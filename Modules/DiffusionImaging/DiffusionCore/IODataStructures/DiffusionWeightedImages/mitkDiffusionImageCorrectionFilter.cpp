@@ -70,8 +70,9 @@ void mitk::DiffusionImageCorrectionFilter<TPixelType>
     mitkThrow() << " No diffusion image given! ";
   }
 
-  GradientDirectionContainerType directions = m_SourceImage->GetDirections();
-  GradientDirectionContainerType corrected_directions;
+  GradientDirectionContainerPointerType directions = m_SourceImage->GetDirections();
+  GradientDirectionContainerPointerType corrected_directions =
+      GradientDirectionContainerType::New();
 
   unsigned int transformed = 0;
   for(size_t i=0; i< directions->Size(); i++ )

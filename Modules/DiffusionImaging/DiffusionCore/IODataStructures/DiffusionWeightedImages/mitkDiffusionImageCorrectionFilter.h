@@ -37,8 +37,9 @@ public:
 
   typedef vnl_vector_fixed< double, 3 >      GradientDirectionType;
   typedef vnl_matrix_fixed< double, 3, 3 >   TransformMatrixType;
-  typedef itk::VectorContainer< unsigned int, GradientDirectionType >::Pointer
+  typedef itk::VectorContainer< unsigned int, GradientDirectionType >
                                              GradientDirectionContainerType;
+  typedef GradientDirectionContainerType::Pointer GradientDirectionContainerPointerType;
 
   typedef std::vector< TransformMatrixType >  TransformsVectorType;
 

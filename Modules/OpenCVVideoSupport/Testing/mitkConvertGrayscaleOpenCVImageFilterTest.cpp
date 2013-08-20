@@ -36,6 +36,8 @@ static void ConvertTestLoadedImage(std::string mitkImagePath)
   MITK_TEST_CONDITION_REQUIRED(image.channels() == 1, "Image must not have more than one channel after grayscale conversion.");
 
   MITK_TEST_CONDITION_REQUIRED(cv::countNonZero(image != comparisonImg) == 0, "All pixel values must be the same between the two converted images.");
+
+  MITK_TEST_CONDITION_REQUIRED(grayscaleFilter->FilterImage(image), "Image conversion should be no problem if image is a grayscale image already.")
 }
 
 /**Documentation

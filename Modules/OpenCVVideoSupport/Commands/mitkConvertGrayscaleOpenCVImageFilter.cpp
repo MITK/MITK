@@ -22,6 +22,9 @@ namespace mitk {
 
 bool ConvertGrayscaleOpenCVImageFilter::FilterImage( cv::Mat& image )
 {
+  // there is nothing to do if the image is grayscale already
+  if (image.channels() == 1) { return true; }
+
   cv::Mat buffer;
 
   cv::cvtColor(image, buffer, CV_RGB2GRAY, 1);

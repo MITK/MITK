@@ -86,6 +86,9 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   // the unweighted images are of same modality
   registrationMethod->SetCrossModalityOff();
 
+  // use the advanced (windowed sinc) interpolation
+  registrationMethod->SetUseAdvancedInterpolation(true);
+
   // Initialize the temporary output image
   mitk::Image::Pointer registeredB0Image = b0Image->Clone();
   const unsigned int numberOfb0Images = b0Image->GetTimeSteps();
@@ -161,6 +164,8 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   AccessFixedDimensionByItk_1(registeredB0Image, ItkAccumulateFilter, (4), b0referenceImage );
 
   weightedRegistrationMethod->SetFixedImage( b0referenceImage );
+  // use the advanced (windowed sinc) interpolation
+  weightedRegistrationMethod->SetUseAdvancedInterpolation(true);
 
   //
   //   - (3.2) Register all timesteps in the splitted image onto the first reference

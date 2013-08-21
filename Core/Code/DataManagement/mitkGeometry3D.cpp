@@ -876,7 +876,7 @@ bool mitk::Equal( const Geometry3D::TransformType *rightHandSide, const Geometry
   if( !mitk::MatrixEqualElementWise( rightHandSide->GetMatrix(),
                                      leftHandSide->GetMatrix()) )
   {
-    MITK_INFO << "[AreEqual( Geometry3D )] Index to World Transformation matrix differs.";
+    MITK_INFO << "[( Geometry3D )] Index to World Transformation matrix differs.";
     MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetMatrix() << " : leftHandSide is " << leftHandSide->GetMatrix() << " and tolerance is " << eps;
     return false;
   }

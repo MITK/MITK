@@ -75,6 +75,7 @@ set(H_FILES
 
 set(CPP_FILES
   Algorithms/mitkBaseDataSource.cpp
+  Algorithms/mitkCompareImageFilter.cpp
   Algorithms/mitkDataNodeSource.cpp
   Algorithms/mitkGeometry2DDataToSurfaceFilter.cpp
   Algorithms/mitkHistogramGenerator.cpp

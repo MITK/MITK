@@ -11,8 +11,10 @@ set(MODULE_TESTS
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
+  mitkGeometry3DAreEqualTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkGlobalInteractionTest.cpp
+  mitkImageAreEqualTest.cpp
   mitkImageDataItemTest.cpp
   #mitkImageMapper2DTest.cpp
   mitkImageGeneratorTest.cpp

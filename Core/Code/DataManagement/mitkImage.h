@@ -565,6 +565,20 @@ public:
     return m_ImageStatistics;
   }
 
+  /**
+    \brief A function comparing two images for beeing identical
+
+    Identical means same dimensionality, same dimensions and same orientation for the geometry and identical voxel values in case of integral pixel types
+    and a difference in the voxel values of less then mitk::eps for floating point pixel types.
+    */
+  static bool AreEqual( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide, ScalarType eps = mitk::eps);
+  static bool AreGeometriesEqual( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide, ScalarType eps = mitk::eps );
+  static bool AreDimensionsEqual( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide );
+  static bool AreDimensionalitiesEqual( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide );
+  static bool ArePixelTypesEqual( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide );
+  static bool ArePixelValuesEqual( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide, ScalarType eps = mitk::eps );
+  static bool AreNotNull(const mitk::Image *rightHandSide, const mitk::Image *leftHandSide);
+
 protected:
 
   int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;
@@ -629,6 +643,7 @@ private:
 
 };
 
+//}
 //##Documentation
 //## @brief Cast an itk::Image (with a specific type) to an mitk::Image.
 //##

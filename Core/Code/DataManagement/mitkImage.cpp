@@ -14,13 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+//MITK
 #include "mitkImage.h"
-
 #include "mitkImageStatisticsHolder.h"
 #include "mitkPixelTypeMultiplex.h"
+#include "mitkCompareImageFilter.h"
 
+//VTK
 #include <vtkImageData.h>
 
+//Other
 #include <cmath>
 
 #define FILL_C_ARRAY( _arr, _size, _value) for(unsigned int i=0u; i<_size; i++) \
@@ -1216,22 +1219,119 @@ bool mitk::Image::IsRotated() const
   return ret;
 }
 
-#include "mitkImageStatisticsHolder.h"
+bool mitk::Image::AreEqual(const mitk::Image* rightHandSide, const mitk::Image* leftHandSide, ScalarType eps)
+{
+  if( !AreNotNull(rightHandSide, leftHandSide))
+    return false;
 
-//##Documentation
+  if( !AreDimensionalitiesEqual(rightHandSide, leftHandSide))
+    return false;
+
+  if( !AreDimensionsEqual(rightHandSide, leftHandSide))
+    return false;
+
+  if( !ArePixelTypesEqual(rightHandSide, leftHandSide))
+    return false;
+
+  if( !AreGeometriesEqual(rightHandSide, leftHandSide, eps))
+    return false;
+
+  if( !ArePixelValuesEqual(rightHandSide, leftHandSide, eps))
+    return false;
+
+  return true;
+}
+
+bool mitk::Image::AreGeometriesEqual(const mitk::Image *rightHandSide, const mitk::Image *leftHandSide, mitk::ScalarType eps)
+{
+  if( !mitk::Geometry3D::AreEqual(rightHandSide->GetGeometry(), leftHandSide->GetGeometry(), eps) )
+    return false;
+  return true;
+}
+
+bool mitk::Image::AreDimensionsEqual(const mitk::Image *rightHandSide, const mitk::Image *leftHandSide)
+{
+  // compare each dimension
+  bool dimensionsIdentical = true;
+  for( unsigned int i=0; i< rightHandSide->GetDimension(); ++i)
+  {
+    if( rightHandSide->GetDimension(i) != leftHandSide->GetDimension(i) )
+    {
+      dimensionsIdentical = false;
+      MITK_INFO << "[AreDimensionsEqual( Image )] dimension differs.";
+      MITK_INFO << "rightHandSide->GetDimension("<<i<<") is " << rightHandSide->GetDimension(i);
+      MITK_INFO << "leftHandSide->GetDimension("<<i<<") is " << leftHandSide->GetDimension(i);
+    }
+  }
+  if(!dimensionsIdentical)
+  {
+    return false;
+  }
+  return true;
+}
+
+bool mitk::Image::AreDimensionalitiesEqual(const mitk::Image *rightHandSide, const mitk::Image *leftHandSide)
+{
+  if( rightHandSide->GetDimension() != leftHandSide->GetDimension() )
+  {
+    MITK_INFO << "[AreDimensionalitiesEqual( Image )] Dimensionality differs.";
+    MITK_INFO << "rightHandSide is " << rightHandSide->GetDimension();
+    MITK_INFO << "leftHandSide is " << leftHandSide->GetDimension();
+    return false;
+  }
+  return true;
+}
+
+bool mitk::Image::ArePixelTypesEqual(const mitk::Image *rightHandSide, const mitk::Image *leftHandSide)
+{
+  mitk::PixelType pixelTypeRightHandSide = rightHandSide->GetPixelType();
+  mitk::PixelType pixelTypeLeftHandSide = leftHandSide->GetPixelType();
+  if( !( pixelTypeRightHandSide == pixelTypeLeftHandSide ) )
+  {
+    MITK_INFO << "[ArePixelTypesEqual( Image )] PixelType differs.";
+    //Todo: why is pixelTypeLeftHandSide.GetPixelTypeAsString() empty?
+    MITK_INFO << "rightHandSide is " << pixelTypeRightHandSide.GetTypeAsString();
+    MITK_INFO << "leftHandSide is " << pixelTypeLeftHandSide.GetTypeAsString();
+    return false;
+  }
+  return true;
+}
+
+bool mitk::Image::ArePixelValuesEqual(const mitk::Image *rightHandSide, const mitk::Image *leftHandSide, ScalarType eps )
+{
+  mitk::CompareImageFilter::Pointer compareFilter = mitk::CompareImageFilter::New();
+  compareFilter->SetInputImage1(rightHandSide);
+  compareFilter->SetInputImage2(leftHandSide);
+  compareFilter->Update();
+  return true;
+}
+
+bool mitk::Image::AreNotNull(const mitk::Image *rightHandSide, const mitk::Image *leftHandSide)
+{
+  if( rightHandSide == NULL )
+  {
+    MITK_INFO << "[AreNotNull( Image )] rightHandSide NULL.";
+    return false;
+  }
+  if( leftHandSide == NULL)
+  {
+    MITK_INFO << "[AreNotNull( Image )] leftHandSide NULL.";
+    return false;
+  }
+  return true;
+}
+
 mitk::ScalarType mitk::Image::GetScalarValueMin(int t) const
 {
   return m_ImageStatistics->GetScalarValueMin(t);
 }
 
-//##Documentation
 //## \brief Get the maximum for scalar images
 mitk::ScalarType mitk::Image::GetScalarValueMax(int t) const
 {
   return m_ImageStatistics->GetScalarValueMax(t);
 }
 
-//##Documentation
 //## \brief Get the second smallest value for scalar images
 mitk::ScalarType mitk::Image::GetScalarValue2ndMin(int t) const
 {

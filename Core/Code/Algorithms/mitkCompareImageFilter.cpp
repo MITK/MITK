@@ -46,13 +46,11 @@ bool mitk::CompareImageFilter::GetResult(size_t threshold)
 {
   if (! m_CompareResult)
   {
-    m_CompareDetails.PrintSelf();
     return false;
   }
 
   if( m_CompareDetails.m_PixelsWithDifference > threshold )
   {
-    m_CompareDetails.PrintSelf();
     return false;
   }
 

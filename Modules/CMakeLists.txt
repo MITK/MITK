@@ -12,7 +12,9 @@ set(module_dirs
     SceneSerialization
     GraphAlgorithms
     SurfaceInterpolation
+    SegmentationContour
     Segmentation
+    SegmentationContourTools
     PlanarFigureSegmentation
     Qmitk
     QmitkExt

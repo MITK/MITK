@@ -27,8 +27,8 @@ set(CPP_FILES
   Controllers/mitkSegmentationInterpolationController.cpp
   Controllers/mitkToolManager.cpp
   DataManagement/mitkContour.cpp
-  DataManagement/mitkContourElement.cpp
-  DataManagement/mitkContourModel.cpp
+  #DataManagement/mitkContourElement.cpp
+  #DataManagement/mitkContourModel.cpp
   DataManagement/mitkContourSet.cpp
   DataManagement/mitkExtrudedContour.cpp
   Interactions/mitkAdaptiveRegionGrowingTool.cpp

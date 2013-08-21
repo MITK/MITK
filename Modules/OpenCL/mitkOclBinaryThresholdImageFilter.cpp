@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkOclBinaryThresholdImageFilter.h"
+#include "usServiceReference.h"
 
 mitk::OclBinaryThresholdImageFilter::OclBinaryThresholdImageFilter()
 : m_ckBinaryThreshold( NULL )
@@ -43,7 +44,7 @@ void mitk::OclBinaryThresholdImageFilter::Update()
   //Check if context & program available
   if (!this->Initialize())
   {
-    mitk::ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+    us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
     OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
 
     // clean-up also the resources
@@ -82,7 +83,6 @@ void mitk::OclBinaryThresholdImageFilter::Execute()
 
   // signalize the GPU-side data changed
   m_Output->Modified( GPU_DATA );
-
 }
 
 bool mitk::OclBinaryThresholdImageFilter::Initialize()

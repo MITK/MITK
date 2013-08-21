@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStandardFileLocations.h>
 #include <mitkConfig.h>
 
+//usService
+#include "usServiceReference.h"
+
 mitk::OclFilter::OclFilter()
   : m_ClFile(),
     m_ClSource(NULL),
@@ -60,7 +63,7 @@ mitk::OclFilter::~OclFilter()
   // release program
   if (m_ClProgram)
   {
-    mitk::ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+    us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
     OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
 
     // remove program from storage
@@ -83,7 +86,7 @@ bool mitk::OclFilter::ExecuteKernel( cl_kernel kernel, unsigned int workSizeDim 
 
 bool mitk::OclFilter::Initialize()
 {
-  mitk::ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+  us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
   OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
 
   m_CommandQue = resources->GetCommandQueue();
@@ -135,7 +138,7 @@ void mitk::OclFilter::CompileSource()
   int clErr = 0;
 
   //get a valid opencl context
-  mitk::ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+  us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
   OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
 
   cl_context gpuContext = resources->GetContext();

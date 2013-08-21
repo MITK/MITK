@@ -47,13 +47,15 @@ namespace itk
     ::TensorReconstructionWithEigenvalueCorrectionFilter()
   {
     m_B0Threshold = 50.0;
+    m_Flagstatus = 0;
   }
 
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
   TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
-  ::GenerateData ( )
+  ::GenerateData ()
   {
+
     m_GradientImagePointer = static_cast< GradientImagesType * >(
       this->ProcessObject::GetInput(0) );
 
@@ -144,7 +146,16 @@ namespace itk
     }
 
     double max_diagonal = diagonal.max_value();
-    directions=directions*sqrt(m_BValue/1000.0)*(1.0/sqrt(max_diagonal));
+
+    if (m_Flagstatus == 1)
+    {
+      directions=directions*sqrt(m_BValue/1000.0)*(1.0/sqrt(max_diagonal));
+    }
+    else
+    {
+      directions=directions*sqrt(m_BValue)*(1.0/sqrt(max_diagonal));
+    }
+
     dirsTimesDirsTrans = directions*directions.transpose();
 
     for (int i=0;i<nof-numberb0;i++)

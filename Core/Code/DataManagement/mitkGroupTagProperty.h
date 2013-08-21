@@ -41,8 +41,6 @@ class MITK_CORE_EXPORT GroupTagProperty : public BaseProperty
     mitkClassMacro(GroupTagProperty, BaseProperty);
     itkNewMacro(GroupTagProperty);
 
-    Pointer Clone() const;
-
     using BaseProperty::operator=;
 
   protected:

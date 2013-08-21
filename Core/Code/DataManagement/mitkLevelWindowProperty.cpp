@@ -79,12 +79,6 @@ std::string mitk::LevelWindowProperty::GetValueAsString() const
   return myStr.str();
 }
 
-mitk::LevelWindowProperty::Pointer mitk::LevelWindowProperty::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer mitk::LevelWindowProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

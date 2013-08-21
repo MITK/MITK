@@ -112,7 +112,7 @@ public:
   //## Set the requested region from this data object to match the requested
   //## region of the data object passed in as a parameter.  This method is
   //## implemented in the concrete subclasses of DataObject.
-  virtual void SetRequestedRegion(itk::DataObject *data);
+  virtual void SetRequestedRegion( const itk::DataObject *data);
 
   //##Documentation
   //## Set the requested region from this data object to match the requested

@@ -98,6 +98,5 @@ namespace mitk
 
 } //namespace MITK
 
-//#include "mitkNrrdTbssImageReader.cpp"
 
 #endif // __mitkNrrdTbssImageReader_h

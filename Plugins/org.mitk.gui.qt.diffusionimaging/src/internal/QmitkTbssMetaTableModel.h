@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QmitkTbssMetaTableModel : public QAbstractTableModel
 {
 
-  //Q_OBJECT
+  // TableModel to model pairs of group description and group number
 
 public:
   QmitkTbssMetaTableModel(QObject *parent=0);

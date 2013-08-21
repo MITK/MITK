@@ -22,67 +22,51 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkImage.h"
 #include "itkVectorImage.h"
-#include "itkImageFileReader.h"
+
 #include "mitkTbssImage.h"
 #include "QuantificationExports.h"
 
 
-
 namespace mitk
 {
-  //template<class TPixelType>
+
+/**
+  * \brief Converts FSL TBSS data (4D skeleton projection images) to a NRRD image with meta data.
+  *
+  * The TBSS pipeline of FSL produces a 4D image containing the 3D skeleton projections of all individuals.
+  * This class converts the FSL Nifty image to NRRD and adds information about the type of measurement and the study groups.
+  */
+
   class Quantification_EXPORT TbssImporter : public itk::Object {
 
   public:
-   // typedef TPixelType PixelType;
-    typedef itk::VectorImage<float,3> DataImageType; // type of the 3d vector image containing the skeletonized images
-    typedef itk::VectorImage<int,3> VectorImageType; // Datatype of the tbss gradient images
-    typedef itk::Image<float, 4> FloatImage4DType;
-    typedef itk::ImageFileReader<FloatImage4DType> FileReaderType4D;
-    typedef itk::ImageFileReader<VectorImageType> VectorReaderType;
 
-    typedef itk::Image<float, 3> FloatImage3DType;
-    typedef itk::ImageFileReader<FloatImage3DType> FileReaderType3D;
-
-
+    // type of the 3d vector image containing the skeletonized images
+    typedef itk::VectorImage<float,3> DataImageType;
 
     mitkClassMacro( TbssImporter, Object )
     itkNewMacro(Self)
 
 
-
-
+    /* \brief Converts the FSL Nifty to NRRD and adds the meta data */
     mitk::TbssImage::Pointer Import();
 
-    mitk::TbssImage::Pointer ImportMeta();
 
-
+    /* \brief Group info is set by providing a vector with pairs of group name and number*/
     void SetGroupInfo(std::vector< std::pair<std::string, int> > groups)
     {
       m_Groups = groups;
     }
 
-    std::vector< std::pair<std::string, int> > GetGroupInfo()
-    {
-      return m_Groups;
-    }
 
-    void SetTbssDatasets(std::vector< std::pair<std::string, std::string> > files)
-    {
-      m_MetaFiles = files;
-    }
-
+    /* \brief Used to indicate the type of measurement */
     void SetMeasurementInfo(std::string s)
     {
       m_MeasurementInfo = s;
     }
 
-    std::string GetMeasurementInfo()
-    {
-      return m_MeasurementInfo;
-    }
 
-
+    /* \brief Sets the FSL import volume */
     void SetImportVolume(mitk::Image::Pointer inputVolume)
     {
       m_InputVolume = inputVolume;
@@ -95,21 +79,18 @@ namespace mitk
     virtual ~TbssImporter(){}
 
     DataImageType::Pointer m_Data;
+
     std::vector< std::pair<std::string, int> > m_Groups;
-    std::vector< std::pair<std::string, std::string> > m_MetaFiles;
 
     std::string m_MeasurementInfo;
-
 
     mitk::Image::Pointer m_InputVolume;
 
 
-    mitk::TbssImage::MetaDataFunction RetrieveTbssFunction(std::string s);
 
 
   };
 
 }
 
-//#include "mitkTbssImporter.cpp"
 #endif // __mitkTbssImporter_h

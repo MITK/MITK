@@ -67,12 +67,6 @@ void mitk::ModalityProperty::AddEnumerationTypes()
   AddEnum( "Power Doppler", newId++ ); // ultrasound
 }
 
-mitk::ModalityProperty::Pointer mitk::ModalityProperty::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer mitk::ModalityProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

@@ -31,7 +31,7 @@ class NavigationDataTestClass
       mitk::NavigationData::OrientationType o(1.0, 2.0, 3.0, 4.0);
       nd->SetOrientation(o);
       nd->SetDataValid(true);
-      nd->SetTimeStamp(100.111);
+      nd->SetIGTTimeStamp(100.111);
       nd->SetHasPosition(false);
       nd->SetHasOrientation(false);
       mitk::NavigationData::CovarianceMatrixType m;
@@ -68,8 +68,8 @@ class NavigationDataTestClass
       nd->SetDataValid(true);
       MITK_TEST_CONDITION(nd->IsDataValid() == true, "Set-/IsDataValid()");
 
-      nd->SetTimeStamp(100.111);
-      MITK_TEST_CONDITION(mitk::Equal(nd->GetTimeStamp(), 100.111), "Set-/GetTimeStamp()");
+      nd->SetIGTTimeStamp(100.111);
+      MITK_TEST_CONDITION(mitk::Equal(nd->GetIGTTimeStamp(), 100.111), "Set-/GetIGTTimeStamp()");
 
       nd->SetHasPosition(false);
       MITK_TEST_CONDITION(nd->GetHasPosition() == false, "Set-/GetHasPosition()");
@@ -112,7 +112,7 @@ class NavigationDataTestClass
     bool graftIsEqual = (nd->GetPosition() == graftedCopy->GetPosition())
                      && (nd->GetOrientation() == graftedCopy->GetOrientation())
                      && (nd->IsDataValid() == graftedCopy->IsDataValid())
-                     && mitk::Equal(nd->GetTimeStamp(), graftedCopy->GetTimeStamp())
+                     && mitk::Equal(nd->GetIGTTimeStamp(), graftedCopy->GetIGTTimeStamp())
                      && (nd->GetHasPosition() == graftedCopy->GetHasPosition())
                      && (nd->GetHasOrientation() == graftedCopy->GetHasOrientation())
                      && (nd->GetCovErrorMatrix() == graftedCopy->GetCovErrorMatrix())

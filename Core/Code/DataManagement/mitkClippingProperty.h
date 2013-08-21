@@ -50,8 +50,6 @@ public:
   mitkNewMacro2Param( ClippingProperty,
     const Point3D &, const Vector3D & );
 
-  Pointer Clone() const;
-
   bool GetClippingEnabled() const;
   void SetClippingEnabled( bool enabled );
 

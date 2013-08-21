@@ -18,8 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
-#include "mitkExtractImageFilter.h"
 #include "mitkImageTimeSelector.h"
+#include <mitkExtractSliceFilter.h>
+//#include <mitkPlaneGeometry.h>
 
 #include "mitkShapeBasedInterpolationAlgorithm.h"
 
@@ -388,9 +389,15 @@ void mitk::SegmentationInterpolationController::PrintStatus()
   }
 }
 
-mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep )
+mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, const mitk::PlaneGeometry* currentPlane, unsigned int timeStep )
 {
   if (m_Segmentation.IsNull()) return NULL;
+
+
+  if(!currentPlane)
+  {
+    return NULL;
+  }
 
   if ( timeStep >= m_SegmentationCountInSlice.size() ) return NULL;
   if ( sliceDimension > 2 ) return NULL;
@@ -435,37 +442,58 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
   mitk::Image::Pointer lowerMITKSlice;
   mitk::Image::Pointer upperMITKSlice;
   mitk::Image::Pointer resultImage;
+
   try
   {
-  // extract the two neighoring slices from the segmentation volume
-    ExtractImageFilter::Pointer extractor= ExtractImageFilter::New();
-    extractor->SetInput( m_Segmentation );
-    extractor->SetSliceDimension( sliceDimension );
-    extractor->SetSliceIndex( lowerBound );
-    extractor->SetTimeStep( timeStep );
-    extractor->Update();
-    lowerMITKSlice = extractor->GetOutput();
-    lowerMITKSlice->DisconnectPipeline(); // otherwise the next output of the filter will overwrite this pointer, too
+    //Setting up the ExtractSliceFilter
+    mitk::ExtractSliceFilter::Pointer extractor = ExtractSliceFilter::New();
+    extractor->SetInput(m_Segmentation);
+    extractor->SetTimeStep(timeStep);
+    extractor->SetResliceTransformByGeometry( m_Segmentation->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+    extractor->SetVtkOutputRequest(false);
 
-    extractor->SetInput( m_Segmentation );
-    extractor->SetSliceDimension( sliceDimension );
-    extractor->SetSliceIndex( sliceIndex );
-    extractor->SetTimeStep( timeStep );
+    //Reslicing the current plane
+    extractor->SetWorldGeometry(currentPlane);
+    extractor->Modified();
     extractor->Update();
     resultImage = extractor->GetOutput();
     resultImage->DisconnectPipeline();
 
-    extractor->SetInput( m_Segmentation );
-    extractor->SetSliceDimension( sliceDimension );
-    extractor->SetSliceIndex( upperBound );
-    extractor->SetTimeStep( timeStep );
+    //Creating PlaneGeometry for lower slice
+    mitk::PlaneGeometry::Pointer reslicePlane = currentPlane->Clone();
+
+    //Transforming the current origin so that it matches the lower slice
+    mitk::Point3D origin = currentPlane->GetOrigin();
+    m_Segmentation->GetSlicedGeometry()->WorldToIndex(origin, origin);
+    origin[sliceDimension] = lowerBound;
+    m_Segmentation->GetSlicedGeometry()->IndexToWorld(origin, origin);
+    reslicePlane->SetOrigin(origin);
+
+    //Extract the lower slice
+    extractor->SetWorldGeometry(reslicePlane);
+    extractor->Modified();
+    extractor->Update();
+    lowerMITKSlice = extractor->GetOutput();
+    lowerMITKSlice->DisconnectPipeline();
+
+    //Transforming the current origin so that it matches the upper slice
+    m_Segmentation->GetSlicedGeometry()->WorldToIndex(origin, origin);
+    origin[sliceDimension] = upperBound;
+    m_Segmentation->GetSlicedGeometry()->IndexToWorld(origin, origin);
+    reslicePlane->SetOrigin(origin);
+
+    //Extract the upper slice
+    extractor->SetWorldGeometry(reslicePlane);
+    extractor->Modified();
     extractor->Update();
     upperMITKSlice = extractor->GetOutput();
+    upperMITKSlice->DisconnectPipeline();
 
     if ( lowerMITKSlice.IsNull() || upperMITKSlice.IsNull() ) return NULL;
   }
-  catch(...)
+  catch(const std::exception &e)
   {
+    MITK_ERROR<<"Error in 2D interpolation: "<<e.what();
     return NULL;
   }
 
@@ -486,6 +514,5 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
                                  resultImage,
                                  timeStep,
                                  m_ReferenceImage );
-
 }
 

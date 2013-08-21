@@ -23,10 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::RenderWindowBase::RenderWindowBase( )
-: m_ProcessWheelEvents(true),
-m_InvertScrollingDirection(false)
 {
-
 }
 
 /*
@@ -106,13 +103,10 @@ void mitk::RenderWindowBase::mouseMoveMitkEvent(mitk::MouseEvent *me)
 
 void mitk::RenderWindowBase::wheelMitkEvent(mitk::WheelEvent *we)
 {
-  if ( !m_ProcessWheelEvents )
+  if(m_Renderer.IsNotNull())
   {
-    if(m_Renderer.IsNotNull())
-      m_Renderer->WheelEvent(we);
-    return;
+    m_Renderer->WheelEvent(we);
   }
-
 }
 
 void mitk::RenderWindowBase::keyPressMitkEvent(mitk::KeyEvent* mke)
@@ -166,21 +160,4 @@ mitk::BaseController * mitk::RenderWindowBase::GetController()
 mitk::VtkPropRenderer* mitk::RenderWindowBase::GetRenderer()
 {
   return m_Renderer;
-}
-
-
-
-void mitk::RenderWindowBase::SetProcessWheelEvents( bool state )
-{
-  m_ProcessWheelEvents = state;
-}
-
-bool mitk::RenderWindowBase::GetProcessWheelEvents()
-{
-  return m_ProcessWheelEvents;
-}
-
-void mitk::RenderWindowBase::SetInvertScrollingDirection( bool invert )
-{
-  m_InvertScrollingDirection = invert;
 }

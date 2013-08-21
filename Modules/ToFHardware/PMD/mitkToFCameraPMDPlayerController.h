@@ -61,6 +61,11 @@ namespace mitk
 
   protected:
 
+    /*
+    \brief Transform method used for phyical camera devices. For the player no transform is needed.
+    */
+    virtual void TransformCameraOutput(float* in, float* out, bool isDist){};
+
     ToFCameraPMDPlayerController();
 
     ~ToFCameraPMDPlayerController();

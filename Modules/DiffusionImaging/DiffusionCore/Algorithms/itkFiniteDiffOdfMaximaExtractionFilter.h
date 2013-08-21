@@ -100,7 +100,7 @@ Image< Vector< PixelType, 3 >, 3 > >
     ~FiniteDiffOdfMaximaExtractionFilter(){}
 
     void BeforeThreadedGenerateData();
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int threadID );
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadID );
     void AfterThreadedGenerateData();
 
     /** Extract all local maxima from the densely sampled ODF surface. Thresholding possible. **/

@@ -46,8 +46,6 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
 
     typedef itk::Object::Pointer ValueType;
 
-    Pointer Clone() const;
-
     itk::Object::Pointer GetSmartPointer() const;
     ValueType GetValue() const;
 

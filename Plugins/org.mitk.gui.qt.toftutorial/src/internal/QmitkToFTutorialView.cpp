@@ -99,7 +99,7 @@ void QmitkToFTutorialView::OnStep1()
     // update image grabber which itself represents the source of a MITK filter pipeline
     tofImageGrabber->Update();
     // grab distance image
-    mitk::Image::Pointer distanceImage = tofImageGrabber->GetOutput(0);
+    mitk::Image::Pointer distanceImage = tofImageGrabber->GetOutput();
     // grab amplitude image
     mitk::Image::Pointer amplitudeImage = tofImageGrabber->GetOutput(1);
     // grab intensity image

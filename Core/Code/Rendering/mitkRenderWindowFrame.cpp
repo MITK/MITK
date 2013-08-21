@@ -143,7 +143,7 @@ bool mitk::RenderWindowFrame::VerifyRequestedRegion()
     return true;
 }
 
-void mitk::RenderWindowFrame::SetRequestedRegion(itk::DataObject*)
+void mitk::RenderWindowFrame::SetRequestedRegion( const itk::DataObject*)
 {
     //nothing to do
 }

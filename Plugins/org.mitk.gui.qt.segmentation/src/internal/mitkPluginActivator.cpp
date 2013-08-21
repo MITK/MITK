@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkThresholdAction.h"
 #include "QmitkOtsuAction.h"
 #include "QmitkCreatePolygonModelAction.h"
-#include "QmitkStatisticsAction.h"
 #include "QmitkAutocropAction.h"
 #include "QmitkSegmentationPreferencePage.h"
 #include "QmitkDeformableClippingPlaneView.h"
@@ -35,7 +34,6 @@ void PluginActivator::start(ctkPluginContext *context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkThresholdAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkOtsuAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkCreatePolygonModelAction, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkStatisticsAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAutocropAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDeformableClippingPlaneView, context)

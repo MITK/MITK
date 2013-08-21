@@ -8,19 +8,12 @@ macro(MITK_INSTALL_HELPER_APP)
 
   # TODO: how to supply to correct intermediate directory??
   # CMAKE_CFG_INTDIR is not expanded to actual values inside the install(CODE "...") macro ...
-  set(intermediate_dir )
+  set(intermediate_dir .)
   if(WIN32 AND NOT MINGW)
     set(intermediate_dir Release)
   endif()
 
-  set(DIRS
-    ${VTK_RUNTIME_LIBRARY_DIRS}/${intermediate_dir}
-    ${ITK_LIBRARY_DIRS}/${intermediate_dir}
-    ${QT_LIBRARY_DIR}
-  ${QT_LIBRARY_DIR}/../bin
-    ${MITK_BINARY_DIR}/bin/${intermediate_dir}
-    ${_install_LIBRARY_DIRS}
-    )
+  mitkFunctionGetLibrarySearchPaths(DIRS ${intermediate_dir})
 
   if(APPLE)
     list(APPEND DIRS "/usr/lib")

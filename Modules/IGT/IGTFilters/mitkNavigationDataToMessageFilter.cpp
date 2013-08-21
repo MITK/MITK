@@ -68,8 +68,8 @@ void mitk::NavigationDataToMessageFilter::GenerateData()
     if ((output->GetCovErrorMatrix().GetVnlMatrix() - input->GetCovErrorMatrix().GetVnlMatrix()).absolute_value_max() > m_CovErrorEpsilon)
       m_ErrorChangedMessage.Send(input->GetCovErrorMatrix(), i);
 
-    if (fabs(output->GetTimeStamp() - input->GetTimeStamp()) > m_TimeStampEpsilon)
-      m_TimeStampChangedMessage.Send(input->GetTimeStamp(), i);
+    if (fabs(output->GetIGTTimeStamp() - input->GetIGTTimeStamp()) > m_TimeStampEpsilon)
+      m_TimeStampChangedMessage.Send(input->GetIGTTimeStamp(), i);
 
     if (input->IsDataValid() != output->IsDataValid())
       m_DataValidChangedMessage.Send(input->IsDataValid(), i);

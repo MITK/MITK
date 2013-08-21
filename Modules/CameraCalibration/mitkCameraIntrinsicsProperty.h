@@ -39,8 +39,6 @@ public:
   itkNewMacro(CameraIntrinsicsProperty);
   mitkNewMacro1Param(CameraIntrinsicsProperty, mitk::CameraIntrinsics::Pointer);
 
-  Pointer Clone() const;
-
   itkSetMacro(Value, mitk::CameraIntrinsics::Pointer );
   itkGetConstMacro(Value, mitk::CameraIntrinsics::Pointer );
 

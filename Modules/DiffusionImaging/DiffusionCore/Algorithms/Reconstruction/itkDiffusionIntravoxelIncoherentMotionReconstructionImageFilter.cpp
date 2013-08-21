@@ -184,13 +184,13 @@ MeasAndBvals DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, T
     retval.N = newmeas.size();
 
     retval.meas.set_size(retval.N);
-    for(int i=0; i<newmeas.size(); i++)
+    for(size_t i=0; i<newmeas.size(); i++)
     {
         retval.meas[i] = newmeas[i];
     }
 
     retval.bvals.set_size(retval.N);
-    for(int i=0; i<newbvals.size(); i++)
+    for(size_t i=0; i<newbvals.size(); i++)
     {
         retval.bvals[i] = newbvals[i];
     }
@@ -201,11 +201,11 @@ MeasAndBvals DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, T
 template< class TIn, class TOut>
 void DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, TOut>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-                       int )
+                       ThreadIdType )
 {
 
     typename OutputImageType::Pointer outputImage =
-            static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+            static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
     oit.GoToBegin();
 
@@ -682,7 +682,7 @@ void DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, TOut>
     if(m_Method == IVIM_REGULARIZED)
     {
         typename OutputImageType::Pointer outputImage =
-                static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+                static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
         ImageRegionIterator< OutputImageType > oit0(outputImage, outputImage->GetLargestPossibleRegion());
         oit0.GoToBegin();
 

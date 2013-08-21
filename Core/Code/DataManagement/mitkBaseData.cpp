@@ -19,13 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactoryBase.h>
 
 
-#define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
-
 mitk::BaseData::BaseData() :
-  m_RequestedRegionInitialized(false), m_SmartSourcePointer(NULL),
-  m_SourceOutputIndexDuplicate(0), m_Initialized(true),
-  m_Unregistering(false), m_CalculatingExternalReferenceCount(false),
-  m_ExternalReferenceCount(-1)
+  m_RequestedRegionInitialized(false),
+  m_SourceOutputIndexDuplicate(0), m_Initialized(true)
 {
   m_TimeSlicedGeometry = TimeSlicedGeometry::New();
   m_PropertyList = PropertyList::New();
@@ -34,11 +30,8 @@ mitk::BaseData::BaseData() :
 mitk::BaseData::BaseData( const BaseData &other ):
 itk::DataObject(), mitk::OperationActor(),
 m_RequestedRegionInitialized(other.m_RequestedRegionInitialized),
-m_SmartSourcePointer(other.m_SmartSourcePointer),
 m_SourceOutputIndexDuplicate(other.m_SourceOutputIndexDuplicate),
-m_Initialized(other.m_Initialized), m_Unregistering(other.m_Unregistering),
-m_CalculatingExternalReferenceCount(other.m_CalculatingExternalReferenceCount),
-m_ExternalReferenceCount(other.m_ExternalReferenceCount)
+m_Initialized(other.m_Initialized)
 {
   m_TimeSlicedGeometry = dynamic_cast<mitk::TimeSlicedGeometry*>(other.m_TimeSlicedGeometry->Clone().GetPointer());
   m_PropertyList = other.m_PropertyList->Clone();
@@ -46,7 +39,7 @@ m_ExternalReferenceCount(other.m_ExternalReferenceCount)
 
 mitk::BaseData::~BaseData()
 {
-  m_SmartSourcePointer = NULL;
+
 }
 
 void mitk::BaseData::InitializeTimeSlicedGeometry(unsigned int timeSteps)
@@ -158,86 +151,9 @@ bool mitk::BaseData::IsEmpty() const
   return true;
 }
 
-itk::SmartPointer<mitk::BaseProcess> mitk::BaseData::GetSource() const
+itk::SmartPointer<mitk::BaseDataSource> mitk::BaseData::GetSource() const
 {
-  return static_cast<mitk::BaseProcess*>(Superclass::GetSource().GetPointer());
-}
-
-int mitk::BaseData::GetExternalReferenceCount() const
-{
-  if(m_CalculatingExternalReferenceCount==false) //this is only needed because a smart-pointer to m_Outputs (private!!) must be created by calling GetOutputs.
-  {
-    m_CalculatingExternalReferenceCount = true;
-
-    m_ExternalReferenceCount = -1;
-
-    int realReferenceCount = GetReferenceCount();
-
-    if(GetSource().IsNull())
-    {
-      m_ExternalReferenceCount = realReferenceCount;
-      m_CalculatingExternalReferenceCount = false;
-      return m_ExternalReferenceCount;
-    }
-
-    mitk::BaseProcess::DataObjectPointerArray outputs = m_SmartSourcePointer->GetOutputs();
-
-    unsigned int idx;
-    for (idx = 0; idx < outputs.size(); ++idx)
-    {
-      //references of outputs that are not referenced from someone else (reference additional to the reference from this BaseProcess object) are interpreted as non-existent
-      if(outputs[idx]==this)
-        --realReferenceCount;
-    }
-    m_ExternalReferenceCount = realReferenceCount;
-    if(m_ExternalReferenceCount<0)
-      m_ExternalReferenceCount=0;
-    m_CalculatingExternalReferenceCount = false;
-  }
-  else
-    return -1;
-  return m_ExternalReferenceCount;
-}
-
-void mitk::BaseData::UnRegister() const
-{
-#ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
-  if(GetReferenceCount()>1)
-  {
-    Superclass::UnRegister();
-    if((m_Unregistering==false) && (m_SmartSourcePointer.IsNotNull()))
-    {
-      m_Unregistering=true;
-      // the order of the following boolean statement is important:
-      // this->GetSource() returns a SmartPointer,
-      // which increases and afterwards decreases the reference count,
-      // which may result in an ExternalReferenceCount of 0, causing
-      // BaseProcess::UnRegister() to destroy us (also we already
-      // about to do that).
-      if((this->m_SmartSourcePointer->GetExternalReferenceCount()==0) || (this->GetSource().IsNull()))
-        m_SmartSourcePointer=NULL; // now the reference count is zero and this object has been destroyed; thus nothing may be done after this line!!
-      else
-        m_Unregistering=false;
-    }
-  }
-  else
-#endif
-    Superclass::UnRegister(); // now the reference count is zero and this object has been destroyed; thus nothing may be done after this line!!
-}
-
-void mitk::BaseData::ConnectSource(itk::ProcessObject *arg, unsigned int idx) const
-{
-#ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
-  itkDebugMacro( "connecting source  " << arg
-    << ", source output index " << idx);
-
-  if ( GetSource().GetPointer() != arg || m_SourceOutputIndexDuplicate != idx)
-  {
-    m_SmartSourcePointer = dynamic_cast<mitk::BaseProcess*>(arg);
-    m_SourceOutputIndexDuplicate = idx;
-    Modified();
-  }
-#endif
+  return static_cast<mitk::BaseDataSource*>(Superclass::GetSource().GetPointer());
 }
 
 mitk::PropertyList::Pointer mitk::BaseData::GetPropertyList() const
@@ -304,6 +220,11 @@ unsigned long mitk::BaseData::GetMTime() const
     //}
   }
   return time;
+}
+
+void mitk::BaseData::Graft(const itk::DataObject*)
+{
+  itkExceptionMacro(<< "Graft not implemented for mitk::BaseData subclass " << this->GetNameOfClass())
 }
 
 void mitk::BaseData::CopyInformation( const itk::DataObject* data )

@@ -776,7 +776,7 @@ void QmitkPointBasedRegistrationView::UndoTransformation()
 {
   if(!m_UndoPointsGeometryList.empty())
   {
-    mitk::AffineGeometryFrame3D::Pointer movingLandmarksGeometry = m_MovingLandmarks->GetGeometry(0)->Clone();
+    mitk::Geometry3D::Pointer movingLandmarksGeometry = m_MovingLandmarks->GetGeometry(0)->Clone();
     m_RedoPointsGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingLandmarksGeometry.GetPointer()));
     m_MovingLandmarks->SetGeometry(m_UndoPointsGeometryList.back());
     m_UndoPointsGeometryList.pop_back();
@@ -785,7 +785,7 @@ void QmitkPointBasedRegistrationView::UndoTransformation()
     m_MovingPointSetNode->SetMapper(1, NULL);
 
     mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
-    mitk::AffineGeometryFrame3D::Pointer movingGeometry = movingData->GetGeometry(0)->Clone();
+    mitk::Geometry3D::Pointer movingGeometry = movingData->GetGeometry(0)->Clone();
     m_RedoGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingGeometry.GetPointer()));
     movingData->SetGeometry(m_UndoGeometryList.back());
     m_UndoGeometryList.pop_back();
@@ -814,7 +814,7 @@ void QmitkPointBasedRegistrationView::RedoTransformation()
 {
   if(!m_RedoPointsGeometryList.empty())
   {
-    mitk::AffineGeometryFrame3D::Pointer movingLandmarksGeometry = m_MovingLandmarks->GetGeometry(0)->Clone();
+    mitk::Geometry3D::Pointer movingLandmarksGeometry = m_MovingLandmarks->GetGeometry(0)->Clone();
     m_UndoPointsGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingLandmarksGeometry.GetPointer()));
     m_MovingLandmarks->SetGeometry(m_RedoPointsGeometryList.back());
     m_RedoPointsGeometryList.pop_back();
@@ -823,7 +823,7 @@ void QmitkPointBasedRegistrationView::RedoTransformation()
     m_MovingPointSetNode->SetMapper(1, NULL);
 
     mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
-    mitk::AffineGeometryFrame3D::Pointer movingGeometry = movingData->GetGeometry(0)->Clone();
+    mitk::Geometry3D::Pointer movingGeometry = movingData->GetGeometry(0)->Clone();
     m_UndoGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingGeometry.GetPointer()));
     movingData->SetGeometry(m_RedoGeometryList.back());
     m_RedoGeometryList.pop_back();
@@ -1008,11 +1008,11 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbasedWithICP()
   if(CheckCalculate())
   {
     mitk::Geometry3D::Pointer pointsGeometry = m_MovingLandmarks->GetGeometry(0);
-    mitk::AffineGeometryFrame3D::Pointer movingLandmarksGeometry = m_MovingLandmarks->GetGeometry(0)->Clone();
+    mitk::Geometry3D::Pointer movingLandmarksGeometry = m_MovingLandmarks->GetGeometry(0)->Clone();
     m_UndoPointsGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingLandmarksGeometry.GetPointer()));
 
     mitk::BaseData::Pointer originalData = m_MovingNode->GetData();
-    mitk::AffineGeometryFrame3D::Pointer originalDataGeometry = originalData->GetGeometry(0)->Clone();
+    mitk::Geometry3D::Pointer originalDataGeometry = originalData->GetGeometry(0)->Clone();
     m_UndoGeometryList.push_back(static_cast<mitk::Geometry3D *>(originalDataGeometry.GetPointer()));
 
     vtkIdType pointId;
@@ -1103,12 +1103,12 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbased()
   if(CheckCalculate())
   {
     mitk::Geometry3D::Pointer pointsGeometry = m_MovingLandmarks->GetGeometry(0);
-    mitk::AffineGeometryFrame3D::Pointer movingLandmarksGeometry = m_MovingLandmarks->GetGeometry(0)->Clone();
-    m_UndoPointsGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingLandmarksGeometry.GetPointer()));
+    mitk::Geometry3D::Pointer movingLandmarksGeometry = m_MovingLandmarks->GetGeometry(0)->Clone();
+    m_UndoPointsGeometryList.push_back(movingLandmarksGeometry.GetPointer());
 
     mitk::BaseData::Pointer originalData = m_MovingNode->GetData();
-    mitk::AffineGeometryFrame3D::Pointer originalDataGeometry = originalData->GetGeometry(0)->Clone();
-    m_UndoGeometryList.push_back(static_cast<mitk::Geometry3D *>(originalDataGeometry.GetPointer()));
+    mitk::Geometry3D::Pointer originalDataGeometry = originalData->GetGeometry(0)->Clone();
+    m_UndoGeometryList.push_back(originalDataGeometry.GetPointer());
 
     vtkIdType pointId;
     vtkPoints* vPointsSource=vtkPoints::New();

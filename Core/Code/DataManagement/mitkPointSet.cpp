@@ -25,26 +25,27 @@ mitk::PointSet::PointSet()
   this->InitializeEmpty();
 }
 
-mitk::PointSet::PointSet(const PointSet &other): BaseData(other)
+mitk::PointSet::PointSet(const PointSet &other)
+  : BaseData(other)
+  , m_PointSetSeries(other.GetPointSetSeriesSize())
+  , m_CalculateBoundingBox(true)
 {
-   // Copy overall geometry information
-   this->SetGeometry(other.GetGeometry());
-
-   // Copy geometry information of every single timestep
-   for (unsigned int t=0; t < other.GetTimeSteps(); t++)
-   {
-      this->SetClonedGeometry( other.GetGeometry(t) );
-   }
-
-   // Expand to desired amount of timesteps
-   this->Expand(other.GetTimeSteps());
 
    // Copy points
-   for (unsigned int t=0; t < other.GetTimeSteps(); t++)
+   for (std::size_t t = 0; t < m_PointSetSeries.size(); ++t)
    {
-      for (int i=0; i< other.GetSize(t); i++)
+     m_PointSetSeries[t] = DataType::New();
+
+     DataType::Pointer otherPts = other.GetPointSet(t);
+     for (PointsConstIterator i = other.Begin(t);
+          i != other.End(t); ++i)
       {
-         this->InsertPoint(i, other.GetPoint(i,t), t);
+       m_PointSetSeries[t]->SetPoint(i.Index(), i.Value());
+       PointDataType pointData;
+       if (otherPts->GetPointData(i.Index(), &pointData))
+       {
+         m_PointSetSeries[t]->SetPointData(i.Index(), pointData);
+       }
       }
    }
 }
@@ -138,6 +139,42 @@ mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet( int t ) const
   {
     return NULL;
   }
+}
+
+mitk::PointSet::PointsIterator mitk::PointSet::Begin( int t )
+{
+  if (t >= 0 && t < static_cast<int>(m_PointSetSeries.size()))
+  {
+    return m_PointSetSeries[t]->GetPoints()->Begin();
+  }
+  return PointsIterator();
+}
+
+mitk::PointSet::PointsConstIterator mitk::PointSet::Begin(int t) const
+{
+  if (t >= 0 && t < static_cast<int>(m_PointSetSeries.size()))
+  {
+    return m_PointSetSeries[t]->GetPoints()->Begin();
+  }
+  return PointsConstIterator();
+}
+
+mitk::PointSet::PointsIterator mitk::PointSet::End( int t )
+{
+  if (t >= 0 && t < static_cast<int>(m_PointSetSeries.size()))
+  {
+    return m_PointSetSeries[t]->GetPoints()->End();
+  }
+  return PointsIterator();
+}
+
+mitk::PointSet::PointsConstIterator mitk::PointSet::End(int t) const
+{
+  if (t >= 0 && t < static_cast<int>(m_PointSetSeries.size()))
+  {
+    return m_PointSetSeries[t]->GetPoints()->End();
+  }
+  return PointsConstIterator();
 }
 
 int mitk::PointSet::SearchPoint( Point3D point, float distance, int t  ) const
@@ -287,27 +324,7 @@ void mitk::PointSet::SetPoint( PointIdentifier id, PointType point, PointSpecifi
 
 void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, int t )
 {
-  if ( (unsigned int) t < m_PointSetSeries.size() )
-  {
-    mitk::Point3D indexPoint;
-    mitk::Geometry3D* tempGeometry = this->GetGeometry( t );
-    if (tempGeometry == NULL)
-    {
-      MITK_INFO<< __FILE__ << ", l." << __LINE__ << ": GetGeometry of "<< t <<" returned NULL!" << std::endl;
-      return;
-    }
-    tempGeometry->WorldToIndex( point, indexPoint );
-    m_PointSetSeries[t]->GetPoints()->InsertElement( id, indexPoint );
-    PointDataType defaultPointData;
-    defaultPointData.id = id;
-    defaultPointData.selected = false;
-    defaultPointData.pointSpec = mitk::PTUNDEFINED;
-    m_PointSetSeries[t]->GetPointData()->InsertElement(id, defaultPointData);
-
-    //boundingbox has to be computed anyway
-    m_CalculateBoundingBox = true;
-    this->Modified();
-  }
+  this->InsertPoint(id, point, mitk::PTUNDEFINED, t);
 }
 
 
@@ -737,7 +754,7 @@ bool mitk::PointSet::VerifyRequestedRegion()
     return true;
 }
 
-void mitk::PointSet::SetRequestedRegion( itk::DataObject * )
+void mitk::PointSet::SetRequestedRegion(const DataObject * )
 {
 }
 
@@ -794,4 +811,9 @@ bool mitk::PointSet::SwapPointContents(PointIdentifier id1, PointIdentifier id2,
   m_PointSetSeries[timeStep]->SetPoint(id2, p1);
   m_PointSetSeries[timeStep]->SetPointData(id2, data1);
   return true;
+}
+
+bool mitk::PointSet::PointDataType::operator ==(const mitk::PointSet::PointDataType &other) const
+{
+  return id == other.id && selected == other.selected && pointSpec == other.pointSpec;
 }

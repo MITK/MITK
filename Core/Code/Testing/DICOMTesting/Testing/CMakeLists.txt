@@ -39,6 +39,7 @@ function(AddDicomTestsFromDataRepository CURRENT_DATASET_DIR TESTS_DIR INPUT_LIS
   endfunction(expectFileExists)
 
   foreach(input ${allInputs})
+
     # extract only the name of the directory of this very test case
     string(REGEX REPLACE ".*${TESTS_DIR}/([^/]+)/.*" "\\1" input ${input})
     set(inputfilelist "${CURRENT_DATASET_DIR}/${TESTS_DIR}/${input}/${INPUT_LISTNAME}")

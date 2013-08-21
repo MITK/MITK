@@ -100,6 +100,65 @@ void QmitkFiberExtractionView::CreateQtPartControl( QWidget *parent )
         connect(m_Controls->m_Extract3dButton, SIGNAL(clicked()), this, SLOT(ExtractPassingMask()));
         connect( m_Controls->m_ExtractMask, SIGNAL(clicked()), this, SLOT(ExtractEndingInMask()) );
         connect( m_Controls->doExtractFibersButton, SIGNAL(clicked()), this, SLOT(DoFiberExtraction()) );
+
+        connect( m_Controls->m_RemoveOutsideMaskButton, SIGNAL(clicked()), this, SLOT(DoRemoveOutsideMask()));
+        connect( m_Controls->m_RemoveInsideMaskButton, SIGNAL(clicked()), this, SLOT(DoRemoveInsideMask()));
+    }
+}
+
+void QmitkFiberExtractionView::DoRemoveInsideMask()
+{
+    if (m_MaskImageNode.IsNull())
+        return;
+
+    mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
+    for (int i=0; i<m_SelectedFB.size(); i++)
+    {
+        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+        QString name(m_SelectedFB.at(i)->GetName().c_str());
+
+        itkUCharImageType::Pointer mask = itkUCharImageType::New();
+        mitk::CastToItkImage<itkUCharImageType>(mitkMask, mask);
+        mitk::FiberBundleX::Pointer newFib = fib->RemoveFibersOutside(mask, true);
+        if (newFib->GetNumFibers()<=0)
+        {
+            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
+            continue;
+        }
+        DataNode::Pointer newNode = DataNode::New();
+        newNode->SetData(newFib);
+        name += "_Cut";
+        newNode->SetName(name.toStdString());
+        GetDefaultDataStorage()->Add(newNode);
+        m_SelectedFB.at(i)->SetVisibility(false);
+    }
+}
+
+void QmitkFiberExtractionView::DoRemoveOutsideMask()
+{
+    if (m_MaskImageNode.IsNull())
+        return;
+
+    mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
+    for (int i=0; i<m_SelectedFB.size(); i++)
+    {
+        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+        QString name(m_SelectedFB.at(i)->GetName().c_str());
+
+        itkUCharImageType::Pointer mask = itkUCharImageType::New();
+        mitk::CastToItkImage<itkUCharImageType>(mitkMask, mask);
+        mitk::FiberBundleX::Pointer newFib = fib->RemoveFibersOutside(mask);
+        if (newFib->GetNumFibers()<=0)
+        {
+            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
+            continue;
+        }
+        DataNode::Pointer newNode = DataNode::New();
+        newNode->SetData(newFib);
+        name += "_Cut";
+        newNode->SetName(name.toStdString());
+        GetDefaultDataStorage()->Add(newNode);
+        m_SelectedFB.at(i)->SetVisibility(false);
     }
 }
 
@@ -159,6 +218,7 @@ void QmitkFiberExtractionView::ExtractPassingMask()
         m_SelectedFB.at(i)->SetVisibility(false);
     }
 }
+
 void QmitkFiberExtractionView::GenerateRoiImage(){
 
     if (m_SelectedPF.empty())
@@ -173,7 +233,7 @@ void QmitkFiberExtractionView::GenerateRoiImage(){
     else
         return;
 
-    mitk::Vector3D spacing = geometry->GetSpacing();
+    itk::Vector<double,3> spacing = geometry->GetSpacing();
     spacing /= m_UpsamplingFactor;
 
     mitk::Point3D newOrigin = geometry->GetOrigin();
@@ -643,6 +703,8 @@ void QmitkFiberExtractionView::UpdateGui()
 {
     m_Controls->m_Extract3dButton->setEnabled(false);
     m_Controls->m_ExtractMask->setEnabled(false);
+    m_Controls->m_RemoveOutsideMaskButton->setEnabled(false);
+    m_Controls->m_RemoveInsideMaskButton->setEnabled(false);
 
     // are fiber bundles selected?
     if ( m_SelectedFB.empty() )
@@ -680,6 +742,8 @@ void QmitkFiberExtractionView::UpdateGui()
         {
             m_Controls->m_Extract3dButton->setEnabled(true);
             m_Controls->m_ExtractMask->setEnabled(true);
+            m_Controls->m_RemoveOutsideMaskButton->setEnabled(true);
+            m_Controls->m_RemoveInsideMaskButton->setEnabled(true);
         }
     }
 

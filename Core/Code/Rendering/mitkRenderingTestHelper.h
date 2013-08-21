@@ -27,7 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 class vtkRenderWindow;
 class vtkRenderer;
 
-class MITK_CORE_EXPORT mitkRenderingTestHelper
+namespace mitk
+{
+
+class MITK_CORE_EXPORT RenderingTestHelper
 {
 
 public:
@@ -37,13 +40,13 @@ public:
       @param argv Given parameters. If no data is inserted via commandline, you can add data
       later via AddNodeToDataStorage().
     **/
-  mitkRenderingTestHelper(int width, int height, int argc, char *argv[]);
+  RenderingTestHelper(int width, int height, int argc, char *argv[]);
 
   /** @brief Generate a rendering test helper object including a render window of the size width * height (in pixel).*/
-  mitkRenderingTestHelper(int width, int height);
+  RenderingTestHelper(int width, int height);
 
   /** Default destructor */
-  ~mitkRenderingTestHelper();
+  ~RenderingTestHelper();
 
   /** @brief Getter for the vtkRenderer.
     **/
@@ -164,5 +167,5 @@ protected:
   bool m_AutomaticallyCloseRenderWindow; //<< Flag indicating whether the renderwindow should automatically close (true, default) or stay open (false). Usefull for debugging.
 
 };
-
+}//namespace mitk
 #endif

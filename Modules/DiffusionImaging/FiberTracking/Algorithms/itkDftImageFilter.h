@@ -30,7 +30,7 @@ This file is based heavily on a corresponding ITK filter.
 namespace itk{
 
 /**
-* \brief Performes deterministic streamline tracking on the input tensor image.   */
+* \brief 2D Discrete Fourier Transform Filter (complex to real) */
 
   template< class TPixelType >
   class DftImageFilter :
@@ -58,7 +58,7 @@ namespace itk{
     DftImageFilter();
     ~DftImageFilter() {}
 
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int threadId);
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
 
   private:
 

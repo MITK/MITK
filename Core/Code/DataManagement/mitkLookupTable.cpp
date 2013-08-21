@@ -219,7 +219,7 @@ bool mitk::LookupTable::VerifyRequestedRegion( )
 }
 
 
-void mitk::LookupTable::SetRequestedRegion( itk::DataObject *)
+void mitk::LookupTable::SetRequestedRegion(const itk::DataObject *)
 {
   //not implemented, since we always want to have the RequestedRegion
   //to be set to LargestPossibleRegion
@@ -300,12 +300,6 @@ void mitk::LookupTable::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
   os << indent;
   m_LookupTable->PrintHeader(os, vtkIndent());
-}
-
-mitk::LookupTable::Pointer mitk::LookupTable::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
 }
 
 itk::LightObject::Pointer mitk::LookupTable::InternalClone() const

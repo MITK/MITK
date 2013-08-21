@@ -234,7 +234,7 @@ namespace itk {
     std::cout << "Done." << std::endl;
 
     typename OutputImageType::Pointer outputImage =
-      static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+      static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
 
     outputImage->SetSpacing( filler->GetOutput()->GetSpacing() );   // Set the image spacing
     outputImage->SetOrigin( filler->GetOutput()->GetOrigin() );     // Set the image origin

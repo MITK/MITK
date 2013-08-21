@@ -130,11 +130,11 @@ MergeDiffusionImagesFilter<TScalarType>
     this->SetNthOutput (0, outImage);
 
     typedef ImageRegionIterator<DwiImageType>               IteratorOutputType;
-    IteratorOutputType      itOut (this->GetOutput(0), this->GetOutput(0)->GetLargestPossibleRegion());
+    IteratorOutputType      itOut (this->GetOutput(), this->GetOutput()->GetLargestPossibleRegion());
 
     MITK_INFO << "MergeDiffusionImagesFilter: merging images";
     GradientType zeroG; zeroG.fill(0.0);
-    boost::progress_display disp(this->GetOutput(0)->GetLargestPossibleRegion().GetNumberOfPixels());
+    boost::progress_display disp(this->GetOutput()->GetLargestPossibleRegion().GetNumberOfPixels());
     while(!itOut.IsAtEnd())
     {
         ++disp;

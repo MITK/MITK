@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.5)
 
 # Change project and application name to your own
 set(MY_PROJECT_NAME $(project-name))

@@ -20,6 +20,9 @@ set(CPP_FILES
 
   # Rendering
   Rendering/mitkTbssImageMapper.cpp
+
+  #Algorithms
+  Algorithms/mitkTractAnalyzer.cpp
 )
 
 set(H_FILES

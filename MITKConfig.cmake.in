@@ -11,6 +11,7 @@ include(mitkFunctionOrganizeSources)
 include(mitkFunctionCreateWindowsBatchScript)
 include(mitkFunctionInstallProvisioningFiles)
 include(mitkFunctionInstallAutoLoadModules)
+include(mitkFunctionGetLibrarySearchPaths)
 include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
 include(mitkMacroCheckModule)
@@ -23,6 +24,7 @@ include(mitkMacroInstallHelperApp)
 include(mitkMacroInstallTargets)
 include(mitkMacroGenerateToolsLibrary)
 include(mitkMacroCreateCTKPlugin)
+include(mitkMacroGetPMDPlatformString)
 
 # The MITK version number
 set(MITK_VERSION_MAJOR "@MITK_VERSION_MAJOR@")
@@ -83,7 +85,7 @@ set(QMITK_LIBRARIES "@QMITK_LIBRARIES@")
 # Link directory variables
 set(MITK_LINK_DIRECTORIES "@MITK_LINK_DIRECTORIES@")
 set(QMITK_LINK_DIRECTORIES "@QMITK_LINK_DIRECTORIES@")
-set(MITK_LIBRARY_DIRS "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@" "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@/plugins")
+set(MITK_LIBRARY_DIRS "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@" "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@/plugins" @MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS_CONFIG@)
 set(MITK_VTK_LIBRARY_DIRS "@MITK_VTK_LIBRARY_DIRS@")
 set(MITK_ITK_LIBRARY_DIRS "@MITK_ITK_LIBRARY_DIRS@")
 
@@ -97,7 +99,9 @@ set(OpenCV_DIR "@OpenCV_DIR@")
 set(SOFA_DIR "@SOFA_DIR@")
 set(MITK_QMAKE_EXECUTABLE "@QT_QMAKE_EXECUTABLE@")
 set(MITK_DATA_DIR "@MITK_DATA_DIR@")
-set(MITK_RUNTIME_PATH "@MITK_RUNTIME_PATH@")
+
+# External SDK directories
+set(MITK_PMD_SDK_DIR @MITK_PMD_SDK_DIR@)
 
 # MITK use variables
 set(MITK_USE_QT @MITK_USE_QT@)
@@ -111,6 +115,38 @@ set(MITK_USE_OpenCV @MITK_USE_OpenCV@)
 set(MITK_USE_SOFA @MITK_USE_SOFA@)
 set(MITK_USE_Python @MITK_USE_Python@)
 
+# MITK ToF use variables
+
+set(MITK_TOF_PMDCAMCUBE_AVAILABLE @MITK_USE_TOF_PMDCAMCUBE@)
+if(MITK_TOF_PMDCAMCUBE_AVAILABLE AND NOT ${PROJECT_NAME} STREQUAL "MITK")
+  option(MITK_USE_TOF_PMDCAMCUBE "Enable support for PMD Cam Cube" @MITK_USE_TOF_PMDCAMCUBE@)
+  mark_as_advanced(MITK_USE_TOF_PMDCAMCUBE)
+endif()
+
+set(MITK_TOF_PMDCAMBOARD_AVAILABLE @MITK_USE_TOF_PMDCAMBOARD@)
+if(MITK_TOF_PMDCAMBOARD_AVAILABLE AND NOT ${PROJECT_NAME} STREQUAL "MITK")
+  option(MITK_USE_TOF_PMDCAMBOARD "Enable support for PMD Cam Board" @MITK_USE_TOF_PMDCAMBOARD@)
+  mark_as_advanced(MITK_USE_TOF_PMDCAMBOARD)
+endif()
+
+set(MITK_TOF_PMDO3_AVAILABLE @MITK_USE_TOF_PMDO3@)
+if(MITK_TOF_PMDO3_AVAILABLE AND NOT ${PROJECT_NAME} STREQUAL "MITK")
+  option(MITK_USE_TOF_PMDO3 "Enable support for PMD =3" @MITK_USE_TOF_PMDO3@)
+  mark_as_advanced(MITK_USE_TOF_PMDO3)
+endif()
+
+set(MITK_TOF_KINECT_AVAILABLE @MITK_USE_TOF_KINECT@)
+if(MITK_TOF_KINECT_AVAILABLE AND NOT ${PROJECT_NAME} STREQUAL "MITK")
+  option(MITK_USE_TOF_KINECT "Enable support for Kinect" @MITK_USE_TOF_KINECT@)
+  mark_as_advanced(MITK_USE_TOF_KINECT)
+endif()
+
+set(MITK_TOF_MESASR4000_AVAILABLE @MITK_USE_TOF_MESASR4000@)
+if(MITK_TOF_MESASR4000_AVAILABLE AND NOT ${PROJECT_NAME} STREQUAL "MITK")
+  option(MITK_USE_TOF_MESASR4000 "Enable support for MESA SR4000" @MITK_USE_TOF_MESASR4000@)
+  mark_as_advanced(MITK_USE_TOF_MESASR4000)
+endif()
+
 # There is no PocoConfig.cmake, so we set Poco specific CMake variables
 # here. This way the call to find_package(Poco) in BlueBerryConfig.cmake
 # finds the Poco distribution supplied by MITK
@@ -120,6 +156,9 @@ set(Poco_LIBRARY_DIR "@MITK_BINARY_DIR@/bin")
 if(MITK_USE_IGT)
   #include(${MITK_DIR}/mitkIGTConfig.cmake)
 endif()
+
+# Install rules for ToF libraries loaded at runtime
+include(@MITK_BINARY_DIR@/mitkToFHardwareInstallRules.cmake)
 
 if(NOT MITK_EXPORTS_FILE_INCLUDED)
   if(EXISTS "@MITK_EXPORTS_FILE@")

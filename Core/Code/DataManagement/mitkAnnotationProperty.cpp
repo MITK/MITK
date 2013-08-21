@@ -111,12 +111,6 @@ std::string mitk::AnnotationProperty::GetValueAsString() const
   return myStr.str();
 }
 
-mitk::AnnotationProperty::Pointer mitk::AnnotationProperty::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer mitk::AnnotationProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

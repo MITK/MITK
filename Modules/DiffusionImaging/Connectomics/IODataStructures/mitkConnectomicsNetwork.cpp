@@ -117,7 +117,7 @@ bool mitk::ConnectomicsNetwork::VerifyRequestedRegion()
 {
   return true;
 }
-void mitk::ConnectomicsNetwork::SetRequestedRegion( itk::DataObject *data )
+void mitk::ConnectomicsNetwork::SetRequestedRegion(const itk::DataObject *data )
 {
 
 }
@@ -351,9 +351,18 @@ std::vector< double > mitk::ConnectomicsNetwork::GetLocalClusteringCoefficients(
   std::pair<vertexIter, vertexIter> vertexPair;
 
   //for every vertex calculate the clustering coefficient
+  int size = vectorOfClusteringCoefficients.size();
   for (vertexPair = vertices(m_Network); vertexPair.first != vertexPair.second; ++vertexPair.first)
   {
-    vectorOfClusteringCoefficients[ m_Network[ *vertexPair.first ].id ] =
+    int index = m_Network[ *vertexPair.first ].id;
+
+    if( index > size )
+    {
+      MITK_ERROR << "Trying to access out of bounds clustering coefficient";
+      continue;
+    }
+
+    vectorOfClusteringCoefficients[ index ] =
       boost::clustering_coefficient(m_Network,*vertexPair.first) ;
   }
 

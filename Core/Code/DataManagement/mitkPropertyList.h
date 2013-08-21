@@ -73,8 +73,6 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
      */
     itkNewMacro(Self)
 
-    Pointer Clone() const;
-
     /**
      * Map structure to hold the properties: the map key is a string,
      * the value consists of the actual property object (BaseProperty).

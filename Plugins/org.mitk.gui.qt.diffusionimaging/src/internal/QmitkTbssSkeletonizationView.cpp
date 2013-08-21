@@ -14,19 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// Blueberry
-#include <berryIWorkbenchWindow.h>
-#include <berryIWorkbenchPage.h>
-#include <berryISelectionService.h>
-#include <berryConstants.h>
-#include <berryPlatformUI.h>
-
 // Qmitk
 #include "QmitkTbssSkeletonizationView.h"
-#include <QmitkStdMultiWidget.h>
 
-#include <mitkDataNodeObject.h>
-#include <itkCastImageFilter.h>
 
 #include <itkSkeletonizationFilter.h>
 #include <itkProjectionFilter.h>
@@ -51,88 +41,6 @@ const std::string QmitkTbssSkeletonizationView::VIEW_ID = "org.mitk.views.tbsssk
 using namespace berry;
 
 
-struct TbssSkeletonizationSelListener : ISelectionListener
-{
-
-  berryObjectMacro(TbssSkeletonizationSelListener)
-
-  TbssSkeletonizationSelListener(QmitkTbssSkeletonizationView* view)
-  {
-    m_View = view;
-  }
-
-
-  void DoSelectionChanged(ISelection::ConstPointer selection)
-  {
-    // save current selection in member variable
-    m_View->m_CurrentSelection = selection.Cast<const IStructuredSelection>();
-
-    // do something with the selected items
-    if(m_View->m_CurrentSelection)
-    {
-
-      bool found3dImage = false;
-      bool found4dImage = false;
-
-      // iterate selection
-      for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin();
-        i != m_View->m_CurrentSelection->End(); ++i)
-      {
-
-        // extract datatree node
-        if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
-        {
-          mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-
-          // only look at interesting types
-          // from valid nodes
-          mitk::BaseData* nodeData = node->GetData();
-
-          if(nodeData)
-          {
-            if(QString("Image").compare(nodeData->GetNameOfClass())==0)
-            {
-              mitk::Image* img = static_cast<mitk::Image*>(nodeData);
-              if(img->GetDimension() == 3)
-              {
-                found3dImage = true;
-              }
-              else if(img->GetDimension() == 4)
-              {
-                found4dImage = true;
-              }
-            }
-          }
-        }
-
-      }
-
-      m_View->m_Controls->m_Skeletonize->setEnabled(found3dImage);
-      m_View->m_Controls->m_Project->setEnabled(found3dImage && found4dImage);
-      m_View->m_Controls->m_OutputMask->setEnabled(found3dImage && found4dImage);
-      m_View->m_Controls->m_OutputDistanceMap->setEnabled(found3dImage && found4dImage);
-    }
-  }
-
-
-  void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection)
-  {
-    // check, if selection comes from datamanager
-    if (part)
-    {
-      QString partname(part->GetPartName().c_str());
-      if(partname.compare("Datamanager")==0)
-      {
-        // apply selection
-        DoSelectionChanged(selection);
-      }
-    }
-  }
-
-  QmitkTbssSkeletonizationView* m_View;
-};
-
-
 QmitkTbssSkeletonizationView::QmitkTbssSkeletonizationView()
 : QmitkFunctionality()
 , m_Controls( 0 )
@@ -150,6 +58,41 @@ void QmitkTbssSkeletonizationView::OnSelectionChanged(std::vector<mitk::DataNode
   //datamanager selection changed
   if (!this->IsActivated())
     return;
+
+  bool found3dImage = false;
+  bool found4dImage = false;
+
+  // iterate selection
+  for ( int i=0; i<nodes.size(); i++ )
+  {
+
+
+    // only look at interesting types from valid nodes
+    mitk::BaseData* nodeData = nodes[i]->GetData();
+
+    if(nodeData)
+    {
+      if(QString("Image").compare(nodeData->GetNameOfClass())==0)
+      {
+        mitk::Image* img = static_cast<mitk::Image*>(nodeData);
+        if(img->GetDimension() == 3)
+        {
+          found3dImage = true;
+        }
+        else if(img->GetDimension() == 4)
+        {
+          found4dImage = true;
+        }
+      }
+    }
+
+  }
+
+  this->m_Controls->m_Skeletonize->setEnabled(found3dImage);
+  this->m_Controls->m_Project->setEnabled(found3dImage && found4dImage);
+  this->m_Controls->m_OutputMask->setEnabled(found3dImage && found4dImage);
+  this->m_Controls->m_OutputDistanceMap->setEnabled(found3dImage && found4dImage);
+
 }
 
 
@@ -165,27 +108,11 @@ void QmitkTbssSkeletonizationView::CreateQtPartControl( QWidget *parent )
     this->CreateConnections();
   }
 
-  m_SelListener = berry::ISelectionListener::Pointer(new TbssSkeletonizationSelListener(this));
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
-  berry::ISelection::ConstPointer sel(
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-  m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-  m_SelListener.Cast<TbssSkeletonizationSelListener>()->DoSelectionChanged(sel);
-
-  m_IsInitialized = false;
-
-
-
 }
 
 void QmitkTbssSkeletonizationView::Activated()
 {
   QmitkFunctionality::Activated();
-
-  berry::ISelection::ConstPointer sel(
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-  m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-  m_SelListener.Cast<TbssSkeletonizationSelListener>()->DoSelectionChanged(sel);
 }
 
 void QmitkTbssSkeletonizationView::Deactivated()
@@ -221,205 +148,193 @@ void QmitkTbssSkeletonizationView::Skeletonize()
   typedef itk::SkeletonizationFilter<FloatImageType, FloatImageType> SkeletonisationFilterType;
   SkeletonisationFilterType::Pointer skeletonizer = SkeletonisationFilterType::New();
 
-  if (m_CurrentSelection)
+
+  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+
+
+  mitk::Image::Pointer meanImage = mitk::Image::New();
+  std::string name = "";
+
+  for ( int i=0; i<nodes.size(); i++ )
   {
-    mitk::DataStorage::SetOfObjects::Pointer set =
-      mitk::DataStorage::SetOfObjects::New();
+    // process only on valid nodes
+    mitk::BaseData* nodeData = nodes[i]->GetData();
 
-
-    mitk::Image::Pointer meanImage = mitk::Image::New();
-
-    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
-      i != m_CurrentSelection->End();
-      ++i)
+    if(nodeData)
     {
-      if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
+      if(QString("Image").compare(nodeData->GetNameOfClass())==0)
       {
-        mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-
-        // process only on valid nodes
-        mitk::BaseData* nodeData = node->GetData();
-
-        if(nodeData)
+        mitk::Image* img = static_cast<mitk::Image*>(nodeData);
+        if(img->GetDimension() == 3)
         {
-          if(QString("Image").compare(nodeData->GetNameOfClass())==0)
-          {
-            mitk::Image* img = static_cast<mitk::Image*>(nodeData);
-            if(img->GetDimension() == 3)
-            {
-              meanImage = img;
-            }
-          }
+          meanImage = img;
+          name = nodes[i]->GetName();
         }
       }
     }
-
-    // Calculate skeleton
-    FloatImageType::Pointer itkImg = FloatImageType::New();
-    mitk::CastToItkImage(meanImage, itkImg);
-    skeletonizer->SetInput(itkImg);
-    skeletonizer->Update();
-
-
-    FloatImageType::Pointer output = skeletonizer->GetOutput();
-    mitk::Image::Pointer mitkOutput = mitk::Image::New();
-    mitk::CastToMitkImage(output, mitkOutput);
-    AddToDataStorage(mitkOutput, "all_FA_skeletonised");
-
-
   }
+
+
+  // Calculate skeleton
+  FloatImageType::Pointer itkImg = FloatImageType::New();
+  mitk::CastToItkImage(meanImage, itkImg);
+  skeletonizer->SetInput(itkImg);
+  skeletonizer->Update();
+
+
+  FloatImageType::Pointer output = skeletonizer->GetOutput();
+  mitk::Image::Pointer mitkOutput = mitk::Image::New();
+  mitk::CastToMitkImage(output, mitkOutput);
+  name += "_skeleton";
+  AddToDataStorage(mitkOutput, name);
+
+
+
 }
 
 void QmitkTbssSkeletonizationView::Project()
 {
+
   typedef itk::SkeletonizationFilter<FloatImageType, FloatImageType> SkeletonisationFilterType;
   typedef itk::ProjectionFilter ProjectionFilterType;
   typedef itk::DistanceMapFilter<FloatImageType, FloatImageType> DistanceMapFilterType;
 
   SkeletonisationFilterType::Pointer skeletonizer = SkeletonisationFilterType::New();
 
-  if (m_CurrentSelection)
+
+
+  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+
+
+  mitk::Image::Pointer meanImage = mitk::Image::New();
+  mitk::Image::Pointer subjects = mitk::Image::New();
+
+  for ( int i=0; i<nodes.size(); i++ )
   {
-    mitk::DataStorage::SetOfObjects::Pointer set =
-      mitk::DataStorage::SetOfObjects::New();
+    // process only on valid nodes
+    mitk::BaseData* nodeData = nodes[i]->GetData();
 
-
-    mitk::Image::Pointer meanImage = mitk::Image::New();
-    mitk::Image::Pointer subjects = mitk::Image::New();
-
-    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
-      i != m_CurrentSelection->End();
-      ++i)
+    if(nodeData)
     {
-      if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
+      if(QString("Image").compare(nodeData->GetNameOfClass())==0)
       {
-        mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-
-        // process only on valid nodes
-        mitk::BaseData* nodeData = node->GetData();
-
-        if(nodeData)
+        mitk::Image* img = static_cast<mitk::Image*>(nodeData);
+        if(img->GetDimension() == 3)
         {
-          if(QString("Image").compare(nodeData->GetNameOfClass())==0)
-          {
-            mitk::Image* img = static_cast<mitk::Image*>(nodeData);
-            if(img->GetDimension() == 3)
-            {
-              meanImage = img;
-            }
-            else if(img->GetDimension() == 4)
-            {
-              subjects = img;
-            }
-          }
+          meanImage = img;
         }
-
+        else if(img->GetDimension() == 4)
+        {
+          subjects = img;
+        }
       }
     }
-
-    Float4DImageType::Pointer allFA = ConvertToItk(subjects);
-
-
-
-
-    // Calculate skeleton
-    FloatImageType::Pointer itkImg = FloatImageType::New();
-    mitk::CastToItkImage(meanImage, itkImg);
-    skeletonizer->SetInput(itkImg);
-    skeletonizer->Update();
-
-
-    FloatImageType::Pointer output = skeletonizer->GetOutput();
-    mitk::Image::Pointer mitkOutput = mitk::Image::New();
-    mitk::CastToMitkImage(output, mitkOutput);
-    AddToDataStorage(mitkOutput, "mean_FA_skeletonised");
-
-
-
-    // Retrieve direction image needed later by the projection filter
-    DirectionImageType::Pointer directionImg = skeletonizer->GetVectorImage();
-
-
-    // Calculate distance image
-
-    DistanceMapFilterType::Pointer distanceMapFilter = DistanceMapFilterType::New();
-    distanceMapFilter->SetInput(output);
-    distanceMapFilter->Update();
-    FloatImageType::Pointer distanceMap = distanceMapFilter->GetOutput();
-
-    if(m_Controls->m_OutputDistanceMap->isChecked())
-    {
-      mitk::Image::Pointer mitkDistance = mitk::Image::New();
-      mitk::CastToMitkImage(distanceMap, mitkDistance);
-      AddToDataStorage(mitkDistance, "distance map");
-    }
-
-    // Do projection
-
-    // Ask a threshold to create a skeleton mask
-    double threshold = -1.0;
-    while(threshold == -1.0)
-    {
-      threshold = QInputDialog::getDouble(m_Controls->m_Skeletonize, tr("Specify the FA threshold"),
-                                            tr("Threshold:"), QLineEdit::Normal,
-                                            0.2);
-
-      if(threshold < 0.0 || threshold > 1.0)
-      {
-        QMessageBox msgBox;
-        msgBox.setText("Please choose a value between 0 and 1");
-        msgBox.exec();
-        threshold = -1.0;
-      }
-    }
-
-    typedef itk::BinaryThresholdImageFilter<FloatImageType, CharImageType> ThresholdFilterType;
-    ThresholdFilterType::Pointer thresholder = ThresholdFilterType::New();
-    thresholder->SetInput(output);
-    thresholder->SetLowerThreshold(threshold);
-    thresholder->SetUpperThreshold(std::numeric_limits<float>::max());
-    thresholder->SetOutsideValue(0);
-    thresholder->SetInsideValue(1);
-    thresholder->Update();
-
-
-    CharImageType::Pointer thresholdedImg = thresholder->GetOutput();
-
-
-    if(m_Controls->m_OutputMask->isChecked())
-    {
-      mitk::Image::Pointer mitkThresholded = mitk::Image::New();
-      mitk::CastToMitkImage(thresholdedImg, mitkThresholded);
-      std::string maskName = "skeleton_mask_at_" + boost::lexical_cast<std::string>(threshold);
-      AddToDataStorage(mitkThresholded, maskName);
-    }
-
-
-
-    typedef itk::ImageFileReader< CharImageType > CharReaderType;
-    CharReaderType::Pointer reader = CharReaderType::New();
-    reader->SetFileName("/local/testing/LowerCingulum_1mm.nii.gz");
-    reader->Update();
-    CharImageType::Pointer cingulum = reader->GetOutput();
-
-
-
-    ProjectionFilterType::Pointer projectionFilter = ProjectionFilterType::New();
-    projectionFilter->SetDistanceMap(distanceMap);
-    projectionFilter->SetDirections(directionImg);
-    projectionFilter->SetAllFA(allFA);
-    projectionFilter->SetTube(cingulum);
-    projectionFilter->SetSkeleton(thresholdedImg);
-    projectionFilter->Project();
-
-    Float4DImageType::Pointer projected = projectionFilter->GetProjections();
-
-    mitk::Image::Pointer mitkProjections = mitk::Image::New();
-    mitk::CastToMitkImage(projected, mitkProjections);
-
-    AddToDataStorage(mitkProjections, "all_FA_projected");
 
   }
+
+  Float4DImageType::Pointer allFA = ConvertToItk(subjects);
+
+
+
+
+  // Calculate skeleton
+  FloatImageType::Pointer itkImg = FloatImageType::New();
+  mitk::CastToItkImage(meanImage, itkImg);
+  skeletonizer->SetInput(itkImg);
+  skeletonizer->Update();
+
+
+  FloatImageType::Pointer output = skeletonizer->GetOutput();
+  mitk::Image::Pointer mitkOutput = mitk::Image::New();
+  mitk::CastToMitkImage(output, mitkOutput);
+  AddToDataStorage(mitkOutput, "mean_FA_skeletonised");
+
+
+
+  // Retrieve direction image needed later by the projection filter
+  DirectionImageType::Pointer directionImg = skeletonizer->GetVectorImage();
+
+
+  // Calculate distance image
+  DistanceMapFilterType::Pointer distanceMapFilter = DistanceMapFilterType::New();
+  distanceMapFilter->SetInput(output);
+  distanceMapFilter->Update();
+  FloatImageType::Pointer distanceMap = distanceMapFilter->GetOutput();
+
+  if(m_Controls->m_OutputDistanceMap->isChecked())
+  {
+    mitk::Image::Pointer mitkDistance = mitk::Image::New();
+    mitk::CastToMitkImage(distanceMap, mitkDistance);
+    AddToDataStorage(mitkDistance, "distance map");
+  }
+
+  // Do projection
+
+  // Ask a threshold to create a skeleton mask
+  double threshold = -1.0;
+  while(threshold == -1.0)
+  {
+    threshold = QInputDialog::getDouble(m_Controls->m_Skeletonize, tr("Specify the FA threshold"),
+                                          tr("Threshold:"), QLineEdit::Normal,
+                                          0.2);
+
+    if(threshold < 0.0 || threshold > 1.0)
+    {
+      QMessageBox msgBox;
+      msgBox.setText("Please choose a value between 0 and 1");
+      msgBox.exec();
+      threshold = -1.0;
+    }
+  }
+
+  typedef itk::BinaryThresholdImageFilter<FloatImageType, CharImageType> ThresholdFilterType;
+  ThresholdFilterType::Pointer thresholder = ThresholdFilterType::New();
+  thresholder->SetInput(output);
+  thresholder->SetLowerThreshold(threshold);
+  thresholder->SetUpperThreshold(std::numeric_limits<float>::max());
+  thresholder->SetOutsideValue(0);
+  thresholder->SetInsideValue(1);
+  thresholder->Update();
+
+
+  CharImageType::Pointer thresholdedImg = thresholder->GetOutput();
+
+
+  if(m_Controls->m_OutputMask->isChecked())
+  {
+    mitk::Image::Pointer mitkThresholded = mitk::Image::New();
+    mitk::CastToMitkImage(thresholdedImg, mitkThresholded);
+    std::string maskName = "skeleton_mask_at_" + boost::lexical_cast<std::string>(threshold);
+    AddToDataStorage(mitkThresholded, maskName);
+  }
+
+
+
+  typedef itk::ImageFileReader< CharImageType > CharReaderType;
+  CharReaderType::Pointer reader = CharReaderType::New();
+  reader->SetFileName("/local/testing/LowerCingulum_1mm.nii.gz");
+  reader->Update();
+  CharImageType::Pointer cingulum = reader->GetOutput();
+
+
+
+  ProjectionFilterType::Pointer projectionFilter = ProjectionFilterType::New();
+  projectionFilter->SetDistanceMap(distanceMap);
+  projectionFilter->SetDirections(directionImg);
+  projectionFilter->SetAllFA(allFA);
+  projectionFilter->SetTube(cingulum);
+  projectionFilter->SetSkeleton(thresholdedImg);
+  projectionFilter->Project();
+
+  Float4DImageType::Pointer projected = projectionFilter->GetProjections();
+
+  mitk::Image::Pointer mitkProjections = mitk::Image::New();
+  mitk::CastToMitkImage(projected, mitkProjections);
+
+  AddToDataStorage(mitkProjections, "all_FA_projected");
+
+
+
 }
 
 void QmitkTbssSkeletonizationView::AddToDataStorage(mitk::Image* img, std::string name)

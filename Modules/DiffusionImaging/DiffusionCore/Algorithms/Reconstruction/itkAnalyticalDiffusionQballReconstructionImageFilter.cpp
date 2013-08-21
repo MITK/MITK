@@ -292,10 +292,10 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
 template< class T, class TG, class TO, int L, int NODF>
 void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-                       int )
+                       ThreadIdType )
 {
     typename OutputImageType::Pointer outputImage =
-            static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+            static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
 
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
     oit.GoToBegin();

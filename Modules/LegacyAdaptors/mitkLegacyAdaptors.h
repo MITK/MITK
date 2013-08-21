@@ -82,7 +82,7 @@ namespace mitk
 
     The IpPicDescriptor uses own notations for different pixel types. This casting is needed e.g. by the CastToIpPicDescriptor method.
   */
-  LegacyAdaptors_EXPORT DEPRECATED(mitkIpPicType_t CastToIpPicType( const std::type_info& intype ) );
+  LegacyAdaptors_EXPORT DEPRECATED(mitkIpPicType_t CastToIpPicType( int componentType ) );
 
   /**
     \brief Returns a mitk::PixelType object corresponding to given mitkIpPicType_t

@@ -89,7 +89,6 @@ void ParticleGrid::ResetGrid()
 
 bool ParticleGrid::ReallocateGrid()
 {
-    std::cout << "ParticleGrid: reallocating ..." << std::endl;
     int new_capacity = m_ContainerCapacity + 100000;    // increase container capacity by 100k particles
     try
     {
@@ -102,7 +101,7 @@ bool ParticleGrid::ReallocateGrid()
             m_Particles[i].ID = i;
 
         m_ContainerCapacity = new_capacity;     // update member variable
-        std::cout << "ParticleGrid: allocated " << (sizeof(Particle)*m_ContainerCapacity + sizeof(Particle*)*m_GridSize[0]*m_GridSize[1]*m_GridSize[2])/1048576 << "mb for " << m_ContainerCapacity/1000 << "k particles." << std::endl;
+        //std::cout << "ParticleGrid: allocated " << (sizeof(Particle)*m_ContainerCapacity + sizeof(Particle*)*m_GridSize[0]*m_GridSize[1]*m_GridSize[2])/1048576 << "mb for " << m_ContainerCapacity/1000 << "k particles." << std::endl;
     }
     catch(...)
     {
@@ -276,16 +275,19 @@ void ParticleGrid::ComputeNeighbors(vnl_vector_fixed<float, 3> &R)
     if (xfrac-xint > 0.5) dx = 1;
     if (xint <= 0) { xint = 0; dx = 1; }
     if (xint >= m_GridSize[0]-1) { xint = m_GridSize[0]-1; dx = -1; }
+    if (m_GridSize[0] <= 1) { dx = 0; } // Necessary with 2d images (bug 15416)
 
     int dy = -1;
     if (yfrac-yint > 0.5) dy = 1;
     if (yint <= 0) {yint = 0; dy = 1; }
     if (yint >= m_GridSize[1]-1) {yint = m_GridSize[1]-1; dy = -1;}
+    if (m_GridSize[1] <= 1) { dy = 0; } // Necessary with 2d images (bug 15416)
 
     int dz = -1;
     if (zfrac-zint > 0.5) dz = 1;
     if (zint <= 0) {zint = 0; dz = 1; }
     if (zint >= m_GridSize[2]-1) {zint = m_GridSize[2]-1; dz = -1;}
+    if (m_GridSize[2] <= 1) { dz = 0; } // Necessary with 2d images (bug 15416)
 
 
     m_NeighbourTracker.cellidx[0] = xint + m_GridSize[0]*(yint+zint*m_GridSize[1]);

@@ -157,7 +157,7 @@ bool mitk::VtkWidgetRendering::VerifyRequestedRegion()
     return true;
 }
 
-void mitk::VtkWidgetRendering::SetRequestedRegion(itk::DataObject*)
+void mitk::VtkWidgetRendering::SetRequestedRegion( const itk::DataObject*)
 {
     //nothing to do
 }

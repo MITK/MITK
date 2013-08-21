@@ -12,6 +12,7 @@ The modules are shared libraries that provide functionality that can be used by 
   \li \subpage SimulationManualPage
   \li \subpage GeneratingDeviceModulesPage
   \li \subpage mitkPython_Overview
+  \li \subpage USModulePage
 
 \section MITKModuleManualsListPageAdditionalInformation Additional Information on Certain Modules
 
@@ -19,4 +20,7 @@ The modules are shared libraries that provide functionality that can be used by 
   \li \subpage DiffusionImagingPropertiesPage
   \li \subpage ConnectomicsRenderingPropertiesPage
 
+\section MITKMigrationGuides Migration Guides
+
+  \li \subpage InteractionMigration
 */

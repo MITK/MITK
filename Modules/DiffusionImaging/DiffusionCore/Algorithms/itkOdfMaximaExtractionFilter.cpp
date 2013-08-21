@@ -1,4 +1,18 @@
+/*===================================================================
 
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 #ifndef __itkOdfMaximaExtractionFilter_cpp
 #define __itkOdfMaximaExtractionFilter_cpp
 
@@ -470,7 +484,7 @@ void OdfMaximaExtractionFilter< TOdfPixelType >
 
     InputIteratorType git(m_ShCoeffImage, m_ShCoeffImage->GetLargestPossibleRegion() );
 
-    mitk::Vector3D spacing = m_ShCoeffImage->GetSpacing();
+    itk::Vector<double,3> spacing = m_ShCoeffImage->GetSpacing();
     double minSpacing = spacing[0];
     if (spacing[1]<minSpacing)
         minSpacing = spacing[1];

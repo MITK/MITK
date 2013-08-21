@@ -39,6 +39,8 @@ if(BUILD_TESTING)
                COMMAND ${CMAKE_COMMAND} -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
                                         -DMITK_DIR:PATH=${MITK_BINARY_DIR}
                                         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                                        -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+                                        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
                                         -DCMAKE_GENERATOR=${CMAKE_GENERATOR}
                                         -DAwesomeProject_BUILD_ALL_PLUGINS:BOOL=ON
                                         -DAwesomeProject_BUILD_ALL_APPS:BOOL=ON
@@ -59,6 +61,8 @@ if(BUILD_TESTING)
              COMMAND ${CMAKE_COMMAND} -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
                                       -DMITK_DIR:PATH=${MITK_BINARY_DIR}
                                       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                                      -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+                                      -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
                                       -DAwesomeProject_BUILD_ALL_PLUGINS:BOOL=ON
                                       -DAwesomeProject_BUILD_ALL_APPS:BOOL=ON
                                       "${MITK-ProjectTemplate_SOURCE_DIR}")

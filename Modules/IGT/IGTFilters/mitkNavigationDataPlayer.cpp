@@ -116,7 +116,7 @@ void mitk::NavigationDataPlayer::GenerateData()
   // therefore we take always the time from the first.
 
 
-  while( nextCandidates[0]->GetTimeStamp() < currentTimeOfData[0])
+  while( nextCandidates[0]->GetIGTTimeStamp() < currentTimeOfData[0])
   {
     for (unsigned int index=0; index < m_NumberOfOutputs; index++)
     {
@@ -439,7 +439,7 @@ void mitk::NavigationDataPlayer::GetFirstData()
         //Have a look it the output was set already without this check the pipline will disconnect after a start/stop cycle
         if (nd.IsNull()) {this->SetNthOutput(index, m_NextToPlayNavigationData[index]);}
 
-        m_StartTimeOfData[index] = m_NextToPlayNavigationData[index]->GetTimeStamp();
+        m_StartTimeOfData[index] = m_NextToPlayNavigationData[index]->GetIGTTimeStamp();
         break;
 
       default: //this case should not happen! therefore the return at this point

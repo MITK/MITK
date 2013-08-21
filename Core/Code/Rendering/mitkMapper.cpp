@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkProperties.h"
 
+
 mitk::Mapper::Mapper()
   :m_TimeStep( 0 )
 {
@@ -39,7 +40,7 @@ return m_DataNode->GetData();
 
 mitk::DataNode* mitk::Mapper::GetDataNode() const
 {
-  return this->m_DataNode.GetPointer();
+  return this->m_DataNode;
 }
 
 
@@ -90,7 +91,7 @@ bool mitk::Mapper::IsVisible(mitk::BaseRenderer* renderer, const char* name) con
 
 void mitk::Mapper::CalculateTimeStep( mitk::BaseRenderer *renderer )
 {
-  if ( ( renderer != NULL ) && ( m_DataNode.GetPointer() != NULL ) )
+  if ( ( renderer != NULL ) && ( m_DataNode != NULL ) )
   {
     m_TimeStep = renderer->GetTimeStep(m_DataNode->GetData());
   }
@@ -133,7 +134,7 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
 bool mitk::Mapper::BaseLocalStorage::IsGenerateDataRequired(
     mitk::BaseRenderer *renderer,
     mitk::Mapper *mapper,
-    mitk::DataNode *dataNode)
+    mitk::DataNode *dataNode) const
 {
   if( mapper && m_LastGenerateDataTime < mapper -> GetMTime () )
     return true;

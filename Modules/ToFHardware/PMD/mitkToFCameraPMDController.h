@@ -138,6 +138,16 @@ namespace mitk
     \return height of image in pixel
     */
     itkGetMacro(CaptureHeight, unsigned int);
+    /*!
+    \brief Access the chosen width of the resulting image in x direction
+    \return widht of image in pixel
+    */
+    itkGetMacro(InternalCaptureWidth, unsigned int);
+    /*!
+    \brief Access the chosen width of the resulting image in y direction
+    \return height of image in pixel
+    */
+    itkGetMacro(InternalCaptureHeight, unsigned int);
 
     itkGetMacro(SourceDataStructSize, int);
 
@@ -153,13 +163,24 @@ namespace mitk
     \return flag indicating if an error occured (false) or not (true)
     */
     bool ErrorText(int error);
+    /*
+    \brief Abstract method that should be used to transform the camera output (e.g. flip / rotate / select region of interest).
+           To be implemented by subclasses
+    \param input data array of original size (m_CaptureWidth x m_CaptureHeight)
+    \param rotated output data array of reduced size (m_InternalCaptureWidth x m_InternalCaputureHeight)
+    \param isDist flag indicating whether the input contains PMD distance information
+    */
+    virtual void TransformCameraOutput(float* in, float* out, bool isDist)=0;
+
     char m_PMDError[128]; ///< member holding the current error text
     int m_PMDRes; ///< holds the current result message provided by PMD
 
     int m_PixelNumber; ///< holds the number of pixels contained in the image
     int m_NumberOfBytes; ///< holds the number of bytes contained in the image
-    unsigned int m_CaptureWidth; ///< holds the width of the image in pixel
-    unsigned int m_CaptureHeight; ///< holds the height of the image in pixel
+    unsigned int m_CaptureWidth; ///< holds the width of the image in pixel as it is originally acquired by the camera
+    unsigned int m_CaptureHeight; ///< holds the height of the image in pixel as it is originally acquired by the camera
+    unsigned int m_InternalCaptureWidth; ///< holds the width of the image in pixel as it is requested by the user (cf. TransformCameraOutput()) Default: m_CaptureWidth
+    unsigned int m_InternalCaptureHeight; ///< holds the height of the image in pixel as is it requested by the user (cf. TransformCameraOutput()) Default: m_CaptureHeight
 
     int m_SourceDataSize; ///< size of the original PMD source data
     int m_SourceDataStructSize; ///< size of the PMD source data struct and the PMD source data

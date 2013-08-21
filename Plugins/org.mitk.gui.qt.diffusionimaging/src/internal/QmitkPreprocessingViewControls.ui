@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>892</width>
-    <height>1080</height>
+    <height>1290</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -67,8 +67,54 @@
       <string>Info</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
+      <item row="1" column="0">
+       <widget class="Line" name="line_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QCommandLinkButton" name="m_ShowGradientsButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Generate pointset displaying the gradient vectors (applied measurement frame).</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Show gradients</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="Line" name="line_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QCommandLinkButton" name="m_AdcAverage">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a new Diffusion Weighted Image (DWI) using an ADC average over all q-shells.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>ADC average (multi-shell)</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
-       <widget class="QTableWidget" name="m_BvalueTable">
+       <widget class="QTableWidget" name="m_B_ValueMap_TableWidget">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
           <horstretch>0</horstretch>
@@ -108,35 +154,42 @@
         </column>
        </widget>
       </item>
-      <item row="0" column="1">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="3" column="0">
+       <widget class="QCommandLinkButton" name="m_CreateLengthCorrectedDwi">
+        <property name="enabled">
+         <bool>false</bool>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
+        <property name="text">
+         <string>Round b-value</string>
         </property>
-       </spacer>
+       </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QCommandLinkButton" name="m_ShowGradientsButton">
+      <item row="2" column="0">
+       <widget class="QSpinBox" name="m_B_ValueMap_Rounder_SpinBox">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string>Generate pointset displaying the gradient vectors (applied measurement frame).</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Round b-values to nearest multiple of this value (click &amp;quot;Round b-value&amp;quot; to create new image with these values).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="statusTip">
-         <string/>
+        <property name="correctionMode">
+         <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
         </property>
-        <property name="whatsThis">
-         <string notr="true"/>
+        <property name="minimum">
+         <number>1</number>
         </property>
-        <property name="text">
-         <string>Show gradients</string>
+        <property name="maximum">
+         <number>10000</number>
+        </property>
+        <property name="singleStep">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="Line" name="line_5">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
@@ -194,6 +247,25 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCommandLinkButton" name="m_CalcAdcButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>If multiple baseline acquisitions are present, the default behaviour is to output an averaged image.</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Calculate ADC map</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -212,16 +284,7 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QFormLayout" name="formLayout_2">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
+         <property name="margin">
           <number>0</number>
          </property>
          <item row="0" column="1">
@@ -303,16 +366,7 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
+         <property name="margin">
           <number>0</number>
          </property>
          <property name="spacing">
@@ -334,6 +388,19 @@
          </item>
         </layout>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <widget class="QCommandLinkButton" name="m_ReduceGradientsButton">

@@ -212,12 +212,12 @@ int mitkLabeledImageToSurfaceFilterTest(int argc, char* argv[])
      std::cout<<"Wrong number of outputs, [FAILED]"<<std::endl;
      return EXIT_FAILURE;
   }
-  else if ( filter->GetOutput(0) == NULL )
+  else if ( filter->GetOutput() == NULL )
   {
      std::cout<<"Output 0 is NULL, [FAILED]"<<std::endl;
      return EXIT_FAILURE;
   }
-  else if ( filter->GetOutput(0)->GetVtkPolyData() == NULL )
+  else if ( filter->GetOutput()->GetVtkPolyData() == NULL )
   {
      std::cout<<"PolyData of output 0 is NULL, [FAILED]"<<std::endl;
      return EXIT_FAILURE;

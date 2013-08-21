@@ -64,7 +64,7 @@ namespace mitk
 
     mitk::Image::Pointer currentMITKDistanceImage = mitk::Image::New();
     currentMITKDistanceImage->Initialize(FloatType, 2, dimensions);
-    currentMITKDistanceImage->SetSlice((float*)m_ImageGrabber->GetOutput(0)->GetSliceData()->GetData(),0,0,0);
+    currentMITKDistanceImage->SetSlice((float*)m_ImageGrabber->GetOutput()->GetSliceData()->GetData(),0,0,0);
     // copy mitk images to OpenCV images
     if (m_ImageDepth==IPL_DEPTH_32F)
     {

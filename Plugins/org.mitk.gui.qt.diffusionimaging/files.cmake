@@ -28,7 +28,7 @@ set(INTERNAL_CPP_FILES
   QmitkStochasticFiberTrackingView.cpp
   QmitkStreamlineTrackingView.cpp
   QmitkFiberProcessingView.cpp
-  QmitkFiberBundleDeveloperView.cpp
+#  QmitkFiberBundleDeveloperView.cpp
   QmitkPartialVolumeAnalysisView.cpp
   QmitkIVIMView.cpp
   QmitkTractbasedSpatialStatisticsView.cpp
@@ -43,6 +43,7 @@ set(INTERNAL_CPP_FILES
   QmitkOdfMaximaExtractionView.cpp
   QmitkFiberfoxView.cpp
   QmitkFiberExtractionView.cpp
+  QmitkFieldmapGeneratorView.cpp
 )
 
 set(UI_FILES
@@ -57,7 +58,7 @@ set(UI_FILES
   src/internal/QmitkStochasticFiberTrackingViewControls.ui
   src/internal/QmitkStreamlineTrackingViewControls.ui
   src/internal/QmitkFiberProcessingViewControls.ui
-  src/internal/QmitkFiberBundleDeveloperViewControls.ui
+#  src/internal/QmitkFiberBundleDeveloperViewControls.ui
   src/internal/QmitkPartialVolumeAnalysisViewControls.ui
   src/internal/QmitkIVIMViewControls.ui
   src/internal/QmitkTractbasedSpatialStatisticsViewControls.ui
@@ -75,6 +76,7 @@ set(UI_FILES
   src/QmitkDotModelParametersWidgetControls.ui
   src/QmitkBallModelParametersWidgetControls.ui
   src/QmitkAstrosticksModelParametersWidgetControls.ui
+  src/internal/QmitkFieldmapGeneratorViewControls.ui
 )
 
 set(MOC_H_FILES
@@ -93,7 +95,7 @@ set(MOC_H_FILES
   src/internal/QmitkStochasticFiberTrackingView.h
   src/internal/QmitkStreamlineTrackingView.h
   src/internal/QmitkFiberProcessingView.h
-  src/internal/QmitkFiberBundleDeveloperView.h
+#  src/internal/QmitkFiberBundleDeveloperView.h
   src/internal/QmitkPartialVolumeAnalysisView.h
   src/QmitkPartialVolumeAnalysisWidget.h
   src/internal/QmitkIVIMView.h
@@ -116,6 +118,7 @@ set(MOC_H_FILES
   src/QmitkDotModelParametersWidget.h
   src/QmitkBallModelParametersWidget.h
   src/QmitkAstrosticksModelParametersWidget.h
+  src/internal/QmitkFieldmapGeneratorView.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -148,6 +151,7 @@ set(CACHED_RESOURCE_FILES
   resources/qball.png
   resources/StreamlineTracking.png
   resources/dwi2.png
+  resources/odf.png
   resources/refresh.xpm
 )
 

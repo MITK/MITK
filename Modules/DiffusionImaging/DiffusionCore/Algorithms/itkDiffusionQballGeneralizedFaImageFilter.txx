@@ -63,7 +63,7 @@ namespace itk {
     void DiffusionQballGeneralizedFaImageFilter< TOdfPixelType,
     TGfaPixelType, NrOdfDirections>
     ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-    int )
+    ThreadIdType )
   {
     typename OutputImageType::Pointer outputImage =
       static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));

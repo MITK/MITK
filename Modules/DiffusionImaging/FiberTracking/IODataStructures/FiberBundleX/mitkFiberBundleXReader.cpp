@@ -278,4 +278,19 @@ namespace mitk
     return false;
   }
 
+  BaseDataSource::DataObjectPointer FiberBundleXReader::MakeOutput(const DataObjectIdentifierType &name)
+  {
+    itkDebugMacro("MakeOutput(" << name << ")");
+    if( this->IsIndexedOutputName(name) )
+      {
+      return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+      }
+    return static_cast<itk::DataObject*>(OutputType::New().GetPointer());
+  }
+
+  BaseDataSource::DataObjectPointer FiberBundleXReader::MakeOutput(DataObjectPointerArraySizeType /*idx*/)
+  {
+    return OutputType::New().GetPointer();
+  }
+
 } //namespace MITK

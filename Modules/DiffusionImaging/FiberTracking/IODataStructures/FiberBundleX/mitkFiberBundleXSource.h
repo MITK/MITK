@@ -38,7 +38,7 @@ public:
   mitkClassMacro(QBallImageSource,ImageSource);
   itkNewMacro(Self);
 
-  virtual DataObjectPointer MakeOutput(unsigned int idx);
+  virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
 
 protected:
   QBallImageSource();

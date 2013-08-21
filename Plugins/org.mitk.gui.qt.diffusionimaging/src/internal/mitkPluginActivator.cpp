@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/QmitkGibbsTrackingView.h"
 #include "src/internal/QmitkStochasticFiberTrackingView.h"
 #include "src/internal/QmitkFiberProcessingView.h"
-#include "src/internal/QmitkFiberBundleDeveloperView.h"
+//#include "src/internal/QmitkFiberBundleDeveloperView.h"
 #include "src/internal/QmitkPartialVolumeAnalysisView.h"
 #include "src/internal/QmitkIVIMView.h"
 #include "src/internal/QmitkTractbasedSpatialStatisticsView.h"
@@ -42,6 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/QmitkOdfMaximaExtractionView.h"
 #include "src/internal/QmitkFiberfoxView.h"
 #include "src/internal/QmitkFiberExtractionView.h"
+#include "src/internal/QmitkFieldmapGeneratorView.h"
 
 namespace mitk {
 
@@ -59,7 +60,7 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkGibbsTrackingView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkStochasticFiberTrackingView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberProcessingView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberBundleDeveloperView, context)
+//  BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberBundleDeveloperView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkPartialVolumeAnalysisView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkIVIMView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkTractbasedSpatialStatisticsView, context)
@@ -71,6 +72,7 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkOdfMaximaExtractionView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberfoxView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberExtractionView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkFieldmapGeneratorView, context)
 }
 
 void PluginActivator::stop(ctkPluginContext* context)

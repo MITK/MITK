@@ -66,12 +66,12 @@ void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
   m_Histogram = histogram;
   HistogramConstIteratorType startIt = m_Histogram->End();
   HistogramConstIteratorType endIt = m_Histogram->End();
-  HistogramConstIteratorType it;
+  HistogramConstIteratorType it  = m_Histogram->Begin();
   ClearData();
   unsigned int i = 0;
   bool firstValue = false;
   // removes frequencies of 0, which are outside the first and last bin
-  for (it = m_Histogram->Begin() ; it != m_Histogram->End(); ++it)
+  for (; it != m_Histogram->End(); ++it)
   {
     if (it.GetFrequency() > 0.0)
     {
@@ -87,7 +87,7 @@ void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
   // generating Lists of measurement and frequencies
   for (it = startIt ; it != endIt; ++it, ++i)
   {
-    QVariant frequency = it.GetFrequency();
+    QVariant frequency = QVariant::fromValue(it.GetFrequency());
     QVariant measurement = it.GetMeasurementVector()[0];
     m_Frequency.insert(i, frequency);
     m_Measurement.insert(i, measurement);

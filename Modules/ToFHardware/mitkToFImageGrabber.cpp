@@ -23,7 +23,8 @@ namespace mitk
 {
   ToFImageGrabber::ToFImageGrabber():m_CaptureWidth(204),m_CaptureHeight(204),m_PixelNumber(41616),
     m_ImageSequence(0), m_RGBImageWidth(0), m_RGBImageHeight(0), m_RGBPixelNumber(0),
-    m_IntensityArray(NULL), m_DistanceArray(NULL), m_AmplitudeArray(NULL), m_SourceDataArray(NULL), m_RgbDataArray(NULL)
+    m_IntensityArray(NULL), m_DistanceArray(NULL), m_AmplitudeArray(NULL), m_SourceDataArray(NULL), m_RgbDataArray(NULL),
+    m_DistanceImageInitialized(false),m_IntensityImageInitialized(false),m_AmplitudeImageInitialized(false),m_RGBImageInitialized(false)
   {
     // Create the output. We use static_cast<> here because we know the default
     // output must be of type TOutputImage
@@ -51,11 +52,6 @@ namespace mitk
     }
   }
 
-  mitk::ImageSource::DataObjectPointer mitk::ImageSource::MakeOutput(unsigned int)
-  {
-    return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
-  }
-
   void ToFImageGrabber::GenerateData()
   {
     int requiredImageSequence = 0;
@@ -69,23 +65,29 @@ namespace mitk
     this->m_ToFCameraDevice->GetAllImages(this->m_DistanceArray, this->m_AmplitudeArray, this->m_IntensityArray, this->m_SourceDataArray,
       requiredImageSequence, this->m_ImageSequence, this->m_RgbDataArray );
 
-    mitk::Image::Pointer distanceImage = this->GetOutput(0);
-    if (!distanceImage->IsInitialized())
+    mitk::Image::Pointer distanceImage = this->GetOutput();
+    //if (!distanceImage->IsInitialized())
+    if (!m_DistanceImageInitialized)
     {
       distanceImage->ReleaseData();
       distanceImage->Initialize(FloatType, 3, dimensions, 1);
+      m_DistanceImageInitialized = true;
     }
     mitk::Image::Pointer amplitudeImage = this->GetOutput(1);
-    if (!amplitudeImage->IsInitialized())
+    //if (!amplitudeImage->IsInitialized())
+    if (!m_AmplitudeImageInitialized)
     {
       amplitudeImage->ReleaseData();
       amplitudeImage->Initialize(FloatType, 3, dimensions, 1);
+      m_AmplitudeImageInitialized = true;
     }
     mitk::Image::Pointer intensityImage = this->GetOutput(2);
-    if (!intensityImage->IsInitialized())
+    //if (!intensityImage->IsInitialized())
+    if (!m_IntensityImageInitialized)
     {
       intensityImage->ReleaseData();
       intensityImage->Initialize(FloatType, 3, dimensions, 1);
+      m_IntensityImageInitialized = true;
     }
 
     unsigned int rgbDimension[3];
@@ -93,10 +95,12 @@ namespace mitk
     rgbDimension[1] = this->GetRGBImageHeight();
     rgbDimension[2] = 1 ;
     mitk::Image::Pointer rgbImage = this->GetOutput(3);
-    if (!rgbImage->IsInitialized())
+    //if (!rgbImage->IsInitialized())
+    if (!m_RGBImageInitialized)
     {
       rgbImage->ReleaseData();
       rgbImage->Initialize(mitk::PixelType(MakePixelType<unsigned char, itk::RGBPixel<unsigned char>, 3>()), 3, rgbDimension,1);
+      m_RGBImageInitialized = true;
     }
 
     capturedImageSequence = this->m_ImageSequence;
@@ -140,7 +144,11 @@ namespace mitk
   bool ToFImageGrabber::DisconnectCamera()
   {
     bool success = m_ToFCameraDevice->DisconnectCamera();
-
+    // reset initialized flag of outputs to allow reinitializing when using new device
+    m_DistanceImageInitialized = false;
+    m_IntensityImageInitialized = false;
+    m_AmplitudeImageInitialized = false;
+    m_RGBImageInitialized = false;
     return success;
   }
 

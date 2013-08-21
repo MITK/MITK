@@ -24,9 +24,15 @@ class vtkPropAssembly;
 
 namespace mitk
 {
+  /** \brief Collects all VTK actors of all simulation models (mitk::SimulationModel) present in a simulation scene.
+   */
   class Simulation_EXPORT SimulationPropAssemblyVisitor : public sofa::simulation::Visitor
   {
   public:
+    /** \brief Sole public constructor.
+     *
+     * \param[in] propAssembly VTK prop assembly to which all found VTK actors will be appended as parts.
+     */
     explicit SimulationPropAssemblyVisitor(vtkPropAssembly* propAssembly, const sofa::core::ExecParams* params = sofa::core::ExecParams::defaultInstance());
     ~SimulationPropAssemblyVisitor();
 

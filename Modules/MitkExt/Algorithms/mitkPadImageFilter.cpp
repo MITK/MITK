@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::PadImageFilter::PadImageFilter()
 {
-  this->SetNumberOfInputs(2);
+  this->SetNumberOfIndexedInputs(2);
   this->SetNumberOfRequiredInputs(2);
   m_BinaryFilter = false;
 

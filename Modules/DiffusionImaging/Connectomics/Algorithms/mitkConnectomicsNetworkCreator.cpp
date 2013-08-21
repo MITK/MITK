@@ -90,6 +90,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
   m_ConNetwork->clear();
   m_LabelToVertexMap.clear();
   m_LabelToNodePropertyMap.clear();
+  idCounter = 0;
 
   vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
   vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();

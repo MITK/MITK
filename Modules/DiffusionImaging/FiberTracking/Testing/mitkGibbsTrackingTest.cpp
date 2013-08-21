@@ -48,7 +48,6 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     RegisterDiffusionCoreObjectFactory();
     RegisterFiberTrackingObjectFactory();
 
-    // test if fib1 can be read
     const std::string s1="", s2="";
     std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[1], s1, s2, false );
     mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile.at(0).GetPointer());

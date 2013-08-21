@@ -131,11 +131,7 @@ void mitk::ItkImageFileReader::GenerateData()
   void* buffer = new unsigned char[imageIO->GetImageSizeInBytes()];
   imageIO->Read( buffer );
 
-  mitk::PixelType pixelType = mitk::PixelType(imageIO->GetComponentTypeInfo(), imageIO->GetPixelType(),
-                                              imageIO->GetComponentSize(), imageIO->GetNumberOfComponents(),
-                                              imageIO->GetComponentTypeAsString( imageIO->GetComponentType() ).c_str(),
-                                              imageIO->GetPixelTypeAsString( imageIO->GetPixelType() ).c_str() );
-  image->Initialize( pixelType, ndim, dimensions );
+  image->Initialize( MakePixelType(imageIO), ndim, dimensions );
   image->SetImportChannel( buffer, 0, Image::ManageMemory );
 
   // access direction of itk::Image and include spacing

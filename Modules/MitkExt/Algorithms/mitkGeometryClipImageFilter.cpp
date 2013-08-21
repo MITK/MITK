@@ -37,7 +37,7 @@ mitk::GeometryClipImageFilter::GeometryClipImageFilter()
     m_AboveGeometryLabel(1),
     m_BelowGeometryLabel(2)
 {
-  this->SetNumberOfInputs(2);
+  this->SetNumberOfIndexedInputs(2);
   this->SetNumberOfRequiredInputs(2);
   m_InputTimeSelector  = mitk::ImageTimeSelector::New();
   m_OutputTimeSelector = mitk::ImageTimeSelector::New();

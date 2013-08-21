@@ -101,6 +101,10 @@ void mitk::SimulationDrawTool::drawPoints(const std::vector<Vector3>& points, fl
   m_Actors.push_back(actor);
 }
 
+void mitk::SimulationDrawTool::drawPoints(const std::vector<Vector3>&, float, const std::vector<Vec4f>)
+{
+}
+
 void mitk::SimulationDrawTool::drawLines(const std::vector<Vector3>& points, float lineWidth, const Vec4f color)
 {
   if (!m_Update || points.empty())
@@ -380,6 +384,10 @@ void mitk::SimulationDrawTool::drawFrame(const Vector3& position, const Quaterni
   m_Wireframe = wireframeBackup;
 }
 
+void mitk::SimulationDrawTool::drawFrame(const Vector3&, const Quaternion&, const Vec3f&, const Vec4f&)
+{
+}
+
 void mitk::SimulationDrawTool::drawSpheres(const std::vector<Vector3>& points, const std::vector<float>& radii, const Vec4f color)
 {
   if (!m_Update || points.empty())
@@ -532,6 +540,10 @@ void mitk::SimulationDrawTool::drawTriangle(const Vector3&, const Vector3&, cons
 }
 
 void mitk::SimulationDrawTool::drawSphere(const Vector3&, float)
+{
+}
+
+void mitk::SimulationDrawTool::drawBoundingBox(const Vector3&, const Vector3&)
 {
 }
 

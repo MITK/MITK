@@ -201,7 +201,7 @@ So a valid, but rather useless state machine would like like this:
 
 Optionally a state can be assigned a special mode that influences the event distribution.
 These modes are GRAB_INPUT , PREFER_INPUT and REGULAR (where REGULAR is default and does not need to be indicated).
-See \ref DispatcherEventDistSection for a description of these modes. Use the special modes only when necessary as they prevent other DataInteractors to
+See \ref DataInteractionTechnicalPage_DispatcherEventDistSection for a description of these modes. Use the special modes only when necessary as they prevent other DataInteractors to
 receive events.
 
 \code
@@ -276,7 +276,12 @@ void mitk::ExampleInteractor::ConnectActionsAndFunctions()
 }
 \endcode
 
-\section HowToDataInteractor Implementation a new DataInteractor
+\section ReferenceToIncludeFiles Integration of the pattern and configuration files
+
+See \ref IncludeFiles for a description.
+
+
+\section HowToDataInteractor Implementation of a new mitk::DataInteractor
 
 DataInteractors are to inherit from mitk::DataInteractor. Their functionality is implemented in functions that follow this interface:
 \code

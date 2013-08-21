@@ -94,6 +94,7 @@ void QmitkFiberProcessingView::StdMultiWidgetAvailable (QmitkStdMultiWidget &std
     m_MultiWidget = &stdMultiWidget;
 }
 
+
 void QmitkFiberProcessingView::StdMultiWidgetNotAvailable()
 {
     m_MultiWidget = NULL;
@@ -408,7 +409,7 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateTractDensityImage(mitk
 
 void QmitkFiberProcessingView::ResampleSelectedBundles()
 {
-    int factor = this->m_Controls->m_ResampleFibersSpinBox->value();
+    double factor = this->m_Controls->m_ResampleFibersSpinBox->value();
     for (int i=0; i<m_SelectedFB.size(); i++)
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());

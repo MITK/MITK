@@ -27,18 +27,10 @@ namespace itk
 template < class TInputImage, class TOutputImage >
 class DistanceMapFilter : public ImageToImageFilter<TInputImage, TOutputImage>
 {
-  /*!
-  \brief itkDistanceMapFilter
-
-  \brief Creates a distance map from a FA skeleton image.
-
-  \sa itkImageToImageFilter
-
-
-  \verbatim
-  Last contributor: $Author: vanbrugg $
-  \endverbatim
-  */
+    /**
+      * \brief This filter creates a map of the distance to the nearest point on a binary mask.
+      *
+      */
 
 public:
 
@@ -69,7 +61,7 @@ public:
   typedef SmartPointer<const Self> ConstPointer;
 
   /** */
-  itkNewMacro( Self);
+  itkNewMacro( Self)
 
   /** Generate Data. The image will be divided into a number of pieces, a number of threads
   will be spawned and Threaded GenerateData() will be called in each thread. */

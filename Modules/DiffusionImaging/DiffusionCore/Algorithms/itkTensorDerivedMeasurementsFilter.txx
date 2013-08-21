@@ -37,7 +37,7 @@ namespace itk {
 
 
     typename OutputImageType::Pointer outputImage =
-        static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+        static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
 
     typename TensorImageType::RegionType region = tensorImage->GetLargestPossibleRegion();
 

@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSimulationTemplate.h"
 #include <mitkProperties.h>
 #include <sstream>
+#include <vector>
 
 typedef std::vector<std::pair<std::string::size_type, std::string::size_type> > TemplateIndex;
 typedef std::vector<std::pair<std::string, mitk::BaseProperty::Pointer> > VariableContents;
@@ -26,22 +27,22 @@ static TemplateIndex CreateTemplateIndex(const std::string& contents)
   TemplateIndex templateIndex;
 
   std::string::size_type begin = 0;
-  begin = contents.find_first_of('{', 0);
+  begin = contents.find('{', 0);
 
   while (begin != std::string::npos)
   {
-    std::string::size_type end = contents.find_first_of('}', begin);
+    std::string::size_type end = contents.find('}', begin);
 
     if (end == std::string::npos)
-      mitkThrow() << "Expected closing brace before end of file!";
+      mitkThrow() << "Could not create template index: Expected closing brace before end of file!";
+
+    if (contents.substr(begin + 1, end).find('{') != std::string::npos)
+      mitkThrow() << "Could not create template index: Expected closing brace before opening brace!";
 
     templateIndex.push_back(std::make_pair(begin, ++end - begin));
 
-    begin = contents.find_first_of('{', end);
+    begin = contents.find('{', end);
   }
-
-  if (templateIndex.empty())
-    mitkThrow() << "No templates found!";
 
   return templateIndex;
 }
@@ -62,110 +63,206 @@ static std::vector<std::string> ParseStaticContents(const std::string& contents,
   return staticContents;
 }
 
+static std::size_t CountSingleQuotationMarks(const std::string& string)
+{
+  if (string.empty())
+    return 0;
+
+  const std::string::size_type length = string.length();
+  std::size_t n = string[0] == '\'' ? 1 : 0;
+
+  for (std::string::size_type i = 1; i != length; ++i)
+  {
+    if (string[i] == '\'' && string[i - 1] != '\\')
+      ++n;
+  }
+
+  return n;
+}
+
+static bool IsEven(std::size_t number)
+{
+  return number % 2 == 0;
+}
+
+static bool ValueExists(const std::string& templ, const std::string& valueName)
+{
+  std::string::size_type index = templ.find(valueName);
+  std::string::size_type definiteIndex = std::string::npos;
+
+  while (index != std::string::npos)
+  {
+    if (IsEven(CountSingleQuotationMarks(templ.substr(0, index))))
+    {
+      definiteIndex = index;
+      break;
+    }
+
+    index = templ.find(valueName, index + 1);
+  }
+
+  return definiteIndex != std::string::npos;
+}
+
+static std::string UnescapeSingleQuotationMarks(const std::string& escapedString)
+{
+  std::string::size_type length = escapedString.length();
+  std::string::size_type max_i = length - 2;
+
+  std::vector<char> unescapedString;
+  unescapedString.reserve(length);
+
+  for (std::string::size_type i = 0; i != length; ++i)
+  {
+    char c = escapedString[i];
+
+    if (c == '\\' && i <= max_i && escapedString[i + 1] == '\'')
+      continue;
+
+    unescapedString.push_back(c);
+  }
+
+  return std::string(unescapedString.begin(), unescapedString.end());
+}
+
 static std::string ParseValue(const std::string& templ, const std::string& valueName)
 {
   const char* spaces = " \t\n";
+
   std::string::size_type index = templ.find(valueName);
+  std::string::size_type definiteIndex = std::string::npos;
 
-  if (index != std::string::npos)
+  while (index != std::string::npos)
   {
-    index += valueName.length();
-    index = templ.find_first_not_of(spaces, index);
-
-    if (index != std::string::npos && templ[index] == '=')
+    if (IsEven(CountSingleQuotationMarks(templ.substr(0, index))))
     {
-      ++index;
-      index = templ.find_first_not_of(spaces, index);
+      if (definiteIndex != std::string::npos)
+        mitkThrow() << "Could not parse " << templ << ": " << valueName << " is ambiguous!";
 
-      if (index != std::string::npos && templ[index] == '\'')
-      {
-        ++index;
-        std::string::size_type length = templ.find_first_of('\'', index);
+      definiteIndex = index;
+    }
 
-        if (length != std::string::npos)
-        {
-          length -= index;
-          return templ.substr(index, length);
-        }
-      }
+    index = templ.find(valueName, index + 1);
+  }
+
+  if (definiteIndex == std::string::npos)
+    mitkThrow() << "Could not parse " << templ << ": " << valueName << " not found!";
+
+  index = templ.find_first_not_of(spaces, definiteIndex + valueName.length());
+
+  if (index == std::string::npos || templ[index] != '=')
+    mitkThrow() << "Could not parse " << templ << ": Expected assignment to " << valueName << "!";
+
+  index = templ.find_first_not_of(spaces, index + 1);
+
+  if (index == std::string::npos || templ[index] != '\'')
+    mitkThrow() << "Could not parse " << templ << ": Value of " << valueName << " is not enclosed within single quotation marks!";
+
+  std::string::size_type index2 = std::string::npos;
+  std::string::size_type length = templ.length();
+
+  for (std::string::size_type i = ++index; i != length; ++i)
+  {
+    if (templ[i] == '\'' && templ[i - 1] != '\\')
+    {
+      index2 = i;
+      break;
     }
   }
 
-  return "";
+  return UnescapeSingleQuotationMarks(templ.substr(index, index2 - index));
 }
 
-template <typename T> T FromString(const std::string& string)
+template <typename T>
+static T lexical_cast(const std::string& string)
 {
-  std::istringstream stream(string);
-
+  std::istringstream sstream(string);
   T value;
-  stream >> value;
+
+  sstream >> value;
+
+  if (sstream.fail())
+    mitkThrow() << "Lexical cast failed for '" << string << "'!";
 
   return value;
 }
 
 static std::pair<std::string, mitk::BaseProperty::Pointer> ParseReference(const std::string& ref)
 {
-  std::string id = "{ref}";
-  mitk::StringProperty::Pointer property = mitk::StringProperty::New(ref.substr(2, ref.length() - 4));
+  std::string id = "{}";
+  std::string string = ref.substr(2, ref.length() - 4);
 
-  return std::make_pair(id, property);
+  if (string.empty())
+    mitkThrow() << "Could not parse " << ref << ": Reference is empty!";
+
+  return std::make_pair(id, mitk::StringProperty::New(string));
 }
 
 static std::pair<std::string, mitk::BaseProperty::Pointer> ParseTemplate(const std::string& templ)
 {
-  if (templ.length() > 4 && templ[1] == '\'')
+  std::string::size_type length = templ.length();
+
+  if (length < 4) // {''}
+    mitkThrow() << "Could not parse " << templ << ": Too short to be reference or template!";
+
+  if(!IsEven(CountSingleQuotationMarks(templ)))
+    mitkThrow() << "Could not parse " << templ << ": Number of single quotation marks is odd!";
+
+  if(templ[1] == '\'')
   {
+    if (templ[length - 2] != '\'')
+      mitkThrow() << "Could not parse " << templ << ": Reference does not end with '}!";
+
     return ParseReference(templ);
   }
-  else
+
+  if (length < 7) // {id=''}
+    mitkThrow() << "Could not parse " << templ << ": Too short to be template!";
+
+  std::string id = ParseValue(templ, "id");
+
+  if (id.empty())
+    mitkThrow() << "Could not parse " << templ << ": Id is empty!";
+
+  std::string type = ValueExists(templ, "type")
+    ? ParseValue(templ, "type")
+    : "string";
+
+  std::string defaultValue = ValueExists(templ, "default")
+    ? ParseValue(templ, "default")
+    : "";
+
+  mitk::BaseProperty::Pointer property;
+
+  if (type == "float")
   {
-    std::string id = ParseValue(templ, "id");
+    float value = !defaultValue.empty()
+      ? lexical_cast<float>(defaultValue)
+      : 0.0;
 
-    if (!id.empty())
-    {
-      std::string type = ParseValue(templ, "type");
+    property = mitk::FloatProperty::New(value);
+  }
+  else if (type == "int")
+  {
+    int value = !defaultValue.empty()
+      ? lexical_cast<int>(defaultValue)
+      : 0.0;
 
-      if (type.empty())
-        type = "string";
+    property = mitk::IntProperty::New(value);
+  }
+  else if (type == "string")
+  {
+    std::string value = !defaultValue.empty()
+      ? defaultValue
+      : "";
 
-      mitk::BaseProperty::Pointer property;
-      std::string defaultValue = ParseValue(templ, "default");
-
-      if (type == "float")
-      {
-        float value = !defaultValue.empty()
-          ? FromString<float>(defaultValue)
-          : 0.0;
-
-        property = mitk::FloatProperty::New(value);
-      }
-      else if (type == "int")
-      {
-        int value = !defaultValue.empty()
-          ? FromString<int>(defaultValue)
-          : 0.0;
-
-        property = mitk::IntProperty::New(value);
-      }
-      else if (type == "string")
-      {
-        std::string value = !defaultValue.empty()
-          ? defaultValue
-          : "";
-
-        property = mitk::StringProperty::New(value);
-      }
-
-      if (property.IsNotNull())
-        return std::make_pair(id, property);
-    }
+    property = mitk::StringProperty::New(value);
   }
 
-  std::string emptyString;
-  mitk::BaseProperty::Pointer nullPointer;
+  if (property.IsNull())
+    mitkThrow() << "Could not parse " << templ << ": Unknown type '" << type << "'!";
 
-  return std::make_pair(emptyString, nullPointer);
+  return std::make_pair(id, property);
 }
 
 static VariableContents ParseVariableContents(const std::string& contents, const TemplateIndex& templateIndex)
@@ -175,12 +272,7 @@ static VariableContents ParseVariableContents(const std::string& contents, const
   for (TemplateIndex::const_iterator it = templateIndex.begin(); it != templateIndex.end(); ++it)
   {
     std::string templ = contents.substr(it->first, it->second);
-    std::pair<std::string, mitk::BaseProperty::Pointer> variableContent = ParseTemplate(templ);
-
-    if (variableContent.first.empty() || variableContent.second.IsNull())
-      mitkThrow() << "Could not parse " << templ << "!";
-
-    variableContents.push_back(variableContent);
+    variableContents.push_back(ParseTemplate(templ));
   }
 
   return variableContents;
@@ -213,11 +305,11 @@ mitk::SimulationTemplate::~SimulationTemplate()
 {
 }
 
-std::string mitk::SimulationTemplate::Bake() const
+std::string mitk::SimulationTemplate::CreateSimulation() const
 {
   if (!m_IsInitialized)
   {
-    MITK_ERROR << "Simulation template is not initialized!";
+    MITK_DEBUG << "Simulation template is not initialized!";
     return "";
   }
 
@@ -227,14 +319,14 @@ std::string mitk::SimulationTemplate::Bake() const
   {
     contents += m_StaticContents[i];
 
-    if (m_VariableContents[i].first == "{ref}")
+    if (m_VariableContents[i].first == "{}")
     {
       VariableContents::const_iterator it = std::find_if(m_VariableContents.begin(), m_VariableContents.end(),
         FirstEqualTo<std::string, mitk::BaseProperty::Pointer>(m_VariableContents[i].second->GetValueAsString()));
 
       if (it == m_VariableContents.end())
       {
-        MITK_ERROR << "Template '" << m_VariableContents[i].second << "' not found!";
+        MITK_DEBUG << "Template '" << m_VariableContents[i].second << "' not found!";
         return "";
       }
 
@@ -254,7 +346,10 @@ std::string mitk::SimulationTemplate::Bake() const
 bool mitk::SimulationTemplate::Parse(const std::string& contents)
 {
   if (m_IsInitialized)
+  {
+    MITK_DEBUG << "Simulation template is already initialized!";
     return false;
+  }
 
   TemplateIndex templateIndex = CreateTemplateIndex(contents);
   std::vector<std::string> staticContents = ParseStaticContents(contents, templateIndex);
@@ -272,31 +367,36 @@ bool mitk::SimulationTemplate::RequestedRegionIsOutsideOfTheBufferedRegion()
   return false;
 }
 
-void mitk::SimulationTemplate::SetProperties(mitk::DataNode::Pointer dataNode) const
+bool mitk::SimulationTemplate::SetProperties(mitk::DataNode::Pointer dataNode) const
 {
   if (dataNode.IsNull())
-    return;
+  {
+    MITK_DEBUG << "Data node does not exist!";
+    return false;
+  }
 
   if (!m_IsInitialized)
   {
-    MITK_ERROR << "Simulation template is not initialized!";
-    return;
+    MITK_DEBUG << "Simulation template is not initialized!";
+    return false;
   }
 
   if (dynamic_cast<SimulationTemplate*>(dataNode->GetData()) != this)
   {
-    MITK_ERROR << "Data node does not own this simulation template!";
-    return;
+    MITK_DEBUG << "Data node does not own this simulation template!";
+    return false;
   }
 
   for(VariableContents::const_iterator it = m_VariableContents.begin(); it != m_VariableContents.end(); ++it)
   {
-    if (it->first != "{ref}")
+    if (it->first != "{}")
       dataNode->SetProperty(it->first.c_str(), it->second.GetPointer());
   }
+
+  return true;
 }
 
-void mitk::SimulationTemplate::SetRequestedRegion(itk::DataObject*)
+void mitk::SimulationTemplate::SetRequestedRegion(const itk::DataObject*)
 {
 }
 

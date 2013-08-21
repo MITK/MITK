@@ -46,13 +46,17 @@ public:
   typedef TbssImage OutputType;
   typedef itk::DataObject::Pointer DataObjectPointer;
 
-  virtual DataObjectPointer MakeOutput(unsigned int idx);
+  virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
+
+  OutputType* GetOutput()
+  {
+      return itkDynamicCastInDebugMode<OutputType*>( this->GetPrimaryOutput() );
+  }
 
   //OutputType * GetOutput(unsigned int idx);
 
   //void SetOutput(OutputType* output);
 
-  //OutputType* GetOutput()
   //{return Superclass::GetOutput();}
 
   OutputType* GetOutput(unsigned int idx);

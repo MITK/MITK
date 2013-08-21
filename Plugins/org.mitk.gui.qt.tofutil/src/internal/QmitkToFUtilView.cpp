@@ -309,7 +309,7 @@ void QmitkToFUtilView::OnToFCameraStarted()
 
     // initial update of composite filter
     this->m_ToFCompositeFilter->Update();
-    this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
+    this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput();
     this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
 
     std::string rgbFileName;
@@ -417,7 +417,7 @@ void QmitkToFUtilView::OnToFCameraStopped()
 void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
 {
   m_SelectedCamera = selected;
-  if ((selected.contains("CamBoard"))||(selected.contains("O3D")))
+  if (selected.contains("O3D"))
   {
     MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
     this->m_Controls->m_SurfaceCheckBox->setEnabled(false);

@@ -30,7 +30,7 @@ mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(mitk::Image::Pointer refImg, mi
   picDesc->dim = refImg->GetDimension();
   memcpy( picDesc->n, imDesc->GetDimensions(), picDesc->dim * sizeof(unsigned int) );
 
-  picDesc->type = CastToIpPicType( refImg->GetPixelType().GetTypeId() );
+  picDesc->type = CastToIpPicType( refImg->GetPixelType().GetComponentType() );
   picDesc->bpe = refImg->GetPixelType().GetBpe();
   picDesc->data = imageAccess->GetData();
 
@@ -52,7 +52,7 @@ mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDa
     picDesc->n[i] = refItem->GetDimension(i);
   }
 
-  picDesc->type = CastToIpPicType( refItem->GetPixelType().GetTypeId() );
+  picDesc->type = CastToIpPicType( refItem->GetPixelType().GetComponentType() );
   picDesc->bpe = refItem->GetPixelType().GetBpe();
   picDesc->data = imageAccess->GetData();
 
@@ -74,7 +74,7 @@ mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(mitk::Image::Pointer refImg, mi
   picDesc->dim = refImg->GetDimension();
   memcpy( picDesc->n, imDesc->GetDimensions(), picDesc->dim * sizeof(unsigned int) );
 
-  picDesc->type = CastToIpPicType( refImg->GetPixelType().GetTypeId() );
+  picDesc->type = CastToIpPicType( refImg->GetPixelType().GetComponentType() );
   picDesc->bpe = refImg->GetPixelType().GetBpe();
   picDesc->data = refImg->GetData();
 
@@ -96,7 +96,7 @@ mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDa
     picDesc->n[i] = refItem->GetDimension(i);
   }
 
-  picDesc->type = CastToIpPicType( refItem->GetPixelType().GetTypeId() );
+  picDesc->type = CastToIpPicType( refItem->GetPixelType().GetComponentType() );
   picDesc->bpe = refItem->GetPixelType().GetBpe();
   picDesc->data = refItem->GetData();
 
@@ -117,24 +117,24 @@ mitk::ImageDescriptor::Pointer mitk::CastToImageDescriptor(mitkIpPicDescriptor *
   return imDescriptor;
 }
 
-mitkIpPicType_t mitk::CastToIpPicType( const std::type_info& intype )
+mitkIpPicType_t mitk::CastToIpPicType( int intype )
 {
   //const std::type_info& intype = ptype.GetTypeId();
 
   //MITK_INFO << "Casting to PicType from " << intype.name() << std::endl;
 
-  const bool isSignedIntegralType = (   intype == typeid(int)
-                                 || intype == typeid(short)
-                                 || intype == typeid(char)
-                                 || intype == typeid(long int) );
+  const bool isSignedIntegralType = (   intype == itk::ImageIOBase::INT
+                                 || intype == itk::ImageIOBase::SHORT
+                                 || intype == itk::ImageIOBase::CHAR
+                                 || intype == itk::ImageIOBase::LONG );
 
-  const bool isUnsignedIntegralType = (   intype == typeid(unsigned int)
-                                   || intype == typeid(unsigned short)
-                                   || intype == typeid(unsigned char)
-                                   || intype == typeid(unsigned long int) );
+  const bool isUnsignedIntegralType = (   intype == itk::ImageIOBase::UINT
+                                   || intype == itk::ImageIOBase::USHORT
+                                   || intype == itk::ImageIOBase::UCHAR
+                                   || intype == itk::ImageIOBase::ULONG );
 
-  const bool isFloatingPointType = (   intype == typeid(float)
-                                || intype == typeid(double) );
+  const bool isFloatingPointType = (   intype == itk::ImageIOBase::FLOAT
+                                || intype == itk::ImageIOBase::DOUBLE );
 
   if( isSignedIntegralType ) return mitkIpPicInt;
   if( isUnsignedIntegralType ) return mitkIpPicUInt;

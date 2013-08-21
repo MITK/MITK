@@ -98,7 +98,7 @@ namespace mitk
 
     Surface* GetContoursAsSurface();
 
-    void SetDataStorage(DataStorage &ds);
+    void SetDataStorage(DataStorage::Pointer ds);
 
     /**
      * Sets the current list of contourpoints which is used for the surface interpolation
@@ -128,6 +128,8 @@ namespace mitk
 
  private:
 
+   void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
+
    struct ContourPositionPair {
      Surface::Pointer contour;
      RestorePlanePositionOperation* position;
@@ -153,7 +155,7 @@ namespace mitk
 
     unsigned int m_DistImageVolume;
 
-    mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+    mitk::DataStorage::Pointer m_DataStorage;
 
     ContourListMap m_MapOfContourLists;
 
@@ -162,6 +164,8 @@ namespace mitk
     unsigned int m_CurrentNumberOfReducedContours;
 
     mitk::Image* m_SelectedSegmentation;
+
+    std::map<mitk::Image*, unsigned long> m_SegmentationObserverTags;
  };
 }
 #endif

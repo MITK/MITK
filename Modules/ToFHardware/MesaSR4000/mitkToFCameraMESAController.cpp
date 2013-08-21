@@ -34,7 +34,7 @@ namespace mitk
   bool ToFCameraMESAController::CloseCameraConnection()
   {
     m_MESARes = SR_Close(m_MESAHandle); //res=SR_Close(srCam);
-    m_ConnectionCheck = ErrorText(m_MESARes);
+    m_ConnectionCheck = !ErrorText(m_MESARes); // if disconnection was successful set connection check to false
     m_MESAHandle = 0;
     return m_ConnectionCheck;
   }

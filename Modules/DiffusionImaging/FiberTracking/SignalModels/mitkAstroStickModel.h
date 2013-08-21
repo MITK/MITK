@@ -44,8 +44,8 @@ public:
     PixelType SimulateMeasurement();
 
     void SetRandomizeSticks(bool randomize=true){ m_RandomizeSticks=randomize; }
-    void SetBvalue(float bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
-    void SetDiffusivity(float diffusivity) { m_Diffusivity = diffusivity; } ///< Scalar diffusion constant
+    void SetBvalue(ScalarType bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
+    void SetDiffusivity(ScalarType diffusivity) { m_Diffusivity = diffusivity; } ///< Scalar diffusion constant
     void SetNumSticks(unsigned int order)
     {
         vnl_matrix<double> sticks;
@@ -88,8 +88,8 @@ public:
 protected:
 
     GradientType GetRandomDirection();
-    float   m_BValue;       ///< b-value used to generate the artificial signal
-    float   m_Diffusivity;  ///< Scalar diffusion constant
+    ScalarType   m_BValue;       ///< b-value used to generate the artificial signal
+    ScalarType   m_Diffusivity;  ///< Scalar diffusion constant
     GradientListType m_Sticks;
     unsigned int m_NumSticks;
     bool m_RandomizeSticks;

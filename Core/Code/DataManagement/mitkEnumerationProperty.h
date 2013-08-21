@@ -80,9 +80,6 @@ public:
    */
   typedef EnumIdsContainerType::const_iterator EnumConstIterator;
 
-  Pointer Clone() const;
-
-
   /**
    * Adds an enumeration value into the enumeration. The name and id provided
    * must be unique. This is checked while adding the new enumeration value.
@@ -202,13 +199,13 @@ protected:
   virtual bool IsEqual( const BaseProperty& property ) const;
   virtual bool Assign( const BaseProperty& property );
 
+  itk::LightObject::Pointer InternalClone() const;
+
+
 private:
 
   // purposely not implemented
   EnumerationProperty& operator=(const EnumerationProperty&);
-
-  itk::LightObject::Pointer InternalClone() const;
-
   IdType m_CurrentValue;
 
   typedef std::map<std::string, EnumIdsContainerType> IdMapForClassNameContainerType;
@@ -216,7 +213,6 @@ private:
 
   static IdMapForClassNameContainerType s_IdMapForClassName;
   static StringMapForClassNameContainerType s_StringMapForClassName;
-
 };
 
 #ifdef _MSC_VER

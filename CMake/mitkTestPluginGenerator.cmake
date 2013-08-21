@@ -38,6 +38,8 @@ if(BUILD_TESTING)
       add_test(NAME mitkPluginGeneratorConfigureTest-${config} CONFIGURATIONS ${config}
                WORKING_DIRECTORY "${test_project_binary_dir}"
                COMMAND ${CMAKE_COMMAND} -D MITK_DIR:PATH=${MITK_BINARY_DIR}
+                                        -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
+                                        -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
                                         -G ${CMAKE_GENERATOR}
                                         "${test_project_source_dir}")
       set_tests_properties(mitkPluginGeneratorConfigureTest-${config} PROPERTIES
@@ -55,6 +57,8 @@ if(BUILD_TESTING)
              WORKING_DIRECTORY "${test_project_binary_dir}"
              COMMAND ${CMAKE_COMMAND} -D MITK_DIR:PATH=${MITK_BINARY_DIR}
                                       -D CMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+                                      -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
+                                      -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
                                       -G ${CMAKE_GENERATOR}
                                       "${test_project_source_dir}")
     set_tests_properties(mitkPluginGeneratorConfigureTest-${CMAKE_BUILD_TYPE} PROPERTIES

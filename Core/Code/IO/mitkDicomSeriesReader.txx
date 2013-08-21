@@ -486,8 +486,12 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
      For CT, HU -1000 might be meaningful, but a general solution seems not possible. Even for CT,
      -1000 would only look natural for many not all images.
   */
+
   // TODO use (0028,0120) Pixel Padding Value if present
+  /*
+  TODO what to do with RGB pixels?
   resampler->SetDefaultPixelValue( std::numeric_limits<typename ImageType::PixelType>::min() );
+  */
 
   // adjust size in Y direction! (maybe just transform the outer last pixel to see how much space we would need
 

@@ -3,7 +3,7 @@
 
 \tableofcontents
 
-\section InteractionPage_Introduction Introduction to Interaction in MITK
+\section DataInteractionPage_Introduction Introduction to Interaction in MITK
 
 Interaction is a very important task in medical image processing software. Therefore MITK provides a special interaction concept
 that provides the developer with an easy way to develop and maintain user interaction separately from the algorithms processing the input.
@@ -21,9 +21,11 @@ Consult \ref HowToUseDataInteractor for usage information.\n
 See \ref SectionImplementationDataInteractor for an example on how to implement a new mitk::DataInteractor \n
 for information about how to create new events refer to ImplementNewEventsPage.\n
 The documentation of the depricated former concept can be found at \ref InteractionPage.
+\n
+For a list of changes with respect to the previous interaction concept please refer to the \ref InteractionMigration
 
 
-\section HandlingSection Event Handling & GUI Toolkit Abstraction
+\section DataInteractionPage_HandlingSection Event Handling & GUI Toolkit Abstraction
 
 The following sequence diagram gives an exemplary overview of the process from creating an event until executing an action in the mitk::DataInteractor.
 This diagram assumes the usage of the Qt framework, but also shows that the interaction concept itself is implemented independent of any specific
@@ -40,7 +42,7 @@ graphical user interface toolkit.
   <li>the actions associated with a state change (transition) are executed and the event is successfully handled.
 </ol>
 
-\section EventPage Events
+\section DataInteractionPage_EventPage Events
 
 Events can describe any sort of user input, such as key strokes, mouse clicks or touch gestures.
 These events are mapped from an UI framework like Qt to an MITK internal representation
@@ -50,7 +52,7 @@ events from tracking devices, etc. Refer to \subpage ImplementNewEventsPage to s
 For an overview of available Events see mitk::InteractionEvent, for on overview of parameters see the \subpage DataInteractionTechnicalPage.
 
 
-\section InteractionEventHandlerSection InteractionEventHandler
+\section DataInteractionPage_InteractionEventHandlerSection InteractionEventHandler
 Is the term describing objects in general that can handle events. These objects can be divided into two groups, namely
 \link mitk::DataInteractor DataInteractors\endlink and mitk::InteractionEventObserver. Their difference is that mitk::DataInteractor instances are
 linked with a mitk::DataNode which they manipulate, whereas mitk::InteractionEventObserver instances do not have a mitk::DataNode and therefore
@@ -67,11 +69,11 @@ digraph linker_deps {
 }
 \enddot
 
-\subsection DataInteractorsSection DataInteractors
+\subsection DataInteractionPage_DataInteractorsSection DataInteractors
 DataInteractors are specialized mitk::InteractionEventHandler which handle events for one spefific DataNode. They are implemented following a concept called state machines
 (see e.g. <a href="http://en.wikipedia.org/wiki/Mealy_machine"> Wikipedia </a>).
 
-\subsubsection StateMachinesSection StateMachines
+\subsubsection DataInteractionPage_StateMachinesSection StateMachines
 
 A specific events action is usually desired to depend on the content of the data object and the state of the interaction.
 For example when adding a line by clicking with the mouse, the first two clicks are supposed to add a point.
@@ -119,7 +121,7 @@ digraph  {
 In this way state machines provide both, a nice and structured way to represent interaction tasks and description of the interaction which is separated from the code.
 One DataInteractor can be re-used for different tasks by simply exchanging the state machine pattern.  These patterns are described in XML files.
 
-\subsubsection DefinitionStateMachine Definition of a State Machine
+\subsubsection DataInteractionPage_DefinitionStateMachine Definition of a State Machine
 
 The definition is made up out of three components.
 <ul>
@@ -149,7 +151,7 @@ An example of a state machine describing the interaction of example 2 looks like
 
 For a more detailed description of state machine patterns see here.
 
-\subsection InteractionEventObserverSection InteractionEventObserver
+\subsection DataInteractionPage_InteractionEventObserverSection InteractionEventObserver
 
 mitk::InteractionEventObserver instances are objects which will receive all user input and are intended for observation only,
 they should never modify any DataNodes.
@@ -169,7 +171,7 @@ digraph event_observer {
 }
 \enddot
 
-\subsection ConfigurationSection Configuration
+\subsection DataInteractionPage_ConfigurationSection Configuration
 In a lot of cases it is preferable to implement interactions independent of a specific event (e.g. left click with mouse), such that it is possible
 to easily change this. This is achieved through configuration of \link mitk::InteractioinEventHandler InteractionEventHandlers\endlink.
 This allows to change the behavior at runtime.
@@ -213,7 +215,7 @@ In this way all objects derived from mitk::InteractionEventHandler can be config
 \ref DataInteractionTechnicalPage page.
 
 
-\section DispatcherSection Dispatcher
+\section DataInteractionPage_DispatcherSection Dispatcher
 
 Instances of mitk::Dispatcher receive all events and distribute them to their related mitk::DataInteractor instances. This is done by ordering
 the DataInteractors according to the layer of their

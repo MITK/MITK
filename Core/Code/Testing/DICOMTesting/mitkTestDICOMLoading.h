@@ -60,7 +60,7 @@ class mitkDICOMTesting_EXPORT TestDICOMLoading
 
     void ResetUserLocale();
 
-    std::string TypeIDToString( const std::type_info& );
+    std::string ComponentTypeToString( int type );
 
     KeyValueMap ParseDump( const std::string& dump );
 

@@ -307,7 +307,7 @@ void QmitkIGTPlayerWidget::OnPlaying()
     m_Controls->sampleLCDNumber->display(static_cast<int>(m_CurrentSequentialPointNumber));
 
     //for debugging purposes
-    //std::cout << "Sample: " << m_CurrentSequentialPointNumber << " X: " << m_SequentialPlayer->GetOutput(0)->GetPosition()[0] << " Y: " << m_SequentialPlayer->GetOutput(0)->GetPosition()[1] << " Y: " << m_SequentialPlayer->GetOutput(0)->GetPosition()[2] << std::endl;
+    //std::cout << "Sample: " << m_CurrentSequentialPointNumber << " X: " << m_SequentialPlayer->GetOutput()->GetPosition()[0] << " Y: " << m_SequentialPlayer->GetOutput()->GetPosition()[1] << " Y: " << m_SequentialPlayer->GetOutput()->GetPosition()[2] << std::endl;
 
     emit SignalPlayerUpdated(); // player successfully updated
 

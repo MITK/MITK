@@ -53,6 +53,7 @@ mitk::ExtractSliceFilter::~ExtractSliceFilter(){
 }
 
 void mitk::ExtractSliceFilter::GenerateOutputInformation(){
+  Superclass::GenerateOutputInformation();
   //TODO try figure out how to set the specs of the slice before it is actually extracted
   /*Image::Pointer output = this->GetOutput();
   Image::ConstPointer input = this->GetInput();
@@ -314,6 +315,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
       break;
     case RESLICE_CUBIC:
       m_Reslicer->SetInterpolationModeToCubic();
+      break;
     default:
       //the default interpolation used by mitk
       m_Reslicer->SetInterpolationModeToNearestNeighbor();
@@ -409,8 +411,10 @@ void mitk::ExtractSliceFilter::GenerateData(){
     //set the geometry from current worldgeometry for the reusultimage
     //this is needed that the image has the correct mitk geometry
     //the originalGeometry is the Geometry of the result slice
-    AffineGeometryFrame3D::Pointer originalGeometryAGF = m_WorldGeometry->Clone();
-    Geometry2D::Pointer originalGeometry = dynamic_cast<Geometry2D*>( originalGeometryAGF.GetPointer() );
+
+//    mitk::AffineGeometryFrame3D::Pointer originalGeometryAGF = m_WorldGeometry->Clone();
+//    Geometry2D::Pointer originalGeometry = dynamic_cast<Geometry2D*>( originalGeometryAGF.GetPointer() );
+    Geometry2D::Pointer originalGeometry = m_WorldGeometry->Clone();
 
     originalGeometry->GetIndexToWorldTransform()->SetMatrix(m_WorldGeometry->GetIndexToWorldTransform()->GetMatrix());
 

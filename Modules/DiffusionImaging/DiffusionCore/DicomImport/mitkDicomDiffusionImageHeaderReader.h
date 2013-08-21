@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFileReader.h>
 #include "itkImageSeriesReader.h"
 #include "itkImageFileReader.h"
-#include "itkOrientedImage.h"
+#include "itkImage.h"
 #include "itkGDCMImageIO.h"
 #include "mitkDiffusionImageHeaderInformation.h"
 
@@ -52,8 +52,8 @@ namespace mitk
     typedef std::vector< std::string > FileNamesContainer;
 
     typedef short PixelValueType;
-    typedef itk::OrientedImage< PixelValueType, 2 > SliceType;
-    typedef itk::OrientedImage< PixelValueType, 3 > VolumeType;
+    typedef itk::Image< PixelValueType, 2 > SliceType;
+    typedef itk::Image< PixelValueType, 3 > VolumeType;
     typedef itk::ImageSeriesReader< VolumeType > VolumeReaderType;
     typedef itk::ImageFileReader< SliceType > SliceReaderType;
     typedef itk::GDCMImageIO ImageIOType;

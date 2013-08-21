@@ -151,7 +151,7 @@ int mitkSlicedGeometry3DTest(int /*argc*/, char* /*argv*/[])
   mitk::FillVector3D(normal,         0,          0, thicknessInMM);
 
   std::cout << "Initializing planegeometry1 by InitializeStandardPlane(rightVector, downVector, spacing = NULL): "<<std::endl;
-  planegeometry1->InitializeStandardPlane(right.Get_vnl_vector(), bottom.Get_vnl_vector());
+  planegeometry1->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
 
   std::cout << "Setting planegeometry2 to a cloned version of planegeometry1: "<<std::endl;
   mitk::PlaneGeometry::Pointer planegeometry2;
@@ -170,9 +170,9 @@ int mitkSlicedGeometry3DTest(int /*argc*/, char* /*argv*/[])
   transform->SetMatrix(matrix);
   transform->SetOffset(planegeometry2->GetIndexToWorldTransform()->GetOffset());
 
-  right.Set_vnl_vector( rotation.rotation_matrix_transpose()*right.Get_vnl_vector() );
-  bottom.Set_vnl_vector(rotation.rotation_matrix_transpose()*bottom.Get_vnl_vector());
-  normal.Set_vnl_vector(rotation.rotation_matrix_transpose()*normal.Get_vnl_vector());
+  right.SetVnlVector( rotation.rotation_matrix_transpose()*right.GetVnlVector() );
+  bottom.SetVnlVector(rotation.rotation_matrix_transpose()*bottom.GetVnlVector());
+  normal.SetVnlVector(rotation.rotation_matrix_transpose()*normal.GetVnlVector());
   planegeometry2->SetIndexToWorldTransform(transform);
 
 

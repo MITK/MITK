@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h> // my be replaced by class
 #include <vtkDataSet.h>
 
-#include <QStringList>
+//#include <QStringList>
 
 #include <mitkPlanarFigure.h>
 
@@ -54,7 +54,7 @@ public:
     virtual void SetRequestedRegionToLargestPossibleRegion();
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
     virtual bool VerifyRequestedRegion();
-    virtual void SetRequestedRegion( itk::DataObject *data );
+    virtual void SetRequestedRegion(const itk::DataObject *data );
 
     mitkClassMacro( FiberBundleX, BaseData )
     itkNewMacro( Self )
@@ -70,8 +70,8 @@ public:
 
     // fiber smoothing/resampling
     void ResampleFibers(float pointDistance = 1);
-    void DoFiberSmoothing(int pointsPerCm);
-    void DoFiberSmoothing(int pointsPerCm, double tension, double continuity, double bias );
+    void DoFiberSmoothing(float pointDistance);
+    void DoFiberSmoothing(float pointDistance, double tension, double continuity, double bias );
     bool RemoveShortFibers(float lengthInMM);
     bool RemoveLongFibers(float lengthInMM);
     bool ApplyCurvatureThreshold(float minRadius, bool deleteFibers);
@@ -88,6 +88,7 @@ public:
     FiberBundleX::Pointer           ExtractFiberSubset(PlanarFigure *pf);
     std::vector<long>               ExtractFiberIdSubset(PlanarFigure* pf);
     FiberBundleX::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint);
+    FiberBundleX::Pointer           RemoveFibersOutside(ItkUcharImgType* mask, bool invert=false);
 
     vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds( std::vector<long> ); // TODO: make protected
     void                            GenerateFiberIds(); // TODO: make protected
@@ -95,7 +96,7 @@ public:
     // get/set data
     void SetFiberPolyData(vtkSmartPointer<vtkPolyData>, bool updateGeometry = true);
     vtkSmartPointer<vtkPolyData> GetFiberPolyData();
-    QStringList GetAvailableColorCodings();
+    std::vector< std::string > GetAvailableColorCodings();
     char* GetCurrentColorCoding();
     itkGetMacro( NumFibers, int)
     itkGetMacro( FiberSampling, int)

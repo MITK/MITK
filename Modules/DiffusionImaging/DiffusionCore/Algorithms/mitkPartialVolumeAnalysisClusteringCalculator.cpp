@@ -445,17 +445,19 @@ namespace mitk
     double sum = histogram->GetTotalFrequency();
 
     // initialize two histograms for class and total probabilities
-    MitkHistType::MeasurementVectorType min;
-    MitkHistType::MeasurementVectorType max;
+    MitkHistType::MeasurementVectorType min(1);
+    MitkHistType::MeasurementVectorType max(1);
     min.Fill(histogram->GetDimensionMins(0)[0]);
     max.Fill(histogram->GetDimensionMaxs(0)[histogram->GetDimensionMaxs(0).size()-1]);
 
     MitkHistType::Pointer interestingHist = MitkHistType::New();
+    interestingHist->SetMeasurementVectorSize(1);
     interestingHist->Initialize(histogram->GetSize(),min,max);
     MitkHistType::Iterator newIt = interestingHist->Begin();
     MitkHistType::Iterator newEnd = interestingHist->End();
 
     MitkHistType::Pointer totalHist = MitkHistType::New();
+    totalHist->SetMeasurementVectorSize(1);
     totalHist->Initialize(histogram->GetSize(),min,max);
     MitkHistType::Iterator totalIt = totalHist->Begin();
     MitkHistType::Iterator totalEnd = totalHist->End();
@@ -534,13 +536,13 @@ namespace mitk
     itimage = itimage.Begin();
     itprob = itprob.Begin();
 
-    MitkHistType::IndexType index;
+    MitkHistType::IndexType index(1);
     float maxp = 0;
     while( !itimage.IsAtEnd() )
     {
       if(itimage.Get())
       {
-        MitkHistType::MeasurementVectorType meas;
+        MitkHistType::MeasurementVectorType meas(1);
         meas.Fill(itimage.Get());
         double aposteriori = 0;
         bool success = clusterResults.interestingHist->GetIndex(meas, index );
@@ -757,28 +759,16 @@ namespace mitk
 
     // generate a histogram from the list sample
     typedef float HistogramMeasurementType;
-    typedef itk::Statistics::ListSampleToHistogramGenerator
-        < ListSampleType, HistogramMeasurementType,
-        itk::Statistics::DenseFrequencyContainer,
-        MeasurementVectorLength > GeneratorType;
+    typedef itk::Statistics::Histogram< HistogramMeasurementType, itk::Statistics::DenseFrequencyContainer2 > HistogramType;
+    typedef itk::Statistics::SampleToHistogramFilter< ListSampleType, HistogramType > GeneratorType;
     GeneratorType::Pointer generator = GeneratorType::New();
 
-    GeneratorType::HistogramType::SizeType size;
+    GeneratorType::HistogramType::SizeType size(2);
     size.Fill(30);
-    generator->SetNumberOfBins( size );
+    generator->SetHistogramSize( size );
 
-    generator->SetListSample( listSample );
+    generator->SetInput( listSample );
     generator->SetMarginalScale( 10.0 );
-
-    MeasurementVectorType min;
-    min[0] = ( MeasurementType ) 0;
-    min[1] = ( MeasurementType ) 0;
-    generator->SetHistogramMin(min);
-
-    MeasurementVectorType max;
-    max[0] = ( MeasurementType ) PVA_PI;
-    max[1] = ( MeasurementType ) PVA_PI;
-    generator->SetHistogramMax(max);
 
     generator->Update();
 

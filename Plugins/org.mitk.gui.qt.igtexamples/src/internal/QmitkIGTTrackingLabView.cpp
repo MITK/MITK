@@ -184,7 +184,7 @@ void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
     return;
   }
 
-  mitk::NavigationData::Pointer nd = m_Source->GetOutput(0);
+  mitk::NavigationData::Pointer nd = m_Source->GetOutput();
 
   if( nd.IsNull() || !nd->IsDataValid())
     QMessageBox::warning( 0, "Invalid tracking data", "Navigation data is not available or invalid!", QMessageBox::Ok );

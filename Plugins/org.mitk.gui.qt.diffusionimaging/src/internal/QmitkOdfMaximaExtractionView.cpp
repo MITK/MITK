@@ -166,6 +166,7 @@ void QmitkOdfMaximaExtractionView::TemplatedConvertShCoeffs(mitk::Image* mitkImg
         DataNode::Pointer node = DataNode::New();
         node->SetData(img);
         node->SetName("_ShCoefficientImage");
+        node->SetVisibility(false);
         GetDataStorage()->Add(node);
     }
 
@@ -291,6 +292,7 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
             name += "_Direction";
             name += QString::number(i+1);
             node->SetName(name.toStdString().c_str());
+            node->SetVisibility(false);
             GetDataStorage()->Add(node);
         }
         break;
@@ -333,6 +335,19 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
         node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
         GetDataStorage()->Add(node);
 
+        {
+            ItkUcharImgType::Pointer numDirImage = filter->GetNumDirectionsImage();
+            mitk::Image::Pointer image2 = mitk::Image::New();
+            image2->InitializeByItk( numDirImage.GetPointer() );
+            image2->SetVolume( numDirImage->GetBufferPointer() );
+            DataNode::Pointer node2 = DataNode::New();
+            node2->SetData(image2);
+            QString name(m_ImageNodes.at(0)->GetName().c_str());
+            name += "_NumDirections";
+            node2->SetName(name.toStdString().c_str());
+            GetDataStorage()->Add(node2);
+        }
+
         typedef FilterType::DirectionImageContainerType DirectionImageContainerType;
         DirectionImageContainerType::Pointer container = filter->GetDirectionImageContainer();
         for (int i=0; i<container->Size(); i++)
@@ -347,6 +362,7 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
             name += "_Direction";
             name += QString::number(i+1);
             node->SetName(name.toStdString().c_str());
+            node->SetVisibility(false);
             GetDataStorage()->Add(node);
         }
         break;
@@ -526,6 +542,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction()
             name += "_Direction";
             name += QString::number(i+1);
             node->SetName(name.toStdString().c_str());
+            node->SetVisibility(false);
             GetDataStorage()->Add(node);
         }
     }

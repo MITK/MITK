@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkMapper.h"
 #include "mitkGLMapper.h"
 #include "mitkGeometry2DDataVtkMapper3D.h"
-#include "mitkPointSetGLMapper2D.h"
 
 #include "mitkImageSliceSelector.h"
 #include "mitkRenderingManager.h"

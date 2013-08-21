@@ -26,6 +26,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkOrientationDistributionFunction.h>
 #include <mitkFiberBundleX.h>
 #include <mitkPlanarEllipse.h>
+#include <mitkDiffusionNoiseModel.h>
+#include <mitkDiffusionSignalModel.h>
+#include <mitkRicianNoiseModel.h>
+#include <itkTractsToDWIImageFilter.h>
+#include <mitkTensorModel.h>
+#include <mitkBallModel.h>
+#include <mitkStickModel.h>
+#include <mitkAstroStickModel.h>
+#include <mitkDotModel.h>
 
 /*!
 \brief View for fiber based diffusion software phantoms (Fiberfox).
@@ -60,9 +69,12 @@ public:
     typedef itk::Vector<double,3>           GradientType;
     typedef vector<GradientType>            GradientListType;
 
-    template<int ndirs> vector<itk::Vector<double,3> > MakeGradientList() ;
+    template<int ndirs> vector<itk::Vector<double,3> > MakeGradientList();
 
 protected slots:
+
+    void LoadParameters();
+    void SaveParameters();
 
     void OnDrawROI();           ///< adds new ROI, handles interactors etc.
     void OnAddBundle();         ///< adds new fiber bundle to datastorage
@@ -81,7 +93,7 @@ protected slots:
 
     /** update fibers if any parameter changes */
     void OnFiberDensityChanged(int value);
-    void OnFiberSamplingChanged(int value);
+    void OnFiberSamplingChanged(double value);
     void OnTensionChanged(double value);
     void OnContinuityChanged(double value);
     void OnBiasChanged(double value);
@@ -91,6 +103,7 @@ protected slots:
     void OnAddNoise(int value);
     void OnAddGhosts(int value);
     void OnAddDistortions(int value);
+    void OnAddEddy(int value);
     void OnConstantRadius(int value);
 
 protected:
@@ -102,10 +115,11 @@ protected:
 
     Ui::QmitkFiberfoxViewControls* m_Controls;
 
-    void UpdateGui();   ///< enable/disbale buttons etc. according to current datamanager selection
+    void UpdateImageParameters();                   ///< update iamge generation paaremeter struct
+    void UpdateGui();                               ///< enable/disbale buttons etc. according to current datamanager selection
     void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
-    void EnableCrosshairNavigation();   ///< enable crosshair navigation if planar figure interaction ends
-    void DisableCrosshairNavigation();  ///< disable crosshair navigation if planar figure interaction starts
+    void EnableCrosshairNavigation();               ///< enable crosshair navigation if planar figure interaction ends
+    void DisableCrosshairNavigation();              ///< disable crosshair navigation if planar figure interaction starts
     void NodeAdded( const mitk::DataNode* node );   ///< add observers
     void NodeRemoved(const mitk::DataNode* node);   ///< remove observers
 
@@ -129,6 +143,45 @@ protected:
         unsigned int m_Flipped;
     };
 
+    /** structure storing the image generation parameters */
+    struct ImageParameters {
+        itk::ImageRegion<3>                 imageRegion;
+        itk::Vector<double,3>               imageSpacing;
+        itk::Point<double,3>                imageOrigin;
+        itk::Matrix<double, 3, 3>           imageDirection;
+        unsigned int                        numGradients;
+        double                              b_value;
+        unsigned int                        repetitions;
+        double                              signalScale;
+        double                              tEcho;
+        double                              tLine;
+        double                              tInhom;
+        double                              axonRadius;
+        unsigned int                        interpolationShrink;
+        double                              kspaceLineOffset;
+        double                              upsampling;
+        double                              eddyStrength;
+        double                              comp3Weight;
+        double                              comp4Weight;
+
+        bool                                doSimulateRelaxation;
+        bool                                doSimulateEddyCurrents;
+        bool                                doDisablePartialVolume;
+
+        mitk::RicianNoiseModel<double>       ricianNoiseModel;
+        mitk::DiffusionSignalModel<double>::GradientListType  gradientDirections;
+        itk::TractsToDWIImageFilter< short >::DiffusionModelList fiberModelList, nonFiberModelList;
+        itk::TractsToDWIImageFilter< short >::KspaceArtifactList artifactList;
+        QString signalModelString, artifactModelString;
+
+        ItkDoubleImgType::Pointer           frequencyMap;
+        ItkUcharImgType::Pointer            tissueMaskImage;
+
+        mitk::DataNode::Pointer             resultNode;
+    };
+
+    ImageParameters                                     m_ImageGenParameters;
+
     std::map<mitk::DataNode*, QmitkPlanarFigureData>    m_DataNodeToPlanarFigureData;   ///< map each planar figure uniquely to a QmitkPlanarFigureData
     mitk::Image::Pointer                                m_TissueMask;                   ///< mask defining which regions of the image should contain signal and which are containing only noise
     mitk::DataNode::Pointer                             m_SelectedFiducial;             ///< selected planar ellipse
@@ -138,4 +191,20 @@ protected:
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles2;
     vector< mitk::DataNode::Pointer >                   m_SelectedFiducials;
     vector< mitk::DataNode::Pointer >                   m_SelectedImages;
+
+    // intra and inter axonal compartments
+    mitk::StickModel<double> m_StickModel1;
+    mitk::StickModel<double> m_StickModel2;
+    mitk::TensorModel<double> m_ZeppelinModel1;
+    mitk::TensorModel<double> m_ZeppelinModel2;
+    mitk::TensorModel<double> m_TensorModel1;
+    mitk::TensorModel<double> m_TensorModel2;
+
+    // extra axonal compartment models
+    mitk::BallModel<double> m_BallModel1;
+    mitk::BallModel<double> m_BallModel2;
+    mitk::AstroStickModel<double> m_AstrosticksModel1;
+    mitk::AstroStickModel<double> m_AstrosticksModel2;
+    mitk::DotModel<double> m_DotModel1;
+    mitk::DotModel<double> m_DotModel2;
 };

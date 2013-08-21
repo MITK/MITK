@@ -104,7 +104,7 @@ void mitk::LabeledImageToSurfaceFilter::GenerateOutputInformation()
   // set the number of outputs to the number of labels used.
   // initialize the output surfaces accordingly (incl. time steps)
   //
-  this->SetNumberOfOutputs( numberOfOutputs );
+  this->SetNumberOfIndexedOutputs( numberOfOutputs );
   this->SetNumberOfRequiredOutputs( numberOfOutputs );
   for ( unsigned int i = 0 ; i < numberOfOutputs; ++i )
   {

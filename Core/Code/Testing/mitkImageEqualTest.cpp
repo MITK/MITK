@@ -35,7 +35,7 @@ static void Setup()
 static void AreEqual_CloneAndOriginal_ReturnsTrue()
 {
   Setup();
-  MITK_TEST_CONDITION_REQUIRED( mitk::Image::AreEqual( m_Image, m_AnotherImage), "A clone should be equal to its original.");
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal( m_Image, m_AnotherImage), "A clone should be equal to its original.");
 }
 
 static void AreEqual_InputIsNull_ReturnsFalse()
@@ -45,7 +45,7 @@ static void AreEqual_InputIsNull_ReturnsFalse()
   m_Image = NULL;
   m_AnotherImage = NULL;
 
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Image::AreEqual( m_Image, m_AnotherImage), "Input is NULL. Result should be false.");
+  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Image, m_AnotherImage), "Input is NULL. Result should be false.");
 }
 
 static void AreEqual_DifferentImageGeometry_ReturnsFalse()
@@ -59,7 +59,7 @@ static void AreEqual_DifferentImageGeometry_ReturnsFalse()
 
   m_AnotherImage->GetGeometry()->SetOrigin(origin);
 
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Image::AreEqual( m_Image, m_AnotherImage), "One origin was modified. Result should be false.");
+  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Image, m_AnotherImage), "One origin was modified. Result should be false.");
 }
 
 static void AreEqual_DifferentPixelTypes_ReturnsFalse()
@@ -68,7 +68,7 @@ static void AreEqual_DifferentPixelTypes_ReturnsFalse()
 
   m_AnotherImage = mitk::ImageGenerator::GenerateGradientImage<float>(3u, 3u, 1u);
 
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Image::AreEqual( m_Image, m_AnotherImage), "One pixel type is float, the other unsigned char. Result should be false.");
+  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Image, m_AnotherImage), "One pixel type is float, the other unsigned char. Result should be false.");
 }
 
 static void AreEqual_DifferentDimensions_ReturnsFalse()
@@ -77,7 +77,7 @@ static void AreEqual_DifferentDimensions_ReturnsFalse()
 
   m_AnotherImage = mitk::ImageGenerator::GenerateGradientImage<unsigned char>(5u, 7u, 3u);
 
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Image::AreEqual( m_Image, m_AnotherImage), "Dimensions of first image are: (3, 3, 1). Dimensions of second image are: (5, 7, 3). Result should be false.");
+  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Image, m_AnotherImage), "Dimensions of first image are: (3, 3, 1). Dimensions of second image are: (5, 7, 3). Result should be false.");
 }
 
 static void AreEqual_DifferentDimensionalities_ReturnsFalse()
@@ -91,7 +91,7 @@ static void AreEqual_DifferentDimensionalities_ReturnsFalse()
   sliceSelector->Update();
   m_AnotherImage = sliceSelector->GetOutput();
 
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Image::AreEqual( m_Image, m_AnotherImage), "First image is 3D. Second image is 2D. Result should be false.");
+  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Image, m_AnotherImage), "First image is 3D. Second image is 2D. Result should be false.");
 }
 
 static void AreEqual_DifferentPixelValues_ReturnsFalse()
@@ -99,22 +99,22 @@ static void AreEqual_DifferentPixelValues_ReturnsFalse()
   m_Image = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(3u, 3u);
   m_AnotherImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(3u, 3u);
 
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Image::AreEqual( m_Image, m_AnotherImage), "We compare  two random images. Result should be false.");
+  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Image, m_AnotherImage), "We compare  two random images. Result should be false.");
 }
 
 /**
  * @brief mitkImageAreEqualTest A test class for AreEqual methods in mitk::Image.
  */
-int mitkImageAreEqualTest(int /*argc*/, char* /*argv*/[])
+int mitkImageEqualTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN(mitkImageAreEqualTest);
 
-//  AreEqual_CloneAndOriginal_ReturnsTrue();
-//  AreEqual_InputIsNull_ReturnsFalse();
-//  AreEqual_DifferentImageGeometry_ReturnsFalse();
-//  AreEqual_DifferentPixelTypes_ReturnsFalse();
-//  AreEqual_DifferentDimensions_ReturnsFalse();
-//  AreEqual_DifferentDimensionalities_ReturnsFalse();
+  AreEqual_CloneAndOriginal_ReturnsTrue();
+  AreEqual_InputIsNull_ReturnsFalse();
+  AreEqual_DifferentImageGeometry_ReturnsFalse();
+  AreEqual_DifferentPixelTypes_ReturnsFalse();
+  AreEqual_DifferentDimensions_ReturnsFalse();
+  AreEqual_DifferentDimensionalities_ReturnsFalse();
   AreEqual_DifferentPixelValues_ReturnsFalse();
 
   MITK_TEST_END();

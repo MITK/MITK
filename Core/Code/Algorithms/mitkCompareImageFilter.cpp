@@ -16,10 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCompareImageFilter.h"
 #include "mitkImageAccessByItk.h"
 
+#include "mitkITKImageImport.h"
+
 #include <itkTestingComparisonImageFilter.h>
 
 mitk::CompareImageFilter::CompareImageFilter()
 {
+  this->SetNumberOfRequiredInputs(2);
 }
 
 
@@ -27,90 +30,76 @@ void mitk::CompareImageFilter::GenerateData()
 {
   // check inputs
 
+  const mitk::Image* input1 = this->GetInput(0);
+  const mitk::Image* input2 = this->GetInput(1);
+
   // check input validity
-  if( m_InputImage1->GetDimension() == m_InputImage2->GetDimension() )
+  if( input1->GetDimension() == input2->GetDimension() )
   {
-    unsigned int dimension = m_InputImage1->GetDimension();
-
-    if( dimension == 2 )
-    {
-      AccessTwoImagesFixedDimensionByItk( m_InputImage1, m_InputImage2, EstimateValueDifference, 2);
-    }
-    else if ( dimension == 3 )
-    {
-      AccessTwoImagesFixedDimensionByItk( m_InputImage1, m_InputImage2, EstimateValueDifference, 3);
-    }
-
-
+    AccessByItk_1( input1, EstimateValueDifference, input2);
   }
 }
 
-#include "itkStatisticsImageFilter.h"
+#include "mitkImageCaster.h"
 
-template< typename TPixel1, unsigned int VImageDimension1,
-          typename TPixel2, unsigned int VImageDimension2>
-void mitk::CompareImageFilter::EstimateValueDifference(
-                              itk::Image< TPixel1, VImageDimension1>* itkImage1,
-                              itk::Image< TPixel2, VImageDimension2>* itkImage2)
+bool mitk::CompareImageFilter::GetResult(size_t threshold)
 {
-  typedef itk::Image< TPixel1, VImageDimension1> InputImageType1;
-  typedef itk::Image< TPixel2, VImageDimension2> InputImageType2;
-  typedef itk::Image< float, VImageDimension> OutputImageType;
-
-  typedef itk::AbsoluteValueDifferenceImageFilter< InputImageType1, InputImageType2, OutputImageType> AbsValueDifferenceFilterType;
-  typedef typename AbsValueDifferenceFilterType::Pointer AbsValueDifferenceFilterTypePointer;
-
-  typedef itk::StatisticsImageFilter< OutputImageType > StatisticsImageFilterType;
-  typedef typename StatisticsImageFilterType::Pointer StatisticsImageFilterPointer;
-
-  // compute the absolute difference of the two input images
-  AbsValueDifferenceFilterTypePointer differenceFilter = AbsValueDifferenceFilterType::New();
-  differenceFilter->SetInput1(itkImage1);
-  differenceFilter->SetInput2(itkImage2);
-  try
+  if (! m_CompareResult)
   {
-    differenceFilter->Update();
-  }
-  catch( itk::ExceptionObject& e)
-  {
-    MITK_ERROR << "Catched exception while executing AbsoluteValueDifferenceFilter \n " << e.what();
+    return false;
   }
 
-  // compute statistics over the difference image
-  StatisticsImageFilterPointer statisticsFilter = StatisticsImageFilterType::New();
-  statisticsFilter->SetInput( differenceFilter->GetOutput() );
+  if( m_CompareDetails.m_PixelsWithDifference > threshold )
+  {
+    return false;
+  }
+
+  return true;
+}
+
+template< typename TPixel, unsigned int VImageDimension>
+void mitk::CompareImageFilter::EstimateValueDifference(itk::Image< TPixel, VImageDimension>* itkImage1,
+                              const mitk::Image* referenceImage)
+{
+
+  typedef itk::Image< TPixel, VImageDimension> InputImageType;
+  typedef itk::Image< double, VImageDimension > OutputImageType;
+
+  typename InputImageType::Pointer itk_reference = InputImageType::New();
+
+  mitk::CastToItkImage( referenceImage,
+                        itk_reference );
+
+  typedef itk::Testing::ComparisonImageFilter< InputImageType, OutputImageType > CompareFilterType;
+  typename CompareFilterType::Pointer compare_filter = CompareFilterType::New();
+  compare_filter->SetTestInput( itkImage1 );
+  compare_filter->SetValidInput( itk_reference );
 
   try
   {
-    statisticsFilter->Update();
+    compare_filter->Update();
   }
-  catch( itk::ExceptionObject& e)
+  catch( const itk::ExceptionObject& e)
   {
-    MITK_ERROR << "Catched exception while executing statistics computation on the difference filter output. \n " << e.what();
+    m_CompareDetails.m_FilterCompleted = false;
+    m_CompareDetails.m_ExceptionMessage = e.what();
+
+    MITK_WARN << e.what();
+
+    m_CompareResult = false;
+    return;
   }
 
-  // get the values from the statistics filter
-  this->m_MaxValue    = statisticsFilter->GetMaximum();
-  this->m_MinValue    = statisticsFilter->GetMinimum();
-  this->m_ValueSum = statisticsFilter->GetSum();
-  this->m_ValueVariance = statisticsFilter->GetVariance();
+  m_CompareDetails.m_FilterCompleted = true;
+
+  m_CompareDetails.m_MaximumDifference = compare_filter->GetMaximumDifference();
+  m_CompareDetails.m_MinimumDifference = compare_filter->GetMinimumDifference();
+  m_CompareDetails.m_MeanDifference = compare_filter->GetMeanDifference();
+  m_CompareDetails.m_TotalDifference = compare_filter->GetTotalDifference();
+  m_CompareDetails.m_PixelsWithDifference = compare_filter->GetNumberOfPixelsWithDifferences();
+
+  mitk::Image::Pointer output = mitk::GrabItkImageMemory( compare_filter->GetOutput() );
+  this->SetOutput( MakeNameFromOutputIndex(0), output.GetPointer() );
 
 
-
-}
-
-float mitk::CompareImageFilter::GetMaxValue()
-{
-  if( Dim == 3)
-  //return m_OutputImage->GetMaxValue()
-}
-
-void mitk::CompareImageFilter::SetInputImage1(mitk::Image::Pointer image)
-{
-  this->m_InputImage1 = image;
-}
-
-void mitk::CompareImageFilter::SetInputImage2(mitk::Image::Pointer image)
-{
-  this->m_InputImage2 = image;
 }

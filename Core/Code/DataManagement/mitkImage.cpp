@@ -1297,13 +1297,14 @@ bool mitk::Image::ArePixelTypesEqual(const mitk::Image *rightHandSide, const mit
   return true;
 }
 
-bool mitk::Image::ArePixelValuesEqual(const mitk::Image *rightHandSide, const mitk::Image *leftHandSide, ScalarType eps )
+bool mitk::Image::ArePixelValuesEqual(const mitk::Image *rightHandSide, const mitk::Image *leftHandSide, ScalarType/* eps*/ )
 {
   mitk::CompareImageFilter::Pointer compareFilter = mitk::CompareImageFilter::New();
-  compareFilter->SetInputImage1(rightHandSide);
-  compareFilter->SetInputImage2(leftHandSide);
+  compareFilter->SetInput(0, rightHandSide);
+  compareFilter->SetInput(1, leftHandSide);
   compareFilter->Update();
-  return true;
+
+  return compareFilter->GetResult();
 }
 
 bool mitk::Image::AreNotNull(const mitk::Image *rightHandSide, const mitk::Image *leftHandSide)

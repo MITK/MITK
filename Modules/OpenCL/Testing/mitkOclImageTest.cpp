@@ -29,7 +29,7 @@ int mitkOclImageTest( int /*argc*/, char* /*argv*/[] )
 {
   MITK_TEST_BEGIN("mitkOclImageTest");
 
-  ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+  us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
   MITK_TEST_CONDITION_REQUIRED( ref != 0, "Got valid ServiceReference" );
 
   OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);

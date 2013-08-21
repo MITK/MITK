@@ -286,6 +286,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
         endif()
 
         if(MODULE_QT_MODULE)
+          # TODO: here we would need handling of both Qt 4 and Qt 5
           if(UI_FILES)
             QT4_WRAP_UI(Q${KITNAME}_GENERATED_UI_CPP ${UI_FILES})
           endif(UI_FILES)

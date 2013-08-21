@@ -111,11 +111,9 @@ mitk::Geometry3D* mitk::TimeSlicedGeometry::GetGeometry3D(int t) const
     //if (a) we don't have a Geometry3D stored for the requested time,
     //(b) m_EvenlyTimed is activated and (c) the first geometry (t=0)
     //is set, then we clone the geometry and set the m_TimeBounds accordingly.
-    if((m_EvenlyTimed) && (geometry3d.IsNull()))
+    if((m_EvenlyTimed) && (geometry3d.IsNull()) && m_Geometry3Ds[0].IsNotNull())
     {
       const Geometry3D* firstgeometry=m_Geometry3Ds[0].GetPointer();
-
-      assert(firstgeometry != NULL);
 
       mitk::Geometry3D::Pointer requestedgeometry;
       requestedgeometry = dynamic_cast<Geometry3D*>(firstgeometry->Clone().GetPointer());
@@ -134,7 +132,10 @@ mitk::Geometry3D* mitk::TimeSlicedGeometry::GetGeometry3D(int t) const
     }
   }
   else
+  {
     return NULL;
+  }
+
   return geometry3d;
 }
 

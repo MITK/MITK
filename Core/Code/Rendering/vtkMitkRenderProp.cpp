@@ -70,6 +70,11 @@ vtkAssemblyPath* vtkMitkRenderProp::GetNextPath()
 //BUG (#1551) added method depth peeling
 int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
 {
+  return 0; /* If I don't deactivate this function, I get lots of output like
+
+               ERROR: In /home/maleike/build/mitk2/VTK-src/Rendering/vtkLODProp3D.cxx, line 969
+               vtkLODProp3D (0x7f810452f000): Index out of range!
+            */
   typedef std::map<int,mitk::Mapper*> MappersMapType;
   MappersMapType mappersMap = m_VtkPropRenderer->GetMappersMap();
   for(MappersMapType::iterator it = mappersMap.begin(); it != mappersMap.end(); it++)

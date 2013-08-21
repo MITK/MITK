@@ -45,7 +45,8 @@ set(MITK_EXPORTS_FILE_INCLUDED 1)
 set(_example_dirs
   MbiLog
   QtFreeRender
-  Overlays
+#  Overlays# depends on QmitkExt..
+  QuickRender
 )
 
 if(MITK_USE_QT)

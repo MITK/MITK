@@ -1,0 +1,5 @@
+MITK_CREATE_MODULE(QmlMitk
+  INCLUDE_DIRS InteractionLegacy
+  PACKAGE_DEPENDS Qt5
+  DEPENDS Mitk OpenView)
+

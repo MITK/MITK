@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::RenderWindow::RenderWindow(vtkRenderWindow* renWin, const char* name, mitk::RenderingManager* rm )
 : m_vtkRenderWindow(renWin)
+, m_vtkRenderWindowInteractor(NULL)
+, m_vtkMitkEventProvider(NULL)
 {
 
   if(m_vtkRenderWindow == NULL)

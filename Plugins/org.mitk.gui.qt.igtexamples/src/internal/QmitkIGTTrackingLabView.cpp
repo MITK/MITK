@@ -722,7 +722,27 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     }
 
     //remember initial object transform to calculate the object to marker transform later on
-    mitk::Transform::Pointer T_Object = mitk::Transform::New(this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform());
+    mitk::AffineTransform3D::Pointer transform = this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform();
+    vnl_matrix_fixed<mitk::ScalarType, 3, 3> rotation = vnl_matrix_fixed<mitk::ScalarType,3,3>();
+    rotation[0][0] = transform->GetMatrix().GetVnlMatrix()[0][0];
+    rotation[0][1] = transform->GetMatrix().GetVnlMatrix()[0][1];
+    rotation[0][2] = transform->GetMatrix().GetVnlMatrix()[0][2];
+    rotation[1][0] = transform->GetMatrix().GetVnlMatrix()[1][0];
+    rotation[1][1] = transform->GetMatrix().GetVnlMatrix()[1][1];
+    rotation[1][2] = transform->GetMatrix().GetVnlMatrix()[1][2];
+    rotation[2][0] = transform->GetMatrix().GetVnlMatrix()[2][0];
+    rotation[2][1] = transform->GetMatrix().GetVnlMatrix()[2][1];
+    rotation[2][2] = transform->GetMatrix().GetVnlMatrix()[2][2];
+
+    mitk::Point3D translation;
+    translation[0] = transform->GetOffset()[0];
+    translation[1] = transform->GetOffset()[1];
+    translation[2] = transform->GetOffset()[2];
+
+
+    mitk::Transform::Pointer T_Object = mitk::Transform::New();
+    T_Object->SetPosition(translation);
+    T_Object->SetRotation(rotation);
 
     //then reset the transform because we will now start to calculate the permenent registration
     this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIdentity();
@@ -753,7 +773,22 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     T_MarkerRel->Concatenate(T_Marker);
     m_T_MarkerRel = T_MarkerRel;
 
-    m_PermanentRegistrationFilter->SetOffset(0,T_MarkerRel->GetAffineTransform3D());
+    //TODO: remove mitk::transform from this class and use only mitk::AffineTransform3D
+    //convert to AffineTransform3D
+    mitk::AffineTransform3D::Pointer T_MarkerRel_conv = mitk::AffineTransform3D::New();
+    {
+    itk::Matrix<float,3,3> rotation = itk::Matrix<float,3,3>();
+    for(int i = 0; i<3; i++)for (int j=0; j<3; j ++)
+    rotation[i][j] = T_MarkerRel->GetVnlRotationMatrix()[i][j];
+    itk::Vector<float,3> translation = itk::Vector<float,3>();
+    for(int i = 0; i<3; i++) translation[i] = T_MarkerRel->GetPosition()[i];
+
+    T_MarkerRel_conv->SetMatrix(rotation);
+    T_MarkerRel_conv->SetOffset(translation);
+    }
+
+
+    m_PermanentRegistrationFilter->SetOffset(0,T_MarkerRel_conv);
 
     //first: image (if activated)
     //set interpolation mode
@@ -767,7 +802,7 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
       mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
       newTransform->SetIdentity();
       newTransform->Compose(m_T_ImageGeo);
-      newTransform->Compose(m_T_MarkerRel->GetAffineTransform3D());
+      newTransform->Compose(T_MarkerRel_conv);
       m_PermanentRegistrationFilter->SetOffset(1,newTransform);
       }
 
@@ -783,7 +818,21 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     m_PermanentRegistration = false;
 
     //restore old registration
-    if(m_T_ObjectReg.IsNotNull()) this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ObjectReg->GetAffineTransform3D());
+    if(m_T_ObjectReg.IsNotNull())
+    {
+    //convert to AffineTransform3D
+    //TODO: remove mitk::transform from this class and use only mitk::AffineTransform3D
+    mitk::AffineTransform3D::Pointer m_T_ObjectReg_conv = mitk::AffineTransform3D::New();
+    itk::Matrix<float,3,3> rotation = itk::Matrix<float,3,3>();
+    for(int i = 0; i<3; i++)for (int j=0; j<3; j ++)
+    rotation[i][j] = m_T_ObjectReg->GetVnlRotationMatrix()[i][j];
+    itk::Vector<float,3> translation = itk::Vector<float,3>();
+    for(int i = 0; i<3; i++) translation[i] = m_T_ObjectReg->GetPosition()[i];
+    m_T_ObjectReg_conv->SetMatrix(rotation);
+    m_T_ObjectReg_conv->SetOffset(translation);
+
+    this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ObjectReg_conv);
+    }
     if(m_T_ImageReg.IsNotNull()) this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ImageReg);
 
     //delete filter

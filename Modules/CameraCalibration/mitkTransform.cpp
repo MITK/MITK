@@ -726,7 +726,7 @@ namespace mitk
     else
       hasPosition = true;
 
-    nd->SetIGTTimeStamp(timestamp);
+    nd->SetTimeStamp(timestamp);
     nd->SetPosition(position);
     nd->SetOrientation(orientation);
     nd->SetCovErrorMatrix(matrix);

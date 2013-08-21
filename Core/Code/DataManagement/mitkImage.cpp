@@ -31,17 +31,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::Image::Image() :
-m_Dimension(0), m_Dimensions(NULL), m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL),
+  m_Dimension(0), m_Dimensions(NULL), m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL),
   m_ImageStatistics(NULL)
 {
-   m_Dimensions = new unsigned int[MAX_IMAGE_DIMENSIONS];
-   FILL_C_ARRAY( m_Dimensions, MAX_IMAGE_DIMENSIONS, 0u);
+  m_Dimensions = new unsigned int[MAX_IMAGE_DIMENSIONS];
+  FILL_C_ARRAY( m_Dimensions, MAX_IMAGE_DIMENSIONS, 0u);
 
-   m_Initialized = false;
+  m_Initialized = false;
 }
 
 mitk::Image::Image(const Image &other) : SlicedData(other), m_Dimension(0), m_Dimensions(NULL),
-m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL), m_ImageStatistics(NULL)
+  m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL), m_ImageStatistics(NULL)
 {
   m_Dimensions = new unsigned int[MAX_IMAGE_DIMENSIONS];
   FILL_C_ARRAY( m_Dimensions, MAX_IMAGE_DIMENSIONS, 0u);
@@ -133,7 +133,7 @@ void AccessPixel( const mitk::PixelType ptype, void* data, const unsigned int of
   if(ptype.GetBpe() != 24)
   {
     value = (double) (((T*) data)[ offset ]);
- }
+  }
   else
   {
     const unsigned int rgboffset = 3 * offset;
@@ -457,9 +457,9 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
           }
         }
       }
-   // REVIEW FIX
-   //   if(ch->GetPicDescriptor()->info->tags_head==NULL)
-   //     mitkIpFuncCopyTags(ch->GetPicDescriptor(), m_Volumes[GetVolumeIndex(0,n)]->GetPicDescriptor());
+      // REVIEW FIX
+      //   if(ch->GetPicDescriptor()->info->tags_head==NULL)
+      //     mitkIpFuncCopyTags(ch->GetPicDescriptor(), m_Volumes[GetVolumeIndex(0,n)]->GetPicDescriptor());
     }
     return m_Channels[n]=ch;
   }
@@ -838,7 +838,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D
 
     bounds[1]-=bounds[0]; bounds[3]-=bounds[2]; bounds[5]-=bounds[4];
     bounds[0] = 0.0;      bounds[2] = 0.0;      bounds[4] = 0.0;
-this->m_ImageDescriptor->Initialize( this->m_Dimensions, this->m_Dimension );
+    this->m_ImageDescriptor->Initialize( this->m_Dimensions, this->m_Dimension );
     slicedGeometry->SetBounds(bounds);
     slicedGeometry->GetIndexToWorldTransform()->SetOffset(origin.GetVnlVector().data_block());
 
@@ -874,9 +874,9 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
 
   if(pDim>=0)
   {
-     tmpDimensions[1]=pDim;
-     if(m_Dimension < 2)
-        m_Dimension = 2;
+    tmpDimensions[1]=pDim;
+    if(m_Dimension < 2)
+      m_Dimension = 2;
   }
   if(sDim>=0)
   {
@@ -954,7 +954,7 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
     spacing[2]=spacinglist[2];
 
   // access origin of vtkImage
-    Point3D origin;
+  Point3D origin;
   vtkFloatingPointType vtkorigin[3];
   vtkimagedata->GetOrigin(vtkorigin);
   FillVector3D(origin, vtkorigin[0], 0.0, 0.0);
@@ -1337,17 +1337,22 @@ bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSi
     returnValue = false;
   }
 
-  // Pixel values - default mode [ 0 threshold in difference ]
-  mitk::CompareImageFilter::Pointer compareFilter = mitk::CompareImageFilter::New();
-  compareFilter->SetInput(0, rightHandSide);
-  compareFilter->SetInput(1, leftHandSide);
-  compareFilter->Update();
 
-  if( compareFilter->GetResult() )
+  // Pixel values - default mode [ 0 threshold in difference ]
+  // compare only if all previous checks were successfull, otherwise the ITK filter will throw an exception
+  if( returnValue )
   {
-    returnValue = false;
-    MITK_INFO << "[(Image)] Pixel values differ: ";
-    compareFilter->GetCompareResults().PrintSelf();
+    mitk::CompareImageFilter::Pointer compareFilter = mitk::CompareImageFilter::New();
+    compareFilter->SetInput(0, rightHandSide);
+    compareFilter->SetInput(1, leftHandSide);
+    compareFilter->Update();
+
+    if( !compareFilter->GetResult() )
+    {
+      returnValue = false;
+      MITK_INFO << "[(Image)] Pixel values differ: ";
+      compareFilter->GetCompareResults().PrintSelf();
+    }
   }
 
 

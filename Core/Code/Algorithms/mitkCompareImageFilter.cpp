@@ -90,6 +90,8 @@ void mitk::CompareImageFilter::EstimateValueDifference(itk::Image< TPixel, VImag
     return;
   }
 
+  // the filter has completed the calculation
+  m_CompareResult = true;
   m_CompareDetails.m_FilterCompleted = true;
 
   m_CompareDetails.m_MaximumDifference = compare_filter->GetMaximumDifference();

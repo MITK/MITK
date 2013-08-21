@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
 
+#include <iomanip>
 
 mitk::PointSet::PointSet()
 {
@@ -816,4 +817,61 @@ bool mitk::PointSet::SwapPointContents(PointIdentifier id1, PointIdentifier id2,
 bool mitk::PointSet::PointDataType::operator ==(const mitk::PointSet::PointDataType &other) const
 {
   return id == other.id && selected == other.selected && pointSpec == other.pointSpec;
+}
+
+bool mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps )
+{
+  bool result = true;
+
+  if( rightHandSide == NULL )
+  {
+    MITK_INFO << "[( PointSet )] rightHandSide NULL.";
+    return false;
+  }
+  if( leftHandSide == NULL )
+  {
+    MITK_INFO << "[( PointSet )] leftHandSide NULL.";
+    return false;
+  }
+
+  if( !mitk::Equal(leftHandSide->GetGeometry(), rightHandSide->GetGeometry(), eps) )
+  {
+    MITK_INFO << "[( PointSet )] Geometries differ.";
+    result = false;
+  }
+
+  if ( leftHandSide->GetSize() != rightHandSide->GetSize())
+  {
+    MITK_INFO << "[( PointSet )] Number of points differ.";
+    result = false;
+  }
+  else
+  {
+    //if the size is equal, we compare the point values
+    mitk::Point3D pointLeftHandSide;
+    mitk::Point3D pointRightHandSide;
+
+    int numberOfIncorrectPoints = 0;
+
+    //Iterate over both pointsets in order to compare all points pair-wise
+    mitk::PointSet::PointsConstIterator end = leftHandSide->End();
+    for( mitk::PointSet::PointsConstIterator pointSetIteratorLeft = leftHandSide->Begin(), pointSetIteratorRight = rightHandSide->Begin();
+         pointSetIteratorLeft != end; ++pointSetIteratorLeft, ++pointSetIteratorRight) //iterate simultaneously over both sets
+    {
+      pointLeftHandSide = pointSetIteratorLeft.Value();
+      pointRightHandSide = pointSetIteratorRight.Value();
+      if( !mitk::Equal( pointLeftHandSide, pointRightHandSide, eps ) )
+      {
+        MITK_INFO << "[( PointSet )] Point values are different.";
+        result = false;
+        numberOfIncorrectPoints++;
+      }
+    }
+
+    if(numberOfIncorrectPoints > 0)
+    {
+      MITK_INFO << numberOfIncorrectPoints <<" of a total of " << leftHandSide->GetSize() << " points are different.";
+    }
+  }
+  return result;
 }

@@ -270,6 +270,19 @@ protected:
   bool m_CalculateBoundingBox;
 };
 
+/**
+ * @brief Equal A function comparing two pointsets for beeing identical.
+ *
+ * The function compares the Geometry, the size and all points element-wise.
+ *
+ * The parameter eps is an optional (default: mitk::eps) tolarence value for all methods which are internally used for comparion.
+ * @param rightHandSide Compare this against leftHandSide.
+ * @param leftHandSide Compare this against rightHandSide.
+ * @param eps Optional (default: mitk::eps) tolarence.
+ * @return True, if all comparison are true. False in any other case.
+ */
+MITK_CORE_EXPORT bool Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps = mitk::eps );
+
 #pragma GCC visibility push(default)
 itkEventMacro( PointSetEvent, itk::AnyEvent );
 itkEventMacro( PointSetMoveEvent, PointSetEvent );

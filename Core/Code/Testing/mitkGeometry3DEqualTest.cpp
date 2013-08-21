@@ -111,7 +111,7 @@ static void Equal_DifferentBoundingBox_ReturnsFalse()
 }
 
 /**
- * @brief mitkGeometry3DAreEqualTest A test class for AreEqual methods in mitk::Geometry3D.
+ * @brief mitkGeometry3DEqualTest A test class for Equal methods in mitk::Geometry3D.
  */
 int mitkGeometry3DEqualTest(int /*argc*/, char* /*argv*/[])
 {

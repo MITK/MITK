@@ -30,6 +30,7 @@ set(MODULE_TESTS
   #mitkPipelineSmartPointerCorrectnessTest.cpp
   mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
+  mitkPointSetEqualTest.cpp
   mitkPointSetFileIOTest.cpp
   mitkPointSetTest.cpp
   mitkPointSetWriterTest.cpp

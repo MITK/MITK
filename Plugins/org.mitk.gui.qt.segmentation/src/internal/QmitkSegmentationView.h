@@ -81,24 +81,6 @@ protected slots:
 
   void OnGoToLabel( const mitk::Point3D& pos );
 
-  // reaction to the signal "combineAndCreateMask" from QmitkLabelSetTableWidget
-  void OnCombineAndCreateMask( const QList<QTableWidgetSelectionRange>& ranges );
-
-  // reaction to the signal "combineAndCreateSurface" from QmitkLabelSetTableWidget
-  void OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>& ranges );
-
-  // reaction to the button "New segmentation session"
-  void OnNewLabelSet();
-
-  // reaction to the button "Load segmentation session"
-  void OnLoadLabelSet();
-
-  // reaction to the button "Import segmentation session"
-  void OnImportLabelSet();
-
-  // reaction to the button "Save Segmentation"
-  void OnSaveLabelSet();
-
   void OnManualTool2DSelected(int id);
   // reaction to the button "New segmentation"
 //  void CreateSegmentationFromSurface();

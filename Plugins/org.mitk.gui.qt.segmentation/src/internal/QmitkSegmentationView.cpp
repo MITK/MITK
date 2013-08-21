@@ -48,7 +48,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QFileDialog>
-#include <QDateTime>
 
 const std::string QmitkSegmentationView::VIEW_ID = "org.mitk.views.segmentation";
 
@@ -165,16 +164,6 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
   m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);
 }
 
-void QmitkSegmentationView::OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>& ranges )
-{
-
-}
-
-void QmitkSegmentationView::OnCombineAndCreateMask( const QList<QTableWidgetSelectionRange>& ranges )
-{
-
-}
-
 void QmitkSegmentationView::NodeAdded(const mitk::DataNode *node)
 {
 
@@ -214,189 +203,6 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
  //   mitk::SurfaceInterpolationController::GetInstance()->RemoveSegmentationFromContourList(lsImage);
   }
 }
-/*
-void QmitkSegmentationView::OnSearchLabel()
-{
-    m_Controls->m_LabelSetTableWidget->SetActiveLabel(m_Controls->m_LabelSearchBox->text().toStdString());
-}
-*/
-void QmitkSegmentationView::OnImportLabelSet()
-{
-    mitk::DataNode* segNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
-    if (!segNode) return;
-
-    mitk::LabelSetImage* segImage = dynamic_cast<mitk::LabelSetImage*>( segNode->GetData() );
-    if (!segImage) return;
-
-    std::string fileExtensions("Segmentation files (*.lset);;");
-    QString qfileName = QFileDialog::getOpenFileName(m_Parent, "Open segmentation", "", fileExtensions.c_str() );
-    if (qfileName.isEmpty() ) return;
-
-    mitk::NrrdLabelSetImageReader<unsigned char>::Pointer reader = mitk::NrrdLabelSetImageReader<unsigned char>::New();
-    reader->SetFileName(qfileName.toLatin1());
-
-    this->WaitCursorOn();
-
-    try
-    {
-        reader->Update();
-    }
-    catch ( itk::ExceptionObject & excep )
-    {
-        MITK_ERROR << "Exception caught: " << excep.GetDescription();
-        QMessageBox::information(m_Parent, "Load segmentation", "Could not load active segmentation. See error log for details.\n");
-        this->WaitCursorOff();
-    }
-
-    this->WaitCursorOff();
-
-    mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
-
-    if (!segImage->Concatenate(lsImage)) {
-        QMessageBox::information(m_Parent,
-        "Import segmentation...",
-        "Could not import the selected segmentation session with the current software version (dimensions must match).\n");
-    }
-
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkSegmentationView::OnLoadLabelSet()
-{
-    mitk::DataNode* refNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
-    if (!refNode) return;
-
-    mitk::Image* refImage = dynamic_cast<mitk::Image*>( refNode->GetData() );
-    if (!refImage) return;
-
-    std::string fileExtensions("Segmentation files (*.lset);;");
-    QString qfileName = QFileDialog::getOpenFileName(m_Parent, "Open segmentation", "", fileExtensions.c_str() );
-    if (qfileName.isEmpty() ) return;
-
-    mitk::NrrdLabelSetImageReader<unsigned char>::Pointer reader = mitk::NrrdLabelSetImageReader<unsigned char>::New();
-    reader->SetFileName(qfileName.toLatin1());
-
-    this->WaitCursorOn();
-
-    try
-    {
-        reader->Update();
-    }
-    catch ( itk::ExceptionObject & excep )
-    {
-        MITK_ERROR << "Exception caught: " << excep.GetDescription();
-        QMessageBox::information(m_Parent, "Load segmentation", "Could not load active segmentation. See error log for details.\n");
-        this->WaitCursorOff();
-    }
-
-    this->WaitCursorOff();
-
-    mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
-
-    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-    newNode->SetData(lsImage);
-    newNode->SetName( lsImage->GetLabelSetName() );
-
-    this->GetDataStorage()->Add(newNode,refNode);
-
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkSegmentationView::OnSaveLabelSet()
-{
-  mitk::DataNode* workingNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
-  if (!workingNode) return;
-
-  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-  if ( !lsImage ) return;
-
-  // update the name in case has changed
-  lsImage->SetName( workingNode->GetName() );
-
-  //set last modification date and time
-  QDateTime cTime = QDateTime::currentDateTime ();
-  lsImage->SetLabelSetLastModified( cTime.toString().toStdString() );
-
-  QString proposedFileName = QString::fromStdString(workingNode->GetName());
-  QString selected_suffix("segmentation files (*.lset)");
-  QString qfileName = QFileDialog::getSaveFileName(m_Parent, QString("Save segmentation..."), proposedFileName, selected_suffix);
-  if (qfileName.isEmpty() ) return;
-
-  mitk::NrrdLabelSetImageWriter<unsigned char>::Pointer writer = mitk::NrrdLabelSetImageWriter<unsigned char>::New();
-  writer->SetFileName(qfileName.toStdString());
-  std::string newName = itksys::SystemTools::GetFilenameWithoutExtension(qfileName.toStdString());
-  lsImage->SetName(newName);
-  workingNode->SetName(newName);
-  writer->SetInput(lsImage);
-
-  this->WaitCursorOn();
-
-  try
-  {
-      writer->Update();
-  }
-  catch ( itk::ExceptionObject & excep )
-  {
-    MITK_ERROR << "Exception caught: " << excep.GetDescription();
-    QMessageBox::information(m_Parent, "Save segmenation", "Could not save active segmentation. See error log for details.\n\n");
-    this->WaitCursorOff();
-  }
-
-  this->WaitCursorOff();
-}
-
-void QmitkSegmentationView::OnNewLabelSet()
-{
-  mitk::DataNode::Pointer refNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
-  if (refNode.IsNotNull())
-  {
-    mitk::Image::Pointer refImage = dynamic_cast<mitk::Image*>( refNode->GetData() );
-    if (refImage.IsNotNull())
-    {
-        bool ok = false;
-        QString refNodeName = QString::fromStdString(refNode->GetName());
-        refNodeName.append("-");
-        QString newName = QInputDialog::getText(m_Parent, "New segmentation", "Set name:", QLineEdit::Normal, refNodeName, &ok);
-        if (!ok) return;
-
-        mitk::PixelType pixelType(mitk::MakeScalarPixelType<unsigned char>() );
-        mitk::LabelSetImage::Pointer labelSetImage = mitk::LabelSetImage::New();
-
-        if (refImage->GetDimension() == 2)
-        {
-            const unsigned int dimensions[] = { refImage->GetDimension(0), refImage->GetDimension(1), 1 };
-            labelSetImage->Initialize(pixelType, 3, dimensions);
-        }
-        else
-        {
-            labelSetImage->Initialize(pixelType, refImage->GetDimension(), refImage->GetDimensions());
-        }
-
-        unsigned int byteSize = sizeof(unsigned char);
-        for (unsigned int dim = 0; dim < labelSetImage->GetDimension(); ++dim)
-        {
-            byteSize *= labelSetImage->GetDimension(dim);
-        }
-
-        mitk::ImageWriteAccessor accessor(static_cast<mitk::Image*>(labelSetImage));
-        memset( accessor.GetData(), 0, byteSize );
-
-        mitk::TimeSlicedGeometry::Pointer originalGeometry = refImage->GetTimeSlicedGeometry()->Clone();
-        labelSetImage->SetGeometry( originalGeometry );
-
-        mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-        newNode->SetData(labelSetImage);
-        newNode->SetName(newName.toStdString());
-        labelSetImage->SetName(newName.toStdString());
-
-        this->GetDataStorage()->Add(newNode,refNode);
-
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-  }
-}
-
-
 
 void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataNode* node )
 {
@@ -608,16 +414,6 @@ void QmitkSegmentationView::SetToolManagerSelection(mitk::DataNode* referenceDat
   }
   else
       m_Controls->m_LabelSetWidget->SetActiveLabelSetImage(NULL);
-
-  // check original image
-//  m_Controls->m_btNewLabelSet->setEnabled(referenceData != NULL);
-//  m_Controls->m_btLoadLabelSet->setEnabled(referenceData != NULL);
-
-//  m_Controls->m_btNewLabel->setEnabled(workingData != NULL);
-//  m_Controls->m_btSaveLabelSet->setEnabled(workingData != NULL);
-//  m_Controls->m_btImportLabelSet->setEnabled(workingData != NULL);
-
-  m_Controls->m_LabelSetWidget->setEnabled(referenceData && workingData);
 }
 
 
@@ -686,6 +482,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   //use the same ToolManager instance for our 3D Tools
   m_Controls->m_ManualToolSelectionBox3D->SetToolManager(*toolManager);
 
+  m_Controls->m_LabelSetWidget->SetDataStorage( *(this->GetDefaultDataStorage()) );
   m_Controls->m_LabelSetWidget->SetPreferences( this->GetPreferences() );
 
   // all part of open source MITK
@@ -722,8 +519,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));
   //connect(m_Controls->m_SlicesInterpolator, SIGNAL(Signal3DInterpolationEnabled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
-
-  m_Controls->m_LabelSetWidget->setEnabled(false);
 }
 
 void QmitkSegmentationView::OnManualTool2DSelected(int id)

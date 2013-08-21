@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ui_QmitkLabelSetWidgetControls.h>
 
+#include "mitkWeakPointer.h"
+
 #include <berryIBerryPreferences.h>
 
 class QmitkDataStorageComboBox;
@@ -26,6 +28,7 @@ class QCompleter;
 
 namespace mitk {
   class LabelSetImage;
+  class DataStorage;
 }
 
 class QmitkLabelSetWidget : public QWidget
@@ -44,9 +47,15 @@ public:
 
   void SetPreferences( berry::IPreferences::Pointer prefs );
 
+  void SetDataStorage(mitk::DataStorage& storage);
+
+  void OnToolManagerWorkingDataModified();
+
+  void OnToolManagerReferenceDataModified();
+
 signals:
 
-  /// \brief Send a signal when it was requested to go to a label.
+  /// \brief Send a signal when it was requested to position the crosshairs on a label.
   void goToLabel(const mitk::Point3D&);
 
 private slots:
@@ -65,6 +74,24 @@ private slots:
   // reaction to the signal "createSurface" from QmitkLabelSetTableWidget
   void OnCreateSurface(int);
 
+  // reaction to the signal "combineAndCreateMask" from QmitkLabelSetTableWidget
+  void OnCombineAndCreateMask( const QList<QTableWidgetSelectionRange>& ranges );
+
+  // reaction to the signal "combineAndCreateSurface" from QmitkLabelSetTableWidget
+  void OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>& ranges );
+
+  // reaction to the button "New segmentation session"
+  void OnNewLabelSet();
+
+  // reaction to the button "Load segmentation session"
+  void OnLoadLabelSet();
+
+  // reaction to the button "Import segmentation session"
+  void OnImportLabelSet();
+
+  // reaction to the button "Save Segmentation"
+  void OnSaveLabelSet();
+
 private:
 
     Ui::QmitkLabelSetWidgetControls m_Controls;
@@ -73,11 +100,23 @@ private:
 
     berry::IPreferences::Pointer m_Preferences;
 
-     // handling of a list of known (organ name, organ color) combination
-  // ATTENTION these methods are defined in QmitkSegmentationOrganNamesHandling.cpp
-  QStringList GetDefaultOrganColorString();
-  void UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color colorname);
-  void AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b);
+    mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+
+    // handling of a list of known (organ name, organ color) combination
+    // ATTENTION these methods are defined in QmitkSegmentationOrganNamesHandling.cpp
+    QStringList GetDefaultOrganColorString();
+    void UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color colorname);
+    void AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b);
+
+    void WaitCursorOn();
+
+    void BusyCursorOn();
+
+    void WaitCursorOff();
+
+    void BusyCursorOff();
+
+    void RestoreOverrideCursor();
 
 };
 

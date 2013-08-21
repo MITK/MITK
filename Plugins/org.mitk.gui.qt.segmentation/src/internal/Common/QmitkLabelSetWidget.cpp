@@ -28,6 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 #include <mitkToolManagerProvider.h>
 #include <mitkLabelSetImageToSurfaceThreadedFilter.h>
+#include <mitkNrrdLabelSetImageReader.h>
+#include <mitkNrrdLabelSetImageWriter.h>
+#include <mitkRenderingManager.h>
+#include <mitkImageWriteAccessor.h>
 
 #include <QmitkDataStorageComboBox.h>
 #include <QmitkNewSegmentationDialog.h>
@@ -38,6 +42,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QCompleter>
 #include <QStringListModel>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QDateTime>
 
 
 QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent)
@@ -62,6 +70,7 @@ QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent)
   connect( m_Controls.m_btSaveLabelSet, SIGNAL(clicked()), this, SLOT(OnSaveLabelSet()) );
   connect( m_Controls.m_btLoadLabelSet, SIGNAL(clicked()), this, SLOT(OnLoadLabelSet()) );
   connect( m_Controls.m_btImportLabelSet, SIGNAL(clicked()), this, SLOT(OnImportLabelSet()) );
+  connect( m_Controls.m_btNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
 
   m_Controls.m_LabelSearchBox->setAlwaysShowClearIcon(true);
   m_Controls.m_LabelSearchBox->setShowSearchIcon(true);
@@ -74,24 +83,61 @@ QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent)
 
   connect( m_Controls.m_LabelSearchBox, SIGNAL(returnPressed()), this, SLOT(OnSearchLabel()) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(labelListModified(const QStringList&)), this, SLOT( OnLabelListModified(const QStringList&)) );
-//  connect( m_Controls.m_btNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
 
   QStringListModel* completeModel = static_cast<QStringListModel*> (m_Completer->model());
   completeModel->setStringList(m_Controls.m_LabelSetTableWidget->GetLabelList());
+
+  // react whenever the set of selected segmentation changes
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerWorkingDataModified );
+  toolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerReferenceDataModified );
+
+  m_Controls.m_LabelSetTableWidget->setEnabled(false);
+  m_Controls.m_LabelSearchBox->setEnabled(false);
+  m_Controls.m_btNewLabelSet->setEnabled(false);
+  m_Controls.m_btLoadLabelSet->setEnabled(false);
+  m_Controls.m_btSaveLabelSet->setEnabled(false);
+  m_Controls.m_btNewLabel->setEnabled(false);
+  m_Controls.m_btImportLabelSet->setEnabled(false);
 }
 
 QmitkLabelSetWidget::~QmitkLabelSetWidget()
 {
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerWorkingDataModified );
+  toolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerReferenceDataModified );
 }
 
-void QmitkLabelSetWidget::SetActiveLabelSetImage(mitk::LabelSetImage* _image)
+void QmitkLabelSetWidget::SetDataStorage( mitk::DataStorage& storage )
+{
+    m_DataStorage = &storage;
+}
+
+void QmitkLabelSetWidget::SetActiveLabelSetImage( mitk::LabelSetImage* _image )
 {
   m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(_image);
 }
 
-void QmitkLabelSetWidget::SetPreferences( berry::IPreferences::Pointer prefs)
+void QmitkLabelSetWidget::SetPreferences( berry::IPreferences::Pointer prefs )
 {
   m_Preferences = prefs;
+}
+
+void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
+{
+    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+    m_Controls.m_LabelSetTableWidget->setEnabled(toolManager->GetWorkingData(0));
+    m_Controls.m_LabelSearchBox->setEnabled(toolManager->GetWorkingData(0));
+    m_Controls.m_btSaveLabelSet->setEnabled(toolManager->GetWorkingData(0));
+    m_Controls.m_btNewLabel->setEnabled(toolManager->GetWorkingData(0));
+    m_Controls.m_btImportLabelSet->setEnabled(toolManager->GetWorkingData(0));
+}
+
+void QmitkLabelSetWidget::OnToolManagerReferenceDataModified()
+{
+    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+    m_Controls.m_btNewLabelSet->setEnabled(toolManager->GetReferenceData(0));
+    m_Controls.m_btLoadLabelSet->setEnabled(toolManager->GetReferenceData(0));
 }
 
 void QmitkLabelSetWidget::OnSearchLabel()
@@ -258,7 +304,218 @@ void QmitkLabelSetWidget::OnCreateSurface(int index)
 
     filter->SetPointerParameter("Input", segImage);
     filter->SetParameter("RequestedLabel", index);
-//    filter->SetDataStorage( *this->GetDataStorage() );
+    filter->SetDataStorage( *m_DataStorage );
 
     filter->StartAlgorithm();
+}
+
+void QmitkLabelSetWidget::OnImportLabelSet()
+{
+    mitk::DataNode* segNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
+    if (!segNode) return;
+
+    mitk::LabelSetImage* segImage = dynamic_cast<mitk::LabelSetImage*>( segNode->GetData() );
+    if (!segImage) return;
+
+    std::string fileExtensions("Segmentation files (*.lset);;");
+    QString qfileName = QFileDialog::getOpenFileName(this, "Import segmentation", "", fileExtensions.c_str() );
+    if (qfileName.isEmpty() ) return;
+
+    mitk::NrrdLabelSetImageReader<unsigned char>::Pointer reader = mitk::NrrdLabelSetImageReader<unsigned char>::New();
+    reader->SetFileName(qfileName.toLatin1());
+
+    this->WaitCursorOn();
+
+    try
+    {
+        reader->Update();
+    }
+    catch ( itk::ExceptionObject & excep )
+    {
+        MITK_ERROR << "Exception caught: " << excep.GetDescription();
+        QMessageBox::information(this, "Load segmentation", "Could not load active segmentation. See error log for details.\n");
+        this->WaitCursorOff();
+    }
+
+    this->WaitCursorOff();
+
+    mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
+
+    if (!segImage->Concatenate(lsImage)) {
+        QMessageBox::information(this,
+        "Import segmentation...",
+        "Could not import the selected segmentation session with the current software version (dimensions must match).\n");
+    }
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkLabelSetWidget::OnLoadLabelSet()
+{
+    mitk::DataNode* refNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
+    if (!refNode) return;
+
+    mitk::Image* refImage = dynamic_cast<mitk::Image*>( refNode->GetData() );
+    if (!refImage) return;
+
+    std::string fileExtensions("Segmentation files (*.lset);;");
+    QString qfileName = QFileDialog::getOpenFileName(this, "Load segmentation", "", fileExtensions.c_str() );
+    if (qfileName.isEmpty() ) return;
+
+    mitk::NrrdLabelSetImageReader<unsigned char>::Pointer reader = mitk::NrrdLabelSetImageReader<unsigned char>::New();
+    reader->SetFileName(qfileName.toLatin1());
+
+    this->WaitCursorOn();
+
+    try
+    {
+        reader->Update();
+    }
+    catch ( itk::ExceptionObject & excep )
+    {
+        MITK_ERROR << "Exception caught: " << excep.GetDescription();
+        QMessageBox::information(this, "Load segmentation", "Could not load active segmentation. See error log for details.\n");
+        this->WaitCursorOff();
+    }
+
+    this->WaitCursorOff();
+
+    mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
+
+    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+    newNode->SetData(lsImage);
+    newNode->SetName( lsImage->GetLabelSetName() );
+
+    m_DataStorage->Add(newNode,refNode);
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkLabelSetWidget::OnSaveLabelSet()
+{
+  mitk::DataNode* workingNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
+  if (!workingNode) return;
+
+  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  if ( !lsImage ) return;
+
+  // update the name in case has changed
+  lsImage->SetName( workingNode->GetName() );
+
+  //set last modification date and time
+  QDateTime cTime = QDateTime::currentDateTime ();
+  lsImage->SetLabelSetLastModified( cTime.toString().toStdString() );
+
+  QString proposedFileName = QString::fromStdString(workingNode->GetName());
+  QString selected_suffix("segmentation files (*.lset)");
+  QString qfileName = QFileDialog::getSaveFileName(this, QString("Save segmentation..."), proposedFileName, selected_suffix);
+  if (qfileName.isEmpty() ) return;
+
+  mitk::NrrdLabelSetImageWriter<unsigned char>::Pointer writer = mitk::NrrdLabelSetImageWriter<unsigned char>::New();
+  writer->SetFileName(qfileName.toStdString());
+  std::string newName = itksys::SystemTools::GetFilenameWithoutExtension(qfileName.toStdString());
+  lsImage->SetName(newName);
+  workingNode->SetName(newName);
+  writer->SetInput(lsImage);
+
+  this->WaitCursorOn();
+
+  try
+  {
+      writer->Update();
+  }
+  catch ( itk::ExceptionObject & excep )
+  {
+    MITK_ERROR << "Exception caught: " << excep.GetDescription();
+    QMessageBox::information(this, "Save segmenation", "Could not save active segmentation. See error log for details.\n\n");
+    this->WaitCursorOff();
+  }
+
+  this->WaitCursorOff();
+}
+
+void QmitkLabelSetWidget::OnNewLabelSet()
+{
+  mitk::DataNode::Pointer refNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
+  if (refNode.IsNotNull())
+  {
+    mitk::Image::Pointer refImage = dynamic_cast<mitk::Image*>( refNode->GetData() );
+    if (refImage.IsNotNull())
+    {
+        bool ok = false;
+        QString refNodeName = QString::fromStdString(refNode->GetName());
+        refNodeName.append("-");
+        QString newName = QInputDialog::getText(this, "New segmentation", "Set name:", QLineEdit::Normal, refNodeName, &ok);
+        if (!ok) return;
+
+        mitk::PixelType pixelType(mitk::MakeScalarPixelType<unsigned char>() );
+        mitk::LabelSetImage::Pointer labelSetImage = mitk::LabelSetImage::New();
+
+        if (refImage->GetDimension() == 2)
+        {
+            const unsigned int dimensions[] = { refImage->GetDimension(0), refImage->GetDimension(1), 1 };
+            labelSetImage->Initialize(pixelType, 3, dimensions);
+        }
+        else
+        {
+            labelSetImage->Initialize(pixelType, refImage->GetDimension(), refImage->GetDimensions());
+        }
+
+        unsigned int byteSize = sizeof(unsigned char);
+        for (unsigned int dim = 0; dim < labelSetImage->GetDimension(); ++dim)
+        {
+            byteSize *= labelSetImage->GetDimension(dim);
+        }
+
+        mitk::ImageWriteAccessor accessor(static_cast<mitk::Image*>(labelSetImage));
+        memset( accessor.GetData(), 0, byteSize );
+
+        mitk::TimeSlicedGeometry::Pointer originalGeometry = refImage->GetTimeSlicedGeometry()->Clone();
+        labelSetImage->SetGeometry( originalGeometry );
+
+        mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+        newNode->SetData(labelSetImage);
+        newNode->SetName(newName.toStdString());
+        labelSetImage->SetName(newName.toStdString());
+
+        m_DataStorage->Add(newNode,refNode);
+
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+  }
+}
+
+void QmitkLabelSetWidget::OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>& ranges )
+{
+
+}
+
+void QmitkLabelSetWidget::OnCombineAndCreateMask( const QList<QTableWidgetSelectionRange>& ranges )
+{
+
+}
+
+void QmitkLabelSetWidget::WaitCursorOn()
+{
+  QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+}
+
+void QmitkLabelSetWidget::BusyCursorOn()
+{
+  QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
+}
+
+void QmitkLabelSetWidget::WaitCursorOff()
+{
+  this->RestoreOverrideCursor();
+}
+
+void QmitkLabelSetWidget::BusyCursorOff()
+{
+  this->RestoreOverrideCursor();
+}
+
+void QmitkLabelSetWidget::RestoreOverrideCursor()
+{
+  QApplication::restoreOverrideCursor();
 }

@@ -38,14 +38,20 @@ namespace mitk {
 
     itkNewMacro(Self);
 
-    /** Defines the rotation modes of the input data of this filter
-       *  which results in different interpretations of quaternions.
-       *  - Standard: normal representation, rawdata from the device is not changed
-       *  - Transposed: the rotation is stored transposed, which is standard in VNL
-       *  ndiStandard is default
-       *  use SetRotationMode to change the mode.
-       */
-      enum RotationMode {RotationStandard, RotationTransposed};
+    /** Defines the rotation modes of this tracking device which results in different representations
+     *  of quaternions.
+     *
+     *  - Standard: normal representation, rawdata from the device is not changed (DEFAULT)
+     *
+     *  - Transposed: the rotation is stored transposed, which is (by mistake!) expected by some older MITK classes due
+     *                to an ambigious method naming in VNL.
+     *
+     *  CAUTION: The rotation mode can only be changed for backward compatibility of old WRONG code.
+     *           PLEASE DO NOT CHANGE THE ROTATION MODE UNLESS YOU ARE KNOWING EXACTLY WHAT YOU ARE DOING!
+     *
+     *  use SetRotationMode to change the mode.
+     */
+    enum RotationMode {RotationStandard, RotationTransposed};
 
     /**
     * \brief Smart Pointer type to a BaseData.
@@ -96,6 +102,8 @@ namespace mitk {
 
     /** Sets the rotation mode of this class. See documentation of enum RotationMode for details
      *  on the different modes.
+     *  CAUTION: The rotation mode can only be changed for backward compatibility of old WRONG code.
+     *           PLEASE DO NOT CHANGE THE ROTATION MODE UNLESS YOU ARE KNOWING EXACTLY WHAT YOU ARE DOING!
      */
     virtual void SetRotationMode(RotationMode r);
 

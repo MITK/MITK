@@ -11,7 +11,7 @@ set(MODULE_TESTS
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
-  mitkGeometry3DAreEqualTest.cpp
+  mitkGeometry3DEqualTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkGlobalInteractionTest.cpp
   mitkImageAreEqualTest.cpp

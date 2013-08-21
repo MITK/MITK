@@ -45,6 +45,10 @@ namespace mitk {
     itkFactorylessNewMacro(Transform);
     mitkNewMacro1Param(Transform, const mitk::NavigationData*);
     mitkNewMacro1Param(Transform, const mitk::AffineTransform3D*);
+    /** @brief TODO: documentation, especially: what is the string for?
+     *
+     *
+     */
     mitkNewMacro1Param(Transform, const std::string&);
 
     ///

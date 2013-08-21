@@ -14,7 +14,7 @@ set(MODULE_TESTS
   mitkGeometry3DEqualTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkGlobalInteractionTest.cpp
-  mitkImageAreEqualTest.cpp
+  mitkImageEqualTest.cpp
   mitkImageDataItemTest.cpp
   #mitkImageMapper2DTest.cpp
   mitkImageGeneratorTest.cpp

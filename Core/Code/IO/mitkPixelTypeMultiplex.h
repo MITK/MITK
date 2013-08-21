@@ -19,25 +19,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPixelTypeMultiplex0( function, ptype )    \
 {                                                 \
     if ( ptype.GetComponentType() == itk::ImageIOBase::CHAR )\
-      function<char>( ptype,  );\
+      function<char>( ptype );\
     else if ( ptype.GetComponentType() == itk::ImageIOBase::UCHAR)\
-      function<unsigned char>( ptype,  );\
+      function<unsigned char>( ptype );\
     else if ( ptype.GetComponentType() == itk::ImageIOBase::SHORT )\
-      function<short>( ptype,  );      \
+      function<short>( ptype );      \
     else if ( ptype.GetComponentType() == itk::ImageIOBase::USHORT )\
-      function<unsigned short>( ptype,  );\
+      function<unsigned short>( ptype  );\
     else if ( ptype.GetComponentType() == itk::ImageIOBase::INT )\
-      function<int>( ptype,  );\
+      function<int>( ptype );\
     else if ( ptype.GetComponentType() == itk::ImageIOBase::UINT )\
-      function<unsigned int>( ptype,  );\
+      function<unsigned int>( ptype );\
     else if ( ptype.GetComponentType() == itk::ImageIOBase::LONG )\
-      function<long int>( ptype,  );\
+      function<long int>( ptype );\
     else if ( ptype.GetComponentType() == itk::ImageIOBase::ULONG )\
-      function<unsigned long int>( ptype,  );\
+      function<unsigned long int>( ptype );\
     else if ( ptype.GetComponentType() == itk::ImageIOBase::FLOAT  )\
-      function<float>( ptype,  );\
+      function<float>( ptype );\
     else if ( ptype.GetComponentType() == itk::ImageIOBase::DOUBLE  )\
-      function<double>( ptype,  );\
+      function<double>( ptype );\
 }\
 
 #define mitkPixelTypeMultiplex1( function, ptype, param1 )    \

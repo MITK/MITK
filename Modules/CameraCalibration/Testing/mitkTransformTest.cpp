@@ -15,38 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkTransform.h>
-#include <mitkNavigationData.h>
 #include <mitkTestingMacros.h>
 #include <mitkStringFromCvMat.h>
 #include <mitkCvMatCompare.h>
 #include <mitkCvMatFromVnlMatrix.h>
-
-class mitkTransformTestClass
-  {
-  public:
-
-    static void TestInstantiation()
-    {
-    mitk::Transform::Pointer transform = mitk::Transform::New();
-    MITK_TEST_CONDITION_REQUIRED(transform.IsNotNull(),"Testing instantiation with constructor 1. (DEFAULT)");
-
-    mitk::AffineTransform3D::Pointer emptyTransform = mitk::AffineTransform3D::New();
-    mitk::Transform::Pointer transform2 = mitk::Transform::New(emptyTransform);
-    MITK_TEST_CONDITION_REQUIRED(transform2.IsNotNull(),"Testing instantiation with constructor 2. (PARAM: AffineTransform3D)");
-    //TODO test if the parameter was copied correctly
-
-    mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
-    mitk::Transform::Pointer transform3 = mitk::Transform::New(nd);
-    MITK_TEST_CONDITION_REQUIRED(transform3.IsNotNull(),"Testing instantiation with constructor 3. (PARAM: NavigationData)");
-    //TODO test if the parameter was copied correctly
-
-    std::string emptyString = "";
-    mitk::Transform::Pointer transform4 = mitk::Transform::New(emptyString);
-    MITK_TEST_CONDITION_REQUIRED(transform4.IsNotNull(),"Testing instantiation with constructor 4. (PARAM: std::string)");
-    //TODO test if the parameter was copied correctly
-    }
-
-  };
 
 /**Documentation
  *  test for the class "Transform".
@@ -54,8 +26,6 @@ class mitkTransformTestClass
 int mitkTransformTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("Transform")
-
-  mitkTransformTestClass::TestInstantiation();
 
   mitk::Transform::Pointer transform = mitk::Transform::New();
   mitk::Transform* t =  transform;

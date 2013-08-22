@@ -28,6 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkUSExports.h>
 #include "mitkUSImageSource.h"
 
+#include "mitkUSControlInterfaceProbes.h"
+#include "mitkUSControlInterfaceBMode.h"
+#include "mitkUSControlInterfaceDoppler.h"
+
 // MITK
 #include <mitkCommon.h>
 #include <mitkImageSource.h>
@@ -59,6 +63,10 @@ namespace mitk {
    class MitkUS_EXPORT USDevice : public mitk::ImageSource
     {
     public:
+      //static USDevice* exp_Device;
+
+      enum DeviceStates { State_NoState, State_Initialized, State_Connected, State_Activated };
+
       mitkClassMacro(USDevice, mitk::ImageSource);
 
       struct USImageCropArea
@@ -72,11 +80,19 @@ namespace mitk {
      /**
       *\brief These constants are used in conjunction with Microservices
       */
-      static const std::string US_INTERFACE_NAME;     // Common Interface name of all US Devices. Used to refer to this device via Microservices
-      static const std::string US_PROPKEY_LABEL;      // Human readable text represntation of this device
-      static const std::string US_PROPKEY_ISACTIVE;   // Whether this Device is active or not.
-      static const std::string US_PROPKEY_CLASS;      // Class Name of this Object
+      static const std::string US_INTERFACE_NAME;       // Common Interface name of all US Devices. Used to refer to this device via Microservices
+      static const std::string US_PROPKEY_LABEL;        // Human readable text represntation of this device
+      static const std::string US_PROPKEY_ISCONNECTED;  // Whether this device is connected or not.
+      static const std::string US_PROPKEY_ISACTIVE;     // Whether this device is active or not.
+      static const std::string US_PROPKEY_CLASS;        // Class Name of this Object
 
+      virtual USAbstractControlInterface::Pointer   GetControlInterfaceCustom();
+      virtual USControlInterfaceBMode::Pointer      GetControlInterfaceBMode();
+      virtual USControlInterfaceProbes::Pointer     GetControlInterfaceProbes();
+      virtual USControlInterfaceDoppler::Pointer    GetControlInterfaceDoppler();
+
+      bool Initialize();
+      bool Deinitialize();
 
       /**
       * \brief Connects this device. A connected device is ready to deliver images (i.e. be Activated). A Connected Device can be active. A disconnected Device cannot be active.
@@ -181,6 +197,11 @@ namespace mitk {
       virtual std::string GetDeviceClass() = 0;
 
       /**
+      * \brief True, if the device object is created and initialized, false otherwise.
+      */
+      bool GetIsInitialized();
+
+      /**
       * \brief True, if the device is currently generating image data, false otherwise.
       */
       bool GetIsActive();
@@ -224,8 +245,7 @@ namespace mitk {
       std::vector<mitk::USProbe::Pointer> m_ConnectedProbes;
       mitk::USImage::Pointer m_Image;
 
-      bool m_IsActive;
-      bool m_IsConnected;
+      DeviceStates m_DeviceState;
 
       /* @brief defines the area that should be cropped from the US image */
       USImageCropArea m_CropArea;
@@ -239,6 +259,14 @@ namespace mitk {
       */
       us::ServiceProperties ConstructServiceProperties();
 
+
+      void UnregisterOnService();
+
+      /**
+      * \brief Is called during the initialization process. Override this method in your subclass to handle the actual initialization.
+      *  Return true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
+      */
+      virtual bool OnInitialization() = 0;
 
       /**
       * \brief Is called during the connection process. Override this method in your subclass to handle the actual connection.
@@ -261,7 +289,7 @@ namespace mitk {
       /**
       * \brief Is called during the deactivation process. After a call to this method the device should still be connected, but not producing images anymore.
       */
-      virtual void OnDeactivation() = 0;
+      virtual bool OnDeactivation() = 0;
 
 
       /**
@@ -315,6 +343,8 @@ namespace mitk {
        itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the range camera
        itk::FastMutexLock::Pointer m_CameraActiveMutex; ///< mutex for the cameraActive flag
        int m_ThreadID; ///< ID of the started thread
+
+       bool m_UnregisteringStarted;
     };
 } // namespace mitk
 

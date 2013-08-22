@@ -1,5 +1,11 @@
 SET(CPP_FILES
-mitkUSTelemedImageSource.cpp
+mitkUSTelemedActivator.cpp
 mitkUSTelemedDevice.cpp
-mitkTelemedBModeControls.cpp
+mitkUSTelemedImageSource.cpp
+mitkUSTelemedProbe.cpp
+mitkUSTelemedScanConverterPlugin.cpp
+mitkUSTelemedSDKHeader.cpp
+mitkUSTelemedBModeControls.cpp
+mitkUSTelemedDopplerControls.cpp
+mitkUSTelemedProbesControls.cpp
 )

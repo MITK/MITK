@@ -35,11 +35,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Ultrasound
 #include "mitkUSDevice.h"
 
+
 const std::string UltrasoundSupport::VIEW_ID = "org.mitk.views.ultrasoundsupport";
 
 void UltrasoundSupport::SetFocus()
 {
-  m_Controls.m_AddDevice->setFocus();
+  //m_Controls.m_AddDevice->setFocus();
 }
 
 void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
@@ -48,8 +49,9 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
 
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
-  connect( m_Controls.m_AddDevice, SIGNAL(clicked()), this, SLOT(OnClickedAddNewDevice()) ); // Change Widget Visibilities
-  connect( m_Controls.m_AddDevice, SIGNAL(clicked()), this->m_Controls.m_NewVideoDeviceWidget, SLOT(CreateNewDevice()) ); // Init NewDeviceWidget
+
+  connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this, SLOT(OnClickedAddNewDevice()) ); // Change Widget Visibilities
+  connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this->m_Controls.m_NewVideoDeviceWidget, SLOT(CreateNewDevice()) ); // Init NewDeviceWidget
   connect( m_Controls.m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone()) ); // After NewDeviceWidget finished editing
   connect( m_Controls.m_BtnView, SIGNAL(clicked()), this, SLOT(OnClickedViewDevice()) );
   connect( m_Timer, SIGNAL(timeout()), this, SLOT(DisplayImage()));
@@ -57,7 +59,6 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.crop_right, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
   connect( m_Controls.crop_top, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
   connect( m_Controls.crop_bot, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
-  //connect (m_Controls.m_ActiveVideoDevices, SIGNAL())
 
   // Initializations
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
@@ -80,8 +81,7 @@ void UltrasoundSupport::OnClickedAddNewDevice()
 {
   m_Controls.m_NewVideoDeviceWidget->setVisible(true);
   m_Controls.m_DeviceManagerWidget->setVisible(false);
-  m_Controls.m_AddDevice->setVisible(false);
-  m_Controls.m_Headline->setText("Add New Device:");
+  m_Controls.m_Headline->setText("Add New Video Device:");
 }
 
 void UltrasoundSupport::DisplayImage()
@@ -159,9 +159,21 @@ void UltrasoundSupport::OnClickedViewDevice()
     m_Controls.crop_right->setEnabled(true);
     m_Controls.crop_bot->setEnabled(true);
     m_Controls.crop_top->setEnabled(true);
+
+    m_ControlProbesWidget = new QmitkUSControlsProbesWidget(m_Device->GetControlInterfaceProbes(), m_Controls.tab2);
+    m_Controls.tab2->layout()->addWidget(m_ControlProbesWidget);
+
+    m_ControlBModeWidget = new QmitkUSControlsBModeWidget(m_Device->GetControlInterfaceBMode(), m_Controls.tab2);
+    m_Controls.tab2->layout()->addWidget(m_ControlBModeWidget);
   }
   else //deactivate imaging
   {
+    m_Controls.tab2->layout()->removeWidget(m_ControlProbesWidget);
+    delete m_ControlProbesWidget;
+
+    m_Controls.tab2->layout()->removeWidget(m_ControlBModeWidget);
+    delete m_ControlBModeWidget;
+
     //stop timer & release data
     m_Timer->stop();
     m_Node->ReleaseData();
@@ -181,8 +193,7 @@ void UltrasoundSupport::OnNewDeviceWidgetDone()
 {
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
   m_Controls.m_DeviceManagerWidget->setVisible(true);
-  m_Controls.m_AddDevice->setVisible(true);
-  m_Controls.m_Headline->setText("Connected Devices:");
+  m_Controls.m_Headline->setText("Ultrasound Devices:");
 }
 
 void UltrasoundSupport::GlobalReinit()
@@ -200,12 +211,8 @@ void UltrasoundSupport::GlobalReinit()
 
 UltrasoundSupport::UltrasoundSupport()
 {
-  m_DevicePersistence = mitk::USDevicePersistence::New();
-  m_DevicePersistence->RestoreLastDevices();
 }
 
 UltrasoundSupport::~UltrasoundSupport()
 {
-  m_DevicePersistence->StoreCurrentDevices();
-  m_Controls.m_DeviceManagerWidget->DisconnectAllDevices();
 }

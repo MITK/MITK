@@ -14,18 +14,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "mitkUSTelemedActivator.h"
 
-#ifndef MITKUSBModeControlInterface_H_HEADER_INCLUDED_
-#define MITKUSBModeControlInterface_H_HEADER_INCLUDED_
+mitk::USTelemedActivator::USTelemedActivator()
+{
 
-#include <MitkUSExports.h>
-#include <mitkCommon.h>
+}
 
-namespace mitk {
+mitk::USTelemedActivator::~USTelemedActivator()
+{
 
-class mitkBModeControlInterface {
+}
 
-};
+void mitk::USTelemedActivator::Load(us::ModuleContext* context)
+{
+  // create a new device
+  m_Device = mitk::USTelemedDevice::New("Telemed", "Ultrasound System");
+  m_Device->Initialize();
+}
 
-} // namespace mitk
-#endif
+void mitk::USTelemedActivator::Unload(us::ModuleContext* context)
+{
+  m_Device = 0;
+}

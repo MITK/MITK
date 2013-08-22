@@ -19,14 +19,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKUSTelemedImageSource_H_HEADER_INCLUDED_
 
 #include "mitkUSImageSource.h"
+#include "mitkUSTelemedSDKHeader.h"
+#include "mitkUSTelemedScanConverterPlugin.h"
 
 namespace mitk {
 
-class MitkUS_EXPORT TelemedImageSource : public USImageSource
+class USTelemedImageSource : public USImageSource
 {
-  virtual void GetNextRawImage( cv::Mat& );
-  virtual void GetNextRawImage( mitk::Image::Pointer );
-}
+public:
+  mitkClassMacro(USTelemedImageSource, USImageSource);
+  itkNewMacro(Self);
+
+  virtual void GetNextRawImage( mitk::Image::Pointer& );
+
+  bool CreateAndConnectConverterPlugin( IUsgDataView*, tagScanMode );
+
+protected:
+  USTelemedImageSource( );
+  virtual ~USTelemedImageSource( );
+
+  IUsgScanConverterPlugin*        m_Plugin;
+  USTelemedScanConverterPlugin*   m_PluginCallback;
+
+  mitk::Image::Pointer            m_Image;
+};
 
 } // namespace mitk
 

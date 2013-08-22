@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSDevice.h"
 #include <itkObjectFactory.h>
 #include "mitkUSImageVideoSource.h"
+#include "mitkUSVideoDeviceCustomControls.h"
 
 namespace mitk {
 
@@ -54,13 +55,18 @@ namespace mitk {
       */
       virtual std::string GetDeviceClass();
 
+      virtual USAbstractControlInterface::Pointer GetControlInterfaceCustom();
+
       void GenerateData();
+
+      void UnregisterOnService();
 
       itkGetMacro(Source, mitk::USImageVideoSource::Pointer);
       itkGetMacro(Image, mitk::USImage::Pointer);
       itkGetMacro(DeviceID,int);
       itkGetMacro(FilePath,std::string);
 
+      static const std::string DeviceClassIdentifier;
     protected:
 
       /**
@@ -92,6 +98,12 @@ namespace mitk {
       void Init();
 
       /**
+      * \brief Is called during the initialization process.
+      *  Returns true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
+      */
+      virtual bool OnInitialization();
+
+      /**
       * \brief Is called during the connection process.
       *  Returns true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
       */
@@ -111,7 +123,7 @@ namespace mitk {
       /**
       * \brief Is called during the deactivation process. After a call to this method the device should still be connected, but not producing images anymore.
       */
-      virtual void OnDeactivation();
+      virtual bool OnDeactivation();
 
       virtual USImageSource::Pointer GetUSImageSource();
 
@@ -134,6 +146,8 @@ namespace mitk {
       * \brief The Filepath id to connect to. Undefined, if m_SourceIsFile == false;
       */
       std::string m_FilePath;
+
+      mitk::USVideoDeviceCustomControls::Pointer m_ControlInterfaceCustom;
 
       void SetSourceCropArea();
     };

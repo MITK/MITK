@@ -14,27 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkUSProbe.h"
-#include <string>
+#include "mitkUSControlInterfaceBMode.h"
 
-
-mitk::USProbe::USProbe() : itk::Object()
-{
-
-}
-
-mitk::USProbe::USProbe(std::string identifier)
- : m_Name(identifier)
+mitk::USControlInterfaceBMode::USControlInterfaceBMode()
 {
 }
 
-mitk::USProbe::~USProbe()
+mitk::USControlInterfaceBMode::~USControlInterfaceBMode()
 {
-
 }
 
-bool mitk::USProbe::IsEqualToProbe(mitk::USProbe::Pointer probe)
+/*std::string GetControlInterfaceType()
 {
-  if(m_Name.compare(probe->GetName()) == 0) return true;
-  else return false;
-}
+  return "";
+}*/

@@ -117,6 +117,31 @@ void mitk::USImageVideoSource::SetRegionOfInterest(int topLeftX, int topLeftY, i
   m_IsCropped = true;
 }
 
+void mitk::USImageVideoSource::SetRegionOfInterest(USImageRoi roi)
+{
+  this->SetRegionOfInterest(roi.topLeftX, roi.topLeftY, roi.bottomRightX, roi.bottomRightY);
+}
+
+void mitk::USImageVideoSource::SetCropping(USImageCropping cropping)
+{
+  int right = this->GetImageWidth() - cropping.right;
+  int bottom = this->GetImageHeight() - cropping.bottom;
+  this->SetRegionOfInterest(cropping.left, cropping.top, right, bottom);
+}
+
+mitk::USImageVideoSource::USImageCropping mitk::USImageVideoSource::GetCropping()
+{
+  cv::Rect cropRect = m_CropFilter->GetCropRegion();
+
+  USImageCropping cropping;
+  cropping.left = cropRect.x;
+  cropping.top = cropRect.y;
+  cropping.bottom = this->GetImageHeight() - cropRect.height;
+  cropping.right = this->GetImageWidth() - cropRect.width;
+
+  return cropping;
+}
+
 void mitk::USImageVideoSource::RemoveRegionOfInterest()
 {
   //itk::BaseData<>
@@ -136,7 +161,7 @@ void mitk::USImageVideoSource::GetNextRawImage( cv::Mat& image )
   *m_VideoCapture >> image; // get a new frame from camera
 }
 
-void mitk::USImageVideoSource::GetNextRawImage( mitk::Image::Pointer image )
+void mitk::USImageVideoSource::GetNextRawImage( mitk::Image::Pointer& image )
 {
   cv::Mat cv_img;
 

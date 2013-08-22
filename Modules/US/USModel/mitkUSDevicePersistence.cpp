@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 //QT
-#include <QMessageBox>
+//#include <QMessageBox>
 
 
 mitk::USDevicePersistence::USDevicePersistence() : m_devices("MITK US","Device Settings")
@@ -58,8 +58,10 @@ void mitk::USDevicePersistence::StoreCurrentDevices()
   MITK_INFO << "Successfully saved " << numberOfSavedDevices << " US devices.";
 }
 
-void mitk::USDevicePersistence::RestoreLastDevices()
+std::vector<mitk::USDevice::Pointer> mitk::USDevicePersistence::RestoreLastDevices()
 {
+  std::vector<mitk::USDevice::Pointer> devices;
+
   int numberOfSavedDevices = m_devices.value("numberOfSavedDevices").toInt();
 
   for(int i=0; i<numberOfSavedDevices; i++)
@@ -68,17 +70,20 @@ void mitk::USDevicePersistence::RestoreLastDevices()
     try
     {
       QString currentString = m_devices.value("device"+QString::number(i)).toString();
-      mitk::USVideoDevice::Pointer currentDevice = StringToUSVideoDevice(currentString);
-      currentDevice->Connect();
+      mitk::USDevice::Pointer currentDevice = dynamic_cast<mitk::USDevice*>(StringToUSVideoDevice(currentString).GetPointer());
+      //currentDevice->Initialize();
+      devices.push_back(currentDevice.GetPointer());
     }
     catch (...)
     {
       MITK_ERROR << "Error occured while loading a USVideoDevice from persistence. Device assumed corrupt, will be deleted.";
-      QMessageBox::warning(NULL, "Could not load device" ,"A stored ultrasound device is corrupted and could not be loaded. The device will be deleted.");
+      //QMessageBox::warning(NULL, "Could not load device" ,"A stored ultrasound device is corrupted and could not be loaded. The device will be deleted.");
     }
   }
 
   MITK_INFO << "Restoring " << numberOfSavedDevices << " US devices.";
+
+  return devices;
 }
 
 QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Pointer d)

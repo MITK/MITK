@@ -13,3 +13,13 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+
+#include "mitkUSControlInterfaceProbes.h"
+
+mitk::USControlInterfaceProbes::USControlInterfaceProbes()
+{
+}
+
+mitk::USControlInterfaceProbes::~USControlInterfaceProbes()
+{
+}

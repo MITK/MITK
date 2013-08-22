@@ -14,4 +14,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkBModeControlInterface.h"
+#include "mitkUSTelemedDopplerControls.h"
+#include <mitkException.h>
+
+mitk::USTelemedDopplerControls::USTelemedDopplerControls()
+{
+}
+
+mitk::USTelemedDopplerControls::~USTelemedDopplerControls()
+{
+}
+
+void mitk::USTelemedDopplerControls::SetIsActive(bool isActive)
+{
+  m_IsActive = isActive;
+}
+
+bool mitk::USTelemedDopplerControls::GetIsActive()
+{
+  return m_IsActive;
+}

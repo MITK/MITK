@@ -21,9 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
-#include <mitkUSDevicePersistence.h>
 
 #include "ui_UltrasoundSupportControls.h"
+#include "QmitkUSControlsBModeWidget.h"
+#include "QmitkUSControlsProbesWidget.h"
 
 #include <QTime>
 
@@ -100,7 +101,8 @@ class UltrasoundSupport : public QmitkAbstractView
     /** @brief reinits the view globally. */
     void GlobalReinit();
 
-    mitk::USDevicePersistence::Pointer m_DevicePersistence;
+    QmitkUSControlsBModeWidget* m_ControlBModeWidget;
+    QmitkUSControlsProbesWidget* m_ControlProbesWidget;
 
 };
 

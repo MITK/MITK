@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <MitkUSExports.h>
+#include <mitkCommon.h>
 #include "mitkUSImage.h"
 #include "mitkAbstractOpenCVImageFilter.h"
 #include "mitkOpenCVToMitkImageFilter.h"
@@ -45,8 +46,7 @@ namespace mitk {
   class MitkUS_EXPORT USImageSource : public itk::Object
   {
   public:
-    mitkClassMacro(USImageSource, itk::ProcessObject);
-    USImageSource();
+    mitkClassMacro(USImageSource, itk::Object);
 
     itkGetMacro(ImageFilter, mitk::AbstractOpenCVImageFilter::Pointer);
     itkSetMacro(ImageFilter, mitk::AbstractOpenCVImageFilter::Pointer);
@@ -61,6 +61,8 @@ namespace mitk {
     mitk::USImage::Pointer GetNextImage( );
 
   protected:
+    USImageSource();
+    virtual ~USImageSource();
     /**
       * \brief Set the given OpenCV image matrix to the next image received
       * from the device or file.
@@ -75,7 +77,7 @@ namespace mitk {
       * \brief Set mitk::Image to the next image received from the device or file.
       * This method must be implemented in every subclass.
       */
-    virtual void GetNextRawImage( mitk::Image::Pointer ) = 0;
+    virtual void GetNextRawImage( mitk::Image::Pointer& ) = 0;
 
     /**
       * \brief Filter is executed during mitk::USImageVideoSource::GetNextImage().

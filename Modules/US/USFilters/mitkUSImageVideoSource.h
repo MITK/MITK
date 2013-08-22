@@ -48,6 +48,22 @@ namespace mitk {
     mitkClassMacro(USImageVideoSource, itk::ProcessObject);
     itkNewMacro(Self);
 
+    struct USImageRoi
+    {
+      int topLeftX;
+      int topLeftY;
+      int bottomRightX;
+      int bottomRightY;
+    };
+
+    struct USImageCropping
+    {
+      int top;
+      int bottom;
+      int left;
+      int right;
+    };
+
     /**
     * \brief Opens a video file for streaming. If nothing goes wrong, the
     * VideoSource is ready to deliver images after calling this function.
@@ -74,6 +90,12 @@ namespace mitk {
     * The dimensions of the output image will be equal to those of the rectangle.
     */
     void SetRegionOfInterest(int topLeftX, int topLeftY, int bottomRightX, int bottomRightY);
+
+    void SetRegionOfInterest(USImageRoi regionOfInterst);
+
+    void SetCropping(USImageCropping cropping);
+
+    USImageCropping GetCropping();
 
     /**
     * /brief Removes the region of interest. Produced images will be uncropped after call.
@@ -119,7 +141,7 @@ namespace mitk {
       * Returns an OpenCV-Matrix containing this image.
       */
     virtual void GetNextRawImage( cv::Mat& );
-    virtual void GetNextRawImage( mitk::Image::Pointer );
+    virtual void GetNextRawImage( mitk::Image::Pointer& );
 
     /**
     * \brief The source of the video, managed internally

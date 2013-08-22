@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkUSControlsBModeWidget</class>
+ <widget class="QWidget" name="QmitkUSControlsBModeWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>216</width>
+    <height>155</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="scanningDepthLabel">
+     <property name="text">
+      <string>Depth Control</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="scanningDepthComboBox"/>
+   </item>
+   <item>
+    <widget class="QLabel" name="scanningGainLabel">
+     <property name="text">
+      <string>Gain Control</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSlider" name="scanningGainSlider">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBelow</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="scanningRejectionLabel">
+     <property name="text">
+      <string>Rejection Control</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSlider" name="scanningRejectionSlider">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBelow</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

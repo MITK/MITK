@@ -23,6 +23,10 @@ mitk::USImageSource::USImageSource()
   m_OpenCVToMitkFilter->SetCopyBuffer(false);
 }
 
+mitk::USImageSource::~USImageSource()
+{
+}
+
 mitk::USImage::Pointer mitk::USImageSource::GetNextImage()
 {
   mitk::Image::Pointer result;
@@ -54,11 +58,19 @@ mitk::USImage::Pointer mitk::USImageSource::GetNextImage()
     this->GetNextRawImage(result);
   }
 
-  // we then transform standard mitk::Image into an USImage
-  return mitk::USImage::New(result);
+  if ( result )
+  {
+    // we then transform standard mitk::Image into an USImage
+    return mitk::USImage::New(result);
+  }
+  else
+  {
+    //MITK_WARN("mitkUSImageSource") << "Result image is not set.";
+    return mitk::USImage::New();
+  }
 }
 
-void mitk::USImageSource::GetNextRawImage( cv::Mat& image)
+void mitk::USImageSource::GetNextRawImage( cv::Mat& image )
 {
   // create filter object if it does not exist yet
   if ( ! m_MitkToOpenCVFilter )

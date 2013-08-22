@@ -14,4 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTelemedBModeControls.h"
+#include "mitkUSControlInterfaceDoppler.h"
+
+mitk::USControlInterfaceDoppler::USControlInterfaceDoppler()
+{
+}
+
+mitk::USControlInterfaceDoppler::~USControlInterfaceDoppler()
+{
+}
+
+/*std::string GetControlInterfaceType()
+{
+  return "";
+}*/

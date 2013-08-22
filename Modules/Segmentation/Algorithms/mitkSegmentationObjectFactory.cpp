@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourModelIOFactory.h"
 #include "mitkContourModelWriterFactory.h"
 #include "mitkContourModelWriter.h"
-#include "mitkContourModelMapper2D.h"
+//#include "mitkContourModelMapper2D.h"
 #include "mitkContourModelGLMapper2D.h"
 #include "mitkContourModelMapper3D.h"
 

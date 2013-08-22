@@ -42,9 +42,6 @@ public:
 
   void SetActiveLabel(int);
 
-  /// \brief Set the LabelSetImage the widget should listen to.
-  //void SetActiveLabelSetImage(mitk::LabelSetImage*);
-
   void SetPreferences( berry::IPreferences::Pointer prefs );
 
   void SetDataStorage(mitk::DataStorage& storage);
@@ -73,6 +70,9 @@ private slots:
 
   // reaction to the signal "createSurface" from QmitkLabelSetTableWidget
   void OnCreateSurface(int);
+
+  // reaction to the signal "createMask" from QmitkLabelSetTableWidget
+  void OnCreateMask(int);
 
   // reaction to the signal "combineAndCreateMask" from QmitkLabelSetTableWidget
   void OnCombineAndCreateMask( const QList<QTableWidgetSelectionRange>& ranges );

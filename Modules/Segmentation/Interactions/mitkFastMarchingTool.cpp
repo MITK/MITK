@@ -20,9 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkInteractionConst.h"
+#include "mitkImageCast.h"
+#include "mitkImageTimeSelector.h"
 
 #include "itkOrImageFilter.h"
-#include "mitkImageTimeSelector.h"
 
 // us
 #include "mitkModule.h"

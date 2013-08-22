@@ -112,12 +112,7 @@ void QmitkLabelSetWidget::SetDataStorage( mitk::DataStorage& storage )
 {
     m_DataStorage = &storage;
 }
-/*
-void QmitkLabelSetWidget::SetActiveLabelSetImage( mitk::LabelSetImage* _image )
-{
-  m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(_image);
-}
-*/
+
 void QmitkLabelSetWidget::SetPreferences( berry::IPreferences::Pointer prefs )
 {
   m_Preferences = prefs;
@@ -125,30 +120,28 @@ void QmitkLabelSetWidget::SetPreferences( berry::IPreferences::Pointer prefs )
 
 void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
 {
-    MITK_INFO << "OnToolManagerWorkingDataModified";
-    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-    mitk::DataNode* node = toolManager->GetWorkingData(0);
-    m_Controls.m_LabelSetTableWidget->setEnabled(node != NULL);
-    m_Controls.m_LabelSearchBox->setEnabled(node != NULL);
-    m_Controls.m_btSaveLabelSet->setEnabled(node != NULL);
-    m_Controls.m_btNewLabel->setEnabled(node != NULL);
-    m_Controls.m_btImportLabelSet->setEnabled(node != NULL);
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  mitk::DataNode* node = toolManager->GetWorkingData(0);
+  m_Controls.m_LabelSetTableWidget->setEnabled(node != NULL);
+  m_Controls.m_LabelSearchBox->setEnabled(node != NULL);
+  m_Controls.m_btSaveLabelSet->setEnabled(node != NULL);
+  m_Controls.m_btNewLabel->setEnabled(node != NULL);
+  m_Controls.m_btImportLabelSet->setEnabled(node != NULL);
 
-    if (node != NULL)
-    {
-      mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>( node->GetData() );
-      m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(lsImage);
-    }
-    else
-      m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(NULL);
+  if (node != NULL)
+  {
+    mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>( node->GetData() );
+    m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(lsImage);
+  }
+  else
+    m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(NULL);
 }
 
 void QmitkLabelSetWidget::OnToolManagerReferenceDataModified()
 {
-    MITK_INFO << "OnToolManagerReferenceDataModified";
-    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-    m_Controls.m_btNewLabelSet->setEnabled(toolManager->GetReferenceData(0));
-    m_Controls.m_btLoadLabelSet->setEnabled(toolManager->GetReferenceData(0));
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  m_Controls.m_btNewLabelSet->setEnabled(toolManager->GetReferenceData(0));
+  m_Controls.m_btLoadLabelSet->setEnabled(toolManager->GetReferenceData(0));
 }
 
 void QmitkLabelSetWidget::OnSearchLabel()
@@ -158,8 +151,8 @@ void QmitkLabelSetWidget::OnSearchLabel()
 
 void QmitkLabelSetWidget::OnLabelListModified(const QStringList& list)
 {
-   QStringListModel* completeModel = static_cast<QStringListModel*> (m_Completer->model());
-   completeModel->setStringList(list);
+  QStringListModel* completeModel = static_cast<QStringListModel*> (m_Completer->model());
+  completeModel->setStringList(list);
 }
 
 void QmitkLabelSetWidget::OnRenameLabel(int index)
@@ -300,6 +293,10 @@ void QmitkLabelSetWidget::OnNewLabel()
     if ( !lsImage ) return;
 
     lsImage->AddLabel(dialog->GetSegmentationName().toStdString(), color);
+}
+
+void QmitkLabelSetWidget::OnCreateMask(int index)
+{
 }
 
 void QmitkLabelSetWidget::OnCreateSurface(int index)

@@ -34,79 +34,70 @@ mitk::ContourUtils::~ContourUtils()
 {
 }
 
-mitk::Contour::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image* slice, Contour* contourIn3D, bool itkNotUsed( correctionForIpSegmentation ), bool constrainToInside)
+mitk::ContourModel::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image* slice, ContourModel* contourIn3D, bool constrainToInside)
 {
   if ( !slice || !contourIn3D ) return NULL;
 
-  Contour::Pointer projectedContour = Contour::New();
+  ContourModel::Pointer projectedContour = ContourModel::New();
 
-  const Contour::PathType::VertexListType* pointsIn3D = contourIn3D->GetContourPath()->GetVertexList();
+//  const ContourModel::VertexListType* pointsIn3D = contourIn3D->GetContourPath()->GetVertexList();
   const Geometry3D* sliceGeometry = slice->GetGeometry();
-  for ( Contour::PathType::VertexListType::const_iterator iter = pointsIn3D->begin();
-        iter != pointsIn3D->end();
+  for ( ContourModel::ConstVertexIterator iter = contourIn3D->Begin();
+        iter != contourIn3D->End();
         ++iter )
   {
-    Contour::PathType::VertexType currentPointIn3DITK = *iter;
+//    ContourModel::VertexType currentPointIn3DITK = *iter;
     Point3D currentPointIn3D;
-    for (int i = 0; i < 3; ++i) currentPointIn3D[i] = currentPointIn3DITK[i];
+    for (int i = 0; i < 3; ++i) currentPointIn3D[i] = (*iter)->Coordinates[i];
 
     Point3D projectedPointIn2D;
     projectedPointIn2D.Fill(0.0);
     sliceGeometry->WorldToIndex( currentPointIn3D, projectedPointIn2D );
-    // MITK_INFO << "world point " << currentPointIn3D << " in index is " << projectedPointIn2D;
-/*
-    if ( !sliceGeometry->IsIndexInside( projectedPointIn2D ) && constrainToInside )
-    {
-      MITK_INFO << "**" << currentPointIn3D << " is " << projectedPointIn2D << " --> correct it (TODO)" << std::endl;
-    }
-*/
     projectedContour->AddVertex( projectedPointIn2D );
   }
 
   return projectedContour;
 }
 
-mitk::Contour::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, Contour* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ) )
+mitk::ContourModel::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D )
 {
   if ( !sliceGeometry || !contourIn2D ) return NULL;
 
-  Contour::Pointer worldContour = Contour::New();
+  ContourModel::Pointer worldContour = ContourModel::New();
+  worldContour->Initialize();
 
-  const Contour::PathType::VertexListType* pointsIn2D = contourIn2D->GetContourPath()->GetVertexList();
-  for ( Contour::PathType::VertexListType::const_iterator iter = pointsIn2D->begin();
-        iter != pointsIn2D->end();
-        ++iter )
+  for ( ContourModel::ConstVertexIterator iter = contourIn2D->Begin();
+        iter != contourIn2D->End();
+        ++iter)
   {
-    Contour::PathType::VertexType currentPointIn3DITK = *iter;
     Point3D currentPointIn2D;
-    for (int i = 0; i < 3; ++i) currentPointIn2D[i] = currentPointIn3DITK[i];
+    for (int i = 0; i < 3; ++i)
+      currentPointIn2D[i] = (*iter)->Coordinates[i];
 
     Point3D worldPointIn3D;
     worldPointIn3D.Fill(0.0);
     sliceGeometry->IndexToWorld( currentPointIn2D, worldPointIn3D );
-    //MITK_INFO << "index " << currentPointIn2D << " world " << worldPointIn3D << std::endl;
-
     worldContour->AddVertex( worldPointIn3D );
   }
 
   return worldContour;
 }
 
-void mitk::ContourUtils::FillContourInSlice( Contour* projectedContour, Image* slice, const LabelSet* labelSet, int paintingPixelValue )
+void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, Image* slice, const LabelSet* labelSet, int paintingPixelValue )
 {
   // 1. Use ipSegmentation to draw a filled(!) contour into a new 8 bit 2D image, which will later be copied back to the slice.
   //    We don't work on the "real" working data, because ipSegmentation would restrict us to 8 bit images
 
   // convert the projected contour into a ipSegmentation format
-  mitkIpInt4_t* picContour = new mitkIpInt4_t[2 * projectedContour->GetNumberOfPoints()];
-  const Contour::PathType::VertexListType* pointsIn2D = projectedContour->GetContourPath()->GetVertexList();
+  mitkIpInt4_t* picContour = new mitkIpInt4_t[2 * projectedContour->GetNumberOfVertices()];
+//  const Contour::PathType::VertexListType* pointsIn2D = projectedContour->GetContourPath()->GetVertexList();
   unsigned int index(0);
-  for ( Contour::PathType::VertexListType::const_iterator iter = pointsIn2D->begin();
-        iter != pointsIn2D->end();
+  for ( ContourModel::ConstVertexIterator iter = projectedContour->Begin();
+        iter != projectedContour->End();
         ++iter, ++index )
   {
-    picContour[ 2 * index + 0 ] = static_cast<mitkIpInt4_t>( (*iter)[0] + 1.0 ); // +0.5 wahrscheinlich richtiger
-    picContour[ 2 * index + 1 ] = static_cast<mitkIpInt4_t>( (*iter)[1] + 1.0 );
+    picContour[ 2 * index + 0 ] = static_cast<mitkIpInt4_t>( (*iter)->Coordinates[0] + 1.0 ); // +0.5 wahrscheinlich richtiger
+    picContour[ 2 * index + 1 ] = static_cast<mitkIpInt4_t>( (*iter)->Coordinates[1] + 1.0 );
     //MITK_INFO << "mitk 2d [" << (*iter)[0] << ", " << (*iter)[1] << "]  pic [" << picContour[ 2*index+0] << ", " << picContour[ 2*index+1] << "]";
   }
 
@@ -119,7 +110,7 @@ void mitk::ContourUtils::FillContourInSlice( Contour* projectedContour, Image* s
   assert( originalPicSlice && picSlice );
 
   // here comes the actual contour filling algorithm (from ipSegmentation/Graphics Gems)
-  ipMITKSegmentationCombineRegion ( picSlice, picContour, projectedContour->GetNumberOfPoints(), NULL, IPSEGMENTATION_OR,  1); // set to 1
+  ipMITKSegmentationCombineRegion ( picSlice, picContour, projectedContour->GetNumberOfVertices(), NULL, IPSEGMENTATION_OR,  1); // set to 1
 
   delete[] picContour;
 

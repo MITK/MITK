@@ -61,8 +61,19 @@ class Segmentation_EXPORT ContourTool : public FeedbackContourTool
     virtual void Activated();
     virtual void Deactivated();
 
+    /**
+    Just show the contour, insert the first point.
+    */
     virtual bool OnMousePressed (Action*, const StateEvent*);
+
+    /**
+     Insert the point to the feedback contour.
+    */
     virtual bool OnMouseMoved   (Action*, const StateEvent*);
+
+    /**
+     Close the contour, project it to the image slice and fill it in 2D.
+    */
     virtual bool OnMouseReleased(Action*, const StateEvent*);
     virtual bool OnChangeActiveLabel(Action*, const StateEvent*);
 

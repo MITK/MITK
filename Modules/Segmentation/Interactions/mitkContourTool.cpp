@@ -18,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkToolManager.h"
 #include "mitkOverwriteSliceImageFilter.h"
-#include "mitkOverwriteDirectedPlaneImageFilter.h"
-
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkLabelSetImage.h"
@@ -71,9 +69,6 @@ bool mitk::ContourTool::OnChangeActiveLabel (Action* action, const StateEvent* s
   return true;
 }
 
-/**
- Just show the contour, insert the first point.
-*/
 bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
@@ -87,10 +82,15 @@ bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateE
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   assert (workingNode);
 
-  Contour* contour = this->GetFeedbackContour();
-  assert (contour);
-  contour->Initialize();
-  contour->AddVertex( positionEvent->GetWorldPosition() );
+  ContourModel* feedbackContour = this->GetFeedbackContour();
+  assert (feedbackContour);
+  feedbackContour->Initialize();
+
+  int timestep = positionEvent->GetSender()->GetTimeStep();
+  feedbackContour->Expand(timestep+1);
+
+  feedbackContour->Close(timestep);
+  feedbackContour->AddVertex( positionEvent->GetWorldPosition(), timestep );
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -99,9 +99,6 @@ bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateE
   return true;
 }
 
-/**
- Insert the point to the feedback contour.
-*/
 bool mitk::ContourTool::OnMouseMoved (Action* action, const StateEvent* stateEvent)
 {
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
@@ -109,9 +106,11 @@ bool mitk::ContourTool::OnMouseMoved (Action* action, const StateEvent* stateEve
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
-  Contour* contour = this->GetFeedbackContour();
-  assert( contour );
-  contour->AddVertex( positionEvent->GetWorldPosition() );
+  int timestep = positionEvent->GetSender()->GetTimeStep();
+
+  ContourModel* feedbackContour = this->GetFeedbackContour();
+  assert( feedbackContour );
+  feedbackContour->AddVertex( positionEvent->GetWorldPosition(), timestep );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
@@ -119,9 +118,6 @@ bool mitk::ContourTool::OnMouseMoved (Action* action, const StateEvent* stateEve
   return true;
 }
 
-/**
-  Close the contour, project it to the image slice and fill it in 2D.
-*/
 bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* stateEvent)
 {
     // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's working image corresponds to that
@@ -151,9 +147,9 @@ bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* state
       return false;
     }
 
-    Contour* feedbackContour = this->GetFeedbackContour();
+    ContourModel* feedbackContour = this->GetFeedbackContour();
     assert( feedbackContour);
-    Contour::Pointer projectedContour = this->ProjectContourTo2DSlice( slice, feedbackContour, false, true );
+    ContourModel::Pointer projectedContour = this->ProjectContourTo2DSlice( slice, feedbackContour );
 
     if (projectedContour.IsNull()) return false;
 

@@ -23,27 +23,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDataStorage.h"
 #include "mitkBaseRenderer.h"
-
+#include "mitkContourUtils.h"
 #include "mitkRenderingManager.h"
 
 mitk::FeedbackContourTool::FeedbackContourTool(const char* type)
 :SegTool2D(type),
- m_FeedbackContourVisible(false),
- m_ContourUtils(ContourUtils::New())
+ m_FeedbackContourVisible(false)
 {
-  m_FeedbackContour = Contour::New();
+  m_FeedbackContour = ContourModel::New();
   m_FeedbackContourNode = DataNode::New();
   m_FeedbackContourNode->SetData( m_FeedbackContour );
-  m_FeedbackContourNode->SetProperty("name", StringProperty::New("One of FeedbackContourTool's feedback nodes"));
+  m_FeedbackContourNode->SetProperty("name", StringProperty::New("feedback contour"));
   m_FeedbackContourNode->SetProperty("visible", BoolProperty::New(true));
   m_FeedbackContourNode->SetProperty("helper object", BoolProperty::New(true));
   m_FeedbackContourNode->SetProperty("layer", IntProperty::New(1000));
-  m_FeedbackContourNode->SetProperty("project", BoolProperty::New(true));
-  m_FeedbackContourNode->SetProperty("Width", FloatProperty::New(1)); // uppercase! Slim line looks very accurate :-)
+//  m_FeedbackContourNode->SetProperty("project", BoolProperty::New(true));
+  m_FeedbackContourNode->SetProperty("contour.width", FloatProperty::New(2)); // uppercase! Slim line looks very accurate :-)
 
-  this->Disable3dRendering();
-
-  SetFeedbackContourColorDefault();
+  this->Disable3DRendering();
+  this->SetFeedbackContourColorDefault();
 }
 
 mitk::FeedbackContourTool::~FeedbackContourTool()
@@ -52,23 +50,23 @@ mitk::FeedbackContourTool::~FeedbackContourTool()
 
 void mitk::FeedbackContourTool::SetFeedbackContourColor( float r, float g, float b )
 {
-  m_FeedbackContourNode->SetProperty("color", ColorProperty::New(r, g, b));
+  m_FeedbackContourNode->SetProperty("contour.color", ColorProperty::New(r, g, b));
 }
 
 void mitk::FeedbackContourTool::SetFeedbackContourColorDefault()
 {
-  m_FeedbackContourNode->SetProperty("color", ColorProperty::New(0.0/255.0, 255.0/255.0, 0.0/255.0));
+  m_FeedbackContourNode->SetProperty("contour.color", ColorProperty::New(0.0/255.0, 255.0/255.0, 0.0/255.0));
 }
 
-mitk::Contour* mitk::FeedbackContourTool::GetFeedbackContour()
+mitk::ContourModel* mitk::FeedbackContourTool::GetFeedbackContour()
 {
   return m_FeedbackContour;
 }
 
-void mitk::FeedbackContourTool::SetFeedbackContour(Contour& contour)
+void mitk::FeedbackContourTool::SetFeedbackContour(ContourModel& contour)
 {
   // begin of temporary fix for 3m3 release
-  this->Disable3dRendering();
+  this->Disable3DRendering();
   //end of temporary fix for 3m3 release
 
   m_FeedbackContour = &contour;
@@ -78,7 +76,7 @@ void mitk::FeedbackContourTool::SetFeedbackContour(Contour& contour)
 void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)
 {
   // begin of temporary fix for 3m3 release
-  this->Disable3dRendering();
+  this->Disable3DRendering();
   //end of temporary fix for 3m3 release
 
   if ( m_FeedbackContourVisible == visible )
@@ -99,22 +97,22 @@ void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)
   m_FeedbackContourVisible = visible;
 }
 
-mitk::Contour::Pointer mitk::FeedbackContourTool::ProjectContourTo2DSlice(Image* slice, Contour* contourIn3D, bool correctionForIpSegmentation, bool constrainToInside)
+mitk::ContourModel::Pointer mitk::FeedbackContourTool::ProjectContourTo2DSlice(Image* slice, ContourModel* contourIn3D, bool constrainToInside)
 {
-  return m_ContourUtils->ProjectContourTo2DSlice(slice, contourIn3D, correctionForIpSegmentation, constrainToInside);
+  return mitk::ContourUtils::ProjectContourTo2DSlice(slice, contourIn3D, constrainToInside);
 }
 
-mitk::Contour::Pointer mitk::FeedbackContourTool::BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, Contour* contourIn2D, bool correctionForIpSegmentation)
+mitk::ContourModel::Pointer mitk::FeedbackContourTool::BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D)
 {
-  return m_ContourUtils->BackProjectContourFrom2DSlice(sliceGeometry, contourIn2D, correctionForIpSegmentation);
+  return mitk::ContourUtils::BackProjectContourFrom2DSlice(sliceGeometry, contourIn2D);
 }
 
-void mitk::FeedbackContourTool::FillContourInSlice( Contour* projectedContour, Image* slice, const LabelSet* labelSet, int paintingPixelValue )
+void mitk::FeedbackContourTool::FillContourInSlice( ContourModel* projectedContour, Image* slice, const LabelSet* labelSet, int paintingPixelValue )
 {
-  m_ContourUtils->FillContourInSlice(projectedContour, slice, labelSet, paintingPixelValue);
+    mitk::ContourUtils::FillContourInSlice(projectedContour, slice, labelSet, paintingPixelValue);
 }
 
-void mitk::FeedbackContourTool::Disable3dRendering()
+void mitk::FeedbackContourTool::Disable3DRendering()
 {
   // set explicitly visible=false for all 3D renderer (that exist already ...)
   const RenderingManager::RenderWindowVector& renderWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();

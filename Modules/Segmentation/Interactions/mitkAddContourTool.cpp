@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAddContourTool.h"
 #include "mitkToolManager.h"
 #include "mitkLabelSetImage.h"
-#include "mitkLookupTableProperty.h"
 #include "mitkAddContourTool.xpm"
 
 // us

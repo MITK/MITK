@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkApplicationCursor.h"
 #include "mitkLabelSetImage.h"
+#include "mitkImageCast.h"
 #include "mitkLookupTableProperty.h"
 
 #include "ipSegmentation.h"
@@ -252,7 +253,7 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
     if (cutContour.cutIt)
     {
       // 3.1.2 copy point from float* to mitk::Contour
-      Contour::Pointer contourInImageIndexCoordinates = Contour::New();
+      ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
       contourInImageIndexCoordinates->Initialize();
       Point3D newPoint;
       for (int index = 0; index < cutContour.deleteSize; ++index)
@@ -268,7 +269,7 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
       free(cutContour.deleteCurve); // perhaps visualize this for fun?
       free(cutContour.onGradient);
 
-      Contour::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), contourInImageIndexCoordinates, true ); // true: sub 0.5 for ipSegmentation correction
+      ContourModel::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), contourInImageIndexCoordinates);
 
       FeedbackContourTool::SetFeedbackContour( *contourInWorldCoordinates );
       FeedbackContourTool::SetFeedbackContourVisible(true);
@@ -417,18 +418,15 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
         if (m_FillFeedbackContour)
         {
           // 3. use contour to fill a region in our working slice
-          Contour* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
+          ContourModel* feedbackContour = FeedbackContourTool::GetFeedbackContour();
           if (feedbackContour)
           {
-            Contour::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( m_WorkingSlice, feedbackContour, false, false ); // false: don't add any 0.5
-                                                                                                                                    // false: don't constrain the contour to the image's inside
+            ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( m_WorkingSlice, feedbackContour);
             if (projectedContour.IsNotNull())
             {
               FeedbackContourTool::FillContourInSlice( projectedContour, m_WorkingSlice, image->GetLabelSet(), m_PaintingPixelValue );
 
               const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
-
-              //MITK_DEBUG << "OnMouseReleased: writing back to dimension " << affectedDimension << ", slice " << affectedSlice << " in working image" << std::endl;
 
              // 4. write working slice back into image volume
              this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
@@ -495,7 +493,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
 
   if (!regionGrowerResult || oneContourOffset == -1)
   {
-    Contour::Pointer dummyContour = Contour::New();
+    ContourModel::Pointer dummyContour = ContourModel::New();
     dummyContour->Initialize();
     FeedbackContourTool::SetFeedbackContour( *dummyContour );
 
@@ -559,7 +557,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
     }
 
     // copy point from float* to mitk::Contour
-    Contour::Pointer contourInImageIndexCoordinates = Contour::New();
+    ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
     contourInImageIndexCoordinates->Initialize();
     Point3D newPoint;
     for (int index = 0; index < numberOfContourPoints; ++index)
@@ -573,7 +571,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
 
     free(contourPoints);
 
-    Contour::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_ReferenceSlice->GetGeometry(), contourInImageIndexCoordinates, true );   // true: sub 0.5 for ipSegmentation correctio
+    ContourModel::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_ReferenceSlice->GetGeometry(), contourInImageIndexCoordinates);
 
     FeedbackContourTool::SetFeedbackContour( *contourInWorldCoordinates );
   }
@@ -582,17 +580,6 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
   return smoothedRegionGrowerResult;
 }
 
-/**
-  Helper method for SmoothIPPicBinaryImage. Smoothes a given part of and image.
-
-  \param sourceImage The original binary image.
-  \param dest The smoothed image (will be written without bounds checking).
-  \param contourOfs One offset of the contour. Is updated if a pixel is changed (which might change the contour).
-  \param maskOffsets Memory offsets that describe the smoothing mask.
-  \param maskSize Entries of the mask.
-  \param startOffset First pixel that should be smoothed using this mask.
-  \param endOffset Last pixel that should be smoothed using this mask.
-*/
 void mitk::RegionGrowingTool::SmoothIPPicBinaryImageHelperForRows( mitkIpPicDescriptor* sourceImage, mitkIpPicDescriptor* dest, int &contourOfs, int* maskOffsets, int maskSize, int startOffset, int endOffset )
 {
   // work on the very first row
@@ -625,9 +612,6 @@ void mitk::RegionGrowingTool::SmoothIPPicBinaryImageHelperForRows( mitkIpPicDesc
   }
 }
 
-/**
-Smoothes a binary ipPic image with a 5x5 mask. The image borders (some first and last rows) are treated differently.
-*/
 mitkIpPicDescriptor* mitk::RegionGrowingTool::SmoothIPPicBinaryImage( mitkIpPicDescriptor* image, int &contourOfs, mitkIpPicDescriptor* dest )
 {
   if (!image) return NULL;

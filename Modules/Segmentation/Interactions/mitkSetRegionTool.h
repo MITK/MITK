@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
 #include "mitkFeedbackContourTool.h"
+#include "mitkContour.h"
 
 namespace mitk
 {
@@ -66,8 +67,8 @@ class Segmentation_EXPORT SetRegionTool : public FeedbackContourTool
     bool m_FillContour;
     bool m_StatusFillWholeSlice;
 
-    Contour::Pointer m_SegmentationContourInWorldCoordinates;
-    Contour::Pointer m_WholeImageContourInWorldCoordinates;
+    ContourModel::Pointer m_SegmentationContourInWorldCoordinates;
+    ContourModel::Pointer m_WholeImageContourInWorldCoordinates;
 };
 
 } // namespace

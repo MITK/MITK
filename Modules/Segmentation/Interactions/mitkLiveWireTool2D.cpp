@@ -152,8 +152,6 @@ void mitk::LiveWireTool2D::Deactivated()
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
   if ( !workingImage ) return;
 
-  ContourUtils::Pointer contourUtils = mitk::ContourUtils::New();
-
   /*+++++++++++++++++++++++ for all contours in list (currently created by tool) ++++++++++++++++++++++++++++++++++++*/
   std::vector< std::pair<mitk::DataNode*, mitk::PlaneGeometry::Pointer> >::iterator it = m_Contours.begin();
   while(it != m_Contours.end() )
@@ -175,19 +173,8 @@ void mitk::LiveWireTool2D::Deactivated()
           //get the segmentation image slice at current timestep
           mitk::Image::Pointer workingSlice = this->GetAffectedImageSliceAs2DImage(it->second, workingImage, currentTimestep);
 
-          /*++++++++++++++++++++++ transfer to plain old contour to use contour util functionality +++++++++++++++++++++++*/
-          mitk::Contour::Pointer plainOldContour = mitk::Contour::New();
-          mitk::ContourModel::VertexIterator iter = contourModel->IteratorBegin(currentTimestep);
-          while(iter != contourModel->IteratorEnd(currentTimestep) )
-          {
-            plainOldContour->AddVertex( (*iter)->Coordinates );
-            iter++;
-          }
-          /*-------------------------------------------------------------------------------*/
-
-
-          mitk::Contour::Pointer projectedContour = contourUtils->ProjectContourTo2DSlice(workingSlice, plainOldContour, true, false);
-          contourUtils->FillContourInSlice(projectedContour, workingSlice, workingImage->GetLabelSet(), 1.0);
+          mitk::ContourModel::Pointer projectedContour = mitk::ContourUtils::ProjectContourTo2DSlice(workingSlice, contourModel, false);
+          mitk::ContourUtils::FillContourInSlice(projectedContour, workingSlice, workingImage->GetLabelSet(), 1.0);
 
           //write back to image volume
           this->WriteBackSegmentationResult(it->second, workingSlice, currentTimestep);
@@ -552,7 +539,7 @@ bool mitk::LiveWireTool2D::OnLastSegmentDelete( Action* action, const StateEvent
       it++;
     }
 
-    newContour->SetIsClosed(m_Contour->IsClosed());
+    newContour->Close(m_Contour->IsClosed());
 
     //set new contour visible
     m_ContourModelNode->SetData(newContour);

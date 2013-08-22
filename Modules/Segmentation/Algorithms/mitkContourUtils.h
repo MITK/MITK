@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImage.h"
 #include "SegmentationExports.h"
-#include "mitkContour.h"
+#include "mitkContourModel.h"
 #include "mitkLabelSetImage.h"
 #include "mitkLegacyAdaptors.h"
 
@@ -30,8 +30,6 @@ namespace mitk
 
 /**
  * \brief Helpful methods for working with contours and images
- *
- *  Originally copied from FeedbackContourTool
  */
 class Segmentation_EXPORT ContourUtils : public itk::Object
 {
@@ -45,19 +43,19 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
 
       \param correctionForIpSegmentation adds 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
     */
-    Contour::Pointer ProjectContourTo2DSlice(Image* slice, Contour* contourIn3D, bool correctionForIpSegmentation, bool constrainToInside);
+    static ContourModel::Pointer ProjectContourTo2DSlice(Image* slice, ContourModel* contourIn3D, bool constrainToInside);
 
     /**
       \brief Projects a slice index coordinates of a contour back into world coordinates.
 
       \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
     */
-    Contour::Pointer BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, Contour* contourIn2D, bool correctionForIpSegmentation = false);
+    static ContourModel::Pointer BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D);
 
     /**
       \brief Fill a contour in a 2D slice with a specified pixel value.
     */
-    void FillContourInSlice( Contour* projectedContour, Image* slice, const LabelSet* labelSet, int paintingPixelValue = 1 );
+    static void FillContourInSlice( ContourModel* projectedContour, Image* slice, const LabelSet* labelSet, int paintingPixelValue = 1 );
 
   protected:
 
@@ -78,7 +76,7 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
       the label "locked" property to overwritevalue, where the corresponding pixel in filledContourSlice is non-zero.
     */
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkCopyFilledContourToSlice2( itk::Image<TPixel,VImageDimension>* originalSlice, const LabelSetImage* filledContourSlice, int overwritevalue = 1 );
+    static void ItkCopyFilledContourToSlice2( itk::Image<TPixel,VImageDimension>* originalSlice, const LabelSetImage* filledContourSlice, int overwritevalue = 1 );
 };
 
 }

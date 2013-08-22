@@ -346,7 +346,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
 
   MITK_DEBUG << "Mouse at C " << indexCoordinates;
 
-  Contour::Pointer contour = Contour::New();
+  ContourModel::Pointer contour = ContourModel::New();
   contour->Initialize();
 
   for (unsigned int index = 0; index < m_MasterContour->GetNumberOfPoints(); ++index)
@@ -367,7 +367,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   }
 
   // visualize contour
-  Contour::Pointer displayContour = Contour::New();
+  ContourModel::Pointer displayContour = ContourModel::New();
   displayContour->Initialize();
 
   //for (unsigned int index = 0; index < contour->GetNumberOfPoints(); ++index)

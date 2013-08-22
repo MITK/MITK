@@ -39,7 +39,7 @@ mitk::CorrectorTool2D::CorrectorTool2D(int paintingPixelValue)
   CONNECT_ACTION( 90, OnMouseMoved );
   CONNECT_ACTION( 42, OnMouseReleased );
 
-  GetFeedbackContour()->SetClosed( false ); // don't close the contour to a polygon
+  GetFeedbackContour()->Close( false ); // don't close the contour to a polygon
 }
 
 mitk::CorrectorTool2D::~CorrectorTool2D()
@@ -76,7 +76,7 @@ bool mitk::CorrectorTool2D::OnMousePressed (Action* action, const StateEvent* st
 
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
-  Contour* contour = FeedbackContourTool::GetFeedbackContour();
+  ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
   contour->Initialize();
   contour->AddVertex( positionEvent->GetWorldPosition() );
 
@@ -92,7 +92,7 @@ bool mitk::CorrectorTool2D::OnMouseMoved   (Action* action, const StateEvent* st
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
-  Contour* contour = FeedbackContourTool::GetFeedbackContour();
+  ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
   contour->AddVertex( positionEvent->GetWorldPosition() );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );

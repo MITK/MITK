@@ -95,6 +95,7 @@ namespace itk
 
 
 
+
     itkSetMacro( BValue, TTensorPixelType)
     itkSetMacro( B0Threshold, float)
 
@@ -139,8 +140,6 @@ namespace itk
 
     void CalculateAttenuation(vnl_vector<double> org_data, vnl_vector<double> &atten,int nof,int numberb0);
 
-    //void CalculateTensor(vnl_vector<double> atten, vnl_vector<double> &tensor,int nof,int numberb0);
-
     void CorrectDiffusionImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,vnl_vector< double> pixel_max,vnl_vector< double> pixel_min);
 
     void GenerateTensorImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,double what_mask,itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer tensorImg );
@@ -174,7 +173,6 @@ namespace itk
     ImageType::Pointer                                m_CorrectedDiffusionVolumes;
 
     float                                             m_B0Threshold;
-
 
 
     itk::Image<short, 3>::Pointer m_MaskImage;

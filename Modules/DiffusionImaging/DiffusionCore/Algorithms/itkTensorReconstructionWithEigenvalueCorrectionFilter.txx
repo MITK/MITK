@@ -41,7 +41,6 @@ namespace itk
   ::GenerateData ()
   {
 
-    // GradientImagesType input
     m_GradientImagePointer = static_cast< GradientImagesType * >(
       this->ProcessObject::GetInput(0) );
 
@@ -188,8 +187,9 @@ namespace itk
     mask->SetOrigin(m_GradientImagePointer->GetOrigin());
     mask->Allocate();
 
-    // Image thresholding: For every voxel mean B0 image is calculated and then voxels of mean B0 less than assumed
-    //treshold are excluded from the dataset with use of defined mask image. 1 in mask voxel means that B0 > assumed treshold.
+    // Image thresholding: For every voxel mean B0 image is calculated and then voxels of mean B0 less than the
+    // treshold on the B0 image proviced by the userare excluded from the dataset with use of defined mask image.
+    // 1 in mask voxel means that B0 > assumed treshold.
 
     int mask_cnt=0;
     for(int x=0;x<size[0];x++)
@@ -280,27 +280,25 @@ namespace itk
             org_vec[i]=pixel2[i];
           }
 
-          if(mask_val >0) // we are dooing this only if the voxels are in the mask
+          if(mask_val >0)
           {
 
-          for( int f=0;f<nof;f++)
-          {
-            if(org_vec[f] <= 0) // if in one of the gradients it is 0 or les than 0
+            for( int f=0;f<nof;f++)
             {
-              org_vec[f] = CheckNeighbours(x,y,z,f,size,mask,m_CorrectedDiffusionVolumes);
-              counter_corrected++;
+              if(org_vec[f] <= 0)
+              {
+                org_vec[f] = CheckNeighbours(x,y,z,f,size,mask,m_CorrectedDiffusionVolumes);
+                counter_corrected++;
 
-              // If method returned 0 it means that there is no valid ( correct) neighborhood. It is done outside the function because
-              //later the same method is called in different concept when this is not important
+              }
             }
-          }
 
-          for (int i=0;i<nof;i++)
-          {
-            pixel2[i]=org_vec[i];
-          }
+            for (int i=0;i<nof;i++)
+            {
+              pixel2[i]=org_vec[i];
+            }
 
-          m_CorrectedDiffusionVolumes->SetPixel(ix, pixel2);
+            m_CorrectedDiffusionVolumes->SetPixel(ix, pixel2);
 
 
           }
@@ -308,7 +306,6 @@ namespace itk
       }
     }
 
-    //Declaration of tensor image that is used for estimation of free water map
 
 
     typename TensorImageType::Pointer tensorImg = TensorImageType::New();
@@ -320,15 +317,15 @@ namespace itk
 
     typename TensorImageType::Pointer temp_tensorImg = TensorImageType::New();
 
-    //Deep copy into memmory tensor image. It is done because temporary tensor image is needed for the pre-processing methods.
+    // Deep copy a temporary tensor image for the pre-processing methods.
 
     DeepCopyTensorImage(tensorImg,temp_tensorImg);
 
-    //Declaration of vectors that contains values of toohigh and toolow atenuation for each gradient. Attenuation is only calculated for
+    //Declaration of vectors that contains too high or too low atenuation for each gradient. Attenuation is only calculated for
     //non B0 images so nof-numberb0.
 
-    vnl_vector< double> pixel_max(nof-numberb0);// to high attenuation
-    vnl_vector< double> pixel_min(nof-numberb0);//to low attenuation
+    vnl_vector< double> pixel_max(nof-numberb0);
+    vnl_vector< double> pixel_min(nof-numberb0);
 
     // to high and to low attenuation is calculated with use of highest allowed =5 and lowest allowed =0.01 diffusion coefficient
 
@@ -342,16 +339,17 @@ namespace itk
     m_H = H_org;
     m_BVec=b_vec;
 
-    // in pre-processing we are dealing with 3 types of voxels: voxels excluded = 0 in mask, voxels correct =1 and voxels under correction
+    // in preprocessing we are dealing with 3 types of voxels: voxels excluded = 0 in mask, voxels correct =1 and voxels under correction
     //= 2. During pre processing most of voxels should be switched from 2 to 1.
-    //To smoothly deal with the mask the Turn mask method is defined that takes previous value of mask and new value of mask.
 
-    double what_mask=0;
+
+
 
     // what mask is a variable declared to simplify tensor calculaton. Tensors are obtained only for voxels that have a mask value bigger
     // than what_mask. Sometimes it is 1 sometimes 2.
 
     // initialization of required variables
+    double what_mask=1.0;
     double set_mask=2.0;
     double previous_mask=0;
 
@@ -363,11 +361,9 @@ namespace itk
     TurnMask(size,mask,previous_mask,set_mask);
     // simply defining all possible tensors as with negative eigenvalues
 
-    what_mask=1.0;// we want to calculate all the tensors
 
-
-    //Pre-processing is done in iterations as long as next iteration does not introduce higher number of bad voxels.
-    //In such a case smoothed DWI should be last one that has smaller or equal number of bad voxels in comparison to the
+    //Preprocessing is performed in multiple iterations as long as the next iteration does not increase the number of bad voxels.
+    //The final DWI should be the one that has a smaller or equal number of bad voxels as in the
     //previous iteration. To obtain this temporary DWI image must be stored in memory.
 
     DeepCopyDiffusionImage(m_CorrectedDiffusionVolumes,corrected_diffusion_temp,nof);
@@ -388,8 +384,6 @@ namespace itk
     CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion_temp,mask,pixel_max,pixel_min);
 
 
-    //pre-processing loop-most important part of the algorithm. The iterative  is repeated as long as correction still helds. The process
-    //might be described in 3 steps: correct diffusion, generate tensor, check how may negative eigenvalues are there.
 
     while (stil_correcting == true)
     {

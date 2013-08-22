@@ -61,13 +61,7 @@ namespace mitk {
       itkGetMacro(DeviceID,int);
       itkGetMacro(FilePath,std::string);
 
-      void GrabImage();
-
     protected:
-
-      static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
-
-
 
       /**
       * \brief Creates a new device that will deliver USImages taken from a video device.
@@ -114,11 +108,12 @@ namespace mitk {
       */
       virtual bool OnActivation();
 
-
       /**
       * \brief Is called during the deactivation process. After a call to this method the device should still be connected, but not producing images anymore.
       */
       virtual void OnDeactivation();
+
+      virtual USImageSource::Pointer GetUSImageSource();
 
       /**
       * \brief The image source that we use to aquire data
@@ -141,14 +136,6 @@ namespace mitk {
       std::string m_FilePath;
 
       void SetSourceCropArea();
-
-      // Threading-Related
-      itk::MultiThreader::Pointer m_MultiThreader; ///< itk::MultiThreader used for thread handling
-      itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the range camera
-      itk::FastMutexLock::Pointer m_CameraActiveMutex; ///< mutex for the cameraActive flag
-      int m_ThreadID; ///< ID of the started thread
-      mitk::USImage::Pointer m_Image;
-
     };
 } // namespace mitk
 #endif

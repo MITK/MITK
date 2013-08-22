@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSImageMetadata.h"
 #include "mitkUSImage.h"
 #include <MitkUSExports.h>
+#include "mitkUSImageSource.h"
 
 // MITK
 #include <mitkCommon.h>
@@ -214,17 +215,24 @@ namespace mitk {
       std::string GetDeviceModel();
       std::string GetDeviceComment();
 
+      void GrabImage();
+
     protected:
+      static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
+
       mitk::USProbe::Pointer m_ActiveProbe;
       std::vector<mitk::USProbe::Pointer> m_ConnectedProbes;
+      mitk::USImage::Pointer m_Image;
+
       bool m_IsActive;
       bool m_IsConnected;
 
       /* @brief defines the area that should be cropped from the US image */
       USImageCropArea m_CropArea;
 
+      virtual USImageSource::Pointer GetUSImageSource() = 0;
 
-      /*
+      /**
       * \brief This Method constructs the service properties which can later be used to
       *  register the object with the Microservices
       *  Return service properties
@@ -280,7 +288,7 @@ namespace mitk {
       /**
       *  \brief Grabs the next frame from the Video input. This method is called internally, whenever Update() is invoked by an Output.
       */
-       void GenerateData() = 0;
+      void GenerateData() = 0;
 
       /**
       *  \brief The Calibration Transformation of this US-Device. This will automatically be written into the image once
@@ -302,8 +310,11 @@ namespace mitk {
       */
        us::ServiceRegistration<Self> m_ServiceRegistration;
 
-
-
+       // Threading-Related
+       itk::MultiThreader::Pointer m_MultiThreader; ///< itk::MultiThreader used for thread handling
+       itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the range camera
+       itk::FastMutexLock::Pointer m_CameraActiveMutex; ///< mutex for the cameraActive flag
+       int m_ThreadID; ///< ID of the started thread
     };
 } // namespace mitk
 

@@ -33,7 +33,11 @@ mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
   return m_CropArea;
 }
 
-mitk::USDevice::USDevice(std::string manufacturer, std::string model) : mitk::ImageSource()
+mitk::USDevice::USDevice(std::string manufacturer, std::string model)
+  : mitk::ImageSource(),
+    m_MultiThreader(itk::MultiThreader::New()),
+    m_ImageMutex(itk::FastMutexLock::New()),
+    m_CameraActiveMutex(itk::FastMutexLock::New())
 {
   // Initialize Members
   m_Metadata = mitk::USImageMetadata::New();
@@ -56,7 +60,11 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model) : mitk::Im
   this->SetNthOutput(0,newOutput);
 }
 
-mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata) : mitk::ImageSource()
+mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
+  : mitk::ImageSource(),
+    m_MultiThreader(itk::MultiThreader::New()),
+    m_ImageMutex(itk::FastMutexLock::New()),
+    m_CameraActiveMutex(itk::FastMutexLock::New())
 {
   m_Metadata = metadata;
   m_IsActive = false;
@@ -168,6 +176,12 @@ bool mitk::USDevice::Activate()
   m_IsActive = true; // <- Necessary to safely allow Subclasses to start threading based on activity state
   m_IsActive = OnActivation();
 
+  if ( m_IsActive )
+  {
+    // spawn thread for aquire images if us device is active
+    this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->Acquire, this);
+  }
+
   us::ServiceProperties props = ConstructServiceProperties();
   this->m_ServiceRegistration.SetProperties(props);
   return m_IsActive;
@@ -239,7 +253,7 @@ void mitk::USDevice::GraftNthOutput(unsigned int idx, itk::DataObject *graft)
   if ( idx >= this->GetNumberOfOutputs() )
   {
     itkExceptionMacro(<<"Requested to graft output " << idx <<
-      " but this filter only has " << this->GetNumberOfOutputs() << " Outputs.");
+                      " but this filter only has " << this->GetNumberOfOutputs() << " Outputs.");
   }
 
   if ( !graft )
@@ -263,8 +277,13 @@ bool mitk::USDevice::ApplyCalibration(mitk::USImage::Pointer image){
   return true;
 }
 
+void mitk::USDevice::GrabImage()
+{
+  m_Image = this->GetUSImageSource()->GetNextImage();
+}
 
- //########### GETTER & SETTER ##################//
+
+//########### GETTER & SETTER ##################//
 
 void mitk::USDevice::setCalibration (mitk::AffineTransform3D::Pointer calibration){
   if (calibration.IsNull())
@@ -309,4 +328,16 @@ std::string mitk::USDevice::GetDeviceComment(){
 std::vector<mitk::USProbe::Pointer> mitk::USDevice::GetConnectedProbes()
 {
   return m_ConnectedProbes;
+}
+
+ITK_THREAD_RETURN_TYPE mitk::USDevice::Acquire(void* pInfoStruct)
+{
+  /* extract this pointer from Thread Info structure */
+  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
+  mitk::USDevice * device = (mitk::USDevice *) pInfo->UserData;
+  while (device->GetIsActive())
+  {
+    device->GrabImage();
+  }
+  return ITK_THREAD_RETURN_VALUE;
 }

@@ -608,6 +608,7 @@ void mitk::ImageVtkMapper2D::ApplyColorTransferFunction(mitk::BaseRenderer *rend
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
   //pass the transfer function to our level window filter
   localStorage->m_LevelWindowFilter->SetLookupTable(transferFunctionProp->GetValue()->GetColorTransferFunction());
+  localStorage->m_LevelWindowFilter->SetOpacityPiecewiseFunction(transferFunctionProp->GetValue()->GetScalarOpacityFunction());
 }
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)

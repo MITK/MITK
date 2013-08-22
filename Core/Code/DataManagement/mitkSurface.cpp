@@ -402,37 +402,79 @@ bool mitk::Equal(  vtkPolyData* rightHandSide,  vtkPolyData* leftHandSide, mitk:
     return false;
   }
 
-  MITK_INFO << "Checking number of cells for equality";
   if( ! mitk::Equal( rightHandSide->GetNumberOfCells(), leftHandSide->GetNumberOfCells(), eps ) )
   {
+    MITK_INFO << "Number of cells not equal";
     noDifferenceFound = false;
   }
 
-  MITK_INFO << "Checking number of vertices for equality";
   if( ! mitk::Equal( rightHandSide->GetNumberOfVerts(), leftHandSide->GetNumberOfVerts(), eps ) )
   {
+    MITK_INFO << "Number of vertices not equal";
     noDifferenceFound = false;
   }
 
-  MITK_INFO << "Checking number of lines for equality";
   if( ! mitk::Equal( rightHandSide->GetNumberOfLines(), leftHandSide->GetNumberOfLines(), eps ) )
   {
+      MITK_INFO << "Number of lines not equal";
     noDifferenceFound = false;
   }
 
-  MITK_INFO << "Checking number of polys for equality";
   if( ! mitk::Equal( rightHandSide->GetNumberOfPolys(), leftHandSide->GetNumberOfPolys(), eps ) )
   {
+      MITK_INFO << "Number of polys not equal";
     noDifferenceFound = false;
   }
 
-  MITK_INFO << "Checking number of strips for equality";
   if( ! mitk::Equal( rightHandSide->GetNumberOfStrips(), leftHandSide->GetNumberOfStrips(), eps ) )
   {
+    MITK_INFO << "Number of strips not equal";
     noDifferenceFound = false;
   }
 
-  MITK_INFO << "Checking whether all coordinates are present";
+  {
+    unsigned int numberOfPointsRight = rightHandSide->GetPoints()->GetNumberOfPoints();
+    unsigned int numberOfPointsLeft = leftHandSide->GetPoints()->GetNumberOfPoints();
+    if(! mitk::Equal( numberOfPointsRight, numberOfPointsLeft ))
+    {
+      MITK_INFO << "Number of points not equal";
+      noDifferenceFound = false;
+    }
+    else
+    {
+      for( unsigned int i( 0 ); i < numberOfPointsRight; i++ )
+      {
+        bool pointFound = false;
+        double pointOne[3];
+        rightHandSide->GetPoints()->GetPoint(i, pointOne);
+
+        for( unsigned int j( 0 ); j < numberOfPointsLeft; j++ )
+        {
+          double pointTwo[3];
+          leftHandSide->GetPoints()->GetPoint(j, pointTwo);
+
+          double x = pointOne[0] - pointTwo[0];
+          double y = pointOne[1] - pointTwo[1];
+          double z = pointOne[2] - pointTwo[2];
+          double distance = x*x + y*y + z*z;
+
+          if( distance < eps )
+          {
+            pointFound = true;
+            break;
+          }
+        }
+        if( !pointFound )
+        {
+          MITK_INFO << "Right hand side point with id " << i << " and coordinates ( "
+            << pointOne[0] << " ; " << pointOne[1] << " ; " << pointOne[2]
+            << " ) could not be found in left hand side with epsilon " << eps << ".";
+          noDifferenceFound = false;
+          break;
+        }
+      }
+    }
+  }
 
   return noDifferenceFound;
 }
@@ -454,29 +496,29 @@ bool mitk::Equal( mitk::Surface* rightHandSide, mitk::Surface* leftHandSide, mit
     return false;
   }
 
-  MITK_INFO << "Checking size of PolyData series for equality";
   if( ! mitk::Equal( rightHandSide->GetSizeOfPolyDataSeries(), leftHandSide->GetSizeOfPolyDataSeries(), eps ) )
   {
+    MITK_INFO << "Size of PolyData series not equal";
     noDifferenceFound = false;
   }
 
-  MITK_INFO << "Checking time sliced geometries for equality";
   if( ! mitk::Equal( rightHandSide->GetTimeSlicedGeometry(), leftHandSide->GetTimeSlicedGeometry(), eps ) )
   {
+    MITK_INFO << "Time sliced geometries not equal";
     noDifferenceFound = false;
   }
 
-  //MITK_INFO << "Checking largest possible region for equality";
   //if( ! mitk::Equal( rightHandSide->GetLargestPossibleRegion(), leftHandSide->GetLargestPossibleRegion(), eps ) )
   //{
+  //  MITK_INFO << "Largest possible region not equal";
   //  noDifferenceFound = false;
   //}
 
-  MITK_INFO << "Checking poly datas for equality";
   for( unsigned int i( 0 ); i < rightHandSide->GetSizeOfPolyDataSeries(); i++ )
   {
     if( ! mitk::Equal( rightHandSide->GetVtkPolyData( i ), leftHandSide->GetVtkPolyData( i ), eps ) )
     {
+      MITK_INFO << "Poly datas not equal";
       noDifferenceFound = false;
     }
   }

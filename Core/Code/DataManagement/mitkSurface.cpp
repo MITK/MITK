@@ -385,7 +385,7 @@ void mitk::Surface::PrintSelf(std::ostream& os, itk::Indent indent) const
   }
 }
 
-bool Equal( const mitk::Surface* rightHandSide, const mitk::Surface* leftHandSide, mitk::ScalarType eps )
+bool Equal( mitk::Surface* rightHandSide, mitk::Surface* leftHandSide, mitk::ScalarType eps )
 {
   bool noDifferenceFound = true;
 
@@ -432,7 +432,7 @@ bool Equal( const mitk::Surface* rightHandSide, const mitk::Surface* leftHandSid
   return noDifferenceFound;
 }
 
-bool Equal( const vtkPolyData* rightHandSide, const vtkPolyData* leftHandSide, mitk::ScalarType eps = mitk::eps)
+bool Equal( vtkPolyData* rightHandSide, vtkPolyData* leftHandSide, mitk::ScalarType eps = mitk::eps)
 {
   bool noDifferenceFound = true;
 

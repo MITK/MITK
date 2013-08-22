@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkBaseLayouter.h"
+#include "mitkBaseRenderer.h"
 
 mitk::BaseLayouter::BaseLayouter()
 {

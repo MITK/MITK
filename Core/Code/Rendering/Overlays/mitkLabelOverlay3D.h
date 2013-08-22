@@ -19,19 +19,22 @@
 
 #include <Overlays/mitkVtkOverlay3D.h>
 #include <mitkLocalStorageHandler.h>
-#include <vtkStringArray.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkPolyData.h>
-#include <vtkActor2D.h>
-#include <vtkProperty2D.h>
-#include <mitkPointSet.h>
-#include <vtkPointSetToLabelHierarchy.h>
-#include <vtkLabelPlacementMapper.h>
-#include <vtkIntArray.h>
 #include "MitkExports.h"
+#include <vtkSmartPointer.h>
 
+class vtkStringArray;
+class vtkPolyDataMapper;
+class vtkPolyData;
+class vtkActor2D;
+class vtkProperty2D;
+class vtkPointSetToLabelHierarchy;
+class vtkLabelPlacementMapper;
+class vtkIntArray;
 
 namespace mitk {
+
+class PointSet;
+
 
 /** \brief Can display a high amount of 3D labels to a PointSet */
 /** */
@@ -39,7 +42,7 @@ class MITK_CORE_EXPORT LabelOverlay3D : public mitk::VtkOverlay3D {
 public:
 
   /** \brief Internal class holding the vtkActor, etc. for each of the render windows */
-  class MITK_CORE_EXPORT LocalStorage : public mitk::Overlay::BaseLocalStorage
+  class LocalStorage : public mitk::Overlay::BaseLocalStorage
   {
   public:
     vtkSmartPointer<vtkPolyData> m_Points;
@@ -72,7 +75,7 @@ public:
   void SetPriorityVector(std::vector<int> PriorityVector);
 
   /** \brief Coordinates of the labels */
-  void SetLabelCoordinates(mitk::PointSet::Pointer LabelCoordinates);
+  void SetLabelCoordinates(itk::SmartPointer<PointSet> LabelCoordinates);
 
 protected:
 
@@ -94,7 +97,7 @@ private:
   std::vector<int> m_PriorityVector;
 
   /** \brief The coordinates of the labels. Indices must match the labelVector and the priorityVector.*/
-  mitk::PointSet::Pointer m_LabelCoordinates;
+  itk::SmartPointer<PointSet> m_LabelCoordinates;
 
   /** \brief copy constructor */
   LabelOverlay3D( const LabelOverlay3D &);

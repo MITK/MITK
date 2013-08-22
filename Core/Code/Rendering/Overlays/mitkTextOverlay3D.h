@@ -28,7 +28,7 @@
 namespace mitk {
 
 /** \brief Displays at 3D position, always facing the camera */
-class MITK_CORE_EXPORT TextOverlay3D : public mitk::VtkOverlay3D {
+class TextOverlay3D : public mitk::VtkOverlay3D {
 public:
 
   /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
@@ -38,7 +38,7 @@ public:
      * internal helper class LocalStorage. This allows rendering n views with just
      * 1 mitkMapper using n vtkMapper.
      * */
-  class MITK_CORE_EXPORT LocalStorage : public mitk::Overlay::BaseLocalStorage
+  class LocalStorage : public mitk::Overlay::BaseLocalStorage
   {
   public:
     /** \brief Actor of a 2D render window. */

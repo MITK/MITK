@@ -15,13 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkOverlayManager.h"
-#include "usGetModuleContext.h"
-
-const std::string mitk::OverlayManager::PROP_ID = "org.mitk.services.OverlayManager.ID";
+#include "mitkBaseRenderer.h"
 
 mitk::OverlayManager::OverlayManager()
 {
-  m_id = this->RegisterMicroservice();
 }
 
 mitk::OverlayManager::~OverlayManager()
@@ -92,25 +89,6 @@ void mitk::OverlayManager::UpdateOverlays(mitk::BaseRenderer* baseRenderer)
   UpdateLayouts(baseRenderer);
 }
 
-std::string mitk::OverlayManager::RegisterMicroservice()
-{
-  us::ServiceProperties properties;
-  static int ID = 0;
-  std::string id_str = static_cast<std::ostringstream*>( &(std::ostringstream() << ID) )->str();
-  properties[mitk::OverlayManager::PROP_ID] = id_str;
-  us::ModuleContext* moduleContext = us::GetModuleContext();
-  m_Registration = moduleContext->RegisterService<Self>(this,properties);
-  ID++;
-  return id_str;
-}
-
-void mitk::OverlayManager::UnregisterMicroservice()
-{
-  if(m_Registration)
-  {
-    m_Registration.Unregister();
-  }
-}
 
 void mitk::OverlayManager::SetLayouter(Overlay *overlay, const char *identifier, mitk::BaseRenderer *renderer)
 {
@@ -137,28 +115,6 @@ void mitk::OverlayManager::UpdateLayouts(mitk::BaseRenderer *renderer)
   {
     (it->second)->PrepareLayout();
   }
-}
-
-
-mitk::OverlayManager::Pointer mitk::OverlayManager::GetServiceInstance(std::string ID)
-{
-  us::ModuleContext* moduleContext = us::GetModuleContext();
-  std::string filter = "("+PROP_ID + "="+ID+")";
-  std::vector<us::ServiceReference<Self> > serref = moduleContext->GetServiceReferences<Self>(filter);
-  if(serref.size()==0)
-  {
-    return NULL;
-  }
-  else
-  {
-    mitk::OverlayManager::Pointer om = moduleContext->GetService<Self>(serref[0]);
-  return om;
-  }
-}
-
-std::string mitk::OverlayManager::GetID()
-{
-  return m_id;
 }
 
 mitk::BaseLayouter::Pointer mitk::OverlayManager::GetLayouter(mitk::BaseRenderer *renderer, const std::string identifier)

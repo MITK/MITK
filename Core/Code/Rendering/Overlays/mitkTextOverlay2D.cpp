@@ -20,7 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageMapper.h>
 #include "vtkQtStringToImage.h"
 #include <vtkFreeTypeStringToImage.h>
-
+#include <vtkTextActor.h>
+#include <vtkImageMapper.h>
 
 mitk::TextOverlay2D::TextOverlay2D()
 {

@@ -18,14 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define OVERLAY_H
 
 #include <MitkExports.h>
-#include <itkObject.h>
 #include <mitkCommon.h>
-#include "mitkBaseRenderer.h"
+#include <mitkBaseRenderer.h>
 
 namespace mitk {
 
 class BaseLayouter;
-
 
 /** \brief Base class for all overlays */
 /** This class is to be implemented in order to create overlays which are managed by the OverlayManager and can be placed by a BaseLayouter.

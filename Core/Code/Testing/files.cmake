@@ -67,7 +67,6 @@ set(MODULE_TESTS
   mitkUIDGeneratorTest.cpp
   mitkShaderRepositoryTest.cpp
   mitkPlanePositionManagerTest.cpp
-  mitkOverlayManagerTest.cpp
   mitkLabelOverlay3DRendering2DTest.cpp
   mitkLabelOverlay3DRendering3DTest.cpp
   mitkTextOverlay2DRenderingTest.cpp

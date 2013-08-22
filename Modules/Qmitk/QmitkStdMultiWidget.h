@@ -29,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataStorage.h"
 
 #include "mitkMouseModeSwitcher.h"
-#include "Overlays/mitkOverlayManager.h"
 
 #include <qwidget.h>
 #include <qsplitter.h>
@@ -304,8 +303,6 @@ protected:
 
   int m_Layout;
   int m_PlaneMode;
-
-  mitk::OverlayManager::Pointer m_OverlayManager;
 
   mitk::RenderingManager* m_RenderingManager;
 

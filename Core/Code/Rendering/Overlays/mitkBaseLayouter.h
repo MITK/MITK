@@ -20,12 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include <itkObject.h>
 #include <mitkCommon.h>
-#include "mitkBaseRenderer.h"
 #include "mitkOverlay.h"
 
 namespace mitk {
 
-
+class BaseRenderer;
 
 /** @brief Baseclass of Overlay layouters */
 /**

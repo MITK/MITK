@@ -38,7 +38,7 @@ digraph linker_deps {
 \enddot
 
 The mitk::Overlay can be implemented using a custom rendering framework like VTK. In this diagram, the vtkOverlay is shown as the superclass for all Overlays which use the vtk framework for rendering.
-The OverlayManager is a microservice that can be registered to several BaseRenderer instances in order to call the update method of each Overlay during the rendering phase of the renderer.
+The OverlayManager can be registered to several BaseRenderer instances in order to call the update method of each Overlay during the rendering phase of the renderer.
 It also manages the respective Layouters which are used to manage the placement of a group of Overlays.
 
 \subsection OverlaysPage_OverlaySubsection Overlay
@@ -50,7 +50,7 @@ framework to display the Overlays. However the mitk::Overlay can also be impleme
 
 \subsection OverlaysPage_OverlayManagerSubsection OverlayManager
 
-The mitk::OverlayManager is the manager for a set of Overlays and the respective Layouters. It is implemented as a microservice that can be instanciated multiple times.
+The mitk::OverlayManager is the manager for a set of Overlays and the respective Layouters.
 Before the manager can be used, all mitk::BaseRenderer have to be registered to the mitk::OverlayManager instance like this:
 
 \snippet OverlayExample.cpp CreateOverlayManager

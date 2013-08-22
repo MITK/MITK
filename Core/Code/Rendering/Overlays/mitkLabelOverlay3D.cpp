@@ -17,8 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLabelOverlay3D.h"
 #include <vtkTextProperty.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkProperty.h>
 #include <vtkPointData.h>
+#include <vtkStringArray.h>
+#include <vtkPolyData.h>
+#include <vtkActor2D.h>
+#include <vtkProperty2D.h>
+#include <vtkPointSetToLabelHierarchy.h>
+#include <vtkLabelPlacementMapper.h>
+#include <vtkIntArray.h>
+#include <mitkPointSet.h>
 
 
 mitk::LabelOverlay3D::LabelOverlay3D()

@@ -24,27 +24,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCellArray.h>
 
 mitk::Surface::Pointer m_Surface3D;
-mitk::Surface::Pointer m_Surface3DLine;
 mitk::Surface::Pointer m_Surface3DTwoTimeSteps;
-mitk::Surface::Pointer m_Surface3DTwoTimeStepsDifferentPoints;
+
+vtkSmartPointer<vtkPoints> m_PointsOne;
+vtkSmartPointer<vtkPoints> m_PointsTwo;
+vtkSmartPointer<vtkCellArray> m_PolygonArrayTwo;
+vtkSmartPointer<vtkPolyData> m_PolyDataOne;
 
 /**
- * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the two used members for a new test case.
- */
+* @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the two used members for a new test case.
+*/
 void Setup()
 {
   //generate two sets of points
-  vtkSmartPointer<vtkPoints> pointsOne = vtkSmartPointer<vtkPoints>::New();
-  pointsOne->InsertNextPoint( 0.0, 0.0, 0.0 );
-  pointsOne->InsertNextPoint( 1.0, 0.0, 0.0 );
-  pointsOne->InsertNextPoint( 0.0, 1.0, 0.0 );
-  pointsOne->InsertNextPoint( 1.0, 1.0, 0.0 );
+  m_PointsOne = vtkSmartPointer<vtkPoints>::New();
+  m_PointsOne->InsertNextPoint( 0.0, 0.0, 0.0 );
+  m_PointsOne->InsertNextPoint( 1.0, 0.0, 0.0 );
+  m_PointsOne->InsertNextPoint( 0.0, 1.0, 0.0 );
+  m_PointsOne->InsertNextPoint( 1.0, 1.0, 0.0 );
 
-  vtkSmartPointer<vtkPoints> pointsTwo = vtkSmartPointer<vtkPoints>::New();
-  pointsTwo->InsertNextPoint( 0.0, 0.0, 0.0 );
-  pointsTwo->InsertNextPoint( 0.0, 0.0, 2.0 );
-  pointsTwo->InsertNextPoint( 0.0, 1.0, 0.0 );
-  pointsTwo->InsertNextPoint( 0.0, 1.0, 2.0 );
+  m_PointsTwo = vtkSmartPointer<vtkPoints>::New();
+  m_PointsTwo->InsertNextPoint( 0.0, 0.0, 0.0 );
+  m_PointsTwo->InsertNextPoint( 0.0, 0.0, 2.0 );
+  m_PointsTwo->InsertNextPoint( 0.0, 1.0, 0.0 );
+  m_PointsTwo->InsertNextPoint( 0.0, 1.0, 2.0 );
 
   //generate two polygons
   vtkSmartPointer<vtkPolygon> polygonOne = vtkSmartPointer<vtkPolygon>::New();
@@ -61,52 +64,29 @@ void Setup()
   polygonTwo->GetPointIds()->SetId(2,0);
   polygonTwo->GetPointIds()->SetId(3,1);
 
-  //generate a line
-  vtkSmartPointer<vtkPolyLine> polyLineOne = vtkSmartPointer<vtkPolyLine>::New();
-  polyLineOne->GetPointIds()->SetNumberOfIds(2);
-  polyLineOne->GetPointIds()->SetId(0,0);
-  polyLineOne->GetPointIds()->SetId(1,1);
-
   //generate polydatas
   vtkSmartPointer<vtkCellArray> polygonArrayOne = vtkSmartPointer<vtkCellArray>::New();
   polygonArrayOne->InsertNextCell(polygonOne);
 
-  vtkSmartPointer<vtkPolyData> polyDataOne = vtkSmartPointer<vtkPolyData>::New();
-  polyDataOne->SetPoints(pointsOne);
-  polyDataOne->SetPolys(polygonArrayOne);
+  m_PolyDataOne = vtkSmartPointer<vtkPolyData>::New();
+  m_PolyDataOne->SetPoints(m_PointsOne);
+  m_PolyDataOne->SetPolys(polygonArrayOne);
 
-  vtkSmartPointer<vtkCellArray> polygonArrayTwo = vtkSmartPointer<vtkCellArray>::New();
-  polygonArrayTwo->InsertNextCell(polygonTwo);
+  m_PolygonArrayTwo = vtkSmartPointer<vtkCellArray>::New();
+  m_PolygonArrayTwo->InsertNextCell(polygonTwo);
 
   vtkSmartPointer<vtkPolyData> polyDataTwo = vtkSmartPointer<vtkPolyData>::New();
-  polyDataTwo->SetPoints(pointsOne);
-  polyDataTwo->SetPolys(polygonArrayTwo);
-
-  vtkSmartPointer<vtkPolyData> polyDataThree = vtkSmartPointer<vtkPolyData>::New();
-  polyDataThree->SetPoints(pointsTwo);
-  polyDataThree->SetPolys(polygonArrayTwo);
-
-  vtkSmartPointer<vtkCellArray> polyLineArrayOne = vtkSmartPointer<vtkCellArray>::New();
-  polyLineArrayOne->InsertNextCell(polyLineOne);
-
-  vtkSmartPointer<vtkPolyData> polyDataFour = vtkSmartPointer<vtkPolyData>::New();
-  polyDataFour->SetPoints(pointsOne);
-  polyDataFour->SetLines(polyLineArrayOne);
+  polyDataTwo->SetPoints(m_PointsOne);
+  polyDataTwo->SetPolys(m_PolygonArrayTwo);
 
   //generate surfaces
   m_Surface3D = mitk::Surface::New();
-  m_Surface3D->SetVtkPolyData( polyDataOne );
+  m_Surface3D->SetVtkPolyData( m_PolyDataOne );
 
   m_Surface3DTwoTimeSteps = mitk::Surface::New();
-  m_Surface3DTwoTimeSteps->SetVtkPolyData( polyDataOne, 0 );
+  m_Surface3DTwoTimeSteps->SetVtkPolyData( m_PolyDataOne, 0 );
   m_Surface3DTwoTimeSteps->SetVtkPolyData( polyDataTwo, 1 );
 
-  m_Surface3DTwoTimeStepsDifferentPoints = mitk::Surface::New();
-  m_Surface3DTwoTimeStepsDifferentPoints->SetVtkPolyData( polyDataOne, 0 );
-  m_Surface3DTwoTimeStepsDifferentPoints->SetVtkPolyData( polyDataThree, 1 );
-
-  m_Surface3DLine = mitk::Surface::New();
-  m_Surface3DLine->SetVtkPolyData( polyDataFour );
 }
 
 void Equal_CloneAndOriginalOneTimestep_ReturnsTrue()
@@ -130,18 +110,44 @@ void Equal_OneTimeStepVSTwoTimeStep_ReturnsFalse()
 void Equal_TwoTimeStepsDifferentPoints_ReturnsFalse()
 {
   Setup();
-  MITK_TEST_CONDITION_REQUIRED( ! mitk::Equal( m_Surface3DTwoTimeStepsDifferentPoints, m_Surface3DTwoTimeSteps ), "A surface with the same timesteps and different points should not be equal.\n");
+
+  vtkSmartPointer<vtkPolyData> polyDataDifferentPoints = vtkSmartPointer<vtkPolyData>::New();
+  polyDataDifferentPoints->SetPoints(m_PointsTwo);
+  polyDataDifferentPoints->SetPolys(m_PolygonArrayTwo);
+
+  mitk::Surface::Pointer surface3DTwoTimeStepsDifferentPoints = mitk::Surface::New();
+  surface3DTwoTimeStepsDifferentPoints->SetVtkPolyData( m_PolyDataOne, 0 );
+  surface3DTwoTimeStepsDifferentPoints->SetVtkPolyData( polyDataDifferentPoints, 1 );
+
+  MITK_TEST_CONDITION_REQUIRED( ! mitk::Equal( surface3DTwoTimeStepsDifferentPoints, m_Surface3DTwoTimeSteps ), "A surface with the same timesteps and different points should not be equal.\n");
 }
 
 void Equal_SurfaceWithPolygonSurfaceWithPolyLine_ReturnsFalse()
 {
   Setup();
-  MITK_TEST_CONDITION_REQUIRED( ! mitk::Equal( m_Surface3D, m_Surface3DLine ), "A surface with the same timesteps and points and the same number of cells, but different types of cells should not be equal.\n");
+
+  //generate a line
+  vtkSmartPointer<vtkPolyLine> polyLineOne = vtkSmartPointer<vtkPolyLine>::New();
+  polyLineOne->GetPointIds()->SetNumberOfIds(2);
+  polyLineOne->GetPointIds()->SetId(0,0);
+  polyLineOne->GetPointIds()->SetId(1,1);
+
+  vtkSmartPointer<vtkCellArray> polyLineArrayOne = vtkSmartPointer<vtkCellArray>::New();
+  polyLineArrayOne->InsertNextCell(polyLineOne);
+
+  vtkSmartPointer<vtkPolyData> polyDataLine = vtkSmartPointer<vtkPolyData>::New();
+  polyDataLine->SetPoints(m_PointsOne);
+  polyDataLine->SetLines(polyLineArrayOne);
+
+  mitk::Surface::Pointer surface3DLine = mitk::Surface::New();
+  surface3DLine->SetVtkPolyData( polyDataLine );
+
+  MITK_TEST_CONDITION_REQUIRED( ! mitk::Equal( m_Surface3D, surface3DLine ), "A surface with the same timesteps and points and the same number of cells, but different types of cells should not be equal.\n");
 }
 
 /**
- * @brief mitkSurfaceEqualTest A test class for Equal methods in mitk::Surface.
- */
+* @brief mitkSurfaceEqualTest A test class for Equal methods in mitk::Surface.
+*/
 int mitkSurfaceEqualTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN(mitkSurfaceEqualTest);

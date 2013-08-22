@@ -26,6 +26,7 @@
 #include "mitkDisplayPositionEvent.h"
 #include "mitkWheelEvent.h"
 
+
 //#include "mitkMapper.h"
 
 #include "mitkSliceNavigationController.h"
@@ -51,6 +52,7 @@ namespace mitk
   class DataStorage;
   class Mapper;
   class BaseLocalStorageHandler;
+  class OverlayManager;
 
 //##Documentation
 //## @brief Organizes the rendering process
@@ -216,6 +218,9 @@ namespace mitk
     //##
     //## \sa m_Slice
     virtual void SetSlice(unsigned int slice);
+
+    void SetOverlayManager(itk::SmartPointer<OverlayManager> overlayManager);
+    itk::SmartPointer<OverlayManager> GetOverlayManager();
 
     itkGetConstMacro(Slice, unsigned int)
 
@@ -478,6 +483,8 @@ namespace mitk
     //## @brief Sets m_CurrentWorldGeometry
     virtual void SetCurrentWorldGeometry(Geometry3D* geometry);
 
+    void UpdateOverlays();
+
 
   private:
     //##Documentation
@@ -488,6 +495,8 @@ namespace mitk
     //## very strange when suddenly the image-slice changes its geometry).
     //## \sa SetWorldGeometry
     Geometry3D::Pointer m_WorldGeometry;
+
+    itk::SmartPointer<OverlayManager> m_OverlayManager;
 
     //##Documentation
     //## m_TimeSlicedWorldGeometry is set by SetWorldGeometry if the passed Geometry3D is a

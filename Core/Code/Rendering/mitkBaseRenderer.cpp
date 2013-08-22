@@ -45,6 +45,7 @@
 #include "mitkProperties.h"
 #include "mitkWeakPointerProperty.h"
 #include "mitkInteractionConst.h"
+#include "Overlays/mitkOverlayManager.h"
 
 // VTK
 #include <vtkLinearTransform.h>
@@ -368,6 +369,20 @@ void mitk::BaseRenderer::SetSlice(unsigned int slice)
   }
 }
 
+void mitk::BaseRenderer::SetOverlayManager(itk::SmartPointer<OverlayManager> overlayManager)
+{
+  if(overlayManager.IsNotNull())
+  {
+  this->m_OverlayManager = overlayManager;
+  this->m_OverlayManager->AddBaseRenderer(this);
+  }
+}
+
+itk::SmartPointer<mitk::OverlayManager> mitk::BaseRenderer::GetOverlayManager()
+{
+  return m_OverlayManager;
+}
+
 void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)
 {
   if (m_TimeStep != timeStep)
@@ -526,6 +541,14 @@ void mitk::BaseRenderer::SetCurrentWorldGeometry(mitk::Geometry3D* geometry)
     m_EmptyWorldGeometry = true;
   else
     m_EmptyWorldGeometry = false;
+}
+
+void mitk::BaseRenderer::UpdateOverlays()
+{
+  if(m_OverlayManager.IsNotNull())
+  {
+    m_OverlayManager->UpdateOverlays(this);
+  }
 }
 
 void mitk::BaseRenderer::SetGeometry(const itk::EventObject & geometrySendEvent)

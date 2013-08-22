@@ -259,6 +259,12 @@ void QmitkStdMultiWidget::InitializeWidget()
   layer = mitk::IntProperty::New(1000);
   planeNode->SetProperty("layer",layer);
 
+  m_OverlayManager = mitk::OverlayManager::New();
+  mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetOverlayManager(m_OverlayManager);
+  mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->SetOverlayManager(m_OverlayManager);
+  mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->SetOverlayManager(m_OverlayManager);
+  mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetOverlayManager(m_OverlayManager);
+
   mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Standard3D);
   // Set plane mode (slicing/rotation behavior) to slicing (default)
   m_PlaneMode = PLANE_MODE_SLICING;
@@ -469,6 +475,8 @@ QmitkStdMultiWidget::~QmitkStdMultiWidget()
   m_CornerAnnotaions[2].cornerText->Delete();
   m_CornerAnnotaions[2].textProp->Delete();
   m_CornerAnnotaions[2].ren->Delete();
+
+  m_OverlayManager->UnregisterMicroservice();
 }
 
 void QmitkStdMultiWidget::RemovePlanesFromDataStorage()

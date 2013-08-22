@@ -48,6 +48,19 @@ mitk::InternalTrackingTool::~InternalTrackingTool()
 {
 }
 
+void mitk::InternalTrackingTool::PrintSelf(std::ostream& os, itk::Indent indent) const
+{
+  Superclass::PrintSelf(os, indent);
+
+  os << indent << "Position: " << m_Position << std::endl;
+  os << indent << "Orientation: " << m_Orientation << std::endl;
+  os << indent << "TrackingError: " << m_TrackingError << std::endl;
+  os << indent << "Enabled: " << m_Enabled << std::endl;
+  os << indent << "DataValid: " << m_DataValid << std::endl;
+  os << indent << "ToolTip: " << m_ToolTip << std::endl;
+  os << indent << "ToolTipRotation: " << m_ToolTipRotation << std::endl;
+  os << indent << "ToolTipSet: " << m_ToolTipSet << std::endl;
+}
 
 void mitk::InternalTrackingTool::SetToolName(const char* _arg)
 {

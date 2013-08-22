@@ -58,6 +58,7 @@ namespace mitk
     virtual void UpdateOutputInformation();
     virtual bool VerifyRequestedRegion();
 
+
   protected:
     Surface();
     virtual ~Surface();
@@ -74,6 +75,22 @@ namespace mitk
     RegionType m_RequestedRegion;
     bool m_CalculateBoundingBox;
   };
+
+  /**
+  * \brief Compare two surfaces for equality, returns true if found equal
+  *
+  */
+  bool Equal( const mitk::Surface* rightHandSide, const mitk::Surface* leftHandSide, ScalarType eps = mitk::eps);
+
+  /**
+  * \brief Compare two vtk PolyDatas for equality, returns true if found equal
+  *
+  * This will only check if the number of cells, vertices, polygons, stripes and lines is the same and whether
+  * all the two poly datas have the same number of points with the same coordinates. It is not checked whether
+  * all points are correctly connected.
+  */
+  bool Equal( const vtkPolyData* rightHandSide, const vtkPolyData* leftHandSide, ScalarType eps = mitk::eps);
+
 }
 
 #endif

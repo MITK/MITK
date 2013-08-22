@@ -384,3 +384,102 @@ void mitk::Surface::PrintSelf(std::ostream& os, itk::Indent indent) const
     ++count;
   }
 }
+
+bool Equal( const mitk::Surface* rightHandSide, const mitk::Surface* leftHandSide, ScalarType eps )
+{
+  bool noDifferenceFound = true;
+
+
+  if( rightHandSide == NULL )
+  {
+    MITK_INFO << "[Equal( mitk::surface*, mitk::surface* )] rightHandSide NULL.";
+    return false;
+  }
+
+  if( leftHandSide == NULL )
+  {
+    MITK_INFO << "[Equal( mitk::surface*, mitk::surface* )] leftHandSide NULL.";
+    return false;
+  }
+
+  MITK_INFO << "Checking size of PolyData series for equality";
+  if( !mitk:::Equal( rightHandSide->GetSizeOfPolyDataSeries(), leftHandSide->GetSizeOfPolyDataSeries(), eps ) )
+  {
+    noDifferenceFound = false;
+  }
+
+  MITK_INFO << "Checking time sliced geometries for equality";
+  if( !mitk:::Equal( rightHandSide->GetTimeSlicedGeometry(), leftHandSide->GetTimeSlicedGeometry(), eps ) )
+  {
+    noDifferenceFound = false;
+  }
+
+  MITK_INFO << "Checking largest possible region for equality";
+  if( !mitk:::Equal( rightHandSide->GetLargestPossibleRegion(), leftHandSide->GetLargestPossibleRegion(), eps ) )
+  {
+    noDifferenceFound = false;
+  }
+
+  MITK_INFO << "Checking poly datas for equality";
+  for( unsigned int i( 0 ); i < rightHandSide->GetSizeOfPolyDataSeries(); i++ )
+  {
+    if( !mitk:::Equal( rightHandSide->GetVtkPolyData( i ), leftHandSide->GetVtkPolyData( i ), eps ) )
+    {
+      noDifferenceFound = false;
+    }
+  }
+
+  return noDifferenceFound;
+}
+
+bool Equal( const vtkPolyData* rightHandSide, const vtkPolyData* leftHandSide, ScalarType eps = mitk::eps)
+{
+  bool noDifferenceFound = true;
+
+
+  if( rightHandSide == NULL )
+  {
+    MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] rightHandSide NULL.";
+    return false;
+  }
+
+  if( leftHandSide == NULL )
+  {
+    MITK_INFO << "[Equal( vtkPolyData*, vtkPolyData* )] leftHandSide NULL.";
+    return false;
+  }
+
+  MITK_INFO << "Checking number of cells for equality";
+  if( !mitk:::Equal( rightHandSide->GetNumberOfCells(), leftHandSide->GetNumberOfCells(), eps ) )
+  {
+    noDifferenceFound = false;
+  }
+
+  MITK_INFO << "Checking number of vertices for equality";
+  if( !mitk:::Equal( rightHandSide->GetNumberOfVerts(), leftHandSide->GetNumberOfVerts(), eps ) )
+  {
+    noDifferenceFound = false;
+  }
+
+  MITK_INFO << "Checking number of lines for equality";
+  if( !mitk:::Equal( rightHandSide->GetNumberOfLines(), leftHandSide->GetNumberOfLines(), eps ) )
+  {
+    noDifferenceFound = false;
+  }
+
+  MITK_INFO << "Checking number of polys for equality";
+  if( !mitk:::Equal( rightHandSide->GetNumberOfPolys(), leftHandSide->GetNumberOfPolys(), eps ) )
+  {
+    noDifferenceFound = false;
+  }
+
+  MITK_INFO << "Checking number of strips for equality";
+  if( !mitk:::Equal( rightHandSide->GetNumberOfStrips(), leftHandSide->GetNumberOfStrips(), eps ) )
+  {
+    noDifferenceFound = false;
+  }
+
+  MITK_INFO << "Checking whether all coordinates are present";
+
+  return noDifferenceFound;
+}

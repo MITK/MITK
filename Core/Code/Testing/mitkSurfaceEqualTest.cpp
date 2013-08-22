@@ -89,6 +89,13 @@ void Setup()
 
 }
 
+void Equal_InputIsNull_ReturnsFalse()
+{
+  mitk::Surface::Pointer surface = NULL;
+
+  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( surface, surface), "Input is NULL. Result should be false.\n");
+}
+
 void Equal_CloneAndOriginalOneTimestep_ReturnsTrue()
 {
   Setup();
@@ -98,7 +105,7 @@ void Equal_CloneAndOriginalOneTimestep_ReturnsTrue()
 void Equal_CloneAndOriginalTwoTimesteps_ReturnsTrue()
 {
   Setup();
-  MITK_TEST_CONDITION_REQUIRED( mitk::Equal( m_Surface3DTwoTimeSteps, m_Surface3DTwoTimeSteps->Clone() ), "A one timestep clone should be equal to its original.\n");
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal( m_Surface3DTwoTimeSteps, m_Surface3DTwoTimeSteps->Clone() ), "A two timestep clone should be equal to its original.\n");
 }
 
 void Equal_OneTimeStepVSTwoTimeStep_ReturnsFalse()
@@ -152,6 +159,7 @@ int mitkSurfaceEqualTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN(mitkSurfaceEqualTest);
 
+  Equal_InputIsNull_ReturnsFalse();
   Equal_CloneAndOriginalOneTimestep_ReturnsTrue();
   Equal_CloneAndOriginalTwoTimesteps_ReturnsTrue();
   Equal_OneTimeStepVSTwoTimeStep_ReturnsFalse();

@@ -59,8 +59,8 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
 
   CONNECT_FUNCTION( "finalize_figure", FinalizeFigure);
   CONNECT_FUNCTION( "hide_preview_point", HidePreviewPoint )
+  CONNECT_FUNCTION( "hide_control_points", HideControlPoints )
   CONNECT_FUNCTION( "set_preview_point_position", SetPreviewPointPosition )
-  CONNECT_FUNCTION( "switch_to_hovering", SwitchToHovering )
   CONNECT_FUNCTION( "move_current_point", MoveCurrentPoint);
   CONNECT_FUNCTION( "deselect_point", DeselectPoint);
   CONNECT_FUNCTION( "add_new_point", AddPoint);
@@ -70,6 +70,8 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION( "select_figure", SelectFigure );
   CONNECT_FUNCTION( "select_point", SelectPoint );
   CONNECT_FUNCTION( "end_interaction", EndInteraction );
+  CONNECT_FUNCTION( "start_hovering", StartHovering )
+  CONNECT_FUNCTION( "end_hovering", EndHovering );
 }
 
 
@@ -156,6 +158,23 @@ bool mitk::PlanarFigureInteractor::EndInteraction( StateMachineAction*, Interact
   return false;
 }
 
+bool mitk::PlanarFigureInteractor::EndHovering( StateMachineAction*, InteractionEvent* interactionEvent )
+{
+  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
+  planarFigure->ResetPreviewContolPoint();
+
+  // Invoke end-hover event once the mouse is exiting the figure area
+  m_IsHovering = false;
+  planarFigure->InvokeEvent( EndHoverPlanarFigureEvent() );
+
+  // Set bool property to indicate that planar figure is no longer in "hovering" mode
+  GetDataNode()->SetBoolProperty( "planarfigure.ishovering", false );
+
+  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+
+  return false;
+}
+
 bool mitk::PlanarFigureInteractor::CheckMinimalFigureFinished( const InteractionEvent* interactionEvent )
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
@@ -190,7 +209,7 @@ bool mitk::PlanarFigureInteractor::DeselectPoint(StateMachineAction*, Interactio
     planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
 
     GetDataNode()->SetBoolProperty( "planarfigure.drawcontrolpoints", true );
-    GetDataNode()->SetBoolProperty( "planarfigure.ishovering", false );
+//    GetDataNode()->SetBoolProperty( "planarfigure.ishovering", false );
     GetDataNode()->Modified();
   }
 
@@ -359,7 +378,7 @@ bool mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction*, Interact
   return true;
 }
 
-bool mitk::PlanarFigureInteractor::SwitchToHovering( StateMachineAction*, InteractionEvent* interactionEvent )
+bool mitk::PlanarFigureInteractor::StartHovering( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if ( positionEvent == NULL )
@@ -413,7 +432,7 @@ bool mitk::PlanarFigureInteractor::SetPreviewPointPosition( StateMachineAction*,
   bool isEditable(true);
   GetDataNode()->GetBoolProperty("selected", selected);
   GetDataNode()->GetBoolProperty("planarfigure.isextendable", isExtendable);
-  GetDataNode()->GetBoolProperty( "planarfigure.iseditable", isEditable );
+  GetDataNode()->GetBoolProperty("planarfigure.iseditable", isEditable );
 
   if ( selected &&  isExtendable && isEditable )
   {
@@ -423,9 +442,14 @@ bool mitk::PlanarFigureInteractor::SetPreviewPointPosition( StateMachineAction*,
 
   renderer->GetRenderingManager()->RequestUpdateAll();
 
-  return false;
+  return true;
 }
 
+bool mitk::PlanarFigureInteractor::HideControlPoints( StateMachineAction*, InteractionEvent* interactionEvent )
+{
+  GetDataNode()->SetBoolProperty( "planarfigure.drawcontrolpoints", false );
+  return true;
+}
 
 bool mitk::PlanarFigureInteractor::HidePreviewPoint( StateMachineAction*, InteractionEvent* interactionEvent )
 {
@@ -435,7 +459,7 @@ bool mitk::PlanarFigureInteractor::HidePreviewPoint( StateMachineAction*, Intera
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   renderer->GetRenderingManager()->RequestUpdateAll();
 
-  return false;
+  return true;
 }
 
 
@@ -451,15 +475,15 @@ bool mitk::PlanarFigureInteractor::CheckFigureHovering( const InteractionEvent* 
   const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
 
   mitk::Point2D pointProjectedOntoLine;
-  int previousControlPoint = mitk::PlanarFigureInteractor::IsPositionOverFigure(
-    positionEvent,
-    planarFigure,
-    planarFigureGeometry,
-    projectionPlane,
-    renderer->GetDisplayGeometry(),
-    pointProjectedOntoLine
-    );
-  bool isHovering = ( previousControlPoint != -1 );
+  int previousControlPoint = this->IsPositionOverFigure( positionEvent,
+                                                         planarFigure,
+                                                         planarFigureGeometry,
+                                                         projectionPlane,
+                                                         renderer->GetDisplayGeometry(),
+                                                         pointProjectedOntoLine
+                                                        );
+
+  bool isHovering = (previousControlPoint != -1);
 
   if ( isHovering )
   {
@@ -467,20 +491,6 @@ bool mitk::PlanarFigureInteractor::CheckFigureHovering( const InteractionEvent* 
   }
   else
   {
-    if ( m_IsHovering )
-    {
-      planarFigure->ResetPreviewContolPoint();
-
-      // Invoke end-hover event once the mouse is exiting the figure area
-      m_IsHovering = false;
-      planarFigure->InvokeEvent( EndHoverPlanarFigureEvent() );
-
-      // Set bool property to indicate that planar figure is no longer in "hovering" mode
-      GetDataNode()->SetBoolProperty( "planarfigure.ishovering", false );
-
-      renderer->GetRenderingManager()->RequestUpdateAll();
-    }
-
     return false;
   }
 
@@ -516,8 +526,6 @@ bool mitk::PlanarFigureInteractor::CheckControlPointHovering( const InteractionE
   {
     return false;
   }
-
-  return false;
 }
 
 bool mitk::PlanarFigureInteractor::CheckSelection( const InteractionEvent* interactionEvent )
@@ -806,7 +814,6 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
       return 0; // Return index of first control point
     }
   }
-
   return -1;
 }
 

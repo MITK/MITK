@@ -16,9 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRenderingManager.h"
 #include "mitkPlanePositionManager.h"
-#include "mitkCoreDataNodeReader.h"
-#include "mitkShaderRepository.h"
-#include "mitkStandardFileLocations.h"
+#include <mitkCoreDataNodeReader.h>
+#include <mitkStandardFileLocations.h>
+#include <mitkShaderRepository.h>
+#include <mitkPropertyAliases.h>
+#include <mitkPropertyDescriptions.h>
+#include <mitkPropertyExtensions.h>
+#include <mitkPropertyFilters.h>
+#include <mitkIOUtil.h>
 
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
@@ -46,45 +51,6 @@ void HandleMicroServicesMessages(us::MsgType type, const char* msg)
     break;
   }
 }
-
-#if defined(_WIN32) || defined(_WIN64)
-std::string GetProgramPath()
-{
-  char path[512];
-  std::size_t index = std::string(path, GetModuleFileName(NULL, path, 512)).find_last_of('\\');
-  return std::string(path, index);
-}
-#elif defined(__APPLE__)
-#include <mach-o/dyld.h>
-std::string GetProgramPath()
-{
-  char path[512];
-  uint32_t size = sizeof(path);
-  if (_NSGetExecutablePath(path, &size) == 0)
-  {
-    std::size_t index = std::string(path).find_last_of('/');
-    std::string strPath = std::string(path, index);
-    const char* execPath = strPath.c_str();
-    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(execPath,false);
-    return strPath;
-  }
-  return std::string();
-}
-#else
-#include <sys/types.h>
-#include <unistd.h>
-#include <sstream>
-std::string GetProgramPath()
-{
-  std::stringstream ss;
-  ss << "/proc/" << getpid() << "/exe";
-  char proc[512] = {0};
-  ssize_t ch = readlink(ss.str().c_str(), proc, 512);
-  if (ch == -1) return std::string();
-  std::size_t index = std::string(proc).find_last_of('/');
-  return std::string(proc, index);
-}
-#endif
 
 void AddMitkAutoLoadPaths(const std::string& programPath)
 {
@@ -129,7 +95,7 @@ public:
 
     // Add the current application directory to the auto-load paths.
     // This is useful for third-party executables.
-    std::string programPath = GetProgramPath();
+    std::string programPath = mitk::IOUtil::GetProgramPath();
     if (programPath.empty())
     {
       MITK_WARN << "Could not get the program path.";
@@ -149,6 +115,18 @@ public:
 
     m_ShaderRepository.reset(new mitk::ShaderRepository);
     context->RegisterService<mitk::IShaderRepository>(m_ShaderRepository.get());
+
+    m_PropertyAliases.reset(new mitk::PropertyAliases);
+    context->RegisterService<mitk::IPropertyAliases>(m_PropertyAliases.get());
+
+    m_PropertyDescriptions.reset(new mitk::PropertyDescriptions);
+    context->RegisterService<mitk::IPropertyDescriptions>(m_PropertyDescriptions.get());
+
+    m_PropertyExtensions.reset(new mitk::PropertyExtensions);
+    context->RegisterService<mitk::IPropertyExtensions>(m_PropertyExtensions.get());
+
+    m_PropertyFilters.reset(new mitk::PropertyFilters);
+    context->RegisterService<mitk::IPropertyFilters>(m_PropertyFilters.get());
 
     context->AddModuleListener(this, &MitkCoreActivator::HandleModuleEvent);
 
@@ -180,6 +158,10 @@ private:
   std::auto_ptr<mitk::PlanePositionManagerService> m_PlanePositionManager;
   std::auto_ptr<mitk::CoreDataNodeReader> m_CoreDataNodeReader;
   std::auto_ptr<mitk::ShaderRepository> m_ShaderRepository;
+  std::auto_ptr<mitk::PropertyAliases> m_PropertyAliases;
+  std::auto_ptr<mitk::PropertyDescriptions> m_PropertyDescriptions;
+  std::auto_ptr<mitk::PropertyExtensions> m_PropertyExtensions;
+  std::auto_ptr<mitk::PropertyFilters> m_PropertyFilters;
 };
 
 void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)

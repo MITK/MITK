@@ -19,7 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPropertyItemModel.h"
 #include <mitkBaseProperty.h>
 #include <mitkFloatPropertyExtension.h>
-#include <mitkPropertyExtensions.h>
+#include <mitkIntPropertyExtension.h>
+#include <mitkIPropertyExtensions.h>
 #include <QComboBox>
 #include <QPainter>
 #include <QPaintEvent>
@@ -120,6 +121,21 @@ QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOp
     {
       QSpinBox* spinBox = new QSpinBox(parent);
 
+      mitk::IPropertyExtensions* extensions = mitk::GetPropertyService<mitk::IPropertyExtensions>();
+      std::string name = this->GetPropertyName(index);
+
+      if (extensions != NULL && !name.empty() && extensions->HasExtension(name))
+      {
+        mitk::IntPropertyExtension::Pointer extension = dynamic_cast<mitk::IntPropertyExtension*>(extensions->GetExtension(name).GetPointer());
+
+        if (extension.IsNotNull())
+        {
+          spinBox->setMinimum(extension->GetMinimum());
+          spinBox->setMaximum(extension->GetMaximum());
+          spinBox->setSingleStep(extension->GetSingleStep());
+        }
+      }
+
       connect(spinBox, SIGNAL(editingFinished()), this, SLOT(OnSpinBoxEditingFinished()));
 
       return spinBox;
@@ -129,17 +145,20 @@ QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOp
     {
       QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);
 
-      mitk::PropertyExtensions* extensions = mitk::GetPropertyService<mitk::PropertyExtensions>();
+      mitk::IPropertyExtensions* extensions = mitk::GetPropertyService<mitk::IPropertyExtensions>();
       std::string name = this->GetPropertyName(index);
 
       if (extensions != NULL && !name.empty() && extensions->HasExtension(name))
       {
-        mitk::FloatPropertyExtension* extension = static_cast<mitk::FloatPropertyExtension*>(extensions->GetExtension(name));
+        mitk::FloatPropertyExtension::Pointer extension = dynamic_cast<mitk::FloatPropertyExtension*>(extensions->GetExtension(name).GetPointer());
 
-        spinBox->setMinimum(extension->GetMinimum());
-        spinBox->setMaximum(extension->GetMaximum());
-        spinBox->setSingleStep(extension->GetSingleStep());
-        spinBox->setDecimals(extension->GetDecimals());
+        if (extension.IsNotNull())
+        {
+          spinBox->setMinimum(extension->GetMinimum());
+          spinBox->setMaximum(extension->GetMaximum());
+          spinBox->setSingleStep(extension->GetSingleStep());
+          spinBox->setDecimals(extension->GetDecimals());
+        }
       }
       else
       {

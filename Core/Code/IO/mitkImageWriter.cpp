@@ -123,7 +123,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
   MITK_INFO << "Writing image: " << fileName << std::endl;
   // Pictures and picture series like .png are written via a different mechanism then volume images.
   // So, they are still multiplexed and thus not support vector images.
-  if (fileName.find(".png") != std::string::npos || fileName.find(".tif") != std::string::npos || fileName.find(".jpg") != std::string::npos)
+  if (fileName.find(".png") != std::string::npos || fileName.find(".tif") != std::string::npos || fileName.find(".jpg") != std::string::npos || fileName.find(".bmp") != std::string::npos)
   {
     try
     {
@@ -434,9 +434,9 @@ const char* mitk::ImageWriter::GetDefaultFilename()
 
 const char* mitk::ImageWriter::GetFileDialogPattern()
 {
-  return "Image (*.pic, *.pic.gz, *.bmp, *.dcm, *.DCM, *.dicom, *.DICOM, *.gipl, *.gipl.gz, *.mha, "
-      "*.nii, *.nii.gz, *.nrrd, *.nhdr, *.png, *.PNG, *.spr, *.mhd, *.vtk, *.vti, *.hdr, *.png, "
-      "*.tif, *.jpg)";
+  return "Image (*.bmp *.dcm *.DCM *.dicom *.DICOM *.gipl *.gipl.gz *.mha "
+      "*.nii *.nii.gz *.nrrd *.nhdr *.png *.PNG *.spr *.mhd *.vtk *.vti *.hdr *.png "
+      "*.tif *.jpg)";
 }
 
 const char *mitk::ImageWriter::GetDefaultExtension()

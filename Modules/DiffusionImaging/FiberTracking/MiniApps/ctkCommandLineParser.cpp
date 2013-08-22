@@ -54,7 +54,7 @@ public:
             const string& longArg, const string& longArgPrefix,
             const string& shortArg, const string& shortArgPrefix,
             ctkCommandLineParser::Type type, const string& argHelp,
-            const mitk::Any& defaultValue, bool ignoreRest,
+            const us::Any& defaultValue, bool ignoreRest,
             bool deprecated, bool optional)
         : LongArg(longArg), LongArgPrefix(longArgPrefix),
           ShortArg(shortArg), ShortArgPrefix(shortArgPrefix),
@@ -112,8 +112,8 @@ public:
     bool    Deprecated;
     bool    Optional;
 
-    mitk::Any                   DefaultValue;
-    mitk::Any                   Value;
+    us::Any                   DefaultValue;
+    us::Any                   Value;
     ctkCommandLineParser::Type  ValueType;
 };
 
@@ -139,7 +139,7 @@ bool CommandLineParserArgumentDescription::addParameter(const string &value)
     {
         try
         {
-            ctkCommandLineParser::StringContainerType list = mitk::any_cast<ctkCommandLineParser::StringContainerType>(Value);
+            ctkCommandLineParser::StringContainerType list = us::any_cast<ctkCommandLineParser::StringContainerType>(Value);
             list.push_back(value);
             Value = list;
         }
@@ -298,7 +298,7 @@ ctkCommandLineParser::~ctkCommandLineParser()
 }
 
 // --------------------------------------------------------------------------
-map<string, mitk::Any> ctkCommandLineParser::parseArguments(const StringContainerType& arguments,
+map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerType& arguments,
                                                               bool* ok)
 {
     // Reset
@@ -309,7 +309,7 @@ map<string, mitk::Any> ctkCommandLineParser::parseArguments(const StringContaine
     for (int i=0; i<Internal->ArgumentDescriptionList.size(); i++)
     {
         CommandLineParserArgumentDescription* desc = Internal->ArgumentDescriptionList.at(i);
-        desc->Value = mitk::Any(desc->ValueType);
+        desc->Value = us::Any(desc->ValueType);
         if (!desc->DefaultValue.Empty())
         {
             desc->Value = desc->DefaultValue;
@@ -423,7 +423,7 @@ map<string, mitk::Any> ctkCommandLineParser::parseArguments(const StringContaine
 //                                missingParameterError.arg(argument).arg(j-1).arg(numberOfParametersToProcess);
 //                        if (this->Internal->Debug) { MITK_DEBUG << this->Internal->ErrorString; }
                         if (ok) { *ok = false; }
-                        return map<string, mitk::Any>();
+                        return map<string, us::Any>();
                     }
                     string parameter = arguments.at(i + j);
                     if (this->Internal->Debug)
@@ -436,7 +436,7 @@ map<string, mitk::Any> ctkCommandLineParser::parseArguments(const StringContaine
 //                                missingParameterError.arg(argument).arg(j-1).arg(numberOfParametersToProcess);
 //                        if (this->Internal->Debug) { MITK_DEBUG << this->Internal->ErrorString; }
                         if (ok) { *ok = false; }
-                        return map<string, mitk::Any>();
+                        return map<string, us::Any>();
                     }
                     if (!currentArgDesc->addParameter(parameter))
                     {
@@ -445,7 +445,7 @@ map<string, mitk::Any> ctkCommandLineParser::parseArguments(const StringContaine
 //                                arg(argument).arg(currentArgDesc->ExactMatchFailedMessage);
 //                        if (this->Internal->Debug) { MITK_DEBUG << this->Internal->ErrorString; }
                         if (ok) { *ok = false; }
-                        return map<string, mitk::Any>();
+                        return map<string, us::Any>();
                     }
                 }
                 // Update main loop increment
@@ -488,7 +488,7 @@ map<string, mitk::Any> ctkCommandLineParser::parseArguments(const StringContaine
 //                                arg(argument).arg(currentArgDesc->ExactMatchFailedMessage);
 //                        if (this->Internal->Debug) { MITK_DEBUG << this->Internal->ErrorString; }
                         if (ok) { *ok = false; }
-                        return map<string, mitk::Any>();
+                        return map<string, us::Any>();
                     }
                     j++;
                 }
@@ -518,7 +518,7 @@ map<string, mitk::Any> ctkCommandLineParser::parseArguments(const StringContaine
         *ok = !error;
     }
 
-    map<string, mitk::Any> parsedArguments;
+    map<string, us::Any> parsedArguments;
 
     int obligatoryArgs = 0;
     vector<CommandLineParserArgumentDescription*>::iterator it;
@@ -548,7 +548,7 @@ map<string, mitk::Any> ctkCommandLineParser::parseArguments(const StringContaine
         if(!desc->Optional)
             parsedObligatoryArgs++;
 
-        std::pair<string, mitk::Any> elem; elem.first = key; elem.second = desc->Value;
+        std::pair<string, us::Any> elem; elem.first = key; elem.second = desc->Value;
         parsedArguments.insert(elem);
     }
 
@@ -562,7 +562,7 @@ map<string, mitk::Any> ctkCommandLineParser::parseArguments(const StringContaine
 }
 
 // -------------------------------------------------------------------------
-map<string, mitk::Any> ctkCommandLineParser::parseArguments(int argc, char** argv, bool* ok)
+map<string, us::Any> ctkCommandLineParser::parseArguments(int argc, char** argv, bool* ok)
 {
     StringContainerType arguments;
 
@@ -588,7 +588,7 @@ const ctkCommandLineParser::StringContainerType& ctkCommandLineParser::unparsedA
 // --------------------------------------------------------------------------
 void ctkCommandLineParser::addArgument(const string& longarg, const string& shortarg,
                                        Type type, const string& argHelp,
-                                       const mitk::Any& defaultValue, bool optional, bool ignoreRest,
+                                       const us::Any& defaultValue, bool optional, bool ignoreRest,
                                        bool deprecated)
 {
     if (longarg.empty() && shortarg.empty()) { return; }
@@ -632,7 +632,7 @@ void ctkCommandLineParser::addArgument(const string& longarg, const string& shor
 void ctkCommandLineParser::addDeprecatedArgument(
         const string& longarg, const string& shortarg, const string& argHelp)
 {
-    addArgument(longarg, shortarg, StringList, argHelp, mitk::Any(), false, true);
+    addArgument(longarg, shortarg, StringList, argHelp, us::Any(), false, true);
 }
 
 // --------------------------------------------------------------------------

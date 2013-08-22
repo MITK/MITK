@@ -10,6 +10,10 @@ file(GLOB dylibFiles @BOOST_ROOT@/lib/*.dylib)
 foreach(_dylib ${dylibFiles})
    message("Fixing boost install name for lib: ${_dylib}")
    execute_process(COMMAND install_name_tool -id ${_dylib} ${_dylib})
+   foreach(_dep_dylib ${dylibFiles})
+      get_filename_component(_dep_dylib_name ${_dep_dylib} NAME)
+      execute_process(COMMAND install_name_tool -change ${_dep_dylib_name} \@loader_path/${_dep_dylib_name} ${_dylib})
+   endforeach()
 endforeach()
 
 

@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   /**
-  * \brief ToFPMDRawPlayerDeviceFactory is an implementation of the factory pattern to generate MESASR4000Devices.
+  * \brief ToFCameraMESASR4000DeviceFactory is an implementation of the factory pattern to generate MESASR4000Devices.
   * ToFCameraMESASR4000DeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
   * This offers users the oppertunity to generate new Raw Player Devices via a global instance of this factory.
   * @ingroup ToFHardware
@@ -63,9 +63,9 @@ namespace mitk
 
   private:
     /*!
-    \brief Create an instance of a ToFPMDRawDataDevice.
+    \brief Create an instance of a ToFCameraMESASR4000Device.
     */
-    ToFCameraDevice::Pointer createToFCameraDevice()
+    ToFCameraDevice::Pointer CreateToFCameraDevice()
     {
       ToFCameraMESASR4000Device::Pointer device = ToFCameraMESASR4000Device::New();
 

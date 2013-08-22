@@ -195,7 +195,7 @@ static std::pair<std::string, mitk::BaseProperty::Pointer> ParseReference(const 
   if (string.empty())
     mitkThrow() << "Could not parse " << ref << ": Reference is empty!";
 
-  return std::make_pair(id, mitk::StringProperty::New(string));
+  return std::make_pair(id, mitk::StringProperty::New(string).GetPointer());
 }
 
 static std::pair<std::string, mitk::BaseProperty::Pointer> ParseTemplate(const std::string& templ)

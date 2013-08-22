@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_CPP__
-#define __MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_CPP__
+#ifndef __MITK_DIFFUSIONIMAGE_SOURCE_CPP__
+#define __MITK_DIFFUSIONIMAGE_SOURCE_CPP__
 
 #include "mitkDiffusionImageSource.h"
 #include "mitkDiffusionImage.h"
@@ -55,47 +55,42 @@ itk::DataObject::Pointer mitk::DiffusionImageSource<TPixelType>::MakeOutput( con
   return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
 
+template<typename TPixelType>
+typename mitk::DiffusionImageSource<TPixelType>::OutputType*
+mitk::DiffusionImageSource<TPixelType>::GetOutput(void)
+{
+  return itkDynamicCastInDebugMode<OutputType*>( this->GetPrimaryOutput() );
+}
 
-//template<typename TPixelType>
-//mitk::DiffusionImage<TPixelType>* mitk::DiffusionImageSource<TPixelType>::GetOutput()
-//{
-//  if (this->GetNumberOfOutputs() < 1)
-//  {
-//    return 0;
-//  }
-//
-//  return static_cast<mitk::DiffusionImage<TPixelType>*>
-//    (this->BaseProcess::GetOutput());
-//}
-//
-//
-//template<typename TPixelType>
-//void mitk::DiffusionImageSource<TPixelType>::GraftOutput(mitk::DiffusionImage<TPixelType>* graft)
-//{
-//  this->GraftNthOutput(0, graft);
-//}
-//
-//template<typename TPixelType>
-//void mitk::DiffusionImageSource<TPixelType>::GraftNthOutput(unsigned int idx, mitk::DiffusionImage<TPixelType> *graft)
-//{
-//  if (idx < this->GetNumberOfOutputs())
-//  {
-//    mitk::DiffusionImage<TPixelType> * output = this->GetOutput(idx);
-//
-//    if (output && graft)
-//    {
-//      // grab a handle to the bulk data of the specified data object
-//      //      output->SetPixelContainer( graft->GetPixelContainer() ); @FIXME!!!!
-//
-//      // copy the region ivars of the specified data object
-//      output->SetRequestedRegion( graft );//graft->GetRequestedRegion() );
-//      //      output->SetLargestPossibleRegion( graft->GetLargestPossibleRegion() ); @FIXME!!!!
-//      //      output->SetBufferedRegion( graft->GetBufferedRegion() ); @FIXME!!!!
-//
-//      // copy the meta-information
-//      output->CopyInformation( graft );
-//    }
-//  }
-//}
+template<typename TPixelType>
+const typename mitk::DiffusionImageSource<TPixelType>::OutputType*
+mitk::DiffusionImageSource<TPixelType>::GetOutput(void) const
+{
+  return itkDynamicCastInDebugMode<const OutputType*>( this->GetPrimaryOutput() );
+}
 
-#endif //__MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_CPP__
+template<typename TPixelType>
+typename mitk::DiffusionImageSource<TPixelType>::OutputType*
+mitk::DiffusionImageSource<TPixelType>::GetOutput(DataObjectPointerArraySizeType idx)
+{
+  OutputType* out = dynamic_cast<OutputType*>( this->ProcessObject::GetOutput(idx) );
+  if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )
+  {
+    itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( OutputType ).name () );
+  }
+  return out;
+}
+
+template<typename TPixelType>
+const typename mitk::DiffusionImageSource<TPixelType>::OutputType*
+mitk::DiffusionImageSource<TPixelType>::GetOutput(DataObjectPointerArraySizeType idx) const
+{
+  const OutputType* out = dynamic_cast<const OutputType*>( this->ProcessObject::GetOutput(idx) );
+  if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )
+  {
+    itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( OutputType ).name () );
+  }
+  return out;
+}
+
+#endif //__MITK_DIFFUSIONIMAGE_SOURCE_CPP__

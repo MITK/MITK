@@ -31,6 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 struct IShaderRepository;
+class IPropertyAliases;
+class IPropertyDescriptions;
+class IPropertyExtensions;
+class IPropertyFilters;
 
 /**
  * @brief Access MITK core services.
@@ -55,11 +59,39 @@ class MITK_CORE_EXPORT CoreServices
 public:
 
   /**
-   * @brief Get a IShaderRepository instance.
+   * @brief Get an IShaderRepository instance.
    * @param context The module context of the module getting the service.
    * @return A non-NULL IShaderRepository instance.
    */
   static IShaderRepository* GetShaderRepository(us::ModuleContext* context = us::GetModuleContext());
+
+  /**
+   * @brief Get an IPropertyAliases instance.
+   * @param context The module context of the module getting the service.
+   * @return A non-NULL IPropertyAliases instance.
+   */
+  static IPropertyAliases* GetPropertyAliases(us::ModuleContext* context = us::GetModuleContext());
+
+  /**
+   * @brief Get an IPropertyDescriptions instance.
+   * @param context The module context of the module getting the service.
+   * @return A non-NULL IPropertyDescriptions instance.
+   */
+  static IPropertyDescriptions* GetPropertyDescriptions(us::ModuleContext* context = us::GetModuleContext());
+
+  /**
+   * @brief Get an IPropertyExtensions instance.
+   * @param context The module context of the module getting the service.
+   * @return A non-NULL IPropertyExtensions instance.
+   */
+  static IPropertyExtensions* GetPropertyExtensions(us::ModuleContext* context = us::GetModuleContext());
+
+  /**
+   * @brief Get an IPropertyFilters instance.
+   * @param context The module context of the module getting the service.
+   * @return A non-NULL IPropertyFilters instance.
+   */
+  static IPropertyFilters* GetPropertyFilters(us::ModuleContext* context = us::GetModuleContext());
 
   /**
    * @brief Unget a previously acquired service instance.

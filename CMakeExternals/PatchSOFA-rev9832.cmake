@@ -7,6 +7,12 @@ string(REPLACE "P ( GLu" "P ( unsigned " vector_device_h "${vector_device_h}")
 set(CONTENTS ${vector_device_h})
 configure_file(${TEMPLATE_FILE} "framework/sofa/helper/vector_device.h" @ONLY)
 
+file(STRINGS "framework/sofa/defaulttype/MapMapSparseMatrix.h" mapMapSparseMatrix_h NEWLINE_CONSUME)
+string(REPLACE "_pair< KeyT, T >" "_pair" mapMapSparseMatrix_h "${mapMapSparseMatrix_h}")
+string(REPLACE "r< KeyType, RowType >" "r" mapMapSparseMatrix_h "${mapMapSparseMatrix_h}")
+set(CONTENTS ${mapMapSparseMatrix_h})
+configure_file(${TEMPLATE_FILE} "framework/sofa/defaulttype/MapMapSparseMatrix.h" @ONLY)
+
 file(STRINGS "sofa-dependencies.cmake" sofaDependencies_cmake NEWLINE_CONSUME)
 string(REPLACE "\"tinyxml\"" "\"SofaTinyXml\"" sofaDependencies_cmake "${sofaDependencies_cmake}")
 string(REPLACE "add_subdirectory(\"\${SOFA_A" "#add_subdirectory(\"\${SOFA_A" sofaDependencies_cmake "${sofaDependencies_cmake}")
@@ -28,6 +34,10 @@ file(STRINGS "modules/sofa/component/SofaUserInteraction/CMakeLists.txt" CMakeLi
 string(REPLACE "../collision/AddFramePerformer." "#../collision/AddFramePerformer." CMakeLists_txt "${CMakeLists_txt}")
 file(WRITE "modules/sofa/component/SofaUserInteraction/CMakeLists.txt" "${CMakeLists_txt}")
 
+file(STRINGS "cmake/externals.cmake" externals_cmake NEWLINE_CONSUME)
+string(REPLACE "graph " "" externals_cmake "${externals_cmake}")
+file(WRITE "cmake/externals.cmake" "${externals_cmake}")
+
 file(STRINGS "cmake/preBuildConfig.cmake" preBuildConfig_cmake NEWLINE_CONSUME)
 string(REPLACE "DEBUG \"\${SOFA_BIN_DIR}" "DEBUG \"\${SOFA_BIN_DIR}/Debug" preBuildConfig_cmake "${preBuildConfig_cmake}")
 string(REPLACE "RELEASE \"\${SOFA_BIN_DIR}" "RELEASE \"\${SOFA_BIN_DIR}/Release" preBuildConfig_cmake "${preBuildConfig_cmake}")
@@ -42,9 +52,9 @@ file(WRITE "cmake/preBuildConfig.cmake" "${preBuildConfig_cmake}")
 file(APPEND "CMakeLists.txt" "\n\nconfigure_file(SOFAConfig.cmake.in SOFAConfig.cmake @ONLY)")
 
 file(WRITE "SOFAConfig.cmake.in"
-"add_definitions(-DSOFA_NO_OPENGL;-DSOFA_XML_PARSER_TINYXML;-DTIXML_USE_STL;-DMINI_FLOWVR)
+"add_definitions(-DSOFA_NO_OPENGL;-DSOFA_XML_PARSER_TINYXML;-DTIXML_USE_STL;-DMINI_FLOWVR;-DSOFA_HAVE_BOOST)
 
-set(SOFA_INCLUDE_DIRS \"@SOFA_EXTLIBS_DIR@/miniBoost;@SOFA_EXTLIBS_DIR@/miniFlowVR/include;@SOFA_EXTLIBS_DIR@/newmat;@SOFA_EXTLIBS_DIR@/tinyxml;@SOFA_SRC_DIR@/framework;@SOFA_SRC_DIR@/modules\")
+set(SOFA_INCLUDE_DIRS \"@SOFA_EXTLIBS_DIR@/miniFlowVR/include;@SOFA_EXTLIBS_DIR@/newmat;@SOFA_EXTLIBS_DIR@/tinyxml;@SOFA_SRC_DIR@/framework;@SOFA_SRC_DIR@/modules\")
 
 if(WIN32)
   set(SOFA_LIBRARY_DIRS \"@SOFA_LIB_DIR@\")

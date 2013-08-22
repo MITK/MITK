@@ -210,6 +210,14 @@ set(CPP_FILES
   DataManagement/mitkResliceMethodProperty.cpp
   DataManagement/mitkMaterial.cpp
   DataManagement/mitkPointSetShapeProperty.cpp
+  DataManagement/mitkFloatPropertyExtension.cpp
+  DataManagement/mitkIntPropertyExtension.cpp
+  DataManagement/mitkPropertyExtension.cpp
+  DataManagement/mitkPropertyFilter.cpp
+  DataManagement/mitkPropertyAliases.cpp
+  DataManagement/mitkPropertyDescriptions.cpp
+  DataManagement/mitkPropertyExtensions.cpp
+  DataManagement/mitkPropertyFilters.cpp
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp
   Interactions/mitkBindDispatcherInteractor.cpp
@@ -266,6 +274,10 @@ set(CPP_FILES
 
   Interfaces/mitkInteractionEventObserver.cpp
   Interfaces/mitkIShaderRepository.cpp
+  Interfaces/mitkIPropertyAliases.cpp
+  Interfaces/mitkIPropertyDescriptions.cpp
+  Interfaces/mitkIPropertyExtensions.cpp
+  Interfaces/mitkIPropertyFilters.cpp
 
   IO/mitkAbstractFileReader.cpp
   IO/mitkAbstractFileWriter.cpp

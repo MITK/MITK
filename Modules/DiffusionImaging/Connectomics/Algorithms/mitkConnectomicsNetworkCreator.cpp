@@ -43,6 +43,8 @@ mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator()
 , m_LabelsToCoordinatesMap()
 , m_MappingStrategy( EndElementPositionAvoidingWhiteMatter )
 , m_EndPointSearchRadius( 10.0 )
+, m_ZeroLabelInvalid( true )
+, m_AbortConnection( false )
 {
 }
 
@@ -57,6 +59,8 @@ mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator( mitk::Image::Point
 , m_LabelsToCoordinatesMap()
 , m_MappingStrategy( EndElementPositionAvoidingWhiteMatter )
 , m_EndPointSearchRadius( 10.0 )
+, m_ZeroLabelInvalid( true )
+, m_AbortConnection( false )
 {
   mitk::CastToItkImage( segmentation, m_SegmentationItk );
 }
@@ -89,7 +93,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
 {
 
   //empty graph
-  m_ConNetwork->clear();
+  m_ConNetwork = mitk::ConnectomicsNetwork::New();
   m_LabelToVertexMap.clear();
   m_LabelToNodePropertyMap.clear();
   idCounter = 0;
@@ -120,6 +124,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
         ReturnLabelForFiberTract( singleTract, m_MappingStrategy )
         )
         );
+      m_AbortConnection = false;
     }
   }
 
@@ -136,6 +141,12 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
 
 void mitk::ConnectomicsNetworkCreator::AddConnectionToNetwork(ConnectionType newConnection)
 {
+  if( m_AbortConnection )
+  {
+    MITK_DEBUG << "Connection aborted";
+    return;
+  }
+
   VertexType vertexA = newConnection.first;
   VertexType vertexB = newConnection.second;
 
@@ -157,6 +168,12 @@ void mitk::ConnectomicsNetworkCreator::AddConnectionToNetwork(ConnectionType new
 
 mitk::ConnectomicsNetworkCreator::VertexType mitk::ConnectomicsNetworkCreator::ReturnAssociatedVertexForLabel( ImageLabelType label )
 {
+  if( m_ZeroLabelInvalid && ( label == 0 ) )
+  {
+    m_AbortConnection = true;
+    return NULL;
+  }
+
   // if label is not known, create entry
   if( ! ( m_LabelToVertexMap.count( label ) > 0 ) )
   {
@@ -186,10 +203,6 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
     {
       return EndElementPositionLabel( singleTract );
     }
-  case PrecomputeAndDistance:
-    {
-      return PrecomputeVertexLocationsBySegmentation( singleTract );
-    }
   case JustEndPointVerticesNoLabel:
     {
       return JustEndPointVerticesNoLabelTest( singleTract );
@@ -197,6 +210,10 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
   case EndElementPositionAvoidingWhiteMatter:
     {
       return EndElementPositionLabelAvoidingWhiteMatter( singleTract );
+    }
+  case PrecomputeAndDistance:
+    {
+      return PrecomputeVertexLocationsBySegmentation( singleTract );
     }
   }
 
@@ -569,6 +586,8 @@ void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
 
     bool keepOn( true );
 
+    itk::ImageRegion<3> itkRegion = m_SegmentationItk->GetLargestPossibleRegion();
+
     for( int parameter( 0 ) ; keepOn ; parameter++ )
     {
       if( parameter > 1000 )
@@ -582,7 +601,14 @@ void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
         tempIndex.SetElement( index, endPoint.GetElement( index ) + parameter * differenceVector[ index ] );
       }
 
-      tempLabel = m_SegmentationItk->GetPixel( tempIndex );
+      if( itkRegion.IsInside( tempIndex ) )
+      {
+        tempLabel = m_SegmentationItk->GetPixel( tempIndex );
+      }
+      else
+      {
+        tempLabel = -1;
+      }
 
       if( IsNonWhiteMatterLabel( tempLabel ) )
       {

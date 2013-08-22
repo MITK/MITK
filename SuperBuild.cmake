@@ -41,11 +41,11 @@ set(external_projects
   ACVD
   GDCM
   CableSwig
+  OpenCV
   ITK
   Boost
   DCMTK
   CTK
-  OpenCV
   SOFA
   MITKData
   )
@@ -173,7 +173,6 @@ set(mitk_cmake_boolean_args
   MITK_USE_BLUEBERRY
   MITK_USE_CTK
   MITK_USE_DCMTK
-  MITK_DCMTK_BUILD_SHARED_LIBS
   MITK_USE_OpenCV
   MITK_USE_SOFA
   MITK_USE_Python

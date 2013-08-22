@@ -42,6 +42,10 @@ namespace mitk
     virtual void SetPercentageVisible (bool visible) =0;
 
     //##Documentation
+    //## @brief Explicitly reset progress bar.
+    virtual void Reset() =0;
+
+    //##Documentation
     //## @brief Adds steps to totalSteps.
     virtual void AddStepsToDo(unsigned int steps) =0;
 

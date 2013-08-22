@@ -237,8 +237,7 @@ void QmitkMeasurementView::NodeAdded( const mitk::DataNode* node )
       figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
       figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
       figureInteractor->SetDataNode( nonConstNode );
-
-      nonConstNode->SetBoolProperty( "planarfigure.isextendable", true );
+//      nonConstNode->SetBoolProperty( "planarfigure.isextendable", true );
     }
     else
     {
@@ -492,6 +491,7 @@ void QmitkMeasurementView::ActionDrawPathTriggered(bool checked)
   mitk::DataNode::Pointer node = this->AddFigureToDataStorage(figure, qString);
   mitk::BoolProperty::Pointer closedProperty = mitk::BoolProperty::New( false );
   node->SetProperty("ClosedPlanarPolygon", closedProperty);
+  node->SetProperty("planarfigure.isextendable",mitk::BoolProperty::New(true));
 
   MEASUREMENT_DEBUG << "PlanarPath initialized...";
 }
@@ -548,7 +548,8 @@ void QmitkMeasurementView::ActionDrawPolygonTriggered(bool checked)
   mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
   figure->ClosedOn();
   QString qString = QString("Polygon%1").arg(++d->m_PolygonCounter);
-  this->AddFigureToDataStorage(figure, qString);
+  mitk::DataNode::Pointer node = this->AddFigureToDataStorage(figure, qString);
+  node->SetProperty("planarfigure.isextendable",mitk::BoolProperty::New(true));
 
   MEASUREMENT_DEBUG << "PlanarPolygon initialized...";
 }

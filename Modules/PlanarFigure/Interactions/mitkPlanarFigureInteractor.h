@@ -114,11 +114,15 @@ protected:
 
   bool AddInitialPoint(StateMachineAction*, InteractionEvent* interactionEvent);
 
-  bool SwitchToHovering( StateMachineAction*, InteractionEvent* interactionEvent );
+  bool StartHovering( StateMachineAction*, InteractionEvent* interactionEvent );
+
+  bool EndHovering( StateMachineAction*, InteractionEvent* interactionEvent );
 
   bool SetPreviewPointPosition( StateMachineAction*, InteractionEvent* interactionEvent );
 
   bool HidePreviewPoint( StateMachineAction*, InteractionEvent* interactionEvent );
+
+  bool HideControlPoints( StateMachineAction*, InteractionEvent* interactionEvent );
 
   bool RemoveSelectedPoint(StateMachineAction*, InteractionEvent* interactionEvent);
 

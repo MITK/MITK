@@ -25,11 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <usServiceRegistration.h>
-#include <mitkModuleContext.h>
+#include <usModuleContext.h>
 #include <usGetModuleContext.h>
-#include <mitkModule.h>
-#include <mitkModuleResource.h>
-#include <mitkModuleResourceStream.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
 
 namespace mitk
 {
@@ -68,16 +68,16 @@ private:
      /*!
    \brief Create an instance of a RawDataCamBoardDeviceFactory.
    */
-   ToFCameraDevice::Pointer createToFCameraDevice()
+   ToFCameraDevice::Pointer CreateToFCameraDevice()
    {
      ToFCameraPMDRawDataCamBoardDevice::Pointer device = ToFCameraPMDRawDataCamBoardDevice::New();
 
      return device.GetPointer();
    }
 
-   ModuleResource GetIntrinsicsResource()
+   us::ModuleResource GetIntrinsicsResource()
    {
-     Module* module = GetModuleContext()->GetModule();
+     us::Module* module = us::GetModuleContext()->GetModule();
      return module->GetResource("CalibrationFiles/PMDCamBoard_camera.xml");
    }
 

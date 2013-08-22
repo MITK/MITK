@@ -149,7 +149,6 @@ option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
 option(MITK_USE_QT "Use Nokia's Qt library" ${MITK_USE_CTK})
 option(MITK_USE_DCMTK "EXPERIMENTAL, superbuild only: Use DCMTK in MITK" ${MITK_USE_CTK})
-option(MITK_DCMTK_BUILD_SHARED_LIBS "EXPERIMENTAL, superbuild only: build DCMTK as shared libs" OFF)
 option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
 option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
@@ -198,15 +197,35 @@ if(MITK_USE_QT)
 endif()
 
 if(MITK_USE_SOFA)
+  # SOFA requires at least CMake 2.8.8
   set(SOFA_CMAKE_VERSION 2.8.8)
   if(${CMAKE_VERSION} VERSION_LESS ${SOFA_CMAKE_VERSION})
     set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
     message(WARNING "Switched off MITK_USE_SOFA\n  Minimum required CMake version: ${SOFA_CMAKE_VERSION}\n  Installed CMake version: ${CMAKE_VERSION}")
   endif()
+  # SOFA doesn't support Clang
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
     message(WARNING "Switched off MITK_USE_SOFA\n  Clang is not supported, use GCC instead.")
   endif()
+  # SOFA requires boost library
+  if(MITK_USE_SOFA AND NOT MITK_USE_Boost)
+    message("Forcing MITK_USE_Boost to ON because of MITK_USE_SOFA")
+    set(MITK_USE_Boost ON CACHE BOOL "" FORCE)
+  endif()
+  # SOFA requires boost system library
+  list(FIND MITK_USE_Boost_LIBRARIES system _result)
+  if(_result LESS 0)
+    message("Adding 'system' to MITK_USE_Boost_LIBRARIES.")
+    list(APPEND MITK_USE_Boost_LIBRARIES system)
+  endif()
+  # SOFA requires boost thread library
+  list(FIND MITK_USE_Boost_LIBRARIES thread _result)
+  if(_result LESS 0)
+    message("Adding 'thread' to MITK_USE_Boost_LIBRARIES.")
+    list(APPEND MITK_USE_Boost_LIBRARIES thread)
+  endif()
+  set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES} CACHE STRING "" FORCE)
 endif()
 
 # Customize the default pixel types for multiplex macros

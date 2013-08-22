@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>435</width>
-    <height>1588</height>
+    <height>1764</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -123,7 +123,16 @@
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QGridLayout" name="gridLayout_12">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item row="1" column="2">
@@ -466,7 +475,16 @@
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QGridLayout" name="gridLayout_9">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item row="2" column="0">
@@ -478,7 +496,16 @@
                 <enum>QFrame::Raised</enum>
                </property>
                <layout class="QGridLayout" name="gridLayout_21">
-                <property name="margin">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
                  <number>0</number>
                 </property>
                 <item row="1" column="0">
@@ -648,7 +675,16 @@
                 <enum>QFrame::Raised</enum>
                </property>
                <layout class="QGridLayout" name="gridLayout_25">
-                <property name="margin">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
                  <number>0</number>
                 </property>
                 <property name="verticalSpacing">
@@ -717,7 +753,16 @@
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QGridLayout" name="gridLayout_5">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item row="0" column="1">
@@ -790,7 +835,16 @@
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QGridLayout" name="gridLayout_22">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item row="0" column="0">
@@ -834,7 +888,16 @@
           <enum>QFrame::Raised</enum>
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
            <number>0</number>
           </property>
           <item row="0" column="0">
@@ -1012,7 +1075,16 @@
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QGridLayout" name="gridLayout_23">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <property name="horizontalSpacing">
@@ -1298,7 +1370,16 @@
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QGridLayout" name="gridLayout_7">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item row="2" column="2">
@@ -1441,7 +1522,16 @@
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QGridLayout" name="gridLayout_24">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <property name="spacing">
@@ -1460,7 +1550,7 @@
                 <string>Number of gradient directions distributed over the half sphere.</string>
                </property>
                <property name="minimum">
-                <number>0</number>
+                <number>1</number>
                </property>
                <property name="maximum">
                 <number>10000</number>
@@ -1543,7 +1633,17 @@
           <string>Noise and other Artifacts</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
-          <item row="3" column="0">
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="m_AddSpikes">
+            <property name="text">
+             <string>Add Spikes</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
            <widget class="QCheckBox" name="m_AddGhosts">
             <property name="text">
              <string>Add N/2 Ghosts</string>
@@ -1553,7 +1653,7 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="5" column="0">
            <widget class="QFrame" name="m_GhostFrame">
             <property name="enabled">
              <bool>true</bool>
@@ -1568,7 +1668,16 @@
              <property name="horizontalSpacing">
               <number>6</number>
              </property>
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item row="0" column="0">
@@ -1621,7 +1730,16 @@
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QFormLayout" name="formLayout_5">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item row="0" column="0">
@@ -1656,7 +1774,7 @@
             </layout>
            </widget>
           </item>
-          <item row="9" column="0">
+          <item row="10" column="0">
            <widget class="QCheckBox" name="m_AddGibbsRinging">
             <property name="toolTip">
              <string>Add ringing artifacts occuring at strong edges in the image.</string>
@@ -1679,7 +1797,17 @@
             </property>
            </widget>
           </item>
-          <item row="11" column="0">
+          <item row="6" column="0">
+           <widget class="QCheckBox" name="m_AddDistortions">
+            <property name="text">
+             <string>Add Distortions</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="12" column="0">
            <widget class="QFrame" name="m_GibbsRingingFrame">
             <property name="enabled">
              <bool>true</bool>
@@ -1694,7 +1822,16 @@
              <property name="horizontalSpacing">
               <number>6</number>
              </property>
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item row="0" column="0">
@@ -1741,17 +1878,20 @@
             </layout>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QCheckBox" name="m_AddDistortions">
+          <item row="8" column="0">
+           <widget class="QCheckBox" name="m_AddEddy">
+            <property name="toolTip">
+             <string>!!!EXPERIMENTAL!!!</string>
+            </property>
             <property name="text">
-             <string>Add Distortions</string>
+             <string>Add Eddy Current Effects</string>
             </property>
             <property name="checked">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
+          <item row="9" column="0">
            <widget class="QFrame" name="m_EddyFrame">
             <property name="enabled">
              <bool>true</bool>
@@ -1769,7 +1909,16 @@
              <property name="horizontalSpacing">
               <number>6</number>
              </property>
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item row="1" column="0">
@@ -1823,7 +1972,7 @@
             </layout>
            </widget>
           </item>
-          <item row="6" column="0">
+          <item row="7" column="0">
            <widget class="QFrame" name="m_DistortionsFrame">
             <property name="enabled">
              <bool>true</bool>
@@ -1838,7 +1987,16 @@
              <property name="horizontalSpacing">
               <number>6</number>
              </property>
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item row="0" column="0">
@@ -1870,17 +2028,65 @@
             </layout>
            </widget>
           </item>
-          <item row="7" column="0">
-           <widget class="QCheckBox" name="m_AddEddy">
-            <property name="toolTip">
-             <string>!!!EXPERIMENTAL!!!</string>
+          <item row="3" column="0">
+           <widget class="QFrame" name="m_SpikeFrame">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
             </property>
-            <property name="text">
-             <string>Add Eddy Current Effects</string>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
             </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
+            <layout class="QFormLayout" name="formLayout_9">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_NoiseLabel_2">
+               <property name="text">
+                <string>Num. Spikes:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="m_SpikeNumBox">
+               <property name="toolTip">
+                <string>The number of randomly occurring signal spikes.</string>
+               </property>
+               <property name="value">
+                <number>1</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QDoubleSpinBox" name="m_SpikeScaleBox">
+               <property name="toolTip">
+                <string>Spike amplitude relative to the largest signal amplitude of the corresponding k-space slice.</string>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="m_NoiseLabel_4">
+               <property name="text">
+                <string>Scale:</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
@@ -2017,7 +2223,16 @@
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QGridLayout" name="gridLayout_18">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item row="0" column="1">
@@ -2206,7 +2421,9 @@
   <tabstop>m_T2starBox</tabstop>
   <tabstop>m_FiberRadius</tabstop>
   <tabstop>m_InterpolationShrink</tabstop>
+  <tabstop>m_RelaxationBox</tabstop>
   <tabstop>m_EnforcePureFiberVoxelsBox</tabstop>
+  <tabstop>m_VolumeFractionsBox</tabstop>
   <tabstop>m_Compartment1Box</tabstop>
   <tabstop>m_Compartment2Box</tabstop>
   <tabstop>m_Compartment3Box</tabstop>
@@ -2214,11 +2431,19 @@
   <tabstop>m_Comp4FractionBox</tabstop>
   <tabstop>m_AddNoise</tabstop>
   <tabstop>m_NoiseLevel</tabstop>
+  <tabstop>m_AddSpikes</tabstop>
+  <tabstop>m_SpikeNumBox</tabstop>
+  <tabstop>m_SpikeScaleBox</tabstop>
   <tabstop>m_AddGhosts</tabstop>
   <tabstop>m_kOffsetBox</tabstop>
   <tabstop>m_AddDistortions</tabstop>
   <tabstop>m_FrequencyMapBox</tabstop>
+  <tabstop>m_AddEddy</tabstop>
+  <tabstop>m_EddyGradientStrength</tabstop>
   <tabstop>m_AddGibbsRinging</tabstop>
+  <tabstop>m_ImageUpsamplingBox</tabstop>
+  <tabstop>m_SaveParametersButton</tabstop>
+  <tabstop>m_LoadParametersButton</tabstop>
   <tabstop>tabWidget</tabstop>
  </tabstops>
  <resources>

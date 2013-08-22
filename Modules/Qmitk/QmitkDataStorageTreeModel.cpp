@@ -660,7 +660,12 @@ void QmitkDataStorageTreeModel::AdjustLayerProperty()
   int i = vec.size()-1;
   for(std::vector<TreeItem*>::const_iterator it = vec.begin(); it != vec.end(); ++it)
   {
-    (*it)->GetDataNode()->SetIntProperty("layer", i);
+    mitk::DataNode::Pointer dataNode = (*it)->GetDataNode();
+    bool fixedLayer = false;
+
+    if (!(dataNode->GetBoolProperty("fixedLayer", fixedLayer) && fixedLayer))
+      dataNode->SetIntProperty("layer", i);
+
     --i;
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

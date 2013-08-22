@@ -50,6 +50,11 @@ public:
   typedef itk::DataObject::Pointer DataObjectPointer;
 
   /**
+    * @brief Get the output data of the diffusion image source object.
+    */
+  mitkBaseDataSourceGetOutputDeclarations
+
+  /**
    * Allocates a new output object and returns it. Currently the
    * index idx is not evaluated.
    * @param idx the index of the output for which an object should be created
@@ -64,18 +69,6 @@ public:
    * virtual.
    */
   virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
-
-
-  //void SetOutput(OutputType* output);
-
-  //OutputType* GetOutput()
-  //{return Superclass::GetOutput();}
-
-  //OutputType* GetOutput(unsigned int idx);
-
-  //virtual void GraftOutput(OutputType* graft);
-
-  //virtual void GraftNthOutput(unsigned int idx, OutputType *graft);
 
 protected:
   DiffusionImageSource();

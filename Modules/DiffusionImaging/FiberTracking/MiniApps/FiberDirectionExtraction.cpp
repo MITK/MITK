@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberTrackingObjectFactory.h>
 #include <metaCommand.h>
 #include "ctkCommandLineParser.h"
-#include <mitkAny.h>
+#include <usAny.h>
 #include <itkImageFileWriter.h>
 #include <mitkIOUtil.h>
 #include <boost/lexical_cast.hpp>
@@ -37,31 +37,31 @@ int FiberDirectionExtraction(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input tractogram (.fib, vtk ascii file format)", mitk::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::String, "output root", mitk::Any(), false);
+    parser.addArgument("input", "i", ctkCommandLineParser::String, "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
+    parser.addArgument("out", "o", ctkCommandLineParser::String, "output root", us::Any(), false);
     parser.addArgument("mask", "m", ctkCommandLineParser::String, "mask image");
     parser.addArgument("athresh", "a", ctkCommandLineParser::Float, "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
     parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "output optional and intermediate calculation results");
 
-    map<string, mitk::Any> parsedArgs = parser.parseArguments(argc, argv);
+    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
-    string fibFile = mitk::any_cast<string>(parsedArgs["input"]);
+    string fibFile = us::any_cast<string>(parsedArgs["input"]);
 
     string maskImage("");
     if (parsedArgs.count("mask"))
-        maskImage = mitk::any_cast<string>(parsedArgs["mask"]);
+        maskImage = us::any_cast<string>(parsedArgs["mask"]);
 
     float angularThreshold = 25;
     if (parsedArgs.count("athresh"))
-        angularThreshold = mitk::any_cast<float>(parsedArgs["athresh"]);
+        angularThreshold = us::any_cast<float>(parsedArgs["athresh"]);
 
-    string outRoot = mitk::any_cast<string>(parsedArgs["out"]);
+    string outRoot = us::any_cast<string>(parsedArgs["out"]);
 
     bool verbose = false;
     if (parsedArgs.count("verbose"))
-        verbose = mitk::any_cast<bool>(parsedArgs["verbose"]);
+        verbose = us::any_cast<bool>(parsedArgs["verbose"]);
 
 
     try

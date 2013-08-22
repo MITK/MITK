@@ -1657,8 +1657,15 @@ DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
   sorter.SetSortFunction(DicomSeriesReader::GdcmSortFunction);
   try
   {
-    sorter.Sort(unsortedFilenames);
-    return sorter.GetFilenames();
+    if (sorter.Sort(unsortedFilenames))
+    {
+      return sorter.GetFilenames();
+    }
+    else
+    {
+      MITK_WARN << "Sorting error. Leaving series unsorted.";
+      return unsortedFilenames;
+    }
   }
   catch(std::logic_error&)
   {

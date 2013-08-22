@@ -35,7 +35,7 @@ int mitkLabelOverlay3DRendering2DTest(int argc, char* argv[])
   // compare rendering to reference image
   MITK_TEST_BEGIN("mitkLabelOverlay3DRendering2DTest")
 
-  mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+  mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
   mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderingHelper.GetVtkRenderWindow());
   mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();

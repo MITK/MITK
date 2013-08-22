@@ -94,12 +94,12 @@ void mitk::OverlayManager::UpdateOverlays(mitk::BaseRenderer* baseRenderer)
 
 std::string mitk::OverlayManager::RegisterMicroservice()
 {
-  mitk::ServiceProperties properties;
+  us::ServiceProperties properties;
   static int ID = 0;
   std::string id_str = static_cast<std::ostringstream*>( &(std::ostringstream() << ID) )->str();
   properties[mitk::OverlayManager::PROP_ID] = id_str;
-  mitk::ModuleContext* moduleContext = mitk::GetModuleContext();
-  m_Registration = moduleContext->RegisterService<mitk::OverlayManager>(this,properties);
+  us::ModuleContext* moduleContext = us::GetModuleContext();
+  m_Registration = moduleContext->RegisterService<Self>(this,properties);
   ID++;
   return id_str;
 }
@@ -142,16 +142,16 @@ void mitk::OverlayManager::UpdateLayouts(mitk::BaseRenderer *renderer)
 
 mitk::OverlayManager::Pointer mitk::OverlayManager::GetServiceInstance(std::string ID)
 {
-  mitk::ModuleContext* moduleContext = mitk::GetModuleContext();
+  us::ModuleContext* moduleContext = us::GetModuleContext();
   std::string filter = "("+PROP_ID + "="+ID+")";
-  std::list<mitk::ServiceReference> serref = moduleContext->GetServiceReferences("org.mitk.services.OverlayManager",filter);
+  std::vector<us::ServiceReference<Self> > serref = moduleContext->GetServiceReferences<Self>(filter);
   if(serref.size()==0)
   {
     return NULL;
   }
   else
   {
-  mitk::OverlayManager::Pointer om = moduleContext->GetService<mitk::OverlayManager>(serref.front());
+    mitk::OverlayManager::Pointer om = moduleContext->GetService<Self>(serref[0]);
   return om;
   }
 }

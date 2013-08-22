@@ -33,7 +33,7 @@ int mitkTextOverlay3DRendering3DTest(int argc, char* argv[])
   // compare rendering to reference image
   MITK_TEST_BEGIN("mitkTextOverlay3DRendering3DTest")
 
-  mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+  mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
   renderingHelper.SetMapperIDToRender3D();
 

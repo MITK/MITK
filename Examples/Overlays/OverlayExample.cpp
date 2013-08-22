@@ -197,7 +197,7 @@ int main(int argc, char* argv[])
   renderWindow.show();
   renderWindow.resize( 256, 256 );
 
-//  return qtapplication.exec();
+  return qtapplication.exec();
 
   // cleanup: Remove References to DataStorage. This will delete the object
   dataStorage = NULL;

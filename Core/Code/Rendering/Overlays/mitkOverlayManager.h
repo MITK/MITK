@@ -91,7 +91,7 @@ private:
 
   std::string RegisterMicroservice();
 
-  mitk::ServiceRegistration m_Registration;
+  us::ServiceRegistration<Self> m_Registration;
 
   std::string m_id;
 

@@ -416,13 +416,13 @@ bool mitk::Equal(  vtkPolyData* rightHandSide,  vtkPolyData* leftHandSide, mitk:
 
   if( ! mitk::Equal( rightHandSide->GetNumberOfLines(), leftHandSide->GetNumberOfLines(), eps ) )
   {
-      MITK_INFO << "Number of lines not equal";
+    MITK_INFO << "Number of lines not equal";
     noDifferenceFound = false;
   }
 
   if( ! mitk::Equal( rightHandSide->GetNumberOfPolys(), leftHandSide->GetNumberOfPolys(), eps ) )
   {
-      MITK_INFO << "Number of polys not equal";
+    MITK_INFO << "Number of polys not equal";
     noDifferenceFound = false;
   }
 
@@ -467,6 +467,7 @@ bool mitk::Equal(  vtkPolyData* rightHandSide,  vtkPolyData* leftHandSide, mitk:
         if( !pointFound )
         {
           MITK_INFO << "Right hand side point with id " << i << " and coordinates ( "
+            << std::setprecision(12)
             << pointOne[0] << " ; " << pointOne[1] << " ; " << pointOne[2]
             << " ) could not be found in left hand side with epsilon " << eps << ".";
           noDifferenceFound = false;
@@ -498,7 +499,7 @@ bool mitk::Equal( mitk::Surface* rightHandSide, mitk::Surface* leftHandSide, mit
 
   if( ! mitk::Equal( rightHandSide->GetSizeOfPolyDataSeries(), leftHandSide->GetSizeOfPolyDataSeries(), eps ) )
   {
-    MITK_INFO << "Size of PolyData series not equal";
+    MITK_INFO << "Size of PolyData series not equal.";
     noDifferenceFound = false;
   }
 
@@ -518,7 +519,7 @@ bool mitk::Equal( mitk::Surface* rightHandSide, mitk::Surface* leftHandSide, mit
   {
     if( ! mitk::Equal( rightHandSide->GetVtkPolyData( i ), leftHandSide->GetVtkPolyData( i ), eps ) )
     {
-      MITK_INFO << "Poly datas not equal";
+      MITK_INFO << "Poly datas not equal.";
       noDifferenceFound = false;
     }
   }

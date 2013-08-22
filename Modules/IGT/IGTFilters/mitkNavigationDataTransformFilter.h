@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkNavigationDataToNavigationDataFilter.h>
 
-#include <itkQuaternionRigidTransform.h>
-#include <itkTransform.h>
 #include <itkVersorRigid3DTransform.h>
 
 
@@ -38,26 +36,42 @@ namespace mitk {
 
   public:
 
+    // The epsilon ITK uses to check the orthogonality of rotation matrices
+    // is too small for float precision so we must use double precision to
+    // compose the transforms and convert back to float (mitk::ScalarType) at
+    // the end
     typedef itk::VersorRigid3DTransform< double > TransformType;
 
     mitkClassMacro(NavigationDataTransformFilter, NavigationDataToNavigationDataFilter);
     itkNewMacro(Self);
 
     /**Documentation
-    *\brief Set the rigid transform used to transform the input navigation data.
-    *
+    * \brief Set the rigid transform used to transform the input navigation data.
     */
-    void SetRigid3DTransform(TransformType::Pointer transform);
+    itkSetObjectMacro(Rigid3DTransform, TransformType);
+    itkGetConstObjectMacro(Rigid3DTransform, TransformType);
 
+    /**Documentation
+    * \brief Set transform composition order
+    *
+    * If precompose is true, then transform is precomposed with the input
+    * NavigationData transform; that is, the resulting transformation consists
+    * of first applying transform, then applying the input NavigationData
+    * transformation.
+    *
+    * If precompose is false or omitted, then transform is post-composed with
+    * the input NavigationData transform; that is the resulting transformation
+    * consists of first applying the NavigationData transformation, followed by
+    * transform.
+    */
+    itkSetMacro(Precompose, bool);
+    itkGetMacro(Precompose, bool);
+    itkBooleanMacro(Precompose);
 
   protected:
 
     NavigationDataTransformFilter();
     virtual ~NavigationDataTransformFilter();
-
-    itk::QuaternionRigidTransform<double>::Pointer m_QuatOrgRigidTransform; ///< transform needed to rotate orientation
-    itk::QuaternionRigidTransform<double>::Pointer m_QuatTmpTransform;      ///< further transform needed to rotate orientation
-
 
     /**Documentation
     * \brief filter execute method
@@ -66,7 +80,8 @@ namespace mitk {
     */
     virtual void GenerateData();
 
-    TransformType::Pointer m_Transform; ///< transform which will be applied on navigation data(s)
+    TransformType::Pointer m_Rigid3DTransform; ///< transform which will be applied on navigation data(s)
+    bool m_Precompose;
   };
 } // namespace mitk
 

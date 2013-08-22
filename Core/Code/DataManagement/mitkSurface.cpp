@@ -385,54 +385,7 @@ void mitk::Surface::PrintSelf(std::ostream& os, itk::Indent indent) const
   }
 }
 
-bool Equal( mitk::Surface* rightHandSide, mitk::Surface* leftHandSide, mitk::ScalarType eps )
-{
-  bool noDifferenceFound = true;
-
-
-  if( rightHandSide == NULL )
-  {
-    MITK_INFO << "[Equal( mitk::surface*, mitk::surface* )] rightHandSide NULL.";
-    return false;
-  }
-
-  if( leftHandSide == NULL )
-  {
-    MITK_INFO << "[Equal( mitk::surface*, mitk::surface* )] leftHandSide NULL.";
-    return false;
-  }
-
-  MITK_INFO << "Checking size of PolyData series for equality";
-  if( ! mitk::Equal( rightHandSide->GetSizeOfPolyDataSeries(), leftHandSide->GetSizeOfPolyDataSeries(), eps ) )
-  {
-    noDifferenceFound = false;
-  }
-
-  MITK_INFO << "Checking time sliced geometries for equality";
-  if( ! mitk::Equal( rightHandSide->GetTimeSlicedGeometry(), leftHandSide->GetTimeSlicedGeometry(), eps ) )
-  {
-    noDifferenceFound = false;
-  }
-
-  MITK_INFO << "Checking largest possible region for equality";
-  if( ! mitk::Equal( rightHandSide->GetLargestPossibleRegion(), leftHandSide->GetLargestPossibleRegion(), eps ) )
-  {
-    noDifferenceFound = false;
-  }
-
-  MITK_INFO << "Checking poly datas for equality";
-  for( unsigned int i( 0 ); i < rightHandSide->GetSizeOfPolyDataSeries(); i++ )
-  {
-    if( ! mitk::Equal( rightHandSide->GetVtkPolyData( i ), leftHandSide->GetVtkPolyData( i ), eps ) )
-    {
-      noDifferenceFound = false;
-    }
-  }
-
-  return noDifferenceFound;
-}
-
-bool Equal( vtkPolyData* rightHandSide, vtkPolyData* leftHandSide, mitk::ScalarType eps = mitk::eps)
+bool mitk::Equal(  vtkPolyData* rightHandSide,  vtkPolyData* leftHandSide, mitk::ScalarType eps )
 {
   bool noDifferenceFound = true;
 
@@ -480,6 +433,53 @@ bool Equal( vtkPolyData* rightHandSide, vtkPolyData* leftHandSide, mitk::ScalarT
   }
 
   MITK_INFO << "Checking whether all coordinates are present";
+
+  return noDifferenceFound;
+}
+
+bool mitk::Equal( mitk::Surface* rightHandSide, mitk::Surface* leftHandSide, mitk::ScalarType eps )
+{
+  bool noDifferenceFound = true;
+
+
+  if( rightHandSide == NULL )
+  {
+    MITK_INFO << "[Equal( mitk::surface*, mitk::surface* )] rightHandSide NULL.";
+    return false;
+  }
+
+  if( leftHandSide == NULL )
+  {
+    MITK_INFO << "[Equal( mitk::surface*, mitk::surface* )] leftHandSide NULL.";
+    return false;
+  }
+
+  MITK_INFO << "Checking size of PolyData series for equality";
+  if( ! mitk::Equal( rightHandSide->GetSizeOfPolyDataSeries(), leftHandSide->GetSizeOfPolyDataSeries(), eps ) )
+  {
+    noDifferenceFound = false;
+  }
+
+  MITK_INFO << "Checking time sliced geometries for equality";
+  if( ! mitk::Equal( rightHandSide->GetTimeSlicedGeometry(), leftHandSide->GetTimeSlicedGeometry(), eps ) )
+  {
+    noDifferenceFound = false;
+  }
+
+  //MITK_INFO << "Checking largest possible region for equality";
+  //if( ! mitk::Equal( rightHandSide->GetLargestPossibleRegion(), leftHandSide->GetLargestPossibleRegion(), eps ) )
+  //{
+  //  noDifferenceFound = false;
+  //}
+
+  MITK_INFO << "Checking poly datas for equality";
+  for( unsigned int i( 0 ); i < rightHandSide->GetSizeOfPolyDataSeries(); i++ )
+  {
+    if( ! mitk::Equal( rightHandSide->GetVtkPolyData( i ), leftHandSide->GetVtkPolyData( i ), eps ) )
+    {
+      noDifferenceFound = false;
+    }
+  }
 
   return noDifferenceFound;
 }

@@ -43,7 +43,7 @@ public:
   void SetActiveLabel(int);
 
   /// \brief Set the LabelSetImage the widget should listen to.
-  void SetActiveLabelSetImage(mitk::LabelSetImage*);
+  //void SetActiveLabelSetImage(mitk::LabelSetImage*);
 
   void SetPreferences( berry::IPreferences::Pointer prefs );
 

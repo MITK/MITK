@@ -74,8 +74,8 @@ public:
 
 protected slots:
 
-  void OnPatientComboBoxSelectionChanged(const mitk::DataNode* node);
-  void OnSegmentationComboBoxSelectionChanged(const mitk::DataNode* node);
+  void OnReferenceSelectionChanged(const mitk::DataNode* node);
+  void OnSegmentationSelectionChanged(const mitk::DataNode* node);
 
   void OnSurfaceStamp();
 
@@ -109,9 +109,6 @@ protected:
   //void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);
   mitk::DataNode::Pointer FindFirstRegularImage( std::vector<mitk::DataNode*> nodes );
   mitk::DataNode::Pointer FindFirstSegmentation( std::vector<mitk::DataNode*> nodes );
-
-  // propagate BlueBerry selection to ToolManager for manual segmentation
-  void SetToolManagerSelection(mitk::DataNode* referenceData, mitk::DataNode* workingData);
 
   // checks if given render window aligns with the slices of given image
   bool IsRenderWindowAligned(QmitkRenderWindow* renderWindow, mitk::Image* image);
@@ -158,7 +155,7 @@ protected:
 
   bool m_AutoSelectionEnabled;
 
-  mitk::NodePredicateAnd::Pointer m_ImagePredicate;
+  mitk::NodePredicateAnd::Pointer m_ReferencePredicate;
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
 };
 

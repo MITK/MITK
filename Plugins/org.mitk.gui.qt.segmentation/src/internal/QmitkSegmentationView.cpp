@@ -77,10 +77,10 @@ QmitkSegmentationView::QmitkSegmentationView()
   validImages->AddPredicate(isDti);
   validImages->AddPredicate(isQbi);
 
-  m_ImagePredicate = mitk::NodePredicateAnd::New();
-  m_ImagePredicate->AddPredicate(validImages);
-  m_ImagePredicate->AddPredicate(mitk::NodePredicateNot::New( m_SegmentationPredicate));
-  m_ImagePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  m_ReferencePredicate = mitk::NodePredicateAnd::New();
+  m_ReferencePredicate->AddPredicate(validImages);
+  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New( m_SegmentationPredicate));
+  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()
@@ -97,8 +97,8 @@ void QmitkSegmentationView::Visible()
     m_Controls->m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(260);
     m_Controls->m_ManualToolSelectionBox3D->setEnabled( true );
 
-    this->OnPatientComboBoxSelectionChanged(m_Controls->patImageSelector->GetSelectedNode());
-    this->OnSegmentationComboBoxSelectionChanged(m_Controls->segImageSelector->GetSelectedNode());
+//    this->OnPatientComboBoxSelectionChanged(m_Controls->patImageSelector->GetSelectedNode());
+//    this->OnSegmentationComboBoxSelectionChanged(m_Controls->segImageSelector->GetSelectedNode());
   }
 }
 
@@ -204,37 +204,26 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
   }
 }
 
-void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataNode* node )
+void QmitkSegmentationView::OnReferenceSelectionChanged( const mitk::DataNode* node )
 {
   if( node != NULL )
   {
-    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
+    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+    assert(toolManager);
+
+    toolManager->ActivateTool(-1);
     this->UpdateWarningLabel("");
     mitk::DataNode* refNode = const_cast<mitk::DataNode*>(node);
-
     refNode->SetVisibility(true);
+    toolManager->SetReferenceData(refNode);
 
-    mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_ImagePredicate);
-    for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherSegmentations->begin(); iter != otherSegmentations->end(); ++iter)
+    mitk::DataStorage::SetOfObjects::ConstPointer others = this->GetDataStorage()->GetSubset(m_ReferencePredicate);
+    for(mitk::DataStorage::SetOfObjects::const_iterator iter = others->begin(); iter != others->end(); ++iter)
     {
-        mitk::DataNode* _otherSegNode = *iter;
-        if (_otherSegNode != refNode)
-            _otherSegNode->SetVisibility(false);
+      mitk::DataNode* _other = *iter;
+      if (_other != refNode)
+          _other->SetVisibility(false);
     }
-
-    mitk::DataNode* segNode = m_Controls->segImageSelector->GetSelectedNode();
-
-    if (segNode)
-    {
-      this->SetToolManagerSelection(refNode, segNode);
-      m_Controls->m_SlicesInterpolator->setEnabled( true );
-    }
-    else
-    {
-      this->SetToolManagerSelection(refNode, NULL);
-      this->UpdateWarningLabel("Create a segmentation");
-    }
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   else
   {
@@ -242,41 +231,29 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
   }
 }
 
-void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::DataNode *node)
+void QmitkSegmentationView::OnSegmentationSelectionChanged(const mitk::DataNode *node)
 {
-  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
-
   if( node != NULL )
   {
+      mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+      assert(toolManager);
+
       mitk::DataNode* segNode = const_cast<mitk::DataNode*>(node);
       segNode->SetVisibility(true);
+      toolManager->SetWorkingData(segNode);
+      m_Controls->m_SlicesInterpolator->setEnabled( true );
 
-      mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
-      for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherSegmentations->begin(); iter != otherSegmentations->end(); ++iter)
+      mitk::DataStorage::SetOfObjects::ConstPointer others = this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
+      for(mitk::DataStorage::SetOfObjects::const_iterator iter = others->begin(); iter != others->end(); ++iter)
       {
-          mitk::DataNode* _otherSegNode = *iter;
-           if (_otherSegNode != segNode)
-              _otherSegNode->SetVisibility(false);
-      }
-
-      mitk::DataNode* refNode = m_Controls->patImageSelector->GetSelectedNode();
-
-      if (!refNode)
-      {
-        this->SetToolManagerSelection(NULL, segNode);
-      }
-      else
-      {
-        this->UpdateWarningLabel("");
-        segNode->SetVisibility(true);
-        this->SetToolManagerSelection(refNode, segNode);
-        m_Controls->m_SlicesInterpolator->setEnabled( true );
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        mitk::DataNode* _other = *iter;
+        if (_other != segNode)
+          _other->SetVisibility(false);
       }
   }
   else
   {
-    this->SetToolManagerSelection(NULL, NULL);
+    m_Controls->m_SlicesInterpolator->setEnabled( false );
     this->UpdateWarningLabel("Create a segmentation");
   }
 }
@@ -397,26 +374,6 @@ void QmitkSegmentationView::OnTabWidgetChanged(int id)
   }
 }
 
-
-void QmitkSegmentationView::SetToolManagerSelection(mitk::DataNode* referenceData, mitk::DataNode* workingData)
-{
-  // called as a result of new BlueBerry selections
-  //   tells the ToolManager for manual segmentation about new selections
-  //   updates GUI information about what the user should select
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->SetReferenceData(referenceData);
-  toolManager->SetWorkingData(workingData);
-
-  if (workingData)
-  {
-      mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>( workingData->GetData());
-      m_Controls->m_LabelSetWidget->SetActiveLabelSetImage(lsImage);
-  }
-  else
-      m_Controls->m_LabelSetWidget->SetActiveLabelSetImage(NULL);
-}
-
-
 bool QmitkSegmentationView::CheckForSameGeometry(const mitk::DataNode *node1, const mitk::DataNode *node2) const
 {
   bool isSameGeometry(true);
@@ -461,7 +418,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->setupUi(parent);
 
   m_Controls->patImageSelector->SetDataStorage(this->GetDefaultDataStorage());
-  m_Controls->patImageSelector->SetPredicate(m_ImagePredicate);
+  m_Controls->patImageSelector->SetPredicate(m_ReferencePredicate);
 
   this->UpdateWarningLabel("Please load an image");
 
@@ -509,9 +466,9 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   // create signal/slot connections
 
   connect( m_Controls->patImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
-       this, SLOT( OnPatientComboBoxSelectionChanged( const mitk::DataNode* ) ) );
+       this, SLOT( OnReferenceSelectionChanged( const mitk::DataNode* ) ) );
   connect( m_Controls->segImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
-       this, SLOT( OnSegmentationComboBoxSelectionChanged( const mitk::DataNode* ) ) );
+       this, SLOT( OnSegmentationSelectionChanged( const mitk::DataNode* ) ) );
 
   connect( m_Controls->m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
 

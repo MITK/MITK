@@ -42,8 +42,10 @@ namespace mitk {
   public:
     mitkClassMacro(InternalTrackingTool, TrackingTool);
 
-    virtual void GetPosition(mitk::Point3D& position) const;    ///< returns the current position of the tool as an array of three floats (in the tracking device coordinate system)
-    virtual void GetOrientation(mitk::Quaternion& orientation) const;  ///< returns the current orientation of the tool as a quaternion (in the tracking device coordinate system)
+    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+
+    virtual void GetPosition(Point3D& position) const;    ///< returns the current position of the tool as an array of three floats (in the tracking device coordinate system)
+    virtual void GetOrientation(Quaternion& orientation) const;  ///< returns the current orientation of the tool as a quaternion (in the tracking device coordinate system)
     virtual bool Enable();                                      ///< enablea the tool, so that it will be tracked. Returns true if enabling was successfull
     virtual bool Disable();                                     ///< disables the tool, so that it will not be tracked anymore. Returns true if disabling was successfull
     virtual bool IsEnabled() const;                             ///< returns whether the tool is enabled or disabled
@@ -51,12 +53,12 @@ namespace mitk {
     virtual float GetTrackingError() const;                     ///< return one value that corresponds to the overall tracking error. The dimension of this value is specific to each tracking device
     virtual void SetToolName(const std::string _arg);           ///< Sets the name of the tool
     virtual void SetToolName(const char* _arg);                 ///< Sets the name of the tool
-    virtual void SetPosition(mitk::Point3D position);           ///< sets the position
-    virtual void SetOrientation(mitk::Quaternion orientation);  ///< sets the orientation as a quaternion
+    virtual void SetPosition(Point3D position, ScalarType eps=0.0);           ///< sets the position
+    virtual void SetOrientation(Quaternion orientation, ScalarType eps=0.0);  ///< sets the orientation as a quaternion
     virtual void SetTrackingError(float error);                 ///< sets the tracking error
     virtual void SetDataValid(bool _arg);                       ///< sets if the tracking data (position & Orientation) is valid
     virtual void SetErrorMessage(const char* _arg);             ///< sets the error message
-    virtual void SetToolTip(mitk::Point3D toolTipPosition, mitk::Quaternion orientation = mitk::Quaternion(0,0,0,1)); ///< defines a tool tip for this tool in tool coordinates. GetPosition() and GetOrientation() return the data of the tool tip if it is defined. By default no tooltip is defined.
+    virtual void SetToolTip(Point3D toolTipPosition, Quaternion orientation = Quaternion(0,0,0,1), ScalarType eps=0.0); ///< defines a tool tip for this tool in tool coordinates. GetPosition() and GetOrientation() return the data of the tool tip if it is defined. By default no tooltip is defined.
 
   protected:
     itkNewMacro(Self);

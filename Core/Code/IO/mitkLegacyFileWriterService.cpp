@@ -53,12 +53,8 @@ void mitk::LegacyFileWriterService::Write(const BaseData* /*data*/, std::ostream
   //return 0;
 }
 
-bool mitk::LegacyFileWriterService::CanWrite(const BaseData* data, const std::string& path) const
+bool mitk::LegacyFileWriterService::CanWrite(const BaseData* data) const
 {
-  // Default implementation only checks if extension and basedatatype are correct
-  std::string pathEnd = path.substr( path.length() - m_Extension.length(), m_Extension.length() );
-  if ( !(m_Extension == pathEnd)) return false;
-
   std::string externalDataType = data->GetNameOfClass();
   return (externalDataType == m_BasedataType);
 }

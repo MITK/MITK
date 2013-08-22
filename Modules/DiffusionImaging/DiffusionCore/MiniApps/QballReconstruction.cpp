@@ -42,6 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageWriter.h"
 #include "itkAnalyticalDiffusionQballReconstructionImageFilter.h"
 #include <boost/lexical_cast.hpp>
+#include <mitkNrrdQBallImageWriter.h>
 
 using namespace mitk;
 /**
@@ -50,13 +51,13 @@ using namespace mitk;
 int QballReconstruction(int argc, char* argv[])
 {
 
-    if ( argc!=5
+    if ( argc!=6
          )
     {
         std::cout << std::endl;
         std::cout << "Perform QBall reconstruction on an dwi file" << std::endl;
         std::cout << std::endl;
-        std::cout << "usage: " << argv[0] << " <in-file> <lambda> <baseline-threshold> <out-file> " << std::endl;
+        std::cout << "usage: " << argv[0] << " " << argv[1] << " <in-file> <lambda> <baseline-threshold> <out-file> " << std::endl;
         std::cout << std::endl;
         return EXIT_FAILURE;
     }
@@ -67,7 +68,7 @@ int QballReconstruction(int argc, char* argv[])
 
         MITK_INFO << "Loading image ...";
         const std::string s1="", s2="";
-        std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( argv[1], s1, s2, false );
+        std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( argv[2], s1, s2, false );
         DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(infile.at(0).GetPointer());
 
         typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
@@ -77,8 +78,8 @@ int QballReconstruction(int argc, char* argv[])
         FilterType::Pointer filter = FilterType::New();
         filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
         filter->SetBValue(dwi->GetB_Value());
-        filter->SetThreshold( boost::lexical_cast<int>(argv[3]) );
-        filter->SetLambda(boost::lexical_cast<float>(argv[2]));
+        filter->SetThreshold( boost::lexical_cast<int>(argv[4]) );
+        filter->SetLambda(boost::lexical_cast<float>(argv[3]));
         filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
         filter->Update();
 
@@ -86,16 +87,12 @@ int QballReconstruction(int argc, char* argv[])
         image->InitializeByItk( filter->GetOutput() );
         image->SetVolume( filter->GetOutput()->GetBufferPointer() );
 
-        std::string outfilename = argv[4];
+        std::string outfilename = argv[5];
         MITK_INFO << "writing image " << outfilename;
-        mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
-        for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-        {
-            if ( (*it)->CanWriteBaseDataType(image.GetPointer()) ) {
-                (*it)->SetFileName( outfilename.c_str() );
-                (*it)->DoWrite( image.GetPointer() );
-            }
-        }
+        mitk::NrrdQBallImageWriter::Pointer writer = mitk::NrrdQBallImageWriter::New();
+        writer->SetInput(image.GetPointer());
+        writer->SetFileName(outfilename.c_str());
+        writer->Update();
     }
     catch ( itk::ExceptionObject &err)
     {

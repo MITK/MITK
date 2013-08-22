@@ -44,13 +44,13 @@ class Point : public itk::Point<TCoordRep, NPointDimension>
 
 public:
      /** Default constructor has nothing to do. */
-  mitk::Point<TCoordRep, NPointDimension>() {}
+  Point<TCoordRep, NPointDimension>() {}
 
   /** Pass-through constructors for the Array base class. */
-  mitk::Point<TCoordRep, NPointDimension>(const mitk::Point<TCoordRep, NPointDimension>& r) : itk::Point<TCoordRep, NPointDimension>(r) {}
-  mitk::Point<TCoordRep, NPointDimension>(const ValueType r[NPointDimension]):itk::Point<TCoordRep, NPointDimension>(r) {}
-  mitk::Point<TCoordRep, NPointDimension>(const ValueType & v):itk::Point<TCoordRep, NPointDimension>(v) {}
-  mitk::Point<TCoordRep, NPointDimension>(const itk::Point<TCoordRep, NPointDimension> r) : itk::Point<TCoordRep, NPointDimension>(r) {}
+  Point<TCoordRep, NPointDimension>(const mitk::Point<TCoordRep, NPointDimension>& r) : itk::Point<TCoordRep, NPointDimension>(r) {}
+  Point<TCoordRep, NPointDimension>(const TCoordRep r[NPointDimension]):itk::Point<TCoordRep, NPointDimension>(r) {}
+  Point<TCoordRep, NPointDimension>(const TCoordRep & v):itk::Point<TCoordRep, NPointDimension>(v) {}
+  Point<TCoordRep, NPointDimension>(const itk::Point<TCoordRep, NPointDimension> r) : itk::Point<TCoordRep, NPointDimension>(r) {}
 
   /**
   * Warning: Array must have same dimension as Point
@@ -64,13 +64,13 @@ public:
   }
 };
 
-typedef mitk::Point<ScalarType,2> Point2D;
-typedef mitk::Point<ScalarType,3> Point3D;
-typedef mitk::Point<ScalarType,4> Point4D;
+typedef Point<ScalarType,2> Point2D;
+typedef Point<ScalarType,3> Point3D;
+typedef Point<ScalarType,4> Point4D;
 
-typedef mitk::Point<int,2> Point2I;
-typedef mitk::Point<int,3> Point3I;
-typedef mitk::Point<int,4> Point4I;
+typedef Point<int,2> Point2I;
+typedef Point<int,3> Point3I;
+typedef Point<int,4> Point4I;
 
 } // namespace mitk
 

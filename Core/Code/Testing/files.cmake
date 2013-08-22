@@ -46,6 +46,7 @@ set(MODULE_TESTS
   ##mitkStateMachineContainerTest.cpp ## rewrite test, indirect since no longer exported Bug 14529
   mitkStateTest.cpp
   mitkSurfaceTest.cpp
+  mitkSurfaceEqualTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp
   mitkTimeSlicedGeometryTest.cpp
   mitkTransitionTest.cpp

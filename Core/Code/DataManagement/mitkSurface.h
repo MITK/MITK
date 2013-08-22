@@ -80,7 +80,7 @@ namespace mitk
   * \brief Compare two surfaces for equality, returns true if found equal
   *
   */
-  bool Equal( const mitk::Surface* rightHandSide, const mitk::Surface* leftHandSide, ScalarType eps = mitk::eps);
+  bool Equal( const mitk::Surface* rightHandSide, const mitk::Surface* leftHandSide, mitk::ScalarType eps = mitk::eps);
 
   /**
   * \brief Compare two vtk PolyDatas for equality, returns true if found equal
@@ -89,7 +89,7 @@ namespace mitk
   * all the two poly datas have the same number of points with the same coordinates. It is not checked whether
   * all points are correctly connected.
   */
-  bool Equal( const vtkPolyData* rightHandSide, const vtkPolyData* leftHandSide, ScalarType eps = mitk::eps);
+  bool Equal( const vtkPolyData* rightHandSide, const vtkPolyData* leftHandSide, mitk::ScalarType eps = mitk::eps);
 
 }
 

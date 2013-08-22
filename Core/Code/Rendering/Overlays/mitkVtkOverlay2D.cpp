@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVtkOverlay2D.h"
 #include <vtkCoordinate.h>
+#include <vtkActor2D.h>
+#include <vtkProperty2D.h>
 
 mitk::VtkOverlay2D::VtkOverlay2D()
 {

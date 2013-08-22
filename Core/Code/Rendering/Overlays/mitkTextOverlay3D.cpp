@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTextProperty.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
+#include <vtkFollower.h>
+#include <vtkVectorText.h>
+#include <vtkTextActor3D.h>
 
 
 mitk::TextOverlay3D::TextOverlay3D()

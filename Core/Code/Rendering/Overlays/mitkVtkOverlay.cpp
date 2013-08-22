@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVtkOverlay.h"
 #include <vtkProperty.h>
+#include <vtkProp.h>
 
 mitk::VtkOverlay::VtkOverlay()
 {

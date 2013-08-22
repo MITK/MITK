@@ -18,14 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define VTKOVERLAY2D_H
 
 #include <MitkExports.h>
-#include <itkObject.h>
 #include <mitkCommon.h>
 #include "mitkVtkOverlay.h"
-#include "mitkBaseRenderer.h"
 #include <vtkSmartPointer.h>
-#include <vtkActor2D.h>
-#include <vtkProperty2D.h>
 
+class vtkActor2D;
+class vtkProperty2D;
 
 namespace mitk {
 

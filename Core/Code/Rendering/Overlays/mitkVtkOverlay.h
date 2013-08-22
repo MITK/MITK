@@ -18,13 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define VTKOVERLAY_H
 
 #include <MitkExports.h>
-#include <itkObject.h>
 #include <mitkCommon.h>
 #include "mitkOverlay.h"
-#include "mitkBaseRenderer.h"
 #include <vtkSmartPointer.h>
-#include <vtkProp.h>
 
+class vtkProp;
 
 namespace mitk {
 

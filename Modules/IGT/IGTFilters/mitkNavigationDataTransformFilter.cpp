@@ -20,30 +20,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::NavigationDataTransformFilter::NavigationDataTransformFilter()
 : mitk::NavigationDataToNavigationDataFilter()
 {
-  m_Transform = NULL;
-
-  //transform to rotate orientation
-  m_QuatOrgRigidTransform = itk::QuaternionRigidTransform<double>::New();
-  m_QuatTmpTransform = itk::QuaternionRigidTransform<double>::New();
+  m_Rigid3DTransform = NULL;
+  m_Precompose = false;
 }
 
 
 mitk::NavigationDataTransformFilter::~NavigationDataTransformFilter()
 {
-  m_Transform = NULL;
-}
-
-void mitk::NavigationDataTransformFilter::SetRigid3DTransform( TransformType::Pointer transform )
-{
-  m_Transform = transform;
-  this->Modified();
+  m_Rigid3DTransform = NULL;
 }
 
 void mitk::NavigationDataTransformFilter::GenerateData()
 {
 
   // only update data if m_Transform was set
-  if(m_Transform.IsNull())
+  if(m_Rigid3DTransform.IsNull())
   {
     itkExceptionMacro("Invalid parameter: Transform was not set!  Use SetRigid3DTransform() before updating the filter.");
     return;
@@ -66,40 +57,37 @@ void mitk::NavigationDataTransformFilter::GenerateData()
         continue;
       }
 
-      mitk::NavigationData::PositionType tempCoordinateIn, tempCoordinateOut;
-      tempCoordinateIn = input->GetPosition();
+      // Get input position/orientation as float numbers
+      const NavigationData::PositionType    pInF = input->GetPosition();
+      const NavigationData::OrientationType oInF = input->GetOrientation();
 
-      itk::Point<float,3> itkPointIn, itkPointOut;
-      itkPointIn[0] = tempCoordinateIn[0];
-      itkPointIn[1] = tempCoordinateIn[1];
-      itkPointIn[2] = tempCoordinateIn[2];
+      // Cast the input NavigationData to double precision
+      TransformType::OutputVectorType pInD;
+      FillVector3D(pInD, pInF[0], pInF[1], pInF[2]);
+      TransformType::VersorType oInD;
+      oInD.Set(oInF.x(), oInF.y(), oInF.z(), oInF.r());
 
-      //do the transform
-      itkPointOut = m_Transform->TransformPoint( itkPointIn );
+      TransformType::Pointer composedTransform = TransformType::New();
+      // SetRotation+SetOffset defines the Tip-to-World coordinate frame
+      // transformation ("World" is used in the generic sense)
+      composedTransform->SetRotation(oInD);
+      composedTransform->SetOffset(pInD);
+      // If !m_Precompose: The resulting transform is Tip-to-UserWorld
+      // If m_Precompose:  The resulting transform is UserTip-to-World
+      composedTransform->Compose(m_Rigid3DTransform, m_Precompose);
 
-      tempCoordinateOut[0] = itkPointOut[0];
-      tempCoordinateOut[1] = itkPointOut[1];
-      tempCoordinateOut[2] = itkPointOut[2];
+      // Transformed position/orientation as double numbers
+      const TransformType::OutputVectorType  pOutD = composedTransform->GetOffset();
+      const TransformType::VersorType        oOutD = composedTransform->GetVersor();
 
-      output->Graft(input); // First, copy all information from input to output
-      output->SetPosition(tempCoordinateOut);// Then change the member(s): add new position of navigation data after tranformation
+      // Cast to transformed NavigationData back to float precision
+      NavigationData::OrientationType oOutF(oOutD.GetX(), oOutD.GetY(), oOutD.GetZ(), oOutD.GetW());
+      NavigationData::PositionType pOutF;
+      FillVector3D(pOutF, pOutD[0], pOutD[1], pOutD[2]);
+
+      output->SetOrientation(oOutF);
+      output->SetPosition(pOutF);
       output->SetDataValid(true); // operation was successful, therefore data of output is valid.
-
-      //---transform orientation
-      NavigationData::OrientationType  quatIn = input->GetOrientation();
-      vnl_quaternion<double> const vnlQuatIn(quatIn.x(), quatIn.y(), quatIn.z(), quatIn.r());
-
-      TransformType::MatrixType rotMatrixD = m_Transform->GetMatrix();
-
-      m_QuatOrgRigidTransform->SetMatrix(rotMatrixD);//SetRotation(vnlQ);
-      m_QuatTmpTransform->SetRotation(vnlQuatIn);
-      m_QuatTmpTransform->Compose(m_QuatOrgRigidTransform,false);
-      vnl_quaternion<double> vnlQuatOut = m_QuatTmpTransform->GetRotation();
-      NavigationData::OrientationType quatOut(vnlQuatOut[0], vnlQuatOut[1], vnlQuatOut[2], vnlQuatOut[3]);
-
-      output->SetOrientation(quatOut);
-
-
     }
   }
 }

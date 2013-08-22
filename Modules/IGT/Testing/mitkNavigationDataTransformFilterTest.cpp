@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 
+#include <itkQuaternionRigidTransform.h>
+
 #include <itkTransform.h>
 #include <itkVector.h>
 #include <iostream>
@@ -58,6 +60,17 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   nd1->SetPositionAccuracy(initialError);
   nd1->SetDataValid(initialValid);
 
+  MITK_TEST_CONDITION(myFilter->GetPrecompose() == false, "Testing default Precompose mode");
+
+  myFilter->SetPrecompose(true);
+  MITK_TEST_CONDITION(myFilter->GetPrecompose() == true, "Testing Set-/GetPrecompose, part 1");
+
+  myFilter->PrecomposeOff();
+  MITK_TEST_CONDITION(myFilter->GetPrecompose() == false, "Testing PrecomposeOff");
+
+  myFilter->PrecomposeOn();
+  MITK_TEST_CONDITION(myFilter->GetPrecompose() == true, "Testing PrecomposeOn");
+
   myFilter->SetInput(nd1);
   MITK_TEST_CONDITION(myFilter->GetInput() == nd1, "Testing Set-/GetInput()");
 
@@ -74,10 +87,13 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   translationVector[2] = 1.7;
 
 
-  /* test translation */
+  //
+  // Test translation-only transform with PrecomposeOff
+  //
   transform->Translate(translationVector);
 
   myFilter->SetRigid3DTransform(transform);
+  myFilter->SetPrecompose(false);
 
   output = myFilter->GetOutput();
   MITK_TEST_CONDITION_REQUIRED(output != NULL, "Testing GetOutput()");
@@ -88,17 +104,24 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION( mitk::Equal(output->GetOrientation(),initialOri),"Testing if Orientation remains unchanged ");
   MITK_TEST_CONDITION(output->IsDataValid() == initialValid, "Testing if DataValid remains unchanged");
 
+  // Repeat the same translation test with precompose on - results should
+  // be the same for a translation-only transform
+  myFilter->PrecomposeOn();
+  MITK_TEST_CONDITION(output->GetPosition() == resultPos,
+                      "Testing if precomposed translation was calculated correct");
+  MITK_TEST_CONDITION(mitk::Equal(output->GetOrientation(),initialOri),
+                      "Testing if precomposed Orientation remains unchanged ");
+  MITK_TEST_CONDITION(output->IsDataValid() == initialValid,
+                      "Testing if precomposed DataValid remains unchanged");
 
-  // test rotation
+
   mitk::NavigationDataTransformFilter::Pointer myFilter2 = mitk::NavigationDataTransformFilter::New();
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
   MITK_TEST_CONDITION_REQUIRED(myFilter2.IsNotNull(),"Testing instantiation");
 
-  mitk::FillVector3D(initialPos, 1.1, 1.1, 1.1);
-  mitk::FillVector3D(resultPos,  1.1, -1.1, 1.1);
-
-  mitk::NavigationData::OrientationType resultOri(0.0, 0.0, -0.7071, 0.7071);
+  // Setup for subsequent PrecomposeOff/PrecomposeOn tests
+  mitk::FillVector3D(initialPos, 1.1, 2.2, 3.3);
   initialOri[0] = 0;
   initialOri[1] = 0;
   initialOri[2] = 0;
@@ -109,6 +132,12 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 
   myFilter2->SetInput(nd1);
 
+  //
+  // Test rotation-only transform with PrecomposeOff
+  //
+  myFilter2->PrecomposeOff();
+
+  // Rotate 90 degrees about Z axis
   mitk::NavigationDataTransformFilter::TransformType::MatrixType rotMatrix;
   rotMatrix[0][0] = 0;
   rotMatrix[0][1] = 1;
@@ -130,12 +159,30 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 
   output2->Update(); // execute filter
 
-  MITK_TEST_CONDITION(output2->GetPosition() == resultPos, "Testing if position after rotation is correctly calculated");
-  MITK_TEST_CONDITION( mitk::Equal(output2->GetOrientation(), resultOri),"Testing if orientation after rotation is correctly caclculated  ");
-  MITK_TEST_CONDITION(output2->IsDataValid() == initialValid, "Testing if DataValid remains unchanged");
+  mitk::FillVector3D(resultPos,  2.2, -1.1, 3.3);
+  mitk::NavigationData::OrientationType resultOri(0.0, 0.0, -0.7071067690849304, 0.7071067690849304);
 
+  MITK_TEST_CONDITION(output2->GetPosition() == resultPos, "Testing if postcomposed position after rotation is correctly calculated");
+  MITK_TEST_CONDITION( mitk::Equal(output2->GetOrientation(), resultOri),"Testing if postcomposed orientation after rotation is correctly caclculated  ");
+  MITK_TEST_CONDITION(output2->IsDataValid() == initialValid, "Testing if postcomposed DataValid remains unchanged");
 
+  //
+  // Test rotation-only transform with PrecomposeOn
+  //
+  myFilter2->PrecomposeOn();
+  output2->Update();
+
+  // Output position should be the same as input position for rotation-only with PrecomposeOn
+  MITK_TEST_CONDITION(output2->GetPosition() == initialPos,
+                      "Testing if precomposed position after rotation is correctly calculated");
+  MITK_TEST_CONDITION(mitk::Equal(output2->GetOrientation(), resultOri),
+                      "Testing if precomposed orientation after rotation is correctly calculated");
+  MITK_TEST_CONDITION(output2->IsDataValid() == initialValid,
+                      "Testing if precomposed DataValid remains unchanged");
+
+  //
   // test obscure rotation angle vs. ITK precision requirements
+  //
   itk::QuaternionRigidTransform<mitk::NavigationDataTransformFilter::TransformType::ScalarType>::VnlQuaternionType obscureRotationQuat(37,29,71);
   obscureRotationQuat.normalize();                 // Just to demonstrate that even normalizing doesn't help
 

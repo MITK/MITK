@@ -88,8 +88,8 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
     const mitk::BaseData* data = this->GetRepresentationObject(index);
     if (data == NULL)
     {
-      itkWarningMacro("NavigationDataObjectVisualizationFilter: Wrong/No BaseData associated with input.");
-      return;
+      itkWarningMacro("No BaseData associated with input " << index);
+      continue;
     }
 
     //get the transform from data
@@ -97,8 +97,8 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
     if (affineTransform.IsNull())
     {
       //replace with mitk standard output
-      itkWarningMacro("NavigationDataObjectVisualizationFilter: AffineTransform IndexToWorldTransform not initialized!");
-      return;
+      itkWarningMacro("AffineTransform IndexToWorldTransform not initialized!");
+      continue;
     }
 
     //store the current scaling to set it after transformation

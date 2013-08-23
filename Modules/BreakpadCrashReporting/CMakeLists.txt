@@ -18,12 +18,13 @@ if(MITK_USE_Breakpad) # from top-level CMakeLists.txt
   MITK_CREATE_MODULE(BreakpadCrashReporting
     INTERNAL_INCLUDE_DIRS ${Breakpad_INCLUDE_DIR}
     ADDITIONAL_LIBS ${Breakpad_LIBRARIES}
+    FORCE_STATIC
     )
 
   if(CMAKE_SYSTEM MATCHES "Windows")
     add_executable(CrashReportingServer mitkCrashReportingServer.cpp)
-    # TODO MITK_INSTALL(CrashReportingServer ..)
     target_link_libraries(CrashReportingServer ${ALL_LIBRARIES} BreakpadCrashReporting)
+    MITK_INSTALL(TARGETS CrashReportingServer)
   endif()
 
 

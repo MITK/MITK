@@ -33,7 +33,7 @@ class BaseRenderer;
  * call the update method of each Overlay during the rendering phase of the renderer.
  * See \ref OverlaysPage for more info.
 */
-class MITK_CORE_EXPORT OverlayManager : public itk::Object {
+class MITK_CORE_EXPORT OverlayManager : public itk::LightObject {
 public:
   typedef std::set<BaseRenderer*> BaseRendererSet;
   typedef std::set<Overlay::Pointer> OverlaySet;

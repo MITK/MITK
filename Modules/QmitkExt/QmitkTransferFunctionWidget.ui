@@ -110,13 +110,13 @@ Click right mouse button to delete a point.</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>48</width>
+            <width>60</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>48</width>
+            <width>60</width>
             <height>16777215</height>
            </size>
           </property>
@@ -201,13 +201,13 @@ Click right mouse button to delete a point.</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>48</width>
+            <width>60</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>48</width>
+            <width>60</width>
             <height>16777215</height>
            </size>
           </property>
@@ -276,13 +276,13 @@ Double-click left mouse button to change color of a point.</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>48</width>
+            <width>60</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>48</width>
+            <width>60</width>
             <height>16777215</height>
            </size>
           </property>
@@ -385,7 +385,7 @@ Click right mouse button to delete a point.</string>
           </property>
           <property name="maximumSize">
            <size>
-            <width>48</width>
+            <width>60</width>
             <height>16777215</height>
            </size>
           </property>
@@ -464,7 +464,7 @@ Click right mouse button to delete a point.</string>
           </property>
           <property name="maximumSize">
            <size>
-            <width>48</width>
+            <width>60</width>
             <height>16777215</height>
            </size>
           </property>

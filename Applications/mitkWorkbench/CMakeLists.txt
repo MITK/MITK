@@ -6,6 +6,11 @@ if(MITK_SHOW_CONSOLE_WINDOW)
 endif()
 
 MITK_USE_MODULE(qtsingleapplication Mitk)
+
+if(MITK_USE_Breakpad)
+MITK_USE_MODULE(BreakpadCrashReporting)
+endif()
+
 include_directories(${ALL_INCLUDE_DIRECTORIES})
 
 # Create a cache entry for the provisioning file which is used to export
@@ -44,4 +49,3 @@ endif(APPLE)
 if(MITK_MODULES_ENABLED_PLUGINS)
   add_dependencies(mitkWorkbench ${MITK_MODULES_ENABLED_PLUGINS})
 endif()
-

@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkCommon.h>
 #include <mitkException.h>
+#include <mitkBreakpadCrashReporting.h>
 
 class QtSafeApplication : public QtSingleApplication
 {
@@ -98,6 +99,10 @@ public:
 
 int main(int argc, char** argv)
 {
+  mitk::BreakpadCrashReporting myBreakpad;
+  myBreakpad.StartCrashServer(true);
+  myBreakpad.InitializeClientHandler( true );
+
   // Create a QApplication instance first
   QtSafeApplication qSafeApp(argc, argv);
   qSafeApp.setApplicationName("MITK Workbench");

@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTransform.h>
 #include <vnl/vnl_quaternion.h>
 #include <MitkExports.h>
-#include "mitkDataTypeBasics.h"
+#include "mitkTypeBasics.h"
 
 
 namespace mitk {

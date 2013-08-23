@@ -18,13 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkLog.h>
 #include "mitkLogMacros.h"
+#include <ctime>
+#include <stdio.h>
+#include <string.h>
+#ifdef WIN32
+  #include <process.h>
+#elif __gnu_linux__
+  #include <sys/types.h>
+#endif
 
-#include <QtCore>
-#include <QObject>
-#include <QApplication>
-#include <QDateTime>
-#include <QTimer>
-#include <QObject>
 
 // Simple server process for out-of-process crash reporting. By default this server will log to the executables directory, or
 // to the crash dump path if provided properly.
@@ -52,10 +54,8 @@ private slots:
 
 int main(int argc, char* argv[])
 {
-  QApplication qtapplication( argc, argv );
-
-  QString folderForCrashDumps ="";
-  QString namedPipeName = "";
+  std::string folderForCrashDumps ="";
+  std::string namedPipeName = "";
 
   if (argc != 3)
   {
@@ -65,47 +65,44 @@ int main(int argc, char* argv[])
   {
     namedPipeName       = argv[1];
     folderForCrashDumps = argv[2];
-    namedPipeName.remove('"');
-    folderForCrashDumps.remove('"');
   }
   try
   {
     // set up logging to file
     mitk::LoggingBackend::Register();
-    QString logfile;
-    if(folderForCrashDumps.isEmpty())
-      logfile = QCoreApplication::applicationDirPath().append("/");
-    else
-      logfile = folderForCrashDumps.append("/");
 
-    QDateTime date(QDateTime::currentDateTime());
-    QString dateString(date.toString("yyyy-MM-dd_hh-mm-ss"));
-    logfile.append(dateString);
-    logfile.append("-CrashReportingServer-");
+    time_t now = time(0);
+    tm* time = localtime( &now );
+    char dateTime[20];
 
-    QString pidString( QString::number(QCoreApplication::applicationPid()) );
-    logfile.append(pidString);
-    QString logfile2 = logfile + QString(".log");
+    strftime( dateTime, 20, "%Y-%m-%d_%H-%M-%S", time );
+    if(folderForCrashDumps.empty())
+      folderForCrashDumps = mitk::BreakpadCrashReporting::GetModulePath();
 
-    MITK_INFO << "** Logging to " << logfile2.toStdString() << std::endl;
-    mitk::LoggingBackend::SetLogFile( logfile2.toLocal8Bit().constData() );
+    std::stringstream pid;
+    pid << getpid();
+
+    std::string logfile = folderForCrashDumps + "/" + dateTime + "-CrashReportingServer-" + pid.str() + ".log";
+
+    MITK_INFO << "** Logging to " << logfile << std::endl;
+    mitk::LoggingBackend::SetLogFile( logfile.c_str() );
 
     // init breakpad server
     myBreakpad = new mitk::BreakpadCrashReporting();
 
-    if(!namedPipeName.isEmpty())
+    if(!namedPipeName.empty())
     {
-      MITK_INFO << "Using arg[1] as named pipe name";
+      MITK_INFO << "Using arg[1] as named pipe name" << namedPipeName;
       myBreakpad->SetNamedPipeName(namedPipeName);
     }
-    if(!folderForCrashDumps.isEmpty())
+    if(!folderForCrashDumps.empty())
     {
-      MITK_INFO << "Using arg[2] as crash dump path";
+      MITK_INFO << "Using arg[2] as crash dump path" << folderForCrashDumps;
       myBreakpad->SetCrashDumpPath(folderForCrashDumps);
     }
 
-    MITK_INFO << "NamedPipeName: " << myBreakpad->GetNamedPipeName().toStdString().c_str() << "\n";
-    MITK_INFO << "FolderForCrashDumps: " << myBreakpad->GetCrashDumpPath().toStdString().c_str() << "\n";
+    MITK_INFO << "NamedPipeName: " << myBreakpad->GetNamedPipeName() << "\n";
+    MITK_INFO << "FolderForCrashDumps: " << myBreakpad->GetCrashDumpPath() << "\n";
 
     if(myBreakpad->StartCrashServer(false)) // false = we are already in a separate process.
     {
@@ -120,7 +117,7 @@ int main(int argc, char* argv[])
     //Timer* shutdownTimer = new Timer();
     // shutdownTimer->start(3000);
 
-    qtapplication.exec();
+    //qtapplication.exec();
   }
   catch(...)
   {
@@ -128,8 +125,5 @@ int main(int argc, char* argv[])
     exit(2);
   }
 
-
-
   MITK_INFO << "mitk Crash Reporting Server shuting down.";
-
 }

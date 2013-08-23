@@ -15,10 +15,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTestingMacros.h"
+#include "mitkBreakpadCrashReporting.h"
 
-#include <QDir>
-#include <QTime>
-#include <QCoreApplication>
+#ifdef WIN32
+  #include <windows.h>
+  #include <direct.h>
+#elif __gnu_linux__
+  #include <unistd.h>
+#endif
+
+#include <stdio.h>
+#include <string.h>
+#include <itksys/SystemTools.hxx>
+#include <itkDirectory.h>
 
 /**
   \brief Checks result of crash test mitkBreakpadCrashReportingDumpTest.
@@ -34,46 +43,48 @@ int mitkBreakpadCrashReportingDumpCheckTest(int, char** const)
 {
   // always start with this!
   MITK_TEST_BEGIN("mitkBreakpadCrashReportingDumpCheckTest");
-
 #ifdef WIN32
   // Waiting a bit to let the crash reporting server do its work
   // This is not neccessary on Linux because we run the SERVER as
   // the unittest, so when it is done, the crash dump must exist.
   // (On Windows, we run the client and this in turn starts a server)
-  QTime dieTime = QTime::currentTime().addSecs(3);
-  while( QTime::currentTime() < dieTime )
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+  Sleep( 3000 );
 #endif
+  std::string crashDumpFolderString = mitk::BreakpadCrashReporting::GetModulePath() + "/breakpadtestdump/";
+  itk::Directory::Pointer crashDumpDirectory = itk::Directory::New();
+  MITK_TEST_CONDITION_REQUIRED( crashDumpDirectory->Load( crashDumpFolderString.c_str() ), "Crash dump folder exists." );
 
-  QString dirnamePattern = QString("mitkBreakpadCrashReportingDumpTest-*");
-
-  QDir tempDir = QDir::temp();
-  QStringList nameFilters;
-  nameFilters << dirnamePattern;
-  tempDir.setNameFilters( nameFilters );
-  tempDir.setSorting( QDir::Time );
-
-  QStringList dumpFolders = tempDir.entryList();
-
-  MITK_TEST_CONDITION_REQUIRED( !dumpFolders.empty(), "Found at least one folder matching mitkBreakpadCrashReportingDumpTest-*")
-
-  QString foldernameToCheck = dumpFolders.first(); // most recent
-
-  QDir folderToCheck( QDir::tempPath() + QDir::separator() + foldernameToCheck );
-  MITK_TEST_CONDITION( folderToCheck.exists(), qPrintable(foldernameToCheck) << " exists")
-  QStringList dumpFiles = folderToCheck.entryList( QDir::Files );
-  MITK_TEST_CONDITION( dumpFiles.size() == 1, qPrintable(foldernameToCheck) << " has one entry (the DUMP)")
-
-  MITK_TEST_OUTPUT( << "----------------------------------------" )
-  MITK_TEST_OUTPUT( << "Files in " << qPrintable(folderToCheck.path()) )
-  foreach(QString f, dumpFiles)
+  // since the folder is only used for this testing purposes, there should only be crash dump folders here
+  // so we only have to check if the crash dump directory contains anything
+  MITK_TEST_CONDITION_REQUIRED( crashDumpDirectory->GetNumberOfFiles() > 0, "Found at least one folder in crash dump directory.");
+  for ( unsigned int i = 0; i < crashDumpDirectory->GetNumberOfFiles(); ++i )
   {
-    MITK_TEST_OUTPUT( << " .. entry " << qPrintable(f) )
-    folderToCheck.remove(f);
-  }
-  MITK_TEST_OUTPUT( << "--- End of file list--------------------" )
+    std::string folderName = crashDumpFolderString + "/" + crashDumpDirectory->GetFile( i );
+    if( folderName.find( "mitkBreakpadCrashReportingDumpTest-" ) == std::string::npos )
+    {
+      // not a crash pad folder
+      continue;
+    }
 
-  MITK_TEST_CONDITION( tempDir.rmdir( foldernameToCheck ), "Clean up created folders, i.e. remove " << qPrintable(foldernameToCheck) )
+    itk::Directory::Pointer folder = itk::Directory::New();
+    MITK_TEST_CONDITION( folder->Load( folderName.c_str() ), "Directory " << folderName << " could be opened.");
+    bool dmpFileFound = false;
+    for ( unsigned int j = 0; j < folder->GetNumberOfFiles(); ++j )
+    {
+      std::string filename = folderName + "/" + folder->GetFile( j );
+
+      std::string extension = itksys::SystemTools::GetFilenameExtension(filename.c_str());
+
+      if(extension.compare(".dmp")==0)
+      {
+        dmpFileFound = true;
+      }
+      remove( filename.c_str() );
+    }
+    MITK_TEST_CONDITION( dmpFileFound, "Dump file was created." );
+    rmdir( folderName.c_str() );
+  }
+  rmdir( crashDumpFolderString.c_str() );
 
   // always end with this!
   MITK_TEST_END()

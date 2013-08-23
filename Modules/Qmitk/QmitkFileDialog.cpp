@@ -17,6 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#define _USE_MATH_DEFINES
 #include <QmitkFileDialog.h>
 
+// MITK
+#include <mitkFileReaderManager.h>
+#include <mitkIFileReader.h>
+
 // STL Headers
 #include <list>
 
@@ -25,14 +29,90 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 #include <usServiceProperties.h>
 
+//QT
+#include <qgroupbox.h>
+#include <qcheckbox.h>
+#include <qlabel.h>
 #include <mitkCommon.h>
+
+// Test imports, delete later
+#include <mitkAbstractFileReader.h>
+
+class DummyReader : public mitk::AbstractFileReader
+{
+public:
+
+  DummyReader(const DummyReader& other)
+    : mitk::AbstractFileReader(other)
+  {
+  }
+
+  DummyReader(const std::string& extension, int priority)
+    : mitk::AbstractFileReader(extension, "This is a dummy description")
+  {
+    m_Priority = priority;
+    //std::list<std::string> options;
+    m_Options.push_front(std::make_pair("isANiceGuy", true));
+    m_Options.push_front(std::make_pair("canFly", false));
+    m_Options.push_front(std::make_pair("isAwesome", true));
+    m_Options.push_front(std::make_pair("hasOptions", true));
+    m_Options.push_front(std::make_pair("has more Options", true));
+    m_Options.push_front(std::make_pair("has maaaaaaaany Options", true));
+    m_ServiceReg = this->RegisterService();
+  }
+
+  ~DummyReader()
+  {
+    if (m_ServiceReg) m_ServiceReg.Unregister();
+  }
+
+  using mitk::AbstractFileReader::Read;
+
+  virtual std::list< itk::SmartPointer<mitk::BaseData> >  Read(const std::istream& /*stream*/, mitk::DataStorage* /*ds*/ = 0)
+  {
+    std::list<mitk::BaseData::Pointer> result;
+    return result;
+  }
+
+  virtual void SetOptions(const std::list< mitk::FileServiceOption >& options )
+  {
+    m_Options = options;
+    //m_Registration.SetProperties(GetServiceProperties());
+  }
+
+private:
+
+  DummyReader* Clone() const
+  {
+    return new DummyReader(*this);
+  }
+
+  us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
+}; // End of internal dummy reader
 
 const std::string QmitkFileDialog::VIEW_ID = "org.mitk.views.QmitkFileDialog";
 
+//
+//
+//
+//
+
+//
+
+//
+
+//
+//
+//
+
 QmitkFileDialog::QmitkFileDialog(QWidget* parent, Qt::WindowFlags f): QFileDialog(parent, f)
 {
-  //m_controls = null;
-  //CreateQtPartControl(this);
+  this->setOption(QFileDialog::DontUseNativeDialog);
+  this->setFileMode(QFileDialog::ExistingFile);
+
+  DummyReader* dr = new DummyReader(".xsfd", 1000);
+
+  CreateQtPartControl(this);
 }
 
 QmitkFileDialog::~QmitkFileDialog()
@@ -41,19 +121,113 @@ QmitkFileDialog::~QmitkFileDialog()
 
 //////////////////// INITIALIZATION /////////////////////
 
-//void QmitkFileDialog::CreateQtPartControl(QWidget *parent)
-//{
-//  if (!m_Controls)
-//  {
-//    // create GUI widgets
-//    m_Controls = new Ui::QmitkFileDialogControls;
-//    m_Controls->setupUi(parent);
-//    this->CreateConnections();
-//  }
-//  m_Context = us::GetModuleContext();
-//}
+void QmitkFileDialog::CreateQtPartControl(QWidget *parent)
+{
+  // cast own layout to gridLayout
+  QGridLayout *layout = (QGridLayout*)this->layout();
+
+  // creat groupbox for options
+  QGroupBox *box = new QGroupBox(this);
+  box->setTitle("Options:");
+  box->setVisible(true);
+  m_BoxLayout = new QGridLayout(box);
+  box->setLayout(m_BoxLayout);
+  layout->addWidget(box,4,0,1,3);
+
+  this->CreateConnections();
+
+  //  m_context = us::getmodulecontext();
+}
 
 void QmitkFileDialog::CreateConnections()
 {
-  //connect( m_Controls->m_ServiceList, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)), this, SLOT(OnServiceSelectionChanged()) );
+  connect( this, SIGNAL(currentChanged( const QString &)), this, SLOT(DisplayOptions( QString)) );
+  connect( this, SIGNAL(fileSelected( const QString &)), this, SLOT(ProcessSelectedFile()) );
+}
+
+/////////////////////////// OPTIONS ///////////////////////////////
+
+void QmitkFileDialog::DisplayOptions(QString path)
+{
+  std::string extension = path.toStdString();
+  extension.erase(0, extension.find_last_of('.'));
+
+  ClearOptionsBox();
+
+  us::ModuleContext* context = us::GetModuleContext();
+  mitk::FileReaderManager manager;
+  mitk::IFileReader* reader = manager.GetReader(extension);
+
+  if (reader == NULL)
+  {
+    // MITK_WARN << "Did not find ReaderService for registered Extension. This should be looked into by a developer.";
+    return;
+  }
+
+  std::list< mitk::FileServiceOption > options = reader->GetOptions();
+  int i = 0;
+  while (options.size() > 0)
+  {
+    QCheckBox *checker = new QCheckBox(this);
+    checker->setText( options.front().first.c_str() );
+    checker->setChecked( options.front().second );
+    options.pop_front();
+    m_BoxLayout->addWidget(checker, i / 4, i % 4);
+    i++;
+  }
+}
+
+void QmitkFileDialog::ClearOptionsBox()
+{
+  if ( m_BoxLayout != NULL )
+  {
+    QLayoutItem* item;
+    while ( ( item = m_BoxLayout->takeAt( 0 ) ) != NULL )
+    {
+      delete item->widget();
+      delete item;
+    }
+  }
+}
+
+void QmitkFileDialog::ProcessSelectedFile()
+{
+  std::string file = this->selectedFiles().front().toStdString();
+  std::string extension = file;
+  extension.erase(0, extension.find_last_of('.'));
+
+  m_Options = GetSelectedOptions();
+  // We are not looking for specific Options here, which is okay, since the dialog currently only shows the
+  // reader with the highest priority. Better behaviour required, if we want selectable readers.
+
+  m_FileReader = m_FileReaderManager.GetReader(extension);
+  m_FileReader->GetOptions();
+}
+
+std::list< mitk::FileServiceOption > QmitkFileDialog::GetSelectedOptions()
+{
+  std::list<mitk::FileServiceOption> result;
+
+  if ( m_BoxLayout != NULL )
+  {
+    QLayoutItem* item;
+    while ( ( item = m_BoxLayout->takeAt( 0 ) ) != NULL )
+    {
+      QCheckBox* checker = dynamic_cast<QCheckBox*> (item->widget());
+      if (checker)
+      {
+        mitk::FileServiceOption option = std::make_pair( checker->text().toStdString() , checker->isChecked() );
+        result.push_back(option);
+      }
+
+      delete item->widget();
+      delete item;
+    }
+  }
+  return result;
+}
+
+mitk::IFileReader* QmitkFileDialog::GetReader()
+{
+  return 0;
 }

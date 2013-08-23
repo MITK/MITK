@@ -23,13 +23,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 //QT headers
 #include <QWidget>
 #include <qfiledialog.h>
-#include <QListWidgetItem>
+#include <qgridlayout.h>
 
 //Microservices
 #include "usServiceReference.h"
 #include "usModuleContext.h"
 #include "usServiceEvent.h"
 #include "usServiceInterface.h"
+
+// MITK
+#include <mitkIFileReader.h>
+#include <mitkFileReaderManager.h>
 
 /**
 * \ingroup QmitkModule
@@ -59,17 +63,32 @@ public:
   virtual ~QmitkFileDialog();
 
   /** \brief This method is part of the widget and needs not to be called separately. */
-  //virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent);
   /** \brief This method is part of the widget and needs not to be called separately. (Creation of the connections of main and control widget.)*/
   virtual void CreateConnections();
+
+  virtual std::list< mitk::FileServiceOption > GetSelectedOptions();
+
+  virtual mitk::IFileReader* GetReader();
 
 signals:
 
   public slots:
 
+    virtual void DisplayOptions(QString path);
+
     protected slots:
 
+      virtual void ProcessSelectedFile();
+
 protected:
+
+  QGridLayout* m_BoxLayout;
+  mitk::IFileReader* m_FileReader;
+  std::list <mitk::FileServiceOption> m_Options;
+  mitk::FileReaderManager m_FileReaderManager;
+
+  virtual void ClearOptionsBox();
 
   //Ui::QmitkFileDialogControls* m_Controls; ///< member holding the UI elements of this widget
 };

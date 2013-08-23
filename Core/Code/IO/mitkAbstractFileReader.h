@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef AbstractFileReader_H_HEADER_INCLUDED_C1E7E521
 #define AbstractFileReader_H_HEADER_INCLUDED_C1E7E521
 
@@ -35,12 +34,11 @@ namespace us {
 }
 
 namespace mitk {
-
-//##Documentation
-//## @brief Interface class of readers that read from files
-//## @ingroup Process
-class MITK_CORE_EXPORT AbstractFileReader : public mitk::IFileReader
-{
+  //##Documentation
+  //## @brief Interface class of readers that read from files
+  //## @ingroup Process
+  class MITK_CORE_EXPORT AbstractFileReader : public mitk::IFileReader
+  {
   public:
 
     virtual std::list< itk::SmartPointer<BaseData> > Read(const std::string& path, mitk::DataStorage *ds = 0 );
@@ -53,7 +51,9 @@ class MITK_CORE_EXPORT AbstractFileReader : public mitk::IFileReader
 
     virtual std::string GetDescription() const;
 
-    virtual std::list< std::string > GetSupportedOptions() const;
+    virtual std::list< mitk::FileServiceOption > GetOptions() const;
+
+    virtual void SetOptions(std::list< mitk::FileServiceOption > options);
 
     virtual bool CanRead(const std::string& path) const;
 
@@ -61,7 +61,7 @@ class MITK_CORE_EXPORT AbstractFileReader : public mitk::IFileReader
 
     us::ServiceRegistration<IFileReader> RegisterService(us::ModuleContext* context = us::GetModuleContext());
 
-protected:
+  protected:
     AbstractFileReader();
     ~AbstractFileReader();
 
@@ -73,18 +73,22 @@ protected:
     std::string m_Extension;
     std::string m_Description;
     int m_Priority;
-    std::list< std::string > m_Options; // Options supported by this reader. Can be left emtpy if no special options are required
+
+    /**
+    * \brief Options supported by this reader. Set sensible default values!
+    *
+    * Can be left emtpy if no special options are required.
+    */
+    std::list< mitk::FileServiceOption > m_Options;
 
     virtual us::ServiceProperties GetServiceProperties();
 
-private:
+  private:
 
     us::PrototypeServiceFactory* m_PrototypeFactory;
 
     virtual mitk::IFileReader* Clone() const = 0;
-
-};
-
+  };
 } // namespace mitk
 
 // This is the microservice declaration. Do not meddle!

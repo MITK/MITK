@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef IFileReader_H_HEADER_INCLUDED_C1E7E521
 #define IFileReader_H_HEADER_INCLUDED_C1E7E521
 
@@ -28,31 +27,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 // STL
 #include <list>
 
-
 namespace mitk {
   class BaseData;
   class DataStorage;
 }
 
 namespace itk {
-
   template<class T> class SmartPointer;
 }
 
 namespace mitk {
+  typedef std::pair<std::string, bool> FileServiceOption;
 
-/**
-* \brief The common interface of all FileReader.
-*
-* This interface defines the Methods necessary for the FileReaderManager
-* to interact with its FileReaders. To implement a new Filereader, it is
-* recommended to derive from FileReaderAbstract instead of from the Interface,
-* as the abstract class already implements most of the functions and also makes sure
-* that your reader will be managed by the FileReaderManager.
-*/
-struct MITK_CORE_EXPORT IFileReader
-{
-
+  /**
+  * \brief The common interface of all FileReader.
+  *
+  * This interface defines the Methods necessary for the FileReaderManager
+  * to interact with its FileReaders. To implement a new Filereader, it is
+  * recommended to derive from FileReaderAbstract instead of from the Interface,
+  * as the abstract class already implements most of the functions and also makes sure
+  * that your reader will be managed by the FileReaderManager.
+  */
+  struct MITK_CORE_EXPORT IFileReader
+  {
     virtual ~IFileReader();
 
     /**
@@ -95,9 +92,22 @@ struct MITK_CORE_EXPORT IFileReader
     /**
     * \brief returns a list of the supported Options
     *
-    * Options are strings that are treated as flags when passed to the read method.
+    * Inititally, the reader contains a set of standard options. These can be retrieved,
+    * manipulated and set again. To activate or deactivate an option, just set it's bool
+    * value accordingly. All supported options are in the default set, it does not
+    * make sense to add strings artificially after retrieving a reader - the specific
+    * implementation decides which options it wants to support.
+    * If no options are supported, an empty list is returned.
     */
-    virtual std::list< std::string > GetSupportedOptions() const = 0;
+    virtual std::list< mitk::FileServiceOption > GetOptions() const = 0;
+
+    /**
+    * \brief Sets the options for this reader
+    *
+    * The best way to use this method is to retireve the options via GetOptions, manipulate the bool values,
+    * and then set the options again.
+    */
+    virtual void SetOptions(std::list< mitk::FileServiceOption > options) = 0;
 
     /**
     * \brief Returns true if this writer can confirm that it can read this file and false otherwise.
@@ -115,18 +125,13 @@ struct MITK_CORE_EXPORT IFileReader
     static const std::string PROP_DESCRIPTION;
     static const std::string PROP_IS_LEGACY;
 
-
     // Microservice names for defined properties
     static const std::string OPTION_READ_AS_BINARY;
     static const std::string OPTION_READ_MULTIPLE_FILES;
 
-protected:
-
-};
-
+  protected:
+  };
 } // namespace mitk
-
-
 
 // This is the microservice declaration. Do not meddle!
 US_DECLARE_SERVICE_INTERFACE(mitk::IFileReader, "org.mitk.IFileReader")

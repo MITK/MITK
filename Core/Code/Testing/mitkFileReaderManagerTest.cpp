@@ -27,10 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <mitkCoreObjectFactory.h>
 
-
 class DummyReader : public mitk::AbstractFileReader
 {
-
 public:
 
   DummyReader(const DummyReader& other)
@@ -58,7 +56,7 @@ public:
     return result;
   }
 
-  virtual void SetOptions(const std::list< std::string >& options )
+  virtual void SetOptions(const std::list< mitk::FileServiceOption >& options )
   {
     m_Options = options;
     //m_Registration.SetProperties(ConstructServiceProperties());
@@ -72,12 +70,10 @@ private:
   }
 
   us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
-
 }; // End of internal dummy reader
 
 class DummyReader2 : public mitk::AbstractFileReader
 {
-
 public:
 
   DummyReader2(const DummyReader2& other)
@@ -105,7 +101,7 @@ public:
     return result;
   }
 
-  virtual void SetOptions(const std::list< std::string >& options )
+  virtual void SetOptions(const std::list< mitk::FileServiceOption >& options )
   {
     m_Options = options;
     //m_Registration.SetProperties(ConstructServiceProperties());
@@ -119,18 +115,17 @@ private:
   }
 
   us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
-
 }; // End of internal dummy reader 2
 
 /**
- *  TODO
- */
+*  TODO
+*/
 int mitkFileReaderManagerTest(int /*argc*/ , char* /*argv*/[])
 {
   // always start with this!
   MITK_TEST_BEGIN("FileReaderManager");
- // mitk::FileReaderManager::Pointer frm = mitk::FileReaderManager::New();
- // MITK_TEST_CONDITION_REQUIRED(argc == 2,"Testing FileReaderManager instantiation");
+  // mitk::FileReaderManager::Pointer frm = mitk::FileReaderManager::New();
+  // MITK_TEST_CONDITION_REQUIRED(argc == 2,"Testing FileReaderManager instantiation");
 
   DummyReader testDR("test",1);
   DummyReader otherDR("other",1);
@@ -156,49 +151,50 @@ int mitkFileReaderManagerTest(int /*argc*/ , char* /*argv*/[])
 
   // Now to give those readers some options, then we will try again
 
-  std::list<std::string> options;
-  options.push_front("isANiceGuy");
+  std::list< mitk::FileServiceOption > options;
+  options.push_front(std::make_pair("isANiceGuy", true));
   mediocreTestDR.SetOptions(options);
   options.clear();
-  options.push_front("canFly");
+  options.push_front(std::make_pair("canFly", true));
   prettyFlyTestDR.SetOptions(options);
-  options.push_front("isAwesome");
+  options.push_front(std::make_pair("isAwesome", true));
   awesomeTestDR.SetOptions(options); //note: awesomeReader canFly and isAwesome
 
   // Reset Options, use to define what we want the reader to do
   options.clear();
-  options.push_front("canFly");
-  returned = readerManager->GetReader("test", options);
+  std::list<std::string> optionsFilter;
+  optionsFilter.push_front("canFly");
+  returned = readerManager->GetReader("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileReader&>(awesomeTestDR) != returned, "Testing correct retrieval of FileReader with Options: Best reader with options");
 
-  options.push_front("isAwesome");
-  returned = readerManager->GetReader("test", options);
+  optionsFilter.push_front("isAwesome");
+  returned = readerManager->GetReader("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileReader&>(awesomeTestDR) != returned, "Testing correct retrieval of FileReader with multiple Options: Best reader with options");
 
-  options.clear();
-  options.push_front("isANiceGuy");
-  returned = readerManager->GetReader("test", options);
+  optionsFilter.clear();
+  optionsFilter.push_front("isANiceGuy");
+  returned = readerManager->GetReader("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileReader&>(mediocreTestDR) != returned, "Testing correct retrieval of specific FileReader with Options: Low priority reader with specific option");
 
-  options.push_front("canFly");
-  returned = readerManager->GetReader("test", options);
+  optionsFilter.push_front("canFly");
+  returned = readerManager->GetReader("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returned == NULL, "Testing correct return of 0 value when no matching reader was found");
 
   // Onward to test the retrieval of multiple readers
 
   std::vector< mitk::IFileReader* > returnedList;
-  returnedList = readerManager->GetReaders("test", options);
+  returnedList = readerManager->GetReaders("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returnedList.empty(), "Testing correct return of zero readers when no matching reader was found, asking for all compatibles");
 
-  options.clear();
-  options.push_back("canFly");
-  returnedList = readerManager->GetReaders("test", options);
+  optionsFilter.clear();
+  optionsFilter.push_back("canFly");
+  returnedList = readerManager->GetReaders("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 2, "Testing correct return of two readers when two matching reader was found, asking for all compatibles");
   MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyReader2*>(returnedList.front()), "Testing correct priorization of returned Readers with options 1/2");
 
-  options.clear();
-  options.push_back("isAwesome");
-  returnedList = readerManager->GetReaders("test", options);
+  optionsFilter.clear();
+  optionsFilter.push_back("isAwesome");
+  returnedList = readerManager->GetReaders("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 1, "Testing correct return of one readers when one matching reader was found, asking for all compatibles");
   MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyReader2*>(returnedList.front()), "Testing correctness of result from former query");
 
@@ -216,7 +212,7 @@ int mitkFileReaderManagerTest(int /*argc*/ , char* /*argv*/[])
   //MITK_TEST_CONDITION_REQUIRED(pointset.IsNotNull(), "Testing templated call of Read()");
 
   // And now for something completely different... (Debug)
- // mitk::LegacyFileReaderService::Pointer lfr = mitk::LegacyFileReaderService::New(".nrrd", "Nearly Raw Raster Data");
+  // mitk::LegacyFileReaderService::Pointer lfr = mitk::LegacyFileReaderService::New(".nrrd", "Nearly Raw Raster Data");
   //returned = mitk::FileReaderManager::GetReader(".nrrd");
   //MITK_TEST_CONDITION_REQUIRED(lfr == returned, "Testing correct retrieval of specific FileReader with Options: Low priority reader with specific option");
 

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkFileReaderManager.h"
 
 // Microservices
@@ -35,7 +34,7 @@ mitk::FileReaderManager::FileReaderManager()
 mitk::FileReaderManager::~FileReaderManager()
 {
   for (std::map<mitk::IFileReader*, us::ServiceObjects<mitk::IFileReader> >::iterator iter = m_ServiceObjects.begin(),
-       end = m_ServiceObjects.end(); iter != end; ++iter)
+    end = m_ServiceObjects.end(); iter != end; ++iter)
   {
     iter->second.UngetService(iter->first);
   }
@@ -75,7 +74,6 @@ std::list< mitk::BaseData::Pointer > mitk::FileReaderManager::ReadAll(const std:
   return result;
 }
 
-
 //////////////////// GETTING READERS ////////////////////
 
 mitk::IFileReader* mitk::FileReaderManager::GetReader(const std::string& extension, us::ModuleContext* context )
@@ -93,7 +91,7 @@ std::vector <mitk::IFileReader*> mitk::FileReaderManager::GetReaders(const std::
 
   // Translate List of ServiceRefs to List of Pointers
   for (std::vector <us::ServiceReference<IFileReader> >::const_iterator iter = refs.begin(), end = refs.end();
-       iter != end; ++iter)
+    iter != end; ++iter)
   {
     us::ServiceObjects<mitk::IFileReader> serviceObjects = context->GetServiceObjects(*iter);
     mitk::IFileReader* reader = serviceObjects.GetService();
@@ -119,7 +117,7 @@ std::vector <mitk::IFileReader*> mitk::FileReaderManager::GetReaders(const std::
   // the list is already sorted by priority. Now find reader that supports all options
 
   for (std::vector <mitk::IFileReader*>::const_iterator iter = allReaders.begin(), end = allReaders.end();
-       iter != end; ++iter)
+    iter != end; ++iter)
   {
     mitk::IFileReader * currentReader = *iter;
     // Now see if this reader supports all options. If yes, push to results
@@ -134,7 +132,7 @@ std::vector <mitk::IFileReader*> mitk::FileReaderManager::GetReaders(const std::
 void mitk::FileReaderManager::UngetReader(mitk::IFileReader* reader)
 {
   std::map<mitk::IFileReader*, us::ServiceObjects<mitk::IFileReader> >::iterator readerIter =
-      m_ServiceObjects.find(reader);
+    m_ServiceObjects.find(reader);
   if (readerIter != m_ServiceObjects.end())
   {
     readerIter->second.UngetService(reader);
@@ -145,7 +143,7 @@ void mitk::FileReaderManager::UngetReader(mitk::IFileReader* reader)
 void mitk::FileReaderManager::UngetReaders(const std::vector<mitk::IFileReader*>& readers)
 {
   for (std::vector<mitk::IFileReader*>::const_iterator iter = readers.begin(), end = readers.end();
-       iter != end; ++iter)
+    iter != end; ++iter)
   {
     this->UngetReader(*iter);
   }
@@ -186,28 +184,26 @@ std::string mitk::FileReaderManager::GetSupportedExtensions(const std::string& e
 
 bool mitk::FileReaderManager::ReaderSupportsOptions(mitk::IFileReader* reader, const std::list<std::string>& options )
 {
-  const std::list<std::string> readerOptions = reader->GetSupportedOptions();
+  const std::list< mitk::FileServiceOption > readerOptions = reader->GetOptions();
   if (options.empty()) return true;         // if no options were requested, return true unconditionally
   if (readerOptions.empty()) return false;  // if options were requested and reader supports no options, return false
 
   // For each of the strings in requested options, check if option is available in reader
-  for(std::list<std::string>::const_iterator options_i = options.begin(), i_end = options.end(); options_i != i_end; ++options_i)
+  for(std::list< std::string >::const_iterator options_i = options.begin(), i_end = options.end(); options_i != i_end; ++options_i)
   {
     {
       bool optionFound = false;
       // Iterate over each available option from reader to check if one of them matches the current option
-      for(std::list<std::string>::const_iterator options_j = readerOptions.begin(), j_end = readerOptions.end();
-          options_j != j_end; ++options_j)
+      for(std::list<mitk::FileServiceOption>::const_iterator options_j = readerOptions.begin(), j_end = readerOptions.end();
+        options_j != j_end; ++options_j)
       {
-        if ( *options_i == *options_j ) optionFound = true;
+        if ( *options_i == options_j->first ) optionFound = true;
       }
       if (optionFound == false) return false; // If one option was not found, leave method and return false
     }
   }
   return true; // if all options have been found, return true
 }
-
-
 
 //////////////////// uS-INTERACTION ////////////////////
 

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include <mitkAbstractFileReader.h>
 
 #include <usGetModuleContext.h>
@@ -24,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 
 #include <fstream>
-
 
 mitk::AbstractFileReader::AbstractFileReader()
   : m_Priority (0)
@@ -85,7 +83,7 @@ us::ServiceRegistration<mitk::IFileReader> mitk::AbstractFileReader::RegisterSer
     }
 
     void UngetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/,
-                      const us::InterfaceMap& service)
+      const us::InterfaceMap& service)
     {
       delete us::ExtractInterface<mitk::IFileReader>(service);
     }
@@ -109,17 +107,25 @@ us::ServiceProperties mitk::AbstractFileReader::GetServiceProperties()
   result[mitk::IFileReader::PROP_DESCRIPTION]    = m_Description;
   result[us::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
 
-  for (std::list<std::string>::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it) {
-    result[*it] = std::string("true");
+  for (std::list< mitk::FileServiceOption  >::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it) {
+    if (it->second)
+      result[it->first] = std::string("true");
+    else result[it->first] = std::string("false");
   }
   return result;
 }
 
 //////////////////////// Options ///////////////////////
 
-std::list< std::string > mitk::AbstractFileReader::GetSupportedOptions() const
+std::list< mitk::FileServiceOption > mitk::AbstractFileReader::GetOptions() const
 {
   return m_Options;
+}
+
+void mitk::AbstractFileReader::SetOptions(std::list< mitk::FileServiceOption > options)
+{
+  if (options.size() != m_Options.size()) MITK_WARN << "Number of set Options differs from Number of available Options, which is a sign of false usage. Please consult documentation";
+  m_Options = options;
 }
 
 ////////////////// MISC //////////////////

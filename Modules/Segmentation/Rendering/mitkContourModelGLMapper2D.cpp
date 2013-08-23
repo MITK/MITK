@@ -121,6 +121,8 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     float vtkp[3];
     float lineWidth = 3.0;
 
+    bool drawit=false;
+
     bool isHovering = false;
     dataNode->GetBoolProperty("contour.hovering", isHovering);
 
@@ -129,7 +131,6 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     else
         dataNode->GetFloatProperty("contour.width", lineWidth);
 
-    bool drawit=false;
 
     bool showSegments = false;
     dataNode->GetBoolProperty("contour.segments.show", showSegments);
@@ -146,6 +147,9 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     bool showControlPointsNumbers = false;
     dataNode->GetBoolProperty("contour.controlpoints.text", showControlPointsNumbers);
 
+    bool projectmode=false;
+    dataNode->GetVisibility(projectmode, renderer, "contour.project-onto-plane");
+
 
     mitk::ContourModel::VertexIterator pointsIt = renderingContour->IteratorBegin(timestep);
 
@@ -153,6 +157,8 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     Point2D lastPt2d;
 
     int index = 0;
+
+    mitk::ScalarType maxDiff = 0.25;
 
     while ( pointsIt != renderingContour->IteratorEnd(timestep) )
     {
@@ -172,19 +178,21 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       Vector3D diff=p-projected_p;
       ScalarType scalardiff = diff.GetNorm();
 
-      //draw lines
-      bool projectmode=false;
-      dataNode->GetVisibility(projectmode, renderer, "contour.project-onto-plane");
-
+      //project to plane
       if(projectmode)
       {
         drawit=true;
       }
-      else if(scalardiff<0.25)
+      else if(scalardiff<maxDiff)//point is close enough to be drawn
       {
         drawit=true;
       }
+      else
+      {
+        drawit = false;
+      }
 
+      //draw line
       if(drawit)
       {
 
@@ -338,7 +346,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       //----------------------------------
 
       //draw point if close to plane
-      if(scalardiff<0.25)
+      if(scalardiff<maxDiff)
       {
 
         float pointsize = 5;

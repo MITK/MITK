@@ -144,6 +144,7 @@ option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
 set(MITK_BUILD_TUTORIAL OFF CACHE INTERNAL "Deprecated! Use MITK_BUILD_EXAMPLES instead!")
 option(MITK_BUILD_EXAMPLES "Build the MITK Examples" ${MITK_BUILD_TUTORIAL})
 option(MITK_USE_ACVD "Use Approximated Centroidal Voronoi Diagrams" OFF)
+option(MITK_USE_GLEW "Use the GLEW library" ON)
 option(MITK_USE_Boost "Use the Boost C++ library" OFF)
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
@@ -160,6 +161,7 @@ if(MITK_USE_Python)
 endif()
 
 mark_as_advanced(MITK_BUILD_ALL_APPS
+                 MITK_USE_GLEW
                  MITK_USE_CTK
                  MITK_USE_DCMTK
                 )

@@ -17,7 +17,6 @@ subdirs(
   qwt
   qxt
   mbilog
-  glew
   qtsingleapplication
   KWStyle
 )

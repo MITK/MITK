@@ -1,7 +1,3 @@
-#FIND_PACKAGE(OpenGL)
-#IF(NOT OPENGL_FOUND)
-#  MESSAGE("GL is required for MITK rendering")
-#ENDIF(NOT OPENGL_FOUND )
 
 set(TOOL_CPPS "")
 

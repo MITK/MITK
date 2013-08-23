@@ -38,6 +38,7 @@ endif()
 
 set(external_projects
   ANN
+  GLEW
   VTK
   ACVD
   GDCM
@@ -51,12 +52,14 @@ set(external_projects
   MITKData
   )
 
+
+set(MITK_USE_GLEW 1)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 set(MITK_USE_GDCM 1)
 set(MITK_USE_ITK 1)
 set(MITK_USE_VTK 1)
 
-foreach(proj VTK ACVD GDCM CableSwig ITK DCMTK CTK OpenCV SOFA)
+foreach(proj GLEW VTK ACVD GDCM CableSwig ITK DCMTK CTK OpenCV SOFA)
   if(MITK_USE_${proj})
     set(EXTERNAL_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
     mark_as_advanced(EXTERNAL_${proj}_DIR)
@@ -169,6 +172,7 @@ set(mitk_cmake_boolean_args
   MITK_BUILD_TUTORIAL # Deprecated. Use MITK_BUILD_EXAMPLES instead
   MITK_BUILD_EXAMPLES
   MITK_USE_ACVD
+  MITK_USE_GLEW
   MITK_USE_Boost
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
@@ -210,6 +214,7 @@ ExternalProject_Add(${proj}
     ${ITK_DEPENDS}
     # Optionnal dependencies
     ${ACVD_DEPENDS}
+    ${GLEW_DEPENDS}
     ${Boost_DEPENDS}
     ${CTK_DEPENDS}
     ${DCMTK_DEPENDS}
@@ -217,7 +222,6 @@ ExternalProject_Add(${proj}
     ${SOFA_DEPENDS}
     ${MITK-Data_DEPENDS}
 )
-
 #-----------------------------------------------------------------------------
 # Additional MITK CXX/C Flags
 #-----------------------------------------------------------------------------
@@ -251,7 +255,6 @@ foreach(type RUNTIME ARCHIVE LIBRARY)
     list(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
   endif()
 endforeach()
-
 # Optional python variables
 if(MITK_USE_Python)
     list(APPEND mitk_optional_cache_args
@@ -313,6 +316,7 @@ ExternalProject_Add(${proj}
     -DMITK_KWSTYLE_EXECUTABLE:FILEPATH=${MITK_KWSTYLE_EXECUTABLE}
     -DCTK_DIR:PATH=${CTK_DIR}
     -DDCMTK_DIR:PATH=${DCMTK_DIR}
+    -DGLEW_DIR:PATH=${GLEW_DIR}
     -DANN_DIR:PATH=${ANN_DIR}
     -DVTK_DIR:PATH=${VTK_DIR}     # FindVTK expects VTK_DIR
     -DITK_DIR:PATH=${ITK_DIR}     # FindITK expects ITK_DIR

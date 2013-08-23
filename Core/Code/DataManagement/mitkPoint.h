@@ -19,24 +19,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKPOINT_H
 
 
-
-// this is needed for memcopy in ITK
-// can be removed when fixed in ITK
-#include <cstring>
-
 #include <itkPoint.h>
-#include <float.h>
-#include <itkIndex.h>
-#include <itkContinuousIndex.h>
-#include <itkVector.h>
-#include <itkMatrix.h>
-#include <itkTransform.h>
-#include <vnl/vnl_quaternion.h>
-#include <MitkExports.h>
 #include "mitkTypeBasics.h"
 
-
 namespace mitk {
+
+
+//##Documentation
+//##@brief enumeration of the type a point can be
+enum PointSpecificationType
+{
+  PTUNDEFINED = 0,
+  PTSTART,
+  PTCORNER,
+  PTEDGE,
+  PTEND
+};
+
 
 template<class TCoordRep, unsigned int NPointDimension = 3>
 class Point : public itk::Point<TCoordRep, NPointDimension>

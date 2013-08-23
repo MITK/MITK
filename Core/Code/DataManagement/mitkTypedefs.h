@@ -38,13 +38,11 @@ typedef itk::Transform<ScalarType, 3, 3> Transform3D;
 typedef vnl_vector<ScalarType> VnlVector;
 typedef vnl_vector_ref<ScalarType> VnlVectorRef;
 
-
 typedef itk::Index<3> Index3D;
 typedef itk::ContinuousIndex<ScalarType, 3> ContinuousIndex3D;
 typedef vnl_quaternion<ScalarType> Quaternion;
 
 typedef itk::NumericTraits<mitk::ScalarType> ScalarTypeNumericTraits;
-
 
 typedef itk::Vector<ScalarType,2> Vector2D;
 typedef itk::Vector<ScalarType,3> Vector3D;

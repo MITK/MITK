@@ -45,20 +45,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 
-//##Documentation
-//##@brief enumeration of the type a point can be
-enum PointSpecificationType
-{
-  PTUNDEFINED = 0,
-  PTSTART,
-  PTCORNER,
-  PTEDGE,
-  PTEND
-};
-
-typedef itk::NumericTraits<mitk::ScalarType> ScalarTypeNumericTraits;
-
-
 template <class T, unsigned int NVectorDimension>
   itk::Vector<T, NVectorDimension> operator+(const itk::Vector<T, NVectorDimension> &vector, const itk::Point<T, NVectorDimension> &point)
 {

@@ -379,6 +379,45 @@ int mitk::SerialCommunication::ApplyConfiguration()
   case BaudRate115200:
     baudrate = B115200;
     break;
+  case BaudRate230400:
+    baudrate = B230400;
+    break;
+  case BaudRate460800:
+    baudrate = B460800;
+    break;
+  case BaudRate500000:
+    baudrate = B500000;
+    break;
+  case BaudRate576000:
+    baudrate = B576000;
+    break;
+  case BaudRate921600:
+    baudrate = B921600;
+    break;
+  case BaudRate1000000:
+    baudrate = B1000000;
+    break;
+  case BaudRate1152000:
+    baudrate = B1152000;
+    break;
+  case BaudRate1500000:
+    baudrate = B1500000;
+    break;
+  case BaudRate2000000:
+    baudrate = B2000000;
+    break;
+  case BaudRate2500000:
+    baudrate = B2500000;
+    break;
+  case BaudRate3000000:
+    baudrate = B3000000;
+    break;
+  case BaudRate3500000:
+    baudrate = B3500000;
+    break;
+  case BaudRate4000000:
+    baudrate = B4000000;
+    break;
   default:
     baudrate = B9600;
     break;

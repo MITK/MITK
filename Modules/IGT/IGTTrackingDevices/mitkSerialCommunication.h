@@ -71,12 +71,25 @@ namespace mitk
 
     enum BaudRate
     {
-      BaudRate9600   = 9600,
-      BaudRate14400  = 14400,
-      BaudRate19200  = 19200,
-      BaudRate38400  = 38400,
-      BaudRate57600  = 57600,
-      BaudRate115200 = 115200
+      BaudRate9600    = 9600,
+      BaudRate14400   = 14400,
+      BaudRate19200   = 19200,
+      BaudRate38400   = 38400,
+      BaudRate57600   = 57600,
+      BaudRate115200  = 115200,
+      BaudRate230400  = 230400,
+      BaudRate460800  = 460800,
+      BaudRate500000  = 500000,
+      BaudRate576000  = 576000,
+      BaudRate921600  = 921600,
+      BaudRate1000000 = 1000000,
+      BaudRate1152000 = 1152000,
+      BaudRate1500000 = 1500000,
+      BaudRate2000000 = 2000000,
+      BaudRate2500000 = 2500000,
+      BaudRate3000000 = 3000000,
+      BaudRate3500000 = 3500000,
+      BaudRate4000000 = 4000000
     };
 
     enum DataBits
@@ -249,6 +262,8 @@ namespace mitk
 
     /**
     * \brief set the send timeout in milliseconds
+    *
+    * Only applies to WIN32, not POSIX
     */
     itkSetMacro(SendTimeout, unsigned int);
 

@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_BREAKPAD_CRASH_REPORTING_H
 #define MITK_BREAKPAD_CRASH_REPORTING_H
 
-#include "BreakpadCrashReportingExports.h"
-
 #include <string>
 
 namespace google_breakpad {
@@ -65,7 +63,7 @@ namespace mitk {
   * one server instance running.
   *
   */
-  class BreakpadCrashReporting_EXPORT BreakpadCrashReporting
+  class BreakpadCrashReporting
   {
     public:
 

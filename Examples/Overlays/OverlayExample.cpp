@@ -121,13 +121,13 @@ int main(int argc, char* argv[])
 
   //! [AddLayouter]
   //This creates a 2DLayouter that is only active for the recently fetched axialRenderer and positione
-  mitk::Overlay2DLayouter::Pointer topleftLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT, renderer2D);
+  mitk::Overlay2DLayouter::Pointer topleftLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(), renderer2D);
 
   //Now, the created Layouter is added to the OverlayManager and can be referred to by its identification string.
   overlayManager->AddLayouter(topleftLayouter.GetPointer());
 
   //Several other Layouters can be added to the overlayManager
-  mitk::Overlay2DLayouter::Pointer bottomLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_BOTTOM, renderer2D);
+  mitk::Overlay2DLayouter::Pointer bottomLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_BOTTOM(), renderer2D);
   overlayManager->AddLayouter(bottomLayouter.GetPointer());
   //! [AddLayouter]
 
@@ -151,12 +151,12 @@ int main(int argc, char* argv[])
 
   //Alternatively, a layouter can be used to manage the position of the overlay. If a layouter is set, the absolute position of the overlay is not used anymore
   //The Standard TopLeft Layouter has to be registered to the OverlayManager first
-  overlayManager->AddLayouter(mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT, renderer2D).GetPointer());
+  overlayManager->AddLayouter(mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(), renderer2D).GetPointer());
   //! [TextOverlay2D]
 
   //! [SetLayouterToOverlay]
   //Because a Layouter is specified by the identification string AND the Renderer, both have to be passed to the call.
-  overlayManager->SetLayouter(textOverlay.GetPointer(),mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT,renderer2D);
+  overlayManager->SetLayouter(textOverlay.GetPointer(),mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(),renderer2D);
   //! [SetLayouterToOverlay]
 
 

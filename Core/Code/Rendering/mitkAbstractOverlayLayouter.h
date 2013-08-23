@@ -50,7 +50,7 @@ public:
   void RemoveOverlay(Overlay *Overlay);
 
   /** \brief Returns a unique identifier for one specific kind of layouter.*/
-  std::string GetIdentifier();
+  std::string GetIdentifier() const;
 
   /** \brief Sets the positions of each managed overlay according to the layouter role*/
   /** This has to be implemented in order to provide a layouting procedure for the list of managed Overlays.
@@ -67,7 +67,7 @@ protected:
   virtual ~AbstractOverlayLayouter();
 
   /** \brief returns a list of the overlays that is managed by this Layouter. */
-  std::list<mitk::Overlay*> GetManagedOverlays();
+  std::list<mitk::Overlay*> GetManagedOverlays() const;
 
   /** \brief A unique identifier for one specific kind of layouter.*/
   /** If the implementation of the layouter can manage the overlay positions in different ways, each instance has to have

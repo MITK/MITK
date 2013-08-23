@@ -25,7 +25,7 @@ mitk::AbstractOverlayLayouter::~AbstractOverlayLayouter()
 {
 }
 
-std::list<mitk::Overlay*> mitk::AbstractOverlayLayouter::GetManagedOverlays()
+std::list<mitk::Overlay*> mitk::AbstractOverlayLayouter::GetManagedOverlays() const
 {
   return m_ManagedOverlays;
 }
@@ -54,7 +54,7 @@ void mitk::AbstractOverlayLayouter::RemoveOverlay(mitk::Overlay* Overlay)
   m_ManagedOverlays.remove(Overlay);
 }
 
-std::string mitk::AbstractOverlayLayouter::GetIdentifier()
+std::string mitk::AbstractOverlayLayouter::GetIdentifier() const
 {
   return m_Identifier;
 }

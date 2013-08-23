@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLine.h"
 #include "mitkInteractionConst.h"
 #include "mitkDataStorage.h"
+#include "mitkOverlayManager.h"
 
 #include "mitkNodePredicateBase.h"
 #include "mitkNodePredicateDataType.h"
@@ -258,6 +259,12 @@ void QmitkStdMultiWidget::InitializeWidget()
   planeNode->SetColor(1.0,1.0,0.0);
   layer = mitk::IntProperty::New(1000);
   planeNode->SetProperty("layer",layer);
+
+  mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
+  mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetOverlayManager(OverlayManager);
+  mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->SetOverlayManager(OverlayManager);
+  mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->SetOverlayManager(OverlayManager);
+  mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetOverlayManager(OverlayManager);
 
   mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Standard3D);
   // Set plane mode (slicing/rotation behavior) to slicing (default)

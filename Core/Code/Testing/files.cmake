@@ -72,6 +72,14 @@ set(MODULE_TESTS
   mitkPropertyDescriptionsTest.cpp
   mitkPropertyExtensionsTest.cpp
   mitkPropertyFiltersTest.cpp
+  mitkLabelOverlay3DRendering2DTest.cpp
+  mitkLabelOverlay3DRendering3DTest.cpp
+  mitkTextOverlay2DRenderingTest.cpp
+  mitkTextOverlay2DLayouterRenderingTest.cpp
+  #mitkTextOverlay2DSymbolsRenderingTest.cpp
+  mitkTextOverlay3DRendering2DTest.cpp
+  mitkTextOverlay3DRendering3DTest.cpp
+  mitkTextOverlay3DColorRenderingTest.cpp
 )
 
 # test with image filename as an extra command line parameter

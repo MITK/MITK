@@ -27,6 +27,8 @@ mitkDefineGenericProperty(DoubleProperty,double,0.0);
 
 mitkDefineGenericProperty(Vector3DProperty,Vector3D,Vector3D(0.0f));
 
+mitkDefineGenericProperty(Point2dProperty,Point2D,Point2D::BaseArray::Filled(0.0f).GetDataPointer() );
+
 mitkDefineGenericProperty(Point3dProperty,Point3D,Point3D::BaseArray::Filled(0.0f).GetDataPointer() );
 
 mitkDefineGenericProperty(Point4dProperty,Point4D,Point4D::BaseArray::Filled(0.0f).GetDataPointer() );

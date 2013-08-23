@@ -32,6 +32,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkTransferFunctionWidget.h>
 
+namespace mitk {
+class BaseRenderer;
+}
+
 
 class QmitkExt_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::QmitkTransferFunctionWidget
 {
@@ -43,7 +47,7 @@ class QmitkExt_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::Q
     QmitkTransferFunctionWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkTransferFunctionWidget () ;
 
-    void SetDataNode(mitk::DataNode* node);
+    void SetDataNode(mitk::DataNode* node, const mitk::BaseRenderer* renderer = NULL);
 
    void SetIntegerMode(bool intMode);
 

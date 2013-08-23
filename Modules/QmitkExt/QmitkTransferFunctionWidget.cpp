@@ -107,7 +107,7 @@ void QmitkTransferFunctionWidget::SetGradientOpacityFunctionEnabled(bool enable)
   m_GradientOpacityWidget->setEnabled(enable);
 }
 
-void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode* node)
+void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode* node, const mitk::BaseRenderer* renderer)
 {
 
   //MITK_INFO << "TransW called with" << (1&&node);
@@ -115,7 +115,7 @@ void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode* node)
 
   if (node)
   {
-    tfpToChange = dynamic_cast<mitk::TransferFunctionProperty*>(node->GetProperty("TransferFunction"));
+    tfpToChange = dynamic_cast<mitk::TransferFunctionProperty*>(node->GetProperty("TransferFunction", renderer));
 
     if(!tfpToChange)
     {

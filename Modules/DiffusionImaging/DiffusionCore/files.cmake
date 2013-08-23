@@ -54,6 +54,7 @@ set(CPP_FILES
   Rendering/mitkPlanarFigureMapper3D.cpp
 
   # Algorithms
+  Algorithms/Registration/mitkBatchedRegistration.cpp
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
   Algorithms/itkDwiGradientLengthCorrectionFilter.cpp

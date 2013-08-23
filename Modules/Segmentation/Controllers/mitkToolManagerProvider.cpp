@@ -42,8 +42,8 @@ mitk::ToolManager* mitk::ToolManagerProvider::GetToolManager()
 
 mitk::ToolManagerProvider* mitk::ToolManagerProvider::GetInstance()
 {
-  static ServiceReference serviceRef;
-  static ModuleContext* context = mitk::GetModuleContext();
+  static us::ServiceReference<mitk::ToolManagerProvider> serviceRef;
+  static us::ModuleContext* context = us::GetModuleContext();
   if (!serviceRef)
   {
     // This is either the first time GetInstance() was called,

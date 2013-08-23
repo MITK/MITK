@@ -26,18 +26,18 @@ namespace mitk
   /**
   \brief Registers services for segmentation module.
   */
-  class SegmentationModuleActivator : public mitk::ModuleActivator
+  class SegmentationModuleActivator : public us::ModuleActivator
   {
   public:
 
-    void Load(mitk::ModuleContext* context)
+    void Load(us::ModuleContext* context)
     {
       /*register ToolManager provider service*/
       m_ToolManagerProvider = mitk::ToolManagerProvider::New();
       context->RegisterService<mitk::ToolManagerProvider>(m_ToolManagerProvider);
     }
 
-    void Unload(ModuleContext*)
+    void Unload(us::ModuleContext*)
     {
     }
 

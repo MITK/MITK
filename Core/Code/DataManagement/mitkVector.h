@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTransform.h>
 #include <vnl/vnl_quaternion.h>
 #include <MitkExports.h>
+#include <mitkLogMacros.h>
 
 #ifndef DOXYGEN_SKIP
 
@@ -390,7 +391,14 @@ inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2
 
 inline bool Equal(double scalar1, double scalar2, ScalarType eps=mitk::eps)
 {
-  return fabs(scalar1-scalar2) < eps;
+  bool isEqual( fabs(scalar1-scalar2) < eps );
+
+  if( !isEqual )
+  {
+    MITK_INFO << "Scalars not equal. RHS " << scalar1 << " - LHS " << scalar2 << " - epsilon " << eps;
+  }
+
+  return isEqual;
 }
 
 template <typename TCoordRep, unsigned int NPointDimension>

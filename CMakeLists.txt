@@ -370,7 +370,6 @@ find_package(ITK REQUIRED)
 find_package(VTK REQUIRED)
 
 find_package(GDCM PATHS ${ITK_GDCM_DIR} REQUIRED)
-include(${GDCM_USE_FILE})
 
 #-----------------------------------------------------------------------------
 # Set MITK specific options and variables (NOT available during superbuild)
@@ -667,10 +666,6 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${MITK_C_FLAGS_RELEASE}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MITK_EXE_LINKER_FLAGS}")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${MITK_SHARED_LINKER_FLAGS}")
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER_FLAGS}")
-
-if(MITK_USE_QT)
-  add_definitions(-DQWT_DLL)
-endif()
 
 #-----------------------------------------------------------------------------
 # Add custom targets representing CDash subprojects

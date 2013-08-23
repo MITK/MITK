@@ -43,7 +43,7 @@ endforeach()
      #${VTK_INCLUDE_DIRS}
 #    )
 
-foreach(d Utilities Utilities/ipPic Utilities/tinyxml Utilities/mbilog)
+foreach(d Utilities Utilities/ipPic Utilities/mbilog)
   list(APPEND MITK_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/${d})
 endforeach()
 list(APPEND MITK_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/Utilities/mbilog)

@@ -714,9 +714,6 @@ EXCLUDE                = @MITK_SOURCE_DIR@/BlueBerry/Documentation/reference/api
                          @MITK_SOURCE_DIR@/Utilities/KWStyle/ \
                          @MITK_SOURCE_DIR@/Utilities/Poco/ \
                          @MITK_SOURCE_DIR@/Utilities/qtsingleapplication/ \
-                         @MITK_SOURCE_DIR@/Utilities/qwt/ \
-                         @MITK_SOURCE_DIR@/Utilities/qxt/ \
-                         @MITK_SOURCE_DIR@/Utilities/tinyxml/ \
                          @MITK_SOURCE_DIR@/Applications/PluginGenerator/ \
                          @MITK_SOURCE_DIR@/Core/CppMicroServices/README.md \
                          @MITK_SOURCE_DIR@/Core/CppMicroServices/documentation/snippets/ \

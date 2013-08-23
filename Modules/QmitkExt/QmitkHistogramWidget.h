@@ -63,7 +63,7 @@ public:
 
 protected slots:
 
-  void OnSelect( const QwtDoublePoint &pos );
+  void OnSelect( const QPointF &pos );
 
 protected:
 
@@ -79,6 +79,7 @@ protected:
   QwtPlotPicker*  m_Picker;
   QwtPlotZoomer*  m_Zoomer;
   QmitkHistogram* m_Histogram;
+  QwtSymbol*      m_Symbol;
 };
 
 #endif /* QMITKHistogramWidget_H_ */

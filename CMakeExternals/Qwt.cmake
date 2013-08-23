@@ -1,32 +1,33 @@
 #-----------------------------------------------------------------------------
-# ANN
+# Qwt
 #-----------------------------------------------------------------------------
 
 # Sanity checks
-if(DEFINED ANN_DIR AND NOT EXISTS ${ANN_DIR})
-  message(FATAL_ERROR "ANN_DIR variable is defined but corresponds to non-existing directory")
+if(DEFINED Qwt_DIR AND NOT EXISTS ${Qwt_DIR})
+  message(FATAL_ERROR "Qwt_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-set(proj ANN)
+set(proj Qwt)
 set(proj_DEPENDENCIES )
-set(ANN_DEPENDS ${proj})
+set(${proj}_DEPENDS ${proj})
 
-if(NOT DEFINED ANN_DIR)
+if(NOT DEFINED ${proj}_DIR)
 
   ExternalProject_Add(${proj}
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
      PREFIX ${proj}-cmake
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ann-cmake-1.1.2.tar.gz
-     URL_MD5 d9bbbc9e6fd6f29312a7c2bee48430e4
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qwt-cmake-6.1.0.tar.gz
+     URL_MD5 0f6e5c5221ffbbf7d0ba9a778f3e6f05
      INSTALL_COMMAND ""
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
+       -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
      DEPENDS ${proj_DEPENDENCIES}
     )
 
-  set(ANN_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+  set(${proj}_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
 
 else()
 

@@ -378,7 +378,7 @@ public:
   virtual Bounds GetBoundsOnDisplay(BaseRenderer *renderer) = 0;
 
   /** \brief Sets position and size of the overlay on the display.*/
-  virtual void SetBoundsOnDisplay(BaseRenderer *renderer, Bounds) = 0;
+  virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds&) = 0;
 
   mitkClassMacro(Overlay, itk::Object);
 

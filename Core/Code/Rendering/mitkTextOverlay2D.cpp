@@ -46,7 +46,7 @@ mitk::Overlay::Bounds mitk::TextOverlay2D::GetBoundsOnDisplay(mitk::BaseRenderer
   return bounds;
 }
 
-void mitk::TextOverlay2D::SetBoundsOnDisplay(mitk::BaseRenderer *renderer, mitk::Overlay::Bounds bounds)
+void mitk::TextOverlay2D::SetBoundsOnDisplay(mitk::BaseRenderer *renderer, const mitk::Overlay::Bounds& bounds)
 {
   vtkSmartPointer<vtkActor2D> actor = GetVtkActor2D(renderer);
   actor->SetDisplayPosition(bounds.Position[0],bounds.Position[1]);

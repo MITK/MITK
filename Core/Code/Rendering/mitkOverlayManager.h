@@ -31,6 +31,7 @@ class BaseRenderer;
 /** \brief The OverlayManager updates and manages Overlays and the respective Layouters. */
 /** An Instance of the OverlayManager can be registered to several BaseRenderer instances in order to
  * call the update method of each Overlay during the rendering phase of the renderer.
+ * See \ref OverlaysPage for more info.
 */
 class MITK_CORE_EXPORT OverlayManager : public itk::Object {
 public:

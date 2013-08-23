@@ -49,7 +49,7 @@ int mitkLabelOverlay3DRendering3DTest(int argc, char* argv[])
   offset[0] = .5;
   offset[1] = .5;
   offset[2] = .5;
-  std::vector<const char*> labels;
+  std::vector<std::string> labels;
   int idx = 0;
   for(int i=-10 ; i < 10 ; i+=2){
     for(int j=-10 ; j < 10 ; j+=2){

@@ -31,12 +31,12 @@ namespace mitk {
 class MITK_CORE_EXPORT TextOverlay3D : public mitk::VtkOverlay3D {
 public:
 
-  /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
+  /** \brief Internal class holding the mapper, actor, etc. for each of the render windows */
   /**
-     * To render transveral, coronal, and sagittal, the mapper is called three times.
-     * For performance reasons, the corresponding data for each view is saved in the
-     * internal helper class LocalStorage. This allows rendering n views with just
-     * 1 mitkMapper using n vtkMapper.
+     * To render the Overlay on transveral, coronal, and sagittal, the update method
+     * is called for each renderwindow. For performance reasons, the corresponding data
+     * for each view is saved in the internal helper class LocalStorage.
+     * This allows rendering n views with just 1 mitkOverlay using n vtkMapper.
      * */
   class LocalStorage : public mitk::Overlay::BaseLocalStorage
   {
@@ -45,7 +45,6 @@ public:
     vtkSmartPointer<vtkFollower> m_follower;
 
     vtkSmartPointer<vtkVectorText> m_textSource;
-
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;
@@ -57,13 +56,13 @@ public:
 
   };
 
-  /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
-  mitk::LocalStorageHandler<LocalStorage> m_LSH;
-
   mitkClassMacro(TextOverlay3D, mitk::VtkOverlay3D);
   itkNewMacro(TextOverlay3D);
 
 protected:
+
+  /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
+  mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
   virtual vtkProp* GetVtkProp(BaseRenderer *renderer);
   void UpdateVtkOverlay(mitk::BaseRenderer *renderer);

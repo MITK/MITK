@@ -24,19 +24,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+/**
+ * @brief The VtkOverlay3D class is the basis for all VTK based Overlays which create
+ * any 3D element as a vtkProp that will be drawn on the renderer.
+ */
 class MITK_CORE_EXPORT VtkOverlay3D : public VtkOverlay {
 public:
 
-  void SetPosition3D(Point3D position3D, mitk::BaseRenderer* renderer = NULL);
+  void SetPosition3D(const Point3D& position3D, mitk::BaseRenderer* renderer = NULL);
 
-  Point3D GetPosition3D(mitk::BaseRenderer* renderer = NULL);
+  Point3D GetPosition3D(mitk::BaseRenderer* renderer = NULL) const;
 
-  void SetOffsetVector(Point3D OffsetVector, mitk::BaseRenderer* renderer = NULL);
+  void SetOffsetVector(const Point3D& OffsetVector, mitk::BaseRenderer* renderer = NULL);
 
-  Point3D GetOffsetVector(mitk::BaseRenderer* renderer = NULL);
+  Point3D GetOffsetVector(mitk::BaseRenderer* renderer = NULL) const;
 
   Overlay::Bounds GetBoundsOnDisplay(BaseRenderer*);
-  void SetBoundsOnDisplay(BaseRenderer*, Overlay::Bounds);
+  void SetBoundsOnDisplay(BaseRenderer*, const Bounds&);
 
   mitkClassMacro(VtkOverlay3D, VtkOverlay);
 

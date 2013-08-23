@@ -48,16 +48,16 @@ public:
     ~LocalStorage();
   };
 
-  /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
-  mitk::LocalStorageHandler<LocalStorage> m_LSH;
-
   mitkClassMacro(TextOverlay2D, mitk::VtkOverlay2D);
   itkNewMacro(TextOverlay2D);
 
   virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer);
-  virtual void SetBoundsOnDisplay(BaseRenderer *renderer, Overlay::Bounds bounds);
+  virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds& bounds);
 
 protected:
+
+  /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
+  mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
   virtual vtkActor2D* GetVtkActor2D(BaseRenderer *renderer);
   void UpdateVtkOverlay2D(mitk::BaseRenderer *renderer);

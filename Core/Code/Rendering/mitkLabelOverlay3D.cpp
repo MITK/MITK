@@ -125,13 +125,13 @@ vtkProp* mitk::LabelOverlay3D::GetVtkProp(BaseRenderer *renderer)
 }
 
 
-void mitk::LabelOverlay3D::SetLabelVector(std::vector<const char*> LabelVector)
+void mitk::LabelOverlay3D::SetLabelVector(const std::vector<std::string>& LabelVector)
 {
   m_LabelVector = LabelVector;
   this->Modified();
 }
 
-void mitk::LabelOverlay3D::SetPriorityVector(std::vector<int> PriorityVector)
+void mitk::LabelOverlay3D::SetPriorityVector(const std::vector<int>& PriorityVector)
 {
   m_PriorityVector = PriorityVector;
   this->Modified();

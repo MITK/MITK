@@ -26,20 +26,24 @@ class vtkProperty2D;
 
 namespace mitk {
 
+/**
+ * @brief The VtkOverlay2D class is the basis for all VTK based Overlays which create
+ * a vtkActor2D element that will be drawn on the renderer.
+ */
 class MITK_CORE_EXPORT VtkOverlay2D : public VtkOverlay {
 public:
 
   mitkClassMacro(VtkOverlay2D, VtkOverlay);
   virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer);
-  virtual void SetBoundsOnDisplay(BaseRenderer *renderer, Overlay::Bounds bounds);
+  virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds& bounds);
 
-  void SetPosition2D(Point2D position2D, mitk::BaseRenderer* renderer = NULL);
+  void SetPosition2D(const Point2D& position2D, mitk::BaseRenderer* renderer = NULL);
 
-  Point2D GetPosition2D(mitk::BaseRenderer* renderer = NULL);
+  Point2D GetPosition2D(mitk::BaseRenderer* renderer = NULL) const;
 
-  void SetOffsetVector(Point2D OffsetVector, BaseRenderer* renderer = NULL);
+  void SetOffsetVector(const Point2D& OffsetVector, BaseRenderer* renderer = NULL);
 
-  Point2D GetOffsetVector(mitk::BaseRenderer* renderer = NULL);
+  Point2D GetOffsetVector(mitk::BaseRenderer* renderer = NULL) const;
 
 protected:
 

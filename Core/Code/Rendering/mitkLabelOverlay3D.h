@@ -37,7 +37,6 @@ class PointSet;
 
 
 /** \brief Can display a high amount of 3D labels to a PointSet */
-/** */
 class MITK_CORE_EXPORT LabelOverlay3D : public mitk::VtkOverlay3D {
 public:
 
@@ -62,22 +61,22 @@ public:
 
   };
 
-  /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
-  mitk::LocalStorageHandler<LocalStorage> m_LSH;
-
   mitkClassMacro(LabelOverlay3D, mitk::VtkOverlay3D);
   itkNewMacro(LabelOverlay3D);
 
   /** \brief Set the vector of labels that are shown to each corresponding point3D. The size has to be equal to the provided LabelCoordinates. */
-  void SetLabelVector(std::vector<const char *> LabelVector);
+  void SetLabelVector(const std::vector<std::string>& LabelVector);
 
   /** \brief Optional: Provide a vector of priorities. The labels with higher priorities will be visible in lower LOD */
-  void SetPriorityVector(std::vector<int> PriorityVector);
+  void SetPriorityVector(const std::vector<int>& PriorityVector);
 
   /** \brief Coordinates of the labels */
   void SetLabelCoordinates(itk::SmartPointer<PointSet> LabelCoordinates);
 
 protected:
+
+  /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
+  mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
   virtual vtkProp *GetVtkProp(BaseRenderer *renderer);
   void UpdateVtkOverlay(mitk::BaseRenderer *renderer);
@@ -91,7 +90,7 @@ protected:
 private:
 
   /** \brief The char arrays in this vector are displayed at the corresponding coordinates.*/
-  std::vector<const char*> m_LabelVector;
+  std::vector<std::string> m_LabelVector;
 
   /** \brief values in this array set a priority to each label. Higher priority labels are not covert by labels with lower priority.*/
   std::vector<int> m_PriorityVector;

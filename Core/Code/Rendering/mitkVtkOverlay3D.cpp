@@ -36,30 +36,30 @@ mitk::Overlay::Bounds mitk::VtkOverlay3D::GetBoundsOnDisplay(mitk::BaseRenderer*
   return bounds;
 }
 
-void mitk::VtkOverlay3D::SetBoundsOnDisplay(mitk::BaseRenderer*, mitk::Overlay::Bounds)
+void mitk::VtkOverlay3D::SetBoundsOnDisplay(mitk::BaseRenderer*, const mitk::Overlay::Bounds&)
 {
 }
 
-void mitk::VtkOverlay3D::SetPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)
+void mitk::VtkOverlay3D::SetPosition3D(const Point3D& position3D, mitk::BaseRenderer *renderer)
 {
   mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
   SetProperty("VtkOverlay3D.Position3D", position3dProperty.GetPointer(),renderer);
 }
 
-mitk::Point3D mitk::VtkOverlay3D::GetPosition3D(mitk::BaseRenderer *renderer)
+mitk::Point3D mitk::VtkOverlay3D::GetPosition3D(mitk::BaseRenderer *renderer) const
 {
   mitk::Point3D position3D;
   GetPropertyValue<mitk::Point3D>("VtkOverlay3D.Position3D", position3D, renderer);
   return position3D;
 }
 
-void mitk::VtkOverlay3D::SetOffsetVector(Point3D OffsetVector, mitk::BaseRenderer *renderer)
+void mitk::VtkOverlay3D::SetOffsetVector(const Point3D& OffsetVector, mitk::BaseRenderer *renderer)
 {
   mitk::Point3dProperty::Pointer OffsetVectorProperty = mitk::Point3dProperty::New(OffsetVector);
   SetProperty("VtkOverlay3D.OffsetVector", OffsetVectorProperty.GetPointer(),renderer);
 }
 
-mitk::Point3D mitk::VtkOverlay3D::GetOffsetVector(mitk::BaseRenderer *renderer)
+mitk::Point3D mitk::VtkOverlay3D::GetOffsetVector(mitk::BaseRenderer *renderer) const
 {
   mitk::Point3D OffsetVector;
   GetPropertyValue<mitk::Point3D>("VtkOverlay3D.OffsetVector", OffsetVector, renderer);

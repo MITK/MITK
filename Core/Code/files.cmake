@@ -341,7 +341,7 @@ set(CPP_FILES
   Rendering/mitkVtkOverlay2D.cpp
   Rendering/mitkVtkOverlay3D.cpp
   Rendering/mitkOverlayManager.cpp
-  Rendering/mitkBaseLayouter.cpp
+  Rendering/mitkAbstractOverlayLayouter.cpp
 
   Rendering/mitkTextOverlay2D.cpp
   Rendering/mitkTextOverlay3D.cpp

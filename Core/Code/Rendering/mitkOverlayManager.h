@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkLightObject.h>
 #include <vtkSmartPointer.h>
 #include "mitkOverlay.h"
-#include "mitkBaseLayouter.h"
+#include "mitkAbstractOverlayLayouter.h"
 #include "mitkLocalStorageHandler.h"
 
 namespace mitk {
@@ -37,7 +37,7 @@ class MITK_CORE_EXPORT OverlayManager : public itk::Object {
 public:
   typedef std::set<BaseRenderer*> BaseRendererSet;
   typedef std::set<Overlay::Pointer> OverlaySet;
-  typedef std::map<const std::string,BaseLayouter::Pointer > LayouterMap;
+  typedef std::map<const std::string,AbstractOverlayLayouter::Pointer > LayouterMap;
   typedef std::map<const BaseRenderer*,LayouterMap > LayouterRendererMap;
 
   mitkClassMacro(OverlayManager, itk::LightObject);
@@ -56,10 +56,10 @@ public:
   void UpdateLayouts(BaseRenderer* renderer);
 
   /** \brief Returns the Layouter specified by renderer and the identifier*/
-  BaseLayouter::Pointer GetLayouter(BaseRenderer* renderer, const std::string& identifier);
+  AbstractOverlayLayouter::Pointer GetLayouter(BaseRenderer* renderer, const std::string& identifier);
 
   /** \brief Add a layouter to provide it with the use of the SetLayouter method*/
-  void AddLayouter(const BaseLayouter::Pointer& layouter);
+  void AddLayouter(const AbstractOverlayLayouter::Pointer& layouter);
 
   void AddBaseRenderer(BaseRenderer* renderer);
 

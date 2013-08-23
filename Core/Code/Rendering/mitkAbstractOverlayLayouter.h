@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef BASELAYOUTER_H
-#define BASELAYOUTER_H
+#ifndef ABSTRACTOVERLAYLAYOUTER_H
+#define ABSTRACTOVERLAYLAYOUTER_H
 
 #include <MitkExports.h>
 #include <itkObject.h>
@@ -28,16 +28,16 @@ class BaseRenderer;
 
 /** @brief Baseclass of Overlay layouters */
 /**
- *A BaseLayouter can be implemented to control a set of Overlays by means of position and size.
- *BaseLayouter::PrepareLayout() should be implemented with a routine to set the position of the internal m_ManagedOverlays List.
+ *A AbstractOverlayLayouter can be implemented to control a set of Overlays by means of position and size.
+ *AbstractOverlayLayouter::PrepareLayout() should be implemented with a routine to set the position of the internal m_ManagedOverlays List.
  *A layouter is always connected to one BaseRenderer, so there is one instance of the layouter for each BaseRenderer.
  *One type of layouter should always have a unique identifier.
  *@ingroup Overlays
 */
-class MITK_CORE_EXPORT BaseLayouter : public itk::Object {
+class MITK_CORE_EXPORT AbstractOverlayLayouter : public itk::Object {
 public:
 
-  mitkClassMacro(BaseLayouter, itk::Object);
+  mitkClassMacro(AbstractOverlayLayouter, itk::Object);
 
   void SetBaseRenderer(BaseRenderer* renderer);
   BaseRenderer *GetBaseRenderer();
@@ -61,10 +61,10 @@ public:
 protected:
 
   /** \brief explicit constructor which disallows implicit conversions */
-  explicit BaseLayouter();
+  explicit AbstractOverlayLayouter();
 
   /** \brief virtual destructor in order to derive from this class */
-  virtual ~BaseLayouter();
+  virtual ~AbstractOverlayLayouter();
 
   /** \brief returns a list of the overlays that is managed by this Layouter. */
   std::list<mitk::Overlay*> GetManagedOverlays();
@@ -83,13 +83,13 @@ private:
   std::list<mitk::Overlay*> m_ManagedOverlays;
 
   /** \brief copy constructor */
-  BaseLayouter( const BaseLayouter &);
+  AbstractOverlayLayouter( const AbstractOverlayLayouter &);
 
   /** \brief assignment operator */
-  BaseLayouter &operator=(const BaseLayouter &);
+  AbstractOverlayLayouter &operator=(const AbstractOverlayLayouter &);
 };
 
 } // namespace mitk
-#endif // BASELAYOUTER_H
+#endif // ABSTRACTOVERLAYLAYOUTER_H
 
 

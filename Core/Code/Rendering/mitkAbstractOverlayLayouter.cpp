@@ -14,33 +14,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkBaseLayouter.h"
+#include "mitkAbstractOverlayLayouter.h"
 #include "mitkBaseRenderer.h"
 
-mitk::BaseLayouter::BaseLayouter()
+mitk::AbstractOverlayLayouter::AbstractOverlayLayouter()
 {
 }
 
-mitk::BaseLayouter::~BaseLayouter()
+mitk::AbstractOverlayLayouter::~AbstractOverlayLayouter()
 {
 }
 
-std::list<mitk::Overlay*> mitk::BaseLayouter::GetManagedOverlays()
+std::list<mitk::Overlay*> mitk::AbstractOverlayLayouter::GetManagedOverlays()
 {
   return m_ManagedOverlays;
 }
 
-void mitk::BaseLayouter::SetBaseRenderer(BaseRenderer *renderer)
+void mitk::AbstractOverlayLayouter::SetBaseRenderer(BaseRenderer *renderer)
 {
   m_BaseRenderer = renderer;
 }
 
-mitk::BaseRenderer* mitk::BaseLayouter::GetBaseRenderer()
+mitk::BaseRenderer* mitk::AbstractOverlayLayouter::GetBaseRenderer()
 {
   return m_BaseRenderer;
 }
 
-void mitk::BaseLayouter::AddOverlay(mitk::Overlay* Overlay)
+void mitk::AbstractOverlayLayouter::AddOverlay(mitk::Overlay* Overlay)
 {
   if(Overlay->m_LayoutedBy && Overlay->m_LayoutedBy != this)
     Overlay->m_LayoutedBy->RemoveOverlay(Overlay);
@@ -49,12 +49,12 @@ void mitk::BaseLayouter::AddOverlay(mitk::Overlay* Overlay)
   PrepareLayout();
 }
 
-void mitk::BaseLayouter::RemoveOverlay(mitk::Overlay* Overlay)
+void mitk::AbstractOverlayLayouter::RemoveOverlay(mitk::Overlay* Overlay)
 {
   m_ManagedOverlays.remove(Overlay);
 }
 
-std::string mitk::BaseLayouter::GetIdentifier()
+std::string mitk::AbstractOverlayLayouter::GetIdentifier()
 {
   return m_Identifier;
 }

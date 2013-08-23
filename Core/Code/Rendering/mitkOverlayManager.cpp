@@ -103,7 +103,7 @@ void mitk::OverlayManager::SetLayouter(Overlay *overlay, const std::string &iden
 {
   if(renderer)
   {
-    BaseLayouter::Pointer layouter = GetLayouter(renderer,identifier);
+    AbstractOverlayLayouter::Pointer layouter = GetLayouter(renderer,identifier);
     if(layouter.IsNull())
     {
       MITK_WARN << "Layouter " << identifier << " cannot be found or created!";
@@ -126,17 +126,17 @@ void mitk::OverlayManager::UpdateLayouts(mitk::BaseRenderer *renderer)
   }
 }
 
-mitk::BaseLayouter::Pointer mitk::OverlayManager::GetLayouter(mitk::BaseRenderer *renderer, const std::string& identifier)
+mitk::AbstractOverlayLayouter::Pointer mitk::OverlayManager::GetLayouter(mitk::BaseRenderer *renderer, const std::string& identifier)
 {
-  BaseLayouter::Pointer layouter = m_LayouterMap[renderer][identifier];
+  AbstractOverlayLayouter::Pointer layouter = m_LayouterMap[renderer][identifier];
   return layouter;
 }
 
-void mitk::OverlayManager::AddLayouter(const BaseLayouter::Pointer& layouter)
+void mitk::OverlayManager::AddLayouter(const AbstractOverlayLayouter::Pointer& layouter)
 {
   if(layouter.IsNotNull())
   {
-    BaseLayouter::Pointer oldLayouter = m_LayouterMap[layouter->GetBaseRenderer()][layouter->GetIdentifier()];
+    AbstractOverlayLayouter::Pointer oldLayouter = m_LayouterMap[layouter->GetBaseRenderer()][layouter->GetIdentifier()];
     if(oldLayouter.IsNotNull() && oldLayouter.GetPointer() != layouter.GetPointer())
     {
       MITK_WARN << "Layouter " << layouter->GetIdentifier() << " does already exist!";

@@ -23,15 +23,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class BaseLayouter;
+class AbstractOverlayLayouter;
 
 /** \brief Base class for all overlays */
-/** This class is to be implemented in order to create overlays which are managed by the OverlayManager and can be placed by a BaseLayouter.
+/** This class is to be implemented in order to create overlays which are managed by the OverlayManager and can be placed by a AbstractOverlayLayouter.
 This class contains an internal Propertylist, and another PropertyList for each BaseRenderer.
 A property that is specified for a specific renderer always overrides the general internal property of the same name.
 AddOverlay, RemoveOverlay and UpdateOverlay methods have to be implemented.*/
 class MITK_CORE_EXPORT Overlay : public itk::Object {
-  friend class BaseLayouter;
+  friend class AbstractOverlayLayouter;
 public:
 
   /** \brief Container for position and size on the display.*/
@@ -419,7 +419,7 @@ private:
   Overlay &operator=(const Overlay &);
 
   /** \brief Reference to the layouter in which this overlay is managed. */
-  BaseLayouter* m_LayoutedBy;
+  AbstractOverlayLayouter* m_LayoutedBy;
 
 };
 

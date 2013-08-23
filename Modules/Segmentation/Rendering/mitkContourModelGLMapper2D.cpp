@@ -131,6 +131,22 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     bool drawit=false;
 
+    bool showSegments = false;
+    dataNode->GetBoolProperty("contour.segments.show", showSegments);
+
+    bool showControlPoints = false;
+    dataNode->GetBoolProperty("contour.controlpoints.show", showControlPoints);
+
+    bool showPoints = false;
+    dataNode->GetBoolProperty("contour.points.show", showPoints);
+
+    bool showPointsNumbers = false;
+    dataNode->GetBoolProperty("contour.points.text", showPointsNumbers);
+
+    bool showControlPointsNumbers = false;
+    dataNode->GetBoolProperty("contour.controlpoints.text", showControlPointsNumbers);
+
+
     mitk::ContourModel::VertexIterator pointsIt = renderingContour->IteratorBegin(timestep);
 
     Point2D pt2d;       // projected_p in display coordinates
@@ -172,9 +188,6 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       if(drawit)
       {
 
-         bool showSegments = false;
-         dataNode->GetBoolProperty("contour.segments.show", showSegments);
-
          if (showSegments)
          {
             //lastPt2d is not valid in first step
@@ -189,8 +202,6 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
             }
          }
 
-        bool showControlPoints = false;
-        dataNode->GetBoolProperty("contour.controlpoints.show", showControlPoints);
 
         if (showControlPoints)
         {
@@ -224,8 +235,6 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
             }
         }
 
-        bool showPoints = false;
-        dataNode->GetBoolProperty("contour.points.show", showPoints);
 
         if (showPoints)
         {
@@ -255,8 +264,6 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
           glEnd ();
         }
 
-        bool showPointsNumbers = false;
-        dataNode->GetBoolProperty("contour.points.text", showPointsNumbers);
 
         if (showPointsNumbers)
         {
@@ -271,8 +278,6 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
             OpenGLrenderer->WriteSimpleText(l, pt2d[0] + 2, pt2d[1] + 2,rgb[0], rgb[1],rgb[2]);
         }
 
-        bool showControlPointsNumbers = false;
-        dataNode->GetBoolProperty("contour.controlpoints.text", showControlPointsNumbers);
 
         if (showControlPointsNumbers && (*pointsIt)->IsControlPoint)
         {
@@ -294,7 +299,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     }//end while iterate over controlpoints
 
     //close contour if necessary
-    if(renderingContour->IsClosed(timestep) && drawit)
+    if(renderingContour->IsClosed(timestep) && drawit && showSegments)
     {
       lastPt2d = pt2d;
       point = renderingContour->GetVertexAt(0,timestep)->Coordinates;

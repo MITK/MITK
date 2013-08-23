@@ -5,6 +5,10 @@ if(MITK_SHOW_CONSOLE_WINDOW)
   list(APPEND _app_options SHOW_CONSOLE)
 endif()
 
+if(MITK_USE_Breakpad)
+MITK_USE_MODULE(BreakpadCrashReporting)
+endif()
+
 # Create a cache entry for the provisioning file which is used to export
 # the file name in the MITKConfig.cmake file. This will keep external projects
 # which rely on this file happy.

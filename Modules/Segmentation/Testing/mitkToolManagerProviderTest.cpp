@@ -18,10 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkLightObject.h"
 
 #include <usGetModuleContext.h>
-#include "mitkModuleContext.h"
-#include "mitkServiceReference.h"
+#include <usModuleContext.h>
+#include <usServiceReference.h>
 
-#include "mitkGlobalInteraction.h"
 
 
 int mitkToolManagerProviderTest(int, char* [])

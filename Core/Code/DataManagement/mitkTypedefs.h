@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMatrix.h>
 #include <itkTransform.h>
 #include <vnl/vnl_quaternion.h>
+#include <utility>
 
 #include "mitkTypeBasics.h"
 
@@ -44,8 +45,7 @@ typedef vnl_quaternion<ScalarType> Quaternion;
 
 typedef itk::NumericTraits<mitk::ScalarType> ScalarTypeNumericTraits;
 
-typedef itk::Vector<ScalarType,2> Vector2D;
-typedef itk::Vector<ScalarType,3> Vector3D;
+typedef std::pair<std::string, bool> FileServiceOption;
 
 }
 

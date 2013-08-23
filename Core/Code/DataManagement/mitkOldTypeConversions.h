@@ -97,11 +97,11 @@ template<> class VectorTraits< itk::Vector<int,3> > {
 public:
   typedef int ValueType;
 };
-/*
+
 template<> class VectorTraits< mitk::Vector<double,3> > {
 public:
   typedef double ValueType;
-};*/
+};
 
 template<> class VectorTraits< mitk::Point<float,3> > {
 public:

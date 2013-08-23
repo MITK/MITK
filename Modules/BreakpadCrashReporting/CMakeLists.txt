@@ -27,6 +27,9 @@ if(MITK_USE_Breakpad) # from top-level CMakeLists.txt
     MITK_INSTALL(TARGETS CrashReportingServer)
   endif()
 
+  if(CMAKE_SYSTEM MATCHES "Linux")
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ProduceBreakpadSymbols.sh.in ${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ProduceBreakpadSymbols.sh)
+  endif()
 
 add_subdirectory(Testing)
 

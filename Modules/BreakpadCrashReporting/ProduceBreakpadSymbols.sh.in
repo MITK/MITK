@@ -1,0 +1,34 @@
+#!/bin/bash
+#
+# This script can be used to convert the debugging symbols of binaries to text-format symbol files.
+# This needs to be done so that Breakpad can produce useful stack traces.
+# The script takes as argument the path to the binary for which the symbols should be converted.
+#
+# To produce the stack trace use the application @Breakpad_DIR@/minidump_stackwalk
+# For further details have a look at the offical documentation of google breakpad: https://code.google.com/p/google-breakpad/wiki/LinuxStarterGuide
+
+# path to binary
+BINARY_PATH=$1
+
+# path to dump_sys
+DUMPSYMS=@Breakpad_DIR@/dump_syms
+
+# output path
+OUTPUT=@MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY@/CrashDumps
+
+# if output folder does not exist yet
+mkdir -p $OUTPUT
+
+OUTPUTFILEPATH=$OUTPUT/symbols.sym
+
+$DUMPSYMS $BINARY_PATH > $OUTPUTFILEPATH
+
+HASH=$(head -n1 $OUTPUTFILEPATH | awk '{ print $4 }' )
+echo $HASH
+
+EXENAME=$(head -n1 $OUTPUTFILEPATH | awk '{ print $5 }' )
+echo $EXENAME
+
+mkdir -p $OUTPUT/./symbols/$EXENAME/$HASH
+mv $OUTPUTFILEPATH $OUTPUT/./symbols/$EXENAME/$HASH
+

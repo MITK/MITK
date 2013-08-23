@@ -29,7 +29,7 @@ mitk::VtkOverlay2D::~VtkOverlay2D()
 }
 
 
-mitk::Overlay::Bounds mitk::VtkOverlay2D::GetBoundsOnDisplay(mitk::BaseRenderer *renderer)
+mitk::Overlay::Bounds mitk::VtkOverlay2D::GetBoundsOnDisplay(mitk::BaseRenderer *renderer) const
 {
   mitk::Overlay::Bounds bounds;
   vtkSmartPointer<vtkActor2D> actor = GetVtkActor2D(renderer);
@@ -86,7 +86,7 @@ mitk::Point2D mitk::VtkOverlay2D::GetOffsetVector(mitk::BaseRenderer *renderer) 
 }
 
 
-vtkProp* mitk::VtkOverlay2D::GetVtkProp(mitk::BaseRenderer *renderer)
+vtkProp* mitk::VtkOverlay2D::GetVtkProp(mitk::BaseRenderer *renderer) const
 {
   return GetVtkActor2D(renderer);
 }

@@ -34,7 +34,7 @@ class MITK_CORE_EXPORT VtkOverlay2D : public VtkOverlay {
 public:
 
   mitkClassMacro(VtkOverlay2D, VtkOverlay);
-  virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer);
+  virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const;
   virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds& bounds);
 
   void SetPosition2D(const Point2D& position2D, mitk::BaseRenderer* renderer = NULL);
@@ -47,10 +47,10 @@ public:
 
 protected:
 
-  vtkProp* GetVtkProp(BaseRenderer *renderer);
+  vtkProp* GetVtkProp(BaseRenderer *renderer) const;
   virtual void UpdateVtkOverlay(BaseRenderer *renderer);
   virtual void UpdateVtkOverlay2D(BaseRenderer *renderer) = 0;
-  virtual vtkActor2D* GetVtkActor2D(BaseRenderer *renderer) = 0;
+  virtual vtkActor2D* GetVtkActor2D(BaseRenderer *renderer) const = 0;
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit VtkOverlay2D();

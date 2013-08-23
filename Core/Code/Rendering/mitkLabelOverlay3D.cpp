@@ -118,7 +118,7 @@ void mitk::LabelOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
 }
 
 
-vtkProp* mitk::LabelOverlay3D::GetVtkProp(BaseRenderer *renderer)
+vtkProp* mitk::LabelOverlay3D::GetVtkProp(BaseRenderer *renderer) const
 {
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
   return ls->m_LabelsActor;

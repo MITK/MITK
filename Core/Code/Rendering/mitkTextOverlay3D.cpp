@@ -73,7 +73,7 @@ void mitk::TextOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
   }
 }
 
-vtkProp* mitk::TextOverlay3D::GetVtkProp(BaseRenderer *renderer)
+vtkProp* mitk::TextOverlay3D::GetVtkProp(BaseRenderer *renderer) const
 {
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
   ls->m_follower->SetCamera(renderer->GetVtkRenderer()->GetActiveCamera());

@@ -36,7 +36,7 @@ mitk::TextOverlay2D::~TextOverlay2D()
 {
 }
 
-mitk::Overlay::Bounds mitk::TextOverlay2D::GetBoundsOnDisplay(mitk::BaseRenderer *renderer)
+mitk::Overlay::Bounds mitk::TextOverlay2D::GetBoundsOnDisplay(mitk::BaseRenderer *renderer) const
 {
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
   mitk::Overlay::Bounds bounds;
@@ -98,7 +98,7 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
 
 }
 
-vtkActor2D* mitk::TextOverlay2D::GetVtkActor2D(BaseRenderer *renderer)
+vtkActor2D* mitk::TextOverlay2D::GetVtkActor2D(BaseRenderer *renderer) const
 {
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
   return ls->m_textActor;

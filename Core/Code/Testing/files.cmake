@@ -68,7 +68,9 @@ set(MODULE_TESTS
   mitkShaderRepositoryTest.cpp
   mitkPlanePositionManagerTest.cpp
   mitkAffineTransformBaseTest.cpp
-  mitkTypeConversionTest.cpp
+  mitkTypePointConversionTest.cpp
+  mitkTypeVectorConversionTest.cpp
+  mitkTypeMatrixConversionTest.cpp
   mitkTypeOperationTest.cpp
 )
 

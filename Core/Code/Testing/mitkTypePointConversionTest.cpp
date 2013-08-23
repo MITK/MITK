@@ -16,11 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkTestingMacros.h"
-#include "mitkTypes.h"
+#include "mitkTypeBasics.h"
+#include "mitkTypes.h" // for Equal method
+#include "mitkPoint.h"
 #include "itkPoint.h"
 #include "vtkPoints.h"
 #include "vtkSmartPointer.h"
-#include "vnl/vnl_vector_ref.h"
 
 #include <iostream>
 
@@ -121,49 +122,6 @@ static void Test_Pod2Mitk_PointCompatibility()
 }
 
 
-template< class T, unsigned int NVectorDimension>
-itk::Vector<T, NVectorDimension>  toItk(const vnl_vector_fixed<T, NVectorDimension>& vnlVectorFixed)
-{
-  return toItk<T, NVectorDimension>(vnlVectorFixed.as_vector());
-}
-
-
-template< class T, unsigned int NVectorDimension>
-itk::Vector<T, NVectorDimension>  toItk(const vnl_vector<T>& vnlVector)
-{
-  itk::Vector<T, NVectorDimension> vector;
-  vector.SetVnlVector(vnlVector);
-  return vector;
-}
-
-
-static void Test_Vnl2Mitk_VectorFixedCompatibility()
-{
-  Setup();
-
-  mitk::Vector3D vector3D = originalValues;
-  vnl_vector_fixed<ScalarType, 3> vnlVectorFixed(valuesToCopy);
-
-  vector3D = toItk(vnlVectorFixed);
-
-  MITK_TEST_CONDITION( vector3D.GetVnlVector() == vnlVectorFixed, "vnl_vector_fixed assigned to mitk vector")
-  MITK_TEST_CONDITION( vector3D == valuesToCopy, "correct values were assigned" )
-}
-
-static void Test_Vnl2Mitk_VectorCompatibility()
-{
-  Setup();
-
-  mitk::Vector3D vector3D = originalValues;
-  vnl_vector<ScalarType> vnlVector(3);
-  vnlVector.set(valuesToCopy);
-
-  vector3D = toItk<ScalarType, 3>(vnlVector);
-
-  MITK_TEST_CONDITION( vector3D.GetVnlVector() == vnlVector, "vnl_vector assigned to mitk vector")
-  MITK_TEST_CONDITION( vector3D == valuesToCopy, "correct values were assigned" )
-}
-
 
 static void Test_Mitk2Vnl_PointCompatibility()
 {
@@ -181,21 +139,18 @@ static void Test_Mitk2Vnl_PointCompatibility()
 
 
 /**
-* Test the conversions from and to mitk types
+* Test the conversions from and to mitk point types
 */
-int mitkTypeConversionTest(int /*argc*/ , char* /*argv*/[])
+int mitkTypePointConversionTest(int /*argc*/ , char* /*argv*/[])
 {
   // always start with this!
-  MITK_TEST_BEGIN("TypeConversionTest")
+  MITK_TEST_BEGIN("PointConversionTest")
 
   Test_Mitk2Itk_PointCompatibility();
   Test_Itk2Mitk_PointCompatibility();
 
   Test_Vtk2Mitk_PointCompatibility();
   Test_Mitk2Vtk_PointCompatibility();
-
-  Test_Vnl2Mitk_VectorFixedCompatibility();
-  Test_Vnl2Mitk_VectorCompatibility();
 
   Test_Mitk2Vnl_PointCompatibility();
 

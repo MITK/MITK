@@ -63,7 +63,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
     set(MODULE_PROVIDES ${MODULE_NAME})
     if(NOT MODULE_NO_INIT AND NOT MODULE_NAME STREQUAL "Mitk")
       # Add a dependency to the "Mitk" module
-      list(APPEND MODULE_DEPENDS Mitk)
+      #list(APPEND MODULE_DEPENDS Mitk)
     endif()
   endif()
 

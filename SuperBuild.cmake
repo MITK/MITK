@@ -37,6 +37,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 set(external_projects
+  ANN
   VTK
   ACVD
   GDCM
@@ -204,6 +205,7 @@ ExternalProject_Add(${proj}
   INSTALL_COMMAND ""
   DEPENDS
     # Mandatory dependencies
+    ${ANN_DEPENDS}
     ${VTK_DEPENDS}
     ${ITK_DEPENDS}
     # Optionnal dependencies
@@ -311,6 +313,7 @@ ExternalProject_Add(${proj}
     -DMITK_KWSTYLE_EXECUTABLE:FILEPATH=${MITK_KWSTYLE_EXECUTABLE}
     -DCTK_DIR:PATH=${CTK_DIR}
     -DDCMTK_DIR:PATH=${DCMTK_DIR}
+    -DANN_DIR:PATH=${ANN_DIR}
     -DVTK_DIR:PATH=${VTK_DIR}     # FindVTK expects VTK_DIR
     -DITK_DIR:PATH=${ITK_DIR}     # FindITK expects ITK_DIR
     -DACVD_DIR:PATH=${ACVD_DIR}

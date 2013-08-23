@@ -150,9 +150,9 @@ protected:
   // ANN changes. Please note also, that these typedefs are only used in the header
   // file. The implementation always refers to the original types
   //
-  typedef float*      MyANNpoint;
+  typedef double*     MyANNpoint;
   typedef int         MyANNidx;
-  typedef float       MyANNdist;
+  typedef double      MyANNdist;
   typedef MyANNpoint* MyANNpointArray;
   typedef MyANNidx*   MyANNidxArray;
   typedef MyANNdist*  MyANNdistArray;
@@ -186,7 +186,7 @@ protected:
    * @returns the id of the nearest neighbour of the given point. The id corresponds to the id
    * which is given in the original point set.
    */
-  IdType FindClosestPoint( const MyANNpoint& point);
+  IdType FindClosestANNPoint( const MyANNpoint& point);
 
   /**
    * Finds the minimal distance between the given point and a point in the previously defined point set.

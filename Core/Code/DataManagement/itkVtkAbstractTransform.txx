@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkVtkAbstractTransform.h"
 #include <vtkAbstractTransform.h>
-#include <mitkVector.h>
+#include <mitkTypes.h>
 
 namespace itk {
 

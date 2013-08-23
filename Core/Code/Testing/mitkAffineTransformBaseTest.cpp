@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkVector.h"
+#include "mitkTypes.h"
 #include "itkScalableAffineTransform.h"
 #include "mitkMatrixConvert.h"
 
@@ -46,7 +46,7 @@ static void Setup()
 
   offset[0] = 2.0; offset[1] = 3.0; offset[2] = 4.0;
 
-  // 90° rotation
+  // 90ï¿½ rotation
   rotation.Fill(0);
   rotation[0][1] = -1;
   rotation[1][0] =  1;

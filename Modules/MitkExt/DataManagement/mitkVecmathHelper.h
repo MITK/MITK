@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKVECHELPER_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKVECHELPER_H_HEADER_INCLUDED_C1EBD0AD
 
-#include "mitkVector.h"
+#include "mitkTypes.h"
 #include "vecmath.h"
 
 namespace mitk {

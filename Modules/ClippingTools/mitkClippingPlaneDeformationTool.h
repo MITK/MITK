@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNode.h"
 #include "mitkSurfaceDeformationInteractor3D.h"
 #include "mitkTool.h"
-#include "mitkVector.h"
+#include "mitkTypes.h"
 
 namespace mitk
 {

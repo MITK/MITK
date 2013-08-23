@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkSurface.h>
 #include <mitkToFProcessingCommon.h>
-#include <mitkVector.h>
+#include <mitkTypes.h>
 #include <mitkToFTestingCommon.h>
 #include <mitkIOUtil.h>
 

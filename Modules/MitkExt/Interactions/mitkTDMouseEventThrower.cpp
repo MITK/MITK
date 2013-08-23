@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTDMouseEventThrower.h"
 #include "mitkTDMouseEvent.h"
 #include "mitkInteractionConst.h"
-#include "mitkVector.h"
+#include "mitkTypes.h"
 #include "mitkGlobalInteraction.h"
 #include "mitkStateEvent.h"
 #include "mitkSpaceNavigatorDriver.h"
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::TDMouseEventThrower * mitk::TDMouseEventThrower::GetInstance()
 {
-  //instance wird nicht initialisiert und kommt mit 0 zurück!
+  //instance wird nicht initialisiert und kommt mit 0 zurï¿½ck!
   static TDMouseEventThrower instance;
   return &instance;
 }

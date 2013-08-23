@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
 #include "mitkImageToImageFilter.h"
-#include "mitkVector.h"
+#include "mitkTypes.h"
 
 namespace mitk {
 

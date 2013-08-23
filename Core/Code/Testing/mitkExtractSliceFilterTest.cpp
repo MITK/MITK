@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkRotationOperation.h>
 #include <mitkInteractionConst.h>
-#include <mitkVector.h>
+#include <mitkTypes.h>
 
 #include <ctime>
 #include <cstdlib>

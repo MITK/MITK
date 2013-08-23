@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkTestingMacros.h"
 #include <mitkLog.h>
-#include <mitkVector.h>
+#include <mitkTypes.h>
 #include <itkMultiThreader.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkStandardFileLocations.h>

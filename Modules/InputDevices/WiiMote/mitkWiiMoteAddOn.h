@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkWiiMoteExports.h>
 
 // mitk
-#include "mitkVector.h" // used for Point2D
+#include "mitkTypes.h" // used for Point2D
 #include <mitkEventMapperAddon.h>
 
 namespace mitk {

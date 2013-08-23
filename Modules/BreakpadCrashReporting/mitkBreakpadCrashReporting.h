@@ -62,6 +62,17 @@ namespace mitk {
   * (either due to shutdown or due to crash). Also, the sample server will shutdown automatically, if there is already
   * one server instance running.
   *
+  * Note 4: LINUX
+  * Currently there seems to be a problem on linux with crash dump generation. For example in case of a segfault,
+  * the crash dump generation sometimes (seems to be random) gets in a state where it waits for
+  * the child process (the process which crashed) to change the process state, but the child
+  * process is allready attached via ptrace to the parent process (crash server) and therefore has allready the state
+  * "stopped" and does not change until it gets a signal from the parent process. The parent process
+  * itself waits for the child process to change the state. If this happens all processes are in a waiting state and
+  * no crash dump will be generated and only an empty dump file exists.
+  * This is currently only a assumption! The problem seems to lay in the google breakpad class
+  * linux_ptrace_dumper.cc in the method SuspendThread(pid_t pid).
+  *
   */
   class BreakpadCrashReporting
   {

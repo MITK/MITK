@@ -42,7 +42,7 @@ namespace mitk {
 
   public:
     /** Default constructor has nothing to do. */
-    Point<TCoordRep, NPointDimension>() {}
+    Point<TCoordRep, NPointDimension>() : itk::Point<TCoordRep, NPointDimension>() {}
 
     /** Pass-through constructors for the Array base class. */
     Point<TCoordRep, NPointDimension>(const mitk::Point<TCoordRep, NPointDimension>& r) : itk::Point<TCoordRep, NPointDimension>(r) {}
@@ -53,7 +53,7 @@ namespace mitk {
     /**
      * Warning: Array must have same dimension as Point
      */
-    void CopyToArray(ScalarType* const array_p) const
+    void CopyToArray(ScalarType array_p[NPointDimension]) const
     {
       for (int i = 0; i < this->GetPointDimension(); i++)
         {

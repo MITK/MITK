@@ -25,24 +25,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  template<class TCoordRep, unsigned int NPointDimension = 3>
-  class Vector : public itk::Vector<TCoordRep, NPointDimension>
+  template<class TCoordRep, unsigned int NVectorDimension = 3>
+  class Vector : public itk::Vector<TCoordRep, NVectorDimension>
   {
   public:
     /** Default constructor has nothing to do. */
-    Vector<TCoordRep, NPointDimension>() {}
+    Vector<TCoordRep, NVectorDimension>() {}
 
     /** Pass-through constructors for the Array base class. */
-    Vector<TCoordRep, NPointDimension>(const Vector<TCoordRep, NPointDimension>& r) : itk::Vector<TCoordRep, NPointDimension>(r) {}
-    Vector<TCoordRep, NPointDimension>(const TCoordRep r[NPointDimension]):itk::Vector<TCoordRep, NPointDimension>(r) {}
-    Vector<TCoordRep, NPointDimension>(const TCoordRep & v):itk::Vector<TCoordRep, NPointDimension>(v) {}
-    Vector<TCoordRep, NPointDimension>(const itk::Vector<TCoordRep, NPointDimension> r) : itk::Vector<TCoordRep, NPointDimension>(r) {}
+    Vector<TCoordRep, NVectorDimension>(const Vector<TCoordRep, NVectorDimension>& r) : itk::Vector<TCoordRep, NVectorDimension>(r) {}
+    Vector<TCoordRep, NVectorDimension>(const TCoordRep r[NVectorDimension]):itk::Vector<TCoordRep, NVectorDimension>(r) {}
+    Vector<TCoordRep, NVectorDimension>(const TCoordRep & v):itk::Vector<TCoordRep, NVectorDimension>(v) {}
+    Vector<TCoordRep, NVectorDimension>(const itk::Vector<TCoordRep, NVectorDimension> r) : itk::Vector<TCoordRep, NVectorDimension>(r) {}
+
     /**
-     * Warning: Array must have same dimension as Point
+     * Warning: Array must have same dimension as Vector
      */
-    void CopyToArray(ScalarType* const array_p) const
+    void CopyToArray(ScalarType array_p[NVectorDimension]) const
     {
-      for (int i = 0; i < this->GetPointDimension(); i++)
+      for (int i = 0; i < this->GetVectorDimension(); i++)
         {
           array_p[i] = this->GetElement(i);
         }

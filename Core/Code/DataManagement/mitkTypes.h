@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTypedefs.h"
 #include "mitkPoint.h" // TODO SW: should not be included here, maybe generate one "general datatype include" like mitkPrimitives.h
 #include "mitkVector.h"
+#include "mitkMatrix.h"
 
 #include "mitkOldTypeConversions.h"
 

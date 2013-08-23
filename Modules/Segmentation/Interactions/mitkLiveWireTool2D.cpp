@@ -39,7 +39,7 @@ namespace mitk {
 
 
 mitk::LiveWireTool2D::LiveWireTool2D()
-:SegTool2D("LiveWireTool")
+:SegTool2D("LiveWireTool"), m_TimeStep(0)
 {
   m_Contour = mitk::ContourModel::New();
   m_ContourModelNode = mitk::DataNode::New();
@@ -174,7 +174,7 @@ void mitk::LiveWireTool2D::Deactivated()
           mitk::Image::Pointer workingSlice = this->GetAffectedImageSliceAs2DImage(it->second, workingImage, currentTimestep);
 
           mitk::ContourModel::Pointer projectedContour = mitk::ContourUtils::ProjectContourTo2DSlice(workingSlice, contourModel, false);
-          mitk::ContourUtils::FillContourInSlice(projectedContour, workingSlice, workingImage->GetLabelSet(), 1.0);
+          mitk::ContourUtils::FillContourInSlice(projectedContour, workingSlice, workingImage->GetLabelSet(), 1, m_TimeStep);
 
           //write back to image volume
           this->WriteBackSegmentationResult(it->second, workingSlice, currentTimestep);
@@ -200,6 +200,8 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
+
+  m_TimeStep = positionEvent->GetSender()->GetTimeStep();
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();

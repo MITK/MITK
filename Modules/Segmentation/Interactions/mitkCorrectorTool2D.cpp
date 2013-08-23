@@ -71,6 +71,8 @@ bool mitk::CorrectorTool2D::OnMousePressed (Action* action, const StateEvent* st
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
+  int timestep = positionEvent->GetSender()->GetTimeStep();
+
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
@@ -78,7 +80,8 @@ bool mitk::CorrectorTool2D::OnMousePressed (Action* action, const StateEvent* st
 
   ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
   contour->Initialize();
-  contour->AddVertex( positionEvent->GetWorldPosition() );
+  contour->Expand(timestep+1);
+  contour->AddVertex( positionEvent->GetWorldPosition(), timestep );
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
 
@@ -92,8 +95,10 @@ bool mitk::CorrectorTool2D::OnMouseMoved   (Action* action, const StateEvent* st
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
+  int timestep = positionEvent->GetSender()->GetTimeStep();
+
   ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
-  contour->AddVertex( positionEvent->GetWorldPosition() );
+  contour->AddVertex( positionEvent->GetWorldPosition(), timestep );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
@@ -147,6 +152,8 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
   resultSlice->SetVolume(algorithm->GetOutput()->GetData());
 
   this->WriteBackSegmentationResult(positionEvent, resultSlice);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return true;
 }

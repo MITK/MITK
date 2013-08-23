@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageDataItem.h"
 #include "mitkLabelSetImage.h"
 #include "mitkLegacyAdaptors.h"
+#include "mitkContourUtils.h"
 
 #include "ipSegmentation.h"
 
@@ -58,11 +59,12 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
+  int timestep = positionEvent->GetSender()->GetTimeStep();
+
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
-
 
   // 1. Get the working image
   Image::Pointer workingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
@@ -200,10 +202,10 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
       newPoint[1] = contourPoints[ 2 * index + 1];
       newPoint[2] = 0;
 
-      contourInImageIndexCoordinates->AddVertex(newPoint - mitk::Point3D::VectorType(0.5));
+      contourInImageIndexCoordinates->AddVertex(newPoint - mitk::Point3D::VectorType(0.5), timestep);
     }
 
-    m_SegmentationContourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( workingSlice->GetGeometry(), contourInImageIndexCoordinates);
+   // m_SegmentationContourInWorldCoordinates = ContourUtils::BackProjectContourFrom2DSlice( workingSlice->GetGeometry(), contourInImageIndexCoordinates, timestep);
 
     // 3. Show the contour
     FeedbackContourTool::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
@@ -219,15 +221,15 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     contourInImageIndexCoordinates->Initialize();
     Point3D newPoint;
     newPoint[0] = 0; newPoint[1] = 0; newPoint[2] = 0.0;
-    contourInImageIndexCoordinates->AddVertex( newPoint );
+    contourInImageIndexCoordinates->AddVertex( newPoint, timestep);
     newPoint[0] = originalPicSlice->n[0]; newPoint[1] = 0; newPoint[2] = 0.0;
-    contourInImageIndexCoordinates->AddVertex( newPoint );
+    contourInImageIndexCoordinates->AddVertex( newPoint, timestep);
     newPoint[0] = originalPicSlice->n[0]; newPoint[1] = originalPicSlice->n[1]; newPoint[2] = 0.0;
-    contourInImageIndexCoordinates->AddVertex( newPoint );
+    contourInImageIndexCoordinates->AddVertex( newPoint, timestep);
     newPoint[0] = 0; newPoint[1] = originalPicSlice->n[1]; newPoint[2] = 0.0;
-    contourInImageIndexCoordinates->AddVertex( newPoint );
+    contourInImageIndexCoordinates->AddVertex( newPoint, timestep);
 
-    m_WholeImageContourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( workingSlice->GetGeometry(), contourInImageIndexCoordinates);
+//    m_WholeImageContourInWorldCoordinates = ContourUtils::BackProjectContourFrom2DSlice( workingSlice->GetGeometry(), contourInImageIndexCoordinates, timestep);
 
     // 3. Show the contour
     FeedbackContourTool::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
@@ -249,6 +251,8 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
 
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
+
+  int timestep = positionEvent->GetSender()->GetTimeStep();
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
@@ -273,16 +277,18 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
   }
 
   ContourModel* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
-  ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( slice, feedbackContour );
+  ContourModel::Pointer projectedContour = ContourUtils::ProjectContourTo2DSlice( slice, feedbackContour, timestep );
   // false: don't constrain the contour to the image's inside
   if (projectedContour.IsNull()) return false;
 
-  FeedbackContourTool::FillContourInSlice( projectedContour, slice, image->GetLabelSet(), m_PaintingPixelValue );
+  ContourUtils::FillContourInSlice( projectedContour, slice, image->GetLabelSet(), m_PaintingPixelValue, timestep );
 
   this->WriteBackSegmentationResult(positionEvent, slice);
 
   m_WholeImageContourInWorldCoordinates = NULL;
   m_SegmentationContourInWorldCoordinates = NULL;
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return true;
 }

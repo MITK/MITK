@@ -243,7 +243,6 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
       contour->DisconnectPipeline();
     }
   }
-
 }
 
 
@@ -251,10 +250,8 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
 {
   if(!planeGeometry || !slice) return;
 
-
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
-
 
   //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
   vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
@@ -294,10 +291,6 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
   m_undoOperation = NULL;
   m_doOperation = NULL;
   /*============= END undo feature block ========================*/
-
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
 }
 
 void mitk::SegTool2D::SetShowMarkerNodes(bool status)

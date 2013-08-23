@@ -58,6 +58,8 @@ class Segmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
      */
     itkSetMacro(Contour, ContourModel*);
 
+    itkSetMacro(TimeStep, int);
+
     /**
      * \brief Calculated difference image.
      */
@@ -90,6 +92,7 @@ class Segmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
     Image::Pointer m_WorkingImage;
     ContourModel::ConstPointer m_Contour;
     Image::Pointer m_DifferenceImage;
+    int m_TimeStep;
 };
 
 }

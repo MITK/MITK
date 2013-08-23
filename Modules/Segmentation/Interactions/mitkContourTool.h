@@ -75,6 +75,10 @@ class Segmentation_EXPORT ContourTool : public FeedbackContourTool
      Close the contour, project it to the image slice and fill it in 2D.
     */
     virtual bool OnMouseReleased(Action*, const StateEvent*);
+
+    /**
+     Set the label underneath the clicked position as the active one.
+    */
     virtual bool OnChangeActiveLabel(Action*, const StateEvent*);
 
     int m_PaintingPixelValue;

@@ -164,14 +164,13 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       {
         drawit=true;
       }
-      else if(scalardiff<0.25)
+      else if(scalardiff<0.5)
       {
         drawit=true;
       }
 
       if(drawit)
       {
-
          bool showSegments = false;
          dataNode->GetBoolProperty("contour.segments.show", showSegments);
 
@@ -333,7 +332,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       //----------------------------------
 
       //draw point if close to plane
-      if(scalardiff<0.25)
+      if(scalardiff<0.5)
       {
 
         float pointsize = 5;

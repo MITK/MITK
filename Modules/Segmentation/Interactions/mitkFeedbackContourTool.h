@@ -64,28 +64,15 @@ class Segmentation_EXPORT FeedbackContourTool : public SegTool2D
     void Disable3DRendering();
     void SetFeedbackContourVisible(bool);
 
-    /// Provide values from 0.0 (black) to 1.0 (full color)
+    /**
+      \brief Sets the color to the feedback contour.
+    */
     void SetFeedbackContourColor( float r, float g, float b );
+
+    /**
+      \brief Sets the default color to the feedback contour.
+    */
     void SetFeedbackContourColorDefault();
-
-    /**
-      \brief Projects a contour onto an image point by point. Converts from world to index coordinates.
-
-      \param correctionForIpSegmentation adds 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
-    */
-    ContourModel::Pointer ProjectContourTo2DSlice(Image* slice, ContourModel* contourIn3D, bool constrainToInside = true);
-
-    /**
-      \brief Projects a slice index coordinates of a contour back into world coordinates.
-
-      \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
-    */
-    ContourModel::Pointer BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D);
-
-    /**
-      \brief Fill a contour in a 2D slice with a specified pixel value.
-    */
-    void FillContourInSlice( ContourModel* projectedContour, Image* slice, const LabelSet* labelSet, int paintingPixelValue = 1 );
 
   private:
 

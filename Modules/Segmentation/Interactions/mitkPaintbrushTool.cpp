@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkImageDataItem.h"
 #include "ipSegmentation.h"
-
+#include "mitkContourUtils.h"
 #include "mitkLevelWindowProperty.h"
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
@@ -90,6 +90,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return;
 
+  int timestep = positionEvent->GetSender()->GetTimeStep();
   // Get Spacing of current Slice
   //mitk::Vector3D vSpacing = m_WorkingSlice->GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing();
 
@@ -101,6 +102,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
 
   Contour::Pointer contourInImageIndexCoordinates = Contour::New();
   contourInImageIndexCoordinates->Initialize();
+  contourInImageIndexCoordinates->Expand(timestep +1);
 
   // estimate center point of the brush ( relative to the pixel the mouse points on )
   // -- left upper corner for even sizes,
@@ -241,7 +243,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
      tempPoint[0] = quarterCycleUpperRight[i][0];
      tempPoint[1] = quarterCycleUpperRight[i][1];
      tempPoint[2] = 0;
-     contourInImageIndexCoordinates->AddVertex( tempPoint  );
+     contourInImageIndexCoordinates->AddVertex( tempPoint);//, timestep  );
   }
   // the lower right has to be parsed in reverse order
   for (int i=quarterCycleLowerRight.size()-1; i>=0; i--)
@@ -249,14 +251,14 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
      tempPoint[0] = quarterCycleLowerRight[i][0];
      tempPoint[1] = quarterCycleLowerRight[i][1];
      tempPoint[2] = 0;
-     contourInImageIndexCoordinates->AddVertex( tempPoint);
+     contourInImageIndexCoordinates->AddVertex( tempPoint);//, timestep  );
   }
   for (unsigned int i=0; i<quarterCycleLowerLeft.size(); i++)
   {
      tempPoint[0] = quarterCycleLowerLeft[i][0];
      tempPoint[1] = quarterCycleLowerLeft[i][1];
      tempPoint[2] = 0;
-     contourInImageIndexCoordinates->AddVertex( tempPoint );
+     contourInImageIndexCoordinates->AddVertex( tempPoint);//, timestep  );
   }
   // the upper left also has to be parsed in reverse order
   for (int i=quarterCycleUpperLeft.size()-1; i>=0; i--)
@@ -264,7 +266,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
      tempPoint[0] = quarterCycleUpperLeft[i][0];
      tempPoint[1] = quarterCycleUpperLeft[i][1];
      tempPoint[2] = 0;
-     contourInImageIndexCoordinates->AddVertex( tempPoint );
+     contourInImageIndexCoordinates->AddVertex( tempPoint);//, timestep  );
   }
 
   m_MasterContour = contourInImageIndexCoordinates;
@@ -290,9 +292,11 @@ bool mitk::PaintbrushTool::OnMousePressed (Action* action, const StateEvent* sta
 /**
   Insert the point to the feedback contour,finish to build the contour and at the same time the painting function
   */
-bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const StateEvent* stateEvent)
+bool mitk::PaintbrushTool::OnMouseMoved(Action* itkNotUsed(action), const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+
+  int timestep = positionEvent->GetSender()->GetTimeStep();
 
   CheckIfCurrentSliceHasChanged(positionEvent);
 
@@ -355,13 +359,13 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
     point[0] += indexCoordinates[ 0 ];
     point[1] += indexCoordinates[ 1 ];
 
-    contour->AddVertex( point );
+    contour->AddVertex( point, timestep);
   }
 
 
   if (leftMouseButtonPressed)
   {
-    FeedbackContourTool::FillContourInSlice( contour, m_WorkingSlice, NULL, m_PaintingPixelValue );
+    ContourUtils::FillContourInSlice( contour, m_WorkingSlice, NULL, m_PaintingPixelValue, timestep );
     m_WorkingNode->SetData(m_WorkingSlice);
     m_WorkingNode->Modified();
   }
@@ -381,7 +385,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   //  displayContour->AddVertex( point );
   //}
 
-  displayContour = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
+//  displayContour = ContourUtils::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour, timestep );
   SetFeedbackContour( *displayContour );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -398,6 +402,7 @@ bool mitk::PaintbrushTool::OnMouseReleased(Action* /*action*/, const StateEvent*
     const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
     if (!positionEvent) return false;
     this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return true;
 }

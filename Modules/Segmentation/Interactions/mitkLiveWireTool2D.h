@@ -110,6 +110,8 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
 
     bool m_CreateAndUseDynamicCosts;
 
+    int m_TimeStep;
+
     std::vector< std::pair<mitk::DataNode*, mitk::PlaneGeometry::Pointer> > m_Contours;
 
     template<typename TPixel, unsigned int VImageDimension>

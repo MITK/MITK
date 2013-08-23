@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourUtils.h"
 
 mitk::CorrectorAlgorithm::CorrectorAlgorithm()
-:ImageToImageFilter()
+:ImageToImageFilter(), m_TimeStep(0)
 {
 }
 
@@ -148,14 +148,14 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
     return;
   }
 
-  if (projectedContour->GetNumberOfVertices() < 2)
+  if (projectedContour->GetNumberOfVertices(m_TimeStep) < 2)
   {
     delete[] _ofsArray;
     return;
   }
 
   // convert the projected contour into a ipSegmentation format
-  mitkIpInt4_t* _points = new mitkIpInt4_t[2 * projectedContour->GetNumberOfVertices()];
+  mitkIpInt4_t* _points = new mitkIpInt4_t[2 * projectedContour->GetNumberOfVertices(m_TimeStep)];
  // const ContourModel::PathType::VertexListType* pointsIn2D = projectedContour->GetContourPath()->GetVertexList();
   unsigned int index(0);
   for ( ContourModel::ConstVertexIterator iter = projectedContour->Begin();
@@ -168,7 +168,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
 
   // store ofsets of the drawn line in array
   int _ofsNum = 0;
-  unsigned int num = projectedContour->GetNumberOfVertices();
+  unsigned int num = projectedContour->GetNumberOfVertices(m_TimeStep);
   int lastOfs = -1;
   for (unsigned int i=0; i<num-1; i++)
   {
@@ -305,12 +305,12 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
       newPoint[1] = contourPoints[ 2 * index + 1];
       newPoint[2] = 0;
 
-      contourInImageIndexCoordinates->AddVertex( newPoint );
+      contourInImageIndexCoordinates->AddVertex( newPoint, m_TimeStep );
     }
 
     free(contourPoints);
 
-    mitk::ContourUtils::FillContourInSlice( contourInImageIndexCoordinates, m_WorkingImage, NULL );
+    mitk::ContourUtils::FillContourInSlice( contourInImageIndexCoordinates, m_WorkingImage, NULL, 1, m_TimeStep );
   }
 
   delete[] _ofsArray;

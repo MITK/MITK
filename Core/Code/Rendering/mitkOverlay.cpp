@@ -27,23 +27,23 @@ mitk::Overlay::~Overlay()
 
 }
 
-void mitk::Overlay::SetProperty(const char *propertyKey,
-                                     BaseProperty* propertyValue,
+void mitk::Overlay::SetProperty(const std::string& propertyKey,
+                                     const BaseProperty::Pointer& propertyValue,
                                      const mitk::BaseRenderer* renderer)
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, propertyValue);
   this->Modified();
 }
 
-void mitk::Overlay::ReplaceProperty(const char *propertyKey,
-                                         BaseProperty* propertyValue,
+void mitk::Overlay::ReplaceProperty(const std::string& propertyKey,
+                                         const BaseProperty::Pointer& propertyValue,
                                          const mitk::BaseRenderer* renderer)
 {
   GetPropertyList(renderer)->ReplaceProperty(propertyKey, propertyValue);
 }
 
-void mitk::Overlay::AddProperty(const char *propertyKey,
-                                     BaseProperty* propertyValue,
+void mitk::Overlay::AddProperty(const std::string& propertyKey,
+                                     const BaseProperty::Pointer& propertyValue,
                                      const mitk::BaseRenderer* renderer,
                                      bool overwrite)
 {
@@ -58,11 +58,8 @@ void mitk::Overlay::ConcatenatePropertyList(PropertyList *pList, bool replace)
   m_PropertyList->ConcatenatePropertyList(pList, replace);
 }
 
-mitk::BaseProperty* mitk::Overlay::GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer) const
+mitk::BaseProperty* mitk::Overlay::GetProperty(const std::string& propertyKey, const mitk::BaseRenderer* renderer) const
 {
-  if(propertyKey==NULL)
-    return NULL;
-
   //renderer specified?
   if (renderer)
   {
@@ -96,7 +93,7 @@ mitk::BaseProperty* mitk::Overlay::GetProperty(const char *propertyKey, const mi
   return NULL;
 }
 
-bool mitk::Overlay::GetBoolProperty(const char* propertyKey, bool& boolValue, mitk::BaseRenderer* renderer) const
+bool mitk::Overlay::GetBoolProperty(const std::string&  propertyKey, bool& boolValue, mitk::BaseRenderer* renderer) const
 {
   mitk::BoolProperty::Pointer boolprop = dynamic_cast<mitk::BoolProperty*>(GetProperty(propertyKey, renderer));
   if(boolprop.IsNull())
@@ -106,7 +103,7 @@ bool mitk::Overlay::GetBoolProperty(const char* propertyKey, bool& boolValue, mi
   return true;
 }
 
-bool mitk::Overlay::GetIntProperty(const char* propertyKey, int &intValue, mitk::BaseRenderer* renderer) const
+bool mitk::Overlay::GetIntProperty(const std::string&  propertyKey, int &intValue, mitk::BaseRenderer* renderer) const
 {
   mitk::IntProperty::Pointer intprop = dynamic_cast<mitk::IntProperty*>(GetProperty(propertyKey, renderer));
   if(intprop.IsNull())
@@ -116,7 +113,7 @@ bool mitk::Overlay::GetIntProperty(const char* propertyKey, int &intValue, mitk:
   return true;
 }
 
-bool mitk::Overlay::GetFloatProperty(const char* propertyKey, float &floatValue, mitk::BaseRenderer* renderer) const
+bool mitk::Overlay::GetFloatProperty(const std::string&  propertyKey, float &floatValue, mitk::BaseRenderer* renderer) const
 {
   mitk::FloatProperty::Pointer floatprop = dynamic_cast<mitk::FloatProperty*>(GetProperty(propertyKey, renderer));
   if(floatprop.IsNull())
@@ -126,7 +123,7 @@ bool mitk::Overlay::GetFloatProperty(const char* propertyKey, float &floatValue,
   return true;
 }
 
-bool mitk::Overlay::GetStringProperty(const char* propertyKey, std::string& string, mitk::BaseRenderer* renderer) const
+bool mitk::Overlay::GetStringProperty(const std::string&  propertyKey, std::string& string, mitk::BaseRenderer* renderer) const
 {
   mitk::StringProperty::Pointer stringProp = dynamic_cast<mitk::StringProperty*>(GetProperty(propertyKey, renderer));
   if(stringProp.IsNull())
@@ -141,23 +138,41 @@ bool mitk::Overlay::GetStringProperty(const char* propertyKey, std::string& stri
   }
 }
 
-void mitk::Overlay::SetIntProperty(const char* propertyKey, int intValue, mitk::BaseRenderer* renderer)
+void mitk::Overlay::SetIntProperty(const std::string&  propertyKey, int intValue, mitk::BaseRenderer* renderer)
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::IntProperty::New(intValue));
 }
-void mitk::Overlay::SetBoolProperty( const char* propertyKey, bool boolValue, mitk::BaseRenderer* renderer/*=NULL*/ )
+void mitk::Overlay::SetBoolProperty( const std::string&  propertyKey, bool boolValue, mitk::BaseRenderer* renderer/*=NULL*/ )
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::BoolProperty::New(boolValue));
 }
 
-void mitk::Overlay::SetFloatProperty( const char* propertyKey, float floatValue, mitk::BaseRenderer* renderer/*=NULL*/ )
+void mitk::Overlay::SetFloatProperty( const std::string&  propertyKey, float floatValue, mitk::BaseRenderer* renderer/*=NULL*/ )
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::FloatProperty::New(floatValue));
 }
 
-void mitk::Overlay::SetStringProperty( const char* propertyKey, const char* stringValue, mitk::BaseRenderer* renderer/*=NULL*/ )
+void mitk::Overlay::SetStringProperty( const std::string&  propertyKey, const std::string&  stringValue, mitk::BaseRenderer* renderer/*=NULL*/ )
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::StringProperty::New(stringValue));
+}
+
+std::string mitk::Overlay::GetName() const
+{
+  mitk::StringProperty* sp = dynamic_cast<mitk::StringProperty*>(this->GetProperty("name"));
+  if (sp == NULL)
+    return "";
+  return sp->GetValue();
+}
+
+void mitk::Overlay::SetName(const std::string& name)
+{
+  this->SetStringProperty("name", name);
+}
+
+bool mitk::Overlay::GetName(std::string& nodeName, mitk::BaseRenderer* renderer, const std::string& propertyKey) const
+{
+  return GetStringProperty(propertyKey, nodeName, renderer);
 }
 
 void mitk::Overlay::SetText(std::string text)
@@ -165,7 +180,7 @@ void mitk::Overlay::SetText(std::string text)
   SetStringProperty("Overlay.Text", text.c_str());
 }
 
-std::string mitk::Overlay::GetText()
+std::string mitk::Overlay::GetText() const
 {
   std::string text;
   GetPropertyList()->GetStringProperty("Overlay.Text", text);
@@ -177,14 +192,24 @@ void mitk::Overlay::SetFontSize(int fontSize)
   SetIntProperty("Overlay.FontSize",fontSize);
 }
 
-int mitk::Overlay::GetFontSize()
+int mitk::Overlay::GetFontSize() const
 {
   int fontSize;
   GetPropertyList()->GetIntProperty("Overlay.FontSize", fontSize);
   return fontSize;
 }
 
-bool mitk::Overlay::GetColor(float rgb[], mitk::BaseRenderer* renderer, const char* propertyKey) const
+bool mitk::Overlay::GetVisibility(bool& visible, mitk::BaseRenderer* renderer, const std::string& propertyKey) const
+{
+  return GetBoolProperty(propertyKey, visible, renderer);
+}
+
+bool mitk::Overlay::IsVisible(mitk::BaseRenderer* renderer, const std::string& propertyKey, bool defaultIsOn) const
+{
+  return IsOn(propertyKey, renderer, defaultIsOn);
+}
+
+bool mitk::Overlay::GetColor(float rgb[], mitk::BaseRenderer* renderer, const std::string&  propertyKey) const
 {
   mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetProperty(propertyKey, renderer));
   if(colorprop.IsNull())
@@ -194,14 +219,14 @@ bool mitk::Overlay::GetColor(float rgb[], mitk::BaseRenderer* renderer, const ch
   return true;
 }
 
-void mitk::Overlay::SetColor(const mitk::Color &color, mitk::BaseRenderer* renderer, const char* propertyKey)
+void mitk::Overlay::SetColor(const mitk::Color &color, mitk::BaseRenderer* renderer, const std::string&  propertyKey)
 {
   mitk::ColorProperty::Pointer prop;
   prop = mitk::ColorProperty::New(color);
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
-void mitk::Overlay::SetColor(float red, float green, float blue, mitk::BaseRenderer* renderer, const char* propertyKey)
+void mitk::Overlay::SetColor(float red, float green, float blue, mitk::BaseRenderer* renderer, const std::string&  propertyKey)
 {
   float color[3];
   color[0]=red;
@@ -210,14 +235,14 @@ void mitk::Overlay::SetColor(float red, float green, float blue, mitk::BaseRende
   SetColor(color, renderer, propertyKey);
 }
 
-void mitk::Overlay::SetColor(const float rgb[], mitk::BaseRenderer* renderer, const char* propertyKey)
+void mitk::Overlay::SetColor(const float rgb[], mitk::BaseRenderer* renderer, const std::string&  propertyKey)
 {
   mitk::ColorProperty::Pointer prop;
   prop = mitk::ColorProperty::New(rgb);
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
-bool mitk::Overlay::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* propertyKey) const
+bool mitk::Overlay::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const std::string&  propertyKey) const
 {
   mitk::FloatProperty::Pointer opacityprop = dynamic_cast<mitk::FloatProperty*>(GetProperty(propertyKey, renderer));
   if(opacityprop.IsNull())
@@ -227,14 +252,14 @@ bool mitk::Overlay::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, con
   return true;
 }
 
-void mitk::Overlay::SetOpacity(float opacity, mitk::BaseRenderer* renderer, const char* propertyKey)
+void mitk::Overlay::SetOpacity(float opacity, mitk::BaseRenderer* renderer, const std::string&  propertyKey)
 {
   mitk::FloatProperty::Pointer prop;
   prop = mitk::FloatProperty::New(opacity);
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
-void mitk::Overlay::SetVisibility(bool visible, mitk::BaseRenderer *renderer, const char *propertyKey)
+void mitk::Overlay::SetVisibility(bool visible, mitk::BaseRenderer *renderer, const std::string& propertyKey)
 {
   mitk::BoolProperty::Pointer prop;
   prop = mitk::BoolProperty::New(visible);

@@ -32,39 +32,40 @@ class BaseRenderer;
 /** An Instance of the OverlayManager can be registered to several BaseRenderer instances in order to
  * call the update method of each Overlay during the rendering phase of the renderer.
 */
-class MITK_CORE_EXPORT OverlayManager : public itk::LightObject {
+class MITK_CORE_EXPORT OverlayManager : public itk::Object {
 public:
-  typedef std::list<BaseRenderer*> BaseRendererList;
-  typedef std::list<Overlay::Pointer> OverlayList;
+  typedef std::set<BaseRenderer*> BaseRendererSet;
+  typedef std::set<Overlay::Pointer> OverlaySet;
   typedef std::map<const std::string,BaseLayouter::Pointer > LayouterMap;
   typedef std::map<const BaseRenderer*,LayouterMap > LayouterRendererMap;
 
   mitkClassMacro(OverlayManager, itk::LightObject);
   itkNewMacro(OverlayManager);
 
-  void AddOverlay(Overlay* overlay);
-  void RemoveOverlay(Overlay* overlay);
+  void AddOverlay(const Overlay::Pointer& overlay);
+  void RemoveOverlay(const Overlay::Pointer& overlay);
 
   /** \brief Clears the manager of all Overlays.*/
   void RemoveAllOverlays();
 
   /** \brief Adds the overlay to the layouter specified by identifier and renderer*/
-  void SetLayouter(Overlay* overlay, const char* identifier, BaseRenderer* renderer);
+  void SetLayouter(Overlay* overlay, const std::string& identifier, BaseRenderer* renderer);
 
   /** \brief Calls all layouters to update the position and size of the registered Overlays*/
   void UpdateLayouts(BaseRenderer* renderer);
 
   /** \brief Returns the Layouter specified by renderer and the identifier*/
-  BaseLayouter::Pointer GetLayouter(BaseRenderer* renderer, const std::string identifier);
+  BaseLayouter::Pointer GetLayouter(BaseRenderer* renderer, const std::string& identifier);
 
   /** \brief Add a layouter to provide it with the use of the SetLayouter method*/
-  void AddLayouter(BaseLayouter* layouter);
+  void AddLayouter(const BaseLayouter::Pointer& layouter);
 
   void AddBaseRenderer(BaseRenderer* renderer);
 
   /** \brief The layout of each Overlay will be prepared and the properties of each Overlay is updated.*/
   void UpdateOverlays(BaseRenderer *baseRenderer);
 
+  void RemoveBaseRenderer(mitk::BaseRenderer *renderer);
 protected:
 
   /** \brief explicit constructor which disallows implicit conversions */
@@ -74,9 +75,9 @@ protected:
 
 private:
 
-  OverlayList m_OverlayList;
+  OverlaySet m_OverlaySet;
 
-  BaseRendererList m_BaseRendererList;
+  BaseRendererSet m_BaseRendererSet;
 
   LayouterRendererMap m_LayouterMap;
 

@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define VTKOVERLAY2D_H
 
 #include <MitkExports.h>
-#include <mitkCommon.h>
 #include "mitkVtkOverlay.h"
 #include <vtkSmartPointer.h>
 
@@ -38,7 +37,7 @@ public:
 
   Point2D GetPosition2D(mitk::BaseRenderer* renderer = NULL);
 
-  void SetOffsetVector(Point2D OffsetVector, mitk::BaseRenderer* renderer = NULL);
+  void SetOffsetVector(Point2D OffsetVector, BaseRenderer* renderer = NULL);
 
   Point2D GetOffsetVector(mitk::BaseRenderer* renderer = NULL);
 

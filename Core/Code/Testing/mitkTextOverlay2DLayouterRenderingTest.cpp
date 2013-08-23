@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK
 #include "mitkTestingMacros.h"
 #include "mitkRenderingTestHelper.h"
-#include <Overlays/mitkOverlayManager.h>
+#include <mitkOverlayManager.h>
 
 //VTK
 #include <vtkRegressionTestImage.h>
-#include "Overlays/mitkTextOverlay2D.h"
-#include "Overlays/mitkOverlay2DLayouter.h"
+#include "mitkTextOverlay2D.h"
+#include "mitkOverlay2DLayouter.h"
 
 void createTextOverlayWithLayouter(mitk::OverlayManager::Pointer OverlayManager, const char * layouter, mitk::BaseRenderer* renderer,
                                    int fontsize, float red, float green, float blue, std::string text)

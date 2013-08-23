@@ -17,11 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK
 #include "mitkTestingMacros.h"
 #include "mitkRenderingTestHelper.h"
-#include <Overlays/mitkOverlayManager.h>
+#include <mitkOverlayManager.h>
 
 //VTK
 #include <vtkRegressionTestImage.h>
-#include "Overlays/mitkTextOverlay3D.h"
+#include "mitkTextOverlay3D.h"
 #include <mitkPointSet.h>
 
 

@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define VTKOVERLAY_H
 
 #include <MitkExports.h>
-#include <mitkCommon.h>
 #include "mitkOverlay.h"
 #include <vtkSmartPointer.h>
 
@@ -26,16 +25,25 @@ class vtkProp;
 
 namespace mitk {
 
+/**
+ * @brief The VtkOverlay class is the base for all Overlays which are using the VTK framework to render
+ *the elements.
+ */
 class MITK_CORE_EXPORT VtkOverlay : public Overlay {
 public:
 
   mitkClassMacro(VtkOverlay, Overlay);
-  void UpdateOverlay(BaseRenderer *renderer);
-  void AddOverlay(BaseRenderer *renderer);
-  void RemoveOverlay(BaseRenderer *renderer);
+  void Update(BaseRenderer *renderer);
+  void AddToBaseRenderer(BaseRenderer *renderer);
+  void RemoveFromBaseRenderer(BaseRenderer *renderer);
 
 protected:
 
+  /**
+   * @brief This method is implemented by the specific VTKOverlays in order to create the element as a vtkProp
+   * @param renderer
+   * @return The element that was created by the subclasses as a vtkProp.
+   */
   virtual vtkProp* GetVtkProp(BaseRenderer *renderer) = 0;
   virtual void UpdateVtkOverlay(BaseRenderer *renderer) = 0;
 

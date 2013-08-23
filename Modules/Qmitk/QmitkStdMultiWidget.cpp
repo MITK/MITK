@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLine.h"
 #include "mitkInteractionConst.h"
 #include "mitkDataStorage.h"
-#include "Overlays/mitkOverlayManager.h"
+#include "mitkOverlayManager.h"
 
 #include "mitkNodePredicateBase.h"
 #include "mitkNodePredicateDataType.h"

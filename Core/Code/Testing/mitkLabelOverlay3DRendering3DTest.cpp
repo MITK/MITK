@@ -17,14 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK
 #include "mitkTestingMacros.h"
 #include "mitkRenderingTestHelper.h"
-#include <Overlays/mitkOverlayManager.h>
+#include <mitkOverlayManager.h>
 #include <mitkPointSet.h>
 
 //VTK
 #include <vtkRegressionTestImage.h>
-#include "Overlays/mitkTextOverlay2D.h"
-#include "Overlays/mitkOverlay2DLayouter.h"
-#include "Overlays/mitkLabelOverlay3D.h"
+#include "mitkTextOverlay2D.h"
+#include "mitkOverlay2DLayouter.h"
+#include "mitkLabelOverlay3D.h"
 
 
 int mitkLabelOverlay3DRendering3DTest(int argc, char* argv[])

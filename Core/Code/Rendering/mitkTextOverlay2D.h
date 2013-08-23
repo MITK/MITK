@@ -17,7 +17,7 @@
 #ifndef TEXTOVERLAY2D_H
 #define TEXTOVERLAY2D_H
 
-#include <Overlays/mitkVtkOverlay2D.h>
+#include <mitkVtkOverlay2D.h>
 #include <mitkLocalStorageHandler.h>
 #include <vtkSmartPointer.h>
 #include "MitkExports.h"

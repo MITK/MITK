@@ -17,7 +17,7 @@
 #ifndef LabelOverlay3D_H
 #define LabelOverlay3D_H
 
-#include <Overlays/mitkVtkOverlay3D.h>
+#include <mitkVtkOverlay3D.h>
 #include <mitkLocalStorageHandler.h>
 #include "MitkExports.h"
 #include <vtkSmartPointer.h>

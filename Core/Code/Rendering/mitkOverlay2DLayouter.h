@@ -18,13 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKOVERLAY2DLAYOUTER_H
 
 #include <MitkExports.h>
-#include <Overlays/mitkBaseLayouter.h>
+#include <mitkBaseLayouter.h>
 
 namespace mitk {
 
 /** @brief A simple implementation of a layouter for 2D Overlays
- *
- *  @ingroup Overlays
  */
 class MITK_CORE_EXPORT Overlay2DLayouter : public mitk::BaseLayouter {
 public:

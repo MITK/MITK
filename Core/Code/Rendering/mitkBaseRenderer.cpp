@@ -45,7 +45,7 @@
 #include "mitkProperties.h"
 #include "mitkWeakPointerProperty.h"
 #include "mitkInteractionConst.h"
-#include "Overlays/mitkOverlayManager.h"
+#include "mitkOverlayManager.h"
 
 // VTK
 #include <vtkLinearTransform.h>
@@ -237,6 +237,11 @@ mitk::BaseRenderer::~BaseRenderer()
     m_RenderWindow->Delete();
     m_RenderWindow = NULL;
   }
+
+  if (m_OverlayManager.IsNotNull())
+  {
+    m_OverlayManager->RemoveBaseRenderer(this);
+  }
 }
 
 void mitk::BaseRenderer::RemoveAllLocalStorages()
@@ -371,16 +376,32 @@ void mitk::BaseRenderer::SetSlice(unsigned int slice)
 
 void mitk::BaseRenderer::SetOverlayManager(itk::SmartPointer<OverlayManager> overlayManager)
 {
-  if(overlayManager.IsNotNull())
+  if(overlayManager.IsNull())
+    return;
+
+  if(this->m_OverlayManager.IsNotNull())
   {
-  this->m_OverlayManager = overlayManager;
-  this->m_OverlayManager->AddBaseRenderer(this);
+    if(this->m_OverlayManager.GetPointer() == overlayManager.GetPointer())
+    {
+      return;
+    }
+    else
+    {
+      this->m_OverlayManager->RemoveBaseRenderer(this);
+    }
   }
+  this->m_OverlayManager = overlayManager;
+  this->m_OverlayManager->AddBaseRenderer(this); //TODO
 }
 
 itk::SmartPointer<mitk::OverlayManager> mitk::BaseRenderer::GetOverlayManager()
 {
-  return m_OverlayManager;
+  if(this->m_OverlayManager.IsNull())
+  {
+    m_OverlayManager = mitk::OverlayManager::New();
+    m_OverlayManager->AddBaseRenderer(this);
+  }
+  return this->m_OverlayManager;
 }
 
 void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)

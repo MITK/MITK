@@ -336,17 +336,17 @@ set(CPP_FILES
   Rendering/vtkNeverTranslucentTexture.cpp
   Rendering/mitkRenderingTestHelper.cpp
 
-  Rendering/Overlays/mitkOverlay.cpp
-  Rendering/Overlays/mitkVtkOverlay.cpp
-  Rendering/Overlays/mitkVtkOverlay2D.cpp
-  Rendering/Overlays/mitkVtkOverlay3D.cpp
-  Rendering/Overlays/mitkOverlayManager.cpp
-  Rendering/Overlays/mitkBaseLayouter.cpp
+  Rendering/mitkOverlay.cpp
+  Rendering/mitkVtkOverlay.cpp
+  Rendering/mitkVtkOverlay2D.cpp
+  Rendering/mitkVtkOverlay3D.cpp
+  Rendering/mitkOverlayManager.cpp
+  Rendering/mitkBaseLayouter.cpp
 
-  Rendering/Overlays/mitkTextOverlay2D.cpp
-  Rendering/Overlays/mitkTextOverlay3D.cpp
-  Rendering/Overlays/mitkLabelOverlay3D.cpp
-  Rendering/Overlays/mitkOverlay2DLayouter.cpp
+  Rendering/mitkTextOverlay2D.cpp
+  Rendering/mitkTextOverlay3D.cpp
+  Rendering/mitkLabelOverlay3D.cpp
+  Rendering/mitkOverlay2DLayouter.cpp
 
   Common/mitkException.cpp
   Common/mitkCommon.h

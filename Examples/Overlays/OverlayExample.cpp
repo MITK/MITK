@@ -24,10 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itksys/SystemTools.hxx>
 #include <QApplication>
-#include <Overlays/mitkOverlay2DLayouter.h>
-#include <Overlays/mitkOverlayManager.h>
-#include <Overlays/mitkTextOverlay2D.h>
-#include <Overlays/mitkTextOverlay3D.h>
+#include <mitkOverlay2DLayouter.h>
+#include <mitkOverlayManager.h>
+#include <mitkTextOverlay2D.h>
+#include <mitkTextOverlay3D.h>
 //! [includes]
 
 //##Documentation

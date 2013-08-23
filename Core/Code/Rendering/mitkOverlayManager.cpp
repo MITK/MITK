@@ -23,74 +23,83 @@ mitk::OverlayManager::OverlayManager()
 
 mitk::OverlayManager::~OverlayManager()
 {
-  m_BaseRendererList.clear();
-  m_OverlayList.clear();
-  LayouterRendererMap::iterator it;
-  for ( it=m_LayouterMap.begin() ; it != m_LayouterMap.end(); it++ )
-  {
-    (it->second).clear();
-  }
-  m_LayouterMap.clear();
 }
 
 void mitk::OverlayManager::AddBaseRenderer(mitk::BaseRenderer* renderer)
 {
-  size_t nRenderers = m_BaseRendererList.size();
-  m_BaseRendererList.remove(renderer);
-  m_BaseRendererList.push_back(renderer);
-
-  if(nRenderers < m_BaseRendererList.size())
+  std::pair<BaseRendererSet::iterator,bool> inSet;
+  inSet = m_BaseRendererSet.insert(renderer);
+  if(inSet.second)
   {
-    std::list<Overlay::Pointer>::iterator it;
-    for ( it=m_OverlayList.begin() ; it != m_OverlayList.end(); it++ )
+    OverlaySet::iterator it;
+    for ( it=m_OverlaySet.begin() ; it != m_OverlaySet.end(); it++ )
     {
-      (*it)->AddOverlay(renderer);
+      (*it)->AddToBaseRenderer(renderer);
     }
   }
 }
 
-void mitk::OverlayManager::AddOverlay(Overlay *overlay)
+void mitk::OverlayManager::RemoveBaseRenderer(mitk::BaseRenderer* renderer)
 {
-  m_OverlayList.push_back(overlay);
-  BaseRendererList::iterator it;
-  for ( it=m_BaseRendererList.begin() ; it != m_BaseRendererList.end(); it++ )
+  if(!renderer)
+    return;
+  std::pair<BaseRendererSet::iterator,bool> inSet;
+  inSet = m_BaseRendererSet.insert(renderer);
+  m_BaseRendererSet.erase(inSet.first);
+}
+
+void mitk::OverlayManager::AddOverlay(const Overlay::Pointer& overlay)
+{
+  std::pair<OverlaySet::iterator,bool> inSet;
+  inSet = m_OverlaySet.insert(overlay);
+  if(inSet.second)
   {
-    overlay->AddOverlay(*it);
+    BaseRendererSet::iterator it;
+    for ( it=m_BaseRendererSet.begin() ; it != m_BaseRendererSet.end(); it++ )
+    {
+      overlay->AddToBaseRenderer(*it);
+    }
   }
 }
 
-void mitk::OverlayManager::RemoveOverlay(Overlay *overlay)
+void mitk::OverlayManager::RemoveOverlay(const Overlay::Pointer &overlay)
 {
-  m_OverlayList.remove(overlay);
-  BaseRendererList::iterator it;
-  for ( it=m_BaseRendererList.begin() ; it != m_BaseRendererList.end(); it++ )
+  std::pair<OverlaySet::iterator,bool> inSet;
+  inSet = m_OverlaySet.insert(overlay);
+  if(!inSet.second)
   {
-    overlay->RemoveOverlay(*it);
+    BaseRendererSet::iterator it;
+    for ( it=m_BaseRendererSet.begin() ; it != m_BaseRendererSet.end(); it++ )
+    {
+      overlay->RemoveFromBaseRenderer(*it);
+    }
   }
+  m_OverlaySet.erase(inSet.first);
 }
 
 void mitk::OverlayManager::RemoveAllOverlays()
 {
-  std::list<Overlay::Pointer>::iterator it;
-  for ( it=m_OverlayList.begin() ; it != m_OverlayList.end(); it++ )
+  OverlaySet::iterator it;
+  for ( it=m_OverlaySet.begin() ; it != m_OverlaySet.end(); it++ )
   {
     RemoveOverlay(*it);
   }
-  m_OverlayList.clear();
+  m_OverlaySet.clear();
 }
 
 void mitk::OverlayManager::UpdateOverlays(mitk::BaseRenderer* baseRenderer)
 {
-  std::list<Overlay::Pointer>::iterator it;
-  for ( it=m_OverlayList.begin() ; it != m_OverlayList.end(); it++ )
+  OverlaySet::iterator it;
+  for ( it=m_OverlaySet.begin() ; it != m_OverlaySet.end(); it++ )
   {
-    (*it)->UpdateOverlay(baseRenderer);
+    (*it)->Update(baseRenderer);
   }
+  std::pair<std::string,std::string> fdjs("fds","fsd");
   UpdateLayouts(baseRenderer);
 }
 
 
-void mitk::OverlayManager::SetLayouter(Overlay *overlay, const char *identifier, mitk::BaseRenderer *renderer)
+void mitk::OverlayManager::SetLayouter(Overlay *overlay, const std::string &identifier, mitk::BaseRenderer *renderer)
 {
   if(renderer)
   {
@@ -117,18 +126,18 @@ void mitk::OverlayManager::UpdateLayouts(mitk::BaseRenderer *renderer)
   }
 }
 
-mitk::BaseLayouter::Pointer mitk::OverlayManager::GetLayouter(mitk::BaseRenderer *renderer, const std::string identifier)
+mitk::BaseLayouter::Pointer mitk::OverlayManager::GetLayouter(mitk::BaseRenderer *renderer, const std::string& identifier)
 {
   BaseLayouter::Pointer layouter = m_LayouterMap[renderer][identifier];
   return layouter;
 }
 
-void mitk::OverlayManager::AddLayouter(BaseLayouter *layouter)
+void mitk::OverlayManager::AddLayouter(const BaseLayouter::Pointer& layouter)
 {
-  if(layouter)
+  if(layouter.IsNotNull())
   {
     BaseLayouter::Pointer oldLayouter = m_LayouterMap[layouter->GetBaseRenderer()][layouter->GetIdentifier()];
-    if(oldLayouter.IsNotNull() && oldLayouter.GetPointer() != layouter)
+    if(oldLayouter.IsNotNull() && oldLayouter.GetPointer() != layouter.GetPointer())
     {
       MITK_WARN << "Layouter " << layouter->GetIdentifier() << " does already exist!";
     }

@@ -1,3 +1,5 @@
 set(MODULE_TESTS
-  mitkBreakpadCrashReportingDumpTest.cpp
+  if(CMAKE_SYSTEM MATCHES "Windows") # currently only for windows (see documentation of test mitkBreakpadCrashReportingDumpTest)
+    mitkBreakpadCrashReportingDumpTest.cpp
+  endif()
 )

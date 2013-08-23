@@ -1,12 +1,13 @@
 if(BUILD_TESTING)
-  MITK_CREATE_MODULE_TESTS()
+  # currently breakpad testing is only available for windows
+  # ToDo: currently a problem can occure during crash dump generation on linux. please have a look at the documentation of mitkBreakpadCrashReportingDumpTest
+  #set_tests_properties(mitkBreakpadCrashReportingDumpTest PROPERTIES TIMEOUT 5) # the test should not need 5 seconds
 
-  #set_tests_properties(mitkBreakpadCrashReportingDumpTest PROPERTIES WILL_FAIL TRUE) # this one SHOULD crash
 if(CMAKE_SYSTEM MATCHES "Windows")
+    MITK_CREATE_MODULE_TESTS()
+
     add_executable(BreakpadCrashReportingDumpTestApplication mitkBreakpadCrashReportingDumpTestApplication.cpp)
     target_link_libraries(BreakpadCrashReportingDumpTestApplication ${ALL_LIBRARIES} BreakpadCrashReporting)
 endif()
-
-  #set_property(TEST mitkBreakpadCrashReportingDumpCheckTest PROPERTY DEPENDS mitkBreakpadCrashReportingDumpTest) # this one checks if a dump was created
 
 endif()

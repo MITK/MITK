@@ -38,6 +38,8 @@ namespace mitk
   public:
     mitkClassMacro(TrackingTool, itk::Object);
 
+    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+
     virtual void SetToolTip(mitk::Point3D toolTipPosition, mitk::Quaternion orientation) = 0; ///< defines a tool tip for this tool in tool coordinates. GetPosition() and GetOrientation() return the data of the tool tip if it is defined. By default no tooltip is defined.
     virtual void GetPosition(mitk::Point3D& position) const = 0;          ///< returns the current position of the tool as an array of three floats (in the tracking device coordinate system)
     virtual void GetOrientation(mitk::Quaternion& orientation) const = 0;  ///< returns the current orientation of the tool as a quaternion in a mitk::Point4D (in the tracking device coordinate system)

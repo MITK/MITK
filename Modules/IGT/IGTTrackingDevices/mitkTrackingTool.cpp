@@ -33,6 +33,12 @@ mitk::TrackingTool::~TrackingTool()
   m_MyMutex = NULL;
 }
 
+void mitk::TrackingTool::PrintSelf(std::ostream& os, itk::Indent indent) const
+{
+  Superclass::PrintSelf(os, indent);
+  os << indent << "ToolName: " << m_ToolName << std::endl;
+  os << indent << "ErrorMesage: " << m_ErrorMessage << std::endl;
+}
 
 const char* mitk::TrackingTool::GetToolName() const
 {

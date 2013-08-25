@@ -179,6 +179,7 @@ int PeakExtraction(int argc, char* argv[])
             }
             else
             {
+                MITK_INFO << "Flipping image";
                 itk::FixedArray<bool, 4> flipAxes;
                 flipAxes[0] = true;
                 flipAxes[1] = true;
@@ -195,6 +196,7 @@ int PeakExtraction(int argc, char* argv[])
                 converter->SetInputImage(flipped);
             }
 
+            MITK_INFO << "Starting conversion";
             switch (toolkitConvention)
             {
             case 1:
@@ -213,26 +215,26 @@ int PeakExtraction(int argc, char* argv[])
             converter->GenerateData();
             filter->SetInput(converter->GetCoefficientImage());
 
-            // write qbi
-            ConverterType::QballImageType::Pointer itkQbi = converter->GetQballImage();
+//            // write qbi
+//            ConverterType::QballImageType::Pointer itkQbi = converter->GetQballImage();
 
-            if (itkMaskImage.IsNotNull())
-            {
-                itkQbi->SetDirection(itkMaskImage->GetDirection());
-                itkQbi->SetOrigin(itkMaskImage->GetOrigin());
-            }
+//            if (itkMaskImage.IsNotNull())
+//            {
+//                itkQbi->SetDirection(itkMaskImage->GetDirection());
+//                itkQbi->SetOrigin(itkMaskImage->GetOrigin());
+//            }
 
-            mitk::QBallImage::Pointer mitkQbi = mitk::QBallImage::New();
-            mitkQbi->InitializeByItk( itkQbi.GetPointer() );
-            mitkQbi->SetVolume( itkQbi->GetBufferPointer() );
+//            mitk::QBallImage::Pointer mitkQbi = mitk::QBallImage::New();
+//            mitkQbi->InitializeByItk( itkQbi.GetPointer() );
+//            mitkQbi->SetVolume( itkQbi->GetBufferPointer() );
 
-            string outfilename = outRoot;
-            outfilename.append("_QBI.qbi");
-            MITK_INFO << "writing " << outfilename;
+//            string outfilename = outRoot;
+//            outfilename.append("_QBI.qbi");
+//            MITK_INFO << "writing " << outfilename;
 
-            mitk::NrrdQBallImageWriter::Pointer writer = mitk::NrrdQBallImageWriter::New();
-            writer->SetFileName(outfilename.c_str());
-            writer->DoWrite(mitkQbi.GetPointer());
+//            mitk::NrrdQBallImageWriter::Pointer writer = mitk::NrrdQBallImageWriter::New();
+//            writer->SetFileName(outfilename.c_str());
+//            writer->DoWrite(mitkQbi.GetPointer());
         }
         else
         {
@@ -268,6 +270,7 @@ int PeakExtraction(int argc, char* argv[])
             break;
         }
 
+        MITK_INFO << "Starting extraction";
         filter->Update();
 
         // write direction images

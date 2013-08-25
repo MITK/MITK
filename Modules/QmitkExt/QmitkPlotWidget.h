@@ -211,7 +211,7 @@ protected:
   QwtPlot*                    m_Plot;
   std::vector<QwtPlotCurve*>  m_PlotCurveVector;
 
-
+  QwtSeriesData<QPointF>* m_SeriesData;
 };
 
 #endif

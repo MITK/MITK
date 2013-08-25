@@ -709,18 +709,11 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                = @MITK_SOURCE_DIR@/BlueBerry/Documentation/reference/api/MainPage.dox \
-                         @MITK_SOURCE_DIR@/Utilities/ann/ \
-                         @MITK_SOURCE_DIR@/Utilities/glew/ \
                          @MITK_SOURCE_DIR@/Utilities/ipFunc/ \
                          @MITK_SOURCE_DIR@/Utilities/ipSegmentation/ \
                          @MITK_SOURCE_DIR@/Utilities/KWStyle/ \
-                         @MITK_SOURCE_DIR@/Utilities/pic2vtk/ \
                          @MITK_SOURCE_DIR@/Utilities/Poco/ \
                          @MITK_SOURCE_DIR@/Utilities/qtsingleapplication/ \
-                         @MITK_SOURCE_DIR@/Utilities/qwt/ \
-                         @MITK_SOURCE_DIR@/Utilities/qxt/ \
-                         @MITK_SOURCE_DIR@/Utilities/tinyxml/ \
-                         @MITK_SOURCE_DIR@/Utilities/vecmath/ \
                          @MITK_SOURCE_DIR@/Applications/PluginGenerator/ \
                          @MITK_SOURCE_DIR@/Core/CppMicroServices/README.md \
                          @MITK_SOURCE_DIR@/Core/CppMicroServices/documentation/snippets/ \
@@ -775,10 +768,7 @@ EXCLUDE_PATTERNS       = moc_* \
 # wildcard * is used, a substring. Examples: ANamespace, AClass,
 # AClass::ANamespace, ANamespace::*Test
 
-EXCLUDE_SYMBOLS        = *Private* \
-                         ModuleInfo \
-                         ServiceObjectsBase* \
-                         TrackedService*
+EXCLUDE_SYMBOLS        =
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or
 # directories that contain example code fragments that are included (see
@@ -786,16 +776,14 @@ EXCLUDE_SYMBOLS        = *Private* \
 
 EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Examples/ \
                          @MITK_SOURCE_DIR@/Examples/Tutorial/ \
-                         @MITK_SOURCE_DIR@/Examples/Plugins/ \
+                        @MITK_SOURCE_DIR@/Examples/Plugins/ \
                          @MITK_SOURCE_DIR@/Examples/QtFreeRender/ \
                          @MITK_SOURCE_DIR@/Core/Code/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/documentation/snippets/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/examples/ \
+                         @MITK_SOURCE_DIR@/Core/Code/CppMicroServices/Documentation/Snippets/ \
                          @MITK_DOXYGEN_OUTPUT_DIR@/html/extension-points/html/ \
                          @MITK_SOURCE_DIR@/Documentation/Snippets/ \
                          @MITK_SOURCE_DIR@/Documentation/Doxygen/ExampleCode/ \
-                         @MITK_SOURCE_DIR@/Modules/OpenCL/Documentation/doxygen/snippets/ \
-                         @MITK_SOURCE_DIR@/BlueBerry/Documentation/snippets/
+                         @MITK_SOURCE_DIR@/Modules/OpenCL/Documentation/doxygen/snippets/
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp
@@ -1641,9 +1629,10 @@ PREDEFINED             = itkNotUsed(x)= \
                          VXL_LITTLE_ENDIAN=0 \
                          VNL_DLL_DATA= \
                          size_t=vcl_size_t \
-                         "US_PREPEND_NAMESPACE(x)=us::x" \
-                         "US_BEGIN_NAMESPACE= namespace us {" \
+                         "US_PREPEND_NAMESPACE(x)=mitk::x" \
+                         "US_BEGIN_NAMESPACE= namespace mitk {" \
                          "US_END_NAMESPACE=}" \
+                         "US_BASECLASS_NAME=itk::LightObject" \
                          US_EXPORT= \
                          "DEPRECATED(func)=func"
 
@@ -1679,7 +1668,7 @@ SKIP_FUNCTION_MACROS   = YES
 # NOT include the path). If a tag file is not located in the directory in which
 # doxygen is run, you must also specify the path to the tagfile here.
 
-TAGFILES               =
+TAGFILES               = @BLUEBERRY_DOXYGEN_TAGFILE@
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create
 # a tag file that is based on the input files it reads.

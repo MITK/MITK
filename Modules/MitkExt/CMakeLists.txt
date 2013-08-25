@@ -9,7 +9,6 @@ configure_file(${PROJECT_SOURCE_DIR}/CMake/ToolGUIExtensionITKFactory.cpp.in ${P
 MITK_CREATE_MODULE( MitkExt
                INCLUDE_DIRS Algorithms Controllers DataManagement Interactions IO Rendering
                DEPENDS Mitk LegacyAdaptors IpPicSupport ipSegmentation mitkIpFunc PlanarFigure ImageStatistics
-               DEPENDS_INTERNAL pic2vtk
 )
 
 # this is needed for libraries which link to mitkCoreExt and need
@@ -24,5 +23,7 @@ if(MINGW)
   set_target_properties(mitkCoreExt PROPERTIES LINK_FLAGS "${_mitkCoreExt_MINGW_linkflags} -Wl,--export-all-symbols")
 endif(MINGW)
 
-add_subdirectory(Testing)
+if(BUILD_TESTING)
+  add_subdirectory(Testing)
+endif()
 

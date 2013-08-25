@@ -54,7 +54,7 @@ macro(MITK_CHECK_MODULE RESULT_VAR)
     list(SORT PACKAGE_DEPENDS)
   endwhile()
 
-  foreach(_package PACKAGE_DEPENDS)
+  foreach(_package ${PACKAGE_DEPENDS})
     if((DEFINED MITK_USE_${_package}) AND NOT (${MITK_USE_${_package}}))
       list(APPEND ${RESULT_VAR} ${_package})
     endif()

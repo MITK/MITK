@@ -21,8 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkODFDetailsWidget::QmitkODFDetailsWidget( QWidget * parent )
   : QmitkPlotWidget(parent)
 {
-  m_Plot->setCanvasLineWidth(0);
-  m_Plot->setMargin(0);
+  QFrame* canvas = qobject_cast<QFrame*>(m_Plot->canvas());
+  if (canvas)
+  {
+    canvas->setLineWidth(0);
+    canvas->setContentsMargins(0,0,0,0);
+  }
 
   QwtLinearScaleEngine* scale = new QwtLinearScaleEngine();
   m_Plot->setAxisScaleEngine(0, scale);

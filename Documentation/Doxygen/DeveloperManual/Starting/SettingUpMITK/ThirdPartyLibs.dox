@@ -7,6 +7,10 @@ The following third-party libraries can be used with MITK by default and can, in
 
 http://www.creatis.insa-lyon.fr/site/en/acvd
 
+\par ANN
+
+http://www.cs.umd.edu/~mount/ANN/
+
 \par Boost
 
 http://www.boost.org/
@@ -23,59 +27,53 @@ http://dicom.offis.de/dcmtk.php.en
 
 http://gdcm.sourceforge.net/
 
-\par KWStlye
+\par GLEW (The OpenGL Extension Wrangler Library)
 
-http://public.kitware.com/KWStyle/
+http://glew.sourceforge.net/ (Version 1.5.1?)
 
 \par ITK
 
 http://www.itk.org/
 
+\par KWStlye
+
+http://public.kitware.com/KWStyle/
+
+\par LibQxt (the Qt eXTension library)
+
+http://www.libqxt.org/
+
 \par OpenCV
 
 http://opencv.willowgarage.com/wiki/Welcome
-
-\par SOFA
-
-http://www.sofa-framework.org/
 
 \par Qt
 
 http://qt.nokia.com/
 
+\par Qwt (Qt Widgets for Technical Applications)
+
+http://qwt.sourceforge.net/
+
+\par SOFA
+
+http://www.sofa-framework.org/
+
+\par tinyxml
+
+http://sourceforge.net/projects/tinyxml/
+
 \par VTK
 
 http://www.vtk.org/
 
+
 The following third-party libraries are distributed with MITK and used in several places.
-
-\par ANN (A Library for Approximate Nearest Neighbor Searching)
-
-http://www.cs.umd.edu/~mount/ANN/ (Version 1.1)
-
-\par GLEW (The OpenGL Extension Wrangler Library)
-
-http://glew.sourceforge.net/ (Version 1.5.1?)
 
 \par POCO (Portable Components, Basic Edition)
 
 http://pocoproject.org (Version 1.3.5)
 
-\par Qwt (Qt Widgets for Technical Applications)
-
-http://qwt.sourceforge.net/ (Version 5.2.0)
-
-\par LibQxt (the Qt eXTension library)
-
-http://www.libqxt.org/ (Version 0.5.1)
-
-\par tinyxml
-
-http://www.grinninglizard.com/tinyxml/index.html (Version 2.5.5)
-
-\par vecmath
-
-http://www.objectclub.jp/download/vecmath_e (Version 1.2-1.4)
 
 For copyright information on any of the above toolkits see the corresponding home page or the corresponding source folder.
 */

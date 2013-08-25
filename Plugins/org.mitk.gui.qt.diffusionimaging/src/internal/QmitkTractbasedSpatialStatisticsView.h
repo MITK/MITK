@@ -94,7 +94,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     // Creates Roi
     void CreateRoi();
 
-    void Clicked(const QwtDoublePoint& pos);
+    void Clicked(const QPointF& pos);
 
     // Import of FSL TBSS data
     void TbssImport();

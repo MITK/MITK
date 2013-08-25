@@ -21,16 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_mitk_gui_qt_diffusionimaging_Export.h>
 
-#include "QmitkExtExports.h"
-#include "mitkPlanarFigure.h"
-#include "itkVectorImage.h"
 #include <mitkFiberBundleX.h>
-#include <mitkPlanarCircle.h>
 #include <mitkTbssImage.h>
 
-
-#include <qwt_plot.h>
-#include <qwt_plot_picker.h>
+#include <itkVectorImage.h>
 
 typedef itk::VectorImage<float,3>     VectorImageType;
 typedef std::vector< itk::Index<3> > RoiType;
@@ -39,6 +33,7 @@ typedef itk::Point<float,3>               PointType;
 typedef std::vector< PointType>           TractType;
 typedef std::vector< TractType > TractContainerType;
 
+class QwtPlotPicker;
 
 /**
  * \brief Plot widget for TBSS Data

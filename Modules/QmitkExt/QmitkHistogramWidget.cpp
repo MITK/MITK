@@ -15,23 +15,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkHistogramWidget.h"
+
+#include <QmitkHistogram.h>
+
 #include "mitkImageStatisticsHolder.h"
 
-#include <qlabel.h>
-#include <qpen.h>
-#include <qgroupbox.h>
+#include <QVBoxLayout>
+#include <QGroupBox>
+#include <QLabel>
+#include <QTextEdit>
 
+#include <qwt_plot.h>
 #include <qwt_plot_grid.h>
-//#include <qwt_array.h>
+#include <qwt_plot_marker.h>
+#include <qwt_plot_picker.h>
+#include <qwt_plot_zoomer.h>
+#include <qwt_picker_machine.h>
+#include <qwt_series_data.h>
 #include <qwt_text_label.h>
 #include <qwt_text.h>
 #include <qwt_symbol.h>
 
-//#include <iostream>
-
 QmitkHistogramWidget::QmitkHistogramWidget(QWidget * parent, bool showreport)
   : QDialog(parent)
-  , m_Symbol(NULL)
+  , m_Plot(NULL)
+  , m_Textedit(NULL)
+  , m_Marker(NULL)
+  , m_Picker(NULL)
+  , m_Zoomer(NULL)
+  , m_Histogram(NULL)
 {
   QBoxLayout *layout = new QVBoxLayout(this);
 
@@ -79,6 +91,8 @@ QmitkHistogramWidget::QmitkHistogramWidget(QWidget * parent, bool showreport)
   m_Picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
                                QwtPlotPicker::NoRubberBand, QwtPicker::AlwaysOn,
                                m_Plot->canvas());
+  // the m_PickerMachine pointer is managed by the m_Picker instance
+  m_Picker->setStateMachine(new QwtPickerClickPointMachine());
 
   connect(m_Picker, SIGNAL(selected(const QwtDoublePoint &)),
     SLOT(OnSelect(const QwtDoublePoint &)));
@@ -86,7 +100,6 @@ QmitkHistogramWidget::QmitkHistogramWidget(QWidget * parent, bool showreport)
 
 QmitkHistogramWidget::~QmitkHistogramWidget()
 {
-  delete m_Symbol;
 }
 
 void QmitkHistogramWidget::SetHistogram(HistogramType::ConstPointer itkHistogram)
@@ -139,9 +152,8 @@ void QmitkHistogramWidget::InitializeMarker()
   m_Marker->setLineStyle(QwtPlotMarker::VLine);
   m_Marker->setLabelAlignment(Qt::AlignHCenter | Qt::AlignRight);
   m_Marker->setLinePen(QPen(QColor(200,150,0), 3, Qt::SolidLine));
-  m_Symbol = new QwtSymbol(QwtSymbol::Diamond,
-                           QColor(Qt::red), QColor(Qt::red), QSize(10,10));
-  m_Marker->setSymbol(m_Symbol);
+  m_Marker->setSymbol(new QwtSymbol(QwtSymbol::Diamond,
+                                    QColor(Qt::red), QColor(Qt::red), QSize(10,10)));
   m_Marker->attach(m_Plot);
 }
 

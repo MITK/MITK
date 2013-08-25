@@ -16,11 +16,10 @@ set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 0)
 
 MITK_CREATE_MODULE( Mitk
   INCLUDE_DIRS
-    ${CppMicroServices_INCLUDE_DIRS} Algorithms Common DataManagement Controllers
+    Algorithms Common DataManagement Controllers
     Interactions Interfaces IO Rendering ${MITK_BINARY_DIR}
   INTERNAL_INCLUDE_DIRS
     ${OPENGL_INCLUDE_DIR}
-    ${CppMicroServices_INTERNAL_INCLUDE_DIRS}
   DEPENDS mbilog CppMicroServices
   PACKAGE_DEPENDS tinyxml ITK GDCM VTK OpenGL
   EXPORT_DEFINE MITK_CORE_EXPORT

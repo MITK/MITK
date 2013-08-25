@@ -916,7 +916,6 @@ configure_file(mitkExportMacros.h.in ${MITK_BINARY_DIR}/mitkExportMacros.h)
 configure_file(mitkVersion.h.in ${MITK_BINARY_DIR}/mitkVersion.h)
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 
-set(VECMATH_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vecmath)
 set(IPFUNC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipFunc)
 set(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
 

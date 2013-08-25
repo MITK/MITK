@@ -31,9 +31,9 @@ int StreamlineTracking(int argc, char* argv[])
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", ctkCommandLineParser::String, "input tensor image (.dti)", us::Any(), false);
-    parser.addArgument("seed", "s", ctkCommandLineParser::String, "binary seed image");
-    parser.addArgument("mask", "m", ctkCommandLineParser::String, "binary mask image");
-    parser.addArgument("minFA", "t", ctkCommandLineParser::Float, "minimum fractional anisotropy threshold", 0.15, true);
+    parser.addArgument("seed", "si", ctkCommandLineParser::String, "binary seed image");
+    parser.addArgument("mask", "mi", ctkCommandLineParser::String, "binary mask image");
+    parser.addArgument("minFA", "fa", ctkCommandLineParser::Float, "minimum fractional anisotropy threshold", 0.15, true);
     parser.addArgument("minCurv", "c", ctkCommandLineParser::Float, "minimum curvature radius in mm (default = 0.5*minimum-spacing)");
     parser.addArgument("stepSize", "s", ctkCommandLineParser::Float, "stepsize in mm (default = 0.1*minimum-spacing)");
     parser.addArgument("tendf", "f", ctkCommandLineParser::Float, "Weighting factor between first eigenvector (f=1 equals FACT tracking) and input vector dependent direction (f=0).", 1.0, true);
@@ -41,7 +41,7 @@ int StreamlineTracking(int argc, char* argv[])
     parser.addArgument("numSeeds", "n", ctkCommandLineParser::Int, "Number of seeds per voxel.", 1, true);
     parser.addArgument("minLength", "l", ctkCommandLineParser::Float, "minimum fiber length in mm", 20, true);
 
-    parser.addArgument("interpolate", "a", ctkCommandLineParser::Bool, "Use linear interpolation", false, true);
+    parser.addArgument("interpolate", "ip", ctkCommandLineParser::Bool, "Use linear interpolation", false, true);
     parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output fiber bundle (.fib)", us::Any(), false);
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

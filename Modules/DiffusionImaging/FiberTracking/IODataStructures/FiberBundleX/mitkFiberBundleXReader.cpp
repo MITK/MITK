@@ -25,272 +25,278 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <tinyxml.h>
 #include <vtkCleanPolyData.h>
+#include <mitkTrackvis.h>
 
 namespace mitk
 {
 
-  void FiberBundleXReader
-    ::GenerateData()
-  {
+void FiberBundleXReader
+::GenerateData()
+{
     if ( ( ! m_OutputCache ) )
     {
-      Superclass::SetNumberOfRequiredOutputs(0);
-      this->GenerateOutputInformation();
+        Superclass::SetNumberOfRequiredOutputs(0);
+        this->GenerateOutputInformation();
     }
 
     if (!m_OutputCache)
     {
-      itkWarningMacro("Output cache is empty!");
+        itkWarningMacro("Output cache is empty!");
     }
 
 
     Superclass::SetNumberOfRequiredOutputs(1);
     Superclass::SetNthOutput(0, m_OutputCache.GetPointer());
-  }
+}
 
-  void FiberBundleXReader::GenerateOutputInformation()
-  {
+void FiberBundleXReader::GenerateOutputInformation()
+{
     try
     {
-      const std::string& locale = "C";
-      const std::string& currLocale = setlocale( LC_ALL, NULL );
-      setlocale(LC_ALL, locale.c_str());
+        const std::string& locale = "C";
+        const std::string& currLocale = setlocale( LC_ALL, NULL );
+        setlocale(LC_ALL, locale.c_str());
 
-      std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
-      ext = itksys::SystemTools::LowerCase(ext);
+        std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
+        ext = itksys::SystemTools::LowerCase(ext);
 
-      vtkSmartPointer<vtkDataReader> chooser=vtkSmartPointer<vtkDataReader>::New();
-      chooser->SetFileName(m_FileName.c_str() );
-      if( chooser->IsFilePolyData())
-      {
-        MITK_INFO << "Reading vtk fiber bundle";
-        vtkSmartPointer<vtkPolyDataReader> reader = vtkSmartPointer<vtkPolyDataReader>::New();
-        reader->SetFileName( m_FileName.c_str() );
-        reader->Update();
-
-        if ( reader->GetOutput() != NULL )
+        if (ext==".trk")
         {
-          vtkSmartPointer<vtkPolyData> fiberPolyData = reader->GetOutput();
-
-//          vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
-//          cleaner->SetInput(fiberPolyData);
-//          cleaner->Update();
-//          fiberPolyData = cleaner->GetOutput();
-
-          m_OutputCache = OutputType::New(fiberPolyData);
+            MITK_INFO << "Importing fiber bundle from TrackVis ...";
+            m_OutputCache = OutputType::New();
+            TrackVis trk;
+            trk.open(m_FileName);
+            trk.read(m_OutputCache);
+            MITK_INFO << "... done";
+            return;
         }
-      }
-      else // try to read deprecated fiber bundle file format
-      {
-        MITK_INFO << "Reading xml fiber bundle";
 
-        vtkSmartPointer<vtkPolyData> fiberPolyData = vtkSmartPointer<vtkPolyData>::New();
-        vtkSmartPointer<vtkCellArray> cellArray = vtkSmartPointer<vtkCellArray>::New();
-        vtkSmartPointer<vtkPoints>    points = vtkSmartPointer<vtkPoints>::New();
-        TiXmlDocument doc( m_FileName );
-        if(doc.LoadFile())
+        vtkSmartPointer<vtkDataReader> chooser=vtkSmartPointer<vtkDataReader>::New();
+        chooser->SetFileName(m_FileName.c_str() );
+        if( chooser->IsFilePolyData())
         {
-          TiXmlHandle hDoc(&doc);
-          TiXmlElement* pElem;
-          TiXmlHandle hRoot(0);
+            MITK_INFO << "Reading vtk fiber bundle";
+            vtkSmartPointer<vtkPolyDataReader> reader = vtkSmartPointer<vtkPolyDataReader>::New();
+            reader->SetFileName( m_FileName.c_str() );
+            reader->Update();
 
-          pElem = hDoc.FirstChildElement().Element();
-
-          // save this for later
-          hRoot = TiXmlHandle(pElem);
-
-          pElem = hRoot.FirstChildElement("geometry").Element();
-
-          // read geometry
-          mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
-
-          // read origin
-          mitk::Point3D origin;
-          double temp = 0;
-          pElem->Attribute("origin_x", &temp);
-          origin[0] = temp;
-          pElem->Attribute("origin_y", &temp);
-          origin[1] = temp;
-          pElem->Attribute("origin_z", &temp);
-          origin[2] = temp;
-          geometry->SetOrigin(origin);
-
-          // read spacing
-          float spacing[3];
-          pElem->Attribute("spacing_x", &temp);
-          spacing[0] = temp;
-          pElem->Attribute("spacing_y", &temp);
-          spacing[1] = temp;
-          pElem->Attribute("spacing_z", &temp);
-          spacing[2] = temp;
-          geometry->SetSpacing(spacing);
-
-          // read transform
-          vtkMatrix4x4* m = vtkMatrix4x4::New();
-          pElem->Attribute("xx", &temp);
-          m->SetElement(0,0,temp);
-          pElem->Attribute("xy", &temp);
-          m->SetElement(1,0,temp);
-          pElem->Attribute("xz", &temp);
-          m->SetElement(2,0,temp);
-          pElem->Attribute("yx", &temp);
-          m->SetElement(0,1,temp);
-          pElem->Attribute("yy", &temp);
-          m->SetElement(1,1,temp);
-          pElem->Attribute("yz", &temp);
-          m->SetElement(2,1,temp);
-          pElem->Attribute("zx", &temp);
-          m->SetElement(0,2,temp);
-          pElem->Attribute("zy", &temp);
-          m->SetElement(1,2,temp);
-          pElem->Attribute("zz", &temp);
-          m->SetElement(2,2,temp);
-
-          m->SetElement(0,3,origin[0]);
-          m->SetElement(1,3,origin[1]);
-          m->SetElement(2,3,origin[2]);
-          m->SetElement(3,3,1);
-          geometry->SetIndexToWorldTransformByVtkMatrix(m);
-
-          // read bounds
-          float bounds[] = {0, 0, 0, 0, 0, 0};
-          pElem->Attribute("size_x", &temp);
-          bounds[1] = temp;
-          pElem->Attribute("size_y", &temp);
-          bounds[3] = temp;
-          pElem->Attribute("size_z", &temp);
-          bounds[5] = temp;
-          geometry->SetFloatBounds(bounds);
-          geometry->SetImageGeometry(true);
-
-          pElem = hRoot.FirstChildElement("fiber_bundle").FirstChild().Element();
-          for( pElem; pElem; pElem=pElem->NextSiblingElement())
-          {
-            TiXmlElement* pElem2 = pElem->FirstChildElement();
-
-            vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-
-            for( pElem2; pElem2; pElem2=pElem2->NextSiblingElement())
+            if ( reader->GetOutput() != NULL )
             {
-              itk::Point<float> point;
-              pElem2->Attribute("pos_x", &temp);
-              point[0] = temp;
-              pElem2->Attribute("pos_y", &temp);
-              point[1] = temp;
-              pElem2->Attribute("pos_z", &temp);
-              point[2] = temp;
-
-              geometry->IndexToWorld(point, point);
-              vtkIdType id = points->InsertNextPoint(point.GetDataPointer());
-              container->GetPointIds()->InsertNextId(id);
-
+                vtkSmartPointer<vtkPolyData> fiberPolyData = reader->GetOutput();
+                m_OutputCache = OutputType::New(fiberPolyData);
             }
-            cellArray->InsertNextCell(container);
-          }
-          fiberPolyData->SetPoints(points);
-          fiberPolyData->SetLines(cellArray);
-
-          vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
-          cleaner->SetInput(fiberPolyData);
-          cleaner->Update();
-          fiberPolyData = cleaner->GetOutput();
-
-          m_OutputCache = OutputType::New(fiberPolyData);
         }
-        else
+        else // try to read deprecated fiber bundle file format
         {
-          MITK_INFO << "could not open xml file";
-          throw "could not open xml file";
+            MITK_INFO << "Reading xml fiber bundle";
+
+            vtkSmartPointer<vtkPolyData> fiberPolyData = vtkSmartPointer<vtkPolyData>::New();
+            vtkSmartPointer<vtkCellArray> cellArray = vtkSmartPointer<vtkCellArray>::New();
+            vtkSmartPointer<vtkPoints>    points = vtkSmartPointer<vtkPoints>::New();
+            TiXmlDocument doc( m_FileName );
+            if(doc.LoadFile())
+            {
+                TiXmlHandle hDoc(&doc);
+                TiXmlElement* pElem;
+                TiXmlHandle hRoot(0);
+
+                pElem = hDoc.FirstChildElement().Element();
+
+                // save this for later
+                hRoot = TiXmlHandle(pElem);
+
+                pElem = hRoot.FirstChildElement("geometry").Element();
+
+                // read geometry
+                mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
+
+                // read origin
+                mitk::Point3D origin;
+                double temp = 0;
+                pElem->Attribute("origin_x", &temp);
+                origin[0] = temp;
+                pElem->Attribute("origin_y", &temp);
+                origin[1] = temp;
+                pElem->Attribute("origin_z", &temp);
+                origin[2] = temp;
+                geometry->SetOrigin(origin);
+
+                // read spacing
+                float spacing[3];
+                pElem->Attribute("spacing_x", &temp);
+                spacing[0] = temp;
+                pElem->Attribute("spacing_y", &temp);
+                spacing[1] = temp;
+                pElem->Attribute("spacing_z", &temp);
+                spacing[2] = temp;
+                geometry->SetSpacing(spacing);
+
+                // read transform
+                vtkMatrix4x4* m = vtkMatrix4x4::New();
+                pElem->Attribute("xx", &temp);
+                m->SetElement(0,0,temp);
+                pElem->Attribute("xy", &temp);
+                m->SetElement(1,0,temp);
+                pElem->Attribute("xz", &temp);
+                m->SetElement(2,0,temp);
+                pElem->Attribute("yx", &temp);
+                m->SetElement(0,1,temp);
+                pElem->Attribute("yy", &temp);
+                m->SetElement(1,1,temp);
+                pElem->Attribute("yz", &temp);
+                m->SetElement(2,1,temp);
+                pElem->Attribute("zx", &temp);
+                m->SetElement(0,2,temp);
+                pElem->Attribute("zy", &temp);
+                m->SetElement(1,2,temp);
+                pElem->Attribute("zz", &temp);
+                m->SetElement(2,2,temp);
+
+                m->SetElement(0,3,origin[0]);
+                m->SetElement(1,3,origin[1]);
+                m->SetElement(2,3,origin[2]);
+                m->SetElement(3,3,1);
+                geometry->SetIndexToWorldTransformByVtkMatrix(m);
+
+                // read bounds
+                float bounds[] = {0, 0, 0, 0, 0, 0};
+                pElem->Attribute("size_x", &temp);
+                bounds[1] = temp;
+                pElem->Attribute("size_y", &temp);
+                bounds[3] = temp;
+                pElem->Attribute("size_z", &temp);
+                bounds[5] = temp;
+                geometry->SetFloatBounds(bounds);
+                geometry->SetImageGeometry(true);
+
+                pElem = hRoot.FirstChildElement("fiber_bundle").FirstChild().Element();
+                for( pElem; pElem; pElem=pElem->NextSiblingElement())
+                {
+                    TiXmlElement* pElem2 = pElem->FirstChildElement();
+
+                    vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+
+                    for( pElem2; pElem2; pElem2=pElem2->NextSiblingElement())
+                    {
+                        itk::Point<float> point;
+                        pElem2->Attribute("pos_x", &temp);
+                        point[0] = temp;
+                        pElem2->Attribute("pos_y", &temp);
+                        point[1] = temp;
+                        pElem2->Attribute("pos_z", &temp);
+                        point[2] = temp;
+
+                        geometry->IndexToWorld(point, point);
+                        vtkIdType id = points->InsertNextPoint(point.GetDataPointer());
+                        container->GetPointIds()->InsertNextId(id);
+
+                    }
+                    cellArray->InsertNextCell(container);
+                }
+                fiberPolyData->SetPoints(points);
+                fiberPolyData->SetLines(cellArray);
+
+                vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
+                cleaner->SetInput(fiberPolyData);
+                cleaner->Update();
+                fiberPolyData = cleaner->GetOutput();
+
+                m_OutputCache = OutputType::New(fiberPolyData);
+            }
+            else
+            {
+                MITK_INFO << "could not open xml file";
+                throw "could not open xml file";
+            }
         }
-      }
-      setlocale(LC_ALL, currLocale.c_str());
-      MITK_INFO << "Fiber bundle read";
+        setlocale(LC_ALL, currLocale.c_str());
+        MITK_INFO << "Fiber bundle read";
     }
     catch(...)
     {
-      throw;
+        throw;
     }
-  }
+}
 
-  void FiberBundleXReader::Update()
-  {
+void FiberBundleXReader::Update()
+{
     this->GenerateData();
-  }
+}
 
-  const char* FiberBundleXReader
-    ::GetFileName() const
-  {
+const char* FiberBundleXReader
+::GetFileName() const
+{
     return m_FileName.c_str();
-  }
+}
 
 
-  void FiberBundleXReader
-    ::SetFileName(const char* aFileName)
-  {
+void FiberBundleXReader
+::SetFileName(const char* aFileName)
+{
     m_FileName = aFileName;
-  }
+}
 
 
-  const char* FiberBundleXReader
-    ::GetFilePrefix() const
-  {
+const char* FiberBundleXReader
+::GetFilePrefix() const
+{
     return m_FilePrefix.c_str();
-  }
+}
 
 
-  void FiberBundleXReader
-    ::SetFilePrefix(const char* aFilePrefix)
-  {
+void FiberBundleXReader
+::SetFilePrefix(const char* aFilePrefix)
+{
     m_FilePrefix = aFilePrefix;
-  }
+}
 
 
-  const char* FiberBundleXReader
-    ::GetFilePattern() const
-  {
+const char* FiberBundleXReader
+::GetFilePattern() const
+{
     return m_FilePattern.c_str();
-  }
+}
 
 
-  void FiberBundleXReader
-    ::SetFilePattern(const char* aFilePattern)
-  {
+void FiberBundleXReader
+::SetFilePattern(const char* aFilePattern)
+{
     m_FilePattern = aFilePattern;
-  }
+}
 
 
-  bool FiberBundleXReader
-    ::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/)
-  {
+bool FiberBundleXReader
+::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/)
+{
     // First check the extension
     if(  filename == "" )
     {
-      return false;
+        return false;
     }
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(filename);
     ext = itksys::SystemTools::LowerCase(ext);
 
-    if (ext == ".fib")
+    if (ext == ".fib" || ext == ".trk")
     {
-      return true;
+        return true;
     }
 
     return false;
-  }
+}
 
-  BaseDataSource::DataObjectPointer FiberBundleXReader::MakeOutput(const DataObjectIdentifierType &name)
-  {
+BaseDataSource::DataObjectPointer FiberBundleXReader::MakeOutput(const DataObjectIdentifierType &name)
+{
     itkDebugMacro("MakeOutput(" << name << ")");
     if( this->IsIndexedOutputName(name) )
-      {
-      return this->MakeOutput( this->MakeIndexFromOutputName(name) );
-      }
+    {
+        return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    }
     return static_cast<itk::DataObject*>(OutputType::New().GetPointer());
-  }
+}
 
-  BaseDataSource::DataObjectPointer FiberBundleXReader::MakeOutput(DataObjectPointerArraySizeType /*idx*/)
-  {
+BaseDataSource::DataObjectPointer FiberBundleXReader::MakeOutput(DataObjectPointerArraySizeType /*idx*/)
+{
     return OutputType::New().GetPointer();
-  }
+}
 
 } //namespace MITK

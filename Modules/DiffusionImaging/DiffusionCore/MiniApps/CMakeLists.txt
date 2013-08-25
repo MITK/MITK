@@ -29,6 +29,7 @@ IF(BUILD_DiffusionCoreMiniApps)
     TensorReconstruction.cpp
     QballReconstruction.cpp
     DiffusionIndices.cpp
+    CopyGeometry.cpp
   )
 
   # create an executable foreach tool (only one at the moment)

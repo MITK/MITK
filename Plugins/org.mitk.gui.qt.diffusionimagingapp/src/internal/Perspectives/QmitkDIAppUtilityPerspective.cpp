@@ -42,7 +42,7 @@ void QmitkDIAppUtilityPerspective::CreateInitialLayout(berry::IPageLayout::Point
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  left->AddView("org.mitk.views.propertylistview");
+  left->AddView("org.mitk.views.properties");
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.properties");
   lo->SetCloseable(false);
 

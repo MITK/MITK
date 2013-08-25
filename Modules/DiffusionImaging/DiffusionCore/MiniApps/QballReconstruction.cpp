@@ -51,13 +51,12 @@ using namespace mitk;
 int QballReconstruction(int argc, char* argv[])
 {
 
-    if ( argc!=6
-         )
+    if ( argc<6 )
     {
         std::cout << std::endl;
         std::cout << "Perform QBall reconstruction on an dwi file" << std::endl;
         std::cout << std::endl;
-        std::cout << "usage: " << argv[0] << " " << argv[1] << " <in-file> <lambda> <baseline-threshold> <out-file> " << std::endl;
+        std::cout << "usage: " << argv[0] << " " << argv[1] << " <in-file> <lambda> <baseline-threshold> <out-file> <sh order>" << std::endl;
         std::cout << std::endl;
         return EXIT_FAILURE;
     }
@@ -70,22 +69,88 @@ int QballReconstruction(int argc, char* argv[])
         const std::string s1="", s2="";
         std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( argv[2], s1, s2, false );
         DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(infile.at(0).GetPointer());
-
-        typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
-
         dwi->AverageRedundantGradients(0.001);
 
-        FilterType::Pointer filter = FilterType::New();
-        filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-        filter->SetBValue(dwi->GetB_Value());
-        filter->SetThreshold( boost::lexical_cast<int>(argv[4]) );
-        filter->SetLambda(boost::lexical_cast<float>(argv[3]));
-        filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
-        filter->Update();
-
         mitk::QBallImage::Pointer image = mitk::QBallImage::New();
-        image->InitializeByItk( filter->GetOutput() );
-        image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+
+
+        int shOrder = 4;
+        if ( argc>6 )
+            shOrder = boost::lexical_cast<int>(argv[6]);
+        MITK_INFO << "Using SH order of " << shOrder;
+        switch ( shOrder )
+        {
+        case 4:
+        {
+            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
+            FilterType::Pointer filter = FilterType::New();
+            filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
+            filter->SetBValue(dwi->GetB_Value());
+            filter->SetThreshold( boost::lexical_cast<int>(argv[4]) );
+            filter->SetLambda(boost::lexical_cast<float>(argv[3]));
+            filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
+            filter->Update();
+            image->InitializeByItk( filter->GetOutput() );
+            image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+            break;
+        }
+        case 6:
+        {
+            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,6,QBALL_ODFSIZE> FilterType;
+            FilterType::Pointer filter = FilterType::New();
+            filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
+            filter->SetBValue(dwi->GetB_Value());
+            filter->SetThreshold( boost::lexical_cast<int>(argv[4]) );
+            filter->SetLambda(boost::lexical_cast<float>(argv[3]));
+            filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
+            filter->Update();
+            image->InitializeByItk( filter->GetOutput() );
+            image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+            break;
+        }
+        case 8:
+        {
+            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,8,QBALL_ODFSIZE> FilterType;
+            FilterType::Pointer filter = FilterType::New();
+            filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
+            filter->SetBValue(dwi->GetB_Value());
+            filter->SetThreshold( boost::lexical_cast<int>(argv[4]) );
+            filter->SetLambda(boost::lexical_cast<float>(argv[3]));
+            filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
+            filter->Update();
+            image->InitializeByItk( filter->GetOutput() );
+            image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+            break;
+        }
+        case 10:
+        {
+            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,10,QBALL_ODFSIZE> FilterType;
+            FilterType::Pointer filter = FilterType::New();
+            filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
+            filter->SetBValue(dwi->GetB_Value());
+            filter->SetThreshold( boost::lexical_cast<int>(argv[4]) );
+            filter->SetLambda(boost::lexical_cast<float>(argv[3]));
+            filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
+            filter->Update();
+            image->InitializeByItk( filter->GetOutput() );
+            image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+            break;
+        }
+        default:
+        {
+            MITK_INFO << "Supplied SH order not supported. Using default order of 4.";
+            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
+            FilterType::Pointer filter = FilterType::New();
+            filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
+            filter->SetBValue(dwi->GetB_Value());
+            filter->SetThreshold( boost::lexical_cast<int>(argv[4]) );
+            filter->SetLambda(boost::lexical_cast<float>(argv[3]));
+            filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
+            filter->Update();
+            image->InitializeByItk( filter->GetOutput() );
+            image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+        }
+        }
 
         std::string outfilename = argv[5];
         MITK_INFO << "writing image " << outfilename;

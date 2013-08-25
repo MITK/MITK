@@ -149,9 +149,14 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
         endif(MITK_GENERATE_MODULE_DOT)
 
         set(DEPENDS "${MODULE_DEPENDS}")
+        if(NOT MODULE_NO_INIT)
+          # Add a CppMicroServices dependency implicitly, since it is
+          # needed for the generated "module initialization" code.
+          set(DEPENDS "CppMicroServices;${DEPENDS}")
+        endif()
         set(DEPENDS_BEFORE "not initialized")
         set(PACKAGE_DEPENDS "${MODULE_PACKAGE_DEPENDS}")
-        MITK_USE_MODULE("${MODULE_DEPENDS}")
+        MITK_USE_MODULE(${DEPENDS})
 
         # ok, now create the module itself
         include_directories(. ${ALL_INCLUDE_DIRECTORIES})

@@ -84,7 +84,9 @@ short TrackVis::append(mitk::FiberBundleX *fib)
         vtkPoints* points = cell->GetPoints();
 
         unsigned int     numSaved, pos = 0;
-        float     tmp[3*maxSteps];
+        //float* tmp = new float[3*maxSteps];
+        std::vector< float > tmp;
+        tmp.reserve(3*numPoints);
 
         if ( numPoints > maxSteps )
         {
@@ -108,7 +110,7 @@ short TrackVis::append(mitk::FiberBundleX *fib)
             printf( "[ERROR] Problems saving the fiber!\n" );
             return 1;
         }
-        if ( fwrite((char*)&tmp, 1, 4*pos, fp) != 4*pos )
+        if ( fwrite((char*)&(tmp.front()), 1, 4*pos, fp) != 4*pos )
         {
             printf( "[ERROR] Problems saving the fiber!\n" );
             return 1;

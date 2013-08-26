@@ -105,89 +105,12 @@ const std::string QmitkFileSaveDialog::VIEW_ID = "org.mitk.views.QmitkFileSaveDi
 //
 //
 
-QmitkFileSaveDialog::QmitkFileSaveDialog(QWidget* parent, Qt::WindowFlags f): QFileDialog(parent, f)
+QmitkFileSaveDialog::QmitkFileSaveDialog(QWidget* parent, Qt::WindowFlags f): QmitkFileDialog(parent, f)
 {
-  this->setOption(QFileDialog::DontUseNativeDialog);
-  this->setFileMode(QFileDialog::ExistingFile);
-
-  DummyReader* dr = new DummyReader(".xsfd", 1000);
-
-  CreateQtPartControl(this);
 }
 
 QmitkFileSaveDialog::~QmitkFileSaveDialog()
 {
-}
-
-//////////////////// INITIALIZATION /////////////////////
-
-void QmitkFileSaveDialog::CreateQtPartControl(QWidget *parent)
-{
-  // cast own layout to gridLayout
-  QGridLayout *layout = (QGridLayout*)this->layout();
-
-  // creat groupbox for options
-  QGroupBox *box = new QGroupBox(this);
-  box->setTitle("Options:");
-  box->setVisible(true);
-  m_BoxLayout = new QGridLayout(box);
-  box->setLayout(m_BoxLayout);
-  layout->addWidget(box,4,0,1,3);
-
-  this->CreateConnections();
-
-  //  m_context = us::getmodulecontext();
-}
-
-void QmitkFileSaveDialog::CreateConnections()
-{
-  connect( this, SIGNAL(currentChanged( const QString &)), this, SLOT(DisplayOptions( QString)) );
-  connect( this, SIGNAL(fileSelected( const QString &)), this, SLOT(ProcessSelectedFile()) );
-}
-
-/////////////////////////// OPTIONS ///////////////////////////////
-
-void QmitkFileSaveDialog::DisplayOptions(QString path)
-{
-  std::string extension = path.toStdString();
-  extension.erase(0, extension.find_last_of('.'));
-
-  ClearOptionsBox();
-
-  us::ModuleContext* context = us::GetModuleContext();
-  mitk::FileReaderManager manager;
-  mitk::IFileReader* reader = manager.GetReader(extension);
-
-  if (reader == NULL)
-  {
-    // MITK_WARN << "Did not find ReaderService for registered Extension. This should be looked into by a developer.";
-    return;
-  }
-
-  std::list< mitk::IFileWriter::FileServiceOption > options = reader->GetOptions();
-  int i = 0;
-  while (options.size() > 0)
-  {
-    QCheckBox *checker = new QCheckBox(this);
-    checker->setText( options.front().first.c_str() );
-    checker->setChecked( options.front().second );
-    options.pop_front();
-    m_BoxLayout->addWidget(checker, i / 4, i % 4);
-    i++;
-  }
-}
-
-void QmitkFileSaveDialog::ClearOptionsBox()
-{
-  if ( m_BoxLayout != NULL )
-  {
-    QLayoutItem* item;
-    while ( ( item = m_BoxLayout->takeAt( 0 ) ) != NULL )
-    {
-      delete item->widget();
-      delete item;
-    }
-  }
 }
 
 void QmitkFileSaveDialog::ProcessSelectedFile()
@@ -200,45 +123,26 @@ void QmitkFileSaveDialog::ProcessSelectedFile()
   // We are not looking for specific Options here, which is okay, since the dialog currently only shows the
   // reader with the highest priority. Better behaviour required, if we want selectable readers.
 
-  m_FileReader = m_FileReaderManager.GetReader(extension);
-  m_FileReader->SetOptions(m_Options);
+  m_FileWriter = m_FileWriterManager.GetWriter(extension);
+  m_FileWriter->SetOptions(m_Options);
 }
 
-std::list< mitk::IFileWriter::FileServiceOption > QmitkFileSaveDialog::GetSelectedOptions()
+mitk::IFileWriter* QmitkFileSaveDialog::GetWriter()
 {
-  std::list<mitk::IFileWriter::FileServiceOption> result;
-
-  if ( m_BoxLayout != NULL )
-  {
-    QLayoutItem* item;
-    while ( ( item = m_BoxLayout->takeAt( 0 ) ) != NULL )
-    {
-      QCheckBox* checker = dynamic_cast<QCheckBox*> (item->widget());
-      if (checker)
-      {
-        mitk::IFileWriter::FileServiceOption option = std::make_pair( checker->text().toStdString() , checker->isChecked() );
-        result.push_back(option);
-      }
-
-      delete item->widget();
-      delete item;
-    }
-  }
-  return result;
+  return this->m_FileWriter;
 }
 
-mitk::IFileReader* QmitkFileSaveDialog::GetReader()
+void QmitkFileSaveDialog::WriteBaseData(std::list< mitk::BaseData::Pointer > data)
 {
-  return this->m_FileReader;
 }
 
-std::list< mitk::BaseData::Pointer > QmitkFileSaveDialog::GetBaseData()
-{
-  if (m_FileReader == NULL )
-  {
-    MITK_WARN << "Tried go get BaseData while no FileReader was selected in Dialog. Returning empty list.";
-    std::list< mitk::BaseData::Pointer > emptyList;
-    return  emptyList;
-  }
-  return m_FileReader->Read(this->selectedFiles().front().toStdString());
-}
+//std::list< mitk::BaseData::Pointer > QmitkFileSaveDialog::GetBaseData()
+//{
+//  if (m_FileReader == NULL )
+//  {
+//    MITK_WARN << "Tried go get BaseData while no FileReader was selected in Dialog. Returning empty list.";
+//    std::list< mitk::BaseData::Pointer > emptyList;
+//    return  emptyList;
+//  }
+//  return m_FileReader->Read(this->selectedFiles().front().toStdString());
+//}

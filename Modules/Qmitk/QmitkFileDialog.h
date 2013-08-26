@@ -27,13 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //Microservices
 #include "usServiceReference.h"
-#include "usModuleContext.h"
-#include "usServiceEvent.h"
-#include "usServiceInterface.h"
 
 // MITK
 #include <mitkIFileReader.h>
-#include <mitkFileReaderManager.h>
 
 /**
 * \ingroup QmitkModule
@@ -82,9 +78,7 @@ signals:
 protected:
 
   QGridLayout* m_BoxLayout;
-  mitk::IFileReader* m_FileReader;
   std::list <mitk::IFileReader::FileServiceOption> m_Options;
-  mitk::FileReaderManager m_FileReaderManager;
 
   virtual void ClearOptionsBox();
 

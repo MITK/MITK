@@ -71,6 +71,8 @@ namespace mitk {
     */
     virtual std::list< mitk::IFileWriter::FileServiceOption > GetOptions() const = 0;
 
+    virtual void SetOptions(std::list< mitk::IFileWriter::FileServiceOption > options) = 0;
+
     /**
     * \brief Returns true if this reader can confirm that it can write \c data and false otherwise.
     */

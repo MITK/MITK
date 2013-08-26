@@ -127,6 +127,12 @@ std::list< mitk::IFileWriter::FileServiceOption > mitk::AbstractFileWriter::GetO
   return m_Options;
 }
 
+void mitk::AbstractFileWriter::SetOptions(std::list< mitk::IFileWriter::FileServiceOption > options)
+{
+  if (options.size() != m_Options.size()) MITK_WARN << "Number of set Options differs from Number of available Options, which is a sign of false usage. Please consult documentation";
+  m_Options = options;
+}
+
 ////////////////// MISC //////////////////
 
 bool mitk::AbstractFileWriter::CanWrite(const BaseData* data) const

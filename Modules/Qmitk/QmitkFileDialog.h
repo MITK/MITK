@@ -34,22 +34,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
 * \ingroup QmitkModule
 *
-* \brief
+* \brief This is the abstract base class for QmitkFileOpenDialog and QmitkFileSaveDialog.
+*
+* It contains common functionality and logic, but is not really useful on it's own. Use the subclasses!
 */
 class QMITK_EXPORT QmitkFileDialog :public QFileDialog
 {
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
-
-private:
-
-  //us::ModuleContext* m_Context;
-  ///** \brief a filter to further narrow down the list of results*/
-  //std::string m_Filter;
-  ///** \brief The name of the ServiceInterface that this class should list */
-  //std::string m_Interface;
-  ///** \brief The name of the ServiceProperty that will be displayed in the list to represent the service */
-  //std::string m_NamingProperty;
 
 public:
 
@@ -63,21 +55,33 @@ public:
   /** \brief This method is part of the widget and needs not to be called separately. (Creation of the connections of main and control widget.)*/
   virtual void CreateConnections();
 
+  /**
+  * \brief Returns the Options that are currently / have been selected in the widget.
+  */
   virtual std::list< mitk::IFileReader::FileServiceOption > GetSelectedOptions();
 
 signals:
 
   public slots:
 
+    /**
+    * \brief Called when the file selection has changed and the options need to be adapted.
+    */
     virtual void DisplayOptions(QString path);
 
     protected slots:
 
+      /**
+      * \brief When the Dialog is closed, the subclass must execute the logic to process the selected files.
+      */
       virtual void ProcessSelectedFile() = 0;
 
 protected:
 
+  /** \brief Contains the checkboxes for the options*/
   QGridLayout* m_BoxLayout;
+
+  /** \brief The Options the user has set for the reader / writer*/
   std::list <mitk::IFileReader::FileServiceOption> m_Options;
 
   /**
@@ -86,9 +90,8 @@ protected:
   */
   virtual std::list<mitk::IFileReader::FileServiceOption> QueryAvailableOptions(std::string path) = 0;
 
+  /** \brief Remove all checkboxes from the options box.*/
   virtual void ClearOptionsBox();
-
-  //Ui::QmitkFileDialogControls* m_Controls; ///< member holding the UI elements of this widget
 };
 
 #endif // _QmitkFileDialog_H_INCLUDED

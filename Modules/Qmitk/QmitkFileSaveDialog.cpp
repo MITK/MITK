@@ -135,7 +135,7 @@ std::list<mitk::IFileWriter::FileServiceOption> QmitkFileSaveDialog::QueryAvaila
 
   if (writer == NULL)
   {
-    // MITK_WARN << "Did not find ReaderService for registered Extension. This should be looked into by a developer.";
+    // MITK_WARN << "Did not find WriterService for registered Extension. This should be looked into by a developer.";
     std::list<mitk::IFileReader::FileServiceOption> emptyList;
     return emptyList;
   }
@@ -148,17 +148,12 @@ mitk::IFileWriter* QmitkFileSaveDialog::GetWriter()
   return this->m_FileWriter;
 }
 
-void QmitkFileSaveDialog::WriteBaseData(std::list< mitk::BaseData::Pointer > data)
+void QmitkFileSaveDialog::WriteBaseData()
 {
+  if (m_FileWriter == NULL )
+  {
+    MITK_WARN << "Tried go write BaseData while no FileWriter was selected in Dialog. Aborting.";
+    return;
+  }
+  m_FileWriter->Write(m_BaseData);
 }
-
-//std::list< mitk::BaseData::Pointer > QmitkFileSaveDialog::GetBaseData()
-//{
-//  if (m_FileReader == NULL )
-//  {
-//    MITK_WARN << "Tried go get BaseData while no FileReader was selected in Dialog. Returning empty list.";
-//    std::list< mitk::BaseData::Pointer > emptyList;
-//    return  emptyList;
-//  }
-//  return m_FileReader->Read(this->selectedFiles().front().toStdString());
-//}

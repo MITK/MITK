@@ -80,6 +80,12 @@ protected:
   QGridLayout* m_BoxLayout;
   std::list <mitk::IFileReader::FileServiceOption> m_Options;
 
+  /**
+  * \brief This is kind of a workaround. Getting the Options is differen whether using a reader or a writer,
+  * so the subclasses of this dialog must implement this logic.
+  */
+  virtual std::list<mitk::IFileReader::FileServiceOption> QueryAvailableOptions(std::string path) = 0;
+
   virtual void ClearOptionsBox();
 
   //Ui::QmitkFileDialogControls* m_Controls; ///< member holding the UI elements of this widget

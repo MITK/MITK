@@ -50,7 +50,7 @@ public:
 
   static const std::string VIEW_ID;
 
-  QmitkFileSaveDialog(QWidget* p = 0, Qt::WindowFlags f1 = 0);
+  QmitkFileSaveDialog(mitk::BaseData::Pointer baseData, QWidget* p = 0, Qt::WindowFlags f1 = 0);
   virtual ~QmitkFileSaveDialog();
 
   virtual mitk::IFileWriter* GetWriter();
@@ -70,6 +70,9 @@ protected:
   mitk::IFileWriter* m_FileWriter;
   std::list <mitk::IFileWriter::FileServiceOption> m_Options;
   mitk::FileWriterManager m_FileWriterManager;
+  mitk::BaseData::Pointer m_BaseData;
+
+  std::list<mitk::IFileWriter::FileServiceOption> QueryAvailableOptions(std::string path);
 
   //Ui::QmitkFileSaveDialogControls* m_Controls; ///< member holding the UI elements of this widget
 };

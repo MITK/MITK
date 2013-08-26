@@ -149,22 +149,9 @@ void QmitkFileDialog::CreateConnections()
 
 void QmitkFileDialog::DisplayOptions(QString path)
 {
-  std::string extension = path.toStdString();
-  extension.erase(0, extension.find_last_of('.'));
-
   ClearOptionsBox();
 
-  us::ModuleContext* context = us::GetModuleContext();
-  mitk::FileReaderManager manager;
-  mitk::IFileReader* reader = manager.GetReader(extension);
-
-  if (reader == NULL)
-  {
-    // MITK_WARN << "Did not find ReaderService for registered Extension. This should be looked into by a developer.";
-    return;
-  }
-
-  std::list< mitk::IFileReader::FileServiceOption > options = reader->GetOptions();
+  std::list< mitk::IFileReader::FileServiceOption > options = QueryAvailableOptions(path.toStdString());
   int i = 0;
   while (options.size() > 0)
   {

@@ -80,6 +80,8 @@ protected:
   std::list <mitk::IFileReader::FileServiceOption> m_Options;
   mitk::FileReaderManager m_FileReaderManager;
 
+  virtual std::list<mitk::IFileReader::FileServiceOption> QueryAvailableOptions(std::string path) ;
+
   //Ui::QmitkFileOpenDialogControls* m_Controls; ///< member holding the UI elements of this widget
 };
 

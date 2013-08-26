@@ -62,6 +62,25 @@ void QmitkFileOpenDialog::ProcessSelectedFile()
   m_FileReader->SetOptions(m_Options);
 }
 
+std::list<mitk::IFileReader::FileServiceOption> QmitkFileOpenDialog::QueryAvailableOptions(std::string path)
+{
+  std::string extension = path;
+  extension.erase(0, extension.find_last_of('.'));
+
+  us::ModuleContext* context = us::GetModuleContext();
+  mitk::FileReaderManager manager;
+  mitk::IFileReader* reader = manager.GetReader(extension);
+
+  if (reader == NULL)
+  {
+    // MITK_WARN << "Did not find ReaderService for registered Extension. This should be looked into by a developer.";
+    std::list<mitk::IFileReader::FileServiceOption> emptyList;
+    return emptyList;
+  }
+
+  return reader->GetOptions();
+}
+
 mitk::IFileReader* QmitkFileOpenDialog::GetReader()
 {
   return this->m_FileReader;

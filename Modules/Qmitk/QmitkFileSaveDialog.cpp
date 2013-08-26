@@ -105,8 +105,9 @@ const std::string QmitkFileSaveDialog::VIEW_ID = "org.mitk.views.QmitkFileSaveDi
 //
 //
 
-QmitkFileSaveDialog::QmitkFileSaveDialog(QWidget* parent, Qt::WindowFlags f): QmitkFileDialog(parent, f)
+QmitkFileSaveDialog::QmitkFileSaveDialog(mitk::BaseData::Pointer baseData, QWidget* parent, Qt::WindowFlags f): QmitkFileDialog(parent, f)
 {
+  m_BaseData = baseData;
 }
 
 QmitkFileSaveDialog::~QmitkFileSaveDialog()
@@ -125,6 +126,21 @@ void QmitkFileSaveDialog::ProcessSelectedFile()
 
   m_FileWriter = m_FileWriterManager.GetWriter(extension);
   m_FileWriter->SetOptions(m_Options);
+}
+
+std::list<mitk::IFileWriter::FileServiceOption> QmitkFileSaveDialog::QueryAvailableOptions(std::string path)
+{
+  us::ModuleContext* context = us::GetModuleContext();
+  mitk::IFileWriter* writer = m_FileWriterManager.GetWriter(m_BaseData->GetNameOfClass());
+
+  if (writer == NULL)
+  {
+    // MITK_WARN << "Did not find ReaderService for registered Extension. This should be looked into by a developer.";
+    std::list<mitk::IFileReader::FileServiceOption> emptyList;
+    return emptyList;
+  }
+
+  return writer->GetOptions();
 }
 
 mitk::IFileWriter* QmitkFileSaveDialog::GetWriter()

@@ -15,51 +15,60 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "MiniAppManager.h"
-#include <vector>
-#include <iostream>
-#include <fstream>
-#include <algorithm>
-#include <string>
-
-#include <itkImage.h>
-#include <itkImageFileReader.h>
-
-#include <itkExceptionObject.h>
-#include <itkImageFileWriter.h>
-
-#include <itkMetaDataObject.h>
-
-#include "itkVectorContainer.h"
-#include "vnl/vnl_vector_fixed.h"
-#include "itkVectorImage.h"
 
 #include "mitkBaseDataIOFactory.h"
 #include "mitkDiffusionImage.h"
-#include "mitkBaseData.h"
 #include "mitkDiffusionCoreObjectFactory.h"
-#include "mitkCoreObjectFactory.h"
-#include "mitkCoreExtObjectFactory.h"
-#include "mitkImageWriter.h"
 #include "itkAnalyticalDiffusionQballReconstructionImageFilter.h"
 #include <boost/lexical_cast.hpp>
 #include <mitkNrrdQBallImageWriter.h>
+#include "ctkCommandLineParser.h"
+#include <mitkIOUtil.h>
+#include <itksys/SystemTools.hxx>
 
 using namespace mitk;
 /**
- * Convert files from one ending to the other
+ * Perform Q-ball reconstruction using a spherical harmonics basis
  */
 int QballReconstruction(int argc, char* argv[])
 {
+    ctkCommandLineParser parser;
+    parser.setArgumentPrefix("--", "-");
+    parser.addArgument("input", "i", ctkCommandLineParser::String, "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output file", us::Any(), false);
+    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "spherical harmonics order", 4, true);
+    parser.addArgument("b0Threshold", "t", ctkCommandLineParser::Int, "baseline image intensity threshold", 0, true);
+    parser.addArgument("lambda", "r", ctkCommandLineParser::Float, "ragularization factor lambda", 0.006, true);
+    parser.addArgument("csa", "csa", ctkCommandLineParser::Bool, "use constant solid angle consideration");
+    parser.addArgument("outputCoeffs", "shc", ctkCommandLineParser::Bool, "output file containing the SH coefficients");
 
-    if ( argc<6 )
-    {
-        std::cout << std::endl;
-        std::cout << "Perform QBall reconstruction on an dwi file" << std::endl;
-        std::cout << std::endl;
-        std::cout << "usage: " << argv[0] << " " << argv[1] << " <in-file> <lambda> <baseline-threshold> <out-file> <sh order>" << std::endl;
-        std::cout << std::endl;
+    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+    if (parsedArgs.size()==0)
         return EXIT_FAILURE;
-    }
+
+    std::string inFileName = us::any_cast<string>(parsedArgs["input"]);
+    std::string outfilename = us::any_cast<string>(parsedArgs["outFile"]);
+    outfilename = itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
+
+    int threshold = 0;
+    if (parsedArgs.count("b0Threshold"))
+        threshold = us::any_cast<int>(parsedArgs["b0Threshold"]);
+
+    int shOrder = 4;
+    if (parsedArgs.count("shOrder"))
+        shOrder = us::any_cast<int>(parsedArgs["shOrder"]);
+
+    float lambda = 0.006;
+    if (parsedArgs.count("lambda"))
+        lambda = us::any_cast<float>(parsedArgs["lambda"]);
+
+    int normalization = 0;
+    if (parsedArgs.count("csa") && us::any_cast<bool>(parsedArgs["csa"]))
+        normalization = 6;
+
+    bool outCoeffs = false;
+    if (parsedArgs.count("outputCoeffs"))
+        outCoeffs = us::any_cast<bool>(parsedArgs["outputCoeffs"]);
 
     try
     {
@@ -67,17 +76,16 @@ int QballReconstruction(int argc, char* argv[])
 
         MITK_INFO << "Loading image ...";
         const std::string s1="", s2="";
-        std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( argv[2], s1, s2, false );
+        std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
         DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(infile.at(0).GetPointer());
         dwi->AverageRedundantGradients(0.001);
 
         mitk::QBallImage::Pointer image = mitk::QBallImage::New();
+        mitk::Image::Pointer coeffsImage = mitk::Image::New();
 
-
-        int shOrder = 4;
-        if ( argc>6 )
-            shOrder = boost::lexical_cast<int>(argv[6]);
-        MITK_INFO << "Using SH order of " << shOrder;
+        MITK_INFO << "SH order: " << shOrder;
+        MITK_INFO << "lambda: " << lambda;
+        MITK_INFO << "B0 threshold: " << threshold;
         switch ( shOrder )
         {
         case 4:
@@ -86,12 +94,17 @@ int QballReconstruction(int argc, char* argv[])
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
             filter->SetBValue(dwi->GetB_Value());
-            filter->SetThreshold( boost::lexical_cast<int>(argv[4]) );
-            filter->SetLambda(boost::lexical_cast<float>(argv[3]));
-            filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
+            filter->SetThreshold( threshold );
+            filter->SetLambda(lambda);
+            if (normalization==0)
+                filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
+            else
+                filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
             filter->Update();
             image->InitializeByItk( filter->GetOutput() );
             image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+            coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
+            coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
             break;
         }
         case 6:
@@ -100,12 +113,17 @@ int QballReconstruction(int argc, char* argv[])
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
             filter->SetBValue(dwi->GetB_Value());
-            filter->SetThreshold( boost::lexical_cast<int>(argv[4]) );
-            filter->SetLambda(boost::lexical_cast<float>(argv[3]));
-            filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
+            filter->SetThreshold( threshold );
+            filter->SetLambda(lambda);
+            if (normalization==0)
+                filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
+            else
+                filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
             filter->Update();
             image->InitializeByItk( filter->GetOutput() );
             image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+            coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
+            coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
             break;
         }
         case 8:
@@ -114,12 +132,17 @@ int QballReconstruction(int argc, char* argv[])
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
             filter->SetBValue(dwi->GetB_Value());
-            filter->SetThreshold( boost::lexical_cast<int>(argv[4]) );
-            filter->SetLambda(boost::lexical_cast<float>(argv[3]));
-            filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
+            filter->SetThreshold( threshold );
+            filter->SetLambda(lambda);
+            if (normalization==0)
+                filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
+            else
+                filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
             filter->Update();
             image->InitializeByItk( filter->GetOutput() );
             image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+            coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
+            coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
             break;
         }
         case 10:
@@ -128,12 +151,17 @@ int QballReconstruction(int argc, char* argv[])
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
             filter->SetBValue(dwi->GetB_Value());
-            filter->SetThreshold( boost::lexical_cast<int>(argv[4]) );
-            filter->SetLambda(boost::lexical_cast<float>(argv[3]));
-            filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
+            filter->SetThreshold( threshold );
+            filter->SetLambda(lambda);
+            if (normalization==0)
+                filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
+            else
+                filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
             filter->Update();
             image->InitializeByItk( filter->GetOutput() );
             image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+            coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
+            coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
             break;
         }
         default:
@@ -143,21 +171,32 @@ int QballReconstruction(int argc, char* argv[])
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
             filter->SetBValue(dwi->GetB_Value());
-            filter->SetThreshold( boost::lexical_cast<int>(argv[4]) );
-            filter->SetLambda(boost::lexical_cast<float>(argv[3]));
-            filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
+            filter->SetThreshold( threshold );
+            filter->SetLambda(lambda);
+            if (normalization==0)
+                filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
+            else
+                filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
             filter->Update();
             image->InitializeByItk( filter->GetOutput() );
             image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+            coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
+            coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
         }
         }
 
-        std::string outfilename = argv[5];
+        std::string coeffout = outfilename;
+        coeffout += "_shcoeffs.nrrd";
+
+        outfilename += ".qbi";
         MITK_INFO << "writing image " << outfilename;
         mitk::NrrdQBallImageWriter::Pointer writer = mitk::NrrdQBallImageWriter::New();
         writer->SetInput(image.GetPointer());
         writer->SetFileName(outfilename.c_str());
         writer->Update();
+
+        if (outCoeffs)
+            mitk::IOUtil::SaveImage(coeffsImage, coeffout);
     }
     catch ( itk::ExceptionObject &err)
     {

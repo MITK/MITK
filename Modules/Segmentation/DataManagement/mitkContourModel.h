@@ -247,7 +247,7 @@ namespace mitk
     /** \brief Returns the number of vertices at a given timestep.
     \param timestep - default = 0
     */
-    int GetNumberOfVertices( int timestep=0);
+    int GetNumberOfVertices( int timestep=0) const;
 
     /** \brief Returns whether the contour model is empty at a given timestep.
     \pararm timestep - default = 0
@@ -429,6 +429,9 @@ namespace mitk
 
     //The interpolation of the line segment between control points.
     LineSegmentInterpolation m_lineInterpolation;
+
+    //only update the bounding geometry if necessary
+    bool m_UpdateBoundingBox;
   };
 
   itkEventMacro( ContourModelEvent, itk::AnyEvent );

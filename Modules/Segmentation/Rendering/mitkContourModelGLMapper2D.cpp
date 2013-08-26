@@ -26,7 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkGL.h"
 
-mitk::ContourModelGLMapper2D::ContourModelGLMapper2D()
+mitk::ContourModelGLMapper2D::ContourModelGLMapper2D() :
+  m_SubdivisionContour(mitk::ContourModel::New()),
+  m_InitSubdivisionCurve(true)
 {
 }
 
@@ -46,48 +48,42 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 
   if ( !visible ) return;
 
-  bool updateNeccesary=true;
-
   int timestep = renderer->GetTimeStep();
 
-  mitk::ContourModel::Pointer input =  const_cast<mitk::ContourModel*>(this->GetInput());
-  mitk::ContourModel::Pointer renderingContour = input;
+  mitk::ContourModel* input =  const_cast<mitk::ContourModel*>(this->GetInput());
 
-  bool subdivision = false;
+  if(input->GetNumberOfVertices(timestep) < 1) return;
 
-  dataNode->GetBoolProperty( "subdivision curve", subdivision, renderer );
-  if (subdivision)
+  input->UpdateOutputInformation();
+
+  if ( !input->IsEmptyTimeStep(timestep) )
   {
 
-    mitk::ContourModel::Pointer subdivContour = mitk::ContourModel::New();
+    mitk::ContourModel::Pointer renderingContour = input;
 
-    mitk::ContourModelSubDivisionFilter::Pointer subdivFilter = mitk::ContourModelSubDivisionFilter::New();
+    bool subdivision = false;
 
-    subdivFilter->SetInput(input);
-    subdivFilter->Update();
-
-    subdivContour = subdivFilter->GetOutput();
-
-    if(subdivContour->GetNumberOfVertices() == 0 )
+    dataNode->GetBoolProperty( "subdivision curve", subdivision, renderer );
+    if (subdivision)
     {
-      subdivContour = input;
+      if(this->m_SubdivisionContour->GetMTime() < renderingContour->GetMTime() || m_InitSubdivisionCurve)
+      {
+
+        //mitk::ContourModel::Pointer subdivContour = mitk::ContourModel::New();
+
+        mitk::ContourModelSubDivisionFilter::Pointer subdivFilter = mitk::ContourModelSubDivisionFilter::New();
+
+        subdivFilter->SetInput(input);
+        subdivFilter->Update();
+
+        this->m_SubdivisionContour = subdivFilter->GetOutput();
+
+        m_InitSubdivisionCurve = false;
+      }
+      renderingContour = this->m_SubdivisionContour;
     }
 
-    renderingContour = subdivContour;
-  }
 
-  renderingContour->UpdateOutputInformation();
-
-
-  if( renderingContour->GetMTime() < ls->GetLastGenerateDataTime() )
-    updateNeccesary = false;
-
-  if(renderingContour->GetNumberOfVertices(timestep) < 1)
-    updateNeccesary = false;
-
-  if (updateNeccesary)
-  {
-    // ok, das ist aus GenerateData kopiert
     mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
     assert(displayGeometry.IsNotNull());
 
@@ -365,6 +361,8 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       //------------------------------------
     }
   }
+
+  ls->UpdateGenerateDataTime();
 }
 
 const mitk::ContourModel* mitk::ContourModelGLMapper2D::GetInput(void)

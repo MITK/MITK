@@ -218,9 +218,9 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
     if (cutContour.cutIt)
     {
       // 3.1.2 copy point from float* to mitk::Contour
-      ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
-      contourInImageIndexCoordinates->Initialize();
-      contourInImageIndexCoordinates->Expand(timestep+1);
+      ContourModel::Pointer contourInIndexCoordinates = ContourModel::New();
+      contourInIndexCoordinates->Initialize();
+      contourInIndexCoordinates->Expand(timestep+1);
       Point3D newPoint;
       for (int index = 0; index < cutContour.deleteSize; ++index)
       {
@@ -228,7 +228,7 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
         newPoint[1] = cutContour.deleteCurve[ 2 * index + 1 ];
         newPoint[2] = 0.0;
 
-        contourInImageIndexCoordinates->AddVertex( newPoint - Point3D::VectorType(0.5), timestep);
+        contourInIndexCoordinates->AddVertex( newPoint - Point3D::VectorType(0.5), timestep);
       }
 
       free(cutContour.traceline);
@@ -236,11 +236,10 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
       free(cutContour.onGradient);
 
       mitk::ContourModel* feedbackContour = FeedbackContourTool::GetFeedbackContour();
-      ContourUtils::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), contourInImageIndexCoordinates, feedbackContour, timestep);
-      feedbackContour->Close(timestep);
+      assert( feedbackContour );
+      ContourUtils::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), contourInIndexCoordinates, feedbackContour, timestep);
       feedbackContour->Modified();
 
-      //FeedbackContourTool::SetFeedbackContour( *contourInWorldCoordinates );
       mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
       m_FillFeedbackContour = true;
     }
@@ -343,7 +342,6 @@ bool mitk::RegionGrowingTool::OnMouseMoved(Action* action, const StateEvent* sta
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 
-
   return true;
 }
 
@@ -385,7 +383,7 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
         }
 
         FeedbackContourTool::SetFeedbackContourVisible(false);
-        mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }
   }
@@ -440,6 +438,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
   if (!regionGrowerResult || oneContourOffset == -1)
   {
     ContourModel* feedbackContour = FeedbackContourTool::GetFeedbackContour();
+    assert( feedbackContour );
     feedbackContour->Clear(timestep);
 
     if (regionGrowerResult) ipMITKSegmentationFree(regionGrowerResult);
@@ -502,10 +501,10 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
     }
 
     // copy point from float* to mitk::Contour
-    ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
-    contourInImageIndexCoordinates->Initialize();
-    contourInImageIndexCoordinates->Expand(timestep+1);
-    contourInImageIndexCoordinates->Close(timestep);
+    ContourModel::Pointer contourInIndexCoordinates = ContourModel::New();
+    contourInIndexCoordinates->Initialize();
+    contourInIndexCoordinates->Expand(timestep+1);
+    contourInIndexCoordinates->Close(timestep);
 
     Point3D newPoint;
     for (int index = 0; index < numberOfContourPoints; ++index)
@@ -514,16 +513,15 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
       newPoint[1] = contourPoints[ 2 * index + 1 ];
       newPoint[2] = 0;
 
-      contourInImageIndexCoordinates->AddVertex( newPoint - Point3D::VectorType(0.5), timestep);
+      contourInIndexCoordinates->AddVertex( newPoint - Point3D::VectorType(0.5), timestep);
     }
 
     free(contourPoints);
 
     ContourModel* feedbackContour = FeedbackContourTool::GetFeedbackContour();
-    ContourUtils::BackProjectContourFrom2DSlice( m_ReferenceSlice->GetGeometry(), contourInImageIndexCoordinates, feedbackContour, timestep);
-    feedbackContour->Close(timestep);
+    assert( feedbackContour );
+    ContourUtils::BackProjectContourFrom2DSlice( m_ReferenceSlice->GetGeometry(), contourInIndexCoordinates, feedbackContour, timestep);
     feedbackContour->Modified();
-   // FeedbackContourTool::SetFeedbackContour( *contourInWorldCoordinates );
   }
 
   // 5. Result HAS TO BE freed by caller, contains the binary region growing result

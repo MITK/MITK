@@ -58,6 +58,9 @@ class Segmentation_EXPORT FeedbackContourTool : public SegTool2D
     FeedbackContourTool(const char*); // purposely hidden
     virtual ~FeedbackContourTool();
 
+    virtual void Activated();
+    virtual void Deactivated();
+
     ContourModel* GetFeedbackContour();
     void SetFeedbackContour(ContourModel&);
 

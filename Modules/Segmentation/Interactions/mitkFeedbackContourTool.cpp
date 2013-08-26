@@ -34,16 +34,35 @@ mitk::FeedbackContourTool::FeedbackContourTool(const char* type)
   m_FeedbackContourNode = DataNode::New();
   m_FeedbackContourNode->SetData( m_FeedbackContour );
   m_FeedbackContourNode->SetName("feedback contour");
-  m_FeedbackContourNode->SetProperty("helper object", BoolProperty::New(false));
+  m_FeedbackContourNode->SetProperty("helper object", BoolProperty::New(true));
   m_FeedbackContourNode->SetProperty("layer", IntProperty::New(100));
   m_FeedbackContourNode->SetProperty("contour.width", FloatProperty::New(2));
 
-  this->Disable3DRendering();
   this->SetFeedbackContourColorDefault();
 }
 
 mitk::FeedbackContourTool::~FeedbackContourTool()
 {
+}
+
+void mitk::FeedbackContourTool::Activated()
+{
+  this->Disable3DRendering();
+
+  DataStorage* storage = m_ToolManager->GetDataStorage();
+  assert (storage);
+  storage->Add( m_FeedbackContourNode );
+
+  Superclass::Activated();
+}
+
+void mitk::FeedbackContourTool::Deactivated()
+{
+  DataStorage* storage = m_ToolManager->GetDataStorage();
+  assert (storage);
+  storage->Remove( m_FeedbackContourNode );
+
+  Superclass::Deactivated();
 }
 
 void mitk::FeedbackContourTool::SetFeedbackContourColor( float r, float g, float b )
@@ -63,37 +82,19 @@ mitk::ContourModel* mitk::FeedbackContourTool::GetFeedbackContour()
 
 void mitk::FeedbackContourTool::SetFeedbackContour(ContourModel& contour)
 {
-  // begin of temporary fix for 3m3 release
- // this->Disable3DRendering();
-  //end of temporary fix for 3m3 release
-
   m_FeedbackContour = &contour;
   m_FeedbackContour->Modified();
-//  m_FeedbackContourNode->SetData( m_FeedbackContour );
+  m_FeedbackContourNode->SetData( m_FeedbackContour );
 }
 
 void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)
 {
-  // begin of temporary fix for 3m3 release
-  this->Disable3DRendering();
-  //end of temporary fix for 3m3 release
-
   if ( m_FeedbackContourVisible == visible )
     return; // nothing changed
 
-  if ( DataStorage* storage = m_ToolManager->GetDataStorage() )
-  {
-    if (visible)
-    {
-      storage->Add( m_FeedbackContourNode );
-    }
-    else
-    {
-      storage->Remove( m_FeedbackContourNode );
-    }
-  }
-
   m_FeedbackContourVisible = visible;
+
+  m_FeedbackContourNode->SetVisibility(m_FeedbackContourVisible);
 }
 
 void mitk::FeedbackContourTool::Disable3DRendering()

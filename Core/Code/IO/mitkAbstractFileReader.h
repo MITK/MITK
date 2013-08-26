@@ -51,9 +51,9 @@ namespace mitk {
 
     virtual std::string GetDescription() const;
 
-    virtual std::list< mitk::FileServiceOption > GetOptions() const;
+    virtual std::list< mitk::IFileReader::FileServiceOption > GetOptions() const;
 
-    virtual void SetOptions(std::list< mitk::FileServiceOption > options);
+    virtual void SetOptions(std::list< mitk::IFileReader::FileServiceOption > options);
 
     virtual bool CanRead(const std::string& path) const;
 
@@ -79,7 +79,7 @@ namespace mitk {
     *
     * Can be left emtpy if no special options are required.
     */
-    std::list< mitk::FileServiceOption > m_Options;
+    std::list< mitk::IFileReader::FileServiceOption > m_Options;
 
     virtual us::ServiceProperties GetServiceProperties();
 

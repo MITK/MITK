@@ -184,7 +184,7 @@ std::string mitk::FileReaderManager::GetSupportedExtensions(const std::string& e
 
 bool mitk::FileReaderManager::ReaderSupportsOptions(mitk::IFileReader* reader, const std::list<std::string>& options )
 {
-  const std::list< mitk::FileServiceOption > readerOptions = reader->GetOptions();
+  const std::list< mitk::IFileReader::FileServiceOption > readerOptions = reader->GetOptions();
   if (options.empty()) return true;         // if no options were requested, return true unconditionally
   if (readerOptions.empty()) return false;  // if options were requested and reader supports no options, return false
 
@@ -194,7 +194,7 @@ bool mitk::FileReaderManager::ReaderSupportsOptions(mitk::IFileReader* reader, c
     {
       bool optionFound = false;
       // Iterate over each available option from reader to check if one of them matches the current option
-      for(std::list<mitk::FileServiceOption>::const_iterator options_j = readerOptions.begin(), j_end = readerOptions.end();
+      for(std::list<mitk::IFileReader::FileServiceOption>::const_iterator options_j = readerOptions.begin(), j_end = readerOptions.end();
         options_j != j_end; ++options_j)
       {
         if ( *options_i == options_j->first ) optionFound = true;

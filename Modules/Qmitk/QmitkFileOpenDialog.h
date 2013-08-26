@@ -77,7 +77,7 @@ signals:
 protected:
 
   mitk::IFileReader* m_FileReader;
-  std::list <mitk::FileServiceOption> m_Options;
+  std::list <mitk::IFileReader::FileServiceOption> m_Options;
   mitk::FileReaderManager m_FileReaderManager;
 
   //Ui::QmitkFileOpenDialogControls* m_Controls; ///< member holding the UI elements of this widget

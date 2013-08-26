@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include <mitkAbstractFileWriter.h>
 #include <mitkBaseData.h>
 
@@ -49,14 +48,13 @@ mitk::AbstractFileWriter::AbstractFileWriter(const mitk::AbstractFileWriter& oth
 
 mitk::AbstractFileWriter::AbstractFileWriter(const std::string& basedataType, const std::string& extension,
                                              const std::string& description)
-  : m_Extension (extension)
-  , m_BasedataType(basedataType)
-  , m_Description (description)
-  , m_Priority (0)
-  , m_PrototypeFactory(NULL)
+                                             : m_Extension (extension)
+                                             , m_BasedataType(basedataType)
+                                             , m_Description (description)
+                                             , m_Priority (0)
+                                             , m_PrototypeFactory(NULL)
 {
 }
-
 
 ////////////////////// Writing /////////////////////////
 
@@ -89,7 +87,7 @@ us::ServiceRegistration<mitk::IFileWriter> mitk::AbstractFileWriter::RegisterSer
     }
 
     void UngetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/,
-                      const us::InterfaceMap& service)
+      const us::InterfaceMap& service)
     {
       delete us::ExtractInterface<mitk::IFileWriter>(service);
     }
@@ -115,15 +113,16 @@ us::ServiceProperties mitk::AbstractFileWriter::GetServiceProperties()
   result[mitk::IFileWriter::PROP_BASEDATA_TYPE]    = m_BasedataType;
   result[us::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
 
-  for (std::list<std::string>::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it) {
-    result[*it] = std::string("true");
+  for (std::list<mitk::IFileWriter::FileServiceOption>::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it)
+  {
+    result[it->first] = std::string("true");
   }
   return result;
 }
 
 //////////////////////// Options ///////////////////////
 
-std::list< std::string > mitk::AbstractFileWriter::GetSupportedOptions() const
+std::list< mitk::IFileWriter::FileServiceOption > mitk::AbstractFileWriter::GetOptions() const
 {
   return m_Options;
 }

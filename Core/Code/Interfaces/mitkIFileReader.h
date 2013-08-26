@@ -37,8 +37,6 @@ namespace itk {
 }
 
 namespace mitk {
-  typedef std::pair<std::string, bool> FileServiceOption;
-
   /**
   * \brief The common interface of all FileReader.
   *
@@ -51,6 +49,8 @@ namespace mitk {
   struct MITK_CORE_EXPORT IFileReader
   {
     virtual ~IFileReader();
+
+    typedef std::pair<std::string, bool> FileServiceOption;
 
     /**
     * \brief Reads the specified file and returns its contents.
@@ -99,7 +99,7 @@ namespace mitk {
     * implementation decides which options it wants to support.
     * If no options are supported, an empty list is returned.
     */
-    virtual std::list< mitk::FileServiceOption > GetOptions() const = 0;
+    virtual std::list< mitk::IFileReader::FileServiceOption > GetOptions() const = 0;
 
     /**
     * \brief Sets the options for this reader
@@ -107,7 +107,7 @@ namespace mitk {
     * The best way to use this method is to retireve the options via GetOptions, manipulate the bool values,
     * and then set the options again.
     */
-    virtual void SetOptions(std::list< mitk::FileServiceOption > options) = 0;
+    virtual void SetOptions(std::list< mitk::IFileReader::FileServiceOption > options) = 0;
 
     /**
     * \brief Returns true if this writer can confirm that it can read this file and false otherwise.

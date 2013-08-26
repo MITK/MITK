@@ -74,7 +74,7 @@ public:
     return result;
   }
 
-  virtual void SetOptions(const std::list< mitk::FileServiceOption >& options )
+  virtual void SetOptions(const std::list< mitk::IFileReader::FileServiceOption >& options )
   {
     m_Options = options;
     //m_Registration.SetProperties(GetServiceProperties());
@@ -164,7 +164,7 @@ void QmitkFileDialog::DisplayOptions(QString path)
     return;
   }
 
-  std::list< mitk::FileServiceOption > options = reader->GetOptions();
+  std::list< mitk::IFileReader::FileServiceOption > options = reader->GetOptions();
   int i = 0;
   while (options.size() > 0)
   {
@@ -190,9 +190,9 @@ void QmitkFileDialog::ClearOptionsBox()
   }
 }
 
-std::list< mitk::FileServiceOption > QmitkFileDialog::GetSelectedOptions()
+std::list< mitk::IFileReader::FileServiceOption > QmitkFileDialog::GetSelectedOptions()
 {
-  std::list<mitk::FileServiceOption> result;
+  std::list<mitk::IFileReader::FileServiceOption> result;
 
   if ( m_BoxLayout != NULL )
   {
@@ -202,7 +202,7 @@ std::list< mitk::FileServiceOption > QmitkFileDialog::GetSelectedOptions()
       QCheckBox* checker = dynamic_cast<QCheckBox*> (item->widget());
       if (checker)
       {
-        mitk::FileServiceOption option = std::make_pair( checker->text().toStdString() , checker->isChecked() );
+        mitk::IFileReader::FileServiceOption option = std::make_pair( checker->text().toStdString() , checker->isChecked() );
         result.push_back(option);
       }
 

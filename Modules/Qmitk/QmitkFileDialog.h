@@ -67,7 +67,7 @@ public:
   /** \brief This method is part of the widget and needs not to be called separately. (Creation of the connections of main and control widget.)*/
   virtual void CreateConnections();
 
-  virtual std::list< mitk::FileServiceOption > GetSelectedOptions();
+  virtual std::list< mitk::IFileReader::FileServiceOption > GetSelectedOptions();
 
 signals:
 
@@ -83,7 +83,7 @@ protected:
 
   QGridLayout* m_BoxLayout;
   mitk::IFileReader* m_FileReader;
-  std::list <mitk::FileServiceOption> m_Options;
+  std::list <mitk::IFileReader::FileServiceOption> m_Options;
   mitk::FileReaderManager m_FileReaderManager;
 
   virtual void ClearOptionsBox();

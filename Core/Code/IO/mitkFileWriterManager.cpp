@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkFileWriterManager.h"
 
 // MITK
@@ -33,7 +32,7 @@ mitk::FileWriterManager::FileWriterManager()
 mitk::FileWriterManager::~FileWriterManager()
 {
   for (std::map<mitk::IFileWriter*, us::ServiceObjects<mitk::IFileWriter> >::iterator iter = m_ServiceObjects.begin(),
-       end = m_ServiceObjects.end(); iter != end; ++iter)
+    end = m_ServiceObjects.end(); iter != end; ++iter)
   {
     iter->second.UngetService(iter->first);
   }
@@ -54,7 +53,6 @@ void mitk::FileWriterManager::Write(const mitk::BaseData* data, const std::strin
   Writer->Write(data, path);
 }
 
-
 //////////////////// GETTING WRITERS ////////////////////
 
 mitk::IFileWriter* mitk::FileWriterManager::GetWriter(const std::string& extension, us::ModuleContext* context )
@@ -72,7 +70,7 @@ std::vector <mitk::IFileWriter*> mitk::FileWriterManager::GetWriters(const std::
 
   // Translate List of ServiceRefs to List of Pointers
   for (std::vector <us::ServiceReference<IFileWriter> >::const_iterator iter = refs.begin(), end = refs.end();
-       iter != end; ++iter)
+    iter != end; ++iter)
   {
     us::ServiceObjects<mitk::IFileWriter> serviceObjects = context->GetServiceObjects(*iter);
     mitk::IFileWriter* writer = serviceObjects.GetService();
@@ -98,7 +96,7 @@ std::vector <mitk::IFileWriter*> mitk::FileWriterManager::GetWriters(const std::
   // the list is always sorted by priority. Now find Writer that supports all options
 
   for (std::vector <IFileWriter*>::const_iterator iter = allWriters.begin(), end = allWriters.end();
-       iter != end; ++iter)
+    iter != end; ++iter)
   {
     // Now see if this Writer supports all options. If yes, push to results
     if ( mitk::FileWriterManager::WriterSupportsOptions(*iter, options) )
@@ -123,26 +121,24 @@ std::string mitk::FileWriterManager::GetSupportedWriters(const std::string& base
   return CreateFileDialogString(refs);
 }
 
-
 //////////////////// INTERNAL CODE ////////////////////
 
-bool mitk::FileWriterManager::WriterSupportsOptions(mitk::IFileWriter* Writer, const std::list<std::string>& options )
+bool mitk::FileWriterManager::WriterSupportsOptions(mitk::IFileWriter* writer, const std::list<std::string>& options )
 {
-  const std::list<std::string> WriterOptions = Writer->GetSupportedOptions();
+  const std::list< mitk::IFileWriter::FileServiceOption > writerOptions = writer->GetOptions();
   if (options.empty()) return true;         // if no options were requested, return true unconditionally
-  if (WriterOptions.empty()) return false;  // if options were requested and Writer supports no options, return false
+  if (writerOptions.empty()) return false;  // if options were requested and reader supports no options, return false
 
-  // For each of the strings in requuested options, check if option is available in Writer
-  for(std::list<std::string>::const_iterator options_i = options.begin(), i_end = options.end();
-      options_i != i_end; ++options_i)
+  // For each of the strings in requested options, check if option is available in reader
+  for(std::list< std::string >::const_iterator options_i = options.begin(), i_end = options.end(); options_i != i_end; ++options_i)
   {
     {
       bool optionFound = false;
-      // Iterate over each available option from Writer to check if one of them matches the current option
-      for(std::list<std::string>::const_iterator options_j = WriterOptions.begin(), j_end = WriterOptions.end();
-          options_j != j_end; ++options_j)
+      // Iterate over each available option from reader to check if one of them matches the current option
+      for(std::list<mitk::IFileReader::FileServiceOption>::const_iterator options_j = writerOptions.begin(), j_end = writerOptions.end();
+        options_j != j_end; ++options_j)
       {
-        if ( *options_i == *options_j ) optionFound = true;
+        if ( *options_i == options_j->first ) optionFound = true;
       }
       if (optionFound == false) return false; // If one option was not found, leave method and return false
     }
@@ -156,7 +152,7 @@ std::string mitk::FileWriterManager::CreateFileDialogString(const std::vector<us
   entries.reserve(refs.size());
   std::string knownExtensions; // Will contain plain list of all known extensions (for the QFileDialog entry "All Known Extensions")
   for (std::vector<us::ServiceReference<IFileWriter> >::const_iterator iterator = refs.begin(), end = refs.end();
-       iterator != end; ++iterator)
+    iterator != end; ++iterator)
   {
     // Generate List of Extensions
     if (iterator == refs.begin()) // First entry without semicolon
@@ -172,13 +168,12 @@ std::string mitk::FileWriterManager::CreateFileDialogString(const std::vector<us
 
   std::string result = "Known Extensions (" + knownExtensions + ");;All (*)";
   for (std::vector<std::string>::const_iterator iterator = entries.begin(), end = entries.end();
-       iterator != end; ++iterator)
+    iterator != end; ++iterator)
   {
     result += ";;" + *iterator;
   }
   return result;
 }
-
 
 //////////////////// uS-INTERACTION ////////////////////
 

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef IFileWriter_H_HEADER_INCLUDED_C1E7E521
 #define IFileWriter_H_HEADER_INCLUDED_C1E7E521
 
@@ -28,27 +27,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 // STL
 #include <list>
 
-
 namespace mitk {
-
   class BaseData;
 }
 
 namespace mitk {
-
-/**
-* \brief The common interface of all FileWriters.
-*
-* This interface defines the methods necessary for the FileWriterManager
-* to interact with its FileWriters. To implement a new FileWriter, it is
-* recommended to derive from FileWriterAbstract instead of directly from this Interface,
-* as the abstract class already implements most of the methods and also makes sure that your writer
-* will be managed by the FileWriterManager.
-*/
-struct MITK_CORE_EXPORT IFileWriter
-{
-
+  /**
+  * \brief The common interface of all FileWriters.
+  *
+  * This interface defines the methods necessary for the FileWriterManager
+  * to interact with its FileWriters. To implement a new FileWriter, it is
+  * recommended to derive from FileWriterAbstract instead of directly from this Interface,
+  * as the abstract class already implements most of the methods and also makes sure that your writer
+  * will be managed by the FileWriterManager.
+  */
+  struct MITK_CORE_EXPORT IFileWriter
+  {
     virtual ~IFileWriter();
+
+    typedef std::pair<std::string, bool> FileServiceOption;
 
     virtual void Write(const BaseData* data, const std::string& path ) = 0;
 
@@ -72,7 +69,7 @@ struct MITK_CORE_EXPORT IFileWriter
     *
     * Options are strings that are treated as flags when passed to the write method.
     */
-    virtual std::list< std::string > GetSupportedOptions() const = 0;
+    virtual std::list< mitk::IFileWriter::FileServiceOption > GetOptions() const = 0;
 
     /**
     * \brief Returns true if this reader can confirm that it can write \c data and false otherwise.
@@ -91,10 +88,8 @@ struct MITK_CORE_EXPORT IFileWriter
     static const std::string PROP_DESCRIPTION;
     static const std::string PROP_IS_LEGACY;
 
-protected:
-
-};
-
+  protected:
+  };
 } // namespace mitk
 
 // This is the microservice declaration. Do not meddle!

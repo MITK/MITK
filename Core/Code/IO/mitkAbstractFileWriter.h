@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef AbstractFileWriter_H_HEADER_INCLUDED_C1E7E521
 #define AbstractFileWriter_H_HEADER_INCLUDED_C1E7E521
 
@@ -34,27 +33,26 @@ namespace us {
 }
 
 namespace mitk {
-
-/**
-* @brief This abstract class gives a meaningful default implementations to most methods of mitkIFileWriter.h.
-*
-* In general, all FileWriters should derive from this class, this way it is made sure that the new implementation is
-* exposed to the Microservice-Framework and that is automatically available troughout MITK.
-* The default implementation only requires the two write
-* methods and the Clone() method to be implemented. Be sure to set all important members in the constructor. These are:
-* <ul>
-*  <li> m_Extension: To define which file extension can be written.
-*  <li> m_Description: To give a human readable name for this writer to be displayed in FileDialogs.
-*  <li> m_BasedataType: To define which type of Basedata this fileWriter can handle.
-*  <li> (Optional) m_Priority: To make this writer rank higher when choosing writers automatically
-*  <li> (Optional) m_SupportedOptions: To define which options this writer can handle. Options can modify writing behaviour (e.g. set a compression)
-* </ul>
-* You can also use the protected constructor for this.
-*
-* @ingroup Process
-*/
-class MITK_CORE_EXPORT AbstractFileWriter : public mitk::IFileWriter
-{
+  /**
+  * @brief This abstract class gives a meaningful default implementations to most methods of mitkIFileWriter.h.
+  *
+  * In general, all FileWriters should derive from this class, this way it is made sure that the new implementation is
+  * exposed to the Microservice-Framework and that is automatically available troughout MITK.
+  * The default implementation only requires the two write
+  * methods and the Clone() method to be implemented. Be sure to set all important members in the constructor. These are:
+  * <ul>
+  *  <li> m_Extension: To define which file extension can be written.
+  *  <li> m_Description: To give a human readable name for this writer to be displayed in FileDialogs.
+  *  <li> m_BasedataType: To define which type of Basedata this fileWriter can handle.
+  *  <li> (Optional) m_Priority: To make this writer rank higher when choosing writers automatically
+  *  <li> (Optional) m_SupportedOptions: To define which options this writer can handle. Options can modify writing behaviour (e.g. set a compression)
+  * </ul>
+  * You can also use the protected constructor for this.
+  *
+  * @ingroup Process
+  */
+  class MITK_CORE_EXPORT AbstractFileWriter : public mitk::IFileWriter
+  {
   public:
 
     /**
@@ -114,7 +112,7 @@ class MITK_CORE_EXPORT AbstractFileWriter : public mitk::IFileWriter
     *
     * Options are strings that are treated as flags when passed to the read method.
     */
-    virtual std::list< std::string > GetSupportedOptions() const;
+    virtual std::list< mitk::IFileWriter::FileServiceOption > GetOptions() const;
 
     /**
     * \brief Return true if this writer can confirm that it can read this file and false otherwise.
@@ -132,7 +130,7 @@ class MITK_CORE_EXPORT AbstractFileWriter : public mitk::IFileWriter
 
     us::ServiceRegistration<IFileWriter> RegisterService(us::ModuleContext* context = us::GetModuleContext());
 
-protected:
+  protected:
     AbstractFileWriter();
     ~AbstractFileWriter();
 
@@ -145,18 +143,16 @@ protected:
     std::string m_BasedataType;
     std::string m_Description;
     int m_Priority;
-    std::list< std::string > m_Options; // Options supported by this Writer. Can be left emtpy if no special options are required
+    std::list< mitk::IFileWriter::FileServiceOption > m_Options; // Options supported by this Writer. Can be left emtpy if no special options are required
 
     virtual us::ServiceProperties GetServiceProperties();
 
-private:
+  private:
 
     us::PrototypeServiceFactory* m_PrototypeFactory;
 
     virtual mitk::IFileWriter* Clone() const = 0;
-
-};
-
+  };
 } // namespace mitk
 
 #endif /* AbstractFileWriter_H_HEADER_INCLUDED_C1E7E521 */

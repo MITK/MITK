@@ -201,7 +201,7 @@ void QmitkFileDialog::ProcessSelectedFile()
   // reader with the highest priority. Better behaviour required, if we want selectable readers.
 
   m_FileReader = m_FileReaderManager.GetReader(extension);
-  m_FileReader->GetOptions();
+  m_FileReader->SetOptions(m_Options);
 }
 
 std::list< mitk::FileServiceOption > QmitkFileDialog::GetSelectedOptions()
@@ -229,5 +229,16 @@ std::list< mitk::FileServiceOption > QmitkFileDialog::GetSelectedOptions()
 
 mitk::IFileReader* QmitkFileDialog::GetReader()
 {
-  return 0;
+  return this->m_FileReader;
+}
+
+std::list< mitk::BaseData::Pointer > QmitkFileDialog::GetBaseData()
+{
+  if (m_FileReader == NULL )
+  {
+    MITK_WARN << "Tried go get BaseData while no FileReader was selected in Dialog. Returning empty list.";
+    std::list< mitk::BaseData::Pointer > emptyList;
+    return  emptyList;
+  }
+  return m_FileReader->Read(this->selectedFiles().front().toStdString());
 }

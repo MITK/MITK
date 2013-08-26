@@ -71,6 +71,8 @@ public:
 
   virtual mitk::IFileReader* GetReader();
 
+  virtual std::list< mitk::BaseData::Pointer > GetBaseData();
+
 signals:
 
   public slots:

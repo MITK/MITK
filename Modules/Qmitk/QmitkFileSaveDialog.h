@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <QmitkFileDialog.h>
 #include <mitkIFileWriter.h>
-#include <mitkFileWriterManager.h>
+#include <mitkFileWriterRegistry.h>
 #include <mitkBaseData.h>
 
 /**
@@ -55,21 +55,23 @@ public:
 
   virtual mitk::IFileWriter* GetWriter();
 
-  virtual void WriteBaseData(std::list< mitk::BaseData::Pointer > data);
+  /**
+  * \brief Writes the Basedata that the WIdget was constructed with into the file selected by the user.
+  *
+  */
+  virtual void WriteBaseData();
 
 signals:
 
-  public slots:
+  protected slots:
 
-    protected slots:
-
-      virtual void ProcessSelectedFile();
+    virtual void ProcessSelectedFile();
 
 protected:
 
   mitk::IFileWriter* m_FileWriter;
   std::list <mitk::IFileWriter::FileServiceOption> m_Options;
-  mitk::FileWriterManager m_FileWriterManager;
+  mitk::FileWriterRegistry m_FileWriterRegistry;
   mitk::BaseData::Pointer m_BaseData;
 
   std::list<mitk::IFileWriter::FileServiceOption> QueryAvailableOptions(std::string path);

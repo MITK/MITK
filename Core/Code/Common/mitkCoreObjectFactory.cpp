@@ -67,8 +67,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurfaceVtkWriterFactory.h"
 
 // Legacy Support:
-#include <mitkFileReaderManager.h>
-#include <mitkFileWriterManager.h>
+#include <mitkFileReaderRegistry.h>
+#include <mitkFileWriterRegistry.h>
 #include <mitkLegacyFileWriterService.h>
 #include <mitkLegacyImageWriterService.h>
 #include <mitkImageWriter.h>
@@ -105,7 +105,7 @@ mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
   static mitk::CoreObjectFactory::Pointer instance;
   if (instance.IsNull())
   {
-     instance = mitk::CoreObjectFactory::New();
+    instance = mitk::CoreObjectFactory::New();
   }
   return instance;
 }
@@ -185,7 +185,6 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
 
   if (newMapper.IsNull())
   {
-
     mitk::BaseData *data = node->GetData();
 
     if ( id == mitk::BaseRenderer::Standard2D )
@@ -245,23 +244,23 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
 // @deprecated
 //
 #define EXTERNAL_FILE_EXTENSIONS \
-    "All known formats(*.dcm *.DCM *.dc3 *.DC3 *.gdcm *.ima *.mhd *.mps *.nii *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.hdr *.nrrd *.nhdr );;" \
-    "DICOM files(*.dcm *.DCM *.dc3 *.DC3 *.gdcm);;" \
-    "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
-    "NRRD Vector Images (*.nrrd *.nhdr);;" \
-    "Point sets (*.mps);;" \
-    "Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.ima *.tiff);;" \
-    "Surface files (*.stl *.vtk *.vtp *.obj);;" \
-    "NIfTI format (*.nii)"
+"All known formats(*.dcm *.DCM *.dc3 *.DC3 *.gdcm *.ima *.mhd *.mps *.nii *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.hdr *.nrrd *.nhdr );;" \
+"DICOM files(*.dcm *.DCM *.dc3 *.DC3 *.gdcm);;" \
+"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
+"NRRD Vector Images (*.nrrd *.nhdr);;" \
+"Point sets (*.mps);;" \
+"Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.ima *.tiff);;" \
+"Surface files (*.stl *.vtk *.vtp *.obj);;" \
+"NIfTI format (*.nii)"
 
 #define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.vtk *.vti *.hdr *.png *.tiff *.jpg *.hdr *.bmp *.dcm *.gipl *.nii *.nrrd *.nhdr *.spr *.lsm *.dwi *.hdwi *.qbi *.hqbi)"
 */
 
 /**
- * @brief This method gets the supported (open) file extensions as string. This string is can then used by the QT QFileDialog widget.
- * @return The c-string that contains the file extensions
- *
- */
+* @brief This method gets the supported (open) file extensions as string. This string is can then used by the QT QFileDialog widget.
+* @return The c-string that contains the file extensions
+*
+*/
 const char* mitk::CoreObjectFactory::GetFileExtensions()
 {
   MultimapType aMap;
@@ -275,13 +274,13 @@ const char* mitk::CoreObjectFactory::GetFileExtensions()
 }
 
 /**
- * @brief Merge the input map into the fileExtensionsMap. Duplicate entries are removed
- * @param fileExtensionsMap the existing map, it contains value pairs like ("*.dcm", "DICOM files"),("*.dc3", "DICOM files").
- *                          This map is extented/merged with the values from the input map.
- * @param inputMap the input map, it contains value pairs like ("*.dcm", "DICOM files"),("*.dc3", "DICOM files") returned by
- *                 the extra factories.
- *
- */
+* @brief Merge the input map into the fileExtensionsMap. Duplicate entries are removed
+* @param fileExtensionsMap the existing map, it contains value pairs like ("*.dcm", "DICOM files"),("*.dc3", "DICOM files").
+*                          This map is extented/merged with the values from the input map.
+* @param inputMap the input map, it contains value pairs like ("*.dcm", "DICOM files"),("*.dc3", "DICOM files") returned by
+*                 the extra factories.
+*
+*/
 void mitk::CoreObjectFactory::MergeFileExtensions(MultimapType& fileExtensionsMap, MultimapType inputMap)
 {
   bool duplicateFound = false;
@@ -309,17 +308,17 @@ void mitk::CoreObjectFactory::MergeFileExtensions(MultimapType& fileExtensionsMa
 }
 
 /**
- * @brief get the defined (open) file extension map
- * @return the defined (open) file extension map
- */
+* @brief get the defined (open) file extension map
+* @return the defined (open) file extension map
+*/
 mitk::CoreObjectFactoryBase::MultimapType mitk::CoreObjectFactory::GetFileExtensionsMap()
 {
   return m_FileExtensionsMap;
 }
 
 /**
- * @brief initialize the file extension entries for open and save
- */
+* @brief initialize the file extension entries for open and save
+*/
 void mitk::CoreObjectFactory::CreateFileExtensionsMap()
 {
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.dcm", "DICOM files"));
@@ -383,26 +382,25 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
 }
 
 /**
- * @brief This method gets the supported (save) file extensions as string. This string is can then used by the QT QFileDialog widget.
- * @return The c-string that contains the (save) file extensions
- *
- */
+* @brief This method gets the supported (save) file extensions as string. This string is can then used by the QT QFileDialog widget.
+* @return The c-string that contains the (save) file extensions
+*
+*/
 const char* mitk::CoreObjectFactory::GetSaveFileExtensions() {
   MultimapType aMap;
   for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ )
   {
     aMap = (*it)->GetSaveFileExtensionsMap();
     this->MergeFileExtensions(m_SaveFileExtensionsMap, aMap);
-
   }
   this->CreateFileExtensions(m_SaveFileExtensionsMap, m_SaveFileExtensions);
   return m_SaveFileExtensions.c_str();
 };
 
 /**
- * @brief get the defined (save) file extension map
- * @return the defined (save) file extension map
- */
+* @brief get the defined (save) file extension map
+* @return the defined (save) file extension map
+*/
 mitk::CoreObjectFactoryBase::MultimapType mitk::CoreObjectFactory::GetSaveFileExtensionsMap()
 {
   return m_SaveFileExtensionsMap;
@@ -419,7 +417,6 @@ mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters(
 }
 void mitk::CoreObjectFactory::MapEvent(const mitk::Event*, const int)
 {
-
 }
 
 void mitk::CoreObjectFactory::RegisterLegacyReaders(mitk::CoreObjectFactoryBase::Pointer factory)
@@ -434,8 +431,8 @@ void mitk::CoreObjectFactory::RegisterLegacyReaders(mitk::CoreObjectFactoryBase:
     std::string extension = it->first;
     extension = extension.erase(0,1);
     std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-    mitk::FileReaderManager readerManager;
-    if(readerManager.GetReader(it->first) == 0)
+    mitk::FileReaderRegistry readerRegistry;
+    if(readerRegistry.GetReader(it->first) == 0)
     {
       mitk::LegacyFileReaderService* lfrs = new mitk::LegacyFileReaderService(extension, it->second);
       m_LegacyReaders.push_back(lfrs);
@@ -451,7 +448,6 @@ std::string mitk::CoreObjectFactory::GetDescriptionForExtension(const std::strin
   return ""; // If no matching extension was found, return emtpy string
 }
 
-
 void mitk::CoreObjectFactory::RegisterLegacyWriters(/*mitk::CoreObjectFactoryBase::Pointer factory*/)
 {
   // Get all external Writers
@@ -466,14 +462,14 @@ void mitk::CoreObjectFactory::RegisterLegacyWriters(/*mitk::CoreObjectFactoryBas
   mitk::ImageWriter::Pointer dummyWriter = mitk::ImageWriter::New();
   mitk::Image::Pointer dummyImage = mitk::Image::New();
   std::vector<std::string> extensions = dummyWriter->GetPossibleFileExtensions();
-  mitk::FileWriterManager writerManager;
+  mitk::FileWriterRegistry writerRegistry;
   for(std::vector<std::string>::iterator ext = extensions.begin(); ext != extensions.end(); ext++)
   {
     std::string extension = *ext;
     if (extension.compare("") == 0) continue;
     std::string description = GetDescriptionForExtension("*" + extension);
     std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-    if(writerManager.GetWriter(extension) == 0)
+    if(writerRegistry.GetWriter(extension) == 0)
     {
       MITK_INFO << extension << "/" << description;
       mitk::LegacyImageWriterService* liws = new mitk::LegacyImageWriterService(dummyImage->GetNameOfClass(), extension, description);
@@ -494,7 +490,7 @@ void mitk::CoreObjectFactory::RegisterLegacyWriters(/*mitk::CoreObjectFactoryBas
       std::string description = GetDescriptionForExtension("*" + extension);
       //extension = extension.erase(0,1);
       std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-      if(writerManager.GetWriter(extension) == 0)
+      if(writerRegistry.GetWriter(extension) == 0)
       {
         MITK_INFO << extension << "/" << description;
         mitk::LegacyFileWriterService* lfws = new mitk::LegacyFileWriterService(it->GetPointer(), "LegacyDataType", extension, description);

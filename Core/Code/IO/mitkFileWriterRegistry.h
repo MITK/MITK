@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef FileWriterManager_H_HEADER_INCLUDED_C1E7E521
-#define FileWriterManager_H_HEADER_INCLUDED_C1E7E521
+#ifndef FileWriterRegistry_H_HEADER_INCLUDED_C1E7E521
+#define FileWriterRegistry_H_HEADER_INCLUDED_C1E7E521
 
 #include <MitkExports.h>
 
@@ -45,12 +45,12 @@ namespace mitk {
   * \note The life-time of all mitk::IFileWriter objects returned by an
   * instance of this class ends with the destruction of that instance.
   */
-  class MITK_CORE_EXPORT FileWriterManager
+  class MITK_CORE_EXPORT FileWriterRegistry
   {
   public:
 
-    FileWriterManager();
-    ~FileWriterManager();
+    FileWriterRegistry();
+    ~FileWriterRegistry();
 
     void Write(const mitk::BaseData* data, const std::string& path, us::ModuleContext* context = us::GetModuleContext());
 
@@ -84,8 +84,8 @@ namespace mitk {
   private:
 
     // purposely not implemented
-    FileWriterManager(const FileWriterManager&);
-    FileWriterManager& operator=(const FileWriterManager&);
+    FileWriterRegistry(const FileWriterRegistry&);
+    FileWriterRegistry& operator=(const FileWriterRegistry&);
 
     std::map<mitk::IFileWriter*, us::ServiceObjects<mitk::IFileWriter> > m_ServiceObjects;
   };
@@ -95,4 +95,4 @@ namespace mitk {
 # pragma warning(pop)
 #endif
 
-#endif /* FileWriterManager_H_HEADER_INCLUDED_C1E7E521 */
+#endif /* FileWriterRegistry_H_HEADER_INCLUDED_C1E7E521 */

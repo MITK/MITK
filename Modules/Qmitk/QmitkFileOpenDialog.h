@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <QmitkFileDialog.h>
 #include <mitkIFileReader.h>
-#include <mitkFileReaderManager.h>
+#include <mitkFileReaderRegistry.h>
 
 /**
 * \ingroup QmitkModule
@@ -78,7 +78,7 @@ protected:
 
   mitk::IFileReader* m_FileReader;
   std::list <mitk::IFileReader::FileServiceOption> m_Options;
-  mitk::FileReaderManager m_FileReaderManager;
+  mitk::FileReaderRegistry m_FileReaderRegistry;
 
   virtual std::list<mitk::IFileReader::FileServiceOption> QueryAvailableOptions(std::string path) ;
 

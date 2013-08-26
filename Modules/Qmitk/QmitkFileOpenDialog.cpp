@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkFileOpenDialog.h>
 
 // MITK
-#include <mitkFileReaderManager.h>
+#include <mitkFileReaderRegistry.h>
 #include <mitkIFileReader.h>
 
 // STL Headers
@@ -30,9 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 
 //QT
-#include <qgroupbox.h>
-#include <qcheckbox.h>
-#include <qlabel.h>
 #include <mitkCommon.h>
 
 // Test imports, delete later
@@ -58,7 +55,7 @@ void QmitkFileOpenDialog::ProcessSelectedFile()
   // We are not looking for specific options here, which is okay, since the dialog currently only shows the
   // reader with the highest priority. Better behaviour required, if we want selectable readers.
 
-  m_FileReader = m_FileReaderManager.GetReader(extension);
+  m_FileReader = m_FileReaderRegistry.GetReader(extension);
   m_FileReader->SetOptions(m_Options);
 }
 
@@ -68,8 +65,7 @@ std::list<mitk::IFileReader::FileServiceOption> QmitkFileOpenDialog::QueryAvaila
   extension.erase(0, extension.find_last_of('.'));
 
   us::ModuleContext* context = us::GetModuleContext();
-  mitk::FileReaderManager manager;
-  mitk::IFileReader* reader = manager.GetReader(extension);
+  mitk::IFileReader* reader = m_FileReaderRegistry.GetReader(extension);
 
   if (reader == NULL)
   {

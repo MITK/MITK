@@ -288,10 +288,10 @@ set(CPP_FILES
   IO/mitkCoreDataNodeReader.cpp
   IO/mitkDicomSeriesReader.cpp
   IO/mitkFileReader.cpp
-  IO/mitkFileReaderManager.cpp
+  IO/mitkFileReaderRegistry.cpp
   IO/mitkFileSeriesReader.cpp
   IO/mitkFileWriter.cpp
-  IO/mitkFileWriterManager.cpp
+  IO/mitkFileWriterRegistry.cpp
   #IO/mitkIpPicGet.c
   IO/mitkImageGenerator.cpp
   IO/mitkImageWriter.cpp

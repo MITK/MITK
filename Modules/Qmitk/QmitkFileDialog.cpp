@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkFileDialog.h>
 
 // MITK
-#include <mitkFileReaderManager.h>
 #include <mitkIFileReader.h>
 
 // STL Headers
@@ -32,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //QT
 #include <qgroupbox.h>
 #include <qcheckbox.h>
-#include <qlabel.h>
 #include <mitkCommon.h>
 
 // Test imports, delete later

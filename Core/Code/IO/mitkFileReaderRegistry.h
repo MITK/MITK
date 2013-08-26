@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef FileReaderManager_H_HEADER_INCLUDED_C1E7E521
-#define FileReaderManager_H_HEADER_INCLUDED_C1E7E521
+#ifndef FileReaderRegistry_H_HEADER_INCLUDED_C1E7E521
+#define FileReaderRegistry_H_HEADER_INCLUDED_C1E7E521
 
 #include <MitkExports.h>
 #include <mitkBaseData.h>
@@ -41,13 +41,13 @@ namespace mitk {
  * \note The life-time of all mitk::IFileReader objects returned by an
  * instance of this class ends with the destruction of that instance.
  */
-class MITK_CORE_EXPORT FileReaderManager
+class MITK_CORE_EXPORT FileReaderRegistry
 {
 
 public:
 
-  FileReaderManager();
-  ~FileReaderManager();
+  FileReaderRegistry();
+  ~FileReaderRegistry();
 
     /**
     * Reads the file located at <code>path</code> and returns the
@@ -98,11 +98,11 @@ protected:
 private:
 
     // purposely not implemented
-    FileReaderManager(const FileReaderManager&);
-    FileReaderManager& operator=(const FileReaderManager&);
+    FileReaderRegistry(const FileReaderRegistry&);
+    FileReaderRegistry& operator=(const FileReaderRegistry&);
 
     std::map<mitk::IFileReader*, us::ServiceObjects<mitk::IFileReader> > m_ServiceObjects;
 
 };
 } // namespace mitk
-#endif /* FileReaderManager_H_HEADER_INCLUDED_C1E7E521 */
+#endif /* FileReaderRegistry_H_HEADER_INCLUDED_C1E7E521 */

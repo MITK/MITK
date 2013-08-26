@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkFileSaveDialog.h>
 
 // MITK
-#include <mitkFileReaderManager.h>
+#include <mitkFileReaderRegistry.h>
 #include <mitkIFileReader.h>
 
 // STL Headers
@@ -124,14 +124,14 @@ void QmitkFileSaveDialog::ProcessSelectedFile()
   // We are not looking for specific Options here, which is okay, since the dialog currently only shows the
   // reader with the highest priority. Better behaviour required, if we want selectable readers.
 
-  m_FileWriter = m_FileWriterManager.GetWriter(extension);
+  m_FileWriter = m_FileWriterRegistry.GetWriter(extension);
   m_FileWriter->SetOptions(m_Options);
 }
 
 std::list<mitk::IFileWriter::FileServiceOption> QmitkFileSaveDialog::QueryAvailableOptions(std::string path)
 {
   us::ModuleContext* context = us::GetModuleContext();
-  mitk::IFileWriter* writer = m_FileWriterManager.GetWriter(m_BaseData->GetNameOfClass());
+  mitk::IFileWriter* writer = m_FileWriterRegistry.GetWriter(m_BaseData->GetNameOfClass());
 
   if (writer == NULL)
   {
@@ -155,5 +155,5 @@ void QmitkFileSaveDialog::WriteBaseData()
     MITK_WARN << "Tried go write BaseData while no FileWriter was selected in Dialog. Aborting.";
     return;
   }
-  m_FileWriter->Write(m_BaseData);
+  m_FileWriter->Write(m_BaseData, this->selectedFiles().front().toStdString());
 }

@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkFileWriterManager.h"
+#include "mitkFileWriterRegistry.h"
 
 // MITK
 #include <mitkCoreObjectFactory.h>
@@ -25,11 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 #include <usLDAPProp.h>
 
-mitk::FileWriterManager::FileWriterManager()
+mitk::FileWriterRegistry::FileWriterRegistry()
 {
 }
 
-mitk::FileWriterManager::~FileWriterManager()
+mitk::FileWriterRegistry::~FileWriterRegistry()
 {
   for (std::map<mitk::IFileWriter*, us::ServiceObjects<mitk::IFileWriter> >::iterator iter = m_ServiceObjects.begin(),
     end = m_ServiceObjects.end(); iter != end; ++iter)
@@ -40,7 +40,7 @@ mitk::FileWriterManager::~FileWriterManager()
 
 //////////////////// WRITING DIRECTLY ////////////////////
 
-void mitk::FileWriterManager::Write(const mitk::BaseData* data, const std::string& path, us::ModuleContext* context)
+void mitk::FileWriterRegistry::Write(const mitk::BaseData* data, const std::string& path, us::ModuleContext* context)
 {
   // Find extension
   std::string extension = path;
@@ -49,20 +49,20 @@ void mitk::FileWriterManager::Write(const mitk::BaseData* data, const std::strin
   // Get best Writer
   mitk::IFileWriter* Writer = GetWriter(extension, context);
   // Throw exception if no compatible Writer was found
-  if (Writer == NULL) mitkThrow() << "Tried to directly Write a file of type '" + extension + "' via FileWriterManager, but no Writer supporting this filetype was found.";
+  if (Writer == NULL) mitkThrow() << "Tried to directly Write a file of type '" + extension + "' via FileWriterRegistry, but no Writer supporting this filetype was found.";
   Writer->Write(data, path);
 }
 
 //////////////////// GETTING WRITERS ////////////////////
 
-mitk::IFileWriter* mitk::FileWriterManager::GetWriter(const std::string& extension, us::ModuleContext* context )
+mitk::IFileWriter* mitk::FileWriterRegistry::GetWriter(const std::string& extension, us::ModuleContext* context )
 {
   std::vector<mitk::IFileWriter*> results = GetWriters(extension, context);
   if (results.empty()) return NULL;
   return results.front();
 }
 
-std::vector <mitk::IFileWriter*> mitk::FileWriterManager::GetWriters(const std::string& extension, us::ModuleContext* context )
+std::vector <mitk::IFileWriter*> mitk::FileWriterRegistry::GetWriters(const std::string& extension, us::ModuleContext* context )
 {
   std::vector <mitk::IFileWriter*> result;
   const std::vector <us::ServiceReference<IFileWriter> > refs = GetWriterList(extension, context);
@@ -81,17 +81,17 @@ std::vector <mitk::IFileWriter*> mitk::FileWriterManager::GetWriters(const std::
   return result;
 }
 
-mitk::IFileWriter* mitk::FileWriterManager::GetWriter(const std::string& extension, const std::list<std::string>& options,
+mitk::IFileWriter* mitk::FileWriterRegistry::GetWriter(const std::string& extension, const std::list<std::string>& options,
                                                       us::ModuleContext* context )
 {
-  const std::vector <mitk::IFileWriter*> matching = mitk::FileWriterManager::GetWriters(extension, options, context);
+  const std::vector <mitk::IFileWriter*> matching = mitk::FileWriterRegistry::GetWriters(extension, options, context);
   if (matching.empty()) return NULL;
   return matching.front();
 }
 
-std::vector <mitk::IFileWriter*> mitk::FileWriterManager::GetWriters(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context )
+std::vector <mitk::IFileWriter*> mitk::FileWriterRegistry::GetWriters(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context )
 {
-  const std::vector <mitk::IFileWriter*> allWriters = mitk::FileWriterManager::GetWriters(extension, context);
+  const std::vector <mitk::IFileWriter*> allWriters = mitk::FileWriterRegistry::GetWriters(extension, context);
   std::vector <mitk::IFileWriter*> result;
   // the list is always sorted by priority. Now find Writer that supports all options
 
@@ -99,7 +99,7 @@ std::vector <mitk::IFileWriter*> mitk::FileWriterManager::GetWriters(const std::
     iter != end; ++iter)
   {
     // Now see if this Writer supports all options. If yes, push to results
-    if ( mitk::FileWriterManager::WriterSupportsOptions(*iter, options) )
+    if ( mitk::FileWriterRegistry::WriterSupportsOptions(*iter, options) )
     {
       result.push_back(*iter);
     }
@@ -109,13 +109,13 @@ std::vector <mitk::IFileWriter*> mitk::FileWriterManager::GetWriters(const std::
 
 //////////////////// GENERIC INFORMATION ////////////////////
 
-std::string mitk::FileWriterManager::GetSupportedExtensions(const std::string& extension, us::ModuleContext* context)
+std::string mitk::FileWriterRegistry::GetSupportedExtensions(const std::string& extension, us::ModuleContext* context)
 {
   const std::vector<us::ServiceReference<IFileWriter> > refs = GetWriterList(extension, context);
   return CreateFileDialogString(refs);
 }
 
-std::string mitk::FileWriterManager::GetSupportedWriters(const std::string& basedataType, us::ModuleContext* context)
+std::string mitk::FileWriterRegistry::GetSupportedWriters(const std::string& basedataType, us::ModuleContext* context)
 {
   const std::vector<us::ServiceReference<IFileWriter> > refs = GetWriterListByBasedataType(basedataType, context);
   return CreateFileDialogString(refs);
@@ -123,7 +123,7 @@ std::string mitk::FileWriterManager::GetSupportedWriters(const std::string& base
 
 //////////////////// INTERNAL CODE ////////////////////
 
-bool mitk::FileWriterManager::WriterSupportsOptions(mitk::IFileWriter* writer, const std::list<std::string>& options )
+bool mitk::FileWriterRegistry::WriterSupportsOptions(mitk::IFileWriter* writer, const std::list<std::string>& options )
 {
   const std::list< mitk::IFileWriter::FileServiceOption > writerOptions = writer->GetOptions();
   if (options.empty()) return true;         // if no options were requested, return true unconditionally
@@ -146,7 +146,7 @@ bool mitk::FileWriterManager::WriterSupportsOptions(mitk::IFileWriter* writer, c
   return true; // if all options have been found, return true
 }
 
-std::string mitk::FileWriterManager::CreateFileDialogString(const std::vector<us::ServiceReference<IFileWriter> >& refs)
+std::string mitk::FileWriterRegistry::CreateFileDialogString(const std::vector<us::ServiceReference<IFileWriter> >& refs)
 {
   std::vector<std::string> entries; // Will contain Description + Extension (Human readable)
   entries.reserve(refs.size());
@@ -177,7 +177,7 @@ std::string mitk::FileWriterManager::CreateFileDialogString(const std::vector<us
 
 //////////////////// uS-INTERACTION ////////////////////
 
-std::vector< us::ServiceReference<mitk::IFileWriter> > mitk::FileWriterManager::GetWriterList(const std::string& extension, us::ModuleContext* context )
+std::vector< us::ServiceReference<mitk::IFileWriter> > mitk::FileWriterRegistry::GetWriterList(const std::string& extension, us::ModuleContext* context )
 {
   // filter for class and extension
   std::string filter;
@@ -191,7 +191,7 @@ std::vector< us::ServiceReference<mitk::IFileWriter> > mitk::FileWriterManager::
   return result;
 }
 
-std::vector< us::ServiceReference<mitk::IFileWriter> > mitk::FileWriterManager::GetWriterListByBasedataType(const std::string& basedataType, us::ModuleContext* context )
+std::vector< us::ServiceReference<mitk::IFileWriter> > mitk::FileWriterRegistry::GetWriterListByBasedataType(const std::string& basedataType, us::ModuleContext* context )
 {
   // filter for class and extension
   std::string filter = us::LDAPProp(mitk::IFileWriter::PROP_BASEDATA_TYPE) == basedataType;

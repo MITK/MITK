@@ -120,7 +120,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
   if ( m_WorkingSlice.IsNull() || m_ReferenceSlice.IsNull() ) return false;
 
   // 2. Determine if the user clicked inside or outside of the segmentation
-  const Geometry3D* workingSliceGeometry = m_WorkingSlice->GetGeometry(timestep);
+  const Geometry3D* workingSliceGeometry = m_WorkingSlice->GetGeometry(0); // fixme: use timestep to retrieve the geometry
   if (!workingSliceGeometry) return false;
 
   Point3D mprojectedPointIn2D;
@@ -192,6 +192,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
       }
     }
   }
+
   return true;
 }
 

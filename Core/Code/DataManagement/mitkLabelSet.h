@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include <mitkCommon.h>
 #include <mitkMessage.h>
-#include <mitkLookupTable.h>
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
@@ -73,76 +72,169 @@ public:
     */
     LabelContainerConstIteratorType IteratorEnd();
 
+    /** \brief
+    */
     itkSetStringMacro(LastModified);
+
+    /** \brief
+    */
     itkGetStringMacro(LastModified);
 
+    /** \brief
+    */
     itkSetStringMacro(Owner);
+
+    /** \brief
+    */
     itkGetStringMacro(Owner);
 
+    /** \brief
+    */
     itkGetStringMacro(Name);
+
+    /** \brief
+    */
     itkSetStringMacro(Name);
 
+    /** \brief
+    */
     bool HasLabel(int) const;
 
+    /** \brief
+    */
     void SetActiveLabel(int);
 
+    /** \brief
+    */
     void RemoveLabel(int);
 
-    static bool IsSelected(mitk::Label::Pointer label);
-
+    /** \brief
+    */
     void RemoveSelectedLabels();
 
+    /** \brief
+    */
     void RemoveLabels(int begin, int count);
 
+    /** \brief
+    */
     void AddLabel(const mitk::Label& label);
 
+    /** \brief
+    */
     void AddLabel(const std::string& name, const mitk::Color& color);
 
+    /** \brief
+    */
     void RenameLabel(int, const std::string&, const mitk::Color&);
 
+    /** \brief
+    */
     virtual int GetNumberOfLabels() const;
 
+    /** \brief
+    */
     virtual void SetAllLabelsVisible(bool);
 
+    /** \brief
+    */
     virtual void SetAllLabelsLocked(bool);
 
+    /** \brief
+    */
     virtual void RemoveAllLabels();
 
+    /** \brief
+    */
     virtual void SetLabelVisible(int index, bool value);
+
+    /** \brief
+    */
     virtual bool GetLabelVisible(int index);
 
+    /** \brief
+    */
     virtual void SetLabelLocked(int index, bool value);
+
+    /** \brief
+    */
     virtual bool GetLabelLocked(int index);
 
+    /** \brief
+    */
     virtual void SetLabelSelected(int index, bool value);
+
+    /** \brief
+    */
     virtual bool GetLabelSelected(int index);
 
+    /** \brief
+    */
     virtual void SetLabelOpacity(int index, float value);
+
+    /** \brief
+    */
     virtual float GetLabelOpacity(int index);
 
+    /** \brief
+    */
     virtual void SetLabelVolume(int index, float value);
+
+    /** \brief
+    */
     virtual float GetLabelVolume(int index);
 
+    /** \brief
+    */
     virtual void SetLabelName(int index, const std::string &name);
+
+    /** \brief
+    */
     virtual std::string GetLabelName(int index);
 
+    /** \brief
+    */
     virtual void SetLabelColor(int index, const mitk::Color &color);
+
+    /** \brief
+    */
     virtual const mitk::Color& GetLabelColor(int index);
 
+    /** \brief
+    */
     virtual const mitk::Label* GetActiveLabel() const { return m_ActiveLabel; };
 
+    /** \brief
+    */
     virtual mitk::Label::ConstPointer GetLabel(int index) const;
 
+    /** \brief
+    */
     virtual int GetActiveLabelIndex() const;
 
+    /** \brief
+    */
     virtual void SetLabelCenterOfMassIndex(int index, const mitk::Point3D& center);
+
+    /** \brief
+    */
     virtual const mitk::Point3D& GetLabelCenterOfMassIndex(int index);
 
+    /** \brief
+    */
     virtual void SetLabelCenterOfMassCoordinates(int index, const mitk::Point3D& center);
+
+    /** \brief
+    */
     virtual const mitk::Point3D& GetLabelCenterOfMassCoordinates(int index);
 
+    /** \brief
+    */
     virtual void ResetLabels();
 
+    /** \brief
+    */
+    static bool IsSelected(mitk::Label::Pointer label);
 
     LabelSet();
     virtual ~LabelSet();

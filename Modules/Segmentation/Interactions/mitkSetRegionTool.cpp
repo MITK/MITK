@@ -281,7 +281,7 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
   // false: don't constrain the contour to the image's inside
   if (projectedContour.IsNull()) return false;
 
-  ContourUtils::FillContourInSlice( projectedContour, slice, image->GetLabelSet(), m_PaintingPixelValue, timestep );
+  //ContourUtils::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue, timestep );
 
   this->WriteBackSegmentationResult(positionEvent, slice);
 

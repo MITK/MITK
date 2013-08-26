@@ -28,12 +28,16 @@ mitk::LabelSet::LabelSet(): m_Owner(""), m_LastModified("00.00.00")
 
 mitk::LabelSet::LabelSet(const LabelSet& other) : itk::Object()
 {
-    m_LabelContainer = other.m_LabelContainer;
+    this->m_LabelContainer = other.m_LabelContainer;
+    this->m_ActiveLabel = this->m_LabelContainer[other.GetActiveLabelIndex()];
+    this->m_Owner = other.m_Owner;
+    this->m_LastModified  = other.m_LastModified;
+    this->m_Name = other.m_Name;
 }
-
 
 bool mitk::LabelSet::operator==( const mitk::LabelSet& other ) const
 {
+  // todo
   return true;
 }
 

@@ -134,32 +134,34 @@ bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* state
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   assert(workingNode);
 
-  LabelSetImage* image = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  LabelSetImage* lsImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
   const PlaneGeometry* planeGeometry = dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() );
-  if ( !image || !planeGeometry ) return false;
+  if ( !lsImage || !planeGeometry ) return false;
 
   // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
-  Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( planeGeometry, image, timestep );
-
+  mitk::Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( planeGeometry, lsImage, timestep );
   if ( slice.IsNull() )
   {
     MITK_ERROR << "Unable to extract slice." << std::endl;
     return false;
   }
 
+  LabelSetImage::Pointer lsSlice = LabelSetImage::New( slice );
+  lsSlice->SetLabelSet( lsImage->GetLabelSet() );
+
   // 3. Get our feedback contour
   ContourModel* feedbackContour = mitk::FeedbackContourTool::GetFeedbackContour();
   assert( feedbackContour);
 
   // 4. Project it into the extracted plane
-  ContourModel::Pointer projectedContour = ContourUtils::ProjectContourTo2DSlice( slice, feedbackContour, timestep );
+  ContourModel::Pointer projectedContour = ContourUtils::ProjectContourTo2DSlice( lsSlice, feedbackContour, timestep );
   if (projectedContour.IsNull()) return false;
 
-  // 5. Transfer contour to image
-  ContourUtils::FillContourInSlice( projectedContour, slice, image->GetLabelSet(), m_PaintingPixelValue, timestep );
+  // 5. Transfer contour to working slice taking into account whether neighboring labels are locked or editable
+  ContourUtils::FillContourInSlice( projectedContour, lsSlice, m_PaintingPixelValue, timestep );
 
-  // 6. Write back the slice into our working image
-  this->WriteBackSegmentationResult(planeGeometry, slice, timestep);
+  // 6. Write back the slice into our working labelset image
+  this->WriteBackSegmentationResult(planeGeometry, lsSlice, timestep);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 

@@ -351,7 +351,7 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
   {
     DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
     if (!workingNode) return false;
-    LabelSetImage* image = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+    LabelSetImage* lsImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
 
     // 1. If we have a working slice, use the contour to fill a new piece on segmentation on it (or erase a piece that was selected by ipMITKSegmentationGetCutPoints)
     if ( m_WorkingSlice.IsNotNull() && m_OriginalPicSlice )
@@ -373,12 +373,15 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
           ContourModel::Pointer projectedContour = ContourUtils::ProjectContourTo2DSlice( m_WorkingSlice, feedbackContour, timestep);
           if (projectedContour.IsNotNull())
           {
-            ContourUtils::FillContourInSlice( projectedContour, m_WorkingSlice, image->GetLabelSet(), m_PaintingPixelValue, timestep );
+
+            LabelSetImage::Pointer lsSlice = LabelSetImage::New( m_WorkingSlice );
+            lsSlice->SetLabelSet( lsImage->GetLabelSet() );
+            ContourUtils::FillContourInSlice( projectedContour, lsSlice, m_PaintingPixelValue, timestep );
 
             const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
 
            // 4. write working slice back into image volume
-           this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
+           this->WriteBackSegmentationResult(positionEvent, lsSlice);
           }
         }
 

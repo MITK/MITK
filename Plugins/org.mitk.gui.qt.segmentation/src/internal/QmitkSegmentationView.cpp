@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 
 
-#include "mitkSurfaceToImageFilter.h"
-#include "mitkLabelSetImageToSurfaceThreadedFilter.h"
 #include "mitkLabelSetImage.h"
 #include "mitkColormapProperty.h"
 #include "mitkImageWriteAccessor.h"
@@ -143,7 +141,7 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
 
   if (m_Parent)
   {
-    m_Parent->setEnabled(m_MultiWidget);
+    m_Parent->setEnabled(m_MultiWidget != NULL);
   }
 
   // tell the interpolation about toolmanager and multiwidget (and data storage)

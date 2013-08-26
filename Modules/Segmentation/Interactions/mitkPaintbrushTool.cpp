@@ -362,10 +362,9 @@ bool mitk::PaintbrushTool::OnMouseMoved(Action* itkNotUsed(action), const StateE
     contour->AddVertex( point, timestep);
   }
 
-
   if (leftMouseButtonPressed)
   {
-    ContourUtils::FillContourInSlice( contour, m_WorkingSlice, NULL, m_PaintingPixelValue, timestep );
+    //ContourUtils::FillContourInSlice( contour, m_WorkingSlice, m_PaintingPixelValue, timestep );
     m_WorkingNode->SetData(m_WorkingSlice);
     m_WorkingNode->Modified();
   }

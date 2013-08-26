@@ -484,9 +484,8 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
 
         if (auxImage.IsNotNull())
         {
-            mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New();
-            newImage->Initialize( auxImage );
-            newImage->SetLabelSet( *m_Segmentation->GetLabelSet() );
+            mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New(auxImage);
+            newImage->SetLabelSet( m_Segmentation->GetLabelSet() );
 
             mitk::ImageReadAccessor accessor(static_cast<mitk::Image*>(auxImage));
             newImage->SetVolume( accessor.GetData() );

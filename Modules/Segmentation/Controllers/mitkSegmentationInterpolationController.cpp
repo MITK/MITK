@@ -451,7 +451,7 @@ mitk::Image* mitk::SegmentationInterpolationController::Interpolate( unsigned in
 
   mitk::Image::Pointer lowerMITKSlice;
   mitk::Image::Pointer upperMITKSlice;
-  mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
+  mitk::LabelSetImage::Pointer resultImage = NULL;
 
   try
   {
@@ -467,10 +467,8 @@ mitk::Image* mitk::SegmentationInterpolationController::Interpolate( unsigned in
     extractor->Modified();
     extractor->Update();
 
-    resultImage->Initialize(extractor->GetOutput());
-    mitk::ImageReadAccessor accessor(static_cast<mitk::Image*>(extractor->GetOutput()));
-    resultImage->SetVolume( accessor.GetData() );
-    resultImage->SetLabelSet( *m_Segmentation->GetLabelSet() );
+    resultImage = mitk::LabelSetImage::New(extractor->GetOutput());
+    resultImage->SetLabelSet( *m_Segmentation->GetConstLabelSet() );
     extractor->GetOutput()->DisconnectPipeline();
 
     //Creating PlaneGeometry for lower slice

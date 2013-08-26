@@ -21,33 +21,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkColormapProperty.h"
 #include "mitkImageCast.h"
+#include "mitkImageReadAccessor.h"
 
 #include "mitkLookupTableProperty.h"
 
 #include "itkImageRegionIterator.h"
 
-mitk::LabelSetImage::LabelSetImage()
+mitk::LabelSetImage::LabelSetImage() : mitk::Image()
 {
-    m_LabelSet = mitk::LabelSet::New();
-    mitk::Color color;
-    color.SetRed(0.0);
-    color.SetGreen(0.0);
-    color.SetBlue(0.0);
-    mitk::Label::Pointer label = mitk::Label::New();
-    label->SetColor(color);
-    label->SetName("exterior");
-    label->SetExterior(true);
-    label->SetOpacity(0.0);
-    label->SetLocked(false);
-    m_LabelSet->AddLabel(*label);
+  this->CreateDefaultLabelSet();
+}
 
-    mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-    lut->SetActiveColormap(mitk::ColormapProperty::CM_MULTILABEL);
-
-    mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New();
-    lutProp->SetLookupTable(lut);
-
-    this->GetPropertyList()->SetProperty( "LookupTable", lutProp );
+mitk::LabelSetImage::LabelSetImage(mitk::Image::Pointer image) : mitk::Image()
+{
+  try
+  {
+    this->Initialize(image);
+    mitk::ImageReadAccessor imgA(image, image->GetVolumeData(0));
+    this->SetVolume(imgA.GetData());
+    this->CreateDefaultLabelSet();
+  }
+  catch(mitk::Exception e)
+  {
+    mitkReThrow(e) << "Cannot access image data while constructing labelset image";
+  }
 }
 
 mitk::LabelSetImage::~LabelSetImage()
@@ -59,39 +56,63 @@ void mitk::LabelSetImage::ExecuteOperation(mitk::Operation* operation)
 // todo
 }
 
+void mitk::LabelSetImage::CreateDefaultLabelSet()
+{
+  m_LabelSet = mitk::LabelSet::New();
+  mitk::Color color;
+  color.SetRed(0.0);
+  color.SetGreen(0.0);
+  color.SetBlue(0.0);
+  mitk::Label::Pointer label = mitk::Label::New();
+  label->SetColor(color);
+  label->SetName("exterior");
+  label->SetExterior(true);
+  label->SetOpacity(0.0);
+  label->SetLocked(false);
+  m_LabelSet->AddLabel(*label);
+
+  mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+  lut->SetActiveColormap(mitk::ColormapProperty::CM_MULTILABEL);
+
+  mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New();
+  lutProp->SetLookupTable(lut);
+
+  this->GetPropertyList()->SetProperty( "LookupTable", lutProp );
+}
+
 void mitk::LabelSetImage::SetName(const std::string& name)
 {
-    this->m_LabelSet->SetName(name);
+  this->m_LabelSet->SetName(name);
 }
 
 std::string mitk::LabelSetImage::GetLabelSetName()
 {
-    return this->m_LabelSet->GetName();
+  return this->m_LabelSet->GetName();
 }
 
 void mitk::LabelSetImage::SetLabelSetLastModified(const std::string& name)
 {
-    this->m_LabelSet->SetLastModified(name);
+  this->m_LabelSet->SetLastModified(name);
 }
 
 std::string mitk::LabelSetImage::GetLabelSetLastModified()
 {
-    return this->m_LabelSet->GetLastModified();
+  return this->m_LabelSet->GetLastModified();
 }
 
 void mitk::LabelSetImage::MergeLabels(int begin, int count, int index)
 {
-    this->SetActiveLabel( index, false );
-    for (int idx = begin; idx<begin+count; ++idx)
-    {
-        if (idx != index)
-        {
-            AccessByItk_1(this, MergeLabelsProcessing, index);
-        }
-    }
+  this->SetActiveLabel( index, false );
+  for (int idx = begin; idx<begin+count; ++idx)
+  {
+      if (idx != index)
+      {
+          AccessByItk_1(this, MergeLabelsProcessing, index);
+      }
+  }
 
-   // this->RemoveLabels( begin, count );
-    this->Modified();
+ // this->RemoveLabels( begin, count );
+  this->Modified();
 }
 
 void mitk::LabelSetImage::CalculateLabelVolume(int index)
@@ -107,22 +128,22 @@ void mitk::LabelSetImage::EraseLabel(int index, bool reorder)
 
 bool mitk::LabelSetImage::Concatenate(mitk::LabelSetImage* other)
 {
-    const unsigned int* otherDims = other->GetDimensions();
-    const unsigned int* thisDims = this->GetDimensions();
-    if ( (otherDims[0] != thisDims[0]) || (otherDims[1] != thisDims[1]) || (otherDims[2] != thisDims[2]) )
-        return false;
+  const unsigned int* otherDims = other->GetDimensions();
+  const unsigned int* thisDims = this->GetDimensions();
+  if ( (otherDims[0] != thisDims[0]) || (otherDims[1] != thisDims[1]) || (otherDims[2] != thisDims[2]) )
+      return false;
 
-    AccessByItk_1(this, ConcatenateProcessing, other);
+  AccessByItk_1(this, ConcatenateProcessing, other);
 
-    const mitk::LabelSet* ls = other->GetLabelSet();
-    for( int i=1; i<ls->GetNumberOfLabels(); i++) // skip exterior
-    {
-        this->AddLabel( *ls->GetLabel(i) );
-    }
+  mitk::LabelSet::ConstPointer ls = other->GetConstLabelSet();
+  for( int i=1; i<ls->GetNumberOfLabels(); i++) // skip exterior
+  {
+      this->AddLabel( *ls->GetLabel(i) );
+  }
 
-    this->Modified();
+  this->Modified();
 
-    return true;
+  return true;
 }
 
 void mitk::LabelSetImage::ClearBuffer()
@@ -134,37 +155,37 @@ void mitk::LabelSetImage::ClearBuffer()
 template < typename LabelSetImageType >
 void mitk::LabelSetImage::CalculateCenterOfMassProcessing(LabelSetImageType* itkImage, int index)
 {
-   // for now, we just retrieve the voxel in the middle
-   typename typedef itk::ImageRegionConstIteratorWithIndex< LabelSetImageType > IteratorType;
-   IteratorType iter( itkImage, itkImage->GetLargestPossibleRegion() );
-   iter.GoToBegin();
+  // for now, we just retrieve the voxel in the middle
+  typename typedef itk::ImageRegionConstIteratorWithIndex< LabelSetImageType > IteratorType;
+  IteratorType iter( itkImage, itkImage->GetLargestPossibleRegion() );
+  iter.GoToBegin();
 
-   typename std::vector< LabelSetImageType::IndexType > indexVector;
+  typename std::vector< LabelSetImageType::IndexType > indexVector;
 
-   while ( !iter.IsAtEnd() )
-   {
-    if ( iter.Get() == static_cast<int>(index) )
-    {
-      indexVector.push_back(iter.GetIndex());
-    }
-    ++iter;
-   }
+  while ( !iter.IsAtEnd() )
+  {
+  if ( iter.Get() == static_cast<int>(index) )
+  {
+    indexVector.push_back(iter.GetIndex());
+  }
+  ++iter;
+  }
 
-   mitk::Point3D pos;
-   pos.Fill(0.0);
+  mitk::Point3D pos;
+  pos.Fill(0.0);
 
-   if (!indexVector.empty())
-   {
-       typename itk::ImageRegionConstIteratorWithIndex< LabelSetImageType >::IndexType centerIndex;
-       centerIndex = indexVector.at(indexVector.size()/2);
-       pos[0] = centerIndex[0];
-       pos[1] = centerIndex[1];
-       pos[2] = centerIndex[2];
-   }
+  if (!indexVector.empty())
+  {
+     typename itk::ImageRegionConstIteratorWithIndex< LabelSetImageType >::IndexType centerIndex;
+     centerIndex = indexVector.at(indexVector.size()/2);
+     pos[0] = centerIndex[0];
+     pos[1] = centerIndex[1];
+     pos[2] = centerIndex[2];
+  }
 
-   this->m_LabelSet->SetLabelCenterOfMassIndex(index, pos);
-   this->GetSlicedGeometry()->IndexToWorld(pos, pos);
-   this->m_LabelSet->SetLabelCenterOfMassCoordinates(index, pos);
+  this->m_LabelSet->SetLabelCenterOfMassIndex(index, pos);
+  this->GetSlicedGeometry()->IndexToWorld(pos, pos);
+  this->m_LabelSet->SetLabelCenterOfMassCoordinates(index, pos);
 }
 
 template < typename LabelSetImageType >
@@ -447,10 +468,20 @@ bool mitk::LabelSetImage::GetLabelSelected(int index) const
     return this->m_LabelSet->GetLabelSelected(index);
 }
 
+mitk::LabelSet::ConstPointer mitk::LabelSetImage::GetConstLabelSet() const
+{
+  return m_LabelSet.GetPointer();
+}
+
+mitk::LabelSet& mitk::LabelSetImage::GetLabelSet()
+{
+  return *m_LabelSet;
+}
+
 void mitk::LabelSetImage::SetLabelSet(const mitk::LabelSet& labelset)
 {
-    *m_LabelSet = labelset;
-    this->ResetLabels();
+  *m_LabelSet = labelset;
+  this->ResetLabels();
 }
 
 bool mitk::LabelSetImage::IsLabelSelected(mitk::Label::Pointer label)

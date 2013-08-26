@@ -310,7 +310,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
 
     free(contourPoints);
 
-    mitk::ContourUtils::FillContourInSlice( contourInImageIndexCoordinates, m_WorkingImage, NULL, 1, m_TimeStep );
+//    mitk::ContourUtils::FillContourInSlice( contourInImageIndexCoordinates, m_WorkingImage, 1, m_TimeStep );
   }
 
   delete[] _ofsArray;

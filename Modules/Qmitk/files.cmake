@@ -8,6 +8,8 @@ QmitkDataStorageTableModel.cpp
 QmitkDataStorageTreeModel.cpp
 QmitkEventAdapter.cpp
 QmitkFileDialog.cpp
+QmitkFileOpenDialog.cpp
+QmitkFileSaveDialog.cpp
 QmitkLevelWindowPresetDefinitionDialog.cpp
 QmitkLevelWindowRangeChangeDialog.cpp
 QmitkLevelWindowWidgetContextMenu.cpp
@@ -35,6 +37,8 @@ set(MOC_H_FILES
 QmitkDataStorageComboBox.h
 QmitkDataStorageTableModel.h
 QmitkFileDialog.h
+QmitkFileOpenDialog.h
+QmitkFileSaveDialog.h
 QmitkLevelWindowPresetDefinitionDialog.h
 QmitkLevelWindowRangeChangeDialog.h
 QmitkLevelWindowWidgetContextMenu.h

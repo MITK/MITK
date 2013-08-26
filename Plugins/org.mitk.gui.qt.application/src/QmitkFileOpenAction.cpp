@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QFileInfo>
 
-#include <QmitkFileDialog.h>
+#include <QmitkFileOpenDialog.h>
 
 #include <ctkServiceTracker.h>
 
@@ -110,7 +110,7 @@ void QmitkFileOpenAction::Run()
 {
   // Ask the user for a list of files to open
 
-  QmitkFileDialog dialog;
+  QmitkFileOpenDialog dialog;
   //QmitkFileDialog dialog;
   dialog.setFilter(mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
   //dialog.show();

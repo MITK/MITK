@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 //#define _USE_MATH_DEFINES
-#include <QmitkFileDialog.h>
+#include <QmitkFileSaveDialog.h>
 
 // MITK
 #include <mitkFileReaderManager.h>
@@ -90,7 +90,7 @@ private:
   us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
 }; // End of internal dummy reader
 
-const std::string QmitkFileDialog::VIEW_ID = "org.mitk.views.QmitkFileDialog";
+const std::string QmitkFileSaveDialog::VIEW_ID = "org.mitk.views.QmitkFileSaveDialog";
 
 //
 //
@@ -105,7 +105,7 @@ const std::string QmitkFileDialog::VIEW_ID = "org.mitk.views.QmitkFileDialog";
 //
 //
 
-QmitkFileDialog::QmitkFileDialog(QWidget* parent, Qt::WindowFlags f): QFileDialog(parent, f)
+QmitkFileSaveDialog::QmitkFileSaveDialog(QWidget* parent, Qt::WindowFlags f): QFileDialog(parent, f)
 {
   this->setOption(QFileDialog::DontUseNativeDialog);
   this->setFileMode(QFileDialog::ExistingFile);
@@ -115,13 +115,13 @@ QmitkFileDialog::QmitkFileDialog(QWidget* parent, Qt::WindowFlags f): QFileDialo
   CreateQtPartControl(this);
 }
 
-QmitkFileDialog::~QmitkFileDialog()
+QmitkFileSaveDialog::~QmitkFileSaveDialog()
 {
 }
 
 //////////////////// INITIALIZATION /////////////////////
 
-void QmitkFileDialog::CreateQtPartControl(QWidget *parent)
+void QmitkFileSaveDialog::CreateQtPartControl(QWidget *parent)
 {
   // cast own layout to gridLayout
   QGridLayout *layout = (QGridLayout*)this->layout();
@@ -139,7 +139,7 @@ void QmitkFileDialog::CreateQtPartControl(QWidget *parent)
   //  m_context = us::getmodulecontext();
 }
 
-void QmitkFileDialog::CreateConnections()
+void QmitkFileSaveDialog::CreateConnections()
 {
   connect( this, SIGNAL(currentChanged( const QString &)), this, SLOT(DisplayOptions( QString)) );
   connect( this, SIGNAL(fileSelected( const QString &)), this, SLOT(ProcessSelectedFile()) );
@@ -147,7 +147,7 @@ void QmitkFileDialog::CreateConnections()
 
 /////////////////////////// OPTIONS ///////////////////////////////
 
-void QmitkFileDialog::DisplayOptions(QString path)
+void QmitkFileSaveDialog::DisplayOptions(QString path)
 {
   std::string extension = path.toStdString();
   extension.erase(0, extension.find_last_of('.'));
@@ -177,7 +177,7 @@ void QmitkFileDialog::DisplayOptions(QString path)
   }
 }
 
-void QmitkFileDialog::ClearOptionsBox()
+void QmitkFileSaveDialog::ClearOptionsBox()
 {
   if ( m_BoxLayout != NULL )
   {
@@ -190,7 +190,21 @@ void QmitkFileDialog::ClearOptionsBox()
   }
 }
 
-std::list< mitk::FileServiceOption > QmitkFileDialog::GetSelectedOptions()
+void QmitkFileSaveDialog::ProcessSelectedFile()
+{
+  std::string file = this->selectedFiles().front().toStdString();
+  std::string extension = file;
+  extension.erase(0, extension.find_last_of('.'));
+
+  m_Options = GetSelectedOptions();
+  // We are not looking for specific Options here, which is okay, since the dialog currently only shows the
+  // reader with the highest priority. Better behaviour required, if we want selectable readers.
+
+  m_FileReader = m_FileReaderManager.GetReader(extension);
+  m_FileReader->SetOptions(m_Options);
+}
+
+std::list< mitk::FileServiceOption > QmitkFileSaveDialog::GetSelectedOptions()
 {
   std::list<mitk::FileServiceOption> result;
 
@@ -211,4 +225,20 @@ std::list< mitk::FileServiceOption > QmitkFileDialog::GetSelectedOptions()
     }
   }
   return result;
+}
+
+mitk::IFileReader* QmitkFileSaveDialog::GetReader()
+{
+  return this->m_FileReader;
+}
+
+std::list< mitk::BaseData::Pointer > QmitkFileSaveDialog::GetBaseData()
+{
+  if (m_FileReader == NULL )
+  {
+    MITK_WARN << "Tried go get BaseData while no FileReader was selected in Dialog. Returning empty list.";
+    std::list< mitk::BaseData::Pointer > emptyList;
+    return  emptyList;
+  }
+  return m_FileReader->Read(this->selectedFiles().front().toStdString());
 }

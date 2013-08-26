@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _QmitkFileDialog_H_INCLUDED
-#define _QmitkFileDialog_H_INCLUDED
+#ifndef _QmitkFileSaveDialog_H_INCLUDED
+#define _QmitkFileSaveDialog_H_INCLUDED
 
 #include "QmitkExports.h"
 #include <vector>
@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * \brief
 */
-class QMITK_EXPORT QmitkFileDialog :public QFileDialog
+class QMITK_EXPORT QmitkFileSaveDialog :public QFileDialog
 {
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
@@ -59,8 +59,8 @@ public:
 
   static const std::string VIEW_ID;
 
-  QmitkFileDialog(QWidget* p = 0, Qt::WindowFlags f1 = 0);
-  virtual ~QmitkFileDialog();
+  QmitkFileSaveDialog(QWidget* p = 0, Qt::WindowFlags f1 = 0);
+  virtual ~QmitkFileSaveDialog();
 
   /** \brief This method is part of the widget and needs not to be called separately. */
   virtual void CreateQtPartControl(QWidget *parent);
@@ -68,6 +68,10 @@ public:
   virtual void CreateConnections();
 
   virtual std::list< mitk::FileServiceOption > GetSelectedOptions();
+
+  virtual mitk::IFileReader* GetReader();
+
+  virtual std::list< mitk::BaseData::Pointer > GetBaseData();
 
 signals:
 
@@ -77,7 +81,7 @@ signals:
 
     protected slots:
 
-      virtual void ProcessSelectedFile() = 0;
+      virtual void ProcessSelectedFile();
 
 protected:
 
@@ -88,7 +92,7 @@ protected:
 
   virtual void ClearOptionsBox();
 
-  //Ui::QmitkFileDialogControls* m_Controls; ///< member holding the UI elements of this widget
+  //Ui::QmitkFileSaveDialogControls* m_Controls; ///< member holding the UI elements of this widget
 };
 
-#endif // _QmitkFileDialog_H_INCLUDED
+#endif // _QmitkFileSaveDialog_H_INCLUDED

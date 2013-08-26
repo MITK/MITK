@@ -263,11 +263,11 @@ public:
 
   /**
     * \brief  */
-  mitk::LabelSet& GetLabelSet();
+  mitk::LabelSet* GetLabelSet();
 
   /**
     * \brief  */
-  void SetLabelSet(const mitk::LabelSet& labelset);
+  void SetLabelSet(mitk::LabelSet* labelset);
 
   /**
     * \brief  */

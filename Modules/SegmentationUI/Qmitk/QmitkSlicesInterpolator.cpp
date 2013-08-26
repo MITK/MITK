@@ -481,7 +481,7 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
         mitk::SegTool2D::DetermineAffectedImageSlice( m_Segmentation, plane, clickedSliceDimension, clickedSliceIndex );
 
         mitk::Image::Pointer auxImage = m_Interpolator->Interpolate( clickedSliceDimension, clickedSliceIndex, plane, timeStep );
-
+// seba seguir por aca....
         if (auxImage.IsNotNull())
         {
             mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New(auxImage);

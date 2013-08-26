@@ -21,260 +21,248 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 
 
-mitk::LabelSet::LabelSet(): m_Owner(""), m_LastModified("00.00.00")
+mitk::LabelSet::LabelSet() :
+m_Owner(""),
+m_Name(""),
+m_LastModified(""),
+m_ActiveLabel(NULL)
 {
 
 }
 
-mitk::LabelSet::LabelSet(const LabelSet& other) : itk::Object()
+mitk::LabelSet::LabelSet(const mitk::LabelSet& other) :
+m_Name(other.m_Name),
+m_LastModified(other.m_LastModified),
+m_Owner(other.m_Owner),
+m_LabelContainer(other.m_LabelContainer)
 {
-    this->m_LabelContainer = other.m_LabelContainer;
-    this->m_ActiveLabel = this->m_LabelContainer[other.GetActiveLabelIndex()];
-    this->m_Owner = other.m_Owner;
-    this->m_LastModified  = other.m_LastModified;
-    this->m_Name = other.m_Name;
+  this->m_ActiveLabel = this->m_LabelContainer[other.GetActiveLabelIndex()];
 }
 
-bool mitk::LabelSet::operator==( const mitk::LabelSet& other ) const
+void mitk::LabelSet::Initialize(const LabelSet* other)
 {
-  // todo
-  return true;
+  if (!other) return;
+  this->m_Name = other->m_Name;
+  this->m_LastModified = other->m_LastModified;
+  this->m_Owner = other->m_Owner;
+  this->m_LabelContainer = other->m_LabelContainer;
+  this->m_ActiveLabel = this->m_LabelContainer[other->GetActiveLabelIndex()];
 }
 
-bool mitk::LabelSet::operator!=( const mitk::LabelSet& other ) const
+itk::LightObject::Pointer
+mitk::LabelSet::InternalClone() const
 {
-  return !(*this == other);
-}
-
-mitk::LabelSet& mitk::LabelSet::operator=( const mitk::LabelSet& other )
-{
-  if ( this == &other )
-  {
-    return * this;
-  }
-  else
-  {
-    this->m_LabelContainer = other.m_LabelContainer;
-    this->m_ActiveLabel = this->m_LabelContainer[other.GetActiveLabelIndex()];
-    this->m_Owner = other.m_Owner;
-    this->m_LastModified  = other.m_LastModified;
-    this->m_Name = other.m_Name;
-
-    return *this;
-  }
+  Self::Pointer newLabelSet = new LabelSet(*this);
+  newLabelSet->UnRegister();
+  return newLabelSet.GetPointer();
 }
 
 mitk::LabelSet::~LabelSet()
 {
-    m_LabelContainer.clear();
+  m_LabelContainer.clear();
 }
 
 mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorEnd()
 {
-    return this->m_LabelContainer.end();
+  return this->m_LabelContainer.end();
 }
 
 mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorBegin()
 {
-    return this->m_LabelContainer.begin();
+  return this->m_LabelContainer.begin();
 }
 
 bool mitk::LabelSet::HasLabel(int index) const
 {
-    return ( (index >=0) && (index<this->m_LabelContainer.size()) );
+  return ( (index >=0) && (index<this->m_LabelContainer.size()) );
 }
 
 void mitk::LabelSet::RemoveAllLabels()
 {
-    LabelContainerType::iterator _end = this->m_LabelContainer.end();
-    this->m_LabelContainer.erase(this->m_LabelContainer.begin()+1,_end);
+  LabelContainerType::iterator _end = this->m_LabelContainer.end();
+  this->m_LabelContainer.erase(this->m_LabelContainer.begin()+1,_end);
 }
 
 void mitk::LabelSet::SetLabelVisible(int index, bool value)
 {
-    if (this->HasLabel(index))
-    {
-        this->m_LabelContainer[index]->SetVisible(value);
-    }
+  if (this->HasLabel(index))
+  {
+    this->m_LabelContainer[index]->SetVisible(value);
+  }
 }
 
 bool mitk::LabelSet::GetLabelVisible(int index)
 {
-    return this->m_LabelContainer[index]->GetVisible();
+  return this->m_LabelContainer[index]->GetVisible();
 }
 
 void mitk::LabelSet::SetLabelSelected(int index, bool value)
 {
-    if (this->HasLabel(index))
-    {
-        this->m_LabelContainer[index]->SetSelected(value);
-    }
+  if (this->HasLabel(index))
+  {
+    this->m_LabelContainer[index]->SetSelected(value);
+  }
 }
 
 bool mitk::LabelSet::GetLabelSelected(int index)
 {
-    return this->m_LabelContainer[index]->GetSelected();
+  return this->m_LabelContainer[index]->GetSelected();
 }
 
 void mitk::LabelSet::SetLabelLocked(int index, bool value)
 {
-    if (this->HasLabel(index))
-    {
-        this->m_LabelContainer[index]->SetLocked(value);
-    }
+  if (this->HasLabel(index))
+  {
+    this->m_LabelContainer[index]->SetLocked(value);
+  }
 }
 
 bool mitk::LabelSet::GetLabelLocked(int index)
 {
-    return this->m_LabelContainer[index]->GetLocked();
+  return this->m_LabelContainer[index]->GetLocked();
 }
 
 void mitk::LabelSet::SetLabelOpacity(int index, float value)
 {
-    if (this->HasLabel(index))
-    {
-        this->m_LabelContainer[index]->SetOpacity(value);
-    }
+  if (this->HasLabel(index))
+  {
+    this->m_LabelContainer[index]->SetOpacity(value);
+  }
 }
 
 float mitk::LabelSet::GetLabelOpacity(int index)
 {
-    return this->m_LabelContainer[index]->GetOpacity();
+  return this->m_LabelContainer[index]->GetOpacity();
 }
 
 void mitk::LabelSet::SetLabelVolume(int index, float value)
 {
-    if (this->HasLabel(index))
-    {
-        this->m_LabelContainer[index]->SetVolume(value);
-    }
+  if (this->HasLabel(index))
+  {
+    this->m_LabelContainer[index]->SetVolume(value);
+  }
 }
 
 float mitk::LabelSet::GetLabelVolume(int index)
 {
-    return this->m_LabelContainer[index]->GetVolume();
+  return this->m_LabelContainer[index]->GetVolume();
 }
 
 void mitk::LabelSet::SetLabelName(int index, const std::string& name)
 {
-    if (this->HasLabel(index))
-    {
-        this->m_LabelContainer[index]->SetName(name);
-    }
+  if (this->HasLabel(index))
+  {
+    this->m_LabelContainer[index]->SetName(name);
+  }
 }
 
 const mitk::Color& mitk::LabelSet::GetLabelColor(int index)
 {
-    return this->m_LabelContainer[index]->GetColor();
+  return this->m_LabelContainer[index]->GetColor();
 }
 
 void mitk::LabelSet::SetLabelColor(int index, const mitk::Color& color)
 {
-    if (this->HasLabel(index))
-    {
-        this->m_LabelContainer[index]->SetColor(color);
-    }
+  if (this->HasLabel(index))
+  {
+    this->m_LabelContainer[index]->SetColor(color);
+  }
 }
 
 std::string mitk::LabelSet::GetLabelName(int index)
 {
-    return this->m_LabelContainer[index]->GetName();
+  return this->m_LabelContainer[index]->GetName();
 }
 
 void mitk::LabelSet::SetAllLabelsLocked(bool value)
 {
-    LabelContainerType::iterator _end = this->m_LabelContainer.end();
-    LabelContainerType::iterator _it = this->m_LabelContainer.begin();
-    _it++;
-    for(; _it!=_end; ++_it)
-    {
-        (*_it)->SetLocked(value);
-    }
+  LabelContainerType::iterator _end = this->m_LabelContainer.end();
+  LabelContainerType::iterator _it = this->m_LabelContainer.begin();
+  _it++;
+  for(; _it!=_end; ++_it)
+    (*_it)->SetLocked(value);
 }
 
 void mitk::LabelSet::SetAllLabelsVisible(bool value)
 {
-    LabelContainerType::iterator _end = this->m_LabelContainer.end();
-    LabelContainerType::iterator _it = this->m_LabelContainer.begin();
-    _it++;
-    for(; _it!=_end; ++_it)
-    {
-        (*_it)->SetVisible(value);
-    }
+  LabelContainerType::iterator _end = this->m_LabelContainer.end();
+  LabelContainerType::iterator _it = this->m_LabelContainer.begin();
+  _it++;
+  for(; _it!=_end; ++_it)
+    (*_it)->SetVisible(value);
 }
 
 int mitk::LabelSet::GetNumberOfLabels() const
 {
-    return this->m_LabelContainer.size();
+  return this->m_LabelContainer.size();
 }
 
 void mitk::LabelSet::SetActiveLabel(int index)
 {
-    if (this->HasLabel(index))
-        this->m_ActiveLabel = this->m_LabelContainer[index];
+  if (this->HasLabel(index))
+      this->m_ActiveLabel = this->m_LabelContainer[index];
 }
 
 void mitk::LabelSet::RemoveLabel(int index)
 {
-    this->m_LabelContainer.erase(this->m_LabelContainer.begin()+index);
+  this->m_LabelContainer.erase(this->m_LabelContainer.begin()+index);
 }
 
 bool mitk::LabelSet::IsSelected(mitk::Label::Pointer label)
 {
-    return label->GetSelected();
+  return label->GetSelected();
 }
 
 void mitk::LabelSet::RemoveSelectedLabels()
 {
-    mitk::LabelSet::LabelContainerIteratorType _begin = this->m_LabelContainer.begin();
-    mitk::LabelSet::LabelContainerIteratorType _end = this->m_LabelContainer.end();
-    this->m_LabelContainer.erase(std::remove_if( _begin, _end, &mitk::LabelSet::IsSelected ), _end);
-
-    this->m_ActiveLabel = this->m_LabelContainer.front();
+  mitk::LabelSet::LabelContainerIteratorType _begin = this->m_LabelContainer.begin();
+  mitk::LabelSet::LabelContainerIteratorType _end = this->m_LabelContainer.end();
+  this->m_LabelContainer.erase(std::remove_if( _begin, _end, &mitk::LabelSet::IsSelected ), _end);
+  this->m_ActiveLabel = this->m_LabelContainer.front();
 }
 
 void mitk::LabelSet::RemoveLabels(int begin, int count)
 {
-    this->m_LabelContainer.erase(this->m_LabelContainer.begin()+begin, this->m_LabelContainer.begin()+begin+count);
+  this->m_LabelContainer.erase(this->m_LabelContainer.begin()+begin, this->m_LabelContainer.begin()+begin+count);
 }
 
 void mitk::LabelSet::AddLabel(const mitk::Label& label )
 {
-    mitk::Label::Pointer newLabel = mitk::Label::New();
-    newLabel->SetColor( label.GetColor() );
-    newLabel->SetExterior( label.GetExterior() );
-    newLabel->SetName( label.GetName() );
-    newLabel->SetVisible( label.GetVisible() );
-    newLabel->SetLocked( label.GetLocked() );
-    newLabel->SetOpacity( label.GetOpacity() );
-    newLabel->SetVolume( label.GetVolume() );
-    newLabel->SetIndex( this->m_LabelContainer.size() );
-    this->m_LabelContainer.push_back(newLabel);
-    this->m_ActiveLabel = newLabel;
+  mitk::Label::Pointer newLabel = mitk::Label::New();
+  newLabel->SetColor( label.GetColor() );
+  newLabel->SetExterior( label.GetExterior() );
+  newLabel->SetName( label.GetName() );
+  newLabel->SetVisible( label.GetVisible() );
+  newLabel->SetLocked( label.GetLocked() );
+  newLabel->SetOpacity( label.GetOpacity() );
+  newLabel->SetVolume( label.GetVolume() );
+  newLabel->SetIndex( this->m_LabelContainer.size() );
+  this->m_LabelContainer.push_back(newLabel);
+  this->m_ActiveLabel = newLabel;
 }
 
 void mitk::LabelSet::AddLabel(const std::string& name, const mitk::Color& color )
 {
-    mitk::Label::Pointer label = mitk::Label::New();
-    label->SetName(name);
-    label->SetColor(color);
-    label->SetOpacity(0.4);
-    label->SetVolume(0.0);
-    label->SetVisible(true);
-    label->SetLocked(false);
-    label->SetIndex( this->m_LabelContainer.size());
-    this->m_LabelContainer.push_back(label);
-    this->m_ActiveLabel = label;
+  mitk::Label::Pointer label = mitk::Label::New();
+  label->SetName(name);
+  label->SetColor(color);
+  label->SetOpacity(0.4);
+  label->SetVolume(0.0);
+  label->SetVisible(true);
+  label->SetLocked(false);
+  label->SetIndex( this->m_LabelContainer.size());
+  this->m_LabelContainer.push_back(label);
+  this->m_ActiveLabel = label;
 }
 
 void mitk::LabelSet::RenameLabel(int index, const std::string& name, const mitk::Color& color)
 {
-    if (this->HasLabel(index))
-    {
-        mitk::Label* label = this->m_LabelContainer[index];
-        label->SetName(name);
-        label->SetColor(color);
-    }
+  if (this->HasLabel(index))
+  {
+    mitk::Label* label = this->m_LabelContainer[index];
+    label->SetName(name);
+    label->SetColor(color);
+  }
 }
 
 void mitk::LabelSet::PrintSelf(std::ostream &os, itk::Indent indent) const
@@ -285,14 +273,14 @@ void mitk::LabelSet::PrintSelf(std::ostream &os, itk::Indent indent) const
 
 void mitk::LabelSet::ResetLabels()
 {
-    LabelContainerType::iterator _end = this->m_LabelContainer.end();
-    LabelContainerType::iterator _it = this->m_LabelContainer.begin();
-    int value = 0;
-    for (; _it!=_end; ++_it, ++value)
-    {
-        (*_it)->SetIndex(value);
-        (*_it)->SetSelected(false);
-    }
+  LabelContainerType::iterator _end = this->m_LabelContainer.end();
+  LabelContainerType::iterator _it = this->m_LabelContainer.begin();
+  int value = 0;
+  for (; _it!=_end; ++_it, ++value)
+  {
+    (*_it)->SetIndex(value);
+    (*_it)->SetSelected(false);
+  }
 }
 
 int mitk::LabelSet::GetActiveLabelIndex() const

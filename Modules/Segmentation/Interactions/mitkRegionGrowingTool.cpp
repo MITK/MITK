@@ -376,11 +376,13 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
 
             LabelSetImage::Pointer lsSlice = LabelSetImage::New( m_WorkingSlice );
             lsSlice->SetLabelSet( lsImage->GetLabelSet() );
+
+            // 4. stamp contour in 3D ooords into working slice
             ContourUtils::FillContourInSlice( projectedContour, lsSlice, m_PaintingPixelValue, timestep );
 
             const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
 
-           // 4. write working slice back into image volume
+           // 5. write working slice back into working volume
            this->WriteBackSegmentationResult(positionEvent, lsSlice);
           }
         }

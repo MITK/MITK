@@ -473,15 +473,18 @@ mitk::LabelSet::ConstPointer mitk::LabelSetImage::GetConstLabelSet() const
   return m_LabelSet.GetPointer();
 }
 
-mitk::LabelSet& mitk::LabelSetImage::GetLabelSet()
+mitk::LabelSet* mitk::LabelSetImage::GetLabelSet()
 {
-  return *m_LabelSet;
+  return m_LabelSet.GetPointer();
 }
 
-void mitk::LabelSetImage::SetLabelSet(const mitk::LabelSet& labelset)
+void mitk::LabelSetImage::SetLabelSet(mitk::LabelSet* labelset)
 {
-  *m_LabelSet = labelset;
-  this->ResetLabels();
+  if (m_LabelSet != labelset)
+  {
+    m_LabelSet = labelset;
+    this->ResetLabels();
+  }
 }
 
 bool mitk::LabelSetImage::IsLabelSelected(mitk::Label::Pointer label)

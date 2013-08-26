@@ -42,33 +42,15 @@ public:
 
     itkNewMacro( Self );
 
-    mitkCloneMacro(LabelSet);
+    typedef std::vector <mitk::Label::Pointer>    LabelContainerType;
+    typedef LabelContainerType::const_iterator    LabelContainerConstIteratorType;
+    typedef LabelContainerType::iterator          LabelContainerIteratorType;
 
-    typedef std::vector <mitk::Label::Pointer>            LabelContainerType;
-    typedef LabelContainerType::const_iterator            LabelContainerConstIteratorType;
-    typedef LabelContainerType::iterator                  LabelContainerIteratorType;
-
-    //Documentation
-    // @brief equality operator implementation
-    //
-    virtual bool operator==( const LabelSet& LabelSet ) const;
-
-    /*!
-    * \brief non equality operator implementation
-    */
-    virtual bool operator!=( const LabelSet& LabelSet ) const;
-
-    /*!
-    * \brief implementation necessary because operator made
-    * private in itk::Object
-    */
-    virtual LabelSet& operator=( const LabelSet& LabelSet );
-
-    /** \brief Returns a const LabelMap iterator at the begining.
+    /** \brief Returns a const iterator poiting to the begining of the container.
     */
     LabelContainerConstIteratorType IteratorBegin();
 
-    /** \brief Returns a const LabelMap iterator at the end.
+    /** \brief Returns a const iterator pointing to the end of the container.
     */
     LabelContainerConstIteratorType IteratorEnd();
 
@@ -232,18 +214,20 @@ public:
     */
     virtual void ResetLabels();
 
+    void Initialize(const LabelSet* other);
+
     /** \brief
     */
     static bool IsSelected(mitk::Label::Pointer label);
 
+protected:
+
     LabelSet();
     virtual ~LabelSet();
 
-protected:
+    LabelSet(const LabelSet& other);
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const;
-
-    LabelSet(const LabelSet& other);
 
     LabelContainerType m_LabelContainer;
 
@@ -254,6 +238,13 @@ protected:
     std::string m_LastModified;
 
     std::string m_Name;
+
+private:
+
+  // purposely not implemented
+  LabelSet& operator=(const LabelSet&);
+
+  itk::LightObject::Pointer InternalClone() const;
 
 };
 

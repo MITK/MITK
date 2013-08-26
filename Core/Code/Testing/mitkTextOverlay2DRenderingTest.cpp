@@ -50,7 +50,7 @@ int mitkTextOverlay2DRenderingTest(int argc, char* argv[])
   MITK_TEST_BEGIN("mitkTextOverlay2DRenderingTest")
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
-    renderingHelper.SetAutomaticallyCloseRenderWindow(false);
+//    renderingHelper.SetAutomaticallyCloseRenderWindow(false);
 
   mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderingHelper.GetVtkRenderWindow());
   mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
@@ -65,10 +65,10 @@ int mitkTextOverlay2DRenderingTest(int argc, char* argv[])
   renderingHelper.Render();
 
   //use this to generate a reference screenshot or save the file:
-  bool generateReferenceScreenshot = true;
+  bool generateReferenceScreenshot = false;
   if(generateReferenceScreenshot)
   {
-    renderingHelper.SaveReferenceScreenShot("/home/christoph/Pictures/RenderingTestData/mitkTextOverlay2DRenderingTest_rgbImage.png");
+    renderingHelper.SaveReferenceScreenShot("/home/christoph/Pictures/RenderingTestData/mitkTextOverlay2DRenderingTest_ball.png");
   }
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper

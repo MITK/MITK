@@ -38,6 +38,7 @@ int mitkLabelOverlay3DRendering3DTest(int argc, char* argv[])
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
   renderingHelper.SetMapperIDToRender3D();
+//  renderingHelper.SetAutomaticallyCloseRenderWindow(false);
 
   mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderingHelper.GetVtkRenderWindow());
   mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
@@ -74,15 +75,16 @@ int mitkLabelOverlay3DRendering3DTest(int argc, char* argv[])
 
   renderingHelper.Render();
 
+  //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
+  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
+
   //use this to generate a reference screenshot or save the file:
-  bool generateReferenceScreenshot = true;
+  bool generateReferenceScreenshot = false;
   if(generateReferenceScreenshot)
   {
     renderingHelper.SaveReferenceScreenShot("/home/christoph/Pictures/RenderingTestData/mitkLabelOverlay3DRendering3DTest.png");
   }
 
-  //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
-  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
 
   MITK_TEST_END();
 }

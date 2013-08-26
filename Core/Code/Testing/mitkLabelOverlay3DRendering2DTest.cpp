@@ -37,6 +37,7 @@ int mitkLabelOverlay3DRendering2DTest(int argc, char* argv[])
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
+//  renderingHelper.SetAutomaticallyCloseRenderWindow(false);
   mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderingHelper.GetVtkRenderWindow());
   mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
   renderer->SetOverlayManager(OverlayManager);
@@ -50,8 +51,8 @@ int mitkLabelOverlay3DRendering2DTest(int argc, char* argv[])
 
   std::vector<std::string> labels;
   int idx = 0;
-  for(int i=-10 ; i < 10 ; i+=2){
-    for(int j=-10 ; j < 10 ; j+=2){
+  for(int i=-10 ; i < 10 ; i+=4){
+    for(int j=-10 ; j < 10 ; j+=4){
       mitk::Point3D point;
       point[0] = i;
       point[1] = j;
@@ -72,15 +73,15 @@ int mitkLabelOverlay3DRendering2DTest(int argc, char* argv[])
   renderingHelper.AddNodeToStorage(datanode);
   renderingHelper.Render();
 
+  //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
+  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
+
   //use this to generate a reference screenshot or save the file:
-  bool generateReferenceScreenshot = true;
+  bool generateReferenceScreenshot = false;
   if(generateReferenceScreenshot)
   {
     renderingHelper.SaveReferenceScreenShot("/home/christoph/Pictures/RenderingTestData/mitkLabelOverlay3DRendering2DTest.png");
   }
-
-  //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
-  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
 
   MITK_TEST_END();
 }

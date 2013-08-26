@@ -31,10 +31,10 @@ set(ANN_SOURCES
 )
 
 include_directories(${ANN_SOURCE_DIR}/include)
-if(NOT BUILD_SHARED_LIBS)
-  add_definitions( -DANN_STATIC_LIB )
+if(WIN32)
+  add_definitions( -DDLL_EXPORTS )
 endif()
-add_library(ann ${ANN_HEADERS} ${ANN_SOURCES})
+add_library(ann SHARED ${ANN_HEADERS} ${ANN_SOURCES})
 set_target_properties(ann PROPERTIES
                       SOVERSION ${${PROJECT_NAME}_VERSION})
 

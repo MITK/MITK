@@ -13,12 +13,15 @@ set(ANN_DEPENDS ${proj})
 
 if(NOT DEFINED ANN_DIR)
 
+  set(patch_cmd ${CMAKE_COMMAND} -Dproj:STRING=${proj} -Dproj_target:STRING=ann -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake)
+
   ExternalProject_Add(${proj}
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
      PREFIX ${proj}-cmake
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ann-cmake-1.1.2.tar.gz
-     URL_MD5 d9bbbc9e6fd6f29312a7c2bee48430e4
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ann_1.1.2.tar.gz
+     URL_MD5 7ffaacc7ea79ca39d4958a6378071365
+     PATCH_COMMAND ${patch_cmd}
      INSTALL_COMMAND ""
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS

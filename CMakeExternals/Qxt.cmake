@@ -13,12 +13,15 @@ set(${proj}_DEPENDS ${proj})
 
 if(NOT DEFINED ${proj}_DIR)
 
+  set(patch_cmd ${CMAKE_COMMAND} -Dproj:STRING=${proj} -Dproj_target:STRING=QxtCore -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake)
+
   ExternalProject_Add(${proj}
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
      PREFIX ${proj}-cmake
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/libqxt-cmake-0.6.2.tar.gz
-     URL_MD5 345d6282baf64c8a0c35eeb6e560c0b2
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/libqxt-0.6.2-dadc327c2a6a-patched.tar.gz
+     URL_MD5 b0438b4c76793c35b606c8aba02748b8
+     PATCH_COMMAND ${patch_cmd}
      INSTALL_COMMAND ""
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS

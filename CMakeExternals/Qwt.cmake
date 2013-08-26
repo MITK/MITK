@@ -13,12 +13,15 @@ set(${proj}_DEPENDS ${proj})
 
 if(NOT DEFINED ${proj}_DIR)
 
+  set(patch_cmd ${CMAKE_COMMAND} -Dproj:STRING=${proj} -Dproj_target:STRING=qwt -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake)
+
   ExternalProject_Add(${proj}
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
      PREFIX ${proj}-cmake
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qwt-cmake-6.1.0.tar.gz
-     URL_MD5 0f6e5c5221ffbbf7d0ba9a778f3e6f05
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qwt-6.1.0.tar.bz2
+     URL_MD5 aef0437b37f191067a6a9dc01c30ba64
+     PATCH_COMMAND ${patch_cmd}
      INSTALL_COMMAND ""
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS

@@ -94,7 +94,6 @@ void mitk::OverlayManager::UpdateOverlays(mitk::BaseRenderer* baseRenderer)
   {
     (*it)->Update(baseRenderer);
   }
-  std::pair<std::string,std::string> fdjs("fds","fsd");
   UpdateLayouts(baseRenderer);
 }
 

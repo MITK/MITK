@@ -65,8 +65,8 @@ void TbssImporter::Import(const mitk::PixelType , mitk::TbssImage::Pointer tbssI
 
   //Direction must be set
   DataImageType::DirectionType dir;
-  const itk::Transform<float, 3, 3>* transform3D = geo->GetParametricTransform();
-  itk::Transform<float,3,3>::ParametersType p = transform3D->GetParameters();
+  const itk::Transform<ScalarType, 3, 3>* transform3D = geo->GetParametricTransform();
+  itk::Transform<ScalarType,3,3>::ParametersType p = transform3D->GetParameters();
   int t=0;
   for(int i=0; i<3; i++)
   {

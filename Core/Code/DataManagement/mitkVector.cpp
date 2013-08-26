@@ -15,9 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkVector.h"
-#include <vtkSystemIncludes.h>
-#include <vtkMatrix4x4.h>
 
-const mitk::ScalarType mitk::eps     = vnl_math::float_eps*100;
-const mitk::ScalarType mitk::sqrteps = vnl_math::float_sqrteps;
-extern const double mitk::large      = VTK_LARGE_FLOAT;
+const mitk::ScalarType mitk::eps     = vnl_math::eps*100;
+const mitk::ScalarType mitk::sqrteps = vnl_math::sqrteps;
+extern const mitk::ScalarType mitk::large = std::numeric_limits<mitk::ScalarType>::max();

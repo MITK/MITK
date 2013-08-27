@@ -374,8 +374,13 @@ set_target_properties(QxtCore PROPERTIES
 qt4_wrap_cpp(_qxt_gui_sources ${_qxt_gui_moc_headers})
 qt4_add_resources(_qxt_gui_sources ${_qxt_gui_resources})
 
+set(QxtGui_link_libraries ${QT_LIBRARIES})
+if(APPLE)
+  find_library(CARBON_FW NAMES Carbon)
+  list(APPEND QxtGui_link_libraries ${CARBON_FW})
+endif()
 add_library(QxtGui SHARED ${_qxt_gui_sources})
-target_link_libraries(QxtGui QxtCore ${QT_LIBRARIES})
+target_link_libraries(QxtGui QxtCore ${QxtGui_link_libraries})
 
 set_target_properties(QxtGui PROPERTIES
                       SOVERSION ${${PROJECT_NAME}_VERSION}

@@ -61,7 +61,7 @@ public:
     **/
     std::list< itk::SmartPointer<BaseData> > Read(const std::string& path, us::ModuleContext* context = us::GetModuleContext());
 
-    std::list< mitk::BaseData::Pointer > ReadAll(const std::list<std::string> paths, std::list<std::string>* unreadableFiles = 0,
+    std::list< mitk::BaseData::Pointer > ReadAll(const std::list<std::string>& paths, std::list<std::string>* unreadableFiles = 0,
                                                  us::ModuleContext* context = us::GetModuleContext());
 
     template <class T>

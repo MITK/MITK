@@ -43,9 +43,6 @@ public:
 
   virtual void Write(const BaseData* data, std::ostream& stream );
 
-  virtual bool CanWrite(const BaseData* data) const;
-
-
 protected:
 
     mitk::FileWriter::Pointer m_LegacyWriter;

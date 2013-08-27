@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkAbstractFileWriter.h>
 #include <mitkBaseData.h>
+#include <mitkIOUtil.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -60,11 +61,24 @@ mitk::AbstractFileWriter::AbstractFileWriter(const std::string& basedataType, co
 
 void mitk::AbstractFileWriter::Write(const BaseData* data, const std::string& path)
 {
-  if (! itksys::SystemTools::FileExists(path.c_str()))
-    mitkThrow() << "File '" + path + "' not found.";
   std::ofstream stream;
   stream.open(path.c_str());
   this->Write(data, stream);
+}
+
+void mitk::AbstractFileWriter::Write(const mitk::BaseData* data, std::ostream& stream)
+{
+  // Create a temporary file and write the data to it
+  std::ofstream tmpOutputStream;
+  std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpOutputStream);
+  this->Write(data, tmpFilePath);
+  tmpOutputStream.close();
+
+  // Now copy the contents
+  std::ifstream tmpInputStream(tmpFilePath.c_str(), std::ios_base::binary);
+  stream << tmpInputStream.rdbuf();
+  tmpInputStream.close();
+  std::remove(tmpFilePath.c_str());
 }
 
 //////////// µS Registration & Properties //////////////

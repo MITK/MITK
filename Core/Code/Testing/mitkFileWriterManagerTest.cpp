@@ -26,7 +26,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreObjectFactory.h>
 #include <mitkPointSetWriter.h>
 #include <mitkPointSet.h>
+#include <mitkIOUtil.h>
 
+class DummyBaseData : public mitk::BaseData
+{
+public:
+
+  mitkClassMacro(DummyBaseData, mitk::BaseData)
+  itkNewMacro(Self)
+
+  void SetRequestedRegion(const itk::DataObject * /*data*/) {}
+  void SetRequestedRegionToLargestPossibleRegion() {}
+  bool RequestedRegionIsOutsideOfTheBufferedRegion() { return false; }
+  bool VerifyRequestedRegion() { return true; }
+};
 
 class DummyWriter : public mitk::AbstractFileWriter
 {
@@ -35,11 +48,13 @@ public:
 
   DummyWriter(const DummyWriter& other)
     : mitk::AbstractFileWriter(other)
+    , m_Content("Hi there stream")
   {
   }
 
   DummyWriter(const std::string& basedataType, const std::string& extension, int priority)
     : mitk::AbstractFileWriter(basedataType, extension, "This is a dummy description")
+    , m_Content("Hi there stream")
   {
     m_Priority = priority;
     m_ServiceReg = this->RegisterService();
@@ -52,14 +67,13 @@ public:
 
   using AbstractFileWriter::Write;
 
-  virtual void Write(const mitk::BaseData* /*data*/, std::ostream& /*stream*/ )
-  {  }
-
-  virtual void SetOptions(const std::list< std::string >& options )
+  virtual void Write(const mitk::BaseData* data, std::ostream& stream)
   {
-    m_Options = options;
-    //m_Registration.SetProperties(ConstructServiceProperties());
+    MITK_TEST_CONDITION_REQUIRED(dynamic_cast<const DummyBaseData*>(data), "Correct data type")
+    stream << m_Content;
   }
+
+  std::string m_Content;
 
 private:
 
@@ -79,11 +93,13 @@ public:
 
   DummyWriter2(const DummyWriter2& other)
     : mitk::AbstractFileWriter(other)
+    , m_Content("hi there file path")
   {
   }
 
   DummyWriter2(const std::string& basedataType, const std::string& extension, int priority)
     : mitk::AbstractFileWriter(basedataType, extension, "This is a dummy description")
+    , m_Content("hi there file path")
   {
     m_Priority = priority;
     m_ServiceReg = this->RegisterService();
@@ -96,14 +112,24 @@ public:
 
   using AbstractFileWriter::Write;
 
-  virtual void Write(const mitk::BaseData* /*data*/, std::ostream& /*stream*/ )
-  {  }
-
-  virtual void SetOptions(const std::list< std::string >& options )
+  virtual void Write(const mitk::BaseData* data, const std::string& filePath )
   {
-    m_Options = options;
-    //m_Registration.SetProperties(ConstructServiceProperties());
+    MITK_TEST_CONDITION_REQUIRED(dynamic_cast<const DummyBaseData*>(data), "Correct data type")
+    std::ofstream fileStream(filePath.c_str());
+    fileStream << m_Content;
   }
+
+  virtual void Write(const mitk::BaseData* data, std::ostream& stream )
+  {
+    mitk::AbstractFileWriter::Write(data, stream);
+  }
+
+  virtual bool CanWrite(const mitk::BaseData *data) const
+  {
+    return dynamic_cast<const DummyBaseData*>(data);
+  }
+
+  std::string m_Content;
 
 private:
 
@@ -116,6 +142,59 @@ private:
 
 }; // End of internal dummy Writer 2
 
+
+void TestStreamMethods()
+{
+  DummyWriter dummyWriter(DummyBaseData::GetStaticNameOfClass(), ".stream", 100);
+  DummyWriter2 dummyWriter2(DummyBaseData::GetStaticNameOfClass(), ".file", 50);
+  mitk::FileWriterRegistry writerRegistry;
+
+  // Test DummyWriter, which always uses a ostream for writing, even
+  // when a file path is used
+  DummyBaseData dummyData;
+  std::stringstream oss;
+  writerRegistry.Write(&dummyData, oss);
+  MITK_TEST_CONDITION_REQUIRED(dummyWriter.m_Content == oss.str(), "Dummy stream writer")
+
+  std::string content;
+  {
+    std::ofstream tmpStream;
+    std::string tmpFileName = mitk::IOUtil::CreateTemporaryFile(tmpStream);
+    writerRegistry.Write(&dummyData, tmpFileName);
+
+    std::ifstream tmpInput(tmpFileName.c_str());
+    std::getline(tmpInput, content);
+    tmpInput.close();
+    tmpStream.close();
+    std::remove(tmpFileName.c_str());
+  }
+  MITK_TEST_CONDITION_REQUIRED(dummyWriter.m_Content == content, "Dummy stream writer")
+
+  // Test DummyWriter2, which always uses a real file for writing, even
+  // when a std::ostream object is given
+  std::stringstream oss2;
+  dummyWriter2.Write(&dummyData, oss2);
+  MITK_TEST_CONDITION_REQUIRED(dummyWriter2.m_Content == oss2.str(), "Dummy 2 stream writer")
+
+  std::string content2;
+  {
+    std::ofstream tmpStream;
+    std::string tmpFileName = mitk::IOUtil::CreateTemporaryFile(tmpStream);
+    tmpStream.close();
+    std::remove(tmpFileName.c_str());
+
+    // This is a work-around to get a temporary file name ending with ".file"
+    tmpFileName += ".file";
+    writerRegistry.Write(&dummyData, tmpFileName);
+
+    std::ifstream tmpInput(tmpFileName.c_str());
+    std::getline(tmpInput, content2);
+    tmpInput.close();
+    std::remove(tmpFileName.c_str());
+  }
+  MITK_TEST_CONDITION_REQUIRED(dummyWriter2.m_Content == content2, "Dummy 2 stream writer")
+}
+
 /**
  *  TODO
  */
@@ -124,8 +203,12 @@ int mitkFileWriterManagerTest(int argc , char* argv[])
   // always start with this!
   MITK_TEST_BEGIN("FileWriterManager");
 
+  TestStreamMethods();
+
+
  // mitk::FileWriterRegistry::Pointer frm = mitk::FileWriterRegistry::New();
  // MITK_TEST_CONDITION_REQUIRED(argc == 2,"Testing FileWriterRegistry instantiation");
+
   DummyWriter testDR("testdata", "test", 1);
   DummyWriter otherDR("testdata", "other", 1);
 
@@ -226,5 +309,5 @@ int mitkFileWriterManagerTest(int argc , char* argv[])
   delete writerManager;
 
   //// always end with this!
-  MITK_TEST_END();
+  MITK_TEST_END()
 }

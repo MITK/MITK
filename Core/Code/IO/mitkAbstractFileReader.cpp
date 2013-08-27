@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkAbstractFileReader.h>
 
+#include <mitkIOUtil.h>
+
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 #include <usPrototypeServiceFactory.h>
@@ -61,6 +63,20 @@ std::list< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(co
   std::ifstream stream;
   stream.open(path.c_str());
   return this->Read(stream);
+}
+
+std::list< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(const std::istream& stream, mitk::DataStorage* ds)
+{
+  // Create a temporary file and copy the data to it
+  std::ofstream tmpOutputStream;
+  std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpOutputStream);
+  tmpOutputStream << stream.rdbuf();
+  tmpOutputStream.close();
+
+  // Now read from the temporary file
+  std::list< itk::SmartPointer<mitk::BaseData> > result = this->Read(tmpFilePath, ds);
+  std::remove(tmpFilePath.c_str());
+  return result;
 }
 
 //////////// µS Registration & Properties //////////////

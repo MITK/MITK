@@ -55,8 +55,9 @@ std::list< mitk::BaseData::Pointer > mitk::FileReaderRegistry::Read(const std::s
   return reader->Read(path);
 }
 
-std::list< mitk::BaseData::Pointer > mitk::FileReaderRegistry::ReadAll(const std::list<std::string> paths, std::list<std::string>* unreadableFiles,
-                                                                      us::ModuleContext* context)
+std::list< mitk::BaseData::Pointer > mitk::FileReaderRegistry::ReadAll(
+    const std::list<std::string>& paths, std::list<std::string>* unreadableFiles,
+    us::ModuleContext* context)
 {
   std::list< mitk::BaseData::Pointer > result;
   for (std::list<std::string>::const_iterator iterator = paths.begin(), end = paths.end(); iterator != end; ++iterator)

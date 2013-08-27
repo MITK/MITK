@@ -47,16 +47,9 @@ void mitk::LegacyFileWriterService::Write(const BaseData* data, const std::strin
   m_LegacyWriter->Write();
 }
 
-void mitk::LegacyFileWriterService::Write(const BaseData* /*data*/, std::ostream& /*stream*/ )
+void mitk::LegacyFileWriterService::Write(const BaseData* data, std::ostream& stream)
 {
-  mitkThrow () << "Streaming is not supported in Legacy Wrappers.";
-  //return 0;
-}
-
-bool mitk::LegacyFileWriterService::CanWrite(const BaseData* data) const
-{
-  std::string externalDataType = data->GetNameOfClass();
-  return (externalDataType == m_BasedataType);
+  mitk::AbstractFileWriter::Write(data, stream);
 }
 
 mitk::LegacyFileWriterService* mitk::LegacyFileWriterService::Clone() const

@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ToFDistanceImageToSurfaceFilter::ToFDistanceImageToSurfaceFilter() :
   m_IplScalarImage(NULL), m_CameraIntrinsics(), m_TextureImageWidth(0), m_TextureImageHeight(0), m_InterPixelDistance(), m_TextureIndex(0),
-  m_GenerateTriangularMesh(true), m_TriangulationThreshold(-1.0)
+  m_GenerateTriangularMesh(true), m_TriangulationThreshold(0.0)
 {
   m_InterPixelDistance.Fill(0.045);
   m_CameraIntrinsics = mitk::CameraIntrinsics::New();

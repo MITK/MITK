@@ -32,9 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkTransform.h>
 
-#include "pic2vtk.h"
-
-
 
 mitk::ExtractDirectedPlaneImageFilter::ExtractDirectedPlaneImageFilter()
 : m_WorldGeometry(NULL)

@@ -282,6 +282,10 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     if (m_FiberModels.empty())
         itkExceptionMacro("No diffusion model for fiber compartments defined!");
 
+    if (m_EnforcePureFiberVoxels)
+        while (m_FiberModels.size()>1)
+            m_FiberModels.pop_back();
+
     if (m_NonFiberModels.empty())
         itkExceptionMacro("No diffusion model for non-fiber compartments defined!");
 
@@ -584,13 +588,14 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             if (f>voxelVolume || f>0 && m_EnforcePureFiberVoxels)  // more fiber than space in voxel?
             {
                 fiberDwi->SetPixel(index, fiberPix*voxelVolume/f);
+                m_VolumeFractions.at(0)->SetPixel(index, 1);
 
-                for (int i=1; i<m_FiberModels.size(); i++)
-                {
-                    DoubleDwiType::PixelType pix; pix.Fill(0.0);
-                    compartments.at(i)->SetPixel(index, pix);
-                    m_VolumeFractions.at(i)->SetPixel(index, 1);
-                }
+//                for (int i=1; i<m_FiberModels.size(); i++)
+//                {
+//                    DoubleDwiType::PixelType pix; pix.Fill(0.0);
+//                    compartments.at(i)->SetPixel(index, pix);
+//                    m_VolumeFractions.at(i)->SetPixel(index, 1);
+//                }
             }
             else
             {

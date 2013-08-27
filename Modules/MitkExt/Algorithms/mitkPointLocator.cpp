@@ -166,7 +166,7 @@ mitk::PointLocator::IdType mitk::PointLocator::FindClosestPoint( const vtkFloati
   m_ANNQueryPoint[0] = point[0];
   m_ANNQueryPoint[1] = point[1];
   m_ANNQueryPoint[2] = point[2];
-  return FindClosestPoint( m_ANNQueryPoint );
+  return FindClosestANNPoint( m_ANNQueryPoint );
 }
 
 
@@ -176,7 +176,7 @@ mitk::PointLocator::IdType mitk::PointLocator::FindClosestPoint( vtkFloatingPoin
   m_ANNQueryPoint[0] = x;
   m_ANNQueryPoint[1] = y;
   m_ANNQueryPoint[2] = z;
-  return FindClosestPoint( m_ANNQueryPoint );
+  return FindClosestANNPoint( m_ANNQueryPoint );
 }
 
 
@@ -186,10 +186,10 @@ mitk::PointLocator::IdType mitk::PointLocator::FindClosestPoint( mitk::PointSet:
   m_ANNQueryPoint[0] = point[0];
   m_ANNQueryPoint[1] = point[1];
   m_ANNQueryPoint[2] = point[2];
-  return FindClosestPoint( m_ANNQueryPoint );
+  return FindClosestANNPoint( m_ANNQueryPoint );
 }
 
-mitk::PointLocator::IdType mitk::PointLocator::FindClosestPoint( const ANNpoint& point)
+mitk::PointLocator::IdType mitk::PointLocator::FindClosestANNPoint( const ANNpoint& point)
 {
   if ( ! m_SearchTreeInitialized )
     return -1;

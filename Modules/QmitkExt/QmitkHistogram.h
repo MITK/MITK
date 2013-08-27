@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qcolor.h>
 
 #include <qwt_plot_item.h>
-#include <qwt_interval_data.h>
+#include <qwt_series_data.h>
 
 /**
 \brief Used to create a histogram that can be shown in a Qwt Plot.
@@ -38,16 +38,16 @@ public:
     explicit QmitkHistogram(const QwtText &title);
     virtual ~QmitkHistogram();
 
-    void setData(const QwtIntervalData &data);
-    const QwtIntervalData &data() const;
+    void setData(const QwtIntervalSeriesData &data);
+    const QwtIntervalSeriesData &data() const;
 
     void setColor(const QColor &);
     QColor color() const;
 
-    virtual QwtDoubleRect boundingRect() const;
+    virtual QRectF boundingRect() const;
 
     virtual void draw(QPainter *, const QwtScaleMap &xMap,
-        const QwtScaleMap &yMap, const QRect &) const;
+        const QwtScaleMap &yMap, const QRectF &) const;
 
     void setBaseline(double reference);
     double baseline() const;

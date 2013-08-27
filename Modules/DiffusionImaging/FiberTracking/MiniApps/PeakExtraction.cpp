@@ -38,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
-
 mitk::Image::Pointer LoadData(std::string filename)
 {
     if( filename.empty() )
@@ -56,7 +55,9 @@ mitk::Image::Pointer LoadData(std::string filename)
     return dynamic_cast<mitk::Image*>(baseData.GetPointer());
 }
 
-int PeakExtraction(int argc, char* argv[])
+
+template<int shOrder>
+int Start(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
@@ -112,6 +113,7 @@ int PeakExtraction(int argc, char* argv[])
     MITK_INFO << "numpeaks: " << numPeaks;
     MITK_INFO << "peakthres: " << peakThres;
     MITK_INFO << "abspeakthres: " << absPeakThres;
+    MITK_INFO << "shOrder: " << shOrder;
 
     try
     {
@@ -123,8 +125,8 @@ int PeakExtraction(int argc, char* argv[])
         mitk::Image::Pointer mask = LoadData(maskImageName);
 
         typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
-        typedef itk::FiniteDiffOdfMaximaExtractionFilter< float, 4, 20242 > MaximaExtractionFilterType;
-        MaximaExtractionFilterType::Pointer filter = MaximaExtractionFilterType::New();
+        typedef itk::FiniteDiffOdfMaximaExtractionFilter< float, shOrder, 20242 > MaximaExtractionFilterType;
+        typename MaximaExtractionFilterType::Pointer filter = MaximaExtractionFilterType::New();
 
         int toolkitConvention = 0;
 
@@ -164,14 +166,14 @@ int PeakExtraction(int argc, char* argv[])
         if (toolkitConvention>0)
         {
             MITK_INFO << "Converting coefficient image to MITK format";
-            typedef itk::ShCoefficientImageImporter< float, 4 > ConverterType;
+            typedef itk::ShCoefficientImageImporter< float, shOrder > ConverterType;
             typedef mitk::ImageToItk< itk::Image< float, 4 > > CasterType;
             CasterType::Pointer caster = CasterType::New();
             caster->SetInput(image);
             caster->Update();
             itk::Image< float, 4 >::Pointer itkImage = caster->GetOutput();
 
-            ConverterType::Pointer converter = ConverterType::New();
+            typename ConverterType::Pointer converter = ConverterType::New();
 
             if (noFlip)
             {
@@ -179,6 +181,7 @@ int PeakExtraction(int argc, char* argv[])
             }
             else
             {
+                MITK_INFO << "Flipping image";
                 itk::FixedArray<bool, 4> flipAxes;
                 flipAxes[0] = true;
                 flipAxes[1] = true;
@@ -195,6 +198,7 @@ int PeakExtraction(int argc, char* argv[])
                 converter->SetInputImage(flipped);
             }
 
+            MITK_INFO << "Starting conversion";
             switch (toolkitConvention)
             {
             case 1:
@@ -212,33 +216,12 @@ int PeakExtraction(int argc, char* argv[])
             }
             converter->GenerateData();
             filter->SetInput(converter->GetCoefficientImage());
-
-            // write qbi
-            ConverterType::QballImageType::Pointer itkQbi = converter->GetQballImage();
-
-            if (itkMaskImage.IsNotNull())
-            {
-                itkQbi->SetDirection(itkMaskImage->GetDirection());
-                itkQbi->SetOrigin(itkMaskImage->GetOrigin());
-            }
-
-            mitk::QBallImage::Pointer mitkQbi = mitk::QBallImage::New();
-            mitkQbi->InitializeByItk( itkQbi.GetPointer() );
-            mitkQbi->SetVolume( itkQbi->GetBufferPointer() );
-
-            string outfilename = outRoot;
-            outfilename.append("_QBI.qbi");
-            MITK_INFO << "writing " << outfilename;
-
-            mitk::NrrdQBallImageWriter::Pointer writer = mitk::NrrdQBallImageWriter::New();
-            writer->SetFileName(outfilename.c_str());
-            writer->DoWrite(mitkQbi.GetPointer());
         }
         else
         {
             try{
-                typedef mitk::ImageToItk< MaximaExtractionFilterType::CoefficientImageType > CasterType;
-                CasterType::Pointer caster = CasterType::New();
+                typedef mitk::ImageToItk< typename MaximaExtractionFilterType::CoefficientImageType > CasterType;
+                typename CasterType::Pointer caster = CasterType::New();
                 caster->SetInput(image);
                 caster->Update();
                 filter->SetInput(caster->GetOutput());
@@ -268,15 +251,16 @@ int PeakExtraction(int argc, char* argv[])
             break;
         }
 
+        MITK_INFO << "Starting extraction";
         filter->Update();
 
         // write direction images
         {
-            typedef MaximaExtractionFilterType::ItkDirectionImageContainer ItkDirectionImageContainer;
-            ItkDirectionImageContainer::Pointer container = filter->GetDirectionImageContainer();
+            typedef typename MaximaExtractionFilterType::ItkDirectionImageContainer ItkDirectionImageContainer;
+            typename ItkDirectionImageContainer::Pointer container = filter->GetDirectionImageContainer();
             for (int i=0; i<container->Size(); i++)
             {
-                MaximaExtractionFilterType::ItkDirectionImage::Pointer itkImg = container->GetElement(i);
+                typename MaximaExtractionFilterType::ItkDirectionImage::Pointer itkImg = container->GetElement(i);
 
                 if (itkMaskImage.IsNotNull())
                 {
@@ -290,8 +274,8 @@ int PeakExtraction(int argc, char* argv[])
                 outfilename.append(".nrrd");
 
                 MITK_INFO << "writing " << outfilename;
-                typedef itk::ImageFileWriter< MaximaExtractionFilterType::ItkDirectionImage > WriterType;
-                WriterType::Pointer writer = WriterType::New();
+                typedef itk::ImageFileWriter< typename MaximaExtractionFilterType::ItkDirectionImage > WriterType;
+                typename WriterType::Pointer writer = WriterType::New();
                 writer->SetFileName(outfilename);
                 writer->SetInput(itkImg);
                 writer->Update();
@@ -347,5 +331,45 @@ int PeakExtraction(int argc, char* argv[])
     }
     MITK_INFO << "DONE";
     return EXIT_SUCCESS;
+}
+
+int PeakExtraction(int argc, char* argv[])
+{
+    ctkCommandLineParser parser;
+    parser.setArgumentPrefix("--", "-");
+    parser.addArgument("image", "i", ctkCommandLineParser::String, "sh coefficient image", us::Any(), false);
+    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "spherical harmonics order");
+    parser.addArgument("outroot", "o", ctkCommandLineParser::String, "output root", us::Any(), false);
+    parser.addArgument("mask", "m", ctkCommandLineParser::String, "mask image");
+    parser.addArgument("normalization", "n", ctkCommandLineParser::Int, "0=no norm, 1=max norm, 2=single vec norm", 1, true);
+    parser.addArgument("numpeaks", "p", ctkCommandLineParser::Int, "maximum number of extracted peaks", 2, true);
+    parser.addArgument("peakthres", "r", ctkCommandLineParser::Float, "peak threshold relative to largest peak", 0.4, true);
+    parser.addArgument("abspeakthres", "a", ctkCommandLineParser::Float, "absolute peak threshold weighted with local GFA value", 0.06, true);
+    parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "use specified SH-basis (MITK, FSL, MRtrix)", string("MITK"), true);
+    parser.addArgument("noFlip", "f", ctkCommandLineParser::Bool, "do not flip input image to match MITK coordinate convention");
+
+    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+    if (parsedArgs.size()==0)
+        return EXIT_FAILURE;
+
+
+    int shOrder = -1;
+    if (parsedArgs.count("shOrder"))
+        shOrder = us::any_cast<int>(parsedArgs["shOrder"]);
+
+    switch (shOrder)
+    {
+    case 4:
+        return Start<4>(argc, argv);
+    case 6:
+        return Start<6>(argc, argv);
+    case 8:
+        return Start<8>(argc, argv);
+    case 10:
+        return Start<10>(argc, argv);
+    case 12:
+        return Start<12>(argc, argv);
+    }
+    return EXIT_FAILURE;
 }
 RegisterFiberTrackingMiniApp(PeakExtraction);

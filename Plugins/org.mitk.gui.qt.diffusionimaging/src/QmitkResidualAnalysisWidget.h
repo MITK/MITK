@@ -21,20 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_mitk_gui_qt_diffusionimaging_Export.h>
 
-//#include "QmitkHistogram.h"
-#include "QmitkExtExports.h"
-#include "mitkImage.h"
-#include "mitkPlanarFigure.h"
-#include "itkVectorImage.h"
-
-
-//#include <itkHistogram.h>
-
-
-#include <QPainter>
-#include <qwt_plot_picker.h>
-
-
+class QwtPlotPicker;
 
 /**
  * \brief Widget for displaying boxplots

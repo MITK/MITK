@@ -43,7 +43,7 @@ endforeach()
      #${VTK_INCLUDE_DIRS}
 #    )
 
-foreach(d Utilities Utilities/ipPic Utilities/pic2vtk Utilities/tinyxml Utilities/mbilog)
+foreach(d Utilities Utilities/ipPic Utilities/mbilog)
   list(APPEND MITK_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/${d})
 endforeach()
 list(APPEND MITK_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/Utilities/mbilog)
@@ -53,7 +53,6 @@ if(WIN32)
 endif()
 
 # additional include dirs variables
-set(ANN_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ann/include)
 set(IPSEGMENTATION_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipSegmentation)
 
 # variables containing librariy names
@@ -77,7 +76,7 @@ set(VTK_FOR_MITK_LIBRARIES
     ${VTK_FREETYPE_LIBRARIES}
    )
 # TODO: maybe solve this with lib depends mechanism of CMake
-set(UTIL_FOR_MITK_LIBRARIES mitkIpPic mitkIpFunc mbilog)
+set(UTIL_FOR_MITK_LIBRARIES mbilog)
 set(LIBRARIES_FOR_MITK_CORE
     ${UTIL_FOR_MITK_LIBRARIES}
     ${VTK_FOR_MITK_LIBRARIES}
@@ -86,9 +85,6 @@ set(LIBRARIES_FOR_MITK_CORE
 set(MITK_LIBRARIES
     ${MITK_CORE_LIBRARIES}
     ${LIBRARIES_FOR_MITK_CORE}
-    pic2vtk
-    ipSegmentation
-    ann
    )
 
 # variables used in CMake macros which are called from external projects

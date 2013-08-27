@@ -70,6 +70,8 @@ int DiffusionIndices(int argc, char* argv[])
             gfaFilter->SetComputationMethod(GfaFilterType::GFA_STANDARD);
             gfaFilter->Update();
 
+            MITK_INFO << "Writing " << outFileName;
+
             itk::ImageFileWriter< itk::Image<float,3> >::Pointer fileWriter = itk::ImageFileWriter< itk::Image<float,3> >::New();
             fileWriter->SetInput(gfaFilter->GetOutput());
             fileWriter->SetFileName(outFileName);
@@ -109,6 +111,8 @@ int DiffusionIndices(int argc, char* argv[])
             }
 
             measurementsCalculator->Update();
+
+            MITK_INFO << "Writing " << outFileName;
 
             itk::ImageFileWriter< itk::Image<float,3> >::Pointer fileWriter = itk::ImageFileWriter< itk::Image<float,3> >::New();
             fileWriter->SetInput(measurementsCalculator->GetOutput());

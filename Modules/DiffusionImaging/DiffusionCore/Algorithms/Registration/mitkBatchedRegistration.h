@@ -26,7 +26,9 @@ public:
 
   typedef vnl_matrix_fixed<double,4,4> TransformType;
 
-  BatchedRegistration();
+  mitkClassMacro(BatchedRegistration, itk::LightObject)
+  itkNewMacro(Self)
+
 
   void SetFixedImage(Image::Pointer &fixedImage);
   void SetMovingReferenceImage(mitk::Image::Pointer& movingImage);
@@ -45,6 +47,8 @@ public:
   TransformType GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage);
 
 protected:
+  BatchedRegistration();
+  ~BatchedRegistration(){};
 
 private:
   BatchedRegistration(const Self &); //purposely not implemented

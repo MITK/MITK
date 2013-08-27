@@ -106,7 +106,6 @@ mitk::PyramidImageRegistrationMethod::TransformMatrixType mitk::PyramidImageRegi
     this->GetParameters( &affine_params[0] );
 
     transform->SetParameters( affine_params );
-
     base_transform = transform;
   }
   else

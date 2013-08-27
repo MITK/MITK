@@ -24,7 +24,7 @@ class DiffusionCore_EXPORT BatchedRegistration : public itk::LightObject
 {
 public:
 
-  typedef vnl_matrix<double> TransformType;
+  typedef vnl_matrix_fixed<double,4,4> TransformType;
 
   BatchedRegistration();
 

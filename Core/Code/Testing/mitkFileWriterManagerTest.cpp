@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkAbstractFileWriter.h>
 #include <mitkIFileWriter.h>
-#include <mitkFileWriterManager.h>
-#include <mitkFileReaderManager.h>
+#include <mitkFileWriterRegistry.h>
+#include <mitkFileReaderRegistry.h>
 #include <mitkBaseData.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkLegacyFileWriterService.h>
@@ -123,16 +123,16 @@ int mitkFileWriterManagerTest(int argc , char* argv[])
 {
   // always start with this!
   MITK_TEST_BEGIN("FileWriterManager");
- // mitk::FileWriterManager::Pointer frm = mitk::FileWriterManager::New();
- // MITK_TEST_CONDITION_REQUIRED(argc == 2,"Testing FileWriterManager instantiation");
 
+ // mitk::FileWriterRegistry::Pointer frm = mitk::FileWriterRegistry::New();
+ // MITK_TEST_CONDITION_REQUIRED(argc == 2,"Testing FileWriterRegistry instantiation");
   DummyWriter testDR("testdata", "test", 1);
   DummyWriter otherDR("testdata", "other", 1);
 
  // MITK_TEST_CONDITION_REQUIRED(testDR->CanWrite("/this/is/a/folder/file.test"),"Positive test of default CanRead() implementation");
  // MITK_TEST_CONDITION_REQUIRED(!testDR->CanWrite("/this/is/a/folder/file.tes"),"Negative test of default CanRead() implementation");
 
-  mitk::FileWriterManager* writerManager = new mitk::FileWriterManager;
+  mitk::FileWriterRegistry* writerManager = new mitk::FileWriterRegistry;
   mitk::IFileWriter* returned = writerManager->GetWriter("test");
 
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileWriter&>(testDR) != returned,"Testing correct retrieval of FileWriter 1/2");
@@ -204,19 +204,19 @@ int mitkFileWriterManagerTest(int argc , char* argv[])
   //// And now to verify a working read chain for a mps file:
   //mitk::PointSetWriter::Pointer psr = mitk::PointSetWriter::New();
   //mitk::BaseData::Pointer basedata;
-  //basedata = mitk::FileWriterManager::Read("F://Build//MITK-Data//pointSet.mps");
+  //basedata = mitk::FileWriterRegistry::Read("F://Build//MITK-Data//pointSet.mps");
   //MITK_TEST_CONDITION_REQUIRED(basedata.IsNotNull(), "Testing correct read of PointSet");
 
   //// Testing templated call to WriterManager
-  //mitk::PointSet::Pointer pointset = mitk::FileWriterManager::Read< mitk::PointSet >("F://Build//MITK-Data//pointSet.mps");
+  //mitk::PointSet::Pointer pointset = mitk::FileWriterRegistry::Read< mitk::PointSet >("F://Build//MITK-Data//pointSet.mps");
   //MITK_TEST_CONDITION_REQUIRED(pointset.IsNotNull(), "Testing templated call of Read()");
 
   //// And now for something completely different... (Debug)
   //mitk::LegacyFileWriterService::Pointer lfr = mitk::LegacyFileWriterService::New(".nrrd", "Nearly Raw Raster Data");
-  //returned = mitk::FileWriterManager::GetWriter(".nrrd");
+  //returned = mitk::FileWriterRegistry::GetWriter(".nrrd");
   //MITK_TEST_CONDITION_REQUIRED(lfr == returned, "Testing correct retrieval of specific FileWriter with Options: Low priority Writer with specific option");
 
-  //mitk::BaseData::Pointer image = mitk::FileWriterManager::Read("F://Build//MITK-Data//Pic2DplusT.nrrd");
+  //mitk::BaseData::Pointer image = mitk::FileWriterRegistry::Read("F://Build//MITK-Data//Pic2DplusT.nrrd");
   //MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "Testing whether BaseData is empty or not");
   //mitk::Image::Pointer image2 = dynamic_cast<mitk::Image*> (image.GetPointer());
   //MITK_TEST_CONDITION_REQUIRED(image2.IsNotNull(), "Testing if BaseData is an image");

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include "mitkAbstractFileReader.h"
 #include "mitkIFileReader.h"
-#include "mitkFileReaderManager.h"
+#include "mitkFileReaderRegistry.h"
 #include <mitkBaseData.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkLegacyFileReaderService.h>
@@ -124,8 +124,8 @@ int mitkFileReaderManagerTest(int /*argc*/ , char* /*argv*/[])
 {
   // always start with this!
   MITK_TEST_BEGIN("FileReaderManager");
-  // mitk::FileReaderManager::Pointer frm = mitk::FileReaderManager::New();
-  // MITK_TEST_CONDITION_REQUIRED(argc == 2,"Testing FileReaderManager instantiation");
+  // mitk::FileReaderRegistry::Pointer frm = mitk::FileReaderRegistry::New();
+  // MITK_TEST_CONDITION_REQUIRED(argc == 2,"Testing FileReaderRegistry instantiation");
 
   DummyReader testDR("test",1);
   DummyReader otherDR("other",1);
@@ -133,7 +133,7 @@ int mitkFileReaderManagerTest(int /*argc*/ , char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(testDR.CanRead("/this/is/a/folder/file.test"),"Positive test of default CanRead() implementation");
   MITK_TEST_CONDITION_REQUIRED(!testDR.CanRead("/this/is/a/folder/file.tes"),"Negative test of default CanRead() implementation");
 
-  mitk::FileReaderManager* readerManager = new mitk::FileReaderManager;
+  mitk::FileReaderRegistry* readerManager = new mitk::FileReaderRegistry;
   mitk::IFileReader* returned = readerManager->GetReader("test");
 
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileReader&>(testDR) != returned,"Testing correct retrieval of FileReader 1/2");
@@ -201,22 +201,22 @@ int mitkFileReaderManagerTest(int /*argc*/ , char* /*argv*/[])
   // And now to verify a working read chain for a mps file:
   //mitk::PointSetReader::Pointer psr = mitk::PointSetReader::New();
   //std::list<mitk::BaseData::Pointer> basedata;
-  //basedata = mitk::FileReaderManager::Read("F://Build//MITK-Data//pointSet.mps");
+  //basedata = mitk::FileReaderRegistry::Read("F://Build//MITK-Data//pointSet.mps");
   //MITK_TEST_CONDITION_REQUIRED(basedata.size() > 0, "Testing correct read of PointSet");
 
   // Need to instanciate the CoreObjectFactory, so legacy Readers are available
   mitk::CoreObjectFactory::GetInstance();
 
   // Testing templated call to ReaderManager
-  //mitk::PointSet::Pointer pointset = mitk::FileReaderManager::Read< mitk::PointSet >("F://Build//MITK-Data//pointSet.mps");
+  //mitk::PointSet::Pointer pointset = mitk::FileReaderRegistry::Read< mitk::PointSet >("F://Build//MITK-Data//pointSet.mps");
   //MITK_TEST_CONDITION_REQUIRED(pointset.IsNotNull(), "Testing templated call of Read()");
 
   // And now for something completely different... (Debug)
   // mitk::LegacyFileReaderService::Pointer lfr = mitk::LegacyFileReaderService::New(".nrrd", "Nearly Raw Raster Data");
-  //returned = mitk::FileReaderManager::GetReader(".nrrd");
+  //returned = mitk::FileReaderRegistry::GetReader(".nrrd");
   //MITK_TEST_CONDITION_REQUIRED(lfr == returned, "Testing correct retrieval of specific FileReader with Options: Low priority reader with specific option");
 
-  //std::list<mitk::BaseData::Pointer> image = mitk::FileReaderManager::Read("F://Build//MITK-Data//Pic2DplusT.nrrd");
+  //std::list<mitk::BaseData::Pointer> image = mitk::FileReaderRegistry::Read("F://Build//MITK-Data//Pic2DplusT.nrrd");
   //MITK_TEST_CONDITION_REQUIRED(image.size() > 0, "Testing whether image was returned or not");
   //mitk::Image::Pointer image2 = dynamic_cast<mitk::Image*> (image.front().GetPointer());
   //MITK_TEST_CONDITION_REQUIRED(image2.IsNotNull(), "Testing if BaseData is an image");

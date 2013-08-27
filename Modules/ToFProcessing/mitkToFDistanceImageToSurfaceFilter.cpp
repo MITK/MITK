@@ -229,7 +229,6 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
             vtkIdType xy_1V = m_VertexIdList->GetId(xy_1);
             vtkIdType x_1y_1V = m_VertexIdList->GetId(x_1y_1);
 
-
             if (isPointValid[xy]&&isPointValid[x_1y]&&isPointValid[x_1y_1]&&isPointValid[xy_1]) // check if points of cell are valid
             {
               double pointXY[3], pointX_1Y[3], pointXY_1[3], pointX_1Y_1[3];
@@ -239,10 +238,10 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
               points->GetPoint(xy_1V, pointXY_1);
               points->GetPoint(x_1y_1V, pointX_1Y_1);
 
-              if( (m_TriangulationThreshold == -1.0) || ((vtkMath::Distance2BetweenPoints(pointXY, pointX_1Y) <= m_TriangulationThreshold)
-                                                         && (vtkMath::Distance2BetweenPoints(pointXY, pointXY_1) <= m_TriangulationThreshold)
-                                                         && (vtkMath::Distance2BetweenPoints(pointX_1Y, pointX_1Y_1) <= m_TriangulationThreshold)
-                                                         && (vtkMath::Distance2BetweenPoints(pointXY_1, pointX_1Y_1) <= m_TriangulationThreshold)))
+              if( (mitk::Equal(m_TriangulationThreshold, 0.0)) || ((vtkMath::Distance2BetweenPoints(pointXY, pointX_1Y) <= m_TriangulationThreshold)
+                                                                   && (vtkMath::Distance2BetweenPoints(pointXY, pointXY_1) <= m_TriangulationThreshold)
+                                                                   && (vtkMath::Distance2BetweenPoints(pointX_1Y, pointX_1Y_1) <= m_TriangulationThreshold)
+                                                                   && (vtkMath::Distance2BetweenPoints(pointXY_1, pointX_1Y_1) <= m_TriangulationThreshold)))
               {
                 polys->InsertNextCell(3);
                 polys->InsertCellPoint(x_1yV);
@@ -261,38 +260,40 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
                 vertices->InsertCellPoint(xyV);
               }
             }
+
+            //Scalar values are necessary for mapping colors/texture onto the surface
+            if (scalarFloatData)
+            {
+              scalarArray->InsertTuple1(m_VertexIdList->GetId(pixelID), scalarFloatData[pixelID]);
+            }
+            //These Texture Coordinates will map color pixel and vertices 1:1 (e.g. for Kinect).
+            float xNorm = (((float)i)/xDimension);// correct video texture scale for kinect
+            float yNorm = ((float)j)/yDimension; //don't flip. we don't need to flip.
+            textureCoords->InsertTuple2(m_VertexIdList->GetId(pixelID), xNorm, yNorm);
           }
-          else
-          {
-            vertices->InsertNextCell(1);
-            vertices->InsertCellPoint(m_VertexIdList->GetId(pixelID));
-          }
-          //Scalar values are necessary for mapping colors/texture onto the surface
-          if (scalarFloatData)
-          {
-            scalarArray->InsertTuple1(m_VertexIdList->GetId(pixelID), scalarFloatData[pixelID]);
-          }
-          //These Texture Coordinates will map color pixel and vertices 1:1 (e.g. for Kinect).
-          float xNorm = (((float)i)/xDimension);// correct video texture scale for kinect
-          float yNorm = ((float)j)/yDimension; //don't flip. we don't need to flip.
-          textureCoords->InsertTuple2(m_VertexIdList->GetId(pixelID), xNorm, yNorm);
+        }
+        else
+        {
+          //We dont want triangulation, we only want vertices
+          vertices->InsertNextCell(1);
+          vertices->InsertCellPoint(m_VertexIdList->GetId(pixelID));
         }
       }
     }
-
-    vtkSmartPointer<vtkPolyData> mesh = vtkSmartPointer<vtkPolyData>::New();
-    mesh->SetPoints(points);
-    mesh->SetPolys(polys);
-    mesh->SetVerts(vertices);
-    //Pass the scalars to the polydata (if they were set).
-    if (scalarArray->GetNumberOfTuples()>0)
-    {
-      mesh->GetPointData()->SetScalars(scalarArray);
-    }
-    //Pass the TextureCoords to the polydata anyway (to save them).
-    mesh->GetPointData()->SetTCoords(textureCoords);
-    output->SetVtkPolyData(mesh);
   }
+
+  vtkSmartPointer<vtkPolyData> mesh = vtkSmartPointer<vtkPolyData>::New();
+  mesh->SetPoints(points);
+  mesh->SetPolys(polys);
+  mesh->SetVerts(vertices);
+  //Pass the scalars to the polydata (if they were set).
+  if (scalarArray->GetNumberOfTuples()>0)
+  {
+    mesh->GetPointData()->SetScalars(scalarArray);
+  }
+  //Pass the TextureCoords to the polydata anyway (to save them).
+  mesh->GetPointData()->SetTCoords(textureCoords);
+  output->SetVtkPolyData(mesh);
 }
 
 void mitk::ToFDistanceImageToSurfaceFilter::CreateOutputsForAllInputs()

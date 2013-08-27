@@ -117,7 +117,7 @@ namespace mitk
         else if(ext == ".fsl" || ext == ".fslgz")
         {
           // create temporary file with correct ending for nifti-io
-          std::string fname3 = m_FileName;
+          std::string fname3 = "temp_dwi";
           fname3 += ext == ".fsl" ? ".nii" : ".nii.gz";
           itksys::SystemTools::CopyAFile(m_FileName.c_str(), fname3.c_str());
 

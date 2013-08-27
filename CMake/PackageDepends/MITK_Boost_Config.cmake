@@ -10,8 +10,9 @@ if(MITK_USE_Boost)
 
   if(MITK_USE_Boost_LIBRARIES)
     if(NOT MITK_USE_SYSTEM_Boost)
-      set(BOOST_INCLUDEDIR ${CMAKE_BINARY_DIR}/../Boost-install/include/boost-1_54)
+      set(BOOST_INCLUDEDIR ${CMAKE_BINARY_DIR}/../Boost-install/include)
       set(BOOST_LIBRARYDIR ${CMAKE_BINARY_DIR}/../Boost-install/lib)
+      set(Boost_ADDITIONAL_VERSIONS 1.54)
       # Following line is temporary, see bug #15837.
       set(Boost_DEBUG TRUE)
     endif()

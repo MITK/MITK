@@ -112,9 +112,9 @@ namespace mitk {
     *
     * Options are strings that are treated as flags when passed to the read method.
     */
-    virtual std::list< mitk::IFileWriter::FileServiceOption > GetOptions() const;
+    virtual OptionList GetOptions() const;
 
-    virtual void SetOptions(std::list< mitk::IFileWriter::FileServiceOption > options);
+    virtual void SetOptions(const OptionList& options);
 
     /**
     * \brief Return true if this writer can confirm that it can read this file and false otherwise.
@@ -145,7 +145,7 @@ namespace mitk {
     std::string m_BasedataType;
     std::string m_Description;
     int m_Priority;
-    std::list< mitk::IFileWriter::FileServiceOption > m_Options; // Options supported by this Writer. Can be left emtpy if no special options are required
+    OptionList m_Options; // Options supported by this Writer. Can be left emtpy if no special options are required
 
     virtual us::ServiceProperties GetServiceProperties();
 

@@ -107,7 +107,7 @@ us::ServiceProperties mitk::AbstractFileReader::GetServiceProperties()
   result[mitk::IFileReader::PROP_DESCRIPTION]    = m_Description;
   result[us::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
 
-  for (std::list< mitk::IFileReader::FileServiceOption  >::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it) {
+  for (mitk::IFileReader::OptionList::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it) {
     if (it->second)
       result[it->first] = std::string("true");
     else result[it->first] = std::string("false");
@@ -117,12 +117,12 @@ us::ServiceProperties mitk::AbstractFileReader::GetServiceProperties()
 
 //////////////////////// Options ///////////////////////
 
-std::list< mitk::IFileReader::FileServiceOption > mitk::AbstractFileReader::GetOptions() const
+mitk::IFileReader::OptionList mitk::AbstractFileReader::GetOptions() const
 {
   return m_Options;
 }
 
-void mitk::AbstractFileReader::SetOptions(std::list< mitk::IFileReader::FileServiceOption > options)
+void mitk::AbstractFileReader::SetOptions(const mitk::IFileReader::OptionList& options)
 {
   if (options.size() != m_Options.size()) MITK_WARN << "Number of set Options differs from Number of available Options, which is a sign of false usage. Please consult documentation";
   m_Options = options;

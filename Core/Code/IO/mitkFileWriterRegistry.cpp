@@ -123,20 +123,20 @@ std::string mitk::FileWriterRegistry::GetSupportedWriters(const std::string& bas
 
 //////////////////// INTERNAL CODE ////////////////////
 
-bool mitk::FileWriterRegistry::WriterSupportsOptions(mitk::IFileWriter* writer, const std::list<std::string>& options )
+bool mitk::FileWriterRegistry::WriterSupportsOptions(mitk::IFileWriter* writer, const mitk::IFileWriter::OptionNames& options )
 {
-  const std::list< mitk::IFileWriter::FileServiceOption > writerOptions = writer->GetOptions();
+  const mitk::IFileWriter::OptionList writerOptions = writer->GetOptions();
   if (options.empty()) return true;         // if no options were requested, return true unconditionally
   if (writerOptions.empty()) return false;  // if options were requested and reader supports no options, return false
 
   // For each of the strings in requested options, check if option is available in reader
-  for(std::list< std::string >::const_iterator options_i = options.begin(), i_end = options.end(); options_i != i_end; ++options_i)
+  for(mitk::IFileWriter::OptionNames::const_iterator options_i = options.begin(), i_end = options.end(); options_i != i_end; ++options_i)
   {
     {
       bool optionFound = false;
       // Iterate over each available option from reader to check if one of them matches the current option
-      for(std::list<mitk::IFileReader::FileServiceOption>::const_iterator options_j = writerOptions.begin(), j_end = writerOptions.end();
-        options_j != j_end; ++options_j)
+      for(mitk::IFileWriter::OptionList::const_iterator options_j = writerOptions.begin(), j_end = writerOptions.end();
+          options_j != j_end; ++options_j)
       {
         if ( *options_i == options_j->first ) optionFound = true;
       }

@@ -102,14 +102,18 @@ std::vector <mitk::IFileReader*> mitk::FileReaderRegistry::GetReaders(const std:
   return result;
 }
 
-mitk::IFileReader* mitk::FileReaderRegistry::GetReader(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context )
+mitk::IFileReader* mitk::FileReaderRegistry::GetReader(
+    const std::string& extension, const mitk::IFileReader::OptionNames& options,
+    us::ModuleContext* context )
 {
   std::vector <mitk::IFileReader*> matching = mitk::FileReaderRegistry::GetReaders(extension, options, context);
   if (matching.empty()) return NULL;
   return matching.front();
 }
 
-std::vector <mitk::IFileReader*> mitk::FileReaderRegistry::GetReaders(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context )
+std::vector <mitk::IFileReader*> mitk::FileReaderRegistry::GetReaders(
+    const std::string& extension, const mitk::IFileReader::OptionNames& options,
+    us::ModuleContext* context )
 {
   const std::vector <mitk::IFileReader*> allReaders = mitk::FileReaderRegistry::GetReaders(extension, context);
   std::vector <mitk::IFileReader*> result;
@@ -182,19 +186,20 @@ std::string mitk::FileReaderRegistry::GetSupportedExtensions(const std::string& 
 
 //////////////////// INTERNAL CODE ////////////////////
 
-bool mitk::FileReaderRegistry::ReaderSupportsOptions(mitk::IFileReader* reader, const std::list<std::string>& options )
+bool mitk::FileReaderRegistry::ReaderSupportsOptions(mitk::IFileReader* reader,
+                                                     const mitk::IFileReader::OptionNames& options )
 {
-  const std::list< mitk::IFileReader::FileServiceOption > readerOptions = reader->GetOptions();
+  const mitk::IFileReader::OptionList readerOptions = reader->GetOptions();
   if (options.empty()) return true;         // if no options were requested, return true unconditionally
   if (readerOptions.empty()) return false;  // if options were requested and reader supports no options, return false
 
   // For each of the strings in requested options, check if option is available in reader
-  for(std::list< std::string >::const_iterator options_i = options.begin(), i_end = options.end(); options_i != i_end; ++options_i)
+  for(mitk::IFileReader::OptionNames::const_iterator options_i = options.begin(), i_end = options.end(); options_i != i_end; ++options_i)
   {
     {
       bool optionFound = false;
       // Iterate over each available option from reader to check if one of them matches the current option
-      for(std::list<mitk::IFileReader::FileServiceOption>::const_iterator options_j = readerOptions.begin(), j_end = readerOptions.end();
+      for(mitk::IFileReader::OptionList::const_iterator options_j = readerOptions.begin(), j_end = readerOptions.end();
         options_j != j_end; ++options_j)
       {
         if ( *options_i == options_j->first ) optionFound = true;

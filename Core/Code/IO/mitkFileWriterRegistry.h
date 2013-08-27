@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usServiceObjects.h>
 
+#include "mitkIFileWriter.h"
+
 // Temporarily disable warning until PIMPL pattern is implemented here
 #ifdef _MSC_VER
 # pragma warning(push)
@@ -32,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
   class BaseData;
-  struct IFileWriter;
 }
 
 namespace mitk {
@@ -79,7 +80,7 @@ namespace mitk {
 
     std::string CreateFileDialogString(const std::vector<us::ServiceReference<IFileWriter> >& refs);
 
-    bool WriterSupportsOptions(mitk::IFileWriter* writer, const std::list<std::string>& options);
+    bool WriterSupportsOptions(mitk::IFileWriter* writer, const mitk::IFileWriter::OptionNames& options);
 
   private:
 

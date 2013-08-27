@@ -46,6 +46,8 @@ namespace mitk {
     virtual ~IFileWriter();
 
     typedef std::pair<std::string, bool> FileServiceOption;
+    typedef std::vector<FileServiceOption> OptionList;
+    typedef std::vector<std::string> OptionNames;
 
     virtual void Write(const BaseData* data, const std::string& path ) = 0;
 
@@ -69,9 +71,9 @@ namespace mitk {
     *
     * Options are strings that are treated as flags when passed to the write method.
     */
-    virtual std::list< mitk::IFileWriter::FileServiceOption > GetOptions() const = 0;
+    virtual OptionList GetOptions() const = 0;
 
-    virtual void SetOptions(std::list< mitk::IFileWriter::FileServiceOption > options) = 0;
+    virtual void SetOptions(const OptionList& options) = 0;
 
     /**
     * \brief Returns true if this reader can confirm that it can write \c data and false otherwise.

@@ -21,14 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include <mitkBaseData.h>
 
+#include <mitkIFileReader.h>
+
 // Microservices
 #include <usServiceReference.h>
 #include <usGetModuleContext.h>
 #include <usServiceObjects.h>
 
-namespace mitk {
-  struct IFileReader;
-}
 
 namespace mitk {
 
@@ -78,11 +77,11 @@ public:
     **/
     mitk::IFileReader* GetReader(const std::string& extension, us::ModuleContext* context = us::GetModuleContext() );
 
-    mitk::IFileReader* GetReader(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context = us::GetModuleContext() );
+    mitk::IFileReader* GetReader(const std::string& extension, const mitk::IFileReader::OptionNames& options, us::ModuleContext* context = us::GetModuleContext() );
 
     std::vector <mitk::IFileReader*> GetReaders(const std::string& extension, us::ModuleContext* context = us::GetModuleContext() );
 
-    std::vector <mitk::IFileReader*> GetReaders(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context = us::GetModuleContext() );
+    std::vector <mitk::IFileReader*> GetReaders(const std::string& extension, const mitk::IFileReader::OptionNames& options, us::ModuleContext* context = us::GetModuleContext() );
 
     void UngetReader(mitk::IFileReader* reader);
     void UngetReaders(const std::vector<mitk::IFileReader*>& readers);
@@ -93,7 +92,7 @@ protected:
 
     std::vector< us::ServiceReference<IFileReader> > GetReaderList(const std::string& extension, us::ModuleContext* context);
 
-    bool ReaderSupportsOptions(mitk::IFileReader* reader, const std::list<std::string>& options);
+    bool ReaderSupportsOptions(mitk::IFileReader* reader, const mitk::IFileReader::OptionNames& options);
 
 private:
 

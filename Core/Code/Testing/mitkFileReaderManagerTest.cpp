@@ -56,12 +56,6 @@ public:
     return result;
   }
 
-  virtual void SetOptions(const std::list< mitk::FileServiceOption >& options )
-  {
-    m_Options = options;
-    //m_Registration.SetProperties(ConstructServiceProperties());
-  }
-
 private:
 
   DummyReader* Clone() const
@@ -99,12 +93,6 @@ public:
   {
     std::list<mitk::BaseData::Pointer> result;
     return result;
-  }
-
-  virtual void SetOptions(const std::list< mitk::FileServiceOption >& options )
-  {
-    m_Options = options;
-    //m_Registration.SetProperties(ConstructServiceProperties());
   }
 
 private:
@@ -151,32 +139,32 @@ int mitkFileReaderManagerTest(int /*argc*/ , char* /*argv*/[])
 
   // Now to give those readers some options, then we will try again
 
-  std::list< mitk::FileServiceOption > options;
-  options.push_front(std::make_pair("isANiceGuy", true));
+  mitk::IFileReader::OptionList options;
+  options.push_back(std::make_pair("isANiceGuy", true));
   mediocreTestDR.SetOptions(options);
   options.clear();
-  options.push_front(std::make_pair("canFly", true));
+  options.push_back(std::make_pair("canFly", true));
   prettyFlyTestDR.SetOptions(options);
-  options.push_front(std::make_pair("isAwesome", true));
+  options.push_back(std::make_pair("isAwesome", true));
   awesomeTestDR.SetOptions(options); //note: awesomeReader canFly and isAwesome
 
   // Reset Options, use to define what we want the reader to do
   options.clear();
-  std::list<std::string> optionsFilter;
-  optionsFilter.push_front("canFly");
+  mitk::IFileReader::OptionNames optionsFilter;
+  optionsFilter.push_back("canFly");
   returned = readerManager->GetReader("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileReader&>(awesomeTestDR) != returned, "Testing correct retrieval of FileReader with Options: Best reader with options");
 
-  optionsFilter.push_front("isAwesome");
+  optionsFilter.push_back("isAwesome");
   returned = readerManager->GetReader("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileReader&>(awesomeTestDR) != returned, "Testing correct retrieval of FileReader with multiple Options: Best reader with options");
 
   optionsFilter.clear();
-  optionsFilter.push_front("isANiceGuy");
+  optionsFilter.push_back("isANiceGuy");
   returned = readerManager->GetReader("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileReader&>(mediocreTestDR) != returned, "Testing correct retrieval of specific FileReader with Options: Low priority reader with specific option");
 
-  optionsFilter.push_front("canFly");
+  optionsFilter.push_back("canFly");
   returned = readerManager->GetReader("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returned == NULL, "Testing correct return of 0 value when no matching reader was found");
 

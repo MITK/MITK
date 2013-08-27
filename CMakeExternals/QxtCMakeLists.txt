@@ -239,8 +239,6 @@ set(QXT_GUI_SOURCES
   # !qws:!symbian
   qxtapplication.cpp
   qxtglobalshortcut.cpp
-  qxtscreen.cpp
-  qxtwindowsystem.cpp
 )
 
 set(QXT_NETWORK_SOURCES
@@ -277,13 +275,16 @@ if(UNIX)
        qxtfilelock_unix.cpp qxtserialdevice.cpp qxtserialdevice_unix.cpp)
   if(APPLE)
     list(APPEND QXT_GUI_SOURCES
-         qxtapplication_mac.cpp qxtglobalshortcut_mac.cpp
-         qxtscreen.cpp qxtwindowsystem.cpp)
+         qxtapplication_mac.cpp qxtglobalshortcut_mac.cpp)
   else()
     list(APPEND QXT_GUI_SOURCES
          qxtapplication_x11.cpp qxtglobalshortcut_x11.cpp
          qxtscreen_x11.cpp qxtwindowsystem_x11.cpp)
   endif()
+endif()
+
+if(NOT APPLE)
+  list(APPEND QXT_GUI_SOURCES qxtscreen.cpp qxtwindowsystem.cpp)
 endif()
 
 if(WIN32)

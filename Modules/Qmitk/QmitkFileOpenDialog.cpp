@@ -39,6 +39,7 @@ const std::string QmitkFileOpenDialog::VIEW_ID = "org.mitk.views.QmitkFileOpenDi
 
 QmitkFileOpenDialog::QmitkFileOpenDialog(QWidget* parent, Qt::WindowFlags f): QmitkFileDialog(parent, f)
 {
+  this->setFileMode(QFileDialog::ExistingFiles);
 }
 
 QmitkFileOpenDialog::~QmitkFileOpenDialog()
@@ -47,16 +48,22 @@ QmitkFileOpenDialog::~QmitkFileOpenDialog()
 
 void QmitkFileOpenDialog::ProcessSelectedFile()
 {
-  std::string file = this->selectedFiles().front().toStdString();
-  std::string extension = file;
-  extension.erase(0, extension.find_last_of('.'));
+  QStringList files = this->selectedFiles();
+  while( files.size() > 0)
+  {
+    std::string file = files.front().toStdString();
+    files.pop_front();
+    std::string extension = file;
+    extension.erase(0, extension.find_last_of('.'));
 
-  m_Options = GetSelectedOptions();
-  // We are not looking for specific options here, which is okay, since the dialog currently only shows the
-  // reader with the highest priority. Better behaviour required, if we want selectable readers.
+    m_Options = GetSelectedOptions();
+    // We are not looking for specific options here, which is okay, since the dialog currently only shows the
+    // reader with the highest priority. Better behaviour required, if we want selectable readers.
 
-  m_FileReader = m_FileReaderRegistry.GetReader(extension);
-  m_FileReader->SetOptions(m_Options);
+    mitk::IFileReader* fileReader = m_FileReaderRegistry.GetReader(extension);
+    fileReader->SetOptions(m_Options);
+    m_FileReaders.push_back(fileReader);
+  }
 }
 
 std::list<mitk::IFileReader::FileServiceOption> QmitkFileOpenDialog::QueryAvailableOptions(std::string path)
@@ -77,18 +84,27 @@ std::list<mitk::IFileReader::FileServiceOption> QmitkFileOpenDialog::QueryAvaila
   return reader->GetOptions();
 }
 
-mitk::IFileReader* QmitkFileOpenDialog::GetReader()
+std::list<mitk::IFileReader*> QmitkFileOpenDialog::GetReaders()
 {
-  return this->m_FileReader;
+  return this->m_FileReaders;
 }
 
-std::list< mitk::BaseData::Pointer > QmitkFileOpenDialog::GetBaseData()
+std::list< mitk::BaseData::Pointer > QmitkFileOpenDialog::GetBaseDatas()
 {
-  if (m_FileReader == NULL )
-  {
-    MITK_WARN << "Tried go get BaseData while no FileReader was selected in Dialog. Returning empty list.";
-    std::list< mitk::BaseData::Pointer > emptyList;
-    return  emptyList;
-  }
-  return m_FileReader->Read(this->selectedFiles().front().toStdString());
+  //if (m_FileReaders.size() == 0 )
+  //{
+  //  MITK_WARN << "Tried go get BaseData while no FileReader was selected in Dialog. Returning empty list.";
+  //  std::list< mitk::BaseData::Pointer > emptyList;
+  //  return  emptyList;
+  //}
+
+  //std::list<mitk::BaseData::Pointer> result;
+  //for(std::list< mitk::IFileReader* >::iterator reader = m_FileReaders.begin(); reader != m_FileReaders.end; reader++)
+  //{
+  //  result.splice(result.end(), m_FileReaders.)
+  //  result.pu
+  //}
+  //return m_FileReader->Read(this->selectedFiles().front().toStdString());
+  std::list< mitk::BaseData::Pointer > emptyList;
+  return  emptyList;
 }

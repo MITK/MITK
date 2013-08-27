@@ -62,9 +62,9 @@ public:
   QmitkFileOpenDialog(QWidget* p = 0, Qt::WindowFlags f1 = 0);
   virtual ~QmitkFileOpenDialog();
 
-  virtual mitk::IFileReader* GetReader();
+  virtual std::list <mitk::IFileReader*> GetReaders();
 
-  virtual std::list< mitk::BaseData::Pointer > GetBaseData();
+  virtual std::list< mitk::BaseData::Pointer > GetBaseDatas();
 
 signals:
 
@@ -76,7 +76,7 @@ signals:
 
 protected:
 
-  mitk::IFileReader* m_FileReader;
+  std::list<mitk::IFileReader*> m_FileReaders;
   std::list <mitk::IFileReader::FileServiceOption> m_Options;
   mitk::FileReaderRegistry m_FileReaderRegistry;
 

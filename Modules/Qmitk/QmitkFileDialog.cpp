@@ -106,7 +106,6 @@ const std::string QmitkFileDialog::VIEW_ID = "org.mitk.views.QmitkFileDialog";
 QmitkFileDialog::QmitkFileDialog(QWidget* parent, Qt::WindowFlags f): QFileDialog(parent, f)
 {
   this->setOption(QFileDialog::DontUseNativeDialog);
-  this->setFileMode(QFileDialog::ExistingFile);
 
   DummyReader* dr = new DummyReader(".xsfd", 1000);
 

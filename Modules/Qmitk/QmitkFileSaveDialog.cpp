@@ -108,6 +108,7 @@ const std::string QmitkFileSaveDialog::VIEW_ID = "org.mitk.views.QmitkFileSaveDi
 QmitkFileSaveDialog::QmitkFileSaveDialog(mitk::BaseData::Pointer baseData, QWidget* parent, Qt::WindowFlags f): QmitkFileDialog(parent, f)
 {
   m_BaseData = baseData;
+  this->setFileMode(QFileDialog::AnyFile);
 }
 
 QmitkFileSaveDialog::~QmitkFileSaveDialog()

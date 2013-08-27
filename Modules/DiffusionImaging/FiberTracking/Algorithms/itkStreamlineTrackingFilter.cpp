@@ -185,6 +185,8 @@ TPDPixelType>
     if (m_MinCurvatureRadius<0.0)
         m_MinCurvatureRadius = 0.5*minSpacing;
 
+    m_PointPistance = 0;
+
     std::cout << "StreamlineTrackingFilter: Min. curvature radius: " << m_MinCurvatureRadius << std::endl;
     std::cout << "StreamlineTrackingFilter: FA threshold: " << m_FaThreshold << std::endl;
     std::cout << "StreamlineTrackingFilter: stepsize: " << m_StepSize << " mm" << std::endl;

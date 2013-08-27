@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkToolWorkingDataSelectionBox.h"
-
+#include "mitkToolManagerProvider.h"
 
 QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget* parent, mitk::DataStorage* storage)
 :QListWidget(parent),
@@ -24,7 +24,7 @@ m_LastSelectedReferenceData(NULL),
 m_ToolGroupsForFiltering("default"),
 m_DisplayOnlyDerivedNodes(true)
 {
-  m_ToolManager = mitk::ToolManager::New( storage ); // this widget should be placeable from designer so it can't take other than the defaul parameters
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(); // this widget should be placeable from designer so it can't take other than the defaul parameters
 
   QListWidget::setSelectionMode( QListWidget::MultiSelection );
   QListWidget::setDragDropMode(QListWidget::InternalMove);

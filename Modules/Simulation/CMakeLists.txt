@@ -1,5 +1,6 @@
 if(MITK_USE_SOFA)
   MITK_CREATE_MODULE(Simulation
+    DEPENDS Mitk
     PACKAGE_DEPENDS Boost SOFA
   )
 

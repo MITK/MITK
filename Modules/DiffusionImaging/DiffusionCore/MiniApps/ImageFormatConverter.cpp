@@ -46,13 +46,13 @@ int ImageFormatConverter(int argc, char* argv[])
     {
         RegisterDiffusionCoreObjectFactory();
 
-        MITK_INFO << "Loading image ...";
+        MITK_INFO << "Loading image " << imageName;
         const std::string s1="", s2="";
         std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( imageName, s1, s2, false );
 
-        MITK_INFO << "Writing " << outImage;
         if ( dynamic_cast<DiffusionImage<short>*>(infile.at(0).GetPointer()) )
         {
+            MITK_INFO << "Writing " << outImage;
             DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(infile.at(0).GetPointer());
             NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
             writer->SetFileName(outImage);

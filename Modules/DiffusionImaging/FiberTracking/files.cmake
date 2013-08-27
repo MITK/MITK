@@ -9,6 +9,7 @@ set(CPP_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.cpp
+  IODataStructures/FiberBundleX/mitkTrackvis.cpp
 #  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.cpp
 
   # DataStructures -> PlanarFigureComposite
@@ -53,6 +54,7 @@ set(H_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.h
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
 #  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.h
+  IODataStructures/FiberBundleX/mitkTrackvis.h
 
   IODataStructures/mitkFiberTrackingObjectFactory.h
 

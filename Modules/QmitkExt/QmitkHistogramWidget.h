@@ -17,19 +17,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKHistogramWidget_H_
 #define QMITKHistogramWidget_H_
 
-#include <qlayout.h>
 #include "QmitkExtExports.h"
-#include <qtextedit.h>
-#include <qdialog.h>
-#include <qwt_plot.h>
-#include <qwt_plot_marker.h>
-#include <qwt_plot_zoomer.h>
-#include <qwt_plot_picker.h>
 
-#include "QmitkHistogram.h"
+#include <QDialog>
+
 #include "mitkImage.h"
 
-#include <itkHistogram.h>
+class QTextEdit;
+
+class QwtPlot;
+class QwtPlotMarker;
+class QwtPlotPicker;
+class QwtPlotZoomer;
+
+class QmitkHistogram;
+
 
 /**
  \brief Shows a histogram in a Qwt_Plot and a report (selectable) in a QTextEdit
@@ -63,7 +65,7 @@ public:
 
 protected slots:
 
-  void OnSelect( const QwtDoublePoint &pos );
+  void OnSelect( const QPointF &pos );
 
 protected:
 

@@ -55,28 +55,37 @@ namespace mitk {
 
     void Write(const mitk::BaseData* data, const std::string& path, us::ModuleContext* context = us::GetModuleContext());
 
+    void Write(const mitk::BaseData* data, std::ostream& os, us::ModuleContext* context = us::GetModuleContext());
+
     /**
     * Returns a compatible Writer to the given file extension
     */
-    mitk::IFileWriter* GetWriter(const std::string& extension, us::ModuleContext* context = us::GetModuleContext() );
+    mitk::IFileWriter* GetWriter(const std::string& baseDataType, const std::string& extension = std::string(),
+                                 const mitk::IFileWriter::OptionNames& options = mitk::IFileWriter::OptionNames(),
+                                 us::ModuleContext* context = us::GetModuleContext() );
 
-    mitk::IFileWriter* GetWriter(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context = us::GetModuleContext() );
+    mitk::IFileWriter* GetWriter(const mitk::BaseData* baseData, const std::string& extension = std::string(),
+                                 const mitk::IFileWriter::OptionNames& options = mitk::IFileWriter::OptionNames(),
+                                 us::ModuleContext* context = us::GetModuleContext() );
 
-    std::vector <mitk::IFileWriter*> GetWriters(const std::string& extension, us::ModuleContext* context = us::GetModuleContext() );
+    std::vector<mitk::IFileWriter*> GetWriters(const std::string& baseDataType, const std::string& extension = std::string(),
+                                               const mitk::IFileWriter::OptionNames& options = mitk::IFileWriter::OptionNames(),
+                                               us::ModuleContext* context = us::GetModuleContext() );
 
-    std::vector <mitk::IFileWriter*> GetWriters(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context = us::GetModuleContext() );
+    std::vector<mitk::IFileWriter*> GetWriters(const mitk::BaseData* baseData, const std::string& extension = std::string(),
+                                               const mitk::IFileWriter::OptionNames& options = mitk::IFileWriter::OptionNames(),
+                                               us::ModuleContext* context = us::GetModuleContext() );
 
     void UngetWriter(mitk::IFileWriter* writer);
     void UngetWriters(const std::vector<mitk::IFileWriter*>& writers);
 
+    // TODO: We should not generate GUI dependent strings here. Maybe just return a pair of extensions
+    //       and descriptions.
     std::string GetSupportedExtensions(const std::string& extension = std::string(), us::ModuleContext* context = us::GetModuleContext());
 
     std::string GetSupportedWriters(const std::string& basedataType, us::ModuleContext* context = us::GetModuleContext());
 
   protected:
-
-    std::vector< us::ServiceReference<IFileWriter> > GetWriterList(const std::string& extension, us::ModuleContext* context);
-    std::vector< us::ServiceReference<IFileWriter> > GetWriterListByBasedataType(const std::string& basedataType, us::ModuleContext* context);
 
     std::string CreateFileDialogString(const std::vector<us::ServiceReference<IFileWriter> >& refs);
 

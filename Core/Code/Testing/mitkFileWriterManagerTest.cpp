@@ -133,11 +133,11 @@ int mitkFileWriterManagerTest(int argc , char* argv[])
  // MITK_TEST_CONDITION_REQUIRED(!testDR->CanWrite("/this/is/a/folder/file.tes"),"Negative test of default CanRead() implementation");
 
   mitk::FileWriterRegistry* writerManager = new mitk::FileWriterRegistry;
-  mitk::IFileWriter* returned = writerManager->GetWriter("test");
+  mitk::IFileWriter* returned = writerManager->GetWriter("", "test");
 
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileWriter&>(testDR) != returned,"Testing correct retrieval of FileWriter 1/2");
 
-  returned = writerManager->GetWriter("other");
+  returned = writerManager->GetWriter("", "other");
 
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileWriter&>(otherDR) != returned,"Testing correct retrieval of FileWriter 2/2");
 
@@ -161,37 +161,37 @@ int mitkFileWriterManagerTest(int argc , char* argv[])
   // Reset Options, use to define what we want the Writer to do
   mitk::IFileWriter::OptionNames optionFilter;
   optionFilter.push_back("canFly");
-  returned = writerManager->GetWriter("test", options);
+  returned = writerManager->GetWriter("", "test", optionFilter);
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileWriter&>(awesomeTestDR) != returned, "Testing correct retrieval of FileWriter with Options: Best Writer with options");
 
   optionFilter.push_back("isAwesome");
-  returned = writerManager->GetWriter("test", options);
+  returned = writerManager->GetWriter("", "test", optionFilter);
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileWriter&>(awesomeTestDR) != returned, "Testing correct retrieval of FileWriter with multiple Options: Best Writer with options");
 
   optionFilter.clear();
   optionFilter.push_back("isANiceGuy");
-  returned = writerManager->GetWriter("test", options);
+  returned = writerManager->GetWriter("", "test", optionFilter);
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileWriter&>(mediocreTestDR) != returned, "Testing correct retrieval of specific FileWriter with Options: Low priority Writer with specific option");
 
   optionFilter.push_back("canFly");
-  returned = writerManager->GetWriter("test", options);
+  returned = writerManager->GetWriter("", "test", optionFilter);
   MITK_TEST_CONDITION_REQUIRED(returned == NULL, "Testing correct return of 0 value when no matching Writer was found");
 
   // Onward to test the retrieval of multiple Writers
 
   std::vector< mitk::IFileWriter* > returnedList;
-  returnedList = writerManager->GetWriters("test", options);
+  returnedList = writerManager->GetWriters("", "test", optionFilter);
   MITK_TEST_CONDITION_REQUIRED(returnedList.empty(), "Testing correct return of zero Writers when no matching Writer was found, asking for all compatibles");
 
   optionFilter.clear();
   optionFilter.push_back("canFly");
-  returnedList = writerManager->GetWriters("test", options);
+  returnedList = writerManager->GetWriters("", "test", optionFilter);
   MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 2, "Testing correct return of two Writers when two matching Writer was found, asking for all compatibles");
   MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyWriter2*>(returnedList.front()), "Testing correct priorization of returned Writers with options 1/2");
 
   optionFilter.clear();
   optionFilter.push_back("isAwesome");
-  returnedList = writerManager->GetWriters("test", options);
+  returnedList = writerManager->GetWriters("", "test", optionFilter);
   MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 1, "Testing correct return of one Writers when one matching Writer was found, asking for all compatibles");
   MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyWriter2*>(returnedList.front()), "Testing correctness of result from former query");
 

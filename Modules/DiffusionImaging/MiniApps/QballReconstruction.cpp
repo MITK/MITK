@@ -212,4 +212,4 @@ int QballReconstruction(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-RegisterDiffusionCoreMiniApp(QballReconstruction);
+RegisterDiffusionMiniApp(QballReconstruction);

@@ -97,4 +97,4 @@ int TensorReconstruction(int argc, char* argv[])
     return EXIT_SUCCESS;
 
 }
-RegisterDiffusionCoreMiniApp(TensorReconstruction);
+RegisterDiffusionMiniApp(TensorReconstruction);

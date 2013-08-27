@@ -15,4 +15,3 @@ MITK_CREATE_MODULE( DiffusionCore
 )
 
 add_subdirectory(Testing)
-add_subdirectory(MiniApps)

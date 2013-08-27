@@ -90,4 +90,4 @@ int CopyGeometry(int argc, char* argv[])
     MITK_INFO << "DONE";
     return EXIT_SUCCESS;
 }
-RegisterDiffusionCoreMiniApp(CopyGeometry);
+RegisterDiffusionMiniApp(CopyGeometry);

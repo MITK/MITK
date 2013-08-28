@@ -68,6 +68,7 @@ void mitk::VtkOverlay2D::SetPosition2D(const Point2D& position2D, mitk::BaseRend
 mitk::Point2D mitk::VtkOverlay2D::GetPosition2D(mitk::BaseRenderer *renderer) const
 {
   mitk::Point2D position2D;
+  position2D.Fill(0);
   GetPropertyValue<mitk::Point2D>("VtkOverlay2D.Position2D", position2D, renderer);
   return position2D;
 }
@@ -81,6 +82,7 @@ void mitk::VtkOverlay2D::SetOffsetVector(const Point2D& OffsetVector, mitk::Base
 mitk::Point2D mitk::VtkOverlay2D::GetOffsetVector(mitk::BaseRenderer *renderer) const
 {
   mitk::Point2D OffsetVector;
+  OffsetVector.Fill(0);
   GetPropertyValue<mitk::Point2D>("VtkOverlay2D.OffsetVector", OffsetVector, renderer);
   return OffsetVector;
 }

@@ -151,6 +151,16 @@ static void Equal_SurfaceWithPolygonSurfaceWithPolyLine_ReturnsFalse()
   MITK_TEST_NOT_EQUAL( m_Surface3D, surface3DLine, "A surface with the same timesteps and points and the same number of cells, but different types of cells should not be equal.\n");
 }
 
+static void Equal_DifferentPoints_ReturnsFalse()
+{
+  Setup();
+  mitk::Surface::Pointer surfaceWithADifferentPoint = m_Surface3D->Clone();
+  //modify points. m_Surface3D contains m_PointsOne
+  surfaceWithADifferentPoint->GetVtkPolyData()->SetPoints( m_PointsTwo );
+
+  MITK_TEST_NOT_EQUAL( m_Surface3D, surfaceWithADifferentPoint, "A surface with a single timestep and different points should not be equal.\n");
+}
+
 /**
 * @brief mitkSurfaceEqualTest A test class for Equal methods in mitk::Surface.
 */
@@ -163,6 +173,7 @@ int mitkSurfaceEqualTest(int /*argc*/, char* /*argv*/[])
   Equal_CloneAndOriginalTwoTimesteps_ReturnsTrue();
   Equal_OneTimeStepVSTwoTimeStep_ReturnsFalse();
   Equal_TwoTimeStepsDifferentPoints_ReturnsFalse();
+  Equal_DifferentPoints_ReturnsFalse();
   Equal_SurfaceWithPolygonSurfaceWithPolyLine_ReturnsFalse();
 
   MITK_TEST_END();

@@ -233,7 +233,9 @@ namespace mitk
     // visibility of each part is checked, and not only for the
     // whole assembly.
     m_ImageAssembly->VisibilityOn();
-    m_EdgeActor->VisibilityOn();
+    bool drawEdges = true;
+    this->GetDataNode()->GetBoolProperty("draw edges", drawEdges, renderer);
+    m_EdgeActor->SetVisibility(drawEdges);
 
     Geometry2DData::Pointer input = const_cast< Geometry2DData * >(this->GetInput());
 

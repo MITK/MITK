@@ -122,20 +122,20 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
     m_VertexIdList->SetId(i, 0);
   }
 
-  float* scalarFloatData = NULL;
+  ScalarType* scalarFloatData = NULL;
 
   if (this->m_IplScalarImage) // if scalar image is defined use it for texturing
   {
-    scalarFloatData = (float*)this->m_IplScalarImage->imageData;
+    scalarFloatData = (ScalarType*)this->m_IplScalarImage->imageData;
   }
   else if (this->GetInput(m_TextureIndex)) // otherwise use intensity image (input(2))
   {
     ImageReadAccessor inputAcc(this->GetInput(m_TextureIndex));
-    scalarFloatData = (float*)inputAcc.GetData();
+    scalarFloatData = (ScalarType*)inputAcc.GetData();
   }
 
   ImageReadAccessor inputAcc(input, input->GetSliceData(0,0,0));
-  float* inputFloatData = (float*)inputAcc.GetData();
+  ScalarType* inputFloatData = (ScalarType*)inputAcc.GetData();
   //calculate world coordinates
   mitk::ToFProcessingCommon::ToFPoint2D focalLengthInPixelUnits;
   mitk::ToFProcessingCommon::ToFScalarType focalLengthInMm;
@@ -187,7 +187,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
         MITK_ERROR << "Incorrect reconstruction mode!";
       }
       }
-      //Epsilon here, because we may have small float values like 0.00000001 which in fact represents 0.
+      //Epsilon here, because we may have small ScalarType values like 0.00000001 which in fact represents 0.
       if (distance<=mitk::eps)
       {
         isPointValid[pixelID] = false;
@@ -267,8 +267,8 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
               scalarArray->InsertTuple1(m_VertexIdList->GetId(pixelID), scalarFloatData[pixelID]);
             }
             //These Texture Coordinates will map color pixel and vertices 1:1 (e.g. for Kinect).
-            float xNorm = (((float)i)/xDimension);// correct video texture scale for kinect
-            float yNorm = ((float)j)/yDimension; //don't flip. we don't need to flip.
+            ScalarType xNorm = (((ScalarType)i)/xDimension);// correct video texture scale for kinect
+            ScalarType yNorm = ((ScalarType)j)/yDimension; //don't flip. we don't need to flip.
             textureCoords->InsertTuple2(m_VertexIdList->GetId(pixelID), xNorm, yNorm);
           }
         }

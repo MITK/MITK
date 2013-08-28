@@ -239,6 +239,13 @@ pipeline which sometimes may be not desired so it can be switched of by setting
 it to false.
 </ul>
 
+\subsection Geometry2DProperties Geometry2D Properties
+
+<ul>
+  <li> draw edges - Determines if tubes should be drawn around the edges of the 2D
+plane. Default is true.
+</ul>
+
 Information on properties not in this list can be found in the appropriate module.
 
 \subsection PropertiesPageSeeAlso See Also

@@ -158,7 +158,7 @@ mitk::Image::Pointer mitk::TargetPointsCalculator::CreateBinaryImage(mitk::Surfa
 
 mitk::PointSet::Pointer mitk::TargetPointsCalculator::CreateTargetPoints(mitk::Image::Pointer binaryImage)
   {
-  //Bounding-Box besimmten:
+  //determine bounding box:
 
   ImageType::Pointer itkImage = ImageType::New();
   mitk::CastToItkImage(binaryImage, itkImage);
@@ -171,20 +171,20 @@ mitk::PointSet::Pointer mitk::TargetPointsCalculator::CreateTargetPoints(mitk::I
 
   itkImage->TransformIndexToPhysicalPoint(begin, beginWorld);
   itkImage->TransformIndexToPhysicalPoint(end, endWorld);
-  //ende Bounding Box bestimmen
+  //determine end of bounding box
 
   //Pointset initialisieren
   mitk::PointSet::Pointer returnValue = mitk::PointSet::New();
-  int m = 0; //Laufvariable für Pointset-ID
+  int m = 0; //control value for Pointset-ID
 
-  //Abstand der Punkte initialisieren (in mm)
+  //initialize the distance of the points (in mm)
   int abstand = m_InterPointDistance;
 
   //#########################################################
-  //############## BERECHNUNG DER PUNKTE ####################
+  //############## calculation of the points####################
   //#########################################################
 
-  //Gatter aufbauen:
+  //build up gate:
   mitk::Point3D p;
   for(int i=RoundUpToGatter(beginWorld.GetElement(0),abstand); i<endWorld.GetElement(0); i=i+abstand)
   {

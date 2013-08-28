@@ -100,8 +100,8 @@ public:
     TestPlane = planeGeometry;
     TestName = testname;
 
-    float centerCoordValue = TestvolumeSize / 2.0;
-    float center[3] = {centerCoordValue, centerCoordValue, centerCoordValue};
+    mitk::ScalarType centerCoordValue = TestvolumeSize / 2.0;
+    mitk::ScalarType center[3] = {centerCoordValue, centerCoordValue, centerCoordValue};
     mitk::Point3D centerIndex(center);
 
     double radius = TestvolumeSize / 4.0;

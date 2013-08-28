@@ -78,7 +78,7 @@ TransformPoint(const InputPointType &point) const
 
   OutputPointType outputpoint;
   vnl_vector<TScalarType> vnl_vec;
-  float vtkpt[3];
+  double vtkpt[3];
   mitk::itk2vtk(point, vtkpt);
   m_VtkAbstractTransform->TransformPoint(vtkpt, vtkpt);
   mitk::vtk2itk(vtkpt, outputpoint);
@@ -96,9 +96,9 @@ TransformVector(const InputVectorType &vect) const
 
   OutputVectorType outputvector;
   vnl_vector<TScalarType> vnl_vec;
-  float vtkpt[3]={0,0,0};
-  float vtkvec[3];
-  mitk::vnl2vtk<TScalarType, float>(vect.GetVnlVector(), vtkvec);
+  double vtkpt[3]={0,0,0};
+  double vtkvec[3];
+  mitk::vnl2vtk<TScalarType, double>(vect.GetVnlVector(), vtkvec);
   m_VtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
   mitk::vtk2itk(vtkvec, outputvector);
   return outputvector;
@@ -114,9 +114,9 @@ TransformVector(const InputVnlVectorType &vect) const
   assert(m_VtkAbstractTransform!=NULL);
 
   OutputVnlVectorType outputvector;
-  float vtkpt[3]={0,0,0};
-  float vtkvec[3];
-  mitk::vnl2vtk<TScalarType, float>(vect, vtkvec);
+  double vtkpt[3]={0,0,0};
+  double vtkvec[3];
+  mitk::vnl2vtk<TScalarType, double>(vect, vtkvec);
   m_VtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
   mitk::vtk2itk(vtkvec, outputvector);
   return outputvector;
@@ -151,7 +151,7 @@ BackTransform(const OutputPointType &point) const
   assert(m_VtkAbstractTransform!=NULL);
 
   OutputPointType outputpoint;
-  float vtkpt[3];
+  double vtkpt[3];
   mitk::itk2vtk(point, vtkpt);
   m_InverseVtkAbstractTransform->TransformPoint(vtkpt, vtkpt);
   mitk::vtk2itk(vtkpt, outputpoint);
@@ -167,8 +167,8 @@ BackTransform(const OutputVectorType &vect ) const
   assert(m_VtkAbstractTransform!=NULL);
 
   OutputVectorType outputvector;
-  float vtkpt[3]={0,0,0};
-  float vtkvec[3];
+  double vtkpt[3]={0,0,0};
+  double vtkvec[3];
   mitk::itk2vtk(vect, vtkvec);
   m_InverseVtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
   mitk::vtk2itk(vtkvec, outputvector);
@@ -184,8 +184,8 @@ BackTransform(const OutputVnlVectorType &vect ) const
   assert(m_InverseVtkAbstractTransform!=NULL);
 
   OutputVnlVectorType outputvector;
-  float vtkpt[3]={0,0,0};
-  float vtkvec[3];
+  double vtkpt[3]={0,0,0};
+  double vtkvec[3];
   mitk::itk2vtk(vect, vtkvec);
   m_InverseVtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
   mitk::vtk2itk(vtkvec, outputvector);

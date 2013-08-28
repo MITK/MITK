@@ -155,7 +155,7 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
         }
       else if(m_RotationMode == RotationTransposed)
         {
-        vnl_matrix_fixed<float,3,3> rot = orientation.rotation_matrix_transpose();
+        vnl_matrix_fixed<mitk::ScalarType,3,3> rot = orientation.rotation_matrix_transpose();
         for(int i=0; i<3; i++) for (int j=0; j<3; j++) m[i][j] = rot[i][j];
         }
       affineTransform->SetMatrix(m);

@@ -360,8 +360,8 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials()
 
   //transform surface
   mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
-  newTransform->SetMatrix(rotationFloat);
-  newTransform->SetOffset(translationFloat);
+  newTransform->SetMatrix(rotationDouble);
+  newTransform->SetOffset(translationDouble);
 
   //transform surface
   if(m_Controls.m_SurfaceActive->isChecked() && m_Controls.m_ObjectComboBox->GetSelectedNode().IsNotNull())
@@ -377,8 +377,8 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials()
     m_T_ImageGeo->Compose(imageTransform);
     imageTransform->Compose(newTransform);
     mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed directly leads to an error
-    itk::Matrix<float,3,3> rotationFloatNew = imageTransform->GetMatrix();
-    itk::Vector<float,3> translationFloatNew = imageTransform->GetOffset();
+    itk::Matrix<mitk::ScalarType,3,3> rotationFloatNew = imageTransform->GetMatrix();
+    itk::Vector<mitk::ScalarType,3> translationFloatNew = imageTransform->GetOffset();
     newImageTransform->SetMatrix(rotationFloatNew);
     newImageTransform->SetOffset(translationFloatNew);
     m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
@@ -777,10 +777,10 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     //convert to AffineTransform3D
     mitk::AffineTransform3D::Pointer T_MarkerRel_conv = mitk::AffineTransform3D::New();
     {
-    itk::Matrix<float,3,3> rotation = itk::Matrix<float,3,3>();
+    itk::Matrix<mitk::ScalarType,3,3> rotation = itk::Matrix<mitk::ScalarType,3,3>();
     for(int i = 0; i<3; i++)for (int j=0; j<3; j ++)
     rotation[i][j] = T_MarkerRel->GetVnlRotationMatrix()[i][j];
-    itk::Vector<float,3> translation = itk::Vector<float,3>();
+    itk::Vector<mitk::ScalarType,3> translation = itk::Vector<mitk::ScalarType,3>();
     for(int i = 0; i<3; i++) translation[i] = T_MarkerRel->GetPosition()[i];
 
     T_MarkerRel_conv->SetMatrix(rotation);
@@ -823,10 +823,10 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     //convert to AffineTransform3D
     //TODO: remove mitk::transform from this class and use only mitk::AffineTransform3D
     mitk::AffineTransform3D::Pointer m_T_ObjectReg_conv = mitk::AffineTransform3D::New();
-    itk::Matrix<float,3,3> rotation = itk::Matrix<float,3,3>();
+    itk::Matrix<mitk::ScalarType,3,3> rotation = itk::Matrix<mitk::ScalarType,3,3>();
     for(int i = 0; i<3; i++)for (int j=0; j<3; j ++)
     rotation[i][j] = m_T_ObjectReg->GetVnlRotationMatrix()[i][j];
-    itk::Vector<float,3> translation = itk::Vector<float,3>();
+    itk::Vector<mitk::ScalarType,3> translation = itk::Vector<mitk::ScalarType,3>();
     for(int i = 0; i<3; i++) translation[i] = m_T_ObjectReg->GetPosition()[i];
     m_T_ObjectReg_conv->SetMatrix(rotation);
     m_T_ObjectReg_conv->SetOffset(translation);

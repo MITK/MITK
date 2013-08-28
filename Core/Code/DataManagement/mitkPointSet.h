@@ -281,7 +281,7 @@ protected:
  * @param eps Optional (default: mitk::eps) tolarence.
  * @return True, if all comparison are true. False in any other case.
  */
-MITK_CORE_EXPORT bool Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps = mitk::eps );
+MITK_CORE_EXPORT bool Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose );
 
 #pragma GCC visibility push(default)
 itkEventMacro( PointSetEvent, itk::AnyEvent );

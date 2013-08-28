@@ -681,7 +681,7 @@ private:
  * @param eps Optional (default: mitk::eps) tolarence.
  * @return True, if all comparison are true. False in any other case.
  */
-MITK_CORE_EXPORT bool Equal(const mitk::Geometry3D* rightHandSide, const mitk::Geometry3D* leftHandSide, ScalarType eps = mitk::eps);
+MITK_CORE_EXPORT bool Equal(const mitk::Geometry3D* rightHandSide, const mitk::Geometry3D* leftHandSide, ScalarType eps, bool verbose);
 
 /**
  * @brief Equal A function comparing two transforms (TransformType) for beeing identical.
@@ -694,7 +694,7 @@ MITK_CORE_EXPORT bool Equal(const mitk::Geometry3D* rightHandSide, const mitk::G
  * @param eps Optional (default: mitk::eps) tolarence.
  * @return True, if all comparison are true. False in any other case.
  */
-MITK_CORE_EXPORT bool Equal( const mitk::Geometry3D::TransformType *rightHandSide, const  mitk::Geometry3D::TransformType *leftHandSide, ScalarType eps = mitk::eps );
+MITK_CORE_EXPORT bool Equal( const mitk::Geometry3D::TransformType *rightHandSide, const  mitk::Geometry3D::TransformType *leftHandSide, ScalarType eps, bool verbose);
 
 /**
  * @brief Equal A function comparing two bounding boxes (BoundingBoxType) for beeing identical.
@@ -707,7 +707,7 @@ MITK_CORE_EXPORT bool Equal( const mitk::Geometry3D::TransformType *rightHandSid
  * @param eps Optional (default: mitk::eps) tolarence.
  * @return True, if all comparison are true. False in any other case.
  */
-MITK_CORE_EXPORT bool Equal( const mitk::Geometry3D::BoundingBoxType *rightHandSide, const  mitk::Geometry3D::BoundingBoxType *leftHandSide, ScalarType eps = mitk::eps);
+MITK_CORE_EXPORT bool Equal( const mitk::Geometry3D::BoundingBoxType *rightHandSide, const  mitk::Geometry3D::BoundingBoxType *leftHandSide, ScalarType eps, bool verbose);
 
 } // namespace mitk
 

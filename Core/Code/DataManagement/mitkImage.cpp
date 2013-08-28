@@ -1281,27 +1281,32 @@ unsigned int mitk::Image::GetCountOfMinValuedVoxelsNoRecompute( unsigned int t )
   return m_ImageStatistics->GetCountOfMinValuedVoxelsNoRecompute(t);
 }
 
-bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSide, ScalarType eps)
+bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSide, ScalarType eps, bool verbose)
 {
   bool returnValue = true;
-  if( rightHandSide == NULL )
+  if(( rightHandSide == NULL ) )
   {
-    MITK_INFO << "[( Image )] rightHandSide is NULL.";
+    if(verbose)
+      MITK_INFO << "[( Image )] rightHandSide is NULL.";
     return false;
   }
 
-  if( leftHandSide == NULL )
+  if(( leftHandSide == NULL ) )
   {
-    MITK_INFO << "[( Image )] leftHandSide is NULL.";
+    if(verbose)
+      MITK_INFO << "[( Image )] leftHandSide is NULL.";
     return false;
   }
 
   // Dimensionality
-  if( rightHandSide->GetDimension() != leftHandSide->GetDimension() )
+  if(( rightHandSide->GetDimension() != leftHandSide->GetDimension() ) )
   {
-    MITK_INFO << "[( Image )] Dimensionality differs.";
-    MITK_INFO << "rightHandSide is " << rightHandSide->GetDimension()
-              << "leftHandSide is " << leftHandSide->GetDimension();
+    if(verbose)
+    {
+      MITK_INFO << "[( Image )] Dimensionality differs.";
+      MITK_INFO << "rightHandSide is " << rightHandSide->GetDimension()
+                << "leftHandSide is " << leftHandSide->GetDimension();
+    }
     returnValue = false;
   }
 
@@ -1309,34 +1314,42 @@ bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSi
   unsigned int minDimensionality = std::min(rightHandSide->GetDimension(),leftHandSide->GetDimension());
   for( unsigned int i=0; i< minDimensionality; ++i)
   {
-    if( rightHandSide->GetDimension(i) != leftHandSide->GetDimension(i) )
+    if(( rightHandSide->GetDimension(i) != leftHandSide->GetDimension(i) ) )
     {
       returnValue = false;
-      MITK_INFO << "[( Image )] dimension differs.";
-      MITK_INFO << "rightHandSide->GetDimension("<<i<<") is " << rightHandSide->GetDimension(i)
-                << "leftHandSide->GetDimension("<<i<<") is " << leftHandSide->GetDimension(i);
+      if(verbose)
+      {
+        MITK_INFO << "[( Image )] dimension differs.";
+        MITK_INFO << "rightHandSide->GetDimension("<<i<<") is " << rightHandSide->GetDimension(i)
+                  << "leftHandSide->GetDimension("<<i<<") is " << leftHandSide->GetDimension(i);
+      }
     }
   }
 
   // Pixeltype
   mitk::PixelType pixelTypeRightHandSide = rightHandSide->GetPixelType();
   mitk::PixelType pixelTypeLeftHandSide = leftHandSide->GetPixelType();
-  if( !( pixelTypeRightHandSide == pixelTypeLeftHandSide ) )
+  if(( !( pixelTypeRightHandSide == pixelTypeLeftHandSide ) ) )
   {
-    MITK_INFO << "[( Image )] PixelType differs.";
-    MITK_INFO << "rightHandSide is " << pixelTypeRightHandSide.GetTypeAsString()
-              << "leftHandSide is " << pixelTypeLeftHandSide.GetTypeAsString();
+    if(verbose)
+    {
+      MITK_INFO << "[( Image )] PixelType differs.";
+      MITK_INFO << "rightHandSide is " << pixelTypeRightHandSide.GetTypeAsString()
+                << "leftHandSide is " << pixelTypeLeftHandSide.GetTypeAsString();
+    }
     returnValue = false;
   }
 
   // Geometries
-  if( !mitk::Equal( rightHandSide->GetGeometry(),
-                    leftHandSide->GetGeometry(), eps) )
+  if(( !mitk::Equal( rightHandSide->GetGeometry(),
+                     leftHandSide->GetGeometry(), eps, verbose) ) )
   {
-    MITK_INFO << "[( Image )] Geometries differ.";
+    if(verbose)
+    {
+      MITK_INFO << "[( Image )] Geometries differ.";
+    }
     returnValue = false;
   }
-
 
   // Pixel values - default mode [ 0 threshold in difference ]
   // compare only if all previous checks were successfull, otherwise the ITK filter will throw an exception
@@ -1347,14 +1360,15 @@ bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSi
     compareFilter->SetInput(1, leftHandSide);
     compareFilter->Update();
 
-    if( !compareFilter->GetResult() )
+    if(( !compareFilter->GetResult() ) )
     {
       returnValue = false;
-      MITK_INFO << "[(Image)] Pixel values differ: ";
+      if(verbose)
+      {
+        MITK_INFO << "[(Image)] Pixel values differ: ";
+      }
       compareFilter->GetCompareResults().PrintSelf();
     }
   }
-
-
   return returnValue;
 }

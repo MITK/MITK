@@ -644,7 +644,7 @@ private:
  *
  * @return true, if all subsequent comparisons are true, false otherwise
  */
-MITK_CORE_EXPORT bool Equal( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide, ScalarType eps = mitk::eps );
+MITK_CORE_EXPORT bool Equal( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide, ScalarType eps, bool verbose );
 
 
 //}

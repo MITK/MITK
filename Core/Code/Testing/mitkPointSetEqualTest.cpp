@@ -32,7 +32,7 @@ static void Setup()
 static void Equal_CloneAndOriginal_ReturnsTrue()
 {
   Setup();
-  MITK_TEST_CONDITION_REQUIRED( mitk::Equal( m_PointSet, m_AnotherPointSet), "A clone should be equal to its original.");
+  MITK_TEST_EQUAL( m_PointSet, m_AnotherPointSet, "A clone should be equal to its original.");
 }
 
 static void Equal_DifferentGeometries_ReturnsFalse()
@@ -45,17 +45,13 @@ static void Equal_DifferentGeometries_ReturnsFalse()
   origin[2] = 1.0 + 2*mitk::eps;
   m_AnotherPointSet->GetGeometry()->SetOrigin(origin);
 
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_PointSet, m_AnotherPointSet), "Origin was modified. Result should be false.");
+  MITK_TEST_NOT_EQUAL( m_PointSet, m_AnotherPointSet, "Origin was modified. Result should be false.");
 }
 
 static void Equal_InputIsNull_ReturnsFalse()
 {
-  Setup();
-
-  m_PointSet = NULL;
-  m_AnotherPointSet = NULL;
-
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_PointSet, m_AnotherPointSet), "Input is NULL. Result should be false.");
+  mitk::PointSet::Pointer pointSet = NULL;
+  MITK_TEST_NOT_EQUAL( pointSet, pointSet, "Input is NULL. Result should be false.");
 }
 
 static void Equal_DifferentNumberOfPoints_ReturnsFalse()
@@ -71,7 +67,7 @@ static void Equal_DifferentNumberOfPoints_ReturnsFalse()
 
   m_AnotherPointSet->InsertPoint( 1, tmpPoint );
 
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_PointSet, m_AnotherPointSet), "One pointset has two points the other has one. Result should be false.");
+  MITK_TEST_NOT_EQUAL( m_PointSet, m_AnotherPointSet, "One pointset has two points the other has one. Result should be false.");
 }
 
 static void Equal_DifferentPoints_ReturnsFalse()
@@ -88,7 +84,7 @@ static void Equal_DifferentPoints_ReturnsFalse()
   tmpPoint[0] = 1.0 + 2*mitk::eps;
   m_AnotherPointSet->InsertPoint( 1, tmpPoint );
 
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_PointSet, m_AnotherPointSet), "Two pointsets with different points. Result should be false.");
+  MITK_TEST_NOT_EQUAL( m_PointSet, m_AnotherPointSet, "Two pointsets with different points. Result should be false.");
 }
 
 /**

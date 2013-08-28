@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
 
+#include <mitkTesting.h>
 #include <iomanip>
 
 mitk::PointSet::PointSet()
@@ -819,30 +820,36 @@ bool mitk::PointSet::PointDataType::operator ==(const mitk::PointSet::PointDataT
   return id == other.id && selected == other.selected && pointSpec == other.pointSpec;
 }
 
-bool mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps )
+bool mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose )
 {
   bool result = true;
 
   if( rightHandSide == NULL )
   {
-    MITK_INFO << "[( PointSet )] rightHandSide NULL.";
+    if(verbose)
+    {
+      MITK_INFO << "[( PointSet )] rightHandSide NULL.";
+    }
     return false;
   }
   if( leftHandSide == NULL )
   {
-    MITK_INFO << "[( PointSet )] leftHandSide NULL.";
+    if(verbose)
+      MITK_INFO << "[( PointSet )] leftHandSide NULL.";
     return false;
   }
 
-  if( !mitk::Equal(leftHandSide->GetGeometry(), rightHandSide->GetGeometry(), eps) )
+  if( !mitk::Equal(leftHandSide->GetGeometry(), rightHandSide->GetGeometry(), eps, verbose) )
   {
-    MITK_INFO << "[( PointSet )] Geometries differ.";
+    if(verbose)
+      MITK_INFO << "[( PointSet )] Geometries differ.";
     result = false;
   }
 
   if ( leftHandSide->GetSize() != rightHandSide->GetSize())
   {
-    MITK_INFO << "[( PointSet )] Number of points differ.";
+    if(verbose)
+      MITK_INFO << "[( PointSet )] Number of points differ.";
     result = false;
   }
   else
@@ -860,15 +867,16 @@ bool mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* righ
     {
       pointLeftHandSide = pointSetIteratorLeft.Value();
       pointRightHandSide = pointSetIteratorRight.Value();
-      if( !mitk::Equal( pointLeftHandSide, pointRightHandSide, eps ) )
+      if( !mitk::Equal( pointLeftHandSide, pointRightHandSide, eps, verbose ) )
       {
-        MITK_INFO << "[( PointSet )] Point values are different.";
+        if(verbose)
+          MITK_INFO << "[( PointSet )] Point values are different.";
         result = false;
         numberOfIncorrectPoints++;
       }
     }
 
-    if(numberOfIncorrectPoints > 0)
+    if((numberOfIncorrectPoints > 0) && verbose)
     {
       MITK_INFO << numberOfIncorrectPoints <<" of a total of " << leftHandSide->GetSize() << " points are different.";
     }

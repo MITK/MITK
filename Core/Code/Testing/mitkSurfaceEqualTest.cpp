@@ -92,25 +92,25 @@ static void Setup()
 static void Equal_InputIsNull_ReturnsFalse()
 {
   mitk::Surface::Pointer surface = NULL;
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( surface, surface), "Input is NULL. Result should be false.\n");
+  MITK_TEST_NOT_EQUAL( surface, surface, "Input is NULL. Result should be false.\n");
 }
 
 static void Equal_CloneAndOriginalOneTimestep_ReturnsTrue()
 {
   Setup();
-  MITK_TEST_CONDITION_REQUIRED( mitk::Equal( m_Surface3D, m_Surface3D->Clone() ), "A one timestep clone should be equal to its original.\n");
+  MITK_TEST_EQUAL( m_Surface3D, m_Surface3D->Clone(), "A one timestep clone should be equal to its original.\n");
 }
 
 static void Equal_CloneAndOriginalTwoTimesteps_ReturnsTrue()
 {
   Setup();
-  MITK_TEST_CONDITION_REQUIRED( mitk::Equal( m_Surface3DTwoTimeSteps, m_Surface3DTwoTimeSteps->Clone() ), "A two timestep clone should be equal to its original.\n");
+  MITK_TEST_EQUAL( m_Surface3DTwoTimeSteps, m_Surface3DTwoTimeSteps->Clone(), "A two timestep clone should be equal to its original.\n");
 }
 
 static void Equal_OneTimeStepVSTwoTimeStep_ReturnsFalse()
 {
   Setup();
-  MITK_TEST_CONDITION_REQUIRED( ! mitk::Equal( m_Surface3D, m_Surface3DTwoTimeSteps ), "A one timestep and two timestep surface should not be equal.\n");
+  MITK_TEST_NOT_EQUAL( m_Surface3D, m_Surface3DTwoTimeSteps, "A one timestep and two timestep surface should not be equal.\n");
 }
 
 static void Equal_TwoTimeStepsDifferentPoints_ReturnsFalse()
@@ -125,7 +125,7 @@ static void Equal_TwoTimeStepsDifferentPoints_ReturnsFalse()
   surface3DTwoTimeStepsDifferentPoints->SetVtkPolyData( m_PolyDataOne, 0 );
   surface3DTwoTimeStepsDifferentPoints->SetVtkPolyData( polyDataDifferentPoints, 1 );
 
-  MITK_TEST_CONDITION_REQUIRED( ! mitk::Equal( surface3DTwoTimeStepsDifferentPoints, m_Surface3DTwoTimeSteps ), "A surface with the same timesteps and different points should not be equal.\n");
+  MITK_TEST_NOT_EQUAL( surface3DTwoTimeStepsDifferentPoints, m_Surface3DTwoTimeSteps, "A surface with the same timesteps and different points should not be equal.\n");
 }
 
 static void Equal_SurfaceWithPolygonSurfaceWithPolyLine_ReturnsFalse()
@@ -148,7 +148,7 @@ static void Equal_SurfaceWithPolygonSurfaceWithPolyLine_ReturnsFalse()
   mitk::Surface::Pointer surface3DLine = mitk::Surface::New();
   surface3DLine->SetVtkPolyData( polyDataLine );
 
-  MITK_TEST_CONDITION_REQUIRED( ! mitk::Equal( m_Surface3D, surface3DLine ), "A surface with the same timesteps and points and the same number of cells, but different types of cells should not be equal.\n");
+  MITK_TEST_NOT_EQUAL( m_Surface3D, surface3DLine, "A surface with the same timesteps and points and the same number of cells, but different types of cells should not be equal.\n");
 }
 
 /**

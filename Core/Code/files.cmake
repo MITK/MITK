@@ -51,6 +51,7 @@ set(H_FILES
   Common/mitkExceptionMacro.h
   Common/mitkServiceBaseObject.h
   Common/mitkTestingMacros.h
+  Common/mitkTesting.h
 
   DataManagement/mitkImageAccessByItk.h
   DataManagement/mitkImageCast.h

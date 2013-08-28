@@ -33,7 +33,7 @@ static void Setup()
 static void Equal_CloneAndOriginal_ReturnsTrue()
 {
   Setup();
-  MITK_TEST_CONDITION_REQUIRED( mitk::Equal( m_Geometry3D, m_AnotherGeometry3D), "A clone should be equal to its original.");
+  MITK_TEST_EQUAL( m_Geometry3D, m_AnotherGeometry3D, "A clone should be equal to its original.");
 }
 
 static void Equal_DifferentOrigin_ReturnsFalse()
@@ -46,7 +46,7 @@ static void Equal_DifferentOrigin_ReturnsFalse()
   origin[2] = 1.0 + 2*mitk::eps;
   m_AnotherGeometry3D->SetOrigin(origin);
 
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Geometry3D, m_AnotherGeometry3D), "Origin was modified. Result should be false.");
+  MITK_TEST_NOT_EQUAL( m_Geometry3D, m_AnotherGeometry3D, "Origin was modified. Result should be false.");
 }
 
 static void Equal_DifferentIndexToWorldTransform_ReturnsFalse()
@@ -63,7 +63,7 @@ static void Equal_DifferentIndexToWorldTransform_ReturnsFalse()
   differentIndexToWorldTransform->SetMatrix( differentMatrix );
   m_AnotherGeometry3D->SetIndexToWorldTransform(differentIndexToWorldTransform);
 
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Geometry3D, m_AnotherGeometry3D), "IndexToWorldTransform was modified. Result should be false.");
+  MITK_TEST_NOT_EQUAL( m_Geometry3D, m_AnotherGeometry3D, "IndexToWorldTransform was modified. Result should be false.");
 }
 
 static void Equal_DifferentSpacing_ReturnsFalse()
@@ -77,7 +77,7 @@ static void Equal_DifferentSpacing_ReturnsFalse()
 
   m_AnotherGeometry3D->SetSpacing(differentSpacing);
 
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Geometry3D, m_AnotherGeometry3D), "Spacing was modified. Result should be false.");
+  MITK_TEST_NOT_EQUAL( m_Geometry3D, m_AnotherGeometry3D, "Spacing was modified. Result should be false.");
 }
 
 static void Equal_InputIsNull_ReturnsFalse()
@@ -87,7 +87,7 @@ static void Equal_InputIsNull_ReturnsFalse()
   m_Geometry3D = NULL;
   m_AnotherGeometry3D = NULL;
 
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Geometry3D, m_AnotherGeometry3D), "Input is NULL. Result should be false.");
+  MITK_TEST_NOT_EQUAL( m_Geometry3D, m_AnotherGeometry3D, "Input is NULL. Result should be false.");
 }
 
 static void Equal_DifferentImageGeometry_ReturnsFalse()
@@ -96,7 +96,7 @@ static void Equal_DifferentImageGeometry_ReturnsFalse()
 
   m_AnotherGeometry3D->SetImageGeometry(true);
 
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Geometry3D, m_AnotherGeometry3D), "One Geometry is image, the other is not. Result should be false.");
+  MITK_TEST_NOT_EQUAL( m_Geometry3D, m_AnotherGeometry3D, "One Geometry is image, the other is not. Result should be false.");
 }
 
 static void Equal_DifferentBoundingBox_ReturnsFalse()
@@ -107,7 +107,7 @@ static void Equal_DifferentBoundingBox_ReturnsFalse()
     float bounds[ ] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     m_AnotherGeometry3D->SetBounds(bounds);
 
-    MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Geometry3D, m_AnotherGeometry3D), "Bounds are different. Result should be false.");
+    MITK_TEST_NOT_EQUAL( m_Geometry3D, m_AnotherGeometry3D, "Bounds are different. Result should be false.");
 }
 
 /**

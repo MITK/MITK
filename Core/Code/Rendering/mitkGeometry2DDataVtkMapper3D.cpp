@@ -390,7 +390,6 @@ namespace mitk
       LayerSortedActorList layerSortedActors;
 
       // Traverse the data tree to find nodes resliced by ImageMapperGL2D
-      mitk::NodePredicateOr::Pointer p = mitk::NodePredicateOr::New();
       //use a predicate to get all data nodes which are "images" or inherit from mitk::Image
       mitk::TNodePredicateDataType< mitk::Image >::Pointer predicateAllImages = mitk::TNodePredicateDataType< mitk::Image >::New();
       mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetSubset(predicateAllImages);

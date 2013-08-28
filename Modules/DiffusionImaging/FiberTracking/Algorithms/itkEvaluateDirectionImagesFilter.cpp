@@ -182,12 +182,24 @@ void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
         // get number of valid directions (length > 0)
         int numRefDirs = 0;
         int numTestDirs = 0;
+        std::vector< vnl_vector_fixed< PixelType, 3 > > testDirs;
+        std::vector< vnl_vector_fixed< PixelType, 3 > > refDirs;
         for (int i=0; i<numDirections; i++)
         {
-            if (m_ReferenceImageSet->GetElement(i)->GetPixel(index).GetVnlVector().magnitude() > m_Eps )
+            vnl_vector_fixed< PixelType, 3 > refDir = m_ReferenceImageSet->GetElement(i)->GetPixel(index).GetVnlVector();
+            if (refDir.magnitude() > m_Eps )
+            {
+                refDir.normalize();
+                refDirs.push_back(refDir);
                 numRefDirs++;
-            if (m_ImageSet->GetElement(i)->GetPixel(index).GetVnlVector().magnitude() > m_Eps )
+            }
+            vnl_vector_fixed< PixelType, 3 > testDir = m_ImageSet->GetElement(i)->GetPixel(index).GetVnlVector();
+            if (testDir.magnitude() > m_Eps )
+            {
+                testDir.normalize();
+                testDirs.push_back(testDir);
                 numTestDirs++;
+            }
         }
 
         // i: index of reference direction
@@ -195,10 +207,10 @@ void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
         for (int i=0; i<numDirections; i++)     // for each reference direction
         {
             bool missingDir = false;
-            vnl_vector_fixed< PixelType, 3 > refDir = m_ReferenceImageSet->GetElement(i)->GetPixel(index).GetVnlVector();
+            vnl_vector_fixed< PixelType, 3 > refDir;
 
             if (i<numRefDirs)  // normalize if not null
-                refDir.normalize();
+                refDir = refDirs.at(i);
             else if (m_IgnoreMissingDirections)
                 continue;
             else
@@ -206,9 +218,9 @@ void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
 
             for (int j=0; j<numDirections; j++)     // and each test direction
             {
-                vnl_vector_fixed< PixelType, 3 > testDir = m_ImageSet->GetElement(j)->GetPixel(index).GetVnlVector();
+                vnl_vector_fixed< PixelType, 3 > testDir;
                 if (j<numTestDirs)  // normalize if not null
-                    testDir.normalize();
+                    testDir = testDirs.at(j);
                 else if (m_IgnoreMissingDirections || missingDir)
                     continue;
                 else

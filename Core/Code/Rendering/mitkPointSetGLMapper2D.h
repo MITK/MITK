@@ -61,7 +61,7 @@ class PointSet;
 class MITK_CORE_EXPORT PointSetGLMapper2D : public GLMapper
 {
 public:
-  DEPRECATED(mitkClassMacro(PointSetGLMapper2D, GLMapper));
+  mitkClassMacro(PointSetGLMapper2D, GLMapper);
 
   itkNewMacro(Self);
 

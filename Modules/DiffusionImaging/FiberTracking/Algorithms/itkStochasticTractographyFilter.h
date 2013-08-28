@@ -115,9 +115,19 @@ public:
   //overide the built in set input function
   //we need to create a new cache everytime we change the input image
   //but we need to preserve it when the input image is the same
-  using Superclass::SetInput;
-  void SetInput( typename InputDWIImageType::Pointer dwiimagePtr ){
-    Superclass::SetInput( dwiimagePtr );
+  void SetPrimaryInput(DataObject *input)
+  {
+    typename InputDWIImageType::Pointer dwiimagePtr;
+    try
+    {
+      dwiimagePtr = dynamic_cast<InputDWIImageType*>( input );
+    }
+    catch(itk::ExceptionObject &e)
+    {
+        MITK_INFO << "wrong image type: " << e.what();
+        throw;
+    }
+    Superclass::SetPrimaryInput( input );
     //update the likelihood cache
     this->m_LikelihoodCachePtr = ProbabilityDistributionImageType::New();
     this->m_LikelihoodCachePtr->CopyInformation( this->GetInput() );

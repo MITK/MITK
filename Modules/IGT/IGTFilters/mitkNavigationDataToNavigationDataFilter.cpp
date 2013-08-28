@@ -39,11 +39,10 @@ void mitk::NavigationDataToNavigationDataFilter::SetInput( const NavigationData*
 
 void mitk::NavigationDataToNavigationDataFilter::SetInput( unsigned int idx, const NavigationData* nd )
 {
-  if ((nd == NULL) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
-    this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
+  if ( nd == NULL ) // if an input is set to NULL, remove it
+    this->RemoveInput(idx);
   else
-    this->ProcessObject::SetNthInput(idx, const_cast<NavigationData*>(nd));   // Process object is not const-correct so the const_cast is required here
-
+    this->ProcessObject::SetNthInput(idx, const_cast<NavigationData*>(nd));   // ProcessObject is not const-correct so a const_cast is required here
   this->CreateOutputsForAllInputs();
 }
 

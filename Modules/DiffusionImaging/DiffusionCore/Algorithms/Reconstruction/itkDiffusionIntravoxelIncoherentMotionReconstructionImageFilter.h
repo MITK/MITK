@@ -320,8 +320,8 @@ namespace itk{
     void PrintSelf(std::ostream& os, Indent indent) const;
 
     void BeforeThreadedGenerateData();
-    void ThreadedGenerateData( const
-                               OutputImageRegionType &outputRegionForThread, int);
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread,
+                               ThreadIdType);
     void AfterThreadedGenerateData();
 
     MeasAndBvals ApplyS0Threshold(vnl_vector<double> &meas, vnl_vector<double> &bvals);

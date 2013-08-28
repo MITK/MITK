@@ -197,7 +197,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
 
     /* init TractographyFilter */
     TrackingFilterType::Pointer trackingFilter = TrackingFilterType::New();
-    trackingFilter->SetInput(m_DiffusionImage->GetVectorImage().GetPointer());
+    trackingFilter->SetPrimaryInput(m_DiffusionImage->GetVectorImage().GetPointer());
     trackingFilter->SetbValues(vecCont);
     trackingFilter->SetGradients(Pdir);
     trackingFilter->SetMeasurementFrame(measurement_frame);

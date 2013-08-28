@@ -122,13 +122,13 @@ int mitkEventConfigTest(int argc, char* argv[])
 
   // Construction providing a property list
   mitk::PropertyList::Pointer propertyList1 = mitk::PropertyList::New();
-  propertyList1->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass.c_str(), "MousePressEvent");
-  propertyList1->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant.c_str(), "MousePressEventVariant");
+  propertyList1->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass().c_str(), "MousePressEvent");
+  propertyList1->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant().c_str(), "MousePressEventVariant");
   propertyList1->SetStringProperty("Modifiers","CTRL,ALT");
 
   mitk::PropertyList::Pointer propertyList2 = mitk::PropertyList::New();
-  propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass.c_str(), "MOUSERELEASEEVENT");
-  propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant.c_str(), "MouseReleaseEventVariant");
+  propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass().c_str(), "MOUSERELEASEEVENT");
+  propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant().c_str(), "MouseReleaseEventVariant");
   propertyList2->SetStringProperty("Modifiers","SHIFT");
 
   std::vector<mitk::PropertyList::Pointer>* configDescription = new std::vector<mitk::PropertyList::Pointer>();

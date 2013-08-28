@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegTool2D.h"
 
 
+
 mitk::ToolManager::ToolManager(DataStorage* storage)
 :m_ActiveTool(NULL),
  m_ActiveToolID(-1),

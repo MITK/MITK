@@ -26,23 +26,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferencesService.h>
 #include <berryPlatformUI.h>
 
-#include <ctkServiceTracker.h>
-
 #include <mitkWorkbenchUtil.h>
 
 class QmitkDefaultDropTargetListenerPrivate
 {
 public:
 
-  QmitkDefaultDropTargetListenerPrivate()
-  : m_PrefServiceTracker(mitk::PluginActivator::GetContext())
-  {
-    m_PrefServiceTracker.open();
-  }
-
   berry::IPreferences::Pointer GetPreferences() const
   {
-    berry::IPreferencesService* prefService = m_PrefServiceTracker.getService();
+    berry::IPreferencesService::Pointer prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
     if (prefService)
     {
       return prefService->GetSystemPreferences()->Node("/General");
@@ -59,8 +51,6 @@ public:
     }
     return true;
   }
-
-  ctkServiceTracker<berry::IPreferencesService*> m_PrefServiceTracker;
 };
 
 QmitkDefaultDropTargetListener::QmitkDefaultDropTargetListener()

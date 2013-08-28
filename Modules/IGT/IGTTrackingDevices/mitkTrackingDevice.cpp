@@ -25,7 +25,8 @@ typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 mitk::TrackingDevice::TrackingDevice() :
   m_Data(mitk::DeviceDataUnspecified),
   m_State(mitk::TrackingDevice::Setup),
-  m_StopTracking(false), m_ErrorMessage("")
+  m_StopTracking(false), m_ErrorMessage(""),
+  m_RotationMode(mitk::TrackingDevice::RotationStandard)
 
 {
   m_StopTrackingMutex = itk::FastMutexLock::New();
@@ -60,6 +61,10 @@ void mitk::TrackingDevice::SetState( TrackingDeviceState state )
   this->Modified();
 }
 
+void mitk::TrackingDevice::SetRotationMode(RotationMode r)
+{
+  MITK_WARN << "Rotation mode switching is not implemented for this device. Leaving it at mitk::TrackingDevice::RotationStandard";
+}
 
 mitk::TrackingDeviceType mitk::TrackingDevice::GetType() const{
   return m_Data.Line;

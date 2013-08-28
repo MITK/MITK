@@ -82,6 +82,10 @@ bool mitk::NDITrackingDevice::UpdateTool(mitk::TrackingTool* tool)
   }
 }
 
+void mitk::NDITrackingDevice::SetRotationMode(RotationMode r)
+{
+  m_RotationMode = r;
+}
 
 mitk::NDITrackingDevice::~NDITrackingDevice()
 {

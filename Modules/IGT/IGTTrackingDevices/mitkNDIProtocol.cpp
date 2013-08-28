@@ -822,6 +822,16 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
 
         /* copy local values to the tool */
         mitk::Quaternion orientation(localQuat[1], localQuat[2], localQuat[3], localQuat[0]);
+
+        //If the rotation mode is vnlTransposed we have to transpose the quaternion
+        if (m_TrackingDevice->GetRotationMode() == mitk::NDITrackingDevice::RotationTransposed)
+          {
+          orientation[0] *= -1; //qx
+          orientation[1] *= -1; //qy
+          orientation[2] *= -1; //qz
+          //qr is not inverted
+          }
+
         tool->SetOrientation(orientation);
         mitk::Point3D position;
         position[0] = localPos[0];

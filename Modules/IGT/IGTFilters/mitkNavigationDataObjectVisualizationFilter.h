@@ -38,6 +38,21 @@ namespace mitk {
 
     itkNewMacro(Self);
 
+    /** Defines the rotation modes of this tracking device which results in different representations
+     *  of quaternions.
+     *
+     *  - Standard: normal representation, rawdata from the device is not changed (DEFAULT)
+     *
+     *  - Transposed: the rotation is stored transposed, which is (by mistake!) expected by some older MITK classes due
+     *                to an ambigious method naming in VNL.
+     *
+     *  CAUTION: The rotation mode can only be changed for backward compatibility of old WRONG code.
+     *           PLEASE DO NOT CHANGE THE ROTATION MODE UNLESS YOU ARE KNOWING EXACTLY WHAT YOU ARE DOING!
+     *
+     *  use SetRotationMode to change the mode.
+     */
+    enum RotationMode {RotationStandard, RotationTransposed};
+
     /**
     * \brief Smart Pointer type to a BaseData.
     */
@@ -80,6 +95,21 @@ namespace mitk {
     virtual void TransformOrientationOn(unsigned int index);  ///< sets the TransformOrientation flag to true for the given index
     virtual void TransformOrientationOff(unsigned int index); ///< sets the TransformOrientation flag to false for the given index
 
+    /** @brief Defines an offset for a representation object. This offset is applied before the object is visualized.
+     *         If no offset is given, no offset will be used. To deactivate the offset just set it to NULL.
+     */
+    void SetOffset(int index, mitk::AffineTransform3D::Pointer offset);
+
+    /** Sets the rotation mode of this class. See documentation of enum RotationMode for details
+     *  on the different modes.
+     *  CAUTION: The rotation mode can only be changed for backward compatibility of old WRONG code.
+     *           PLEASE DO NOT CHANGE THE ROTATION MODE UNLESS YOU ARE KNOWING EXACTLY WHAT YOU ARE DOING!
+     */
+    virtual void SetRotationMode(RotationMode r);
+
+    /** @return Returns the offset of a represenation object. Returns NULL if there is no offset. */
+    mitk::AffineTransform3D::Pointer GetOffset(int index);
+
     /**
     *\brief Get the number of added BaseData associated to NavigationData
     * \return Returns the size of the internal map
@@ -97,6 +127,7 @@ namespace mitk {
 
   protected:
     typedef std::map<itk::ProcessObject::DataObjectPointerArraySizeType, bool> BooleanInputMap;
+    typedef std::map<unsigned int, mitk::AffineTransform3D::Pointer> OffsetPointerMap;
 
     /**
     * \brief Constructor
@@ -114,6 +145,10 @@ namespace mitk {
     RepresentationPointerMap m_RepresentationList;
     BooleanInputMap m_TransformPosition;    ///< if set to true, the filter will use the position part of the input navigation data at the given index for the calculation of the transform. If no entry for the index exists, it defaults to true.
     BooleanInputMap m_TransformOrientation; ///< if set to true, the filter will use the orientation part of the input navigation data at the given index for the calculation of the transform. If no entry for the index exists, it defaults to true.
+    OffsetPointerMap m_OffsetList;
+
+  private:
+    RotationMode m_RotationMode; ///< defines the rotation mode Standard or Transposed, Standard is default
   };
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATAOBJECTVISUALIZATIONFILTER_H_HEADER_INCLUDED_ */

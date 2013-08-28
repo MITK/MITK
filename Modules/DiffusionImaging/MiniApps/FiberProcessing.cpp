@@ -157,4 +157,4 @@ int FiberProcessing(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 }
-RegisterFiberTrackingMiniApp(FiberProcessing);
+RegisterDiffusionMiniApp(FiberProcessing);

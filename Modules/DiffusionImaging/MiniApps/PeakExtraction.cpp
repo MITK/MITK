@@ -372,4 +372,4 @@ int PeakExtraction(int argc, char* argv[])
     }
     return EXIT_FAILURE;
 }
-RegisterFiberTrackingMiniApp(PeakExtraction);
+RegisterDiffusionMiniApp(PeakExtraction);

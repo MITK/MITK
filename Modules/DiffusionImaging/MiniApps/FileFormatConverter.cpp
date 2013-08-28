@@ -19,51 +19,64 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImage.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkDiffusionCoreObjectFactory.h>
+#include <mitkFiberTrackingObjectFactory.h>
 #include <mitkIOUtil.h>
 #include <mitkNrrdDiffusionImageWriter.h>
+#include <mitkFiberBundleX.h>
+#include <mitkFiberBundleXWriter.h>
 #include "ctkCommandLineParser.h"
 #include "ctkCommandLineParser.cpp"
 
 using namespace mitk;
-#include "ctkCommandLineParser.h"
 
-int ImageFormatConverter(int argc, char* argv[])
+int FileFormatConverter(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("in", "i", ctkCommandLineParser::String, "input image", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::String, "output image", us::Any(), false);
+    parser.addArgument("in", "i", ctkCommandLineParser::String, "input file", us::Any(), false);
+    parser.addArgument("out", "o", ctkCommandLineParser::String, "output file", us::Any(), false);
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
     // mandatory arguments
-    string imageName = us::any_cast<string>(parsedArgs["in"]);
-    string outImage = us::any_cast<string>(parsedArgs["out"]);
+    string inName = us::any_cast<string>(parsedArgs["in"]);
+    string outName = us::any_cast<string>(parsedArgs["out"]);
 
     try
     {
         RegisterDiffusionCoreObjectFactory();
+        RegisterFiberTrackingObjectFactory();
 
-        MITK_INFO << "Loading image " << imageName;
+        MITK_INFO << "Loading " << inName;
         const std::string s1="", s2="";
-        std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( imageName, s1, s2, false );
+        std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inName, s1, s2, false );
+        mitk::BaseData::Pointer baseData = infile.at(0);
 
-        if ( dynamic_cast<DiffusionImage<short>*>(infile.at(0).GetPointer()) )
+        if ( dynamic_cast<DiffusionImage<short>*>(baseData.GetPointer()) )
         {
-            MITK_INFO << "Writing " << outImage;
-            DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(infile.at(0).GetPointer());
+            MITK_INFO << "Writing " << outName;
+            DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(baseData.GetPointer());
             NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
-            writer->SetFileName(outImage);
+            writer->SetFileName(outName);
             writer->SetInput(dwi);
             writer->Update();
         }
-        else if ( dynamic_cast<Image*>(infile.at(0).GetPointer()) )
+        else if ( dynamic_cast<Image*>(baseData.GetPointer()) )
         {
-            Image::Pointer image = dynamic_cast<Image*>(infile.at(0).GetPointer());
-            mitk::IOUtil::SaveImage(image, outImage);
+            Image::Pointer image = dynamic_cast<Image*>(baseData.GetPointer());
+            mitk::IOUtil::SaveImage(image, outName);
         }
+        else if ( dynamic_cast<FiberBundleX*>(baseData.GetPointer()) )
+        {
+            MITK_INFO << "Writing " << outName;
+            FiberBundleXWriter::Pointer fibWriter = FiberBundleXWriter::New();
+            fibWriter->SetFileName(outName.c_str());
+            fibWriter->DoWrite( dynamic_cast<FiberBundleX*>(baseData.GetPointer()) );
+        }
+        else
+            MITK_INFO << "File type currently not supported!";
     }
     catch (itk::ExceptionObject e)
     {
@@ -83,4 +96,4 @@ int ImageFormatConverter(int argc, char* argv[])
     MITK_INFO << "DONE";
     return EXIT_SUCCESS;
 }
-RegisterDiffusionCoreMiniApp(ImageFormatConverter);
+RegisterDiffusionMiniApp(FileFormatConverter);

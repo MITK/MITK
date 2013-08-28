@@ -164,4 +164,4 @@ int FiberDirectionExtraction(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-RegisterFiberTrackingMiniApp(FiberDirectionExtraction);
+RegisterDiffusionMiniApp(FiberDirectionExtraction);

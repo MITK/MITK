@@ -112,12 +112,8 @@ if(NOT DEFINED MITK_BUILD_EXAMPLES)
   set(MITK_BUILD_EXAMPLES TRUE)
 endif()
 
-if(NOT BUILD_DiffusionCoreMiniApps)
-  set(BUILD_DiffusionCoreMiniApps TRUE)
-endif()
-
-if(NOT BUILD_FiberTrackingMiniApps)
-  set(BUILD_FiberTrackingMiniApps TRUE)
+if(NOT BUILD_DiffusionMiniApps)
+  set(BUILD_DiffusionMiniApps TRUE)
 endif()
 
 set(INITIAL_CMAKECACHE_OPTIONS "

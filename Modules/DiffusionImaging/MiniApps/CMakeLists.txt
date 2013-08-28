@@ -1,11 +1,11 @@
-OPTION(BUILD_FiberTrackingMiniApps "Build commandline tools for fiber tracking" OFF)
+OPTION(BUILD_DiffusionMiniApps "Build commandline tools for diffusion" OFF)
 
-IF(BUILD_FiberTrackingMiniApps)
+IF(BUILD_DiffusionMiniApps)
 
   # include necessary modules here MitkExt QmitkExt
   MITK_CHECK_MODULE(_RESULT DiffusionCore FiberTracking )
   IF(_RESULT)
-    MESSAGE("Warning: FiberTrackingMiniApps is missing ${_RESULT}")
+    MESSAGE("Warning: DiffusionMiniApps is missing ${_RESULT}")
   ELSE(_RESULT)
   MITK_USE_MODULE( DiffusionCore FiberTracking )
 
@@ -15,16 +15,21 @@ IF(BUILD_FiberTrackingMiniApps)
     ${CMAKE_CURRENT_BINARY_DIR}
     ${ALL_INCLUDE_DIRECTORIES})
 
-  PROJECT( mitkFiberTrackingMiniApps )
+  PROJECT( mitkDiffusionMiniApps )
 
   # fill in the standalone executables here
-  SET(FIBERTRACKINGMINIAPPS
-    mitkFiberTrackingMiniApps
+  SET(DIFFUSIONMINIAPPS
+    mitkDiffusionMiniApps
   )
 
   # set additional files here
-  SET(FIBERTRACKING_ADDITIONAL_FILES
+  SET(DIFFUSIONCORE_ADDITIONAL_FILES
     MiniAppManager.cpp
+    FileFormatConverter.cpp
+    TensorReconstruction.cpp
+    QballReconstruction.cpp
+    DiffusionIndices.cpp
+    CopyGeometry.cpp
     GibbsTracking.cpp
     StreamlineTracking.cpp
     FiberProcessing.cpp
@@ -35,11 +40,11 @@ IF(BUILD_FiberTrackingMiniApps)
   )
 
   # create an executable foreach tool (only one at the moment)
-  FOREACH(tool ${FIBERTRACKINGMINIAPPS})
+  FOREACH(tool ${DIFFUSIONMINIAPPS})
     ADD_EXECUTABLE(
     ${tool}
     ${tool}.cpp
-    ${FIBERTRACKING_ADDITIONAL_FILES}
+    ${DIFFUSIONCORE_ADDITIONAL_FILES}
     )
 
     TARGET_LINK_LIBRARIES(
@@ -48,6 +53,6 @@ IF(BUILD_FiberTrackingMiniApps)
   ENDFOREACH(tool)
   ENDIF()
 
-  MITK_INSTALL_TARGETS(EXECUTABLES mitkFiberTrackingMiniApps )
+  MITK_INSTALL_TARGETS(EXECUTABLES mitkDiffusionMiniApps )
 
-ENDIF(BUILD_FiberTrackingMiniApps)
+ENDIF(BUILD_DiffusionMiniApps)

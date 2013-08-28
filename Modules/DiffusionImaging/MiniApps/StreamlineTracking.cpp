@@ -171,4 +171,4 @@ int StreamlineTracking(int argc, char* argv[])
     MITK_INFO << "DONE";
     return EXIT_SUCCESS;
 }
-RegisterFiberTrackingMiniApp(StreamlineTracking);
+RegisterDiffusionMiniApp(StreamlineTracking);

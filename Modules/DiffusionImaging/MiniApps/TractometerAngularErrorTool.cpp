@@ -21,20 +21,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkFiberTrackingObjectFactory.h>
+#include <itkEvaluateDirectionImagesFilter.h>
 #include <metaCommand.h>
 #include "ctkCommandLineParser.h"
+#include <itkTractsToVectorImageFilter.h>
 #include <usAny.h>
 #include <itkImageFileWriter.h>
 #include <mitkIOUtil.h>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <fstream>
-#include <itkEvaluateTractogramDirectionsFilter.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-int TractogramAngularError(int argc, char* argv[])
+int TractometerAngularErrorTool(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
@@ -42,9 +43,9 @@ int TractogramAngularError(int argc, char* argv[])
     parser.addArgument("reference", "r", ctkCommandLineParser::StringList, "reference direction images", us::Any(), false);
     parser.addArgument("out", "o", ctkCommandLineParser::String, "output root", us::Any(), false);
     parser.addArgument("mask", "m", ctkCommandLineParser::String, "mask image");
+    parser.addArgument("athresh", "a", ctkCommandLineParser::Float, "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
     parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "output optional and intermediate calculation results");
     parser.addArgument("ignore", "n", ctkCommandLineParser::Bool, "don't increase error for missing or too many directions");
-    parser.addArgument("trilinear", "t", ctkCommandLineParser::Bool, "use trilinear instead of nearest neighbor interpolation");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -58,6 +59,10 @@ int TractogramAngularError(int argc, char* argv[])
     if (parsedArgs.count("mask"))
         maskImage = us::any_cast<string>(parsedArgs["mask"]);
 
+    float angularThreshold = 25;
+    if (parsedArgs.count("athresh"))
+        angularThreshold = us::any_cast<float>(parsedArgs["athresh"]);
+
     string outRoot = us::any_cast<string>(parsedArgs["out"]);
 
     bool verbose = false;
@@ -68,10 +73,6 @@ int TractogramAngularError(int argc, char* argv[])
     if (parsedArgs.count("ignore"))
         ignore = us::any_cast<bool>(parsedArgs["ignore"]);
 
-    bool interpolate = false;
-    if (parsedArgs.count("interpolate"))
-        interpolate = us::any_cast<bool>(parsedArgs["interpolate"]);
-
     try
     {
         RegisterDiffusionCoreObjectFactory();
@@ -80,12 +81,10 @@ int TractogramAngularError(int argc, char* argv[])
         typedef itk::Image<unsigned char, 3>                                    ItkUcharImgType;
         typedef itk::Image< itk::Vector< float, 3>, 3 >                         ItkDirectionImage3DType;
         typedef itk::VectorContainer< int, ItkDirectionImage3DType::Pointer >   ItkDirectionImageContainerType;
-        typedef itk::EvaluateTractogramDirectionsFilter< float >                EvaluationFilterType;
+        typedef itk::EvaluateDirectionImagesFilter< float >                     EvaluationFilterType;
 
         // load fiber bundle
         mitk::FiberBundleX::Pointer inputTractogram = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
-        if (!inputTractogram)
-            return EXIT_FAILURE;
 
         // load reference directions
         ItkDirectionImageContainerType::Pointer referenceImageContainer = ItkDirectionImageContainerType::New();
@@ -124,13 +123,72 @@ int TractogramAngularError(int argc, char* argv[])
             mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, itkMaskImage);
         }
 
+
+        // extract directions from fiber bundle
+        itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
+        fOdfFilter->SetFiberBundle(inputTractogram);
+        fOdfFilter->SetMaskImage(itkMaskImage);
+        fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
+        fOdfFilter->SetNormalizeVectors(true);
+        fOdfFilter->SetUseWorkingCopy(false);
+        fOdfFilter->Update();
+        ItkDirectionImageContainerType::Pointer directionImageContainer = fOdfFilter->GetDirectionImageContainer();
+
+        if (verbose)
+        {
+            // write vector field
+            mitk::FiberBundleX::Pointer directions = fOdfFilter->GetOutputFiberBundle();
+            mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
+            for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
+            {
+                if ( (*it)->CanWriteBaseDataType(directions.GetPointer()) ) {
+                    string outfilename = outRoot;
+                    outfilename.append("_VECTOR_FIELD.fib");
+                    (*it)->SetFileName( outfilename.c_str() );
+                    (*it)->DoWrite( directions.GetPointer() );
+                }
+            }
+
+            // write direction images
+            for (int i=0; i<directionImageContainer->Size(); i++)
+            {
+                itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = directionImageContainer->GetElement(i);
+                typedef itk::ImageFileWriter< itk::TractsToVectorImageFilter<float>::ItkDirectionImageType > WriterType;
+                WriterType::Pointer writer = WriterType::New();
+
+                string outfilename = outRoot;
+                outfilename.append("_DIRECTION_");
+                outfilename.append(boost::lexical_cast<string>(i));
+                outfilename.append(".nrrd");
+
+                MITK_INFO << "writing " << outfilename;
+                writer->SetFileName(outfilename.c_str());
+                writer->SetInput(itkImg);
+                writer->Update();
+            }
+
+            // write num direction image
+            {
+                ItkUcharImgType::Pointer numDirImage = fOdfFilter->GetNumDirectionsImage();
+                typedef itk::ImageFileWriter< ItkUcharImgType > WriterType;
+                WriterType::Pointer writer = WriterType::New();
+
+                string outfilename = outRoot;
+                outfilename.append("_NUM_DIRECTIONS.nrrd");
+
+                MITK_INFO << "writing " << outfilename;
+                writer->SetFileName(outfilename.c_str());
+                writer->SetInput(numDirImage);
+                writer->Update();
+            }
+        }
+
         // evaluate directions
         EvaluationFilterType::Pointer evaluationFilter = EvaluationFilterType::New();
-        evaluationFilter->SetTractogram(inputTractogram);
+        evaluationFilter->SetImageSet(directionImageContainer);
         evaluationFilter->SetReferenceImageSet(referenceImageContainer);
         evaluationFilter->SetMaskImage(itkMaskImage);
         evaluationFilter->SetIgnoreMissingDirections(ignore);
-        evaluationFilter->SetUseInterpolation(interpolate);
         evaluationFilter->Update();
 
         if (verbose)
@@ -202,4 +260,4 @@ int TractogramAngularError(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-RegisterFiberTrackingMiniApp(TractogramAngularError);
+RegisterDiffusionMiniApp(TractometerAngularErrorTool);

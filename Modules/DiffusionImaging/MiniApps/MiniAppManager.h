@@ -32,7 +32,7 @@ protected:
 //
 // Register miniApps
 //
-#define RegisterDiffusionCoreMiniApp(functionName) \
+#define RegisterDiffusionMiniApp(functionName) \
     static MiniAppManager::MiniAppFunction MiniApp##functionName = \
     MiniAppManager::GetInstance()->AddFunction(#functionName, &functionName)
 #endif

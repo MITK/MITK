@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTensorImage.h>
 #include "ctkCommandLineParser.h"
 #include <boost/algorithm/string.hpp>
+#include <itksys/SystemTools.hxx>
 
 /**
  * Calculate indices derived from Qball or tensor images
@@ -46,6 +47,10 @@ int DiffusionIndices(int argc, char* argv[])
     string inFileName = us::any_cast<string>(parsedArgs["input"]);
     string index = us::any_cast<string>(parsedArgs["index"]);
     string outFileName = us::any_cast<string>(parsedArgs["outFile"]);
+
+    string ext = itksys::SystemTools::GetFilenameLastExtension(outFileName);
+    if (ext.empty())
+        outFileName += ".nrrd";
 
     try
     {
@@ -119,6 +124,8 @@ int DiffusionIndices(int argc, char* argv[])
             fileWriter->SetFileName(outFileName);
             fileWriter->Update();
         }
+        else
+            MITK_INFO << "Diffusion index " << index << " not supported for supplied file type.";
     }
     catch (itk::ExceptionObject e)
     {
@@ -138,4 +145,4 @@ int DiffusionIndices(int argc, char* argv[])
     return EXIT_SUCCESS;
 }
 
-RegisterDiffusionCoreMiniApp(DiffusionIndices);
+RegisterDiffusionMiniApp(DiffusionIndices);

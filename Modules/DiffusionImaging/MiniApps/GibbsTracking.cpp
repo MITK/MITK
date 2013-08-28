@@ -212,4 +212,4 @@ int GibbsTracking(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-RegisterFiberTrackingMiniApp(GibbsTracking);
+RegisterDiffusionMiniApp(GibbsTracking);

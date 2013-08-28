@@ -32,16 +32,10 @@ class QmitkDnDFrameWidgetPrivate
 {
 public:
 
-  QmitkDnDFrameWidgetPrivate()
-  : m_PrefServiceTracker(QmitkCommonActivator::GetContext())
-  {
-    m_PrefServiceTracker.open();
-  }
-
   berry::IPreferences::Pointer GetPreferences() const
   {
-    berry::IPreferencesService* prefService = m_PrefServiceTracker.getService();
-    if (prefService)
+    berry::IPreferencesService::Pointer prefService = QmitkCommonActivator::GetInstance()->GetPreferencesService();
+    if (prefService.IsNotNull())
     {
       return prefService->GetSystemPreferences()->Node("/General");
     }
@@ -58,7 +52,6 @@ public:
     return true;
   }
 
-  ctkServiceTracker<berry::IPreferencesService*> m_PrefServiceTracker;
 };
 
 QmitkDnDFrameWidget::QmitkDnDFrameWidget(QWidget *parent)

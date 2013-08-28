@@ -37,14 +37,8 @@ class QmitkFileOpenActionPrivate
 {
 public:
 
-  QmitkFileOpenActionPrivate()
-    : m_PrefServiceTracker(mitk::PluginActivator::GetContext())
-  {}
-
   void init ( berry::IWorkbenchWindow::Pointer window, QmitkFileOpenAction* action )
   {
-    m_PrefServiceTracker.open();
-
     m_Window = window;
     action->setParent(static_cast<QWidget*>(m_Window.Lock()->GetShell()->GetControl()));
     action->setText("&Open...");
@@ -55,8 +49,8 @@ public:
 
   berry::IPreferences::Pointer GetPreferences() const
   {
-    berry::IPreferencesService* prefService = m_PrefServiceTracker.getService();
-    if (prefService)
+    berry::IPreferencesService::Pointer prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
+    if (prefService.IsNotNull())
     {
       return prefService->GetSystemPreferences()->Node("/General");
     }
@@ -83,8 +77,17 @@ public:
     }
   }
 
+  bool GetOpenEditor() const
+  {
+    berry::IPreferences::Pointer prefs = GetPreferences();
+    if(prefs.IsNotNull())
+    {
+      return prefs->GetBool("OpenEditor", true);
+    }
+    return true;
+  }
+
   berry::IWorkbenchWindow::WeakPtr m_Window;
-  ctkServiceTracker<berry::IPreferencesService*> m_PrefServiceTracker;
 };
 
 QmitkFileOpenAction::QmitkFileOpenAction(berry::IWorkbenchWindow::Pointer window)
@@ -116,5 +119,5 @@ void QmitkFileOpenAction::Run()
     return;
 
   d->setLastFileOpenPath(fileNames.front());
-  mitk::WorkbenchUtil::LoadFiles(fileNames, d->m_Window.Lock());
+  mitk::WorkbenchUtil::LoadFiles(fileNames, d->m_Window.Lock(), d->GetOpenEditor());
 }

@@ -51,13 +51,13 @@ public:
     : mitk::AbstractFileReader(extension, "This is a dummy description")
   {
     m_Priority = priority;
-    //std::list<std::string> options;
-    m_Options.push_front(std::make_pair("isANiceGuy", true));
-    m_Options.push_front(std::make_pair("canFly", false));
-    m_Options.push_front(std::make_pair("isAwesome", true));
-    m_Options.push_front(std::make_pair("hasOptions", true));
-    m_Options.push_front(std::make_pair("has more Options", true));
-    m_Options.push_front(std::make_pair("has maaaaaaaany Options", true));
+    //std::vector<std::string> options;
+    m_Options.push_back(std::make_pair("isANiceGuy", true));
+    m_Options.push_back(std::make_pair("canFly", false));
+    m_Options.push_back(std::make_pair("isAwesome", true));
+    m_Options.push_back(std::make_pair("hasOptions", true));
+    m_Options.push_back(std::make_pair("has more Options", true));
+    m_Options.push_back(std::make_pair("has maaaaaaaany Options", true));
     m_ServiceReg = this->RegisterService();
   }
 
@@ -68,13 +68,13 @@ public:
 
   using mitk::AbstractFileReader::Read;
 
-  virtual std::list< itk::SmartPointer<mitk::BaseData> >  Read(const std::istream& /*stream*/, mitk::DataStorage* /*ds*/ = 0)
+  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read(const std::istream& /*stream*/, mitk::DataStorage* /*ds*/ = 0)
   {
-    std::list<mitk::BaseData::Pointer> result;
+    std::vector<mitk::BaseData::Pointer> result;
     return result;
   }
 
-  virtual void SetOptions(const std::list< mitk::IFileWriter::FileServiceOption >& options )
+  virtual void SetOptions(const std::vector< mitk::IFileWriter::FileServiceOption >& options )
   {
     m_Options = options;
     //m_Registration.SetProperties(GetServiceProperties());
@@ -129,7 +129,7 @@ void QmitkFileSaveDialog::ProcessSelectedFile()
   m_FileWriter->SetOptions(m_Options);
 }
 
-std::list<mitk::IFileWriter::FileServiceOption> QmitkFileSaveDialog::QueryAvailableOptions(std::string path)
+std::vector<mitk::IFileWriter::FileServiceOption> QmitkFileSaveDialog::QueryAvailableOptions(std::string path)
 {
   us::ModuleContext* context = us::GetModuleContext();
   mitk::IFileWriter* writer = m_FileWriterRegistry.GetWriter(m_BaseData->GetNameOfClass());
@@ -137,7 +137,7 @@ std::list<mitk::IFileWriter::FileServiceOption> QmitkFileSaveDialog::QueryAvaila
   if (writer == NULL)
   {
     // MITK_WARN << "Did not find WriterService for registered Extension. This should be looked into by a developer.";
-    std::list<mitk::IFileReader::FileServiceOption> emptyList;
+    std::vector<mitk::IFileReader::FileServiceOption> emptyList;
     return emptyList;
   }
 

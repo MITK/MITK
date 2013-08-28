@@ -41,9 +41,9 @@ public:
   LegacyFileReaderService(const std::string& extension, const std::string& description);
   virtual ~LegacyFileReaderService();
 
-  virtual std::list< mitk::BaseData::Pointer > Read(const std::string& path, mitk::DataStorage* ds = 0);
+  virtual std::vector< mitk::BaseData::Pointer > Read(const std::string& path, mitk::DataStorage* ds = 0);
 
-  virtual std::list< mitk::BaseData::Pointer > Read(const std::istream& stream, mitk::DataStorage* ds = 0 );
+  virtual std::vector< mitk::BaseData::Pointer > Read(const std::istream& stream, mitk::DataStorage* ds = 0 );
 
 private:
 

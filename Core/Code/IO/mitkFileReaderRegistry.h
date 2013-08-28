@@ -59,15 +59,15 @@ public:
     * FileNotFoundException: If no file was found at <code>path</code>
     * FileReadException: If the selected reader failed to read the file
     **/
-    std::list< itk::SmartPointer<BaseData> > Read(const std::string& path, us::ModuleContext* context = us::GetModuleContext());
+    std::vector< itk::SmartPointer<BaseData> > Read(const std::string& path, us::ModuleContext* context = us::GetModuleContext());
 
-    std::list< mitk::BaseData::Pointer > ReadAll(const std::list<std::string>& paths, std::list<std::string>* unreadableFiles = 0,
+    std::vector< mitk::BaseData::Pointer > ReadAll(const std::vector<std::string>& paths, std::vector<std::string>* unreadableFiles = 0,
                                                  us::ModuleContext* context = us::GetModuleContext());
 
     template <class T>
     itk::SmartPointer<T>  Read(const std::string& path, us::ModuleContext* context = us::GetModuleContext())
     {
-      std::list<mitk::BaseData::Pointer> basedatas = Read(path, context);
+      std::vector<mitk::BaseData::Pointer> basedatas = Read(path, context);
       T* result = dynamic_cast<T*> (basedatas.front().GetPointer());
       return result;
     }

@@ -42,7 +42,7 @@ mitk::FileReaderRegistry::~FileReaderRegistry()
 
 //////////////////// READING DIRECTLY ////////////////////
 
-std::list< mitk::BaseData::Pointer > mitk::FileReaderRegistry::Read(const std::string& path, us::ModuleContext* context)
+std::vector< mitk::BaseData::Pointer > mitk::FileReaderRegistry::Read(const std::string& path, us::ModuleContext* context)
 {
   // Find extension
   std::string extension = path;
@@ -55,17 +55,17 @@ std::list< mitk::BaseData::Pointer > mitk::FileReaderRegistry::Read(const std::s
   return reader->Read(path);
 }
 
-std::list< mitk::BaseData::Pointer > mitk::FileReaderRegistry::ReadAll(
-    const std::list<std::string>& paths, std::list<std::string>* unreadableFiles,
-    us::ModuleContext* context)
+std::vector< mitk::BaseData::Pointer > mitk::FileReaderRegistry::ReadAll(
+  const std::vector<std::string>& paths, std::vector<std::string>* unreadableFiles,
+  us::ModuleContext* context)
 {
-  std::list< mitk::BaseData::Pointer > result;
-  for (std::list<std::string>::const_iterator iterator = paths.begin(), end = paths.end(); iterator != end; ++iterator)
+  std::vector< mitk::BaseData::Pointer > result;
+  for (std::vector<std::string>::const_iterator iterator = paths.begin(), end = paths.end(); iterator != end; ++iterator)
   {
     try
     {
-      std::list<mitk::BaseData::Pointer> baseDataList = Read( *iterator, context );
-      result.merge(baseDataList);
+      std::vector<mitk::BaseData::Pointer> baseDataList = Read( *iterator, context );
+      result.insert(result.end(), baseDataList.begin(), baseDataList.end());
     }
     catch (...)
     {
@@ -104,8 +104,8 @@ std::vector <mitk::IFileReader*> mitk::FileReaderRegistry::GetReaders(const std:
 }
 
 mitk::IFileReader* mitk::FileReaderRegistry::GetReader(
-    const std::string& extension, const mitk::IFileReader::OptionNames& options,
-    us::ModuleContext* context )
+  const std::string& extension, const mitk::IFileReader::OptionNames& options,
+  us::ModuleContext* context )
 {
   std::vector <mitk::IFileReader*> matching = mitk::FileReaderRegistry::GetReaders(extension, options, context);
   if (matching.empty()) return NULL;
@@ -113,8 +113,8 @@ mitk::IFileReader* mitk::FileReaderRegistry::GetReader(
 }
 
 std::vector <mitk::IFileReader*> mitk::FileReaderRegistry::GetReaders(
-    const std::string& extension, const mitk::IFileReader::OptionNames& options,
-    us::ModuleContext* context )
+  const std::string& extension, const mitk::IFileReader::OptionNames& options,
+  us::ModuleContext* context )
 {
   const std::vector <mitk::IFileReader*> allReaders = mitk::FileReaderRegistry::GetReaders(extension, context);
   std::vector <mitk::IFileReader*> result;

@@ -14,12 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include <mitkLegacyFileReaderService.h>
 #include <mitkIOUtil.h>
 
 #include <usGetModuleContext.h>
-
 
 mitk::LegacyFileReaderService::LegacyFileReaderService(const mitk::LegacyFileReaderService& other)
   : mitk::AbstractFileReader(other)
@@ -40,17 +38,17 @@ mitk::LegacyFileReaderService::~LegacyFileReaderService()
 
 ////////////////////// Reading /////////////////////////
 
-std::list< mitk::BaseData::Pointer > mitk::LegacyFileReaderService::Read(const std::string& path, mitk::DataStorage* /*ds*/)
+std::vector< mitk::BaseData::Pointer > mitk::LegacyFileReaderService::Read(const std::string& path, mitk::DataStorage* /*ds*/)
 {
-  std::list< mitk::BaseData::Pointer > result;
-  result.push_front(mitk::IOUtil::LoadDataNode(path)->GetData());
+  std::vector< mitk::BaseData::Pointer > result;
+  result.push_back(mitk::IOUtil::LoadDataNode(path)->GetData());
   return result;
 }
 
-std::list< mitk::BaseData::Pointer > mitk::LegacyFileReaderService::Read(const std::istream& /*stream*/, mitk::DataStorage* /*ds*/)
+std::vector< mitk::BaseData::Pointer > mitk::LegacyFileReaderService::Read(const std::istream& /*stream*/, mitk::DataStorage* /*ds*/)
 {
   mitkThrow () << "Streaming is not supported in Legacy Wrappers.";
-  std::list< mitk::BaseData::Pointer > result;
+  std::vector< mitk::BaseData::Pointer > result;
   return result;
 }
 

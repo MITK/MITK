@@ -41,9 +41,9 @@ namespace mitk {
   {
   public:
 
-    virtual std::list< itk::SmartPointer<BaseData> > Read(const std::string& path, mitk::DataStorage *ds = 0 );
+    virtual std::vector< itk::SmartPointer<BaseData> > Read(const std::string& path, mitk::DataStorage *ds = 0 );
 
-    virtual std::list< itk::SmartPointer<BaseData> > Read(const std::istream& stream, mitk::DataStorage *ds = 0 ) = 0;
+    virtual std::vector< itk::SmartPointer<BaseData> > Read(const std::istream& stream, mitk::DataStorage *ds = 0 ) = 0;
 
     virtual int GetPriority() const;
 

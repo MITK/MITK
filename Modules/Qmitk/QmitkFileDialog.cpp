@@ -49,13 +49,13 @@ public:
     : mitk::AbstractFileReader(extension, "This is a dummy description")
   {
     m_Priority = priority;
-    //std::list<std::string> options;
-    m_Options.push_front(std::make_pair("isANiceGuy", true));
-    m_Options.push_front(std::make_pair("canFly", false));
-    m_Options.push_front(std::make_pair("isAwesome", true));
-    m_Options.push_front(std::make_pair("hasOptions", true));
-    m_Options.push_front(std::make_pair("has more Options", true));
-    m_Options.push_front(std::make_pair("has maaaaaaaany Options", true));
+    //std::vector<std::string> options;
+    m_Options.push_back(std::make_pair("isANiceGuy", true));
+    m_Options.push_back(std::make_pair("canFly", false));
+    m_Options.push_back(std::make_pair("isAwesome", true));
+    m_Options.push_back(std::make_pair("hasOptions", true));
+    m_Options.push_back(std::make_pair("has more Options", true));
+    m_Options.push_back(std::make_pair("has maaaaaaaany Options", true));
     m_ServiceReg = this->RegisterService();
   }
 
@@ -66,13 +66,13 @@ public:
 
   using mitk::AbstractFileReader::Read;
 
-  virtual std::list< itk::SmartPointer<mitk::BaseData> >  Read(const std::istream& /*stream*/, mitk::DataStorage* /*ds*/ = 0)
+  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read(const std::istream& /*stream*/, mitk::DataStorage* /*ds*/ = 0)
   {
-    std::list<mitk::BaseData::Pointer> result;
+    std::vector<mitk::BaseData::Pointer> result;
     return result;
   }
 
-  virtual void SetOptions(const std::list< mitk::IFileReader::FileServiceOption >& options )
+  virtual void SetOptions(const std::vector< mitk::IFileReader::FileServiceOption >& options )
   {
     m_Options = options;
     //m_Registration.SetProperties(GetServiceProperties());
@@ -148,16 +148,13 @@ void QmitkFileDialog::DisplayOptions(QString path)
 {
   ClearOptionsBox();
 
-  std::list< mitk::IFileReader::FileServiceOption > options = QueryAvailableOptions(path.toStdString());
-  int i = 0;
-  while (options.size() > 0)
+  std::vector< mitk::IFileReader::FileServiceOption > options = QueryAvailableOptions(path.toStdString());
+  for (int i = 0; i < options.size(); i++)
   {
     QCheckBox *checker = new QCheckBox(this);
-    checker->setText( options.front().first.c_str() );
-    checker->setChecked( options.front().second );
-    options.pop_front();
+    checker->setText( options[i].first.c_str() );
+    checker->setChecked( options[i].second );
     m_BoxLayout->addWidget(checker, i / 4, i % 4);
-    i++;
   }
 }
 
@@ -174,9 +171,9 @@ void QmitkFileDialog::ClearOptionsBox()
   }
 }
 
-std::list< mitk::IFileReader::FileServiceOption > QmitkFileDialog::GetSelectedOptions()
+std::vector< mitk::IFileReader::FileServiceOption > QmitkFileDialog::GetSelectedOptions()
 {
-  std::list<mitk::IFileReader::FileServiceOption> result;
+  std::vector<mitk::IFileReader::FileServiceOption> result;
 
   if ( m_BoxLayout != NULL )
   {

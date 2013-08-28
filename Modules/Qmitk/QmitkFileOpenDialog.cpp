@@ -66,7 +66,7 @@ void QmitkFileOpenDialog::ProcessSelectedFile()
   }
 }
 
-std::list<mitk::IFileReader::FileServiceOption> QmitkFileOpenDialog::QueryAvailableOptions(std::string path)
+std::vector<mitk::IFileReader::FileServiceOption> QmitkFileOpenDialog::QueryAvailableOptions(std::string path)
 {
   std::string extension = path;
   extension.erase(0, extension.find_last_of('.'));
@@ -77,34 +77,34 @@ std::list<mitk::IFileReader::FileServiceOption> QmitkFileOpenDialog::QueryAvaila
   if (reader == NULL)
   {
     // MITK_WARN << "Did not find ReaderService for registered Extension. This should be looked into by a developer.";
-    std::list<mitk::IFileReader::FileServiceOption> emptyList;
+    std::vector<mitk::IFileReader::FileServiceOption> emptyList;
     return emptyList;
   }
 
   return reader->GetOptions();
 }
 
-std::list<mitk::IFileReader*> QmitkFileOpenDialog::GetReaders()
+std::vector<mitk::IFileReader*> QmitkFileOpenDialog::GetReaders()
 {
   return this->m_FileReaders;
 }
 
-std::list< mitk::BaseData::Pointer > QmitkFileOpenDialog::GetBaseDatas()
+std::vector< mitk::BaseData::Pointer > QmitkFileOpenDialog::GetBaseDatas()
 {
   //if (m_FileReaders.size() == 0 )
   //{
   //  MITK_WARN << "Tried go get BaseData while no FileReader was selected in Dialog. Returning empty list.";
-  //  std::list< mitk::BaseData::Pointer > emptyList;
+  //  std::vector< mitk::BaseData::Pointer > emptyList;
   //  return  emptyList;
   //}
 
-  //std::list<mitk::BaseData::Pointer> result;
-  //for(std::list< mitk::IFileReader* >::iterator reader = m_FileReaders.begin(); reader != m_FileReaders.end; reader++)
+  //std::vector<mitk::BaseData::Pointer> result;
+  //for(std::vector< mitk::IFileReader* >::iterator reader = m_FileReaders.begin(); reader != m_FileReaders.end; reader++)
   //{
   //  result.splice(result.end(), m_FileReaders.)
   //  result.pu
   //}
   //return m_FileReader->Read(this->selectedFiles().front().toStdString());
-  std::list< mitk::BaseData::Pointer > emptyList;
+  std::vector< mitk::BaseData::Pointer > emptyList;
   return  emptyList;
 }

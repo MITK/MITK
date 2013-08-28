@@ -57,12 +57,12 @@ namespace mitk {
     /**
     * \brief Reads the specified file and returns its contents.
     */
-    virtual std::list< itk::SmartPointer<BaseData> > Read(const std::string& path, mitk::DataStorage* ds = 0) = 0;
+    virtual std::vector< itk::SmartPointer<BaseData> > Read(const std::string& path, mitk::DataStorage* ds = 0) = 0;
 
     /**
     * \brief Reads the specified input stream and returns its contents.
     */
-    virtual std::list< itk::SmartPointer<BaseData> > Read(const std::istream& stream, mitk::DataStorage* ds  = 0) = 0;
+    virtual std::vector< itk::SmartPointer<BaseData> > Read(const std::istream& stream, mitk::DataStorage* ds  = 0) = 0;
 
     /**
     * \brief Returns the priority which defined how 'good' the FileReader can handle it's file format.

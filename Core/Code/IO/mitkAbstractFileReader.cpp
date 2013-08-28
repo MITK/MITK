@@ -56,7 +56,7 @@ mitk::AbstractFileReader::AbstractFileReader(const std::string& extension, const
 
 ////////////////////// Reading /////////////////////////
 
-std::list< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(const std::string& path, mitk::DataStorage* /*ds*/)
+std::vector< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(const std::string& path, mitk::DataStorage* /*ds*/)
 {
   if (! itksys::SystemTools::FileExists(path.c_str()))
     mitkThrow() << "File '" + path + "' not found.";
@@ -65,7 +65,7 @@ std::list< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(co
   return this->Read(stream);
 }
 
-std::list< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(const std::istream& stream, mitk::DataStorage* ds)
+std::vector< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(const std::istream& stream, mitk::DataStorage* ds)
 {
   // Create a temporary file and copy the data to it
   std::ofstream tmpOutputStream;
@@ -74,7 +74,7 @@ std::list< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(co
   tmpOutputStream.close();
 
   // Now read from the temporary file
-  std::list< itk::SmartPointer<mitk::BaseData> > result = this->Read(tmpFilePath, ds);
+  std::vector< itk::SmartPointer<mitk::BaseData> > result = this->Read(tmpFilePath, ds);
   std::remove(tmpFilePath.c_str());
   return result;
 }

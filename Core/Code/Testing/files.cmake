@@ -8,8 +8,8 @@ set(MODULE_TESTS
   mitkDispatcherTest.cpp
   mitkEnumerationPropertyTest.cpp
   mitkEventTest.cpp
-  mitkFileReaderManagerTest.cpp
-  mitkFileWriterManagerTest.cpp
+  mitkFileReaderRegistryTest.cpp
+  mitkFileWriterRegistryTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp

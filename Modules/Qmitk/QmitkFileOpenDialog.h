@@ -62,9 +62,9 @@ public:
   QmitkFileOpenDialog(QWidget* p = 0, Qt::WindowFlags f1 = 0);
   virtual ~QmitkFileOpenDialog();
 
-  virtual std::list <mitk::IFileReader*> GetReaders();
+  virtual std::vector <mitk::IFileReader*> GetReaders();
 
-  virtual std::list< mitk::BaseData::Pointer > GetBaseDatas();
+  virtual std::vector< mitk::BaseData::Pointer > GetBaseDatas();
 
 signals:
 
@@ -76,11 +76,11 @@ signals:
 
 protected:
 
-  std::list<mitk::IFileReader*> m_FileReaders;
-  std::list <mitk::IFileReader::FileServiceOption> m_Options;
+  std::vector<mitk::IFileReader*> m_FileReaders;
+  std::vector <mitk::IFileReader::FileServiceOption> m_Options;
   mitk::FileReaderRegistry m_FileReaderRegistry;
 
-  virtual std::list<mitk::IFileReader::FileServiceOption> QueryAvailableOptions(std::string path) ;
+  virtual std::vector<mitk::IFileReader::FileServiceOption> QueryAvailableOptions(std::string path) ;
 
   //Ui::QmitkFileOpenDialogControls* m_Controls; ///< member holding the UI elements of this widget
 };

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::VtkOverlay3D::VtkOverlay3D()
 {
   mitk::Point3D offsetVector;
-  offsetVector[0]=offsetVector[1]=offsetVector[2]=0;
+  offsetVector.Fill(0);
   SetOffsetVector(offsetVector);
 }
 
@@ -49,6 +49,7 @@ void mitk::VtkOverlay3D::SetPosition3D(const Point3D& position3D, mitk::BaseRend
 mitk::Point3D mitk::VtkOverlay3D::GetPosition3D(mitk::BaseRenderer *renderer) const
 {
   mitk::Point3D position3D;
+  position3D.Fill(0);
   GetPropertyValue<mitk::Point3D>("VtkOverlay3D.Position3D", position3D, renderer);
   return position3D;
 }
@@ -62,6 +63,7 @@ void mitk::VtkOverlay3D::SetOffsetVector(const Point3D& OffsetVector, mitk::Base
 mitk::Point3D mitk::VtkOverlay3D::GetOffsetVector(mitk::BaseRenderer *renderer) const
 {
   mitk::Point3D OffsetVector;
+  OffsetVector.Fill(0);
   GetPropertyValue<mitk::Point3D>("VtkOverlay3D.OffsetVector", OffsetVector, renderer);
   return OffsetVector;
 }

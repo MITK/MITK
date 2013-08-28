@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk headers
 #include <mitkNavigationDataSource.h>
 #include <usGetModuleContext.h>
+#include "usServiceReference.h"
 
 
 
@@ -55,24 +56,25 @@ void QmitkNavigationDataSourceSelectionWidget::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( (QObject*)(m_Controls->m_NaviagationDataSourceWidget), SIGNAL(ServiceSelectionChanged(mitk::ServiceReference)), this, SLOT(NavigationDataSourceSelected(mitk::ServiceReference)) );
+    connect( (QObject*)(m_Controls->m_NaviagationDataSourceWidget), SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(NavigationDataSourceSelected(us::ServiceReferenceU)) );
 
   }
 }
 
-void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::ServiceReference<mitk::NavigationDataSource> s)
+void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::ServiceReferenceU s)
   {
     if (!s) //no device selected
       {
         //reset everything
         m_CurrentSource = NULL;
         m_CurrentStorage = NULL;
+        emit NavigationDataSourceSelected(m_CurrentSource);
         return;
       }
 
     // Get Source
     us::ModuleContext* context = us::GetModuleContext();
-    m_CurrentSource = context->GetService(s);
+    m_CurrentSource = context->GetService<mitk::NavigationDataSource>(s);
     std::string id = s.GetProperty(mitk::NavigationDataSource::US_PROPKEY_ID).ToString();
 
     //Fill tool list
@@ -96,6 +98,8 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::
       MITK_WARN << "Found a tool storage, but it has not the same number of tools like the NavigationDataSource. This storage won't be used because it isn't the right one.";
       m_CurrentStorage = NULL;
       }
+
+    emit NavigationDataSourceSelected(m_CurrentSource);
   }
 
 mitk::NavigationDataSource::Pointer QmitkNavigationDataSourceSelectionWidget::GetSelectedNavigationDataSource()

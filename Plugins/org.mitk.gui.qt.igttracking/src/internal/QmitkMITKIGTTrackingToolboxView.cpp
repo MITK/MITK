@@ -199,6 +199,10 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
   //build the IGT pipeline
   mitk::TrackingDevice::Pointer trackingDevice = this->m_Controls->m_configurationWidget->GetTrackingDevice();
 
+  //set device to rotation mode transposed becaus we are working with VNL style quaternions
+  if(m_Controls->m_InverseMode->isChecked())
+    trackingDevice->SetRotationMode(mitk::TrackingDevice::RotationTransposed);
+
   //Get Tracking Volume Data
   mitk::TrackingDeviceData data = mitk::DeviceDataUnspecified;
 
@@ -212,6 +216,10 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
   mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,trackingDevice);
   m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
   MITK_INFO << "Number of tools: " << m_TrackingDeviceSource->GetNumberOfOutputs();
+
+  //set filter to rotation mode transposed becaus we are working with VNL style quaternions
+  if(m_Controls->m_InverseMode->isChecked())
+    m_ToolVisualizationFilter->SetRotationMode(mitk::NavigationDataObjectVisualizationFilter::RotationTransposed);
 
   //First check if the created object is valid
   if (m_TrackingDeviceSource.IsNull())

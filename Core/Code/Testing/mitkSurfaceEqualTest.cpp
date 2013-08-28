@@ -32,9 +32,9 @@ vtkSmartPointer<vtkCellArray> m_PolygonArrayTwo;
 vtkSmartPointer<vtkPolyData> m_PolyDataOne;
 
 /**
-* @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the two used members for a new test case.
+* @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
 */
-void Setup()
+static void Setup()
 {
   //generate two sets of points
   m_PointsOne = vtkSmartPointer<vtkPoints>::New();
@@ -89,32 +89,31 @@ void Setup()
 
 }
 
-void Equal_InputIsNull_ReturnsFalse()
+static void Equal_InputIsNull_ReturnsFalse()
 {
   mitk::Surface::Pointer surface = NULL;
-
   MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( surface, surface), "Input is NULL. Result should be false.\n");
 }
 
-void Equal_CloneAndOriginalOneTimestep_ReturnsTrue()
+static void Equal_CloneAndOriginalOneTimestep_ReturnsTrue()
 {
   Setup();
   MITK_TEST_CONDITION_REQUIRED( mitk::Equal( m_Surface3D, m_Surface3D->Clone() ), "A one timestep clone should be equal to its original.\n");
 }
 
-void Equal_CloneAndOriginalTwoTimesteps_ReturnsTrue()
+static void Equal_CloneAndOriginalTwoTimesteps_ReturnsTrue()
 {
   Setup();
   MITK_TEST_CONDITION_REQUIRED( mitk::Equal( m_Surface3DTwoTimeSteps, m_Surface3DTwoTimeSteps->Clone() ), "A two timestep clone should be equal to its original.\n");
 }
 
-void Equal_OneTimeStepVSTwoTimeStep_ReturnsFalse()
+static void Equal_OneTimeStepVSTwoTimeStep_ReturnsFalse()
 {
   Setup();
   MITK_TEST_CONDITION_REQUIRED( ! mitk::Equal( m_Surface3D, m_Surface3DTwoTimeSteps ), "A one timestep and two timestep surface should not be equal.\n");
 }
 
-void Equal_TwoTimeStepsDifferentPoints_ReturnsFalse()
+static void Equal_TwoTimeStepsDifferentPoints_ReturnsFalse()
 {
   Setup();
 
@@ -129,7 +128,7 @@ void Equal_TwoTimeStepsDifferentPoints_ReturnsFalse()
   MITK_TEST_CONDITION_REQUIRED( ! mitk::Equal( surface3DTwoTimeStepsDifferentPoints, m_Surface3DTwoTimeSteps ), "A surface with the same timesteps and different points should not be equal.\n");
 }
 
-void Equal_SurfaceWithPolygonSurfaceWithPolyLine_ReturnsFalse()
+static void Equal_SurfaceWithPolygonSurfaceWithPolyLine_ReturnsFalse()
 {
   Setup();
 

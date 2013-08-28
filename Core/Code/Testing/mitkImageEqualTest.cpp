@@ -23,8 +23,8 @@ mitk::Image::Pointer m_Image;
 mitk::Image::Pointer m_AnotherImage;
 
 /**
- * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the two used members for a new test case.
- */
+* @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
+*/
 static void Setup()
 {
   //generate a gradient test image
@@ -32,23 +32,19 @@ static void Setup()
   m_AnotherImage = m_Image->Clone();
 }
 
-static void AreEqual_CloneAndOriginal_ReturnsTrue()
+void Equal_CloneAndOriginal_ReturnsTrue()
 {
   Setup();
   MITK_TEST_CONDITION_REQUIRED( mitk::Equal( m_Image, m_AnotherImage), "A clone should be equal to its original.");
 }
 
-static void AreEqual_InputIsNull_ReturnsFalse()
+static void Equal_InputIsNull_ReturnsFalse()
 {
-  Setup();
-
-  m_Image = NULL;
-  m_AnotherImage = NULL;
-
-  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Image, m_AnotherImage), "Input is NULL. Result should be false.");
+  mitk::Image::Pointer image = NULL;
+  MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( image, image ), "Input is NULL. Result should be false.");
 }
 
-static void AreEqual_DifferentImageGeometry_ReturnsFalse()
+static void Equal_DifferentImageGeometry_ReturnsFalse()
 {
   Setup();
 
@@ -62,7 +58,7 @@ static void AreEqual_DifferentImageGeometry_ReturnsFalse()
   MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Image, m_AnotherImage), "One origin was modified. Result should be false.");
 }
 
-static void AreEqual_DifferentPixelTypes_ReturnsFalse()
+static void Equal_DifferentPixelTypes_ReturnsFalse()
 {
   Setup();
 
@@ -71,7 +67,7 @@ static void AreEqual_DifferentPixelTypes_ReturnsFalse()
   MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Image, m_AnotherImage), "One pixel type is float, the other unsigned char. Result should be false.");
 }
 
-static void AreEqual_DifferentDimensions_ReturnsFalse()
+static void Equal_DifferentDimensions_ReturnsFalse()
 {
   Setup();
 
@@ -80,7 +76,7 @@ static void AreEqual_DifferentDimensions_ReturnsFalse()
   MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Image, m_AnotherImage), "Dimensions of first image are: (3, 3, 1). Dimensions of second image are: (5, 7, 3). Result should be false.");
 }
 
-static void AreEqual_DifferentDimensionalities_ReturnsFalse()
+static void Equal_DifferentDimensionalities_ReturnsFalse()
 {
   Setup();
 
@@ -94,7 +90,7 @@ static void AreEqual_DifferentDimensionalities_ReturnsFalse()
   MITK_TEST_CONDITION_REQUIRED( !mitk::Equal( m_Image, m_AnotherImage), "First image is 3D. Second image is 2D. Result should be false.");
 }
 
-static void AreEqual_DifferentPixelValues_ReturnsFalse()
+static void Equal_DifferentPixelValues_ReturnsFalse()
 {
   m_Image = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(3u, 3u);
   m_AnotherImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(3u, 3u);
@@ -109,13 +105,13 @@ int mitkImageEqualTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN(mitkImageAreEqualTest);
 
-  AreEqual_CloneAndOriginal_ReturnsTrue();
-  AreEqual_InputIsNull_ReturnsFalse();
-  AreEqual_DifferentImageGeometry_ReturnsFalse();
-  AreEqual_DifferentPixelTypes_ReturnsFalse();
-  AreEqual_DifferentDimensions_ReturnsFalse();
-  AreEqual_DifferentDimensionalities_ReturnsFalse();
-  AreEqual_DifferentPixelValues_ReturnsFalse();
+  Equal_CloneAndOriginal_ReturnsTrue();
+  Equal_InputIsNull_ReturnsFalse();
+  Equal_DifferentImageGeometry_ReturnsFalse();
+  Equal_DifferentPixelTypes_ReturnsFalse();
+  Equal_DifferentDimensions_ReturnsFalse();
+  Equal_DifferentDimensionalities_ReturnsFalse();
+  Equal_DifferentPixelValues_ReturnsFalse();
 
   MITK_TEST_END();
 

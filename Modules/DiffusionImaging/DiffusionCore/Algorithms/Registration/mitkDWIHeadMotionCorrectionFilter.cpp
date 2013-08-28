@@ -93,32 +93,40 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   mitk::Image::Pointer registeredB0Image = b0Image->Clone();
   const unsigned int numberOfb0Images = b0Image->GetTimeSteps();
 
-  mitk::ImageTimeSelector::Pointer t_selector2 =
-      mitk::ImageTimeSelector::New();
-
-  t_selector2->SetInput( b0Image );
-
-  for( unsigned int i=1; i<numberOfb0Images; i++)
+  if( numberOfb0Images > 1)
   {
 
-    t_selector2->SetTimeNr(i);
-    t_selector2->Update();
+    mitk::ImageTimeSelector::Pointer t_selector2 =
+        mitk::ImageTimeSelector::New();
 
-    registrationMethod->SetMovingImage( t_selector2->GetOutput() );
+    t_selector2->SetInput( b0Image );
 
-    try
+    for( unsigned int i=1; i<numberOfb0Images; i++)
     {
-      MITK_INFO << " === (" << i <<"/"<< numberOfb0Images-1 << ") :: Starting registration";
-      registrationMethod->Update();
-    }
-    catch( const itk::ExceptionObject& e)
-    {
-      mitkThrow() << "Failed to register the b0 images, the PyramidRegistration threw an exception: \n" << e.what();
+
+      t_selector2->SetTimeNr(i);
+      t_selector2->Update();
+
+      registrationMethod->SetMovingImage( t_selector2->GetOutput() );
+
+      try
+      {
+        MITK_INFO << " === (" << i <<"/"<< numberOfb0Images-1 << ") :: Starting registration";
+        registrationMethod->Update();
+      }
+      catch( const itk::ExceptionObject& e)
+      {
+        mitkThrow() << "Failed to register the b0 images, the PyramidRegistration threw an exception: \n" << e.what();
+      }
+
+      // import volume to the inter-results
+      registeredB0Image->SetImportVolume( registrationMethod->GetResampledMovingImage()->GetData(),
+                                          i, 0, mitk::Image::ReferenceMemory );
+
     }
 
-    // import volume to the inter-results
-    registeredB0Image->SetImportVolume( registrationMethod->GetResampledMovingImage()->GetData(),
-                                       i, 0, mitk::Image::ReferenceMemory );
+    // use the accumulateImageFilter as provided by the ItkAccumulateFilter method in the header file
+    AccessFixedDimensionByItk_1(registeredB0Image, ItkAccumulateFilter, (4), b0referenceImage );
 
   }
 
@@ -157,12 +165,10 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   weightedRegistrationMethod->SetCrossModalityOn();
 
   //
-  //   - (3.1) Create a reference image by averaging the aligned b0 images
+  //   - (3.1) Set the reference image
+  //      - a single b0 image
+  //      - average over the registered b0 images if multiple present
   //
-
-  // use the accumulateImageFilter as provided by the ItkAccumulateFilter method in the header file
-  AccessFixedDimensionByItk_1(registeredB0Image, ItkAccumulateFilter, (4), b0referenceImage );
-
   weightedRegistrationMethod->SetFixedImage( b0referenceImage );
   // use the advanced (windowed sinc) interpolation
   weightedRegistrationMethod->SetUseAdvancedInterpolation(true);

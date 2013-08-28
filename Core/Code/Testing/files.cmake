@@ -130,6 +130,13 @@ set(MODULE_CUSTOM_TESTS
     mitkPointSetVtkMapper2DTest.cpp
     mitkPointSetVtkMapper2DImageTest.cpp
     mitkPointSetVtkMapper2DGlyphTypeTest.cpp
+    mitkLabelOverlay3DRendering2DTest.cpp
+    mitkLabelOverlay3DRendering3DTest.cpp
+    mitkTextOverlay2DRenderingTest.cpp
+    mitkTextOverlay2DLayouterRenderingTest.cpp
+    mitkTextOverlay3DRendering2DTest.cpp
+    mitkTextOverlay3DRendering3DTest.cpp
+    mitkTextOverlay3DColorRenderingTest.cpp
 )
 
 set(MODULE_RESOURCE_FILES

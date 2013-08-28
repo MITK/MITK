@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKVOLUMEVISUALIZATIONVIEW_H_
 #define QMITKVOLUMEVISUALIZATIONVIEW_H_
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 
 #include <berryISelectionListener.h>
 #include <mitkDataNodeSelection.h>
@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
  * \ingroup org_mitk_gui_qt_volumevisualization_internal
  */
-class QmitkVolumeVisualizationView : public QmitkFunctionality
+class QmitkVolumeVisualizationView : public QmitkAbstractView
 {
   Q_OBJECT
 
@@ -54,7 +54,7 @@ public:
   ///
   /// Invoked when the DataManager selection changed
   ///
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes);
 
   static const std::string VIEW_ID;
 

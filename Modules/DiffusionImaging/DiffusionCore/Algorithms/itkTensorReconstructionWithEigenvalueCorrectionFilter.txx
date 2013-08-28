@@ -489,7 +489,6 @@ namespace itk
 
 
     double tempsum=0;
-    itk::Index<3> ix;
     double temp_number=0;
     double temp_mask=0;
 
@@ -499,11 +498,7 @@ namespace itk
       {
         for (int k=back_z; k<=forth_z; k++)
         {
-
-          ix[0] = i;
-          ix[1] = j;
-          ix[2] = k;
-
+          itk::Index<3> ix = {i,j,k};
           temp_mask=mask->GetPixel(ix);
 
 
@@ -528,7 +523,7 @@ namespace itk
 
     //getting back to the original position of the voxel
 
-    ix[0] = x;ix[1] = y;ix[2] = z;
+    itk::Index<3> ix = {x,y,z};
 
     if (temp_number <= 0.0)
     {
@@ -588,7 +583,6 @@ namespace itk
       // declaration of important structures and variables
       double badvoxels=0;
       double pixel=0;
-      itk::Index<3> ix;
       itk::DiffusionTensor3D<float> ten;
       vnl_matrix<double> temp_tensor(3,3);
       vnl_vector<double> eigen_vals(3);
@@ -605,8 +599,7 @@ namespace itk
           {
 
 
-              ix[0] = x; ix[1] = y; ix[2] = z;
-
+              itk::Index<3> ix = {x,y,z};
               pixel = mask->GetPixel(ix);
 
               // but only if previously marked as bad one-negative eigen value
@@ -614,41 +607,41 @@ namespace itk
               if(pixel > 1)
               {
 
-              ten = tensorImg->GetPixel(ix);
+                ten = tensorImg->GetPixel(ix);
 
-              // changing order from tensor structure in MITK into vnl structure 3x3 symmetric tensor matrix
+                // changing order from tensor structure in MITK into vnl structure 3x3 symmetric tensor matrix
 
-              tensor[0] = ten(0,0);
-              tensor[3] = ten(0,1);
-              tensor[5] = ten(0,2);
-              tensor[1] = ten(1,1);
-              tensor[4] = ten(1,2);
-              tensor[2] = ten(2,2);
+                tensor[0] = ten(0,0);
+                tensor[3] = ten(0,1);
+                tensor[5] = ten(0,2);
+                tensor[1] = ten(1,1);
+                tensor[4] = ten(1,2);
+                tensor[2] = ten(2,2);
 
-              temp_tensor[0][0]= tensor[0]; temp_tensor[1][0]= tensor[3]; temp_tensor[2][0]= tensor[5];
-              temp_tensor[0][1]= tensor[3]; temp_tensor[1][1]= tensor[1]; temp_tensor[2][1]= tensor[4];
-              temp_tensor[0][2]= tensor[5]; temp_tensor[1][2]= tensor[4]; temp_tensor[2][2]= tensor[2];
+                temp_tensor[0][0]= tensor[0]; temp_tensor[1][0]= tensor[3]; temp_tensor[2][0]= tensor[5];
+                temp_tensor[0][1]= tensor[3]; temp_tensor[1][1]= tensor[1]; temp_tensor[2][1]= tensor[4];
+                temp_tensor[0][2]= tensor[5]; temp_tensor[1][2]= tensor[4]; temp_tensor[2][2]= tensor[2];
 
-              //checking negativity of tensor eigenvalues
+                //checking negativity of tensor eigenvalues
 
-              vnl_symmetric_eigensystem<double> eigen_tensor(temp_tensor);
+                vnl_symmetric_eigensystem<double> eigen_tensor(temp_tensor);
 
 
-              eigen_vals[0]=eigen_tensor.get_eigenvalue(0);
-              eigen_vals[1]=eigen_tensor.get_eigenvalue(1);
-              eigen_vals[2]=eigen_tensor.get_eigenvalue(2);
+                eigen_vals[0]=eigen_tensor.get_eigenvalue(0);
+                eigen_vals[1]=eigen_tensor.get_eigenvalue(1);
+                eigen_vals[2]=eigen_tensor.get_eigenvalue(2);
 
-              //comparison to 0.01 instead of 0 was proposed by O.Pasternak
+                //comparison to 0.01 instead of 0 was proposed by O.Pasternak
 
-              if( eigen_vals[0]>0.01 && eigen_vals[1]>0.01 && eigen_vals[2]>0.01)
-              {
-                mask->SetPixel(ix,1);
+                if( eigen_vals[0]>0.01 && eigen_vals[1]>0.01 && eigen_vals[2]>0.01)
+                {
+                  mask->SetPixel(ix,1);
 
-              }
-              else
-              {
-                badvoxels++;
-              }
+                }
+                else
+                {
+                  badvoxels++;
+                }
 
               }
 
@@ -668,109 +661,107 @@ namespace itk
   TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
   ::CorrectDiffusionImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,vnl_vector< double> pixel_max,vnl_vector< double> pixel_min)
   {
-      // in this method the voxels that has tensor negative eigenvalues are smoothed. Smoothing is done on DWI image.For the voxel
-      //detected as bad one, B0 image is smoothed obligatory. All other gradient images are smoothed only when value of attenuation
-      //is out of declared bounds for too high or too low attenuation.
+    // in this method the voxels that has tensor negative eigenvalues are smoothed. Smoothing is done on DWI image.For the voxel
+    //detected as bad one, B0 image is smoothed obligatory. All other gradient images are smoothed only when value of attenuation
+    //is out of declared bounds for too high or too low attenuation.
 
-     // declaration of important variables
+    // declaration of important variables
 
-      itk::Index<3> ix;
-      vnl_vector<double> org_data(nof-numberb0);
-      vnl_vector<double> atten(nof-numberb0);
-      double cnt_atten=0;
 
-      for (int z=0;z<size[2];z++)
+    vnl_vector<double> org_data(nof-numberb0);
+    vnl_vector<double> atten(nof-numberb0);
+    double cnt_atten=0;
+
+    for (int z=0;z<size[2];z++)
+    {
+
+      for (int x=0;x<size[0];x++)
       {
 
-        for (int x=0;x<size[0];x++)
+        for (int y=0;y<size[1];y++)
         {
+          itk::Index<3> ix = {x, y, z};
 
-          for (int y=0;y<size[1];y++)
+
+          if(mask->GetPixel(ix) > 1.0)
           {
+            GradientVectorType  pt = corrected_diffusion->GetPixel(ix);
+
+            for (int i=0;i<nof;i++)
+            {
+              org_data[i]=pt[i];
+            }
 
 
-              ix[0] = x; ix[1] = y; ix[2] = z;
+            double mean_b=0.0;
 
-
-              if(mask->GetPixel(ix) > 1.0)
+            for (int i=0;i<nof;i++)
+            {
+              if(m_B0Mask[i]>0)
               {
-                  GradientVectorType  pt = corrected_diffusion->GetPixel(ix);
+                mean_b=mean_b+org_data[i];
+              }
 
-                  for (int i=0;i<nof;i++)
-                  {
-                    org_data[i]=pt[i];
-                  }
+             }
+            mean_b=mean_b/numberb0;
+            int cnt=0;
+            for (int i=0;i<nof;i++)
+            {
+              if(m_B0Mask[i]==0)
+              {
 
+                atten[cnt]=org_data[i]/mean_b;
+                cnt++;
+              }
+            }
 
-                  double mean_b=0.0;
+            cnt_atten=0;
 
-                  for (int i=0;i<nof;i++)
-                  {
-                    if(m_B0Mask[i]>0)
-                    {
-                      mean_b=mean_b+org_data[i];
-                    }
+            //smoothing certain gradient images taht are out of declared constraints
 
-                   }
-                  mean_b=mean_b/numberb0;
-                  int cnt=0;
-                  for (int i=0;i<nof;i++)
-                  {
-                    if(m_B0Mask[i]==0)
-                    {
+            for (int f=0;f<nof;f++)
+            {
+              if(m_B0Mask[f]==0)
+              {
 
-                      atten[cnt]=org_data[i]/mean_b;
-                      cnt++;
-                    }
-                  }
-
-                  cnt_atten=0;
-
-                  //smoothing certain gradient images taht are out of declared constraints
-
-                  for (int f=0;f<nof;f++)
-                  {
-                    if(m_B0Mask[f]==0)
-                    {
-
-                        if(atten[cnt_atten]<pixel_min[cnt_atten] || atten[cnt_atten]> pixel_max[cnt_atten])
-                    {
-                        org_data[f] = CheckNeighbours(x,y,z,f,size,mask,corrected_diffusion);
-
-                    }
-
-
-                    cnt_atten++;
-
-                   }
-                    //smoothing B0
-                    if(m_B0Mask[f]==1)
-                    {
-
-                        org_data[f] = CheckNeighbours(x,y,z,f,size,mask,corrected_diffusion);
-
-                    }
-
-
-                  }
-
-                  for (int i=0;i<nof;i++)
-                  {
-                    pt[i]=org_data[i];
-                  }
-
-                  corrected_diffusion->SetPixel(ix, pt);
+                  if(atten[cnt_atten]<pixel_min[cnt_atten] || atten[cnt_atten]> pixel_max[cnt_atten])
+              {
+                  org_data[f] = CheckNeighbours(x,y,z,f,size,mask,corrected_diffusion);
 
               }
-              else
+
+
+              cnt_atten++;
+
+             }
+              //smoothing B0
+              if(m_B0Mask[f]==1)
               {
-                  GradientVectorType  pt = corrected_diffusion->GetPixel(ix);
-                  corrected_diffusion->SetPixel(ix, pt);
+
+                  org_data[f] = CheckNeighbours(x,y,z,f,size,mask,corrected_diffusion);
 
               }
-           }
+
+
+            }
+
+            for (int i=0;i<nof;i++)
+            {
+              pt[i]=org_data[i];
+            }
+
+            corrected_diffusion->SetPixel(ix, pt);
+
+          }
+          else
+          {
+              GradientVectorType  pt = corrected_diffusion->GetPixel(ix);
+              corrected_diffusion->SetPixel(ix, pt);
+
+          }
         }
-       }
+      }
+    }
 
 
 

@@ -58,15 +58,13 @@ namespace mitk
     /**
     * Initializes the movement, stores starting position.
     */
-    virtual bool CheckOverObject (StateMachineAction*, InteractionEvent*);
+    virtual bool CheckOverObject (const InteractionEvent *);
     virtual bool SelectObject (StateMachineAction*, InteractionEvent*);
     virtual bool DeselectObject (StateMachineAction*, InteractionEvent*);
     virtual bool InitTranslate (StateMachineAction*, InteractionEvent*);
     virtual bool InitRotate (StateMachineAction*, InteractionEvent*);
     virtual bool TranslateObject (StateMachineAction*, InteractionEvent*);
     virtual bool RotateObject (StateMachineAction*, InteractionEvent*);
-   // virtual bool EndTranslate (StateMachineAction*, InteractionEvent*);
-   // virtual bool EndRotate (StateMachineAction*, InteractionEvent*);*/
 
     bool ColorizeSurface(BaseRenderer::Pointer renderer, double scalar = 0.0);
 

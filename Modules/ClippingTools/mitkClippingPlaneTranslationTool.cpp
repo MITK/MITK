@@ -17,11 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkClippingPlaneTranslationTool.xpm"
 
 #include "mitkBaseRenderer.h"
-#include "mitkGlobalInteraction.h"
-#include "mitkModule.h"
-#include "mitkModuleContext.h"
-#include "mitkGetModuleContext.h"
-#include "mitkModuleRegistry.h"
+#include "usModule.h"
+#include "usModuleContext.h"
+#include "usGetModuleContext.h"
+#include "usModuleRegistry.h"
 #include "mitkRenderingManager.h"
 #include "mitkToolManager.h"
 
@@ -62,14 +61,13 @@ void mitk::ClippingPlaneTranslationTool::Activated()
     //check if the Clipping plane is changed.
     if(m_ClippingPlaneNode != m_ToolManager->GetWorkingData(0))
     {
-
       m_ClippingPlaneNode = m_ToolManager->GetWorkingData(0);
-            m_ClippingPlaneNode->SetDataInteractor(NULL);
+      m_ClippingPlaneNode->SetDataInteractor(NULL);
     }
 
+    m_AffineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkExt"));
+    m_AffineDataInteractor->SetEventConfig("AffineTranslationConfig.xml", us::ModuleRegistry::GetModule("MitkExt"));
     m_AffineDataInteractor->SetDataNode(m_ClippingPlaneNode);
-    m_AffineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", ModuleRegistry::GetModule("MitkExt"));
-    m_AffineDataInteractor->SetEventConfig("AffineTranslationConfig.xml", ModuleRegistry::GetModule("MitkExt"));
 }
 
 void mitk::ClippingPlaneTranslationTool::Deactivated()

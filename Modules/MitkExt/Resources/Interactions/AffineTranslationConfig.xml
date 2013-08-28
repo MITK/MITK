@@ -5,7 +5,7 @@
       <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>
   <event_variant name="ObjectTranslation" class="MouseMoveEvent">
-      <attribute name="EventButton" value="LeftMouseButton"/>
+      <attribute name="ButtonState" value="LeftMouseButton"/>
   </event_variant>
   <event_variant name="EndTranslatation" class="MouseReleaseEvent">
       <attribute name="EventButton" value="LeftMouseButton"/>

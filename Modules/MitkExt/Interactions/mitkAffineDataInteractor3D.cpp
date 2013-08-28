@@ -51,15 +51,14 @@ mitk::AffineDataInteractor3D::~AffineDataInteractor3D()
 
 void mitk::AffineDataInteractor3D::ConnectActionsAndFunctions()
 {
-  CONNECT_FUNCTION("checkOverObject",CheckOverObject);
+  CONNECT_CONDITION("isOverObject", CheckOverObject);
+
   CONNECT_FUNCTION("selectObject",SelectObject);
   CONNECT_FUNCTION("deselectObject",DeselectObject);
   CONNECT_FUNCTION("initTranslate",InitTranslate);
   CONNECT_FUNCTION("initRotate",InitRotate);
   CONNECT_FUNCTION("translateObject",TranslateObject);
   CONNECT_FUNCTION("rotateObject",RotateObject);
-  //CONNECT_FUNCTION("endTranslate",EndTranslate);
-  //CONNECT_FUNCTION("endRotate",EndRotate);
 }
 
 /*
@@ -92,32 +91,22 @@ void mitk::AffineDataInteractor3D::DataNodeChanged()
   //}
 }
 
-bool mitk::AffineDataInteractor3D::CheckOverObject(StateMachineAction*, InteractionEvent* interactionEvent)
+bool mitk::AffineDataInteractor3D::CheckOverObject(const InteractionEvent* interactionEvent)
 {
   ////Is only a copy of the old AffineInteractor3D. Not sure if is still needed.
   ////Re-enable VTK interactor (may have been disabled previously)
-  //if ( renderWindowInteractor != NULL )
-  //  renderWindowInteractor->Enable();
-  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
     return false;
 
   m_CurrentPickedPoint = positionEvent->GetPositionInWorld();
   m_CurrentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
 
-  InternalEvent::Pointer event;
   if(interactionEvent->GetSender()->PickObject( m_CurrentPickedDisplayPoint, m_CurrentPickedPoint ) == this->GetDataNode().GetPointer())
   {
-    //Object will be selected
-    event = InternalEvent::New(NULL, this, "OverObject");
+    return true;
   }
-  else
-  {
-    //Object will be de-selected
-    event = InternalEvent::New(NULL, this, "NotOverObject");
-  }
-  positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
-  return true;
+  return false;
 }
 
 bool mitk::AffineDataInteractor3D::SelectObject(StateMachineAction*, InteractionEvent* interactionEvent)
@@ -263,6 +252,9 @@ bool mitk::AffineDataInteractor3D::TranslateObject (StateMachineAction*, Interac
   this->GetDataNode()->GetData()->GetGeometry( timeStep )->SetOrigin(
     origin + transformedObjectNormal * (interactionMove * transformedObjectNormal) );
 
+  //TODO: Only 3D reinit
+  RenderingManager::GetInstance()->RequestUpdateAll();
+
   return true;
 }
 
@@ -337,6 +329,10 @@ bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, Interactio
     {
       timeSlicedGeometry->SetGeometry3D( newGeometry, timeStep );
     }
+
+    //TODO: Only 3D reinit
+    RenderingManager::GetInstance()->RequestUpdateAll();
+
     return true;
   }
   else

@@ -408,7 +408,9 @@ bool mitk::RegionGrowingTool::OnChangeActiveLabel (Action* action, const StateEv
 
   mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
 
-  int value = lsImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition() );
+  int timestep = positionEvent->GetSender()->GetTimeStep();
+
+  int value = lsImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition(), timestep );
 
   lsImage->SetActiveLabel(value, true);
 

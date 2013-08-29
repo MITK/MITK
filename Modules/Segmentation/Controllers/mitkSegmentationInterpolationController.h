@@ -98,7 +98,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
 
       When you change a single slice, call SetChangedSlice() instead.
     */
-    void SetSegmentationVolume( const LabelSetImage* segmentation );
+    void SetWorkingImage( LabelSetImage* image );
 
     /**
       \brief Set a reference image (original patient image) - optional.
@@ -107,7 +107,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
       the interpolation algorithm may consider image content to improve the interpolated
       (estimated) segmentation.
      */
-    void SetReferenceVolume( const Image* segmentation );
+    void SetReferenceImage( Image* image );
 
     /**
       \brief Update after changing a single slice.
@@ -133,9 +133,9 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
 
       \param timeStep Which time step to use
     */
-    Image* Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, const mitk::PlaneGeometry* currentPlane, unsigned int timeStep );
+    Image::Pointer Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, const mitk::PlaneGeometry* currentPlane, unsigned int timeStep );
 
-    void OnImageModified(const itk::EventObject&);
+    void OnWorkingImageModified(const itk::EventObject&);
 
     /**
      * Activate/Deactivate the 2D interpolation.
@@ -195,8 +195,11 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
 
     static InterpolatorMapType s_InterpolatorForImage;
 
-    LabelSetImage::ConstPointer m_Segmentation;
-    Image::ConstPointer m_ReferenceImage;
+    LabelSetImage::Pointer m_WorkingImage;
+    Image::Pointer m_ReferenceImage;
+
+    unsigned long m_WorkingImageObserverID;
+
     int m_ActiveLabel;
     bool m_BlockModified;
     bool m_2DInterpolationActivated;

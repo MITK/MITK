@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkShapeBasedInterpolationAlgorithm.h"
 #include "mitkImageCast.h"
 #include "mitkImageDataItem.h"
+#include "mitkToolManagerProvider.h"
+#include "mitkToolManager.h"
 
 #include <itkBinaryThresholdImageFilter.h>
 #include "ipSegmentation.h"
@@ -26,13 +28,14 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
                                Image::ConstPointer upperSlice, unsigned int upperSliceIndex,
                                unsigned int requestedIndex,
                                unsigned int /*sliceDimension*/, // commented variables are not used
-                               LabelSetImage* resultImage,
+                               Image* resultImage,
                                unsigned int /*timeStep*/,
-                               Image::ConstPointer /*referenceImage*/)
+                               Image::Pointer /*referenceImage*/)
 {
   typedef itk::Image< ipMITKSegmentationTYPE, 2 > InputSliceType;
 
-  const int activeLabel = resultImage->GetActiveLabelIndex();
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  const int& activePixelValue = toolManager->GetActiveLabelIndex();
 
   // convert these slices to the ipSegmentation data type (into an ITK image)
   itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeLowerITKSlice;
@@ -49,35 +52,55 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   correctPixelTypeLowerITKSlice->SetDirection(imageDirection);
   correctPixelTypeUpperITKSlice->SetDirection(imageDirection);
 
-  // binarize the slice according to current label
+  // binarize the slice according to the active label
   typedef itk::BinaryThresholdImageFilter< InputSliceType, InputSliceType > InputThresholdType;
 
   InputThresholdType::Pointer thresholder1 = InputThresholdType::New();
   thresholder1->SetInput(correctPixelTypeLowerITKSlice);
-  thresholder1->SetUpperThreshold( activeLabel );
-  thresholder1->SetLowerThreshold( activeLabel );
+  thresholder1->SetUpperThreshold( activePixelValue );
+  thresholder1->SetLowerThreshold( activePixelValue );
   thresholder1->SetInsideValue( 1 );
   thresholder1->SetOutsideValue( 0 );
   thresholder1->ReleaseDataFlagOn();
-  thresholder1->Update();
+
+  try
+  {
+    thresholder1->Update();
+  }
+  catch(const std::exception &e)
+  {
+    MITK_ERROR << "Error in shape based interpolation: " << e.what();
+    return;
+  }
 
   // back-convert to MITK images to access a mitkIpPicDescriptor
   Image::Pointer correctPixelTypeLowerMITKSlice = Image::New();
   CastToMitkImage( thresholder1->GetOutput(), correctPixelTypeLowerMITKSlice );
+
   mitkIpPicDescriptor* lowerPICSlice = mitkIpPicNew();
   CastToIpPicDescriptor( correctPixelTypeLowerMITKSlice, lowerPICSlice);
 
   InputThresholdType::Pointer thresholder2 = InputThresholdType::New();
   thresholder2->SetInput(correctPixelTypeUpperITKSlice);
-  thresholder2->SetUpperThreshold( activeLabel );
-  thresholder2->SetLowerThreshold( activeLabel );
+  thresholder2->SetUpperThreshold( activePixelValue );
+  thresholder2->SetLowerThreshold( activePixelValue );
   thresholder2->SetInsideValue( 1 );
   thresholder2->SetOutsideValue( 0 );
   thresholder2->ReleaseDataFlagOn();
-  thresholder2->Update();
+
+  try
+  {
+    thresholder2->Update();
+  }
+  catch(const std::exception &e)
+  {
+    MITK_ERROR << "Error in shape based interpolation: " << e.what();
+    return;
+  }
 
   Image::Pointer correctPixelTypeUpperMITKSlice = Image::New();
   CastToMitkImage( thresholder2->GetOutput(), correctPixelTypeUpperMITKSlice );
+
   mitkIpPicDescriptor* upperPICSlice = mitkIpPicNew();
   CastToIpPicDescriptor( correctPixelTypeUpperMITKSlice, upperPICSlice);
 
@@ -114,22 +137,19 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   sourceIterator.GoToBegin();
   targetIterator.GoToBegin();
 
-  const bool overwrite = true;
-
-    while (!sourceIterator.IsAtEnd())
+  while (!sourceIterator.IsAtEnd())
+  {
+    const int targetValue = targetIterator.Get();
+    if ( sourceIterator.Get() != 0 )
     {
-
-      const int targetValue = targetIterator.Get();
-      if ( sourceIterator.Get() != 0 )
-      {
-        if (!resultImage->GetLabelLocked(targetValue))
-          targetIterator.Set( activeLabel );
-      }
-
-      ++sourceIterator;
-      ++targetIterator;
+      if (!toolManager->GetLabelLocked(targetValue))
+        targetIterator.Set( activePixelValue );
     }
 
-    resultImage->Modified();
+    ++sourceIterator;
+    ++targetIterator;
+  }
+
+  resultImage->Modified();
 }
 

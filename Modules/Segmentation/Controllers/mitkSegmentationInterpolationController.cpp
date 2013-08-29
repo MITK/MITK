@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 #include <mitkExtractSliceFilter.h>
 #include "mitkImageReadAccessor.h"
-//#include <mitkPlaneGeometry.h>
 
 #include "mitkShapeBasedInterpolationAlgorithm.h"
 
@@ -45,7 +44,7 @@ mitk::SegmentationInterpolationController* mitk::SegmentationInterpolationContro
 }
 
 mitk::SegmentationInterpolationController::SegmentationInterpolationController()
-:m_BlockModified(false), m_ActiveLabel(0)
+:m_BlockModified(false), m_ActiveLabel(0), m_WorkingImage(NULL)
 {
 }
 
@@ -69,11 +68,11 @@ mitk::SegmentationInterpolationController::~SegmentationInterpolationController(
   }
 }
 
-void mitk::SegmentationInterpolationController::OnImageModified(const itk::EventObject&)
+void mitk::SegmentationInterpolationController::OnWorkingImageModified(const itk::EventObject&)
 {
-  if (!m_BlockModified  && m_Segmentation.IsNotNull() && m_2DInterpolationActivated )
+  if (!m_BlockModified  && m_WorkingImage.IsNotNull() && m_2DInterpolationActivated )
   {
-    SetSegmentationVolume( m_Segmentation );
+    this->SetWorkingImage( m_WorkingImage );
   }
 }
 
@@ -82,7 +81,7 @@ void mitk::SegmentationInterpolationController::BlockModified(bool block)
   m_BlockModified = block;
 }
 
-void mitk::SegmentationInterpolationController::SetSegmentationVolume( const LabelSetImage* segmentation )
+void mitk::SegmentationInterpolationController::SetWorkingImage( LabelSetImage* segmentation )
 {
   // clear old information (remove all time steps
   m_SegmentationCountInSlice.clear();
@@ -100,50 +99,53 @@ void mitk::SegmentationInterpolationController::SetSegmentationVolume( const Lab
     itkExceptionMacro("SegmentationInterpolationController needs a 3D-segmentation or 3D+t, not 2D.");
   }
 
-  if (m_Segmentation != segmentation)
+  if (m_WorkingImage != segmentation)
   {
+    if (m_WorkingImage.IsNotNull())
+      m_WorkingImage->RemoveObserver( m_WorkingImageObserverID );
+
     // observe Modified() event of image
     itk::ReceptorMemberCommand<SegmentationInterpolationController>::Pointer command = itk::ReceptorMemberCommand<SegmentationInterpolationController>::New();
-    command->SetCallbackFunction( this, &SegmentationInterpolationController::OnImageModified );
-    segmentation->AddObserver( itk::ModifiedEvent(), command );
+    command->SetCallbackFunction( this, &SegmentationInterpolationController::OnWorkingImageModified );
+    m_WorkingImageObserverID = segmentation->AddObserver( itk::ModifiedEvent(), command );
+
+    m_WorkingImage = segmentation;
   }
 
-  m_Segmentation = segmentation;
+  m_ActiveLabel = m_WorkingImage->GetActiveLabelIndex();
 
-  m_ActiveLabel = m_Segmentation->GetActiveLabelIndex();
-
-  m_SegmentationCountInSlice.resize( m_Segmentation->GetTimeSteps() );
-  for (unsigned int timeStep = 0; timeStep < m_Segmentation->GetTimeSteps(); ++timeStep)
+  m_SegmentationCountInSlice.resize( m_WorkingImage->GetTimeSteps() );
+  for (unsigned int timeStep = 0; timeStep < m_WorkingImage->GetTimeSteps(); ++timeStep)
   {
     m_SegmentationCountInSlice[timeStep].resize(3);
     for (unsigned int dim = 0; dim < 3; ++dim)
     {
       m_SegmentationCountInSlice[timeStep][dim].clear();
-      m_SegmentationCountInSlice[timeStep][dim].resize( m_Segmentation->GetDimension(dim) );
-      m_SegmentationCountInSlice[timeStep][dim].assign( m_Segmentation->GetDimension(dim), 0 );
+      m_SegmentationCountInSlice[timeStep][dim].resize( m_WorkingImage->GetDimension(dim) );
+      m_SegmentationCountInSlice[timeStep][dim].assign( m_WorkingImage->GetDimension(dim), 0 );
     }
   }
 
-  s_InterpolatorForImage.insert( std::make_pair( m_Segmentation, this ) );
+  s_InterpolatorForImage.insert( std::make_pair( m_WorkingImage, this ) );
 
   // for all timesteps
   // scan whole image
-  for (unsigned int timeStep = 0; timeStep < m_Segmentation->GetTimeSteps(); ++timeStep)
+  for (unsigned int timeStep = 0; timeStep < m_WorkingImage->GetTimeSteps(); ++timeStep)
   {
     ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
-    timeSelector->SetInput( m_Segmentation );
+    timeSelector->SetInput( m_WorkingImage );
     timeSelector->SetTimeNr( timeStep );
     timeSelector->UpdateLargestPossibleRegion();
     Image::Pointer segmentation3D = timeSelector->GetOutput();
-    AccessFixedDimensionByItk_2( segmentation3D, ScanWholeVolume, 3, m_Segmentation, timeStep );
+    AccessFixedDimensionByItk_2( segmentation3D, ScanWholeVolume, 3, m_WorkingImage, timeStep );
   }
 
-  this->SetReferenceVolume( m_ReferenceImage );
+  this->SetReferenceImage( m_ReferenceImage );
 
-  Modified();
+  this->Modified();
 }
 
-void mitk::SegmentationInterpolationController::SetReferenceVolume( const Image* referenceImage )
+void mitk::SegmentationInterpolationController::SetReferenceImage( Image* referenceImage )
 {
   m_ReferenceImage = referenceImage;
 
@@ -151,10 +153,10 @@ void mitk::SegmentationInterpolationController::SetReferenceVolume( const Image*
 
   // ensure the reference image has the same dimensionality and extents as the segmentation image
   if (    m_ReferenceImage.IsNull()
-       || m_Segmentation.IsNull()
-       || m_ReferenceImage->GetDimension() != m_Segmentation->GetDimension()
+       || m_WorkingImage.IsNull()
+       || m_ReferenceImage->GetDimension() != m_WorkingImage->GetDimension()
        || m_ReferenceImage->GetPixelType().GetNumberOfComponents() != 1
-       || m_Segmentation->GetPixelType().GetNumberOfComponents() != 1
+       || m_WorkingImage->GetPixelType().GetNumberOfComponents() != 1
      )
   {
     MITK_WARN << "Segmentation image has different image characteristics than reference image." << std::endl;
@@ -162,8 +164,8 @@ void mitk::SegmentationInterpolationController::SetReferenceVolume( const Image*
     return;
   }
 
-  for (unsigned int dim = 0; dim < m_Segmentation->GetDimension(); ++dim)
-    if ( m_ReferenceImage->GetDimension(dim) != m_Segmentation->GetDimension(dim) )
+  for (unsigned int dim = 0; dim < m_WorkingImage->GetDimension(); ++dim)
+    if ( m_ReferenceImage->GetDimension(dim) != m_WorkingImage->GetDimension(dim) )
     {
       MITK_WARN << "original patient image does not match segmentation (different extent in dimension " << dim
                 << "), ignoring patient image" << std::endl;
@@ -180,7 +182,7 @@ void mitk::SegmentationInterpolationController::SetChangedVolume( const Image* s
   AccessFixedDimensionByItk_1( sliceDiff, ScanChangedVolume, 3, timeStep );
 
   //PrintStatus();
-  Modified();
+  this->Modified();
 }
 
 
@@ -216,7 +218,7 @@ void mitk::SegmentationInterpolationController::SetChangedSlice( const Image* sl
 
   //PrintStatus();
 
-  Modified();
+  this->Modified();
 }
 
 template < typename DATATYPE >
@@ -400,12 +402,12 @@ void mitk::SegmentationInterpolationController::PrintStatus()
   }
 }
 
-mitk::Image* mitk::SegmentationInterpolationController::Interpolate(unsigned int sliceDimension,
-                                                                    unsigned int sliceIndex,
-                                                                    const mitk::PlaneGeometry* currentPlane,
-                                                                    unsigned int timeStep )
+mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsigned int sliceDimension,
+                                                                            unsigned int sliceIndex,
+                                                                            const mitk::PlaneGeometry* currentPlane,
+                                                                            unsigned int timeStep )
 {
-  if (m_Segmentation.IsNull()) return NULL;
+  if (m_WorkingImage.IsNull()) return NULL;
 
   if(!currentPlane)
   {
@@ -452,14 +454,12 @@ mitk::Image* mitk::SegmentationInterpolationController::Interpolate(unsigned int
 
   // ok, we have found two neighboring slices with segmentations
   // (and we made sure that the current slice does NOT contain anything
-  mitk::Image::Pointer lowerMITKSlice;
-  mitk::Image::Pointer upperMITKSlice;
 
   //Setting up the ExtractSliceFilter
   mitk::ExtractSliceFilter::Pointer extractor = ExtractSliceFilter::New();
-  extractor->SetInput(m_Segmentation);
+  extractor->SetInput(m_WorkingImage);
   extractor->SetTimeStep(timeStep);
-  extractor->SetResliceTransformByGeometry( m_Segmentation->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+  extractor->SetResliceTransformByGeometry( m_WorkingImage->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
   extractor->SetVtkOutputRequest(false);
 
   //Reslicing the current plane
@@ -472,47 +472,64 @@ mitk::Image* mitk::SegmentationInterpolationController::Interpolate(unsigned int
   }
   catch(const std::exception &e)
   {
-    MITK_ERROR<<"Error in 2D interpolation: "<<e.what();
+    MITK_ERROR<<"Error in 2D interpolation: " << e.what();
     return NULL;
   }
 
-  mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New(extractor->GetOutput());
-  mitk::LabelSet::Pointer labelset = mitk::LabelSet::New();
-  labelset->Initialize( m_Segmentation->GetConstLabelSet() );
-  resultImage->SetLabelSet( labelset );
+  mitk::Image::Pointer resultImage = extractor->GetOutput();
+  resultImage->DisconnectPipeline();
 
-    //Creating PlaneGeometry for lower slice
-    mitk::PlaneGeometry::Pointer reslicePlane = currentPlane->Clone();
+  //Creating PlaneGeometry for lower slice
+  mitk::PlaneGeometry::Pointer reslicePlane = currentPlane->Clone();
 
-    //Transforming the current origin so that it matches the lower slice
-    mitk::Point3D origin = currentPlane->GetOrigin();
-    m_Segmentation->GetSlicedGeometry()->WorldToIndex(origin, origin);
-    origin[sliceDimension] = lowerBound;
-    m_Segmentation->GetSlicedGeometry()->IndexToWorld(origin, origin);
-    reslicePlane->SetOrigin(origin);
+  //Transforming the current origin so that it matches the lower slice
+  mitk::Point3D origin = currentPlane->GetOrigin();
+  m_WorkingImage->GetSlicedGeometry()->WorldToIndex(origin, origin);
+  origin[sliceDimension] = lowerBound;
+  m_WorkingImage->GetSlicedGeometry()->IndexToWorld(origin, origin);
+  reslicePlane->SetOrigin(origin);
 
-    //Extract the lower slice
-    extractor->SetWorldGeometry(reslicePlane);
-    extractor->Modified();
+  //Extract the lower slice
+  extractor->SetWorldGeometry(reslicePlane);
+  extractor->Modified();
+
+  try
+  {
     extractor->Update();
-    lowerMITKSlice = extractor->GetOutput();
-    lowerMITKSlice->DisconnectPipeline();
+  }
+  catch(const std::exception &e)
+  {
+    MITK_ERROR<<"Error in 2D interpolation: " << e.what();
+    return NULL;
+  }
 
-    //Transforming the current origin so that it matches the upper slice
-    m_Segmentation->GetSlicedGeometry()->WorldToIndex(origin, origin);
-    origin[sliceDimension] = upperBound;
-    m_Segmentation->GetSlicedGeometry()->IndexToWorld(origin, origin);
-    reslicePlane->SetOrigin(origin);
+  mitk::Image::Pointer lowerMITKSlice = extractor->GetOutput();
+  lowerMITKSlice->DisconnectPipeline();
 
-    //Extract the upper slice
-    extractor->SetWorldGeometry(reslicePlane);
-    extractor->Modified();
+  //Transforming the current origin so that it matches the upper slice
+  m_WorkingImage->GetSlicedGeometry()->WorldToIndex(origin, origin);
+  origin[sliceDimension] = upperBound;
+  m_WorkingImage->GetSlicedGeometry()->IndexToWorld(origin, origin);
+  reslicePlane->SetOrigin(origin);
+
+  //Extract the upper slice
+  extractor->SetWorldGeometry(reslicePlane);
+  extractor->Modified();
+
+  try
+  {
     extractor->Update();
-    upperMITKSlice = extractor->GetOutput();
-    upperMITKSlice->DisconnectPipeline();
+  }
+  catch(const std::exception &e)
+  {
+    MITK_ERROR<<"Error in 2D interpolation: " << e.what();
+    return NULL;
+  }
 
-    if ( lowerMITKSlice.IsNull() || upperMITKSlice.IsNull() ) return NULL;
+  mitk::Image::Pointer upperMITKSlice = extractor->GetOutput();
+  upperMITKSlice->DisconnectPipeline();
 
+  if ( lowerMITKSlice.IsNull() || upperMITKSlice.IsNull() ) return NULL;
 
   // interpolation algorithm gets some inputs
   //   two segmentations (guaranteed to be of the same data type, but no special data type guaranteed)
@@ -532,5 +549,5 @@ mitk::Image* mitk::SegmentationInterpolationController::Interpolate(unsigned int
                           timeStep,
                           m_ReferenceImage );
 
-  return resultImage.GetPointer();
+  return resultImage;
 }

@@ -220,7 +220,7 @@ private:
     void Show2DInterpolationControls(bool show);
     void Show3DInterpolationControls(bool show);
 
-    mitk::SegmentationInterpolationController::Pointer m_Interpolator;
+    mitk::SegmentationInterpolationController::Pointer m_InterpolatorController;
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
     mitk::ToolManager::Pointer m_ToolManager;

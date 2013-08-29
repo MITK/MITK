@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyLine.h>
 #include <vtkCellArray.h>
 
+/** Members used inside the different (sub-)tests. All members are initialized via Setup().*/
 mitk::Surface::Pointer m_Surface3D;
 mitk::Surface::Pointer m_Surface3DTwoTimeSteps;
 
@@ -86,7 +87,6 @@ static void Setup()
   m_Surface3DTwoTimeSteps = mitk::Surface::New();
   m_Surface3DTwoTimeSteps->SetVtkPolyData( m_PolyDataOne, 0 );
   m_Surface3DTwoTimeSteps->SetVtkPolyData( polyDataTwo, 1 );
-
 }
 
 static void Equal_InputIsNull_ReturnsFalse()
@@ -125,6 +125,7 @@ static void Equal_TwoTimeStepsDifferentPoints_ReturnsFalse()
   surface3DTwoTimeStepsDifferentPoints->SetVtkPolyData( m_PolyDataOne, 0 );
   surface3DTwoTimeStepsDifferentPoints->SetVtkPolyData( polyDataDifferentPoints, 1 );
 
+  //The geometry also changes, because the second pointset has a different geometry/extent.
   MITK_TEST_NOT_EQUAL( surface3DTwoTimeStepsDifferentPoints, m_Surface3DTwoTimeSteps, "A surface with the same timesteps and different points should not be equal.\n");
 }
 

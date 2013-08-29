@@ -101,6 +101,4 @@ int mitkPointSetEqualTest(int /*argc*/, char* /*argv*/[])
   Equal_DifferentPoints_ReturnsFalse();
 
   MITK_TEST_END();
-
-  return EXIT_SUCCESS;
 }

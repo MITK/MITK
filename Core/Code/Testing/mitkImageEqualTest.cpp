@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include <mitkImageSliceSelector.h>
 
+/** Members used inside the different (sub-)tests. All members are initialized via Setup().*/
 mitk::Image::Pointer m_Image;
 mitk::Image::Pointer m_AnotherImage;
 
@@ -92,14 +93,15 @@ static void Equal_DifferentDimensionalities_ReturnsFalse()
 
 static void Equal_DifferentPixelValues_ReturnsFalse()
 {
+  //todo: Replace the random images via simpler images with fixed values.
   m_Image = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(3u, 3u);
   m_AnotherImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(3u, 3u);
 
-  MITK_TEST_NOT_EQUAL( m_Image, m_AnotherImage, "We compare  two random images. Result should be false.");
+  MITK_TEST_NOT_EQUAL( m_Image, m_AnotherImage, "We compare two random images. Result should be false.");
 }
 
 /**
- * @brief mitkImageAreEqualTest A test class for AreEqual methods in mitk::Image.
+ * @brief mitkImageAreEqualTest A test class for Equal methods in mitk::Image.
  */
 int mitkImageEqualTest(int /*argc*/, char* /*argv*/[])
 {
@@ -114,6 +116,4 @@ int mitkImageEqualTest(int /*argc*/, char* /*argv*/[])
   Equal_DifferentPixelValues_ReturnsFalse();
 
   MITK_TEST_END();
-
-  return EXIT_SUCCESS;
 }

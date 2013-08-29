@@ -65,7 +65,7 @@ void mitk::LabelSetImage::CreateDefaultLabelSet()
   color.SetBlue(0.0);
   mitk::Label::Pointer label = mitk::Label::New();
   label->SetColor(color);
-  label->SetName("exterior");
+  label->SetName("Exterior");
   label->SetExterior(true);
   label->SetOpacity(0.0);
   label->SetLocked(false);

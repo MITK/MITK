@@ -37,8 +37,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkDiffusionTensor3D.h>
 #include <itkVectorContainer.h>
 
-#include <itkVectorContainer.h>
-
 namespace itk
 {
 

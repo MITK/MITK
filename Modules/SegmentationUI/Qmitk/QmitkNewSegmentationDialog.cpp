@@ -99,6 +99,17 @@ void QmitkNewSegmentationDialog::onAcceptClicked()
   this->accept();
 }
 
+void QmitkNewSegmentationDialog::SetSegmentationName(const std::string& name)
+{
+  this->edtName->setText(name.c_str());
+}
+
+void QmitkNewSegmentationDialog::SetColor(const mitk::Color& color)
+{
+  QColor qColor( color.GetRed() * 255, color.GetGreen() * 255, color.GetBlue() * 255);
+  this->btnColor->setStyleSheet(QString("background-color:rgb(%1,%2, %3)").arg(qColor.red()).arg(qColor.green()).arg(qColor.blue()));
+}
+
 const QString QmitkNewSegmentationDialog::GetSegmentationName()
 {
   return m_SegmentationName;

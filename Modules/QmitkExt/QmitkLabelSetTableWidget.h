@@ -96,7 +96,7 @@ class QmitkExt_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     void newLabel();
 
     /// \brief Send a signal when it was requested to rename a label.
-    void renameLabel(int);
+    void renameLabel(int index, const mitk::Color& color, const std::string& name);
 
     /// \brief Send a signal when it was requested to create a surface out of a label.
     void createSurface(int);

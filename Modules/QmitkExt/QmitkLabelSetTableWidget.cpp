@@ -817,7 +817,8 @@ void QmitkLabelSetTableWidget::OnSetOnlyActiveLabelVisible(bool value)
 
 void QmitkLabelSetTableWidget::OnRenameLabel(bool value)
 {
-    emit renameLabel( this->currentRow() );
+  int index = this->currentRow();
+  emit renameLabel( index, this->m_LabelSetImage->GetLabelColor(index), this->m_LabelSetImage->GetLabelName(index) );
 }
 
 void QmitkLabelSetTableWidget::OnRandomColor(bool value)

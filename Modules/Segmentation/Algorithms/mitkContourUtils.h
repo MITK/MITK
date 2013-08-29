@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "SegmentationExports.h"
 #include "mitkContourModel.h"
-#include "mitkLabelSetImage.h"
+#include "mitkImage.h"
 #include "mitkLegacyAdaptors.h"
 
 #include <itkImage.h>
@@ -51,7 +51,7 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
     /**
       \brief Fill a contour in a 2D slice with a specified pixel value.
     */
-    static void FillContourInSlice( ContourModel* projectedContour, LabelSetImage* slice, int paintingPixelValue, int timestep );
+    static void FillContourInSlice( ContourModel* projectedContour, Image* slice, int paintingPixelValue, int timestep );
 
   protected:
 
@@ -60,19 +60,11 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
 
     /**
       \brief Paint a filled contour (e.g. of an ipSegmentation pixel type) into a mitk::Image (or arbitraty pixel type).
-      Will not copy the whole filledContourSlice, but only set those pixels in originalSlice to overwritevalue, where the corresponding pixel
-      in filledContourSlice is non-zero.
-    */
-    template<typename TPixel, unsigned int VImageDimension>
-    void ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDimension>* originalSlice, const Image* filledContourSlice, int pixelvalue );
-
-    /**
-      \brief Paint a filled contour (e.g. of an ipSegmentation pixel type) into a mitk::Image (or arbitraty pixel type).
       Will not copy the whole filledContourSlice, but only set those pixels in originalSlice that can be overwritten acording to
       the label "locked" property to overwritevalue, where the corresponding pixel in filledContourSlice is non-zero.
     */
     template<typename TPixel, unsigned int VImageDimension>
-    static void ItkCopyFilledContourToSlice2( itk::Image<TPixel,VImageDimension>* originalSlice, const LabelSetImage* filledContourSlice, int pixelvalue );
+    static void ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDimension>* originalSlice, const mitk::Image* filledContourSlice, int pixelvalue );
 };
 
 }

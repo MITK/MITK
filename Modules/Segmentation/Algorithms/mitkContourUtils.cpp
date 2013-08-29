@@ -18,13 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkInstantiateAccessFunctions.h"
+#include "mitkToolManagerProvider.h"
+#include "mitkToolManager.h"
 #include "ipSegmentation.h"
 
-#define InstantiateAccessFunction_ItkCopyFilledContourToSlice2(pixelType, dim) \
-  template void mitk::ContourUtils::ItkCopyFilledContourToSlice2(itk::Image<pixelType,dim>*, const mitk::LabelSetImage*, int pixelvalue);
+#define InstantiateAccessFunction_ItkCopyFilledContourToSlice(pixelType, dim) \
+  template void mitk::ContourUtils::ItkCopyFilledContourToSlice(itk::Image<pixelType,dim>*, const mitk::Image*, int pixelvalue);
 
-// explicitly instantiate the 2D version of this method
-InstantiateAccessFunctionForFixedDimension(ItkCopyFilledContourToSlice2, 2);
+//explicitly instantiate the 2D version of this method
+InstantiateAccessFunctionForFixedDimension(ItkCopyFilledContourToSlice, 2);
 
 mitk::ContourUtils::ContourUtils()
 {
@@ -70,25 +72,17 @@ void mitk::ContourUtils::BackProjectContourFrom2DSlice(const Geometry3D* sliceGe
   contourIn3D->Clear(timestep);
   contourIn3D->Initialize();
   contourIn3D->Expand(timestep+1);
-/*
-  ContourModel::Pointer worldContour = ContourModel::New();
-  worldContour->Initialize();
-  worldContour->Expand(timestep+1);
-  worldContour->Close(timestep);
-*/
+
   ContourModel::ConstVertexIterator iter = contourIn2D->Begin(timestep);
   for ( ; iter != contourIn2D->End(timestep); ++iter)
   {
     Point3D worldPointIn3D;
     sliceGeometry->IndexToWorld( (*iter)->Coordinates, worldPointIn3D );
     contourIn3D->AddVertex(worldPointIn3D,timestep);
-    //worldContour->AddVertex( worldPointIn3D, timestep );
   }
-
- // return worldContour;
 }
 
-void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, LabelSetImage* slice, int paintingPixelValue, int timestep )
+void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, Image* slice, int paintingPixelValue, int timestep )
 {
   // 1. Use ipSegmentation to draw a filled(!) contour into a new 8 bit 2D image, which will later be copied back to the slice.
   //    We don't work on the "real" working data, because ipSegmentation would restrict us to 8 bit images
@@ -123,25 +117,25 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, Lab
   //    copy all pixels that are non-zero to the original image (not caring for the actual type of the working image). perhaps make the replace value a parameter ( -> general painting tool ).
   //    make the pic slice an mitk/itk image (as little ipPic code as possible), call a templated method with accessbyitk, iterate over the original and the modified slice
 
-  LabelSetImage::Pointer ipsegmentationModifiedSlice = LabelSetImage::New();
+  Image::Pointer ipsegmentationModifiedSlice = Image::New();
   ipsegmentationModifiedSlice->Initialize( CastToImageDescriptor( picSlice ) );
   ipsegmentationModifiedSlice->SetSlice( picSlice->data );
-  ipsegmentationModifiedSlice->SetLabelSet( slice->GetLabelSet() );
 
-  //AccessFixedDimensionByItk_2( slice, ItkCopyFilledContourToSlice, 2, ipsegmentationModifiedSlice, paintingPixelValue );
-  AccessFixedDimensionByItk_2( slice, ItkCopyFilledContourToSlice2, 2, ipsegmentationModifiedSlice, paintingPixelValue );
+  AccessFixedDimensionByItk_2( slice, ItkCopyFilledContourToSlice, 2, ipsegmentationModifiedSlice, paintingPixelValue );
 
   ipsegmentationModifiedSlice = NULL; // free MITK header information
   ipMITKSegmentationFree( picSlice ); // free actual memory
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDimension>* originalSlice, const Image* filledContourSlice, int overwritevalue )
+void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDimension>* originalSlice, const mitk::Image* filledContourSlice, int overwritevalue )
 {
   typedef itk::Image<TPixel,VImageDimension> SliceType;
 
   typename SliceType::Pointer filledContourSliceITK;
   CastToItkImage( filledContourSlice, filledContourSliceITK );
+
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 
   // now the original slice and the ipSegmentation-painted slice are in the same format, and we can just copy all pixels that are non-zero
   typedef itk::ImageRegionIterator< SliceType >       OutputIteratorType;
@@ -153,52 +147,23 @@ void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDi
   outputIterator.GoToBegin();
   inputIterator.GoToBegin();
 
-  while ( !outputIterator.IsAtEnd() )
-  {
-    if ( inputIterator.Get() != 0 )
-    {
-      outputIterator.Set( overwritevalue );
-    }
+  const int& activePixelValue = toolManager->GetActiveLabelIndex();
 
-    ++outputIterator;
-    ++inputIterator;
-  }
-}
-
-template<typename TPixel, unsigned int VImageDimension>
-void mitk::ContourUtils::ItkCopyFilledContourToSlice2( itk::Image<TPixel,VImageDimension>* originalSlice, const LabelSetImage* filledContourSlice, int overwritevalue )
-{
-  typedef itk::Image<TPixel,VImageDimension> SliceType;
-
-  typename SliceType::Pointer filledContourSliceITK;
-  CastToItkImage( filledContourSlice, filledContourSliceITK );
-
-  // now the original slice and the ipSegmentation-painted slice are in the same format, and we can just copy all pixels that are non-zero
-  typedef itk::ImageRegionIterator< SliceType >       OutputIteratorType;
-  typedef itk::ImageRegionConstIterator< SliceType >   InputIteratorType;
-
-  InputIteratorType inputIterator( filledContourSliceITK, filledContourSliceITK->GetLargestPossibleRegion() );
-  OutputIteratorType outputIterator( originalSlice, originalSlice->GetLargestPossibleRegion() );
-
-  outputIterator.GoToBegin();
-  inputIterator.GoToBegin();
-
-  const int& activePixelValue = filledContourSlice->GetActiveLabelIndex();
-
-  if (overwritevalue != 0)
-  {
+//  if (overwritevalue != 0)
+//  {
       while ( !outputIterator.IsAtEnd() )
       {
         const int targetValue = outputIterator.Get();
         if ( inputIterator.Get() != 0 )
         {
-          if (!filledContourSlice->GetLabelLocked(targetValue))
+          if (!toolManager->GetLabelLocked(targetValue))
             outputIterator.Set( overwritevalue );
         }
 
         ++outputIterator;
         ++inputIterator;
       }
+/*
   }
   else // we are erasing
   {
@@ -215,4 +180,5 @@ void mitk::ContourUtils::ItkCopyFilledContourToSlice2( itk::Image<TPixel,VImageD
         ++inputIterator;
       }
   }
+*/
 }

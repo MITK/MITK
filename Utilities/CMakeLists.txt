@@ -12,7 +12,6 @@ subdirs(
   ipPic
   ipFunc
   ipSegmentation
-  Poco
   mbilog
   qtsingleapplication
   KWStyle
@@ -23,17 +22,3 @@ subdirs(
 set(mbilog_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/mbilog" "${CMAKE_CURRENT_BINARY_DIR}/mbilog")
 set(mbilog_CONFIG_FILE "${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME}/mbilogConfig.cmake" CACHE INTERNAL "Path to module config" FORCE)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mbilog/mbilogConfig.cmake.in" "${mbilog_CONFIG_FILE}")
-
-set(Poco_INCLUDE_DIR
-    ${CMAKE_CURRENT_SOURCE_DIR}/Poco
-    CACHE PATH
-    "top-level directory containing the poco include directories. E.g /usr/local/include/ or c:\\poco\\include\\poco-1.3.2"
-)
-
-set(Poco_LIBRARY_DIR
-    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-    CACHE PATH
-    "top-level directory containing the poco libraries."
-)
-
-

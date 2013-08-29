@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYUITESTCALLER_H_
 #define BERRYUITESTCALLER_H_
 
-#include <CppUnit/TestCase.h>
-#include <CppUnit/Guards.h>
+#include <cppunit/TestCase.h>
+#include <cppunit/Guards.h>
 
 #include <memory>
 

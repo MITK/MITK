@@ -1173,7 +1173,7 @@ void mitk::Image::PrintSelf(std::ostream& os, itk::Indent indent) const
 
       os << indent << " Channel: " << this->m_ImageDescriptor->GetChannelName(ch) << std::endl;
       os << indent << " PixelType: " << chPixelType.GetPixelTypeAsString() << std::endl;
-      os << indent << " BitsPerElement: " << chPixelType.GetSize() << std::endl;
+      os << indent << " BytesPerElement: " << chPixelType.GetSize() << std::endl;
       os << indent << " ComponentType: " << chPixelType.GetComponentTypeAsString() << std::endl;
       os << indent << " NumberOfComponents: " << chPixelType.GetNumberOfComponents() << std::endl;
       os << indent << " BitsPerComponent: " << chPixelType.GetBitsPerComponent() << std::endl;

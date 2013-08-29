@@ -149,36 +149,46 @@ void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDi
 
   const int& activePixelValue = toolManager->GetActiveLabelIndex();
 
-//  if (overwritevalue != 0)
-//  {
-      while ( !outputIterator.IsAtEnd() )
-      {
-        const int targetValue = outputIterator.Get();
-        if ( inputIterator.Get() != 0 )
-        {
-          if (!toolManager->GetLabelLocked(targetValue))
-            outputIterator.Set( overwritevalue );
-        }
-
-        ++outputIterator;
-        ++inputIterator;
-      }
-/*
-  }
-  else // we are erasing
+  if (activePixelValue == 0) // if exterior is the active label
   {
-      while ( !outputIterator.IsAtEnd() )
+    while ( !outputIterator.IsAtEnd() )
+    {
+      if (inputIterator.Get() != 0)
       {
-        const int targetValue = outputIterator.Get();
-        if (inputIterator.Get() != 0)
-        {
-          if (targetValue == activePixelValue)
-            outputIterator.Set( overwritevalue );
-        }
-
-        ++outputIterator;
-        ++inputIterator;
+        outputIterator.Set( overwritevalue );
       }
+      ++outputIterator;
+      ++inputIterator;
+    }
   }
-*/
+  else if (overwritevalue != 0) // if we are not erasing
+  {
+    while ( !outputIterator.IsAtEnd() )
+    {
+      const int targetValue = outputIterator.Get();
+      if ( inputIterator.Get() != 0 )
+      {
+        if (!toolManager->GetLabelLocked(targetValue))
+          outputIterator.Set( overwritevalue );
+      }
+
+      ++outputIterator;
+      ++inputIterator;
+    }
+  }
+  else // if we are erasing
+  {
+    while ( !outputIterator.IsAtEnd() )
+    {
+      const int targetValue = outputIterator.Get();
+      if (inputIterator.Get() != 0)
+      {
+        if (targetValue == activePixelValue)
+          outputIterator.Set( overwritevalue );
+      }
+
+      ++outputIterator;
+      ++inputIterator;
+    }
+  }
 }

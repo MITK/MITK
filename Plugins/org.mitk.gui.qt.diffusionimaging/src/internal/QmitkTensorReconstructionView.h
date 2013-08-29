@@ -92,7 +92,7 @@ protected:
 
   QmitkStdMultiWidget* m_MultiWidget;
 
-  template<int ndirs> std::vector<itk::Vector<double,3> > MakeGradientList();
+  template<int ndirs> itk::VectorContainer<unsigned int, vnl_vector_fixed<double,3> >::Pointer MakeGradientList();
 
   template<int L>
   void TemplatedAnalyticalTensorReconstruction(mitk::DiffusionImage<DiffusionPixelType>* vols,

@@ -31,7 +31,7 @@ namespace mitk {
 mitk::AddContourTool::AddContourTool()
 :ContourTool()
 {
-      CONNECT_ACTION( 49014, OnInvertLogic );
+  CONNECT_ACTION( 49014, OnInvertLogic );
 }
 
 mitk::AddContourTool::~AddContourTool()
@@ -40,17 +40,17 @@ mitk::AddContourTool::~AddContourTool()
 
 bool mitk::AddContourTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
 {
-    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-    assert (workingNode);
+  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  assert (workingNode);
 
-    LabelSetImage* lsImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-    assert (lsImage);
+  LabelSetImage* lsImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  assert (lsImage);
 
-    m_PaintingPixelValue = lsImage->GetActiveLabelIndex();
-    const mitk::Color& color = lsImage->GetActiveLabelColor();
-    this->SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
+  m_PaintingPixelValue = lsImage->GetActiveLabelIndex();
+  const mitk::Color& color = lsImage->GetActiveLabelColor();
+  this->SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
 
-    return Superclass::OnMousePressed(action, stateEvent);
+  return Superclass::OnMousePressed(action, stateEvent);
 }
 
 const char** mitk::AddContourTool::GetXPM() const
@@ -79,24 +79,21 @@ const char* mitk::AddContourTool::GetName() const
 
 bool mitk::AddContourTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
 {
-    if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
-
-    m_LogicInverted = !m_LogicInverted;
-
-    if (m_LogicInverted)
-    {
-        m_PaintingPixelValue = 0;
-        FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
-    }
-    else
-    {
-        DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-        assert (workingNode);
-        LabelSetImage* lsImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-        m_PaintingPixelValue = lsImage->GetActiveLabelIndex();
-        const mitk::Color& color = lsImage->GetActiveLabelColor();
-        FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
-    }
-
-    return true;
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  m_LogicInverted = !m_LogicInverted;
+  if (m_LogicInverted)
+  {
+    m_PaintingPixelValue = 0;
+    FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+  }
+  else
+  {
+    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+    assert (workingNode);
+    LabelSetImage* lsImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+    m_PaintingPixelValue = lsImage->GetActiveLabelIndex();
+    const mitk::Color& color = lsImage->GetActiveLabelColor();
+    FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
+  }
+  return true;
 }

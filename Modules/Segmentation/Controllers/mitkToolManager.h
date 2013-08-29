@@ -221,6 +221,16 @@ class Segmentation_EXPORT ToolManager : public itk::Object
     void SetDataStorage(DataStorage& storage);
 
     /*
+     \brief Get the index of the active label
+     */
+    int GetActiveLabelIndex();
+
+    /*
+     \brief Get whether the label with the given index is locked
+     */
+    bool GetLabelLocked(int index);
+
+    /*
       \brief Tell that someone is using tools.
       GUI elements should call this when they become active. This method increases an internal "client count". Tools
       are only registered to GlobalInteraction when this count is greater than 0. This is useful to automatically deactivate

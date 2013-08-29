@@ -19,14 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLabelSetImage.h"
 #include "mitkColormapProperty.h"
-#include "mitkImageWriteAccessor.h"
-#include "mitkNrrdLabelSetImageWriter.h"
-#include "mitkNrrdLabelSetImageReader.h"
+//#include "mitkNrrdLabelSetImageWriter.h"
+//#include "mitkNrrdLabelSetImageReader.h"
 #include "mitkStatusBar.h"
 #include "mitkApplicationCursor.h"
 #include "mitkToolManagerProvider.h"
 #include "mitkSegmentationObjectFactory.h"
-//#include "mitkProperties.h"
 #include "mitkSegTool2D.h"
 #include "mitkPlanePositionManager.h"
 
@@ -478,22 +476,22 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
 void QmitkSegmentationView::OnManualTool2DSelected(int id)
 {
-    if (id >= 0)
-    {
-        std::string text = "Active Tool: \"";
-        mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-        text += toolManager->GetToolById(id)->GetName();
-        text += "\"";
-        mitk::StatusBar::GetInstance()->DisplayText(text.c_str());
+  if (id >= 0)
+  {
+    std::string text = "Active Tool: \"";
+    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+    text += toolManager->GetToolById(id)->GetName();
+    text += "\"";
+    mitk::StatusBar::GetInstance()->DisplayText(text.c_str());
 
-        mitk::ModuleResource resource = toolManager->GetToolById(id)->GetCursorIconResource();
-        this->SetMouseCursor(resource, 0, 0);
-    }
-    else
-    {
-        this->ResetMouseCursor();
-        mitk::StatusBar::GetInstance()->DisplayText("");
-    }
+    mitk::ModuleResource resource = toolManager->GetToolById(id)->GetCursorIconResource();
+    this->SetMouseCursor(resource, 0, 0);
+  }
+  else
+  {
+      this->ResetMouseCursor();
+      mitk::StatusBar::GetInstance()->DisplayText("");
+  }
 }
 
 void QmitkSegmentationView::ResetMouseCursor()

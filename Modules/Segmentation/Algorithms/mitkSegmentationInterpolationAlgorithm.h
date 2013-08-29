@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
-#include "mitkLabelSetImage.h"
+#include "mitkImage.h"
 
 #include <itkObjectFactory.h>
 
@@ -58,9 +58,9 @@ class Segmentation_EXPORT SegmentationInterpolationAlgorithm : public itk::Objec
                                        Image::ConstPointer upperSlice, unsigned int upperSliceIndex,
                                        unsigned int requestedIndex,
                                        unsigned int sliceDimension,
-                                       LabelSetImage* resultImage,
+                                       Image* resultImage,
                                        unsigned int timeStep = 0,
-                                       Image::ConstPointer referenceImage = NULL) = 0;
+                                       Image::Pointer referenceImage = NULL) = 0;
 };
 
 } // namespace

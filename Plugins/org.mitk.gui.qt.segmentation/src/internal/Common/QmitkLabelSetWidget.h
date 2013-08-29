@@ -63,7 +63,7 @@ private slots:
   void OnLabelListModified(const QStringList& list);
 
   // reaction to the signal "renameLabel" from QmitkLabelSetTableWidget
-  void OnRenameLabel(int);
+  void OnRenameLabel(int index, const mitk::Color& color, const std::string& name);
 
   // reaction to the signal "newlabel" from QmitkLabelSetTableWidget
   void OnNewLabel();

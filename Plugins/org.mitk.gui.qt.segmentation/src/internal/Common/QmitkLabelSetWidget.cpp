@@ -56,7 +56,7 @@ QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent)
   m_Controls.m_LabelSetTableWidget->Init();
 
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(newLabel()), this, SLOT(OnNewLabel()) );
-  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(renameLabel(int)), this, SLOT(OnRenameLabel(int)) );
+  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(renameLabel(int, const mitk::Color&, const std::string&)), this, SLOT(OnRenameLabel(int, const mitk::Color&, const std::string&)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createSurface(int)), this, SLOT(OnCreateSurface(int)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SIGNAL(goToLabel(const mitk::Point3D&)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(combineAndCreateSurface( const QList<QTableWidgetSelectionRange>& )),
@@ -155,7 +155,7 @@ void QmitkLabelSetWidget::OnLabelListModified(const QStringList& list)
   completeModel->setStringList(list);
 }
 
-void QmitkLabelSetWidget::OnRenameLabel(int index)
+void QmitkLabelSetWidget::OnRenameLabel(int index, const mitk::Color& color, const std::string& name)
 {
     // ask about the name and organ type of the new segmentation
     QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this );
@@ -168,47 +168,32 @@ void QmitkLabelSetWidget::OnRenameLabel(int index)
     }
     else
     {
-        /*
-        a couple of examples of how organ names are stored:
+      // recover string list from BlueBerry view's preferences
+      QString storedString = QString::fromStdString( m_Preferences->GetByteArray("Organ-Color-List","") );
+      // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
+      QRegExp onePart("(?:[^;]|\\\\;)*");
+      int count = 0;
+      int pos = 0;
+      while( (pos = onePart.indexIn( storedString, pos )) != -1 )
+      {
+        ++count;
+        int length = onePart.matchedLength();
+        if (length == 0) break;
+        QString matchedString = storedString.mid(pos, length);
+        MITK_DEBUG << "   Captured length " << length << ": " << matchedString.toStdString();
+        pos += length + 1; // skip separating ';'
 
-        a simple item is built up like 'name#AABBCC' where #AABBCC is the hexadecimal notation of a color as known from HTML
+        // unescape possible occurrences of '\;' in the string
+        matchedString.replace("\\;", ";");
 
-        items are stored separated by ';'
-        this makes it necessary to escape occurrences of ';' in name.
-        otherwise the string "hugo;ypsilon#AABBCC;eugen#AABBCC" could not be parsed as two organs
-        but we would get "hugo" and "ypsilon#AABBCC" and "eugen#AABBCC"
-
-        so the organ name "hugo;ypsilon" is stored as "hugo\;ypsilon"
-        and must be unescaped after loading
-
-        the following lines could be one split with Perl's negative lookbehind
-        */
-
-        // recover string list from BlueBerry view's preferences
-        QString storedString = QString::fromStdString( m_Preferences->GetByteArray("Organ-Color-List","") );
-        MITK_DEBUG << "storedString: " << storedString.toStdString();
-        // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
-        QRegExp onePart("(?:[^;]|\\\\;)*");
-        int count = 0;
-        int pos = 0;
-        while( (pos = onePart.indexIn( storedString, pos )) != -1 )
-        {
-            ++count;
-            int length = onePart.matchedLength();
-            if (length == 0) break;
-            QString matchedString = storedString.mid(pos, length);
-            MITK_DEBUG << "   Captured length " << length << ": " << matchedString.toStdString();
-            pos += length + 1; // skip separating ';'
-
-            // unescape possible occurrences of '\;' in the string
-            matchedString.replace("\\;", ";");
-
-            // add matched string part to output list
-            organColors << matchedString;
-        }
+        // add matched string part to output list
+        organColors << matchedString;
+      }
     }
 
     dialog->SetSuggestionList( organColors );
+    dialog->SetColor(color);
+    dialog->SetSegmentationName(name);
 
     int dialogReturnValue = dialog->exec();
 

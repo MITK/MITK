@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkApplicationCursor.h"
 #include "mitkImageCast.h"
 #include "mitkContourUtils.h"
+#include "mitkLabelSetImage.h"
 
 #include "ipSegmentation.h"
 

@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkInteractionConst.h>
 #include <mitkContourModelLiveWireInteractor.h>
 #include <mitkGlobalInteraction.h>
+#include <mitkLabelSetImage.h>
 
 #include "mitkContourUtils.h"
 #include "mitkContour.h"

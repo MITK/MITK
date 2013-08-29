@@ -195,6 +195,7 @@ include_directories(${_ctk_plugins_include_dirs})
 link_directories(${_ctk_plugins_link_dirs})
 
 if(BLUEBERRY_BUILD_TESTING)
+  find_package(CppUnit REQUIRED)
   include(berryTestingHelpers)
 
   set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}")
@@ -261,10 +262,7 @@ endif()
 # CTK Plugin Exports
 set(BB_PLUGIN_EXPORTS_FILE "${CMAKE_CURRENT_BINARY_DIR}/BlueBerryPluginExports.cmake")
 GetMyTargetLibraries("${${PROJECT_NAME}_PLUGIN_LIBRARIES}" my_plugin_targets)
-set(additional_export_targets mbilog PocoFoundation PocoUtil PocoXML)
-if(BLUEBERRY_BUILD_TESTING)
-  list(APPEND additional_export_targets CppUnit)
-endif()
+set(additional_export_targets mbilog)
 export(TARGETS ${my_plugin_targets} ${additional_export_targets}
        FILE ${BB_PLUGIN_EXPORTS_FILE})
 

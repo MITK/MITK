@@ -48,6 +48,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
   endif()
 
   if(_PLUGIN_TEST_PLUGIN)
+    find_package(CppUnit REQUIRED)
     set(is_test_plugin "TEST_PLUGIN")
   else()
     set(is_test_plugin)
@@ -119,7 +120,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
     UI_FORMS ${_PLUGIN_UI_FILES}
     EXPORTED_INCLUDE_SUFFIXES ${_PLUGIN_EXPORTED_INCLUDE_SUFFIXES}
     RESOURCES ${_PLUGIN_QRC_FILES}
-    TARGET_LIBRARIES ${_PLUGIN_target_libraries}
+    TARGET_LIBRARIES ${_PLUGIN_target_libraries} ${CppUnit_LIBRARIES}
     CACHED_RESOURCEFILES ${_PLUGIN_CACHED_RESOURCE_FILES}
     TRANSLATIONS ${_PLUGIN_TRANSLATION_FILES}
     OUTPUT_DIR ${_output_dir}
@@ -131,13 +132,10 @@ macro(MACRO_CREATE_CTK_PLUGIN)
   endif()
 
   include_directories(${Poco_INCLUDE_DIRS})
+  include_directories(${CppUnit_INCLUDE_DIRS})
   include_directories(${BlueBerry_BINARY_DIR})
 
-  target_link_libraries(${PLUGIN_TARGET}
-    optimized PocoFoundation debug PocoFoundationd
-    optimized PocoUtil debug PocoUtild
-    optimized PocoXML debug PocoXMLd
-  )
+  target_link_libraries(${PLUGIN_TARGET} ${Poco_LIBRARIES})
 
   # Set compiler flags
   get_target_property(_plugin_compile_flags ${PLUGIN_TARGET} COMPILE_FLAGS)

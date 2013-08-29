@@ -146,22 +146,19 @@ bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* state
     return false;
   }
 
-  LabelSetImage::Pointer lsSlice = LabelSetImage::New( slice );
-  lsSlice->SetLabelSet( lsImage->GetLabelSet() );
-
   // 3. Get our feedback contour
   ContourModel* feedbackContour = mitk::FeedbackContourTool::GetFeedbackContour();
   assert( feedbackContour);
 
   // 4. Project it into the extracted plane
-  ContourModel::Pointer projectedContour = ContourUtils::ProjectContourTo2DSlice( lsSlice, feedbackContour, timestep );
+  ContourModel::Pointer projectedContour = ContourUtils::ProjectContourTo2DSlice( slice, feedbackContour, timestep );
   if (projectedContour.IsNull()) return false;
 
   // 5. Transfer contour to working slice taking into account whether neighboring labels are locked or editable
-  ContourUtils::FillContourInSlice( projectedContour, lsSlice, m_PaintingPixelValue, timestep );
+  ContourUtils::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue, timestep );
 
-  // 6. Write back the slice into our working labelset image
-  this->WriteBackSegmentationResult(planeGeometry, lsSlice, timestep);
+  // 6. Write back the slice into our working image
+  this->WriteBackSegmentationResult(planeGeometry, slice, timestep);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 

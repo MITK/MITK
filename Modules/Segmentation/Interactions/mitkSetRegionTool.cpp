@@ -277,7 +277,8 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
   }
 
   ContourModel* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
-  ContourModel::Pointer projectedContour = ContourUtils::ProjectContourTo2DSlice( slice, feedbackContour, timestep );
+  ContourModel::Pointer projectedContour = ContourModel::New();
+  ContourUtils::ProjectContourTo2DSlice( slice, feedbackContour, projectedContour, timestep );
   // false: don't constrain the contour to the image's inside
   if (projectedContour.IsNull()) return false;
 

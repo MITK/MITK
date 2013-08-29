@@ -36,33 +36,26 @@ mitk::ContourUtils::~ContourUtils()
 {
 }
 
-mitk::ContourModel::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image* slice, ContourModel* contourIn3D, int timestep)
+void mitk::ContourUtils::ProjectContourTo2DSlice(Image* slice, ContourModel* contourIn3D, ContourModel* contourIn2D, int timestep)
 {
-  if ( !slice || !contourIn3D ) return NULL;
+  if ( !slice || !contourIn3D ) return;
 
-  ContourModel::Pointer projectedContour = ContourModel::New();
-  projectedContour->Initialize();
-  projectedContour->Expand(timestep+1);
+  contourIn2D->Clear(timestep);
+  contourIn2D->Initialize();
+  contourIn2D->Expand(timestep+1);
 
   // fixme: we may consider the timestamp in the next line
   const Geometry3D* sliceGeometry = slice->GetGeometry(0);
-  if (!sliceGeometry) return NULL;
+  if (!sliceGeometry) return;
 
   for ( ContourModel::ConstVertexIterator iter = contourIn3D->Begin(timestep);
         iter != contourIn3D->End(timestep);
         ++iter )
   {
-    Point3D currentPointIn3D;
-    for (int i = 0; i < 3; ++i)
-      currentPointIn3D[i] = (*iter)->Coordinates[i];
-
-    Point3D projectedPointIn2D;
-    projectedPointIn2D.Fill(0.0);
-    sliceGeometry->WorldToIndex( currentPointIn3D, projectedPointIn2D );
-    projectedContour->AddVertex( projectedPointIn2D, timestep );
+    Point3D pointIn2D;
+    sliceGeometry->WorldToIndex( (*iter)->Coordinates, pointIn2D );
+    contourIn2D->AddVertex( pointIn2D, timestep );
   }
-
-  return projectedContour;
 }
 
 void mitk::ContourUtils::BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D, ContourModel* contourIn3D, int timestep )
@@ -76,9 +69,9 @@ void mitk::ContourUtils::BackProjectContourFrom2DSlice(const Geometry3D* sliceGe
   ContourModel::ConstVertexIterator iter = contourIn2D->Begin(timestep);
   for ( ; iter != contourIn2D->End(timestep); ++iter)
   {
-    Point3D worldPointIn3D;
-    sliceGeometry->IndexToWorld( (*iter)->Coordinates, worldPointIn3D );
-    contourIn3D->AddVertex(worldPointIn3D,timestep);
+    Point3D pointIn3D;
+    sliceGeometry->IndexToWorld( (*iter)->Coordinates, pointIn3D );
+    contourIn3D->AddVertex( pointIn3D, timestep );
   }
 }
 

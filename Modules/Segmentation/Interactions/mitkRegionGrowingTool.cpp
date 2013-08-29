@@ -371,20 +371,15 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
           // 3. use contour to fill a region in our working slice
           ContourModel* feedbackContour = FeedbackContourTool::GetFeedbackContour();
           assert(feedbackContour);
-          ContourModel::Pointer projectedContour = ContourUtils::ProjectContourTo2DSlice( m_WorkingSlice, feedbackContour, timestep);
+          ContourModel::Pointer projectedContour = ContourModel::New();
+          ContourUtils::ProjectContourTo2DSlice( m_WorkingSlice, feedbackContour, projectedContour, timestep);
           if (projectedContour.IsNotNull())
           {
-
-            LabelSetImage::Pointer lsSlice = LabelSetImage::New( m_WorkingSlice );
-            lsSlice->SetLabelSet( lsImage->GetLabelSet() );
-
             // 4. stamp contour in 3D ooords into working slice
-            ContourUtils::FillContourInSlice( projectedContour, lsSlice, m_PaintingPixelValue, timestep );
-
-            const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
-
+            ContourUtils::FillContourInSlice( projectedContour, m_WorkingSlice, m_PaintingPixelValue, timestep );
+            const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D()) );
            // 5. write working slice back into working volume
-           this->WriteBackSegmentationResult(positionEvent, lsSlice);
+           this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
           }
         }
 

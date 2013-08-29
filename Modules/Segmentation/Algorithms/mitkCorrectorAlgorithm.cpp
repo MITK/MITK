@@ -140,9 +140,10 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
   segData.reserve( 16 );
 
   ContourModel* contour3D = const_cast<ContourModel*>(m_Contour.GetPointer());
-  ContourModel::Pointer projectedContour = mitk::ContourUtils::ProjectContourTo2DSlice( m_WorkingImage, contour3D, false );
+  ContourModel::Pointer projectedContour = ContourModel::New();
+  mitk::ContourUtils::ProjectContourTo2DSlice( m_WorkingImage, contour3D, projectedContour, m_TimeStep );
 
-  if (projectedContour.IsNull())
+  if (projectedContour->IsEmpty( m_TimeStep ))
   {
     delete[] _ofsArray;
     return;

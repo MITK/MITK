@@ -151,7 +151,8 @@ bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* state
   assert( feedbackContour);
 
   // 4. Project it into the extracted plane
-  ContourModel::Pointer projectedContour = ContourUtils::ProjectContourTo2DSlice( slice, feedbackContour, timestep );
+  ContourModel::Pointer projectedContour = ContourModel::New();
+  ContourUtils::ProjectContourTo2DSlice( slice, feedbackContour, projectedContour, timestep );
   if (projectedContour.IsNull()) return false;
 
   // 5. Transfer contour to working slice taking into account whether neighboring labels are locked or editable

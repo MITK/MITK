@@ -48,10 +48,10 @@ TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
 ::BeforeThreadedGenerateData()
 {
 
-  if( m_GradientList->Size()==0 )
-  {
-    throw itk::ExceptionObject (__FILE__,__LINE__,"Error: gradient list is empty, cannot generate DWI.");
-  }
+    if( m_GradientList->Size()==0 )
+    {
+      throw itk::ExceptionObject (__FILE__,__LINE__,"Error: gradient list is empty, cannot generate DWI.");
+    }
 
   if( m_BaselineImage.IsNull() )
   {
@@ -91,29 +91,15 @@ TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
     m_BaselineImage = rescaler->GetOutput();
   }
 
-  typename OutputImageType::Pointer outImage = OutputImageType::New();
-  outImage->SetSpacing( this->GetInput()->GetSpacing() );   // Set the image spacing
-  outImage->SetOrigin( this->GetInput()->GetOrigin() );     // Set the image origin
-  outImage->SetDirection( this->GetInput()->GetDirection() );  // Set the image direction
-  outImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
-  outImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
-  outImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
-  outImage->SetVectorLength(m_GradientList->Size());
-  outImage->Allocate();
-
-  this->SetNumberOfRequiredOutputs (1);
-  this->SetNthOutput (0, outImage);
-
-}
-
-template <class TInputScalarType, class TOutputScalarType>
-void
-TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
-::ThreadedGenerateData (const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId )
-{
-  typedef ImageRegionIterator<OutputImageType>      IteratorOutputType;
-  typedef ImageRegionConstIterator<InputImageType>  IteratorInputType;
-  typedef ImageRegionConstIterator<BaselineImageType>  IteratorBaselineType;
+    typename OutputImageType::Pointer outImage = OutputImageType::New();
+    outImage->SetSpacing( this->GetInput()->GetSpacing() );   // Set the image spacing
+    outImage->SetOrigin( this->GetInput()->GetOrigin() );     // Set the image origin
+    outImage->SetDirection( this->GetInput()->GetDirection() );  // Set the image direction
+    outImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
+    outImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
+    outImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
+    outImage->SetVectorLength(m_GradientList->Size());
+    outImage->Allocate();
 
   unsigned long numPixels = outputRegionForThread.GetNumberOfPixels();
   unsigned long step = numPixels/100;
@@ -145,12 +131,18 @@ TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
     out.SetSize(m_GradientList->Size());
     out.Fill(0);
 
-    if( b0 > 0)
-    {
-      for( unsigned int i=0; i<m_GradientList->Size()-1; i++)
-      {
+      BaselinePixelType b0 = itB0.Get();
 
-        GradientType g = m_GradientList->at(i+1);
+      OutputPixelType out;
+      out.SetSize(m_GradientList->Size());
+      out.Fill(0);
+
+      if( b0 > 0)
+      {
+        for( unsigned int i=0; i<m_GradientList->Size()-1; i++)
+        {
+
+          GradientType g = m_GradientList->at(i);
 
         // normalize vector so the following computations work
         const double twonorm = g.two_norm();
@@ -181,7 +173,7 @@ TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
       }
     }
 
-    out[0] = b0;
+      out[m_GradientList->Size()-1] = b0;
 
     itOut.Set(out);
 

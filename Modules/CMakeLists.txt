@@ -13,6 +13,7 @@ set(module_dirs
     GraphAlgorithms
     SurfaceInterpolation
     Segmentation
+    DicomRT
     PlanarFigureSegmentation
     Qmitk
     QmitkExt
@@ -41,7 +42,6 @@ set(module_dirs
     Simulation
     Remeshing
     Python
-    DicomRT
 )
 
 set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

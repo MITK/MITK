@@ -13,5 +13,4 @@ set(CPP_FILES
   IO/mitkContourModelReader.cpp
   IO/mitkContourModelWriter.cpp
   IO/mitkContourModelWriterFactory.cpp
-
 )

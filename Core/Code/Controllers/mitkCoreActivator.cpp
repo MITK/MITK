@@ -14,6 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+// Rendering
 #include "mitkRenderingManager.h"
 #include "mitkPlanePositionManager.h"
 #include <mitkCoreDataNodeReader.h>
@@ -23,8 +24,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPropertyDescriptions.h>
 #include <mitkPropertyExtensions.h>
 #include <mitkPropertyFilters.h>
-#include <mitkIOUtil.h>
 
+// File IO
+#include <mitkIOUtil.h>
+#include <mitkIFileReader.h>
+#include <mitkIFileWriter.h>
+#include <mitkPointSetReaderService.h>
+
+// Microservices
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 #include <usModuleSettings.h>
@@ -81,9 +88,9 @@ void AddMitkAutoLoadPaths(const std::string& programPath)
 }
 
 /*
- * This is the module activator for the "Mitk" module. It registers core services
- * like ...
- */
+* This is the module activator for the "Mitk" module. It registers core services
+* like ...
+*/
 class MitkCoreActivator : public us::ModuleActivator
 {
 public:
@@ -130,6 +137,13 @@ public:
 
     context->AddModuleListener(this, &MitkCoreActivator::HandleModuleEvent);
 
+    // Add Reader / Writer Services
+
+    mitk::IFileReader* reader;
+//    mitk::IFileWriter* writer;
+    reader = new mitk::PointSetReaderService();
+    m_FileReaders.push_back(reader);
+
     /*
     There IS an option to exchange ALL vtkTexture instances against vtkNeverTranslucentTextureFactory.
     This code is left here as a reminder, just in case we might need to do that some time.
@@ -162,6 +176,10 @@ private:
   std::auto_ptr<mitk::PropertyDescriptions> m_PropertyDescriptions;
   std::auto_ptr<mitk::PropertyExtensions> m_PropertyExtensions;
   std::auto_ptr<mitk::PropertyFilters> m_PropertyFilters;
+
+  // File IO
+  std::vector<mitk::IFileReader*> m_FileReaders;
+  std::vector<mitk::IFileReader*> m_FileWriters;
 };
 
 void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
@@ -170,9 +188,9 @@ void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
   {
     // search and load shader files
     std::vector<us::ModuleResource> shaderResoruces =
-        moduleEvent.GetModule()->FindResources("Shaders", "*.xml", true);
+      moduleEvent.GetModule()->FindResources("Shaders", "*.xml", true);
     for (std::vector<us::ModuleResource>::iterator i = shaderResoruces.begin();
-         i != shaderResoruces.end(); ++i)
+      i != shaderResoruces.end(); ++i)
     {
       if (*i)
       {
@@ -188,20 +206,17 @@ void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
   else if (moduleEvent.GetType() == us::ModuleEvent::UNLOADED)
   {
     std::map<long, std::vector<int> >::iterator shaderIdsIter =
-        moduleIdToShaderIds.find(moduleEvent.GetModule()->GetModuleId());
+      moduleIdToShaderIds.find(moduleEvent.GetModule()->GetModuleId());
     if (shaderIdsIter != moduleIdToShaderIds.end())
     {
       for (std::vector<int>::iterator idIter = shaderIdsIter->second.begin();
-           idIter != shaderIdsIter->second.end(); ++idIter)
+        idIter != shaderIdsIter->second.end(); ++idIter)
       {
         m_ShaderRepository->UnloadShader(*idIter);
       }
       moduleIdToShaderIds.erase(shaderIdsIter);
     }
   }
-
-
 }
 
 US_EXPORT_MODULE_ACTIVATOR(Mitk, MitkCoreActivator)
-

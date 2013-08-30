@@ -57,7 +57,9 @@ namespace mitk {
 
     virtual bool CanRead(const std::string& path) const;
 
-    virtual float GetProgress() const;
+    virtual void AddProgressCallback(const mitk::MessageAbstractDelegate<float>& callback);
+
+    virtual void RemoveProgressCallback(const mitk::MessageAbstractDelegate<float>& callback);
 
     us::ServiceRegistration<IFileReader> RegisterService(us::ModuleContext* context = us::GetModuleContext());
 

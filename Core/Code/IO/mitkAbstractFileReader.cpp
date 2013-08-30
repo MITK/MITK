@@ -153,10 +153,12 @@ bool mitk::AbstractFileReader::CanRead(const std::string& path) const
   return (m_Extension == pathEnd);
 }
 
-float mitk::AbstractFileReader::GetProgress() const
+void mitk::AbstractFileReader::AddProgressCallback(const mitk::MessageAbstractDelegate<float>& callback)
 {
-  // Default implementation always returns 1 (finished)
-  return 1;
+}
+
+void mitk::AbstractFileReader::RemoveProgressCallback(const mitk::MessageAbstractDelegate<float>& callback)
+{
 }
 
 ////////////////// µS related Getters //////////////////

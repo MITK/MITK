@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Microservices
 #include <usServiceInterface.h>
 
+// MITK
+#include <mitkMessage.h>
+
 // STL
 #include <list>
 

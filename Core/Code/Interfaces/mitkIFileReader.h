@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Microservices
 #include <usServiceInterface.h>
 
+// MITK
+#include <mitkMessage.h>
+
 // STL
 #include <list>
 
@@ -116,11 +119,9 @@ namespace mitk {
     */
     virtual bool CanRead(const std::string& path) const = 0;
 
-    /**
-    * \brief Returns a value between 0 and 1 depending on the progress of the read.
-    * This method need not necessarily be implemented meaningfully, always returning zero is accepted.
-    */
-    virtual float GetProgress() const = 0;
+    virtual void AddProgressCallback(const mitk::MessageAbstractDelegate<float>& callback) = 0;
+
+    virtual void RemoveProgressCallback(const mitk::MessageAbstractDelegate<float>& callback) = 0;
 
     // Microservice properties
     static const std::string PROP_EXTENSION;

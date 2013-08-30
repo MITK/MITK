@@ -4,6 +4,7 @@ set(CPP_FILES
   Algorithms/mitkContourModelToPointSetFilter.cpp
   Algorithms/mitkContourModelToSurfaceFilter.cpp
   Algorithms/mitkImageToContourModelFilter.cpp
+  Algorithms/mitkContourObjectFactory.cpp
   DataManagement/mitkContourModel.cpp
   DataManagement/mitkContourElement.cpp
   Rendering/mitkContourModelGLMapper2D.cpp

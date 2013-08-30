@@ -38,8 +38,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLabelSetImage.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkImageTimeSelector.h>
-
-
+#include <mitkImageToContourModelFilter.h>
+#include <mitkContourUtils.h>
 #include <itkCommand.h>
 
 #include <QCheckBox>
@@ -119,8 +119,11 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
 
   // feedback node and its visualization properties
   m_FeedbackNode = mitk::DataNode::New();
+  m_FeedbackContour = mitk::ContourModel::New();
+  m_FeedbackNode->SetData( m_FeedbackContour );
   m_FeedbackNode->SetName( "Interpolation feedback" );
   m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(false) );
+  m_FeedbackNode->SetProperty( "contour.width", mitk::FloatProperty::New( 3.0 ) );
 
   m_InterpolatedSurfaceNode = mitk::DataNode::New();
   m_InterpolatedSurfaceNode->SetName( "Surface Interpolation feedback" );
@@ -451,20 +454,31 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
   // see if timestep is needed here
   mitk::SegTool2D::DetermineAffectedImageSlice( m_WorkingImage, plane, clickedSliceDimension, clickedSliceIndex );
 
-//  mitk::SegTool2D::GetAffectedImageSliceAs2DImage( plane, m_WorkingImage, timeStep);
-
   mitk::Image::Pointer auxImage = m_InterpolatorController->Interpolate( clickedSliceDimension, clickedSliceIndex, plane, timeStep );
 
   if (auxImage.IsNotNull())
   {
-    mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New(auxImage);
-    newImage->SetLabelSet( m_WorkingImage->GetLabelSet() );
+    mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
+    contourExtractor->SetInput(auxImage);
+    contourExtractor->SetUseProgressBar(false);
 
-    mitk::ImageReadAccessor accessor(static_cast<mitk::Image*>(auxImage));
-    newImage->SetVolume( accessor.GetData() );
-    newImage->SetLabelOpacity( m_WorkingImage->GetActiveLabelIndex(), 1.0 );
+    try
+    {
+      contourExtractor->Update();
+    }
+    catch ( itk::ExceptionObject & excep )
+    {
+      MITK_ERROR << "Exception caught: " << excep.GetDescription();
+      return;
+    }
 
-    m_FeedbackNode->SetData( newImage );
+    m_FeedbackContour = contourExtractor->GetOutput();
+    m_FeedbackContour->DisconnectPipeline();
+
+    m_FeedbackNode->SetData( m_FeedbackContour );
+
+    const mitk::Color& color = m_WorkingImage->GetActiveLabelColor();
+    m_FeedbackNode->SetProperty("contour.color", mitk::ColorProperty::New(color));
   }
 
   m_LastSNC = slicer;
@@ -507,50 +521,92 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
   }
 }
 
-void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
+mitk::Image::Pointer QmitkSlicesInterpolator::GetWorkingSlice()
 {
-  if (m_WorkingImage.IsNotNull() && m_FeedbackNode->GetData())
-  {
-    mitk::Image::Pointer slice = dynamic_cast<mitk::Image*>(m_FeedbackNode->GetData());
     unsigned int timeStep = m_LastSNC->GetTime()->GetPos();
 
     const mitk::PlaneGeometry* planeGeometry = m_LastSNC->GetCurrentPlaneGeometry();
-    if (!planeGeometry) return;
-
-    const mitk::Geometry3D* imageGeometry = m_WorkingImage->GetTimeSlicedGeometry()->GetGeometry3D( timeStep );
-    if (!imageGeometry) return;
+    if (!planeGeometry) return NULL;
 
     //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
     vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
-    //Set the slice as 'input'
-    reslice->SetInputSlice(slice->GetSliceData()->GetVtkImageData(slice));
-    //set overwrite mode to true to write back to the image volume
-    reslice->SetOverwriteMode(true);
+    //set to false to extract a slice
+    reslice->SetOverwriteMode(false);
     reslice->Modified();
 
+    //use ExtractSliceFilter with our specific vtkImageReslice for overwriting and extracting
     mitk::ExtractSliceFilter::Pointer extractor =  mitk::ExtractSliceFilter::New(reslice);
     extractor->SetInput( m_WorkingImage );
     extractor->SetTimeStep( timeStep );
     extractor->SetWorldGeometry( planeGeometry );
-    extractor->SetVtkOutputRequest(true);
-    extractor->SetResliceTransformByGeometry( imageGeometry );
+    extractor->SetVtkOutputRequest(false);
+    extractor->SetResliceTransformByGeometry( m_WorkingImage->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+
     extractor->Modified();
 
     try
     {
       extractor->Update();
     }
-    catch(...)
+    catch ( itk::ExceptionObject & excep )
     {
-      // Showing message box with possible memory error
-      QMessageBox errorInfo;
-      errorInfo.setWindowTitle("Interpolation Process");
-      errorInfo.setIcon(QMessageBox::Critical);
-      errorInfo.setText("An error occurred during interpolation. Possible cause: Not enough memory!");
-      errorInfo.exec();
+      MITK_ERROR << "Exception caught: " << excep.GetDescription();
+      return NULL;
+    }
 
-      //additional error message
-      MITK_ERROR << "Interpolation eror in " __FILE__ " l. " << __LINE__ ;
+    mitk::Image::Pointer slice = extractor->GetOutput();
+
+    //specify the undo operation with the non edited slice
+    m_undoOperation = new mitk::DiffSliceOperation(
+      m_WorkingImage, extractor->GetVtkOutput(), slice->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+
+    slice->DisconnectPipeline();
+
+    return slice;
+}
+
+void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
+{
+  if (m_WorkingImage.IsNotNull() && m_FeedbackNode->GetData())
+  {
+    mitk::Image::Pointer slice = this->GetWorkingSlice();
+    if (slice.IsNull()) return;
+
+    unsigned int timeStep = m_LastSNC->GetTime()->GetPos();
+
+    const mitk::PlaneGeometry* planeGeometry = m_LastSNC->GetCurrentPlaneGeometry();
+    if (!planeGeometry) return;
+
+    mitk::ContourModel::Pointer projectedContour = mitk::ContourModel::New();
+    mitk::ContourUtils::ProjectContourTo2DSlice( slice, m_FeedbackContour, projectedContour, timeStep );
+    if (projectedContour.IsNull()) return;
+
+    mitk::ContourUtils::FillContourInSlice( projectedContour, slice, m_WorkingImage->GetActiveLabelIndex(), timeStep );
+
+    //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
+    vtkSmartPointer<mitkVtkImageOverwrite> overwrite = vtkSmartPointer<mitkVtkImageOverwrite>::New();
+    overwrite->SetInputSlice(slice->GetVtkImageData());
+    //set overwrite mode to true to write back to the image volume
+    overwrite->SetOverwriteMode(true);
+    overwrite->Modified();
+
+    mitk::ExtractSliceFilter::Pointer extractor =  mitk::ExtractSliceFilter::New(overwrite);
+    extractor->SetInput( m_WorkingImage );
+    extractor->SetTimeStep( timeStep );
+    extractor->SetWorldGeometry( planeGeometry );
+    extractor->SetVtkOutputRequest(true);
+    extractor->SetResliceTransformByGeometry( m_WorkingImage->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+
+    extractor->Modified();
+
+    try
+    {
+      extractor->Update();
+    }
+    catch ( itk::ExceptionObject & excep )
+    {
+      MITK_ERROR << "Exception caught: " << excep.GetDescription();
+      return;
     }
 
     //the image was modified within the pipeline, but not marked so
@@ -558,10 +614,12 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     m_WorkingImage->GetVtkImageData()->Modified();
 
     //specify the undo operation with the edited slice
-    m_doOperation = new mitk::DiffSliceOperation(m_WorkingImage, extractor->GetVtkOutput(),slice->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+    m_doOperation = new mitk::DiffSliceOperation(
+      m_WorkingImage, extractor->GetVtkOutput(),slice->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
 
     //create an operation event for the undo stack
-    mitk::OperationEvent* undoStackItem = new mitk::OperationEvent( mitk::DiffSliceOperationApplier::GetInstance(), m_doOperation, m_undoOperation, "Segmentation" );
+    mitk::OperationEvent* undoStackItem = new mitk::OperationEvent(
+      mitk::DiffSliceOperationApplier::GetInstance(), m_doOperation, m_undoOperation, "Segmentation" );
 
     //add it to the undo controller
     mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
@@ -570,7 +628,8 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     m_undoOperation = NULL;
     m_doOperation = NULL;
 
-    m_FeedbackNode->SetData(NULL);
+    m_FeedbackContour->Clear();
+
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -677,7 +736,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       }
     }
 
-    m_FeedbackNode->SetData(NULL);
+//    m_FeedbackNode->SetData(NULL);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegmentationInterpolationController.h"
 #include "mitkToolManager.h"
 #include "mitkDiffSliceOperation.h"
+#include "mitkContourModel.h"
 
 #include <map>
 
@@ -149,6 +150,11 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
     */
     void OnAcceptInterpolationClicked();
 
+    /**
+      Gets the working slice based on the last saved interaction
+    */
+    mitk::Image::Pointer GetWorkingSlice();
+
     /*
       Opens popup to ask about which orientation should be interpolated
     */
@@ -245,6 +251,7 @@ private:
     QCheckBox* m_ChkShowPositionNodes;
 
     mitk::DataNode::Pointer m_FeedbackNode;
+    mitk::ContourModel::Pointer m_FeedbackContour;
     mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
     mitk::DataNode::Pointer m_3DContourNode;
 

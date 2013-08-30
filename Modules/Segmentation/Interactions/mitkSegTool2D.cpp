@@ -220,6 +220,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   if ((!positionEvent) || (!slice)) return;
 
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
+
   if( !planeGeometry ) return;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );

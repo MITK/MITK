@@ -67,19 +67,16 @@ int mitkDicomRTReaderTest(int  argc , char* argv[])
   mitk::ContourModel::Pointer a2 = mitk::ContourModel::New();
 
   a1->AddVertex(samePoint);
-  a1->AddVertex(b);
   a2->AddVertex(samePoint);
 
   a1->Close();
   a2->Close();
 
-  _DicomRTReader->Equals(a1,a2);
-
   MITK_TEST_CONDITION_REQUIRED( !real->IsEmpty() , "Tests if the first ContouModelObject from ReadDicomFile/Struct isnt empty" );
   MITK_TEST_CONDITION_REQUIRED( real != created , "Tests if created ContourModel is different to frist ContourModel" );
   MITK_TEST_CONDITION_REQUIRED( same != real , "Tests if the ContourModel looks like in the DcmDump Output" );
   MITK_TEST_CONDITION_REQUIRED( samePoint == b , "Tests the two Points with same coords" );
-  MITK_TEST_CONDITION_REQUIRED( a1 != a2 , "Tests the two generated ContourModels" );
+  MITK_TEST_CONDITION_REQUIRED( _DicomRTReader->Equals(a1,a2) , "Tests the two generated ContourModels" );
 
   std::cout << "\n";
   // always end with this!

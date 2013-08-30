@@ -515,19 +515,26 @@ namespace mitk
 
   bool DicomRTReader::Equals(mitk::ContourModel::Pointer first, mitk::ContourModel::Pointer second)
   {
-    if(first->GetNumberOfVertices != second->GetNumberOfVertices)
+    if(first->GetNumberOfVertices() != second->GetNumberOfVertices())
     {
       std::cout << "Different number of vertices\n";
       return false;
     }
     for( int i = 0; i < first->GetNumberOfVertices(); i++)
     {
-      mitk::ContourElement::VertexType x = first->GetVertexAt(i);
-      mitk::ContourElement::VertexType y = second->GetVertexAt(i);
-      if(x != y)
+      const mitk::ContourElement::VertexType* x = first->GetVertexAt(i);
+      const mitk::ContourElement::VertexType* y = second->GetVertexAt(i);
+
+      mitk::ContourElement::VertexType xx = *x;
+      mitk::ContourElement::VertexType yy = *y;
+
+      for(int j=0; j<3; j++)
       {
-        std::cout << "VertexNumber:" << i << " is different\n";
-        return false;
+        if(xx.Coordinates[j] != yy.Coordinates[j])
+        {
+          std::cout << "Dimenson " << y << " is different";
+          return false;
+        }
       }
     }
     return true;

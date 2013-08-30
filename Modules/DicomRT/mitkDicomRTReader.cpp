@@ -517,7 +517,6 @@ namespace mitk
   {
     if(first->GetNumberOfVertices() != second->GetNumberOfVertices())
     {
-      std::cout << "Different number of vertices\n";
       return false;
     }
     for( int i = 0; i < first->GetNumberOfVertices(); i++)
@@ -532,7 +531,6 @@ namespace mitk
       {
         if(xx.Coordinates[j] != yy.Coordinates[j])
         {
-          std::cout << "Dimenson " << y << " is different";
           return false;
         }
       }

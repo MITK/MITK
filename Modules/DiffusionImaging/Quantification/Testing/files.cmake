@@ -3,5 +3,6 @@ SET(MODULE_CUSTOM_TESTS
   #mitkTbssRoiNrrdImageReaderTest.cpp
   mitkTbssNrrdImageWriterTest.cpp
   mitkTbssSkeletonizationTest.cpp
+  mitkTractAnalyzerTest.cpp
 )
 

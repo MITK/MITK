@@ -8,3 +8,8 @@ mitkAddCustomModuleTest(mitkTbssSkeletonizationTest mitkTbssSkeletonizationTest 
                                                                                 ${MITK_DATA_DIR}/DiffusionImaging/LowerCingulum_1mm.nii.gz
                                                                                 ${MITK_DATA_DIR}/DiffusionImaging/single_subject4d.nhdr
                                                                                 ${MITK_DATA_DIR}/DiffusionImaging/single_subject_projected.nrrd)
+
+
+mitkAddCustomModuleTest(mitkTractAnalyzerTest mitkTractAnalyzerTest ${MITK_DATA_DIR}/DiffusionImaging/mean_FA_skeleton.nii.gz
+                                                                    ${MITK_DATA_DIR}/DiffusionImaging/tbssRoiPointset.mps
+                                                                    ${MITK_DATA_DIR}/DiffusionImaging/roi_cc.roi)

@@ -17,12 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include <mitkPointSet.h>
 
+/** Members used inside the different (sub-)tests. All members are initialized via Setup().*/
 mitk::PointSet::Pointer m_PointSet;
 mitk::PointSet::Pointer m_AnotherPointSet;
 
 /**
- * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the two used members for a new test case.
- */
+* @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
+*/
 static void Setup()
 {
   m_PointSet = mitk::PointSet::New();

@@ -673,12 +673,13 @@ private:
  * The function compares the spacing, origin, axisvectors, extents, the matrix of the
  * IndexToWorldTransform (elementwise), the bounding (elementwise) and the ImageGeometry flag.
  *
- * The parameter eps is an optional (default: mitk::eps) tolarence value for all methods which are internally used for comparion.
+ * The parameter eps is a tolarence value for all methods which are internally used for comparion.
  * If you want to use different tolarance values for different parts of the geometry, feel free to use
- * the other comparison methods and write your own implementation.
+ * the other comparison methods and write your own implementation of Equal.
  * @param rightHandSide Compare this against leftHandSide.
  * @param leftHandSide Compare this against rightHandSide.
- * @param eps Optional (default: mitk::eps) tolarence.
+ * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+ * @param verbose Flag indicating if the user wants detailed console output or not.
  * @return True, if all comparison are true. False in any other case.
  */
 MITK_CORE_EXPORT bool Equal(const mitk::Geometry3D* rightHandSide, const mitk::Geometry3D* leftHandSide, ScalarType eps, bool verbose);
@@ -688,10 +689,11 @@ MITK_CORE_EXPORT bool Equal(const mitk::Geometry3D* rightHandSide, const mitk::G
  *
  * The function compares the IndexToWorldTransform (elementwise).
  *
- * The parameter eps is an optional (default: mitk::eps) tolarence value for all methods which are internally used for comparion.
+ * The parameter eps is a tolarence value for all methods which are internally used for comparion.
  * @param rightHandSide Compare this against leftHandSide.
  * @param leftHandSide Compare this against rightHandSide.
- * @param eps Optional (default: mitk::eps) tolarence.
+ * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+ * @param verbose Flag indicating if the user wants detailed console output or not.
  * @return True, if all comparison are true. False in any other case.
  */
 MITK_CORE_EXPORT bool Equal( const mitk::Geometry3D::TransformType *rightHandSide, const  mitk::Geometry3D::TransformType *leftHandSide, ScalarType eps, bool verbose);
@@ -701,10 +703,11 @@ MITK_CORE_EXPORT bool Equal( const mitk::Geometry3D::TransformType *rightHandSid
  *
  * The function compares the bounds (elementwise).
  *
- * The parameter eps is an optional (default: mitk::eps) tolarence value for all methods which are internally used for comparion.
+ * The parameter eps is a tolarence value for all methods which are internally used for comparion.
  * @param rightHandSide Compare this against leftHandSide.
  * @param leftHandSide Compare this against rightHandSide.
- * @param eps Optional (default: mitk::eps) tolarence.
+ * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+ * @param verbose Flag indicating if the user wants detailed console output or not.
  * @return True, if all comparison are true. False in any other case.
  */
 MITK_CORE_EXPORT bool Equal( const mitk::Geometry3D::BoundingBoxType *rightHandSide, const  mitk::Geometry3D::BoundingBoxType *leftHandSide, ScalarType eps, bool verbose);

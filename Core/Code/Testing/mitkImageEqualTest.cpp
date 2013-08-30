@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkImageGenerator.h"
 #include "mitkTestingMacros.h"
-#include <mitkImageSliceSelector.h>
+#include "mitkImageSliceSelector.h"
 
 /** Members used inside the different (sub-)tests. All members are initialized via Setup().*/
 mitk::Image::Pointer m_Image;

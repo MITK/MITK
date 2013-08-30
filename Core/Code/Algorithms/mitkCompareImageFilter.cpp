@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "mitkCompareImageFilter.h"
 #include "mitkImageAccessByItk.h"
-
 #include "mitkITKImageImport.h"
 
 #include <itkTestingComparisonImageFilter.h>

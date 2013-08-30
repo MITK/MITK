@@ -775,13 +775,13 @@ bool mitk::Equal( const mitk::Geometry3D::BoundingBoxType *rightHandSide, const 
   if(( rightHandSide == NULL ) )
   {
     if(verbose)
-      MITK_INFO << "[( Geometry3D )] rightHandSide NULL.";
+      MITK_INFO << "[( Geometry3D::BoundingBoxType )] rightHandSide NULL.";
     return false;
   }
   if(( leftHandSide == NULL ) )
   {
     if(verbose)
-      MITK_INFO << "[( Geometry3D )] leftHandSide NULL.";
+      MITK_INFO << "[( Geometry3D::BoundingBoxType )] leftHandSide NULL.";
     return false;
   }
 
@@ -794,7 +794,7 @@ bool mitk::Equal( const mitk::Geometry3D::BoundingBoxType *rightHandSide, const 
     {
       if(verbose)
       {
-        MITK_INFO << "[( Geometry3D )] bounds are not equal.";
+        MITK_INFO << "[( Geometry3D::BoundingBoxType )] bounds are not equal.";
         MITK_INFO << "rightHandSide is " << setprecision(12) << *itRight << " : leftHandSide is " << *itLeft << " and tolerance is " << eps;
       }
       result = false;
@@ -900,7 +900,7 @@ bool mitk::Equal( const Geometry3D::TransformType *rightHandSide, const Geometry
   {
     if(verbose)
     {
-      MITK_INFO << "[( Geometry3D )] Index to World Transformation matrix differs.";
+      MITK_INFO << "[( Geometry3D::TransformType )] Index to World Transformation matrix differs.";
       MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetMatrix() << " : leftHandSide is " << leftHandSide->GetMatrix() << " and tolerance is " << eps;
     }
     return false;

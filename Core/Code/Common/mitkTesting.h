@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKTESTING_H_HEADER_INCLUDED
 #define MITKTESTING_H_HEADER_INCLUDED
 
@@ -25,12 +24,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 /**
- * @brief Equal
- * @param scalar1
- * @param scalar2
- * @param verbose
- * @param eps
- * @return
+ * @brief Equal Verbose version of the mitk::Equal method in mitkVector.h
+ * @param scalar1 Scalar value to compare.
+ * @param scalar2 Scalar value to compare.
+ * @param eps Tolerance for floating point comparison.
+ * @param verbose Flag indicating detailed console output.
+ * @return True if scalars are equal.
  */
 inline bool Equal(double scalar1, double scalar2, ScalarType eps, bool verbose)
 {
@@ -43,6 +42,14 @@ inline bool Equal(double scalar1, double scalar2, ScalarType eps, bool verbose)
   return isEqual;
 }
 
+/**
+ * @brief Equal Verbose version of the mitk::Equal method in mitkVector.h
+ * @param vector1 Vector to compare.
+ * @param vector2 Vector to compare.
+ * @param eps Tolerance for floating point comparison.
+ * @param verbose Flag indicating detailed console output.
+ * @return True if vectors are equal.
+ */
 template <typename TCoordRep, unsigned int NPointDimension>
 inline bool Equal(const itk::Vector<TCoordRep, NPointDimension>& vector1, const itk::Vector<TCoordRep, NPointDimension>& vector2, TCoordRep eps, bool verbose)
 {
@@ -50,34 +57,58 @@ inline bool Equal(const itk::Vector<TCoordRep, NPointDimension>& vector1, const 
 
   if(( !isEqual ) && verbose)
   {
-    MITK_INFO << "Vector not equal. Righthandside " << std::setprecision(12) << vector1 << " - Lefthandside " << vector2 << " - epsilon " << eps;
+    MITK_INFO << "Vectors not equal. Righthandside " << std::setprecision(12) << vector1 << " - Lefthandside " << vector2 << " - epsilon " << eps;
   }
   return isEqual;
 }
 
+/**
+ * @brief Equal Verbose version of the mitk::Equal method in mitkVector.h
+ * @param point1 Point to compare.
+ * @param point2 Point to compare.
+ * @param eps Tolerance for floating point comparison.
+ * @param verbose Flag indicating detailed console output.
+ * @return True if points are equal.
+ */
 template <typename TCoordRep, unsigned int NPointDimension>
-inline bool Equal(const itk::Point<TCoordRep, NPointDimension>& vector1, const itk::Point<TCoordRep, NPointDimension>& vector2, TCoordRep eps, bool verbose)
+inline bool Equal(const itk::Point<TCoordRep, NPointDimension>& point1, const itk::Point<TCoordRep, NPointDimension>& point2, TCoordRep eps, bool verbose)
 {
-  bool isEqual = mitk::Equal( vector1, vector2, eps );
+  bool isEqual = mitk::Equal( point1, point2, eps );
 
   if(( !isEqual ) && verbose)
   {
-    MITK_INFO << "Vector not equal. Righthandside " << std::setprecision(12) << vector1 << " - Lefthandside " << vector2 << " - epsilon " << eps;
+    MITK_INFO << "Points not equal. Righthandside " << std::setprecision(12) << point1 << " - Lefthandside " << point2 << " - epsilon " << eps;
   }
   return isEqual;
 }
 
+/**
+ * @brief Equal Verbose version of the mitk::Equal method in mitkVector.h
+ * @param vector1 Vector to compare.
+ * @param vector2 Vector to compare.
+ * @param eps Tolerance for floating point comparison.
+ * @param verbose Flag indicating detailed console output.
+ * @return True if vectors are equal.
+ */
 inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2, bool verbose, ScalarType eps)
 {
   bool isEqual = mitk::Equal( vector1, vector2, eps );
 
   if(( !isEqual ) && verbose)
   {
-    MITK_INFO << "Vector not equal. Righthandside " << std::setprecision(12) << vector1 << " - Lefthandside " << vector2 << " - epsilon " << eps;
+    MITK_INFO << "Vectors not equal. Righthandside " << std::setprecision(12) << vector1 << " - Lefthandside " << vector2 << " - epsilon " << eps;
   }
   return isEqual;
 }
 
+/**
+ * @brief Equal Verbose version of the mitk::Equal method in mitkVector.h
+ * @param vector1 Vector to compare.
+ * @param vector2 Vector to compare.
+ * @param eps Tolerance for floating point comparison.
+ * @param verbose Flag indicating detailed console output.
+ * @return True if vectors are equal.
+ */
 template <typename TCoordRep, unsigned int NPointDimension>
 inline bool Equal(const vnl_vector_fixed<TCoordRep, NPointDimension> & vector1, const vnl_vector_fixed<TCoordRep, NPointDimension>& vector2, TCoordRep eps, bool verbose)
 {
@@ -85,7 +116,7 @@ inline bool Equal(const vnl_vector_fixed<TCoordRep, NPointDimension> & vector1, 
 
   if(( !isEqual ) && verbose)
   {
-    MITK_INFO << "Vector not equal. Righthandside " << std::setprecision(12) << vector1 << " - Lefthandside " << vector2 << " - epsilon " << eps;
+    MITK_INFO << "Vectors not equal. Righthandside " << std::setprecision(12) << vector1 << " - Lefthandside " << vector2 << " - epsilon " << eps;
   }
   return isEqual;
 }

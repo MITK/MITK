@@ -45,7 +45,7 @@ struct CompareFilterResults
               << "Max. difference: " << m_MaximumDifference <<"\n"
               << "Total difference: " << m_TotalDifference <<"\n"
               << "Mean difference: " << m_MeanDifference <<"\n"
-              << "Pixels count w differences: " << m_PixelsWithDifference <<"\n";
+              << "Number of pixels with differences: " << m_PixelsWithDifference;
   }
 
   double m_MinimumDifference;
@@ -109,13 +109,10 @@ protected:
   void EstimateValueDifference( itk::Image< TPixel, VImageDimension>* itkImage1,
                                 const mitk::Image* referenceImage);
 
-
   bool m_CompareResult;
 
   CompareFilterResults m_CompareDetails;
-
 };
-
 } // end namespace mitk
 
 #endif // MITKCOMPAREIMAGEFILTER_H

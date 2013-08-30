@@ -17,12 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGeometry3D.h"
 #include "mitkTestingMacros.h"
 
+/** Members used inside the different (sub-)tests. All members are initialized via Setup().*/
 mitk::Geometry3D::Pointer m_Geometry3D;
 mitk::Geometry3D::Pointer m_AnotherGeometry3D;
 
 /**
- * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the two used members for a new test case.
- */
+* @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
+*/
 static void Setup()
 {
   m_Geometry3D = mitk::Geometry3D::New();
@@ -82,12 +83,8 @@ static void Equal_DifferentSpacing_ReturnsFalse()
 
 static void Equal_InputIsNull_ReturnsFalse()
 {
-  Setup();
-
-  m_Geometry3D = NULL;
-  m_AnotherGeometry3D = NULL;
-
-  MITK_TEST_NOT_EQUAL( m_Geometry3D, m_AnotherGeometry3D, "Input is NULL. Result should be false.");
+  mitk::Geometry3D::Pointer geometry3D = NULL;
+  MITK_TEST_NOT_EQUAL( geometry3D, geometry3D, "Input is NULL. Result should be false.");
 }
 
 static void Equal_DifferentImageGeometry_ReturnsFalse()
@@ -126,6 +123,4 @@ int mitkGeometry3DEqualTest(int /*argc*/, char* /*argv*/[])
   Equal_DifferentBoundingBox_ReturnsFalse();
 
   MITK_TEST_END();
-
-  return EXIT_SUCCESS;
 }

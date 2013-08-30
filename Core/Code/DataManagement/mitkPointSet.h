@@ -274,12 +274,13 @@ protected:
  * @brief Equal A function comparing two pointsets for beeing identical.
  *
  * The function compares the Geometry, the size and all points element-wise.
+ * The parameter eps is a tolarence value for all methods which are internally used for comparion.
  *
- * The parameter eps is an optional (default: mitk::eps) tolarence value for all methods which are internally used for comparion.
  * @param rightHandSide Compare this against leftHandSide.
  * @param leftHandSide Compare this against rightHandSide.
- * @param eps Optional (default: mitk::eps) tolarence.
- * @return True, if all comparison are true. False in any other case.
+ * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+ * @param verbose Flag indicating if the user wants detailed console output or not.
+ * @return True, if all subsequent comparisons are true, false otherwise
  */
 MITK_CORE_EXPORT bool Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose );
 

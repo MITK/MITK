@@ -640,8 +640,8 @@ private:
  *
  * @param rightHandSide An image to be compared
  * @param leftHandSide An image to be compared
- * @param eps (optional, default value = mitk::eps ) tolerance used for all comparisons
- *
+ * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+ * @param verbose Flag indicating if the user wants detailed console output or not.
  * @return true, if all subsequent comparisons are true, false otherwise
  */
 MITK_CORE_EXPORT bool Equal( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide, ScalarType eps, bool verbose );

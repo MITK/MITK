@@ -77,25 +77,28 @@ namespace mitk
   };
 
   /**
-  * \brief Compare two surfaces for equality, returns true if found equal
+  * @brief Equal Compare two surfaces for equality, returns true if found equal.
+  * @param rightHandSide Surface to compare.
+  * @param leftHandSide Surface to compare.
   * @param eps Epsilon to use for floating point comparison. Most of the time mitk::eps will be sufficient.
   * @param verbose Flag indicating if the method should give a detailed console output.
-  *
-  * This checks if any surface is NULL, compares the TimeSlicedGeometry, the vtkPolyData and the number of timesteps.
+  * @return True if every comparison is true, false in any other case.
   */
-MITK_CORE_EXPORT  bool Equal( mitk::Surface* rightHandSide,  mitk::Surface* leftHandSide, mitk::ScalarType eps, bool verbose);
+MITK_CORE_EXPORT bool Equal( mitk::Surface* rightHandSide, mitk::Surface* leftHandSide, mitk::ScalarType eps, bool verbose);
 
   /**
-  * \brief Compare two vtk PolyDatas for equality, returns true if found equal.
+  * @brief Equal Compare two vtk PolyDatas for equality, returns true if found equal.
+  * @param rightHandSide Surface to compare.
+  * @param leftHandSide Surface to compare.
   * @param eps Epsilon to use for floating point comparison. Most of the time mitk::eps will be sufficient.
   * @param verbose Flag indicating if the method should give a detailed console output.
+  * @return True if every comparison is true, false in any other case.
   *
   * This will only check if the number of cells, vertices, polygons, stripes and lines is the same and whether
   * all the two poly datas have the same number of points with the same coordinates. It is not checked whether
   * all points are correctly connected.
   */
-MITK_CORE_EXPORT  bool Equal( vtkPolyData* rightHandSide,  vtkPolyData* leftHandSide, mitk::ScalarType eps, bool verbose);
-
+MITK_CORE_EXPORT bool Equal( vtkPolyData* rightHandSide, vtkPolyData* leftHandSide, mitk::ScalarType eps, bool verbose);
 }
 
 #endif

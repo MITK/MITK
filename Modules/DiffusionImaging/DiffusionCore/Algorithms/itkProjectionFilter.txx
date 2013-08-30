@@ -64,7 +64,6 @@ namespace itk
         for(int y=1; y<size[1]-1; y++)
         {
 
-          std::cout << "x";
           for(int x=1; x<size[0]-1; x++)
           {
 

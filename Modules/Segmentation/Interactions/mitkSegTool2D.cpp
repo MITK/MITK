@@ -217,24 +217,35 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEv
 
 void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* positionEvent, Image* slice)
 {
-  if(!positionEvent) return;
+  if ((!positionEvent) || (!slice)) return;
 
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
+  if( !planeGeometry ) return;
 
-  if( planeGeometry && slice)
+  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  Image* image = dynamic_cast<Image*>(workingNode->GetData());
+  unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( image );
+  this->WriteBackSegmentationResult(planeGeometry, slice, timeStep);
+  slice->DisconnectPipeline();
+
+  if (m_3DInterpolationEnabled )
   {
-    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-    Image* image = dynamic_cast<Image*>(workingNode->GetData());
-    unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( image );
-    this->WriteBackSegmentationResult(planeGeometry, slice, timeStep);
-
-    slice->DisconnectPipeline();
     ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
     contourExtractor->SetInput(slice);
-    contourExtractor->Update();
+
+    try
+    {
+      contourExtractor->Update();
+    }
+    catch ( itk::ExceptionObject & excep )
+    {
+        MITK_ERROR << "Exception caught: " << excep.GetDescription();
+        return;
+    }
+
     mitk::Surface::Pointer contour = contourExtractor->GetOutput();
 
-    if (m_3DInterpolationEnabled && contour->GetVtkPolyData()->GetNumberOfPoints() > 0 )
+    if ( contour->GetVtkPolyData()->GetNumberOfPoints() > 0 )
     {
       unsigned int pos = this->AddContourmarker(positionEvent);
       mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();

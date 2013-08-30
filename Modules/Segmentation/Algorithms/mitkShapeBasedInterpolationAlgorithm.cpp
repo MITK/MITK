@@ -145,6 +145,8 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
       if (!toolManager->GetLabelLocked(targetValue))
         targetIterator.Set( activePixelValue );
     }
+    else
+        targetIterator.Set( 0 );
 
     ++sourceIterator;
     ++targetIterator;

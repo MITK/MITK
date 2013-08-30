@@ -84,7 +84,7 @@ void mitk::SegmentationInterpolationController::BlockModified(bool block)
 void mitk::SegmentationInterpolationController::SetWorkingImage( LabelSetImage* segmentation )
 {
   // clear old information (remove all time steps
-  m_SegmentationCountInSlice.clear();
+  m_LabelCountInSlice.clear();
 
   // delete this from the list of interpolators
   InterpolatorMapType::iterator iter = s_InterpolatorForImage.find( segmentation );
@@ -114,15 +114,20 @@ void mitk::SegmentationInterpolationController::SetWorkingImage( LabelSetImage* 
 
   m_ActiveLabel = m_WorkingImage->GetActiveLabelIndex();
 
-  m_SegmentationCountInSlice.resize( m_WorkingImage->GetTimeSteps() );
+  m_LabelCountInSlice.resize( m_WorkingImage->GetTimeSteps() );
   for (unsigned int timeStep = 0; timeStep < m_WorkingImage->GetTimeSteps(); ++timeStep)
   {
-    m_SegmentationCountInSlice[timeStep].resize(3);
+    m_LabelCountInSlice[timeStep].resize(3);
     for (unsigned int dim = 0; dim < 3; ++dim)
     {
-      m_SegmentationCountInSlice[timeStep][dim].clear();
-      m_SegmentationCountInSlice[timeStep][dim].resize( m_WorkingImage->GetDimension(dim) );
-      m_SegmentationCountInSlice[timeStep][dim].assign( m_WorkingImage->GetDimension(dim), 0 );
+      m_LabelCountInSlice[timeStep][dim].clear();
+      m_LabelCountInSlice[timeStep][dim].resize( m_WorkingImage->GetDimension(dim) );
+      for (unsigned int slice = 0; slice < m_WorkingImage->GetDimension(dim); ++slice)
+      {
+        m_LabelCountInSlice[timeStep][dim][slice].clear();
+        m_LabelCountInSlice[timeStep][dim][slice].resize( m_WorkingImage->GetNumberOfLabels() );
+        m_LabelCountInSlice[timeStep][dim][slice].assign( m_WorkingImage->GetNumberOfLabels(), 0 );
+      }
     }
   }
 
@@ -190,8 +195,8 @@ void mitk::SegmentationInterpolationController::SetChangedSlice( const Image* sl
 {
   if ( !sliceDiff ) return;
   if ( sliceDimension > 2 ) return;
-  if ( timeStep >= m_SegmentationCountInSlice.size() ) return;
-  if ( sliceIndex >= m_SegmentationCountInSlice[timeStep][sliceDimension].size() ) return;
+  if ( timeStep >= m_LabelCountInSlice.size() ) return;
+  if ( sliceIndex >= m_LabelCountInSlice[timeStep][sliceDimension].size() ) return;
 
   unsigned int dim0(0);
   unsigned int dim1(1);
@@ -208,39 +213,35 @@ void mitk::SegmentationInterpolationController::SetChangedSlice( const Image* sl
       dim0 = 1; dim1 = 2; break;
   }
 
-  //mitkIpPicDescriptor* rawSlice = const_cast<Image*>(sliceDiff)->GetSliceData()->GetPicDescriptor(); // we promise not to change anything!
-
   mitk::ImageReadAccessor readAccess(const_cast<Image*>(sliceDiff));
   unsigned char* rawSlice = (unsigned char*) readAccess.GetData();
   if (!rawSlice) return;
 
   AccessFixedDimensionByItk_1( sliceDiff, ScanChangedSlice, 2, SetChangedSliceOptions(sliceDimension, sliceIndex, dim0, dim1, timeStep, rawSlice) );
 
-  //PrintStatus();
-
   this->Modified();
 }
 
-template < typename DATATYPE >
-void mitk::SegmentationInterpolationController::ScanChangedSlice( itk::Image<DATATYPE, 2>*, const SetChangedSliceOptions& options )
+template < typename PixelType >
+void mitk::SegmentationInterpolationController::ScanChangedSlice( itk::Image<PixelType, 2>*, const SetChangedSliceOptions& options )
 {
-  DATATYPE* pixelData( (DATATYPE*)options.pixelData );
+  PixelType* pixelData( (PixelType*)options.pixelData );
 
   unsigned int timeStep( options.timeStep );
-
   unsigned int sliceDimension( options.sliceDimension );
   unsigned int sliceIndex( options.sliceIndex );
 
   if ( sliceDimension > 2 ) return;
-  if ( sliceIndex >= m_SegmentationCountInSlice[timeStep][sliceDimension].size() ) return;
+  if ( sliceIndex >= m_LabelCountInSlice[timeStep][sliceDimension].size() ) return;
 
   unsigned int dim0( options.dim0 );
   unsigned int dim1( options.dim1 );
 
-  int numberOfPixels(0); // number of pixels in this slice that are not 0
+  std::vector <int> numberOfPixels; // number of pixels in the current slice that are equal to the active label
+  numberOfPixels.resize(m_WorkingImage->GetNumberOfLabels());
 
-  unsigned int dim0max = m_SegmentationCountInSlice[timeStep][dim0].size();
-  unsigned int dim1max = m_SegmentationCountInSlice[timeStep][dim1].size();
+  unsigned int dim0max = m_LabelCountInSlice[timeStep][dim0].size();
+  unsigned int dim1max = m_LabelCountInSlice[timeStep][dim1].size();
 
   // scan the slice from two directions
   // and set the flags for the two dimensions of the slice
@@ -248,25 +249,15 @@ void mitk::SegmentationInterpolationController::ScanChangedSlice( itk::Image<DAT
   {
     for (unsigned int u = 0; u < dim0max; ++u)
     {
-      DATATYPE value = *(pixelData + u + v * dim0max);
-
-      assert ( (signed) m_SegmentationCountInSlice[timeStep][dim0][u] + (signed)value >= 0 ); // just for debugging. This must always be true, otherwise some counting is going wrong
-      assert ( (signed) m_SegmentationCountInSlice[timeStep][dim1][v] + (signed)value >= 0 );
-
-      if (value == m_ActiveLabel)
-      {
-          m_SegmentationCountInSlice[timeStep][dim0][u] = static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][dim0][u] + value );
-          m_SegmentationCountInSlice[timeStep][dim1][v] = static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][dim1][v] + value );
-          numberOfPixels += static_cast<int>( value );
-      }
+      int value = static_cast<int>(*(pixelData + u + v * dim0max));
+      ++ m_LabelCountInSlice[timeStep][dim0][u][value];
+      ++ m_LabelCountInSlice[timeStep][dim1][v][value];
+      ++ numberOfPixels[value];
     }
   }
 
-  // flag for the dimension of the slice itself
-  assert ( (signed) m_SegmentationCountInSlice[timeStep][sliceDimension][sliceIndex] + numberOfPixels >= 0 );
-  m_SegmentationCountInSlice[timeStep][sliceDimension][sliceIndex] += numberOfPixels;
-
-  //MITK_INFO << "scan t=" << timeStep << " from (0,0) to (" << dim0max << "," << dim1max << ") (" << pixelData << "-" << pixelData+dim0max*dim1max-1 <<  ") in slice " << sliceIndex << " found " << numberOfPixels << " pixels" << std::endl;
+  for (unsigned int label = 0; label < m_WorkingImage->GetNumberOfLabels(); ++label)
+      m_LabelCountInSlice[timeStep][2][sliceIndex][label] = numberOfPixels[label];
 }
 
 
@@ -279,12 +270,13 @@ void mitk::SegmentationInterpolationController::ScanChangedVolume( itk::Image<TP
   iter.SetFirstDirection(0);
   iter.SetSecondDirection(1);
 
-  int numberOfPixels(0); // number of pixels in this slice that are not 0
-
   typename IteratorType::IndexType index;
   unsigned int x = 0;
   unsigned int y = 0;
   unsigned int z = 0;
+
+  std::vector <int> numberOfPixels; // number of pixels per slice that are equal to the active label
+  numberOfPixels.resize(m_WorkingImage->GetNumberOfLabels());
 
   iter.GoToBegin();
   while ( !iter.IsAtEnd() )
@@ -294,53 +286,43 @@ void mitk::SegmentationInterpolationController::ScanChangedVolume( itk::Image<TP
       while ( !iter.IsAtEndOfLine() )
       {
         index = iter.GetIndex();
-
         x = index[0];
         y = index[1];
         z = index[2];
 
-        TPixel value = iter.Get();
-
-        assert ( (signed) m_SegmentationCountInSlice[timeStep][0][x] + (signed)value >= 0 ); // just for debugging. This must always be true, otherwise some counting is going wrong
-        assert ( (signed) m_SegmentationCountInSlice[timeStep][1][y] + (signed)value >= 0 );
-
-        if (value == m_ActiveLabel)
-        {
-           m_SegmentationCountInSlice[timeStep][0][x] =
-               static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][0][x] + value );
-
-            m_SegmentationCountInSlice[timeStep][1][y] =
-                static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][1][y] + value );
-
-            numberOfPixels += static_cast<int>( value );
-        }
+        int value = static_cast<unsigned int>( iter.Get() );
+        ++m_LabelCountInSlice[timeStep][0][x][value];
+        ++m_LabelCountInSlice[timeStep][1][y][value];
+        ++numberOfPixels[value];
 
         ++iter;
       }
       iter.NextLine();
     }
-    assert ( (signed) m_SegmentationCountInSlice[timeStep][2][z] + numberOfPixels >= 0 );
-    m_SegmentationCountInSlice[timeStep][2][z] += numberOfPixels;
-    numberOfPixels = 0;
 
+    for (unsigned int label = 0; label < m_WorkingImage->GetNumberOfLabels(); ++label)
+      m_LabelCountInSlice[timeStep][2][z][label] += numberOfPixels[label];
+
+    // clear per-slice label counter
+    numberOfPixels.assign(m_WorkingImage->GetNumberOfLabels(), 0);
     iter.NextSlice();
   }
 }
 
 
-template < typename DATATYPE >
-void mitk::SegmentationInterpolationController::ScanWholeVolume( itk::Image<DATATYPE, 3>*, const Image* volume, unsigned int timeStep )
+template < typename PixelType >
+void mitk::SegmentationInterpolationController::ScanWholeVolume( itk::Image<PixelType, 3>*, const Image* volume, unsigned int timeStep )
 {
   if (!volume) return;
-  if ( timeStep >= m_SegmentationCountInSlice.size() ) return;
+  if ( timeStep >= m_LabelCountInSlice.size() ) return;
 
   for (unsigned int slice = 0; slice < volume->GetDimension(2); ++slice)
   {
-    DATATYPE* rawVolume = static_cast<DATATYPE*>( const_cast<Image*>(volume)->GetVolumeData(timeStep)->GetData() ); // we again promise not to change anything, we'll just count
+    PixelType* rawVolume = static_cast<PixelType*>( const_cast<Image*>(volume)->GetVolumeData(timeStep)->GetData() ); // we again promise not to change anything, we'll just count
     //DATATYPE* rawSlice = static_cast<DATATYPE*>( volume->GetSliceData(slice)->GetData() ); // TODO THIS wouldn't work. Did I mess up with some internal mitk::Image data structure?
-    DATATYPE* rawSlice = rawVolume + ( volume->GetDimension(0) * volume->GetDimension(1) * slice );
+    PixelType* rawSlice = rawVolume + ( volume->GetDimension(0) * volume->GetDimension(1) * slice );
 
-    ScanChangedSlice<DATATYPE>( NULL, SetChangedSliceOptions(2, slice, 0, 1, timeStep, rawSlice) );
+    this->ScanChangedSlice<PixelType>( NULL, SetChangedSliceOptions(2, slice, 0, 1, timeStep, rawSlice) );
   }
 }
 
@@ -349,16 +331,16 @@ void mitk::SegmentationInterpolationController::PrintStatus()
   unsigned int timeStep(0); // if needed, put a loop over time steps around everyting, but beware, output will be long
 
   MITK_INFO << "Interpolator status (timestep 0): dimensions "
-           << m_SegmentationCountInSlice[timeStep][0].size() << " "
-           << m_SegmentationCountInSlice[timeStep][1].size() << " "
-           << m_SegmentationCountInSlice[timeStep][2].size() << std::endl;
+           << m_LabelCountInSlice[timeStep][0].size() << " "
+           << m_LabelCountInSlice[timeStep][1].size() << " "
+           << m_LabelCountInSlice[timeStep][2].size() << std::endl;
 
-  MITK_INFO << "Slice 0: " <<  m_SegmentationCountInSlice[timeStep][2][0] << std::endl;
-
+  MITK_INFO << "Slice 0: " <<  m_LabelCountInSlice[timeStep][2][0].size() << std::endl;
+/*
   // row "x"
-  for (unsigned int index = 0; index < m_SegmentationCountInSlice[timeStep][0].size(); ++index)
+  for (unsigned int index = 0; index < m_LabelCountInSlice[timeStep][0].size(); ++index)
   {
-    if ( m_SegmentationCountInSlice[timeStep][0][index] > 0 )
+    if ( m_LabelCountInSlice[timeStep][0][index] > 0 )
       MITK_INFO << "O";
     else
       MITK_INFO << ".";
@@ -400,6 +382,7 @@ void mitk::SegmentationInterpolationController::PrintStatus()
 
     MITK_INFO << std::endl;
   }
+  */
 }
 
 mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsigned int sliceDimension,
@@ -414,14 +397,15 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
     return NULL;
   }
 
-  if ( timeStep >= m_SegmentationCountInSlice.size() ) return NULL;
+  if ( timeStep >= m_LabelCountInSlice.size() ) return NULL;
   if ( sliceDimension > 2 ) return NULL;
-  unsigned int upperLimit = m_SegmentationCountInSlice[timeStep][sliceDimension].size();
+  unsigned int upperLimit = m_LabelCountInSlice[timeStep][sliceDimension].size();
   if ( sliceIndex >= upperLimit - 1 ) return NULL; // can't interpolate first and last slice
   if ( sliceIndex < 1  ) return NULL;
 
+  int activeLabel = m_WorkingImage->GetActiveLabelIndex();
   // slice contains a segmentation, won't interpolate anything then
-  if ( m_SegmentationCountInSlice[timeStep][sliceDimension][sliceIndex] > 0 ) return NULL;
+  if ( m_LabelCountInSlice[timeStep][sliceDimension][sliceIndex][activeLabel] > 0 ) return NULL;
 
   unsigned int lowerBound(0);
   unsigned int upperBound(0);
@@ -429,7 +413,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
 
   for (lowerBound = sliceIndex - 1; /*lowerBound >= 0*/; --lowerBound)
   {
-    if ( m_SegmentationCountInSlice[timeStep][sliceDimension][lowerBound] > 0 )
+    if ( m_LabelCountInSlice[timeStep][sliceDimension][lowerBound][activeLabel] > 0 )
     {
       bounds = true;
       break;
@@ -443,7 +427,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
   bounds = false;
   for (upperBound = sliceIndex + 1 ; upperBound < upperLimit; ++upperBound)
   {
-    if ( m_SegmentationCountInSlice[timeStep][sliceDimension][upperBound] > 0 )
+    if ( m_LabelCountInSlice[timeStep][sliceDimension][upperBound][activeLabel] > 0 )
     {
       bounds = true;
       break;
@@ -453,8 +437,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
   if (!bounds) return NULL;
 
   // ok, we have found two neighboring slices with segmentations
-  // (and we made sure that the current slice does NOT contain anything
-
+  // (and we made sure that the current slice does NOT contain the active label
   //Setting up the ExtractSliceFilter
   mitk::ExtractSliceFilter::Pointer extractor = ExtractSliceFilter::New();
   extractor->SetInput(m_WorkingImage);

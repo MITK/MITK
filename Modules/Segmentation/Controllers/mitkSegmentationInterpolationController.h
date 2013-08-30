@@ -163,35 +163,33 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
         void* pixelData;
     };
 
-    typedef std::vector<unsigned int> DirtyVectorType;
-    //typedef std::vector< DirtyVectorType[3] > TimeResolvedDirtyVectorType; // cannot work with C++, so next line is used for implementation
-    typedef std::vector< std::vector<DirtyVectorType> > TimeResolvedDirtyVectorType;
+    typedef std::vector<unsigned int> LabelCounterVectorType;
+    typedef std::vector< LabelCounterVectorType > LabelCounterSliceVectorType;
+    typedef std::vector< std::vector< LabelCounterSliceVectorType > > LabelCounterSliceTimeVectorType;
     typedef std::map< const Image*, SegmentationInterpolationController* > InterpolatorMapType;
 
     SegmentationInterpolationController();// purposely hidden
     virtual ~SegmentationInterpolationController();
 
     /// internal scan of a single slice
-    template < typename DATATYPE >
-    void ScanChangedSlice( itk::Image<DATATYPE, 2>*, const SetChangedSliceOptions& options );
+    template < typename PixelType >
+    void ScanChangedSlice( itk::Image<PixelType, 2>*, const SetChangedSliceOptions& options );
 
     template < typename TPixel, unsigned int VImageDimension >
     void ScanChangedVolume( itk::Image<TPixel, VImageDimension>*, unsigned int timeStep );
 
-    template < typename DATATYPE >
-    void ScanWholeVolume( itk::Image<DATATYPE, 3>*, const Image* volume, unsigned int timeStep );
+    template < typename PixelType >
+    void ScanWholeVolume( itk::Image<PixelType, 3>*, const Image* volume, unsigned int timeStep );
 
     void PrintStatus();
 
     /**
-      An array of flags. One for each dimension of the image. A flag is set, when a slice in a certain dimension
+      An array that of flags. One for each dimension of the image. A flag is set, when a slice in a certain dimension
       has at least one pixel that is not 0 (which would mean that it has to be considered by the interpolation algorithm).
-
       E.g. flags for axial slices are stored in m_SegmentationCountInSlice[0][index].
-
       Enhanced with time steps it is now m_SegmentationCountInSlice[timeStep][0][index]
     */
-    TimeResolvedDirtyVectorType m_SegmentationCountInSlice;
+    LabelCounterSliceTimeVectorType m_LabelCountInSlice;
 
     static InterpolatorMapType s_InterpolatorForImage;
 

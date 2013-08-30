@@ -19,24 +19,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSliceNavigationController.h"
 #include "SegmentationUIExports.h"
-#include "mitkSegmentationInterpolationController.h"
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
-#include "mitkWeakPointer.h"
+//#include "mitkWeakPointer.h"
 #include "mitkSurfaceInterpolationController.h"
+#include "mitkSegmentationInterpolationController.h"
 #include "mitkToolManager.h"
+#include "mitkDiffSliceOperation.h"
 
-#include <QWidget>
 #include <map>
 
+#include <QWidget>
 #include <QComboBox>
 #include <QFrame>
 #include <QRadioButton>
 #include <QGroupBox>
 #include <QCheckBox>
-
-#include "mitkVtkRepresentationProperty.h"
-#include "vtkProperty.h"
 
 //For running 3D interpolation in background
 #include <QtConcurrentRun>
@@ -85,10 +83,13 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
     QmitkSlicesInterpolator(QWidget* parent = 0, const char* name = 0);
 
     /**
-      To be called once before real use.
-      */
+      Initializes the widget. To be called once before real use.
+    */
     void Initialize(mitk::ToolManager* toolManager, const QList<mitk::SliceNavigationController*> &controllers);
 
+    /**
+      Removal of observers.
+    */
     void Uninitialize();
 
     virtual ~QmitkSlicesInterpolator();
@@ -230,8 +231,11 @@ private:
     QHash<mitk::SliceNavigationController*, int> m_ControllerToSliceObserverTag;
     QHash<mitk::SliceNavigationController*, int> m_ControllerToDeleteObserverTag;
 
-    unsigned int InterpolationInfoChangedObserverTag;
-    unsigned int SurfaceInterpolationInfoChangedObserverTag;
+    unsigned int m_InterpolationInfoChangedObserverTag;
+    unsigned int m_SurfaceInterpolationInfoChangedObserverTag;
+
+    mitk::DiffSliceOperation* m_doOperation;
+    mitk::DiffSliceOperation* m_undoOperation;
 
     QGroupBox* m_GroupBoxEnableExclusiveInterpolationMode;
     QComboBox* m_CmbInterpolation;
@@ -244,7 +248,7 @@ private:
     mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
     mitk::DataNode::Pointer m_3DContourNode;
 
-    mitk::LabelSetImage* m_Segmentation;
+    mitk::LabelSetImage::Pointer m_WorkingImage;
 
     mitk::SliceNavigationController* m_LastSNC;
     unsigned int m_LastSliceIndex;

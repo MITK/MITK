@@ -312,7 +312,9 @@ set(CPP_FILES
   IO/mitkPixelType.cpp
   IO/mitkPointSetIOFactory.cpp
   IO/mitkPointSetReader.cpp
+  IO/mitkPointSetReaderService.cpp
   IO/mitkPointSetWriter.cpp
+  IO/mitkPointSetWriterService.cpp
   IO/mitkPointSetWriterFactory.cpp
   IO/mitkRawImageFileReader.cpp
   IO/mitkStandardFileLocations.cpp

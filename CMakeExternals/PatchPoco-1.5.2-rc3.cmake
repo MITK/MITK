@@ -1,7 +1,29 @@
 # Called by Poco.cmake (ExternalProject_Add) as a patch for Poco.
-# Adds #define TIXML_USE_STL to enable STL string support
+# Fixes the CMake build system
 
-# read whole file
+# read CMakeLists.txt
+file(STRINGS CMakeLists.txt sourceCode NEWLINE_CONSUME)
+
+# Fix CMAKE_DEBUG_POSTFIX, see see https://github.com/pocoproject/poco/issues/279
+string(REPLACE
+"if (CMAKE_BUILD_TYPE STREQUAL \"Debug\")
+  message(STATUS \"Debug output enabled\")
+  set(CMAKE_DEBUG_POSTFIX \"d\" CACHE STRING \"Set debug library postfix\" FORCE)
+else ()
+  message(STATUS \"Optimized output enabled\")
+  set(CMAKE_DEBUG_POSTFIX \"\" CACHE STRING \"Set debug library postfix\" FORCE)
+endif ()"
+       "set(CMAKE_DEBUG_POSTFIX \"d\")"
+       sourceCode ${sourceCode}
+      )
+
+# set variable CONTENTS, which is substituted in TEMPLATE_FILE
+set(CONTENTS ${sourceCode})
+configure_file(${CMAKE_CURRENT_LIST_DIR}/EmptyFileForPatching.dummy CMakeLists.txt @ONLY)
+
+# For the next fixes, see https://github.com/pocoproject/poco/issues/274
+
+# read whole Foundation/CMakeLists.txt
 file(STRINGS Foundation/CMakeLists.txt sourceCode NEWLINE_CONSUME)
 
 # Remove files

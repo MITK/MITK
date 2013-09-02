@@ -772,13 +772,13 @@ bool mitk::Geometry3D::Is2DConvertable()
 bool mitk::Equal( const mitk::Geometry3D::BoundingBoxType *rightHandSide, const mitk::Geometry3D::BoundingBoxType *leftHandSide, ScalarType eps, bool verbose )
 {
   bool result = true;
-  if(( rightHandSide == NULL ) )
+  if( rightHandSide == NULL )
   {
     if(verbose)
       MITK_INFO << "[( Geometry3D::BoundingBoxType )] rightHandSide NULL.";
     return false;
   }
-  if(( leftHandSide == NULL ) )
+  if( leftHandSide == NULL )
   {
     if(verbose)
       MITK_INFO << "[( Geometry3D::BoundingBoxType )] leftHandSide NULL.";
@@ -808,13 +808,13 @@ bool mitk::Equal(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *
 {
   bool result = true;
 
-  if(( rightHandSide == NULL ) )
+  if( rightHandSide == NULL )
   {
     if(verbose)
       MITK_INFO << "[( Geometry3D )] rightHandSide NULL.";
     return false;
   }
-  if(( leftHandSide == NULL) )
+  if( leftHandSide == NULL)
   {
     if(verbose)
       MITK_INFO << "[( Geometry3D )] leftHandSide NULL.";
@@ -822,7 +822,7 @@ bool mitk::Equal(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *
   }
 
   //Compare spacings
-  if(( !mitk::Equal( rightHandSide->GetSpacing(), leftHandSide->GetSpacing(), eps )) )
+  if( !mitk::Equal( rightHandSide->GetSpacing(), leftHandSide->GetSpacing(), eps ) )
   {
     if(verbose)
     {
@@ -833,7 +833,7 @@ bool mitk::Equal(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *
   }
 
   //Compare Origins
-  if(( !mitk::Equal( rightHandSide->GetOrigin(), leftHandSide->GetOrigin(), eps )) )
+  if( !mitk::Equal( rightHandSide->GetOrigin(), leftHandSide->GetOrigin(), eps ) )
   {
     if(verbose)
     {
@@ -856,7 +856,7 @@ bool mitk::Equal(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *
       result =  false;
     }
 
-    if(( !mitk::Equal( rightHandSide->GetExtent(i), leftHandSide->GetExtent(i), eps) ) )
+    if( !mitk::Equal( rightHandSide->GetExtent(i), leftHandSide->GetExtent(i), eps) )
     {
       if(verbose)
       {
@@ -868,7 +868,7 @@ bool mitk::Equal(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *
   }
 
   //Compare ImageGeometry Flag
-  if(( rightHandSide->GetImageGeometry() != leftHandSide->GetImageGeometry()) )
+  if( rightHandSide->GetImageGeometry() != leftHandSide->GetImageGeometry() )
   {
     if(verbose)
     {
@@ -879,13 +879,13 @@ bool mitk::Equal(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *
   }
 
   //Compare BoundingBoxes
-  if(( !mitk::Equal( rightHandSide->GetBoundingBox(), leftHandSide->GetBoundingBox(), eps, verbose)) )
+  if( !mitk::Equal( rightHandSide->GetBoundingBox(), leftHandSide->GetBoundingBox(), eps, verbose) )
   {
     result = false;
   }
 
   //Compare IndexToWorldTransform Matrix
-  if(( !mitk::Equal( rightHandSide->GetIndexToWorldTransform(), rightHandSide->GetIndexToWorldTransform(), eps, verbose)) )
+  if( !mitk::Equal( rightHandSide->GetIndexToWorldTransform(), rightHandSide->GetIndexToWorldTransform(), eps, verbose) )
   {
     result = false;
   }
@@ -895,8 +895,8 @@ bool mitk::Equal(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *
 bool mitk::Equal( const Geometry3D::TransformType *rightHandSide, const Geometry3D::TransformType *leftHandSide, ScalarType eps, bool verbose )
 {
   //Compare IndexToWorldTransform Matrix
-  if(( !mitk::MatrixEqualElementWise( rightHandSide->GetMatrix(),
-                                      leftHandSide->GetMatrix()) ) )
+  if( !mitk::MatrixEqualElementWise( rightHandSide->GetMatrix(),
+                                      leftHandSide->GetMatrix()) )
   {
     if(verbose)
     {

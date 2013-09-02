@@ -1284,14 +1284,14 @@ unsigned int mitk::Image::GetCountOfMinValuedVoxelsNoRecompute( unsigned int t )
 bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSide, ScalarType eps, bool verbose)
 {
   bool returnValue = true;
-  if(( rightHandSide == NULL ) )
+  if( rightHandSide == NULL )
   {
     if(verbose)
       MITK_INFO << "[( Image )] rightHandSide is NULL.";
     return false;
   }
 
-  if(( leftHandSide == NULL ) )
+  if( leftHandSide == NULL )
   {
     if(verbose)
       MITK_INFO << "[( Image )] leftHandSide is NULL.";
@@ -1299,7 +1299,7 @@ bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSi
   }
 
   // Dimensionality
-  if(( rightHandSide->GetDimension() != leftHandSide->GetDimension() ) )
+  if( rightHandSide->GetDimension() != leftHandSide->GetDimension() )
   {
     if(verbose)
     {
@@ -1314,7 +1314,7 @@ bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSi
   unsigned int minDimensionality = std::min(rightHandSide->GetDimension(),leftHandSide->GetDimension());
   for( unsigned int i=0; i< minDimensionality; ++i)
   {
-    if(( rightHandSide->GetDimension(i) != leftHandSide->GetDimension(i) ) )
+    if( rightHandSide->GetDimension(i) != leftHandSide->GetDimension(i) )
     {
       returnValue = false;
       if(verbose)
@@ -1329,7 +1329,7 @@ bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSi
   // Pixeltype
   mitk::PixelType pixelTypeRightHandSide = rightHandSide->GetPixelType();
   mitk::PixelType pixelTypeLeftHandSide = leftHandSide->GetPixelType();
-  if(( !( pixelTypeRightHandSide == pixelTypeLeftHandSide ) ) )
+  if( !( pixelTypeRightHandSide == pixelTypeLeftHandSide ) )
   {
     if(verbose)
     {
@@ -1341,8 +1341,8 @@ bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSi
   }
 
   // Geometries
-  if(( !mitk::Equal( rightHandSide->GetGeometry(),
-                     leftHandSide->GetGeometry(), eps, verbose) ) )
+  if( !mitk::Equal( rightHandSide->GetGeometry(),
+                     leftHandSide->GetGeometry(), eps, verbose) )
   {
     if(verbose)
     {

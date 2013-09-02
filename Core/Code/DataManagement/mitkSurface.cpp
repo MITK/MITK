@@ -390,7 +390,7 @@ bool mitk::Equal( vtkPolyData* rightHandSide,  vtkPolyData* leftHandSide, mitk::
 {
   bool noDifferenceFound = true;
 
-  if(( rightHandSide == NULL ) )
+  if( rightHandSide == NULL )
   {
     if(verbose)
     {
@@ -399,7 +399,7 @@ bool mitk::Equal( vtkPolyData* rightHandSide,  vtkPolyData* leftHandSide, mitk::
     return false;
   }
 
-  if(( leftHandSide == NULL ) )
+  if( leftHandSide == NULL )
   {
     if(verbose)
     {

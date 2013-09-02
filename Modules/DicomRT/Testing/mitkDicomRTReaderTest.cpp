@@ -68,21 +68,37 @@ int mitkDicomRTReaderTest(int  argc , char* argv[])
   mitk::ContourModel::Pointer a3 = mitk::ContourModel::New();
   mitk::ContourModel::Pointer a4 = mitk::ContourModel::New();
 
+  mitk::ContourModel::Pointer a5 = mitk::ContourModel::New();
+  mitk::ContourModel::Pointer a6 = mitk::ContourModel::New();
+  mitk::ContourModel::Pointer a7 = mitk::ContourModel::New();
+  mitk::ContourModel::Pointer empty0 = mitk::ContourModel::New();
+  mitk::ContourModel::Pointer empty1 = mitk::ContourModel::New();
+
   a1->AddVertex(samePoint);
   a2->AddVertex(samePoint);
   a3->AddVertex(b);
   a4->AddVertex(point);
 
-  a1->Close();
-  a2->Close();
+  a5->AddVertex(samePoint);
+  a5->AddVertex(b);
+  a6->AddVertex(b);
+  a6->AddVertex(samePoint);
+  a7->AddVertex(samePoint);
+  a7->AddVertex(point);
 
-  MITK_TEST_CONDITION_REQUIRED( !real->IsEmpty() , "Tests if the first ContouModelObject from ReadDicomFile/Struct isnt empty" );
-  MITK_TEST_CONDITION_REQUIRED( real != created , "Tests if created ContourModel is different to frist ContourModel" );
-  MITK_TEST_CONDITION_REQUIRED( same != real , "Tests if the ContourModel looks like in the DcmDump Output" );
-  MITK_TEST_CONDITION_REQUIRED( samePoint == b , "Tests the two Points with same coords" );
-  MITK_TEST_CONDITION_REQUIRED( _DicomRTReader->Equals(a1,a2) , "ContourModels with same Points" );
-  MITK_TEST_CONDITION_REQUIRED( _DicomRTReader->Equals(a1,a3) , "ContourModels with different Points but same coords" );
-  MITK_TEST_CONDITION_REQUIRED( !_DicomRTReader->Equals(a1,a4) , "ContourModels with different Points" );
+  MITK_TEST_CONDITION_REQUIRED( !real->IsEmpty() , " 01. Tests if the first ContouModelObject from ReadDicomFile/Struct isnt empty -> False" );
+  MITK_TEST_CONDITION_REQUIRED( real != created , " 02. Tests if created ContourModel is different to frist ContourModel -> True" );
+  MITK_TEST_CONDITION_REQUIRED( same != real , " 03. Tests if the ContourModel looks like in the DcmDump Output -> True" );
+  MITK_TEST_CONDITION_REQUIRED( samePoint == b , " 04. Tests the two Points with same coords -> True" );
+
+  MITK_TEST_CONDITION_REQUIRED( _DicomRTReader->Equals(empty0,empty1) , " 05. Tests two empty ContourModels -> True" );
+  MITK_TEST_CONDITION_REQUIRED( !_DicomRTReader->Equals(a1,empty0) , " 06. Tests Model with 1 Point and empty Model -> False" );
+  MITK_TEST_CONDITION_REQUIRED( !_DicomRTReader->Equals(a1,a4) , " 07. Tests Models with 1 different point -> False" );
+  MITK_TEST_CONDITION_REQUIRED( _DicomRTReader->Equals(a1,a3) , " 08. Tests Models with 1 point and same coords -> True" );
+  MITK_TEST_CONDITION_REQUIRED( !_DicomRTReader->Equals(a5,a1) , " 09. Tests a Model with 2 points and a model with one point, first point is the same -> False" );
+  MITK_TEST_CONDITION_REQUIRED( !_DicomRTReader->Equals(a5,a4) , " 10. Tests a Model with 2 points and a model with one point, first point is different -> False" );
+  MITK_TEST_CONDITION_REQUIRED( _DicomRTReader->Equals(a5,a6) , " 11. Tests two Models with 2 points and same coords -> True" );
+  MITK_TEST_CONDITION_REQUIRED( !_DicomRTReader->Equals(a5,a7) , " 12. Tests two Models with 2 points first is the same second is different -> False" );
 
   std::cout << "\n";
   // always end with this!

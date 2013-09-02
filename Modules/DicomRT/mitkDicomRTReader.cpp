@@ -316,9 +316,6 @@ namespace mitk
 
   OFString DicomRTReader::GetReferencedFrameOfReferenceSOPInstanceUID(DRTStructureSetIOD &structSetObject)
   {
-
-    //ToDo: MITK Error Message which object cant be passed
-
     OFString invalid;
     DRTReferencedFrameOfReferenceSequence &refFrameOfRefSeqObject = structSetObject.getReferencedFrameOfReferenceSequence();
     if(!refFrameOfRefSeqObject.gotoFirstItem().good())
@@ -372,6 +369,7 @@ namespace mitk
 
     return resultUid;
   }
+
 
 
   int DicomRTReader::LoadRTPlan(DcmDataset *dataset)

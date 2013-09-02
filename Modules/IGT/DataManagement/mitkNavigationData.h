@@ -38,6 +38,8 @@ namespace mitk {
     public:
       mitkClassMacro(NavigationData, itk::DataObject);
       itkNewMacro(Self);
+      mitkNewMacro1Param(Self, mitk::AffineTransform3D::Pointer);
+
 
       /**
       * \brief Type that holds the position part of the tracking data
@@ -55,7 +57,6 @@ namespace mitk {
       * \brief type that holds the time at which the data was recorded
       */
       typedef double TimeStampType;
-
 
       /**
       * \brief sets the position of the NavigationData object
@@ -160,8 +161,12 @@ namespace mitk {
       */
       void SetOrientationAccuracy(mitk::ScalarType error);
 
+      mitk::AffineTransform3D::Pointer GetAffineTransform3D();
+
     protected:
       NavigationData();
+      NavigationData(mitk::AffineTransform3D::Pointer affineTransform3D);
+
       virtual ~NavigationData();
 
       /**

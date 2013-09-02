@@ -136,3 +136,17 @@ void mitk::NavigationData::SetOrientationAccuracy(mitk::ScalarType error)
     }
   m_CovErrorMatrix[3][3] = m_CovErrorMatrix[4][4] = m_CovErrorMatrix[5][5] = error * error;
 }
+
+mitk::NavigationData::NavigationData(
+    mitk::AffineTransform3D::Pointer affineTransform3D) : itk::DataObject(),
+        m_Position(), m_Orientation(0.0, 0.0, 0.0, 0.0), m_CovErrorMatrix(),
+        m_HasPosition(true), m_HasOrientation(true), m_DataValid(false), m_IGTTimeStamp(0.0),
+        m_Name()
+{
+}
+
+mitk::AffineTransform3D::Pointer
+mitk::NavigationData::GetAffineTransform3D()
+{
+  return AffineTransform3D::New();
+}

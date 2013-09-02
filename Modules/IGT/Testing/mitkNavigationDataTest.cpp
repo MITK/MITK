@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 #include "mitkNavigationData.h"
+#include "mitkVector.h"
+#include "vnl/vnl_math.h"
 
 #include "itkIndent.h"
 
@@ -176,6 +178,35 @@ class NavigationDataTestClass
     }
   };
 
+  static void TestAffineTransform3DConstructor()
+  {
+    mitk::AffineTransform3D::Pointer affineTransform3D = mitk::AffineTransform3D::New();
+    double bla[3] = {1.0,2.0,3.123456};
+    mitk::Vector3D offset = bla;
+    double matrix[3][3] = {{0, -1, 0},
+                           {1,  0, 0},
+                           {0,  0, 1}};
+
+    mitk::Matrix3D rotation;
+    rotation[0][1] = -1;
+    rotation[1][0] = 1;
+    rotation[2][2] = 1;
+
+    affineTransform3D->SetOffset(offset);
+    affineTransform3D->SetMatrix(rotation);
+
+    mitk::NavigationData::Pointer navigationData = mitk::NavigationData::New(affineTransform3D);
+
+    mitk::AffineTransform3D::Pointer affineTransform3D_2;
+
+    affineTransform3D_2 = navigationData->GetAffineTransform3D();
+
+
+
+    MITK_TEST_CONDITION(mitk::Equal(affineTransform3D->GetOffset(), affineTransform3D_2->GetOffset())
+        && mitk::MatrixEqualElementWise(affineTransform3D->GetMatrix(), affineTransform3D_2->GetMatrix()), "Testing AffineTransform3D constructor");
+  }
+
 /**
 * This function is testing the Class mitk::NavigationData. For most tests we would need the MicronTracker hardware, so only a few
 * simple tests, which can run without the hardware are implemented yet (2009, January, 23rd). As soon as there is a working
@@ -191,10 +222,7 @@ int mitkNavigationDataTest(int /* argc */, char* /*argv*/[])
   NavigationDataTestClass::TestPrintSelf();
   NavigationDataTestClass::TestWrongInputs();
 
-
-
-
-
+  TestAffineTransform3DConstructor();
 
 
   MITK_TEST_END();

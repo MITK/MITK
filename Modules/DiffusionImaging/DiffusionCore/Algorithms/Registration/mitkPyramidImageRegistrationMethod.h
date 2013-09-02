@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <DiffusionCoreExports.h>
 
 #include <itkObject.h>
+#include "itkImageMaskSpatialObject.h"
+#include "itkNotImageFilter.h"
 #include <vnl/vnl_matrix_fixed.h>
 
 #include "mitkImage.h"
@@ -29,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkWindowedSincInterpolateImageFunction.h>
 
 #include "mitkImageToItk.h"
+#include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
 
 
@@ -125,6 +128,10 @@ public:
   /** Input image, the one to be transformed */
   void SetMovingImage( mitk::Image::Pointer );
 
+
+  /** Fixed image mask, excludes the masked voxels from the registration metric*/
+  void SetFixedImageMask( mitk::Image::Pointer mask);
+
   void Update();
 
   /**
@@ -175,6 +182,15 @@ public:
   }
 
   /**
+   * @brief Set if fixed image mask is used to exclude a region.
+   * @param flag , true if mask is to be used, false if mask is to be ignored (default)
+   */
+  void SetUseFixedImageMask( bool flag)
+  {
+    m_UseMask = flag;
+  }
+
+  /**
    * @brief Returns the moving image transformed according to the estimated transformation and resampled
    * to the geometry of the fixed image
    *
@@ -202,11 +218,15 @@ protected:
   /** Moving image, will be transformed */
   mitk::Image::Pointer m_MovingImage;
 
+  mitk::Image::Pointer m_FixedImageMask;
+
   bool m_CrossModalityRegistration;
 
   bool m_UseAffineTransform;
 
   bool m_UseWindowedSincInterpolator;
+
+  bool m_UseMask;
 
   double* m_EstimatedParameters;
 
@@ -338,6 +358,20 @@ protected:
     registration->SetFixedImageRegion( maskedRegion );
     registration->SetMovingImage( movingImage );
     registration->SetSchedules( fixedSchedule, fixedSchedule);
+    // SET MASKED AREA
+    typedef itk::Image<unsigned char, 3> BinaryImageType;
+    BinaryImageType::Pointer itkFixedImageMask = BinaryImageType::New();
+    itk::ImageMaskSpatialObject< 3 >::Pointer fixedMaskSpatialObject = itk::ImageMaskSpatialObject< 3 >::New();
+    if (m_UseMask)
+    {
+      CastToItkImage(m_FixedImageMask,itkFixedImageMask);
+      itk::NotImageFilter<BinaryImageType, BinaryImageType>::Pointer notFilter = itk::NotImageFilter<BinaryImageType, BinaryImageType>::New();
+      notFilter->SetInput(itkFixedImageMask);
+      notFilter->Update();
+
+      fixedMaskSpatialObject->SetImage( notFilter->GetOutput() );
+      metric->SetFixedImageMask( fixedMaskSpatialObject );
+    }
     // OTHER INPUTS
     registration->SetMetric( metric );
     registration->SetOptimizer( optimizer );

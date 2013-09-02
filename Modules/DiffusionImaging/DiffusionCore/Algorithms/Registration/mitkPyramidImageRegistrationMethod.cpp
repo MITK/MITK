@@ -25,6 +25,7 @@ mitk::PyramidImageRegistrationMethod::PyramidImageRegistrationMethod()
     m_CrossModalityRegistration(true),
     m_UseAffineTransform(true),
     m_UseWindowedSincInterpolator(false),
+    m_UseMask(false),
     m_EstimatedParameters(NULL),
     m_Verbose(false)
 {
@@ -53,6 +54,11 @@ void mitk::PyramidImageRegistrationMethod::SetMovingImage(mitk::Image::Pointer m
   {
     m_MovingImage = moving;
   }
+}
+
+void mitk::PyramidImageRegistrationMethod::SetFixedImageMask(mitk::Image::Pointer mask)
+{
+  m_FixedImageMask = mask;
 }
 
 void mitk::PyramidImageRegistrationMethod::Update()

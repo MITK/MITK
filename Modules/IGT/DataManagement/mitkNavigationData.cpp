@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationData.h"
 
-
 mitk::NavigationData::NavigationData() : itk::DataObject(),
 m_Position(), m_Orientation(0.0, 0.0, 0.0, 0.0), m_CovErrorMatrix(),
 m_HasPosition(true), m_HasOrientation(true), m_DataValid(false), m_IGTTimeStamp(0.0),
@@ -139,14 +138,42 @@ void mitk::NavigationData::SetOrientationAccuracy(mitk::ScalarType error)
 
 mitk::NavigationData::NavigationData(
     mitk::AffineTransform3D::Pointer affineTransform3D) : itk::DataObject(),
-        m_Position(), m_Orientation(0.0, 0.0, 0.0, 0.0), m_CovErrorMatrix(),
-        m_HasPosition(true), m_HasOrientation(true), m_DataValid(false), m_IGTTimeStamp(0.0),
+        m_Position(), m_Orientation(affineTransform3D->GetMatrix().GetVnlMatrix()),
+        m_CovErrorMatrix(), m_HasPosition(true), m_HasOrientation(true), m_DataValid(true), m_IGTTimeStamp(0.0),
         m_Name()
 {
+  mitk::Vector3D offset = affineTransform3D->GetOffset();
+
+  m_Position[0] = offset[0];
+  m_Position[1] = offset[1];
+  m_Position[2] = offset[2];
 }
 
 mitk::AffineTransform3D::Pointer
 mitk::NavigationData::GetAffineTransform3D()
 {
-  return AffineTransform3D::New();
+  AffineTransform3D::Pointer affineTransform3D = AffineTransform3D::New();
+
+
+  // first set rotation
+  vnl_matrix_fixed<ScalarType,3,3> vnl_rotation = m_Orientation.rotation_matrix_transpose().transpose();
+  Matrix3D mitkRotation;
+
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      mitkRotation[i][j] = vnl_rotation[i][j];
+    }
+  }
+
+  affineTransform3D->SetMatrix(mitkRotation);
+
+  // now set offset
+  Vector3D vector3D;
+
+  for (int i = 0; i < 3; ++i) {
+    vector3D[i] = m_Position[i];
+  }
+  affineTransform3D->SetOffset(vector3D);
+
+  return affineTransform3D;
 }

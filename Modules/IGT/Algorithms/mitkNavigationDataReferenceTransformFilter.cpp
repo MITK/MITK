@@ -52,7 +52,7 @@ void mitk::NavigationDataReferenceTransformFilter::SetSourceNavigationDatas(cons
   if(sourceNavigationDatas.size() < 3) // if less than 3 ND's passed, more source points have to be generated
     this->CreateLandmarkPointsForSingleNavigationData(m_SourceLandmarksFromNavigationDatas, sourceNavigationDatas);
   else{
-    for(int i=0; i < sourceNavigationDatas.size(); ++i){
+    for(unsigned int i=0; i < sourceNavigationDatas.size(); ++i){
       mitk::Point3D point = sourceNavigationDatas.at(i)->GetPosition();
       m_SourceLandmarksFromNavigationDatas->InsertPoint(i,point); // pass the position of every ND as point to the source points container
     }
@@ -78,7 +78,7 @@ void mitk::NavigationDataReferenceTransformFilter::SetTargetNavigationDatas(cons
   if(targetNavigationDatas.size() < 3) // if less than 3 ND's passed, more target points have to be generated
     this->CreateLandmarkPointsForSingleNavigationData(m_TargetLandmarksFromNavigationDatas, targetNavigationDatas);
   else {
-    for(int i=0; i < targetNavigationDatas.size(); ++i){
+    for(unsigned int i=0; i < targetNavigationDatas.size(); ++i){
       mitk::Point3D point = targetNavigationDatas.at(i)->GetPosition();
       m_TargetLandmarksFromNavigationDatas->InsertPoint(i,point);// pass the position of every ND as point to the target points container
     }
@@ -127,7 +127,7 @@ mitk::PointSet::Pointer mitk::NavigationDataReferenceTransformFilter::CreateLand
   if(m_QuaternionTransform.IsNull()) // if quaternion transform not available return
     return landmarkContainer;
 
-  for(int i=0; i < navigationDatas.size(); ++i)
+  for(unsigned int i=0; i < navigationDatas.size(); ++i)
   {
     mitk::Point3D pointA;
     mitk::Point3D pointB;

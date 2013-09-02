@@ -9,7 +9,6 @@ set(CPP_FILES
   Algorithms/mitkNavigationDataTransformFilter.cpp
 
   Common/mitkIGTTimeStamp.cpp
-  Common/mitkRealTimeClock.cpp
   Common/mitkSerialCommunication.cpp
 
   DataManagement/mitkNavigationData.cpp
@@ -57,9 +56,3 @@ endif(MITK_USE_MICRON_TRACKER)
 if(MITK_USE_MICROBIRD_TRACKER)
   set(CPP_FILES ${CPP_FILES} TrackingDevices/mitkMicroBirdTrackingDevice.cpp)
 endif(MITK_USE_MICROBIRD_TRACKER)
-
-if(WIN32)
-  set(CPP_FILES ${CPP_FILES} Common/mitkWindowsRealTimeClock.cpp)
-else()
-  set(CPP_FILES ${CPP_FILES} Common/mitkLinuxRealTimeClock.cpp)
-endif(WIN32)

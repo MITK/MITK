@@ -208,7 +208,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, const Q
   {
     //Has to be initialized
     m_LastSNC = slicer;
-    MITK_INFO << "Initialize get time: " << slicer->GetTime()->GetPos();
+
     m_TimeStep.insert(slicer, slicer->GetTime()->GetPos());
 
     itk::MemberCommand<QmitkSlicesInterpolator>::Pointer deleteCommand = itk::MemberCommand<QmitkSlicesInterpolator>::New();

@@ -62,10 +62,10 @@ namespace mitk {
     mitk::TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::NavigationDataObjectVisualizationFilter::Pointer &visualizationFilter);
 
     /** @return Returns the internal number of the corresponding tool in the tool storage of a output navigation data. Returns -1 if there was an error. */
-    int GetToolNumberInToolStorage(int outputID);
+    int GetToolNumberInToolStorage(unsigned int outputID);
 
     /** @return Returns the identifier of the corresponding tool in the tool storage of a output navigation data. Returns an empty string if there was an error.*/
-    std::string GetToolIdentifierInToolStorage(int outputID);
+    std::string GetToolIdentifierInToolStorage(unsigned int outputID);
 
     /** @return Returns a vector with all internal numbers of the corresponding tools in the tool storage of all outputs.
       *         The order is the same like the order of the outputs. Returns an empty vector if there was an error.

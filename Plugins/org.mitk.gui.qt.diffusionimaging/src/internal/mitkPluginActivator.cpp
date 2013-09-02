@@ -43,6 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/QmitkFiberfoxView.h"
 #include "src/internal/QmitkFiberExtractionView.h"
 #include "src/internal/QmitkFieldmapGeneratorView.h"
+#include "src/internal/QmitkDiffusionRegistrationView.h"
 
 namespace mitk {
 
@@ -73,6 +74,7 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberfoxView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberExtractionView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFieldmapGeneratorView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionRegistrationView, context)
 }
 
 void PluginActivator::stop(ctkPluginContext* context)

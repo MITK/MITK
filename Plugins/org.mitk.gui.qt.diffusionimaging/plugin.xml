@@ -171,6 +171,11 @@
           icon="resources/odf.png" />
   </extension>
 
-
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.diffusionregistrationview"
+          name="DWI Registration"
+          class="QmitkDiffusionRegistrationView"
+          icon="resources/diffusionregistration.png" />
+  </extension>
 
 </plugin>

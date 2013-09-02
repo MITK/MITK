@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include "MitkIGTExports.h"
+#include "MitkIGTBaseExports.h"
 #include "mitkCommon.h"
 
 namespace mitk {
@@ -35,7 +35,7 @@ namespace mitk {
   * \ingroup IGT
   */
 
-  class MitkIGT_EXPORT RealTimeClock : public itk::Object
+  class MitkIGTBase_EXPORT RealTimeClock : public itk::Object
   {
   public:
     mitkClassMacro(RealTimeClock, itk::Object);

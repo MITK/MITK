@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKLINUXREALTIMECLOCK_H_HEADER_INCLUDED_
 
 #include "mitkRealTimeClock.h"
+#include "MitkIGTBaseExports.h"
 
 namespace mitk {
 
@@ -33,7 +34,7 @@ namespace mitk {
   * \ingroup IGT
   */
 
-  class MitkIGT_EXPORT LinuxRealTimeClock : public RealTimeClock
+  class MitkIGTBase_EXPORT LinuxRealTimeClock : public RealTimeClock
   {
   public:
     mitkClassMacro(mitk::LinuxRealTimeClock, mitk::RealTimeClock);

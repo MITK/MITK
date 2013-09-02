@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKWINDOWSREALTIMECLOCK_H_HEADER_INCLUDED_
 #define MITKWINDOWSREALTIMECLOCK_H_HEADER_INCLUDED_
 
-#include "MitkIGTExports.h"
+#include "MitkIGTBaseExports.h"
 #include "mitkRealTimeClock.h"
 
 
@@ -34,7 +34,7 @@ namespace mitk {
   * \ingroup Navigation
   */
 
-  class MitkIGT_EXPORT WindowsRealTimeClock : public RealTimeClock
+  class MitkIGTBase_EXPORT WindowsRealTimeClock : public RealTimeClock
   {
   public:
     mitkClassMacro(WindowsRealTimeClock, mitk::RealTimeClock);

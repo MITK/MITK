@@ -78,23 +78,29 @@ mitk::Image::Pointer mitk::BatchedRegistration::ApplyTransformationToImage(mitk:
   return NULL;
 }
 
-mitk::BatchedRegistration::TransformType mitk::BatchedRegistration::GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage)
+mitk::BatchedRegistration::TransformType mitk::BatchedRegistration::GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage, mitk::Image::Pointer mask)
 {
-  mitk::Point3D startingOrigin = movingImage->GetGeometry()->GetOrigin();
 
   mitk::PyramidImageRegistrationMethod::Pointer registrationMethod = mitk::PyramidImageRegistrationMethod::New();
   registrationMethod->SetFixedImage( fixedImage );
+
+  if (mask.IsNotNull())
+  {
+  registrationMethod->SetFixedImageMask(mask);
+  registrationMethod->SetUseFixedImageMask(true);
+  }
   registrationMethod->SetTransformToRigid();
   registrationMethod->SetCrossModalityOn();
   registrationMethod->SetMovingImage(movingImage);
   registrationMethod->Update();
-  // TODO fancy shit, where you query and create a transformation type object thingy
 
-  mitk::Point3D endingOrigin = registrationMethod->GetResampledMovingImage()->GetGeometry()->GetOrigin();
+  // TODO fancy shit, where you query and create a transformation type object thingy
 
   TransformType transformation;
   mitk::PyramidImageRegistrationMethod::TransformMatrixType rotationMatrix;
   rotationMatrix = registrationMethod->GetLastRotationMatrix();
+  double param[6];
+  registrationMethod->GetParameters(param); // first three: euler angles, last three translation
   for (unsigned int i = 0; i < 3; i++)
   {
     for (unsigned int j = 0; j < 3; ++j)
@@ -103,11 +109,9 @@ mitk::BatchedRegistration::TransformType mitk::BatchedRegistration::GetTransform
       transformation.set(i,j, value);
     }
   }
-  double value;
-  value = endingOrigin[0] - startingOrigin[0];
-  transformation.set(0,3,value);
-  transformation.set(1,3,endingOrigin[1] - startingOrigin[1]);
-  transformation.set(2,3,endingOrigin[2] - startingOrigin[2]);
+  transformation.set(0,3,param[3]);
+  transformation.set(1,3,param[4]);
+  transformation.set(2,3,param[5]);
   transformation.set(3,3,1);
 
   return transformation;

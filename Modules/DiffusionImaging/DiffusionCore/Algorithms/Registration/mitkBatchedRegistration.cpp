@@ -99,10 +99,13 @@ mitk::BatchedRegistration::TransformType mitk::BatchedRegistration::GetTransform
   {
     for (unsigned int j = 0; j < 3; ++j)
     {
-      transformation.set(i,j, *rotationMatrix[i,j]);
+      double value = rotationMatrix.get(i,j);
+      transformation.set(i,j, value);
     }
   }
-  transformation.set(0,3,endingOrigin[0] - startingOrigin[0]);
+  double value;
+  value = endingOrigin[0] - startingOrigin[0];
+  transformation.set(0,3,value);
   transformation.set(1,3,endingOrigin[1] - startingOrigin[1]);
   transformation.set(2,3,endingOrigin[2] - startingOrigin[2]);
   transformation.set(3,3,1);

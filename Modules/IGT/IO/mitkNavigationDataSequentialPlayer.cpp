@@ -87,7 +87,7 @@ void mitk::NavigationDataSequentialPlayer::ReinitXML()
   }
 }
 
-void mitk::NavigationDataSequentialPlayer::GoToSnapshot(int i)
+void mitk::NavigationDataSequentialPlayer::GoToSnapshot(unsigned int i)
 {
   if(!m_Repeat && (this->GetNumberOfSnapshots()<i))
     {

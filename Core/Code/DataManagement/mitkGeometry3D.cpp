@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <sstream>
+#include <iomanip>
 
 #include "mitkGeometry3D.h"
 #include "mitkMatrixConvert.h"
@@ -23,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
-//#include "mitkStatusBar.h"
 
 #include <vtkMatrixToLinearTransform.h>
 #include <vtkMatrix4x4.h>
@@ -739,7 +739,6 @@ mitk::Geometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnIma
   this->SetImageGeometry(isAnImageGeometry);
 }
 
-
 bool mitk::Geometry3D::Is2DConvertable()
 {
    bool isConvertableWithoutLoss = true;
@@ -768,4 +767,143 @@ bool mitk::Geometry3D::Is2DConvertable()
    } while (0);
 
    return isConvertableWithoutLoss;
+}
+
+bool mitk::Equal( const mitk::Geometry3D::BoundingBoxType *rightHandSide, const mitk::Geometry3D::BoundingBoxType *leftHandSide, ScalarType eps, bool verbose )
+{
+  bool result = true;
+  if(( rightHandSide == NULL ) )
+  {
+    if(verbose)
+      MITK_INFO << "[( Geometry3D::BoundingBoxType )] rightHandSide NULL.";
+    return false;
+  }
+  if(( leftHandSide == NULL ) )
+  {
+    if(verbose)
+      MITK_INFO << "[( Geometry3D::BoundingBoxType )] leftHandSide NULL.";
+    return false;
+  }
+
+  Geometry3D::BoundsArrayType rightBounds = rightHandSide->GetBounds();
+  Geometry3D::BoundsArrayType leftBounds = leftHandSide->GetBounds();
+  Geometry3D::BoundsArrayType::Iterator itLeft = leftBounds.Begin();
+  for( Geometry3D::BoundsArrayType::Iterator itRight = rightBounds.Begin(); itRight != rightBounds.End(); ++itRight)
+  {
+    if(( !mitk::Equal( *itRight, *itLeft, eps )) )
+    {
+      if(verbose)
+      {
+        MITK_INFO << "[( Geometry3D::BoundingBoxType )] bounds are not equal.";
+        MITK_INFO << "rightHandSide is " << setprecision(12) << *itRight << " : leftHandSide is " << *itLeft << " and tolerance is " << eps;
+      }
+      result = false;
+    }
+    itLeft++;
+  }
+  return result;
+}
+
+bool mitk::Equal(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *leftHandSide, ScalarType eps, bool verbose)
+{
+  bool result = true;
+
+  if(( rightHandSide == NULL ) )
+  {
+    if(verbose)
+      MITK_INFO << "[( Geometry3D )] rightHandSide NULL.";
+    return false;
+  }
+  if(( leftHandSide == NULL) )
+  {
+    if(verbose)
+      MITK_INFO << "[( Geometry3D )] leftHandSide NULL.";
+    return false;
+  }
+
+  //Compare spacings
+  if(( !mitk::Equal( rightHandSide->GetSpacing(), leftHandSide->GetSpacing(), eps )) )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( Geometry3D )] Spacing differs.";
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetSpacing() << " : leftHandSide is " << leftHandSide->GetSpacing() << " and tolerance is " << eps;
+    }
+    result = false;
+  }
+
+  //Compare Origins
+  if(( !mitk::Equal( rightHandSide->GetOrigin(), leftHandSide->GetOrigin(), eps )) )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( Geometry3D )] Origin differs.";
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetOrigin() << " : leftHandSide is " << leftHandSide->GetOrigin() << " and tolerance is " << eps;
+    }
+    result = false;
+  }
+
+  //Compare Axis and Extents
+  for( unsigned int i=0; i<3; ++i)
+  {
+    if( !mitk::Equal( rightHandSide->GetAxisVector(i), leftHandSide->GetAxisVector(i), eps))
+    {
+      if(verbose)
+      {
+        MITK_INFO << "[( Geometry3D )] AxisVector #" << i << " differ";
+        MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetAxisVector(i) << " : leftHandSide is " << leftHandSide->GetAxisVector(i) << " and tolerance is " << eps;
+      }
+      result =  false;
+    }
+
+    if(( !mitk::Equal( rightHandSide->GetExtent(i), leftHandSide->GetExtent(i), eps) ) )
+    {
+      if(verbose)
+      {
+        MITK_INFO << "[( Geometry3D )] Extent #" << i << " differ";
+        MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetExtent(i) << " : leftHandSide is " << leftHandSide->GetExtent(i) << " and tolerance is " << eps;
+      }
+      result = false;
+    }
+  }
+
+  //Compare ImageGeometry Flag
+  if(( rightHandSide->GetImageGeometry() != leftHandSide->GetImageGeometry()) )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( Geometry3D )] GetImageGeometry is different.";
+      MITK_INFO << "rightHandSide is " << rightHandSide->GetImageGeometry() << " : leftHandSide is " << leftHandSide->GetImageGeometry();
+    }
+    result = false;
+  }
+
+  //Compare BoundingBoxes
+  if(( !mitk::Equal( rightHandSide->GetBoundingBox(), leftHandSide->GetBoundingBox(), eps, verbose)) )
+  {
+    result = false;
+  }
+
+  //Compare IndexToWorldTransform Matrix
+  if(( !mitk::Equal( rightHandSide->GetIndexToWorldTransform(), rightHandSide->GetIndexToWorldTransform(), eps, verbose)) )
+  {
+    result = false;
+  }
+  return result;
+}
+
+bool mitk::Equal( const Geometry3D::TransformType *rightHandSide, const Geometry3D::TransformType *leftHandSide, ScalarType eps, bool verbose )
+{
+  //Compare IndexToWorldTransform Matrix
+  if(( !mitk::MatrixEqualElementWise( rightHandSide->GetMatrix(),
+                                      leftHandSide->GetMatrix()) ) )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( Geometry3D::TransformType )] Index to World Transformation matrix differs.";
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetMatrix() << " : leftHandSide is " << leftHandSide->GetMatrix() << " and tolerance is " << eps;
+    }
+    return false;
+  }
+  return true;
 }

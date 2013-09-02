@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkMacro.h>
 #include <mitkTestManager.h>
+#include <mitkTesting.h>
 
 namespace mitk {
   /** \brief Indicate a failed test. */
@@ -136,4 +137,19 @@ namespace mitk {
   MITK_TEST_FOR_EXCEPTION_BEGIN(EXCEPTIONCLASS) \
   STATEMENT ; \
   MITK_TEST_FOR_EXCEPTION_END(EXCEPTIONCLASS)
+
+/** \brief Testing macro to test if two obejcts are (not) equal.
+ *
+ * This macro uses mitk::eps and the corresponding mitk::Equal methods for all
+ * comparisons and will give verbose output on the dashboard/console.
+ * Feel free to implement mitk::Equal for your own datatype or purpose.
+ *
+ * @param OBJ1 First object.
+ * @param OBJ2 Second object.
+ * @param MSG Message to appear with the test.
+ */
+#define MITK_TEST_EQUAL(OBJ1,OBJ2,MSG) \
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(OBJ1, OBJ2, mitk::eps, true)==true, MSG)
+#define MITK_TEST_NOT_EQUAL(OBJ1,OBJ2,MSG) \
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(OBJ1, OBJ2, mitk::eps, true)==false, MSG)
 

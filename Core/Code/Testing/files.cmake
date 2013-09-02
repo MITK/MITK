@@ -11,8 +11,10 @@ set(MODULE_TESTS
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
+  mitkGeometry3DEqualTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkGlobalInteractionTest.cpp
+  mitkImageEqualTest.cpp
   mitkImageDataItemTest.cpp
   #mitkImageMapper2DTest.cpp
   mitkImageGeneratorTest.cpp
@@ -28,6 +30,7 @@ set(MODULE_TESTS
   #mitkPipelineSmartPointerCorrectnessTest.cpp
   mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
+  mitkPointSetEqualTest.cpp
   mitkPointSetFileIOTest.cpp
   mitkPointSetTest.cpp
   mitkPointSetWriterTest.cpp
@@ -43,6 +46,7 @@ set(MODULE_TESTS
   ##mitkStateMachineContainerTest.cpp ## rewrite test, indirect since no longer exported Bug 14529
   mitkStateTest.cpp
   mitkSurfaceTest.cpp
+  mitkSurfaceEqualTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp
   mitkTimeSlicedGeometryTest.cpp
   mitkTransitionTest.cpp

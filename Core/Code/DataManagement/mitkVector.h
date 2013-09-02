@@ -390,7 +390,8 @@ inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2
 
 inline bool Equal(double scalar1, double scalar2, ScalarType eps=mitk::eps)
 {
-  return fabs(scalar1-scalar2) < eps;
+  bool isEqual( fabs(scalar1-scalar2) < eps );
+  return isEqual;
 }
 
 template <typename TCoordRep, unsigned int NPointDimension>

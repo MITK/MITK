@@ -14,7 +14,6 @@ set(module_dirs
     SurfaceInterpolation
     SegmentationContour
     Segmentation
-    SegmentationContourTools
     PlanarFigureSegmentation
     Qmitk
     QmitkExt

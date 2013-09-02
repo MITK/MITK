@@ -16,24 +16,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingConfig.h"
 
-//Poco headers
-#include "Poco/Path.h"
-
-#include <mitkNavigationToolStorageSerializer.h>
-#include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkCommon.h>
 #include <mitkTestingMacros.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkSTLFileReader.h>
 
-#include "mitkNavigationToolStorage.h"
+#include <mitkNavigationToolStorageSerializer.h>
+#include <mitkNavigationToolStorageDeserializer.h>
+#include <mitkNavigationToolStorage.h>
+#include <mitkIGTException.h>
+#include <mitkIGTIOException.h>
+#include <mitkIGTConfig.h>
 
 //POCO
 #include <Poco/Exception.h>
+#include <Poco/Path.h>
 
-#include "mitkIGTException.h"
-#include "mitkIGTIOException.h"
+
 
 class NavigationToolStorageSerializerAndDeserializerTestClass
   {
@@ -320,7 +320,8 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     {
     mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
 
-    std::string toolFileName = mitk::StandardFileLocations::GetInstance()->FindFile("Empty.zip", "Modules/IGT/Testing/Data");
+    std::string toolFileName(MITK_IGT_DATA_DIR);
+    toolFileName.append("/Empty.zip");
     MITK_TEST_CONDITION(toolFileName.empty() == false, "Check if tool calibration of claron tool file exists");
     mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
 
@@ -459,7 +460,8 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     mitk::NavigationToolStorageDeserializer::Pointer testDeseralizer2= mitk::NavigationToolStorageDeserializer::New(tempStorage);
     try
       {
-      std::string filename = mitk::StandardFileLocations::GetInstance()->FindFile("EmptyZipFile.zip", "Modules/IGT/Testing/Data");
+    std::string filename(MITK_IGT_DATA_DIR);
+    filename.append("/Empty.zip");
       mitk::NavigationToolStorage::Pointer readStorage = testDeseralizer2->Deserialize(filename);
       }
     catch(mitk::IGTException)

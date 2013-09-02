@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRealTimeClock.h"
 
+
 // check if MITK runs on a Windows-System
 #ifdef _WIN32
   #include "mitkWindowsRealTimeClock.h"

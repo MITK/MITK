@@ -70,6 +70,3 @@ LARGE_INTEGER mitk::WindowsRealTimeClock::GetFrequency()
 {
   return this->m_Frequency;
 }
-
-
-

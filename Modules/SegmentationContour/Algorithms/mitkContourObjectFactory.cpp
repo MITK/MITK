@@ -21,12 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNode.h"
 #include "mitkCoreObjectFactory.h"
 
-#include "mitkContour.h"
-#include "mitkContourMapper2D.h"
-#include "mitkContourSetMapper2D.h"
-#include "mitkContourSetVtkMapper3D.h"
-#include "mitkContourVtkMapper3D.h"
-
 
 #include "mitkContourModel.h"
 #include "mitkContourModelIOFactory.h"

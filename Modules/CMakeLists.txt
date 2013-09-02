@@ -11,8 +11,8 @@ set(module_dirs
     MitkExt
     SceneSerialization
     GraphAlgorithms
-    SurfaceInterpolation
     SegmentationContour
+    SurfaceInterpolation
     Segmentation
     PlanarFigureSegmentation
     Qmitk

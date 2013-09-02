@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
 #include "mitkGLMapper.h"
+#include "mitkContourModel.h"
 
 
 namespace mitk {
@@ -60,6 +61,9 @@ protected:
     ContourModelGLMapper2D();
 
     virtual ~ContourModelGLMapper2D();
+
+    mitk::ContourModel::Pointer m_SubdivisionContour;
+    bool m_InitSubdivisionCurve;
 };
 
 } // namespace mitk

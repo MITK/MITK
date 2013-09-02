@@ -26,7 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkGL.h"
 
-mitk::ContourModelGLMapper2D::ContourModelGLMapper2D()
+mitk::ContourModelGLMapper2D::ContourModelGLMapper2D() :
+  m_SubdivisionContour(mitk::ContourModel::New()),
+  m_InitSubdivisionCurve(true)
 {
 }
 
@@ -46,48 +48,42 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 
   if ( !visible ) return;
 
-  bool updateNeccesary=true;
-
   int timestep = renderer->GetTimeStep();
 
-  mitk::ContourModel::Pointer input =  const_cast<mitk::ContourModel*>(this->GetInput());
-  mitk::ContourModel::Pointer renderingContour = input;
+  mitk::ContourModel* input =  const_cast<mitk::ContourModel*>(this->GetInput());
 
-  bool subdivision = false;
+  if(input->GetNumberOfVertices(timestep) < 1) return;
 
-  dataNode->GetBoolProperty( "subdivision curve", subdivision, renderer );
-  if (subdivision)
+  input->UpdateOutputInformation();
+
+  if ( !input->IsEmptyTimeStep(timestep) )
   {
 
-    mitk::ContourModel::Pointer subdivContour = mitk::ContourModel::New();
+    mitk::ContourModel::Pointer renderingContour = input;
 
-    mitk::ContourModelSubDivisionFilter::Pointer subdivFilter = mitk::ContourModelSubDivisionFilter::New();
+    bool subdivision = false;
 
-    subdivFilter->SetInput(input);
-    subdivFilter->Update();
-
-    subdivContour = subdivFilter->GetOutput();
-
-    if(subdivContour->GetNumberOfVertices() == 0 )
+    dataNode->GetBoolProperty( "subdivision curve", subdivision, renderer );
+    if (subdivision)
     {
-      subdivContour = input;
+      if(this->m_SubdivisionContour->GetMTime() < renderingContour->GetMTime() || m_InitSubdivisionCurve)
+      {
+
+        //mitk::ContourModel::Pointer subdivContour = mitk::ContourModel::New();
+
+        mitk::ContourModelSubDivisionFilter::Pointer subdivFilter = mitk::ContourModelSubDivisionFilter::New();
+
+        subdivFilter->SetInput(input);
+        subdivFilter->Update();
+
+        this->m_SubdivisionContour = subdivFilter->GetOutput();
+
+        m_InitSubdivisionCurve = false;
+      }
+      renderingContour = this->m_SubdivisionContour;
     }
 
-    renderingContour = subdivContour;
-  }
 
-  renderingContour->UpdateOutputInformation();
-
-
-  if( renderingContour->GetMTime() < ls->GetLastGenerateDataTime() )
-    updateNeccesary = false;
-
-  if(renderingContour->GetNumberOfVertices(timestep) < 1)
-    updateNeccesary = false;
-
-  if (updateNeccesary)
-  {
-    // ok, das ist aus GenerateData kopiert
     mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
     assert(displayGeometry.IsNotNull());
 
@@ -121,6 +117,8 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     float vtkp[3];
     float lineWidth = 3.0;
 
+    bool drawit=false;
+
     bool isHovering = false;
     dataNode->GetBoolProperty("contour.hovering", isHovering);
 
@@ -129,7 +127,25 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     else
         dataNode->GetFloatProperty("contour.width", lineWidth);
 
-    bool drawit=false;
+
+    bool showSegments = false;
+    dataNode->GetBoolProperty("contour.segments.show", showSegments);
+
+    bool showControlPoints = false;
+    dataNode->GetBoolProperty("contour.controlpoints.show", showControlPoints);
+
+    bool showPoints = false;
+    dataNode->GetBoolProperty("contour.points.show", showPoints);
+
+    bool showPointsNumbers = false;
+    dataNode->GetBoolProperty("contour.points.text", showPointsNumbers);
+
+    bool showControlPointsNumbers = false;
+    dataNode->GetBoolProperty("contour.controlpoints.text", showControlPointsNumbers);
+
+    bool projectmode=false;
+    dataNode->GetVisibility(projectmode, renderer, "contour.project-onto-plane");
+
 
     mitk::ContourModel::VertexIterator pointsIt = renderingContour->IteratorBegin(timestep);
 
@@ -137,6 +153,8 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     Point2D lastPt2d;
 
     int index = 0;
+
+    mitk::ScalarType maxDiff = 0.25;
 
     while ( pointsIt != renderingContour->IteratorEnd(timestep) )
     {
@@ -156,24 +174,23 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       Vector3D diff=p-projected_p;
       ScalarType scalardiff = diff.GetNorm();
 
-      //draw lines
-      bool projectmode=false;
-      dataNode->GetVisibility(projectmode, renderer, "contour.project-onto-plane");
-
+      //project to plane
       if(projectmode)
       {
         drawit=true;
       }
-      else if(scalardiff<0.25)
+      else if(scalardiff<maxDiff)//point is close enough to be drawn
       {
         drawit=true;
       }
+      else
+      {
+        drawit = false;
+      }
 
+      //draw line
       if(drawit)
       {
-
-         bool showSegments = false;
-         dataNode->GetBoolProperty("contour.segments.show", showSegments);
 
          if (showSegments)
          {
@@ -189,8 +206,6 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
             }
          }
 
-        bool showControlPoints = false;
-        dataNode->GetBoolProperty("contour.controlpoints.show", showControlPoints);
 
         if (showControlPoints)
         {
@@ -224,8 +239,6 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
             }
         }
 
-        bool showPoints = false;
-        dataNode->GetBoolProperty("contour.points.show", showPoints);
 
         if (showPoints)
         {
@@ -255,8 +268,6 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
           glEnd ();
         }
 
-        bool showPointsNumbers = false;
-        dataNode->GetBoolProperty("contour.points.text", showPointsNumbers);
 
         if (showPointsNumbers)
         {
@@ -271,8 +282,6 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
             OpenGLrenderer->WriteSimpleText(l, pt2d[0] + 2, pt2d[1] + 2,rgb[0], rgb[1],rgb[2]);
         }
 
-        bool showControlPointsNumbers = false;
-        dataNode->GetBoolProperty("contour.controlpoints.text", showControlPointsNumbers);
 
         if (showControlPointsNumbers && (*pointsIt)->IsControlPoint)
         {
@@ -294,7 +303,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     }//end while iterate over controlpoints
 
     //close contour if necessary
-    if(renderingContour->IsClosed(timestep) && drawit)
+    if(renderingContour->IsClosed(timestep) && drawit && showSegments)
     {
       lastPt2d = pt2d;
       point = renderingContour->GetVertexAt(0,timestep)->Coordinates;
@@ -333,7 +342,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       //----------------------------------
 
       //draw point if close to plane
-      if(scalardiff<0.25)
+      if(scalardiff<maxDiff)
       {
 
         float pointsize = 5;
@@ -352,6 +361,8 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       //------------------------------------
     }
   }
+
+  ls->UpdateGenerateDataTime();
 }
 
 const mitk::ContourModel* mitk::ContourModelGLMapper2D::GetInput(void)

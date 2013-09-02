@@ -92,6 +92,7 @@ void mitk::ContourModelReader::GenerateData()
           MITK_WARN << "wrong file format!";
           //newContourModel = this->ReadPoint(newContourModel, currentContourElement, 0);
         }
+        newContourModel->UpdateOutputInformation();
         this->SetNthOutput( contourCounter, newContourModel );
         contourCounter++;
       }

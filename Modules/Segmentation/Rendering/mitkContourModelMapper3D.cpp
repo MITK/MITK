@@ -171,8 +171,8 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper3D::CreateVtkPolyDataFromCo
       // If the contour is closed add a line from the last to the first control point
       mitk::ContourModel::VertexType* firstControlPoint = *(inputContour->IteratorBegin(timestep));
       mitk::ContourModel::VertexType* lastControlPoint = *(--(inputContour->IteratorEnd(timestep)));
-      if( lastControlPoint->Coordinates[0] != firstControlPoint->Coordinates[0] &&
-          lastControlPoint->Coordinates[1] != firstControlPoint->Coordinates[1] &&
+      if( lastControlPoint->Coordinates[0] != firstControlPoint->Coordinates[0] ||
+          lastControlPoint->Coordinates[1] != firstControlPoint->Coordinates[1] ||
           lastControlPoint->Coordinates[2] != firstControlPoint->Coordinates[2])
       {
         vtkIdType p2 = points->InsertNextPoint(lastControlPoint->Coordinates[0], lastControlPoint->Coordinates[1], lastControlPoint->Coordinates[2]);

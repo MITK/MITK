@@ -7,6 +7,7 @@ set(MODULE_TESTS
    mitkNavigationDataDisplacementFilterTest.cpp
    mitkNavigationDataLandmarkTransformFilterTest.cpp
    mitkNavigationDataObjectVisualizationFilterTest.cpp
+   mitkNavigationDataSetTest.cpp
    mitkNavigationDataTest.cpp
    mitkNavigationDataRecorderTest.cpp
    mitkNavigationDataReferenceTransformFilterTest.cpp

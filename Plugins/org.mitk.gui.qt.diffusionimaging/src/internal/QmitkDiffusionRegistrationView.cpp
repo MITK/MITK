@@ -38,7 +38,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QDir>
 
+
 #include <mitkDWIHeadMotionCorrectionFilter.h>
+
+
+
+/*
+#include "QmitkDataStorageComboBox.h"
+#include <mitkDataStorage.h>
+#include <mitkILinkedRenderWindowPart.h>
+#include <mitkGlobalInteraction.h>
+#include <mitkNodePredicateDataType.h>
+#include <itkScalableAffineTransform.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkNodePredicateOr.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+*/
+
+#include <mitkDWIHeadMotionCorrectionFilter.h>
+
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 
 
 QmitkRegistrationWorker::QmitkRegistrationWorker(QmitkDiffusionRegistrationView* view)
@@ -55,6 +78,7 @@ void QmitkRegistrationWorker::run()
 
   for( int i=0; i< m_View->m_SelectedDiffusionNodes.size(); i++)
   {
+
     m_View->m_GlobalRegisterer = QmitkDiffusionRegistrationView::DWIHeadMotionCorrectionFilterType::New();
 
     mitk::DataNode::Pointer node = m_View->m_SelectedDiffusionNodes.at(i);

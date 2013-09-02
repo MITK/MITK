@@ -77,7 +77,7 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent);
   void SetFocus();
-  
+
   typedef mitk::DWIHeadMotionCorrectionFilter< DiffusionPixelType >       DWIHeadMotionCorrectionFilterType;
 
 protected slots:

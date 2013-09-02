@@ -85,9 +85,9 @@ void mitk::NavigationDataEvaluationFilter::CreateMembersForAllInputs()
 
 void mitk::NavigationDataEvaluationFilter::ResetStatistic()
 {
-for (int i = 0; i < m_LoggedPositions.size(); i++) m_LoggedPositions[i] = std::vector<mitk::Point3D>();
-for (int i = 0; i < m_LoggedQuaternions.size(); i++) m_LoggedQuaternions[i] = std::vector<mitk::Quaternion>();
-for (int i = 0; i < m_InavildSamples.size(); i++) m_InavildSamples[i] = 0;
+for (unsigned int i = 0; i < m_LoggedPositions.size(); i++) m_LoggedPositions[i] = std::vector<mitk::Point3D>();
+for (unsigned int i = 0; i < m_LoggedQuaternions.size(); i++) m_LoggedQuaternions[i] = std::vector<mitk::Quaternion>();
+for (unsigned int i = 0; i < m_InavildSamples.size(); i++) m_InavildSamples[i] = 0;
 }
 
 int mitk::NavigationDataEvaluationFilter::GetNumberOfAnalysedNavigationData(int input)
@@ -126,7 +126,7 @@ std::vector<double> list1 = std::vector<double>();
 std::vector<double> list2 = std::vector<double>();
 std::vector<double> list3 = std::vector<double>();
 std::vector<double> list4 = std::vector<double>();
-for (int i=0; i<m_LoggedQuaternions[input].size(); i++)
+for (unsigned int i=0; i<m_LoggedQuaternions[input].size(); i++)
   {
   list1.push_back(m_LoggedQuaternions[input].at(i)[0]);
   list2.push_back(m_LoggedQuaternions[input].at(i)[1]);
@@ -227,7 +227,7 @@ mean[1] = 0;
 mean[2] = 0;
 mean[3] = 0;
 
-for (int i=0; i<list.size(); i++)
+for (unsigned int i=0; i<list.size(); i++)
   {
   mean[0] += list.at(i)[0];
   mean[1] += list.at(i)[1];
@@ -246,14 +246,14 @@ return mean;
 mitk::PointSet::Pointer mitk::NavigationDataEvaluationFilter::VectorToPointSet(std::vector<mitk::Point3D> pSet)
 {
   mitk::PointSet::Pointer returnValue = mitk::PointSet::New();
-  for (int i=0; i<pSet.size(); i++) returnValue->InsertPoint(i,pSet.at(i));
+  for (unsigned int i=0; i<pSet.size(); i++) returnValue->InsertPoint(i,pSet.at(i));
   return returnValue;
 }
 
 mitk::PointSet::Pointer mitk::NavigationDataEvaluationFilter::VectorToPointSet(std::vector<mitk::Vector3D> pSet)
 {
   mitk::PointSet::Pointer returnValue = mitk::PointSet::New();
-  for (int i=0; i<pSet.size(); i++)
+  for (unsigned int i=0; i<pSet.size(); i++)
     {
     mitk::Point3D thisPoint;
     thisPoint[0] = pSet.at(i)[0];
@@ -267,7 +267,7 @@ mitk::PointSet::Pointer mitk::NavigationDataEvaluationFilter::VectorToPointSet(s
 std::vector<mitk::Vector3D> mitk::NavigationDataEvaluationFilter::QuaternionsToEulerAngles(std::vector<mitk::Quaternion> quaterions)
 {
   std::vector<mitk::Vector3D> returnValue = std::vector<mitk::Vector3D>();
-  for (int i=0; i<quaterions.size(); i++)
+  for (unsigned int i=0; i<quaterions.size(); i++)
     {
     mitk::Vector3D eulerAngles;
     mitk::Quaternion currentQuaternion = quaterions.at(i);
@@ -285,7 +285,7 @@ std::vector<mitk::Vector3D> mitk::NavigationDataEvaluationFilter::QuaternionsToE
   double PI = M_PI;
   std::vector<mitk::Vector3D> returnValue = std::vector<mitk::Vector3D>();
   std::vector<mitk::Vector3D> eulerAnglesRadians = QuaternionsToEulerAngles(quaterions);
-  for (int i=0; i<eulerAnglesRadians.size(); i++)
+  for (unsigned int i=0; i<eulerAnglesRadians.size(); i++)
     {
     mitk::Vector3D currentAngles;
     currentAngles[0] = (eulerAnglesRadians.at(i)[0]/PI)*180;
@@ -296,7 +296,7 @@ std::vector<mitk::Vector3D> mitk::NavigationDataEvaluationFilter::QuaternionsToE
   return returnValue;
 }
 
-mitk::Point3D  mitk::NavigationDataEvaluationFilter::GetLoggedPosition(int i, int input)
+mitk::Point3D  mitk::NavigationDataEvaluationFilter::GetLoggedPosition(unsigned int i, int input)
 {
   mitk::Point3D returnValue;
   if ((m_LoggedPositions[input].size()<=i)||(i<0)) returnValue.Fill(0);
@@ -305,7 +305,7 @@ mitk::Point3D  mitk::NavigationDataEvaluationFilter::GetLoggedPosition(int i, in
 }
 
 
-mitk::Quaternion  mitk::NavigationDataEvaluationFilter::GetLoggedOrientation(int i, int input)
+mitk::Quaternion  mitk::NavigationDataEvaluationFilter::GetLoggedOrientation(unsigned int i, int input)
 {
   mitk::Quaternion returnValue;
   if ((m_LoggedQuaternions[input].size()<=i)||(i<0)) returnValue.fill(0);

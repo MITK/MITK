@@ -51,6 +51,11 @@ public:
 
   itkNewMacro(Self)
 
+  itkGetMacro( Steps, unsigned long )
+  itkGetMacro( CurrentStep, unsigned long )
+  itkGetMacro( IsInValidState, bool)
+  itkSetMacro( AbortRegistration, bool )
+
   // public typedefs
   typedef typename Superclass::InputImageType         DiffusionImageType;
   typedef typename Superclass::InputImagePointerType  DiffusionImagePointerType;
@@ -63,6 +68,11 @@ protected:
   virtual ~DWIHeadMotionCorrectionFilter() {}
 
   virtual void GenerateData();
+
+  unsigned long   m_Steps;
+  unsigned long   m_CurrentStep;
+  bool            m_IsInValidState;       ///< Whether the filter is in a valid state, false if error occured
+  bool            m_AbortRegistration;        ///< set flag to abort
 
   /**
    * @brief Averages an 3d+t image along the time axis.

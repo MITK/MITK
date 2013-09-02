@@ -43,14 +43,14 @@ namespace itk {
 /**
  * \class NonUniformBSpline
  * \brief BSpline with nonuniform knot spacing.
+ * \warning This class was taken from an earlier ITK version and slightly modified.
+ * The original itkNonUniformBSpline is deprecated in ITK 4.3. Currently, the
+ * mitkItkNonUniformBSpline is only used inside the virtual tracking device.
  *
  * This class is a bspline with nonuniform knot spacing. The
  * use can specify a set of points and a set of knots and the
  * spline will attempt to find the control points which will
  * cause the spline to interpolate the points.
- *
- * CAUTION: THIS CLASS IS STILL UNDER DEVELOPMENT.
- *
  */
 
 template < unsigned int TDimension = 3 >

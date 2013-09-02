@@ -13,6 +13,7 @@ set(CPP_FILES
   Common/mitkSerialCommunication.cpp
 
   DataManagement/mitkNavigationData.cpp
+  DataManagement/mitkNavigationDataSet.cpp
   DataManagement/mitkNavigationDataSource.cpp
   DataManagement/mitkNavigationTool.cpp
   DataManagement/mitkNavigationToolStorage.cpp

@@ -257,12 +257,45 @@ class NavigationDataTestClass
 
   }
 
-  static void TestAffineConstructorError()
+
+  static void TestAffineConstructorErrorTransposedNotInverse()
   {
     SetupNaviDataTests();
+    rotation.SetIdentity();
+    rotation[1][0] = 2; // this matrix has determinant = 1 (triangular matrix with ones in diagonal) but transposed != inverse
+    AffineTransform3D::Pointer affineTransform3D = CreateAffineTransform(rotation, offsetVector);
 
-    MITK_TEST_CONDITION(false, "gna");
+    MITK_TEST_FOR_EXCEPTION(mitk::Exception&, NavigationData::New(affineTransform3D));
+  }
 
+  static void TestAffineConstructorErrorDeterminantNonEqualOne()
+  {
+    SetupNaviDataTests();
+    rotation.SetIdentity();
+    rotation[0][0] = 2; // determinant for diagonal matrices is product of diagonal elements => det = 2
+    AffineTransform3D::Pointer affineTransform3D = CreateAffineTransform(rotation, offsetVector);
+
+    MITK_TEST_FOR_EXCEPTION(mitk::Exception&, NavigationData::New(affineTransform3D));
+  }
+
+  static void TestAffineConstructorErrorCheckingFalse()
+  {
+    SetupNaviDataTests();
+    rotation.SetIdentity();
+    rotation[0][0] = 2; // determinant for diagonal matrices is product of diagonal elements => det = 2
+    AffineTransform3D::Pointer affineTransform3D = CreateAffineTransform(rotation, offsetVector);
+
+    bool exceptionSuppressed = true;
+    try
+    {
+      NavigationData::New(affineTransform3D, false);
+    }
+    catch (mitk::Exception&)
+    {
+      exceptionSuppressed = false;
+    }
+
+    MITK_TEST_CONDITION(exceptionSuppressed, "Test affine constructor: exception can be suppressed.")
   }
 
   static void TestAffineGetter()
@@ -309,11 +342,14 @@ int mitkNavigationDataTest(int /* argc */, char* /*argv*/[])
   NavigationDataTestClass::TestWrongInputs();
 
   TestAffineConstructor();
-  TestAffineConstructorError();
+  TestAffineConstructorErrorDeterminantNonEqualOne();
+  TestAffineConstructorErrorTransposedNotInverse();
+  TestAffineConstructorErrorCheckingFalse();
+
   TestAffineGetter();
   TestAffineToNaviDataToAffine();
 
-  TestInverse();
+  //TestInverse();
 
 
   MITK_TEST_END();

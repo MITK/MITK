@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkNavigationData.h"
+#include "vnl/vnl_det.h"
+#include "mitkException.h"
 
 mitk::NavigationData::NavigationData() : itk::DataObject(),
 m_Position(), m_Orientation(0.0, 0.0, 0.0, 0.0), m_CovErrorMatrix(),
@@ -137,9 +139,9 @@ void mitk::NavigationData::SetOrientationAccuracy(mitk::ScalarType error)
 }
 
 mitk::NavigationData::NavigationData(
-    mitk::AffineTransform3D::Pointer affineTransform3D) : itk::DataObject(),
+    mitk::AffineTransform3D::Pointer affineTransform3D,
+    bool checkForRotationMatrix) : itk::DataObject(),
         m_Position(),
-        m_Orientation(affineTransform3D->GetMatrix().GetVnlMatrix().transpose()), // the .transpose is because vnl_quaterion expects a transposed rotation matrix
         m_CovErrorMatrix(), m_HasPosition(true), m_HasOrientation(true), m_DataValid(true), m_IGTTimeStamp(0.0),
         m_Name()
 {
@@ -148,6 +150,23 @@ mitk::NavigationData::NavigationData(
   m_Position[0] = offset[0];
   m_Position[1] = offset[1];
   m_Position[2] = offset[2];
+
+  vnl_matrix_fixed<ScalarType, 3, 3> rotationMatrix           = affineTransform3D->GetMatrix().GetVnlMatrix();
+  vnl_matrix_fixed<ScalarType, 3, 3> rotationMatrixTransposed = rotationMatrix.transpose();
+
+  if (checkForRotationMatrix)
+  {
+    // a quadratic matrix is a rotation matrix exactly when determinant is 1 and transposed is inverse
+     if (!Equal(1.0, vnl_det(rotationMatrix))
+         || !((rotationMatrix*rotationMatrixTransposed).is_identity()))
+     {
+       mitkThrow() << "tried to initialize NavigationData with non-rotation matrix";
+     }
+
+  }
+
+  // the transpose is because vnl_quaterion expects a transposed rotation matrix
+  m_Orientation = Quaternion(rotationMatrixTransposed);
 }
 
 mitk::AffineTransform3D::Pointer
@@ -155,18 +174,8 @@ mitk::NavigationData::GetAffineTransform3D()
 {
   AffineTransform3D::Pointer affineTransform3D = AffineTransform3D::New();
 
-
   // first set rotation
-  vnl_matrix_fixed<ScalarType,3,3> vnl_rotation = m_Orientation.rotation_matrix_transpose().transpose();
-  Matrix3D mitkRotation;
-
-  for (int i = 0; i < 3; ++i) {
-    for (int j = 0; j < 3; ++j) {
-      mitkRotation[i][j] = vnl_rotation[i][j];
-    }
-  }
-
-  affineTransform3D->SetMatrix(mitkRotation);
+  affineTransform3D->SetMatrix(this->getRotationMatrix());
 
   // now set offset
   Vector3D vector3D;
@@ -178,3 +187,19 @@ mitk::NavigationData::GetAffineTransform3D()
 
   return affineTransform3D;
 }
+
+mitk::Matrix3D
+mitk::NavigationData::getRotationMatrix()
+{
+  vnl_matrix_fixed<ScalarType,3,3> vnl_rotation = m_Orientation.rotation_matrix_transpose().transpose();
+  Matrix3D mitkRotation;
+
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      mitkRotation[i][j] = vnl_rotation[i][j];
+    }
+  }
+
+  return mitkRotation;
+}
+

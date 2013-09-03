@@ -148,29 +148,13 @@ void mitk::NavigationData::SetOrientationAccuracy(mitk::ScalarType error)
 void
 mitk::NavigationData::Compose(const mitk::NavigationData::Pointer n, const bool pre)
 {
+  NavigationData::Pointer nd3;
+  if (!pre)
+    nd3 = getComposition(this, n);
+  else
+    nd3 = getComposition(n, this);
 
-  // A2 * A1
-  this->SetOrientation(n->GetOrientation() * this->GetOrientation());
-
-  // first: b1, b2 vnl vector
-  vnl_vector_fixed<ScalarType,3> b1, b2, b3;
-  for (int i = 0; i < 3; ++i) {
-    b1[i] = this->GetPosition()[i];
-    b2[i] = n->GetPosition()[i];
-  }
-
-  // b3 = A2b1 + b2
-  b3  = n->GetOrientation().rotate(b1) + b2;
-
-  // back to mitk::Point3D
-  Point3D point;
-  for (int i = 0; i < 3; ++i) {
-    point[i] = b3[i];
-  }
-
-  this->SetPosition(point);
-
-  this->ResetCovarianceValidity();
+  this->Graft(nd3);
 }
 
 mitk::NavigationData::NavigationData(
@@ -300,4 +284,36 @@ mitk::NavigationData::ResetCovarianceValidity()
 {
   this->SetHasPosition(false);
   this->SetHasOrientation(false);
+}
+
+mitk::NavigationData::Pointer
+mitk::NavigationData::getComposition(const mitk::NavigationData::Pointer nd1,
+    const mitk::NavigationData::Pointer nd2)
+{
+  NavigationData::Pointer nd3 = nd1->Clone();
+
+  // A2 * A1
+  nd3->SetOrientation(nd2->GetOrientation() * nd1->GetOrientation());
+
+  // first: b1, b2 vnl vector
+  vnl_vector_fixed<ScalarType,3> b1, b2, b3;
+  for (int i = 0; i < 3; ++i) {
+    b1[i] = nd1->GetPosition()[i];
+    b2[i] = nd2->GetPosition()[i];
+  }
+
+  // b3 = A2b1 + b2
+  b3  = nd2->GetOrientation().rotate(b1) + b2;
+
+  // back to mitk::Point3D
+  Point3D point;
+  for (int i = 0; i < 3; ++i) {
+    point[i] = b3[i];
+  }
+
+  nd3->SetPosition(point);
+
+  nd3->ResetCovarianceValidity();
+
+  return nd3;
 }

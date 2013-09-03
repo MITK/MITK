@@ -249,6 +249,9 @@ namespace mitk {
 
       void ResetCovarianceValidity();
 
+      // pre = false
+      static mitk::NavigationData::Pointer getComposition(const mitk::NavigationData::Pointer nd1, const mitk::NavigationData::Pointer nd2);
+
     };
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATA_H_HEADER_INCLUDED_ */

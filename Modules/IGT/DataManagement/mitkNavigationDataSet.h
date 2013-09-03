@@ -62,7 +62,8 @@ namespace mitk {
     * @param timestamp Timestamp for selecting last object before.
     * @return Last mitk::NavigationData with timestamp less than given timestamp, 0 if there is no adequate object.
     */
-    NavigationData::Pointer GetNavigationDataBeforeTimestamp( mitk::NavigationData::TimeStampType timestamp , unsigned int toolIndex ) const;
+    // Method not yet supported
+    //NavigationData::Pointer GetNavigationDataBeforeTimestamp( mitk::NavigationData::TimeStampType timestamp , unsigned int toolIndex ) const;
 
     unsigned int GetNumberOfTools();
     unsigned int GetNumberOfNavigationDatas(bool check = true);

@@ -38,7 +38,7 @@ bool mitk::NavigationDataSet::AddNavigationDatas( std::vector<mitk::NavigationDa
   if ( m_NavigationDataVectors.size() > 0)
   {
     for (int i = 0; i < navigationDatas.size(); i++)
-      if (navigationDatas[i]->GetIGTTimeStamp() <= (*(m_NavigationDataVectors[i].end()-1))->GetIGTTimeStamp())
+      if (navigationDatas[i]->GetIGTTimeStamp() <= m_NavigationDataVectors.back()[i]->GetIGTTimeStamp())
       {
         MITK_WARN("NavigationDataSet") << "IGTTimeStamp of new NavigationData should be newer then timestamp of last NavigationData.";
         return false;
@@ -66,35 +66,36 @@ mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataForIndex
   return m_NavigationDataVectors.at(toolIndex).at(index);
 }
 
-mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataBeforeTimestamp(
-  mitk::NavigationData::TimeStampType timestamp, unsigned int toolIndex) const
-{
-  if ( toolIndex >= m_NavigationDataVectors.size() )
-  {
-    MITK_WARN("NavigationDataSet") << "There is no tool with index " << toolIndex << ".";
-    return NULL;
-  }
-
-  std::vector<mitk::NavigationData::Pointer>::const_iterator it;
-
-  // iterate through all NavigationData objects of the given tool index
-  // till the timestamp of the NavigationData is greater then the given timestamp
-  for (it = m_NavigationDataVectors.at(toolIndex).begin();
-    it != m_NavigationDataVectors.at(toolIndex).end(); ++it)
-  {
-    if ( (*it)->GetIGTTimeStamp() > timestamp) { break; }
-  }
-
-  // first element was greater than timestamp -> return null
-  if ( it == m_NavigationDataVectors.at(toolIndex).begin() )
-  {
-    MITK_WARN("NavigationDataSet") << "No NavigationData was recorded before given timestamp.";
-    return NULL;
-  }
-
-  // return last element smaller than the given timestamp
-  return *(it-1);
-}
+// Method not yet supported, code below compiles but delivers wrong results
+//mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataBeforeTimestamp(
+//  mitk::NavigationData::TimeStampType timestamp, unsigned int toolIndex) const
+//{
+//  if ( toolIndex >= m_NavigationDataVectors.size() )
+//  {
+//    MITK_WARN("NavigationDataSet") << "There is no tool with index " << toolIndex << ".";
+//    return NULL;
+//  }
+//
+//  std::vector<mitk::NavigationData::Pointer>::const_iterator it;
+//
+//  // iterate through all NavigationData objects of the given tool index
+//  // till the timestamp of the NavigationData is greater then the given timestamp
+//  for (it = m_NavigationDataVectors.at(toolIndex).begin();
+//    it != m_NavigationDataVectors.at(toolIndex).end(); ++it)
+//  {
+//    if ( (*it)->GetIGTTimeStamp() > timestamp) { break; }
+//  }
+//
+//  // first element was greater than timestamp -> return null
+//  if ( it == m_NavigationDataVectors.at(toolIndex).begin() )
+//  {
+//    MITK_WARN("NavigationDataSet") << "No NavigationData was recorded before given timestamp.";
+//    return NULL;
+//  }
+//
+//  // return last element smaller than the given timestamp
+//  return *(it-1);
+//}
 
 unsigned int mitk::NavigationDataSet::GetNumberOfTools()
 {

@@ -28,15 +28,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   /**Documentation
-  * \brief This class records NavigationData objects.
+  * \brief This class records NavigationData objects into NavigationDataSets.
   *
-  * The output of this class is formated as a XML document.
-  *
-  * Internal this class uses streams for recording NavigationData objects. Therefore different types of output are possible
-  * and can be set with the SetOutputMode() method. The default output is directed to the console. If you want to save into a
-  * file you have to set a file name and the path. The recording is started with the call of the method StartRecording(). Now
-  * every Update() stores the current state of the added NavigationDatas. With StopRecording() the stream is stopped. With
-  * another call of StartRecording() the output is written to a new file with incremented filename counter.
+  * The recording is started with the call of the method StartRecording(). Now
+  * every Update() stores the current state of the added NavigationDatas into the NavigationDataSet.
+  * With StopRecording() the stream is stopped, but can be resumed anytime.
+  * To start recording to a new NavigationDataSet, call ResetRecording();
   *
   * \warning Do not add inputs while the recorder ist recording. The recorder can't handle that and will cause a nullpointer exception.
   * \ingroup IGT
@@ -51,7 +48,7 @@ namespace mitk
     itkNewMacro( Self );
 
     /**
-    * \brief Returns whether the NavigationDataRecorder is recording or not
+    * \brief Returns whether the NavigationDataRecorder is currently recording or not
     */
     itkGetMacro(Recording, bool);
 
@@ -61,7 +58,7 @@ namespace mitk
     itkGetMacro(NavigationDataSet, mitk::NavigationDataSet::Pointer);
 
     /**
-    * \brief Sets a limit of recorded data sets / frames. Recording will be stopped if the number is reached. -1 disables the limit, -1 is default value as well.
+    * \brief Sets a limit of recorded data sets / frames. Recording will be stopped if the number is reached. values < 1 disable this behaviour. Default is -1.
     */
     itkSetMacro(RecordCountLimit, int);
 

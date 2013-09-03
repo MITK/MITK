@@ -18,22 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkFileSaveDialog.h>
 
 // MITK
-#include <mitkFileReaderRegistry.h>
-#include <mitkIFileReader.h>
-
-// STL Headers
-#include <list>
-
-//microservices
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
-#include <usServiceProperties.h>
-
-//QT
-#include <qgroupbox.h>
-#include <qcheckbox.h>
-#include <qlabel.h>
-#include <mitkCommon.h>
+#include <mitkFileWriterRegistry.h>
 
 // Test imports, delete later
 #include <mitkAbstractFileReader.h>
@@ -90,8 +75,6 @@ private:
   us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
 }; // End of internal dummy reader
 
-const std::string QmitkFileSaveDialog::VIEW_ID = "org.mitk.views.QmitkFileSaveDialog";
-
 //
 //
 //
@@ -105,9 +88,21 @@ const std::string QmitkFileSaveDialog::VIEW_ID = "org.mitk.views.QmitkFileSaveDi
 //
 //
 
-QmitkFileSaveDialog::QmitkFileSaveDialog(mitk::BaseData::Pointer baseData, QWidget* parent, Qt::WindowFlags f): QmitkFileDialog(parent, f)
+class QmitkFileSaveDialogPrivate
 {
-  m_BaseData = baseData;
+public:
+
+  mitk::IFileWriter* m_FileWriter;
+  mitk::IFileWriter::OptionList m_Options;
+  mitk::FileWriterRegistry m_FileWriterRegistry;
+  mitk::BaseData::Pointer m_BaseData;
+};
+
+QmitkFileSaveDialog::QmitkFileSaveDialog(mitk::BaseData::Pointer baseData, QWidget* parent, Qt::WindowFlags f)
+  : QmitkFileDialog(parent, f)
+  , d(new QmitkFileSaveDialogPrivate)
+{
+  d->m_BaseData = baseData;
   this->setFileMode(QFileDialog::AnyFile);
 }
 
@@ -121,18 +116,17 @@ void QmitkFileSaveDialog::ProcessSelectedFile()
   std::string extension = file;
   extension.erase(0, extension.find_last_of('.'));
 
-  m_Options = GetSelectedOptions();
+  d->m_Options = GetSelectedOptions();
   // We are not looking for specific Options here, which is okay, since the dialog currently only shows the
   // reader with the highest priority. Better behaviour required, if we want selectable readers.
 
-  m_FileWriter = m_FileWriterRegistry.GetWriter(extension);
-  m_FileWriter->SetOptions(m_Options);
+  d->m_FileWriter = d->m_FileWriterRegistry.GetWriter(extension);
+  d->m_FileWriter->SetOptions(d->m_Options);
 }
 
-mitk::IFileWriter::OptionList QmitkFileSaveDialog::QueryAvailableOptions(std::string path)
+mitk::IFileWriter::OptionList QmitkFileSaveDialog::QueryAvailableOptions(const QString& /*path*/)
 {
-  us::ModuleContext* context = us::GetModuleContext();
-  mitk::IFileWriter* writer = m_FileWriterRegistry.GetWriter(m_BaseData->GetNameOfClass());
+  mitk::IFileWriter* writer = d->m_FileWriterRegistry.GetWriter(d->m_BaseData->GetNameOfClass());
 
   if (writer == NULL)
   {
@@ -145,15 +139,15 @@ mitk::IFileWriter::OptionList QmitkFileSaveDialog::QueryAvailableOptions(std::st
 
 mitk::IFileWriter* QmitkFileSaveDialog::GetWriter()
 {
-  return this->m_FileWriter;
+  return d->m_FileWriter;
 }
 
 void QmitkFileSaveDialog::WriteBaseData()
 {
-  if (m_FileWriter == NULL )
+  if (d->m_FileWriter == NULL )
   {
     MITK_WARN << "Tried go write BaseData while no FileWriter was selected in Dialog. Aborting.";
     return;
   }
-  m_FileWriter->Write(m_BaseData, this->selectedFiles().front().toStdString());
+  d->m_FileWriter->Write(d->m_BaseData, this->selectedFiles().front().toStdString());
 }

@@ -18,21 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _QmitkFileSaveDialog_H_INCLUDED
 
 #include "QmitkExports.h"
+
+// STL
 #include <vector>
-
-//QT headers
-#include <QWidget>
-#include <qfiledialog.h>
-#include <qgridlayout.h>
-
-//Microservices
-#include "usServiceReference.h"
 
 // MITK
 #include <QmitkFileDialog.h>
 #include <mitkIFileWriter.h>
-#include <mitkFileWriterRegistry.h>
 #include <mitkBaseData.h>
+
+class QmitkFileSaveDialogPrivate;
 
 /**
 * \ingroup QmitkModule
@@ -44,39 +39,29 @@ class QMITK_EXPORT QmitkFileSaveDialog :public QmitkFileDialog
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
 
-private:
-
 public:
-
-  static const std::string VIEW_ID;
 
   QmitkFileSaveDialog(mitk::BaseData::Pointer baseData, QWidget* p = 0, Qt::WindowFlags f1 = 0);
   virtual ~QmitkFileSaveDialog();
 
-  virtual mitk::IFileWriter* GetWriter();
+  mitk::IFileWriter* GetWriter();
 
   /**
   * \brief Writes the Basedata that the WIdget was constructed with into the file selected by the user.
   *
   */
-  virtual void WriteBaseData();
-
-signals:
-
-  protected slots:
-
-    virtual void ProcessSelectedFile();
+  void WriteBaseData();
 
 protected:
 
-  mitk::IFileWriter* m_FileWriter;
-  mitk::IFileWriter::OptionList m_Options;
-  mitk::FileWriterRegistry m_FileWriterRegistry;
-  mitk::BaseData::Pointer m_BaseData;
+  virtual mitk::IFileWriter::OptionList QueryAvailableOptions(const QString& path);
 
-  mitk::IFileWriter::OptionList QueryAvailableOptions(std::string path);
+  virtual void ProcessSelectedFile();
 
-  //Ui::QmitkFileSaveDialogControls* m_Controls; ///< member holding the UI elements of this widget
+private:
+
+  QScopedPointer<QmitkFileSaveDialogPrivate> d;
+
 };
 
 #endif // _QmitkFileSaveDialog_H_INCLUDED

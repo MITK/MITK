@@ -18,26 +18,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _QmitkFileDialog_H_INCLUDED
 
 #include "QmitkExports.h"
-#include <vector>
 
 //QT headers
-#include <QWidget>
-#include <qfiledialog.h>
-#include <qgridlayout.h>
-
-//Microservices
-#include "usServiceReference.h"
+#include <QFileDialog>
 
 // MITK
 #include <mitkIFileReader.h>
 
+class QmitkFileDialogPrivate;
+
 /**
-* \ingroup QmitkModule
-*
-* \brief This is the abstract base class for QmitkFileOpenDialog and QmitkFileSaveDialog.
-*
-* It contains common functionality and logic, but is not really useful on it's own. Use the subclasses!
-*/
+ * \ingroup QmitkModule
+ *
+ * \brief This is the abstract base class for QmitkFileOpenDialog and QmitkFileSaveDialog.
+ *
+ * It contains common functionality and logic, but is not really useful on it's own. Use the subclasses!
+ */
 class QMITK_EXPORT QmitkFileDialog :public QFileDialog
 {
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -45,53 +41,38 @@ class QMITK_EXPORT QmitkFileDialog :public QFileDialog
 
 public:
 
-  static const std::string VIEW_ID;
-
   QmitkFileDialog(QWidget* p = 0, Qt::WindowFlags f1 = 0);
   virtual ~QmitkFileDialog();
 
-  /** \brief This method is part of the widget and needs not to be called separately. */
-  virtual void CreateQtPartControl(QWidget *parent);
-  /** \brief This method is part of the widget and needs not to be called separately. (Creation of the connections of main and control widget.)*/
-  virtual void CreateConnections();
-
   /**
-  * \brief Returns the Options that are currently / have been selected in the widget.
-  */
+   * \brief Returns the Options that are currently / have been selected in the widget.
+   */
   virtual mitk::IFileReader::OptionList GetSelectedOptions();
-
-signals:
-
-  public slots:
-
-    /**
-    * \brief Called when the file selection has changed and the options need to be adapted.
-    */
-    virtual void DisplayOptions(QString path);
-
-    protected slots:
-
-      /**
-      * \brief When the Dialog is closed, the subclass must execute the logic to process the selected files.
-      */
-      virtual void ProcessSelectedFile() = 0;
 
 protected:
 
-  /** \brief Contains the checkboxes for the options*/
-  QGridLayout* m_BoxLayout;
+  /**
+   * \brief This is kind of a workaround. Getting the Options is different whether using a reader or a writer,
+   * so the subclasses of this dialog must implement this logic.
+   */
+  virtual mitk::IFileReader::OptionList QueryAvailableOptions(const QString& path) = 0;
 
-  /** \brief The Options the user has set for the reader / writer*/
-  mitk::IFileReader::OptionList m_Options;
 
   /**
-  * \brief This is kind of a workaround. Getting the Options is differen whether using a reader or a writer,
-  * so the subclasses of this dialog must implement this logic.
-  */
-  virtual mitk::IFileReader::OptionList QueryAvailableOptions(std::string path) = 0;
+   * \brief Called when the file selection has changed and the options need to be adapted.
+   */
+  Q_SLOT void DisplayOptions(const QString& path);
 
-  /** \brief Remove all checkboxes from the options box.*/
-  virtual void ClearOptionsBox();
+
+  /**
+   * \brief When the Dialog is closed, the subclass must execute the logic to process the selected files.
+   */
+  Q_SLOT virtual void ProcessSelectedFile() = 0;
+
+
+private:
+
+  QScopedPointer<QmitkFileDialogPrivate> d;
 };
 
 #endif // _QmitkFileDialog_H_INCLUDED

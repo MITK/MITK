@@ -19,25 +19,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkFileReaderRegistry.h>
-#include <mitkIFileReader.h>
 
-// STL Headers
-#include <list>
+class QmitkFileOpenDialogPrivate
+{
+public:
 
-//microservices
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
-#include <usServiceProperties.h>
+  std::vector<mitk::IFileReader*> m_FileReaders;
+  mitk::IFileReader::OptionList m_Options;
+  mitk::FileReaderRegistry m_FileReaderRegistry;
+};
 
-//QT
-#include <mitkCommon.h>
-
-// Test imports, delete later
-#include <mitkAbstractFileReader.h>
-
-const std::string QmitkFileOpenDialog::VIEW_ID = "org.mitk.views.QmitkFileOpenDialog";
-
-QmitkFileOpenDialog::QmitkFileOpenDialog(QWidget* parent, Qt::WindowFlags f): QmitkFileDialog(parent, f)
+QmitkFileOpenDialog::QmitkFileOpenDialog(QWidget* parent, Qt::WindowFlags f)
+  : QmitkFileDialog(parent, f)
+  , d(new QmitkFileOpenDialogPrivate)
 {
   this->setFileMode(QFileDialog::ExistingFiles);
 }
@@ -56,23 +50,21 @@ void QmitkFileOpenDialog::ProcessSelectedFile()
     std::string extension = file;
     extension.erase(0, extension.find_last_of('.'));
 
-    m_Options = GetSelectedOptions();
+    d->m_Options = GetSelectedOptions();
     // We are not looking for specific options here, which is okay, since the dialog currently only shows the
     // reader with the highest priority. Better behaviour required, if we want selectable readers.
 
-    mitk::IFileReader* fileReader = m_FileReaderRegistry.GetReader(extension);
-    fileReader->SetOptions(m_Options);
-    m_FileReaders.push_back(fileReader);
+    mitk::IFileReader* fileReader = d->m_FileReaderRegistry.GetReader(extension);
+    fileReader->SetOptions(d->m_Options);
+    d->m_FileReaders.push_back(fileReader);
   }
 }
 
-mitk::IFileReader::OptionList QmitkFileOpenDialog::QueryAvailableOptions(std::string path)
+mitk::IFileReader::OptionList QmitkFileOpenDialog::QueryAvailableOptions(const QString& path)
 {
-  std::string extension = path;
-  extension.erase(0, extension.find_last_of('.'));
+  QString extension = QFileInfo(path).completeSuffix();
 
-  us::ModuleContext* context = us::GetModuleContext();
-  mitk::IFileReader* reader = m_FileReaderRegistry.GetReader(extension);
+  mitk::IFileReader* reader = d->m_FileReaderRegistry.GetReader(extension.toStdString());
 
   if (reader == NULL)
   {
@@ -85,7 +77,7 @@ mitk::IFileReader::OptionList QmitkFileOpenDialog::QueryAvailableOptions(std::st
 
 std::vector<mitk::IFileReader*> QmitkFileOpenDialog::GetReaders()
 {
-  return this->m_FileReaders;
+  return d->m_FileReaders;
 }
 
 std::vector< mitk::BaseData::Pointer > QmitkFileOpenDialog::GetBaseDatas()

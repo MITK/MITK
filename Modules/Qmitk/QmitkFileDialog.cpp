@@ -17,21 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#define _USE_MATH_DEFINES
 #include <QmitkFileDialog.h>
 
-// MITK
-#include <mitkIFileReader.h>
-
-// STL Headers
-#include <list>
-
-//microservices
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
-#include <usServiceProperties.h>
-
 //QT
-#include <qgroupbox.h>
-#include <qcheckbox.h>
-#include <mitkCommon.h>
+#include <QGroupBox>
+#include <QCheckBox>
+#include <QGridLayout>
+
 
 // Test imports, delete later
 #include <mitkAbstractFileReader.h>
@@ -88,7 +78,6 @@ private:
   us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
 }; // End of internal dummy reader
 
-const std::string QmitkFileDialog::VIEW_ID = "org.mitk.views.QmitkFileDialog";
 
 //
 //
@@ -103,13 +92,32 @@ const std::string QmitkFileDialog::VIEW_ID = "org.mitk.views.QmitkFileDialog";
 //
 //
 
-QmitkFileDialog::QmitkFileDialog(QWidget* parent, Qt::WindowFlags f): QFileDialog(parent, f)
+class QmitkFileDialogPrivate
+{
+public:
+
+  /** \brief This method is part of the widget and needs not to be called separately. */
+  void CreateQtPartControl(QWidget *parent);
+
+  /** \brief Remove all checkboxes from the options box.*/
+  void ClearOptionsBox();
+
+  /** \brief Contains the checkboxes for the options*/
+  QGridLayout* m_BoxLayout;
+
+  /** \brief The Options the user has set for the reader / writer*/
+  mitk::IFileReader::OptionList m_Options;
+};
+
+QmitkFileDialog::QmitkFileDialog(QWidget* parent, Qt::WindowFlags f)
+  : QFileDialog(parent, f)
+  , d(new QmitkFileDialogPrivate)
 {
   this->setOption(QFileDialog::DontUseNativeDialog);
 
   DummyReader* dr = new DummyReader(".xsfd", 1000);
 
-  CreateQtPartControl(this);
+  d->CreateQtPartControl(this);
 }
 
 QmitkFileDialog::~QmitkFileDialog()
@@ -118,37 +126,30 @@ QmitkFileDialog::~QmitkFileDialog()
 
 //////////////////// INITIALIZATION /////////////////////
 
-void QmitkFileDialog::CreateQtPartControl(QWidget *parent)
+void QmitkFileDialogPrivate::CreateQtPartControl(QWidget *parent)
 {
   // cast own layout to gridLayout
-  QGridLayout *layout = (QGridLayout*)this->layout();
+  QGridLayout *layout = qobject_cast<QGridLayout*>(parent->layout());
 
   // creat groupbox for options
-  QGroupBox *box = new QGroupBox(this);
+  QGroupBox *box = new QGroupBox(parent);
   box->setTitle("Options:");
   box->setVisible(true);
   m_BoxLayout = new QGridLayout(box);
   box->setLayout(m_BoxLayout);
   layout->addWidget(box,4,0,1,3);
 
-  this->CreateConnections();
-
-  //  m_context = us::getmodulecontext();
-}
-
-void QmitkFileDialog::CreateConnections()
-{
-  connect( this, SIGNAL(currentChanged( const QString &)), this, SLOT(DisplayOptions( QString)) );
-  connect( this, SIGNAL(fileSelected( const QString &)), this, SLOT(ProcessSelectedFile()) );
+  parent->connect( parent, SIGNAL(currentChanged(QString)), parent, SLOT(DisplayOptions( QString)) );
+  parent->connect( parent, SIGNAL(fileSelected(QString)), parent, SLOT(ProcessSelectedFile()) );
 }
 
 /////////////////////////// OPTIONS ///////////////////////////////
 
-void QmitkFileDialog::DisplayOptions(QString path)
+void QmitkFileDialog::DisplayOptions(const QString& path)
 {
-  ClearOptionsBox();
+  d->ClearOptionsBox();
 
-  mitk::IFileReader::OptionList options = QueryAvailableOptions(path.toStdString());
+  mitk::IFileReader::OptionList options = QueryAvailableOptions(path);
   int i = 0;
   for (mitk::IFileReader::OptionList::const_iterator iter = options.begin(),
        end = options.end(); iter != end; ++iter)
@@ -156,12 +157,12 @@ void QmitkFileDialog::DisplayOptions(QString path)
     QCheckBox *checker = new QCheckBox(this);
     checker->setText( QString::fromStdString(iter->first) );
     checker->setChecked( iter->second );
-    m_BoxLayout->addWidget(checker, i / 4, i % 4);
+    d->m_BoxLayout->addWidget(checker, i / 4, i % 4);
     ++i;
   }
 }
 
-void QmitkFileDialog::ClearOptionsBox()
+void QmitkFileDialogPrivate::ClearOptionsBox()
 {
   if ( m_BoxLayout != NULL )
   {
@@ -178,10 +179,10 @@ mitk::IFileReader::OptionList QmitkFileDialog::GetSelectedOptions()
 {
   mitk::IFileReader::OptionList result;
 
-  if ( m_BoxLayout != NULL )
+  if ( d->m_BoxLayout != NULL )
   {
     QLayoutItem* item;
-    while ( ( item = m_BoxLayout->takeAt( 0 ) ) != NULL )
+    while ( ( item = d->m_BoxLayout->takeAt( 0 ) ) != NULL )
     {
       QCheckBox* checker = dynamic_cast<QCheckBox*> (item->widget());
       if (checker)

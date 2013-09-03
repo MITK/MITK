@@ -18,22 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _QmitkFileOpenDialog_H_INCLUDED
 
 #include "QmitkExports.h"
+
+// STL
 #include <vector>
-
-//QT headers
-#include <QWidget>
-#include <qgridlayout.h>
-
-//Microservices
-#include "usServiceReference.h"
-#include "usModuleContext.h"
-#include "usServiceEvent.h"
-#include "usServiceInterface.h"
 
 // MITK
 #include <QmitkFileDialog.h>
 #include <mitkIFileReader.h>
-#include <mitkFileReaderRegistry.h>
+#include <mitkBaseData.h>
+
+class QmitkFileOpenDialogPrivate;
 
 /**
 * \ingroup QmitkModule
@@ -45,44 +39,25 @@ class QMITK_EXPORT QmitkFileOpenDialog :public QmitkFileDialog
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
 
-private:
-
-  //us::ModuleContext* m_Context;
-  ///** \brief a filter to further narrow down the list of results*/
-  //std::string m_Filter;
-  ///** \brief The name of the ServiceInterface that this class should list */
-  //std::string m_Interface;
-  ///** \brief The name of the ServiceProperty that will be displayed in the list to represent the service */
-  //std::string m_NamingProperty;
-
 public:
-
-  static const std::string VIEW_ID;
 
   QmitkFileOpenDialog(QWidget* p = 0, Qt::WindowFlags f1 = 0);
   virtual ~QmitkFileOpenDialog();
 
-  virtual std::vector <mitk::IFileReader*> GetReaders();
+  std::vector <mitk::IFileReader*> GetReaders();
 
-  virtual std::vector< mitk::BaseData::Pointer > GetBaseDatas();
-
-signals:
-
-  public slots:
-
-    protected slots:
-
-      virtual void ProcessSelectedFile();
+  std::vector< mitk::BaseData::Pointer > GetBaseDatas();
 
 protected:
 
-  std::vector<mitk::IFileReader*> m_FileReaders;
-  mitk::IFileReader::OptionList m_Options;
-  mitk::FileReaderRegistry m_FileReaderRegistry;
+  virtual mitk::IFileReader::OptionList QueryAvailableOptions(const QString& path);
 
-  virtual mitk::IFileReader::OptionList QueryAvailableOptions(std::string path);
+  virtual void ProcessSelectedFile();
 
-  //Ui::QmitkFileOpenDialogControls* m_Controls; ///< member holding the UI elements of this widget
+private:
+
+  QScopedPointer<QmitkFileOpenDialogPrivate> d;
+
 };
 
 #endif // _QmitkFileOpenDialog_H_INCLUDED

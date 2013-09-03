@@ -166,6 +166,8 @@ namespace mitk {
 
       mitk::Matrix3D getRotationMatrix();
 
+      mitk::Point3D Transform(const mitk::Point3D);
+
     protected:
       NavigationData();
 

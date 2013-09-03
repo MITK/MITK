@@ -203,3 +203,8 @@ mitk::NavigationData::getRotationMatrix()
   return mitkRotation;
 }
 
+mitk::Point3D
+mitk::NavigationData::Transform(const mitk::Point3D point)
+{
+  return point;
+}

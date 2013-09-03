@@ -235,10 +235,24 @@ class NavigationDataTestClass
   {
     SetupNaviDataTests();
     NavigationData::Pointer navigationData = CreateNavidata(quaternion, offsetPoint);
+//
+//    navigationData = navigationData->GetInverse();
+//
+//    MITK_TEST_CONDITION(false,"bla");
+  }
 
+  static void TestTransform()
+  {
+    SetupNaviDataTests();
+    NavigationData::Pointer navigationData = CreateNavidata(quaternion, offsetPoint);
+    ScalarType pointArray[] = {1.0, 3.0, 5.0};
+    Point3D    point        = pointArray;
 
+    point = navigationData->Transform(point);
 
-    MITK_TEST_CONDITION(false,"bla");
+    ScalarType resultingPointArray[] = {-2, 3, 8.123456};
+    Point3D    resultingPoint        = resultingPointArray;
+    MITK_TEST_CONDITION(Equal(resultingPoint, point), "Testing point transformation");
   }
 
   static void TestAffineConstructor()
@@ -348,6 +362,8 @@ int mitkNavigationDataTest(int /* argc */, char* /*argv*/[])
 
   TestAffineGetter();
   TestAffineToNaviDataToAffine();
+
+  TestTransform();
 
   //TestInverse();
 

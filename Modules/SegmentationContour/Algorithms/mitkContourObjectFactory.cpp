@@ -130,13 +130,20 @@ void mitk::ContourObjectFactory::RegisterIOFactories()
   CreateFileExtensionsMap();
 }
 
-void RegisterContourObjectFactory()
-{
-  static bool oneContourObjectFactoryRegistered = false;
-  if ( ! oneContourObjectFactoryRegistered )
+
+struct RegisterContourObjectFactory{
+  RegisterContourObjectFactory()
+    : m_Factory( mitk::ContourObjectFactory::New() )
   {
-    MITK_DEBUG << "Registering ContourObjectFactory..." << std::endl;
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::ContourObjectFactory::New());
-    oneContourObjectFactoryRegistered = true;
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory( m_Factory );
   }
-}
+
+  ~RegisterContourObjectFactory()
+  {
+    mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory( m_Factory );
+  }
+
+  mitk::ContourObjectFactory::Pointer m_Factory;
+};
+
+static RegisterContourObjectFactory registerContourObjectFactory;

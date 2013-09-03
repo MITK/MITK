@@ -186,6 +186,13 @@ class NavigationDataTestClass
   static Point3D    offsetPoint;
   static Matrix3D   rotation;
 
+  static Quaternion quaternion2;
+  static Vector3D   offsetVector2;
+  static Point3D    offsetPoint2;
+  static Matrix3D   rotation2;
+
+  static Point3D  point;
+
   static void SetupNaviDataTests()
   {
     // set rotation matrix to
@@ -208,6 +215,28 @@ class NavigationDataTestClass
     double offsetArray[3] = {1.0,2.0,3.123456};
     offsetVector          = offsetArray;
     offsetPoint           = offsetArray;
+
+    /***** Second set of data for compose tests ****/
+
+    // set rotation2 matrix to
+    /*
+     * 1  0  0
+     * 0  0 -1
+     * 0  1  0
+     */
+    rotation2.Fill(0);
+    rotation2[0][0] =  1;
+    rotation2[1][2] = -1;
+    rotation2[2][1] =  1;
+
+    quaternion2                = Quaternion(0.7071067811865475, 0, 0, 0.7071067811865476);
+    ScalarType offsetArray2[3] = {1, 0, 0};
+    offsetVector2              = offsetArray2;
+    offsetPoint2               = offsetArray2;
+
+    /***** Create a point to be transformed *****/
+    ScalarType pointArray[] = {1.0, 3.0, 5.0};
+    point        = pointArray;
   }
 
   /**
@@ -291,8 +320,6 @@ class NavigationDataTestClass
   {
     SetupNaviDataTests();
     NavigationData::Pointer navigationData = CreateNavidata(quaternion, offsetPoint);
-    ScalarType pointArray[] = {1.0, 3.0, 5.0};
-    Point3D    point        = pointArray;
 
     point = navigationData->Transform(point);
 
@@ -386,6 +413,36 @@ class NavigationDataTestClass
     MITK_TEST_CONDITION(MatrixEqualElementWise(affineTransform3D->GetMatrix(), affineTransform3D_2->GetMatrix()), "Testing affine -> navidata -> affine chain: rotation");
   }
 
+  static void TestCompose(bool pre = false)
+  {
+    SetupNaviDataTests();
+    NavigationData::Pointer    nd = CreateNavidata(quaternion, offsetPoint);
+    AffineTransform3D::Pointer at = CreateAffineTransform(rotation, offsetVector);
+    // second transform for composition
+    NavigationData::Pointer    nd2 = CreateNavidata(quaternion2, offsetPoint2);
+    AffineTransform3D::Pointer at2 = CreateAffineTransform(rotation2, offsetVector2);
+    // save point for affinetransform
+    Point3D point2 = point;
+
+
+    nd->Compose(nd2, pre);
+    point  = nd->Transform(point);
+
+    at->Compose(at2, pre);
+    point2 = at->TransformPoint(point2);
+
+    MITK_TEST_CONDITION(Equal(point, point2), "Compose pre = " << pre << ": composition works ");
+
+    bool covarianceValidityReset = !nd->GetHasOrientation() && !nd->GetHasPosition();
+
+    MITK_TEST_CONDITION(covarianceValidityReset, "Compose pre = " << pre << ": covariance validities reset because not implemented yet.");
+  }
+
+  static void TestReverseCompose()
+  {
+    TestCompose(true);
+  }
+
 /**
 * This function is testing the Class mitk::NavigationData. For most tests we would need the MicronTracker hardware, so only a few
 * simple tests, which can run without the hardware are implemented yet (2009, January, 23rd). As soon as there is a working
@@ -415,6 +472,8 @@ int mitkNavigationDataTest(int /* argc */, char* /*argv*/[])
   TestDoubleInverse();
   TestInverseError();
 
+  TestCompose();
+  TestReverseCompose();
 
   MITK_TEST_END();
 }

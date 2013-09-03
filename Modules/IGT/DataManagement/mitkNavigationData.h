@@ -248,6 +248,7 @@ namespace mitk {
     private:
 
       void ResetCovarianceValidity();
+
     };
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATA_H_HEADER_INCLUDED_ */

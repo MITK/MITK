@@ -148,7 +148,29 @@ void mitk::NavigationData::SetOrientationAccuracy(mitk::ScalarType error)
 void
 mitk::NavigationData::Compose(const mitk::NavigationData::Pointer n, const bool pre)
 {
-  // TODO SW.
+
+  // A2 * A1
+  this->SetOrientation(n->GetOrientation() * this->GetOrientation());
+
+  // first: b1, b2 vnl vector
+  vnl_vector_fixed<ScalarType,3> b1, b2, b3;
+  for (int i = 0; i < 3; ++i) {
+    b1[i] = this->GetPosition()[i];
+    b2[i] = n->GetPosition()[i];
+  }
+
+  // b3 = A2b1 + b2
+  b3  = n->GetOrientation().rotate(b1) + b2;
+
+  // back to mitk::Point3D
+  Point3D point;
+  for (int i = 0; i < 3; ++i) {
+    point[i] = b3[i];
+  }
+
+  this->SetPosition(point);
+
+  this->ResetCovarianceValidity();
 }
 
 mitk::NavigationData::NavigationData(

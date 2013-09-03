@@ -31,7 +31,6 @@ public:
 
 
   void SetFixedImage(Image::Pointer &fixedImage);
-  void SetFixedImageMask(Image::Pointer fixedImageMask);
 
   void SetMovingReferenceImage(mitk::Image::Pointer& movingImage);
 
@@ -44,7 +43,7 @@ public:
    */
   std::vector<mitk::Image::Pointer> GetRegisteredImages();
 
-  mitk::Image::Pointer ApplyTransformationToImage(mitk::Image::Pointer& img, const TransformType& transformation) const;
+  void ApplyTransformationToImage(mitk::Image::Pointer& img, const TransformType& transformation) const;
 
   TransformType GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage, mitk::Image::Pointer mask = NULL);
 

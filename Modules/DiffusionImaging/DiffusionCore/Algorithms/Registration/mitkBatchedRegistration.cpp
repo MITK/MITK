@@ -35,18 +35,20 @@ std::vector<mitk::Image::Pointer> mitk::BatchedRegistration::GetRegisteredImages
     // First transform moving reference image
     TransformType transf = GetTransformation(m_FixedImage, m_MovingReference);
     // store it as first element in vector
-    m_RegisteredImages.push_back(ApplyTransformationToImage(m_MovingReference,transf));
+    ApplyTransformationToImage(m_MovingReference,transf);
+    m_RegisteredImages.push_back(m_MovingReference);
     // apply transformation to whole batch
     std::vector<mitk::Image::Pointer>::const_iterator itEnd = m_ImageBatch.end();
     for (std::vector<mitk::Image::Pointer>::iterator it = m_ImageBatch.begin(); it != itEnd; ++it)
     {
-      m_RegisteredImages.push_back(ApplyTransformationToImage(*it,transf));
+      ApplyTransformationToImage(*it,transf);
+      m_RegisteredImages.push_back(*it);
     }
   }
   return m_RegisteredImages;
 }
 
-mitk::Image::Pointer mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer &img, const mitk::BatchedRegistration::TransformType &transformation) const
+void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer &img, const mitk::BatchedRegistration::TransformType &transformation) const
 {
  // TODO: perform some magic!
   mitk::Vector3D translateVector;
@@ -74,8 +76,6 @@ mitk::Image::Pointer mitk::BatchedRegistration::ApplyTransformationToImage(mitk:
   {
     // do regular stuff
   }
-
-  return NULL;
 }
 
 mitk::BatchedRegistration::TransformType mitk::BatchedRegistration::GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage, mitk::Image::Pointer mask)
@@ -86,8 +86,8 @@ mitk::BatchedRegistration::TransformType mitk::BatchedRegistration::GetTransform
 
   if (mask.IsNotNull())
   {
-  registrationMethod->SetFixedImageMask(mask);
-  registrationMethod->SetUseFixedImageMask(true);
+    registrationMethod->SetFixedImageMask(mask);
+    registrationMethod->SetUseFixedImageMask(true);
   }
   registrationMethod->SetTransformToRigid();
   registrationMethod->SetCrossModalityOn();
@@ -98,7 +98,7 @@ mitk::BatchedRegistration::TransformType mitk::BatchedRegistration::GetTransform
 
   TransformType transformation;
   mitk::PyramidImageRegistrationMethod::TransformMatrixType rotationMatrix;
-  rotationMatrix = registrationMethod->GetLastRotationMatrix();
+  rotationMatrix = registrationMethod->GetLastRotationMatrix().transpose();
   double param[6];
   registrationMethod->GetParameters(param); // first three: euler angles, last three translation
   for (unsigned int i = 0; i < 3; i++)
@@ -109,9 +109,9 @@ mitk::BatchedRegistration::TransformType mitk::BatchedRegistration::GetTransform
       transformation.set(i,j, value);
     }
   }
-  transformation.set(0,3,param[3]);
-  transformation.set(1,3,param[4]);
-  transformation.set(2,3,param[5]);
+  transformation.set(0,3,-param[3]);
+  transformation.set(1,3,-param[4]);
+  transformation.set(2,3,-param[5]);
   transformation.set(3,3,1);
 
   return transformation;

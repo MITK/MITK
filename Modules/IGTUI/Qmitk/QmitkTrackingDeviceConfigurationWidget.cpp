@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkTrackingDeviceConfigurationWidget.h"
 #include <mitkClaronTrackingDevice.h>
 #include <mitkNDITrackingDevice.h>
+#include <mitkIGTException.h>
 #include <mitkSerialCommunication.h>
 #include <qscrollbar.h>
 #include <qmessagebox.h>
@@ -489,6 +490,11 @@ mitk::TrackingDeviceType QmitkTrackingDeviceConfigurationWidget::ScanPort(QStrin
 {
   mitk::NDITrackingDevice::Pointer tracker = mitk::NDITrackingDevice::New();
   tracker->SetDeviceName(port.toStdString());
-  return tracker->TestConnection();
+  mitk::TrackingDeviceType returnValue = mitk::TrackingSystemInvalid;
+  try
+  {returnValue = tracker->TestConnection();}
+  catch (mitk::IGTException)
+  {}//do nothing: there is simply no device on this port
+  return returnValue;
 }
 

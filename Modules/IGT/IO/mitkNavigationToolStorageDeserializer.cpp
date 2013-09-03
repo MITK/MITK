@@ -57,8 +57,6 @@ mitk::NavigationToolStorageDeserializer::~NavigationToolStorageDeserializer()
 
 mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::Deserialize(std::string filename)
   {
-  bool success = false;
-
   //decomress zip file into temporary directory
   decomressFiles(filename,m_tempDirectory);
 

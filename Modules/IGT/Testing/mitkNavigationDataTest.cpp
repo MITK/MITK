@@ -255,7 +255,7 @@ class NavigationDataTestClass
     }
 
 
-    MITK_TEST_CONDITION(Equal(navigationData->GetOrientation().inverse(), navigationDataInverse->GetOrientation()),"Testing GetInverse: quaternion inverted");
+    MITK_TEST_CONDITION(Equal(navigationData->GetOrientation().inverse(), navigationDataInverse->GetOrientation()),"Testing GetInverse: orientation inverted");
     MITK_TEST_CONDITION(Equal(navigationData->GetPosition(), invertedPosition), "Testing GetInverse: quaternion inverted");
 
     // TODO: Test for hasOrientation, IGTTimestamp, ...

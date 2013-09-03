@@ -21,9 +21,26 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="QRadioButton" name="m_virtualTrackingRadioButton">
+     <property name="text">
+      <string>Virtual Tracking Device</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="m_NDITrackingRadioButton">
+     <property name="text">
+      <string>NDI Tracking Device</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="m_StartButton">
      <property name="toolTip">
-      <string>start dumb segmentation</string>
+      <string/>
      </property>
      <property name="text">
       <string>Start image guided therapy</string>

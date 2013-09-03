@@ -13,5 +13,5 @@ if(MITK_NDI_POLARIS_CONNECTED)
 endif(MITK_NDI_POLARIS_CONNECTED)
 
 if(MITK_CLARON_MICRONTRACKER_CONNECTED)
-  mitkAddCustomModuleTest(mitkClaronTrackingDeviceHardwareTest  mitkClaronTrackingDeviceHardwareTest ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_11 ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_12 ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_13)
+  mitkAddCustomModuleTest(mitkClaronTrackingDeviceHardwareTest  mitkClaronTrackingDeviceHardwareTest ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_11 ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_12 ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_13 ${MITK_MICRON_TRACKER_CALIBRATION_DIR})
 endif(MITK_CLARON_MICRONTRACKER_CONNECTED)

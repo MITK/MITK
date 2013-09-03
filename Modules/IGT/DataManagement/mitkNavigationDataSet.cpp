@@ -27,16 +27,16 @@ mitk::NavigationDataSet::~NavigationDataSet( )
 
 bool mitk::NavigationDataSet::AddNavigationDatas( std::vector<mitk::NavigationData::Pointer> navigationDatas )
 {
-  //// test if tool with given index exist
-  //if ( toolIndex >= m_NavigationDataVectors.size() )
-  //{
-  //  MITK_WARN("NavigationDataSet") << "There is no tool with index " << toolIndex << ".";
-  //  return false;
-  //}
+  // test if tool with given index exist
+  if ( navigationDatas.size() >= m_NavigationDataVectors.size() )
+  {
+    MITK_WARN("NavigationDataSet") << "Tried to add to many navigation Datas to set, only " << m_NavigationDataVectors.size() << " allowed, tried to add " << navigationDatas.size() << ".";
+    return false;
+  }
 
   //// test for consistent timestamp
   //if ( m_NavigationDataVectors.at(toolIndex).size() > 0 &&
-  //     navigationData->GetIGTTimeStamp() <= (*(m_NavigationDataVectors.at(toolIndex).end()-1))->GetIGTTimeStamp())
+  //  navigationData->GetIGTTimeStamp() <= (*(m_NavigationDataVectors.at(toolIndex).end()-1))->GetIGTTimeStamp())
   //{
   //  MITK_WARN("NavigationDataSet") << "IGTTimeStamp of new NavigationData should be greater then timestamp of last NavigationData.";
   //  return false;
@@ -140,16 +140,16 @@ void mitk::NavigationDataSet::SetRequestedRegion(const DataObject * )
 }
 // <--- methods necessary for BaseData
 
-// <--- methods for Iterators
+// ---> methods for Iterators
 
-std::vector< mitk::NavigationData::Pointer >::iterator mitk::NavigationDataSet::begin()
+std::vector< mitk::NavigationData::Pointer >::iterator mitk::NavigationDataSet::Begin()
 {
   //TODO default implementation
   std::vector< mitk::NavigationData::Pointer >::iterator result;
   return result;
 }
 
-std::vector< mitk::NavigationData::Pointer >::iterator mitk::NavigationDataSet::end()
+std::vector< mitk::NavigationData::Pointer >::iterator mitk::NavigationDataSet::End()
 {
   //TODO default implementation
   std::vector< mitk::NavigationData::Pointer >::iterator result;

@@ -64,8 +64,8 @@ namespace mitk {
     unsigned int GetNumberOfTools();
     unsigned int GetNumberOfNavigationDatas(bool check = true);
 
-    virtual std::vector< mitk::NavigationData::Pointer >::iterator begin();
-    virtual std::vector< mitk::NavigationData::Pointer >::iterator end();
+    virtual std::vector< mitk::NavigationData::Pointer >::iterator Begin();
+    virtual std::vector< mitk::NavigationData::Pointer >::iterator End();
 
     // virtual methods, that need to be implemented, but aren't reasonable for NavigationData
     virtual void SetRequestedRegionToLargestPossibleRegion( );

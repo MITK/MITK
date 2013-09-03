@@ -243,10 +243,10 @@ class NavigationDataTestClass
     // for -A2b1 we need vnl_vectors.
     vnl_vector_fixed<ScalarType, 3> b1;
     for (int i = 0; i < 3; ++i) {
-      b1[i] = navigationData->GetOrientation()[i];
+      b1[i] = navigationData->GetPosition()[i];
     }
     vnl_vector_fixed<ScalarType, 3> b2;
-    b2 = -(navigationData->GetOrientation().rotate(b1));
+    b2 = -(navigationDataInverse->GetOrientation().rotate(b1));
 
     // now copy result back into our mitk::Point3D
     Point3D invertedPosition;
@@ -256,9 +256,14 @@ class NavigationDataTestClass
 
 
     MITK_TEST_CONDITION(Equal(navigationData->GetOrientation().inverse(), navigationDataInverse->GetOrientation()),"Testing GetInverse: orientation inverted");
-    MITK_TEST_CONDITION(Equal(navigationData->GetPosition(), invertedPosition), "Testing GetInverse: quaternion inverted");
+    MITK_TEST_CONDITION(Equal(invertedPosition, navigationDataInverse->GetPosition()), "Testing GetInverse: position inverted");
 
     // TODO: Test for hasOrientation, IGTTimestamp, ...
+  }
+
+  static void TestDoubleInverse()
+  {
+
   }
 
   static void TestInverseError()

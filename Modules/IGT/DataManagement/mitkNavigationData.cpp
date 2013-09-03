@@ -253,7 +253,7 @@ mitk::NavigationData::GetInverse() const
   }
 
   // invert position
-  vnlPoint = -(this->GetOrientation().rotate(vnlPoint));
+  vnlPoint = -(navigationDataInverse->GetOrientation().rotate(vnlPoint));
 
   // back to Point3D
   Point3D invertedPosition = this->GetPosition();

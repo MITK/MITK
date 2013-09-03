@@ -26,63 +26,67 @@ static void TestEmptySet()
   MITK_TEST_CONDITION_REQUIRED(! navigationDataSet->GetNavigationDataBeforeTimestamp(0, 100), "Trying to get non-existant NavigationData by timestamp should return false.")
 }
 
-static void TestSetGetByIndex()
-{
-  mitk::NavigationDataSet::Pointer navigationDataSet = mitk::NavigationDataSet::New(2);
-
-  mitk::NavigationData::Pointer nd11 = mitk::NavigationData::New();
-  mitk::NavigationData::Pointer nd12 = mitk::NavigationData::New(); nd12->SetIGTTimeStamp(1);
-  mitk::NavigationData::Pointer nd2 = mitk::NavigationData::New();
-
-  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->InsertNavigationData(0, nd11),
-                               "Adding NavigationData for tool 0 should be successfull.");
-  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->InsertNavigationData(0, nd12),
-                               "Adding second NavigationData for tool 0 should be successfull.");
-  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->InsertNavigationData(1, nd2),
-                               "Adding NavigationData for tool 1 should be successfull.");
-
-  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataForIndex(0, 0) == nd11,
-                               "First NavigationData object for tool 0 should be the same as added previously.");
-  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataForIndex(0, 1) == nd12,
-                               "Second NavigationData object for tool 0 should be the same as added previously.");
-  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataForIndex(1, 0) == nd2,
-                               "NavigationData object for tool 1 should be the same as added previously.");
-}
-
-static void TestSetGetBeforeTimestamp()
+static void TestSetAndGet()
 {
   mitk::NavigationDataSet::Pointer navigationDataSet = mitk::NavigationDataSet::New(2);
 
   mitk::NavigationData::Pointer nd11 = mitk::NavigationData::New();
   mitk::NavigationData::Pointer nd12 = mitk::NavigationData::New();
+  mitk::NavigationData::Pointer nd13 = mitk::NavigationData::New();
+  nd12->SetIGTTimeStamp(1);
+  nd12->SetIGTTimeStamp(2);
+
   mitk::NavigationData::Pointer nd21 = mitk::NavigationData::New();
   mitk::NavigationData::Pointer nd22 = mitk::NavigationData::New();
+  mitk::NavigationData::Pointer nd23 = mitk::NavigationData::New();
+  nd22->SetIGTTimeStamp(1);
 
-  nd11->SetIGTTimeStamp(1.3); nd12->SetIGTTimeStamp(3.5);
-  nd21->SetIGTTimeStamp(1.3); nd22->SetIGTTimeStamp(3.5);
+  // First set, Timestamp = 0
+  std::vector<mitk::NavigationData::Pointer> step1;
+  step1.push_back(nd11);
+  step1.push_back(nd21);
 
-  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->InsertNavigationData(0, nd11) &&
-                               navigationDataSet->InsertNavigationData(0, nd12) &&
-                               navigationDataSet->InsertNavigationData(1, nd21) &&
-                               navigationDataSet->InsertNavigationData(1, nd22),
-                               "Adding NavigationData should be no problem now.");
+  // Second set, Timestamp = 1
+  std::vector<mitk::NavigationData::Pointer> step2;
+  step2.push_back(nd12);
+  step2.push_back(nd22);
 
-  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataBeforeTimestamp(0, 2) == nd11,
-                               "First navigation data object should be returned when timestamp '2' is given.");
-  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataBeforeTimestamp(0, 3.5) == nd12,
-                               "Second navigation data object should be returned when timestamp '3.5' is given.");
+  //Third set, Timestamp invalid ()
+  std::vector<mitk::NavigationData::Pointer> step3;
+  step3.push_back(nd13);
+  step3.push_back(nd23);
+
+  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->AddNavigationDatas(step1),
+    "Adding a valid first set, should be successful.");
+  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->AddNavigationDatas(step2),
+    "Adding a valid second set, should be successful.");
+  MITK_TEST_CONDITION_REQUIRED(!(navigationDataSet->AddNavigationDatas(step3)),
+    "Adding an invalid third set, should be unsusuccessful.");
+
+  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataForIndex(0, 0) == nd11,
+    "First NavigationData object for tool 0 should be the same as added previously.");
+  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataForIndex(0, 1) == nd12,
+    "Second NavigationData object for tool 0 should be the same as added previously.");
+  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataForIndex(1, 0) == nd21,
+    "First NavigationData object for tool 0 should be the same as added previously.");
+  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataForIndex(1, 1) == nd22,
+    "Second NavigationData object for tool 0 should be the same as added previously.");
+
+  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataBeforeTimestamp(0, 1.5) == nd11,
+    "First navigation data object should be returned when timestamp '2' is given.");
+  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataBeforeTimestamp(0, 2.5) == nd12,
+    "Second navigation data object should be returned when timestamp '3.5' is given.");
 }
 
 /**
-  *
-  */
+*
+*/
 int mitkNavigationDataSetTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("NavigationDataSet");
 
   TestEmptySet();
-  TestSetGetByIndex();
-  TestSetGetBeforeTimestamp();
+  TestSetAndGet();
 
   MITK_TEST_END();
 }

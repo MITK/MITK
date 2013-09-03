@@ -91,6 +91,11 @@ namespace mitk {
     * tool to which this data belongs. i.e. the first dimension is usually the longer one.
     */
     std::vector<std::vector<NavigationData::Pointer> > m_NavigationDataVectors;
+
+    /**
+    * \brief The Number of Tools that this class is going to support.
+    */
+    int m_NumberOfTools;
   };
 }
 

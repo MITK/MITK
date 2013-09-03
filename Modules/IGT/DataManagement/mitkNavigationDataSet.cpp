@@ -16,8 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataSet.h"
 
-mitk::NavigationDataSet::NavigationDataSet( unsigned int numTools )
-  : m_NavigationDataVectors(std::vector<std::vector<mitk::NavigationData::Pointer> >(numTools, std::vector<mitk::NavigationData::Pointer>()))
+mitk::NavigationDataSet::NavigationDataSet( unsigned int numberOfTools )
+  : m_NavigationDataVectors(std::vector<std::vector<mitk::NavigationData::Pointer> >()), m_NumberOfTools(numberOfTools)
 {
 }
 
@@ -28,7 +28,7 @@ mitk::NavigationDataSet::~NavigationDataSet( )
 bool mitk::NavigationDataSet::AddNavigationDatas( std::vector<mitk::NavigationData::Pointer> navigationDatas )
 {
   // test if tool with given index exist
-  if ( navigationDatas.size() != m_NavigationDataVectors.size() )
+  if ( navigationDatas.size() != m_NumberOfTools )
   {
     MITK_WARN("NavigationDataSet") << "Tried to add to many or too few navigation Datas to NavigationDataSet. " << m_NavigationDataVectors.size() << " required, tried to add " << navigationDatas.size() << ".";
     return false;
@@ -51,15 +51,15 @@ bool mitk::NavigationDataSet::AddNavigationDatas( std::vector<mitk::NavigationDa
 
 mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataForIndex( unsigned int index, unsigned int toolIndex ) const
 {
-  if ( toolIndex >= m_NavigationDataVectors.size() )
+  if ( index >= m_NavigationDataVectors.size() )
   {
-    MITK_WARN("NavigationDataSet") << "There is no tool with index " << toolIndex << ".";
+    MITK_WARN("NavigationDataSet") << "There is no NavigationData available at index " << index << ".";
     return NULL;
   }
 
-  if ( index >= m_NavigationDataVectors.at(toolIndex).size() )
+  if ( toolIndex >= m_NavigationDataVectors.at(index).size() )
   {
-    MITK_WARN("NavigationDataSet") << "There is no mitk::Navigation with index " << index << " for tool " << toolIndex << ".";
+    MITK_WARN("NavigationDataSet") << "There is NavigatitionData available at index " << index << " for tool " << toolIndex << ".";
     return NULL;
   }
 

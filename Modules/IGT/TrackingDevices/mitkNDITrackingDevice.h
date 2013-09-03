@@ -148,6 +148,7 @@ namespace mitk
     * it to the list of tools. It returns a pointer of type mitk::TrackingTool to the tool
     * that can be used to read tracking data from it.
     * This is the only way to add tools to NDITrackingDevice.
+    * @throw mitk::IGTHardwareException Throws an exception if there are errors while adding the tool.
     *
     * \warning adding tools is not possible in tracking mode, only in setup and ready.
     */
@@ -217,6 +218,7 @@ namespace mitk
 
     /**
     * \brief Sets the desired tracking volume. Returns true if the volume type could be set. Usage: ndiTracker->SetVolume(mitk::Dome);
+    * @throw mitk::IGTHardwareException Throws an IGT hardware exception if the volume could not be set.
     **/
     virtual bool SetVolume(NDITrackingVolume volume);
 
@@ -224,7 +226,7 @@ namespace mitk
 
     /**
     * \brief Add a passive 6D tool to the list of tracked tools. This method is used by AddTool
-    *
+    * @throw mitk::IGTHardwareException Throws an exception if there are errors while adding the tool.
     * \warning adding tools is not possible in tracking mode, only in setup and ready.
     */
     virtual bool InternalAddTool(NDIPassiveTool* tool);
@@ -240,6 +242,7 @@ namespace mitk
     * and frees the handles at the tracking device and it removes the tools from the internal tool list
     * \warning This method can remove TrackingTools from the tool list! After calling this method, GetTool(i) could return
     *          a different tool, because tool indices could have changed.
+    * @throw mitk::IGTHardwareException Throws an exception if there are errors while communicating with the device.
     * \return returns NDIOKAY if everything was sucessfull, returns an error code otherwise
     */
     NDIErrorCode FreePortHandles();

@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qscrollbar.h>
 #include <qmessagebox.h>
 #include <qfiledialog.h>
+#include <mitkIGTException.h>
 
 #include <itksys/SystemTools.hxx>
 #include <Poco/Path.h>
@@ -223,31 +224,23 @@ mitk::TrackingDevice::Pointer testTrackingDevice = ConstructTrackingDevice();
 
 //#### Step 2: test connection and start tracking, generate output
 AddOutput("<br>testing connection <br>  ...");
-bool connectionSuccess = false;
-bool trackingSuccess = false;
-if (testTrackingDevice->OpenConnection())
+
+try
   {
   //try start/stop tracking
   AddOutput("<br>testing tracking <br>  ...");
-  if (testTrackingDevice->StartTracking()) {if (testTrackingDevice->StopTracking()) {trackingSuccess = true;}}
+  testTrackingDevice->StartTracking();
+  testTrackingDevice->StopTracking();
 
   //try close connection
-  if (testTrackingDevice->CloseConnection()) {connectionSuccess = true;}
-  }
-
-if (connectionSuccess && trackingSuccess)
-  {
+  testTrackingDevice->CloseConnection();
   AddOutput("OK");
   }
-else
+catch(mitk::IGTException &e)
   {
   AddOutput("ERROR!");
-  if(!connectionSuccess)
-    {MITK_WARN << "Error while connecting to device: " <<  testTrackingDevice->GetErrorMessage();}
-  else if(!trackingSuccess)
-    {MITK_WARN << "Error while start tracking to device: " <<  testTrackingDevice->GetErrorMessage();}
+  MITK_WARN << "Error while testing connection / start tracking of the device: " << e.GetDescription();
   }
-
 
 this->setEnabled(true);
 }

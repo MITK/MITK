@@ -941,27 +941,22 @@ bool mitk::NDITrackingDevice::InternalAddTool(mitk::NDIPassiveTool* tool)
       /* now write the SROM file of the tool to the tracking system using PVWR */
       returnvalue = m_DeviceProtocol->PVWR(&newPortHandle, p->GetSROMData(), p->GetSROMDataLength());
       if (returnvalue != NDIOKAY)
-      {
-        this->SetErrorMessage((std::string("Could not write SROM file for tool '") + p->GetToolName() + std::string("' to tracking device")).c_str());
-        return false;
-      }
+        {mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not write SROM file for tool '") + p->GetToolName() + std::string("' to tracking device")).c_str();}
       /* initialize the port handle */
       returnvalue = m_DeviceProtocol->PINIT(&newPortHandle);
       if (returnvalue != NDIOKAY)
-      {
-        this->SetErrorMessage((std::string("Could not initialize port '") + newPortHandle +
-          std::string("' for tool '")+ p->GetToolName() + std::string("'")).c_str());
-        return false;
-      }
+        {
+          mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not initialize port '") + newPortHandle +
+          std::string("' for tool '")+ p->GetToolName() + std::string("'")).c_str();
+        }
       /* enable the port handle */
       if (p->IsEnabled() == true)
       {
         returnvalue = m_DeviceProtocol->PENA(&newPortHandle, p->GetTrackingPriority()); // Enable tool
         if (returnvalue != NDIOKAY)
         {
-          this->SetErrorMessage((std::string("Could not enable port '") + newPortHandle +
-            std::string("' for tool '")+ p->GetToolName() + std::string("'")).c_str());
-          return false;
+          mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not enable port '") + newPortHandle +
+            std::string("' for tool '")+ p->GetToolName() + std::string("'")).c_str();
         }
       }
     }
@@ -1147,10 +1142,7 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::FreePortHandles()
   std::string portHandle;
   returnvalue = m_DeviceProtocol->PHSR(FREED, &portHandle);
   if (returnvalue != NDIOKAY)
-  {
-    this->SetErrorMessage("Could not obtain a list of port handles that need to be freed");
-    return returnvalue;     // ToDo: Is this a fatal error?
-  }
+    {mitkThrowException(mitk::IGTHardwareException) << "Could not obtain a list of port handles that need to be freed";}
 
   /* if there are port handles that need to be freed, free them */
   if (portHandle.empty() == true)
@@ -1172,10 +1164,7 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::FreePortHandles()
       returnvalue = m_DeviceProtocol->PHF(&ph);  // free it there
       // What to do if port handle could not be freed? This seems to be a non critical error
       if (returnvalue != NDIOKAY)
-      {
-        this->SetErrorMessage("Could not free all port handles");
-        //        return false; // could not free all Handles
-      }
+        {mitkThrowException(mitk::IGTHardwareException) << "Could not free all port handles";}
     }
   }
   return returnvalue;
@@ -1187,7 +1176,7 @@ int mitk::NDITrackingDevice::GetMajorFirmwareRevisionNumber()
   std::string revision;
   if (m_DeviceProtocol->APIREV(&revision) != mitk::NDIOKAY || revision.empty() || (revision.size() != 9) )
   {
-    this->SetErrorMessage("Could not receive firmware revision number!");
+    MITK_ERROR << "Could not receive firmware revision number!";
     return 0;
   }
 
@@ -1201,7 +1190,7 @@ const char* mitk::NDITrackingDevice::GetFirmwareRevisionNumber()
   static std::string revision;
   if (m_DeviceProtocol->APIREV(&revision) != mitk::NDIOKAY || revision.empty() || (revision.size() != 9) )
   {
-    this->SetErrorMessage("Could not receive firmware revision number!");
+    MITK_ERROR << "Could not receive firmware revision number!";
     revision = "";
     return revision.c_str();
   }
@@ -1216,7 +1205,7 @@ bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes,
   static std::string info;
   if (m_DeviceProtocol->SFLIST(&info) != mitk::NDIOKAY || info.empty())
   {
-    this->SetErrorMessage("Could not receive tracking volume information of tracking system!");
+    MITK_ERROR << "Could not receive tracking volume information of tracking system!";
     return false;
   }
 
@@ -1276,8 +1265,7 @@ bool mitk::NDITrackingDevice::SetVolume(NDITrackingVolume volume)
 {
   if (m_DeviceProtocol->VSEL(volume) != mitk::NDIOKAY)
   {
-    this->SetErrorMessage("Could not set volume!");
-    return false;
+    mitkThrowException(mitk::IGTHardwareException) << "Could not set volume!";
   }
   return true;
 }

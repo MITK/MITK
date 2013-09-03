@@ -77,7 +77,7 @@ namespace mitk
 
     /**
     * \brief Opens the connection to the device. This have to be done before the tracking is started.
-    *
+    * @throw mitk::IGTException Throws an exception if there are two less control points to start the the virtual device.
     */
     virtual bool OpenConnection();
 
@@ -161,6 +161,7 @@ namespace mitk
     /**
     * \brief This method tracks tools as long as the variable m_Mode is set to "Tracking".
     * Tracking tools means generating random numbers for the tool position and orientation.
+    * @throw mitk::IGTException Throws an mitk::IGTException if there is an error during virtual tool tracking.
     */
     void TrackTools();
 

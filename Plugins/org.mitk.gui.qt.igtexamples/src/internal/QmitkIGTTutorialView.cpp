@@ -33,8 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkIGTTutorialView::VIEW_ID = "org.mitk.views.igttutorial";
 
 QmitkIGTTutorialView::QmitkIGTTutorialView()
-: QmitkFunctionality(),
-m_Controls(NULL),  m_MultiWidget(NULL), m_Source(NULL), m_Visualizer(NULL), m_Timer(NULL)
+: QmitkAbstractView(),
+m_Controls(NULL), m_Source(NULL), m_Visualizer(NULL), m_Timer(NULL)
 {
 }
 
@@ -56,17 +56,6 @@ void QmitkIGTTutorialView::CreateQtPartControl(QWidget *parent)
 }
 
 
-void QmitkIGTTutorialView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
-{
-  m_MultiWidget = &stdMultiWidget;
-}
-
-
-void QmitkIGTTutorialView::StdMultiWidgetNotAvailable()
-{
-  m_MultiWidget = NULL;
-}
-
 
 void QmitkIGTTutorialView::CreateConnections()
 {
@@ -77,16 +66,9 @@ void QmitkIGTTutorialView::CreateConnections()
   }
 }
 
-
-void QmitkIGTTutorialView::Activated()
+void QmitkIGTTutorialView::SetFocus()
 {
-  QmitkFunctionality::Activated();
-}
-
-
-void QmitkIGTTutorialView::Deactivated()
-{
-  QmitkFunctionality::Deactivated();
+  m_Controls->m_virtualTrackingRadioButton->setFocus();
 }
 
 
@@ -96,15 +78,6 @@ void QmitkIGTTutorialView::OnStartIGT()
   //start with the connection to a tracking system and as we do image guided procedures we want to show
   //something on the screen. In this tutorial we connect to the NDI Polaris tracking system and we will
   //show the movement of a tool as cone in MITK.
-
-  //Check if we have a widget for visualization. Makes no sense to start otherwise.
-  if (m_MultiWidget == NULL) // if creating the multiwidget failed, stop here.
-  {
-    QMessageBox::warning ( NULL, "Error", "Starting the tutorial is not possible without an initialized "
-      "rendering widget. Please load a dataset first.");
-    return;
-  }
-
   try
   {
     if(m_Controls->m_NDITrackingRadioButton->isChecked())
@@ -184,7 +157,7 @@ void QmitkIGTTutorialView::OnStartIGT()
     node->SetData(cone);                          //The data of that node is our cone.
     node->SetName("My tracked object");           //The node has additional properties like a name
     node->SetColor(1.0, 0.0, 0.0);                //or the color. Here we make it red.
-    this->GetDefaultDataStorage()->Add(node);     //After adding the Node with the cone in it to the
+    this->GetDataStorage()->Add(node);     //After adding the Node with the cone in it to the
     //DataStorage, MITK will show the cone in the
     //render windows.
 
@@ -227,7 +200,10 @@ void QmitkIGTTutorialView::OnTimer()
   //new NavigationData is available. If we have a new NavigationData the cone position and orientation
   //will be adapted.
   m_Visualizer->Update();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();  //update the render windows
+
+  mitk::TimeSlicedGeometry::Pointer geo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
+  mitk::RenderingManager::GetInstance()->InitializeViews( geo );
+  this->RequestRenderWindowUpdate();
 }
 
 
@@ -249,5 +225,5 @@ void QmitkIGTTutorialView::OnStopIGT()
   m_Source = NULL;
   m_Visualizer = NULL;
   m_Source = NULL;
-  this->GetDefaultDataStorage()->Remove(this->GetDefaultDataStorage()->GetNamedNode("My tracked object"));
+  this->GetDataStorage()->Remove(this->GetDataStorage()->GetNamedNode("My tracked object"));
 }

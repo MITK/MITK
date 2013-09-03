@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QMITKIGTTUTORIALVIEW_H_INCLUDED
 #define _QMITKIGTTUTORIALVIEW_H_INCLUDED
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 
 #include <string>
 
@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * \sa QmitkFunctionality
 * \ingroup Functionalities
 */
-class QmitkIGTTutorialView : public QmitkFunctionality
+class QmitkIGTTutorialView : public QmitkAbstractView
 {
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -58,13 +58,7 @@ class QmitkIGTTutorialView : public QmitkFunctionality
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  /// \brief Called when the functionality is activated
-  virtual void Activated();
-
-  virtual void Deactivated();
-
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void SetFocus();
 
 protected slots:
 
@@ -86,8 +80,6 @@ protected slots:
 protected:
 
   Ui::QmitkIGTTutorialViewControls* m_Controls;
-
-  QmitkStdMultiWidget* m_MultiWidget; ///< our display widget
 
   mitk::TrackingDeviceSource::Pointer m_Source; ///< source filer that connects to the tracking device
   mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer; ///< visualization filter uses output from m_Source

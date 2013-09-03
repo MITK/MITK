@@ -234,19 +234,19 @@ class NavigationDataTestClass
   static void TestInverse()
   {
     SetupNaviDataTests();
-    NavigationData::Pointer navigationData = CreateNavidata(quaternion, offsetPoint);
+    NavigationData::Pointer nd = CreateNavidata(quaternion, offsetPoint);
 
-    NavigationData::Pointer navigationDataInverse = navigationData->GetInverse();
+    NavigationData::Pointer ndInverse = nd->GetInverse();
 
     // calculate expected inverted position vector: b2 = -A2b1
 
     // for -A2b1 we need vnl_vectors.
     vnl_vector_fixed<ScalarType, 3> b1;
     for (int i = 0; i < 3; ++i) {
-      b1[i] = navigationData->GetPosition()[i];
+      b1[i] = nd->GetPosition()[i];
     }
     vnl_vector_fixed<ScalarType, 3> b2;
-    b2 = -(navigationDataInverse->GetOrientation().rotate(b1));
+    b2 = -(ndInverse->GetOrientation().rotate(b1));
 
     // now copy result back into our mitk::Point3D
     Point3D invertedPosition;
@@ -254,15 +254,28 @@ class NavigationDataTestClass
       invertedPosition[i] = b2[i];
     }
 
+    MITK_TEST_CONDITION(Equal(nd->GetOrientation().inverse(), ndInverse->GetOrientation()),"Testing GetInverse: orientation inverted");
+    MITK_TEST_CONDITION(Equal(invertedPosition, ndInverse->GetPosition()), "Testing GetInverse: position inverted");
 
-    MITK_TEST_CONDITION(Equal(navigationData->GetOrientation().inverse(), navigationDataInverse->GetOrientation()),"Testing GetInverse: orientation inverted");
-    MITK_TEST_CONDITION(Equal(invertedPosition, navigationDataInverse->GetPosition()), "Testing GetInverse: position inverted");
+    bool otherFlagsOk = (nd->IsDataValid() == ndInverse->IsDataValid())
+                         && mitk::Equal(nd->GetIGTTimeStamp(), ndInverse->GetIGTTimeStamp())
+                         && (nd->GetHasPosition() == ndInverse->GetHasPosition())
+                         && (nd->GetHasOrientation() == ndInverse->GetHasOrientation())
+                         && (nd->GetCovErrorMatrix() == ndInverse->GetCovErrorMatrix())
+                         && (std::string(nd->GetName()) == ndInverse->GetName());
 
-    // TODO: Test for hasOrientation, IGTTimestamp, ...
+    MITK_TEST_CONDITION(otherFlagsOk, "Testing GetInverse: other flags are same");
   }
 
   static void TestDoubleInverse()
   {
+    SetupNaviDataTests();
+    NavigationData::Pointer nd = CreateNavidata(quaternion, offsetPoint);
+
+    NavigationData::Pointer ndDoubleInverse = nd->GetInverse()->GetInverse();
+
+    MITK_TEST_CONDITION(Equal(nd->GetOrientation(), ndDoubleInverse->GetOrientation()),"Testing GetInverse double application: orientation preserved");
+    MITK_TEST_CONDITION(Equal(nd->GetPosition(), ndDoubleInverse->GetPosition()), "Testing GetInverse double application: position preserved");
 
   }
 
@@ -396,6 +409,7 @@ int mitkNavigationDataTest(int /* argc */, char* /*argv*/[])
   TestTransform();
 
   TestInverse();
+  TestDoubleInverse();
 
 
   MITK_TEST_END();

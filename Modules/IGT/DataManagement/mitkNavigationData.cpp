@@ -32,7 +32,7 @@ mitk::NavigationData::NavigationData(const mitk::NavigationData& toCopy) : itk::
     m_Position(toCopy.GetPosition()), m_Orientation(toCopy.GetOrientation()), m_CovErrorMatrix(toCopy.GetCovErrorMatrix()),
         m_HasPosition(toCopy.GetHasPosition()), m_HasOrientation(toCopy.GetHasOrientation()), m_DataValid(toCopy.IsDataValid()), m_IGTTimeStamp(toCopy.GetIGTTimeStamp()),
         m_Name(toCopy.GetName())
-{/* TODO SW: This constructor is not tested! */}
+{/* TODO SW: This constructor is not tested! TODO SW: Graft does the same, remove code duplications, set Graft to deprecated, remove duplication in tescode */}
 
 mitk::NavigationData::~NavigationData()
 {

@@ -90,6 +90,7 @@ namespace mitk
     */
     virtual bool CloseConnection();
 
+    /** @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device. */
     bool InitializeWiredTools();
 
     /** Sets the rotation mode of this class. See documentation of enum RotationMode for details
@@ -103,6 +104,7 @@ namespace mitk
     * TestConnection() tries to connect to a NDI tracking device on the current port/device.
     * \return It returns the type of the device that
     * answers at the port/device or mitk::TrackingSystemNotSpecified if no NDI tracking device is available at that port
+    * @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device.
     */
     virtual mitk::TrackingDeviceType TestConnection();
 
@@ -112,6 +114,8 @@ namespace mitk
     * This method queries the tracking device for all wired tools, initializes them and creates TrackingTool representation objects
     * for them
     * \return true if no error occured, false if an error occured. Check GetErrorMessage() in case of error.
+    * @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device.
+    * @throw mitk::IGTException Throws a normal IGT exception if an error occures which is not related to the hardware.
     */
     bool DiscoverWiredTools();
 
@@ -248,7 +252,7 @@ namespace mitk
     void ClearReceiveBuffer();                ///< empty receive buffer of serial communication interface
     const std::string CalcCRC(const std::string* input);  ///< returns the CRC16 for input as a std::string
 
-public://TODO
+public:
 
     /**
     * \brief TrackTools() continuously polls serial interface for new 6d tool positions until StopTracking is called.
@@ -256,6 +260,7 @@ public://TODO
     * Continuously tracks the 6D position of all tools until StopTracking() is called.
     * This function is executed by the tracking thread (through StartTracking() and ThreadStartTracking()).
     * It should not be called directly.
+    * @throw mitk::IGTHardwareException Throws an exception if there are errors while tracking the tools.
     */
     virtual void TrackTools();
 

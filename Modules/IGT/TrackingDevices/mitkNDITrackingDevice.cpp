@@ -552,10 +552,7 @@ bool mitk::NDITrackingDevice::InitializeWiredTools()
   returnvalue = m_DeviceProtocol->PHSR(OCCUPIED, &portHandle);
 
   if (returnvalue != NDIOKAY)
-  {
-    this->SetErrorMessage("Could not obtain a list of port handles that are connected");
-    return false;     // ToDo: Is this a fatal error?
-  }
+    {mitkThrowException(mitk::IGTHardwareException) << "Could not obtain a list of port handles that are connected";}
 
   /* if there are port handles that need to be initialized, initialize them. Furthermore instantiate tools for each handle that has no tool yet. */
   std::string ph;
@@ -572,24 +569,19 @@ bool mitk::NDITrackingDevice::InitializeWiredTools()
 
     returnvalue = m_DeviceProtocol->PVWR(&ph, pt->GetSROMData(), pt->GetSROMDataLength());
     if (returnvalue != NDIOKAY)
-    {
-      this->SetErrorMessage((std::string("Could not write SROM file for tool '") + pt->GetToolName() + std::string("' to tracking device")).c_str());
-      return false;
-    }
+      {mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not write SROM file for tool '") + pt->GetToolName() + std::string("' to tracking device")).c_str();}
+
     returnvalue = m_DeviceProtocol->PINIT(&ph);
     if (returnvalue != NDIOKAY)
-    {
-      this->SetErrorMessage((std::string("Could not initialize tool '") + pt->GetToolName()).c_str());
-      return false;
-    }
+      {mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not initialize tool '") + pt->GetToolName()).c_str();}
+
     if (pt->IsEnabled() == true)
     {
       returnvalue = m_DeviceProtocol->PENA(&ph, pt->GetTrackingPriority()); // Enable tool
       if (returnvalue != NDIOKAY)
       {
-        this->SetErrorMessage((std::string("Could not enable port '") + portHandle +
-          std::string("' for tool '")+ pt->GetToolName() + std::string("'")).c_str());
-        return false;
+        mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not enable port '") + portHandle +
+          std::string("' for tool '")+ pt->GetToolName() + std::string("'")).c_str();
       }
     }
   }
@@ -638,10 +630,9 @@ mitk::TrackingDeviceType mitk::NDITrackingDevice::TestConnection()
   this->ClearReceiveBuffer();     // flush the receive buffer of all remaining data (carriage return, strings other than reset
   if (reset.compare(answer) != 0)  // check for RESETBE6F
   {
-    this->SetErrorMessage("Hardware Reset of tracking device did not work");
     m_SerialCommunication->CloseConnection();
     m_SerialCommunication = NULL;
-    return mitk::TrackingSystemNotSpecified;
+    mitkThrowException(mitk::IGTHardwareException) << "Hardware Reset of tracking device did not work";
   }
 
   /* Now the tracking device is reset, start initialization */
@@ -680,7 +671,6 @@ bool mitk::NDITrackingDevice::CloseConnection()
     this->InvalidateAll();
     /* return to setup mode */
     this->SetState(Setup);
-    this->SetErrorMessage("");
     m_SerialCommunication = NULL;
   }
   return true;
@@ -776,10 +766,8 @@ void mitk::NDITrackingDevice::TrackTools()
 
   returnvalue = m_DeviceProtocol->TSTOP();
   if (returnvalue != NDIOKAY)
-  {
-    /* insert error handling/notification here */
-    ; // how can this thread tell the application, that an error has occurred?
-  }
+    {mitkThrowException(mitk::IGTHardwareException) << "An error occured while tracking tools.";}
+
   return;       // returning from this function (and ThreadStartTracking()) this will end the thread and transfer control back to main thread by releasing trackingFinishedLockHolder
 }
 
@@ -1092,10 +1080,7 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
   returnvalue = m_DeviceProtocol->PHSR(OCCUPIED, &portHandle);
 
   if (returnvalue != NDIOKAY)
-  {
-    this->SetErrorMessage("Could not obtain a list of port handles that are connected");
-    return false;     // ToDo: Is this a fatal error?
-  }
+    {mitkThrowException(mitk::IGTHardwareException) << "Could not obtain a list of port handles that are connected";}
 
   /* if there are port handles that need to be initialized, initialize them. Furthermore instantiate tools for each handle that has no tool yet. */
   std::string ph;
@@ -1123,22 +1108,20 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
     {
       if (returnvalue != NDIOKAY)
       {
-        this->SetErrorMessage((std::string("Could not initialize port '") + ph +
-          std::string("' for tool '")+ newTool->GetToolName() + std::string("'")).c_str());
-        return false;
+        mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not initialize port '") + ph +
+          std::string("' for tool '")+ newTool->GetToolName() + std::string("'")).c_str();
       }
       /* enable the port handle */
       returnvalue = m_DeviceProtocol->PENA(&ph, newTool->GetTrackingPriority()); // Enable tool
       if (returnvalue != NDIOKAY)
       {
-        this->SetErrorMessage((std::string("Could not enable port '") + ph +
-          std::string("' for tool '")+ newTool->GetToolName() + std::string("'")).c_str());
-        return false;
+        mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not enable port '") + ph +
+          std::string("' for tool '")+ newTool->GetToolName() + std::string("'")).c_str();
       }
     }
     //we have to temporarily unlock m_ModeMutex here to avoid a deadlock with another lock inside InternalAddTool()
     if (this->InternalAddTool(newTool) == false)
-      this->SetErrorMessage("Error while adding new tool");
+      {mitkThrowException(mitk::IGTException) << "Error while adding new tool";}
     else occupiedPorts.push_back(i);
   }
 

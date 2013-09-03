@@ -47,6 +47,21 @@ set(CPP_FILES
   TrackingDevices/mitkVirtualTrackingTool.cpp
 )
 
+set(RESOURCE_FILES
+  ClaronMicron.stl
+  IntuitiveDaVinci.stl
+  NDIAurora.stl
+  NDIAurora_Dome.stl
+  NDIAuroraCompactFG_Dome.stl
+  NDIAuroraPlanarFG_Dome.stl
+  NDIAuroraTabletopFG_Dome.stl
+  NDIAuroraTabletopFG_Prototype_Dome.stl
+  NDIPolaris.stl
+  NDIPolarisVicra.stl
+  StandardVolume.stl
+)
+
+
 if(MITK_USE_MICRON_TRACKER)
   set(CPP_FILES ${CPP_FILES} TrackingDevices/mitkClaronInterface.cpp)
 else()

@@ -22,13 +22,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationData.h"
 
 namespace mitk {
-
   /**
-    * \brief Data structure which stores sets of mitk::NavigationData for
-    * multiple tools.
-    *
-    *
-    */
+  * \brief Data structure which stores sets of mitk::NavigationData for
+  * multiple tools.
+  *
+  *
+  */
   class MitkIGT_EXPORT NavigationDataSet : public BaseData
   {
   public:
@@ -37,33 +36,36 @@ namespace mitk {
     mitkNewMacro1Param(Self, unsigned int);
 
     /**
-      * \brief Add mitk::NavigationData of the given tool to the Set.
-      *
-      * @param toolIndex Index of the tool for which mitk::NavigationData should be added.
-      * @param navigationData mitk::NavigationData object to be added.
-      * @return true if object could be added to the set, false otherwise (e.g. tool with given index not existing)
-      */
-    bool InsertNavigationData( unsigned int toolIndex, NavigationData::Pointer navigationData );
+    * \brief Add mitk::NavigationData of the given tool to the Set.
+    *
+    * @param toolIndex Index of the tool for which mitk::NavigationData should be added.
+    * @param navigationData mitk::NavigationData object to be added.
+    * @return true if object could be added to the set, false otherwise (e.g. tool with given index not existing)
+    */
+    bool AddNavigationDatas( std::vector<mitk::NavigationData::Pointer> navigationDatas );
 
     /**
-      * \brief Get mitk::NavigationData from the given tool at given index.
-      *
-      * @param toolIndex Index of the tool from which mitk::NavigationData should be returned.
-      * @param index Index of the mitk::NavigationData object that should be returned.
-      * @return mitk::NavigationData at the specified indices, 0 if there is no object at the indices.
-      */
-    NavigationData::Pointer GetNavigationDataForIndex( unsigned int toolIndex, unsigned int index ) const;
+    * \brief Get mitk::NavigationData from the given tool at given index.
+    *
+    * @param toolIndex Index of the tool from which mitk::NavigationData should be returned.
+    * @param index Index of the mitk::NavigationData object that should be returned.
+    * @return mitk::NavigationData at the specified indices, 0 if there is no object at the indices.
+    */
+    NavigationData::Pointer GetNavigationDataForIndex( unsigned int index, unsigned int toolIndex ) const;
 
     /**
-      * \brief Get last mitk::Navigation object for given tool whose timestamp is less than the given timestamp.
-      * @param toolIndex Index of the tool from which mitk::NavigationData should be returned.
-      * @param timestamp Timestamp for selecting last object before.
-      * @return Last mitk::NavigationData with timestamp less than given timestamp, 0 if there is no adequate object.
-      */
-    NavigationData::Pointer GetNavigationDataBeforeTimestamp( unsigned int toolIndex, mitk::NavigationData::TimeStampType timestamp ) const;
+    * \brief Get last mitk::Navigation object for given tool whose timestamp is less than the given timestamp.
+    * @param toolIndex Index of the tool from which mitk::NavigationData should be returned.
+    * @param timestamp Timestamp for selecting last object before.
+    * @return Last mitk::NavigationData with timestamp less than given timestamp, 0 if there is no adequate object.
+    */
+    NavigationData::Pointer GetNavigationDataBeforeTimestamp( mitk::NavigationData::TimeStampType timestamp , unsigned int toolIndex ) const;
 
     unsigned int GetNumberOfTools();
     unsigned int GetNumberOfNavigationDatas(bool check = true);
+
+    virtual std::vector< mitk::NavigationData::Pointer >::iterator begin();
+    virtual std::vector< mitk::NavigationData::Pointer >::iterator end();
 
     // virtual methods, that need to be implemented, but aren't reasonable for NavigationData
     virtual void SetRequestedRegionToLargestPossibleRegion( );
@@ -73,15 +75,18 @@ namespace mitk {
 
   protected:
     /**
-      * \brief Constructs set with fixed number of tools.
-      * @param numTools How many tools are used with this mitk::NavigationDataSet.
-      */
+    * \brief Constructs set with fixed number of tools.
+    * @param numTools How many tools are used with this mitk::NavigationDataSet.
+    */
     NavigationDataSet( unsigned int numTools );
     virtual ~NavigationDataSet( );
 
     /**
-      * \brief Holds all the mitk::NavigationData objects managed by this class.
-      */
+    * \brief Holds all the mitk::NavigationData objects managed by this class.
+    *
+    * The first dimension is the index of the navigation data, the second is the
+    * tool to which this data belongs. i.e. the first dimension is usually the longer one.
+    */
     std::vector<std::vector<NavigationData::Pointer> > m_NavigationDataVectors;
   };
 }

@@ -19,45 +19,44 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::NavigationDataSet::NavigationDataSet( unsigned int numTools )
   : m_NavigationDataVectors(std::vector<std::vector<mitk::NavigationData::Pointer> >(numTools, std::vector<mitk::NavigationData::Pointer>()))
 {
-
 }
 
 mitk::NavigationDataSet::~NavigationDataSet( )
 {
 }
 
-bool mitk::NavigationDataSet::InsertNavigationData( unsigned int toolIndex, mitk::NavigationData::Pointer navigationData )
+bool mitk::NavigationDataSet::AddNavigationDatas( std::vector<mitk::NavigationData::Pointer> navigationDatas )
 {
-  // test if tool with given index exist
-  if ( toolIndex >= m_NavigationDataVectors.size() )
-  {
-    MITK_WARN("NavigationDataSet") << "There is no tool with index "<<toolIndex<<".";
-    return false;
-  }
+  //// test if tool with given index exist
+  //if ( toolIndex >= m_NavigationDataVectors.size() )
+  //{
+  //  MITK_WARN("NavigationDataSet") << "There is no tool with index " << toolIndex << ".";
+  //  return false;
+  //}
 
-  // test for consistent timestamp
-  if ( m_NavigationDataVectors.at(toolIndex).size() > 0 &&
-       navigationData->GetIGTTimeStamp() <= (*(m_NavigationDataVectors.at(toolIndex).end()-1))->GetIGTTimeStamp())
-  {
-    MITK_WARN("NavigationDataSet") << "IGTTimeStamp of new NavigationData should be greater then timestamp of last NavigationData.";
-    return false;
-  }
+  //// test for consistent timestamp
+  //if ( m_NavigationDataVectors.at(toolIndex).size() > 0 &&
+  //     navigationData->GetIGTTimeStamp() <= (*(m_NavigationDataVectors.at(toolIndex).end()-1))->GetIGTTimeStamp())
+  //{
+  //  MITK_WARN("NavigationDataSet") << "IGTTimeStamp of new NavigationData should be greater then timestamp of last NavigationData.";
+  //  return false;
+  //}
 
-  m_NavigationDataVectors.at(toolIndex).push_back(navigationData);
+  //m_NavigationDataVectors.at(toolIndex).push_back(navigationData);
   return true;
 }
 
-mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataForIndex( unsigned int toolIndex, unsigned int index ) const
+mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataForIndex( unsigned int index, unsigned int toolIndex ) const
 {
   if ( toolIndex >= m_NavigationDataVectors.size() )
   {
-    MITK_WARN("NavigationDataSet") << "There is no tool with index "<<toolIndex<<".";
+    MITK_WARN("NavigationDataSet") << "There is no tool with index " << toolIndex << ".";
     return NULL;
   }
 
   if ( index >= m_NavigationDataVectors.at(toolIndex).size() )
   {
-    MITK_WARN("NavigationDataSet") << "There is no mitk::Navigation with index "<<index<<" for tool "<<toolIndex<<".";
+    MITK_WARN("NavigationDataSet") << "There is no mitk::Navigation with index " << index << " for tool " << toolIndex << ".";
     return NULL;
   }
 
@@ -65,12 +64,11 @@ mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataForIndex
 }
 
 mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataBeforeTimestamp(
-    unsigned int toolIndex, mitk::NavigationData::TimeStampType timestamp
-    ) const
+  mitk::NavigationData::TimeStampType timestamp, unsigned int toolIndex) const
 {
   if ( toolIndex >= m_NavigationDataVectors.size() )
   {
-    MITK_WARN("NavigationDataSet") << "There is no tool with index "<<toolIndex<<".";
+    MITK_WARN("NavigationDataSet") << "There is no tool with index " << toolIndex << ".";
     return NULL;
   }
 
@@ -79,7 +77,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataBeforeTi
   // iterate through all NavigationData objects of the given tool index
   // till the timestamp of the NavigationData is greater then the given timestamp
   for (it = m_NavigationDataVectors.at(toolIndex).begin();
-       it != m_NavigationDataVectors.at(toolIndex).end(); ++it)
+    it != m_NavigationDataVectors.at(toolIndex).end(); ++it)
   {
     if ( (*it)->GetIGTTimeStamp() > timestamp) { break; }
   }
@@ -108,9 +106,8 @@ unsigned int mitk::NavigationDataSet::GetNumberOfNavigationDatas(bool check)
 
   if (check)
   {
-
     for (std::vector<std::vector<NavigationData::Pointer> >::iterator it = m_NavigationDataVectors.begin()+1;
-         it != m_NavigationDataVectors.end(); ++it)
+      it != m_NavigationDataVectors.end(); ++it)
     {
       if (it->size() != number)
       {
@@ -130,15 +127,31 @@ void mitk::NavigationDataSet::SetRequestedRegionToLargestPossibleRegion()
 
 bool mitk::NavigationDataSet::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-    return false;
+  return false;
 }
 
 bool mitk::NavigationDataSet::VerifyRequestedRegion()
 {
-    return true;
+  return true;
 }
 
 void mitk::NavigationDataSet::SetRequestedRegion(const DataObject * )
 {
 }
 // <--- methods necessary for BaseData
+
+// <--- methods for Iterators
+
+std::vector< mitk::NavigationData::Pointer >::iterator mitk::NavigationDataSet::begin()
+{
+  //TODO default implementation
+  std::vector< mitk::NavigationData::Pointer >::iterator result;
+  return result;
+}
+
+std::vector< mitk::NavigationData::Pointer >::iterator mitk::NavigationDataSet::end()
+{
+  //TODO default implementation
+  std::vector< mitk::NavigationData::Pointer >::iterator result;
+  return result;
+}

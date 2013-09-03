@@ -37,6 +37,8 @@ public:
   LegacyFileWriterService(mitk::FileWriterWithInformation::Pointer legacyWriter, const std::string& basedataType,
                           const std::string& extension, const std::string& description);
 
+  ~LegacyFileWriterService();
+
   using AbstractFileWriter::Write;
 
   virtual void Write(const BaseData* data, const std::string& path);
@@ -53,6 +55,7 @@ private:
 
     LegacyFileWriterService* Clone() const;
 
+    us::ServiceRegistration<IFileWriter> m_ServiceRegistration;
 };
 
 } // namespace mitk

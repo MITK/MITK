@@ -84,7 +84,7 @@ namespace mitk
     *
     * @throw mitk::IGTException Throws an exception if cannot go back to particular snapshot.
     */
-    void GoToSnapshot(int i);
+    void GoToSnapshot(unsigned int i);
 
     /**
     * \brief Used for pipeline update just to tell the pipeline

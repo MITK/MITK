@@ -102,10 +102,19 @@ void mitk::NavigationDataPlayer::UpdateOutputInformation()
 
 void mitk::NavigationDataPlayer::InitPlayer()
 {
-  mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-  reader->SetFileName(m_FileName);
-  this->SetNavigationDataReader(reader.GetPointer());
-  this->ReadNavigationDataSet();
+  if (!m_FileName.empty())
+  {
+    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+    reader->SetFileName(m_FileName);
+    this->SetNavigationDataReader(reader.GetPointer());
+    this->ReadNavigationDataSet();
+  }
+
+  if ( m_NavigationDataSet.IsNull() )
+  {
+    mitkThrowException(mitk::IGTException)
+        << "NavigationDataSet has to be set before initializing player.";
+  }
 
   m_NumberOfOutputs = m_NavigationDataSet->GetNumberOfTools();
   SetNumberOfRequiredOutputs(m_NumberOfOutputs);
@@ -124,28 +133,24 @@ void mitk::NavigationDataPlayer::InitPlayer()
 
 void mitk::NavigationDataPlayer::StartPlaying()
 {
-  if (m_NavigationDataSet.IsNull())
-  {
-    this->InitPlayer();
-  }
+  // make sure that player is initialized before playing starts
+  this->InitPlayer();
 
-  if (m_NavigationDataSet.IsNotNull())
-  {
-    m_CurPlayerState = PlayerRunning;
-    m_NavigationDataSetIterator = m_NavigationDataSet->Begin();
-    m_StartPlayingTimeStamp = mitk::IGTTimeStamp::GetInstance()->GetElapsed()
-        - m_NavigationDataSet->Begin()->at(0)->GetIGTTimeStamp();
-  }
-  else
-  {
-    MITK_ERROR << "Cannot start playing with empty NavigationData set.";
-  }
+  // set state and iterator for playing from start
+  m_CurPlayerState = PlayerRunning;
+  m_NavigationDataSetIterator = m_NavigationDataSet->Begin();
+
+  // timestamp for indicating playing start is set to the past
+  // so that the first navigation data object will be shown NOW
+  m_StartPlayingTimeStamp = mitk::IGTTimeStamp::GetInstance()->GetElapsed()
+      - m_NavigationDataSet->Begin()->at(0)->GetIGTTimeStamp();
 }
 
 void mitk::NavigationDataPlayer::StopPlaying()
 {
   m_CurPlayerState = PlayerStopped;
 
+  // reset playing timestamps
   m_StartPlayingTimeStamp = 0;
   m_PauseTimeStamp = 0;
 }

@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataReaderInterface.h"
 
 namespace mitk {
-  class NavigationDataReaderCSV : public NavigationDataReaderInterface
+  class MitkIGT_EXPORT NavigationDataReaderCSV : public NavigationDataReaderInterface
   {
 
   };

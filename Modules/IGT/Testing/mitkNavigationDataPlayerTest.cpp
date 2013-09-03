@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataPlayer.h"
 #include "mitkNavigationData.h"
+#include "mitkNavigationDataReaderXML.h"
 
 #include "mitkTestingMacros.h"
 #include "mitkStandardFileLocations.h"
@@ -35,6 +36,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkNavigationDataPlayerTestClass
   {
   public:
+    static mitk::NavigationDataSet::Pointer GetNavigationDataSetFromXML(std::string filename)
+    {
+      mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+      reader->SetFileName(filename);
+      return reader->Read();
+    }
+
     static void TestInstantiation()
     {
     // let's create an object of our class
@@ -53,15 +61,20 @@ class mitkNavigationDataPlayerTestClass
     // let's create an object of our class
     mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
 
+    // create a file reader for the navigation data xml file
+    mitk::NavigationDataReaderXML::Pointer navigationDataReader = mitk::NavigationDataReaderXML::New();
     std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData.xml", "Modules/IGT/Testing/Data");
+    navigationDataReader->SetFileName( file );
 
-    player->SetFileName( file );
+    // set NavigationDataSet to player
+    mitk::NavigationDataSet::Pointer navigationDataSet = navigationDataReader->Read();
+    player->SetNavigationDataSet( navigationDataSet );
+    MITK_TEST_CONDITION_REQUIRED( navigationDataSet == player->GetNavigationDataSet() ,
+                                  "Testing SetNavigationDataSet and GetNavigationDataSet." );
 
-    MITK_TEST_CONDITION_REQUIRED( strcmp(player->GetFileName(), file.c_str()) == 0, "Testing SetFileName and GetFileName");
-    //exception is thrown in StartPlaying method
     player->StartPlaying();
     player->Update();
-    player->StopPlaying();;
+    player->StopPlaying();
 
     mitk::NavigationData::Pointer nd = player->GetOutput();
     mitk::Point3D pnt;
@@ -72,7 +85,7 @@ class mitkNavigationDataPlayerTestClass
     MITK_TEST_CONDITION_REQUIRED( nd->GetPosition() == pnt, "Testing position of replayed NavigaionData" );
 
     player = mitk::NavigationDataPlayer::New();
-    player->SetFileName( file );
+    player->SetNavigationDataSet( navigationDataReader->Read() );
 
     std::vector<double> times, refTimes;
     refTimes.resize(5);
@@ -132,11 +145,13 @@ class mitkNavigationDataPlayerTestClass
     // let's create an object of our class
     mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
 
+    // create a file reader for the navigation data xml file
+    mitk::NavigationDataReaderXML::Pointer navigationDataReader = mitk::NavigationDataReaderXML::New();
     std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData.xml", "Modules/IGT/Testing/Data");
+    navigationDataReader->SetFileName( file );
 
-    player->SetFileName( file );
-
-    MITK_TEST_CONDITION_REQUIRED( strcmp(player->GetFileName(), file.c_str()) == 0, "Testing SetFileName and GetFileName");
+    // set NavigationDataSet to player
+    player->SetNavigationDataSet( navigationDataReader->Read() );
 
     player->StartPlaying();
     player->Update();
@@ -161,7 +176,7 @@ class mitkNavigationDataPlayerTestClass
     player->StopPlaying();
 
     player = mitk::NavigationDataPlayer::New();
-    player->SetFileName( file );
+    player->SetNavigationDataSet( navigationDataReader->Read() );
 
     std::vector<double> times, refTimes;
     refTimes.resize(5);
@@ -266,7 +281,8 @@ class mitkNavigationDataPlayerTestClass
     //case 1: non-existing file
     player = mitk::NavigationDataPlayer::New();
     bool InvalidStreamException1 = false;
-    player->SetFileName( "ffdsd" );
+    MITK_TEST_FOR_EXCEPTION(mitk::IGTIOException,
+                            player->SetNavigationDataSet(mitkNavigationDataPlayerTestClass::GetNavigationDataSetFromXML(file)));
     try
     {
     player->StartPlaying();
@@ -285,7 +301,7 @@ class mitkNavigationDataPlayerTestClass
     player = mitk::NavigationDataPlayer::New();
     bool InvalidStreamException2 = false;
     file = mitk::StandardFileLocations::GetInstance()->FindFile("SROMFile.rom", "Modules/IGT/Testing/Data");
-    player->SetFileName( file );
+    player->SetNavigationDataSet(mitkNavigationDataPlayerTestClass::GetNavigationDataSetFromXML(file));
     try
     {
     player->StartPlaying();
@@ -303,7 +319,7 @@ class mitkNavigationDataPlayerTestClass
     //case 3: wrong file version
     player = mitk::NavigationDataPlayer::New();
     file = mitk::StandardFileLocations::GetInstance()->FindFile("InvalidVersionNavigationDataTestData.xml", "Modules/IGT/Testing/Data");
-    player->SetFileName( file );
+    player->SetNavigationDataSet(mitkNavigationDataPlayerTestClass::GetNavigationDataSetFromXML(file));
     bool InvalidStreamException3 = false;
     try
     {
@@ -319,8 +335,15 @@ class mitkNavigationDataPlayerTestClass
     MITK_TEST_CONDITION_REQUIRED(InvalidStreamException3, "Testing Invalid Stream method if exception (wrong file version) was thrown.");
 
     //case 4: wrong file
+    mitk::NavigationDataSet::Pointer navigationDataSet;
+    mitk::NavigationDataReaderXML::Pointer navigationDataReader = mitk::NavigationDataReaderXML::New();
+    navigationDataReader->SetFileName( "cs:\fsd/$%§²³ffdsd" );
+    MITK_TEST_FOR_EXCEPTION(mitk::IGTIOException,
+                            navigationDataSet = navigationDataReader->Read());
+
     player = mitk::NavigationDataPlayer::New();
-    player->SetFileName( "cs:\fsd/$%§²³ffdsd" );
+    player->SetNavigationDataSet( navigationDataSet );
+
     bool InvalidStreamException4=false;
     try
     {

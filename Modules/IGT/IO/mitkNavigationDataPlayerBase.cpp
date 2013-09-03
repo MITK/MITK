@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::NavigationDataPlayerBase::NavigationDataPlayerBase()
-  : m_StreamValid(true), m_ErrorMessage("")
 {
   m_Name ="Navigation Data Player Source";
 }

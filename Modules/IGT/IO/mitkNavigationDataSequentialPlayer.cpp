@@ -87,7 +87,7 @@ void mitk::NavigationDataSequentialPlayer::ReinitXML()
   }
 }
 
-void mitk::NavigationDataSequentialPlayer::GoToSnapshot(int i)
+void mitk::NavigationDataSequentialPlayer::GoToSnapshot(unsigned int i)
 {
   if(!m_Repeat && (this->GetNumberOfSnapshots()<i))
     {
@@ -192,15 +192,14 @@ void mitk::NavigationDataSequentialPlayer::GenerateData()
     if(tmp.IsNotNull())
       {
       output->Graft(tmp);
-      m_StreamValid = true;
+      //m_StreamValid = true;
       }
     else // no valid output
       {
       output->SetDataValid(false);
-      m_StreamValid = false;
+      //m_StreamValid = false;
 
-      m_ErrorMessage = "Error: Cannot parse input file.";
-      mitkThrowException(mitk::IGTException)<<m_ErrorMessage;
+      mitkThrowException(mitk::IGTException) << "Error: Cannot parse input file.";
       }
   }
 }

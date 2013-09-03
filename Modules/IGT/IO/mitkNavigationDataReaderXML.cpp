@@ -33,7 +33,7 @@ mitk::NavigationDataReaderXML::~NavigationDataReaderXML()
   delete m_currentNode;
   delete m_parentElement;
 
-  if (m_StreamSetOutsideFromClass) { delete m_Stream; }
+  if (!m_StreamSetOutsideFromClass) { delete m_Stream; }
 }
 
 mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read()

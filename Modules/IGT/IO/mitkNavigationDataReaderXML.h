@@ -25,7 +25,7 @@ class TiXmlNode;
 
 namespace mitk {
 
-  class NavigationDataReaderXML : public NavigationDataReaderInterface
+  class MitkIGT_EXPORT NavigationDataReaderXML : public NavigationDataReaderInterface
   {
   public:
     mitkClassMacro(NavigationDataReaderXML, NavigationDataReaderInterface);

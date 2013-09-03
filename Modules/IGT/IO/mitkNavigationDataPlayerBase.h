@@ -43,20 +43,8 @@ namespace mitk{
     */
     virtual void UpdateOutputInformation();
 
-    /** @return Returns an error message if there was one (e.g. if the stream is invalid).
-     *          Returns an empty string if there was no error in the current stream.
-     */
-    itkGetStringMacro(ErrorMessage);
-
-    /** @return Retruns if the current stream is valid or not. */
-    itkGetMacro(StreamValid,bool);
-
-   /**
-    * \brief This method checks if player arrived at end of file.
-    *
-    *\warning This method is not tested yet. It is not save to use!
-    */
-    bool IsAtEnd();
+    itkGetMacro(NavigationDataSet, NavigationDataSet::Pointer);
+    itkSetMacro(NavigationDataSet, NavigationDataSet::Pointer);
 
     itkGetMacro(NavigationDataReader, NavigationDataReaderInterface::Pointer);
     itkSetMacro(NavigationDataReader, NavigationDataReaderInterface::Pointer);
@@ -64,23 +52,20 @@ namespace mitk{
   protected:
     NavigationDataPlayerBase();
     virtual ~NavigationDataPlayerBase();
+
     virtual void GenerateData() = 0;
 
     void ReadNavigationDataSet();
     void GraftEmptyOutput();
 
-    mitk::NavigationDataReaderInterface::Pointer m_NavigationDataReader;
-    mitk::NavigationDataSet::Pointer m_NavigationDataSet;
+    NavigationDataReaderInterface::Pointer m_NavigationDataReader;
+    NavigationDataSet::Pointer m_NavigationDataSet;
 
     /**
     * \brief Creates NavigationData from XML element and returns it
     * @throw mitk::Exception Throws an exception if elem is NULL.
     */
     mitk::NavigationData::Pointer ReadNavigationData(TiXmlElement* elem);
-
-    bool m_StreamValid;                       ///< stores if the input stream is valid or not
-    std::string m_ErrorMessage;               ///< stores the error message if the stream is invalid
-
   };
 } // namespace mitk
 

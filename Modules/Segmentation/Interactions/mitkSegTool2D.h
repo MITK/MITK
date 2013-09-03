@@ -76,9 +76,14 @@ class Segmentation_EXPORT SegTool2D : public Tool
     void SetShowMarkerNodes(bool);
 
     /**
-     * \brief Enables or disables the 3D interpolation after writing back the 2D segmentation result, and defaults to true.
+     * \brief Enables or disables the 3D interpolation after writing back the 2D segmentation result, and defaults to false.
      */
     void SetEnable3DInterpolation(bool);
+
+    /**
+     * \brief Enables or disables the 2D interpolation after writing back the 2D segmentation result, and defaults to false.
+     */
+    void SetEnable2DInterpolation(bool);
 
   protected:
 
@@ -141,6 +146,7 @@ class Segmentation_EXPORT SegTool2D : public Tool
 
     bool m_ShowMarkerNodes;
     bool m_3DInterpolationEnabled;
+    bool m_2DInterpolationEnabled;
 
     DiffSliceOperation* m_doOperation;
     DiffSliceOperation* m_undoOperation;

@@ -528,6 +528,7 @@ void mitk::LabelSetImage::SetActiveLabel(int index, bool sendEvent)
     this->m_LabelSet->SetActiveLabel(index);
     if (sendEvent)
         ModifyLabelEvent.Send(index);
+    this->Modified();
 }
 
 void mitk::LabelSetImage::SetLabelLocked(int index, bool value)

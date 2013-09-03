@@ -68,7 +68,7 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
     this->m_IRenderWindowPart = renderWindowPart;
     this->m_Parent->setEnabled(true);
 
-    QmitkRenderWindow* renderWindow = renderWindowPart->GetQmitkRenderWindow("stdmulti.widget1");
+    QmitkRenderWindow* renderWindow = renderWindowPart->GetQmitkRenderWindow("axial");
     if (renderWindow)
     {
       if (m_AxialStepper) m_AxialStepper->deleteLater();
@@ -203,7 +203,7 @@ void QmitkImageNavigatorView::SetBorderColors()
 {
   if (m_IRenderWindowPart)
   {
-    QmitkRenderWindow* renderWindow = m_IRenderWindowPart->GetQmitkRenderWindow("stdmulti.widget1");
+    QmitkRenderWindow* renderWindow = m_IRenderWindowPart->GetQmitkRenderWindow("axial");
     if (renderWindow)
     {
       mitk::PlaneGeometry::ConstPointer geometry = renderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();

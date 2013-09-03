@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ui_QmitkLabelSetWidgetControls.h>
 
 #include "mitkWeakPointer.h"
+#include "mitkDataNode.h"
 
 #include <berryIBerryPreferences.h>
 
@@ -101,6 +102,9 @@ private:
     berry::IPreferences::Pointer m_Preferences;
 
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+
+    mitk::DataNode::Pointer m_ReferenceNode;
+    mitk::DataNode::Pointer m_WorkingNode;
 
     // handling of a list of known (organ name, organ color) combination
     // ATTENTION these methods are defined in QmitkSegmentationOrganNamesHandling.cpp

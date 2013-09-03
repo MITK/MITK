@@ -48,8 +48,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDateTime>
 
 
-QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent)
-  : QWidget(parent)
+QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent): QWidget(parent),
+m_ReferenceNode(0),
+m_WorkingNode(0)
 {
   m_Controls.setupUi(this);
 
@@ -122,15 +123,18 @@ void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
 {
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   mitk::DataNode* node = toolManager->GetWorkingData(0);
-  m_Controls.m_LabelSetTableWidget->setEnabled(node != NULL);
-  m_Controls.m_LabelSearchBox->setEnabled(node != NULL);
-  m_Controls.m_btSaveLabelSet->setEnabled(node != NULL);
-  m_Controls.m_btNewLabel->setEnabled(node != NULL);
-  m_Controls.m_btImportLabelSet->setEnabled(node != NULL);
+  if (m_WorkingNode == node) return;
 
-  if (node != NULL)
+  m_WorkingNode = node;
+  m_Controls.m_LabelSetTableWidget->setEnabled(m_WorkingNode.IsNotNull());
+  m_Controls.m_LabelSearchBox->setEnabled(m_WorkingNode.IsNotNull());
+  m_Controls.m_btSaveLabelSet->setEnabled(m_WorkingNode.IsNotNull());
+  m_Controls.m_btNewLabel->setEnabled(m_WorkingNode.IsNotNull());
+  m_Controls.m_btImportLabelSet->setEnabled(m_WorkingNode.IsNotNull());
+
+  if (m_WorkingNode.IsNotNull())
   {
-    mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>( node->GetData() );
+    mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>( m_WorkingNode->GetData() );
     m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(lsImage);
   }
   else
@@ -140,8 +144,11 @@ void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
 void QmitkLabelSetWidget::OnToolManagerReferenceDataModified()
 {
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  m_Controls.m_btNewLabelSet->setEnabled(toolManager->GetReferenceData(0));
-  m_Controls.m_btLoadLabelSet->setEnabled(toolManager->GetReferenceData(0));
+  mitk::DataNode* node = toolManager->GetReferenceData(0);
+  if (m_ReferenceNode == node) return;
+  m_ReferenceNode = node;
+  m_Controls.m_btNewLabelSet->setEnabled(m_ReferenceNode.IsNotNull());
+  m_Controls.m_btLoadLabelSet->setEnabled(m_ReferenceNode.IsNotNull());
 }
 
 void QmitkLabelSetWidget::OnSearchLabel()

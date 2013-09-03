@@ -98,6 +98,8 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
     void SetDataStorage( mitk::DataStorage::Pointer storage );
     mitk::DataStorage* GetDataStorage();
 
+    void OnWorkingImageModified(const itk::EventObject&);
+
     /**
       Just public because it is called by itk::Commands. You should not need to call this.
     */
@@ -117,7 +119,7 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
     /**
       Just public because it is called by itk::Commands. You should not need to call this.
     */
-    void OnInterpolationInfoChanged(const itk::EventObject&);
+    void OnSliceInterpolationInfoChanged(const itk::EventObject&);
 
     /**
       Just public because it is called by itk::Commands. You should not need to call this.
@@ -188,8 +190,10 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
 
   protected:
 
-    const std::map<QAction*, mitk::SliceNavigationController*> createActionToSliceDimension();
-    std::map<QAction*, mitk::SliceNavigationController*> ACTION_TO_SLICEDIMENSION;
+    typedef std::map<QAction*, mitk::SliceNavigationController*> ActionToSliceDimensionMapType;
+
+    const ActionToSliceDimensionMapType CreateActionToSliceDimension();
+    ActionToSliceDimensionMapType m_ActionToSliceDimensionMap;
 
     void AcceptAllInterpolations(mitk::SliceNavigationController* slicer);
 
@@ -227,7 +231,7 @@ private:
     void Show2DInterpolationControls(bool show);
     void Show3DInterpolationControls(bool show);
 
-    mitk::SegmentationInterpolationController::Pointer m_InterpolatorController;
+    mitk::SegmentationInterpolationController::Pointer m_SliceInterpolatorController;
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
     mitk::ToolManager::Pointer m_ToolManager;
@@ -258,7 +262,10 @@ private:
     mitk::LabelSetImage::Pointer m_WorkingImage;
 
     mitk::SliceNavigationController* m_LastSNC;
+
     unsigned int m_LastSliceIndex;
+
+    unsigned long m_WorkingImageObserverID;
 
     QHash<mitk::SliceNavigationController*, unsigned int> m_TimeStep;
 

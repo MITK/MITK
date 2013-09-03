@@ -110,9 +110,12 @@ void mitk::ImageToContourModelFilter::ExtractContoursITKProcessing (itk::Image<T
 
 //  for (unsigned int i = 0; i < foundPaths; i++)
 //  {
-    const ContourPath* currentPath = contourExtractor->GetOutput(0)->GetVertexList();
+  if (!contourExtractor->GetOutput(0)) return;
 
-    mitk::ProgressBar::GetInstance()->AddStepsToDo( currentPath->Size() );
+  const ContourPath* currentPath = contourExtractor->GetOutput(0)->GetVertexList();
+
+    if (m_UseProgressBar)
+      mitk::ProgressBar::GetInstance()->AddStepsToDo( currentPath->Size() );
 
     for (unsigned int j = 0; j < currentPath->Size(); j++)
     {

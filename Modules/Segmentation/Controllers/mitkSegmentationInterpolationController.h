@@ -135,7 +135,9 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     */
     Image::Pointer Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, const mitk::PlaneGeometry* currentPlane, unsigned int timeStep );
 
-    void OnWorkingImageModified(const itk::EventObject&);
+    void BuildLabelCount();
+
+   // void OnWorkingImageModified(const itk::EventObject&);
 
     /**
      * Activate/Deactivate the 2D interpolation.
@@ -150,8 +152,8 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     class Segmentation_EXPORT SetChangedSliceOptions
     {
       public:
-        SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t, void* pixels )
-          : sliceDimension(sd), sliceIndex(si), dim0(d0), dim1(d1), timeStep(t), pixelData(pixels)
+        SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t)
+          : sliceDimension(sd), sliceIndex(si), dim0(d0), dim1(d1), timeStep(t)
         {
         }
 
@@ -160,7 +162,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
         unsigned int dim0;
         unsigned int dim1;
         unsigned int timeStep;
-        void* pixelData;
+//        void* pixelData;
     };
 
     typedef std::vector<unsigned int> LabelCounterVectorType;
@@ -178,8 +180,8 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     template < typename TPixel, unsigned int VImageDimension >
     void ScanChangedVolume( itk::Image<TPixel, VImageDimension>*, unsigned int timeStep );
 
-    template < typename PixelType >
-    void ScanWholeVolume( itk::Image<PixelType, 3>*, const Image* volume, unsigned int timeStep );
+//    template < typename PixelType >
+//    void ScanWholeVolume( itk::Image<PixelType, 3>*, const Image* volume, unsigned int timeStep );
 
     void PrintStatus();
 
@@ -196,9 +198,11 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     LabelSetImage::Pointer m_WorkingImage;
     Image::Pointer m_ReferenceImage;
 
-    unsigned long m_WorkingImageObserverID;
+ //   unsigned long m_WorkingImageObserverID;
 
     int m_ActiveLabel;
+    int m_NumberOfLabels;
+    int m_CurrentNumberOfLabels;
     bool m_BlockModified;
     bool m_2DInterpolationActivated;
 };

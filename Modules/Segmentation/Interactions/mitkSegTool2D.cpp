@@ -15,27 +15,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkSegTool2D.h"
-#include "mitkToolManager.h"
 
+#include "mitkToolManager.h"
 #include "mitkDataStorage.h"
 #include "mitkBaseRenderer.h"
-
 #include "mitkPlaneGeometry.h"
-
-#include "mitkExtractImageFilter.h"
-#include "mitkExtractDirectedPlaneImageFilter.h"
-
-//Include of the new ImageExtractor
-#include "mitkExtractDirectedPlaneImageFilterNew.h"
 #include "mitkPlanarCircle.h"
-#include "mitkOverwriteSliceImageFilter.h"
-#include "mitkOverwriteDirectedPlaneImageFilter.h"
-
 #include "mitkGetModuleContext.h"
 
-//Includes for 3DSurfaceInterpolation
+
 #include "mitkImageToContourFilter.h"
 #include "mitkSurfaceInterpolationController.h"
+#include "mitkSegmentationInterpolationController.h"
 
 //includes for resling and overwriting
 #include <mitkExtractSliceFilter.h>
@@ -55,7 +46,8 @@ m_LastEventSender(NULL),
 m_LastEventSlice(0),
 m_Contourmarkername ("Position"),
 m_ShowMarkerNodes (false),
-m_3DInterpolationEnabled(true)
+m_3DInterpolationEnabled(false),
+m_2DInterpolationEnabled(true)
 {
 }
 
@@ -183,10 +175,8 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Plane
 
   Image::Pointer slice = extractor->GetOutput();
 
-  /*============= BEGIN undo feature block ========================*/
   //specify the undo operation with the non edited slice
   m_undoOperation = new DiffSliceOperation(const_cast<mitk::Image*>(image), extractor->GetVtkOutput(), slice->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
-  /*============= END undo feature block ========================*/
 
   return slice;
 }
@@ -220,14 +210,22 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   if ((!positionEvent) || (!slice)) return;
 
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
-
   if( !planeGeometry ) return;
 
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
+
   unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( image );
   this->WriteBackSegmentationResult(planeGeometry, slice, timeStep);
   slice->DisconnectPipeline();
+
+  if (m_2DInterpolationEnabled)
+  {
+    int clickedSliceDimension(-1);
+    int clickedSliceIndex(-1);
+    mitk::SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, clickedSliceDimension, clickedSliceIndex );
+    mitk::SegmentationInterpolationController::InterpolatorForImage(image)->SetChangedSlice( slice, clickedSliceDimension, clickedSliceIndex, timeStep );
+  }
 
   if (m_3DInterpolationEnabled )
   {
@@ -281,15 +279,22 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
   extractor->SetWorldGeometry( planeGeometry );
   extractor->SetVtkOutputRequest(true);
   extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
-
   extractor->Modified();
-  extractor->Update();
+
+  try
+  {
+    extractor->Update();
+  }
+  catch ( itk::ExceptionObject & excep )
+  {
+      MITK_ERROR << "Exception caught: " << excep.GetDescription();
+      return;
+  }
 
   //the image was modified within the pipeline, but not marked so
   image->Modified();
   image->GetVtkImageData()->Modified();
 
-  /*============= BEGIN undo feature block ========================*/
   //specify the undo operation with the edited slice
   m_doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(),slice->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
 
@@ -302,7 +307,6 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
   //clear the pointers as the operation are stored in the undocontroller and also deleted from there
   m_undoOperation = NULL;
   m_doOperation = NULL;
-  /*============= END undo feature block ========================*/
 }
 
 void mitk::SegTool2D::SetShowMarkerNodes(bool status)
@@ -313,6 +317,11 @@ void mitk::SegTool2D::SetShowMarkerNodes(bool status)
 void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)
 {
   m_3DInterpolationEnabled = enabled;
+}
+
+void mitk::SegTool2D::SetEnable2DInterpolation(bool enabled)
+{
+  m_2DInterpolationEnabled = enabled;
 }
 
 unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )

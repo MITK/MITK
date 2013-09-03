@@ -161,7 +161,7 @@ bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* state
   ContourUtils::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue, timestep );
 
   // 6. Write back the slice into our working image
-  this->WriteBackSegmentationResult(planeGeometry, slice, timestep);
+  this->WriteBackSegmentationResult(positionEvent, slice);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 

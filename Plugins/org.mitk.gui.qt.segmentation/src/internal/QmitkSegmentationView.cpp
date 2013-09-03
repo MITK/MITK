@@ -234,16 +234,17 @@ void QmitkSegmentationView::OnSegmentationSelectionChanged(const mitk::DataNode 
       mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
       assert(toolManager);
 
-      mitk::DataNode* segNode = const_cast<mitk::DataNode*>(node);
-      segNode->SetVisibility(true);
-      toolManager->SetWorkingData(segNode);
+      mitk::DataNode* workingNode = const_cast<mitk::DataNode*>(node);
+      workingNode->SetVisibility(true);
+      toolManager->SetWorkingData(workingNode);
       m_Controls->m_SlicesInterpolator->setEnabled( true );
+//      m_Controls->m_SlicesInterpolator->SetWorkingImage( dynamic_cast< mitk::LabelSetImage*>( workingNode->GetData() ) );
 
       mitk::DataStorage::SetOfObjects::ConstPointer others = this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
       for(mitk::DataStorage::SetOfObjects::const_iterator iter = others->begin(); iter != others->end(); ++iter)
       {
         mitk::DataNode* _other = *iter;
-        if (_other != segNode)
+        if (_other != workingNode)
           _other->SetVisibility(false);
       }
   }

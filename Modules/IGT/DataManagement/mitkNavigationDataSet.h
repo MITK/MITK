@@ -62,6 +62,9 @@ namespace mitk {
       */
     NavigationData::Pointer GetNavigationDataBeforeTimestamp( unsigned int toolIndex, mitk::NavigationData::TimeStampType timestamp ) const;
 
+    unsigned int GetNumberOfTools();
+    unsigned int GetNumberOfNavigationDatas(bool check = true);
+
     // virtual methods, that need to be implemented, but aren't reasonable for NavigationData
     virtual void SetRequestedRegionToLargestPossibleRegion( );
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion( );

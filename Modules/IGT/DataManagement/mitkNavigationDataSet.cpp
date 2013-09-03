@@ -95,6 +95,34 @@ mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataBeforeTi
   return *(it-1);
 }
 
+unsigned int mitk::NavigationDataSet::GetNumberOfTools()
+{
+  return m_NavigationDataVectors.size();
+}
+
+unsigned int mitk::NavigationDataSet::GetNumberOfNavigationDatas(bool check)
+{
+  if (this->GetNumberOfTools() == 0) { return 0; };
+
+  unsigned int number = m_NavigationDataVectors.at(0).size();;
+
+  if (check)
+  {
+
+    for (std::vector<std::vector<NavigationData::Pointer> >::iterator it = m_NavigationDataVectors.begin()+1;
+         it != m_NavigationDataVectors.end(); ++it)
+    {
+      if (it->size() != number)
+      {
+        MITK_WARN << "Number of NavigationData objects differs for different tools.";
+        return -1;
+      }
+    }
+  }
+
+  return number;
+}
+
 // ---> methods necessary for BaseData
 void mitk::NavigationDataSet::SetRequestedRegionToLargestPossibleRegion()
 {

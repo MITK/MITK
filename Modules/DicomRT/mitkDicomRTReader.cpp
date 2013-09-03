@@ -83,11 +83,6 @@ namespace mitk
     }
   }
 
-
-
-
-
-
   ContourModelVector DicomRTReader::ReadDicomFile(char* filename)
   {
     std::cout << "Filename:" << filename << "\n\n";

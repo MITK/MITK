@@ -368,7 +368,6 @@ protected:
       itk::NotImageFilter<BinaryImageType, BinaryImageType>::Pointer notFilter = itk::NotImageFilter<BinaryImageType, BinaryImageType>::New();
       notFilter->SetInput(itkFixedImageMask);
       notFilter->Update();
-
       fixedMaskSpatialObject->SetImage( notFilter->GetOutput() );
       metric->SetFixedImageMask( fixedMaskSpatialObject );
     }

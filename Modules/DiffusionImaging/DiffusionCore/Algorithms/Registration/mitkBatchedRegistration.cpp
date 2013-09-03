@@ -3,7 +3,11 @@
 #include "mitkDiffusionImage.h"
 
 #include <mitkRotationOperation.h>
+
 #include <itkScalableAffineTransform.h>
+#include <vnl/vnl_inverse.h>
+// VTK
+#include <vtkTransform.h>
 
 mitk::BatchedRegistration::BatchedRegistration() :
   m_RegisteredImagesValid(false)
@@ -50,27 +54,20 @@ std::vector<mitk::Image::Pointer> mitk::BatchedRegistration::GetRegisteredImages
 
 void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer &img, const mitk::BatchedRegistration::TransformType &transformation) const
 {
- // TODO: perform some magic!
-  mitk::Vector3D translateVector;
-  translateVector[0] = transformation.get(0,3);
-  translateVector[1] = transformation.get(1,3);
-  translateVector[2] = transformation.get(2,3);
-  img->GetGeometry()->Translate(translateVector);
-
   itk::ScalableAffineTransform<mitk::ScalarType,3>::Pointer rotationTransform;
-  itk::Matrix<mitk::ScalarType, 3,3> rotationMatrix;
-  for (int i = 0; i < 3;++i)
-    for (int j = 0; j < 3;++j)
-      rotationMatrix[i][j] = transformation.get(i,j);
+  vtkMatrix4x4* transformationMatrix = vtkMatrix4x4::New();
+  for (int i = 0; i < 4;++i)
+    for (int j = 0; j < 4;++j)
+      transformationMatrix->Element[i][j] = transformation.get(i,j);
+
   rotationTransform  = itk::ScalableAffineTransform<mitk::ScalarType,3>::New();
-  rotationTransform->SetMatrix(rotationMatrix);
+
   itk::ScalableAffineTransform<mitk::ScalarType,3>::Pointer geometryTransform = img->GetGeometry()->GetIndexToWorldTransform();
-  geometryTransform->Compose(rotationTransform);
-  img->GetGeometry()->SetIndexToWorldTransform(geometryTransform);
+  img->GetGeometry()->Compose( transformationMatrix); //SetIndexToWorldTransform(geometryTransform);
 
   if (dynamic_cast<mitk::DiffusionImage<short>*> (img.GetPointer()) != NULL)
   {
-   // apply transformation to image geometry as well as to all gradients !?
+    // apply transformation to image geometry as well as to all gradients !?
   }
   else
   {
@@ -89,12 +86,15 @@ mitk::BatchedRegistration::TransformType mitk::BatchedRegistration::GetTransform
     registrationMethod->SetFixedImageMask(mask);
     registrationMethod->SetUseFixedImageMask(true);
   }
+  else
+  {
+    registrationMethod->SetUseFixedImageMask(false);
+  }
+
   registrationMethod->SetTransformToRigid();
   registrationMethod->SetCrossModalityOn();
   registrationMethod->SetMovingImage(movingImage);
   registrationMethod->Update();
-
-  // TODO fancy shit, where you query and create a transformation type object thingy
 
   TransformType transformation;
   mitk::PyramidImageRegistrationMethod::TransformMatrixType rotationMatrix;
@@ -113,6 +113,6 @@ mitk::BatchedRegistration::TransformType mitk::BatchedRegistration::GetTransform
   transformation.set(1,3,-param[4]);
   transformation.set(2,3,-param[5]);
   transformation.set(3,3,1);
-
+  //transformation =vnl_inverse<double>(transformation);
   return transformation;
 }

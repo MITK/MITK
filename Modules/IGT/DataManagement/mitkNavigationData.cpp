@@ -206,5 +206,21 @@ mitk::NavigationData::getRotationMatrix()
 mitk::Point3D
 mitk::NavigationData::Transform(const mitk::Point3D point)
 {
-  return point;
+  vnl_vector_fixed<ScalarType, 3> vnlPoint;
+
+  for (int i = 0; i < 3; ++i) {
+    vnlPoint[i] = point[i];
+  }
+
+  // first get rotated point
+  vnlPoint = this->GetOrientation().rotate(vnlPoint);
+
+  Point3D resultingPoint;
+
+  for (int i = 0; i < 3; ++i) {
+    // now copy it to our format + offset
+    resultingPoint[i] = vnlPoint[i] + this->GetPosition()[i];
+  }
+
+  return resultingPoint;
 }

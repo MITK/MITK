@@ -75,8 +75,8 @@ Quaternion m_Orientation;   ///< holds the orientation of the tool
 float m_TrackingError;    ///< holds the tracking error of the tool
 bool m_Enabled;           ///< if true, tool is enabled and should receive tracking updates from the tracking device
 bool m_DataValid;         ///< if true, data in m_Position and m_Orientation is valid, e.g. true tracking data
-Point3D m_ToolTip;
-Quaternion m_ToolTipRotation;
+Point3D m_ToolTip;        ///< translation of the tooltip transform
+Quaternion m_ToolTipRotation; ///< orientation of the tooltip transform
 bool m_ToolTipSet;
 };
 } // namespace mitk

@@ -244,6 +244,10 @@ namespace mitk {
       * \brief name of the navigation data
       */
       std::string m_Name;
+
+    private:
+
+      void ResetCovarianceValidity();
     };
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATA_H_HEADER_INCLUDED_ */

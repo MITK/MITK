@@ -259,8 +259,8 @@ class NavigationDataTestClass
 
     bool otherFlagsOk = (nd->IsDataValid() == ndInverse->IsDataValid())
                          && mitk::Equal(nd->GetIGTTimeStamp(), ndInverse->GetIGTTimeStamp())
-                         && (nd->GetHasPosition() == ndInverse->GetHasPosition())
-                         && (nd->GetHasOrientation() == ndInverse->GetHasOrientation())
+                         && (false == ndInverse->GetHasPosition()) // covariance update mechanism not yet implemented
+                         && (false == ndInverse->GetHasOrientation())
                          && (nd->GetCovErrorMatrix() == ndInverse->GetCovErrorMatrix())
                          && (std::string(nd->GetName()) == ndInverse->GetName());
 

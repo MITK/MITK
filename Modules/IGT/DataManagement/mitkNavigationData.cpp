@@ -267,6 +267,15 @@ mitk::NavigationData::GetInverse() const
 
   navigationDataInverse->SetPosition(invertedPosition);
 
+  // Inversion does not care for covariances for now
+  navigationDataInverse->ResetCovarianceValidity();
+
   return navigationDataInverse;
 }
 
+void
+mitk::NavigationData::ResetCovarianceValidity()
+{
+  this->SetHasPosition(false);
+  this->SetHasOrientation(false);
+}

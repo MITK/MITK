@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Rendering
 #include "mitkRenderingManager.h"
 #include "mitkPlanePositionManager.h"
-#include <mitkCoreDataNodeReader.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkShaderRepository.h>
 #include <mitkPropertyAliases.h>
@@ -117,9 +116,6 @@ public:
     m_PlanePositionManager.reset(new mitk::PlanePositionManagerService);
     context->RegisterService<mitk::PlanePositionManagerService>(m_PlanePositionManager.get());
 
-    m_CoreDataNodeReader.reset(new mitk::CoreDataNodeReader);
-    context->RegisterService<mitk::IDataNodeReader>(m_CoreDataNodeReader.get());
-
     m_ShaderRepository.reset(new mitk::ShaderRepository);
     context->RegisterService<mitk::IShaderRepository>(m_ShaderRepository.get());
 
@@ -170,7 +166,6 @@ private:
 
   //mitk::RenderingManager::Pointer m_RenderingManager;
   std::auto_ptr<mitk::PlanePositionManagerService> m_PlanePositionManager;
-  std::auto_ptr<mitk::CoreDataNodeReader> m_CoreDataNodeReader;
   std::auto_ptr<mitk::ShaderRepository> m_ShaderRepository;
   std::auto_ptr<mitk::PropertyAliases> m_PropertyAliases;
   std::auto_ptr<mitk::PropertyDescriptions> m_PropertyDescriptions;

@@ -53,9 +53,9 @@ namespace mitk {
     FileWriterRegistry();
     ~FileWriterRegistry();
 
-    void Write(const mitk::BaseData* data, const std::string& path, us::ModuleContext* context = us::GetModuleContext());
+    static void Write(const mitk::BaseData* data, const std::string& path, us::ModuleContext* context = us::GetModuleContext());
 
-    void Write(const mitk::BaseData* data, std::ostream& os, us::ModuleContext* context = us::GetModuleContext());
+    static void Write(const mitk::BaseData* data, std::ostream& os, us::ModuleContext* context = us::GetModuleContext());
 
     /**
     * Returns a compatible Writer to the given file extension

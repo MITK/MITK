@@ -147,7 +147,7 @@ namespace mitk {
     int m_Priority;
     OptionList m_Options; // Options supported by this Writer. Can be left emtpy if no special options are required
 
-    virtual us::ServiceProperties GetServiceProperties();
+    virtual us::ServiceProperties GetServiceProperties() const;
 
   private:
 

@@ -34,66 +34,68 @@ namespace us {
 }
 
 namespace mitk {
-  //##Documentation
-  //## @brief Interface class of readers that read from files
-  //## @ingroup Process
-  class MITK_CORE_EXPORT AbstractFileReader : public mitk::IFileReader
-  {
-  public:
 
-    virtual std::vector< itk::SmartPointer<BaseData> > Read(const std::string& path, mitk::DataStorage *ds = 0 );
+/**
+ * @brief Interface class of readers that read from files
+ * @ingroup Process
+ */
+class MITK_CORE_EXPORT AbstractFileReader : public mitk::IFileReader
+{
 
-    virtual std::vector< itk::SmartPointer<BaseData> > Read(const std::istream& stream, mitk::DataStorage *ds = 0 ) = 0;
+public:
 
-    virtual int GetPriority() const;
+  virtual std::vector< itk::SmartPointer<BaseData> > Read(const std::string& path, mitk::DataStorage *ds = 0 );
 
-    virtual std::string GetExtension() const;
+  virtual std::vector< itk::SmartPointer<BaseData> > Read(const std::istream& stream, mitk::DataStorage *ds = 0 ) = 0;
 
-    virtual std::string GetDescription() const;
+  virtual int GetPriority() const;
 
-    virtual mitk::IFileReader::OptionList GetOptions() const;
+  virtual std::string GetExtension() const;
 
-    virtual void SetOptions(const mitk::IFileReader::OptionList& options);
+  virtual std::string GetDescription() const;
 
-    virtual bool CanRead(const std::string& path) const;
+  virtual mitk::IFileReader::OptionList GetOptions() const;
 
-    virtual void AddProgressCallback(const mitk::MessageAbstractDelegate<float>& callback);
+  virtual void SetOptions(const mitk::IFileReader::OptionList& options);
 
-    virtual void RemoveProgressCallback(const mitk::MessageAbstractDelegate<float>& callback);
+  virtual bool CanRead(const std::string& path) const;
 
-    us::ServiceRegistration<IFileReader> RegisterService(us::ModuleContext* context = us::GetModuleContext());
+  virtual void AddProgressCallback(const mitk::MessageAbstractDelegate<float>& callback);
 
-  protected:
-    AbstractFileReader();
-    ~AbstractFileReader();
+  virtual void RemoveProgressCallback(const mitk::MessageAbstractDelegate<float>& callback);
 
-    AbstractFileReader(const AbstractFileReader& other);
+  us::ServiceRegistration<IFileReader> RegisterService(us::ModuleContext* context = us::GetModuleContext());
 
-    AbstractFileReader(const std::string& extension, const std::string& description);
+protected:
 
-    // Minimal Service Properties: ALWAYS SET THESE IN CONSTRUCTOR OF DERIVED CLASSES!
-    std::string m_Extension;
-    std::string m_Description;
-    int m_Priority;
+  AbstractFileReader();
+  ~AbstractFileReader();
 
-    /**
-    * \brief Options supported by this reader. Set sensible default values!
-    *
-    * Can be left emtpy if no special options are required.
-    */
-    mitk::IFileReader::OptionList m_Options;
+  AbstractFileReader(const AbstractFileReader& other);
 
-    virtual us::ServiceProperties GetServiceProperties();
+  AbstractFileReader(const std::string& extension, const std::string& description);
 
-  private:
+  // Minimal Service Properties: ALWAYS SET THESE IN CONSTRUCTOR OF DERIVED CLASSES!
+  std::string m_Extension;
+  std::string m_Description;
+  int m_Priority;
 
-    us::PrototypeServiceFactory* m_PrototypeFactory;
+  /**
+   * \brief Options supported by this reader. Set sensible default values!
+   *
+   * Can be left emtpy if no special options are required.
+   */
+  mitk::IFileReader::OptionList m_Options;
 
-    virtual mitk::IFileReader* Clone() const = 0;
-  };
+  virtual us::ServiceProperties GetServiceProperties() const;
+
+private:
+
+  us::PrototypeServiceFactory* m_PrototypeFactory;
+
+  virtual mitk::IFileReader* Clone() const = 0;
+};
+
 } // namespace mitk
-
-// This is the microservice declaration. Do not meddle!
-US_DECLARE_SERVICE_INTERFACE(mitk::AbstractFileReader, "org.mitk.services.FileReader")
 
 #endif /* AbstractFileReader_H_HEADER_INCLUDED_C1E7E521 */

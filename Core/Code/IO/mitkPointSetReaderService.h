@@ -48,7 +48,7 @@ namespace mitk
   * @ingroup PSIO
   * @ingroup IO
   */
-  class MITK_CORE_EXPORT PointSetReaderService: public AbstractFileReader
+  class PointSetReaderService: public AbstractFileReader
   {
   public:
 
@@ -69,6 +69,8 @@ namespace mitk
     virtual bool CanRead(const std::string& path) const;
 
   protected:
+
+    PointSetReaderService(const PointSetReaderService& other);
 
     virtual mitk::PointSet::Pointer ReadPoint(mitk::PointSet::Pointer newPointSet,
       TiXmlElement* currentTimeSeries, unsigned int currentTimeStep);

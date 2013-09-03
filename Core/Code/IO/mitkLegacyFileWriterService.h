@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkAbstractFileWriter.h>
-#include <mitkFileWriter.h>
+#include <mitkFileWriterWithInformation.h>
 
 namespace mitk {
 
@@ -34,7 +34,7 @@ class LegacyFileWriterService : public mitk::AbstractFileWriter
 {
 public:
 
-  LegacyFileWriterService(mitk::FileWriter::Pointer legacyWriter, const std::string& basedataType,
+  LegacyFileWriterService(mitk::FileWriterWithInformation::Pointer legacyWriter, const std::string& basedataType,
                           const std::string& extension, const std::string& description);
 
   using AbstractFileWriter::Write;
@@ -43,9 +43,11 @@ public:
 
   virtual void Write(const BaseData* data, std::ostream& stream );
 
+  virtual bool CanWrite(const BaseData *data) const;
+
 protected:
 
-    mitk::FileWriter::Pointer m_LegacyWriter;
+    mitk::FileWriterWithInformation::Pointer m_LegacyWriter;
 
 private:
 

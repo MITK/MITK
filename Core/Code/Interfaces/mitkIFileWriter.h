@@ -90,10 +90,10 @@ namespace mitk {
     virtual float GetProgress() const = 0;
 
     // Microservice properties
-    static const std::string PROP_EXTENSION;
-    static const std::string PROP_BASEDATA_TYPE;
-    static const std::string PROP_DESCRIPTION;
-    static const std::string PROP_IS_LEGACY;
+    static std::string PROP_EXTENSION();
+    static std::string PROP_BASEDATA_TYPE();
+    static std::string PROP_DESCRIPTION();
+    static std::string PROP_IS_LEGACY();
 
   protected:
   };

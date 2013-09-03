@@ -16,45 +16,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkImage.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkImageTimeSelector.h"
+#include "mitkIOUtil.h"
+#include "mitkTestingMacros.h"
+
+#include <itkExceptionObject.h>
+
 #include <itksys/SystemTools.hxx>
 
-#include <fstream>
+
 int mitkImageTimeSelectorTest(int argc, char* argv[])
 {
+  MITK_TEST_BEGIN(ImageTimeSelector)
 
-  std::cout << "Loading file: ";
   if(argc==0)
   {
-    std::cout<<"no file specified [FAILED]"<<std::endl;
-    return EXIT_FAILURE;
+    MITK_TEST_FAILED_MSG( << "no file specified [FAILED]" )
   }
+
   mitk::Image::Pointer image = NULL;
-  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
   try
   {
-    factory->SetFileName( argv[1] );
-    factory->Update();
-
-    if(factory->GetNumberOfOutputs()<1)
-    {
-      std::cout<<"file could not be loaded [FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
+    mitk::DataNode::Pointer node = mitk::IOUtil::LoadDataNode(argv[1]);
     image = dynamic_cast<mitk::Image*>(node->GetData());
-    if(image.IsNull())
-    {
-      std::cout<<"file not an image - test will not be applied [PASSED]"<<std::endl;
-      std::cout<<"[TEST DONE]"<<std::endl;
-      return EXIT_SUCCESS;
-    }
+    MITK_TEST_CONDITION_REQUIRED(!image.IsNull(), "file not an image")
   }
-  catch ( itk::ExceptionObject & ex )
+  catch (const itk::ExceptionObject& ex )
   {
-    std::cout << "Exception: " << ex << "[FAILED]" << std::endl;
-    return EXIT_FAILURE;
+    MITK_TEST_FAILED_MSG( << "Exception: " << ex.what() << "[FAILED]" )
   }
 
   //Take a time step
@@ -64,27 +53,9 @@ int mitkImageTimeSelectorTest(int argc, char* argv[])
   timeSelector->UpdateLargestPossibleRegion();
   mitk::Image::Pointer result = timeSelector->GetOutput();
 
-  std::cout << "Testing IsInitialized(): ";
-  if(result->IsInitialized()==false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing if Volume is set ";
-  //result->DisconnectPipeline();
-  //timeSelector = NULL;
+  MITK_TEST_CONDITION(result->IsInitialized(), "Testin IsInitialized()")
+  MITK_TEST_CONDITION(result->IsVolumeSet(0), "Test IsVolumeSet(0)")
 
-  if( result->IsVolumeSet(0) == false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
-
-
-  std::cout<<"[TEST DONE]"<<std::endl;
-  return EXIT_SUCCESS;
+  MITK_TEST_END()
 }

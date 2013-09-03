@@ -22,12 +22,35 @@ mitk::IFileReader::~IFileReader()
 
 }
 
-const std::string mitk::IFileReader::PROP_EXTENSION = "org.mitk.services.FileReader.Extension";
-const std::string mitk::IFileReader::PROP_DESCRIPTION = "org.mitk.services.FileReader.Description";
-const std::string mitk::IFileReader::PROP_IS_LEGACY = "org.mitk.services.FileReader.IsLegacy";
+std::string mitk::IFileReader::PROP_EXTENSION()
+{
+  static std::string s = "org.mitk.services.FileReader.Extension";
+  return s;
+}
+
+std::string mitk::IFileReader::PROP_DESCRIPTION()
+{
+  static std::string s = "org.mitk.services.FileReader.Description";
+  return s;
+}
+
+std::string mitk::IFileReader::PROP_IS_LEGACY()
+{
+  static std::string s = "org.mitk.services.FileReader.IsLegacy";
+  return s;
+}
 
 /**
 * @brief Used to indicate that an image should be read as an binary image.
 */
-const std::string mitk::IFileReader::OPTION_READ_AS_BINARY = "org.mitk.services.FileReader.Option.ReadAsBinary";
-const std::string mitk::IFileReader::OPTION_READ_MULTIPLE_FILES = "org.mitk.services.FileReader.Option.ReadMultipleFiles";
+std::string mitk::IFileReader::OPTION_READ_AS_BINARY()
+{
+  static std::string s = "org.mitk.services.FileReader.Option.ReadAsBinary";
+  return s;
+}
+
+std::string mitk::IFileReader::OPTION_READ_MULTIPLE_FILES()
+{
+  static std::string s = "org.mitk.services.FileReader.Option.ReadMultipleFiles";
+  return s;
+}

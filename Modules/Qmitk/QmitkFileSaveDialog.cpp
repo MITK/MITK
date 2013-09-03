@@ -74,7 +74,7 @@ public:
     return result;
   }
 
-  virtual void SetOptions(const std::vector< mitk::IFileWriter::FileServiceOption >& options )
+  virtual void SetOptions(const mitk::IFileWriter::OptionList& options )
   {
     m_Options = options;
     //m_Registration.SetProperties(GetServiceProperties());
@@ -129,7 +129,7 @@ void QmitkFileSaveDialog::ProcessSelectedFile()
   m_FileWriter->SetOptions(m_Options);
 }
 
-std::vector<mitk::IFileWriter::FileServiceOption> QmitkFileSaveDialog::QueryAvailableOptions(std::string path)
+mitk::IFileWriter::OptionList QmitkFileSaveDialog::QueryAvailableOptions(std::string path)
 {
   us::ModuleContext* context = us::GetModuleContext();
   mitk::IFileWriter* writer = m_FileWriterRegistry.GetWriter(m_BaseData->GetNameOfClass());
@@ -137,8 +137,7 @@ std::vector<mitk::IFileWriter::FileServiceOption> QmitkFileSaveDialog::QueryAvai
   if (writer == NULL)
   {
     // MITK_WARN << "Did not find WriterService for registered Extension. This should be looked into by a developer.";
-    std::vector<mitk::IFileReader::FileServiceOption> emptyList;
-    return emptyList;
+    return mitk::IFileWriter::OptionList();
   }
 
   return writer->GetOptions();

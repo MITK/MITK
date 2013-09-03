@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryUIException.h>
 #include <berryIPreferencesService.h>
 
-#include <mitkDataNodeFactory.h>
 #include "mitkIDataStorageService.h"
 #include "mitkDataStorageEditorInput.h"
 #include "mitkRenderingManager.h"

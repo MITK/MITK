@@ -70,11 +70,11 @@ signals:
 protected:
 
   mitk::IFileWriter* m_FileWriter;
-  std::vector <mitk::IFileWriter::FileServiceOption> m_Options;
+  mitk::IFileWriter::OptionList m_Options;
   mitk::FileWriterRegistry m_FileWriterRegistry;
   mitk::BaseData::Pointer m_BaseData;
 
-  std::vector<mitk::IFileWriter::FileServiceOption> QueryAvailableOptions(std::string path);
+  mitk::IFileWriter::OptionList QueryAvailableOptions(std::string path);
 
   //Ui::QmitkFileSaveDialogControls* m_Controls; ///< member holding the UI elements of this widget
 };

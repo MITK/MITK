@@ -58,7 +58,7 @@ public:
   /**
   * \brief Returns the Options that are currently / have been selected in the widget.
   */
-  virtual std::vector< mitk::IFileReader::FileServiceOption > GetSelectedOptions();
+  virtual mitk::IFileReader::OptionList GetSelectedOptions();
 
 signals:
 
@@ -82,13 +82,13 @@ protected:
   QGridLayout* m_BoxLayout;
 
   /** \brief The Options the user has set for the reader / writer*/
-  std::vector <mitk::IFileReader::FileServiceOption> m_Options;
+  mitk::IFileReader::OptionList m_Options;
 
   /**
   * \brief This is kind of a workaround. Getting the Options is differen whether using a reader or a writer,
   * so the subclasses of this dialog must implement this logic.
   */
-  virtual std::vector<mitk::IFileReader::FileServiceOption> QueryAvailableOptions(std::string path) = 0;
+  virtual mitk::IFileReader::OptionList QueryAvailableOptions(std::string path) = 0;
 
   /** \brief Remove all checkboxes from the options box.*/
   virtual void ClearOptionsBox();

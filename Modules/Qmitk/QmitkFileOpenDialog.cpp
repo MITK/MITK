@@ -66,7 +66,7 @@ void QmitkFileOpenDialog::ProcessSelectedFile()
   }
 }
 
-std::vector<mitk::IFileReader::FileServiceOption> QmitkFileOpenDialog::QueryAvailableOptions(std::string path)
+mitk::IFileReader::OptionList QmitkFileOpenDialog::QueryAvailableOptions(std::string path)
 {
   std::string extension = path;
   extension.erase(0, extension.find_last_of('.'));
@@ -77,8 +77,7 @@ std::vector<mitk::IFileReader::FileServiceOption> QmitkFileOpenDialog::QueryAvai
   if (reader == NULL)
   {
     // MITK_WARN << "Did not find ReaderService for registered Extension. This should be looked into by a developer.";
-    std::vector<mitk::IFileReader::FileServiceOption> emptyList;
-    return emptyList;
+    return mitk::IFileReader::OptionList();
   }
 
   return reader->GetOptions();

@@ -50,7 +50,8 @@ void mitk::FileWriterRegistry::Write(const mitk::BaseData* data, const std::stri
   std::string extension = itksys::SystemTools::GetFilenameExtension(path);
 
   // Get best Writer
-  mitk::IFileWriter* writer = GetWriter(data, extension, mitk::IFileWriter::OptionNames(), context);
+  FileWriterRegistry writerRegistry;
+  mitk::IFileWriter* writer = writerRegistry.GetWriter(data, extension, mitk::IFileWriter::OptionNames(), context);
   // Throw exception if no compatible Writer was found
   if (writer == NULL)
   {
@@ -64,7 +65,8 @@ void mitk::FileWriterRegistry::Write(const mitk::BaseData* data, const std::stri
 void mitk::FileWriterRegistry::Write(const mitk::BaseData* data, std::ostream& os, us::ModuleContext* context)
 {
   // Get best Writer
-  mitk::IFileWriter* writer = GetWriter(data, std::string(), mitk::IFileWriter::OptionNames(), context);
+  FileWriterRegistry writerRegistry;
+  mitk::IFileWriter* writer = writerRegistry.GetWriter(data, std::string(), mitk::IFileWriter::OptionNames(), context);
   // Throw exception if no compatible Writer was found
   if (writer == NULL)
   {
@@ -105,8 +107,8 @@ std::vector<mitk::IFileWriter*> mitk::FileWriterRegistry::GetWriters(
     const mitk::IFileWriter::OptionNames& options, us::ModuleContext* context)
 {
   // filter for class and extension
-  std::string filter = us::LDAPProp(mitk::IFileWriter::PROP_BASEDATA_TYPE) == baseDataType &&
-                       us::LDAPProp(mitk::IFileWriter::PROP_EXTENSION) == extension;
+  std::string filter = us::LDAPProp(mitk::IFileWriter::PROP_BASEDATA_TYPE()) == baseDataType &&
+                       us::LDAPProp(mitk::IFileWriter::PROP_EXTENSION()) == extension;
 
   std::vector <us::ServiceReference<IFileWriter> > refs = context->GetServiceReferences<IFileWriter>(filter);
   std::sort(refs.begin(), refs.end());
@@ -138,14 +140,14 @@ std::vector<mitk::IFileWriter*> mitk::FileWriterRegistry::GetWriters(
 
 std::string mitk::FileWriterRegistry::GetSupportedExtensions(const std::string& extension, us::ModuleContext* context)
 {
-  std::string filter = us::LDAPProp(mitk::IFileWriter::PROP_EXTENSION) == extension;
+  std::string filter = us::LDAPProp(mitk::IFileWriter::PROP_EXTENSION()) == extension;
   const std::vector <us::ServiceReference<IFileWriter> > refs = context->GetServiceReferences<IFileWriter>(filter);
   return CreateFileDialogString(refs);
 }
 
 std::string mitk::FileWriterRegistry::GetSupportedWriters(const std::string& baseDataType, us::ModuleContext* context)
 {
-  std::string filter = us::LDAPProp(mitk::IFileWriter::PROP_BASEDATA_TYPE) == baseDataType;
+  std::string filter = us::LDAPProp(mitk::IFileWriter::PROP_BASEDATA_TYPE()) == baseDataType;
   const std::vector <us::ServiceReference<IFileWriter> > refs = context->GetServiceReferences<IFileWriter>(filter);
   return CreateFileDialogString(refs);
 }
@@ -186,12 +188,12 @@ std::string mitk::FileWriterRegistry::CreateFileDialogString(const std::vector<u
   {
     // Generate List of Extensions
     if (iterator == refs.begin()) // First entry without semicolon
-      knownExtensions += "*" + iterator->GetProperty(mitk::IFileWriter::PROP_EXTENSION).ToString();
+      knownExtensions += "*" + iterator->GetProperty(mitk::IFileWriter::PROP_EXTENSION()).ToString();
     else // Ad semicolon for each following entry
-      knownExtensions += "; *" + iterator->GetProperty(mitk::IFileWriter::PROP_EXTENSION).ToString();
+      knownExtensions += "; *" + iterator->GetProperty(mitk::IFileWriter::PROP_EXTENSION()).ToString();
 
     // Generate List of human readable entries composed of Description + Extension
-    std::string entry = iterator->GetProperty(mitk::IFileWriter::PROP_DESCRIPTION).ToString() + "(*" + iterator->GetProperty(mitk::IFileWriter::PROP_EXTENSION).ToString() + ");;";
+    std::string entry = iterator->GetProperty(mitk::IFileWriter::PROP_DESCRIPTION()).ToString() + "(*" + iterator->GetProperty(mitk::IFileWriter::PROP_EXTENSION()).ToString() + ");;";
     entries.push_back(entry);
   }
   std::sort(entries.begin(), entries.end());

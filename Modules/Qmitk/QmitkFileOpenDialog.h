@@ -77,10 +77,10 @@ signals:
 protected:
 
   std::vector<mitk::IFileReader*> m_FileReaders;
-  std::vector <mitk::IFileReader::FileServiceOption> m_Options;
+  mitk::IFileReader::OptionList m_Options;
   mitk::FileReaderRegistry m_FileReaderRegistry;
 
-  virtual std::vector<mitk::IFileReader::FileServiceOption> QueryAvailableOptions(std::string path) ;
+  virtual mitk::IFileReader::OptionList QueryAvailableOptions(std::string path);
 
   //Ui::QmitkFileOpenDialogControls* m_Controls; ///< member holding the UI elements of this widget
 };

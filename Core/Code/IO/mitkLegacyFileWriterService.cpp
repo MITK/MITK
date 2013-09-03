@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <usGetModuleContext.h>
 
-mitk::LegacyFileWriterService::LegacyFileWriterService(mitk::FileWriter::Pointer legacyWriter,
+mitk::LegacyFileWriterService::LegacyFileWriterService(mitk::FileWriterWithInformation::Pointer legacyWriter,
                                                        const std::string& basedataType,
                                                        const std::string& extension,
                                                        const std::string& description)
@@ -41,15 +41,18 @@ void mitk::LegacyFileWriterService::Write(const BaseData* data, const std::strin
     mitkThrow() << "LegacyFileWriterService was incorrectly initialized: Has no LegacyFileWriter.";
 
   m_LegacyWriter->SetFileName(path.c_str());
-  mitk::DataNode::Pointer node = mitk::DataNode::New();
-  node->SetData(const_cast<BaseData*>(data));
-  m_LegacyWriter->SetInput(node);
-  m_LegacyWriter->Write();
+  m_LegacyWriter->DoWrite(mitk::BaseData::Pointer(const_cast<BaseData*>(data)));
 }
 
 void mitk::LegacyFileWriterService::Write(const BaseData* data, std::ostream& stream)
 {
   mitk::AbstractFileWriter::Write(data, stream);
+}
+
+bool mitk::LegacyFileWriterService::CanWrite(const mitk::BaseData* data) const
+{
+  return mitk::AbstractFileWriter::CanWrite(data) &&
+      m_LegacyWriter->CanWriteBaseDataType(mitk::BaseData::Pointer(const_cast<BaseData*>(data)));
 }
 
 mitk::LegacyFileWriterService* mitk::LegacyFileWriterService::Clone() const

@@ -16,14 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkFileExitAction.h"
 
-#include <QFileDialog>
-#include <mitkDataNodeFactory.h>
-
-#include <mitkCoreObjectFactory.h>
-#include <mitkDataStorageEditorInput.h>
-#include <berryIEditorPart.h>
-#include <berryIWorkbenchPage.h>
-
 #include <berryPlatformUI.h>
 
 QmitkFileExitAction::QmitkFileExitAction(berry::IWorkbenchWindow::Pointer window)

@@ -112,7 +112,7 @@ us::ServiceRegistration<mitk::IFileWriter> mitk::AbstractFileWriter::RegisterSer
   return context->RegisterService<mitk::IFileWriter>(m_PrototypeFactory, props);
 }
 
-us::ServiceProperties mitk::AbstractFileWriter::GetServiceProperties()
+us::ServiceProperties mitk::AbstractFileWriter::GetServiceProperties() const
 {
   if ( m_Extension.empty() )
     MITK_WARN << "Registered a Writer with no extension defined (m_Extension is empty). Writer will not be found by calls from WriterManager.)";
@@ -122,9 +122,9 @@ us::ServiceProperties mitk::AbstractFileWriter::GetServiceProperties()
     MITK_WARN << "Registered a Writer with no description defined (m_Description is empty). Writer will have no human readable extension information in FileDialogs.)";
 
   us::ServiceProperties result;
-  result[mitk::IFileWriter::PROP_EXTENSION]    = m_Extension;
-  result[mitk::IFileWriter::PROP_DESCRIPTION]    = m_Description;
-  result[mitk::IFileWriter::PROP_BASEDATA_TYPE]    = m_BasedataType;
+  result[mitk::IFileWriter::PROP_EXTENSION()]    = m_Extension;
+  result[mitk::IFileWriter::PROP_DESCRIPTION()]    = m_Description;
+  result[mitk::IFileWriter::PROP_BASEDATA_TYPE()]    = m_BasedataType;
   result[us::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
 
   for (mitk::IFileWriter::OptionList::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it)

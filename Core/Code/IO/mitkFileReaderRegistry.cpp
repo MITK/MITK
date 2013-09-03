@@ -22,10 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 #include <usLDAPProp.h>
 
-// Legacy Support
-#include <mitkCoreObjectFactory.h>
-
-//const std::string mitk::IFileWriter::PROP_EXTENSION = "org.mitk.services.FileWriter.Extension";
+#include "itksys/SystemTools.hxx"
 
 mitk::FileReaderRegistry::FileReaderRegistry()
 {
@@ -45,11 +42,11 @@ mitk::FileReaderRegistry::~FileReaderRegistry()
 std::vector< mitk::BaseData::Pointer > mitk::FileReaderRegistry::Read(const std::string& path, us::ModuleContext* context)
 {
   // Find extension
-  std::string extension = path;
-  extension.erase(0, path.find_last_of('.'));
+  const std::string extension = itksys::SystemTools::GetFilenameExtension(path);
 
   // Get best Reader
-  mitk::IFileReader* reader = GetReader(extension, context);
+  FileReaderRegistry readerRegistry;
+  mitk::IFileReader* reader = readerRegistry.GetReader(extension, context);
   // Throw exception if no compatible reader was found
   if (reader == NULL) mitkThrow() << "Tried to directly read a file of type '" + extension + "' via FileReaderRegistry, but no reader supporting this filetype was found.";
   return reader->Read(path);
@@ -57,14 +54,20 @@ std::vector< mitk::BaseData::Pointer > mitk::FileReaderRegistry::Read(const std:
 
 std::vector< mitk::BaseData::Pointer > mitk::FileReaderRegistry::ReadAll(
   const std::vector<std::string>& paths, std::vector<std::string>* unreadableFiles,
-  us::ModuleContext* context)
+    us::ModuleContext* context)
 {
+  FileReaderRegistry readerRegistry;
   std::vector< mitk::BaseData::Pointer > result;
   for (std::vector<std::string>::const_iterator iterator = paths.begin(), end = paths.end(); iterator != end; ++iterator)
   {
     try
     {
-      std::vector<mitk::BaseData::Pointer> baseDataList = Read( *iterator, context );
+      const std::string extension = itksys::SystemTools::GetFilenameExtension(*iterator);
+      mitk::IFileReader* reader = readerRegistry.GetReader(extension, context);
+      // Throw exception if no compatible reader was found
+      if (reader == NULL) throw;
+
+      std::vector<mitk::BaseData::Pointer> baseDataList = reader->Read( *iterator );
       result.insert(result.end(), baseDataList.begin(), baseDataList.end());
     }
     catch (...)
@@ -104,8 +107,8 @@ std::vector <mitk::IFileReader*> mitk::FileReaderRegistry::GetReaders(const std:
 }
 
 mitk::IFileReader* mitk::FileReaderRegistry::GetReader(
-  const std::string& extension, const mitk::IFileReader::OptionNames& options,
-  us::ModuleContext* context )
+    const std::string& extension, const mitk::IFileReader::OptionNames& options,
+    us::ModuleContext* context )
 {
   std::vector <mitk::IFileReader*> matching = mitk::FileReaderRegistry::GetReaders(extension, options, context);
   if (matching.empty()) return NULL;
@@ -113,8 +116,8 @@ mitk::IFileReader* mitk::FileReaderRegistry::GetReader(
 }
 
 std::vector <mitk::IFileReader*> mitk::FileReaderRegistry::GetReaders(
-  const std::string& extension, const mitk::IFileReader::OptionNames& options,
-  us::ModuleContext* context )
+    const std::string& extension, const mitk::IFileReader::OptionNames& options,
+    us::ModuleContext* context )
 {
   const std::vector <mitk::IFileReader*> allReaders = mitk::FileReaderRegistry::GetReaders(extension, context);
   std::vector <mitk::IFileReader*> result;
@@ -167,12 +170,12 @@ std::string mitk::FileReaderRegistry::GetSupportedExtensions(const std::string& 
   {
     // Generate List of Extensions
     if (iterator == refs.begin()) // First entry without semicolon
-      knownExtensions += "*" + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION).ToString();
+      knownExtensions += "*" + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION()).ToString();
     else // Ad semicolon for each following entry
-      knownExtensions += "; *" + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION).ToString();
+      knownExtensions += "; *" + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION()).ToString();
 
     // Generate List of human readable entries composed of Description + Extension
-    std::string entry = iterator->GetProperty(mitk::IFileReader::PROP_DESCRIPTION).ToString() + "(*" + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION).ToString() + ");;";
+    std::string entry = iterator->GetProperty(mitk::IFileReader::PROP_DESCRIPTION()).ToString() + "(*" + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION()).ToString() + ");;";
     entries.push_back(entry);
   }
   std::sort(entries.begin(), entries.end());
@@ -219,7 +222,7 @@ std::vector< us::ServiceReference<mitk::IFileReader> > mitk::FileReaderRegistry:
   std::string filter;
   if (!extension.empty())
   {
-    filter = us::LDAPProp(mitk::IFileReader::PROP_EXTENSION) == extension;
+    filter = us::LDAPProp(mitk::IFileReader::PROP_EXTENSION()) == extension;
   }
   std::vector<us::ServiceReference<IFileReader> > result = context->GetServiceReferences<IFileReader>(filter);
   std::sort(result.begin(), result.end());

@@ -133,7 +133,6 @@ set(CPP_FILES
   DataManagement/mitkDataStorage.cpp
   #DataManagement/mitkDataTree.cpp
   DataManagement/mitkDataNode.cpp
-  DataManagement/mitkDataNodeFactory.cpp
   #DataManagement/mitkDataTreeStorage.cpp
   DataManagement/mitkDisplayGeometry.cpp
   DataManagement/mitkEnumerationProperty.cpp
@@ -281,25 +280,16 @@ set(CPP_FILES
 
   IO/mitkAbstractFileReader.cpp
   IO/mitkAbstractFileWriter.cpp
-  IO/mitkLegacyImageWriterService.cpp
   IO/mitkLegacyFileReaderService.cpp
   IO/mitkLegacyFileWriterService.cpp
-  IO/mitkBaseDataIOFactory.cpp
-  IO/mitkCoreDataNodeReader.cpp
   IO/mitkDicomSeriesReader.cpp
   IO/mitkFileReader.cpp
-  IO/mitkFileReaderRegistry.cpp
-  IO/mitkFileSeriesReader.cpp
   IO/mitkFileWriter.cpp
+  IO/mitkFileReaderRegistry.cpp
   IO/mitkFileWriterRegistry.cpp
   #IO/mitkIpPicGet.c
   IO/mitkImageGenerator.cpp
-  IO/mitkImageWriter.cpp
-  IO/mitkImageWriterFactory.cpp
-  IO/mitkItkImageFileIOFactory.cpp
-  IO/mitkItkImageFileReader.cpp
   IO/mitkItkLoggingAdapter.cpp
-  IO/mitkItkPictureWrite.cpp
   IO/mitkIOUtil.cpp
   IO/mitkLookupTableProperty.cpp
   IO/mitkOperation.cpp
@@ -310,26 +300,10 @@ set(CPP_FILES
   #IO/mitkPicVolumeTimeSeriesIOFactory.cpp
   #IO/mitkPicVolumeTimeSeriesReader.cpp
   IO/mitkPixelType.cpp
-  IO/mitkPointSetIOFactory.cpp
-  IO/mitkPointSetReader.cpp
   IO/mitkPointSetReaderService.cpp
-  IO/mitkPointSetWriter.cpp
   IO/mitkPointSetWriterService.cpp
-  IO/mitkPointSetWriterFactory.cpp
-  IO/mitkRawImageFileReader.cpp
   IO/mitkStandardFileLocations.cpp
-  IO/mitkSTLFileIOFactory.cpp
-  IO/mitkSTLFileReader.cpp
-  IO/mitkSurfaceVtkWriter.cpp
-  IO/mitkSurfaceVtkWriterFactory.cpp
   IO/mitkVtkLoggingAdapter.cpp
-  IO/mitkVtiFileIOFactory.cpp
-  IO/mitkVtiFileReader.cpp
-  IO/mitkVtkImageIOFactory.cpp
-  IO/mitkVtkImageReader.cpp
-  IO/mitkVtkSurfaceIOFactory.cpp
-  IO/mitkVtkSurfaceReader.cpp
-  IO/vtkPointSetXMLParser.cpp
   IO/mitkLog.cpp
   Rendering/mitkBaseRenderer.cpp
   Rendering/mitkVtkMapper.cpp

@@ -80,12 +80,10 @@ set(MODULE_TESTS
 set(MODULE_IMAGE_TESTS
   mitkImageTimeSelectorTest.cpp #only runs on images
   mitkImageAccessorTest.cpp #only runs on images
-  mitkDataNodeFactoryTest.cpp #runs on all types of data
 )
 
 set(MODULE_SURFACE_TESTS
   mitkSurfaceVtkWriterTest.cpp #only runs on surfaces
-  mitkDataNodeFactoryTest.cpp #runs on all types of data
 )
 
 # list of images for which the tests are run

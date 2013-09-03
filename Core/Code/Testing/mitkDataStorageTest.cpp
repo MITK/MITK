@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkReferenceCountWatcher.h"
 
 #include "mitkDataStorage.h"
+#include "mitkFileReaderRegistry.h"
 #include "mitkStandaloneDataStorage.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateDataType.h"
@@ -39,7 +40,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "mitkPicFileReader.h"
 #include "mitkTestingMacros.h"
 
-#include "mitkItkImageFileReader.h"
 
 
 void TestDataStorage(mitk::DataStorage* ds, std::string filename);
@@ -184,10 +184,7 @@ void TestDataStorage( mitk::DataStorage* ds, std::string filename )
 
   // Take the ItkImageFile Reader for the .nrrd data format.
   // (was previously pic which is now deprecated format)
-  mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
-  reader -> SetFileName(filename.c_str());
-  reader -> Update();
-  mitk::Image::Pointer image = reader->GetOutput();
+  mitk::Image::Pointer image = mitk::FileReaderRegistry::Read<mitk::Image>(filename.c_str());
 
   // create some DataNodes to fill the ds
   mitk::DataNode::Pointer n1 = mitk::DataNode::New();   // node with image and name property

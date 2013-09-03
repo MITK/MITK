@@ -18,9 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVolumeCalculator.h"
 #include "mitkImage.h"
 #include "mitkTestingMacros.h"
-#include <mitkDataNodeFactory.h>
 #include <mitkStandaloneDataStorage.h>
-
+#include "mitkIOUtil.h"
 
 int mitkVolumeCalculatorTest(int /*argc*/, char* argv[])
 {
@@ -28,16 +27,12 @@ int mitkVolumeCalculatorTest(int /*argc*/, char* argv[])
   const char * filename = argv[1];
   const char * filename3D = argv[2];
   mitk::VolumeCalculator::Pointer volumeCalculator = mitk::VolumeCalculator::New();
-  mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
       //*********************************************************************
       // Part I: Testing calculated volume.
       // The correct values have been manually calculated using external software.
       //*********************************************************************
 
-      nodeReader->SetFileName(filename);
-      nodeReader->Update();
-
-      mitk::DataNode::Pointer node = nodeReader->GetOutput();
+      mitk::DataNode::Pointer node = mitk::IOUtil::LoadDataNode(filename);
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
        MITK_TEST_CONDITION_REQUIRED(
          image.IsNotNull()
@@ -60,10 +55,7 @@ int mitkVolumeCalculatorTest(int /*argc*/, char* argv[])
          volume == 1272.50
          , "03 Test Volume Result. Expected 1272.50 actual value " << volume);
 
-      nodeReader->SetFileName(filename3D);
-      nodeReader->Update();
-
-      node = nodeReader->GetOutput();
+      node = mitk::IOUtil::LoadDataNode(filename3D);
       image = dynamic_cast<mitk::Image*>(node->GetData());
 
        volumeCalculator->SetImage(image);

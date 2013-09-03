@@ -33,7 +33,7 @@ mitk::PointSetReaderService::~PointSetReaderService()
 
 std::vector< itk::SmartPointer<mitk::BaseData> > mitk::PointSetReaderService::Read(const std::istream& stream, mitk::DataStorage *ds )
 {
-  std::vector< itk::SmartPointer<mitk::BaseData>> emptySet;
+  std::vector< itk::SmartPointer<mitk::BaseData> > emptySet;
   return emptySet;
 }
 
@@ -41,12 +41,12 @@ std::vector< itk::SmartPointer<mitk::BaseData> >  mitk::PointSetReaderService::R
 {
   std::locale::global(std::locale("C"));
 
-  std::vector< itk::SmartPointer<mitk::BaseData>> result;
+  std::vector< itk::SmartPointer<mitk::BaseData> > result;
 
   if ( ! this->CanRead( path ) )
   {
     MITK_WARN << "Sorry, can't read file " << path << "! Returning empty set...";
-    std::vector< itk::SmartPointer<mitk::BaseData>> emptySet;
+    std::vector< itk::SmartPointer<mitk::BaseData> > emptySet;
     return emptySet;
   }
 
@@ -56,7 +56,7 @@ std::vector< itk::SmartPointer<mitk::BaseData> >  mitk::PointSetReaderService::R
     if (loadOkay)
     {
       TiXmlHandle docHandle( &doc );
-      unsigned int pointSetCounter(0);
+      //unsigned int pointSetCounter(0);
       for( TiXmlElement* currentPointSetElement = docHandle.FirstChildElement("point_set_file").FirstChildElement("point_set").ToElement();
         currentPointSetElement != NULL; currentPointSetElement = currentPointSetElement->NextSiblingElement())
       {
@@ -132,13 +132,18 @@ mitk::PointSet::Pointer mitk::PointSetReaderService::ReadPoint(mitk::PointSet::P
 
 bool mitk::PointSetReaderService::CanRead(const std::string& path) const
 {
-  std::ifstream in( path );
+  std::ifstream in( path.c_str() );
   bool isGood = in.good();
   in.close();
   return isGood;
 }
 
+mitk::PointSetReaderService::PointSetReaderService(const mitk::PointSetReaderService& other)
+  : mitk::AbstractFileReader(other)
+{
+}
+
 mitk::IFileReader* mitk::PointSetReaderService::Clone() const
 {
-  return new mitk::PointSetReaderService();
+  return new mitk::PointSetReaderService(*this);
 }

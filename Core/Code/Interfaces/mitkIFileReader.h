@@ -97,7 +97,7 @@ namespace mitk {
     /**
     * \brief returns a list of the supported Options
     *
-    * Inititally, the reader contains a set of standard options. These can be retrieved,
+    * Initially, the reader contains a set of standard options. These can be retrieved,
     * manipulated and set again. To activate or deactivate an option, just set it's bool
     * value accordingly. All supported options are in the default set, it does not
     * make sense to add strings artificially after retrieving a reader - the specific
@@ -124,13 +124,13 @@ namespace mitk {
     virtual void RemoveProgressCallback(const mitk::MessageAbstractDelegate<float>& callback) = 0;
 
     // Microservice properties
-    static const std::string PROP_EXTENSION;
-    static const std::string PROP_DESCRIPTION;
-    static const std::string PROP_IS_LEGACY;
+    static std::string PROP_EXTENSION();
+    static std::string PROP_DESCRIPTION();
+    static std::string PROP_IS_LEGACY();
 
     // Microservice names for defined properties
-    static const std::string OPTION_READ_AS_BINARY;
-    static const std::string OPTION_READ_MULTIPLE_FILES;
+    static std::string OPTION_READ_AS_BINARY();
+    static std::string OPTION_READ_MULTIPLE_FILES();
 
   protected:
   };

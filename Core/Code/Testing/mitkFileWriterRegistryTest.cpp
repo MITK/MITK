@@ -18,13 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAbstractFileWriter.h>
 #include <mitkIFileWriter.h>
 #include <mitkFileWriterRegistry.h>
+#include <mitkFileReaderRegistry.h>
 #include <mitkBaseData.h>
-#include <mitkBaseDataIOFactory.h>
-#include <mitkLegacyFileWriterService.h>
-#include <mitkImage.h>
-#include <mitkCoreObjectFactory.h>
-#include <mitkPointSetWriter.h>
-#include <mitkPointSet.h>
 #include <mitkIOUtil.h>
 
 class DummyBaseData : public mitk::BaseData
@@ -214,12 +209,12 @@ int mitkFileWriterRegistryTest(int argc , char* argv[])
  // MITK_TEST_CONDITION_REQUIRED(testDR->CanWrite("/this/is/a/folder/file.test"),"Positive test of default CanRead() implementation");
  // MITK_TEST_CONDITION_REQUIRED(!testDR->CanWrite("/this/is/a/folder/file.tes"),"Negative test of default CanRead() implementation");
 
-  mitk::FileWriterRegistry* WriterRegistry = new mitk::FileWriterRegistry;
-  mitk::IFileWriter* returned = WriterRegistry->GetWriter("", "test");
+  mitk::FileWriterRegistry* writerRegistry = new mitk::FileWriterRegistry;
+  mitk::IFileWriter* returned = writerRegistry->GetWriter("", "test");
 
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileWriter&>(testDR) != returned,"Testing correct retrieval of FileWriter 1/2");
 
-  returned = WriterRegistry->GetWriter("", "other");
+  returned = writerRegistry->GetWriter("", "other");
 
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileWriter&>(otherDR) != returned,"Testing correct retrieval of FileWriter 2/2");
 
@@ -227,7 +222,7 @@ int mitkFileWriterRegistryTest(int argc , char* argv[])
   DummyWriter prettyFlyTestDR("testdata", "test", 50);
   DummyWriter2 awesomeTestDR("testdata", "test", 100);
 
-  returned = WriterRegistry->GetWriter("test");
+  returned = writerRegistry->GetWriter("test");
   MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyWriter2*>(&awesomeTestDR), "Testing correct priorized retrieval of FileWriter: Best Writer");
 
   // Now to give those Writers some options, then we will try again
@@ -243,45 +238,45 @@ int mitkFileWriterRegistryTest(int argc , char* argv[])
   // Reset Options, use to define what we want the Writer to do
   mitk::IFileWriter::OptionNames optionFilter;
   optionFilter.push_back("canFly");
-  returned = WriterRegistry->GetWriter("", "test", optionFilter);
+  returned = writerRegistry->GetWriter("", "test", optionFilter);
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileWriter&>(awesomeTestDR) != returned, "Testing correct retrieval of FileWriter with Options: Best Writer with options");
 
   optionFilter.push_back("isAwesome");
-  returned = WriterRegistry->GetWriter("", "test", optionFilter);
+  returned = writerRegistry->GetWriter("", "test", optionFilter);
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileWriter&>(awesomeTestDR) != returned, "Testing correct retrieval of FileWriter with multiple Options: Best Writer with options");
 
   optionFilter.clear();
   optionFilter.push_back("isANiceGuy");
-  returned = WriterRegistry->GetWriter("", "test", optionFilter);
+  returned = writerRegistry->GetWriter("", "test", optionFilter);
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileWriter&>(mediocreTestDR) != returned, "Testing correct retrieval of specific FileWriter with Options: Low priority Writer with specific option");
 
   optionFilter.push_back("canFly");
-  returned = WriterRegistry->GetWriter("", "test", optionFilter);
+  returned = writerRegistry->GetWriter("", "test", optionFilter);
   MITK_TEST_CONDITION_REQUIRED(returned == NULL, "Testing correct return of 0 value when no matching Writer was found");
 
   // Onward to test the retrieval of multiple Writers
 
   std::vector< mitk::IFileWriter* > returnedList;
-  returnedList = WriterRegistry->GetWriters("", "test", optionFilter);
+  returnedList = writerRegistry->GetWriters("", "test", optionFilter);
   MITK_TEST_CONDITION_REQUIRED(returnedList.empty(), "Testing correct return of zero Writers when no matching Writer was found, asking for all compatibles");
 
   optionFilter.clear();
   optionFilter.push_back("canFly");
-  returnedList = WriterRegistry->GetWriters("", "test", optionFilter);
+  returnedList = writerRegistry->GetWriters("", "test", optionFilter);
   MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 2, "Testing correct return of two Writers when two matching Writer was found, asking for all compatibles");
   MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyWriter2*>(returnedList.front()), "Testing correct priorization of returned Writers with options 1/2");
 
   optionFilter.clear();
   optionFilter.push_back("isAwesome");
-  returnedList = WriterRegistry->GetWriters("", "test", optionFilter);
+  returnedList = writerRegistry->GetWriters("", "test", optionFilter);
   MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 1, "Testing correct return of one Writers when one matching Writer was found, asking for all compatibles");
   MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyWriter2*>(returnedList.front()), "Testing correctness of result from former query");
 
-  mitk::CoreObjectFactory::GetInstance();
-  //mitk::FileReaderRegistry ReaderRegistry;
-  //mitk::Image::Pointer image = ReaderRegistry.Read<mitk::Image>("F://Build//MITK-Data//Pic2DplusT.nrrd");
+  //mitk::CoreObjectFactory::GetInstance();
+  //mitk::FileReaderRegistry readerRegistry;
+  //mitk::Image::Pointer image = readerRegistry.Read<mitk::Image>("F://Build//MITK-Data//Pic2DplusT.nrrd");
 
-  //WriterRegistry->Write(image.GetPointer(), "F://Build//MITK-Data//Pic2DplusTcopy.nrrd");
+  //writerRegistry->Write(image.GetPointer(), "F://Build//MITK-Data//Pic2DplusTcopy.nrrd");
 
   //// And now to verify a working read chain for a mps file:
   //mitk::PointSetWriter::Pointer psr = mitk::PointSetWriter::New();
@@ -305,7 +300,7 @@ int mitkFileWriterRegistryTest(int argc , char* argv[])
 
   // Delete this here because it will call the PrototypeServiceFactory::Unget() method
   // of the dummy writers.
-  delete WriterRegistry;
+  delete writerRegistry;
 
   //// always end with this!
   MITK_TEST_END()

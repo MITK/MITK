@@ -110,17 +110,16 @@ us::ServiceRegistration<mitk::IFileReader> mitk::AbstractFileReader::RegisterSer
   return context->RegisterService<mitk::IFileReader>(m_PrototypeFactory, props);
 }
 
-us::ServiceProperties mitk::AbstractFileReader::GetServiceProperties()
+us::ServiceProperties mitk::AbstractFileReader::GetServiceProperties() const
 {
   if ( m_Extension.empty() )
     MITK_WARN << "Registered a Reader with no extension defined (m_Extension is empty). Reader will not be found by calls from ReaderManager.)";
   if ( m_Description.empty() )
     MITK_WARN << "Registered a Reader with no description defined (m_Description is empty). Reader will have no human readable extension information in FileDialogs.)";
-  std::transform(m_Extension.begin(), m_Extension.end(), m_Extension.begin(), ::tolower);
 
   us::ServiceProperties result;
-  result[mitk::IFileReader::PROP_EXTENSION]    = m_Extension;
-  result[mitk::IFileReader::PROP_DESCRIPTION]    = m_Description;
+  result[mitk::IFileReader::PROP_EXTENSION()]    = m_Extension;
+  result[mitk::IFileReader::PROP_DESCRIPTION()]    = m_Description;
   result[us::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
 
   for (mitk::IFileReader::OptionList::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it) {

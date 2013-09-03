@@ -19,13 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIFileReader.h"
 #include "mitkFileReaderRegistry.h"
 #include <mitkBaseData.h>
-#include <mitkBaseDataIOFactory.h>
-#include <mitkLegacyFileReaderService.h>
 #include <mitkImage.h>
-
-#include <mitkPointSetReader.h>
-#include <mitkPointSet.h>
-#include <mitkCoreObjectFactory.h>
 
 class DummyReader : public mitk::AbstractFileReader
 {
@@ -121,12 +115,12 @@ int mitkFileReaderRegistryTest(int /*argc*/ , char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(testDR.CanRead("/this/is/a/folder/file.test"),"Positive test of default CanRead() implementation");
   MITK_TEST_CONDITION_REQUIRED(!testDR.CanRead("/this/is/a/folder/file.tes"),"Negative test of default CanRead() implementation");
 
-  mitk::FileReaderRegistry* ReaderRegistry = new mitk::FileReaderRegistry;
-  mitk::IFileReader* returned = ReaderRegistry->GetReader("test");
+  mitk::FileReaderRegistry* readerRegistry = new mitk::FileReaderRegistry;
+  mitk::IFileReader* returned = readerRegistry->GetReader("test");
 
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileReader&>(testDR) != returned,"Testing correct retrieval of FileReader 1/2");
 
-  returned = ReaderRegistry->GetReader("other");
+  returned = readerRegistry->GetReader("other");
 
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileReader&>(otherDR) != returned,"Testing correct retrieval of FileReader 2/2");
 
@@ -134,7 +128,7 @@ int mitkFileReaderRegistryTest(int /*argc*/ , char* /*argv*/[])
   DummyReader prettyFlyTestDR("test", 50);
   DummyReader2 awesomeTestDR("test", 100);
 
-  returned = ReaderRegistry->GetReader("test");
+  returned = readerRegistry->GetReader("test");
   MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyReader2*>(returned), "Testing correct priorized retrieval of FileReader: Best reader");
 
   // Now to give those readers some options, then we will try again
@@ -152,37 +146,37 @@ int mitkFileReaderRegistryTest(int /*argc*/ , char* /*argv*/[])
   options.clear();
   mitk::IFileReader::OptionNames optionsFilter;
   optionsFilter.push_back("canFly");
-  returned = ReaderRegistry->GetReader("test", optionsFilter);
+  returned = readerRegistry->GetReader("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileReader&>(awesomeTestDR) != returned, "Testing correct retrieval of FileReader with Options: Best reader with options");
 
   optionsFilter.push_back("isAwesome");
-  returned = ReaderRegistry->GetReader("test", optionsFilter);
+  returned = readerRegistry->GetReader("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileReader&>(awesomeTestDR) != returned, "Testing correct retrieval of FileReader with multiple Options: Best reader with options");
 
   optionsFilter.clear();
   optionsFilter.push_back("isANiceGuy");
-  returned = ReaderRegistry->GetReader("test", optionsFilter);
+  returned = readerRegistry->GetReader("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileReader&>(mediocreTestDR) != returned, "Testing correct retrieval of specific FileReader with Options: Low priority reader with specific option");
 
   optionsFilter.push_back("canFly");
-  returned = ReaderRegistry->GetReader("test", optionsFilter);
+  returned = readerRegistry->GetReader("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returned == NULL, "Testing correct return of 0 value when no matching reader was found");
 
   // Onward to test the retrieval of multiple readers
 
   std::vector< mitk::IFileReader* > returnedList;
-  returnedList = ReaderRegistry->GetReaders("test", optionsFilter);
+  returnedList = readerRegistry->GetReaders("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returnedList.empty(), "Testing correct return of zero readers when no matching reader was found, asking for all compatibles");
 
   optionsFilter.clear();
   optionsFilter.push_back("canFly");
-  returnedList = ReaderRegistry->GetReaders("test", optionsFilter);
+  returnedList = readerRegistry->GetReaders("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 2, "Testing correct return of two readers when two matching reader was found, asking for all compatibles");
   MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyReader2*>(returnedList.front()), "Testing correct priorization of returned Readers with options 1/2");
 
   optionsFilter.clear();
   optionsFilter.push_back("isAwesome");
-  returnedList = ReaderRegistry->GetReaders("test", optionsFilter);
+  returnedList = readerRegistry->GetReaders("test", optionsFilter);
   MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 1, "Testing correct return of one readers when one matching reader was found, asking for all compatibles");
   MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyReader2*>(returnedList.front()), "Testing correctness of result from former query");
 
@@ -191,9 +185,6 @@ int mitkFileReaderRegistryTest(int /*argc*/ , char* /*argv*/[])
   //std::vector<mitk::BaseData::Pointer> basedata;
   //basedata = mitk::FileReaderRegistry::Read("F://Build//MITK-Data//pointSet.mps");
   //MITK_TEST_CONDITION_REQUIRED(basedata.size() > 0, "Testing correct read of PointSet");
-
-  // Need to instanciate the CoreObjectFactory, so legacy Readers are available
-  mitk::CoreObjectFactory::GetInstance();
 
   // Testing templated call to ReaderRegistry
   //mitk::PointSet::Pointer pointset = mitk::FileReaderRegistry::Read< mitk::PointSet >("F://Build//MITK-Data//pointSet.mps");
@@ -211,7 +202,7 @@ int mitkFileReaderRegistryTest(int /*argc*/ , char* /*argv*/[])
 
   // Delete this here because it will call the PrototypeServiceFactory::Unget() method
   // of the dummy readers.
-  delete ReaderRegistry;
+  delete readerRegistry;
 
   // always end with this!
   MITK_TEST_END();

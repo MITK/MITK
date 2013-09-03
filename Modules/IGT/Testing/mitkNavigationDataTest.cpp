@@ -181,11 +181,8 @@ class NavigationDataTestClass
   static void TestAffineTransform3DConstructor()
   {
     mitk::AffineTransform3D::Pointer affineTransform3D = mitk::AffineTransform3D::New();
-    double bla[3] = {1.0,2.0,3.123456};
-    mitk::Vector3D offset = bla;
-    double matrix[3][3] = {{0, -1, 0},
-                           {1,  0, 0},
-                           {0,  0, 1}};
+    double offsetArray[3] = {1.0,2.0,3.123456};
+    mitk::Vector3D offset = offsetArray;
 
     mitk::Matrix3D rotation;
     rotation[0][1] = -1;
@@ -195,16 +192,13 @@ class NavigationDataTestClass
     affineTransform3D->SetOffset(offset);
     affineTransform3D->SetMatrix(rotation);
 
+    // there and back again: affineTransform -> NavigationData -> affineTransform
     mitk::NavigationData::Pointer navigationData = mitk::NavigationData::New(affineTransform3D);
-
     mitk::AffineTransform3D::Pointer affineTransform3D_2;
-
     affineTransform3D_2 = navigationData->GetAffineTransform3D();
 
-
-
-    MITK_TEST_CONDITION(mitk::Equal(affineTransform3D->GetOffset(), affineTransform3D_2->GetOffset())
-        && mitk::MatrixEqualElementWise(affineTransform3D->GetMatrix(), affineTransform3D_2->GetMatrix()), "Testing AffineTransform3D constructor");
+    MITK_TEST_CONDITION(mitk::Equal(affineTransform3D->GetOffset(), affineTransform3D_2->GetOffset()), "Testing AffineTransform3D constructor: translation");
+    MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(affineTransform3D->GetMatrix(), affineTransform3D_2->GetMatrix()), "Testing AffineTransform3D constructor: rotation");
   }
 
 /**

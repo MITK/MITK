@@ -138,7 +138,8 @@ void mitk::NavigationData::SetOrientationAccuracy(mitk::ScalarType error)
 
 mitk::NavigationData::NavigationData(
     mitk::AffineTransform3D::Pointer affineTransform3D) : itk::DataObject(),
-        m_Position(), m_Orientation(affineTransform3D->GetMatrix().GetVnlMatrix()),
+        m_Position(),
+        m_Orientation(affineTransform3D->GetMatrix().GetVnlMatrix().transpose()), // the .transpose is because vnl_quaterion expects a transposed rotation matrix
         m_CovErrorMatrix(), m_HasPosition(true), m_HasOrientation(true), m_DataValid(true), m_IGTTimeStamp(0.0),
         m_Name()
 {

@@ -163,9 +163,21 @@ namespace mitk {
 
       mitk::AffineTransform3D::Pointer GetAffineTransform3D();
 
+      mitk::Matrix3D getRotationMatrix();
+
     protected:
       NavigationData();
-      NavigationData(mitk::AffineTransform3D::Pointer affineTransform3D);
+
+      /**
+       * Creates a NavigationData object from an affineTransform3D.
+       * @param checkForRotationMatrix  if this is true, the rotation matrix coming from the affineTransform is checked
+       *  for being a rotation matrix. If it isn't, an exception is thrown. Disable this check by
+       *  setting checkForRotationMatrix to false.
+       *
+       *  @throws mitkException if checkForRotationMatrix is true and a non rotation matrix was introduced by
+       *    AffineTransform.
+       */
+      NavigationData(mitk::AffineTransform3D::Pointer affineTransform3D, bool checkForRotationMatrix = true);
 
       virtual ~NavigationData();
 

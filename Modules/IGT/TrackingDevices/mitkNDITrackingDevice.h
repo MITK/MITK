@@ -78,6 +78,8 @@ namespace mitk
     * - initializing the device
     * - initializing all manually added passive tools (user supplied srom file)
     * - initializing active tools that are connected to the tracking device
+    * @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device.
+    * @throw mitk::IGTException Throws a normal IGT exception if an error occures which is not related to the hardware.
     */
     virtual bool OpenConnection();
 

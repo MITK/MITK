@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNDITrackingDevice.h"
 #include "mitkIGTTimeStamp.h"
+#include "mitkIGTHardwareException.h"
 #include <stdio.h>
 
 #include <itksys/SystemTools.hxx>
@@ -363,18 +364,12 @@ bool mitk::NDITrackingDevice::OpenConnection()
 
   //this->m_ModeMutex->Lock();
   if (this->GetState() != Setup)
-  {
-    this->SetErrorMessage("Can only try to open the connection if in setup mode");
-    return false;
-  }
-
-  //
+    {mitkThrowException(mitk::IGTException) << "Can only try to open the connection if in setup mode";}
 
   m_SerialCommunication = mitk::SerialCommunication::New();
 
   /* init local com port to standard com settings for a NDI tracking device:
-  9600 baud, 8 data bits, no parity, 1 stop bit, no hardware handshake
-  */
+  9600 baud, 8 data bits, no parity, 1 stop bit, no hardware handshake */
   if (m_DeviceName.empty())
     m_SerialCommunication->SetPortNumber(m_PortNumber);
   else
@@ -387,10 +382,9 @@ bool mitk::NDITrackingDevice::OpenConnection()
   m_SerialCommunication->SetReceiveTimeout(5000);
   if (m_SerialCommunication->OpenConnection() == 0) // 0 == ERROR_VALUE
   {
-    this->SetErrorMessage("Can not open serial port");
     m_SerialCommunication->CloseConnection();
     m_SerialCommunication = NULL;
-    return false;
+    mitkThrowException(mitk::IGTHardwareException) << "Can not open serial port";
   }
 
   /* Reset Tracking device by sending a serial break for 500ms */
@@ -403,13 +397,12 @@ bool mitk::NDITrackingDevice::OpenConnection()
   this->ClearReceiveBuffer();     // flush the receive buffer of all remaining data (carriage return, strings other than reset
   if (reset.compare(answer) != 0)  // check for RESETBE6F
   {
-    this->SetErrorMessage("Hardware Reset of tracking device did not work");
     if (m_SerialCommunication.IsNotNull())
     {
       m_SerialCommunication->CloseConnection();
       m_SerialCommunication = NULL;
     }
-    return false;
+    mitkThrowException(mitk::IGTHardwareException) << "Hardware Reset of tracking device did not work";
   }
 
   /* Now the tracking device is reset, start initialization */
@@ -419,10 +412,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   returnvalue = m_DeviceProtocol->COMM(m_BaudRate, m_DataBits, m_Parity, m_StopBits, m_HardwareHandshake);
 
   if (returnvalue != NDIOKAY)
-  {
-    this->SetErrorMessage("Could not set comm settings in trackingdevice");
-    return false;
-  }
+    {mitkThrowException(mitk::IGTHardwareException) << "Could not set comm settings in trackingdevice";}
 
   //after changing COMM wait at least 100ms according to NDI Api documentation page 31
   itksys::SystemTools::Delay(500);
@@ -437,23 +427,18 @@ bool mitk::NDITrackingDevice::OpenConnection()
   m_SerialCommunication->SetSendTimeout(5000);
   m_SerialCommunication->SetReceiveTimeout(5000);
   m_SerialCommunication->OpenConnection();
+
   /* initialize the tracking device */
   returnvalue = m_DeviceProtocol->INIT();
   if (returnvalue != NDIOKAY)
-  {
-    this->SetErrorMessage("Could not initialize the tracking device");
-    return false;
-  }
+    {mitkThrowException(mitk::IGTHardwareException) << "Could not initialize the tracking device";}
 
   if (this->GetType() == mitk::TrackingSystemNotSpecified)  // if the type of tracking device is not specified, try to query the connected device
   {
     mitk::TrackingDeviceType deviceType;
     returnvalue = m_DeviceProtocol->VER(deviceType);
     if ((returnvalue != NDIOKAY) || (deviceType == mitk::TrackingSystemNotSpecified))
-    {
-      this->SetErrorMessage("Could not determine tracking device type. Please set manually and try again.");
-      return false;
-    }
+      {mitkThrowException(mitk::IGTHardwareException) << "Could not determine tracking device type. Please set manually and try again.";}
     this->SetType(deviceType);
   }
 
@@ -523,24 +508,19 @@ bool mitk::NDITrackingDevice::OpenConnection()
         {
           returnvalue = m_DeviceProtocol->PVWR(&portHandle, (*it)->GetSROMData(), (*it)->GetSROMDataLength());
           if (returnvalue != NDIOKAY)
-          {
-            this->SetErrorMessage((std::string("Could not write SROM file for tool '") + (*it)->GetToolName() + std::string("' to tracking device")).c_str());
-            return false;
-          }
+            {mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not write SROM file for tool '") + (*it)->GetToolName() + std::string("' to tracking device")).c_str();}
+
           returnvalue = m_DeviceProtocol->PINIT(&portHandle);
           if (returnvalue != NDIOKAY)
-          {
-            this->SetErrorMessage((std::string("Could not initialize tool '") + (*it)->GetToolName()).c_str());
-            return false;
-          }
+            {mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not initialize tool '") + (*it)->GetToolName()).c_str();}
+
           if ((*it)->IsEnabled() == true)
           {
             returnvalue = m_DeviceProtocol->PENA(&portHandle, (*it)->GetTrackingPriority()); // Enable tool
             if (returnvalue != NDIOKAY)
             {
-              this->SetErrorMessage((std::string("Could not enable port '") + portHandle +
-                std::string("' for tool '")+ (*it)->GetToolName() + std::string("'")).c_str());
-              return false;
+              mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not enable port '") + portHandle +
+                std::string("' for tool '")+ (*it)->GetToolName() + std::string("'")).c_str();
             }
           }
         }
@@ -558,14 +538,10 @@ bool mitk::NDITrackingDevice::OpenConnection()
   {
     returnvalue = m_DeviceProtocol->IRATE(this->m_IlluminationActivationRate);
     if (returnvalue != NDIOKAY)
-    {
-      this->SetErrorMessage("Could not set the illuminator activation rate");
-      return false;
-    }
+      {mitkThrowException(mitk::IGTHardwareException) << "Could not set the illuminator activation rate";}
   }
   /* finish  - now all tools should be added, initialized and enabled, so that tracking can be started */
   this->SetState(Ready);
-  this->SetErrorMessage("");
   return true;
 }
 

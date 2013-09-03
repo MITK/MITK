@@ -48,19 +48,19 @@ namespace mitk
 
     /**
     * \brief Starts the tracking.
-    * \return Returns true if the tracking is started. Returns false if there was an error.
+    * \return Returns true if the tracking is started. Throws an exception if an error occures.
     * @throw mitk::IGTHardwareException Throws an exception if there is an error during start tracking.
     */
     virtual bool StartTracking();
 
     /**
     * \brief Stops the tracking.
-    * \return Returns true if the tracking is stopped. Returns false if there was an error.
+    * \return Returns true if the tracking is stopped.
     */
     virtual bool StopTracking();
 
     /**
-    * \brief Opens the connection to the device. This have to be done before the tracking is startet.
+    * \brief Opens the connection to the device. This have to be done before the tracking is started.
     * @throw mitk::IGTHardwareException Throws an exception if there is an error during open connection.
     */
     virtual bool OpenConnection();

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKNavigationDataPlayerBase_H_HEADER_INCLUDED_
 
 #include <mitkNavigationDataSource.h>
+#include "mitkNavigationDataReaderInterface.h"
 #include "tinyxml.h"
 
 
@@ -57,11 +58,19 @@ namespace mitk{
     */
     bool IsAtEnd();
 
+    itkGetMacro(NavigationDataReader, NavigationDataReaderInterface::Pointer);
+    itkSetMacro(NavigationDataReader, NavigationDataReaderInterface::Pointer);
+
   protected:
     NavigationDataPlayerBase();
     virtual ~NavigationDataPlayerBase();
     virtual void GenerateData() = 0;
 
+    void ReadNavigationDataSet();
+    void GraftEmptyOutput();
+
+    mitk::NavigationDataReaderInterface::Pointer m_NavigationDataReader;
+    mitk::NavigationDataSet::Pointer m_NavigationDataSet;
 
     /**
     * \brief Creates NavigationData from XML element and returns it

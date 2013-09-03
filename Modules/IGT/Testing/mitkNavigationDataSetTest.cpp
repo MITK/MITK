@@ -82,8 +82,8 @@ static void TestSetAndGet()
 }
 
 /**
-*
-*/
+  *
+  */
 int mitkNavigationDataSetTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("NavigationDataSet");

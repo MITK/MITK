@@ -77,9 +77,11 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
   std::vector< itk::Index<3> > refRoi = referenceRoi->GetRoi();
 
   bool equalSize(roi.size() == refRoi.size());
-  MITK_TEST_CONDITION(equalSize, "Size of skeleton and control skeleton are the same.");
 
+  MITK_INFO << "roi size: " << roi.size();
+  MITK_INFO << "ref roi size: " << refRoi.size();
 
+  MITK_TEST_EQUAL(roi.size(), refRoi.size(), "Size of roi and control roi are the same.");
 
   if(equalSize)
   {

@@ -71,6 +71,14 @@ static void TestSetAndGet()
     "First NavigationData object for tool 0 should be the same as added previously.");
   MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataForIndex(1, 1) == nd22,
     "Second NavigationData object for tool 0 should be the same as added previously.");
+
+  std::vector<mitk::NavigationData::Pointer> result = navigationDataSet->GetTimeStep(1);
+  MITK_TEST_CONDITION_REQUIRED(nd12 == result[0],"Comparing returned datas from GetTimeStep().");
+  MITK_TEST_CONDITION_REQUIRED(nd22 == result[1],"Comparing returned datas from GetTimeStep().");
+
+  result = navigationDataSet->GetDataStreamForTool(1);
+  MITK_TEST_CONDITION_REQUIRED(nd21 == result[0],"Comparing returned datas from GetStreamForTool().");
+  MITK_TEST_CONDITION_REQUIRED(nd22 == result[1],"Comparing returned datas from GetStreamForTool().");
 }
 
 /**

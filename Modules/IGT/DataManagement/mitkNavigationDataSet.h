@@ -76,10 +76,22 @@ namespace mitk {
     /**
     * \brief Returns a vector that contains all tracking data for a given tool.
     *
+    * This is a relatively expensive operation, as it requires the construction of a new vector.
+    *
     * @param toolIndex Index of the tool for which the stream should be returned.
     * @return Returns a vector that contains all tracking data for a given tool.
     */
-    std::vector< mitk::NavigationData::Pointer > GetTrackingStreamForTool(unsigned int toolIndex);
+    virtual std::vector< mitk::NavigationData::Pointer > GetDataStreamForTool(unsigned int toolIndex);
+
+    /**
+    * \brief Returns a vector that contains NavigationDatas for each tool for a given timestep.
+    *
+    * If GetNumberOFTools() equals four, then 4 NavigationDatas will be returned.
+    *
+    * @param index Index of the timeStep for which the datas should be returned. cannot be larger than mitk::NavigationDataSet::Size()
+    * @return Returns a vector that contains all tracking data for a given tool.
+    */
+    virtual std::vector< mitk::NavigationData::Pointer > GetTimeStep(unsigned int index);
 
     /**
     * \brief Returns the number of tools for which NavigationDatas are stored in this set.

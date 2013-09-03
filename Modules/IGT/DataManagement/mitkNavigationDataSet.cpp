@@ -97,7 +97,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataForIndex
 //  return *(it-1);
 //}
 
-std::vector< mitk::NavigationData::Pointer > mitk::NavigationDataSet::GetTrackingStreamForTool(unsigned int toolIndex)
+std::vector< mitk::NavigationData::Pointer > mitk::NavigationDataSet::GetDataStreamForTool(unsigned int toolIndex)
 {
   if (toolIndex >= m_NumberOfTools )
   {
@@ -106,6 +106,7 @@ std::vector< mitk::NavigationData::Pointer > mitk::NavigationDataSet::GetTrackin
   }
 
   std::vector< mitk::NavigationData::Pointer > result;
+
   for(int i = 0; i < m_NavigationDataVectors.size(); i++)
     result.push_back(m_NavigationDataVectors[i][toolIndex]);
 

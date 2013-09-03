@@ -97,6 +97,26 @@ mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataForIndex
 //  return *(it-1);
 //}
 
+std::vector< mitk::NavigationData::Pointer > mitk::NavigationDataSet::GetTrackingStreamForTool(unsigned int toolIndex)
+{
+  if (toolIndex >= m_NumberOfTools )
+  {
+    MITK_WARN("NavigationDataSet") << "Invalid toolIndex: " << m_NumberOfTools << " Tools known, requested index " << toolIndex << "";
+    return std::vector<mitk::NavigationData::Pointer>();
+  }
+
+  std::vector< mitk::NavigationData::Pointer > result;
+  for(int i = 0; i < m_NavigationDataVectors.size(); i++)
+    result.push_back(m_NavigationDataVectors[i][toolIndex]);
+
+  return result;
+}
+
+std::vector< mitk::NavigationData::Pointer > mitk::NavigationDataSet::GetTimeStep(unsigned int index)
+{
+  return m_NavigationDataVectors[index];
+}
+
 unsigned int mitk::NavigationDataSet::GetNumberOfTools()
 {
   return m_NumberOfTools;

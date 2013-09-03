@@ -74,6 +74,14 @@ namespace mitk {
     //NavigationData::Pointer GetNavigationDataBeforeTimestamp( mitk::NavigationData::TimeStampType timestamp , unsigned int toolIndex ) const;
 
     /**
+    * \brief Returns a vector that contains all tracking data for a given tool.
+    *
+    * @param toolIndex Index of the tool for which the stream should be returned.
+    * @return Returns a vector that contains all tracking data for a given tool.
+    */
+    std::vector< mitk::NavigationData::Pointer > GetTrackingStreamForTool(unsigned int toolIndex);
+
+    /**
     * \brief Returns the number of tools for which NavigationDatas are stored in this set.
     *
     * This is always equal to the number given in the constructor of this class.

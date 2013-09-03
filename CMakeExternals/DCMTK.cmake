@@ -48,6 +48,7 @@ if(MITK_USE_DCMTK)
          -DDCMTK_WITH_TIFF:BOOL=OFF  # see bug #9894
          -DDCMTK_WITH_XML:BOOL=OFF  # see bug #9894
          -DDCMTK_WITH_ICONV:BOOL=OFF  # see bug #9894
+         -DCMAKE_INSTALL_NAME_DIR:STRING=<INSTALL_DIR>/lib
       DEPENDS ${proj_DEPENDENCIES}
       )
     set(DCMTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)

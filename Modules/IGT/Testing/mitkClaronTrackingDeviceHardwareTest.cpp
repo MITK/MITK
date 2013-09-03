@@ -37,13 +37,16 @@ int mitkClaronTrackingDeviceHardwareTest(int argc, char* argv[])
   std::string toolfile1 = argv[1];
   std::string toolfile2 = argv[2];
   std::string toolfile3 = argv[3];
-  std::string calibrdir = MITK_MICRON_TRACKER_CALIBRATION_DIR;
+  std::string calibrdir("");
+#ifdef MITK_MICRON_TRACKER_CALIBRATION_DIR
+   calibrdir = MITK_MICRON_TRACKER_CALIBRATION_DIR;
+#endif
 
   MITK_TEST_CONDITION_REQUIRED( (calibrdir.empty() == false), "MITK_MICRON_TRACKER_CALIBRATION_DIR was not set in CMake, but is required for the test.");
 
   //create tracking device
   mitk::ClaronTrackingDevice::Pointer myDevice = mitk::ClaronTrackingDevice::New();
-  myDevice->SetCalibrationDir(calibrdir);
+  myDevice->SetCalibrationDir(calibrdir.c_str());
   MITK_TEST_OUTPUT(<<".. Creating tracking device.");
 
   //add tools

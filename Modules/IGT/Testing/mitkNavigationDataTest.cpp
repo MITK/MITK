@@ -180,12 +180,13 @@ class NavigationDataTestClass
     }
   };
 
+
   static Quaternion quaternion;
   static Vector3D   offsetVector;
   static Point3D    offsetPoint;
   static Matrix3D   rotation;
 
-  static void SetupAffine()
+  static void SetupNaviDataTests()
   {
     // set rotation matrix to
     /*
@@ -193,7 +194,7 @@ class NavigationDataTestClass
      * 1  0  0
      * 0  0  1
      */
-
+    rotation.Fill(0);
     rotation[0][1] = -1;
     rotation[1][0] =  1;
     rotation[2][2] =  1;
@@ -209,13 +210,80 @@ class NavigationDataTestClass
     offsetPoint           = offsetArray;
   }
 
+  /**
+   * Helper method, which creates a NavigationData object using the data created in SetupNaviDataTests()
+   */
+  static NavigationData::Pointer CreateNavidata(Quaternion quaternion, Point3D offset)
+  {
+    NavigationData::Pointer navigationData = NavigationData::New();
+    navigationData->SetOrientation(quaternion);
+    navigationData->SetPosition(offset);
+
+    return navigationData;
+  }
+
+  static AffineTransform3D::Pointer CreateAffineTransform(Matrix3D rotationMatrix, Vector3D offset)
+  {
+    AffineTransform3D::Pointer affineTransform3D = AffineTransform3D::New();
+    affineTransform3D->SetOffset(offset);
+    affineTransform3D->SetMatrix(rotationMatrix);
+
+    return affineTransform3D;
+  }
+
+  static void TestInverse()
+  {
+    SetupNaviDataTests();
+    NavigationData::Pointer navigationData = CreateNavidata(quaternion, offsetPoint);
+
+    NavigationData::Pointer navigationDataInverse = navigationData->GetInverse();
+
+    // calculate expected inverted position vector: b2 = -A2b1
+
+    // for -A2b1 we need vnl_vectors.
+    vnl_vector_fixed<ScalarType, 3> b1;
+    for (int i = 0; i < 3; ++i) {
+      b1[i] = navigationData->GetOrientation()[i];
+    }
+    vnl_vector_fixed<ScalarType, 3> b2;
+    b2 = -(navigationData->GetOrientation().rotate(b1));
+
+    // now copy result back into our mitk::Point3D
+    Point3D invertedPosition;
+    for (int i = 0; i < 3; ++i) {
+      invertedPosition[i] = b2[i];
+    }
+
+
+    MITK_TEST_CONDITION(Equal(navigationData->GetOrientation().inverse(), navigationDataInverse->GetOrientation()),"Testing GetInverse: quaternion inverted");
+    MITK_TEST_CONDITION(Equal(navigationData->GetPosition(), invertedPosition), "Testing GetInverse: quaternion inverted");
+
+    // TODO: Test for hasOrientation, IGTTimestamp, ...
+  }
+
+  static void TestInverseError()
+  {
+
+  }
+
+  static void TestTransform()
+  {
+    SetupNaviDataTests();
+    NavigationData::Pointer navigationData = CreateNavidata(quaternion, offsetPoint);
+    ScalarType pointArray[] = {1.0, 3.0, 5.0};
+    Point3D    point        = pointArray;
+
+    point = navigationData->Transform(point);
+
+    ScalarType resultingPointArray[] = {-2, 3, 8.123456};
+    Point3D    resultingPoint        = resultingPointArray;
+    MITK_TEST_CONDITION(Equal(resultingPoint, point), "Testing point transformation");
+  }
+
   static void TestAffineConstructor()
   {
-    SetupAffine();
-
-    AffineTransform3D::Pointer affineTransform3D = AffineTransform3D::New();
-    affineTransform3D->SetOffset(offsetVector);
-    affineTransform3D->SetMatrix(rotation);
+    SetupNaviDataTests();
+    AffineTransform3D::Pointer affineTransform3D = CreateAffineTransform(rotation, offsetVector);
 
     NavigationData::Pointer navigationData = NavigationData::New(affineTransform3D);
 
@@ -224,17 +292,55 @@ class NavigationDataTestClass
     MITK_TEST_CONDITION(true == navigationData->GetHasPosition(), "Testing affine constructor: hasposition == true");
     MITK_TEST_CONDITION(true == navigationData->GetHasOrientation(), "Testing affine constructor: hasorientation == true");
     MITK_TEST_CONDITION(true == navigationData->IsDataValid(), "Testing affine constructor: isdatavalid == true");
-    MITK_TEST_CONDITION(Equal(navigationData->GetIGTTimeStamp(),0.0), "Testing affine constructor: Timestamp is zero");
+    MITK_TEST_CONDITION(Equal(navigationData->GetIGTTimeStamp(),0.0), "Testing affine constructor: IGTTimestamp is zero");
 
+  }
+
+
+  static void TestAffineConstructorErrorTransposedNotInverse()
+  {
+    SetupNaviDataTests();
+    rotation.SetIdentity();
+    rotation[1][0] = 2; // this matrix has determinant = 1 (triangular matrix with ones in diagonal) but transposed != inverse
+    AffineTransform3D::Pointer affineTransform3D = CreateAffineTransform(rotation, offsetVector);
+
+    MITK_TEST_FOR_EXCEPTION(mitk::Exception&, NavigationData::New(affineTransform3D));
+  }
+
+  static void TestAffineConstructorErrorDeterminantNonEqualOne()
+  {
+    SetupNaviDataTests();
+    rotation.SetIdentity();
+    rotation[0][0] = 2; // determinant for diagonal matrices is product of diagonal elements => det = 2
+    AffineTransform3D::Pointer affineTransform3D = CreateAffineTransform(rotation, offsetVector);
+
+    MITK_TEST_FOR_EXCEPTION(mitk::Exception&, NavigationData::New(affineTransform3D));
+  }
+
+  static void TestAffineConstructorErrorCheckingFalse()
+  {
+    SetupNaviDataTests();
+    rotation.SetIdentity();
+    rotation[0][0] = 2; // determinant for diagonal matrices is product of diagonal elements => det = 2
+    AffineTransform3D::Pointer affineTransform3D = CreateAffineTransform(rotation, offsetVector);
+
+    bool exceptionSuppressed = true;
+    try
+    {
+      NavigationData::New(affineTransform3D, false);
+    }
+    catch (mitk::Exception&)
+    {
+      exceptionSuppressed = false;
+    }
+
+    MITK_TEST_CONDITION(exceptionSuppressed, "Test affine constructor: exception can be suppressed.")
   }
 
   static void TestAffineGetter()
   {
-    SetupAffine();
-
-    NavigationData::Pointer navigationData = NavigationData::New();
-    navigationData->SetOrientation(quaternion);
-    navigationData->SetPosition(offsetPoint);
+    SetupNaviDataTests();
+    NavigationData::Pointer navigationData = CreateNavidata(quaternion, offsetPoint);
 
     AffineTransform3D::Pointer affineTransform = navigationData->GetAffineTransform3D();
 
@@ -242,17 +348,13 @@ class NavigationDataTestClass
     MITK_TEST_CONDITION(MatrixEqualElementWise(affineTransform->GetMatrix(), rotation), "Testing AffineTransform3D getter: rotation");
   }
 
-  /**s
+  /**
    * This test tests the complete chain from affineTransform -> NavigationData -> affineTransform
    */
   static void TestAffineToNaviDataToAffine()
   {
-    SetupAffine();
-
-    AffineTransform3D::Pointer affineTransform3D = AffineTransform3D::New();
-
-    affineTransform3D->SetOffset(offsetVector);
-    affineTransform3D->SetMatrix(rotation);
+    SetupNaviDataTests();
+    AffineTransform3D::Pointer affineTransform3D = CreateAffineTransform(rotation, offsetVector);
 
     // there and back again: affineTransform -> NavigationData -> affineTransform
     NavigationData::Pointer navigationData = NavigationData::New(affineTransform3D);
@@ -279,8 +381,16 @@ int mitkNavigationDataTest(int /* argc */, char* /*argv*/[])
   NavigationDataTestClass::TestWrongInputs();
 
   TestAffineConstructor();
+  TestAffineConstructorErrorDeterminantNonEqualOne();
+  TestAffineConstructorErrorTransposedNotInverse();
+  TestAffineConstructorErrorCheckingFalse();
+
   TestAffineGetter();
   TestAffineToNaviDataToAffine();
+
+  TestTransform();
+
+  TestInverse();
 
 
   MITK_TEST_END();

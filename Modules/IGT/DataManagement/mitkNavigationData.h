@@ -38,6 +38,7 @@ namespace mitk {
     public:
       mitkClassMacro(NavigationData, itk::DataObject);
       itkNewMacro(Self);
+      mitkNewMacro2Param(Self, mitk::AffineTransform3D::Pointer, bool);
       mitkNewMacro1Param(Self, mitk::AffineTransform3D::Pointer);
 
 
@@ -163,9 +164,46 @@ namespace mitk {
 
       mitk::AffineTransform3D::Pointer GetAffineTransform3D();
 
+      mitk::Matrix3D getRotationMatrix();
+
+      mitk::Point3D Transform(const mitk::Point3D);
+
+      /**
+       * Get inverse of the Transformation represented by this NavigationData.
+       * @throws mitk::Exception in case this is not a valid Transformation. (e.g. quaternion is not initialized validly.
+       */
+      mitk::NavigationData::Pointer GetInverse();
+
+      /** Compose with another NavigationData
+       *
+       * This method composes self with another NavigationData of the
+       * same dimension, modifying self to be the composition of self
+       * and other.  If the argument pre is true, then other is
+       * precomposed with self; that is, the resulting transformation
+       * consists of first applying other to the source, followed by
+       * self.  If pre is false or omitted, then other is post-composed
+       * with self; that is the resulting transformation consists of
+       * first applying self to the source, followed by other. */
+      void Compose(mitk::NavigationData::Pointer n, bool pre = false);
+
     protected:
       NavigationData();
-      NavigationData(mitk::AffineTransform3D::Pointer affineTransform3D);
+
+      /*
+       * Copy constructor internally used.
+       */
+      NavigationData(mitk::NavigationData::Pointer toCopy);
+
+      /**
+       * Creates a NavigationData object from an affineTransform3D.
+       * @param checkForRotationMatrix  if this is true, the rotation matrix coming from the affineTransform is checked
+       *  for being a rotation matrix. If it isn't, an exception is thrown. Disable this check by
+       *  setting checkForRotationMatrix to false.
+       *
+       *  @throws mitkException if checkForRotationMatrix is true and a non rotation matrix was introduced by
+       *    AffineTransform.
+       */
+      NavigationData(mitk::AffineTransform3D::Pointer affineTransform3D, bool checkForRotationMatrix = true);
 
       virtual ~NavigationData();
 

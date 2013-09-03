@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkClaronTool.h"
 #include "mitkTestingMacros.h"
 #include "mitkIGTConfig.h"
+#include "mitkIGTException.h"
 
 
 static bool TestIsMicronTrackerInstalled()
@@ -82,7 +83,10 @@ static void TestAllMethodsOnSystemsWithoutMicronTracker()
   mitk::ClaronTrackingDevice::Pointer myClaronTrackingDevice = mitk::ClaronTrackingDevice::New();
 
   //OpenConnection
-  MITK_TEST_CONDITION( (!myClaronTrackingDevice->OpenConnection()), "Testing behavior of method OpenConnection() (Errors should occur because MicronTracker is not activated).\n");
+  MITK_TEST_OUTPUT(<<"Testing behavior of method OpenConnection() (Errors should occur because MicronTracker is not activated).");
+  MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::IGTException)
+    myClaronTrackingDevice->OpenConnection();
+  MITK_TEST_FOR_EXCEPTION_END(mitk::IGTException)
 
   std::string toolFileName(MITK_IGT_DATA_DIR);
   toolFileName.append("/ClaronTool");

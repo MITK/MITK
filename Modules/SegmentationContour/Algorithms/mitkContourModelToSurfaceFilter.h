@@ -44,7 +44,7 @@ namespace mitk {
 
     typedef mitk::ContourModel InputType;
 
-
+    void GenerateOutputInformation();
 
     /** Set/Get the image input of this process object.  */
     virtual void SetInput( const InputType *input);

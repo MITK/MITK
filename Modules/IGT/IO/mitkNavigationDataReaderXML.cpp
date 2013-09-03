@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTIOException.h"
 
 mitk::NavigationDataReaderXML::NavigationDataReaderXML()
-  : m_parentElement(0), m_currentNode(0)
+  : m_parentElement(0), m_currentNode(0), m_Stream(0)
 {
 }
 

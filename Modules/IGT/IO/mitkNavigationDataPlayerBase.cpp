@@ -17,7 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataPlayerBase.h"
 
 
-mitk::NavigationDataPlayerBase::NavigationDataPlayerBase() : m_StreamValid(true), m_ErrorMessage("")
+mitk::NavigationDataPlayerBase::NavigationDataPlayerBase()
+  : m_StreamValid(true), m_ErrorMessage("")
 {
   m_Name ="Navigation Data Player Source";
 }
@@ -26,17 +27,19 @@ mitk::NavigationDataPlayerBase::~NavigationDataPlayerBase()
 {
 }
 
-
-
-
+void mitk::NavigationDataPlayerBase::ReadNavigationDataSet()
+{
+  if (m_NavigationDataReader.IsNotNull())
+  {
+    m_NavigationDataSet = m_NavigationDataReader->Read();
+  }
+}
 
 void mitk::NavigationDataPlayerBase::UpdateOutputInformation()
 {
   this->Modified();  // make sure that we need to be updated
   Superclass::UpdateOutputInformation();
 }
-
-
 
 mitk::NavigationData::Pointer mitk::NavigationDataPlayerBase::ReadNavigationData(TiXmlElement* elem)
 {
@@ -115,4 +118,24 @@ mitk::NavigationData::Pointer mitk::NavigationDataPlayerBase::ReadNavigationData
 
 
   return nd;
+}
+
+void mitk::NavigationDataPlayerBase::GraftEmptyOutput()
+{
+  for (unsigned int index = 0; index < m_NavigationDataSet->GetNumberOfTools(); index++)
+  {
+    mitk::NavigationData* output = this->GetOutput(index);
+    assert(output);
+
+    mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
+    mitk::NavigationData::PositionType position;
+    mitk::NavigationData::OrientationType orientation(0.0,0.0,0.0,0.0);
+    position.Fill(0.0);
+
+    nd->SetPosition(position);
+    nd->SetOrientation(orientation);
+    nd->SetDataValid(false);
+
+    output->Graft(nd);
+  }
 }

@@ -102,8 +102,7 @@ namespace mitk
     * \brief TestConnection() tries to connect to a NDI tracking device on the current port/device and returns which device it has found
     *
     * TestConnection() tries to connect to a NDI tracking device on the current port/device.
-    * \return It returns the type of the device that
-    * answers at the port/device or mitk::TrackingSystemNotSpecified if no NDI tracking device is available at that port
+    * \return It returns the type of the device that answers at the port/device. Throws an exception if no device is available on that port.
     * @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device.
     */
     virtual mitk::TrackingDeviceType TestConnection();
@@ -113,7 +112,7 @@ namespace mitk
     *
     * This method queries the tracking device for all wired tools, initializes them and creates TrackingTool representation objects
     * for them
-    * \return true if no error occured, false if an error occured. Check GetErrorMessage() in case of error.
+    * \return True if the method was executed successful.
     * @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device.
     * @throw mitk::IGTException Throws a normal IGT exception if an error occures which is not related to the hardware.
     */

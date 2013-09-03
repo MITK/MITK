@@ -148,14 +148,10 @@ void mitk::NavigationDataSet::SetRequestedRegion(const DataObject * )
 
 mitk::NavigationDataSet::NavigationDataSetIterator mitk::NavigationDataSet::Begin()
 {
-  //TODO default implementation
-  mitk::NavigationDataSet::NavigationDataSetIterator result;
-  return result;
+  return m_NavigationDataVectors.begin();
 }
 
 mitk::NavigationDataSet::NavigationDataSetIterator mitk::NavigationDataSet::End()
 {
-  //TODO default implementation
-  mitk::NavigationDataSet::NavigationDataSetIterator result;
-  return result;
+  return m_NavigationDataVectors.end();
 }

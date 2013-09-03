@@ -99,29 +99,12 @@ mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataForIndex
 
 unsigned int mitk::NavigationDataSet::GetNumberOfTools()
 {
-  return m_NavigationDataVectors.size();
+  return m_NumberOfTools;
 }
 
-unsigned int mitk::NavigationDataSet::GetNumberOfNavigationDatas(bool check)
+unsigned int mitk::NavigationDataSet::Size()
 {
-  if (this->GetNumberOfTools() == 0) { return 0; };
-
-  unsigned int number = m_NavigationDataVectors.at(0).size();;
-
-  if (check)
-  {
-    for (std::vector<std::vector<NavigationData::Pointer> >::iterator it = m_NavigationDataVectors.begin()+1;
-      it != m_NavigationDataVectors.end(); ++it)
-    {
-      if (it->size() != number)
-      {
-        MITK_WARN << "Number of NavigationData objects differs for different tools.";
-        return -1;
-      }
-    }
-  }
-
-  return number;
+  return m_NavigationDataVectors.size();
 }
 
 // ---> methods necessary for BaseData

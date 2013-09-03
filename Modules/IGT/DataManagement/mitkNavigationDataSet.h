@@ -31,6 +31,9 @@ namespace mitk {
   class MitkIGT_EXPORT NavigationDataSet : public BaseData
   {
   public:
+
+    typedef std::vector< std::vector<mitk::NavigationData::Pointer> >::iterator NavigationDataSetIterator;
+
     mitkClassMacro(NavigationDataSet, BaseData);
 
     mitkNewMacro1Param(Self, unsigned int);
@@ -64,8 +67,8 @@ namespace mitk {
     unsigned int GetNumberOfTools();
     unsigned int GetNumberOfNavigationDatas(bool check = true);
 
-    virtual std::vector< mitk::NavigationData::Pointer >::iterator Begin();
-    virtual std::vector< mitk::NavigationData::Pointer >::iterator End();
+    virtual NavigationDataSetIterator Begin();
+    virtual NavigationDataSetIterator End();
 
     // virtual methods, that need to be implemented, but aren't reasonable for NavigationData
     virtual void SetRequestedRegionToLargestPossibleRegion( );

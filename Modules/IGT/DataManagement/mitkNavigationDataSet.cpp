@@ -28,21 +28,24 @@ mitk::NavigationDataSet::~NavigationDataSet( )
 bool mitk::NavigationDataSet::AddNavigationDatas( std::vector<mitk::NavigationData::Pointer> navigationDatas )
 {
   // test if tool with given index exist
-  if ( navigationDatas.size() >= m_NavigationDataVectors.size() )
+  if ( navigationDatas.size() != m_NavigationDataVectors.size() )
   {
-    MITK_WARN("NavigationDataSet") << "Tried to add to many navigation Datas to set, only " << m_NavigationDataVectors.size() << " allowed, tried to add " << navigationDatas.size() << ".";
+    MITK_WARN("NavigationDataSet") << "Tried to add to many or too few navigation Datas to NavigationDataSet. " << m_NavigationDataVectors.size() << " required, tried to add " << navigationDatas.size() << ".";
     return false;
   }
 
-  //// test for consistent timestamp
-  //if ( m_NavigationDataVectors.at(toolIndex).size() > 0 &&
-  //  navigationData->GetIGTTimeStamp() <= (*(m_NavigationDataVectors.at(toolIndex).end()-1))->GetIGTTimeStamp())
-  //{
-  //  MITK_WARN("NavigationDataSet") << "IGTTimeStamp of new NavigationData should be greater then timestamp of last NavigationData.";
-  //  return false;
-  //}
+  // test for consistent timestamp
+  if ( m_NavigationDataVectors.size() > 0)
+  {
+    for (int i = 0; i < navigationDatas.size(); i++)
+      if (navigationDatas[i]->GetIGTTimeStamp() <= (*(m_NavigationDataVectors[i].end()-1))->GetIGTTimeStamp())
+      {
+        MITK_WARN("NavigationDataSet") << "IGTTimeStamp of new NavigationData should be newer then timestamp of last NavigationData.";
+        return false;
+      }
+  }
 
-  //m_NavigationDataVectors.at(toolIndex).push_back(navigationData);
+  m_NavigationDataVectors.push_back(navigationDatas);
   return true;
 }
 
@@ -142,16 +145,16 @@ void mitk::NavigationDataSet::SetRequestedRegion(const DataObject * )
 
 // ---> methods for Iterators
 
-std::vector< mitk::NavigationData::Pointer >::iterator mitk::NavigationDataSet::Begin()
+mitk::NavigationDataSet::NavigationDataSetIterator mitk::NavigationDataSet::Begin()
 {
   //TODO default implementation
-  std::vector< mitk::NavigationData::Pointer >::iterator result;
+  mitk::NavigationDataSet::NavigationDataSetIterator result;
   return result;
 }
 
-std::vector< mitk::NavigationData::Pointer >::iterator mitk::NavigationDataSet::End()
+mitk::NavigationDataSet::NavigationDataSetIterator mitk::NavigationDataSet::End()
 {
   //TODO default implementation
-  std::vector< mitk::NavigationData::Pointer >::iterator result;
+  mitk::NavigationDataSet::NavigationDataSetIterator result;
   return result;
 }

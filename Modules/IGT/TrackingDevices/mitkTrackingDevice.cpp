@@ -25,7 +25,7 @@ typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 mitk::TrackingDevice::TrackingDevice() :
   m_Data(mitk::DeviceDataUnspecified),
   m_State(mitk::TrackingDevice::Setup),
-  m_StopTracking(false), m_ErrorMessage(""),
+  m_StopTracking(false),
   m_RotationMode(mitk::TrackingDevice::RotationStandard)
 
 {

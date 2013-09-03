@@ -49,6 +49,7 @@ namespace mitk
     /**
     * \brief Starts the tracking.
     * \return Returns true if the tracking is started. Returns false if there was an error.
+    * @throw mitk::IGTHardwareException Throws an exception if there is an error during start tracking.
     */
     virtual bool StartTracking();
 
@@ -60,6 +61,7 @@ namespace mitk
 
     /**
     * \brief Opens the connection to the device. This have to be done before the tracking is startet.
+    * @throw mitk::IGTHardwareException Throws an exception if there is an error during open connection.
     */
     virtual bool OpenConnection();
 
@@ -122,6 +124,7 @@ namespace mitk
     /**
     * \brief This method tracks tools as long as the variable m_Mode is set to "Tracking".
     * Tracking tools means grabbing frames from the camera an updating the tools.
+    * @throw mitk::IGTHardwareException Throws an exception if there is an error during tracking of tools.
     */
     void TrackTools();
 

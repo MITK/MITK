@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVirtualTrackingDevice.h"
 #include "mitkIGTTimeStamp.h"
+#include "mitkIGTException.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -131,10 +132,7 @@ mitk::TrackingTool* mitk::VirtualTrackingDevice::GetTool(unsigned int toolNumber
 bool mitk::VirtualTrackingDevice::OpenConnection()
 {
   if (m_NumberOfControlPoints < 1)
-  {
-    this->SetErrorMessage("to few control points for spline interpolation");
-    return false;
-  }
+    {mitkThrowException(mitk::IGTException) << "to few control points for spline interpolation";}
   srand(time(NULL)); //Init random number generator
 
   this->SetState(Ready);
@@ -282,7 +280,7 @@ void mitk::VirtualTrackingDevice::TrackTools()
   {
     m_TrackingFinishedMutex->Unlock();
     this->StopTracking();
-    this->SetErrorMessage("Error while trying to track tools. Thread stopped.");
+    mitkThrowException(mitk::IGTException) << "Error while trying to track tools. Thread stopped.";
   }
 }
 

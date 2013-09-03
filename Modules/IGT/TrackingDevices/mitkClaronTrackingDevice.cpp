@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkClaronTool.h"
 #include "mitkIGTConfig.h"
 #include "mitkIGTTimeStamp.h"
+#include "mitkIGTHardwareException.h"
 #include <itksys/SystemTools.hxx>
 #include <iostream>
 #include <itkMutexLockHolder.h>
@@ -132,10 +133,7 @@ bool mitk::ClaronTrackingDevice::StartTracking()
     return true;
   }
   else
-  {
-    m_ErrorMessage = "Error while trying to start the device!";
-    return false;
-  }
+    {mitkThrowException(mitk::IGTHardwareException) << "Error while trying to start the device!";}
 }
 
 
@@ -186,7 +184,7 @@ bool mitk::ClaronTrackingDevice::OpenConnection()
     }
     m_Device->StopTracking();
     this->SetState(Setup);
-    m_ErrorMessage = "Error while trying to open connection to the MicronTracker.";
+    mitkThrowException(mitk::IGTHardwareException) << "Error while trying to open connection to the MicronTracker.";
   }
   return returnValue;
 }
@@ -295,7 +293,7 @@ void mitk::ClaronTrackingDevice::TrackTools()
   catch(...)
   {
     this->StopTracking();
-    this->SetErrorMessage("Error while trying to track tools. Thread stopped.");
+    mitkThrowException(mitk::IGTHardwareException) << "Error while trying to track tools. Thread stopped.";
   }
 }
 

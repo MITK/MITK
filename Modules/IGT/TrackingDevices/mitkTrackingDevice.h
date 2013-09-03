@@ -124,10 +124,6 @@ namespace mitk {
       itkGetConstMacro(RotationMode,RotationMode);
 
       /**
-       * \brief return current error message
-       */
-      itkGetStringMacro(ErrorMessage);
-      /**
        * \brief return current object state (Setup, Ready or Tracking)
        */
       TrackingDeviceState GetState() const;
@@ -151,10 +147,7 @@ namespace mitk {
     void SetData(TrackingDeviceData data);
 
     protected:
-      /**
-      * \brief  set error message
-      */
-      itkSetStringMacro(ErrorMessage);
+
       /**
       * \brief  change object state
       */
@@ -170,7 +163,6 @@ namespace mitk {
       itk::FastMutexLock::Pointer m_StopTrackingMutex; ///< mutex to control access to m_StopTracking
       itk::FastMutexLock::Pointer m_TrackingFinishedMutex; ///< mutex to manage control flow of StopTracking()
       itk::FastMutexLock::Pointer m_StateMutex; ///< mutex to control access to m_State
-      std::string m_ErrorMessage; ///< current error message
       RotationMode m_RotationMode; ///< defines the rotation mode Standard or Transposed, Standard is default
     };
 } // namespace mitk

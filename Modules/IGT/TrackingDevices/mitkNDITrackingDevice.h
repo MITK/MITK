@@ -78,6 +78,8 @@ namespace mitk
     * - initializing the device
     * - initializing all manually added passive tools (user supplied srom file)
     * - initializing active tools that are connected to the tracking device
+    * @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device.
+    * @throw mitk::IGTException Throws a normal IGT exception if an error occures which is not related to the hardware.
     */
     virtual bool OpenConnection();
 
@@ -88,6 +90,7 @@ namespace mitk
     */
     virtual bool CloseConnection();
 
+    /** @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device. */
     bool InitializeWiredTools();
 
     /** Sets the rotation mode of this class. See documentation of enum RotationMode for details
@@ -101,6 +104,7 @@ namespace mitk
     * TestConnection() tries to connect to a NDI tracking device on the current port/device.
     * \return It returns the type of the device that
     * answers at the port/device or mitk::TrackingSystemNotSpecified if no NDI tracking device is available at that port
+    * @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device.
     */
     virtual mitk::TrackingDeviceType TestConnection();
 
@@ -110,6 +114,8 @@ namespace mitk
     * This method queries the tracking device for all wired tools, initializes them and creates TrackingTool representation objects
     * for them
     * \return true if no error occured, false if an error occured. Check GetErrorMessage() in case of error.
+    * @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device.
+    * @throw mitk::IGTException Throws a normal IGT exception if an error occures which is not related to the hardware.
     */
     bool DiscoverWiredTools();
 
@@ -142,6 +148,7 @@ namespace mitk
     * it to the list of tools. It returns a pointer of type mitk::TrackingTool to the tool
     * that can be used to read tracking data from it.
     * This is the only way to add tools to NDITrackingDevice.
+    * @throw mitk::IGTHardwareException Throws an exception if there are errors while adding the tool.
     *
     * \warning adding tools is not possible in tracking mode, only in setup and ready.
     */
@@ -211,6 +218,7 @@ namespace mitk
 
     /**
     * \brief Sets the desired tracking volume. Returns true if the volume type could be set. Usage: ndiTracker->SetVolume(mitk::Dome);
+    * @throw mitk::IGTHardwareException Throws an IGT hardware exception if the volume could not be set.
     **/
     virtual bool SetVolume(NDITrackingVolume volume);
 
@@ -218,7 +226,7 @@ namespace mitk
 
     /**
     * \brief Add a passive 6D tool to the list of tracked tools. This method is used by AddTool
-    *
+    * @throw mitk::IGTHardwareException Throws an exception if there are errors while adding the tool.
     * \warning adding tools is not possible in tracking mode, only in setup and ready.
     */
     virtual bool InternalAddTool(NDIPassiveTool* tool);
@@ -234,6 +242,7 @@ namespace mitk
     * and frees the handles at the tracking device and it removes the tools from the internal tool list
     * \warning This method can remove TrackingTools from the tool list! After calling this method, GetTool(i) could return
     *          a different tool, because tool indices could have changed.
+    * @throw mitk::IGTHardwareException Throws an exception if there are errors while communicating with the device.
     * \return returns NDIOKAY if everything was sucessfull, returns an error code otherwise
     */
     NDIErrorCode FreePortHandles();
@@ -246,7 +255,7 @@ namespace mitk
     void ClearReceiveBuffer();                ///< empty receive buffer of serial communication interface
     const std::string CalcCRC(const std::string* input);  ///< returns the CRC16 for input as a std::string
 
-public://TODO
+public:
 
     /**
     * \brief TrackTools() continuously polls serial interface for new 6d tool positions until StopTracking is called.
@@ -254,6 +263,7 @@ public://TODO
     * Continuously tracks the 6D position of all tools until StopTracking() is called.
     * This function is executed by the tracking thread (through StartTracking() and ThreadStartTracking()).
     * It should not be called directly.
+    * @throw mitk::IGTHardwareException Throws an exception if there are errors while tracking the tools.
     */
     virtual void TrackTools();
 

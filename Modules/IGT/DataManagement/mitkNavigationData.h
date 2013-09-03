@@ -170,7 +170,7 @@ namespace mitk {
 
       /**
        * Get inverse of the Transformation represented by this NavigationData.
-       * @throws mitk::Exception in case this is not a valid Transformation. (e.g. quaternion is not initialized validly.
+       * @throws mitk::Exception in case the transformation is invalid (only case: quaternion is zero)
        */
       mitk::NavigationData::Pointer GetInverse() const;
 

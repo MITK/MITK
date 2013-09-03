@@ -242,9 +242,13 @@ mitk::NavigationData::Transform(const mitk::Point3D point) const
 mitk::NavigationData::Pointer
 mitk::NavigationData::GetInverse() const
 {
+  // non-zero quaternion does not have inverse: throw exception in this case.
+  Quaternion zeroQuaternion;
+  if (Equal(zeroQuaternion, this->GetOrientation()))
+    mitkThrow() << "tried to invert zero quaternion in NavigationData";
+
   mitk::NavigationData::Pointer navigationDataInverse = NavigationData::Clone();
   navigationDataInverse->SetOrientation(this->GetOrientation().inverse());
-
 
   // To vnl_vector
   vnl_vector_fixed<ScalarType, 3> vnlPoint;

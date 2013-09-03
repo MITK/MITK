@@ -281,7 +281,10 @@ class NavigationDataTestClass
 
   static void TestInverseError()
   {
+    // initialize empty NavigationData (quaternion is zeroed)
+    NavigationData::Pointer nd = NavigationData::New();
 
+    MITK_TEST_FOR_EXCEPTION(mitk::Exception&, nd->GetInverse());
   }
 
   static void TestTransform()
@@ -410,6 +413,7 @@ int mitkNavigationDataTest(int /* argc */, char* /*argv*/[])
 
   TestInverse();
   TestDoubleInverse();
+  TestInverseError();
 
 
   MITK_TEST_END();

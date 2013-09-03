@@ -21,10 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationData.h"
 #include "mitkNavigationDataSet.h"
 
-#include <iostream>
-
-#include <mitkRealTimeClock.h>
-
 namespace mitk
 {
   /**Documentation
@@ -112,8 +108,6 @@ namespace mitk
     bool m_StandardizedTimeInitialized; //< set to true the first time start recording is called.
 
     int m_RecordCountLimit; ///< limits the number of frames, recording will be stopped if the limit is reached. -1 disables the limit
-
-    mitk::RealTimeClock::Pointer m_SystemTimeClock;  ///< system time clock for system time tag in output xml file
   };
 }
 #endif // #define _MITK_POINT_SET_SOURCE_H

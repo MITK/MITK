@@ -15,14 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkNavigationDataRecorder.h"
-#include <fstream>
 #include <mitkIGTTimeStamp.h>
-#include <tinyxml.h>
-#include <itksys/SystemTools.hxx>
-
-//headers for exceptions
-#include "mitkIGTException.h"
-#include "mitkIGTIOException.h"
 
 mitk::NavigationDataRecorder::NavigationDataRecorder()
 {

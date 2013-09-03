@@ -32,15 +32,14 @@ namespace mitk
   class DataStorage;
 };
 
-/*!
-  \brief Heidelberg Minimally Invasive Navigation Device
-
-  Functionality for visualizing a tracking instrument in relation to a tracked patient.
-
-  \sa QmitkFunctionality
-  \sa IGT
-  \ingroup Functionalities
-*/
+/**@deprecated This widget is deprecated. The features (1) connection to NDI tracking devices and
+  *            (2) handling of navigation tools are available in the pluging org.mitk.gui.qt.igttracking
+  *            in a current version. The new concept to access the tracking devices is to use microservices.
+  *            This can be achieved very simple by using the QmitkNavigationDataSourceSelectionWidget. You
+  *            can find an example in the IGT tutorial step 2 / org.mitk.gui.qt.igtexamples (view TrackingLab).
+  *
+  *\ingroup IGTUI
+  */
 class MitkIGTUI_EXPORT QmitkNDIConfigurationWidget : public QWidget
 {
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -48,22 +47,22 @@ public:
   QmitkNDIConfigurationWidget(QWidget* parent);
   virtual ~QmitkNDIConfigurationWidget();
 
-  std::string GetDeviceName() const;
-  mitk::NDITrackingDevice* GetTracker() const;
-  mitk::DataStorage* GetDataStorage() const;
-  mitk::NodePredicateBase* GetPredicate() const;
-  const QStringList& GetToolTypes() const;
-  void SetToolTypes(const QStringList& types);       ///< set types list for type editor combobox
-  void SetDataStorage(mitk::DataStorage* ds);    ///< set datastorage for organ node editor
-  void SetPredicate(mitk::NodePredicateBase::Pointer p); ///< set predicate for organ node editor
-  void SetTagPropertyName(const std::string& name);      ///< set name of the property that is used to tag selected nodes
-  void SetTagProperty(mitk::BaseProperty::Pointer prop);   ///< set the property that is used to tag selected nodes
+  DEPRECATED(std::string GetDeviceName() const);
+  DEPRECATED(mitk::NDITrackingDevice* GetTracker() const);
+  DEPRECATED(mitk::DataStorage* GetDataStorage() const);
+  DEPRECATED(mitk::NodePredicateBase* GetPredicate() const);
+  DEPRECATED(const QStringList& GetToolTypes() const);
+  DEPRECATED(void SetToolTypes(const QStringList& types));       ///< set types list for type editor combobox
+  DEPRECATED(void SetDataStorage(mitk::DataStorage* ds));    ///< set datastorage for organ node editor
+  DEPRECATED(void SetPredicate(mitk::NodePredicateBase::Pointer p)); ///< set predicate for organ node editor
+  DEPRECATED(void SetTagPropertyName(const std::string& name));      ///< set name of the property that is used to tag selected nodes
+  DEPRECATED(void SetTagProperty(mitk::BaseProperty::Pointer prop));   ///< set the property that is used to tag selected nodes
 
-  const QString GetToolType(unsigned int index) const;
-  const QString GetToolName(unsigned int index) const;
-  QMap<QString, unsigned int> GetToolAndTypes() const;
-  QList<unsigned int> GetToolsByToolType(QString toolType) const;
-  mitk::DataNode* GetNode(unsigned int index) const;
+  DEPRECATED(const QString GetToolType(unsigned int index) const);
+  DEPRECATED(const QString GetToolName(unsigned int index) const);
+  DEPRECATED(QMap<QString, unsigned int> GetToolAndTypes() const);
+  DEPRECATED(QList<unsigned int> GetToolsByToolType(QString toolType) const);
+  DEPRECATED(mitk::DataNode* GetNode(unsigned int index) const);
 
 
   signals:

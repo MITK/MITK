@@ -27,6 +27,13 @@ m_Name()
   m_CovErrorMatrix.SetIdentity();
 }
 
+
+mitk::NavigationData::NavigationData(mitk::NavigationData::Pointer toCopy) : itk::DataObject(),
+    m_Position(toCopy->GetPosition()), m_Orientation(toCopy->GetOrientation()), m_CovErrorMatrix(toCopy->GetCovErrorMatrix()),
+        m_HasPosition(toCopy->GetHasPosition()), m_HasOrientation(toCopy->GetHasOrientation()), m_DataValid(toCopy->IsDataValid()), m_IGTTimeStamp(toCopy->GetIGTTimeStamp()),
+        m_Name(toCopy->GetName())
+{/* TODO SW: This constructor is not tested! */}
+
 mitk::NavigationData::~NavigationData()
 {
 }
@@ -138,6 +145,12 @@ void mitk::NavigationData::SetOrientationAccuracy(mitk::ScalarType error)
   m_CovErrorMatrix[3][3] = m_CovErrorMatrix[4][4] = m_CovErrorMatrix[5][5] = error * error;
 }
 
+void
+mitk::NavigationData::Compose(mitk::NavigationData::Pointer n, bool pre)
+{
+  // TODO SW.
+}
+
 mitk::NavigationData::NavigationData(
     mitk::AffineTransform3D::Pointer affineTransform3D,
     bool checkForRotationMatrix) : itk::DataObject(),
@@ -191,7 +204,7 @@ mitk::NavigationData::GetAffineTransform3D()
 mitk::Matrix3D
 mitk::NavigationData::getRotationMatrix()
 {
-  vnl_matrix_fixed<ScalarType,3,3> vnl_rotation = m_Orientation.rotation_matrix_transpose().transpose();
+  vnl_matrix_fixed<ScalarType,3,3> vnl_rotation = m_Orientation.rotation_matrix_transpose().transpose(); // :-)
   Matrix3D mitkRotation;
 
   for (int i = 0; i < 3; ++i) {
@@ -212,8 +225,9 @@ mitk::NavigationData::Transform(const mitk::Point3D point)
     vnlPoint[i] = point[i];
   }
 
+  Quaternion normalizedQuaternion = this->GetOrientation().normalize();
   // first get rotated point
-  vnlPoint = this->GetOrientation().rotate(vnlPoint);
+  vnlPoint = normalizedQuaternion.rotate(vnlPoint);
 
   Point3D resultingPoint;
 
@@ -224,3 +238,15 @@ mitk::NavigationData::Transform(const mitk::Point3D point)
 
   return resultingPoint;
 }
+
+mitk::NavigationData::Pointer
+mitk::NavigationData::GetInverse()
+{
+  mitk::NavigationData::Pointer navigationDataInverse(this);
+  navigationDataInverse->SetOrientation(this->GetOrientation().inverse());
+
+
+
+  return NavigationData::New();
+}
+

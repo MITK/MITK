@@ -168,8 +168,31 @@ namespace mitk {
 
       mitk::Point3D Transform(const mitk::Point3D);
 
+      /**
+       * Get inverse of the Transformation represented by this NavigationData.
+       * @throws mitk::Exception in case this is not a valid Transformation. (e.g. quaternion is not initialized validly.
+       */
+      mitk::NavigationData::Pointer GetInverse();
+
+      /** Compose with another NavigationData
+       *
+       * This method composes self with another NavigationData of the
+       * same dimension, modifying self to be the composition of self
+       * and other.  If the argument pre is true, then other is
+       * precomposed with self; that is, the resulting transformation
+       * consists of first applying other to the source, followed by
+       * self.  If pre is false or omitted, then other is post-composed
+       * with self; that is the resulting transformation consists of
+       * first applying self to the source, followed by other. */
+      void Compose(mitk::NavigationData::Pointer n, bool pre = false);
+
     protected:
       NavigationData();
+
+      /*
+       * Copy constructor internally used.
+       */
+      NavigationData(mitk::NavigationData::Pointer toCopy);
 
       /**
        * Creates a NavigationData object from an affineTransform3D.

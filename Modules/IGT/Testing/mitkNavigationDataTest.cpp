@@ -235,10 +235,35 @@ class NavigationDataTestClass
   {
     SetupNaviDataTests();
     NavigationData::Pointer navigationData = CreateNavidata(quaternion, offsetPoint);
-//
-//    navigationData = navigationData->GetInverse();
-//
-//    MITK_TEST_CONDITION(false,"bla");
+
+    NavigationData::Pointer navigationDataInverse = navigationData->GetInverse();
+
+    // calculate expected inverted position vector: b2 = -A2b1
+
+    // for -A2b1 we need vnl_vectors.
+    vnl_vector_fixed<ScalarType, 3> b1;
+    for (int i = 0; i < 3; ++i) {
+      b1[i] = navigationData->GetOrientation()[i];
+    }
+    vnl_vector_fixed<ScalarType, 3> b2;
+    b2 = -(navigationData->GetOrientation().rotate(b1));
+
+    // now copy result back into our mitk::Point3D
+    Point3D invertedPosition;
+    for (int i = 0; i < 3; ++i) {
+      invertedPosition[i] = b2[i];
+    }
+
+
+    MITK_TEST_CONDITION(Equal(navigationData->GetOrientation().inverse(), navigationDataInverse->GetOrientation()),"Testing GetInverse: quaternion inverted");
+    MITK_TEST_CONDITION(Equal(navigationData->GetPosition(), invertedPosition), "Testing GetInverse: quaternion inverted");
+
+    // TODO: Test for hasOrientation, IGTTimestamp, ...
+  }
+
+  static void TestInverseError()
+  {
+
   }
 
   static void TestTransform()
@@ -365,7 +390,7 @@ int mitkNavigationDataTest(int /* argc */, char* /*argv*/[])
 
   TestTransform();
 
-  //TestInverse();
+  TestInverse();
 
 
   MITK_TEST_END();

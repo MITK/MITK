@@ -97,31 +97,35 @@ mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataForIndex
 //  return *(it-1);
 //}
 
-unsigned int mitk::NavigationDataSet::GetNumberOfTools()
+std::vector< mitk::NavigationData::Pointer > mitk::NavigationDataSet::GetDataStreamForTool(unsigned int toolIndex)
 {
-  return m_NavigationDataVectors.size();
-}
-
-unsigned int mitk::NavigationDataSet::GetNumberOfNavigationDatas(bool check)
-{
-  if (this->GetNumberOfTools() == 0) { return 0; };
-
-  unsigned int number = m_NavigationDataVectors.at(0).size();;
-
-  if (check)
+  if (toolIndex >= m_NumberOfTools )
   {
-    for (std::vector<std::vector<NavigationData::Pointer> >::iterator it = m_NavigationDataVectors.begin()+1;
-      it != m_NavigationDataVectors.end(); ++it)
-    {
-      if (it->size() != number)
-      {
-        MITK_WARN << "Number of NavigationData objects differs for different tools.";
-        return -1;
-      }
-    }
+    MITK_WARN("NavigationDataSet") << "Invalid toolIndex: " << m_NumberOfTools << " Tools known, requested index " << toolIndex << "";
+    return std::vector<mitk::NavigationData::Pointer>();
   }
 
-  return number;
+  std::vector< mitk::NavigationData::Pointer > result;
+
+  for(int i = 0; i < m_NavigationDataVectors.size(); i++)
+    result.push_back(m_NavigationDataVectors[i][toolIndex]);
+
+  return result;
+}
+
+std::vector< mitk::NavigationData::Pointer > mitk::NavigationDataSet::GetTimeStep(unsigned int index)
+{
+  return m_NavigationDataVectors[index];
+}
+
+unsigned int mitk::NavigationDataSet::GetNumberOfTools()
+{
+  return m_NumberOfTools;
+}
+
+unsigned int mitk::NavigationDataSet::Size()
+{
+  return m_NavigationDataVectors.size();
 }
 
 // ---> methods necessary for BaseData
@@ -148,14 +152,10 @@ void mitk::NavigationDataSet::SetRequestedRegion(const DataObject * )
 
 mitk::NavigationDataSet::NavigationDataSetIterator mitk::NavigationDataSet::Begin()
 {
-  //TODO default implementation
-  mitk::NavigationDataSet::NavigationDataSetIterator result;
-  return result;
+  return m_NavigationDataVectors.begin();
 }
 
 mitk::NavigationDataSet::NavigationDataSetIterator mitk::NavigationDataSet::End()
 {
-  //TODO default implementation
-  mitk::NavigationDataSet::NavigationDataSetIterator result;
-  return result;
+  return m_NavigationDataVectors.end();
 }

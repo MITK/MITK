@@ -38,6 +38,9 @@ namespace mitk {
     public:
       mitkClassMacro(NavigationData, itk::DataObject);
       itkNewMacro(Self);
+      mitkNewMacro2Param(Self, mitk::AffineTransform3D::Pointer, const bool);
+      mitkNewMacro1Param(Self, mitk::AffineTransform3D::Pointer);
+      mitkCloneMacro(NavigationData);
 
       /**
       * \brief Type that holds the position part of the tracking data
@@ -55,7 +58,6 @@ namespace mitk {
       * \brief type that holds the time at which the data was recorded
       */
       typedef double TimeStampType;
-
 
       /**
       * \brief sets the position of the NavigationData object
@@ -160,8 +162,49 @@ namespace mitk {
       */
       void SetOrientationAccuracy(mitk::ScalarType error);
 
+      mitk::AffineTransform3D::Pointer GetAffineTransform3D() const;
+
+      mitk::Matrix3D GetRotationMatrix() const;
+
+      mitk::Point3D TransformPoint(const mitk::Point3D) const;
+
+      /**
+       * Get inverse of the Transformation represented by this NavigationData.
+       * @throws mitk::Exception in case the transformation is invalid (only case: quaternion is zero)
+       */
+      mitk::NavigationData::Pointer GetInverse() const;
+
+      /** Compose with another NavigationData
+       *
+       * This method composes self with another NavigationData of the
+       * same dimension, modifying self to be the composition of self
+       * and other.  If the argument pre is true, then other is
+       * precomposed with self; that is, the resulting transformation
+       * consists of first applying other to the source, followed by
+       * self.  If pre is false or omitted, then other is post-composed
+       * with self; that is the resulting transformation consists of
+       * first applying self to the source, followed by other. */
+      void Compose(const mitk::NavigationData::Pointer n, const bool pre = false);
+
     protected:
       NavigationData();
+
+      /*
+       * Copy constructor internally used.
+       */
+      NavigationData(const mitk::NavigationData& toCopy);
+
+      /**
+       * Creates a NavigationData object from an affineTransform3D.
+       * @param checkForRotationMatrix  if this is true, the rotation matrix coming from the affineTransform is checked
+       *  for being a rotation matrix. If it isn't, an exception is thrown. Disable this check by
+       *  setting checkForRotationMatrix to false.
+       *
+       *  @throws mitkException if checkForRotationMatrix is true and a non rotation matrix was introduced by
+       *    AffineTransform.
+       */
+      NavigationData(mitk::AffineTransform3D::Pointer affineTransform3D, const bool checkForRotationMatrix = true);
+
       virtual ~NavigationData();
 
       /**
@@ -201,6 +244,14 @@ namespace mitk {
       * \brief name of the navigation data
       */
       std::string m_Name;
+
+    private:
+
+      void ResetCovarianceValidity();
+
+      // pre = false
+      static mitk::NavigationData::Pointer getComposition(const mitk::NavigationData::Pointer nd1, const mitk::NavigationData::Pointer nd2);
+
     };
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATA_H_HEADER_INCLUDED_ */

@@ -185,7 +185,7 @@ static void TestMode3DMean(mitk::NavigationDataToPointSetFilter::Pointer myNavig
   player->SetFileName( file );
   player->StartPlaying();
 
-  for (int i = 0; i< player->GetNumberOfOutputs(); i++)
+  for (unsigned int i = 0; i< player->GetNumberOfOutputs(); i++)
   {
     myNavigationDataToPointSetFilter->SetInput(i, player->GetOutput(i));
   }

@@ -96,7 +96,8 @@ namespace mitk {
     virtual void TransformOrientationOff(unsigned int index); ///< sets the TransformOrientation flag to false for the given index
 
     /** @brief Defines an offset for a representation object. This offset is applied before the object is visualized.
-     *         If no offset is given, no offset will be used. To deactivate the offset just set it to NULL.
+     *         If no offset is given, no offset will be used. To deactivate the offset just set it to NULL. The offset is deactivated by default.
+     * @param offset The new offset which will be set. Set to NULL to deactivate the offset.
      */
     void SetOffset(int index, mitk::AffineTransform3D::Pointer offset);
 

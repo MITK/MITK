@@ -81,17 +81,17 @@ private slots:
   // reaction to the signal "combineAndCreateSurface" from QmitkLabelSetTableWidget
   void OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>& ranges );
 
-  // reaction to the button "New segmentation session"
-  void OnNewLabelSet();
+  // reaction to the button "New Segmentation"
+  void OnNewSegmentation();
 
-  // reaction to the button "Load segmentation session"
-  void OnLoadLabelSet();
+  // reaction to the button "Load Segmentation"
+  void OnLoadSegmentation();
 
-  // reaction to the button "Import segmentation session"
-  void OnImportLabelSet();
+  // reaction to the button "Import Segmentation"
+  void OnImportSegmentation();
 
   // reaction to the button "Save Segmentation"
-  void OnSaveLabelSet();
+  void OnSaveSegmentation();
 
 private:
 

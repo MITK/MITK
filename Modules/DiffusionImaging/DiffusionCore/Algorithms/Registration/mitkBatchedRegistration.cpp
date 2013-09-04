@@ -113,6 +113,5 @@ mitk::BatchedRegistration::TransformType mitk::BatchedRegistration::GetTransform
   transformation.set(1,3,-param[4]);
   transformation.set(2,3,-param[5]);
   transformation.set(3,3,1);
-  //transformation =vnl_inverse<double>(transformation);
   return transformation;
 }

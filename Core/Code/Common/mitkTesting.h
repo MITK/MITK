@@ -25,6 +25,7 @@ namespace mitk {
 
 /**
  * @brief Equal Verbose version of the mitk::Equal method in mitkVector.h
+ * @ingroup MITKTestingAPI
  * @param scalar1 Scalar value to compare.
  * @param scalar2 Scalar value to compare.
  * @param eps Tolerance for floating point comparison.
@@ -44,6 +45,7 @@ inline bool Equal(double scalar1, double scalar2, ScalarType eps, bool verbose)
 
 /**
  * @brief Equal Verbose version of the mitk::Equal method in mitkVector.h
+ * @ingroup MITKTestingAPI
  * @param vector1 Vector to compare.
  * @param vector2 Vector to compare.
  * @param eps Tolerance for floating point comparison.
@@ -64,6 +66,7 @@ inline bool Equal(const itk::Vector<TCoordRep, NPointDimension>& vector1, const 
 
 /**
  * @brief Equal Verbose version of the mitk::Equal method in mitkVector.h
+ * @ingroup MITKTestingAPI
  * @param point1 Point to compare.
  * @param point2 Point to compare.
  * @param eps Tolerance for floating point comparison.
@@ -84,6 +87,7 @@ inline bool Equal(const itk::Point<TCoordRep, NPointDimension>& point1, const it
 
 /**
  * @brief Equal Verbose version of the mitk::Equal method in mitkVector.h
+ * @ingroup MITKTestingAPI
  * @param vector1 Vector to compare.
  * @param vector2 Vector to compare.
  * @param eps Tolerance for floating point comparison.
@@ -103,6 +107,7 @@ inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2
 
 /**
  * @brief Equal Verbose version of the mitk::Equal method in mitkVector.h
+ * @ingroup MITKTestingAPI
  * @param vector1 Vector to compare.
  * @param vector2 Vector to compare.
  * @param eps Tolerance for floating point comparison.

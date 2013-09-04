@@ -670,6 +670,8 @@ private:
 /**
  * @brief Equal A function comparing two geometries for beeing identical.
  *
+ * @ingroup MITKTestingAPI
+ *
  * The function compares the spacing, origin, axisvectors, extents, the matrix of the
  * IndexToWorldTransform (elementwise), the bounding (elementwise) and the ImageGeometry flag.
  *
@@ -687,6 +689,8 @@ MITK_CORE_EXPORT bool Equal(const mitk::Geometry3D* leftHandSide, const mitk::Ge
 /**
  * @brief Equal A function comparing two transforms (TransformType) for beeing identical.
  *
+ * @ingroup MITKTestingAPI
+ *
  * The function compares the IndexToWorldTransform (elementwise).
  *
  * The parameter eps is a tolarence value for all methods which are internally used for comparion.
@@ -700,6 +704,8 @@ MITK_CORE_EXPORT bool Equal(const mitk::Geometry3D::TransformType *leftHandSide,
 
 /**
  * @brief Equal A function comparing two bounding boxes (BoundingBoxType) for beeing identical.
+ *
+ * @ingroup MITKTestingAPI
  *
  * The function compares the bounds (elementwise).
  *

@@ -138,7 +138,9 @@ namespace mitk {
   STATEMENT ; \
   MITK_TEST_FOR_EXCEPTION_END(EXCEPTIONCLASS)
 
-/** \brief Testing macro to test if two obejcts are (not) equal.
+/** \brief Testing macro to test if two objects are (not) equal.
+ *
+ * @ingroup MITKTestingAPI
  *
  * This macro uses mitk::eps and the corresponding mitk::Equal methods for all
  * comparisons and will give verbose output on the dashboard/console.

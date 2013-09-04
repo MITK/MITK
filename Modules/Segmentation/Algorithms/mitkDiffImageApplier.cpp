@@ -103,17 +103,10 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
         mitk::SegmentationInterpolationController* interpolator = mitk::SegmentationInterpolationController::InterpolatorForImage(m_Image);
         if (interpolator)
         {
-          interpolator->BlockModified(true);
-          MITK_INFO << "interpolator->SetChangedSlice() !!!";
           interpolator->SetChangedSlice( m_SliceDifferenceImage, m_SliceDimension, m_SliceIndex, m_TimeStep );
         }
 
         m_Image->Modified();
-
-        if (interpolator)
-        {
-          interpolator->BlockModified(false);
-        }
 
         if ( m_Factor == -1 ) // return to normal values
         {
@@ -164,16 +157,10 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
         SegmentationInterpolationController* interpolator = SegmentationInterpolationController::InterpolatorForImage(m_Image);
         if (interpolator)
         {
-          interpolator->BlockModified(true);
           interpolator->SetChangedVolume( m_SliceDifferenceImage, m_TimeStep );
         }
 
         m_Image->Modified();
-
-        if (interpolator)
-        {
-          interpolator->BlockModified(false);
-        }
 
         if ( m_Factor == -1 ) // return to normal values
         {

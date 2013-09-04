@@ -219,14 +219,16 @@ void QmitkTrackingDeviceConfigurationWidget::TestConnection()
 {
 this->setEnabled(false);
 
-//#### Step 1: construct a tracking device:
+//construct a tracking device:
 mitk::TrackingDevice::Pointer testTrackingDevice = ConstructTrackingDevice();
-
-//#### Step 2: test connection and start tracking, generate output
-AddOutput("<br>testing connection <br>  ...");
 
 try
   {
+  //test connection and start tracking, generate output
+  AddOutput("<br>testing connection <br>  ...");
+  testTrackingDevice->OpenConnection();
+  AddOutput("OK");
+
   //try start/stop tracking
   AddOutput("<br>testing tracking <br>  ...");
   testTrackingDevice->StartTracking();

@@ -23,6 +23,7 @@ mitk::NavigationDataRecorder::NavigationDataRecorder()
   m_NumberOfInputs = 0;
   m_Recording = false;
   m_StandardizedTimeInitialized = false;
+  m_RecordCountLimit = -1;
 }
 
 mitk::NavigationDataRecorder::~NavigationDataRecorder()
@@ -33,7 +34,7 @@ mitk::NavigationDataRecorder::~NavigationDataRecorder()
 void mitk::NavigationDataRecorder::GenerateData()
 {
   // get each input, lookup the associated BaseData and transfer the data
-  DataObjectPointerArray inputs = this->GetInputs(); //get all inputs
+  DataObjectPointerArray inputs = this->GetIndexedInputs(); //get all inputs
 
   //This vector will hold the NavigationDatas that are copied from the inputs
   //it is initialized with the size of inputs (one for each) and a new constructor, so we can graft later
@@ -52,7 +53,7 @@ void mitk::NavigationDataRecorder::GenerateData()
     }
   }
   // if limitation is set and has been reached, stop recording
-  if ((m_RecordCountLimit <= 0) && (m_RecordCountLimit >=  m_NavigationDataSet->Size())) m_Recording = false;
+  if ((m_RecordCountLimit > 0) && (m_NavigationDataSet->Size() >= m_RecordCountLimit)) m_Recording = false;
 
   // Do the actual recording
   if (m_Recording)

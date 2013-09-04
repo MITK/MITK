@@ -85,17 +85,6 @@ int mitkNavigationDataSetReaderWriterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(! mitkNavigationDataSetReaderWriterTestClass::CompareFiles("F://Build//MITK-Data//IGT-Data//NavigationDataSet.xml",
     "F://Build//MITK-Data//IGT-Data//SROMFile.rom"), "Asserting that compare function for files works correctly - Negative Test");
   mitkNavigationDataSetReaderWriterTestClass::TestReadWrite();
-  //mitkNavigationDataSetReaderWriterTestClass::TestRecordingWithGivenStream();
-  //mitkNavigationDataSetReaderWriterTestClass::TestRecordingOnHarddiscXML();
-  //mitkNavigationDataSetReaderWriterTestClass::TestRecordingOnHarddiscXMLZIP();
-  //mitkNavigationDataSetReaderWriterTestClass::TestRecordingOnHarddiscCSV();
-  //mitkNavigationDataSetReaderWriterTestClass::TestRecordingInvalidData();
-  //mitkNavigationDataSetReaderWriterTestClass::TestStartRecordingExceptions();
-
-  ////Test fails under linux, perhaps reading permission problems, deactivated it temporary
-  ////mitkNavigationDataSetReaderWriterTestClass::TestLoadingRecordedXMLFile();
-
-  //mitkNavigationDataSetReaderWriterTestClass::CleanUp();
 
   MITK_TEST_END();
 };

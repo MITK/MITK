@@ -43,18 +43,18 @@ namespace mitk
      * \brief sets the file name and path (if XMLString is set, this is neglected)
      * @throw mitk::IGTIOException Throws an exception if the given file cannot be loaded.
      */
-    void SetFileName(const std::string& _FileName);
+    //void SetFileName(const std::string& _FileName);
 
     /**
     * \brief returns the file name and path
     */
-    itkGetStringMacro(FileName);
+    //itkGetStringMacro(FileName);
 
     /**
     * \brief sets a xml string (by this, the xml string is not read from file)
     * @throw mitk::IGTExcepton Throws an mitk::IGTExcepton if the string to set is not an XMLString
     */
-    void SetXMLString(const std::string& _XMLString);
+    //void SetXMLString(const std::string& _XMLString);
 
     /**
     * \brief returns the current xml string
@@ -70,11 +70,6 @@ namespace mitk
      * @return Returns if the data player should repeat the outputs.
      */
     itkGetMacro(Repeat, bool);
-
-    /**
-     * @return Returns the number of navigation data snapshots available in the file
-     */
-    itkGetMacro(NumberOfSnapshots, unsigned int);
 
     /**
     * advance the output to the i-th snapshot
@@ -99,9 +94,9 @@ namespace mitk
     /**
      * @throw mitk::IGTException Throws an exception if data element is not found.
      */
-    void ReinitXML();
+    //void ReinitXML();
 
-    mitk::NavigationData::Pointer ReadVersion1();
+    //mitk::NavigationData::Pointer ReadVersion1();
 
     /**
      * @throw mitk::IGTException Throws an exception if cannot parse input file

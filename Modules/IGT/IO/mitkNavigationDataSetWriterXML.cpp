@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Third Party
 #include <tinyxml.h>
 #include <itksys/SystemTools.hxx>
+#include <fstream>
 
 mitk::NavigationDataSetWriterXML::NavigationDataSetWriterXML()
 {

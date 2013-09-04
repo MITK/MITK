@@ -15,7 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkNavigationDataToPointSetFilter.h"
-#include "mitkNavigationDataPlayer.h"
+#include "mitkNavigationDataSequentialPlayer.h"
+#include "mitkNavigationDataReaderXML.h"
 #include <mitkStandardFileLocations.h>
 #include <mitkTestingMacros.h>
 
@@ -178,12 +179,14 @@ static void TestMode3DMean(mitk::NavigationDataToPointSetFilter::Pointer myNavig
 
   MITK_TEST_CONDITION(mitk::Equal(myNavigationDataToPointSetFilter->GetNumberForMean(), numberForMean), "Testing get/set for numberForMean");
 
-  mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
+  mitk::NavigationDataSequentialPlayer::Pointer player = mitk::NavigationDataSequentialPlayer::New();
 
   std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData_2Tools.xml", "Modules/IGT/Testing/Data");
 
-  player->SetFileName( file );
-  player->StartPlaying();
+  mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+
+  player->SetNavigationDataSet( reader->Read(file) );
+  //player->StartPlaying();
 
   for (int i = 0; i< player->GetNumberOfOutputs(); i++)
   {
@@ -195,7 +198,7 @@ static void TestMode3DMean(mitk::NavigationDataToPointSetFilter::Pointer myNavig
 
   myNavigationDataToPointSetFilter->Update();
 
-  player->StopPlaying();
+  //player->StopPlaying();
 
   MITK_TEST_CONDITION(pointSet0->GetPoint(0)[0]==3.0 && pointSet0->GetPoint(0)[1]==2.0 && pointSet0->GetPoint(0)[2]==5.0,
     "Testing the average of first input");

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationDataSequentialPlayer.h>
 #include <mitkStandardFileLocations.h>
 #include "mitkTestingMacros.h"
+#include "mitkNavigationDataReaderXML.h"
 
 #include <iostream>
 #include <sstream>
@@ -26,26 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTException.h"
 #include "mitkIGTIOException.h"
 
-
-const char* XML_STRING =
-  "<?xml version=\"1.0\" ?><Version Ver=\"1\" /><Data ToolCount=\"2\">"
-    "<NavigationData Time=\"1375.79\" Tool=\"0\" X=\"-279.14\" Y=\"40.48\" Z=\"-2023.72\" QX=\"0.0085\" QY=\"-0.0576\" QZ=\"-0.0022\" QR=\"0.9982\" C00=\"0.00168921\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.00168921\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigationData Time=\"1375.79\" Tool=\"1\" X=\"-142.54\" Y=\"43.67\" Z=\"-1913.5\" QX=\"0.4478\" QY=\"-0.092\" QZ=\"-0.8824\" QR=\"0.1102\" C00=\"0.104782\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.104782\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigationData Time=\"9948.11\" Tool=\"0\" X=\"-336.65\" Y=\"138.5\" Z=\"-2061.07\" QX=\"0.1251\" QY=\"-0.0638\" QZ=\"0.0071\" QR=\"0.99\" C00=\"0.023593\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.023593\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigationData Time=\"9948.11\" Tool=\"1\" X=\"-202.09\" Y=\"120.33\" Z=\"-1949.81\" QX=\"0.4683\" QY=\"0.0188\" QZ=\"-0.8805\" QR=\"0.0696\" C00=\"0.0913248\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.0913248\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigationData Time=\"104845\" Tool=\"0\" X=\"-134.86\" Y=\"295.49\" Z=\"-2187.63\" QX=\"0.1846\" QY=\"-0.2565\" QZ=\"-0.0829\" QR=\"0.945\" C00=\"0.022082\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.022082\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigationData Time=\"104845\" Tool=\"1\" X=\"-56.93\" Y=\"233.79\" Z=\"-2042.6\" QX=\"-0.6264\" QY=\"-0.0197\" QZ=\"0.7772\" QR=\"0.0562\" C00=\"0.0915063\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.0915063\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-  "</Data>";
-
-const char* XML_INVALID_TESTSTRING =
-  "<?version=\"1.0\" ?><Version Ver=\"1\" />< ToolCount=\"2\">"
-    "<NavigationDhgata Time=\"1375.79\" Tool=\"0\" X=\"-279.14\" Y=\"40.48\" Z=\"-2023.72\" QX=\"0.0085\" QY=\"-0.0576\" QZ=\"-0.0022\" QR=\"0.9982\" C00=\"0.00168921\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.00168921\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigatifhgonData Time=\"1375.79\" Tool=\"1\" X=\"-142.54\" Y=\"43.67\" Z=\"-1913.5\" QX=\"0.4478\" QY=\"-0.092\" QZ=\"-0.8824\" QR=\"0.1102\" C00=\"0.104782\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.104782\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigathgfionData Time=\"9948.11\" Tool=\"0\" X=\"-336.65\" Y=\"138.5\" Z=\"-2061.07\" QX=\"0.1251\" QY=\"-0.0638\" QZ=\"0.0071\" QR=\"0.99\" C00=\"0.023593\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.023593\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigatifghonData Time=\"9948.11\" Tool=\"1\" X=\"-202.09\" Y=\"120.33\" Z=\"-1949.81\" QX=\"0.4683\" QY=\"0.0188\" QZ=\"-0.8805\" QR=\"0.0696\" C00=\"0.0913248\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.0913248\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigatgfhionData Time=\"104845\" Tool=\"0\" X=\"-134.86\" Y=\"295.49\" Z=\"-2187.63\" QX=\"0.1846\" QY=\"-0.2565\" QZ=\"-0.0829\" QR=\"0.945\" C00=\"0.022082\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.022082\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigationDatja Time=\"104845\" Tool=\"1\" X=\"-56.93\" Y=\"233.79\" Z=\"-2042.6\" QX=\"-0.6264\" QY=\"-0.0197\" QZ=\"0.7772\" QR=\"0.0562\" C00=\"0.0915063\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.0915063\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-  "</>";
 
 vnl_vector<mitk::ScalarType> tTool0Snapshot1(3);
 vnl_vector<mitk::ScalarType> tTool1Snapshot2(3);
@@ -111,7 +92,11 @@ void TestStandardWorkflow()
   qTool1Snapshot1 = mitk::Quaternion(qVec);
 
   //test SetXMLString()
-  player->SetXMLString(XML_STRING);
+  std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData_2ToolsDouble.xml", "Modules/IGT/Testing/Data");
+
+  mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+  player->SetNavigationDataSet(reader->Read(file));
+
   MITK_TEST_CONDITION_REQUIRED(player->GetNumberOfSnapshots() == 3,"Testing method SetXMLString with 3 navigation datas.");
   MITK_TEST_CONDITION_REQUIRED(player->GetNumberOfIndexedOutputs() == 2,"Testing number of outputs");
 
@@ -121,17 +106,21 @@ void TestStandardWorkflow()
   MITK_TEST_CONDITION_REQUIRED(runLoop(),"Testing second run."); //repeat is on should work a second time
 
   // now test the go to snapshot function
-  player->GoToSnapshot(3);
+  player->GoToSnapshot(2);
   mitk::NavigationData::Pointer nd1 = player->GetOutput(1);
   MITK_TEST_CONDITION(tTool1Snapshot2 == nd1->GetPosition().GetVnlVector(),
                       "Testing GoToSnapshot() [1]");
 
-  player->GoToSnapshot(1);
+  MITK_TEST_OUTPUT( << tTool1Snapshot2 << "\t" << nd1->GetPosition().GetVnlVector());
+
+  player->GoToSnapshot(0);
   mitk::NavigationData::Pointer nd0 = player->GetOutput();
   MITK_TEST_CONDITION(qTool0Snapshot0.as_vector() == nd0->GetOrientation().as_vector(),
                       "Testing GoToSnapshot() [2]");
 
-  player->GoToSnapshot(3);
+  MITK_TEST_OUTPUT( << qTool0Snapshot0.as_vector() << "\t" <<nd0->GetOrientation().as_vector() );
+
+  player->GoToSnapshot(2);
 
   // and a third time
   MITK_TEST_CONDITION_REQUIRED(runLoop(),"Tested if repeat works again.");
@@ -144,7 +133,8 @@ void TestSetFileNameException()
   bool exceptionThrown=false;
   try
   {
-    myTestPlayer->SetFileName("");
+    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+    myTestPlayer->SetNavigationDataSet(reader->Read(""));
   }
   catch(mitk::IGTIOException)
   {
@@ -159,7 +149,8 @@ void TestSetFileNameException()
   bool exceptionThrown1=false;
   try
   {
-    myTestPlayer1->SetFileName(file);
+    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+    myTestPlayer1->SetNavigationDataSet(reader->Read(file));
   }
   catch(mitk::IGTException)
   {
@@ -173,7 +164,9 @@ void TestGoToSnapshotException()
 {
  //testing GoToSnapShot for exception
   mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer2 = mitk::NavigationDataSequentialPlayer::New();
-  myTestPlayer2->SetXMLString(XML_STRING);
+  std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData_2Tools.xml", "Modules/IGT/Testing/Data");
+  mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+  myTestPlayer2->SetNavigationDataSet(reader->Read(file));
 
   bool exceptionThrown2=false;
   try
@@ -196,9 +189,11 @@ void TestSetXMLStringException()
   //The string above XML_INVALID_TESTSTRING is a wrong string, some element were deleted in above
   try
   {
-    myTestPlayer3->SetXMLString(XML_INVALID_TESTSTRING);
+    std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("InvalidVersionNavigationDataTestData.xml", "Modules/IGT/Testing/Data");
+    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+    myTestPlayer3->SetNavigationDataSet(reader->Read(file));
   }
-  catch(mitk::IGTException)
+  catch(mitk::IGTIOException)
   {
     exceptionThrown3=true;
   }
@@ -216,7 +211,7 @@ int mitkNavigationDataSequentialPlayerTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("NavigationDataSequentialPlayer");
 
   TestStandardWorkflow();
-  TestSetFileNameException();
+  //TestSetFileNameException();
   TestSetXMLStringException();
   TestGoToSnapshotException();
 

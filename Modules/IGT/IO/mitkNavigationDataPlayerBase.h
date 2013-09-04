@@ -44,10 +44,12 @@ namespace mitk{
     virtual void UpdateOutputInformation();
 
     itkGetMacro(NavigationDataSet, NavigationDataSet::Pointer);
-    itkSetMacro(NavigationDataSet, NavigationDataSet::Pointer);
+    void SetNavigationDataSet(NavigationDataSet::Pointer navigationDataSet);
 
-    itkGetMacro(NavigationDataReader, NavigationDataReaderInterface::Pointer);
-    itkSetMacro(NavigationDataReader, NavigationDataReaderInterface::Pointer);
+    /**
+     * @return Returns the number of navigation data snapshots available in the player
+     */
+    unsigned int GetNumberOfSnapshots();
 
   protected:
     NavigationDataPlayerBase();
@@ -55,11 +57,20 @@ namespace mitk{
 
     virtual void GenerateData() = 0;
 
-    void ReadNavigationDataSet();
+    /**
+     * \brief Initializes the outputs of this NavigationDataSource.
+     */
+    void InitPlayer();
+
+    /**
+      *
+      */
     void GraftEmptyOutput();
 
-    NavigationDataReaderInterface::Pointer m_NavigationDataReader;
     NavigationDataSet::Pointer m_NavigationDataSet;
+    mitk::NavigationDataSet::NavigationDataSetIterator m_NavigationDataSetIterator;
+
+    unsigned int m_NumberOfOutputs; ///< stores the number of outputs known from NavigationDataSet
 
     /**
     * \brief Creates NavigationData from XML element and returns it

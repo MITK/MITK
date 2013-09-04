@@ -756,27 +756,14 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     T_MarkerRel->Compose(T_Object);
     T_MarkerRel->Compose(T_Marker->GetInverse());
 
-    m_T_MarkerRel = mitk::Transform::New(T_MarkerRel);
+    m_T_MarkerRel = T_MarkerRel;
     MITK_INFO << "m_T_MarkerRel nach Berechnung: " << m_T_MarkerRel->GetOrientation();
     MITK_INFO << "T_MarkerRel nach Berechnung: " << T_MarkerRel->GetRotationMatrix() << " als quaternion " << T_MarkerRel->GetOrientation();
     MITK_INFO << "T_Marker: " << T_Marker->GetRotationMatrix() << " als quaternion " << T_Marker->GetOrientation();
 
-    //TODO: remove mitk::transform from this class and use only mitk::AffineTransform3D
-    //convert to AffineTransform3D
-    mitk::AffineTransform3D::Pointer T_MarkerRel_conv = mitk::AffineTransform3D::New();
-    {
-    itk::Matrix<mitk::ScalarType,3,3> rotation = itk::Matrix<mitk::ScalarType,3,3>();
-    for(int i = 0; i<3; i++)for (int j=0; j<3; j ++)
-    rotation[i][j] = m_T_MarkerRel->GetVnlRotationMatrix()[i][j];
-    itk::Vector<mitk::ScalarType,3> translation = itk::Vector<mitk::ScalarType,3>();
-    for(int i = 0; i<3; i++) translation[i] = m_T_MarkerRel->GetPosition()[i];
-
-    T_MarkerRel_conv->SetMatrix(rotation);
-    T_MarkerRel_conv->SetOffset(translation);
-    }
 
 
-    m_PermanentRegistrationFilter->SetOffset(0,T_MarkerRel_conv);
+    m_PermanentRegistrationFilter->SetOffset(0,m_T_MarkerRel->GetAffineTransform3D());
 
     //first: image (if activated)
     //set interpolation mode
@@ -790,7 +777,7 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
       mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
       newTransform->SetIdentity();
       newTransform->Compose(m_T_ImageGeo);
-      newTransform->Compose(T_MarkerRel_conv);
+      newTransform->Compose(m_T_MarkerRel->GetAffineTransform3D());
       m_PermanentRegistrationFilter->SetOffset(1,newTransform);
       }
 

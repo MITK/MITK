@@ -142,28 +142,10 @@ void QmitkIGTTrackingLabView::UpdateTimer()
 {
   if (m_PermanentRegistration && m_PermanentRegistrationFilter.IsNotNull())
   {
-    mitk::Transform::Pointer ObjectMarkerCurrentTransform = mitk::Transform::New(m_ObjectmarkerNavigationData);
-    if(IsTransformDifferenceHigh(ObjectMarkerCurrentTransform, m_ObjectmarkerNavigationDataLastUpdate))
+    if(IsTransformDifferenceHigh(m_ObjectmarkerNavigationData, m_ObjectmarkerNavigationDataLastUpdate))
     {
-      m_ObjectmarkerNavigationDataLastUpdate = mitk::Transform::New(m_ObjectmarkerNavigationData);
+      m_ObjectmarkerNavigationDataLastUpdate->Graft(m_ObjectmarkerNavigationData);
       m_PermanentRegistrationFilter->Update();
-      //if(m_Controls.m_SurfaceActive->isChecked())
-      //{
-      //  mitk::Transform::Pointer newTransform = mitk::Transform::New();
-      //  newTransform->Concatenate(m_T_MarkerRel);
-      //  newTransform->Concatenate(ObjectMarkerCurrentTransform);
-      //  this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform->GetAffineTransform3D());
-      //}
-
-      //if(m_Controls.m_ImageActive->isChecked())
-      //{
-      //  mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
-      //  newTransform->SetIdentity();
-      //  newTransform->Compose(m_T_ImageGeo);
-      //  newTransform->Compose(m_T_MarkerRel->GetAffineTransform3D());
-      //  newTransform->Compose(ObjectMarkerCurrentTransform->GetAffineTransform3D());
-      //  this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform);
-      //}
     }
   }
 
@@ -674,7 +656,7 @@ bool QmitkIGTTrackingLabView::CheckRegistrationInitialization()
   return true;
 }
 
-bool QmitkIGTTrackingLabView::IsTransformDifferenceHigh(mitk::Transform::Pointer transformA, mitk::Transform::Pointer transformB)
+bool QmitkIGTTrackingLabView::IsTransformDifferenceHigh(mitk::NavigationData::Pointer transformA, mitk::NavigationData::Pointer transformB)
 {
   double euclideanDistanceThreshold = .8;
   double angularDifferenceThreshold = .8;
@@ -792,7 +774,7 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
 
     //some general stuff
     m_PermanentRegistration = true;
-    m_ObjectmarkerNavigationDataLastUpdate = mitk::Transform::New();
+    m_ObjectmarkerNavigationDataLastUpdate = mitk::NavigationData::New();
 
 
     }

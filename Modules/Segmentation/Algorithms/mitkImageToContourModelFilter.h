@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourModelSource.h"
 #include <mitkImage.h>
 
-#include "itkContourExtractor2DImageFilter.h"
+#include "itkPolyLineParametricPath.h"
 
 namespace mitk {
 

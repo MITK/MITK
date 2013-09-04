@@ -15,9 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkImageToContourModelFilter.h"
-//#include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkProgressBar.h"
+
+#include "itkContourExtractor2DImageFilter.h"
 
 mitk::ImageToContourModelFilter::ImageToContourModelFilter() :
 m_UseProgressBar(false),
@@ -41,14 +42,12 @@ void mitk::ImageToContourModelFilter::SetInput ( unsigned int idx, const mitk::I
   {
     this->SetNumberOfRequiredInputs(idx + 1);
   }
-  if ( input != static_cast<InputType*> ( this->ProcessObject::GetInput ( idx ) ) )
+  if ( input != static_cast<InputType*> ( ProcessObject::GetInput ( idx ) ) )
   {
     this->ProcessObject::SetNthInput ( idx, const_cast<InputType*> ( input ) );
     this->Modified();
   }
 }
-
-
 
 const mitk::ImageToContourModelFilter::InputType* mitk::ImageToContourModelFilter::GetInput( void )
 {
@@ -57,15 +56,12 @@ const mitk::ImageToContourModelFilter::InputType* mitk::ImageToContourModelFilte
   return static_cast<const mitk::ImageToContourModelFilter::InputType*>(this->ProcessObject::GetInput(0));
 }
 
-
-
 const mitk::ImageToContourModelFilter::InputType* mitk::ImageToContourModelFilter::GetInput( unsigned int idx )
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
   return static_cast<const mitk::ImageToContourModelFilter::InputType*>(this->ProcessObject::GetInput(idx));
 }
-
 
 void mitk::ImageToContourModelFilter::GenerateData()
 {
@@ -103,16 +99,41 @@ void mitk::ImageToContourModelFilter::ExtractContoursITKProcessing (itk::Image<T
 
   unsigned int foundPaths = contourExtractor->GetNumberOfOutputs();
 
+//  unsigned int pointId (0);
+
+  //
+  // set the number of outputs to the number of paths found
+  // initialize the output contour models according to the available time steps
+  //
+  const mitk::Image* image = this->GetInput();
+  unsigned int numberOfTimeSteps = image->GetTimeSlicedGeometry()->GetTimeSteps();
+
+  // todo: add the following when contour model sets become available
+/*
+  this->SetNumberOfIndexedOutputs( foundPaths );
+  this->SetNumberOfRequiredOutputs( foundPaths );
+  for ( unsigned int i = 0 ; i < foundPaths; ++i )
+  {
+    if ( ! this->GetOutput( i ) )
+    {
+      mitk::ContourModel::Pointer output = static_cast<mitk::ContourModel*>( this->MakeOutput(i).GetPointer() );
+      assert ( output.IsNotNull() );
+      output->Expand( numberOfTimeSteps );
+      this->SetNthOutput( i, output.GetPointer() );
+    }
+  }
+*/
+
   mitk::ContourModel::Pointer output = ImageToContourModelFilter::GetOutput();
+  assert ( output.IsNotNull() );
   output->Initialize();
 
-  unsigned int pointId (0);
+  output->Expand( numberOfTimeSteps );
 
-//  for (unsigned int i = 0; i < foundPaths; i++)
-//  {
-  if (!contourExtractor->GetOutput(0)) return;
-
-  const ContourPath* currentPath = contourExtractor->GetOutput(0)->GetVertexList();
+  for (unsigned int i = 0; i < foundPaths; i++)
+  {
+    if (!contourExtractor->GetOutput(i)) return;
+    const ContourPath* currentPath = contourExtractor->GetOutput(i)->GetVertexList();
 
     if (m_UseProgressBar)
       mitk::ProgressBar::GetInstance()->AddStepsToDo( currentPath->Size() );
@@ -130,6 +151,7 @@ void mitk::ImageToContourModelFilter::ExtractContoursITKProcessing (itk::Image<T
       if (m_UseProgressBar)
         mitk::ProgressBar::GetInstance()->Progress(1);
     }
+  }
 }
 
 void mitk::ImageToContourModelFilter::GenerateOutputInformation()

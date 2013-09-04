@@ -143,20 +143,9 @@ class QmitkIGTTrackingLabView : public QmitkAbstractView
     */
     void SetupIGTPipeline();
     /**
-    \brief This method initializes all needed filters.
-    */
-    void InitializeFilters();
-    /**
     \brief This method destroys the filter pipeline.
     */
     void DestroyIGTPipeline();
-
-
-    /**
-    \brief This method creates a DataNode for fiducial PointSets.
-    */
-    mitk::DataNode::Pointer CreateRegistrationFiducialsNode( const std::string& label, const mitk::Color& color);
-
 
 
 

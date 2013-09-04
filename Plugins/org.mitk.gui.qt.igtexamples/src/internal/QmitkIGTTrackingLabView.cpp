@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <mitkCone.h>
+#include <mitkIGTException.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
@@ -103,7 +104,10 @@ void QmitkIGTTrackingLabView::CreateBundleWidgets( QWidget* parent )
 
 void QmitkIGTTrackingLabView::CreateConnections()
 {
+  //initialize timer
   m_Timer = new QTimer(this);
+
+  //create connections
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(UpdateTimer()));
   connect( m_ToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnToolBoxCurrentChanged(int)) );
   connect( m_Controls.m_UsePermanentRegistrationToggle, SIGNAL(toggled(bool)), this, SLOT(OnPermanentRegistration(bool)) );
@@ -206,8 +210,7 @@ void QmitkIGTTrackingLabView::OnInstrumentSelected()
 
 void QmitkIGTTrackingLabView::OnObjectmarkerSelected()
 {
-
-if (m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource().IsNotNull())
+  if (m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource().IsNotNull())
     {
     m_ObjectmarkerNavigationData = m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedToolID());
     MITK_INFO << "Objectmarker rotation: " << m_ObjectmarkerNavigationData->GetOrientation();
@@ -230,33 +233,32 @@ if (m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource(
 
 void QmitkIGTTrackingLabView::OnSetupNavigation()
 {
-  MITK_INFO << "SetupNavigationCalled";
   if(m_Source.IsNotNull())
     if(m_Source->IsTracking())
       return;
 
   mitk::DataStorage* ds = this->GetDataStorage();
+
   if(ds == NULL)
   {
-    QMessageBox::warning(NULL, "IGTSurfaceTracker: Error", "can not access DataStorage. Navigation not possible");
+    MITK_WARN << "IGTSurfaceTracker: Error", "can not access DataStorage. Navigation not possible";
     return;
   }
 
-  // Building up the filter pipeline
+  //Building up the filter pipeline
   try
   {
     this->SetupIGTPipeline();
-
   }
-  catch(std::exception& e)
+  catch(mitk::IGTException& e)
   {
-    QMessageBox::warning(NULL, QString("IGTSurfaceTracker: Error"), QString("Error while building the IGT-Pipeline: %1").arg(e.what()));
+    MITK_WARN << "Error while building the IGT-Pipeline: " << e.GetDescription();
     this->DestroyIGTPipeline(); // destroy the pipeline if building is incomplete
     return;
   }
   catch(...)
   {
-    QMessageBox::warning(NULL, QString("IGTSurfaceTracker: Error"), QString("Error while building the IGT-Pipeline"));
+    MITK_WARN << "Unexpected error while building the IGT-Pipeline";
     this->DestroyIGTPipeline();
     return;
   }
@@ -265,11 +267,6 @@ void QmitkIGTTrackingLabView::OnSetupNavigation()
 void QmitkIGTTrackingLabView::SetupIGTPipeline()
 {
   this->InitializeRegistration(); //initializes the registration widget
-}
-
-void QmitkIGTTrackingLabView::InitializeFilters()
-{
-
 }
 
 void QmitkIGTTrackingLabView::OnRegisterFiducials()
@@ -439,20 +436,6 @@ void QmitkIGTTrackingLabView::OnToolBoxCurrentChanged(const int index)
   }
 }
 
-
-mitk::DataNode::Pointer QmitkIGTTrackingLabView::CreateRegistrationFiducialsNode( const std::string& label, const mitk::Color& color)
-{
-  mitk::DataNode::Pointer fiducialsNode = mitk::DataNode::New();
-  mitk::PointSet::Pointer fiducialsPointSet = mitk::PointSet::New();
-
-  fiducialsNode->SetData(fiducialsPointSet);
-  fiducialsNode->SetName( label );
-  fiducialsNode->SetColor( color );
-  fiducialsNode->SetBoolProperty( "updateDataOnRender", false );
-
-  return fiducialsNode;
-}
-
 void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
 {
   mitk::DataStorage* ds = this->GetDataStorage();
@@ -491,21 +474,6 @@ void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
     m_PointSetRecording = false;
   }
 }
-
-/*void QmitkIGTTrackingLabView::GlobalReinit()
-{
-  // request global reiinit
-  mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
-  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
-
-  // calculate bounding geometry of these nodes
-  mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
-
-  // initialize the views to the bounding geometry
-  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-
-  //global reinit end
-}*/
 
 void QmitkIGTTrackingLabView::OnVirtualCamera(bool on)
 {
@@ -693,14 +661,7 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     mitk::NavigationData::Pointer T_MarkerRel = mitk::NavigationData::New();
     T_MarkerRel->Compose(T_Object);
     T_MarkerRel->Compose(T_Marker->GetInverse());
-
     m_T_MarkerRel = T_MarkerRel;
-    MITK_INFO << "m_T_MarkerRel nach Berechnung: " << m_T_MarkerRel->GetOrientation();
-    MITK_INFO << "T_MarkerRel nach Berechnung: " << T_MarkerRel->GetRotationMatrix() << " als quaternion " << T_MarkerRel->GetOrientation();
-    MITK_INFO << "T_Marker: " << T_Marker->GetRotationMatrix() << " als quaternion " << T_Marker->GetOrientation();
-
-
-
     m_PermanentRegistrationFilter->SetOffset(0,m_T_MarkerRel->GetAffineTransform3D());
 
     //first: image (if activated)
@@ -722,8 +683,6 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     //some general stuff
     m_PermanentRegistration = true;
     m_ObjectmarkerNavigationDataLastUpdate = mitk::NavigationData::New();
-
-
     }
   else
     {
@@ -737,6 +696,4 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     //delete filter
     m_PermanentRegistrationFilter = NULL;
     }
-
-
 }

@@ -80,16 +80,6 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     static SegmentationInterpolationController* InterpolatorForImage(const Image*);
 
     /**
-      \brief Block reaction to an images Modified() events.
-
-      Blocking the scan of the whole image is especially useful when you are about to change a single slice
-      of the image. Then you would send a difference image of this single slice to SegmentationInterpolationController
-      but call image->Modified() anyway. Before calling image->Modified() you should block
-      SegmentationInterpolationController's reactions to this modified by using this method.
-    */
-    void BlockModified(bool);
-
-    /**
       \brief Initialize with a whole volume.
 
       Will scan the volume for segmentation pixels (values other than 0) and fill some internal data structures.
@@ -137,13 +127,6 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
 
     void BuildLabelCount();
 
-   // void OnWorkingImageModified(const itk::EventObject&);
-
-    /**
-     * Activate/Deactivate the 2D interpolation.
-    */
-    void Activate2DInterpolation(bool);
-
   protected:
 
     /**
@@ -175,13 +158,11 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
 
     /// internal scan of a single slice
     template < typename PixelType >
-    void ScanChangedSlice( itk::Image<PixelType, 2>*, const SetChangedSliceOptions& options );
+    void ScanSliceITKProcessing( itk::Image<PixelType, 2>*, const SetChangedSliceOptions& options );
 
+    /// internal scan of the whole image
     template < typename TPixel, unsigned int VImageDimension >
-    void ScanChangedVolume( itk::Image<TPixel, VImageDimension>*, unsigned int timeStep );
-
-//    template < typename PixelType >
-//    void ScanWholeVolume( itk::Image<PixelType, 3>*, const Image* volume, unsigned int timeStep );
+    void ScanImageITKProcessing( itk::Image<TPixel, VImageDimension>*, unsigned int timeStep );
 
     void PrintStatus();
 
@@ -198,13 +179,9 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     LabelSetImage::Pointer m_WorkingImage;
     Image::Pointer m_ReferenceImage;
 
- //   unsigned long m_WorkingImageObserverID;
-
     int m_ActiveLabel;
     int m_NumberOfLabels;
     int m_CurrentNumberOfLabels;
-    bool m_BlockModified;
-    bool m_2DInterpolationActivated;
 };
 
 } // namespace

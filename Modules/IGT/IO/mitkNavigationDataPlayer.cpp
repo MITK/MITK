@@ -21,13 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 #include "mitkNavigationDataReaderXML.h"
 
-//includes for exceptions
 #include "mitkIGTException.h"
-#include "mitkIGTIOException.h"
 
 mitk::NavigationDataPlayer::NavigationDataPlayer()
-  : m_CurPlayerState(PlayerStopped), m_FileName(""),
-    m_NumberOfOutputs(0),
+  : m_CurPlayerState(PlayerStopped),
     m_StartPlayingTimeStamp(0.0), m_PauseTimeStamp(0.0)
 {
   // to get a start time
@@ -79,7 +76,7 @@ void mitk::NavigationDataPlayer::GenerateData()
   for (unsigned int index = 0; index < m_NumberOfOutputs; index++)
   {
     mitk::NavigationData* output = this->GetOutput(index);
-    assert(output);
+    if( !output ) { mitkThrowException(mitk::IGTException) << "Output of index "<<index<<" is null."; }
 
     mitk::NavigationDataSet::NavigationDataSetIterator curIterator = m_NavigationDataSetIterator-1;
     output->Graft(curIterator->at(index));
@@ -97,38 +94,6 @@ void mitk::NavigationDataPlayer::UpdateOutputInformation()
 {
   this->Modified();  // make sure that we need to be updated
   Superclass::UpdateOutputInformation();
-}
-
-
-void mitk::NavigationDataPlayer::InitPlayer()
-{
-  if (!m_FileName.empty())
-  {
-    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-    reader->SetFileName(m_FileName);
-    this->SetNavigationDataReader(reader.GetPointer());
-    this->ReadNavigationDataSet();
-  }
-
-  if ( m_NavigationDataSet.IsNull() )
-  {
-    mitkThrowException(mitk::IGTException)
-        << "NavigationDataSet has to be set before initializing player.";
-  }
-
-  m_NumberOfOutputs = m_NavigationDataSet->GetNumberOfTools();
-  SetNumberOfRequiredOutputs(m_NumberOfOutputs);
-
-  for (unsigned int n = 0; n < m_NumberOfOutputs; ++n)
-  {
-    mitk::NavigationData* output = this->GetOutput(n);
-    if (!output)
-    {
-      DataObjectPointer newOutput = this->MakeOutput(n);
-      this->SetNthOutput(n, newOutput);
-      this->Modified();
-    }
-  }
 }
 
 void mitk::NavigationDataPlayer::StartPlaying()
@@ -189,13 +154,4 @@ void mitk::NavigationDataPlayer::Resume()
 bool mitk::NavigationDataPlayer::IsAtEnd()
 {
   return m_NavigationDataSetIterator == m_NavigationDataSet->End();
-}
-
-void mitk::NavigationDataPlayer::SetStream( std::istream* stream )
-{
-  mitkThrowException(mitk::IGTIOException) << "Not implement at the moment.";
-  //dynamic_cast<mitk::NavigationDataReaderXML::Pointer>(m_NavigationDataReader.GetPointer())->SetStream(stream);
-
-  this->Modified();
-  InitPlayer();
 }

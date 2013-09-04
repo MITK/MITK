@@ -16,8 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataPlayerBase.h"
 
+// includes for exceptions
+#include "mitkIGTException.h"
+//#include "mitkIGTIOException.h"
 
 mitk::NavigationDataPlayerBase::NavigationDataPlayerBase()
+  : m_NumberOfOutputs(0)
 {
   m_Name ="Navigation Data Player Source";
 }
@@ -26,18 +30,46 @@ mitk::NavigationDataPlayerBase::~NavigationDataPlayerBase()
 {
 }
 
-void mitk::NavigationDataPlayerBase::ReadNavigationDataSet()
-{
-  if (m_NavigationDataReader.IsNotNull())
-  {
-    m_NavigationDataSet = m_NavigationDataReader->Read();
-  }
-}
-
 void mitk::NavigationDataPlayerBase::UpdateOutputInformation()
 {
   this->Modified();  // make sure that we need to be updated
   Superclass::UpdateOutputInformation();
+}
+
+void mitk::NavigationDataPlayerBase::SetNavigationDataSet(NavigationDataSet::Pointer navigationDataSet)
+{
+  m_NavigationDataSet = navigationDataSet;
+  m_NavigationDataSetIterator = navigationDataSet->Begin();
+
+  this->InitPlayer();
+}
+
+unsigned int mitk::NavigationDataPlayerBase::GetNumberOfSnapshots()
+{
+  return m_NavigationDataSet.IsNull() ? 0 : m_NavigationDataSet->Size();
+}
+
+void mitk::NavigationDataPlayerBase::InitPlayer()
+{
+  if ( m_NavigationDataSet.IsNull() )
+  {
+    mitkThrowException(mitk::IGTException)
+        << "NavigationDataSet has to be set before initializing player.";
+  }
+
+  m_NumberOfOutputs = m_NavigationDataSet->GetNumberOfTools();
+  this->SetNumberOfRequiredOutputs(m_NumberOfOutputs);
+
+  for (unsigned int n = 0; n < m_NumberOfOutputs; ++n)
+  {
+    mitk::NavigationData* output = this->GetOutput(n);
+    if (!output)
+    {
+      DataObjectPointer newOutput = this->MakeOutput(n);
+      this->SetNthOutput(n, newOutput);
+      this->Modified();
+    }
+  }
 }
 
 mitk::NavigationData::Pointer mitk::NavigationDataPlayerBase::ReadNavigationData(TiXmlElement* elem)

@@ -47,17 +47,6 @@ namespace mitk {
     itkNewMacro(Self);
 
     /**
-    * \brief sets the file name and path for the PlayerMode NormalFile and ZipFile
-    */
-    itkSetStringMacro(FileName);
-
-    /**
-    * \brief returns the file name and path for the PlayerMode NormalFile and ZipFile
-    */
-    itkGetStringMacro(FileName);
-
-
-    /**
     * \brief Used for pipeline update just to tell the pipeline that we always have to update
     */
     virtual void UpdateOutputInformation();
@@ -100,13 +89,6 @@ namespace mitk {
      */
     bool IsAtEnd();
 
-    /**
-     * \brief Sets the stream of this player.
-     * @throw mitk::IGTException Throws an exception if stream is NULL or if it is not good.
-     * \deprecated Will be removed in one of the next releases. Use SetFileName() instead.
-     */
-    void SetStream(std::istream* stream);
-
   protected:
     enum PlayerState { PlayerStopped, PlayerRunning, PlayerPaused };
 
@@ -121,17 +103,6 @@ namespace mitk {
      * \brief filter execute method
      */
     virtual void GenerateData();
-
-    /**
-     * \brief This method initializes the player with first data
-     */
-    void InitPlayer();
-
-    mitk::NavigationDataSet::NavigationDataSetIterator m_NavigationDataSetIterator;
-
-    std::string m_FileName; ///< stores the filename
-
-    unsigned int m_NumberOfOutputs; ///< stores the number of outputs known from the XML document
 
     TimeStampType m_StartPlayingTimeStamp; ///< the starttime of the playing set in the method StartPlaying()
     TimeStampType m_PauseTimeStamp; ///< stores the beginning of a pause

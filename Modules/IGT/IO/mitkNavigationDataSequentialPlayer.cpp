@@ -25,12 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTIOException.h"
 
 mitk::NavigationDataSequentialPlayer::NavigationDataSequentialPlayer()
-  : mitk::NavigationDataPlayerBase()
-  , m_DataElem(0)
-  , m_CurrentElem(0)
-  , m_Repeat(false)
-  , m_NumberOfSnapshots(0)
-  , m_LastGoTo(0)
+  : m_Repeat(false)
 {
 }
 
@@ -43,12 +38,13 @@ void mitk::NavigationDataSequentialPlayer::GoToSnapshot(unsigned int i)
   if( !m_Repeat && (this->GetNumberOfSnapshots() <= i) )
   {
     MITK_ERROR << "Snaphot " << i << " does not exist and repat is off: can't go to that snapshot!";
-    mitkThrowException(mitk::IGTException) << "Snaphot " << i << " does not exist and repat is off: can't go to that snapshot!";
+    mitkThrowException(mitk::IGTException) << "Snapshot " << i << " does not exist and repat is off: can't go to that snapshot!";
   }
 
   // set iterator to given position (modulo for allowing repeat)
   m_NavigationDataSetIterator = m_NavigationDataSet->Begin() + ( i % this->GetNumberOfSnapshots() );
 
+  // set outputs to selected snapshot
   this->Update();
 }
 

@@ -186,7 +186,6 @@ static void TestMode3DMean(mitk::NavigationDataToPointSetFilter::Pointer myNavig
   mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
 
   player->SetNavigationDataSet( reader->Read(file) );
-  //player->StartPlaying();
 
   for (int i = 0; i< player->GetNumberOfOutputs(); i++)
   {
@@ -198,14 +197,11 @@ static void TestMode3DMean(mitk::NavigationDataToPointSetFilter::Pointer myNavig
 
   myNavigationDataToPointSetFilter->Update();
 
-  //player->StopPlaying();
-
   MITK_TEST_CONDITION(pointSet0->GetPoint(0)[0]==3.0 && pointSet0->GetPoint(0)[1]==2.0 && pointSet0->GetPoint(0)[2]==5.0,
     "Testing the average of first input");
 
   MITK_TEST_CONDITION(pointSet1->GetPoint(0)[0]==30.0 && pointSet1->GetPoint(0)[1]==20.0 && pointSet1->GetPoint(0)[2]==50.0,
     "Testing the average of second input");
-
 }
 };
 

@@ -10,6 +10,7 @@ set(MODULE_TESTS
   mitkEventTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
+  mitkGeometry2DTest.cpp
   mitkGeometry3DTest.cpp
   mitkGeometry3DEqualTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp

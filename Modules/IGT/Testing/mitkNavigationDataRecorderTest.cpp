@@ -53,11 +53,9 @@ public:
     }
 
     recorder->StartRecording();
-    int i = 0;
     while (!player->IsAtEnd())
     {
       recorder->Update();
-      i++;
     }
 
     mitk::NavigationDataSetWriterXML writer;
@@ -65,7 +63,26 @@ public:
     writer.Write("F://Build//MITK-Data//IGT-Data//NavigationDataSet2.xml", recorder->GetNavigationDataSet());
 
     MITK_TEST_CONDITION_REQUIRED(mitkNavigationDataRecorderTestClass::CompareFiles("F://Build//MITK-Data//IGT-Data//NavigationDataSet.xml",
-      "F://Build//MITK-Data//IGT-Data//NavigationDataSet2.xml"), "Asserting that compare function for files works correctly - Negative Test");
+      "F://Build//MITK-Data//IGT-Data//NavigationDataSet2.xml"), "Asserting that played back file has been recorded correctly");
+
+    recorder->StopRecording();
+    MITK_TEST_CONDITION_REQUIRED(! recorder->GetRecording(), "Test if StopRecording is working");
+    recorder->ResetRecording();
+    MITK_TEST_CONDITION_REQUIRED(recorder->GetNavigationDataSet()->Size() == 0, "Test correct reset of recorder");
+
+    //Reset Player
+    player = mitk::NavigationDataSequentialPlayer::New();
+    player->SetNavigationDataSet(set);
+
+    // Check if Limiting recording works
+    recorder->SetRecordCountLimit(100);
+    recorder->StartRecording();
+    while (!player->IsAtEnd())
+    {
+      recorder->Update();
+    }
+
+    MITK_TEST_CONDITION_REQUIRED(recorder->GetNavigationDataSet()->Size() == 100, "Test if SetRecordCountLimit works as intended.");
   }
 
   static bool mitkNavigationDataRecorderTestClass::CompareFiles(std::string file1, std::string file2)

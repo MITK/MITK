@@ -49,7 +49,7 @@ public:
     writer.Write("F://Build//MITK-Data//IGT-Data//NavigationDataSet2.xml", set);
 
     MITK_TEST_CONDITION_REQUIRED(mitkNavigationDataSetReaderWriterTestClass::CompareFiles("F://Build//MITK-Data//IGT-Data//NavigationDataSet.xml",
-      "F://Build//MITK-Data//IGT-Data//NavigationDataSet2.xml"), "Asserting that compare function for files works correctly - Negative Test");
+      "F://Build//MITK-Data//IGT-Data//NavigationDataSet2.xml"), "Testing if read/write cycle creates identical files");
   }
 
   static bool CompareFiles(std::string file1, std::string file2)

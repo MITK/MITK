@@ -91,6 +91,7 @@ namespace mitk
 
     /**
     * \brief Returns the number of time steps that were recorded in the current set.
+    * Warning: This Method does NOT Stop Recording!
     */
     virtual int GetNumberOfRecordedSteps();
 

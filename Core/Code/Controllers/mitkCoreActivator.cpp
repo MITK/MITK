@@ -39,6 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModule.h>
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
+#include <usSharedLibrary.h>
+
 
 void HandleMicroServicesMessages(us::MsgType type, const char* msg)
 {
@@ -137,6 +139,10 @@ public:
     m_MimeTypeProviderReg = context->RegisterService<mitk::IMimeTypeProvider>(m_MimeTypeProvider.get());
 
     context->AddModuleListener(this, &MitkCoreActivator::HandleModuleEvent);
+
+    // Explicitly load the LegacyIO module
+    us::SharedLibrary legacyIOLib(programPath, "LegacyIO");
+    legacyIOLib.Load();
 
     // Add Reader / Writer Services
 

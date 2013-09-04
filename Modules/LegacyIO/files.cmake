@@ -3,6 +3,7 @@ set(H_FILES
 )
 
 set(CPP_FILES
+  mitkActivator.cpp
   mitkBaseDataIOFactory.cpp
   mitkDataNodeFactory.cpp
   mitkFileSeriesReader.cpp

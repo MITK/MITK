@@ -43,18 +43,29 @@ void _CastToItkImage2Access( itk::Image<TPixel, VImageDimension>* itkInputImage,
 #endif //DOXYGEN_SKIP
 
 typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
+typedef itk::Image<itk::RGBPixel<float>, 2>  itkImageRGBF2;
+typedef itk::Image<itk::RGBPixel<short>, 2>  itkImageRGBS2;
+typedef itk::Image<itk::RGBPixel<unsigned short>, 2>  itkImageRGBUS2;
 typedef itk::Image<itk::DiffusionTensor3D<float>, 2>  itkImageDTIF2;
 typedef itk::Image<itk::DiffusionTensor3D<double>, 2>  itkImageDTID2;
 
 template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageRGBUC2*,  itk::SmartPointer<itkImageRGBUC2>&);
+template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageRGBF2*,  itk::SmartPointer<itkImageRGBF2>&);
+template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageRGBS2*,  itk::SmartPointer<itkImageRGBS2>&);
+template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageRGBUS2*,  itk::SmartPointer<itkImageRGBUS2>&);
 template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTIF2*,  itk::SmartPointer<itkImageDTIF2>&);
 template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTID2*,  itk::SmartPointer<itkImageDTID2>&);
 
 typedef itk::Image<itk::RGBPixel<unsigned char>, 3>  itkImageRGBUC3;
+typedef itk::Image<itk::RGBPixel<unsigned short>, 3>  itkImageRGBUS3;
+typedef itk::Image<itk::RGBPixel<float>, 3>  itkImageRGBF3;
+typedef itk::Image<itk::RGBPixel<float>, 2>  itkImageRGBF2;
 typedef itk::Image<itk::DiffusionTensor3D<float>, 3>  itkImageDTIF3;
 typedef itk::Image<itk::DiffusionTensor3D<double>, 3>  itkImageDTID3;
 
 template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageRGBUC3*,  itk::SmartPointer<itkImageRGBUC3>&);
+template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageRGBF3*,  itk::SmartPointer<itkImageRGBF3>&);
+template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageRGBUS3*,  itk::SmartPointer<itkImageRGBUS3>&);
 template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTIF3*,  itk::SmartPointer<itkImageDTIF3>&);
 template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTID3*,  itk::SmartPointer<itkImageDTID3>&);
 

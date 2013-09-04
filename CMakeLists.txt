@@ -241,7 +241,7 @@ set(MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES
     CACHE STRING "List of floating pixel types used in AccessByItk and InstantiateAccessFunction macros")
 
 set(MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES
-    "itk::RGBPixel<unsigned char>, itk::RGBAPixel<unsigned char>"
+    "itk::RGBPixel<unsigned char>,itk::RGBPixel<unsigned short>, itk::RGBPixel<float>, itk::RGBAPixel<unsigned char>"
     CACHE STRING "List of composite pixel types used in AccessByItk and InstantiateAccessFunction macros")
 
 set(MITK_ACCESSBYITK_DIMENSIONS
@@ -270,7 +270,7 @@ endif()
 
 if(NOT MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES)
   set(MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES
-    "itk::RGBPixel<unsigned char>, itk::RGBAPixel<unsigned char>"
+    "itk::RGBPixel<unsigned char>,itk::RGBPixel<unsigned short>, itk::RGBPixel<float>, itk::RGBAPixel<unsigned char>"
     CACHE STRING "List of composite pixel types used in AccessByItk and InstantiateAccessFunction macros" FORCE)
 endif()
 

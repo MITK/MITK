@@ -46,6 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageData.h>
 #include <vtkPoints.h>
 #include <vtkGeneralTransform.h>
+#include <vtkImageExtractComponents.h>
 #include <vtkImageReslice.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkPlaneSource.h>
@@ -367,7 +368,10 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     }
   }
 
-  if (!(numberOfComponents == 1 || numberOfComponents == 3 || numberOfComponents == 4))
+  bool isVectorImage = false;
+  datanode->GetBoolProperty("Image.Vector Image", isVectorImage, renderer);
+
+  if (!isVectorImage && !(numberOfComponents == 1 || numberOfComponents == 3 || numberOfComponents == 4))
   {
     MITK_WARN << "Unknown number of components!";
   }
@@ -378,9 +382,21 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
   localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
-  //connect the input with the levelwindow filter
-  localStorage->m_LevelWindowFilter->SetInput(localStorage->m_ReslicedImage);
-  //connect the texture with the output of the levelwindow filter
+  if (isVectorImage)
+  {
+    int visibleComponent = 0;
+    datanode->GetIntProperty("Image.Vector Image.Visible Component", visibleComponent, renderer);
+
+    localStorage->m_VectorComponentExtractor->SetComponents(visibleComponent);
+    localStorage->m_VectorComponentExtractor->SetInput(localStorage->m_ReslicedImage);
+
+    localStorage->m_LevelWindowFilter->SetInputConnection(localStorage->m_VectorComponentExtractor->GetOutputPort(0));
+  }
+  else
+  {
+    //connect the input with the levelwindow filter
+    localStorage->m_LevelWindowFilter->SetInput(localStorage->m_ReslicedImage);
+  }
 
   // check for texture interpolation property
   bool textureInterpolation = false;
@@ -389,6 +405,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   //set the interpolation modus according to the property
   localStorage->m_Texture->SetInterpolate(textureInterpolation);
 
+  // connect the texture with the output of the levelwindow filter
   localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
 
   this->TransformActor( renderer );
@@ -1019,6 +1036,7 @@ mitk::ImageVtkMapper2D::LocalStorage::~LocalStorage()
 }
 
 mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
+  : m_VectorComponentExtractor(vtkSmartPointer<vtkImageExtractComponents>::New())
 {
 
   m_LevelWindowFilter = vtkSmartPointer<vtkMitkLevelWindowFilter>::New();

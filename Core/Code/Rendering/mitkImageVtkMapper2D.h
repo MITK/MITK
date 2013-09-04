@@ -34,6 +34,7 @@ class vtkPolyDataMapper;
 class vtkPlaneSource;
 class vtkImageData;
 class vtkLookupTable;
+class vtkImageExtractComponents;
 class vtkImageReslice;
 class vtkImageChangeInformation;
 class vtkPoints;
@@ -151,6 +152,7 @@ public:
     vtkSmartPointer<vtkPropAssembly> m_Actors;
     /** \brief Mapper of a 2D render window. */
     vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
+    vtkSmartPointer<vtkImageExtractComponents> m_VectorComponentExtractor;
     /** \brief Current slice of a 2D render window.*/
     vtkSmartPointer<vtkImageData> m_ReslicedImage;
     /** \brief Empty vtkPolyData that is set when rendering geometry does not

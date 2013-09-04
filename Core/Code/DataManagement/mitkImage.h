@@ -632,6 +632,8 @@ private:
  /**
  * @brief Equal A function comparing two images for beeing equal in meta- and imagedata
  *
+ * @ingroup MITKTestingAPI
+ *
  * Following aspects are tested for equality:
  *  - dimension of the images
  *  - size of the images

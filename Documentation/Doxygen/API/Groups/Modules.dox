@@ -22,3 +22,11 @@
 
   \brief This group includes all MITK example plugins demonstrating specific framework features.
 */
+
+/**
+  \defgroup MITKTestingAPI MITK Testing
+
+  \brief This group includes all useful methods for testing.
+
+   In this group, the API documentation of the methods for testing. The more general concepts of Testing in MITK are described on the \ref GeneralTests page.
+*/

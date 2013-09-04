@@ -368,26 +368,17 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     }
   }
 
-  bool isVectorImage = false;
-  datanode->GetBoolProperty("Image.Vector Image", isVectorImage, renderer);
-
-  if (!isVectorImage && !(numberOfComponents == 1 || numberOfComponents == 3 || numberOfComponents == 4))
-  {
-    MITK_WARN << "Unknown number of components!";
-  }
-
   this->ApplyOpacity( renderer );
   this->ApplyRenderingMode(renderer);
 
   // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
   localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
-  if (isVectorImage)
-  {
-    int visibleComponent = 0;
-    datanode->GetIntProperty("Image.Vector Image.Visible Component", visibleComponent, renderer);
+  int displayedComponent = 0;
 
-    localStorage->m_VectorComponentExtractor->SetComponents(visibleComponent);
+  if (datanode->GetIntProperty("Image.Displayed Component", displayedComponent, renderer) && numberOfComponents > 1)
+  {
+    localStorage->m_VectorComponentExtractor->SetComponents(displayedComponent);
     localStorage->m_VectorComponentExtractor->SetInput(localStorage->m_ReslicedImage);
 
     localStorage->m_LevelWindowFilter->SetInputConnection(localStorage->m_VectorComponentExtractor->GetOutputPort(0));
@@ -781,10 +772,11 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
     node->AddProperty("layer", mitk::IntProperty::New(0), renderer, overwrite);
 
-    bool isVectorImage = image->GetPixelType().GetPixelTypeAsString() == "vector";
+    PixelType pixelType = image->GetPixelType();
+    std::size_t numComponents = pixelType.GetNumberOfComponents();
 
-    node->AddProperty("Image.Vector Image", mitk::BoolProperty::New(isVectorImage), renderer, overwrite);
-    node->AddProperty("Image.Vector Image.Visible Component", mitk::IntProperty::New(0), renderer, overwrite);
+    if ((pixelType.GetPixelTypeAsString() == "vector" && numComponents > 1) || numComponents == 2 || numComponents > 4)
+      node->AddProperty("Image.Displayed Component", mitk::IntProperty::New(0), renderer, overwrite);
   }
 
   if(image.IsNotNull() && image->IsInitialized())

@@ -31,6 +31,10 @@ namespace mitk {
     * pipeline. It encapsulates position and orientation of a tracked tool/sensor. Additionally,
     * it contains a data structure that contains error/plausibility information
     *
+    * It provides methods to work with the affine transformation represented by its orientation and position.
+    * Additionally, it provides a constructor to construct a NavigationData object from an AffineTransform3D and
+    * a getter to create an AffineTransform3D from a NavigationData object.
+    *
     * \ingroup IGT
     */
   class MitkIGT_EXPORT NavigationData : public itk::DataObject
@@ -162,11 +166,24 @@ namespace mitk {
       */
       void SetOrientationAccuracy(mitk::ScalarType error);
 
+      /**
+       * \brief Calculate AffineTransform3D from the transformation held by this NavigationData.
+       * TODO: should throw an error if transformation is invalid.
+       */
       mitk::AffineTransform3D::Pointer GetAffineTransform3D() const;
 
+      /**
+       * \brief Calculate the RotationMatrix of this transformation.
+       */
       mitk::Matrix3D GetRotationMatrix() const;
 
-      mitk::Point3D TransformPoint(const mitk::Point3D) const;
+      /**
+       * \brief Transform by an affine transformation
+       *
+       * This method applies the affine transform given by self to a
+       * given point, returning the transformed point.
+       */
+      mitk::Point3D TransformPoint(const mitk::Point3D point) const;
 
       /**
        * Get inverse of the Transformation represented by this NavigationData.

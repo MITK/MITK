@@ -676,11 +676,13 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
    */
   if (m_WorkingImage.IsNotNull())
   {
+/*
     //making interpolation separately undoable
     mitk::UndoStackItem::IncCurrObjectEventId();
     mitk::UndoStackItem::IncCurrGroupEventId();
     mitk::UndoStackItem::ExecuteIncrement();
-
+*/
+    /*
     mitk::Image::Pointer image3D = m_WorkingImage;
     unsigned int timeStep = slicer->GetTime()->GetPos();
     if (m_WorkingImage->GetDimension() == 4)
@@ -691,6 +693,8 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       timeSelector->Update();
       image3D = timeSelector->GetOutput();
     }
+    */
+    /*
     // create a empty diff image for the undo operation
     mitk::Image::Pointer diffImage = mitk::Image::New();
     diffImage->Initialize( image3D );
@@ -698,10 +702,10 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     // Set all pixels to zero
     mitk::PixelType pixelType( mitk::MakeScalarPixelType<unsigned char>()  );
     memset( diffImage->GetData(), 0, (pixelType.GetBpe() >> 3) * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2) );
-
+*/
     // Since we need to shift the plane it must be clone so that the original plane isn't altered
     mitk::PlaneGeometry::Pointer reslicePlane = slicer->GetCurrentPlaneGeometry()->Clone();
-
+    unsigned int timeStep = slicer->GetTime()->GetPos();
     int sliceDimension(-1);
     int sliceIndex(-1);
     mitk::SegTool2D::DetermineAffectedImageSlice( m_WorkingImage, reslicePlane, sliceDimension, sliceIndex );
@@ -725,6 +729,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
       if (interpolation.IsNotNull()) // we don't check if interpolation is necessary/sensible - but m_InterpolatorController does
       {
+/*
         //Setting up the reslicing pipeline which allows us to write the interpolation results back into
         //the image volume
         vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
@@ -735,22 +740,52 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
         reslice->Modified();
 
         mitk::ExtractSliceFilter::Pointer diffslicewriter =  mitk::ExtractSliceFilter::New(reslice);
-        diffslicewriter->SetInput( diffImage );
+        diffslicewriter->SetInput( m_WorkingImage ); //diffImage );
         diffslicewriter->SetTimeStep( timeStep );
         diffslicewriter->SetWorldGeometry(reslicePlane);
         diffslicewriter->SetVtkOutputRequest(true);
-        diffslicewriter->SetResliceTransformByGeometry( diffImage->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+        diffslicewriter->SetResliceTransformByGeometry( m_WorkingImage->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
 
         diffslicewriter->Modified();
         diffslicewriter->Update();
+*/
+        //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
+        vtkSmartPointer<mitkVtkImageOverwrite> overwrite = vtkSmartPointer<mitkVtkImageOverwrite>::New();
+        overwrite->SetInputSlice(interpolation->GetVtkImageData());
+        //set overwrite mode to true to write back to the image volume
+        overwrite->SetOverwriteMode(true);
+        overwrite->Modified();
+
+        mitk::ExtractSliceFilter::Pointer extractor =  mitk::ExtractSliceFilter::New(overwrite);
+        extractor->SetInput( m_WorkingImage );
+        extractor->SetTimeStep( timeStep );
+        extractor->SetWorldGeometry( reslicePlane );
+        extractor->SetVtkOutputRequest(true);
+        extractor->SetResliceTransformByGeometry( m_WorkingImage->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+
+        extractor->Modified();
+
+        try
+        {
+          extractor->Update();
+        }
+        catch ( itk::ExceptionObject & excep )
+        {
+          MITK_ERROR << "Exception caught: " << excep.GetDescription();
+          return;
+        }
+
+        //the image was modified within the pipeline, but not marked so
+        m_WorkingImage->Modified();
+        m_WorkingImage->GetVtkImageData()->Modified();
+
         ++totalChangedSlices;
 
         mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
       }
       mitk::ProgressBar::GetInstance()->Progress();
     }
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
+/*
     if (totalChangedSlices > 0)
     {
         // create do/undo operations
@@ -765,7 +800,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
         // acutally apply the changes here to the original image
         mitk::DiffImageApplier::GetInstanceForUndo()->ExecuteOperation( doOp );
     }
-
+*/
 //    m_FeedbackNode->SetData(NULL);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }

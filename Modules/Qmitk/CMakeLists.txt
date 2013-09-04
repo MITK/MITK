@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE( Qmitk
-               DEPENDS Mitk
+               DEPENDS Mitk LegacyIO
                PACKAGE_DEPENDS QT QVTK
                SUBPROJECTS MITK-CoreUI
                EXPORT_DEFINE QMITK_EXPORT

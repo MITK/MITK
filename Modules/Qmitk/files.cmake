@@ -10,6 +10,7 @@ QmitkEventAdapter.cpp
 QmitkFileDialog.cpp
 QmitkFileOpenDialog.cpp
 QmitkFileSaveDialog.cpp
+QmitkIOUtil.cpp
 QmitkLevelWindowPresetDefinitionDialog.cpp
 QmitkLevelWindowRangeChangeDialog.cpp
 QmitkLevelWindowWidgetContextMenu.cpp

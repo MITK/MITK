@@ -18,13 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QmitkIOUtil__h_
 #define _QmitkIOUtil__h_
 
-#include "QmitkExtExports.h"
+#include "QmitkExports.h"
 
 // std
 #include <string>
 
 // mitk includes
 #include <mitkCommon.h>
+#include <mitkBaseData.h>
 #include <mitkDataNode.h>
 #include <mitkImage.h>
 #include <mitkSurface.h>
@@ -32,14 +33,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFileWriterWithInformation.h>
 
 //Qt
-#include <qstring.h>
-#include <QWidget>
+#include <QList>
 
+class QWidget;
+class QString;
+class QStringList;
 
-namespace mitk
-{
+namespace mitk {
+class DataStorage;
+struct IFileReader;
+}
 
-class QmitkExt_EXPORT QmitkIOUtil
+class QMITK_EXPORT QmitkIOUtil
 {
     /**
      * @brief QmitkIOUtil This is a static helper method to save any files with Qt dialogs.
@@ -47,13 +52,28 @@ class QmitkExt_EXPORT QmitkIOUtil
     */
 public:
 
+  /**
+   * @brief Loads the specified files
+   *
+   * This methods tries to load all specified files and pop-ups dialog boxes if further
+   * user input is required (e.g. ambiguous mime-types or reader options).
+   *
+   * If the provided DataStorage is not NULL, some files will be added to it automatically,
+   * dependeing on the IFileReader used.
+   *
+   * @param files A list of files to load.
+   * @param ds An optional data storage passed to IFileReader instances
+   * @return A list of BaseData instances which have not already been added to the data storage.
+   */
+  static QList<mitk::BaseData::Pointer> LoadFiles(const QStringList& files, mitk::DataStorage* ds = NULL);
+
     /**
    * @brief SaveBaseDataWithDialog Convenience method to save any data with a Qt dialog.
    * @param data BaseData holding the data you wish to save.
    * @param fileName The file name where to save the data (including path and extension).
    * @param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the screen.
    */
-    static void SaveBaseDataWithDialog(BaseData *data, std::string fileName, QWidget* parent = NULL);
+    static void SaveBaseDataWithDialog(mitk::BaseData *data, std::string fileName, QWidget* parent = NULL);
 
     /**
      * @brief SaveSurfaceWithDialog Convenience method to save a surface with a Qt dialog.
@@ -101,6 +121,9 @@ protected:
    */
     static bool SaveToFileWriter(mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const std::string fileName);
 
+private:
+
+    static QString ReadFile(mitk::IFileReader* reader, const QString& file, mitk::DataStorage* ds, QList<mitk::BaseData::Pointer>& result);
 };
-} //end namespace mitk
+
 #endif // _QmitkIOUtil__h_

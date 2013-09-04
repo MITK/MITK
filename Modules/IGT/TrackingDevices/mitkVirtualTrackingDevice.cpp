@@ -255,9 +255,9 @@ void mitk::VirtualTrackingDevice::TrackTools()
 
         mitk::Quaternion quat;
         /* fix quaternion rotation */
-        quat.x() = 1.0;
-        quat.y() = 1.0;
-        quat.z() = 1.0;
+        quat.x() = 0.0;
+        quat.y() = 0.0;
+        quat.z() = 0.0;
         quat.r() = 1.0;
         quat.normalize();
         currentTool->SetOrientation(quat);
@@ -313,5 +313,6 @@ mitk::VirtualTrackingDevice::ControlPointType mitk::VirtualTrackingDevice::GetRa
   pos[0] = m_Bounds[0] + (m_Bounds[1] - m_Bounds[0]) * (rand() / (RAND_MAX + 1.0));  // X =  xMin + xRange * (random number between 0 and 1)
   pos[1] = m_Bounds[2] + (m_Bounds[3] - m_Bounds[2]) * (rand() / (RAND_MAX + 1.0));  // Y
   pos[2] = m_Bounds[4] + (m_Bounds[5] - m_Bounds[4]) * (rand() / (RAND_MAX + 1.0));  // Z
+
   return pos;
 }

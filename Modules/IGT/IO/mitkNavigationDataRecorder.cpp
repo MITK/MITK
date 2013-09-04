@@ -37,14 +37,21 @@ void mitk::NavigationDataRecorder::GenerateData()
   DataObjectPointerArray inputs = this->GetIndexedInputs(); //get all inputs
 
   //This vector will hold the NavigationDatas that are copied from the inputs
-  //it is initialized with the size of inputs (one for each) and a new constructor, so we can graft later
-  std::vector< mitk::NavigationData::Pointer > clonedDatas = std::vector< mitk::NavigationData::Pointer > (inputs.size(), mitk::NavigationData::New());
+  std::vector< mitk::NavigationData::Pointer > clonedDatas;
+
+  // For each input
   for (unsigned int index=0; index < inputs.size(); index++)
   {
-    //get the necessary variables
-    clonedDatas[index]->Graft(this->GetInput(index));
+    // First copy input to output
+    this->GetOutput(index)->Graft(this->GetInput(index));
 
-    mitk::NavigationData* output = this->GetOutput(index);
+    // if we are not recording, that's all there is to do
+    if (! m_Recording) continue;
+
+    // Clone a Navigation Data
+    mitk::NavigationData::Pointer clone = mitk::NavigationData::New();
+    clone->Graft(this->GetInput(index));
+    clonedDatas.push_back(clone);
 
     if (m_StandardizeTime)
     {
@@ -55,11 +62,8 @@ void mitk::NavigationDataRecorder::GenerateData()
   // if limitation is set and has been reached, stop recording
   if ((m_RecordCountLimit > 0) && (m_NavigationDataSet->Size() >= m_RecordCountLimit)) m_Recording = false;
 
-  // Do the actual recording
-  if (m_Recording)
-  {
-    m_NavigationDataSet->AddNavigationDatas(clonedDatas);
-  }
+  // Add data to set
+  m_NavigationDataSet->AddNavigationDatas(clonedDatas);
 }
 
 void mitk::NavigationDataRecorder::StartRecording()

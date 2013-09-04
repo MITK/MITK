@@ -44,6 +44,7 @@ public:
     player->SetNavigationDataSet(set);
 
     mitk::NavigationDataRecorder::Pointer recorder = mitk::NavigationDataRecorder::New();
+    recorder->SetStandardizeTime(false);
 
     // connect player to recorder
     for (int i = 0; i < player->GetNumberOfIndexedOutputs(); i++)
@@ -53,7 +54,7 @@ public:
 
     recorder->StartRecording();
     int i = 0;
-    while (i < 151)
+    while (!player->IsAtEnd())
     {
       recorder->Update();
       i++;

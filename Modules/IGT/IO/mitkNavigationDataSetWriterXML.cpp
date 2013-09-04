@@ -21,24 +21,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <tinyxml.h>
 #include <itksys/SystemTools.hxx>
 #include <fstream>
+#include <iostream>
+
+mitk::NavigationDataSetWriterXML::NavigationDataSetWriterXML()
+{
+}
+
+mitk::NavigationDataSetWriterXML::~NavigationDataSetWriterXML()
+{
+}
 
 void mitk::NavigationDataSetWriterXML::Write (std::string path, mitk::NavigationDataSet::Pointer data)
 {
-  std::stringstream ss;
-  std::ostream* stream;
-
-  //An existing extension will be cut and replaced with .xml
-  std::string tmpPath = itksys::SystemTools::GetFilenamePath(path);
-  path = itksys::SystemTools::GetFilenameWithoutExtension(path);
-  std::string extension = ".xml";
-  stream = new std::ofstream(ss.str().c_str());
+  std::ofstream stream;
+  stream.open (path);
 
   // Pass to Stream Handler
-  Write(stream, data);
-
-  // Cleanup
-
-  delete stream;
+  Write(&stream, data);
+  stream.close();
 }
 
 void mitk::NavigationDataSetWriterXML::Write (std::ostream* stream, mitk::NavigationDataSet::Pointer data)
@@ -75,7 +75,7 @@ void mitk::NavigationDataSetWriterXML::StreamData (std::ostream* stream, mitk::N
     for (int toolIndex = 0; toolIndex < it->size(); toolIndex++)
     {
       mitk::NavigationData::Pointer nd = it->at(toolIndex);
-      TiXmlElement* elem = new TiXmlElement("NavigationData");
+      TiXmlElement* elem = new TiXmlElement("ND");
 
       elem->SetDoubleAttribute("Time", nd->GetIGTTimeStamp());
       // elem->SetAttribute("SystemTime", sysTimeStr); // tag for system time

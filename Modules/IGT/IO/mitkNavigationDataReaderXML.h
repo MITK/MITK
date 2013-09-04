@@ -31,7 +31,8 @@ namespace mitk {
     mitkClassMacro(NavigationDataReaderXML, NavigationDataReaderInterface);
     itkNewMacro(Self);
 
-    virtual mitk::NavigationDataSet::Pointer Read();
+    virtual mitk::NavigationDataSet::Pointer Read(std::string fileName);
+    virtual mitk::NavigationDataSet::Pointer Read(std::istream* stream);
 
     // -- deprecated | begin
     /**
@@ -39,12 +40,14 @@ namespace mitk {
      * @throw mitk::IGTException Throws an exception if stream is NULL or if it is not good.
      * \deprecated Will be removed in one of the next releases. Use SetFileName() instead.
      */
-    void SetStream(std::istream* stream);
+    //void SetStream(std::istream* stream);
     // -- deprecated | end
 
   protected:
     NavigationDataReaderXML();
     virtual ~NavigationDataReaderXML();
+
+    NavigationDataSet::Pointer ReadNavigationDataSet();
 
     /**
      * \brief This method reads one line of the XML document and returns the data as a NavigationData object
@@ -54,15 +57,16 @@ namespace mitk {
     mitk::NavigationData::Pointer ReadVersion1();
     mitk::NavigationData::Pointer ReadNavigationData(TiXmlElement* elem);
 
+    std::string m_FileName;
+
     TiXmlElement* m_parentElement;
     TiXmlNode* m_currentNode;
 
-    unsigned int m_FileVersion; ///< indicates which XML encoding is used
-    unsigned int m_NumberOfOutputs; ///< stores the number of outputs known from the XML document
+    int m_FileVersion; ///< indicates which XML encoding is used
+    int m_NumberOfOutputs; ///< stores the number of outputs known from the XML document
 
     // -- deprecated | begin
-    std::istream* m_Stream; ///< stores a pointer to the input stream
-    bool m_StreamSetOutsideFromClass; ///< stores if the stream was created in this class and must be deleted in the end
+    //std::istream* m_Stream; ///< stores a pointer to the input stream
     bool m_StreamEnd; ///< stores if the input stream arrived at end
     bool m_StreamValid;                       ///< stores if the input stream is valid or not
     std::string m_ErrorMessage;               ///< stores the error message if the stream is invalid
@@ -74,7 +78,7 @@ namespace mitk {
      * @throw mitk::IGTIOException Throws an exception if file does not exist
      * @throw mitk::IGTException Throws an exception if the stream is NULL
      */
-    void CreateStreamFromFilename();
+    //void CreateStreamFromFilename();
 
     /**
      * \brief Returns the file version out of the XML document.

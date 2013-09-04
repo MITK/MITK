@@ -24,36 +24,54 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTIOException.h"
 
 mitk::NavigationDataReaderXML::NavigationDataReaderXML()
-  : m_parentElement(0), m_currentNode(0), m_Stream(0)
+  : m_parentElement(0), m_currentNode(0)
 {
 }
 
 mitk::NavigationDataReaderXML::~NavigationDataReaderXML()
 {
-  delete m_currentNode;
-  delete m_parentElement;
 
-  if (!m_StreamSetOutsideFromClass) { delete m_Stream; }
 }
 
-mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read()
+mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::string fileName)
 {
-  if ( !m_FileName.empty() )
-  {
-    this->CreateStreamFromFilename();
-  }
-  else if ( m_Stream )
-  {
+  m_FileName = fileName;
 
-  }
-  else
+  TiXmlDocument document;
+  if ( !document.LoadFile(fileName))
   {
-    mitkThrowException(mitk::IGTIOException) << "Stream or file name has to be set before reading.";
+    mitkThrowException(mitk::IGTIOException) << "File '"<<fileName<<"' could not be loaded.";
   }
 
+  TiXmlElement* m_DataElem = document.FirstChildElement("Version");
+  if(!m_DataElem)
+  {
+    mitkThrowException(mitk::IGTIOException) << "Version not specified in XML file.";
+  }
 
+  m_DataElem->QueryIntAttribute("Ver", &m_FileVersion);
+  if (m_FileVersion != 1)
+  {
+    mitkThrowException(mitk::IGTIOException) << "File format version "<<m_FileVersion<<" is not supported.";
+  }
+
+  m_parentElement = document.FirstChildElement("Data");
+  if(!m_parentElement)
+  {
+    mitkThrowException(mitk::IGTIOException) << "Data element not found.";
+  }
+
+  m_parentElement->QueryIntAttribute("ToolCount", &m_NumberOfOutputs);
+
+  mitk::NavigationDataSet::Pointer navigationDataSet = this->ReadNavigationDataSet();
+
+  return navigationDataSet;
+}
+
+mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::istream* stream)
+{
   // first get the file version
-  m_FileVersion = this->GetFileVersion(m_Stream);
+  m_FileVersion = this->GetFileVersion(stream);
 
   // check if we have a valid version: m_FileVersion has to be always bigger than 1 for playing
   if (m_FileVersion < 1)
@@ -62,44 +80,49 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read()
     return 0;
   }
 
-  m_NumberOfOutputs = this->GetNumberOfNavigationDatas(m_Stream);
+  m_NumberOfOutputs = this->GetNumberOfNavigationDatas(stream);
   if (m_NumberOfOutputs == 0) { return 0; }
 
+  return this->ReadNavigationDataSet();
+}
+
+mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::ReadNavigationDataSet()
+{
   mitk::NavigationDataSet::Pointer navigationDataSet = mitk::NavigationDataSet::New(m_NumberOfOutputs);
   mitk::NavigationData::Pointer curNavigationData;
 
   do
-  {
-    std::vector<mitk::NavigationData::Pointer> navDatas(m_NumberOfOutputs, NULL);
-    for (unsigned int n = 0; n < m_NumberOfOutputs; ++n)
     {
-      curNavigationData = this->ReadVersion1();
-
-      if (curNavigationData.IsNull())
+      std::vector<mitk::NavigationData::Pointer> navDatas(m_NumberOfOutputs, NULL);
+      for (unsigned int n = 0; n < m_NumberOfOutputs; ++n)
       {
-        if (n == 0)
+        curNavigationData = this->ReadVersion1();
+
+        if (curNavigationData.IsNull())
         {
-          MITK_ERROR("mitkNavigationDataReaderXML")
-              << "Different number of NaivigationData objects for different tools. Ignoring last ones.";
+          if (n == 0)
+          {
+            MITK_ERROR("mitkNavigationDataReaderXML")
+                << "Different number of NaivigationData objects for different tools. Ignoring last ones.";
+          }
+          break;
         }
-        break;
+        navDatas.at(n) = curNavigationData;
       }
-      navDatas.at(n) = curNavigationData;
-    }
 
-    if (curNavigationData.IsNotNull())
-    {
-      navigationDataSet->AddNavigationDatas(navDatas);
+      if (curNavigationData.IsNotNull())
+      {
+        navigationDataSet->AddNavigationDatas(navDatas);
+      }
     }
-  }
-  while (curNavigationData.IsNotNull());
+    while (curNavigationData.IsNotNull());
 
-  return navigationDataSet;
+    return navigationDataSet;
 }
 
 mitk::NavigationData::Pointer mitk::NavigationDataReaderXML::ReadVersion1()
 {
-  if (!m_parentElement)
+  if ( !m_parentElement )
   {
     mitkThrowException(mitk::IGTIOException)
         << "Reading XML is not possible. Parent element is not set.";
@@ -129,8 +152,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataReaderXML::ReadVersion1()
 
   mitk::NavigationData::Pointer nd = this->ReadNavigationData(elem);
 
-  if(delElem)
-    delete elem;
+  if(delElem) { delete elem; }
 
   return nd;
 }
@@ -215,32 +237,17 @@ mitk::NavigationData::Pointer mitk::NavigationDataReaderXML::ReadNavigationData(
 }
 
 // -- deprecated | begin
-void mitk::NavigationDataReaderXML::CreateStreamFromFilename()
-{
-  m_Stream = NULL;
-
-  if (!itksys::SystemTools::FileExists(m_FileName.c_str()))
-  {
-    mitkThrowException(mitk::IGTIOException) << "File does not exist!";
-  }
-
-  m_Stream = new std::ifstream(m_FileName.c_str());
-  m_StreamSetOutsideFromClass = false;
-
-  this->Modified();
-}
-
 unsigned int mitk::NavigationDataReaderXML::GetFileVersion(std::istream* stream)
 {
   if (stream==NULL)
   {
     MITK_ERROR << "No input stream set!";
-    mitkThrowException(mitk::IGTException)<<"No input stream set!";
+    mitkThrowException(mitk::IGTIOException)<<"No input stream set!";
   }
   if (!stream->good())
   {
     MITK_ERROR << "Stream is not good!";
-    mitkThrowException(mitk::IGTException)<<"Stream is not good!";
+    mitkThrowException(mitk::IGTIOException)<<"Stream is not good!";
   }
   int version = 1;
 
@@ -301,7 +308,7 @@ unsigned int mitk::NavigationDataReaderXML::GetNumberOfNavigationDatas(std::istr
   return 0;
 }
 
-void mitk::NavigationDataReaderXML::SetStream( std::istream* stream )
+/*void mitk::NavigationDataReaderXML::SetStream( std::istream* stream )
 {
   if ( (stream == NULL) || (!stream->good()))
   {
@@ -317,7 +324,7 @@ void mitk::NavigationDataReaderXML::SetStream( std::istream* stream )
   m_StreamSetOutsideFromClass = true;
 
   this->Modified();
-}
+}*/
 
 void mitk::NavigationDataReaderXML::StreamInvalid(std::string message)
 {

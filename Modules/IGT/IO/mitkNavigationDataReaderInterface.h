@@ -28,16 +28,11 @@ namespace mitk {
   public:
     mitkClassMacro(NavigationDataReaderInterface, itk::Object);
 
-    itkSetMacro(FileName, std::string);
-    itkGetMacro(FileName, std::string);
-
-    virtual mitk::NavigationDataSet::Pointer Read() = 0;
+    virtual mitk::NavigationDataSet::Pointer Read(std::string filename) = 0;
 
   protected:
     NavigationDataReaderInterface();
     virtual ~NavigationDataReaderInterface();
-
-    std::string m_FileName;
   };
 }
 

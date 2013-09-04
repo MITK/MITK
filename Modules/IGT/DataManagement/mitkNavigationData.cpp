@@ -194,7 +194,7 @@ mitk::NavigationData::GetAffineTransform3D() const
   AffineTransform3D::Pointer affineTransform3D = AffineTransform3D::New();
 
   // first set rotation
-  affineTransform3D->SetMatrix(this->getRotationMatrix());
+  affineTransform3D->SetMatrix(this->GetRotationMatrix());
 
   // now set offset
   Vector3D vector3D;
@@ -208,7 +208,7 @@ mitk::NavigationData::GetAffineTransform3D() const
 }
 
 mitk::Matrix3D
-mitk::NavigationData::getRotationMatrix() const
+mitk::NavigationData::GetRotationMatrix() const
 {
   vnl_matrix_fixed<ScalarType,3,3> vnl_rotation = m_Orientation.rotation_matrix_transpose().transpose(); // :-)
   Matrix3D mitkRotation;
@@ -223,7 +223,7 @@ mitk::NavigationData::getRotationMatrix() const
 }
 
 mitk::Point3D
-mitk::NavigationData::Transform(const mitk::Point3D point) const
+mitk::NavigationData::TransformPoint(const mitk::Point3D point) const
 {
   vnl_vector_fixed<ScalarType, 3> vnlPoint;
 

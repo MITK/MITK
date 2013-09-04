@@ -321,7 +321,7 @@ class NavigationDataTestClass
     SetupNaviDataTests();
     NavigationData::Pointer navigationData = CreateNavidata(quaternion, offsetPoint);
 
-    point = navigationData->Transform(point);
+    point = navigationData->TransformPoint(point);
 
     ScalarType resultingPointArray[] = {-2, 3, 8.123456};
     Point3D    resultingPoint        = resultingPointArray;
@@ -426,7 +426,7 @@ class NavigationDataTestClass
 
 
     nd->Compose(nd2, pre);
-    point  = nd->Transform(point);
+    point  = nd->TransformPoint(point);
 
     at->Compose(at2, pre);
     point2 = at->TransformPoint(point2);

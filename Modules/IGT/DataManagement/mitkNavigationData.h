@@ -164,9 +164,9 @@ namespace mitk {
 
       mitk::AffineTransform3D::Pointer GetAffineTransform3D() const;
 
-      mitk::Matrix3D getRotationMatrix() const;
+      mitk::Matrix3D GetRotationMatrix() const;
 
-      mitk::Point3D Transform(const mitk::Point3D) const;
+      mitk::Point3D TransformPoint(const mitk::Point3D) const;
 
       /**
        * Get inverse of the Transformation represented by this NavigationData.

@@ -227,6 +227,7 @@ void QmitkIGTTrackingLabView::OnObjectmarkerSelected()
 if (m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource().IsNotNull())
     {
     m_ObjectmarkerNavigationData = m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedToolID());
+    MITK_INFO << "Objectmarker rotation: " << m_ObjectmarkerNavigationData->GetOrientation();
     }
   else
     {
@@ -723,26 +724,10 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
 
     //remember initial object transform to calculate the object to marker transform later on
     mitk::AffineTransform3D::Pointer transform = this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform();
-    vnl_matrix_fixed<mitk::ScalarType, 3, 3> rotation = vnl_matrix_fixed<mitk::ScalarType,3,3>();
-    rotation[0][0] = transform->GetMatrix().GetVnlMatrix()[0][0];
-    rotation[0][1] = transform->GetMatrix().GetVnlMatrix()[0][1];
-    rotation[0][2] = transform->GetMatrix().GetVnlMatrix()[0][2];
-    rotation[1][0] = transform->GetMatrix().GetVnlMatrix()[1][0];
-    rotation[1][1] = transform->GetMatrix().GetVnlMatrix()[1][1];
-    rotation[1][2] = transform->GetMatrix().GetVnlMatrix()[1][2];
-    rotation[2][0] = transform->GetMatrix().GetVnlMatrix()[2][0];
-    rotation[2][1] = transform->GetMatrix().GetVnlMatrix()[2][1];
-    rotation[2][2] = transform->GetMatrix().GetVnlMatrix()[2][2];
 
-    mitk::Point3D translation;
-    translation[0] = transform->GetOffset()[0];
-    translation[1] = transform->GetOffset()[1];
-    translation[2] = transform->GetOffset()[2];
+    //TODO Exception abfangen?
+    mitk::NavigationData::Pointer T_Object = mitk::NavigationData::New(transform,false);
 
-
-    mitk::Transform::Pointer T_Object = mitk::Transform::New();
-    T_Object->SetPosition(translation);
-    T_Object->SetRotation(rotation);
 
     //then reset the transform because we will now start to calculate the permenent registration
     this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIdentity();
@@ -753,7 +738,7 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     //create the permanent registration filter
     m_PermanentRegistrationFilter = mitk::NavigationDataObjectVisualizationFilter::New();
     //set to rotation mode transposed because we are working with VNL style quaternions
-    m_PermanentRegistrationFilter->SetRotationMode(mitk::NavigationDataObjectVisualizationFilter::RotationTransposed);
+    //m_PermanentRegistrationFilter->SetRotationMode(mitk::NavigationDataObjectVisualizationFilter::RotationTransposed);
 
     //first: surface (always activated)
 
@@ -764,14 +749,17 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     m_PermanentRegistrationFilter->SetRepresentationObject(0,this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData());
 
     //get the marker transform out of the navigation data
-    mitk::Transform::Pointer T_Marker = mitk::Transform::New(this->m_ObjectmarkerNavigationData);
+    mitk::NavigationData::Pointer T_Marker = m_ObjectmarkerNavigationData;
 
     //compute transform from object to marker
-    mitk::Transform::Pointer T_MarkerRel = mitk::Transform::New();
-    T_MarkerRel->Concatenate(T_Object);
-    T_Marker->Invert();
-    T_MarkerRel->Concatenate(T_Marker);
-    m_T_MarkerRel = T_MarkerRel;
+    mitk::NavigationData::Pointer T_MarkerRel = mitk::NavigationData::New();
+    T_MarkerRel->Compose(T_Object);
+    T_MarkerRel->Compose(T_Marker->GetInverse());
+
+    m_T_MarkerRel = mitk::Transform::New(T_MarkerRel);
+    MITK_INFO << "m_T_MarkerRel nach Berechnung: " << m_T_MarkerRel->GetOrientation();
+    MITK_INFO << "T_MarkerRel nach Berechnung: " << T_MarkerRel->GetRotationMatrix() << " als quaternion " << T_MarkerRel->GetOrientation();
+    MITK_INFO << "T_Marker: " << T_Marker->GetRotationMatrix() << " als quaternion " << T_Marker->GetOrientation();
 
     //TODO: remove mitk::transform from this class and use only mitk::AffineTransform3D
     //convert to AffineTransform3D
@@ -779,9 +767,9 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     {
     itk::Matrix<mitk::ScalarType,3,3> rotation = itk::Matrix<mitk::ScalarType,3,3>();
     for(int i = 0; i<3; i++)for (int j=0; j<3; j ++)
-    rotation[i][j] = T_MarkerRel->GetVnlRotationMatrix()[i][j];
+    rotation[i][j] = m_T_MarkerRel->GetVnlRotationMatrix()[i][j];
     itk::Vector<mitk::ScalarType,3> translation = itk::Vector<mitk::ScalarType,3>();
-    for(int i = 0; i<3; i++) translation[i] = T_MarkerRel->GetPosition()[i];
+    for(int i = 0; i<3; i++) translation[i] = m_T_MarkerRel->GetPosition()[i];
 
     T_MarkerRel_conv->SetMatrix(rotation);
     T_MarkerRel_conv->SetOffset(translation);

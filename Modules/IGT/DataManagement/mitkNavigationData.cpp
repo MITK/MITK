@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkException.h"
 
 mitk::NavigationData::NavigationData() : itk::DataObject(),
-m_Position(), m_Orientation(0.0, 0.0, 0.0, 0.0), m_CovErrorMatrix(),
+m_Position(), m_Orientation(0.0, 0.0, 0.0, 1.0), m_CovErrorMatrix(),
 m_HasPosition(true), m_HasOrientation(true), m_DataValid(false), m_IGTTimeStamp(0.0),
 m_Name()
 {
@@ -176,16 +176,17 @@ mitk::NavigationData::NavigationData(
   if (checkForRotationMatrix)
   {
     // a quadratic matrix is a rotation matrix exactly when determinant is 1 and transposed is inverse
-     if (!Equal(1.0, vnl_det(rotationMatrix))
-         || !((rotationMatrix*rotationMatrixTransposed).is_identity()))
+     if (!Equal(1.0, vnl_det(rotationMatrix), 0.1)
+         || !((rotationMatrix*rotationMatrixTransposed).is_identity(0.1)))
      {
-       mitkThrow() << "tried to initialize NavigationData with non-rotation matrix";
+       mitkThrow() << "tried to initialize NavigationData with non-rotation matrix :" << rotationMatrix;
      }
 
   }
 
   // the transpose is because vnl_quaterion expects a transposed rotation matrix
   m_Orientation = Quaternion(rotationMatrixTransposed);
+  MITK_INFO << "Quaternion: " << m_Orientation;
 }
 
 mitk::AffineTransform3D::Pointer
@@ -250,6 +251,8 @@ mitk::NavigationData::GetInverse() const
 {
   // non-zero quaternion does not have inverse: throw exception in this case.
   Quaternion zeroQuaternion;
+  MITK_INFO << "ZeroQuaternion: " << zeroQuaternion;
+  MITK_INFO << "InternalQuaternion: " << this->GetOrientation();
   if (Equal(zeroQuaternion, this->GetOrientation()))
     mitkThrow() << "tried to invert zero quaternion in NavigationData";
 

@@ -111,7 +111,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../../resources/segmentation.qrc">
-          <normaloff>:/segmentation/LoadLabelSet_48.png</normaloff>:/segmentation/LoadLabelSet_48.png</iconset>
+          <normaloff>:/segmentation/ImportLabelSet_48.png</normaloff>:/segmentation/ImportLabelSet_48.png</iconset>
         </property>
         <property name="iconSize">
          <size>

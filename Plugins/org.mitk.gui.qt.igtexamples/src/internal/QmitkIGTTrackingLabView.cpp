@@ -34,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
-#include <mitkTransform.h>
 #include <itkVector.h>
 
 #include <vtkConeSource.h>
@@ -73,11 +72,7 @@ QmitkIGTTrackingLabView::QmitkIGTTrackingLabView()
 ,m_TrackerFiducialsDataNode(NULL)
 ,m_PermanentRegistrationSourcePoints(NULL)
 {
-
-  //[-1;0;0] for WOLF_6D bronchoscope
-  m_DirectionOfProjectionVector[0]=0;
-  m_DirectionOfProjectionVector[1]=0;
-  m_DirectionOfProjectionVector[2]=-1;}
+}
 
 QmitkIGTTrackingLabView::~QmitkIGTTrackingLabView()
 {
@@ -458,47 +453,6 @@ mitk::DataNode::Pointer QmitkIGTTrackingLabView::CreateRegistrationFiducialsNode
   return fiducialsNode;
 }
 
-
-void QmitkIGTTrackingLabView::ChangeToolRepresentation( int toolID , mitk::Surface::Pointer surface )
-{
-  mitk::DataStorage* ds = this->GetDataStorage();
-  if(ds == NULL)
-  {
-    QMessageBox::warning(NULL, "IGTSurfaceTracker: Error", "Can not access DataStorage. Changing tool representation not possible!");
-    return;
-  }
-
-  mitk::TrackingDevice::Pointer tracker = m_NDIConfigWidget->GetTracker();
-  if(tracker.IsNull())
-  {
-    QMessageBox::warning(NULL, "IGTSurfaceTracker: Error", "Can not access Tracker. Changing tool representation not possible!");
-    return;
-  }
-
-  try
-  {
-    const char* name = tracker->GetTool(toolID)->GetToolName();   // get tool name by id
-
-    mitk::DataNode::Pointer toolNode = ds->GetNamedNode(name);
-
-    if(toolNode.IsNull())
-      return;
-
-    toolNode->SetData(surface); // change surface representation of node
-    toolNode->SetColor(0.45,0.70,0.85); //light blue like old 5D sensors
-    toolNode->Modified();
-
-    m_Visualizer->SetRepresentationObject( toolID, toolNode->GetData()); // updating node with changed surface back in visualizer
-
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-  catch(std::exception& e)
-  {
-    QMessageBox::warning(NULL, QString("IGTSurfaceTracker: Error"), QString("Can not change tool representation!").arg(e.what()));
-    return;
-  }
-}
-
 void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
 {
   mitk::DataStorage* ds = this->GetDataStorage();
@@ -786,58 +740,3 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
 
 
 }
-
-mitk::PointSet::Pointer QmitkIGTTrackingLabView::GetVirtualPointSetFromPosition(mitk::NavigationData::Pointer navigationData)
-{
-  typedef itk::QuaternionRigidTransform<double> QuaternionTransformType;
-
-  mitk::NavigationData::PositionType pointA;
-  mitk::NavigationData::PositionType pointB;
-  mitk::NavigationData::PositionType pointC;
-
-  //initializing three points with position(0|0|0)
-  pointA.Fill(0);
-  pointB.Fill(0);
-  pointC.Fill(0);
-
-  // changing position off all points in order to make them orthogonal
-  pointA[0] = 1;
-  pointB[1] = 1;
-  pointC[2] = 1;
-
-  QuaternionTransformType::Pointer quatTransform = QuaternionTransformType::New();
-
-  // orientation of NavigationData from parameter
-  mitk::NavigationData::OrientationType quatIn = navigationData->GetOrientation();
-
-  // set orientation to quaternion transform
-  vnl_quaternion<double> const vnlQuatIn(quatIn.x(), quatIn.y(), quatIn.z(), quatIn.r());
-  quatTransform->SetRotation(vnlQuatIn);
-
-  // transform each point
-  pointA = quatTransform->TransformPoint(pointA);
-  pointB = quatTransform->TransformPoint(pointB);
-  pointC = quatTransform->TransformPoint(pointC);
-
-  // add position data from NavigationData parameter to each point
-  pointA[0] += navigationData->GetPosition()[0];
-  pointA[1] += navigationData->GetPosition()[1];
-  pointA[2] += navigationData->GetPosition()[2];
-
-  pointB[0] += navigationData->GetPosition()[0];
-  pointB[1] += navigationData->GetPosition()[1];
-  pointB[2] += navigationData->GetPosition()[2];
-
-  pointC[0] += navigationData->GetPosition()[0];
-  pointC[1] += navigationData->GetPosition()[1];
-  pointC[2] += navigationData->GetPosition()[2];
-
-  // insert points in source points pointset for the permanent registration landmark transform
-  m_PermanentRegistrationSourcePoints->InsertPoint(0,pointA);
-  m_PermanentRegistrationSourcePoints->InsertPoint(1,pointB);
-  m_PermanentRegistrationSourcePoints->InsertPoint(2,pointC);
-
-
-  return m_PermanentRegistrationSourcePoints;
-}
-

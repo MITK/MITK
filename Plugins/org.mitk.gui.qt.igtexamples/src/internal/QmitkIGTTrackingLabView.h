@@ -41,13 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSpinBox>
 #include <QTimer>
 
-class QmitkNDIConfigurationWidget;
-class QmitkFiducialRegistrationWidget;
-class QmitkUpdateTimerWidget;
-class QmitkToolSelectionWidget;
-class QmitkToolTrackingStatusWidget;
-
-
 /*!
   \brief QmitkIGTTrackingLabView
 
@@ -104,10 +97,6 @@ class QmitkIGTTrackingLabView : public QmitkAbstractView
     \brief This method initializes the registration for the FiducialRegistrationWidget.
     */
     void InitializeRegistration();
-    /**
-    \brief This method reacts on tool surface changes.
-    */
-    void ChangeToolRepresentation( int toolID , mitk::Surface::Pointer surface );
     /**
     \brief This method starts the PointSet recording.
     */
@@ -168,10 +157,7 @@ class QmitkIGTTrackingLabView : public QmitkAbstractView
     */
     mitk::DataNode::Pointer CreateRegistrationFiducialsNode( const std::string& label, const mitk::Color& color);
 
-    /**
-    \brief This method returns a PointSet with three vritual points transformed from the position and orientation of the given NavigationData. This method is needed to calculate the source points for permanent registration from one tool's position.
-    */
-    mitk::PointSet::Pointer GetVirtualPointSetFromPosition(mitk::NavigationData::Pointer navigationData);
+
 
 
     mitk::TrackingDeviceSource::Pointer m_Source; ///< source that connects to the tracking device
@@ -180,7 +166,6 @@ class QmitkIGTTrackingLabView : public QmitkAbstractView
     mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer; ///< visualization filter
     mitk::CameraVisualization::Pointer m_VirtualView; ///< filter to update the vtk camera according to the reference navigation data
 
-    mitk::Vector3D  m_DirectionOfProjectionVector;///< vector for direction of projection of instruments
 
     bool CheckRegistrationInitialization();///< Checks if everything is initialized for registration. Gives error messages and returns false if not.
 
@@ -194,7 +179,7 @@ private:
 
   mitk::PointSet::Pointer m_PSRecordingPointSet;
 
-  QmitkNDIConfigurationWidget* m_NDIConfigWidget;  // tracking device configuration widget
+
   QmitkFiducialRegistrationWidget* m_RegistrationWidget; // landmark registration widget
 
   std::string m_RegistrationTrackingFiducialsName;
@@ -207,12 +192,6 @@ private:
 
   mitk::DataNode::Pointer m_ImageFiducialsDataNode;
   mitk::DataNode::Pointer m_TrackerFiducialsDataNode;
-
-  QmitkToolSelectionWidget* m_PermanentRegistrationToolSelectionWidget;
-  QmitkToolSelectionWidget* m_VirtualViewToolSelectionWidget;
-
-  mitk::NavigationData::PositionType m_TargetPosition;
-  mitk::NavigationData::OrientationType m_PermanentRegistrationInitialOrientation;
 
   mitk::PointSet::Pointer m_PermanentRegistrationSourcePoints;
 

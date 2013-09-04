@@ -34,6 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNavigationToolStorageSerializer.h>
+#include <mitkNavigationDataSetWriterCSV.h>
+#include <mitkNavigationDataSetWriterXML.h>
 
 // vtk
 #include <vtkSphereSource.h>
@@ -512,7 +514,7 @@ void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
   if (m_logging)
     {
     this->m_loggingFilter->Update();
-    m_loggedFrames = this->m_loggingFilter->GetRecordCounter();
+    m_loggedFrames = this->m_loggingFilter->GetNumberOfRecordedSteps();
     this->m_Controls->m_LoggedFramesLabel->setText("Logged Frames: "+QString::number(m_loggedFrames));
     //check if logging stopped automatically
     if((m_loggedFrames>1)&&(!m_loggingFilter->GetRecording())){StopLogging();}
@@ -534,24 +536,14 @@ void QmitkMITKIGTTrackingToolboxView::StartLogging()
     {
     //initialize logging filter
     m_loggingFilter = mitk::NavigationDataRecorder::New();
-    m_loggingFilter->SetRecordingMode(mitk::NavigationDataRecorder::NormalFile);
-    if (m_Controls->m_xmlFormat->isChecked()) m_loggingFilter->SetOutputFormat(mitk::NavigationDataRecorder::xml);
-    else if (m_Controls->m_csvFormat->isChecked()) m_loggingFilter->SetOutputFormat(mitk::NavigationDataRecorder::csv);
-    std::string filename = m_Controls->m_LoggingFileName->text().toStdString().c_str();
-    // this part has been changed in order to prevent crash of the  program
-    if(!filename.empty())
-    m_loggingFilter->SetFileName(filename);
-    else if(filename.empty()){
-     std::string errormessage = "File name has not been set, please set the file name";
-     mitkThrowException(mitk::IGTIOException)<<errormessage;
-     QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
-     m_loggingFilter->SetFileName(filename);
-    }
 
     if (m_Controls->m_LoggingLimit->isChecked()){m_loggingFilter->SetRecordCountLimit(m_Controls->m_LoggedFramesLimit->value());}
 
     //connect filter
-    for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfOutputs(); i++){m_loggingFilter->AddNavigationData(m_ToolVisualizationFilter->GetOutput(i));}
+    for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfIndexedOutputs(); i++)
+    {
+      m_loggingFilter->SetInput(i, m_ToolVisualizationFilter->GetOutput(i));
+    }
 
     //start filter with try-catch block for exceptions
     try
@@ -578,17 +570,46 @@ void QmitkMITKIGTTrackingToolboxView::StartLogging()
 
 
 void QmitkMITKIGTTrackingToolboxView::StopLogging()
-  {
+{
   if (m_logging)
-    {
+  {
     //update label
     this->m_Controls->m_LoggingLabel->setText("Logging OFF");
 
     m_loggingFilter->StopRecording();
     m_logging = false;
     EnableLoggingButtons();
+
+    std::string filename = m_Controls->m_LoggingFileName->text().toStdString().c_str();
+    // this part has been changed in order to prevent crash of the  program
+    if(filename.empty())
+    {
+      std::string errormessage = "File name has not been set, please set the file name";
+      mitkThrowException(mitk::IGTIOException)<<errormessage;
+      QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
     }
+
+    try
+    {
+      if (m_Controls->m_xmlFormat->isChecked())
+      {
+        mitk::NavigationDataSetWriterXML().Write(filename, m_loggingFilter->GetNavigationDataSet());
+      }
+      else if (m_Controls->m_csvFormat->isChecked())
+      {
+        //mitk::NavigationDataSetWriterCSV().Write(filename, m_loggingFilter->GetNavigationDataSet());
+        mitkThrowException(mitk::Exception) << "CSV writer not implemented, yet.";
+      }
+    }
+    catch (const std::exception &e) // TODO: error handling has to be adapted when the new writers are merged
+    {
+      MITK_WARN << "IGTPlayer: Error", e.what();
+      QMessageBox::warning(NULL, "IGTPlayer: Error", e.what());
+      return;
+    }
+
   }
+}
 
 void QmitkMITKIGTTrackingToolboxView::OnAddSingleTool()
   {

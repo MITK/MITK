@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkNavigationToolStorageSerializer.h>
 #include <mitkStatusBar.h>
+#include <mitkNavigationDataSetWriterXML.h>
 
 //itk headers
 #include <itksys/SystemTools.hxx>
@@ -108,7 +109,7 @@ void QmitkIGTLoggerWidget::OnStartRecording(bool recording)
 
     if (!m_RecordingActivated)
     {
-      m_Recorder->SetFileName(m_CmpFilename.toStdString());
+      //m_Recorder->SetFileName(m_CmpFilename.toStdString());
 
       try
       { /*start the recording mechanism */
@@ -162,6 +163,18 @@ void QmitkIGTLoggerWidget::StopRecording()
   m_Controls->m_leRecordingValue->setEnabled(true);
   m_Controls->m_cbRecordingType->setEnabled(true);
   m_RecordingActivated = false;
+
+  try
+  {
+    // write NavigationDataSet on StopRecording
+    mitk::NavigationDataSetWriterXML().Write(m_CmpFilename.toStdString(), m_Recorder->GetNavigationDataSet());
+  }
+  catch(const std::exception &e)
+  {
+    // TODO: catch must be adapted when new file writer are merged to master
+    QMessageBox::warning(NULL, "IGT-Tracking Logger: Error", QString("Error while writing tracking data: %1").arg(e.what()));
+    MITK_WARN << "File could not be written.";
+  }
 
   emit SignalRecordingStopped();
 }

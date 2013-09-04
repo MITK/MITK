@@ -251,8 +251,7 @@ mitk::NavigationData::GetInverse() const
 {
   // non-zero quaternion does not have inverse: throw exception in this case.
   Quaternion zeroQuaternion;
-  MITK_INFO << "ZeroQuaternion: " << zeroQuaternion;
-  MITK_INFO << "InternalQuaternion: " << this->GetOrientation();
+  zeroQuaternion.fill(0);
   if (Equal(zeroQuaternion, this->GetOrientation()))
     mitkThrow() << "tried to invert zero quaternion in NavigationData";
 

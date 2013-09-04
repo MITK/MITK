@@ -21,6 +21,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <tinyxml.h>
 #include <itksys/SystemTools.hxx>
 
+mitk::NavigationDataSetWriterXML::NavigationDataSetWriterXML()
+{
+}
+
+mitk::NavigationDataSetWriterXML::~NavigationDataSetWriterXML()
+{
+}
+
 void mitk::NavigationDataSetWriterXML::Write (std::string path, mitk::NavigationDataSet::Pointer data)
 {
   std::stringstream ss;
@@ -74,7 +82,7 @@ void mitk::NavigationDataSetWriterXML::StreamData (std::ostream* stream, mitk::N
     for (int toolIndex = 0; toolIndex < it->size(); toolIndex++)
     {
       mitk::NavigationData::Pointer nd = it->at(toolIndex);
-      TiXmlElement* elem = new TiXmlElement("NavigationData");
+      TiXmlElement* elem = new TiXmlElement("ND");
 
       elem->SetDoubleAttribute("Time", nd->GetIGTTimeStamp());
       // elem->SetAttribute("SystemTime", sysTimeStr); // tag for system time

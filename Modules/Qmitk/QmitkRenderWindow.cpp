@@ -92,10 +92,6 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
     this->mousePressMitkEvent(&myevent);
     QVTKWidget::mousePressEvent(me);
   }
-  else
-  {
-    QVTKWidget::mousePressEvent(me);
-  }
 
   if (m_ResendQtEvents)
     me->ignore();
@@ -110,10 +106,6 @@ void QmitkRenderWindow::mouseDoubleClickEvent( QMouseEvent *me )
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mousePressMitkEvent(&myevent);
-    QVTKWidget::mousePressEvent(me);
-  }
-  else
-  {
     QVTKWidget::mousePressEvent(me);
   }
 
@@ -131,10 +123,6 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mouseReleaseMitkEvent(&myevent);
-    QVTKWidget::mouseReleaseEvent(me);
-  }
-  else
-  {
     QVTKWidget::mouseReleaseEvent(me);
   }
 
@@ -155,10 +143,6 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
     this->mouseMoveMitkEvent(&myevent);
     QVTKWidget::mouseMoveEvent(me);
   }
-  else
-  {
-    QVTKWidget::mouseReleaseEvent(me);
-  }
 }
 
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
@@ -170,10 +154,6 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
   { // TODO: INTERACTION_LEGACY
     mitk::WheelEvent myevent(QmitkEventAdapter::AdaptWheelEvent(m_Renderer, we));
     this->wheelMitkEvent(&myevent);
-    QVTKWidget::wheelEvent(we);
-  }
-  else
-  {
     QVTKWidget::wheelEvent(we);
   }
 
@@ -195,11 +175,6 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
     ke->accept();
     QVTKWidget::keyPressEvent(ke);
   }
-  else
-  {
-    QVTKWidget::keyPressEvent(ke);
-  }
-
 
   if (m_ResendQtEvents)
     ke->ignore();

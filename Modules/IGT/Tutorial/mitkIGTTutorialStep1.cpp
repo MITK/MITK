@@ -189,7 +189,4 @@ int main(int  /*argc*/, char*  /*argv*/[])
 
   itksys::SystemTools::Delay(2000);
   std::cout << "finished" << std::endl;
-
 }
-
-

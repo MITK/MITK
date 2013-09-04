@@ -78,7 +78,7 @@ namespace itk
     ::BeforeThreadedGenerateData()
   {
 
-    if( m_GradientList.size()==0 )
+    if( m_GradientList->Size()==0 )
     {
       throw itk::ExceptionObject (__FILE__,__LINE__,"Error: gradient list is empty, cannot generate DWI.");
     }
@@ -125,7 +125,7 @@ namespace itk
     outImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
     outImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
     outImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
-    outImage->SetVectorLength(m_GradientList.size());
+    outImage->SetVectorLength(m_GradientList->Size());
     outImage->Allocate();
 
     this->SetNumberOfRequiredOutputs (1);
@@ -170,15 +170,15 @@ namespace itk
       BaselinePixelType b0 = itB0.Get();
 
       OutputPixelType out;
-      out.SetSize(m_GradientList.size());
+      out.SetSize(m_GradientList->Size());
       out.Fill(0);
 
       if( b0 > 0)
       {
-        for( unsigned int i=0; i<m_GradientList.size()-1; i++)
+        for( unsigned int i=0; i<m_GradientList->Size()-1; i++)
         {
 
-          GradientType g = m_GradientList[i];
+          GradientType g = m_GradientList->at(i);
 
           InputPixelType S;
           S[0] = g[0]*g[0];
@@ -199,7 +199,7 @@ namespace itk
         }
       }
 
-      out[m_GradientList.size()-1] = b0;
+      out[m_GradientList->Size()-1] = b0;
 
       itOut.Set(out);
 

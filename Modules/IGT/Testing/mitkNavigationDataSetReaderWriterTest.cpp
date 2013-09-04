@@ -47,6 +47,9 @@ public:
     std::string path = "F://Build//MITK-Data//IGT-Data//NavigationDataSet.xml";
     mitk::NavigationDataSet::Pointer set = reader->Read(path);
     writer.Write("F://Build//MITK-Data//IGT-Data//NavigationDataSet2.xml", set);
+
+    MITK_TEST_CONDITION_REQUIRED(mitkNavigationDataSetReaderWriterTestClass::CompareFiles("F://Build//MITK-Data//IGT-Data//NavigationDataSet.xml",
+      "F://Build//MITK-Data//IGT-Data//NavigationDataSet2.xml"), "Asserting that compare function for files works correctly - Negative Test");
   }
 
   static bool CompareFiles(std::string file1, std::string file2)

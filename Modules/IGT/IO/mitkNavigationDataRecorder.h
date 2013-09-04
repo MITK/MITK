@@ -72,7 +72,7 @@ namespace mitk
     /**
     * \brief Starts recording NavigationData into the NAvigationDataSet
     */
-    void StartRecording();
+    virtual void StartRecording();
 
     /**
     * \brief Stops StopsRecording to the NavigationDataSet.
@@ -80,14 +80,19 @@ namespace mitk
     * Recording can be resumed to the same Dataset by just calling StartRecording() again.
     * Call ResetRecording() to start recording to a new Dataset;
     */
-    void StopRecording();
+    virtual void StopRecording();
 
     /**
     * \brief Resets the Datasets and the timestamp, so a new recording can happen.
     *
     * Do not forget to save the old Dataset, it will be lost after calling this function.
     */
-    void ResetRecording();
+    virtual void ResetRecording();
+
+    /**
+    * \brief Returns the number of time steps that were recorded in the current set.
+    */
+    virtual int GetNumberOfRecordedSteps();
 
   protected:
 

@@ -99,3 +99,8 @@ void mitk::NavigationDataRecorder::ResetRecording()
     mitk::IGTTimeStamp::GetInstance()->Start(this);
   }
 }
+
+int mitk::NavigationDataRecorder::GetNumberOfRecordedSteps()
+{
+  return m_NavigationDataSet->Size();
+}

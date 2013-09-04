@@ -14,7 +14,9 @@ set(CPP_FILES
   Qmitk/QmitkIGTConnectionWidget.cpp
   Qmitk/QmitkToolSelectionWidget.cpp
   Qmitk/QmitkNavigationToolCreationWidget.cpp
+  Qmitk/QmitkNavigationToolCreationAdvancedWidget.cpp
   Qmitk/QmitkNavigationDataSourceSelectionWidget.cpp
+  Qmitk/QmitkInteractiveTransformationWidget.cpp
 )
 
 set(UI_FILES
@@ -31,7 +33,9 @@ set(UI_FILES
   Qmitk/QmitkIGTConnectionWidgetControls.ui
   Qmitk/QmitkToolSelectionWidgetControls.ui
   Qmitk/QmitkNavigationToolCreationWidget.ui
+  Qmitk/QmitkNavigationToolCreationAdvancedWidgetControls.ui
   Qmitk/QmitkNavigationDataSourceSelectionWidgetControls.ui
+  Qmitk/QmitkInteractiveTransformationWidgetControls.ui
 )
 
 set(MOC_H_FILES
@@ -50,7 +54,9 @@ set(MOC_H_FILES
   Qmitk/QmitkIGTConnectionWidget.h
   Qmitk/QmitkToolSelectionWidget.h
   Qmitk/QmitkNavigationToolCreationWidget.h
+  Qmitk/QmitkNavigationToolCreationAdvancedWidget.h
   Qmitk/QmitkNavigationDataSourceSelectionWidget.h
+  Qmitk/QmitkInteractiveTransformationWidget.h
 )
 
 set(QRC_FILES

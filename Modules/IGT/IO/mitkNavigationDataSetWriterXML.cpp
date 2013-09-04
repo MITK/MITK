@@ -34,7 +34,7 @@ mitk::NavigationDataSetWriterXML::~NavigationDataSetWriterXML()
 void mitk::NavigationDataSetWriterXML::Write (std::string path, mitk::NavigationDataSet::Pointer data)
 {
   std::ofstream stream;
-  stream.open (path);
+  stream.open (path.c_str(), std::ios_base::trunc);
 
   // Pass to Stream Handler
   Write(&stream, data);

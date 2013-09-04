@@ -113,10 +113,10 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::ReadNavigationDa
 
         if (curNavigationData.IsNull())
         {
-          if (n == 0)
+          if (n != 0)
           {
-            MITK_ERROR("mitkNavigationDataReaderXML")
-                << "Different number of NaivigationData objects for different tools. Ignoring last ones.";
+            MITK_WARN("mitkNavigationDataReaderXML")
+                << "Different number of NavigationData objects for different tools. Ignoring last ones.";
           }
           break;
         }
@@ -291,7 +291,6 @@ unsigned int mitk::NavigationDataReaderXML::GetFileVersion(std::istream* stream)
   else { return 0; }
 }
 
-
 unsigned int mitk::NavigationDataReaderXML::GetNumberOfNavigationDatas(std::istream* stream)
 {
   if (stream == NULL)
@@ -320,24 +319,6 @@ unsigned int mitk::NavigationDataReaderXML::GetNumberOfNavigationDatas(std::istr
 
   return 0;
 }
-
-/*void mitk::NavigationDataReaderXML::SetStream( std::istream* stream )
-{
-  if ( (stream == NULL) || (!stream->good()))
-  {
-    // throw an exception for stream=NULL or it is not good
-    mitkThrowException(mitk::IGTException) << "The stream is NULL or it is not good";
-    m_StreamEnd = true;
-    return;
-  }
-
-  if (m_StreamSetOutsideFromClass) { delete m_Stream; }
-
-  m_Stream = stream;
-  m_StreamSetOutsideFromClass = true;
-
-  this->Modified();
-}*/
 
 void mitk::NavigationDataReaderXML::StreamInvalid(std::string message)
 {

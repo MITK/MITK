@@ -19,13 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKNavigationDataPlayer_H_HEADER_INCLUDED_
 
 #include <mitkNavigationDataPlayerBase.h>
-#include <mitkNavigationDataSource.h>
-#include <mitkNavigationDataRecorder.h> //for the Recording Mode enum
-#include "mitkTrackingDevice.h"
 
 #include <itkMultiThreader.h>
-
-#include <istream>
 
 
 namespace mitk {
@@ -54,13 +49,9 @@ namespace mitk {
     /**
      * \brief This method starts the player.
      *
-     * Before the stream has to be set. Either with a PlayingMode (SetStream(PlayerMode)) and FileName. Or
-     * with an own inputstream (SetStream(istream*)).
+     * The method mitk::NavigationDataPlayer::SetNavigationDataSet() has to be called before.
      *
-     * @throw mitk::IGTIOException Throws an exception if the file cannot be opened.
-     * @throw mitk::IGTIOException Throws an exception if there is no valid filename.
-     * @throw mitk::IGTIOException Throws an exception if the file is damaged.
-     * @throw mitk::IGTException Throws an exception if there is no stream (i.e stream=NULL).
+     * @throw mitk::IGTException If m_NavigationDataSet is null.
      */
     void StartPlaying();
 
@@ -87,27 +78,31 @@ namespace mitk {
      * \brief This method checks if player arrived at end of file.
      *
      */
-    bool IsAtEnd();
+    virtual bool IsAtEnd();
 
   protected:
-    enum PlayerState { PlayerStopped, PlayerRunning, PlayerPaused };
-
-    PlayerState m_CurPlayerState;
-
     NavigationDataPlayer();
     virtual ~NavigationDataPlayer();
+
+    /**
+     * \brief Set outputs to the navigation data object corresponding to current time.
+     */
+    virtual void GenerateData();
+
+    enum PlayerState { PlayerStopped, PlayerRunning, PlayerPaused };
+    PlayerState m_CurPlayerState;
 
     typedef mitk::NavigationData::TimeStampType TimeStampType;
 
     /**
-     * \brief filter execute method
-     */
-    virtual void GenerateData();
+      * \brief The start time of the playing. Set in the method mitk::NavigationDataPlayer::StartPlaying().
+      */
+    TimeStampType m_StartPlayingTimeStamp;
 
-    TimeStampType m_StartPlayingTimeStamp; ///< the starttime of the playing set in the method StartPlaying()
-    TimeStampType m_PauseTimeStamp; ///< stores the beginning of a pause
-
-    std::vector<TimeStampType> m_StartTimeOfData; ///< stores the start time of the different tools
+    /**
+      * \brief Stores the time when a pause began.
+      */
+    TimeStampType m_PauseTimeStamp;
   };
 } // namespace mitk
 

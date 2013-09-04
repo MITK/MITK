@@ -65,12 +65,6 @@ namespace mitk
     */
     virtual void UpdateOutputInformation();
 
-    /**
-     * \brief This method checks if player arrived at end of file.
-     *
-     */
-    virtual bool IsAtEnd();
-
   protected:
     NavigationDataSequentialPlayer();
     virtual ~NavigationDataSequentialPlayer();
@@ -81,6 +75,9 @@ namespace mitk
      */
     virtual void GenerateData();
 
+    /**
+      * \brief If the player should repeat outputs. Default is false.
+      */
     bool m_Repeat;
   };
 } // namespace mitk

@@ -763,6 +763,8 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     node->AddProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer, overwrite );
     node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
     node->AddProperty("layer", mitk::IntProperty::New(0), renderer, overwrite);
+    node->AddProperty("Image.Vector Image", mitk::BoolProperty::New(false), renderer, overwrite);
+    node->AddProperty("Image.Vector Image.Visible Component", mitk::IntProperty::New(0), renderer, overwrite);
   }
 
   if(image.IsNotNull() && image->IsInitialized())

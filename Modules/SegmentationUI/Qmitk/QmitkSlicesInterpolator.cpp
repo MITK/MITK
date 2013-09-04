@@ -160,9 +160,9 @@ const QmitkSlicesInterpolator::ActionToSliceDimensionMapType QmitkSlicesInterpol
     if (name == "stdmulti.widget1")
       name = "Axial (red window)";
     else if (name == "stdmulti.widget2")
-      name = "Sagittal (yellow window)";
+      name = "Sagittal (green window)";
     else if (name == "stdmulti.widget3")
-      name = "Coronal (green window)";
+      name = "Coronal (blue window)";
     actionToSliceDimension[new QAction(QString::fromStdString(name),0)] = slicer;
   }
 
@@ -321,6 +321,7 @@ void QmitkSlicesInterpolator::ActivateInterpolation(bool enabled)
   }
   else
   {
+    mitk::UndoController::GetCurrentUndoModel()->Clear();
     this->HideAllInterpolationControls();
     this->Activate2DInterpolation(false);
     this->Activate3DInterpolation(false);
@@ -479,12 +480,12 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
   // see if timestep is needed here
   mitk::SegTool2D::DetermineAffectedImageSlice( m_WorkingImage, plane, clickedSliceDimension, clickedSliceIndex );
 
-  mitk::Image::Pointer auxImage = m_SliceInterpolatorController->Interpolate( clickedSliceDimension, clickedSliceIndex, plane, timeStep );
+  mitk::Image::Pointer interpolation = m_SliceInterpolatorController->Interpolate( clickedSliceDimension, clickedSliceIndex, plane, timeStep );
 
-  if (auxImage.IsNotNull())
+  if (interpolation.IsNotNull())
   {
     mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
-    contourExtractor->SetInput(auxImage);
+    contourExtractor->SetInput(interpolation);
     contourExtractor->SetUseProgressBar(false);
 
     try
@@ -497,7 +498,9 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
       return;
     }
 
-    m_FeedbackContour = contourExtractor->GetOutput();
+    int numberOfContours = contourExtractor->GetNumberOfIndexedOutputs();
+
+    m_FeedbackContour = contourExtractor->GetOutput(0);
     m_FeedbackContour->DisconnectPipeline();
 
     m_FeedbackNode->SetData( m_FeedbackContour );
@@ -727,7 +730,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
         vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
         //set overwrite mode to true to write back to the image volume
-        reslice->SetInputSlice(interpolation->GetSliceData()->GetVtkImageData(interpolation));
+        reslice->SetInputSlice(interpolation->GetVtkImageData());
         reslice->SetOverwriteMode(true);
         reslice->Modified();
 
@@ -741,6 +744,8 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
         diffslicewriter->Modified();
         diffslicewriter->Update();
         ++totalChangedSlices;
+
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
       }
       mitk::ProgressBar::GetInstance()->Progress();
     }
@@ -748,9 +753,6 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
     if (totalChangedSlices > 0)
     {
-      // store undo stack items
-      if ( true )
-      {
         // create do/undo operations
         mitk::ApplyDiffImageOperation* doOp = new mitk::ApplyDiffImageOperation( mitk::OpTEST, m_WorkingImage, diffImage, timeStep );
         mitk::ApplyDiffImageOperation* undoOp = new mitk::ApplyDiffImageOperation( mitk::OpTEST, m_WorkingImage, diffImage, timeStep );
@@ -762,7 +764,6 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
         // acutally apply the changes here to the original image
         mitk::DiffImageApplier::GetInstanceForUndo()->ExecuteOperation( doOp );
-      }
     }
 
 //    m_FeedbackNode->SetData(NULL);
@@ -859,11 +860,9 @@ void QmitkSlicesInterpolator::Activate2DInterpolation(bool on)
     }
   }
 
-  m_SliceInterpolatorController->Activate2DInterpolation(on);
-
-  if (!on)
+  if (on)
   {
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    this->UpdateVisibleSuggestion();
     return;
   }
 
@@ -875,8 +874,6 @@ void QmitkSlicesInterpolator::Activate2DInterpolation(bool on)
     m_SliceInterpolatorController->SetReferenceImage( referenceImage ); // may be NULL
   }
 */
-
-  this->UpdateVisibleSuggestion();
 }
 
 void QmitkSlicesInterpolator::Run3DInterpolation()

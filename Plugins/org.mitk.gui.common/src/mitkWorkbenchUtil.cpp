@@ -32,10 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateData.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
-#include "mitkIOUtil.h"
-#include "mitkWorkbenchUtil.h"
+#include "mitkCoreObjectFactory.h"
 
-#include <ctkUtils.h>
+#include "QmitkIOUtil.h"
 
 #include <QMessageBox>
 #include <QApplication>
@@ -94,6 +93,7 @@ struct WorkbenchUtilPrivate {
     return editorDesc;
   }
 };
+
 // //! [UtilLoadFiles]
 void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWindow::Pointer window, bool openEditor)
 // //! [UtilLoadFiles]
@@ -127,23 +127,26 @@ void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWin
 
   mitk::DataStorage::Pointer dataStorage = dataStorageRef->GetDataStorage();
 
-  // Do the actual work of loading the data into the data storage
-  std::vector<std::string> fileNames2;
-
-  // Correct conversion for File names.(BUG 12252)
-  fileNames2.resize(fileNames.size());
-  for (int i = 0; i< fileNames.size(); i++)
-    fileNames2[i] = std::string(QFile::encodeName(fileNames[i]).data());
-
-  // Old conversion which returns wrong encoded Non-Latin-Characters.
-  //ctk::qListToSTLVector(fileNames, fileNames2);
-
   // Turn off ASSERT
   #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
       int lastCrtReportType = _CrtSetReportMode( _CRT_ASSERT, _CRTDBG_MODE_DEBUG );
   #endif
 
-  const bool dsmodified = mitk::IOUtil::LoadFiles(fileNames2, *dataStorage);
+  unsigned int oldSize = dataStorage->GetAll()->Size();
+  QList<mitk::BaseData::Pointer> data = QmitkIOUtil::LoadFiles(fileNames, dataStorage.GetPointer());
+  foreach(mitk::BaseData::Pointer baseData, data)
+  {
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(baseData);
+    mitk::StringProperty::Pointer pathProp = dynamic_cast<mitk::StringProperty*>(baseData->GetProperty("path").GetPointer());
+    if (pathProp.IsNotNull())
+    {
+      node->SetName(pathProp->GetValue());
+    }
+    mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties(node);
+    dataStorage->Add(node);
+  }
+  const bool dsmodified = !data.empty() || oldSize < dataStorage->GetAll()->Size();
 
   // Set ASSERT status back to previous status.
   #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)

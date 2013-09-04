@@ -17,6 +17,7 @@ QmitkLevelWindowWidgetContextMenu.cpp
 QmitkLevelWindowWidget.cpp
 QmitkLineEditLevelWindowWidget.cpp
 QmitkMemoryUsageIndicatorView.cpp
+QmitkNativeFileOpenDialog.cpp
 QmitkNodeDescriptor.cpp
 QmitkNodeDescriptorManager.cpp
 QmitkRenderWindowMenu.cpp

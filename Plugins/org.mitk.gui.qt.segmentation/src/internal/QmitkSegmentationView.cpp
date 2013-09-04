@@ -171,6 +171,7 @@ void QmitkSegmentationView::Deactivated()
     mitk::PlanePositionManagerService* service = context->getService<mitk::PlanePositionManagerService>(ppmRef);
     service->RemoveAllPlanePositions();
     context->ungetService(ppmRef);
+    this->SetToolManagerSelection(0,0);
   }
 }
 

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 
 #include "ui_QmitkIGTTrackingLabViewControls.h"
 
@@ -57,7 +57,7 @@ class QmitkToolTrackingStatusWidget;
   \sa QmitkFunctionality
   \ingroup ${plugin_target}_internal
 */
-class QmitkIGTTrackingLabView : public QmitkFunctionality
+class QmitkIGTTrackingLabView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -78,6 +78,8 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     virtual ~QmitkIGTTrackingLabView();
 
     virtual void CreateQtPartControl(QWidget *parent);
+
+    virtual void SetFocus();
 
   protected slots:
 

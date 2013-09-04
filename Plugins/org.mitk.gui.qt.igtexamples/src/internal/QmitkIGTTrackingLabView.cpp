@@ -48,6 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qt
 #include <QMessageBox>
 #include <QIcon>
+#include <QPushButton>
 
 // vtk
 #include <mitkVtkResliceInterpolationProperty.h>
@@ -56,7 +57,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkIGTTrackingLabView::VIEW_ID = "org.mitk.views.igttrackinglab";
 
 QmitkIGTTrackingLabView::QmitkIGTTrackingLabView()
-: QmitkFunctionality()
+: QmitkAbstractView()
 ,m_Source(NULL)
 ,m_PermanentRegistrationFilter(NULL)
 ,m_Visualizer(NULL)
@@ -130,6 +131,11 @@ void QmitkIGTTrackingLabView::CreateConnections()
   m_Controls.m_ImageComboBox->SetDataStorage(this->GetDataStorage());
   m_Controls.m_ImageComboBox->SetAutoSelectNewItems(false);
   m_Controls.m_ImageComboBox->SetPredicate(mitk::NodePredicateDataType::New("Image"));
+}
+
+void QmitkIGTTrackingLabView::SetFocus()
+{
+  m_Controls.m_UseAsPointerButton->setFocus();
 }
 
 void QmitkIGTTrackingLabView::UpdateTimer()
@@ -251,7 +257,7 @@ void QmitkIGTTrackingLabView::OnSetupNavigation()
     if(m_Source->IsTracking())
       return;
 
-  mitk::DataStorage* ds = this->GetDefaultDataStorage();
+  mitk::DataStorage* ds = this->GetDataStorage();
   if(ds == NULL)
   {
     QMessageBox::warning(NULL, "IGTSurfaceTracker: Error", "can not access DataStorage. Navigation not possible");
@@ -294,7 +300,7 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials()
   if (!CheckRegistrationInitialization()) return;
 
   /* retrieve fiducials from data storage */
-  mitk::DataStorage* ds = this->GetDefaultDataStorage();
+  mitk::DataStorage* ds = this->GetDataStorage();
   mitk::PointSet::Pointer imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsDataNode->GetData());
   mitk::PointSet::Pointer trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
 
@@ -402,12 +408,16 @@ void QmitkIGTTrackingLabView::DestroyIGTPipeline()
 
 void QmitkIGTTrackingLabView::InitializeRegistration()
 {
-  mitk::DataStorage* ds = this->GetDefaultDataStorage();
+  mitk::DataStorage* ds = this->GetDataStorage();
   if( ds == NULL )
     return;
 
-
-  m_RegistrationWidget->SetMultiWidget(this->GetActiveStdMultiWidget()); // passing multiwidget to pointsetwidget
+  // let the registration widget know about the slice navigation controllers
+  // in the active render window part (crosshair updates)
+  foreach(QmitkRenderWindow* renderWindow, this->GetRenderWindowPart()->GetQmitkRenderWindows().values())
+  {
+    m_RegistrationWidget->AddSliceNavigationController(renderWindow->GetSliceNavigationController());
+  }
 
   if(m_ImageFiducialsDataNode.IsNull())
   {
@@ -424,7 +434,6 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
 
     ds->Add(m_ImageFiducialsDataNode);
   }
-  m_RegistrationWidget->SetMultiWidget(this->GetActiveStdMultiWidget());
   m_RegistrationWidget->SetImageFiducialsNode(m_ImageFiducialsDataNode);
 
   if(m_TrackerFiducialsDataNode.IsNull())
@@ -476,7 +485,7 @@ mitk::DataNode::Pointer QmitkIGTTrackingLabView::CreateRegistrationFiducialsNode
 
 void QmitkIGTTrackingLabView::ChangeToolRepresentation( int toolID , mitk::Surface::Pointer surface )
 {
-  mitk::DataStorage* ds = this->GetDefaultDataStorage();
+  mitk::DataStorage* ds = this->GetDataStorage();
   if(ds == NULL)
   {
     QMessageBox::warning(NULL, "IGTSurfaceTracker: Error", "Can not access DataStorage. Changing tool representation not possible!");
@@ -516,7 +525,7 @@ void QmitkIGTTrackingLabView::ChangeToolRepresentation( int toolID , mitk::Surfa
 
 void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
 {
-  mitk::DataStorage* ds = this->GetDefaultDataStorage();
+  mitk::DataStorage* ds = this->GetDataStorage();
 
   if(record)
   {
@@ -596,7 +605,7 @@ if(on)
   if (m_Controls.m_NeedleUpInvert->isChecked()) viewUpVector *= -1;
   m_VirtualView->SetViewUpInToolCoordinates(viewUpVector);
 
-  m_VirtualView->SetRenderer(this->GetActiveStdMultiWidget()->GetRenderWindow4()->GetRenderer());
+  m_VirtualView->SetRenderer(this->GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer());
   //next line: better code when this plugin is migrated to mitk::abstractview
   //m_VirtualView->SetRenderer(mitk::BaseRenderer::GetInstance(this->GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow()));
   m_CameraView = true;
@@ -622,7 +631,7 @@ else
 
 bool QmitkIGTTrackingLabView::CheckRegistrationInitialization()
 {
-  mitk::DataStorage* ds = this->GetDefaultDataStorage();
+  mitk::DataStorage* ds = this->GetDataStorage();
   mitk::PointSet::Pointer imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsDataNode->GetData());
   mitk::PointSet::Pointer trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
 

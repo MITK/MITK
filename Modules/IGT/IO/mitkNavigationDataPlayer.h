@@ -74,12 +74,6 @@ namespace mitk {
      */
     void Resume();
 
-    /**
-     * \brief This method checks if player arrived at end of file.
-     *
-     */
-    virtual bool IsAtEnd();
-
   protected:
     NavigationDataPlayer();
     virtual ~NavigationDataPlayer();

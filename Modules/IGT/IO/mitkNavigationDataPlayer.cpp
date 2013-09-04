@@ -150,8 +150,3 @@ void mitk::NavigationDataPlayer::Resume()
     MITK_ERROR << "Player is not paused!" << std::endl;
   }
 }
-
-bool mitk::NavigationDataPlayer::IsAtEnd()
-{
-  return m_NavigationDataSetIterator == m_NavigationDataSet->End();
-}

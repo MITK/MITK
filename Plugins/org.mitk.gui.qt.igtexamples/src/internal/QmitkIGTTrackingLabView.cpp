@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkUpdateTimerWidget.h>
 #include <QmitkToolSelectionWidget.h>
 #include <QmitkToolTrackingStatusWidget.h>
-#include "QmitkStdMultiWidgetEditor.h"
 
 
 #include <mitkCone.h>
@@ -413,8 +412,12 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
   if( ds == NULL )
     return;
 
-  QmitkStdMultiWidgetEditor * multiWidgetEdit = dynamic_cast<QmitkStdMultiWidgetEditor *>(this->GetRenderWindowPart());
-  m_RegistrationWidget->SetMultiWidget(multiWidgetEdit->GetStdMultiWidget()); // passing multiwidget to pointsetwidget
+  // let the registration widget know about the slice navigation controllers
+  // in the active render window part (crosshair updates)
+  foreach(QmitkRenderWindow* renderWindow, this->GetRenderWindowPart()->GetQmitkRenderWindows().values())
+  {
+    m_RegistrationWidget->AddSliceNavigationController(renderWindow->GetSliceNavigationController());
+  }
 
   if(m_ImageFiducialsDataNode.IsNull())
   {
@@ -431,7 +434,6 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
 
     ds->Add(m_ImageFiducialsDataNode);
   }
-  m_RegistrationWidget->SetMultiWidget(multiWidgetEdit->GetStdMultiWidget());
   m_RegistrationWidget->SetImageFiducialsNode(m_ImageFiducialsDataNode);
 
   if(m_TrackerFiducialsDataNode.IsNull())
@@ -603,8 +605,7 @@ if(on)
   if (m_Controls.m_NeedleUpInvert->isChecked()) viewUpVector *= -1;
   m_VirtualView->SetViewUpInToolCoordinates(viewUpVector);
 
-  QmitkStdMultiWidgetEditor * multiWidgetEdit = dynamic_cast<QmitkStdMultiWidgetEditor *>(this->GetRenderWindowPart());
-  m_VirtualView->SetRenderer(multiWidgetEdit->GetStdMultiWidget()->GetRenderWindow4()->GetRenderer());
+  m_VirtualView->SetRenderer(this->GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer());
   //next line: better code when this plugin is migrated to mitk::abstractview
   //m_VirtualView->SetRenderer(mitk::BaseRenderer::GetInstance(this->GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow()));
   m_CameraView = true;

@@ -337,20 +337,13 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials()
     translationDouble[k] = m->GetElement(k,3);
   }
 
-  /*MITK_INFO << "MATRIX: ";
-  for(int k=0; k<=3; k++)
-    {
-    MITK_INFO << m->GetElement(k,0) << " " << m->GetElement(k,1) << " " << m->GetElement(k,2) << " " << m->GetElement(k,3);
-    }*/
-
-  //save transform
-  m_T_ObjectReg = mitk::Transform::New();
-  m_T_ObjectReg->SetMatrix(m);
-
-  //transform surface
+  //create affine transform 3D surface
   mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
   newTransform->SetMatrix(rotationDouble);
   newTransform->SetOffset(translationDouble);
+
+  //save transform
+  m_T_ObjectReg = mitk::NavigationData::New(newTransform);
 
   //transform surface
   if(m_Controls.m_SurfaceActive->isChecked() && m_Controls.m_ObjectComboBox->GetSelectedNode().IsNotNull())
@@ -784,22 +777,8 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     m_PermanentRegistration = false;
 
     //restore old registration
-    if(m_T_ObjectReg.IsNotNull())
-    {
-    //convert to AffineTransform3D
-    //TODO: remove mitk::transform from this class and use only mitk::AffineTransform3D
-    mitk::AffineTransform3D::Pointer m_T_ObjectReg_conv = mitk::AffineTransform3D::New();
-    itk::Matrix<mitk::ScalarType,3,3> rotation = itk::Matrix<mitk::ScalarType,3,3>();
-    for(int i = 0; i<3; i++)for (int j=0; j<3; j ++)
-    rotation[i][j] = m_T_ObjectReg->GetVnlRotationMatrix()[i][j];
-    itk::Vector<mitk::ScalarType,3> translation = itk::Vector<mitk::ScalarType,3>();
-    for(int i = 0; i<3; i++) translation[i] = m_T_ObjectReg->GetPosition()[i];
-    m_T_ObjectReg_conv->SetMatrix(rotation);
-    m_T_ObjectReg_conv->SetOffset(translation);
-
-    this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ObjectReg_conv);
-    }
-    if(m_T_ImageReg.IsNotNull()) this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ImageReg);
+    if(m_T_ObjectReg.IsNotNull()) {this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ObjectReg->GetAffineTransform3D());}
+    if(m_T_ImageReg.IsNotNull()) {this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ImageReg);}
 
     //delete filter
     m_PermanentRegistrationFilter = NULL;

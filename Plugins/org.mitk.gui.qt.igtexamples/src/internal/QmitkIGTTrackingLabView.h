@@ -32,7 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTrackingDeviceSource.h>
 #include <mitkSurface.h>
 #include <mitkCameraVisualization.h>
-#include <mitkTransform.h>
 
 #include <QToolBox>
 #include <QCheckBox>
@@ -222,7 +221,7 @@ private:
   mitk::NavigationData::Pointer m_PointSetRecordingNavigationData;
 
   mitk::NavigationData::Pointer m_T_MarkerRel;
-  mitk::Transform::Pointer m_T_ObjectReg;
+  mitk::NavigationData::Pointer m_T_ObjectReg;
   mitk::AffineTransform3D::Pointer m_T_ImageReg;
   mitk::AffineTransform3D::Pointer m_T_ImageGeo;
   mitk::NavigationData::Pointer m_ObjectmarkerNavigationDataLastUpdate;

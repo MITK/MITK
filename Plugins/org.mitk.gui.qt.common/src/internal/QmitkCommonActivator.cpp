@@ -42,6 +42,7 @@ QmitkCommonActivator::start(ctkPluginContext* context)
 {
   this->m_Instance = this;
   this->m_Context = context;
+  this->m_PrefServiceTracker.reset(new ctkServiceTracker<berry::IPreferencesService*>(context));
 
   if(berry::PlatformUI::IsWorkbenchRunning())
   {

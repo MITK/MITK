@@ -80,8 +80,12 @@ void mitk::InternalTrackingTool::GetPosition(mitk::Point3D& position) const
   MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
   if (m_ToolTipSet)
     {
-    //compute position of tooltip
-    vnl_vector<ScalarType> pos_vnl = (m_ToolTipRotation.rotate(m_Position.GetVnlVector()))+ m_ToolTip.GetVnlVector();
+    // Compute the position of tool tip in the coordinate frame of the
+    // tracking device: Rotate the position of the tip into the tracking
+    // device coordinate frame then add to the position of the tracking
+    // sensor
+    vnl_vector<float> pos_vnl = m_Position.Get_vnl_vector() + m_Orientation.rotate( m_ToolTip.Get_vnl_vector() ) ;
+
     position[0] = pos_vnl[0];
     position[1] = pos_vnl[1];
     position[2] = pos_vnl[2];
@@ -110,8 +114,12 @@ void mitk::InternalTrackingTool::GetOrientation(mitk::Quaternion& orientation) c
   MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
   if (m_ToolTipSet)
     {
-    //compute rotation of tooltip
-    orientation = m_ToolTipRotation * m_Orientation;
+    // Compute the orientation of the tool tip in the coordinate frame of
+    // the tracking device.
+    //
+    //   * m_Orientation is the orientation of the sensor relative to the transmitter
+    //   * m_ToolTipRotation is the orientation of the tool tip relative to the sensor
+    orientation =  m_Orientation * m_ToolTipRotation;
     }
   else
     {

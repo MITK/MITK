@@ -78,7 +78,7 @@ namespace mitk {
      * \brief This method checks if player arrived at end of file.
      *
      */
-    bool IsAtEnd();
+    virtual bool IsAtEnd();
 
   protected:
     NavigationDataPlayer();

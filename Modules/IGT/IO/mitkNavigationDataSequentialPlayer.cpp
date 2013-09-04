@@ -82,3 +82,8 @@ void mitk::NavigationDataSequentialPlayer::UpdateOutputInformation()
   this->Modified();  // make sure that we need to be updated
   Superclass::UpdateOutputInformation();
 }
+
+bool mitk::NavigationDataSequentialPlayer::IsAtEnd()
+{
+  return m_NavigationDataSetIterator == m_NavigationDataSet->End();
+}

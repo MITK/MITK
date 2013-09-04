@@ -51,6 +51,12 @@ namespace mitk{
      */
     unsigned int GetNumberOfSnapshots();
 
+    /**
+     * \brief This method checks if player arrived at end of file.
+     *
+     */
+    virtual bool IsAtEnd() = 0;
+
   protected:
     NavigationDataPlayerBase();
     virtual ~NavigationDataPlayerBase();

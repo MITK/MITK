@@ -46,10 +46,23 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::string
   TiXmlElement* m_DataElem = document.FirstChildElement("Version");
   if(!m_DataElem)
   {
-    mitkThrowException(mitk::IGTIOException) << "Version not specified in XML file.";
+    // for backwards compatibility of version tag
+    m_DataElem = document.FirstChildElement("Data");
+    if(!m_DataElem)
+    {
+      mitkThrowException(mitk::IGTIOException) << "Data element not found.";
+    }
+
   }
 
-  m_DataElem->QueryIntAttribute("Ver", &m_FileVersion);
+  if (m_DataElem->QueryIntAttribute("Ver", &m_FileVersion) != TIXML_SUCCESS)
+  {
+    if (m_DataElem->QueryIntAttribute("version", &m_FileVersion) != TIXML_SUCCESS)
+    {
+      mitkThrowException(mitk::IGTIOException) << "Version not specified in XML file.";
+    }
+  }
+
   if (m_FileVersion != 1)
   {
     mitkThrowException(mitk::IGTIOException) << "File format version "<<m_FileVersion<<" is not supported.";

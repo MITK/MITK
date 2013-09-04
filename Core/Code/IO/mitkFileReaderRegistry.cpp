@@ -16,6 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFileReaderRegistry.h"
 
+#include "mitkIMimeTypeProvider.h"
+#include "mitkCoreServices.h"
+
 // Microservices
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -42,7 +45,8 @@ mitk::FileReaderRegistry::~FileReaderRegistry()
 std::vector< mitk::BaseData::Pointer > mitk::FileReaderRegistry::Read(const std::string& path, us::ModuleContext* context)
 {
   // Find extension
-  const std::string extension = itksys::SystemTools::GetFilenameExtension(path);
+  std::string extension = itksys::SystemTools::GetFilenameExtension(path);
+  extension = extension.substr(1, extension.size()-1);
 
   // Get best Reader
   FileReaderRegistry readerRegistry;
@@ -62,7 +66,8 @@ std::vector< mitk::BaseData::Pointer > mitk::FileReaderRegistry::ReadAll(
   {
     try
     {
-      const std::string extension = itksys::SystemTools::GetFilenameExtension(*iterator);
+      std::string extension = itksys::SystemTools::GetFilenameExtension(*iterator);
+      extension = extension.substr(1, extension.size()-1);
       mitk::IFileReader* reader = readerRegistry.GetReader(extension, context);
       // Throw exception if no compatible reader was found
       if (reader == NULL) throw;
@@ -78,7 +83,31 @@ std::vector< mitk::BaseData::Pointer > mitk::FileReaderRegistry::ReadAll(
   return result;
 }
 
+
 //////////////////// GETTING READERS ////////////////////
+
+mitk::FileReaderRegistry::ReaderReference mitk::FileReaderRegistry::GetReaderReference(const std::string& mimeType, us::ModuleContext* context)
+{
+  std::vector<ReaderReference> refs = GetReaderReferences(mimeType, context);
+  if (refs.empty()) return ReaderReference();
+  std::sort(refs.begin(), refs.end());
+  return refs.back();
+}
+
+std::vector<mitk::FileReaderRegistry::ReaderReference> mitk::FileReaderRegistry::GetReaderReferences(const std::string& mimeType, us::ModuleContext* context)
+{
+  std::string filter = us::LDAPProp(us::ServiceConstants::OBJECTCLASS()) == us_service_interface_iid<IFileReader>() &&
+                       us::LDAPProp(IFileReader::PROP_MIMETYPE()) == mimeType;
+  return context->GetServiceReferences<IFileReader>(filter);
+}
+
+mitk::IFileReader* mitk::FileReaderRegistry::GetReader(const mitk::FileReaderRegistry::ReaderReference& ref, us::ModuleContext* context)
+{
+  us::ServiceObjects<mitk::IFileReader> serviceObjects = context->GetServiceObjects(ref);
+  mitk::IFileReader* reader = serviceObjects.GetService();
+  m_ServiceObjects.insert(std::make_pair(reader, serviceObjects));
+  return reader;
+}
 
 mitk::IFileReader* mitk::FileReaderRegistry::GetReader(const std::string& extension, us::ModuleContext* context )
 {
@@ -157,37 +186,6 @@ void mitk::FileReaderRegistry::UngetReaders(const std::vector<mitk::IFileReader*
   }
 }
 
-//////////////////// GENERIC INFORMATION ////////////////////
-
-std::string mitk::FileReaderRegistry::GetSupportedExtensions(const std::string& extension)
-{
-  us::ModuleContext* context = us::GetModuleContext();
-  const std::vector<us::ServiceReference<IFileReader> > refs = GetReaderList(extension, context);
-  std::vector<std::string> entries; // Will contain Description + Extension (Human readable)
-  entries.reserve(refs.size());
-  std::string knownExtensions; // Will contain plain list of all known extensions (for the QFileDialog entry "All Known Extensions")
-  for (std::vector<us::ServiceReference<IFileReader> >::const_iterator iterator = refs.begin(), end = refs.end(); iterator != end; ++iterator)
-  {
-    // Generate List of Extensions
-    if (iterator == refs.begin()) // First entry without semicolon
-      knownExtensions += "*" + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION()).ToString();
-    else // Ad semicolon for each following entry
-      knownExtensions += "; *" + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION()).ToString();
-
-    // Generate List of human readable entries composed of Description + Extension
-    std::string entry = iterator->GetProperty(mitk::IFileReader::PROP_DESCRIPTION()).ToString() + "(*" + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION()).ToString() + ");;";
-    entries.push_back(entry);
-  }
-  std::sort(entries.begin(), entries.end());
-
-  std::string result = "Known Extensions (" + knownExtensions + ");;All (*)";
-  for (std::vector<std::string>::const_iterator iterator = entries.begin(), end = entries.end(); iterator != end; ++iterator)
-  {
-    result += ";;" + *iterator;
-  }
-  return result;
-}
-
 //////////////////// INTERNAL CODE ////////////////////
 
 bool mitk::FileReaderRegistry::ReaderSupportsOptions(mitk::IFileReader* reader,
@@ -218,13 +216,22 @@ bool mitk::FileReaderRegistry::ReaderSupportsOptions(mitk::IFileReader* reader,
 
 std::vector< us::ServiceReference<mitk::IFileReader> > mitk::FileReaderRegistry::GetReaderList(const std::string& extension, us::ModuleContext* context )
 {
-  // filter for class and extension
+  std::vector<us::ServiceReference<IFileReader> > result;
+
+  // filter for mime type
   std::string filter;
   if (!extension.empty())
   {
-    filter = us::LDAPProp(mitk::IFileReader::PROP_EXTENSION()) == extension;
+    mitk::IMimeTypeProvider* mimeTypeProvider = mitk::CoreServices::GetMimeTypeProvider(context);
+    std::vector<std::string> mimeTypes = mimeTypeProvider->GetMimeTypesForExtension(extension);
+    if (mimeTypes.empty())
+    {
+      MITK_WARN << "No mime-type information for extension " << extension << " available.";
+      return result;
+    }
+    filter = us::LDAPProp(mitk::IFileReader::PROP_MIMETYPE()) == mimeTypes.front();
   }
-  std::vector<us::ServiceReference<IFileReader> > result = context->GetServiceReferences<IFileReader>(filter);
+  result = context->GetServiceReferences<IFileReader>(filter);
   std::sort(result.begin(), result.end());
   std::reverse(result.begin(), result.end());
   return result;

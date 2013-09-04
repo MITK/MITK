@@ -36,16 +36,18 @@ public:
   }
 
   DummyReader(const std::string& extension, int priority)
-    : mitk::AbstractFileReader(extension, "This is a dummy description")
+    : mitk::AbstractFileReader("application/dummy", extension, "This is a dummy description")
   {
-    m_Priority = priority;
+    this->SetPriority(priority);
     //std::vector<std::string> options;
-    m_Options.push_back(std::make_pair("isANiceGuy", true));
-    m_Options.push_back(std::make_pair("canFly", false));
-    m_Options.push_back(std::make_pair("isAwesome", true));
-    m_Options.push_back(std::make_pair("hasOptions", true));
-    m_Options.push_back(std::make_pair("has more Options", true));
-    m_Options.push_back(std::make_pair("has maaaaaaaany Options", true));
+    OptionList options;
+    options.push_back(std::make_pair("isANiceGuy", true));
+    options.push_back(std::make_pair("canFly", false));
+    options.push_back(std::make_pair("isAwesome", true));
+    options.push_back(std::make_pair("hasOptions", true));
+    options.push_back(std::make_pair("has more Options", true));
+    options.push_back(std::make_pair("has maaaaaaaany Options", true));
+    this->SetOptions(options);
     m_ServiceReg = this->RegisterService();
   }
 
@@ -56,16 +58,10 @@ public:
 
   using mitk::AbstractFileReader::Read;
 
-  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read(const std::istream& /*stream*/, mitk::DataStorage* /*ds*/ = 0)
+  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read(std::istream& /*stream*/)
   {
     std::vector<mitk::BaseData::Pointer> result;
     return result;
-  }
-
-  virtual void SetOptions(const mitk::IFileReader::OptionList& options )
-  {
-    m_Options = options;
-    //m_Registration.SetProperties(GetServiceProperties());
   }
 
 private:
@@ -187,7 +183,7 @@ mitk::IFileReader::OptionList QmitkFileDialog::GetSelectedOptions()
       QCheckBox* checker = dynamic_cast<QCheckBox*> (item->widget());
       if (checker)
       {
-        mitk::IFileReader::FileServiceOption option( checker->text().toStdString() , checker->isChecked() );
+        mitk::IFileReader::Option option( checker->text().toStdString() , checker->isChecked() );
         result.push_back(option);
       }
 

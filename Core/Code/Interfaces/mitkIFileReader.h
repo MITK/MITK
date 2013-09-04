@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Macro
 #include <MitkExports.h>
-#include <mitkCommon.h>
 
 // Microservices
 #include <usServiceInterface.h>
@@ -27,8 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkMessage.h>
 
-// STL
-#include <list>
 
 namespace mitk {
   class BaseData;
@@ -41,58 +38,58 @@ namespace itk {
 
 namespace mitk {
   /**
-  * \brief The common interface of all FileReader.
+  * \brief The common interface for all MITK file readers.
   *
-  * This interface defines the Methods necessary for the FileReaderManager
-  * to interact with its FileReaders. To implement a new Filereader, it is
-  * recommended to derive from FileReaderAbstract instead of from the Interface,
-  * as the abstract class already implements most of the functions and also makes sure
-  * that your reader will be managed by the FileReaderManager.
+  * Implementations of this interface must be registered as a service
+  * to make themselve available via the service registry. If the
+  * implementation is state-full, the service should be registered using
+  * a PrototypeServiceFactory.
+  *
+  * The file reader implementation is associated with a mime-type, specified
+  * in the service property PROP_MIMETYPE(). The specified mime-type should
+  * have a corresponding IMimeType service object, registered by the reader
+  * or some other party.
+  *
+  * It is recommended to derive new implementations from AbstractFileReader,
+  * which provides correct service registration semantics.
+  *
+  * \sa AbstractFileReader
+  * \sa IMimeType
+  * \sa FileReaderRegistry
   */
   struct MITK_CORE_EXPORT IFileReader
   {
     virtual ~IFileReader();
 
-    typedef std::pair<std::string, bool> FileServiceOption;
+    typedef std::pair<std::string, bool> Option;
     typedef std::vector<std::string> OptionNames;
-    typedef std::vector<FileServiceOption> OptionList;
+    typedef std::vector<Option> OptionList;
+
+    typedef mitk::MessageAbstractDelegate1<float> ProgressCallback;
+
+    /**
+     * \brief Reads the specified file and returns its contents.
+     */
+    virtual std::vector<itk::SmartPointer<BaseData> > Read(const std::string& path) = 0;
+
+    /**
+     * \brief Reads the specified input stream and returns its contents.
+     */
+    virtual std::vector<itk::SmartPointer<BaseData> > Read(std::istream& stream) = 0;
 
     /**
     * \brief Reads the specified file and returns its contents.
+    *
+    * When reading a given file, multiple BaseData instances might be produces.
+    * If a DataStorage instance is passed and the reader added a BaseData instance
+    * to it, the second element in the returned pair will be set true.
     */
-    virtual std::vector< itk::SmartPointer<BaseData> > Read(const std::string& path, mitk::DataStorage* ds = 0) = 0;
+    virtual std::vector<std::pair<itk::SmartPointer<BaseData>,bool> > Read(const std::string& path, mitk::DataStorage& ds) = 0;
 
     /**
     * \brief Reads the specified input stream and returns its contents.
     */
-    virtual std::vector< itk::SmartPointer<BaseData> > Read(const std::istream& stream, mitk::DataStorage* ds  = 0) = 0;
-
-    /**
-    * \brief Returns the priority which defined how 'good' the FileReader can handle it's file format.
-    *
-    * Default is zero and should only be chosen differently for a reason.
-    * The priority is intended to be used by the MicroserviceFramework to determine
-    * which reader to use if several equivalent readers have been found.
-    * It may be used to replace a default reader from MITK in your own project.
-    * E.g. if you want to use your own reader for *.nrrd files instead of the default,
-    * implement it and give it a higher priority than zero.
-    */
-    virtual int GetPriority() const = 0 ;
-
-    /**
-    * \brief returns the file extension that this FileReader is able to handle.
-    *
-    * Please enter only the characters after the fullstop, e.g "nrrd" is correct
-    * while "*.nrrd" and ".nrrd" are incorrect.
-    */
-    virtual std::string GetExtension() const = 0;
-
-    /**
-    * \brief Returns a human readable description of the file format.
-    *
-    * This will be used in FileDialogs for example.
-    */
-    virtual std::string GetDescription() const = 0;
+    virtual std::vector<std::pair<itk::SmartPointer<BaseData>,bool> > Read(std::istream& stream, mitk::DataStorage& ds) = 0;
 
     /**
     * \brief returns a list of the supported Options
@@ -119,21 +116,38 @@ namespace mitk {
     */
     virtual bool CanRead(const std::string& path) const = 0;
 
-    virtual void AddProgressCallback(const mitk::MessageAbstractDelegate<float>& callback) = 0;
+    /**
+     * \brief Returns true if this writer can read from the specified stream.
+     *
+     * @param stream The input stream.
+     * @return \c true if the stream can be read, \c false otherwise.
+     */
+    virtual bool CanRead(std::istream& stream) const = 0;
 
-    virtual void RemoveProgressCallback(const mitk::MessageAbstractDelegate<float>& callback) = 0;
+    virtual void AddProgressCallback(const ProgressCallback& callback) = 0;
 
-    // Microservice properties
-    static std::string PROP_EXTENSION();
+    virtual void RemoveProgressCallback(const ProgressCallback& callback) = 0;
+
+    /**
+     * @brief Service property name for a description.
+     *
+     * The property value must be of type \c std::string.
+     *
+     * @return The property name.
+     */
     static std::string PROP_DESCRIPTION();
-    static std::string PROP_IS_LEGACY();
 
-    // Microservice names for defined properties
-    static std::string OPTION_READ_AS_BINARY();
-    static std::string OPTION_READ_MULTIPLE_FILES();
+    /**
+     * @brief Service property name for the mime-type associated with this file reader.
+     *
+     * The property value must be of type \c std::string.
+     *
+     * @return The property name.
+     */
+    static std::string PROP_MIMETYPE();
 
-  protected:
   };
+
 } // namespace mitk
 
 // This is the microservice declaration. Do not meddle!

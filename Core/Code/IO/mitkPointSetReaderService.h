@@ -62,11 +62,9 @@ namespace mitk
     */
     virtual ~PointSetReaderService();
 
-    virtual std::vector< itk::SmartPointer<BaseData> > Read(const std::string& path, mitk::DataStorage* /*ds*/);
+    using AbstractFileReader::Read;
 
-    virtual std::vector< itk::SmartPointer<BaseData> > Read(const std::istream& stream, mitk::DataStorage *ds = 0 );
-
-    virtual bool CanRead(const std::string& path) const;
+    virtual std::vector< itk::SmartPointer<BaseData> > Read(std::istream& stream);
 
   protected:
 

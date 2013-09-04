@@ -38,16 +38,26 @@ public:
 
   LegacyFileReaderService(const LegacyFileReaderService& other);
 
-  LegacyFileReaderService(const std::string& extension, const std::string& description);
+  LegacyFileReaderService(const std::string& mimeType, const std::string& extension, const std::string& description);
   virtual ~LegacyFileReaderService();
 
-  virtual std::vector< mitk::BaseData::Pointer > Read(const std::string& path, mitk::DataStorage* ds = 0);
+  using mitk::AbstractFileReader::Read;
 
-  virtual std::vector< mitk::BaseData::Pointer > Read(const std::istream& stream, mitk::DataStorage* ds = 0 );
+  virtual std::vector<itk::SmartPointer<BaseData> > Read(const std::string& path);
+
+  virtual std::vector<itk::SmartPointer<BaseData> > Read(std::istream& stream);
+
+protected:
+
+  us::ServiceRegistration<IMimeType> RegisterMimeType(us::ModuleContext* context);
 
 private:
 
   LegacyFileReaderService* Clone() const;
+
+  std::vector<mitk::BaseData::Pointer> ReadFileSeriesTypeDCM(const std::string& path);
+
+  std::vector<mitk::BaseData::Pointer> LoadBaseDataFromFile(const std::string& path);
 
   us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
 };

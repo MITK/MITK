@@ -53,8 +53,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkResliceInterpolationProperty.h"
 
 // Legacy Support:
+#include <mitkCoreServices.h>
 #include <mitkFileReaderRegistry.h>
 #include <mitkFileWriterRegistry.h>
+#include <mitkIMimeTypeProvider.h>
 #include <mitkLegacyFileReaderService.h>
 #include <mitkLegacyFileWriterService.h>
 
@@ -365,18 +367,28 @@ void mitk::CoreObjectFactory::RegisterLegacyReaders(mitk::CoreObjectFactoryBase*
   // many readers initialize the map the first time when this method is called
   factory->GetFileExtensions();
 
+  CoreServicePointer<IMimeTypeProvider> mimeTypeProvider(CoreServices::GetMimeTypeProvider());
+
   std::multimap<std::string, std::string> fileExtensionMap = factory->GetFileExtensionsMap();
   for(std::multimap<std::string, std::string>::iterator it = fileExtensionMap.begin(); it != fileExtensionMap.end(); it++)
   {
-    //only add if no reader already registered under that extension
     std::string extension = it->first;
-    extension = extension.erase(0,1);
-    std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-    mitk::FileReaderRegistry readerRegistry;
-    if(readerRegistry.GetReader(it->first) == 0)
+    // remove "*."
+    extension = extension.erase(0,2);
+    std::string mimeType;
+    std::vector<std::string> mimeTypes = mimeTypeProvider->GetMimeTypesForExtension(extension);
+    for(std::vector<std::string>::iterator mimeType = mimeTypes.begin();
+        mimeType != mimeTypes.end(); ++mimeType)
     {
-      mitk::LegacyFileReaderService* lfrs = new mitk::LegacyFileReaderService(extension, it->second);
-      m_LegacyReaders.push_back(lfrs);
+      try
+      {
+        mitk::LegacyFileReaderService* lfrs = new mitk::LegacyFileReaderService(*mimeType, extension, it->second);
+        m_LegacyReaders.push_back(lfrs);
+      }
+      catch (const std::exception& e)
+      {
+        MITK_WARN << e.what();
+      }
     }
   }
 }
@@ -403,7 +415,8 @@ void mitk::CoreObjectFactory::RegisterLegacyWriters(mitk::CoreObjectFactoryBase*
       std::string extensionWithStar = extension;
       if (extension.find_first_of('*') == 0)
       {
-        extension.erase(0, 1);
+        // remove "*."
+        extension = extension.substr(0, extension.size()-2);
       }
       else
       {

@@ -31,9 +31,9 @@ public:
   }
 
   DummyReader(const std::string& extension, int priority)
-    : mitk::AbstractFileReader(extension, "This is a dummy description")
+    : mitk::AbstractFileReader("application/dummy", extension, "This is a dummy description")
   {
-    m_Priority = priority;
+    this->SetPriority(priority);
     m_ServiceReg = this->RegisterService();
   }
 
@@ -44,7 +44,7 @@ public:
 
   using mitk::AbstractFileReader::Read;
 
-  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read(const std::istream& /*stream*/, mitk::DataStorage* /*ds*/ = 0)
+  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read(std::istream& /*stream*/)
   {
     std::vector<mitk::BaseData::Pointer> result;
     return result;
@@ -70,9 +70,9 @@ public:
   }
 
   DummyReader2(const std::string& extension, int priority)
-    : mitk::AbstractFileReader(extension, "This is a second dummy description")
+    : mitk::AbstractFileReader("application/dummy", extension, "This is a second dummy description")
   {
-    m_Priority = priority;
+    this->SetPriority(priority);
     m_ServiceReg = this->RegisterService();
   }
 
@@ -83,7 +83,7 @@ public:
 
   using mitk::AbstractFileReader::Read;
 
-  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read(const std::istream& /*stream*/, mitk::DataStorage* /*ds*/ = 0)
+  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read(std::istream& /*stream*/)
   {
     std::vector<mitk::BaseData::Pointer> result;
     return result;
@@ -112,7 +112,6 @@ int mitkFileReaderRegistryTest(int /*argc*/ , char* /*argv*/[])
   DummyReader testDR("test",1);
   DummyReader otherDR("other",1);
 
-  MITK_TEST_CONDITION_REQUIRED(testDR.CanRead("/this/is/a/folder/file.test"),"Positive test of default CanRead() implementation");
   MITK_TEST_CONDITION_REQUIRED(!testDR.CanRead("/this/is/a/folder/file.tes"),"Negative test of default CanRead() implementation");
 
   mitk::FileReaderRegistry* readerRegistry = new mitk::FileReaderRegistry;

@@ -45,6 +45,8 @@ class MITK_CORE_EXPORT FileReaderRegistry
 
 public:
 
+  typedef us::ServiceReference<IFileReader> ReaderReference;
+
   FileReaderRegistry();
   ~FileReaderRegistry();
 
@@ -73,6 +75,12 @@ public:
       return result;
     }
 
+    static ReaderReference GetReaderReference(const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
+
+    static std::vector<ReaderReference> GetReaderReferences(const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
+
+    mitk::IFileReader* GetReader(const ReaderReference& ref, us::ModuleContext* context = us::GetModuleContext());
+
     /**
     * Returns a compatible Reader to the given file extension
     **/
@@ -86,8 +94,6 @@ public:
 
     void UngetReader(mitk::IFileReader* reader);
     void UngetReaders(const std::vector<mitk::IFileReader*>& readers);
-
-    std::string GetSupportedExtensions(const std::string& extension = "");
 
 protected:
 

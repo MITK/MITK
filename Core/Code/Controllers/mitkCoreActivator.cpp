@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <mitkIFileReader.h>
 #include <mitkIFileWriter.h>
+#include <mitkMimeTypeProvider.h>
 #include <mitkPointSetReaderService.h>
 
 // Microservices
@@ -131,6 +132,10 @@ public:
     m_PropertyFilters.reset(new mitk::PropertyFilters);
     context->RegisterService<mitk::IPropertyFilters>(m_PropertyFilters.get());
 
+    m_MimeTypeProvider.reset(new mitk::MimeTypeProvider);
+    m_MimeTypeProvider->Start();
+    m_MimeTypeProviderReg = context->RegisterService<mitk::IMimeTypeProvider>(m_MimeTypeProvider.get());
+
     context->AddModuleListener(this, &MitkCoreActivator::HandleModuleEvent);
 
     // Add Reader / Writer Services
@@ -156,6 +161,13 @@ public:
     // will always be 0 for the Mitk library. It makes no sense
     // to use it at this stage anyway, since all libraries which
     // know about the module system have already been unloaded.
+
+    // we need to close the internal service tracker of the
+    // MimeTypeProvider class here. Otherwise it
+    // would hold on to the ModuleContext longer than it is
+    // actually valid.
+    m_MimeTypeProviderReg.Unregister();
+    m_MimeTypeProvider->Stop();
   }
 
 private:
@@ -171,10 +183,13 @@ private:
   std::auto_ptr<mitk::PropertyDescriptions> m_PropertyDescriptions;
   std::auto_ptr<mitk::PropertyExtensions> m_PropertyExtensions;
   std::auto_ptr<mitk::PropertyFilters> m_PropertyFilters;
+  std::auto_ptr<mitk::MimeTypeProvider> m_MimeTypeProvider;
 
   // File IO
   std::vector<mitk::IFileReader*> m_FileReaders;
   std::vector<mitk::IFileReader*> m_FileWriters;
+
+  us::ServiceRegistration<mitk::IMimeTypeProvider> m_MimeTypeProviderReg;
 };
 
 void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)

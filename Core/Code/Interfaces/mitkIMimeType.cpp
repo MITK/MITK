@@ -14,21 +14,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "mitkIMimeType.h"
 
-#include "mitkIFileReader.h"
+namespace mitk {
 
-mitk::IFileReader::~IFileReader()
+IMimeType::~IMimeType()
 {
 }
 
-std::string mitk::IFileReader::PROP_DESCRIPTION()
+std::string IMimeType::PROP_ID()
 {
-  static std::string s = "org.mitk.IFileReader.description";
+  static std::string s = "org.mitk.IMimeType.id";
   return s;
 }
 
-std::string mitk::IFileReader::PROP_MIMETYPE()
+std::string IMimeType::PROP_CATEGORY()
 {
-  static std::string s = "org.mitk.IFileReader.mimetype";
+  static std::string s = "org.mitk.IMimeType.category";
   return s;
+}
+
+std::string IMimeType::PROP_EXTENSIONS()
+{
+  static std::string s = "org.mitk.IMimeType.extensions";
+  return s;
+}
+
+std::string IMimeType::PROP_DESCRIPTION()
+{
+  static std::string s = "org.mitk.IMimeType.description";
+  return s;
+}
+
 }

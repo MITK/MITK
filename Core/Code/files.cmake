@@ -271,6 +271,8 @@ set(CPP_FILES
   Interactions/mitkVtkInteractorStyle.cxx
   Interactions/mitkCrosshairPositionEvent.cpp
 
+  Interfaces/mitkIMimeType.cpp
+  Interfaces/mitkIMimeTypeProvider.cpp
   Interfaces/mitkInteractionEventObserver.cpp
   Interfaces/mitkIShaderRepository.cpp
   Interfaces/mitkIPropertyAliases.cpp
@@ -292,6 +294,7 @@ set(CPP_FILES
   IO/mitkItkLoggingAdapter.cpp
   IO/mitkIOUtil.cpp
   IO/mitkLookupTableProperty.cpp
+  IO/mitkMimeTypeProvider.cpp
   IO/mitkOperation.cpp
   #IO/mitkPicFileIOFactory.cpp
   #IO/mitkPicFileReader.cpp
@@ -302,6 +305,7 @@ set(CPP_FILES
   IO/mitkPixelType.cpp
   IO/mitkPointSetReaderService.cpp
   IO/mitkPointSetWriterService.cpp
+  IO/mitkSimpleMimeType.cpp
   IO/mitkStandardFileLocations.cpp
   IO/mitkVtkLoggingAdapter.cpp
   IO/mitkLog.cpp

@@ -48,6 +48,7 @@ void mitk::FileWriterRegistry::Write(const mitk::BaseData* data, const std::stri
 {
   // Find extension
   std::string extension = itksys::SystemTools::GetFilenameExtension(path);
+  extension = extension.substr(1, extension.size()-1);
 
   // Get best Writer
   FileWriterRegistry writerRegistry;

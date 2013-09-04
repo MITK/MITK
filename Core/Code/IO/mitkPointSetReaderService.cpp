@@ -23,7 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 #include <locale>
 
-mitk::PointSetReaderService::PointSetReaderService() : AbstractFileReader("mps", "Great Reader of Point Sets")
+mitk::PointSetReaderService::PointSetReaderService()
+  : AbstractFileReader("application/vnd.mitk.pointset", "mps", "Great Reader of Point Sets")
 {
   RegisterService();
 }
@@ -31,29 +32,30 @@ mitk::PointSetReaderService::PointSetReaderService() : AbstractFileReader("mps",
 mitk::PointSetReaderService::~PointSetReaderService()
 {}
 
-std::vector< itk::SmartPointer<mitk::BaseData> > mitk::PointSetReaderService::Read(const std::istream& stream, mitk::DataStorage *ds )
-{
-  std::vector< itk::SmartPointer<mitk::BaseData> > emptySet;
-  return emptySet;
-}
-
-std::vector< itk::SmartPointer<mitk::BaseData> >  mitk::PointSetReaderService::Read(const std::string& path, mitk::DataStorage* /*ds*/)
+std::vector< itk::SmartPointer<mitk::BaseData> > mitk::PointSetReaderService::Read(std::istream& stream)
 {
   std::locale::global(std::locale("C"));
 
   std::vector< itk::SmartPointer<mitk::BaseData> > result;
 
-  if ( ! this->CanRead( path ) )
+
+  stream.seekg(0, std::ios_base::end);
+  long int length = stream.tellg();
+  stream.seekg(0, std::ios_base::beg);
+
+  if (length <= 0)
   {
-    MITK_WARN << "Sorry, can't read file " << path << "! Returning empty set...";
-    std::vector< itk::SmartPointer<mitk::BaseData> > emptySet;
-    return emptySet;
+    MITK_WARN << "Could not read point set, no data.";
+    return result;
   }
 
+  char* data = new char[length+1];
+  stream.read(data, length);
+  data[length] = 0;
+
   try{
-    TiXmlDocument doc(path.c_str());
-    bool loadOkay = doc.LoadFile();
-    if (loadOkay)
+    TiXmlDocument doc("pointset.xml");
+    if (doc.Parse(data))
     {
       TiXmlHandle docHandle( &doc );
       //unsigned int pointSetCounter(0);
@@ -89,6 +91,9 @@ std::vector< itk::SmartPointer<mitk::BaseData> >  mitk::PointSetReaderService::R
   {
     MITK_ERROR  << "Error while reading point set. Aborting...";
   }
+
+  delete data;
+
   return result;
 }
 
@@ -128,14 +133,6 @@ mitk::PointSet::Pointer mitk::PointSetReaderService::ReadPoint(mitk::PointSet::P
     }
   }
   return newPointSet;
-}
-
-bool mitk::PointSetReaderService::CanRead(const std::string& path) const
-{
-  std::ifstream in( path.c_str() );
-  bool isGood = in.good();
-  in.close();
-  return isGood;
 }
 
 mitk::PointSetReaderService::PointSetReaderService(const mitk::PointSetReaderService& other)

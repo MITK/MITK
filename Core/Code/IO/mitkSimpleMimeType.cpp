@@ -14,21 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "mitkSimpleMimeType.h"
 
-#include "mitkIFileReader.h"
-
-mitk::IFileReader::~IFileReader()
+std::string mitk::SimpleMimeType::GetMagicPatterns() const
 {
-}
-
-std::string mitk::IFileReader::PROP_DESCRIPTION()
-{
-  static std::string s = "org.mitk.IFileReader.description";
-  return s;
-}
-
-std::string mitk::IFileReader::PROP_MIMETYPE()
-{
-  static std::string s = "org.mitk.IFileReader.mimetype";
-  return s;
+  return std::string();
 }

@@ -26,103 +26,178 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <fstream>
 
-mitk::AbstractFileReader::AbstractFileReader()
-  : m_Priority (0)
-  , m_PrototypeFactory(NULL)
+namespace mitk {
+
+class AbstractFileReader::Impl
+{
+public:
+
+  Impl()
+    : m_Priority(0)
+    , m_PrototypeFactory(NULL)
+  {}
+
+  Impl(const Impl& other)
+    : m_MimeType(other.m_MimeType)
+    , m_Category(other.m_Category)
+    , m_Extensions(other.m_Extensions)
+    , m_Description(other.m_Description)
+    , m_Priority(other.m_Priority)
+    , m_Options(other.m_Options)
+    , m_PrototypeFactory(NULL)
+  {}
+
+  // Minimal Service Properties: ALWAYS SET THESE IN CONSTRUCTOR OF DERIVED CLASSES!
+  std::string m_MimeType;
+  std::string m_Category;
+  std::vector<std::string> m_Extensions;
+  std::string m_Description;
+  int m_Priority;
+
+  /**
+   * \brief Options supported by this reader. Set sensible default values!
+   *
+   * Can be left emtpy if no special options are required.
+   */
+  IFileReader::OptionList m_Options;
+
+  us::PrototypeServiceFactory* m_PrototypeFactory;
+
+  mitk::Message1<float> m_ProgressMessage;
+
+  mitk::SimpleMimeType m_SimpleMimeType;
+  us::ServiceRegistration<IMimeType> m_MimeTypeReg;
+};
+
+
+AbstractFileReader::AbstractFileReader()
+  : d(new Impl)
 {
 }
 
-mitk::AbstractFileReader::~AbstractFileReader()
+AbstractFileReader::~AbstractFileReader()
 {
-  delete m_PrototypeFactory;
+  delete d->m_PrototypeFactory;
+
+  if (d->m_MimeTypeReg)
+  {
+    d->m_MimeTypeReg.Unregister();
+  }
 }
 
-mitk::AbstractFileReader::AbstractFileReader(const mitk::AbstractFileReader& other)
-  : m_Extension(other.m_Extension)
-  , m_Description(other.m_Description)
-  , m_Priority(other.m_Priority)
-  , m_Options(other.m_Options)
-  , m_PrototypeFactory(NULL)
+AbstractFileReader::AbstractFileReader(const AbstractFileReader& other)
+  : d(new Impl(*other.d.get()))
 {
 }
 
-mitk::AbstractFileReader::AbstractFileReader(const std::string& extension, const std::string& description)
-  : m_Extension (extension)
-  , m_Description (description)
-  , m_Priority (0)
-  , m_PrototypeFactory(NULL)
+AbstractFileReader::AbstractFileReader(const std::string& mimeType,const std::string& extension,
+                                             const std::string& description)
+  : d(new Impl)
 {
+  d->m_MimeType = mimeType;
+  d->m_Extensions.push_back(extension);
+  d->m_Description = description;
 }
 
 ////////////////////// Reading /////////////////////////
 
-std::vector< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(const std::string& path, mitk::DataStorage* /*ds*/)
+std::vector<itk::SmartPointer<BaseData> > AbstractFileReader::Read(const std::string& path)
 {
-  if (! itksys::SystemTools::FileExists(path.c_str()))
+  if (!itksys::SystemTools::FileExists(path.c_str()))
     mitkThrow() << "File '" + path + "' not found.";
   std::ifstream stream;
   stream.open(path.c_str());
   return this->Read(stream);
 }
 
-std::vector< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(const std::istream& stream, mitk::DataStorage* ds)
+std::vector<itk::SmartPointer<BaseData> > AbstractFileReader::Read(std::istream& stream)
 {
   // Create a temporary file and copy the data to it
   std::ofstream tmpOutputStream;
-  std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpOutputStream);
+  std::string tmpFilePath = IOUtil::CreateTemporaryFile(tmpOutputStream);
   tmpOutputStream << stream.rdbuf();
   tmpOutputStream.close();
 
   // Now read from the temporary file
-  std::vector< itk::SmartPointer<mitk::BaseData> > result = this->Read(tmpFilePath, ds);
+  std::vector<itk::SmartPointer<BaseData> > result = this->Read(tmpFilePath);
   std::remove(tmpFilePath.c_str());
+  return result;
+}
+
+std::vector<std::pair<itk::SmartPointer<BaseData>,bool> > AbstractFileReader::Read(const std::string& path, DataStorage& /*ds*/)
+{
+  std::vector<std::pair<BaseData::Pointer,bool> > result;
+  std::vector<BaseData::Pointer> data = this->Read(path);
+  for (std::vector<BaseData::Pointer>::iterator iter = data.begin();
+       iter != data.end(); ++iter)
+  {
+    result.push_back(std::make_pair(*iter, false));
+  }
+  return result;
+}
+
+std::vector<std::pair<itk::SmartPointer<BaseData>,bool> > AbstractFileReader::Read(std::istream& stream, DataStorage& /*ds*/)
+{
+  std::vector<std::pair<BaseData::Pointer,bool> > result;
+  std::vector<BaseData::Pointer> data = this->Read(stream);
+  for (std::vector<BaseData::Pointer>::iterator iter = data.begin();
+       iter != data.end(); ++iter)
+  {
+    result.push_back(std::make_pair(*iter, false));
+  }
   return result;
 }
 
 //////////// µS Registration & Properties //////////////
 
-us::ServiceRegistration<mitk::IFileReader> mitk::AbstractFileReader::RegisterService(us::ModuleContext* context)
+us::ServiceRegistration<IFileReader> AbstractFileReader::RegisterService(us::ModuleContext* context)
 {
-  if (m_PrototypeFactory) return us::ServiceRegistration<mitk::IFileReader>();
+  if (d->m_PrototypeFactory) return us::ServiceRegistration<IFileReader>();
+
+  d->m_MimeTypeReg = this->RegisterMimeType(context);
 
   struct PrototypeFactory : public us::PrototypeServiceFactory
   {
-    mitk::AbstractFileReader* const m_Prototype;
+    AbstractFileReader* const m_Prototype;
 
-    PrototypeFactory(mitk::AbstractFileReader* prototype)
+    PrototypeFactory(AbstractFileReader* prototype)
       : m_Prototype(prototype)
     {}
 
     us::InterfaceMap GetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/)
     {
-      return us::MakeInterfaceMap<mitk::IFileReader>(m_Prototype->Clone());
+      return us::MakeInterfaceMap<IFileReader>(m_Prototype->Clone());
     }
 
     void UngetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/,
       const us::InterfaceMap& service)
     {
-      delete us::ExtractInterface<mitk::IFileReader>(service);
+      delete us::ExtractInterface<IFileReader>(service);
     }
   };
 
-  m_PrototypeFactory = new PrototypeFactory(this);
+  d->m_PrototypeFactory = new PrototypeFactory(this);
   us::ServiceProperties props = this->GetServiceProperties();
-  return context->RegisterService<mitk::IFileReader>(m_PrototypeFactory, props);
+  return context->RegisterService<IFileReader>(d->m_PrototypeFactory, props);
 }
 
-us::ServiceProperties mitk::AbstractFileReader::GetServiceProperties() const
+us::ServiceProperties AbstractFileReader::GetServiceProperties() const
 {
-  if ( m_Extension.empty() )
+  if ( d->m_MimeType.empty() )
+    MITK_WARN << "Registered a Reader with no mime type defined (m_MimeType is empty). Reader will not be found by calls from ReaderManager.)";
+  if ( d->m_Extensions.empty() )
     MITK_WARN << "Registered a Reader with no extension defined (m_Extension is empty). Reader will not be found by calls from ReaderManager.)";
-  if ( m_Description.empty() )
+  if ( d->m_Description.empty() )
     MITK_WARN << "Registered a Reader with no description defined (m_Description is empty). Reader will have no human readable extension information in FileDialogs.)";
 
   us::ServiceProperties result;
-  result[mitk::IFileReader::PROP_EXTENSION()]    = m_Extension;
-  result[mitk::IFileReader::PROP_DESCRIPTION()]    = m_Description;
-  result[us::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
 
-  for (mitk::IFileReader::OptionList::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it) {
+  result[IFileReader::PROP_DESCRIPTION()]    = d->m_Description;
+  result[IFileReader::PROP_MIMETYPE()]       = d->m_MimeType;
+
+  result[us::ServiceConstants::SERVICE_RANKING()]  = d->m_Priority;
+
+  for (IFileReader::OptionList::const_iterator it = d->m_Options.begin(); it != d->m_Options.end(); ++it) {
     if (it->second)
       result[it->first] = std::string("true");
     else result[it->first] = std::string("false");
@@ -130,49 +205,121 @@ us::ServiceProperties mitk::AbstractFileReader::GetServiceProperties() const
   return result;
 }
 
-//////////////////////// Options ///////////////////////
-
-mitk::IFileReader::OptionList mitk::AbstractFileReader::GetOptions() const
+us::ServiceProperties AbstractFileReader::GetMimeTypeServiceProperties() const
 {
-  return m_Options;
+  us::ServiceProperties result;
+
+  result[IMimeType::PROP_ID()] = d->m_MimeType;
+  result[IMimeType::PROP_CATEGORY()] = d->m_Category;
+  result[IMimeType::PROP_EXTENSIONS()] = d->m_Extensions;
+  result[IMimeType::PROP_DESCRIPTION()] = d->m_Description;
+
+  result[us::ServiceConstants::SERVICE_RANKING()]  = d->m_Priority;
+
+  return result;
 }
 
-void mitk::AbstractFileReader::SetOptions(const mitk::IFileReader::OptionList& options)
+us::ServiceRegistration<IMimeType> AbstractFileReader::RegisterMimeType(us::ModuleContext* context)
 {
-  if (options.size() != m_Options.size()) MITK_WARN << "Number of set Options differs from Number of available Options, which is a sign of false usage. Please consult documentation";
-  m_Options = options;
+  us::ServiceProperties mimeTypeProps = this->GetMimeTypeServiceProperties();
+  return context->RegisterService<IMimeType>(&d->m_SimpleMimeType, mimeTypeProps);
+}
+
+void AbstractFileReader::SetMimeType(const std::string& mimeType)
+{
+  d->m_MimeType = mimeType;
+}
+
+void AbstractFileReader::SetCategory(const std::string& category)
+{
+  d->m_Category = category;
+}
+
+void AbstractFileReader::SetExtensions(const std::vector<std::string>& extensions)
+{
+  d->m_Extensions = extensions;
+}
+
+void AbstractFileReader::SetDescription(const std::string& description)
+{
+  d->m_Description = description;
+}
+
+void AbstractFileReader::SetPriority(int priority)
+{
+  d->m_Priority = priority;
+}
+
+
+//////////////////////// Options ///////////////////////
+
+IFileReader::OptionList AbstractFileReader::GetOptions() const
+{
+  return d->m_Options;
+}
+
+void AbstractFileReader::SetOptions(const OptionList& options)
+{
+  if (options.size() != d->m_Options.size()) MITK_WARN << "Number of set Options differs from Number of available Options, which is a sign of false usage. Please consult documentation";
+  d->m_Options = options;
 }
 
 ////////////////// MISC //////////////////
 
-bool mitk::AbstractFileReader::CanRead(const std::string& path) const
+bool AbstractFileReader::CanRead(const std::string& path) const
 {
+  if (!itksys::SystemTools::FileExists(path.c_str(), true))
+  {
+    return false;
+  }
+
   // Default implementation only checks if extension is correct
-  std::string pathEnd = path.substr( path.length() - m_Extension.length(), m_Extension.length() );
-  return (m_Extension == pathEnd);
+  std::string extension = itksys::SystemTools::GetFilenameExtension(path);
+  extension = extension.substr(1, extension.size()-1);
+  if (std::find(d->m_Extensions.begin(), d->m_Extensions.end(), extension) == d->m_Extensions.end())
+  {
+    return false;
+  }
+
+  std::ifstream stream(path.c_str());
+  return this->CanRead(stream);
 }
 
-void mitk::AbstractFileReader::AddProgressCallback(const mitk::MessageAbstractDelegate<float>& callback)
+bool AbstractFileReader::CanRead(std::istream& stream) const
 {
+  return stream.good();
 }
 
-void mitk::AbstractFileReader::RemoveProgressCallback(const mitk::MessageAbstractDelegate<float>& callback)
+void AbstractFileReader::AddProgressCallback(const ProgressCallback& callback)
 {
+  d->m_ProgressMessage += callback;
+}
+
+void AbstractFileReader::RemoveProgressCallback(const ProgressCallback& callback)
+{
+  d->m_ProgressMessage -= callback;
 }
 
 ////////////////// µS related Getters //////////////////
 
-int mitk::AbstractFileReader::GetPriority() const
+int AbstractFileReader::GetPriority() const
 {
-  return m_Priority;
+  return d->m_Priority;
 }
 
-std::string mitk::AbstractFileReader::GetExtension() const
+std::string AbstractFileReader::GetMimeType() const
 {
-  return m_Extension;
+  return d->m_MimeType;
 }
 
-std::string mitk::AbstractFileReader::GetDescription() const
+std::vector<std::string> AbstractFileReader::GetExtensions() const
 {
-  return m_Description;
+  return d->m_Extensions;
+}
+
+std::string AbstractFileReader::GetDescription() const
+{
+  return d->m_Description;
+}
+
 }

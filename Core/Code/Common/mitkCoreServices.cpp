@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCoreServices.h"
 
+#include <mitkIMimeTypeProvider.h>
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>
 #include <mitkIPropertyExtensions.h>
@@ -74,6 +75,11 @@ IPropertyExtensions* CoreServices::GetPropertyExtensions(us::ModuleContext* cont
 IPropertyFilters* CoreServices::GetPropertyFilters(us::ModuleContext* context)
 {
   return GetCoreService<IPropertyFilters>(context);
+}
+
+IMimeTypeProvider* CoreServices::GetMimeTypeProvider(us::ModuleContext* context)
+{
+  return GetCoreService<IMimeTypeProvider>(context);
 }
 
 bool CoreServices::Unget(us::ModuleContext* context, const std::string& /*interfaceId*/, void* service)

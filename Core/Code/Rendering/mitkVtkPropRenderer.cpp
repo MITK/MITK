@@ -550,6 +550,12 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
         vtk2itk(m_PointPicker->GetPickPosition(), worldPoint);
         break;
       }
+    case(CellPicking) :
+      {
+        m_CellPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
+        vtk2itk(m_CellPicker->GetPickPosition(), worldPoint);
+        break;
+      }
     }
   }
   else

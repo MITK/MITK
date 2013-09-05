@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImageToImageFilter.h>
 #include <itkVectorImage.h>
-#include "itkDWIvoxelFunctor.h"
+#include "itkDWIVoxelFunctor.h"
 
 
 namespace itk

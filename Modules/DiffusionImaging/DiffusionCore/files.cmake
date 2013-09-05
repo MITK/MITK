@@ -65,7 +65,6 @@ set(CPP_FILES
 
 
   # MultishellProcessing
-  Algorithms/Reconstruction/MultishellProcessing/itkDWIvoxelFunctor.cpp
   Algorithms/Reconstruction/MultishellProcessing/itkADCAverageFunctor.cpp
   Algorithms/Reconstruction/MultishellProcessing/itkADCFitFunctor.cpp
   Algorithms/Reconstruction/MultishellProcessing/itkKurtosisFitFunctor.cpp
@@ -95,7 +94,7 @@ set(H_FILES
 
   # MultishellProcessing
   Algorithms/Reconstruction/MultishellProcessing/itkRadialMultishellToSingleshellImageFilter.h
-  Algorithms/Reconstruction/MultishellProcessing/itkDWIvoxelFunctor.h
+  Algorithms/Reconstruction/MultishellProcessing/itkDWIVoxelFunctor.h
   Algorithms/Reconstruction/MultishellProcessing/itkADCAverageFunctor.h
   Algorithms/Reconstruction/MultishellProcessing/itkKurtosisFitFunctor.h
   Algorithms/Reconstruction/MultishellProcessing/itkBiExpFitFunctor.h

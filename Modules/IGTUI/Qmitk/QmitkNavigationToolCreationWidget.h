@@ -26,6 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorage.h>
 #include <mitkNodePredicateDataType.h>
 
+// Qmitk headers
+#include "QmitkNavigationToolCreationAdvancedWidget.h"
+
 //ui header
 #include "ui_QmitkNavigationToolCreationWidget.h"
 
@@ -65,10 +68,10 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
 
   signals:
 
-    /** @brief This signal is emited if the user finished the creation of the tool. */
+    /** @brief This signal is emitted if the user finished the creation of the tool. */
     void NavigationToolFinished();
 
-    /** @brief This signal is emited if the user canceld the creation of the tool. */
+    /** @brief This signal is emitted if the user canceled the creation of the tool. */
     void Canceled();
 
   protected slots:
@@ -77,7 +80,9 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
     void OnFinished();
     void OnLoadSurface();
     void OnLoadCalibrationFile();
-
+    void OnShowAdvancedOptions(bool state);
+    void OnProcessDialogCloseRequest();
+    void OnRetrieveDataForManualTooltipManipulation();
 
   protected:
 
@@ -87,6 +92,8 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
     virtual void CreateQtPartControl(QWidget *parent);
 
     Ui::QmitkNavigationToolCreationWidgetControls* m_Controls;
+
+    QmitkNavigationToolCreationAdvancedWidget* m_AdvancedWidget;
 
     /** @brief holds the DataStorage */
     mitk::DataStorage* m_DataStorage;

@@ -41,14 +41,25 @@ namespace mitk
     mitkClassMacro(ConnectomicsStatisticsCalculator, itk::Object);
     itkNewMacro(Self);
 
-    itkSetObjectMacro( Network, mitk::ConnectomicsNetwork );
+    // Typedefs
+    typedef mitk::ConnectomicsNetwork::NetworkType NetworkType;
+    typedef mitk::ConnectomicsNetwork::VertexDescriptorType VertexDescriptorType;
+    typedef mitk::ConnectomicsNetwork::EdgeDescriptorType EdgeDescriptorType;
+    typedef boost::graph_traits<NetworkType>::vertex_iterator VertexIteratorType;
 
+    // Set/Get Macros
+    itkSetObjectMacro( Network, mitk::ConnectomicsNetwork );
     itkGetMacro( NumberOfVertices, unsigned int );
     itkGetMacro( NumberOfEdges, unsigned int );
     itkGetMacro( AverageDegree, double );
     itkGetMacro( ConnectionDensity, double );
     itkGetMacro( NumberOfConnectedComponents, unsigned int );
     itkGetMacro( AverageComponentSize, double );
+    itkGetMacro( Components, std::vector< int > );
+    itkGetMacro( LargestComponentSize, unsigned int );
+    itkGetMacro( RatioOfNodesInLargestComponent, double );
+    itkGetMacro( HopPlotExponent, double );
+    itkGetMacro( EffectiveHopDiameter, double );
 
     void Update();
 
@@ -70,6 +81,12 @@ namespace mitk
 
     void CalculateAverageComponentSize();
 
+    void CalculateLargestComponentSize();
+
+    void CalculateRatioOfNodesInLargestComponent();
+
+    void CalculateHopPlotValues();
+
     /////////////////////// Variables ////////////////////////
 
     // The connectomics network, which is used for statistics calculation
@@ -82,6 +99,11 @@ namespace mitk
     double m_ConnectionDensity;
     unsigned int m_NumberOfConnectedComponents;
     double m_AverageComponentSize;
+    std::vector< int > m_Components;
+    unsigned int m_LargestComponentSize;
+    double m_RatioOfNodesInLargestComponent;
+    double m_HopPlotExponent;
+    double m_EffectiveHopDiameter;
   };
 
 }// end namespace mitk

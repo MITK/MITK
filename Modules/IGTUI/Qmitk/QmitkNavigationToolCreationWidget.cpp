@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTrackingTypes.h"
 #include <mitkSTLFileReader.h>
 #include <mitkSurface.h>
+#include "mitkNavigationData.h"
 
 //qt headers
 #include <qfiledialog.h>
@@ -126,18 +127,6 @@ void QmitkNavigationToolCreationWidget::OnFinished()
   //here we create a new tool
   m_CreatedTool = mitk::NavigationTool::New();
 
-  if(m_AdvancedWidget->GetManipulatedToolTip().IsNotNull())
-  {
-    mitk::Surface::Pointer manipulatedSurface = dynamic_cast<mitk::Surface*>(
-      m_AdvancedWidget->GetManipulatedToolTip()->GetData());
-
-    mitk::Geometry3D::Pointer geo = manipulatedSurface->GetGeometry();
-    ;
-    geo->GetParametricTransform();
-    m_CreatedTool->SetToolTipOrientation();
-    m_CreatedTool->SetToolTipPosition(geo->GetCenter());
-  }
-
   //create DataNode...
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   if(m_Controls->m_Surface_Use_Sphere->isChecked())
@@ -194,6 +183,18 @@ void QmitkNavigationToolCreationWidget::OnFinished()
   {
     m_CreatedTool->SetType(mitk::NavigationTool::Unknown);
   }
+
+  if(m_AdvancedWidget->GetManipulatedToolTip().IsNotNull())
+  {
+    mitk::Surface::Pointer manipulatedSurface = dynamic_cast<mitk::Surface*>(
+      m_AdvancedWidget->GetManipulatedToolTip()->GetData());
+
+    mitk::Geometry3D::Pointer geo = manipulatedSurface->GetGeometry();
+    mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(geo->GetIndexToWorldTransform());
+    m_CreatedTool->SetToolTipOrientation(tempND->GetOrientation());
+    m_CreatedTool->SetToolTipPosition(tempND->GetPosition());
+  }
+
   emit NavigationToolFinished();
 }
 

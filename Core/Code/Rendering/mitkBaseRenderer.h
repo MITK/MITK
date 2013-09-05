@@ -26,6 +26,7 @@
 #include "mitkDisplayPositionEvent.h"
 #include "mitkWheelEvent.h"
 
+
 //#include "mitkMapper.h"
 
 #include "mitkSliceNavigationController.h"
@@ -51,6 +52,7 @@ namespace mitk
   class DataStorage;
   class Mapper;
   class BaseLocalStorageHandler;
+  class OverlayManager;
 
 //##Documentation
 //## @brief Organizes the rendering process
@@ -216,6 +218,16 @@ namespace mitk
     //##
     //## \sa m_Slice
     virtual void SetSlice(unsigned int slice);
+
+    //##Documentation
+    //## @brief Sets an OverlayManager which is used to add various Overlays to this
+    //## renderer. If an OverlayManager was already set it will be overwritten.
+    void SetOverlayManager(itk::SmartPointer<OverlayManager> overlayManager);
+
+    //##Documentation
+    //## @brief Get the OverlayManager registered with this renderer
+    //## if none was set, it will be created at this point.
+    itk::SmartPointer<OverlayManager> GetOverlayManager();
 
     itkGetConstMacro(Slice, unsigned int)
 
@@ -478,6 +490,11 @@ namespace mitk
     //## @brief Sets m_CurrentWorldGeometry
     virtual void SetCurrentWorldGeometry(Geometry3D* geometry);
 
+    //##Documentation
+    //## @brief This method is called during the rendering process to update or render the Overlays
+    //## which are stored in the OverlayManager
+    void UpdateOverlays();
+
 
   private:
     //##Documentation
@@ -488,6 +505,8 @@ namespace mitk
     //## very strange when suddenly the image-slice changes its geometry).
     //## \sa SetWorldGeometry
     Geometry3D::Pointer m_WorldGeometry;
+
+    itk::SmartPointer<OverlayManager> m_OverlayManager;
 
     //##Documentation
     //## m_TimeSlicedWorldGeometry is set by SetWorldGeometry if the passed Geometry3D is a

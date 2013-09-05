@@ -62,6 +62,7 @@ endif()
 #------------------------------------------------------------------------
 
 find_package(MITK REQUIRED)
+find_package(Poco REQUIRED)
 
 # -----------------------------------------------------------------------
 # Set up include and link dirs for the executable

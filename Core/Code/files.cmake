@@ -51,6 +51,7 @@ set(H_FILES
   Common/mitkExceptionMacro.h
   Common/mitkServiceBaseObject.h
   Common/mitkTestingMacros.h
+  Common/mitkTesting.h
 
   DataManagement/mitkImageAccessByItk.h
   DataManagement/mitkImageCast.h
@@ -75,6 +76,7 @@ set(H_FILES
 
 set(CPP_FILES
   Algorithms/mitkBaseDataSource.cpp
+  Algorithms/mitkCompareImageFilter.cpp
   Algorithms/mitkDataNodeSource.cpp
   Algorithms/mitkGeometry2DDataToSurfaceFilter.cpp
   Algorithms/mitkHistogramGenerator.cpp
@@ -351,6 +353,18 @@ set(CPP_FILES
   Rendering/vtkMitkLevelWindowFilter.cpp
   Rendering/vtkNeverTranslucentTexture.cpp
   Rendering/mitkRenderingTestHelper.cpp
+
+  Rendering/mitkOverlay.cpp
+  Rendering/mitkVtkOverlay.cpp
+  Rendering/mitkVtkOverlay2D.cpp
+  Rendering/mitkVtkOverlay3D.cpp
+  Rendering/mitkOverlayManager.cpp
+  Rendering/mitkAbstractOverlayLayouter.cpp
+
+  Rendering/mitkTextOverlay2D.cpp
+  Rendering/mitkTextOverlay3D.cpp
+  Rendering/mitkLabelOverlay3D.cpp
+  Rendering/mitkOverlay2DLayouter.cpp
 
   Common/mitkException.cpp
   Common/mitkCommon.h

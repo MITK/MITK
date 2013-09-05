@@ -16,17 +16,50 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkDnDFrameWidget.h>
 
+#include <berryIPreferencesService.h>
 #include <berryPlatformUI.h>
 
-#include "mitkWorkbenchUtil.h"
+#include "internal/QmitkCommonActivator.h"
+
+#include <mitkWorkbenchUtil.h>
 
 #include <QDragEnterEvent>
 
 
+class QmitkDnDFrameWidgetPrivate
+{
+public:
+
+  berry::IPreferences::Pointer GetPreferences() const
+  {
+    berry::IPreferencesService::Pointer prefService = QmitkCommonActivator::GetInstance()->GetPreferencesService();
+    if (prefService.IsNotNull())
+    {
+      return prefService->GetSystemPreferences()->Node("/General");
+    }
+    return berry::IPreferences::Pointer(0);
+  }
+
+  bool GetOpenEditor() const
+  {
+    berry::IPreferences::Pointer prefs = GetPreferences();
+    if(prefs.IsNotNull())
+    {
+      return prefs->GetBool("OpenEditor", true);
+    }
+    return true;
+  }
+
+};
+
 QmitkDnDFrameWidget::QmitkDnDFrameWidget(QWidget *parent)
-: QWidget(parent)
+: QWidget(parent), d(new QmitkDnDFrameWidgetPrivate())
 {
   setAcceptDrops(true);
+}
+
+QmitkDnDFrameWidget::~QmitkDnDFrameWidget()
+{
 }
 
 void QmitkDnDFrameWidget::dragEnterEvent( QDragEnterEvent *event )
@@ -50,7 +83,8 @@ void QmitkDnDFrameWidget::dropEvent( QDropEvent * event )
   }
 
   mitk::WorkbenchUtil::LoadFiles(fileNames2,
-                                 berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow());
+                                 berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow(),
+                                 d->GetOpenEditor());
 
   event->accept();
 }

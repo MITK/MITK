@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageReadAccessor.h"
 #include "mitkException.h"
 
+#include "mitkImageSliceSelector.h"
+
 // itk includes
 #include <itkImage.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
@@ -276,7 +278,7 @@ int mitkImageTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(), origin),  "Testing correctness of changed origin via GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(): ");
 
   //-----------------
-  // testing spacing information and methods
+  // testing spacing information and methodsunsigned int dim[]={100,100,20};
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(imgMem->GetGeometry()->GetSpacing(), spacing), "Testing correct spacing from Geometry3D!");
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetSpacing(), spacing), "Testing correctspacing from TimeSlicedGeometry!");
 

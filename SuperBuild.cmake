@@ -39,12 +39,14 @@ endif()
 set(external_projects
   tinyxml
   ANN
+  CppUnit
   GLEW
   VTK
   ACVD
   GDCM
   CableSwig
   OpenCV
+  Poco
   ITK
   Boost
   DCMTK
@@ -68,6 +70,10 @@ set(MITK_USE_CableSwig ${MITK_USE_Python})
 if(MITK_USE_QT)
   set(MITK_USE_Qwt 1)
   set(MITK_USE_Qxt 1)
+endif()
+
+if(MITK_USE_BLUEBERRY)
+  set(MITK_USE_CppUnit 1)
 endif()
 
 # A list of "nice" external projects, playing well together with CMake
@@ -186,6 +192,7 @@ set(mitk_cmake_boolean_args
   MITK_BUILD_TUTORIAL # Deprecated. Use MITK_BUILD_EXAMPLES instead
   MITK_BUILD_EXAMPLES
   MITK_USE_ACVD
+  MITK_USE_CppUnit
   MITK_USE_GLEW
   MITK_USE_Boost
   MITK_USE_SYSTEM_Boost
@@ -193,6 +200,7 @@ set(mitk_cmake_boolean_args
   MITK_USE_CTK
   MITK_USE_DCMTK
   MITK_USE_OpenCV
+  MITK_USE_Poco
   MITK_USE_SOFA
   MITK_USE_Python
   MITK_USE_OpenCL
@@ -229,11 +237,13 @@ ExternalProject_Add(${proj}
     ${ITK_DEPENDS}
     # Optionnal dependencies
     ${ACVD_DEPENDS}
+    ${CppUnit_DEPENDS}
     ${GLEW_DEPENDS}
     ${Boost_DEPENDS}
     ${CTK_DEPENDS}
     ${DCMTK_DEPENDS}
     ${OpenCV_DEPENDS}
+    ${Poco_DEPENDS}
     ${SOFA_DEPENDS}
     ${MITK-Data_DEPENDS}
     ${Qwt_DEPENDS}
@@ -336,10 +346,12 @@ ExternalProject_Add(${proj}
     -Dtinyxml_DIR:PATH=${tinyxml_DIR}
     -DGLEW_DIR:PATH=${GLEW_DIR}
     -DANN_DIR:PATH=${ANN_DIR}
+    -DCppUnit_DIR:PATH=${CppUnit_DIR}
     -DVTK_DIR:PATH=${VTK_DIR}     # FindVTK expects VTK_DIR
     -DITK_DIR:PATH=${ITK_DIR}     # FindITK expects ITK_DIR
     -DACVD_DIR:PATH=${ACVD_DIR}
     -DOpenCV_DIR:PATH=${OpenCV_DIR}
+    -DPoco_DIR:PATH=${Poco_DIR}
     -DSOFA_DIR:PATH=${SOFA_DIR}
     -DGDCM_DIR:PATH=${GDCM_DIR}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}

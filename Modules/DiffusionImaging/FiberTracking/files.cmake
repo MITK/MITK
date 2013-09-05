@@ -1,7 +1,4 @@
 set(CPP_FILES
-
-  MiniApps/ctkCommandLineParser.h
-
   # DataStructures -> FiberBundleX
   IODataStructures/FiberBundleX/mitkFiberBundleX.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXWriter.cpp
@@ -38,8 +35,6 @@ set(CPP_FILES
 )
 
 set(H_FILES
-  MiniApps/ctkCommandLineParser.h
-
   # Rendering
   Rendering/mitkFiberBundleXMapper3D.h
   Rendering/mitkFiberBundleXMapper2D.h

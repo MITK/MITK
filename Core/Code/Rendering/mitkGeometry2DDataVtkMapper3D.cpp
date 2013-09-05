@@ -233,7 +233,9 @@ namespace mitk
     // visibility of each part is checked, and not only for the
     // whole assembly.
     m_ImageAssembly->VisibilityOn();
-    m_EdgeActor->VisibilityOn();
+    bool drawEdges = true;
+    this->GetDataNode()->GetBoolProperty("draw edges", drawEdges, renderer);
+    m_EdgeActor->SetVisibility(drawEdges);
 
     Geometry2DData::Pointer input = const_cast< Geometry2DData * >(this->GetInput());
 
@@ -388,7 +390,6 @@ namespace mitk
       LayerSortedActorList layerSortedActors;
 
       // Traverse the data tree to find nodes resliced by ImageMapperGL2D
-      mitk::NodePredicateOr::Pointer p = mitk::NodePredicateOr::New();
       //use a predicate to get all data nodes which are "images" or inherit from mitk::Image
       mitk::TNodePredicateDataType< mitk::Image >::Pointer predicateAllImages = mitk::TNodePredicateDataType< mitk::Image >::New();
       mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetSubset(predicateAllImages);

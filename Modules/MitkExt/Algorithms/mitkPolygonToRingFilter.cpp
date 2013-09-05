@@ -103,16 +103,16 @@ void mitk::PolygonToRingFilter::GenerateData()
 }
 
 
-//sl: Stern Letzter
-//sc: Stern Current=aktueller Stern
-//idmax: Id des Strahls des aktuellen Sterns (sc), der am besten zum ersten Strahl vom letzten Stern (sl) passt.
-//last_p: Mittelpunkt des letzten Sterns
-//cur_p: Mittelpunkt des aktuellen Sterns
+//sl: last star
+//sc: current star
+//idmax: Id of the current star ray (sc), which matchs proberly to the first ray of the last star (sl).
+//last_p: center of the last star
+//cur_p: center of the current star
 void mitk::PolygonToRingFilter::DrawCyl(vtkPoints *vPoints, vtkCellArray *polys,
                                         VectorListType &sl, VectorListType &sc, int idmax, Point3D & last_p, Point3D & cur_p)
 {
   unsigned int i;
-  //jetzt haben wir alles: sl0 wird mit sc->at(idmax) verbunden usw.
+  //now we finished:sl0 will be connected with sc->at(idmax)
   VectorListType::iterator slit=sl.begin(), scit=sc.begin(), scend=sc.end();
   scit+=idmax;
   Point3D a,b;
@@ -159,13 +159,13 @@ void mitk::PolygonToRingFilter::BuildVtkTube(vtkPoints *vPoints, vtkCellArray *p
   Vector3D axis, last_v, next_v, s;
   Point3D cur_p,last_p;
 
-  //Listen für den Stern
+  //lists for the star
   VectorListType *sl, *sc, *swp, sfirst, buf1, buf2;
   sl=&buf1; sc=&buf2;
 
   Vector3D a,b;
   Matrix3D m;
-  //Initialisierung für ersten Punkt
+  //Initialization for the first point
   //alternative1:
   //  last_v=*(vl.getLast()); next_v=*vit.current(); axis=last_v+next_v; s.cross(last_v,next_v); s.normalize();
   //alternative2:
@@ -175,7 +175,7 @@ void mitk::PolygonToRingFilter::BuildVtkTube(vtkPoints *vPoints, vtkCellArray *p
   last_v=vecList.back(); next_v=*vit; s.SetVnlVector( vnl_cross_3d(last_v.GetVnlVector(),next_v.GetVnlVector()) ); s.Normalize();
   a=last_v; b=next_v; a.Normalize(); b.Normalize(); axis=a+b; axis.Normalize();
 
-  //Stern am ersten Punkt aufbauen
+  //build the star at the first point
   m = vnl_quaternion<mitk::ScalarType>(axis.GetVnlVector(),2*vnl_math::pi/(double)m_RingResolution).rotation_matrix_transpose();
   unsigned int i;
   for(i=0;i<m_RingResolution;++i)
@@ -187,7 +187,7 @@ void mitk::PolygonToRingFilter::BuildVtkTube(vtkPoints *vPoints, vtkCellArray *p
   last_p=*pit;
   ++pit; ++vit;
 
-  //nun die Hauptschleife über alle Punkte
+  //mainloop for all points
   for ( ; pit != pend; ++pit, ++vit )
   {
     //    cur_p=*pit.current(); last_v=next_v; next_v=*vit.current(); axis=last_v+next_v; s.cross(last_v,next_v); s.normalize();
@@ -195,7 +195,7 @@ void mitk::PolygonToRingFilter::BuildVtkTube(vtkPoints *vPoints, vtkCellArray *p
     //    axis=next_v-last_v; axis.normalize(); aa.set(s, M_PI/2.0); m.set(aa); m.transform(&axis);
     a=last_v; b=next_v; a.Normalize(); b.Normalize(); axis=a+b; axis.Normalize();
 
-    //neuen Stern sc (SternCurrent) bauen und dabei Start für neuen Stern suchen
+    //build new star sc(currentStar) during searching for a start point for the new star
     double max=0; int idmax=0; Vector3D sl0=*(sl->begin());
     m = vnl_quaternion<mitk::ScalarType>(axis.GetVnlVector(),2*vnl_math::pi/(double)m_RingResolution).rotation_matrix_transpose();
     for(i=0;i<m_RingResolution;++i)
@@ -210,19 +210,19 @@ void mitk::PolygonToRingFilter::BuildVtkTube(vtkPoints *vPoints, vtkCellArray *p
       s=m*s;
     }
 
-    //sl: Stern Letzter
-    //sc: Stern Current=aktueller Stern
-    //idmax: Id des Strahls des aktuellen Sterns (sc), der am besten zum ersten Strahl vom letzten Stern (sl) passt.
-    //last_p: Mittelpunkt des letzten Sterns
-    //cur_p: Mittelpunkt des aktuellen Sterns
+    //sl: last star
+    //sc: current star
+    //idmax: Id of the current star ray (sc), which matchs proberly to the first ray of the last star (sl).
+    //last_p: center of the last star
+    //cur_p: center of the current star
     DrawCyl(vPoints, polys, *sl, *sc, idmax, last_p, cur_p);
 
-    //Übergang zum nächsten
+    //Crossover to the next
     last_p=cur_p;
     swp=sl; sl=sc; sc=swp; sc->clear();
   }
 
-  //idmax für Verbindung ersten mit letztem ausrechnen:
+  //calcutate idmax for connection:
   double max=0; int idmax=0; Vector3D sl0=*(sl->begin());
   for(i=0;i<m_RingResolution;++i)
   {

@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionImageToDiffusionImageFilter.h"
 
 #include <itkAccumulateImageFilter.h>
+#include <itkExtractImageFilter.h>
+
 #include "mitkITKImageImport.h"
 
 namespace mitk
@@ -49,6 +51,11 @@ public:
 
   itkNewMacro(Self)
 
+  itkGetMacro( Steps, unsigned long )
+  itkGetMacro( CurrentStep, unsigned long )
+  itkGetMacro( IsInValidState, bool)
+  itkSetMacro( AbortRegistration, bool )
+
   // public typedefs
   typedef typename Superclass::InputImageType         DiffusionImageType;
   typedef typename Superclass::InputImagePointerType  DiffusionImagePointerType;
@@ -61,6 +68,11 @@ protected:
   virtual ~DWIHeadMotionCorrectionFilter() {}
 
   virtual void GenerateData();
+
+  unsigned long   m_Steps;
+  unsigned long   m_CurrentStep;
+  bool            m_IsInValidState;       ///< Whether the filter is in a valid state, false if error occured
+  bool            m_AbortRegistration;        ///< set flag to abort
 
   /**
    * @brief Averages an 3d+t image along the time axis.
@@ -76,23 +88,35 @@ protected:
     // input 3d+t --> output 3d
     typedef itk::Image< TPixel, 4> InputItkType;
     typedef itk::Image< TPixel, 3> OutputItkType;
-    typedef typename itk::AccumulateImageFilter< InputItkType, OutputItkType > FilterType;
+    // the accumulate filter requires the same dimension in output and input image
+    typedef typename itk::AccumulateImageFilter< InputItkType, InputItkType > FilterType;
 
     typename FilterType::Pointer filter = FilterType::New();
     filter->SetInput( image );
     filter->SetAccumulateDimension( 3 );
     filter->SetAverage( true );
 
+    // we need to extract the volume to reduce the size from 4 to 3 for further processing
+    typedef typename itk::ExtractImageFilter< InputItkType, OutputItkType > ExtractFilterType;
+    typename ExtractFilterType::Pointer extractor = ExtractFilterType::New();
+    extractor->SetInput( filter->GetOutput() );
+    extractor->SetDirectionCollapseToIdentity();
+
+    typename InputItkType::RegionType extractRegion = image->GetLargestPossibleRegion();
+    // crop out the time axis
+    extractRegion.SetSize( 3, 0);
+    extractor->SetExtractionRegion( extractRegion );
+
     try
     {
-      filter->Update();
+      extractor->Update();
     }
     catch( const itk::ExceptionObject& e)
     {
       mitkThrow() << " Exception while averaging: " << e.what();
     }
 
-    output = mitk::GrabItkImageMemory( filter->GetOutput() );
+    output = mitk::GrabItkImageMemory( extractor->GetOutput() );
   }
 
 };

@@ -48,6 +48,7 @@ set(_plugins
   org.mitk.gui.qt.moviemaker
   org.mitk.gui.qt.basicimageprocessing
   org.mitk.gui.qt.registration
+  org.mitk.gui.qt.properties
 )
 
 # Plug-ins listed below will not be

@@ -192,9 +192,13 @@ int Start(int argc, char* argv[])
                 flipper->SetFlipAxes(flipAxes);
                 flipper->Update();
                 itk::Image< float, 4 >::Pointer flipped = flipper->GetOutput();
-                flipped->SetDirection(itkImage->GetDirection());
-                flipped->SetOrigin(itkImage->GetOrigin());
+                itk::Matrix< double,4,4 > m = itkImage->GetDirection(); m[0][0] *= -1; m[1][1] *= -1;
+                flipped->SetDirection(m);
 
+                itk::Point< float, 4 > o = itkImage->GetOrigin();
+                o[0] -= (flipped->GetLargestPossibleRegion().GetSize(0)-1);
+                o[1] -= (flipped->GetLargestPossibleRegion().GetSize(1)-1);
+                flipped->SetOrigin(o);
                 converter->SetInputImage(flipped);
             }
 

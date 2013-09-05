@@ -427,6 +427,7 @@ void QmitkOdfMaximaExtractionView::StartTensor()
         QString name(m_TensorImageNodes.at(0)->GetName().c_str());
         name += "_PrincipalDirection";
         node->SetName(name.toStdString().c_str());
+        node->SetVisibility(false);
         GetDataStorage()->Add(node);
     }
 

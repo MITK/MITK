@@ -50,6 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "qwidgetaction.h"
 #include "qcolordialog.h"
+#include <itkMultiThreader.h>
 
 #define ROUND(a) ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -484,6 +485,7 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
 {
   currentThickSlicesMode = 1;
   m_MyMenu = NULL;
+  itk::MultiThreader::SetGlobalDefaultNumberOfThreads(itk::MultiThreader::GetGlobalMaximumNumberOfThreads());
 }
 
 QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView(const QmitkControlVisualizationPropertiesView& other)

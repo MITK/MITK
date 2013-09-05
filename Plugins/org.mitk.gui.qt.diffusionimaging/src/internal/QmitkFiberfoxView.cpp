@@ -1482,7 +1482,7 @@ void QmitkFiberfoxView::GenerateImage()
         tractsToDwiFilter->SetInterpolationShrink(m_ImageGenParameters.interpolationShrink);
         tractsToDwiFilter->SetFiberRadius(m_ImageGenParameters.axonRadius);
         tractsToDwiFilter->SetSignalScale(m_ImageGenParameters.signalScale);
-        if (m_ImageGenParameters.interpolationShrink)
+        if (m_ImageGenParameters.interpolationShrink>0)
             tractsToDwiFilter->SetUseInterpolation(true);
         tractsToDwiFilter->SetTissueMask(m_ImageGenParameters.tissueMaskImage);
         tractsToDwiFilter->SetFrequencyMap(m_ImageGenParameters.frequencyMap);

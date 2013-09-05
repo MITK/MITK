@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "MiniAppManager.h"
+#include <itkMultiThreader.h>
 
 MiniAppManager* MiniAppManager::GetInstance()
 {
@@ -27,6 +28,7 @@ MiniAppManager* MiniAppManager::GetInstance()
 // the app will be run
 int MiniAppManager::RunMiniApp(int argc, char* argv[])
 {
+    itk::MultiThreader::SetGlobalDefaultNumberOfThreads(itk::MultiThreader::GetGlobalMaximumNumberOfThreads());
     try
     {
         std::string nameOfMiniApp;

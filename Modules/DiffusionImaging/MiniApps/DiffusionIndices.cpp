@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkCommandLineParser.h"
 #include <boost/algorithm/string.hpp>
 #include <itksys/SystemTools.hxx>
+#include <itkMultiThreader.h>
 
 /**
  * Calculate indices derived from Qball or tensor images

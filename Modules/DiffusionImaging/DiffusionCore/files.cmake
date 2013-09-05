@@ -65,6 +65,7 @@ set(CPP_FILES
 
 
   # MultishellProcessing
+  Algorithms/Reconstruction/MultishellProcessing/itkDWIvoxelFunctor.cpp
   Algorithms/Reconstruction/MultishellProcessing/itkADCAverageFunctor.cpp
   Algorithms/Reconstruction/MultishellProcessing/itkADCFitFunctor.cpp
   Algorithms/Reconstruction/MultishellProcessing/itkKurtosisFitFunctor.cpp

@@ -26,7 +26,5 @@
 /**
   \defgroup MITKTestingAPI MITK Testing
 
-  \brief This group includes all useful methods for testing.
-
-   In this group, the API documentation of the methods for testing. The more general concepts of Testing in MITK are described on the \ref GeneralTests page.
+  \brief In this group, the API documentation of methods useful for testing is collected. The more general concepts of testing in MITK are described on the \ref GeneralTests page.
 */

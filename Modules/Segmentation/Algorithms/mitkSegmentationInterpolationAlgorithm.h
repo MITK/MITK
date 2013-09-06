@@ -57,10 +57,7 @@ class Segmentation_EXPORT SegmentationInterpolationAlgorithm : public itk::Objec
     virtual void Interpolate(Image::ConstPointer lowerSlice, unsigned int lowerSliceIndex,
                                        Image::ConstPointer upperSlice, unsigned int upperSliceIndex,
                                        unsigned int requestedIndex,
-                                       unsigned int sliceDimension,
-                                       Image* resultImage,
-                                       unsigned int timeStep = 0,
-                                       Image::Pointer referenceImage = NULL) = 0;
+                                       Image* resultImage) = 0;
 };
 
 } // namespace

@@ -123,6 +123,8 @@ class Segmentation_EXPORT SegTool2D : public Tool
     */
     Image::Pointer GetAffectedReferenceSlice(const PositionEvent*);
 
+    void PasteSegmentation( Image* targetSlice, Image* sourceSlice, int paintingPixelValue, int timestep );
+
     void WriteBackSegmentationResult (const PositionEvent*, Image*);
 
     void WriteBackSegmentationResult (const PlaneGeometry* planeGeometry, Image*, unsigned int timeStep);
@@ -135,7 +137,6 @@ class Segmentation_EXPORT SegTool2D : public Tool
     unsigned int AddContourmarker ( const PositionEvent* );
 
     void InteractiveSegmentationBugMessage( const std::string& message );
-
 
     BaseRenderer*         m_LastEventSender;
     unsigned int          m_LastEventSlice;
@@ -150,6 +151,9 @@ class Segmentation_EXPORT SegTool2D : public Tool
 
     DiffSliceOperation* m_doOperation;
     DiffSliceOperation* m_undoOperation;
+
+    template<typename TPixel, unsigned int VImageDimension>
+    void ItkPasteSegmentation( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, int pixelvalue );
 };
 
 } // namespace

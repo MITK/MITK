@@ -46,10 +46,7 @@ class Segmentation_EXPORT ShapeBasedInterpolationAlgorithm : public Segmentation
     void Interpolate(Image::ConstPointer lowerSlice, unsigned int lowerSliceIndex,
                                Image::ConstPointer upperSlice, unsigned int upperSliceIndex,
                                unsigned int requestedIndex,
-                               unsigned int sliceDimension,
-                               Image* resultImage,
-                               unsigned int timeStep,
-                               Image::Pointer referenceImage);
+                               Image* resultImage);
 };
 
 } // namespace

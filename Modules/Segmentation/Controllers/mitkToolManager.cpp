@@ -478,6 +478,16 @@ int mitk::ToolManager::GetActiveLabelIndex()
   return lsImage->GetActiveLabelIndex();
 }
 
+const mitk::Label* mitk::ToolManager::GetActiveLabel()
+{
+  if (m_WorkingData.empty()) return NULL;
+
+  mitk::LabelSetImage* lsImage = dynamic_cast< mitk::LabelSetImage* > ( m_WorkingData.at(0)->GetData() );
+  if (!lsImage) return NULL;
+
+  return lsImage->GetActiveLabel();
+}
+
 bool mitk::ToolManager::GetLabelLocked(int index)
 {
   if (m_WorkingData.empty()) return -1;

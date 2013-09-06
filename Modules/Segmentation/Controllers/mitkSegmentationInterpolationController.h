@@ -164,8 +164,6 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     template < typename TPixel, unsigned int VImageDimension >
     void ScanImageITKProcessing( itk::Image<TPixel, VImageDimension>*, unsigned int timeStep );
 
-    void PrintStatus();
-
     /**
       An array that of flags. One for each dimension of the image. A flag is set, when a slice in a certain dimension
       has at least one pixel that is not 0 (which would mean that it has to be considered by the interpolation algorithm).
@@ -179,7 +177,6 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     LabelSetImage::Pointer m_WorkingImage;
     Image::Pointer m_ReferenceImage;
 
-    int m_ActiveLabel;
     int m_NumberOfLabels;
     int m_CurrentNumberOfLabels;
 };

@@ -17,13 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkFastMarchingTool_h_Included
 #define mitkFastMarchingTool_h_Included
 
-#include "mitkFeedbackContourTool.h"
+#include "mitkSegTool2D.h"
 #include "mitkLegacyAdaptors.h"
 #include "SegmentationExports.h"
 #include "mitkDataNode.h"
 #include "mitkPointSet.h"
 #include "mitkToolCommand.h"
 #include "mitkPositionEvent.h"
+#include "mitkLabelSetImage.h"
 
 #include "itkImage.h"
 
@@ -49,11 +50,11 @@ namespace mitk
 
   For detailed documentation see ITK Software Guide section 9.3.1 Fast Marching Segmentation.
 */
-class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
+class Segmentation_EXPORT FastMarchingTool : public SegTool2D
 {
   public:
 
-    mitkClassMacro(FastMarchingTool, FeedbackContourTool);
+    mitkClassMacro(FastMarchingTool, SegTool2D);
     itkNewMacro(FastMarchingTool);
 
     /* typedefs for itk pipeline */
@@ -70,12 +71,11 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     typedef FastMarchingFilterType::NodeContainer                                                       NodeContainer;
     typedef FastMarchingFilterType::NodeType                                                            NodeType;
 
-
     /* icon stuff */
-    virtual const char** GetXPM() const;
-    virtual const char* GetName() const;
+    const char** GetXPM() const;
+    const char* GetName() const;
 
-    virtual ModuleResource GetCursorIconResource() const;
+    ModuleResource GetCursorIconResource() const;
     ModuleResource GetIconResource() const;
 
     /// \brief Set parameter used in Threshold filter.
@@ -97,16 +97,16 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     void SetBeta(double);
 
     /// \brief Adds the feedback image to the current working image.
-    virtual void ConfirmSegmentation();
+    void ConfirmSegmentation();
 
     /// \brief Set the working time step.
-    virtual void SetCurrentTimeStep(int t);
-
-    /// \brief Clear all seed points.
-    void ClearSeeds();
+    void SetCurrentTimeStep(int t);
 
     /// \brief Updates the itk pipeline and shows the result of FastMarching.
     void Update();
+
+    /// \brief Clear all seed points.
+    void ClearSeeds();
 
   protected:
 
@@ -115,20 +115,17 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
 
     virtual float CanHandleEvent( StateEvent const *stateEvent) const;
 
-    virtual void Activated();
-    virtual void Deactivated();
-    virtual void Initialize();
+    void Activated();
+    void Deactivated();
+    void Initialize();
 
-    virtual void BuildITKPipeline();
+    void BuildITKPipeline();
 
     /// \brief Add point action of StateMachine pattern
-    virtual bool OnAddPoint (Action*, const StateEvent*);
+    bool OnAddPoint (Action*, const StateEvent*);
 
     /// \brief Delete action of StateMachine pattern
-    virtual bool OnDelete (Action*, const StateEvent*);
-
-    /// \brief Reset all relevant inputs of the itk pipeline.
-    void Reset();
+    bool OnDelete (Action*, const StateEvent*);
 
     mitk::ToolCommand::Pointer m_ProgressCommand;
 
@@ -150,9 +147,8 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
 
     NodeContainer::Pointer m_SeedContainer; //seed points for FastMarching
 
-    InternalImageType::Pointer m_ReferenceImageSliceAsITK; //the reference image as itk::Image
-
-    mitk::DataNode::Pointer m_ResultImageNode;//holds the result as a preview image
+    mitk::DataNode::Pointer  m_FeedbackNode;
+    mitk::LabelSetImage::Pointer     m_FeedbackImage;
 
     mitk::DataNode::Pointer m_SeedsAsPointSetNode;//used to visualize the seed points
     mitk::PointSet::Pointer m_SeedsAsPointSet;

@@ -42,7 +42,7 @@ QmitkLabelSetTableWidget::QmitkLabelSetTableWidget( QWidget* parent )
 m_BlockEvents(false),
 m_AutoSelectNewLabels(true),
 m_AllVisible(true),
-m_AllLocked(true),
+m_AllLocked(false),
 m_ColorSequenceRainbow(mitk::ColorSequenceRainbow::New())
 {
   m_ColorSequenceRainbow->GoToBegin();
@@ -466,43 +466,36 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
               QAction* mergeAction = new QAction(QIcon(":/QmitkExt/mergelabels.png"), "Merge selected labels", this );
               mergeAction->setEnabled(true);
               QObject::connect( mergeAction, SIGNAL( triggered(bool) ), this, SLOT( OnMergeLabels(bool) ) );
-
               menu->addAction(mergeAction);
 
               QAction* removeLabelsAction = new QAction(QIcon(":/QmitkExt/removelabel.png"), "Remove selected labels", this );
               removeLabelsAction->setEnabled(true);
               QObject::connect( removeLabelsAction, SIGNAL( triggered(bool) ), this, SLOT( OnRemoveLabels(bool) ) );
-
               menu->addAction(removeLabelsAction);
 
               QAction* eraseLabelsAction = new QAction(QIcon(":/QmitkExt/eraselabel.png"), "Erase selected labels", this );
               eraseLabelsAction->setEnabled(true);
               QObject::connect( eraseLabelsAction, SIGNAL( triggered(bool) ), this, SLOT( OnEraseLabels(bool) ) );
-
               menu->addAction(eraseLabelsAction);
 
               QAction* createSurfacesAction = new QAction(QIcon(":/QmitkExt/createsurface.png"), "Create a surface for each selected label", this );
               createSurfacesAction->setEnabled(true);
               QObject::connect( createSurfacesAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateSurfaces(bool) ) );
-
               menu->addAction(createSurfacesAction);
 
               QAction* combineAndCreateSurfaceAction = new QAction(QIcon(":/QmitkExt/createsurface.png"), "Combine and create a surface", this );
               combineAndCreateSurfaceAction->setEnabled(true);
               QObject::connect( combineAndCreateSurfaceAction, SIGNAL( triggered(bool) ), this, SLOT( OnCombineAndCreateSurface(bool) ) );
-
               menu->addAction(combineAndCreateSurfaceAction);
 
               QAction* createMasksAction = new QAction(QIcon(":/QmitkExt/createmask.png"), "Create a mask for each selected label", this );
               createMasksAction->setEnabled(true);
               QObject::connect( createMasksAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateMasks(bool) ) );
-
               menu->addAction(createMasksAction);
 
               QAction* combineAndCreateMaskAction = new QAction(QIcon(":/QmitkExt/createmask.png"), "Combine and create a mask", this );
               combineAndCreateMaskAction->setEnabled(true);
               QObject::connect( combineAndCreateMaskAction, SIGNAL( triggered(bool) ), this, SLOT( OnCombineAndCreateMask(bool) ) );
-
               menu->addAction(combineAndCreateMaskAction);
           }
           else
@@ -510,38 +503,37 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
               QAction* renameAction = new QAction(QIcon(":/QmitkExt/renamelabel.png"), "Rename...", this );
               renameAction->setEnabled(true);
               QObject::connect( renameAction, SIGNAL( triggered(bool) ), this, SLOT( OnRenameLabel(bool) ) );
-
               menu->addAction(renameAction);
 
               QAction* removeAction = new QAction(QIcon(":/QmitkExt/removelabel.png"), "Remove label", this );
               removeAction->setEnabled(true);
               QObject::connect( removeAction, SIGNAL( triggered(bool) ), this, SLOT( OnRemoveLabel(bool) ) );
-
               menu->addAction(removeAction);
 
               QAction* eraseAction = new QAction(QIcon(":/QmitkExt/eraselabel.png"), "Erase label", this );
               eraseAction->setEnabled(true);
               QObject::connect( eraseAction, SIGNAL( triggered(bool) ), this, SLOT( OnEraseLabel(bool) ) );
-
               menu->addAction(eraseAction);
 
               QAction* randomColorAction = new QAction(QIcon(":/QmitkExt/randomcolor.png"), "Random color", this );
               randomColorAction->setEnabled(true);
               QObject::connect( randomColorAction, SIGNAL( triggered(bool) ), this, SLOT( OnRandomColor(bool) ) );
-
               menu->addAction(randomColorAction);
 
               QAction* viewOnlyAction = new QAction(QIcon(":/QmitkExt/visible.png"), "View only", this );
               viewOnlyAction->setEnabled(true);
               QObject::connect( viewOnlyAction, SIGNAL( triggered(bool) ), this, SLOT( OnSetOnlyActiveLabelVisible(bool) ) );
-
               menu->addAction(viewOnlyAction);
 
               QAction* viewAllAction = new QAction(QIcon(":/QmitkExt/visible.png"), "View/Hide all", this );
               viewAllAction->setEnabled(true);
               QObject::connect( viewAllAction, SIGNAL( triggered(bool) ), this, SLOT( OnSetAllLabelsVisible(bool) ) );
-
               menu->addAction(viewAllAction);
+
+              QAction* lockAllAction = new QAction(QIcon(":/QmitkExt/lock.png"), "Lock/Unlock all", this );
+              lockAllAction->setEnabled(true);
+              QObject::connect( lockAllAction, SIGNAL( triggered(bool) ), this, SLOT( OnLockAllLabels(bool) ) );
+              menu->addAction(lockAllAction);
 
               QAction* createSurfaceAction = new QAction(QIcon(":/QmitkExt/createsurface.png"), "Create surface", this );
               createSurfaceAction->setEnabled(true);
@@ -592,11 +584,6 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
           viewAllAction->setEnabled(true);
           QObject::connect( viewAllAction, SIGNAL( triggered(bool) ), this, SLOT( OnSetAllLabelsVisible(bool) ) );
           menu->addAction(viewAllAction);
-
-          QAction* lockAllAction = new QAction(QIcon(":/QmitkExt/lock.png"), "Lock/Unlock all", this );
-          lockAllAction->setEnabled(true);
-          QObject::connect( lockAllAction, SIGNAL( triggered(bool) ), this, SLOT( OnLockAllLabels(bool) ) );
-          menu->addAction(lockAllAction);
 
           QAction* removeAllAction = new QAction(QIcon(":/QmitkExt/removelabel.png"), "Remove all", this );
           removeAllAction->setEnabled(true);

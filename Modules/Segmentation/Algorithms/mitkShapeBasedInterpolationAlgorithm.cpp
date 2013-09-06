@@ -27,15 +27,12 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
                                Image::ConstPointer lowerSlice, unsigned int lowerSliceIndex,
                                Image::ConstPointer upperSlice, unsigned int upperSliceIndex,
                                unsigned int requestedIndex,
-                               unsigned int /*sliceDimension*/, // commented variables are not used
-                               Image* resultImage,
-                               unsigned int /*timeStep*/,
-                               Image::Pointer /*referenceImage*/)
+                               Image* resultImage)
 {
   typedef itk::Image< ipMITKSegmentationTYPE, 2 > InputSliceType;
 
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  const int& activePixelValue = toolManager->GetActiveLabelIndex();
+  const int& activeLabel = toolManager->GetActiveLabelIndex();
 
   // convert these slices to the ipSegmentation data type (into an ITK image)
   itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeLowerITKSlice;
@@ -57,8 +54,8 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
 
   InputThresholdType::Pointer thresholder1 = InputThresholdType::New();
   thresholder1->SetInput(correctPixelTypeLowerITKSlice);
-  thresholder1->SetUpperThreshold( activePixelValue );
-  thresholder1->SetLowerThreshold( activePixelValue );
+  thresholder1->SetUpperThreshold( activeLabel );
+  thresholder1->SetLowerThreshold( activeLabel );
   thresholder1->SetInsideValue( 1 );
   thresholder1->SetOutsideValue( 0 );
   thresholder1->ReleaseDataFlagOn();
@@ -82,8 +79,8 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
 
   InputThresholdType::Pointer thresholder2 = InputThresholdType::New();
   thresholder2->SetInput(correctPixelTypeUpperITKSlice);
-  thresholder2->SetUpperThreshold( activePixelValue );
-  thresholder2->SetLowerThreshold( activePixelValue );
+  thresholder2->SetUpperThreshold( activeLabel );
+  thresholder2->SetLowerThreshold( activeLabel );
   thresholder2->SetInsideValue( 1 );
   thresholder2->SetOutsideValue( 0 );
   thresholder2->ReleaseDataFlagOn();
@@ -143,10 +140,12 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
     if ( sourceIterator.Get() != 0 )
     {
       if (!toolManager->GetLabelLocked(targetValue))
-        targetIterator.Set( activePixelValue );
+        targetIterator.Set( activeLabel );
     }
     else
-        targetIterator.Set( 0 );
+    {
+      targetIterator.Set( 0 );
+    }
 
     ++sourceIterator;
     ++targetIterator;

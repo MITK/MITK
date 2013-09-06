@@ -138,13 +138,6 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
     void SignalRememberContourPositions(bool);
     void SignalShowMarkerNodes(bool);
 
-  public slots:
-
-    /**
-      Call this from the outside to accept all interpolations
-    */
-   void FinishInterpolation(mitk::SliceNavigationController* slicer = NULL);
-
   protected slots:
 
     /**

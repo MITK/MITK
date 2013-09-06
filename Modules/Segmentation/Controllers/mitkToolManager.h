@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataStorage.h"
 #include "mitkWeakPointer.h"
 #include "mitkServiceReference.h"
+#include "mitkLabel.h"
 
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
@@ -224,6 +225,11 @@ class Segmentation_EXPORT ToolManager : public itk::Object
      \brief Get the index of the active label
      */
     int GetActiveLabelIndex();
+
+    /*
+     \brief Get the active label
+     */
+    const mitk::Label* GetActiveLabel();
 
     /*
      \brief Get whether the label with the given index is locked

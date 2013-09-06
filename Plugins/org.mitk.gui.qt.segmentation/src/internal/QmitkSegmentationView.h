@@ -23,15 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkSegmentationControls.h"
 
-
 class QmitkRenderWindow;
 class QCompleter;
-
 
 /**
  * \ingroup ToolManagerEtAl
  * \ingroup org_mitk_gui_qt_segmentation_internal
- * \warning Implementation of this class is split up into two .cpp files to make things more compact. Check both this file and QmitkSegmentationOrganNamesHandling.cpp
+ * \warning Implementation of this class is split up into two .cpp files to make things more compact.
+ *  Check both this file and QmitkSegmentationOrganNamesHandling.cpp
  */
 class QmitkSegmentationView : public QmitkFunctionality
 {
@@ -75,6 +74,7 @@ public:
 protected slots:
 
   void OnReferenceSelectionChanged(const mitk::DataNode* node);
+
   void OnSegmentationSelectionChanged(const mitk::DataNode* node);
 
   void OnSurfaceStamp();
@@ -82,13 +82,6 @@ protected slots:
   void OnGoToLabel( const mitk::Point3D& pos );
 
   void OnManualTool2DSelected(int id);
-  // reaction to the button "New segmentation"
-//  void CreateSegmentationFromSurface();
-
-  // called when one of "Manual", "Organ", "Lesion" pages of the QToolbox is selected
-//  void ToolboxStackPageChanged(int id);
-
-//  void OnSurfaceSelectionChanged();
 
   void OnShowMarkerNodes(bool);
 
@@ -106,7 +99,6 @@ protected:
   //void PullCurrentDataManagerSelection();
 
   // reactions to selection events from data manager (and potential other senders)
-  //void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);
   mitk::DataNode::Pointer FindFirstRegularImage( std::vector<mitk::DataNode*> nodes );
   mitk::DataNode::Pointer FindFirstSegmentation( std::vector<mitk::DataNode*> nodes );
 
@@ -153,11 +145,8 @@ protected:
 
   NodeTagMapType  m_BinaryPropertyObserverTags;
 
-  bool m_AutoSelectionEnabled;
-
   mitk::NodePredicateAnd::Pointer m_ReferencePredicate;
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
 };
 
 #endif /*QMITKsegmentationVIEW_H_*/
-

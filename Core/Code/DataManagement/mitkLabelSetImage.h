@@ -98,10 +98,6 @@ public:
 
   /**
     * \brief  */
-  virtual void ExecuteOperation(Operation* operation);
-
-  /**
-    * \brief  */
   bool Concatenate(mitk::LabelSetImage* image);
 
   /**
@@ -227,7 +223,7 @@ public:
     * \brief  */
   const mitk::Color& GetActiveLabelColor() const;
 
-  //const mitk::Label* GetActiveLabel() const;
+  const mitk::Label* GetActiveLabel() const;
 
   /**
     * \brief  */

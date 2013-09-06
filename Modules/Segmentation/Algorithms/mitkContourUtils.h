@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkContourUtilshIncludett
 #define mitkContourUtilshIncludett
 
-#include "mitkImage.h"
 #include "SegmentationExports.h"
 #include "mitkContourModel.h"
 #include "mitkImage.h"

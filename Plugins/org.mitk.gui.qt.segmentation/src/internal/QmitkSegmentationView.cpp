@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLabelSetImage.h"
 #include "mitkColormapProperty.h"
-//#include "mitkNrrdLabelSetImageWriter.h"
-//#include "mitkNrrdLabelSetImageReader.h"
 #include "mitkStatusBar.h"
 #include "mitkApplicationCursor.h"
 #include "mitkToolManagerProvider.h"
@@ -32,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSegmentationView.h"
 #include "QmitkSegmentationOrganNamesHandling.cpp"
 #include "QmitkStdMultiWidget.h"
-#include "QmitkNewSegmentationDialog.h"
 
 // us
 #include "mitkGetModuleContext.h"
@@ -88,11 +85,11 @@ void QmitkSegmentationView::Visible()
 {
   if( m_Controls )
   {
+    MITK_INFO << "QmitkSegmentationView::Visible()";
     m_Controls->m_ManualToolSelectionBox2D->SetAutoShowNamesWidth(250);
     m_Controls->m_ManualToolSelectionBox2D->setEnabled( true );
     m_Controls->m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(260);
     m_Controls->m_ManualToolSelectionBox3D->setEnabled( true );
-
 //    this->OnPatientComboBoxSelectionChanged(m_Controls->patImageSelector->GetSelectedNode());
 //    this->OnSegmentationComboBoxSelectionChanged(m_Controls->segImageSelector->GetSelectedNode());
   }
@@ -100,21 +97,33 @@ void QmitkSegmentationView::Visible()
 
 void QmitkSegmentationView::Activated()
 {
-
+  if( m_Controls )
+  {
+    MITK_INFO << "QmitkSegmentationView::Activated()";
+    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetReferenceData(m_Controls->m_cbReferenceNodeSelector->GetSelectedNode());
+    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetWorkingData(m_Controls->m_cbWorkingNodeSelector->GetSelectedNode());
+  }
 }
 
 void QmitkSegmentationView::Deactivated()
 {
-  if( m_Controls )
-  {
-    m_Controls->m_ManualToolSelectionBox2D->setEnabled( false );
-    m_Controls->m_ManualToolSelectionBox3D->setEnabled( false );
-    //deactivate all tools
-    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
+  mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
+  mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::PlanePositionManagerService>();
 
-    m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
-    m_Controls->m_SlicesInterpolator->setEnabled( false );
-  }
+  mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(context->GetService(serviceRef));
+  service->RemoveAllPlanePositions();
+
+  //deactivate all tools
+  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
+
+  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetWorkingData(NULL);
+  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetReferenceData(NULL);
+
+  m_Controls->m_ManualToolSelectionBox2D->setEnabled( false );
+  m_Controls->m_ManualToolSelectionBox3D->setEnabled( false );
+
+  m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
+  m_Controls->m_SlicesInterpolator->setEnabled( false );
 }
 
 void QmitkSegmentationView::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
@@ -157,7 +166,7 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
 
 void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
-  m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);
+
 }
 
 void QmitkSegmentationView::NodeAdded(const mitk::DataNode *node)
@@ -414,18 +423,18 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls = new Ui::QmitkSegmentationControls;
   m_Controls->setupUi(parent);
 
-  m_Controls->patImageSelector->SetDataStorage(this->GetDefaultDataStorage());
-  m_Controls->patImageSelector->SetPredicate(m_ReferencePredicate);
+  m_Controls->m_cbReferenceNodeSelector->SetDataStorage(this->GetDefaultDataStorage());
+  m_Controls->m_cbReferenceNodeSelector->SetPredicate(m_ReferencePredicate);
 
   this->UpdateWarningLabel("Please load an image");
 
-  if( m_Controls->patImageSelector->GetSelectedNode().IsNotNull() )
+  if( m_Controls->m_cbReferenceNodeSelector->GetSelectedNode().IsNotNull() )
       this->UpdateWarningLabel("Create a segmentation");
 
-  m_Controls->segImageSelector->SetDataStorage(this->GetDefaultDataStorage());
-  m_Controls->segImageSelector->SetPredicate(m_SegmentationPredicate);
-  m_Controls->segImageSelector->SetAutoSelectNewItems(true);
-  if( m_Controls->segImageSelector->GetSelectedNode().IsNotNull() )
+  m_Controls->m_cbWorkingNodeSelector->SetDataStorage(this->GetDefaultDataStorage());
+  m_Controls->m_cbWorkingNodeSelector->SetPredicate(m_SegmentationPredicate);
+  m_Controls->m_cbWorkingNodeSelector->SetAutoSelectNewItems(true);
+  if( m_Controls->m_cbWorkingNodeSelector->GetSelectedNode().IsNotNull() )
     this->UpdateWarningLabel("");
 
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
@@ -443,7 +452,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
   m_Controls->m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer2D );
   //m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' 'FastMarching2D'");
-  m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract 'Region Growing'");
+  m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract 'Region Growing' 'FastMarching2D'");
   m_Controls->m_ManualToolSelectionBox2D->SetLayoutColumns(3);
   m_Controls->m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
   connect( m_Controls->m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
@@ -462,9 +471,10 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
   // create signal/slot connections
 
-  connect( m_Controls->patImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
+  connect( m_Controls->m_cbReferenceNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
        this, SLOT( OnReferenceSelectionChanged( const mitk::DataNode* ) ) );
-  connect( m_Controls->segImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
+
+  connect( m_Controls->m_cbWorkingNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
        this, SLOT( OnSegmentationSelectionChanged( const mitk::DataNode* ) ) );
 
   connect( m_Controls->m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );

@@ -155,7 +155,7 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
 
         // just send the diff to SegmentationInterpolationController
         SegmentationInterpolationController* interpolator = SegmentationInterpolationController::InterpolatorForImage(m_Image);
-        if (interpolator)
+        if (interpolator )
         {
           interpolator->SetChangedVolume( m_SliceDifferenceImage, m_TimeStep );
         }

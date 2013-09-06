@@ -51,11 +51,6 @@ mitk::LabelSetImage::~LabelSetImage()
 {
 }
 
-void mitk::LabelSetImage::ExecuteOperation(mitk::Operation* operation)
-{
-// todo
-}
-
 void mitk::LabelSetImage::CreateDefaultLabelSet()
 {
   m_LabelSet = mitk::LabelSet::New();
@@ -445,22 +440,27 @@ void mitk::LabelSetImage::EraseLabels(std::vector<int>& indexes)
 
 std::string mitk::LabelSetImage::GetLabelName(int index)
 {
-    return this->m_LabelSet->GetLabelName(index);
+  return this->m_LabelSet->GetLabelName(index);
 }
 
 int mitk::LabelSetImage::GetActiveLabelIndex() const
 {
-    return this->m_LabelSet->GetActiveLabel()->GetIndex();
+  return this->m_LabelSet->GetActiveLabel()->GetIndex();
+}
+
+const mitk::Label* mitk::LabelSetImage::GetActiveLabel() const
+{
+  return this->m_LabelSet->GetActiveLabel();
 }
 
 const mitk::Color& mitk::LabelSetImage::GetActiveLabelColor() const
 {
-    return this->m_LabelSet->GetActiveLabel()->GetColor();
+  return this->m_LabelSet->GetActiveLabel()->GetColor();
 }
 
 bool mitk::LabelSetImage::GetLabelLocked(int index) const
 {
-    return this->m_LabelSet->GetLabelLocked(index);
+  return this->m_LabelSet->GetLabelLocked(index);
 }
 
 bool mitk::LabelSetImage::GetLabelSelected(int index) const

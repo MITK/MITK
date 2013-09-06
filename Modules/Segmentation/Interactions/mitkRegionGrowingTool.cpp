@@ -352,7 +352,6 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
   {
     DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
     if (!workingNode) return false;
-    LabelSetImage* lsImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
 
     // 1. If we have a working slice, use the contour to fill a new piece on segmentation on it (or erase a piece that was selected by ipMITKSegmentationGetCutPoints)
     if ( m_WorkingSlice.IsNotNull() && m_OriginalPicSlice )

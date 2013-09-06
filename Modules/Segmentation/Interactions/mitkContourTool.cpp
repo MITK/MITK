@@ -128,9 +128,6 @@ bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* state
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
-  assert( positionEvent->GetSender()->GetRenderWindow() );
-  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
-
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
@@ -161,7 +158,7 @@ bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* state
   ContourUtils::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue, timestep );
 
   // 6. Write back the slice into our working image
-  this->WriteBackSegmentationResult(positionEvent, slice);
+  SegTool2D::WriteBackSegmentationResult(positionEvent, slice);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 

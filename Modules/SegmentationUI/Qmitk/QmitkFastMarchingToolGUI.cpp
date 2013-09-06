@@ -309,9 +309,8 @@ void QmitkFastMarchingToolGUI::Refetch()
 
 void QmitkFastMarchingToolGUI::OnClearSeeds()
 {
-  //event from image navigator recieved - timestep has changed
-   m_FastMarchingTool->ClearSeeds();
-   this->Update();
+  m_FastMarchingTool->ClearSeeds();
+  this->Update();
 }
 
 void QmitkFastMarchingToolGUI::BusyStateChanged(bool value)

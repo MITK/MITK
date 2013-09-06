@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkConnectomicsStatisticsCalculator.h"
 
+#include <numeric>
+
 #include <boost/graph/connected_components.hpp>
 #include <boost/graph/clustering_coefficient.hpp>
 #include <boost/graph/betweenness_centrality.hpp>
@@ -60,6 +62,18 @@ mitk::ConnectomicsStatisticsCalculator::ConnectomicsStatisticsCalculator()
   , m_LargestComponentSize( 0 )
   , m_HopPlotExponent( 0.0 )
   , m_EffectiveHopDiameter( 0.0 )
+  , m_VectorOfClusteringCoefficientsC( 0 )
+  , m_VectorOfClusteringCoefficientsD( 0 )
+  , m_VectorOfClusteringCoefficientsE( 0 )
+  , m_AverageClusteringCoefficientsC( 0.0 )
+  , m_AverageClusteringCoefficientsD( 0.0 )
+  , m_AverageClusteringCoefficientsE( 0.0 )
+  , m_VectorOfVertexBetweennessCentralities( 0 )
+  , m_PropertyMapOfVertexBetweennessCentralities( )
+  , m_AverageVertexBetweennessCentrality( 0.0 )
+  , m_VectorOfEdgeBetweennessCentralities( 0 )
+  , m_PropertyMapOfEdgeBetweennessCentralities( )
+  , m_AverageEdgeBetweennessCentrality( 0.0 )
 {
 }
 
@@ -78,6 +92,8 @@ void mitk::ConnectomicsStatisticsCalculator::Update()
   CalculateLargestComponentSize();
   CalculateRatioOfNodesInLargestComponent();
   CalculateHopPlotValues();
+  CalculateClusteringCoefficients();
+  CalculateBetweennessCentrality();
 }
 
 void mitk::ConnectomicsStatisticsCalculator::CalculateNumberOfVertices()
@@ -198,4 +214,126 @@ void mitk::ConnectomicsStatisticsCalculator::CalculateHopPlotValues()
   m_EffectiveHopDiameter =
     std::pow( ( m_NumberOfVertices * m_NumberOfVertices )
     / ( m_NumberOfVertices + 2 * m_NumberOfEdges ), 1.0 / m_HopPlotExponent );
+}
+
+void mitk::ConnectomicsStatisticsCalculator::CalculateClusteringCoefficients()
+{
+  VertexIteratorType vi, vi_end;
+  std::vector<double> m_VectorOfClusteringCoefficientsC;
+  std::vector<double> m_VectorOfClusteringCoefficientsD;
+  std::vector<double> m_VectorOfClusteringCoefficientsE;
+  typedef std::set<VertexDescriptorType> NeighborSetType;
+  typedef NetworkType::out_edge_iterator OutEdgeIterType;
+
+  for(boost::tie(vi,vi_end) = boost::vertices( *(m_Network->GetBoostGraph()) ); vi!=vi_end; ++vi)
+  {
+    // Get the list of vertices which are in the neighborhood of vi.
+    std::pair<AdjacencyIteratorType, AdjacencyIteratorType> adjacent =
+      boost::adjacent_vertices(*vi, *(m_Network->GetBoostGraph()) );
+
+    //Populate a set with the neighbors of vi
+    NeighborSetType neighbors;
+    for(; adjacent.first!=adjacent.second; ++adjacent.first)
+    {
+      neighbors.insert(*adjacent.first);
+    }
+
+    // Now, count the edges between vertices in the neighborhood.
+    unsigned int neighborhood_edge_count = 0;
+    if(neighbors.size() > 0)
+    {
+      NeighborSetType::iterator iter;
+      for(iter = neighbors.begin(); iter != neighbors.end(); ++iter)
+      {
+        std::pair<OutEdgeIterType, OutEdgeIterType> oe = out_edges(*iter, *(m_Network->GetBoostGraph()) );
+        for(; oe.first != oe.second; ++oe.first)
+        {
+          if(neighbors.find(target(*oe.first, *(m_Network->GetBoostGraph()) )) != neighbors.end())
+          {
+            ++neighborhood_edge_count;
+          }
+        }
+      }
+      neighborhood_edge_count /= 2;
+    }
+    //Clustering Coefficienct C,E
+    if(neighbors.size() > 1)
+    {
+      double num   = neighborhood_edge_count;
+      double denum = neighbors.size() * (neighbors.size()-1)/2;
+      m_VectorOfClusteringCoefficientsC.push_back( num / denum);
+      m_VectorOfClusteringCoefficientsE.push_back( num / denum);
+    }
+    else
+    {
+      m_VectorOfClusteringCoefficientsC.push_back(0.0);
+    }
+
+    //Clustering Coefficienct D
+    if(neighbors.size() > 0)
+    {
+      double num   = neighbors.size() + neighborhood_edge_count;
+      double denum = ( (neighbors.size()+1) * neighbors.size()) / 2;
+      m_VectorOfClusteringCoefficientsD.push_back( num / denum);
+    }
+    else
+    {
+      m_VectorOfClusteringCoefficientsD.push_back(0.0);
+    }
+  }
+
+  // Average Clustering coefficienies:
+  m_AverageClusteringCoefficientsC = std::accumulate(m_VectorOfClusteringCoefficientsC.begin(),
+    m_VectorOfClusteringCoefficientsC.end(),
+    0.0) / m_NumberOfVertices;
+
+  m_AverageClusteringCoefficientsD = std::accumulate(m_VectorOfClusteringCoefficientsD.begin(),
+    m_VectorOfClusteringCoefficientsD.end(),
+    0.0) / m_NumberOfVertices;
+
+  m_AverageClusteringCoefficientsE = std::accumulate(m_VectorOfClusteringCoefficientsE.begin(),
+    m_VectorOfClusteringCoefficientsE.end(),
+    0.0) / m_VectorOfClusteringCoefficientsE.size();
+}
+
+void mitk::ConnectomicsStatisticsCalculator::CalculateBetweennessCentrality()
+{
+
+  // std::map used for convenient initialization
+  EdgeIndexStdMapType stdEdgeIndex;
+  // associative property map needed for iterator property map-wrapper
+  EdgeIndexMapType edgeIndex(stdEdgeIndex);
+
+  boost::graph_traits<NetworkType>::edge_iterator iterator, end;
+
+  // sets iterator to start end end to end
+  boost::tie(iterator, end) = boost::edges( *(m_Network->GetBoostGraph()) );
+
+  int i(0);
+  for ( ; iterator != end; ++iterator, ++i)
+  {
+    stdEdgeIndex.insert(std::pair< EdgeDescriptorType, int >( *iterator, i));
+  }
+
+  // Define EdgeCentralityMap
+  m_VectorOfEdgeBetweennessCentralities.resize( m_NumberOfEdges, 0.0);
+  // Create the external property map
+  m_PropertyMapOfEdgeBetweennessCentralities = EdgeIteratorPropertyMapType(m_VectorOfEdgeBetweennessCentralities.begin(), edgeIndex);
+
+  // Define VertexCentralityMap
+  VertexIndexMapType vertexIndex = get(boost::vertex_index, *(m_Network->GetBoostGraph()) );
+  m_VectorOfVertexBetweennessCentralities.resize( m_NumberOfVertices, 0.0);
+    // Create the external property map
+  m_PropertyMapOfVertexBetweennessCentralities = VertexIteratorPropertyMapType(m_VectorOfVertexBetweennessCentralities.begin(), vertexIndex);
+
+  boost::brandes_betweenness_centrality( *(m_Network->GetBoostGraph()),
+    m_PropertyMapOfVertexBetweennessCentralities, m_PropertyMapOfEdgeBetweennessCentralities );
+
+  m_AverageVertexBetweennessCentrality = std::accumulate(m_VectorOfVertexBetweennessCentralities.begin(),
+    m_VectorOfVertexBetweennessCentralities.end(),
+    0.0) / (double) m_NumberOfVertices;
+
+  m_AverageEdgeBetweennessCentrality = std::accumulate(m_VectorOfEdgeBetweennessCentralities.begin(),
+    m_VectorOfEdgeBetweennessCentralities.end(),
+    0.0) / (double) m_NumberOfEdges;
 }

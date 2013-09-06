@@ -46,6 +46,12 @@ namespace mitk
     typedef mitk::ConnectomicsNetwork::VertexDescriptorType VertexDescriptorType;
     typedef mitk::ConnectomicsNetwork::EdgeDescriptorType EdgeDescriptorType;
     typedef boost::graph_traits<NetworkType>::vertex_iterator VertexIteratorType;
+    typedef boost::graph_traits<NetworkType>::adjacency_iterator AdjacencyIteratorType;
+    typedef std::map<EdgeDescriptorType, int> EdgeIndexStdMapType;
+    typedef boost::associative_property_map< EdgeIndexStdMapType > EdgeIndexMapType;
+    typedef boost::iterator_property_map< std::vector< double >::iterator, EdgeIndexMapType > EdgeIteratorPropertyMapType;
+    typedef boost::property_map< NetworkType, boost::vertex_index_t>::type VertexIndexMapType;
+    typedef boost::iterator_property_map< std::vector< double >::iterator, VertexIndexMapType > VertexIteratorPropertyMapType;
 
     // Set/Get Macros
     itkSetObjectMacro( Network, mitk::ConnectomicsNetwork );
@@ -60,6 +66,18 @@ namespace mitk
     itkGetMacro( RatioOfNodesInLargestComponent, double );
     itkGetMacro( HopPlotExponent, double );
     itkGetMacro( EffectiveHopDiameter, double );
+    itkGetMacro( VectorOfClusteringCoefficientsC, std::vector< double > );
+    itkGetMacro( VectorOfClusteringCoefficientsD, std::vector< double > );
+    itkGetMacro( VectorOfClusteringCoefficientsE, std::vector< double > );
+    itkGetMacro( AverageClusteringCoefficientsC, double );
+    itkGetMacro( AverageClusteringCoefficientsD, double );
+    itkGetMacro( AverageClusteringCoefficientsE, double );
+    itkGetMacro( VectorOfVertexBetweennessCentralities, std::vector< double > );
+    itkGetMacro( PropertyMapOfVertexBetweennessCentralities, VertexIteratorPropertyMapType );
+    itkGetMacro( AverageVertexBetweennessCentrality, double );
+    itkGetMacro( VectorOfEdgeBetweennessCentralities, std::vector< double > );
+    itkGetMacro( PropertyMapOfEdgeBetweennessCentralities, EdgeIteratorPropertyMapType );
+    itkGetMacro( AverageEdgeBetweennessCentrality, double );
 
     void Update();
 
@@ -87,6 +105,10 @@ namespace mitk
 
     void CalculateHopPlotValues();
 
+    void CalculateClusteringCoefficients();
+
+    void CalculateBetweennessCentrality();
+
     /////////////////////// Variables ////////////////////////
 
     // The connectomics network, which is used for statistics calculation
@@ -104,6 +126,18 @@ namespace mitk
     double m_RatioOfNodesInLargestComponent;
     double m_HopPlotExponent;
     double m_EffectiveHopDiameter;
+    std::vector< double > m_VectorOfClusteringCoefficientsC;
+    std::vector< double > m_VectorOfClusteringCoefficientsD;
+    std::vector< double > m_VectorOfClusteringCoefficientsE;
+    double m_AverageClusteringCoefficientsC;
+    double m_AverageClusteringCoefficientsD;
+    double m_AverageClusteringCoefficientsE;
+    std::vector< double > m_VectorOfVertexBetweennessCentralities;
+    VertexIteratorPropertyMapType m_PropertyMapOfVertexBetweennessCentralities;
+    double m_AverageVertexBetweennessCentrality;
+    std::vector< double > m_VectorOfEdgeBetweennessCentralities;
+    EdgeIteratorPropertyMapType m_PropertyMapOfEdgeBetweennessCentralities;
+    double m_AverageEdgeBetweennessCentrality;
   };
 
 }// end namespace mitk

@@ -78,6 +78,22 @@ namespace mitk
     itkGetMacro( VectorOfEdgeBetweennessCentralities, std::vector< double > );
     itkGetMacro( PropertyMapOfEdgeBetweennessCentralities, EdgeIteratorPropertyMapType );
     itkGetMacro( AverageEdgeBetweennessCentrality, double );
+    itkGetMacro( NumberOfIsolatedPoints, unsigned int );
+    itkGetMacro( RatioOfIsolatedPoints, double );
+    itkGetMacro( NumberOfEndPoints, unsigned int );
+    itkGetMacro( RatioOfEndPoints, double );
+    itkGetMacro( VectorOfEccentrities, std::vector< int > );
+    itkGetMacro( VectorOfEccentrities90, std::vector< int > );
+    itkGetMacro( VectorOfAveragePathLengths, std::vector< double > );
+    itkGetMacro( Diameter, unsigned int );
+    itkGetMacro( Diameter90, unsigned int );
+    itkGetMacro( Radius, unsigned int );
+    itkGetMacro( Radius90, unsigned int );
+    itkGetMacro( AverageEccentricity, double );
+    itkGetMacro( AverageEccentricity90, double );
+    itkGetMacro( AveragePathLength, double );
+    itkGetMacro( NumberOfCentralPoints, unsigned int );
+    itkGetMacro( RatioOfCentralPoints, double );
 
     void Update();
 
@@ -109,6 +125,10 @@ namespace mitk
 
     void CalculateBetweennessCentrality();
 
+    void CalculateIsolatedAndEndPoints();
+
+    void CalculateShortestPathMetrics();
+
     /////////////////////// Variables ////////////////////////
 
     // The connectomics network, which is used for statistics calculation
@@ -138,6 +158,22 @@ namespace mitk
     std::vector< double > m_VectorOfEdgeBetweennessCentralities;
     EdgeIteratorPropertyMapType m_PropertyMapOfEdgeBetweennessCentralities;
     double m_AverageEdgeBetweennessCentrality;
+    unsigned int m_NumberOfIsolatedPoints;
+    double m_RatioOfIsolatedPoints;
+    unsigned int m_NumberOfEndPoints;
+    double m_RatioOfEndPoints;
+    std::vector< int > m_VectorOfEccentrities;
+    std::vector< int > m_VectorOfEccentrities90;
+    std::vector< double > m_VectorOfAveragePathLengths;
+    unsigned int m_Diameter;
+    unsigned int m_Diameter90;
+    unsigned int m_Radius;
+    unsigned int m_Radius90;
+    double m_AverageEccentricity;
+    double m_AverageEccentricity90;
+    double m_AveragePathLength;
+    unsigned int m_NumberOfCentralPoints;
+    double m_RatioOfCentralPoints;
   };
 
 }// end namespace mitk

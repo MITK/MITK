@@ -74,6 +74,22 @@ mitk::ConnectomicsStatisticsCalculator::ConnectomicsStatisticsCalculator()
   , m_VectorOfEdgeBetweennessCentralities( 0 )
   , m_PropertyMapOfEdgeBetweennessCentralities( )
   , m_AverageEdgeBetweennessCentrality( 0.0 )
+  , m_NumberOfIsolatedPoints( 0 )
+  , m_RatioOfIsolatedPoints( 0.0 )
+  , m_NumberOfEndPoints( 0 )
+  , m_RatioOfEndPoints( 0.0 )
+  , m_VectorOfEccentrities( 0 )
+  , m_VectorOfEccentrities90( 0 )
+  , m_VectorOfAveragePathLengths( 0.0 )
+  , m_Diameter( 0 )
+  , m_Diameter90( 0 )
+  , m_Radius( 0 )
+  , m_Radius90( 0 )
+  , m_AverageEccentricity( 0.0 )
+  , m_AverageEccentricity90( 0.0 )
+  , m_AveragePathLength( 0.0 )
+  , m_NumberOfCentralPoints( 0 )
+  , m_RatioOfCentralPoints( 0.0 )
 {
 }
 
@@ -94,6 +110,8 @@ void mitk::ConnectomicsStatisticsCalculator::Update()
   CalculateHopPlotValues();
   CalculateClusteringCoefficients();
   CalculateBetweennessCentrality();
+  CalculateIsolatedAndEndPoints();
+  CalculateShortestPathMetrics();
 }
 
 void mitk::ConnectomicsStatisticsCalculator::CalculateNumberOfVertices()
@@ -298,7 +316,6 @@ void mitk::ConnectomicsStatisticsCalculator::CalculateClusteringCoefficients()
 
 void mitk::ConnectomicsStatisticsCalculator::CalculateBetweennessCentrality()
 {
-
   // std::map used for convenient initialization
   EdgeIndexStdMapType stdEdgeIndex;
   // associative property map needed for iterator property map-wrapper
@@ -323,7 +340,7 @@ void mitk::ConnectomicsStatisticsCalculator::CalculateBetweennessCentrality()
   // Define VertexCentralityMap
   VertexIndexMapType vertexIndex = get(boost::vertex_index, *(m_Network->GetBoostGraph()) );
   m_VectorOfVertexBetweennessCentralities.resize( m_NumberOfVertices, 0.0);
-    // Create the external property map
+  // Create the external property map
   m_PropertyMapOfVertexBetweennessCentralities = VertexIteratorPropertyMapType(m_VectorOfVertexBetweennessCentralities.begin(), vertexIndex);
 
   boost::brandes_betweenness_centrality( *(m_Network->GetBoostGraph()),
@@ -336,4 +353,185 @@ void mitk::ConnectomicsStatisticsCalculator::CalculateBetweennessCentrality()
   m_AverageEdgeBetweennessCentrality = std::accumulate(m_VectorOfEdgeBetweennessCentralities.begin(),
     m_VectorOfEdgeBetweennessCentralities.end(),
     0.0) / (double) m_NumberOfEdges;
+}
+
+void mitk::ConnectomicsStatisticsCalculator::CalculateIsolatedAndEndPoints()
+{
+  m_NumberOfIsolatedPoints = 0;
+  m_NumberOfEndPoints = 0;
+
+  VertexIteratorType vi, vi_end;
+  for( boost::tie(vi,vi_end) = boost::vertices( *(m_Network->GetBoostGraph()) ); vi!=vi_end; ++vi)
+  {
+    int degree = boost::out_degree(*vi, *(m_Network->GetBoostGraph()) );
+    if(degree == 0)
+    {
+      m_NumberOfIsolatedPoints++;
+    }
+    else if (degree == 1)
+    {
+      m_NumberOfEndPoints++;
+    }
+  }
+
+  m_RatioOfEndPoints = (double) m_NumberOfEndPoints / (double) m_NumberOfVertices;
+  m_RatioOfIsolatedPoints = (double) m_NumberOfIsolatedPoints / (double) m_NumberOfVertices;
+}
+
+
+/**
+* Calculates Shortest Path Related metrics of the graph.  The
+* function runs a BFS from each node to find out the shortest
+* distances to other nodes in the graph. The maximum of this distance
+* is called the eccentricity of that node. The maximum eccentricity
+* in the graph is called diameter and the minimum eccentricity is
+* called the radius of the graph.  Central points are those nodes
+* having eccentricity equals to radius.
+*/
+void mitk::ConnectomicsStatisticsCalculator::CalculateShortestPathMetrics()
+{
+  //for all vertices:
+  VertexIteratorType vi, vi_end;
+
+  //store the eccentricities in a vector.
+  m_VectorOfEccentrities.resize( m_NumberOfVertices );
+  m_VectorOfEccentrities90.resize( m_NumberOfVertices );
+  m_VectorOfAveragePathLengths.resize( m_NumberOfVertices );
+
+  //assign diameter and radius while iterating over the ecccencirities.
+  m_Diameter              = 0;
+  m_Diameter90            = 0;
+  m_Radius                = std::numeric_limits<unsigned int>::max();
+  m_Radius90              = std::numeric_limits<unsigned int>::max();
+  m_AverageEccentricity   = 0.0;
+  m_AverageEccentricity90 = 0.0;
+  m_AveragePathLength     = 0.0;
+
+  //The size of the giant connected component so far.
+  unsigned int giant_component_size = 0;
+  VertexDescriptorType radius_src;
+
+  //Loop over the vertices
+  for( boost::tie(vi, vi_end) = boost::vertices( *(m_Network->GetBoostGraph()) ); vi!=vi_end; ++vi)
+  {
+    //We are going to start a BFS, initialize the neccessary
+    //structures for that.  Store the distances of nodes from the
+    //source in distance vector. The maximum distance is stored in
+    //max. The BFS will start from the node that vi is pointing, that
+    //is the src is *vi. We also init the distance of the src node to
+    //itself to 0. size gives the number of nodes discovered during
+    //this BFS.
+    std::vector<int> distances( m_NumberOfVertices );
+    int max_distance = 0;
+    VertexDescriptorType src = *vi;
+    distances[src] = 0;
+    unsigned int size = 0;
+
+    breadth_first_search(*(m_Network->GetBoostGraph()), src,
+      visitor(all_pairs_shortest_recorder<NetworkType>
+      (&distances[0], max_distance, size)));
+    // vertex vi has eccentricity equal to max_distance
+    m_VectorOfEccentrities[src] = max_distance;
+
+    //check whether there is any change in the diameter or the radius.
+    //note that the diameter we are calculating here is also the
+    //diameter of the giant connected component!
+    if(m_VectorOfEccentrities[src] > m_Diameter)
+    {
+      m_Diameter = m_VectorOfEccentrities[src];
+    }
+
+    //The radius should be calculated on the largest connected
+    //component, otherwise it is very likely that radius will be 1.
+    //We change the value of the radius only if this is the giant
+    //connected component so far. After all the eccentricities are
+    //found we should loop over this connected component and find the
+    //minimum eccentricity which is the radius. So we keep the src
+    //node, so that we can find the connected component later on.
+    if(size > giant_component_size)
+    {
+      giant_component_size = size;
+      radius_src = src;
+    }
+
+    //Calculate in how many hops we can reach 90 percent of the
+    //nodes. We store the number of hops we can reach in h hops in the
+    //bucket vector. That is bucket[h] gives the number of nodes
+    //reachable in exactly h hops. sum of bucket[i<h] gives the number
+    //of nodes that are reachable in less than h hops. We also
+    //calculate sum of the distances from this node to every single
+    //other node in the graph.
+    int reachable90 = std::ceil((double)size * 0.9);
+    std::vector <int> bucket (max_distance+1);
+    int counter = 0;
+    for(unsigned int i=0; i<distances.size(); i++)
+    {
+      if(distances[i]>0)
+      {
+        bucket[distances[i]]++;
+        m_VectorOfAveragePathLengths[src] += distances[i];
+        counter ++;
+      }
+    }
+    if(counter > 0)
+    {
+      m_VectorOfAveragePathLengths[src] = m_VectorOfAveragePathLengths[src] / counter;
+    }
+
+    int eccentricity90 = 0;
+    while(reachable90 > 0)
+    {
+      eccentricity90 ++;
+      reachable90 = reachable90 - bucket[eccentricity90];
+    }
+    // vertex vi has eccentricity90 equal to eccentricity90
+    m_VectorOfEccentrities90[src] = eccentricity90;
+    if(m_VectorOfEccentrities90[src] > m_Diameter90)
+    {
+      m_Diameter90 = m_VectorOfEccentrities90[src];
+    }
+  }
+
+  //We are going to calculate the radius now. We stored the src node
+  //that when we start a BFS gives the giant connected component, and
+  //we have the eccentricities calculated. Iterate over the nodes of
+  //this giant component and find the minimum eccentricity.
+  std::vector<int> component( m_NumberOfVertices );
+  boost::connected_components( *(m_Network->GetBoostGraph()), &component[0]);
+  for (unsigned int i=0; i<component.size(); i++)
+  {
+    //If we are in the same component and the radius is not the
+    //minimum so far store the eccentricity as the radius.
+    if( component[i] == component[radius_src])
+    {
+      if(m_Radius > m_VectorOfEccentrities[i])
+      {
+        m_Radius = m_VectorOfEccentrities[i];
+      }
+      if(m_Radius90 > m_VectorOfEccentrities90[i])
+      {
+        m_Radius90 = m_VectorOfEccentrities90[i];
+      }
+    }
+  }
+
+  m_AverageEccentricity = std::accumulate(m_VectorOfEccentrities.begin(),
+    m_VectorOfEccentrities.end(), 0.0) / m_NumberOfVertices;
+
+  m_AverageEccentricity90 = std::accumulate(m_VectorOfEccentrities90.begin(),
+    m_VectorOfEccentrities90.end(), 0.0) / m_NumberOfVertices;
+
+  m_AveragePathLength = std::accumulate(m_VectorOfAveragePathLengths.begin(),
+    m_VectorOfAveragePathLengths.end(), 0.0) / m_NumberOfVertices;
+
+  //calculate Number of Central Points, nodes having eccentricity = radius.
+  m_NumberOfCentralPoints = 0;
+  for (boost::tie(vi, vi_end) = boost::vertices( *(m_Network->GetBoostGraph()) ); vi != vi_end; ++vi)
+  {
+    if(m_VectorOfEccentrities[*vi] == m_Radius)
+    {
+      m_NumberOfCentralPoints++;
+    }
+  }
+  m_RatioOfCentralPoints = (double)m_NumberOfCentralPoints / m_NumberOfVertices;
 }

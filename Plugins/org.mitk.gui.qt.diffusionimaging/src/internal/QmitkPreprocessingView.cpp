@@ -276,7 +276,7 @@ void QmitkPreprocessingView::DoAKCFit()
 
 void QmitkPreprocessingView::DoADCFit()
 {
-// later
+  // later
 }
 
 void QmitkPreprocessingView::DoADCAverage()
@@ -401,7 +401,7 @@ void QmitkPreprocessingView::UpdateBValueTableWidget(int i)
         m_Controls->m_ReductionFrame->layout()->addWidget(checkBox);
 
         spinBox = new QSpinBox();
-        spinBox->setValue(std::ceil((float)it->second.size()/2));
+        spinBox->setValue(std::ceil((float)it->second.size()));
         spinBox->setMaximum(it->second.size());
         spinBox->setMinimum(0);
         m_ReduceGradientSpinboxes.push_back(spinBox);
@@ -666,12 +666,22 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
   imageNode->SetData( image );
   QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
 
-  foreach(QSpinBox* box, m_ReduceGradientSpinboxes)
-  {
-    name += "_";
-    name += QString::number(box->value());
-  }
 
+  QList<QSpinBox*>::iterator itSpinBox = m_ReduceGradientSpinboxes.begin();
+  QList<QCheckBox*>::iterator itCheckBox = m_ReduceGradientCheckboxes.begin();
+  while(itSpinBox != m_ReduceGradientSpinboxes.end() && itCheckBox != m_ReduceGradientCheckboxes.end())
+  {
+
+    name += "_";
+    if((*itCheckBox)->isChecked()){
+      name += QString::number((*itSpinBox)->value());
+    }else
+    {
+      name += QString::number(0);
+    }
+    ++itSpinBox;
+    ++itCheckBox;
+  }
   imageNode->SetName(name.toStdString().c_str());
   GetDefaultDataStorage()->Add(imageNode);
 }

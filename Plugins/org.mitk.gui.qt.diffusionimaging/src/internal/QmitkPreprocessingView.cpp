@@ -245,7 +245,7 @@ void QmitkPreprocessingView::DoBiExpFit()
     const double targetBValue = bValueList.mean();
     functor->setListOfBValues(bValueList);
     functor->setTargetBValue(targetBValue);
-    CallMultishellToSingleShellFilter(functor,inImage,name + "_ADC");
+    CallMultishellToSingleShellFilter(functor,inImage,name + "_BiExp");
   }
 }
 

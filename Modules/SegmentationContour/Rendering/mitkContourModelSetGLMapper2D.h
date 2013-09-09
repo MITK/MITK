@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationContourExports.h"
 #include "mitkGLMapper.h"
 #include "mitkContourModelSet.h"
+#include "mitkBaseRenderer.h"
 
 
 namespace mitk {
@@ -57,14 +58,14 @@ namespace mitk {
 
     virtual ~ContourModelSetGLMapper2D();
 
-    void DrawContour(mitk::ContourModel& contour);
+    void DrawContour(mitk::ContourModel* contour, mitk::BaseRenderer* renderer);
 
   private:
 
     /**
     * return a refernce of the rendered data object
     */
-    const ContourModelSet* GetInput(void);
+    ContourModelSet* GetInput(void);
   };
 
 } // namespace mitk

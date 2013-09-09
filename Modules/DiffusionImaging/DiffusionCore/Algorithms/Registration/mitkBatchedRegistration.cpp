@@ -11,6 +11,10 @@
 // VTK
 #include <vtkTransform.h>
 
+// DEBUG
+#include <mitkIOUtil.h>
+
+
 mitk::BatchedRegistration::BatchedRegistration() :
   m_RegisteredImagesValid(false)
 {
@@ -56,7 +60,8 @@ std::vector<mitk::Image::Pointer> mitk::BatchedRegistration::GetRegisteredImages
 
 void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer &img, const mitk::BatchedRegistration::TransformType &transformation) const
 {
-  itk::ScalableAffineTransform<mitk::ScalarType,3>::Pointer rotationTransform;
+  typedef mitk::DiffusionImage<short> DiffusionImageType;
+
   vtkMatrix4x4* transformationMatrix = vtkMatrix4x4::New();
   vnl_matrix_fixed<double,3,3> vnlRotationMatrix;
   for (int i = 0; i < 4;++i)
@@ -67,23 +72,46 @@ void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer 
         vnlRotationMatrix.set(i,j,transformation.get(i,j));
     }
 
-  rotationTransform  = itk::ScalableAffineTransform<mitk::ScalarType,3>::New();
+  img->GetGeometry()->Compose( transformationMatrix);
 
-  itk::ScalableAffineTransform<mitk::ScalarType,3>::Pointer geometryTransform = img->GetGeometry()->GetIndexToWorldTransform();
-  img->GetGeometry()->Compose( transformationMatrix); //SetIndexToWorldTransform(geometryTransform);
-
-  if (dynamic_cast<mitk::DiffusionImage<short>*> (img.GetPointer()) != NULL)
+  if (dynamic_cast<DiffusionImageType*> (img.GetPointer()) != NULL)
   {
-    mitk::DiffusionImage<short>::Pointer diffImages =
-        dynamic_cast<mitk::DiffusionImage<short>*>(img.GetPointer());
+    DiffusionImageType::Pointer diffImages =
+        dynamic_cast<DiffusionImageType*>(img.GetPointer());
+
+    // Changes to default geometry does not affect the presentation
+    // of Diffusion Images. (No idea why)
+    // Workaround:
+    // Extracting a B0-image
+    // Casting B0 to an MITK image, so we have an image with
+    //    the same dimensions and space
+    // Apply the transformation to this image
+    // Cast back to ITK image
+    // Copy Transformation informations from B0-ITK-Image to
+    //    diffusion vector image.
+    itk::B0ImageExtractionImageFilter<short,short >::Pointer b0Extraction =
+        itk::B0ImageExtractionImageFilter<short,short>::New();
+    b0Extraction->SetInput(diffImages->GetVectorImage());
+    b0Extraction->SetDirections(diffImages->GetDirections());
+    b0Extraction->Update();
+    mitk::Image::Pointer tmp = mitk::Image::New();
+    tmp->InitializeByItk(b0Extraction->GetOutput());
+    tmp->SetVolume(b0Extraction->GetOutput()->GetBufferPointer());
+
+    tmp->GetGeometry()->Compose(transformationMatrix);
+    itk::Image<short, 3>::Pointer itkTmp;
+    mitk::CastToItkImage<itk::Image<short, 3> >(tmp, itkTmp);
+
+    diffImages->GetVectorImage()->SetOrigin(itkTmp->GetOrigin());
+    diffImages->GetVectorImage()->SetDirection(itkTmp->GetDirection());
+    diffImages->GetVectorImage()->SetSpacing(itkTmp->GetSpacing());
 
     mitk::DiffusionImageCorrectionFilter<short>::Pointer correctionFilter =
         mitk::DiffusionImageCorrectionFilter<short>::New();
 
+    // For Diff. Images: Need to rotate the gradients
     correctionFilter->SetImage(diffImages);
-    // apply transformation to all gradients
     correctionFilter->CorrectDirections(vnlRotationMatrix);
-    //img = correctionFilter->GetOutput();
 
   }
 }

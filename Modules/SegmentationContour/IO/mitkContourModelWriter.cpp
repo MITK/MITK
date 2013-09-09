@@ -70,7 +70,6 @@ const char* mitk::ContourModelWriter::XML_Z = "z" ;
 
 
 
-
 mitk::ContourModelWriter::ContourModelWriter()
     : m_FileName(""), m_FilePrefix(""), m_FilePattern("")
 {

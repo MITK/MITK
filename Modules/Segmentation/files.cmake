@@ -1,9 +1,9 @@
 set(CPP_FILES
   Algorithms/mitkCalculateSegmentationVolume.cpp
-  Algorithms/mitkContourModelSource.cpp
-  Algorithms/mitkContourModelSubDivisionFilter.cpp
-  Algorithms/mitkContourModelToPointSetFilter.cpp
-  Algorithms/mitkContourModelToSurfaceFilter.cpp
+  #Algorithms/mitkContourModelSource.cpp
+  #Algorithms/mitkContourModelSubDivisionFilter.cpp
+  #Algorithms/mitkContourModelToPointSetFilter.cpp
+  #Algorithms/mitkContourModelToSurfaceFilter.cpp
   Algorithms/mitkContourSetToPointSetFilter.cpp
   Algorithms/mitkContourUtils.cpp
   Algorithms/mitkCorrectorAlgorithm.cpp
@@ -12,7 +12,7 @@ set(CPP_FILES
   Algorithms/mitkDiffSliceOperationApplier.cpp
   Algorithms/mitkImageLiveWireContourModelFilter.cpp
   Algorithms/mitkImageToContourFilter.cpp
-  Algorithms/mitkImageToContourModelFilter.cpp
+  #Algorithms/mitkImageToContourModelFilter.cpp
   Algorithms/mitkImageToLiveWireContourFilter.cpp
   Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
   Algorithms/mitkOtsuSegmentationFilter.cpp
@@ -29,8 +29,8 @@ set(CPP_FILES
   Controllers/mitkSegmentationModuleActivator.cpp
   Controllers/mitkToolManagerProvider.cpp
   DataManagement/mitkContour.cpp
-  DataManagement/mitkContourElement.cpp
-  DataManagement/mitkContourModel.cpp
+  #DataManagement/mitkContourElement.cpp
+  #DataManagement/mitkContourModel.cpp
   DataManagement/mitkContourSet.cpp
   DataManagement/mitkExtrudedContour.cpp
   Interactions/mitkAdaptiveRegionGrowingTool.cpp
@@ -68,14 +68,14 @@ set(CPP_FILES
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
   Interactions/mitkWatershedTool.cpp
-  IO/mitkContourModelIOFactory.cpp
-  IO/mitkContourModelReader.cpp
-  IO/mitkContourModelWriter.cpp
-  IO/mitkContourModelWriterFactory.cpp
+  #IO/mitkContourModelIOFactory.cpp
+  #IO/mitkContourModelReader.cpp
+  #IO/mitkContourModelWriter.cpp
+  #IO/mitkContourModelWriterFactory.cpp
   Rendering/mitkContourMapper2D.cpp
-  Rendering/mitkContourModelGLMapper2D.cpp
-  Rendering/mitkContourModelMapper2D.cpp
-  Rendering/mitkContourModelMapper3D.cpp
+  #Rendering/mitkContourModelGLMapper2D.cpp
+  #Rendering/mitkContourModelMapper2D.cpp
+  #Rendering/mitkContourModelMapper3D.cpp
   Rendering/mitkContourSetMapper2D.cpp
   Rendering/mitkContourSetVtkMapper3D.cpp
   Rendering/mitkContourVtkMapper3D.cpp

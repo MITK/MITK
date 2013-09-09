@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_CONTOURMODEL_H_
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include "SegmentationContourExports.h"
 #include "mitkBaseData.h"
 
 #include <mitkContourElement.h>
@@ -50,7 +50,7 @@ namespace mitk
   mitk::ContourModelMapper3D. See these classes for display options which can
   can be set via properties.
   */
-  class Segmentation_EXPORT ContourModel : public BaseData
+  class SegmentationContour_EXPORT ContourModel : public BaseData
   {
 
   public:

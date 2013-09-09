@@ -17,10 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkContourElement_H_
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include "SegmentationContourExports.h"
 #include <mitkVector.h>
 
-#include <ANN/ANN.h>
+//#include <ANN/ANN.h>
 
 
 #include <deque>
@@ -37,7 +37,7 @@ namespace mitk
   \Note It is highly not recommend to use this class directly as no secure mechanism is used here.
   Use mitk::ContourModel instead providing some additional features.
   */
-  class Segmentation_EXPORT ContourElement : public itk::LightObject
+  class SegmentationContour_EXPORT ContourElement : public itk::LightObject
   {
 
   public:
@@ -222,7 +222,7 @@ namespace mitk
     \param point - query position in 3D space.
     \param eps - the error bound for search algorithm.
     */
-    VertexType* OptimizedGetVertexAt(const mitk::Point3D &point, float eps);
+    //VertexType* OptimizedGetVertexAt(const mitk::Point3D &point, float eps);
 
     VertexListType* GetControlVertices();
 

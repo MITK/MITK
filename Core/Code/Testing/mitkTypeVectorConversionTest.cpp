@@ -82,6 +82,50 @@ static void Test_Vnl2Mitk_VectorCompatibility()
 }
 
 /**
+ * tests if constructing a mitk::Vector using a shorter in size vnl_vector is handled properly
+ */
+static void Test_Vnl2Mitk_ShortVectorCompatibility()
+{
+  ScalarType shorterValuesToCopy[] = {4.12345678910, 5.10987654321};
+  mitk::Vector3D vector3D = originalValues;
+  vnl_vector<ScalarType> vnlVector(2);
+  vnlVector.set(shorterValuesToCopy);
+
+  vector3D = vnlVector;
+
+  bool correctValuesInVector3D = true;
+  for (int var = 0; var < 2; ++var) {
+    correctValuesInVector3D = correctValuesInVector3D &&
+        (vector3D[var] && shorterValuesToCopy[var]);
+  }
+  correctValuesInVector3D = correctValuesInVector3D && (vector3D[2] == 0.0);
+
+  MITK_TEST_CONDITION(correctValuesInVector3D, "shorter vnl vector correctly assigned to mitk vector" )
+}
+
+/**
+ * tests if constructing a mitk::Vector using a large in size vnl_vector is handled properly
+ */
+static void Test_Vnl2Mitk_LargeVectorCompatibility()
+{
+  ScalarType largerValuesToCopy[] = {4.12345678910, 5.10987654321, 6.123456789132456, 7.123456987789456};
+  mitk::Vector3D vector3D = originalValues;
+  vnl_vector<ScalarType> vnlVector(4);
+  vnlVector.set(largerValuesToCopy);
+
+  vector3D = vnlVector;
+
+  bool correctValuesInVector3D = true;
+  for (int var = 0; var < 3; ++var) {
+    correctValuesInVector3D = correctValuesInVector3D &&
+        (vector3D[var] && largerValuesToCopy[var]);
+  }
+
+  MITK_TEST_CONDITION(correctValuesInVector3D, "larger vnl vector correctly assigned to mitk vector" )
+}
+
+
+/**
 * Test the conversions from and to the mitk vector type
 */
 int mitkTypeVectorConversionTest(int /*argc*/ , char* /*argv*/[])
@@ -93,7 +137,10 @@ int mitkTypeVectorConversionTest(int /*argc*/ , char* /*argv*/[])
   Test_Mitk2itk_Compatibility();
 
   Test_Vnl2Mitk_VectorFixedCompatibility();
+
   Test_Vnl2Mitk_VectorCompatibility();
+  Test_Vnl2Mitk_ShortVectorCompatibility();
+  Test_Vnl2Mitk_LargeVectorCompatibility();
 
   MITK_TEST_END()
 

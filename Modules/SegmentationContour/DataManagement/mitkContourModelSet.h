@@ -28,12 +28,12 @@ namespace mitk
 
   /** \brief
   */
-  class SegmentationContour_EXPORT ContourModelSet : public itk::LightObject
+  class SegmentationContour_EXPORT ContourModelSet : public mitk::BaseData
   {
 
   public:
 
-    mitkClassMacro(ContourModelSet, itk::LightObject);
+    mitkClassMacro(ContourModelSet, mitk::BaseData);
 
     itkNewMacro(Self);
 
@@ -100,6 +100,21 @@ namespace mitk
     /** \brief Clear the storage container.
     */
     virtual void Clear();
+
+    //////////////// inherit  from mitk::BaseData ////////////////////
+
+    /*                  NO support for regions !                    */
+
+    void SetRequestedRegionToLargestPossibleRegion(){}
+
+    bool RequestedRegionIsOutsideOfTheBufferedRegion(){return false;}
+
+    bool VerifyRequestedRegion(){return true;}
+
+    void SetRequestedRegion(const itk::DataObject* ){}
+
+    //////////////// END inherit  from mitk::BaseData ////////////////////
+
 
   protected:
 

@@ -33,20 +33,35 @@ namespace mitk
   {
   public:
     /** Default constructor has nothing to do. */
-    Vector<TCoordRep, NVectorDimension>() {}
+    Vector<TCoordRep, NVectorDimension>()
+      : itk::Vector<TCoordRep, NVectorDimension>() {}
 
-    /** Pass-through constructors for the Array base class. */
-    Vector<TCoordRep, NVectorDimension>(const Vector<TCoordRep, NVectorDimension>& r)
-        : itk::Vector<TCoordRep, NVectorDimension>(r) {}
+    /**
+     * Constructor to convert from mitk::Vector to mitk::Vector.
+     * Can convert nonidentical types.
+     * E.g. use this to convert from mitk::Vector<float, 3> to mitk::Vector<double,3>
+     */
+    template <typename TOtherTypeRepresentation>
+    Vector<TCoordRep, NVectorDimension>(const Vector<TOtherTypeRepresentation, NVectorDimension>& r)
+      : itk::Vector<TCoordRep, NVectorDimension>(r) {}
+
+    /**
+     * Constructor to convert from itk::Vector to mitk::Vector.
+     * Can convert nonidentical types.
+     * E.g. use this to convert from itk::Vector<double, 3> to mitk::Vector<float,3>
+     */
+    template <typename TOtherTypeRepresentation>
+    Vector<TCoordRep, NVectorDimension>(const itk::Vector<TOtherTypeRepresentation, NVectorDimension>& r)
+      : itk::Vector<TCoordRep, NVectorDimension>(r) {}
 
     Vector<TCoordRep, NVectorDimension>(const TCoordRep r[NVectorDimension])
-        : itk::Vector<TCoordRep, NVectorDimension>(r) {}
+      : itk::Vector<TCoordRep, NVectorDimension>(r) {}
 
+    /**
+     * Constructor to initialize entire vector to one value.
+     */
     Vector<TCoordRep, NVectorDimension>(const TCoordRep & v):itk::Vector<TCoordRep, NVectorDimension>(v)
-        {}
-
-    Vector<TCoordRep, NVectorDimension>(const itk::Vector<TCoordRep, NVectorDimension> r)
-        : itk::Vector<TCoordRep, NVectorDimension>(r) {}
+      {}
 
     /**
      * Attention: vnlVector should have same size as NVectorDimension, otherwise

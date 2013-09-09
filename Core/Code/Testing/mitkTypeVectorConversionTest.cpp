@@ -14,22 +14,57 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <iostream>
+
+#include "itkVector.h"
+
+#include <vnl/vnl_vector_ref.h>
+#include <vnl/vnl_vector_fixed_ref.h>
+#include "vnl/vnl_math.h"
+
 #include "mitkTestingMacros.h"
 #include "mitkTypeBasics.h"
 #include "mitkVector.h"
 #include "mitkTypes.h" // for Equals
-#include "itkVector.h"
-#include <vnl/vnl_vector_ref.h>
-#include <vnl/vnl_vector_fixed_ref.h>
-
-#include <iostream>
 
 using namespace mitk;
 
+/**
+ * these private variables are used in the test functions
+ *
+ * The variable which should be copied into is set to its original value.
+ * The value which should be copied is set to valuesToCopy.
+ *
+ * Then the copying takes place. The test is successful, if the variable which
+ * should be copied into holds the valuesToCopy afterwards and is equal to the
+ * vector which should be copied.
+ */
+static const ScalarType originalValues[]      =  {1.123456789987, 2.789456321456, 3.123654789987456};
+static const float      originalValuesFloat[] =  {1.123456789987, 2.789456321456, 3.123654789987456};
 
-static const ScalarType originalValues[] =  {1.0, 2.0, 3.0};
-static const ScalarType valuesToCopy[]   =  {4.0, 5.0, 6.0};
+static const ScalarType valuesToCopy[]        =  {4.654789123321, 5.987456789321, 6.321654987789546};
+static const float      valuesToCopyFloat[]   =  {4.654789123321, 5.987456789321, 6.321654987789546};
 
+
+
+static void Test_mitk2Mitk_DifferntTypeCompatibility(void)
+{
+  mitk::Vector<float, 3>  floatVector3D  = originalValuesFloat;
+  mitk::Vector<double, 3> doubleVector3D = valuesToCopy;
+
+  floatVector3D = doubleVector3D;
+
+  MITK_TEST_CONDITION(floatVector3D == doubleVector3D, "mitk double vector assigned to mitk float vector")
+
+  // test for correct values needs a little more love than in other cases
+  // since Equal cannot compare arrays/vectors of different type
+  bool correctValuesAssigned = true;
+  for (int var = 0; var < 3; ++var) {
+      correctValuesAssigned = correctValuesAssigned
+          && Equal(floatVector3D[var], valuesToCopy[var], vnl_math::float_eps * 10.0);
+  }
+  MITK_TEST_CONDITION(correctValuesAssigned, "correct values were assigned within float accuracy")
+}
 
 static void Test_itk2Mitk_Compatibility(void)
 {
@@ -40,6 +75,25 @@ static void Test_itk2Mitk_Compatibility(void)
 
   MITK_TEST_CONDITION(vector3D == itkVector, "itk vector assigned to mitk vector")
   MITK_TEST_CONDITION(vector3D == valuesToCopy, "correct values were assigned")
+}
+
+static void Test_itk2Mitk_floatCompatibility(void)
+{
+  Vector3D vector3D = originalValues;
+  itk::Vector<float, 3> itkVector = valuesToCopyFloat;
+
+  vector3D = itkVector;
+
+  MITK_TEST_CONDITION(vector3D == itkVector, "itk float vector assigned to mitk vector")
+
+  // test for correct values needs a little more love than in other cases
+  // since Equal cannot compare arrays/vectors of different type
+  bool correctValuesAssigned = true;
+  for (int var = 0; var < 3; ++var) {
+      correctValuesAssigned = correctValuesAssigned
+          && Equal(vector3D[var], valuesToCopyFloat[var]);
+  }
+  MITK_TEST_CONDITION(correctValuesAssigned, "correct values were assigned")
 }
 
 static void Test_Mitk2itk_Compatibility(void)
@@ -65,7 +119,6 @@ static void Test_Vnl2Mitk_VectorFixedCompatibility()
 
   MITK_TEST_CONDITION( vector3D.GetVnlVector() == vnlVectorFixed, "vnl_vector_fixed assigned to mitk vector")
   MITK_TEST_CONDITION( vector3D == valuesToCopy, "correct values were assigned" )
-  MITK_TEST_CONDITION( Equal(vnlVectorFixed, vnlVectorFixed), "vnl_vector_fixed holds its original values" )
 }
 
 static void Test_Vnl2Mitk_VectorCompatibility()
@@ -133,7 +186,11 @@ int mitkTypeVectorConversionTest(int /*argc*/ , char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("VectorConversionTest")
 
+  Test_mitk2Mitk_DifferntTypeCompatibility();
+
   Test_itk2Mitk_Compatibility();
+  Test_itk2Mitk_floatCompatibility();
+
   Test_Mitk2itk_Compatibility();
 
   Test_Vnl2Mitk_VectorFixedCompatibility();

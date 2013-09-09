@@ -1,4 +1,4 @@
-MITK_CREATE_MODULE( SegmentationContour
+MITK_CREATE_MODULE( ContourModel
   INCLUDE_DIRS Algorithms DataManagement IO Rendering
   DEPENDS Mitk
 )

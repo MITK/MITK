@@ -18,11 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define SEGMENTATIONOBJECTFACTORY_H_INCLUDED
 
 #include "mitkCoreObjectFactoryBase.h"
-#include "SegmentationContourExports.h"
+#include "ContourModelExports.h"
 
 namespace mitk {
 
-  class SegmentationContour_EXPORT ContourObjectFactory : public CoreObjectFactoryBase
+  class ContourModel_EXPORT ContourObjectFactory : public CoreObjectFactoryBase
   {
   public:
     mitkClassMacro(ContourObjectFactory,CoreObjectFactoryBase);

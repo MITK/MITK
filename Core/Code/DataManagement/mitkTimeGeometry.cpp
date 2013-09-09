@@ -130,7 +130,6 @@ void mitk::TimeGeometry::UpdateBoundingBox ()
   m_BoundingBox->ComputeBoundingBox();
   if (this->GetMTime() < lastModifiedTime)
     this->Modified();
-
 }
 
 mitk::ScalarType mitk::TimeGeometry::GetExtentInWorld (unsigned int direction) const
@@ -176,6 +175,6 @@ itk::LightObject::Pointer mitk::TimeGeometry::InternalClone() const
   {
     mitkThrow() << " Downcast to type " << this->GetNameOfClass() << " failed.";
   }
-  rval->m_BoundingBox = m_BoundingBox->Clone();
+  rval->m_BoundingBox = m_BoundingBox->DeepCopy();
   return parent;
 }

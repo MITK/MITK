@@ -118,7 +118,6 @@ void mitk::RenderingTestHelper::Render()
   {
     MITK_ERROR << "No images loaded in data storage!";
   }
-
 }
 
 mitk::DataStorage::Pointer mitk::RenderingTestHelper::GetDataStorage()

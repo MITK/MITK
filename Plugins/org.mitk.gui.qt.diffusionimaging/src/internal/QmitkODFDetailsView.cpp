@@ -183,7 +183,7 @@ void QmitkODFDetailsView::UpdateOdf()
     mitk::Point3D index;
     mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(m_ImageNode->GetData());
     unsigned int *img_dimension = img->GetDimensions();
-    img->GetTimeSlicedGeometry()->WorldToIndex(world, index);
+    img->GetGeometry()->WorldToIndex(world, index);
 
     float sum = 0;
     float max = itk::NumericTraits<float>::NonpositiveMin();

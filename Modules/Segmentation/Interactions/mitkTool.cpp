@@ -166,8 +166,8 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
 
   if (original->GetTimeSlicedGeometry() )
   {
-    TimeSlicedGeometry::Pointer originalGeometry = original->GetTimeSlicedGeometry()->Clone();
-    segmentation->SetGeometry( originalGeometry );
+    TimeGeometry::Pointer originalGeometry = original->GetTimeGeometry()->Clone();
+    segmentation->SetTimeGeometry( originalGeometry );
   }
   else
   {

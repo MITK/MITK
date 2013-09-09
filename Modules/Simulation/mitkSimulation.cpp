@@ -234,7 +234,7 @@ void mitk::Simulation::UpdateOutputInformation()
     }
   }
 
-  this->GetTimeSlicedGeometry()->UpdateInformation();
+  this->GetTimeGeometry()->Update();
 }
 
 bool mitk::Simulation::VerifyRequestedRegion()

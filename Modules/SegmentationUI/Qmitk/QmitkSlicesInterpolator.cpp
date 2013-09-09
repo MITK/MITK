@@ -438,10 +438,10 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
   {
     const mitk::SliceNavigationController::GeometrySliceEvent& event = dynamic_cast<const mitk::SliceNavigationController::GeometrySliceEvent&>(e);
 
-    mitk::TimeSlicedGeometry* tsg = event.GetTimeSlicedGeometry();
+    mitk::TimeGeometry* tsg = event.GetTimeGeometry();
     if (tsg && m_TimeStep.contains(slicer))
     {
-      mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(tsg->GetGeometry3D(m_TimeStep[slicer]));
+      mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(tsg->GetGeometryForTimeStep(m_TimeStep[slicer]).GetPointer());
       if (slicedGeometry)
       {
         m_LastSNC = slicer;
@@ -547,7 +547,7 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     extractor->SetTimeStep( timestep );
     extractor->SetWorldGeometry( m_LastSNC->GetCurrentPlaneGeometry() );
     extractor->SetVtkOutputRequest(true);
-    extractor->SetResliceTransformByGeometry( m_Segmentation->GetTimeSlicedGeometry()->GetGeometry3D( timestep ) );
+    extractor->SetResliceTransformByGeometry( m_Segmentation->GetTimeGeometry()->GetGeometryForTimeStep( timestep ) );
 
     extractor->Modified();
     extractor->Update();
@@ -634,7 +634,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
         diffslicewriter->SetTimeStep( timeStep );
         diffslicewriter->SetWorldGeometry(reslicePlane);
         diffslicewriter->SetVtkOutputRequest(true);
-        diffslicewriter->SetResliceTransformByGeometry( diffImage->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+        diffslicewriter->SetResliceTransformByGeometry( diffImage->GetTimeGeometry()->GetGeometryForTimeStep( timeStep ) );
 
         diffslicewriter->Modified();
         diffslicewriter->Update();
@@ -724,7 +724,6 @@ void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction* action)
       mitk::SliceNavigationController* slicer = iter->second;
       AcceptAllInterpolations( slicer );
     }
-
   }
   catch(...)
   {
@@ -919,10 +918,10 @@ void QmitkSlicesInterpolator::UpdateVisibleSuggestion()
     mitk::BaseRenderer* renderer = m_LastSNC->GetRenderer();
     if (renderer && renderer->GetMapperID() == mitk::BaseRenderer::Standard2D)
     {
-      const mitk::TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const mitk::TimeSlicedGeometry*>( renderer->GetWorldGeometry() );
-      if (timeSlicedGeometry)
+      const mitk::TimeGeometry* timeGeometry = dynamic_cast<const mitk::TimeGeometry*>( renderer->GetWorldGeometry() );
+      if (timeGeometry)
       {
-        mitk::SliceNavigationController::GeometrySliceEvent event( const_cast<mitk::TimeSlicedGeometry*>(timeSlicedGeometry), renderer->GetSlice() );
+        mitk::SliceNavigationController::GeometrySliceEvent event( const_cast<mitk::TimeGeometry*>(timeGeometry), renderer->GetSlice() );
 
         TranslateAndInterpolateChangedSlice(event, m_LastSNC);
       }

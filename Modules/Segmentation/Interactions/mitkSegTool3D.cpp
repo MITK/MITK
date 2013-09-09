@@ -14,68 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkAutoSegmentationTool.h"
+#include "mitkSegTool3D.h"
 #include "mitkToolManager.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
 
-mitk::AutoSegmentationTool::AutoSegmentationTool()
-:Tool("dummy"),
-m_OverwriteExistingSegmentation (false)
+mitk::SegTool3D::SegTool3D(const char* type) : Tool(type)
 {
 }
 
-mitk::AutoSegmentationTool::~AutoSegmentationTool()
+mitk::SegTool3D::~SegTool3D()
 {
 }
 
-const char* mitk::AutoSegmentationTool::GetGroup() const
+const char* mitk::SegTool3D::GetGroup() const
 {
-  return "autoSegmentation";
+  return "SegTool3D";
 }
 
-void mitk::AutoSegmentationTool::SetOverwriteExistingSegmentation(bool overwrite)
-{
-  m_OverwriteExistingSegmentation = overwrite;
-}
-
-std::string mitk::AutoSegmentationTool::GetCurrentSegmentationName()
-{
-  if (m_ToolManager->GetWorkingData(0))
-    return m_ToolManager->GetWorkingData(0)->GetName();
-  else
-    return "";
-}
-
-mitk::DataNode* mitk::AutoSegmentationTool::GetTargetSegmentationNode()
-{
-  mitk::DataNode::Pointer emptySegmentation;
-  if (m_OverwriteExistingSegmentation)
-  {
-    emptySegmentation = m_ToolManager->GetWorkingData(0);
-  }
-  else
-  {
-    mitk::DataNode::Pointer refNode = m_ToolManager->GetReferenceData(0);
-    if (refNode.IsNull())
-    {
-      //TODO create and use segmentation exceptions instead!!
-      MITK_ERROR<<"No valid reference data!";
-      return NULL;
-    }
-    std::string nodename = m_ToolManager->GetReferenceData(0)->GetName()+"_"+this->GetName();
-    mitk::Color color;
-    color.SetRed(1);
-    color.SetBlue(0);
-    color.SetGreen(0);
-    emptySegmentation = CreateEmptySegmentationNode(dynamic_cast<mitk::Image*>(refNode->GetData()), nodename, color);
-    m_ToolManager->GetDataStorage()->Add(emptySegmentation, refNode);
-
-  }
-  return emptySegmentation;
-}
-
-void mitk::AutoSegmentationTool::PasteSegmentation( Image* targetImage, Image* sourceImage, int pixelvalue, int timestep )
+void mitk::SegTool3D::PasteSegmentation( Image* targetImage, Image* sourceImage, int pixelvalue, int timestep )
 {
   if ((!targetImage)|| (!sourceImage)) return;
 
@@ -98,7 +55,7 @@ void mitk::AutoSegmentationTool::PasteSegmentation( Image* targetImage, Image* s
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::AutoSegmentationTool::ItkPasteSegmentation(
+void mitk::SegTool3D::ItkPasteSegmentation(
        itk::Image<TPixel,VImageDimension>* targetImage, const mitk::Image* sourceImage, int overwritevalue )
 {
   typedef itk::Image<TPixel,VImageDimension> ImageType;

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationUIExports.h"
 #include "mitkFastMarchingTool.h"
 
+class ctkDoubleSlider;
 class ctkSliderWidget;
 class ctkRangeWidget;
 class QPushButton;
@@ -77,6 +78,7 @@ protected:
   mitk::FastMarchingTool::Pointer m_FastMarchingTool;
 
   bool m_TimeIsConnected;
+  bool m_SelfCall;
   mitk::Stepper::Pointer m_TimeStepper;
 };
 

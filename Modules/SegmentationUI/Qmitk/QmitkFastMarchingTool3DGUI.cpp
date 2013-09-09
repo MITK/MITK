@@ -98,7 +98,7 @@ m_TimeIsConnected(false)
   m_slAlpha->setMaximum(0);
   m_slAlpha->setPageStep(0.1);
   m_slAlpha->setSingleStep(0.01);
-  m_slAlpha->setValue(-2.5);
+  m_slAlpha->setValue(-0.5);
   m_slAlpha->setDecimals(2);
   m_slAlpha->setTracking(false);
   m_slAlpha->setToolTip("The \"alpha\" parameter in the Sigmoid mapping filter.");
@@ -125,7 +125,7 @@ m_TimeIsConnected(false)
   m_slBeta->setMaximum(100);
   m_slBeta->setPageStep(0.1);
   m_slBeta->setSingleStep(0.01);
-  m_slBeta->setValue(3.5);
+  m_slBeta->setValue(3.0);
   m_slBeta->setDecimals(2);
   m_slBeta->setTracking(false);
   m_slBeta->setToolTip("The \"beta\" parameter in the Sigmoid mapping filter.");
@@ -176,7 +176,7 @@ m_TimeIsConnected(false)
 
   m_slwThreshold = new ctkRangeWidget(this);
   m_slwThreshold->setMinimum(-100);
-  m_slwThreshold->setMaximum(5000);
+  m_slwThreshold->setMaximum(500);
   m_slwThreshold->setMinimumValue(-100);
   m_slwThreshold->setMaximumValue(2000);
   m_slwThreshold->setDecimals(0);
@@ -293,6 +293,7 @@ void QmitkFastMarchingTool3DGUI::OnStoppingValueChanged(double value)
 
 void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
 {
+/*
   QmitkConfirmSegmentationDialog dialog;
   QString segName = QString::fromStdString(m_FastMarchingTool->GetCurrentSegmentationName());
 
@@ -310,6 +311,7 @@ void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
   case QmitkConfirmSegmentationDialog::CANCEL_SEGMENTATION:
     return;
   }
+*/
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->ConfirmSegmentation();

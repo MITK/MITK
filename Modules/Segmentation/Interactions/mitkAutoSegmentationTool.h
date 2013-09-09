@@ -59,6 +59,11 @@ class Segmentation_EXPORT AutoSegmentationTool : public Tool
 
     virtual const char* GetGroup() const;
 
+    void PasteSegmentation( Image* targetImage, Image* sourceImage, int pixelvalue, int timestep );
+
+    template<typename TPixel, unsigned int VImageDimension>
+    void ItkPasteSegmentation( itk::Image<TPixel,VImageDimension>* targetImage, const mitk::Image* sourceImage, int pixelvalue );
+
     bool m_OverwriteExistingSegmentation;
  };
 

@@ -468,16 +468,6 @@ void mitk::ToolManager::SetDataStorage(DataStorage& storage)
   m_DataStorage = &storage;
 }
 
-int mitk::ToolManager::GetActiveLabelIndex()
-{
-  if (m_WorkingData.empty()) return -1;
-
-  mitk::LabelSetImage* lsImage = dynamic_cast< mitk::LabelSetImage* > ( m_WorkingData.at(0)->GetData() );
-  if (!lsImage) return -1;
-
-  return lsImage->GetActiveLabelIndex();
-}
-
 const mitk::Label* mitk::ToolManager::GetActiveLabel()
 {
   if (m_WorkingData.empty()) return NULL;

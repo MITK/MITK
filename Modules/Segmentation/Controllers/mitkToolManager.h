@@ -222,11 +222,6 @@ class Segmentation_EXPORT ToolManager : public itk::Object
     void SetDataStorage(DataStorage& storage);
 
     /*
-     \brief Get the index of the active label
-     */
-    int GetActiveLabelIndex();
-
-    /*
      \brief Get the active label
      */
     const mitk::Label* GetActiveLabel();

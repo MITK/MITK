@@ -66,6 +66,7 @@ set(CPP_FILES
   Interactions/mitkSegmentationsProcessingTool.cpp
   Interactions/mitkSetRegionTool.cpp
   Interactions/mitkSegTool2D.cpp
+  Interactions/mitkSegTool3D.cpp
   Interactions/mitkSubtractContourTool.cpp
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNode.h"
 #include "mitkPointSet.h"
 #include "mitkToolCommand.h"
-#include "mitkPositionEvent.h"
+#include "mitkStateEvent.h"
 #include "mitkLabelSetImage.h"
 
 #include "itkImage.h"
@@ -99,9 +99,6 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
     /// \brief Adds the feedback image to the current working image.
     void ConfirmSegmentation();
 
-    /// \brief Set the working time step.
-    void SetCurrentTimeStep(int t);
-
     /// \brief Updates the itk pipeline and shows the result of FastMarching.
     void Update();
 
@@ -117,9 +114,6 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
 
     void Activated();
     void Deactivated();
-    void Initialize();
-
-    void BuildITKPipeline();
 
     /// \brief Add point action of StateMachine pattern
     bool OnAddPoint (Action*, const StateEvent*);
@@ -134,6 +128,8 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
 
     bool m_NeedUpdate;
 
+    bool m_Initialized;
+
     int m_CurrentTimeStep;
 
     mitk::PositionEvent* m_PositionEvent;
@@ -147,8 +143,8 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
 
     NodeContainer::Pointer m_SeedContainer; //seed points for FastMarching
 
-    mitk::DataNode::Pointer  m_FeedbackNode;
-    mitk::LabelSetImage::Pointer     m_FeedbackImage;
+    mitk::DataNode::Pointer       m_FeedbackNode;
+    mitk::LabelSetImage::Pointer  m_FeedbackImage;
 
     mitk::DataNode::Pointer m_SeedsAsPointSetNode;//used to visualize the seed points
     mitk::PointSet::Pointer m_SeedsAsPointSet;

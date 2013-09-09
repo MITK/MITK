@@ -17,13 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkFastMarchingTool3D_h_Included
 #define mitkFastMarchingTool3D_h_Included
 
-#include "mitkAutoSegmentationTool.h"
+#include "mitkSegTool3D.h"
 #include "mitkLegacyAdaptors.h"
 #include "SegmentationExports.h"
 #include "mitkDataNode.h"
+#include "mitkLabelSetImage.h"
 #include "mitkPointSet.h"
 #include "mitkPointSetInteractor.h"
 #include "mitkToolCommand.h"
+#include "mitkStateEvent.h"
 
 #include "itkImage.h"
 
@@ -50,11 +52,11 @@ namespace mitk
 
   For detailed documentation see ITK Software Guide section 9.3.1 Fast Marching Segmentation.
 */
-class Segmentation_EXPORT FastMarchingTool3D : public AutoSegmentationTool
+class Segmentation_EXPORT FastMarchingTool3D : public SegTool3D
 {
   public:
 
-    mitkClassMacro(FastMarchingTool3D, AutoSegmentationTool)
+    mitkClassMacro(FastMarchingTool3D, SegTool3D)
     itkNewMacro(FastMarchingTool3D)
 
     /* typedefs for itk pipeline */
@@ -112,18 +114,16 @@ class Segmentation_EXPORT FastMarchingTool3D : public AutoSegmentationTool
     FastMarchingTool3D();
     virtual ~FastMarchingTool3D();
 
+    virtual float CanHandleEvent( StateEvent const *stateEvent) const;
+
     virtual void Activated();
     virtual void Deactivated();
-    virtual void Initialize();
 
     /// \brief Add point action of StateMachine pattern
-    virtual void OnAddPoint ();
+    bool OnAddPoint (Action*, const StateEvent*);
 
     /// \brief Delete action of StateMachine pattern
-    virtual void OnDelete ();
-
-    /// \brief Reset all relevant inputs of the itk pipeline.
-    void Reset();
+    bool OnDelete (Action*, const StateEvent*);
 
     mitk::ToolCommand::Pointer m_ProgressCommand;
 
@@ -142,18 +142,14 @@ class Segmentation_EXPORT FastMarchingTool3D : public AutoSegmentationTool
 
     NodeContainer::Pointer m_SeedContainer; //seed points for FastMarching
 
-    InternalImageType::Pointer m_ReferenceImageAsITK; //the reference image as itk::Image
-
-    mitk::DataNode::Pointer m_ResultImageNode;//holds the result as a preview image
+    mitk::DataNode::Pointer       m_FeedbackNode; //holds the result as a preview image
+    mitk::LabelSetImage::Pointer  m_FeedbackImage;
 
     mitk::DataNode::Pointer m_SeedsAsPointSetNode;//used to visualize the seed points
     mitk::PointSet::Pointer m_SeedsAsPointSet;
-    mitk::PointSetInteractor::Pointer m_SeedPointInteractor;
-    unsigned int m_PointSetAddObserverTag;
-    unsigned int m_PointSetRemoveObserverTag;
 
     ThresholdingFilterType::Pointer m_ThresholdFilter;
-    SmoothingFilterType::Pointer m_SmoothFilter;
+  //  SmoothingFilterType::Pointer m_SmoothFilter;
     GradientFilterType::Pointer m_GradientMagnitudeFilter;
     SigmoidFilterType::Pointer m_SigmoidFilter;
     FastMarchingFilterType::Pointer m_FastMarchingFilter;

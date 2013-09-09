@@ -140,7 +140,7 @@ void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDi
   outputIterator.GoToBegin();
   inputIterator.GoToBegin();
 
-  const int& activePixelValue = toolManager->GetActiveLabelIndex();
+  const int& activePixelValue = toolManager->GetActiveLabel()->GetIndex();
 
   if (activePixelValue == 0) // if exterior is the active label
   {

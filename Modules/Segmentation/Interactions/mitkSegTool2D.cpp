@@ -224,7 +224,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
 
   unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( image );
   this->WriteBackSegmentationResult(planeGeometry, slice, timeStep);
-  slice->DisconnectPipeline();
+  //slice->DisconnectPipeline();
 
   if (m_2DInterpolationEnabled)
   {
@@ -404,24 +404,6 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
   return id;
 }
 
-void mitk::SegTool2D::InteractiveSegmentationBugMessage( const std::string& message )
-{
-  MITK_ERROR << "********************************************************************************" << std::endl
-    << " " << message << std::endl
-    << "********************************************************************************" << std::endl
-    << "  " << std::endl
-    << " If your image is rotated or the 2D views don't really contain the patient image, try to press the button next to the image selection. " << std::endl
-    << "  " << std::endl
-    << " Please file a BUG REPORT: " << std::endl
-    << " http://bugs.mitk.org" << std::endl
-    << " Contain the following information:" << std::endl
-    << "  - What image were you working on?" << std::endl
-    << "  - Which region of the image?" << std::endl
-    << "  - Which tool did you use?" << std::endl
-    << "  - What did you do?" << std::endl
-    << "  - What happened (not)? What did you expect?" << std::endl;
-}
-
 void mitk::SegTool2D::PasteSegmentation( Image* targetSlice, Image* sourceSlice, int paintingPixelValue, int timestep )
 {
   if ((!targetSlice)|| (!sourceSlice)) return;
@@ -446,7 +428,7 @@ void mitk::SegTool2D::ItkPasteSegmentation( itk::Image<TPixel,VImageDimension>* 
   outputIterator.GoToBegin();
   inputIterator.GoToBegin();
 
-  const int& activePixelValue = m_ToolManager->GetActiveLabelIndex();
+  const int& activePixelValue = m_ToolManager->GetActiveLabel()->GetIndex();
 
   if (activePixelValue == 0) // if exterior is the active label
   {

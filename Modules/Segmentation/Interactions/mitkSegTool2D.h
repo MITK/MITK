@@ -136,10 +136,8 @@ class Segmentation_EXPORT SegTool2D : public Tool
 
     unsigned int AddContourmarker ( const PositionEvent* );
 
-    void InteractiveSegmentationBugMessage( const std::string& message );
-
-    BaseRenderer*         m_LastEventSender;
-    unsigned int          m_LastEventSlice;
+    BaseRenderer*  m_LastEventSender;
+    unsigned int   m_LastEventSlice;
 
   private:
     //The prefix of the contourmarkername. Suffix is a consecutive number

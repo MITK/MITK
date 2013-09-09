@@ -32,7 +32,7 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   typedef itk::Image< ipMITKSegmentationTYPE, 2 > InputSliceType;
 
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  const int& activeLabel = toolManager->GetActiveLabelIndex();
+  const int& activeLabel = toolManager->GetActiveLabel()->GetIndex();
 
   // convert these slices to the ipSegmentation data type (into an ITK image)
   itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeLowerITKSlice;

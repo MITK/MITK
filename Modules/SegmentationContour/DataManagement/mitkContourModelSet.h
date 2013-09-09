@@ -40,15 +40,22 @@ namespace mitk
     mitkCloneMacro(Self);
 
     typedef std::deque<mitk::ContourModel::Pointer> ContourModelListType;
-    typedef ContourModelListType::iterator ContourModelIterator;
+    typedef ContourModelListType::iterator ContourModelSetIterator;
 
     //  start of inline methods
 
     /** \brief Return an iterator a the front.
     */
-    virtual ContourModelIterator Begin()
+    virtual ContourModelSetIterator Begin()
     {
       return this->m_Contours.begin();
+    }
+
+    /** \brief Return an iterator a the front.
+    */
+    virtual ContourModelSetIterator End()
+    {
+      return this->m_Contours.end();
     }
 
     /** \brief Returns the number of contained contours.
@@ -61,7 +68,11 @@ namespace mitk
 
     /** \brief Add a ContourModel to the container.
     */
-    virtual void AddContourModel(mitk::ContourModel &ContourModel);
+    virtual void AddContourModel(mitk::ContourModel &contourModel);
+
+    /** \brief Add a ContourModel to the container.
+    */
+    virtual void AddContourModel(mitk::ContourModel::Pointer contourModel);
 
     /** \brief Returns the ContourModel a given index
     \param index
@@ -79,7 +90,7 @@ namespace mitk
     /** \brief Remove the given ContourModel from the container if exists.
     \param ContourModel - the ContourModel to be removed.
     */
-    virtual bool RemoveContourModel(mitk::ContourModel* ContourModel);
+    virtual bool RemoveContourModel(mitk::ContourModel* contourModel);
 
     /** \brief Remove a ContourModel at given index within the container if exists.
     \param index - the index where the ContourModel should be removed.

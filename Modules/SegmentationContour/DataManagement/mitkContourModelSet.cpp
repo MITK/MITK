@@ -38,9 +38,15 @@ mitk::ContourModelSet::~ContourModelSet()
 
 
 
-void mitk::ContourModelSet::AddContourModel(mitk::ContourModel &ContourModel)
+void mitk::ContourModelSet::AddContourModel(mitk::ContourModel &contourModel)
 {
-  this->m_Contours.push_back(&ContourModel);
+  this->m_Contours.push_back(&contourModel);
+}
+
+
+void mitk::ContourModelSet::AddContourModel(mitk::ContourModel::Pointer contourModel)
+{
+  this->m_Contours.push_back(contourModel);
 }
 
 
@@ -62,16 +68,16 @@ mitk::ContourModelSet::ContourModelListType* mitk::ContourModelSet::GetContourMo
 }
 
 
-bool mitk::ContourModelSet::RemoveContourModel(mitk::ContourModel* ContourModel)
+bool mitk::ContourModelSet::RemoveContourModel(mitk::ContourModel* contourModel)
 {
-  ContourModelIterator it = this->m_Contours.begin();
+  ContourModelSetIterator it = this->m_Contours.begin();
 
-  ContourModelIterator end = this->m_Contours.end();
+  ContourModelSetIterator end = this->m_Contours.end();
 
   //search for ContourModel and remove it if exists
   while(it != end)
   {
-    if((*it) == ContourModel)
+    if((*it) == contourModel)
     {
       this->m_Contours.erase(it);
       return true;

@@ -14,56 +14,58 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include <mitkTestingMacros.h>
-#include <mitkContourModel.h>
+#include <mitkContourModelSet.h>
 
 
-//Add a vertex to the contour and see if size changed
+
 static void TestAddVertex()
 {
+  mitk::ContourModelSet::Pointer contourSet = mitk::ContourModelSet::New();
+
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
-  mitk::Point3D p;
-  p[0] = p[1] = p[2] = 0;
+  contourSet->AddContourModel(contour);
 
-  contour->AddVertex(p);
-
-  MITK_TEST_CONDITION(contour->GetNumberOfVertices() > 0, "Add a Vertex, size increased");
+  MITK_TEST_CONDITION(contourSet->GetSize() > 0, "Add a contour, size increased");
 
 }
 
 
-
-//Remove a vertex by index
 static void TestRemoveContourAtIndex()
 {
+  mitk::ContourModelSet::Pointer contourSet = mitk::ContourModelSet::New();
+
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
-  mitk::Point3D p;
-  p[0] = p[1] = p[2] = 0;
+  contourSet->AddContourModel(contour);
 
-  contour->AddVertex(p);
+  contourSet->RemoveContourModelAt(0);
 
-  contour->RemoveVertexAt(0);
+  MITK_TEST_CONDITION(contourSet->GetSize() == 0, "removed contour by index");
 
-  MITK_TEST_CONDITION(contour->GetNumberOfVertices() == 0, "removed vertex");
+  contourSet->AddContourModel(contour);
+
+  contourSet->RemoveContourModel(contour);
+
+  MITK_TEST_CONDITION(contourSet->GetSize() == 0, "removed contour by object");
 }
 
 
 
 static void TestEmptyContour()
 {
-  mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+  mitk::ContourModelSet::Pointer contourSet = mitk::ContourModelSet::New();
 
-  MITK_TEST_CONDITION(contour->IteratorBegin() == contour->IteratorEnd(), "test iterator of emtpy contour");
+  MITK_TEST_CONDITION(contourSet->Begin() == contourSet->End(), "test iterator of emtpy contour");
 
-  MITK_TEST_CONDITION(contour->GetNumberOfVertices() == 0, "test numberof vertices of empty contour");
+  MITK_TEST_CONDITION(contourSet->GetSize() == 0, "test numberof vertices of empty contour");
 }
 
 
 
 int mitkContourModelSetTest(int argc, char* argv[])
 {
-  MITK_TEST_BEGIN("mitkContourModelTest")
+  MITK_TEST_BEGIN("mitkContourModelSetTest")
 
     TestEmptyContour();
     TestAddVertex();

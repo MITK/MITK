@@ -15,13 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITK_ContourModelGLMapper2D_H_
-#define MITK_ContourModelGLMapper2D_H_
+#ifndef MITK_ContourModelSetGLMapper2D_H_
+#define MITK_ContourModelSetGLMapper2D_H_
 
 #include "mitkCommon.h"
 #include "SegmentationContourExports.h"
 #include "mitkGLMapper.h"
-#include "mitkContourModel.h"
+#include "mitkContourModelSet.h"
 
 
 namespace mitk {
@@ -30,16 +30,16 @@ namespace mitk {
   class ContourModel;
 
   /**
-  * @brief OpenGL-based mapper to display a mitk::Contour object in a 2D render window
+  * @brief OpenGL-based mapper to display a mitk::ContourModelSet object containing several contours in a 2D render window
   *
   *
   * @ingroup Mapper
   */
-  class SegmentationContour_EXPORT ContourModelGLMapper2D : public GLMapper
+  class SegmentationContour_EXPORT ContourModelSetGLMapper2D : public GLMapper
   {
   public:
 
-    mitkClassMacro(ContourModelGLMapper2D, GLMapper);
+    mitkClassMacro(ContourModelSetGLMapper2D, GLMapper);
 
     itkNewMacro(Self);
 
@@ -52,22 +52,19 @@ namespace mitk {
 
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 
-
   protected:
-    ContourModelGLMapper2D();
+    ContourModelSetGLMapper2D();
 
-    virtual ~ContourModelGLMapper2D();
+    virtual ~ContourModelSetGLMapper2D();
 
-    mitk::ContourModel::Pointer m_SubdivisionContour;
-    bool m_InitSubdivisionCurve;
-
+    void DrawContour(mitk::ContourModel& contour);
 
   private:
 
     /**
     * return a refernce of the rendered data object
     */
-    const ContourModel* GetInput(void);
+    const ContourModelSet* GetInput(void);
   };
 
 } // namespace mitk

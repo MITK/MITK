@@ -11,6 +11,7 @@ set(CPP_FILES
   Rendering/mitkContourModelGLMapper2D.cpp
   Rendering/mitkContourModelMapper2D.cpp
   Rendering/mitkContourModelMapper3D.cpp
+  Rendering/mitkContourModelSetGLMapper2D.cpp
   IO/mitkContourModelIOFactory.cpp
   IO/mitkContourModelReader.cpp
   IO/mitkContourModelWriter.cpp

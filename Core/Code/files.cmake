@@ -66,6 +66,7 @@ set(H_FILES
   DataManagement/mitkImageToItk.txx
   DataManagement/mitkOldTypeConversions.h
   DataManagement/mitkTypedefs.h
+  DataManagement/mitkTypes.h
   DataManagement/mitkVector.h
   DataManagement/mitkPoint.h
   DataManagement/mitkMatrix.h

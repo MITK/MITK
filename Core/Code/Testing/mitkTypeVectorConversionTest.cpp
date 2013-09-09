@@ -54,21 +54,6 @@ static void Test_Mitk2itk_Compatibility(void)
 }
 
 
-template< class T, unsigned int NVectorDimension>
-itk::Vector<T, NVectorDimension>  toItk(const vnl_vector_fixed<T, NVectorDimension>& vnlVectorFixed)
-{
-  return toItk<T, NVectorDimension>(vnlVectorFixed.as_vector());
-}
-
-
-template< class T, unsigned int NVectorDimension>
-itk::Vector<T, NVectorDimension>  toItk(const vnl_vector<T>& vnlVector)
-{
-  itk::Vector<T, NVectorDimension> vector;
-  vector.SetVnlVector(vnlVector);
-  return vector;
-}
-
 
 static void Test_Vnl2Mitk_VectorFixedCompatibility()
 {
@@ -76,10 +61,11 @@ static void Test_Vnl2Mitk_VectorFixedCompatibility()
   mitk::Vector3D vector3D = originalValues;
   vnl_vector_fixed<ScalarType, 3> vnlVectorFixed(valuesToCopy);
 
-  vector3D = toItk(vnlVectorFixed);
+  vector3D = vnlVectorFixed;
 
   MITK_TEST_CONDITION( vector3D.GetVnlVector() == vnlVectorFixed, "vnl_vector_fixed assigned to mitk vector")
   MITK_TEST_CONDITION( vector3D == valuesToCopy, "correct values were assigned" )
+  MITK_TEST_CONDITION( Equal(vnlVectorFixed, vnlVectorFixed), "vnl_vector_fixed holds its original values" )
 }
 
 static void Test_Vnl2Mitk_VectorCompatibility()
@@ -89,7 +75,7 @@ static void Test_Vnl2Mitk_VectorCompatibility()
   vnl_vector<ScalarType> vnlVector(3);
   vnlVector.set(valuesToCopy);
 
-  vector3D = toItk<ScalarType, 3>(vnlVector);
+  vector3D = vnlVector;
 
   MITK_TEST_CONDITION( vector3D.GetVnlVector() == vnlVector, "vnl_vector assigned to mitk vector")
   MITK_TEST_CONDITION( vector3D == valuesToCopy, "correct values were assigned" )

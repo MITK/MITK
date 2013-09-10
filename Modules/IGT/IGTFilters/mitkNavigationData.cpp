@@ -77,6 +77,7 @@ void mitk::NavigationData::PrintSelf(std::ostream& os, itk::Indent indent) const
   this->Superclass::PrintSelf(os, indent);
   os << indent << "data valid: "     << this->IsDataValid() << std::endl;
   os << indent << "Position: "       << this->GetPosition() << std::endl;
+  os << indent << "Orientation: "    << this->GetOrientation() << std::endl;
   os << indent << "TimeStamp: "      << this->GetIGTTimeStamp() << std::endl;
   os << indent << "HasPosition: "    << this->GetHasPosition() << std::endl;
   os << indent << "HasOrientation: " << this->GetHasOrientation() << std::endl;

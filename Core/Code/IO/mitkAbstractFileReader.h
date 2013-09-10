@@ -139,6 +139,8 @@ protected:
 
 private:
 
+  AbstractFileReader& operator=(const AbstractFileReader& other);
+
   virtual mitk::IFileReader* Clone() const = 0;
 
   class Impl;

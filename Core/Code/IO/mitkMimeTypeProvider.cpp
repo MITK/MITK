@@ -21,21 +21,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itksys/SystemTools.hxx>
 
+#ifdef _MSC_VER
+#pragma warning(disable:4503) // decorated name length exceeded, name was truncated
+#pragma warning(disable:4355)
+#endif
+
 namespace mitk {
 
 MimeTypeProvider::MimeTypeProvider()
-  : m_Tracker(us::GetModuleContext(), this)
+  : m_Tracker(NULL)
 {
 }
 
 void MimeTypeProvider::Start()
 {
-  m_Tracker.Open();
+  if (m_Tracker == NULL)
+  {
+    m_Tracker = new us::ServiceTracker<IMimeType, MimeTypeTrackerTypeTraits>(us::GetModuleContext(), this);
+  }
+  m_Tracker->Open();
 }
 
 void MimeTypeProvider::Stop()
 {
-  m_Tracker.Close();
+  m_Tracker->Close();
 }
 
 std::vector<std::string> MimeTypeProvider::GetMimeTypes() const

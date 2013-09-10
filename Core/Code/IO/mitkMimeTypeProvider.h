@@ -76,7 +76,7 @@ private:
   virtual void ModifiedService(const ServiceReferenceT& reference, ServiceReferenceT service);
   virtual void RemovedService(const ServiceReferenceT& reference, ServiceReferenceT service);
 
-  us::ServiceTracker<IMimeType, MimeTypeTrackerTypeTraits> m_Tracker;
+  us::ServiceTracker<IMimeType, MimeTypeTrackerTypeTraits>* m_Tracker;
 
   typedef std::map<std::string, std::set<us::ServiceReferenceU> > MapType;
   MapType m_MimeTypeToRefs;

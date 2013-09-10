@@ -29,8 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * @deprecatedSince{2013_09} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
-DEPRECATED( template < typename TPixel, unsigned int VImageDimension >
-void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName) );
+template < typename TPixel, unsigned int VImageDimension >
+DEPRECATED( void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName) );
 
 /**
  * @brief ITK-Like method to be called for writing an image
@@ -39,7 +39,7 @@ void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const
  *
  * @deprecatedSince{2013_09} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
-DEPRECATED( template < typename TPixel, unsigned int VImageDimension >
-void _mitkItkPictureWriteComposite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName) );
+template < typename TPixel, unsigned int VImageDimension >
+DEPRECATED( void _mitkItkPictureWriteComposite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName) );
 
 #endif /* MITKITKPICTUREWRITE_H */

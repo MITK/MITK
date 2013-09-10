@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
+#include <mitkDataNodeFactory.h>
+
+#include <mitkDicomRTReader.h>
 
 #include "ui_DcmRTVControls.h"
 

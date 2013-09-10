@@ -85,7 +85,8 @@ namespace mitk
 
   ContourModelVector DicomRTReader::ReadDicomFile(char* filename)
   {
-    std::cout << "Filename:" << filename << "\n\n";
+
+    std::cout << "\n\n" << "Filename:" << filename << "\n\n";
     DcmFileFormat file;
     OFCondition outp;
     outp = file.loadFile(filename, EXS_Unknown);
@@ -95,7 +96,13 @@ namespace mitk
       OFString sopClass;
       if(dataset->findAndGetOFString(DCM_SOPClassUID, sopClass).good() && !sopClass.empty())
       {
-        if(sopClass == UID_RTStructureSetStorage)
+        if(sopClass == UID_RTDoseStorage)
+        {
+          int x = this->DicomRTReader::LoadRTDose(dataset);
+          ContourModelVector y;
+          return y;
+        }
+        else if(sopClass == UID_RTStructureSetStorage)
         {
           ContourModelVector x = this->DicomRTReader::ReadStructureSet(dataset);
           return x;
@@ -204,11 +211,6 @@ namespace mitk
       {
         continue;
       }
-      vtkSmartPointer<vtkPoints> tmpPoints = vtkSmartPointer<vtkPoints>::New();
-      vtkSmartPointer<vtkCellArray> tmpCellArray = vtkSmartPointer<vtkCellArray>::New();
-
-      vtkIdType pointId = 0;
-
       currentRoiObject.getReferencedROINumber(refRoiNumber);
       DRTContourSequence &contourSeqObject = currentRoiObject.getContourSequence();
 
@@ -238,7 +240,7 @@ namespace mitk
 
           for(int i=0; i<contourData_LPS.size()/3;i++)
           {
-            mitk::Point3D &point = mitk::Point3D();
+            mitk::Point3D point;
             point[0] = contourData_LPS.at(3*i);
             point[1] = contourData_LPS.at(3*i+1);
             point[2] = contourData_LPS.at(3*i+2);
@@ -258,43 +260,6 @@ namespace mitk
       {
         std::cout << "Cant find referenced ROI\n\n";
         continue;
-      }
-      if(tmpPoints->GetNumberOfPoints() == 1)
-      {
-        // Point ROI
-        vtkSmartPointer<vtkPolyData> tmpPolyData = vtkSmartPointer<vtkPolyData>::New();
-        tmpPolyData->SetPoints(tmpPoints);
-        tmpPolyData->SetVerts(tmpCellArray);
-        refROI->SetPolyData(tmpPolyData);
-      }
-      else if(tmpPoints->GetNumberOfPoints() > 1)
-      {
-        // much to do
-        // Contour ROI
-        vtkSmartPointer<vtkPolyData> tmpPolyData = vtkSmartPointer<vtkPolyData>::New();
-        tmpPolyData->SetPoints(tmpPoints);
-        tmpPolyData->SetLines(tmpCellArray);
-
-        // Remove coincident points (if there are multiple contour points at the same position then the
-        // ribbon filter fails)
-        vtkSmartPointer<vtkCleanPolyData> cleaner=vtkSmartPointer<vtkCleanPolyData>::New();
-        cleaner->SetInput(tmpPolyData);
-
-        // convert to ribbon using vtkRibbonFilter
-        vtkSmartPointer<vtkRibbonFilter> ribbonFilter = vtkSmartPointer<vtkRibbonFilter>::New();
-        ribbonFilter->SetInputConnection(cleaner->GetOutputPort());
-        ribbonFilter->SetDefaultNormal(0,0,-1);
-        ribbonFilter->SetWidth(sliceThickness/2.0);
-        ribbonFilter->SetAngle(90.0);
-        ribbonFilter->UseDefaultNormalOn();
-        ribbonFilter->Update();
-
-        vtkSmartPointer<vtkPolyDataNormals> normalFilter = vtkSmartPointer<vtkPolyDataNormals>::New();
-        normalFilter->SetInputConnection(ribbonFilter->GetOutputPort());
-        normalFilter->ConsistencyOn();
-        normalFilter->Update();
-
-        refROI->SetPolyData(normalFilter->GetOutput());
       }
       Sint32 roiColor;
       for(int j=0;j<3;j++)
@@ -474,12 +439,20 @@ namespace mitk
   int DicomRTReader::LoadRTDose(DcmDataset* dataset)
   {
     DRTDoseIOD doseObject;
+
+//#############################################################################################################
+//######################################## READING CHECK ######################################################
+
     OFCondition result = doseObject.read(*dataset);
     if(result.bad())
     {
       std::cout << "Error reading the RT Dose dataset\n\n";
       return 0;
     }
+
+//#############################################################################################################
+//###################################### GRID SCALING CHECK ###################################################
+
     OFString doseGridScaling;
     if(doseObject.getDoseGridScaling(doseGridScaling).bad())
     {
@@ -487,6 +460,11 @@ namespace mitk
       return 0;
     }
     doseObject.setDoseGridScaling(doseGridScaling.c_str());
+
+    std::cout << "Dose Grid Scaling: " << doseGridScaling << "\n\n";
+
+//#############################################################################################################
+//####################################### DOSE UNITS CHECK ####################################################
 
     OFString doseUnits;
     if(doseObject.getDoseUnits(doseUnits).bad())
@@ -496,12 +474,38 @@ namespace mitk
     }
     doseObject.setDoseUnits(doseUnits.c_str());
 
+    std::cout << "Dose Units: " << doseUnits << "\n\n";
+
+//#############################################################################################################
+//##################################### PIXEL SPACING CHECK ###################################################
+
     OFVector<Float64> pixelSpacingOFVector;
     if(doseObject.getPixelSpacing(pixelSpacingOFVector).bad() || pixelSpacingOFVector.size() < 2)
     {
       std::cout << "Error reading the pixel spacing for dose object\n\n";
       return 0;
     }
+
+    for(int i=0; i<pixelSpacingOFVector.size(); i++)
+    {
+      std::cout << "Pixel Spacing Vector at: " << i << " -> " << pixelSpacingOFVector.at(i) << "\n";
+    }
+    std::cout << "\n";
+
+//#############################################################################################################
+//####################################### PIXEL DATA CHECK ####################################################
+
+    DcmPixelData pixelData = doseObject.getPixelData();
+    if(pixelData.isEmpty())
+    {
+      std::cout << "Error reading the pixel data \n\n";
+      return 0;
+    }
+
+    std::cout << "Pixel Data Length: " << pixelData.getLength() << "\n\n";
+
+//#############################################################################################################
+//#############################################################################################################
 
     return 1;
   }

@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk
 #include "DcmRTV.h"
 
+#include "mitkSegmentationObjectFactory.h"
+
+
 // Qt
 #include <QMessageBox>
 
@@ -35,6 +38,7 @@ void DcmRTV::SetFocus()
 
 void DcmRTV::CreateQtPartControl( QWidget *parent )
 {
+  RegisterSegmentationObjectFactory();
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
   connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
@@ -55,47 +59,43 @@ void DcmRTV::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
   }
 
   m_Controls.labelWarning->setVisible( true );
-  m_Controls.buttonPerformImageProcessing->setEnabled( false );
+  m_Controls.buttonPerformImageProcessing->setEnabled( true );
 }
 
 
 void DcmRTV::DoImageProcessing()
 {
-  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  if (nodes.empty()) return;
+  //char* filename="/home/riecker/DicomRT/DICOMRT_Bilder/2/RTSTRUCT.2.16.840.1.113669.2.931128.509887832.20120106104805.776010.dcm";
+  char* filename="/home/riecker/DicomRT/DICOMRT_Bilder/1/0_RS.dcm";
+  //char* filename="/home/riecker/DicomRT/DICOMRT_Bilder/DICOM-RT/L_H/RS1.2.826.0.1.3680043.8.176.2013826104523980.670.5041441575.dcm";
+  //char* filename="/home/riecker/DicomRT/DICOMRT_Bilder/DICOM-RT/W_K/RS1.2.826.0.1.3680043.8.176.2013826103827986.364.7703564406.dcm";
 
-  mitk::DataNode* node = nodes.front();
+  mitk::DicomRTReader::Pointer _DicomRTReader = mitk::DicomRTReader::New();
 
-  if (!node)
+  DcmFileFormat file;
+  OFCondition outp = file.loadFile(filename, EXS_Unknown);
+  if(outp.bad())
   {
-    // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, "Template", "Please load and select an image before starting image processing.");
-    return;
+    QMessageBox::information(NULL,"Error","Cant read the file");
+  }
+  DcmDataset *dataset = file.getDataset();
+
+  ContourModelVector result = _DicomRTReader->ReadStructureSet(dataset);
+
+  mitk::DicomRTReader::Pointer readerRT = mitk::DicomRTReader::New();
+  ContourModelVector modelVector = readerRT->ReadDicomFile(filename);
+
+  if(result.empty())
+  {
+    QMessageBox::information(NULL, "Error", "Vector is empty ...");
   }
 
-  // here we have a valid mitk::DataNode
-
-  // a node itself is not very useful, we need its data item (the image)
-  mitk::BaseData* data = node->GetData();
-  if (data)
+  for(int i=0;i<modelVector.size();i++)
   {
-    // test if this data item is an image or not (could also be a surface or something totally different)
-    mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-    if (image)
-    {
-      std::stringstream message;
-      std::string name;
-      message << "Performing image processing for image ";
-      if (node->GetName(name))
-      {
-        // a property called "name" was found for this DataNode
-        message << "'" << name << "'";
-      }
-      message << ".";
-      MITK_INFO << message.str();
-
-      // actually do something here...
-
-    }
+    mitk::DataNode::Pointer x = mitk::DataNode::New();
+    x->SetData(modelVector.at(i));
+    x->SetName("ContourModel");
+    x->SetVisibility(true);
+    GetDataStorage()->Add(x);
   }
 }

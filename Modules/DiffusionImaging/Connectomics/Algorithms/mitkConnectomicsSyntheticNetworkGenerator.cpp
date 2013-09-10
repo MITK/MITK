@@ -238,9 +238,6 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCenterToSurfa
   // uniform weight of one
   int edgeWeight(1);
 
-  mitk::ConnectomicsNetwork::VertexDescriptorType source;
-  mitk::ConnectomicsNetwork::VertexDescriptorType target;
-
   //add vertices on sphere surface
   for( int loopID( 1 ); loopID < numberOfPoints; loopID++  )
   {

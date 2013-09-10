@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkContourModel.h"
+#include "mitkContourModelSet.h"
 #include "mitkContourModelIOFactory.h"
 #include "mitkContourModelWriterFactory.h"
 #include "mitkContourModelWriter.h"
@@ -58,6 +59,13 @@ mitk::Mapper::Pointer mitk::ContourObjectFactory::CreateMapper(mitk::DataNode* n
       newMapper = mitk::ContourModelGLMapper2D::New();
       newMapper->SetDataNode(node);
     }
+
+    std::string contourModelSet_classname("ContourModelSet");
+    if(node->GetData() && contourModelSet_classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::ContourModelSetGLMapper2D::New();
+      newMapper->SetDataNode(node);
+    }
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
@@ -84,6 +92,12 @@ void mitk::ContourObjectFactory::SetDefaultProperties(mitk::DataNode* node)
   {
     mitk::ContourModelGLMapper2D::SetDefaultProperties(node);
     mitk::ContourModelMapper3D::SetDefaultProperties(node);
+  }
+
+  std::string contourModelSet_classname("ContourModelSet");
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::ContourModelSetGLMapper2D::SetDefaultProperties(node);
   }
 }
 

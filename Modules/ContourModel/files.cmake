@@ -6,10 +6,12 @@ set(CPP_FILES
   Algorithms/mitkImageToContourModelFilter.cpp
   Algorithms/mitkContourObjectFactory.cpp
   DataManagement/mitkContourModel.cpp
+  DataManagement/mitkContourModelSet.cpp
   DataManagement/mitkContourElement.cpp
   Rendering/mitkContourModelGLMapper2D.cpp
   Rendering/mitkContourModelMapper2D.cpp
   Rendering/mitkContourModelMapper3D.cpp
+  Rendering/mitkContourModelSetGLMapper2D.cpp
   IO/mitkContourModelIOFactory.cpp
   IO/mitkContourModelReader.cpp
   IO/mitkContourModelWriter.cpp

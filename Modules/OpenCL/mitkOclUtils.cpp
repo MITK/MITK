@@ -131,57 +131,6 @@ void oclPrintMemObjectInfo(cl_mem memobj)
   MITK_INFO << "================== \n" << std::endl;
 }
 
-
-char* oclLoadProgramSource( const char* srcFilename, const char* srcPreamble, size_t* srcLength)
-{
-  FILE* pFileStream = NULL;
-  size_t szSourceLength;
-
-  MITK_INFO<< "Loading GPU SourceCode from " << srcFilename <<" \n";
-
-#ifdef _WIN32
-  if(fopen_s(&pFileStream, srcFilename, "rb") != 0)
-  {
-    return NULL;
-    printf("Failed to open file \n");
-
-  }
-#else           // Linux version
-  pFileStream = fopen(srcFilename, "rb");
-  if(pFileStream == 0)
-  {
-    return NULL;
-  }
-#endif
-
-  size_t szPreambleLength = strlen(srcPreamble);
-
-  // get the length of the source code
-  fseek(pFileStream, 0, SEEK_END);
-  szSourceLength = ftell(pFileStream);
-  fseek(pFileStream, 0, SEEK_SET);
-
-  // allocate a buffer for the source code string and read it in
-  char* cSourceString = (char *)malloc(szSourceLength + szPreambleLength + 1);
-  memcpy(cSourceString, srcPreamble, szPreambleLength);
-  if (fread((cSourceString) + szPreambleLength, szSourceLength, 1, pFileStream) != 1)
-  {
-    fclose(pFileStream);
-    free(cSourceString);
-    return 0;
-  }
-
-  // close the file and return the total length of the combined (preamble + source) string
-  fclose(pFileStream);
-  if(srcLength != 0)
-  {
-    *srcLength = szSourceLength + szPreambleLength;
-  }
-  cSourceString[szSourceLength + szPreambleLength] = '\0';
-
-  return cSourceString;
-}
-
 void oclPrintDeviceInfo(cl_device_id device)
 {
   char device_string[1024];

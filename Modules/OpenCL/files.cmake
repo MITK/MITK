@@ -17,3 +17,7 @@ set(CPP_FILES
 # own filter implementations
   mitkOclBinaryThresholdImageFilter.cpp
 )
+
+set(RESOURCE_FILES
+  BinaryThresholdFilter.cl
+)

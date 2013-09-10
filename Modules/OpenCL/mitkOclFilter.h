@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOclUtils.h"
 #include "mitkCommon.h"
 
+#include <vector>
+#include <usModule.h>
+
 #include <MitkOclExports.h>
 
 namespace mitk
@@ -39,17 +42,8 @@ public:
     *
     *  @param filename Path to the file
     */
-  void SetSourceFile(const char* filename);
-
-  /**
-    * @brief Set the folder of the directory that contains
-    *        the OpenCL source files. This location will also be used
-    *        as an include folder for the OpenCL compiler and all headers placed
-    *        there can be loaded by the compiler.
-    *
-    *  @param path to the modulefolder that contains the gpuSource
-    */
-  void SetSourcePath(const char* path);
+//  void SetSourceFile(const char* filename);
+    void AddSourceFile(const char* filename);
 
   /**
     * @brief Set specific compilerflags to compile the CL source. Default is set to NULL;
@@ -68,17 +62,15 @@ public:
   virtual ~OclFilter();
 
 protected:
+
+  typedef std::vector<const char*> CStringList;
+  typedef std::vector<size_t> ClSizeList;
+
   /** @brief Constructor */
   OclFilter();
 
   /** @brief Constructor ( overloaded ) */
   OclFilter(const char* filename);
-
-  /** @brief Path to the *.cl source file */
-  std::string m_ClFile;
-
-  /** @brief The source code to be compiled for the GPU */
-  const char* m_ClSource;
 
   /** @brief String that contains the compiler flags */
   const char* m_ClCompilerFlags;
@@ -95,11 +87,10 @@ protected:
   /*! @brief source preambel for e.g. #define commands to be inserted into the OpenCL source */
   const char* m_Preambel;
 
+  CStringList m_ClFiles;
+
   /** @brief  status of the filter */
   bool m_Initialized;
-
-  /** @brief The path of the module folder in wich the gpu sourcefiles are stored */
-  std::string m_ClSourcePath;
 
   /** @brief The local work size fo the filter */
   size_t m_LocalWorkSize[3];
@@ -140,7 +131,9 @@ protected:
       */
   void SetSourcePreambel(const char* preambel);
 
+  virtual us::Module* GetModule() = 0;
 
+  void LoadSourceFiles(CStringList &SourceCodeList, ClSizeList &SourceCodeSizeList);
 };
 }
 #endif // __mitkOclFilter_h

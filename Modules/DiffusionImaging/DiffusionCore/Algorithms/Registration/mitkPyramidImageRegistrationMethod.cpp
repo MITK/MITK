@@ -27,7 +27,8 @@ mitk::PyramidImageRegistrationMethod::PyramidImageRegistrationMethod()
     m_UseWindowedSincInterpolator(false),
     m_UseMask(false),
     m_EstimatedParameters(NULL),
-    m_Verbose(false)
+    m_Verbose(false),
+    m_InitializeByGeometry(false)
 {
 
 }

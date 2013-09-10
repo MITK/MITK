@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObject.h>
 #include "itkImageMaskSpatialObject.h"
 #include "itkNotImageFilter.h"
+#include <itkCenteredVersorTransformInitializer.h>
 #include <vnl/vnl_matrix_fixed.h>
 
 #include "mitkImage.h"
@@ -132,6 +133,12 @@ public:
   /** Fixed image mask, excludes the masked voxels from the registration metric*/
   void SetFixedImageMask( mitk::Image::Pointer mask);
 
+
+  void SetInitializeByGeometry(bool flag)
+  {
+    m_InitializeByGeometry = flag;
+  }
+
   void Update();
 
   /**
@@ -233,6 +240,8 @@ protected:
   /** Control the verbosity of the regsitistration output */
   bool m_Verbose;
 
+  bool m_InitializeByGeometry;
+
   template <typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
   void RegisterTwoImages(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image<TPixel2, VImageDimension2>* itkImage2)
   {
@@ -286,8 +295,6 @@ protected:
     {
       initialParams[0] = initialParams[4] = initialParams[8] = 1;
     }
-
-
     typename FixedImageType::Pointer referenceImage = itkImage1;
     typename MovingImageType::Pointer movingImage = itkImage2;
     typename FixedImageType::RegionType maskedRegion = referenceImage->GetLargestPossibleRegion();
@@ -338,6 +345,25 @@ protected:
     optimizer->SetRelaxationFactor( 0.7 );
     optimizer->SetMaximumStepLength( optmaxstep );
     optimizer->SetMinimumStepLength( optminstep );
+
+    // Initializing by Geometry
+    if (!m_UseAffineTransform && m_InitializeByGeometry)
+    {
+      typedef itk::CenteredVersorTransformInitializer< FixedImageType, MovingImageType> TransformInitializerType;
+      typename TransformInitializerType::TransformType::Pointer rigidTransform = TransformInitializerType::TransformType::New() ;
+      MITK_INFO << "Initializer starting at : " << rigidTransform->GetParameters();
+
+      typename TransformInitializerType::Pointer initializer = TransformInitializerType::New();
+      initializer->SetTransform( rigidTransform);
+      initializer->SetFixedImage( referenceImage.GetPointer() );
+      initializer->SetMovingImage(  movingImage.GetPointer() );
+      initializer->MomentsOn();
+      initializer->InitializeTransform();
+      MITK_INFO << "Initialized Rigid position :  " << rigidTransform->GetParameters();
+      initialParams[3]=rigidTransform->GetParameters()[3];
+      initialParams[4]=rigidTransform->GetParameters()[4];
+      initialParams[5]=rigidTransform->GetParameters()[5];
+    }
 
     // add observer tag if verbose */
     unsigned long vopt_tag = 0;

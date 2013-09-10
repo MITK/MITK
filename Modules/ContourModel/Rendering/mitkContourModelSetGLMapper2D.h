@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "ContourModelExports.h"
-#include "mitkGLMapper.h"
+#include "mitkContourModelGLMapper2DBase.h"
 #include "mitkContourModelSet.h"
 #include "mitkBaseRenderer.h"
 
@@ -36,11 +36,11 @@ namespace mitk {
   *
   * @ingroup Mapper
   */
-  class ContourModel_EXPORT ContourModelSetGLMapper2D : public GLMapper
+  class ContourModel_EXPORT ContourModelSetGLMapper2D : public ContourModelGLMapper2DBase
   {
   public:
 
-    mitkClassMacro(ContourModelSetGLMapper2D, GLMapper);
+    mitkClassMacro(ContourModelSetGLMapper2D, ContourModelGLMapper2DBase);
 
     itkNewMacro(Self);
 

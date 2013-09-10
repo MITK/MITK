@@ -160,7 +160,7 @@ mitk::ContourElement::VertexType* mitk::ContourElement::BruteForceGetVertexAt(co
 
 
 
-mitk::ContourElement::VertexType* mitk::ContourElement::OptimizedGetVertexAt(const mitk::Point3D &point, float eps)
+/*mitk::ContourElement::VertexType* mitk::ContourElement::OptimizedGetVertexAt(const mitk::Point3D &point, float eps)
 {
   if( (eps > 0) && (this->m_Vertices->size()>0) )
   {
@@ -223,6 +223,7 @@ mitk::ContourElement::VertexType* mitk::ContourElement::OptimizedGetVertexAt(con
   }
   return NULL;
 }
+*/
 
 
 

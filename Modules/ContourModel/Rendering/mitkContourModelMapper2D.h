@@ -14,12 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITK_CONTOURMODEL_MAPPER_3D_H_
-#define _MITK_CONTOURMODEL_MAPPER_3D_H_
+#ifndef _MITK_CONTOURMODEL_MAPPER_H_
+#define _MITK_CONTOURMODEL_MAPPER_H_
 
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include "ContourModelExports.h"
 
 #include "mitkBaseRenderer.h"
 #include "mitkVtkMapper.h"
@@ -32,16 +32,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkActor.h>
 #include <vtkProp.h>
 #include <vtkPolyData.h>
-#include <vtkTubeFilter.h>
-
 
 namespace mitk {
 
-  class Segmentation_EXPORT ContourModelMapper3D : public VtkMapper
+  class ContourModel_EXPORT ContourModelMapper2D : public VtkMapper
   {
       public:
     /** Standard class typedefs. */
-    mitkClassMacro( ContourModelMapper3D,VtkMapper );
+    mitkClassMacro( ContourModelMapper2D,VtkMapper );
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
@@ -55,11 +53,10 @@ namespace mitk {
 
         /*+++ methods of MITK-VTK rendering pipeline +++*/
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
-
     /*+++ END methods of MITK-VTK rendering pipeline +++*/
 
 
-    class Segmentation_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
+    class ContourModel_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
 
@@ -67,8 +64,6 @@ namespace mitk {
       vtkSmartPointer<vtkActor> m_Actor;
       /** \brief Mapper of a 2D render window. */
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
-
-      vtkSmartPointer<vtkTubeFilter> m_TubeFilter;
 
       //mitk::ContourModelToVtkPolyDataFilter::Pointer m_contourToPolyData;
 
@@ -97,12 +92,12 @@ namespace mitk {
 
 
   protected:
-    ContourModelMapper3D();
-    virtual ~ContourModelMapper3D();
+    ContourModelMapper2D();
+    virtual ~ContourModelMapper2D();
 
     void GenerateDataForRenderer( mitk::BaseRenderer *renderer );
 
-    virtual vtkSmartPointer<vtkPolyData> CreateVtkPolyDataFromContour(mitk::ContourModel* inputContour);
+    virtual vtkSmartPointer<vtkPolyData> CreateVtkPolyDataFromContour(mitk::ContourModel* inputContour, mitk::BaseRenderer* renderer);
 
     virtual void ApplyContourProperties(mitk::BaseRenderer* renderer);
   };

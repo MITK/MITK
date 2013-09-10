@@ -14,50 +14,53 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITK_CONTOURMODEL_TO_Surface_FILTER_H_
-#define _MITK_CONTOURMODEL_TO_Surface_FILTER_H_
-
+#ifndef _mitkImageToContourModelFilter_h__
+#define _mitkImageToContourModelFilter_h__
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
-
-
+#include "ContourModelExports.h"
 #include "mitkContourModel.h"
 #include "mitkContourModelSource.h"
-
-#include <mitkSurfaceSource.h>
+#include <mitkImage.h>
 
 
 namespace mitk {
 
-  class Segmentation_EXPORT ContourModelToSurfaceFilter : public SurfaceSource
+  /**
+  *
+  * \brief Base class for all filters with mitk::Image as input and mitk::ContourModel
+  *
+  * \ingroup ContourModelFilters
+  * \ingroup Process
+  */
+  class ContourModel_EXPORT ImageToContourModelFilter : public ContourModelSource
   {
 
   public:
-    /** Standard class typedefs. */
-    mitkClassMacro( ContourModelToSurfaceFilter, SurfaceSource );
 
-    /** Method for creation through the object factory. */
+    mitkClassMacro(ImageToContourModelFilter, ContourModelSource);
     itkNewMacro(Self);
 
-    typedef mitk::Surface OutputType;
-
-    typedef mitk::ContourModel InputType;
+    typedef mitk::Image InputType;
 
 
-
-    /** Set/Get the image input of this process object.  */
     virtual void SetInput( const InputType *input);
+
     virtual void SetInput( unsigned int idx, const InputType * input);
-    const InputType * GetInput(void);
-    const InputType * GetInput(unsigned int idx);
+
+    const InputType* GetInput(void);
+
+    const InputType* GetInput(unsigned int idx);
 
   protected:
-    ContourModelToSurfaceFilter();
-    ~ContourModelToSurfaceFilter();
+    ImageToContourModelFilter();
 
-    virtual void GenerateData();
+    virtual ~ImageToContourModelFilter();
+
+    void GenerateData();
 
   };
+
 }
+
 #endif

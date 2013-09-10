@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include <mitkContourModelMapper2D.h>
 
+#include <mitkContourModelSubDivisionFilter.h>
+
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
 #include <vtkAppendPolyData.h>

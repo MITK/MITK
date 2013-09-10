@@ -35,9 +35,9 @@ namespace mitk
 
     mitkClassMacro(ContourModelSet, mitk::BaseData);
 
-    itkNewMacro(Self);
+    itkNewMacro(ContourModelSet);
 
-    mitkCloneMacro(Self);
+    mitkCloneMacro(ContourModelSet);
 
     typedef std::deque<mitk::ContourModel::Pointer> ContourModelListType;
     typedef ContourModelListType::iterator ContourModelSetIterator;
@@ -113,6 +113,13 @@ namespace mitk
 
     void SetRequestedRegion(const itk::DataObject* ){}
 
+    /**
+    \brief Update the OutputInformation of a ContourModel object
+
+    The BoundingBox of the contour will be updated, if necessary.
+    */
+    virtual void UpdateOutputInformation();
+
     //////////////// END inherit  from mitk::BaseData ////////////////////
 
 
@@ -122,7 +129,13 @@ namespace mitk
     ContourModelSet(const mitk::ContourModelSet &other);
     virtual ~ContourModelSet();
 
+    //inherit from BaseData. Initial state with no contours and a single timestep.
+    virtual void InitializeEmpty();
+
     ContourModelListType m_Contours;
+
+    //only update the bounding geometry if necessary
+    bool m_UpdateBoundingBox;
 
   };
 } // namespace mitk

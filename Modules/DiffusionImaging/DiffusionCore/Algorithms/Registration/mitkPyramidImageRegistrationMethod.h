@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageToItk.h"
 #include "mitkImageCast.h"
+#include "mitkImageCaster.h"
 #include "mitkITKImageImport.h"
 
 
@@ -454,9 +455,8 @@ protected:
     typedef itk::WindowedSincInterpolateImageFunction< ImageType, 7> WindowedSincInterpolatorType;
     typename WindowedSincInterpolatorType::Pointer sinc_interpolator = WindowedSincInterpolatorType::New();
 
-    typename mitk::ImageToItk< ImageType >::Pointer reference_image = mitk::ImageToItk< ImageType >::New();
-    reference_image->SetInput( this->m_FixedImage );
-    reference_image->Update();
+    typename ImageType::Pointer reference_image = ImageType::New();
+    CastToItkImage(m_FixedImage,reference_image);
 
     typedef itk::MatrixOffsetTransformBase< double, 3, 3> BaseTransformType;
     BaseTransformType::Pointer base_transform = BaseTransformType::New();
@@ -494,7 +494,7 @@ protected:
 
     resampler->SetInput( itkImage );
     resampler->SetTransform( base_transform );
-    resampler->SetReferenceImage( reference_image->GetOutput() );
+    resampler->SetReferenceImage( reference_image );
     resampler->UseReferenceImageOn();
 
     resampler->Update();

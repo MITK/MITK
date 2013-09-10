@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <berryIWorkbenchPage.h>
-
+#include <berryConstants.h>
 
 #include "mitkLabelSetImage.h"
 #include "mitkColormapProperty.h"
@@ -47,12 +47,10 @@ const std::string QmitkSegmentationView::VIEW_ID = "org.mitk.views.segmentation"
 
 // public methods
 
-QmitkSegmentationView::QmitkSegmentationView()
-:m_Parent(NULL)
-,m_Controls(NULL)
-,m_MultiWidget(NULL)
-,m_DataSelectionChanged(false)
-,m_MouseCursorSet(false)
+QmitkSegmentationView::QmitkSegmentationView() :
+m_Parent(NULL),
+m_DataSelectionChanged(false),
+m_MouseCursorSet(false)
 {
   RegisterSegmentationObjectFactory();
 
@@ -78,33 +76,30 @@ QmitkSegmentationView::QmitkSegmentationView()
 
 QmitkSegmentationView::~QmitkSegmentationView()
 {
-  delete m_Controls;
 }
 
+/*
 void QmitkSegmentationView::Visible()
 {
-  if( m_Controls )
-  {
-    MITK_INFO << "QmitkSegmentationView::Visible()";
-    m_Controls->m_ManualToolSelectionBox2D->SetAutoShowNamesWidth(250);
-    m_Controls->m_ManualToolSelectionBox2D->setEnabled( true );
-    m_Controls->m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(260);
-    m_Controls->m_ManualToolSelectionBox3D->setEnabled( true );
-//    this->OnPatientComboBoxSelectionChanged(m_Controls->patImageSelector->GetSelectedNode());
-//    this->OnSegmentationComboBoxSelectionChanged(m_Controls->segImageSelector->GetSelectedNode());
-  }
+  MITK_INFO << "QmitkSegmentationView::Visible()";
+  m_Controls.m_ManualToolSelectionBox2D->SetAutoShowNamesWidth(250);
+  m_Controls.m_ManualToolSelectionBox2D->setEnabled( true );
+  m_Controls.m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(260);
+  m_Controls.m_ManualToolSelectionBox3D->setEnabled( true );
+//    this->OnPatientComboBoxSelectionChanged(m_Controls.patImageSelector->GetSelectedNode());
+//    this->OnSegmentationComboBoxSelectionChanged(m_Controls.segImageSelector->GetSelectedNode());
 }
+*/
 
+/*
 void QmitkSegmentationView::Activated()
 {
-  if( m_Controls )
-  {
-    MITK_INFO << "QmitkSegmentationView::Activated()";
-    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetReferenceData(m_Controls->m_cbReferenceNodeSelector->GetSelectedNode());
-    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetWorkingData(m_Controls->m_cbWorkingNodeSelector->GetSelectedNode());
-  }
+  MITK_INFO << "QmitkSegmentationView::Activated()";
+  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetReferenceData(m_Controls.m_cbReferenceNodeSelector->GetSelectedNode());
+  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetWorkingData(m_Controls.m_cbWorkingNodeSelector->GetSelectedNode());
 }
-
+*/
+/*
 void QmitkSegmentationView::Deactivated()
 {
   mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
@@ -119,28 +114,67 @@ void QmitkSegmentationView::Deactivated()
   mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetWorkingData(NULL);
   mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetReferenceData(NULL);
 
-  m_Controls->m_ManualToolSelectionBox2D->setEnabled( false );
-  m_Controls->m_ManualToolSelectionBox3D->setEnabled( false );
+  m_Controls.m_ManualToolSelectionBox2D->setEnabled( false );
+  m_Controls.m_ManualToolSelectionBox3D->setEnabled( false );
 
-  m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
-  m_Controls->m_SlicesInterpolator->setEnabled( false );
+  m_Controls.m_SlicesInterpolator->EnableInterpolation( false );
+  m_Controls.m_SlicesInterpolator->setEnabled( false );
 }
+*/
 
-void QmitkSegmentationView::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
+void QmitkSegmentationView::SetFocus ()
 {
-  SetMultiWidget(&stdMultiWidget);
+
 }
 
-void QmitkSegmentationView::StdMultiWidgetNotAvailable()
+void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-  SetMultiWidget(NULL);
+  if (this->m_IRenderWindowPart != renderWindowPart)
+  {
+    this->m_IRenderWindowPart = renderWindowPart;
+    this->m_Parent->setEnabled(true);
+
+    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+    m_Controls.m_SlicesInterpolator->SetDataStorage( this->GetDataStorage());
+    QList<mitk::SliceNavigationController*> controllers;
+    controllers.push_back(renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
+    controllers.push_back(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
+    controllers.push_back(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
+    m_Controls.m_SlicesInterpolator->Initialize( toolManager, controllers );
+  }
 }
 
-void QmitkSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget& /*stdMultiWidget*/ )
+void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
-  SetMultiWidget(NULL);
+  m_IRenderWindowPart = 0;
+  m_Parent->setEnabled(false);
 }
 
+int QmitkSegmentationView::GetSizeFlags(bool width)
+{
+  if(!width)
+  {
+    return berry::Constants::MIN | berry::Constants::MAX | berry::Constants::FILL;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+int QmitkSegmentationView::ComputePreferredSize(bool width, int /*availableParallel*/, int /*availablePerpendicular*/, int preferredResult)
+{
+  if(width==false)
+  {
+    return 200;
+  }
+  else
+  {
+    return preferredResult;
+  }
+}
+
+/*
 void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
 {
   // save the current multiwidget as the working widget
@@ -155,15 +189,15 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
   if (m_Controls && m_MultiWidget)
   {
     mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-    m_Controls->m_SlicesInterpolator->SetDataStorage( this->GetDefaultDataStorage());
+    m_Controls.m_SlicesInterpolator->SetDataStorage( this->GetDataStorage());
     QList<mitk::SliceNavigationController*> controllers;
     controllers.push_back(m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController());
     controllers.push_back(m_MultiWidget->GetRenderWindow2()->GetSliceNavigationController());
     controllers.push_back(m_MultiWidget->GetRenderWindow3()->GetSliceNavigationController());
-    m_Controls->m_SlicesInterpolator->Initialize( toolManager, controllers );
+    m_Controls.m_SlicesInterpolator->Initialize( toolManager, controllers );
   }
 }
-
+*/
 void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
 
@@ -246,8 +280,8 @@ void QmitkSegmentationView::OnSegmentationSelectionChanged(const mitk::DataNode 
       mitk::DataNode* workingNode = const_cast<mitk::DataNode*>(node);
       workingNode->SetVisibility(true);
       toolManager->SetWorkingData(workingNode);
-      m_Controls->m_SlicesInterpolator->setEnabled( true );
-//      m_Controls->m_SlicesInterpolator->SetWorkingImage( dynamic_cast< mitk::LabelSetImage*>( workingNode->GetData() ) );
+      m_Controls.m_SlicesInterpolator->setEnabled( true );
+//      m_Controls.m_SlicesInterpolator->SetWorkingImage( dynamic_cast< mitk::LabelSetImage*>( workingNode->GetData() ) );
 
       mitk::DataStorage::SetOfObjects::ConstPointer others = this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
       for(mitk::DataStorage::SetOfObjects::const_iterator iter = others->begin(); iter != others->end(); ++iter)
@@ -259,7 +293,7 @@ void QmitkSegmentationView::OnSegmentationSelectionChanged(const mitk::DataNode 
   }
   else
   {
-    m_Controls->m_SlicesInterpolator->setEnabled( false );
+    m_Controls.m_SlicesInterpolator->setEnabled( false );
     this->UpdateWarningLabel("Create a segmentation");
   }
 }
@@ -296,7 +330,7 @@ void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
 void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
 }
-
+/*
 void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
 {
   QmitkRenderWindow* selectedRenderWindow = 0;
@@ -354,7 +388,7 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
-
+*/
 void QmitkSegmentationView::OnTabWidgetChanged(int id)
 {
   //always disable tools on tab changed
@@ -365,8 +399,8 @@ void QmitkSegmentationView::OnTabWidgetChanged(int id)
   if (id == 0)
   {
     //Hide 3D selection box, show 2D selection box
-    m_Controls->m_ManualToolSelectionBox3D->hide();
-    m_Controls->m_ManualToolSelectionBox2D->show();
+    m_Controls.m_ManualToolSelectionBox3D->hide();
+    m_Controls.m_ManualToolSelectionBox2D->show();
     //Deactivate possible active tool
 
     //TODO Remove possible visible interpolations -> Maybe changes in SlicesInterpolator
@@ -374,8 +408,8 @@ void QmitkSegmentationView::OnTabWidgetChanged(int id)
   else
   {
     //Hide 3D selection box, show 2D selection box
-    m_Controls->m_ManualToolSelectionBox2D->hide();
-    m_Controls->m_ManualToolSelectionBox3D->show();
+    m_Controls.m_ManualToolSelectionBox2D->hide();
+    m_Controls.m_ManualToolSelectionBox3D->show();
     //Deactivate possible active tool
   }
 }
@@ -409,81 +443,79 @@ bool QmitkSegmentationView::CheckForSameGeometry(const mitk::DataNode *node1, co
 void QmitkSegmentationView::UpdateWarningLabel(QString text)
 {
   if (text.size() == 0)
-    m_Controls->lblSegmentationWarnings->hide();
+    m_Controls.lblSegmentationWarnings->hide();
   else
-    m_Controls->lblSegmentationWarnings->show();
-  m_Controls->lblSegmentationWarnings->setText(text);
+    m_Controls.lblSegmentationWarnings->show();
+  m_Controls.lblSegmentationWarnings->setText(text);
 }
 
 void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 {
   // setup the basic GUI of this view
   m_Parent = parent;
+  m_Controls.setupUi(parent);
 
-  m_Controls = new Ui::QmitkSegmentationControls;
-  m_Controls->setupUi(parent);
-
-  m_Controls->m_cbReferenceNodeSelector->SetDataStorage(this->GetDefaultDataStorage());
-  m_Controls->m_cbReferenceNodeSelector->SetPredicate(m_ReferencePredicate);
+  m_Controls.m_cbReferenceNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.m_cbReferenceNodeSelector->SetPredicate(m_ReferencePredicate);
 
   this->UpdateWarningLabel("Please load an image");
 
-  if( m_Controls->m_cbReferenceNodeSelector->GetSelectedNode().IsNotNull() )
+  if( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode().IsNotNull() )
       this->UpdateWarningLabel("Create a segmentation");
 
-  m_Controls->m_cbWorkingNodeSelector->SetDataStorage(this->GetDefaultDataStorage());
-  m_Controls->m_cbWorkingNodeSelector->SetPredicate(m_SegmentationPredicate);
-  m_Controls->m_cbWorkingNodeSelector->SetAutoSelectNewItems(true);
-  if( m_Controls->m_cbWorkingNodeSelector->GetSelectedNode().IsNotNull() )
+  m_Controls.m_cbWorkingNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.m_cbWorkingNodeSelector->SetPredicate(m_SegmentationPredicate);
+  m_Controls.m_cbWorkingNodeSelector->SetAutoSelectNewItems(true);
+  if( m_Controls.m_cbWorkingNodeSelector->GetSelectedNode().IsNotNull() )
     this->UpdateWarningLabel("");
 
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   assert ( toolManager );
-  toolManager->SetDataStorage( *(this->GetDefaultDataStorage()) );
+  toolManager->SetDataStorage( *(this->GetDataStorage()) );
   toolManager->InitializeTools();
 
   //use the same ToolManager instance for our 3D Tools
-  m_Controls->m_ManualToolSelectionBox3D->SetToolManager(*toolManager);
+  m_Controls.m_ManualToolSelectionBox3D->SetToolManager(*toolManager);
 
-  m_Controls->m_LabelSetWidget->SetDataStorage( *(this->GetDefaultDataStorage()) );
-  m_Controls->m_LabelSetWidget->SetPreferences( this->GetPreferences() );
+  m_Controls.m_LabelSetWidget->SetDataStorage( *(this->GetDataStorage()) );
+  m_Controls.m_LabelSetWidget->SetPreferences( this->GetPreferences() );
 
   // all part of open source MITK
-  m_Controls->m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
-  m_Controls->m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer2D );
-  //m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' 'FastMarching2D'");
-  m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract 'Region Growing' 'FastMarching2D'");
-  m_Controls->m_ManualToolSelectionBox2D->SetLayoutColumns(3);
-  m_Controls->m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
-  connect( m_Controls->m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
+  m_Controls.m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
+  m_Controls.m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer2D );
+  //m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' 'FastMarching2D'");
+  m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract 'Region Growing' 'FastMarching2D'");
+  m_Controls.m_ManualToolSelectionBox2D->SetLayoutColumns(3);
+  m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
+  connect( m_Controls.m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
 
   //setup 3D Tools
-  m_Controls->m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
-  m_Controls->m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer3D );
+  m_Controls.m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
+  m_Controls.m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer3D );
   //specify tools to be added to 3D Tool area
-//  m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'Two Thresholds' Otsu FastMarching3D RegionGrowing Watershed");
-  m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold Otsu FastMarching3D");
-  m_Controls->m_ManualToolSelectionBox3D->SetLayoutColumns(3);
-  m_Controls->m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
+//  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'Two Thresholds' Otsu FastMarching3D RegionGrowing Watershed");
+  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold Otsu FastMarching3D");
+  m_Controls.m_ManualToolSelectionBox3D->SetLayoutColumns(3);
+  m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
 
   //Hide 3D selection box, show 2D selection box
-  m_Controls->m_ManualToolSelectionBox3D->hide();
-  m_Controls->m_ManualToolSelectionBox2D->show();
+  m_Controls.m_ManualToolSelectionBox3D->hide();
+  m_Controls.m_ManualToolSelectionBox2D->show();
 
   // create signal/slot connections
 
-  connect( m_Controls->m_cbReferenceNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
+  connect( m_Controls.m_cbReferenceNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
        this, SLOT( OnReferenceSelectionChanged( const mitk::DataNode* ) ) );
 
-  connect( m_Controls->m_cbWorkingNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
+  connect( m_Controls.m_cbWorkingNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
        this, SLOT( OnSegmentationSelectionChanged( const mitk::DataNode* ) ) );
 
-  connect( m_Controls->m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
+  connect( m_Controls.m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
 
-  connect( m_Controls->tabWidgetSegmentationTools, SIGNAL(currentChanged(int)), this, SLOT(OnTabWidgetChanged(int)));
+  connect( m_Controls.tabWidgetSegmentationTools, SIGNAL(currentChanged(int)), this, SLOT(OnTabWidgetChanged(int)));
 
-  connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));
-  //connect(m_Controls->m_SlicesInterpolator, SIGNAL(Signal3DInterpolationEnabled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
+  connect(m_Controls.m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));
+  //connect(m_Controls.m_SlicesInterpolator, SIGNAL(Signal3DInterpolationEnabled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
 }
 
 void QmitkSegmentationView::OnManualTool2DSelected(int id)
@@ -529,13 +561,13 @@ void QmitkSegmentationView::SetMouseCursor( const mitk::ModuleResource resource,
 
 void QmitkSegmentationView::OnGoToLabel(const mitk::Point3D& pos)
 {
-   m_MultiWidget->MoveCrossToPosition(pos);
+//   m_MultiWidget->MoveCrossToPosition(pos);
 }
 
 void QmitkSegmentationView::OnSurfaceStamp()
 {
     /*
-    mitk::DataNode* surfaceNode = m_Controls->m_SurfaceSelector->GetSelectedNode();
+    mitk::DataNode* surfaceNode = m_Controls.m_SurfaceSelector->GetSelectedNode();
 
     if (!surfaceNode)
     {
@@ -552,7 +584,7 @@ void QmitkSegmentationView::OnSurfaceStamp()
         return;
     }
 
-    mitk::DataNode * segNode = m_Controls->m_LabelSetSelector->GetSelectedNode();
+    mitk::DataNode * segNode = m_Controls.m_LabelSetSelector->GetSelectedNode();
 
     if (!segNode)
     {
@@ -573,7 +605,7 @@ void QmitkSegmentationView::OnSurfaceStamp()
     filter->SetImage( lsImage );
     filter->MakeOutputBinaryOff();
     filter->SetBackgroundValue( 0 );
-//    filter->SetOverwrite( m_Controls->m_chkOverwriteStamp->isChecked() );
+//    filter->SetOverwrite( m_Controls.m_chkOverwriteStamp->isChecked() );
     filter->SetForegroundValue( lsImage->GetActiveLabelIndex() );
    // filter->SetImage( image );
 

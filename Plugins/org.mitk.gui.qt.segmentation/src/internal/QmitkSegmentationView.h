@@ -17,22 +17,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkSegmentationView_h
 #define QmitkSegmentationView_h
 
-#include "QmitkFunctionality.h"
-
+#include <berryISizeProvider.h>
 #include <berryIBerryPreferences.h>
+
+#include <QmitkAbstractView.h>
+#include <mitkIRenderWindowPartListener.h>
+
 
 #include "ui_QmitkSegmentationControls.h"
 
 class QmitkRenderWindow;
-class QCompleter;
 
 /**
  * \ingroup ToolManagerEtAl
  * \ingroup org_mitk_gui_qt_segmentation_internal
- * \warning Implementation of this class is split up into two .cpp files to make things more compact.
- *  Check both this file and QmitkSegmentationOrganNamesHandling.cpp
  */
-class QmitkSegmentationView : public QmitkFunctionality
+class QmitkSegmentationView : public QmitkAbstractView, public mitk::IRenderWindowPartListener, public berry::ISizeProvider
 {
   Q_OBJECT
 
@@ -44,21 +44,17 @@ public:
 
   typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;
 
+  // GUI setup
+  void CreateQtPartControl(QWidget* parent);
+
   /*!
     \brief Invoked when the DataManager selection changed
-    */
+  */
   virtual void OnSelectionChanged(mitk::DataNode* node);
   virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
 
-  // QmitkFunctionality's activate/deactivate
-  virtual void Activated();
-  virtual void Deactivated();
-  virtual void Visible();
-
-  // QmitkFunctionality's changes regarding THE QmitkStdMultiWidget
-  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
-  virtual void StdMultiWidgetClosed(QmitkStdMultiWidget& stdMultiWidget);
+  virtual int GetSizeFlags(bool width);
+  virtual int ComputePreferredSize(bool width, int /*availableParallel*/, int /*availablePerpendicular*/, int preferredResult);
 
   // BlueBerry's notification about preference changes (e.g. from a dialog)
   virtual void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
@@ -89,14 +85,10 @@ protected slots:
 
 protected:
 
-  // a type for handling lists of DataNodes
-  typedef std::vector<mitk::DataNode*> NodeList;
+  void SetFocus();
 
-  // set available multiwidget
-  void SetMultiWidget(QmitkStdMultiWidget* multiWidget);
-
-  // actively query the current selection of data manager
-  //void PullCurrentDataManagerSelection();
+  void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart);
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart);
 
   // reactions to selection events from data manager (and potential other senders)
   mitk::DataNode::Pointer FindFirstRegularImage( std::vector<mitk::DataNode*> nodes );
@@ -108,9 +100,6 @@ protected:
   // make sure all images/segmentations look as selected by the users in this view's preferences
   void ForceDisplayPreferencesUponAllImages();
 
-  // GUI setup
-  void CreateQtPartControl(QWidget* parent);
-
   void ResetMouseCursor( );
 
   void SetMouseCursor(const mitk::ModuleResource, int hotspotX, int hotspotY );
@@ -118,7 +107,7 @@ protected:
   bool m_MouseCursorSet;
 
   // If a contourmarker is selected, the plane in the related widget will be reoriented according to the marker`s geometry
-  void OnContourMarkerSelected (const mitk::DataNode* node);
+  //void OnContourMarkerSelected (const mitk::DataNode* node);
 
   void NodeRemoved(const mitk::DataNode* node);
 
@@ -132,10 +121,9 @@ protected:
   QWidget* m_Parent;
 
   // our GUI
-  Ui::QmitkSegmentationControls * m_Controls;
+  Ui::QmitkSegmentationControls m_Controls;
 
-  // THE currently existing QmitkStdMultiWidget
-  QmitkStdMultiWidget * m_MultiWidget;
+  mitk::IRenderWindowPart* m_IRenderWindowPart;
 
   unsigned long m_VisibilityChangedObserverTag;
 
@@ -149,4 +137,4 @@ protected:
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
 };
 
-#endif /*QMITKsegmentationVIEW_H_*/
+#endif // QmitkSegmentationView_h

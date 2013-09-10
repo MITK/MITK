@@ -30,7 +30,7 @@ namespace mitk
 {
 
   /**
-  \brief Calculates the segmented volumes for binary images.
+  \brief A tool for image thresholding.
 
   \ingroup ToolManagerEtAl
   \sa mitk::Tool
@@ -56,7 +56,10 @@ namespace mitk
     virtual void Deactivated();
 
     virtual void SetThresholdValue(double value);
-    virtual void AcceptCurrentThresholdValue();
+
+    /// \brief Adds the preview image to the current working image.
+    virtual void ConfirmSegmentation();
+
     virtual void CancelThresholding();
 
 
@@ -67,15 +70,13 @@ namespace mitk
 
     void SetupPreviewNodeFor( DataNode* nodeForThresholding );
 
-    void CreateNewSegmentationFromThreshold(DataNode* node);
-
     void OnRoiDataChanged();
 
     template <typename TPixel, unsigned int VImageDimension>
     void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, unsigned int timeStep );
 
     DataNode::Pointer m_ThresholdFeedbackNode;
-    DataNode::Pointer m_OriginalImageNode;
+    DataNode::Pointer m_ReferenceNode;
     DataNode::Pointer m_NodeForThresholding;
 
     double m_SensibleMinimumThresholdValue;

@@ -58,6 +58,7 @@ QmitkBinaryThresholdULToolGUI::~QmitkBinaryThresholdULToolGUI()
   {
     m_BinaryThresholdULTool->IntervalBordersChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged );
     m_BinaryThresholdULTool->ThresholdingValuesChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged );
+    m_BinaryThresholdULTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkBinaryThresholdULToolGUI, bool>( this, &QmitkBinaryThresholdULToolGUI::BusyStateChanged );
   }
 
 }
@@ -68,6 +69,7 @@ void QmitkBinaryThresholdULToolGUI::OnNewToolAssociated(mitk::Tool* tool)
   {
     m_BinaryThresholdULTool->IntervalBordersChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged );
     m_BinaryThresholdULTool->ThresholdingValuesChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged );
+    m_BinaryThresholdULTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkBinaryThresholdULToolGUI, bool>( this, &QmitkBinaryThresholdULToolGUI::BusyStateChanged );
   }
 
   m_BinaryThresholdULTool = dynamic_cast<mitk::BinaryThresholdULTool*>( tool );
@@ -76,6 +78,7 @@ void QmitkBinaryThresholdULToolGUI::OnNewToolAssociated(mitk::Tool* tool)
   {
     m_BinaryThresholdULTool->IntervalBordersChanged += mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged );
     m_BinaryThresholdULTool->ThresholdingValuesChanged += mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged );
+    m_BinaryThresholdULTool->CurrentlyBusy += mitk::MessageDelegate1<QmitkBinaryThresholdULToolGUI, bool>( this, &QmitkBinaryThresholdULToolGUI::BusyStateChanged );
   }
 }
 

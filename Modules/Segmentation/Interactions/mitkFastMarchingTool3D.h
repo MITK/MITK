@@ -97,7 +97,7 @@ class Segmentation_EXPORT FastMarchingTool3D : public SegTool3D
     /// \brief Set parameter used in Fast Marching filter.
     void SetBeta(double);
 
-    /// \brief Adds the feedback image to the current working image.
+    /// \brief Adds the preview image to the current working image.
     virtual void ConfirmSegmentation();
 
     /// \brief Set the working time step.

@@ -83,6 +83,8 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer( mitk::BaseRenderer 
     mapper->SetInput(localStorage->m_TubeFilter->GetOutput());
 
     localStorage->m_Assembly->AddPart(actor);
+
+    ++it;
   }
 
 

@@ -53,6 +53,13 @@ namespace mitk
     typedef boost::property_map< NetworkType, boost::vertex_index_t>::type VertexIndexMapType;
     typedef boost::iterator_property_map< std::vector< double >::iterator, VertexIndexMapType > VertexIteratorPropertyMapType;
 
+    //Macro
+    itkSetObjectMacro( Network, mitk::ConnectomicsNetwork );
+
+    // Conversion Getters
+    vnl_matrix<double> GetNetworkAsVNLAdjacencyMatrix();
+    vnl_matrix<double> GetNetworkAsVNLDegreeMatrix();
+
   protected:
 
     //////////////////// Functions ///////////////////////
@@ -60,7 +67,8 @@ namespace mitk
     ~ConnectomicsNetworkConverter();
 
     /////////////////////// Variables ////////////////////////
-
+    // The connectomics network, which is converted
+    mitk::ConnectomicsNetwork::Pointer m_Network;
   };
 
 }// end namespace mitk

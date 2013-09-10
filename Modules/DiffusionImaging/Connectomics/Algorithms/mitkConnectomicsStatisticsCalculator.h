@@ -46,6 +46,7 @@ namespace mitk
     typedef mitk::ConnectomicsNetwork::VertexDescriptorType VertexDescriptorType;
     typedef mitk::ConnectomicsNetwork::EdgeDescriptorType EdgeDescriptorType;
     typedef boost::graph_traits<NetworkType>::vertex_iterator VertexIteratorType;
+    typedef boost::graph_traits<NetworkType>::edge_iterator EdgeIteratorType;
     typedef boost::graph_traits<NetworkType>::adjacency_iterator AdjacencyIteratorType;
     typedef std::map<EdgeDescriptorType, int> EdgeIndexStdMapType;
     typedef boost::associative_property_map< EdgeIndexStdMapType > EdgeIndexMapType;
@@ -94,6 +95,23 @@ namespace mitk
     itkGetMacro( AveragePathLength, double );
     itkGetMacro( NumberOfCentralPoints, unsigned int );
     itkGetMacro( RatioOfCentralPoints, double );
+    itkGetMacro( VectorOfSortedEigenValues, std::vector< double > );
+    itkGetMacro( SpectralRadius, double );
+    itkGetMacro( SecondLargestEigenValue, double );
+    itkGetMacro( AdjacencyTrace, double );
+    itkGetMacro( AdjacencyEnergy, double );
+    itkGetMacro( VectorOfSortedLaplacianEigenValues, std::vector< double > );
+    itkGetMacro( LaplacianTrace, double );
+    itkGetMacro( LaplacianEnergy, double );
+    itkGetMacro( LaplacianSpectralGap, double );
+    itkGetMacro( VectorOfSortedNormalizedLaplacianEigenValues, std::vector< double > );
+    itkGetMacro( NormalizedLaplacianTrace, double );
+    itkGetMacro( NormalizedLaplacianEnergy, double );
+    itkGetMacro( NormalizedLaplacianNumberOf2s, unsigned int );
+    itkGetMacro( NormalizedLaplacianNumberOf1s, unsigned int );
+    itkGetMacro( NormalizedLaplacianNumberOf0s, unsigned int );
+    itkGetMacro( NormalizedLaplacianLowerSlope, double );
+    itkGetMacro( NormalizedLaplacianUpperSlope, double );
 
     void Update();
 
@@ -128,6 +146,12 @@ namespace mitk
     void CalculateIsolatedAndEndPoints();
 
     void CalculateShortestPathMetrics();
+
+    void CalculateSpectralMetrics();
+
+    void CalculateLaplacianMetrics();
+
+    void CalculateNormalizedLaplacianMetrics();
 
     /////////////////////// Variables ////////////////////////
 
@@ -174,6 +198,23 @@ namespace mitk
     double m_AveragePathLength;
     unsigned int m_NumberOfCentralPoints;
     double m_RatioOfCentralPoints;
+    std::vector<double> m_VectorOfSortedEigenValues;
+    double m_SpectralRadius;
+    double m_SecondLargestEigenValue;
+    double m_AdjacencyTrace;
+    double m_AdjacencyEnergy;
+    std::vector<double> m_VectorOfSortedLaplacianEigenValues;
+    double m_LaplacianTrace;
+    double m_LaplacianEnergy;
+    double m_LaplacianSpectralGap;
+    std::vector<double> m_VectorOfSortedNormalizedLaplacianEigenValues;
+    double m_NormalizedLaplacianTrace;
+    double m_NormalizedLaplacianEnergy;
+    unsigned int m_NormalizedLaplacianNumberOf2s;
+    unsigned int m_NormalizedLaplacianNumberOf1s;
+    unsigned int m_NormalizedLaplacianNumberOf0s;
+    double m_NormalizedLaplacianLowerSlope;
+    double m_NormalizedLaplacianUpperSlope;
   };
 
 }// end namespace mitk

@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkConnectomicsStatisticsCalculator.h"
+#include "mitkConnectomicsNetworkConverter.h"
 
 #include <numeric>
 
@@ -22,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/graph/clustering_coefficient.hpp>
 #include <boost/graph/betweenness_centrality.hpp>
 #include <boost/graph/visitors.hpp>
+
+#include "vnl/algo/vnl_symmetric_eigensystem.h"
 
 template<typename GraphType>
 class all_pairs_shortest_recorder : public boost::default_bfs_visitor
@@ -90,6 +93,23 @@ mitk::ConnectomicsStatisticsCalculator::ConnectomicsStatisticsCalculator()
   , m_AveragePathLength( 0.0 )
   , m_NumberOfCentralPoints( 0 )
   , m_RatioOfCentralPoints( 0.0 )
+  , m_VectorOfSortedEigenValues( 0 )
+  , m_SpectralRadius( 0.0 )
+  , m_SecondLargestEigenValue( 0.0 )
+  , m_AdjacencyTrace( 0.0 )
+  , m_AdjacencyEnergy( 0.0 )
+  , m_VectorOfSortedLaplacianEigenValues( 0 )
+  , m_LaplacianTrace( 0.0 )
+  , m_LaplacianEnergy( 0.0 )
+  , m_LaplacianSpectralGap( 0.0 )
+  , m_VectorOfSortedNormalizedLaplacianEigenValues( 0 )
+  , m_NormalizedLaplacianTrace( 0.0 )
+  , m_NormalizedLaplacianEnergy( 0.0 )
+  , m_NormalizedLaplacianNumberOf2s( 0 )
+  , m_NormalizedLaplacianNumberOf1s( 0 )
+  , m_NormalizedLaplacianNumberOf0s( 0 )
+  , m_NormalizedLaplacianLowerSlope( 0.0 )
+  , m_NormalizedLaplacianUpperSlope( 0.0 )
 {
 }
 
@@ -112,6 +132,9 @@ void mitk::ConnectomicsStatisticsCalculator::Update()
   CalculateBetweennessCentrality();
   CalculateIsolatedAndEndPoints();
   CalculateShortestPathMetrics();
+  CalculateSpectralMetrics();
+  CalculateLaplacianMetrics();
+  CalculateNormalizedLaplacianMetrics();
 }
 
 void mitk::ConnectomicsStatisticsCalculator::CalculateNumberOfVertices()
@@ -131,7 +154,7 @@ void  mitk::ConnectomicsStatisticsCalculator::CalculateAverageDegree()
 
 void mitk::ConnectomicsStatisticsCalculator::CalculateConnectionDensity()
 {
-  double numberOfPossibleEdges = (double) m_NumberOfVertices * ( (double) m_NumberOfVertices - 1 ) / 2 ;
+  double numberOfPossibleEdges = (double) m_NumberOfVertices * ( (double) m_NumberOfVertices - 1 ) / 2;
 
   m_ConnectionDensity = (double) m_NumberOfEdges / numberOfPossibleEdges;
 }
@@ -321,7 +344,7 @@ void mitk::ConnectomicsStatisticsCalculator::CalculateBetweennessCentrality()
   // associative property map needed for iterator property map-wrapper
   EdgeIndexMapType edgeIndex(stdEdgeIndex);
 
-  boost::graph_traits<NetworkType>::edge_iterator iterator, end;
+  EdgeIteratorType iterator, end;
 
   // sets iterator to start end end to end
   boost::tie(iterator, end) = boost::edges( *(m_Network->GetBoostGraph()) );
@@ -534,4 +557,167 @@ void mitk::ConnectomicsStatisticsCalculator::CalculateShortestPathMetrics()
     }
   }
   m_RatioOfCentralPoints = (double)m_NumberOfCentralPoints / m_NumberOfVertices;
+}
+
+void mitk::ConnectomicsStatisticsCalculator::CalculateSpectralMetrics()
+{
+  mitk::ConnectomicsNetworkConverter::Pointer converter = mitk::ConnectomicsNetworkConverter::New();
+  converter->SetNetwork( m_Network );
+  vnl_matrix<double> adjacencyMatrix = converter->GetNetworkAsVNLAdjacencyMatrix();
+
+  vnl_symmetric_eigensystem<double> eigenSystem(adjacencyMatrix);
+
+  m_AdjacencyTrace = 0;
+  m_AdjacencyEnergy = 0;
+  m_VectorOfSortedEigenValues.clear();
+
+  for(int i=0; i < m_NumberOfVertices; ++i)
+  {
+    double value = std::fabs(eigenSystem.get_eigenvalue(i));
+    m_VectorOfSortedEigenValues.push_back(value);
+    m_AdjacencyTrace += value;
+    m_AdjacencyEnergy += value * value;
+  }
+
+  std::sort(m_VectorOfSortedEigenValues.begin(), m_VectorOfSortedEigenValues.end());
+
+  m_SpectralRadius = m_VectorOfSortedEigenValues[ m_NumberOfVertices - 1];
+  m_SecondLargestEigenValue  = m_VectorOfSortedEigenValues[ m_NumberOfVertices - 2];
+}
+
+void mitk::ConnectomicsStatisticsCalculator::CalculateLaplacianMetrics()
+{
+  mitk::ConnectomicsNetworkConverter::Pointer converter = mitk::ConnectomicsNetworkConverter::New();
+  converter->SetNetwork( m_Network );
+  vnl_matrix<double> adjacencyMatrix = converter->GetNetworkAsVNLAdjacencyMatrix();
+  vnl_matrix<double> laplacianMatrix ( m_NumberOfVertices, m_NumberOfVertices, 0);
+  vnl_matrix<double> degreeMatrix = converter->GetNetworkAsVNLDegreeMatrix();
+
+  m_VectorOfSortedLaplacianEigenValues.clear();
+  laplacianMatrix = degreeMatrix - adjacencyMatrix;
+  int numberOfConnectedComponents = 0;
+  vnl_symmetric_eigensystem <double> laplacianEigenSystem( laplacianMatrix );
+  m_LaplacianEnergy = 0;
+  m_LaplacianTrace  = 0;
+  for(int i(0); i < m_NumberOfVertices; ++i)
+  {
+    double value = std::fabs( laplacianEigenSystem.get_eigenvalue(i) );
+    m_VectorOfSortedLaplacianEigenValues.push_back( value );
+    m_LaplacianTrace += value;
+    m_LaplacianEnergy += value * value;
+    if ( std::fabs( value ) < mitk::eps )
+    {
+      numberOfConnectedComponents++;
+    }
+  }
+
+  std::sort(m_VectorOfSortedLaplacianEigenValues.begin(), m_VectorOfSortedLaplacianEigenValues.end());
+  for(unsigned int i(0); i < m_VectorOfSortedLaplacianEigenValues.size(); ++i)
+  {
+    if(m_VectorOfSortedLaplacianEigenValues[i] > mitk::eps )
+    {
+      m_LaplacianSpectralGap = m_VectorOfSortedLaplacianEigenValues[i];
+      break;
+    }
+  }
+}
+
+void  mitk::ConnectomicsStatisticsCalculator::CalculateNormalizedLaplacianMetrics()
+{
+  vnl_matrix<double> normalizedLaplacianMatrix(m_NumberOfVertices, m_NumberOfVertices, 0);
+  EdgeIteratorType ei, ei_end;
+  VertexDescriptorType sourceVertex, destinationVertex;
+  int sourceIndex, destinationIndex;
+  VertexIndexMapType vertexIndexMap = boost::get(boost::vertex_index, *(m_Network->GetBoostGraph()) );
+  m_VectorOfSortedNormalizedLaplacianEigenValues.clear();
+
+  // Normalized laplacian matrix
+  for( boost::tie(ei, ei_end) = boost::edges( *(m_Network->GetBoostGraph()) ); ei != ei_end; ++ei)
+  {
+    sourceVertex = boost::source(*ei, *(m_Network->GetBoostGraph()) );
+    sourceIndex = vertexIndexMap[sourceVertex];
+
+    destinationVertex = boost::target(*ei, *(m_Network->GetBoostGraph()) );
+    destinationIndex = vertexIndexMap[destinationVertex];
+    int sourceDegree = boost::out_degree(sourceVertex, *(m_Network->GetBoostGraph()) );
+    int destinationDegree = boost::out_degree(destinationVertex, *(m_Network->GetBoostGraph()) );
+
+    normalizedLaplacianMatrix.put(
+      sourceIndex, destinationIndex, -1 / (sqrt(double(sourceDegree * destinationDegree))));
+    normalizedLaplacianMatrix.put(
+      destinationIndex, sourceIndex, -1 / (sqrt(double(sourceDegree * destinationDegree))));
+  }
+
+  VertexIteratorType vi, vi_end;
+  for(boost::tie(vi, vi_end)=boost::vertices( *(m_Network->GetBoostGraph()) ); vi!=vi_end; ++vi)
+  {
+    if(boost::out_degree(*vi, *(m_Network->GetBoostGraph()) ) > 0)
+    {
+      normalizedLaplacianMatrix.put(vertexIndexMap[*vi], vertexIndexMap[*vi], 1);
+    }
+  }
+  //End of normalized laplacian matrix definition
+
+  vnl_symmetric_eigensystem <double>
+    normalizedLaplacianEigensystem(normalizedLaplacianMatrix);
+
+  double N1=0, C1=0, D1=0, E1=0, F1=0, b1=0;
+  double N2=0, C2=0, D2=0, E2=0, F2=0, b2=0;
+  m_NormalizedLaplacianNumberOf2s = 0;
+  m_NormalizedLaplacianNumberOf1s = 0;
+  m_NormalizedLaplacianNumberOf0s = 0;
+  m_NormalizedLaplacianTrace = 0;
+  m_NormalizedLaplacianEnergy = 0;
+
+  for(int i(0); i< m_NumberOfVertices; ++i)
+  {
+    double eigenValue = std::fabs(normalizedLaplacianEigensystem.get_eigenvalue(i));
+    m_VectorOfSortedNormalizedLaplacianEigenValues.push_back(eigenValue);
+    m_NormalizedLaplacianTrace  += eigenValue;
+    m_NormalizedLaplacianEnergy += eigenValue * eigenValue;
+
+    //0
+    if(eigenValue < mitk::eps)
+    {
+      m_NormalizedLaplacianNumberOf0s++;
+    }
+
+    //Between 0 and 1.
+    else if(eigenValue > mitk::eps && eigenValue< 1 - mitk::eps)
+    {
+      C1 += i;
+      D1 += eigenValue;
+      E1 += i * eigenValue;
+      F1 += i * i;
+      N1 ++;
+    }
+
+    //1
+    else if(std::fabs( std::fabs(eigenValue) - 1) < mitk::eps)
+    {
+      m_NormalizedLaplacianNumberOf1s++;
+    }
+
+    //Between 1 and 2
+    else if(std::fabs(eigenValue) > 1+mitk::eps && std::fabs(eigenValue)< 2 - mitk::eps)
+    {
+      C2 += i;
+      D2 += eigenValue;
+      E2 += i * eigenValue;
+      F2 += i * i;
+      N2 ++;
+    }
+
+    //2
+    else if(std::fabs( std::fabs(eigenValue) - 2) < mitk::eps)
+    {
+      m_NormalizedLaplacianNumberOf2s++;
+    }
+  }
+
+  b1 = (D1*F1 - C1*E1)/(F1*N1 - C1*C1);
+  m_NormalizedLaplacianLowerSlope = (E1 - b1*C1)/F1;
+
+  b2 = (D2*F2 - C2*E2)/(F2*N2 - C2*C2);
+  m_NormalizedLaplacianUpperSlope = (E2 - b2*C2)/F2;
 }

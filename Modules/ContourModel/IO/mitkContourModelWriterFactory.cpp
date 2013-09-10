@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVersion.h"
 
 #include <mitkContourModelWriter.h>
+#include <mitkContourModelSetWriter.h>
 
 namespace mitk
 {
@@ -53,9 +54,15 @@ ContourModelWriterFactory::ContourModelWriterFactory()
 {
   this->RegisterOverride("IOWriter",
                          "ContourModelWriter",
-                         "ContourModel xml Writer",
+                         "ContourModel xml writer",
                          1,
                          mitk::CreateContourModelWriter<mitk::ContourModelWriter>::New());
+
+  this->RegisterOverride("IOWriter",
+                         "ContourModelSetWriter",
+                         "Writes a set of ContourModel objects.",
+                         1,
+                         mitk::CreateContourModelWriter<mitk::ContourModelSetWriter>::New());
 }
 
 ContourModelWriterFactory::~ContourModelWriterFactory()

@@ -27,8 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourModelIOFactory.h"
 #include "mitkContourModelWriterFactory.h"
 #include "mitkContourModelWriter.h"
+#include "mitkContourModelSetWriter.h"
 #include "mitkContourModelMapper2D.h"
 #include "mitkContourModelGLMapper2D.h"
+#include "mitkContourModelSetGLMapper2D.h"
 #include "mitkContourModelMapper3D.h"
 #include "mitkContourModelSetMapper3D.h"
 
@@ -55,14 +57,12 @@ mitk::Mapper::Pointer mitk::ContourObjectFactory::CreateMapper(mitk::DataNode* n
   if ( id == mitk::BaseRenderer::Standard2D )
   {
     std::string classname("ContourModel");
-    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    if( dynamic_cast<mitk::ContourModel*>(node->GetData())!=NULL )
     {
       newMapper = mitk::ContourModelGLMapper2D::New();
       newMapper->SetDataNode(node);
     }
-
-    std::string contourModelSet_classname("ContourModelSet");
-    if(node->GetData() && contourModelSet_classname.compare(node->GetData()->GetNameOfClass())==0)
+    else if( dynamic_cast<mitk::ContourModelSet*>(node->GetData())!=NULL )
     {
       newMapper = mitk::ContourModelSetGLMapper2D::New();
       newMapper->SetDataNode(node);
@@ -70,15 +70,12 @@ mitk::Mapper::Pointer mitk::ContourObjectFactory::CreateMapper(mitk::DataNode* n
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
-    std::string classname("ContourModel");
-    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    if( dynamic_cast<mitk::ContourModel*>(node->GetData())!=NULL )
     {
       newMapper = mitk::ContourModelMapper3D::New();
       newMapper->SetDataNode(node);
     }
-
-    std::string contourModelSet_classname("ContourModelSet");
-    if(node->GetData() && contourModelSet_classname.compare(node->GetData()->GetNameOfClass())==0)
+    else if( dynamic_cast<mitk::ContourModelSet*>(node->GetData())!=NULL )
     {
       newMapper = mitk::ContourModelSetMapper3D::New();
       newMapper->SetDataNode(node);
@@ -95,17 +92,18 @@ void mitk::ContourObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 
   mitk::DataNode::Pointer nodePointer = node;
 
-  std::string classname("ContourModel");
-  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  if(node->GetData() ==NULL)
+    return;
+
+  if( dynamic_cast<mitk::ContourModel*>(node->GetData())!=NULL )
   {
     mitk::ContourModelGLMapper2D::SetDefaultProperties(node);
     mitk::ContourModelMapper3D::SetDefaultProperties(node);
   }
-
-  std::string contourModelSet_classname("ContourModelSet");
-  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  else if( dynamic_cast<mitk::ContourModelSet*>(node->GetData())!=NULL )
   {
     mitk::ContourModelSetGLMapper2D::SetDefaultProperties(node);
+    mitk::ContourModelSetMapper3D::SetDefaultProperties(node);
   }
 }
 
@@ -131,6 +129,10 @@ void mitk::ContourObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour Files"));
 
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour File"));
+
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt_set", "ContourModelSet Files"));
+
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt_set", "ContourModelSet File"));
 }
 
 const char* mitk::ContourObjectFactory::GetSaveFileExtensions()
@@ -148,6 +150,7 @@ void mitk::ContourObjectFactory::RegisterIOFactories()
   mitk::ContourModelWriterFactory::RegisterOneFactory();
 
   this->m_FileWriters.push_back(mitk::ContourModelWriter::New().GetPointer());
+  this->m_FileWriters.push_back(mitk::ContourModelSetWriter::New().GetPointer());
 
   CreateFileExtensionsMap();
 }

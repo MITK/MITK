@@ -52,21 +52,23 @@ void mitk::ContourModelReader::GenerateData()
     {
       TiXmlHandle docHandle( &doc );
 
-      //handle geometry information
-      TiXmlElement* currentContourElement = docHandle.FirstChildElement("contourModel").FirstChildElement("head").FirstChildElement("geometryInformation").ToElement();
-
-
       /*++++ handle n contourModels within data tags ++++*/
       unsigned int contourCounter(0);
 
-      for( TiXmlElement* currentContourElement = docHandle.FirstChildElement("contourModel").FirstChildElement("data").ToElement();
+      for( TiXmlElement* currentContourElement = docHandle.FirstChildElement("contourModel").ToElement();
         currentContourElement != NULL; currentContourElement = currentContourElement->NextSiblingElement())
       {
         mitk::ContourModel::Pointer newContourModel = mitk::ContourModel::New();
-        if(currentContourElement->FirstChildElement("timestep") != NULL)
+        if(currentContourElement->FirstChildElement("data")->FirstChildElement("timestep") != NULL)
         {
+
+          //handle geometry information
+          //TiXmlElement* currentGeometryInfo = currentContourElement->FirstChildElement("head")->FirstChildElement("geometryInformation")->ToElement();
+          ///////////// NOT SUPPORTED YET ////////////////
+
+
           /*++++ handle n timesteps within timestep tags ++++*/
-          for( TiXmlElement* currentTimeSeries = currentContourElement->FirstChildElement("timestep")->ToElement();
+          for( TiXmlElement* currentTimeSeries = currentContourElement->FirstChildElement("data")->FirstChildElement("timestep")->ToElement();
             currentTimeSeries != NULL; currentTimeSeries = currentTimeSeries->NextSiblingElement())
           {
             unsigned int currentTimeStep(0);

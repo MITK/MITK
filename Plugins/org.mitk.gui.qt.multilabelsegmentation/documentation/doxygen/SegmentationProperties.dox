@@ -1,0 +1,17 @@
+/**
+\page SegmentationPropertiesPage The Segmentation Properties
+
+These properties control how a segmentation is rendered:
+
+<ul>
+ <li> binary controls whether the image is treated as a binary/segmentation image
+ <li> binaryimage.hoveringannotationcolor controls the colour of the annotation if the segmentation has a property signifying it is hovered over set to true
+ <li> binaryimage.hoveringcolor controls the colour of the segmentation if it has a property signifying it is hovered over set to true
+ <li> binaryimage.selectedannotationcolor controls the colour of the annotation if the segmentation has a property signifying it is selected set to true
+ <li> binaryimage.selectedcolor controls the colour of the segmentation if it has a property signifying it is selected set to true
+ <li> segmentation used by the segmentation view to check whether an image should be treated as a segmentation
+ <li> outline binary controls whether the segmentation is drawn as an outline (on) or solid (off)
+ <li> outline width controls the width of the outline, if it is drawn
+ <li> showVolume controls whether the volume of the segmentation is shown in the 2D views as an annotation
+</ul>
+*/

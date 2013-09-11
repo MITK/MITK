@@ -50,6 +50,7 @@ void QmitkOtsuTool3DGUI::OnItemSelectionChanged(QListWidgetItem* item)
   {
     m_SelectedItem = 0;
     m_Controls.m_selectionListWidget->clearSelection();
+    m_Controls.m_ConfSegButton->setEnabled( false );
     m_OtsuTool3DTool->ShowMultiLabelResultNode(true);
     return;
   }

@@ -64,7 +64,14 @@ void mitk::ContourModelSet::AddContourModel(mitk::ContourModel::Pointer contourM
 
 mitk::ContourModel* mitk::ContourModelSet::GetContourModelAt(int index)
 {
-  return this->m_Contours.at(index).GetPointer();
+  if( index >= 0 && index < this->m_Contours.size() )
+  {
+    return this->m_Contours.at(index).GetPointer();
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 bool mitk::ContourModelSet::IsEmpty()

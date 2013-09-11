@@ -197,6 +197,8 @@ m_TimeIsConnected(false)
   connect( m_btConfirm, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()) );
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
+
+  this->setEnabled(false);
 }
 
 QmitkFastMarchingTool3DGUI::~QmitkFastMarchingTool3DGUI()
@@ -204,7 +206,7 @@ QmitkFastMarchingTool3DGUI::~QmitkFastMarchingTool3DGUI()
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>( this, &QmitkFastMarchingTool3DGUI::BusyStateChanged );
-    m_FastMarchingTool->RemoveReadyListener(mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::EnableConfirmButton) );
+    m_FastMarchingTool->RemoveReadyListener(mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady) );
   }
 }
 
@@ -213,7 +215,7 @@ void QmitkFastMarchingTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>( this, &QmitkFastMarchingTool3DGUI::BusyStateChanged );
-    m_FastMarchingTool->RemoveReadyListener(mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::EnableConfirmButton) );
+    m_FastMarchingTool->RemoveReadyListener(mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady) );
   }
 
   m_FastMarchingTool = dynamic_cast<mitk::FastMarchingTool3D*>( tool );
@@ -221,7 +223,7 @@ void QmitkFastMarchingTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->CurrentlyBusy += mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>( this, &QmitkFastMarchingTool3DGUI::BusyStateChanged );
-    m_FastMarchingTool->AddReadyListener(mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::EnableConfirmButton) );
+    m_FastMarchingTool->AddReadyListener(mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady) );
 
     //listen to timestep change events
     mitk::BaseRenderer::Pointer renderer;
@@ -348,7 +350,8 @@ void QmitkFastMarchingTool3DGUI::BusyStateChanged(bool value)
       QApplication::restoreOverrideCursor();
 }
 
-void QmitkFastMarchingTool3DGUI::EnableConfirmButton()
+void QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady()
 {
+  this->setEnabled(true);
   this->m_btConfirm->setEnabled(true);
 }

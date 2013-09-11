@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToolCommand.h"
 #include "mitkPositionEvent.h"
 
+#include "mitkMessage.h"
+
 #include "itkImage.h"
 
 //itk filter
@@ -53,6 +55,8 @@ namespace mitk
 */
 class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
 {
+    mitkNewMessageMacro(Ready);
+
   public:
 
     mitkClassMacro(FastMarchingTool, FeedbackContourTool);
@@ -71,7 +75,6 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     typedef itk::FastMarchingImageFilter< InternalImageType, InternalImageType >                        FastMarchingFilterType;
     typedef FastMarchingFilterType::NodeContainer                                                       NodeContainer;
     typedef FastMarchingFilterType::NodeType                                                            NodeType;
-
 
     /* icon stuff */
     virtual const char** GetXPM() const;

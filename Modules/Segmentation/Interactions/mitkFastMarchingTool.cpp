@@ -366,6 +366,8 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
 
   m_NeedUpdate = true;
 
+  m_ReadyMessage.Send();
+
   this->Update();
 
   return true;
@@ -439,7 +441,14 @@ void mitk::FastMarchingTool::ClearSeeds()
     this->m_SeedContainer->Initialize();
 
   if(this->m_SeedsAsPointSet.IsNotNull())
-    this->m_SeedsAsPointSet->Clear();
+  {
+    this->m_SeedsAsPointSet = mitk::PointSet::New();
+    this->m_SeedsAsPointSetNode->SetData(this->m_SeedsAsPointSet);
+    m_SeedsAsPointSetNode->SetName("Seeds_Preview");
+    m_SeedsAsPointSetNode->SetBoolProperty("helper object", true);
+    m_SeedsAsPointSetNode->SetColor(0.0, 1.0, 0.0);
+    m_SeedsAsPointSetNode->SetVisibility(true);
+  }
 
   if(this->m_FastMarchingFilter.IsNotNull())
     m_FastMarchingFilter->Modified();

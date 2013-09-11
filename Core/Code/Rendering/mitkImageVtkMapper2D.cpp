@@ -774,9 +774,13 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
 
     PixelType pixelType = image->GetPixelType();
     std::size_t numComponents = pixelType.GetNumberOfComponents();
+    std::string className = image->GetNameOfClass();
 
-    if ((pixelType.GetPixelTypeAsString() == "vector" && numComponents > 1) || numComponents == 2 || numComponents > 4)
-      node->AddProperty("Image.Displayed Component", mitk::IntProperty::New(0), renderer, overwrite);
+    if (className != "TensorImage" && className != "QBallImage")
+    {
+      if ((pixelType.GetPixelTypeAsString() == "vector" && numComponents > 1) || numComponents == 2 || numComponents > 4)
+        node->AddProperty("Image.Displayed Component", mitk::IntProperty::New(0), renderer, overwrite);
+    }
   }
 
   if(image.IsNotNull() && image->IsInitialized())

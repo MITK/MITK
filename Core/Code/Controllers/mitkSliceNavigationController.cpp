@@ -469,11 +469,13 @@ SliceNavigationController::ReorientSlices( const Point3D &point,
 void SliceNavigationController::ReorientSlices(const mitk::Point3D &point,
    const mitk::Vector3D &axisVec0, const mitk::Vector3D &axisVec1 )
 {
-   PlaneOperation op( OpORIENT, point, axisVec0, axisVec1 );
+   if (m_CreatedWorldGeometry)
+   {
+     PlaneOperation op( OpORIENT, point, axisVec0, axisVec1 );
+     m_CreatedWorldGeometry->ExecuteOperation( &op );
 
-   m_CreatedWorldGeometry->ExecuteOperation( &op );
-
-   this->SendCreatedWorldGeometryUpdate();
+     this->SendCreatedWorldGeometryUpdate();
+   }
 }
 
 

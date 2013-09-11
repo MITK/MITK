@@ -76,7 +76,7 @@ void mitk::NavigationDataEvaluationFilter::CreateMembersForAllInputs()
     }
   while(this->m_InvalidSamples.size() < this->GetNumberOfInputs())
     {
-    std::pair<int,int> newElement(m_LoggedQuaternions.size(),0);
+    std::pair<int,int> newElement(m_InvalidSamples.size(),0);
     m_InvalidSamples.insert(newElement);
     }
 

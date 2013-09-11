@@ -493,7 +493,7 @@ namespace mitk
     std::cout << "\n";
 
 //#############################################################################################################
-//####################################### PIXEL DATA CHECK ####################################################
+//######################################### TESTING CHECK #####################################################
 
     DcmPixelData pixelData = doseObject.getPixelData();
     if(pixelData.isEmpty())
@@ -501,8 +501,34 @@ namespace mitk
       std::cout << "Error reading the pixel data \n\n";
       return 0;
     }
-
     std::cout << "Pixel Data Length: " << pixelData.getLength() << "\n\n";
+
+
+    OFVector<Float64> imagePositionPatient;
+    doseObject.getImagePositionPatient(imagePositionPatient);
+    for(int i=0; i<imagePositionPatient.size(); i++)
+    {
+      std::cout << "Image Position Patient " << i << " : " << imagePositionPatient.at(i) << "\n\n";
+    }
+
+
+    OFVector<Float64> gridFrameOffsetVector;
+    doseObject.getGridFrameOffsetVector(gridFrameOffsetVector);
+    for(int i=0; i<gridFrameOffsetVector.size(); i++)
+    {
+      if(i < 3 || i == gridFrameOffsetVector.size() - 1 )
+      {
+        std::cout << "Grid Frame Offset Vector " << i << " : " << gridFrameOffsetVector.at(i) << "\n\n";
+      }
+    }
+
+
+    Uint16 samplesperPixel;
+    doseObject.getSamplesPerPixel(samplesperPixel);
+    std::cout << "Samples per Pixel: " << samplesperPixel << "\n\n";
+
+
+
 
 //#############################################################################################################
 //#############################################################################################################

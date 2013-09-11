@@ -68,8 +68,6 @@ namespace mitk {
       /** \brief Assembly of contours. */
       vtkSmartPointer<vtkAssembly> m_Assembly;
 
-      vtkSmartPointer<vtkTubeFilter> m_TubeFilter;
-
       mitk::ContourModelToSurfaceFilter::Pointer m_contourToPolyData;
 
       /** \brief Timestamp of last update of stored data. */

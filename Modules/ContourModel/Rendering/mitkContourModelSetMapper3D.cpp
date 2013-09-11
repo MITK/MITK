@@ -62,25 +62,27 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer( mitk::BaseRenderer 
     mitk::ContourModel* inputContour  = it->GetPointer();
     vtkSmartPointer<vtkPolyData> polyData = this->CreateVtkPolyDataFromContour(inputContour, renderer);
 
-    localStorage->m_TubeFilter->SetInput(polyData);
+    vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
+    tubeFilter->SetInput(polyData);
 
     float lineWidth(1.0);
-    if (this->GetDataNode()->GetFloatProperty( "3D contour width", lineWidth, renderer ))
+    if (this->GetDataNode()->GetFloatProperty( "contour.3D.width", lineWidth, renderer ))
     {
-      localStorage->m_TubeFilter->SetRadius(lineWidth);
+      tubeFilter->SetRadius(lineWidth);
     }else
     {
-      localStorage->m_TubeFilter->SetRadius(0.5);
+      tubeFilter->SetRadius(0.5);
     }
-    localStorage->m_TubeFilter->CappingOn();
-    localStorage->m_TubeFilter->SetNumberOfSides(10);
-    localStorage->m_TubeFilter->Update();
+    tubeFilter->CappingOn();
+    tubeFilter->SetNumberOfSides(10);
+    tubeFilter->Update();
 
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
 
-    mapper->SetInput(localStorage->m_TubeFilter->GetOutput());
+    mapper->SetInputConnection(tubeFilter->GetOutputPort());
+    //mapper->SetInput(polyData);
 
     localStorage->m_Assembly->AddPart(actor);
 
@@ -160,7 +162,7 @@ void mitk::ContourModelSetMapper3D::ApplyContourProperties(mitk::BaseRenderer* r
 
 
   mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-        ("color", renderer));
+        ("contour.color", renderer));
   if(colorprop)
   {
     //set the color of the contour
@@ -192,14 +194,13 @@ mitk::ContourModelSetMapper3D::LocalStorage::LocalStorage()
 {
   m_Assembly = vtkSmartPointer<vtkAssembly>::New();
   m_contourToPolyData = mitk::ContourModelToSurfaceFilter::New();
-  m_TubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
 }
 
 
 void mitk::ContourModelSetMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
-  node->AddProperty( "3D contour width", mitk::FloatProperty::New( 0.5 ), renderer, overwrite );
+  node->AddProperty( "contour.3D.width", mitk::FloatProperty::New( 0.5 ), renderer, overwrite );
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

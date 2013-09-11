@@ -89,13 +89,13 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_CmbInterpolation->addItem("3-Dimensional");
   vboxLayout->addWidget(m_CmbInterpolation);
 
-  m_BtnApply2D = new QPushButton("Apply", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnApply2D = new QPushButton("Confirm Segmentation", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApply2D);
 
-  m_BtnApplyForAllSlices2D = new QPushButton("Apply for all slices", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnApplyForAllSlices2D = new QPushButton("Confirm Segmentation For All Slices", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApplyForAllSlices2D);
 
-  m_BtnApply3D = new QPushButton("Apply", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnApply3D = new QPushButton("Confirm Segmentation", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApply3D);
 
   m_ChkShowPositionNodes = new QCheckBox("Show Position Nodes", m_GroupBoxEnableExclusiveInterpolationMode);
@@ -654,7 +654,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
         mitk::ApplyDiffImageOperation* undoOp = new mitk::ApplyDiffImageOperation( mitk::OpTEST, m_Segmentation, diffImage, timeStep );
         undoOp->SetFactor( -1.0 );
         std::stringstream comment;
-        comment << "Accept all interpolations (" << totalChangedSlices << ")";
+        comment << "Confirm all interpolations (" << totalChangedSlices << ")";
         mitk::OperationEvent* undoStackItem = new mitk::OperationEvent( mitk::DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, comment.str() );
         mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
 

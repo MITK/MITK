@@ -78,6 +78,8 @@ protected:
 
   bool m_TimeIsConnected;
   mitk::Stepper::Pointer m_TimeStepper;
+
+  void EnableConfirmButton();
 };
 
 #endif

@@ -91,13 +91,11 @@ void KspaceImageFilter< TPixelType >
     double gamma = 42576000;    // Gyromagnetic ratio in Hz/T
     if (m_DiffusionGradientDirection.GetNorm()>0.001)
     {
-        m_DiffusionGradientDirection.Normalize();
         m_EddyGradientMagnitude /= 1000; // eddy gradient magnitude in T/m
+        m_DiffusionGradientDirection.Normalize();
         m_DiffusionGradientDirection = m_DiffusionGradientDirection * m_EddyGradientMagnitude *  gamma;
         m_IsBaseline = false;
     }
-    else
-        m_EddyGradientMagnitude = gamma*m_EddyGradientMagnitude/1000;
 
     this->SetNthOutput(0, outputImage);
 }

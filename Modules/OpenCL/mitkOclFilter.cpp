@@ -119,8 +119,7 @@ void mitk::OclFilter::LoadSourceFiles(CStringList &sourceCode, ClSizeList &sourc
 {
   for( CStringList::iterator it = m_ClFiles.begin(); it != m_ClFiles.end(); ++it )
   {
-
-    MITK_INFO << "File :" << *it;
+    MITK_DEBUG << "Load file :" << *it;
     us::ModuleResource mdr = GetModule()->GetResource(*it);
 
     if( !mdr.IsValid() )
@@ -128,30 +127,37 @@ void mitk::OclFilter::LoadSourceFiles(CStringList &sourceCode, ClSizeList &sourc
 
     us:ModuleResourceStream rss(mdr);
 
+    // read resource file to a string
     std::istreambuf_iterator<char> eos;
-    std::string src(std::istreambuf_iterator<char>(rss), eos);
+    std::string source(std::istreambuf_iterator<char>(rss), eos);
 
+    // add preambel and build up string to compile
+    std::string src(m_Preambel);
+    src.append("\n");
+    src.append(source);
+
+    // allocate new char buffer
     char* tmp = new char[src.size() + 1];
-
     strcpy(tmp,src.c_str());
 
-    sourceCode.push_back(tmp);
+    // add source to list
+    sourceCode.push_back((const char*)tmp);
     sourceCodeSize.push_back(src.size());
   }
 }
 
 void mitk::OclFilter::CompileSource()
 {
+  // helper variable
+  int clErr = 0;
+  CStringList sourceCode;
+  ClSizeList sourceCodeSize;
+
   if (m_ClFiles.empty())
   {
     MITK_ERROR("ocl.filter") << "No shader source file was set";
     return;
   }
-
-  // helper variable
-  CStringList sourceCode;
-  ClSizeList sourceCodeSize;
-  int clErr = 0;
 
   //get a valid opencl context
   us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
@@ -163,6 +169,7 @@ void mitk::OclFilter::CompileSource()
 
   if ( !sourceCode.empty() )
   {
+    // create program from all files in the file list
     m_ClProgram = clCreateProgramWithSource(gpuContext, sourceCode.size(), &sourceCode[0], &sourceCodeSize[0], &clErr);
     CHECK_OCL_ERR(clErr);
 
@@ -187,6 +194,12 @@ void mitk::OclFilter::CompileSource()
 
     // store the succesfully build program into the program storage provided by the resource service
     resources->InsertProgram(m_ClProgram, m_FilterID, true);
+
+    // free the char buffers with the source code
+    for( CStringList::iterator it = sourceCode.begin(); it != sourceCode.end(); ++it )
+    {
+      delete[] *it;
+    }
   }
   else
   {

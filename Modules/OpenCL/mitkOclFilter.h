@@ -38,11 +38,11 @@ class MitkOcl_EXPORT OclFilter
 {
 public:
   /**
-    * @brief Set the source file of the OpenCL shader
+    * @brief Add a source file from the resource files to the
+    *        OpenCL shader file list. Multiple files can be added to the list.
     *
-    *  @param filename Path to the file
+    *  @param name of the file in the resource system
     */
-//  void SetSourceFile(const char* filename);
     void AddSourceFile(const char* filename);
 
   /**
@@ -54,8 +54,8 @@ public:
   void SetCompilerFlags(const char* flags);
 
   /**
-      @brief Returns true if the initialization was successfull
-      */
+    * @brief Returns true if the initialization was successfull
+    */
   virtual bool IsInitialized();
 
   /** @brief Destructor */
@@ -87,6 +87,7 @@ protected:
   /*! @brief source preambel for e.g. #define commands to be inserted into the OpenCL source */
   const char* m_Preambel;
 
+  /** @brief List of sourcefiles that will be compiled for this filter.*/
   CStringList m_ClFiles;
 
   /** @brief  status of the filter */
@@ -131,8 +132,17 @@ protected:
       */
   void SetSourcePreambel(const char* preambel);
 
+  /**
+   * @brief Get the Module of the filter. Needs to be implemented by every subclass.
+   *        The filter will load the OpenCL sourcefiles from this module context.
+   */
   virtual us::Module* GetModule() = 0;
 
+  /**
+   * @brief Helper functions that load sourcefiles from the module context in the Initialize function.
+   * @param SourceCodeList holds the sourcecode for every file as string, the SourceCodeSizeList holst the
+   *        size of every file in bytes.
+   */
   void LoadSourceFiles(CStringList &SourceCodeList, ClSizeList &SourceCodeSizeList);
 };
 }

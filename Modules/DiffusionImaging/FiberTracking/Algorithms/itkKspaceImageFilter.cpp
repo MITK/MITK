@@ -175,8 +175,8 @@ void KspaceImageFilter< TPixelType >
         InputIteratorType it(m_CompartmentImages.at(0), m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
         while( !it.IsAtEnd() )
         {
-            double x = it.GetIndex()[0];
-            double y = it.GetIndex()[1];
+            double x = it.GetIndex()[0]-in_szx/2;
+            double y = it.GetIndex()[1]-in_szy/2;
 
             vcl_complex<double> f(0, 0);
 
@@ -189,16 +189,11 @@ void KspaceImageFilter< TPixelType >
 
             // simulate eddy currents and other distortions
             double omega_t = 0;
-            if ( m_SimulateEddyCurrents )
+            if ( m_SimulateEddyCurrents && !m_IsBaseline)
             {
-                if (!m_IsBaseline)
-                {
-                    itk::Vector< double, 3 > pos; pos[0] = x-kxMax/2; pos[1] = y-kyMax/2; pos[2] = m_Z;
-                    pos = m_DirectionMatrix*pos/1000;   // vector from image center to current position (in meter)
-                    omega_t += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2])*eddyDecay;
-                }
-                else
-                    omega_t += m_EddyGradientMagnitude*eddyDecay;
+                itk::Vector< double, 3 > pos; pos[0] = x; pos[1] = y; pos[2] = m_Z;
+                pos = m_DirectionMatrix*pos/1000;   // vector from image center to current position (in meter)
+                omega_t += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2])*eddyDecay;
             }
             if (m_SimulateDistortions)
                 omega_t += m_FrequencyMap->GetPixel(it.GetIndex())*t/1000;
@@ -213,7 +208,7 @@ void KspaceImageFilter< TPixelType >
         if (m_Spikes>0 && sqrt(s.imag()*s.imag()+s.real()*s.real()) > sqrt(spike.imag()*spike.imag()+spike.real()*spike.real()) )
             spike = s;
 
-//        m_TEMPIMAGE->SetPixel(kIdx, sqrt(s.real()*s.real()+s.imag()*s.imag()));
+        //        m_TEMPIMAGE->SetPixel(kIdx, sqrt(s.real()*s.real()+s.imag()*s.imag()));
         outputImage->SetPixel(kIdx, s);
         ++oit;
     }
@@ -227,11 +222,11 @@ void KspaceImageFilter< TPixelType >
         outputImage->SetPixel(spikeIdx, spike);
     }
 
-//    typedef itk::ImageFileWriter< InputImageType > WriterType;
-//    typename WriterType::Pointer writer = WriterType::New();
-//    writer->SetFileName("/local/kspace.nrrd");
-//    writer->SetInput(m_TEMPIMAGE);
-//    writer->Update();
+    //    typedef itk::ImageFileWriter< InputImageType > WriterType;
+    //    typename WriterType::Pointer writer = WriterType::New();
+    //    writer->SetFileName("/local/kspace.nrrd");
+    //    writer->SetInput(m_TEMPIMAGE);
+    //    writer->Update();
 }
 
 template< class TPixelType >

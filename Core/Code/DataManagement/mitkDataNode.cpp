@@ -271,7 +271,7 @@ mitk::DataNode::GroupTagList mitk::DataNode::GetGroupTags() const
   return groups;
 }
 
-bool mitk::DataNode::GetBoolProperty(const char* propertyKey, bool& boolValue, mitk::BaseRenderer* renderer) const
+bool mitk::DataNode::GetBoolProperty(const char* propertyKey, bool& boolValue, const mitk::BaseRenderer* renderer) const
 {
   mitk::BoolProperty::Pointer boolprop = dynamic_cast<mitk::BoolProperty*>(GetProperty(propertyKey, renderer));
   if(boolprop.IsNull())
@@ -281,7 +281,7 @@ bool mitk::DataNode::GetBoolProperty(const char* propertyKey, bool& boolValue, m
   return true;
 }
 
-bool mitk::DataNode::GetIntProperty(const char* propertyKey, int &intValue, mitk::BaseRenderer* renderer) const
+bool mitk::DataNode::GetIntProperty(const char* propertyKey, int &intValue, const mitk::BaseRenderer* renderer) const
 {
   mitk::IntProperty::Pointer intprop = dynamic_cast<mitk::IntProperty*>(GetProperty(propertyKey, renderer));
   if(intprop.IsNull())
@@ -291,7 +291,7 @@ bool mitk::DataNode::GetIntProperty(const char* propertyKey, int &intValue, mitk
   return true;
 }
 
-bool mitk::DataNode::GetFloatProperty(const char* propertyKey, float &floatValue, mitk::BaseRenderer* renderer) const
+bool mitk::DataNode::GetFloatProperty(const char* propertyKey, float &floatValue, const mitk::BaseRenderer* renderer) const
 {
   mitk::FloatProperty::Pointer floatprop = dynamic_cast<mitk::FloatProperty*>(GetProperty(propertyKey, renderer));
   if(floatprop.IsNull())
@@ -301,7 +301,7 @@ bool mitk::DataNode::GetFloatProperty(const char* propertyKey, float &floatValue
   return true;
 }
 
-bool mitk::DataNode::GetStringProperty(const char* propertyKey, std::string& string, mitk::BaseRenderer* renderer) const
+bool mitk::DataNode::GetStringProperty(const char* propertyKey, std::string& string, const mitk::BaseRenderer* renderer) const
 {
   mitk::StringProperty::Pointer stringProp = dynamic_cast<mitk::StringProperty*>(GetProperty(propertyKey, renderer));
   if(stringProp.IsNull())
@@ -316,7 +316,7 @@ bool mitk::DataNode::GetStringProperty(const char* propertyKey, std::string& str
   }
 }
 
-bool mitk::DataNode::GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* propertyKey) const
+bool mitk::DataNode::GetColor(float rgb[3], const mitk::BaseRenderer* renderer, const char* propertyKey) const
 {
   mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetProperty(propertyKey, renderer));
   if(colorprop.IsNull())
@@ -326,7 +326,7 @@ bool mitk::DataNode::GetColor(float rgb[3], mitk::BaseRenderer* renderer, const 
   return true;
 }
 
-bool mitk::DataNode::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* propertyKey) const
+bool mitk::DataNode::GetOpacity(float &opacity, const mitk::BaseRenderer* renderer, const char* propertyKey) const
 {
   mitk::FloatProperty::Pointer opacityprop = dynamic_cast<mitk::FloatProperty*>(GetProperty(propertyKey, renderer));
   if(opacityprop.IsNull())
@@ -336,7 +336,7 @@ bool mitk::DataNode::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, co
   return true;
 }
 
-bool mitk::DataNode::GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer* renderer, const char* propertyKey) const
+bool mitk::DataNode::GetLevelWindow(mitk::LevelWindow &levelWindow, const mitk::BaseRenderer* renderer, const char* propertyKey) const
 {
   mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(GetProperty(propertyKey, renderer));
   if(levWinProp.IsNull())
@@ -346,14 +346,14 @@ bool mitk::DataNode::GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRe
   return true;
 }
 
-void mitk::DataNode::SetColor(const mitk::Color &color, mitk::BaseRenderer* renderer, const char* propertyKey)
+void mitk::DataNode::SetColor(const mitk::Color &color, const mitk::BaseRenderer* renderer, const char* propertyKey)
 {
   mitk::ColorProperty::Pointer prop;
   prop = mitk::ColorProperty::New(color);
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
-void mitk::DataNode::SetColor(float red, float green, float blue, mitk::BaseRenderer* renderer, const char* propertyKey)
+void mitk::DataNode::SetColor(float red, float green, float blue, const mitk::BaseRenderer* renderer, const char* propertyKey)
 {
   float color[3];
   color[0]=red;
@@ -362,49 +362,49 @@ void mitk::DataNode::SetColor(float red, float green, float blue, mitk::BaseRend
   SetColor(color, renderer, propertyKey);
 }
 
-void mitk::DataNode::SetColor(const float rgb[3], mitk::BaseRenderer* renderer, const char* propertyKey)
+void mitk::DataNode::SetColor(const float rgb[3], const mitk::BaseRenderer* renderer, const char* propertyKey)
 {
   mitk::ColorProperty::Pointer prop;
   prop = mitk::ColorProperty::New(rgb);
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
-void mitk::DataNode::SetVisibility(bool visible, mitk::BaseRenderer* renderer, const char* propertyKey)
+void mitk::DataNode::SetVisibility(bool visible, const mitk::BaseRenderer* renderer, const char* propertyKey)
 {
   mitk::BoolProperty::Pointer prop;
   prop = mitk::BoolProperty::New(visible);
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
-void mitk::DataNode::SetOpacity(float opacity, mitk::BaseRenderer* renderer, const char* propertyKey)
+void mitk::DataNode::SetOpacity(float opacity, const mitk::BaseRenderer* renderer, const char* propertyKey)
 {
   mitk::FloatProperty::Pointer prop;
   prop = mitk::FloatProperty::New(opacity);
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
-void mitk::DataNode::SetLevelWindow(mitk::LevelWindow levelWindow, mitk::BaseRenderer* renderer, const char* propertyKey)
+void mitk::DataNode::SetLevelWindow(mitk::LevelWindow levelWindow, const mitk::BaseRenderer* renderer, const char* propertyKey)
 {
   mitk::LevelWindowProperty::Pointer prop;
   prop = mitk::LevelWindowProperty::New(levelWindow);
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
-void mitk::DataNode::SetIntProperty(const char* propertyKey, int intValue, mitk::BaseRenderer* renderer)
+void mitk::DataNode::SetIntProperty(const char* propertyKey, int intValue, const mitk::BaseRenderer* renderer)
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::IntProperty::New(intValue));
 }
-void mitk::DataNode::SetBoolProperty( const char* propertyKey, bool boolValue, mitk::BaseRenderer* renderer/*=NULL*/ )
+void mitk::DataNode::SetBoolProperty( const char* propertyKey, bool boolValue, const mitk::BaseRenderer* renderer/*=NULL*/ )
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::BoolProperty::New(boolValue));
 }
 
-void mitk::DataNode::SetFloatProperty( const char* propertyKey, float floatValue, mitk::BaseRenderer* renderer/*=NULL*/ )
+void mitk::DataNode::SetFloatProperty( const char* propertyKey, float floatValue, const mitk::BaseRenderer* renderer/*=NULL*/ )
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::FloatProperty::New(floatValue));
 }
 
-void mitk::DataNode::SetStringProperty( const char* propertyKey, const char* stringValue, mitk::BaseRenderer* renderer/*=NULL*/ )
+void mitk::DataNode::SetStringProperty( const char* propertyKey, const char* stringValue, const mitk::BaseRenderer* renderer/*=NULL*/ )
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::StringProperty::New(stringValue));
 }
@@ -463,7 +463,7 @@ unsigned long mitk::DataNode::GetMTime() const
   return time;
 }
 
-void mitk::DataNode::SetSelected(bool selected, mitk::BaseRenderer* renderer)
+void mitk::DataNode::SetSelected(bool selected, const mitk::BaseRenderer* renderer)
 {
   mitk::BoolProperty::Pointer selectedProperty = dynamic_cast<mitk::BoolProperty*>(GetProperty("selected"));
 
@@ -508,7 +508,7 @@ private:
 };
 */
 
-bool mitk::DataNode::IsSelected(mitk::BaseRenderer* renderer)
+bool mitk::DataNode::IsSelected(const mitk::BaseRenderer* renderer)
 {
   bool selected;
 

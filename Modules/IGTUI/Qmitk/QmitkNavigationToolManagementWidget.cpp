@@ -115,6 +115,7 @@ void QmitkNavigationToolManagementWidget::Initialize(mitk::DataStorage* dataStor
   {
   m_DataStorage = dataStorage;
   m_NavigationToolStorage = mitk::NavigationToolStorage::New(m_DataStorage);
+  m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage,"Tool0");
   }
 
 //##################################################################################
@@ -160,6 +161,7 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
 
     //fill forms
     mitk::NavigationTool::Pointer selectedTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
+    m_Controls->m_ToolCreationWidget->SetDefaultData(selectedTool);
     m_Controls->m_ToolNameEdit->setText(QString(selectedTool->GetDataNode()->GetName().c_str()));
     m_Controls->m_IdentifierEdit->setText(QString(selectedTool->GetIdentifier().c_str()));
     m_Controls->m_SerialNumberEdit->setText(QString(selectedTool->GetSerialNumber().c_str()));

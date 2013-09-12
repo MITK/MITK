@@ -41,7 +41,6 @@ QmitkNavigationToolManagementWidget::QmitkNavigationToolManagementWidget(QWidget
   m_Controls = NULL;
   CreateQtPartControl(this);
   CreateConnections();
-  m_Controls->m_SurfaceChooser->SetAutoSelectNewItems(true);
 }
 
 
@@ -106,8 +105,6 @@ void QmitkNavigationToolManagementWidget::CreateConnections()
       //widget page "add tool":
       connect( (QObject*)(m_Controls->m_ToolCreationWidget), SIGNAL(Canceled()), this, SLOT(OnAddToolCancel()) );
       connect( (QObject*)(m_Controls->m_ToolCreationWidget), SIGNAL(NavigationToolFinished()), this, SLOT(OnAddToolSave()) );
-      connect( (QObject*)(m_Controls->m_LoadSurface), SIGNAL(clicked()), this, SLOT(OnLoadSurface()) );
-      connect( (QObject*)(m_Controls->m_LoadCalibrationFile), SIGNAL(clicked()), this, SLOT(OnLoadCalibrationFile()) );
     }
   }
 
@@ -124,19 +121,8 @@ void QmitkNavigationToolManagementWidget::Initialize(mitk::DataStorage* dataStor
 
 void QmitkNavigationToolManagementWidget::OnAddTool()
   {
-    //initialize UI components
-    m_Controls->m_SurfaceChooser->SetDataStorage(m_DataStorage);
-    m_Controls->AddToolLabel->setText("<b>Add Tool:</b>");
-    m_Controls->m_MainWidgets->setCurrentIndex(1);
-
-    //reset input fields
-    QString identifier = "NavigationTool#"+QString::number(m_NavigationToolStorage->GetToolCount());
-    m_Controls->m_ToolNameEdit->setText("");
-    m_Controls->m_IdentifierEdit->setText(identifier);
-    m_Controls->m_SerialNumberEdit->setText("");
-    m_Controls->m_CalibrationFileName->setText("");
-    m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage,identifier.toStdString());
-
+    QString defaultIdentifier = "NavigationTool#"+QString::number(m_NavigationToolStorage->GetToolCount());
+    m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage,defaultIdentifier.toStdString());
     m_edit = false;
   }
 
@@ -156,43 +142,13 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
     //if no item is selected, show error message:
     if (m_Controls->m_ToolList->currentItem() == NULL) {MessageBox("Error: Please select tool first!");return;}
 
-    //initialize UI components
-    m_Controls->m_SurfaceChooser->SetDataStorage(m_DataStorage);
-    m_Controls->AddToolLabel->setText("<b>Edit Tool:</b>");
-    m_Controls->m_MainWidgets->setCurrentIndex(1);
 
-    //fill forms
     mitk::NavigationTool::Pointer selectedTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
     m_Controls->m_ToolCreationWidget->SetDefaultData(selectedTool);
-    m_Controls->m_ToolNameEdit->setText(QString(selectedTool->GetDataNode()->GetName().c_str()));
-    m_Controls->m_IdentifierEdit->setText(QString(selectedTool->GetIdentifier().c_str()));
-    m_Controls->m_SerialNumberEdit->setText(QString(selectedTool->GetSerialNumber().c_str()));
-    switch(selectedTool->GetTrackingDeviceType())
-      {
-      case mitk::NDIAurora:
-              m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);break;
-      case mitk::NDIPolaris:
-              m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(1);break;
-      case mitk::ClaronMicron:
-              m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(2);break;
-      default:
-              m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);
-      }
-    m_Controls->m_CalibrationFileName->setText(QString(selectedTool->GetCalibrationFile().c_str()));
-    switch(selectedTool->GetType())
-      {
-      case mitk::NavigationTool::Instrument:
-        m_Controls->m_ToolTypeChooser->setCurrentIndex(0); break;
-      case mitk::NavigationTool::Fiducial:
-        m_Controls->m_ToolTypeChooser->setCurrentIndex(1); break;
-      case mitk::NavigationTool::Skinmarker:
-        m_Controls->m_ToolTypeChooser->setCurrentIndex(2); break;
-      case mitk::NavigationTool::Unknown:
-        m_Controls->m_ToolTypeChooser->setCurrentIndex(3); break;
-      }
 
-    m_Controls->m_SurfaceChooser->SetSelectedNode(selectedTool->GetDataNode());
     m_edit = true;
+
+    m_Controls->m_MainWidgets->setCurrentIndex(1);
   }
 
 void QmitkNavigationToolManagementWidget::OnLoadStorage()
@@ -257,35 +213,6 @@ void QmitkNavigationToolManagementWidget::OnAddToolCancel()
   {
     m_Controls->m_MainWidgets->setCurrentIndex(0);
   }
-
-void QmitkNavigationToolManagementWidget::OnLoadSurface()
-  {
-    std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), "/", "*.stl").toLatin1().data();
-    mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
-    try
-      {
-      stlReader->SetFileName( filename.c_str() );
-      stlReader->Update();
-      }
-    catch (...)
-      {
-      }
-
-    if ( stlReader->GetOutput() == NULL );
-    else
-      {
-      mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-      newNode->SetName(filename);
-      newNode->SetData(stlReader->GetOutput());
-      m_DataStorage->Add(newNode);
-      }
-  }
-
-void QmitkNavigationToolManagementWidget::OnLoadCalibrationFile()
-  {
-    m_Controls->m_CalibrationFileName->setText(QFileDialog::getOpenFileName(NULL,tr("Open Calibration File"), "/", "*.*"));
-  }
-
 
 
 //##################################################################################

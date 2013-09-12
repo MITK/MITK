@@ -64,9 +64,6 @@ class MitkIGTUI_EXPORT QmitkNavigationToolManagementWidget : public QWidget
     //widget page "add tool":
     void OnAddToolCancel();
     void OnAddToolSave();
-    void OnLoadSurface();
-    void OnLoadCalibrationFile();
-
 
   protected:
 

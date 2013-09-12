@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //itk headers
 #include <itkObjectFactory.h>
 #include <itkSpatialObject.h>
+#include <itkDataObject.h>
 
 //mitk headers
 #include <mitkCommon.h>
@@ -40,44 +41,44 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationTool : public itk::Object
+  class MitkIGT_EXPORT NavigationTool : public itk::DataObject
   {
   public:
 
-    mitkClassMacro(NavigationTool,itk::Object);
+    mitkClassMacro(NavigationTool,itk::DataObject);
     itkNewMacro(Self);
 
     enum NavigationToolType {Instrument, Fiducial, Skinmarker, Unknown};
 
     //## getter and setter ##
     //NavigationToolType:
-    itkGetMacro(Type,NavigationToolType);
+    itkGetConstMacro(Type,NavigationToolType);
     itkSetMacro(Type,NavigationToolType);
 
     //Identifier:
-    itkGetMacro(Identifier,std::string);
+    itkGetConstMacro(Identifier,std::string);
     itkSetMacro(Identifier,std::string);
 
     //Datatreenode:
-    itkGetMacro(DataNode,mitk::DataNode::Pointer);
+    itkGetConstMacro(DataNode,mitk::DataNode::Pointer);
     itkSetMacro(DataNode,mitk::DataNode::Pointer);
 
     //SpatialObject:
-    itkGetMacro(SpatialObject,itk::SpatialObject<3>::Pointer);
+    itkGetConstMacro(SpatialObject,itk::SpatialObject<3>::Pointer);
     itkSetMacro(SpatialObject,itk::SpatialObject<3>::Pointer);
 
     //TrackingTool:
-    itkGetMacro(TrackingTool,mitk::TrackingTool::Pointer);
+    itkGetConstMacro(TrackingTool,mitk::TrackingTool::Pointer);
     itkSetMacro(TrackingTool,mitk::TrackingTool::Pointer);
 
     //CalibrationFile:
-    itkGetMacro(CalibrationFile,std::string);
+    itkGetConstMacro(CalibrationFile,std::string);
     void SetCalibrationFile(const std::string filename);
 
     //Tool tip definition:
-    itkGetMacro(ToolTipPosition,mitk::Point3D);
+    itkGetConstMacro(ToolTipPosition,mitk::Point3D);
     itkSetMacro(ToolTipPosition,mitk::Point3D);
-    itkGetMacro(ToolTipOrientation,mitk::Quaternion);
+    itkGetConstMacro(ToolTipOrientation,mitk::Quaternion);
     itkSetMacro(ToolTipOrientation,mitk::Quaternion);
 
     /** @return Returns true if a tooltip is set, false if not. */
@@ -88,7 +89,7 @@ namespace mitk {
      *          tool that can be used for registration. The landmarks should be given in tool coordinates.
      *          If there are no landmarks defined for this tool the method returns an empty point set.
      */
-    itkGetMacro(ToolRegistrationLandmarks,mitk::PointSet::Pointer);
+    itkGetConstMacro(ToolRegistrationLandmarks,mitk::PointSet::Pointer);
     /** @brief  Sets the tool registration landmarks which represent markers / special points on a
      *          tool that can be used for registration. The landmarks should be given in tool coordinates.
      */
@@ -96,17 +97,17 @@ namespace mitk {
     /** @return Returns the tool calibration landmarks for calibration of the defined points in the
       *         tool coordinate system, e.g. 2 landmarks for a 5DoF tool and 3 landmarks for a 6DoF tool.
       */
-    itkGetMacro(ToolCalibrationLandmarks,mitk::PointSet::Pointer);
+    itkGetConstMacro(ToolCalibrationLandmarks,mitk::PointSet::Pointer);
     /** @brief  Sets the tool calibration landmarks for calibration of defined points in the
       *         tool coordinate system, e.g. 2 landmarks for a 5DoF tool and 3 landmarks for a 6DoF tool.
       */
     itkSetMacro(ToolCalibrationLandmarks,mitk::PointSet::Pointer);
 
     //SerialNumber:
-    itkGetMacro(SerialNumber,std::string);
+    itkGetConstMacro(SerialNumber,std::string);
     itkSetMacro(SerialNumber,std::string);
     //TrackingDeviceType:
-    itkGetMacro(TrackingDeviceType,mitk::TrackingDeviceType);
+    itkGetConstMacro(TrackingDeviceType,mitk::TrackingDeviceType);
     itkSetMacro(TrackingDeviceType,mitk::TrackingDeviceType);
     //ToolName (only getter):
     /** @return Returns the name of this navigation tool. Returns an empty string if there is
@@ -127,6 +128,17 @@ namespace mitk {
      *          want to set a new surface only get the data node and modify its data.
      */
     mitk::Surface::Pointer GetToolSurface();
+    /**
+      * \brief Graft the data and information from one NavigationTool to another.
+      *
+      * Copies the content of data into this object.
+      * This is a convenience method to setup a second NavigationTool object with all the meta
+      * information of another NavigationTool object.
+      * Note that this method is different than just using two
+      * SmartPointers to the same NavigationTool object since separate DataObjects are
+      * still maintained.
+      */
+    virtual void Graft(const DataObject *data);
     //#######################
 
   protected:

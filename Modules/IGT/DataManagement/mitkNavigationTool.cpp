@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkNavigationTool.h"
+#include "mitkIGTException.h"
 #include "Poco/File.h"
 
 mitk::NavigationTool::NavigationTool() : m_Type(mitk::NavigationTool::Unknown),
@@ -35,6 +36,44 @@ mitk::NavigationTool::~NavigationTool()
   {
 
   }
+
+void mitk::NavigationTool::Graft( const DataObject *data )
+{
+  // Attempt to cast data to an NavigationData
+  const Self* nd;
+  try
+  {
+    nd = dynamic_cast<const Self *>( data );
+  }
+  catch( ... )
+  {
+    mitkThrowException(mitk::IGTException) << "mitk::NavigationData::Graft cannot cast "
+      << typeid(data).name() << " to "
+      << typeid(const Self *).name() ;
+  }
+  if (!nd)
+  {
+    // pointer could not be cast back down
+    mitkThrowException(mitk::IGTException) << "mitk::NavigationData::Graft cannot cast "
+      << typeid(data).name() << " to "
+      << typeid(const Self *).name() ;
+  }
+  // Now copy anything that is needed
+  m_Identifier = nd->GetIdentifier();
+  m_Type = nd->GetType();
+  m_DataNode->SetName(nd->GetDataNode()->GetName());
+  m_DataNode->SetData(nd->GetDataNode()->GetData());
+  m_SpatialObject = nd->GetSpatialObject();
+  m_TrackingTool = nd->GetTrackingTool();
+  m_CalibrationFile = nd->GetCalibrationFile();
+  m_SerialNumber = nd->GetSerialNumber();
+  m_TrackingDeviceType = nd->GetTrackingDeviceType();
+  m_ToolRegistrationLandmarks = nd->GetToolRegistrationLandmarks();
+  m_ToolCalibrationLandmarks = nd->GetToolCalibrationLandmarks();
+  m_ToolTipPosition = nd->GetToolTipPosition();
+  m_ToolTipOrientation = nd->GetToolTipOrientation();
+
+}
 
 bool mitk::NavigationTool::IsToolTipSet()
   {

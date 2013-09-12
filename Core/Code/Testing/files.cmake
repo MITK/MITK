@@ -142,7 +142,12 @@ set(MODULE_CUSTOM_TESTS
     mitkTextOverlay3DRendering2DTest.cpp
     mitkTextOverlay3DRendering3DTest.cpp
     mitkTextOverlay3DColorRenderingTest.cpp
+    mitkVTKRenderWindowSizeTest.cpp
 )
+
+if (${VTK_MAJOR_VERSION} VERSION_LESS 6) # test can be removed with VTK 6
+  set(MODULE_TESTS ${MODULE_TESTS} mitkVTKRenderWindowSizeTest.cpp)
+endif()
 
 set(MODULE_RESOURCE_FILES
   Interactions/AddAndRemovePoints.xml

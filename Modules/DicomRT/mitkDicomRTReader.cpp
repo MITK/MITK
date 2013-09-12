@@ -321,12 +321,6 @@ namespace mitk
     OFString resultUid;
     contourImageSeqItem.getReferencedSOPInstanceUID(resultUid);
 
-    /*
-    structSetObject.getReferencedFrameOfReferenceSequence().getCurrentItem().getRTReferencedStudySequence()
-      .getCurrentItem().getRTReferencedSeriesSequence().getCurrentItem().getContourImageSequence()
-      .getCurrentItem().getReferencedSOPInstanceUID(resultUid);
-    */
-
     return resultUid;
   }
 
@@ -466,15 +460,15 @@ namespace mitk
 //#############################################################################################################
 //####################################### DOSE UNITS CHECK ####################################################
 
-    OFString doseUnits;
-    if(doseObject.getDoseUnits(doseUnits).bad())
-    {
-      std::cout << "Error reading the dose units\n\n";
-      return 0;
-    }
-    doseObject.setDoseUnits(doseUnits.c_str());
+//    OFString doseUnits;
+//    if(doseObject.getDoseUnits(doseUnits).bad())
+//    {
+//      std::cout << "Error reading the dose units\n\n";
+//      return 0;
+//    }
+//    doseObject.setDoseUnits(doseUnits.c_str());
 
-    std::cout << "Dose Units: " << doseUnits << "\n\n";
+//    std::cout << "Dose Units: " << doseUnits << "\n\n";
 
 //#############################################################################################################
 //##################################### PIXEL SPACING CHECK ###################################################
@@ -495,40 +489,73 @@ namespace mitk
 //#############################################################################################################
 //######################################### TESTING CHECK #####################################################
 
-    DcmPixelData pixelData = doseObject.getPixelData();
-    if(pixelData.isEmpty())
+//    DcmPixelData pixelData = doseObject.getPixelData();
+//    if(pixelData.isEmpty())
+//    {
+//      std::cout << "Error reading the pixel data \n\n";
+//      return 0;
+//    }
+//    std::cout << "Pixel Data Length: " << pixelData.getLength() << "\n\n";
+
+
+//    OFVector<Float64> imagePositionPatient;
+//    doseObject.getImagePositionPatient(imagePositionPatient);
+//    for(int i=0; i<imagePositionPatient.size(); i++)
+//    {
+//      std::cout << "Image Position Patient " << i << " : " << imagePositionPatient.at(i) << "\n\n";
+//    }
+
+
+//    OFVector<Float64> gridFrameOffsetVector;
+//    doseObject.getGridFrameOffsetVector(gridFrameOffsetVector);
+//    for(int i=0; i<gridFrameOffsetVector.size(); i++)
+//    {
+//      if(i < 3 || i == gridFrameOffsetVector.size() - 1 )
+//      {
+//        std::cout << "Grid Frame Offset Vector " << i << " : " << gridFrameOffsetVector.at(i) << "\n\n";
+//      }
+//    }
+
+
+//    Uint16 samplesperPixel;
+//    doseObject.getSamplesPerPixel(samplesperPixel);
+//    std::cout << "Samples per Pixel: " << samplesperPixel << "\n\n";
+
+
+    Uint16 rows, columns, frames;
+    OFString nrframes, doseUnits, doseType, summationType, gridScaling;
+    Uint16 &rows_ref = rows;
+    Uint16 &columns_ref = columns;
+    Float32 gridscale;
+    const Uint16 *pixelData = NULL;
+    unsigned long count = 0;
+
+    doseObject.getRows(rows_ref);
+    doseObject.getColumns(columns_ref);
+    doseObject.getNumberOfFrames(nrframes);
+    doseObject.getDoseUnits(doseUnits);
+    doseObject.getDoseType(doseType);
+    doseObject.getDoseSummationType(summationType);
+    doseObject.getDoseGridScaling(gridScaling);
+
+    gridscale = OFStandard::atof(gridScaling.c_str());
+    frames = atoi(nrframes.c_str());
+
+    if(dataset->findAndGetUint16Array(DCM_PixelData, pixelData, &count).good())
     {
-      std::cout << "Error reading the pixel data \n\n";
-      return 0;
-    }
-    std::cout << "Pixel Data Length: " << pixelData.getLength() << "\n\n";
-
-
-    OFVector<Float64> imagePositionPatient;
-    doseObject.getImagePositionPatient(imagePositionPatient);
-    for(int i=0; i<imagePositionPatient.size(); i++)
-    {
-      std::cout << "Image Position Patient " << i << " : " << imagePositionPatient.at(i) << "\n\n";
-    }
-
-
-    OFVector<Float64> gridFrameOffsetVector;
-    doseObject.getGridFrameOffsetVector(gridFrameOffsetVector);
-    for(int i=0; i<gridFrameOffsetVector.size(); i++)
-    {
-      if(i < 3 || i == gridFrameOffsetVector.size() - 1 )
+      for(int i=0;i<frames;i++)
       {
-        std::cout << "Grid Frame Offset Vector " << i << " : " << gridFrameOffsetVector.at(i) << "\n\n";
+        for(int j=0;j<rows;j++)
+        {
+          for(int k=0;k<columns;k++)
+          {
+            std::cout << pixelData[i*rows*columns + j*columns + k] << "\n";
+            std::cout << static_cast<Float32>(pixelData[i*rows*columns + j*columns + k]) * gridscale << "\n\n";
+          }
+        }
       }
+      std::cout << "Number of Frames: " << frames << "\n\n";
     }
-
-
-    Uint16 samplesperPixel;
-    doseObject.getSamplesPerPixel(samplesperPixel);
-    std::cout << "Samples per Pixel: " << samplesperPixel << "\n\n";
-
-
-
 
 //#############################################################################################################
 //#############################################################################################################

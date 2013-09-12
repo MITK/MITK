@@ -40,9 +40,6 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="styleSheet">
-      <string notr="true">color:rgb(255, 0, 0)</string>
-     </property>
      <property name="text">
       <string>Shift+Click to place seedpoint</string>
      </property>
@@ -73,9 +70,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="ctkRangeWidget" name="m_ThresholdSlider" native="true">
-        <zorder>m_lblSetSeedpoint</zorder>
-       </widget>
+       <widget class="ctkRangeWidget" name="m_ThresholdSlider" native="true"/>
       </item>
      </layout>
     </widget>

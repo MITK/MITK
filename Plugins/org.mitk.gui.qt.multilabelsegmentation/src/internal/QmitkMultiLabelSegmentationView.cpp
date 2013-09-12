@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryConstants.h>
 
 #include "mitkLabelSetImage.h"
-#include "mitkColormapProperty.h"
 #include "mitkStatusBar.h"
 #include "mitkApplicationCursor.h"
 #include "mitkToolManagerProvider.h"
@@ -44,9 +43,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 
 const std::string QmitkMultiLabelSegmentationView::VIEW_ID = "org.mitk.views.multilabelsegmentation";
-
-
-// public methods
 
 QmitkMultiLabelSegmentationView::QmitkMultiLabelSegmentationView() :
 m_Parent(NULL),
@@ -79,49 +75,76 @@ QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
 {
 }
 
-/*
-void QmitkMultiLabelSegmentationView::Visible()
+void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 {
-  MITK_INFO << "QmitkMultiLabelSegmentationView::Visible()";
-  m_Controls.m_ManualToolSelectionBox2D->SetAutoShowNamesWidth(250);
-  m_Controls.m_ManualToolSelectionBox2D->setEnabled( true );
-  m_Controls.m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(260);
-  m_Controls.m_ManualToolSelectionBox3D->setEnabled( true );
-//    this->OnPatientComboBoxSelectionChanged(m_Controls.patImageSelector->GetSelectedNode());
-//    this->OnSegmentationComboBoxSelectionChanged(m_Controls.segImageSelector->GetSelectedNode());
+  // setup the basic GUI of this view
+  m_Parent = parent;
+  m_Controls.setupUi(parent);
+
+  m_Controls.m_cbReferenceNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.m_cbReferenceNodeSelector->SetPredicate(m_ReferencePredicate);
+
+  this->UpdateWarningLabel("Please load an image");
+
+  if( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode().IsNotNull() )
+      this->UpdateWarningLabel("Create a segmentation");
+
+  m_Controls.m_cbWorkingNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.m_cbWorkingNodeSelector->SetPredicate(m_SegmentationPredicate);
+  m_Controls.m_cbWorkingNodeSelector->SetAutoSelectNewItems(true);
+  if( m_Controls.m_cbWorkingNodeSelector->GetSelectedNode().IsNotNull() )
+    this->UpdateWarningLabel("");
+
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  assert ( toolManager );
+  toolManager->SetDataStorage( *(this->GetDataStorage()) );
+  toolManager->InitializeTools();
+
+  //use the same ToolManager instance for our 3D Tools
+  m_Controls.m_ManualToolSelectionBox3D->SetToolManager(*toolManager);
+
+  m_Controls.m_LabelSetWidget->SetDataStorage( *(this->GetDataStorage()) );
+  m_Controls.m_LabelSetWidget->SetPreferences( this->GetPreferences() );
+
+  // all part of open source MITK
+  m_Controls.m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
+  m_Controls.m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer2D );
+  //m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' 'FastMarching2D'");
+  m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract 'Region Growing' 'FastMarching2D'");
+  m_Controls.m_ManualToolSelectionBox2D->SetLayoutColumns(3);
+  m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
+  connect( m_Controls.m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
+
+  //setup 3D Tools
+  m_Controls.m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
+  m_Controls.m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer3D );
+  //specify tools to be added to 3D Tool area
+//  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'Two Thresholds' Otsu FastMarching3D RegionGrowing Watershed");
+  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold Otsu FastMarching3D");
+  m_Controls.m_ManualToolSelectionBox3D->SetLayoutColumns(3);
+  m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
+
+  //Hide 3D selection box, show 2D selection box
+  m_Controls.m_ManualToolSelectionBox3D->hide();
+  m_Controls.m_ManualToolSelectionBox2D->show();
+
+  // create signal/slot connections
+
+  connect( m_Controls.m_cbReferenceNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
+       this, SLOT( OnReferenceSelectionChanged( const mitk::DataNode* ) ) );
+
+  connect( m_Controls.m_cbWorkingNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
+       this, SLOT( OnSegmentationSelectionChanged( const mitk::DataNode* ) ) );
+
+  connect( m_Controls.m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
+
+  connect( m_Controls.tabWidgetSegmentationTools, SIGNAL(currentChanged(int)), this, SLOT(OnTabWidgetChanged(int)));
+
+  connect(m_Controls.m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));
+  //connect(m_Controls.m_SlicesInterpolator, SIGNAL(Signal3DInterpolationEnabled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
+
+  m_Controls.m_LabelSetWidget->ReInit();
 }
-*/
-
-/*
-void QmitkMultiLabelSegmentationView::Activated()
-{
-  MITK_INFO << "QmitkMultiLabelSegmentationView::Activated()";
-  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetReferenceData(m_Controls.m_cbReferenceNodeSelector->GetSelectedNode());
-  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetWorkingData(m_Controls.m_cbWorkingNodeSelector->GetSelectedNode());
-}
-*/
-/*
-void QmitkMultiLabelSegmentationView::Deactivated()
-{
-  mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
-  mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::PlanePositionManagerService>();
-
-  mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(context->GetService(serviceRef));
-  service->RemoveAllPlanePositions();
-
-  //deactivate all tools
-  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
-
-  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetWorkingData(NULL);
-  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetReferenceData(NULL);
-
-  m_Controls.m_ManualToolSelectionBox2D->setEnabled( false );
-  m_Controls.m_ManualToolSelectionBox3D->setEnabled( false );
-
-  m_Controls.m_SlicesInterpolator->EnableInterpolation( false );
-  m_Controls.m_SlicesInterpolator->setEnabled( false );
-}
-*/
 
 void QmitkMultiLabelSegmentationView::SetFocus ()
 {
@@ -289,87 +312,21 @@ void QmitkMultiLabelSegmentationView::OnShowMarkerNodes (bool state)
   }
 }
 
-/*
-void QmitkMultiLabelSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
-{
-  QmitkRenderWindow* selectedRenderWindow = 0;
-  QmitkRenderWindow* RenderWindow1 =
-      this->GetActiveStdMultiWidget()->GetRenderWindow1();
-  QmitkRenderWindow* RenderWindow2 =
-      this->GetActiveStdMultiWidget()->GetRenderWindow2();
-  QmitkRenderWindow* RenderWindow3 =
-      this->GetActiveStdMultiWidget()->GetRenderWindow3();
-  QmitkRenderWindow* RenderWindow4 =
-      this->GetActiveStdMultiWidget()->GetRenderWindow4();
-  bool PlanarFigureInitializedWindow = false;
-
-  // find initialized renderwindow
-  if (node->GetBoolProperty("PlanarFigureInitializedWindow",
-                PlanarFigureInitializedWindow, RenderWindow1->GetRenderer()))
-  {
-    selectedRenderWindow = RenderWindow1;
-  }
-  if (!selectedRenderWindow && node->GetBoolProperty(
-        "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-        RenderWindow2->GetRenderer()))
-  {
-    selectedRenderWindow = RenderWindow2;
-  }
-  if (!selectedRenderWindow && node->GetBoolProperty(
-        "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-        RenderWindow3->GetRenderer()))
-  {
-    selectedRenderWindow = RenderWindow3;
-  }
-  if (!selectedRenderWindow && node->GetBoolProperty(
-        "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-        RenderWindow4->GetRenderer()))
-  {
-    selectedRenderWindow = RenderWindow4;
-  }
-
-  // make node visible
-  if (selectedRenderWindow)
-  {
-    std::string nodeName = node->GetName();
-    unsigned int t = nodeName.find_last_of(" ");
-    unsigned int id = atof(nodeName.substr(t+1).c_str())-1;
-
-    // gets the context of the "Mitk" (Core) module (always has id 1)
-    // TODO Workaround until CTL plugincontext is available
-    mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
-    // Workaround end
-    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::PlanePositionManagerService>();
-
-    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(context->GetService(serviceRef));
-    selectedRenderWindow->GetSliceNavigationController()->ExecuteOperation(service->GetPlanePosition(id));
-    selectedRenderWindow->GetRenderer()->GetDisplayGeometry()->Fit();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-}
-*/
 void QmitkMultiLabelSegmentationView::OnTabWidgetChanged(int id)
 {
   //always disable tools on tab changed
   mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
 
-  //2D Tab ID = 0
-  //3D Tab ID = 1
   if (id == 0)
   {
     //Hide 3D selection box, show 2D selection box
     m_Controls.m_ManualToolSelectionBox3D->hide();
     m_Controls.m_ManualToolSelectionBox2D->show();
-    //Deactivate possible active tool
-
-    //TODO Remove possible visible interpolations -> Maybe changes in SlicesInterpolator
   }
   else
   {
-    //Hide 3D selection box, show 2D selection box
     m_Controls.m_ManualToolSelectionBox2D->hide();
     m_Controls.m_ManualToolSelectionBox3D->show();
-    //Deactivate possible active tool
   }
 }
 
@@ -406,75 +363,6 @@ void QmitkMultiLabelSegmentationView::UpdateWarningLabel(QString text)
   else
     m_Controls.lblSegmentationWarnings->show();
   m_Controls.lblSegmentationWarnings->setText(text);
-}
-
-void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
-{
-  // setup the basic GUI of this view
-  m_Parent = parent;
-  m_Controls.setupUi(parent);
-
-  m_Controls.m_cbReferenceNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.m_cbReferenceNodeSelector->SetPredicate(m_ReferencePredicate);
-
-  this->UpdateWarningLabel("Please load an image");
-
-  if( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode().IsNotNull() )
-      this->UpdateWarningLabel("Create a segmentation");
-
-  m_Controls.m_cbWorkingNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.m_cbWorkingNodeSelector->SetPredicate(m_SegmentationPredicate);
-  m_Controls.m_cbWorkingNodeSelector->SetAutoSelectNewItems(true);
-  if( m_Controls.m_cbWorkingNodeSelector->GetSelectedNode().IsNotNull() )
-    this->UpdateWarningLabel("");
-
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert ( toolManager );
-  toolManager->SetDataStorage( *(this->GetDataStorage()) );
-  toolManager->InitializeTools();
-
-  //use the same ToolManager instance for our 3D Tools
-  m_Controls.m_ManualToolSelectionBox3D->SetToolManager(*toolManager);
-
-  m_Controls.m_LabelSetWidget->SetDataStorage( *(this->GetDataStorage()) );
-  m_Controls.m_LabelSetWidget->SetPreferences( this->GetPreferences() );
-
-  // all part of open source MITK
-  m_Controls.m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
-  m_Controls.m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer2D );
-  //m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' 'FastMarching2D'");
-  m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract 'Region Growing' 'FastMarching2D'");
-  m_Controls.m_ManualToolSelectionBox2D->SetLayoutColumns(3);
-  m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
-  connect( m_Controls.m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
-
-  //setup 3D Tools
-  m_Controls.m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
-  m_Controls.m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer3D );
-  //specify tools to be added to 3D Tool area
-//  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'Two Thresholds' Otsu FastMarching3D RegionGrowing Watershed");
-  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold Otsu FastMarching3D");
-  m_Controls.m_ManualToolSelectionBox3D->SetLayoutColumns(3);
-  m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
-
-  //Hide 3D selection box, show 2D selection box
-  m_Controls.m_ManualToolSelectionBox3D->hide();
-  m_Controls.m_ManualToolSelectionBox2D->show();
-
-  // create signal/slot connections
-
-  connect( m_Controls.m_cbReferenceNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
-       this, SLOT( OnReferenceSelectionChanged( const mitk::DataNode* ) ) );
-
-  connect( m_Controls.m_cbWorkingNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
-       this, SLOT( OnSegmentationSelectionChanged( const mitk::DataNode* ) ) );
-
-  connect( m_Controls.m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
-
-  connect( m_Controls.tabWidgetSegmentationTools, SIGNAL(currentChanged(int)), this, SLOT(OnTabWidgetChanged(int)));
-
-  connect(m_Controls.m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));
-  //connect(m_Controls.m_SlicesInterpolator, SIGNAL(Signal3DInterpolationEnabled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
 }
 
 void QmitkMultiLabelSegmentationView::OnManualTool2DSelected(int id)

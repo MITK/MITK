@@ -107,11 +107,19 @@ QmitkLabelSetWidget::~QmitkLabelSetWidget()
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   toolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerWorkingDataModified );
   toolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerReferenceDataModified );
+  m_WorkingNode = NULL;
+  m_ReferenceNode = NULL;
+}
+
+void QmitkLabelSetWidget::ReInit()
+{
+  this->OnToolManagerWorkingDataModified();
+  this->OnToolManagerReferenceDataModified();
 }
 
 void QmitkLabelSetWidget::SetDataStorage( mitk::DataStorage& storage )
 {
-    m_DataStorage = &storage;
+  m_DataStorage = &storage;
 }
 
 void QmitkLabelSetWidget::SetPreferences( berry::IPreferences::Pointer prefs )

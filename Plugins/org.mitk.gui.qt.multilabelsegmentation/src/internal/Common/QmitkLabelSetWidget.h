@@ -45,6 +45,8 @@ public:
 
   void SetPreferences( berry::IPreferences::Pointer prefs );
 
+  void ReInit();
+
   void SetDataStorage(mitk::DataStorage& storage);
 
   void OnToolManagerWorkingDataModified();

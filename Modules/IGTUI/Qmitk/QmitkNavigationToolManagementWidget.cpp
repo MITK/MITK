@@ -104,8 +104,8 @@ void QmitkNavigationToolManagementWidget::CreateConnections()
       connect( (QObject*)(m_Controls->m_SaveTool), SIGNAL(clicked()), this, SLOT(OnSaveTool()) );
 
       //widget page "add tool":
-      connect( (QObject*)(m_Controls->m_AddToolCancel), SIGNAL(clicked()), this, SLOT(OnAddToolCancel()) );
-      connect( (QObject*)(m_Controls->m_AddToolSave), SIGNAL(clicked()), this, SLOT(OnAddToolSave()) );
+      connect( (QObject*)(m_Controls->m_ToolCreationWidget), SIGNAL(Canceled()), this, SLOT(OnAddToolCancel()) );
+      connect( (QObject*)(m_Controls->m_ToolCreationWidget), SIGNAL(NavigationToolFinished()), this, SLOT(OnAddToolSave()) );
       connect( (QObject*)(m_Controls->m_LoadSurface), SIGNAL(clicked()), this, SLOT(OnLoadSurface()) );
       connect( (QObject*)(m_Controls->m_LoadCalibrationFile), SIGNAL(clicked()), this, SLOT(OnLoadCalibrationFile()) );
     }
@@ -130,10 +130,12 @@ void QmitkNavigationToolManagementWidget::OnAddTool()
     m_Controls->m_MainWidgets->setCurrentIndex(1);
 
     //reset input fields
+    QString identifier = "NavigationTool#"+QString::number(m_NavigationToolStorage->GetToolCount());
     m_Controls->m_ToolNameEdit->setText("");
-    m_Controls->m_IdentifierEdit->setText("NavigationTool#"+QString::number(m_NavigationToolStorage->GetToolCount()));
+    m_Controls->m_IdentifierEdit->setText(identifier);
     m_Controls->m_SerialNumberEdit->setText("");
     m_Controls->m_CalibrationFileName->setText("");
+    m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage,identifier.toStdString());
 
     m_edit = false;
   }
@@ -234,44 +236,17 @@ void QmitkNavigationToolManagementWidget::OnSaveStorage()
 
 void QmitkNavigationToolManagementWidget::OnAddToolSave()
   {
-    mitk::NavigationTool::Pointer workTool;
+    mitk::NavigationTool::Pointer newTool = m_Controls->m_ToolCreationWidget->GetCreatedTool();
 
     if (m_edit) //here we edit a existing tool
       {
-      workTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
-
-      //edit existing DataNode...
-      workTool->GetDataNode()->SetName(m_Controls->m_ToolNameEdit->text().toLatin1());
-      workTool->GetDataNode()->SetData(m_Controls->m_SurfaceChooser->GetSelectedNode()->GetData());
+      mitk::NavigationTool::Pointer editedTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
+      editedTool->Graft(newTool);
       }
     else //here we create a new tool
       {
-      workTool = mitk::NavigationTool::New();
-
-      //create DataNode...
-      mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-      newNode->SetName(m_Controls->m_ToolNameEdit->text().toLatin1());
-      newNode->SetData(m_Controls->m_SurfaceChooser->GetSelectedNode()->GetData());
-      m_DataStorage->Add(newNode);
-      workTool->SetDataNode(newNode);
+      m_NavigationToolStorage->AddTool(newTool);
       }
-
-    //fill NavigationTool object
-    workTool->SetCalibrationFile(m_Controls->m_CalibrationFileName->text().toAscii().data());
-    workTool->SetIdentifier(m_Controls->m_IdentifierEdit->text().toAscii().data());
-    workTool->SetSerialNumber(m_Controls->m_SerialNumberEdit->text().toAscii().data());
-    //Tracking Device
-    if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NDI Aurora") workTool->SetTrackingDeviceType(mitk::NDIAurora);
-    else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NDI Polaris") workTool->SetTrackingDeviceType(mitk::NDIPolaris);
-    else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="Claron Technology Micron Tracker") workTool->SetTrackingDeviceType(mitk::ClaronMicron);
-    else workTool->SetTrackingDeviceType(mitk::TrackingSystemNotSpecified);
-    //ToolType
-    if (m_Controls->m_ToolTypeChooser->currentText()=="Instrument") workTool->SetType(mitk::NavigationTool::Instrument);
-    else if (m_Controls->m_ToolTypeChooser->currentText()=="Fiducial") workTool->SetType(mitk::NavigationTool::Fiducial);
-    else if (m_Controls->m_ToolTypeChooser->currentText()=="Skinmarker") workTool->SetType(mitk::NavigationTool::Skinmarker);
-    else workTool->SetType(mitk::NavigationTool::Unknown);
-
-    if (!m_edit) m_NavigationToolStorage->AddTool(workTool);
 
     UpdateToolTable();
 

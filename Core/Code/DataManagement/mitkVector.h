@@ -60,8 +60,8 @@ namespace mitk
     /**
      * Constructor to initialize entire vector to one value.
      */
-    Vector<TCoordRep, NVectorDimension>(const TCoordRep & v):itk::Vector<TCoordRep, NVectorDimension>(v)
-      {}
+    Vector<TCoordRep, NVectorDimension>(const TCoordRep & v)
+        : itk::Vector<TCoordRep, NVectorDimension>(v) {}
 
     /**
      * Attention: vnlVector should have same size as NVectorDimension, otherwise
@@ -87,7 +87,11 @@ namespace mitk
       }
     };
 
-    Vector<TCoordRep, NVectorDimension>(const vnl_vector_fixed<ScalarType, 3> vnlVectorFixed)
+    /**
+     * Convert a vnl_vector_fixed to a mitk::Vector of the same size and coordinate representation.
+     * TODO SW: allow different coordinate representations.
+     */
+    Vector<TCoordRep, NVectorDimension>(const vnl_vector_fixed<TCoordRep, NVectorDimension> vnlVectorFixed)
         : itk::Vector<TCoordRep, NVectorDimension>(vnlVectorFixed.data_block()){};
 
     /**
@@ -100,12 +104,22 @@ namespace mitk
           array_p[i] = this->GetElement(i);
         }
     }
-  };
+
+    /**
+     * User defined conversion of mitk::Vector to vnl_vector_fixed
+     */
+    operator vnl_vector_fixed<TCoordRep, NVectorDimension>& () const
+    {
+      vnl_vector_fixed<TCoordRep, NVectorDimension> vnlVectorFixed(this->GetVnlVector());
+      return vnlVectorFixed;
+    }
+
+  }; // end mitk::Vector
 
   typedef Vector<ScalarType,2> Vector2D;
   typedef Vector<ScalarType,3> Vector3D;
   typedef Vector<ScalarType,4> Vector4D;
 
-}
+} // end namespace mitk
 
 #endif /* MITKVECTOR_H_ */

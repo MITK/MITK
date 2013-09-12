@@ -198,6 +198,7 @@ inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2
   return true;
 }
 
+
 inline bool Equal(ScalarType scalar1, ScalarType scalar2, ScalarType eps=mitk::eps)
 {
   return fabs(scalar1-scalar2) < eps;
@@ -217,6 +218,22 @@ template <typename TCoordRep, unsigned int NPointDimension>
   }
 
   return returnValue;
+}
+
+/**
+ * Compares two ArrayTypes of size size.
+ * ArrayTypes are all Objects/Types who have a [] operator. Pay attention not to set size higher
+ * than the actual size of the ArrayType. For POD arrays like float array[4] this will memory corruption.
+ */
+template <typename TArrayType1, typename TArrayType2>
+  inline bool EqualArray(TArrayType1& arrayType1, TArrayType2& arrayType2, int size, ScalarType eps = mitk::eps)
+{
+  bool isEqual = true;
+  for (int var = 0; var < size; ++var)
+  {
+    isEqual = isEqual && Equal(arrayType1[var], arrayType2[var], eps);
+  }
+  return isEqual;
 }
 
 

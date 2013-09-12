@@ -70,7 +70,7 @@ p, li { white-space: pre-wrap; }
    <item>
     <widget class="QToolBox" name="toolBox">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page">
       <property name="geometry">
@@ -127,7 +127,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="QLineEdit" name="m_CalibrationFileName">
            <property name="text">
-            <string>&lt;not given&gt;</string>
+            <string>none</string>
            </property>
           </widget>
          </item>

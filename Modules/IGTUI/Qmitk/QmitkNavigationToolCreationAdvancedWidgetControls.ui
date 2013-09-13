@@ -115,7 +115,7 @@
      </item>
     </layout>
    </item>
-   <item row="6" column="0">
+   <item row="5" column="0">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -129,13 +129,6 @@
     </spacer>
    </item>
    <item row="3" column="0">
-    <widget class="QCheckBox" name="m_ManipulateTooltipCB">
-     <property name="text">
-      <string>Manipulate Tooltip Manually</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
     <widget class="QmitkInteractiveTransformationWidget" name="m_InteractiveTransformation" native="true"/>
    </item>
   </layout>

@@ -415,7 +415,7 @@
    <item row="2" column="0">
     <widget class="QPushButton" name="m_ResetPB">
      <property name="text">
-      <string>Reset</string>
+      <string>Set To Identity</string>
      </property>
     </widget>
    </item>

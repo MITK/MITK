@@ -87,7 +87,6 @@ signals:
 
   protected slots:
     void OnToolTypeChanged(int state);
-    void OnManipulateTooltip(int state);
     void OnClose();
     void OnApplyManipulatedToolTip();
 

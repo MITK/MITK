@@ -32,7 +32,7 @@ QmitkNavigationToolCreationAdvancedWidget::QmitkNavigationToolCreationAdvancedWi
 {
   CreateQtPartControl(this);
   CreateConnections();
-  m_Controls->m_InteractiveTransformation->hide();
+  //m_Controls->m_InteractiveTransformation->hide();
 
   m_Controls->m_ToolTypeChooser->setCurrentIndex(0);
   m_ToolType = Instrument;   // initialize according to GUI setting;
@@ -57,7 +57,6 @@ void QmitkNavigationToolCreationAdvancedWidget::CreateConnections()
     if ( m_Controls )
     {
       connect( (QObject*)(m_Controls->m_ToolTypeChooser), SIGNAL(stateChanged(int)), this, SLOT(OnToolTypeChanged(int)) );
-      connect( (QObject*)(m_Controls->m_ManipulateTooltipCB), SIGNAL(stateChanged(int)), this, SLOT(OnManipulateTooltip(int)) );
       connect( (QObject*)(this), SIGNAL(finished(int)), this, SLOT(OnClose()));
       connect( (QObject*)(m_Controls->m_InteractiveTransformation), SIGNAL(ApplyManipulatedToolTip()), this, SLOT(OnApplyManipulatedToolTip()));
     }
@@ -66,6 +65,11 @@ void QmitkNavigationToolCreationAdvancedWidget::CreateConnections()
 void QmitkNavigationToolCreationAdvancedWidget::OnClose()
 {
   //clean the data storage
+ if(m_DataStorage->Exists(m_DataStorage->GetNamedNode("StandardToolTip")))
+    {
+      m_DataStorage->Remove(m_DataStorage->GetNamedNode("StandardToolTip"));
+    }
+
  if(m_DataStorage.IsNotNull() && m_DataStorage->Exists(m_DataStorage->GetNamedNode("ManipulatedToolTip")))
     {
     m_DataStorage->Remove(m_DataStorage->GetNamedNode("ManipulatedToolTip"));
@@ -129,33 +133,11 @@ void QmitkNavigationToolCreationAdvancedWidget::SetDataStorage( mitk::DataStorag
   m_DataStorage = dataStorage;
 }
 
-void QmitkNavigationToolCreationAdvancedWidget::OnManipulateTooltip(int state)
-{
-  if(state == Qt::Checked)
-  {
-    this->RetrieveAndInitializeDataForTooltipManipulation();
-    m_Controls->m_InteractiveTransformation->show();
-  }
-  else
-  {
-    m_Controls->m_InteractiveTransformation->hide();
-
-    // clean the data storage
-    if(m_DataStorage->Exists(m_DataStorage->GetNamedNode("StandardToolTip")))
-    {
-      m_DataStorage->Remove(m_DataStorage->GetNamedNode("StandardToolTip"));
-    }
-
-    if(m_DataStorage->Exists(m_DataStorage->GetNamedNode("ManipulatedToolTip")))
-    {
-      m_DataStorage->Remove(m_DataStorage->GetNamedNode("ManipulatedToolTip"));
-    }
-  }
-}
-
 void QmitkNavigationToolCreationAdvancedWidget::ReInitialize()
 {
    if (m_DataStorage.IsNull()) return;
+
+   this->RetrieveAndInitializeDataForTooltipManipulation();
 
    mitk::DataNode::Pointer manipulatedTipNode = NULL;
 
@@ -173,6 +155,8 @@ void QmitkNavigationToolCreationAdvancedWidget::ReInitialize()
       manipulatedTipNode = m_DataStorage->GetNamedNode("ManipulatedToolTip");
       manipulatedTipNode->SetData(m_ManipulatedToolTip);
     }
+
+
 
 }
 
@@ -207,7 +191,7 @@ void QmitkNavigationToolCreationAdvancedWidget::RetrieveAndInitializeDataForTool
     m_ManipulatedToolTip = m_ToolTipSurface->Clone();
 
 
-   this->ReInitialize();
+   //this->ReInitialize();
 
     mitk::Geometry3D::Pointer defaultGeo = mitk::Geometry3D::New();
     defaultGeo->SetIndexToWorldTransform(m_DefaultToolTip);
@@ -221,7 +205,6 @@ void QmitkNavigationToolCreationAdvancedWidget::RetrieveAndInitializeDataForTool
   }
   else
   {
-    this->OnManipulateTooltip(0);
     mitkThrow() << "No tooltip surface specified, operation aborted";
   }
 }

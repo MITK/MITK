@@ -33,10 +33,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkNavigationToolCreationWidget.h"
 
  /** Documentation:
-  *   \brief An object of this class offers an UI to create new NavigationTools
+  *   \brief An object of this class offers an UI to create or modify NavigationTools.
   *
-  *      Be sure to call the Initialize-methode before you start the widget
-  *      otherwise some errors might occure.
+  *          Be sure to call the initialize method before you start the widget
+  *          otherwise some errors might occure.
   *
   *   \ingroup IGTUI
   */

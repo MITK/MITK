@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationTool.h"
 #include "mitkIGTException.h"
+#include "mitkNavigationData.h"
 #include "Poco/File.h"
 
 mitk::NavigationTool::NavigationTool() : m_Type(mitk::NavigationTool::Unknown),
@@ -36,6 +37,14 @@ mitk::NavigationTool::~NavigationTool()
   {
 
   }
+
+mitk::AffineTransform3D::Pointer mitk::NavigationTool::GetToolTipTransform()
+ {
+   mitk::NavigationData::Pointer returnValue = mitk::NavigationData::New();
+   returnValue->SetPosition(this->m_ToolTipPosition);
+   returnValue->SetOrientation(this->m_ToolTipOrientation);
+   return returnValue->GetAffineTransform3D();
+ }
 
 void mitk::NavigationTool::Graft( const DataObject *data )
 {

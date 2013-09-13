@@ -67,7 +67,16 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationAdvancedWidget : public QDialo
 
     void SetToolTipSurface(bool cone, mitk::DataNode::Pointer node = NULL);
 
-    mitk::DataNode::Pointer GetManipulatedToolTip();
+    /** Sets a default tooltip transform, which will shown in the beginning.
+     *  If the windows is already open, the transform will be set to default
+     *  immediately.
+     */
+    void SetDefaultTooltip(mitk::AffineTransform3D::Pointer defaultToolTip);
+
+    /** @return Returns the manipulated tip transform. Returns an identity transform if
+     *          nothing was manipulated.
+     */
+    mitk::AffineTransform3D::Pointer GetManipulatedToolTip();
 
 signals:
     void DialogCloseRequested();
@@ -88,10 +97,12 @@ signals:
     // Member variables
     Ui::QmitkNavigationToolCreationAdvancedWidgetControls* m_Controls;
 
+    mitk::AffineTransform3D::Pointer m_DefaultToolTip;
+
     mitk::DataStorage::Pointer m_DataStorage;
     mitk::Surface::Pointer m_ToolTipSurface;
-    mitk::Surface::Pointer m_ManipulatedToolTip;
-    ToolType m_ToolType;    ///< \brief The variable holds the type of the tool selected by the user.
+    mitk::Surface::Pointer m_ManipulatedToolTip; ///< manipulated surface object, which holds the tooltip as geometry
+    ToolType m_ToolType; ///< \brief The variable holds the type of the tool selected by the user.
     std::string m_SurfaceNodeName;
 };
 #endif // QmitkNavigationToolCreationAdvancedWidget_H

@@ -44,7 +44,7 @@ class MitkIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QWidget
     QmitkInteractiveTransformationWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkInteractiveTransformationWidget();
 
-    void SetGeometry(mitk::Geometry3D::Pointer geometry);
+    void SetGeometry(mitk::Geometry3D::Pointer geometry, mitk::Geometry3D::Pointer defaultValues = NULL);
 
     mitk::Geometry3D::Pointer GetGeometry();
 
@@ -66,6 +66,10 @@ signals:
     virtual void CreateConnections();
 
     virtual void CreateQtPartControl(QWidget *parent);
+
+    void SetSliderX(int v);
+    void SetSliderY(int v);
+    void SetSliderZ(int v);
 
     /*! \brief Method performs the translation.
         \params translateVector New translation to be combine with geometry. */

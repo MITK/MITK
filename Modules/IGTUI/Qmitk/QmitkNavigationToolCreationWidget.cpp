@@ -184,16 +184,9 @@ void QmitkNavigationToolCreationWidget::OnFinished()
     m_CreatedTool->SetType(mitk::NavigationTool::Unknown);
   }
 
-  if(m_AdvancedWidget->GetManipulatedToolTip().IsNotNull())
-  {
-    mitk::Surface::Pointer manipulatedSurface = dynamic_cast<mitk::Surface*>(
-      m_AdvancedWidget->GetManipulatedToolTip()->GetData());
-
-    mitk::Geometry3D::Pointer geo = manipulatedSurface->GetGeometry();
-    mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(geo->GetIndexToWorldTransform());
-    m_CreatedTool->SetToolTipOrientation(tempND->GetOrientation());
-    m_CreatedTool->SetToolTipPosition(tempND->GetPosition());
-  }
+  mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(m_AdvancedWidget->GetManipulatedToolTip());
+  m_CreatedTool->SetToolTipOrientation(tempND->GetOrientation());
+  m_CreatedTool->SetToolTipPosition(tempND->GetPosition());
 
   emit NavigationToolFinished();
 }
@@ -201,10 +194,7 @@ void QmitkNavigationToolCreationWidget::OnFinished()
 void QmitkNavigationToolCreationWidget::OnCancel()
 {
   m_CreatedTool = NULL;
-  if(m_AdvancedWidget->GetManipulatedToolTip().IsNotNull())
-  {
-    m_DataStorage->Remove(m_AdvancedWidget->GetManipulatedToolTip());
-  }
+
   emit Canceled();
 }
 
@@ -241,6 +231,7 @@ void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Poi
   m_Controls->m_ToolNameEdit->setText(QString(DefaultTool->GetDataNode()->GetName().c_str()));
   m_AdvancedWidget->SetToolIdentifier( DefaultTool->GetIdentifier() );
   m_AdvancedWidget->SetSerialNumber( DefaultTool->GetSerialNumber() );
+  m_AdvancedWidget->SetDefaultTooltip( DefaultTool->GetToolTipTransform() );
   switch(DefaultTool->GetTrackingDeviceType())
   {
   case mitk::NDIAurora:

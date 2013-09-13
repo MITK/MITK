@@ -40,7 +40,11 @@ QmitkNavigationToolCreationAdvancedWidget::QmitkNavigationToolCreationAdvancedWi
 
 QmitkNavigationToolCreationAdvancedWidget::~QmitkNavigationToolCreationAdvancedWidget()
 {
-
+ //clean the data storage
+ if(m_DataStorage.IsNotNull() && m_DataStorage->Exists(m_DataStorage->GetNamedNode("ManipulatedToolTip")))
+    {
+    m_DataStorage->Remove(m_DataStorage->GetNamedNode("ManipulatedToolTip"));
+    }
 }
 
 void QmitkNavigationToolCreationAdvancedWidget::CreateQtPartControl(QWidget *parent)
@@ -192,7 +196,12 @@ void QmitkNavigationToolCreationAdvancedWidget::RetrieveAndInitializeDataForTool
       manipulatedTipNode = m_DataStorage->GetNamedNode("ManipulatedToolTip");
       manipulatedTipNode->SetData(m_ManipulatedToolTip);
     }
-    m_Controls->m_InteractiveTransformation->SetGeometry(m_ManipulatedToolTip->GetGeometry());
+    //m_ManipulatedToolTip->GetGeometry()->SetIndexToWorldTransform(this->m_DefaultToolTip);
+
+    mitk::Geometry3D::Pointer defaultGeo = mitk::Geometry3D::New();
+    defaultGeo->SetIndexToWorldTransform(m_DefaultToolTip);
+
+    m_Controls->m_InteractiveTransformation->SetGeometry(m_ManipulatedToolTip->GetGeometry(),defaultGeo);
 
     // reinit the views with the new nodes
     mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetAll();
@@ -204,6 +213,11 @@ void QmitkNavigationToolCreationAdvancedWidget::RetrieveAndInitializeDataForTool
     this->OnManipulateTooltip(0);
     mitkThrow() << "No tooltip surface specified, operation aborted";
   }
+}
+
+void QmitkNavigationToolCreationAdvancedWidget::SetDefaultTooltip(mitk::AffineTransform3D::Pointer defaultToolTip)
+{
+  m_DefaultToolTip = defaultToolTip;
 }
 
 void QmitkNavigationToolCreationAdvancedWidget::SetToolTipSurface( bool cone, mitk::DataNode::Pointer node /*= NULL*/ )
@@ -234,17 +248,14 @@ void QmitkNavigationToolCreationAdvancedWidget::SetToolTipSurface( bool cone, mi
 
 void QmitkNavigationToolCreationAdvancedWidget::OnApplyManipulatedToolTip()
 {
-  // remove the old standard cone;
-  m_DataStorage->Remove(m_DataStorage->GetNamedNode(m_SurfaceNodeName));
-
-  // set the manipulated surface as default surface
-  mitk::DataNode::Pointer newToolTip = m_DataStorage->GetNamedNode("ManipulatedToolTip");
-  newToolTip->SetColor(1.0,1.0,1.0);
-  newToolTip->SetOpacity(1.0);
-  newToolTip->SetName(m_SurfaceNodeName);
+  //save manipulated surface object, which holds the tooltip as geometry
+  m_ManipulatedToolTip = dynamic_cast<mitk::Surface*>(m_DataStorage->GetNamedNode("ManipulatedToolTip")->GetData()->Clone().GetPointer());
 }
 
-mitk::DataNode::Pointer QmitkNavigationToolCreationAdvancedWidget::GetManipulatedToolTip()
+mitk::AffineTransform3D::Pointer QmitkNavigationToolCreationAdvancedWidget::GetManipulatedToolTip()
 {
-  return m_DataStorage->GetNamedNode(m_SurfaceNodeName);
+  mitk::AffineTransform3D::Pointer returnValue;
+  if (m_ManipulatedToolTip.IsNotNull()) returnValue = m_ManipulatedToolTip->GetGeometry()->GetIndexToWorldTransform();
+  else returnValue->SetIdentity();
+  return returnValue;
 }

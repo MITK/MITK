@@ -18,10 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkNavigationToolCreationWidget.h"
 
 // mitk includes
-#include "mitkRenderingManager.h"
+#include <mitkRenderingManager.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
 
 // vtk includes
-#include "vtkSphereSource.h"
+#include <vtkSphereSource.h>
 #include <vtkConeSource.h>
 
 const std::string QmitkNavigationToolCreationAdvancedWidget::VIEW_ID = "org.mitk.views.navigationtoolcreationadvancedwidget";
@@ -108,6 +110,12 @@ void QmitkNavigationToolCreationAdvancedWidget::ReInitialize()
       manipulatedTipNode = m_DataStorage->GetNamedNode("ManipulatedToolTip");
       manipulatedTipNode->SetData(m_ManipulatedToolTip);
     }
+
+   // reinit the views with the new nodes
+   mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
+   mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetSubset(pred);
+   mitk::TimeSlicedGeometry::Pointer bounds = m_DataStorage->ComputeBoundingGeometry3D(rs, "visible");
+   mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }
 
 void QmitkNavigationToolCreationAdvancedWidget::RetrieveAndInitializeDataForTooltipManipulation()
@@ -144,11 +152,6 @@ void QmitkNavigationToolCreationAdvancedWidget::RetrieveAndInitializeDataForTool
     defaultGeo->SetIndexToWorldTransform(m_DefaultToolTip);
 
     m_Controls->m_InteractiveTransformation->SetGeometry(m_ManipulatedToolTip->GetGeometry(),defaultGeo);
-
-    // reinit the views with the new nodes
-    mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetAll();
-    mitk::TimeSlicedGeometry::Pointer bounds = m_DataStorage->ComputeBoundingGeometry3D(rs, "visible");    // initialize the views to the bounding geometry
-    mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
   }
   else
   {

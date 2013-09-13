@@ -599,6 +599,11 @@ void QmitkMITKIGTTrackingToolboxView::OnAddSingleTool()
   m_Controls->m_NavigationToolCreationWidget->SetTrackingDeviceType(m_Controls->m_configurationWidget->GetTrackingDevice()->GetType(),false);
   m_Controls->m_TrackingToolsWidget->setCurrentIndex(1);
 
+  //disable tracking volume during tool editing
+  lastTrackingVolumeState = m_Controls->m_ShowTrackingVolume->isChecked();
+  if (lastTrackingVolumeState) m_Controls->m_ShowTrackingVolume->click();
+  GlobalReinit();
+
   }
 
 void QmitkMITKIGTTrackingToolboxView::OnAddSingleToolFinished()
@@ -608,11 +613,19 @@ void QmitkMITKIGTTrackingToolboxView::OnAddSingleToolFinished()
   m_toolStorage->AddTool(m_Controls->m_NavigationToolCreationWidget->GetCreatedTool());
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
   QString toolLabel = QString("Loaded Tools: <manually added>");
+
+  //enable tracking volume again
+  if (lastTrackingVolumeState) m_Controls->m_ShowTrackingVolume->click();
+  GlobalReinit();
   }
 
 void QmitkMITKIGTTrackingToolboxView::OnAddSingleToolCanceled()
   {
   m_Controls->m_TrackingToolsWidget->setCurrentIndex(0);
+
+  //enable tracking volume again
+  if (lastTrackingVolumeState) m_Controls->m_ShowTrackingVolume->click();
+  GlobalReinit();
   }
 
 

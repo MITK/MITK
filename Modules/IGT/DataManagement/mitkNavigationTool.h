@@ -81,6 +81,9 @@ namespace mitk {
     itkGetConstMacro(ToolTipOrientation,mitk::Quaternion);
     itkSetMacro(ToolTipOrientation,mitk::Quaternion);
 
+    /** @return Returns the tooltip as transform object. */
+    mitk::AffineTransform3D::Pointer GetToolTipTransform();
+
     /** @return Returns true if a tooltip is set, false if not. */
     bool IsToolTipSet();
 

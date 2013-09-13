@@ -47,35 +47,29 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationAdvancedWidget : public QDialo
     QmitkNavigationToolCreationAdvancedWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkNavigationToolCreationAdvancedWidget();
 
-    enum ToolType{
-    Instrument,
-    Fiducial,
-    Skinmarker,
-    Unknown
-    };
-
-    ToolType GetToolType();
-    void SetToolType(int type);
-
-    std::string GetToolIdentifier();
-    void SetToolIdentifier(std::string _arg);
-
-    std::string GetSerialNumber();
-    void SetSerialNumber(std::string _arg);
-
     void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
 
     void SetToolTipSurface(bool cone, mitk::DataNode::Pointer node = NULL);
 
-    mitk::DataNode::Pointer GetManipulatedToolTip();
+    /** Sets a default tooltip transform, which will shown in the beginning.
+     *  If the windows is already open, the transform will be set to default
+     *  immediately.
+     */
+    void SetDefaultTooltip(mitk::AffineTransform3D::Pointer defaultToolTip);
+
+    /** @return Returns the manipulated tip transform. Returns an identity transform if
+     *          nothing was manipulated.
+     */
+    mitk::AffineTransform3D::Pointer GetManipulatedToolTip();
+
+    /** Reinitializes the widget, e.g. after it was closed. */
+    void ReInitialize();
 
 signals:
     void DialogCloseRequested();
     void RetrieveDataForManualToolTipManipulation();
 
   protected slots:
-    void OnToolTypeChanged(int state);
-    void OnManipulateTooltip(int state);
     void OnClose();
     void OnApplyManipulatedToolTip();
 
@@ -88,10 +82,11 @@ signals:
     // Member variables
     Ui::QmitkNavigationToolCreationAdvancedWidgetControls* m_Controls;
 
+    mitk::AffineTransform3D::Pointer m_DefaultToolTip;
+
     mitk::DataStorage::Pointer m_DataStorage;
     mitk::Surface::Pointer m_ToolTipSurface;
-    mitk::Surface::Pointer m_ManipulatedToolTip;
-    ToolType m_ToolType;    ///< \brief The variable holds the type of the tool selected by the user.
+    mitk::Surface::Pointer m_ManipulatedToolTip; ///< manipulated surface object, which holds the tooltip as geometry
     std::string m_SurfaceNodeName;
 };
 #endif // QmitkNavigationToolCreationAdvancedWidget_H

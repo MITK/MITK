@@ -186,7 +186,6 @@ mitk::NavigationData::NavigationData(
 
   // the transpose is because vnl_quaterion expects a transposed rotation matrix
   m_Orientation = Quaternion(rotationMatrixTransposed);
-  MITK_INFO << "Quaternion: " << m_Orientation;
 }
 
 mitk::AffineTransform3D::Pointer

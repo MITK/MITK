@@ -155,8 +155,8 @@ void QmitkNavigationToolCreationWidget::OnFinished()
 
   //fill NavigationTool object
   m_CreatedTool->SetCalibrationFile(m_Controls->m_CalibrationFileName->text().toAscii().data());
-  m_CreatedTool->SetIdentifier(m_AdvancedWidget->GetToolIdentifier().c_str());
-  m_CreatedTool->SetSerialNumber(m_AdvancedWidget->GetSerialNumber().c_str());
+  m_CreatedTool->SetIdentifier(m_Controls->m_IdentifierEdit->text().toAscii().data());
+  m_CreatedTool->SetSerialNumber(m_Controls->m_SerialNumberEdit->text().toAscii().data());
 
   //Tracking Device
   if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NDI Aurora") m_CreatedTool->SetTrackingDeviceType(mitk::NDIAurora);
@@ -165,25 +165,10 @@ void QmitkNavigationToolCreationWidget::OnFinished()
   else m_CreatedTool->SetTrackingDeviceType(mitk::TrackingSystemNotSpecified);
 
   //ToolType
-  if (m_AdvancedWidget->GetToolType() ==
-    QmitkNavigationToolCreationAdvancedWidget::Instrument)
-  {
-    m_CreatedTool->SetType(mitk::NavigationTool::Instrument);
-  }
-  else if (m_AdvancedWidget->GetToolType() ==
-    QmitkNavigationToolCreationAdvancedWidget::Fiducial)
-  {
-    m_CreatedTool->SetType(mitk::NavigationTool::Fiducial);
-  }
-  else if (m_AdvancedWidget->GetToolType() ==
-    QmitkNavigationToolCreationAdvancedWidget::Skinmarker)
-  {
-    m_CreatedTool->SetType(mitk::NavigationTool::Skinmarker);
-  }
-  else
-  {
-    m_CreatedTool->SetType(mitk::NavigationTool::Unknown);
-  }
+  if (m_Controls->m_ToolTypeChooser->currentText()=="Instrument") m_CreatedTool->SetType(mitk::NavigationTool::Instrument);
+  else if (m_Controls->m_ToolTypeChooser->currentText()=="Fiducial") m_CreatedTool->SetType(mitk::NavigationTool::Fiducial);
+  else if (m_Controls->m_ToolTypeChooser->currentText()=="Skinmarker") m_CreatedTool->SetType(mitk::NavigationTool::Skinmarker);
+  else m_CreatedTool->SetType(mitk::NavigationTool::Unknown);
 
   mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(m_AdvancedWidget->GetManipulatedToolTip());
   m_CreatedTool->SetToolTipOrientation(tempND->GetOrientation());
@@ -230,8 +215,8 @@ void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()
 void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Pointer DefaultTool)
 {
   m_Controls->m_ToolNameEdit->setText(QString(DefaultTool->GetDataNode()->GetName().c_str()));
-  m_AdvancedWidget->SetToolIdentifier( DefaultTool->GetIdentifier() );
-  m_AdvancedWidget->SetSerialNumber( DefaultTool->GetSerialNumber() );
+  m_Controls->m_IdentifierEdit->setText(QString(DefaultTool->GetIdentifier().c_str()));
+  m_Controls->m_SerialNumberEdit->setText(QString(DefaultTool->GetSerialNumber().c_str()));
   m_AdvancedWidget->SetDefaultTooltip( DefaultTool->GetToolTipTransform() );
   switch(DefaultTool->GetTrackingDeviceType())
   {
@@ -247,16 +232,16 @@ void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Poi
   m_Controls->m_CalibrationFileName->setText(QString(DefaultTool->GetCalibrationFile().c_str()));
   m_Controls->m_Surface_Use_Other->setChecked(true);
   switch(DefaultTool->GetType())
-  {
-  case mitk::NavigationTool::Instrument:
-    m_AdvancedWidget->SetToolType(0); break;
-  case mitk::NavigationTool::Fiducial:
-    m_AdvancedWidget->SetToolType(1); break;
-  case mitk::NavigationTool::Skinmarker:
-    m_AdvancedWidget->SetToolType(2); break;
-  case mitk::NavigationTool::Unknown:
-    m_AdvancedWidget->SetToolType(3); break;
-  }
+      {
+      case mitk::NavigationTool::Instrument:
+        m_Controls->m_ToolTypeChooser->setCurrentIndex(0); break;
+      case mitk::NavigationTool::Fiducial:
+        m_Controls->m_ToolTypeChooser->setCurrentIndex(1); break;
+      case mitk::NavigationTool::Skinmarker:
+        m_Controls->m_ToolTypeChooser->setCurrentIndex(2); break;
+      case mitk::NavigationTool::Unknown:
+        m_Controls->m_ToolTypeChooser->setCurrentIndex(3); break;
+      }
 
   m_Controls->m_SurfaceChooser->SetSelectedNode(DefaultTool->GetDataNode());
 

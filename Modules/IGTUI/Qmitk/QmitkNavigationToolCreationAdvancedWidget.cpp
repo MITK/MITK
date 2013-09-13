@@ -82,12 +82,18 @@ void QmitkNavigationToolCreationAdvancedWidget::ReInitialize()
 {
    if (m_DataStorage.IsNull()) return;
 
+   //reset some variables
    m_ManipulatedToolTip = NULL;
+   m_ToolTipSurface = NULL;
+   m_SurfaceNodeName = "";
+   mitk::Geometry3D::Pointer emptyGeo = mitk::Geometry3D::New();
+   m_Controls->m_InteractiveTransformation->SetGeometry(emptyGeo,emptyGeo);
 
+   //call initialization method
    this->RetrieveAndInitializeDataForTooltipManipulation();
 
+   //care for new data nodes
    mitk::DataNode::Pointer manipulatedTipNode = NULL;
-
    if(!m_DataStorage->Exists(m_DataStorage->GetNamedNode("ManipulatedToolTip")))
     {
       manipulatedTipNode = mitk::DataNode::New();

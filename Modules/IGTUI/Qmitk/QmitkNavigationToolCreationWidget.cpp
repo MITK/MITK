@@ -261,7 +261,7 @@ void QmitkNavigationToolCreationWidget::OnShowAdvancedOptions(bool state)
   if(state)
   {
     m_AdvancedWidget->show();
-    //m_AdvancedWidget->SetDefaultTooltip(m_AdvancedWidget->GetManipulatedToolTip()); //use the last one, if there is one
+    m_AdvancedWidget->SetDefaultTooltip(m_AdvancedWidget->GetManipulatedToolTip()); //use the last one, if there is one
     m_AdvancedWidget->ReInitialize();
 
     // reinit the views with the new nodes

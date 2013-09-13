@@ -32,8 +32,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkNavigationToolCreationAdvancedWidgetControls.h"
 
  /** Documentation:
-  *   \brief An object of this class offers an UI to create a widget to access the advance tool creation options.
+  *   \brief An object of this class offers an UI to modify a tooltip of an IGT navigation tool.
   *
+  *          The user can modify translation and orientation of the tooltip. The current tooltip
+  *          might be provided as default data, then the widget starts with the given values for
+  *          translation and orientation.
+  *
+  *          As long as the UI is open, there will also be a (temporary) preview data node, so
+  *          the user can see the effect of his manipulations.
+  *
+  *          Please call the method SetDataStorage to initialize the UI with the data storage
+  *          of the current application.
   *
   *   \ingroup IGTUI
   */
@@ -47,8 +56,15 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationAdvancedWidget : public QDialo
     QmitkNavigationToolCreationAdvancedWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkNavigationToolCreationAdvancedWidget();
 
+    /** Initializes the view with the a data storage. This data storage is needed for the
+     *  preview node during tooltip manipulation.
+     */
     void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
 
+    /** Sets the current tooltip surface, also for preview purposes (the preview node
+     *  will be a clone of this surface). If there is no surface, a simple cone can be used.
+     *  Please set cone to true in this case.
+     */
     void SetToolTipSurface(bool cone, mitk::DataNode::Pointer node = NULL);
 
     /** Sets a default tooltip transform, which will shown in the beginning.
@@ -62,7 +78,8 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationAdvancedWidget : public QDialo
      */
     mitk::AffineTransform3D::Pointer GetManipulatedToolTip();
 
-    /** Reinitializes the widget, e.g. after it was closed. */
+    /** Reinitializes the view, e.g. after it was closed.
+      */
     void ReInitialize();
 
 signals:

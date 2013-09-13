@@ -162,7 +162,7 @@ void mitk::WatershedTool::DoIt()
   }
   catch(itk::ExceptionObject& e)
   {
-      MITK_ERROR<<"Watershed Filter Error: " << e.GetDescription();
+    MITK_ERROR<<"Watershed Filter Error: " << e.GetDescription();
   }
 
   RenderingManager::GetInstance()->RequestUpdateAll();
@@ -182,7 +182,7 @@ void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* ori
 
   // use the progress bar
   mitk::ToolCommand::Pointer command = mitk::ToolCommand::New();
-  command->AddStepsToDo(15);
+  command->AddStepsToDo(10);
 
   // then add the watershed filter to the pipeline
   typename WatershedFilter::Pointer watershed = WatershedFilter::New();

@@ -83,9 +83,6 @@ signals:
     \params rotateVector New rotation to be combined with geometry. */
     void Rotate(mitk::Vector3D rotateVector);
 
-    /** @brief Converts euler angles (in degrees!) to a rotation matrix. */
-    itk::Matrix<double,3,3> ConvertEulerAnglesToRotationMatrix(double alpha, double beta, double gamma);
-
     // Member variables
     Ui::QmitkInteractiveTransformationWidgetControls* m_Controls;
 

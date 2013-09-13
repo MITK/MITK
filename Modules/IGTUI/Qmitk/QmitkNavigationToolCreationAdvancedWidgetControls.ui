@@ -7,115 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>462</width>
-    <height>293</height>
+    <height>429</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <widget class="QLabel" name="label_7">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Tool Type:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="m_ToolTypeChooser">
-       <property name="minimumSize">
-        <size>
-         <width>150</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>150</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <item>
-        <property name="text">
-         <string>Instrument</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Fiducial</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Skinmarker</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Unkown</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="1" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
-     <item>
-      <widget class="QLabel" name="label_4">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Identifier:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="m_IdentifierEdit">
-       <property name="text">
-        <string>&lt;not given&gt;</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
    <item row="2" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
-     <item>
-      <widget class="QLabel" name="label_5">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Serial Number:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="m_SerialNumberEdit">
-       <property name="text">
-        <string>&lt;not given&gt;</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="5" column="0">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -128,8 +27,15 @@
      </property>
     </spacer>
    </item>
-   <item row="3" column="0">
-    <widget class="QmitkInteractiveTransformationWidget" name="m_InteractiveTransformation" native="true"/>
+   <item row="0" column="0">
+    <widget class="QmitkInteractiveTransformationWidget" name="m_InteractiveTransformation" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>400</height>
+      </size>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

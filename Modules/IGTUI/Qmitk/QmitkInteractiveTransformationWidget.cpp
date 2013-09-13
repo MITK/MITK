@@ -81,23 +81,33 @@ void QmitkInteractiveTransformationWidget::SetGeometry( mitk::Geometry3D::Pointe
 
   //set default values
   if (defaultValues.IsNotNull())
-  {
-  //first: some conversion
-  mitk::NavigationData::Pointer transformConversionHelper = mitk::NavigationData::New(defaultValues->GetIndexToWorldTransform());
-  double eulerAlphaDegrees = transformConversionHelper->GetOrientation().rotation_euler_angles()[0] / vnl_math::pi * 180;
-  double eulerBetaDegrees = transformConversionHelper->GetOrientation().rotation_euler_angles()[1] / vnl_math::pi * 180;
-  double eulerGammaDegrees = transformConversionHelper->GetOrientation().rotation_euler_angles()[2] / vnl_math::pi * 180;
+    {
+    //first: some conversion
+    mitk::NavigationData::Pointer transformConversionHelper = mitk::NavigationData::New(defaultValues->GetIndexToWorldTransform());
+    double eulerAlphaDegrees = transformConversionHelper->GetOrientation().rotation_euler_angles()[0] / vnl_math::pi * 180;
+    double eulerBetaDegrees = transformConversionHelper->GetOrientation().rotation_euler_angles()[1] / vnl_math::pi * 180;
+    double eulerGammaDegrees = transformConversionHelper->GetOrientation().rotation_euler_angles()[2] / vnl_math::pi * 180;
 
-  //set translation
-  OnXTranslationValueChanged(defaultValues->GetIndexToWorldTransform()->GetOffset()[0]);
-  OnYTranslationValueChanged(defaultValues->GetIndexToWorldTransform()->GetOffset()[1]);
-  OnZTranslationValueChanged(defaultValues->GetIndexToWorldTransform()->GetOffset()[2]);
+    //set translation
+    OnXTranslationValueChanged(defaultValues->GetIndexToWorldTransform()->GetOffset()[0]);
+    OnYTranslationValueChanged(defaultValues->GetIndexToWorldTransform()->GetOffset()[1]);
+    OnZTranslationValueChanged(defaultValues->GetIndexToWorldTransform()->GetOffset()[2]);
 
-  //set rotation
-  OnXRotationValueChanged(eulerAlphaDegrees);
-  OnYRotationValueChanged(eulerBetaDegrees);
-  OnZRotationValueChanged(eulerGammaDegrees);
-  }
+    //set rotation
+    OnXRotationValueChanged(eulerAlphaDegrees);
+    OnYRotationValueChanged(eulerBetaDegrees);
+    OnZRotationValueChanged(eulerGammaDegrees);
+    }
+  else
+    {
+    //reset everything
+    OnXTranslationValueChanged(0);
+    OnYTranslationValueChanged(0);
+    OnZTranslationValueChanged(0);
+    OnXRotationValueChanged(0);
+    OnYRotationValueChanged(0);
+    OnZRotationValueChanged(0);
+    }
 }
 
 mitk::Geometry3D::Pointer QmitkInteractiveTransformationWidget::GetGeometry()
@@ -224,12 +234,25 @@ void QmitkInteractiveTransformationWidget::Rotate(mitk::Vector3D rotateVector)
   double radianX = rotateVector[0] * vnl_math::pi / 180;
   double radianY = rotateVector[1] * vnl_math::pi / 180;
   double radianZ = rotateVector[2] * vnl_math::pi / 180;
+
   //1: from euler angles to quaternion
-  mitk::Quaternion rotation(radianX,radianY,radianZ) ;
+  mitk::Quaternion rotation(radianX,radianY,radianZ);
+
   //2: Conversion to navigation data / transform
   mitk::NavigationData::Pointer rotationTransform = mitk::NavigationData::New();
   rotationTransform->SetOrientation(rotation);
+
   //3: Apply transform
+
+  //also remember old transform, but without rotation, because rotation is completely stored in the sliders
+  mitk::NavigationData::Pointer oldTransform = mitk::NavigationData::New(m_Geometry->GetIndexToWorldTransform());
+  mitk::Quaternion identity(0,0,0,1);
+  oldTransform->SetOrientation(identity);
+
+  //compose old transform with the new one
+  rotationTransform->Compose(oldTransform);
+
+  //and apply it...
   m_Geometry->SetIndexToWorldTransform(rotationTransform->GetAffineTransform3D());
   qApp->processEvents();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -262,30 +285,4 @@ void QmitkInteractiveTransformationWidget::OnResetGeometry()
 void QmitkInteractiveTransformationWidget::OnApplyManipulatedToolTip()
 {
   emit ApplyManipulatedToolTip();
-}
-
-itk::Matrix<double,3,3> QmitkInteractiveTransformationWidget::ConvertEulerAnglesToRotationMatrix(double alpha, double beta, double gamma)
-{
-    double PI = vnl_math::pi;
-    alpha = alpha * PI / 180;
-    beta = beta * PI / 180;
-    gamma = gamma * PI / 180;
-
-    //convert angles to matrix:
-    itk::Matrix<double,3,3> matrix;
-
-    //Luftfahrtnorm (DIN 9300) (Yaw-Pitch-Roll, Z, Y, X)
-    matrix[0][0] = cos(beta) * cos(alpha);
-    matrix[0][1] = cos(beta) * sin(alpha);
-    matrix[0][2] = -sin(beta);
-
-    matrix[1][0] = sin(gamma) * sin(beta) * cos(alpha) - cos(gamma) * sin(alpha) ;
-    matrix[1][1] = sin(gamma) * sin(beta) * sin(alpha) + cos(gamma) * cos(alpha);
-    matrix[1][2] = sin(gamma) * cos(beta);
-
-    matrix[2][0] = cos(gamma) * sin(beta) * cos(alpha) + sin(gamma) * sin(alpha);
-    matrix[2][1] = cos(gamma) * sin(beta) * sin(alpha) - sin(gamma) * cos(alpha);
-    matrix[2][2] = cos(gamma) * cos(beta);
-
-    return matrix;
 }

@@ -47,22 +47,6 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationAdvancedWidget : public QDialo
     QmitkNavigationToolCreationAdvancedWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkNavigationToolCreationAdvancedWidget();
 
-    enum ToolType{
-    Instrument,
-    Fiducial,
-    Skinmarker,
-    Unknown
-    };
-
-    ToolType GetToolType();
-    void SetToolType(int type);
-
-    std::string GetToolIdentifier();
-    void SetToolIdentifier(std::string _arg);
-
-    std::string GetSerialNumber();
-    void SetSerialNumber(std::string _arg);
-
     void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
 
     void SetToolTipSurface(bool cone, mitk::DataNode::Pointer node = NULL);
@@ -86,7 +70,6 @@ signals:
     void RetrieveDataForManualToolTipManipulation();
 
   protected slots:
-    void OnToolTypeChanged(int state);
     void OnClose();
     void OnApplyManipulatedToolTip();
 
@@ -104,7 +87,6 @@ signals:
     mitk::DataStorage::Pointer m_DataStorage;
     mitk::Surface::Pointer m_ToolTipSurface;
     mitk::Surface::Pointer m_ManipulatedToolTip; ///< manipulated surface object, which holds the tooltip as geometry
-    ToolType m_ToolType; ///< \brief The variable holds the type of the tool selected by the user.
     std::string m_SurfaceNodeName;
 };
 #endif // QmitkNavigationToolCreationAdvancedWidget_H

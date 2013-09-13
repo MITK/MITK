@@ -32,10 +32,6 @@ QmitkNavigationToolCreationAdvancedWidget::QmitkNavigationToolCreationAdvancedWi
 {
   CreateQtPartControl(this);
   CreateConnections();
-  //m_Controls->m_InteractiveTransformation->hide();
-
-  m_Controls->m_ToolTypeChooser->setCurrentIndex(0);
-  m_ToolType = Instrument;   // initialize according to GUI setting;
 }
 
 QmitkNavigationToolCreationAdvancedWidget::~QmitkNavigationToolCreationAdvancedWidget()
@@ -56,7 +52,6 @@ void QmitkNavigationToolCreationAdvancedWidget::CreateConnections()
   {
     if ( m_Controls )
     {
-      connect( (QObject*)(m_Controls->m_ToolTypeChooser), SIGNAL(stateChanged(int)), this, SLOT(OnToolTypeChanged(int)) );
       connect( (QObject*)(this), SIGNAL(finished(int)), this, SLOT(OnClose()));
       connect( (QObject*)(m_Controls->m_InteractiveTransformation), SIGNAL(ApplyManipulatedToolTip()), this, SLOT(OnApplyManipulatedToolTip()));
     }
@@ -78,56 +73,6 @@ void QmitkNavigationToolCreationAdvancedWidget::OnClose()
   emit DialogCloseRequested();
 }
 
-void QmitkNavigationToolCreationAdvancedWidget::OnToolTypeChanged(int state)
-{
-  switch (state)
-  {
-  case 0:
-    m_ToolType = Instrument;
-      break;
-  case 1:
-    m_ToolType = Fiducial;
-    break;
-  case 2:
-    m_ToolType = Skinmarker;
-    break;
-  default:
-    m_ToolType = Unknown;
-  }
-}
-
-QmitkNavigationToolCreationAdvancedWidget::ToolType
-QmitkNavigationToolCreationAdvancedWidget::GetToolType()
-{
-  return m_ToolType;
-}
-
-void QmitkNavigationToolCreationAdvancedWidget::SetToolType( int type )
-{
-  m_ToolType = (ToolType) type;
-  m_Controls->m_ToolTypeChooser->setCurrentIndex(type);
-}
-
-std::string QmitkNavigationToolCreationAdvancedWidget::GetToolIdentifier()
-{
-  return m_Controls->m_IdentifierEdit->text().toStdString();
-}
-
-std::string QmitkNavigationToolCreationAdvancedWidget::GetSerialNumber()
-{
-  return m_Controls->m_SerialNumberEdit->text().toStdString();
-}
-
-void QmitkNavigationToolCreationAdvancedWidget::SetToolIdentifier( std::string _arg )
-{
-  m_Controls->m_IdentifierEdit->setText(QString(_arg.c_str()));
-}
-
-void QmitkNavigationToolCreationAdvancedWidget::SetSerialNumber( std::string _arg )
-{
-  m_Controls->m_SerialNumberEdit->setText(QString(_arg.c_str()));
-}
-
 void QmitkNavigationToolCreationAdvancedWidget::SetDataStorage( mitk::DataStorage::Pointer dataStorage )
 {
   m_DataStorage = dataStorage;
@@ -136,6 +81,8 @@ void QmitkNavigationToolCreationAdvancedWidget::SetDataStorage( mitk::DataStorag
 void QmitkNavigationToolCreationAdvancedWidget::ReInitialize()
 {
    if (m_DataStorage.IsNull()) return;
+
+   m_ManipulatedToolTip = NULL;
 
    this->RetrieveAndInitializeDataForTooltipManipulation();
 
@@ -155,9 +102,6 @@ void QmitkNavigationToolCreationAdvancedWidget::ReInitialize()
       manipulatedTipNode = m_DataStorage->GetNamedNode("ManipulatedToolTip");
       manipulatedTipNode->SetData(m_ManipulatedToolTip);
     }
-
-
-
 }
 
 void QmitkNavigationToolCreationAdvancedWidget::RetrieveAndInitializeDataForTooltipManipulation()
@@ -189,9 +133,6 @@ void QmitkNavigationToolCreationAdvancedWidget::RetrieveAndInitializeDataForTool
     }
 
     m_ManipulatedToolTip = m_ToolTipSurface->Clone();
-
-
-   //this->ReInitialize();
 
     mitk::Geometry3D::Pointer defaultGeo = mitk::Geometry3D::New();
     defaultGeo->SetIndexToWorldTransform(m_DefaultToolTip);
@@ -250,7 +191,7 @@ void QmitkNavigationToolCreationAdvancedWidget::OnApplyManipulatedToolTip()
 
 mitk::AffineTransform3D::Pointer QmitkNavigationToolCreationAdvancedWidget::GetManipulatedToolTip()
 {
-  mitk::AffineTransform3D::Pointer returnValue;
+  mitk::AffineTransform3D::Pointer returnValue = mitk::AffineTransform3D::New();
   if (m_ManipulatedToolTip.IsNotNull()) returnValue = m_ManipulatedToolTip->GetGeometry()->GetIndexToWorldTransform();
   else returnValue->SetIdentity();
   return returnValue;

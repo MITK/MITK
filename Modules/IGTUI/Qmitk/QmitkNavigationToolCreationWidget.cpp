@@ -81,8 +81,7 @@ void QmitkNavigationToolCreationWidget::CreateConnections()
 void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorage, std::string supposedIdentifier, std::string supposedName)
 {
   m_DataStorage = dataStorage;
-  //m_Controls->m_IdentifierEdit->setText(QString(supposedIdentifier.c_str()));
-  m_AdvancedWidget->SetToolIdentifier(supposedIdentifier);
+
   //initialize UI components
   m_Controls->m_SurfaceChooser->SetDataStorage(m_DataStorage);
   m_Controls->m_SurfaceChooser->SetAutoSelectNewItems(true);
@@ -91,9 +90,7 @@ void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorag
   //set default data
   m_Controls->m_ToolNameEdit->setText(supposedName.c_str());
   m_Controls->m_CalibrationFileName->setText("none");
-  m_AdvancedWidget->SetSerialNumber("");
   m_Controls->m_Surface_Use_Sphere->setChecked(true);
-  m_AdvancedWidget->SetToolType(0);
   m_AdvancedWidget->SetDataStorage(m_DataStorage);
 
 }
@@ -264,6 +261,7 @@ void QmitkNavigationToolCreationWidget::OnShowAdvancedOptions(bool state)
   if(state)
   {
     m_AdvancedWidget->show();
+    //m_AdvancedWidget->SetDefaultTooltip(m_AdvancedWidget->GetManipulatedToolTip()); //use the last one, if there is one
     m_AdvancedWidget->ReInitialize();
 
     // reinit the views with the new nodes

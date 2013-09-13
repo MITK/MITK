@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>631</width>
-    <height>399</height>
+    <width>374</width>
+    <height>380</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -415,7 +415,7 @@
    <item row="2" column="0">
     <widget class="QPushButton" name="m_ResetPB">
      <property name="text">
-      <string>Set To Identity</string>
+      <string>Reset To Identity</string>
      </property>
     </widget>
    </item>

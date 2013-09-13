@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk includes
 #include "mitkRenderingManager.h"
+#include "mitkNavigationData.h"
 
 // vtk includes
 #include "vtkMatrix4x4.h"
@@ -78,11 +79,24 @@ void QmitkInteractiveTransformationWidget::SetGeometry( mitk::Geometry3D::Pointe
   m_Geometry = geometry;
   m_ResetGeometry = geometry->Clone();
 
+  //set default values
   if (defaultValues.IsNotNull())
   {
+  //first: some conversion
+  mitk::NavigationData::Pointer transformConversionHelper = mitk::NavigationData::New(defaultValues->GetIndexToWorldTransform());
+  double eulerAlphaDegrees = transformConversionHelper->GetOrientation().rotation_euler_angles()[0] / vnl_math::pi * 180;
+  double eulerBetaDegrees = transformConversionHelper->GetOrientation().rotation_euler_angles()[1] / vnl_math::pi * 180;
+  double eulerGammaDegrees = transformConversionHelper->GetOrientation().rotation_euler_angles()[2] / vnl_math::pi * 180;
+
+  //set translation
   OnXTranslationValueChanged(defaultValues->GetIndexToWorldTransform()->GetOffset()[0]);
   OnYTranslationValueChanged(defaultValues->GetIndexToWorldTransform()->GetOffset()[1]);
   OnZTranslationValueChanged(defaultValues->GetIndexToWorldTransform()->GetOffset()[2]);
+
+  //set rotation
+  OnXRotationValueChanged(eulerAlphaDegrees);
+  OnYRotationValueChanged(eulerBetaDegrees);
+  OnZRotationValueChanged(eulerGammaDegrees);
   }
 }
 
@@ -91,22 +105,9 @@ mitk::Geometry3D::Pointer QmitkInteractiveTransformationWidget::GetGeometry()
   return m_Geometry;
 }
 
-void QmitkInteractiveTransformationWidget::SetSliderX(int v)
-{
-  m_Controls->m_XTransSlider->setValue(v);
-  m_Controls->m_XTransSpinBox->setValue(v);
-}
-void QmitkInteractiveTransformationWidget::SetSliderY(int v)
-{
-  m_Controls->m_YTransSlider->setValue(v);
-  m_Controls->m_YTransSpinBox->setValue(v);
 
-}
-void QmitkInteractiveTransformationWidget::SetSliderZ(int v)
-{
-  m_Controls->m_ZTransSlider->setValue(v);
-  m_Controls->m_ZTransSpinBox->setValue(v);
-}
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Section to allow interactive positioning of the moving surface
@@ -122,6 +123,12 @@ void QmitkInteractiveTransformationWidget::OnXTranslationValueChanged( int v )
   this->Translate(translationParams);
 }
 
+void QmitkInteractiveTransformationWidget::SetSliderX(int v)
+{
+  m_Controls->m_XTransSlider->setValue(v);
+  m_Controls->m_XTransSpinBox->setValue(v);
+}
+
 void QmitkInteractiveTransformationWidget::OnYTranslationValueChanged( int v )
 {
   mitk::Vector3D translationParams;
@@ -132,6 +139,12 @@ void QmitkInteractiveTransformationWidget::OnYTranslationValueChanged( int v )
   this->Translate(translationParams);
 }
 
+void QmitkInteractiveTransformationWidget::SetSliderY(int v)
+{
+  m_Controls->m_YTransSlider->setValue(v);
+  m_Controls->m_YTransSpinBox->setValue(v);
+}
+
 void QmitkInteractiveTransformationWidget::OnZTranslationValueChanged( int v )
 {
   mitk::Vector3D translationParams;
@@ -140,6 +153,12 @@ void QmitkInteractiveTransformationWidget::OnZTranslationValueChanged( int v )
   translationParams[2] = v;
   SetSliderZ(v);
   this->Translate(translationParams);
+}
+
+void QmitkInteractiveTransformationWidget::SetSliderZ(int v)
+{
+  m_Controls->m_ZTransSlider->setValue(v);
+  m_Controls->m_ZTransSpinBox->setValue(v);
 }
 
 void QmitkInteractiveTransformationWidget::Translate( mitk::Vector3D translateVector)
@@ -201,66 +220,17 @@ void QmitkInteractiveTransformationWidget::OnZRotationValueChanged( int v )
 
 void QmitkInteractiveTransformationWidget::Rotate(mitk::Vector3D rotateVector)
 {
-  mitk::Vector3D rotateVec;
-
-  rotateVec[0] = rotateVector[0] - m_RotateSliderPos[0];
-  rotateVec[1] = rotateVector[1] - m_RotateSliderPos[1];
-  rotateVec[2] = rotateVector[2] - m_RotateSliderPos[2];
-
-  m_RotateSliderPos[0] = rotateVector[0];
-  m_RotateSliderPos[1] = rotateVector[1];
-  m_RotateSliderPos[2] = rotateVector[2];
-
-  vtkMatrix4x4* rotationMatrix = vtkMatrix4x4::New();
-  vtkMatrix4x4* translationMatrix = vtkMatrix4x4::New();
-  rotationMatrix->Identity();
-  translationMatrix->Identity();
-
-  double (*rotMatrix)[4] = rotationMatrix->Element;
-  double (*transMatrix)[4] = translationMatrix->Element;
-
-  mitk::Point3D centerBB = m_Geometry->GetCenter();
-
-  transMatrix[0][3] = centerBB[0];
-  transMatrix[1][3] = centerBB[1];
-  transMatrix[2][3] = centerBB[2];
-
-  translationMatrix->Invert();
-
-  m_Geometry->Compose( translationMatrix );
-  m_Geometry->TransferVtkToItkTransform();
-
-  double radianX = rotateVec[0] * vnl_math::pi / 180;
-  double radianY = rotateVec[1] * vnl_math::pi / 180;
-  double radianZ = rotateVec[2] * vnl_math::pi / 180;
-
-  if ( rotateVec[0] != 0 )
-  {
-    rotMatrix[1][1] = cos( radianX );
-    rotMatrix[1][2] = -sin( radianX );
-    rotMatrix[2][1] = sin( radianX );
-    rotMatrix[2][2] = cos( radianX );
-  }
-  else if ( rotateVec[1] != 0 )
-  {
-    rotMatrix[0][0] = cos( radianY );
-    rotMatrix[0][2] = sin( radianY );
-    rotMatrix[2][0] = -sin( radianY );
-    rotMatrix[2][2] = cos( radianY );
-  }
-  else if ( rotateVec[2] != 0 )
-  {
-    rotMatrix[0][0] = cos( radianZ );
-    rotMatrix[0][1] = -sin( radianZ );
-    rotMatrix[1][0] = sin( radianZ );
-    rotMatrix[1][1] = cos( radianZ );
-  }
-
-  m_Geometry->Compose(rotationMatrix);
-  m_Geometry->TransferItkToVtkTransform();
-
-  translationMatrix->Invert();
-  m_Geometry->Compose( translationMatrix );
+  //0: from degrees to radians
+  double radianX = rotateVector[0] * vnl_math::pi / 180;
+  double radianY = rotateVector[1] * vnl_math::pi / 180;
+  double radianZ = rotateVector[2] * vnl_math::pi / 180;
+  //1: from euler angles to quaternion
+  mitk::Quaternion rotation(radianX,radianY,radianZ) ;
+  //2: Conversion to navigation data / transform
+  mitk::NavigationData::Pointer rotationTransform = mitk::NavigationData::New();
+  rotationTransform->SetOrientation(rotation);
+  //3: Apply transform
+  m_Geometry->SetIndexToWorldTransform(rotationTransform->GetAffineTransform3D());
   qApp->processEvents();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -292,4 +262,30 @@ void QmitkInteractiveTransformationWidget::OnResetGeometry()
 void QmitkInteractiveTransformationWidget::OnApplyManipulatedToolTip()
 {
   emit ApplyManipulatedToolTip();
+}
+
+itk::Matrix<double,3,3> QmitkInteractiveTransformationWidget::ConvertEulerAnglesToRotationMatrix(double alpha, double beta, double gamma)
+{
+    double PI = vnl_math::pi;
+    alpha = alpha * PI / 180;
+    beta = beta * PI / 180;
+    gamma = gamma * PI / 180;
+
+    //convert angles to matrix:
+    itk::Matrix<double,3,3> matrix;
+
+    //Luftfahrtnorm (DIN 9300) (Yaw-Pitch-Roll, Z, Y, X)
+    matrix[0][0] = cos(beta) * cos(alpha);
+    matrix[0][1] = cos(beta) * sin(alpha);
+    matrix[0][2] = -sin(beta);
+
+    matrix[1][0] = sin(gamma) * sin(beta) * cos(alpha) - cos(gamma) * sin(alpha) ;
+    matrix[1][1] = sin(gamma) * sin(beta) * sin(alpha) + cos(gamma) * cos(alpha);
+    matrix[1][2] = sin(gamma) * cos(beta);
+
+    matrix[2][0] = cos(gamma) * sin(beta) * cos(alpha) + sin(gamma) * sin(alpha);
+    matrix[2][1] = cos(gamma) * sin(beta) * sin(alpha) - sin(gamma) * cos(alpha);
+    matrix[2][2] = cos(gamma) * cos(beta);
+
+    return matrix;
 }

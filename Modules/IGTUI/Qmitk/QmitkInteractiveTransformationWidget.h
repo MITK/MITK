@@ -44,6 +44,10 @@ class MitkIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QWidget
     QmitkInteractiveTransformationWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkInteractiveTransformationWidget();
 
+    /** Sets the geometry which will be modified by this widget. Default values may be
+     *  provided by the second variable. These values will be applied to the geometry
+     *  in the beginning and the UI will also hold these values.
+     */
     void SetGeometry(mitk::Geometry3D::Pointer geometry, mitk::Geometry3D::Pointer defaultValues = NULL);
 
     mitk::Geometry3D::Pointer GetGeometry();
@@ -78,6 +82,9 @@ signals:
     /*! \brief Method performs the rotation.
     \params rotateVector New rotation to be combined with geometry. */
     void Rotate(mitk::Vector3D rotateVector);
+
+    /** @brief Converts euler angles (in degrees!) to a rotation matrix. */
+    itk::Matrix<double,3,3> ConvertEulerAnglesToRotationMatrix(double alpha, double beta, double gamma);
 
     // Member variables
     Ui::QmitkInteractiveTransformationWidgetControls* m_Controls;

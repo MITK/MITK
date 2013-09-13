@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSTLFileReader.h>
 #include <mitkSurface.h>
 #include "mitkNavigationData.h"
+#include "mitkRenderingManager.h"
 
 //qt headers
 #include <qfiledialog.h>
@@ -278,6 +279,12 @@ void QmitkNavigationToolCreationWidget::OnShowAdvancedOptions(bool state)
   if(state)
   {
     m_AdvancedWidget->show();
+    m_AdvancedWidget->ReInitialize();
+
+    // reinit the views with the new nodes
+    mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetAll();
+    mitk::TimeSlicedGeometry::Pointer bounds = m_DataStorage->ComputeBoundingGeometry3D(rs, "visible");    // initialize the views to the bounding geometry
+    mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
   }
   else
   {

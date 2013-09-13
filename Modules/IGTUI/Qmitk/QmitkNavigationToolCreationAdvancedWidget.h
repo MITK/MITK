@@ -78,6 +78,9 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationAdvancedWidget : public QDialo
      */
     mitk::AffineTransform3D::Pointer GetManipulatedToolTip();
 
+    /** Reinitializes the widget, e.g. after it was closed. */
+    void ReInitialize();
+
 signals:
     void DialogCloseRequested();
     void RetrieveDataForManualToolTipManipulation();

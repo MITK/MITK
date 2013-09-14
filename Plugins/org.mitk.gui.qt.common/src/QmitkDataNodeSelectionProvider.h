@@ -38,7 +38,7 @@ class MITK_QT_COMMON QmitkDataNodeSelectionProvider : public berry::QtSelectionP
 {
 public:
 
-  berryObjectMacro(QmitkDataNodeSelectionProvider)
+  berryObjectMacro(QmitkDataNodeSelectionProvider);
 
   QmitkDataNodeSelectionProvider();
 

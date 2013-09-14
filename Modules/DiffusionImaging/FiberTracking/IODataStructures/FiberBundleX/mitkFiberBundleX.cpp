@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarCircle.h>
 #include <mitkPlanarPolygon.h>
 #include <mitkPlanarFigureComposite.h>
+#include "mitkImagePixelReadAccessor.h"
+#include <mitkPixelTypeMultiplex.h>
 
 #include <vtkPointData.h>
 #include <vtkDataArray.h>
@@ -525,29 +527,39 @@ void mitk::FiberBundleX::ResetFiberOpacity() {
 
 void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
 {
-    MITK_DEBUG << "SetFAMap";
-    vtkSmartPointer<vtkDoubleArray> faValues = vtkSmartPointer<vtkDoubleArray>::New();
-    faValues->SetName(COLORCODING_FA_BASED);
-    faValues->Allocate(m_FiberPolyData->GetNumberOfPoints());
-    faValues->SetNumberOfValues(m_FiberPolyData->GetNumberOfPoints());
-
-    vtkPoints* pointSet = m_FiberPolyData->GetPoints();
-    for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); ++i)
-    {
-        Point3D px;
-        px[0] = pointSet->GetPoint(i)[0];
-        px[1] = pointSet->GetPoint(i)[1];
-        px[2] = pointSet->GetPoint(i)[2];
-        double faPixelValue = 1-FAimage->GetPixelValueByWorldCoordinate(px);
-        faValues->InsertValue(i, faPixelValue);
-    }
-
-    m_FiberPolyData->GetPointData()->AddArray(faValues);
-    this->GenerateFiberIds();
-
-    if(m_FiberPolyData->GetPointData()->HasArray(COLORCODING_FA_BASED))
-        MITK_DEBUG << "FA VALUE ARRAY SET";
+   mitkPixelTypeMultiplex1( SetFAMap, FAimage->GetPixelType(), FAimage );
 }
+
+template <typename TPixel>
+void mitk::FiberBundleX::SetFAMap(const mitk::PixelType pixelType, mitk::Image::Pointer FAimage)
+{
+  MITK_DEBUG << "SetFAMap";
+  vtkSmartPointer<vtkDoubleArray> faValues = vtkSmartPointer<vtkDoubleArray>::New();
+  faValues->SetName(COLORCODING_FA_BASED);
+  faValues->Allocate(m_FiberPolyData->GetNumberOfPoints());
+  faValues->SetNumberOfValues(m_FiberPolyData->GetNumberOfPoints());
+
+  mitk::ImagePixelReadAccessor<TPixel,3> readFAimage (FAimage, FAimage->GetVolumeData(0));
+
+  vtkPoints* pointSet = m_FiberPolyData->GetPoints();
+  for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); ++i)
+  {
+      Point3D px;
+      px[0] = pointSet->GetPoint(i)[0];
+      px[1] = pointSet->GetPoint(i)[1];
+      px[2] = pointSet->GetPoint(i)[2];
+      double faPixelValue = 1-readFAimage.GetPixelByWorldCoordinates(px);
+      faValues->InsertValue(i, faPixelValue);
+  }
+
+  m_FiberPolyData->GetPointData()->AddArray(faValues);
+  this->GenerateFiberIds();
+
+  if(m_FiberPolyData->GetPointData()->HasArray(COLORCODING_FA_BASED))
+      MITK_DEBUG << "FA VALUE ARRAY SET";
+
+}
+
 
 void mitk::FiberBundleX::GenerateFiberIds()
 {

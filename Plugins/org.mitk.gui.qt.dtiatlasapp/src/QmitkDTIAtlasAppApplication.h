@@ -27,11 +27,6 @@ class QmitkDTIAtlasAppApplication : public QObject, public berry::IApplication
 public:
 
   QmitkDTIAtlasAppApplication() {}
-  QmitkDTIAtlasAppApplication(const QmitkDTIAtlasAppApplication& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   ~QmitkDTIAtlasAppApplication() {}
 
   int Start();

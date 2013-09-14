@@ -104,6 +104,7 @@ protected slots:
     void OnAddGhosts(int value);
     void OnAddDistortions(int value);
     void OnAddEddy(int value);
+    void OnAddSpikes(int value);
     void OnConstantRadius(int value);
 
 protected:
@@ -163,6 +164,8 @@ protected:
         double                              eddyStrength;
         double                              comp3Weight;
         double                              comp4Weight;
+        int                                 spikes;
+        double                              spikeAmplitude;
 
         bool                                doSimulateRelaxation;
         bool                                doSimulateEddyCurrents;

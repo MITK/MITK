@@ -60,7 +60,7 @@ class BERRY_COMMANDS ParameterType: public HandleObject
 
 public:
 
-  berryObjectMacro(ParameterType)
+  berryObjectMacro(ParameterType);
 
   /**
    * Adds a listener to this parameter type that will be notified when its

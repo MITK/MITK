@@ -34,7 +34,7 @@ class BERRY_UI QtWidgetController : public Object
 
 public:
 
-  berryObjectMacro(QtWidgetController)
+  berryObjectMacro(QtWidgetController);
 
   static const char PROPERTY_ID[];
 

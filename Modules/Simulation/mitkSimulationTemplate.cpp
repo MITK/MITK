@@ -36,7 +36,7 @@ static TemplateIndex CreateTemplateIndex(const std::string& contents)
     if (end == std::string::npos)
       mitkThrow() << "Could not create template index: Expected closing brace before end of file!";
 
-    if (contents.substr(begin + 1, end).find('{') != std::string::npos)
+    if (contents.substr(begin + 1, end - begin - 1).find('{') != std::string::npos)
       mitkThrow() << "Could not create template index: Expected closing brace before opening brace!";
 
     templateIndex.push_back(std::make_pair(begin, ++end - begin));
@@ -195,7 +195,7 @@ static std::pair<std::string, mitk::BaseProperty::Pointer> ParseReference(const 
   if (string.empty())
     mitkThrow() << "Could not parse " << ref << ": Reference is empty!";
 
-  return std::make_pair(id, mitk::StringProperty::New(string));
+  return std::make_pair(id, mitk::StringProperty::New(string).GetPointer());
 }
 
 static std::pair<std::string, mitk::BaseProperty::Pointer> ParseTemplate(const std::string& templ)

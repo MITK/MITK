@@ -77,7 +77,7 @@ namespace itk
     typedef itk::VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
 
     typedef std::vector<unsigned int>           IndicesVector;
-    typedef std::map<double, IndicesVector>     BValueMap;
+    typedef std::map<unsigned int, IndicesVector>     BValueMap;
 
     itkGetMacro(OriginalGradientDirections, GradientDirectionContainerType::Pointer)
     itkSetMacro(OriginalGradientDirections, GradientDirectionContainerType::Pointer)

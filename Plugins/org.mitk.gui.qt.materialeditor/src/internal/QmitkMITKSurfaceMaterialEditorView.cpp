@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchPage.h"
 
 #include "mitkShaderProperty.h"
-#include "mitkShaderRepository.h"
 
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkStdMultiWidget.h"
@@ -83,9 +82,6 @@ QmitkMITKSurfaceMaterialEditorView::QmitkMITKSurfaceMaterialEditorView()
   shaderProperties.push_back( "material.wireframeLineWidth" );
 
   observerAllocated = false;
-
-
-  mitk::ShaderRepository::GetGlobalShaderRepository();
 }
 
 QmitkMITKSurfaceMaterialEditorView::~QmitkMITKSurfaceMaterialEditorView()
@@ -188,51 +184,6 @@ void QmitkMITKSurfaceMaterialEditorView::RefreshPropertiesList()
   m_Controls->m_ShaderPropertyList->SetPropertyList( DstPL );
   //m_Controls->m_PreviewRenderWindow->GetRenderer()->GetVtkRenderer()->ResetCameraClippingRange();
 }
-
-    /*
-
-      // subscribe for property change events
-
-      itk::MemberCommand<QmitkPropertiesTableModel>::Pointer propertyModifiedCommand =
-         itk::MemberCommand<QmitkPropertiesTableModel>::New();
-      propertyModifiedCommand->SetCallbackFunction(this, &QmitkPropertiesTableModel::PropertyModified);
-
-       m_PropertyModifiedObserverTags[it->first] = it->second.first->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
-
-
-            itk::MemberCommand<QmitkDataStorageTableModel>::Pointer propertyModifiedCommand = itk::MemberCommand<QmitkDataStorageTableModel>::New();
-        propertyModifiedCommand->SetCallbackFunction(this, &QmitkDataStorageTableModel::PropertyModified);
-
-        mitk::BaseProperty* visibilityProperty = (*it)->GetProperty("visible");
-        if(visibilityProperty)
-          m_PropertyModifiedObserverTags[visibilityProperty]
-        = visibilityProperty->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
-
-        mitk::BaseProperty* nameProperty = (*it)->GetProperty("name");
-        if(nameProperty)
-          m_PropertyModifiedObserverTags[nameProperty]
-        = nameProperty->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
-
-
-    for(mitk::PropertyList::PropertyMap::const_iterator it=m_PropertyList->GetMap()->begin()
-      ; it!=m_PropertyList->GetMap()->end()
-      ; it++)
-    {
-      // add relevant property column values
-      m_PropertyListElements.push_back((*it));
-
-      // subscribe for property change events
-
-      itk::MemberCommand<QmitkPropertiesTableModel>::Pointer propertyModifiedCommand =
-         itk::MemberCommand<QmitkPropertiesTableModel>::New();
-      propertyModifiedCommand->SetCallbackFunction(this, &QmitkPropertiesTableModel::PropertyModified);
-
-       m_PropertyModifiedObserverTags[it->first] = it->second.first->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);*/
-
-
-
-
-
 
 void QmitkMITKSurfaceMaterialEditorView::CreateQtPartControl(QWidget *parent)
 {

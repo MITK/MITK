@@ -39,13 +39,14 @@ class DiffusionCore_EXPORT gradients
 {
 private:
   typedef std::vector<unsigned int> IndiciesVector;
-  typedef std::map<double, IndiciesVector > BValueMap;
-  typedef vnl_vector_fixed< double, 3 > GradientDirectionType;
-  typedef itk::VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
+  typedef std::map<unsigned int, IndiciesVector > BValueMap;
+  typedef itk::VectorContainer< unsigned int, vnl_vector_fixed< double, 3 > > GradientDirectionContainerType;
+  typedef vnl_vector_fixed<double , 3 > GradientDirectionType;
 
 public:
-  static std::vector<unsigned int> GetAllUniqueDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, const GradientDirectionContainerType *refGradientsContainer );
-  static bool CheckForDifferingShellDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, const GradientDirectionContainerType * refGradientsContainer);
+  static std::vector<unsigned int> GetAllUniqueDirections(const BValueMap &bValueMap, GradientDirectionContainerType *refGradientsContainer );
+
+  static bool CheckForDifferingShellDirections(const BValueMap &bValueMap, GradientDirectionContainerType::ConstPointer refGradientsContainer);
   static vnl_matrix<double> ComputeSphericalHarmonicsBasis(const vnl_matrix<double> & QBallReference, const unsigned int & LOrder);
   static vnl_matrix<double> ComputeSphericalFromCartesian(const IndiciesVector  & refShell, const GradientDirectionContainerType * refGradientsContainer);
   static mitk::gradients::GradientDirectionContainerType::Pointer CreateNormalizedUniqueGradientDirectionContainer(const BValueMap &bValueMap, const GradientDirectionContainerType * origninalGradentcontainer);

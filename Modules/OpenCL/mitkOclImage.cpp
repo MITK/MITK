@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOclUtils.h"
 
-
+#include <mitkImageReadAccessor.h>
 #include <fstream>
 
 mitk::OclImage::OclImage() : m_gpuImage(NULL), m_context(NULL), m_bufferSize(0), m_gpuModified(false), m_cpuModified(false),
@@ -56,7 +56,7 @@ cl_mem mitk::OclImage::CreateGPUImage(unsigned int _wi, unsigned int _he, unsign
 
   m_BpE = _bpp;
 
-  mitk::ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+  us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
   OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
 
   cl_context gpuContext = resources->GetContext();
@@ -133,7 +133,8 @@ int mitk::OclImage::TransferDataToGPU(cl_command_queue gpuComQueue)
 
       if( this->m_formatSupported )
       {
-        clErr = clEnqueueWriteImage( gpuComQueue, m_gpuImage, CL_TRUE, origin, region, 0, 0, m_Image->GetData(), 0, NULL, NULL);
+        mitk::ImageReadAccessor accessor(m_Image);
+        clErr = clEnqueueWriteImage( gpuComQueue, m_gpuImage, CL_TRUE, origin, region, 0, 0, accessor.GetData(), 0, NULL, NULL);
       }
       else
       {
@@ -152,7 +153,7 @@ cl_int mitk::OclImage::AllocateGPUImage()
 {
   cl_int clErr = 0;
 
-  mitk::ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+  us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
   OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
 
   cl_context gpuContext = resources->GetContext();
@@ -224,10 +225,8 @@ cl_mem mitk::OclImage::GetGPUImage(cl_command_queue gpuComQueue)
 
     //release pointer
     clReleaseMemObject(tempBuffer);
-
   }
   return m_gpuImage;
-
 }
 
 void mitk::OclImage::SetPixelType(const cl_image_format *_image)
@@ -260,7 +259,6 @@ void* mitk::OclImage::TransferDataToCPU(cl_command_queue gpuComQueue)
   this->m_gpuModified = false;
 
   return (void*) data;
-
 }
 
 cl_image_format mitk::OclImage::ConvertPixelTypeToOCLFormat()
@@ -341,7 +339,6 @@ void mitk::OclImage::InitializeMITKImage()
 
 void mitk::OclImage::GetOffset(float* _imOffset) const
 {
-
   itk::Vector<float, 3> result2;
   result2.Fill(0.0f);
 
@@ -350,5 +347,4 @@ void mitk::OclImage::GetOffset(float* _imOffset) const
   _imOffset[0] = result2[0];
   _imOffset[1] = result2[1];
   _imOffset[2] = result2[2];
-
 }

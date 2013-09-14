@@ -53,7 +53,7 @@ private:
 
 public:
 
-  berryObjectMacro(JobChangeEvent)
+  berryObjectMacro(JobChangeEvent);
 
   JobChangeEvent();
 

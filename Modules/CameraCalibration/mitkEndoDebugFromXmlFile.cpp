@@ -1,3 +1,19 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
 #include "mitkEndoDebugFromXmlFile.h"
 #include <itksys/SystemTools.hxx>
 #include <tinyxml.h>
@@ -30,19 +46,24 @@ namespace mitk
   }
 
   void StringExplode(string str, string separator, set<string>* results){
-      int found;
+      std::size_t found;
       found = str.find_first_of(separator);
       while(found != string::npos){
-          if(found > 0){
+          if(found != 0){
               results->insert(str.substr(0,found));
           }
           str = str.substr(found+1);
           found = str.find_first_of(separator);
       }
-      if(str.length() > 0){
+      if(!str.empty()){
           results->insert(str);
       }
   }
+
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable:4390)
+#endif
 
   void EndoDebugFromXmlFile::Update()
   {
@@ -85,7 +106,7 @@ namespace mitk
     if( elem->QueryIntAttribute("ShowImagesInDebug",&_ShowImagesInDebug) != TIXML_SUCCESS )
       endodebug("ShowImagesInDebug attribute not found");
 
-    int _ShowImagesTimeOut = d->m_EndoDebug->GetShowImagesTimeOut();
+    int _ShowImagesTimeOut = static_cast<int>(d->m_EndoDebug->GetShowImagesTimeOut());
     if( elem->QueryIntAttribute("ShowImagesTimeOut",&_ShowImagesTimeOut) != TIXML_SUCCESS )
       endodebug("ShowImagesTimeOut attribute not found");
 
@@ -126,5 +147,9 @@ namespace mitk
     // save that modified time
     d->m_FileModifiedTime = _FileModifiedTime;
   }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 }

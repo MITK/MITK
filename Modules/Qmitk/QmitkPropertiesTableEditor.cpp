@@ -59,44 +59,6 @@ void QmitkPropertiesTableEditor::SetPropertyList( mitk::PropertyList::Pointer _L
     m_NodePropertiesTableView->resizeRowsToContents();
     m_NodePropertiesTableView->horizontalHeader()->setStretchLastSection(true);
     m_NodePropertiesTableView->setEditTriggers(QAbstractItemView::CurrentChanged);
-
-/*
-    // refill the combo boxes
-    m_ComboRenderer->clear();
-
-    for(mitk::BaseRenderer::BaseRendererMapType::iterator mapit = mitk::BaseRenderer::baseRendererMap.begin();
-      mapit != mitk::BaseRenderer::baseRendererMap.end(); mapit++)
-    {
-      if((*mapit).second->GetName())
-      {
-        std::string winName((*mapit).second->GetName());
-        //  winName.erase(0,winName.find("::")+2);
-        m_ComboRenderer->insertItem(winName.c_str());
-      }
-    }
-
-    // try to select focused RenderWindow
-    vtkRenderWindow* focusedRenderWindow = NULL;
-
-    mitk::FocusManager* fm =
-      mitk::GlobalInteraction::GetInstance()->GetFocusManager();
-    mitk::BaseRenderer::ConstPointer br = fm->GetFocused();
-    if (br.IsNotNull())
-    {
-      focusedRenderWindow = br->GetRenderWindow();
-    }
-
-    if (focusedRenderWindow)
-    {
-
-      m_ComboRenderer->setCurrentText(mitk::BaseRenderer::GetInstance(focusedRenderWindow)->GetName());
-    }
-    else
-    {
-      m_ComboRenderer->setCurrentText("no focused window");
-    }
-*/
-
   }
   else
   {
@@ -134,11 +96,9 @@ void QmitkPropertiesTableEditor::init()
 
   m_NodePropertiesTableView->setSelectionMode( QAbstractItemView::SingleSelection );
   m_NodePropertiesTableView->setSelectionBehavior( QAbstractItemView::SelectItems );
-  //m_NodePropertiesTableView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
   m_NodePropertiesTableView->verticalHeader()->hide();
   m_NodePropertiesTableView->setItemDelegate(new QmitkPropertyDelegate(this));
   m_NodePropertiesTableView->setAlternatingRowColors(true);
-  //m_NodePropertiesTableView->horizontalHeader()->setStretchLastSection(true);
   m_NodePropertiesTableView->setSortingEnabled(true);
   m_NodePropertiesTableView->verticalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 
@@ -156,39 +116,3 @@ QTableView* QmitkPropertiesTableEditor::getTable() const
 {
   return m_NodePropertiesTableView;
 }
-/*
-void QmitkPropertiesTableEditor::ChkShowRenderPropertiesToggled( bool checked )
-{
-  m_ComboRenderer->setEnabled(checked);
-  if(checked) {
-    ComboRendererCurrentIndexChanged( m_ComboRenderer->currentIndex() );
-  } else {
-    if (m_SelectedNode != NULL) {
-      m_Model->setPropertyList( m_SelectedNode->GetPropertyList() );
-    } else {
-      m_Model->setPropertyList( NULL );
-    }
-  }
-}
-
-void QmitkPropertiesTableEditor::ComboRendererCurrentIndexChanged( int index )
-{
-  if ( m_SelectedNode )
-  {
-    if  (m_ComboRenderer->isEnabled())
-    {
-      QString rendererName = m_ComboRenderer->currentText();
-      if(rendererName.isEmpty() == false)
-      {
-        vtkRenderWindow* renWin =  mitk::BaseRenderer::GetRenderWindowByName(rendererName.toAscii().data());
-
-        if (renWin)
-        {
-          m_Model->setPropertyList(m_SelectedNode->GetPropertyList(mitk::BaseRenderer::GetInstance(renWin)) );
-        }
-      }
-    }
-    m_NodePropertiesTableView->resizeRowsToContents();
-  }
-}
-*/

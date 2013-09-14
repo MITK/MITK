@@ -39,7 +39,7 @@ namespace berry {
  */
 struct IExecutionListenerWithChecks : public IExecutionListener {
 
-  berryInterfaceMacro(IExecutionListenerWithChecks, berry)
+  berryInterfaceMacro(IExecutionListenerWithChecks, berry);
 
   struct Events : public IExecutionListener::Events {
 

@@ -34,7 +34,7 @@ namespace berry {
  */
 struct BERRY_UI ITestHarness : public virtual Object {
 
-  berryInterfaceMacro(ITestHarness, berry)
+  berryInterfaceMacro(ITestHarness, berry);
 
     /**
      * Runs the tests.

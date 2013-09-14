@@ -37,7 +37,7 @@ mitk::InputDeviceRegistry::InputDeviceRegistry()
     // the pointer will be at end (not the last element, actually after it)
     if(this->m_ListRegisteredDevices.find(temp->GetID()) == this->m_ListRegisteredDevices.end())
     {
-      m_ListRegisteredDevices.insert(std::make_pair<std::string, InputDeviceDescriptorPtr>(temp->GetID(),temp));
+      m_ListRegisteredDevices.insert(std::make_pair(temp->GetID(),temp));
     }
     else
     {

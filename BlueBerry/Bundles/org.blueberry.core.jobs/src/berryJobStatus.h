@@ -29,7 +29,7 @@ namespace berry {
 
   public:
 
-  berryObjectMacro(JobStatus)
+  berryObjectMacro(JobStatus);
 
   /**
    * Creates a new job status with no interesting error code or exception.

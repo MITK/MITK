@@ -46,6 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageData.h>
 #include <vtkPoints.h>
 #include <vtkGeneralTransform.h>
+#include <vtkImageExtractComponents.h>
 #include <vtkImageReslice.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkPlaneSource.h>
@@ -367,20 +368,26 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     }
   }
 
-  if (!(numberOfComponents == 1 || numberOfComponents == 3 || numberOfComponents == 4))
-  {
-    MITK_WARN << "Unknown number of components!";
-  }
-
   this->ApplyOpacity( renderer );
   this->ApplyRenderingMode(renderer);
 
   // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
   localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
-  //connect the input with the levelwindow filter
-  localStorage->m_LevelWindowFilter->SetInput(localStorage->m_ReslicedImage);
-  //connect the texture with the output of the levelwindow filter
+  int displayedComponent = 0;
+
+  if (datanode->GetIntProperty("Image.Displayed Component", displayedComponent, renderer) && numberOfComponents > 1)
+  {
+    localStorage->m_VectorComponentExtractor->SetComponents(displayedComponent);
+    localStorage->m_VectorComponentExtractor->SetInput(localStorage->m_ReslicedImage);
+
+    localStorage->m_LevelWindowFilter->SetInputConnection(localStorage->m_VectorComponentExtractor->GetOutputPort(0));
+  }
+  else
+  {
+    //connect the input with the levelwindow filter
+    localStorage->m_LevelWindowFilter->SetInput(localStorage->m_ReslicedImage);
+  }
 
   // check for texture interpolation property
   bool textureInterpolation = false;
@@ -389,6 +396,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   //set the interpolation modus according to the property
   localStorage->m_Texture->SetInterpolate(textureInterpolation);
 
+  // connect the texture with the output of the levelwindow filter
   localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
 
   this->TransformActor( renderer );
@@ -763,6 +771,17 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     node->AddProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer, overwrite );
     node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
     node->AddProperty("layer", mitk::IntProperty::New(0), renderer, overwrite);
+
+    std::string className = image->GetNameOfClass();
+
+    if (className != "TensorImage" && className != "QBallImage")
+    {
+      PixelType pixelType = image->GetPixelType();
+      size_t numComponents = pixelType.GetNumberOfComponents();
+
+      if ((pixelType.GetPixelTypeAsString() == "vector" && numComponents > 1) || numComponents == 2 || numComponents > 4)
+        node->AddProperty("Image.Displayed Component", mitk::IntProperty::New(0), renderer, overwrite);
+    }
   }
 
   if(image.IsNotNull() && image->IsInitialized())
@@ -1014,6 +1033,7 @@ mitk::ImageVtkMapper2D::LocalStorage::~LocalStorage()
 }
 
 mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
+  : m_VectorComponentExtractor(vtkSmartPointer<vtkImageExtractComponents>::New())
 {
 
   m_LevelWindowFilter = vtkSmartPointer<vtkMitkLevelWindowFilter>::New();

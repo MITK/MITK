@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImageFileReader.h>
 
+// mitk
+#include <mitkImagePixelReadAccessor.h>
+
 // Qt
 #include <QInputDialog>
 #include <QMessageBox>
@@ -42,9 +45,9 @@ using namespace berry;
 
 
 QmitkTbssSkeletonizationView::QmitkTbssSkeletonizationView()
-: QmitkFunctionality()
-, m_Controls( 0 )
-, m_MultiWidget( NULL )
+  : QmitkFunctionality()
+  , m_Controls( 0 )
+  , m_MultiWidget( NULL )
 {
 
 }
@@ -275,8 +278,8 @@ void QmitkTbssSkeletonizationView::Project()
   while(threshold == -1.0)
   {
     threshold = QInputDialog::getDouble(m_Controls->m_Skeletonize, tr("Specify the FA threshold"),
-                                          tr("Threshold:"), QLineEdit::Normal,
-                                          0.2);
+                                        tr("Threshold:"), QLineEdit::Normal,
+                                        0.2);
 
     if(threshold < 0.0 || threshold > 1.0)
     {
@@ -350,6 +353,7 @@ void QmitkTbssSkeletonizationView::AddToDataStorage(mitk::Image* img, std::strin
 
 Float4DImageType::Pointer QmitkTbssSkeletonizationView::ConvertToItk(mitk::Image::Pointer image)
 {
+
   Float4DImageType::Pointer output = Float4DImageType::New();
 
   mitk::Geometry3D* geo = image->GetGeometry();
@@ -401,31 +405,34 @@ Float4DImageType::Pointer QmitkTbssSkeletonizationView::ConvertToItk(mitk::Image
   {
     int timesteps = image->GetDimension(3);
 
-    // iterate through the subjects and copy data to output
-    for(int t=0; t<timesteps; t++)
-    {
-      for(int x=0; x<image->GetDimension(0); x++)
+    try{
+      // REPLACE THIS METHODE()ConvertToItk) WITH mitk::CastToItk
+      mitk::ImagePixelReadAccessor<float,4> imageAccessor(image, image->GetSliceData());
+
+      // iterate through the subjects and copy data to output
+      for(int t=0; t<timesteps; t++)
       {
-        for(int y=0; y<image->GetDimension(1); y++)
+        for(int x=0; x<image->GetDimension(0); x++)
         {
-          for(int z=0; z<image->GetDimension(2); z++)
+          for(int y=0; y<image->GetDimension(1); y++)
           {
-            itk::Index<4> ix4;
-            ix4[0] = x;
-            ix4[1] = y;
-            ix4[2] = z;
-            ix4[3] = t;
+            for(int z=0; z<image->GetDimension(2); z++)
+            {
+              itk::Index<4> ix4;
+              ix4[0] = x;
+              ix4[1] = y;
+              ix4[2] = z;
+              ix4[3] = t;
 
-            mitk::Index3D ix;
-            ix[0] = x;
-            ix[1] = y;
-            ix[2] = z;
+              output->SetPixel(ix4, imageAccessor.GetPixelByIndex(ix4));
 
-            output->SetPixel(ix4, image->GetPixelValueByIndex(ix, t));
-
+            }
           }
         }
       }
+    }catch(std::exception & e)
+    {
+      MITK_INFO << e.what();
     }
 
   }

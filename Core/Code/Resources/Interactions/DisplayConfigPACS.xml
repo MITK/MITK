@@ -2,9 +2,9 @@
   <!-- Zoom sensitivity -->
   <param name="zoomFactor" value="5"/>
   <!-- Zoom either by moving mouse leftright or updown -->
-  <param name="zoomDirection" value="leftright"/>
+  <param name="zoomDirection" value="updown"/>
   <!-- scrolling either by moving mouse leftright or updown -->
-  <param name="scrollDirection" value="leftright"/>
+  <param name="scrollDirection" value="updown"/>
   <!-- Sets how many pixel the mouse has to be moved for scrolling 1 slice-->
   <param name="pixelPerSlice" value="3"/>
   <!-- when scrolling restart at beginning of volume, when end is reached-->

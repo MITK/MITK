@@ -47,7 +47,7 @@ class BERRY_COMMANDS State : public Object {
 
 public:
 
-  berryObjectMacro(State)
+  berryObjectMacro(State);
 
   /**
    * Adds a listener to changes for this state.

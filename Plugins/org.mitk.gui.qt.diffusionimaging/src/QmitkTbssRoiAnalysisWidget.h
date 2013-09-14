@@ -21,15 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_mitk_gui_qt_diffusionimaging_Export.h>
 
-#include "QmitkExtExports.h"
-#include "mitkPlanarFigure.h"
-#include "itkVectorImage.h"
 #include <mitkFiberBundleX.h>
-#include <mitkPlanarCircle.h>
+#include <mitkTbssImage.h>
 
-
-#include <qwt_plot.h>
-#include <qwt_plot_picker.h>
+#include <itkVectorImage.h>
 
 typedef itk::VectorImage<float,3>     VectorImageType;
 typedef std::vector< itk::Index<3> > RoiType;
@@ -38,6 +33,7 @@ typedef itk::Point<float,3>               PointType;
 typedef std::vector< PointType>           TractType;
 typedef std::vector< TractType > TractContainerType;
 
+class QwtPlotPicker;
 
 /**
  * \brief Plot widget for TBSS Data
@@ -62,7 +58,14 @@ public:
   }
 
   /* \brief Draws the group averaged profiles */
-  void DrawProfiles(std::string preprocessed);
+  void DrawProfiles();
+
+
+  void PlotFiber4D(mitk::TbssImage::Pointer tbssImage,
+                   mitk::FiberBundleX *fib,
+                   mitk::PlanarFigure* startRoi,
+                   mitk::PlanarFigure* endRoi,
+                   int number);
 
 
   void PlotFiberBundles(TractContainerType tracts, mitk::Image* img, bool avg=false);
@@ -154,8 +157,14 @@ protected:
 
 
 
-  std::vector< std::vector<double> > CalculateGroupProfiles(std::string preprocessed);
+  std::vector< std::vector<double> > CalculateGroupProfiles();
+  std::vector< std::vector<double> > CalculateGroupProfilesFibers(mitk::TbssImage::Pointer tbssImage,
+                                                                  mitk::FiberBundleX *fib,
+                                                                  mitk::PlanarFigure* startRoi,
+                                                                  mitk::PlanarFigure* endRoi,
+                                                                  int number);
 
+  void Plot(std::vector <std::vector<double> > groupProfiles);
 
 
   void Tokenize(const std::string& str,
@@ -192,13 +201,11 @@ protected:
   TractContainerType ParameterizeTracts(TractContainerType tracts, int number);
 
 
-
-
   TractContainerType m_CurrentTracts;
 
 
-
   mitk::Image* m_CurrentImage;
+  mitk::TbssImage* m_CurrentTbssImage;
 
   mitk::PlanarFigure* m_CurrentStartRoi;
   mitk::PlanarFigure* m_CurrentEndRoi;
@@ -209,6 +216,8 @@ protected:
 
 
 
+  /* \brief Creates tracts from a mitk::FiberBundleX and two planar figures indicating the start end end point */
+  TractContainerType CreateTracts(mitk::FiberBundleX *fib, mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi);
 
 
 

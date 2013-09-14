@@ -52,7 +52,7 @@ class BERRY_RUNTIME PlatformObject : public Object, public IAdaptable {
 
 public:
 
-  berryObjectMacro(berry::PlatformObject)
+  berryObjectMacro(berry::PlatformObject);
 
   /**
    * Constructs a new platform object.

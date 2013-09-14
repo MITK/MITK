@@ -65,7 +65,7 @@ private:
 
 public:
 
-  berryObjectMacro( WorkbenchTestable)
+  berryObjectMacro( WorkbenchTestable);
 
   /**
    * Constructs a new workbench testable object.

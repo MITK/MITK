@@ -22,8 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "mitkVector.h"
-#include "mitkInteractor.h"
-#include "mitkBaseRenderer.h"
+#include "mitkDataInteractor.h"
 
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
@@ -37,6 +36,9 @@ class Geometry2D;
 class DisplayGeometry;
 class PlanarFigure;
 class PositionEvent;
+class BaseRenderer;
+class InteractionPositionEvent;
+class StateMachineAction;
 
 #pragma GCC visibility push(default)
 
@@ -59,12 +61,11 @@ itkEventMacro( ContextMenuPlanarFigureEvent, PlanarFigureEvent );
   *
   * \ingroup Interaction
   */
-class PlanarFigure_EXPORT PlanarFigureInteractor : public Interactor
+class PlanarFigure_EXPORT PlanarFigureInteractor : public DataInteractor
 {
 public:
-  mitkClassMacro(PlanarFigureInteractor, Interactor);
-  mitkNewMacro3Param(Self, const char *, DataNode *, int);
-  mitkNewMacro2Param(Self, const char *, DataNode *);
+  mitkClassMacro(PlanarFigureInteractor, DataInteractor);
+  itkNewMacro(Self);
 
   /** \brief Sets the amount of precision */
   void SetPrecision( ScalarType precision );
@@ -72,55 +73,77 @@ public:
   /** \brief Sets the minimal distance between two control points. */
   void SetMinimumPointDistance( ScalarType minimumDistance );
 
-  /**
-    * \brief Calculates how good the data, this statemachine handles, is hit
-    * by the event.
-    *
-    * This method returns 0.0 (and thus does NOT handle the given event at
-    * all) if:
-    *  - the incoming event is NOT a mitk::PositionEvent
-    *  - this statemachine has no transition for the incoming event in the current state
-    *  - the current position (in world coordinates) of the incoming event is further away
-    *    from the planarFigure geometry than the planeThickness
-    *
-    * If the planarFigure that is handled by this statemachine is NULL, 0.42 is returned.
-    * (rather unlikely that the event will be handled)
-    *
-    * If the planarFigure is
-    *  - selected but NOT placed (on click a new planarFigure will be created) -> 0.6 is returned
-    *  - placed but NOT selected (picking of existing planarFigures) -> 0.7 is returned
-    *  - placed AND selected (editing of selected planarFigure) -> 0.75 is returned
-    *
-    * Thus, the user rather edits an existing planarFigure than create a new one.
-    */
-  virtual float CanHandleEvent(StateEvent const *stateEvent) const;
-
-
 protected:
-  /**
-    * \brief Constructor with Param n for limited Set of Points
-    *
-    * if no n is set, then the number of points is unlimited*
-    */
-  PlanarFigureInteractor(const char *type,
-    DataNode *dataNode, int n = -1);
 
-  /**
-    * \brief Default Destructor
-    **/
+  PlanarFigureInteractor();
   virtual ~PlanarFigureInteractor();
 
-  virtual bool ExecuteAction( Action *action,
-    mitk::StateEvent const *stateEvent );
+  virtual void ConnectActionsAndFunctions();
+
+  ////////  Conditions ////////
+  bool CheckFigurePlaced( const InteractionEvent* interactionEvent );
+
+  bool CheckFigureHovering( const InteractionEvent* interactionEvent );
+
+  bool CheckControlPointHovering( const InteractionEvent* interactionEvent );
+
+  bool CheckSelection( const InteractionEvent* interactionEvent );
+
+  bool CheckPointValidity( const InteractionEvent* interactionEvent );
+
+  bool CheckFigureFinished( const InteractionEvent* interactionEvent );
+
+  bool CheckResetOnPointSelect( const InteractionEvent* interactionEvent );
+
+  bool CheckFigureOnRenderingGeometry( const InteractionEvent* interactionEvent );
+
+  bool CheckMinimalFigureFinished( const InteractionEvent* interactionEvent );
+
+  bool CheckFigureIsExtendable( const InteractionEvent* interactionEvent );
+
+
+  ////////  Actions ////////
+
+  bool FinalizeFigure( StateMachineAction*, InteractionEvent* interactionEvent );
+
+  bool MoveCurrentPoint(StateMachineAction*, InteractionEvent* interactionEvent);
+
+  bool DeselectPoint(StateMachineAction*, InteractionEvent* interactionEvent);
+
+  bool AddPoint(StateMachineAction*, InteractionEvent* interactionEvent);
+
+  bool AddInitialPoint(StateMachineAction*, InteractionEvent* interactionEvent);
+
+  bool StartHovering( StateMachineAction*, InteractionEvent* interactionEvent );
+
+  bool EndHovering( StateMachineAction*, InteractionEvent* interactionEvent );
+
+  bool SetPreviewPointPosition( StateMachineAction*, InteractionEvent* interactionEvent );
+
+  bool HidePreviewPoint( StateMachineAction*, InteractionEvent* interactionEvent );
+
+  bool HideControlPoints( StateMachineAction*, InteractionEvent* interactionEvent );
+
+  bool RemoveSelectedPoint(StateMachineAction*, InteractionEvent* interactionEvent);
+
+  bool RequestContextMenu(StateMachineAction*, InteractionEvent* interactionEvent);
+
+  bool SelectFigure( StateMachineAction*, InteractionEvent* interactionEvent );
+
+  bool SelectPoint( StateMachineAction*, InteractionEvent* interactionEvent );
+
+  bool EndInteraction( StateMachineAction*, InteractionEvent* interactionEvent );
+
+
 
   /**
     \brief Used when clicking to determine if a point is too close to the previous point.
     */
-  bool IsMousePositionAcceptableAsNewControlPoint( mitk::StateEvent const *, const PlanarFigure* );
+  bool IsMousePositionAcceptableAsNewControlPoint( const mitk::InteractionPositionEvent* positionEvent, const PlanarFigure* );
 
-  bool TransformPositionEventToPoint2D( const StateEvent *stateEvent,
-    Point2D &point2D,
-    const Geometry2D *planarFigureGeometry );
+  bool TransformPositionEventToPoint2D( const InteractionPositionEvent* positionEvent,
+                                        const Geometry2D *planarFigureGeometry,
+                                        Point2D &point2D );
 
   bool TransformObjectToDisplay( const mitk::Point2D &point2D,
     mitk::Point2D &displayPoint,
@@ -139,7 +162,8 @@ protected:
   /** \brief Returns true if the point contained in the passed event (in display coordinates)
    * is over the planar figure (with a pre-defined tolerance range); false otherwise. */
   int IsPositionOverFigure(
-    const StateEvent *StateEvent, PlanarFigure *planarFigure,
+    const InteractionPositionEvent* positionEvent,
+    PlanarFigure *planarFigure,
     const Geometry2D *planarFigureGeometry,
     const Geometry2D *rendererGeometry,
     const DisplayGeometry *displayGeometry,
@@ -149,12 +173,15 @@ protected:
    * in the passed event (in display coordinates) currently is; -1 if the point is not over
    * a marker. */
   int IsPositionInsideMarker(
-    const StateEvent *StateEvent, const PlanarFigure *planarFigure,
+    const InteractionPositionEvent* positionEvent,
+    const PlanarFigure *planarFigure,
     const Geometry2D *planarFigureGeometry,
     const Geometry2D *rendererGeometry,
     const DisplayGeometry *displayGeometry ) const;
 
   void LogPrintPlanarFigureQuantities( const PlanarFigure *planarFigure );
+
+  virtual void ConfigurationChanged();
 
 private:
 
@@ -168,6 +195,8 @@ private:
   bool m_IsHovering;
 
   bool m_LastPointWasValid;
+
+  //mitk::PlanarFigure::Pointer m_PlanarFigure;
 };
 
 }

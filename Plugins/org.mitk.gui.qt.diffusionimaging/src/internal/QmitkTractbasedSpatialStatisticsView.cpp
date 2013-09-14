@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QInputDialog>
 #include <QClipboard>
 
+#include <qwt_plot_picker.h>
 
 #include <mitkTractAnalyzer.h>
 #include <mitkTbssImporter.h>
@@ -67,35 +68,6 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
   if (!this->IsActivated())
     return;
 
-/*
-  // Get DataManagerSelection
-  if (!this->GetDataManagerSelection().empty())
-  {
-    mitk::DataNode::Pointer sourceImageNode = this->GetDataManagerSelection().front();
-    mitk::Image::Pointer sourceImage = dynamic_cast<mitk::Image*>(sourceImageNode->GetData());
-
-    if (!sourceImage)
-    {
-      m_Controls->m_TbssImageLabel->setText(
-        QString( sourceImageNode->GetName().c_str() ) + " is no image"
-        );
-
-      return;
-    }
-
-    // set Text
-    m_Controls->m_TbssImageLabel->setText(
-      QString( sourceImageNode->GetName().c_str() ) + " (" +
-      QString::number(sourceImage->GetDimension()) + "D)"
-      );
-
-
-  }
-  else
-  {
-    m_Controls->m_TbssImageLabel->setText("Please select an image");
-  }
-*/
 
   // Check which datatypes are selected in the datamanager and enable/disable widgets accordingly
 
@@ -187,14 +159,19 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
     this->Plot(image, roiImage);
   }
 
-  if(found3dImage && foundFiberBundle && foundStartRoi && foundEndRoi)
+  else if(found3dImage && foundFiberBundle && foundStartRoi && foundEndRoi)
   {
     this->PlotFiberBundle(fib, img, start, end);
   }
 
-  else if(found3dImage == true && foundFiberBundle)
+  else if(found3dImage && foundFiberBundle)
   {
     this->PlotFiberBundle(fib, img);
+  }
+
+  else if(foundTbss && foundStartRoi && foundEndRoi && foundFiberBundle)
+  {
+    this->PlotFiber4D(image, fib, start, end);
   }
 
   if(found3dImage)
@@ -203,8 +180,8 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
   }
 
   this->m_Controls->m_Cut->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi);
-  this->m_Controls->m_SegmentLabel->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && found3dImage);
-  this->m_Controls->m_Segments->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && found3dImage);
+  this->m_Controls->m_SegmentLabel->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && (found3dImage || foundTbss));
+  this->m_Controls->m_Segments->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && (found3dImage || foundTbss));
   this->m_Controls->m_Average->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && found3dImage);
 
 }
@@ -228,7 +205,7 @@ void QmitkTractbasedSpatialStatisticsView::InitPointsets()
     m_P1->SetData( m_PointSetNode );
     m_P1->SetProperty( "name", mitk::StringProperty::New( "PointSet" ) );
     m_P1->SetProperty( "opacity", mitk::FloatProperty::New( 1 ) );
-    m_P1->SetProperty( "helper object", mitk::BoolProperty::New(true) ); // CHANGE if wanted
+    m_P1->SetProperty( "helper object", mitk::BoolProperty::New(false) ); // CHANGE if wanted
     m_P1->SetProperty( "pointsize", mitk::FloatProperty::New( 0.1 ) );
     m_P1->SetColor( 1.0, 0.0, 0.0 );
     this->GetDefaultDataStorage()->Add(m_P1);
@@ -276,8 +253,8 @@ void QmitkTractbasedSpatialStatisticsView::CreateConnections()
     connect( (QObject*)(m_Controls->m_AddGroup), SIGNAL(clicked()), this, SLOT(AddGroup()) );
     connect( (QObject*)(m_Controls->m_RemoveGroup), SIGNAL(clicked()), this, SLOT(RemoveGroup()) );
     connect( (QObject*)(m_Controls->m_Clipboard), SIGNAL(clicked()), this, SLOT(CopyToClipboard()) );
-    connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(selected(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
-    connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
+    connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(selected(const QPointF&)), SLOT(Clicked(const QPointF&) ) );
+    connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QPointF&)), SLOT(Clicked(const QPointF&) ) );
     connect( (QObject*)(m_Controls->m_Cut), SIGNAL(clicked()), this, SLOT(Cut()) );
     connect( (QObject*)(m_Controls->m_Average), SIGNAL(stateChanged(int)), this, SLOT(PerformChange()) );
     connect( (QObject*)(m_Controls->m_Segments), SIGNAL(valueChanged(int)), this, SLOT(PerformChange()) );
@@ -503,7 +480,7 @@ void QmitkTractbasedSpatialStatisticsView::AddTbssToDataStorage(mitk::Image* ima
 }
 
 
-void QmitkTractbasedSpatialStatisticsView::Clicked(const QwtDoublePoint& pos)
+void QmitkTractbasedSpatialStatisticsView::Clicked(const QPointF& pos)
 {
   int index = (int)pos.x();
 
@@ -1093,7 +1070,25 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 
 }
 
+void QmitkTractbasedSpatialStatisticsView::PlotFiber4D(mitk::TbssImage* image,
+                                                            mitk::FiberBundleX* fib,
+                                                            mitk::PlanarFigure* startRoi,
+                                                            mitk::PlanarFigure* endRoi)
+{
 
+
+  if(m_Controls->m_TabWidget->currentWidget() == m_Controls->m_MeasureTAB)
+  {
+    m_CurrentGeometry = image->GetGeometry();
+
+    m_Controls->m_RoiPlotWidget->SetGroups(image->GetGroupInfo());
+    m_Controls->m_RoiPlotWidget->SetProjections(image->GetImage());
+    m_Controls->m_RoiPlotWidget->SetMeasure( image->GetMeasurementInfo() );
+    m_Controls->m_RoiPlotWidget->PlotFiber4D(image, fib, startRoi, endRoi, m_Controls->m_Segments->value());
+  }
+
+
+}
 
 void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundleX *fib, mitk::Image* img,
                                                            mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi)
@@ -1116,7 +1111,6 @@ void QmitkTractbasedSpatialStatisticsView::Plot(mitk::TbssImage* image, mitk::Tb
     m_CurrentGeometry = image->GetGeometry();
 
 
-    std::string resultfile = "";
     std::string structure = roiImage->GetStructure();
 
     m_Controls->m_RoiPlotWidget->SetGroups(image->GetGroupInfo());
@@ -1124,7 +1118,7 @@ void QmitkTractbasedSpatialStatisticsView::Plot(mitk::TbssImage* image, mitk::Tb
     m_Controls->m_RoiPlotWidget->SetRoi(roi);
     m_Controls->m_RoiPlotWidget->SetStructure(structure);
     m_Controls->m_RoiPlotWidget->SetMeasure( image->GetMeasurementInfo() );
-    m_Controls->m_RoiPlotWidget->DrawProfiles(resultfile);
+    m_Controls->m_RoiPlotWidget->DrawProfiles();
   }
 
   m_Controls->m_RoiPlotWidget->SetPlottingFiber(false);

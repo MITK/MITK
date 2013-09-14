@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkImageTimeSelector.h"
 #include <mitkExtractSliceFilter.h>
+#include "mitkImageReadAccessor.h"
 //#include <mitkPlaneGeometry.h>
 
 #include "mitkShapeBasedInterpolationAlgorithm.h"
@@ -207,7 +208,9 @@ void mitk::SegmentationInterpolationController::SetChangedSlice( const Image* sl
   }
 
   //mitkIpPicDescriptor* rawSlice = const_cast<Image*>(sliceDiff)->GetSliceData()->GetPicDescriptor(); // we promise not to change anything!
-  unsigned char* rawSlice = (unsigned char*) const_cast<Image*>(sliceDiff)->GetData();
+
+  mitk::ImageReadAccessor readAccess(const_cast<Image*>(sliceDiff));
+  unsigned char* rawSlice = (unsigned char*) readAccess.GetData();
   if (!rawSlice) return;
 
   AccessFixedDimensionByItk_1( sliceDiff, ScanChangedSlice, 2, SetChangedSliceOptions(sliceDimension, sliceIndex, dim0, dim1, timeStep, rawSlice) );

@@ -37,24 +37,49 @@ endif()
 #-----------------------------------------------------------------------------
 
 set(external_projects
+  tinyxml
+  ANN
+  CppUnit
+  GLEW
   VTK
+  ACVD
   GDCM
   CableSwig
+  OpenCV
+  Poco
   ITK
   Boost
   DCMTK
   CTK
-  OpenCV
   SOFA
   MITKData
+  Qwt
+  Qxt
   )
 
-set(MITK_USE_CableSwig ${MITK_USE_Python})
+# These are "hard" dependencies and always set to ON
+set(MITK_USE_tinyxml 1)
+set(MITK_USE_ANN 1)
+set(MITK_USE_GLEW 1)
 set(MITK_USE_GDCM 1)
 set(MITK_USE_ITK 1)
 set(MITK_USE_VTK 1)
 
-foreach(proj VTK GDCM CableSwig ITK DCMTK CTK OpenCV SOFA)
+# Semi-hard dependencies, enabled by user-controlled variables
+set(MITK_USE_CableSwig ${MITK_USE_Python})
+if(MITK_USE_QT)
+  set(MITK_USE_Qwt 1)
+  set(MITK_USE_Qxt 1)
+endif()
+
+if(MITK_USE_BLUEBERRY)
+  set(MITK_USE_CppUnit 1)
+endif()
+
+# A list of "nice" external projects, playing well together with CMake
+set(nice_external_projects ${external_projects})
+list(REMOVE_ITEM nice_external_projects Boost)
+foreach(proj ${nice_external_projects})
   if(MITK_USE_${proj})
     set(EXTERNAL_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
     mark_as_advanced(EXTERNAL_${proj}_DIR)
@@ -166,13 +191,16 @@ set(mitk_cmake_boolean_args
   MITK_BUILD_ALL_APPS
   MITK_BUILD_TUTORIAL # Deprecated. Use MITK_BUILD_EXAMPLES instead
   MITK_BUILD_EXAMPLES
+  MITK_USE_ACVD
+  MITK_USE_CppUnit
+  MITK_USE_GLEW
   MITK_USE_Boost
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_CTK
   MITK_USE_DCMTK
-  MITK_DCMTK_BUILD_SHARED_LIBS
   MITK_USE_OpenCV
+  MITK_USE_Poco
   MITK_USE_SOFA
   MITK_USE_Python
   MITK_USE_OpenCL
@@ -203,17 +231,24 @@ ExternalProject_Add(${proj}
   INSTALL_COMMAND ""
   DEPENDS
     # Mandatory dependencies
+    ${tinyxml_DEPENDS}
+    ${ANN_DEPENDS}
     ${VTK_DEPENDS}
     ${ITK_DEPENDS}
     # Optionnal dependencies
+    ${ACVD_DEPENDS}
+    ${CppUnit_DEPENDS}
+    ${GLEW_DEPENDS}
     ${Boost_DEPENDS}
     ${CTK_DEPENDS}
     ${DCMTK_DEPENDS}
     ${OpenCV_DEPENDS}
+    ${Poco_DEPENDS}
     ${SOFA_DEPENDS}
     ${MITK-Data_DEPENDS}
+    ${Qwt_DEPENDS}
+    ${Qxt_DEPENDS}
 )
-
 #-----------------------------------------------------------------------------
 # Additional MITK CXX/C Flags
 #-----------------------------------------------------------------------------
@@ -247,13 +282,13 @@ foreach(type RUNTIME ARCHIVE LIBRARY)
     list(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
   endif()
 endforeach()
-
 # Optional python variables
 if(MITK_USE_Python)
     list(APPEND mitk_optional_cache_args
          -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
          -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
-         -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY} )
+         -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
+         -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2} )
 endif()
 
 set(proj MITK-Configure)
@@ -308,14 +343,22 @@ ExternalProject_Add(${proj}
     -DMITK_KWSTYLE_EXECUTABLE:FILEPATH=${MITK_KWSTYLE_EXECUTABLE}
     -DCTK_DIR:PATH=${CTK_DIR}
     -DDCMTK_DIR:PATH=${DCMTK_DIR}
+    -Dtinyxml_DIR:PATH=${tinyxml_DIR}
+    -DGLEW_DIR:PATH=${GLEW_DIR}
+    -DANN_DIR:PATH=${ANN_DIR}
+    -DCppUnit_DIR:PATH=${CppUnit_DIR}
     -DVTK_DIR:PATH=${VTK_DIR}     # FindVTK expects VTK_DIR
     -DITK_DIR:PATH=${ITK_DIR}     # FindITK expects ITK_DIR
+    -DACVD_DIR:PATH=${ACVD_DIR}
     -DOpenCV_DIR:PATH=${OpenCV_DIR}
+    -DPoco_DIR:PATH=${Poco_DIR}
     -DSOFA_DIR:PATH=${SOFA_DIR}
     -DGDCM_DIR:PATH=${GDCM_DIR}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
     -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
+    -DQwt_DIR:PATH=${Qwt_DIR}
+    -DQxt_DIR:PATH=${Qxt_DIR}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
 

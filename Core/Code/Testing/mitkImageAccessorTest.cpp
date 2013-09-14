@@ -38,6 +38,8 @@ struct ThreadData
    bool m_Successful;   // to check if everything worked
 };
 
+itk::SimpleFastMutexLock testMutex;
+
 ITK_THREAD_RETURN_TYPE ThreadMethod(void* data)
 {
    /* extract data pointer from Thread Info structure */
@@ -69,7 +71,9 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void* data)
    {
       if(rand() % 2)
       {
+         testMutex.Lock();
          mitk::ImageDataItem* iDi = im->GetSliceData(rand() % nrSlices);
+         testMutex.Unlock();
          while(!iDi->IsComplete()) {}
 
          //MITK_INFO << "pixeltype: " << im->GetPixelType().GetComponentTypeAsString();
@@ -105,7 +109,9 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void* data)
       }
       else
       {
+         testMutex.Lock();
          mitk::ImageDataItem* iDi = im->GetSliceData(rand() % nrSlices);
+         testMutex.Unlock();
          while(!iDi->IsComplete()) {}
 
 
@@ -203,6 +209,7 @@ int mitkImageAccessorTest(int argc, char* argv[])
       return EXIT_FAILURE;
    }
 
+
    // CHECK PROHIBITED AND UNAPPROPRIATE USE
 
    // recursive mutex lock
@@ -219,7 +226,7 @@ int mitkImageAccessorTest(int argc, char* argv[])
    image->GetGeometry()->Initialize();
 
    itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
-   unsigned int noOfThreads = 1;
+   unsigned int noOfThreads = 100;
 
    // initialize barrier
    itk::Barrier::Pointer barrier = itk::Barrier::New();

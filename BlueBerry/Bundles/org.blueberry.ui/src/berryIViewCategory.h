@@ -31,7 +31,7 @@ namespace berry {
  */
 struct BERRY_UI IViewCategory : public Object
 {
-  berryInterfaceMacro(IViewCategory, berry)
+  berryInterfaceMacro(IViewCategory, berry);
 
   virtual const std::string& GetId() const = 0;
   virtual std::string GetLabel() const = 0;

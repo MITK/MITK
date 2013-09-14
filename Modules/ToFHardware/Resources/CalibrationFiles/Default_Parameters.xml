@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<data>
+    <CameraIntrinsics fx="100" fy="100" cx="100" cy="100" k1="100" k2="100" p1="100" p2="100" Valid="1" />
+</data>

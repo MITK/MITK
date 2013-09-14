@@ -10,9 +10,12 @@ set(MODULE_TESTS
   mitkEventTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
+  mitkGeometry2DTest.cpp
   mitkGeometry3DTest.cpp
+  mitkGeometry3DEqualTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkGlobalInteractionTest.cpp
+  mitkImageEqualTest.cpp
   mitkImageDataItemTest.cpp
   #mitkImageMapper2DTest.cpp
   mitkImageGeneratorTest.cpp
@@ -28,6 +31,7 @@ set(MODULE_TESTS
   #mitkPipelineSmartPointerCorrectnessTest.cpp
   mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
+  mitkPointSetEqualTest.cpp
   mitkPointSetFileIOTest.cpp
   mitkPointSetTest.cpp
   mitkPointSetWriterTest.cpp
@@ -43,6 +47,7 @@ set(MODULE_TESTS
   ##mitkStateMachineContainerTest.cpp ## rewrite test, indirect since no longer exported Bug 14529
   mitkStateTest.cpp
   mitkSurfaceTest.cpp
+  mitkSurfaceEqualTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp
   mitkTimeSlicedGeometryTest.cpp
   mitkTransitionTest.cpp
@@ -67,6 +72,11 @@ set(MODULE_TESTS
   mitkUIDGeneratorTest.cpp
   mitkShaderRepositoryTest.cpp
   mitkPlanePositionManagerTest.cpp
+  mitkAffineTransformBaseTest.cpp
+  mitkPropertyAliasesTest.cpp
+  mitkPropertyDescriptionsTest.cpp
+  mitkPropertyExtensionsTest.cpp
+  mitkPropertyFiltersTest.cpp
 )
 
 # test with image filename as an extra command line parameter
@@ -125,6 +135,13 @@ set(MODULE_CUSTOM_TESTS
     mitkPointSetVtkMapper2DTest.cpp
     mitkPointSetVtkMapper2DImageTest.cpp
     mitkPointSetVtkMapper2DGlyphTypeTest.cpp
+    mitkLabelOverlay3DRendering2DTest.cpp
+    mitkLabelOverlay3DRendering3DTest.cpp
+    mitkTextOverlay2DRenderingTest.cpp
+    mitkTextOverlay2DLayouterRenderingTest.cpp
+    mitkTextOverlay3DRendering2DTest.cpp
+    mitkTextOverlay3DRendering3DTest.cpp
+    mitkTextOverlay3DColorRenderingTest.cpp
 )
 
 set(MODULE_RESOURCE_FILES
@@ -136,12 +153,9 @@ set(MODULE_RESOURCE_FILES
 
 # Create an artificial module initializing class for
 # the usServiceListenerTest.cpp
-usFunctionGenerateModuleInit(testdriver_init_file
-                             NAME ${MODULE_NAME}TestDriver
-                             DEPENDS "Mitk"
-                             VERSION "0.1.0"
-                             EXECUTABLE
-                            )
+usFunctionGenerateExecutableInit(testdriver_init_file
+                                 IDENTIFIER ${MODULE_NAME}TestDriver
+                                )
 
 # Embed the resources
 set(testdriver_resources )

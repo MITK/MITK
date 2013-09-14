@@ -33,7 +33,7 @@ class MockViewPart: public QObject, public MockWorkbenchPart, public IViewPart
 
 public:
 
-  berryObjectMacro(MockViewPart)
+  berryObjectMacro(MockViewPart);
 
   static const std::string ID; // = "org.blueberry.ui.tests.api.MockViewPart";
   static const std::string ID2; // = ID + "2";

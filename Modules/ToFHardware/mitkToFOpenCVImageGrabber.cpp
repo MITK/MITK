@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk includes
 #include "mitkImageDataItem.h"
 #include <mitkImageStatisticsHolder.h>
+#include "mitkImageReadAccessor.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkColorTransferFunction.h"
@@ -54,37 +55,44 @@ namespace mitk
     // create single component float pixel type
     mitk::PixelType FloatType = MakeScalarPixelType<float>();
 
+    ImageReadAccessor imgGrabAcc0(m_ImageGrabber->GetOutput(0), m_ImageGrabber->GetOutput(0)->GetSliceData());
+    ImageReadAccessor imgGrabAcc1(m_ImageGrabber->GetOutput(1), m_ImageGrabber->GetOutput(1)->GetSliceData());
+    ImageReadAccessor imgGrabAcc2(m_ImageGrabber->GetOutput(2), m_ImageGrabber->GetOutput(2)->GetSliceData());
+
     mitk::Image::Pointer currentMITKIntensityImage = mitk::Image::New();
     currentMITKIntensityImage->Initialize(FloatType, 2, dimensions);
-    currentMITKIntensityImage->SetSlice((float*)m_ImageGrabber->GetOutput(2)->GetSliceData()->GetData(),0,0,0);
+    currentMITKIntensityImage->SetSlice((float*) imgGrabAcc2.GetData(),0,0,0);
 
     mitk::Image::Pointer currentMITKAmplitudeImage = mitk::Image::New();
     currentMITKAmplitudeImage->Initialize(FloatType, 2, dimensions);
-    currentMITKAmplitudeImage->SetSlice((float*)m_ImageGrabber->GetOutput(1)->GetSliceData()->GetData(),0,0,0);
+    currentMITKAmplitudeImage->SetSlice((float*)imgGrabAcc1.GetData(),0,0,0);
 
     mitk::Image::Pointer currentMITKDistanceImage = mitk::Image::New();
     currentMITKDistanceImage->Initialize(FloatType, 2, dimensions);
-    currentMITKDistanceImage->SetSlice((float*)m_ImageGrabber->GetOutput()->GetSliceData()->GetData(),0,0,0);
+    currentMITKDistanceImage->SetSlice((float*)imgGrabAcc0.GetData(),0,0,0);
     // copy mitk images to OpenCV images
     if (m_ImageDepth==IPL_DEPTH_32F)
     {
       if (m_ImageType==1)
       {
-        float* amplitudeFloatData = (float*)currentMITKAmplitudeImage->GetSliceData(0, 0, 0)->GetData();
+        ImageReadAccessor currentAmplAcc(currentMITKAmplitudeImage, currentMITKAmplitudeImage->GetSliceData(0, 0, 0));
+        float* amplitudeFloatData = (float*) currentAmplAcc.GetData();
         memcpy(m_CurrentOpenCVAmplitudeImage->imageData,(unsigned char*)amplitudeFloatData,numOfPixel*sizeof(float));
         cv::Mat image(m_CurrentOpenCVAmplitudeImage);
         return image;
       }
       else if (m_ImageType==2)
       {
-        float* intensityFloatData = (float*)currentMITKIntensityImage->GetSliceData(0, 0, 0)->GetData();
+        ImageReadAccessor currentIntenAcc(currentMITKIntensityImage, currentMITKIntensityImage->GetSliceData(0, 0, 0));
+        float* intensityFloatData = (float*) currentIntenAcc.GetData();
         memcpy(m_CurrentOpenCVIntensityImage->imageData,(unsigned char*)intensityFloatData,numOfPixel*sizeof(float));
         cv::Mat image(m_CurrentOpenCVIntensityImage);
         return image;
       }
       else
       {
-        float* distanceFloatData = (float*)currentMITKDistanceImage->GetSliceData(0, 0, 0)->GetData();
+        ImageReadAccessor currentDistAcc(currentMITKDistanceImage, currentMITKDistanceImage->GetSliceData(0, 0, 0));
+        float* distanceFloatData = (float*) currentDistAcc.GetData();
         memcpy(m_CurrentOpenCVDistanceImage->imageData,(unsigned char*)distanceFloatData,numOfPixel*sizeof(float));
         cv::Mat image(m_CurrentOpenCVDistanceImage);
         return image;
@@ -159,7 +167,8 @@ namespace mitk
   void ToFOpenCVImageGrabber::MapScalars( mitk::Image::Pointer mitkImage, IplImage* openCVImage)
   {
     unsigned int numOfPixel = m_ImageGrabber->GetCaptureWidth()*m_ImageGrabber->GetCaptureHeight();
-    float* floatData = (float*)mitkImage->GetSliceData(0, 0, 0)->GetData();
+    ImageReadAccessor imgAcc(mitkImage, mitkImage->GetSliceData(0, 0, 0));
+    float* floatData = (float*)imgAcc.GetData();
     vtkSmartPointer<vtkColorTransferFunction> colorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
     vtkSmartPointer<vtkFloatArray> floatArrayInt = vtkSmartPointer<vtkFloatArray>::New();
     floatArrayInt->Initialize();
@@ -175,5 +184,5 @@ namespace mitk
     //TODO other depth values
     colorTransferFunction->MapScalarsThroughTable(floatArrayInt, (unsigned char*)openCVImage->imageData, VTK_LUMINANCE);
   }
-}
 
+} // end namespace mitk

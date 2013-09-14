@@ -53,6 +53,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/foreach.hpp>
 #include <QFileDialog>
 #include <QMessageBox>
+#include "usModuleRegistry.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -107,6 +108,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_GhostFrame->setVisible(false);
         m_Controls->m_DistortionsFrame->setVisible(false);
         m_Controls->m_EddyFrame->setVisible(false);
+        m_Controls->m_SpikeFrame->setVisible(false);
 
         m_Controls->m_FrequencyMapBox->SetDataStorage(this->GetDataStorage());
         mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -136,6 +138,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_AddGhosts, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddGhosts(int)));
         connect((QObject*) m_Controls->m_AddDistortions, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddDistortions(int)));
         connect((QObject*) m_Controls->m_AddEddy, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddEddy(int)));
+        connect((QObject*) m_Controls->m_AddSpikes, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddSpikes(int)));
 
         connect((QObject*) m_Controls->m_ConstantRadiusBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnConstantRadius(int)));
         connect((QObject*) m_Controls->m_CopyBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(CopyBundles()));
@@ -166,6 +169,8 @@ void QmitkFiberfoxView::UpdateImageParameters()
     m_ImageGenParameters.tissueMaskImage = NULL;
     m_ImageGenParameters.frequencyMap = NULL;
     m_ImageGenParameters.gradientDirections.clear();
+    m_ImageGenParameters.spikes = 0;
+    m_ImageGenParameters.spikeAmplitude = 1;
 
     if (m_SelectedDWI.IsNotNull())  // use parameters of selected DWI
     {
@@ -244,6 +249,13 @@ void QmitkFiberfoxView::UpdateImageParameters()
     m_ImageGenParameters.interpolationShrink = m_Controls->m_InterpolationShrink->value();
     m_ImageGenParameters.axonRadius = m_Controls->m_FiberRadius->value();
     m_ImageGenParameters.signalScale = m_Controls->m_SignalScaleBox->value();
+
+    if (m_Controls->m_AddSpikes->isChecked())
+    {
+        m_ImageGenParameters.spikes = m_Controls->m_SpikeNumBox->value();
+        m_ImageGenParameters.spikeAmplitude = m_Controls->m_SpikeScaleBox->value();
+        m_ImageGenParameters.artifactModelString += "_SPIKES";
+    }
 
     // adjust echo time if needed
     if ( m_ImageGenParameters.tEcho < m_ImageGenParameters.imageRegion.GetSize(1)*m_ImageGenParameters.tLine )
@@ -589,6 +601,9 @@ void QmitkFiberfoxView::SaveParameters()
     parameters.put("fiberfox.image.artifacts.eddyStrength", m_Controls->m_EddyGradientStrength->value());
     parameters.put("fiberfox.image.artifacts.addringing", m_Controls->m_AddGibbsRinging->isChecked());
     parameters.put("fiberfox.image.artifacts.ringingupsampling", m_Controls->m_ImageUpsamplingBox->value());
+    parameters.put("fiberfox.image.artifacts.addspikes", m_Controls->m_AddSpikes->isChecked());
+    parameters.put("fiberfox.image.artifacts.spikesnum", m_Controls->m_SpikeNumBox->value());
+    parameters.put("fiberfox.image.artifacts.spikesscale", m_Controls->m_SpikeScaleBox->value());
 
     parameters.put("fiberfox.image.compartment1.index", m_Controls->m_Compartment1Box->currentIndex());
     parameters.put("fiberfox.image.compartment2.index", m_Controls->m_Compartment2Box->currentIndex());
@@ -712,6 +727,9 @@ void QmitkFiberfoxView::LoadParameters()
             m_Controls->m_kOffsetBox->setValue(v1.second.get<double>("artifacts.kspaceLineOffset"));
             m_Controls->m_AddDistortions->setChecked(v1.second.get<bool>("artifacts.distortions"));
 
+            m_Controls->m_AddSpikes->setChecked(v1.second.get<bool>("artifacts.addspikes"));
+            m_Controls->m_SpikeNumBox->setValue(v1.second.get<int>("artifacts.spikesnum"));
+            m_Controls->m_SpikeScaleBox->setValue(v1.second.get<double>("artifacts.spikesscale"));
             m_Controls->m_AddEddy->setChecked(v1.second.get<bool>("artifacts.addeddy"));
             m_Controls->m_EddyGradientStrength->setValue(v1.second.get<double>("artifacts.eddyStrength"));
             m_Controls->m_AddGibbsRinging->setChecked(v1.second.get<bool>("artifacts.addringing"));
@@ -873,6 +891,14 @@ void QmitkFiberfoxView::OnConstantRadius(int value)
 {
     if (value>0 && m_Controls->m_RealTimeFibers->isChecked())
         GenerateFibers();
+}
+
+void QmitkFiberfoxView::OnAddSpikes(int value)
+{
+    if (value>0)
+        m_Controls->m_SpikeFrame->setVisible(true);
+    else
+        m_Controls->m_SpikeFrame->setVisible(false);
 }
 
 void QmitkFiberfoxView::OnAddEddy(int value)
@@ -1200,7 +1226,6 @@ void QmitkFiberfoxView::OnDrawROI()
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( figure );
 
-
     QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
     for( int i=0; i<nodes.size(); i++)
         nodes.at(i)->SetSelected(false);
@@ -1210,16 +1235,21 @@ void QmitkFiberfoxView::OnDrawROI()
     QString name = QString("Fiducial_%1").arg(children->size());
     node->SetName(name.toStdString());
     node->SetSelected(true);
-    GetDataStorage()->Add(node, m_SelectedBundles.at(0));
 
     this->DisableCrosshairNavigation();
 
-    mitk::PlanarFigureInteractor::Pointer figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+    mitk::PlanarFigureInteractor::Pointer figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
     if(figureInteractor.IsNull())
-        figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", node);
-    mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+    {
+      figureInteractor = mitk::PlanarFigureInteractor::New();
+      us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+      figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+      figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+      figureInteractor->SetDataNode( node );
+    }
 
     UpdateGui();
+    GetDataStorage()->Add(node, m_SelectedBundles.at(0));
 }
 
 bool CompareLayer(mitk::DataNode::Pointer i,mitk::DataNode::Pointer j)
@@ -1373,6 +1403,8 @@ void QmitkFiberfoxView::GenerateImage()
                 filter->SetEddyGradientStrength(m_ImageGenParameters.eddyStrength);
                 filter->SetUpsampling(m_ImageGenParameters.upsampling);
                 filter->SetFrequencyMap(m_ImageGenParameters.frequencyMap);
+                filter->SetSpikeAmplitude(m_ImageGenParameters.spikeAmplitude);
+                filter->SetSpikes(m_ImageGenParameters.spikes);
                 filter->Update();
 
                 mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
@@ -1450,11 +1482,12 @@ void QmitkFiberfoxView::GenerateImage()
         tractsToDwiFilter->SetInterpolationShrink(m_ImageGenParameters.interpolationShrink);
         tractsToDwiFilter->SetFiberRadius(m_ImageGenParameters.axonRadius);
         tractsToDwiFilter->SetSignalScale(m_ImageGenParameters.signalScale);
-        if (m_ImageGenParameters.interpolationShrink)
+        if (m_ImageGenParameters.interpolationShrink>0)
             tractsToDwiFilter->SetUseInterpolation(true);
         tractsToDwiFilter->SetTissueMask(m_ImageGenParameters.tissueMaskImage);
         tractsToDwiFilter->SetFrequencyMap(m_ImageGenParameters.frequencyMap);
-
+        tractsToDwiFilter->SetSpikeAmplitude(m_ImageGenParameters.spikeAmplitude);
+        tractsToDwiFilter->SetSpikes(m_ImageGenParameters.spikes);
         tractsToDwiFilter->Update();
 
         mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
@@ -1892,6 +1925,14 @@ void QmitkFiberfoxView::NodeRemoved(const mitk::DataNode* node)
     mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(node);
     std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it = m_DataNodeToPlanarFigureData.find(nonConstNode);
 
+    if (dynamic_cast<FiberBundleX*>(node->GetData()))
+    {
+        m_SelectedBundles.clear();
+        m_SelectedBundles2.clear();
+    }
+    else if (dynamic_cast<Image*>(node->GetData()))
+        m_SelectedImages.clear();
+
     if( it != m_DataNodeToPlanarFigureData.end() )
     {
         QmitkPlanarFigureData& data = it->second;
@@ -1916,21 +1957,17 @@ void QmitkFiberfoxView::NodeAdded( const mitk::DataNode* node )
     {
         MITK_DEBUG << "figure added. will add interactor if needed.";
         mitk::PlanarFigureInteractor::Pointer figureInteractor
-                = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+                = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
         mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>( node );
         if(figureInteractor.IsNull())
         {
-            figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", nonConstNode);
+          figureInteractor = mitk::PlanarFigureInteractor::New();
+          us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+          figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+          figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+          figureInteractor->SetDataNode( nonConstNode );
         }
-        else
-        {
-            // just to be sure that the interactor is not added twice
-            mitk::GlobalInteraction::GetInstance()->RemoveInteractor(figureInteractor);
-        }
-
-        MITK_DEBUG << "adding interactor to globalinteraction";
-        mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
 
         MITK_DEBUG << "will now add observers for planarfigure";
         QmitkPlanarFigureData data;

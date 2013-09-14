@@ -21,8 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPropertyItemSortFilterProxyModel.h"
 #include "QmitkPropertyTreeView.h"
 #include <berryIBerryPreferences.h>
-#include <mitkPropertyAliases.h>
-#include <mitkPropertyDescriptions.h>
+#include <mitkIPropertyAliases.h>
+#include <mitkIPropertyDescriptions.h>
 #include <QPainter>
 
 const std::string QmitkPropertyTreeView::VIEW_ID = "org.mitk.views.properties";
@@ -31,9 +31,10 @@ QmitkPropertyTreeView::QmitkPropertyTreeView()
   : m_PropertyNameChangedTag(0),
     m_PropertyAliases(NULL),
     m_PropertyDescriptions(NULL),
-    m_ShowGenuineNames(false),
+    m_ShowAliasesInDescription(true),
     m_ProxyModel(NULL),
-    m_Model(NULL)
+    m_Model(NULL),
+    m_Delegate(NULL)
 {
 }
 
@@ -57,9 +58,11 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
   m_ProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
   m_ProxyModel->setDynamicSortFilter(true);
 
-  m_Controls.treeView->setItemDelegateForColumn(1, new QmitkPropertyItemDelegate(m_Controls.treeView));
+  m_Delegate = new QmitkPropertyItemDelegate(m_Controls.treeView);
+
+  m_Controls.treeView->setItemDelegateForColumn(1, m_Delegate);
   m_Controls.treeView->setModel(m_ProxyModel);
-  m_Controls.treeView->setColumnWidth(0, 150);
+  m_Controls.treeView->setColumnWidth(0, 180);
   m_Controls.treeView->sortByColumn(0, Qt::AscendingOrder);
   m_Controls.treeView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_Controls.treeView->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -108,6 +111,9 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
       {
         std::string trueName = m_PropertyAliases->GetPropertyName(name.toStdString());
 
+        if (trueName.empty() && !m_SelectionClassName.empty())
+          trueName = m_PropertyAliases->GetPropertyName(name.toStdString(), m_SelectionClassName);
+
         if (!trueName.empty())
         {
           alias = name;
@@ -117,24 +123,34 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
       }
 
       QString description = QString::fromStdString(m_PropertyDescriptions->GetDescription(name.toStdString()));
+      std::vector<std::string> aliases;
 
-      if (!description.isEmpty())
+      if (!isTrueName && m_PropertyAliases != NULL)
       {
-        if (!isTrueName && alias.isEmpty() && m_PropertyAliases != NULL)
-          alias = QString::fromStdString(m_PropertyAliases->GetAlias(name.toStdString()));
+        aliases = m_PropertyAliases->GetAliases(name.toStdString(), m_SelectionClassName);
 
+        if (aliases.empty() && !m_SelectionClassName.empty())
+          aliases = m_PropertyAliases->GetAliases(name.toStdString());
+      }
+
+      if (!description.isEmpty() || !aliases.empty())
+      {
         QString customizedDescription;
 
-        if (!alias.isEmpty())
+        if (m_ShowAliasesInDescription && !aliases.empty())
         {
-          if (m_ShowGenuineNames)
+          customizedDescription = "<h3 style=\"margin-bottom:0\">" + name + "</h3>";
+
+          std::size_t numAliases = aliases.size();
+          std::size_t lastAlias = numAliases - 1;
+
+          for (std::size_t i = 0; i < numAliases; ++i)
           {
-            customizedDescription = "<h3 style=\"margin-bottom:0\">" + alias + "</h3>";
-            customizedDescription += "<h5 style=\"margin-top:0;margin-bottom:10px\">" + name + "</h5>";
-          }
-          else
-          {
-            customizedDescription = "<h3 style=\"margin-bottom:10px\">" + alias + "</h3>";
+            customizedDescription += i != lastAlias
+              ? "<h5 style=\"margin-top:0;margin-bottom:0\">"
+              : "<h5 style=\"margin-top:0;margin-bottom:10px\">";
+
+            customizedDescription += QString::fromStdString(aliases[i]) + "</h5>";
           }
         }
         else
@@ -142,7 +158,8 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
           customizedDescription = "<h3 style=\"margin-bottom:10px\">" + name + "</h3>";
         }
 
-        customizedDescription += description;
+        if (!description.isEmpty())
+          customizedDescription += description;
 
         m_Controls.description->setText(customizedDescription);
         m_Controls.description->show();
@@ -174,26 +191,26 @@ void QmitkPropertyTreeView::OnPreferencesChanged(const berry::IBerryPreferences*
 {
   bool showAliases = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES, true);
   bool showDescriptions = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_DESCRIPTIONS, true);
-  bool showGenuineNames = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_GENUINE_NAMES, true);
+  bool showAliasesInDescription = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES_IN_DESCRIPTION, true);
 
   bool updateAliases = showAliases != (m_PropertyAliases != NULL);
   bool updateDescriptions = showDescriptions != (m_PropertyDescriptions != NULL);
-  bool updateGenuineNames = showGenuineNames != m_ShowGenuineNames;
+  bool updateAliasesInDescription = showAliasesInDescription != m_ShowAliasesInDescription;
 
   if (updateAliases)
     m_PropertyAliases = showAliases
-      ? mitk::GetPropertyService<mitk::PropertyAliases>()
+      ? mitk::GetPropertyService<mitk::IPropertyAliases>()
       : NULL;
 
   if (updateDescriptions)
     m_PropertyDescriptions = showDescriptions
-      ? mitk::GetPropertyService<mitk::PropertyDescriptions>()
+      ? mitk::GetPropertyService<mitk::IPropertyDescriptions>()
       : NULL;
 
-  if (updateGenuineNames)
-    m_ShowGenuineNames = showGenuineNames;
+  if (updateAliasesInDescription)
+    m_ShowAliasesInDescription = showAliasesInDescription;
 
-  if (updateDescriptions || updateGenuineNames)
+  if (updateDescriptions || updateAliasesInDescription)
   {
     QModelIndexList selection = m_Controls.treeView->selectionModel()->selectedRows();
 
@@ -239,6 +256,7 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
   {
     this->SetPartName("Properties");
     m_Model->SetPropertyList(NULL);
+    m_Delegate->SetPropertyList(NULL);
   }
   else
   {
@@ -246,7 +264,9 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
       ? nodes.front()->GetData()->GetNameOfClass()
       : "";
 
+    m_SelectionClassName = selectionClassName.toStdString();
     m_Model->SetPropertyList(nodes.front()->GetPropertyList(), selectionClassName);
+    m_Delegate->SetPropertyList(nodes.front()->GetPropertyList());
     OnPropertyNameChanged(itk::ModifiedEvent());
 
     mitk::BaseProperty* nameProperty = nodes.front()->GetProperty("name");

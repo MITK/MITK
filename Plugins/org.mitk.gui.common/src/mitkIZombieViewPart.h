@@ -35,7 +35,7 @@ namespace mitk {
  *
  * Some MITK Views need to change the application state in a way which should not be affected
  * by this View's activated/deactivated state. Examples are setting special interactors or removing
- * the crosshair from a QmitkRenderWindow. Such MITK Views are called \emph{Zombie Views} because
+ * the crosshair from a QmitkRenderWindow. Such MITK Views are called <em>Zombie Views</em> because
  * they partially outlive their own deactivation. Zombie Views are usually mutually exclusive.
  *
  * To ease the handling of Zombie Views, this interface acts as a marker to declare the implementing

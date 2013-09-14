@@ -29,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <usServiceInterface.h>
-#include <usServiceRegistration.h>
 
 namespace mitk
 {
@@ -224,10 +223,6 @@ namespace mitk
     int m_ImageSequence; ///<  counter for acquired images
 
     PropertyList::Pointer m_PropertyList; ///< a list of the corresponding properties
-
-  private:
-
-    mitk::ServiceRegistration m_ServiceRegistration;
 
   };
 } //END mitk namespace

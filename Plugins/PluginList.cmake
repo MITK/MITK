@@ -20,7 +20,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.diffusionimagingapp:OFF
   org.mitk.gui.qt.datamanager:ON
   org.mitk.gui.qt.datamanagerlight:OFF
-  org.mitk.gui.qt.properties:OFF
+  org.mitk.gui.qt.properties:ON
   org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.dicom:OFF
   org.mitk.gui.qt.diffusionimaging:OFF
@@ -38,6 +38,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.pointsetinteraction:OFF
   org.mitk.gui.qt.python:OFF
   org.mitk.gui.qt.registration:OFF
+  org.mitk.gui.qt.remeshing:OFF
   org.mitk.gui.qt.segmentation:OFF
   org.mitk.gui.qt.simulation:OFF
   org.mitk.gui.qt.toftutorial:OFF

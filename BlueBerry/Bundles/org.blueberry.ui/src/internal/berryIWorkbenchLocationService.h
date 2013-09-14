@@ -36,7 +36,7 @@ struct IPageSite;
  */
 struct BERRY_UI IWorkbenchLocationService : public Object {
 
-  berryInterfaceMacro(IWorkbenchLocationService, berry)
+  berryInterfaceMacro(IWorkbenchLocationService, berry);
 
   ~IWorkbenchLocationService();
 

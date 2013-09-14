@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __itkShortestPathImageFilter_txx
 
 
+#include "itkShortestPathImageFilter.h"
+
 #include "time.h"
 #include "mitkMemoryUtilities.h"
 #include <iostream>
@@ -948,4 +950,4 @@ namespace itk
 
 } /* end namespace itk */
 
-#endif
+#endif // __itkShortestPathImageFilter_txx

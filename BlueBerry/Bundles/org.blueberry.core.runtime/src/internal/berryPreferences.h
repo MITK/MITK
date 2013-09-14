@@ -39,7 +39,7 @@ namespace berry
     ///
     /// For use with berry::SmartPtr
     ///
-    berryObjectMacro(berry::Preferences)
+    berryObjectMacro(berry::Preferences);
     ///
     /// Maps a string key to a string value
     ///

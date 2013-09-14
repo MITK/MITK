@@ -45,6 +45,8 @@ AddArtifactsToDwiImageFilter< TPixelType >
     , m_SimulateEddyCurrents(false)
     , m_TE(100)
     , m_Upsampling(1)
+    , m_Spikes(0)
+    , m_SpikeAmplitude(1)
 {
     this->SetNumberOfRequiredInputs( 1 );
 }
@@ -135,7 +137,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         fMap->FillBuffer(0.0);
     }
 
-    if ( m_FrequencyMap.IsNotNull() || m_kOffset>0.0 || m_Upsampling>1.00001 || m_SimulateEddyCurrents)
+    if (m_Spikes>0 || m_FrequencyMap.IsNotNull() || m_kOffset>0.0 || m_Upsampling>1.00001 || m_SimulateEddyCurrents)
     {
         MatrixType transform = inputImage->GetDirection();
         for (int i=0; i<3; i++)
@@ -157,8 +159,24 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         if (m_SimulateEddyCurrents)
             MITK_INFO << "Simulating eddy currents";
 
+        std::vector< int > spikeVolume;
+        for (int i=0; i<m_Spikes; i++)
+            spikeVolume.push_back(rand()%inputImage->GetVectorLength());
+        std::sort (spikeVolume.begin(), spikeVolume.end());
+        std::reverse (spikeVolume.begin(), spikeVolume.end());
+
         boost::progress_display disp(inputImage->GetVectorLength()*inputRegion.GetSize(2));
         for (int g=0; g<inputImage->GetVectorLength(); g++)
+        {
+            std::vector< int > spikeSlice;
+            while (!spikeVolume.empty() && spikeVolume.back()==g)
+            {
+                spikeSlice.push_back(rand()%inputImage->GetLargestPossibleRegion().GetSize(2));
+                spikeVolume.pop_back();
+            }
+            std::sort (spikeSlice.begin(), spikeSlice.end());
+            std::reverse (spikeSlice.begin(), spikeSlice.end());
+
             for (int z=0; z<inputRegion.GetSize(2); z++)
             {
                 std::vector< SliceType::Pointer > compartmentSlices;
@@ -209,6 +227,14 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                 idft->SetZ((double)z-(double)inputRegion.GetSize(2)/2.0);
                 idft->SetDirectionMatrix(transform);
                 idft->SetOutSize(outSize);
+                int numSpikes = 0;
+                while (!spikeSlice.empty() && spikeSlice.back()==z)
+                {
+                    numSpikes++;
+                    spikeSlice.pop_back();
+                }
+                idft->SetSpikes(numSpikes);
+                idft->SetSpikeAmplitude(m_SpikeAmplitude);
                 idft->Update();
                 fSlice = idft->GetOutput();
 
@@ -220,8 +246,8 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                 newSlice = dft->GetOutput();
 
                 // put slice back into channel g
-                for (int y=0; y<inputRegion.GetSize(1); y++)
-                    for (int x=0; x<inputRegion.GetSize(0); x++)
+                for (y=0; y<inputRegion.GetSize(1); y++)
+                    for (x=0; x<inputRegion.GetSize(0); x++)
                     {
                         typename DiffusionImageType::IndexType index3D;
                         index3D[0]=x; index3D[1]=y; index3D[2]=z;
@@ -241,6 +267,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
 
                 ++disp;
             }
+        }
     }
 
     if (m_NoiseModel!=NULL)

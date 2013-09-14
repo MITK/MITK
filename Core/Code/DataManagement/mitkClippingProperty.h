@@ -42,7 +42,7 @@ namespace mitk {
 class MITK_CORE_EXPORT ClippingProperty : public BaseProperty
 {
 public:
-  mitkClassMacro(ClippingProperty, BaseProperty)
+  mitkClassMacro(ClippingProperty, BaseProperty);
 
   typedef std::string ValueType;
 

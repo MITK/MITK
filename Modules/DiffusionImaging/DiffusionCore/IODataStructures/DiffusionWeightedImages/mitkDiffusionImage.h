@@ -50,7 +50,7 @@ public:
   // key   := b-Value
   // value := indicesVector (containing corresponding gradient directions for a b-Value-Shell
   typedef std::vector< unsigned int > IndicesVector;
-  typedef std::map< double , IndicesVector >  BValueMap;
+  typedef std::map< unsigned int , IndicesVector >  BValueMap;
 
   mitkClassMacro( DiffusionImage, Image )
   itkNewMacro(Self)
@@ -85,7 +85,7 @@ public:
   int GetNumDirections();
   int GetNumB0();
 
-  float GetB_Value(int i);
+  float GetB_Value(unsigned int i);
   bool IsMultiBval();
   void UpdateBValueMap();
 

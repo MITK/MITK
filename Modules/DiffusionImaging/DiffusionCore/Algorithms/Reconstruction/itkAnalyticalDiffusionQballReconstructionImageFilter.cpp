@@ -732,10 +732,17 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
 template< class T, class TG, class TO, int L, int NODF>
 void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::SetGradientImage( GradientDirectionContainerType *gradientDirection,
+::SetGradientImage(const GradientDirectionContainerType *gradientDirection,
                     const GradientImagesType *gradientImage )
 {
-    this->m_GradientDirectionContainer = gradientDirection;
+  // Copy Gradient Direction Container
+  this->m_GradientDirectionContainer = GradientDirectionContainerType::New();
+  for(GradientDirectionContainerType::ConstIterator it = gradientDirection->Begin();
+    it != gradientDirection->End(); it++)
+  {
+    this->m_GradientDirectionContainer->push_back(it.Value());
+  }
+
 
     unsigned int numImages = gradientDirection->Size();
     this->m_NumberOfBaselineImages = 0;

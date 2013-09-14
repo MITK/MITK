@@ -300,6 +300,13 @@ void QmitkToFUtilView::OnToFCameraStarted()
       m_CameraIntrinsics = NULL;
       MITK_ERROR << "No camera intrinsics were found!";
     }
+
+    // set camera intrinsics
+    if ( m_CameraIntrinsics.IsNotNull() )
+    {
+      this->m_ToFDistanceImageToSurfaceFilter->SetCameraIntrinsics(m_CameraIntrinsics);
+    }
+
     // initial update of image grabber
     this->m_ToFImageGrabber->Update();
 
@@ -330,6 +337,11 @@ void QmitkToFUtilView::OnToFCameraStarted()
     {
       //set the reconstruction mode for kinect
       this->m_ToFDistanceImageToSurfaceFilter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::Kinect);
+    }
+
+    if (m_CameraIntrinsics.IsNotNull())
+    {
+      m_ToFDistanceImageToSurfaceFilter->SetCameraIntrinsics(m_CameraIntrinsics);
     }
 
     if(hasRGBImage || (rgbFileName!=""))
@@ -444,19 +456,27 @@ void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
     this->m_SurfaceNode->SetData(this->m_Surface);
     this->m_SurfaceNode->SetMapper(mitk::BaseRenderer::Standard3D, m_ToFSurfaceVtkMapper3D);
 
+    this->m_ToFDistanceImageToSurfaceFilter->SetTriangulationThreshold( this->m_Controls->m_TriangulationThreshold->value() );
+
     //we need to initialize (reinit) the surface, to make it fit into the renderwindow
     this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(
           this->m_Surface->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
 
-    //the default camera position is rather unfortunate,
-    //that's why we set our own position according to the surface center
-    mitk::Point3D surfaceCenter= this->m_Surface->GetGeometry()->GetCenter();
+    // correctly place the vtk camera for appropriate surface rendering
     vtkCamera* camera3d = GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera();
     //1m distance to camera should be a nice default value for most cameras
-    camera3d->SetPosition(0,0,-1000);
+    camera3d->SetPosition(0,0,0);
     camera3d->SetViewUp(0,-1,0);
-    camera3d->SetFocalPoint(0,0,surfaceCenter[2]);
-    camera3d->SetViewAngle(40);
+    camera3d->SetFocalPoint(0,0,1);
+    if (this->m_CameraIntrinsics.IsNotNull())
+    {
+      // compute view angle from camera intrinsics
+      camera3d->SetViewAngle(mitk::ToFProcessingCommon::CalculateViewAngle(m_CameraIntrinsics,m_ToFImageGrabber->GetCaptureWidth()));
+    }
+    else
+    {
+      camera3d->SetViewAngle(45);
+    }
     camera3d->SetClippingRange(1, 10000);
   }
 }
@@ -657,7 +677,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
     if(RGBImageHasDifferentResolution)
     {
       //update the display geometry by using the RBG image node. Only for renderwindow coronal
-      mitk::RenderingManager::GetInstance()->InitializeView( GetRenderWindowPart()->GetRenderWindow("coronal")->GetRenderWindow(), this->m_RGBImageNode->GetData()->GetGeometry() );
+      mitk::RenderingManager::GetInstance()->InitializeView( GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetRenderWindow(), this->m_RGBImageNode->GetData()->GetGeometry() );
     }
   }
 }

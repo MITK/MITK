@@ -2,8 +2,8 @@
  
  \page Step08Page MITK Tutorial - Step 8: Use QmitkStdMultiWidget as widget
  
- In this step a QmitkStdMultiWidget is used. It offers four views on the data.
- From top left to bottom the views are initialized as axial, sagittal and coronar. The bottom right view is initialized as 3D view.
+ In this step a QmitkStdMultiWidget is used. It offers four views of the data.
+ From top left to bottom left the views are initialized as axial, sagittal and coronar. The bottom right view is initialized as 3D view.
  
  \image html step8_result.png 
  

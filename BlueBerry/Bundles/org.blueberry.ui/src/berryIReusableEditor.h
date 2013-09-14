@@ -33,7 +33,7 @@ namespace berry {
  */
 struct BERRY_UI IReusableEditor : public virtual IEditorPart {
 
-  berryInterfaceMacro(IReusableEditor, berry)
+  berryInterfaceMacro(IReusableEditor, berry);
 
   virtual ~IReusableEditor();
 

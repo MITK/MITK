@@ -629,6 +629,27 @@ private:
 
 };
 
+ /**
+ * @brief Equal A function comparing two images for beeing equal in meta- and imagedata
+ *
+ * @ingroup MITKTestingAPI
+ *
+ * Following aspects are tested for equality:
+ *  - dimension of the images
+ *  - size of the images
+ *  - pixel type
+ *  - pixel values : pixel values are expected to be identical at each position ( for other options see mitk::CompareImageFilter )
+ *
+ * @param rightHandSide An image to be compared
+ * @param leftHandSide An image to be compared
+ * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+ * @param verbose Flag indicating if the user wants detailed console output or not.
+ * @return true, if all subsequent comparisons are true, false otherwise
+ */
+MITK_CORE_EXPORT bool Equal( const mitk::Image* leftHandSide, const mitk::Image* rightHandSide, ScalarType eps, bool verbose );
+
+
+//}
 //##Documentation
 //## @brief Cast an itk::Image (with a specific type) to an mitk::Image.
 //##

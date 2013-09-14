@@ -20,6 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourTool.h"
 #include "SegmentationExports.h"
 
+namespace us {
+class ModuleResource;
+}
+
 namespace mitk
 {
 
@@ -51,6 +55,9 @@ class Segmentation_EXPORT SubtractContourTool : public ContourTool
     itkNewMacro(SubtractContourTool);
 
     virtual const char** GetXPM() const;
+    virtual us::ModuleResource GetCursorIconResource() const;
+    us::ModuleResource GetIconResource() const;
+
     virtual const char* GetName() const;
 
   protected:

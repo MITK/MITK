@@ -94,7 +94,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     // Creates Roi
     void CreateRoi();
 
-    void Clicked(const QwtDoublePoint& pos);
+    void Clicked(const QPointF& pos);
 
     // Import of FSL TBSS data
     void TbssImport();
@@ -127,6 +127,8 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     void PlotFiberBundle(mitk::FiberBundleX* fib, mitk::Image* img, mitk::PlanarFigure* startRoi=NULL, mitk::PlanarFigure* endRoi=NULL);
 
+
+    void PlotFiber4D(mitk::TbssImage*, mitk::FiberBundleX* fib, mitk::PlanarFigure* startRoi=NULL, mitk::PlanarFigure* endRoi=NULL);
 
     // Create a point set. This point set defines the points through which a region of interest should go
     void InitPointsets();
@@ -161,6 +163,9 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     // needed when a plot should only show values between a start end end roi
     mitk::DataNode::Pointer m_CurrentStartRoi;
     mitk::DataNode::Pointer m_CurrentEndRoi;
+
+
+
 
 };
 

@@ -27,7 +27,7 @@ namespace berry
 {
   struct IBerryPreferencesService : public IPreferencesService
   {
-    berryInterfaceMacro(IBerryPreferencesService, berry)
+    berryInterfaceMacro(IBerryPreferencesService, berry);
 
     ///
     /// Try to import the prefs from the given file.

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <itkImageRegionIterator.h>
+#include "mitkImageWriteAccessor.h"
 
 namespace mitk {
 //##Documentation
@@ -142,7 +143,16 @@ public:
         output->SetSpacing(spacing);
 
         //get a pointer to the image buffer to write into
-        TPixelType* imageBuffer = (TPixelType*)output->GetData();
+        TPixelType* imageBuffer;
+        try
+        {
+          mitk::ImageWriteAccessor writeAccess( output );
+          imageBuffer = static_cast<TPixelType*>( writeAccess.GetData() );
+        }
+        catch(...)
+        {
+          MITK_ERROR << "Write access not granted on mitk::Image.";
+        }
 
         //initialize the random generator
         itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randomGenerator = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();

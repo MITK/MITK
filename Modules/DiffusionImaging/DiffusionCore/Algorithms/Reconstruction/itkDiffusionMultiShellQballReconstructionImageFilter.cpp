@@ -57,13 +57,19 @@ DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::SetGradientImage( GradientDirectionContainerType *gradientDirection
+::SetGradientImage(const GradientDirectionContainerType *gradientDirection
                     , const GradientImagesType *gradientImage
                     , float bvalue)
 {
   m_BValue = bvalue;
-  m_GradientDirectionContainer = gradientDirection;
   m_NumberOfBaselineImages = 0;
+
+  this->m_GradientDirectionContainer = GradientDirectionContainerType::New();
+  for(GradientDirectionContainerType::ConstIterator it = gradientDirection->Begin();
+    it != gradientDirection->End(); it++)
+  {
+    this->m_GradientDirectionContainer->push_back(it.Value());
+  }
 
 
   if(m_BValueMap.size() == 0){

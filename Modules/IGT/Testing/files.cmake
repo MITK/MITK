@@ -15,7 +15,7 @@ set(MODULE_TESTS
    mitkNavigationDataToMessageFilterTest.cpp
    mitkNavigationDataToNavigationDataFilterTest.cpp
    mitkNavigationDataToPointSetFilterTest.cpp
-   # mitkNavigationDataTransformFilterTest.cpp commented out because of bug 15023
+   mitkNavigationDataTransformFilterTest.cpp
    mitkNDIPassiveToolTest.cpp
    mitkNDIProtocolTest.cpp
    mitkNDITrackingDeviceTest.cpp
@@ -32,13 +32,9 @@ set(MODULE_TESTS
 
    # ------------------ Navigation Tool Management Tests -------------------
    mitkNavigationToolStorageTest.cpp
-   mitkNavigationToolStorageSerializerAndDeserializerTest.cpp
    mitkNavigationToolTest.cpp
    mitkNavigationToolReaderAndWriterTest.cpp
-   # -----------------------------------------------------------------------
-
-   # ------------------ Deavtivated Tests ----------------------------------
-
+   mitkNavigationToolStorageSerializerAndDeserializerTest.cpp
    # -----------------------------------------------------------------------
 )
 

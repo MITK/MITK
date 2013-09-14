@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/Remeshing">
+    <file>RemeshingIcon.png</file>
+  </qresource>
+</RCC>

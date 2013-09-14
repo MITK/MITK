@@ -9,9 +9,16 @@ if(MITK_USE_Boost)
   set(Boost_USE_STATIC_RUNTIME 0)
 
   if(MITK_USE_Boost_LIBRARIES)
-    find_package(Boost 1.40.0 REQUIRED COMPONENTS ${MITK_USE_Boost_LIBRARIES})
+    if(NOT MITK_USE_SYSTEM_Boost)
+      set(BOOST_INCLUDEDIR ${CMAKE_BINARY_DIR}/../Boost-install/include)
+      set(BOOST_LIBRARYDIR ${CMAKE_BINARY_DIR}/../Boost-install/lib)
+      set(Boost_ADDITIONAL_VERSIONS 1.54)
+      # Following line is temporary, see bug #15837.
+      set(Boost_DEBUG TRUE)
+    endif()
+    find_package(Boost 1.54.0 REQUIRED COMPONENTS ${MITK_USE_Boost_LIBRARIES})
   else()
-    find_package(Boost 1.40.0 REQUIRED)
+    find_package(Boost 1.54.0 REQUIRED)
   endif()
 
   list(APPEND ALL_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})

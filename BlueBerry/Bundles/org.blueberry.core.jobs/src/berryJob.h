@@ -66,7 +66,7 @@ class BERRY_JOBS Job: public InternalJob
 
 public:
 
-   berryObjectMacro(Job)
+   berryObjectMacro(Job);
 
   /**
    * Job status return value that is used to indicate asynchronous job completion.

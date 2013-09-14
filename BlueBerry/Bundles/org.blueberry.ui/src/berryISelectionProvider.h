@@ -36,7 +36,7 @@ namespace berry
  */
 struct BERRY_UI ISelectionProvider : public virtual Object {
 
-  berryInterfaceMacro(ISelectionProvider, berry)
+  berryInterfaceMacro(ISelectionProvider, berry);
 
   ~ISelectionProvider();
 

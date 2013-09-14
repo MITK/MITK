@@ -76,45 +76,6 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
    *
    * \return The active QmitkRenderWindow instance; <code>NULL</code>
    *         if no render window is active.
-   *
-   * \deprecatedSince{2012_09} The method is deprecated, use the IRenderWindowPart::GetActiveQmitkRenderWindow() instead
-   */
-  DEPRECATED( virtual QmitkRenderWindow* GetActiveRenderWindow() const)
-  {
-    return GetActiveQmitkRenderWindow();
-  }
-
-  /**
-   * Get all render windows with their ids.
-   *
-   * \return A hash map mapping the render window id to the QmitkRenderWindow instance.
-   *
-   * \deprecatedSince{2012_09} The method is deprecated, use the IRenderWindowPart::GetQmitkRenderWindows() instead
-   */
-  DEPRECATED( virtual QHash<QString,QmitkRenderWindow*> GetRenderWindows() const )
-  {
-    return GetQmitkRenderWindows();
-  }
-
-  /**
-   * Get a render window with a specific id.
-   *
-   * \param id The render window id.
-   * \return The QmitkRenderWindow instance for <code>id</code>
-   *
-   * \deprecatedSince{2012_09} The method is deprecated, use the IRenderWindowPart::GetQmitkRenderWindow(const QString& id) instead
-   */
-  DEPRECATED( virtual QmitkRenderWindow* GetRenderWindow(const QString& id) const )
-  {
-    return GetQmitkRenderWindow( id );
-  }
-
-  /**
-   * Get the currently active (focused) render window.
-   * Focus handling is implementation specific.
-   *
-   * \return The active QmitkRenderWindow instance; <code>NULL</code>
-   *         if no render window is active.
    */
   virtual QmitkRenderWindow* GetActiveQmitkRenderWindow() const = 0;
 

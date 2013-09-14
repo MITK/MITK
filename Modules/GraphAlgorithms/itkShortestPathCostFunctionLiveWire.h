@@ -17,13 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkShortestPathCostFunctionLiveWire_h
 #define __itkShortestPathCostFunctionLiveWire_h
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
-#include "itkShortestPathCostFunction.h" // Superclass of Metrics
+#include "itkShortestPathCostFunction.h"
 
-#include <itkImageRegionConstIterator.h>
-
-
+#include "itkImageRegionConstIterator.h"
 
 
 namespace itk
@@ -36,13 +32,13 @@ namespace itk
   - Gradient Direction
   - Laplacian Zero Crossing
 
-  By default the Gradient Magnitude is mapped linear to costs
+  By default the Gradient Magnitude is mapped linearly to cost values
   between 0 (good) and 1 (bad). Via SetDynamicCostMap( std::map< int, int > &costMap)
   a cost map can be set to dynamically map Gradient Magnitude (non
-  linear). Thus lower values can be considered with lower costs
+  linear). Thus, lower values can be considered with lower costs
   than higher values of gradient magnitudes.
   To compute  the costs of the gradient magnitude dynamically
-  a iverted map of the histogram of gradient magnitude image is used.
+  an iverted map of the histogram of gradient magnitude image is used.
 
   */
   template <class TInputImageType>
@@ -64,17 +60,16 @@ namespace itk
     itkTypeMacro(ShortestPathCostFunctionLiveWire, ShortestPathCostFunction);
 
 
-    typedef itk::Image<unsigned char, 2>  UnsignedCharImageType;
-    typedef itk::Image<float, 2>  FloatImageType;
+    typedef itk::Image<unsigned char, 2>               UnsignedCharImageType;
+    typedef itk::Image<float, 2>                       FloatImageType;
 
     typedef float ComponentType;
-    typedef itk::CovariantVector< ComponentType, 2  > OutputPixelType;
-    typedef itk::Image< OutputPixelType, 2 > VectorOutputImageType;
+    typedef itk::CovariantVector< ComponentType, 2  >  OutputPixelType;
+    typedef itk::Image< OutputPixelType, 2 >           VectorOutputImageType;
 
-    typedef typename TInputImageType::IndexType             IndexType;
-    typedef TInputImageType                                 ImageType;
-    typedef itk::ImageRegion<2>                             RegionType;
-
+    typedef typename TInputImageType::IndexType        IndexType;
+    typedef TInputImageType                            ImageType;
+    typedef itk::ImageRegion<2>                        RegionType;
 
 
     /** \brief calculates the costs for going from p1 to p2*/
@@ -86,17 +81,14 @@ namespace itk
     /** \brief Initialize the metric*/
     virtual void Initialize ();
 
+     /** \brief Add void pixel in cost map*/
+    virtual void AddRepulsivePoint( const IndexType& index );
 
-    /** \brief Set repulsive path*/
-    virtual void AddRepulsivePoint( itk::Index<3>  );
+     /** \brief Remove void pixel in cost map*/
+    virtual void RemoveRepulsivePoint( const IndexType& index );
 
-    /** \brief Clear repulsive path*/
-    virtual void ClearRepulsivePoints(  );
-
-
-
-    ShortestPathCostFunctionLiveWire();
-
+    /** \brief Clear repulsive points in cost function*/
+    virtual void ClearRepulsivePoints();
 
     itkSetMacro (RequestedRegion, RegionType);
     itkGetMacro (RequestedRegion, RegionType);
@@ -105,15 +97,7 @@ namespace itk
     itkSetMacro (UseApproximateGradient, bool);
     itkGetMacro (UseApproximateGradient, bool);
 
-    virtual void SetImage(const TInputImageType* _arg)
-    {
-      if (this->m_Image != _arg)
-      {
-        this->m_Image = _arg;
-        this->Modified();
-        this->m_Initialized = false;
-      }
-    }
+    virtual void SetImage(const TInputImageType* _arg);
 
     void SetDynamicCostMap( std::map< int, int > &costMap)
     {
@@ -152,21 +136,33 @@ namespace itk
     */
     static double Gaussian(double x, double xOfGaussian, double yOfGaussian);
 
+    const UnsignedCharImageType* GetMaskImage()
+        { return this->m_MaskImage.GetPointer(); };
+
+    const FloatImageType* GetGradientMagnitudeImage()
+        { return this->m_GradientMagnitudeImage.GetPointer(); };
+
+    const FloatImageType* GetEdgeImage()
+        { return this->m_EdgeImage.GetPointer(); };
+
+    const VectorOutputImageType* GetGradientImage()
+        { return this->m_GradientImage.GetPointer(); };
+
   protected:
+
+    ShortestPathCostFunctionLiveWire();
 
     virtual ~ShortestPathCostFunctionLiveWire() {};
 
 
-    typename ImageType::Pointer m_GradientMagnImage;
-    typename UnsignedCharImageType::Pointer m_ZeroCrossingsImage;
-    typename FloatImageType::Pointer m_EdgeImage;
-    typename VectorOutputImageType::Pointer m_GradientImage;
+    FloatImageType::Pointer m_GradientMagnitudeImage;
+    FloatImageType::Pointer m_EdgeImage;
+    UnsignedCharImageType::Pointer m_MaskImage;
+    VectorOutputImageType::Pointer m_GradientImage;
 
     double minCosts;
 
-    bool m_UseRepulsivePoint;
-
-    std::vector<  itk::Index<3>  > m_RepulsivePoints;
+    bool m_UseRepulsivePoints;
 
     typename Superclass::PixelType val;
 

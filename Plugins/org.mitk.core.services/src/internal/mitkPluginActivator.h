@@ -21,12 +21,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIBundleContext.h>
 
 #include "mitkIDataStorageService.h"
-#include <mitkServiceEvent.h>
+#include <usServiceEvent.h>
+
+namespace us {
+class ModuleContext;
+}
 
 namespace mitk
 {
-
-class ModuleContext;
 
 class org_mitk_core_services_Activator : public QObject, public ctkPluginActivator
 {
@@ -42,7 +44,7 @@ public:
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
 
-  void MitkServiceChanged(const mitk::ServiceEvent event);
+  void MitkServiceChanged(const us::ServiceEvent event);
 
 private:
 
@@ -50,12 +52,12 @@ private:
   QMap<long, QObject*> mapMitkIdToAdapter;
   QMap<long, ctkServiceRegistration> mapMitkIdToRegistration;
 
-  mitk::ModuleContext* mitkContext;
+  us::ModuleContext* mitkContext;
   ctkPluginContext* pluginContext;
 
-  void AddMitkService(const mitk::ServiceReference &ref);
+  void AddMitkService(const us::ServiceReferenceU& ref);
 
-  ctkDictionary CreateServiceProperties(const mitk::ServiceReference& ref);
+  ctkDictionary CreateServiceProperties(const us::ServiceReferenceU& ref);
 };
 
 typedef org_mitk_core_services_Activator PluginActivator;

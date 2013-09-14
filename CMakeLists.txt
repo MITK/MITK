@@ -143,14 +143,16 @@ option(BUILD_TESTING "Test the project" ON)
 option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
 set(MITK_BUILD_TUTORIAL OFF CACHE INTERNAL "Deprecated! Use MITK_BUILD_EXAMPLES instead!")
 option(MITK_BUILD_EXAMPLES "Build the MITK Examples" ${MITK_BUILD_TUTORIAL})
+option(MITK_USE_ACVD "Use Approximated Centroidal Voronoi Diagrams" OFF)
+option(MITK_USE_GLEW "Use the GLEW library" ON)
 option(MITK_USE_Boost "Use the Boost C++ library" OFF)
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
 option(MITK_USE_QT "Use Nokia's Qt library" ${MITK_USE_CTK})
 option(MITK_USE_DCMTK "EXPERIMENTAL, superbuild only: Use DCMTK in MITK" ${MITK_USE_CTK})
-option(MITK_DCMTK_BUILD_SHARED_LIBS "EXPERIMENTAL, superbuild only: build DCMTK as shared libs" OFF)
 option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
 option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
+option(MITK_USE_Poco "Use the Poco library" ON)
 option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
 option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
@@ -160,6 +162,7 @@ if(MITK_USE_Python)
 endif()
 
 mark_as_advanced(MITK_BUILD_ALL_APPS
+                 MITK_USE_GLEW
                  MITK_USE_CTK
                  MITK_USE_DCMTK
                 )
@@ -197,11 +200,35 @@ if(MITK_USE_QT)
 endif()
 
 if(MITK_USE_SOFA)
+  # SOFA requires at least CMake 2.8.8
   set(SOFA_CMAKE_VERSION 2.8.8)
-  if(${CMAKE_VERSION} VERSION_LESS ${SOFA_CMAKE_VERSION} OR APPLE)
+  if(${CMAKE_VERSION} VERSION_LESS ${SOFA_CMAKE_VERSION})
     set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
     message(WARNING "Switched off MITK_USE_SOFA\n  Minimum required CMake version: ${SOFA_CMAKE_VERSION}\n  Installed CMake version: ${CMAKE_VERSION}")
   endif()
+  # SOFA doesn't support Clang
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
+    message(WARNING "Switched off MITK_USE_SOFA\n  Clang is not supported, use GCC instead.")
+  endif()
+  # SOFA requires boost library
+  if(MITK_USE_SOFA AND NOT MITK_USE_Boost)
+    message("Forcing MITK_USE_Boost to ON because of MITK_USE_SOFA")
+    set(MITK_USE_Boost ON CACHE BOOL "" FORCE)
+  endif()
+  # SOFA requires boost system library
+  list(FIND MITK_USE_Boost_LIBRARIES system _result)
+  if(_result LESS 0)
+    message("Adding 'system' to MITK_USE_Boost_LIBRARIES.")
+    list(APPEND MITK_USE_Boost_LIBRARIES system)
+  endif()
+  # SOFA requires boost thread library
+  list(FIND MITK_USE_Boost_LIBRARIES thread _result)
+  if(_result LESS 0)
+    message("Adding 'thread' to MITK_USE_Boost_LIBRARIES.")
+    list(APPEND MITK_USE_Boost_LIBRARIES thread)
+  endif()
+  set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES} CACHE STRING "" FORCE)
 endif()
 
 # Customize the default pixel types for multiplex macros
@@ -344,7 +371,6 @@ find_package(ITK REQUIRED)
 find_package(VTK REQUIRED)
 
 find_package(GDCM PATHS ${ITK_GDCM_DIR} REQUIRED)
-include(${GDCM_USE_FILE})
 
 #-----------------------------------------------------------------------------
 # Set MITK specific options and variables (NOT available during superbuild)
@@ -437,6 +463,7 @@ include(mitkSetupC++0xVariables)
 
 if(WIN32)
   set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -D_WIN32_WINNT=0x0501 -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
+  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} /wd4231") # warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
 endif()
 
 if(NOT MSVC_VERSION)
@@ -452,6 +479,12 @@ if(NOT MSVC_VERSION)
     -Wstrict-null-sentinel
     #-Wold-style-cast
     #-Wsign-promo
+
+    # the following two lines should be removed after ITK-3097 has
+    # been resolved, see also MITK bug 15279
+    -Wno-unused-local-typedefs
+    -Wno-array-bounds
+
     -fdiagnostics-show-option
     )
     mitkFunctionCheckCAndCXXCompilerFlags(${_flag} MITK_C_FLAGS MITK_CXX_FLAGS)
@@ -635,10 +668,6 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MITK_EXE_LINKER_FLAGS}")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${MITK_SHARED_LINKER_FLAGS}")
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER_FLAGS}")
 
-if(MITK_USE_QT)
-  add_definitions(-DQWT_DLL)
-endif()
-
 #-----------------------------------------------------------------------------
 # Add custom targets representing CDash subprojects
 #-----------------------------------------------------------------------------
@@ -656,7 +685,6 @@ endforeach()
 link_directories(${MITK_LINK_DIRECTORIES})
 
 add_subdirectory(Core)
-include(${CMAKE_CURRENT_BINARY_DIR}/Core/Code/CppMicroServices/CppMicroServicesConfig.cmake)
 
 add_subdirectory(Modules)
 
@@ -889,7 +917,6 @@ configure_file(mitkExportMacros.h.in ${MITK_BINARY_DIR}/mitkExportMacros.h)
 configure_file(mitkVersion.h.in ${MITK_BINARY_DIR}/mitkVersion.h)
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 
-set(VECMATH_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vecmath)
 set(IPFUNC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipFunc)
 set(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
 

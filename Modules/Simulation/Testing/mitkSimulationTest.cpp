@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSimulationObjectFactory.h>
 #include <mitkTestingMacros.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <sofa/simulation/common/UpdateContextVisitor.h>
 #include <sofa/simulation/tree/GNode.h>
 #include <sstream>
 
@@ -85,10 +84,10 @@ static void DrawSimulation(mitk::Simulation::Pointer simulation, bool updateCont
 
   simulation->SetAsActiveSimulation();
 
-  if (updateContext)
-    rootNode->execute<sofa::simulation::UpdateContextVisitor>(sofa::core::ExecParams::defaultInstance());
-
   sofa::simulation::Simulation::SPtr sofaSimulation = simulation->GetSimulation();
+
+  if (updateContext)
+    sofaSimulation->updateContext(rootNode.get());
 
   sofaSimulation->updateVisual(rootNode.get());
   sofaSimulation->draw(sofa::core::visual::VisualParams::defaultInstance(), rootNode.get());

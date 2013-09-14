@@ -39,7 +39,7 @@ class BERRY_COMMANDS CommandEvent : public AbstractNamedHandleEvent {
 
 public:
 
-  berryObjectMacro(CommandEvent)
+  berryObjectMacro(CommandEvent);
 
   /**
    * Creates a new instance of this class.

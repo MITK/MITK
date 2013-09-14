@@ -61,11 +61,6 @@ class QmitkMitkWorkbenchIntroPart : public berry::QtIntroPart
 public:
 
   QmitkMitkWorkbenchIntroPart();
-  QmitkMitkWorkbenchIntroPart(const QmitkMitkWorkbenchIntroPart& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
  ~QmitkMitkWorkbenchIntroPart();
 
 

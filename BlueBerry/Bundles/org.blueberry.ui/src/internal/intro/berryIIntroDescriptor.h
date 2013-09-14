@@ -35,7 +35,7 @@ namespace berry {
  */
 struct BERRY_UI IIntroDescriptor : public Object {
 
-  berryInterfaceMacro(IIntroDescriptor, berry)
+  berryInterfaceMacro(IIntroDescriptor, berry);
 
   ~IIntroDescriptor();
 

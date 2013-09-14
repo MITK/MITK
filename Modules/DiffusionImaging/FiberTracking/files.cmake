@@ -1,7 +1,4 @@
 set(CPP_FILES
-
-  MiniApps/ctkCommandLineParser.h
-
   # DataStructures -> FiberBundleX
   IODataStructures/FiberBundleX/mitkFiberBundleX.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXWriter.cpp
@@ -9,6 +6,7 @@ set(CPP_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.cpp
+  IODataStructures/FiberBundleX/mitkTrackvis.cpp
 #  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.cpp
 
   # DataStructures -> PlanarFigureComposite
@@ -37,8 +35,6 @@ set(CPP_FILES
 )
 
 set(H_FILES
-  MiniApps/ctkCommandLineParser.h
-
   # Rendering
   Rendering/mitkFiberBundleXMapper3D.h
   Rendering/mitkFiberBundleXMapper2D.h
@@ -53,6 +49,7 @@ set(H_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.h
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
 #  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.h
+  IODataStructures/FiberBundleX/mitkTrackvis.h
 
   IODataStructures/mitkFiberTrackingObjectFactory.h
 

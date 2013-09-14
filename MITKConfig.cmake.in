@@ -2,7 +2,7 @@
 # Update the CMake module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@MITK_SOURCE_DIR@/CMake")
 
-include(@MITK_BINARY_DIR@/Core/Code/CppMicroServices/CppMicroServicesConfig.cmake)
+set(CppMicroServices_DIR "@MITK_BINARY_DIR@/Core/CppMicroServices")
 
 # Include MITK macros
 include(MacroParseArguments)
@@ -72,9 +72,7 @@ endforeach()
 # Include directory variables
 set(MITK_INCLUDE_DIRS "@MITK_INCLUDE_DIRS@")
 set(QMITK_INCLUDE_DIRS "@QMITK_INCLUDE_DIRS@")
-set(ANN_INCLUDE_DIR "@ANN_INCLUDE_DIR@")
 set(IPSEGMENTATION_INCLUDE_DIR "@IPSEGMENTATION_INCLUDE_DIR@")
-set(VECMATH_INCLUDE_DIR "@VECMATH_INCLUDE_DIR@")
 set(IPFUNC_INCLUDE_DIR "@IPFUNC_INCLUDE_DIR@")
 set(MITK_IGT_INCLUDE_DIRS "@MITK_IGT_INCLUDE_DIRS@")
 
@@ -90,13 +88,20 @@ set(MITK_VTK_LIBRARY_DIRS "@MITK_VTK_LIBRARY_DIRS@")
 set(MITK_ITK_LIBRARY_DIRS "@MITK_ITK_LIBRARY_DIRS@")
 
 # External projects
+set(ANN_DIR "@ANN_DIR@")
+set(CppUnit_DIR "@CppUnit_DIR@")
+set(GLEW_DIR "@GLEW_DIR@")
+set(tinyxml_DIR "@tinyxml_DIR@")
 set(ITK_DIR "@ITK_DIR@")
 set(VTK_DIR "@VTK_DIR@")
 set(DCMTK_DIR "@DCMTK_DIR@")
 set(GDCM_DIR "@GDCM_DIR@")
 set(BOOST_ROOT "@BOOST_ROOT@")
 set(OpenCV_DIR "@OpenCV_DIR@")
+set(Poco_DIR "@Poco_DIR@")
 set(SOFA_DIR "@SOFA_DIR@")
+set(Qwt_DIR "@Qwt_DIR@")
+set(Qxt_DIR "@Qxt_DIR@")
 set(MITK_QMAKE_EXECUTABLE "@QT_QMAKE_EXECUTABLE@")
 set(MITK_DATA_DIR "@MITK_DATA_DIR@")
 
@@ -146,12 +151,6 @@ if(MITK_TOF_MESASR4000_AVAILABLE AND NOT ${PROJECT_NAME} STREQUAL "MITK")
   option(MITK_USE_TOF_MESASR4000 "Enable support for MESA SR4000" @MITK_USE_TOF_MESASR4000@)
   mark_as_advanced(MITK_USE_TOF_MESASR4000)
 endif()
-
-# There is no PocoConfig.cmake, so we set Poco specific CMake variables
-# here. This way the call to find_package(Poco) in BlueBerryConfig.cmake
-# finds the Poco distribution supplied by MITK
-set(Poco_INCLUDE_DIR "@MITK_SOURCE_DIR@/Utilities/Poco")
-set(Poco_LIBRARY_DIR "@MITK_BINARY_DIR@/bin")
 
 if(MITK_USE_IGT)
   #include(${MITK_DIR}/mitkIGTConfig.cmake)

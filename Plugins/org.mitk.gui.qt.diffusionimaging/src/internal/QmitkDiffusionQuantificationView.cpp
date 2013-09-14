@@ -275,7 +275,6 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
                 GfaFilterType;
         GfaFilterType::Pointer gfaFilter = GfaFilterType::New();
         gfaFilter->SetInput(itkvol);
-        gfaFilter->SetNumberOfThreads(8);
 
         double scale = 1;
         std::string newname;

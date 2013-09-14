@@ -68,6 +68,7 @@ namespace mitk
     */
     //itkSetMacro(Type, TrackingDeviceType);
 
+
     /**
     * \brief initialize the connection to the tracking device
     *
@@ -88,6 +89,11 @@ namespace mitk
     virtual bool CloseConnection();
 
     bool InitializeWiredTools();
+
+    /** Sets the rotation mode of this class. See documentation of enum RotationMode for details
+     *  on the different modes.
+     */
+    virtual void SetRotationMode(RotationMode r);
 
     /**
     * \brief TestConnection() tries to connect to a NDI tracking device on the current port/device and returns which device it has found

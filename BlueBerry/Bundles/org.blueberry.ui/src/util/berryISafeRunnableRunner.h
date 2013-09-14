@@ -42,7 +42,7 @@ struct BERRY_UI ISafeRunnableRunner : public Object {
 
 public:
 
-  berryInterfaceMacro(ISafeRunnableRunner, berry)
+  berryInterfaceMacro(ISafeRunnableRunner, berry);
 
   ~ISafeRunnableRunner();
 

@@ -1,7 +1,7 @@
 /**
 \page NewModulePage How to create a new MITK Module
 
-\subsection CreateFolder 1) Create a Folder for your Module
+\section NewModulePageCreateFolder 1) Create a Folder for your Module
 
 First, create a folder for your module within /Modules  e.g. 'NewModule'. 
 You need to add the new Folder to the CMakeLists.txt in the Module directory as well as well.
@@ -17,7 +17,7 @@ set(module_dirs
 Inside the folder create a new folder called "Testing", which will later contain the module tests.
 Also create subfolders for you sourceFiles, for example "NewModuleFilters" and "NewModuleSourceFiles".
 
-\subsection CreateCMakeLists 2) Create CMakeLists.txt
+\section NewModulePageCreateCMakeLists 2) Create CMakeLists.txt
 
 Within your module create the following file named CMakeLists.txt with the following content:
 
@@ -42,7 +42,7 @@ Make sure to include these folders in the List of subfolders, or CMake will not 
 In the DEPENDS section, you can enter the modules that your module requires to function.
 You will not be able to use classes from modules that are not listed here.
 
-\subsection Createfilesdotcmake 3) Create files.cmake
+\section NewModulePageCreatefilesdotcmake 3) Create files.cmake
 
 Next, create a new file and name it files.cmake, containing the following:
 
@@ -58,14 +58,16 @@ SET(CPP_FILES
 Add each .cpp file you create to this file.
 Also, only add you .cpp files here, not the header files!
 
-\subsection CreateTEstingEnvironment 4) Set up the Test environment 
+\section NewModulePageCreateTEstingEnvironment 4) Set up the Test environment 
 
+We also need to set up a testing environment where you can add your tests.
 Inside your "Testing" Folder, create a new files.cmake containing the following:
 
 \code
 SET(MODULE_TESTS
    mitkNewModuleTest.cpp
 )
+\endcode
 
 Also, create a new CMakeLists.text:
 
@@ -73,8 +75,8 @@ Also, create a new CMakeLists.text:
 MITK_CREATE_MODULE_TESTS()
 \endcode
 
-*/
-
 That's it! Enjoy your new module! After following these steps, it should look something like this:
 
 \image html NewModule.png "Your shiny new module!"
+
+*/

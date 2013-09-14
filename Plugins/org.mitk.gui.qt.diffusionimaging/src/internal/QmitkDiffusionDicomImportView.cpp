@@ -376,6 +376,15 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
       // Only get the DICOM files:
       gdcm::Directory::FilenamesType l2 = s.GetKeys();
+
+
+
+      gdcm::Directory::FilenamesType::iterator it;
+
+      for (it = l2.begin() ; it != l2.end(); ++it) {
+        MITK_INFO << "-------FN " << *it;
+      }
+
       const int nfiles = l2.size();
       if(nfiles < 1)
       {
@@ -435,8 +444,15 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       {
         gdcm::Sorter sorter;
         sorter.SetSortFunction( SortBySeriesUID );
-        sorter.StableSort( l2 );
-        files = sorter.GetFilenames();
+        if (sorter.StableSort( l2 ))
+        {
+          files = sorter.GetFilenames();
+        }
+        else
+        {
+          Error("Loading of at least one DICOM file not successfull!");
+          return;
+        }
       }
       else
       {

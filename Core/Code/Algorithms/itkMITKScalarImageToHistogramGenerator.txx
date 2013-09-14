@@ -23,6 +23,7 @@ This file is based heavily on a corresponding ITK filter.
 #define _itkMITKScalarImageToHistogramGenerator_txx
 
 #include "itkMITKScalarImageToHistogramGenerator.h"
+#include "itkDefaultConvertPixelTraits.h"
 
 
 namespace itk {
@@ -75,6 +76,7 @@ MITKScalarImageToHistogramGenerator< TImage, TMeasurementType >
 ::SetNumberOfBins( unsigned int numberOfBins )
 {
   typename HistogramType::SizeType size;
+  size.SetSize(itk::DefaultConvertPixelTraits<typename TImage::PixelType>::GetNumberOfComponents());
   size.Fill( numberOfBins );
   m_HistogramGenerator->SetHistogramSize( size );
 }

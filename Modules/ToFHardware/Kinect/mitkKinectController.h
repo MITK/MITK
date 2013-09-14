@@ -68,7 +68,7 @@ namespace mitk
     void GetIntensities(float* intensities);
     /*!
     \brief acquire new rgb data from the Kinect camera
-    \parama rgb pointer to memory location where rgb information should be stored
+    \param rgb pointer to memory location where rgb information should be stored
     */
     void GetRgb(unsigned char* rgb);
     /*!

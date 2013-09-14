@@ -56,6 +56,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarPolygon.h"
 #include "mitkPartialVolumeAnalysisClusteringCalculator.h"
 #include "mitkDiffusionImage.h"
+#include "usModuleRegistry.h"
 
 #include <itkVectorImage.h>
 #include "itkTensorDerivedMeasurementsFilter.h"
@@ -1856,12 +1857,16 @@ void QmitkPartialVolumeAnalysisView::Activated()
 
         if(figure)
         {
-            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+          figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
-            if(figureInteractor.IsNull())
-                figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", node);
-
-            mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+          if(figureInteractor.IsNull())
+          {
+            figureInteractor = mitk::PlanarFigureInteractor::New();
+            us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+            figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+            figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+            figureInteractor->SetDataNode( node );
+          }
         }
     }
 }
@@ -1889,10 +1894,10 @@ void QmitkPartialVolumeAnalysisView::ActivatedZombieView(berry::IWorkbenchPartRe
 
         if(figure)
         {
-            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
             if(figureInteractor)
-                mitk::GlobalInteraction::GetInstance()->RemoveInteractor(figureInteractor);
+              figureInteractor->SetDataNode( NULL );
         }
     }
 }
@@ -2108,12 +2113,16 @@ void QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage(const mitk::DataNode
 
         // set interactor for new node (if not already set)
         mitk::PlanarFigureInteractor::Pointer figureInteractor
-                = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+                = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
         if(figureInteractor.IsNull())
-            figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", nonConstNode);
-
-        mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+        {
+          figureInteractor = mitk::PlanarFigureInteractor::New();
+          us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+          figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+          figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+          figureInteractor->SetDataNode( nonConstNode );
+        }
 
         // remove uninitialized old planars
         if( m_SelectedPlanarFigureNodes->GetNode().IsNotNull() && m_CurrentFigureNodeInitialized == false )

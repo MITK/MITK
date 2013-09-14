@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
    struct IJobStatus : public IStatus {
 
-   berryObjectMacro(IJobStatus)
+   berryObjectMacro(IJobStatus);
 
   /**
    * Returns the job associated with this status.

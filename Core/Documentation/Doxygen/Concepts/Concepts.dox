@@ -15,6 +15,7 @@ The following items describe some issues about MITK on a more abstract level.
  -# \subpage PropertiesPage
  -# \subpage GeometryOverviewPage
  -# \subpage PipelineingConceptPage
+ -# \subpage OverlaysPage
 -# \subpage QVTKRendering
 -# Interaction
  -# \subpage DataInteractionPage

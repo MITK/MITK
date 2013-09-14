@@ -109,7 +109,7 @@ try
 {
   itk::Index<2> idx = {{ 12, 34 }};
 
-  mitk::ImagePixelReadAccessor<short,2> readAcces(image, image->GetSliceData(2));
+  mitk::ImagePixelReadAccessor<short,2> readAccess(image, image->GetSliceData(2));
   short value = readAccess.GetPixelByIndex(idx);
 
   mitk::ImagePixelWriteAccessor<short,2> writeAccess(image, image->GetSliceData(4));
@@ -145,46 +145,22 @@ catch(mitk::Exception& e) {
 \section MitkImagePage_WorkingWith Working with MITK Image
 
 \subsection MitkImagePage_Cloning     Cloning a MITK Image
-When duplicating an image, be sure to duplicate all data that you want to transfer. This includes Geometry, the visual Data and any properties necessary. The simplest way to achieve this is to first call Image::Initialize(const Image * image). This will copy the geometry information, but not the data or the properties. Afterwards, copy the image's data and, if necessary, it's properties.
+In order to clone an image, you can simply call the inherited method Clone(). It returns an itk::SmartPointer and works also with const image pointers.
 
 \verbatim
-mitk::Image::Pointer new = mitk::Image::New(); // Create new, empty image
-new->Initialize(old); // new no has the geometry information from old image
-new->SetVolume(old->GetData()); // new now additionally contains the old images visual data
-new->SetPropertyList(old->GetPropertyList()) // new now additionally contains the old image's properties
+mitk::Image::Pointer testMethod(const mitk::Image* image)
+{
+  mitk::Image::Pointer nIm = image->Clone();
+  return nIm;
+}
 \endverbatim
 
+Cloning can also be done manually by copying the Geometry, the visual Data and further properties separately. The simplest way to achieve this is to first call Image::Initialize(const Image * image). This will copy the geometry information, but not the data or the properties. Afterwards, copy the image's data (e.g. with SetVolume) and, if necessary, it's properties with SetPropertyList(image->GetPropertyList()).
 
 \subsection MitkImagePage_Inheriting      Inheriting from MITK Image
 In general, one should try to avoid inheriting from mitk Image. The simple reason for this is that your derived class will not 
 cleanly work together with the Filters already implemented (See the chapter on Pipelining for Details). If however, mitk Image 
 does not offer the functionality you require it is possible to do so. See the documentation for various examples of classes 
 that inherit from image.
-
-
-
-*/
-
-
-\section MitkImagePage_WorkingWith Working with MITK Image
-
-\subsection MitkImagePage_Cloning     Cloning a MITK Image
-When duplicating an image, be sure to duplicate all data that you want to transfer. This includes Geometry, the visual Data and any properties necessary. The simplest way to achieve this is to first call Image::Initialize(const Image * image). This will copy the geometry information, but not the data or the properties. Afterwards, copy the image's data and, if necessary, it's properties.
-
-\verbatim
-mitk::Image::Pointer new = mitk::Image::New(); // Create new, empty image
-new->Initialize(old); // new now has the geometry information from old image
-new->SetVolume(old->GetData()); // new now additionally contains the old images visual data
-new->SetPropertyList(old->GetPropertyList()) // new now additionally contains the old image's properties
-\endverbatim
-
-
-\subsection MitkImagePage_Inheriting      Inheriting from MITK Image
-In general, one should try to avoid inheriting from mitk Image. The simple reason for this is that your derived class will not 
-cleanly work together with the Filters already implemented (See the chapter on Pipelining for Details). If however, mitk Image 
-does not offer the functionality you require it is possible to do so. See the documentation for various examples of classes 
-that inherit from image.
-
-
 
 */

@@ -57,13 +57,6 @@ class REGISTRATION_EXPORT QmitkDeformableRegistrationView : public QmitkFunction
     */
     QmitkDeformableRegistrationView(QObject *parent=0, const char *name=0);
 
-    QmitkDeformableRegistrationView(const QmitkDeformableRegistrationView& other)
-    {
-      Q_UNUSED(other)
-      throw std::runtime_error("Copy constructor not implemented");
-    }
-
-
     /*!
     \brief default destructor
     */

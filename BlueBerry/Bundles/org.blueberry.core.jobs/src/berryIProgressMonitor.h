@@ -27,7 +27,7 @@ namespace berry
 struct IProgressMonitor: public Object
 {
 
-berryInterfaceMacro(IProgressMonitor, berry)
+berryInterfaceMacro(IProgressMonitor, berry);
 
   /** Constant indicating an unknown amount of work. */
 
@@ -55,7 +55,7 @@ berryInterfaceMacro(IProgressMonitor, berry)
   /**
    * Internal method to handle scaling correctly. This method
    * must not be called by a client. Clients should
-   * always use the method </code>worked(int)</code>.
+   * always use the method <code>worked(int)</code>.
    *
    * @param work the amount of work done
    */

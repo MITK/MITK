@@ -19,12 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "QmitkMovieMakerControls.h"
 #include "QmitkStepperAdapter.h"
 #include "QmitkStdMultiWidget.h"
-#include "QmitkCommonFunctionality.h"
 #include "QmitkMovieMaker.h"
 //#include "QmitkMovieMakerControls.h"
 #include "QmitkStepperAdapter.h"
 #include "QmitkStdMultiWidget.h"
-#include "QmitkCommonFunctionality.h"
 
 #include "mitkVtkPropRenderer.h"
 #include "mitkGlobalInteraction.h"

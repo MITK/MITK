@@ -54,14 +54,6 @@ const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
  */
 void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
 {
-
-    //MITK_INFO << "GENERATE DATA FOR FBX :)";
-    //=====timer measurement====
-//    QTime myTimer;
-//    myTimer.start();
-    //==========================
-
-
     mitk::FiberBundleX* FBX = dynamic_cast<mitk::FiberBundleX*> (GetDataNode()->GetData());
     if (FBX == NULL)
         return;
@@ -71,10 +63,8 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
     if (FiberData == NULL)
         return;
 
-
     FBXLocalStorage3D *localStorage = m_LSH.GetLocalStorage(renderer);
     localStorage->m_FiberMapper->SetInput(FiberData);
-
 
     if ( FiberData->GetPointData()->GetNumberOfArrays() > 0 )
         localStorage->m_FiberMapper->SelectColorArray( FBX->GetCurrentColorCoding() );
@@ -84,14 +74,14 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
     localStorage->m_FiberActor->SetMapper(localStorage->m_FiberMapper);
     localStorage->m_FiberMapper->SetLookupTable(m_lut);
 
-
     // set Opacity
     float tmpopa;
     this->GetDataNode()->GetOpacity(tmpopa, NULL);
     localStorage->m_FiberActor->GetProperty()->SetOpacity((double) tmpopa);
 
-
-
+    int lineWidth = 1;
+    this->GetDataNode()->GetIntProperty("LineWidth",lineWidth);
+    localStorage->m_FiberActor->GetProperty()->SetLineWidth(lineWidth);
 
     // set color
     if (FBX->GetCurrentColorCoding() != NULL){
@@ -106,7 +96,6 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
             localStorage->m_FiberActor->GetProperty()->SetColor(trgb);
         }
     }
-
 
     localStorage->m_FiberAssembly->AddPart(localStorage->m_FiberActor);
     localStorage->m_LastUpdateTime.Modified();

@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRigidRegistrationView.h"
 
 #include "QmitkStdMultiWidget.h"
-#include "QmitkCommonFunctionality.h"
 #include "qinputdialog.h"
 #include "qmessagebox.h"
 #include "qcursor.h"
@@ -29,11 +28,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 
 #include "mitkDataNodeObject.h"
+#include <mitkImageCast.h>
 
 #include "berryIWorkbenchWindow.h"
 #include "berryISelectionService.h"
 
-#include <mitkShowSegmentationAsSurface.h>
 #include "mitkManualSegmentationToSurfaceFilter.h"
 #include <mitkSegmentationSink.h>
 

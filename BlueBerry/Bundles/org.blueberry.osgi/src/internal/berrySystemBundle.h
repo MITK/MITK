@@ -28,7 +28,7 @@ class SystemBundle : public Bundle
 
 public:
 
-  berryObjectMacro(SystemBundle)
+  berryObjectMacro(SystemBundle);
 
   SystemBundle(BundleLoader& loader, IBundleStorage::Pointer storage);
 

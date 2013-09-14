@@ -51,6 +51,60 @@ class MITK_CORE_EXPORT IOUtil
 public:
 
   /**
+   * Get the file system path where the running executable is located.
+   *
+   * @return The location of the currently running executable, without the filename.
+   */
+  static std::string GetProgramPath();
+
+  /**
+   * Get the default temporary path.
+   *
+   * @return The default path for temporary data.
+   */
+  static std::string GetTempPath();
+
+  /**
+   * Create and open a temporary file.
+   *
+   * This method generates a unique temporary filename from \c templateName, creates
+   * and opens the file using the output stream \c tmpStream and returns the name of
+   * the newly create file.
+   *
+   * The last six characters of \c templateName must be "XXXXXX" and these are replaced
+   * with a string that makes the filename unique.
+   *
+   * The file is created with read and write permissions for owner only.
+   *
+   * @param tmpStream The output stream for writing to the temporary file.
+   * @param templateName An optional template for the filename.
+   * @param path An optional path where the temporary file should be created. Defaults
+   *        to the default temp path as returned by GetTempPath().
+   * @return The filename of the created temporary file.
+   *
+   * @throw mitk::Exception if the temporary file could not be created.
+   */
+  static std::string CreateTemporaryFile(std::ofstream& tmpStream, const std::string& templateName = "XXXXXX", std::string path = std::string());
+
+  /**
+   * Create a temporary directory.
+   *
+   * This method generates a uniquely named temporary directory from \c templateName.
+   * The last six characters of \c templateName must be "XXXXXX" and these are replaced
+   * with a string that makes the directory name unique.
+   *
+   * The directory is created with read, write and executable permissions for owner only.
+   *
+   * @param templateName An optional template for the directory name.
+   * @param path An optional path where the temporary directory should be created. Defaults
+   *        to the default temp path as returned by GetTempPath().
+   * @return The filename of the created temporary file.
+   *
+   * @throw mitk::Exception if the temporary directory could not be created.
+   */
+  static std::string CreateTemporaryDirectory(const std::string& templateName = "XXXXXX", std::string path = std::string());
+
+  /**
    * Load a files in <code>fileNames</code> and add the constructed mitk::DataNode instances
    * to the mitk::DataStorage <code>storage</code>
    *
@@ -113,6 +167,16 @@ public:
    * @return Returns true for success else false.
    */
   static bool SaveImage(mitk::Image::Pointer image, const std::string path);
+
+  /**
+   * @brief SaveBaseData Convenience method to save arbitrary baseData.
+   * @param path The path to the image including file name and file extension.
+   * If not extention is set, the default value (defined in DEFAULTIMAGEEXTENSION) is used.
+   * @param data The data to save.
+   * @throws mitk::Exception This exception is thrown when the writer is not able to write the image.
+   * @return Returns true for success else false.
+   */
+  static bool SaveBaseData(mitk::BaseData* data, const std::string& path);
 
   /**
    * @brief SaveSurface Convenience method to save an arbitrary mitkSurface.

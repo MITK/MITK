@@ -47,7 +47,7 @@ namespace berry {
  */
 struct BERRY_UI IFileEditorMapping : public Object {
 
-  berryInterfaceMacro(IFileEditorMapping, berry)
+  berryInterfaceMacro(IFileEditorMapping, berry);
 
   virtual ~IFileEditorMapping();
 

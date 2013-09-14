@@ -315,7 +315,6 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
 {
   typedef itk::Image<int, 3> ImageType;
   typedef itk::ImageSeriesReader< ImageType > ReaderType;
-  typedef itk::NumericSeriesFileNames NameGenerator;
 
   if ( ! this->GenerateFileList() )
   {

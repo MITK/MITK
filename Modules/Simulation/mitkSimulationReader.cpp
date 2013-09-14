@@ -72,6 +72,7 @@ void mitk::SimulationReader::GenerateData()
   simulation->SetRootNode(rootNode.get());
   simulation->SetDefaultDT(rootNode->getDt());
   sofaSimulation->init(rootNode.get());
+  sofaSimulation->reset(rootNode.get());
 
   sofa::helper::system::DataRepository.removePath(path);
 

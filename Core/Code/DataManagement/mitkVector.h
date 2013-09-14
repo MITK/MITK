@@ -282,7 +282,7 @@ template <class T, unsigned int NVectorDimension>
 \brief Check for matrix equality with a user defined accuracy. As an equality metric the root mean squared error (RMS) of all elements is calculated.
 \param matrix1 first vnl matrix
 \param matrix2 second vnl matrix
-\epsilon user defined accuracy bounds
+\param epsilon user defined accuracy bounds
 */
 template <typename TCoordRep, unsigned int NRows, unsigned int NCols>
 inline bool MatrixEqualRMS(const vnl_matrix_fixed<TCoordRep,NRows,NCols>& matrix1,const vnl_matrix_fixed<TCoordRep,NRows,NCols>& matrix2,mitk::ScalarType epsilon=mitk::eps)
@@ -309,7 +309,7 @@ inline bool MatrixEqualRMS(const vnl_matrix_fixed<TCoordRep,NRows,NCols>& matrix
 \brief Check for matrix equality with a user defined accuracy. As an equality metric the root mean squared error (RMS) of all elements is calculated.
 \param matrix1 first itk matrix
 \param matrix2 second itk matrix
-\epsilon user defined accuracy bounds
+\param epsilon user defined accuracy bounds
 */
 template <typename TCoordRep, unsigned int NRows, unsigned int NCols>
 inline bool MatrixEqualRMS(const itk::Matrix<TCoordRep, NRows, NCols>& matrix1,const itk::Matrix<TCoordRep, NRows, NCols>& matrix2,mitk::ScalarType epsilon=mitk::eps)
@@ -321,7 +321,7 @@ inline bool MatrixEqualRMS(const itk::Matrix<TCoordRep, NRows, NCols>& matrix1,c
 \brief Check for element-wise matrix equality with a user defined accuracy.
 \param matrix1 first vnl matrix
 \param matrix2 second vnl matrix
-\epsilon user defined accuracy bounds
+\param epsilon user defined accuracy bounds
 */
 template <typename TCoordRep, unsigned int NRows, unsigned int NCols>
 inline bool MatrixEqualElementWise(const vnl_matrix_fixed<TCoordRep,NRows,NCols>& matrix1,const vnl_matrix_fixed<TCoordRep,NRows,NCols>& matrix2,mitk::ScalarType epsilon=mitk::eps)
@@ -351,7 +351,7 @@ inline bool MatrixEqualElementWise(const vnl_matrix_fixed<TCoordRep,NRows,NCols>
 \brief Check for element-wise matrix equality with a user defined accuracy.
 \param matrix1 first itk matrix
 \param matrix2 second itk matrix
-\epsilon user defined accuracy bounds
+\param epsilon user defined accuracy bounds
 */
 template <typename TCoordRep, unsigned int NRows, unsigned int NCols>
 inline bool MatrixEqualElementWise(const itk::Matrix<TCoordRep, NRows, NCols>& matrix1,const itk::Matrix<TCoordRep, NRows, NCols>& matrix2,mitk::ScalarType epsilon=mitk::eps)
@@ -390,7 +390,8 @@ inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2
 
 inline bool Equal(double scalar1, double scalar2, ScalarType eps=mitk::eps)
 {
-  return fabs(scalar1-scalar2) < eps;
+  bool isEqual( fabs(scalar1-scalar2) < eps );
+  return isEqual;
 }
 
 template <typename TCoordRep, unsigned int NPointDimension>

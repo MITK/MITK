@@ -84,27 +84,28 @@ cd MITK-superbuild
 ccmake ../MITK
 \endcode
 
-If you use <B>Windows</B>, then you just start the CMake GUI and enter the location of the source and of the binary tree,
+If you use <b>Windows</b>, then you just start the CMake GUI and enter the location of the source and of the binary tree,
 choose a suitable generator and configure the project.
 
 If you use <b>Mac OS X</b> you will have to tweak the CMake configuration:
  - First of all you have to check the selected compilers, i.e.:
-  - <tt><b>CMAKE_CXX_COMPILER</tt></b>
-  - <tt><b>CMAKE_C_COMPILER</tt></b>
+  - <tt><b>CMAKE_CXX_COMPILER</b></tt>
+  - <tt><b>CMAKE_C_COMPILER</b></tt>
   - both should be either apple's clang or apple's gcc compiler
- - Next you have to assure hat <tt><b>CMAKE_OSX_SYSROOT</tt></b> points to the correct SDK location:
+ - Next you have to assure hat <tt><b>CMAKE_OSX_SYSROOT</b></tt> points to the correct SDK location:
   - This is either /Developer/SDKs/Developer/SDKs/MacOSX10.7.sdk or if you have installed Xcode 4.3+ it is located in /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/
- - Finally you should set the cmake variable <tt><b>MITK_USE_VTK_5_8_IN_SUPERBUILD</tt></b> to ON
+ - Finally you should set the cmake variable <tt><b>MITK_USE_VTK_5_8_IN_SUPERBUILD</b></tt> to ON
 
 CMake will present you a couple of options, these are the most important ones:
 
+ - <tt><b>MITK_USE_ACVD</b></tt> Build MITK code which depends on ACVD (this will download and build ACVD)
  - <tt><b>MITK_USE_BLUEBERRY</b></tt> Build the BlueBerry application framework
  - <tt><b>MITK_USE_Boost</b></tt> Build MITK code which depends on Boost (this will download Boost 1.45.0)
  - <tt><b>MITK_USE_Boost_LIBRARIES</b></tt> If you need binary Boost libraries, specify them here.
  - <tt><b>MITK_USE_OpenCV</b></tt> Build MITK code which depends on OpenCV (this will download and build OpenCV 2.3)
  - <tt><b>MITK_USE_Python</b></tt> Enables Python wrapping in MITK. This will also configure ITK, VTK, and OpenCV (if enabled) to build Python wrappers.
  - <tt><b>MITK_USE_QT</b></tt> Build MITK code which depends on Qt
- - <tt><b>MITK_USE_SOFA</b></tt> Build MITK code which depends on SOFA (this will download and build SOFA 1.0 RC1)
+ - <tt><b>MITK_USE_SOFA</b></tt> Build MITK code which depends on SOFA (this will download and build SOFA)
  - <tt><b>QT_QMAKE_EXECUTABLE</b></tt> The path to the qmake executable of your Qt installation
 
 If you are satisfied with the configuration of your MITK superbuild, generate the project files with

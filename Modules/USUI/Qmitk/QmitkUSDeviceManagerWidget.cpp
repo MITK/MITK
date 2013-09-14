@@ -16,8 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#define _USE_MATH_DEFINES
 #include <QmitkUSDeviceManagerWidget.h>
-#include <mitkModuleContext.h>
+#include <usModuleContext.h>
 #include <usGetModuleContext.h>
+#include <QMessageBox>
 
 
 const std::string QmitkUSDeviceManagerWidget::VIEW_ID = "org.mitk.views.QmitkUSDeviceManagerWidget";
@@ -55,7 +56,7 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
   {
     connect( m_Controls->m_BtnActivate,   SIGNAL( clicked() ), this, SLOT(OnClickedActivateDevice()) );
     connect( m_Controls->m_BtnDisconnect, SIGNAL( clicked() ), this, SLOT(OnClickedDisconnectDevice()) );
-    connect( m_Controls->m_ConnectedDevices, SIGNAL( ServiceSelectionChanged(mitk::ServiceReference) ), this, SLOT(OnDeviceSelectionChanged(mitk::ServiceReference)) );
+    connect( m_Controls->m_ConnectedDevices, SIGNAL( ServiceSelectionChanged(mitk::ServiceReference) ), this, SLOT(OnDeviceSelectionChanged(us::ServiceReferenceU)) );
   }
 }
 
@@ -65,9 +66,23 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
 void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
 {
   mitk::USDevice::Pointer device = m_Controls->m_ConnectedDevices->GetSelectedService<mitk::USDevice>();
-  if (device.IsNull()) return;
-  if (device->GetIsActive()) device->Deactivate();
-  else device->Activate();
+  if (device.IsNull())
+  {
+    return;
+  }
+  if (device->GetIsActive())
+  {
+    device->Deactivate();
+  }
+  else
+  {
+    device->Activate();
+
+    if ( ! device->GetIsActive() )
+    {
+      QMessageBox::warning(this, "Activation failed", "Could not activate device. Check logging for details.");
+    }
+  }
 
   // Manually reevaluate Button logic
   OnDeviceSelectionChanged(m_Controls->m_ConnectedDevices->GetSelectedServiceReference());
@@ -75,11 +90,11 @@ void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
 
 void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){
   mitk::USDevice::Pointer device = m_Controls->m_ConnectedDevices->GetSelectedService<mitk::USDevice>();
-  if (device.IsNull()) return;
+  if (device.IsNull()) { return; }
   device->Disconnect();
 }
 
-void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(mitk::ServiceReference reference){
+void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(us::ServiceReferenceU reference){
   if (! reference)
   {
     m_Controls->m_BtnActivate->setEnabled(false);
@@ -103,14 +118,14 @@ void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(mitk::ServiceReference
 
 void QmitkUSDeviceManagerWidget::DisconnectAllDevices()
 {
-//at the moment disconnects ALL devices. Maybe we only want to disconnect the devices handled by this widget?
-mitk::ModuleContext* thisContext = mitk::GetModuleContext();
-std::list<mitk::ServiceReference> services = thisContext->GetServiceReferences<mitk::USDevice>();
-for(std::list<mitk::ServiceReference>::iterator it = services.begin(); it != services.end(); ++it)
-    {
-    mitk::USDevice::Pointer currentDevice = thisContext->GetService<mitk::USDevice>(*it);
+  //at the moment disconnects ALL devices. Maybe we only want to disconnect the devices handled by this widget?
+  us::ModuleContext* thisContext = us::GetModuleContext();
+  std::vector<us::ServiceReference<mitk::USDevice> > services = thisContext->GetServiceReferences<mitk::USDevice>();
+  for(std::vector<us::ServiceReference<mitk::USDevice> >::iterator it = services.begin(); it != services.end(); ++it)
+  {
+    mitk::USDevice* currentDevice = thisContext->GetService(*it);
     currentDevice->Disconnect();
-    }
-MITK_INFO << "Disconnected ALL US devises!";
+  }
+  MITK_INFO << "Disconnected ALL US devises!";
 }
 

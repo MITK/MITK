@@ -57,7 +57,7 @@ protected:
 
 public:
 
-  berryObjectMacro(EditorSite)
+  berryObjectMacro(EditorSite);
 
     /**
      * Constructs an EditorSite for an editor.

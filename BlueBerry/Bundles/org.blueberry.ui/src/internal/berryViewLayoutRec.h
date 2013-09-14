@@ -30,7 +30,7 @@ namespace berry {
  */
 struct ViewLayoutRec : public Object {
 
-  berryObjectMacro(ViewLayoutRec)
+  berryObjectMacro(ViewLayoutRec);
 
     bool isCloseable;
 

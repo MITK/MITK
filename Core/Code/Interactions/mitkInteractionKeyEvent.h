@@ -36,7 +36,7 @@ namespace mitk
   /**
    * \class InteractionKeyEvent
    * \brief Handles key events.
-   * \input std::string for pressed key or special key description , mitk::ModifierKeys for modifiers
+   * Takes a std::string for pressed key or special key description, mitk::ModifierKeys for modifiers
    * \ingroup Interaction.
    */
 

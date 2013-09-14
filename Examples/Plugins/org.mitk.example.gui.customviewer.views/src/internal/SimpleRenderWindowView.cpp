@@ -68,11 +68,6 @@ SimpleRenderWindowView::~SimpleRenderWindowView()
 {
 }
 
-QmitkRenderWindow *SimpleRenderWindowView::GetActiveRenderWindow() const
-{
-  return m_RenderWindow;
-}
-
 QmitkRenderWindow *SimpleRenderWindowView::GetActiveQmitkRenderWindow() const
 {
   return m_RenderWindow;

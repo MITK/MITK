@@ -41,7 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <mitkDataStorage.h>
 #include <mitkDataNode.h>
-#include <QmitkCommonFunctionality.h>
 #include <QmitkCustomVariants.h>
 #include "QmitkCmdLineModuleGui.h"
 
@@ -545,18 +544,57 @@ void QmitkCmdLineModuleProgressWidget::Run()
         int pid = QCoreApplication::applicationPid();
         int randomInt = qrand() % 1000000;
 
-        QString fileName = m_TemporaryDirectoryName + "/" + name + QString::number(pid) + "_" + QString::number(randomInt) + ".nii";
+        QString fileNameBase = m_TemporaryDirectoryName + "/" + name + QString::number(pid) + "_" + QString::number(randomInt);
+        QString fileName = "";
+        bool writeSucess = false;
 
-        message = "Saving " + fileName;
-        this->PublishMessage(message);
+        // Try to save the image using one of the specified "fileExtensions" or
+        // .nii if none have been specified.
+        if (parameter.fileExtensions().isEmpty())
+        {
+          fileName = fileNameBase + ".nii";
+          try
+          {
+            if (mitk::IOUtil::SaveBaseData( image, fileName.toStdString() ))
+            {
+              writeSucess = true;
+            }
+          }
+          catch(const std::exception&){}
+        }
+        else
+        {
+          foreach (QString extension, parameter.fileExtensions())
+          {
+            fileName = fileNameBase + "." + extension;
+            try
+            {
+              if (mitk::IOUtil::SaveBaseData( image, fileName.toStdString() ))
+              {
+                writeSucess = true;
+                break;
+              }
+            }
+            catch(const std::exception&)
+            {}
+          }
+        }
 
-        std::string tmpFN = CommonFunctionality::SaveImage(image, fileName.toStdString().c_str());
-        QString temporaryStorageFileName = QString::fromStdString(tmpFN);
+        if(!writeSucess)
+        {
+          QStringList extensions = parameter.fileExtensions();
+          if (extensions.isEmpty())
+          {
+            extensions.push_back("nii");
+          }
+          QMessageBox::warning(this, "Saving temporary input file failed",
+                               QString("Unsupported file formats: ") + extensions.join(", "));
+          return;
+        }
+        m_TemporaryFileNames.push_back(fileName);
+        m_ModuleFrontEnd->setValue(parameterName, fileName);
 
-        m_TemporaryFileNames.push_back(temporaryStorageFileName);
-        m_ModuleFrontEnd->setValue(parameterName, temporaryStorageFileName);
-
-        message = "Saved " + temporaryStorageFileName;
+        message = "Saved " + fileName;
         this->PublishMessage(message);
       } // end if image
     } // end if node

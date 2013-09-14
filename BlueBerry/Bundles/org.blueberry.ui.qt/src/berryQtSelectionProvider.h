@@ -35,7 +35,7 @@ class BERRY_UI_QT QtSelectionProvider: public QObject,
 
 public:
 
-  berryObjectMacro(QtSelectionProvider)
+  berryObjectMacro(QtSelectionProvider);
 
   QtSelectionProvider();
 

@@ -43,6 +43,8 @@ mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator()
 , m_LabelsToCoordinatesMap()
 , m_MappingStrategy( EndElementPositionAvoidingWhiteMatter )
 , m_EndPointSearchRadius( 10.0 )
+, m_ZeroLabelInvalid( true )
+, m_AbortConnection( false )
 {
 }
 
@@ -57,7 +59,10 @@ mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator( mitk::Image::Point
 , m_LabelsToCoordinatesMap()
 , m_MappingStrategy( EndElementPositionAvoidingWhiteMatter )
 , m_EndPointSearchRadius( 10.0 )
+, m_ZeroLabelInvalid( true )
+, m_AbortConnection( false )
 {
+  mitk::CastToItkImage( segmentation, m_SegmentationItk );
 }
 
 mitk::ConnectomicsNetworkCreator::~ConnectomicsNetworkCreator()
@@ -72,6 +77,7 @@ void mitk::ConnectomicsNetworkCreator::SetFiberBundle(mitk::FiberBundleX::Pointe
 void mitk::ConnectomicsNetworkCreator::SetSegmentation(mitk::Image::Pointer segmentation)
 {
   m_Segmentation = segmentation;
+  mitk::CastToItkImage( segmentation, m_SegmentationItk );
 }
 
 itk::Point<float, 3> mitk::ConnectomicsNetworkCreator::GetItkPoint(double point[3])
@@ -87,7 +93,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
 {
 
   //empty graph
-  m_ConNetwork->clear();
+  m_ConNetwork = mitk::ConnectomicsNetwork::New();
   m_LabelToVertexMap.clear();
   m_LabelToNodePropertyMap.clear();
   idCounter = 0;
@@ -118,6 +124,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
         ReturnLabelForFiberTract( singleTract, m_MappingStrategy )
         )
         );
+      m_AbortConnection = false;
     }
   }
 
@@ -134,6 +141,12 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
 
 void mitk::ConnectomicsNetworkCreator::AddConnectionToNetwork(ConnectionType newConnection)
 {
+  if( m_AbortConnection )
+  {
+    MITK_DEBUG << "Connection aborted";
+    return;
+  }
+
   VertexType vertexA = newConnection.first;
   VertexType vertexB = newConnection.second;
 
@@ -155,6 +168,12 @@ void mitk::ConnectomicsNetworkCreator::AddConnectionToNetwork(ConnectionType new
 
 mitk::ConnectomicsNetworkCreator::VertexType mitk::ConnectomicsNetworkCreator::ReturnAssociatedVertexForLabel( ImageLabelType label )
 {
+  if( m_ZeroLabelInvalid && ( label == 0 ) )
+  {
+    m_AbortConnection = true;
+    return NULL;
+  }
+
   // if label is not known, create entry
   if( ! ( m_LabelToVertexMap.count( label ) > 0 ) )
   {
@@ -184,10 +203,6 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
     {
       return EndElementPositionLabel( singleTract );
     }
-  case PrecomputeAndDistance:
-    {
-      return PrecomputeVertexLocationsBySegmentation( singleTract );
-    }
   case JustEndPointVerticesNoLabel:
     {
       return JustEndPointVerticesNoLabelTest( singleTract );
@@ -195,6 +210,10 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
   case EndElementPositionAvoidingWhiteMatter:
     {
       return EndElementPositionLabelAvoidingWhiteMatter( singleTract );
+    }
+  case PrecomputeAndDistance:
+    {
+      return PrecomputeVertexLocationsBySegmentation( singleTract );
     }
   }
 
@@ -233,8 +252,8 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
       lastElementSegIndex.SetElement( index, lastElementSegCoord.GetElement( index ) );
     }
 
-    int firstLabel = m_Segmentation->GetPixelValueByIndex( firstElementSegIndex );
-    int lastLabel = m_Segmentation->GetPixelValueByIndex( lastElementSegIndex );
+    int firstLabel = m_SegmentationItk->GetPixel(firstElementSegIndex);
+    int lastLabel = m_SegmentationItk->GetPixel(lastElementSegIndex );
 
     labelpair.first = firstLabel;
     labelpair.second = lastLabel;
@@ -283,8 +302,8 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
       lastElementSegIndex.SetElement( index, lastElementSegCoord.GetElement( index ) );
     }
 
-    int firstLabel = m_Segmentation->GetPixelValueByIndex( firstElementSegIndex );
-    int lastLabel = m_Segmentation->GetPixelValueByIndex( lastElementSegIndex );
+    int firstLabel = m_SegmentationItk->GetPixel(firstElementSegIndex);
+    int lastLabel = m_SegmentationItk->GetPixel(lastElementSegIndex );
 
     // Check whether the labels belong to the white matter (which means, that the fibers ended early)
     bool extendFront(false), extendEnd(false), retractFront(false), retractEnd(false);
@@ -567,6 +586,8 @@ void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
 
     bool keepOn( true );
 
+    itk::ImageRegion<3> itkRegion = m_SegmentationItk->GetLargestPossibleRegion();
+
     for( int parameter( 0 ) ; keepOn ; parameter++ )
     {
       if( parameter > 1000 )
@@ -580,7 +601,14 @@ void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
         tempIndex.SetElement( index, endPoint.GetElement( index ) + parameter * differenceVector[ index ] );
       }
 
-      tempLabel = m_Segmentation->GetPixelValueByIndex( tempIndex );
+      if( itkRegion.IsInside( tempIndex ) )
+      {
+        tempLabel = m_SegmentationItk->GetPixel( tempIndex );
+      }
+      else
+      {
+        tempLabel = -1;
+      }
 
       if( IsNonWhiteMatterLabel( tempLabel ) )
       {
@@ -599,7 +627,6 @@ void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
     }
 
   }
-
 }
 
 void mitk::ConnectomicsNetworkCreator::RetractionUntilBrainMatter( bool retractFront, TractType::Pointer singleTract,
@@ -669,7 +696,7 @@ void mitk::ConnectomicsNetworkCreator::RetractionUntilBrainMatter( bool retractF
           currentPoint.GetElement( index ) + ( 1.0 + parameter ) / ( 1.0 + length ) * differenceVector[ index ] );
       }
 
-      tempLabel = m_Segmentation->GetPixelValueByIndex( tempIndex );
+      tempLabel = m_SegmentationItk->GetPixel( tempIndex );
 
       if( !IsBackgroundLabel( tempLabel ) )
       {
@@ -731,12 +758,8 @@ void mitk::ConnectomicsNetworkCreator::RetractionUntilBrainMatter( bool retractF
 
 void mitk::ConnectomicsNetworkCreator::CalculateCenterOfMass()
 {
+
   const int dimensions = 3;
-  typedef itk::Image<int, dimensions > ITKImageType;
-
-  ITKImageType::Pointer itkImage = ITKImageType::New();
-  mitk::CastToItkImage( m_Segmentation, itkImage );
-
   int max = m_Segmentation->GetStatistics()->GetScalarValueMax();
   int min = m_Segmentation->GetStatistics()->GetScalarValueMin();
 
@@ -746,7 +769,7 @@ void mitk::ConnectomicsNetworkCreator::CalculateCenterOfMass()
   std::vector< std::vector< std::vector< double> > > coordinatesPerLabelVector;
   coordinatesPerLabelVector.resize( range );
 
-  itk::ImageRegionIteratorWithIndex<ITKImageType> it_itkImage( itkImage, itkImage->GetLargestPossibleRegion() );
+  itk::ImageRegionIteratorWithIndex<ITKImageType> it_itkImage( m_SegmentationItk, m_SegmentationItk->GetLargestPossibleRegion() );
 
   for( it_itkImage.GoToBegin(); !it_itkImage.IsAtEnd(); ++it_itkImage )
   {

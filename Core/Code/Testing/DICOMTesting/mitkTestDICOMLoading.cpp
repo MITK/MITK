@@ -57,7 +57,7 @@ void mitk::TestDICOMLoading::ResetUserLocale()
 
 
 
-mitk::TestDICOMLoading::ImageList mitk::TestDICOMLoading::LoadFiles( const StringContainer& files )
+mitk::TestDICOMLoading::ImageList mitk::TestDICOMLoading::LoadFiles( const StringContainer& files, Image::Pointer preLoadedVolume )
 {
   for (StringContainer::const_iterator iter = files.begin();
        iter != files.end();
@@ -77,7 +77,7 @@ mitk::TestDICOMLoading::ImageList mitk::TestDICOMLoading::LoadFiles( const Strin
   {
     StringContainer files = seriesIter->second.GetFilenames();
 
-    DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries( files );
+    DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries( files, true, true, true, 0, preLoadedVolume ); // true, true, true ist just a copy of the default values
 
     if (node.IsNotNull())
     {

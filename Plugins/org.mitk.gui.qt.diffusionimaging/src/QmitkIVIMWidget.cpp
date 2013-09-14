@@ -18,30 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkHistogramGenerator.h"
 
-#include <qlabel.h>
-#include <qpen.h>
-#include <qgroupbox.h>
-//#include <qmargins.h>
-
-
-#include <vtkQtChartArea.h>
-#include <vtkQtChartTableSeriesModel.h>
-#include <vtkQtChartStyleManager.h>
-#include <vtkQtChartColorStyleGenerator.h>
-
-#include <vtkQtChartMouseSelection.h>
-#include <vtkQtChartInteractorSetup.h>
-#include <vtkQtChartSeriesSelectionHandler.h>
-#include <vtkQtChartAxisLayer.h>
-#include <vtkQtChartAxis.h>
-#include <vtkQtChartAxisOptions.h>
-#include <vtkQtChartLegend.h>
-#include <vtkQtChartLegendManager.h>
 
 #include <qwt_scale_engine.h>
 #include <qwt_legend.h>
 
-//#include <iostream>
 
 QmitkIVIMWidget::QmitkIVIMWidget( QWidget * parent )
   : QmitkPlotWidget(parent)
@@ -49,10 +29,14 @@ QmitkIVIMWidget::QmitkIVIMWidget( QWidget * parent )
   //  this->SetAxisTitle( QwtPlot::xBottom, "Grayvalue" );
   //  this->SetAxisTitle( QwtPlot::yLeft, "Probability" );
   //  this->Replot();
-  m_Plot->setCanvasLineWidth(0);
-  m_Plot->setMargin(0);
+  QFrame* canvas = qobject_cast<QFrame*>(m_Plot->canvas());
+  if (canvas)
+  {
+    canvas->setLineWidth(0);
+    canvas->setContentsMargins(0,0,0,0);
+  }
 
-  QwtLog10ScaleEngine* logScale = new QwtLog10ScaleEngine();
+  QwtLogScaleEngine* logScale = new QwtLogScaleEngine();
   m_Plot->setAxisScaleEngine(0, logScale);
 
   m_Plot->setAxisScale( 0, 0.15, 1.0 );
@@ -164,4 +148,3 @@ void QmitkIVIMWidget::SetParameters( IVIMFilterType::IVIMSnapshot snap )
   this->Replot();
 
 }
-

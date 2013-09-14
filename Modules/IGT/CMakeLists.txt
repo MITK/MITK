@@ -14,7 +14,8 @@ MITK_CREATE_MODULE(MitkIGT
   SUBPROJECTS MITK-IGT
   INCLUDE_DIRS IGTFilters IGTTrackingDevices IGTToolManagement IGTExceptionHandling
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
-  DEPENDS Mitk tinyxml SceneSerialization
+  DEPENDS Mitk SceneSerialization
+  PACKAGE_DEPENDS tinyxml
   ADDITIONAL_LIBS "${ADDITIONAL_LIBS}"
 )
 

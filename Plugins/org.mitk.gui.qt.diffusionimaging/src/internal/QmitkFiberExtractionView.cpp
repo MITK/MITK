@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNodeObject.h>
 #include <mitkDiffusionImage.h>
 #include <mitkTensorImage.h>
+#include "usModuleRegistry.h"
 
 // ITK
 #include <itkResampleImageFilter.h>
@@ -62,7 +63,7 @@ QmitkFiberExtractionView::QmitkFiberExtractionView()
     , m_MultiWidget( NULL )
     , m_CircleCounter(0)
     , m_PolygonCounter(0)
-    , m_UpsamplingFactor(5)
+    , m_UpsamplingFactor(1)
 {
 
 }
@@ -230,6 +231,8 @@ void QmitkFiberExtractionView::GenerateRoiImage(){
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.front()->GetData());
         geometry = fib->GetGeometry();
     }
+    else if (m_SelectedImage)
+        geometry = m_SelectedImage->GetGeometry();
     else
         return;
 
@@ -758,7 +761,7 @@ void QmitkFiberExtractionView::UpdateGui()
     }
     else
     {
-        if ( !m_SelectedFB.empty() )
+        if ( !m_SelectedFB.empty() || m_SelectedImage.IsNotNull())
             m_Controls->m_GenerateRoiImage->setEnabled(true);
         else
             m_Controls->m_GenerateRoiImage->setEnabled(false);
@@ -850,12 +853,16 @@ void QmitkFiberExtractionView::OnDrawPolygon()
 
         if(figureP)
         {
-            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+          figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
-            if(figureInteractor.IsNull())
-                figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", node);
-
-            mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+          if(figureInteractor.IsNull())
+          {
+            figureInteractor = mitk::PlanarFigureInteractor::New();
+            us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+            figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+            figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+            figureInteractor->SetDataNode( node );
+          }
         }
     }
 
@@ -881,12 +888,16 @@ void QmitkFiberExtractionView::OnDrawCircle()
 
         if(figureP)
         {
-            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
             if(figureInteractor.IsNull())
-                figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", node);
-
-            mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+          {
+            figureInteractor = mitk::PlanarFigureInteractor::New();
+            us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+            figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+            figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+            figureInteractor->SetDataNode( node );
+          }
         }
     }
 }

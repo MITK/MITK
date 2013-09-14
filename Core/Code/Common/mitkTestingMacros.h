@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkMacro.h>
 #include <mitkTestManager.h>
+#include <mitkTesting.h>
 
 namespace mitk {
   /** \brief Indicate a failed test. */
@@ -33,27 +34,39 @@ namespace mitk {
  *
  * \brief Output some text without generating a terminating newline. Include
  *
+ * @ingroup MITKTestingAPI
+ *
  * */
 #define MITK_TEST_OUTPUT_NO_ENDL(x) \
   std::cout x ;
 
-/** \brief Output some text. */
+/** \brief Output some text.
+
+ @ingroup MITKTestingAPI
+*/
 #define MITK_TEST_OUTPUT(x) \
   MITK_TEST_OUTPUT_NO_ENDL(x << "\n")
 
 /** \brief Do some general test preparations. Must be called first in the
-     main test function. */
+     main test function.
+
+    @ingroup MITKTestingAPI
+*/
 #define MITK_TEST_BEGIN(testName)      \
   std::string mitkTestName(#testName);   \
   mitk::TestManager::GetInstance()->Initialize();  \
   try {
 
-/** \brief Fail and finish test with message MSG */
+/** \brief Fail and finish test with message MSG
+ @ingroup MITKTestingAPI
+*/
 #define MITK_TEST_FAILED_MSG(MSG)  \
   MITK_TEST_OUTPUT(MSG) \
   throw mitk::TestFailedException();
 
-/** \brief Must be called last in the main test function. */
+/** \brief Must be called last in the main test function.
+ * @ingroup MITKTestingAPI
+*/
 #define MITK_TEST_END()                                   \
   } catch (mitk::TestFailedException ex) {                      \
     MITK_TEST_OUTPUT(<< "Further test execution skipped.") \
@@ -100,6 +113,8 @@ namespace mitk {
 /**
  * \brief Begin block which should be checked for exceptions
  *
+ * @ingroup MITKTestingAPI
+ *
  * This macro, together with MITK_TEST_FOR_EXCEPTION_END, can be used
  * to test whether a code block throws an expected exception. The test FAILS if the
  * exception is NOT thrown. A simple example:
@@ -131,9 +146,42 @@ namespace mitk {
 /**
  * \brief Simplified version of MITK_TEST_FOR_EXCEPTION_BEGIN / END for
  * a single statement
+ *
+ * @ingroup MITKTestingAPI
  */
 #define MITK_TEST_FOR_EXCEPTION(EXCEPTIONCLASS, STATEMENT) \
   MITK_TEST_FOR_EXCEPTION_BEGIN(EXCEPTIONCLASS) \
   STATEMENT ; \
   MITK_TEST_FOR_EXCEPTION_END(EXCEPTIONCLASS)
+
+/** \brief Testing macro to test if two objects are equal.
+ *
+ * @ingroup MITKTestingAPI
+ *
+ * This macro uses mitk::eps and the corresponding mitk::Equal methods for all
+ * comparisons and will give verbose output on the dashboard/console.
+ * Feel free to implement mitk::Equal for your own datatype or purpose.
+ *
+ * @param OBJ1 First object.
+ * @param OBJ2 Second object.
+ * @param MSG Message to appear with the test.
+ */
+#define MITK_TEST_EQUAL(OBJ1,OBJ2,MSG) \
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(OBJ1, OBJ2, mitk::eps, true)==true, MSG)
+
+/** \brief Testing macro to test if two objects are not equal.
+ *
+ * @ingroup MITKTestingAPI
+ *
+ * This macro uses mitk::eps and the corresponding mitk::Equal methods for all
+ * comparisons and will give verbose output on the dashboard/console.
+ *
+ * @param OBJ1 First object.
+ * @param OBJ2 Second object.
+ * @param MSG Message to appear with the test.
+ *
+ * \sa MITK_TEST_EQUAL
+ */
+#define MITK_TEST_NOT_EQUAL(OBJ1,OBJ2,MSG) \
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(OBJ1, OBJ2, mitk::eps, true)==false, MSG)
 

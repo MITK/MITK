@@ -79,11 +79,9 @@ void mitk::ShaderProperty::AddShaderTypes()
 {
   AddEnum( "fixed" );
 
-  IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
-  if (shaderRepo == NULL) return;
+  CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
 
   std::list<mitk::IShaderRepository::Shader::Pointer> l = shaderRepo->GetShaders();
-
   std::list<mitk::IShaderRepository::Shader::Pointer>::const_iterator i = l.begin();
 
   while( i != l.end() )

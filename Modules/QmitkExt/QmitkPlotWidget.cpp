@@ -17,9 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qlayout.h>
 #include <iostream>
 
+#include <qwt_point_data.h>
+
 #include "QmitkPlotWidget.h"
 
-QmitkPlotWidget::QmitkPlotWidget(QWidget* parent, const char* title, const char*  /*name*/, Qt::WindowFlags f): QWidget(parent, f)
+QmitkPlotWidget::QmitkPlotWidget(QWidget* parent, const char* title, const char*  /*name*/, Qt::WindowFlags f)
+  : QWidget(parent, f)
+  , m_SeriesData(NULL)
 {
   QVBoxLayout* boxLayout = new QVBoxLayout(this);
   m_Plot = new QwtPlot( QwtText(title), this ) ;
@@ -31,6 +35,7 @@ QmitkPlotWidget::~QmitkPlotWidget()
 {
   this->Clear();
   delete m_Plot;
+  delete m_SeriesData;
 }
 
 
@@ -72,7 +77,9 @@ bool QmitkPlotWidget::SetCurveData( unsigned int curveId, const QmitkPlotWidget:
   }
   double* rawDataX = ConvertToRawArray( xValues );
   double* rawDataY = ConvertToRawArray( yValues );
-  m_PlotCurveVector[curveId]->setData( rawDataX, rawDataY, static_cast<int>(xValues.size()) );
+  delete m_SeriesData;
+  m_SeriesData = new QwtPointArrayData(rawDataX, rawDataY, static_cast<int>(xValues.size()));
+  m_PlotCurveVector[curveId]->setSamples(m_SeriesData);
   delete[] rawDataX;
   delete[] rawDataY;
   return true;
@@ -83,7 +90,9 @@ bool QmitkPlotWidget::SetCurveData( unsigned int curveId, const QmitkPlotWidget:
 {
   double* rawDataX = ConvertToRawArray( data, 0 );
   double* rawDataY = ConvertToRawArray( data, 1 );
-  m_PlotCurveVector[curveId]->setData( rawDataX, rawDataY, static_cast<int>(data.size()) );
+  delete m_SeriesData;
+  m_SeriesData = new QwtPointArrayData(rawDataX, rawDataY, static_cast<int>(data.size()));
+  m_PlotCurveVector[curveId]->setData(m_SeriesData);
   delete[] rawDataX;
   delete[] rawDataY;
   return true;
@@ -113,7 +122,7 @@ void QmitkPlotWidget::SetCurveStyle( unsigned int curveId, const QwtPlotCurve::C
 
 void QmitkPlotWidget::SetCurveSymbol( unsigned int curveId, QwtSymbol* symbol )
 {
-  m_PlotCurveVector[curveId]->setSymbol(*symbol);
+  m_PlotCurveVector[curveId]->setSymbol(symbol);
 }
 
 void QmitkPlotWidget::Replot()
@@ -126,7 +135,7 @@ void QmitkPlotWidget::Clear()
 {
   m_PlotCurveVector.clear();
   m_PlotCurveVector.resize(0);
-  m_Plot->clear();
+  m_Plot->detachItems();
 }
 
 

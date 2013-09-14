@@ -27,7 +27,7 @@ mitkAddCustomModuleTest(mitkDataStorageTest_US4DCyl mitkDataStorageTest ${MITK_D
 
 mitkAddCustomModuleTest(mitkStateMachineFactoryTest_TestStateMachine1_2 mitkStateMachineFactoryTest ${MITK_DATA_DIR}/TestStateMachine1.xml ${MITK_DATA_DIR}/TestStateMachine2.xml)
 
-mitkAddCustomModuleTest(mitkDicomSeriesReaderTest_CTImage mitkDicomSeriesReaderTest ${MITK_DATA_DIR}/TinyCTAbdomen)
+mitkAddCustomModuleTest(mitkDicomSeriesReaderTest_CTImage mitkDicomSeriesReaderTest ${MITK_DATA_DIR}/TinyCTAbdomen  ${MITK_DATA_DIR}/DICOMReader/Broken-Series)
 
 mitkAddCustomModuleTest(mitkPointSetReaderTest mitkPointSetReaderTest ${MITK_DATA_DIR}/PointSetReaderTestData.mps)
 
@@ -36,6 +36,7 @@ mitkAddCustomModuleTest(mitkImageTest_2D+tImageData mitkImageTest ${MITK_DATA_DI
 mitkAddCustomModuleTest(mitkImageTest_3DImageData mitkImageTest ${MITK_DATA_DIR}/Pic3D.nrrd)
 mitkAddCustomModuleTest(mitkImageTest_brainImage mitkImageTest ${MITK_DATA_DIR}/brain.mhd)
 #mitkAddCustomModuleTest(mitkImageTest_color2DImage mitkImageTest ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg)
+mitkAddCustomModuleTest(mitkImageTest_3DImageData mitkImageGeneratorTest ${MITK_DATA_DIR}/Pic3D.nrrd)
 
 mitkAddCustomModuleTest(mitkIOUtilTest mitkIOUtilTest #test for a randomly chosen Pic3D swivelled slice
                         ${MITK_DATA_DIR}/Pic3D.nrrd
@@ -103,6 +104,44 @@ mitkAddCustomModuleTest(ResliceInterpolationIsCubic mitkImageVtkMapper2DResliceI
                         ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dRefCubic.png #corresponding reference screenshot CUBIC
 )
 #End test reslice interpolation
+
+
+#Overlays
+
+mitkAddCustomModuleTest(mitkLabelOverlay3DRendering2DTest mitkLabelOverlay3DRendering2DTest #OverlayTest
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkLabelOverlay3DRendering2DTest.png #corresponding reference screenshot
+)
+
+mitkAddCustomModuleTest(mitkLabelOverlay3DRendering3DTest mitkLabelOverlay3DRendering3DTest #OverlayTest
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkLabelOverlay3DRendering3DTest.png #corresponding reference screenshot
+)
+
+mitkAddCustomModuleTest(mitkTextOverlay2DRenderingTest_ball mitkTextOverlay2DRenderingTest #OverlayTest
+                        ${MITK_DATA_DIR}/ball.stl #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkTextOverlay2DRenderingTest_ball.png #corresponding reference screenshot
+)
+
+mitkAddCustomModuleTest(mitkTextOverlay2DLayouterRenderingTest_ball mitkTextOverlay2DLayouterRenderingTest #OverlayTest
+                        ${MITK_DATA_DIR}/ball.stl #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkTextOverlay2DLayouterRenderingTest_ball.png #corresponding reference screenshot
+)
+
+mitkAddCustomModuleTest(mitkTextOverlay3DRendering2DTest_ball mitkTextOverlay3DRendering2DTest #OverlayTest
+                        ${MITK_DATA_DIR}/ball.stl #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkTextOverlay3DRendering2DTest_ball.png #corresponding reference screenshot
+)
+
+mitkAddCustomModuleTest(mitkTextOverlay3DRendering3DTest_ball mitkTextOverlay3DRendering3DTest #OverlayTest
+                        ${MITK_DATA_DIR}/ball.stl #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkTextOverlay3DRendering3DTest_ball.png #corresponding reference screenshot
+)
+
+mitkAddCustomModuleTest(mitkTextOverlay3DColorRenderingTest_ball mitkTextOverlay3DColorRenderingTest #OverlayTest
+                        ${MITK_DATA_DIR}/ball.stl #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkTextOverlay3DColorRenderingTest_ball.png #corresponding reference screenshot
+)
+
+##End of overlayTests
 
 # Testing of the rendering of binary images
 mitkAddCustomModuleTest(mitkImageVtkMapper2D_binaryTestImage640x480 mitkImageVtkMapper2DTest #test for standard Pic3D axial slice

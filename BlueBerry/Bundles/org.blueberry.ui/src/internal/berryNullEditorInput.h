@@ -32,7 +32,7 @@ private: EditorReference::Pointer editorReference;
 
 public:
 
-  berryObjectMacro(NullEditorInput)
+  berryObjectMacro(NullEditorInput);
 
   NullEditorInput();
 

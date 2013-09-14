@@ -90,7 +90,7 @@ class BERRY_OSGI Object
 
 public:
 
-  berryObjectMacro(Object)
+  berryObjectMacro(Object);
 
   struct Hash {
     inline std::size_t operator()(const Self* value) const

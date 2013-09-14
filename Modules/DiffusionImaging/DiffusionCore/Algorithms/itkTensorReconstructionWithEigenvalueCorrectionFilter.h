@@ -13,22 +13,6 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-/*=========================================================================
-
-Program:   Tensor ToolKit - TTK
-Module:    $URL: svn://scm.gforge.inria.fr/svn/ttk/trunk/Algorithms/itkTensorImageToDiffusionImageFilter.h $
-Language:  C++
-Date:      $Date: 2010-06-07 13:39:13 +0200 (Mo, 07 Jun 2010) $
-Version:   $Revision: 68 $
-
-Copyright (c) INRIA 2010. All rights reserved.
-See LICENSE.txt for details.
-
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
-
-=========================================================================*/
 #ifndef _itk_TensorReconstructionWithEigenvalueCorrectionFilter_h_
 #define _itk_TensorReconstructionWithEigenvalueCorrectionFilter_h_
 
@@ -38,11 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vnl/algo/vnl_symmetric_eigensystem.h>
 
 #include <math.h>
-#include <mitkDiffusionImage.h>
-
-
-typedef itk::VectorImage<short, 3>  ImageType;
-
 
 
 
@@ -56,34 +35,36 @@ namespace itk
 
   public:
 
+
+    typedef itk::VectorImage<short, 3>  ImageType;
+
+
+
     typedef TensorReconstructionWithEigenvalueCorrectionFilter                  Self;
     typedef SmartPointer<Self>                          Pointer;
     typedef SmartPointer<const Self>                    ConstPointer;
+
+
+
     typedef ImageToImageFilter< Image< TDiffusionPixelType, 3>,
       Image< DiffusionTensor3D< TTensorPixelType >, 3 > >
       Superclass;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkNewMacro(Self)
 
     /** Runtime information support. */
-    itkTypeMacro(TensorReconstructionWithEigenvalueCorrectionFilter, ImageToImageFilter);
+    itkTypeMacro(TensorReconstructionWithEigenvalueCorrectionFilter, ImageToImageFilter)
 
-    typedef TDiffusionPixelType                       ReferencePixelType;
+
     typedef TDiffusionPixelType                       GradientPixelType;
     typedef DiffusionTensor3D< TTensorPixelType >     TensorPixelType;
 
-
-    /** Reference image data,  This image is aquired in the absence
-    * of a diffusion sensitizing field gradient */
-    typedef typename Superclass::InputImageType      ReferenceImageType;
     typedef Image< TensorPixelType, 3 >              TensorImageType;
-    typedef TensorImageType                          OutputImageType;
+
     typedef typename Superclass::OutputImageRegionType
       OutputImageRegionType;
 
-    /** Typedef defining one (of the many) gradient images.  */
-    typedef Image< GradientPixelType, 3 >            GradientImageType;
 
     /** An alternative typedef defining one (of the many) gradient images.
     * It will be assumed that the vectorImage has the same dimension as the
@@ -93,12 +74,6 @@ namespace itk
     typedef typename GradientImagesType::PixelType         GradientVectorType;
 
 
-    /*
-    /** Holds the tensor basis coefficients G_k
-    typedef vnl_matrix_fixed< double, 6, 6 >         TensorBasisMatrixType;
-
-    typedef vnl_matrix< double >                     CoefficientMatrixType;
-    */
 
     /** Holds each magnetic field gradient used to acquire one DWImage */
     typedef vnl_vector_fixed< double, 3 >            GradientDirectionType;
@@ -118,52 +93,21 @@ namespace itk
     void SetGradientImage( GradientDirectionContainerType *,
       const GradientImagesType *image);
 
-    /** Set method to set the reference image. */
-    void SetReferenceImage( ReferenceImageType *referenceImage )
+
+
+
+    itkSetMacro( BValue, TTensorPixelType)
+    itkSetMacro( B0Threshold, float)
+
+    itkGetMacro(PseudoInverse, vnl_matrix<double>)
+    itkGetMacro(H, vnl_matrix<double>)
+    itkGetMacro(BVec, vnl_vector<double>)
+    itkGetMacro(B0Mask, vnl_vector<short>)
+
+
+    ImageType::Pointer GetCorrectedDiffusionVolumes()
     {
-      if( m_GradientImageTypeEnumeration == GradientIsInASingleImage)
-      {
-        itkExceptionMacro( << "Cannot call both methods:"
-          << "AddGradientImage and SetGradientImage. Please call only one of them.");
-      }
-
-      this->ProcessObject::SetNthInput( 0, referenceImage );
-
-      m_GradientImageTypeEnumeration = GradientIsInManyImages;
-    }
-
-    /** Get reference image */
-    virtual ReferenceImageType * GetReferenceImage()
-    { return ( static_cast< ReferenceImageType *>(this->ProcessObject::GetInput(0)) ); }
-
-    /** Return the gradient direction. idx is 0 based */
-    virtual GradientDirectionType GetGradientDirection( unsigned int idx) const
-    {
-      if( idx >= m_NumberOfGradientDirections )
-      {
-        itkExceptionMacro( << "Gradient direction " << idx << "does not exist" );
-      }
-      return m_GradientDirectionContainer->ElementAt( idx+1 );
-    }
-
-    itkSetMacro( BValue, TTensorPixelType);
-    itkSetMacro( B0Threshold, float);
-    itkSetMacro (Flagstatus, int);
-
-    itkGetMacro(PseudoInverse, vnl_matrix<double>);
-    itkGetMacro(H, vnl_matrix<double>);
-    itkGetMacro(BVec, vnl_vector<double>);
-    itkGetMacro(B0Mask, vnl_vector<short>);
-    itkGetMacro(Voxdim, vnl_vector<double>);
-
-    mitk::DiffusionImage<short>::Pointer GetOutputDiffusionImage()
-    {
-      return m_OutputDiffusionImage;
-    }
-
-    ImageType::Pointer GetVectorImage()
-    {
-      return m_VectorImage;
+      return m_CorrectedDiffusionVolumes;
     }
 
     itk::Image<short, 3>::Pointer GetMask()
@@ -172,14 +116,10 @@ namespace itk
     }
 
 
-    //itkGetMacro(OutputDiffusionImage, mitk::DiffusionImage<double>)
-
-    //itkGetMacro( GradientDirectionContainer, GradientDirectionContainerType::Pointer);
-
   protected:
 
     TensorReconstructionWithEigenvalueCorrectionFilter();
-    ~TensorReconstructionWithEigenvalueCorrectionFilter() {};
+    ~TensorReconstructionWithEigenvalueCorrectionFilter() {}
 
 
     void GenerateData();
@@ -196,12 +136,23 @@ namespace itk
 
   private:
 
-    short CheckNeighbours(int x, int y, int z,int f, itk::Size<3> size);
+    double CheckNeighbours(int x, int y, int z,int f, itk::Size<3> size, itk::Image<short, 3> ::Pointer mask,itk::VectorImage<short, 3>::Pointer corrected_diffusion_temp);
 
     void CalculateAttenuation(vnl_vector<double> org_data, vnl_vector<double> &atten,int nof,int numberb0);
 
+    void CorrectDiffusionImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,vnl_vector< double> pixel_max,vnl_vector< double> pixel_min);
 
-    void CalculateTensor(vnl_matrix<double> pseudoInverse,vnl_vector<double> atten, vnl_vector<double> &tensor,int nof,int numberb0);
+    void GenerateTensorImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,double what_mask,itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer tensorImg );
+
+    void DeepCopyTensorImage(itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer tensorImg, itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer temp_tensorImg);
+
+    void DeepCopyDiffusionImage(itk::VectorImage<short, 3>::Pointer corrected_diffusion, itk::VectorImage<short, 3>::Pointer corrected_diffusion_temp,int nof);
+
+
+    void TurnMask( itk::Size<3> size, itk::Image<short, 3>::Pointer mask, double previous_mask, double set_mask);
+
+    double CheckNegatives ( itk::Size<3> size, itk::Image<short, 3>::Pointer mask, itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer tensorImg );
+
 
     /** Gradient image was specified in a single image or in multiple images */
     GradientImageTypeEnumeration                      m_GradientImageTypeEnumeration;
@@ -219,21 +170,18 @@ namespace itk
     /** Number of baseline images */
     unsigned int                                      m_NumberOfBaselineImages;
 
-    mitk::DiffusionImage<short>::Pointer              m_OutputDiffusionImage;
-
-    ImageType::Pointer                                m_VectorImage;
+    ImageType::Pointer                                m_CorrectedDiffusionVolumes;
 
     float                                             m_B0Threshold;
-
 
 
     itk::Image<short, 3>::Pointer m_MaskImage;
     vnl_matrix<double> m_PseudoInverse;
     vnl_matrix<double> m_H;
     vnl_vector<double> m_BVec;
+
+    /** m_B0Mask indicates whether a volume identified by an index is B0-weighted or not */
     vnl_vector<short> m_B0Mask;
-    vnl_vector<double> m_Voxdim;
-    int  m_Flagstatus;
 
     typename GradientImagesType::Pointer m_GradientImagePointer;
 

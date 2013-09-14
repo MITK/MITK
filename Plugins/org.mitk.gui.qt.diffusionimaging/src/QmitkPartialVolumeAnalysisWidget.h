@@ -20,24 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPlotWidget.h"
 #include <org_mitk_gui_qt_diffusionimaging_Export.h>
 
-#include "QmitkHistogram.h"
-#include "QmitkExtExports.h"
 #include "mitkImage.h"
-#include "mitkPlanarFigure.h"
 #include "mitkPartialVolumeAnalysisClusteringCalculator.h"
-
-#include <qlayout.h>
-#include <qtextedit.h>
-#include <qdialog.h>
-
-#include <itkHistogram.h>
-
-#include <vtkQtChartWidget.h>
-#include <vtkQtBarChart.h>
-
-#include <QStandardItemModel>
-
-
 
 
 /**

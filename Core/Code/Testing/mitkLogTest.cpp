@@ -37,11 +37,14 @@ public:
 mitkClassMacro(mitkTestLoggingThread,itk::Object);
 mitkNewMacro1Param(mitkTestLoggingThread,itk::MultiThreader::Pointer);
 
+int NumberOfMessages;
+
 protected:
 
 mitkTestLoggingThread(itk::MultiThreader::Pointer MultiThreader)
   {
   ThreadID = -1;
+  NumberOfMessages = 0;
   m_MultiThreader = MultiThreader;
   }
 
@@ -56,12 +59,14 @@ void LogMessages()
 
   while(LoggingRunning)
     {
-    MITK_INFO << "Test info stream in thread " << ThreadID;
-    MITK_WARN << "Test warning stream in thread " << ThreadID;
+    MITK_INFO << "Test info stream in thread" << ThreadID << "\n even with newlines";
+    MITK_WARN << "Test warning stream in thread " << ThreadID <<". "
+              << "Even with a very long text, even without meaning or implied meaning or content, just a long sentence to see whether something has problems with long sentences or output in files or into windows or commandlines or whatever.";
     MITK_DEBUG << "Test debugging stream in thread " << ThreadID;
     MITK_ERROR << "Test error stream in thread " << ThreadID;
     MITK_FATAL << "Test fatal stream in thread " << ThreadID;
 
+    NumberOfMessages += 5;
     }
   }
 
@@ -161,35 +166,61 @@ static void TestObjectInfoLogging()
 
 
 
-static void TestThreadSaveLog()
+static void TestThreadSaveLog(bool toFile)
     {
     bool testSucceded = true;
 
 
     try
       {
-      int threadID1 = -1, threadID2 = -1;
-      //initialize two threads...
-      itk::MultiThreader::Pointer multiThreader = itk::MultiThreader::New();
-      mitkTestLoggingThread::Pointer myThreadClass1 = mitkTestLoggingThread::New(multiThreader);
-      mitkTestLoggingThread::Pointer myThreadClass2 = mitkTestLoggingThread::New(multiThreader);
+        if (toFile)
+        {
+          std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "/testthreadlog.log";
+          itksys::SystemTools::RemoveFile(filename.c_str()); // remove old file, we do not want to append to large files
+          mitk::LoggingBackend::SetLogFile(filename.c_str());
+        }
 
-      //start them
-      threadID1 = myThreadClass1->Start();
-      threadID2 = myThreadClass2->Start();
+        unsigned int numberOfThreads = 20;
+        unsigned int threadRuntimeInMilliseconds = 2000;
 
-      //wait for 500 ms
-      itksys::SystemTools::Delay(500);
+        std::vector<unsigned int> threadIDs;
+        std::vector<mitkTestLoggingThread::Pointer> threads;
 
-      //stop them
-      myThreadClass1->Stop();
-      myThreadClass2->Stop();
+        itk::MultiThreader::Pointer multiThreader = itk::MultiThreader::New();
+        for (unsigned int threadIdx = 0; threadIdx < numberOfThreads; ++threadIdx)
+        {
+          //initialize threads...
+          mitkTestLoggingThread::Pointer newThread = mitkTestLoggingThread::New(multiThreader);
+          threads.push_back(newThread);
+          std::cout << "Created " << threadIdx << ". thread." << std::endl;
+        }
 
-      //Wait for all threads to end
-      if(threadID1 >= 0)
-        multiThreader->TerminateThread(threadID1);
-      if(threadID2 >= 0)
-          multiThreader->TerminateThread(threadID2);
+        for (unsigned int threadIdx = 0; threadIdx < numberOfThreads; ++threadIdx)
+        {
+          //start them
+          std::cout << "Start " << threadIdx << ". thread." << std::endl;
+          threadIDs.push_back( threads[threadIdx]->Start() );
+          std::cout << threadIdx << ". thread has ID " << threadIDs[threadIdx] << std::endl;
+        }
+
+        //wait for some time (milliseconds)
+        itksys::SystemTools::Delay( threadRuntimeInMilliseconds );
+
+
+        for (unsigned int threadIdx = 0; threadIdx < numberOfThreads; ++threadIdx)
+        {
+          //stop them
+          std::cout << "Stop " << threadIdx << ". thread." << std::endl;
+          threads[threadIdx]->Stop();
+        }
+
+        for (unsigned int threadIdx = 0; threadIdx < numberOfThreads; ++threadIdx)
+        {
+          //Wait for all threads to end
+          multiThreader->TerminateThread(threadIDs[threadIdx]);
+          std::cout << "Terminated " << threadIdx << ". thread (" << threads[threadIdx]->NumberOfMessages << " messages)." << std::endl;
+        }
+
       }
     catch(std::exception e)
       {
@@ -246,7 +277,9 @@ int mitkLogTest(int /* argc */, char* /*argv*/[])
 
   mitkLogTestClass::TestLoggingToFile();
   mitkLogTestClass::TestAddAndRemoveBackends();
-    mitkLogTestClass::TestThreadSaveLog();
+  mitkLogTestClass::TestThreadSaveLog( false ); // false = to console
+  mitkLogTestClass::TestThreadSaveLog( true );  // true = to file
+  // TODO actually test file somehow?
 
   // always end with this!
   MITK_TEST_END()

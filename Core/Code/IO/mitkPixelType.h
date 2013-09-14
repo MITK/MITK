@@ -167,8 +167,6 @@ private:
 template< typename ComponentT, typename PixelT, std::size_t numOfComponents >
 PixelType MakePixelType()
 {
-  typedef itk::Image< PixelT, numOfComponents> ItkImageType;
-
   return PixelType( MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOComponentType,
                     MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOPixelType,
                     sizeof(ComponentT), numOfComponents,

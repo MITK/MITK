@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceReference.h>
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
-#include <mitkModuleContext.h>
+#include <usModuleContext.h>
 
 //QT
 #include <QMessageBox>
@@ -32,14 +32,14 @@ mitk::USDevicePersistence::USDevicePersistence() : m_devices("MITK US","Device S
 
 void mitk::USDevicePersistence::StoreCurrentDevices()
 {
-  mitk::ModuleContext* thisContext = mitk::GetModuleContext();
+  us::ModuleContext* thisContext = us::GetModuleContext();
 
-  std::list<mitk::ServiceReference> services = thisContext->GetServiceReferences<mitk::USDevice>();
+  std::vector<us::ServiceReference<USDevice> > services = thisContext->GetServiceReferences<USDevice>();
   MITK_INFO << "Trying to save " << services.size() << " US devices.";
   int numberOfSavedDevices = 0;
-  for(std::list<mitk::ServiceReference>::iterator it = services.begin(); it != services.end(); ++it)
+  for(std::vector<us::ServiceReference<USDevice> >::iterator it = services.begin(); it != services.end(); ++it)
   {
-    mitk::USDevice::Pointer currentDevice = thisContext->GetService<mitk::USDevice>(*it);
+    mitk::USDevice::Pointer currentDevice = thisContext->GetService(*it);
     //check if it is a USVideoDevice
     if (currentDevice->GetDeviceClass() == "org.mitk.modules.us.USVideoDevice")
     {

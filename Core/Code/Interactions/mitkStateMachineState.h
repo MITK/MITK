@@ -17,11 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef SMSTATE_H_HEADER_INCLUDED_C19A8A5D
 #define SMSTATE_H_HEADER_INCLUDED_C19A8A5D
 
-#include <MitkExports.h>
 #include <string>
 #include <itkLightObject.h>
-#include <itkObjectFactory.h>
 #include "mitkStateMachineTransition.h"
+#include "MitkExports.h"
 
 namespace mitk {
   /**
@@ -46,8 +45,15 @@ namespace mitk {
 
     /**
     * @brief Return Transition which matches given event description.
+    *
+    * \deprecatedSince{2013_09} Use method GetTransitionList() instead.
+    */
+    DEPRECATED(StateMachineTransition::Pointer GetTransition(const std::string& eventClass,const std::string& eventVariant));
+
+    /**
+    * @brief Return Transitions that match given event description.
     **/
-    StateMachineTransition::Pointer GetTransition(const std::string& eventClass,const std::string& eventVariant);
+    TransitionVector GetTransitionList(const std::string& eventClass,const std::string& eventVariant);
 
     /**
     * @brief Returns the name.

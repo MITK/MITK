@@ -38,7 +38,7 @@ class BERRY_COMMANDS HandlerEvent : public AbstractBitSetEvent {
 
 public:
 
-  berryObjectMacro(HandlerEvent)
+  berryObjectMacro(HandlerEvent);
 
   /**
    * Creates a new instance of this class.

@@ -27,11 +27,6 @@ class QmitkDiffusionImagingAppApplication : public QObject, public berry::IAppli
 public:
 
   QmitkDiffusionImagingAppApplication() {}
-  QmitkDiffusionImagingAppApplication(const QmitkDiffusionImagingAppApplication& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   ~QmitkDiffusionImagingAppApplication() {}
 
   int Start();

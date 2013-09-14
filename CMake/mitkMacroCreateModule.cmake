@@ -63,7 +63,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
     set(MODULE_PROVIDES ${MODULE_NAME})
     if(NOT MODULE_NO_INIT AND NOT MODULE_NAME STREQUAL "Mitk")
       # Add a dependency to the "Mitk" module
-      list(APPEND MODULE_DEPENDS Mitk)
+      #list(APPEND MODULE_DEPENDS Mitk)
     endif()
   endif()
 
@@ -149,9 +149,14 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
         endif(MITK_GENERATE_MODULE_DOT)
 
         set(DEPENDS "${MODULE_DEPENDS}")
+        if(NOT MODULE_NO_INIT)
+          # Add a CppMicroServices dependency implicitly, since it is
+          # needed for the generated "module initialization" code.
+          set(DEPENDS "CppMicroServices;${DEPENDS}")
+        endif()
         set(DEPENDS_BEFORE "not initialized")
         set(PACKAGE_DEPENDS "${MODULE_PACKAGE_DEPENDS}")
-        MITK_USE_MODULE("${MODULE_DEPENDS}")
+        MITK_USE_MODULE(${DEPENDS})
 
         # ok, now create the module itself
         include_directories(. ${ALL_INCLUDE_DIRECTORIES})
@@ -241,7 +246,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           set(_STATIC )
         endif(MODULE_FORCE_STATIC)
 
-        if(NOT MODULE_NO_INIT)
+        if(NOT MODULE_NO_INIT AND NOT MODULE_HEADERS_ONLY)
           set(MODULE_LIBNAME ${MODULE_PROVIDES})
 
           usFunctionGenerateModuleInit(CPP_FILES
@@ -286,7 +291,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           endif(UI_FILES)
 
           if(MOC_H_FILES)
-            QT4_WRAP_CPP(Q${KITNAME}_GENERATED_MOC_CPP ${MOC_H_FILES})
+            QT4_WRAP_CPP(Q${KITNAME}_GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
           endif(MOC_H_FILES)
 
           if(QRC_FILES)

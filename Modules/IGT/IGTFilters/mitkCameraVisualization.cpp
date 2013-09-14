@@ -82,7 +82,9 @@ void mitk::CameraVisualization::GenerateData()
   /* because of an itk bug, the transform can not be calculated with float datatype.
   To use it in the mitk geometry classes, it has to be transfered to mitk::ScalarType which is float */
   static AffineTransform3D::MatrixType m;
-  mitk::TransferMatrix(quatTransform->GetMatrix(), m);
+  //mitk::TransferMatrix(quatTransform->GetMatrix(), m);
+  m = navigationData->GetOrientation().rotation_matrix_transpose();
+
 
   Vector3D directionOfProjection = m*m_DirectionOfProjectionInToolCoordinates;
   directionOfProjection.Normalize();

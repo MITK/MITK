@@ -84,7 +84,7 @@ struct IWorkbenchPage;
  */
 struct BERRY_UI IWorkbench : public IServiceLocator {
 
-  berryInterfaceMacro(IWorkbench, berry)
+  berryInterfaceMacro(IWorkbench, berry);
 
   virtual ~IWorkbench();
 

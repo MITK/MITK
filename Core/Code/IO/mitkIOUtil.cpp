@@ -21,11 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSetWriter.h"
 #include "mitkSurfaceVtkWriter.h"
 
-#include <mitkGetModuleContext.h>
-#include <mitkModuleContext.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkIDataNodeReader.h>
 #include <mitkProgressBar.h>
+#include <mitkExceptionMacro.h>
+#include <mitkCoreObjectFactory.h>
 
 //ITK
 #include <itksys/SystemTools.hxx>
@@ -35,6 +37,209 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTriangleFilter.h>
 #include <vtkSmartPointer.h>
 
+#include <cerrno>
+#include <cstdlib>
+
+static std::string GetLastErrorStr()
+{
+#ifdef US_PLATFORM_POSIX
+  return std::string(strerror(errno));
+#else
+  // Retrieve the system error message for the last-error code
+  LPVOID lpMsgBuf;
+  DWORD dw = GetLastError();
+
+  FormatMessage(
+    FORMAT_MESSAGE_ALLOCATE_BUFFER |
+    FORMAT_MESSAGE_FROM_SYSTEM |
+    FORMAT_MESSAGE_IGNORE_INSERTS,
+    NULL,
+    dw,
+    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+    (LPTSTR) &lpMsgBuf,
+    0, NULL );
+
+  std::string errMsg((LPCTSTR)lpMsgBuf);
+
+  LocalFree(lpMsgBuf);
+
+  return errMsg;
+#endif
+}
+
+#ifdef US_PLATFORM_WINDOWS
+
+#include <io.h>
+#include <fcntl.h>
+#include <direct.h>
+#include <sys/stat.h>
+
+static const char validLetters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+// A Windows version of the POSIX mkstemp function
+static int mkstemp(char* tmpl)
+{
+  static unsigned long long value = 0;
+  unsigned long long randomTimeBits = 0;
+  int savedErrno = errno;
+
+  // Lower bound on the number of temporary files to attempt to generate.
+#define ATTEMPTS_MIN (62 * 62 * 62)
+
+  /* The number of times to attempt to generate a temporary file.  To
+     conform to POSIX, this must be no smaller than TMP_MAX.  */
+#if ATTEMPTS_MIN < TMP_MAX
+  const unsigned int attempts = TMP_MAX;
+#else
+  const unsigned int attempts = ATTEMPTS_MIN;
+#endif
+
+  const int len = strlen(tmpl);
+  if (len < 6 || strcmp(&tmpl[len - 6], "XXXXXX"))
+  {
+    errno = EINVAL;
+    return -1;
+  }
+
+  /* This is where the Xs start.  */
+  char* XXXXXX = &tmpl[len - 6];
+
+  /* Get some more or less random data.  */
+  {
+    SYSTEMTIME stNow;
+    FILETIME ftNow;
+
+    // get system time
+    GetSystemTime(&stNow);
+    stNow.wMilliseconds = 500;
+    if (!SystemTimeToFileTime(&stNow, &ftNow))
+    {
+      errno = -1;
+      return -1;
+    }
+
+    randomTimeBits = ((static_cast<unsigned long long>(ftNow.dwHighDateTime) << 32)
+                      | static_cast<unsigned long long>(ftNow.dwLowDateTime));
+  }
+  value += randomTimeBits ^ static_cast<unsigned long long>(GetCurrentThreadId());
+
+  for (unsigned int count = 0; count < attempts; value += 7777, ++count)
+  {
+    unsigned long long v = value;
+
+    /* Fill in the random bits.  */
+    XXXXXX[0] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[1] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[2] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[3] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[4] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[5] = validLetters[v % 62];
+
+    int fd = _open (tmpl, _O_RDWR | _O_CREAT | _O_EXCL, _S_IREAD | _S_IWRITE);
+    if (fd >= 0)
+    {
+      errno = savedErrno;
+      return fd;
+    }
+    else if (errno != EEXIST)
+    {
+      return -1;
+    }
+  }
+
+  /* We got out of the loop because we ran out of combinations to try.  */
+  errno = EEXIST;
+  return -1;
+}
+
+// A Windows version of the POSIX mkdtemp function
+static char* mkdtemp(char* tmpl)
+{
+  static unsigned long long value = 0;
+  unsigned long long randomTimeBits = 0;
+  int savedErrno = errno;
+
+  // Lower bound on the number of temporary dirs to attempt to generate.
+#define ATTEMPTS_MIN (62 * 62 * 62)
+
+  /* The number of times to attempt to generate a temporary dir.  To
+     conform to POSIX, this must be no smaller than TMP_MAX.  */
+#if ATTEMPTS_MIN < TMP_MAX
+  const unsigned int attempts = TMP_MAX;
+#else
+  const unsigned int attempts = ATTEMPTS_MIN;
+#endif
+
+  const int len = strlen(tmpl);
+  if (len < 6 || strcmp(&tmpl[len - 6], "XXXXXX"))
+  {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  /* This is where the Xs start.  */
+  char* XXXXXX = &tmpl[len - 6];
+
+  /* Get some more or less random data.  */
+  {
+    SYSTEMTIME stNow;
+    FILETIME ftNow;
+
+    // get system time
+    GetSystemTime(&stNow);
+    stNow.wMilliseconds = 500;
+    if (!SystemTimeToFileTime(&stNow, &ftNow))
+    {
+      errno = -1;
+      return NULL;
+    }
+
+    randomTimeBits = ((static_cast<unsigned long long>(ftNow.dwHighDateTime) << 32)
+                      | static_cast<unsigned long long>(ftNow.dwLowDateTime));
+  }
+  value += randomTimeBits ^ static_cast<unsigned long long>(GetCurrentThreadId());
+
+  unsigned int count = 0;
+  for (; count < attempts; value += 7777, ++count)
+  {
+    unsigned long long v = value;
+
+    /* Fill in the random bits.  */
+    XXXXXX[0] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[1] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[2] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[3] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[4] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[5] = validLetters[v % 62];
+
+    int fd = _mkdir (tmpl); //, _S_IREAD | _S_IWRITE | _S_IEXEC);
+    if (fd >= 0)
+    {
+      errno = savedErrno;
+      return tmpl;
+    }
+    else if (errno != EEXIST)
+    {
+      return NULL;
+    }
+  }
+
+  /* We got out of the loop because we ran out of combinations to try.  */
+  errno = EEXIST;
+  return NULL;
+}
+
+#endif
 
 namespace mitk {
 
@@ -42,17 +247,129 @@ const std::string IOUtil::DEFAULTIMAGEEXTENSION = ".nrrd";
 const std::string IOUtil::DEFAULTSURFACEEXTENSION = ".stl";
 const std::string IOUtil::DEFAULTPOINTSETEXTENSION = ".mps";
 
+#ifdef US_PLATFORM_WINDOWS
+std::string IOUtil::GetProgramPath()
+{
+  char path[512];
+  std::size_t index = std::string(path, GetModuleFileName(NULL, path, 512)).find_last_of('\\');
+  return std::string(path, index);
+}
+#elif defined(US_PLATFORM_APPLE)
+#include <mach-o/dyld.h>
+std::string IOUtil::GetProgramPath()
+{
+  char path[512];
+  uint32_t size = sizeof(path);
+  if (_NSGetExecutablePath(path, &size) == 0)
+  {
+    std::size_t index = std::string(path).find_last_of('/');
+    std::string strPath = std::string(path, index);
+    //const char* execPath = strPath.c_str();
+    //mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(execPath,false);
+    return strPath;
+  }
+  return std::string();
+}
+#else
+#include <sys/types.h>
+#include <unistd.h>
+#include <sstream>
+std::string IOUtil::GetProgramPath()
+{
+  std::stringstream ss;
+  ss << "/proc/" << getpid() << "/exe";
+  char proc[512] = {0};
+  ssize_t ch = readlink(ss.str().c_str(), proc, 512);
+  if (ch == -1) return std::string();
+  std::size_t index = std::string(proc).find_last_of('/');
+  return std::string(proc, index);
+}
+#endif
+
+std::string IOUtil::GetTempPath()
+{
+  static std::string result;
+  if (result.empty())
+  {
+#ifdef US_PLATFORM_WINDOWS
+    char tempPathTestBuffer[1];
+    DWORD bufferLength = ::GetTempPath(1, tempPathTestBuffer);
+    if (bufferLength == 0)
+    {
+      mitkThrow() << GetLastErrorStr();
+    }
+    std::vector<char> tempPath(bufferLength);
+    bufferLength = ::GetTempPath(bufferLength, &tempPath[0]);
+    if (bufferLength == 0)
+    {
+      mitkThrow() << GetLastErrorStr();
+    }
+    result.assign(tempPath.begin(), tempPath.begin() + static_cast<std::size_t>(bufferLength));
+#else
+    result = "/tmp/";
+#endif
+  }
+
+  return result;
+}
+
+std::string IOUtil::CreateTemporaryFile(std::ofstream& f, const std::string& templateName, std::string path)
+{
+  if (path.empty())
+  {
+    path = GetTempPath();
+  }
+
+  path += "/" + templateName;
+  std::vector<char> dst_path(path.begin(), path.end());
+  dst_path.push_back('\0');
+
+  int fd = mkstemp(&dst_path[0]);
+  if(fd != -1)
+  {
+    path.assign(dst_path.begin(), dst_path.end() - 1);
+    f.open(path.c_str(),
+           std::ios_base::trunc | std::ios_base::out);
+    close(fd);
+  }
+  else
+  {
+    mitkThrow() << "Creating temporary file " << &dst_path[0] << " failed: " << GetLastErrorStr();
+  }
+  return path;
+}
+
+std::string IOUtil::CreateTemporaryDirectory(const std::string& templateName, std::string path)
+{
+  if (path.empty())
+  {
+    path = GetTempPath();
+  }
+
+  path += "/" + templateName;
+  std::vector<char> dst_path(path.begin(), path.end());
+  dst_path.push_back('\0');
+
+  if(mkdtemp(&dst_path[0]) == NULL)
+  {
+    mitkThrow() << "Creating temporary directory " << &dst_path[0] << " failed: " << GetLastErrorStr();
+  }
+
+  path.assign(dst_path.begin(), dst_path.end() - 1);
+  return path;
+}
+
 int IOUtil::LoadFiles(const std::vector<std::string> &fileNames, DataStorage &ds)
 {
     // Get the set of registered mitk::IDataNodeReader services
-    ModuleContext* context = mitk::GetModuleContext();
-    const std::list<ServiceReference> refs = context->GetServiceReferences<IDataNodeReader>();
+    us::ModuleContext* context = us::GetModuleContext();
+    const std::vector<us::ServiceReference<IDataNodeReader> > refs = context->GetServiceReferences<IDataNodeReader>();
     std::vector<IDataNodeReader*> services;
     services.reserve(refs.size());
-    for (std::list<ServiceReference>::const_iterator i = refs.begin();
+    for (std::vector<us::ServiceReference<IDataNodeReader> >::const_iterator i = refs.begin();
          i != refs.end(); ++i)
     {
-        IDataNodeReader* s = context->GetService<IDataNodeReader>(*i);
+        IDataNodeReader* s = context->GetService(*i);
         if (s != 0)
         {
             services.push_back(s);
@@ -84,7 +401,7 @@ int IOUtil::LoadFiles(const std::vector<std::string> &fileNames, DataStorage &ds
         mitk::ProgressBar::GetInstance()->Progress(2);
     }
 
-    for (std::list<ServiceReference>::const_iterator i = refs.begin();
+    for (std::vector<us::ServiceReference<IDataNodeReader> >::const_iterator i = refs.begin();
          i != refs.end(); ++i)
     {
         context->UngetService(*i);
@@ -170,8 +487,10 @@ PointSet::Pointer IOUtil::LoadPointSet(const std::string path)
 bool IOUtil::SaveImage(mitk::Image::Pointer image, const std::string path)
 {
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
-    std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( path );
-    std::string extension = itksys::SystemTools::GetFilenameLastExtension( path );
+    std::string baseFilename = itksys::SystemTools::GetFilenameWithoutExtension( path );
+    std::string extension = itksys::SystemTools::GetFilenameExtension( path );
+    if (dir == "")
+      dir = ".";
     std::string finalFileName = dir + "/" + baseFilename;
 
     mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
@@ -213,6 +532,8 @@ bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string path)
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( path );
     std::string extension = itksys::SystemTools::GetFilenameLastExtension( path );
+    if (dir == "")
+      dir = ".";
     std::string finalFileName = dir + "/" + baseFilename;
 
     if (extension == "") // if no extension has been set we use the default extension
@@ -283,6 +604,8 @@ bool IOUtil::SavePointSet(PointSet::Pointer pointset, const std::string path)
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( path );
     std::string extension = itksys::SystemTools::GetFilenameLastExtension( path );
+    if (dir == "")
+      dir = ".";
     std::string finalFileName = dir + "/" + baseFilename;
 
     if (extension == "") // if no extension has been entered manually into the filename
@@ -314,4 +637,60 @@ bool IOUtil::SavePointSet(PointSet::Pointer pointset, const std::string path)
     }
     return true;
 }
+
+bool IOUtil::SaveBaseData( mitk::BaseData* data, const std::string& path )
+{
+  if (data == NULL || path.empty()) return false;
+
+  std::string dir = itksys::SystemTools::GetFilenamePath( path );
+  std::string baseFilename = itksys::SystemTools::GetFilenameWithoutExtension( path );
+  std::string extension = itksys::SystemTools::GetFilenameExtension( path );
+  if (dir == "")
+    dir = ".";
+  std::string fileNameWithoutExtension = dir + "/" + baseFilename;
+
+  mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
+
+  for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
+  {
+    if ( (*it)->CanWriteBaseDataType(data) )
+    {
+      // Ensure a valid filename
+      if(baseFilename=="")
+      {
+        baseFilename = (*it)->GetDefaultFilename();
+      }
+      // Check if an extension exists already and if not, append the default extension
+      if (extension=="" )
+      {
+        extension=(*it)->GetDefaultExtension();
+      }
+      else
+      {
+        if (!(*it)->IsExtensionValid(extension))
+        {
+          MITK_WARN << extension << " extension is unknown";
+          continue;
+        }
+      }
+
+      std::string finalFileName = fileNameWithoutExtension + extension;
+      try
+      {
+        (*it)->SetFileName( finalFileName.c_str() );
+        (*it)->DoWrite( data );
+        return true;
+      }
+      catch( const std::exception& e )
+      {
+        MITK_ERROR << " during attempt to write '" << finalFileName << "' Exception says:";
+        MITK_ERROR << e.what();
+        mitkThrow() << "An exception occured during writing the file " << finalFileName << ". Exception says " << e.what();
+      }
+    }
+  }
+
+  return false;
+}
+
 }

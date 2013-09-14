@@ -58,7 +58,7 @@ namespace berry
 struct BERRY_COMMON_RUNTIME IStatus: public Object
 {
 
-  berryInterfaceMacro(IStatus, berry)
+  berryInterfaceMacro(IStatus, berry);
 
   enum Severity
   {

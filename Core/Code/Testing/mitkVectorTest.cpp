@@ -65,7 +65,7 @@ int mitkVectorTest(int /*argc*/, char* /*argv*/[])
 
   MITK_TEST_CONDITION(mitk::Equal(mitk_vnl_vector_1,mitk_vnl_vector_1), "Test mitk vnl vector equality using the same mitk vnl vector with mitk::eps");
   MITK_TEST_CONDITION(!mitk::Equal(mitk_vnl_vector_1,mitk_vnl_vector_2), "Test mitk vnl vector equality using different mitk vnl vectors with an element-wise difference greater than mitk::eps");
-  MITK_TEST_CONDITION( mitk::Equal(mitk_vnl_vector_1, mitk_vnl_vector_2, mitk::eps*1.2), "Vnl vectors are equal for higher epsilon tolerance ( 1.2 * mitk::eps )");
+  MITK_TEST_CONDITION( mitk::Equal(mitk_vnl_vector_1, mitk_vnl_vector_2, true, mitk::eps*1.2), "Vnl vectors are equal for higher epsilon tolerance ( 1.2 * mitk::eps )");
   MITK_TEST_CONDITION(mitk::Equal(mitk_vnl_vector_1,mitk_vnl_vector_3), "Test mitk vnl vector equality using different mitk vnl vectors with an element-wise difference less than mitk::eps");
 
   // test vnl_vector equality method

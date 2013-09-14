@@ -411,11 +411,11 @@ const DicomSeriesReader::TagToPropertyMapType& DicomSeriesReader::GetDICOMTagsTo
 
 
 DataNode::Pointer
-DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback)
+DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback, Image::Pointer preLoadedImageBlock)
 {
   DataNode::Pointer node = DataNode::New();
 
-  if (DicomSeriesReader::LoadDicomSeries(filenames, *node, sort, check_4d, correctTilt, callback))
+  if (DicomSeriesReader::LoadDicomSeries(filenames, *node, sort, check_4d, correctTilt, callback, preLoadedImageBlock))
   {
     if( filenames.empty() )
     {
@@ -431,7 +431,14 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, 
 }
 
 bool
-DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback)
+DicomSeriesReader::LoadDicomSeries(
+    const StringContainer &filenames,
+    DataNode &node,
+    bool sort,
+    bool check_4d,
+    bool correctTilt,
+    UpdateCallBackMethod callback,
+    Image::Pointer preLoadedImageBlock)
 {
   if( filenames.empty() )
   {
@@ -454,34 +461,34 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &n
         switch (io->GetComponentType())
         {
           case DcmIoType::UCHAR:
-            DicomSeriesReader::LoadDicom<unsigned char>(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<unsigned char>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::CHAR:
-            DicomSeriesReader::LoadDicom<char>(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<char>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::USHORT:
-            DicomSeriesReader::LoadDicom<unsigned short>(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<unsigned short>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::SHORT:
-            DicomSeriesReader::LoadDicom<short>(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<short>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::UINT:
-            DicomSeriesReader::LoadDicom<unsigned int>(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<unsigned int>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::INT:
-            DicomSeriesReader::LoadDicom<int>(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<int>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::ULONG:
-            DicomSeriesReader::LoadDicom<long unsigned int>(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<long unsigned int>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::LONG:
-            DicomSeriesReader::LoadDicom<long int>(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<long int>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::FLOAT:
-            DicomSeriesReader::LoadDicom<float>(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<float>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::DOUBLE:
-            DicomSeriesReader::LoadDicom<double>(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<double>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           default:
             MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
@@ -492,34 +499,34 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &n
         switch (io->GetComponentType())
         {
           case DcmIoType::UCHAR:
-            DicomSeriesReader::LoadDicom< itk::RGBPixel<unsigned char> >(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom< itk::RGBPixel<unsigned char> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::CHAR:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<char> >(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<itk::RGBPixel<char> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::USHORT:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<unsigned short> >(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<itk::RGBPixel<unsigned short> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::SHORT:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<short> >(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<itk::RGBPixel<short> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::UINT:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<unsigned int> >(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<itk::RGBPixel<unsigned int> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::INT:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<int> >(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<itk::RGBPixel<int> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::ULONG:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<long unsigned int> >(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<itk::RGBPixel<long unsigned int> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::LONG:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<long int> >(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<itk::RGBPixel<long int> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::FLOAT:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<float> >(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<itk::RGBPixel<float> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           case DcmIoType::DOUBLE:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<double> >(filenames, node, sort, check_4d, correctTilt, callback);
+            DicomSeriesReader::LoadDicom<itk::RGBPixel<double> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
             break;
           default:
             MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
@@ -1650,8 +1657,15 @@ DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
   sorter.SetSortFunction(DicomSeriesReader::GdcmSortFunction);
   try
   {
-    sorter.Sort(unsortedFilenames);
-    return sorter.GetFilenames();
+    if (sorter.Sort(unsortedFilenames))
+    {
+      return sorter.GetFilenames();
+    }
+    else
+    {
+      MITK_WARN << "Sorting error. Leaving series unsorted.";
+      return unsortedFilenames;
+    }
   }
   catch(std::logic_error&)
   {
@@ -1676,8 +1690,8 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
      - slice thickness
      - number of rows/columns
   */
-  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
-  const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
+  static const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
+  static const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
 
   // see if we have Image Position and Orientation
   if ( ds1.FindDataElement(tagImagePositionPatient) && ds1.FindDataElement(tagImageOrientation) &&
@@ -1737,7 +1751,7 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
     else // we need to check more properties to distinguish slices
     {
       // try to sort by Acquisition Number
-      const gdcm::Tag tagAcquisitionNumber(0x0020, 0x0012);
+      static const gdcm::Tag tagAcquisitionNumber(0x0020, 0x0012);
       if (ds1.FindDataElement(tagAcquisitionNumber) && ds2.FindDataElement(tagAcquisitionNumber))
       {
         gdcm::Attribute<0x0020,0x0012> acquisition_number1; // Acquisition number
@@ -1753,7 +1767,7 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
         else // neither position nor acquisition number are good for sorting, so check more
         {
           // try to sort by Acquisition Time
-          const gdcm::Tag tagAcquisitionTime(0x0008, 0x0032);
+          static const gdcm::Tag tagAcquisitionTime(0x0008, 0x0032);
           if (ds1.FindDataElement(tagAcquisitionTime) && ds2.FindDataElement(tagAcquisitionTime))
           {
             gdcm::Attribute<0x0008,0x0032> acquisition_time1; // Acquisition time
@@ -1769,7 +1783,7 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
             else // we gave up on image position, acquisition number and acquisition time now
             {
               // let's try trigger time
-              const gdcm::Tag tagTriggerTime(0x0018, 0x1060);
+              static const gdcm::Tag tagTriggerTime(0x0018, 0x1060);
               if (ds1.FindDataElement(tagTriggerTime) && ds2.FindDataElement(tagTriggerTime))
               {
                 gdcm::Attribute<0x0018,0x1060> trigger_time1; // Trigger time
@@ -1794,7 +1808,7 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
 
   // LAST RESORT: all valuable information for sorting is missing.
   // Sort by some meaningless but unique identifiers to satisfy the sort function
-  const gdcm::Tag tagSOPInstanceUID(0x0008, 0x0018);
+  static const gdcm::Tag tagSOPInstanceUID(0x0008, 0x0018);
   if (ds1.FindDataElement(tagSOPInstanceUID) && ds2.FindDataElement(tagSOPInstanceUID))
   {
     MITK_DEBUG << "Dicom images are missing attributes for a meaningful sorting, falling back to SOP instance UID comparison.";

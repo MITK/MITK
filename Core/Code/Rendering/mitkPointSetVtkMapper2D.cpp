@@ -109,7 +109,8 @@ m_LineWidth(1),
 m_PointLineWidth(1),
 m_Point2DSize(6),
 m_IDShapeProperty(mitk::PointSetShapeProperty::CROSS),
-m_FillShape(false)
+m_FillShape(false),
+m_DistanceToPlane(4.0f)
 {
 }
 
@@ -308,8 +309,8 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     float diff = planeGeometry->DistanceFromPlane(point);
     diff = diff * diff;
 
-    // if point is close to current plane ( distance < 4) it will be displayed
-    if(diff < 4.0)
+    // draw markers on slices a certain distance away from the points true location according to the tolerance threshold (m_DistanceToPlane)
+    if(diff < m_DistanceToPlane)
     {
 
       // is point selected or not?
@@ -325,7 +326,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
         // point is scaled according to its distance to the plane
         ls->m_UnselectedScales->InsertNextTuple3(m_Point2DSize - (2*diff),0,0);
       }
-
 
       //---- LABEL -----//
 
@@ -606,6 +606,7 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   node->GetIntProperty("point line width",    m_PointLineWidth, renderer);
   node->GetIntProperty("point 2D size",       m_Point2DSize, renderer);
   node->GetBoolProperty("Pointset.2D.fill shape", m_FillShape, renderer);
+  node->GetFloatProperty("Pointset.2D.distance to plane", m_DistanceToPlane, renderer );
 
   mitk::PointSetShapeProperty::Pointer shape = dynamic_cast<mitk::PointSetShapeProperty*>(this->GetDataNode()->GetProperty( "Pointset.2D.shape", renderer ));
   if(shape.IsNotNull())
@@ -715,9 +716,9 @@ void mitk::PointSetVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk:
   node->AddProperty( "show distant lines", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "layer", mitk::IntProperty::New(1), renderer, overwrite );
   node->AddProperty( "Pointset.2D.fill shape", mitk::BoolProperty::New(false), renderer, overwrite); // fill or do not fill the glyph shape
-
   mitk::PointSetShapeProperty::Pointer pointsetShapeProperty = mitk::PointSetShapeProperty::New();
   node->AddProperty( "Pointset.2D.shape", pointsetShapeProperty, renderer, overwrite);
+  node->AddProperty( "Pointset.2D.distance to plane", mitk::FloatProperty::New(4.0f), renderer, overwrite ); //show the point at a certain distance above/below the 2D imaging plane.
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

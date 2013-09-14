@@ -95,7 +95,6 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
         palette.setColor(QPalette::Button, result);
         colorBtn->setPalette(palette);
         colorBtn->setStyleSheet(QString("background-color: %1;foreground-color: %1; border-style: none;").arg(result.name()));
-        //colorBtn->setFlat(true);
       }
       // QColorDialog closed by 'Cancel' button, use the old property color
       else
@@ -111,17 +110,6 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
 
       editorWidget = colorBtn;
     }
-
-/*
-    else if(data.type() == QVariant::Bool)
-    {
-      QCheckBox *visibilityCheckBox = new QCheckBox(parent);
-      connect(visibilityCheckBox, SIGNAL(editingFinished()),
-        this, SLOT(commitAndCloseEditor()));
-
-      return visibilityCheckBox;
-    }*/
-
 
     else if(data.type() == QVariant::Int)
     {
@@ -190,34 +178,7 @@ void QmitkPropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &in
 
   if(data.isValid())
   {
-
-    if(data.type() == QVariant::Color)
-    {
-
-      /*
-      QPushButton *colorBtn = qobject_cast<QPushButton *>(editor);
-      QColor qcol = data.value<QColor>();
-      colorBtn->setPalette(QPalette(qcol));
-
-
-      QColor result = QColorDialog::getColor(qcol);
-      if(result.isValid())
-      {
-        colorBtn->setPalette(QPalette(result));
-      }
-*/
-
-    }
-
-
-/*
-    else if(data.type() == QVariant::Bool)
-    {
-      QCheckBox *visibilityCheckBox = qobject_cast<QCheckBox *>(editor);
-      visibilityCheckBox->setChecked(data.toBool());
-    }*/
-
-    /*else*/ if(data.type() == QVariant::Int)
+    if(data.type() == QVariant::Int)
     {
       QSpinBox* spinBox = qobject_cast<QSpinBox *>(editor);
       spinBox->setValue(data.toInt());
@@ -235,9 +196,6 @@ void QmitkPropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &in
       QComboBox* comboBox = qobject_cast<QComboBox *>(editor);
       QString displayString = displayData.value<QString>();
       comboBox->setCurrentIndex(comboBox->findData(displayString));
-
-//       connect(comboBox, SIGNAL(currentIndexChanged(int)),
-//         this, SLOT(ComboBoxCurrentIndexChanged(int)));
     }
 
     else
@@ -305,25 +263,8 @@ void QmitkPropertyDelegate::commitAndCloseEditor()
   QWidget* editor = 0;
   if(QPushButton *pushBtn = qobject_cast<QPushButton *>(sender()))
   {
-/*
-    QColor result = QColorDialog::getColor(pushBtn->palette().color(QPalette::Window));
-    if(result.isValid())
-    {
-      QPalette palette = pushBtn->palette();
-      palette.setColor(QPalette::Window, result);
-      pushBtn->setPalette(palette);
-    }*/
-
     editor = pushBtn;
   }
-
-
-/*
-  else if(QCheckBox *chkBox = qobject_cast<QCheckBox *>(sender()))
-  {
-    editor = chkBox;
-  }*/
-
 
   if(editor)
   {
@@ -337,21 +278,6 @@ void QmitkPropertyDelegate::updateEditorGeometry(QWidget *editor,
                                                     const QStyleOptionViewItem &option,
                                                     const QModelIndex & /*index*/) const
 {
-/*
-  QRect rect = option.rect;
-
-  if (QCheckBox* checkBoxEditor = qobject_cast<QCheckBox*>(editor))
-  {
-    const QStyle *style = QApplication::style();
-
-    const int indicatorWidth = style->pixelMetric(QStyle::PM_IndicatorWidth, &option);
-    const int indicatorHeight = style->pixelMetric(QStyle::PM_IndicatorHeight, &option);
-    rect = QRect(option.rect.x()+ option.rect.width()/2-indicatorWidth/2,
-      option.rect.y()+ option.rect.height()/2-indicatorHeight/2,
-      indicatorWidth, indicatorHeight);
-  }
-*/
-
   editor->setGeometry(option.rect);
 }
 

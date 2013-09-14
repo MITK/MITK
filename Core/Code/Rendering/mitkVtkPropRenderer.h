@@ -92,7 +92,17 @@ public:
   virtual void Resize(int w, int h);
 
   // Picking
-  enum PickingMode{ WorldPointPicking, PointPicking };
+  enum PickingMode{ WorldPointPicking, PointPicking, CellPicking};
+  /** \brief  Set the picking mode.
+  This method is used to set the picking mode for 3D object picking. The user can select one of
+  the three options WorldPointPicking, PointPicking and CellPicking. The first option uses the zBuffer
+  from graphics rendering, the second uses the 3D points from the closest surface mesh, and the third
+  option uses the cells   of that mesh. The last option is the slowest, the first one the fastest.
+  However, the first option cannot use transparent data object and the tolerance of the picked position
+  to the selected point should be considered. PointPicking also need a tolerance around the picking
+  position to select the closest point in the mesh. The CellPicker performs very well, if the
+  foreground surface part (i.e. the surfacepart that is closest to the scene's cameras) needs to be
+  picked. */
   itkSetEnumMacro( PickingMode, PickingMode );
   itkGetEnumMacro( PickingMode, PickingMode );
 
@@ -101,6 +111,7 @@ public:
 
   // Simple text rendering method
   int WriteSimpleText(std::string text, double posX, double posY, double color1 = 0.0, double color2 = 1.0, double color3 = 0.0, float opacity = 1.0);
+
   vtkTextProperty * GetTextLabelProperty(int text_id);
 
   // Initialization / geometry handling
@@ -145,6 +156,16 @@ protected:
   VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm = NULL );
   virtual ~VtkPropRenderer();
   virtual void Update();
+
+  /**
+    \brief Convert display geometry coordinates to VTK coordinates.
+
+    For use within WriteSimpleText: the input is display geometry coordinates
+    but the text actor needs positions that fit in a specified viewport.
+    Conversion is done in this method.
+  */
+  mitk::Point2D TransformOpenGLPointToViewport( mitk::Point2D point );
+
 
 private:
 

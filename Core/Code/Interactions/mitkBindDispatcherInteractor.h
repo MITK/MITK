@@ -41,7 +41,7 @@ namespace mitk
   {
 
   public:
-    BindDispatcherInteractor();
+    BindDispatcherInteractor( const std::string& );
     ~BindDispatcherInteractor();
 
     /**

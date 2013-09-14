@@ -13,39 +13,29 @@ if(MITK_USE_DCMTK)
   set(proj_DEPENDENCIES )
   set(DCMTK_DEPENDS ${proj})
 
-if(CMAKE_GENERATOR MATCHES Xcode)
-  set(DCMTK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchDCMTK-20122202.cmake)
-endif()
+  if(CMAKE_GENERATOR MATCHES Xcode)
+    set(DCMTK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchDCMTK-20121102.cmake)
+  endif()
 
   if(NOT DEFINED DCMTK_DIR)
-    if(UNIX)
-      set(DCMTK_CXX_FLAGS "-fPIC")
-      set(DCMTK_C_FLAGS "-fPIC")
-    endif(UNIX)
     if(DCMTK_DICOM_ROOT_ID)
       set(DCMTK_CXX_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
       set(DCMTK_C_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
-    endif()
-
-
-    set (dcmtk_shared_flags "-DBUILD_SHARED_LIBS:BOOL=${MITK_DCMTK_BUILD_SHARED_LIBS}")
-    if (NOT MITK_DCMTK_BUILD_SHARED_LIBS)
-      set (dcmtk_shared_flags ${dcmtk_shared_flags} "-DDCMTK_FORCE_FPIC_ON_UNIX:BOOL=ON")
     endif()
 
     ExternalProject_Add(${proj}
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.1_20120222.tar.gz
-      URL_MD5 86fa9e0f91e4e0c6b44d513ea48391d6
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.1_20121102.tar.gz
+      URL_MD5 39d97456027a4219ce47e566e3ab123b
       INSTALL_DIR ${proj}-install
       PATCH_COMMAND ${DCMTK_PATCH_COMMAND}
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
          ${ep_common_args}
-         -DDCMTK_OVERWRITE_WIN32_COMPILER_FLAGS:BOOL=OFF
-         ${dcmtk_shared_flags}
+         #-DDCMTK_OVERWRITE_WIN32_COMPILER_FLAGS:BOOL=OFF
+         -DBUILD_SHARED_LIBS:BOOL=ON
          "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS} ${DCMTK_CXX_FLAGS}"
          "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS} ${DCMTK_C_FLAGS}"
          -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
@@ -58,6 +48,7 @@ endif()
          -DDCMTK_WITH_TIFF:BOOL=OFF  # see bug #9894
          -DDCMTK_WITH_XML:BOOL=OFF  # see bug #9894
          -DDCMTK_WITH_ICONV:BOOL=OFF  # see bug #9894
+         -DCMAKE_INSTALL_NAME_DIR:STRING=<INSTALL_DIR>/lib
       DEPENDS ${proj_DEPENDENCIES}
       )
     set(DCMTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)

@@ -148,7 +148,7 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
     /**
       Gets the working slice based on the last saved interaction
     */
-    mitk::Image::Pointer GetWorkingSlice();
+    mitk::Image::Pointer GetWorkingSlice(const mitk::PlaneGeometry* planeGeometry);
 
     /*
       Opens popup to ask about which orientation should be interpolated

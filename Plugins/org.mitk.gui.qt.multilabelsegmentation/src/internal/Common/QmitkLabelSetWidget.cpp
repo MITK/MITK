@@ -181,7 +181,7 @@ void QmitkLabelSetWidget::OnRenameLabel(int index, const mitk::Color& color, con
     QStringList organColors;
     if (storedList.isEmpty())
     {
-        organColors = GetDefaultOrganColorString();
+      organColors = GetDefaultOrganColorString();
     }
     else
     {

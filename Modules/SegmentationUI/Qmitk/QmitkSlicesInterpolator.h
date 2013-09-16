@@ -32,8 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QWidget>
 #include <QComboBox>
-#include <QFrame>
-#include <QRadioButton>
 #include <QGroupBox>
 #include <QCheckBox>
 
@@ -52,7 +50,6 @@ namespace mitk
 }
 
 class QPushButton;
-
 
 /**
   \brief GUI for slices interpolation.
@@ -128,7 +125,7 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
 
     /**
      * @brief Set the visibility of the 3d interpolation
-     */
+    */
     void Show3DInterpolationResult(bool);
 
     void EnableInterpolation(bool);
@@ -162,7 +159,7 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
 
     /*
      * Will trigger interpolation for all slices in given orientation (called from popup menu of OnAcceptAllInterpolationsClicked)
-     */
+    */
     void OnAcceptAllPopupActivated(QAction* action);
 
     void ActivateInterpolation(bool);
@@ -196,13 +193,13 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
 
       \param e is a actually a mitk::SliceNavigationController::GeometrySliceEvent, sent by a SliceNavigationController
       \param slice the SliceNavigationController
-          */
+    */
     bool TranslateAndInterpolateChangedSlice(const itk::EventObject& e, mitk::SliceNavigationController* slicer);
 
     /**
       Given a PlaneGeometry, this method figures out which slice of the first working image (of the associated ToolManager)
       should be interpolated. The actual work is then done by our SegmentationInterpolation object.
-     */
+    */
     void Interpolate( mitk::PlaneGeometry* plane, unsigned int timeStep, mitk::SliceNavigationController *slicer );
 
     //void InterpolateSurface();

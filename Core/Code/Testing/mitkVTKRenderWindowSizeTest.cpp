@@ -24,6 +24,7 @@ void CheckRWSize(unsigned int width, unsigned int height)
   MITK_TEST_OUTPUT(<<"Requesting VTK render window of size " << width << "x" << height );
   vtkSmartPointer<vtkRenderWindow> renderWindowVTK = vtkRenderWindow::New();
   renderWindowVTK->SetSize( width, height );
+  renderWindowVTK->SetOffScreenRendering(1); // seems to be related to off-screen rendering (only?)
 
   int* renderWindowSize = renderWindowVTK->GetSize();
 

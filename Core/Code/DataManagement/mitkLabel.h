@@ -91,8 +91,11 @@ public:
     const mitk::Color& GetColor() const
     { return m_Color; };
 
-    itkSetMacro(Index, int);
-    itkGetConstMacro(Index, int);
+    itkSetMacro(Index, unsigned int);
+    itkGetConstMacro(Index, unsigned int);
+
+    itkSetMacro(Component, unsigned int);
+    itkGetConstMacro(Component, unsigned int);
 
     Label();
     virtual ~Label();
@@ -114,7 +117,8 @@ protected:
     std::string m_LatinName;
     float m_Volume;
     std::string m_LastModified;
-    int m_Index;
+    unsigned int m_Index;
+    unsigned int m_Component;
     mitk::Color m_Color;
     mitk::Point3D m_CenterOfMassIndex;
     mitk::Point3D m_CenterOfMassCoordinates;

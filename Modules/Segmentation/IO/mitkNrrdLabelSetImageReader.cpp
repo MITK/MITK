@@ -87,83 +87,84 @@ namespace mitk
 
           if (image.IsNotNull())
           {
-              mitk::LabelSetImage::Pointer output = static_cast<OutputType*>(this->GetOutput());
-              output->InitializeByItk<ImageType>( image );
-              output->SetVolume( reader->GetOutput()->GetBufferPointer() );
+            mitk::LabelSetImage::Pointer output = static_cast<OutputType*>(this->GetOutput());
+            output->InitializeByItk<ImageType>( image );
+            output->SetVolume( reader->GetOutput()->GetBufferPointer() );
 
-              itk::MetaDataDictionary imgMetaDictionary = image->GetMetaDataDictionary();
-              std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
-              std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-              std::string metaString;
+            itk::MetaDataDictionary imgMetaDictionary = image->GetMetaDataDictionary();
+            std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
+            std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
+            std::string metaString;
 
-              char keybuffer[256];
+            char keybuffer[256];
 
-              int numberOfLabels = 0;
-              std::string name, lastmodified;
+            int numberOfLabels = 0;
+            std::string name, lastmodified;
+            for (; itKey != imgMetaKeys.end(); itKey ++)
+            {
+              itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
+              if (itKey->find("name") != std::string::npos)
+              {
+                  name = metaString;
+              }
+
+              itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
+              if (itKey->find("last modified") != std::string::npos)
+              {
+                  lastmodified = metaString;
+              }
+
+              if (itKey->find("number of labels") != std::string::npos)
+              {
+                  numberOfLabels = atoi(metaString.c_str());
+              }
+            }
+
+            output->SetName(name);
+            output->SetLabelSetLastModified(lastmodified);
+
+            // skip first label (exterior) since it is created by mitkLabelSetImage constructor
+            for (int i=1; i<numberOfLabels; i++)
+            {
+              itKey = imgMetaKeys.begin();
+
+              mitk::Color color;
+              std::string name;
+              float opacity, volume;
+              int locked, visible, component;
               for (; itKey != imgMetaKeys.end(); itKey ++)
               {
                 itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-                if (itKey->find("name") != std::string::npos)
+                sprintf( keybuffer, "label_%03d_name", i );
+                if (itKey->find(keybuffer) != std::string::npos)
                 {
-                    name = metaString;
+                    char str [512];
+                    sscanf(metaString.c_str(), "%[^\n]s", &str);
+                    name = str;
                 }
-
-                itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-                if (itKey->find("last modified") != std::string::npos)
+                sprintf( keybuffer, "label_%03d_props", i );
+                if (itKey->find(keybuffer) != std::string::npos)
                 {
-                    lastmodified = metaString;
-                }
-
-                if (itKey->find("number of labels") != std::string::npos)
-                {
-                    numberOfLabels = atoi(metaString.c_str());
+                    float rgba[4];
+                    sscanf(metaString.c_str(), "%f %f %f %f %d %d %f %d", &rgba[0], &rgba[1], &rgba[2], &rgba[3], &locked, &visible, &volume, &component);
+                    color.SetRed(rgba[0]);
+                    color.SetGreen(rgba[1]);
+                    color.SetBlue(rgba[2]);
+                    opacity = rgba[3];
                 }
               }
 
-              output->SetName(name);
-              output->SetLabelSetLastModified(lastmodified);
+              mitk::Label::Pointer label = mitk::Label::New();
+              label->SetName(name);
+              label->SetOpacity(opacity);
+              label->SetColor(color);
+              label->SetLocked(locked);
+              label->SetVisible(visible);
+              label->SetVolume(volume);
+              label->SetComponent(component);
 
-              // skip first label (exterior) since it is created by mitkLabelSetImage constructor
-              for (int i=1; i<numberOfLabels; i++)
-              {
-                  itKey = imgMetaKeys.begin();
-
-                  mitk::Color color;
-                  std::string name;
-                  float opacity, volume;
-                  int locked, visible;
-                  for (; itKey != imgMetaKeys.end(); itKey ++)
-                  {
-                    itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-                    sprintf( keybuffer, "label_%03d_name", i );
-                    if (itKey->find(keybuffer) != std::string::npos)
-                    {
-                        char str [512];
-                        sscanf(metaString.c_str(), "%[^\n]s", &str);
-                        name = str;
-                    }
-                    sprintf( keybuffer, "label_%03d_props", i );
-                    if (itKey->find(keybuffer) != std::string::npos)
-                    {
-                        float rgba[4];
-                        sscanf(metaString.c_str(), "%f %f %f %f %d %d %f", &rgba[0], &rgba[1], &rgba[2], &rgba[3], &locked, &visible, &volume);
-                        color.SetRed(rgba[0]);
-                        color.SetGreen(rgba[1]);
-                        color.SetBlue(rgba[2]);
-                        opacity = rgba[3];
-                    }
-                  }
-
-                  mitk::Label::Pointer label = mitk::Label::New();
-                  label->SetName(name);
-                  label->SetOpacity(opacity);
-                  label->SetColor(color);
-                  label->SetLocked(locked);
-                  label->SetVisible(visible);
-                  label->SetVolume(volume);
-
-                  output->AddLabel(*label);
-              }
+              output->AddLabel(*label);
+            }
           }
         }
 

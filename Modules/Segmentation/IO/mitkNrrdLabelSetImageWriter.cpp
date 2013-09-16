@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMetaDataDictionary.h"
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
-#include "itkNiftiImageIO.h"
+//#include "itkNiftiImageIO.h"
 #include "itkImageFileWriter.h"
 #include "itksys/SystemTools.hxx"
 
@@ -77,7 +77,6 @@ void mitk::NrrdLabelSetImageWriter<TPixelType>::GenerateData()
   if (ext == ".lset")
   {
     itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
-    //io->SetNrrdVectorType( nrrdKindList );
     io->SetFileType( itk::ImageIOBase::Binary );
     io->UseCompressionOn();
 
@@ -119,7 +118,8 @@ void mitk::NrrdLabelSetImageWriter<TPixelType>::GenerateData()
         int locked = input->GetLabelLocked(i);
         int visible = input->GetLabelVisible(i);
         float volume = input->GetLabelVolume(i);
-        sprintf( valbuffer, "%f %f %f %f %d %d %f", rgba[0], rgba[1], rgba[2], rgba[3], locked, visible, volume);
+        unsigned int component = input->GetLabelComponent(i);
+        sprintf( valbuffer, "%f %f %f %f %d %d %f %d", rgba[0], rgba[1], rgba[2], rgba[3], locked, visible, volume, component);
 
         itk::EncapsulateMetaData<std::string>(itkImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
     }

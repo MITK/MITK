@@ -189,7 +189,6 @@ void mitk::LabelSetImage::ClearBufferProcessing(LabelSetImageType* itkImage)
   itkImage->FillBuffer(0);
 }
 
-//AccessTwoImagesFixedDimensionByItk
 template < typename LabelSetImageType >
 void mitk::LabelSetImage::ConcatenateProcessing(LabelSetImageType* itkTarget, mitk::LabelSetImage* other)
 {
@@ -443,9 +442,19 @@ std::string mitk::LabelSetImage::GetLabelName(int index)
   return this->m_LabelSet->GetLabelName(index);
 }
 
-int mitk::LabelSetImage::GetActiveLabelIndex() const
+unsigned int mitk::LabelSetImage::GetActiveLabelIndex() const
 {
   return this->m_LabelSet->GetActiveLabel()->GetIndex();
+}
+
+unsigned int mitk::LabelSetImage::GetLabelComponent(int index) const
+{
+  return this->m_LabelSet->GetLabelComponent(index);
+}
+
+unsigned int mitk::LabelSetImage::GetActiveLabelComponent() const
+{
+  return this->m_LabelSet->GetActiveLabel()->GetComponent();
 }
 
 const mitk::Label* mitk::LabelSetImage::GetActiveLabel() const
@@ -492,7 +501,7 @@ bool mitk::LabelSetImage::IsLabelSelected(mitk::Label::Pointer label)
     return label->GetSelected();
 }
 
-bool mitk::LabelSetImage::GetLabelVisible(int index)
+bool mitk::LabelSetImage::GetLabelVisible(int index) const
 {
     return this->m_LabelSet->GetLabelVisible(index);
 }

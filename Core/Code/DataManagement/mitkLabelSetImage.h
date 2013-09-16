@@ -213,16 +213,26 @@ public:
 
   /**
     * \brief  */
-  bool GetLabelVisible(int index);
+  bool GetLabelVisible(int index) const;
 
   /**
     * \brief  */
-  int GetActiveLabelIndex() const;
+  unsigned int GetLabelComponent(int index) const;
+
+  /**
+  * \brief  */
+  unsigned int GetActiveLabelComponent() const;
+
+  /**
+    * \brief  */
+  unsigned int GetActiveLabelIndex() const;
 
   /**
     * \brief  */
   const mitk::Color& GetActiveLabelColor() const;
 
+  /**
+    * \brief  */
   const mitk::Label* GetActiveLabel() const;
 
   /**

@@ -144,6 +144,10 @@ public:
 
     /** \brief
     */
+    virtual unsigned int GetLabelComponent(int index) const;
+
+    /** \brief
+    */
     virtual void SetLabelSelected(int index, bool value);
 
     /** \brief
@@ -193,6 +197,10 @@ public:
     /** \brief
     */
     virtual int GetActiveLabelIndex() const;
+
+    /** \brief
+    */
+    virtual int GetActiveLabelComponent() const;
 
     /** \brief
     */

@@ -211,48 +211,50 @@ void QmitkLabelSetTableWidget::AllLabelsModified( )
 
 void QmitkLabelSetTableWidget::LabelModified( int index )
 {
-    // this is an event function, avoid calling ourself
-    QTableWidgetItem* nameItem = this->item(index,NAME_COL);
+  // this is an event function, avoid calling ourself
+  QTableWidgetItem* nameItem = this->item(index,NAME_COL);
 
-    if (nameItem)
-    {
-      QString text = fontMetrics().elidedText(m_LabelSetImage->GetLabelName(index).c_str(), Qt::ElideMiddle, this->columnWidth(NAME_COL)-2);
-      nameItem->setText(text);
-      nameItem->setToolTip(text);
-    }
+  if (nameItem)
+  {
+    int colWidth = (this->columnWidth(NAME_COL) < 180) ? 180 : this->columnWidth(NAME_COL)-2;
+    QString text = fontMetrics().elidedText(m_LabelSetImage->GetLabelName(index).c_str(), Qt::ElideMiddle, colWidth);
+  //  QString text = fontMetrics().elidedText(m_LabelSetImage->GetLabelName(index).c_str(), Qt::ElideMiddle, this->columnWidth(NAME_COL)-2);
+    nameItem->setText(text);
+    nameItem->setToolTip(text);
+  }
 
-    QPushButton* lbutton = (QPushButton*) this->cellWidget(index,LOCKED_COL);
-    if (lbutton)
-    {
-         lbutton->setChecked(!m_LabelSetImage->GetLabelLocked(index));
-    }
+  QPushButton* lbutton = (QPushButton*) this->cellWidget(index,LOCKED_COL);
+  if (lbutton)
+  {
+       lbutton->setChecked(!m_LabelSetImage->GetLabelLocked(index));
+  }
 
-    QPushButton* button = (QPushButton*) this->cellWidget(index,COLOR_COL);
-    if (button)
-    {
-        const mitk::Color& color = m_LabelSetImage->GetLabelColor(index);
-        button->setAutoFillBackground(true);
-        QColor qcolor(color[0]*255,color[1]*255,color[2]*255);
-        QString styleSheet = "background-color:rgb(";
-        styleSheet.append(QString::number(qcolor.red()));
-        styleSheet.append(",");
-        styleSheet.append(QString::number(qcolor.green()));
-        styleSheet.append(",");
-        styleSheet.append(QString::number(qcolor.blue()));
-        styleSheet.append(")");
-        button->setStyleSheet(styleSheet);
-    }
+  QPushButton* button = (QPushButton*) this->cellWidget(index,COLOR_COL);
+  if (button)
+  {
+      const mitk::Color& color = m_LabelSetImage->GetLabelColor(index);
+      button->setAutoFillBackground(true);
+      QColor qcolor(color[0]*255,color[1]*255,color[2]*255);
+      QString styleSheet = "background-color:rgb(";
+      styleSheet.append(QString::number(qcolor.red()));
+      styleSheet.append(",");
+      styleSheet.append(QString::number(qcolor.green()));
+      styleSheet.append(",");
+      styleSheet.append(QString::number(qcolor.blue()));
+      styleSheet.append(")");
+      button->setStyleSheet(styleSheet);
+  }
 
-    QPushButton* vbutton = (QPushButton*) this->cellWidget(index,VISIBLE_COL);
-    if (vbutton)
-    {
-         vbutton->setChecked(!m_LabelSetImage->GetLabelVisible(index));
-    }
+  QPushButton* vbutton = (QPushButton*) this->cellWidget(index,VISIBLE_COL);
+  if (vbutton)
+  {
+       vbutton->setChecked(!m_LabelSetImage->GetLabelVisible(index));
+  }
 
-    this->clearSelection();
-    this->setSelectionMode(QAbstractItemView::SingleSelection);
-    this->selectRow(m_LabelSetImage->GetActiveLabelIndex());
-    this->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  this->clearSelection();
+  this->setSelectionMode(QAbstractItemView::SingleSelection);
+  this->selectRow(m_LabelSetImage->GetActiveLabelIndex());
+  this->setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
 void QmitkLabelSetTableWidget::SetAutoSelectNewItems( bool value )
@@ -355,19 +357,19 @@ void QmitkLabelSetTableWidget::OnItemDoubleClicked(QTableWidgetItem *item)
 
   if (row >= 0 && row < this->rowCount())
   {
-      m_LabelSetImage->SetActiveLabel(row,false);
-      this->BusyCursorOn();
-      const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(m_LabelSetImage->GetActiveLabelIndex(), true);
-      this->BusyCursorOff();
-      if (pos.Get_vnl_vector().max_value() > 0.0)
-          emit goToLabel(pos);
+    m_LabelSetImage->SetActiveLabel(row,false);
+    this->BusyCursorOn();
+    const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(m_LabelSetImage->GetActiveLabelIndex(), true);
+    this->BusyCursorOff();
+    if (pos.GetVnlVector().max_value() > 0.0)
+        emit goToLabel(pos);
   }
 }
 
 void QmitkLabelSetTableWidget::SetAllLabelsVisible(bool value)
 {
-   m_AllVisible = !value;
-   this->OnSetAllLabelsVisible(true);
+  m_AllVisible = !value;
+  this->OnSetAllLabelsVisible(true);
 }
 
 void QmitkLabelSetTableWidget::InsertItem()
@@ -386,7 +388,8 @@ void QmitkLabelSetTableWidget::InsertItem()
   styleSheet.append(QString::number(color[2]*255));
   styleSheet.append(")");
 
-  QString text = fontMetrics().elidedText(m_LabelSetImage->GetLabelName(index).c_str(), Qt::ElideMiddle, this->columnWidth(NAME_COL)-2);
+  int colWidth = (this->columnWidth(NAME_COL) < 180) ? 180 : this->columnWidth(NAME_COL)-2;
+  QString text = fontMetrics().elidedText(m_LabelSetImage->GetLabelName(index).c_str(), Qt::ElideMiddle, colWidth);
   QTableWidgetItem *nameItem = new QTableWidgetItem(text);
   nameItem->setToolTip(m_LabelSetImage->GetLabelName(index).c_str());
   nameItem->setTextAlignment(Qt::AlignCenter | Qt::AlignLeft);
@@ -452,154 +455,126 @@ void QmitkLabelSetTableWidget::InsertItem()
 
 void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint & pos )
 {
+  QTableWidgetItem *itemAt = this->itemAt(pos);
+  if (!itemAt) return;
+  int row = itemAt->row();
+  QMenu* menu = new QMenu(this);
 
-  // check if multiple rows were selected
-      QTableWidgetItem *itemAt = this->itemAt(pos);
-      if (itemAt != NULL)
-      {
-          int row = itemAt->row();
+  if (this->selectedItems().size()>1)
+  {
+    QAction* mergeAction = new QAction(QIcon(":/QmitkExt/mergelabels.png"), "Merge selected labels", this );
+    mergeAction->setEnabled(true);
+    QObject::connect( mergeAction, SIGNAL( triggered(bool) ), this, SLOT( OnMergeLabels(bool) ) );
+    menu->addAction(mergeAction);
 
-          QMenu* menu = new QMenu(this);
+    QAction* removeLabelsAction = new QAction(QIcon(":/QmitkExt/removelabel.png"), "Remove selected labels", this );
+    removeLabelsAction->setEnabled(true);
+    QObject::connect( removeLabelsAction, SIGNAL( triggered(bool) ), this, SLOT( OnRemoveLabels(bool) ) );
+    menu->addAction(removeLabelsAction);
 
-          if (this->selectedItems().size()>1)
-          {
-              QAction* mergeAction = new QAction(QIcon(":/QmitkExt/mergelabels.png"), "Merge selected labels", this );
-              mergeAction->setEnabled(true);
-              QObject::connect( mergeAction, SIGNAL( triggered(bool) ), this, SLOT( OnMergeLabels(bool) ) );
-              menu->addAction(mergeAction);
+    QAction* eraseLabelsAction = new QAction(QIcon(":/QmitkExt/eraselabel.png"), "Erase selected labels", this );
+    eraseLabelsAction->setEnabled(true);
+    QObject::connect( eraseLabelsAction, SIGNAL( triggered(bool) ), this, SLOT( OnEraseLabels(bool) ) );
+    menu->addAction(eraseLabelsAction);
 
-              QAction* removeLabelsAction = new QAction(QIcon(":/QmitkExt/removelabel.png"), "Remove selected labels", this );
-              removeLabelsAction->setEnabled(true);
-              QObject::connect( removeLabelsAction, SIGNAL( triggered(bool) ), this, SLOT( OnRemoveLabels(bool) ) );
-              menu->addAction(removeLabelsAction);
+    QAction* createSurfacesAction = new QAction(QIcon(":/QmitkExt/createsurface.png"), "Create a surface for each selected label", this );
+    createSurfacesAction->setEnabled(true);
+    QObject::connect( createSurfacesAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateSurfaces(bool) ) );
+    menu->addAction(createSurfacesAction);
 
-              QAction* eraseLabelsAction = new QAction(QIcon(":/QmitkExt/eraselabel.png"), "Erase selected labels", this );
-              eraseLabelsAction->setEnabled(true);
-              QObject::connect( eraseLabelsAction, SIGNAL( triggered(bool) ), this, SLOT( OnEraseLabels(bool) ) );
-              menu->addAction(eraseLabelsAction);
+    QAction* combineAndCreateSurfaceAction = new QAction(QIcon(":/QmitkExt/createsurface.png"), "Combine and create a surface", this );
+    combineAndCreateSurfaceAction->setEnabled(true);
+    QObject::connect( combineAndCreateSurfaceAction, SIGNAL( triggered(bool) ), this, SLOT( OnCombineAndCreateSurface(bool) ) );
+    menu->addAction(combineAndCreateSurfaceAction);
 
-              QAction* createSurfacesAction = new QAction(QIcon(":/QmitkExt/createsurface.png"), "Create a surface for each selected label", this );
-              createSurfacesAction->setEnabled(true);
-              QObject::connect( createSurfacesAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateSurfaces(bool) ) );
-              menu->addAction(createSurfacesAction);
+    QAction* createMasksAction = new QAction(QIcon(":/QmitkExt/createmask.png"), "Create a mask for each selected label", this );
+    createMasksAction->setEnabled(true);
+    QObject::connect( createMasksAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateMasks(bool) ) );
+    menu->addAction(createMasksAction);
 
-              QAction* combineAndCreateSurfaceAction = new QAction(QIcon(":/QmitkExt/createsurface.png"), "Combine and create a surface", this );
-              combineAndCreateSurfaceAction->setEnabled(true);
-              QObject::connect( combineAndCreateSurfaceAction, SIGNAL( triggered(bool) ), this, SLOT( OnCombineAndCreateSurface(bool) ) );
-              menu->addAction(combineAndCreateSurfaceAction);
+    QAction* combineAndCreateMaskAction = new QAction(QIcon(":/QmitkExt/createmask.png"), "Combine and create a mask", this );
+    combineAndCreateMaskAction->setEnabled(true);
+    QObject::connect( combineAndCreateMaskAction, SIGNAL( triggered(bool) ), this, SLOT( OnCombineAndCreateMask(bool) ) );
+    menu->addAction(combineAndCreateMaskAction);
+  }
+  else
+  {
+    QAction* renameAction = new QAction(QIcon(":/QmitkExt/renamelabel.png"), "Rename...", this );
+    renameAction->setEnabled(true);
+    QObject::connect( renameAction, SIGNAL( triggered(bool) ), this, SLOT( OnRenameLabel(bool) ) );
+    menu->addAction(renameAction);
 
-              QAction* createMasksAction = new QAction(QIcon(":/QmitkExt/createmask.png"), "Create a mask for each selected label", this );
-              createMasksAction->setEnabled(true);
-              QObject::connect( createMasksAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateMasks(bool) ) );
-              menu->addAction(createMasksAction);
+    QAction* removeAction = new QAction(QIcon(":/QmitkExt/removelabel.png"), "Remove label", this );
+    removeAction->setEnabled(true);
+    QObject::connect( removeAction, SIGNAL( triggered(bool) ), this, SLOT( OnRemoveLabel(bool) ) );
+    menu->addAction(removeAction);
 
-              QAction* combineAndCreateMaskAction = new QAction(QIcon(":/QmitkExt/createmask.png"), "Combine and create a mask", this );
-              combineAndCreateMaskAction->setEnabled(true);
-              QObject::connect( combineAndCreateMaskAction, SIGNAL( triggered(bool) ), this, SLOT( OnCombineAndCreateMask(bool) ) );
-              menu->addAction(combineAndCreateMaskAction);
-          }
-          else
-          {
-              QAction* renameAction = new QAction(QIcon(":/QmitkExt/renamelabel.png"), "Rename...", this );
-              renameAction->setEnabled(true);
-              QObject::connect( renameAction, SIGNAL( triggered(bool) ), this, SLOT( OnRenameLabel(bool) ) );
-              menu->addAction(renameAction);
+    QAction* eraseAction = new QAction(QIcon(":/QmitkExt/eraselabel.png"), "Erase label", this );
+    eraseAction->setEnabled(true);
+    QObject::connect( eraseAction, SIGNAL( triggered(bool) ), this, SLOT( OnEraseLabel(bool) ) );
+    menu->addAction(eraseAction);
 
-              QAction* removeAction = new QAction(QIcon(":/QmitkExt/removelabel.png"), "Remove label", this );
-              removeAction->setEnabled(true);
-              QObject::connect( removeAction, SIGNAL( triggered(bool) ), this, SLOT( OnRemoveLabel(bool) ) );
-              menu->addAction(removeAction);
+    QAction* randomColorAction = new QAction(QIcon(":/QmitkExt/randomcolor.png"), "Random color", this );
+    randomColorAction->setEnabled(true);
+    QObject::connect( randomColorAction, SIGNAL( triggered(bool) ), this, SLOT( OnRandomColor(bool) ) );
+    menu->addAction(randomColorAction);
 
-              QAction* eraseAction = new QAction(QIcon(":/QmitkExt/eraselabel.png"), "Erase label", this );
-              eraseAction->setEnabled(true);
-              QObject::connect( eraseAction, SIGNAL( triggered(bool) ), this, SLOT( OnEraseLabel(bool) ) );
-              menu->addAction(eraseAction);
+    QAction* viewOnlyAction = new QAction(QIcon(":/QmitkExt/visible.png"), "View only", this );
+    viewOnlyAction->setEnabled(true);
+    QObject::connect( viewOnlyAction, SIGNAL( triggered(bool) ), this, SLOT( OnSetOnlyActiveLabelVisible(bool) ) );
+    menu->addAction(viewOnlyAction);
 
-              QAction* randomColorAction = new QAction(QIcon(":/QmitkExt/randomcolor.png"), "Random color", this );
-              randomColorAction->setEnabled(true);
-              QObject::connect( randomColorAction, SIGNAL( triggered(bool) ), this, SLOT( OnRandomColor(bool) ) );
-              menu->addAction(randomColorAction);
+    QAction* viewAllAction = new QAction(QIcon(":/QmitkExt/visible.png"), "View/Hide all", this );
+    viewAllAction->setEnabled(true);
+    QObject::connect( viewAllAction, SIGNAL( triggered(bool) ), this, SLOT( OnSetAllLabelsVisible(bool) ) );
+    menu->addAction(viewAllAction);
 
-              QAction* viewOnlyAction = new QAction(QIcon(":/QmitkExt/visible.png"), "View only", this );
-              viewOnlyAction->setEnabled(true);
-              QObject::connect( viewOnlyAction, SIGNAL( triggered(bool) ), this, SLOT( OnSetOnlyActiveLabelVisible(bool) ) );
-              menu->addAction(viewOnlyAction);
+    QAction* lockAllAction = new QAction(QIcon(":/QmitkExt/lock.png"), "Lock/Unlock all", this );
+    lockAllAction->setEnabled(true);
+    QObject::connect( lockAllAction, SIGNAL( triggered(bool) ), this, SLOT( OnLockAllLabels(bool) ) );
+    menu->addAction(lockAllAction);
 
-              QAction* viewAllAction = new QAction(QIcon(":/QmitkExt/visible.png"), "View/Hide all", this );
-              viewAllAction->setEnabled(true);
-              QObject::connect( viewAllAction, SIGNAL( triggered(bool) ), this, SLOT( OnSetAllLabelsVisible(bool) ) );
-              menu->addAction(viewAllAction);
+    QAction* createSurfaceAction = new QAction(QIcon(":/QmitkExt/createsurface.png"), "Create surface", this );
+    createSurfaceAction->setEnabled(true);
+    QObject::connect( createSurfaceAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateSurface(bool) ) );
 
-              QAction* lockAllAction = new QAction(QIcon(":/QmitkExt/lock.png"), "Lock/Unlock all", this );
-              lockAllAction->setEnabled(true);
-              QObject::connect( lockAllAction, SIGNAL( triggered(bool) ), this, SLOT( OnLockAllLabels(bool) ) );
-              menu->addAction(lockAllAction);
+    menu->addAction(createSurfaceAction);
 
-              QAction* createSurfaceAction = new QAction(QIcon(":/QmitkExt/createsurface.png"), "Create surface", this );
-              createSurfaceAction->setEnabled(true);
-              QObject::connect( createSurfaceAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateSurface(bool) ) );
+    QAction* createMaskAction = new QAction(QIcon(":/QmitkExt/createmask.png"), "Create mask", this );
+    createMaskAction->setEnabled(true);
+    QObject::connect( createMaskAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateMask(bool) ) );
 
-              menu->addAction(createSurfaceAction);
+    menu->addAction(createMaskAction);
 
-              QAction* createMaskAction = new QAction(QIcon(":/QmitkExt/createmask.png"), "Create mask", this );
-              createMaskAction->setEnabled(true);
-              QObject::connect( createMaskAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateMask(bool) ) );
+    m_OpacitySlider = new QSlider;
+    m_OpacitySlider->setMinimum(0);
+    m_OpacitySlider->setMaximum(100);
+    m_OpacitySlider->setOrientation(Qt::Horizontal);
+    QObject::connect( m_OpacitySlider, SIGNAL( valueChanged(int) ), this, SLOT( OpacityChanged(int) ) );
 
-              menu->addAction(createMaskAction);
+    QLabel* _OpacityLabel = new QLabel("Opacity: ");
+    QVBoxLayout* _OpacityWidgetLayout = new QVBoxLayout;
+    _OpacityWidgetLayout->setContentsMargins(4,4,4,4);
+    _OpacityWidgetLayout->addWidget(_OpacityLabel);
+    _OpacityWidgetLayout->addWidget(m_OpacitySlider);
+    QWidget* _OpacityWidget = new QWidget;
+    _OpacityWidget->setLayout(_OpacityWidgetLayout);
 
-              m_OpacitySlider = new QSlider;
-              m_OpacitySlider->setMinimum(0);
-              m_OpacitySlider->setMaximum(100);
-              m_OpacitySlider->setOrientation(Qt::Horizontal);
-              QObject::connect( m_OpacitySlider, SIGNAL( valueChanged(int) ), this, SLOT( OpacityChanged(int) ) );
+    m_OpacityAction = new QWidgetAction(this);
+    m_OpacityAction->setDefaultWidget(_OpacityWidget);
+  //  QObject::connect( m_OpacityAction, SIGNAL( changed() ), this, SLOT( OpacityActionChanged() ) );
+    m_OpacitySlider->setValue(static_cast<int>(m_LabelSetImage->GetLabelOpacity(row)*100));
 
-              QLabel* _OpacityLabel = new QLabel("Opacity: ");
-              QVBoxLayout* _OpacityWidgetLayout = new QVBoxLayout;
-              _OpacityWidgetLayout->setContentsMargins(4,4,4,4);
-              _OpacityWidgetLayout->addWidget(_OpacityLabel);
-              _OpacityWidgetLayout->addWidget(m_OpacitySlider);
-              QWidget* _OpacityWidget = new QWidget;
-              _OpacityWidget->setLayout(_OpacityWidgetLayout);
-
-              m_OpacityAction = new QWidgetAction(this);
-              m_OpacityAction->setDefaultWidget(_OpacityWidget);
-            //  QObject::connect( m_OpacityAction, SIGNAL( changed() ), this, SLOT( OpacityActionChanged() ) );
-              m_OpacitySlider->setValue(static_cast<int>(m_LabelSetImage->GetLabelOpacity(row)*100));
-
-              menu->addAction(m_OpacityAction);
-          }
-
-          menu->popup(QCursor::pos());
-      }
-      else
-      {
-          QMenu* menu = new QMenu(this);
-
-          QAction* newAction = new QAction(QIcon(":/QmitkExt/newlabel.png"), "New label", this );
-          newAction->setEnabled(true);
-          QObject::connect( newAction, SIGNAL( triggered(bool) ), this, SLOT( OnNewLabel(bool) ) );
-          menu->addAction(newAction);
-
-          QAction* viewAllAction = new QAction(QIcon(":/QmitkExt/visible.png"), "View/Hide all", this );
-          viewAllAction->setEnabled(true);
-          QObject::connect( viewAllAction, SIGNAL( triggered(bool) ), this, SLOT( OnSetAllLabelsVisible(bool) ) );
-          menu->addAction(viewAllAction);
-
-          QAction* removeAllAction = new QAction(QIcon(":/QmitkExt/removelabel.png"), "Remove all", this );
-          removeAllAction->setEnabled(true);
-          QObject::connect( removeAllAction, SIGNAL( triggered(bool) ), this, SLOT( OnRemoveAllLabels(bool) ) );
-          menu->addAction(removeAllAction);
-
-
-          menu->popup(QCursor::pos());
-      }
+    menu->addAction(m_OpacityAction);
+  }
+  menu->popup(QCursor::pos());
 }
 
 void QmitkLabelSetTableWidget::OpacityChanged(int value)
 {
-   float opacity = static_cast<float>(value)/100.0f;
-   m_LabelSetImage->SetLabelOpacity(this->currentRow(),opacity);
-   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  float opacity = static_cast<float>(value)/100.0f;
+  m_LabelSetImage->SetLabelOpacity(this->currentRow(),opacity);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetTableWidget::OnRemoveLabel(bool value)
@@ -676,9 +651,9 @@ void QmitkLabelSetTableWidget::OnRemoveLabels(bool value)
       this->m_LabelSetImage->RemoveLabels(indexes);
 
       this->BusyCursorOff();
-   }
+  }
 
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetTableWidget::OnEraseLabels(bool value)
@@ -690,29 +665,26 @@ void QmitkLabelSetTableWidget::OnEraseLabels(bool value)
 
   if (answerButton == QMessageBox::Yes)
   {
-      QList<QTableWidgetSelectionRange> ranges = this->selectedRanges();
-      if ( ranges.isEmpty() )
-      return;
+    QList<QTableWidgetSelectionRange> ranges = this->selectedRanges();
+    if ( ranges.isEmpty() )
+    return;
 
-      std::vector<int> indexes;
-      for (int i=0; i<ranges.size(); i++)
-      {
-          int begin = ranges.at(i).topRow();
-          for (int j=0; j<ranges.at(i).rowCount(); j++)
-          {
-              //this->m_LabelSetImage->SetLabelSelected(begin+j, true);
-              indexes.push_back(begin+j);
-          }
-      }
+    std::vector<int> indexes;
+    for (int i=0; i<ranges.size(); i++)
+    {
+        int begin = ranges.at(i).topRow();
+        for (int j=0; j<ranges.at(i).rowCount(); j++)
+        {
+            //this->m_LabelSetImage->SetLabelSelected(begin+j, true);
+            indexes.push_back(begin+j);
+        }
+    }
 
-      this->BusyCursorOn();
-
-      this->m_LabelSetImage->EraseLabels(indexes);
-
-      this->BusyCursorOff();
-
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-   }
+    this->BusyCursorOn();
+    this->m_LabelSetImage->EraseLabels(indexes);
+    this->BusyCursorOff();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 void QmitkLabelSetTableWidget::OnEraseLabel(bool value)
@@ -735,27 +707,27 @@ void QmitkLabelSetTableWidget::OnEraseLabel(bool value)
 
 void QmitkLabelSetTableWidget::OnNewLabel(bool value)
 {
-   emit newLabel();
+  emit newLabel();
 }
 
 void QmitkLabelSetTableWidget::OnCreateSurface(bool value)
 {
-   emit createSurface( this->currentRow() );
+  emit createSurface( this->currentRow() );
 }
 
 void QmitkLabelSetTableWidget::OnCreateSurfaces(bool value)
 {
-   //emit createSurfaces( this->selectedRanges() );
+  //emit createSurfaces( this->selectedRanges() );
 }
 
 void QmitkLabelSetTableWidget::OnCombineAndCreateSurface(bool value)
 {
-   emit combineAndCreateSurface( this->selectedRanges() );
+  emit combineAndCreateSurface( this->selectedRanges() );
 }
 
 void QmitkLabelSetTableWidget::OnCreateMask(bool value)
 {
-   emit createMask( this->currentRow() );
+  emit createMask( this->currentRow() );
 }
 
 void QmitkLabelSetTableWidget::OnCreateMasks(bool value)
@@ -765,20 +737,20 @@ void QmitkLabelSetTableWidget::OnCreateMasks(bool value)
 
 void QmitkLabelSetTableWidget::OnCombineAndCreateMask(bool value)
 {
-   emit combineAndCreateMask( this->selectedRanges() );
+  emit combineAndCreateMask( this->selectedRanges() );
 }
 
 void QmitkLabelSetTableWidget::OnLockAllLabels(bool value)
 {
-   m_AllLocked = !m_AllLocked;
-   this->m_LabelSetImage->SetAllLabelsLocked(m_AllLocked);
+  m_AllLocked = !m_AllLocked;
+  this->m_LabelSetImage->SetAllLabelsLocked(m_AllLocked);
 }
 
 void QmitkLabelSetTableWidget::OnSetAllLabelsVisible(bool value)
 {
-   m_AllVisible = !m_AllVisible;
-   this->m_LabelSetImage->SetAllLabelsVisible(m_AllVisible);
-   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  m_AllVisible = !m_AllVisible;
+  this->m_LabelSetImage->SetAllLabelsVisible(m_AllVisible);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetTableWidget::OnRemoveAllLabels(bool value)
@@ -796,10 +768,10 @@ void QmitkLabelSetTableWidget::OnRemoveAllLabels(bool value)
 
 void QmitkLabelSetTableWidget::OnSetOnlyActiveLabelVisible(bool value)
 {
-   m_AllVisible = false;
-   this->m_LabelSetImage->SetAllLabelsVisible(m_AllVisible);
-   this->m_LabelSetImage->SetLabelVisible( this->currentRow(), true);
-   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  m_AllVisible = false;
+  this->m_LabelSetImage->SetAllLabelsVisible(m_AllVisible);
+  this->m_LabelSetImage->SetLabelVisible( this->currentRow(), true);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetTableWidget::OnRenameLabel(bool value)
@@ -810,8 +782,8 @@ void QmitkLabelSetTableWidget::OnRenameLabel(bool value)
 
 void QmitkLabelSetTableWidget::OnRandomColor(bool value)
 {
-    this->m_LabelSetImage->SetLabelColor( this->currentRow(), this->m_ColorSequenceRainbow->GetNextColor() );
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  this->m_LabelSetImage->SetLabelColor( this->currentRow(), this->m_ColorSequenceRainbow->GetNextColor() );
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetTableWidget::Reset()

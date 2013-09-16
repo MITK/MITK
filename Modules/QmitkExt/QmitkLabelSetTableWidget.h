@@ -42,7 +42,7 @@ class QmitkExt_EXPORT QmitkLabelSetTableWidget : public QTableWidget
 
     ~QmitkLabelSetTableWidget();
 
-    enum ResliceInterpolation { NAME_COL=0, LOCKED_COL, COLOR_COL, VISIBLE_COL };
+    enum TableColumns { NAME_COL=0, LOCKED_COL, COLOR_COL, VISIBLE_COL };
 
     /// \brief Sets the active label. It will be shown as selected.
     void SetActiveLabel( int );

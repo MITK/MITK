@@ -278,13 +278,13 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
   TimeSlicedGeometry::Pointer originalGeometry = dynamic_cast<TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
   diffImage->SetGeometry( originalGeometry );
 */
-  this->PasteSegmentation( workingImage, m_FeedbackImage, m_ToolManager->GetActiveLabel()->GetIndex(), m_CurrentTimeStep );
+  this->PasteSegmentationOnWorkingImage( workingImage, m_FeedbackImage, m_ToolManager->GetActiveLabel()->GetIndex(), m_CurrentTimeStep );
 
   this->ClearSeeds();
 
   //the workingImage was modified within the pipeline, but not marked so
   workingImage->Modified();
-  workingImage->GetVtkImageData()->Modified();
+//  workingImage->GetVtkImageData()->Modified();
 
   m_FeedbackImage->EraseLabel(1,false);
 

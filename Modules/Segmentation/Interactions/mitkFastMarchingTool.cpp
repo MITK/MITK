@@ -193,8 +193,8 @@ void mitk::FastMarchingTool::Activated()
   m_ProgressCommand = mitk::ToolCommand::New();
 
   m_SmoothFilter = SmoothingFilterType::New();
-  m_SmoothFilter->SetTimeStep( 0.05 );
-  m_SmoothFilter->SetNumberOfIterations( 2 );
+  m_SmoothFilter->SetTimeStep( 0.025 );
+  m_SmoothFilter->SetNumberOfIterations( 3 );
   m_SmoothFilter->SetConductanceParameter( 9.0 );
 
   m_GradientMagnitudeFilter = GradientFilterType::New();
@@ -253,7 +253,7 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
   mitk::Image::Pointer workingImageSlice = GetAffectedWorkingSlice( m_PositionEvent );
 
   // paste the binary segmentation to the current working slice
-  mitk::SegTool2D::PasteSegmentation( workingImageSlice, m_FeedbackImage, m_ToolManager->GetActiveLabel()->GetIndex(), m_CurrentTimeStep );
+  mitk::SegTool2D::PasteSegmentationOnWorkingImage( workingImageSlice, m_FeedbackImage, m_ToolManager->GetActiveLabel()->GetIndex(), m_CurrentTimeStep );
 
   // paste current working slice back to the working image
   mitk::SegTool2D::WriteBackSegmentationResult(m_PositionEvent, workingImageSlice);

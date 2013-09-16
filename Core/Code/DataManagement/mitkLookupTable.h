@@ -135,6 +135,7 @@ protected:
     LookupTable(const LookupTable& other);
 
     virtual void BuildGrayScaleLookupTable();
+    virtual void BuildLegacyBinaryLookupTable();
     virtual void BuildInverseGrayScaleLookupTable();
     virtual void BuildRedBlackAlphaLookupTable();
     virtual void BuildGreenBlackAlphaLookupTable();

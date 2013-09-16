@@ -133,6 +133,9 @@ void mitk::LookupTable::SetActiveColormap(int index)
     case (mitk::ColormapProperty::CM_MULTILABEL):
         this->BuildMultiLabelLookupTable();
         break;
+    case (mitk::ColormapProperty::CM_LEGACYBINARY):
+        this->BuildLegacyBinaryLookupTable();
+        break;
     default:
         MITK_ERROR << "Unexisting colormap";
     }
@@ -410,6 +413,20 @@ void mitk::LookupTable::BuildGrayScaleLookupTable()
   lut->SetHueRange( 0.0, 0.0 );
   lut->SetValueRange( 0.0, 1.0 );
   lut->Build();
+
+  m_LookupTable = lut;
+  this->Modified();
+}
+
+void mitk::LookupTable::BuildLegacyBinaryLookupTable()
+{
+  vtkLookupTable* lut = vtkLookupTable::New();
+  lut->SetRampToLinear();
+  lut->SetSaturationRange( 0.0, 0.0 );
+  lut->SetHueRange( 0.0, 0.0 );
+  lut->SetValueRange( 0.0, 1.0 );
+  lut->Build();
+  lut->SetTableValue(0,0.0,0.0,0.0,0.0);
 
   m_LookupTable = lut;
   this->Modified();

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __vtkMitkLevelWindowFilter_h
 
 class vtkScalarsToColors;
+class vtkPiecewiseFunction;
 #include <vtkImageData.h>
 #include <vtkImageToImageFilter.h>
 
@@ -48,6 +49,14 @@ public:
   vtkScalarsToColors* GetLookupTable();
   /** \brief Set the lookup table for the RGB level window */
   void SetLookupTable(vtkScalarsToColors *lookupTable);
+
+  /** \brief Get the piecewise function used to map scalar to alpha component value (only
+   *  used when the lookupTable is a vtkColorTransferFunction) */
+  vtkPiecewiseFunction* GetOpacityPiecewiseFunction()
+  { return m_OpacityFunction; }
+  /** \brief Set the iiecewise function used to map scalar to alpha component value (only
+   *  used when the lookupTable is a vtkColorTransferFunction) */
+  void SetOpacityPiecewiseFunction(vtkPiecewiseFunction *opacityFunction);
 
   /** \brief Get/Set the lower window opacity for the alpha level window */
   void SetMinOpacity(double minOpacity);
@@ -82,6 +91,8 @@ protected:
 private:
   /** m_LookupTable contains the lookup table for the RGB level window.*/
   vtkScalarsToColors* m_LookupTable;
+  /** The transfer function to map the scalar to alpha (4th component of the RGBA output value) */
+  vtkPiecewiseFunction* m_OpacityFunction;
   /** m_MinOpacity contains the lower bound for the alpha level window.*/
   double m_MinOpacity;
   /** m_MaxOpacity contains the upper bound for the alpha level window.*/

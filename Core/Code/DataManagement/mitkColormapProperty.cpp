@@ -62,7 +62,6 @@ void mitk::ColormapProperty::AddEnumerationTypes()
 {
   IdType newId = static_cast<IdType>(EnumerationProperty::Size());
 
-  AddEnum( "None", newId++ );
   AddEnum( "Grayscale", newId++ );
   AddEnum( "Inverse Grayscale", newId++ );
   AddEnum( "Red - Black - Alpha", newId++ );
@@ -86,6 +85,7 @@ void mitk::ColormapProperty::AddEnumerationTypes()
   AddEnum( "Asymmetry", newId++ );
   AddEnum( "p-value", newId++ );
   AddEnum( "Multi-Label", newId++ );
+  AddEnum( "Legacy-Binary", newId++ );
 }
 
 

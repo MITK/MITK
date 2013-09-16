@@ -320,10 +320,7 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
             bool useColor = boolProp->GetValue();
             readProperties->DeleteProperty("use color");
             mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-            if(useColor)
-              renderingMode->SetValue( mitk::RenderingModeProperty::LEVELWINDOW_COLOR );
-            else
-              renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
+            renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW );
             readProperties->SetProperty("Image Rendering.Mode", renderingMode);
             MITK_WARN << "The property 'use color' has been found in a scene file and was replaced by 'Image Rendering.Mode'. 'use color' is deprecated since 2013.03 release.";
           }

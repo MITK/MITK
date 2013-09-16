@@ -165,8 +165,6 @@ public:
     vtkSmartPointer<vtkPlaneSource> m_Plane;
     /** \brief The texture which is used to render the current slice. */
     vtkSmartPointer<vtkTexture> m_Texture;
-    /** \brief The lookuptables for colors and level window */
-    vtkSmartPointer<vtkLookupTable> m_DefaultLookupTable;
     /** \brief The actual reslicer (one per renderer) */
     mitk::ExtractSliceFilter::Pointer m_Reslicer;
     /** \brief Filter for thick slices */
@@ -177,12 +175,16 @@ public:
     vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
 
     /** \brief Timestamp of last update of stored data. */
-    itk::TimeStamp m_LastUpdateTime;
+    itk::TimeStamp m_LastDataUpdateTime;
+
+    /** \brief Timestamp of last update of a property. */
+    itk::TimeStamp m_LastPropertyUpdateTime;
 
     /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
     mitk::ScalarType* m_mmPerPixel;
 
-    int m_Colormap;
+    /** \brief Currently active color map. */
+    int m_ColorMap;
 
     /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */
     vtkSmartPointer<vtkMitkLevelWindowFilter> m_LevelWindowFilter;

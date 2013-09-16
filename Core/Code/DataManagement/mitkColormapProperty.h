@@ -45,7 +45,7 @@ class MITK_CORE_EXPORT ColormapProperty : public EnumerationProperty
 
     enum ColormapType
       {
-        CM_BW = 1,
+        CM_BW,
         CM_BWINVERSE,
         CM_REDBLACKALPHA,
         CM_GREENBLACKALPHA,
@@ -67,7 +67,8 @@ class MITK_CORE_EXPORT ColormapProperty : public EnumerationProperty
         CM_LONI2,
         CM_ASYMMETRY,
         CM_PVALUE,
-        CM_MULTILABEL
+        CM_MULTILABEL,
+        CM_LEGACYBINARY
       //  Default = CM_BW;
       };
 

@@ -1,0 +1,10 @@
+/**
+\page MultiLabelSegmentationPropertiesPage The Segmentation properties
+
+These properties control how a segmentation is rendered:
+
+<ul>
+ <li> property #1
+ <li> property #2
+</ul>
+*/

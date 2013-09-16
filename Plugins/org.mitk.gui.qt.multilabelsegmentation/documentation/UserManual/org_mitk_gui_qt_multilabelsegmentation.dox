@@ -1,15 +1,15 @@
 /**
-\page org_mitk_views_segmentation The Segmentation Plugin
+\page org_mitk_views_multilabelsegmentation The Segmentation Plugin
 
-\image html segmentation.png "Icon of the Plugin"
+\image html multilabelsegmentation.png "Icon of the Plugin"
 
-<i>Some of the features described below are closed source additions to the open source toolkit MITK and are not  available in every application.</i>
+<i>Some of the features described below are closed source additions to the open source toolkit MITK and are not available in every application.</i>
 
 Available sections:
 
  - \ref org_mitk_gui_qt_segmentationUserManualOverview
  - \ref org_mitk_gui_qt_segmentationUserManualTechnical
- - \ref org_mitk_gui_qt_segmentationUserManualImageSelection
+ - \ref org_mitk_gui_qt_segmentationUserManualLabelTable
  - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling
    - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling1
    - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling2
@@ -27,12 +27,12 @@ Available sections:
 
 \section org_mitk_gui_qt_segmentationUserManualOverview Overview
 
-The <b>Segmentation perspective</b> allows you to create segmentations of anatomical and pathological structures in medical images of the human body.
+The <b>Segmentation perspective</b> allows to create segmentations of anatomical and pathological structures in medical images of the human body.
 The perspective groups a number of tools which can be used for:
 <ul>
   <li> (semi-)automatic segmentation of organs on CT or MR image volumes
   <li> semi-automatic segmentation of lesions such as enlarged lymph nodes or tumors
-  <li> manual segmentation of any structures you might want to delineate
+  <li> manual segmentation of structures
 </ul>
 
 \image html org_mitk_gui_qt_segmentationIMGapplication.png Segmentation perspective consisting of the Data Manager view and the Segmentation view
@@ -62,15 +62,9 @@ The Segmentation perspective makes a number of assumptions. To know what this vi
   <li> Segmentations are handled as binary images of the same extent as the original image
 </ul>
 
-\section org_mitk_gui_qt_segmentationUserManualImageSelection Image Selection
+\section org_mitk_gui_qt_segmentationUserManualLabelTable The Labels Table
 
-The Segmentation perspective makes use of the Data Manager view to give you an overview of all images and segmentations.
-
-\image html org_mitk_gui_qt_segmentationIMGselection.png Data Manager is used for selecting the current segmentation. The reference image is selected in the drop down box of the control area.
-
-To select the reference image (e.g. the original CT/MR image) use the drop down box in the control area of the Segmentation view. The segmentation image selected in the Data Manager is displayed below the drop down box. If no segmentation image exists or none is selected create a new segmentation image by using the "New segmentation" button.
-Some items of the graphical user interface might be disabled when no image is selected.
-In any case, the application will give you hints if a selection is needed.
+\image html org_mitk_gui_qt_segmentationIMGlabelwidget.png The Label table shows all the labels in the segmentation session ...
 
 \section org_mitk_gui_qt_segmentationUserManualManualKringeling Manual Contouring
 

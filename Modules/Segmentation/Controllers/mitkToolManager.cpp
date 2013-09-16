@@ -480,7 +480,7 @@ const mitk::Label* mitk::ToolManager::GetActiveLabel()
 
 bool mitk::ToolManager::GetLabelLocked(int index)
 {
-  if (m_WorkingData.empty()) return -1;
+  if (m_WorkingData.empty()) return false;
 
   mitk::LabelSetImage* lsImage = dynamic_cast< mitk::LabelSetImage* > ( m_WorkingData.at(0)->GetData() );
   if (!lsImage) return true;

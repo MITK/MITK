@@ -543,6 +543,7 @@ namespace mitk
 
     if(dataset->findAndGetUint16Array(DCM_PixelData, pixelData, &count).good())
     {
+      int counter = 0;
       for(int i=0;i<frames;i++)
       {
         for(int j=0;j<rows;j++)
@@ -551,10 +552,15 @@ namespace mitk
           {
             std::cout << pixelData[i*rows*columns + j*columns + k] << "\n";
             std::cout << static_cast<Float32>(pixelData[i*rows*columns + j*columns + k]) * gridscale << "\n\n";
+            counter++;
           }
         }
       }
       std::cout << "Number of Frames: " << frames << "\n\n";
+      std::cout << "Number of Data in file: " << counter << "\n\n";
+      std::cout << "Number of Data in file expacted overall: " << rows*columns*frames << "\n\n";
+      std::cout << "Number of Data in file expacted per frame: " << rows*columns << "\n\n";
+      std::cout << "Resolution: " << rows << "x" << columns << "\n\n";
     }
 
 //#############################################################################################################

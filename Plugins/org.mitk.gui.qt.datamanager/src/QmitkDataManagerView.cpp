@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkDataManagerView.h"
 
-#include <itkOtsuThresholdImageFilter.h>
-
 //# Own Includes
 //## mitk
 #include "mitkDataStorageEditorInput.h"
@@ -37,11 +35,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkLookupTableProperty.h"
 #include <mitkNodePredicateAnd.h>
-#include <mitkITKImageImport.h>
-#include <mitkIDataStorageService.h>
-#include <mitkIRenderingManager.h>
-#include <mitkImageCast.h>
-#include <mitkLabelSetImage.h>
+#include "mitkITKImageImport.h"
+#include "mitkIDataStorageService.h"
+#include "mitkIRenderingManager.h"
+#include "mitkImageCast.h"
+#include "mitkLabelSetImage.h"
+#include "mitkDataNodeObject.h"
+#include "mitkIContextMenuAction.h"
 
 //## Qmitk
 #include <QmitkDnDFrameWidget.h>
@@ -52,6 +52,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkCustomVariants.h>
 #include "src/internal/QmitkNodeTableViewKeyFilter.h"
 #include "src/internal/QmitkInfoDialog.h"
+
 //## Berry
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
@@ -59,10 +60,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatform.h>
 #include <berryPlatformUI.h>
 #include <berryIEditorRegistry.h>
+#include "berryIExtensionPointService.h"
 
 //# Toolkit Includes
 #include <QTableView>
-#include <QGroupBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -70,27 +71,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QListView>
 #include <QMenu>
 #include <QAction>
-#include <QComboBox>
 #include <QApplication>
 #include <QCursor>
 #include <QHeaderView>
 #include <QTreeView>
 #include <QWidgetAction>
-#include <QSplitter>
 #include <QPushButton>
 #include <QMotifStyle>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QToolBar>
 #include <QKeyEvent>
 #include <QColor>
 #include <QColorDialog>
 #include <QSizePolicy>
 #include <QSignalMapper>
 
-#include "mitkDataNodeObject.h"
-#include "mitkIContextMenuAction.h"
-#include "berryIExtensionPointService.h"
+
 
 const std::string QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 
@@ -365,14 +361,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   unknownDataNodeDescriptor->AddAction(actionShowInfoDialog);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,actionShowInfoDialog));
 
-  //obsolete...
-  //QAction* otsuFilterAction = new QAction("Apply Otsu Filter", this);
-  //QObject::connect( otsuFilterAction, SIGNAL( triggered(bool) )
-  //  , this, SLOT( OtsuFilter(bool) ) );
-  // //Otsu filter does not work properly, remove it temporarily
-  // imageDataNodeDescriptor->AddAction(otsuFilterAction);
-  // m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,otsuFilterAction));
-
   QGridLayout* _DndFrameWidgetLayout = new QGridLayout;
   _DndFrameWidgetLayout->addWidget(m_NodeTreeView, 0, 0);
   _DndFrameWidgetLayout->setContentsMargins(0,0,0,0);
@@ -410,24 +398,7 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   confElem->GetAttribute("class", className);
   confElem->GetAttribute("smoothed", smoothed);
 
-  if(className == "QmitkOtsuAction")
-  {
-    contextMenuAction->SetDataStorage(this->GetDataStorage());
-  }
-  else if(className == "QmitkCreatePolygonModelAction")
-  {
-    contextMenuAction->SetDataStorage(this->GetDataStorage());
-    if(smoothed == "false")
-    {
-      contextMenuAction->SetSmoothed(false);
-    }
-    else
-    {
-      contextMenuAction->SetSmoothed(true);
-    }
-    contextMenuAction->SetDecimated(m_SurfaceDecimation);
-  }
-  else if(className == "QmitkStatisticsAction")
+  if(className == "QmitkStatisticsAction")
   {
     contextMenuAction->SetFunctionality(this);
   }
@@ -521,9 +492,18 @@ void QmitkDataManagerView::ColorChanged()
   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
   if(node)
   {
-    QColor color = QColorDialog::getColor();
+    mitk::Color color;
+    mitk::ColorProperty::Pointer colorProp;
+    node->GetProperty(colorProp,"color");
+    if(colorProp.IsNull())
+      return;
+    color = colorProp->GetValue();
+    QColor initial(color.GetRed()*255,color.GetGreen()*255,color.GetBlue()*255);
+    QColor qcolor = QColorDialog::getColor(initial,0,QString("Change color"));
+    if (!qcolor.isValid())
+      return;
     m_ColorButton->setAutoFillBackground(true);
-    node->SetProperty("color",mitk::ColorProperty::New(color.red()/255.0,color.green()/255.0,color.blue()/255.0));
+    node->SetProperty("color",mitk::ColorProperty::New(qcolor.red()/255.0,qcolor.green()/255.0,qcolor.blue()/255.0));
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -568,6 +548,7 @@ void QmitkDataManagerView::TextureInterpolationToggled( bool checked )
   if(node)
   {
     node->SetBoolProperty("texture interpolation", checked);
+    node->GetData()->Modified(); // fixme: workaround to force data-type rendering (and not only property-type)
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 
@@ -584,11 +565,6 @@ void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
   if(!cmProp)
     return;
 
-  mitk::LookupTableProperty::Pointer lutProp =
-      dynamic_cast<mitk::LookupTableProperty*> (node->GetProperty("LookupTable"));
-  if(!lutProp)
-    return;
-
   QAction* senderAction = qobject_cast<QAction*> ( QObject::sender() );
 
   if(!senderAction)
@@ -601,19 +577,6 @@ void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
     if ( cmProp->IsValidEnumerationValue( activatedItem ) )
     {
         cmProp->SetValue( activatedItem );
-
-        mitk::RenderingModeProperty::Pointer renderingModeProp = dynamic_cast<mitk::RenderingModeProperty*> (node->GetProperty("Image Rendering.Mode"));
-        if (renderingModeProp.IsNotNull())
-        {
-            if (cmProp->GetValueAsId() == 0)
-              renderingModeProp->SetValue( mitk::RenderingModeProperty::LEVELWINDOW_COLOR );
-            else
-            {
-              renderingModeProp->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
-              lutProp->GetLookupTable()->SetActiveColormap( cmProp->GetValueAsId() );
-            }
-        }
-
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
@@ -649,7 +612,6 @@ void QmitkDataManagerView::ColormapMenuAboutToShow()
     QObject::connect( tmp, SIGNAL( triggered(bool) )
       , this, SLOT( ColormapActionToggled(bool) ) );
   }
-
 }
 
 void QmitkDataManagerView::SurfaceRepresentationMenuAboutToShow()
@@ -934,58 +896,6 @@ void QmitkDataManagerView::GlobalReinit( bool )
   renderWindow->GetRenderingManager()->InitializeViews(bounds);
 }
 
-void QmitkDataManagerView::OtsuFilter( bool )
-{
-  QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
-
-  mitk::Image::Pointer mitkImage = 0;
-  foreach(mitk::DataNode::Pointer node, selectedNodes)
-  {
-    mitkImage = dynamic_cast<mitk::Image*>( node->GetData() );
-
-    if(mitkImage.IsNull())
-      continue;
-
-    try
-    {
-      // get selected mitk image
-      const unsigned short dim = 3;
-      typedef short InputPixelType;
-      typedef unsigned char OutputPixelType;
-
-      typedef itk::Image< InputPixelType, dim > InputImageType;
-      typedef itk::Image< OutputPixelType, dim > OutputImageType;
-
-      typedef itk::OtsuThresholdImageFilter< InputImageType, OutputImageType > FilterType;
-      FilterType::Pointer filter = FilterType::New();
-
-      filter->SetOutsideValue( 1 );
-      filter->SetInsideValue( 0 );
-
-      InputImageType::Pointer itkImage;
-      mitk::CastToItkImage(mitkImage, itkImage);
-
-      filter->SetInput( itkImage );
-
-      filter->Update();
-
-      mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
-      std::string nameOfResultImage = node->GetName();
-      nameOfResultImage.append("Otsu");
-      resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
-      resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
-      resultNode->SetData( mitk::ImportItkImage(filter->GetOutput())->Clone());
-
-      this->GetDataStorage()->Add(resultNode, node);
-
-    }
-    catch( std::exception& err )
-    {
-      MITK_ERROR(this->GetClassName()) << err.what();
-    }
-
-  }
-}
 void QmitkDataManagerView::NodeTreeViewRowsRemoved (
   const QModelIndex & /*parent*/, int /*start*/, int /*end*/ )
 {

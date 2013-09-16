@@ -164,9 +164,6 @@ public slots:
   ///
   void ContextMenuActionTriggered( bool );
 
-  /// Invoked when the median action is invoked
-  void OtsuFilter( bool checked = false );
-
   /// When rows are inserted auto expand them
   void NodeTreeViewRowsInserted ( const QModelIndex & parent, int start, int end );
 

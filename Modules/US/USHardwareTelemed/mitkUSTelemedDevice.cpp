@@ -85,6 +85,13 @@ bool mitk::USTelemedDevice::OnConnection()
   }
 
   m_ControlsProbes->SetIsActive(true);
+
+  if ( m_ControlsProbes->GetProbesCount() < 1 )
+  {
+    MITK_WARN("USDevice")("USTelemedDevice") << "No probe found.";
+    return false;
+  }
+
   m_ControlsProbes->SelectProbe(0); // select first probe as a default
 
   return true;

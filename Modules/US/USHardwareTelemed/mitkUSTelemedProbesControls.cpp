@@ -63,11 +63,24 @@ std::vector<mitk::USProbe::Pointer> mitk::USTelemedProbesControls::GetProbeSet()
 
 void mitk::USTelemedProbesControls::SelectProbe(unsigned int index)
 {
+  if (index >= m_ProbesSet.size())
+  {
+    MITK_ERROR("USTelemedProbesControls")("USControlInterfaceProbes")
+      << "Cannot select probe with index " << index << ". Maximum possible index is " << m_ProbesSet.size()-1 << ".";
+    mitkThrow() << "Cannot select probe with index " << index <<
+      ". Maximum possible index is " << m_ProbesSet.size()-1 << ".";
+  }
+
   m_TelemedDevice->SetActiveDataView(m_ProbesSet.at(index)->GetUsgDataView());
 }
 
 void mitk::USTelemedProbesControls::SelectProbe(mitk::USProbe::Pointer probe)
 {
+}
+
+unsigned int mitk::USTelemedProbesControls::GetProbesCount() const
+{
+  return m_ProbesSet.size();
 }
 
 void mitk::USTelemedProbesControls::SetTelemedDevice(itk::SmartPointer<USTelemedDevice> telemedDevice)

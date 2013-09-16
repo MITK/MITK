@@ -30,6 +30,7 @@ namespace mitk {
     virtual std::vector<USProbe::Pointer> GetProbeSet() = 0;
     virtual void SelectProbe(unsigned int index) = 0;
     virtual void SelectProbe(USProbe::Pointer probe) = 0;
+    virtual unsigned int GetProbesCount() const = 0;
 
   protected:
     USControlInterfaceProbes();

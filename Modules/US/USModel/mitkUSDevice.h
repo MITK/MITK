@@ -238,6 +238,8 @@ namespace mitk {
 
       void GrabImage();
 
+      virtual USImageSource::Pointer GetUSImageSource() = 0;
+
     protected:
       static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
 
@@ -249,8 +251,6 @@ namespace mitk {
 
       /* @brief defines the area that should be cropped from the US image */
       USImageCropArea m_CropArea;
-
-      virtual USImageSource::Pointer GetUSImageSource() = 0;
 
       /**
       * \brief This Method constructs the service properties which can later be used to

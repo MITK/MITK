@@ -30,6 +30,7 @@ mitk::USImageVideoSource::USImageVideoSource()
   : m_VideoCapture(new cv::VideoCapture()),
     m_IsVideoReady(false),
     m_IsGreyscale(false),
+    m_IsCropped(false),
     m_ResolutionOverrideWidth(0),
     m_ResolutionOverrideHeight(0),
     m_ResolutionOverride(false),
@@ -112,9 +113,10 @@ void mitk::USImageVideoSource::SetRegionOfInterest(int topLeftX, int topLeftY, i
 {
   m_CropFilter->SetCropRegion(topLeftX, topLeftY, bottomRightX, bottomRightY);
 
-  if (! m_IsCropped ) { m_CombinationFilter->PushFilter(m_CropFilter.GetPointer()); }
-
-  m_IsCropped = true;
+  if (! m_IsCropped && ! m_CropFilter->GetIsCropRegionEmpty()) {
+    m_CombinationFilter->PushFilter(m_CropFilter.GetPointer());
+    m_IsCropped = true;
+  }
 }
 
 void mitk::USImageVideoSource::SetRegionOfInterest(USImageRoi roi)
@@ -136,8 +138,24 @@ mitk::USImageVideoSource::USImageCropping mitk::USImageVideoSource::GetCropping(
   USImageCropping cropping;
   cropping.left = cropRect.x;
   cropping.top = cropRect.y;
-  cropping.bottom = this->GetImageHeight() - cropRect.height;
-  cropping.right = this->GetImageWidth() - cropRect.width;
+
+  if ( cropRect.height == 0 )
+  {
+    cropping.bottom = 0;
+  }
+  else
+  {
+    cropping.bottom = this->GetImageHeight() - (cropRect.y + cropRect.height);
+  }
+
+  if ( cropRect.width == 0 )
+  {
+    cropping.right = 0;
+  }
+  else
+  {
+    cropping.right = this->GetImageWidth() - (cropRect.x + cropRect.width);
+  }
 
   return cropping;
 }

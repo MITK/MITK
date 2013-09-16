@@ -23,14 +23,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+ctkPluginContext* org_mitk_gui_qt_ultrasound_Activator::m_Context = 0;
+
 void org_mitk_gui_qt_ultrasound_Activator::start(ctkPluginContext* context)
 {
+  m_Context = context;
+
   BERRY_REGISTER_EXTENSION_CLASS(UltrasoundSupport, context)
 }
 
 void org_mitk_gui_qt_ultrasound_Activator::stop(ctkPluginContext* context)
 {
+  m_Context = 0;
+
   Q_UNUSED(context)
+}
+
+ctkPluginContext *org_mitk_gui_qt_ultrasound_Activator::GetContext()
+{
+  return m_Context;
 }
 
 }

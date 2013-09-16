@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 
-
 // Qmitk
 #include "UltrasoundSupport.h"
 #include <QTimer>
@@ -34,6 +33,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Ultrasound
 #include "mitkUSDevice.h"
+#include "QmitkUSAbstractCustomWidget.h"
+
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
+#include "usServiceReference.h"
+#include "internal/org_mitk_gui_qt_ultrasound_Activator.h"
 
 
 const std::string UltrasoundSupport::VIEW_ID = "org.mitk.views.ultrasoundsupport";
@@ -55,22 +60,11 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone()) ); // After NewDeviceWidget finished editing
   connect( m_Controls.m_BtnView, SIGNAL(clicked()), this, SLOT(OnClickedViewDevice()) );
   connect( m_Timer, SIGNAL(timeout()), this, SLOT(DisplayImage()));
-  connect( m_Controls.crop_left, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
-  connect( m_Controls.crop_right, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
-  connect( m_Controls.crop_top, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
-  connect( m_Controls.crop_bot, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
 
   // Initializations
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
   std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(" + mitk::USDevice::US_PROPKEY_ISACTIVE + "=true))";
   m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL ,filter);
-
-  //UI initializations
-  m_Controls.crop_left->setEnabled(false);
-  m_Controls.crop_right->setEnabled(false);
-  m_Controls.crop_bot->setEnabled(false);
-  m_Controls.crop_top->setEnabled(false);
-
 
   m_Node = mitk::DataNode::New();
   m_Node->SetName("US Image Stream");
@@ -100,31 +94,6 @@ void UltrasoundSupport::DisplayImage()
   }
 }
 
-void UltrasoundSupport::OnCropAreaChanged()
-{
-if (m_Device->GetDeviceClass()=="org.mitk.modules.us.USVideoDevice")
-      {
-      mitk::USVideoDevice::Pointer currentVideoDevice = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
-
-      mitk::USDevice::USImageCropArea newArea;
-      newArea.cropLeft = m_Controls.crop_left->value();
-      newArea.cropTop = m_Controls.crop_top->value();
-      newArea.cropRight = m_Controls.crop_right->value();
-      newArea.cropBottom = m_Controls.crop_bot->value();
-
-      //check enabled: if not we are in the initializing step and don't need to do anything
-      //otherwise: update crop area
-      if (m_Controls.crop_right->isEnabled())
-        currentVideoDevice->SetCropArea(newArea);
-
-      GlobalReinit();
-      }
-else
-      {
-      MITK_WARN << "No USVideoDevice: Cannot Crop!";
-  }
-}
-
 void UltrasoundSupport::OnClickedViewDevice()
 {
   m_FrameCounter = 0;
@@ -151,20 +120,30 @@ void UltrasoundSupport::OnClickedViewDevice()
     //change UI elements
     m_Controls.m_BtnView->setText("Stop Viewing");
     m_Controls.m_FrameRate->setEnabled(false);
-    m_Controls.crop_left->setValue(m_Device->GetCropArea().cropLeft);
-    m_Controls.crop_right->setValue(m_Device->GetCropArea().cropRight);
-    m_Controls.crop_bot->setValue(m_Device->GetCropArea().cropBottom);
-    m_Controls.crop_top->setValue(m_Device->GetCropArea().cropTop);
-    m_Controls.crop_left->setEnabled(true);
-    m_Controls.crop_right->setEnabled(true);
-    m_Controls.crop_bot->setEnabled(true);
-    m_Controls.crop_top->setEnabled(true);
 
     m_ControlProbesWidget = new QmitkUSControlsProbesWidget(m_Device->GetControlInterfaceProbes(), m_Controls.tab2);
     m_Controls.tab2->layout()->addWidget(m_ControlProbesWidget);
 
     m_ControlBModeWidget = new QmitkUSControlsBModeWidget(m_Device->GetControlInterfaceBMode(), m_Controls.tab2);
     m_Controls.tab2->layout()->addWidget(m_ControlBModeWidget);
+
+
+    ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
+    if ( pluginContext )
+    {
+      std::string filter = "(ork.mitk.services.UltrasoundCustomWidget.deviceClass=" + m_Device->GetDeviceClass() + ")";
+
+      QString interfaceName ( us_service_interface_iid<QmitkUSAbstractCustomWidget>() );
+      m_CustomWidgetServiceReference = pluginContext->getServiceReferences(interfaceName, QString::fromStdString(filter));
+
+      if (m_CustomWidgetServiceReference.size() > 0)
+      {
+        m_ControlCustomWidget = pluginContext->getService<QmitkUSAbstractCustomWidget>
+          (m_CustomWidgetServiceReference.at(0))->CloneForQt(m_Controls.tab2);
+        m_ControlCustomWidget->SetDevice(m_Device);
+        m_Controls.tab2->layout()->addWidget(m_ControlCustomWidget);
+      }
+    }
   }
   else //deactivate imaging
   {
@@ -174,6 +153,14 @@ void UltrasoundSupport::OnClickedViewDevice()
     m_Controls.tab2->layout()->removeWidget(m_ControlBModeWidget);
     delete m_ControlBModeWidget;
 
+    if ( m_ControlCustomWidget )
+    {
+      ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
+      m_Controls.tab2->layout()->removeWidget(m_ControlCustomWidget);
+      pluginContext->ungetService(m_CustomWidgetServiceReference.at(0));
+      delete m_ControlCustomWidget; m_ControlCustomWidget = 0;
+    }
+
     //stop timer & release data
     m_Timer->stop();
     m_Node->ReleaseData();
@@ -182,10 +169,6 @@ void UltrasoundSupport::OnClickedViewDevice()
     //change UI elements
     m_Controls.m_BtnView->setText("Start Viewing");
     m_Controls.m_FrameRate->setEnabled(true);
-    m_Controls.crop_left->setEnabled(false);
-    m_Controls.crop_right->setEnabled(false);
-    m_Controls.crop_bot->setEnabled(false);
-    m_Controls.crop_top->setEnabled(false);
   }
 }
 

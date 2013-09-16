@@ -14,12 +14,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkUSControlInterfaceBMode.h"
+#include "mitkUSUIActivator.h"
 
-mitk::USControlInterfaceBMode::USControlInterfaceBMode()
+mitk::USUIActivator::USUIActivator()
 {
+
 }
 
-mitk::USControlInterfaceBMode::~USControlInterfaceBMode()
+mitk::USUIActivator::~USUIActivator()
+{
+
+}
+
+void mitk::USUIActivator::Load(us::ModuleContext* context)
+{
+  m_CustomVideoDeviceWidget.RegisterService(context);
+}
+
+void mitk::USUIActivator::Unload(us::ModuleContext* context)
 {
 }

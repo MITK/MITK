@@ -47,9 +47,6 @@ namespace mitk {
       // To open A VideoFile (Path, Metadata)
       mitkNewMacro2Param(Self, std::string, mitk::USImageMetadata::Pointer);
 
-      /*@brief Sets the area that will be cropped from the US image. Set [0,0,0,0] to disable it, which is also default. */
-      void SetCropArea(mitk::USDevice::USImageCropArea newArea);
-
       /**
       * \brief Returns the qualified name of this class. Be sure to override this when inheriting from VideoDevice!
       */
@@ -61,7 +58,8 @@ namespace mitk {
 
       void UnregisterOnService();
 
-      itkGetMacro(Source, mitk::USImageVideoSource::Pointer);
+      virtual USImageSource::Pointer GetUSImageSource();
+
       itkGetMacro(Image, mitk::USImage::Pointer);
       itkGetMacro(DeviceID,int);
       itkGetMacro(FilePath,std::string);
@@ -125,8 +123,6 @@ namespace mitk {
       */
       virtual bool OnDeactivation();
 
-      virtual USImageSource::Pointer GetUSImageSource();
-
       /**
       * \brief The image source that we use to aquire data
       */
@@ -148,8 +144,6 @@ namespace mitk {
       std::string m_FilePath;
 
       mitk::USVideoDeviceCustomControls::Pointer m_ControlInterfaceCustom;
-
-      void SetSourceCropArea();
     };
 } // namespace mitk
 #endif

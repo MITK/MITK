@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 
 #include "ui_UltrasoundSupportControls.h"
+#include "QmitkUSAbstractCustomWidget.h"
 #include "QmitkUSControlsBModeWidget.h"
 #include "QmitkUSControlsProbesWidget.h"
 
@@ -64,8 +65,6 @@ class UltrasoundSupport : public QmitkAbstractView
 
     void OnClickedViewDevice();
 
-    void OnCropAreaChanged();
-
     /*
     * \brief This is the main imaging loop that is called regularily during the imaging process
     */
@@ -101,8 +100,11 @@ class UltrasoundSupport : public QmitkAbstractView
     /** @brief reinits the view globally. */
     void GlobalReinit();
 
+    QmitkUSAbstractCustomWidget* m_ControlCustomWidget;
     QmitkUSControlsBModeWidget* m_ControlBModeWidget;
     QmitkUSControlsProbesWidget* m_ControlProbesWidget;
+
+    QList<ctkServiceReference>  m_CustomWidgetServiceReference;
 
 };
 

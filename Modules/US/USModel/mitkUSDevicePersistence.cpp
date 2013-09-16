@@ -22,10 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 
-//QT
-//#include <QMessageBox>
-
-
 mitk::USDevicePersistence::USDevicePersistence() : m_devices("MITK US","Device Settings")
 {
 }
@@ -88,21 +84,29 @@ std::vector<mitk::USDevice::Pointer> mitk::USDevicePersistence::RestoreLastDevic
 
 QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Pointer d)
 {
-
   QString manufacturer = d->GetDeviceManufacturer().c_str();
   QString model = d->GetDeviceModel().c_str();
   QString comment = d->GetDeviceComment().c_str();
   int source = d->GetDeviceID();
   std::string file = d->GetFilePath();
   if (file == "") file = "none";
-  int greyscale = d->GetSource()->GetIsGreyscale();
-  int resOverride = d->GetSource()->GetResolutionOverride();
-  int resWidth = d->GetSource()->GetResolutionOverrideWidth();
-  int resHight = d->GetSource()->GetResolutionOverrideHeight();
-  int cropRight = d->GetCropArea().cropRight;
-  int cropLeft = d->GetCropArea().cropLeft;
-  int cropBottom = d->GetCropArea().cropBottom;
-  int cropTop = d->GetCropArea().cropTop;
+
+  mitk::USImageVideoSource::Pointer imageSource = dynamic_cast<mitk::USImageVideoSource*>(d->GetUSImageSource().GetPointer());
+  if ( ! imageSource )
+  {
+    MITK_ERROR << "There is no USImageVideoSource at the current device.";
+    mitkThrow() << "There is no USImageVideoSource at the current device.";
+  }
+
+  int greyscale = imageSource->GetIsGreyscale();
+  int resOverride = imageSource->GetResolutionOverride();
+  int resWidth = imageSource->GetResolutionOverrideWidth();
+  int resHight = imageSource->GetResolutionOverrideHeight();
+  int cropRight = imageSource->GetCropping().right;
+  int cropLeft = imageSource->GetCropping().left;
+  int cropBottom = imageSource->GetCropping().bottom;
+  int cropTop = imageSource->GetCropping().top;
+
   char seperator = '|';
 
   QString returnValue = manufacturer + seperator
@@ -146,11 +150,11 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
   bool resOverride = (QString(data.at(6).c_str())).toInt();
   int resWidth = (QString(data.at(7).c_str())).toInt();
   int resHight = (QString(data.at(8).c_str())).toInt();
-  mitk::USDevice::USImageCropArea cropArea;
-  cropArea.cropRight = (QString(data.at(9).c_str())).toInt();
-  cropArea.cropLeft = (QString(data.at(10).c_str())).toInt();
-  cropArea.cropBottom = (QString(data.at(11).c_str())).toInt();
-  cropArea.cropTop = (QString(data.at(12).c_str())).toInt();
+  mitk::USImageVideoSource::USImageCropping cropArea;
+  cropArea.right = (QString(data.at(9).c_str())).toInt();
+  cropArea.left = (QString(data.at(10).c_str())).toInt();
+  cropArea.bottom = (QString(data.at(11).c_str())).toInt();
+  cropArea.top = (QString(data.at(12).c_str())).toInt();
 
   // Assemble Metadata
   mitk::USImageMetadata::Pointer metadata = mitk::USImageMetadata::New();
@@ -171,18 +175,26 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
     returnValue = mitk::USVideoDevice::New(file, metadata);
   }
 
+  mitk::USImageVideoSource::Pointer imageSource =
+    dynamic_cast<mitk::USImageVideoSource*>(returnValue->GetUSImageSource().GetPointer());
+  if ( ! imageSource )
+  {
+    MITK_ERROR << "There is no USImageVideoSource at the current device.";
+    mitkThrow() << "There is no USImageVideoSource at the current device.";
+  }
+
   // Set Video Options
-  returnValue->GetSource()->SetColorOutput(!greyscale);
+  imageSource->SetColorOutput(!greyscale);
 
   // If Resolution override is activated, apply it
   if (resOverride)
     {
-    returnValue->GetSource()->OverrideResolution(resWidth, resHight);
-    returnValue->GetSource()->SetResolutionOverride(true);
+    imageSource->OverrideResolution(resWidth, resHight);
+    imageSource->SetResolutionOverride(true);
     }
 
   // Set Crop Area
-  returnValue->SetCropArea(cropArea);
+  imageSource->SetCropping(cropArea);
 
   return returnValue;
 }

@@ -9,6 +9,7 @@ set(MODULE_TESTS
   mitkContourModelIOTest.cpp
 #  mitkToolManagerTest.cpp
   mitkToolManagerProviderTest.cpp
+  mitkVectorImageTest.cpp
 )
 
 set(MODULE_IMAGE_TESTS

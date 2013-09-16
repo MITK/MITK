@@ -123,7 +123,7 @@ class Segmentation_EXPORT SegTool2D : public Tool
     */
     Image::Pointer GetAffectedReferenceSlice(const PositionEvent*);
 
-    void PasteSegmentation( Image* targetSlice, Image* sourceSlice, int paintingPixelValue, int timestep );
+    void PasteSegmentationOnWorkingImage( Image* targetSlice, Image* sourceSlice, int paintingPixelValue, int timestep );
 
     void WriteBackSegmentationResult (const PositionEvent*, Image*);
 
@@ -151,7 +151,7 @@ class Segmentation_EXPORT SegTool2D : public Tool
     DiffSliceOperation* m_undoOperation;
 
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkPasteSegmentation( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, int pixelvalue );
+    void ItkPasteSegmentationOnWorkingImage( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, int pixelvalue );
 };
 
 } // namespace

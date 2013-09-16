@@ -232,8 +232,11 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     int clickedSliceIndex(-1);
     mitk::SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, clickedSliceDimension, clickedSliceIndex );
     mitk::SegmentationInterpolationController* interpolator = mitk::SegmentationInterpolationController::InterpolatorForImage(image);
+
     if (interpolator)
+    {
       interpolator->SetChangedSlice( slice, clickedSliceDimension, clickedSliceIndex, timeStep );
+    }
   }
 
   if (m_3DInterpolationEnabled )
@@ -263,7 +266,6 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     }
   }
 }
-
 
 void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeometry, Image* slice, unsigned int timeStep)
 {
@@ -302,7 +304,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
 
   //the image was modified within the pipeline, but not marked so
   image->Modified();
-  image->GetVtkImageData()->Modified();
+//  image->GetVtkImageData()->Modified();
 
   //specify the undo operation with the edited slice
   m_doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(), slice->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
@@ -404,14 +406,14 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
   return id;
 }
 
-void mitk::SegTool2D::PasteSegmentation( Image* targetSlice, Image* sourceSlice, int paintingPixelValue, int timestep )
+void mitk::SegTool2D::PasteSegmentationOnWorkingImage( Image* targetSlice, Image* sourceSlice, int paintingPixelValue, int timestep )
 {
   if ((!targetSlice)|| (!sourceSlice)) return;
-  AccessFixedDimensionByItk_2( targetSlice, ItkPasteSegmentation, 2, sourceSlice, paintingPixelValue );
+  AccessFixedDimensionByItk_2( targetSlice, ItkPasteSegmentationOnWorkingImage, 2, sourceSlice, paintingPixelValue );
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::SegTool2D::ItkPasteSegmentation( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, int overwritevalue )
+void mitk::SegTool2D::ItkPasteSegmentationOnWorkingImage( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, int overwritevalue )
 {
   typedef itk::Image<TPixel,VImageDimension> SliceType;
 

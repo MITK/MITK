@@ -32,30 +32,30 @@ const char* mitk::SegTool3D::GetGroup() const
   return "SegTool3D";
 }
 
-void mitk::SegTool3D::PasteSegmentation( Image* targetImage, Image* sourceImage, int pixelvalue, int timestep )
+void mitk::SegTool3D::PasteSegmentationOnWorkingImage( Image* targetImage, Image* sourceImage, int overwritevalue, int timestep )
 {
   if ((!targetImage)|| (!sourceImage)) return;
 
   try
   {
-    AccessFixedDimensionByItk_2( targetImage, ItkPasteSegmentation, 3, sourceImage, pixelvalue );
+    AccessFixedDimensionByItk_2( targetImage, ItkPasteSegmentationOnWorkingImage, 3, sourceImage, overwritevalue );
   }
   catch( itk::ExceptionObject & e )
   {
-    MITK_ERROR << "Could not paste segmentation " << e.GetDescription();
+    MITK_ERROR << "Could not paste segmentation on working image." << e.GetDescription();
     m_ToolManager->ActivateTool(-1);
     return;
   }
   catch (...)
   {
-    MITK_ERROR << "Could not generate segmentation.";
+    MITK_ERROR << "Could not paste segmentation on working image.";
     m_ToolManager->ActivateTool(-1);
     return;
   }
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::SegTool3D::ItkPasteSegmentation(
+void mitk::SegTool3D::ItkPasteSegmentationOnWorkingImage(
        itk::Image<TPixel,VImageDimension>* targetImage, const mitk::Image* sourceImage, int overwritevalue )
 {
   typedef itk::Image<TPixel,VImageDimension> ImageType;

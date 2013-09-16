@@ -48,6 +48,7 @@ mitk::BinaryThresholdTool::BinaryThresholdTool()
 :m_SensibleMinimumThresholdValue(-100),
 m_SensibleMaximumThresholdValue(+100),
 m_CurrentThresholdValue(0.0),
+m_CurrentTimeStep(0),
 m_IsFloatImage(false)
 {
   this->SupportRoiOn();
@@ -61,7 +62,7 @@ m_IsFloatImage(false)
   m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(100, 1) ) );
   m_ThresholdFeedbackNode->SetProperty( "name", StringProperty::New("Thresholding feedback") );
   m_ThresholdFeedbackNode->SetProperty( "opacity", FloatProperty::New(0.3) );
-  m_ThresholdFeedbackNode->SetProperty( "helper object", BoolProperty::New(false) );
+  m_ThresholdFeedbackNode->SetProperty( "helper object", BoolProperty::New(true) );
 }
 
 mitk::BinaryThresholdTool::~BinaryThresholdTool()
@@ -90,6 +91,7 @@ void mitk::BinaryThresholdTool::Activated()
   m_ToolManager->RoiDataChanged += mitk::MessageDelegate<mitk::BinaryThresholdTool>(this, &mitk::BinaryThresholdTool::OnRoiDataChanged);
   m_ReferenceNode = m_ToolManager->GetReferenceData(0);
   m_NodeForThresholding = m_ReferenceNode;
+  m_CurrentTimeStep = 0; // get the right e.g. from GUI
 
   if ( m_NodeForThresholding.IsNotNull() )
   {
@@ -123,58 +125,59 @@ void mitk::BinaryThresholdTool::Deactivated()
 
 void mitk::BinaryThresholdTool::SetThresholdValue(double value)
 {
-  if (m_ThresholdFeedbackNode.IsNotNull())
+  if (value != m_CurrentThresholdValue)
   {
-    m_CurrentThresholdValue = value;
-    m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(m_CurrentThresholdValue, 0.001) ) );
-    RenderingManager::GetInstance()->RequestUpdateAll();
+    if (m_ThresholdFeedbackNode.IsNotNull())
+    {
+      m_CurrentThresholdValue = value;
+      m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(m_CurrentThresholdValue, 0.001) ) );
+      RenderingManager::GetInstance()->RequestUpdateAll();
+    }
   }
 }
 
 void mitk::BinaryThresholdTool::ConfirmSegmentation()
 {
-    Image::Pointer thresholdImage = dynamic_cast<Image*>( m_NodeForThresholding->GetData() );
-    if (thresholdImage.IsNull()) return;
+  Image::Pointer referenceImage = dynamic_cast<Image*>( m_ToolManager->GetReferenceData(0)->GetData() );
+  if (referenceImage.IsNull()) return;
 
-    LabelSetImage::Pointer workingImage = dynamic_cast<LabelSetImage*>( m_ToolManager->GetWorkingData(0)->GetData() );
-    if (workingImage.IsNull()) return;
+  LabelSetImage::Pointer workingImage = dynamic_cast<LabelSetImage*>( m_ToolManager->GetWorkingData(0)->GetData() );
+  if (workingImage.IsNull()) return;
 
-    CurrentlyBusy.Send(true);
+  CurrentlyBusy.Send(true);
 
-    // perform the actual thresholding
-    for (unsigned int timeStep = 0; timeStep < workingImage->GetTimeSteps(); ++timeStep)
+  // perform the actual thresholding
+  ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+  timeSelector->SetInput( workingImage );
+  timeSelector->SetTimeNr( m_CurrentTimeStep );
+  timeSelector->UpdateLargestPossibleRegion();
+  Image::Pointer workingImageTimeStep = timeSelector->GetOutput();
+
+  try
+  {
+    if (workingImageTimeStep->GetDimension() == 2)
     {
-        ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
-        timeSelector->SetInput( workingImage );
-        timeSelector->SetTimeNr( timeStep );
-        timeSelector->UpdateLargestPossibleRegion();
-        Image::Pointer workingImageTimeStep = timeSelector->GetOutput();
-
-        try
-        {
-          if (workingImageTimeStep->GetDimension() == 2)
-          {
-            AccessFixedDimensionByItk_2( workingImageTimeStep, ITKThresholding, 2,thresholdImage, timeStep );
-          }
-          else
-          {
-            AccessFixedDimensionByItk_2( workingImageTimeStep, ITKThresholding, 3, thresholdImage, timeStep );
-          }
-        }
-        catch(...)
-        {
-          CurrentlyBusy.Send(false);
-          Tool::ErrorMessage("Error accessing single time steps of the original image. Cannot create segmentation.");
-        }
+      AccessTwoImagesFixedDimensionByItk( workingImageTimeStep.GetPointer(), referenceImage.GetPointer(), ITKThresholding, 2 );
     }
-
+    else
+    {
+      AccessTwoImagesFixedDimensionByItk( workingImageTimeStep.GetPointer(), referenceImage.GetPointer(), ITKThresholding, 3 );
+    }
+  }
+  catch(...)
+  {
     CurrentlyBusy.Send(false);
+    Tool::ErrorMessage("Error accessing single time steps of the original image. Cannot create segmentation.");
+  }
 
-    workingImage->Modified();
-    workingImage->GetVtkImageData()->Modified();
+  workingImageTimeStep->Modified();
 
-    RenderingManager::GetInstance()->RequestUpdateAll();
-    m_ToolManager->ActivateTool(-1);
+  workingImage->Modified();
+
+  CurrentlyBusy.Send(false);
+
+  RenderingManager::GetInstance()->RequestUpdateAll();
+  m_ToolManager->ActivateTool(-1);
 }
 
 void mitk::BinaryThresholdTool::CancelThresholding()
@@ -184,83 +187,82 @@ void mitk::BinaryThresholdTool::CancelThresholding()
 
 void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataNode* nodeForThresholding )
 {
-  if (nodeForThresholding)
+  if (!nodeForThresholding) return;
+
+  Image::Pointer image = dynamic_cast<Image*>( nodeForThresholding->GetData() );
+  Image::Pointer originalImage = dynamic_cast<Image*> (m_ReferenceNode->GetData());
+  if (image.IsNotNull())
   {
-    Image::Pointer image = dynamic_cast<Image*>( nodeForThresholding->GetData() );
-    Image::Pointer originalImage = dynamic_cast<Image*> (m_ReferenceNode->GetData());
-    if (image.IsNotNull())
+    // initialize a new node with the same image as our reference image
+    // use the level window property of this image copy to display the result of a thresholding operation
+    m_ThresholdFeedbackNode->SetData( image );
+    int layer(50);
+    nodeForThresholding->GetIntProperty("layer", layer);
+    m_ThresholdFeedbackNode->SetIntProperty("layer", layer+1);
+
+    if (DataStorage* storage = m_ToolManager->GetDataStorage())
     {
-      // initialize a new node with the same image as our reference image
-      // use the level window property of this image copy to display the result of a thresholding operation
-      m_ThresholdFeedbackNode->SetData( image );
-      int layer(50);
-      nodeForThresholding->GetIntProperty("layer", layer);
-      m_ThresholdFeedbackNode->SetIntProperty("layer", layer+1);
+      if (storage->Exists(m_ThresholdFeedbackNode))
+         storage->Remove(m_ThresholdFeedbackNode);
 
-      if (DataStorage* storage = m_ToolManager->GetDataStorage())
-      {
-        if (storage->Exists(m_ThresholdFeedbackNode))
-           storage->Remove(m_ThresholdFeedbackNode);
-
-        storage->Add( m_ThresholdFeedbackNode);
-      }
-
-      if (image.GetPointer() == originalImage.GetPointer())
-      {
-        if ((originalImage->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR)
-          &&(originalImage->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT))
-           m_IsFloatImage = true;
-        else
-           m_IsFloatImage = false;
-
-       m_SensibleMinimumThresholdValue = static_cast<double>( originalImage->GetScalarValueMin() );
-       m_SensibleMaximumThresholdValue = static_cast<double>( originalImage->GetScalarValueMax() );
-      }
-
-      LevelWindowProperty::Pointer lwp = dynamic_cast<LevelWindowProperty*>( m_ThresholdFeedbackNode->GetProperty( "levelwindow" ));
-      if (lwp && !m_IsFloatImage )
-      {
-        m_CurrentThresholdValue = static_cast<double>( lwp->GetLevelWindow().GetLevel() );
-      }
-      else
-      {
-        m_CurrentThresholdValue = (m_SensibleMaximumThresholdValue + m_SensibleMinimumThresholdValue)/2;
-      }
-
-      IntervalBordersChanged.Send(m_SensibleMinimumThresholdValue, m_SensibleMaximumThresholdValue, m_IsFloatImage);
-      ThresholdingValueChanged.Send(m_CurrentThresholdValue);
+      storage->Add( m_ThresholdFeedbackNode);
     }
+
+    if (image.GetPointer() == originalImage.GetPointer())
+    {
+      if ((originalImage->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR)
+        &&(originalImage->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT))
+         m_IsFloatImage = true;
+      else
+         m_IsFloatImage = false;
+
+     m_SensibleMinimumThresholdValue = static_cast<double>( originalImage->GetScalarValueMin() );
+     m_SensibleMaximumThresholdValue = static_cast<double>( originalImage->GetScalarValueMax() );
+    }
+
+    LevelWindowProperty::Pointer lwp = dynamic_cast<LevelWindowProperty*>( m_ThresholdFeedbackNode->GetProperty( "levelwindow" ));
+    if (lwp && !m_IsFloatImage )
+    {
+      m_CurrentThresholdValue = static_cast<double>( lwp->GetLevelWindow().GetLevel() );
+    }
+    else
+    {
+      m_CurrentThresholdValue = (m_SensibleMaximumThresholdValue + m_SensibleMinimumThresholdValue)/2;
+    }
+
+    IntervalBordersChanged.Send(m_SensibleMinimumThresholdValue, m_SensibleMaximumThresholdValue, m_IsFloatImage);
+    ThresholdingValueChanged.Send(m_CurrentThresholdValue);
   }
 }
 
-template <typename TPixel, unsigned int VImageDimension>
-void mitk::BinaryThresholdTool::ITKThresholding( itk::Image<TPixel, VImageDimension>* targetImage, Image* sourceImage, unsigned int timeStep )
+template <typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>
+void mitk::BinaryThresholdTool::ITKThresholding(
+  itk::Image<TPixel1, VDimension1>* targetImage, const itk::Image<TPixel2, VDimension2>* sourceImage )
 {
-  typedef itk::Image<TPixel,VImageDimension> ImageType;
+  typedef typename itk::Image< TPixel1, VDimension1> TargetImageType;
+  typedef typename itk::Image< TPixel2, VDimension2> SourceImageType;
 
-  typename ImageType::Pointer sourceImageITK;
-  CastToItkImage( sourceImage, sourceImageITK );
+  typedef itk::ImageRegionConstIterator< SourceImageType > SourceIteratorType;
+  typedef typename itk::ImageRegionIterator< TargetImageType > TargetIteratorType;
 
-  typedef itk::ImageRegionConstIterator< ImageType > SourceIteratorType;
-  typedef itk::ImageRegionIterator< ImageType >      TargetIteratorType;
-
-  typename SourceIteratorType sourceIterator( sourceImageITK, sourceImageITK->GetLargestPossibleRegion() );
+  typename SourceIteratorType sourceIterator( sourceImage, sourceImage->GetLargestPossibleRegion() );
   typename TargetIteratorType targetIterator( targetImage, targetImage->GetLargestPossibleRegion() );
+
+  int overwriteValue = m_ToolManager->GetActiveLabel()->GetIndex();
 
   sourceIterator.GoToBegin();
   targetIterator.GoToBegin();
 
-  const int& activePixelValue = m_ToolManager->GetActiveLabel()->GetIndex();
-
   while (!targetIterator.IsAtEnd())
   {
-    const int targetValue = targetIterator.Get();
+    int targetValue = targetIterator.Get();
     if ( sourceIterator.Get() >= m_CurrentThresholdValue )
     {
       if (!m_ToolManager->GetLabelLocked(targetValue))
-        targetIterator.Set( activePixelValue );
+      {
+        targetIterator.Set( overwriteValue );
+      }
     }
-
     ++sourceIterator;
     ++targetIterator;
   }
@@ -278,10 +280,17 @@ void mitk::BinaryThresholdTool::OnRoiDataChanged()
       return;
 
     mitk::MaskAndCutRoiImageFilter::Pointer roiFilter = mitk::MaskAndCutRoiImageFilter::New();
-
     roiFilter->SetInput(thresholdImage);
     roiFilter->SetRegionOfInterest(roiNode->GetData());
-    roiFilter->Update();
+
+    try
+    {
+      roiFilter->Update();
+    }
+    catch(...)
+    {
+      Tool::ErrorMessage("Error applying roi.");
+    }
 
     mitk::DataNode::Pointer tmpNode = mitk::DataNode::New();
     mitk::Image::Pointer tmpImage = roiFilter->GetOutput();

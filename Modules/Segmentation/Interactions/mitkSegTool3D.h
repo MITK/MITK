@@ -42,10 +42,10 @@ class Segmentation_EXPORT SegTool3D : public Tool
 
     virtual const char* GetGroup() const;
 
-    void PasteSegmentation( Image* targetImage, Image* sourceImage, int pixelvalue, int timestep );
+    void PasteSegmentationOnWorkingImage( Image* targetImage, Image* sourceImage, int overwritevalue, int timestep );
 
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkPasteSegmentation( itk::Image<TPixel,VImageDimension>* targetImage, const mitk::Image* sourceImage, int pixelvalue );
+    void ItkPasteSegmentationOnWorkingImage( itk::Image<TPixel,VImageDimension>* targetImage, const mitk::Image* sourceImage, int overwritevalue );
  };
 
 } // namespace

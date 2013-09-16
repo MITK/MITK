@@ -14,22 +14,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "mitkContourModelSetReader.h"
 #include "mitkContourModelReader.h"
 #include <iostream>
 #include <fstream>
 #include <locale>
 
-mitk::ContourModelReader::ContourModelReader()
+mitk::ContourModelSetReader::ContourModelSetReader()
 {
   m_Success = false;
 }
 
 
-mitk::ContourModelReader::~ContourModelReader()
+mitk::ContourModelSetReader::~ContourModelSetReader()
 {}
 
 
-void mitk::ContourModelReader::GenerateData()
+void mitk::ContourModelSetReader::GenerateData()
 {
     std::locale::global(std::locale("C"));
 
@@ -42,77 +43,30 @@ void mitk::ContourModelReader::GenerateData()
     if ( ! this->CanReadFile( m_FileName.c_str() ) )
     {
       itkWarningMacro( << "Sorry, can't read file " << m_FileName << "!" );
-        return ;
+      return ;
     }
 
-  try{
-    TiXmlDocument doc(m_FileName.c_str());
-    bool loadOkay = doc.LoadFile();
-    if (loadOkay)
-    {
-      TiXmlHandle docHandle( &doc );
+    try{
+      mitk::ContourModelSet::Pointer contourSet = mitk::ContourModelSet::New();
+      this->SetNthOutput(0,contourSet);
 
-      /*++++ handle n contourModels within data tags ++++*/
-      unsigned int contourCounter(0);
+      mitk::ContourModelReader::Pointer reader = mitk::ContourModelReader::New();
+      reader->SetFileName( this->GetFileName() );
+      reader->Update();
 
-      for( TiXmlElement* currentContourElement = docHandle.FirstChildElement("contourModel").ToElement();
-        currentContourElement != NULL; currentContourElement = currentContourElement->NextSiblingElement())
+      for(unsigned int i = 0; i < reader->GetNumberOfOutputs(); ++i)
       {
-        mitk::ContourModel::Pointer newContourModel = mitk::ContourModel::New();
-        if(currentContourElement->FirstChildElement("data")->FirstChildElement("timestep") != NULL)
-        {
-
-          //handle geometry information
-          //TiXmlElement* currentGeometryInfo = currentContourElement->FirstChildElement("head")->FirstChildElement("geometryInformation")->ToElement();
-          ///////////// NOT SUPPORTED YET ////////////////
-
-
-          /*++++ handle n timesteps within timestep tags ++++*/
-          for( TiXmlElement* currentTimeSeries = currentContourElement->FirstChildElement("data")->FirstChildElement("timestep")->ToElement();
-            currentTimeSeries != NULL; currentTimeSeries = currentTimeSeries->NextSiblingElement())
-          {
-            unsigned int currentTimeStep(0);
-
-
-            currentTimeStep = atoi(currentTimeSeries->Attribute("n"));
-
-            this->ReadPoints(newContourModel, currentTimeSeries, currentTimeStep);
-
-            int isClosed;
-            currentTimeSeries->QueryIntAttribute("isClosed", &isClosed);
-            if( isClosed )
-            {
-              newContourModel->Close(currentTimeStep);
-            }
-          }
-          /*++++ END handle n timesteps within timestep tags ++++*/
-
-        }
-        else
-        {
-          //this should not happen
-          MITK_WARN << "wrong file format!";
-          //newContourModel = this->ReadPoint(newContourModel, currentContourElement, 0);
-        }
-        newContourModel->UpdateOutputInformation();
-        this->SetNthOutput( contourCounter, newContourModel );
-        contourCounter++;
+        contourSet->AddContourModel( reader->GetOutput(i) );
       }
-      /*++++ END handle n contourModels within data tags ++++*/
-    }
-    else
+
+    }catch(...)
     {
-      MITK_WARN << "XML parser error!";
-    }
-  }catch(...)
-   {
       MITK_ERROR  << "Cannot read contourModel.";
-      m_Success = false;
-   }
+    }
     m_Success = true;
 }
 
-void mitk::ContourModelReader::ReadPoints(mitk::ContourModel::Pointer newContourModel,
+void mitk::ContourModelSetReader::ReadPoints(mitk::ContourModel::Pointer newContourModel,
         TiXmlElement* currentTimeSeries, unsigned int currentTimeStep)
 {
   //check if the timesteps in contourModel have to be expanded
@@ -152,11 +106,11 @@ void mitk::ContourModelReader::ReadPoints(mitk::ContourModel::Pointer newContour
 
 }
 
-void mitk::ContourModelReader::GenerateOutputInformation()
+void mitk::ContourModelSetReader::GenerateOutputInformation()
 {
 }
 
-int mitk::ContourModelReader::CanReadFile ( const char *name )
+int mitk::ContourModelSetReader::CanReadFile ( const char *name )
 {
     std::ifstream in( name );
     bool isGood = in.good();
@@ -164,7 +118,7 @@ int mitk::ContourModelReader::CanReadFile ( const char *name )
     return isGood;
 }
 
-bool mitk::ContourModelReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern)
+bool mitk::ContourModelSetReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern)
 {
   // First check the extension
   if(  filename == "" )
@@ -178,16 +132,16 @@ bool mitk::ContourModelReader::CanReadFile(const std::string filename, const std
     return false;
 
   bool extensionFound = false;
-  std::string::size_type MPSPos = filename.rfind(".cnt");
+  std::string::size_type MPSPos = filename.rfind(".cnt_set");
   if ((MPSPos != std::string::npos)
-      && (MPSPos == filename.length() - 4))
+      && (MPSPos == filename.length() - 8))
     {
     extensionFound = true;
     }
 
-  MPSPos = filename.rfind(".CNT");
+  MPSPos = filename.rfind(".CNT_SET");
   if ((MPSPos != std::string::npos)
-      && (MPSPos == filename.length() - 4))
+      && (MPSPos == filename.length() - 8))
     {
     extensionFound = true;
     }
@@ -201,7 +155,7 @@ bool mitk::ContourModelReader::CanReadFile(const std::string filename, const std
   return true;
 }
 
-void mitk::ContourModelReader::ResizeOutputs( const unsigned int& num )
+void mitk::ContourModelSetReader::ResizeOutputs( const unsigned int& num )
 {
     unsigned int prevNum = this->GetNumberOfOutputs();
     this->SetNumberOfIndexedOutputs( num );
@@ -212,7 +166,7 @@ void mitk::ContourModelReader::ResizeOutputs( const unsigned int& num )
 }
 
 
-bool mitk::ContourModelReader::GetSuccess() const
+bool mitk::ContourModelSetReader::GetSuccess() const
 {
     return m_Success;
 }

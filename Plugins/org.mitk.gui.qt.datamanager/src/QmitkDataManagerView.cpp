@@ -85,8 +85,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QColorDialog>
 #include <QSizePolicy>
 #include <QSignalMapper>
-
-
+#include <QInputDialog>
+#include <QLineEdit>
 
 const std::string QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 
@@ -191,6 +191,11 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
       QmitkNodeDescriptor("LabelSetImage", QString(":/Qmitk/LabelSetImage_48.png"), isLabelSetImage, this);
 
   QmitkNodeDescriptorManager::GetInstance()->AddDescriptor(labelSetImageDataNodeDescriptor);
+
+  QAction* renameAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Rename_48.png"), "Rename...", this);
+  QObject::connect( renameAction, SIGNAL( triggered(bool) ) , this, SLOT( RenameSelectedNode(bool) ) );
+  unknownDataNodeDescriptor->AddAction(renameAction);
+  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,renameAction));
 
   QAction* globalReinitAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"), "Global Reinit", this);
   QObject::connect( globalReinitAction, SIGNAL( triggered(bool) )
@@ -675,7 +680,28 @@ void QmitkDataManagerView::SurfaceRepresentationActionToggled( bool /*checked*/ 
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
+}
 
+void QmitkDataManagerView::RenameSelectedNode( bool )
+{
+  QModelIndexList indexesOfSelectedRows = m_NodeTreeView->selectionModel()->selectedRows();
+  if (indexesOfSelectedRows.size() != 1)
+  {
+    return;
+  }
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(indexesOfSelectedRows.at(0));
+  if ( node == 0 )
+  {
+    return;
+  }
+  bool ok = false;
+  QString oldName = QString::fromStdString(node->GetName());
+  QString newName = QInputDialog::getText(m_Parent, "MITK", "New name:", QLineEdit::Normal, oldName, &ok);
+
+  if(ok)
+  {
+    node->SetName(newName.toStdString());
+  }
 }
 
 void QmitkDataManagerView::SaveSelectedNodes( bool )

@@ -122,6 +122,10 @@ public slots:
   ///
   void SaveSelectedNodes( bool checked = false );
   ///
+  /// \brief Invoked when an element should be renamed.
+  ///
+  void RenameSelectedNode( bool checked = false );
+  ///
   /// \brief Invoked when an element should be removed.
   ///
   void RemoveSelectedNodes( bool checked = false );

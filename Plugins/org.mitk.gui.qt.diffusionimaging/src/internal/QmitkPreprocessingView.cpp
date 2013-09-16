@@ -212,16 +212,18 @@ void QmitkPreprocessingView::CallMultishellToSingleShellFilter(itk::DWIVoxelFunc
   imageNode->SetName(imageName.toStdString().c_str());
   GetDefaultDataStorage()->Add(imageNode);
 
-  // create new Error image
-  FilterType::ErrorImageType::Pointer errImage = filter->GetErrorImage();
-  mitk::Image::Pointer mitkErrImage = mitk::Image::New();
-  mitkErrImage->InitializeByItk<FilterType::ErrorImageType>(errImage);
-  mitkErrImage->SetVolume(errImage->GetBufferPointer());
+  if(m_Controls->m_OutputRMSErrorImage->isChecked()){
+    // create new Error image
+    FilterType::ErrorImageType::Pointer errImage = filter->GetErrorImage();
+    mitk::Image::Pointer mitkErrImage = mitk::Image::New();
+    mitkErrImage->InitializeByItk<FilterType::ErrorImageType>(errImage);
+    mitkErrImage->SetVolume(errImage->GetBufferPointer());
 
-  imageNode = mitk::DataNode::New();
-  imageNode->SetData( mitkErrImage );
-  imageNode->SetName((imageName+"_Error").toStdString().c_str());
-  GetDefaultDataStorage()->Add(imageNode);
+    imageNode = mitk::DataNode::New();
+    imageNode->SetData( mitkErrImage );
+    imageNode->SetName((imageName+"_Error").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode);
+  }
 }
 
 void QmitkPreprocessingView::DoBiExpFit()
@@ -450,6 +452,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
   m_Controls->m_CreateLengthCorrectedDwi->setEnabled(foundDwiVolume);
   m_Controls->m_CalcAdcButton->setEnabled(foundDwiVolume);
   m_Controls->m_targetBValueSpinBox->setEnabled(foundDwiVolume);
+  m_Controls->m_OutputRMSErrorImage->setEnabled(foundDwiVolume);
 
   UpdateBValueTableWidget(m_Controls->m_B_ValueMap_Rounder_SpinBox->value());
 

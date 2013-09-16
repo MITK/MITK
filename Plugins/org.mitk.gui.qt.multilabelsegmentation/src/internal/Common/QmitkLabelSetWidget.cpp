@@ -147,6 +147,8 @@ void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
   }
   else
     m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(NULL);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnToolManagerReferenceDataModified()
@@ -322,46 +324,46 @@ void QmitkLabelSetWidget::OnCreateSurface(int index)
 
 void QmitkLabelSetWidget::OnImportSegmentation()
 {
-    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-    toolManager->ActivateTool(-1);
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->ActivateTool(-1);
 
-    mitk::DataNode* segNode = toolManager->GetWorkingData(0);
-    if (!segNode) return;
+  mitk::DataNode* segNode = toolManager->GetWorkingData(0);
+  if (!segNode) return;
 
-    mitk::LabelSetImage* segImage = dynamic_cast<mitk::LabelSetImage*>( segNode->GetData() );
-    if (!segImage) return;
+  mitk::LabelSetImage* segImage = dynamic_cast<mitk::LabelSetImage*>( segNode->GetData() );
+  if (!segImage) return;
 
-    std::string fileExtensions("Segmentation files (*.lset);;");
-    QString qfileName = QFileDialog::getOpenFileName(this, "Import Segmentation", "", fileExtensions.c_str() );
-    if (qfileName.isEmpty() ) return;
+  std::string fileExtensions("Segmentation files (*.lset);;");
+  QString qfileName = QFileDialog::getOpenFileName(this, "Import Segmentation", "", fileExtensions.c_str() );
+  if (qfileName.isEmpty() ) return;
 
-    mitk::NrrdLabelSetImageReader<unsigned char>::Pointer reader = mitk::NrrdLabelSetImageReader<unsigned char>::New();
-    reader->SetFileName(qfileName.toLatin1());
+  mitk::NrrdLabelSetImageReader<unsigned char>::Pointer reader = mitk::NrrdLabelSetImageReader<unsigned char>::New();
+  reader->SetFileName(qfileName.toLatin1());
 
-    this->WaitCursorOn();
+  this->WaitCursorOn();
 
-    try
-    {
-        reader->Update();
-    }
-    catch ( itk::ExceptionObject & e )
-    {
-        MITK_ERROR << "Exception caught: " << e.GetDescription();
-        QMessageBox::information(this, "Import Segmentation", "Could not load the selected segmentation. See error log for details.\n");
-        this->WaitCursorOff();
-    }
+  try
+  {
+      reader->Update();
+  }
+  catch ( itk::ExceptionObject & e )
+  {
+      MITK_ERROR << "Exception caught: " << e.GetDescription();
+      QMessageBox::information(this, "Import Segmentation", "Could not load the selected segmentation. See error log for details.\n");
+      this->WaitCursorOff();
+  }
 
-    this->WaitCursorOff();
+  this->WaitCursorOff();
 
-    mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
+  mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
 
-    if (!segImage->Concatenate(lsImage)) {
-        QMessageBox::information(this,
-        "Import segmentation...",
-        "Could not import the selected segmentation session with the current software version (dimensions must match).\n");
-    }
+  if (!segImage->Concatenate(lsImage)) {
+      QMessageBox::information(this,
+      "Import segmentation...",
+      "Could not import the selected segmentation session with the current software version (dimensions must match).\n");
+  }
 
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnLoadSegmentation()
@@ -476,18 +478,18 @@ void QmitkLabelSetWidget::OnNewSegmentation()
 
   if (refImage->GetDimension() == 2)
   {
-      const unsigned int dimensions[] = { refImage->GetDimension(0), refImage->GetDimension(1), 1 };
-      labelSetImage->Initialize(pixelType, 3, dimensions);
+    const unsigned int dimensions[] = { refImage->GetDimension(0), refImage->GetDimension(1), 1 };
+    labelSetImage->Initialize(pixelType, 3, dimensions);
   }
   else
   {
-      labelSetImage->Initialize(pixelType, refImage->GetDimension(), refImage->GetDimensions());
+    labelSetImage->Initialize(pixelType, refImage->GetDimension(), refImage->GetDimensions());
   }
 
   unsigned int byteSize = sizeof(unsigned char);
   for (unsigned int dim = 0; dim < labelSetImage->GetDimension(); ++dim)
   {
-      byteSize *= labelSetImage->GetDimension(dim);
+    byteSize *= labelSetImage->GetDimension(dim);
   }
 
   mitk::ImageWriteAccessor accessor(static_cast<mitk::Image*>(labelSetImage));

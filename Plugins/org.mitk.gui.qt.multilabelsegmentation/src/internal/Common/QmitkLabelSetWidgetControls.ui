@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>273</width>
+    <width>250</width>
     <height>397</height>
    </rect>
   </property>
@@ -164,7 +164,14 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkLabelSetTableWidget" name="m_LabelSetTableWidget"/>
+    <widget class="QmitkLabelSetTableWidget" name="m_LabelSetTableWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="ctkSearchBox" name="m_LabelSearchBox"/>

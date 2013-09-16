@@ -30,7 +30,7 @@ class QmitkRenderWindow;
 
 /**
  * \ingroup ToolManagerEtAl
- * \ingroup org_mitk_gui_qt_segmentation_internal
+ * \ingroup org_mitk_gui_qt_multilabelsegmentation_internal
  */
 class QmitkMultiLabelSegmentationView : public QmitkAbstractView,
   public mitk::IRenderWindowPartListener, public berry::ISizeProvider

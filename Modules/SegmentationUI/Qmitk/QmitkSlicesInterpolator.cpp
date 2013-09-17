@@ -110,12 +110,13 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_FeedbackNode = mitk::DataNode::New();
   m_FeedbackContour = mitk::ContourModel::New();
   m_FeedbackNode->SetData( m_FeedbackContour );
-  m_FeedbackNode->SetName( "Interpolation feedback" );
-  m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(false) );
-  m_FeedbackNode->SetProperty( "contour.width", mitk::FloatProperty::New( 3.0 ) );
+  m_FeedbackNode->SetName( "2D interpolation feedback" );
+  m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
+  m_FeedbackNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
+  m_FeedbackNode->SetProperty( "contour.width", mitk::FloatProperty::New( 2.0 ) );
 
   m_InterpolatedSurfaceNode = mitk::DataNode::New();
-  m_InterpolatedSurfaceNode->SetName( "Surface Interpolation feedback" );
+  m_InterpolatedSurfaceNode->SetName( "3D interpolation feedback" );
   m_InterpolatedSurfaceNode->SetProperty( "color", mitk::ColorProperty::New(255.0,255.0,0.0) );
   m_InterpolatedSurfaceNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5) );
   m_InterpolatedSurfaceNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
@@ -149,6 +150,8 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   connect(&m_Watcher, SIGNAL(finished()), this, SLOT(StopUpdateInterpolationTimer()));
   m_Timer = new QTimer(this);
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(ChangeSurfaceColor()));
+
+  QWidget::setEnabled(false);
 }
 
 const QmitkSlicesInterpolator::ActionToSliceDimensionMapType QmitkSlicesInterpolator::CreateActionToSliceDimension()
@@ -203,8 +206,8 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, const Q
   m_ToolManager = toolManager;
 
   // set enabled only if a segmentation is selected
-  mitk::DataNode* node = m_ToolManager->GetWorkingData(0);
-  QWidget::setEnabled( node != NULL );
+ // mitk::DataNode* node = m_ToolManager->GetWorkingData(0);
+ // QWidget::setEnabled( node != NULL );
 
   // react whenever the set of selected segmentation changes
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkSlicesInterpolator>( this, &QmitkSlicesInterpolator::OnToolManagerWorkingDataModified );
@@ -377,7 +380,11 @@ void QmitkSlicesInterpolator::OnWorkingImageModified(const itk::EventObject&)
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
   mitk::DataNode* workingNode = this->m_ToolManager->GetWorkingData(0);
-  if (!workingNode) return;
+  if (!workingNode)
+  {
+    QWidget::setEnabled( false );
+    return;
+  }
 
   mitk::LabelSetImage::Pointer newImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
   if ( newImage.IsNull() ) return;
@@ -387,6 +394,8 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
     MITK_ERROR << "slices interpolator needs a 3D or 3D+t segmentation, not 2D.";
     return;
   }
+
+  QWidget::setEnabled( true );
 
   if (m_WorkingImage != newImage)
   {

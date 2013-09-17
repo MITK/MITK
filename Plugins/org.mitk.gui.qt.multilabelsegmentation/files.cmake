@@ -6,12 +6,18 @@ set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkMultiLabelSegmentationView.cpp
   Common/QmitkLabelSetWidget.cpp
-
+  Common/QmitkDataSelectionWidget.cpp
+  SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesView.cpp
+  SegmentationUtilities/QmitkSegmentationUtilityWidget.cpp
+  SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidget.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkMultiLabelSegmentationControls.ui
   src/internal/Common/QmitkLabelSetWidgetControls.ui
+  src/internal/Common/QmitkDataSelectionWidgetControls.ui
+  src/internal/SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesViewControls.ui
+  src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidgetControls.ui
 )
 
 set(MOC_H_FILES
@@ -19,16 +25,21 @@ set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/QmitkMultiLabelSegmentationView.h
   src/internal/Common/QmitkLabelSetWidget.h
-
+  src/internal/Common/QmitkDataSelectionWidget.h
+  src/internal/SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesView.h
+  src/internal/SegmentationUtilities/QmitkSegmentationUtilityWidget.h
+  src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidget.h
 )
 
 set(CACHED_RESOURCE_FILES
   resources/multilabelsegmentation.png
+  resources/MultiLabelSegmentationUtilities_48x48.png
   plugin.xml
 )
 
 set(QRC_FILES
   resources/multilabelsegmentation.qrc
+  resources/MultiLabelSegmentationUtilities.qrc
 )
 
 set(CPP_FILES)

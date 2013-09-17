@@ -53,6 +53,8 @@ class QmitkMITKIGTNavigationToolManagerView : public QmitkFunctionality
 
   protected slots:
 
+    void NewStorageByWidget(mitk::NavigationToolStorage::Pointer storage,std::string);
+
   protected:
 
     Ui::QmitkMITKIGTNavigationToolManagerViewControls* m_Controls;

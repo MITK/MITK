@@ -170,7 +170,7 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
       {
       Poco::Path myPath = Poco::Path(filename.c_str());
       this->LoadStorage(tempStorage,myPath.getFileName());
-      emit NewStorageAdded(m_NavigationToolStorage);
+      emit NewStorageAdded(m_NavigationToolStorage,myPath.getFileName());
       }
   }
 

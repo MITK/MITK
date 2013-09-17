@@ -64,8 +64,9 @@ class MitkIGTUI_EXPORT QmitkNavigationToolManagementWidget : public QWidget
     /** This signal is emmited if a new storage was added by the widget itself, e.g. because
      *  a storage was loaded from the harddisk.
      *  @param newStorage Holds the new storage which was added.
+     *  @param storageName Name of the new storage (e.g. filename)
      */
-    void NewStorageAdded(mitk::NavigationToolStorage::Pointer newStorage);
+    void NewStorageAdded(mitk::NavigationToolStorage::Pointer newStorage, std::string storageName);
 
   protected slots:
 

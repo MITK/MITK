@@ -49,10 +49,17 @@ void QmitkMITKIGTNavigationToolManagerView::CreateQtPartControl( QWidget *parent
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls = new Ui::QmitkMITKIGTNavigationToolManagerViewControls;
     m_Controls->setupUi( parent );
+    connect( (QObject*)(m_Controls->m_toolManagerWidget), SIGNAL(NewStorageAdded(mitk::NavigationToolStorage::Pointer,std::string)), this, SLOT(NewStorageByWidget(mitk::NavigationToolStorage::Pointer,std::string)) );
   }
   m_Controls->m_toolManagerWidget->Initialize(this->GetDataStorage());
+  std::string empty = "";
+  m_Controls->m_ToolStorageListWidget->Initialize<mitk::NavigationToolStorage>(mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID,empty);
 }
 
+void QmitkMITKIGTNavigationToolManagerView::NewStorageByWidget(mitk::NavigationToolStorage::Pointer storage,std::string storageName)
+{
+  storage->RegisterAsMicroservice(storageName);
+}
 
 void QmitkMITKIGTNavigationToolManagerView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {

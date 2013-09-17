@@ -23,19 +23,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  class MitkUS_EXPORT USAbstractControlInterface : public itk::Object
-  {
-  public:
-    mitkClassMacro(USAbstractControlInterface, itk::Object);
+/**
+  * \brief Superclass for all ultrasound device control interfaces.
+  * Defines an interface for activating and deactivating a control interface.
+  */
+class MitkUS_EXPORT USAbstractControlInterface : public itk::Object
+{
+public:
+  mitkClassMacro(USAbstractControlInterface, itk::Object);
 
-    virtual void SetIsActive(bool) = 0;
-    virtual bool GetIsActive() = 0;
+  /**
+    * Method must be implemented in every control interface to handle all
+    * activities which should be done on activating and deactivating the
+    * concrete control interface.
+    * \param isActive whether the control interface should be activated or deactivated
+    */
+  virtual void SetIsActive( bool isActive ) = 0;
 
-  protected:
-    USAbstractControlInterface();
-    virtual ~USAbstractControlInterface();
-  };
+  /**
+    * Method must be implemented in every control interface to tell the caller
+    * if the interface is currently activated or deactivated.
+    * \return whether the control interface is active or not
+    */
+  virtual bool GetIsActive( ) = 0;
 
-}
+protected:
+  USAbstractControlInterface( );
+  virtual ~USAbstractControlInterface( );
+};
+
+} // namespace mitk
 
 #endif // MITKUSAbstractControlInterface_H_HEADER_INCLUDED_

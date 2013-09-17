@@ -22,20 +22,52 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  class MitkUS_EXPORT USControlInterfaceProbes : public USAbstractControlInterface
-  {
-  public:
-    mitkClassMacro(USControlInterfaceProbes, USAbstractControlInterface);
+/**
+  * \brief Interface defining methods for probe selection of ultrasound devices.
+  * It consists of methods for getting all available probes and selecting one of
+  * them.
+  *
+  * All of the methods of this interface must be implemented in a concrete
+  * subclass. There are some pure virtual methods in the superclass
+  * mitk::USAbstractControlInterface which must be implemente, too.
+  *
+  */
+class MitkUS_EXPORT USControlInterfaceProbes : public USAbstractControlInterface
+{
+public:
+  mitkClassMacro(USControlInterfaceProbes, USAbstractControlInterface);
 
-    virtual std::vector<USProbe::Pointer> GetProbeSet() = 0;
-    virtual void SelectProbe(unsigned int index) = 0;
-    virtual void SelectProbe(USProbe::Pointer probe) = 0;
-    virtual unsigned int GetProbesCount() const = 0;
+  /**
+    * \return vector of all probes currently available at the ultrasound device
+    */
+  virtual std::vector<USProbe::Pointer> GetProbeSet( ) = 0;
 
-  protected:
-    USControlInterfaceProbes();
-    virtual ~USControlInterfaceProbes();
-  };
+  /**
+    * Select and activate probe by given index. The index corresponds to the
+    * the index of the probe in the vector returned by
+    * mitk::USControlInterfaceProbes::GetProbeSet().
+    *
+    * \param index index of the probe to be selected
+    */
+  virtual void SelectProbe( unsigned int index ) = 0;
+
+  /**
+    * Select and activate probe by given mitk::USProbe object. This object can
+    * be one of these returned by mitk::USControlInterfaceProbes::GetProbeSet().
+    *
+    * \param probe pointer to probe to be selected
+    */
+  virtual void SelectProbe( USProbe::Pointer probe ) = 0;
+
+  /**
+    * \return number of probes currently available at the ultrasound device
+    */
+  virtual unsigned int GetProbesCount( ) const = 0;
+
+protected:
+  USControlInterfaceProbes( );
+  virtual ~USControlInterfaceProbes( );
+};
 
 } // namespace mitk
 

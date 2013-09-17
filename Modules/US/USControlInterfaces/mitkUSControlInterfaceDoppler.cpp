@@ -23,8 +23,3 @@ mitk::USControlInterfaceDoppler::USControlInterfaceDoppler()
 mitk::USControlInterfaceDoppler::~USControlInterfaceDoppler()
 {
 }
-
-/*std::string GetControlInterfaceType()
-{
-  return "";
-}*/

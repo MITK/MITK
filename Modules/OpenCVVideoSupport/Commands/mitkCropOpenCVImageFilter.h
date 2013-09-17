@@ -56,6 +56,11 @@ public:
     */
   cv::Rect GetCropRegion( );
 
+  /**
+    * \return True if a non-empty crop region was set before.
+    */
+  bool GetIsCropRegionEmpty( );
+
 protected:
   /**
     * \brief Defines the region which will be cropped from the image.

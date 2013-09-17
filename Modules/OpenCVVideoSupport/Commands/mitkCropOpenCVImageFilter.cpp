@@ -97,4 +97,9 @@ cv::Rect CropOpenCVImageFilter::GetCropRegion( )
   return m_CropRegion;
 }
 
+bool CropOpenCVImageFilter::GetIsCropRegionEmpty( )
+{
+  return m_CropRegion.width == 0;
+}
+
 } // namespace mitk

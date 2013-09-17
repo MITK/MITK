@@ -8,5 +8,6 @@
         <file>zoom-out.png</file>
         <file>close.png</file>
         <file>clear.png</file>
+        <file>print.png</file>
     </qresource>
 </RCC>

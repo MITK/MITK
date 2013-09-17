@@ -104,6 +104,7 @@ private:
   QAction* m_OpenHelpMode;
   QAction* m_CloseHelpMode;
   QAction* m_HomeAction;
+  QAction* m_PrintAction;
 };
 
 } // end namespace berry

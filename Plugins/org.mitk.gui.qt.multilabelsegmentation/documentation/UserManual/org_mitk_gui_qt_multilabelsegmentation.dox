@@ -1,211 +1,307 @@
 /**
-\page org_mitk_views_multilabelsegmentation The Segmentation Plugin
+\page org_mitk_views_multilabelsegmentation User Manual
 
-\image html multilabelsegmentation.png "Icon of the Plugin"
+\image html multilabelsegmentation.png
 
-<i>Some of the features described below are closed source additions to the open source toolkit MITK and are not available in every application.</i>
+<i>Some of the features described below are closed source additions to the open source toolkit MITK and are not
+available in every application.</i>
 
 Available sections:
 
  - \ref org_mitk_gui_qt_segmentationUserManualOverview
  - \ref org_mitk_gui_qt_segmentationUserManualTechnical
+ - \ref org_mitk_gui_qt_segmentationUserManualCreateOpenSaveImportAdd
  - \ref org_mitk_gui_qt_segmentationUserManualLabelTable
- - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling
-   - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling1
-   - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling2
-   - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling3
-   - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling4
- - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling5
- - \ref org_mitk_gui_qt_segmentationUserManualOrganSegmentation
+ - \ref org_mitk_gui_qt_segmentationUserManualLabelCreation
+ - \ref org_mitk_gui_qt_segmentationUserManualLabelSelection
+ - \ref org_mitk_gui_qt_segmentationUserManualLabelSearch
+ - \ref org_mitk_gui_qt_segmentationUserManualLabelEditing
+   - \ref org_mitk_gui_qt_segmentationUserManualContouring
+   - \ref org_mitk_gui_qt_segmentationUserManualInterpolation
+   - \ref org_mitk_gui_qt_segmentationUserManualOrganSegmentation
    - \ref org_mitk_gui_qt_segmentationUserManualOrganSegmentation1
    - \ref org_mitk_gui_qt_segmentationUserManualOrganSegmentation2
    - \ref org_mitk_gui_qt_segmentationUserManualOrganSegmentation99
  - \ref org_mitk_gui_qt_segmentationUserManualLesionSegmentation
- - \ref org_mitk_gui_qt_segmentationUserManualPostprocessing
  - \ref org_mitk_gui_qt_segmentationUserManualSurfaceMasking
  - \ref org_mitk_gui_qt_segmentationUserManualTechnicalDetail
 
 \section org_mitk_gui_qt_segmentationUserManualOverview Overview
 
-The <b>Segmentation perspective</b> allows to create segmentations of anatomical and pathological structures in medical images of the human body.
+The <b>Segmentation Perspective</b> allows to create segmentations of anatomical and pathological structures in medical
+images of the human body.
 The perspective groups a number of tools which can be used for:
 <ul>
   <li> (semi-)automatic segmentation of organs on CT or MR image volumes
   <li> semi-automatic segmentation of lesions such as enlarged lymph nodes or tumors
-  <li> manual segmentation of structures
+  <li> manual segmentation of such structures
 </ul>
 
-\image html org_mitk_gui_qt_segmentationIMGapplication.png Segmentation perspective consisting of the Data Manager view and the Segmentation view
+\image html org_mitk_gui_qt_segmentationIMGapplication.png Segmentation perspective consisting of the Data Manager view, the
+Segmentation view and the Segmentation Utilities view.
 
 If you wonder what segmentations are good for, we shortly revisit the concept of a segmentation here.
 A CT or MR image is made up of volume of physical measurements (volume elements are called voxels).
-In CT images, for example, the gray value of each voxel corresponds to the mass absorbtion coefficient for X-rays in this voxel, which is similar in many %parts of the human body.
-The gray value does not contain any further information, so the computer does not know whether a given voxel is part of the body or the background, nor can it tell a brain from a liver.
-However, the distinction between a foreground and a background structure is required when:
+In CT images, for example, the gray value of each voxel corresponds to the mass absorbtion coefficient
+for X-rays in this voxel, which is similar in many %parts of the human body.
+The gray value does not contain any further information, so the computer does not know whether a given
+voxel is part of the body or the background, nor can it tell a brain from a liver.
+However, the distinction between voxels belonging to an object and a background structure is required when:
 <ul>
 <li>you want to know the volume of a given organ (the computer needs to know which %parts of the image belong to this organ)
 <li>you want to create 3D polygon visualizations (the computer needs to know the surfaces of structures that should be drawn)
 <li>as a necessary pre-processing step for therapy planning, therapy support, and therapy monitoring
 </ul>
-Creating this distinction between foreground and background is called <i>segmentation</i>.
-The Segmentation perspective of the MITK Workbench uses a voxel based approach to segmentation, i.e. each voxel of an image must be completely assigned to either foreground or background.
-This is in contrast to some other applications which might use an approach based on contours, where the border of a structure might cut a voxel into two %parts.
+
+This distinction between voxels inside and object and background is called <i>segmentation</i>.
+Since many objects might be segmented on an image, each segmentation is assigned a different <b>label</b>. A label
+has a name, a color, and a number of properties that we will describe later.
+The current implementation of the Segmentation perspective uses a voxel-based approach for segmentations, i.e. each voxel
+of an image must  be completely assigned to either a label or background. In a future version of the toolkit we will also enable
+the generation of segmentations based on contours. In this way, the user will be able to better define the borders of the
+segmented objects by taking advantage of his/her medical knowledge. Segmentations based on contours are not restricted to
+the voxel size of the medical image and can be arbitrarily positioned.
 
 The remainder of this document will summarize the features of the Segmentation perspective and how they are used.
 
 \section org_mitk_gui_qt_segmentationUserManualTechnical Technical Issues
 
-The Segmentation perspective makes a number of assumptions. To know what this view can be used for, it will help you to know that:
+The <b> Segmentation Perspective </b> makes a number of assumptions. To know what this view can be used for, it will help you to know that:
 <ul>
-  <li> Images must be 2D, 3D, or 3D+t
-  <li> Images must be single-values, i.e. CT, MRI or "normal" ultrasound. Images from color doppler or photographic (RGB) images are not supported
-  <li> Segmentations are handled as binary images of the same extent as the original image
+  <li> Images must be 2D, 3D, or 3D+t.
+  <li> Images must be single-values, i.e. CT, MRI or "typical" ultrasound. Images from color doppler, microscopy or
+photographs (RGB) are not yet supported.
+  <li> Segmentations are handled as multi-labeled images of the same extent as the original medical image.
 </ul>
 
-\section org_mitk_gui_qt_segmentationUserManualLabelTable The Labels Table
+\section org_mitk_gui_qt_segmentationUserManualCreateOpenSaveImportAdd Start Segmenting
 
-\image html org_mitk_gui_qt_segmentationIMGlabelwidget.png The Label table shows all the labels in the segmentation session ...
+To start using the <b>Segmentation Perspective</b> you will have to either create a new segmentation session or
+load an existing one from disk. The <b>Segmentation toolbar</b> collects buttons for the these actions:
 
-\section org_mitk_gui_qt_segmentationUserManualManualKringeling Manual Contouring
+\image html org_mitk_gui_qt_segmentationIMGtoolbar.png Segmentation toolbar
 
-With manual contouring you define which voxels are part of the segmentation and which are not.
-This allows you to create segmentations of any structeres that you may find in an image, even if they are not part of the human body.
-You might also use manual contouring to correct segmentations that result from sub-optimal automatic methods.
-The drawback of manual contouring is that you might need to define contours on many 2D slices.
-However, this is moderated by the interpolation feature, which will make suggestions for a segmentation.
+<ul>
+  <li>Create segmentation session</li> a new segmentation session is created.
+  <li>Load segmentation session</li> a segmentation session can be loaded from disk (.lset file extensions).
+  <li>Save segmentation session</li> the current segmentation session can be saved to disk.
+  <li>Import segmentation session</li> a segmentation session can be incorporated into the current one. All new labels will be appended
+  at the end of the table.
+  <li>Add label</li> a new label is appended to the current segmentation session, at the end of the table.
+</ul>
 
-\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling1 Creating New Segmentations
+\section org_mitk_gui_qt_segmentationUserManualLabelTable Labels Table
 
-Unless you want to edit existing segmentations, you have to create a new, empty segmentation before you can edit it.
-To do so, click the "New manual segmentation" button.
-Input fields will appear where you can choose a name for the new segmentation and a color for its display.
-Click the checkmark button to confirm or the X button to cancel the new segmentation.
-Notice that the input field suggests names once you %start typing and that it also suggests colors for known organ names.
-If you use names that are not yet known to the application, it will automatically remember these names and consider them the next time you create a new segmentation.
+The following label properties are readily available to modify:
 
-Once you created a new segmentation, you can notice a new item with the "binary mask" icon in the Data Manager tree view.
-This item is automatically selected for you, allowing you to %start editing the new segmentation right away.
+<ul>
+  <li>Name</li> the name of the label. Can be a predefined one or any other.
+  <li>Color</li> the color of the label.
+  <li>Visible</li> whether the label is currently visible or hiden.
+  <li>Locked</li> whether the label is locked or editable. A locked label cannot be overwritten by another.
+</ul>
 
-\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling2 Selecting Segmentations for Editing
+The Label Table is shown below:
 
-As you might want to have segmentations of multiple structures in a single patient image, the application needs to know which of them to use for editing.
-You select a segmenation by clicking it in the tree view of Data Manager. Note that segmentations are usually displayed as sub-items of "their" patient image.
-In the rare case, where you need to edit a segmentation that is not displayed as a a sub-item, you can click both the original image AND the segmentation while holding down CTRL or for Mac OS X the CMD on the keyboard.
+\image html org_mitk_gui_qt_segmentationIMGlabeltable.png The <b>Label Table</b> showing all the labels in the current segmentation session
 
-When a selection is made, the Segmentation View will hide all but the selected segmentation and the corresponding original image.
-When there are multiple segmentations, the unselected ones will remain in the Data Manager, you can make them visible at any time by selecting them.
+If you right click on any label in the table, a menu will pop-up offering the following actions to be performed on the selected label:
 
-\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling3 Selecting Editing Tools
+<ul>
+  <li><b>Rename...</b></li> : change the name and/or color of the selected label.
+  <li><b>Remove label </b></li> : delete the selected label.
+  <li><b>Erase label </b></li> : only clear the contents of the selected label.
+  <li><b>Random color </b></li> : generate a surface mesh out of the selected label.
+  <li><b>View only </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
+  <li><b>View/Hide all </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
+  <li><b>Lock/Unlock all </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
+  <li><b>Create surface </b></li> : generate a surface out of the selected label.
+  <li><b>Create mask </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
+</ul>
 
-If you are familiar with the MITK Workbench, you know that clicking and moving the mouse in any of the 2D render windows will move around the crosshair that defines what part of the image is displayed.
-This behavior is disabled while any of the manual segmentation tools are active -- otherwise you might have a hard time concentrating on the contour you are drawing.
+\image html org_mitk_gui_qt_segmentationIMGLabelTableSingleSelectionContextMenu.png Context menu for single label selection
 
-To %start using one of the editing tools, click its button the the displayed toolbox.
+\section org_mitk_gui_qt_segmentationUserManualSurfaceMasking Surface Masking
+
+You can use the surface masking tool to create binary images from a surface which is used used as a mask on an image. This task is
+demonstrated below:
+
+\image html segmentationFromSurfaceBefore.png Load an image and a surface
+
+Select the image and the surface in the corresponding drop-down boxes (both are selected automatically if there is just one image and one surface)
+
+If more than one label is selected, a different menu will show up:
+
+\image html org_mitk_gui_qt_segmentationIMGLabelTableMultipleSelectionContextMenu.png Context menu for multiple label selection
+
+<ul>
+  <li><b>Merge selection on current label</b></li> : transfer the contents of the selected labels in the <b>Label Table</b> into the current one.
+  <li><b>Remove selected labels</b></li> : delete the selected labels.
+  <li><b>Erase selected labels</b></li> : only clear the contents of the selected labels.
+  <li><b>Create a surface for each selected label</b></li> : generate a surface mesh out of each selected label.
+  <li><b>Combine and create a surface</b></li> : generate a surface out of the combination of the selected labels.
+  <li><b>Create a mask for each selected label</b></li> : generate a mask out of each selected label. A mask is a binary image with "1" inside and "0" outside.
+  <li><b>Combine and create a mask</b></li> : generate a mask out of the combination of the selected labels.
+</ul>
+
+\subsection org_mitk_gui_qt_segmentationUserManualLabelCreation Creating a New Label
+
+Click the "New Label" button to add a new label. A dialog will show-up to enter the name and color. Preset organ names and
+corresponding colors are offered while you type in, but you can set any name. The new name if not known will be automatically
+remembered and made available the next time you create a new label. In the current implementation of the plugin,
+the maximum number of labels is restricted to 255. If you need more, you will have to create a new segmentation session.
+
+
+\subsection org_mitk_gui_qt_segmentationUserManualLabelSelection Selecting a label for editing
+
+You can select the active label by clicking on the corresponding row in the Label Table. Only one label can be active at the time.
+
+\subsection org_mitk_gui_qt_segmentationUserManualLabelSearch Searching a Label
+
+It may happen that many labels (e.g. > 200) are present in a segmentation session and therefore manual searching is time consuming.
+The <b> Label Search </b> edit box allows for quickly finding the label you want. Just start writing its name and and you will get
+assitance for completing its name. If the label you were searching is found, press enter and it will became the active one.
+
+\image html org_mitk_gui_qt_segmentationIMGsearchlabel.png Label search
+
+\subsection org_mitk_gui_qt_segmentationUserManualLabelEditing Label Editing
+
+To start using one of the editing tools, click its button in the toolbox.
 The selected editing tool will be active and its corresponding button will stay pressed until you click the button again.
-Selecting a different tool also deactivates the previous one.
+Selecting a different tool also deactivates the previous one. If you are familiar with the MITK Workbench, you know that
+clicking and moving the mouse in any of the 2D windows will move around the crosshair that defines the position in
+the image you are standing in. Depending on the tool that you activate, this behavior may be disabled during segmenting
+-- otherwise you might have a hard time concentrating on the contour you are drawing.
 
-If you have to delineate a lot of images, you should try using shortcuts to switch tools. Just hit the first letter of each tool to activate it (A for Add, S for Subtract, etc.).
+If you have to delineate a lot of images, you should try using shortcuts to switch tools. Just hit the first letter of each
+tool to activate it (e.g. "A" for Add, "S" for Subtract, etc.). If you hover the cursor on a tool button you will get a tip
+message reminding you this.
 
-\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling4 Using Editing Tools
+\subsection org_mitk_gui_qt_segmentationUserManualManualEditingTools Manual Editing Tools
 
-All of the editing tools work by the same principle: you use the mouse (left button) to click anywhere in a 2D window (any of the orientations axial, sagittal, or frontal), move the mouse while holding the mouse button and release to finish the editing action.
+All of the editing tools work by the same principle: you use the mouse (left button) to click anywhere in a 2D
+window (any of the orientations axial, sagittal, or frontal), move the mouse while holding the mouse button and
+release to finish the editing action.
 
-Multi-step undo and redo is fully supported by all editing tools. Use the application-wide undo button in the toolbar to revert erroneous %actions.
+At any time you can undo or redo your past actions with corresponding buttons in the application\'s toolbar.
+
+\section org_mitk_gui_qt_segmentationUserManualContouring Manual Contouring
+
+The "Add" and "Subtract" tools allow for freely tracing a contour around an organ or structure in an image.
+You might also use manual contouring to further enhance or correct a segmentation resulting from sub-optimal automatic methods.
+The drawback of manual contouring is that you might need to define contours on many 2D slices to segment the whole structure.
+However, this is moderated by the interpolation tools, which are described later.
 
 \image html org_mitk_gui_qt_segmentationIMGiconAddSubtract.png Add and Subtract Tools
 
-Use the left mouse button to draw a closed contour. When releasing the mouse button, the contour will be added (Add tool) to or removed from (Subtract tool) the current segmentation.
+Use the left mouse button to draw a closed contour. When releasing the mouse button, the contour will be added (Add tool) to or
+removed from (Subtract tool) the current segmentation.
 Hold down the CTRL / CMD key to invert the operation (this will switch tools temporarily to allow for quick corrections).
 
 \image html org_mitk_gui_qt_segmentationIMGiconPaintWipe.png Paint and Wipe Tools
 
-Use the slider below the toolbox to change the radius of these round paintbrush tools. Move the mouse in any 2D window and press the left button to draw or erase pixels.
-As the Add/Subtract tools, holding CTRL / CMD while drawing will invert the current tool's behavior.
+Use the slider below the toolbox to change the radius of the paintbrush tool. Move the mouse
+in any 2D window and press the left button to draw or erase the active label.
+As the Add/Subtract tools, holding CTRL/CMD while drawing will invert the current tool's behavior.
 
 \image html org_mitk_gui_qt_segmentationIMGiconRegionGrowing.png Region Growing Tool
 
-Click at one point in a 2D slice widget to add an image region to the segmentation with the region growing tool. Moving up the cursor while holding the left mouse button widens the range for the included grey values; moving it down narrows it.
-When working on an image with a high range of grey values, the selection range can be influenced more strongly by moving the cursor at higher velocity.
-
-Region Growing selects all pixels around the mouse cursor that have a similar gray value as the pixel below the mouse cursor.
+Click with the left button at one point in a 2D window and move up or down while keeping it pressed. This action
+will make your segmentation grow (up) or shrink (down). When working on an image with a high range of grey values,
+the selection range can be influenced more strongly by moving the cursor at higher velocity. The region growing algorithm
+tool selects all pixels around the mouse cursor that have a similar gray value as the pixel below the first clicked position.
 This enables you to quickly create segmentations of structures that have a good contrast to surrounding tissue, e.g. the lungs.
-The tool will select more or less pixels (corresponding to a changing gray value interval width) when you move the mouse up or down while holding down the left mouse button.
 
-A common issue with region growing is the so called "leakage" which happens when the structure of interest is connected to other pixels, of similar gray values, through a narrow "bridge" at the border of the structure.
-The Region Growing tool comes with a "leakage detection/removal" feature. If leakage happens, you can left-click into the leakage region and the tool will try to automatically remove this region (see illustration below).
+A common issue with region growing is the so called "leakage" which happens when the structure of interest is connected to
+other pixels, of similar gray values, through a narrow "bridge" at the border of the structure.
+The Region Growing tool comes with a "leakage detection/removal" feature. If leakage happens, you can left-click into the
+leakage region and the tool will try to automatically remove this region (see illustration below).
 
 \image html org_mitk_gui_qt_segmentationIMGleakage.png Leakage correction feature of the Region Growing tool
 <br>
 \image html org_mitk_gui_qt_segmentationIMGiconCorrection.png Correction Tool
 
-You do not have to draw a closed contour to use the Correction tool and do not need to switch between the Add and Substract tool to perform
-small corrective changes. The following figure shows the usage of this tool:
+The corrector tool is used to perform small corrective changes. The following figure illustrates its use:
 <ul>
-<li> if the user draws a line which %starts and ends outside the segmenation AND it intersects no other segmentation the endpoints of the line are connected and the resulting contour is filled
-<li> if the user draws a line which %starts and ends outside the segmenation a part of it is cut off (left image)
-<li> if the line is drawn fully inside the segmentation the marked region is added to the segmentation (right image)
+<li> if the user draws a line which %starts and ends outside the active label, the
+endpoints of the line are connected and the region inside the resulting contour is incorporated to the active label.
+<li> if the user draws a line which %starts and ends outside the active label, the smaller region on the side is cut off (left image)
+<li> if the line is drawn fully inside the active label, the marked region is added to the segmentation (right image)
 </ul>
 
 \image html org_mitk_gui_qt_segmentationIMGcorrectionActions.png %Actions of the Correction tool illustrated.
 <br>
 \image html org_mitk_gui_qt_segmentationIMGiconFill.png Fill Tool
 
-Left-click inside a segmentation with holes to completely fill all holes.
+Left-click inside a hole inside the active label to fill it. If you click outside the hole (but yet inside the label) all
+holes within the label will be filled.
 
 \image html org_mitk_gui_qt_segmentationIMGiconErase.png Erase Tool
 
-This tool removes a connected part of pixels that form a segmentation. You may use it to remove so called islands (see picture) or to clear a whole slice at once (hold CTRL while clicking).
+This tool removes a connected region around the clicked position.
 
 \image html org_mitk_gui_qt_segmentationIMGiconLiveWire.png LiveWire Tool
 
-The LiveWire Tool acts as a magnetic lasso with a contour snapping to edges of objects.
+The LiveWire tool acts as a magnetic lasso with a contour snapping to edges of objects.
 
 \image html org_mitk_gui_qt_segmentationIMGLiveWireUsage.png Steps for using LiveWire Tool
 
 <ul>
-<li>(1) To start the Tool you have to double click near the edge of the object you want to segment. The initial anchor point will snap to the edge within a 3x3 region.
+<li>(1) To start the Tool you have to double click near the edge of the object you want to segment. The initial anchor point will
+snap to the edge within a 3x3 region.
 <li>(2) Move the mouse. You don't have trace the edge of the object. The contour will automatically snap to it.
 <li>(3) To fix a segment you can set anchor points by single left mouse button click.
 <li>(4) Go on with moving the mouse and setting anchor points.
 <li>(5) To close the contour double click on the initial anchor point.
-<li>(6) After closing the contour can be edited by moving, inserting and deleting anchor points.
+<li>(6) After closing the contour, it can further be edited by dragging, inserting and deleting anchor points.
 </ul>
 
-The contour will be transfered to its binary image representation by deactivating the tool.
+The contour will be transfered to the active label when the tool is deactivated.
 
-\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling5 Interpolation
+\image html org_mitk_gui_qt_segmentationIMGiconFastMarching2D.png FastMarching Tool
 
-Creating segmentations for modern CT volumes is very time-consuming, because structures of interest can easily cover a range of 50 or more slices.
-The Manual Segmentation View offers two helpful features for these cases:
+The FastMarching tool ...
+
+\subsection org_mitk_gui_qt_segmentationUserManualInterpolation Interpolation
+
+Segmenting modern CT and MR volumes is very time-consuming, because structures of interest can easily
+cover a range of 50 or more slices. The Segmentation plugin offers two helpful features for these cases:
 
 <ul>
 <li> <b>3D Interpolation</b>
 <li> <b>2D Interpolation</b>
 </ul>
 <br>
-<b>The 3D interpolation</b> is activated by default when using the manual segmentation tools. That means if you start contouring, from the second contour onwards, the surface of the segmented area will be interpolated based on the given contour information.
-The interpolation works with all available manual tools. Please note that this is currently a pure mathematical interpolation, i.e. image intensity information is not taken into account. With each further contour the interpolation result will be improved,
-but the more contours you provide the longer the recalculation will take. To achieve an optimal interpolation result and in this way a most accurate segmentation you should try to describe the surface with sparse contours by segmenting in arbitrary
-oriented planes. The 3D interpolation is not meant to be used for parallel slice-wise segmentation.
+<b>The 3D interpolation</b> is activated by default when using the manual segmentation tools. That means if you start
+contouring, from the second contour onwards, the surface of the segmented area will be interpolated based on the available contours.
+The interpolation works with all available manual tools. Please note that this is currently a pure geometrical interpolation,
+i.e. image intensity information is not taken into account. With each new contour that the user traces, the interpolation result
+will improve, but the more contours you provide the longer the recalculation will take. To optimize the interpolation result you
+should try to provide sparse contours in arbitrary oriented planes. Generating parallel contours along a given direction is not
+a good approach. During interpolation recalculation, the generated surface blinks in yellow/white. When the interpolation
+has finished the surface is shown yellow with a small opacity. Additional to the surface, black contours are shown in the 3D render
+window. They mark the positions of all the drawn contours which were used for the interpolation. You can navigate between the drawn
+contours by clicking on the „Position“ - Nodes in the Data Manager which are located below the active segmentation. If you don't
+want to see these nodes just unckeck the „Show Position Nodes“ Checkbox and these nodes will
+be hidden. If you want to delete a drawn contour we recommend to use the Erase-Tool since Redo/Undo is not yet working for 3D
+interpolation.
 
 \image html org_mitk_gui_qt_segmentation3DInterpolationWrongRight.png 3D Interpolation HowTo
 
-You can accept the interpolation result by clicking the "Accept" - button below the tool buttons.
-In this case the 3D interpolation will be deactivated automatically so that the result can be postprocessed without any interpolation running in background. During recalculation the interpolated surface is blinking yellow/white. When the interpolation
-has finished the surface is shown yellow with a small opacity. Additional to the surface, black contours are shown in the 3D render window. They mark the positions of all the drawn contours which were used for the interpolation.
-You can navigate between the drawn contours by clicking on the „Position“ - Nodes in the datamanager which are located below the selected segmentation. If you don't want to see these nodes just unckeck the „Show Position Nodes“ Checkbox and these nodes will be hidden.
-If you want to delete a drawn contour we recommend to use the Erase-Tool since Redo/Undo is not yet working for 3D interpolation.
+Finally, you can accept the interpolation result by clicking the "Accept" - button below the toolbox. The region inside the surface is
+assigned to the active label.
 
 <br>
-<b>The 2D Interpolation</b> creates suggestions for a segmentation whenever you have a slice that
+<b>The 2D Interpolation</b> creates suggestions for extending the active label into neighboring slices provided
 <ul>
-<li> has got neighboring slices with segmentations (these do not need to be direct neighbors but could also be a couple of slices away) AND
-<li> is completely clear of a manual segmentation -- i.e. there will be no suggestion if there is even only a single pixel of segmentation in the current slice.
+<li> a segmentation of the same active label is available a couple of slices away AND
+<li> is completely clear of the active label in between -- i.e. there will be no interpolation suggestion if there is even only
+a single pixel of the active label between the aforementioned slices.
 </ul>
 
-Interpolated suggestions are displayed in a different way than manual segmentations are, until you "accept" them as part of the segmentation.
-To accept single slices, click the "Accept" button below the toolbox.
-If you have segmented a whole organ in every-x-slice, you may also review the interpolations and then accept all of them at once by clicking "... all slices".
+Interpolated suggestions are displayed as contours with the same color as the active label. To accept an interpolation suggestion
+in a single slice, click the "Accept" button below the toolbox. You can also accept all interpolated suggestions at once in a
+given window, by pressing the "Accept All" button.
 
 \section org_mitk_gui_qt_segmentationUserManualOrganSegmentation Organ Segmentation
 
@@ -267,36 +363,8 @@ If the lymph node segmentation is not to your content, you can select the "Lymph
 This kind of correction helps in many cases.
 If nothing else helps, you can still use the pure manual tools as a fallback.
 
-\section org_mitk_gui_qt_segmentationUserManualPostprocessing Things you can do with segmentations
-
-As mentioned in the introduction, segmentations are never an end in themselves.
-Consequently, the Segmentation view adds a couple of "post-processing" %actions to the Data Manager.
-These %actions are accessible through the context-menu of segmentations in Data Manager's list view
-
-\image html org_mitk_gui_qt_segmentationIMGDataManagerContextMenu.png Context menu items for segmentations.
-
-<ul>
-<li> <b>Create polygon %model</b> applies the marching cubes algorithms to the segmentation. This polygon %model can be used for visualization in 3D or other things such as stereolithography (3D printing).
-<li> <b>Create smoothed polygon %model</b> uses smoothing in addition to the marching cubes algorithms, which creates models that do not follow the exact outlines of the segmentation, but look smoother.
-<li> <b>Statistics</b> goes through all the voxels in the patient image that are part of the segmentation and calculates some statistical measures (minumum, maximum, median, histogram, etc.). Note that the statistics are ALWAYS calculated for the parent element of the segmentation as shown in Data Manager.
-<li> <b>Autocrop</b> can save memory. Manual segmentations have the same extent as the patient image, even if the segmentation comprises only a small sub-volume. This invisible and meaningless margin is removed by autocropping.
-</ul>
-
-\section org_mitk_gui_qt_segmentationUserManualSurfaceMasking Surface Masking
-
-You can use the surface masking tool to create binary images from a surface which
-is used used as a mask on an image. This task is demonstrated below:
-
-\image html segmentationFromSurfaceBefore.png Load an image and a surface.
-
-Select the image and the surface in the corresponding drop-down boxes (both are selected automatically if there is just one image and one surface)
-
-\image html segmentationFromSurfaceAfter.png Create segmentation from surface
-
-After clicking "Create segmentation from surface" the newly created binary image is inserted in the DataManager and can be used for further processing
-
 \section org_mitk_gui_qt_segmentationUserManualTechnicalDetail Technical Information for Developers
 
-For technical specifications see \subpage QmitkSegmentationTechnicalPage and for information on the extensions of the tools system \subpage toolextensions .
+For technical specifications see : \subpage QmitkSegmentationTechnicalPage and for information on the extensions of the tools system : \subpage toolextensions.
 
 */

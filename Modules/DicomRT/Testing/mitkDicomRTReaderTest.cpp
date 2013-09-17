@@ -26,8 +26,9 @@ int mitkDicomRTReaderTest(int  argc , char* argv[])
 
   mitk::DicomRTReader::Pointer _DicomRTReader = mitk::DicomRTReader::New();
 
-  ContourModelVector emptyItem;
-  ContourModelVector result = _DicomRTReader->ReadDicomFile(argv[1]);
+  mitk::ContourModelSet::Pointer emptyItem;
+  mitk::ContourModelSet::Pointer result = mitk::ContourModelSet::New();
+  result = _DicomRTReader->ReadDicomFile(argv[1]);
 
 //  DcmFileFormat file;
 //  OFCondition outp = file.loadFile(argv[1], EXS_Unknown);

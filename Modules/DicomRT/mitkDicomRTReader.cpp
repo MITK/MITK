@@ -83,9 +83,8 @@ namespace mitk
     }
   }
 
-  ContourModelVector DicomRTReader::ReadDicomFile(char* filename)
+  mitk::ContourModelSet::Pointer DicomRTReader::ReadDicomFile(char* filename)
   {
-
     std::cout << "\n\n" << "Filename:" << filename << "\n\n";
     DcmFileFormat file;
     OFCondition outp;
@@ -99,38 +98,38 @@ namespace mitk
         if(sopClass == UID_RTDoseStorage)
         {
           int x = this->DicomRTReader::LoadRTDose(dataset);
-          ContourModelVector y;
+          mitk::ContourModelSet::Pointer y;
           return y;
         }
         else if(sopClass == UID_RTStructureSetStorage)
         {
-          ContourModelVector x = this->DicomRTReader::ReadStructureSet(dataset);
+          mitk::ContourModelSet::Pointer x = this->DicomRTReader::ReadStructureSet(dataset);
           return x;
         }
         else if(sopClass == UID_RTPlanStorage)
         {
           int x = this->DicomRTReader::LoadRTPlan(dataset);
-          ContourModelVector y;
+          mitk::ContourModelSet::Pointer y;
           return y;
         }
         else
         {
           std::cout << "Error reading the RTStructureSetStorage\n\n";
-          ContourModelVector y;
+          mitk::ContourModelSet::Pointer y;
           return y;
         }
       }
       else
       {
         std::cout << "Error reading the SOPClassID\n\n";
-        ContourModelVector y;
+        mitk::ContourModelSet::Pointer y;
         return y;
       }
     }
     else
     {
       std::cout << "Cant read the input file\n\n";
-      ContourModelVector y;
+      mitk::ContourModelSet::Pointer y;
       return y;
     }
   }
@@ -154,20 +153,21 @@ namespace mitk
     return NULL;
   }
 
-  ContourModelVector DicomRTReader::ReadStructureSet(DcmDataset* dataset)
+  mitk::ContourModelSet::Pointer DicomRTReader::ReadStructureSet(DcmDataset* dataset)
   {
+    mitk::ContourModelSet::Pointer contourSet = mitk::ContourModelSet::New();
     DRTStructureSetIOD structureSetObject;
     OFCondition outp = structureSetObject.read(*dataset);
     if(!outp.good())
     {
       std::cout << "Error reading the file\n\n";
-      return contourVector;
+      return contourSet;
     }
     DRTStructureSetROISequence &roiSequence = structureSetObject.getStructureSetROISequence();
     if(!roiSequence.gotoFirstItem().good())
     {
       std::cout << "Error reading the structure sequence\n\n";
-      return contourVector;
+      return contourSet;
     }
     do{
       DRTStructureSetROISequence::Item &currentSequence = roiSequence.getCurrentItem();
@@ -202,7 +202,7 @@ namespace mitk
     if(!roiContourSeqObject.gotoFirstItem().good())
     {
       std::cout << "Error reading the contour sequence\n\n";
-      return contourVector;
+      return contourSet;
     }
     do
     {
@@ -228,7 +228,7 @@ namespace mitk
           OFString numberOfPoints;
           OFVector<Float64> contourData_LPS;
           mitk::ContourModel::Pointer contourSequence = mitk::ContourModel::New();
-          contourSequence->Initialize();
+          //contourSequence->Initialize();
 
           contourItem.getContourNumber(contourNumber);
           contourItem.getNumberOfContourPoints(numberOfPoints);
@@ -247,7 +247,7 @@ namespace mitk
             contourSequence->AddVertex(point);
           }
           contourSequence->Close();
-          contourVector.push_back(contourSequence);
+          contourSet->AddContourModel(contourSequence);
         }
         while(contourSeqObject.gotoNextItem().good());
       }
@@ -271,7 +271,7 @@ namespace mitk
     }
     while(roiContourSeqObject.gotoNextItem().good());
 
-    return contourVector;
+    return contourSet;
   }
 
   OFString DicomRTReader::GetReferencedFrameOfReferenceSOPInstanceUID(DRTStructureSetIOD &structSetObject)

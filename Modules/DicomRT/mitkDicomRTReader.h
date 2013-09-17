@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDicomRTExports.h>
 #include "mitkContourModel.h"
 #include "mitkContourElement.h"
+#include <mitkContourModelSet.h>
 
 #include "dcmtk/config/osconfig.h"
 #include "dcmtk/ofstd/ofconapp.h"
@@ -53,8 +54,6 @@ class DcmDataset;
 class OFString;
 class DRTContourSequence;
 class DRTStructureSetIOD;
-
-typedef std::vector<mitk::ContourModel::Pointer> ContourModelVector;
 
 namespace mitk
 {
@@ -110,8 +109,8 @@ namespace mitk
 
     itkNewMacro( Self );
 
-    ContourModelVector ReadDicomFile(char* filename);
-    ContourModelVector ReadStructureSet(DcmDataset* dataset);
+    mitk::ContourModelSet::Pointer ReadDicomFile(char* filename);
+    mitk::ContourModelSet::Pointer ReadStructureSet(DcmDataset* dataset);
     int LoadRTPlan(DcmDataset* dataset);
     int LoadRTDose(DcmDataset* dataset);
     size_t GetNumberOfRois();
@@ -129,7 +128,6 @@ namespace mitk
 
     std::vector<RoiEntry> RoiSequenceVector;
     std::vector<BeamEntry> BeamSequenceVector;
-    ContourModelVector contourVector;
 
     /**
     * Constructor.

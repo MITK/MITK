@@ -45,10 +45,27 @@ class MitkIGTUI_EXPORT QmitkNavigationToolManagementWidget : public QWidget
   public:
     static const std::string VIEW_ID;
 
+    /** Initializes the widget. Has to be called before any action, otherwise errors might occur. */
     void Initialize(mitk::DataStorage* dataStorage);
+
+    /** Loads a storage to the widget. The old storage storage is dropped, so be careful, if the
+     *  storage is not saved somewhere else it might be lost. You might want to ask the user if he
+     *  wants to save the storage to the harddisk before calling this method.
+     *  @param storageToLoad This storage will be loaded and might be modified by the user.
+     *  @param storageName This name will be displayed for this storage.
+     */
+    void LoadStorage(mitk::NavigationToolStorage::Pointer storageToLoad, std::string storageName);
 
     QmitkNavigationToolManagementWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkNavigationToolManagementWidget();
+
+  signals:
+
+    /** This signal is emmited if a new storage was added by the widget itself, e.g. because
+     *  a storage was loaded from the harddisk.
+     *  @param newStorage Holds the new storage which was added.
+     */
+    void NewStorageAdded(mitk::NavigationToolStorage::Pointer newStorage);
 
   protected slots:
 

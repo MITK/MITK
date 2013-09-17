@@ -151,6 +151,14 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
     m_Controls->m_MainWidgets->setCurrentIndex(1);
   }
 
+
+void QmitkNavigationToolManagementWidget::LoadStorage(mitk::NavigationToolStorage::Pointer storageToLoad, std::string storageName)
+  {
+  m_NavigationToolStorage = storageToLoad;
+  m_Controls->m_StorageName->setText(storageName.c_str());
+  UpdateToolTable();
+  }
+
 void QmitkNavigationToolManagementWidget::OnLoadStorage()
   {
     mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(m_DataStorage);
@@ -160,11 +168,10 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
     if (tempStorage.IsNull()) MessageBox("Error" + myDeserializer->GetErrorMessage());
     else
       {
-      m_NavigationToolStorage = tempStorage;
       Poco::Path myPath = Poco::Path(filename.c_str());
-      m_Controls->m_StorageName->setText(myPath.getFileName().c_str());
+      this->LoadStorage(tempStorage,myPath.getFileName());
+      emit NewStorageAdded(m_NavigationToolStorage);
       }
-    UpdateToolTable();
   }
 
 void QmitkNavigationToolManagementWidget::OnSaveStorage()

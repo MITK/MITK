@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkMultiLabelSegmentationView.h"
 #include "QmitkMultiLabelSegmentationPreferencePage.h"
+#include "SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesView.h"
 
 using namespace mitk;
 
@@ -24,6 +25,7 @@ void PluginActivator::start(ctkPluginContext *context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationPreferencePage, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationUtilitiesView, context)
 }
 
 void PluginActivator::stop(ctkPluginContext *)

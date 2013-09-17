@@ -115,7 +115,7 @@ public:
   /**
     * \brief
   */
-  void MergeLabels(int begin, int count, int index);
+  void MergeLabels(std::vector<int>& indexes, int index);
 
   /**
     * \brief  */

@@ -16,9 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkMultiLabelSegmentationView.h"
 
+// blueberry
 #include <berryIWorkbenchPage.h>
 #include <berryConstants.h>
 
+// mitk
 #include "mitkLabelSetImage.h"
 #include "mitkStatusBar.h"
 #include "mitkApplicationCursor.h"
@@ -37,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkModuleRegistry.h"
 #include "mitkModuleResource.h"
 
-//Qt
+// Qt
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QFileDialog>
@@ -46,6 +48,7 @@ const std::string QmitkMultiLabelSegmentationView::VIEW_ID = "org.mitk.views.mul
 
 QmitkMultiLabelSegmentationView::QmitkMultiLabelSegmentationView() :
 m_Parent(NULL),
+m_IRenderWindowPart(NULL),
 m_DataSelectionChanged(false),
 m_MouseCursorSet(false)
 {
@@ -88,13 +91,13 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 
   if( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode().IsNotNull() )
       this->UpdateWarningLabel("Create a segmentation");
-
+/*
   m_Controls.m_cbWorkingNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.m_cbWorkingNodeSelector->SetPredicate(m_SegmentationPredicate);
   m_Controls.m_cbWorkingNodeSelector->SetAutoSelectNewItems(true);
   if( m_Controls.m_cbWorkingNodeSelector->GetSelectedNode().IsNotNull() )
     this->UpdateWarningLabel("");
-
+*/
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   assert ( toolManager );
   toolManager->SetDataStorage( *(this->GetDataStorage()) );
@@ -105,6 +108,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.m_LabelSetWidget->SetDataStorage( *(this->GetDataStorage()) );
   m_Controls.m_LabelSetWidget->SetPreferences( this->GetPreferences() );
+  m_Controls.m_LabelSetWidget->SetPredicate( m_SegmentationPredicate );
 
   // all part of open source MITK
   m_Controls.m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
@@ -132,9 +136,6 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 
   connect( m_Controls.m_cbReferenceNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
        this, SLOT( OnReferenceSelectionChanged( const mitk::DataNode* ) ) );
-
-  connect( m_Controls.m_cbWorkingNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
-       this, SLOT( OnSegmentationSelectionChanged( const mitk::DataNode* ) ) );
 
   connect( m_Controls.m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
 
@@ -170,6 +171,8 @@ void QmitkMultiLabelSegmentationView::RenderWindowPartActivated(mitk::IRenderWin
 
 void QmitkMultiLabelSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->ActivateTool(-1);
   m_IRenderWindowPart = 0;
   m_Parent->setEnabled(false);
 }
@@ -257,34 +260,6 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
   else
   {
     this->UpdateWarningLabel("Please load an image");
-  }
-}
-
-void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk::DataNode *node)
-{
-  if( node != NULL )
-  {
-      mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-      assert(toolManager);
-
-      mitk::DataNode* workingNode = const_cast<mitk::DataNode*>(node);
-      workingNode->SetVisibility(true);
-      toolManager->SetWorkingData(workingNode);
-      m_Controls.m_SlicesInterpolator->setEnabled( true );
-//      m_Controls.m_SlicesInterpolator->SetWorkingImage( dynamic_cast< mitk::LabelSetImage*>( workingNode->GetData() ) );
-
-      mitk::DataStorage::SetOfObjects::ConstPointer others = this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
-      for(mitk::DataStorage::SetOfObjects::const_iterator iter = others->begin(); iter != others->end(); ++iter)
-      {
-        mitk::DataNode* _other = *iter;
-        if (_other != workingNode)
-          _other->SetVisibility(false);
-      }
-  }
-  else
-  {
-    m_Controls.m_SlicesInterpolator->setEnabled( false );
-    this->UpdateWarningLabel("Create a segmentation");
   }
 }
 
@@ -408,7 +383,8 @@ void QmitkMultiLabelSegmentationView::SetMouseCursor( const mitk::ModuleResource
 
 void QmitkMultiLabelSegmentationView::OnGoToLabel(const mitk::Point3D& pos)
 {
-//   m_MultiWidget->MoveCrossToPosition(pos);
+  if (m_IRenderWindowPart)
+    m_IRenderWindowPart->SetSelectedPosition(pos);
 }
 
 void QmitkMultiLabelSegmentationView::OnSurfaceStamp()

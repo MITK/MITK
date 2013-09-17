@@ -59,8 +59,6 @@ protected slots:
 
   void OnReferenceSelectionChanged(const mitk::DataNode* node);
 
-  void OnSegmentationSelectionChanged(const mitk::DataNode* node);
-
   void OnSurfaceStamp();
 
   void OnGoToLabel( const mitk::Point3D& pos );

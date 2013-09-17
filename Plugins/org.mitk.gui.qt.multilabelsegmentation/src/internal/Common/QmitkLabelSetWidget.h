@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkWeakPointer.h"
 #include "mitkDataNode.h"
+#include "mitkNodePredicateBase.h"
 
 #include <berryIBerryPreferences.h>
 
@@ -45,11 +46,11 @@ public:
 
   void SetPreferences( berry::IPreferences::Pointer prefs );
 
+  void SetPredicate( mitk::NodePredicateBase* predicate );
+
   void ReInit();
 
   void SetDataStorage(mitk::DataStorage& storage);
-
-  void OnToolManagerWorkingDataModified();
 
   void OnToolManagerReferenceDataModified();
 
@@ -64,6 +65,9 @@ private slots:
 
   // reaction to signal "labelListModified" from QmitkLabelSetTableWidget
   void OnLabelListModified(const QStringList& list);
+
+  // reaction to the signal "OnSelectionChanged" from QmitkDataStorageComboBox
+  void OnSegmentationSelectionChanged(const mitk::DataNode* node);
 
   // reaction to the signal "renameLabel" from QmitkLabelSetTableWidget
   void OnRenameLabel(int index, const mitk::Color& color, const std::string& name);
@@ -102,6 +106,8 @@ private:
     QCompleter* m_Completer;
 
     berry::IPreferences::Pointer m_Preferences;
+
+    mitk::NodePredicateBase::Pointer m_Predicate;
 
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 

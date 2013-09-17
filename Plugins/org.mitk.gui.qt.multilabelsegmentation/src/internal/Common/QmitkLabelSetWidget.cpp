@@ -20,11 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIDataStorageService.h>
 #include <mitkLabelSetImage.h>
-#include <mitkNodePredicateAnd.h>
-#include <mitkNodePredicateOr.h>
-#include <mitkNodePredicateDataType.h>
-#include <mitkNodePredicateNot.h>
-#include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
 #include <mitkToolManagerProvider.h>
 #include <mitkLabelSetImageToSurfaceThreadedFilter.h>
@@ -55,6 +50,9 @@ m_WorkingNode(0)
   m_Controls.setupUi(this);
 
   m_Controls.m_LabelSetTableWidget->Init();
+
+  connect( m_Controls.m_cbWorkingNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
+       this, SLOT( OnSegmentationSelectionChanged( const mitk::DataNode* ) ) );
 
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(newLabel()), this, SLOT(OnNewLabel()) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(renameLabel(int, const mitk::Color&, const std::string&)), this, SLOT(OnRenameLabel(int, const mitk::Color&, const std::string&)) );
@@ -90,7 +88,6 @@ m_WorkingNode(0)
 
   // react whenever the set of selected segmentation changes
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerWorkingDataModified );
   toolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerReferenceDataModified );
 
   m_Controls.m_LabelSetTableWidget->setEnabled(false);
@@ -105,7 +102,6 @@ m_WorkingNode(0)
 QmitkLabelSetWidget::~QmitkLabelSetWidget()
 {
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerWorkingDataModified );
   toolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerReferenceDataModified );
   m_WorkingNode = NULL;
   m_ReferenceNode = NULL;
@@ -113,13 +109,14 @@ QmitkLabelSetWidget::~QmitkLabelSetWidget()
 
 void QmitkLabelSetWidget::ReInit()
 {
-  this->OnToolManagerWorkingDataModified();
   this->OnToolManagerReferenceDataModified();
+  this->OnSegmentationSelectionChanged(m_Controls.m_cbWorkingNodeSelector->GetSelectedNode());
 }
 
 void QmitkLabelSetWidget::SetDataStorage( mitk::DataStorage& storage )
 {
   m_DataStorage = &storage;
+  m_Controls.m_cbWorkingNodeSelector->SetDataStorage(m_DataStorage);
 }
 
 void QmitkLabelSetWidget::SetPreferences( berry::IPreferences::Pointer prefs )
@@ -127,13 +124,17 @@ void QmitkLabelSetWidget::SetPreferences( berry::IPreferences::Pointer prefs )
   m_Preferences = prefs;
 }
 
-void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
+void QmitkLabelSetWidget::SetPredicate( mitk::NodePredicateBase* predicate )
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  mitk::DataNode* node = toolManager->GetWorkingData(0);
-  if (m_WorkingNode == node) return;
+  m_Predicate = predicate;
+  m_Controls.m_cbWorkingNodeSelector->SetPredicate(m_Predicate);
+  m_Controls.m_cbWorkingNodeSelector->SetAutoSelectNewItems(true);
+}
 
-  m_WorkingNode = node;
+void QmitkLabelSetWidget::OnSegmentationSelectionChanged(const mitk::DataNode *node)
+{
+  if (m_WorkingNode == node) return;
+  m_WorkingNode = const_cast<mitk::DataNode*>(node);
   m_Controls.m_LabelSetTableWidget->setEnabled(m_WorkingNode.IsNotNull());
   m_Controls.m_LabelSearchBox->setEnabled(m_WorkingNode.IsNotNull());
   m_Controls.m_btSaveLabelSet->setEnabled(m_WorkingNode.IsNotNull());
@@ -146,9 +147,23 @@ void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
     m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(lsImage);
   }
   else
+  {
     m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(NULL);
+    return;
+  }
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  m_WorkingNode->SetVisibility(true);
+
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->SetWorkingData(m_WorkingNode);
+//      m_Controls.m_SlicesInterpolator->setEnabled( true );
+  mitk::DataStorage::SetOfObjects::ConstPointer others = m_DataStorage->GetSubset(m_Predicate);
+  for(mitk::DataStorage::SetOfObjects::const_iterator iter = others->begin(); iter != others->end(); ++iter)
+  {
+    mitk::DataNode* _other = *iter;
+    if (_other != m_WorkingNode)
+      _other->SetVisibility(false);
+  }
 }
 
 void QmitkLabelSetWidget::OnToolManagerReferenceDataModified()
@@ -174,152 +189,171 @@ void QmitkLabelSetWidget::OnLabelListModified(const QStringList& list)
 
 void QmitkLabelSetWidget::OnRenameLabel(int index, const mitk::Color& color, const std::string& name)
 {
-    // ask about the name and organ type of the new segmentation
-    QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this );
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->ActivateTool(-1);
 
-    QString storedList = QString::fromStdString( m_Preferences->GetByteArray("Organ-Color-List","") );
-    QStringList organColors;
-    if (storedList.isEmpty())
+  // ask about the name and organ type of the new segmentation
+  QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this );
+
+  QString storedList = QString::fromStdString( m_Preferences->GetByteArray("Organ-Color-List","") );
+  QStringList organColors;
+  if (storedList.isEmpty())
+  {
+    organColors = GetDefaultOrganColorString();
+  }
+  else
+  {
+    // recover string list from BlueBerry view's preferences
+    QString storedString = QString::fromStdString( m_Preferences->GetByteArray("Organ-Color-List","") );
+    // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
+    QRegExp onePart("(?:[^;]|\\\\;)*");
+    int count = 0;
+    int pos = 0;
+    while( (pos = onePart.indexIn( storedString, pos )) != -1 )
     {
-      organColors = GetDefaultOrganColorString();
+      ++count;
+      int length = onePart.matchedLength();
+      if (length == 0) break;
+      QString matchedString = storedString.mid(pos, length);
+      MITK_DEBUG << "   Captured length " << length << ": " << matchedString.toStdString();
+      pos += length + 1; // skip separating ';'
+
+      // unescape possible occurrences of '\;' in the string
+      matchedString.replace("\\;", ";");
+
+      // add matched string part to output list
+      organColors << matchedString;
     }
-    else
-    {
-      // recover string list from BlueBerry view's preferences
-      QString storedString = QString::fromStdString( m_Preferences->GetByteArray("Organ-Color-List","") );
-      // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
-      QRegExp onePart("(?:[^;]|\\\\;)*");
-      int count = 0;
-      int pos = 0;
-      while( (pos = onePart.indexIn( storedString, pos )) != -1 )
-      {
-        ++count;
-        int length = onePart.matchedLength();
-        if (length == 0) break;
-        QString matchedString = storedString.mid(pos, length);
-        MITK_DEBUG << "   Captured length " << length << ": " << matchedString.toStdString();
-        pos += length + 1; // skip separating ';'
+  }
 
-        // unescape possible occurrences of '\;' in the string
-        matchedString.replace("\\;", ";");
+  dialog->setWindowTitle("Rename Label");
+  dialog->SetSuggestionList( organColors );
+  dialog->SetColor(color);
+  dialog->SetSegmentationName(name);
 
-        // add matched string part to output list
-        organColors << matchedString;
-      }
-    }
+  int dialogReturnValue = dialog->exec();
 
-    dialog->SetSuggestionList( organColors );
-    dialog->SetColor(color);
-    dialog->SetSegmentationName(name);
+  if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
 
-    int dialogReturnValue = dialog->exec();
+  mitk::DataNode* workingNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
+  if (!workingNode) return;
 
-    if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
+  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  if ( !lsImage ) return;
 
-    mitk::DataNode* workingNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
-    if (!workingNode) return;
-
-    mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-    if ( !lsImage ) return;
-
-    lsImage->RenameLabel(index, dialog->GetSegmentationName().toStdString(), dialog->GetColor());
+  lsImage->RenameLabel(index, dialog->GetSegmentationName().toStdString(), dialog->GetColor());
 }
 
 void QmitkLabelSetWidget::OnNewLabel()
 {
-    // ask about the name and organ type of the new segmentation
-    QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this );
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->ActivateTool(-1);
 
-    QString storedList = QString::fromStdString( m_Preferences->GetByteArray("Organ-Color-List","") );
-    QStringList organColors;
-    if (storedList.isEmpty())
+  // ask about the name and organ type of the new segmentation
+  QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this );
+
+  QString storedList = QString::fromStdString( m_Preferences->GetByteArray("Organ-Color-List","") );
+  QStringList organColors;
+  if (storedList.isEmpty())
+  {
+    organColors = GetDefaultOrganColorString();
+  }
+  else
+  {
+    /*
+    a couple of examples of how organ names are stored:
+
+    a simple item is built up like 'name#AABBCC' where #AABBCC is the hexadecimal notation of a color as known from HTML
+
+    items are stored separated by ';'
+    this makes it necessary to escape occurrences of ';' in name.
+    otherwise the string "hugo;ypsilon#AABBCC;eugen#AABBCC" could not be parsed as two organs
+    but we would get "hugo" and "ypsilon#AABBCC" and "eugen#AABBCC"
+
+    so the organ name "hugo;ypsilon" is stored as "hugo\;ypsilon"
+    and must be unescaped after loading
+
+    the following lines could be one split with Perl's negative lookbehind
+    */
+
+    // recover string list from BlueBerry view's preferences
+    QString storedString = QString::fromStdString( m_Preferences->GetByteArray("Organ-Color-List","") );
+    MITK_DEBUG << "storedString: " << storedString.toStdString();
+    // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
+    QRegExp onePart("(?:[^;]|\\\\;)*");
+    MITK_DEBUG << "matching " << onePart.pattern().toStdString();
+    int count = 0;
+    int pos = 0;
+    while( (pos = onePart.indexIn( storedString, pos )) != -1 )
     {
-        organColors = GetDefaultOrganColorString();
+      ++count;
+      int length = onePart.matchedLength();
+      if (length == 0) break;
+      QString matchedString = storedString.mid(pos, length);
+      MITK_DEBUG << "   Captured length " << length << ": " << matchedString.toStdString();
+      pos += length + 1; // skip separating ';'
+
+      // unescape possible occurrences of '\;' in the string
+      matchedString.replace("\\;", ";");
+
+      // add matched string part to output list
+      organColors << matchedString;
     }
-    else
-    {
-        /*
-        a couple of examples of how organ names are stored:
+    MITK_DEBUG << "Captured " << count << " organ name/colors";
+  }
 
-        a simple item is built up like 'name#AABBCC' where #AABBCC is the hexadecimal notation of a color as known from HTML
+  dialog->SetSuggestionList( organColors );
 
-        items are stored separated by ';'
-        this makes it necessary to escape occurrences of ';' in name.
-        otherwise the string "hugo;ypsilon#AABBCC;eugen#AABBCC" could not be parsed as two organs
-        but we would get "hugo" and "ypsilon#AABBCC" and "eugen#AABBCC"
+  dialog->setWindowTitle("New Label");
 
-        so the organ name "hugo;ypsilon" is stored as "hugo\;ypsilon"
-        and must be unescaped after loading
+  int dialogReturnValue = dialog->exec();
 
-        the following lines could be one split with Perl's negative lookbehind
-        */
+  if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
 
-        // recover string list from BlueBerry view's preferences
-        QString storedString = QString::fromStdString( m_Preferences->GetByteArray("Organ-Color-List","") );
-        MITK_DEBUG << "storedString: " << storedString.toStdString();
-        // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
-        QRegExp onePart("(?:[^;]|\\\\;)*");
-        MITK_DEBUG << "matching " << onePart.pattern().toStdString();
-        int count = 0;
-        int pos = 0;
-        while( (pos = onePart.indexIn( storedString, pos )) != -1 )
-        {
-            ++count;
-            int length = onePart.matchedLength();
-            if (length == 0) break;
-            QString matchedString = storedString.mid(pos, length);
-            MITK_DEBUG << "   Captured length " << length << ": " << matchedString.toStdString();
-            pos += length + 1; // skip separating ';'
+  mitk::Color color = dialog->GetColor();
 
-            // unescape possible occurrences of '\;' in the string
-            matchedString.replace("\\;", ";");
+  mitk::DataNode* workingNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
+  if (!workingNode) return;
 
-            // add matched string part to output list
-            organColors << matchedString;
-        }
-        MITK_DEBUG << "Captured " << count << " organ name/colors";
-    }
+  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  if ( !lsImage ) return;
 
-    dialog->SetSuggestionList( organColors );
-
-    int dialogReturnValue = dialog->exec();
-
-    if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
-
-    mitk::Color color = dialog->GetColor();
-
-    mitk::DataNode* workingNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
-    if (!workingNode) return;
-
-    mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-    if ( !lsImage ) return;
-
-    lsImage->AddLabel(dialog->GetSegmentationName().toStdString(), color);
+  lsImage->AddLabel(dialog->GetSegmentationName().toStdString(), color);
 }
 
 void QmitkLabelSetWidget::OnCreateMask(int index)
 {
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->ActivateTool(-1);
+
+  mitk::DataNode* segNode = toolManager->GetWorkingData(0);
+  if (!segNode) return;
+
+  mitk::LabelSetImage* segImage = dynamic_cast<mitk::LabelSetImage*>( segNode->GetData() );
+  if (!segImage) return;
+
+  // continue
 }
 
 void QmitkLabelSetWidget::OnCreateSurface(int index)
 {
-    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-    toolManager->ActivateTool(-1);
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->ActivateTool(-1);
 
-    mitk::DataNode* segNode = toolManager->GetWorkingData(0);
-    if (!segNode) return;
+  mitk::DataNode* segNode = toolManager->GetWorkingData(0);
+  if (!segNode) return;
 
-    mitk::LabelSetImage* segImage = dynamic_cast<mitk::LabelSetImage*>( segNode->GetData() );
-    if (!segImage) return;
+  mitk::LabelSetImage* segImage = dynamic_cast<mitk::LabelSetImage*>( segNode->GetData() );
+  if (!segImage) return;
 
-    mitk::LabelSetImageToSurfaceThreadedFilter::Pointer filter =
-       mitk::LabelSetImageToSurfaceThreadedFilter::New();
+  mitk::LabelSetImageToSurfaceThreadedFilter::Pointer filter =
+     mitk::LabelSetImageToSurfaceThreadedFilter::New();
 
-    filter->SetPointerParameter("Input", segImage);
-    filter->SetParameter("RequestedLabel", index);
-    filter->SetDataStorage( *m_DataStorage );
+  filter->SetPointerParameter("Input", segImage);
+  filter->SetParameter("RequestedLabel", index);
+  filter->SetDataStorage( *m_DataStorage );
 
-    filter->StartAlgorithm();
+  filter->StartAlgorithm();
 }
 
 void QmitkLabelSetWidget::OnImportSegmentation()
@@ -344,7 +378,7 @@ void QmitkLabelSetWidget::OnImportSegmentation()
 
   try
   {
-      reader->Update();
+    reader->Update();
   }
   catch ( itk::ExceptionObject & e )
   {
@@ -360,7 +394,7 @@ void QmitkLabelSetWidget::OnImportSegmentation()
   if (!segImage->Concatenate(lsImage)) {
       QMessageBox::information(this,
       "Import segmentation...",
-      "Could not import the selected segmentation session with the current software version (dimensions must match).\n");
+      "Could not import the selected segmentation session (dimensions must match).\n");
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -470,7 +504,7 @@ void QmitkLabelSetWidget::OnNewSegmentation()
   bool ok = false;
   QString refNodeName = QString::fromStdString(refNode->GetName());
   refNodeName.append("-");
-  QString newName = QInputDialog::getText(this, "New segmentation", "Set name:", QLineEdit::Normal, refNodeName, &ok);
+  QString newName = QInputDialog::getText(this, "New Segmentation", "Set a name:", QLineEdit::Normal, refNodeName, &ok);
   if (!ok) return;
 
   mitk::PixelType pixelType(mitk::MakeScalarPixelType<unsigned char>() );
@@ -506,6 +540,8 @@ void QmitkLabelSetWidget::OnNewSegmentation()
   m_DataStorage->Add(newNode,refNode);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  this->OnNewLabel();
 }
 
 void QmitkLabelSetWidget::OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>& ranges )

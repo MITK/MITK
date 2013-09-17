@@ -95,21 +95,6 @@ std::string mitk::LabelSetImage::GetLabelSetLastModified()
   return this->m_LabelSet->GetLastModified();
 }
 
-void mitk::LabelSetImage::MergeLabels(int begin, int count, int index)
-{
-  this->SetActiveLabel( index, false );
-  for (int idx = begin; idx<begin+count; ++idx)
-  {
-      if (idx != index)
-      {
-          AccessByItk_1(this, MergeLabelsProcessing, index);
-      }
-  }
-
- // this->RemoveLabels( begin, count );
-  this->Modified();
-}
-
 void mitk::LabelSetImage::CalculateLabelVolume(int index)
 {
 // todo
@@ -263,11 +248,11 @@ void mitk::LabelSetImage::MergeLabelsProcessing(LabelSetImageType* itkImage, int
 
    while (!iter.IsAtEnd())
    {
-      if (static_cast<int>(iter.Get()) == index)
-      {
-        iter.Set( activeLabel->GetIndex() );
-      }
-      ++iter;
+     if (static_cast<int>(iter.Get()) == index)
+     {
+       iter.Set( activeLabel->GetIndex() );
+     }
+     ++iter;
    }
 }
 
@@ -320,71 +305,71 @@ void mitk::LabelSetImage::SetLabelColor(int index, const mitk::Color& color)
 
 float mitk::LabelSetImage::GetLabelOpacity(int index)
 {
-    return this->m_LabelSet->GetLabelOpacity(index);
+  return this->m_LabelSet->GetLabelOpacity(index);
 }
 
 float mitk::LabelSetImage::GetLabelVolume(int index)
 {
-    return this->m_LabelSet->GetLabelVolume(index);
+  return this->m_LabelSet->GetLabelVolume(index);
 }
 
 void mitk::LabelSetImage::SetLabelOpacity(int index, float value)
 {
-   mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetPropertyList()->GetProperty( "LookupTable" ));
-   double rgba[4];
-   lutProp->GetLookupTable()->GetTableValue(index,rgba);
-   rgba[3] = value;
-   lutProp->GetLookupTable()->SetTableValue(index,rgba);
-   m_LabelSet->SetLabelOpacity(index,value);
-   ModifyLabelEvent.Send(index);
+  mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetPropertyList()->GetProperty( "LookupTable" ));
+  double rgba[4];
+  lutProp->GetLookupTable()->GetTableValue(index,rgba);
+  rgba[3] = value;
+  lutProp->GetLookupTable()->SetTableValue(index,rgba);
+  m_LabelSet->SetLabelOpacity(index,value);
+  ModifyLabelEvent.Send(index);
 }
 
 void mitk::LabelSetImage::SetLabelVolume(int index, float value)
 {
-   m_LabelSet->SetLabelVolume(index,value);
-   ModifyLabelEvent.Send(index);
+  m_LabelSet->SetLabelVolume(index,value);
+  ModifyLabelEvent.Send(index);
 }
 
 void mitk::LabelSetImage::RenameLabel(int index, const std::string& name, const mitk::Color& color)
 {
-    m_LabelSet->SetLabelName(index, name);
-    m_LabelSet->SetLabelColor(index, color);
-    mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetPropertyList()->GetProperty( "LookupTable" ));
-    double rgba[4];
-    lutProp->GetLookupTable()->GetTableValue(index,rgba);
-    rgba[0] = color.GetRed();
-    rgba[1] = color.GetGreen();
-    rgba[2] = color.GetBlue();
-    lutProp->GetLookupTable()->SetTableValue(index,rgba);
-    ModifyLabelEvent.Send(index);
+  m_LabelSet->SetLabelName(index, name);
+  m_LabelSet->SetLabelColor(index, color);
+  mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetPropertyList()->GetProperty( "LookupTable" ));
+  double rgba[4];
+  lutProp->GetLookupTable()->GetTableValue(index,rgba);
+  rgba[0] = color.GetRed();
+  rgba[1] = color.GetGreen();
+  rgba[2] = color.GetBlue();
+  lutProp->GetLookupTable()->SetTableValue(index,rgba);
+  ModifyLabelEvent.Send(index);
 }
 
 void mitk::LabelSetImage::SetLabelName(int index, const std::string& name)
 {
-    this->m_LabelSet->SetLabelName(index, name);
-    ModifyLabelEvent.Send(index);
+  this->m_LabelSet->SetLabelName(index, name);
+  ModifyLabelEvent.Send(index);
 }
 
 void mitk::LabelSetImage::SetAllLabelsLocked(bool value)
 {
-    this->m_LabelSet->SetAllLabelsLocked(value);
-    AllLabelsModifiedEvent.Send();
+  this->m_LabelSet->SetAllLabelsLocked(value);
+  AllLabelsModifiedEvent.Send();
 }
 
 void mitk::LabelSetImage::SetAllLabelsVisible(bool value)
 {
-    this->m_LabelSet->SetAllLabelsVisible(value);
-    mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetPropertyList()->GetProperty( "LookupTable" ));
-    mitk::LabelSet::LabelContainerConstIteratorType _it = this->m_LabelSet->IteratorBegin();
-    mitk::LabelSet::LabelContainerConstIteratorType _end = this->m_LabelSet->IteratorEnd();
-    double rgba[4];
-    for(; _it!=_end; ++_it)
-    {
-        lutProp->GetLookupTable()->GetTableValue((*_it)->GetIndex(),rgba);
-        rgba[3] = value ? (*_it)->GetOpacity() : 0.0;
-        lutProp->GetLookupTable()->SetTableValue((*_it)->GetIndex(),rgba);
-    }
-    AllLabelsModifiedEvent.Send();
+  this->m_LabelSet->SetAllLabelsVisible(value);
+  mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetPropertyList()->GetProperty( "LookupTable" ));
+  mitk::LabelSet::LabelContainerConstIteratorType _it = this->m_LabelSet->IteratorBegin();
+  mitk::LabelSet::LabelContainerConstIteratorType _end = this->m_LabelSet->IteratorEnd();
+  double rgba[4];
+  for(; _it!=_end; ++_it)
+  {
+      lutProp->GetLookupTable()->GetTableValue((*_it)->GetIndex(),rgba);
+      rgba[3] = value ? (*_it)->GetOpacity() : 0.0;
+      lutProp->GetLookupTable()->SetTableValue((*_it)->GetIndex(),rgba);
+  }
+  AllLabelsModifiedEvent.Send();
 }
 
 void mitk::LabelSetImage::RemoveLabel(int index)
@@ -413,18 +398,37 @@ void mitk::LabelSetImage::ResetLabels()
     }
 }
 
+void mitk::LabelSetImage::MergeLabels(std::vector<int>& indexes, int index)
+{
+  this->SetActiveLabel( index, false );
+  for (int idx=0; idx<indexes.size(); idx++)
+  {
+    if (idx != index)
+    {
+      MITK_INFO << "MergeLabelsProcessing: merging " << indexes[idx]-idx << " into " << index;
+      AccessByItk_1(this, MergeLabelsProcessing, indexes[idx]);
+//      this->m_LabelSet->RemoveLabel(indexes[idx]-idx);
+//      this->ResetLabels();
+    }
+    else
+      MITK_ERROR << "active label was included in indexes vector";
+  }
+
+  RemoveLabelEvent.Send();
+}
+
 void mitk::LabelSetImage::RemoveLabels(std::vector<int>& indexes)
 {
-    std::sort(indexes.begin(), indexes.end());
+  std::sort(indexes.begin(), indexes.end());
 
-    for (int i=0; i<indexes.size(); i++)
-    {
-        this->EraseLabel(indexes[i]-i, true);
-        this->m_LabelSet->RemoveLabel(indexes[i]-i);
-        this->ResetLabels();
-    }
+  for (int i=0; i<indexes.size(); i++)
+  {
+    this->EraseLabel(indexes[i]-i, true);
+    this->m_LabelSet->RemoveLabel(indexes[i]-i);
+    this->ResetLabels();
+  }
 
-    RemoveLabelEvent.Send();
+  RemoveLabelEvent.Send();
 }
 
 void mitk::LabelSetImage::EraseLabels(std::vector<int>& indexes)

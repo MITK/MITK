@@ -462,7 +462,7 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
 
   if (this->selectedItems().size()>1)
   {
-    QAction* mergeAction = new QAction(QIcon(":/QmitkExt/mergelabels.png"), "Merge selected labels", this );
+    QAction* mergeAction = new QAction(QIcon(":/QmitkExt/mergelabels.png"), "Merge selection on current label", this );
     mergeAction->setEnabled(true);
     QObject::connect( mergeAction, SIGNAL( triggered(bool) ), this, SLOT( OnMergeLabels(bool) ) );
     menu->addAction(mergeAction);
@@ -605,17 +605,26 @@ void QmitkLabelSetTableWidget::OnMergeLabels(bool value)
 
   if (answerButton == QMessageBox::Yes)
   {
-      QList<QTableWidgetSelectionRange> ranges = this->selectedRanges();
-      if ( ranges.isEmpty() )
+    QList<QTableWidgetSelectionRange> ranges = this->selectedRanges();
+    if ( ranges.isEmpty() )
       return;
 
-      for (int range=0; range<ranges.size(); ++range)
+    std::vector<int> indexes;
+    for (int i=0; i<ranges.size(); i++)
+    {
+      int begin = ranges.at(i).topRow();
+      for (int j=0; j<ranges.at(i).rowCount(); j++)
       {
-          int begin = ranges.at(range).topRow();
-          int count = ranges.at(range).rowCount();
-
-          this->m_LabelSetImage->MergeLabels( begin-1, count, this->currentRow() );
+        if (begin+j != this->currentRow())
+        {
+          indexes.push_back(begin+j);
+        }
       }
+    }
+
+    this->BusyCursorOn();
+    this->m_LabelSetImage->MergeLabels(indexes,this->currentRow());
+    this->BusyCursorOff();
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -631,26 +640,23 @@ void QmitkLabelSetTableWidget::OnRemoveLabels(bool value)
 
   if (answerButton == QMessageBox::Yes)
   {
-      QList<QTableWidgetSelectionRange> ranges = this->selectedRanges();
-      if ( ranges.isEmpty() )
+    QList<QTableWidgetSelectionRange> ranges = this->selectedRanges();
+    if ( ranges.isEmpty() )
       return;
 
-      std::vector<int> indexes;
-      for (int i=0; i<ranges.size(); i++)
+    std::vector<int> indexes;
+    for (int i=0; i<ranges.size(); i++)
+    {
+      int begin = ranges.at(i).topRow();
+      for (int j=0; j<ranges.at(i).rowCount(); j++)
       {
-          int begin = ranges.at(i).topRow();
-          for (int j=0; j<ranges.at(i).rowCount(); j++)
-          {
-              //this->m_LabelSetImage->SetLabelSelected(begin+j, true);
-              indexes.push_back(begin+j);
-          }
+          indexes.push_back(begin+j);
       }
+    }
 
-      this->BusyCursorOn();
-
-      this->m_LabelSetImage->RemoveLabels(indexes);
-
-      this->BusyCursorOff();
+    this->BusyCursorOn();
+    this->m_LabelSetImage->RemoveLabels(indexes);
+    this->BusyCursorOff();
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

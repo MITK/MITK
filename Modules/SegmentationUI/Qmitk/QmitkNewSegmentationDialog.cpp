@@ -97,9 +97,9 @@ void QmitkNewSegmentationDialog::onAcceptClicked()
   this->accept();
 }
 
-void QmitkNewSegmentationDialog::SetSegmentationName(const std::string& name)
+void QmitkNewSegmentationDialog::SetSegmentationName(const std::string& text)
 {
-  this->edtName->setText(name.c_str());
+  this->edtName->setText(text.c_str());
 }
 
 void QmitkNewSegmentationDialog::SetColor(const mitk::Color& color)

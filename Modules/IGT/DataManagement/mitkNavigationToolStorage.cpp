@@ -30,7 +30,7 @@ mitk::NavigationToolStorage::NavigationToolStorage() : m_ToolCollection(std::vec
   this->SetName("ToolStorage (no name given)");
   }
 
-mitk::NavigationToolStorage::NavigationToolStorage(mitk::DataStorage::Pointer ds)
+mitk::NavigationToolStorage::NavigationToolStorage(mitk::DataStorage::Pointer ds) : m_storageLocked(false)
   {
   m_ToolCollection = std::vector<mitk::NavigationTool::Pointer>();
   this->m_DataStorage = ds;
@@ -166,7 +166,7 @@ void mitk::NavigationToolStorage::UnLockStorage()
   m_storageLocked = false;
   }
 
-bool mitk::NavigationToolStorage::IsLocked()
+bool mitk::NavigationToolStorage::isLocked()
   {
   return m_storageLocked;
   }

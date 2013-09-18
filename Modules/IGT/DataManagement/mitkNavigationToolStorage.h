@@ -152,7 +152,7 @@ namespace mitk {
     /** Unlocks the storage again. */
     void UnLockStorage();
     /** @return Returns true if the storage is locked at the moment, false if not. */
-    bool IsLocked();
+    bool isLocked();
 
   protected:
     NavigationToolStorage();

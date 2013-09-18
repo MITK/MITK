@@ -64,20 +64,25 @@ void QmitkNavigationToolManagementWidget::CreateQtPartControl(QWidget *parent)
 
 void QmitkNavigationToolManagementWidget::OnLoadTool()
 {
-    mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
-    std::string filename = QFileDialog::getOpenFileName(NULL,tr("Add Navigation Tool"), "/", "*.IGTTool").toAscii().data();
-    if (filename == "") return;
-    mitk::NavigationTool::Pointer readTool = myReader->DoRead(filename);
-    if (readTool.IsNull()) MessageBox("Error: " + myReader->GetErrorMessage());
-    else
+  if(m_NavigationToolStorage->isLocked())
+  {
+    MessageBox("Storage is locked, cannot modify it. Maybe the tracking device which uses this storage is connected. If you want to modify the storage please disconnect the device first.");
+   return;
+  }
+  mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
+  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Add Navigation Tool"), "/", "*.IGTTool").toAscii().data();
+  if (filename == "") return;
+  mitk::NavigationTool::Pointer readTool = myReader->DoRead(filename);
+  if (readTool.IsNull()) MessageBox("Error: " + myReader->GetErrorMessage());
+  else
+    {
+    if (!m_NavigationToolStorage->AddTool(readTool))
       {
-      if (!m_NavigationToolStorage->AddTool(readTool))
-        {
-        MessageBox("Error: Can't add tool!");
-        m_DataStorage->Remove(readTool->GetDataNode());
-        }
-      UpdateToolTable();
+      MessageBox("Error: Can't add tool!");
+      m_DataStorage->Remove(readTool->GetDataNode());
       }
+    UpdateToolTable();
+    }
 }
 
 void QmitkNavigationToolManagementWidget::OnSaveTool()
@@ -142,6 +147,11 @@ void QmitkNavigationToolManagementWidget::LoadStorage(mitk::NavigationToolStorag
 
 void QmitkNavigationToolManagementWidget::OnAddTool()
   {
+    if(m_NavigationToolStorage->isLocked())
+    {
+      MessageBox("Storage is locked, cannot modify it. Maybe the tracking device which uses this storage is connected. If you want to modify the storage please disconnect the device first.");
+      return;
+    }
     QString defaultIdentifier = "NavigationTool#"+QString::number(m_NavigationToolStorage->GetToolCount());
     m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage,defaultIdentifier.toStdString());
     m_edit = false;
@@ -150,8 +160,17 @@ void QmitkNavigationToolManagementWidget::OnAddTool()
 
 void QmitkNavigationToolManagementWidget::OnDeleteTool()
   {
-    //if no item is selected, show error message:
-    if (m_Controls->m_ToolList->currentItem() == NULL) {MessageBox("Error: Please select tool first!");return;}
+    //first: some checks
+    if(m_NavigationToolStorage->isLocked())
+    {
+      MessageBox("Storage is locked, cannot modify it. Maybe the tracking device which uses this storage is connected. If you want to modify the storage please disconnect the device first.");
+      return;
+    }
+    else if (m_Controls->m_ToolList->currentItem() == NULL) //if no item is selected, show error message:
+    {
+      MessageBox("Error: Please select tool first!");
+      return;
+    }
 
     m_DataStorage->Remove(m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())->GetDataNode());
     m_NavigationToolStorage->DeleteTool(m_Controls->m_ToolList->currentIndex().row());
@@ -161,8 +180,16 @@ void QmitkNavigationToolManagementWidget::OnDeleteTool()
 
 void QmitkNavigationToolManagementWidget::OnEditTool()
   {
-    //if no item is selected, show error message:
-    if (m_Controls->m_ToolList->currentItem() == NULL) {MessageBox("Error: Please select tool first!");return;}
+    if(m_NavigationToolStorage->isLocked())
+    {
+      MessageBox("Storage is locked, cannot modify it. Maybe the tracking device which uses this storage is connected. If you want to modify the storage please disconnect the device first.");
+      return;
+    }
+    else if (m_Controls->m_ToolList->currentItem() == NULL) //if no item is selected, show error message:
+    {
+      MessageBox("Error: Please select tool first!");
+      return;
+    }
     mitk::NavigationTool::Pointer selectedTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
     m_Controls->m_ToolCreationWidget->SetDefaultData(selectedTool);
     m_edit = true;

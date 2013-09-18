@@ -60,6 +60,8 @@ QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
 {
 //remove the tracking volume
 this->GetDataStorage()->Remove(m_TrackingVolumeNode);
+//remove the tool storage
+m_toolStorage->UnRegisterMicroservice();
 }
 
 
@@ -252,7 +254,7 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
     m_TrackingDeviceSource->RegisterAsMicroservice();
     m_toolStorage->UnRegisterMicroservice();
     m_toolStorage->RegisterAsMicroservice(m_TrackingDeviceSource->GetMicroserviceID());
-    //TODO: lock the storage here?
+    m_toolStorage->LockStorage();
     }
   catch (...) //todo: change to mitk::IGTException
     {
@@ -278,7 +280,7 @@ void QmitkMITKIGTTrackingToolboxView::OnDisconnect()
 
   m_TrackingDeviceSource->Disconnect();
   m_TrackingDeviceSource->UnRegisterMicroservice();
-  //ToolStorages unregisters automatically
+  m_toolStorage->UnLockStorage();
 
   //enable/disable Buttons
   m_Controls->m_Disconnect->setEnabled(false);
@@ -713,6 +715,7 @@ void QmitkMITKIGTTrackingToolboxView::DisableTrackingConfigurationButtons()
 void QmitkMITKIGTTrackingToolboxView::ReplaceCurrentToolStorage(mitk::NavigationToolStorage::Pointer newStorage, std::string newStorageName)
 {
     //first: get rid of the old one
+    m_toolStorage->UnLockStorage(); //only to be sure...
     m_toolStorage->UnRegisterMicroservice();
     m_toolStorage = NULL;
 

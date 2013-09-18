@@ -398,10 +398,12 @@ bool mitk::FastMarchingTool::OnDelete(Action* action, const StateEvent* stateEve
 
 void mitk::FastMarchingTool::Update()
 {
+  const unsigned int progress_steps = 20;
+
   // update FastMarching pipeline and show result
   if (m_NeedUpdate)
   {
-    m_ProgressCommand->AddStepsToDo(20);
+    m_ProgressCommand->AddStepsToDo(progress_steps);
     CurrentlyBusy.Send(true);
     try
     {
@@ -411,7 +413,8 @@ void mitk::FastMarchingTool::Update()
     {
      MITK_ERROR << "Exception caught: " << excep.GetDescription();
 
-     m_ProgressCommand->SetRemainingProgress(100);
+     // progress by max step count, will force
+     m_ProgressCommand->SetProgress(progress_steps);
      CurrentlyBusy.Send(false);
 
      std::string msg = excep.GetDescription();
@@ -419,7 +422,7 @@ void mitk::FastMarchingTool::Update()
 
      return;
     }
-    m_ProgressCommand->SetRemainingProgress(100);
+    m_ProgressCommand->SetProgress(progress_steps);
     CurrentlyBusy.Send(false);
 
     //make output visible

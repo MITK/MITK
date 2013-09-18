@@ -367,13 +367,14 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
   if (m_Controls->tab2DTools->isVisible() && !selectedNodeIsVisible)
   {
     m_Controls->m_ManualToolSelectionBox2D->setEnabled(false);
+    m_Controls->m_SlicesInterpolator->setEnabled(false);
     this->UpdateWarningLabel("The selected segmentation is currently not visible!");
-    m_Controls->m_SlicesInterpolator->Show3DInterpolationResult(false);
     mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
   }
   else
   {
-      m_Controls->m_ManualToolSelectionBox2D->setEnabled(true);
+    m_Controls->m_ManualToolSelectionBox2D->setEnabled(true);
+    m_Controls->m_SlicesInterpolator->setEnabled(true);
     this->UpdateWarningLabel("");
     //Trigger 3d interpolation is selected segmentation is visible again
     mitk::SurfaceInterpolationController::GetInstance()->Modified();

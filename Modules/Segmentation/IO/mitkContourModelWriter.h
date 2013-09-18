@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkContourModel.h>
 
 //DEPRECATED
-#include <mitkTimeSlicedGeometry.h>
+#include <mitkTimeGeometry.h>
 
 namespace mitk
 {

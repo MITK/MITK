@@ -524,7 +524,7 @@ void mitk::ContourModel::Initialize()
 void mitk::ContourModel::Initialize(mitk::ContourModel &other)
 {
   unsigned int numberOfTimesteps = other.GetTimeGeometry()->GetNumberOfTimeSteps();
-  this->InitializeTimeSlicedGeometry(numberOfTimesteps);
+  this->InitializeTimeGeometry(numberOfTimesteps);
 
   for(int currentTimestep = 0; currentTimestep < numberOfTimesteps; currentTimestep++)
   {

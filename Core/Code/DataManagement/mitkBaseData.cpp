@@ -42,7 +42,6 @@ m_Initialized(other.m_Initialized)
 
 mitk::BaseData::~BaseData()
 {
-
 }
 
 void mitk::BaseData::InitializeTimeGeometry(unsigned int timeSteps)
@@ -250,7 +249,6 @@ void mitk::BaseData::CopyInformation( const itk::DataObject* data )
       itk::LightObject::Pointer clon = bd->GetTimeGeometry()->Clone();
       m_TimeGeometry = dynamic_cast<TimeGeometry *> (clon.GetPointer());
     }
-
   }
   else
   {
@@ -260,7 +258,6 @@ void mitk::BaseData::CopyInformation( const itk::DataObject* data )
       << typeid(data).name() << " to "
       << typeid(Self*).name() );
   }
-
 }
 
 bool mitk::BaseData::IsInitialized() const

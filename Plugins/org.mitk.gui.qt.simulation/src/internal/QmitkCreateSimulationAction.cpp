@@ -50,7 +50,7 @@ static void InitializeViews(mitk::DataStorage::Pointer dataStorage)
 {
   mitk::NodePredicateNot::Pointer predicate = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
   mitk::DataStorage::SetOfObjects::ConstPointer subset = dataStorage->GetSubset(predicate);
-  mitk::TimeSlicedGeometry::Pointer geometry = dataStorage->ComputeBoundingGeometry3D(subset);
+  mitk::TimeGeometry::Pointer geometry = dataStorage->ComputeBoundingGeometry(subset);
 
   mitk::RenderingManager::GetInstance()->InitializeViews(geometry);
 }

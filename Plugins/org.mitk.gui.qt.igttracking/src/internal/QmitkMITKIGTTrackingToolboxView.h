@@ -154,6 +154,11 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    void EnableOptionsButtons();
    void EnableTrackingConfigurationButtons();
    void DisableTrackingConfigurationButtons();
+   /** Replaces the current navigation tool storage which is stored in m_toolStorage.
+    *  Basically handles the microservice stuff: unregisteres the old storage, then
+    *  replaces the storage and registers the new one.
+    */
+   void ReplaceCurrentToolStorage(mitk::NavigationToolStorage::Pointer newStorage, std::string newStorageName);
 
 };
 

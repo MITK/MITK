@@ -132,6 +132,15 @@ namespace mitk {
      */
     itkGetMacro(DataStorage,mitk::DataStorage::Pointer);
 
+    /** Sets the name of this storage. The name should be understandable for the user.
+     *  Something like "NDI Aurora Tool Storage". If a storage is loaded from the harddisk
+     *  the name might be the filename.
+     */
+    itkSetMacro(Name,std::string);
+
+    /** @return Returns the name of this storage. */
+    itkGetConstMacro(Name,std::string);
+
   protected:
     NavigationToolStorage();
     NavigationToolStorage(mitk::DataStorage::Pointer);
@@ -139,6 +148,7 @@ namespace mitk {
 
     std::vector<mitk::NavigationTool::Pointer> m_ToolCollection;
     mitk::DataStorage::Pointer m_DataStorage;
+    std::string m_Name;
 
   private:
     us::ServiceRegistration<Self> m_ServiceRegistration;

@@ -25,10 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string  mitk::NavigationToolStorage::US_INTERFACE_NAME = "org.mitk.services.NavigationToolStorage"; // Name of the interface
 const std::string  mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID = US_INTERFACE_NAME + ".sourceID";
 
-mitk::NavigationToolStorage::NavigationToolStorage()
+mitk::NavigationToolStorage::NavigationToolStorage() : m_ToolCollection(std::vector<mitk::NavigationTool::Pointer>()),m_DataStorage(NULL),m_Name("ToolStorage (no name given)")
   {
-  m_ToolCollection = std::vector<mitk::NavigationTool::Pointer>();
-  this->m_DataStorage = NULL;
   }
 
 mitk::NavigationToolStorage::NavigationToolStorage(mitk::DataStorage::Pointer ds)

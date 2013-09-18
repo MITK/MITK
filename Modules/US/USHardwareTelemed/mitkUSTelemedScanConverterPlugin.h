@@ -23,15 +23,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 
 /**
-*     The telemed sdk needs a plugin. This is the plugin.
-      It will be registerd by the usgfw2 class and
-      SetScanConverterPlugin is to call. After that the
-      sdk of usgfw knows the function which it have to call.
-      So every X timeunits some functions here will be called
-      with a Pointer to the acutal image memory.
-
-      In this functions here we get the memory an copy it to
-      our m_cLiveView memory*/
+  * \brief Telemed API plugin for getting images from scan lines.
+  * Implements a COM interface whereat only the function InterimOutBufferCB
+  * is used for copying given image buffer into a mitk::Image.
+  *
+  * A pointer to this mitk::Image must be set by calling
+  * mitk::USTelemedScanConverterPlugin::SetOutputImage() first.
+  * The image content is then updated every time the Telemed API calls
+  * the implemented callback function of this class.
+  *
+  * For more infomration about the implemented COM interface refer to the
+  * Telemed API documentation.
+  */
 class USTelemedScanConverterPlugin : public IUsgfwScanConverterPluginCB
 
 {
@@ -39,13 +42,18 @@ public:
   USTelemedScanConverterPlugin( );
   ~USTelemedScanConverterPlugin( );
 
+  // internal functions for Telemed API
   virtual HRESULT __stdcall QueryInterface(const IID& iid,void** ppv);
   virtual ULONG __stdcall AddRef();
   virtual ULONG __stdcall Release();
 
+  /**
+    * Setter for a pointer to a mitk::Image in which the current
+    * image buffer from the Telemed API will be stored at every
+    * API callback. This function must be called before image data
+    * can be got from this class.
+    */
   void SetOutputImage(mitk::Image::Pointer outputImage);
-
-  // begin: plug-in must implement IUsgfwScanConverterPluginCB interface that is defined at usgfw.h
 
   // receives pointers to input and output media samples
   STDMETHOD(SampleCB) (
@@ -119,22 +127,30 @@ public:
   // if parameter is negative parameter was changed by some filter interface
   STDMETHOD(ParameterCB) (
     int nPin
-    );
-
-// end: plug-in must implement IUsgfwScanConverterPluginCB interface that is defined at usgfw.h
+    ) { return S_OK; }
 
   STDMETHOD(SetScanConverterPlugin)(IDispatch* plugin);
   //STDMETHOD(getSource)(LONG* plugin);
 
 protected:
+  /**
+    * Remove Telemed API callback and release and delete m_Plugin attribute.
+    */
   void ReleasePlugin( );
 
+  /**
+    * Telemed API object for handling callbacks on new image data.
+    */
   IUsgfwScanConverterPlugin*  m_Plugin;
+
+  /**
+    * Pointer to mitk::Image in which the current image buffer
+    * from the Telemed API will be stored at every API callback.
+    */
   mitk::Image::Pointer        m_OutputImage;
 
 private:
   long m_cRef ;
 };
-
 
 #endif // MITKUSTelemedScanConverterPlugin_H_HEADER_INCLUDED_

@@ -24,22 +24,44 @@ struct IUsgDataView;
 
 namespace mitk
 {
+  /**
+    * \brief Specialized mitk::USProbe for handling Telemed API probe objects.
+    * It encapsulates a probe object from the Telemed API.
+    *
+    * This class should only be instantiated by mitk::USTelemedProbesControls.
+    * Every other object can get instances of mitk::USTelemedProbe from there.
+    */
   class USTelemedProbe : public USProbe
   {
   public:
     mitkClassMacro(USTelemedProbe, USProbe);
     mitkNewMacro2Param(Self, IProbe*, IUsgDataView*);
 
+    /**
+      * Returns the Telemed API probe connected with this object.
+      * This method is just for being called by mitk::USTelemedProbesControls.
+      */
     IProbe* GetUsgProbe();
+
+    /**
+      * Returns the Telemed API data view connected with this object.
+      * This method is just for being called by mitk::USTelemedProbesControls.
+      */
     IUsgDataView* GetUsgDataView();
 
   protected:
-    USTelemedProbe(IProbe*, IUsgDataView*);
+    /**
+      * Constructs mitk::USTelemedProbe object with given API objects.
+      *
+      * \param probe API probe object which should be represented by the constructed object
+      * \param dataView API data view object conected to this probe object
+      */
+    USTelemedProbe(IProbe* probe, IUsgDataView* dataView);
     virtual ~USTelemedProbe();
 
     IProbe*                         m_UsgProbe;
     IUsgDataView*                   m_UsgDataView;
   };
-}
+} // namespace mitk
 
 #endif // MITKUSTelemedProbe_H_HEADER_INCLUDED_

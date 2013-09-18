@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKUSTelemedImageSource_H_HEADER_INCLUDED_
 #define MITKUSTelemedImageSource_H_HEADER_INCLUDED_
 
@@ -23,15 +22,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSTelemedScanConverterPlugin.h"
 
 namespace mitk {
-
+/**
+  * \brief Implementation of mitk::USImageSource for Telemed API devices.
+  * The method mitk::USImageSource::GetNextRawImage() is implemented for
+  * getting images from the Telemed API.
+  *
+  * A method for connecting this ImageSource to the Telemed API is
+  * implemented (mitk::USTelemedImageSource::CreateAndConnectConverterPlugin()).
+  * This method is available for being used by mitk::USTelemedDevice.
+  */
 class USTelemedImageSource : public USImageSource
 {
 public:
   mitkClassMacro(USTelemedImageSource, USImageSource);
   itkNewMacro(Self);
 
+  /**
+    * Implementation of the superclass method. Returns the pointer
+    * to the mitk::Image filled by Telemed API callback.
+    */
   virtual void GetNextRawImage( mitk::Image::Pointer& );
 
+  /**
+    * \brief Connect this object to the Telemed API.
+    * This method is for being used by mitk::USTelemedDevice.
+    */
   bool CreateAndConnectConverterPlugin( IUsgDataView*, tagScanMode );
 
 protected:
@@ -43,7 +58,6 @@ protected:
 
   mitk::Image::Pointer            m_Image;
 };
-
 } // namespace mitk
 
 #endif // MITKUSTelemedImageSource_H

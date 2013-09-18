@@ -31,6 +31,13 @@ mitk::USTelemedProbesControls::~USTelemedProbesControls()
 
 void mitk::USTelemedProbesControls::SetIsActive(bool isActive)
 {
+  if ( ! m_TelemedDevice )
+  {
+    MITK_WARN("USTelemedProbesControls")("USControlInterfaceProbes")
+      << "Cannot activate probe controls while device is not set. Call SetTelemedDevice() first.";
+    return;
+  }
+
   if ( isActive )
   {
     this->CreateProbesCollection();
@@ -38,7 +45,6 @@ void mitk::USTelemedProbesControls::SetIsActive(bool isActive)
   }
   else
   {
-
   }
 
   m_IsActive = isActive;
@@ -93,22 +99,32 @@ bool mitk::USTelemedProbesControls::CreateProbesCollection()
   IUnknown* tmp_obj = NULL;
   HRESULT hr;
 
+  // get the main API interface from the Telemed device
   IUsgfw2* usgMainInterface = m_TelemedDevice->GetUsgMainInterface();
-  if ( ! usgMainInterface ) { mitkThrow() << "Main interface of Telemed device must not be null."; }
+  if ( ! usgMainInterface )
+  {
+    MITK_ERROR("USTelemedProbesControls")("USControlInterfaceProbes")
+      << "Main interface of Telemed device must not be null.";
+    mitkThrow() << "Main interface of Telemed device must not be null.";
+  }
 
+  // get probes collection from Telemed API
   hr = usgMainInterface->get_ProbesCollection(&tmp_obj);
   if (FAILED(hr) || ! tmp_obj)
   {
-    MITK_ERROR << "Error on getting probes collection (" << hr << ").";
+    MITK_WARN("USTelemedProbesControls")("USControlInterfaceProbes")
+      << "Error on getting probes collection (" << hr << ").";
     return false;
   }
 
+  // second step for getting probes collection from Telemed API
   SAFE_RELEASE(m_ProbesCollection);
   hr = tmp_obj->QueryInterface(IID_IUsgCollection,(void**)&m_ProbesCollection);
   SAFE_RELEASE(tmp_obj);
   if (FAILED(hr) || ! m_ProbesCollection)
   {
-    MITK_ERROR << "Error on querying interface for probes collection (" << hr << ").";
+    MITK_WARN("USTelemedProbesControls")("USControlInterfaceProbes")
+      << "Error on querying interface for probes collection (" << hr << ").";
     return false;
   }
 
@@ -119,38 +135,70 @@ void mitk::USTelemedProbesControls::CreateProbesSet()
 {
   if ( ! m_ProbesCollection)
   {
+    MITK_ERROR("USTelemedProbesControls")("USControlInterfaceProbes")
+      << "Cannot get probe set without ProbesCollection being initialized before.";
     mitkThrow() << "Cannot get probe set without ProbesCollection being initialized before.";
   }
 
+  // get number of available probes
   LONG probes_count = 0;
   HRESULT hr = m_ProbesCollection->get_Count(&probes_count);
   if (FAILED(hr)) { mitkThrow() << "Could not get probes count (" << hr << ")."; }
 
-  if ( ! m_TelemedDevice ) { mitkThrow() << "Telemed device must not be null when creating probes set."; }
+  if ( ! m_TelemedDevice )
+  {
+    MITK_ERROR("USTelemedProbesControls")("USControlInterfaceProbes")
+      << "Telemed device must not be null when creating probes set.";
+    mitkThrow() << "Telemed device must not be null when creating probes set.";
+  }
+
+  // get the main API interface from the Telemed device
   IUsgfw2* usgMainInterface = m_TelemedDevice->GetUsgMainInterface();
-  if ( ! usgMainInterface ) { mitkThrow() << "Usg main interface must not be null when creating probes set."; }
+  if ( ! usgMainInterface )
+  {
+    MITK_ERROR("USTelemedProbesControls")("USControlInterfaceProbes")
+      << "Usg main interface must not be null when creating probes set.";
+    mitkThrow() << "Usg main interface must not be null when creating probes set.";
+  }
 
   // initialize probes set with new vector
   m_ProbesSet = std::vector<mitk::USTelemedProbe::Pointer>(probes_count, 0);
 
   for (unsigned int n = 0; n < probes_count; ++n)
   {
+    // get the probe item from the API collection
     IUnknown* tmp_obj = NULL;
     hr = m_ProbesCollection->Item(n,&tmp_obj);
-    if (FAILED(hr)) { mitkThrow() << "Could not get probe with index " << n << "."; }
+    if (FAILED(hr))
+    {
+      MITK_ERROR("USTelemedProbesControls")("USControlInterfaceProbes")
+        << "Could not get probe with index " << n << ".";
+      mitkThrow() << "Could not get probe with index " << n << ".";
+    }
 
+    // convert this item to a probe
     IProbe* probe;
     hr = tmp_obj->QueryInterface(IID_IProbe,(void**)&probe);
-    if (FAILED(hr)) { mitkThrow() << "Error on querying interface for probe with index "<< n << "."; }
+    if (FAILED(hr))
+    {
+      MITK_ERROR("USTelemedProbesControls")("USControlInterfaceProbes")
+        << "Error on querying interface for probe with index "<< n << ".";
+      mitkThrow() << "Error on querying interface for probe with index "<< n << ".";
+    }
 
     // create main ultrasound scanning object for selected probe
     IUsgDataView* usgDataView;
     HRESULT hr = usgMainInterface->CreateDataView(probe, &usgDataView);
-    if (FAILED(hr) || ! usgDataView) { mitkThrow() << "Could not create data view for selected probe."; }
+    if (FAILED(hr) || ! usgDataView)
+    {
+      MITK_ERROR("USTelemedProbesControls")("USControlInterfaceProbes")
+        << "Could not create data view for selected probe.";
+      mitkThrow() << "Could not create data view for selected probe.";
+    }
 
+    // probe object can be created now from API data
     m_ProbesSet.at(n) = mitk::USTelemedProbe::New(probe, usgDataView);
 
     SAFE_RELEASE(tmp_obj);
-    //SAFE_RELEASE(probe);
   }
 }

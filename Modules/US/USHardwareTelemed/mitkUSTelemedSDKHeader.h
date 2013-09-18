@@ -17,16 +17,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKUSTelemedSDKHeader_H
 #define MITKUSTelemedSDKHeader_H
 
-#include <Usgfw2_i.c>   //wg IID's
+#include <Usgfw2_i.c>
 #include <usgfw2.h>
 #include <usgfw.h>
 #include <usgscanb.h>
-#include <comutil.h>    // for _bstr_t class
 
 #include <mitkCommon.h>
 
+/**
+  * Release the given COM object pointer and set the pointer to null.
+  */
 #define SAFE_RELEASE(x) { if (x) x->Release(); x = NULL; }
 
+/**
+  * Get the current value from the given COM object and return it as double.
+  */
 #define RETURN_TelemedValue(control) { \
   LONG value; \
   HRESULT hr = control->get_Current(&value); \
@@ -34,11 +39,18 @@ See LICENSE.txt or http://www.mitk.org for details.
   return static_cast<double>(value); \
 }
 
+/**
+  * Cast the value to LONG and set it at the given COM object.
+  */
 #define SET_TelemedValue(control,value) { \
   HRESULT hr = control->put_Current(static_cast<LONG>(value)); \
   if (FAILED(hr)) { mitkThrow() << "Could not set telemed value " << value << " to " << control << "(" << hr << ")."; }; \
 }
 
+/**
+  * Get all available values for given COM object and return
+  * them as std::vector<double>.
+  */
 #define RETURN_TelemedAvailableValues(control) { \
   IUsgValues *usgValues; \
   HRESULT hr = control->get_Values(&usgValues); \
@@ -60,6 +72,12 @@ See LICENSE.txt or http://www.mitk.org for details.
   return values; \
 }
 
+/**
+  * Get all available values for given COM object, calculate
+  * minimum, maximum and interval step from them and save this
+  * three in given "output" variable. This variable must be a
+  * c array with three elements.
+  */
 #define GETINOUTPUT_TelemedAvailableValuesBounds(control, output) { \
   IUsgValues *usgValues; \
   HRESULT hr = control->get_Values(&usgValues); \
@@ -82,6 +100,10 @@ See LICENSE.txt or http://www.mitk.org for details.
   output[2] = (output[1] - output[0]) / usgValuesNum; \
 }
 
+/**
+  * Create Telemed API control. The interface documentation can be found
+  * in the Telemed API documentation regarding CreateUsgControl().
+  */
 #define CREATE_TelemedControl(control, dataView, iidType, type, scanMode) { \
   IUnknown* tmp_obj = NULL; \
   mitk::telemed::CreateUsgControl( dataView, iidType, scanMode, 0, (void**)&tmp_obj ); \
@@ -93,12 +115,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
   namespace telemed {
-
     enum ScanModes { ScanModeB };
 
+    /**
+      * Just a helper function for avoiding code duplication when creating
+      * a Telemed API control. This function is from the Telemed API documentation
+      * thus a description of the interface can be found there.
+      */
     bool CreateUsgControl( IUsgDataView* dataView, const IID& typeId, ULONG scanMode, ULONG streamId, void** ctrl );
+
+    /**
+      * Converts given BSTR (which is in fact a wchar*) to std::string.
+      */
     std::string ConvertWcharToString( const BSTR input );
-  }
-}
+  } // namespace telemed
+} // namespace mitk
 
 #endif // MITKUSTelemedSDKHeader_H

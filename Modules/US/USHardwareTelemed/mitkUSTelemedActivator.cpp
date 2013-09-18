@@ -18,12 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::USTelemedActivator::USTelemedActivator()
 {
-
 }
 
 mitk::USTelemedActivator::~USTelemedActivator()
 {
-
 }
 
 void mitk::USTelemedActivator::Load(us::ModuleContext* context)
@@ -35,5 +33,7 @@ void mitk::USTelemedActivator::Load(us::ModuleContext* context)
 
 void mitk::USTelemedActivator::Unload(us::ModuleContext* context)
 {
+  // set smart pointer to null (device will be unregistered from
+  // micro service in it's destrcutor)
   m_Device = 0;
 }

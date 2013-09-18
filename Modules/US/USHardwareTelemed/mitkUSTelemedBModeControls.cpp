@@ -37,11 +37,6 @@ void mitk::USTelemedBModeControls::SetUsgDataView( IUsgDataView* usgDataView)
   m_UsgDataView = usgDataView;
 }
 
-/*bool mitk::USTelemedBModeControls::GetIsInitialized()
-{
-  return m_DepthControl != 0 && m_GainControl != 0 && m_RejectionControl != 0;
-}*/
-
 void mitk::USTelemedBModeControls::SetIsActive(bool active)
 {
   if (active)
@@ -151,15 +146,16 @@ void mitk::USTelemedBModeControls::CreateControls()
 
   // create B mode gain control
   CREATE_TelemedControl(m_GainControl, m_UsgDataView, IID_IUsgGain, IUsgGain, SCAN_MODE_B);
-  GETINOUTPUT_TelemedAvailableValuesBounds(m_GainControl, m_GainSteps);
+  GETINOUTPUT_TelemedAvailableValuesBounds(m_GainControl, m_GainSteps); // get min, max and tick for gain
 
   // create B mode rejection control
   CREATE_TelemedControl(m_RejectionControl, m_UsgDataView, IID_IUsgRejection2, IUsgRejection2, SCAN_MODE_B);
-  GETINOUTPUT_TelemedAvailableValuesBounds(m_RejectionControl, m_RejectionSteps);
+  GETINOUTPUT_TelemedAvailableValuesBounds(m_RejectionControl, m_RejectionSteps); // get min, max and tick for rejection
 }
 
 void mitk::USTelemedBModeControls::ReleaseControls()
 {
+  // remove all controls and delete their objects
   SAFE_RELEASE(m_DepthControl);
   SAFE_RELEASE(m_GainControl);
   SAFE_RELEASE(m_RejectionControl);

@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::USTelemedImageSource::USTelemedImageSource(  )
   : m_Image(mitk::Image::New()), m_Plugin(0), m_PluginCallback(0)
 {
-
 }
 
 mitk::USTelemedImageSource::~USTelemedImageSource( )
@@ -34,6 +33,8 @@ void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 {
   if ( m_Image->IsInitialized() )
   {
+    // just set the image pointer to the image
+    // which content was filled by Telemed API
     image = m_Image;
   }
 }
@@ -42,7 +43,7 @@ bool mitk::USTelemedImageSource::CreateAndConnectConverterPlugin(IUsgDataView* u
 {
   IUnknown* tmp_obj = NULL;
 
-  //get plugin
+  // create control object from Telemed API
   mitk::telemed::CreateUsgControl( usgDataView, IID_IUsgScanConverterPlugin, scanMode, 0, (void**)&tmp_obj );
   if ( ! tmp_obj )
   {
@@ -53,9 +54,12 @@ bool mitk::USTelemedImageSource::CreateAndConnectConverterPlugin(IUsgDataView* u
   SAFE_RELEASE(m_Plugin);
   m_Plugin = (IUsgScanConverterPlugin*)tmp_obj;
 
+  // now the ScanConverterPlugin can be created and set as plugin
   SAFE_RELEASE(m_PluginCallback);
   m_PluginCallback = new USTelemedScanConverterPlugin();
   m_PluginCallback->SetScanConverterPlugin(m_Plugin);
+
+  // current image buffer should be copied to m_Image at every callback
   m_PluginCallback->SetOutputImage(m_Image.GetPointer());
 
   return true;

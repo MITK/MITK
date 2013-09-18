@@ -23,15 +23,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactory.h>
 
 namespace mitk {
+  /**
+    * \brief Implementation of mitk::USControlInterfaceBMode for Telemed ultrasound devices.
+    * See documentation of mitk::USControlInterfaceBMode for a description of the interface methods.
+    */
   class USTelemedBModeControls : public USControlInterfaceBMode
   {
   public:
     mitkClassMacro(USTelemedBModeControls, USControlInterfaceBMode);
     itkNewMacro(Self);
 
-    //virtual bool GetIsInitialized();
-
+    /**
+      * Scan mode is set to b mode when this controls are activated.
+      * All necessary controls are created at the Telemed API.
+      */
     virtual void SetIsActive( bool );
+
+    /**
+      * \return true if API controls are created and scan mode is set to b mode
+      */
     virtual bool GetIsActive( );
 
     virtual double GetScanningDepth( );
@@ -50,6 +60,10 @@ namespace mitk {
     virtual double GetScanningRejectionMax( );
     virtual double GetScanningRejectionTick( );
 
+    /**
+      * \brief Setter for the IUsgDataView necesary for communicating with the Telemed API.
+      * This method is just for internal use of the mitk::USTelemedDevice.
+      */
     void SetUsgDataView( IUsgDataView* );
 
   protected:
@@ -59,16 +73,16 @@ namespace mitk {
     void CreateControls( );
     void ReleaseControls( );
 
-    IUsgDataView*             m_UsgDataView;
+    IUsgDataView*             m_UsgDataView; // main SDK object for comminucating with the Telemed API
     IUsgDepth*                m_DepthControl; // control for B mode scanning depth
     IUsgGain*                 m_GainControl; // control for B mode scanning gain
     IUsgRejection2*           m_RejectionControl; // control for B mode scanning rejection
 
     bool                      m_Active;
 
-    double*                   m_GainSteps;
-    double*                   m_RejectionSteps;
+    double*                   m_GainSteps;      // array holding possible gains: [min, max, tick]
+    double*                   m_RejectionSteps; // array holding possible rejections: [min, max, tick]
   };
-}
+} // namespace mitk
 
 #endif // MITKUSTelemedBModeControls_H_HEADER_INCLUDED_

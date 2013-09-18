@@ -32,7 +32,7 @@ namespace mitk
     virtual ~USTelemedActivator();
 
     /**
-      * \brief Telemed device is created an initialized on module load.
+      * \brief Telemed device is created and initialized on module load.
       * Service registration is done during the initialization process.
       */
     void Load(us::ModuleContext* context);
@@ -46,7 +46,7 @@ namespace mitk
   protected:
     USTelemedDevice::Pointer m_Device;
   };
-}
+} // namespace mitk
 
 US_EXPORT_MODULE_ACTIVATOR(MitkUSHardwareTelemed, mitk::USTelemedActivator)
 

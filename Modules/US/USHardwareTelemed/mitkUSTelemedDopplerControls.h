@@ -23,18 +23,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactory.h>
 
 namespace mitk {
+  /**
+    * \brief Implementation of mitk::USControlInterfaceDoppler for Telemed ultrasound devices.
+    * See documentation of mitk::USControlInterfaceBMode for a description of the interface methods.
+    *
+    * This implementation does nothing, yet!
+    */
   class USTelemedDopplerControls : public USControlInterfaceDoppler
   {
   public:
     mitkClassMacro(USTelemedDopplerControls, USControlInterfaceDoppler);
     itkNewMacro(Self);
 
+    virtual void SetIsActive(bool);
+    virtual bool GetIsActive();
+
   protected:
     USTelemedDopplerControls();
     virtual ~USTelemedDopplerControls();
-
-    virtual void SetIsActive(bool);
-    virtual bool GetIsActive();
 
     bool  m_IsActive;
   };

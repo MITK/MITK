@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 bool mitk::telemed::CreateUsgControl( IUsgDataView* dataView, const IID& typeId, ULONG scanMode, ULONG streamId, void** ctrl )
 {
   if ( ! dataView ) {
-    MITK_ERROR("CreateUsgControl") << "DataView must not be null.";
+    MITK_WARN("CreateUsgControl") << "DataView must not be null.";
     return false;
   }
 
@@ -31,7 +31,7 @@ bool mitk::telemed::CreateUsgControl( IUsgDataView* dataView, const IID& typeId,
   hr = dataView->GetControlObj( &typeId, scanMode, streamId, &ctrl2 );
   if (FAILED(hr) || ! ctrl2)
   {
-    MITK_ERROR("CreateUsgControl") << "Could not get control object from data view (" << hr << ").";
+    MITK_WARN("CreateUsgControl") << "Could not get control object from data view (" << hr << ").";
     return false;
   }
 
@@ -45,7 +45,11 @@ bool mitk::telemed::CreateUsgControl( IUsgDataView* dataView, const IID& typeId,
 
 std::string mitk::telemed::ConvertWcharToString( const BSTR input )
 {
+  // BSTR (-> wchar*) must first be converted to a std::wstring
   std::wstring tmp(input);
+
+  // this can be converted to a std::string then
   std::string output(tmp.begin(), tmp.end());
+
   return output;
 }

@@ -28,7 +28,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkServiceListWidget" name="m_ToolStorageListWidget"/>
+    <widget class="QmitkNavigationToolStorageSelectionWidget" name="m_ToolStorageListWidget"/>
    </item>
    <item>
     <widget class="QmitkNavigationToolManagementWidget" name="m_toolManagerWidget" native="true"/>
@@ -60,9 +60,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QmitkServiceListWidget</class>
+   <class>QmitkNavigationToolStorageSelectionWidget</class>
    <extends>QTextEdit</extends>
-   <header>QmitkServiceListWidget.h</header>
+   <header>QmitkNavigationToolStorageSelectionWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

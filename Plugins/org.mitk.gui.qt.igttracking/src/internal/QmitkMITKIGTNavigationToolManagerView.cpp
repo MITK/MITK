@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkMITKIGTNavigationToolManagerView.h"
 #include "QmitkStdMultiWidget.h"
 
+// MITK
+#include <usGetModuleContext.h>
+
 // Qt
 #include <QMessageBox>
 
@@ -52,13 +55,26 @@ void QmitkMITKIGTNavigationToolManagerView::CreateQtPartControl( QWidget *parent
     connect( (QObject*)(m_Controls->m_toolManagerWidget), SIGNAL(NewStorageAdded(mitk::NavigationToolStorage::Pointer,std::string)), this, SLOT(NewStorageByWidget(mitk::NavigationToolStorage::Pointer,std::string)) );
   }
   m_Controls->m_toolManagerWidget->Initialize(this->GetDataStorage());
-  std::string empty = "";
-  m_Controls->m_ToolStorageListWidget->Initialize<mitk::NavigationToolStorage>(mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID,empty);
 }
 
 void QmitkMITKIGTNavigationToolManagerView::NewStorageByWidget(mitk::NavigationToolStorage::Pointer storage,std::string storageName)
 {
   storage->RegisterAsMicroservice(storageName);
+  m_AllStoragesHandledByThisWidget.push_back(storage);
+}
+
+void QmitkMITKIGTNavigationToolManagerView::ToolStorageSelected(mitk::NavigationToolStorage::Pointer storage)
+{
+  if (storage.IsNull()) //no storage selected
+      {
+        //reset everything
+        return;
+      }
+
+    // Get Source
+    //us::ModuleContext* context = us::GetModuleContext();
+    //mitk::NavigationToolStorage::Pointer currentStorage = context->GetService<mitk::NavigationToolStorage>(s);
+    //m_Controls->m_toolManagerWidget->LoadStorage(currentStorage,"dummy");
 }
 
 void QmitkMITKIGTNavigationToolManagerView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)

@@ -152,10 +152,10 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
   }
 
 
-void QmitkNavigationToolManagementWidget::LoadStorage(mitk::NavigationToolStorage::Pointer storageToLoad, std::string storageName)
+void QmitkNavigationToolManagementWidget::LoadStorage(mitk::NavigationToolStorage::Pointer storageToLoad)
   {
   m_NavigationToolStorage = storageToLoad;
-  m_Controls->m_StorageName->setText(storageName.c_str());
+  m_Controls->m_StorageName->setText(m_NavigationToolStorage->GetName().c_str());
   UpdateToolTable();
   }
 
@@ -169,7 +169,8 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
     else
       {
       Poco::Path myPath = Poco::Path(filename.c_str());
-      this->LoadStorage(tempStorage,myPath.getFileName());
+      tempStorage->SetName(myPath.getFileName()); //set the filename as name for the storage, so the user can identify it
+      this->LoadStorage(tempStorage);
       emit NewStorageAdded(m_NavigationToolStorage,myPath.getFileName());
       }
   }

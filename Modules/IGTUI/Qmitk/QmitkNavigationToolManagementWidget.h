@@ -52,9 +52,8 @@ class MitkIGTUI_EXPORT QmitkNavigationToolManagementWidget : public QWidget
      *  storage is not saved somewhere else it might be lost. You might want to ask the user if he
      *  wants to save the storage to the harddisk before calling this method.
      *  @param storageToLoad This storage will be loaded and might be modified by the user.
-     *  @param storageName This name will be displayed for this storage.
      */
-    void LoadStorage(mitk::NavigationToolStorage::Pointer storageToLoad, std::string storageName);
+    void LoadStorage(mitk::NavigationToolStorage::Pointer storageToLoad);
 
     QmitkNavigationToolManagementWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkNavigationToolManagementWidget();

@@ -143,6 +143,17 @@ namespace mitk {
     /** @return Returns the name of this storage. */
     itkGetConstMacro(Name,std::string);
 
+    /** Locks the storage. A logged storage may not be modified.
+     *  If a method tries to modify the storage anyway a waring message is given.
+     *  The storage is unlocked by default. A Storage might be locked when a
+     *  tracking device is active and needs the storage to stay consistent.
+     */
+    void LockStorage();
+    /** Unlocks the storage again. */
+    void UnLockStorage();
+    /** @return Returns true if the storage is locked at the moment, false if not. */
+    bool IsLocked();
+
   protected:
     NavigationToolStorage();
     NavigationToolStorage(mitk::DataStorage::Pointer);
@@ -151,6 +162,7 @@ namespace mitk {
     std::vector<mitk::NavigationTool::Pointer> m_ToolCollection;
     mitk::DataStorage::Pointer m_DataStorage;
     std::string m_Name;
+    bool m_storageLocked;
 
   private:
     us::ServiceRegistration<Self> m_ServiceRegistration;

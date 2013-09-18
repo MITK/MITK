@@ -482,7 +482,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
     if ((mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0) == node) && m_Controls->patImageSelector->GetSelectedNode().IsNotNull())
     {
       this->SetToolManagerSelection(mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0), NULL);
-      this->UpdateWarningLabel("Select or create a segmentation!");
+      this->UpdateWarningLabel("Select or create a segmentation");
     }
 
     mitk::SurfaceInterpolationController::GetInstance()->RemoveSegmentationFromContourList(image);
@@ -604,7 +604,7 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
       if ( !isSourceNode && (!this->CheckForSameGeometry(segNode, node) || possibleParents->Size() > 0 ))
       {
         this->SetToolManagerSelection(node, NULL);
-        this->UpdateWarningLabel("The selected patient image does not\nmatch with the selected segmentation!");
+        this->UpdateWarningLabel("The selected patient image does not match with the selected segmentation!");
       }
       else if ((!isSourceNode && this->CheckForSameGeometry(segNode, node)) || isSourceNode )
       {
@@ -632,8 +632,11 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
 
 void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::DataNode *node)
 {
-  if ( node == 0)
+  if (node == NULL)
+  {
+    this->UpdateWarningLabel("Select or create a segmentation");
     return;
+  }
 
   mitk::DataNode* refNode = m_Controls->patImageSelector->GetSelectedNode();
 
@@ -651,7 +654,7 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
 
       if (parentNode != refNode)
       {
-        this->UpdateWarningLabel("The selected segmentation does not\nmatch with the selected patient image!");
+        this->UpdateWarningLabel("The selected segmentation does not match with the selected patient image!");
         this->SetToolManagerSelection(NULL, node);
       }
       else

@@ -190,20 +190,13 @@ void KspaceImageFilter< TPixelType >
             if (m_SimulateDistortions)
                 omega_t += m_FrequencyMap->GetPixel(it.GetIndex())*t/1000;
 
-            double scale = 1;
-            if (y<-yMaxFov/2)
-            {
-                scale = 0.5;
+            if (g<-yMaxFov/2)
                 y += yMaxFov;
-            }
             else if (y>=yMaxFov/2)
-            {
-                scale = 0.5;
                 y -= yMaxFov;
-            }
 
             // actual DFT term
-            s += scale*f * exp( std::complex<double>(0, 2 * M_PI * (kx*x/xMax + ky*y/yMaxFov + omega_t )) );
+            s += f * exp( std::complex<double>(0, 2 * M_PI * (kx*x/xMax + ky*y/yMaxFov + omega_t )) );
 
             ++it;
         }

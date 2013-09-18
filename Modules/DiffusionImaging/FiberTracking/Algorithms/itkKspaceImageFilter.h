@@ -55,6 +55,7 @@ namespace itk{
     typedef typename Superclass::OutputImageType            OutputImageType;
     typedef typename Superclass::OutputImageRegionType      OutputImageRegionType;
     typedef itk::Matrix<double, 3, 3>                       MatrixType;
+    typedef itk::Point<double,2>                            Point2D;
 
     itkSetMacro( FrequencyMap, typename InputImageType::Pointer )
     itkSetMacro( tLine, double )

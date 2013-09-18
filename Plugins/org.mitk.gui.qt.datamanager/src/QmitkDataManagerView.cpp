@@ -382,11 +382,7 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   confElem->GetAttribute("class", className);
   confElem->GetAttribute("smoothed", smoothed);
 
-  if(className == "QmitkOtsuAction")
-  {
-    contextMenuAction->SetDataStorage(this->GetDataStorage());
-  }
-  else if(className == "QmitkCreatePolygonModelAction")
+  if(className == "QmitkCreatePolygonModelAction")
   {
     contextMenuAction->SetDataStorage(this->GetDataStorage());
     if(smoothed == "false")

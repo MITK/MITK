@@ -33,7 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QDialog;
 class QmitkStdMultiWidget;
 
-class MITK_QT_SEGMENTATION QmitkOtsuAction : public QObject, public mitk::IContextMenuAction
+/** \deprecatedSince{2013_09} The interaction for the Otsu image filter was revised and moved to the segmentation plugin view. */
+class DEPRECATED() MITK_QT_SEGMENTATION QmitkOtsuAction : public QObject, public mitk::IContextMenuAction
 {
   Q_OBJECT
   Q_INTERFACES(mitk::IContextMenuAction)

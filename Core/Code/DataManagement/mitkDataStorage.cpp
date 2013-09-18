@@ -25,12 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkCommand.h"
 
-
 mitk::DataStorage::DataStorage() : itk::Object()
-, m_BlockNodeModifiedEvents(false)
+  , m_BlockNodeModifiedEvents(false)
 {
 }
-
 
 mitk::DataStorage::~DataStorage()
 {
@@ -42,14 +40,13 @@ mitk::DataStorage::~DataStorage()
   //m_NodeDeleteObserverTags.clear();
 }
 
-
 void mitk::DataStorage::Add(mitk::DataNode* node, mitk::DataNode* parent)
 {
   mitk::DataStorage::SetOfObjects::Pointer parents = mitk::DataStorage::SetOfObjects::New();
-  parents->InsertElement(0, parent);
+  if (parent != NULL) //< Return empty set if parent is null
+    parents->InsertElement(0, parent);
   this->Add(node, parents);
 }
-
 
 void mitk::DataStorage::Remove(const mitk::DataStorage::SetOfObjects* nodes)
 {
@@ -59,13 +56,11 @@ void mitk::DataStorage::Remove(const mitk::DataStorage::SetOfObjects* nodes)
     this->Remove(it.Value());
 }
 
-
 mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSubset(const NodePredicateBase* condition) const
 {
   mitk::DataStorage::SetOfObjects::ConstPointer result = this->FilterSetOfObjects(this->GetAll(), condition);
   return result;
 }
-
 
 mitk::DataNode* mitk::DataStorage::GetNamedNode(const char* name) const
 
@@ -81,7 +76,6 @@ mitk::DataNode* mitk::DataStorage::GetNamedNode(const char* name) const
   else
     return NULL;
 }
-
 
 mitk::DataNode* mitk::DataStorage::GetNode(const NodePredicateBase* condition) const
 {
@@ -108,7 +102,6 @@ mitk::DataNode* mitk::DataStorage::GetNamedDerivedNode(const char* name, const m
   else
     return NULL;
 }
-
 
 void mitk::DataStorage::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
@@ -143,7 +136,6 @@ void mitk::DataStorage::PrintSelf(std::ostream& os, itk::Indent indent) const
   os << std::endl;
 }
 
-
 mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::FilterSetOfObjects(const SetOfObjects* set, const NodePredicateBase* condition) const
 {
   if (set == NULL)
@@ -156,7 +148,6 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::FilterSetOfObje
 
   return mitk::DataStorage::SetOfObjects::ConstPointer(result);
 }
-
 
 const mitk::DataNode::GroupTagList mitk::DataStorage::GetGroupTags() const
 {
@@ -176,12 +167,10 @@ const mitk::DataNode::GroupTagList mitk::DataStorage::GetGroupTags() const
   return result;
 }
 
-
 void mitk::DataStorage::EmitAddNodeEvent(const mitk::DataNode* node)
 {
   AddNodeEvent.Send(node);
 }
-
 
 void mitk::DataStorage::EmitRemoveNodeEvent(const mitk::DataNode* node)
 {
@@ -213,7 +202,6 @@ void mitk::DataStorage::OnNodeModifiedOrDeleted( const itk::Object *caller, cons
   }
 }
 
-
 void mitk::DataStorage::AddListeners( const mitk::DataNode* _Node )
 {
   itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_MutexOne);
@@ -225,10 +213,9 @@ void mitk::DataStorage::AddListeners( const mitk::DataNode* _Node )
     itk::MemberCommand<mitk::DataStorage>::Pointer nodeModifiedCommand =
       itk::MemberCommand<mitk::DataStorage>::New();
     nodeModifiedCommand->SetCallbackFunction(this
-                              , &mitk::DataStorage::OnNodeModifiedOrDeleted);
+      , &mitk::DataStorage::OnNodeModifiedOrDeleted);
     m_NodeModifiedObserverTags[NonConstNode]
-      = NonConstNode->AddObserver(itk::ModifiedEvent(), nodeModifiedCommand);
-
+    = NonConstNode->AddObserver(itk::ModifiedEvent(), nodeModifiedCommand);
 
     itk::MemberCommand<mitk::DataStorage>::Pointer interactorChangedCommand = itk::MemberCommand<mitk::DataStorage>::New();
     interactorChangedCommand->SetCallbackFunction(this, &mitk::DataStorage::OnNodeInteractorChanged);
@@ -240,10 +227,9 @@ void mitk::DataStorage::AddListeners( const mitk::DataNode* _Node )
     deleteCommand->SetCallbackFunction(this, &mitk::DataStorage::OnNodeModifiedOrDeleted);
     // add observer
     m_NodeDeleteObserverTags[NonConstNode]
-        = NonConstNode->AddObserver(itk::DeleteEvent(), deleteCommand);
+    = NonConstNode->AddObserver(itk::DeleteEvent(), deleteCommand);
   }
 }
-
 
 void mitk::DataStorage::RemoveListeners( const mitk::DataNode* _Node )
 {
@@ -256,12 +242,11 @@ void mitk::DataStorage::RemoveListeners( const mitk::DataNode* _Node )
     // const cast is bad! but sometimes it is necessary. removing an observer does not really
     // touch the internal state
     NonConstNode->RemoveObserver(m_NodeModifiedObserverTags
-                                 .find(NonConstNode)->second);
+      .find(NonConstNode)->second);
     NonConstNode->RemoveObserver(m_NodeDeleteObserverTags
-                                 .find(NonConstNode)->second);
+      .find(NonConstNode)->second);
     NonConstNode->RemoveObserver(m_NodeInteractorChangedObserverTags
       .find(NonConstNode)->second);
-
 
     m_NodeModifiedObserverTags.erase(NonConstNode);
     m_NodeDeleteObserverTags.erase(NonConstNode);
@@ -429,7 +414,6 @@ mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeVisibleBoundingGeome
   return ComputeBoundingGeometry3D( "visible", renderer, boolPropertyKey );
 }
 
-
 mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
   BoundingBox::PointsContainer::Pointer pointscontainer=BoundingBox::PointsContainer::New();
@@ -474,7 +458,6 @@ mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* bo
         }
       }
     }
-
   }
 
   BoundingBox::Pointer result = BoundingBox::New();
@@ -483,7 +466,6 @@ mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* bo
 
   return result;
 }
-
 
 mitk::TimeBounds mitk::DataStorage::ComputeTimeBounds( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {

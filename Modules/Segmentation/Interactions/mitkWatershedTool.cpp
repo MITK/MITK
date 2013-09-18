@@ -74,12 +74,12 @@ us::ModuleResource mitk::WatershedTool::GetIconResource() const
   return resource;
 }
 
-us::ModuleResource mitk::WatershedTool::GetCursorIconResource() const
-{
-  us::Module* module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Watershed_Cursor_32x32.png");
-  return resource;
-}
+//us::ModuleResource mitk::WatershedTool::GetCursorIconResource() const
+//{
+//  us::Module* module = us::GetModuleContext()->GetModule();
+//  us::ModuleResource resource = module->GetResource("Watershed_Cursor_32x32.png");
+//  return resource;
+//}
 
 const char** mitk::WatershedTool::GetXPM() const
 {
@@ -182,7 +182,7 @@ void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* ori
 
   // use the progress bar
   mitk::ToolCommand::Pointer command = mitk::ToolCommand::New();
-  command->AddStepsToDo(10);
+  command->AddStepsToDo(60);
 
   // then add the watershed filter to the pipeline
   typename WatershedFilter::Pointer watershed = WatershedFilter::New();

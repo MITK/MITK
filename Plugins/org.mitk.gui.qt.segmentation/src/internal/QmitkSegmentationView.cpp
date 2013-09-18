@@ -216,6 +216,7 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
 void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
   m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);
+  this->ForceDisplayPreferencesUponAllImages();
 }
 
 void QmitkSegmentationView::CreateNewSegmentation()
@@ -975,6 +976,58 @@ void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* refere
 //      }
     }
   }
+}
+
+void QmitkSegmentationView::ForceDisplayPreferencesUponAllImages()
+{
+  if (!m_Parent || !m_Parent->isVisible()) return;
+
+  // check all images and segmentations in DataStorage:
+  // (items in brackets are implicitly done by previous steps)
+  // 1.
+  //   if  a reference image is selected,
+  //     show the reference image
+  //     and hide all other images (orignal and segmentation),
+  //     (and hide all segmentations of the other original images)
+  //     and show all the reference's segmentations
+  //   if no reference image is selected, do do nothing
+  //
+  // 2.
+  //   if  a segmentation is selected,
+  //     show it
+  //     (and hide all all its siblings (childs of the same parent, incl, NULL parent))
+  //   if no segmentation is selected, do nothing
+
+  if (!m_Controls)
+    return; // might happen on initialization (preferences loaded)
+
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  mitk::DataNode::Pointer referenceData = toolManager->GetReferenceData(0);
+  mitk::DataNode::Pointer workingData =   toolManager->GetWorkingData(0);
+
+  // 1.
+  if (referenceData.IsNotNull())
+  {
+    // iterate all images
+    mitk::DataStorage::SetOfObjects::ConstPointer allImages = this->GetDefaultDataStorage()->GetSubset( m_IsABinaryImagePredicate );
+
+    for ( mitk::DataStorage::SetOfObjects::const_iterator iter = allImages->begin(); iter != allImages->end(); ++iter)
+
+    {
+      mitk::DataNode* node = *iter;
+      // apply display preferences
+      ApplyDisplayOptions(node);
+
+      // set visibility
+      node->SetVisibility(node == referenceData);
+    }
+  }
+
+  // 2.
+  if (workingData.IsNotNull())
+    workingData->SetVisibility(true);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)

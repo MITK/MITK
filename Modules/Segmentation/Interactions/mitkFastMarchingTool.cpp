@@ -414,7 +414,7 @@ void mitk::FastMarchingTool::Update()
      MITK_ERROR << "Exception caught: " << excep.GetDescription();
 
      // progress by max step count, will force
-     m_ProgressCommand->SetRemainingProgress(progress_steps);
+     m_ProgressCommand->SetProgress(progress_steps);
      CurrentlyBusy.Send(false);
 
      std::string msg = excep.GetDescription();
@@ -422,7 +422,7 @@ void mitk::FastMarchingTool::Update()
 
      return;
     }
-    m_ProgressCommand->SetRemainingProgress(progress_steps);
+    m_ProgressCommand->SetProgress(progress_steps);
     CurrentlyBusy.Send(false);
 
     //make output visible

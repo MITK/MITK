@@ -347,7 +347,7 @@ void mitk::FastMarchingTool3D::Update()
     {
      MITK_ERROR << "Exception caught: " << excep.GetDescription();
 
-     m_ProgressCommand->SetRemainingProgress(progress_steps);
+     m_ProgressCommand->SetProgress(progress_steps);
      CurrentlyBusy.Send(false);
 
      std::string msg = excep.GetDescription();
@@ -355,7 +355,7 @@ void mitk::FastMarchingTool3D::Update()
 
      return;
     }
-    m_ProgressCommand->SetRemainingProgress(progress_steps);
+    m_ProgressCommand->SetProgress(progress_steps);
     CurrentlyBusy.Send(false);
 
     //make output visible

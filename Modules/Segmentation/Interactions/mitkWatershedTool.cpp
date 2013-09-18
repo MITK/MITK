@@ -74,13 +74,6 @@ us::ModuleResource mitk::WatershedTool::GetIconResource() const
   return resource;
 }
 
-//us::ModuleResource mitk::WatershedTool::GetCursorIconResource() const
-//{
-//  us::Module* module = us::GetModuleContext()->GetModule();
-//  us::ModuleResource resource = module->GetResource("Watershed_Cursor_32x32.png");
-//  return resource;
-//}
-
 const char** mitk::WatershedTool::GetXPM() const
 {
   return NULL;

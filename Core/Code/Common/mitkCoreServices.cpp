@@ -22,54 +22,60 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usModuleContext.h"
 #include "usServiceReference.h"
 
+#include <itkSimpleFastMutexLock.h>
+#include <itkMutexLockHolder.h>
+
 namespace mitk {
 
-template<class S>
-S* GetCoreService(us::ModuleContext* context, std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> >& csm)
-{
-  S* coreService = NULL;
-  us::ServiceReference<S> serviceRef = context->GetServiceReference<S>();
-  if (serviceRef)
+  static itk::SimpleFastMutexLock s_ContextToServicesMapMutex;
+  static std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> > s_ContextToServicesMap;
+
+  template<class S>
+  static S* GetCoreService(us::ModuleContext* context)
   {
-    coreService = context->GetService(serviceRef);
+    itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex);
+    S* coreService = NULL;
+    us::ServiceReference<S> serviceRef = context->GetServiceReference<S>();
+    if (serviceRef)
+    {
+      coreService = context->GetService(serviceRef);
+    }
+
+    assert(coreService && "Asserting non-NULL MITK core service");
+    s_ContextToServicesMap[context].insert(std::make_pair(coreService,serviceRef));
+
+    return coreService;
   }
 
-  assert(coreService && "Asserting non-NULL MITK core service");
-  csm[context].insert(std::make_pair(coreService,serviceRef));
-
-  return coreService;
-}
-
-std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> > CoreServices::m_ContextToServicesMap;
-
-IShaderRepository* CoreServices::GetShaderRepository(us::ModuleContext* context)
-{
-  return GetCoreService<IShaderRepository>(context, m_ContextToServicesMap);
-}
-
-bool CoreServices::Unget(us::ModuleContext* context, const std::string& /*interfaceId*/, void* service)
-{
-  bool success = false;
-
-  std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> >::iterator iter = m_ContextToServicesMap.find(context);
-  if (iter != m_ContextToServicesMap.end())
+  IShaderRepository* CoreServices::GetShaderRepository(us::ModuleContext* context)
   {
-    std::map<void*,us::ServiceReferenceU>::iterator iter2 = iter->second.find(service);
-    if (iter2 != iter->second.end())
+    return GetCoreService<IShaderRepository>(context);
+  }
+
+  bool CoreServices::Unget(us::ModuleContext* context, const std::string& /*interfaceId*/, void* service)
+  {
+    bool success = false;
+
+    itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex);
+    std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> >::iterator iter = s_ContextToServicesMap.find(context);
+    if (iter != s_ContextToServicesMap.end())
     {
-      us::ServiceReferenceU serviceRef = iter2->second;
-      if (serviceRef)
+      std::map<void*,us::ServiceReferenceU>::iterator iter2 = iter->second.find(service);
+      if (iter2 != iter->second.end())
       {
-        success = context->UngetService(serviceRef);
-        if (success)
+        us::ServiceReferenceU serviceRef = iter2->second;
+        if (serviceRef)
         {
-          iter->second.erase(iter2);
+          success = context->UngetService(serviceRef);
+          if (success)
+          {
+            iter->second.erase(iter2);
+          }
         }
       }
     }
-  }
 
-  return success;
-}
+    return success;
+  }
 
 }

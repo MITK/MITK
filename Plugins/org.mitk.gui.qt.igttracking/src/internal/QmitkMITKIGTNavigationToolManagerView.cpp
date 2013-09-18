@@ -53,6 +53,7 @@ void QmitkMITKIGTNavigationToolManagerView::CreateQtPartControl( QWidget *parent
     m_Controls = new Ui::QmitkMITKIGTNavigationToolManagerViewControls;
     m_Controls->setupUi( parent );
     connect( (QObject*)(m_Controls->m_toolManagerWidget), SIGNAL(NewStorageAdded(mitk::NavigationToolStorage::Pointer,std::string)), this, SLOT(NewStorageByWidget(mitk::NavigationToolStorage::Pointer,std::string)) );
+    connect( (QObject*)(m_Controls->m_ToolStorageListWidget), SIGNAL(NavigationToolStorageSelected(mitk::NavigationToolStorage::Pointer)), this, SLOT(ToolStorageSelected(mitk::NavigationToolStorage::Pointer)) );
   }
   m_Controls->m_toolManagerWidget->Initialize(this->GetDataStorage());
 }
@@ -71,10 +72,7 @@ void QmitkMITKIGTNavigationToolManagerView::ToolStorageSelected(mitk::Navigation
         return;
       }
 
-    // Get Source
-    //us::ModuleContext* context = us::GetModuleContext();
-    //mitk::NavigationToolStorage::Pointer currentStorage = context->GetService<mitk::NavigationToolStorage>(s);
-    //m_Controls->m_toolManagerWidget->LoadStorage(currentStorage,"dummy");
+  this->m_Controls->m_toolManagerWidget->LoadStorage(storage);
 }
 
 void QmitkMITKIGTNavigationToolManagerView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)

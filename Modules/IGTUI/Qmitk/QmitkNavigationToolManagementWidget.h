@@ -77,6 +77,7 @@ class MitkIGTUI_EXPORT QmitkNavigationToolManagementWidget : public QWidget
     void OnSaveTool();
     void OnLoadStorage();
     void OnSaveStorage();
+    void OnCreateStorage();
 
     //widget page "add tool":
     void OnAddToolCancel();
@@ -103,5 +104,7 @@ class MitkIGTUI_EXPORT QmitkNavigationToolManagementWidget : public QWidget
     //############## private help methods #######################
     void MessageBox(std::string s);
     void UpdateToolTable();
+    void DisableStorageControls();
+    void EnableStorageControls();
 };
 #endif

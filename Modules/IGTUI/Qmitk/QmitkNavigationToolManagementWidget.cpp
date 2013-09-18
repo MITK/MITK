@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //qt headers
 #include <qfiledialog.h>
+#include <qinputdialog.h>
 #include <qmessagebox.h>
 
 //poco headers
@@ -56,6 +57,9 @@ void QmitkNavigationToolManagementWidget::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkNavigationToolManagementWidgetControls;
     m_Controls->setupUi(parent);
     }
+
+    //Disable StorageControls in the beginning, because there is no storage to edit
+    DisableStorageControls();
   }
 
 void QmitkNavigationToolManagementWidget::OnLoadTool()
@@ -101,6 +105,8 @@ void QmitkNavigationToolManagementWidget::CreateConnections()
       connect( (QObject*)(m_Controls->m_SaveStorage), SIGNAL(clicked()), this, SLOT(OnSaveStorage()) );
       connect( (QObject*)(m_Controls->m_LoadTool), SIGNAL(clicked()), this, SLOT(OnLoadTool()) );
       connect( (QObject*)(m_Controls->m_SaveTool), SIGNAL(clicked()), this, SLOT(OnSaveTool()) );
+      connect( (QObject*)(m_Controls->m_CreateNewStorage), SIGNAL(clicked()), this, SLOT(OnCreateStorage()) );
+
 
       //widget page "add tool":
       connect( (QObject*)(m_Controls->m_ToolCreationWidget), SIGNAL(Canceled()), this, SLOT(OnAddToolCancel()) );
@@ -111,8 +117,23 @@ void QmitkNavigationToolManagementWidget::CreateConnections()
 void QmitkNavigationToolManagementWidget::Initialize(mitk::DataStorage* dataStorage)
   {
   m_DataStorage = dataStorage;
-  m_NavigationToolStorage = mitk::NavigationToolStorage::New(m_DataStorage);
   m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage,"Tool0");
+  }
+
+void QmitkNavigationToolManagementWidget::LoadStorage(mitk::NavigationToolStorage::Pointer storageToLoad)
+  {
+  if(storageToLoad.IsNotNull())
+    {
+    m_NavigationToolStorage = storageToLoad;
+    m_Controls->m_StorageName->setText(m_NavigationToolStorage->GetName().c_str());
+    EnableStorageControls();
+    }
+  else
+    {
+    m_NavigationToolStorage = NULL;
+    DisableStorageControls();
+    }
+  UpdateToolTable();
   }
 
 //##################################################################################
@@ -124,6 +145,7 @@ void QmitkNavigationToolManagementWidget::OnAddTool()
     QString defaultIdentifier = "NavigationTool#"+QString::number(m_NavigationToolStorage->GetToolCount());
     m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage,defaultIdentifier.toStdString());
     m_edit = false;
+    m_Controls->m_MainWidgets->setCurrentIndex(1);
   }
 
 void QmitkNavigationToolManagementWidget::OnDeleteTool()
@@ -141,22 +163,21 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
   {
     //if no item is selected, show error message:
     if (m_Controls->m_ToolList->currentItem() == NULL) {MessageBox("Error: Please select tool first!");return;}
-
-
     mitk::NavigationTool::Pointer selectedTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
     m_Controls->m_ToolCreationWidget->SetDefaultData(selectedTool);
-
     m_edit = true;
-
     m_Controls->m_MainWidgets->setCurrentIndex(1);
   }
 
-
-void QmitkNavigationToolManagementWidget::LoadStorage(mitk::NavigationToolStorage::Pointer storageToLoad)
+void QmitkNavigationToolManagementWidget::OnCreateStorage()
   {
-  m_NavigationToolStorage = storageToLoad;
-  m_Controls->m_StorageName->setText(m_NavigationToolStorage->GetName().c_str());
-  UpdateToolTable();
+    QString storageName = QInputDialog::getText(NULL,"Storage Name","Name of the new tool storage:");
+    if (storageName.isNull()) return;
+    m_NavigationToolStorage = mitk::NavigationToolStorage::New(this->m_DataStorage);
+    m_NavigationToolStorage->SetName(storageName.toStdString());
+    m_Controls->m_StorageName->setText(m_NavigationToolStorage->GetName().c_str());
+    EnableStorageControls();
+    emit NewStorageAdded(m_NavigationToolStorage, storageName.toStdString());
   }
 
 void QmitkNavigationToolManagementWidget::OnLoadStorage()
@@ -229,6 +250,7 @@ void QmitkNavigationToolManagementWidget::OnAddToolCancel()
 void QmitkNavigationToolManagementWidget::UpdateToolTable()
   {
   m_Controls->m_ToolList->clear();
+  if(m_NavigationToolStorage.IsNull()) return;
   for(int i=0; i<m_NavigationToolStorage->GetToolCount(); i++)
     {
       QString currentTool = "Tool" + QString::number(i) + ": " + QString(m_NavigationToolStorage->GetTool(i)->GetDataNode()->GetName().c_str())+ " ";
@@ -265,3 +287,30 @@ void QmitkNavigationToolManagementWidget::MessageBox(std::string s)
   msgBox.setText(s.c_str());
   msgBox.exec();
   }
+
+void QmitkNavigationToolManagementWidget::DisableStorageControls()
+{
+  m_Controls->m_StorageName->setText("<none>");
+  m_Controls->m_AddTool->setEnabled(false);
+  m_Controls->m_LoadTool->setEnabled(false);
+  m_Controls->m_selectedLabel->setEnabled(false);
+  m_Controls->m_DeleteTool->setEnabled(false);
+  m_Controls->m_EditTool->setEnabled(false);
+  m_Controls->m_SaveTool->setEnabled(false);
+  m_Controls->m_ToolList->setEnabled(false);
+  m_Controls->m_SaveStorage->setEnabled(false);
+  m_Controls->m_ToolLabel->setEnabled(false);
+}
+
+void QmitkNavigationToolManagementWidget::EnableStorageControls()
+{
+  m_Controls->m_AddTool->setEnabled(true);
+  m_Controls->m_LoadTool->setEnabled(true);
+  m_Controls->m_selectedLabel->setEnabled(true);
+  m_Controls->m_DeleteTool->setEnabled(true);
+  m_Controls->m_EditTool->setEnabled(true);
+  m_Controls->m_SaveTool->setEnabled(true);
+  m_Controls->m_ToolList->setEnabled(true);
+  m_Controls->m_SaveStorage->setEnabled(true);
+  m_Controls->m_ToolLabel->setEnabled(true);
+}

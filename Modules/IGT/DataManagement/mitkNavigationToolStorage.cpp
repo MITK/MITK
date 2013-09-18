@@ -19,14 +19,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 //Microservices
 #include <usGetModuleContext.h>
 #include <usModule.h>
-#include <usServiceProperties.h>
 #include <usModuleContext.h>
 
 const std::string  mitk::NavigationToolStorage::US_INTERFACE_NAME = "org.mitk.services.NavigationToolStorage"; // Name of the interface
 const std::string  mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID = US_INTERFACE_NAME + ".sourceID";
+const std::string  mitk::NavigationToolStorage::US_PROPKEY_STORAGE_NAME = US_INTERFACE_NAME + ".name";
 
-mitk::NavigationToolStorage::NavigationToolStorage() : m_ToolCollection(std::vector<mitk::NavigationTool::Pointer>()),m_DataStorage(NULL),m_Name("ToolStorage (no name given)")
+mitk::NavigationToolStorage::NavigationToolStorage() : m_ToolCollection(std::vector<mitk::NavigationTool::Pointer>()),m_DataStorage(NULL)
   {
+  this->SetName("ToolStorage (no name given)");
   }
 
 mitk::NavigationToolStorage::NavigationToolStorage(mitk::DataStorage::Pointer ds)
@@ -35,6 +36,11 @@ mitk::NavigationToolStorage::NavigationToolStorage(mitk::DataStorage::Pointer ds
   this->m_DataStorage = ds;
   }
 
+void mitk::NavigationToolStorage::SetName(std::string n)
+  {
+  m_Name = n;
+  m_props[ US_PROPKEY_STORAGE_NAME ] = m_Name;
+  }
 
 
 mitk::NavigationToolStorage::~NavigationToolStorage()
@@ -55,9 +61,8 @@ void mitk::NavigationToolStorage::RegisterAsMicroservice(std::string sourceID){
   us::ModuleContext* context = us::GetModuleContext();
 
   // Define ServiceProps
-  us::ServiceProperties props;
-  props[ US_PROPKEY_SOURCE_ID ] = sourceID;
-  m_ServiceRegistration = context->RegisterService(this, props);
+  m_props[ US_PROPKEY_SOURCE_ID ] = sourceID;
+  m_ServiceRegistration = context->RegisterService(this, m_props);
 }
 
 

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKUSDevice_H_HEADER_INCLUDED_
 #define MITKUSDevice_H_HEADER_INCLUDED_
 
@@ -47,7 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-    /**Documentation
+    /**
     * \brief A device holds information about it's model, make and the connected probes. It is the
     * common super class for all devices and acts as an image source for mitkUSImages. It is the base class
     * for all US Devices, and every new device should extend it.
@@ -56,16 +55,17 @@ namespace mitk {
     * To achieve this, call SetCalibration, and make sure that the subclass also calls apply
     * transformation at some point (The USDevice does not automatically apply the transformation to the image)
     *
-    * Note that SmartPointers to USDevices will not invalidate while the device is still connected.
+    * Note that USDevices will be removed from micro servive when their
+    * destructor is called. Registering into micro service is done when
+    * mitk::USDevice::Initialize() is called.
+    *
     * \ingroup US
     */
 
    class MitkUS_EXPORT USDevice : public mitk::ImageSource
     {
     public:
-      //static USDevice* exp_Device;
-
-      enum DeviceStates { State_NoState, State_Initialized, State_Connected, State_Activated };
+     enum DeviceStates { State_NoState, State_Initialized, State_Connected, State_Activated };
 
       mitkClassMacro(USDevice, mitk::ImageSource);
 
@@ -86,13 +86,50 @@ namespace mitk {
       static const std::string US_PROPKEY_ISACTIVE;     // Whether this device is active or not.
       static const std::string US_PROPKEY_CLASS;        // Class Name of this Object
 
+      /**
+        * \brief Default getter for the custom control interface.
+        * Has to be implemented in a subclass if a custom control interface is
+        * available. Default implementation returns null.
+        *
+        * \return null pointer
+        */
       virtual USAbstractControlInterface::Pointer   GetControlInterfaceCustom();
+
+      /**
+        * \brief Default getter for the b mode control interface.
+        * Has to be implemented in a subclass if a b mode control interface is
+        * available. Default implementation returns null.
+        *
+        * \return null pointer
+        */
       virtual USControlInterfaceBMode::Pointer      GetControlInterfaceBMode();
+
+      /**
+        * \brief Default getter for the probes control interface.
+        * Has to be implemented in a subclass if a probes control interface is
+        * available. Default implementation returns null.
+        *
+        * \return null pointer
+        */
       virtual USControlInterfaceProbes::Pointer     GetControlInterfaceProbes();
+
+      /**
+        * \brief Default getter for the doppler control interface.
+        * Has to be implemented in a subclass if a doppler control interface is
+        * available. Default implementation returns null.
+        *
+        * \return null pointer
+        */
       virtual USControlInterfaceDoppler::Pointer    GetControlInterfaceDoppler();
 
+      /**
+        * \brief Changes device state to mitk::USDevice::State_Initialized.
+        * During initialization the virtual method
+        * mitk::USDevice::OnInitialization will be called. If this method
+        * returns false the initialization process will be canceled. Otherwise
+        * the mitk::USDevice is registered in a micro service.
+        */
       bool Initialize();
-      bool Deinitialize();
 
       /**
       * \brief Connects this device. A connected device is ready to deliver images (i.e. be Activated). A Connected Device can be active. A disconnected Device cannot be active.
@@ -113,13 +150,17 @@ namespace mitk {
       bool Disconnect();
 
       /**
-      * \brief Activates this device. After the activation process, the device will start to produce images. This Method will fail, if the device is not connected.
-      */
+        * \brief Activates this device.
+        * After the activation process, the device will start to produce images.
+        * This Method will fail, if the device is not connected.
+        */
       bool Activate();
 
       /**
-      * \brief Deactivates this device. After the deactivation process, the device will no longer produce images, but still be connected.
-      */
+        * \brief Deactivates this device.
+        * After the deactivation process, the device will no longer produce
+        * images, but still be connected.
+        */
       void Deactivate();
 
       /**
@@ -260,43 +301,69 @@ namespace mitk {
       us::ServiceProperties ConstructServiceProperties();
 
 
+      /**
+        * \brief Remove this device from the micro service.
+        */
       void UnregisterOnService();
 
       /**
-      * \brief Is called during the initialization process. Override this method in your subclass to handle the actual initialization.
-      *  Return true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
+      * \brief Is called during the initialization process.
+      * Override this method in a subclass to handle the actual initialization.
+      * If it returns false, the initialization process will be canceled.
+      *
+      * \return true if successful and false if unsuccessful
+      * \throw mitk::Exception implementation may throw an exception to clarify what went wrong
       */
       virtual bool OnInitialization() = 0;
 
       /**
-      * \brief Is called during the connection process. Override this method in your subclass to handle the actual connection.
-      *  Return true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
+      * \brief Is called during the connection process.
+      * Override this method in a subclass to handle the actual connection.
+      * If it returns false, the connection process will be canceled.
+      *
+      * \return true if successful and false if unsuccessful
+      * \throw mitk::Exception implementation may throw an exception to clarify what went wrong
       */
       virtual bool OnConnection() = 0;
 
       /**
-      * \brief Is called during the disconnection process. Override this method in your subclass to handle the actual disconnection.
-      *  Return true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
+      * \brief Is called during the disconnection process.
+      * Override this method in a subclass to handle the actual disconnection.
+      * If it returns false, the disconnection process will be canceled.
+      *
+      * \return true if successful and false if unsuccessful
+      * \throw mitk::Exception implementation may throw an exception to clarify what went wrong
       */
       virtual bool OnDisconnection() = 0;
 
       /**
-      * \brief Is called during the activation process. After this method is finished, the device should be generating images
+      * \brief Is called during the activation process.
+      * After this method is finished, the device should be generating images.
+      * If it returns false, the activation process will be canceled.
+      *
+      * \return true if successful and false if unsuccessful
+      * \throw mitk::Exception implementation may throw an exception to clarify what went wrong
       */
       virtual bool OnActivation() = 0;
 
 
       /**
-      * \brief Is called during the deactivation process. After a call to this method the device should still be connected, but not producing images anymore.
+      * \brief Is called during the deactivation process.
+      * After a call to this method the device should still be connected,
+      * but not producing images anymore.
+      *
+      * \return true if successful and false if unsuccessful
+      * \throw mitk::Exception implementation may throw an exception to clarify what went wrong
       */
       virtual bool OnDeactivation() = 0;
 
 
       /**
       * \brief This metadata set is privately used to imprint USImages with Metadata later.
-      *        At instantiation time, it only contains Information about the Device,
-      *        At scan time, it integrates this data with the probe information and imprints it on
-      *        the produced images. This field is intentionally hidden from outside interference.
+      * At instantiation time, it only contains Information about the Device.
+      * At scan time, it integrates this data with the probe information and
+      * imprints it on the produced images. This field is intentionally hidden
+      * from outside interference.
       */
       mitk::USImageMetadata::Pointer m_Metadata;
 
@@ -314,28 +381,32 @@ namespace mitk {
       virtual ~USDevice();
 
       /**
-      *  \brief Grabs the next frame from the Video input. This method is called internally, whenever Update() is invoked by an Output.
-      */
+        * \brief Grabs the next frame from the Video input.
+        * This method is called internally, whenever Update() is invoked by an Output.
+        */
       void GenerateData() = 0;
 
       /**
-      *  \brief The Calibration Transformation of this US-Device. This will automatically be written into the image once
-      */
+        * \brief The Calibration Transformation of this US-Device.
+        * This will automatically be written into the image once
+        */
        mitk::AffineTransform3D::Pointer m_Calibration;
 
       /**
-      *  \brief Convenience method that can be used by subclasses to apply the Calibration Data to the image. A subclass has to call
-      * this method or set the transformation itself for the output to be calibrated! Returns true if a Calibration was set and false otherwise
-      * (Usually happens when no transformation was set yet).
-      */
+        *  \brief Convenience method that can be used by subclasses to apply the Calibration Data to the image.
+        * A subclass has to call this method or set the transformation itself for
+        * the output to be calibrated!
+        *
+        * \return true if a Calibration was set and false otherwise (usually happens when no transformation was set yet)
+        */
        bool ApplyCalibration(mitk::USImage::Pointer image);
 
 
      private:
 
       /**
-      *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
-      */
+        *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
+        */
        us::ServiceRegistration<Self> m_ServiceRegistration;
 
        // Threading-Related
@@ -346,9 +417,10 @@ namespace mitk {
 
        bool m_UnregisteringStarted;
     };
+
 } // namespace mitk
 
 // This is the microservice declaration. Do not meddle!
 US_DECLARE_SERVICE_INTERFACE(mitk::USDevice, "org.mitk.services.UltrasoundDevice")
 
-#endif
+#endif // MITKUSDevice_H_HEADER_INCLUDED_

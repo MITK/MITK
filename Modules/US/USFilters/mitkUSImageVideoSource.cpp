@@ -53,7 +53,7 @@ void mitk::USImageVideoSource::SetVideoFileInput(std::string path)
   else
     m_IsVideoReady = true;
 
-  // If Override is enabled, use it
+  // if Override is enabled, use it
   if (m_ResolutionOverride) {
     m_VideoCapture->set(CV_CAP_PROP_FRAME_WIDTH, this->m_ResolutionOverrideWidth);
     m_VideoCapture->set(CV_CAP_PROP_FRAME_HEIGHT, this->m_ResolutionOverrideHeight);
@@ -69,7 +69,7 @@ void mitk::USImageVideoSource::SetCameraInput(int deviceID)
   else
     m_IsVideoReady = true;
 
-  // If Override is enabled, use it
+  // if Override is enabled, use it
   if (m_ResolutionOverride)
   {
     m_VideoCapture->set(CV_CAP_PROP_FRAME_WIDTH, this->m_ResolutionOverrideWidth);
@@ -162,20 +162,19 @@ mitk::USImageVideoSource::USImageCropping mitk::USImageVideoSource::GetCropping(
 
 void mitk::USImageVideoSource::RemoveRegionOfInterest()
 {
-  //itk::BaseData<>
   m_CombinationFilter->RemoveFilter(m_CropFilter.GetPointer());
   m_IsCropped = false;
 }
 
 void mitk::USImageVideoSource::GetNextRawImage( cv::Mat& image )
 {
-  // Loop video if necessary
+  // loop video if necessary
   if (m_VideoCapture->get(CV_CAP_PROP_POS_AVI_RATIO) >= 0.99 )
   {
     m_VideoCapture->set(CV_CAP_PROP_POS_AVI_RATIO, 0);
   }
 
-  // Retrieve image
+  // retrieve image
   *m_VideoCapture >> image; // get a new frame from camera
 }
 
@@ -185,7 +184,7 @@ void mitk::USImageVideoSource::GetNextRawImage( mitk::Image::Pointer& image )
 
   this->GetNextRawImage(cv_img);
 
-  // Convert to MITK-Image
+  // convert to MITK-Image
   IplImage ipl_img = cv_img;
 
   this->m_OpenCVToMitkFilter->SetOpenCVImage(&ipl_img);
@@ -194,7 +193,7 @@ void mitk::USImageVideoSource::GetNextRawImage( mitk::Image::Pointer& image )
   // OpenCVToMitkImageFilter returns a standard mitk::image. We then transform it into an USImage
   image = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput());
 
-  // Clean up
+  // clean up
   cv_img.release();
 }
 

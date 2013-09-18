@@ -25,34 +25,44 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class USActivator : public us::ModuleActivator {
-  public:
 
-    USActivator();
-    virtual ~USActivator();
+/**
+  * \brief Module activator for the US module.
+  * Loads mitk::USVideoDevice objects from hard disk on module load and write
+  * them to hard disk on module unload.
+  *
+  * Pointers to mitk::USVideoDevice objects are held to make sure that they
+  * will not be deleted while the module is loaded. A service event listener is
+  * registered, so that pointers to devices which are registered into micro
+  * service from a plugin for example can be held here, too.
+  */
+class USActivator : public us::ModuleActivator {
+public:
 
-    /**
-      * \brief Telemed device is created an initialized on module load.
-      * Service registration is done during the initialization process.
-      */
-    void Load(us::ModuleContext* context);
+  USActivator();
+  virtual ~USActivator();
 
-    /**
-      * \brief Device pointer is removed on module unload.
-      * Service deregistration is done in the device destructor.
-      */
-    void Unload(us::ModuleContext* context);
-
-  protected:
-    /**
-    *\brief This Function listens to ServiceRegistry changes and updates the list of us devices accordingly.
+  /**
+    * \brief The mitk::USVideoDevice obejcts are loaded from hard disk and registered into micro service.
     */
-    void OnServiceEvent(const us::ServiceEvent event);
+  void Load(us::ModuleContext* context);
 
-    us::ModuleContext*                    m_Context;
-    std::vector<USDevice::Pointer>        m_Devices;
-  };
-}
+  /**
+    * \brief Registered mitk::USVideoDevice objects are stored to hard disk an deregistered from micro service.
+    */
+  void Unload(us::ModuleContext* context);
+
+protected:
+  /**
+    *\brief Listens to ServiceRegistry changes and updates the list of mitk::USVideoDevice object accordingly.
+    */
+  void OnServiceEvent(const us::ServiceEvent event);
+
+  us::ModuleContext*                    m_Context;
+  std::vector<USDevice::Pointer>        m_Devices;
+};
+
+} // namespace mitk
 
 US_EXPORT_MODULE_ACTIVATOR(MitkUS, mitk::USActivator)
 

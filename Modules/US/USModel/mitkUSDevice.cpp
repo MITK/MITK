@@ -28,11 +28,11 @@ const std::string mitk::USDevice::US_PROPKEY_ISCONNECTED = US_INTERFACE_NAME + "
 const std::string mitk::USDevice::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
 const std::string mitk::USDevice::US_PROPKEY_CLASS = US_INTERFACE_NAME + ".class";
 
-//mitk::USDevice* mitk::USDevice::exp_Device = 0;
-
 mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
 {
-  MITK_INFO << "Return Crop Area L:" << m_CropArea.cropLeft << " R:" << m_CropArea.cropRight << " T:" << m_CropArea.cropTop << " B:" << m_CropArea.cropBottom;
+  MITK_INFO << "Return Crop Area L:" << m_CropArea.cropLeft
+            << " R:" << m_CropArea.cropRight << " T:" << m_CropArea.cropTop
+            << " B:" << m_CropArea.cropBottom;
   return m_CropArea;
 }
 
@@ -91,6 +91,8 @@ mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
 
 mitk::USDevice::~USDevice()
 {
+  // make sure that the us device is not registered at the micro service
+  // anymore after it is destructed
   this->UnregisterOnService();
 }
 
@@ -104,19 +106,19 @@ mitk::USControlInterfaceBMode::Pointer mitk::USDevice::GetControlInterfaceBMode(
 {
   MITK_INFO << "Control interface BMode does not exist for this object.";
   return 0;
-};
+}
 
 mitk::USControlInterfaceProbes::Pointer mitk::USDevice::GetControlInterfaceProbes()
 {
   MITK_INFO << "Control interface BMode does not exist for this object.";
   return 0;
-};
+}
 
 mitk::USControlInterfaceDoppler::Pointer mitk::USDevice::GetControlInterfaceDoppler()
 {
   MITK_INFO << "Control interface BMode does not exist for this object.";
   return 0;
-};
+}
 
 us::ServiceProperties mitk::USDevice::ConstructServiceProperties()
 {
@@ -260,7 +262,7 @@ void mitk::USDevice::Deactivate()
 
 void mitk::USDevice::AddProbe(mitk::USProbe::Pointer probe)
 {
-  for(int i = 0; i < m_ConnectedProbes.size(); i++)
+  for(unsigned int i = 0; i < m_ConnectedProbes.size(); i++)
   {
     if (m_ConnectedProbes[i]->IsEqualToProbe(probe)) return;
   }
@@ -272,7 +274,7 @@ void mitk::USDevice::ActivateProbe(mitk::USProbe::Pointer probe){
   // currently, we may just add the probe. This behaviour should be changed, should more complicated SDK applications emerge
   AddProbe(probe);
   int index = -1;
-  for(int i = 0; i < m_ConnectedProbes.size(); i++)
+  for(unsigned int i = 0; i < m_ConnectedProbes.size(); i++)
   {
     if (m_ConnectedProbes[i]->IsEqualToProbe(probe)) index = i;
   }

@@ -37,9 +37,12 @@ bool mitk::USVideoDeviceCustomControls::GetIsActive()
 
 void mitk::USVideoDeviceCustomControls::SetCropArea(mitk::USImageVideoSource::USImageCropping newArea)
 {
-  MITK_INFO << "Set Crop Area L:" << newArea.left << " R:" << newArea.right << " T:" << newArea.top << " B:" << newArea.bottom;
+  MITK_INFO << "Set Crop Area L:" << newArea.left << " R:" << newArea.right
+            << " T:" << newArea.top << " B:" << newArea.bottom;
+
   if (m_ImageSource.IsNotNull())
   {
+    // removing of crop area is done when a complete empty crop are is given
     if((newArea.bottom==0) && (newArea.top==0)&&
       (newArea.left==0) && (newArea.right==0))
     {
@@ -58,5 +61,6 @@ void mitk::USVideoDeviceCustomControls::SetCropArea(mitk::USImageVideoSource::US
 
 mitk::USImageVideoSource::USImageCropping mitk::USVideoDeviceCustomControls::GetCropArea()
 {
+  // just return the crop area set at the image source
   return m_ImageSource->GetCropping();
 }

@@ -19,31 +19,57 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSAbstractControlInterface.h"
 #include "mitkUSImageVideoSource.h"
+
 #include <itkObjectFactory.h>
 
 namespace mitk {
 
-  class MitkUS_EXPORT USVideoDeviceCustomControls : public USAbstractControlInterface
-  {
-  public:
-    mitkClassMacro(USVideoDeviceCustomControls, USAbstractControlInterface);
-    mitkNewMacro1Param(Self, mitk::USImageVideoSource::Pointer);
+/**
+  * \brief Custom controls for mitk::USVideoDevice.
+  * Controls image cropping of the corresponding mitk::USImageVideoSource.
+  */
+class MitkUS_EXPORT USVideoDeviceCustomControls : public USAbstractControlInterface
+{
+public:
+  mitkClassMacro(USVideoDeviceCustomControls, USAbstractControlInterface);
+  mitkNewMacro1Param(Self, mitk::USImageVideoSource::Pointer);
 
-    virtual void SetIsActive(bool);
-    virtual bool GetIsActive();
+  /**
+    * Activate or deactivate the custom controls. This is just for handling
+    * widget visibility in a GUI for example. Cropping will not be deactivated
+    * if this method is called with false. Use
+    * mitk::USVideoDeviceCustomControls::SetCropArea() with an empty are
+    * instead.
+    */
+  virtual void SetIsActive( bool isActive );
 
-    /*@brief Sets the area that will be cropped from the US image. Set [0,0,0,0] to disable it, which is also default. */
-    void SetCropArea(USImageVideoSource::USImageCropping newArea);
+  /**
+    * \return if this custom controls are currently activated
+    */
+  virtual bool GetIsActive( );
 
-    mitk::USImageVideoSource::USImageCropping GetCropArea();
+  /**
+    * \brief Sets the area that will be cropped from the US image.
+    * Set [0,0,0,0] to disable it, which is also default.
+    */
+  void SetCropArea( USImageVideoSource::USImageCropping newArea );
 
-  protected:
-    USVideoDeviceCustomControls(mitk::USImageVideoSource::Pointer);
-    virtual ~USVideoDeviceCustomControls();
+  /**
+    * \return area currently set for image cropping
+    */
+  mitk::USImageVideoSource::USImageCropping GetCropArea( );
 
-    bool                          m_IsActive;
-    USImageVideoSource::Pointer   m_ImageSource;
-  };
+protected:
+  /**
+    * Class needs an mitk::USImageVideoSource object for beeing constructed.
+    * This object will be manipulated by the custom controls methods.
+    */
+  USVideoDeviceCustomControls( mitk::USImageVideoSource::Pointer );
+  virtual ~USVideoDeviceCustomControls( );
+
+  bool                          m_IsActive;
+  USImageVideoSource::Pointer   m_ImageSource;
+};
 
 } // namespace mitk
 

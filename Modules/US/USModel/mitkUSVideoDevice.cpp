@@ -72,7 +72,7 @@ std::string mitk::USVideoDevice::GetDeviceClass(){
 
 mitk::USAbstractControlInterface::Pointer mitk::USVideoDevice::GetControlInterfaceCustom()
 {
-  return m_ControlInterfaceCustom;
+  return m_ControlInterfaceCustom.GetPointer();
 }
 
 bool mitk::USVideoDevice::OnInitialization()

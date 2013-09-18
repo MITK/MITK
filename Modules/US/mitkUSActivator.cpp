@@ -19,18 +19,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::USActivator::USActivator() : m_Context(0)
 {
-
 }
 
 mitk::USActivator::~USActivator()
 {
-
 }
 
 void mitk::USActivator::Load(us::ModuleContext* context)
 {
   m_Context = context;
 
+  // load us video devices from the harddisk
   mitk::USDevicePersistence::Pointer devicePersistence = mitk::USDevicePersistence::New();
   m_Devices = devicePersistence->RestoreLastDevices();
 
@@ -53,6 +52,7 @@ void mitk::USActivator::Unload(us::ModuleContext* context)
   // no notifiation of the following unregistering is wanted
   context->RemoveServiceListener(this, &mitk::USActivator::OnServiceEvent);
 
+  // store us video devices on the harddisk
   mitk::USDevicePersistence::Pointer devicePersistence = mitk::USDevicePersistence::New();
   devicePersistence->StoreCurrentDevices();
 
@@ -62,12 +62,20 @@ void mitk::USActivator::Unload(us::ModuleContext* context)
 
 void mitk::USActivator::OnServiceEvent(const us::ServiceEvent event)
 {
-  if ( ! m_Context ) { return; }
+  if ( ! m_Context )
+  {
+    MITK_WARN("us::ModuleActivator")("USActivator")
+        << "OnServiceEvent listener called without having a module context in "
+        << "the activator. Cannot handle event.";
+    return;
+  }
 
   // just USVideoDevice objects need processing in this method
   us::ServiceReference<mitk::USDevice> service = event.GetServiceReference();
   if ( service.GetProperty(mitk::USDevice::US_PROPKEY_CLASS).ToString() != "org.mitk.modules.us.USVideoDevice" )
   {
+    MITK_INFO("us::ModuleActivator")("USActivator")
+        << "Device is no USVideoDevice.";
     return;
   }
 
@@ -84,5 +92,9 @@ void mitk::USActivator::OnServiceEvent(const us::ServiceEvent event)
       std::vector<mitk::USDevice::Pointer>::iterator it = find(m_Devices.begin(), m_Devices.end(), device.GetPointer());
       if (it != m_Devices.end()) { m_Devices.erase(it); }
       break;
+    /*default:
+      MITK_DEBUG("us::ModuleActivator")("USActivator")
+          << "Received uninteresting service event: " << event.GetType();
+      break;*/
   }
 }

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef UltrasoundSupport_h
 #define UltrasoundSupport_h
 
@@ -25,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_UltrasoundSupportControls.h"
 #include "QmitkUSAbstractCustomWidget.h"
 #include "QmitkUSControlsBModeWidget.h"
+#include "QmitkUSControlsDopplerWidget.h"
 #include "QmitkUSControlsProbesWidget.h"
 
 #include <QTime>
@@ -72,8 +72,6 @@ class UltrasoundSupport : public QmitkAbstractView
 
   protected:
 
-
-
     int m_FrameCounter;
 
     /*
@@ -100,15 +98,14 @@ class UltrasoundSupport : public QmitkAbstractView
     /** @brief reinits the view globally. */
     void GlobalReinit();
 
-    QmitkUSAbstractCustomWidget* m_ControlCustomWidget;
-    QmitkUSControlsBModeWidget* m_ControlBModeWidget;
-    QmitkUSControlsProbesWidget* m_ControlProbesWidget;
+    QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;
+    QmitkUSControlsBModeWidget*   m_ControlBModeWidget;
+    QmitkUSControlsDopplerWidget* m_ControlDopplerWidget;
+    QmitkUSControlsProbesWidget*  m_ControlProbesWidget;
 
-    QList<ctkServiceReference>  m_CustomWidgetServiceReference;
+    QList<ctkServiceReference>    m_CustomWidgetServiceReference;
 
     //void OnPreferencesChanged(const berry::IBerryPreferences*);
-
 };
 
 #endif // UltrasoundSupport_h
-

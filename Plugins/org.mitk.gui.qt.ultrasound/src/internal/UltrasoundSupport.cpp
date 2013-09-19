@@ -71,9 +71,11 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   m_Node->SetName("US Image Stream");
   this->GetDataStorage()->Add(m_Node);
 
-  ctkFlowLayout* flowLayout = ctkFlowLayout::replaceLayout(m_Controls.m_WidgetDevices);
+  m_Controls.tabWidget->setTabEnabled(1, false);
+
+  /*ctkFlowLayout* flowLayout = ctkFlowLayout::replaceLayout(m_Controls.m_WidgetDevices);
   flowLayout->setAlignItems(true);
-  flowLayout->setOrientation(Qt::Vertical);
+  flowLayout->setOrientation(Qt::Vertical);*/
 }
 
 void UltrasoundSupport::OnClickedAddNewDevice()
@@ -106,6 +108,9 @@ void UltrasoundSupport::OnClickedViewDevice()
   // We use the activity state of the timer to determine whether we are currently viewing images
   if ( ! m_Timer->isActive() ) // Activate Imaging
   {
+    m_Controls.tabWidget->setTabEnabled(1, true);
+    m_Controls.tabWidget->setCurrentIndex(1);
+
     //get device & set data node
     m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedService<mitk::USDevice>();
     if (m_Device.IsNull()){
@@ -127,13 +132,24 @@ void UltrasoundSupport::OnClickedViewDevice()
     m_Controls.m_BtnView->setText("Stop Viewing");
     m_Controls.m_FrameRate->setEnabled(false);
 
-    m_ControlProbesWidget = new QmitkUSControlsProbesWidget(m_Device->GetControlInterfaceProbes(), m_Controls.tab2);
-    //m_Controls.tab2->layout()->addWidget(m_ControlProbesWidget);
-    m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlProbesWidget, "Probes Controls");
+    m_ControlProbesWidget = new QmitkUSControlsProbesWidget(m_Device->GetControlInterfaceProbes(), m_Controls.m_ToolBoxControlWidgets);
+    m_Controls.probesWidgetContainer->addWidget(m_ControlProbesWidget);
 
-    m_ControlBModeWidget = new QmitkUSControlsBModeWidget(m_Device->GetControlInterfaceBMode(), m_Controls.tab2);
-    //m_Controls.tab2->layout()->addWidget(m_ControlBModeWidget);
+    // create b mode widget for current device
+    m_ControlBModeWidget = new QmitkUSControlsBModeWidget(m_Device->GetControlInterfaceBMode(), m_Controls.m_ToolBoxControlWidgets);
     m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlBModeWidget, "B Mode Controls");
+    if ( ! m_Device->GetControlInterfaceBMode() )
+    {
+      m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
+    }
+
+    // create doppler widget for current device
+    m_ControlDopplerWidget = new QmitkUSControlsDopplerWidget(m_Device->GetControlInterfaceDoppler(), m_Controls.m_ToolBoxControlWidgets);
+    m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlDopplerWidget, "Doppler Controls");
+    if ( ! m_Device->GetControlInterfaceDoppler() )
+    {
+      m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
+    }
 
     ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
     if ( pluginContext )
@@ -151,15 +167,23 @@ void UltrasoundSupport::OnClickedViewDevice()
         //m_Controls.tab2->layout()->addWidget(m_ControlCustomWidget);
         m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlCustomWidget, "Custom Controls");
       }
+      else
+      {
+        m_Controls.m_ToolBoxControlWidgets->addItem(new QWidget(m_Controls.m_ToolBoxControlWidgets), "Custom Controls");
+        m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
+      }
     }
   }
   else //deactivate imaging
   {
+    m_Controls.tabWidget->setTabEnabled(1, false);
+
     while (m_Controls.m_ToolBoxControlWidgets->count() > 0)
     {
       m_Controls.m_ToolBoxControlWidgets->removeItem(0);
     }
 
+    m_Controls.probesWidgetContainer->removeWidget(m_ControlProbesWidget);
     //m_Controls.tab2->layout()->removeWidget(m_ControlProbesWidget);
     delete m_ControlProbesWidget;
     m_ControlProbesWidget = 0;
@@ -167,6 +191,9 @@ void UltrasoundSupport::OnClickedViewDevice()
     //m_Controls.tab2->layout()->removeWidget(m_ControlBModeWidget);
     delete m_ControlBModeWidget;
     m_ControlBModeWidget = 0;
+
+    delete m_ControlDopplerWidget;
+    m_ControlDopplerWidget = 0;
 
     if ( m_ControlCustomWidget )
     {

@@ -6,23 +6,36 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>195</width>
+    <width>198</width>
     <height>57</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <widget class="QLabel" name="label">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
-      <string>Ultrasound Probes</string>
+      <string>Probes</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="probesComboBox"/>
+    <widget class="QComboBox" name="probesComboBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

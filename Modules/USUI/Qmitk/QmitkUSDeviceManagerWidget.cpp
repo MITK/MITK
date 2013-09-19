@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include "mitkUSVideoDevice.h"
 
-
 const std::string QmitkUSDeviceManagerWidget::VIEW_ID = "org.mitk.views.QmitkUSDeviceManagerWidget";
 
 QmitkUSDeviceManagerWidget::QmitkUSDeviceManagerWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
@@ -63,7 +62,6 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
   }
 }
 
-
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
 
 void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
@@ -77,8 +75,10 @@ void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
   }
   else
   {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     if ( ! device->GetIsConnected() ) { device->Connect(); }
     device->Activate();
+    QApplication::restoreOverrideCursor();
 
     if ( ! device->GetIsActive() )
     {
@@ -163,4 +163,3 @@ void QmitkUSDeviceManagerWidget::DisconnectAllDevices()
   }
   MITK_INFO << "Disconnected ALL US devises!";
 }
-

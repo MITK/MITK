@@ -23,22 +23,22 @@
    <item row="1" column="0" colspan="3">
     <layout class="QHBoxLayout" name="m_LayoutButtons">
      <item>
-      <widget class="QPushButton" name="m_BtnRemove">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Remove</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="m_BtnActivate">
        <property name="enabled">
         <bool>false</bool>
        </property>
        <property name="text">
         <string>Activate</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_BtnRemove">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Remove</string>
        </property>
       </widget>
      </item>

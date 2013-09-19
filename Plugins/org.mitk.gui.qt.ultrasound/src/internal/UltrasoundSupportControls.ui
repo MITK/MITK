@@ -151,13 +151,18 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tab2">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <attribute name="title">
        <string>US Imaging</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
-        <widget class="QToolBox" name="m_ToolBoxControlWidgets">
-        </widget>
+        <layout class="QVBoxLayout" name="probesWidgetContainer"/>
+       </item>
+       <item>
+        <widget class="QToolBox" name="m_ToolBoxControlWidgets"/>
        </item>
        <item>
         <spacer name="verticalSpacer_2">

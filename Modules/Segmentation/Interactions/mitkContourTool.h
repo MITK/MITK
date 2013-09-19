@@ -77,7 +77,7 @@ class Segmentation_EXPORT ContourTool : public FeedbackContourTool
     virtual bool OnMouseReleased(Action*, const StateEvent*);
 
     /**
-     Set the label underneath the clicked position as the active one.
+     Set the label under clicked position as the active one.
     */
     virtual bool OnChangeActiveLabel(Action*, const StateEvent*);
 

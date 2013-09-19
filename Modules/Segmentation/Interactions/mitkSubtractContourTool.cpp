@@ -32,7 +32,7 @@ namespace mitk {
 mitk::SubtractContourTool::SubtractContourTool()
 :ContourTool()
 {
-    CONNECT_ACTION( 49014, OnInvertLogic );
+  CONNECT_ACTION( 49014, OnInvertLogic );
 }
 
 mitk::SubtractContourTool::~SubtractContourTool()
@@ -41,10 +41,10 @@ mitk::SubtractContourTool::~SubtractContourTool()
 
 bool mitk::SubtractContourTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
 {
-    m_PaintingPixelValue = 0;
-    FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+  m_PaintingPixelValue = 0;
+  FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
 
-    return Superclass::OnMousePressed(action, stateEvent);
+  return Superclass::OnMousePressed(action, stateEvent);
 }
 
 const char** mitk::SubtractContourTool::GetXPM() const

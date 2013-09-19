@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkEraseRegionTool.xpm"
 
+#include "mitkToolManager.h"
+#include "mitkLabelSetImage.h"
+
 // us
 #include "mitkModule.h"
 #include "mitkModuleResource.h"
@@ -28,9 +31,9 @@ namespace mitk {
 }
 
 mitk::EraseRegionTool::EraseRegionTool()
-:SetRegionTool(0)
+:SetRegionTool()
 {
-  FeedbackContourTool::SetFeedbackContourColor( 1.0, 1.0, 0.0 );
+  CONNECT_ACTION( 49014, OnInvertLogic );
 }
 
 mitk::EraseRegionTool::~EraseRegionTool()
@@ -61,3 +64,38 @@ const char* mitk::EraseRegionTool::GetName() const
   return "Erase";
 }
 
+bool mitk::EraseRegionTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
+{
+  m_PaintingPixelValue = 0;
+  FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+
+  return Superclass::OnMousePressed(action, stateEvent);
+}
+
+/**
+  Called when the CTRL key is pressed. Will change the painting pixel value from 0 to the active label
+  and viceversa.
+*/
+bool mitk::EraseRegionTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
+{
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+
+  m_LogicInverted = !m_LogicInverted;
+
+  if (m_LogicInverted)
+  {
+    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+    if (!workingNode) return false;
+    LabelSetImage* image = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+    m_PaintingPixelValue = image->GetActiveLabelIndex();
+    const mitk::Color& color = image->GetActiveLabelColor();
+    FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
+  }
+  else
+  {
+    m_PaintingPixelValue = 0;
+    FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+  }
+
+  return true;
+}

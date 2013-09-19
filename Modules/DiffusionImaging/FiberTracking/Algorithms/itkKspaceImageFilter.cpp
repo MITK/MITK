@@ -190,7 +190,7 @@ void KspaceImageFilter< TPixelType >
             if (m_SimulateDistortions)
                 omega_t += m_FrequencyMap->GetPixel(it.GetIndex())*t/1000;
 
-            if (g<-yMaxFov/2)
+            if (y<-yMaxFov/2)
                 y += yMaxFov;
             else if (y>=yMaxFov/2)
                 y -= yMaxFov;

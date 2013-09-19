@@ -338,6 +338,9 @@ void mitk::FastMarchingTool3D::Update()
   if (m_NeedUpdate)
   {
     m_ProgressCommand->AddStepsToDo(progress_steps);
+
+    //remove interaction with poinset while updating
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SeedPointInteractor);
     CurrentlyBusy.Send(true);
     try
     {
@@ -366,6 +369,9 @@ void mitk::FastMarchingTool3D::Update()
     m_ResultImageNode->SetData(result);
     m_ResultImageNode->SetVisibility(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+    //add interaction with poinset again
+    mitk::GlobalInteraction::GetInstance()->AddInteractor(m_SeedPointInteractor);
   }
 }
 

@@ -62,6 +62,25 @@ ContourModelWriterFactory::~ContourModelWriterFactory()
 {
 }
 
+void ContourModelWriterFactory::RegisterOneFactory(void)
+{
+  if ( GetInstance()->GetReferenceCount() == 1 )
+  {
+    ObjectFactoryBase::RegisterFactory( GetInstance().GetPointer() );
+  }
+}
+
+void ContourModelWriterFactory::UnRegisterOneFactory(void)
+{
+  ObjectFactoryBase::UnRegisterFactory( GetInstance().GetPointer() );
+}
+
+itk::ObjectFactoryBase::Pointer ContourModelWriterFactory::GetInstance()
+{
+  static itk::ObjectFactoryBase::Pointer factory(mitk::ContourModelWriterFactory::New().GetPointer());
+  return factory;
+}
+
 const char* ContourModelWriterFactory::GetITKSourceVersion() const
 {
   return ITK_SOURCE_VERSION;

@@ -32,17 +32,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::ContourObjectFactory::ContourObjectFactory()
-:CoreObjectFactoryBase()
+: CoreObjectFactoryBase()
+, m_ContourModelIOFactory(mitk::ContourModelIOFactory::New().GetPointer())
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
     MITK_DEBUG << "ContourObjectFactory c'tor" << std::endl;
 
-    RegisterIOFactories();
+    itk::ObjectFactoryBase::RegisterFactory( m_ContourModelIOFactory );
+
+    mitk::ContourModelWriterFactory::RegisterOneFactory();
+
+    this->m_FileWriters.push_back(mitk::ContourModelWriter::New().GetPointer());
+
+    CreateFileExtensionsMap();
 
     alreadyDone = true;
   }
+}
+
+mitk::ContourObjectFactory::~ContourObjectFactory()
+{
+  mitk::ContourModelWriterFactory::UnRegisterOneFactory();
+  itk::ObjectFactoryBase::UnRegisterFactory(m_ContourModelIOFactory);
 }
 
 mitk::Mapper::Pointer mitk::ContourObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)
@@ -120,14 +133,6 @@ const char* mitk::ContourObjectFactory::GetSaveFileExtensions()
 
 void mitk::ContourObjectFactory::RegisterIOFactories()
 {
-  //register io classes of mitkContourModel
-  mitk::ContourModelIOFactory::RegisterOneFactory();
-
-  mitk::ContourModelWriterFactory::RegisterOneFactory();
-
-  this->m_FileWriters.push_back(mitk::ContourModelWriter::New().GetPointer());
-
-  CreateFileExtensionsMap();
 }
 
 

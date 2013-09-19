@@ -36,9 +36,13 @@ namespace mitk {
     void RegisterIOFactories();
   protected:
     ContourObjectFactory();
+    ~ContourObjectFactory();
     void CreateFileExtensionsMap();
     MultimapType m_FileExtensionsMap;
     MultimapType m_SaveFileExtensionsMap;
+
+  private:
+    itk::ObjectFactoryBase::Pointer m_ContourModelIOFactory;
   };
 
 }

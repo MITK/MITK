@@ -60,7 +60,7 @@ void QmitkIVIMWidget::ClearItemModel()
 
 }
 
-std::vector<double> QmitkIVIMWidget::vec(vnl_vector<double> vector)
+std::vector<double> QmitkIVIMWidget::vec(const vnl_vector<double>& vector)
 {
   std::vector<double> retval(vector.size());
   for(unsigned int i=0; i<vector.size(); i++)
@@ -85,24 +85,24 @@ void QmitkIVIMWidget::SetParameters( IVIMFilterType::IVIMSnapshot snap )
 
   curveId = this->InsertCurve( "ignored measurement points" );
   this->SetCurveData( curveId, vec(snap.bvalues), vec(snap.allmeas) );
-  this->SetCurvePen( curveId, QPen( Qt::NoPen ) );
-  QwtSymbol whiteSymbol(QwtSymbol::Diamond, QColor(Qt::white), QColor(Qt::black), QSize(10,10));
-  this->SetCurveSymbol(curveId, &whiteSymbol);
+  this->SetCurvePen( curveId, QPen(Qt::NoPen) );
+  QwtSymbol* whiteSymbol = new QwtSymbol(QwtSymbol::Diamond, QColor(Qt::white), QColor(Qt::black), QSize(10,10));
+  this->SetCurveSymbol(curveId, whiteSymbol);
 
   if(snap.currentDStar != 0)
   {
     curveId = this->InsertCurve( "additional points second fit" );
     this->SetCurveData( curveId, vec(snap.bvals2), vec(snap.meas2) );
     this->SetCurvePen( curveId, QPen( Qt::NoPen ) );
-    QwtSymbol blackSymbol(QwtSymbol::Diamond, QColor(Qt::black), QColor(Qt::black), QSize(10,10));
-    this->SetCurveSymbol(curveId, &blackSymbol);
+    QwtSymbol* blackSymbol = new QwtSymbol(QwtSymbol::Diamond, QColor(Qt::black), QColor(Qt::black), QSize(10,10));
+    this->SetCurveSymbol(curveId, blackSymbol);
   }
 
   curveId = this->InsertCurve( "points first fit" );
   this->SetCurveData( curveId, vec(snap.bvals1), vec(snap.meas1) );
   this->SetCurvePen( curveId, QPen( Qt::NoPen ) );
-  QwtSymbol redSymbol(QwtSymbol::Diamond, QColor(Qt::red), QColor(Qt::red), QSize(10,10));
-  this->SetCurveSymbol(curveId, &redSymbol);
+  QwtSymbol* redSymbol = new QwtSymbol(QwtSymbol::Diamond, QColor(Qt::red), QColor(Qt::red), QSize(10,10));
+  this->SetCurveSymbol(curveId, redSymbol);
 
   QPen pen;
   pen.setColor( QColor(Qt::red) );

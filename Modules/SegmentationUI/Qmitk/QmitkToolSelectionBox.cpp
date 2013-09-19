@@ -348,9 +348,8 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 /**
  External enableization...
 */
-void QmitkToolSelectionBox::setEnabled( bool enable )
+void QmitkToolSelectionBox::setEnabled( bool /*enable*/ )
 {
-  QWidget::setEnabled(enable);
   SetGUIEnabledAccordingToToolManagerState();
 }
 

@@ -31,6 +31,36 @@ namespace us {
   class PrototypeServiceFactory;
 }
 
+/**
+  * \brief Abstract superclass for all custom control widgets of mitk::USDevice classes.
+  *
+  * Subclasses must implement three methods:
+  * - QmitkUSAbstractCustomWidget::OnDeviceSet() -> should handle initialization when mitk:USDevice was set
+  * - QmitkUSAbstractCustomWidget::GetDeviceClass() -> must return device class of corresponding mitk::USDevice
+  * - QmitkUSAbstractCustomWidget::Clone() -> must create a copy of the current object
+  *
+  *
+  * The code to use a custom control widget in a plugin can look like this:
+  *
+  * \code
+  * ctkPluginContext* pluginContext = // get the plugig context
+  * mitk::USDevice device = // get the ultrasound device
+  *
+  * // get service references for ultrasound device
+  * std::string filter = "(ork.mitk.services.UltrasoundCustomWidget.deviceClass=" + device->GetDeviceClass() + ")";
+  * QString interfaceName ( us_service_interface_iid<QmitkUSAbstractCustomWidget>() );
+  * QList<ctkServiceReference> serviceRefs = pluginContext->getServiceReferences(interfaceName, QString::fromStdString(filter));
+  *
+  * if (serviceRefs.size() > 0)
+  * {
+  *   // get widget from the service and make sure that it is cloned, so that
+  *   // it can be deleted if it should be removed from the GUI later
+  *   QmitkUSAbstractCustomWidget* widget = pluginContext->getService<QmitkUSAbstractCustomWidget>
+  *          (serviceRefs.at(0))->CloneForQt(parentWidget);
+  *   // now the widget can be used like any other QWidget
+  * }
+  * \endcode
+  */
 class MitkUSUI_EXPORT QmitkUSAbstractCustomWidget : public QWidget
 {
 public:
@@ -40,28 +70,67 @@ public:
   void SetDevice(mitk::USDevice::Pointer device);
   mitk::USDevice::Pointer GetDevice() const;
 
+  /**
+    * \brief Called every time a mitk::USDevice was set with QmitkUSAbstractCustomWidget::SetDevice().
+    * A sublcass can implement this function to handle initialiation actions
+    * necessary when a device was set.
+    */
   virtual void OnDeviceSet() = 0;
 
+  /**
+    * \brief Subclass must implement this method to return device class of corresponding mitk::USDevice.
+    *
+    * \return same value as mitk::USDevice::GetDeviceClass() of the corresponding mitk::USDevice
+    */
   virtual std::string GetDeviceClass() const = 0;
+
+  /**
+    * \brief Subclass must implement this method to return a pointer to a copy of the object.
+    */
   virtual QmitkUSAbstractCustomWidget* Clone(QWidget* parent = 0) const = 0;
 
+  /**
+    * \brief Return pointer to copy of the object.
+    * Internally use of QmitkUSAbstractCustomWidget::Clone() with additionaly
+    * setting an internal flag that the object was really cloned.
+    */
   QmitkUSAbstractCustomWidget* CloneForQt(QWidget* parent = 0) const;
 
+  /**
+    * \brief Register object as micro service.
+    * The object will be registered using an us::PrototypeServiceFactory.
+    */
   us::ServiceRegistration<QmitkUSAbstractCustomWidget> RegisterService(us::ModuleContext* context);
+
+  /**
+    * \brief Returns the properties of the micro service.
+    * Properties consist of just the device class of the corresponding
+    * mitk::USDevice.
+    */
   us::ServiceProperties GetServiceProperties() const;
 
-  static const std::string US_DEVICE_PROPKEY_CLASS;        // class name of corresponding us device object
-
+  /**
+    * \brief Overwritten Qt even method.
+    * It is checked if the object was cloned with
+    * QmitkUSAbstractCustomWidget::CloneForQt() before. An exception is thrown
+    * if not. This is done, because using the object from micro service directly
+    * in Qt without cloning it first can cause problems after Qt deleted the
+    * object.
+    *
+    * \throws mitk::Exception
+    */
   void showEvent ( QShowEvent * event );
 
+  /**
+    * \brief Property key for the class name of corresponding us device object.
+    */
+  static const std::string US_DEVICE_PROPKEY_CLASS;
+
 private:
-  //void SetIsClonedForQt();
 
-  mitk::USDevice::Pointer m_Device;
-
+  mitk::USDevice::Pointer         m_Device;
   us::PrototypeServiceFactory*    m_PrototypeServiceFactory;
-
-  bool m_IsClonedForQt;
+  bool                            m_IsClonedForQt;
 };
 
 

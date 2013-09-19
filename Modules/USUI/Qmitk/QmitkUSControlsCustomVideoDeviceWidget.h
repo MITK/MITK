@@ -25,21 +25,49 @@ namespace Ui {
 class QmitkUSControlsCustomVideoDeviceWidget;
 }
 
+/** \brief Widget for custom controls of mitk::USVideoDevice.
+  * This class handles the itk::USVideoDeviceCustomControls of video device
+  * objects.
+  */
 class QmitkUSControlsCustomVideoDeviceWidget : public QmitkUSAbstractCustomWidget
 {
     Q_OBJECT
 
 private slots:
+  /**
+    * \brief Called when user changes one of the crop area control elements.
+    */
   void OnCropAreaChanged();
 
 public:
-  explicit QmitkUSControlsCustomVideoDeviceWidget(mitk::USVideoDeviceCustomControls::Pointer controlInterface, QWidget *parent = 0);
+  /**
+    * Constructs widget object. All gui control elements will be disabled until
+    * QmitkUSAbstractCustomWidget::SetDevice() was called.
+    */
   explicit QmitkUSControlsCustomVideoDeviceWidget(QWidget *parent = 0);
   ~QmitkUSControlsCustomVideoDeviceWidget();
 
+  /**
+    * Getter for the device class of mitk:USVideoDevice.
+    */
   virtual std::string GetDeviceClass() const;
+
+  /**
+    * Creates new QmitkUSAbstractCustomWidget with the same mitk::USVideoDevice
+    * and the same mitk::USVideoDeviceCustomControls which were set on the
+    * original object.
+    *
+    * This method is just for being calles by the factory. Use
+    * QmitkUSAbstractCustomWidget::CloneForQt() instead, if you want a clone of
+    * an object.
+    */
   virtual QmitkUSAbstractCustomWidget* Clone(QWidget* parent = 0) const;
 
+  /**
+    * Gets control interface from the device which was currently set. Control
+    * elements are according to current crop area of the device. If custom
+    * control interface is null, the control elements stay disabled.
+    */
   virtual void OnDeviceSet();
 
 private:

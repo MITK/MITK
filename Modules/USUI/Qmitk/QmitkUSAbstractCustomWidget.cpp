@@ -24,7 +24,6 @@ const std::string QmitkUSAbstractCustomWidget::US_DEVICE_PROPKEY_CLASS = "ork.mi
 QmitkUSAbstractCustomWidget::QmitkUSAbstractCustomWidget(QWidget* parent)
   : QWidget(parent), m_PrototypeServiceFactory(0), m_IsClonedForQt(false)
 {
-  GetDevice();
 }
 
 QmitkUSAbstractCustomWidget::~QmitkUSAbstractCustomWidget()
@@ -47,7 +46,7 @@ mitk::USDevice::Pointer QmitkUSAbstractCustomWidget::GetDevice() const
 QmitkUSAbstractCustomWidget* QmitkUSAbstractCustomWidget::CloneForQt(QWidget* parent) const
 {
   QmitkUSAbstractCustomWidget* clonedWidget = this->Clone(parent);
-  clonedWidget->m_IsClonedForQt = true;
+  clonedWidget->m_IsClonedForQt = true; // set flag that this object was really cloned
   return clonedWidget;
 }
 
@@ -55,6 +54,9 @@ us::ServiceRegistration<QmitkUSAbstractCustomWidget> QmitkUSAbstractCustomWidget
 {
   if (this->m_PrototypeServiceFactory) { return us::ServiceRegistration<QmitkUSAbstractCustomWidget>(); }
 
+  // create an us::PrototypeServiceFactory which is user on any following call
+  // to QmitkUSAbstractCustomWidget::RegisterService(); this factory uses the
+  // clone method of the concrete subclass which should be created
   struct PrototypeFactory : public us::PrototypeServiceFactory
   {
     QmitkUSAbstractCustomWidget* const m_Prototype;
@@ -89,6 +91,9 @@ us::ServiceProperties QmitkUSAbstractCustomWidget::GetServiceProperties() const
 
 void QmitkUSAbstractCustomWidget::showEvent ( QShowEvent * event )
 {
+  // using object from micro service directly in Qt without cloning it first
+  // can cause problems when Qt deletes this object -> throw an exception to
+  // show that object should be cloned before
   if ( ! m_IsClonedForQt )
   {
     MITK_ERROR << "Object wasn't cloned with CloneForQt() before using as QWidget.";

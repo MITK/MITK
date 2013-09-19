@@ -28,9 +28,11 @@ mitk::USUIActivator::~USUIActivator()
 
 void mitk::USUIActivator::Load(us::ModuleContext* context)
 {
-  m_CustomVideoDeviceWidget.RegisterService(context);
+  m_ServiceRegistration = m_CustomVideoDeviceWidget.RegisterService(context);
 }
 
-void mitk::USUIActivator::Unload(us::ModuleContext* context)
+void mitk::USUIActivator::Unload(us::ModuleContext* /*context*/)
 {
+  m_ServiceRegistration.Unregister();
+  m_ServiceRegistration = 0;
 }

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
@@ -39,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include "usServiceReference.h"
 #include "internal/org_mitk_gui_qt_ultrasound_Activator.h"
-
 
 const std::string UltrasoundSupport::VIEW_ID = "org.mitk.views.ultrasoundsupport";
 
@@ -127,7 +125,6 @@ void UltrasoundSupport::OnClickedViewDevice()
     m_ControlBModeWidget = new QmitkUSControlsBModeWidget(m_Device->GetControlInterfaceBMode(), m_Controls.tab2);
     m_Controls.tab2->layout()->addWidget(m_ControlBModeWidget);
 
-
     ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
     if ( pluginContext )
     {
@@ -149,16 +146,22 @@ void UltrasoundSupport::OnClickedViewDevice()
   {
     m_Controls.tab2->layout()->removeWidget(m_ControlProbesWidget);
     delete m_ControlProbesWidget;
+    m_ControlProbesWidget = 0;
 
     m_Controls.tab2->layout()->removeWidget(m_ControlBModeWidget);
     delete m_ControlBModeWidget;
+    m_ControlBModeWidget = 0;
 
     if ( m_ControlCustomWidget )
     {
       ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
       m_Controls.tab2->layout()->removeWidget(m_ControlCustomWidget);
-      pluginContext->ungetService(m_CustomWidgetServiceReference.at(0));
       delete m_ControlCustomWidget; m_ControlCustomWidget = 0;
+
+      if ( m_CustomWidgetServiceReference.size() > 0 )
+      {
+        pluginContext->ungetService(m_CustomWidgetServiceReference.at(0));
+      }
     }
 
     //stop timer & release data
@@ -193,6 +196,9 @@ void UltrasoundSupport::GlobalReinit()
 }
 
 UltrasoundSupport::UltrasoundSupport()
+  : m_ControlCustomWidget(0),
+    m_ControlBModeWidget(0),
+    m_ControlProbesWidget(0)
 {
 }
 

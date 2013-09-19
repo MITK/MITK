@@ -87,17 +87,6 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_cbReferenceNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.m_cbReferenceNodeSelector->SetPredicate(m_ReferencePredicate);
 
-  this->UpdateWarningLabel("Please load an image");
-
-  if( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode().IsNotNull() )
-      this->UpdateWarningLabel("Create a segmentation");
-/*
-  m_Controls.m_cbWorkingNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.m_cbWorkingNodeSelector->SetPredicate(m_SegmentationPredicate);
-  m_Controls.m_cbWorkingNodeSelector->SetAutoSelectNewItems(true);
-  if( m_Controls.m_cbWorkingNodeSelector->GetSelectedNode().IsNotNull() )
-    this->UpdateWarningLabel("");
-*/
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   assert ( toolManager );
   toolManager->SetDataStorage( *(this->GetDataStorage()) );
@@ -124,7 +113,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer3D );
   //specify tools to be added to 3D Tool area
 //  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'Two Thresholds' Otsu FastMarching3D RegionGrowing Watershed");
-  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold Otsu FastMarching3D");
+  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold FastMarching3D");
   m_Controls.m_ManualToolSelectionBox3D->SetLayoutColumns(3);
   m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
 
@@ -154,10 +143,10 @@ void QmitkMultiLabelSegmentationView::SetFocus ()
 
 void QmitkMultiLabelSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-  if (this->m_IRenderWindowPart != renderWindowPart)
+  if (m_IRenderWindowPart != renderWindowPart)
   {
-    this->m_IRenderWindowPart = renderWindowPart;
-    this->m_Parent->setEnabled(true);
+    m_IRenderWindowPart = renderWindowPart;
+    m_Parent->setEnabled(true);
 
     mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
     m_Controls.m_SlicesInterpolator->SetDataStorage( this->GetDataStorage());
@@ -241,10 +230,7 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
   if( node != NULL )
   {
     mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-    assert(toolManager);
-
     toolManager->ActivateTool(-1);
-    this->UpdateWarningLabel("");
     mitk::DataNode* refNode = const_cast<mitk::DataNode*>(node);
     refNode->SetVisibility(true);
     toolManager->SetReferenceData(refNode);
@@ -257,33 +243,17 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
           _other->SetVisibility(false);
     }
   }
-  else
-  {
-    this->UpdateWarningLabel("Please load an image");
-  }
 }
 
 void QmitkMultiLabelSegmentationView::OnShowMarkerNodes (bool state)
 {
   mitk::SegTool2D::Pointer manualSegmentationTool;
-
   unsigned int numberOfExistingTools = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetTools().size();
-
   for(unsigned int i = 0; i < numberOfExistingTools; i++)
   {
     manualSegmentationTool = dynamic_cast<mitk::SegTool2D*>(mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetToolById(i));
-
     if (manualSegmentationTool)
-    {
-      if(state == true)
-      {
-        manualSegmentationTool->SetShowMarkerNodes( true );
-      }
-      else
-      {
-        manualSegmentationTool->SetShowMarkerNodes( false );
-      }
-    }
+      manualSegmentationTool->SetShowMarkerNodes( state );
   }
 }
 
@@ -331,15 +301,6 @@ bool QmitkMultiLabelSegmentationView::CheckForSameGeometry(const mitk::DataNode 
   }
 }
 
-void QmitkMultiLabelSegmentationView::UpdateWarningLabel(QString text)
-{
-  if (text.size() == 0)
-    m_Controls.lblSegmentationWarnings->hide();
-  else
-    m_Controls.lblSegmentationWarnings->show();
-  m_Controls.lblSegmentationWarnings->setText(text);
-}
-
 void QmitkMultiLabelSegmentationView::OnManualTool2DSelected(int id)
 {
   if (id >= 0)
@@ -355,8 +316,8 @@ void QmitkMultiLabelSegmentationView::OnManualTool2DSelected(int id)
   }
   else
   {
-      this->ResetMouseCursor();
-      mitk::StatusBar::GetInstance()->DisplayText("");
+    this->ResetMouseCursor();
+    mitk::StatusBar::GetInstance()->DisplayText("");
   }
 }
 

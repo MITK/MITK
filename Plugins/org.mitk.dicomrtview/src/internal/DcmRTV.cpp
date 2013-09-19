@@ -97,8 +97,19 @@ void DcmRTV::DoImageProcessing()
   {
     mitk::DataNode::Pointer x = mitk::DataNode::New();
     x->SetData(modelVector.at(i));
-    x->SetName("ContourModel");
+    std::stringstream strstr;
+    if(i+1<10)
+    {
+      strstr << "ContourModel0" << i+1;
+    }
+    else
+    {
+      strstr << "ContourModel" << i+1;
+    }
+    x->SetName(strstr.str());
     x->SetVisibility(true);
     GetDataStorage()->Add(x);
   }
+  mitk::TimeSlicedGeometry::Pointer geo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
+  mitk::RenderingManager::GetInstance()->InitializeViews( geo );
 }

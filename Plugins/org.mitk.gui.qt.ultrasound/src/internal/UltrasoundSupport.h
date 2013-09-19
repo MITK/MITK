@@ -106,6 +106,8 @@ class UltrasoundSupport : public QmitkAbstractView
 
     QList<ctkServiceReference>  m_CustomWidgetServiceReference;
 
+    //void OnPreferencesChanged(const berry::IBerryPreferences*);
+
 };
 
 #endif // UltrasoundSupport_h

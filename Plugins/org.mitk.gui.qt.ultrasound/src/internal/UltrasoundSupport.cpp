@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
@@ -40,6 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usServiceReference.h"
 #include "internal/org_mitk_gui_qt_ultrasound_Activator.h"
 
+#include <ctkFlowLayout.h>
+#include <ctkDoubleSlider.h>
 
 const std::string UltrasoundSupport::VIEW_ID = "org.mitk.views.ultrasoundsupport";
 
@@ -69,6 +70,10 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   m_Node = mitk::DataNode::New();
   m_Node->SetName("US Image Stream");
   this->GetDataStorage()->Add(m_Node);
+
+  ctkFlowLayout* flowLayout = ctkFlowLayout::replaceLayout(m_Controls.m_WidgetDevices);
+  flowLayout->setAlignItems(true);
+  flowLayout->setOrientation(Qt::Vertical);
 }
 
 void UltrasoundSupport::OnClickedAddNewDevice()
@@ -130,7 +135,6 @@ void UltrasoundSupport::OnClickedViewDevice()
     //m_Controls.tab2->layout()->addWidget(m_ControlBModeWidget);
     m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlBModeWidget, "B Mode Controls");
 
-
     ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
     if ( pluginContext )
     {
@@ -151,18 +155,29 @@ void UltrasoundSupport::OnClickedViewDevice()
   }
   else //deactivate imaging
   {
-    m_Controls.tab2->layout()->removeWidget(m_ControlProbesWidget);
-    delete m_ControlProbesWidget;
+    while (m_Controls.m_ToolBoxControlWidgets->count() > 0)
+    {
+      m_Controls.m_ToolBoxControlWidgets->removeItem(0);
+    }
 
-    m_Controls.tab2->layout()->removeWidget(m_ControlBModeWidget);
+    //m_Controls.tab2->layout()->removeWidget(m_ControlProbesWidget);
+    delete m_ControlProbesWidget;
+    m_ControlProbesWidget = 0;
+
+    //m_Controls.tab2->layout()->removeWidget(m_ControlBModeWidget);
     delete m_ControlBModeWidget;
+    m_ControlBModeWidget = 0;
 
     if ( m_ControlCustomWidget )
     {
       ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
-      m_Controls.tab2->layout()->removeWidget(m_ControlCustomWidget);
-      pluginContext->ungetService(m_CustomWidgetServiceReference.at(0));
+      //m_Controls.tab2->layout()->removeWidget(m_ControlCustomWidget);
       delete m_ControlCustomWidget; m_ControlCustomWidget = 0;
+
+      if ( m_CustomWidgetServiceReference.size() > 0 )
+      {
+        pluginContext->ungetService(m_CustomWidgetServiceReference.at(0));
+      }
     }
 
     //stop timer & release data
@@ -197,7 +212,15 @@ void UltrasoundSupport::GlobalReinit()
   mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }
 
+/*void UltrasoundSupport::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
+{
+  std::cout << prefs << std::endl;
+}*/
+
 UltrasoundSupport::UltrasoundSupport()
+  : m_ControlCustomWidget(0),
+    m_ControlBModeWidget(0),
+    m_ControlProbesWidget(0)
 {
 }
 

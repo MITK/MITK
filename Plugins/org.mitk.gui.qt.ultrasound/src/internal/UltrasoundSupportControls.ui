@@ -19,11 +19,11 @@
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -31,81 +31,106 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QLabel" name="m_Headline">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Ultrasound Devices:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QmitkUSDeviceManagerWidget" name="m_DeviceManagerWidget" native="true"/>
-       </item>
-       <item>
-        <widget class="QmitkUSNewVideoDeviceWidget" name="m_NewVideoDeviceWidget" native="true"/>
-       </item>
-       <item>
-        <widget class="QWidget" name="m_WidgetActiveDevices" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout">
+        <widget class="QWidget" name="m_WidgetDevices" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <widget class="QLabel" name="m_HeadlineActive">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Active Ultrasound Devices:</string>
-            </property>
+           <widget class="QWidget" name="m_WidgetAvailableDevices" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <item>
+              <widget class="QLabel" name="m_Headline">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Ultrasound Devices:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QmitkUSNewVideoDeviceWidget" name="m_NewVideoDeviceWidget" native="true"/>
+             </item>
+             <item>
+              <widget class="QmitkUSDeviceManagerWidget" name="m_DeviceManagerWidget" native="true"/>
+             </item>
+            </layout>
            </widget>
           </item>
           <item>
-           <widget class="QmitkServiceListWidget" name="m_ActiveVideoDevices" native="true">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
+           <widget class="QWidget" name="m_WidgetActiveDevices" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <item>
+              <widget class="QLabel" name="m_HeadlineActive">
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Active Ultrasound Devices:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QmitkServiceListWidget" name="m_ActiveVideoDevices" native="true">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <item>
+                <spacer name="horizontalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="m_BtnView">
+                 <property name="minimumSize">
+                  <size>
+                   <width>120</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Start Viewing</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+            </layout>
            </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="m_BtnView">
-              <property name="minimumSize">
-               <size>
-                <width>120</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Start Viewing</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
           </item>
          </layout>
         </widget>
@@ -132,27 +157,6 @@
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
         <widget class="QToolBox" name="m_ToolBoxControlWidgets">
-         <property name="currentIndex">
-          <number>1</number>
-         </property>
-         <widget class="QWidget" name="page_2">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>376</width>
-            <height>105</height>
-           </rect>
-          </property>
-          <attribute name="label">
-           <string>Probes Controls</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="page">
-          <attribute name="label">
-           <string>B Mode Controls</string>
-          </attribute>
-         </widget>
         </widget>
        </item>
        <item>

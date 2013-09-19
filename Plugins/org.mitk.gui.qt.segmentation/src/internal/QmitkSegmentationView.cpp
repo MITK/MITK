@@ -149,8 +149,6 @@ void QmitkSegmentationView::Deactivated()
     m_Controls->m_ManualToolSelectionBox3D->setEnabled( false );
     //deactivate all tools
     mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
-//    m_Controls->m_OrganToolSelectionBox->setEnabled( false );
-//    m_Controls->m_LesionToolSelectionBox->setEnabled( false );
     m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
 
     //Removing all observers
@@ -704,16 +702,6 @@ void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
   nodes.push_back( node );
   this->OnSelectionChanged( nodes );
 }
-
-//void QmitkSegmentationView::OnSurfaceSelectionChanged()
-//{
-//  // if Image and Surface are selected, enable button
-//  if ( (m_Controls->patImageSelector->GetSelectedNode().IsNull()) ||
-//  (m_Controls->MaskSurfaces->GetSelectedNode().IsNull()))
-//    m_Controls->CreateSegmentationFromSurface->setEnabled(false);
-//  else
-//    m_Controls->CreateSegmentationFromSurface->setEnabled(true);
-//}
 
 void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {

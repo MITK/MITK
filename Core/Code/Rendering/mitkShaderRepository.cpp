@@ -66,7 +66,7 @@ void mitk::ShaderRepository::LoadShaders()
         element->SetName(itksys::SystemTools::GetFilenameWithoutExtension(filename));
         std::string filePath = dirPath + std::string("/") + element->GetName() + std::string(".xml");
 
-        SR_INFO << "found shader '" << element->GetName() << "'";
+        SR_INFO(debug) << "found shader '" << element->GetName() << "'";
 
         std::ifstream fileStream(filePath.c_str());
         element->LoadProperties(fileStream);

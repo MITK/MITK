@@ -22,7 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::Mapper::Mapper()
-  :m_TimeStep( 0 )
+  : m_DataNode(NULL)
+  , m_TimeStep( 0 )
 {
 }
 
@@ -34,7 +35,7 @@ mitk::Mapper::~Mapper()
 
 mitk::BaseData* mitk::Mapper::GetData() const
 {
-return m_DataNode->GetData();
+  return m_DataNode == NULL ? NULL : m_DataNode->GetData();
 }
 
 

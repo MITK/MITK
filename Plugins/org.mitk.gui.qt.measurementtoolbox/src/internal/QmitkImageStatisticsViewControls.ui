@@ -79,6 +79,9 @@
    </item>
    <item row="2" column="0">
     <widget class="QGroupBox" name="groupBox_3">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Statistics</string>
      </property>
@@ -131,7 +134,7 @@
          <enum>Qt::DotLine</enum>
         </property>
         <property name="cornerButtonEnabled">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <attribute name="horizontalHeaderVisible">
          <bool>false</bool>
@@ -251,6 +254,9 @@
    </item>
    <item row="3" column="0">
     <widget class="QGroupBox" name="groupBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="minimumSize">
       <size>
        <width>150</width>

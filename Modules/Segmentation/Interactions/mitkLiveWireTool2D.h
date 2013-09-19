@@ -104,6 +104,13 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     /// \brief Finish contour interaction.
     void FinishTool();
 
+    /** \brief Enable interaction with contours.
+    * Contours that are created by the tool can be edited using LiveWire functionality.
+    * Points can thus be inserted, moved or deleted.
+    * \param on true to have interaction enabled.
+    */
+    void EnableContourLiveWireInteraction(bool on);
+
 
     //the contour already set by the user
     mitk::ContourModel::Pointer m_Contour;

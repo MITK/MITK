@@ -1714,7 +1714,7 @@
                 <double>0.010000000000000</double>
                </property>
                <property name="value">
-                <double>0.100000000000000</double>
+                <double>0.250000000000000</double>
                </property>
               </widget>
              </item>
@@ -1767,7 +1767,7 @@
                 <double>0.001000000000000</double>
                </property>
                <property name="value">
-                <double>25.000000000000000</double>
+                <double>50.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -1955,7 +1955,7 @@
                 <double>0.001000000000000</double>
                </property>
                <property name="value">
-                <double>0.001000000000000</double>
+                <double>0.005000000000000</double>
                </property>
               </widget>
              </item>

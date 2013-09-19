@@ -133,12 +133,15 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
 
   public slots:
 
+    virtual void setEnabled( bool );
     /**
       Call this from the outside to enable/disable interpolation
     */
    void EnableInterpolation(bool);
 
    void Enable3DInterpolation(bool);
+
+
 
     /**
       Call this from the outside to accept all interpolations

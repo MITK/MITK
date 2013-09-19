@@ -30,7 +30,7 @@ This file is based heavily on a corresponding ITK filter.
 namespace itk{
 
 /**
-* \brief 2D Discrete Fourier Transform Filter (complex to real) */
+* \brief 2D Discrete Fourier Transform Filter (complex to real). Special issue for Fiberfox -> rearranges slice. */
 
   template< class TPixelType >
   class DftImageFilter :

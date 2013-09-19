@@ -74,13 +74,6 @@ us::ModuleResource mitk::WatershedTool::GetIconResource() const
   return resource;
 }
 
-us::ModuleResource mitk::WatershedTool::GetCursorIconResource() const
-{
-  us::Module* module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Watershed_Cursor_32x32.png");
-  return resource;
-}
-
 const char** mitk::WatershedTool::GetXPM() const
 {
   return NULL;
@@ -182,7 +175,7 @@ void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* ori
 
   // use the progress bar
   mitk::ToolCommand::Pointer command = mitk::ToolCommand::New();
-  command->AddStepsToDo(10);
+  command->AddStepsToDo(60);
 
   // then add the watershed filter to the pipeline
   typename WatershedFilter::Pointer watershed = WatershedFilter::New();
@@ -199,6 +192,9 @@ void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* ori
 
   // start the whole pipeline
   cast->Update();
+
+  // reset the progress bar by setting progress
+  command->SetProgress(10);
 
   // since we obtain a new image from our pipeline, we have to make sure, that our mitk::Image::Pointer
   // is responsible for the memory management of the output image

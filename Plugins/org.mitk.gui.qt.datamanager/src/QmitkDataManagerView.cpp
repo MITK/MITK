@@ -382,11 +382,7 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   confElem->GetAttribute("class", className);
   confElem->GetAttribute("smoothed", smoothed);
 
-  if(className == "QmitkOtsuAction")
-  {
-    contextMenuAction->SetDataStorage(this->GetDataStorage());
-  }
-  else if(className == "QmitkCreatePolygonModelAction")
+  if(className == "QmitkCreatePolygonModelAction")
   {
     contextMenuAction->SetDataStorage(this->GetDataStorage());
     if(smoothed == "false")
@@ -489,16 +485,25 @@ void QmitkDataManagerView::OpacityActionChanged()
 }
 
 void QmitkDataManagerView::ColorChanged()
-{
-  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
-  if(node)
-  {
-    QColor color = QColorDialog::getColor();
+ {
+   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+   if(node)
+   {
+    mitk::Color color;
+    mitk::ColorProperty::Pointer colorProp;
+    node->GetProperty(colorProp,"color");
+    if(colorProp.IsNull())
+      return;
+    color = colorProp->GetValue();
+    QColor initial(color.GetRed()*255,color.GetGreen()*255,color.GetBlue()*255);
+    QColor qcolor = QColorDialog::getColor(initial,0,QString("Change color"));
+    if (!qcolor.isValid())
+      return;
     m_ColorButton->setAutoFillBackground(true);
-    node->SetProperty("color",mitk::ColorProperty::New(color.red()/255.0,color.green()/255.0,color.blue()/255.0));
+    node->SetProperty("color",mitk::ColorProperty::New(qcolor.red()/255.0,qcolor.green()/255.0,qcolor.blue()/255.0));
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-}
+   }
+ }
 
 void QmitkDataManagerView::ColorActionChanged()
 {

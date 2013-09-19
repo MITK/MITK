@@ -257,7 +257,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
         cellIdIt = cellIt->Value()->PointIdsBegin();
         cellIdEnd = cellIt->Value()->PointIdsEnd();
 
-        firstOfCell3D = input->GetPoint(*cellIdIt);
+        firstOfCell3D = input->GetPoint(*cellIdIt,timeStep);
 
         intersectionPoints.clear();
         intersectionPoints.reserve(numOfPointsInCell);
@@ -268,7 +268,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
         {
           lastPoint3D = thisPoint;
 
-          thisPoint = input->GetPoint(*cellIdIt);
+          thisPoint = input->GetPoint(*cellIdIt,timeStep);
 
           //search in data (vector<> selectedLines) if the index of the point is set. if so, then the line is selected.
           lineSelected = false;

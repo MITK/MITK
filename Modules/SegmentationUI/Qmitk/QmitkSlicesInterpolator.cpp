@@ -281,6 +281,35 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
   delete m_Timer;
 }
 
+/**
+External enableization...
+*/
+void QmitkSlicesInterpolator::setEnabled( bool enable )
+{
+  QWidget::setEnabled(enable);
+
+  //Set the gui elements of the different interpolation modi enabled
+  if (enable)
+  {
+    if (m_2DInterpolationEnabled)
+    {
+      this->Show2DInterpolationControls(true);
+      m_Interpolator->Activate2DInterpolation(true);
+    }
+    else if (m_3DInterpolationEnabled)
+    {
+      this->Show3DInterpolationControls(true);
+      this->Show3DInterpolationResult(true);
+    }
+  }
+  //Set all gui elements of the interpolation disabled
+  else
+  {
+    this->HideAllInterpolationControls();
+    this->Show3DInterpolationResult(false);
+  }
+}
+
 void QmitkSlicesInterpolator::On2DInterpolationEnabled(bool status)
 {
   OnInterpolationActivated(status);

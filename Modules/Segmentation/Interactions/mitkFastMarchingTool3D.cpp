@@ -333,9 +333,11 @@ void mitk::FastMarchingTool3D::OnDelete()
 
 void mitk::FastMarchingTool3D::Update()
 {
+  const unsigned int progress_steps = 200;
+
   if (m_NeedUpdate)
   {
-    m_ProgressCommand->AddStepsToDo(200);
+    m_ProgressCommand->AddStepsToDo(progress_steps);
     CurrentlyBusy.Send(true);
     try
     {
@@ -345,7 +347,7 @@ void mitk::FastMarchingTool3D::Update()
     {
      MITK_ERROR << "Exception caught: " << excep.GetDescription();
 
-     m_ProgressCommand->SetRemainingProgress(100);
+     m_ProgressCommand->SetProgress(progress_steps);
      CurrentlyBusy.Send(false);
 
      std::string msg = excep.GetDescription();
@@ -353,7 +355,7 @@ void mitk::FastMarchingTool3D::Update()
 
      return;
     }
-    m_ProgressCommand->SetRemainingProgress(100);
+    m_ProgressCommand->SetProgress(progress_steps);
     CurrentlyBusy.Send(false);
 
     //make output visible

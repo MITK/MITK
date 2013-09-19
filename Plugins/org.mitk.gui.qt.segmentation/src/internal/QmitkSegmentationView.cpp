@@ -326,14 +326,6 @@ void QmitkSegmentationView::CreateNewSegmentation()
             emptySegmentation->SetSelected(true);
             this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
-            itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-            command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);
-            m_WorkingDataObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( emptySegmentation, emptySegmentation->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command ) ) );
-
-            itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command2 = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-            command2->SetCallbackFunction(this, &QmitkSegmentationView::OnBinaryPropertyChanged);
-            m_BinaryPropertyObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( emptySegmentation, emptySegmentation->GetProperty("binary")->AddObserver( itk::ModifiedEvent(), command2 ) ) );
-
             this->ApplyDisplayOptions( emptySegmentation );
             this->FireNodeSelected( emptySegmentation );
             this->OnSelectionChanged( emptySegmentation );

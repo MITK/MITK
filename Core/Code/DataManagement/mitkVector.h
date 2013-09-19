@@ -65,7 +65,8 @@ namespace mitk
 
     /**
      * @brief convert an array of a different data type to Vector
-     * @param r the array. Attention: must have NVectorDimension valid arguments!
+     * @param r the array.
+     * @attention must have NVectorDimension valid arguments!
      */
     template <typename TOtherCoordRep>
     Vector<TCoordRep, NVectorDimension>(const TOtherCoordRep r[NVectorDimension])
@@ -85,10 +86,10 @@ namespace mitk
     /**
      * @brief Constructor for vnl_vectors.
      * Can convert non-identical coordinate representations.
-     * Attention: vnlVector should have same size as NVectorDimension, otherwise
-     * 1. elements will be lost in case vnlVector is bigger.
-     * 2. elements will be set to 0 in case this is bigger.
-     * In both cases, MITK_WARN warnings will be issued.
+     * @attention vnlVector should have same size as NVectorDimension, otherwise
+     * @attention 1. elements will be lost in case vnlVector is bigger.
+     * @attention 2. elements will be set to 0 in case this is bigger.
+     * @attention In both cases, MITK_WARN warnings will be issued.
      */
     template <typename TOtherCoordRep>
     Vector<TCoordRep, NVectorDimension>(const vnl_vector<TOtherCoordRep>& vnlVector)
@@ -132,40 +133,56 @@ namespace mitk
       }
     };
 
-    template <unsigned int NOtherVectorDimension>
-    Vector<TCoordRep, NVectorDimension>& operator=(const vnl_vector_fixed<TCoordRep, NOtherVectorDimension>& vnlVectorFixed)
+    template <typename TOtherCoordRep>
+    Vector<TCoordRep, NVectorDimension>& operator=(const vnl_vector_fixed<TOtherCoordRep, NVectorDimension>& vnlVectorFixed)
     {
-      for (int var = 0; (var < NVectorDimension) && (var < NOtherVectorDimension); ++var) {
+      for (int var = 0; (var < NVectorDimension); ++var) {
         this->SetElement(var, static_cast<TCoordRep>(vnlVectorFixed[var]));
       }
       return *this;
     }
 
+//    /**
+//     * @brief User defined conversion of mitk::Vector to vnl_vector_fixed
+//     * mustn't implement when vnl_vector is implemented due to implicit conversion of mitk::Vector3D.
+//     */
+//    template <typename TOtherCoordRep>
+//    operator vnl_vector_fixed<TOtherCoordRep, NVectorDimension> () const
+//    {
+//      Vector<TOtherCoordRep, NVectorDimension> convertedVector = *this;
+//      vnl_vector_fixed<TOtherCoordRep, NVectorDimension> vnlVectorFixed(convertedVector.GetVnlVector());
+//      return vnlVectorFixed;
+//    }
 
     /**
-     * @brief User defined conversion of mitk::Vector to vnl_vector_fixed
+     * @brief User defined conversion of mitk::Vector to vnl_vector
      */
     template <typename TOtherCoordRep>
-    operator vnl_vector_fixed<TOtherCoordRep, NVectorDimension> () const
+    operator vnl_vector<TOtherCoordRep> () const
     {
       Vector<TOtherCoordRep, NVectorDimension> convertedVector = *this;
-      vnl_vector_fixed<TOtherCoordRep, NVectorDimension> vnlVectorFixed(convertedVector.GetVnlVector());
-      return vnlVectorFixed;
+      vnl_vector<TOtherCoordRep> vnlVector(convertedVector.GetVnlVector());
+      return vnlVector;
     }
 
 
     /**
-     * @brief Copies the array array_p to this Vector.
-     * Warning: Array must have same dimension as Vector
+     * @brief Copies the elements of this into the array r
+     * @param[out] r    the array which will hold the elements.
+     * @attention Must be of at least dimension NVectorDimension!
      */
     template <typename TOtherCoordRep>
-    void CopyToArray(TOtherCoordRep array_p[NVectorDimension]) const
+    void CopyToArray(TOtherCoordRep r[NVectorDimension]) const
     {
       for (int i = 0; i < this->GetVectorDimension(); i++)
         {
-          array_p[i] = static_cast<TOtherCoordRep>(this->GetElement(i));
+          r[i] = static_cast<TOtherCoordRep>(this->GetElement(i));
         }
     }
+
+  private:
+
+
 
   }; // end mitk::Vector
 

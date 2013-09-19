@@ -64,8 +64,6 @@ bool LabelSetImageToSurfaceThreadedFilter::ReadyToRun()
 
 bool LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateFunction()
 {
-  MITK_INFO << "ThreadedUpdateFunction 1";
-
   LabelSetImage::Pointer image;
   this->GetPointerParameter("Input", image);
 
@@ -126,8 +124,6 @@ bool LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateFunction()
 
 void LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateSuccessful()
 {
-   MITK_INFO << "ThreadedUpdateSuccessful 1";
-
    LabelSetImage::Pointer image;
    this->GetPointerParameter("Input", image);
 

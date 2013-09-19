@@ -22,9 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageChangeInformation.h>
 
 #include <mitkImageAccessByItk.h>
-#include <mitkTool.h>
 
 #include <itkBinaryThresholdImageFilter.h>
+#include <itkCastImageFilter.h>
 #include <itkAntiAliasBinaryImageFilter.h>
 
 #include <itkImageToVTKImageFilter.h>
@@ -100,10 +100,13 @@ template < typename TPixel, unsigned int VImageDimension >
 void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImageDimension>* input, mitk::Surface* surface )
 {
    typedef itk::Image<TPixel, VImageDimension> InputImageType;
-   typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> BinaryImageType;
+   typedef itk::Image< unsigned char, VImageDimension> BinaryImageType;
    typedef itk::BinaryThresholdImageFilter< InputImageType, BinaryImageType > BinaryThresholdFilterType;
+
    typedef float FloatPixelType;
    typedef itk::Image<FloatPixelType, VImageDimension> FloatImageType;
+//   typedef itk::CastImageFilter< BinaryImageType, FloatImageType> CastImageFilterType;
+
    typedef itk::AntiAliasBinaryImageFilter< BinaryImageType, FloatImageType > AntiAliasFilterType;
    typedef itk::ImageToVTKImageFilter< FloatImageType > ITKFloatConvertType;
 
@@ -113,16 +116,20 @@ void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImag
    thresholdFilter->SetUpperThreshold(m_UpperThreshold);
    thresholdFilter->SetOutsideValue(0);
    thresholdFilter->SetInsideValue(1);
-   thresholdFilter->ReleaseDataFlagOn();
+//   thresholdFilter->ReleaseDataFlagOn();
+
+//   typename CastImageFilterType::Pointer castFilter = CastImageFilterType::New();
+//   castFilter->SetInput( thresholdFilter->GetOutput() );
+
 
    typename AntiAliasFilterType::Pointer antiAliasFilter;
    // todo: check why input parameters are not used in the ITK filter
    antiAliasFilter = AntiAliasFilterType::New();
-   antiAliasFilter->SetMaximumRMSError(0.01);
+   antiAliasFilter->SetMaximumRMSError(0.05);
    antiAliasFilter->SetNumberOfLayers(2);
-   antiAliasFilter->SetNumberOfIterations(15);
+   antiAliasFilter->SetNumberOfIterations(5);
    antiAliasFilter->SetInput( thresholdFilter->GetOutput() );
-   antiAliasFilter->ReleaseDataFlagOn();
+//   antiAliasFilter->ReleaseDataFlagOn();
 /*
    if (m_Observer.IsNotNull())
    {
@@ -133,6 +140,10 @@ void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImag
    }
 */
    antiAliasFilter->Update();
+
+  MITK_INFO << " antiAliasFilter->GetUpperBinaryValue() " << static_cast<int>( antiAliasFilter->GetUpperBinaryValue() );
+  MITK_INFO << " antiAliasFilter->GetLowerBinaryValue() " << static_cast<int>( antiAliasFilter->GetLowerBinaryValue() );
+
 /*
    if (m_Observer.IsNotNull())
    {
@@ -144,7 +155,7 @@ void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImag
    typename FloatImageType::Pointer outputFloatImage;
 
    outputFloatImage = antiAliasFilter->GetOutput();
-   outputFloatImage->DisconnectPipeline();
+//   outputFloatImage->DisconnectPipeline();
 
    typename ITKFloatConvertType::Pointer connector;
    connector = ITKFloatConvertType::New();
@@ -169,7 +180,7 @@ void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImag
    vtkPolyData* polydata = marching->GetOutput();
 
    if ( (!polydata) || (!polydata->GetNumberOfPoints()) )
-      throw itk::ExceptionObject (__FILE__,__LINE__,"LabelSetImageToSurfaceFilter: marching cubes has failed.");
+      mitkThrow() << "Marching cubes filter has failed";
 
    if (polydata->GetNumberOfPoints() > 0)
    {

@@ -4,6 +4,7 @@ set(CPP_FILES
   Qmitk/QmitkUSDeviceManagerWidget.cpp
   Qmitk/QmitkUSNewVideoDeviceWidget.cpp
   Qmitk/QmitkUSControlsBModeWidget.cpp
+  Qmitk/QmitkUSControlsDopplerWidget.cpp
   Qmitk/QmitkUSControlsProbesWidget.cpp
   Qmitk/QmitkUSControlsCustomVideoDeviceWidget.cpp
   Qmitk/QmitkUSAbstractCustomWidget.cpp
@@ -12,6 +13,7 @@ set(UI_FILES
   Qmitk/QmitkUSDeviceManagerWidgetControls.ui
   Qmitk/QmitkUSNewVideoDeviceWidgetControls.ui
   Qmitk/QmitkUSControlsBModeWidget.ui
+  Qmitk/QmitkUSControlsDopplerWidget.ui
   Qmitk/QmitkUSControlsProbesWidget.ui
   Qmitk/QmitkUSControlsCustomVideoDeviceWidget.ui
 )
@@ -20,6 +22,7 @@ set(MOC_H_FILES
   Qmitk/QmitkUSDeviceManagerWidget.h
   Qmitk/QmitkUSNewVideoDeviceWidget.h
   Qmitk/QmitkUSControlsBModeWidget.h
+  Qmitk/QmitkUSControlsDopplerWidget.h
   Qmitk/QmitkUSControlsProbesWidget.h
   Qmitk/QmitkUSControlsCustomVideoDeviceWidget.h
 )

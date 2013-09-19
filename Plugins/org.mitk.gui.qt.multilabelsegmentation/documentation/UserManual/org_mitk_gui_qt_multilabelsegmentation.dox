@@ -9,11 +9,10 @@ available in every application.</i>
 Available sections:
 
  - \ref org_mitk_gui_qt_segmentationUserManualOverview
- - \ref org_mitk_gui_qt_segmentationUserManualTechnical
+   - \ref org_mitk_gui_qt_segmentationUserManualTechnical
  - \ref org_mitk_gui_qt_segmentationUserManualCreateOpenSaveImportAdd
  - \ref org_mitk_gui_qt_segmentationUserManualLabelTable
  - \ref org_mitk_gui_qt_segmentationUserManualLabelCreation
- - \ref org_mitk_gui_qt_segmentationUserManualLabelSelection
  - \ref org_mitk_gui_qt_segmentationUserManualLabelSearch
  - \ref org_mitk_gui_qt_segmentationUserManualLabelEditing
    - \ref org_mitk_gui_qt_segmentationUserManualContouring
@@ -23,7 +22,10 @@ Available sections:
    - \ref org_mitk_gui_qt_segmentationUserManualOrganSegmentation2
    - \ref org_mitk_gui_qt_segmentationUserManualOrganSegmentation99
  - \ref org_mitk_gui_qt_segmentationUserManualLesionSegmentation
- - \ref org_mitk_gui_qt_segmentationUserManualSurfaceMasking
+ - \ref org_mitk_gui_qt_segmentationUserManualOperationsOnLabels
+   - \ref org_mitk_gui_qt_segmentationUserManualOperationsOnSingleSelection
+   - \ref org_mitk_gui_qt_segmentationUserManualOperationsOnMultipleSelection
+ - \ref org_mitk_gui_qt_segmentationUserManualSegmentationUtilities
  - \ref org_mitk_gui_qt_segmentationUserManualTechnicalDetail
 
 \section org_mitk_gui_qt_segmentationUserManualOverview Overview
@@ -42,7 +44,7 @@ Segmentation view and the Segmentation Utilities view.
 
 If you wonder what segmentations are good for, we shortly revisit the concept of a segmentation here.
 A CT or MR image is made up of volume of physical measurements (volume elements are called voxels).
-In CT images, for example, the gray value of each voxel corresponds to the mass absorbtion coefficient
+In CT images, for example, the gray value of each voxel corresponds to the mass absorption coefficient
 for X-rays in this voxel, which is similar in many %parts of the human body.
 The gray value does not contain any further information, so the computer does not know whether a given
 voxel is part of the body or the background, nor can it tell a brain from a liver.
@@ -50,7 +52,7 @@ However, the distinction between voxels belonging to an object and a background 
 <ul>
 <li>you want to know the volume of a given organ (the computer needs to know which %parts of the image belong to this organ)
 <li>you want to create 3D polygon visualizations (the computer needs to know the surfaces of structures that should be drawn)
-<li>as a necessary pre-processing step for therapy planning, therapy support, and therapy monitoring
+<li>as a necessary preprocessing step for therapy planning, therapy support, and therapy monitoring
 </ul>
 
 This distinction between voxels inside and object and background is called <i>segmentation</i>.
@@ -64,7 +66,7 @@ the voxel size of the medical image and can be arbitrarily positioned.
 
 The remainder of this document will summarize the features of the Segmentation perspective and how they are used.
 
-\section org_mitk_gui_qt_segmentationUserManualTechnical Technical Issues
+\subsection org_mitk_gui_qt_segmentationUserManualTechnical Technical Issues
 
 The <b> Segmentation Perspective </b> makes a number of assumptions. To know what this view can be used for, it will help you to know that:
 <ul>
@@ -90,7 +92,7 @@ load an existing one from disk. The <b>Segmentation toolbar</b> collects buttons
   <li>Add label</li> a new label is appended to the current segmentation session, at the end of the table.
 </ul>
 
-\section org_mitk_gui_qt_segmentationUserManualLabelTable Labels Table
+\section org_mitk_gui_qt_segmentationUserManualLabelTable The Label Table
 
 The following label properties are readily available to modify:
 
@@ -105,58 +107,14 @@ The Label Table is shown below:
 
 \image html org_mitk_gui_qt_segmentationIMGlabeltable.png The <b>Label Table</b> showing all the labels in the current segmentation session
 
-If you right click on any label in the table, a menu will pop-up offering the following actions to be performed on the selected label:
-
-<ul>
-  <li><b>Rename...</b></li> : change the name and/or color of the selected label.
-  <li><b>Remove label </b></li> : delete the selected label.
-  <li><b>Erase label </b></li> : only clear the contents of the selected label.
-  <li><b>Random color </b></li> : generate a surface mesh out of the selected label.
-  <li><b>View only </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
-  <li><b>View/Hide all </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
-  <li><b>Lock/Unlock all </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
-  <li><b>Create surface </b></li> : generate a surface out of the selected label.
-  <li><b>Create mask </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
-</ul>
-
-\image html org_mitk_gui_qt_segmentationIMGLabelTableSingleSelectionContextMenu.png Context menu for single label selection
-
-\section org_mitk_gui_qt_segmentationUserManualSurfaceMasking Surface Masking
-
-You can use the surface masking tool to create binary images from a surface which is used used as a mask on an image. This task is
-demonstrated below:
-
-\image html segmentationFromSurfaceBefore.png Load an image and a surface
-
-Select the image and the surface in the corresponding drop-down boxes (both are selected automatically if there is just one image and one surface)
-
-If more than one label is selected, a different menu will show up:
-
-\image html org_mitk_gui_qt_segmentationIMGLabelTableMultipleSelectionContextMenu.png Context menu for multiple label selection
-
-<ul>
-  <li><b>Merge selection on current label</b></li> : transfer the contents of the selected labels in the <b>Label Table</b> into the current one.
-  <li><b>Remove selected labels</b></li> : delete the selected labels.
-  <li><b>Erase selected labels</b></li> : only clear the contents of the selected labels.
-  <li><b>Create a surface for each selected label</b></li> : generate a surface mesh out of each selected label.
-  <li><b>Combine and create a surface</b></li> : generate a surface out of the combination of the selected labels.
-  <li><b>Create a mask for each selected label</b></li> : generate a mask out of each selected label. A mask is a binary image with "1" inside and "0" outside.
-  <li><b>Combine and create a mask</b></li> : generate a mask out of the combination of the selected labels.
-</ul>
-
-\subsection org_mitk_gui_qt_segmentationUserManualLabelCreation Creating a New Label
+\section org_mitk_gui_qt_segmentationUserManualLabelCreation Creating a New Label
 
 Click the "New Label" button to add a new label. A dialog will show-up to enter the name and color. Preset organ names and
 corresponding colors are offered while you type in, but you can set any name. The new name if not known will be automatically
 remembered and made available the next time you create a new label. In the current implementation of the plugin,
 the maximum number of labels is restricted to 255. If you need more, you will have to create a new segmentation session.
 
-
-\subsection org_mitk_gui_qt_segmentationUserManualLabelSelection Selecting a label for editing
-
-You can select the active label by clicking on the corresponding row in the Label Table. Only one label can be active at the time.
-
-\subsection org_mitk_gui_qt_segmentationUserManualLabelSearch Searching a Label
+\section org_mitk_gui_qt_segmentationUserManualLabelSearch Searching a Label
 
 It may happen that many labels (e.g. > 200) are present in a segmentation session and therefore manual searching is time consuming.
 The <b> Label Search </b> edit box allows for quickly finding the label you want. Just start writing its name and and you will get
@@ -164,14 +122,15 @@ assitance for completing its name. If the label you were searching is found, pre
 
 \image html org_mitk_gui_qt_segmentationIMGsearchlabel.png Label search
 
-\subsection org_mitk_gui_qt_segmentationUserManualLabelEditing Label Editing
+\section org_mitk_gui_qt_segmentationUserManualLabelEditing Label Editing
 
-To start using one of the editing tools, click its button in the toolbox.
-The selected editing tool will be active and its corresponding button will stay pressed until you click the button again.
+First of all, you have to select the active label by clicking on the corresponding row in the <b>Label Table</b>. Only one label
+can be active at the time. Then you can select an editing tool in the toolbox.
+The selected editing tool will be active and its corresponding button will stay pressed until you click the same button again.
 Selecting a different tool also deactivates the previous one. If you are familiar with the MITK Workbench, you know that
 clicking and moving the mouse in any of the 2D windows will move around the crosshair that defines the position in
-the image you are standing in. Depending on the tool that you activate, this behavior may be disabled during segmenting
--- otherwise you might have a hard time concentrating on the contour you are drawing.
+the image you are standing on. Depending on the tool that you activate, this behavior may be disabled during segmenting
+-- otherwise you might have a hard time concentrating on the contour you are drawing --.
 
 If you have to delineate a lot of images, you should try using shortcuts to switch tools. Just hit the first letter of each
 tool to activate it (e.g. "A" for Add, "S" for Subtract, etc.). If you hover the cursor on a tool button you will get a tip
@@ -185,7 +144,7 @@ release to finish the editing action.
 
 At any time you can undo or redo your past actions with corresponding buttons in the application\'s toolbar.
 
-\section org_mitk_gui_qt_segmentationUserManualContouring Manual Contouring
+\subsection org_mitk_gui_qt_segmentationUserManualContouring Manual Contouring
 
 The "Add" and "Subtract" tools allow for freely tracing a contour around an organ or structure in an image.
 You might also use manual contouring to further enhance or correct a segmentation resulting from sub-optimal automatic methods.
@@ -231,14 +190,12 @@ endpoints of the line are connected and the region inside the resulting contour 
 
 \image html org_mitk_gui_qt_segmentationIMGcorrectionActions.png %Actions of the Correction tool illustrated.
 <br>
-\image html org_mitk_gui_qt_segmentationIMGiconFill.png Fill Tool
+\image html org_mitk_gui_qt_segmentationIMGiconFillErase.png Fill and Erase Tools
 
-Left-click inside a hole inside the active label to fill it. If you click outside the hole (but yet inside the label) all
-holes within the label will be filled.
+The <b>Fill Tool</b> works by filling a hole surrounded by the active label, at the clicked position. If you click outside the
+hole (but yet inside the label) all holes found surrounded by the active label will be filled.
 
-\image html org_mitk_gui_qt_segmentationIMGiconErase.png Erase Tool
-
-This tool removes a connected region around the clicked position.
+The <b>Erase Tool</b> removes a connected region of the active label around the clicked position.
 
 \image html org_mitk_gui_qt_segmentationIMGiconLiveWire.png LiveWire Tool
 
@@ -256,7 +213,7 @@ snap to the edge within a 3x3 region.
 <li>(6) After closing the contour, it can further be edited by dragging, inserting and deleting anchor points.
 </ul>
 
-The contour will be transfered to the active label when the tool is deactivated.
+The contour will be transferred to the active label when the tool is deactivated.
 
 \image html org_mitk_gui_qt_segmentationIMGiconFastMarching2D.png FastMarching Tool
 
@@ -272,7 +229,8 @@ cover a range of 50 or more slices. The Segmentation plugin offers two helpful f
 <li> <b>2D Interpolation</b>
 </ul>
 <br>
-<b>The 3D interpolation</b> is activated by default when using the manual segmentation tools. That means if you start
+
+The <b>3D interpolation</b> is activated by default when using the manual segmentation tools. That means if you start
 contouring, from the second contour onwards, the surface of the segmented area will be interpolated based on the available contours.
 The interpolation works with all available manual tools. Please note that this is currently a pure geometrical interpolation,
 i.e. image intensity information is not taken into account. With each new contour that the user traces, the interpolation result
@@ -292,7 +250,7 @@ Finally, you can accept the interpolation result by clicking the "Accept" - butt
 assigned to the active label.
 
 <br>
-<b>The 2D Interpolation</b> creates suggestions for extending the active label into neighboring slices provided
+The <b>2D Interpolation</b> creates suggestions for extending the active label into neighboring slices provided
 <ul>
 <li> a segmentation of the same active label is available a couple of slices away AND
 <li> is completely clear of the active label in between -- i.e. there will be no interpolation suggestion if there is even only
@@ -300,8 +258,10 @@ a single pixel of the active label between the aforementioned slices.
 </ul>
 
 Interpolated suggestions are displayed as contours with the same color as the active label. To accept an interpolation suggestion
-in a single slice, click the "Accept" button below the toolbox. You can also accept all interpolated suggestions at once in a
+in a single slice, click the "Accept" button. You can also accept all interpolated suggestions at once in a
 given window, by pressing the "Accept All" button.
+
+\image html org_mitk_gui_qt_segmentation2DInterpolation.png 2D Interpolation
 
 \section org_mitk_gui_qt_segmentationUserManualOrganSegmentation Organ Segmentation
 
@@ -314,7 +274,7 @@ The Segmentation View comprises a number of easy-to-use tools for segmentation o
 
 \subsection org_mitk_gui_qt_segmentationUserManualOrganSegmentation1 Liver on CT Images
 
-On CT image volumes, preferrably with a contrast agent in the portal venous phase, the Liver tool will fully automatically analyze and segment the image.
+On CT image volumes, preferably with a contrast agent in the portal venous phase, the Liver tool will fully automatically analyze and segment the image.
 All you have to do is to load and select the image, then click the "Liver" button.
 During the process, which takes a minute or two, you will get visual progress feedback by means of a contour that moves closer and closer to the real liver boundaries.
 
@@ -345,7 +305,7 @@ The basic algorithm is versatile and can be applied on all kinds of segmentation
 If you are interested in other organs than those offered by the current version of the Segmentation view,
 please contact our research team.
 
-\section org_mitk_gui_qt_segmentationUserManualLesionSegmentation Lesion Segmentation
+\subsection org_mitk_gui_qt_segmentationUserManualLesionSegmentation Lesion Segmentation
 
 \note This feature is only available in our 3M3 Demo Application (http://www.mint-medical.de/productssolutions/mitk3m3/mitk3m3/#downloads) but not in the open source part of MITK
 
@@ -353,15 +313,64 @@ Lesion segmentation is a little different from organ segmentation. Since lesions
 and are often found in varying places all over the body.
 The tools in this section offer efficient ways to create 3D segmentations of such lesions.
 
-The Segmentation View currently offers supoprt for enlarged lymph nodes.
+The Segmentation View currently offers support for enlarged lymph nodes.
 
 To segment an enlarged lymph node, find a more or less central slice of it, activate the "Lymph Node" tool and draw a rough contour on the inside of the lymph node.
-When releaseing the mouse button, a segmentation algorithm is started in a background task. The result will become visible after a couple of seconds, but you do not have to wait for it.
+When releasing the mouse button, a segmentation algorithm is started in a background task. The result will become visible after a couple of seconds, but you do not have to wait for it.
 If you need to segment several lymph nodes, you can continue to inspect the image right after closing the drawn contour.
 
 If the lymph node segmentation is not to your content, you can select the "Lymph Node Correction" tool and drag %parts of the lymph node surface towards the right position (works in 3D, not slice-by-slice).
 This kind of correction helps in many cases.
 If nothing else helps, you can still use the pure manual tools as a fallback.
+
+\section org_mitk_gui_qt_segmentationUserManualOperationsOnLabels Operations on Labels
+
+Depending on your selection in the <b> Label Table </b>, several actions are offered:
+
+\subsection org_mitk_gui_qt_segmentationUserManualOperationsOnSingleSelection Single Label Selection
+
+If you right click on any label in the table, a menu will pop-up offering the following actions to be performed on the selected label:
+
+<ul>
+  <li><b>Rename...</b></li> : change the name and/or color of the selected label.
+  <li><b>Remove label </b></li> : delete the selected label.
+  <li><b>Erase label </b></li> : only clear the contents of the selected label.
+  <li><b>Random color </b></li> : generate a surface mesh out of the selected label.
+  <li><b>View only </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
+  <li><b>View/Hide all </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
+  <li><b>Lock/Unlock all </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
+  <li><b>Create surface </b></li> : generate a surface out of the selected label.
+  <li><b>Create mask </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
+</ul>
+
+\image html org_mitk_gui_qt_segmentationIMGLabelTableSingleSelectionContextMenu.png Context menu for single label selection
+
+\subsection org_mitk_gui_qt_segmentationUserManualOperationsOnMultipleSelection Multiple Label Selection
+
+If more than one label is selected, a different menu will show up:
+
+\image html org_mitk_gui_qt_segmentationIMGLabelTableMultipleSelectionContextMenu.png Context menu for multiple label selection
+
+<ul>
+  <li><b>Merge selection on current label</b></li> : transfer the contents of the selected labels in the <b>Label Table</b> into the current one.
+  <li><b>Remove selected labels</b></li> : delete the selected labels.
+  <li><b>Erase selected labels</b></li> : only clear the contents of the selected labels.
+  <li><b>Create a surface for each selected label</b></li> : generate a surface mesh out of each selected label.
+  <li><b>Combine and create a surface</b></li> : generate a surface out of the combination of the selected labels.
+  <li><b>Create a mask for each selected label</b></li> : generate a mask out of each selected label. A mask is a binary image with "1" inside and "0" outside.
+  <li><b>Combine and create a mask</b></li> : generate a mask out of the combination of the selected labels.
+</ul>
+
+\section org_mitk_gui_qt_segmentationUserManualSegmentationUtilities Segmentation Utilities
+
+The <b> Segmentation Utilities </b> view ...
+
+One is the surface masking utility. It is used for create a new label from a surface. The surface is used as a "mask": the region inside
+the surface is assigned a new label.
+
+\image html org_mitk_gui_qt_segmentationIMGsurfacemask.png Surface masking utility
+
+Select the image and the surface in the corresponding drop-down boxes (both are selected automatically if there is just one image and one surface)
 
 \section org_mitk_gui_qt_segmentationUserManualTechnicalDetail Technical Information for Developers
 

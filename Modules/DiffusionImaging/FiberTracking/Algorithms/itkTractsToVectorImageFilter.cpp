@@ -537,8 +537,8 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
             m_MaskImage->TransformContinuousIndexToPhysicalPoint( center, worldCenter );
 
             // workaround *********************************************
-            //DirectionType dir = m_MaskImage->GetDirection()*directions.at(i);
-            DirectionType dir = directions.at(i);
+            DirectionType dir = m_MaskImage->GetDirection()*directions.at(i);
+//            DirectionType dir = directions.at(i);
             // workaround *********************************************
 
             // set direction image pixel

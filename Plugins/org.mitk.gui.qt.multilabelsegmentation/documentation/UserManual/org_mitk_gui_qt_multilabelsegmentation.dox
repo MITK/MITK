@@ -30,13 +30,13 @@ Available sections:
 
 \section org_mitk_gui_qt_segmentationUserManualOverview Overview
 
-The <b>Segmentation Perspective</b> allows to create segmentations of anatomical and pathological structures in medical
-images of the human body.
-The perspective groups a number of tools which can be used for:
+The <b>Segmentation Perspective</b> allows to create segmentations of structures of interest in biomedical and biological
+images. Examples of such structures are an organ, a vessel or a lesion in a CT or MR image, or a cell or organelle in microscopy
+images. The perspective groups a number of tools which can be used for:
 <ul>
-  <li> (semi-)automatic segmentation of organs on CT or MR image volumes
-  <li> semi-automatic segmentation of lesions such as enlarged lymph nodes or tumors
-  <li> manual segmentation of such structures
+  <li> fully-automatic segmentation
+  <li> semi-automatic segmentation
+  <li> manual segmentation
 </ul>
 
 \image html org_mitk_gui_qt_segmentationIMGapplication.png Segmentation perspective consisting of the Data Manager view, the

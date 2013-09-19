@@ -97,6 +97,7 @@ m_WorkingNode(0)
   m_Controls.m_btSaveLabelSet->setEnabled(false);
   m_Controls.m_btNewLabel->setEnabled(false);
   m_Controls.m_btImportLabelSet->setEnabled(false);
+  m_Controls.m_btImportLabelSetImage->setEnabled(false);
 }
 
 QmitkLabelSetWidget::~QmitkLabelSetWidget()
@@ -140,6 +141,7 @@ void QmitkLabelSetWidget::OnSegmentationSelectionChanged(const mitk::DataNode *n
   m_Controls.m_btSaveLabelSet->setEnabled(m_WorkingNode.IsNotNull());
   m_Controls.m_btNewLabel->setEnabled(m_WorkingNode.IsNotNull());
   m_Controls.m_btImportLabelSet->setEnabled(m_WorkingNode.IsNotNull());
+  m_Controls.m_btImportLabelSetImage->setEnabled(m_WorkingNode.IsNotNull());
 
   if (m_WorkingNode.IsNotNull())
   {
@@ -164,6 +166,8 @@ void QmitkLabelSetWidget::OnSegmentationSelectionChanged(const mitk::DataNode *n
     if (_other != m_WorkingNode)
       _other->SetVisibility(false);
   }
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnToolManagerReferenceDataModified()

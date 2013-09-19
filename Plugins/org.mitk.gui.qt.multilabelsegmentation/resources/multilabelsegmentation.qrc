@@ -5,6 +5,7 @@
     <file>SaveLabelSet_48.png</file>
     <file>NewLabelSet_48.png</file>
     <file>ImportLabelSet_48.png</file>
+    <file>ImportLabelSetImage_48.png</file>
     <file>NewLabel_48.png</file>
   </qresource>
 </RCC>

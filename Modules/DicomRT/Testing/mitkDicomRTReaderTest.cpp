@@ -26,9 +26,11 @@ int mitkDicomRTReaderTest(int  argc , char* argv[])
 
   mitk::DicomRTReader::Pointer _DicomRTReader = mitk::DicomRTReader::New();
 
+  char* h  = "/home/riecker/DicomRT/DICOMRT_Bilder/Patient19_anonym/Pat19-Spezial^01HIT_ BPL _Schaedel _S4-Vsim_RTStructureSetSeries_5-RTSTRUCT-00001-1.2.826.0.1.3680043.2.1143.5364730193977184707660191712117743577.dcm";
+
   mitk::ContourModelSet::Pointer emptyItem;
-  mitk::ContourModelSet::Pointer result = mitk::ContourModelSet::New();
-  result = _DicomRTReader->ReadDicomFile(argv[1]);
+  std::deque<mitk::ContourModelSet::Pointer> result;
+  result = _DicomRTReader->ReadDicomFile(h);
 
 //  DcmFileFormat file;
 //  OFCondition outp = file.loadFile(argv[1], EXS_Unknown);

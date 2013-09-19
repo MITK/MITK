@@ -60,6 +60,9 @@ namespace mitk
 
   class mitkDicomRT_EXPORT DicomRTReader: public itk::Object
   {
+
+    typedef std::deque<mitk::ContourModelSet::Pointer> ContourModelSetVector;
+
     class BeamEntry
     {
     public:
@@ -109,8 +112,8 @@ namespace mitk
 
     itkNewMacro( Self );
 
-    mitk::ContourModelSet::Pointer ReadDicomFile(char* filename);
-    mitk::ContourModelSet::Pointer ReadStructureSet(DcmDataset* dataset);
+    ContourModelSetVector ReadDicomFile(char* filename);
+    ContourModelSetVector ReadStructureSet(DcmDataset* dataset);
     int LoadRTPlan(DcmDataset* dataset);
     int LoadRTDose(DcmDataset* dataset);
     size_t GetNumberOfRois();

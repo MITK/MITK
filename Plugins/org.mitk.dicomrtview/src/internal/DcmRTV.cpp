@@ -62,15 +62,14 @@ void DcmRTV::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
   m_Controls.buttonPerformImageProcessing->setEnabled( true );
 }
 
-
 void DcmRTV::DoImageProcessing()
 {
   //char* filename="/home/riecker/DicomRT/DICOMRT_Bilder/2/RTSTRUCT.2.16.840.1.113669.2.931128.509887832.20120106104805.776010.dcm";
   //char* filename="/home/riecker/DicomRT/DICOMRT_Bilder/1/0_RS.dcm";
   //char* filename="/home/riecker/DicomRT/DICOMRT_Bilder/DICOM-RT/L_H/RS1.2.826.0.1.3680043.8.176.2013826104523980.670.5041441575.dcm";
   //char* filename="/home/riecker/DicomRT/DICOMRT_Bilder/DICOM-RT/W_K/RS1.2.826.0.1.3680043.8.176.2013826103827986.364.7703564406.dcm";
-  //char* filename="/home/riecker/DicomRT/DICOMRT_Bilder/Patient1_anonym/Pat1-Spezial^01HIT_ BPL _Schaedel _S4-Vsim_RTStructureSetSeries_5-RTSTRUCT-00001-1.2.826.0.1.3680043.2.1143.1983092986672434422852955193772404798.dcm";
-  char* filename="/home/riecker/DicomRT/DICOMRT_Bilder/Patient19_anonym/Pat19-Spezial^01HIT_ BPL _Schaedel _S4-Vsim_RTStructureSetSeries_5-RTSTRUCT-00001-1.2.826.0.1.3680043.2.1143.304187726920509235770366954684227281.dcm";
+  char* filename="/home/riecker/DicomRT/DICOMRT_Bilder/Patient1_anonym/Pat1-Spezial^01HIT_ BPL _Schaedel _S4-Vsim_RTStructureSetSeries_5-RTSTRUCT-00001-1.2.826.0.1.3680043.2.1143.1983092986672434422852955193772404798.dcm";
+  //char* filename="/home/riecker/DicomRT/DICOMRT_Bilder/Patient19_anonym/Pat19-Spezial^01HIT_ BPL _Schaedel _S4-Vsim_RTStructureSetSeries_5-RTSTRUCT-00001-1.2.826.0.1.3680043.2.1143.998272335983426758812865773853768684.dcm";
 
   mitk::DicomRTReader::Pointer _DicomRTReader = mitk::DicomRTReader::New();
 
@@ -82,22 +81,22 @@ void DcmRTV::DoImageProcessing()
   }
   DcmDataset *dataset = file.getDataset();
 
-  mitk::ContourModelSet::Pointer result = mitk::ContourModelSet::New();
+  std::deque<mitk::ContourModelSet::Pointer> result;
   result = _DicomRTReader->ReadStructureSet(dataset);
 
   mitk::DicomRTReader::Pointer readerRT = mitk::DicomRTReader::New();
-  mitk::ContourModelSet::Pointer modelVector = mitk::ContourModelSet::New();
+  std::deque<mitk::ContourModelSet::Pointer> modelVector;
   modelVector = readerRT->ReadDicomFile(filename);
 
-  if(result->IsEmpty())
+  if(result.empty())
   {
     QMessageBox::information(NULL, "Error", "Vector is empty ...");
   }
 
-  for(int i=0;i<modelVector->GetSize();i++)
+  for(int i=0; i<modelVector.size();i++)
   {
     mitk::DataNode::Pointer x = mitk::DataNode::New();
-    x->SetData(modelVector->GetContourModelAt(i));
+    x->SetData(modelVector.at(i));
     x->SetName("ContourModel");
     x->SetVisibility(true);
     GetDataStorage()->Add(x);

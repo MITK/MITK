@@ -130,6 +130,7 @@ void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(us::ServiceReferenceU 
   if (! reference)
   {
     m_Controls->m_BtnActivate->setEnabled(false);
+    m_Controls->m_BtnRemove->setEnabled(false);
     return;
   }
   std::string isConnected = reference.GetProperty( mitk::USDevice::US_PROPKEY_ISCONNECTED ).ToString();

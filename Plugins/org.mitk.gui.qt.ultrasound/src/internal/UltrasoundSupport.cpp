@@ -76,6 +76,7 @@ void UltrasoundSupport::OnClickedAddNewDevice()
   m_Controls.m_NewVideoDeviceWidget->setVisible(true);
   m_Controls.m_DeviceManagerWidget->setVisible(false);
   m_Controls.m_Headline->setText("Add New Video Device:");
+  m_Controls.m_WidgetActiveDevices->setVisible(false);
 }
 
 void UltrasoundSupport::DisplayImage()
@@ -122,10 +123,12 @@ void UltrasoundSupport::OnClickedViewDevice()
     m_Controls.m_FrameRate->setEnabled(false);
 
     m_ControlProbesWidget = new QmitkUSControlsProbesWidget(m_Device->GetControlInterfaceProbes(), m_Controls.tab2);
-    m_Controls.tab2->layout()->addWidget(m_ControlProbesWidget);
+    //m_Controls.tab2->layout()->addWidget(m_ControlProbesWidget);
+    m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlProbesWidget, "Probes Controls");
 
     m_ControlBModeWidget = new QmitkUSControlsBModeWidget(m_Device->GetControlInterfaceBMode(), m_Controls.tab2);
-    m_Controls.tab2->layout()->addWidget(m_ControlBModeWidget);
+    //m_Controls.tab2->layout()->addWidget(m_ControlBModeWidget);
+    m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlBModeWidget, "B Mode Controls");
 
 
     ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
@@ -141,7 +144,8 @@ void UltrasoundSupport::OnClickedViewDevice()
         m_ControlCustomWidget = pluginContext->getService<QmitkUSAbstractCustomWidget>
           (m_CustomWidgetServiceReference.at(0))->CloneForQt(m_Controls.tab2);
         m_ControlCustomWidget->SetDevice(m_Device);
-        m_Controls.tab2->layout()->addWidget(m_ControlCustomWidget);
+        //m_Controls.tab2->layout()->addWidget(m_ControlCustomWidget);
+        m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlCustomWidget, "Custom Controls");
       }
     }
   }
@@ -177,6 +181,7 @@ void UltrasoundSupport::OnNewDeviceWidgetDone()
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
   m_Controls.m_DeviceManagerWidget->setVisible(true);
   m_Controls.m_Headline->setText("Ultrasound Devices:");
+  m_Controls.m_WidgetActiveDevices->setVisible(true);
 }
 
 void UltrasoundSupport::GlobalReinit()

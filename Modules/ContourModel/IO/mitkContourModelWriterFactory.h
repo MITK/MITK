@@ -37,16 +37,11 @@ namespace mitk
     itkFactorylessNewMacro(Self);
 
     /** Register one factory of this type  */
-    static void RegisterOneFactory(void)
-    {
-      static bool IsRegistered = false;
-      if ( !IsRegistered )
-      {
-        ContourModelWriterFactory::Pointer contourModelWriterFactory = ContourModelWriterFactory::New();
-        ObjectFactoryBase::RegisterFactory( contourModelWriterFactory );
-        IsRegistered = true;
-      }
-    }
+    static void RegisterOneFactory(void);
+
+    /** UnRegister one factory of this type  */
+    static void UnRegisterOneFactory(void);
+
 
   protected:
     ContourModelWriterFactory();
@@ -56,6 +51,7 @@ namespace mitk
     ContourModelWriterFactory(const Self&); //purposely not implemented
     void operator=(const Self&); //purposely not implemented
 
+    static itk::ObjectFactoryBase::Pointer GetInstance();
   };
 }
 #endif //CONTOURMODELWRITERFACTORY_H_HEADER_INCLUDED

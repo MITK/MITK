@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_vector.h>
 
 #include "mitkTypeBasics.h"
-#include "mitkLogMacros.h"
 #include "mitkExceptionMacro.h"
 
 namespace mitk
@@ -41,7 +40,7 @@ namespace mitk
 
     /**
      * @brief Copy constructor.
-     * Can convert nonidentical coordinate representations.
+     * Can convert non-identical coordinate representations.
      * E.g. use this to convert from mitk::Vector<float, 3> to mitk::Vector<double,3>
      */
     template <typename TOtherCoordRep>
@@ -57,15 +56,10 @@ namespace mitk
     Vector<TCoordRep, NVectorDimension>(const itk::Vector<TOtherCoordRep, NVectorDimension>& r)
       : itk::Vector<TCoordRep, NVectorDimension>(r) {}
 
-//    /**
-//     * @brief convert an array of the same data type to Vector.
-//     * @param r the array. Attention: must have NVectorDimension valid arguments!
-//     */
-//    Vector<TCoordRep, NVectorDimension>(const TCoordRep r[NVectorDimension])
-//      : itk::Vector<TCoordRep, NVectorDimension>(r) {}
 
     /**
-     * @brief convert an array of a different data type to Vector
+     * @brief Constructor to convert an array to mitk::Vector
+     * Can convert non-identical coordinate representations.
      * @param r the array.
      * @attention must have NVectorDimension valid arguments!
      */
@@ -102,7 +96,7 @@ namespace mitk
     }
 
     /**
-     * @brief Convert a vnl_vector_fixed to a mitk::Vector of the same size.
+     * @brief Constructor for vnl_vecto_fixed.
      * Can convert non-identical coordinate representations.
      */
     template <typename TOtherCoordRep>
@@ -114,29 +108,11 @@ namespace mitk
       }
     };
 
-    template <typename TOtherCoordRep>
-    Vector<TCoordRep, NVectorDimension>& operator=(const vnl_vector_fixed<TOtherCoordRep, NVectorDimension>& vnlVectorFixed)
-    {
-      for (int var = 0; (var < NVectorDimension); ++var) {
-        this->SetElement(var, static_cast<TCoordRep>(vnlVectorFixed[var]));
-      }
-      return *this;
-    }
-
-//    /**
-//     * @brief User defined conversion of mitk::Vector to vnl_vector_fixed
-//     * mustn't implement when vnl_vector is implemented due to implicit conversion of mitk::Vector3D.
-//     */
-//    template <typename TOtherCoordRep>
-//    operator vnl_vector_fixed<TOtherCoordRep, NVectorDimension> () const
-//    {
-//      Vector<TOtherCoordRep, NVectorDimension> convertedVector = *this;
-//      vnl_vector_fixed<TOtherCoordRep, NVectorDimension> vnlVectorFixed(convertedVector.GetVnlVector());
-//      return vnlVectorFixed;
-//    }
 
     /**
-     * @brief User defined conversion of mitk::Vector to vnl_vector
+     * @brief User defined conversion of mitk::Vector to vnl_vector.
+     * Note: the conversion to mitk::Vector to vnl_vector_fixed has not been implemented since this
+     * would collide with the conversion vnl_vector to vnl_vector_fixed provided by vnl.
      */
     template <typename TOtherCoordRep>
     operator vnl_vector<TOtherCoordRep> () const
@@ -161,12 +137,9 @@ namespace mitk
         }
     }
 
-  private:
-
-
-
   }; // end mitk::Vector
 
+  // convenience typedefs for often used mitk::Vector representations.
   typedef Vector<ScalarType,2> Vector2D;
   typedef Vector<ScalarType,3> Vector3D;
   typedef Vector<ScalarType,4> Vector4D;

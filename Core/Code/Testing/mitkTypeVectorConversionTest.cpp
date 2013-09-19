@@ -45,19 +45,20 @@ static const float      originalValuesFloat[] =  {1.123456789987, 2.789456321456
 static const ScalarType valuesToCopy[]        =  {4.654789123321, 5.987456789321, 6.321654987789546};
 static const float      valuesToCopyFloat[]   =  {4.654789123321, 5.987456789321, 6.321654987789546};
 
+static float epsDouble2Float = vnl_math::float_eps * 10.0;
 
 static void Test_pod2mitk(void)
 {
   mitk::Vector3D vector3D = valuesToCopy;
 
-  MITK_TEST_CONDITION(EqualArray(vector3D, valuesToCopy, 3), "pod copied into vector of same type")
+  MITK_TEST_CONDITION(EqualArray(vector3D, valuesToCopy, 3), "pod copied into mitk::Vector of same type")
 }
 
 static void Test_pod2mitk_DifferentType(void)
 {
   mitk::Vector3D vector3D = valuesToCopyFloat;
 
-  MITK_TEST_CONDITION(EqualArray(vector3D, valuesToCopyFloat, 3, vnl_math::float_eps), "float pod copied into double vector")
+  MITK_TEST_CONDITION(EqualArray(vector3D, valuesToCopyFloat, 3, epsDouble2Float), "float pod copied into mitk::Vector<double>")
 }
 
 
@@ -68,7 +69,7 @@ static void Test_mitk2pod(void)
 
   vector3D.CopyToArray(podArray);
 
-  MITK_TEST_CONDITION(EqualArray(podArray, vector3D, 3), "mitk vector copied into pod array")
+  MITK_TEST_CONDITION(EqualArray(podArray, vector3D, 3), "mitk::Vector copied into pod array")
 }
 
 static void Test_mitk2pod_DifferentType(void)
@@ -78,7 +79,7 @@ static void Test_mitk2pod_DifferentType(void)
 
   vector3D.CopyToArray(podArray);
 
-  MITK_TEST_CONDITION(EqualArray(podArray, vector3D, 3, vnl_math::float_eps*10.0), "mitk vector copied into pod array with different type")
+  MITK_TEST_CONDITION(EqualArray(podArray, vector3D, 3, epsDouble2Float), "mitk::Vector<double> copied into float pod array")
 }
 
 static void Test_oneElement2mitk(void)
@@ -94,7 +95,7 @@ static void Test_oneElement2mitk_DifferentType(void)
   float twos[] = {2.0, 2.0, 2.0};
   mitk::Vector<double, 3> vector3D(2.0F);
 
-  MITK_TEST_CONDITION(EqualArray(vector3D, twos, 3), "one values initializes all elements to this value: value has different type than vector.")
+  MITK_TEST_CONDITION(EqualArray(vector3D, twos, 3), "one values initializes all elements to this value: value has different type than mitk::Vector.")
 }
 
 static void Test_mitk2mitk_DifferentType(void)
@@ -104,8 +105,8 @@ static void Test_mitk2mitk_DifferentType(void)
 
   floatVector3D = doubleVector3D;
 
-  MITK_TEST_CONDITION(floatVector3D == doubleVector3D, "mitk double vector assigned to mitk float vector")
-  MITK_TEST_CONDITION(EqualArray(floatVector3D, valuesToCopy, 3, vnl_math::float_eps * 10.0), "correct values were assigned within float accuracy")
+  MITK_TEST_CONDITION(floatVector3D == doubleVector3D, "mitk::Vector<double> assigned to mitk::Vector<float>")
+  MITK_TEST_CONDITION(EqualArray(floatVector3D, valuesToCopy, 3, epsDouble2Float), "correct values were assigned within float accuracy")
 }
 
 static void Test_itk2mitk(void)
@@ -115,19 +116,19 @@ static void Test_itk2mitk(void)
 
   vector3D = itkVector;
 
-  MITK_TEST_CONDITION(vector3D == itkVector, "itk vector assigned to mitk vector")
+  MITK_TEST_CONDITION(vector3D == itkVector, "itk::Vector assigned to mitk::Vector")
   MITK_TEST_CONDITION(vector3D == valuesToCopy, "correct values were assigned")
 }
 
 static void Test_itk2mitk_DifferentType(void)
 {
-  Vector3D vector3D = originalValues;
-  itk::Vector<float, 3> itkVector = valuesToCopyFloat;
+  Vector<float, 3> vector3F        = originalValuesFloat;
+  itk::Vector<double, 3> itkVector = valuesToCopy;
 
-  vector3D = itkVector;
+  vector3F = itkVector;
 
-  MITK_TEST_CONDITION(vector3D == itkVector, "itk float vector assigned to mitk double vector")
-  MITK_TEST_CONDITION(EqualArray(vector3D, valuesToCopyFloat, 3), "correct values were assigned")
+  MITK_TEST_CONDITION(EqualArray(vector3F, itkVector, 3, epsDouble2Float) , "itk::Vector<double> assigned to mitk::Vector<float>")
+  MITK_TEST_CONDITION(EqualArray(vector3F, valuesToCopyFloat, 3, epsDouble2Float), "correct values were assigned")
 }
 
 static void Test_mitk2itk(void)
@@ -137,19 +138,19 @@ static void Test_mitk2itk(void)
 
   itkVector = vector3D;
 
-  MITK_TEST_CONDITION(vector3D == itkVector, "mitk vector assigned to itk vector")
+  MITK_TEST_CONDITION(vector3D == itkVector, "mitk::Vector assigned to itk::Vector")
   MITK_TEST_CONDITION(itkVector == valuesToCopy, "correct values were assigned")
 }
 
 static void Test_mitk2itk_DifferentType(void)
 {
-  itk::Vector<double,3> itkDoubleVector = originalValues;
-  mitk::Vector<float, 3> mitkFloatVector = valuesToCopyFloat;
+  itk::Vector<float,3> itkFloatVector = originalValuesFloat;
+  mitk::Vector<double, 3> mitkDoubleVector = valuesToCopy;
 
-  itkDoubleVector = mitkFloatVector;
+  itkFloatVector = mitkDoubleVector;
 
-  MITK_TEST_CONDITION(itkDoubleVector == mitkFloatVector, "mitk float vector assigned to itk double vector")
-  MITK_TEST_CONDITION(EqualArray(itkDoubleVector, valuesToCopyFloat, 3), "correct values were assigned")
+  MITK_TEST_CONDITION(itkFloatVector == mitkDoubleVector, "mitk::Vector<double> assigned to itk::Vector<float>")
+  MITK_TEST_CONDITION(EqualArray(itkFloatVector, valuesToCopy, 3, epsDouble2Float), "correct values were assigned")
 }
 
 
@@ -160,19 +161,19 @@ static void Test_vnlfixed2mitk(void)
 
   vector3D = vnlVectorFixed;
 
-  MITK_TEST_CONDITION( vector3D.GetVnlVector() == vnlVectorFixed, "vnl_vector_fixed assigned to mitk vector")
+  MITK_TEST_CONDITION( vector3D.GetVnlVector() == vnlVectorFixed, "vnl_vector_fixed assigned to mitk::Vector")
   MITK_TEST_CONDITION( vector3D == valuesToCopy, "correct values were assigned" )
 }
 
 static void Test_vnlfixed2mitk_DifferentType(void)
 {
-  mitk::Vector<double, 3> vector3D = originalValues;
-  vnl_vector_fixed<float, 3> vnlVectorFixed(valuesToCopyFloat);
+  mitk::Vector<float, 3> vector3F = originalValuesFloat;
+  vnl_vector_fixed<double, 3> vnlVectorFixed(valuesToCopy);
 
-  vector3D = vnlVectorFixed;
+  vector3F = vnlVectorFixed;
 
-  MITK_TEST_CONDITION( EqualArray(vector3D, vnlVectorFixed, 3), "vnl_vector_fixed float assigned to mitk vector double")
-  MITK_TEST_CONDITION( EqualArray(vector3D, valuesToCopyFloat, 3),   "correct values were assigned" )
+  MITK_TEST_CONDITION( EqualArray(vector3F, vnlVectorFixed, 3, epsDouble2Float), "vnl_vector_fixed<double> assigned to mitk::Vector<float>")
+  MITK_TEST_CONDITION( EqualArray(vector3F, valuesToCopy,   3, epsDouble2Float), "correct values were assigned" )
 }
 
 static void Test_mitk2vnlfixed(void)
@@ -182,7 +183,7 @@ static void Test_mitk2vnlfixed(void)
 
   vnlVectorFixed = vector3D;
 
-  MITK_TEST_CONDITION( vnlVectorFixed == vector3D.GetVnlVector(), "mitk vector assigned to vnl_vector_fixed")
+  MITK_TEST_CONDITION( vnlVectorFixed == vector3D.GetVnlVector(),   "mitk::Vector assigned to vnl_vector_fixed")
   MITK_TEST_CONDITION( EqualArray(vnlVectorFixed, valuesToCopy, 3), "correct values were assigned" )
 }
 
@@ -193,8 +194,8 @@ static void Test_mitk2vnlfixed_DifferentType(void)
 
   vnlVectorFixed = vector3D;
 
-  MITK_TEST_CONDITION( EqualArray(vnlVectorFixed, vector3D, 3, vnl_math::float_eps * 10.0), "mitk vector double assigned to vnl_vector_fixed float")
-  MITK_TEST_CONDITION( EqualArray(vnlVectorFixed, valuesToCopy, 3, vnl_math::float_eps * 10.0), "correct values were assigned" )
+  MITK_TEST_CONDITION( EqualArray(vnlVectorFixed, vector3D,     3, epsDouble2Float), "mitk::Vector<double> assigned to vnl_vector_fixed<float>")
+  MITK_TEST_CONDITION( EqualArray(vnlVectorFixed, valuesToCopy, 3, epsDouble2Float), "correct values were assigned" )
 }
 
 
@@ -207,21 +208,21 @@ static void Test_vnl2mitk(void)
 
   vector3D = vnlVector;
 
-  MITK_TEST_CONDITION( vector3D.GetVnlVector() == vnlVector, "vnl_vector assigned to mitk vector")
-  MITK_TEST_CONDITION( vector3D == valuesToCopy, "correct values were assigned" )
+  MITK_TEST_CONDITION( vector3D.GetVnlVector() == vnlVector, "vnl_vector assigned to mitk::Vector")
+  MITK_TEST_CONDITION( vector3D == valuesToCopy,             "correct values were assigned" )
 }
 
 static void Test_vnl2mitk_DifferentType(void)
 {
 
-  mitk::Vector<double, 3> vector3D = originalValues;
-  vnl_vector<float> vnlVector(3);
-  vnlVector.set(valuesToCopyFloat);
+  mitk::Vector<float, 3> vector3F = originalValuesFloat;
+  vnl_vector<double> vnlVector(3);
+  vnlVector.set(valuesToCopy);
 
-  vector3D = vnlVector;
+  vector3F = vnlVector;
 
-  MITK_TEST_CONDITION( EqualArray(vector3D, vnlVector, 3, vnl_math::float_eps * 10.0), "vnl_vector float assigned to mitk vector double")
-  MITK_TEST_CONDITION( EqualArray(vector3D, valuesToCopy, 3,  vnl_math::float_eps * 10.0), "correct values were assigned" )
+  MITK_TEST_CONDITION( EqualArray(vector3F, vnlVector,    3, epsDouble2Float), "vnl_vector<double> assigned to mitk::Vector<float>")
+  MITK_TEST_CONDITION( EqualArray(vector3F, valuesToCopy, 3, epsDouble2Float), "correct values were assigned" )
 }
 
 static void Test_mitk2vnl(void)
@@ -232,7 +233,7 @@ static void Test_mitk2vnl(void)
 
   vnlVector = vector3D;
 
-  MITK_TEST_CONDITION( vnlVector == vector3D.GetVnlVector(), "mitk vector assigned to vnlVector")
+  MITK_TEST_CONDITION( vnlVector == vector3D.GetVnlVector(),   "mitk::Vector assigned to vnl_vector")
   MITK_TEST_CONDITION( EqualArray(vnlVector, valuesToCopy, 3), "correct values were assigned" )
 }
 
@@ -244,8 +245,8 @@ static void Test_mitk2vnl_DifferentType(void)
 
   vnlVector = vector3D;
 
-  MITK_TEST_CONDITION( EqualArray(vnlVector, vector3D, 3, vnl_math::float_eps * 10.0), "mitk vector double assigned to vnlVector float")
-  MITK_TEST_CONDITION( EqualArray(vnlVector, valuesToCopy, 3, vnl_math::float_eps * 10.0), "correct values were assigned" )
+  MITK_TEST_CONDITION( EqualArray(vnlVector, vector3D,     3, epsDouble2Float), "mitk::Vector<double> assigned to vnl_vector<float>")
+  MITK_TEST_CONDITION( EqualArray(vnlVector, valuesToCopy, 3, epsDouble2Float), "correct values were assigned" )
 }
 
 

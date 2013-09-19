@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ui_QmitkSurfaceToImageWidgetControls.h>
 
 #include <mitkSurface.h>
-#include <mitkLabelSetImage.h>
 
 /*!
   \brief QmitkSurfaceToImageWidget
@@ -55,6 +54,9 @@ private:
 
   /** @brief Enable buttons if data selction is valid. */
   void EnableButtons(bool enable = true);
+
+  /** @brief Convert a surface into an binary image. */
+  mitk::Image::Pointer ConvertSurfaceToImage( mitk::Image::Pointer image, mitk::Surface::Pointer surface );
 
   Ui::QmitkSurfaceToImageWidgetControls m_Controls;
 };

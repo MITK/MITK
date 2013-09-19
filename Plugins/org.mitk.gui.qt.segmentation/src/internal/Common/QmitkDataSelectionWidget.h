@@ -34,7 +34,7 @@ class QmitkDataSelectionWidget : public QWidget
   Q_OBJECT
 
 public:
-  enum PredicateType
+  enum Predicate
   {
     ImagePredicate,
     SegmentationPredicate,
@@ -44,14 +44,14 @@ public:
   explicit QmitkDataSelectionWidget(QWidget* parent = NULL);
   ~QmitkDataSelectionWidget();
 
-  unsigned int AddDataStorageComboBox(PredicateType predicate);
+  unsigned int AddDataStorageComboBox(Predicate predicate);
   unsigned int AddDataStorageComboBox(mitk::NodePredicateBase* predicate = NULL);
-  unsigned int AddDataStorageComboBox(const QString &labelText, PredicateType predicate);
+  unsigned int AddDataStorageComboBox(const QString &labelText, Predicate predicate);
   unsigned int AddDataStorageComboBox(const QString &labelText, mitk::NodePredicateBase* predicate = NULL);
 
   mitk::DataStorage::Pointer GetDataStorage() const;
   mitk::DataNode::Pointer GetSelection(unsigned int index);
-  void SetPredicate(unsigned int index, PredicateType predicate);
+  void SetPredicate(unsigned int index, Predicate predicate);
   void SetPredicate(unsigned int index, mitk::NodePredicateBase* predicate);
   void SetHelpText(const QString& text);
 

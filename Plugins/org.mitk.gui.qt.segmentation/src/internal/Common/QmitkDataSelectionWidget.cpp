@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIDataStorageService.h>
 #include <mitkImage.h>
 #include <mitkNodePredicateAnd.h>
-#include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
@@ -31,41 +30,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <cassert>
 #include <iterator>
 
-static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget::PredicateType predicateType)
+static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget::Predicate predicate)
 {
-  mitk::NodePredicateAnd::Pointer m_SegmentationPredicate = mitk::NodePredicateAnd::New();
-  m_SegmentationPredicate->AddPredicate(mitk::NodePredicateDataType::New("LabelSetImage"));
-  m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
-
-  mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
-  mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
-  mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
-
-  mitk::NodePredicateOr::Pointer validImages = mitk::NodePredicateOr::New();
-  validImages->AddPredicate( mitk::TNodePredicateDataType<mitk::Image>::New() );
-  validImages->AddPredicate(isDwi);
-  validImages->AddPredicate(isDti);
-  validImages->AddPredicate(isQbi);
-
-  mitk::NodePredicateAnd::Pointer m_ImagePredicate = mitk::NodePredicateAnd::New();
-  m_ImagePredicate->AddPredicate(validImages);
-  m_ImagePredicate->AddPredicate(mitk::NodePredicateNot::New( m_SegmentationPredicate));
-  m_ImagePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
-
-  mitk::NodePredicateAnd::Pointer m_SurfacePredicate = mitk::NodePredicateAnd::New();
-  m_SurfacePredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::Surface>::New());
-  m_SurfacePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
-
-  switch(predicateType)
+  switch(predicate)
   {
     case QmitkDataSelectionWidget::ImagePredicate:
-      return m_ImagePredicate.GetPointer();
+      return mitk::NodePredicateAnd::New(
+        mitk::NodePredicateAnd::New(mitk::TNodePredicateDataType<mitk::Image>::New(),
+                               mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true)))),
+        mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
 
     case QmitkDataSelectionWidget::SegmentationPredicate:
-      return m_SegmentationPredicate.GetPointer();
+      return mitk::NodePredicateAnd::New(
+        mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true)),
+        mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
 
     case QmitkDataSelectionWidget::SurfacePredicate:
-      return m_SurfacePredicate.GetPointer();
+      return mitk::NodePredicateAnd::New(
+        mitk::TNodePredicateDataType<mitk::Surface>::New(),
+        mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
 
     default:
       assert(false && "Unknown predefined predicate!");
@@ -84,7 +67,7 @@ QmitkDataSelectionWidget::~QmitkDataSelectionWidget()
 {
 }
 
-unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(QmitkDataSelectionWidget::PredicateType predicate)
+unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(QmitkDataSelectionWidget::Predicate predicate)
 {
   return this->AddDataStorageComboBox("", predicate);
 }
@@ -94,7 +77,7 @@ unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(mitk::NodePredicat
   return this->AddDataStorageComboBox("", predicate);
 }
 
-unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(const QString &labelText, QmitkDataSelectionWidget::PredicateType predicate)
+unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(const QString &labelText, QmitkDataSelectionWidget::Predicate predicate)
 {
   return this->AddDataStorageComboBox(labelText, CreatePredicate(predicate));
 }
@@ -134,7 +117,7 @@ mitk::DataNode::Pointer QmitkDataSelectionWidget::GetSelection(unsigned int inde
   return m_DataStorageComboBoxes[index]->GetSelectedNode();
 }
 
-void QmitkDataSelectionWidget::SetPredicate(unsigned int index, PredicateType predicate)
+void QmitkDataSelectionWidget::SetPredicate(unsigned int index, Predicate predicate)
 {
   this->SetPredicate(index, CreatePredicate(predicate));
 }

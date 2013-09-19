@@ -157,7 +157,7 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
     resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
     resultNode->SetProperty("binary", mitk::BoolProperty::New(false) );
     mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-    renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW );
+    renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
     resultNode->SetProperty("Image Rendering.Mode", renderingMode);
 
     mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
@@ -194,4 +194,4 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
   {
     MITK_ERROR(this->GetClassName()) << err.what();
   }
-  }
+}

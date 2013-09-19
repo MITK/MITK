@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>335</width>
-    <height>357</height>
+    <width>295</width>
+    <height>591</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -36,7 +36,13 @@
   <property name="windowTitle">
    <string>QmitkSegmentation</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout_6">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetMinimumSize</enum>
+   </property>
+   <property name="margin">
+    <number>6</number>
+   </property>
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="sizePolicy">
@@ -53,7 +59,7 @@
        <number>6</number>
       </property>
       <item>
-       <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0">
+       <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0">
         <property name="sizeConstraint">
          <enum>QLayout::SetMinimumSize</enum>
         </property>
@@ -86,8 +92,28 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="2">
+         <widget class="QToolButton" name="btnNewSegmentation">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>Create a new segmentation</string>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../resources/segmentation.qrc">
+            <normaloff>:/segmentation/btnNew.png</normaloff>:/segmentation/btnNew.png</iconset>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="1">
-         <widget class="QmitkDataStorageComboBox" name="m_cbWorkingNodeSelector">
+         <widget class="QmitkDataStorageComboBox" name="segImageSelector">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -97,7 +123,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QmitkDataStorageComboBox" name="m_cbReferenceNodeSelector">
+         <widget class="QmitkDataStorageComboBox" name="patImageSelector">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -216,13 +242,13 @@
         <property name="text">
          <string>Please load an image!</string>
         </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>
     </widget>
-   </item>
-   <item>
-    <widget class="QmitkLabelSetWidget" name="m_LabelSetWidget" native="true"/>
    </item>
    <item>
     <widget class="QTabWidget" name="tabWidgetSegmentationTools">
@@ -417,12 +443,6 @@
    <extends>QWidget</extends>
    <header location="global">QmitkToolGUIArea.h</header>
   </customwidget>
-  <customwidget>
-   <class>QmitkLabelSetWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">internal/Common/QmitkLabelSetWidget.h</header>
-   <container>1</container>
-  </customwidget>
  </customwidgets>
  <includes>
   <include location="global">QmitkToolReferenceDataSelectionBox.h</include>
@@ -432,7 +452,6 @@
  </includes>
  <resources>
   <include location="../../resources/segmentation.qrc"/>
-  <include location="../../../../../mitk-master2/Plugins/org.mitk.gui.qt.segmentation/resources/segmentation.qrc"/>
  </resources>
  <connections/>
 </ui>

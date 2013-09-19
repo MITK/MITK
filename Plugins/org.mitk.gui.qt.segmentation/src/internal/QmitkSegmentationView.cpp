@@ -437,6 +437,7 @@ void QmitkSegmentationView::NodeAdded(const mitk::DataNode *node)
     m_BinaryPropertyObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( const_cast<mitk::DataNode*>(node), node->GetProperty("binary")->AddObserver( itk::ModifiedEvent(), command2 ) ) );
 
     this->ApplyDisplayOptions(  const_cast<mitk::DataNode*>(node) );
+    m_Controls->segImageSelector->setCurrentIndex( m_Controls->segImageSelector->Find(node) );
   }
 }
 

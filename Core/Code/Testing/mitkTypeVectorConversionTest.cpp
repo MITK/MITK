@@ -108,21 +108,6 @@ static void Test_mitk2mitk_DifferentType(void)
   MITK_TEST_CONDITION(EqualArray(floatVector3D, valuesToCopy, 3, vnl_math::float_eps * 10.0), "correct values were assigned within float accuracy")
 }
 
-static void Test_mitk2mitk_ShorterVectorAssigned(void)
-{
-  mitk::Vector3D vector3D = originalValues;
-  mitk::Vector2D vector2D = valuesToCopy;
-
-  vector3D = vector2D;
-
-  bool firstTwoElementsCopied = EqualArray(vector3D, vector2D, 2);
-  bool lastElementIsUntouched = (vector3D[2] == originalValues[2]);
-
-  MITK_TEST_CONDITION(firstTwoElementsCopied, "shorter mitk vector correctly assigned to mitk vector: first two elements were copied" )
-  MITK_TEST_CONDITION(lastElementIsUntouched, "shorter mitk vector correctly assigned to mitk vector: last element was untoched")
-
-}
-
 static void Test_itk2mitk(void)
 {
   Vector3D vector3D = originalValues;
@@ -239,43 +224,6 @@ static void Test_vnl2mitk_DifferentType(void)
   MITK_TEST_CONDITION( EqualArray(vector3D, valuesToCopy, 3,  vnl_math::float_eps * 10.0), "correct values were assigned" )
 }
 
-/**
- * tests if constructing a mitk::Vector using a shorter in size vnl_vector is handled properly.
- * Attention:
- * say you have a mitk::Vector holding {1, 2, 3}.
- * Now you assign a vnl_vector holdin {4, 5}.
- *
- * The result will be {4, 5, 0}, not {4, 5, 3}
- */
-static void Test_vnl2mitk_ShorterVectorInConstructor(void)
-{
-  vnl_vector<ScalarType> vnlVector(2);
-  vnlVector.set(valuesToCopy);
-
-  mitk::Vector3D vector3D = vnlVector;
-
-  bool firstTwoElementsCopied = EqualArray(vector3D, vnlVector, 2);
-  bool lastElementIs0 = (vector3D[2] == 0.0);
-
-  MITK_TEST_CONDITION(
-      firstTwoElementsCopied && lastElementIs0, "shorter vnl vector correctly copied to mitk vector" )
-}
-
-//static void Test_vnl2mitk_ShorterVectorAssigned()
-//{
-//  mitk::Vector3D vector3D = originalValues;
-//  vnl_vector<ScalarType> vnlVector(2);
-//  vnlVector.set(valuesToCopy);
-//
-//  vector3D = vnlVector;
-//
-//  bool firstTwoElementsCopied = EqualArray(vector3D, vnlVector, 2);
-//  bool lastElementUnchanged = (vector3D[2] == originalValues[2]);
-//
-//  MITK_TEST_CONDITION(
-//      firstTwoElementsCopied && lastElementUnchanged, "shorter vnl vector correctly assigned to mitk vector" )
-//}
-
 static void Test_mitk2vnl(void)
 {
   vnl_vector<ScalarType> vnlVector(3);
@@ -301,32 +249,37 @@ static void Test_mitk2vnl_DifferentType(void)
 }
 
 
-
-
 /**
- * tests if constructing a mitk::Vector using a large in size vnl_vector is handled properly
+ * tests if constructing a mitk::Vector using a too large in size vnl_vector is handled properly.
+ * Meaning: Exception is thrown.
  */
-static void Test_vnl2mitk_LargerVectorConstructor()
+static void Test_vnl2mitk_WrongVnlVectorSize()
 {
   ScalarType largerValuesToCopy[] = {4.12345678910, 5.10987654321, 6.123456789132456, 7.123456987789456};
   mitk::Vector3D vector3D = originalValues;
   vnl_vector<ScalarType> vnlVector(4);
   vnlVector.set(largerValuesToCopy);
 
-  vector3D = vnlVector;
+  MITK_TEST_FOR_EXCEPTION(mitk::Exception&, vector3D = vnlVector;)
 
-  MITK_TEST_CONDITION(EqualArray(vector3D, largerValuesToCopy, 3), "larger vnl vector correctly assigned to mitk vector" )
 }
 
 
 
 /**
-* Test the conversions from and to the mitk vector type
+* @brief Test the conversions from and to the mitk::Vector type.
+*
+* Tests for every conversion, if it can be done and in a second test, if the assignment of a
+* different type succeeds. E.g., assign a double vnl_vector to a float mitk::Vector
+* In cases where the size can not be determined during compile time it is checked if the assignment of
+* a differently sized vector yields an error.
 */
 int mitkTypeVectorConversionTest(int /*argc*/ , char* /*argv*/[])
 {
   // always start with this!
   MITK_TEST_BEGIN("VectorConversionTest")
+
+  Test_mitk2mitk_DifferentType();
 
   Test_pod2mitk();
   Test_pod2mitk_DifferentType();
@@ -336,9 +289,6 @@ int mitkTypeVectorConversionTest(int /*argc*/ , char* /*argv*/[])
 
   Test_oneElement2mitk();
   Test_oneElement2mitk_DifferentType();
-
-  Test_mitk2mitk_DifferentType();
-  Test_mitk2mitk_ShorterVectorAssigned();
 
   Test_itk2mitk();
   Test_itk2mitk_DifferentType();
@@ -354,9 +304,7 @@ int mitkTypeVectorConversionTest(int /*argc*/ , char* /*argv*/[])
 
   Test_vnl2mitk();
   Test_vnl2mitk_DifferentType();
-  Test_vnl2mitk_ShorterVectorInConstructor();
-  //Test_vnl2mitk_ShorterVectorAssigned();
-  Test_vnl2mitk_LargerVectorConstructor();
+  Test_vnl2mitk_WrongVnlVectorSize();
 
   Test_mitk2vnl();
   Test_mitk2vnl_DifferentType();

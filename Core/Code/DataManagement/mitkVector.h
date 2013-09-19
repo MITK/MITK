@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTypeBasics.h"
 #include "mitkLogMacros.h"
+#include "mitkExceptionMacro.h"
 
 namespace mitk
 {
@@ -86,39 +87,19 @@ namespace mitk
     /**
      * @brief Constructor for vnl_vectors.
      * Can convert non-identical coordinate representations.
-     * @attention vnlVector should have same size as NVectorDimension, otherwise
-     * @attention 1. elements will be lost in case vnlVector is bigger.
-     * @attention 2. elements will be set to 0 in case this is bigger.
-     * @attention In both cases, MITK_WARN warnings will be issued.
+     * @throws mitk::Exception if vnl_vector.size() != NVectorDimension.
      */
     template <typename TOtherCoordRep>
     Vector<TCoordRep, NVectorDimension>(const vnl_vector<TOtherCoordRep>& vnlVector)
             : itk::Vector<TCoordRep, NVectorDimension>()
     {
-      this->Fill(0);
-
-      if (vnlVector.size() < NVectorDimension)
-        MITK_WARN << "Attention: conversion of vnl_vector to mitk::Vector:"
-                  << "the mitk::Vector has more elements than the vnl_vector. Remaining elements will be set to 0.";
-
-      if (NVectorDimension < vnlVector.size())
-        MITK_WARN << "Attention: conversion of vnl_vector to mitk::Vector:"
-                  << "the vnl_vector has more elements than the mitk::Vector. vnlVector[NVectorDimension .. vnlVector.size()] will be lost.";
+      if (vnlVector.size() != NVectorDimension)
+        mitkThrow() << "when constructing mitk::Vector from vnl_vector: sizes didn't match: mitk::Vector " << NVectorDimension << "vnl_vector " << vnlVector.size();
 
       for (int var = 0; (var < NVectorDimension) && (var < vnlVector.size()); ++var) {
         this->SetElement(var, static_cast<TCoordRep>(vnlVector.get(var)));
       }
     }
-
-    template <unsigned int NOtherVectorDimension>
-    Vector<TCoordRep, NVectorDimension>& operator=(const Vector<TCoordRep, NOtherVectorDimension>& otherVector)
-    {
-      for (int var = 0; (var < NVectorDimension) && (var < NOtherVectorDimension); ++var) {
-        this->SetElement(var, static_cast<TCoordRep>(otherVector[var]));
-      }
-      return *this;
-    }
-
 
     /**
      * @brief Convert a vnl_vector_fixed to a mitk::Vector of the same size.

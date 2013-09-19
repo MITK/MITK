@@ -67,7 +67,7 @@ void mitk::USVideoDevice::Init()
 }
 
 std::string mitk::USVideoDevice::GetDeviceClass(){
-  return "org.mitk.modules.us.USVideoDevice";
+  return mitk::USVideoDevice::DeviceClassIdentifier;
 }
 
 mitk::USAbstractControlInterface::Pointer mitk::USVideoDevice::GetControlInterfaceCustom()

@@ -129,7 +129,7 @@ const char** mitk::LiveWireTool2D::GetXPM() const
 
 const char* mitk::LiveWireTool2D::GetName() const
 {
-  return "LiveWire";
+  return "Live Wire";
 }
 
 

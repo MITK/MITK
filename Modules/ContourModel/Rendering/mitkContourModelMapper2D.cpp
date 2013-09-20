@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkStripper.h>
 #include <vtkTubeFilter.h>
 #include <vtkSphereSource.h>
+#include <mitkCoreServices.h>
+#include <mitkPropertyAliases.h>
 
 
 mitk::ContourModelMapper2D::ContourModelMapper2D()
@@ -344,16 +346,10 @@ void mitk::ContourModelMapper2D::ApplyContourProperties(mitk::BaseRenderer* rend
     localStorage->m_Actor->GetProperty()->SetLineWidth(lineWidth);
   }
 
-  mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("color", renderer));
-  if(colorprop)
-  {
-    //set the color of the contour
-    double red = colorprop->GetColor().GetRed();
-    double green = colorprop->GetColor().GetGreen();
-    double blue = colorprop->GetColor().GetBlue();
-    localStorage->m_Actor->GetProperty()->SetColor(red, green, blue);
-  }
+  float color[3];
+  this->GetDataNode()->GetColor(color, renderer);
 
+  localStorage->m_Actor->GetProperty()->SetColor(color[0], color[1], color[2]);
 
   //make sure that directional lighting isn't used for our contour
   localStorage->m_Actor->GetProperty()->SetAmbient(1.0);
@@ -387,6 +383,13 @@ void mitk::ContourModelMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk
   node->AddProperty( "width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
   node->AddProperty( "use cutting plane", mitk::BoolProperty::New( true ), renderer, overwrite );
   node->AddProperty( "subdivision curve", mitk::BoolProperty::New( false ), renderer, overwrite );
+
+  IPropertyAliases* aliases = CoreServices::GetPropertyAliases();
+
+  if(aliases != NULL)
+  {
+    aliases->AddAlias("color", "contour.color", "ContourModel");
+  }
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

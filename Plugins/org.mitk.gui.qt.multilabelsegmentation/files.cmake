@@ -5,6 +5,9 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkMultiLabelSegmentationView.cpp
+  QmitkThresholdAction.cpp
+  QmitkCreatePolygonModelAction.cpp
+  QmitkAutocropAction.cpp
   Common/QmitkLabelSetWidget.cpp
   Common/QmitkDataSelectionWidget.cpp
   SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesView.cpp
@@ -24,6 +27,9 @@ set(MOC_H_FILES
   src/QmitkMultiLabelSegmentationPreferencePage.h
   src/internal/mitkPluginActivator.h
   src/internal/QmitkMultiLabelSegmentationView.h
+  src/internal/QmitkThresholdAction.h
+  src/internal/QmitkCreatePolygonModelAction.h
+  src/internal/QmitkAutocropAction.h
   src/internal/Common/QmitkLabelSetWidget.h
   src/internal/Common/QmitkDataSelectionWidget.h
   src/internal/SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesView.h

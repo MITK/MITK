@@ -16,6 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPluginActivator.h"
 
 #include "QmitkMultiLabelSegmentationView.h"
+#include "QmitkThresholdAction.h"
+#include "QmitkCreatePolygonModelAction.h"
+#include "QmitkAutocropAction.h"
 #include "QmitkMultiLabelSegmentationPreferencePage.h"
 #include "SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesView.h"
 
@@ -24,6 +27,9 @@ using namespace mitk;
 void PluginActivator::start(ctkPluginContext *context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkThresholdAction, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkCreatePolygonModelAction, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkAutocropAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationUtilitiesView, context)
 }

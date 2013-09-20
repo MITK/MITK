@@ -27,4 +27,10 @@
     <keyword id="org.mitk.gui.qt.application.MultiLabelSegmentationPreferencePageKeywords" label="data manager"></keyword>
   </extension>
 
+  <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
+    <contextMenuAction nodeDescriptorName="ImageMask" label="Create polygon model" icon="" smoothed="false" class="QmitkCreatePolygonModelAction" />
+    <contextMenuAction nodeDescriptorName="ImageMask" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />
+    <contextMenuAction nodeDescriptorName="ImageMask" label="Autocrop" icon="" class="QmitkAutocropAction" />
+  </extension>
+
 </plugin>

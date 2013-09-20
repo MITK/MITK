@@ -53,16 +53,10 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* rendering
     //apply color and opacity read from the PropertyList
     ApplyProperties(renderer);
 
-    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("contour.color", renderer));
+    float color[3];
+    this->GetDataNode()->GetColor(color,renderer);
 
-    if(colorprop)
-    {
-      //set the color of the contour
-      double red = colorprop->GetColor().GetRed();
-      double green = colorprop->GetColor().GetGreen();
-      double blue = colorprop->GetColor().GetBlue();
-      glColor4f(red,green,blue,0.5);
-    }
+    glColor4f(color[0],color[1],color[2],0.5);
 
     mitk::ColorProperty::Pointer selectedcolor = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("contour.points.color", renderer));
     if(!selectedcolor)
@@ -194,7 +188,7 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* rendering
               glEnd();
               glLineWidth(1);
               //the actual point in the specified color to see the usual color of the point
-              glColor3f(colorprop->GetColor().GetRed(),colorprop->GetColor().GetGreen(),colorprop->GetColor().GetBlue());
+              glColor3f(color[0],color[1],color[2]);
               glPointSize(1);
               glBegin (GL_POINTS);
               tmp=pt2d;             glVertex2fv(&tmp[0]);
@@ -224,7 +218,7 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* rendering
           glEnd();
           glLineWidth(1);
           //the actual point in the specified color to see the usual color of the point
-          glColor3f(colorprop->GetColor().GetRed(),colorprop->GetColor().GetGreen(),colorprop->GetColor().GetBlue());
+          glColor3f(color[0],color[1],color[2]);
           glPointSize(1);
           glBegin (GL_POINTS);
           tmp=pt2d;             glVertex2fv(&tmp[0]);

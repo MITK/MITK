@@ -35,9 +35,7 @@ mitk::SetRegionTool::SetRegionTool()
   CONNECT_ACTION( 80, OnMousePressed );
   //CONNECT_ACTION( 90, OnMouseMoved );
   CONNECT_ACTION( 42, OnMouseReleased );
-//  CONNECT_ACTION( 49014, OnInvertLogic );
   CONNECT_ACTION( 91, OnChangeActiveLabel );
-
 }
 
 mitk::SetRegionTool::~SetRegionTool()
@@ -160,7 +158,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
 */
   ipMITKSegmentationTYPE* data = static_cast<ipMITKSegmentationTYPE*>(originalPicSlice->data);
 
-  if ( data[oneContourOffset] != activeLabel ) // initial seed 0
+  if ( data[oneContourOffset] != activeLabel ) // ) // initial seed 0
   {
     for ( ; oneContourOffset < size; ++oneContourOffset )
     {
@@ -173,7 +171,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     bool inSeg = true;    // inside segmentation?
     for ( ; oneContourOffset < size; ++oneContourOffset )
     {
-      if ( ( data[oneContourOffset] != activeLabel ) && inSeg ) // pixel 0 and inside-flag set: this happens at the first pixel outside a filled region
+      if ( (data[oneContourOffset] != activeLabel) && inSeg ) // pixel 0 and inside-flag set: this happens at the first pixel outside a filled region
       {
         inSeg = false;
         lastValidPixel = oneContourOffset - 1; // store the last pixel position inside a filled region
@@ -183,7 +181,6 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
       {
         inSeg = true; // first iteration lands here
       }
-
     }
     oneContourOffset = lastValidPixel;
   }
@@ -317,36 +314,3 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
 
   return true;
 }
-
-/**
-  Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0.
-*/
-/*
-bool mitk::SetRegionTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
-{
-
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
-
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
-
-  if (m_StatusFillWholeSlice)
-  {
-    // use contour extracted from image data
-//    if (m_SegmentationContourInWorldCoordinates.IsNotNull())
-  //    FeedbackContourTool::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
-    mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
-  }
-  else
-  {
-    // use some artificial contour
-    if (m_WholeImageContourInWorldCoordinates.IsNotNull())
-      FeedbackContourTool::SetFeedbackContour( *m_WholeImageContourInWorldCoordinates );
-    mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
-  }
-
-  m_StatusFillWholeSlice = !m_StatusFillWholeSlice;
-
-  return true;
-}
-*/

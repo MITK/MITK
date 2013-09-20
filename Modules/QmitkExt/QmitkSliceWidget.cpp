@@ -88,14 +88,7 @@ void QmitkSliceWidget::SetDataStorage(
 
 mitk::StandaloneDataStorage* QmitkSliceWidget::GetDataStorage()
 {
-  if (m_DataStorage.IsNotNull())
-  {
-    return m_DataStorage;
-  }
-  else
-  {
-    return NULL;
-  }
+  return m_DataStorage;
 }
 
 void QmitkSliceWidget::SetData(

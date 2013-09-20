@@ -149,8 +149,6 @@ void QmitkSegmentationView::Deactivated()
     m_Controls->m_ManualToolSelectionBox3D->setEnabled( false );
     //deactivate all tools
     mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
-//    m_Controls->m_OrganToolSelectionBox->setEnabled( false );
-//    m_Controls->m_LesionToolSelectionBox->setEnabled( false );
     m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
 
     //Removing all observers
@@ -326,14 +324,6 @@ void QmitkSegmentationView::CreateNewSegmentation()
             emptySegmentation->SetSelected(true);
             this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
-            itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-            command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);
-            m_WorkingDataObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( emptySegmentation, emptySegmentation->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command ) ) );
-
-            itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command2 = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-            command2->SetCallbackFunction(this, &QmitkSegmentationView::OnBinaryPropertyChanged);
-            m_BinaryPropertyObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( emptySegmentation, emptySegmentation->GetProperty("binary")->AddObserver( itk::ModifiedEvent(), command2 ) ) );
-
             this->ApplyDisplayOptions( emptySegmentation );
             this->FireNodeSelected( emptySegmentation );
             this->OnSelectionChanged( emptySegmentation );
@@ -364,9 +354,10 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
   bool selectedNodeIsVisible = selectedNode->IsVisible(mitk::BaseRenderer::GetInstance(
                                                          mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
 
-  if (m_Controls->tab2DTools->isVisible() && !selectedNodeIsVisible)
+  if (!selectedNodeIsVisible)
   {
     m_Controls->m_ManualToolSelectionBox2D->setEnabled(false);
+    m_Controls->m_ManualToolSelectionBox3D->setEnabled(false);
     m_Controls->m_SlicesInterpolator->setEnabled(false);
     this->UpdateWarningLabel("The selected segmentation is currently not visible!");
     mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
@@ -374,6 +365,7 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
   else
   {
     m_Controls->m_ManualToolSelectionBox2D->setEnabled(true);
+    m_Controls->m_ManualToolSelectionBox3D->setEnabled(true);
     m_Controls->m_SlicesInterpolator->setEnabled(true);
     this->UpdateWarningLabel("");
     //Trigger 3d interpolation is selected segmentation is visible again
@@ -445,6 +437,7 @@ void QmitkSegmentationView::NodeAdded(const mitk::DataNode *node)
     m_BinaryPropertyObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( const_cast<mitk::DataNode*>(node), node->GetProperty("binary")->AddObserver( itk::ModifiedEvent(), command2 ) ) );
 
     this->ApplyDisplayOptions(  const_cast<mitk::DataNode*>(node) );
+    m_Controls->segImageSelector->setCurrentIndex( m_Controls->segImageSelector->Find(node) );
   }
 }
 
@@ -710,16 +703,6 @@ void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
   nodes.push_back( node );
   this->OnSelectionChanged( nodes );
 }
-
-//void QmitkSegmentationView::OnSurfaceSelectionChanged()
-//{
-//  // if Image and Surface are selected, enable button
-//  if ( (m_Controls->patImageSelector->GetSelectedNode().IsNull()) ||
-//  (m_Controls->MaskSurfaces->GetSelectedNode().IsNull()))
-//    m_Controls->CreateSegmentationFromSurface->setEnabled(false);
-//  else
-//    m_Controls->CreateSegmentationFromSurface->setEnabled(true);
-//}
 
 void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {

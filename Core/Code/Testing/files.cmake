@@ -135,6 +135,7 @@ set(MODULE_CUSTOM_TESTS
     mitkPointSetVtkMapper2DTest.cpp
     mitkPointSetVtkMapper2DImageTest.cpp
     mitkPointSetVtkMapper2DGlyphTypeTest.cpp
+    mitkPointSetVtkMapper2DTransformedPointsTest.cpp
     mitkLabelOverlay3DRendering2DTest.cpp
     mitkLabelOverlay3DRendering3DTest.cpp
     mitkTextOverlay2DRenderingTest.cpp

@@ -78,6 +78,8 @@ void mitk::OtsuTool3D::Activated()
 
 void mitk::OtsuTool3D::Deactivated()
 {
+  Superclass::Deactivated();
+
   m_ToolManager->GetDataStorage()->Remove( this->m_MultiLabelResultNode );
   m_MultiLabelResultNode = NULL;
   m_ToolManager->GetDataStorage()->Remove( this->m_BinaryPreviewNode );

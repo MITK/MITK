@@ -100,9 +100,12 @@ void mitk::FastMarchingTool3D::SetSigma(double value)
 {
   if (m_Sigma != value)
   {
+    if(value > 0.0)
+    {
       m_Sigma = value;
       m_GradientMagnitudeFilter->SetSigma( m_Sigma );
       m_NeedUpdate = true;
+    }
   }
 }
 
@@ -338,6 +341,9 @@ void mitk::FastMarchingTool3D::Update()
   if (m_NeedUpdate)
   {
     m_ProgressCommand->AddStepsToDo(progress_steps);
+
+    //remove interaction with poinset while updating
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SeedPointInteractor);
     CurrentlyBusy.Send(true);
     try
     {
@@ -366,6 +372,9 @@ void mitk::FastMarchingTool3D::Update()
     m_ResultImageNode->SetData(result);
     m_ResultImageNode->SetVisibility(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+    //add interaction with poinset again
+    mitk::GlobalInteraction::GetInstance()->AddInteractor(m_SeedPointInteractor);
   }
 }
 
@@ -378,12 +387,26 @@ void mitk::FastMarchingTool3D::ClearSeeds()
 
   if(this->m_SeedsAsPointSet.IsNotNull())
   {
+    //remove observers from current pointset
+    m_SeedsAsPointSet->RemoveObserver(m_PointSetAddObserverTag);
+    m_SeedsAsPointSet->RemoveObserver(m_PointSetRemoveObserverTag);
+
+    //renew pointset
     this->m_SeedsAsPointSet = mitk::PointSet::New();
     this->m_SeedsAsPointSetNode->SetData(this->m_SeedsAsPointSet);
     m_SeedsAsPointSetNode->SetName("Seeds_Preview");
     m_SeedsAsPointSetNode->SetBoolProperty("helper object", true);
     m_SeedsAsPointSetNode->SetColor(0.0, 1.0, 0.0);
     m_SeedsAsPointSetNode->SetVisibility(true);
+
+    //add callback function for adding and removing points
+    itk::SimpleMemberCommand<mitk::FastMarchingTool3D>::Pointer pointAddedCommand = itk::SimpleMemberCommand<mitk::FastMarchingTool3D>::New();
+    pointAddedCommand->SetCallbackFunction(this, &mitk::FastMarchingTool3D::OnAddPoint);
+    m_PointSetAddObserverTag = m_SeedsAsPointSet->AddObserver( mitk::PointSetAddEvent(), pointAddedCommand);
+
+    itk::SimpleMemberCommand<mitk::FastMarchingTool3D>::Pointer pointRemovedCommand = itk::SimpleMemberCommand<mitk::FastMarchingTool3D>::New();
+    pointRemovedCommand->SetCallbackFunction(this, &mitk::FastMarchingTool3D::OnDelete);
+    m_PointSetRemoveObserverTag = m_SeedsAsPointSet->AddObserver( mitk::PointSetRemoveEvent(), pointRemovedCommand);
   }
 
   if(this->m_FastMarchingFilter.IsNotNull())

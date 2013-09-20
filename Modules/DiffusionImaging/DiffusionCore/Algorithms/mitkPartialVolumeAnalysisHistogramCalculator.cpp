@@ -566,6 +566,14 @@ namespace mitk
     m_InternalMask3D  =
         maskSO->GetAxisAlignedBoundingBoxRegion();
 
+    // check if bounding box is empty, if so set it to 1,1,1
+    // to prevent empty mask image
+    if (m_InternalMask3D.GetSize()[0] == 0 )
+    {
+      m_InternalMask3D.SetSize(0,1);
+      m_InternalMask3D.SetSize(1,1);
+      m_InternalMask3D.SetSize(2,1);
+    }
     MITK_DEBUG << "Bounding Box Region: " << m_InternalMask3D;
 
     typedef itk::RegionOfInterestImageFilter< ImageType, MaskImage3DType > ROIFilterType;

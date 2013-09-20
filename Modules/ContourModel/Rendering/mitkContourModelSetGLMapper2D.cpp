@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkContourModelSet.h"
 #include <vtkLinearTransform.h>
+#include <mitkCoreServices.h>
+#include <mitkPropertyAliases.h>
 
 #include "mitkGL.h"
 
@@ -89,14 +91,10 @@ void mitk::ContourModelSetGLMapper2D::DrawContour(mitk::ContourModel* renderingC
 
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("contour.color", renderer));
 
-    if(colorprop)
-    {
-      //set the color of the contour
-      double red = colorprop->GetColor().GetRed();
-      double green = colorprop->GetColor().GetGreen();
-      double blue = colorprop->GetColor().GetBlue();
-      glColor4f(red,green,blue,0.5);
-    }
+    float color[3];
+    this->GetDataNode()->GetColor(color, renderer);
+
+    glColor4f(color[0],color[1],color[2],0.5);
 
     mitk::ColorProperty::Pointer selectedcolor = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("contour.points.color", renderer));
     if(!selectedcolor)
@@ -362,7 +360,7 @@ void mitk::ContourModelSetGLMapper2D::DrawContour(mitk::ContourModel* renderingC
 
 void mitk::ContourModelSetGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "contour.color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite );
+  node->AddProperty( "color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite );
   node->AddProperty( "contour.points.color", ColorProperty::New(1.0, 0.0, 0.1), renderer, overwrite );
   node->AddProperty( "contour.points.show", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "contour.segments.show", mitk::BoolProperty::New( true ), renderer, overwrite );
@@ -374,6 +372,13 @@ void mitk::ContourModelSetGLMapper2D::SetDefaultProperties(mitk::DataNode* node,
   node->AddProperty( "contour.controlpoints.text", mitk::BoolProperty::New( false ), renderer, overwrite );
 
   node->AddProperty( "contour.project-onto-plane", mitk::BoolProperty::New( false ), renderer, overwrite );
+
+  IPropertyAliases* aliases = CoreServices::GetPropertyAliases();
+
+  if(aliases != NULL)
+  {
+    aliases->AddAlias("color", "contour.color", "ContourModelSet");
+  }
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

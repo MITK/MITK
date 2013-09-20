@@ -646,6 +646,14 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         for(unsigned int i=0; i<hc.size(); i++)
         {
           vnl_vector_fixed<double, 3> vect = hc[i]->DiffusionVector;
+          // since some protocols provide a gradient direction of (0,0,0) in their dicom files when isotropic diffusion is assumed,
+          // the nrrd compatible way of storing b-values is not possible, so in this case we overwrite
+          // the gradient direction to (1,1,1)
+          if (b_vals[i] == 0.0 && vect[0] == 0.0 && vect[1] == 0.0 && vect[2] ==0.0)
+          {
+            vect.fill(1.0);
+          }
+
           vect.normalize();
           vect *= sqrt(b_vals[i]/maxb);
           directions->push_back(vect);

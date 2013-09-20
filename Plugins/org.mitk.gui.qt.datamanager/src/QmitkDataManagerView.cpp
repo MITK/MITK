@@ -403,7 +403,20 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   confElem->GetAttribute("class", className);
   confElem->GetAttribute("smoothed", smoothed);
 
-  if(className == "QmitkStatisticsAction")
+  if(className == "QmitkCreatePolygonModelAction")
+  {
+    contextMenuAction->SetDataStorage(this->GetDataStorage());
+    if(smoothed == "false")
+    {
+      contextMenuAction->SetSmoothed(false);
+    }
+    else
+    {
+      contextMenuAction->SetSmoothed(true);
+    }
+    contextMenuAction->SetDecimated(m_SurfaceDecimation);
+  }
+  else if(className == "QmitkStatisticsAction")
   {
     contextMenuAction->SetFunctionality(this);
   }

@@ -351,13 +351,16 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
     return mitk::DataStorage::SetOfObjects::ConstPointer(mitk::DataStorage::SetOfObjects::New());  // return empty set
 
   mitk::BoolProperty::Pointer trueProp = mitk::BoolProperty::New(true);
-//  mitk::NodePredicateProperty::Pointer notBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(false));
+  mitk::NodePredicateProperty::Pointer notBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(false));
   mitk::NodePredicateProperty::Pointer hasLevelWindow = mitk::NodePredicateProperty::New("levelwindow", NULL);
 
   mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
   mitk::NodePredicateDataType::Pointer isDImage = mitk::NodePredicateDataType::New("DiffusionImage");
   mitk::NodePredicateDataType::Pointer isTImage = mitk::NodePredicateDataType::New("TensorImage");
   mitk::NodePredicateDataType::Pointer isQImage = mitk::NodePredicateDataType::New("QBallImage");
+  mitk::NodePredicateDataType::Pointer isLabelSetImage = mitk::NodePredicateDataType::New("LabelSetImage");
+  mitk::NodePredicateNot::Pointer notLabelSetImage = mitk::NodePredicateNot::New( isLabelSetImage );
+
   mitk::NodePredicateOr::Pointer predicateTypes = mitk::NodePredicateOr::New();
   predicateTypes->AddPredicate(isImage);
   predicateTypes->AddPredicate(isDImage);
@@ -365,7 +368,8 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
   predicateTypes->AddPredicate(isQImage);
 
   mitk::NodePredicateAnd::Pointer predicate = mitk::NodePredicateAnd::New();
-  //predicate->AddPredicate(notBinary);
+  predicate->AddPredicate(notBinary);
+  predicate->AddPredicate(notLabelSetImage);
   predicate->AddPredicate(hasLevelWindow);
   predicate->AddPredicate(predicateTypes);
 

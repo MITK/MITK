@@ -501,23 +501,23 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
 
       if(isOutlined)
       {
-          if ( localStorage->m_Actors->GetParts()->GetNumberOfItems() > 1 )
+        if ( localStorage->m_Actors->GetParts()->GetNumberOfItems() > 1 )
+        {
+          float rgb[3]= { 1.0f, 1.0f, 1.0f };
+          mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
+                                                                                      ("outline binary shadow color", renderer));
+          if(colorprop.IsNotNull())
           {
-                float rgb[3]= { 1.0f, 1.0f, 1.0f };
-                mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-                                                                                            ("outline binary shadow color", renderer));
-                if(colorprop.IsNotNull())
-                {
-                  memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
-                }
-                double rgbConv[3] = {(double)rgb[0], (double)rgb[1], (double)rgb[2]}; //conversion to double for VTK
-
-                vtkActor* contourShadowActor = dynamic_cast<vtkActor*> (localStorage->m_Actors->GetParts()->GetItemAsObject(0));
-                if (contourShadowActor)
-                {
-                    contourShadowActor->GetProperty()->SetColor(rgbConv);
-                }
+            memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
           }
+          double rgbConv[3] = {(double)rgb[0], (double)rgb[1], (double)rgb[2]}; //conversion to double for VTK
+
+          vtkActor* contourShadowActor = dynamic_cast<vtkActor*> (localStorage->m_Actors->GetParts()->GetItemAsObject(0));
+          if (contourShadowActor)
+          {
+              contourShadowActor->GetProperty()->SetColor(rgbConv);
+          }
+        }
       }
   }
   else
@@ -747,9 +747,9 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     }
     // PALETTE interpretation should be handled ok by RGB loading
   }
-/*
+
   bool isBinaryImage(false);
-  if ( ! node->GetBoolProperty("binary", isBinaryImage) )
+  if ( ( !node->GetBoolProperty("binary", isBinaryImage)) && (!dynamic_cast<mitk::LabelSetImage*>(node->GetData())) )
   {
     // ok, property is not set, use heuristic to determine if this
     // is a binary image
@@ -783,9 +783,6 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     }
     isBinaryImage = ( maxValue == min2ndValue && minValue == max2ndValue );
   }
-*/
-   bool isBinaryImage(false);
-   node->GetBoolProperty("binary", isBinaryImage);
 
   // some more properties specific for a binary...
   if (isBinaryImage)
@@ -796,7 +793,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     node->AddProperty( "binaryimage.selectedannotationcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
     node->AddProperty( "binaryimage.hoveringcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
     node->AddProperty( "binaryimage.hoveringannotationcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
-//    node->AddProperty( "binary", mitk::BoolProperty::New( true ), renderer, overwrite );
+    node->AddProperty( "binary", mitk::BoolProperty::New( true ), renderer, overwrite );
     node->AddProperty( "layer", mitk::IntProperty::New(10), renderer, overwrite);
     colormapProperty->SetValue(mitk::ColormapProperty::CM_LEGACYBINARY);
   }
@@ -804,7 +801,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   {
     node->AddProperty( "opacity", mitk::FloatProperty::New(0.7f), renderer, overwrite );
     node->AddProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer, overwrite );
-//    node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
+    node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
     node->AddProperty( "layer", mitk::IntProperty::New(100), renderer, overwrite);
 
     mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
@@ -819,7 +816,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   {
     node->AddProperty( "opacity", mitk::FloatProperty::New(1.0f), renderer, overwrite );
     node->AddProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer, overwrite );
-   // node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
+    node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
     node->AddProperty( "layer", mitk::IntProperty::New(0), renderer, overwrite);
     colormapProperty->SetValue(mitk::ColormapProperty::CM_BW);
 

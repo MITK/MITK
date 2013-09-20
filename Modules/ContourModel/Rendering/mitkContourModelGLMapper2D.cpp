@@ -86,7 +86,7 @@ mitk::ContourModel* mitk::ContourModelGLMapper2D::GetInput(void)
 
 void mitk::ContourModelGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "contour.color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite );
+  node->AddProperty( "color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite );
   node->AddProperty( "contour.points.color", ColorProperty::New(1.0, 0.0, 0.1), renderer, overwrite );
   node->AddProperty( "contour.points.show", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "contour.segments.show", mitk::BoolProperty::New( true ), renderer, overwrite );
@@ -99,6 +99,13 @@ void mitk::ContourModelGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mi
 
   node->AddProperty( "subdivision curve", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "contour.project-onto-plane", mitk::BoolProperty::New( false ), renderer, overwrite );
+
+  IPropertyAliases* aliases = CoreServices::GetPropertyAliases();
+
+  if(aliases != NULL)
+  {
+    aliases->AddAlias("color", "contour.color", "ContourModel");
+  }
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

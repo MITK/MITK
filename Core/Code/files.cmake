@@ -96,6 +96,7 @@ set(CPP_FILES
   Algorithms/mitkClippedSurfaceBoundsCalculator.cpp
   Algorithms/mitkExtractSliceFilter.cpp
   Algorithms/mitkConvert2Dto3DImageFilter.cpp
+  Algorithms/mitkPadImageFilter.cpp
   Controllers/mitkBaseController.cpp
   Controllers/mitkCallbackFromGUIThread.cpp
   Controllers/mitkCameraController.cpp

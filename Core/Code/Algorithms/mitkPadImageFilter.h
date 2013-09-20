@@ -18,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPADIMAGEFILTER_H_HEADER_INCLUDED
 #define MITKPADIMAGEFILTER_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
-#include "MitkExtExports.h"
 #include "mitkImageToImageFilter.h"
 #include "mitkImageTimeSelector.h"
 
@@ -36,7 +34,7 @@ namespace mitk {
  *
  * \ingroup Process
  */
-class MitkExt_EXPORT PadImageFilter : public ImageToImageFilter
+class MITK_CORE_EXPORT PadImageFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(PadImageFilter, ImageToImageFilter);

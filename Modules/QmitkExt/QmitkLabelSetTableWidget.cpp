@@ -777,6 +777,11 @@ void QmitkLabelSetTableWidget::OnSetOnlyActiveLabelVisible(bool value)
   m_AllVisible = false;
   this->m_LabelSetImage->SetAllLabelsVisible(m_AllVisible);
   this->m_LabelSetImage->SetLabelVisible( this->currentRow(), true);
+  this->BusyCursorOn();
+  const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(m_LabelSetImage->GetActiveLabelIndex(), true);
+  this->BusyCursorOff();
+  if (pos.GetVnlVector().max_value() > 0.0)
+    emit goToLabel(pos);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

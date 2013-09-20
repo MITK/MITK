@@ -44,6 +44,8 @@ public:
 
   void SetActiveLabel(int);
 
+  mitk::DataNode* GetActiveLabelSetNode();
+
   void SetPreferences( berry::IPreferences::Pointer prefs );
 
   void SetPredicate( mitk::NodePredicateBase* predicate );

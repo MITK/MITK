@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "MitkExports.h"
 #include <mitkLabelSet.h>
+#include <mitkSurface.h>
 
 #include <itkImage.h>
 
@@ -283,6 +284,10 @@ public:
     * \brief  */
   void ResetLabels();
 
+  void PasteSurfaceOnActiveLabel(mitk::Surface* surface, bool forceOverwrite);
+
+  void PasteMaskOnActiveLabel(mitk::Image* mask, bool forceOverwrite);
+
 protected:
   LabelSetImage();
   virtual ~LabelSetImage();
@@ -296,19 +301,22 @@ protected:
   LabelSetImage(mitk::Image::Pointer image);
 
   template < typename LabelSetImageType >
-  void CalculateCenterOfMassProcessing(LabelSetImageType * itkImage,int index);
+  void CalculateCenterOfMassProcessing(LabelSetImageType * input,int index);
 
   template < typename LabelSetImageType >
-  void ClearBufferProcessing(LabelSetImageType * itkImage);
+  void ClearBufferProcessing(LabelSetImageType * input);
 
   template < typename LabelSetImageType >
-  void EraseLabelProcessing(LabelSetImageType * itkImage, int index, bool reorder);
+  void EraseLabelProcessing(LabelSetImageType * input, int index, bool reorder);
 
   template < typename LabelSetImageType >
-  void MergeLabelsProcessing(LabelSetImageType * itkImage, int index);
+  void MergeLabelsProcessing(LabelSetImageType * input, int index);
 
   template < typename LabelSetImageType >
-  void ConcatenateProcessing(LabelSetImageType * itkImage1, mitk::LabelSetImage* other);
+  void ConcatenateProcessing(LabelSetImageType * input, mitk::LabelSetImage* other);
+
+  template < typename LabelSetImageType >
+  void PasteMaskOnActiveLabelProcessing(LabelSetImageType * input, mitk::Image* mask, bool forceOverwrite);
 
   mitk::LabelSet::Pointer m_LabelSet;
 };

@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegmentationObjectFactory.h"
 #include "mitkSegTool2D.h"
 #include "mitkPlanePositionManager.h"
+#include "mitkSurfaceToLabelFilter.h"
 
 // Qmitk
 #include "QmitkMultiLabelSegmentationOrganNamesHandling.cpp"
@@ -57,6 +58,18 @@ m_MouseCursorSet(false)
   m_SegmentationPredicate = mitk::NodePredicateAnd::New();
   m_SegmentationPredicate->AddPredicate(mitk::NodePredicateDataType::New("LabelSetImage"));
   m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+
+  m_SurfacePredicate = mitk::NodePredicateAnd::New();
+  m_SurfacePredicate->AddPredicate(mitk::NodePredicateDataType::New("Surface"));
+  m_SurfacePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+
+  mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
+  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+  mitk::NodePredicateAnd::Pointer isBinaryImage = mitk::NodePredicateAnd::New(isBinary, isImage);
+
+  m_MaskPredicate = mitk::NodePredicateAnd::New();
+  m_MaskPredicate->AddPredicate(isBinaryImage);
+  m_MaskPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
 
   mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
   mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
@@ -99,6 +112,12 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_LabelSetWidget->SetPreferences( this->GetPreferences() );
   m_Controls.m_LabelSetWidget->SetPredicate( m_SegmentationPredicate );
 
+  m_Controls.m_cbSurfaceNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.m_cbSurfaceNodeSelector->SetPredicate( m_SurfacePredicate );
+
+  m_Controls.m_cbMaskNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.m_cbMaskNodeSelector->SetPredicate( m_MaskPredicate );
+
   // all part of open source MITK
   m_Controls.m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
   m_Controls.m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer2D );
@@ -132,6 +151,9 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));
   //connect(m_Controls.m_SlicesInterpolator, SIGNAL(Signal3DInterpolationEnabled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
+
+  connect(m_Controls.m_pbSurfaceStamp, SIGNAL(clicked()), this, SLOT(OnSurfaceStamp()));
+  connect(m_Controls.m_pbMaskStamp, SIGNAL(clicked()), this, SLOT(OnMaskStamp()));
 
   m_Controls.m_LabelSetWidget->ReInit();
 }
@@ -348,92 +370,87 @@ void QmitkMultiLabelSegmentationView::OnGoToLabel(const mitk::Point3D& pos)
     m_IRenderWindowPart->SetSelectedPosition(pos);
 }
 
+void QmitkMultiLabelSegmentationView::OnMaskStamp()
+{
+  mitk::DataNode* maskNode = m_Controls.m_cbMaskNodeSelector->GetSelectedNode();
+
+  if (!maskNode)
+  {
+    QMessageBox::information( m_Parent, "Mask Stamp", "Please load and select a mask before starting some action.");
+    return;
+  }
+
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->ActivateTool(-1);
+
+  mitk::Image* mask = dynamic_cast<mitk::Image*>(maskNode->GetData() );
+  if ( !mask )
+  {
+    QMessageBox::information( m_Parent, "Mask Stamp", "Please load and select a mask before starting some action.");
+    return;
+  }
+
+  mitk::DataNode * workingNode = m_Controls.m_LabelSetWidget->GetActiveLabelSetNode();
+
+  if (!workingNode)
+  {
+   QMessageBox::information( m_Parent, "Mask Stamp", "Please load and select a segmentation before starting some action.");
+   return;
+  }
+
+  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
+
+  if (!lsImage)
+  {
+    QMessageBox::information( m_Parent, "Mask Stamp", "Please load and select a segmentation before starting some action.");
+    return;
+  }
+
+  lsImage->PasteMaskOnActiveLabel( mask, m_Controls.m_chkMaskStampOverwrite->isChecked() );
+
+  maskNode->SetVisibility(false);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+}
+
 void QmitkMultiLabelSegmentationView::OnSurfaceStamp()
 {
-    /*
-    mitk::DataNode* surfaceNode = m_Controls.m_SurfaceSelector->GetSelectedNode();
+  mitk::DataNode* surfaceNode = m_Controls.m_cbSurfaceNodeSelector->GetSelectedNode();
 
-    if (!surfaceNode)
-    {
-        QMessageBox::information( m_Parent, "MITK", "Please load and select a surface before starting some action.");
-        return;
-    }
+  if (!surfaceNode)
+  {
+    QMessageBox::information( m_Parent, "Surface Stamp", "Please load and select a surface before starting some action.");
+    return;
+  }
 
-    m_ToolManager->ActivateTool(-1);
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->ActivateTool(-1);
 
-    mitk::Surface* surface = dynamic_cast<mitk::Surface*>(surfaceNode->GetData() );
-    if ( !surface )
-    {
-        QMessageBox::information( m_Parent, "MITK", "Please load and select a surface before starting some action.");
-        return;
-    }
+  mitk::Surface* surface = dynamic_cast<mitk::Surface*>(surfaceNode->GetData() );
+  if ( !surface )
+  {
+    QMessageBox::information( m_Parent, "Surface Stamp", "Please load and select a surface before starting some action.");
+    return;
+  }
 
-    mitk::DataNode * segNode = m_Controls.m_LabelSetSelector->GetSelectedNode();
+  mitk::DataNode * workingNode = m_Controls.m_LabelSetWidget->GetActiveLabelSetNode();
 
-    if (!segNode)
-    {
-       QMessageBox::information( m_Parent, "MITK", "Please load and select a segmentation before starting some action.");
-       return;
-    }
+  if (!workingNode)
+  {
+   QMessageBox::information( m_Parent, "Surface Stamp", "Please load and select a segmentation before starting some action.");
+   return;
+  }
 
-    mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>( segNode->GetData() );
+  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
 
-    if (!lsImage)
-    {
-        QMessageBox::information( m_Parent, "MITK", "Please load and select a segmentation before starting some action.");
-        return;
-    }
+  if (!lsImage)
+  {
+    QMessageBox::information( m_Parent, "Surface Stamp", "Please load and select a segmentation before starting some action.");
+    return;
+  }
 
-    mitk::SurfaceToImageFilter::Pointer filter = mitk::SurfaceToImageFilter::New();
-    filter->SetInput( surface );
-    filter->SetImage( lsImage );
-    filter->MakeOutputBinaryOff();
-    filter->SetBackgroundValue( 0 );
-//    filter->SetOverwrite( m_Controls.m_chkOverwriteStamp->isChecked() );
-    filter->SetForegroundValue( lsImage->GetActiveLabelIndex() );
-   // filter->SetImage( image );
+  lsImage->PasteSurfaceOnActiveLabel( surface, m_Controls.m_chkSurfaceStampOverwrite->isChecked() );
 
-itk::ReceptorMemberCommand<QmitkImageSegmenterView>::Pointer command =
-itk::ReceptorMemberCommand<QmitkImageSegmenterView>::New();
-//    command->SetCallbackFunction(this, &QmitkDataManagerView::ProcessingCallback);
-
-    mitk::StatusBar::GetInstance()->DisplayText("Surface stamping is running in background...");
-
-    mitk::ProcessObserver::Pointer anyEventObserver = mitk::ProcessObserver::New();
-    anyEventObserver->AddObserver( itk::AnyEvent(), command );
-    filter->SetObserver(anyEventObserver);
-
-    try
-    {
-       filter->Update();
-    }
-    catch (itk::ExceptionObject & excep)
-    {
-     MITK_ERROR << "Exception caught: " << excep.GetDescription();
-     std::string msg = "Could not stamp surface. ";
-     msg += excep.GetDescription();
-     QMessageBox::warning(m_Parent, "MITK", msg.c_str());
-     mitk::ProgressBar::GetInstance()->Reset();
-     mitk::StatusBar::GetInstance()->DisplayText("");
-     return;
-    }
-
-    mitk::Image::Pointer resultImage = filter->GetOutput();
-
-    if (resultImage.IsNull() || resultImage->IsEmpty())
-    {
-       MITK_ERROR << "Could not stamp surface";
-       std::string msg = "Could not stamp surface";
-       QMessageBox::warning(m_Parent, "MITK", msg.c_str());
-       return;
-    }
-
-    //m_LabelSetNode->SetData(resultImage);
-   segNode->Update();
-
-    mitk::ProgressBar::GetInstance()->Reset();
-    mitk::StatusBar::GetInstance()->DisplayText("");
-
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    */
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

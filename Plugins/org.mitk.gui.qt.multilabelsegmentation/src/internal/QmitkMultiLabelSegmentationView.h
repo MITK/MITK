@@ -59,8 +59,6 @@ protected slots:
 
   void OnReferenceSelectionChanged(const mitk::DataNode* node);
 
-  void OnSurfaceStamp();
-
   void OnGoToLabel( const mitk::Point3D& pos );
 
   void OnManualTool2DSelected(int id);
@@ -68,6 +66,10 @@ protected slots:
   void OnShowMarkerNodes(bool);
 
   void OnTabWidgetChanged(int);
+
+  void OnSurfaceStamp();
+
+  void OnMaskStamp();
 
 protected:
 
@@ -107,6 +109,8 @@ protected:
 
   mitk::NodePredicateAnd::Pointer m_ReferencePredicate;
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
+  mitk::NodePredicateAnd::Pointer m_SurfacePredicate;
+  mitk::NodePredicateAnd::Pointer m_MaskPredicate;
 
   bool m_MouseCursorSet;
 };

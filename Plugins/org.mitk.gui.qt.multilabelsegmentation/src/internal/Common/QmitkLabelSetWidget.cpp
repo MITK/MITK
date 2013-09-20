@@ -132,6 +132,11 @@ void QmitkLabelSetWidget::SetPredicate( mitk::NodePredicateBase* predicate )
   m_Controls.m_cbWorkingNodeSelector->SetAutoSelectNewItems(true);
 }
 
+mitk::DataNode* QmitkLabelSetWidget::GetActiveLabelSetNode()
+{
+  return m_WorkingNode;
+}
+
 void QmitkLabelSetWidget::OnSegmentationSelectionChanged(const mitk::DataNode *node)
 {
   if (m_WorkingNode == node) return;

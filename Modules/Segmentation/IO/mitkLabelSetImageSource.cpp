@@ -14,9 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkLabelSetImageSource_CPP_
-#define __mitkLabelSetImageSource_CPP_
-
 #include "mitkLabelSetImageSource.h"
 #include "mitkLabelSetImage.h"
 
@@ -35,7 +32,6 @@ mitk::LabelSetImageSource::~LabelSetImageSource()
 {
 }
 
-
 itk::DataObject::Pointer mitk::LabelSetImageSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
     return OutputType::New().GetPointer();
@@ -52,5 +48,3 @@ itk::DataObject::Pointer mitk::LabelSetImageSource::MakeOutput( const DataObject
 }
 
 mitkBaseDataSourceGetOutputDefinitions(mitk::LabelSetImageSource)
-
-#endif //__mitkLabelSetImageSource_CPP_

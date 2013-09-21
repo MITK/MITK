@@ -292,6 +292,7 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
         _other->SetVisibility(false);
     }
     m_Controls.m_LabelSetWidget->setEnabled(true);
+//    m_Controls.m_SlicesInterpolator
   }
   else
   {

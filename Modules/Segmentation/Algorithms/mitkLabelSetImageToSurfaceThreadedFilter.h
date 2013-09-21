@@ -46,9 +46,10 @@ class Segmentation_EXPORT LabelSetImageToSurfaceThreadedFilter : public Segmenta
 
   private:
 
-     mitk::LabelSetImageToSurfaceFilter::Pointer m_Filter;
      mitk::ColorSequenceRainbow::Pointer m_ColorSequenceRainbow;
      int m_RequestedLabel;
+     Surface::Pointer m_ResultSurface;
+   //  std::stringstream m_ResultNodeName;
 };
 
 } // namespace

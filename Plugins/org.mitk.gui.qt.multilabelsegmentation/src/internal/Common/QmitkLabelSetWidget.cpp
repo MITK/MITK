@@ -44,12 +44,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent): QWidget(parent),
-m_ReferenceNode(0),
 m_WorkingNode(0)
 {
   m_Controls.setupUi(this);
-
-  m_Controls.m_LabelSetTableWidget->Init();
 
   connect( m_Controls.m_cbWorkingNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
        this, SLOT( OnSegmentationSelectionChanged( const mitk::DataNode* ) ) );
@@ -86,11 +83,7 @@ m_WorkingNode(0)
   QStringListModel* completeModel = static_cast<QStringListModel*> (m_Completer->model());
   completeModel->setStringList(m_Controls.m_LabelSetTableWidget->GetLabelList());
 
-  // react whenever the set of selected segmentation changes
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerReferenceDataModified );
-
-  m_Controls.m_LabelSetTableWidget->setEnabled(false);
+ // m_Controls.m_LabelSetTableWidget->setEnabled(false);
   m_Controls.m_LabelSearchBox->setEnabled(false);
   m_Controls.m_btNewLabelSet->setEnabled(false);
   m_Controls.m_btLoadLabelSet->setEnabled(false);
@@ -102,16 +95,25 @@ m_WorkingNode(0)
 
 QmitkLabelSetWidget::~QmitkLabelSetWidget()
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerReferenceDataModified );
-  m_WorkingNode = NULL;
-  m_ReferenceNode = NULL;
+
 }
 
-void QmitkLabelSetWidget::ReInit()
+void QmitkLabelSetWidget::setEnabled(bool enabled)
 {
-  this->OnToolManagerReferenceDataModified();
-  this->OnSegmentationSelectionChanged(m_Controls.m_cbWorkingNodeSelector->GetSelectedNode());
+//  m_Controls.m_LabelSetTableWidget->setEnabled(enabled);
+  m_Controls.m_btNewLabelSet->setEnabled(enabled);
+  m_Controls.m_btLoadLabelSet->setEnabled(enabled);
+
+  if (enabled)
+  {
+    this->OnSegmentationSelectionChanged( m_Controls.m_cbWorkingNodeSelector->GetSelectedNode() );
+  }
+  else
+  {
+    this->OnSegmentationSelectionChanged( NULL );
+  }
+
+  QWidget::setEnabled(enabled);
 }
 
 void QmitkLabelSetWidget::SetDataStorage( mitk::DataStorage& storage )
@@ -139,7 +141,6 @@ mitk::DataNode* QmitkLabelSetWidget::GetActiveLabelSetNode()
 
 void QmitkLabelSetWidget::OnSegmentationSelectionChanged(const mitk::DataNode *node)
 {
-  if (m_WorkingNode == node) return;
   m_WorkingNode = const_cast<mitk::DataNode*>(node);
   m_Controls.m_LabelSetTableWidget->setEnabled(m_WorkingNode.IsNotNull());
   m_Controls.m_LabelSearchBox->setEnabled(m_WorkingNode.IsNotNull());
@@ -148,16 +149,10 @@ void QmitkLabelSetWidget::OnSegmentationSelectionChanged(const mitk::DataNode *n
   m_Controls.m_btImportLabelSet->setEnabled(m_WorkingNode.IsNotNull());
   m_Controls.m_btImportLabelSetImage->setEnabled(m_WorkingNode.IsNotNull());
 
-  if (m_WorkingNode.IsNotNull())
-  {
-    mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>( m_WorkingNode->GetData() );
-    m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(lsImage);
-  }
-  else
-  {
-    m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(NULL);
-    return;
-  }
+  if (m_WorkingNode.IsNull()) return;
+
+  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>( m_WorkingNode->GetData() );
+  m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(lsImage);
 
   m_WorkingNode->SetVisibility(true);
 
@@ -173,16 +168,6 @@ void QmitkLabelSetWidget::OnSegmentationSelectionChanged(const mitk::DataNode *n
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkLabelSetWidget::OnToolManagerReferenceDataModified()
-{
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  mitk::DataNode* node = toolManager->GetReferenceData(0);
-  if (m_ReferenceNode == node) return;
-  m_ReferenceNode = node;
-  m_Controls.m_btNewLabelSet->setEnabled(m_ReferenceNode.IsNotNull());
-  m_Controls.m_btLoadLabelSet->setEnabled(m_ReferenceNode.IsNotNull());
 }
 
 void QmitkLabelSetWidget::OnSearchLabel()

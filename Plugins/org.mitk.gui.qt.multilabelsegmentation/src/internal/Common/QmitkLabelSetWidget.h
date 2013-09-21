@@ -50,11 +50,9 @@ public:
 
   void SetPredicate( mitk::NodePredicateBase* predicate );
 
-  void ReInit();
+  virtual void setEnabled(bool enabled);
 
   void SetDataStorage(mitk::DataStorage& storage);
-
-  void OnToolManagerReferenceDataModified();
 
 signals:
 
@@ -113,7 +111,6 @@ private:
 
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
-    mitk::DataNode::Pointer m_ReferenceNode;
     mitk::DataNode::Pointer m_WorkingNode;
 
     // handling of a list of known (organ name, organ color) combination

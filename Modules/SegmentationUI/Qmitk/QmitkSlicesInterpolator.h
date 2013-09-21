@@ -83,7 +83,7 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
     /**
       Initializes the widget. To be called once before real use.
     */
-    void Initialize(mitk::ToolManager* toolManager, const QList<mitk::SliceNavigationController*> &controllers);
+    void Initialize(const QList<mitk::SliceNavigationController*> &controllers);
 
     /**
       Removal of observers.

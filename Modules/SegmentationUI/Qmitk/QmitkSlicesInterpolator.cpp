@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageTimeSelector.h>
 #include <mitkImageToContourModelFilter.h>
 #include <mitkContourUtils.h>
+#include <mitkToolManagerProvider.h>
 #include <itkCommand.h>
 
 #include <QCheckBox>
@@ -191,11 +192,9 @@ mitk::DataStorage* QmitkSlicesInterpolator::GetDataStorage()
 }
 
 
-void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, const QList<mitk::SliceNavigationController *> &controllers)
+void QmitkSlicesInterpolator::Initialize(const QList<mitk::SliceNavigationController *> &controllers)
 {
   Q_ASSERT(!controllers.empty());
-
-  if (!toolManager) return;
 
   if (m_Initialized)
   {
@@ -203,7 +202,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, const Q
     this->Uninitialize();
   }
 
-  m_ToolManager = toolManager;
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 
   // set enabled only if a segmentation is selected
  // mitk::DataNode* node = m_ToolManager->GetWorkingData(0);

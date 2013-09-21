@@ -86,25 +86,31 @@ bool LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateFunction()
   {
      MITK_WARN << "\"RequestedLabel\" parameter was not set: will use the default value (" << m_RequestedLabel << ").";
   }
-
+/*
   m_Filter = mitk::LabelSetImageToSurfaceFilter::New();
   m_Filter->SetInput(image);
 //  m_Filter->SetObserver(obsv);
   m_Filter->SetGenerateAllLabels( false );
   m_Filter->SetRequestedLabel( m_RequestedLabel );
+*/
+  mitk::LabelSetImageToSurfaceFilter::Pointer filter = mitk::LabelSetImageToSurfaceFilter::New();
+  filter->SetInput(image);
+//  filter->SetObserver(obsv);
+  filter->SetGenerateAllLabels( false );
+  filter->SetRequestedLabel( m_RequestedLabel );
 
   try
   {
-     m_Filter->Update();
+     filter->Update();
   }
-  catch (itk::ExceptionObject& exception)
+  catch (itk::ExceptionObject& e)
   {
-     MITK_ERROR << "Exception caught: " << exception.GetDescription();
+     MITK_ERROR << "Exception caught: " << e.GetDescription();
      return false;
   }
-  catch (std::exception& exception)
+  catch (std::exception& e)
   {
-     MITK_ERROR << "Exception caught: " << exception.what();
+     MITK_ERROR << "Exception caught: " << e.what();
      return false;
   }
   catch (...)
@@ -113,11 +119,12 @@ bool LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateFunction()
      return false;
   }
 
-  if (!m_Filter->GetDataIsAvailable())
-  {
-     MITK_ERROR << "LabelSetImageToSurfaceThreadedFilter failed";
+  m_ResultSurface = filter->GetOutput();
+
+  if ( m_ResultSurface.IsNull() || !m_ResultSurface->GetVtkPolyData() )
      return false;
-  }
+
+//  m_ResultSurface->DisconnectPipeline();
 
   return true;
 }
@@ -130,11 +137,11 @@ void LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateSuccessful()
    std::string name = image->GetLabelName(m_RequestedLabel);
    name.append("-surf");
 
-   mitk::Surface::Pointer surface = m_Filter->GetOutput(0);
-   surface->DisconnectPipeline();
+  // mitk::Surface::Pointer surface = m_ResultSurface;
+  // surface->DisconnectPipeline();
 
    mitk::DataNode::Pointer node = mitk::DataNode::New();
-   node->SetData(surface);
+   node->SetData(m_ResultSurface);
    node->SetName(name);
 
    mitk::Color color = image->GetLabelColor(m_RequestedLabel);

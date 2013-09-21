@@ -105,6 +105,8 @@ protected:
 
   mitk::IRenderWindowPart* m_IRenderWindowPart;
 
+  mitk::DataNode::Pointer m_ReferenceNode;
+
   bool m_DataSelectionChanged;
 
   mitk::NodePredicateAnd::Pointer m_ReferencePredicate;

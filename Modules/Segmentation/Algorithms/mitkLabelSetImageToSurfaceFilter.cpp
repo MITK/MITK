@@ -100,14 +100,14 @@ template < typename TPixel, unsigned int VImageDimension >
 void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImageDimension>* input, mitk::Surface* surface )
 {
    typedef itk::Image<TPixel, VImageDimension> InputImageType;
-   typedef itk::Image< unsigned char, VImageDimension> BinaryImageType;
-   typedef itk::BinaryThresholdImageFilter< InputImageType, BinaryImageType > BinaryThresholdFilterType;
+  // typedef itk::Image< unsigned char, VImageDimension> BinaryImageType;
+   typedef itk::BinaryThresholdImageFilter< InputImageType, InputImageType > BinaryThresholdFilterType;
 
    typedef float FloatPixelType;
    typedef itk::Image<FloatPixelType, VImageDimension> FloatImageType;
 //   typedef itk::CastImageFilter< BinaryImageType, FloatImageType> CastImageFilterType;
 
-   typedef itk::AntiAliasBinaryImageFilter< BinaryImageType, FloatImageType > AntiAliasFilterType;
+   typedef itk::AntiAliasBinaryImageFilter< InputImageType, FloatImageType > AntiAliasFilterType;
    typedef itk::ImageToVTKImageFilter< FloatImageType > ITKFloatConvertType;
 
    typename BinaryThresholdFilterType::Pointer thresholdFilter = BinaryThresholdFilterType::New();
@@ -116,6 +116,7 @@ void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImag
    thresholdFilter->SetUpperThreshold(m_UpperThreshold);
    thresholdFilter->SetOutsideValue(0);
    thresholdFilter->SetInsideValue(1);
+   thresholdFilter->Update();
 //   thresholdFilter->ReleaseDataFlagOn();
 
 //   typename CastImageFilterType::Pointer castFilter = CastImageFilterType::New();
@@ -125,9 +126,9 @@ void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImag
    typename AntiAliasFilterType::Pointer antiAliasFilter;
    // todo: check why input parameters are not used in the ITK filter
    antiAliasFilter = AntiAliasFilterType::New();
-   antiAliasFilter->SetMaximumRMSError(0.05);
+   antiAliasFilter->SetMaximumRMSError(0.01);
    antiAliasFilter->SetNumberOfLayers(2);
-   antiAliasFilter->SetNumberOfIterations(5);
+   antiAliasFilter->SetNumberOfIterations(15);
    antiAliasFilter->SetInput( thresholdFilter->GetOutput() );
 //   antiAliasFilter->ReleaseDataFlagOn();
 /*
@@ -140,9 +141,6 @@ void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImag
    }
 */
    antiAliasFilter->Update();
-
-  MITK_INFO << " antiAliasFilter->GetUpperBinaryValue() " << static_cast<int>( antiAliasFilter->GetUpperBinaryValue() );
-  MITK_INFO << " antiAliasFilter->GetLowerBinaryValue() " << static_cast<int>( antiAliasFilter->GetLowerBinaryValue() );
 
 /*
    if (m_Observer.IsNotNull())

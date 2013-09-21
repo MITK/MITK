@@ -337,7 +337,6 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 
     emit ToolSelected(-1);
   }
-
 }
 
 /**

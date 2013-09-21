@@ -37,8 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkCommand.h>
 
-QmitkLabelSetTableWidget::QmitkLabelSetTableWidget( QWidget* parent )
-: QTableWidget(parent),
+QmitkLabelSetTableWidget::QmitkLabelSetTableWidget( QWidget* parent ) : QTableWidget(parent),
 m_BlockEvents(false),
 m_AutoSelectNewLabels(true),
 m_AllVisible(true),
@@ -46,6 +45,7 @@ m_AllLocked(false),
 m_ColorSequenceRainbow(mitk::ColorSequenceRainbow::New())
 {
   m_ColorSequenceRainbow->GoToBegin();
+  this->Initialize();
 }
 
 QmitkLabelSetTableWidget::~QmitkLabelSetTableWidget()
@@ -67,7 +67,17 @@ QmitkLabelSetTableWidget::~QmitkLabelSetTableWidget()
   }
 }
 
-void QmitkLabelSetTableWidget::Init()
+void QmitkLabelSetTableWidget::setEnabled(bool enabled)
+{
+  if (!enabled)
+  {
+    this->SetActiveLabelSetImage(NULL);
+  }
+
+  QWidget::setEnabled(enabled);
+}
+
+void QmitkLabelSetTableWidget::Initialize()
 {
   connect(this, SIGNAL(itemClicked(QTableWidgetItem *)), this, SLOT(OnItemClicked(QTableWidgetItem *)));
   connect(this, SIGNAL(itemDoubleClicked(QTableWidgetItem *)), this, SLOT(OnItemDoubleClicked(QTableWidgetItem *)));
@@ -100,14 +110,6 @@ void QmitkLabelSetTableWidget::Init()
 
   this->setSelectionMode(QAbstractItemView::ExtendedSelection);
   this->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-  // todo: implement a selection model
-//  this->setModel(m_LabelSetTableModel);
-
-  //connect( this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ContextMenuRequested(const QPoint&)) );
-
- // connect( this, SIGNAL(currentItemChanged ( QTableWidgetItem * , QTableWidgetItem * ) ),
- //     this, SLOT( NodeSelectionChanged ( QTableWidgetItem * , QTableWidgetItem * ) ) );
 }
 
 const QStringList& QmitkLabelSetTableWidget::GetLabelList()
@@ -128,17 +130,17 @@ void QmitkLabelSetTableWidget::SetActiveLabelSetImage(mitk::LabelSetImage* _imag
     // if there is an old labelset, remove listeners
     if(m_LabelSetImage.IsNotNull())
     {
-        this->m_LabelSetImage->AddLabelEvent.RemoveListener( mitk::MessageDelegate<QmitkLabelSetTableWidget>(
-            this, &QmitkLabelSetTableWidget::LabelAdded ) );
+      this->m_LabelSetImage->AddLabelEvent.RemoveListener( mitk::MessageDelegate<QmitkLabelSetTableWidget>(
+          this, &QmitkLabelSetTableWidget::LabelAdded ) );
 
-        this->m_LabelSetImage->RemoveLabelEvent.RemoveListener( mitk::MessageDelegate<QmitkLabelSetTableWidget>(
-            this, &QmitkLabelSetTableWidget::LabelRemoved ) );
+      this->m_LabelSetImage->RemoveLabelEvent.RemoveListener( mitk::MessageDelegate<QmitkLabelSetTableWidget>(
+          this, &QmitkLabelSetTableWidget::LabelRemoved ) );
 
-        this->m_LabelSetImage->ModifyLabelEvent.RemoveListener( mitk::MessageDelegate1<QmitkLabelSetTableWidget
-          , int>( this, &QmitkLabelSetTableWidget::LabelModified ) );
+      this->m_LabelSetImage->ModifyLabelEvent.RemoveListener( mitk::MessageDelegate1<QmitkLabelSetTableWidget
+        , int>( this, &QmitkLabelSetTableWidget::LabelModified ) );
 
-        this->m_LabelSetImage->AllLabelsModifiedEvent.RemoveListener( mitk::MessageDelegate<QmitkLabelSetTableWidget>(
-            this, &QmitkLabelSetTableWidget::AllLabelsModified ) );
+      this->m_LabelSetImage->AllLabelsModifiedEvent.RemoveListener( mitk::MessageDelegate<QmitkLabelSetTableWidget>(
+          this, &QmitkLabelSetTableWidget::AllLabelsModified ) );
     }
 
     m_LabelSetImage = _image;
@@ -146,17 +148,17 @@ void QmitkLabelSetTableWidget::SetActiveLabelSetImage(mitk::LabelSetImage* _imag
     // add listeners to the new labelset
     if(m_LabelSetImage.IsNotNull())
     {
-        this->m_LabelSetImage->AddLabelEvent.AddListener( mitk::MessageDelegate<QmitkLabelSetTableWidget>(
-            this, &QmitkLabelSetTableWidget::LabelAdded ) );
+      this->m_LabelSetImage->AddLabelEvent.AddListener( mitk::MessageDelegate<QmitkLabelSetTableWidget>(
+          this, &QmitkLabelSetTableWidget::LabelAdded ) );
 
-        this->m_LabelSetImage->RemoveLabelEvent.AddListener( mitk::MessageDelegate<QmitkLabelSetTableWidget>(
-            this, &QmitkLabelSetTableWidget::LabelRemoved ) );
+      this->m_LabelSetImage->RemoveLabelEvent.AddListener( mitk::MessageDelegate<QmitkLabelSetTableWidget>(
+          this, &QmitkLabelSetTableWidget::LabelRemoved ) );
 
-        this->m_LabelSetImage->ModifyLabelEvent.AddListener( mitk::MessageDelegate1<QmitkLabelSetTableWidget
-          , int>( this, &QmitkLabelSetTableWidget::LabelModified ) );
+      this->m_LabelSetImage->ModifyLabelEvent.AddListener( mitk::MessageDelegate1<QmitkLabelSetTableWidget
+        , int>( this, &QmitkLabelSetTableWidget::LabelModified ) );
 
-        this->m_LabelSetImage->AllLabelsModifiedEvent.AddListener( mitk::MessageDelegate<QmitkLabelSetTableWidget>(
-            this, &QmitkLabelSetTableWidget::AllLabelsModified ) );
+      this->m_LabelSetImage->AllLabelsModifiedEvent.AddListener( mitk::MessageDelegate<QmitkLabelSetTableWidget>(
+          this, &QmitkLabelSetTableWidget::AllLabelsModified ) );
     }
 
     this->Reset();

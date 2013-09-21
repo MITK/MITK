@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegmentationObjectFactory.h"
 #include "mitkSegTool2D.h"
 #include "mitkPlanePositionManager.h"
-#include "mitkSurfaceToLabelFilter.h"
 
 // Qmitk
 #include "QmitkMultiLabelSegmentationOrganNamesHandling.cpp"
@@ -39,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkModule.h"
 #include "mitkModuleRegistry.h"
 #include "mitkModuleResource.h"
+#include "mitkPluginActivator.h"
 
 // Qt
 #include <QMessageBox>
@@ -50,6 +50,7 @@ const std::string QmitkMultiLabelSegmentationView::VIEW_ID = "org.mitk.views.mul
 QmitkMultiLabelSegmentationView::QmitkMultiLabelSegmentationView() :
 m_Parent(NULL),
 m_IRenderWindowPart(NULL),
+m_ReferenceNode(NULL),
 m_DataSelectionChanged(false),
 m_MouseCursorSet(false)
 {
@@ -89,6 +90,20 @@ m_MouseCursorSet(false)
 
 QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
 {
+  m_Controls.m_ManualToolSelectionBox2D->setEnabled(false);
+  m_Controls.m_ManualToolSelectionBox3D->setEnabled( false );
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->ActivateTool(-1);
+/*
+  m_Controls.m_SlicesInterpolator->EnableInterpolation(false);
+  ctkPluginContext* context = mitk::PluginActivator::getContext();
+  ctkServiceReference ppmRef = context->getServiceReference<mitk::PlanePositionManagerService>();
+  mitk::PlanePositionManagerService* service = context->getService<mitk::PlanePositionManagerService>(ppmRef);
+  service->RemoveAllPlanePositions();
+  context->ungetService(ppmRef);
+*/
+  toolManager->SetReferenceData(NULL);
+  toolManager->SetWorkingData(NULL);
 }
 
 void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
@@ -99,9 +114,9 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.m_cbReferenceNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.m_cbReferenceNodeSelector->SetPredicate(m_ReferencePredicate);
+  m_Controls.m_cbReferenceNodeSelector->SetAutoSelectNewItems(true);
 
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert ( toolManager );
   toolManager->SetDataStorage( *(this->GetDataStorage()) );
   toolManager->InitializeTools();
 
@@ -155,7 +170,19 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.m_pbSurfaceStamp, SIGNAL(clicked()), this, SLOT(OnSurfaceStamp()));
   connect(m_Controls.m_pbMaskStamp, SIGNAL(clicked()), this, SLOT(OnMaskStamp()));
 
-  m_Controls.m_LabelSetWidget->ReInit();
+  m_Controls.m_SlicesInterpolator->SetDataStorage(this->GetDataStorage());
+
+  this->OnReferenceSelectionChanged( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode() );
+
+  m_IRenderWindowPart = this->GetRenderWindowPart();
+  if (m_IRenderWindowPart)
+  {
+    QList<mitk::SliceNavigationController*> controllers;
+    controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
+    controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
+    controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
+    m_Controls.m_SlicesInterpolator->Initialize(controllers);
+  }
 }
 
 void QmitkMultiLabelSegmentationView::SetFocus ()
@@ -170,13 +197,11 @@ void QmitkMultiLabelSegmentationView::RenderWindowPartActivated(mitk::IRenderWin
     m_IRenderWindowPart = renderWindowPart;
     m_Parent->setEnabled(true);
 
-    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-    m_Controls.m_SlicesInterpolator->SetDataStorage( this->GetDataStorage());
     QList<mitk::SliceNavigationController*> controllers;
     controllers.push_back(renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
     controllers.push_back(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
     controllers.push_back(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
-    m_Controls.m_SlicesInterpolator->Initialize( toolManager, controllers );
+    m_Controls.m_SlicesInterpolator->Initialize(controllers);
   }
 }
 
@@ -249,21 +274,28 @@ void QmitkMultiLabelSegmentationView::NodeRemoved(const mitk::DataNode* node)
 
 void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::DataNode* node )
 {
-  if( node != NULL )
+  m_ReferenceNode = const_cast<mitk::DataNode*>(node);
+
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->ActivateTool(-1);
+  toolManager->SetReferenceData(m_ReferenceNode);
+
+  if( m_ReferenceNode.IsNotNull() )
   {
-    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-    toolManager->ActivateTool(-1);
-    mitk::DataNode* refNode = const_cast<mitk::DataNode*>(node);
-    refNode->SetVisibility(true);
-    toolManager->SetReferenceData(refNode);
+    m_ReferenceNode->SetVisibility(true);
 
     mitk::DataStorage::SetOfObjects::ConstPointer others = this->GetDataStorage()->GetSubset(m_ReferencePredicate);
     for(mitk::DataStorage::SetOfObjects::const_iterator iter = others->begin(); iter != others->end(); ++iter)
     {
       mitk::DataNode* _other = *iter;
-      if (_other != refNode)
-          _other->SetVisibility(false);
+      if (_other != m_ReferenceNode)
+        _other->SetVisibility(false);
     }
+    m_Controls.m_LabelSetWidget->setEnabled(true);
+  }
+  else
+  {
+    m_Controls.m_LabelSetWidget->setEnabled(false);
   }
 }
 
@@ -410,8 +442,7 @@ void QmitkMultiLabelSegmentationView::OnMaskStamp()
 
   maskNode->SetVisibility(false);
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
+  this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
 }
 
 void QmitkMultiLabelSegmentationView::OnSurfaceStamp()
@@ -452,5 +483,5 @@ void QmitkMultiLabelSegmentationView::OnSurfaceStamp()
 
   lsImage->PasteSurfaceOnActiveLabel( surface, m_Controls.m_chkSurfaceStampOverwrite->isChecked() );
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
 }

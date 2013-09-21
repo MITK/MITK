@@ -62,41 +62,41 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
     m_2DInterpolationEnabled(false),
     m_3DInterpolationEnabled(false)
 {
-  m_GroupBoxEnableExclusiveInterpolationMode = new QGroupBox("Interpolation", this);
-  m_GroupBoxEnableExclusiveInterpolationMode->setCheckable(true);
-  m_GroupBoxEnableExclusiveInterpolationMode->setChecked(false);
+  m_gbControls = new QGroupBox("Interpolation", this);
+  m_gbControls->setCheckable(true);
+  m_gbControls->setChecked(false);
 
-  QVBoxLayout* vboxLayout = new QVBoxLayout(m_GroupBoxEnableExclusiveInterpolationMode);
+  QVBoxLayout* vboxLayout = new QVBoxLayout(m_gbControls);
 
-  m_CmbInterpolation = new QComboBox(m_GroupBoxEnableExclusiveInterpolationMode);
-  m_CmbInterpolation->addItem("2-Dimensional");
-  m_CmbInterpolation->addItem("3-Dimensional");
-  vboxLayout->addWidget(m_CmbInterpolation);
+  m_cbInterpolationMode = new QComboBox(m_gbControls);
+  m_cbInterpolationMode->addItem("2-Dimensional");
+  m_cbInterpolationMode->addItem("3-Dimensional");
+  vboxLayout->addWidget(m_cbInterpolationMode);
 
-  m_BtnApply2D = new QPushButton("Accept", m_GroupBoxEnableExclusiveInterpolationMode);
-  vboxLayout->addWidget(m_BtnApply2D);
+  m_btApply2D = new QPushButton("Accept", m_gbControls);
+  vboxLayout->addWidget(m_btApply2D);
 
-  m_BtnApplyForAllSlices2D = new QPushButton("Accept All", m_GroupBoxEnableExclusiveInterpolationMode);
-  vboxLayout->addWidget(m_BtnApplyForAllSlices2D);
+  m_btApplyForAllSlices2D = new QPushButton("Accept All", m_gbControls);
+  vboxLayout->addWidget(m_btApplyForAllSlices2D);
 
-  m_BtnApply3D = new QPushButton("Accept", m_GroupBoxEnableExclusiveInterpolationMode);
-  vboxLayout->addWidget(m_BtnApply3D);
+  m_btApply3D = new QPushButton("Accept", m_gbControls);
+  vboxLayout->addWidget(m_btApply3D);
 
-  m_ChkShowPositionNodes = new QCheckBox("Show Position Nodes", m_GroupBoxEnableExclusiveInterpolationMode);
-  vboxLayout->addWidget(m_ChkShowPositionNodes);
+  m_chkShowPositionNodes = new QCheckBox("Show Position Nodes", m_gbControls);
+  vboxLayout->addWidget(m_chkShowPositionNodes);
 
   this->HideAllInterpolationControls();
 
-  connect(m_GroupBoxEnableExclusiveInterpolationMode, SIGNAL(toggled(bool)), this, SLOT(ActivateInterpolation(bool)));
-  connect(m_CmbInterpolation, SIGNAL(currentIndexChanged(int)), this, SLOT(OnInterpolationMethodChanged(int)));
-  connect(m_BtnApply2D, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
-  connect(m_BtnApplyForAllSlices2D, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()));
-  connect(m_BtnApply3D, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
-  connect(m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
-  connect(m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SIGNAL(SignalShowMarkerNodes(bool)));
+  connect(m_gbControls, SIGNAL(toggled(bool)), this, SLOT(ActivateInterpolation(bool)));
+  connect(m_cbInterpolationMode, SIGNAL(currentIndexChanged(int)), this, SLOT(OnInterpolationMethodChanged(int)));
+  connect(m_btApply2D, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
+  connect(m_btApplyForAllSlices2D, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()));
+  connect(m_btApply3D, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
+  connect(m_chkShowPositionNodes, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
+  connect(m_chkShowPositionNodes, SIGNAL(toggled(bool)), this, SIGNAL(SignalShowMarkerNodes(bool)));
 
   QHBoxLayout* layout = new QHBoxLayout(this);
-  layout->addWidget(m_GroupBoxEnableExclusiveInterpolationMode);
+  layout->addWidget(m_gbControls);
   this->setLayout(layout);
 
   itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
@@ -145,13 +145,13 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
 
   //For running 3D Interpolation in background
   // create a QFuture and a QFutureWatcher
-
+/*
   connect(&m_Watcher, SIGNAL(started()), this, SLOT(StartUpdateInterpolationTimer()));
   connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnSurfaceInterpolationFinished()));
   connect(&m_Watcher, SIGNAL(finished()), this, SLOT(StopUpdateInterpolationTimer()));
   m_Timer = new QTimer(this);
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(ChangeSurfaceColor()));
-
+*/
   QWidget::setEnabled(false);
 }
 
@@ -179,19 +179,6 @@ void QmitkSlicesInterpolator::SetDataStorage( mitk::DataStorage::Pointer storage
   m_SurfaceInterpolator->SetDataStorage(storage);
 }
 
-mitk::DataStorage* QmitkSlicesInterpolator::GetDataStorage()
-{
-  if ( m_DataStorage.IsNotNull() )
-  {
-    return m_DataStorage;
-  }
-  else
-  {
-    return NULL;
-  }
-}
-
-
 void QmitkSlicesInterpolator::Initialize(const QList<mitk::SliceNavigationController *> &controllers)
 {
   Q_ASSERT(!controllers.empty());
@@ -204,13 +191,8 @@ void QmitkSlicesInterpolator::Initialize(const QList<mitk::SliceNavigationContro
 
   m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 
-  // set enabled only if a segmentation is selected
- // mitk::DataNode* node = m_ToolManager->GetWorkingData(0);
- // QWidget::setEnabled( node != NULL );
-
   // react whenever the set of selected segmentation changes
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkSlicesInterpolator>( this, &QmitkSlicesInterpolator::OnToolManagerWorkingDataModified );
-  m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkSlicesInterpolator>( this, &QmitkSlicesInterpolator::OnToolManagerReferenceDataModified );
 
   // connect to the slice navigation controller. after each change, call the interpolator
   foreach(mitk::SliceNavigationController* slicer, controllers)
@@ -242,7 +224,6 @@ void QmitkSlicesInterpolator::Uninitialize()
   if (m_ToolManager.IsNotNull())
   {
     m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkSlicesInterpolator>(this, &QmitkSlicesInterpolator::OnToolManagerWorkingDataModified);
-    m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkSlicesInterpolator>(this, &QmitkSlicesInterpolator::OnToolManagerReferenceDataModified);
   }
 
   foreach(mitk::SliceNavigationController* slicer, m_ControllerToSliceObserverTag.keys())
@@ -280,7 +261,7 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
   m_SliceInterpolatorController->RemoveObserver( m_InterpolationInfoChangedObserverTag );
   m_SurfaceInterpolator->RemoveObserver( m_SurfaceInterpolationInfoChangedObserverTag );
 
-  delete m_Timer;
+  //delete m_Timer;
 }
 
 void QmitkSlicesInterpolator::HideAllInterpolationControls()
@@ -291,19 +272,19 @@ void QmitkSlicesInterpolator::HideAllInterpolationControls()
 
 void QmitkSlicesInterpolator::Show2DInterpolationControls(bool show)
 {
-  m_BtnApply2D->setVisible(show);
-  m_BtnApplyForAllSlices2D->setVisible(show);
+  m_btApply2D->setVisible(show);
+  m_btApplyForAllSlices2D->setVisible(show);
 }
 
 void QmitkSlicesInterpolator::Show3DInterpolationControls(bool show)
 {
-  m_BtnApply3D->setVisible(show);
-  m_ChkShowPositionNodes->setVisible(show);
+  m_btApply3D->setVisible(show);
+  m_chkShowPositionNodes->setVisible(show);
 }
 
-void QmitkSlicesInterpolator::EnableInterpolation(bool enabled)
+void QmitkSlicesInterpolator::setChecked(bool enabled)
 {
-  m_GroupBoxEnableExclusiveInterpolationMode->setChecked(enabled);
+  m_gbControls->setChecked(enabled);
 }
 
 void QmitkSlicesInterpolator::ActivateInterpolation(bool enabled)
@@ -337,7 +318,7 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
   {
     default:
     case 0: // 2D
-      m_GroupBoxEnableExclusiveInterpolationMode->setTitle("2D Interpolation (Enabled)");
+      m_gbControls->setTitle("2D Interpolation (Enabled)");
       this->HideAllInterpolationControls();
       this->Show2DInterpolationControls(true);
       this->Activate2DInterpolation(true);
@@ -345,7 +326,7 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
       break;
 
     case 1: // 3D
-      m_GroupBoxEnableExclusiveInterpolationMode->setTitle("3D Interpolation (Enabled)");
+      m_gbControls->setTitle("3D Interpolation (Enabled)");
       this->HideAllInterpolationControls();
       this->Show3DInterpolationControls(true);
       this->Activate2DInterpolation(false);
@@ -365,66 +346,42 @@ void QmitkSlicesInterpolator::OnShowMarkers(bool state)
   }
 }
 
-void QmitkSlicesInterpolator::OnWorkingImageModified(const itk::EventObject&)
-{
-  /*
-  if (m_2DInterpolationEnabled)
-  {
-    this->m_SliceInterpolatorController->BuildLabelCount();
-    this->UpdateVisibleSuggestion();
-  }
-  */
-}
-
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
   mitk::DataNode* workingNode = this->m_ToolManager->GetWorkingData(0);
   if (!workingNode)
   {
-    QWidget::setEnabled( false );
+    this->setChecked(false);
+    this->setEnabled(false);
     return;
   }
 
-  mitk::LabelSetImage::Pointer newImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
-  if ( newImage.IsNull() ) return;
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  if (!workingImage)
+  {
+    this->setChecked(false);
+    this->setEnabled(false);
+    return;
+  }
 
-  if (newImage->GetDimension() > 4 || newImage->GetDimension() < 3)
+  if (workingImage->GetDimension() > 4 || workingImage->GetDimension() < 3)
   {
     MITK_ERROR << "slices interpolator needs a 3D or 3D+t segmentation, not 2D.";
+    this->setChecked(false);
+    this->setEnabled(false);
     return;
   }
 
-  QWidget::setEnabled( true );
-
-  if (m_WorkingImage != newImage)
+  if (m_WorkingImage != workingImage)
   {
     if (m_WorkingImage.IsNotNull())
       m_WorkingImage->RemoveObserver( m_WorkingImageObserverID );
 
-    m_WorkingImage = newImage;
-
-    // observe Modified() event of image
-    itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
-    command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnWorkingImageModified );
-    m_WorkingImageObserverID = m_WorkingImage->AddObserver( itk::ModifiedEvent(), command );
+    m_WorkingImage = workingImage;
   }
 
   m_SliceInterpolatorController->SetWorkingImage( m_WorkingImage );
   this->UpdateVisibleSuggestion();
-}
-
-void QmitkSlicesInterpolator::OnToolManagerReferenceDataModified()
-{
-/*
-  if (m_2DInterpolationEnabled)
-  {
-    this->Activate2DInterpolation( true ); // re-initialize if needed
-  }
-  if (m_3DInterpolationEnabled)
-  {
-    this->Show3DInterpolationResult(false);
-  }
-*/
 }
 
 void QmitkSlicesInterpolator::OnTimeChanged(itk::Object* sender, const itk::EventObject& e)
@@ -538,7 +495,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
   if (interpolatedSurface.IsNotNull() && workingNode &&
      workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("Coronal"))))
   {
-    m_BtnApply3D->setEnabled(true);
+    m_btApply3D->setEnabled(true);
     m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
     m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
 
@@ -552,7 +509,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
   }
   else if (interpolatedSurface.IsNull())
   {
-    m_BtnApply3D->setEnabled(false);
+    m_btApply3D->setEnabled(false);
 
     if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
     {
@@ -807,15 +764,14 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 
     // check if ToolManager holds valid ReferenceData
     if (m_ToolManager->GetReferenceData(0) == NULL || m_ToolManager->GetWorkingData(0) == NULL)
-    {
-        return;
-    }
+      return;
+
     s2iFilter->SetImage(dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData()));
     s2iFilter->Update();
 
     mitk::DataNode* segmentationNode = m_ToolManager->GetWorkingData(0);
     segmentationNode->SetData(s2iFilter->GetOutput());
-    m_CmbInterpolation->setCurrentIndex(0);
+    m_cbInterpolationMode->setCurrentIndex(0);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     this->Show3DInterpolationResult(false);
   }
@@ -873,12 +829,12 @@ void QmitkSlicesInterpolator::Run3DInterpolation()
 
 void QmitkSlicesInterpolator::StartUpdateInterpolationTimer()
 {
-  m_Timer->start(500);
+ // m_Timer->start(500);
 }
 
 void QmitkSlicesInterpolator::StopUpdateInterpolationTimer()
 {
-  m_Timer->stop();
+ // m_Timer->stop();
   m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(255.0,255.0,0.0));
   mitk::RenderingManager::GetInstance()->RequestUpdate(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("3D"))->GetRenderWindow());
 }
@@ -932,35 +888,35 @@ void QmitkSlicesInterpolator::Activate3DInterpolation(bool on)
             ret = msgBox.exec();
           }
 
-          if (m_Watcher.isRunning())
-            m_Watcher.waitForFinished();
+//          if (m_Watcher.isRunning())
+//            m_Watcher.waitForFinished();
 
           if (ret == QMessageBox::Yes)
           {
-            m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
-            m_Watcher.setFuture(m_Future);
+//            m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+//            m_Watcher.setFuture(m_Future);
           }
           else
           {
-            m_CmbInterpolation->setCurrentIndex(0);
+            m_cbInterpolationMode->setCurrentIndex(0);
           }
         }
         else if (!m_3DInterpolationEnabled)
         {
           this->Show3DInterpolationResult(false);
-          m_BtnApply3D->setEnabled(m_3DInterpolationEnabled);
+          m_btApply3D->setEnabled(m_3DInterpolationEnabled);
         }
       }
       else
       {
         QWidget::setEnabled( false );
-        m_ChkShowPositionNodes->setEnabled(m_3DInterpolationEnabled);
+        m_chkShowPositionNodes->setEnabled(m_3DInterpolationEnabled);
       }
     }
     if (!m_3DInterpolationEnabled)
     {
        this->Show3DInterpolationResult(false);
-       m_BtnApply3D->setEnabled(m_3DInterpolationEnabled);
+       m_btApply3D->setEnabled(m_3DInterpolationEnabled);
     }
   }
   catch(...)
@@ -1000,10 +956,10 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged(const itk::Event
 {
   if(m_3DInterpolationEnabled)
   {
-    if (m_Watcher.isRunning())
-      m_Watcher.waitForFinished();
-    m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
-    m_Watcher.setFuture(m_Future);
+//    if (m_Watcher.isRunning())
+//      m_Watcher.waitForFinished();
+//    m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+//    m_Watcher.setFuture(m_Future);
   }
 }
 
@@ -1051,10 +1007,10 @@ void QmitkSlicesInterpolator::SetCurrentContourListID()
 
         if (m_3DInterpolationEnabled)
         {
-          if (m_Watcher.isRunning())
-            m_Watcher.waitForFinished();
-          m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
-          m_Watcher.setFuture(m_Future);
+//          if (m_Watcher.isRunning())
+//            m_Watcher.waitForFinished();
+//          m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+//          m_Watcher.setFuture(m_Future);
         }
       }
     }

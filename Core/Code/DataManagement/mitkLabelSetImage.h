@@ -99,7 +99,7 @@ public:
 
   /**
     * \brief  */
-  bool Concatenate(mitk::LabelSetImage* image);
+  void Concatenate(mitk::LabelSetImage* image);
 
   /**
     * \brief  */
@@ -284,9 +284,11 @@ public:
     * \brief  */
   void ResetLabels();
 
-  void PasteSurfaceOnActiveLabel(mitk::Surface* surface, bool forceOverwrite);
+  void SurfaceStamp(mitk::Surface* surface, bool forceOverwrite);
 
-  void PasteMaskOnActiveLabel(mitk::Image* mask, bool forceOverwrite);
+  mitk::Image::Pointer CreateLabelMask(int index);
+
+  void MaskStamp(mitk::Image* mask, bool forceOverwrite);
 
 protected:
   LabelSetImage();
@@ -316,7 +318,10 @@ protected:
   void ConcatenateProcessing(LabelSetImageType * input, mitk::LabelSetImage* other);
 
   template < typename LabelSetImageType >
-  void PasteMaskOnActiveLabelProcessing(LabelSetImageType * input, mitk::Image* mask, bool forceOverwrite);
+  void MaskStampProcessing(LabelSetImageType * input, mitk::Image* mask, bool forceOverwrite);
+
+  template < typename LabelSetImageType >
+  void CreateLabelMaskProcessing(LabelSetImageType * input, mitk::Image* mask, int index);
 
   mitk::LabelSet::Pointer m_LabelSet;
 };

@@ -406,6 +406,13 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
   {
     m_Segmentation = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
   }
+  else
+  {
+    //If no workingdata is set, remove the interpolation feedback
+    this->GetDataStorage()->Remove(m_FeedbackNode);
+    m_FeedbackNode->SetData(NULL);
+    return;
+  }
   //Updating the current selected segmentation for the 3D interpolation
   SetCurrentContourListID();
 
@@ -417,14 +424,6 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 
 void QmitkSlicesInterpolator::OnToolManagerReferenceDataModified()
 {
-  if (m_2DInterpolationEnabled)
-  {
-    OnInterpolationActivated( true ); // re-initialize if needed
-  }
-  if (m_3DInterpolationEnabled)
-  {
-    this->Show3DInterpolationResult(false);
-  }
 }
 
 void QmitkSlicesInterpolator::OnTimeChanged(itk::Object* sender, const itk::EventObject& e)

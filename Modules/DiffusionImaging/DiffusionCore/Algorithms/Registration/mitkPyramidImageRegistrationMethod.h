@@ -67,6 +67,9 @@ public:
   /** Typedef for the transformation matrix, corresponds to the InternalMatrixType from ITK transforms */
   typedef vnl_matrix_fixed< double, 3, 3> TransformMatrixType;
 
+  typedef itk::AffineTransform< double >  AffineTransformType;
+  typedef itk::Euler3DTransform< double >  RigidTransformType;
+
   /** Registration is between modalities - will take MattesMutualInformation as error metric */
   void SetCrossModalityOn()
   {
@@ -130,7 +133,6 @@ public:
   /** Input image, the one to be transformed */
   void SetMovingImage( mitk::Image::Pointer );
 
-
   /** Fixed image mask, excludes the masked voxels from the registration metric*/
   void SetFixedImageMask( mitk::Image::Pointer mask);
 
@@ -190,6 +192,20 @@ public:
   }
 
   /**
+   * @brief Control the interpolator used for resampling.
+   *
+   * The class uses the
+   *  - Linear interpolator on default ( flag = false )
+   *  - Nearest neighbor interpolation if this is true
+   *
+   *  used to resample e.g. segmentations.
+   */
+  void SetUseNearestNeighborInterpolation( bool flag)
+  {
+    m_UseNearestNeighborInterpolator = flag;
+  }
+
+  /**
    * @brief Set if fixed image mask is used to exclude a region.
    * @param flag , true if mask is to be used, false if mask is to be ignored (default)
    */
@@ -200,10 +216,16 @@ public:
 
   /**
    * @brief Returns the moving image transformed according to the estimated transformation and resampled
-   * to the geometry of the fixed image
+   * to the geometry of the fixed/resampling reference image
    *
    */
   mitk::Image::Pointer GetResampledMovingImage();
+
+  /**
+   * @brief Returns a provided moving image transformed according to the given transformation and resampled
+   * to the geometry of the fixed/resampling reference image
+   */
+  mitk::Image::Pointer GetResampledMovingImage(mitk::Image::Pointer movingImage, double *transform );
 
   /**
    * @brief Get the rotation part of the transformation as a vnl_fixed_matrix<double, 3,3>
@@ -234,6 +256,8 @@ protected:
 
   bool m_UseWindowedSincInterpolator;
 
+  bool m_UseNearestNeighborInterpolator;
+
   bool m_UseMask;
 
   double* m_EstimatedParameters;
@@ -251,8 +275,6 @@ protected:
     typedef typename itk::MultiResolutionImageRegistrationMethod< FixedImageType, MovingImageType > RegistrationType;
     typedef itk::RegularStepGradientDescentOptimizer OptimizerType;
 
-    typedef itk::AffineTransform< double >  AffineTransformType;
-    typedef itk::Euler3DTransform< double >  RigidTransformType;
     typedef itk::MatrixOffsetTransformBase< double, VImageDimension1, VImageDimension2 > BaseTransformType;
 
     typedef typename itk::MattesMutualInformationImageToImageMetric< FixedImageType, MovingImageType > MMIMetricType;
@@ -452,6 +474,11 @@ protected:
     typedef itk::LinearInterpolateImageFunction< ImageType, double > InterpolatorType;
     typename InterpolatorType::Pointer linear_interpolator = InterpolatorType::New();
 
+
+    typedef itk::NearestNeighborInterpolateImageFunction< ImageType, double > NearestNeighborInterpolatorType;
+    typename NearestNeighborInterpolatorType::Pointer nn_interpolator = NearestNeighborInterpolatorType::New();
+
+
     typedef itk::WindowedSincInterpolateImageFunction< ImageType, 7> WindowedSincInterpolatorType;
     typename WindowedSincInterpolatorType::Pointer sinc_interpolator = WindowedSincInterpolatorType::New();
 
@@ -463,34 +490,37 @@ protected:
 
     if( this->m_UseAffineTransform )
     {
-        typedef itk::AffineTransform< double > TransformType;
-        TransformType::Pointer transform = TransformType::New();
+      typedef itk::AffineTransform< double > TransformType;
+      TransformType::Pointer transform = TransformType::New();
 
-        TransformType::ParametersType affine_params( TransformType::ParametersDimension );
-        this->GetParameters( &affine_params[0] );
+      TransformType::ParametersType affine_params( TransformType::ParametersDimension );
+      this->GetParameters( &affine_params[0] );
 
-        transform->SetParameters( affine_params );
+      transform->SetParameters( affine_params );
 
-        base_transform = transform;
+      base_transform = transform;
     }
     // Rigid
     else
     {
-        typedef itk::Euler3DTransform< double > RigidTransformType;
-        RigidTransformType::Pointer rtransform = RigidTransformType::New();
+      typedef itk::Euler3DTransform< double > RigidTransformType;
+      RigidTransformType::Pointer rtransform = RigidTransformType::New();
 
-        RigidTransformType::ParametersType rigid_params( RigidTransformType::ParametersDimension  );
-        this->GetParameters( &rigid_params[0] );
+      RigidTransformType::ParametersType rigid_params( RigidTransformType::ParametersDimension  );
+      this->GetParameters( &rigid_params[0] );
 
-        rtransform->SetParameters( rigid_params );
+      rtransform->SetParameters( rigid_params );
 
-        base_transform = rtransform;
+      base_transform = rtransform;
     }
 
     typename ResampleImageFilterType::Pointer resampler = ResampleImageFilterType::New();
+
     resampler->SetInterpolator( linear_interpolator );
     if( m_UseWindowedSincInterpolator )
       resampler->SetInterpolator( sinc_interpolator );
+    if ( m_UseNearestNeighborInterpolator)
+      resampler->SetInterpolator ( nn_interpolator );
 
     resampler->SetInput( itkImage );
     resampler->SetTransform( base_transform );
@@ -498,7 +528,6 @@ protected:
     resampler->UseReferenceImageOn();
 
     resampler->Update();
-
 
     mitk::GrabItkImageMemory( resampler->GetOutput(), outputImage);
 

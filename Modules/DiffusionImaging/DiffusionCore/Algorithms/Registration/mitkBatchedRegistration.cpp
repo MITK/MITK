@@ -43,7 +43,8 @@ std::vector<mitk::Image::Pointer> mitk::BatchedRegistration::GetRegisteredImages
   {
     m_RegisteredImages.clear();
     // First transform moving reference image
-    TransformType transf = GetTransformation(m_FixedImage, m_MovingReference);
+    RidgidTransformType transf = new double(6);
+    GetTransformation(m_FixedImage, m_MovingReference,transf);
     // store it as first element in vector
     ApplyTransformationToImage(m_MovingReference,transf);
     m_RegisteredImages.push_back(m_MovingReference);
@@ -58,21 +59,30 @@ std::vector<mitk::Image::Pointer> mitk::BatchedRegistration::GetRegisteredImages
   return m_RegisteredImages;
 }
 
-void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer &img, const mitk::BatchedRegistration::TransformType &transformation) const
+void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer &img, const mitk::BatchedRegistration::RidgidTransformType &transformation, mitk::Image::Pointer resampleReference,  bool binary ) const
 {
   typedef mitk::DiffusionImage<short> DiffusionImageType;
 
-  vtkMatrix4x4* transformationMatrix = vtkMatrix4x4::New();
-  vnl_matrix_fixed<double,3,3> vnlRotationMatrix;
-  for (int i = 0; i < 4;++i)
-    for (int j = 0; j < 4;++j)
-    {
-      transformationMatrix->Element[i][j] = transformation.get(i,j);
-      if (i < 3 && j < 3)
-        vnlRotationMatrix.set(i,j,transformation.get(i,j));
-    }
+  mitk::Image::Pointer ref;
+  mitk::PyramidImageRegistrationMethod::Pointer registrationMethod = mitk::PyramidImageRegistrationMethod::New();
+  registrationMethod->SetTransformToRigid();
+  if (binary)
+    registrationMethod->SetUseNearestNeighborInterpolation(true);
 
-  img->GetGeometry()->Compose( transformationMatrix);
+  if (resampleReference.IsNotNull())
+  {
+    registrationMethod->SetFixedImage( resampleReference );
+  }
+  else
+  {
+    // clone image, to prevent recursive access on resampling ..
+    ref = img->Clone();
+    registrationMethod->SetFixedImage( ref );
+  }
+
+  img = registrationMethod->GetResampledMovingImage(img, transformation);
+
+
 
   if (dynamic_cast<DiffusionImageType*> (img.GetPointer()) != NULL)
   {
@@ -98,7 +108,8 @@ void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer 
     tmp->InitializeByItk(b0Extraction->GetOutput());
     tmp->SetVolume(b0Extraction->GetOutput()->GetBufferPointer());
 
-    tmp->GetGeometry()->Compose(transformationMatrix);
+    // TODO FIXME!!!
+    //tmp->GetGeometry()->Compose(transformationMatrix);
     itk::Image<short, 3>::Pointer itkTmp;
     mitk::CastToItkImage<itk::Image<short, 3> >(tmp, itkTmp);
 
@@ -111,12 +122,12 @@ void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer 
 
     // For Diff. Images: Need to rotate the gradients
     correctionFilter->SetImage(diffImages);
-    correctionFilter->CorrectDirections(vnlRotationMatrix);
+    //correctionFilter->CorrectDirections(vnlRotationMatrix);
 
   }
 }
 
-mitk::BatchedRegistration::TransformType mitk::BatchedRegistration::GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage, mitk::Image::Pointer mask)
+void mitk::BatchedRegistration::GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage, RidgidTransformType transformation, mitk::Image::Pointer mask)
 {
   // Handle case that fixed or moving image is a DWI image
   mitk::DiffusionImage<short>* fixedDwi = dynamic_cast<mitk::DiffusionImage<short>*> (fixedImage.GetPointer());
@@ -162,22 +173,6 @@ mitk::BatchedRegistration::TransformType mitk::BatchedRegistration::GetTransform
   registrationMethod->SetMovingImage(movingImage);
   registrationMethod->Update();
 
-  TransformType transformation;
-  mitk::PyramidImageRegistrationMethod::TransformMatrixType rotationMatrix;
-  rotationMatrix = registrationMethod->GetLastRotationMatrix().transpose();
-  double param[6];
-  registrationMethod->GetParameters(param); // first three: euler angles, last three translation
-  for (unsigned int i = 0; i < 3; i++)
-  {
-    for (unsigned int j = 0; j < 3; ++j)
-    {
-      double value = rotationMatrix.get(i,j);
-      transformation.set(i,j, value);
-    }
-  }
-  transformation.set(0,3,-param[3]);
-  transformation.set(1,3,-param[4]);
-  transformation.set(2,3,-param[5]);
-  transformation.set(3,3,1);
-  return transformation;
+  registrationMethod->GetParameters(transformation); // first three: euler angles, last three translation
+
 }

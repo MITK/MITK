@@ -24,7 +24,7 @@ class DiffusionCore_EXPORT BatchedRegistration : public itk::LightObject
 {
 public:
 
-  typedef vnl_matrix_fixed<double,4,4> TransformType;
+  typedef double* RidgidTransformType;
 
   mitkClassMacro(BatchedRegistration, itk::LightObject)
   itkNewMacro(Self)
@@ -43,9 +43,10 @@ public:
    */
   std::vector<mitk::Image::Pointer> GetRegisteredImages();
 
-  void ApplyTransformationToImage(mitk::Image::Pointer& img, const TransformType& transformation) const;
+  void ApplyTransformationToImage(mitk::Image::Pointer& img, const RidgidTransformType& transformation, mitk::Image::Pointer resampleReference = NULL , bool binary = false) const;
 
-  TransformType GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage, mitk::Image::Pointer mask = NULL);
+  void GetTransformation(mitk::Image::Pointer fixedImage , mitk::Image::Pointer movingImage, RidgidTransformType transformation, mitk::Image::Pointer mask = NULL);
+
 
 protected:
   BatchedRegistration();

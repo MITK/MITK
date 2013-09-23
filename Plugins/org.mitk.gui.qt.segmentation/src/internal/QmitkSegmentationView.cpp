@@ -368,8 +368,6 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
     m_Controls->m_ManualToolSelectionBox3D->setEnabled(true);
     m_Controls->m_SlicesInterpolator->setEnabled(true);
     this->UpdateWarningLabel("");
-    //Trigger 3d interpolation is selected segmentation is visible again
-    mitk::SurfaceInterpolationController::GetInstance()->Modified();
   }
 }
 

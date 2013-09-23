@@ -65,6 +65,8 @@ protected slots:
 
   void OnShowMarkerNodes(bool);
 
+  void On2DInterpolationEnabled(bool);
+
   void OnTabWidgetChanged(int);
 
   void OnSurfaceStamp();

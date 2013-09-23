@@ -115,7 +115,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.m_cbReferenceNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.m_cbReferenceNodeSelector->SetPredicate(m_ReferencePredicate);
-  m_Controls.m_cbReferenceNodeSelector->SetAutoSelectNewItems(true);
+ // m_Controls.m_cbReferenceNodeSelector->SetAutoSelectNewItems(true);
 
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   toolManager->SetDataStorage( *(this->GetDataStorage()) );
@@ -166,6 +166,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls.tabWidgetSegmentationTools, SIGNAL(currentChanged(int)), this, SLOT(OnTabWidgetChanged(int)));
 
   connect(m_Controls.m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));
+  connect(m_Controls.m_SlicesInterpolator, SIGNAL(Signal2DInterpolationEnabled(bool)), this, SLOT(On2DInterpolationEnabled(bool)));
   //connect(m_Controls.m_SlicesInterpolator, SIGNAL(Signal3DInterpolationEnabled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
 
   connect(m_Controls.m_pbSurfaceStamp, SIGNAL(clicked()), this, SLOT(OnSurfaceStamp()));
@@ -292,6 +293,7 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
       if (_other != m_ReferenceNode)
         _other->SetVisibility(false);
     }
+
     m_Controls.m_LabelSetWidget->setEnabled(true);
     m_Controls.m_SlicesInterpolator->setEnabled(true);
   }
@@ -303,15 +305,29 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
   }
 }
 
-void QmitkMultiLabelSegmentationView::OnShowMarkerNodes (bool state)
+void QmitkMultiLabelSegmentationView::On2DInterpolationEnabled(bool state)
 {
-  mitk::SegTool2D::Pointer manualSegmentationTool;
-  unsigned int numberOfExistingTools = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetTools().size();
+  mitk::SegTool2D::Pointer tool;
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  unsigned int numberOfExistingTools = toolManager->GetTools().size();
   for(unsigned int i = 0; i < numberOfExistingTools; i++)
   {
-    manualSegmentationTool = dynamic_cast<mitk::SegTool2D*>(mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetToolById(i));
-    if (manualSegmentationTool)
-      manualSegmentationTool->SetShowMarkerNodes( state );
+    tool = dynamic_cast<mitk::SegTool2D*>(toolManager->GetToolById(i));
+    if (tool)
+      tool->SetEnable2DInterpolation( state );
+  }
+}
+
+void QmitkMultiLabelSegmentationView::OnShowMarkerNodes(bool state)
+{
+  mitk::SegTool2D::Pointer tool;
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  unsigned int numberOfExistingTools = toolManager->GetTools().size();
+  for(unsigned int i = 0; i < numberOfExistingTools; i++)
+  {
+    tool = dynamic_cast<mitk::SegTool2D*>(toolManager->GetToolById(i));
+    if (tool)
+      tool->SetShowMarkerNodes( state );
   }
 }
 

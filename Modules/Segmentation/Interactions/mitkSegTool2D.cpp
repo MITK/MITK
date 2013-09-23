@@ -54,7 +54,7 @@ m_LastEventSlice(0),
 m_Contourmarkername ("Position"),
 m_ShowMarkerNodes (false),
 m_3DInterpolationEnabled(false),
-m_2DInterpolationEnabled(true)
+m_2DInterpolationEnabled(false)
 {
 }
 

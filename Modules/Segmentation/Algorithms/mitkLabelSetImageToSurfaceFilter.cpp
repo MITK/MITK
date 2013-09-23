@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMarchingCubes.h>
 #include <vtkLinearTransform.h>
 #include <vtkImageChangeInformation.h>
+#include <vtkImageMedian3D.h>
+#include <vtkImageResample.h>
 
 #include <mitkImageAccessByItk.h>
 
@@ -103,12 +105,14 @@ void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImag
   // typedef itk::Image< unsigned char, VImageDimension> BinaryImageType;
    typedef itk::BinaryThresholdImageFilter< InputImageType, InputImageType > BinaryThresholdFilterType;
 
-   typedef float FloatPixelType;
-   typedef itk::Image<FloatPixelType, VImageDimension> FloatImageType;
+   typedef double FloatPixelType;
+   typedef itk::Image<FloatPixelType, VImageDimension> RealImageType;
 //   typedef itk::CastImageFilter< BinaryImageType, FloatImageType> CastImageFilterType;
 
-   typedef itk::AntiAliasBinaryImageFilter< InputImageType, FloatImageType > AntiAliasFilterType;
-   typedef itk::ImageToVTKImageFilter< FloatImageType > ITKFloatConvertType;
+   typedef itk::AntiAliasBinaryImageFilter< InputImageType, RealImageType > AntiAliasFilterType;
+   typedef itk::ImageToVTKImageFilter< InputImageType > ConvertType;
+
+   mitk::Vector3D spacing = this->GetInput()->GetGeometry(0)->GetSpacing();
 
    typename BinaryThresholdFilterType::Pointer thresholdFilter = BinaryThresholdFilterType::New();
    thresholdFilter->SetInput( input );
@@ -122,7 +126,7 @@ void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImag
 //   typename CastImageFilterType::Pointer castFilter = CastImageFilterType::New();
 //   castFilter->SetInput( thresholdFilter->GetOutput() );
 
-
+/*
    typename AntiAliasFilterType::Pointer antiAliasFilter;
    // todo: check why input parameters are not used in the ITK filter
    antiAliasFilter = AntiAliasFilterType::New();
@@ -131,7 +135,7 @@ void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImag
    antiAliasFilter->SetNumberOfIterations(15);
    antiAliasFilter->SetInput( thresholdFilter->GetOutput() );
 //   antiAliasFilter->ReleaseDataFlagOn();
-/*
+
    if (m_Observer.IsNotNull())
    {
       m_Observer->SetRemainingProgress(100);
@@ -140,7 +144,7 @@ void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImag
       m_Observer->AddStepsToDo(100);
    }
 */
-   antiAliasFilter->Update();
+   //antiAliasFilter->Update();
 
 /*
    if (m_Observer.IsNotNull())
@@ -150,27 +154,41 @@ void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImag
       m_Observer->SetRemainingProgress(100);
    }
 */
-   typename FloatImageType::Pointer outputFloatImage;
+//   typename FloatImageType::Pointer outputFloatImage;
 
-   outputFloatImage = antiAliasFilter->GetOutput();
+//   outputFloatImage = antiAliasFilter->GetOutput();
 //   outputFloatImage->DisconnectPipeline();
 
-   typename ITKFloatConvertType::Pointer connector;
-   connector = ITKFloatConvertType::New();
-   connector->SetInput( outputFloatImage );
+   typename ConvertType::Pointer connector = ConvertType::New();
+   connector->SetInput( thresholdFilter->GetOutput() );
    connector->ReleaseDataFlagOn();
 
-   connector->Update();
+   //connector->Update();
+/*
+   vtkSmartPointer<vtkImageResample> imageresample = vtkSmartPointer<vtkImageResample>::New();
+   imageresample->SetInput(connector->GetOutput());
+   imageresample->SetAxisOutputSpacing(0, spacing[0] * 1.5);
+   imageresample->SetAxisOutputSpacing(1, spacing[1] * 1.5);
+   imageresample->SetAxisOutputSpacing(2, spacing[2] * 1.5);
+   imageresample->UpdateInformation();
+   imageresample->Update();
+*/
+   vtkSmartPointer<vtkImageMedian3D> median = vtkSmartPointer<vtkImageMedian3D>::New();
+   median->SetInput(connector->GetOutput());
+   median->SetKernelSize(3,3,3);
+   median->ReleaseDataFlagOn();
+   median->UpdateInformation();
+  // median->Update();
 
    vtkSmartPointer<vtkImageChangeInformation> indexCoordinatesImageFilter = vtkSmartPointer<vtkImageChangeInformation>::New();
-   indexCoordinatesImageFilter->SetInput(connector->GetOutput());
+   indexCoordinatesImageFilter->SetInput(median->GetOutput());
    indexCoordinatesImageFilter->SetOutputOrigin(0.0,0.0,0.0);
 
    vtkSmartPointer<vtkMarchingCubes> marching = vtkSmartPointer<vtkMarchingCubes>::New();
    marching->ComputeNormalsOn();
    marching->ComputeGradientsOn();
    marching->SetInput(indexCoordinatesImageFilter->GetOutput());
-   marching->SetValue(0,0);
+   marching->SetValue(1,1);
    marching->ReleaseDataFlagOn();
 
    marching->Update();
@@ -180,31 +198,27 @@ void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImag
    if ( (!polydata) || (!polydata->GetNumberOfPoints()) )
       mitkThrow() << "Marching cubes filter has failed";
 
-   if (polydata->GetNumberOfPoints() > 0)
-   {
-    mitk::Vector3D spacing = this->GetInput()->GetGeometry(0)->GetSpacing();
 
-    vtkPoints * points = polydata->GetPoints();
-    vtkMatrix4x4 *vtkmatrix = vtkMatrix4x4::New();
-    this->GetInput()->GetGeometry(0)->GetVtkTransform()->GetMatrix(vtkmatrix);
-    double (*matrix)[4] = vtkmatrix->Element;
+  vtkPoints * points = polydata->GetPoints();
+  vtkMatrix4x4 *vtkmatrix = vtkMatrix4x4::New();
+  this->GetInput()->GetGeometry(0)->GetVtkTransform()->GetMatrix(vtkmatrix);
+  double (*matrix)[4] = vtkmatrix->Element;
 
-    unsigned int i,j;
-    for(i=0;i<3;++i)
-      for(j=0;j<3;++j)
-        matrix[i][j]/=spacing[j];
+  unsigned int i,j;
+  for(i=0;i<3;++i)
+    for(j=0;j<3;++j)
+      matrix[i][j]/=spacing[j];
 
-    unsigned int n = points->GetNumberOfPoints();
-    vtkFloatingPointType point[3];
+  unsigned int n = points->GetNumberOfPoints();
+  vtkFloatingPointType point[3];
 
-    for (i = 0; i < n; i++)
-    {
-      points->GetPoint(i, point);
-      mitkVtkLinearTransformPoint(matrix,point,point);
-      points->SetPoint(i, point);
-    }
-    vtkmatrix->Delete();
+  for (i = 0; i < n; i++)
+  {
+    points->GetPoint(i, point);
+    mitkVtkLinearTransformPoint(matrix,point,point);
+    points->SetPoint(i, point);
   }
+  vtkmatrix->Delete();
 
   surface->SetVtkPolyData( polydata );
 }

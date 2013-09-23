@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNrrdLabelSetImageWriter.h>
 #include <mitkRenderingManager.h>
 #include <mitkImageWriteAccessor.h>
+#include <mitkStatusBar.h>
+#include <mitkShowSegmentationAsSmoothedSurface.h>
 
 #include <QmitkDataStorageComboBox.h>
 #include <QmitkNewSegmentationDialog.h>
@@ -326,7 +328,44 @@ void QmitkLabelSetWidget::OnCreateMask(int index)
   mitk::LabelSetImage* segImage = dynamic_cast<mitk::LabelSetImage*>( segNode->GetData() );
   if (!segImage) return;
 
-  // continue
+  mitk::Image::Pointer maskImage = NULL;
+
+  this->WaitCursorOn();
+
+  try
+  {
+    maskImage = segImage->CreateLabelMask(index);
+  }
+  catch ( mitk::Exception & excep )
+  {
+    MITK_ERROR << "Exception caught: " << excep.GetDescription();
+    QMessageBox::information(this, "Create Mask", "Could not create a mask out of the selected label.\n");
+    this->WaitCursorOff();
+    return;
+  }
+
+  this->WaitCursorOff();
+
+  if (maskImage.IsNull())
+  {
+    QMessageBox::information(this, "Create Mask", "Could not create a mask out of the selected label.\n");
+    this->WaitCursorOff();
+    return;
+  }
+
+  mitk::DataNode::Pointer maskNode = mitk::DataNode::New();
+  std::string name = segImage->GetLabelName(index);
+  name += "-mask";
+  maskNode->SetName(name);
+  maskNode->SetData(maskImage);
+  maskNode->SetBoolProperty("binary",true);
+  maskNode->SetBoolProperty("outline binary",true);
+  maskNode->SetBoolProperty("outline binary shadow",true);
+  maskNode->SetFloatProperty("outline width",2.0);
+  maskNode->SetColor(segImage->GetLabelColor(index));
+  maskNode->SetOpacity(1.0);
+
+  this->m_DataStorage->Add(maskNode, m_WorkingNode);
 }
 
 void QmitkLabelSetWidget::OnCreateSurface(int index)
@@ -334,8 +373,8 @@ void QmitkLabelSetWidget::OnCreateSurface(int index)
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   toolManager->ActivateTool(-1);
 
-  mitk::DataNode* segNode = toolManager->GetWorkingData(0);
-  if (!segNode) return;
+  mitk::DataNode::Pointer segNode = toolManager->GetWorkingData(0);
+  if (segNode.IsNull()) return;
 
   mitk::LabelSetImage* segImage = dynamic_cast<mitk::LabelSetImage*>( segNode->GetData() );
   if (!segImage) return;
@@ -343,11 +382,30 @@ void QmitkLabelSetWidget::OnCreateSurface(int index)
   mitk::LabelSetImageToSurfaceThreadedFilter::Pointer filter =
      mitk::LabelSetImageToSurfaceThreadedFilter::New();
 
+  itk::SimpleMemberCommand<QmitkLabelSetWidget>::Pointer successCommand = itk::SimpleMemberCommand<QmitkLabelSetWidget>::New();
+  successCommand->SetCallbackFunction(this, &QmitkLabelSetWidget::OnThreadedCalculationDone);
+  filter->AddObserver(mitk::ResultAvailable(), successCommand);
+
+  itk::SimpleMemberCommand<QmitkLabelSetWidget>::Pointer errorCommand = itk::SimpleMemberCommand<QmitkLabelSetWidget>::New();
+  errorCommand->SetCallbackFunction(this, &QmitkLabelSetWidget::OnThreadedCalculationDone);
+  filter->AddObserver(mitk::ProcessingError(), errorCommand);
+
+  filter->SetPointerParameter("Group node", segNode);
   filter->SetPointerParameter("Input", segImage);
   filter->SetParameter("RequestedLabel", index);
   filter->SetDataStorage( *m_DataStorage );
 
-  filter->StartAlgorithm();
+  mitk::StatusBar::GetInstance()->DisplayText("Surface creation is running in background...");
+
+  try
+  {
+    filter->StartAlgorithm();
+  }
+  catch ( mitk::Exception & excep )
+  {
+    MITK_ERROR << "Exception caught: " << excep.GetDescription();
+    QMessageBox::information(this, "Create Surface", "Could not create a surface mesh out of the selected label.\n See error log for details.\n");
+  }
 }
 
 void QmitkLabelSetWidget::OnImportSegmentation()
@@ -374,21 +432,25 @@ void QmitkLabelSetWidget::OnImportSegmentation()
   {
     reader->Update();
   }
-  catch ( itk::ExceptionObject & e )
+  catch ( ... )
   {
-      MITK_ERROR << "Exception caught: " << e.GetDescription();
-      QMessageBox::information(this, "Import Segmentation", "Could not load the selected segmentation. See error log for details.\n");
-      this->WaitCursorOff();
+    QMessageBox::information(this, "Import Segmentation", "Could not load the selected segmentation. See error log for details.\n");
+    this->WaitCursorOff();
+    return;
   }
 
   this->WaitCursorOff();
 
   mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
 
-  if (!segImage->Concatenate(lsImage)) {
-      QMessageBox::information(this,
-      "Import segmentation...",
-      "Could not import the selected segmentation session (dimensions must match).\n");
+  try
+  {
+    segImage->Concatenate(lsImage);
+  }
+  catch ( mitk::Exception & excep )
+  {
+    MITK_ERROR << "Exception caught: " << excep.GetDescription();
+    QMessageBox::information(this, "Import segmentation", "Could not import the selected segmentation session.\n See error log for details.\n");
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -396,46 +458,46 @@ void QmitkLabelSetWidget::OnImportSegmentation()
 
 void QmitkLabelSetWidget::OnLoadSegmentation()
 {
-    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-    toolManager->ActivateTool(-1);
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->ActivateTool(-1);
 
-    mitk::DataNode* refNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
-    if (!refNode) return;
+  mitk::DataNode* refNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
+  if (!refNode) return;
 
-    mitk::Image* refImage = dynamic_cast<mitk::Image*>( refNode->GetData() );
-    if (!refImage) return;
+  mitk::Image* refImage = dynamic_cast<mitk::Image*>( refNode->GetData() );
+  if (!refImage) return;
 
-    std::string fileExtensions("Segmentation files (*.lset);;");
-    QString qfileName = QFileDialog::getOpenFileName(this, "Load Segmentation", "", fileExtensions.c_str() );
-    if (qfileName.isEmpty() ) return;
+  std::string fileExtensions("Segmentation files (*.lset);;");
+  QString qfileName = QFileDialog::getOpenFileName(this, "Load Segmentation", "", fileExtensions.c_str() );
+  if (qfileName.isEmpty() ) return;
 
-    mitk::NrrdLabelSetImageReader<unsigned char>::Pointer reader = mitk::NrrdLabelSetImageReader<unsigned char>::New();
-    reader->SetFileName(qfileName.toLatin1());
+  mitk::NrrdLabelSetImageReader<unsigned char>::Pointer reader = mitk::NrrdLabelSetImageReader<unsigned char>::New();
+  reader->SetFileName(qfileName.toLatin1());
 
-    this->WaitCursorOn();
+  this->WaitCursorOn();
 
-    try
-    {
-        reader->Update();
-    }
-    catch ( itk::ExceptionObject & e )
-    {
-        MITK_ERROR << "Exception caught: " << e.GetDescription();
-        QMessageBox::information(this, "Load Segmentation", "Could not load the selected segmentation. See error log for details.\n");
-        this->WaitCursorOff();
-    }
-
+  try
+  {
+    reader->Update();
+  }
+  catch ( itk::ExceptionObject & e )
+  {
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(this, "Load Segmentation", "Could not load the selected segmentation. See error log for details.\n");
     this->WaitCursorOff();
+  }
 
-    mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
+  this->WaitCursorOff();
 
-    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-    newNode->SetData(lsImage);
-    newNode->SetName( lsImage->GetLabelSetName() );
+  mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
 
-    m_DataStorage->Add(newNode,refNode);
+  mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+  newNode->SetData(lsImage);
+  newNode->SetName( lsImage->GetLabelSetName() );
 
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  m_DataStorage->Add(newNode,refNode);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnSaveSegmentation()
@@ -472,12 +534,11 @@ void QmitkLabelSetWidget::OnSaveSegmentation()
 
   try
   {
-      writer->Update();
+    writer->Update();
   }
-  catch ( itk::ExceptionObject & excep )
+  catch (...)
   {
-    MITK_ERROR << "Exception caught: " << excep.GetDescription();
-    QMessageBox::information(this, "Save Segmenation", "Could not save active segmentation. See error log for details.\n\n");
+    QMessageBox::information(this, "Save Segmenation", "Could not save active segmentation.\n");
     this->WaitCursorOff();
   }
 
@@ -571,4 +632,9 @@ void QmitkLabelSetWidget::BusyCursorOff()
 void QmitkLabelSetWidget::RestoreOverrideCursor()
 {
   QApplication::restoreOverrideCursor();
+}
+
+void QmitkLabelSetWidget::OnThreadedCalculationDone()
+{
+  mitk::StatusBar::GetInstance()->Clear();
 }

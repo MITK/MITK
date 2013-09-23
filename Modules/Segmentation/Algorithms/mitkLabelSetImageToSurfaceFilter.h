@@ -41,25 +41,25 @@ class Segmentation_EXPORT LabelSetImageToSurfaceFilter : public SurfaceSource
 {
 public:
 
-    mitkClassMacro( LabelSetImageToSurfaceFilter, SurfaceSource );
+  mitkClassMacro( LabelSetImageToSurfaceFilter, SurfaceSource );
 
-    itkNewMacro( Self );
+  itkNewMacro( Self );
 
-    typedef mitk::Tool::DefaultSegmentationDataType LabelType;
+  typedef mitk::Tool::DefaultSegmentationDataType LabelType;
 
-    typedef std::map<LabelType, unsigned long> LabelMapType;
+  typedef std::map<LabelType, unsigned long> LabelMapType;
 
-    typedef std::map<unsigned int, LabelType> IndexToLabelMapType;
+  typedef std::map<unsigned int, LabelType> IndexToLabelMapType;
 
-    /**
-    * Returns a const pointer to the labelset image set as input
-    */
-    const mitk::Image* GetInput(void);
+  /**
+  * Returns a const pointer to the labelset image set as input
+  */
+  const mitk::Image* GetInput(void);
 
-    /**
-    * Set the labelset image to create a surface from.
-    */
-    virtual void SetInput(const mitk::Image *image);
+  /**
+  * Set the labelset image to create a surface from.
+  */
+  virtual void SetInput(const mitk::Image *image);
 
  //   virtual void SetObserver(mitk::ProcessObserver::Pointer observer);
 

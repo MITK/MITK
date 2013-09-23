@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSegmentationSink.h"
 #include "mitkSurface.h"
-#include "mitkLabelSetImageToSurfaceFilter.h"
-#include "mitkColorSequenceRainbow.h"
 
 namespace mitk
 {
@@ -46,7 +44,6 @@ class Segmentation_EXPORT LabelSetImageToSurfaceThreadedFilter : public Segmenta
 
   private:
 
-     mitk::ColorSequenceRainbow::Pointer m_ColorSequenceRainbow;
      int m_RequestedLabel;
      Surface::Pointer m_ResultSurface;
    //  std::stringstream m_ResultNodeName;

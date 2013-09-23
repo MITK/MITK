@@ -22,7 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-LabelSetImageToSurfaceThreadedFilter::LabelSetImageToSurfaceThreadedFilter(): m_RequestedLabel(1)
+LabelSetImageToSurfaceThreadedFilter::LabelSetImageToSurfaceThreadedFilter():
+m_RequestedLabel(1),
+m_ResultSurface(NULL)
 {
 }
 
@@ -61,7 +63,6 @@ bool LabelSetImageToSurfaceThreadedFilter::ReadyToRun()
   return true;
 }
 
-
 bool LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateFunction()
 {
   LabelSetImage::Pointer image;
@@ -86,13 +87,7 @@ bool LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateFunction()
   {
      MITK_WARN << "\"RequestedLabel\" parameter was not set: will use the default value (" << m_RequestedLabel << ").";
   }
-/*
-  m_Filter = mitk::LabelSetImageToSurfaceFilter::New();
-  m_Filter->SetInput(image);
-//  m_Filter->SetObserver(obsv);
-  m_Filter->SetGenerateAllLabels( false );
-  m_Filter->SetRequestedLabel( m_RequestedLabel );
-*/
+
   mitk::LabelSetImageToSurfaceFilter::Pointer filter = mitk::LabelSetImageToSurfaceFilter::New();
   filter->SetInput(image);
 //  filter->SetObserver(obsv);
@@ -101,16 +96,16 @@ bool LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateFunction()
 
   try
   {
-     filter->Update();
+    filter->Update();
   }
-  catch (itk::ExceptionObject& e)
+  catch (itk::ExceptionObject& excep)
   {
-     MITK_ERROR << "Exception caught: " << e.GetDescription();
-     return false;
+    MITK_ERROR << "Exception caught: " << excep.GetDescription();
+    return false;
   }
-  catch (std::exception& e)
+  catch (std::exception& excep)
   {
-     MITK_ERROR << "Exception caught: " << e.what();
+     MITK_ERROR << "Exception caught: " << excep.what();
      return false;
   }
   catch (...)
@@ -124,32 +119,29 @@ bool LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateFunction()
   if ( m_ResultSurface.IsNull() || !m_ResultSurface->GetVtkPolyData() )
      return false;
 
-//  m_ResultSurface->DisconnectPipeline();
+  m_ResultSurface->DisconnectPipeline();
 
   return true;
 }
 
 void LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateSuccessful()
 {
-   LabelSetImage::Pointer image;
-   this->GetPointerParameter("Input", image);
+  LabelSetImage::Pointer image;
+  this->GetPointerParameter("Input", image);
 
-   std::string name = image->GetLabelName(m_RequestedLabel);
-   name.append("-surf");
+  std::string name = image->GetLabelName(m_RequestedLabel);
+  name.append("-surf");
 
-  // mitk::Surface::Pointer surface = m_ResultSurface;
-  // surface->DisconnectPipeline();
+  mitk::DataNode::Pointer node = mitk::DataNode::New();
+  node->SetData(m_ResultSurface);
+  node->SetName(name);
 
-   mitk::DataNode::Pointer node = mitk::DataNode::New();
-   node->SetData(m_ResultSurface);
-   node->SetName(name);
+  mitk::Color color = image->GetLabelColor(m_RequestedLabel);
+  node->SetColor(color);
 
-   mitk::Color color = image->GetLabelColor(m_RequestedLabel);
-   node->SetColor(color);
+  this->InsertBelowGroupNode(node);
 
-   this->GetDataStorage()->Add(node);
-
-   Superclass::ThreadedUpdateSuccessful();
+  Superclass::ThreadedUpdateSuccessful();
 }
 
 } // namespace

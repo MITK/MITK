@@ -129,6 +129,8 @@ private:
 
     void RestoreOverrideCursor();
 
+    void OnThreadedCalculationDone();
+
 };
 
 #endif

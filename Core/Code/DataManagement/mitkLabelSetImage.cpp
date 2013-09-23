@@ -43,6 +43,9 @@ mitk::LabelSetImage::LabelSetImage(Image::Pointer image) : mitk::Image()
   try
   {
     this->Initialize(image);
+    mitk::TimeSlicedGeometry::Pointer geometry = image->GetTimeSlicedGeometry()->Clone();
+    image->SetGeometry( geometry );
+
     mitk::ImageReadAccessor imgA(image, image->GetVolumeData(0));
     this->SetVolume(imgA.GetData());
     this->CreateDefaultLabelSet();
@@ -811,4 +814,50 @@ void mitk::LabelSetImage::SurfaceStamp(mitk::Surface* surface, bool forceOverwri
   {
     mitkThrow() << "Could not stamp the provided surface.";
   }
+}
+
+void mitk::LabelSetImage::ImportLabeledImage(mitk::Image* image)
+{
+  this->Initialize(image);
+
+  unsigned int byteSize = sizeof(unsigned char);
+  for (unsigned int dim = 0; dim < image->GetDimension(); ++dim)
+  {
+    byteSize *= image->GetDimension(dim);
+  }
+
+  mitk::ImageWriteAccessor* accessor = new mitk::ImageWriteAccessor(static_cast<mitk::Image*>(this));
+  memset( accessor->GetData(), 0, byteSize );
+
+  delete accessor;
+
+  mitk::TimeSlicedGeometry::Pointer geometry = image->GetTimeSlicedGeometry()->Clone();
+  this->SetGeometry( geometry );
+
+  this->CreateDefaultLabelSet();
+
+  AccessTwoImagesFixedDimensionByItk(this, image, ImportLabeledImageProcessing,3);
+}
+
+template < typename LabelSetImageType, typename LabeledImageType >
+void mitk::LabelSetImage::ImportLabeledImageProcessing(LabelSetImageType* input, LabeledImageType* labeled)
+{
+  typedef itk::ImageRegionConstIterator< LabeledImageType > SourceIteratorType;
+  typedef itk::ImageRegionIterator< LabelSetImageType > TargetIteratorType;
+
+  TargetIteratorType targetIter( input, input->GetLargestPossibleRegion() );
+  targetIter.GoToBegin();
+
+  SourceIteratorType sourceIter( labeled, labeled->GetLargestPossibleRegion() );
+  sourceIter.GoToBegin();
+
+  while ( !sourceIter.IsAtEnd() )
+  {
+    int sourceValue = static_cast<int>(sourceIter.Get());
+    targetIter.Set( sourceValue );
+    ++sourceIter;
+    ++targetIter;
+  }
+
+  this->Modified();
 }

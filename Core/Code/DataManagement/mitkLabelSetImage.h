@@ -288,6 +288,8 @@ public:
 
   mitk::Image::Pointer CreateLabelMask(int index);
 
+  void ImportLabeledImage(mitk::Image* image);
+
   void MaskStamp(mitk::Image* mask, bool forceOverwrite);
 
 protected:
@@ -322,6 +324,9 @@ protected:
 
   template < typename LabelSetImageType >
   void CreateLabelMaskProcessing(LabelSetImageType * input, mitk::Image* mask, int index);
+
+  template < typename LabelSetImageType, typename LabeledImageType >
+  void ImportLabeledImageProcessing(LabelSetImageType* input, LabeledImageType* labeled);
 
   mitk::LabelSet::Pointer m_LabelSet;
 };

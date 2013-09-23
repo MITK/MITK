@@ -102,10 +102,8 @@ QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Po
   int resOverride = imageSource->GetResolutionOverride();
   int resWidth = imageSource->GetResolutionOverrideWidth();
   int resHight = imageSource->GetResolutionOverrideHeight();
-  int cropRight = imageSource->GetCropping().right;
-  int cropLeft = imageSource->GetCropping().left;
-  int cropBottom = imageSource->GetCropping().bottom;
-  int cropTop = imageSource->GetCropping().top;
+
+  mitk::USImageVideoSource::USImageRoi roi = imageSource->GetRegionOfInterest();
 
   char seperator = '|';
 
@@ -118,10 +116,10 @@ QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Po
                        + QString::number(resOverride) + seperator
                        + QString::number(resWidth) + seperator
                        + QString::number(resHight) + seperator
-                       + QString::number(cropRight) + seperator
-                       + QString::number(cropLeft) + seperator
-                       + QString::number(cropBottom) + seperator
-                       + QString::number(cropTop)
+                       + QString::number(roi.topLeftX) + seperator
+                       + QString::number(roi.topLeftY) + seperator
+                       + QString::number(roi.bottomRightX) + seperator
+                       + QString::number(roi.bottomRightY)
                        ;
 
   MITK_INFO << "Output String: " << returnValue.toStdString();
@@ -150,11 +148,11 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
   bool resOverride = (QString(data.at(6).c_str())).toInt();
   int resWidth = (QString(data.at(7).c_str())).toInt();
   int resHight = (QString(data.at(8).c_str())).toInt();
-  mitk::USImageVideoSource::USImageCropping cropArea;
-  cropArea.right = (QString(data.at(9).c_str())).toInt();
-  cropArea.left = (QString(data.at(10).c_str())).toInt();
-  cropArea.bottom = (QString(data.at(11).c_str())).toInt();
-  cropArea.top = (QString(data.at(12).c_str())).toInt();
+  mitk::USImageVideoSource::USImageRoi cropArea;
+  cropArea.topLeftX = (QString(data.at(9).c_str())).toInt();
+  cropArea.topLeftY = (QString(data.at(10).c_str())).toInt();
+  cropArea.bottomRightX = (QString(data.at(11).c_str())).toInt();
+  cropArea.bottomRightY = (QString(data.at(12).c_str())).toInt();
 
   // Assemble Metadata
   mitk::USImageMetadata::Pointer metadata = mitk::USImageMetadata::New();
@@ -194,7 +192,7 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
     }
 
   // Set Crop Area
-  imageSource->SetCropping(cropArea);
+  imageSource->SetRegionOfInterest(cropArea);
 
   return returnValue;
 }

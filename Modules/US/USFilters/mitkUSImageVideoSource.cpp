@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //Other
 #include <stdio.h>
 
-
 mitk::USImageVideoSource::USImageVideoSource()
   : m_VideoCapture(new cv::VideoCapture()),
     m_IsVideoReady(false),
@@ -48,18 +47,18 @@ mitk::USImageVideoSource::~USImageVideoSource()
 void mitk::USImageVideoSource::SetVideoFileInput(std::string path)
 {
   m_VideoCapture->open(path.c_str());
-  if(!m_VideoCapture->isOpened())  // check if we succeeded
-    m_IsVideoReady = false;
-  else
-    m_IsVideoReady = true;
+
+  // check if we succeeded
+  if(!m_VideoCapture->isOpened()) { m_IsVideoReady = false; }
+  else { m_IsVideoReady = true; }
 
   // if Override is enabled, use it
-  if (m_ResolutionOverride) {
+  if (m_ResolutionOverride)
+  {
     m_VideoCapture->set(CV_CAP_PROP_FRAME_WIDTH, this->m_ResolutionOverrideWidth);
     m_VideoCapture->set(CV_CAP_PROP_FRAME_HEIGHT, this->m_ResolutionOverrideHeight);
   }
 }
-
 
 void mitk::USImageVideoSource::SetCameraInput(int deviceID)
 {
@@ -113,7 +112,8 @@ void mitk::USImageVideoSource::SetRegionOfInterest(int topLeftX, int topLeftY, i
 {
   m_CropFilter->SetCropRegion(topLeftX, topLeftY, bottomRightX, bottomRightY);
 
-  if (! m_IsCropped && ! m_CropFilter->GetIsCropRegionEmpty()) {
+  if (! m_IsCropped && ! m_CropFilter->GetIsCropRegionEmpty())
+  {
     m_CombinationFilter->PushFilter(m_CropFilter.GetPointer());
     m_IsCropped = true;
   }
@@ -126,9 +126,10 @@ void mitk::USImageVideoSource::SetRegionOfInterest(USImageRoi roi)
 
 void mitk::USImageVideoSource::SetCropping(USImageCropping cropping)
 {
-  int right = this->GetImageWidth() - cropping.right;
-  int bottom = this->GetImageHeight() - cropping.bottom;
-  this->SetRegionOfInterest(cropping.left, cropping.top, right, bottom);
+  int width = this->GetImageWidth();
+  int height = this->GetImageHeight();
+
+  this->SetRegionOfInterest(cropping.left, cropping.top, width - cropping.right, height - cropping.bottom);
 }
 
 mitk::USImageVideoSource::USImageCropping mitk::USImageVideoSource::GetCropping()
@@ -158,6 +159,13 @@ mitk::USImageVideoSource::USImageCropping mitk::USImageVideoSource::GetCropping(
   }
 
   return cropping;
+}
+
+mitk::USImageVideoSource::USImageRoi  mitk::USImageVideoSource::GetRegionOfInterest()
+{
+  cv::Rect cropRect = m_CropFilter->GetCropRegion();
+
+  return USImageRoi(cropRect.x, cropRect.y, cropRect.x + cropRect.width, cropRect.y + cropRect.height);
 }
 
 void mitk::USImageVideoSource::RemoveRegionOfInterest()

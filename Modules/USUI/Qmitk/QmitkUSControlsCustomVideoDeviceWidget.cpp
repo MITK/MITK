@@ -52,7 +52,7 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnDeviceSet()
   m_ControlInterface = dynamic_cast<mitk::USVideoDeviceCustomControls*>
     (this->GetDevice()->GetControlInterfaceCustom().GetPointer());
 
-  if ( m_ControlInterface.IsNull() )
+  if ( m_ControlInterface.IsNotNull() )
   {
     mitk::USImageVideoSource::USImageCropping cropping = m_ControlInterface->GetCropArea();
     ui->crop_left->setValue(cropping.left);

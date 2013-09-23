@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKUSImageVideoSource_H_HEADER_INCLUDED_
 #define MITKUSImageVideoSource_H_HEADER_INCLUDED_
 
@@ -31,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <highgui.h>
 
 namespace mitk {
-
   /**
     * \brief This class can be pointed to a video file or a videodevice and delivers USImages.
     *
@@ -57,6 +55,11 @@ namespace mitk {
       int topLeftY;
       int bottomRightX;
       int bottomRightY;
+
+      USImageRoi()
+        : topLeftX(0), topLeftY(0), bottomRightX(0), bottomRightY(0) { };
+      USImageRoi(unsigned int topLeftX, unsigned int topLeftY, unsigned int bottomRightX, unsigned int bottomRightY)
+        : topLeftX(topLeftX), topLeftY(topLeftY), bottomRightX(bottomRightX), bottomRightY(bottomRightY) { };
     };
 
     /**
@@ -64,10 +67,15 @@ namespace mitk {
       */
     struct USImageCropping
     {
-      int top;
-      int bottom;
-      int left;
-      int right;
+      unsigned int top;
+      unsigned int bottom;
+      unsigned int left;
+      unsigned int right;
+
+      USImageCropping()
+        : top(0), bottom(0), left(0), right(0) { };
+      USImageCropping(unsigned int top, unsigned int bottom, unsigned int left, unsigned int right)
+        : top(top), bottom(bottom), left(left), right(right) { };
     };
 
     /**
@@ -137,7 +145,6 @@ namespace mitk {
       */
     void OverrideResolution(int width, int height);
 
-
     // Getter & Setter
     itkGetMacro(IsVideoReady, bool);
     itkGetMacro(ResolutionOverride, bool);
@@ -148,6 +155,7 @@ namespace mitk {
     int GetImageHeight();
     int GetImageWidth();
     USImageCropping GetCropping();
+    USImageRoi GetRegionOfInterest();
 
     /**
       * \brief Returns true if images can be delivered.
@@ -157,7 +165,6 @@ namespace mitk {
       * If false is returned, behaviour is undefined.
       */
     bool GetIsReady();
-
 
   protected:
     USImageVideoSource();
@@ -207,7 +214,6 @@ namespace mitk {
     ConvertGrayscaleOpenCVImageFilter::Pointer  m_GrayscaleFilter;
     CropOpenCVImageFilter::Pointer              m_CropFilter;
     BasicCombinationOpenCVImageFilter::Pointer  m_CombinationFilter;
-
   };
 } // namespace mitk
 #endif /* MITKUSImageVideoSource_H_HEADER_INCLUDED_ */

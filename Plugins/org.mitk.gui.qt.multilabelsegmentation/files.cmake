@@ -13,6 +13,9 @@ set(INTERNAL_CPP_FILES
   SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesView.cpp
   SegmentationUtilities/QmitkSegmentationUtilityWidget.cpp
   SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidget.cpp
+  SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidget.cpp
+  SegmentationUtilities/SurfaceToImage/QmitkSurfaceToImageWidget.cpp
+  SegmentationUtilities/ImageMasking/QmitkImageMaskingWidget.cpp
 )
 
 set(UI_FILES
@@ -21,6 +24,9 @@ set(UI_FILES
   src/internal/Common/QmitkDataSelectionWidgetControls.ui
   src/internal/SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesViewControls.ui
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidgetControls.ui
+  src/internal/SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidgetControls.ui
+  src/internal/SegmentationUtilities/SurfaceToImage/QmitkSurfaceToImageWidgetControls.ui
+  src/internal/SegmentationUtilities/ImageMasking/QmitkImageMaskingWidgetControls.ui
 )
 
 set(MOC_H_FILES
@@ -35,6 +41,9 @@ set(MOC_H_FILES
   src/internal/SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesView.h
   src/internal/SegmentationUtilities/QmitkSegmentationUtilityWidget.h
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidget.h
+  src/internal/SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidget.h
+  src/internal/SegmentationUtilities/SurfaceToImage/QmitkSurfaceToImageWidget.h
+  src/internal/SegmentationUtilities/ImageMasking/QmitkImageMaskingWidget.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -46,6 +55,8 @@ set(CACHED_RESOURCE_FILES
 set(QRC_FILES
   resources/multilabelsegmentation.qrc
   resources/MultiLabelSegmentationUtilities.qrc
+  resources/MorphologicalOperationsWidget.qrc
+  resources/BooleanOperationsWidget.qrc
 )
 
 set(CPP_FILES)

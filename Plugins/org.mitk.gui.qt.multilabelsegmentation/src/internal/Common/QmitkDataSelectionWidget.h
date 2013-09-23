@@ -37,7 +37,7 @@ public:
   enum PredicateType
   {
     ImagePredicate,
-    SegmentationPredicate,
+    MaskPredicate,
     SurfacePredicate
   };
 

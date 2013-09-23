@@ -1,5 +1,5 @@
 <RCC>
-  <qresource prefix="/SegmentationUtilities">
+  <qresource prefix="/MultiLabelSegmentationUtilities">
      <file>BooleanOperations_48x48.png</file>
      <file>ImageMasking_48x48.png</file>
      <file>MorphologicalOperations_48x48.png</file>

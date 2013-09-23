@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 
 class QmitkBooleanOperationsWidget;
+class QmitkSurfaceToImageWidget;
+class QmitkImageMaskingWidget;
+class QmitkMorphologicalOperationsWidget;
 
 class QmitkMultiLabelSegmentationUtilitiesView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
@@ -41,6 +44,12 @@ private:
   void AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text);
 
   QmitkBooleanOperationsWidget* m_BooleanOperationsWidget;
+
+  QmitkMorphologicalOperationsWidget* m_MorphologicalOperationsWidget;
+
+  QmitkSurfaceToImageWidget* m_SurfaceToImageWidget;
+
+  QmitkImageMaskingWidget* m_ImageMaskingWidget;
 
   Ui::QmitkMultiLabelSegmentationUtilitiesViewControls m_Controls;
 };

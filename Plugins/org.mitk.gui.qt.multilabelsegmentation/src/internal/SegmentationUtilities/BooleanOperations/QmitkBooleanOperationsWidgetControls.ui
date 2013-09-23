@@ -32,7 +32,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../../../resources/BooleanOperationsWidget.qrc">
-         <normaloff>:/SegmentationUtilities/BooleanOperations/BooleanDifference_48x48.png</normaloff>:/SegmentationUtilities/BooleanOperations/BooleanDifference_48x48.png</iconset>
+         <normaloff>:/MultiLabelSegmentationUtilities/BooleanOperations/BooleanDifference_48x48.png</normaloff>:/MultiLabelSegmentationUtilities/BooleanOperations/BooleanDifference_48x48.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -70,7 +70,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../../../resources/BooleanOperationsWidget.qrc">
-         <normaloff>:/SegmentationUtilities/BooleanOperations/BooleanIntersection_48x48.png</normaloff>:/SegmentationUtilities/BooleanOperations/BooleanIntersection_48x48.png</iconset>
+         <normaloff>:/MultiLabelSegmentationUtilities/BooleanOperations/BooleanIntersection_48x48.png</normaloff>:/MultiLabelSegmentationUtilities/BooleanOperations/BooleanIntersection_48x48.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -108,7 +108,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../../../resources/BooleanOperationsWidget.qrc">
-         <normaloff>:/SegmentationUtilities/BooleanOperations/BooleanUnion_48x48.png</normaloff>:/SegmentationUtilities/BooleanOperations/BooleanUnion_48x48.png</iconset>
+         <normaloff>:/MultiLabelSegmentationUtilities/BooleanOperations/BooleanUnion_48x48.png</normaloff>:/MultiLabelSegmentationUtilities/BooleanOperations/BooleanUnion_48x48.png</iconset>
        </property>
        <property name="iconSize">
         <size>

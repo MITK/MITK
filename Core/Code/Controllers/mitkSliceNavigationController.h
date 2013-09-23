@@ -159,8 +159,8 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
       Transversal, // deprecated
 #endif
       Axial = 0,
-      Sagittal,
-      Frontal,
+      Sagittal = 1,
+      Frontal = 2,
       Original
     };
 
@@ -202,6 +202,9 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
      */
     itkSetEnumMacro(DefaultViewDirection, ViewDirection);
     itkGetEnumMacro(DefaultViewDirection, ViewDirection);
+
+
+    const char* GetViewDirection();
 
     virtual void SetViewDirectionToDefault();
 

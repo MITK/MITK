@@ -92,7 +92,6 @@ m_WorkingNode(0)
   m_Controls.m_btSaveLabelSet->setEnabled(false);
   m_Controls.m_btNewLabel->setEnabled(false);
   m_Controls.m_btImportLabelSet->setEnabled(false);
-  m_Controls.m_btImportLabelSetImage->setEnabled(false);
 }
 
 QmitkLabelSetWidget::~QmitkLabelSetWidget()
@@ -149,7 +148,6 @@ void QmitkLabelSetWidget::OnSegmentationSelectionChanged(const mitk::DataNode *n
   m_Controls.m_btSaveLabelSet->setEnabled(m_WorkingNode.IsNotNull());
   m_Controls.m_btNewLabel->setEnabled(m_WorkingNode.IsNotNull());
   m_Controls.m_btImportLabelSet->setEnabled(m_WorkingNode.IsNotNull());
-  m_Controls.m_btImportLabelSetImage->setEnabled(m_WorkingNode.IsNotNull());
 
   if (m_WorkingNode.IsNull()) return;
 
@@ -581,8 +579,9 @@ void QmitkLabelSetWidget::OnNewSegmentation()
     byteSize *= labelSetImage->GetDimension(dim);
   }
 
-  mitk::ImageWriteAccessor accessor(static_cast<mitk::Image*>(labelSetImage));
-  memset( accessor.GetData(), 0, byteSize );
+  mitk::ImageWriteAccessor* accessor = new mitk::ImageWriteAccessor(labelSetImage.GetPointer());
+  memset( accessor->GetData(), 0, byteSize );
+  delete accessor;
 
   mitk::TimeSlicedGeometry::Pointer originalGeometry = refImage->GetTimeSlicedGeometry()->Clone();
   labelSetImage->SetGeometry( originalGeometry );

@@ -16,6 +16,7 @@ set(INTERNAL_CPP_FILES
   SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidget.cpp
   SegmentationUtilities/SurfaceToImage/QmitkSurfaceToImageWidget.cpp
   SegmentationUtilities/ImageMasking/QmitkImageMaskingWidget.cpp
+  SegmentationUtilities/LabeledImageImport/QmitkLabeledImageImportWidget.cpp
 )
 
 set(UI_FILES
@@ -27,6 +28,7 @@ set(UI_FILES
   src/internal/SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidgetControls.ui
   src/internal/SegmentationUtilities/SurfaceToImage/QmitkSurfaceToImageWidgetControls.ui
   src/internal/SegmentationUtilities/ImageMasking/QmitkImageMaskingWidgetControls.ui
+  src/internal/SegmentationUtilities/LabeledImageImport/QmitkLabeledImageImportWidgetControls.ui
 )
 
 set(MOC_H_FILES
@@ -44,6 +46,7 @@ set(MOC_H_FILES
   src/internal/SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidget.h
   src/internal/SegmentationUtilities/SurfaceToImage/QmitkSurfaceToImageWidget.h
   src/internal/SegmentationUtilities/ImageMasking/QmitkImageMaskingWidget.h
+  src/internal/SegmentationUtilities/LabeledImageImport/QmitkLabeledImageImportWidget.h
 )
 
 set(CACHED_RESOURCE_FILES

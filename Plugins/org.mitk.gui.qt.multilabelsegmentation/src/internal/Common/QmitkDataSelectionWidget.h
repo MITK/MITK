@@ -38,6 +38,7 @@ public:
   {
     ImagePredicate,
     MaskPredicate,
+    SegmentationPredicate,
     SurfacePredicate
   };
 

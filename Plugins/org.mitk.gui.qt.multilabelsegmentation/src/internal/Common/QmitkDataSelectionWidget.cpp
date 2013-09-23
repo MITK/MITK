@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatform.h>
 #include <mitkIDataStorageService.h>
 #include <mitkImage.h>
+#include <mitkLabelSetImage.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateDataType.h>
@@ -33,6 +34,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget::PredicateType predicateType)
 {
+
+  mitk::NodePredicateAnd::Pointer  segmentationPredicate = mitk::NodePredicateAnd::New();
+  segmentationPredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
+  segmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
 
   mitk::NodePredicateAnd::Pointer maskPredicate = mitk::NodePredicateAnd::New();
   maskPredicate->AddPredicate(mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true)));
@@ -65,6 +70,9 @@ static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget
 
     case QmitkDataSelectionWidget::MaskPredicate:
       return maskPredicate.GetPointer();
+
+    case QmitkDataSelectionWidget::SegmentationPredicate:
+      return segmentationPredicate.GetPointer();
 
     case QmitkDataSelectionWidget::SurfacePredicate:
       return surfacePredicate.GetPointer();

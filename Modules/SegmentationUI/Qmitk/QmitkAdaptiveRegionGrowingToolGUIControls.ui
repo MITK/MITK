@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>264</width>
-    <height>170</height>
+    <height>171</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -198,7 +198,7 @@ p, li { white-space: pre-wrap; }
       <string>Press to confirm the segmentation and calculate 3D representation.</string>
      </property>
      <property name="text">
-      <string>&amp;Confirm segmentation</string>
+      <string>&amp;Confirm Segmentation</string>
      </property>
      <property name="shortcut">
       <string>Alt+C</string>

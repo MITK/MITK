@@ -57,19 +57,19 @@ m_MouseCursorSet(false)
   RegisterSegmentationObjectFactory();
 
   m_SegmentationPredicate = mitk::NodePredicateAnd::New();
-  m_SegmentationPredicate->AddPredicate(mitk::NodePredicateDataType::New("LabelSetImage"));
+  m_SegmentationPredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
   m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
 
   m_SurfacePredicate = mitk::NodePredicateAnd::New();
   m_SurfacePredicate->AddPredicate(mitk::NodePredicateDataType::New("Surface"));
   m_SurfacePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
 
-  mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
+  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
   mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  mitk::NodePredicateAnd::Pointer isBinaryImage = mitk::NodePredicateAnd::New(isBinary, isImage);
+  mitk::NodePredicateAnd::Pointer isMask = mitk::NodePredicateAnd::New(isBinary, isImage);
 
   m_MaskPredicate = mitk::NodePredicateAnd::New();
-  m_MaskPredicate->AddPredicate(isBinaryImage);
+  m_MaskPredicate->AddPredicate(isMask);
   m_MaskPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
 
   mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
@@ -77,14 +77,15 @@ m_MouseCursorSet(false)
   mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
 
   mitk::NodePredicateOr::Pointer validImages = mitk::NodePredicateOr::New();
-  validImages->AddPredicate( mitk::TNodePredicateDataType<mitk::Image>::New() );
+  validImages->AddPredicate(isImage);
   validImages->AddPredicate(isDwi);
   validImages->AddPredicate(isDti);
   validImages->AddPredicate(isQbi);
 
   m_ReferencePredicate = mitk::NodePredicateAnd::New();
   m_ReferencePredicate->AddPredicate(validImages);
-  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New( m_SegmentationPredicate));
+  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(m_SegmentationPredicate));
+  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(isMask));
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
 }
 
@@ -441,7 +442,16 @@ void QmitkMultiLabelSegmentationView::OnMaskStamp()
     return;
   }
 
-  lsImage->PasteMaskOnActiveLabel( mask, m_Controls.m_chkMaskStampOverwrite->isChecked() );
+  try
+  {
+    lsImage->MaskStamp( mask, m_Controls.m_chkMaskStampOverwrite->isChecked() );
+  }
+  catch ( mitk::Exception & excep )
+  {
+    MITK_ERROR << "Exception caught: " << excep.GetDescription();
+    QMessageBox::information( m_Parent, "Mask Stamp", "Could not stamp the selected mask.\n See error log for details.\n");
+    return;
+  }
 
   maskNode->SetVisibility(false);
 
@@ -484,7 +494,16 @@ void QmitkMultiLabelSegmentationView::OnSurfaceStamp()
     return;
   }
 
-  lsImage->PasteSurfaceOnActiveLabel( surface, m_Controls.m_chkSurfaceStampOverwrite->isChecked() );
+  try
+  {
+    lsImage->SurfaceStamp( surface, m_Controls.m_chkSurfaceStampOverwrite->isChecked() );
+  }
+  catch ( mitk::Exception & excep )
+  {
+    MITK_ERROR << "Exception caught: " << excep.GetDescription();
+    QMessageBox::information( m_Parent, "Surface Stamp", "Could not stamp the selected surface.\n See error log for details.\n");
+    return;
+  }
 
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
 }

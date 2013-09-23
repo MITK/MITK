@@ -125,7 +125,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     */
     Image::Pointer Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, const mitk::PlaneGeometry* currentPlane, unsigned int timeStep );
 
-    void BuildLabelCount();
+    void ResetLabelCount();
 
   protected:
 

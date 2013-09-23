@@ -109,6 +109,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
 
   // feedback node and its visualization properties
   m_FeedbackNode = mitk::DataNode::New();
+  m_FeedbackNode->Initialize();
   m_FeedbackContour = mitk::ContourModel::New();
   m_FeedbackNode->SetData( m_FeedbackContour );
   m_FeedbackNode->SetName( "2D interpolation feedback" );
@@ -291,24 +292,14 @@ void QmitkSlicesInterpolator::ActivateInterpolation(bool enabled)
 {
   if (enabled)
   {
-    if (m_3DInterpolationEnabled)
-    {
-      this->Show3DInterpolationControls(true);
-      this->Show3DInterpolationResult(false);
-    }
-    else
-    {
-      this->Show2DInterpolationControls(true);
-      this->Activate2DInterpolation(true);
-    }
+    this->Show2DInterpolationControls(true);
+    this->Activate2DInterpolation(true);
   }
   else
   {
-    mitk::UndoController::GetCurrentUndoModel()->Clear();
     this->HideAllInterpolationControls();
     this->Activate2DInterpolation(false);
-    this->Activate3DInterpolation(false);
-    this->Show3DInterpolationResult(false);
+    mitk::UndoController::GetCurrentUndoModel()->Clear();
   }
 }
 
@@ -349,7 +340,7 @@ void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
   mitk::DataNode* workingNode = this->m_ToolManager->GetWorkingData(0);
-  if (!workingNode)
+  if ( (!workingNode) || (!dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData())) )
   {
     this->setChecked(false);
     this->setEnabled(false);
@@ -357,13 +348,6 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
   }
 
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
-  if (!workingImage)
-  {
-    this->setChecked(false);
-    this->setEnabled(false);
-    return;
-  }
-
   if (workingImage->GetDimension() > 4 || workingImage->GetDimension() < 3)
   {
     MITK_ERROR << "slices interpolator needs a 3D or 3D+t segmentation, not 2D.";
@@ -374,14 +358,10 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 
   if (m_WorkingImage != workingImage)
   {
-    if (m_WorkingImage.IsNotNull())
-      m_WorkingImage->RemoveObserver( m_WorkingImageObserverID );
-
     m_WorkingImage = workingImage;
+    m_SliceInterpolatorController->SetWorkingImage( m_WorkingImage );
+    this->UpdateVisibleSuggestion();
   }
-
-  m_SliceInterpolatorController->SetWorkingImage( m_WorkingImage );
-  this->UpdateVisibleSuggestion();
 }
 
 void QmitkSlicesInterpolator::OnTimeChanged(itk::Object* sender, const itk::EventObject& e)
@@ -410,10 +390,9 @@ void QmitkSlicesInterpolator::OnSliceChanged(itk::Object *sender, const itk::Eve
 
   mitk::SliceNavigationController* slicer = dynamic_cast<mitk::SliceNavigationController*>(sender);
 
-  if (this->TranslateAndInterpolateChangedSlice(e, slicer))
-  {
-    slicer->GetRenderer()->RequestUpdate();
-  }
+  this->TranslateAndInterpolateChangedSlice(e, slicer);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  //  slicer->GetRenderer()->RequestUpdate();
 }
 
 bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::EventObject& e, mitk::SliceNavigationController* slicer)
@@ -793,6 +772,8 @@ void QmitkSlicesInterpolator::Activate2DInterpolation(bool on)
 
   m_2DInterpolationEnabled = on;
 
+  emit Signal2DInterpolationEnabled(m_2DInterpolationEnabled);
+
   if ( m_DataStorage.IsNotNull() )
   {
     if (on && !m_DataStorage->Exists(m_FeedbackNode))
@@ -807,7 +788,7 @@ void QmitkSlicesInterpolator::Activate2DInterpolation(bool on)
 
   if (on)
   {
-//    this->m_SliceInterpolatorController->BuildLabelCount();
+    m_SliceInterpolatorController->SetWorkingImage( m_WorkingImage );
     this->UpdateVisibleSuggestion();
     return;
   }

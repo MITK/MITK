@@ -94,9 +94,6 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
 
     void SetDataStorage( mitk::DataStorage::Pointer storage );
 
-    /**
-      Just public because it is called by itk::Commands. You should not need to call this.
-    */
     void OnToolManagerWorkingDataModified();
 
     void OnTimeChanged(itk::Object* sender, const itk::EventObject&);
@@ -129,6 +126,8 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
 
     void SignalRememberContourPositions(bool);
     void SignalShowMarkerNodes(bool);
+    void Signal2DInterpolationEnabled(bool);
+    void Signal3DInterpolationEnabled(bool);
 
   protected slots:
 
@@ -251,8 +250,6 @@ private:
     mitk::SliceNavigationController* m_LastSNC;
 
     unsigned int m_LastSliceIndex;
-
-    unsigned long m_WorkingImageObserverID;
 
     QHash<mitk::SliceNavigationController*, unsigned int> m_TimeStep;
 

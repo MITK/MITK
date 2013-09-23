@@ -92,6 +92,10 @@ public slots:
   ///
   void TextureInterpolationChanged();
   ///
+  /// Invoked when the CenterRotation action changed
+  ///
+  void CenterRotationChanged();
+  ///
   /// Invoked when the color action changed
   ///
   void TextureInterpolationToggled ( bool checked );
@@ -234,6 +238,8 @@ protected:
   QPushButton* m_ColorButton;
   /// TextureInterpolation action
   QAction* m_TextureInterpolation;
+  // CenterRotation action
+  QAction* m_ActionCenterRotation;
   /// SurfaceRepresentation action
   QAction* m_SurfaceRepresentation;
 

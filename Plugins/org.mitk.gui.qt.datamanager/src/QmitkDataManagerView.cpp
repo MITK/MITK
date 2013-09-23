@@ -48,6 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkDataStorageTableModel.h>
 #include <QmitkPropertiesTableEditor.h>
 #include <QmitkIOUtil.h>
+#include <QmitkRenderWindow.h>
 #include <QmitkDataStorageTreeModel.h>
 #include <QmitkCustomVariants.h>
 #include "src/internal/QmitkNodeTableViewKeyFilter.h"
@@ -311,6 +312,11 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   unknownDataNodeDescriptor->AddAction(colorAction, false);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,colorAction));
 
+  m_ActionCenterRotation = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/CenterRotation_48.png"),"Center Rotation", this);
+  QObject::connect( m_ActionCenterRotation, SIGNAL( triggered() ), this, SLOT( CenterRotationChanged() ) );
+  surfaceDataNodeDescriptor->AddAction(m_ActionCenterRotation);
+  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(surfaceDataNodeDescriptor, m_ActionCenterRotation));
+
   m_TextureInterpolation = new QAction("Texture Interpolation", this);
   m_TextureInterpolation->setCheckable ( true );
   QObject::connect( m_TextureInterpolation, SIGNAL( changed() )
@@ -546,6 +552,39 @@ void QmitkDataManagerView::ColorActionChanged()
     styleSheet.append(QString::number(color[2]*255));
     styleSheet.append(")");
     m_ColorButton->setStyleSheet(styleSheet);
+  }
+}
+
+void QmitkDataManagerView::CenterRotationChanged()
+{
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  if (node)
+  {
+    mitk::Surface* surface = dynamic_cast<mitk::Surface*> (node->GetData());
+    if (!surface) return;
+
+    mitk::Geometry3D* surfaceGeometry = surface->GetGeometry(0);
+    if (!surfaceGeometry) return;
+
+    mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
+
+    if (renderWindowPart == NULL)
+      renderWindowPart = this->OpenRenderWindowPart(false);
+
+  //  QmitkStdMultiWidget *multiwidget = this->GetActiveStdMultiWidget();
+
+    QmitkRenderWindow* renderWindow = renderWindowPart->GetQmitkRenderWindow("3d");
+    if (!renderWindow) return;
+
+    mitk::BaseRenderer* baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow->GetVtkRenderWindow());
+    if (!baseRenderer) return;
+
+    mitk::CameraController* controller = baseRenderer->GetCameraController();
+
+    mitk::Point3D center = surfaceGeometry->GetCenter();
+    controller->SetCameraFocalPoint(center);
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
   }
 }
 

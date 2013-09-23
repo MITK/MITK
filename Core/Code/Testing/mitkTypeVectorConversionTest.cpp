@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVector.h"
 #include "mitkTypes.h" // for Equals
 
+#include <cv.h>
+
 using namespace mitk;
 
 /**
@@ -46,6 +48,13 @@ static const ScalarType valuesToCopy[]        =  {4.654789123321, 5.987456789321
 static const float      valuesToCopyFloat[]   =  {4.654789123321, 5.987456789321, 6.321654987789546};
 
 static float epsDouble2Float = vnl_math::float_eps * 10.0;
+
+template <typename T1, typename T2>
+static void TestForEquality(T1 vectorToBeAssigned, T2 vectorToCopy, std::string nameToBeAssigned, std::string nameToCopy, ScalarType eps = mitk::eps)
+{
+  MITK_TEST_CONDITION( EqualArray(vectorToBeAssigned, vectorToCopy, 3, eps),  "Assigning " << nameToCopy << " to " << nameToBeAssigned << ": 1. both are equal")
+  MITK_TEST_CONDITION( EqualArray(vectorToBeAssigned, valuesToCopy, 3, eps), "2. both hold values of " << nameToCopy)
+}
 
 static void Test_pod2mitk(void)
 {
@@ -67,7 +76,7 @@ static void Test_mitk2pod(void)
   ScalarType podArray[3];
   mitk::Vector3D vector3D = valuesToCopy;
 
-  vector3D.CopyToArray(podArray);
+  vector3D.ToArray(podArray);
 
   MITK_TEST_CONDITION(EqualArray(podArray, vector3D, 3), "mitk::Vector copied into pod array")
 }
@@ -77,7 +86,7 @@ static void Test_mitk2pod_DifferentType(void)
   float podArray[3];
   mitk::Vector3D vector3D = valuesToCopy;
 
-  vector3D.CopyToArray(podArray);
+  vector3D.ToArray(podArray);
 
   MITK_TEST_CONDITION(EqualArray(podArray, vector3D, 3, epsDouble2Float), "mitk::Vector<double> copied into float pod array")
 }
@@ -265,6 +274,25 @@ static void Test_vnl2mitk_WrongVnlVectorSize()
 
 }
 
+static void Test_mitk2opencv()
+{
+  cv::Vec3d opencvVector(originalValues[0], originalValues[1], originalValues[2]);
+  mitk::Vector3D vector3D = valuesToCopy;
+
+  vector3D.ToArray(opencvVector);
+
+  TestForEquality(opencvVector, vector3D, "cv::Vec3d", "mitk::Vector3D");
+}
+
+static void Test_opencv2mitk()
+{
+  mitk::Vector3D vector3D = originalValues;
+  cv::Vec3d opencvVector(valuesToCopy[0], valuesToCopy[1], valuesToCopy[2]);
+
+  vector3D.FromArray(opencvVector);
+
+  TestForEquality(vector3D, opencvVector, "mitk::Vector3D", "cv::Vec3d");
+}
 
 
 /**
@@ -309,6 +337,9 @@ int mitkTypeVectorConversionTest(int /*argc*/ , char* /*argv*/[])
 
   Test_mitk2vnl();
   Test_mitk2vnl_DifferentType();
+
+  Test_mitk2opencv();
+  Test_opencv2mitk();
 
   MITK_TEST_END()
 

@@ -124,17 +124,30 @@ namespace mitk
 
 
     /**
-     * @brief Copies the elements of this into the array r
-     * @param[out] r    the array which will hold the elements.
+     * @brief Copies the elements of this into an ArrayType T
+     * @param[out] array    the array which will hold the elements. Must be of a type which overrides the [] operator.
      * @attention Must be of at least dimension NVectorDimension!
      */
-    template <typename TOtherCoordRep>
-    void CopyToArray(TOtherCoordRep r[NVectorDimension]) const
+    template <typename ArrayType>
+    void ToArray(ArrayType& array) const
     {
-      for (int i = 0; i < this->GetVectorDimension(); i++)
+      for (int i = 0; i < NVectorDimension; i++)
         {
-          r[i] = static_cast<TOtherCoordRep>(this->GetElement(i));
+          array[i] = this->GetElement(i);
         }
+    }
+
+    /**
+     * @brief Copies elements of an ArrayType T to this Vector
+     * @param array     the array whose values will be copied into the Vector. Must be of a type which overrides the [] operator
+     * @attention Must be of dimension NVectorDimension!
+     */
+    template <typename ArrayType>
+    void FromArray(const ArrayType& array)
+    {
+      for (unsigned short int var = 0; var < NVectorDimension; ++var) {
+        this->SetElement(var, array[var]);
+      }
     }
 
   }; // end mitk::Vector

@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVector.h"
 #include "mitkTypes.h" // for Equals
 
+// TODO SW: here we will need a guard in case opencv is not activated in a build.
 #include <cv.h>
 
 using namespace mitk;

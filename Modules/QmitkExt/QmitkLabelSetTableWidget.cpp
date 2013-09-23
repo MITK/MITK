@@ -176,6 +176,11 @@ void QmitkLabelSetTableWidget::SetActiveLabel(int index)
 void QmitkLabelSetTableWidget::SetActiveLabel(const std::string& text)
 {
   this->SetActiveLabel(m_LabelStringList.indexOf(text.c_str()));
+  this->BusyCursorOn();
+  const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(m_LabelSetImage->GetActiveLabelIndex(), true);
+  this->BusyCursorOff();
+  if (pos.GetVnlVector().max_value() > 0.0)
+      emit goToLabel(pos);
 }
 
 void QmitkLabelSetTableWidget::LabelAdded()

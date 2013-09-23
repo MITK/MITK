@@ -40,37 +40,24 @@ namespace mitk
 
     /**
      * @brief Copy constructor.
-     * Can convert non-identical coordinate representations.
-     * E.g. use this to convert from mitk::Vector<float, 3> to mitk::Vector<double,3>
      */
-    template <typename TOtherCoordRep>
-    Vector<TCoordRep, NVectorDimension>(const Vector<TOtherCoordRep, NVectorDimension>& r)
+    Vector<TCoordRep, NVectorDimension>(const Vector<TCoordRep, NVectorDimension>& r)
       : itk::Vector<TCoordRep, NVectorDimension>(r) {}
 
     /**
      * @brief Constructor to convert from itk::Vector to mitk::Vector.
-     * Can convert non-identical coordinate representations.
-     * E.g. use this to convert from itk::Vector<double, 3> to mitk::Vector<float,3>
      */
-    template <typename TOtherCoordRep>
-    Vector<TCoordRep, NVectorDimension>(const itk::Vector<TOtherCoordRep, NVectorDimension>& r)
+    Vector<TCoordRep, NVectorDimension>(const itk::Vector<TCoordRep, NVectorDimension>& r)
       : itk::Vector<TCoordRep, NVectorDimension>(r) {}
 
 
     /**
      * @brief Constructor to convert an array to mitk::Vector
-     * Can convert non-identical coordinate representations.
      * @param r the array.
      * @attention must have NVectorDimension valid arguments!
      */
-    template <typename TOtherCoordRep>
-    Vector<TCoordRep, NVectorDimension>(const TOtherCoordRep r[NVectorDimension])
-      : itk::Vector<TCoordRep, NVectorDimension>()
-    { // TODO SW: very strange: you could leave the following lines and gcc would still copy the array!
-      for (int var = 0; var < 3; ++var) {
-        this->SetElement(var, static_cast<TCoordRep>(r[var]));
-      }
-    }
+    Vector<TCoordRep, NVectorDimension>(const TCoordRep r[NVectorDimension])
+      : itk::Vector<TCoordRep, NVectorDimension>(r) {}
 
     /**
      * Constructor to initialize entire vector to one value.
@@ -80,31 +67,27 @@ namespace mitk
 
     /**
      * @brief Constructor for vnl_vectors.
-     * Can convert non-identical coordinate representations.
      * @throws mitk::Exception if vnl_vector.size() != NVectorDimension.
      */
-    template <typename TOtherCoordRep>
-    Vector<TCoordRep, NVectorDimension>(const vnl_vector<TOtherCoordRep>& vnlVector)
+    Vector<TCoordRep, NVectorDimension>(const vnl_vector<TCoordRep>& vnlVector)
             : itk::Vector<TCoordRep, NVectorDimension>()
     {
       if (vnlVector.size() != NVectorDimension)
-        mitkThrow() << "when constructing mitk::Vector from vnl_vector: sizes didn't match: mitk::Vector " << NVectorDimension << "vnl_vector " << vnlVector.size();
+        mitkThrow() << "when constructing mitk::Vector from vnl_vector: sizes didn't match: mitk::Vector " << NVectorDimension << "; vnl_vector " << vnlVector.size();
 
       for (int var = 0; (var < NVectorDimension) && (var < vnlVector.size()); ++var) {
-        this->SetElement(var, static_cast<TCoordRep>(vnlVector.get(var)));
+        this->SetElement(var, vnlVector.get(var));
       }
     }
 
     /**
-     * @brief Constructor for vnl_vecto_fixed.
-     * Can convert non-identical coordinate representations.
+     * @brief Constructor for vnl_vector_fixed.
      */
-    template <typename TOtherCoordRep>
-    Vector<TCoordRep, NVectorDimension>(const vnl_vector_fixed<TOtherCoordRep, NVectorDimension> vnlVectorFixed)
+    Vector<TCoordRep, NVectorDimension>(const vnl_vector_fixed<TCoordRep, NVectorDimension> vnlVectorFixed)
         : itk::Vector<TCoordRep, NVectorDimension>()
     {
       for (int var = 0; var < 3; ++var) {
-        this->SetElement(var, static_cast<TOtherCoordRep>(vnlVectorFixed[var]));
+        this->SetElement(var,  vnlVectorFixed[var]);
       }
     };
 
@@ -114,11 +97,9 @@ namespace mitk
      * Note: the conversion to mitk::Vector to vnl_vector_fixed has not been implemented since this
      * would collide with the conversion vnl_vector to vnl_vector_fixed provided by vnl.
      */
-    template <typename TOtherCoordRep>
-    operator vnl_vector<TOtherCoordRep> () const
+    operator vnl_vector<TCoordRep> () const
     {
-      Vector<TOtherCoordRep, NVectorDimension> convertedVector = *this;
-      vnl_vector<TOtherCoordRep> vnlVector(convertedVector.GetVnlVector());
+      vnl_vector<TCoordRep> vnlVector(this->GetVnlVector());
       return vnlVector;
     }
 

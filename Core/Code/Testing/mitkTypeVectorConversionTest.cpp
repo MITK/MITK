@@ -41,33 +41,38 @@ using namespace mitk;
  * should be copied into holds the valuesToCopy afterwards and is equal to the
  * vector which should be copied.
  */
-static const ScalarType originalValues[]      =  {1.123456789987, 2.789456321456, 3.123654789987456};
-static const float      originalValuesFloat[] =  {1.123456789987, 2.789456321456, 3.123654789987456};
+static const ScalarType originalValues[] =  {1.123456789987, 2.789456321456, 3.123654789987456};
+static const ScalarType valuesToCopy[]   =  {4.654789123321, 5.987456789321, 6.321654987789546};
 
-static const ScalarType valuesToCopy[]        =  {4.654789123321, 5.987456789321, 6.321654987789546};
-static const float      valuesToCopyFloat[]   =  {4.654789123321, 5.987456789321, 6.321654987789546};
-
-static float epsDouble2Float = vnl_math::float_eps * 10.0;
-
+/**
+ * @brief Convenience method to test if one vector has been assigned successfully to the other.
+ *
+ * More specifically, tests if v1 = v2 was performed correctly. The method therefore assures that
+ * 1. v1 equals v2 and
+ * 2. both hold the values of v2.
+ *
+ * @param v1    The vector v1 of the assignment v1 = v2
+ * @param v2    The vector v2 of the assignment v1 = v2
+ * @param v1Name        The type name of v1 (e.g.: mitk::Vector3D). Necessary for the correct test output.
+ * @param v2Name        The type name of v2 (e.g.: mitk::Vector3D). Necessary for the correct test output.
+*  @param eps   defines the allowed tolerance when testing for equality.
+ */
 template <typename T1, typename T2>
-static void TestForEquality(T1 vectorToBeAssigned, T2 vectorToCopy, std::string nameToBeAssigned, std::string nameToCopy, ScalarType eps = mitk::eps)
+static void TestForEquality(T1 v1, T2 v2, std::string v1Name, std::string v2Name, ScalarType eps = mitk::eps)
 {
-  MITK_TEST_CONDITION( EqualArray(vectorToBeAssigned, vectorToCopy, 3, eps),  "\nAssigning " << nameToCopy << " to " << nameToBeAssigned << ":\n1. both are equal")
-  MITK_TEST_CONDITION( EqualArray(vectorToBeAssigned, valuesToCopy, 3, eps), "2. both hold values of " << nameToCopy)
+  MITK_TEST_CONDITION( EqualArray(v1, v2, 3, eps),  "\nAssigning " << v2Name << " to " << v1Name << ":\n1. both are equal")
+  MITK_TEST_CONDITION( EqualArray(v1, v2, 3, eps), "2. both hold values of " << v2Name)
 }
+
+const float epsDouble2Float = vnl_math::float_eps * 10.0;
+
+
 
 static void Test_pod2mitk(void)
 {
   mitk::Vector3D vector3D = valuesToCopy;
 
   TestForEquality(vector3D, valuesToCopy, "mitk::Vector3D", "double POD");
-}
-
-static void Test_pod2mitk_DifferentType(void)
-{
-  mitk::Vector3D vector3D = valuesToCopyFloat;
-
-  MITK_TEST_CONDITION(EqualArray(vector3D, valuesToCopyFloat, 3, epsDouble2Float), "float pod copied into mitk::Vector<double>")
 }
 
 
@@ -81,15 +86,6 @@ static void Test_mitk2pod(void)
   TestForEquality(podArray, vector3D, "double POD", "mitk::Vector3D");
 }
 
-static void Test_mitk2pod_DifferentType(void)
-{
-  float podArray[3];
-  mitk::Vector3D vector3D = valuesToCopy;
-
-  vector3D.ToArray(podArray);
-
-  MITK_TEST_CONDITION(EqualArray(podArray, vector3D, 3, epsDouble2Float), "mitk::Vector<double> copied into float pod array")
-}
 
 static void Test_oneElement2mitk(void)
 {
@@ -99,24 +95,6 @@ static void Test_oneElement2mitk(void)
   MITK_TEST_CONDITION(EqualArray(vector3D, twos, 3), "\none values initializes all elements to this value")
 }
 
-static void Test_oneElement2mitk_DifferentType(void)
-{
-  float twos[] = {2.0, 2.0, 2.0};
-  mitk::Vector<double, 3> vector3D(2.0F);
-
-  MITK_TEST_CONDITION(EqualArray(vector3D, twos, 3), "one values initializes all elements to this value: value has different type than mitk::Vector.")
-}
-
-static void Test_mitk2mitk_DifferentType(void)
-{
-  mitk::Vector<float, 3>  floatVector3D  = originalValuesFloat;
-  mitk::Vector<double, 3> doubleVector3D = valuesToCopy;
-
-  floatVector3D = doubleVector3D;
-
-  MITK_TEST_CONDITION(floatVector3D == doubleVector3D, "mitk::Vector<double> assigned to mitk::Vector<float>")
-  MITK_TEST_CONDITION(EqualArray(floatVector3D, valuesToCopy, 3, epsDouble2Float), "correct values were assigned within float accuracy")
-}
 
 static void Test_itk2mitk(void)
 {
@@ -128,16 +106,6 @@ static void Test_itk2mitk(void)
   TestForEquality(vector3D, itkVector, "mitk::Vector3D", "itk::Vector");
 }
 
-static void Test_itk2mitk_DifferentType(void)
-{
-  Vector<float, 3> vector3F        = originalValuesFloat;
-  itk::Vector<double, 3> itkVector = valuesToCopy;
-
-  vector3F = itkVector;
-
-  MITK_TEST_CONDITION(EqualArray(vector3F, itkVector, 3, epsDouble2Float) , "itk::Vector<double> assigned to mitk::Vector<float>")
-  MITK_TEST_CONDITION(EqualArray(vector3F, valuesToCopyFloat, 3, epsDouble2Float), "correct values were assigned")
-}
 
 static void Test_mitk2itk(void)
 {
@@ -147,17 +115,6 @@ static void Test_mitk2itk(void)
   itkVector = vector3D;
 
   TestForEquality(itkVector, vector3D, "itk::Vector", "mitk::Vector3D");
-}
-
-static void Test_mitk2itk_DifferentType(void)
-{
-  itk::Vector<float,3> itkFloatVector = originalValuesFloat;
-  mitk::Vector<double, 3> mitkDoubleVector = valuesToCopy;
-
-  itkFloatVector = mitkDoubleVector;
-
-  MITK_TEST_CONDITION(itkFloatVector == mitkDoubleVector, "mitk::Vector<double> assigned to itk::Vector<float>")
-  MITK_TEST_CONDITION(EqualArray(itkFloatVector, valuesToCopy, 3, epsDouble2Float), "correct values were assigned")
 }
 
 
@@ -171,16 +128,6 @@ static void Test_vnlfixed2mitk(void)
   TestForEquality(vector3D, vnlVectorFixed, "mitk::Vector3D", "vnl_vector_fixed<ScalarType>");
 }
 
-static void Test_vnlfixed2mitk_DifferentType(void)
-{
-  mitk::Vector<float, 3> vector3F = originalValuesFloat;
-  vnl_vector_fixed<double, 3> vnlVectorFixed(valuesToCopy);
-
-  vector3F = vnlVectorFixed;
-
-  MITK_TEST_CONDITION( EqualArray(vector3F, vnlVectorFixed, 3, epsDouble2Float), "vnl_vector_fixed<double> assigned to mitk::Vector<float>")
-  MITK_TEST_CONDITION( EqualArray(vector3F, valuesToCopy,   3, epsDouble2Float), "correct values were assigned" )
-}
 
 static void Test_mitk2vnlfixed(void)
 {
@@ -190,17 +137,6 @@ static void Test_mitk2vnlfixed(void)
   vnlVectorFixed = vector3D;
 
   TestForEquality(vnlVectorFixed, vector3D, "vnl_vector_fixed<ScalarType>", "mitk::Vector3D");
-}
-
-static void Test_mitk2vnlfixed_DifferentType(void)
-{
-  vnl_vector_fixed<float, 3> vnlVectorFixed(originalValuesFloat);
-  mitk::Vector<double, 3> vector3D = valuesToCopy;
-
-  vnlVectorFixed = vector3D;
-
-  MITK_TEST_CONDITION( EqualArray(vnlVectorFixed, vector3D,     3, epsDouble2Float), "mitk::Vector<double> assigned to vnl_vector_fixed<float>")
-  MITK_TEST_CONDITION( EqualArray(vnlVectorFixed, valuesToCopy, 3, epsDouble2Float), "correct values were assigned" )
 }
 
 
@@ -216,18 +152,6 @@ static void Test_vnl2mitk(void)
   TestForEquality(vector3D, vnlVector, "mitk::Vector3D", "vnl_vector<ScalarType>");
 }
 
-static void Test_vnl2mitk_DifferentType(void)
-{
-
-  mitk::Vector<float, 3> vector3F = originalValuesFloat;
-  vnl_vector<double> vnlVector(3);
-  vnlVector.set(valuesToCopy);
-
-  vector3F = vnlVector;
-
-  MITK_TEST_CONDITION( EqualArray(vector3F, vnlVector,    3, epsDouble2Float), "vnl_vector<double> assigned to mitk::Vector<float>")
-  MITK_TEST_CONDITION( EqualArray(vector3F, valuesToCopy, 3, epsDouble2Float), "correct values were assigned" )
-}
 
 static void Test_mitk2vnl(void)
 {
@@ -240,22 +164,8 @@ static void Test_mitk2vnl(void)
   TestForEquality(vnlVector, vector3D, "vnl_vector<ScalarType>", "mitk::Vector3D");
 }
 
-static void Test_mitk2vnl_DifferentType(void)
-{
-  vnl_vector<float> vnlVector(3);
-  vnlVector.set(originalValuesFloat);
-  mitk::Vector3D vector3D = valuesToCopy;
-
-  vnlVector = vector3D;
-
-  MITK_TEST_CONDITION( EqualArray(vnlVector, vector3D,     3, epsDouble2Float), "mitk::Vector<double> assigned to vnl_vector<float>")
-  MITK_TEST_CONDITION( EqualArray(vnlVector, valuesToCopy, 3, epsDouble2Float), "correct values were assigned" )
-}
-
-
 /**
- * tests if constructing a mitk::Vector using a too large in size vnl_vector is handled properly.
- * Meaning: Exception is thrown.
+ * @brief Tests if an exception is thrown when constructing an mitk::Vector form a vnl_vector of not suited size.
  */
 static void Test_vnl2mitk_WrongVnlVectorSize()
 {
@@ -266,6 +176,7 @@ static void Test_vnl2mitk_WrongVnlVectorSize()
 
   MITK_TEST_FOR_EXCEPTION(mitk::Exception&, vector3D = vnlVector;)
 }
+
 
 static void Test_mitk2opencv()
 {
@@ -288,6 +199,35 @@ static void Test_opencv2mitk()
 }
 
 
+static void Test_ToArray_DifferentType(void)
+{
+  float podArray[3];
+  for (int var = 0; var < 3; ++var) {
+    podArray[var] = originalValues[var];
+  }
+  mitk::Vector3D vector3D = valuesToCopy;
+
+  vector3D.ToArray(podArray);
+
+  TestForEquality(podArray, vector3D, "float POD", "mitk::Vector3D", epsDouble2Float);
+}
+
+
+static void Test_FromArray_DifferentType(void)
+{
+  mitk::Vector3D vector3D = originalValues;
+  float podArray[3];
+  for (int var = 0; var < 3; ++var) {
+    podArray[var] = valuesToCopy[var];
+  }
+
+  vector3D.FromArray(podArray);
+
+  TestForEquality(vector3D, podArray, "mitk::Vector3D", "float POD", epsDouble2Float);
+}
+
+
+
 /**
 * @brief Test the conversions from and to the mitk::Vector type.
 *
@@ -301,38 +241,30 @@ int mitkTypeVectorConversionTest(int /*argc*/ , char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("VectorConversionTest")
 
-  Test_mitk2mitk_DifferentType();
-
   Test_pod2mitk();
-  Test_pod2mitk_DifferentType();
-
   Test_mitk2pod();
-  Test_mitk2pod_DifferentType();
 
   Test_oneElement2mitk();
-  Test_oneElement2mitk_DifferentType();
 
   Test_itk2mitk();
-  Test_itk2mitk_DifferentType();
-
   Test_mitk2itk();
-  Test_mitk2itk_DifferentType();
 
   Test_vnlfixed2mitk();
-  Test_vnlfixed2mitk_DifferentType();
-
   Test_mitk2vnlfixed();
-  Test_mitk2vnlfixed_DifferentType();
 
   Test_vnl2mitk();
-  Test_vnl2mitk_DifferentType();
-  Test_vnl2mitk_WrongVnlVectorSize();
-
   Test_mitk2vnl();
-  Test_mitk2vnl_DifferentType();
+  Test_vnl2mitk_WrongVnlVectorSize();
 
   Test_mitk2opencv();
   Test_opencv2mitk();
+
+  /**
+   * The ToArray and FromArray can assign non equal types by implicit primitive type conversion.
+   * The next two tests show this behavior
+   */
+  Test_ToArray_DifferentType();
+  Test_FromArray_DifferentType();
 
   MITK_TEST_END()
 

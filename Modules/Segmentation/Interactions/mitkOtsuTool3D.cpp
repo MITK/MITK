@@ -58,6 +58,8 @@ void mitk::OtsuTool3D::Activated()
 
     m_BinaryPreviewNode = mitk::DataNode::New();
     m_BinaryPreviewNode->SetName("Binary_Preview");
+    m_BinaryPreviewNode->SetProperty( "color", ColorProperty::New(0.0, 1.0, 0.0) );
+    m_BinaryPreviewNode->SetProperty( "opacity", FloatProperty::New(0.3) );
     //m_BinaryPreviewNode->SetBoolProperty("helper object", true);
     //m_BinaryPreviewNode->SetProperty("binary", mitk::BoolProperty::New(true));
     m_ToolManager->GetDataStorage()->Add( this->m_BinaryPreviewNode );
@@ -184,7 +186,6 @@ void mitk::OtsuTool3D::UpdateBinaryPreview(int regionID)
   m_BinaryPreviewNode->SetData(binarySegmentation);
   m_BinaryPreviewNode->SetVisibility(true);
   m_BinaryPreviewNode->SetProperty("outline binary", mitk::BoolProperty::New(false));
-  m_BinaryPreviewNode->SetOpacity(1.0);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

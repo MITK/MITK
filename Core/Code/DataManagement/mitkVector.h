@@ -126,7 +126,7 @@ namespace mitk
     /**
      * @brief Copies the elements of this into an ArrayType T
      * @param[out] array    the array which will hold the elements. Must be of a type which overrides the [] operator.
-     * @attention Must be of at least dimension NVectorDimension!
+     * @attention array must be of dimension NVectorDimension!
      */
     template <typename ArrayType>
     void ToArray(ArrayType& array) const
@@ -140,7 +140,7 @@ namespace mitk
     /**
      * @brief Copies elements of an ArrayType T to this Vector
      * @param array     the array whose values will be copied into the Vector. Must be of a type which overrides the [] operator
-     * @attention Must be of dimension NVectorDimension!
+     * @attention array must be of dimension NVectorDimension!
      */
     template <typename ArrayType>
     void FromArray(const ArrayType& array)

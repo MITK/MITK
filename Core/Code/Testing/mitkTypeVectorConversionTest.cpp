@@ -143,7 +143,6 @@ static void Test_mitk2vnlfixed(void)
 
 static void Test_vnl2mitk(void)
 {
-
   mitk::Vector3D vector3D = originalValues;
   vnl_vector<ScalarType> vnlVector(3);
   vnlVector.set(valuesToCopy);
@@ -164,6 +163,7 @@ static void Test_mitk2vnl(void)
 
   TestForEquality(vnlVector, vector3D, "vnl_vector<ScalarType>", "mitk::Vector3D");
 }
+
 
 /**
  * @brief Tests if an exception is thrown when constructing an mitk::Vector form a vnl_vector of not suited size.
@@ -188,6 +188,7 @@ static void Test_mitk2opencv()
 
   TestForEquality(opencvVector, vector3D, "cv::Vec3d", "mitk::Vector3D");
 }
+
 
 static void Test_opencv2mitk()
 {
@@ -268,5 +269,4 @@ int mitkTypeVectorConversionTest(int /*argc*/ , char* /*argv*/[])
   Test_FromArray_DifferentType();
 
   MITK_TEST_END()
-
 }

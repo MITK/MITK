@@ -70,6 +70,7 @@ set(H_FILES
   DataManagement/mitkVector.h
   DataManagement/mitkPoint.h
   DataManagement/mitkMatrix.h
+  DataManagement/mitkTypeOperations.h
 
   Interactions/mitkEventMapperAddOn.h
   Interfaces/mitkIDataNodeReader.h

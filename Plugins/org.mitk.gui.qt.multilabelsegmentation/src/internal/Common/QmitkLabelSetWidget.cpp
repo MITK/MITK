@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageWriteAccessor.h>
 #include <mitkStatusBar.h>
 #include <mitkShowSegmentationAsSmoothedSurface.h>
+#include <mitkIOUtil.h>
+#include <mitkCoreObjectFactory.h>
 
 #include <QmitkDataStorageComboBox.h>
 #include <QmitkNewSegmentationDialog.h>
@@ -68,6 +70,7 @@ m_WorkingNode(0)
   connect( m_Controls.m_btSaveLabelSet, SIGNAL(clicked()), this, SLOT(OnSaveSegmentation()) );
   connect( m_Controls.m_btLoadLabelSet, SIGNAL(clicked()), this, SLOT(OnLoadSegmentation()) );
   connect( m_Controls.m_btImportLabelSet, SIGNAL(clicked()), this, SLOT(OnImportSegmentation()) );
+  connect( m_Controls.m_btImportLabeledImage, SIGNAL(clicked()), this, SLOT(OnImportLabeledImage()) );
   connect( m_Controls.m_btNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
 
   m_Controls.m_LabelSearchBox->setAlwaysShowClearIcon(true);
@@ -406,6 +409,51 @@ void QmitkLabelSetWidget::OnCreateSurface(int index)
   }
 }
 
+void QmitkLabelSetWidget::OnImportLabeledImage()
+{
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->ActivateTool(-1);
+
+  mitk::DataNode* referenceNode = toolManager->GetReferenceData(0);
+  if (!referenceNode) return;
+
+  // Ask the user for a list of files to open
+  QStringList fileNames = QFileDialog::getOpenFileNames( this, "Open Image", "",
+                                                        mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
+
+  if (fileNames.empty())
+    return;
+
+  try
+  {
+    this->WaitCursorOn();
+
+    mitk::Image::Pointer image = mitk::IOUtil::LoadImage( fileNames.front().toStdString() );
+    if (image.IsNull()) return;
+
+    mitk::LabelSetImage::Pointer lsImage = mitk::LabelSetImage::New();
+    lsImage->InitializeByLabeledImage(image);
+
+    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+    std::string newName = referenceNode->GetName();
+    newName += "-labels";
+    newNode->SetName(newName);
+    newNode->SetData(lsImage);
+    m_DataStorage->Add(newNode, referenceNode);
+  }
+  catch (mitk::Exception & e)
+  {
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(this, "Import Labeled Image", "Could not load the selected segmentation. See error log for details.\n");
+    this->WaitCursorOff();
+    return;
+   }
+
+  this->WaitCursorOff();
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 void QmitkLabelSetWidget::OnImportSegmentation()
 {
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
@@ -534,9 +582,10 @@ void QmitkLabelSetWidget::OnSaveSegmentation()
   {
     writer->Update();
   }
-  catch (...)
+  catch (mitk::Exception& e)
   {
-    QMessageBox::information(this, "Save Segmenation", "Could not save active segmentation.\n");
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(this, "Save Segmenation", "Could not save active segmentation.\n See error log for details.");
     this->WaitCursorOff();
   }
 

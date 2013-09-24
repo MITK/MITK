@@ -96,6 +96,9 @@ private slots:
   // reaction to the button "Import Segmentation"
   void OnImportSegmentation();
 
+  // reaction to the button "Import Labeled Image"
+  void OnImportLabeledImage();
+
   // reaction to the button "Save Segmentation"
   void OnSaveSegmentation();
 

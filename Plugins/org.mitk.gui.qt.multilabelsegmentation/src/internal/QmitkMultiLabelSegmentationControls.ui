@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>335</width>
-    <height>401</height>
+    <height>413</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -71,7 +71,7 @@
    <item>
     <widget class="QmitkLabelSetWidget" name="m_LabelSetWidget" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -157,17 +157,17 @@
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer">
+        <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeType">
-          <enum>QSizePolicy::MinimumExpanding</enum>
+          <enum>QSizePolicy::Minimum</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>5</height>
+           <height>2</height>
           </size>
          </property>
         </spacer>
@@ -221,17 +221,17 @@
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_2">
+        <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeType">
-          <enum>QSizePolicy::MinimumExpanding</enum>
+          <enum>QSizePolicy::Minimum</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>5</height>
+           <height>2</height>
           </size>
          </property>
         </spacer>

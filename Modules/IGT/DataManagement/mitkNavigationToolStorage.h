@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Microservices
 #include <usServiceInterface.h>
 #include <usServiceRegistration.h>
+#include <usServiceProperties.h>
 
 namespace mitk {
   /**Documentation
@@ -73,6 +74,7 @@ namespace mitk {
     */
     static const std::string US_INTERFACE_NAME; // Name of the interface
     static const std::string US_PROPKEY_SOURCE_ID; // ID of the device this ToolStorage is associated with
+    static const std::string US_PROPKEY_STORAGE_NAME; // name of the storage
 
 
     /**
@@ -132,6 +134,26 @@ namespace mitk {
      */
     itkGetMacro(DataStorage,mitk::DataStorage::Pointer);
 
+    /** Sets the name of this storage. The name should be understandable for the user.
+     *  Something like "NDI Aurora Tool Storage". If a storage is loaded from the harddisk
+     *  the name might be the filename.
+     */
+    void SetName(std::string);
+
+    /** @return Returns the name of this storage. */
+    itkGetConstMacro(Name,std::string);
+
+    /** Locks the storage. A logged storage may not be modified.
+     *  If a method tries to modify the storage anyway a waring message is given.
+     *  The storage is unlocked by default. A Storage might be locked when a
+     *  tracking device is active and needs the storage to stay consistent.
+     */
+    void LockStorage();
+    /** Unlocks the storage again. */
+    void UnLockStorage();
+    /** @return Returns true if the storage is locked at the moment, false if not. */
+    bool isLocked();
+
   protected:
     NavigationToolStorage();
     NavigationToolStorage(mitk::DataStorage::Pointer);
@@ -139,9 +161,12 @@ namespace mitk {
 
     std::vector<mitk::NavigationTool::Pointer> m_ToolCollection;
     mitk::DataStorage::Pointer m_DataStorage;
+    std::string m_Name;
+    bool m_storageLocked;
 
   private:
     us::ServiceRegistration<Self> m_ServiceRegistration;
+    us::ServiceProperties m_props;
 
   };
 } // namespace mitk

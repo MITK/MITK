@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk headers
 #include <mitkNavigationDataSource.h>
 #include <usGetModuleContext.h>
-#include "usServiceReference.h"
+#include <usServiceReference.h>
 
 
 

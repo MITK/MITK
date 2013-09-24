@@ -69,7 +69,7 @@ us::ModuleResource mitk::FastMarchingTool3D::GetIconResource() const
 
 const char* mitk::FastMarchingTool3D::GetName() const
 {
-  return "FastMarching3D";
+  return "Fast Marching 3D";
 }
 
 void mitk::FastMarchingTool3D::SetUpperThreshold(double value)

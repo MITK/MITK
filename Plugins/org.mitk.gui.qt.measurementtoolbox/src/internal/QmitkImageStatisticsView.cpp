@@ -657,6 +657,9 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
     this->m_Controls->m_StatisticsTable->setItem( 0, 6, new QTableWidgetItem(
       "NA" ) );
   }
+
+  this->m_Controls->m_StatisticsTable->setItem( 0, 7, new QTableWidgetItem(
+      QString("%1").arg(s.HotspotMean, 0, 'f', decimals) ) );
 }
 
 void QmitkImageStatisticsView::InvalidateStatisticsTableView()

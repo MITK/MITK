@@ -82,8 +82,13 @@ public:
     double Variance;
     double Sigma;
     double RMS;
+    double HotspotMin;
+    double HotspotMax;
+    double HotspotMean;
+    double HotspotVariance;
     vnl_vector< int > MinIndex;
     vnl_vector< int > MaxIndex;
+    vnl_vector< int > HotspotCenterIndex;
 
     void Reset()
     {
@@ -96,6 +101,10 @@ public:
       Variance = 0.0;
       Sigma = 0.0;
       RMS = 0.0;
+      HotspotMin = 0.0;
+      HotspotMax = 0.0;
+      HotspotMean = 31.0;
+      HotspotVariance = 0.0;
     }
   };
 
@@ -142,6 +151,15 @@ public:
 
   /** \brief Get wether a pixel value will be ignored in the statistics */
   bool GetDoIgnorePixelValue();
+
+  void SetHotspotSize (double hotspotRadiusInMM);
+
+  double GetHotspotSize();
+
+  void SetCalculateHotspot(bool calculateHotspot);
+
+  bool IsHotspotCalculated();
+
 
   /** \brief Compute statistics (together with histogram) for the current
    * masking mode.
@@ -315,6 +333,9 @@ protected:
   double m_IgnorePixelValue;
   bool m_DoIgnorePixelValue;
   bool m_IgnorePixelValueChanged;
+
+  double m_HotspotSize;
+  bool m_CalculateHotspot;
 
   unsigned int m_PlanarFigureAxis;    // Normal axis for PlanarFigure
   unsigned int m_PlanarFigureSlice;   // Slice which contains PlanarFigure

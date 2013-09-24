@@ -145,6 +145,7 @@ void QmitkImageStatisticsCalculationThread::run()
   calculator->SetIgnorePixelValue(0);
   try
   {
+    //calculator->SetCalculateHotspot(true);
     statisticChanged = calculator->ComputeStatistics(m_TimeStep);
   }
   catch ( mitk::Exception& e)

@@ -1032,6 +1032,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       statistics.Sigma = labelStatisticsFilter->GetSigma( *it );
       statistics.RMS = sqrt( statistics.Mean * statistics.Mean
         + statistics.Sigma * statistics.Sigma );
+      statistics.HotspotMean = 35.0; //Test value
 
       // restrict image to mask area for min/max index calculation
       typedef itk::MaskImageFilter< ImageType, MaskImageType, ImageType > MaskImageFilterType;

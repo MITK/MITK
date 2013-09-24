@@ -231,6 +231,7 @@ private:
     void HideAllInterpolationControls();
     void Show2DInterpolationControls(bool show);
     void Show3DInterpolationControls(bool show);
+    void CheckSupportedImageDimension();
 
     mitk::SegmentationInterpolationController::Pointer m_Interpolator;
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;

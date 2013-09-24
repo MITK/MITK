@@ -72,6 +72,11 @@ class UltrasoundSupport : public QmitkAbstractView
 
   protected:
 
+    /**
+      * \brief Reinits the view globally.
+      */
+    void GlobalReinit();
+
     int m_FrameCounter;
 
     /*
@@ -95,15 +100,15 @@ class UltrasoundSupport : public QmitkAbstractView
 
     Ui::UltrasoundSupportControls m_Controls;
 
-    /** @brief reinits the view globally. */
-    void GlobalReinit();
-
     QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;
     QmitkUSControlsBModeWidget*   m_ControlBModeWidget;
     QmitkUSControlsDopplerWidget* m_ControlDopplerWidget;
     QmitkUSControlsProbesWidget*  m_ControlProbesWidget;
 
     QList<ctkServiceReference>    m_CustomWidgetServiceReference;
+
+    unsigned int m_CurrentImageWidth;
+    unsigned int m_CurrentImageHeight;
 
     //void OnPreferencesChanged(const berry::IBerryPreferences*);
 };

@@ -25,6 +25,7 @@ set(MOC_H_FILES
   Qmitk/QmitkUSControlsDopplerWidget.h
   Qmitk/QmitkUSControlsProbesWidget.h
   Qmitk/QmitkUSControlsCustomVideoDeviceWidget.h
+  Qmitk/QmitkUSAbstractCustomWidget.h
 )
 
 # uncomment the following line if you want to use Qt resources

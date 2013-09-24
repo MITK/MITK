@@ -89,8 +89,18 @@ void UltrasoundSupport::OnClickedAddNewDevice()
 void UltrasoundSupport::DisplayImage()
 {
   m_Device->UpdateOutputData(0);
-  m_Node->SetData(m_Device->GetOutput());
+  mitk::Image::Pointer curOutput = m_Device->GetOutput();
+  m_Node->SetData(curOutput);
   this->RequestRenderWindowUpdate();
+
+  if ( curOutput->GetDimension() > 1
+    && (curOutput->GetDimension(0) != m_CurrentImageWidth
+    || curOutput->GetDimension(1) != m_CurrentImageHeight) )
+  {
+    this->GlobalReinit();
+    m_CurrentImageWidth = curOutput->GetDimension(0);
+    m_CurrentImageHeight = curOutput->GetDimension(1);
+  }
 
   m_FrameCounter ++;
   if (m_FrameCounter == 10)
@@ -126,7 +136,7 @@ void UltrasoundSupport::OnClickedViewDevice()
     m_Timer->start();
 
     //reinit view
-    GlobalReinit();
+    //this->GlobalReinit();
 
     //change UI elements
     m_Controls.m_BtnView->setText("Stop Viewing");
@@ -247,7 +257,9 @@ void UltrasoundSupport::GlobalReinit()
 UltrasoundSupport::UltrasoundSupport()
   : m_ControlCustomWidget(0),
     m_ControlBModeWidget(0),
-    m_ControlProbesWidget(0)
+    m_ControlProbesWidget(0),
+    m_CurrentImageWidth(0),
+    m_CurrentImageHeight(0)
 {
 }
 

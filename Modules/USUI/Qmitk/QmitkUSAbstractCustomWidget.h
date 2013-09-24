@@ -63,6 +63,8 @@ namespace us {
   */
 class MitkUSUI_EXPORT QmitkUSAbstractCustomWidget : public QWidget
 {
+  Q_OBJECT
+
 public:
   QmitkUSAbstractCustomWidget(QWidget* parent = 0);
   virtual ~QmitkUSAbstractCustomWidget();
@@ -132,7 +134,6 @@ private:
   us::PrototypeServiceFactory*    m_PrototypeServiceFactory;
   bool                            m_IsClonedForQt;
 };
-
 
 // This is the microservice declaration. Do not meddle!
 US_DECLARE_SERVICE_INTERFACE(QmitkUSAbstractCustomWidget, "org.mitk.QmitkUSAbstractCustomWidget")

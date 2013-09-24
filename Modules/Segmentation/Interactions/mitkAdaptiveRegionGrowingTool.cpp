@@ -53,7 +53,7 @@ const char** mitk::AdaptiveRegionGrowingTool::GetXPM() const
 
 const char* mitk::AdaptiveRegionGrowingTool::GetName() const
 {
-  return "RegionGrowing";
+  return "Region Growing 3D";
 }
 
 us::ModuleResource mitk::AdaptiveRegionGrowingTool::GetIconResource() const

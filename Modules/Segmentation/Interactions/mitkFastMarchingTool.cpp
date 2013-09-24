@@ -103,7 +103,7 @@ us::ModuleResource mitk::FastMarchingTool::GetCursorIconResource() const
 
 const char* mitk::FastMarchingTool::GetName() const
 {
-  return "FastMarching2D";
+  return "2D Fast Marching";
 }
 
 void mitk::FastMarchingTool::BuildITKPipeline()

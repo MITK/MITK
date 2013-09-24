@@ -454,6 +454,9 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
   m_Controls->m_targetBValueSpinBox->setEnabled(foundDwiVolume);
   m_Controls->m_OutputRMSErrorImage->setEnabled(foundDwiVolume);
 
+  // reset sampling frame to 1 and update all ealted components
+  m_Controls->m_B_ValueMap_Rounder_SpinBox->setValue(1);
+
   UpdateBValueTableWidget(m_Controls->m_B_ValueMap_Rounder_SpinBox->value());
 
   if (foundDwiVolume)

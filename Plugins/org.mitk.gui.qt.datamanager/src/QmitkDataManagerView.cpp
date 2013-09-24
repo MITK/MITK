@@ -422,6 +422,10 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
     }
     contextMenuAction->SetDecimated(m_SurfaceDecimation);
   }
+  else if(className == "QmitkConvertToMultiLabelSegmentationAction")
+  {
+    contextMenuAction->SetDataStorage(this->GetDataStorage());
+  }
   else if(className == "QmitkStatisticsAction")
   {
     contextMenuAction->SetFunctionality(this);

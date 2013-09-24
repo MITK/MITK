@@ -303,6 +303,8 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
     m_Controls.m_SlicesInterpolator->setChecked(false);
     m_Controls.m_SlicesInterpolator->setEnabled(false);
   }
+
+  this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
 }
 
 void QmitkMultiLabelSegmentationView::On2DInterpolationEnabled(bool state)

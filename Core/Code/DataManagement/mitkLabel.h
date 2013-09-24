@@ -58,7 +58,7 @@ public:
     itkGetConstMacro(Filled, bool);
     itkBooleanMacro(Filled);
 
-    itkSetMacro( Selected, bool );
+    itkSetMacro(Selected, bool );
     itkGetConstMacro( Selected, bool );
     itkBooleanMacro(Selected);
 

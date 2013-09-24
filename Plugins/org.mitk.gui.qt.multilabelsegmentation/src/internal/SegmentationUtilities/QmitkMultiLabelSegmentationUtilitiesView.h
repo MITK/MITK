@@ -25,7 +25,6 @@ class QmitkBooleanOperationsWidget;
 class QmitkSurfaceToImageWidget;
 class QmitkImageMaskingWidget;
 class QmitkMorphologicalOperationsWidget;
-class QmitkLabeledImageImportWidget;
 
 class QmitkMultiLabelSegmentationUtilitiesView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
@@ -51,8 +50,6 @@ private:
   QmitkSurfaceToImageWidget* m_SurfaceToImageWidget;
 
   QmitkImageMaskingWidget* m_ImageMaskingWidget;
-
-  QmitkLabeledImageImportWidget* m_LabeledImageImportWidget;
 
   Ui::QmitkMultiLabelSegmentationUtilitiesViewControls m_Controls;
 };

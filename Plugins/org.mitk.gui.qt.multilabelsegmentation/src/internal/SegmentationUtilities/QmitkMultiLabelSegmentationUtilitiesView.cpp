@@ -21,14 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MorphologicalOperations/QmitkMorphologicalOperationsWidget.h"
 #include "SurfaceToImage/QmitkSurfaceToImageWidget.h"
 #include "ImageMasking/QmitkImageMaskingWidget.h"
-#include "LabeledImageImport/QmitkLabeledImageImportWidget.h"
 
 QmitkMultiLabelSegmentationUtilitiesView::QmitkMultiLabelSegmentationUtilitiesView() :
 m_BooleanOperationsWidget(NULL),
 m_MorphologicalOperationsWidget(NULL),
 m_SurfaceToImageWidget(NULL),
-m_ImageMaskingWidget(NULL),
-m_LabeledImageImportWidget(NULL)
+m_ImageMaskingWidget(NULL)
 {
 }
 
@@ -54,8 +52,6 @@ void QmitkMultiLabelSegmentationUtilitiesView::CreateQtPartControl(QWidget* pare
 
   m_ImageMaskingWidget = new QmitkImageMaskingWidget(timeNavigationController, parent);
 
-  m_LabeledImageImportWidget = new QmitkLabeledImageImportWidget(timeNavigationController, parent);
-
   this->AddUtilityWidget(m_BooleanOperationsWidget, QIcon(":/MultiLabelSegmentationUtilities/BooleanOperations_48x48.png"), "Boolean Operations");
 
   this->AddUtilityWidget(m_MorphologicalOperationsWidget, QIcon(":/MultiLabelSegmentationUtilities/MorphologicalOperations_48x48.png"), "Morphological Operations");
@@ -63,8 +59,6 @@ void QmitkMultiLabelSegmentationUtilitiesView::CreateQtPartControl(QWidget* pare
   this->AddUtilityWidget(m_SurfaceToImageWidget, QIcon(":/MultiLabelSegmentationUtilities/SurfaceToImage_48x48.png"), "Surface To Image");
 
   this->AddUtilityWidget(m_ImageMaskingWidget, QIcon(":/MultiLabelSegmentationUtilities/ImageMasking_48x48.png"), "Image Masking");
-
-  this->AddUtilityWidget(m_LabeledImageImportWidget, QIcon(":/MultiLabelSegmentationUtilities/LabeledImageImport_48x48.png"), "Labeled Image Import");
 }
 
 void QmitkMultiLabelSegmentationUtilitiesView::AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text)
@@ -85,7 +79,6 @@ void QmitkMultiLabelSegmentationUtilitiesView::RenderWindowPartActivated(mitk::I
   m_MorphologicalOperationsWidget->SetTimeNavigationController(timeNavigationController);
   m_SurfaceToImageWidget->SetTimeNavigationController(timeNavigationController);
   m_ImageMaskingWidget->SetTimeNavigationController(timeNavigationController);
-  m_LabeledImageImportWidget->SetTimeNavigationController(timeNavigationController);
 }
 
 void QmitkMultiLabelSegmentationUtilitiesView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
@@ -94,5 +87,4 @@ void QmitkMultiLabelSegmentationUtilitiesView::RenderWindowPartDeactivated(mitk:
   m_MorphologicalOperationsWidget->SetTimeNavigationController(NULL);
   m_SurfaceToImageWidget->SetTimeNavigationController(NULL);
   m_ImageMaskingWidget->SetTimeNavigationController(NULL);
-  m_LabeledImageImportWidget->SetTimeNavigationController(NULL);
 }

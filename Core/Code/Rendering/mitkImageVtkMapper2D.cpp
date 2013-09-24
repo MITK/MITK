@@ -799,7 +799,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   }
   else if (dynamic_cast<mitk::LabelSetImage*>(node->GetData())) // a labelset image
   {
-    node->AddProperty( "opacity", mitk::FloatProperty::New(0.7f), renderer, overwrite );
+    node->AddProperty( "opacity", mitk::FloatProperty::New(1.0f), renderer, overwrite );
     node->AddProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer, overwrite );
     node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
     node->AddProperty( "layer", mitk::IntProperty::New(100), renderer, overwrite);
@@ -847,7 +847,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       }
 
       contrast.SetLevelWindow( level, window, true );
-      node->SetProperty( "levelwindow", LevelWindowProperty::New( contrast ), renderer );
+      node->AddProperty( "levelwindow", LevelWindowProperty::New( contrast ), renderer );
     }
     else
     {
@@ -866,8 +866,8 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     mitk::LevelWindow opaclevwin;
     opaclevwin.SetRangeMinMax(0,255);
     opaclevwin.SetWindowBounds(0,255);
-    mitk::LevelWindowProperty::Pointer prop = mitk::LevelWindowProperty::New(opaclevwin);
-    node->SetProperty( "opaclevelwindow", prop, renderer );
+    mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New(opaclevwin);
+    node->AddProperty( "opaclevelwindow", levWinProp, renderer, overwrite );
   }
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);

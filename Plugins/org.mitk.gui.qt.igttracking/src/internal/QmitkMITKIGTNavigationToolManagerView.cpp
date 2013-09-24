@@ -41,6 +41,8 @@ QmitkMITKIGTNavigationToolManagerView::QmitkMITKIGTNavigationToolManagerView()
 
 QmitkMITKIGTNavigationToolManagerView::~QmitkMITKIGTNavigationToolManagerView()
 {
+  for(int i=0; i < m_AllStoragesHandledByThisWidget.size(); i++)
+    m_AllStoragesHandledByThisWidget.at(i)->UnRegisterMicroservice();
 }
 
 

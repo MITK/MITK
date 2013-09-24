@@ -138,6 +138,11 @@ void QmitkSegmentationView::Activated()
       m_BinaryPropertyObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( node, node->GetProperty("binary")->AddObserver( itk::ModifiedEvent(), command2 ) ) );
     }
   }
+
+  itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command3 = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
+  command3->SetCallbackFunction( this, &QmitkSegmentationView::RenderingManagerReinitialized );
+  m_RenderingManagerObserverTag = mitk::RenderingManager::GetInstance()->AddObserver( mitk::RenderingManagerViewsInitializedEvent(), command3 );
+
   this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), m_Controls->segImageSelector->GetSelectedNode());
 }
 
@@ -163,6 +168,8 @@ void QmitkSegmentationView::Deactivated()
       (*dataIter).first->GetProperty("binary")->RemoveObserver( (*dataIter).second );
     }
     m_BinaryPropertyObserverTags.clear();
+
+    mitk::RenderingManager::GetInstance()->RemoveObserver(m_RenderingManagerObserverTag);
 
     ctkPluginContext* context = mitk::PluginActivator::getContext();
     ctkServiceReference ppmRef = context->getServiceReference<mitk::PlanePositionManagerService>();
@@ -356,17 +363,12 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
 
   if (!selectedNodeIsVisible)
   {
-    m_Controls->m_ManualToolSelectionBox2D->setEnabled(false);
-    m_Controls->m_ManualToolSelectionBox3D->setEnabled(false);
-    m_Controls->m_SlicesInterpolator->setEnabled(false);
+    this->SetToolSelectionBoxesEnabled(false);
     this->UpdateWarningLabel("The selected segmentation is currently not visible!");
-    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
   }
   else
   {
-    m_Controls->m_ManualToolSelectionBox2D->setEnabled(true);
-    m_Controls->m_ManualToolSelectionBox3D->setEnabled(true);
-    m_Controls->m_SlicesInterpolator->setEnabled(true);
+    this->SetToolSelectionBoxesEnabled(true);
     this->UpdateWarningLabel("");
   }
 }
@@ -1031,6 +1033,34 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
   }
 }
 
+void QmitkSegmentationView::RenderingManagerReinitialized()
+{
+  /*
+   * Here we check whether the geometry of the selected segmentation image if aligned with the worldgeometry
+   * At the moment it is not supported to use a geometry different from the selected image for reslicing.
+   * For further information see Bug 16063
+   */
+  mitk::DataNode* workingNode = m_Controls->segImageSelector->GetSelectedNode();
+  if (workingNode)
+  {
+    const mitk::Geometry3D* workingNodeGeo = workingNode->GetData()->GetGeometry();
+    const mitk::Geometry3D* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
+    if (mitk::Equal(workingNodeGeo->GetBoundingBox(), worldGeo->GetBoundingBox(), mitk::eps, true) &&
+        mitk::Equal(workingNodeGeo->GetIndexToWorldTransform(), worldGeo->GetIndexToWorldTransform(), mitk::eps, true))
+    {
+      this->UpdateWarningLabel("");
+      this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), workingNode);
+      this->SetToolSelectionBoxesEnabled(true);
+    }
+    else
+    {
+      this->UpdateWarningLabel("Please perform a reinit on the segmentation image!");
+      this->SetToolManagerSelection(NULL, NULL);
+      this->SetToolSelectionBoxesEnabled(false);
+    }
+  }
+}
+
 bool QmitkSegmentationView::CheckForSameGeometry(const mitk::DataNode *node1, const mitk::DataNode *node2) const
 {
   bool isSameGeometry(true);
@@ -1181,6 +1211,13 @@ void QmitkSegmentationView::SetMouseCursor( const us::ModuleResource& resource, 
   us::ModuleResourceStream cursor(resource, std::ios::binary);
   mitk::ApplicationCursor::GetInstance()->PushCursor( cursor, hotspotX, hotspotY );
   m_MouseCursorSet = true;
+}
+
+void QmitkSegmentationView::SetToolSelectionBoxesEnabled(bool status)
+{
+  m_Controls->m_ManualToolSelectionBox2D->setEnabled(status);
+  m_Controls->m_ManualToolSelectionBox3D->setEnabled(status);
+  m_Controls->m_SlicesInterpolator->setEnabled(status);
 }
 
 // ATTENTION some methods for handling the known list of (organ names, colors) are defined in QmitkSegmentationOrganNamesHandling.cpp

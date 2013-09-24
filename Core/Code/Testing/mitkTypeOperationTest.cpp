@@ -53,7 +53,7 @@ static void Test_Addition(void)
 {
   Setup();
 
-  add(a, b, c);
+  mitk::add(a, b, c);
 
   TestForValuesHelper(a, 16.777777, 15.3, 7.6666879, "summation a = b + c correctly performed");
 }
@@ -63,7 +63,7 @@ static void Test_Substraction(void)
 {
   Setup();
 
-  sub(a, b, c);
+  mitk::sub(a, b, c);
 
   TestForValuesHelper(a, 11.469135, 5.1, 2.580225678, "difference a = b - c correctly performed");
 }
@@ -73,7 +73,7 @@ static void Test_Multiplication(void)
 {
   Setup();
 
-  mul(a, b, c);
+  mitk::mul(a, b, c);
 
   TestForValuesHelper(a, 37.4881858534, 52.02, 13.0301347016, "multiplication a = b * c correctly performed", 1E-10);
   // google calculator provides us with only 10 digits after comma :)
@@ -84,7 +84,7 @@ static void Test_Division(void)
 {
   Setup();
 
-  div(a, b, c);
+  mitk::div(a, b, c);
 
   TestForValuesHelper(a, 5.32092991014, 2.0, 2.01454628596, "division a = b / c correctly performed", 1E-11);
   // 11 digits after comma provided by google calculator :)
@@ -96,7 +96,7 @@ static void Test_DivisionByZero(void)
   Setup();
   c[2] = mitk::eps;
 
-  MITK_TEST_FOR_EXCEPTION(mitk::Exception&, div(a,b,c, 2.0 * c[2]))
+  MITK_TEST_FOR_EXCEPTION(mitk::Exception&, mitk::div(a,b,c, 2.0 * c[2]))
 }
 
 
@@ -105,7 +105,7 @@ static void Test_DivisionByAlmostZero(void)
   Setup();
   c[2] = 2.0 * mitk::eps;
 
-  div(a,b,c);
+  mitk::div(a,b,c);
 
   MITK_TEST_CONDITION_REQUIRED(true, "division by element almost equal to zero doesn't throw exception")
 }

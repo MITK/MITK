@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "mitkImageCaster.h"
 #include "mitkITKImageImport.h"
+#include "mitkIOUtil.h"
 
 
 namespace mitk
@@ -530,7 +531,6 @@ protected:
     resampler->Update();
 
     mitk::GrabItkImageMemory( resampler->GetOutput(), outputImage);
-
   }
 
 };

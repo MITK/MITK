@@ -80,23 +80,19 @@ void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer 
     registrationMethod->SetFixedImage( ref );
   }
 
-  img = registrationMethod->GetResampledMovingImage(img, transformation);
 
-
-
-  if (dynamic_cast<DiffusionImageType*> (img.GetPointer()) != NULL)
+  if (dynamic_cast<DiffusionImageType*> (img.GetPointer()) == NULL)
+  {
+    img = registrationMethod->GetResampledMovingImage(img, transformation);
+  }
+  else
   {
     DiffusionImageType::Pointer diffImages =
         dynamic_cast<DiffusionImageType*>(img.GetPointer());
 
-    // Changes to default geometry does not affect the presentation
-    // of Diffusion Images. (No idea why)
-    // Workaround:
+    // Workaround for Diffusion Images:
     // Extracting a B0-image
-    // Casting B0 to an MITK image, so we have an image with
-    //    the same dimensions and space
     // Apply the transformation to this image
-    // Cast back to ITK image
     // Copy Transformation informations from B0-ITK-Image to
     //    diffusion vector image.
     itk::B0ImageExtractionImageFilter<short,short >::Pointer b0Extraction =
@@ -104,18 +100,27 @@ void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer 
     b0Extraction->SetInput(diffImages->GetVectorImage());
     b0Extraction->SetDirections(diffImages->GetDirections());
     b0Extraction->Update();
+
     mitk::Image::Pointer tmp = mitk::Image::New();
     tmp->InitializeByItk(b0Extraction->GetOutput());
     tmp->SetVolume(b0Extraction->GetOutput()->GetBufferPointer());
 
-    // TODO FIXME!!!
-    //tmp->GetGeometry()->Compose(transformationMatrix);
-    itk::Image<short, 3>::Pointer itkTmp;
-    mitk::CastToItkImage<itk::Image<short, 3> >(tmp, itkTmp);
+    // apply transformation
+    ref = tmp->Clone();
+    registrationMethod->SetFixedImage( ref );
+    mitk::Image::Pointer resampled = registrationMethod->GetResampledMovingImage(tmp, transformation);
 
+    IOUtil::SaveImage(tmp, "/home/cweber/resampledB0heute.nrrd");
+    IOUtil::SaveImage(resampled, "/home/cweber/resampledB0heuteimg.nrrd");
+
+    itk::Image<short, 3>::Pointer itkTmp;
+    mitk::CastToItkImage<itk::Image<short, 3> >(resampled, itkTmp);
+
+    diffImages->SetGeometry(img->GetGeometry());
     diffImages->GetVectorImage()->SetOrigin(itkTmp->GetOrigin());
     diffImages->GetVectorImage()->SetDirection(itkTmp->GetDirection());
     diffImages->GetVectorImage()->SetSpacing(itkTmp->GetSpacing());
+    diffImages->Modified();
 
     mitk::DiffusionImageCorrectionFilter<short>::Pointer correctionFilter =
         mitk::DiffusionImageCorrectionFilter<short>::New();
@@ -123,8 +128,11 @@ void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer 
     // For Diff. Images: Need to rotate the gradients
     correctionFilter->SetImage(diffImages);
     //correctionFilter->CorrectDirections(vnlRotationMatrix);
+    //correctionFilter->Update();
 
+    img = diffImages;
   }
+
 }
 
 void mitk::BatchedRegistration::GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage, RidgidTransformType transformation, mitk::Image::Pointer mask)
@@ -133,6 +141,9 @@ void mitk::BatchedRegistration::GetTransformation(mitk::Image::Pointer fixedImag
   mitk::DiffusionImage<short>* fixedDwi = dynamic_cast<mitk::DiffusionImage<short>*> (fixedImage.GetPointer());
   mitk::DiffusionImage<short>* movingDwi = dynamic_cast<mitk::DiffusionImage<short>*> (movingImage.GetPointer());
   itk::B0ImageExtractionImageFilter<short,short >::Pointer b0Extraction = itk::B0ImageExtractionImageFilter<short,short>::New();
+
+  double offset[3];
+  offset[0]=offset[1]=offset[2]=0;
   if (fixedDwi != NULL)
   {
     b0Extraction->SetInput(fixedDwi->GetVectorImage());
@@ -152,6 +163,12 @@ void mitk::BatchedRegistration::GetTransformation(mitk::Image::Pointer fixedImag
     tmp->InitializeByItk(b0Extraction->GetOutput());
     tmp->SetVolume(b0Extraction->GetOutput()->GetBufferPointer());
     movingImage = tmp;
+
+    Point3D origin = fixedImage->GetGeometry()->GetOrigin();
+    offset[0] = origin[0];
+    offset[1] = origin[1];
+    offset[2] = origin[2];
+    movingImage->GetGeometry()->SetOrigin(origin);
   }
   // Start registration
   mitk::PyramidImageRegistrationMethod::Pointer registrationMethod = mitk::PyramidImageRegistrationMethod::New();
@@ -174,5 +191,7 @@ void mitk::BatchedRegistration::GetTransformation(mitk::Image::Pointer fixedImag
   registrationMethod->Update();
 
   registrationMethod->GetParameters(transformation); // first three: euler angles, last three translation
-
+  transformation[3] -= offset[0];
+  transformation[4] -= offset[1];
+  transformation[5] -= offset[2];
 }

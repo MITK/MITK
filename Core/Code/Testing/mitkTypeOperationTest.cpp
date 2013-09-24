@@ -69,24 +69,24 @@ static void Test_Substraction(void)
 }
 
 
-static void Test_Multiplication(void)
+static void Test_ScalarMultiplication(void)
 {
   Setup();
 
-  mitk::mul(a, b, c);
+  mitk::mul(a, b, 2.123456789);
 
-  TestForValuesHelper(a, 37.4881858534, 52.02, 13.0301347016, "multiplication a = b * c correctly performed", 1E-10);
+  TestForValuesHelper(a, 29.9905485273, 21.6592592478, 10.8794391018, "multiplication a = b * scalar correctly performed", 1E-10);
   // google calculator provides us with only 10 digits after comma :)
 }
 
 
-static void Test_Division(void)
+static void Test_ScalarDivision(void)
 {
   Setup();
 
-  mitk::div(a, b, c);
+  mitk::div(a, b, 2.123456789);
 
-  TestForValuesHelper(a, 5.32092991014, 2.0, 2.01454628596, "division a = b / c correctly performed", 1E-11);
+  TestForValuesHelper(a, 6.65116242212, 4.80348837463, 2.41279069842, "division a = b / scalar correctly performed", 1E-11);
   // 11 digits after comma provided by google calculator :)
 }
 
@@ -94,21 +94,23 @@ static void Test_Division(void)
 static void Test_DivisionByZero(void)
 {
   Setup();
-  c[2] = mitk::eps;
+  ScalarType scalar = mitk::eps;
 
-  MITK_TEST_FOR_EXCEPTION(mitk::Exception&, mitk::div(a,b,c, 2.0 * c[2]))
+  MITK_TEST_FOR_EXCEPTION(mitk::Exception&, mitk::div(a,b,scalar, 2.0 * scalar))
 }
 
 
 static void Test_DivisionByAlmostZero(void)
 {
   Setup();
-  c[2] = 2.0 * mitk::eps;
+  ScalarType scalar = 2.0 * mitk::eps;
 
-  mitk::div(a,b,c);
+  mitk::div(a,b,scalar);
 
   MITK_TEST_CONDITION_REQUIRED(true, "division by element almost equal to zero doesn't throw exception")
 }
+
+
 
 
 int mitkTypeOperationTest(int /*argc*/ , char* /*argv*/[])
@@ -120,12 +122,11 @@ int mitkTypeOperationTest(int /*argc*/ , char* /*argv*/[])
 
   Test_Substraction();
 
-  Test_Multiplication();
+  Test_ScalarMultiplication();
 
-  Test_Division();
+  Test_ScalarDivision();
   Test_DivisionByZero();
   Test_DivisionByAlmostZero();
 
   MITK_TEST_END()
-
 }

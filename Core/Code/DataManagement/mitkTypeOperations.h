@@ -24,6 +24,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /**
+   * This file provides convenience methods to add and subtract itk::FixedArrays and to multiply and divide itk::FixedArrays with scalars.
+   * That means these methods apply to all types deriving from itk::FixedArray.
+   * This can e.g. useful to add points and divide them by the number of added points to build an average.
+   */
 
 
   /**
@@ -48,6 +53,13 @@ namespace mitk
   }
 
 
+  /**
+   * @brief implements difference = minuend - subtrahend.
+   *
+   * @param difference
+   * @param minuend
+   * @param subtrahend
+   */
   template< typename TCoordRep, unsigned int NPointDimension>
   void sub(itk::FixedArray<TCoordRep, NPointDimension>& difference,
       itk::FixedArray<TCoordRep, NPointDimension>& minuend, itk::FixedArray<TCoordRep, NPointDimension>& subtrahend)
@@ -59,36 +71,46 @@ namespace mitk
   }
 
 
+  /**
+   * @brief Multiplies a scalar to a FixedArray: product = multiplicand * scalar
+   * E.g. multiplying the point {1.0, 2.0, 3.0} with 2.0 results in {2.0, 4.0, 6.0}
+   *
+   * @param product     {2.0, 4.0, 6.0} in the above example
+   * @param multiplicand         {1.0, 2.0, 3.0} in the above example
+   * @param scalar      2.0 in the above example
+   */
   template< typename TCoordRep, unsigned int NPointDimension>
   void mul(itk::FixedArray<TCoordRep, NPointDimension>& product,
-      itk::FixedArray<TCoordRep, NPointDimension>& multiplicand, itk::FixedArray<TCoordRep, NPointDimension>& multiplier)
+      itk::FixedArray<TCoordRep, NPointDimension>& multiplicand, TCoordRep scalar)
   {
     for (typename itk::FixedArray<TCoordRep, NPointDimension>::SizeType var = 0; var < NPointDimension; ++var)
     {
-      product[var] = multiplicand[var] * multiplier[var];
+      product[var] = multiplicand[var] * scalar;
     }
   }
 
 
   /**
-   *
+   * @brief implements quotient = dividend / scalar.
    * @throws mitk::Exception in case division by zero is attempted
    *
    * @param quotient
    * @param dividend
-   * @param divisor
+   * @param scalar
    * @param eps   defines how near to 0 an exception shall be thrown if trying to divide by such a value.
    */
   template< typename TCoordRep, unsigned int NPointDimension>
   void div(itk::FixedArray<TCoordRep, NPointDimension>& quotient,
-      itk::FixedArray<TCoordRep, NPointDimension>& dividend, itk::FixedArray<TCoordRep, NPointDimension>& divisor,
+      itk::FixedArray<TCoordRep, NPointDimension>& dividend, const TCoordRep scalar,
       TCoordRep eps = mitk::eps)
   {
+    if (Equal(scalar, 0.0, eps)) // TODO SW: do we want an exception thrown when dividing against zero?
+      mitkThrow() << "Division by zero attempted. Scalar to divide is " << scalar;
+
     for (typename itk::FixedArray<TCoordRep, NPointDimension>::SizeType var = 0; var < NPointDimension; ++var)
     {
-      if (Equal(divisor[var], 0.0, eps))
-        mitkThrow() << "Division by zero attempted. 0 found in " << divisor;
-      quotient[var] = dividend[var] / divisor[var]; // TODO SW: do we want an exception thrown when dividing against zero?
+
+      quotient[var] = dividend[var] / scalar;
     }
   }
 

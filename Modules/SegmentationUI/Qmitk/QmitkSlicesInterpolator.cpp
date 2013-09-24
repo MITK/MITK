@@ -420,6 +420,7 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
   {
     OnInterpolationActivated( true ); // re-initialize if needed
   }
+  this->CheckSupportedImageDimension();
 }
 
 void QmitkSlicesInterpolator::OnToolManagerReferenceDataModified()
@@ -861,6 +862,8 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
 {
   m_3DInterpolationEnabled = on;
 
+  this->CheckSupportedImageDimension();
+
   try
   {
     if ( m_DataStorage.IsNotNull() && m_ToolManager && m_3DInterpolationEnabled)
@@ -1017,7 +1020,11 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
         m_SurfaceInterpolator->SetMinSpacing(minSpacing);
         m_SurfaceInterpolator->SetDistanceImageVolume(50000);
 
-        m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(dynamic_cast<mitk::Image*>(workingNode->GetData()));
+        mitk::Image* segmentationImage = dynamic_cast<mitk::Image*>(workingNode->GetData());
+        if (segmentationImage->GetDimension() == 3)
+          m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(segmentationImage);
+        else
+          MITK_INFO<<"3D Interpolation is only supported for 3D images at the moment!";
 
         if (m_3DInterpolationEnabled)
         {
@@ -1044,6 +1051,19 @@ void QmitkSlicesInterpolator::Show3DInterpolationResult(bool status)
       m_3DContourNode->SetVisibility(status, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
 
    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkSlicesInterpolator::CheckSupportedImageDimension()
+{
+  if (m_3DInterpolationEnabled && m_Segmentation->GetDimension() != 3)
+  {
+    QMessageBox info;
+    info.setWindowTitle("3D Interpolation Process");
+    info.setIcon(QMessageBox::Information);
+    info.setText("3D Interpolation is only supported for 3D images at the moment!");
+    info.exec();
+    m_CmbInterpolation->setCurrentIndex(0);
+  }
 }
 
 void QmitkSlicesInterpolator::OnSliceNavigationControllerDeleted(const itk::Object *sender, const itk::EventObject& /*e*/)

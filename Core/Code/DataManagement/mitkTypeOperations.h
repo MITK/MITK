@@ -20,8 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkFixedArray.h>
 
+#include "mitkExceptionMacro.h"
+
 /**
- * @brief implements sum = s1 + s2
+ * @brief implements sum = addend1 + addend2
  * Takes FixedArray so you sum all deriving classes like e.g.
  * sum two points returning a point or
  * sum a vector and a point, returning a vector.
@@ -30,17 +32,59 @@ See LICENSE.txt or http://www.mitk.org for details.
  * @attention E.g., summing two points does geometrically not make sense, which is why itk does
  * @attention not provide an operator+ for these types.
  *
- * @param sum
- * @param s1
- * @param s2
  */
 template< typename TCoordRep, unsigned int NPointDimension>
 void add(itk::FixedArray<TCoordRep, NPointDimension>& sum,
-    itk::FixedArray<TCoordRep, NPointDimension>& s1, itk::FixedArray<TCoordRep, NPointDimension>& s2)
+    itk::FixedArray<TCoordRep, NPointDimension>& addend1, itk::FixedArray<TCoordRep, NPointDimension>& addend2)
 {
   for (typename itk::FixedArray<TCoordRep, NPointDimension>::SizeType var = 0; var < NPointDimension; ++var)
   {
-    sum[var] = s1[var] + s2[var];
+    sum[var] = addend1[var] + addend2[var];
+  }
+}
+
+
+template< typename TCoordRep, unsigned int NPointDimension>
+void sub(itk::FixedArray<TCoordRep, NPointDimension>& difference,
+    itk::FixedArray<TCoordRep, NPointDimension>& minuend, itk::FixedArray<TCoordRep, NPointDimension>& subtrahend)
+{
+  for (typename itk::FixedArray<TCoordRep, NPointDimension>::SizeType var = 0; var < NPointDimension; ++var)
+  {
+    difference[var] = minuend[var] - subtrahend[var];
+  }
+}
+
+
+template< typename TCoordRep, unsigned int NPointDimension>
+void mul(itk::FixedArray<TCoordRep, NPointDimension>& product,
+    itk::FixedArray<TCoordRep, NPointDimension>& multiplicand, itk::FixedArray<TCoordRep, NPointDimension>& multiplier)
+{
+  for (typename itk::FixedArray<TCoordRep, NPointDimension>::SizeType var = 0; var < NPointDimension; ++var)
+  {
+    product[var] = multiplicand[var] * multiplier[var];
+  }
+}
+
+
+/**
+ *
+ * @throws mitk::Exception in case division by zero is attempted
+ *
+ * @param quotient
+ * @param dividend
+ * @param divisor
+ * @param eps   defines how near to 0 an exception shall be thrown if trying to divide by such a value.
+ */
+template< typename TCoordRep, unsigned int NPointDimension>
+void div(itk::FixedArray<TCoordRep, NPointDimension>& quotient,
+    itk::FixedArray<TCoordRep, NPointDimension>& dividend, itk::FixedArray<TCoordRep, NPointDimension>& divisor,
+    TCoordRep eps = mitk::eps)
+{
+  for (typename itk::FixedArray<TCoordRep, NPointDimension>::SizeType var = 0; var < NPointDimension; ++var)
+  {
+    if (Equal(divisor[var], 0.0, eps))
+      mitkThrow() << "Division by zero attempted. 0 found in " << divisor;
+    quotient[var] = dividend[var] / divisor[var]; // TODO SW: do we want an exception thrown when dividing against zero?
   }
 }
 

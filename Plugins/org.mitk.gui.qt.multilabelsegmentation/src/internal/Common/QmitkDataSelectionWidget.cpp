@@ -56,6 +56,7 @@ static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget
 
   mitk::NodePredicateAnd::Pointer imagePredicate = mitk::NodePredicateAnd::New();
   imagePredicate->AddPredicate(validImages);
+  imagePredicate->AddPredicate(mitk::NodePredicateNot::New(segmentationPredicate));
   imagePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true))));
   imagePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true))));
 

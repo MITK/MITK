@@ -35,15 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 MitkOcl_EXPORT unsigned int iDivUp(unsigned int dividend, unsigned int divisor);
 
-/*! \brief Loads a program source code from a text-file to a string,
-
-@param srcFilename: the file location
-@param srcPreamble: will be added on the top (e.g. #define USE_UCHAR / USE_FLOAT)
-
-@return a char*
-*/
-MitkOcl_EXPORT char* oclLoadProgramSource( const char* ,const char* ,size_t* );
-
 /**
  @brief Returns the name of an OpenCL Error as a string
 

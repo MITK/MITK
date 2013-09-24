@@ -374,8 +374,8 @@ void QmitkLabelSetWidget::OnCreateSurface(int index)
   mitk::DataNode::Pointer segNode = toolManager->GetWorkingData(0);
   if (segNode.IsNull()) return;
 
-  mitk::LabelSetImage* segImage = dynamic_cast<mitk::LabelSetImage*>( segNode->GetData() );
-  if (!segImage) return;
+  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>( segNode->GetData() );
+  if (!lsImage) return;
 
   mitk::LabelSetImageToSurfaceThreadedFilter::Pointer filter =
      mitk::LabelSetImageToSurfaceThreadedFilter::New();
@@ -389,7 +389,7 @@ void QmitkLabelSetWidget::OnCreateSurface(int index)
   filter->AddObserver(mitk::ProcessingError(), errorCommand);
 
   filter->SetPointerParameter("Group node", segNode);
-  filter->SetPointerParameter("Input", segImage);
+  filter->SetPointerParameter("Input", lsImage);
   filter->SetParameter("RequestedLabel", index);
   filter->SetDataStorage( *m_DataStorage );
 
@@ -445,9 +445,9 @@ void QmitkLabelSetWidget::OnImportSegmentation()
   {
     segImage->Concatenate(lsImage);
   }
-  catch ( mitk::Exception & excep )
+  catch ( mitk::Exception & e )
   {
-    MITK_ERROR << "Exception caught: " << excep.GetDescription();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
     QMessageBox::information(this, "Import segmentation", "Could not import the selected segmentation session.\n See error log for details.\n");
   }
 
@@ -548,54 +548,41 @@ void QmitkLabelSetWidget::OnNewSegmentation()
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   toolManager->ActivateTool(-1);
 
-  mitk::DataNode::Pointer refNode = toolManager->GetReferenceData(0);
-  if (refNode.IsNull()) return;
+  mitk::DataNode::Pointer referenceNode = toolManager->GetReferenceData(0);
+  if (referenceNode.IsNull()) return;
 
-  mitk::Image::Pointer refImage = dynamic_cast<mitk::Image*>( refNode->GetData() );
-  if (refImage.IsNull()) return;
+  mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*>( referenceNode->GetData() );
+  if (referenceImage.IsNull()) return;
 
   bool ok = false;
-  QString refNodeName = QString::fromStdString(refNode->GetName());
-  refNodeName.append("-");
-  QString newName = QInputDialog::getText(this, "New Segmentation", "Set a name:", QLineEdit::Normal, refNodeName, &ok);
+  QString name = QString::fromStdString(referenceNode->GetName());
+  name.append("-");
+  QString newName = QInputDialog::getText(this, "New Segmentation", "Set a name:", QLineEdit::Normal, name, &ok);
   if (!ok) return;
 
-  mitk::PixelType pixelType(mitk::MakeScalarPixelType<unsigned char>() );
   mitk::LabelSetImage::Pointer labelSetImage = mitk::LabelSetImage::New();
-
-  if (refImage->GetDimension() == 2)
+  labelSetImage->Initialize(referenceImage);
+  try
   {
-    const unsigned int dimensions[] = { refImage->GetDimension(0), refImage->GetDimension(1), 1 };
-    labelSetImage->Initialize(pixelType, 3, dimensions);
+    labelSetImage->InitializeByLabeledImage(referenceImage);
   }
-  else
+  catch (mitk::Exception &e)
   {
-    labelSetImage->Initialize(pixelType, refImage->GetDimension(), refImage->GetDimensions());
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(this, "Create Mask", "Could not create a mask out of the selected label.\n");
+    return;
   }
-
-  unsigned int byteSize = sizeof(unsigned char);
-  for (unsigned int dim = 0; dim < labelSetImage->GetDimension(); ++dim)
-  {
-    byteSize *= labelSetImage->GetDimension(dim);
-  }
-
-  mitk::ImageWriteAccessor* accessor = new mitk::ImageWriteAccessor(labelSetImage.GetPointer());
-  memset( accessor->GetData(), 0, byteSize );
-  delete accessor;
-
-  mitk::TimeSlicedGeometry::Pointer originalGeometry = refImage->GetTimeSlicedGeometry()->Clone();
-  labelSetImage->SetGeometry( originalGeometry );
 
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetData(labelSetImage);
   newNode->SetName(newName.toStdString());
   labelSetImage->SetName(newName.toStdString());
 
-  m_DataStorage->Add(newNode,refNode);
+  m_DataStorage->Add(newNode,referenceNode);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-  this->OnNewLabel();
+//  this->OnNewLabel();
 }
 
 void QmitkLabelSetWidget::OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>& ranges )

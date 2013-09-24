@@ -43,11 +43,10 @@ public:
   itkNewMacro(Self);
 
   /**
-  * \brief this constructor creates a labelset image identical to the recieved mitkImage. The Metadata are set to default.
-  *  The image data is shared, so don't continue to manipulate the original image.
-  * @throw mitk::Exception Throws an exception if there is a problem with access to the data while constructing the image.
+  * \brief this constructor creates a labelset image out of the provided reference image.
+  * @throw mitk::Exception Throws an exception if there is a problem while creating the labelset image.
   */
-  mitkNewMacro1Param(Self, Image::Pointer);
+ // mitkNewMacro1Param(Self, Image::Pointer);
 
   /**
   * \brief AddLabelEvent is emitted whenever a new label has been added to the LabelSet.
@@ -96,6 +95,10 @@ public:
   * a Message object which is thread safe
   */
   Message<> AllLabelsModifiedEvent;
+
+  /**
+    * \brief  */
+  virtual void Initialize(const mitk::Image* image);
 
   /**
     * \brief  */
@@ -242,11 +245,11 @@ public:
 
   /**
     * \brief  */
-  const mitk::Point3D& GetLabelCenterOfMassIndex(int index, bool update);
+  const mitk::Point3D& GetLabelCenterOfMassIndex(int index, bool forceUpdate);
 
   /**
     * \brief  */
-  const mitk::Point3D& GetLabelCenterOfMassCoordinates(int index, bool update);
+  const mitk::Point3D& GetLabelCenterOfMassCoordinates(int index, bool forceUpdate);
 
   /**
     * \brief  */
@@ -284,12 +287,20 @@ public:
     * \brief  */
   void ResetLabels();
 
+  /**
+    * \brief  */
   void SurfaceStamp(mitk::Surface* surface, bool forceOverwrite);
 
+  /**
+    * \brief  */
   mitk::Image::Pointer CreateLabelMask(int index);
 
-  void ImportLabeledImage(mitk::Image* image);
+  /**
+    * \brief  */
+  void InitializeByLabeledImage(mitk::Image::Pointer image);
 
+  /**
+    * \brief  */
   void MaskStamp(mitk::Image* mask, bool forceOverwrite);
 
 protected:
@@ -299,10 +310,10 @@ protected:
   virtual void CreateDefaultLabelSet();
 
   /**
-    * \brief this constructor creates a labelset Image identical to the recieved mitkImage. The Metadata are set to default.
-    *  The image data is shared, so don't continue to manipulate the original image.
+  * \brief this constructor creates a labelset image out of the provided reference image.
+  * @throw mitk::Exception Throws an exception if there is a problem while creating the labelset image.
   */
-  LabelSetImage(mitk::Image::Pointer image);
+ // LabelSetImage(mitk::Image::Pointer image);
 
   template < typename LabelSetImageType >
   void CalculateCenterOfMassProcessing(LabelSetImageType * input,int index);
@@ -326,7 +337,7 @@ protected:
   void CreateLabelMaskProcessing(LabelSetImageType * input, mitk::Image* mask, int index);
 
   template < typename LabelSetImageType, typename LabeledImageType >
-  void ImportLabeledImageProcessing(LabelSetImageType* input, LabeledImageType* labeled);
+  void InitializeByLabeledImageProcessing(LabelSetImageType* input, LabeledImageType* labeled);
 
   mitk::LabelSet::Pointer m_LabelSet;
 };

@@ -62,6 +62,10 @@ int FiberProcessing(int argc, char* argv[])
 
     parser.addArgument("copyAndJoin", "c", ctkCommandLineParser::Bool, "Create a copy of the input fiber bundle (applied after resample/smooth/minLength/maxLength/minCurv/mirror) and join copy with original (applied after rotate/scale/translate)");
     //parser.addArgument("join", "j", ctkCommandLineParser::Bool, "Join the original and copied fiber bundle (applied after rotate/scale/translate)");
+
+    parser.addArgument("rotate-x", "rx", ctkCommandLineParser::Float, "Rotate around x-axis (if copy is given the copy is rotated, in deg)");
+    parser.addArgument("rotate-y", "ry", ctkCommandLineParser::Float, "Rotate around y-axis (if copy is given the copy is rotated, in deg)");
+    parser.addArgument("rotate-z", "rz", ctkCommandLineParser::Float, "Rotate around z-axis (if copy is given the copy is rotated, in deg)");
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
@@ -93,6 +97,18 @@ int FiberProcessing(int argc, char* argv[])
     bool copyAndJoin = false;
     if(parsedArgs.count("copyAndJoin"))
       copyAndJoin = us::any_cast<bool>(parsedArgs["copyAndJoin"]);
+
+    float rotateX = 0;
+    if (parsedArgs.count("rotate-x"))
+        rotateX = us::any_cast<float>(parsedArgs["rotate-x"]);
+
+    float rotateY = 0;
+    if (parsedArgs.count("rotate-y"))
+        rotateY = us::any_cast<float>(parsedArgs["rotate-y"]);
+
+    float rotateZ = 0;
+    if (parsedArgs.count("rotate-z"))
+        rotateZ = us::any_cast<float>(parsedArgs["rotate-z"]);
     string inFileName = us::any_cast<string>(parsedArgs["input"]);
     string outFileName = us::any_cast<string>(parsedArgs["outFile"]);
 
@@ -131,9 +147,17 @@ int FiberProcessing(int argc, char* argv[])
         {
           MITK_INFO << "Create copy";
           mitk::FiberBundleX::Pointer fibCopy = fib->GetDeepCopy();
+          if (rotateX > 0 || rotateY > 0 || rotateZ > 0){
+            MITK_INFO << "Rotate " << rotateX << " " << rotateY << " " << rotateZ;
+            fibCopy->RotateAroundAxis(rotateX, rotateY, rotateZ);
+          }
           MITK_INFO << "Join copy with original";
           fib = fib->AddBundle(fibCopy.GetPointer());
         } else {
+          if (rotateX > 0 || rotateY > 0 || rotateZ > 0){
+            MITK_INFO << "Rotate " << rotateX << " " << rotateY << " " << rotateZ;
+            fib->RotateAroundAxis(rotateX, rotateY, rotateZ);
+          }
         }
         mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
         for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)

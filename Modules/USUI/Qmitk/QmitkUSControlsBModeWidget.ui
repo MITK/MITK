@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>216</width>
-    <height>155</height>
+    <height>160</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,7 +22,33 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="scanningDepthComboBox"/>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QToolButton" name="scanningDepthPrev">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../BlueBerry/Bundles/org.blueberry.ui.qt.help/resources/org_blueberry_ui_qt_help.qrc">
+         <normaloff>:/org.blueberry.ui.qt.help/go-previous.png</normaloff>:/org.blueberry.ui.qt.help/go-previous.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QmitkComboBoxStepThrough" name="scanningDepthComboBox"/>
+     </item>
+     <item>
+      <widget class="QToolButton" name="scanningDepthNext">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../BlueBerry/Bundles/org.blueberry.ui.qt.help/resources/org_blueberry_ui_qt_help.qrc">
+         <normaloff>:/org.blueberry.ui.qt.help/go-next.png</normaloff>:/org.blueberry.ui.qt.help/go-next.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QLabel" name="scanningGainLabel">
@@ -73,6 +99,86 @@
    </item>
   </layout>
  </widget>
- <resources/>
- <connections/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkComboBoxStepThrough</class>
+   <extends>QComboBox</extends>
+   <header>QmitkComboBoxStepThrough.h</header>
+   <slots>
+    <signal>SignalReachedBegin(bool)</signal>
+    <signal>SignalReachedEnd(bool)</signal>
+    <slot>OnSetPreviousIndex()</slot>
+    <slot>OnSetNextIndex()</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../../BlueBerry/Bundles/org.blueberry.ui.qt.help/resources/org_blueberry_ui_qt_help.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>scanningDepthNext</sender>
+   <signal>clicked()</signal>
+   <receiver>scanningDepthComboBox</receiver>
+   <slot>OnSetNextIndex()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>197</x>
+     <y>36</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>107</x>
+     <y>35</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scanningDepthPrev</sender>
+   <signal>clicked()</signal>
+   <receiver>scanningDepthComboBox</receiver>
+   <slot>OnSetPreviousIndex()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>17</x>
+     <y>36</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>107</x>
+     <y>35</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scanningDepthComboBox</sender>
+   <signal>SignalReachedBegin(bool)</signal>
+   <receiver>scanningDepthPrev</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>107</x>
+     <y>35</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>17</x>
+     <y>36</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scanningDepthComboBox</sender>
+   <signal>SignalReachedEnd(bool)</signal>
+   <receiver>scanningDepthNext</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>107</x>
+     <y>35</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>197</x>
+     <y>36</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

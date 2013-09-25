@@ -8,6 +8,7 @@ set(CPP_FILES
   Qmitk/QmitkUSControlsProbesWidget.cpp
   Qmitk/QmitkUSControlsCustomVideoDeviceWidget.cpp
   Qmitk/QmitkUSAbstractCustomWidget.cpp
+  Qmitk/QmitkComboBoxStepThrough.cpp
 )
 set(UI_FILES
   Qmitk/QmitkUSDeviceManagerWidgetControls.ui
@@ -26,6 +27,7 @@ set(MOC_H_FILES
   Qmitk/QmitkUSControlsProbesWidget.h
   Qmitk/QmitkUSControlsCustomVideoDeviceWidget.h
   Qmitk/QmitkUSAbstractCustomWidget.h
+  Qmitk/QmitkComboBoxStepThrough.h
 )
 
 # uncomment the following line if you want to use Qt resources

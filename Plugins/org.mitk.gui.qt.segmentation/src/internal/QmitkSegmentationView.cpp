@@ -1166,7 +1166,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 //      this, SLOT( OnSurfaceSelectionChanged( ) ) );
 
   connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));
-  connect(m_Controls->m_SlicesInterpolator, SIGNAL(Signal3DInterpolationEnabled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
 
 //  m_Controls->MaskSurfaces->SetDataStorage(this->GetDefaultDataStorage());
 //  m_Controls->MaskSurfaces->SetPredicate(mitk::NodePredicateDataType::New("Surface"));

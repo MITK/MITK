@@ -66,6 +66,16 @@ int FiberProcessing(int argc, char* argv[])
     parser.addArgument("rotate-x", "rx", ctkCommandLineParser::Float, "Rotate around x-axis (if copy is given the copy is rotated, in deg)");
     parser.addArgument("rotate-y", "ry", ctkCommandLineParser::Float, "Rotate around y-axis (if copy is given the copy is rotated, in deg)");
     parser.addArgument("rotate-z", "rz", ctkCommandLineParser::Float, "Rotate around z-axis (if copy is given the copy is rotated, in deg)");
+
+    parser.addArgument("scale-x", "sx", ctkCommandLineParser::Float, "Scale in direction of x-axis (if copy is given the copy is scaled)");
+    parser.addArgument("scale-y", "sy", ctkCommandLineParser::Float, "Scale in direction of y-axis (if copy is given the copy is scaled)");
+    parser.addArgument("scale-z", "sz", ctkCommandLineParser::Float, "Scale in direction of z-axis (if copy is given the copy is scaled)");
+
+    parser.addArgument("translate-x", "tx", ctkCommandLineParser::Float, "Translate in direction of x-axis (if copy is given the copy is translated, in mm)");
+    parser.addArgument("translate-y", "ty", ctkCommandLineParser::Float, "Translate in direction of y-axis (if copy is given the copy is translated, in mm)");
+    parser.addArgument("translate-z", "tz", ctkCommandLineParser::Float, "Translate in direction of z-axis (if copy is given the copy is translated, in mm)");
+
+
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
@@ -121,6 +131,20 @@ int FiberProcessing(int argc, char* argv[])
     float scaleZ = 0;
     if (parsedArgs.count("scale-z"))
         scaleZ = us::any_cast<float>(parsedArgs["scale-z"]);
+
+    float translateX = 0;
+    if (parsedArgs.count("translate-x"))
+        translateX = us::any_cast<float>(parsedArgs["translate-x"]);
+
+    float translateY = 0;
+    if (parsedArgs.count("translate-y"))
+        translateY = us::any_cast<float>(parsedArgs["translate-y"]);
+
+    float translateZ = 0;
+    if (parsedArgs.count("translate-z"))
+        translateZ = us::any_cast<float>(parsedArgs["translate-z"]);
+
+
     string inFileName = us::any_cast<string>(parsedArgs["input"]);
     string outFileName = us::any_cast<string>(parsedArgs["outFile"]);
 
@@ -159,22 +183,31 @@ int FiberProcessing(int argc, char* argv[])
         {
           MITK_INFO << "Create copy";
           mitk::FiberBundleX::Pointer fibCopy = fib->GetDeepCopy();
+
           if (rotateX > 0 || rotateY > 0 || rotateZ > 0){
             MITK_INFO << "Rotate " << rotateX << " " << rotateY << " " << rotateZ;
             fibCopy->RotateAroundAxis(rotateX, rotateY, rotateZ);
           }
+          if (translateX > 0 || translateY > 0 || translateZ > 0)
+            fibCopy->TranslateFibers(translateX, translateY, translateZ);
           if (scaleX > 0 || scaleY > 0 || scaleZ > 0)
             fibCopy->ScaleFibers(scaleX, scaleY, scaleZ);
+
           MITK_INFO << "Join copy with original";
           fib = fib->AddBundle(fibCopy.GetPointer());
+
         } else {
           if (rotateX > 0 || rotateY > 0 || rotateZ > 0){
             MITK_INFO << "Rotate " << rotateX << " " << rotateY << " " << rotateZ;
             fib->RotateAroundAxis(rotateX, rotateY, rotateZ);
           }
+          if (translateX > 0 || translateY > 0 || translateZ > 0){
+            fib->TranslateFibers(translateX, translateY, translateZ);
+          }
           if (scaleX > 0 || scaleY > 0 || scaleZ > 0)
             fib->ScaleFibers(scaleX, scaleY, scaleZ);
         }
+
         mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
         for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
         {

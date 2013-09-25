@@ -104,41 +104,52 @@ namespace mitk
     }
 
 
-    /**
-     * @brief Copies the elements of this into an ArrayType T
-     * @param[out] array    the array which will hold the elements. Must be of a type which overrides the [] operator.
-     * @attention array must be of dimension NVectorDimension!
-     * @attention this method implicitly converts between data types.
-     */
-    template <typename ArrayType>
-    void ToArray(ArrayType& array) const
-    {
-      for (int i = 0; i < NVectorDimension; i++)
-        {
-          array[i] = this->GetElement(i);
-        }
-    }
-
-    /**
-     * @brief Copies elements of an ArrayType T to this Vector
-     * @param array     the array whose values will be copied into the Vector. Must be of a type which overrides the [] operator
-     * @attention array must be of dimension NVectorDimension!
-     * @attention this method implicitly converts between data types.
-     */
-    template <typename ArrayType>
-    void FromArray(const ArrayType& array)
-    {
-      for (unsigned short int var = 0; var < NVectorDimension; ++var) {
-        this->SetElement(var, array[var]);
-      }
-    }
-
   }; // end mitk::Vector
 
   // convenience typedefs for often used mitk::Vector representations.
   typedef Vector<ScalarType,2> Vector2D;
   typedef Vector<ScalarType,3> Vector3D;
   typedef Vector<ScalarType,4> Vector4D;
+
+  /**
+   *  Now methods to copy from and into ArrayTypes.
+   *  ArrayTypes here are all types who implement operator[].
+   *  The two methods were made free floating so you may template specifications for you concrete type.
+   */
+
+
+  /**
+   * @brief Copies elements of an array to this Vector
+   * @param[in] array    the array whose values will be copied into the Vector. Must be of a type which overrides the [] operator
+   * @param[out] vectorOrPoint          the FixedArrray (e.g., mitk::Vector or mitk::Point) which should hold the elements of array.
+   * @attention array must be of dimension NVectorDimension!
+   * @attention this method implicitly converts between data types.
+   */
+  template <typename ArrayType, typename TCoordRep, unsigned int NVectorDimension>
+  void FromArray(itk::FixedArray<TCoordRep, NVectorDimension>& vectorOrPoint, const ArrayType& array)
+  {
+    for (unsigned short int var = 0; var < NVectorDimension; ++var)
+      {
+        vectorOrPoint[var] =  array[var];
+      }
+  }
+
+
+  /**
+   * @brief Copies the elements of this into an array
+   * @param[in] vectorOrPoint   the itk::FixedArray which shall be copied into the array. Can e.g. be of type mitk::Vector or mitk::Point
+   * @param[out] array    the array which will hold the elements. Must be of a type which overrides the [] operator.
+   * @attention array must be of dimension NVectorDimension!
+   * @attention this method implicitly converts between data types.
+   */
+  template <typename ArrayType, typename TCoordRep, unsigned int NVectorDimension>
+  void ToArray(ArrayType& array, const itk::FixedArray<TCoordRep, NVectorDimension>& vectorOrPoint)
+  {
+    for (unsigned short int var = 0; var < NVectorDimension; ++var)
+    {
+      array[var] = vectorOrPoint[var];
+    }
+  }
 
 } // end namespace mitk
 

@@ -17,14 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkComboBoxStepThrough.h"
 
 QmitkComboBoxStepThrough::QmitkComboBoxStepThrough(QWidget* parent)
-  : QComboBox(parent), m_LastIndex(0)
+  : QComboBox(parent), m_LastIndex(0), m_LastMaxIndex(0)
 {
   connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(OnCurrentIndexChanged(int)));
 }
 
 QmitkComboBoxStepThrough::~QmitkComboBoxStepThrough()
 {
-
 }
 
 void QmitkComboBoxStepThrough::OnSetPreviousIndex()
@@ -33,11 +32,7 @@ void QmitkComboBoxStepThrough::OnSetPreviousIndex()
 
   if ( curIndex > 0 )
   {
-    //if (curIndex == this->count() - 1) { emit SignalReachedEnd(false); }
-
     this->setCurrentIndex(--curIndex);
-
-    //if (curIndex == 0) { emit SignalReachedBegin(true); }
   }
 }
 
@@ -47,13 +42,8 @@ void QmitkComboBoxStepThrough::OnSetNextIndex()
 
   if ( curIndex < this->count() - 1 )
   {
-    //if (curIndex == 0) { emit SignalReachedBegin(false); }
-
     this->setCurrentIndex(++curIndex);
-
-    //if (curIndex == this->count() -1 ) { emit SignalReachedEnd(true); }
   }
-
 }
 
 void QmitkComboBoxStepThrough::OnCurrentIndexChanged(int newIndex)
@@ -67,10 +57,9 @@ void QmitkComboBoxStepThrough::OnCurrentIndexChanged(int newIndex)
     emit SignalReachedBegin(true);
   }
 
-
   int maxIndex = this->count() - 1;
 
-  if ( m_LastIndex == maxIndex && newIndex < maxIndex)
+  if ( (m_LastIndex == maxIndex || m_LastIndex == m_LastMaxIndex) && newIndex < maxIndex)
   {
     emit SignalReachedEnd(false);
   }
@@ -80,4 +69,53 @@ void QmitkComboBoxStepThrough::OnCurrentIndexChanged(int newIndex)
   }
 
   m_LastIndex = newIndex;
+  m_LastMaxIndex = maxIndex;
+}
+
+void QmitkComboBoxStepThrough::addItem ( const QString & text, const QVariant & userData )
+{
+  QComboBox::addItem(text, userData);
+
+  // make sure that begin and end signals are emitted
+  OnCurrentIndexChanged(this->currentIndex());
+}
+
+void QmitkComboBoxStepThrough::addItem ( const QIcon & icon, const QString & text, const QVariant & userData )
+{
+  QComboBox::addItem(icon, text, userData);
+
+  // make sure that begin and end signals are emitted
+  OnCurrentIndexChanged(this->currentIndex());
+}
+
+void QmitkComboBoxStepThrough::addItems ( const QStringList & texts )
+{
+   QComboBox::addItems(texts);
+
+   // make sure that begin and end signals are emitted
+  OnCurrentIndexChanged(this->currentIndex());
+}
+
+void QmitkComboBoxStepThrough::insertItem( int index, const QString & text, const QVariant & userData )
+{
+  QComboBox::insertItem(index, text, userData);
+
+  // make sure that begin and end signals are emitted
+  OnCurrentIndexChanged(this->currentIndex());
+}
+
+void QmitkComboBoxStepThrough::insertItem( int index, const QIcon & icon, const QString & text, const QVariant & userData )
+{
+  QComboBox::insertItem(index, icon, text, userData);
+
+  // make sure that begin and end signals are emitted
+  OnCurrentIndexChanged(this->currentIndex());
+}
+
+void QmitkComboBoxStepThrough::insertItems( int index, const QStringList & list )
+{
+  QComboBox::insertItems(index, list);
+
+  // make sure that begin and end signals are emitted
+  OnCurrentIndexChanged(this->currentIndex());
 }

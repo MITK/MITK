@@ -38,7 +38,18 @@ public:
   QmitkComboBoxStepThrough(QWidget* parent = 0);
   ~QmitkComboBoxStepThrough();
 
+  // --> Overwritten superclass methods
+  void addItem( const QString & text, const QVariant & userData = QVariant() );
+  void addItem( const QIcon & icon, const QString & text, const QVariant & userData = QVariant() );
+  void addItems( const QStringList & texts );
+
+  void insertItem( int index, const QString & text, const QVariant & userData = QVariant() );
+  void insertItem( int index, const QIcon & icon, const QString & text, const QVariant & userData = QVariant() );
+  void insertItems( int index, const QStringList & list );
+  // Overwritten superclass methods <--
+
 private:
+  int m_LastMaxIndex;
   int m_LastIndex;
 };
 

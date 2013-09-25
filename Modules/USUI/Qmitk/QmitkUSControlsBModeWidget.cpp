@@ -56,7 +56,7 @@ QmitkUSControlsBModeWidget::QmitkUSControlsBModeWidget(mitk::USControlInterfaceB
   ui->scanningRejectionSlider->setTickInterval(m_ControlInterface->GetScanningGainTick());
   ui->scanningRejectionSlider->setValue(m_ControlInterface->GetScanningGain());
 
-  connect( ui->scanningDepthComboBox, SIGNAL(activated(int)), this, SLOT(OnDepthControlActivated(int)) );
+  connect( ui->scanningDepthComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnDepthControlActivated(int)) );
   connect( ui->scanningGainSlider, SIGNAL(valueChanged(int)), this, SLOT(OnGainControlValueChanged(int)) );
   connect( ui->scanningRejectionSlider, SIGNAL(valueChanged(int)), this, SLOT(OnRejectionControlValueChanged(int)) );
 }

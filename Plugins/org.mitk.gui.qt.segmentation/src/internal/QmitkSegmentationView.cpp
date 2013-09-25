@@ -105,11 +105,7 @@ void QmitkSegmentationView::Activated()
   // should be moved to ::BecomesVisible() or similar
   if( m_Controls )
   {
-    //m_Controls->m_ManualToolSelectionBox2D->SetAutoShowNamesWidth(m_Controls->m_ManualToolSelectionBox2D->minimumSizeHint().width()+1);
-    m_Controls->m_ManualToolSelectionBox2D->SetAutoShowNamesWidth(250);
     m_Controls->m_ManualToolSelectionBox2D->setEnabled( true );
-    //m_Controls->m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(m_Controls->m_ManualToolSelectionBox3D->minimumSizeHint().width()+1);
-    m_Controls->m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(260);
     m_Controls->m_ManualToolSelectionBox3D->setEnabled( true );
 //    m_Controls->m_OrganToolSelectionBox->setEnabled( true );
 //    m_Controls->m_LesionToolSelectionBox->setEnabled( true );
@@ -220,6 +216,13 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
 
 void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
+  if (m_Controls != NULL)
+  {
+    bool slimView = prefs->GetBool("slim view", false);
+    m_Controls->m_ManualToolSelectionBox2D->SetShowNames(!slimView);
+    m_Controls->m_ManualToolSelectionBox3D->SetShowNames(!slimView);
+  }
+
   m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);
   this->ForceDisplayPreferencesUponAllImages();
 }

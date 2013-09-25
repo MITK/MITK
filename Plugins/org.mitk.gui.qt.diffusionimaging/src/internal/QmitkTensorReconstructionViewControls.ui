@@ -58,7 +58,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Tensor Reconstruction</string>
+      <string>Tensor reconstruction and colormap visualization</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>

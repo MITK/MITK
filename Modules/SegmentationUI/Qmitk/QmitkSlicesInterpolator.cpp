@@ -89,13 +89,13 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_CmbInterpolation->addItem("3-Dimensional");
   vboxLayout->addWidget(m_CmbInterpolation);
 
-  m_BtnApply2D = new QPushButton("Confirm Interpolation", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnApply2D = new QPushButton("Confirm for single slice", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApply2D);
 
-  m_BtnApplyForAllSlices2D = new QPushButton("Confirm For All Slices", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnApplyForAllSlices2D = new QPushButton("Confirm for all slices", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApplyForAllSlices2D);
 
-  m_BtnApply3D = new QPushButton("Confirm Interpolation", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnApply3D = new QPushButton("Confirm", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApply3D);
 
   m_ChkShowPositionNodes = new QCheckBox("Show Position Nodes", m_GroupBoxEnableExclusiveInterpolationMode);

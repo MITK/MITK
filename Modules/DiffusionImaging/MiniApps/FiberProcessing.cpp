@@ -22,17 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 #include <string>
 
-#include <itkImage.h>
-#include <itkImageFileReader.h>
-#include <itkExceptionObject.h>
 #include <itkImageFileWriter.h>
 #include <itkMetaDataObject.h>
 #include <itkVectorImage.h>
-#include <itkResampleImageFilter.h>
 
 #include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionImage.h>
-#include <mitkQBallImage.h>
 #include <mitkBaseData.h>
 #include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkFiberTrackingObjectFactory.h>
@@ -40,9 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkCommandLineParser.h"
 #include <boost/lexical_cast.hpp>
 
-/**
- * Short program to average redundant gradients in dwi-files
- */
 
 mitk::FiberBundleX::Pointer LoadFib(std::string filename)
 {

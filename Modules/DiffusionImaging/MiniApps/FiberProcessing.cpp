@@ -109,6 +109,18 @@ int FiberProcessing(int argc, char* argv[])
     float rotateZ = 0;
     if (parsedArgs.count("rotate-z"))
         rotateZ = us::any_cast<float>(parsedArgs["rotate-z"]);
+
+    float scaleX = 0;
+    if (parsedArgs.count("scale-x"))
+        scaleX = us::any_cast<float>(parsedArgs["scale-x"]);
+
+    float scaleY = 0;
+    if (parsedArgs.count("scale-y"))
+        scaleY = us::any_cast<float>(parsedArgs["scale-y"]);
+
+    float scaleZ = 0;
+    if (parsedArgs.count("scale-z"))
+        scaleZ = us::any_cast<float>(parsedArgs["scale-z"]);
     string inFileName = us::any_cast<string>(parsedArgs["input"]);
     string outFileName = us::any_cast<string>(parsedArgs["outFile"]);
 
@@ -151,6 +163,8 @@ int FiberProcessing(int argc, char* argv[])
             MITK_INFO << "Rotate " << rotateX << " " << rotateY << " " << rotateZ;
             fibCopy->RotateAroundAxis(rotateX, rotateY, rotateZ);
           }
+          if (scaleX > 0 || scaleY > 0 || scaleZ > 0)
+            fibCopy->ScaleFibers(scaleX, scaleY, scaleZ);
           MITK_INFO << "Join copy with original";
           fib = fib->AddBundle(fibCopy.GetPointer());
         } else {
@@ -158,6 +172,8 @@ int FiberProcessing(int argc, char* argv[])
             MITK_INFO << "Rotate " << rotateX << " " << rotateY << " " << rotateZ;
             fib->RotateAroundAxis(rotateX, rotateY, rotateZ);
           }
+          if (scaleX > 0 || scaleY > 0 || scaleZ > 0)
+            fib->ScaleFibers(scaleX, scaleY, scaleZ);
         }
         mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
         for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)

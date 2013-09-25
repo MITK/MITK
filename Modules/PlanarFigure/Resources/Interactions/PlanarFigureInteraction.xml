@@ -66,20 +66,18 @@
     <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverFigure" >
       <condition name="figure_is_on_current_slice" />
       <condition name="hovering_above_figure" />
-      <condition name="hovering_above_point" inverted="true"/>
       <action name="start_hovering" />
     </transition>
 
     <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverPoint" >
       <condition name="figure_is_on_current_slice" />
-      <condition name="hovering_above_figure" inverted="true"/>
       <condition name="hovering_above_point" />
       <action name="start_hovering" />
       <action name="select_point" />
     </transition>
   </state>
 
-  <state name="HoveringOverFigure">  <!--FigureHover-->
+  <state name="HoveringOverFigure">
     <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="EditFigure" > <!-- end hovering -->
       <condition name="hovering_above_figure" inverted="true" />
       <action name="hide_preview_point" />
@@ -98,7 +96,7 @@
       <action name="select_point" />
     </transition>
 
-    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlacedByDrag" >  <!-- continue hovering -->
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlacedByDrag" >
       <condition name="figure_is_on_current_slice" />
       <condition name="figure_is_selected" />
       <condition name="point_is_valid" />
@@ -110,6 +108,11 @@
       <condition name="figure_is_on_current_slice" />
       <condition name="figure_is_selected" inverted="true" />
       <action name="select_figure" />
+    </transition>
+
+    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="FigurePlacedByDrag" >
+      <condition name="figure_is_on_current_slice" />
+      <action name="move_current_point" ID="90" />
     </transition>
 
     <transition event_class="MousePressEvent" event_variant="SecondaryButtonPressed" target="HoveringOverFigure" > <!-- continue hovering -->
@@ -155,6 +158,11 @@
       <action name="select_point" />
     </transition>
 
+    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="FigurePlacedByDrag" >
+      <condition name="figure_is_on_current_slice" />
+      <action name="move_current_point" ID="90" />
+    </transition>
+
     <transition event_class="MousePressEvent" event_variant="SecondaryButtonPressed" target="HoveringAfterPointRemovedGuardState" >
       <!-- remove the control-point under the cursor -->
       <condition name="figure_is_on_current_slice" />
@@ -167,6 +175,7 @@
       <condition name="figure_is_on_current_slice" />
       <condition name="points_can_be_added_or_removed" inverted="true" />
     </transition>
+
   </state>
 
   <state name="HoveringAfterPointRemovedGuardState">

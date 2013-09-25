@@ -60,6 +60,8 @@ int FiberProcessing(int argc, char* argv[])
     parser.addArgument("minCurv", "a", ctkCommandLineParser::Float, "Minimum curvature radius (in mm)");
     parser.addArgument("mirror", "p", ctkCommandLineParser::Int, "Invert fiber coordinates XYZ (e.g. 010 to invert y-coordinate of each fiber point)");
 
+    parser.addArgument("copyAndJoin", "c", ctkCommandLineParser::Bool, "Create a copy of the input fiber bundle (applied after resample/smooth/minLength/maxLength/minCurv/mirror) and join copy with original (applied after rotate/scale/translate)");
+    //parser.addArgument("join", "j", ctkCommandLineParser::Bool, "Join the original and copied fiber bundle (applied after rotate/scale/translate)");
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
@@ -88,6 +90,9 @@ int FiberProcessing(int argc, char* argv[])
     if (parsedArgs.count("mirror"))
         axis = us::any_cast<int>(parsedArgs["mirror"]);
 
+    bool copyAndJoin = false;
+    if(parsedArgs.count("copyAndJoin"))
+      copyAndJoin = us::any_cast<bool>(parsedArgs["copyAndJoin"]);
     string inFileName = us::any_cast<string>(parsedArgs["input"]);
     string outFileName = us::any_cast<string>(parsedArgs["outFile"]);
 
@@ -122,6 +127,14 @@ int FiberProcessing(int argc, char* argv[])
         if (axis%10==1)
             fib->MirrorFibers(2);
 
+        if (copyAndJoin == true)
+        {
+          MITK_INFO << "Create copy";
+          mitk::FiberBundleX::Pointer fibCopy = fib->GetDeepCopy();
+          MITK_INFO << "Join copy with original";
+          fib = fib->AddBundle(fibCopy.GetPointer());
+        } else {
+        }
         mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
         for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
         {

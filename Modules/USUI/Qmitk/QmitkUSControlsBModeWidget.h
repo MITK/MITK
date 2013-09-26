@@ -37,6 +37,16 @@ class MitkUSUI_EXPORT QmitkUSControlsBModeWidget : public QWidget
 
 private slots:
   /**
+    * \brief Called when user changes frequency value.
+    */
+  void OnFrequencyControlIndexChanged(int);
+
+  /**
+    * \brief Called when user changes power value.
+    */
+  void OnPowerControlValueChanged(int);
+
+  /**
     * \brief Called when user changes depth value.
     */
   void OnDepthControlActivated(int);

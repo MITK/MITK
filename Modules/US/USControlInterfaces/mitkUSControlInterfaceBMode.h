@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSAbstractControlInterface.h"
 
 namespace mitk {
-
 /**
   * \brief Interface defining methods for scanning mode b of ultrasound devices.
   * It consists of methods for scanning depth, scanning gaing and scanning
@@ -53,6 +52,46 @@ public:
   mitkClassMacro(USControlInterfaceBMode, USAbstractControlInterface);
 
   /**
+    * \return current frequency value
+    */
+  virtual double GetScanningFrequency( ) = 0;
+
+  /**
+    * \param depth new frequency value
+    */
+  virtual void SetScanningFrequency( double frequency ) = 0;
+
+  /**
+    * \return vector of all possible frequency values for the utrasound device
+    */
+  virtual std::vector<double> GetScanningFrequencyValues( ) = 0;
+
+    /**
+    * \return current power value
+    */
+  virtual double GetScanningPower( ) = 0;
+
+  /**
+    * \param depth new power value
+    */
+  virtual void SetScanningPower( double power ) = 0;
+
+  /**
+    * \return minimum power value for the ultrasound device
+    */
+  virtual double GetScanningPowerMin( ) = 0;
+
+  /**
+    * \return maximum power value for the ultrasound device
+    */
+  virtual double GetScanningPowerMax( ) = 0;
+
+  /**
+    * \return interval between two power values for the ultrasound device
+    */
+  virtual double GetScanningPowerTick( ) = 0;
+
+  /**
     * \return current depth value
     */
   virtual double GetScanningDepth( ) = 0;
@@ -66,7 +105,6 @@ public:
     * \return vector of all possible depth values for the utrasound device
     */
   virtual std::vector<double> GetScanningDepthValues( ) = 0;
-
 
   /**
     * \return current scanning gain
@@ -92,7 +130,6 @@ public:
     * \return interval between two gain values for the ultrasound device
     */
   virtual double GetScanningGainTick( ) = 0;
-
 
   /**
     * \return current scanning rejection
@@ -123,7 +160,6 @@ protected:
   USControlInterfaceBMode( );
   virtual ~USControlInterfaceBMode( );
 };
-
 } // namespace mitk
 
 #endif // MITKUSControlInterfaceBMode_H_HEADER_INCLUDED_

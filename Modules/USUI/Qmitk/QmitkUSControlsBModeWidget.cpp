@@ -25,15 +25,16 @@ QmitkUSControlsBModeWidget::QmitkUSControlsBModeWidget(mitk::USControlInterfaceB
 
   if ( ! m_ControlInterface )
   {
-    ui->scanningDepthComboBox->setEnabled(false);
+    this->setDisabled(true);
+    /*ui->scanningDepthComboBox->setEnabled(false);
     ui->scanningGainSlider->setEnabled(false);
-    ui->scanningRejectionSlider->setEnabled(false);
+    ui->scanningRejectionSlider->setEnabled(false);*/
     return;
   }
 
   if ( ! m_ControlInterface->GetIsActive() ) { m_ControlInterface->SetIsActive(true); }
 
-    // get possible scanning depth values and set combo box values according to them
+  // get possible scanning depth values and set combo box values according to them
   std::vector<double> scanningDepths = m_ControlInterface->GetScanningDepthValues();
   double curDepthValue = m_ControlInterface->GetScanningDepth();
   for (std::vector<double>::iterator it = scanningDepths.begin(); it != scanningDepths.end(); it++)
@@ -45,6 +46,22 @@ QmitkUSControlsBModeWidget::QmitkUSControlsBModeWidget(mitk::USControlInterfaceB
     if (curDepthValue == *it) ui->scanningDepthComboBox->setCurrentIndex(ui->scanningDepthComboBox->count()-1);
   }
 
+  // get possible scanning frequency values and set combo box values according to them
+  std::vector<double> scanningFrequencies = m_ControlInterface->GetScanningFrequencyValues();
+  double curFrequencyValue = m_ControlInterface->GetScanningFrequency();
+  for (std::vector<double>::iterator it = scanningFrequencies.begin(); it != scanningFrequencies.end(); it++)
+  {
+    ui->scanningFrequencyComboBox->addItem(QString::number(*it, 'f', 2) + QString(" MHz"));
+
+    // set current index to last inserted element if this element is equal
+    // to the current depth value got from the interface
+    if (curFrequencyValue == *it) ui->scanningFrequencyComboBox->setCurrentIndex(ui->scanningFrequencyComboBox->count()-1);
+  }
+
+  ui->scanningPowerSlider->setMinimum(m_ControlInterface->GetScanningPowerMin());
+  ui->scanningPowerSlider->setMaximum(m_ControlInterface->GetScanningPowerMax());
+  ui->scanningPowerSlider->setTickInterval(m_ControlInterface->GetScanningPowerTick());
+  ui->scanningPowerSlider->setValue(m_ControlInterface->GetScanningPower());
 
   ui->scanningGainSlider->setMinimum(m_ControlInterface->GetScanningGainMin());
   ui->scanningGainSlider->setMaximum(m_ControlInterface->GetScanningGainMax());
@@ -56,7 +73,9 @@ QmitkUSControlsBModeWidget::QmitkUSControlsBModeWidget(mitk::USControlInterfaceB
   ui->scanningRejectionSlider->setTickInterval(m_ControlInterface->GetScanningGainTick());
   ui->scanningRejectionSlider->setValue(m_ControlInterface->GetScanningGain());
 
+  connect( ui->scanningFrequencyComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnFrequencyControlIndexChanged(int)) );
   connect( ui->scanningDepthComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnDepthControlActivated(int)) );
+  connect( ui->scanningPowerSlider, SIGNAL(valueChanged(int)), this, SLOT(OnPowerControlValueChanged(int)) );
   connect( ui->scanningGainSlider, SIGNAL(valueChanged(int)), this, SLOT(OnGainControlValueChanged(int)) );
   connect( ui->scanningRejectionSlider, SIGNAL(valueChanged(int)), this, SLOT(OnRejectionControlValueChanged(int)) );
 }
@@ -67,9 +86,22 @@ QmitkUSControlsBModeWidget::~QmitkUSControlsBModeWidget()
 }
 
 // slots
+void QmitkUSControlsBModeWidget::OnFrequencyControlIndexChanged(int)
+{
+  QString currentText = ui->scanningFrequencyComboBox->currentText();
+  m_ControlInterface->SetScanningFrequency((currentText.left(currentText.size()-5)).toDouble());
+
+  MITK_INFO << (currentText.left(currentText.size()-4)).toStdString();
+}
+
 void QmitkUSControlsBModeWidget::OnDepthControlActivated(int)
 {
-  m_ControlInterface->SetScanningDepth((ui->scanningDepthComboBox->currentText()).toDouble());
+  m_ControlInterface->SetScanningDepth(ui->scanningDepthComboBox->currentText().toDouble());
+}
+
+void QmitkUSControlsBModeWidget::OnPowerControlValueChanged(int value)
+{
+  m_ControlInterface->SetScanningPower(static_cast<double>(value));
 }
 
 void QmitkUSControlsBModeWidget::OnGainControlValueChanged(int value)

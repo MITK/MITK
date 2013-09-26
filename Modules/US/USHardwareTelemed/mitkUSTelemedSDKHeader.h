@@ -52,6 +52,10 @@ See LICENSE.txt or http://www.mitk.org for details.
   * them as std::vector<double>.
   */
 #define RETURN_TelemedAvailableValues(control) { \
+  RETURN_TelemedAvailableValuesWithFactor(control, 1); \
+}
+
+#define RETURN_TelemedAvailableValuesWithFactor(control, factor) { \
   IUsgValues *usgValues; \
   HRESULT hr = control->get_Values(&usgValues); \
   \
@@ -64,7 +68,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   for (int n = 0; n < usgValuesNum; n++) \
   { \
     usgValues->Item(n, &item); \
-    values.at(n) = static_cast<double>(item.lVal); \
+    values.at(n) = static_cast<double>(item.lVal) / factor; \
     VariantClear(&item); \
   } \
   \

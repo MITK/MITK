@@ -17,10 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSTelemedBModeControls.h"
 #include <mitkException.h>
 
+#define TELEMED_FREQUENCY_FACTOR 1000000
+
 mitk::USTelemedBModeControls::USTelemedBModeControls()
-: m_UsgDataView(0),
+: m_UsgDataView(0), m_PowerControl(0), m_FrequencyControl(0),
   m_DepthControl(0), m_GainControl(0), m_RejectionControl(0),
-  m_Active(false), m_GainSteps(new double[3]), m_RejectionSteps(new double[3])
+  m_Active(false), m_PowerSteps(new double[3]),
+  m_GainSteps(new double[3]), m_RejectionSteps(new double[3])
 {
 }
 
@@ -28,6 +31,7 @@ mitk::USTelemedBModeControls::~USTelemedBModeControls()
 {
   this->ReleaseControls();
 
+  delete[] m_PowerSteps;
   delete[] m_GainSteps;
   delete[] m_RejectionSteps;
 }
@@ -72,6 +76,51 @@ bool mitk::USTelemedBModeControls::GetIsActive( )
   if (FAILED(hr)) { mitkThrow() << "Could not get scan mode (" << hr << ")."; }
 
   return m_Active && scanMode == SCAN_MODE_B;
+}
+
+double mitk::USTelemedBModeControls::GetScanningFrequencyAPI( )
+{
+  RETURN_TelemedValue(m_FrequencyControl);
+}
+
+double mitk::USTelemedBModeControls::GetScanningFrequency( )
+{
+  return this->GetScanningFrequencyAPI() / TELEMED_FREQUENCY_FACTOR;
+}
+
+void mitk::USTelemedBModeControls::SetScanningFrequency( double value )
+{
+  SET_TelemedValue(m_FrequencyControl, value * TELEMED_FREQUENCY_FACTOR);
+}
+
+std::vector<double> mitk::USTelemedBModeControls::GetScanningFrequencyValues( )
+{
+  RETURN_TelemedAvailableValuesWithFactor(m_FrequencyControl, TELEMED_FREQUENCY_FACTOR);
+}
+
+double mitk::USTelemedBModeControls::GetScanningPower( )
+{
+  RETURN_TelemedValue(m_PowerControl);
+}
+
+void mitk::USTelemedBModeControls::SetScanningPower(double value)
+{
+  SET_TelemedValue(m_PowerControl, value);
+}
+
+double mitk::USTelemedBModeControls::GetScanningPowerMin()
+{
+  return m_PowerSteps[0];
+}
+
+double mitk::USTelemedBModeControls::GetScanningPowerMax()
+{
+  return m_PowerSteps[1];
+}
+
+double mitk::USTelemedBModeControls::GetScanningPowerTick()
+{
+  return m_PowerSteps[2];
 }
 
 double mitk::USTelemedBModeControls::GetScanningDepth()
@@ -141,6 +190,13 @@ double mitk::USTelemedBModeControls::GetScanningRejectionTick( )
 
 void mitk::USTelemedBModeControls::CreateControls()
 {
+  // create frequency control
+  CREATE_TelemedControl(m_FrequencyControl, m_UsgDataView, IID_IUsgProbeFrequency2, IUsgProbeFrequency2, SCAN_MODE_B);
+
+  // create power control
+  CREATE_TelemedControl(m_PowerControl, m_UsgDataView, IID_IUsgPower, IUsgPower, SCAN_MODE_B);
+  GETINOUTPUT_TelemedAvailableValuesBounds(m_PowerControl, m_PowerSteps); // get min, max and tick for gain
+
   // create B mode depth control
   CREATE_TelemedControl(m_DepthControl, m_UsgDataView, IID_IUsgDepth, IUsgDepth, SCAN_MODE_B);
 
@@ -156,6 +212,8 @@ void mitk::USTelemedBModeControls::CreateControls()
 void mitk::USTelemedBModeControls::ReleaseControls()
 {
   // remove all controls and delete their objects
+  SAFE_RELEASE(m_PowerControl);
+  SAFE_RELEASE(m_FrequencyControl);
   SAFE_RELEASE(m_DepthControl);
   SAFE_RELEASE(m_GainControl);
   SAFE_RELEASE(m_RejectionControl);

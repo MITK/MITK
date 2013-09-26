@@ -44,6 +44,16 @@ namespace mitk {
       */
     virtual bool GetIsActive( );
 
+    virtual double GetScanningFrequency( );
+    virtual void SetScanningFrequency( double frequency );
+    virtual std::vector<double> GetScanningFrequencyValues( );
+
+    virtual double GetScanningPower( );
+    virtual void SetScanningPower( double power );
+    virtual double GetScanningPowerMin( );
+    virtual double GetScanningPowerMax( );
+    virtual double GetScanningPowerTick( );
+
     virtual double GetScanningDepth( );
     virtual void SetScanningDepth( double );
     virtual std::vector<double> GetScanningDepthValues( );
@@ -73,15 +83,20 @@ namespace mitk {
     void CreateControls( );
     void ReleaseControls( );
 
-    IUsgDataView*             m_UsgDataView; // main SDK object for comminucating with the Telemed API
-    IUsgDepth*                m_DepthControl; // control for B mode scanning depth
-    IUsgGain*                 m_GainControl; // control for B mode scanning gain
+    double GetScanningFrequencyAPI( );
+
+    IUsgDataView*             m_UsgDataView;      // main SDK object for comminucating with the Telemed API
+    IUsgPower*                m_PowerControl;     // control for scanning power
+    IUsgProbeFrequency2*      m_FrequencyControl; // control for scanning frequency
+    IUsgDepth*                m_DepthControl;     // control for B mode scanning depth
+    IUsgGain*                 m_GainControl;      // control for B mode scanning gain
     IUsgRejection2*           m_RejectionControl; // control for B mode scanning rejection
 
     bool                      m_Active;
 
-    double*                   m_GainSteps;      // array holding possible gains: [min, max, tick]
-    double*                   m_RejectionSteps; // array holding possible rejections: [min, max, tick]
+    double*                   m_PowerSteps;       // array holding possible power values: [min, max, tick]
+    double*                   m_GainSteps;        // array holding possible gains: [min, max, tick]
+    double*                   m_RejectionSteps;   // array holding possible rejections: [min, max, tick]
   };
 } // namespace mitk
 

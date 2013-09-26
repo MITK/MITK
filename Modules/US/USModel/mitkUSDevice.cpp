@@ -250,7 +250,6 @@ bool mitk::USDevice::Activate()
   return m_DeviceState == State_Activated;
 }
 
-
 void mitk::USDevice::Deactivate()
 {
   m_DeviceState = State_Connected;
@@ -269,7 +268,6 @@ void mitk::USDevice::AddProbe(mitk::USProbe::Pointer probe)
   m_ConnectedProbes.push_back(probe);
 }
 
-
 void mitk::USDevice::ActivateProbe(mitk::USProbe::Pointer probe){
   // currently, we may just add the probe. This behaviour should be changed, should more complicated SDK applications emerge
   AddProbe(probe);
@@ -282,11 +280,9 @@ void mitk::USDevice::ActivateProbe(mitk::USProbe::Pointer probe){
   m_ActiveProbe = m_ConnectedProbes[index];
 }
 
-
 void mitk::USDevice::DeactivateProbe(){
   m_ActiveProbe = 0;
 }
-
 
 mitk::USImage* mitk::USDevice::GetOutput()
 {
@@ -296,7 +292,6 @@ mitk::USImage* mitk::USDevice::GetOutput()
   return static_cast<USImage*>(this->ProcessObject::GetPrimaryOutput());
 }
 
-
 mitk::USImage* mitk::USDevice::GetOutput(unsigned int idx)
 {
   if (this->GetNumberOfOutputs() < 1)
@@ -304,12 +299,10 @@ mitk::USImage* mitk::USDevice::GetOutput(unsigned int idx)
   return static_cast<USImage*>(this->ProcessObject::GetOutput(idx));
 }
 
-
 void mitk::USDevice::GraftOutput(itk::DataObject *graft)
 {
   this->GraftNthOutput(0, graft);
 }
-
 
 void mitk::USDevice::GraftNthOutput(unsigned int idx, itk::DataObject *graft)
 {
@@ -345,7 +338,6 @@ void mitk::USDevice::GrabImage()
   m_Image = this->GetUSImageSource()->GetNextImage();
 }
 
-
 //########### GETTER & SETTER ##################//
 
 void mitk::USDevice::setCalibration (mitk::AffineTransform3D::Pointer calibration){
@@ -373,12 +365,10 @@ bool mitk::USDevice::GetIsActive()
   return m_DeviceState == State_Activated;
 }
 
-
 bool mitk::USDevice::GetIsConnected()
 {
   return m_DeviceState == State_Connected;
 }
-
 
 std::string mitk::USDevice::GetDeviceManufacturer(){
   return this->m_Metadata->GetDeviceManufacturer();

@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactory.h>
 
 namespace mitk {
-
 /**
   * \brief Custom controls for mitk::USVideoDevice.
   * Controls image cropping of the corresponding mitk::USImageVideoSource.
@@ -70,7 +69,6 @@ protected:
   bool                          m_IsActive;
   USImageVideoSource::Pointer   m_ImageSource;
 };
-
 } // namespace mitk
 
 #endif // MITKUSVideoDeviceCustomControls_H_HEADER_INCLUDED_

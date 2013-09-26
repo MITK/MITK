@@ -30,9 +30,10 @@ void QmitkComboBoxStepThrough::OnSetPreviousIndex()
 {
   int curIndex = this->currentIndex();
 
+  // increase index if not already at end
   if ( curIndex > 0 )
   {
-    this->setCurrentIndex(--curIndex);
+    this->setCurrentIndex(curIndex-1);
   }
 }
 
@@ -40,14 +41,16 @@ void QmitkComboBoxStepThrough::OnSetNextIndex()
 {
   int curIndex = this->currentIndex();
 
+  // decrease index if not already at begin
   if ( curIndex < this->count() - 1 )
   {
-    this->setCurrentIndex(++curIndex);
+    this->setCurrentIndex(curIndex+1);
   }
 }
 
 void QmitkComboBoxStepThrough::OnCurrentIndexChanged(int newIndex)
 {
+  // emit begin reached singal if index is zero now or was zero before
   if ( m_LastIndex == 0 && newIndex > 0)
   {
     emit SignalReachedBegin(false);
@@ -59,6 +62,7 @@ void QmitkComboBoxStepThrough::OnCurrentIndexChanged(int newIndex)
 
   int maxIndex = this->count() - 1;
 
+  // emit end reached signal if index is max index now or was max index before
   if ( (m_LastIndex == maxIndex || m_LastIndex == m_LastMaxIndex) && newIndex < maxIndex)
   {
     emit SignalReachedEnd(false);

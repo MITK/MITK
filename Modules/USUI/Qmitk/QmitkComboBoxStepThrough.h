@@ -19,19 +19,46 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QComboBox>
 
+/**
+  * \brief Extension of QComboBox which offers stepping through the values.
+  *
+  * Slots added for setting index to the next position and the previous position.
+  * Signals added for signaling if the begin or the end of the values is reached.
+  */
 class QmitkComboBoxStepThrough : public QComboBox
 {
   Q_OBJECT
 
 signals:
+  /**
+    * True if the end of the available values is reached. False if index was
+    * the last possible index and is now another index.
+    */
   void SignalReachedEnd(bool);
+
+  /**
+    * True if the begin of the available values is reached. False if index was
+    * the first possible index and is now another index.
+    */
   void SignalReachedBegin(bool);
 
 public slots:
+  /**
+    * Set index of the combo box to previous index. If current index is already
+    * the first index, nothing is done.
+    */
   void OnSetPreviousIndex();
+
+  /**
+    * Set index of the combo box to next index. If current index is already
+    * the last index, nothing is done.
+    */
   void OnSetNextIndex();
 
 private slots:
+  /**
+    * Emits SignalReachedEnd and SignalReachedBegin signals if conditions are met.
+    */
   void OnCurrentIndexChanged(int);
 
 public:

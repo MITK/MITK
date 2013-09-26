@@ -208,98 +208,118 @@ void LoadParameters(const std::string & filename,
       }
 
 
+
       // compartment 1
-      m_StickModel1->SetGradientList(m_ImageGenParameters.gradientDirections);
-      m_StickModel1->SetBvalue(m_ImageGenParameters.b_value);
-      m_StickModel1->SetDiffusivity(v1.second.get<double>("compartment1.stick.d"));
-      m_StickModel1->SetT2(v1.second.get<double>("compartment1.stick.t2"));
-      m_ImageGenParameters.fiberModelList.push_back(m_StickModel1);
-
-
-      m_ZeppelinModel1->SetGradientList(m_ImageGenParameters.gradientDirections);
-      m_ZeppelinModel1->SetBvalue(m_ImageGenParameters.b_value);
-      m_ZeppelinModel1->SetDiffusivity1(v1.second.get<double>("compartment1.zeppelin.d1"));
-      m_ZeppelinModel1->SetDiffusivity2(v1.second.get<double>("compartment1.zeppelin.d2"));
-      m_ZeppelinModel1->SetDiffusivity3(v1.second.get<double>("compartment1.zeppelin.d2"));
-      m_ZeppelinModel1->SetT2(v1.second.get<double>("compartment1.zeppelin.t2"));
-      m_ImageGenParameters.fiberModelList.push_back(m_ZeppelinModel1);
-
-
-      m_TensorModel1->SetGradientList(m_ImageGenParameters.gradientDirections);
-      m_TensorModel1->SetBvalue(m_ImageGenParameters.b_value);
-      m_TensorModel1->SetDiffusivity1(v1.second.get<double>("compartment1.tensor.d1"));
-      m_TensorModel1->SetDiffusivity2(v1.second.get<double>("compartment1.tensor.d2"));
-      m_TensorModel1->SetDiffusivity3(v1.second.get<double>("compartment1.tensor.d3"));
-      m_TensorModel1->SetT2(v1.second.get<double>("compartment1.tensor.t2"));
-      m_ImageGenParameters.fiberModelList.push_back(m_TensorModel1);
-
+      switch(v1.second.get<int>("compartment1.index")){
+      case 0:
+        m_StickModel1->SetGradientList(m_ImageGenParameters.gradientDirections);
+        m_StickModel1->SetBvalue(m_ImageGenParameters.b_value);
+        m_StickModel1->SetDiffusivity(v1.second.get<double>("compartment1.stick.d"));
+        m_StickModel1->SetT2(v1.second.get<double>("compartment1.stick.t2"));
+        m_ImageGenParameters.fiberModelList.push_back(m_StickModel1);
+        break;
+      case 1:
+        m_ZeppelinModel1->SetGradientList(m_ImageGenParameters.gradientDirections);
+        m_ZeppelinModel1->SetBvalue(m_ImageGenParameters.b_value);
+        m_ZeppelinModel1->SetDiffusivity1(v1.second.get<double>("compartment1.zeppelin.d1"));
+        m_ZeppelinModel1->SetDiffusivity2(v1.second.get<double>("compartment1.zeppelin.d2"));
+        m_ZeppelinModel1->SetDiffusivity3(v1.second.get<double>("compartment1.zeppelin.d2"));
+        m_ZeppelinModel1->SetT2(v1.second.get<double>("compartment1.zeppelin.t2"));
+        m_ImageGenParameters.fiberModelList.push_back(m_ZeppelinModel1);
+        break;
+      case 2:
+        m_TensorModel1->SetGradientList(m_ImageGenParameters.gradientDirections);
+        m_TensorModel1->SetBvalue(m_ImageGenParameters.b_value);
+        m_TensorModel1->SetDiffusivity1(v1.second.get<double>("compartment1.tensor.d1"));
+        m_TensorModel1->SetDiffusivity2(v1.second.get<double>("compartment1.tensor.d2"));
+        m_TensorModel1->SetDiffusivity3(v1.second.get<double>("compartment1.tensor.d3"));
+        m_TensorModel1->SetT2(v1.second.get<double>("compartment1.tensor.t2"));
+        m_ImageGenParameters.fiberModelList.push_back(m_TensorModel1);
+        break;
+      }
 
       // compartment 2
-      m_StickModel2->SetGradientList(m_ImageGenParameters.gradientDirections);
-      m_StickModel2->SetBvalue(m_ImageGenParameters.b_value);
-      m_StickModel2->SetDiffusivity(v1.second.get<double>("compartment2.stick.d"));
-      m_StickModel2->SetT2(v1.second.get<double>("compartment2.stick.t2"));
-      m_ImageGenParameters.fiberModelList.push_back(m_StickModel2);
-
-      m_ZeppelinModel2->SetGradientList(m_ImageGenParameters.gradientDirections);
-      m_ZeppelinModel2->SetBvalue(m_ImageGenParameters.b_value);
-      m_ZeppelinModel2->SetDiffusivity1(v1.second.get<double>("compartment2.zeppelin.d1"));
-      m_ZeppelinModel2->SetDiffusivity2(v1.second.get<double>("compartment2.zeppelin.d2"));
-      m_ZeppelinModel2->SetDiffusivity3(v1.second.get<double>("compartment2.zeppelin.d2"));
-      m_ZeppelinModel2->SetT2(v1.second.get<double>("compartment2.zeppelin.t2"));
-      m_ImageGenParameters.fiberModelList.push_back(m_ZeppelinModel2);
-
-      m_TensorModel2->SetGradientList(m_ImageGenParameters.gradientDirections);
-      m_TensorModel2->SetBvalue(m_ImageGenParameters.b_value);
-      m_TensorModel2->SetDiffusivity1(v1.second.get<double>("compartment2.tensor.d1"));
-      m_TensorModel2->SetDiffusivity2(v1.second.get<double>("compartment2.tensor.d2"));
-      m_TensorModel2->SetDiffusivity3(v1.second.get<double>("compartment2.tensor.d3"));
-      m_TensorModel2->SetT2(v1.second.get<double>("compartment2.tensor.t2"));
-      m_ImageGenParameters.fiberModelList.push_back(m_TensorModel2);
-
+      switch(v1.second.get<int>("compartment2.index")){
+      case 0:
+        m_StickModel2->SetGradientList(m_ImageGenParameters.gradientDirections);
+        m_StickModel2->SetBvalue(m_ImageGenParameters.b_value);
+        m_StickModel2->SetDiffusivity(v1.second.get<double>("compartment2.stick.d"));
+        m_StickModel2->SetT2(v1.second.get<double>("compartment2.stick.t2"));
+        m_ImageGenParameters.fiberModelList.push_back(m_StickModel2);
+        break;
+      case 1:
+        m_ZeppelinModel2->SetGradientList(m_ImageGenParameters.gradientDirections);
+        m_ZeppelinModel2->SetBvalue(m_ImageGenParameters.b_value);
+        m_ZeppelinModel2->SetDiffusivity1(v1.second.get<double>("compartment2.zeppelin.d1"));
+        m_ZeppelinModel2->SetDiffusivity2(v1.second.get<double>("compartment2.zeppelin.d2"));
+        m_ZeppelinModel2->SetDiffusivity3(v1.second.get<double>("compartment2.zeppelin.d2"));
+        m_ZeppelinModel2->SetT2(v1.second.get<double>("compartment2.zeppelin.t2"));
+        m_ImageGenParameters.fiberModelList.push_back(m_ZeppelinModel2);
+        break;
+      case 2:
+        m_TensorModel2->SetGradientList(m_ImageGenParameters.gradientDirections);
+        m_TensorModel2->SetBvalue(m_ImageGenParameters.b_value);
+        m_TensorModel2->SetDiffusivity1(v1.second.get<double>("compartment2.tensor.d1"));
+        m_TensorModel2->SetDiffusivity2(v1.second.get<double>("compartment2.tensor.d2"));
+        m_TensorModel2->SetDiffusivity3(v1.second.get<double>("compartment2.tensor.d3"));
+        m_TensorModel2->SetT2(v1.second.get<double>("compartment2.tensor.t2"));
+        m_ImageGenParameters.fiberModelList.push_back(m_TensorModel2);
+        break;
+      }
 
       // compartment 3
-      m_BallModel1->SetGradientList(m_ImageGenParameters.gradientDirections);
-      m_BallModel1->SetBvalue(m_ImageGenParameters.b_value);
-      m_BallModel1->SetDiffusivity(v1.second.get<double>("compartment3.ball.d"));
-      m_BallModel1->SetT2(v1.second.get<double>("compartment3.ball.t2"));
-      m_BallModel1->SetWeight(m_ImageGenParameters.comp3Weight);
-      m_ImageGenParameters.nonFiberModelList.push_back(m_BallModel1);
-
-      m_AstrosticksModel1->SetGradientList(m_ImageGenParameters.gradientDirections);
-      m_AstrosticksModel1->SetBvalue(m_ImageGenParameters.b_value);
-      m_AstrosticksModel1->SetDiffusivity(v1.second.get<double>("compartment3.astrosticks.d"));
-      m_AstrosticksModel1->SetT2(v1.second.get<double>("compartment3.astrosticks.t2"));
-      m_AstrosticksModel1->SetRandomizeSticks(v1.second.get<bool>("compartment3.astrosticks.randomize"));
-      m_AstrosticksModel1->SetWeight(m_ImageGenParameters.comp3Weight);
-      m_ImageGenParameters.nonFiberModelList.push_back(m_AstrosticksModel1);
-
-      m_DotModel1->SetGradientList(m_ImageGenParameters.gradientDirections);
-      m_DotModel1->SetT2(v1.second.get<double>("compartment3.dot.t2"));
-      m_DotModel1->SetWeight(m_ImageGenParameters.comp3Weight);
-      m_ImageGenParameters.nonFiberModelList.push_back(m_DotModel1);
-
+      switch(v1.second.get<int>("compartment3.index")){
+      case 0:
+        m_BallModel1->SetGradientList(m_ImageGenParameters.gradientDirections);
+        m_BallModel1->SetBvalue(m_ImageGenParameters.b_value);
+        m_BallModel1->SetDiffusivity(v1.second.get<double>("compartment3.ball.d"));
+        m_BallModel1->SetT2(v1.second.get<double>("compartment3.ball.t2"));
+        m_BallModel1->SetWeight(m_ImageGenParameters.comp3Weight);
+        m_ImageGenParameters.nonFiberModelList.push_back(m_BallModel1);
+        break;
+      case 1:
+        m_AstrosticksModel1->SetGradientList(m_ImageGenParameters.gradientDirections);
+        m_AstrosticksModel1->SetBvalue(m_ImageGenParameters.b_value);
+        m_AstrosticksModel1->SetDiffusivity(v1.second.get<double>("compartment3.astrosticks.d"));
+        m_AstrosticksModel1->SetT2(v1.second.get<double>("compartment3.astrosticks.t2"));
+        m_AstrosticksModel1->SetRandomizeSticks(v1.second.get<bool>("compartment3.astrosticks.randomize"));
+        m_AstrosticksModel1->SetWeight(m_ImageGenParameters.comp3Weight);
+        m_ImageGenParameters.nonFiberModelList.push_back(m_AstrosticksModel1);
+        break;
+      case 2:
+        m_DotModel1->SetGradientList(m_ImageGenParameters.gradientDirections);
+        m_DotModel1->SetT2(v1.second.get<double>("compartment3.dot.t2"));
+        m_DotModel1->SetWeight(m_ImageGenParameters.comp3Weight);
+        m_ImageGenParameters.nonFiberModelList.push_back(m_DotModel1);
+        break;
+      }
 
       // compartment 4
-      m_BallModel2->SetGradientList(m_ImageGenParameters.gradientDirections);
-      m_BallModel2->SetBvalue(m_ImageGenParameters.b_value);
-      m_BallModel2->SetDiffusivity(v1.second.get<double>("compartment4.ball.d"));
-      m_BallModel2->SetT2(v1.second.get<double>("compartment4.ball.t2"));
-      m_BallModel2->SetWeight(m_ImageGenParameters.comp4Weight);
-      m_ImageGenParameters.nonFiberModelList.push_back(m_BallModel2);
-
-      m_AstrosticksModel2->SetGradientList(m_ImageGenParameters.gradientDirections);
-      m_AstrosticksModel2->SetBvalue(m_ImageGenParameters.b_value);
-      m_AstrosticksModel2->SetDiffusivity(v1.second.get<double>("compartment4.astrosticks.d"));
-      m_AstrosticksModel2->SetT2(v1.second.get<double>("compartment4.astrosticks.t2"));
-      m_AstrosticksModel2->SetRandomizeSticks(v1.second.get<bool>("compartment4.astrosticks.randomize"));
-      m_AstrosticksModel2->SetWeight(m_ImageGenParameters.comp4Weight);
-      m_ImageGenParameters.nonFiberModelList.push_back(m_AstrosticksModel2);
-
-      m_DotModel2->SetGradientList(m_ImageGenParameters.gradientDirections);
-      m_DotModel2->SetT2(v1.second.get<double>("compartment4.dot.t2"));
-      m_DotModel2->SetWeight(m_ImageGenParameters.comp4Weight);
-      m_ImageGenParameters.nonFiberModelList.push_back(m_DotModel2);
+      switch(v1.second.get<int>("compartment4.index")){
+      case 0:
+        m_BallModel2->SetGradientList(m_ImageGenParameters.gradientDirections);
+        m_BallModel2->SetBvalue(m_ImageGenParameters.b_value);
+        m_BallModel2->SetDiffusivity(v1.second.get<double>("compartment4.ball.d"));
+        m_BallModel2->SetT2(v1.second.get<double>("compartment4.ball.t2"));
+        m_BallModel2->SetWeight(m_ImageGenParameters.comp4Weight);
+        m_ImageGenParameters.nonFiberModelList.push_back(m_BallModel2);
+        break;
+      case 1:
+        m_AstrosticksModel2->SetGradientList(m_ImageGenParameters.gradientDirections);
+        m_AstrosticksModel2->SetBvalue(m_ImageGenParameters.b_value);
+        m_AstrosticksModel2->SetDiffusivity(v1.second.get<double>("compartment4.astrosticks.d"));
+        m_AstrosticksModel2->SetT2(v1.second.get<double>("compartment4.astrosticks.t2"));
+        m_AstrosticksModel2->SetRandomizeSticks(v1.second.get<bool>("compartment4.astrosticks.randomize"));
+        m_AstrosticksModel2->SetWeight(m_ImageGenParameters.comp4Weight);
+        m_ImageGenParameters.nonFiberModelList.push_back(m_AstrosticksModel2);
+        break;
+      case 2:
+        m_DotModel2->SetGradientList(m_ImageGenParameters.gradientDirections);
+        m_DotModel2->SetT2(v1.second.get<double>("compartment4.dot.t2"));
+        m_DotModel2->SetWeight(m_ImageGenParameters.comp4Weight);
+        m_ImageGenParameters.nonFiberModelList.push_back(m_DotModel2);
+        break;
+      }
 
       m_ImageGenParameters.signalScale = v1.second.get<int>("signalScale");
       m_ImageGenParameters.repetitions = v1.second.get<int>("repetitions");
@@ -328,10 +348,7 @@ m_Controls->m_AdvancedOptionsBox_2->setChecked(v1.second.get<bool>("showadvanced
             m_Controls->m_IncludeFiducials->setChecked(v1.second.get<bool>("includeFiducials"));
             m_Controls->m_ConstantRadiusBox->setChecked(v1.second.get<bool>("constantradius"));
 
-            //m_Controls->m_Compartment1Box->setCurrentIndex(v1.second.get<int>("compartment1.index"));
-            //m_Controls->m_Compartment2Box->setCurrentIndex(v1.second.get<int>("compartment2.index"));
-            //m_Controls->m_Compartment3Box->setCurrentIndex(v1.second.get<int>("compartment3.index"));
-            //m_Controls->m_Compartment4Box->setCurrentIndex(v1.second.get<int>("compartment4.index"));
+
 
 
             BOOST_FOREACH( boost::property_tree::ptree::value_type const& v2, v1.second )

@@ -1286,16 +1286,20 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
             return;
         }
 
-        // Retrieve HistogramStatisticsCalculator from has map (or create a new one
-        // for this image if non-existant)
-        PartialVolumeAnalysisMapType::iterator it =
-                m_PartialVolumeAnalysisMap.find( m_SelectedImage );
-
-        if ( it != m_PartialVolumeAnalysisMap.end() )
+        m_CurrentStatisticsCalculator = NULL;
+        if(!m_IsTensorImage)
         {
+          // Retrieve HistogramStatisticsCalculator from has map (or create a new one
+          // for this image if non-existant)
+          PartialVolumeAnalysisMapType::iterator it =
+              m_PartialVolumeAnalysisMap.find( m_SelectedImage );
+
+          if ( it != m_PartialVolumeAnalysisMap.end() )
+          {
             m_CurrentStatisticsCalculator = it->second;
+          }
         }
-        else
+        if(m_CurrentStatisticsCalculator.IsNull())
         {
             m_CurrentStatisticsCalculator = mitk::PartialVolumeAnalysisHistogramCalculator::New();
             m_CurrentStatisticsCalculator->SetPlanarFigureThickness(m_Controls->m_PlanarFiguresThickness->value());

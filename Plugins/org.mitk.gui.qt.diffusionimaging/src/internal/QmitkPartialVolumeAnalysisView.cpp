@@ -1327,6 +1327,14 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
             mitk::PixelType pixelType = m_SelectedImageMask->GetPixelType();
             MITK_DEBUG << pixelType.GetPixelTypeAsString();
 
+
+            if(pixelType.GetComponentTypeAsString() == "char")
+            {
+                MITK_DEBUG << "Pixel type is char instead of uchar";
+                return;
+            }
+
+
             if(pixelType.GetBitsPerComponent() == 16)
             {
                 //convert from short to uchar
@@ -1347,6 +1355,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
 
                 mitk::CastToMitkImage(charImage, m_SelectedImageMask);
             }
+
 
             m_CurrentStatisticsCalculator->SetImageMask( m_SelectedImageMask );
 

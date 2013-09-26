@@ -200,6 +200,11 @@
           <string>Hotspot Mean</string>
          </property>
         </row>
+        <row>
+         <property name="text">
+          <string>Hotspot Min</string>
+         </property>
+        </row>
         <column>
          <property name="text">
           <string>Component 1</string>

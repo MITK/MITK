@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkStatisticsImageFilter.h>
 #include <itkLabelStatisticsImageFilter.h>
 #include <itkMaskImageFilter.h>
+#include <itkImageRegionConstIterator.h>
 
 #include <itkCastImageFilter.h>
 #include <itkImageFileWriter.h>
@@ -1013,6 +1014,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       maskNonEmpty = true;
     }
   }
+
   if ( maskNonEmpty )
   {
     std::list< int >::iterator it;
@@ -1032,7 +1034,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       statistics.Sigma = labelStatisticsFilter->GetSigma( *it );
       statistics.RMS = sqrt( statistics.Mean * statistics.Mean
         + statistics.Sigma * statistics.Sigma );
-      statistics.HotspotMean = 35.0; //Test value
+      //statistics.HotspotMean = 35.0; //Test value
 
       // restrict image to mask area for min/max index calculation
       typedef itk::MaskImageFilter< ImageType, MaskImageType, ImageType > MaskImageFilterType;
@@ -1080,16 +1082,49 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
           }
         }
 // FIX END
-
+      // ComputeHotspotStatistics()
+      statistics.HotspotMean = CalculateMinMaxIndex< TPixel, VImageDimension >(adaptedImage, adaptedMaskImage.GetPointer());
       statisticsContainer->push_back( statistics );
     }
   }
   else
   {
     histogramContainer->push_back( HistogramType::ConstPointer( m_EmptyHistogram ) );
-    statisticsContainer->push_back( Statistics() );;
+    statisticsContainer->push_back( Statistics() );
   }
 }
+
+template < typename TPixel, unsigned int VImageDimension>
+unsigned short ImageStatisticsCalculator::CalculateMinMaxIndex(
+  const itk::Image<TPixel, VImageDimension> *inputImage,
+  itk::Image<unsigned short, VImageDimension> *maskImage)
+{
+  typedef itk::Image< TPixel, VImageDimension > ImageType;
+  typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
+
+  typedef itk::ImageRegionConstIterator<ImageType> InputImageIteratorType;
+  typedef itk::ImageRegionConstIterator<MaskImageType> MaskImageIteratorType;
+
+  typename ImageType::RegionType inputRegionOfInterest = inputImage->GetLargestPossibleRegion();
+  InputImageIteratorType imageIt(inputImage, inputRegionOfInterest);
+  MaskImageIteratorType maskIt(maskImage, inputRegionOfInterest);
+
+  unsigned short maxValue = 1;
+  unsigned short minValue = 1000;
+
+  for(imageIt.GoToBegin(), maskIt.GoToBegin(); !imageIt.IsAtEnd() && !maskIt.IsAtEnd(); imageIt++, maskIt++)
+  {
+    if(maskIt.Get() > itk::NumericTraits<typename MaskImageType::PixelType>::Zero)
+    {
+      minValue = vnl_math_min((unsigned int)imageIt.Get(),(unsigned int)minValue);
+      maxValue = vnl_math_max((unsigned int)imageIt.Get(),(unsigned int)maxValue);
+    }
+  }
+
+  return minValue;
+}
+
+
 
 
 template < typename TPixel, unsigned int VImageDimension >

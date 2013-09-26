@@ -101,7 +101,7 @@ public:
       Variance = 0.0;
       Sigma = 0.0;
       RMS = 0.0;
-      HotspotMin = 0.0;
+      HotspotMin = 0.0; // Just Mean and Variance required, remove Min and Max?
       HotspotMax = 0.0;
       HotspotMean = 31.0;
       HotspotVariance = 0.0;
@@ -110,7 +110,6 @@ public:
 
   typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
   typedef std::vector< Statistics > StatisticsContainer;
-
 
   mitkClassMacro( ImageStatisticsCalculator, itk::Object );
   itkNewMacro( ImageStatisticsCalculator );
@@ -159,7 +158,6 @@ public:
   void SetCalculateHotspot(bool calculateHotspot);
 
   bool IsHotspotCalculated();
-
 
   /** \brief Compute statistics (together with histogram) for the current
    * masking mode.
@@ -243,6 +241,12 @@ protected:
   void InternalMaskIgnoredPixels(
     const itk::Image< TPixel, VImageDimension > *image,
     itk::Image< unsigned short, VImageDimension > *maskImage );
+
+  template < typename TPixel, unsigned int VImageDimension>
+  unsigned short CalculateMinMaxIndex(
+    const itk::Image<TPixel, VImageDimension> *inputImage,
+    itk::Image<unsigned short, VImageDimension> *maskImage
+    );
 
   /** Connection from ITK to VTK */
   template <typename ITK_Exporter, typename VTK_Importer>

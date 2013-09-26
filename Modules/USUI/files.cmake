@@ -30,7 +30,6 @@ set(MOC_H_FILES
   Qmitk/QmitkComboBoxStepThrough.h
 )
 
-# uncomment the following line if you want to use Qt resources
 set(QRC_FILES
-#  resources/QmitkToFUtilWidget.qrc
+  resources/USUI.qrc
 )

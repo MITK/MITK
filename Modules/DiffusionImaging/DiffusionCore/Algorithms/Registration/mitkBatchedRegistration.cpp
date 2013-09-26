@@ -47,14 +47,14 @@ std::vector<mitk::Image::Pointer> mitk::BatchedRegistration::GetRegisteredImages
     double offset[3];
     //GetTransformation(m_FixedImage, m_MovingReference,transf,NULL,offset);
     // store it as first element in vector
-  //  ApplyTransformationToImage(m_MovingReference,transf,NULL,false,offset);
+    //  ApplyTransformationToImage(m_MovingReference,transf,NULL,false,offset);
     m_RegisteredImages.push_back(m_MovingReference);
     // apply transformation to whole batch
     std::vector<mitk::Image::Pointer>::const_iterator itEnd = m_ImageBatch.end();
     for (std::vector<mitk::Image::Pointer>::iterator it = m_ImageBatch.begin(); it != itEnd; ++it)
     {
       //TODO fixme
-     // ApplyTransformationToImage(*it,transf);
+      // ApplyTransformationToImage(*it,transf);
       m_RegisteredImages.push_back(*it);
     }
   }
@@ -89,109 +89,39 @@ void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer 
   }
   else
   {
+    DiffusionImageType::Pointer diffImages = dynamic_cast<DiffusionImageType*>(img.GetPointer());
 
-    MITK_INFO << " Transformation : " << transformation[3] << ", "<< transformation[4] << ", "<< transformation[5];
-    MITK_INFO << " Offset : " << offset[0] << ", "<< offset[1] << ", "<< offset[2];
-    MITK_INFO << " Original Origin Moving Image : " << img->GetGeometry()->GetOrigin();
-    DiffusionImageType::Pointer diffImages =
-        dynamic_cast<DiffusionImageType*>(img.GetPointer());
-
-    // Workaround for Diffusion Images:
-    // Extracting a B0-image
-    // Apply the transformation to this image
-    // Copy Transformation informations from B0-ITK-Image to
-    //    diffusion vector image.
-    itk::B0ImageExtractionImageFilter<short,short >::Pointer b0Extraction =
-        itk::B0ImageExtractionImageFilter<short,short>::New();
-    b0Extraction->SetInput(diffImages->GetVectorImage());
-    b0Extraction->SetDirections(diffImages->GetDirections());
-    b0Extraction->Update();
-
-    mitk::Image::Pointer tmp = mitk::Image::New();
-    tmp->InitializeByItk(b0Extraction->GetOutput());
-    tmp->SetVolume(b0Extraction->GetOutput()->GetBufferPointer());
-    tmp->Modified();
-
-    MITK_INFO << " Original B0 Moving Image : " << b0Extraction->GetOutput()->GetOrigin();
-    MITK_INFO << " Original MITK TMP Image : " << tmp->GetGeometry()->GetOrigin();
-
- //   itk::Euler3DTransform< double > bullTrans;
- //   bullTrans.GetInverseTransform()->GetIn
-
-    // Fancy shit
     typedef itk::Euler3DTransform< double > RigidTransformType;
     RigidTransformType::Pointer rtransform = RigidTransformType::New();
     RigidTransformType::ParametersType parameters(RigidTransformType::ParametersDimension);
-    //itk::Euler3DTransform< double >* rtransform;
 
     for (int i = 0; i<6;++i)
       parameters[i] = transformation[i];
 
     rtransform->SetParameters( parameters );
-    mitk::Point3D b0origin = tmp->GetGeometry()->GetOrigin();
+
+    mitk::Point3D b0origin = diffImages->GetVectorImage()->GetOrigin();
     b0origin[0]-=offset[0];
     b0origin[1]-=offset[1];
     b0origin[2]-=offset[2];
-    tmp->GetGeometry()->SetOrigin(b0origin);
 
-    // apply transformation
-    ref = tmp->Clone();
-    registrationMethod->SetFixedImage( ref );
+    mitk::Point3D newOrigin = rtransform->GetInverseTransform()->TransformPoint(b0origin);
 
-    mitk::Image::Pointer resampled = registrationMethod->GetResampledMovingImage(tmp, transformation);
-    resampled->Modified();
+    itk::Matrix<double,3,3> dir = diffImages->GetVectorImage()->GetDirection();
+    itk::Matrix<double,3,3> transM  ( vnl_inverse(rtransform->GetMatrix().GetVnlMatrix()));
+    itk::Matrix<double,3,3> newDirection = transM * dir;
 
-    mitk::Point3D    newOrigin = rtransform->TransformPoint(b0origin);
-        tmp->GetGeometry()->SetOrigin(newOrigin);
-        IOUtil::SaveImage(tmp, "/home/cweber/B0_ManualChangedOriginNormal.nrrd");
-
- newOrigin = rtransform->GetInverseTransform()->TransformPoint(b0origin);
-    tmp->GetGeometry()->SetOrigin(newOrigin);
-    IOUtil::SaveImage(tmp, "/home/cweber/B0_ManualChangedOriginInverse.nrrd");
-
-    {
-      itk::Euler3DTransform< double >::Pointer blub = itk::Euler3DTransform< double >::New();
-      itk::Image<short, 3>::Pointer itkTmp;
-      mitk::CastToItkImage<itk::Image<short, 3> >(tmp, itkTmp);
-      itk::Image<short, 3>::DirectionType dir = itkTmp->GetDirection();
-     // rtransform->GetInverse(blub.GetPointer());
-      itk::Matrix<double,3,3>  transM  ( vnl_inverse(rtransform->GetMatrix().GetVnlMatrix()));
-      itk::Matrix<double,3,3> erg = transM * dir;
-      itkTmp->SetDirection(erg);
-      mitk::CastToMitkImage(itkTmp, tmp);
-
-      IOUtil::SaveImage(tmp, "/home/cweber/B0_ManualChangedDirectionInverse.nrrd");
-    }
-
-
-    // End of fancy shit
-
-
-    MITK_INFO << " Resampled Origin : " << resampled->GetGeometry()->GetOrigin();
-    MITK_INFO << " Resampled tmp ? Origin : " << tmp->GetGeometry()->GetOrigin();
-
-    IOUtil::SaveImage(resampled, "/home/cweber/resampledB0heuteimg.nrrd");
-
-    itk::Image<short, 3>::Pointer itkTmp;
-    mitk::CastToItkImage<itk::Image<short, 3> >(resampled, itkTmp);
-
-    MITK_INFO << "ITK ORIGIN " << itkTmp->GetOrigin();
-    diffImages->SetGeometry(resampled->GetGeometry());
-    diffImages->GetVectorImage()->SetOrigin(itkTmp->GetOrigin());
-    diffImages->GetVectorImage()->SetDirection(itkTmp->GetDirection());
-    diffImages->GetVectorImage()->SetSpacing(itkTmp->GetSpacing());
+    diffImages->GetVectorImage()->SetOrigin(newOrigin);
+    diffImages->GetVectorImage()->SetDirection(newDirection);
     diffImages->Modified();
-    MITK_INFO << "DIFF IM ORIGIN " << diffImages->GetGeometry()->GetOrigin();
-
 
     mitk::DiffusionImageCorrectionFilter<short>::Pointer correctionFilter =
         mitk::DiffusionImageCorrectionFilter<short>::New();
 
     // For Diff. Images: Need to rotate the gradients
     correctionFilter->SetImage(diffImages);
-    //correctionFilter->CorrectDirections(vnlRotationMatrix);
-    //correctionFilter->Update();
-
+    // works direcrky on input image!!
+    correctionFilter->CorrectDirections(transM.GetVnlMatrix());
     img = diffImages;
   }
 
@@ -250,8 +180,5 @@ void mitk::BatchedRegistration::GetTransformation(mitk::Image::Pointer fixedImag
 
   registrationMethod->SetMovingImage(movingImage);
   registrationMethod->Update();
-
-  IOUtil::SaveImage(registrationMethod->GetResampledMovingImage(),"/home/cweber/b0_filterRegisteredImage");
-
   registrationMethod->GetParameters(transformation); // first three: euler angles, last three translation
 }

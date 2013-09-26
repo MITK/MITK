@@ -1235,7 +1235,7 @@ void mitk::FiberBundleX::SetColorCoding(const char* requestedColorCoding)
 
 void mitk::FiberBundleX::RotateAroundAxis(double x, double y, double z)
 {
-    MITK_INFO << "Rotating fibers";
+    MITK_INFO << "rotate " << z;
     x = x*M_PI/180;
     y = y*M_PI/180;
     z = z*M_PI/180;
@@ -1261,14 +1261,11 @@ void mitk::FiberBundleX::RotateAroundAxis(double x, double y, double z)
     mitk::Geometry3D::Pointer geom = this->GetGeometry();
     mitk::Point3D center = geom->GetCenter();
 
-    boost::progress_display disp(m_NumFibers);
-
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
 
     for (int i=0; i<m_NumFibers; i++)
     {
-        ++disp ;
         vtkCell* cell = m_FiberPolyData->GetCell(i);
         int numPoints = cell->GetNumberOfPoints();
         vtkPoints* points = cell->GetPoints();
@@ -1340,15 +1337,11 @@ void mitk::FiberBundleX::ScaleFibers(double x, double y, double z)
 
 void mitk::FiberBundleX::TranslateFibers(double x, double y, double z)
 {
-    MITK_INFO << "Translating fibers";
-    boost::progress_display disp(m_NumFibers);
-
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
 
     for (int i=0; i<m_NumFibers; i++)
     {
-        ++disp;
         vtkCell* cell = m_FiberPolyData->GetCell(i);
         int numPoints = cell->GetNumberOfPoints();
         vtkPoints* points = cell->GetPoints();

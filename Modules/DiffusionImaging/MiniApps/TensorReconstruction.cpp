@@ -45,7 +45,7 @@ int TensorReconstruction(int argc, char* argv[])
 
     std::string inFileName = us::any_cast<string>(parsedArgs["input"]);
     std::string outfilename = us::any_cast<string>(parsedArgs["outFile"]);
-    outfilename = itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
+    outfilename = itksys::SystemTools::GetFilenamePath(outfilename)+"/"+itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
     outfilename += ".dti";
 
     int threshold = 0;

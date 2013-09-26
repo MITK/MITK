@@ -105,7 +105,9 @@ protected slots:
     void OnAddEddy(int value);
     void OnAddSpikes(int value);
     void OnAddAliasing(int value);
+    void OnAddMotion(int value);
     void OnConstantRadius(int value);
+
 
 protected:
 
@@ -167,10 +169,13 @@ protected:
         int                                 spikes;
         double                              spikeAmplitude;
         double                              wrap;
+        itk::Vector<double,3>               translation;
+        itk::Vector<double,3>               rotation;
 
         bool                                doSimulateRelaxation;
         bool                                doSimulateEddyCurrents;
         bool                                doDisablePartialVolume;
+        bool                                doAddMotion;
 
         mitk::RicianNoiseModel<double>       ricianNoiseModel;
         mitk::DiffusionSignalModel<double>::GradientListType  gradientDirections;
@@ -179,7 +184,7 @@ protected:
         QString signalModelString, artifactModelString;
 
         ItkDoubleImgType::Pointer           frequencyMap;
-        ItkUcharImgType::Pointer            tissueMaskImage;
+        vtkPolyData*                        maskSurface;
 
         mitk::DataNode::Pointer             resultNode;
     };
@@ -187,7 +192,6 @@ protected:
     ImageParameters                                     m_ImageGenParameters;
 
     std::map<mitk::DataNode*, QmitkPlanarFigureData>    m_DataNodeToPlanarFigureData;   ///< map each planar figure uniquely to a QmitkPlanarFigureData
-    mitk::Image::Pointer                                m_TissueMask;                   ///< mask defining which regions of the image should contain signal and which are containing only noise
     mitk::DataNode::Pointer                             m_SelectedFiducial;             ///< selected planar ellipse
     mitk::DataNode::Pointer                             m_SelectedImage;
     mitk::DataNode::Pointer                             m_SelectedDWI;

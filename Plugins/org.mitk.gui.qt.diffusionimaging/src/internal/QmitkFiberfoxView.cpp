@@ -54,6 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QMessageBox>
 #include "usModuleRegistry.h"
+#include <mitkSurface.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -109,6 +110,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_EddyFrame->setVisible(false);
         m_Controls->m_SpikeFrame->setVisible(false);
         m_Controls->m_AliasingFrame->setVisible(false);
+        m_Controls->m_MotionArtifactFrame->setVisible(false);
 
         m_Controls->m_FrequencyMapBox->SetDataStorage(this->GetDataStorage());
         mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -140,6 +142,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_AddEddy, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddEddy(int)));
         connect((QObject*) m_Controls->m_AddSpikes, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddSpikes(int)));
         connect((QObject*) m_Controls->m_AddAliasing, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddAliasing(int)));
+        connect((QObject*) m_Controls->m_AddMotion, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddMotion(int)));
 
         connect((QObject*) m_Controls->m_ConstantRadiusBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnConstantRadius(int)));
         connect((QObject*) m_Controls->m_CopyBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(CopyBundles()));
@@ -167,7 +170,6 @@ void QmitkFiberfoxView::UpdateImageParameters()
     m_ImageGenParameters.signalModelString = "";
     m_ImageGenParameters.artifactModelString = "";
     m_ImageGenParameters.resultNode = mitk::DataNode::New();
-    m_ImageGenParameters.tissueMaskImage = NULL;
     m_ImageGenParameters.frequencyMap = NULL;
     m_ImageGenParameters.gradientDirections.clear();
     m_ImageGenParameters.spikes = 0;
@@ -250,6 +252,15 @@ void QmitkFiberfoxView::UpdateImageParameters()
         m_ImageGenParameters.wrap = 1/m_Controls->m_WrapBox->value();
     }
 
+    // Motion
+    m_ImageGenParameters.doAddMotion = m_Controls->m_AddMotion->isChecked();
+    m_ImageGenParameters.translation[0] = m_Controls->m_MaxTranslationBoxX->value();
+    m_ImageGenParameters.translation[1] = m_Controls->m_MaxTranslationBoxY->value();
+    m_ImageGenParameters.translation[2] = m_Controls->m_MaxTranslationBoxZ->value();
+    m_ImageGenParameters.rotation[0] = m_Controls->m_MaxRotationBoxX->value();
+    m_ImageGenParameters.rotation[1] = m_Controls->m_MaxRotationBoxY->value();
+    m_ImageGenParameters.rotation[2] = m_Controls->m_MaxRotationBoxZ->value();
+
     m_ImageGenParameters.tLine = m_Controls->m_LineReadoutTimeBox->value();
     m_ImageGenParameters.tInhom = m_Controls->m_T2starBox->value();
     m_ImageGenParameters.tEcho = m_Controls->m_TEbox->value();
@@ -272,13 +283,6 @@ void QmitkFiberfoxView::UpdateImageParameters()
         this->m_Controls->m_TEbox->setValue( m_ImageGenParameters.imageRegion.GetSize(1)*m_ImageGenParameters.tLine );
         m_ImageGenParameters.tEcho = m_Controls->m_TEbox->value();
         QMessageBox::information( NULL, "Warning", "Echo time is too short! Time not sufficient to read slice. Automaticall adjusted to "+QString::number(m_ImageGenParameters.tEcho)+" ms");
-    }
-
-    // check tissue mask
-    if (m_TissueMask.IsNotNull())
-    {
-        m_ImageGenParameters.tissueMaskImage = ItkUcharImgType::New();
-        mitk::CastToItkImage<ItkUcharImgType>(m_TissueMask, m_ImageGenParameters.tissueMaskImage);
     }
 
     // rician noise
@@ -900,6 +904,14 @@ void QmitkFiberfoxView::OnConstantRadius(int value)
         GenerateFibers();
 }
 
+void QmitkFiberfoxView::OnAddMotion(int value)
+{
+    if (value>0)
+        m_Controls->m_MotionArtifactFrame->setVisible(true);
+    else
+        m_Controls->m_MotionArtifactFrame->setVisible(false);
+}
+
 void QmitkFiberfoxView::OnAddAliasing(int value)
 {
     if (value>0)
@@ -1492,11 +1504,15 @@ void QmitkFiberfoxView::GenerateImage()
         tractsToDwiFilter->SetSignalScale(m_ImageGenParameters.signalScale);
         if (m_ImageGenParameters.interpolationShrink>0)
             tractsToDwiFilter->SetUseInterpolation(true);
-        tractsToDwiFilter->SetTissueMask(m_ImageGenParameters.tissueMaskImage);
+        if (m_ImageGenParameters.maskSurface)
+            tractsToDwiFilter->SetMaskSurface(m_ImageGenParameters.maskSurface);
         tractsToDwiFilter->SetFrequencyMap(m_ImageGenParameters.frequencyMap);
         tractsToDwiFilter->SetSpikeAmplitude(m_ImageGenParameters.spikeAmplitude);
         tractsToDwiFilter->SetSpikes(m_ImageGenParameters.spikes);
         tractsToDwiFilter->SetWrap(m_ImageGenParameters.wrap);
+        tractsToDwiFilter->SetAddMotionArtifact(m_ImageGenParameters.doAddMotion);
+        tractsToDwiFilter->SetMaxTranslation(m_ImageGenParameters.translation);
+        tractsToDwiFilter->SetMaxRotation(m_ImageGenParameters.rotation);
         tractsToDwiFilter->Update();
 
         mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
@@ -1806,7 +1822,7 @@ void QmitkFiberfoxView::UpdateGui()
         m_Controls->m_AlignOnGrid->setEnabled(true);
     }
 
-    if (m_TissueMask.IsNotNull() || m_SelectedImage.IsNotNull())
+    if (m_SelectedImage.IsNotNull())
     {
         m_Controls->m_GeometryMessage->setVisible(true);
         m_Controls->m_GeometryFrame->setEnabled(false);
@@ -1838,7 +1854,7 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
     m_SelectedImages.clear();
     m_SelectedFiducials.clear();
     m_SelectedFiducial = NULL;
-    m_TissueMask = NULL;
+    m_ImageGenParameters.maskSurface = NULL;
     m_SelectedBundles.clear();
     m_SelectedImage = NULL;
     m_SelectedDWI = NULL;
@@ -1859,13 +1875,12 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
         {
             m_SelectedImages.push_back(node);
             m_SelectedImage = node;
-            bool isBinary = false;
-            node->GetPropertyValue<bool>("binary", isBinary);
-            if (isBinary)
-            {
-                m_TissueMask = dynamic_cast<mitk::Image*>(node->GetData());
-                m_Controls->m_TissueMaskLabel->setText(node->GetName().c_str());
-            }
+        }
+        else if( node.IsNotNull() && dynamic_cast<mitk::Surface*>(node->GetData()) )
+        {
+            mitk::Surface::Pointer surf = dynamic_cast<mitk::Surface*>(node->GetData());
+            m_ImageGenParameters.maskSurface = surf->GetVtkPolyData();
+            m_Controls->m_TissueMaskLabel->setText(node->GetName().c_str());
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
         {

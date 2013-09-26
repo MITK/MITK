@@ -48,7 +48,7 @@ int QballReconstruction(int argc, char* argv[])
 
     std::string inFileName = us::any_cast<string>(parsedArgs["input"]);
     std::string outfilename = us::any_cast<string>(parsedArgs["outFile"]);
-    outfilename = itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
+    outfilename = itksys::SystemTools::GetFilenamePath(outfilename)+"/"+itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
 
     int threshold = 0;
     if (parsedArgs.count("b0Threshold"))

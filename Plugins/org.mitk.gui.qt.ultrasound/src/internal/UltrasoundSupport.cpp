@@ -60,6 +60,7 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this->m_Controls.m_NewVideoDeviceWidget, SLOT(CreateNewDevice()) ); // Init NewDeviceWidget
   connect( m_Controls.m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone()) ); // After NewDeviceWidget finished editing
   connect( m_Controls.m_BtnView, SIGNAL(clicked()), this, SLOT(OnClickedViewDevice()) );
+  connect( m_Controls.m_FrameRate, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit(int)) );
   connect( m_Timer, SIGNAL(timeout()), this, SLOT(DisplayImage()));
 
   // Initializations
@@ -90,7 +91,7 @@ void UltrasoundSupport::DisplayImage()
 {
   m_Device->UpdateOutputData(0);
   mitk::Image::Pointer curOutput = m_Device->GetOutput();
-  m_Node->SetData(curOutput);
+  m_Node->SetData(curOutput->Clone());
   this->RequestRenderWindowUpdate();
 
   if ( curOutput->GetDimension() > 1
@@ -140,7 +141,6 @@ void UltrasoundSupport::OnClickedViewDevice()
 
     //change UI elements
     m_Controls.m_BtnView->setText("Stop Viewing");
-    m_Controls.m_FrameRate->setEnabled(false);
 
     m_ControlProbesWidget = new QmitkUSControlsProbesWidget(m_Device->GetControlInterfaceProbes(), m_Controls.m_ToolBoxControlWidgets);
     m_Controls.probesWidgetContainer->addWidget(m_ControlProbesWidget);
@@ -244,8 +244,12 @@ void UltrasoundSupport::OnClickedViewDevice()
 
     //change UI elements
     m_Controls.m_BtnView->setText("Start Viewing");
-    m_Controls.m_FrameRate->setEnabled(true);
   }
+}
+
+void UltrasoundSupport::OnChangedFramerateLimit(int value)
+{
+  m_Timer->setInterval(1000 / value);
 }
 
 void UltrasoundSupport::OnNewDeviceWidgetDone()
@@ -268,11 +272,6 @@ void UltrasoundSupport::GlobalReinit()
   // initialize the views to the bounding geometry
   mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }
-
-/*void UltrasoundSupport::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
-{
-  std::cout << prefs << std::endl;
-}*/
 
 UltrasoundSupport::UltrasoundSupport()
   : m_ControlCustomWidget(0),

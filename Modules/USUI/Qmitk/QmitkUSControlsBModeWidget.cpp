@@ -90,8 +90,6 @@ void QmitkUSControlsBModeWidget::OnFrequencyControlIndexChanged(int)
 {
   QString currentText = ui->scanningFrequencyComboBox->currentText();
   m_ControlInterface->SetScanningFrequency((currentText.left(currentText.size()-5)).toDouble());
-
-  MITK_INFO << (currentText.left(currentText.size()-4)).toStdString();
 }
 
 void QmitkUSControlsBModeWidget::OnDepthControlActivated(int)

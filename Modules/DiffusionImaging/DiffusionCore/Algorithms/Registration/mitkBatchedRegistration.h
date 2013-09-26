@@ -43,9 +43,9 @@ public:
    */
   std::vector<mitk::Image::Pointer> GetRegisteredImages();
 
-  void ApplyTransformationToImage(mitk::Image::Pointer& img, const RidgidTransformType& transformation, mitk::Image::Pointer resampleReference = NULL , bool binary = false) const;
+  void ApplyTransformationToImage(mitk::Image::Pointer& img, const RidgidTransformType& transformation, double *offset, mitk::Image::Pointer resampleReference = NULL , bool binary = false) const;
 
-  void GetTransformation(mitk::Image::Pointer fixedImage , mitk::Image::Pointer movingImage, RidgidTransformType transformation, mitk::Image::Pointer mask = NULL);
+  void GetTransformation(mitk::Image::Pointer fixedImage , mitk::Image::Pointer movingImage, RidgidTransformType transformation, double* offset, mitk::Image::Pointer mask = NULL);
 
 
 protected:

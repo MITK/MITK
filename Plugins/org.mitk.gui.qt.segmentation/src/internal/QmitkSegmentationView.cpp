@@ -1045,8 +1045,7 @@ void QmitkSegmentationView::RenderingManagerReinitialized()
   {
     const mitk::Geometry3D* workingNodeGeo = workingNode->GetData()->GetGeometry();
     const mitk::Geometry3D* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
-    if (mitk::Equal(workingNodeGeo->GetBoundingBox(), worldGeo->GetBoundingBox(), mitk::eps, true) &&
-        mitk::Equal(workingNodeGeo->GetIndexToWorldTransform(), worldGeo->GetIndexToWorldTransform(), mitk::eps, true))
+    if (mitk::Equal(workingNodeGeo->GetBoundingBox(), worldGeo->GetBoundingBox(), mitk::eps, true))
     {
       this->UpdateWarningLabel("");
       this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), workingNode);

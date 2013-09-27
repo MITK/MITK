@@ -243,10 +243,15 @@ protected:
     itk::Image< unsigned short, VImageDimension > *maskImage );
 
   template < typename TPixel, unsigned int VImageDimension>
-  unsigned short CalculateMinMaxIndex(
+  void CalculateMinMaxIndex(
     const itk::Image<TPixel, VImageDimension> *inputImage,
-    itk::Image<unsigned short, VImageDimension> *maskImage
-    );
+    itk::Image<unsigned short, VImageDimension> *maskImage);
+
+  template < typename TPixel, unsigned int VImageDimension>
+  void CalculateHotspotStatistics(
+    const itk::Image<TPixel, VImageDimension> inputImage,
+    itk::Image<unsigned short, VImageDimension> *maskImage,
+    double RadiusInMM);
 
   /** Connection from ITK to VTK */
   template <typename ITK_Exporter, typename VTK_Importer>

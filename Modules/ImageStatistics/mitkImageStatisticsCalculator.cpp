@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkLabelStatisticsImageFilter.h>
 #include <itkMaskImageFilter.h>
 #include <itkImageRegionConstIterator.h>
+#include <itkImageRegionIterator.h>
 
 #include <itkCastImageFilter.h>
 #include <itkImageFileWriter.h>
@@ -48,6 +49,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImageFileWriter.h>
 #include <itkRescaleIntensityImageFilter.h>
+#include <itkConvolutionImageFilter.h>
 
 #include <list>
 
@@ -1083,7 +1085,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
         }
 // FIX END
       // ComputeHotspotStatistics()
-      statistics.HotspotMean = CalculateMinMaxIndex< TPixel, VImageDimension >(adaptedImage, adaptedMaskImage.GetPointer());
+      // statistics.HotspotMean = CalculateMinMaxIndex< TPixel, VImageDimension >(adaptedImage, adaptedMaskImage.GetPointer());
       statisticsContainer->push_back( statistics );
     }
   }
@@ -1095,7 +1097,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 }
 
 template < typename TPixel, unsigned int VImageDimension>
-unsigned short ImageStatisticsCalculator::CalculateMinMaxIndex(
+void ImageStatisticsCalculator::CalculateMinMaxIndex(
   const itk::Image<TPixel, VImageDimension> *inputImage,
   itk::Image<unsigned short, VImageDimension> *maskImage)
 {
@@ -1104,26 +1106,175 @@ unsigned short ImageStatisticsCalculator::CalculateMinMaxIndex(
 
   typedef itk::ImageRegionConstIterator<ImageType> InputImageIteratorType;
   typedef itk::ImageRegionConstIterator<MaskImageType> MaskImageIteratorType;
+  typedef itk::ImageRegionConstIteratorWithIndex<ImageType> InputImageIndexIteratorType;
 
   typename ImageType::RegionType inputRegionOfInterest = inputImage->GetLargestPossibleRegion();
   InputImageIteratorType imageIt(inputImage, inputRegionOfInterest);
   MaskImageIteratorType maskIt(maskImage, inputRegionOfInterest);
+  InputImageIndexIteratorType imageIndexIt(inputImage, inputRegionOfInterest);
 
-  unsigned short maxValue = 1;
-  unsigned short minValue = 1000;
+  unsigned short maxValue = itk::NumericTraits<typename ImageType::PixelType>::max();
+  unsigned short minValue = itk::NumericTraits<typename ImageType::PixelType>::min();
 
-  for(imageIt.GoToBegin(), maskIt.GoToBegin(); !imageIt.IsAtEnd() && !maskIt.IsAtEnd(); imageIt++, maskIt++)
+  ImageType::IndexType maxIndex;
+  ImageType::IndexType minIndex;
+
+  //Calculate Min and Max
+  for(imageIt.GoToBegin(), maskIt.GoToBegin(), imageIndexIt.GoToBegin(); !imageIt.IsAtEnd() && !maskIt.IsAtEnd(); imageIt++, maskIt++, imageIndexIt++)
   {
     if(maskIt.Get() > itk::NumericTraits<typename MaskImageType::PixelType>::Zero)
     {
-      minValue = vnl_math_min((unsigned int)imageIt.Get(),(unsigned int)minValue);
-      maxValue = vnl_math_max((unsigned int)imageIt.Get(),(unsigned int)maxValue);
+      unsigned short tempMax = vnl_math_max((unsigned int)imageIt.Get(),(unsigned int)maxValue);
+      unsigned short tempMin = vnl_math_min((unsigned int)imageIt.Get(),(unsigned int)minValue);
+
+      minValue = tempMin;
+      maxValue = tempMax;
+    }
+
+    // TODO: test if value is correct
+    if(maxValue == tempMax)
+    {
+      maxIndex = imageIndexIt.GetIndex();
+    }
+
+    if(minValue == tempMin)
+    {
+      minIndex = imageIndexIt.GetIndex();
     }
   }
 
-  return minValue;
 }
+template < typename TPixel, unsigned int VImageDimension>
+void ImageStatisticsCalculator::CalculateHotspotStatistics(
+    const itk::Image<TPixel, VImageDimension> inputImage,
+    itk::Image<unsigned short, VImageDimension> *maskImage,
+    double RadiusInMM)
+{
+  typedef itk::Image< TPixel, VImageDimension > ImageType;
+  typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
 
+  typedef itk::ImageRegionIterator<ImageType> InputImageIteratorType;
+
+  typedef typename ImageType::SpacingType SpacingType;
+  typedef typename ImageType::SizeType SizeType;
+  typedef typename ImageType::IndexType IndexType;
+  typedef typename ImageType::PointType PointType;
+  typedef typename ImageType::RegionType RegionType;
+
+  ImageType::Pointer ConvolutionMask = ImageType::New();
+
+  Sizetype spacing = inputImage->GetSpacing();
+
+  IndexType start;
+  start[0] = 0;
+  start[1] = 0;
+  start[2] = 0;
+
+  SizeType size;
+  size[0] = spacing[0] * RadiusInMM * 2;
+  size[1] = spacing[1] * RadiusInMM * 2;
+  size[2] = spacing[2] * RadiusInMM * 2;
+
+  PointType pixelCoordinate;
+  pixelCoordinate[0] = 0.0;
+  pixelCoordinate[1] = 0.0;
+  pixelCoordinate[2] = 0.0;
+
+  RegionType region;
+  region.SetSize(size);
+  region.SetIndex(start);
+
+  Sizetype spacing = inputImage->GetSpacing();
+
+  ConvolutionMask->SetRegions(region);
+  ConvolutionMask->SetOrigin(pixelCoordinate);
+  ConvolutionMask->SetSpacing(spacing);
+  ConvolutionMask->Allocate();
+
+  const double ConvolutionMaskOriginX = size[0]/2;
+  const double ConvolutionMaskOriginY = size[1]/2;
+  const double ConvolutionMaskOriginZ = size[2]/2;
+
+  typename ImageType::RegionType inputRegionOfInterest = inputImage->GetLargestPossibleRegion();
+  InputImageIteratorType imageIt(inputImage, inputRegionOfInterest);
+
+  IndexType pixelIndex;
+
+  int countSubPixel = 0;
+
+  for(imageIt.GoToBegin(); !imageIt.IsAtEnd(); imageIt++)
+  {
+    //Calculate first Subpixel (left upper corner of Subpixel)
+    pixelCoordinate[0] -= spacing[0]/4;
+    pixelCoordinate[1] += spacing[1]/4;
+
+    //Compute distance between Subpixel and origin of ConvolutionMask
+    double distanceSubPixelX = pixelCoordinate[0] - ConvolutionMaskOriginX;
+    double distanceSubPixelY = pixelCoordinate[1] - ConvolutionMaskOriginY;
+    double distanceSubPixelFromOrigin = sqrt(distanceSubPixelX * distanceSubPixelX + distanceSubPixelY * distanceSubPixelY);
+
+    //Check if Subpixel is in the sphere and increase countSubPixel by 1
+    if(distanceSubPixelFromOrigin <= RadiusInMM)
+      countSubPixel++;
+
+    //Calculate second Subpixel (right upper corner of Subpixel)
+    pixelCoordinate[0] += spacing[0]/2;
+    distanceSubPixelX = pixelCoordinate[0] - ConvolutionMaskOriginX;
+    distanceSubPixelY = pixelCoordinate[1] - ConvolutionMaskOriginY;
+    distanceSubPixelFromOrigin = sqrt(distanceSubPixelX * distanceSubPixelX + distanceSubPixelY * distanceSubPixelY);
+
+    if(distanceSubPixelFromOrigin <= RadiusInMM)
+      countSubPixel++;
+
+    //Calculate third Subpixel (right upper corner of Subpixel)
+    pixelCoordinate[1] -= spacing[0]/2;
+    distanceSubPixelX = pixelCoordinate[0] - ConvolutionMaskOriginX;
+    distanceSubPixelY = pixelCoordinate[1] - ConvolutionMaskOriginY;
+    distanceSubPixelFromOrigin = sqrt(distanceSubPixelX * distanceSubPixelX + distanceSubPixelY * distanceSubPixelY);
+
+    if(distanceSubPixelFromOrigin <= RadiusInMM)
+      countSubPixel++;
+
+    //Calculate 4th Subpixel (right upper corner of Subpixel)
+    pixelCoordinate[0] -= spacing[0]/2;
+    distanceSubPixelX = pixelCoordinate[0] - ConvolutionMaskOriginX;
+    distanceSubPixelY = pixelCoordinate[1] - ConvolutionMaskOriginY;
+    distanceSubPixelFromOrigin = sqrt(distanceSubPixelX * distanceSubPixelX + distanceSubPixelY * distanceSubPixelY);
+
+    if(distanceSubPixelFromOrigin <= RadiusInMM)
+      countSubPixel++;
+
+    int pixelValue = countSubPixel/4;
+
+    bool isInside = image->TransformPhysicalPointToIndex(pixelCoordinate, pixelIndex)
+
+    if(isInside)
+    {
+      ConvolutionMask->SetPixel(pixelIndex,pixelValue);
+    }
+
+    countSubPixel = 0;
+  }
+
+  //Convolution of InputImage and ConvolutionMask
+  typedef itk::ConvolutionImageFilte<ImageType> FilterType;
+  FilterType::Pointer convolutionFilter = FilterType::New();
+
+  convolutionFilter->SetInput(inputImage);
+  convolutionFilter->SetKernelImage(ConvolutionMask);
+
+  ImageType::Pointer PeakImage = ImageType::New();
+
+  PeakImage->SetRegions(region);
+  PeakImage->SetSpacing(spacing);
+  PeakImage->Allocate();
+
+  PeakImage = convolutionFilter->GetOutput();
+
+  //Calculate Statistics from PeakImage
+  //CalculateMinMaxIndex(PeakImage.GetPointer(), maskImage);
+
+}
 
 
 

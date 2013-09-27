@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImage.h>
 
+#include "itkTriangleMeshToBinaryImageFilter.h"
+#include "itkMesh.h"
+
 namespace mitk
 {
 
@@ -39,6 +42,10 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
 
     mitkClassMacro(ContourUtils, itk::Object);
     itkNewMacro(ContourUtils);
+
+    typedef itk::Mesh< float , 3 > MeshType;
+    typedef itk::Image< unsigned char, 3 > ImageType;
+    typedef itk::TriangleMeshToBinaryImageFilter<MeshType,ImageType> MeshFilterType;
 
     /**
       \brief Projects a contour onto an image point by point. Converts from world to index coordinates.
@@ -82,6 +89,10 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
     \brief Fill a contour in a 2D slice with a specified pixel value at a given time step.
     */
     void FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue = 1 );
+
+    void ve2itkMesh(ContourModel* contourModel);
+
+    MeshType::Pointer m_mesh;
 
 protected:
 

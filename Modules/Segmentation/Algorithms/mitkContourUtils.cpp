@@ -162,7 +162,7 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, Ima
 
 void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue )
 {
-  // 1. Use ipSegmentation to draw a filled(!) contour into a new 8 bit 2D image, which will later be copied back to the slice.
+  /*// 1. Use ipSegmentation to draw a filled(!) contour into a new 8 bit 2D image, which will later be copied back to the slice.
   //    We don't work on the "real" working data, because ipSegmentation would restrict us to 8 bit images
 
   // convert the projected contour into a ipSegmentation format
@@ -205,6 +205,28 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
 
   ipsegmentationModifiedSlice = NULL; // free MITK header information
   ipMITKSegmentationFree( picSlice ); // free actual memory
+  */
+
+
+    MeshFilterType::Pointer meshFilter = MeshFilterType::New();
+    ve2itkMesh(projectedContour);
+    meshFilter->SetInput(m_mesh);
+    meshFilter->Update();
+    std::cout << "meshFilter: " << meshFilter->GetOutput();
+}
+
+void mitk::ContourUtils::ve2itkMesh(ContourModel* contourModel)
+{
+    mitk::ContourModel::VertexType* vertex;
+    mitk::ContourModel::VertexIterator it = contourModel->Begin();
+    mitk::ContourModel::VertexIterator itEnd = contourModel->End();
+
+    for( int i=0 ; it!=itEnd ; i++ )
+    {
+        itk::Mesh<float,3>::PointType point = (*it)->Coordinates;
+        m_mesh->SetPoint( i , point );
+        it++;
+    }
 }
 
 template<typename TPixel, unsigned int VImageDimension>

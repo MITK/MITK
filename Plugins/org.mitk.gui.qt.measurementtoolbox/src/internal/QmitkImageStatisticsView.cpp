@@ -569,9 +569,14 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     // If a (non-closed) PlanarFigure is selected, display a line profile widget
     if ( m_SelectedPlanarFigure != NULL )
     {
+     // Check if the (closed) planar figure is out of bounds and so no image mask could be calculated--> Intensity Profile can not be calculated
+      bool outOfBounds = false;
+      if ( m_SelectedPlanarFigure->IsClosed() && m_SelectedImageMask == NULL)
+        outOfBounds = true;
+
       // check whether PlanarFigure is initialized
       const mitk::Geometry2D *planarFigureGeometry2D = m_SelectedPlanarFigure->GetGeometry2D();
-      if ( planarFigureGeometry2D == NULL )
+      if ( planarFigureGeometry2D == NULL || outOfBounds)
       {
         // Clear statistics, histogram, and GUI
         this->InvalidateStatisticsTableView();

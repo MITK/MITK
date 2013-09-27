@@ -428,6 +428,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   m_SerialCommunication->SetReceiveTimeout(5000);
   m_SerialCommunication->OpenConnection();
 
+
   /* initialize the tracking device */
   returnvalue = m_DeviceProtocol->INIT();
   if (returnvalue != NDIOKAY)
@@ -542,6 +543,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   }
   /* finish  - now all tools should be added, initialized and enabled, so that tracking can be started */
   this->SetState(Ready);
+  SetVolume(mitk::Standard);
   return true;
 }
 
@@ -1229,7 +1231,8 @@ bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes,
 
     std::string standard = "0";
     std::string pyramid = "4";
-    std::string spectraPyramid = "5";
+    std::string spectraPyramid = "5-2";
+    std::string spectraExtendedPyramid = "5-3";
     std::string vicraVolume = "7";
     std::string cube = "9";
     std::string dome = "A";
@@ -1237,8 +1240,13 @@ bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes,
       volumes->push_back(mitk::Standard);
     if (currentVolume.compare(0,1,pyramid)==0)
       volumes->push_back(mitk::Pyramid);
-    if (currentVolume.compare(0,1,spectraPyramid)==0)
+    if (currentVolume.compare(0,3,spectraPyramid)==0)
       volumes->push_back(mitk::SpectraPyramid);
+    if (currentVolume.compare(1,3,spectraExtendedPyramid)==0)
+    {
+      currentVolume = currentVolume.substr(1,currentVolume.size());
+      volumes->push_back(mitk::SpectraPyramid);
+    }
     if (currentVolume.compare(0,1,vicraVolume)==0)
       volumes->push_back(mitk::VicraVolume);
     else if (currentVolume.compare(0,1,cube)==0)

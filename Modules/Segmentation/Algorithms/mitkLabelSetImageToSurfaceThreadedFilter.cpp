@@ -24,7 +24,7 @@ namespace mitk
 
 LabelSetImageToSurfaceThreadedFilter::LabelSetImageToSurfaceThreadedFilter():
 m_RequestedLabel(1),
-m_ResultSurface(NULL)
+m_Result(NULL)
 {
 }
 
@@ -98,14 +98,14 @@ bool LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateFunction()
   {
     filter->Update();
   }
-  catch (itk::ExceptionObject& excep)
+  catch (itk::ExceptionObject& e)
   {
-    MITK_ERROR << "Exception caught: " << excep.GetDescription();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
     return false;
   }
-  catch (std::exception& excep)
+  catch (std::exception& e)
   {
-     MITK_ERROR << "Exception caught: " << excep.what();
+     MITK_ERROR << "Exception caught: " << e.what();
      return false;
   }
   catch (...)
@@ -114,12 +114,12 @@ bool LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateFunction()
      return false;
   }
 
-  m_ResultSurface = filter->GetOutput();
+  m_Result = filter->GetOutput();
 
-  if ( m_ResultSurface.IsNull() || !m_ResultSurface->GetVtkPolyData() )
+  if ( m_Result.IsNull() || !m_Result->GetVtkPolyData() )
      return false;
 
-  m_ResultSurface->DisconnectPipeline();
+  m_Result->DisconnectPipeline();
 
   return true;
 }
@@ -133,7 +133,7 @@ void LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateSuccessful()
   name.append("-surf");
 
   mitk::DataNode::Pointer node = mitk::DataNode::New();
-  node->SetData(m_ResultSurface);
+  node->SetData(m_Result);
   node->SetName(name);
 
   mitk::Color color = image->GetLabelColor(m_RequestedLabel);

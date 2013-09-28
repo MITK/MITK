@@ -45,8 +45,7 @@ class Segmentation_EXPORT LabelSetImageToSurfaceThreadedFilter : public Segmenta
   private:
 
      int m_RequestedLabel;
-     Surface::Pointer m_ResultSurface;
-   //  std::stringstream m_ResultNodeName;
+     Surface::Pointer m_Result;
 };
 
 } // namespace

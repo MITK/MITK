@@ -339,29 +339,32 @@ void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
-  mitk::DataNode* workingNode = this->m_ToolManager->GetWorkingData(0);
-  if ( (!workingNode) || (!dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData())) )
-  {
-    this->setChecked(false);
-    this->setEnabled(false);
-    return;
-  }
+    mitk::DataNode* workingNode = this->m_ToolManager->GetWorkingData(0);
+    if (!workingNode)
+    {
+      this->setChecked(false);
+      this->setEnabled(false);
+      return;
+    }
 
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
-  if (workingImage->GetDimension() > 4 || workingImage->GetDimension() < 3)
-  {
-    MITK_ERROR << "slices interpolator needs a 3D or 3D+t segmentation, not 2D.";
-    this->setChecked(false);
-    this->setEnabled(false);
-    return;
-  }
+    mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+    if (workingImage->GetDimension() > 4 || workingImage->GetDimension() < 3)
+    {
+      MITK_ERROR << "slices interpolator needs a 3D or 3D+t segmentation, not 2D.";
+      this->setChecked(false);
+      this->setEnabled(false);
+      return;
+    }
 
-  if (m_WorkingImage != workingImage)
-  {
-    m_WorkingImage = workingImage;
-    m_SliceInterpolatorController->SetWorkingImage( m_WorkingImage );
-    this->UpdateVisibleSuggestion();
-  }
+    if ( m_WorkingImage != workingImage )
+    {
+      m_WorkingImage = workingImage;
+      if (m_2DInterpolationEnabled)
+      {
+        m_SliceInterpolatorController->SetWorkingImage( m_WorkingImage );
+        this->UpdateVisibleSuggestion();
+      }
+    }
 }
 
 void QmitkSlicesInterpolator::OnTimeChanged(itk::Object* sender, const itk::EventObject& e)

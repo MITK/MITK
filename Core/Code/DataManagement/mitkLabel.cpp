@@ -28,7 +28,7 @@ m_Exterior(false),
 m_Opacity(0.6),
 m_Volume(0.0),
 m_Index(0),
-m_Component(0),
+m_Layer(0),
 m_StickyBorders(false)
 {
 
@@ -49,7 +49,7 @@ mitk::Label::Label(const Label& other)
   this->m_Volume = other.GetVolume();
   this->m_LastModified = other.GetLastModified();
   this->m_Index = other.GetIndex();
-  this->m_Component = other.GetComponent();
+  this->m_Layer = other.GetLayer();
   this->m_Color = other.GetColor();
 }
 

@@ -118,7 +118,7 @@ void mitk::NrrdLabelSetImageWriter<TPixelType>::GenerateData()
         int locked = input->GetLabelLocked(i);
         int visible = input->GetLabelVisible(i);
         float volume = input->GetLabelVolume(i);
-        unsigned int component = input->GetLabelComponent(i);
+        unsigned int component = input->GetLabelLayer(i);
         sprintf( valbuffer, "%f %f %f %f %d %d %f %d", rgba[0], rgba[1], rgba[2], rgba[3], locked, visible, volume, component);
 
         itk::EncapsulateMetaData<std::string>(itkImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));

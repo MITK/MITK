@@ -111,12 +111,12 @@ namespace mitk
               itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
               if (itKey->find("last modified") != std::string::npos)
               {
-                  lastmodified = metaString;
+                lastmodified = metaString;
               }
 
               if (itKey->find("number of labels") != std::string::npos)
               {
-                  numberOfLabels = atoi(metaString.c_str());
+                numberOfLabels = atoi(metaString.c_str());
               }
             }
 
@@ -131,26 +131,26 @@ namespace mitk
               mitk::Color color;
               std::string name;
               float opacity, volume;
-              int locked, visible, component;
+              int locked, visible, layer;
               for (; itKey != imgMetaKeys.end(); itKey ++)
               {
                 itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
                 sprintf( keybuffer, "label_%03d_name", i );
                 if (itKey->find(keybuffer) != std::string::npos)
                 {
-                    char str [512];
-                    sscanf(metaString.c_str(), "%[^\n]s", &str);
-                    name = str;
+                  char str [512];
+                  sscanf(metaString.c_str(), "%[^\n]s", &str);
+                  name = str;
                 }
                 sprintf( keybuffer, "label_%03d_props", i );
                 if (itKey->find(keybuffer) != std::string::npos)
                 {
-                    float rgba[4];
-                    sscanf(metaString.c_str(), "%f %f %f %f %d %d %f %d", &rgba[0], &rgba[1], &rgba[2], &rgba[3], &locked, &visible, &volume, &component);
-                    color.SetRed(rgba[0]);
-                    color.SetGreen(rgba[1]);
-                    color.SetBlue(rgba[2]);
-                    opacity = rgba[3];
+                  float rgba[4];
+                  sscanf(metaString.c_str(), "%f %f %f %f %d %d %f %d", &rgba[0], &rgba[1], &rgba[2], &rgba[3], &locked, &visible, &volume, &layer);
+                  color.SetRed(rgba[0]);
+                  color.SetGreen(rgba[1]);
+                  color.SetBlue(rgba[2]);
+                  opacity = rgba[3];
                 }
               }
 
@@ -161,7 +161,7 @@ namespace mitk
               label->SetLocked(locked);
               label->SetVisible(visible);
               label->SetVolume(volume);
-              label->SetComponent(component);
+              label->SetLayer(layer);
 
               output->AddLabel(*label);
             }

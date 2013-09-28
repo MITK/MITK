@@ -144,7 +144,7 @@ public:
 
     /** \brief
     */
-    virtual unsigned int GetLabelComponent(int index) const;
+    virtual unsigned int GetLabelLayer(int index) const;
 
     /** \brief
     */
@@ -200,7 +200,7 @@ public:
 
     /** \brief
     */
-    virtual int GetActiveLabelComponent() const;
+    virtual int GetActiveLabelLayer() const;
 
     /** \brief
     */

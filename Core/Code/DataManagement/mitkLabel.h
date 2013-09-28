@@ -94,8 +94,8 @@ public:
     itkSetMacro(Index, unsigned int);
     itkGetConstMacro(Index, unsigned int);
 
-    itkSetMacro(Component, unsigned int);
-    itkGetConstMacro(Component, unsigned int);
+    itkSetMacro(Layer, unsigned int);
+    itkGetConstMacro(Layer, unsigned int);
 
     Label();
     virtual ~Label();
@@ -118,7 +118,7 @@ protected:
     float m_Volume;
     std::string m_LastModified;
     unsigned int m_Index;
-    unsigned int m_Component;
+    unsigned int m_Layer;
     mitk::Color m_Color;
     mitk::Point3D m_CenterOfMassIndex;
     mitk::Point3D m_CenterOfMassCoordinates;

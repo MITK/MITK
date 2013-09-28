@@ -283,15 +283,15 @@ void mitk::LabelSet::ResetLabels()
   }
 }
 
-int mitk::LabelSet::GetActiveLabelComponent() const
+int mitk::LabelSet::GetActiveLabelLayer() const
 {
-  return this->GetActiveLabel()->GetComponent();
+  return this->GetActiveLabel()->GetLayer();
 }
 
-unsigned int mitk::LabelSet::GetLabelComponent(int index) const
+unsigned int mitk::LabelSet::GetLabelLayer(int index) const
 {
   if (this->HasLabel(index))
-    return this->m_LabelContainer[index]->GetComponent();
+    return this->m_LabelContainer[index]->GetLayer();
   else
     return 0;
 }

@@ -269,7 +269,8 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
 
 bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stateEvent)
 {
-  // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's working image corresponds to that
+  // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice
+  // of the toolmanager's working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
 
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());

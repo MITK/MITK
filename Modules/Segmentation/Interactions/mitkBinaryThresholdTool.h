@@ -55,10 +55,11 @@ namespace mitk
     virtual void Activated();
     virtual void Deactivated();
 
+    /// \brief Sets the current threshold value from GUI.
     virtual void SetThresholdValue(double value);
 
     /// \brief Adds the preview image to the current working image.
-    virtual void ConfirmSegmentation();
+    virtual void AcceptPreview();
 
     virtual void CancelThresholding();
 
@@ -69,8 +70,6 @@ namespace mitk
     virtual ~BinaryThresholdTool();
 
     void SetupPreviewNodeFor( DataNode* nodeForThresholding );
-
-    void OnRoiDataChanged();
 
     template <typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>
     void ITKThresholding( itk::Image<TPixel1, VDimension1>* targetImage, const itk::Image<TPixel2, VDimension2>* sourceImage );

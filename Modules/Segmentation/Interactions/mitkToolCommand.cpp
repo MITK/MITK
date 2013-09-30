@@ -81,6 +81,11 @@ void mitk::ToolCommand::SetRemainingProgress(int steps)
   mitk::ProgressBar::GetInstance()->Progress(steps);
 }
 
+void mitk::ToolCommand::Reset()
+{
+  mitk::ProgressBar::GetInstance()->Reset();
+}
+
 double mitk::ToolCommand::GetCurrentProgressValue()
 {
   return m_ProgressValue;

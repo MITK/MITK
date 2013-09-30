@@ -55,6 +55,7 @@ set(CPP_FILES
   Interactions/mitkExtrudedContourInteractor.cpp
   Interactions/mitkFastMarchingTool.cpp
   Interactions/mitkFastMarchingTool3D.cpp
+  Interactions/mitkMedianTool3D.cpp
   Interactions/mitkFeedbackContourTool.cpp
   Interactions/mitkFillRegionTool.cpp
   Interactions/mitkLiveWireTool2D.cpp
@@ -117,4 +118,5 @@ set(RESOURCE_FILES
   Watershed_Cursor_32x32.png
   Wipe_48x48.png
   Wipe_Cursor_32x32.png
+  MedianTool3D_48x48.png
 )

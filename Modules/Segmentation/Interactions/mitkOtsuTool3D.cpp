@@ -157,7 +157,7 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
 
 void mitk::OtsuTool3D::ConfirmSegmentation()
 {
-  GetTargetSegmentationNode()->SetData(dynamic_cast<mitk::Image*>(m_BinaryPreviewNode->GetData()));
+//  GetTargetSegmentationNode()->SetData(dynamic_cast<mitk::Image*>(m_BinaryPreviewNode->GetData()));
 }
 
 void mitk::OtsuTool3D::UpdateBinaryPreview(int regionID)

@@ -16,12 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAutoSegmentationTool.h"
 #include "mitkToolManager.h"
+#include "mitkUndoController.h"
+#include "mitkLabelSetImage.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkRenderingManager.h"
 
-mitk::AutoSegmentationTool::AutoSegmentationTool()
-:Tool("dummy"),
-m_OverwriteExistingSegmentation (false)
+mitk::AutoSegmentationTool::AutoSegmentationTool() : Tool("dummy")
 {
 }
 
@@ -34,45 +35,31 @@ const char* mitk::AutoSegmentationTool::GetGroup() const
   return "autoSegmentation";
 }
 
-void mitk::AutoSegmentationTool::SetOverwriteExistingSegmentation(bool overwrite)
+//to be moved to mitkInteractionConst.h by StateMachineEditor
+const mitk::OperationType mitk::AutoSegmentationTool::OP_EXCHANGE = 717;
+
+// constructors for operation classes
+mitk::AutoSegmentationTool::opExchangeNodes::opExchangeNodes(
+    mitk::OperationType type, mitk::DataNode* node, mitk::BaseData* oldData, mitk::BaseData* newData )
+:mitk::Operation(type),m_Node(node),m_OldData(oldData),m_NewData(newData)
 {
-  m_OverwriteExistingSegmentation = overwrite;
 }
 
-std::string mitk::AutoSegmentationTool::GetCurrentSegmentationName()
+void mitk::AutoSegmentationTool::ExecuteOperation (mitk::Operation *operation)
 {
-  if (m_ToolManager->GetWorkingData(0))
-    return m_ToolManager->GetWorkingData(0)->GetName();
-  else
-    return "";
-}
+  if (!operation) return;
 
-mitk::DataNode* mitk::AutoSegmentationTool::GetTargetSegmentationNode()
-{
-  mitk::DataNode::Pointer emptySegmentation;
-  if (m_OverwriteExistingSegmentation)
+  switch (operation->GetOperationType())
   {
-    emptySegmentation = m_ToolManager->GetWorkingData(0);
+    case OP_EXCHANGE:
+      {
+        opExchangeNodes* op = static_cast<opExchangeNodes*>(operation);
+        op->GetNode()->SetData(op->GetNewData());
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        break;
+      }
+    default:;
   }
-  else
-  {
-    mitk::DataNode::Pointer refNode = m_ToolManager->GetReferenceData(0);
-    if (refNode.IsNull())
-    {
-      //TODO create and use segmentation exceptions instead!!
-      MITK_ERROR<<"No valid reference data!";
-      return NULL;
-    }
-    std::string nodename = m_ToolManager->GetReferenceData(0)->GetName()+"_"+this->GetName();
-    mitk::Color color;
-    color.SetRed(1);
-    color.SetBlue(0);
-    color.SetGreen(0);
-    emptySegmentation = CreateEmptySegmentationNode(dynamic_cast<mitk::Image*>(refNode->GetData()), nodename, color);
-    m_ToolManager->GetDataStorage()->Add(emptySegmentation, refNode);
-
-  }
-  return emptySegmentation;
 }
 
 void mitk::AutoSegmentationTool::PasteSegmentation( Image* targetImage, Image* sourceImage, int pixelvalue, int timestep )
@@ -85,21 +72,21 @@ void mitk::AutoSegmentationTool::PasteSegmentation( Image* targetImage, Image* s
   }
   catch( itk::ExceptionObject & e )
   {
-    MITK_ERROR << "Could not paste segmentation " << e.GetDescription();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
     m_ToolManager->ActivateTool(-1);
     return;
   }
   catch (...)
   {
-    MITK_ERROR << "Could not generate segmentation.";
+    MITK_ERROR << "Unkown exception caught!";
     m_ToolManager->ActivateTool(-1);
     return;
   }
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::AutoSegmentationTool::ItkPasteSegmentation(
-       itk::Image<TPixel,VImageDimension>* targetImage, const mitk::Image* sourceImage, int overwritevalue )
+void mitk::AutoSegmentationTool::ItkPasteSegmentation( itk::Image<TPixel,VImageDimension>* targetImage,
+                                                       const mitk::Image* sourceImage, int overwritevalue )
 {
   typedef itk::Image<TPixel,VImageDimension> ImageType;
 
@@ -115,33 +102,50 @@ void mitk::AutoSegmentationTool::ItkPasteSegmentation(
   sourceIterator.GoToBegin();
   targetIterator.GoToBegin();
 
-  const int& activePixelValue = m_ToolManager->GetActiveLabel()->GetIndex();
+  int activePixelValue = m_ToolManager->GetActiveLabel()->GetIndex();
 
-  if (activePixelValue == 0) // if exterior is the active label
+  while ( !targetIterator.IsAtEnd() )
   {
-    while ( !targetIterator.IsAtEnd() )
+    int targetValue = static_cast< int >( targetIterator.Get() );
+    if ( !m_ToolManager->GetLabelLocked(targetValue) && sourceIterator.Get() )
     {
-      if (sourceIterator.Get() != 0)
-      {
-        targetIterator.Set( overwritevalue );
-      }
-      ++targetIterator;
-      ++sourceIterator;
+      targetIterator.Set( overwritevalue );
     }
-  }
-  else if (overwritevalue != 0) // if we are not erasing
-  {
-    while ( !targetIterator.IsAtEnd() )
-    {
-      const int targetValue = targetIterator.Get();
-      if ( sourceIterator.Get() != 0 )
-      {
-        if (!m_ToolManager->GetLabelLocked(targetValue))
-          targetIterator.Set( overwritevalue );
-      }
 
-      ++targetIterator;
-      ++sourceIterator;
-    }
+    ++targetIterator;
+    ++sourceIterator;
   }
+}
+
+void mitk::AutoSegmentationTool::InitializeUndoController()
+{
+//  mitk::UndoController::GetCurrentUndoModel()->Clear();
+//  mitk::UndoController::GetCurrentUndoModel()->ClearRedoList();
+
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  if (!workingNode)
+    mitkThrow() << "Could not retrieve working node!";
+
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
+  if (!workingNode)
+    mitkThrow() << "Could not retrieve working image!";
+
+  mitk::LabelSetImage::Pointer diffImage = mitk::LabelSetImage::New(workingImage);
+  diffImage->SetVolume(workingImage->GetData());
+
+  opExchangeNodes* undoOp = new opExchangeNodes(OP_EXCHANGE, workingNode,
+  workingNode->GetData(), diffImage);
+
+  opExchangeNodes* doOp  = new opExchangeNodes(OP_EXCHANGE, workingNode,
+      diffImage, workingNode->GetData());
+
+  // TODO: MITK doesn't recognize that a new event happens in the next line,
+  //       because nothing happens in the render window.
+  //       As a result the undo action will happen together with the last action
+  //       recognized by MITK.
+  std::string msg("auto-segmentation");
+  mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent(
+     new mitk::OperationEvent(this, doOp, undoOp, msg) ); // tell the undo controller about the action
+
+  ExecuteOperation(doOp);
 }

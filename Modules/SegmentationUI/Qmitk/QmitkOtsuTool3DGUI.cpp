@@ -78,6 +78,7 @@ void QmitkOtsuTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 
 void QmitkOtsuTool3DGUI::OnSegmentationRegionAccept()
 {
+  /*
   QmitkConfirmSegmentationDialog dialog;
   QString segName = QString::fromStdString(m_OtsuTool3DTool->GetCurrentSegmentationName());
 
@@ -101,6 +102,7 @@ void QmitkOtsuTool3DGUI::OnSegmentationRegionAccept()
     m_OtsuTool3DTool->ConfirmSegmentation();
     m_OtsuTool3DTool->Deactivated();
   }
+  */
 }
 
 void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()

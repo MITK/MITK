@@ -62,7 +62,7 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);
-    void OnConfirmSegmentation();
+    void OnAcceptPreview();
 
     /// \brief Called when Spinner value has changed. Consider: Spinner contains DOUBLE values
     void OnSpinnerValueChanged();

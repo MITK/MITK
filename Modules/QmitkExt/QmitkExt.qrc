@@ -20,5 +20,6 @@
         <file>createmask.png</file>
         <file>mergelabels.png</file>
         <file>eraselabel.png</file>
+        <file>smoothlabel.png</file>
     </qresource>
 </RCC>

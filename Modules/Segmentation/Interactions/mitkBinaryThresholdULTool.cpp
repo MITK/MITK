@@ -181,6 +181,7 @@ void mitk::BinaryThresholdULTool::SetupPreviewNode()
 
 void mitk::BinaryThresholdULTool::CreateNewSegmentationFromThreshold(DataNode* node)
 {
+  /*
   if (node)
   {
     Image::Pointer image = dynamic_cast<Image*>( m_NodeForThresholding->GetData() );
@@ -230,6 +231,7 @@ void mitk::BinaryThresholdULTool::CreateNewSegmentationFromThreshold(DataNode* n
       }
     }
   }
+  */
 }
 
 template <typename TPixel, unsigned int VImageDimension>

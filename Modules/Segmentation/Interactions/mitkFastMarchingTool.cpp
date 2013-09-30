@@ -349,14 +349,14 @@ void mitk::FastMarchingTool::Update()
     {
      MITK_ERROR << "Exception caught: " << e.GetDescription();
 
-     m_ProgressCommand->SetRemainingProgress(100);
+     m_ProgressCommand->Reset();
      CurrentlyBusy.Send(false);
      std::string msg = e.GetDescription();
      ErrorMessage.Send(msg);
      return;
     }
 
-    m_ProgressCommand->SetRemainingProgress(100);
+    m_ProgressCommand->Reset();
     CurrentlyBusy.Send(false);
 
     OutputImageType::Pointer output = m_ThresholdFilter->GetOutput();

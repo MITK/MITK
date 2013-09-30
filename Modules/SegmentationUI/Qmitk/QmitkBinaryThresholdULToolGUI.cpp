@@ -84,6 +84,7 @@ void QmitkBinaryThresholdULToolGUI::OnNewToolAssociated(mitk::Tool* tool)
 
 void QmitkBinaryThresholdULToolGUI::OnAcceptThresholdPreview()
 {
+  /*
   QmitkConfirmSegmentationDialog dialog;
   QString segName = QString::fromStdString(m_BinaryThresholdULTool->GetCurrentSegmentationName());
 
@@ -106,6 +107,7 @@ void QmitkBinaryThresholdULToolGUI::OnAcceptThresholdPreview()
   {
     m_BinaryThresholdULTool->AcceptCurrentThresholdValue();
   }
+  */
 }
 
 void QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged(mitk::ScalarType lower, mitk::ScalarType upper)

@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDataStorage.h"
 #include "mitkRenderingManager.h"
+#include <mitkSliceNavigationController.h>
 
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
@@ -311,7 +312,10 @@ void mitk::BinaryThresholdULTool::UpdatePreview()
   if(thresholdimage)
   {
     ImageType::Pointer itkImage = ImageType::New();
-    CastToItkImage(thresholdimage, itkImage);
+    unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+
+    mitk::Image::Pointer image3D = Get3DImage(thresholdimage, timestep);
+    CastToItkImage(image3D, itkImage);
     ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
     filter->SetInput(itkImage);
     filter->SetLowerThreshold(m_CurrentLowerThresholdValue);

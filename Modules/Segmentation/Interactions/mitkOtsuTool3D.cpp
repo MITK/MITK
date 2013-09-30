@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOtsuTool3D.h"
 #include "mitkToolManager.h"
 #include "mitkRenderingManager.h"
+#include <mitkSliceNavigationController.h>
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 #include <mitkRenderingModeProperty.h>
@@ -104,9 +105,13 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
 
   int numberOfThresholds = regions - 1;
 
+  unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+
+  mitk::Image::Pointer image3D = Get3DImage(m_OriginalImage, timestep);
+
   mitk::OtsuSegmentationFilter::Pointer otsuFilter = mitk::OtsuSegmentationFilter::New();
   otsuFilter->SetNumberOfThresholds( numberOfThresholds );
-  otsuFilter->SetInput( m_OriginalImage );
+  otsuFilter->SetInput( image3D );
 
   try
   {

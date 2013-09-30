@@ -43,10 +43,6 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
     mitkClassMacro(ContourUtils, itk::Object);
     itkNewMacro(ContourUtils);
 
-    typedef itk::Mesh< float , 3 > MeshType;
-    typedef itk::Image< unsigned char, 3 > ImageType;
-    typedef itk::TriangleMeshToBinaryImageFilter<MeshType,ImageType> MeshFilterType;
-
     /**
       \brief Projects a contour onto an image point by point. Converts from world to index coordinates.
 
@@ -90,9 +86,7 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
     */
     void FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue = 1 );
 
-    void ve2itkMesh(ContourModel* contourModel);
-
-    MeshType::Pointer m_mesh;
+    void contourModel2itkMesh(ContourModel* contourModel);
 
 protected:
 

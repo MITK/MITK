@@ -208,25 +208,160 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
   */
 
 
-    MeshFilterType::Pointer meshFilter = MeshFilterType::New();
-    ve2itkMesh(projectedContour);
+    /*MeshFilterType::Pointer meshFilter = MeshFilterType::New();
+    contourModel2itkMesh(projectedContour);
     meshFilter->SetInput(m_mesh);
     meshFilter->Update();
     std::cout << "meshFilter: " << meshFilter->GetOutput();
+
+    ImageType::Pointer filledSegmentationSlice = ImageType::New();
+    filledSegmentationSlice = meshFilter->GetOutput();
+
+    //filledSegmentationSlice = NULL;
+    */
+    typedef itk::Mesh<double> MeshType;
+    typedef typename itk::Image< float, 3> ImageType;
+    /*typedef typename itk::BinaryMask3DMeshSource<  ImageType, MeshType> MeshFilterType;
+
+
+    // Convert ROI to Mesh
+
+    typename MeshFilterType::Pointer resampler = MeshFilterType::New();
+
+    typename ImageType::Pointer itkReference = ImageType::New();
+    typename ImageType::Pointer itkTarget = ImageType::New();
+    CastToItkImage(roi,itkTarget);
+    CastToItkImage(reference,itkReference);
+
+    resampler->SetObjectValue(1);
+    resampler->SetInput(itkTarget);
+
+    try
+    {
+      resampler->Update();
+    }
+    catch( itk::ExceptionObject & exp )
+    {
+      std::cerr << "Exception thrown during Update() " << std::endl;
+      std::cerr << exp << std::endl;
+    }
+
+    */
+    // Create ROI from Mesh with desired dimension, etc.
+
+    /*itk::TriangleMeshToBinaryImageFilter<MeshType, ImageType>::Pointer roiSampler = itk::TriangleMeshToBinaryImageFilter<MeshType, ImageType>::New();
+
+    roiSampler->SetInput(resampler->GetOutput());
+    CastToItkImage(contourModel->)
+    roiSampler->SetInfoImage(itkReference);
+
+    roiSampler->Update();
+
+   GrabItkImageMemory( roiSampler->GetOutput(), output);
+   IOUtil::SaveImage(output,"/home//roi.nrrd");
+   */
 }
 
-void mitk::ContourUtils::ve2itkMesh(ContourModel* contourModel)
+void mitk::ContourUtils::contourModel2itkMesh(ContourModel* contourModel)
 {
-    mitk::ContourModel::VertexType* vertex;
+    //mitk::ContourModel::VertexType* vertex;
     mitk::ContourModel::VertexIterator it = contourModel->Begin();
     mitk::ContourModel::VertexIterator itEnd = contourModel->End();
 
-    for( int i=0 ; it!=itEnd ; i++ )
+    typedef float  PixelType;
+    typedef itk::Mesh< PixelType , 3 > MeshType;
+    typedef MeshType::CellType CellType;
+    typedef itk::Image< unsigned char, 3 > ImageType;
+    typedef itk::VertexCell< CellType >    VertexType;
+    typedef itk::LineCell< CellType >      LineType;
+    typedef itk::TriangleMeshToBinaryImageFilter<MeshType,ImageType> MeshFilterType;
+
+    MeshType::Pointer mesh = MeshType::New();
+    MeshType::PointType point;
+    mitk::Point3D center;
+    int i;
+
+    for( i=0 ; it!=itEnd ; i++ )
     {
-        itk::Mesh<float,3>::PointType point = (*it)->Coordinates;
-        m_mesh->SetPoint( i , point );
+        point = (*it)->Coordinates;
+        MITK_INFO << point;
+        mesh->SetPoint( i , point );
         it++;
+        center[0] = center[0] + point[0];
+        center[1] = center[1] + point[1];
+        center[2] = center[2] + point[2];
     }
+
+    center[0] = center[0]/i;
+    center[1] = center[1]/i;
+    center[2] = center[2]/i;
+    MITK_INFO << "center" << center;
+
+    mesh->SetPoint( i+1, center);
+
+    CellType::CellAutoPointer cellpointer;
+
+    /*MeshType::PointsContainerIterator iter = mesh->Begin();
+
+
+    for( int j = 1; j!=mesh->GetNumberOfPoints(); j++)
+    {
+        if(j%3)
+        {
+        cellpointer.TakeOwnership( new LineType );
+        cellpointer->SetPointId( 0, mesh->PointsContainer[j-1] );
+        cellpointer->SetPointId( 1, mesh->pointSet->GetPoint(j) );
+        mesh->SetCell( j-1, cellpointer );
+        j++;
+        }
+        else
+        {
+        cellpointer.TakeOwnership( new LineType );
+        cellpointer->SetPointId( 0, mesh->GetPoint(j-1) );
+        cellpointer->SetPointId( 1, *itEnd );
+        mesh->SetCell( j-1, cellpointer );
+        j++;
+        }
+    }
+    /*cellpointer.TakeOwnership( new LineType );
+    cellpointer->SetPointId( 0, 0 );
+    cellpointer->SetPointId( 1, 1 );
+    mesh->SetCell( 0, cellpointer );
+
+    cellpointer.TakeOwnership( new LineType );
+    cellpointer->SetPointId( 0, 1 );
+    cellpointer->SetPointId( 1, 2 );
+    mesh->SetCell( 1, cellpointer );
+
+    cellpointer.TakeOwnership( new LineType );
+    cellpointer->SetPointId( 0, 2 );
+    cellpointer->SetPointId( 1, 0 );
+    mesh->SetCell( 2, cellpointer );
+    */
+    MITK_INFO << "Points: " << mesh->GetNumberOfPoints();
+    MITK_INFO << "Cells: " << mesh->GetNumberOfCells();
+
+   typedef MeshType::CellsContainer::ConstIterator CellIterator;
+
+   CellIterator cellIterator = mesh->GetCells()->Begin();
+   CellIterator cellEnd = mesh->GetCells()->End();
+   while( cellIterator != cellEnd )
+   {
+   CellType * cell = cellIterator.Value();
+   MITK_INFO << "cell with " << cell->GetNumberOfPoints();
+   MITK_INFO << " points " << std::endl;
+   // Software Guide : BeginCodeSnippet
+   typedef CellType::PointIdIterator PointIdIterator;
+   PointIdIterator pointIditer = cell->PointIdsBegin();
+   PointIdIterator pointIdend = cell->PointIdsEnd();
+   while( pointIditer != pointIdend )
+   {
+   MITK_INFO << *pointIditer << std::endl;
+   ++pointIditer;
+   }
+   // Software Guide : EndCodeSnippet
+   ++cellIterator;
+   }
 }
 
 template<typename TPixel, unsigned int VImageDimension>
@@ -238,7 +373,7 @@ void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDi
   CastToItkImage( filledContourSlice, filledContourSliceITK );
 
   // now the original slice and the ipSegmentation-painted slice are in the same format, and we can just copy all pixels that are non-zero
-  typedef itk::ImageRegionIterator< SliceType >       OutputIteratorType;
+  typedef itk::ImageRegionIterator< SliceType >        OutputIteratorType;
   typedef itk::ImageRegionConstIterator< SliceType >   InputIteratorType;
 
   InputIteratorType inputIterator( filledContourSliceITK, filledContourSliceITK->GetLargestPossibleRegion() );

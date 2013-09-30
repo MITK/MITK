@@ -44,11 +44,9 @@ public:
 
   void SetActiveLabel(int);
 
-  mitk::DataNode* GetActiveLabelSetNode();
-
   void SetPreferences( berry::IPreferences::Pointer prefs );
 
-  void SetPredicate( mitk::NodePredicateBase* predicate );
+  void SetWorkingNode(mitk::DataNode *node);
 
   virtual void setEnabled(bool enabled);
 
@@ -66,9 +64,6 @@ private slots:
   // reaction to signal "labelListModified" from QmitkLabelSetTableWidget
   void OnLabelListModified(const QStringList& list);
 
-  // reaction to the signal "OnSelectionChanged" from QmitkDataStorageComboBox
-  void OnSegmentationSelectionChanged(const mitk::DataNode* node);
-
   // reaction to the signal "renameLabel" from QmitkLabelSetTableWidget
   void OnRenameLabel(int index, const mitk::Color& color, const std::string& name);
 
@@ -77,6 +72,9 @@ private slots:
 
   // reaction to the signal "createSurface" from QmitkLabelSetTableWidget
   void OnCreateSurface(int);
+
+  // reaction to the signal "smoothLabel" from QmitkLabelSetTableWidget
+  void OnSmoothLabel(int);
 
   // reaction to the signal "createMask" from QmitkLabelSetTableWidget
   void OnCreateMask(int);
@@ -110,7 +108,6 @@ private:
 
     berry::IPreferences::Pointer m_Preferences;
 
-    mitk::NodePredicateBase::Pointer m_Predicate;
 
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
@@ -134,6 +131,9 @@ private:
 
     void OnThreadedCalculationDone();
 
+    void SetLastFileOpenPath(const QString& path) const;
+
+    QString GetLastFileOpenPath() const;
 };
 
 #endif

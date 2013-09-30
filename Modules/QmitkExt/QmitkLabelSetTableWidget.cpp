@@ -114,7 +114,7 @@ void QmitkLabelSetTableWidget::Initialize()
 
 const QStringList& QmitkLabelSetTableWidget::GetLabelList()
 {
-   return m_LabelStringList;
+  return m_LabelStringList;
 }
 
 bool QmitkLabelSetTableWidget::GetAutoSelectNewLabels()
@@ -169,7 +169,7 @@ void QmitkLabelSetTableWidget::SetActiveLabel(int index)
 {
   if (index >= 0 && index < this->rowCount())
   {
-      this->m_LabelSetImage->SetActiveLabel(index,true);
+    this->m_LabelSetImage->SetActiveLabel(index,true);
   }
 }
 
@@ -233,23 +233,23 @@ void QmitkLabelSetTableWidget::LabelModified( int index )
   QPushButton* lbutton = (QPushButton*) this->cellWidget(index,LOCKED_COL);
   if (lbutton)
   {
-       lbutton->setChecked(!m_LabelSetImage->GetLabelLocked(index));
+    lbutton->setChecked(!m_LabelSetImage->GetLabelLocked(index));
   }
 
   QPushButton* button = (QPushButton*) this->cellWidget(index,COLOR_COL);
   if (button)
   {
-      const mitk::Color& color = m_LabelSetImage->GetLabelColor(index);
-      button->setAutoFillBackground(true);
-      QColor qcolor(color[0]*255,color[1]*255,color[2]*255);
-      QString styleSheet = "background-color:rgb(";
-      styleSheet.append(QString::number(qcolor.red()));
-      styleSheet.append(",");
-      styleSheet.append(QString::number(qcolor.green()));
-      styleSheet.append(",");
-      styleSheet.append(QString::number(qcolor.blue()));
-      styleSheet.append(")");
-      button->setStyleSheet(styleSheet);
+    const mitk::Color& color = m_LabelSetImage->GetLabelColor(index);
+    button->setAutoFillBackground(true);
+    QColor qcolor(color[0]*255,color[1]*255,color[2]*255);
+    QString styleSheet = "background-color:rgb(";
+    styleSheet.append(QString::number(qcolor.red()));
+    styleSheet.append(",");
+    styleSheet.append(QString::number(qcolor.green()));
+    styleSheet.append(",");
+    styleSheet.append(QString::number(qcolor.blue()));
+    styleSheet.append(")");
+    button->setStyleSheet(styleSheet);
   }
 
   QPushButton* vbutton = (QPushButton*) this->cellWidget(index,VISIBLE_COL);
@@ -313,37 +313,37 @@ void QmitkLabelSetTableWidget::OnColorButtonClicked()
 
 void QmitkLabelSetTableWidget::OnLockedButtonClicked()
 {
-   int row;
-   for(int i=0; i<this->rowCount(); i++)
-   {
-      if (sender() == this->cellWidget(i,LOCKED_COL))
-      {
-        row = i;
-      }
-   }
+  int row;
+  for(int i=0; i<this->rowCount(); i++)
+  {
+    if (sender() == this->cellWidget(i,LOCKED_COL))
+    {
+      row = i;
+    }
+  }
 
-   if (row >= 0 && row < this->rowCount())
-   {
-    m_LabelSetImage->SetLabelLocked( row, !m_LabelSetImage->GetLabelLocked(row) );
-   }
+  if (row >= 0 && row < this->rowCount())
+  {
+  m_LabelSetImage->SetLabelLocked( row, !m_LabelSetImage->GetLabelLocked(row) );
+  }
 }
 
 void QmitkLabelSetTableWidget::OnVisibleButtonClicked()
 {
-   int row;
-   for(int i=0; i<this->rowCount(); i++)
-   {
-      if (sender() == this->cellWidget(i,VISIBLE_COL))
-      {
-        row = i;
-      }
-   }
+  int row;
+  for(int i=0; i<this->rowCount(); i++)
+  {
+    if (sender() == this->cellWidget(i,VISIBLE_COL))
+    {
+      row = i;
+    }
+  }
 
-   if (row >= 0 && row < this->rowCount())
-   {
-     m_LabelSetImage->SetLabelVisible(row, !m_LabelSetImage->GetLabelVisible(row) );
-     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-   }
+  if (row >= 0 && row < this->rowCount())
+  {
+   m_LabelSetImage->SetLabelVisible(row, !m_LabelSetImage->GetLabelVisible(row) );
+   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 void QmitkLabelSetTableWidget::OnItemClicked(QTableWidgetItem *item)
@@ -453,8 +453,8 @@ void QmitkLabelSetTableWidget::InsertItem()
 
   if (m_AutoSelectNewLabels)
   {
-     this->selectRow(row);
-     m_LabelSetImage->SetActiveLabel(row,true);
+    this->selectRow(row);
+    m_LabelSetImage->SetActiveLabel(row,true);
   }
 
   emit labelListModified(m_LabelStringList);
@@ -483,6 +483,11 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
     eraseLabelsAction->setEnabled(true);
     QObject::connect( eraseLabelsAction, SIGNAL( triggered(bool) ), this, SLOT( OnEraseLabels(bool) ) );
     menu->addAction(eraseLabelsAction);
+
+    QAction* smoothLabelsAction = new QAction(QIcon(":/QmitkExt/smoothlabel.png"), "Smooth selected labels", this );
+    smoothLabelsAction->setEnabled(true);
+    QObject::connect( smoothLabelsAction, SIGNAL( triggered(bool) ), this, SLOT( OnEraseLabels(bool) ) );
+    menu->addAction(smoothLabelsAction);
 
     QAction* createSurfacesAction = new QAction(QIcon(":/QmitkExt/createsurface.png"), "Create a surface for each selected label", this );
     createSurfacesAction->setEnabled(true);
@@ -520,6 +525,11 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
     eraseAction->setEnabled(true);
     QObject::connect( eraseAction, SIGNAL( triggered(bool) ), this, SLOT( OnEraseLabel(bool) ) );
     menu->addAction(eraseAction);
+
+    QAction* smoothAction = new QAction(QIcon(":/QmitkExt/smoothlabel.png"), "Smooth label", this );
+    smoothAction->setEnabled(true);
+    QObject::connect( smoothAction, SIGNAL( triggered(bool) ), this, SLOT( OnSmoothLabel(bool) ) );
+    menu->addAction(smoothAction);
 
     QAction* randomColorAction = new QAction(QIcon(":/QmitkExt/randomcolor.png"), "Random color", this );
     randomColorAction->setEnabled(true);
@@ -669,9 +679,49 @@ void QmitkLabelSetTableWidget::OnRemoveLabels(bool value)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+
+void QmitkLabelSetTableWidget::OnSmoothLabels(bool value)
+{
+  QString question = "Do you really want to smooth the selected labels?";
+
+  QMessageBox::StandardButton answerButton = QMessageBox::question( this, "Smooth selected labels",
+     question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+
+  if (answerButton == QMessageBox::Yes)
+  {
+    QList<QTableWidgetSelectionRange> ranges = this->selectedRanges();
+    if ( ranges.isEmpty() )
+    return;
+
+    std::vector<int> indexes;
+    for (int i=0; i<ranges.size(); i++)
+    {
+        int begin = ranges.at(i).topRow();
+        for (int j=0; j<ranges.at(i).rowCount(); j++)
+        {
+            indexes.push_back(begin+j);
+        }
+    }
+
+    this->BusyCursorOn();
+    this->m_LabelSetImage->SmoothLabels(indexes);
+    this->BusyCursorOff();
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+}
+
+void QmitkLabelSetTableWidget::OnSmoothLabel(bool value)
+{
+  this->BusyCursorOn();
+  this->m_LabelSetImage->SmoothLabel( this->currentRow() );
+  this->BusyCursorOff();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 void QmitkLabelSetTableWidget::OnEraseLabels(bool value)
 {
-  QString question = "Do you really want to erase selected labels?";
+  QString question = "Do you really want to erase the selected labels?";
 
   QMessageBox::StandardButton answerButton = QMessageBox::question( this, "Erase selected labels",
      question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);

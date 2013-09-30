@@ -101,6 +101,9 @@ class QmitkExt_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     /// \brief Send a signal when it was requested to create a surface out of a label.
     void createSurface(int);
 
+    /// \brief Send a signal when it was requested to smooth the selected label.
+    void smoothLabel(int);
+
     /// \brief Send a signal when it was requested to create a surface out of a selection (range) of labels.
     void combineAndCreateSurface( const QList<QTableWidgetSelectionRange>& ranges );
 
@@ -203,11 +206,15 @@ class QmitkExt_EXPORT QmitkLabelSetTableWidget : public QTableWidget
 
     void OnEraseLabel(bool);
 
+    void OnSmoothLabel(bool);
+
     void OnMergeLabels(bool);
 
     void OnRemoveLabels(bool);
 
     void OnEraseLabels(bool);
+
+    void OnSmoothLabels(bool);
 
     void OnNewLabel(bool);
 

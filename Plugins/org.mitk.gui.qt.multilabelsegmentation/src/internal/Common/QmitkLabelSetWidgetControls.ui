@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+   <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -87,7 +87,7 @@
       <item>
        <widget class="QToolButton" name="m_btImportLabeledImage">
         <property name="toolTip">
-         <string>Import labels from another segmentation session</string>
+         <string>Import a labeled image from disk</string>
         </property>
         <property name="text">
          <string>...</string>
@@ -193,19 +193,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkDataStorageComboBox" name="m_cbWorkingNodeSelector">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QmitkLabelSetTableWidget" name="m_LabelSetTableWidget">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -243,11 +233,6 @@
    <class>ctkSearchBox</class>
    <extends>QLineEdit</extends>
    <header location="global">ctkSearchBox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QmitkDataStorageComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">QmitkDataStorageComboBox.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -59,6 +59,8 @@ protected slots:
 
   void OnReferenceSelectionChanged(const mitk::DataNode* node);
 
+  void OnSegmentationSelectionChanged(const mitk::DataNode *node);
+
   void OnGoToLabel( const mitk::Point3D& pos );
 
   void OnManualTool2DSelected(int id);
@@ -90,14 +92,12 @@ protected:
   /**
   * Reimplemented from QmitkAbstractView
   */
-//  virtual void NodeAdded(const mitk::DataNode* node);
+  virtual void NodeAdded(const mitk::DataNode* node);
 
   /**
   * Reimplemented from QmitkAbstractView
   */
   virtual void NodeRemoved(const mitk::DataNode* node);
-
-  bool CheckForSameGeometry(const mitk::DataNode*, const mitk::DataNode*) const;
 
   // the Qt parent of our GUI (NOT of this object)
   QWidget* m_Parent;
@@ -108,9 +108,11 @@ protected:
   mitk::IRenderWindowPart* m_IRenderWindowPart;
 
   mitk::DataNode::Pointer m_ReferenceNode;
+  mitk::DataNode::Pointer m_WorkingNode;
 
   bool m_DataSelectionChanged;
 
+  mitk::DataStorage::Pointer m_SegmentationDataStorage;
   mitk::NodePredicateAnd::Pointer m_ReferencePredicate;
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
   mitk::NodePredicateAnd::Pointer m_SurfacePredicate;

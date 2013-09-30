@@ -78,7 +78,7 @@ us::ModuleResource mitk::BinaryThresholdULTool::GetIconResource() const
 
 const char* mitk::BinaryThresholdULTool::GetName() const
 {
-  return "Two Thresholds";
+  return "UL Threshold";
 }
 
 void mitk::BinaryThresholdULTool::Activated()

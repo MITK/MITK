@@ -244,7 +244,7 @@ void QmitkPreprocessingView::DoBiExpFit()
     while(it != originalShellMap.end())
       bValueList.put(s++,(it++)->first);
 
-    const double targetBValue = bValueList.mean();
+    const double targetBValue = m_Controls->m_targetBValueSpinBox->value();
     functor->setListOfBValues(bValueList);
     functor->setTargetBValue(targetBValue);
     CallMultishellToSingleShellFilter(functor,inImage,name + "_BiExp");
@@ -269,7 +269,7 @@ void QmitkPreprocessingView::DoAKCFit()
     while(it != originalShellMap.end())
       bValueList.put(s++,(it++)->first);
 
-    const double targetBValue = bValueList.mean();
+    const double targetBValue = m_Controls->m_targetBValueSpinBox->value();
     functor->setListOfBValues(bValueList);
     functor->setTargetBValue(targetBValue);
     CallMultishellToSingleShellFilter(functor,inImage,name + "_AKC");
@@ -299,7 +299,7 @@ void QmitkPreprocessingView::DoADCAverage()
     while(it != originalShellMap.end())
       bValueList.put(s++,(it++)->first);
 
-    const double targetBValue = bValueList.mean();
+    const double targetBValue = m_Controls->m_targetBValueSpinBox->value();
     functor->setListOfBValues(bValueList);
     functor->setTargetBValue(targetBValue);
     CallMultishellToSingleShellFilter(functor,inImage,name + "_ADC");
@@ -453,6 +453,9 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
   m_Controls->m_CalcAdcButton->setEnabled(foundDwiVolume);
   m_Controls->m_targetBValueSpinBox->setEnabled(foundDwiVolume);
   m_Controls->m_OutputRMSErrorImage->setEnabled(foundDwiVolume);
+
+  // reset sampling frame to 1 and update all ealted components
+  m_Controls->m_B_ValueMap_Rounder_SpinBox->setValue(1);
 
   UpdateBValueTableWidget(m_Controls->m_B_ValueMap_Rounder_SpinBox->value());
 

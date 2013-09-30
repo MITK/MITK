@@ -105,11 +105,7 @@ void QmitkSegmentationView::Activated()
   // should be moved to ::BecomesVisible() or similar
   if( m_Controls )
   {
-    //m_Controls->m_ManualToolSelectionBox2D->SetAutoShowNamesWidth(m_Controls->m_ManualToolSelectionBox2D->minimumSizeHint().width()+1);
-    m_Controls->m_ManualToolSelectionBox2D->SetAutoShowNamesWidth(250);
     m_Controls->m_ManualToolSelectionBox2D->setEnabled( true );
-    //m_Controls->m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(m_Controls->m_ManualToolSelectionBox3D->minimumSizeHint().width()+1);
-    m_Controls->m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(260);
     m_Controls->m_ManualToolSelectionBox3D->setEnabled( true );
 //    m_Controls->m_OrganToolSelectionBox->setEnabled( true );
 //    m_Controls->m_LesionToolSelectionBox->setEnabled( true );
@@ -138,6 +134,11 @@ void QmitkSegmentationView::Activated()
       m_BinaryPropertyObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( node, node->GetProperty("binary")->AddObserver( itk::ModifiedEvent(), command2 ) ) );
     }
   }
+
+  itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command3 = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
+  command3->SetCallbackFunction( this, &QmitkSegmentationView::RenderingManagerReinitialized );
+  m_RenderingManagerObserverTag = mitk::RenderingManager::GetInstance()->AddObserver( mitk::RenderingManagerViewsInitializedEvent(), command3 );
+
   this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), m_Controls->segImageSelector->GetSelectedNode());
 }
 
@@ -163,6 +164,8 @@ void QmitkSegmentationView::Deactivated()
       (*dataIter).first->GetProperty("binary")->RemoveObserver( (*dataIter).second );
     }
     m_BinaryPropertyObserverTags.clear();
+
+    mitk::RenderingManager::GetInstance()->RemoveObserver(m_RenderingManagerObserverTag);
 
     ctkPluginContext* context = mitk::PluginActivator::getContext();
     ctkServiceReference ppmRef = context->getServiceReference<mitk::PlanePositionManagerService>();
@@ -213,6 +216,13 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
 
 void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
+  if (m_Controls != NULL)
+  {
+    bool slimView = prefs->GetBool("slim view", false);
+    m_Controls->m_ManualToolSelectionBox2D->SetShowNames(!slimView);
+    m_Controls->m_ManualToolSelectionBox3D->SetShowNames(!slimView);
+  }
+
   m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);
   this->ForceDisplayPreferencesUponAllImages();
 }
@@ -356,20 +366,13 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
 
   if (!selectedNodeIsVisible)
   {
-    m_Controls->m_ManualToolSelectionBox2D->setEnabled(false);
-    m_Controls->m_ManualToolSelectionBox3D->setEnabled(false);
-    m_Controls->m_SlicesInterpolator->setEnabled(false);
+    this->SetToolSelectionBoxesEnabled(false);
     this->UpdateWarningLabel("The selected segmentation is currently not visible!");
-    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
   }
   else
   {
-    m_Controls->m_ManualToolSelectionBox2D->setEnabled(true);
-    m_Controls->m_ManualToolSelectionBox3D->setEnabled(true);
-    m_Controls->m_SlicesInterpolator->setEnabled(true);
+    this->SetToolSelectionBoxesEnabled(true);
     this->UpdateWarningLabel("");
-    //Trigger 3d interpolation is selected segmentation is visible again
-    mitk::SurfaceInterpolationController::GetInstance()->Modified();
   }
 }
 
@@ -1033,6 +1036,33 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
   }
 }
 
+void QmitkSegmentationView::RenderingManagerReinitialized()
+{
+  /*
+   * Here we check whether the geometry of the selected segmentation image if aligned with the worldgeometry
+   * At the moment it is not supported to use a geometry different from the selected image for reslicing.
+   * For further information see Bug 16063
+   */
+  mitk::DataNode* workingNode = m_Controls->segImageSelector->GetSelectedNode();
+  if (workingNode)
+  {
+    const mitk::Geometry3D* workingNodeGeo = workingNode->GetData()->GetGeometry();
+    const mitk::Geometry3D* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
+    if (mitk::Equal(workingNodeGeo->GetBoundingBox(), worldGeo->GetBoundingBox(), mitk::eps, true))
+    {
+      this->UpdateWarningLabel("");
+      this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), workingNode);
+      this->SetToolSelectionBoxesEnabled(true);
+    }
+    else
+    {
+      this->UpdateWarningLabel("Please perform a reinit on the segmentation image!");
+      this->SetToolManagerSelection(NULL, NULL);
+      this->SetToolSelectionBoxesEnabled(false);
+    }
+  }
+}
+
 bool QmitkSegmentationView::CheckForSameGeometry(const mitk::DataNode *node1, const mitk::DataNode *node2) const
 {
   bool isSameGeometry(true);
@@ -1098,7 +1128,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   // all part of open source MITK
   m_Controls->m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
   m_Controls->m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer2D );
-  m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' 'FastMarching2D'");
+  m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' '2D Fast Marching'");
   m_Controls->m_ManualToolSelectionBox2D->SetLayoutColumns(3);
   m_Controls->m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
   connect( m_Controls->m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
@@ -1107,7 +1137,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
   m_Controls->m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer3D );
   //specify tools to be added to 3D Tool area
-  m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'Two Thresholds' Otsu FastMarching3D RegionGrowing Watershed");
+  m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'UL Threshold' Otsu 'Fast Marching 3D' 'Region Growing 3D' Watershed");
   m_Controls->m_ManualToolSelectionBox3D->SetLayoutColumns(3);
   m_Controls->m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
 
@@ -1135,7 +1165,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 //      this, SLOT( OnSurfaceSelectionChanged( ) ) );
 
   connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));
-  connect(m_Controls->m_SlicesInterpolator, SIGNAL(Signal3DInterpolationEnabled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
 
 //  m_Controls->MaskSurfaces->SetDataStorage(this->GetDefaultDataStorage());
 //  m_Controls->MaskSurfaces->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
@@ -1183,6 +1212,13 @@ void QmitkSegmentationView::SetMouseCursor( const us::ModuleResource& resource, 
   us::ModuleResourceStream cursor(resource, std::ios::binary);
   mitk::ApplicationCursor::GetInstance()->PushCursor( cursor, hotspotX, hotspotY );
   m_MouseCursorSet = true;
+}
+
+void QmitkSegmentationView::SetToolSelectionBoxesEnabled(bool status)
+{
+  m_Controls->m_ManualToolSelectionBox2D->setEnabled(status);
+  m_Controls->m_ManualToolSelectionBox3D->setEnabled(status);
+  m_Controls->m_SlicesInterpolator->setEnabled(status);
 }
 
 // ATTENTION some methods for handling the known list of (organ names, colors) are defined in QmitkSegmentationOrganNamesHandling.cpp

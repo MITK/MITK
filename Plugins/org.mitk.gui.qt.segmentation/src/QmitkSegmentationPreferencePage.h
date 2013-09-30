@@ -66,6 +66,7 @@ protected slots:
 protected:
 
   QWidget* m_MainControl;
+  QCheckBox* m_SlimViewCheckBox;
   QRadioButton* m_RadioOutline;
   QRadioButton* m_RadioOverlay;
   QCheckBox* m_VolumeRenderingCheckBox;

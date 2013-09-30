@@ -136,6 +136,34 @@ void SliceNavigationController::SetViewDirectionToDefault()
   m_ViewDirection = m_DefaultViewDirection;
 }
 
+const char* SliceNavigationController::GetViewDirection()
+{
+    const char* viewDirectionString;
+    switch(m_ViewDirection)
+    {
+    case 0:
+        viewDirectionString = "Axial";
+        break;
+
+    case 1:
+        viewDirectionString = "Sagittal";
+        break;
+
+    case 2:
+        viewDirectionString = "Frontal";
+        break;
+
+    case 3:
+        viewDirectionString = "Orginal";
+        break;
+
+    default:
+        viewDirectionString = "No View Direction Available";
+        break;
+    }
+    return viewDirectionString;
+}
+
 void SliceNavigationController::Update()
 {
   if ( !m_BlockUpdate )

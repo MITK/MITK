@@ -58,7 +58,7 @@ const std::map<QAction*, mitk::SliceNavigationController*> QmitkSlicesInterpolat
   std::map<QAction*, mitk::SliceNavigationController*> actionToSliceDimension;
   foreach(mitk::SliceNavigationController* slicer, m_ControllerToDeleteObserverTag.keys())
   {
-    actionToSliceDimension[new QAction(QString::fromStdString(slicer->GetRenderer()->GetName()),0)] = slicer;
+    actionToSliceDimension[new QAction(QString::fromStdString(slicer->GetViewDirection()),0)] = slicer;
   }
 
   return actionToSliceDimension;
@@ -89,13 +89,13 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_CmbInterpolation->addItem("3-Dimensional");
   vboxLayout->addWidget(m_CmbInterpolation);
 
-  m_BtnApply2D = new QPushButton("Apply", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnApply2D = new QPushButton("Confirm for single slice", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApply2D);
 
-  m_BtnApplyForAllSlices2D = new QPushButton("Apply for all slices", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnApplyForAllSlices2D = new QPushButton("Confirm for all slices", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApplyForAllSlices2D);
 
-  m_BtnApply3D = new QPushButton("Apply", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnApply3D = new QPushButton("Confirm", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApply3D);
 
   m_ChkShowPositionNodes = new QCheckBox("Show Position Nodes", m_GroupBoxEnableExclusiveInterpolationMode);
@@ -406,6 +406,13 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
   {
     m_Segmentation = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
   }
+  else
+  {
+    //If no workingdata is set, remove the interpolation feedback
+    this->GetDataStorage()->Remove(m_FeedbackNode);
+    m_FeedbackNode->SetData(NULL);
+    return;
+  }
   //Updating the current selected segmentation for the 3D interpolation
   SetCurrentContourListID();
 
@@ -413,18 +420,11 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
   {
     OnInterpolationActivated( true ); // re-initialize if needed
   }
+  this->CheckSupportedImageDimension();
 }
 
 void QmitkSlicesInterpolator::OnToolManagerReferenceDataModified()
 {
-  if (m_2DInterpolationEnabled)
-  {
-    OnInterpolationActivated( true ); // re-initialize if needed
-  }
-  if (m_3DInterpolationEnabled)
-  {
-    this->Show3DInterpolationResult(false);
-  }
 }
 
 void QmitkSlicesInterpolator::OnTimeChanged(itk::Object* sender, const itk::EventObject& e)
@@ -683,7 +683,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
         mitk::ApplyDiffImageOperation* undoOp = new mitk::ApplyDiffImageOperation( mitk::OpTEST, m_Segmentation, diffImage, timeStep );
         undoOp->SetFactor( -1.0 );
         std::stringstream comment;
-        comment << "Accept all interpolations (" << totalChangedSlices << ")";
+        comment << "Confirm all interpolations (" << totalChangedSlices << ")";
         mitk::OperationEvent* undoStackItem = new mitk::OperationEvent( mitk::DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, comment.str() );
         mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
 
@@ -862,6 +862,8 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
 {
   m_3DInterpolationEnabled = on;
 
+  this->CheckSupportedImageDimension();
+
   try
   {
     if ( m_DataStorage.IsNotNull() && m_ToolManager && m_3DInterpolationEnabled)
@@ -1018,7 +1020,11 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
         m_SurfaceInterpolator->SetMinSpacing(minSpacing);
         m_SurfaceInterpolator->SetDistanceImageVolume(50000);
 
-        m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(dynamic_cast<mitk::Image*>(workingNode->GetData()));
+        mitk::Image* segmentationImage = dynamic_cast<mitk::Image*>(workingNode->GetData());
+        if (segmentationImage->GetDimension() == 3)
+          m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(segmentationImage);
+        else
+          MITK_INFO<<"3D Interpolation is only supported for 3D images at the moment!";
 
         if (m_3DInterpolationEnabled)
         {
@@ -1045,6 +1051,19 @@ void QmitkSlicesInterpolator::Show3DInterpolationResult(bool status)
       m_3DContourNode->SetVisibility(status, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
 
    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkSlicesInterpolator::CheckSupportedImageDimension()
+{
+  if (m_3DInterpolationEnabled && m_Segmentation->GetDimension() != 3)
+  {
+    QMessageBox info;
+    info.setWindowTitle("3D Interpolation Process");
+    info.setIcon(QMessageBox::Information);
+    info.setText("3D Interpolation is only supported for 3D images at the moment!");
+    info.exec();
+    m_CmbInterpolation->setCurrentIndex(0);
+  }
 }
 
 void QmitkSlicesInterpolator::OnSliceNavigationControllerDeleted(const itk::Object *sender, const itk::EventObject& /*e*/)

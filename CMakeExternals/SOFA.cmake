@@ -34,7 +34,6 @@ if(MITK_USE_SOFA)
 
   if(NOT MITK_USE_SYSTEM_Boost)
     list(APPEND boost_cmake_args
-      -DBoost_DEBUG:BOOL=ON
       -DBoost_NO_SYSTEM_PATHS:BOOL=ON
       -DBOOST_INCLUDEDIR:PATH=${CMAKE_BINARY_DIR}/Boost-install/include
       -DBOOST_LIBRARYDIR:PATH=${CMAKE_BINARY_DIR}/Boost-install/lib

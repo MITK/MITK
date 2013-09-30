@@ -78,7 +78,7 @@ QmitkWatershedToolGUI::QmitkWatershedToolGUI()
   connect( m_SliderLevel, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueLevelChanged(int)));
   layout->addWidget( m_SliderLevel, 3, 0, 1, 2 );
 
-  QPushButton* okButton = new QPushButton("Create Segmentation", this);
+  QPushButton* okButton = new QPushButton("Run Segmentation", this);
   connect( okButton, SIGNAL(clicked()), this, SLOT(OnCreateSegmentation()));
   okButton->setFont( f );
   layout->addWidget( okButton, 4, 0, 1, 2 );

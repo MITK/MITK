@@ -190,7 +190,7 @@ m_TimeIsConnected(false)
   widgetLayout->addWidget(m_btClearSeeds);
   connect( m_btClearSeeds, SIGNAL(clicked()), this, SLOT(OnClearSeeds()) );
 
-  m_btConfirm = new QPushButton("Accept");
+  m_btConfirm = new QPushButton("Confirm Segmentation");
   m_btConfirm->setToolTip("Incorporate current result in your working session.");
   m_btConfirm->setEnabled(false);
   widgetLayout->addWidget(m_btConfirm);

@@ -136,6 +136,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   //# Tree View (experimental)
   m_NodeTreeView = new QTreeView;
+  m_NodeTreeView->setHeaderHidden(true);
   m_NodeTreeView->setSelectionMode( QAbstractItemView::ExtendedSelection );
   m_NodeTreeView->setSelectionBehavior( QAbstractItemView::SelectRows );
   m_NodeTreeView->setAlternatingRowColors(true);

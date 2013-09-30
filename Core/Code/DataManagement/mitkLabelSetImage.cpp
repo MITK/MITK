@@ -33,10 +33,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkQuadEdgeMesh.h>
 #include <itkTriangleMeshToBinaryImageFilter.h>
 #include <itkRelabelComponentImageFilter.h>
+#include <itkBinaryMedianImageFilter.h>
+#include <itkBinaryThresholdImageFilter.h>
 
 mitk::LabelSetImage::LabelSetImage() : mitk::Image()
 {
   this->CreateDefaultLabelSet();
+}
+
+mitk::LabelSetImage::LabelSetImage(mitk::LabelSetImage* other) : mitk::Image()
+{
+  this->Initialize(other);
+  m_LabelSet = other->GetLabelSet();
+
+  this->GetPropertyList()->SetProperty( "LookupTable", other->GetPropertyList()->GetProperty( "LookupTable") );
 }
 
 void mitk::LabelSetImage::Initialize(const mitk::Image* image)
@@ -66,8 +76,6 @@ void mitk::LabelSetImage::Initialize(const mitk::Image* image)
 
     mitk::TimeSlicedGeometry::Pointer originalGeometry = image->GetTimeSlicedGeometry()->Clone();
     this->SetGeometry( originalGeometry );
-
-    this->CreateDefaultLabelSet();
   }
   catch(mitk::Exception& e)
   {
@@ -126,6 +134,19 @@ std::string mitk::LabelSetImage::GetLabelSetLastModified()
 void mitk::LabelSetImage::CalculateLabelVolume(int index)
 {
 // todo
+}
+
+void mitk::LabelSetImage::SmoothLabel(int index)
+{
+  try
+  {
+    AccessByItk_1(this, SmoothLabelProcessing, index);
+    this->Modified();
+  }
+  catch( ... )
+  {
+    mitkThrow() << "Could not erase label.";
+  }
 }
 
 void mitk::LabelSetImage::EraseLabel(int index, bool reorder)
@@ -245,6 +266,58 @@ void mitk::LabelSetImage::ConcatenateProcessing(LabelSetImageType* itkTarget, mi
     {
         targetIter.Set( sourceValue + numberOfTargetLabels );
     }
+    ++sourceIter;
+    ++targetIter;
+  }
+}
+
+template < typename LabelSetImageType >
+void mitk::LabelSetImage::SmoothLabelProcessing(LabelSetImageType* input, int index)
+{
+  typedef itk::BinaryThresholdImageFilter< LabelSetImageType, LabelSetImageType > ThresholdFilterType;
+  typedef itk::BinaryMedianImageFilter< LabelSetImageType, LabelSetImageType > MedianFilterType;
+
+  typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
+  thresholdFilter->SetInput(input);
+  thresholdFilter->SetLowerThreshold(index);
+  thresholdFilter->SetUpperThreshold(index);
+  thresholdFilter->SetOutsideValue(0);
+  thresholdFilter->SetInsideValue(index);
+  thresholdFilter->Update();
+
+  typename LabelSetImageType::SizeType radius;
+  radius.Fill(1);
+
+  typename MedianFilterType::Pointer medianFilter = MedianFilterType::New();
+  medianFilter->SetInput( thresholdFilter->GetOutput() );
+  medianFilter->SetRadius( radius );
+  medianFilter->SetBackgroundValue(0);
+  medianFilter->SetForegroundValue(index);
+
+  medianFilter->Update();
+
+  LabelSetImageType::Pointer result = medianFilter->GetOutput();
+  result->DisconnectPipeline();
+
+  typedef itk::ImageRegionConstIterator< LabelSetImageType > SourceIteratorType;
+  typedef itk::ImageRegionIterator< LabelSetImageType > TargetIteratorType;
+
+  SourceIteratorType sourceIter( result, result->GetLargestPossibleRegion() );
+  sourceIter.GoToBegin();
+
+  TargetIteratorType targetIter( input, input->GetLargestPossibleRegion() );
+  targetIter.GoToBegin();
+
+  while ( !sourceIter.IsAtEnd() )
+  {
+    int targetValue = static_cast< int >( targetIter.Get() );
+    int sourceValue = static_cast< int >( sourceIter.Get() );
+
+    if ( (targetValue == index) || ( sourceValue && (!this->GetLabelLocked(targetValue))) )
+    {
+      targetIter.Set( sourceValue );
+    }
+
     ++sourceIter;
     ++targetIter;
   }
@@ -473,7 +546,17 @@ void mitk::LabelSetImage::EraseLabels(std::vector<int>& indexes)
 
   for (int i=0; i<indexes.size(); i++)
   {
-    this->EraseLabel(indexes[i]-i, false);
+    this->EraseLabel(indexes[i], false);
+  }
+}
+
+void mitk::LabelSetImage::SmoothLabels(std::vector<int>& indexes)
+{
+  std::sort(indexes.begin(), indexes.end());
+
+  for (int i=0; i<indexes.size(); i++)
+  {
+    this->SmoothLabel(indexes[i]);
   }
 }
 
@@ -487,14 +570,14 @@ unsigned int mitk::LabelSetImage::GetActiveLabelIndex() const
   return this->m_LabelSet->GetActiveLabel()->GetIndex();
 }
 
-unsigned int mitk::LabelSetImage::GetLabelComponent(int index) const
+unsigned int mitk::LabelSetImage::GetLabelLayer(int index) const
 {
-  return this->m_LabelSet->GetLabelComponent(index);
+  return this->m_LabelSet->GetLabelLayer(index);
 }
 
-unsigned int mitk::LabelSetImage::GetActiveLabelComponent() const
+unsigned int mitk::LabelSetImage::GetActiveLabelLayer() const
 {
-  return this->m_LabelSet->GetActiveLabel()->GetComponent();
+  return this->m_LabelSet->GetActiveLabel()->GetLayer();
 }
 
 const mitk::Label* mitk::LabelSetImage::GetActiveLabel() const
@@ -817,7 +900,6 @@ void mitk::LabelSetImage::SurfaceStamp(mitk::Surface* surface, bool forceOverwri
     LabelSetImageType::Pointer resultImage = filter->GetOutput();
     resultImage->DisconnectPipeline();
 
-  // for now, we just retrieve the voxel in the middle
     typedef itk::ImageRegionConstIterator< LabelSetImageType > SourceIteratorType;
     typedef itk::ImageRegionIterator< LabelSetImageType > TargetIteratorType;
 

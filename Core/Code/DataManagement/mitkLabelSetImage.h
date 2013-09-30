@@ -42,6 +42,8 @@ public:
   mitkClassMacro(LabelSetImage, Image);
   itkNewMacro(Self);
 
+  mitkNewMacro1Param(Self, LabelSetImage*);
+
   /**
   * \brief this constructor creates a labelset image out of the provided reference image.
   * @throw mitk::Exception Throws an exception if there is a problem while creating the labelset image.
@@ -127,6 +129,10 @@ public:
 
   /**
     * \brief  */
+  void SmoothLabel(int index);
+
+  /**
+    * \brief  */
   void CalculateLabelVolume(int index);
 
   /**
@@ -205,7 +211,9 @@ public:
     * \brief  */
   void EraseLabels(std::vector<int>& indexes);
 
-//  void RemoveActiveLabel();
+/**
+    * \brief  */
+  void SmoothLabels(std::vector<int>& indexes);
 
   /**
     * \brief  */
@@ -221,11 +229,11 @@ public:
 
   /**
     * \brief  */
-  unsigned int GetLabelComponent(int index) const;
+  unsigned int GetLabelLayer(int index) const;
 
   /**
   * \brief  */
-  unsigned int GetActiveLabelComponent() const;
+  unsigned int GetActiveLabelLayer() const;
 
   /**
     * \brief  */
@@ -305,6 +313,7 @@ public:
 
 protected:
   LabelSetImage();
+  LabelSetImage(mitk::LabelSetImage*);
   virtual ~LabelSetImage();
 
   virtual void CreateDefaultLabelSet();
@@ -323,6 +332,9 @@ protected:
 
   template < typename LabelSetImageType >
   void EraseLabelProcessing(LabelSetImageType * input, int index, bool reorder);
+
+  template < typename LabelSetImageType >
+  void SmoothLabelProcessing(LabelSetImageType * input, int index);
 
   template < typename LabelSetImageType >
   void MergeLabelsProcessing(LabelSetImageType * input, int index);

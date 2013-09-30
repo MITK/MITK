@@ -36,6 +36,10 @@
 
 #include <cassert>
 
+#ifdef _MSC_VER
+#pragma warning(disable:4503) // decorated name length exceeded, name was truncated
+#endif
+
 US_BEGIN_NAMESPACE
 
 typedef ServiceRegistrationBasePrivate::MutexLocker MutexLocker;
@@ -291,7 +295,7 @@ bool ServiceReferenceBasePrivate::UngetService(Module* module, bool checkRefCoun
     registration->dependents.erase(module);
   }
 
-  return hadReferences;
+  return hadReferences && removeService;
 }
 
 const ServicePropertiesImpl& ServiceReferenceBasePrivate::GetProperties() const
@@ -314,7 +318,7 @@ Any ServiceReferenceBasePrivate::GetProperty(const std::string& key, bool lock) 
 
 bool ServiceReferenceBasePrivate::IsConvertibleTo(const std::string& interfaceId) const
 {
-  return registration->service.find(interfaceId) != registration->service.end();
+  return registration ? registration->service.find(interfaceId) != registration->service.end() : false;
 }
 
 US_END_NAMESPACE

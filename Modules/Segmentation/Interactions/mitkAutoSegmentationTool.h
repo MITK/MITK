@@ -59,6 +59,8 @@ class Segmentation_EXPORT AutoSegmentationTool : public Tool
 
     virtual const char* GetGroup() const;
 
+    virtual Image::Pointer Get3DImage(Image::Pointer image, unsigned int timestep);
+
     bool m_OverwriteExistingSegmentation;
  };
 

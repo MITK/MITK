@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
 #include "mitkRenderingManager.h"
+#include <mitkSliceNavigationController.h>
 #include "mitkRenderingModeProperty.h"
 #include "mitkLookupTable.h"
 #include "mitkLookupTableProperty.h"
@@ -90,6 +91,11 @@ void mitk::WatershedTool::DoIt()
   // get image from tool manager
   mitk::DataNode::Pointer referenceData = m_ToolManager->GetReferenceData(0);
   mitk::Image::Pointer input = dynamic_cast<mitk::Image*>(referenceData->GetData());
+  if (input.IsNull())
+    return;
+
+  unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+  input = Get3DImage(input, timestep);
 
   mitk::Image::Pointer output;
 

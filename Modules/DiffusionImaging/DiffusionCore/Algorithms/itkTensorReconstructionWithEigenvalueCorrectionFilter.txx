@@ -74,7 +74,7 @@ namespace itk
     {
       vnl_vector_fixed <double, 3 > vec = m_GradientDirectionContainer->ElementAt(i);
 
-      if(vec[0]<0.0001 && vec[1]<0.0001 && vec[2]<0.0001 && vec[0]>-0.001&& vec[1]>-0.001 && vec[2]>-0.001)
+      if(vec[0]<0.0001 && vec[1]<0.0001 && vec[2]<0.0001 && vec[0]>-0.0001&& vec[1]>-0.0001 && vec[2]>-0.0001)
       {
         // the diffusion encoding gradient is approximately zero, wo we are dealing with a non-diffusion weighted volume
         m_B0Mask[i]=1;

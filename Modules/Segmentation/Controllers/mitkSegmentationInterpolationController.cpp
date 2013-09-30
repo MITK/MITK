@@ -67,8 +67,6 @@ mitk::SegmentationInterpolationController::~SegmentationInterpolationController(
 
 void mitk::SegmentationInterpolationController::ResetLabelCount()
 {
-    assert( m_WorkingImage.IsNotNull() );
-
 //  if ( m_WorkingImage->GetNumberOfLabels() != m_CurrentNumberOfLabels )
 //  {
     m_LabelCountInSlice.clear();
@@ -147,6 +145,7 @@ void mitk::SegmentationInterpolationController::SetReferenceImage( Image* newIma
   }
 
   for (unsigned int dim = 0; dim < m_WorkingImage->GetDimension(); ++dim)
+  {
     if ( m_ReferenceImage->GetDimension(dim) != m_WorkingImage->GetDimension(dim) )
     {
       MITK_WARN << "original patient image does not match segmentation (different extent in dimension " << dim
@@ -154,6 +153,7 @@ void mitk::SegmentationInterpolationController::SetReferenceImage( Image* newIma
       m_ReferenceImage = NULL;
       return;
     }
+  }
 }
 
 void mitk::SegmentationInterpolationController::SetChangedVolume( const Image* image, unsigned int timeStep )

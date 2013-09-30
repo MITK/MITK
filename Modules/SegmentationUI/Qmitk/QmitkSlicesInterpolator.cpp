@@ -108,17 +108,15 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_SurfaceInterpolationInfoChangedObserverTag = m_SurfaceInterpolator->AddObserver( itk::ModifiedEvent(), command2 );
 
   // feedback node and its visualization properties
-  m_FeedbackNode = mitk::DataNode::New();
-  m_FeedbackNode->Initialize();
   m_FeedbackContour = mitk::ContourModel::New();
-  m_FeedbackNode->SetData( m_FeedbackContour );
-  m_FeedbackNode->SetName( "2D interpolation feedback" );
-  m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
-  m_FeedbackNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
-  m_FeedbackNode->SetProperty( "contour.width", mitk::FloatProperty::New( 2.0 ) );
+  m_FeedbackContourNode = mitk::DataNode::New();
+  m_FeedbackContourNode->SetData( m_FeedbackContour );
+  m_FeedbackContourNode->SetName( "2D interpolation preview" );
+  m_FeedbackContourNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
+  m_FeedbackContourNode->SetProperty( "contour.width", mitk::FloatProperty::New(2));
 
   m_InterpolatedSurfaceNode = mitk::DataNode::New();
-  m_InterpolatedSurfaceNode->SetName( "3D interpolation feedback" );
+  m_InterpolatedSurfaceNode->SetName( "3D interpolation preview" );
   m_InterpolatedSurfaceNode->SetProperty( "color", mitk::ColorProperty::New(255.0,255.0,0.0) );
   m_InterpolatedSurfaceNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5) );
   m_InterpolatedSurfaceNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
@@ -455,10 +453,10 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
     m_FeedbackContour = contourExtractor->GetOutput(0);
     m_FeedbackContour->DisconnectPipeline();
 
-    m_FeedbackNode->SetData( m_FeedbackContour );
+    m_FeedbackContourNode->SetData( m_FeedbackContour );
 
     const mitk::Color& color = m_WorkingImage->GetActiveLabelColor();
-    m_FeedbackNode->SetProperty("contour.color", mitk::ColorProperty::New(color));
+    m_FeedbackContourNode->SetProperty("contour.color", mitk::ColorProperty::New(color));
   }
   else
   {
@@ -551,7 +549,7 @@ mitk::Image::Pointer QmitkSlicesInterpolator::GetWorkingSlice(const mitk::PlaneG
 
 void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 {
-  if (m_WorkingImage.IsNotNull() && m_FeedbackNode->GetData())
+  if (m_WorkingImage.IsNotNull() && m_FeedbackContourNode->GetData())
   {
     const mitk::PlaneGeometry* planeGeometry = m_LastSNC->GetCurrentPlaneGeometry();
     mitk::Image::Pointer slice = this->GetWorkingSlice(planeGeometry);
@@ -671,7 +669,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       m_FeedbackContour = contourExtractor->GetOutput(0);
       m_FeedbackContour->DisconnectPipeline();
 
-      m_FeedbackNode->SetData( m_FeedbackContour );
+      m_FeedbackContourNode->SetData( m_FeedbackContour );
 
       mitk::Image::Pointer slice = this->GetWorkingSlice(reslicePlane);
       if (slice.IsNull()) return;
@@ -779,13 +777,13 @@ void QmitkSlicesInterpolator::Activate2DInterpolation(bool on)
 
   if ( m_DataStorage.IsNotNull() )
   {
-    if (on && !m_DataStorage->Exists(m_FeedbackNode))
+    if (on && !m_DataStorage->Exists(m_FeedbackContourNode))
     {
-      m_DataStorage->Add( m_FeedbackNode );
+      m_DataStorage->Add( m_FeedbackContourNode );
     }
-    else if (!on && m_DataStorage->Exists(m_FeedbackNode))
+    else if (!on && m_DataStorage->Exists(m_FeedbackContourNode))
     {
-      m_DataStorage->Remove( m_FeedbackNode );
+      m_DataStorage->Remove( m_FeedbackContourNode );
     }
   }
 

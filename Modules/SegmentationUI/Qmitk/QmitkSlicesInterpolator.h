@@ -240,7 +240,7 @@ private:
     QPushButton* m_btApply3D;
     QCheckBox* m_chkShowPositionNodes;
 
-    mitk::DataNode::Pointer m_FeedbackNode;
+    mitk::DataNode::Pointer m_FeedbackContourNode;
     mitk::ContourModel::Pointer m_FeedbackContour;
     mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
     mitk::DataNode::Pointer m_3DContourNode;

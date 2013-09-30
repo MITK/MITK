@@ -192,7 +192,7 @@ protected:
   /*!
   * \brief Finds the given node in the data tree and optionally fits the cuboid to it
   */
-  virtual void AddBoundingObjectToNode(mitk::DataNode* node, bool fit);
+  virtual void AddBoundingObjectToNode(mitk::DataNode* node);
 
   /*!
   * \brief Removes the cuboid from any node and hides it from the user.

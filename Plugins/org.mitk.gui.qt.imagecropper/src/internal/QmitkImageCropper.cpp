@@ -172,7 +172,6 @@ void QmitkImageCropper::ExecuteOperation (mitk::Operation *operation)
     }
   default:;
   }
-
 }
 
 void QmitkImageCropper::CreateNewBoundingObject()
@@ -186,23 +185,13 @@ void QmitkImageCropper::CreateNewBoundingObject()
 
       if(m_ImageToCrop.IsNotNull())
       {
-        if (this->GetDefaultDataStorage()->GetNamedDerivedNode("CroppingObject", m_ImageNode))
-        {
-          //Remove m_Cropping
-          this->RemoveBoundingObjectFromNode();
-        }
-
-        bool fitCroppingObject = false;
         if(m_CroppingObject.IsNull())
-        {
-          CreateBoundingObject();
-          fitCroppingObject = true;
-        }
+          this->CreateBoundingObject();
 
         if (m_CroppingObject.IsNull())
           return;
 
-        AddBoundingObjectToNode( m_ImageNode, fitCroppingObject );
+        this->AddBoundingObjectToNode( m_ImageNode );
 
         m_ImageNode->SetVisibility(true);
         mitk::RenderingManager::GetInstance()->InitializeViews();
@@ -211,8 +200,6 @@ void QmitkImageCropper::CreateNewBoundingObject()
         m_Controls->m_CropButton->setEnabled(true);
       }
     }
-    else
-      QMessageBox::information(NULL, "Image cropping functionality", "Load an image first!");
   }
 }
 
@@ -265,7 +252,7 @@ void QmitkImageCropper::CropImage()
   // test, if bounding box is visible
   if (m_CroppingObjectNode.IsNull())
   {
-    QMessageBox::information(NULL, "Image cropping functionality", "Generate a new bounding object first!");
+    QMessageBox::information(m_Parent, "Image cropping", "Generate a new bounding object first!");
     return;
   }
 
@@ -284,12 +271,10 @@ void QmitkImageCropper::CropImage()
   try
   {
     cutter->Update();
-    //cutter->UpdateLargestPossibleRegion();
   }
   catch(itk::ExceptionObject&)
   {
-    QMessageBox::warning ( NULL,
-      tr("Cropping not possible"),
+    QMessageBox::warning ( m_Parent, "Image Cropper",
       tr("Sorry, the bounding box has to be completely inside the image.\n\n"
       "The possibility to drag it larger than the image is a bug and has to be fixed."),
       QMessageBox::Ok,  QMessageBox::NoButton,  QMessageBox::NoButton );
@@ -300,7 +285,7 @@ void QmitkImageCropper::CropImage()
   mitk::Image::Pointer resultImage = cutter->GetOutput();
   resultImage->DisconnectPipeline();
 
-  RemoveBoundingObjectFromNode();
+//  RemoveBoundingObjectFromNode();
 
   {
     opExchangeNodes*  doOp   = new opExchangeNodes(OP_EXCHANGE, m_ImageNode.GetPointer(),
@@ -321,7 +306,7 @@ void QmitkImageCropper::CropImage()
   }
 
   m_Controls->m_BoxButton->setEnabled(true);
-  m_Controls->m_CropButton->setEnabled(false);
+  //m_Controls->m_CropButton->setEnabled(false);
 }
 
 void QmitkImageCropper::CreateBoundingObject()
@@ -359,7 +344,7 @@ void QmitkImageCropper::CreateBoundingObject()
 
 void QmitkImageCropper::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
-  this->RemoveBoundingObjectFromNode();
+//  this->RemoveBoundingObjectFromNode();
 
   if (nodes.size() != 1 || dynamic_cast<mitk::Image*>(nodes[0]->GetData()) == 0)
   {
@@ -371,11 +356,9 @@ void QmitkImageCropper::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
   m_ImageNode = nodes[0];
   m_ParentWidget->setEnabled(true);
   // do not accept datanodes with dimension of less than three
-  mitk::Image* m_ImageToCrop = dynamic_cast<mitk::Image*>(nodes[0]->GetData());
-  if (m_ImageToCrop == NULL)
-  {
-    return;
-  }
+  m_ImageToCrop = dynamic_cast<mitk::Image*>(nodes[0]->GetData());
+  if (m_ImageToCrop.IsNull()) return;
+
   unsigned int dim = m_ImageToCrop->GetDimension();
   if (dim < 3)
   {
@@ -388,25 +371,23 @@ void QmitkImageCropper::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
   }
 }
 
-void QmitkImageCropper::AddBoundingObjectToNode(mitk::DataNode* node, bool fit)
+void QmitkImageCropper::AddBoundingObjectToNode(mitk::DataNode* node)
 {
-  m_ImageToCrop = dynamic_cast<mitk::Image*>(node->GetData());
   unsigned int dim = m_ImageToCrop->GetDimension();
   if (dim < 3)
   {
     MITK_WARN << "Image Cropper does not support 1D/2D Objects. Aborting operation";
     return;
   }
+
   if(!this->GetDefaultDataStorage()->Exists(m_CroppingObjectNode))
   {
-    this->GetDefaultDataStorage()->Add(m_CroppingObjectNode, node);
-    if (fit)
-    {
-      m_CroppingObject->FitGeometry(m_ImageToCrop->GetTimeSlicedGeometry());
-    }
-
+    this->GetDefaultDataStorage()->Add(m_CroppingObjectNode);
     mitk::GlobalInteraction::GetInstance()->AddInteractor( m_AffineInteractor );
   }
+
+  m_CroppingObject->FitGeometry(m_ImageToCrop->GetTimeSlicedGeometry());
+
   m_CroppingObjectNode->SetVisibility(true);
 }
 

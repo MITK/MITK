@@ -543,7 +543,6 @@ bool mitk::NDITrackingDevice::OpenConnection()
   }
   /* finish  - now all tools should be added, initialized and enabled, so that tracking can be started */
   this->SetState(Ready);
-  MITK_INFO << "m_Data.Model: " <<this->m_Data.Model;
   SetVolume(this->m_Data);
   return true;
 }
@@ -1229,31 +1228,21 @@ bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes,
     // if i>0 then we have a return statement <LF> infront
     if (i>0)
       currentVolume = currentVolume.substr(1, currentVolume.size());
-
-    std::string standard = "0";
-    std::string pyramid = "4";
-    std::string spectraPyramid = "5-2";
-    std::string spectraExtendedPyramid = "5-3";
-    std::string vicraVolume = "7";
-    std::string cube = "9";
-    std::string dome = "A";
-    if (currentVolume.compare(0,1,standard)==0)
-      volumes->push_back("Polaris Spectra");
-    if (currentVolume.compare(0,1,pyramid)==0)
-      volumes->push_back("Polaris Spectra");
-    if (currentVolume.compare(0,3,spectraPyramid)==0)
-      volumes->push_back("Polaris Spectra");
-    if (currentVolume.compare(1,3,spectraExtendedPyramid)==0)
+    if (currentVolume.compare(0,1,mitk::DeviceDataPolarisOldModel.HardwareCode)==0)
+      volumes->push_back(mitk::DeviceDataPolarisOldModel.Model);
+    if (currentVolume.compare(0,3,mitk::DeviceDataPolarisSpectra.HardwareCode)==0)
+      volumes->push_back(mitk::DeviceDataPolarisSpectra.Model);
+    if (currentVolume.compare(1,3,mitk::DeviceDataSpectraExtendedPyramid.HardwareCode)==0)
     {
       currentVolume = currentVolume.substr(1,currentVolume.size());
-      volumes->push_back("Polaris Spectra Extended Pyramid");
+      volumes->push_back(mitk::DeviceDataSpectraExtendedPyramid.Model);
     }
-    if (currentVolume.compare(0,1,vicraVolume)==0)
-      volumes->push_back("Polaris Vicra");
-    else if (currentVolume.compare(0,1,cube)==0)
-      volumes->push_back("Aurora Planar (Cube)");//alias cube
-    else if (currentVolume.compare(0,1,dome)==0)
-      volumes->push_back("Aurora Planar (Dome)");
+    if (currentVolume.compare(0,1,mitk::DeviceDataPolarisVicra.HardwareCode)==0)
+      volumes->push_back(mitk::DeviceDataPolarisVicra.Model);
+    else if (currentVolume.compare(0,1,mitk::DeviceDataAuroraPlanarCube.HardwareCode)==0)
+      volumes->push_back(mitk::DeviceDataAuroraPlanarCube.Model);//alias cube
+    else if (currentVolume.compare(0,1,mitk::DeviceDataAuroraPlanarDome.HardwareCode)==0)
+      volumes->push_back(mitk::DeviceDataAuroraPlanarDome.Model);
 
     //fill volumesDimensions
     for (unsigned int index = 0; index < 10; index++)

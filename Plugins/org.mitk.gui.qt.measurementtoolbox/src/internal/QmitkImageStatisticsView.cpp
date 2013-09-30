@@ -569,9 +569,19 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     // If a (non-closed) PlanarFigure is selected, display a line profile widget
     if ( m_SelectedPlanarFigure != NULL )
     {
+      // Check if the (closed) planar figure is out of bounds and so no image mask could be calculated--> Intensity Profile can not be calculated
+      bool outOfBounds = false;
+      if ( m_SelectedPlanarFigure->IsClosed() && m_SelectedImageMask == NULL)
+      {
+        outOfBounds = true;
+        std::stringstream message;
+        message << "<font color='red'>Planar figure is outside the images bounds.</font>";
+        m_Controls->m_InfoLabel->setText(message.str().c_str());
+      }
+
       // check whether PlanarFigure is initialized
       const mitk::Geometry2D *planarFigureGeometry2D = m_SelectedPlanarFigure->GetGeometry2D();
-      if ( planarFigureGeometry2D == NULL )
+      if ( planarFigureGeometry2D == NULL || outOfBounds)
       {
         // Clear statistics, histogram, and GUI
         this->InvalidateStatisticsTableView();
@@ -583,7 +593,8 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         this->m_StatisticsUpdatePending = false;
         m_Controls->m_lineRadioButton->setEnabled(true);
         m_Controls->m_barRadioButton->setEnabled(true);
-        m_Controls->m_InfoLabel->setText(QString(""));
+        if (!outOfBounds)
+          m_Controls->m_InfoLabel->setText(QString(""));
         return;
       }
       unsigned int timeStep = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();

@@ -50,6 +50,8 @@ private slots:
   /** @brief This slot is called if user activates the button to convert a surface into a binary image. */
   void OnSurface2ImagePressed();
 
+  void OnMakeOutputBinaryChanged(bool value);
+
 private:
 
   /** @brief Enable buttons if data selction is valid. */

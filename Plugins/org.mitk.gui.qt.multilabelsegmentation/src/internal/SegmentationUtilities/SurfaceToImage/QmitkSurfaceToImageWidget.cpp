@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkExceptionMacro.h>
 #include <mitkProgressBar.h>
 #include <mitkProperties.h>
-#include <mitkSurfaceToImageFilter.h>
+#include <mitkSurfaceStampImageFilter.h>
 
 #include <qmessagebox.h>
 
@@ -37,9 +37,12 @@ QmitkSurfaceToImageWidget::QmitkSurfaceToImageWidget(mitk::SliceNavigationContro
 
   this->EnableButtons(false);
 
+  m_Controls.m_chkMakeOutputBinary->setChecked(true);
+
   connect (m_Controls.btnSurface2Image, SIGNAL(pressed()), this, SLOT(OnSurface2ImagePressed()));
   connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)),
     this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
+  connect (m_Controls.m_chkMakeOutputBinary, SIGNAL(toggled(bool)), this, SLOT(OnMakeOutputBinaryChanged(bool)));
 
   if( m_Controls.dataSelectionWidget->GetSelection(0).IsNotNull() &&
     m_Controls.dataSelectionWidget->GetSelection(1).IsNotNull() )
@@ -55,6 +58,10 @@ QmitkSurfaceToImageWidget::~QmitkSurfaceToImageWidget()
 void QmitkSurfaceToImageWidget::EnableButtons(bool enable)
 {
   m_Controls.btnSurface2Image->setEnabled(enable);
+  m_Controls.m_chkMakeOutputBinary->setEnabled(enable);
+  m_Controls.m_chkOverwriteBackground->setEnabled(enable && !m_Controls.m_chkMakeOutputBinary->isChecked());
+  m_Controls.m_leForegroundValue->setEnabled(enable && !m_Controls.m_chkMakeOutputBinary->isChecked());
+  m_Controls.m_leBackgroundValue->setEnabled(enable && !m_Controls.m_chkMakeOutputBinary->isChecked());
 }
 
 void QmitkSurfaceToImageWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode* selection)
@@ -106,8 +113,7 @@ void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
 
   if( resultImage.IsNull() )
   {
-    MITK_ERROR << "Convert Surface to binary image failed";
-    QMessageBox::information( this, "Surface To Image", "Convert Surface to binary image failed", QMessageBox::Ok );
+    QMessageBox::information( this, "Surface to Image", "Could not stamp surface.\n See error log for details.", QMessageBox::Ok );
     this->EnableButtons();
     return;
   }
@@ -121,7 +127,7 @@ void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
   mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
   resultNode->SetData( resultImage );
   resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
-  resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
+  resultNode->SetProperty("binary", mitk::BoolProperty::New(m_Controls.m_chkMakeOutputBinary->isChecked()) );
 
   dataSelectionWidget->GetDataStorage()->Add(resultNode, dataSelectionWidget->GetSelection(0));
 
@@ -130,26 +136,32 @@ void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
 
 mitk::Image::Pointer QmitkSurfaceToImageWidget::ConvertSurfaceToImage( mitk::Image::Pointer image, mitk::Surface::Pointer surface )
 {
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
-  mitk::ProgressBar::GetInstance()->Progress();
+  mitk::SurfaceStampImageFilter::Pointer filter = mitk::SurfaceStampImageFilter::New();
+  filter->SetInput(image);
+  filter->SetSurface(surface);
+  filter->SetMakeOutputBinary(m_Controls.m_chkMakeOutputBinary->isChecked());
+  filter->SetOverwriteBackground(m_Controls.m_chkOverwriteBackground->isChecked());
+  filter->SetForegroundValue(m_Controls.m_leForegroundValue->text().toFloat());
+  filter->SetBackgroundValue(m_Controls.m_leBackgroundValue->text().toFloat());
 
-  mitk::SurfaceToImageFilter::Pointer surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
-  surfaceToImageFilter->MakeOutputBinaryOn();
-  surfaceToImageFilter->SetInput(surface);
-  surfaceToImageFilter->SetImage(image);
   try
   {
-    surfaceToImageFilter->Update();
+    filter->Update();
   }
-  catch(itk::ExceptionObject& excpt)
+  catch(mitk::Exception& e)
   {
-    MITK_ERROR << excpt.GetDescription();
+    MITK_ERROR << "exception caught: " << e.GetDescription();
     return 0;
   }
 
-  mitk::ProgressBar::GetInstance()->Progress();
-
-  mitk::Image::Pointer resultImage = surfaceToImageFilter->GetOutput();
+  mitk::Image::Pointer resultImage = filter->GetOutput();
 
   return resultImage;
+}
+
+void QmitkSurfaceToImageWidget::OnMakeOutputBinaryChanged(bool value)
+{
+  m_Controls.m_chkOverwriteBackground->setEnabled(!value);
+  m_Controls.m_leForegroundValue->setEnabled(!value);
+  m_Controls.m_leBackgroundValue->setEnabled(!value);
 }

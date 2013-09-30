@@ -1744,7 +1744,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
           reply += s;
           currentVolume += s;
         }
-        MITK_INFO << "currentVolume " << i <<" : " <<currentVolume;
+        //MITK_INFO << "currentVolume " << i <<" : " <<currentVolume;
         //analyze volume here
         static const std::string standard = "0";
         static const std::string pyramid = "4";
@@ -1788,12 +1788,12 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
   }
 
   *info = reply;
-  MITK_INFO << "info: " << *info;
+  //MITK_INFO << "info: " << *info;
   m_TrackingDevice->ClearReceiveBuffer();
   return returnValue;
 }
 
-mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::NDITrackingVolume volume)
+mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::TrackingDeviceData volume)
 {
   if (m_TrackingDevice == NULL)
     return TRACKINGDEVICENOTSET;
@@ -1815,15 +1815,17 @@ mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::NDITrackingVolume volume)
   //find the index where volumes[n] == device
 
   unsigned int index = 1; //the index for VSEL starts at 1
+  MITK_INFO << "volume: " << volume.Model;
   mitk::NDITrackingDevice::NDITrackingVolumeContainerType::iterator it = volumes.begin();
   while (it != volumes.end())
   {
-    if ((*it) == volume)
+    MITK_INFO << "volumes" << index << ": " << *it;
+    if ((*it) == volume.Model)
       break;
     it++, index++;
   }
-  //if (it == volumes.end() || index > numberOfVolumes) //not found / volume not supported
-  //  return NDIINVALIDOPERATIONFORDEVICE;
+  if (it == volumes.end() || index > numberOfVolumes) //not found / volume not supported
+    return NDIINVALIDOPERATIONFORDEVICE;
 
   //index now contains the information on which position the desired volume is situated
 
@@ -1836,7 +1838,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::NDITrackingVolume volume)
 
   //add index to command
   std::stringstream s;
-    s << index-1;
+    s << index;
   command += s.str();
 
   returnValue = m_TrackingDevice->Send(&command, m_UseCRC);
@@ -1879,10 +1881,10 @@ mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::NDITrackingVolume volume)
     std::string readCRC;                                          // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);                       // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
 
-   // if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code
+    if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code
       returnValue = NDIOKAY;
-   // else                                      // return error in CRC
-    //  returnValue = NDICRCERROR;
+    else                                      // return error in CRC
+      returnValue = NDICRCERROR;
   }
   m_TrackingDevice->ClearReceiveBuffer();
   return returnValue;

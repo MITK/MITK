@@ -113,6 +113,7 @@ namespace mitk
     * as defined by NDI API SFLIST (Aurora and Polaris API guide)
   *
     */
+    /*
     enum NDITrackingVolume
     {
     Standard,
@@ -120,9 +121,10 @@ namespace mitk
       SpectraPyramid,
       VicraVolume,
       Cube,
-      Dome
+      Dome,
+      SpectraExtendedPyramid
     };
-
+*/
   /**
   * /brief This structure defines key variables of a device model and type.
   * It is specifically used to find out which models belong to which vendor, and what volume
@@ -154,12 +156,14 @@ namespace mitk
   static TrackingDeviceData DeviceDataMicroBird = {AscensionMicroBird, "Ascension MicroBird", ""};
   static TrackingDeviceData DeviceDataVirtualTracker = {VirtualTracker, "Virtual Tracker", "cube"};
   static TrackingDeviceData DeviceDataUnspecified = {TrackingSystemNotSpecified, "Unspecified System", "cube"};
+  static TrackingDeviceData DeviceDataSpectraExtendedPyramid = {NDIPolaris, "Polaris Spectra Extended Pyramid", "ExtendedPyramid.stl"};
   // Careful when changing the "invalid" device: The mitkTrackingTypeTest is using it's data.
   static TrackingDeviceData DeviceDataInvalid = {TrackingSystemInvalid, "Invalid Tracking System", ""};
 
+
   static TrackingDeviceData TrackingDeviceList[] = {DeviceDataAuroraPlanarCube, DeviceDataAuroraPlanarDome, DeviceDataAuroraCompact,
   DeviceDataAuroraTabletop, DeviceDataMicronTrackerH40, DeviceDataPolarisSpectra, DeviceDataPolarisVicra,
-  DeviceDataDaVinci, DeviceDataMicroBird, DeviceDataVirtualTracker, DeviceDataUnspecified, DeviceDataInvalid};
+  DeviceDataDaVinci, DeviceDataMicroBird, DeviceDataVirtualTracker, DeviceDataUnspecified, DeviceDataSpectraExtendedPyramid, DeviceDataInvalid};
 
   /**
   * /brief Returns all devices compatibel to the given Line of Devices

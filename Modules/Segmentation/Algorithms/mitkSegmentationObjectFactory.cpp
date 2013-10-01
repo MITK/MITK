@@ -28,15 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourVtkMapper3D.h"
 
 
-#include "mitkContourModel.h"
-#include "mitkContourModelIOFactory.h"
-#include "mitkContourModelWriterFactory.h"
-#include "mitkContourModelWriter.h"
-#include "mitkContourModelMapper2D.h"
-#include "mitkContourModelGLMapper2D.h"
-#include "mitkContourModelMapper3D.h"
-
-
 mitk::SegmentationObjectFactory::SegmentationObjectFactory()
 :CoreObjectFactoryBase()
 {
@@ -45,7 +36,7 @@ mitk::SegmentationObjectFactory::SegmentationObjectFactory()
   {
     MITK_DEBUG << "SegmentationObjectFactory c'tor" << std::endl;
 
-    RegisterIOFactories();
+    CreateFileExtensionsMap();
 
     alreadyDone = true;
   }
@@ -112,7 +103,7 @@ const char* mitk::SegmentationObjectFactory::GetFileExtensions()
   std::string fileExtension;
   this->CreateFileExtensions(m_FileExtensionsMap, fileExtension);
   return fileExtension.c_str();
-};
+}
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::SegmentationObjectFactory::GetFileExtensionsMap()
 {
@@ -138,23 +129,21 @@ const char* mitk::SegmentationObjectFactory::GetSaveFileExtensions()
 
 void mitk::SegmentationObjectFactory::RegisterIOFactories()
 {
-  //register io classes of mitkContourModel
-  mitk::ContourModelIOFactory::RegisterOneFactory();
-
-  mitk::ContourModelWriterFactory::RegisterOneFactory();
-
-  this->m_FileWriters.push_back(mitk::ContourModelWriter::New().GetPointer());
-
-  CreateFileExtensionsMap();
 }
 
-void RegisterSegmentationObjectFactory()
-{
-  static bool oneSegmentationObjectFactoryRegistered = false;
-  if ( ! oneSegmentationObjectFactoryRegistered )
+struct RegisterSegmentationObjectFactory{
+  RegisterSegmentationObjectFactory()
+    : m_Factory( mitk::SegmentationObjectFactory::New() )
   {
-    MITK_DEBUG << "Registering SegmentationObjectFactory..." << std::endl;
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::SegmentationObjectFactory::New());
-    oneSegmentationObjectFactoryRegistered = true;
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory( m_Factory );
   }
-}
+
+  ~RegisterSegmentationObjectFactory()
+  {
+    mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory( m_Factory );
+  }
+
+  mitk::SegmentationObjectFactory::Pointer m_Factory;
+};
+
+static RegisterSegmentationObjectFactory registerSegmentationObjectFactory;

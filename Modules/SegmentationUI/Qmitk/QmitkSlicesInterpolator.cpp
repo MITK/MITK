@@ -58,7 +58,7 @@ const std::map<QAction*, mitk::SliceNavigationController*> QmitkSlicesInterpolat
   std::map<QAction*, mitk::SliceNavigationController*> actionToSliceDimension;
   foreach(mitk::SliceNavigationController* slicer, m_ControllerToDeleteObserverTag.keys())
   {
-    actionToSliceDimension[new QAction(QString::fromStdString(slicer->GetViewDirection()),0)] = slicer;
+    actionToSliceDimension[new QAction(QString::fromStdString(slicer->GetViewDirectionAsString()),0)] = slicer;
   }
 
   return actionToSliceDimension;

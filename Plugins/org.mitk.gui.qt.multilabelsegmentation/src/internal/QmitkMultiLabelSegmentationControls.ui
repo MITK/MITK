@@ -102,7 +102,7 @@
    <item>
     <widget class="QmitkLabelSetWidget" name="m_LabelSetWidget" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -118,7 +118,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidgetSegmentationTools">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+      <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
        <horstretch>0</horstretch>
        <verstretch>50</verstretch>
       </sizepolicy>

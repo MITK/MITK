@@ -66,6 +66,8 @@ bool mitk::ContourTool::OnChangeActiveLabel (Action* action, const StateEvent* s
 
   lsImage->SetActiveLabel(value, true);
 
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
   return true;
 }
 

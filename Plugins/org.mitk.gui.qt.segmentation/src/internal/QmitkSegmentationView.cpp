@@ -54,7 +54,6 @@ QmitkSegmentationView::QmitkSegmentationView()
 ,m_DataSelectionChanged(false)
 ,m_MouseCursorSet(false)
 {
-  RegisterSegmentationObjectFactory();
   mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
   mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
   mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");

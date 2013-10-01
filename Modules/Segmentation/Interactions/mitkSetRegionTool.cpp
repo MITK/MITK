@@ -70,6 +70,8 @@ bool mitk::SetRegionTool::OnChangeActiveLabel (Action* action, const StateEvent*
 
   lsImage->SetActiveLabel(value, true);
 
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
   return true;
 }
 

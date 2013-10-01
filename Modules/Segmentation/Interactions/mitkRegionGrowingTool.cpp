@@ -413,6 +413,8 @@ bool mitk::RegionGrowingTool::OnChangeActiveLabel (Action* action, const StateEv
 
   lsImage->SetActiveLabel(value, true);
 
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
   return true;
 }
 

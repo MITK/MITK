@@ -152,10 +152,10 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::SegmentationObjectFactory::GetSa
 void mitk::SegmentationObjectFactory::CreateFileExtensionsMap()
 {
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour Files"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation Files"));
+//  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation Files"));
 
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour File"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation Files"));
+//  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation Files"));
 }
 
 const char* mitk::SegmentationObjectFactory::GetSaveFileExtensions()

@@ -343,6 +343,8 @@ set(CPP_FILES
   Rendering/vtkMitkLevelWindowFilter.cpp
   Rendering/vtkNeverTranslucentTexture.cpp
   Rendering/mitkRenderingTestHelper.cpp
+  Rendering/vtkImageLabelOutline.cxx
+  Rendering/vtkImageNeighborhoodFilter.cxx
 
   Common/mitkException.cpp
   Common/mitkCommon.h

@@ -21,5 +21,6 @@
         <file>mergelabels.png</file>
         <file>eraselabel.png</file>
         <file>smoothlabel.png</file>
+        <file>outline.png</file>
     </qresource>
 </RCC>

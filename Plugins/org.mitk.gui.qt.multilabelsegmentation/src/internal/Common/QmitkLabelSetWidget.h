@@ -76,6 +76,9 @@ private slots:
   // reaction to the signal "smoothLabel" from QmitkLabelSetTableWidget
   void OnSmoothLabel(int);
 
+  // reaction to the signal "toggleOutline" from QmitkLabelSetTableWidget
+  void OnToggleOutline(bool);
+
   // reaction to the signal "createMask" from QmitkLabelSetTableWidget
   void OnCreateMask(int);
 

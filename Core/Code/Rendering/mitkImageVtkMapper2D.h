@@ -41,6 +41,7 @@ class vtkMitkThickSlicesFilter;
 class vtkPolyData;
 class vtkMitkApplyLevelWindowToRGBFilter;
 class vtkMitkLevelWindowFilter;
+class vtkImageLabelOutline;
 
 namespace mitk {
 
@@ -167,6 +168,8 @@ public:
     vtkSmartPointer<vtkTexture> m_Texture;
     /** \brief The actual reslicer (one per renderer) */
     mitk::ExtractSliceFilter::Pointer m_Reslicer;
+    /** \brief The filter for generating label outlines */
+    vtkSmartPointer<vtkImageLabelOutline> m_LabelOutline;
     /** \brief Filter for thick slices */
     vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
     /** \brief PolyData object containg all lines/points needed for outlining the contour.

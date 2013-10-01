@@ -57,7 +57,7 @@ m_WorkingNode(0)
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(renameLabel(int, const mitk::Color&, const std::string&)), this, SLOT(OnRenameLabel(int, const mitk::Color&, const std::string&)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createSurface(int)), this, SLOT(OnCreateSurface(int)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(smoothLabel(int)), this, SLOT(OnSmoothLabel(int)) );
-
+  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(toggleOutline(bool)), this, SLOT(OnToggleOutline(bool)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SIGNAL(goToLabel(const mitk::Point3D&)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(combineAndCreateSurface( const QList<QTableWidgetSelectionRange>& )),
       this, SLOT(OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>&)) );
@@ -340,6 +340,17 @@ void QmitkLabelSetWidget::OnCreateMask(int index)
   this->m_DataStorage->Add(maskNode, m_WorkingNode);
 
   this->WaitCursorOff();
+}
+
+void QmitkLabelSetWidget::OnToggleOutline(bool value)
+{
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  mitk::DataNode::Pointer segNode = toolManager->GetWorkingData(0);
+  if (segNode.IsNull()) return;
+
+  segNode->SetBoolProperty( "labelset.outline.all", value);
+  segNode->GetData()->Modified(); // fixme: workaround to force data-type rendering (and not only property-type)
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnSmoothLabel(int index)

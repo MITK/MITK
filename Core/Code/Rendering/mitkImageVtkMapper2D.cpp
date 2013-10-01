@@ -55,6 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCellArray.h>
 #include <vtkCamera.h>
 #include <vtkColorTransferFunction.h>
+#include <vtkImageLabelOutline.h>
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -151,16 +152,13 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     return;
   }
 
-
   //set main input for ExtractSliceFilter
   localStorage->m_Reslicer->SetInput(input);
   localStorage->m_Reslicer->SetWorldGeometry(worldGeometry);
   localStorage->m_Reslicer->SetTimeStep( this->GetTimestep() );
 
-
   //set the transformation of the image to adapt reslice axis
   localStorage->m_Reslicer->SetResliceTransformByGeometry( input->GetTimeSlicedGeometry()->GetGeometry3D( this->GetTimestep() ) );
-
 
   //is the geometry of the slice based on the input image or the worldgeometry?
   bool inPlaneResampleExtentByGeometry = false;
@@ -203,7 +201,6 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   //set the vtk output property to true, makes sure that no unneeded mitk image convertion
   //is done.
   localStorage->m_Reslicer->SetVtkOutputRequest(true);
-
 
   //Thickslicing
   int thickSlicesMode = 0;
@@ -376,6 +373,24 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   this->ApplyOpacity( renderer );
   this->ApplyRenderingMode(renderer);
+
+  bool outlineAll = false;
+  datanode->GetBoolProperty( "labelset.outline.all", outlineAll, renderer );
+
+  bool outlineActive = false;
+  datanode->GetBoolProperty( "labelset.outline.active", outlineActive, renderer );
+
+  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(datanode->GetData());
+  if ( (outlineAll || outlineActive) && lsImage )
+  {
+//    vtkSmartPointer<vtkImageLabelOutline> m_LabelOutline = vtkSmartPointer<vtkImageLabelOutline>::New();
+    localStorage->m_LabelOutline->SetInput( localStorage->m_ReslicedImage );
+    localStorage->m_LabelOutline->SetActiveLabel( lsImage->GetActiveLabelIndex() );
+    localStorage->m_LabelOutline->SetOutlineAll( outlineAll );
+    localStorage->m_LabelOutline->SetBackground(0.0);
+    localStorage->m_LabelOutline->Update();
+    localStorage->m_ReslicedImage = localStorage->m_LabelOutline->GetOutput();
+  }
 
   // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
   localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
@@ -803,6 +818,8 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     node->AddProperty( "opacity", mitk::FloatProperty::New(1.0f), renderer, overwrite );
     node->AddProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer, overwrite );
     node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
+    node->AddProperty( "labelset.outline.all", mitk::BoolProperty::New( false ), renderer, overwrite );
+    node->AddProperty( "labelset.outline.active", mitk::BoolProperty::New( true ), renderer, overwrite );
     node->AddProperty( "layer", mitk::IntProperty::New(100), renderer, overwrite);
 
     mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
@@ -1087,6 +1104,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
   m_Reslicer = mitk::ExtractSliceFilter::New();
+  m_LabelOutline = vtkSmartPointer<vtkImageLabelOutline>::New();
   m_TSFilter = vtkSmartPointer<vtkMitkThickSlicesFilter>::New();
   m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
   m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();

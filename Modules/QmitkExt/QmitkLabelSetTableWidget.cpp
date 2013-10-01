@@ -42,6 +42,7 @@ m_BlockEvents(false),
 m_AutoSelectNewLabels(true),
 m_AllVisible(true),
 m_AllLocked(false),
+m_AllOutlined(false),
 m_ColorSequenceRainbow(mitk::ColorSequenceRainbow::New())
 {
   m_ColorSequenceRainbow->GoToBegin();
@@ -353,7 +354,8 @@ void QmitkLabelSetTableWidget::OnItemClicked(QTableWidgetItem *item)
 
   if (row >= 0 && row < this->rowCount())
   {
-      m_LabelSetImage->SetActiveLabel(row, false);
+    m_LabelSetImage->SetActiveLabel(row, false);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -511,6 +513,11 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
   }
   else
   {
+    QAction* toggleOutlineAction = new QAction(QIcon(":/QmitkExt/outline.png"), "Outline/Filled all", this );
+    toggleOutlineAction->setEnabled(true);
+    QObject::connect( toggleOutlineAction, SIGNAL( triggered(bool) ), this, SLOT( OnToggleOutline(bool) ) );
+    menu->addAction(toggleOutlineAction);
+
     QAction* renameAction = new QAction(QIcon(":/QmitkExt/renamelabel.png"), "Rename...", this );
     renameAction->setEnabled(true);
     QObject::connect( renameAction, SIGNAL( triggered(bool) ), this, SLOT( OnRenameLabel(bool) ) );
@@ -609,6 +616,12 @@ void QmitkLabelSetTableWidget::OnRemoveLabel(bool value)
     this->m_LabelSetImage->RemoveLabel( this->currentRow() );
     this->BusyCursorOff();
   }
+}
+
+void QmitkLabelSetTableWidget::OnToggleOutline(bool value)
+{
+  m_AllOutlined = !m_AllOutlined;
+  emit toggleOutline(m_AllOutlined);
 }
 
 void QmitkLabelSetTableWidget::OnMergeLabels(bool value)

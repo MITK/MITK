@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   template void mitk::ContourUtils::ItkCopyFilledContourToSlice(itk::Image<pixelType,dim>*, const mitk::Image*, int);
 
 // explicitly instantiate the 2D version of this method
-InstantiateAccessFunctionForFixedDimension(ItkCopyFilledContourToSlice, 2);
+//InstantiateAccessFunctionForFixedDimension(ItkCopyFilledContourToSlice, 2);
 
 mitk::ContourUtils::ContourUtils()
 {
@@ -219,8 +219,6 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
 
     //filledSegmentationSlice = NULL;
     */
-    typedef itk::Mesh<double> MeshType;
-    typedef typename itk::Image< float, 3> ImageType;
     /*typedef typename itk::BinaryMask3DMeshSource<  ImageType, MeshType> MeshFilterType;
 
 
@@ -249,36 +247,32 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
     */
     // Create ROI from Mesh with desired dimension, etc.
 
-    /*itk::TriangleMeshToBinaryImageFilter<MeshType, ImageType>::Pointer roiSampler = itk::TriangleMeshToBinaryImageFilter<MeshType, ImageType>::New();
-
-    roiSampler->SetInput(resampler->GetOutput());
-    CastToItkImage(contourModel->)
-    roiSampler->SetInfoImage(itkReference);
-
+    itk::TriangleMeshToBinaryImageFilter<MeshType, ImageType>::Pointer roiSampler = itk::TriangleMeshToBinaryImageFilter<MeshType, ImageType>::New();
+    MeshType::Pointer mesh = contourModel2itkMesh(projectedContour);
+    roiSampler->SetInput(mesh);
+    ImageType::Pointer output = ImageType::New();
+    MITK_INFO << "sliceImage->GetSliceData(): " << sliceImage->GetSliceData();
+    CastToItkImage(sliceImage, output);
+    roiSampler->SetInfoImage( output );
     roiSampler->Update();
-
-   GrabItkImageMemory( roiSampler->GetOutput(), output);
-   IOUtil::SaveImage(output,"/home//roi.nrrd");
-   */
+    MITK_INFO << "roiSampler->Update();";
+    MITK_INFO << "infoImage: " << roiSampler->GetOutput();
 }
 
-void mitk::ContourUtils::contourModel2itkMesh(ContourModel* contourModel)
+itk::Mesh< float , 3 >::Pointer mitk::ContourUtils::contourModel2itkMesh(ContourModel* contourModel)
 {
     //mitk::ContourModel::VertexType* vertex;
     mitk::ContourModel::VertexIterator it = contourModel->Begin();
     mitk::ContourModel::VertexIterator itEnd = contourModel->End();
 
-    typedef float  PixelType;
-    typedef itk::Mesh< PixelType , 3 > MeshType;
-    typedef MeshType::CellType CellType;
-    typedef itk::Image< unsigned char, 3 > ImageType;
-    typedef itk::VertexCell< CellType >    VertexType;
-    typedef itk::LineCell< CellType >      LineType;
-    typedef itk::TriangleMeshToBinaryImageFilter<MeshType,ImageType> MeshFilterType;
-
     MeshType::Pointer mesh = MeshType::New();
     MeshType::PointType point;
+
     mitk::Point3D center;
+    center[0] = 0;
+    center[1] = 0;
+    center[2] = 0;
+
     int i;
 
     for( i=0 ; it!=itEnd ; i++ )
@@ -297,32 +291,21 @@ void mitk::ContourUtils::contourModel2itkMesh(ContourModel* contourModel)
     center[2] = center[2]/i;
     MITK_INFO << "center" << center;
 
-    mesh->SetPoint( i+1, center);
+    mesh->SetPoint( i, center);
 
     CellType::CellAutoPointer cellpointer;
 
-    /*MeshType::PointsContainerIterator iter = mesh->Begin();
+    MeshType::PointType point2;
 
-
-    for( int j = 1; j!=mesh->GetNumberOfPoints(); j++)
+    //create a line between all points
+    /*for( int j = 1; j!=mesh->GetNumberOfPoints(); j++)
     {
-        if(j%3)
-        {
         cellpointer.TakeOwnership( new LineType );
-        cellpointer->SetPointId( 0, mesh->PointsContainer[j-1] );
-        cellpointer->SetPointId( 1, mesh->pointSet->GetPoint(j) );
+        cellpointer->SetPointId( 0, j-1 );
+        cellpointer->SetPointId( 1, j );
         mesh->SetCell( j-1, cellpointer );
         j++;
-        }
-        else
-        {
-        cellpointer.TakeOwnership( new LineType );
-        cellpointer->SetPointId( 0, mesh->GetPoint(j-1) );
-        cellpointer->SetPointId( 1, *itEnd );
-        mesh->SetCell( j-1, cellpointer );
-        j++;
-        }
-    }
+    }*/
     /*cellpointer.TakeOwnership( new LineType );
     cellpointer->SetPointId( 0, 0 );
     cellpointer->SetPointId( 1, 1 );
@@ -338,10 +321,23 @@ void mitk::ContourUtils::contourModel2itkMesh(ContourModel* contourModel)
     cellpointer->SetPointId( 1, 0 );
     mesh->SetCell( 2, cellpointer );
     */
+
+    int centerPointId = i;
+    TriangleCellType::CellAutoPointer trianglepointer;
+
+    for( int j = 1; j!=mesh->GetNumberOfPoints(); j++)
+    {
+    trianglepointer.TakeOwnership( new TriangleCellType );
+    trianglepointer->SetPointId( 0, j );
+    trianglepointer->SetPointId( 1, j-1 );
+    trianglepointer->SetPointId( 2, centerPointId );
+    mesh->SetCell( j-1, trianglepointer );
+    }
+
     MITK_INFO << "Points: " << mesh->GetNumberOfPoints();
     MITK_INFO << "Cells: " << mesh->GetNumberOfCells();
 
-   typedef MeshType::CellsContainer::ConstIterator CellIterator;
+   /*typedef MeshType::CellsContainer::ConstIterator CellIterator;
 
    CellIterator cellIterator = mesh->GetCells()->Begin();
    CellIterator cellEnd = mesh->GetCells()->End();
@@ -362,6 +358,8 @@ void mitk::ContourUtils::contourModel2itkMesh(ContourModel* contourModel)
    // Software Guide : EndCodeSnippet
    ++cellIterator;
    }
+   */
+   return mesh;
 }
 
 template<typename TPixel, unsigned int VImageDimension>

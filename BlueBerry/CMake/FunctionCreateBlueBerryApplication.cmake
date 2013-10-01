@@ -112,9 +112,14 @@ if(WIN32)
 endif()
 
 # -----------------------------------------------------------------------
-# Add executable icon (Mac)
+# Add executable icon and bundle name (Mac)
 # -----------------------------------------------------------------------
 if(APPLE)
+  if( _APP_DESCRIPTION)
+    set_target_properties(${_APP_NAME} PROPERTIES MACOSX_BUNDLE_NAME "${_APP_DESCRIPTION}")
+  else()
+    set_target_properties(${_APP_NAME} PROPERTIES MACOSX_BUNDLE_NAME "${_APP_NAME}")
+  endif()
   set(icon_name "icon.icns")
   set(icon_full_path "${CMAKE_CURRENT_SOURCE_DIR}/icons/${icon_name}")
   if(EXISTS "${icon_full_path}")

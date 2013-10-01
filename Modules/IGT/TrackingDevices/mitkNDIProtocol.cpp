@@ -1805,8 +1805,10 @@ mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::TrackingDeviceData volume)
   while (it != volumes.end())
   {
     if ((*it) == volume.Model)
+    {
       MITK_INFO << volume.Model << " selected.";
       break;
+    }
     it++, index++;
   }
   if (it == volumes.end() || index > numberOfVolumes) //not found / volume not supported

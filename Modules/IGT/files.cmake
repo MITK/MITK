@@ -59,6 +59,7 @@ set(RESOURCE_FILES
   NDIPolaris.stl
   NDIPolarisVicra.stl
   StandardVolume.stl
+  ExtendedPyramid.stl
 )
 
 

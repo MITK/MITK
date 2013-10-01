@@ -30,6 +30,7 @@ if(MitkIGT_IS_ENABLED)
   MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/NDIPolaris.stl )
   MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/NDIPolarisVicra.stl )
   MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/StandardVolume.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/ExtendedPyramid.stl )
 endif()
 
 MITK_CHECK_MODULE(_RESULT MitkIGT)

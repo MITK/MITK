@@ -64,6 +64,8 @@ class Segmentation_EXPORT AutoSegmentationTool : public Tool
     /// \brief Interface of a mitk::StateMachine (for undo/redo)
     void  ExecuteOperation (mitk::Operation*);
 
+    virtual Image::Pointer Get3DImage(Image::Pointer image, unsigned int timestep);
+
     void InitializeUndoController();
 
     void PasteSegmentation( Image* targetImage, Image* sourceImage, int pixelvalue, int timestep );

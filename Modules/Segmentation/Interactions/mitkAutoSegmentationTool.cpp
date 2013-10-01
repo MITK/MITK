@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLabelSetImage.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkImageTimeSelector.h"
 #include "mitkRenderingManager.h"
 
 mitk::AutoSegmentationTool::AutoSegmentationTool() : Tool("dummy")
@@ -115,6 +116,18 @@ void mitk::AutoSegmentationTool::ItkPasteSegmentation( itk::Image<TPixel,VImageD
     ++targetIterator;
     ++sourceIterator;
   }
+}
+
+mitk::Image::Pointer mitk::AutoSegmentationTool::Get3DImage(mitk::Image::Pointer image, unsigned int timestep)
+{
+  if (image->GetDimension() != 4)
+    return image;
+
+  mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
+  imageTimeSelector->SetInput(image);
+  imageTimeSelector->SetTimeNr(static_cast<int>(timestep));
+  imageTimeSelector->UpdateLargestPossibleRegion();
+  return imageTimeSelector->GetOutput();
 }
 
 void mitk::AutoSegmentationTool::InitializeUndoController()

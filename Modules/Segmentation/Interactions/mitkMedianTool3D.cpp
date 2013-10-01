@@ -71,8 +71,12 @@ void mitk::MedianTool3D::Run()
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   if (!workingNode) return;
 
-  mitk::LabelSetImage* lsImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
-  if (!lsImage) return;
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  if (!workingImage) return;
+
+  unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+
+  Image::Pointer workingImageTimeStep = this->Get3DImage(workingImage, timestep);
 
   m_ProgressCommand = mitk::ToolCommand::New();
 
@@ -80,9 +84,9 @@ void mitk::MedianTool3D::Run()
 
   try
   {
-    AccessByItk(lsImage, ITKProcessing);
+    AccessByItk(workingImageTimeStep, ITKProcessing);
   }
-  catch( itk::ExceptionObject & e )
+  catch( itk::ExceptionObject& e )
   {
    MITK_ERROR << "Exception caught: " << e.GetDescription();
    m_ProgressCommand->Reset();
@@ -92,7 +96,7 @@ void mitk::MedianTool3D::Run()
 
   CurrentlyBusy.Send(false);
 
-  lsImage->Modified();
+  workingImageTimeStep->Modified();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

@@ -193,13 +193,18 @@ void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataNode* nodeForThresholdi
 {
   if (!nodeForThresholding) return;
 
-  Image::Pointer image = dynamic_cast<Image*>( nodeForThresholding->GetData() );
+  unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+
+  Image::Pointer imageForThresholding = dynamic_cast<Image*>( nodeForThresholding->GetData() );
+  Image::Pointer imageForThresholdingTimeStep = this->Get3DImage(imageForThresholding, timestep);
+
   Image::Pointer originalImage = dynamic_cast<Image*> (m_ReferenceNode->GetData());
-  if (image.IsNotNull())
+  Image::Pointer originalImageTimeStep = this->Get3DImage(originalImage, timestep);
+  if (originalImageTimeStep.IsNotNull() && imageForThresholding.IsNotNull())
   {
     // initialize a new node with the same image as our reference image
     // use the level window property of this image copy to display the result of a thresholding operation
-    m_ThresholdFeedbackNode->SetData( image );
+    m_ThresholdFeedbackNode->SetData( imageForThresholding );
     int layer(50);
     nodeForThresholding->GetIntProperty("layer", layer);
     m_ThresholdFeedbackNode->SetIntProperty("layer", layer+1);
@@ -212,16 +217,16 @@ void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataNode* nodeForThresholdi
       storage->Add( m_ThresholdFeedbackNode);
     }
 
-    if (image.GetPointer() == originalImage.GetPointer())
+    if (imageForThresholding.GetPointer() == originalImageTimeStep.GetPointer())
     {
-      if ((originalImage->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR)
-        &&(originalImage->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT))
+      if ((originalImageTimeStep->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR)
+        &&(originalImageTimeStep->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT))
          m_IsFloatImage = true;
       else
          m_IsFloatImage = false;
 
-     m_SensibleMinimumThresholdValue = static_cast<double>( originalImage->GetScalarValueMin() );
-     m_SensibleMaximumThresholdValue = static_cast<double>( originalImage->GetScalarValueMax() );
+     m_SensibleMinimumThresholdValue = static_cast<double>( originalImageTimeStep->GetScalarValueMin() );
+     m_SensibleMaximumThresholdValue = static_cast<double>( originalImageTimeStep->GetScalarValueMax() );
     }
 
     LevelWindowProperty::Pointer lwp = dynamic_cast<LevelWindowProperty*>( m_ThresholdFeedbackNode->GetProperty( "levelwindow" ));

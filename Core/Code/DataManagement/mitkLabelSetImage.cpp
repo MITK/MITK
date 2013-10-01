@@ -533,7 +533,12 @@ void mitk::LabelSetImage::RemoveLabels(std::vector<int>& indexes)
 
   for (int i=0; i<indexes.size(); i++)
   {
-    this->EraseLabel(indexes[i]-i, true);
+    this->EraseLabel(indexes[i], false);
+  }
+
+  for (int i=0; i<indexes.size(); i++)
+  {
+//    this->EraseLabel(indexes[i]-i, true);
     this->m_LabelSet->RemoveLabel(indexes[i]-i);
     this->ResetLabels();
   }

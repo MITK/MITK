@@ -127,6 +127,7 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
       To use it in the mitk geometry classes, it has to be transfered to mitk::ScalarType which is float */
       static AffineTransform3D::MatrixType m;
       mitk::TransferMatrix(quatTransform->GetMatrix(), m);
+        vnl_matrix_fixed<ScalarType,3,3> rot = orientation.rotation_matrix_transpose();
       affineTransform->SetMatrix(m);
     }
     if (this->GetTransformPosition(index) == true)

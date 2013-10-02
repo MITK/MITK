@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMaskImageFilter.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIterator.h>
+#include <itkImageRegionConstIteratorWithIndex.h>
 
 #include <itkCastImageFilter.h>
 #include <itkImageFileWriter.h>
@@ -305,7 +306,6 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
     m_ImageMask = NULL;
   }
 
-
   // Check if statistics is already up-to-date
   unsigned long imageMTime = m_ImageStatisticsTimeStampVector[timeStep].GetMTime();
   unsigned long maskedImageMTime = m_MaskedImageStatisticsTimeStampVector[timeStep].GetMTime();
@@ -522,6 +522,13 @@ ImageStatisticsCalculator::GetStatistics( unsigned int timeStep, unsigned int la
   }
 }
 
+const ImageStatisticsCalculator::Statistics & ImageStatisticsCalculator::GetHotspotStatistics( unsigned int timeStep, unsigned int label) const
+{
+  if(m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()) )
+    return m_EmptyStatistics;
+
+  return m_MaskedImageHotspotStatisticsVector[timeStep][label];
+}
 
 const ImageStatisticsCalculator::StatisticsContainer &
 ImageStatisticsCalculator::GetStatisticsVector( unsigned int timeStep ) const
@@ -1036,7 +1043,6 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       statistics.Sigma = labelStatisticsFilter->GetSigma( *it );
       statistics.RMS = sqrt( statistics.Mean * statistics.Mean
         + statistics.Sigma * statistics.Sigma );
-      //statistics.HotspotMean = 35.0; //Test value
 
       // restrict image to mask area for min/max index calculation
       typedef itk::MaskImageFilter< ImageType, MaskImageType, ImageType > MaskImageFilterType;
@@ -1084,8 +1090,12 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
           }
         }
 // FIX END
-      // ComputeHotspotStatistics()
-      // statistics.HotspotMean = CalculateMinMaxIndex< TPixel, VImageDimension >(adaptedImage, adaptedMaskImage.GetPointer());
+      Statistics hotspotStatistics = CalculateMinMaxIndex<TPixel, VImageDimension >(adaptedImage.GetPointer(), adaptedMaskImage.GetPointer());
+      statistics.HotspotMean = hotspotStatistics.HotspotMean;
+      statistics.HotspotMax = hotspotStatistics.HotspotMax;
+      statistics.HotspotMin = hotspotStatistics.HotspotMin;
+      statistics.HotspotMaxIndex = hotspotStatistics.HotspotMaxIndex;
+      statistics.HotspotMinIndex = hotspotStatistics.HotspotMinIndex;
       statisticsContainer->push_back( statistics );
     }
   }
@@ -1097,52 +1107,70 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 }
 
 template < typename TPixel, unsigned int VImageDimension>
-void ImageStatisticsCalculator::CalculateMinMaxIndex(
+ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateMinMaxIndex(
   const itk::Image<TPixel, VImageDimension> *inputImage,
   itk::Image<unsigned short, VImageDimension> *maskImage)
 {
+  // TODO: check if inputImage and maskImage have same dimensions
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
 
-  typedef itk::ImageRegionConstIterator<ImageType> InputImageIteratorType;
   typedef itk::ImageRegionConstIterator<MaskImageType> MaskImageIteratorType;
   typedef itk::ImageRegionConstIteratorWithIndex<ImageType> InputImageIndexIteratorType;
 
-  typename ImageType::RegionType inputRegionOfInterest = inputImage->GetLargestPossibleRegion();
-  InputImageIteratorType imageIt(inputImage, inputRegionOfInterest);
-  MaskImageIteratorType maskIt(maskImage, inputRegionOfInterest);
-  InputImageIndexIteratorType imageIndexIt(inputImage, inputRegionOfInterest);
+  StatisticsContainer statisticsContainer;
 
-  unsigned short maxValue = itk::NumericTraits<typename ImageType::PixelType>::max();
-  unsigned short minValue = itk::NumericTraits<typename ImageType::PixelType>::min();
+  MaskImageIteratorType maskIt(maskImage, maskImage->GetLargestPossibleRegion());
+  InputImageIndexIteratorType imageIndexIt(inputImage, inputImage->GetLargestPossibleRegion());
 
-  ImageType::IndexType maxIndex;
+  float maxValue = 1;
+  float minValue = 10000;
+
+  ImageType::IndexType maxIndex; // TODO: initialize
   ImageType::IndexType minIndex;
 
-  //Calculate Min and Max
-  for(imageIt.GoToBegin(), maskIt.GoToBegin(), imageIndexIt.GoToBegin(); !imageIt.IsAtEnd() && !maskIt.IsAtEnd(); imageIt++, maskIt++, imageIndexIt++)
+  double sumPixelValue = 0;
+  unsigned int countPixel = 0;
+
+  for(maskIt.GoToBegin(), imageIndexIt.GoToBegin();
+      !maskIt.IsAtEnd() && !imageIndexIt.IsAtEnd();
+      ++maskIt, ++imageIndexIt)
   {
-    if(maskIt.Get() > itk::NumericTraits<typename MaskImageType::PixelType>::Zero)
+    if(maskIt.Get() > itk::NumericTraits<typename MaskImageType::PixelType>::Zero) // TODO: was ist der Unterschied zwischen itk::NumericTraits<typename MaskImageType::PixelType>::Zero und "0"
     {
-      unsigned short tempMax = vnl_math_max((unsigned int)imageIt.Get(),(unsigned int)maxValue);
-      unsigned short tempMin = vnl_math_min((unsigned int)imageIt.Get(),(unsigned int)minValue);
+      //Calculate coefficients for Mean-Value
+      sumPixelValue = sumPixelValue + imageIndexIt.Get();
+      countPixel++;
 
-      minValue = tempMin;
-      maxValue = tempMax;
-    }
+      //Calculate Min and Max and corresponding Index-Values
+      if(imageIndexIt.Get() > maxValue)
+      {
+       maxIndex = imageIndexIt.GetIndex();
+       maxValue = imageIndexIt.Get();
+      }
 
-    // TODO: test if value is correct
-    if(maxValue == tempMax)
-    {
-      maxIndex = imageIndexIt.GetIndex();
-    }
-
-    if(minValue == tempMin)
-    {
-      minIndex = imageIndexIt.GetIndex();
+      if(imageIndexIt.Get() < minValue)
+      {
+       minIndex = imageIndexIt.GetIndex();
+       minValue = imageIndexIt.Get();
+      }
     }
   }
 
+  Statistics stats;
+  stats.HotspotMinIndex.set_size(inputImage->GetImageDimension());
+  stats.HotspotMaxIndex.set_size(inputImage->GetImageDimension());
+
+  for (int i = 0; i<stats.HotspotMinIndex.size(); i++)
+  {
+    stats.HotspotMaxIndex[i] = maxIndex[i];
+    stats.HotspotMinIndex[i] = minIndex[i];
+  }
+
+  stats.HotspotMean = sumPixelValue / countPixel;
+  stats.HotspotMax = maxValue;
+  stats.HotspotMin = minValue;
+  return stats;
 }
 template < typename TPixel, unsigned int VImageDimension>
 void ImageStatisticsCalculator::CalculateHotspotStatistics(
@@ -1170,10 +1198,10 @@ void ImageStatisticsCalculator::CalculateHotspotStatistics(
   start[1] = 0;
   start[2] = 0;
 
-  SizeType size;
-  size[0] = spacing[0] * RadiusInMM * 2;
-  size[1] = spacing[1] * RadiusInMM * 2;
-  size[2] = spacing[2] * RadiusInMM * 2;
+  SizeType size; //TODO: ob 1 rauskommt, float statt int
+  size[0] = spacing[0] * RadiusInMM * 2.0;
+  size[1] = spacing[1] * RadiusInMM * 2.0;
+  size[2] = spacing[2] * RadiusInMM * 2.0;
 
   PointType pixelCoordinate;
   pixelCoordinate[0] = 0.0;
@@ -1201,6 +1229,27 @@ void ImageStatisticsCalculator::CalculateHotspotStatistics(
   IndexType pixelIndex;
 
   int countSubPixel = 0;
+
+  /*
+  for (all pixels in convolution-kernel)
+    for (all sub-pixels in pixel)
+      if (distance (sub-pixel-center - convolution-kernel-pixel-center) < radius)
+        count sub-pixel as part of mask
+    value of convolution-kernel at position of convolution-kernel-pixel = 1 / sub-pixel-count(in-radius)
+
+    for (all sub-pixels in pixel):
+
+    subpixel-dimension-x = x-spacing / 2;
+    subpixel-dimension-y =
+    subpixel-dimension-y =
+    for ( x = pixel-center - subpixel-dimension-x/2;
+          x <= pixel-center + subpixel-dimension-x/2;
+          x += subpixel-dimension-x )
+      for (y = ...)
+        for (z = ...)
+          if ( (x,y,z) - (center) < radius ) .. count sub-pixel
+
+  */
 
   for(imageIt.GoToBegin(); !imageIt.IsAtEnd(); imageIt++)
   {
@@ -1244,6 +1293,7 @@ void ImageStatisticsCalculator::CalculateHotspotStatistics(
     if(distanceSubPixelFromOrigin <= RadiusInMM)
       countSubPixel++;
 
+    //Divide counted Subpixels by 4 and assign this value the pixel
     int pixelValue = countSubPixel/4;
 
     bool isInside = image->TransformPhysicalPointToIndex(pixelCoordinate, pixelIndex)
@@ -1263,13 +1313,10 @@ void ImageStatisticsCalculator::CalculateHotspotStatistics(
   convolutionFilter->SetInput(inputImage);
   convolutionFilter->SetKernelImage(ConvolutionMask);
 
-  ImageType::Pointer PeakImage = ImageType::New();
+  //Create Outputimage (PeakImage)
+  convolutionFilter->UpdateLargestPossibleRegion();
 
-  PeakImage->SetRegions(region);
-  PeakImage->SetSpacing(spacing);
-  PeakImage->Allocate();
-
-  PeakImage = convolutionFilter->GetOutput();
+  ImageType::Pointer PeakImage = convolutionFilter->GetOutput();
 
   //Calculate Statistics from PeakImage
   //CalculateMinMaxIndex(PeakImage.GetPointer(), maskImage);

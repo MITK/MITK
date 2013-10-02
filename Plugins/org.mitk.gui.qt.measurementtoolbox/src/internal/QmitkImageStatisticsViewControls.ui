@@ -202,6 +202,11 @@
         </row>
         <row>
          <property name="text">
+          <string>Hotspot Max</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
           <string>Hotspot Min</string>
          </property>
         </row>

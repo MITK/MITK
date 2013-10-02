@@ -88,7 +88,8 @@ public:
     double HotspotVariance;
     vnl_vector< int > MinIndex;
     vnl_vector< int > MaxIndex;
-    vnl_vector< int > HotspotCenterIndex;
+    vnl_vector<int>  HotspotMaxIndex;
+    vnl_vector<int>  HotspotMinIndex;
 
     void Reset()
     {
@@ -101,9 +102,9 @@ public:
       Variance = 0.0;
       Sigma = 0.0;
       RMS = 0.0;
-      HotspotMin = 0.0; // Just Mean and Variance required, remove Min and Max?
+      HotspotMin = 0.0;
       HotspotMax = 0.0;
-      HotspotMean = 31.0;
+      HotspotMean = 0.0;
       HotspotVariance = 0.0;
     }
   };
@@ -182,6 +183,12 @@ public:
    */
   const Statistics &GetStatistics( unsigned int timeStep = 0, unsigned int label = 0 ) const;
 
+  /** \brief Retrieve statistics depending on the current masking mode.
+   * TODO: Kommentare anpassen!
+   * \param label The label for which to retrieve the statistics in multi-label situations (ascending order).
+   */
+  const Statistics &GetHotspotStatistics( unsigned int timeStep = 0, unsigned int label = 0 ) const;
+
   /** \brief Retrieve statistics depending on the current masking mode (for all image labels). */
   const StatisticsContainer &GetStatisticsVector( unsigned int timeStep = 0 ) const;
 
@@ -243,7 +250,7 @@ protected:
     itk::Image< unsigned short, VImageDimension > *maskImage );
 
   template < typename TPixel, unsigned int VImageDimension>
-  void CalculateMinMaxIndex(
+  Statistics CalculateMinMaxIndex(
     const itk::Image<TPixel, VImageDimension> *inputImage,
     itk::Image<unsigned short, VImageDimension> *maskImage);
 
@@ -319,6 +326,7 @@ protected:
   StatisticsVector m_ImageStatisticsVector;
   StatisticsVector m_MaskedImageStatisticsVector;
   StatisticsVector m_PlanarFigureStatisticsVector;
+  StatisticsVector m_MaskedImageHotspotStatisticsVector;
 
   Statistics m_EmptyStatistics;
   StatisticsContainer m_EmptyStatisticsContainer;

@@ -22,7 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionConst.h"
 #include "mitkPlanePositionManager.h"
 #include "mitkTestingMacros.h"
-#include "mitkGetModuleContext.h"
+
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
+#include "usServiceReference.h"
 
 #include <vnl/vnl_quaternion.h>
 #include <vnl/vnl_quaternion.txx>
@@ -450,8 +453,9 @@ int testRestorePlanePostionOperation ()
     slicedgeometry2->ExecuteOperation(op);
     sliceCtrl2->Update();
 
-    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
-    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+    us::ServiceReference<mitk::PlanePositionManagerService> serviceRef =
+        us::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
+    mitk::PlanePositionManagerService* service = us::GetModuleContext()->GetService(serviceRef);
     service->AddNewPlanePosition(slicedgeometry2->GetGeometry2D(0), 178);
     sliceCtrl1->ExecuteOperation(service->GetPlanePosition(0));
     sliceCtrl1->Update();

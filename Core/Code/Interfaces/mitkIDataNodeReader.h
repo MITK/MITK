@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKIDATANODEREADER_H
 
 #include <mitkDataNode.h>
-#include <mitkServiceInterface.h>
+#include <usServiceInterface.h>
 
 namespace mitk {
 

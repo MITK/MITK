@@ -25,9 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include <mitkGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, FastMarchingTool, "FastMarching2D tool");
@@ -86,17 +87,17 @@ const char** mitk::FastMarchingTool::GetXPM() const
   return NULL;//mitkFastMarchingTool_xpm;
 }
 
-mitk::ModuleResource mitk::FastMarchingTool::GetIconResource() const
+us::ModuleResource mitk::FastMarchingTool::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("FastMarching_48x48.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("FastMarching_48x48.png");
   return resource;
 }
 
-mitk::ModuleResource mitk::FastMarchingTool::GetCursorIconResource() const
+us::ModuleResource mitk::FastMarchingTool::GetCursorIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("FastMarching_Cursor_32x32.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("FastMarching_Cursor_32x32.png");
   return resource;
 }
 

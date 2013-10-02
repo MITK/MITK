@@ -27,11 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 
-// MicroServices
-#include "mitkGetModuleContext.h"
-#include "mitkModule.h"
-#include "mitkModuleRegistry.h"
-
 
 //how precise must the user pick the point
 //default value

@@ -35,10 +35,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPadImageFilter.h"
 
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include "mitkGetModuleContext.h"
-#include "mitkModuleContext.h"
+#include "usModule.h"
+#include "usModuleResource.h"
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, BinaryThresholdULTool, "ThresholdingUL tool");
@@ -69,10 +69,10 @@ const char** mitk::BinaryThresholdULTool::GetXPM() const
   return NULL;
 }
 
-mitk::ModuleResource mitk::BinaryThresholdULTool::GetIconResource() const
+us::ModuleResource mitk::BinaryThresholdULTool::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("TwoThresholds_48x48.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("TwoThresholds_48x48.png");
   return resource;
 }
 

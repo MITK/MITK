@@ -16,9 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkIShaderRepository.h"
-#include "mitkGetModuleContext.h"
-#include "mitkModuleContext.h"
-#include "mitkServiceReference.h"
+
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
+#include "usServiceReference.h"
 
 #include "mitkTestingMacros.h"
 
@@ -29,11 +30,11 @@ int mitkShaderRepositoryTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("ShaderRepository")
 
-  mitk::ModuleContext* context = mitk::GetModuleContext();
-  mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::IShaderRepository>();
+  us::ModuleContext* context = us::GetModuleContext();
+  us::ServiceReference<mitk::IShaderRepository> serviceRef = context->GetServiceReference<mitk::IShaderRepository>();
   MITK_TEST_CONDITION_REQUIRED(serviceRef, "IShaderRepository service ref")
 
-  mitk::IShaderRepository* shaderRepo = context->GetService<mitk::IShaderRepository>(serviceRef);
+  mitk::IShaderRepository* shaderRepo = context->GetService(serviceRef);
   MITK_TEST_CONDITION_REQUIRED(shaderRepo, "Check non-empty IShaderRepositry")
 
   mitk::IShaderRepository::Shader::Pointer shader = shaderRepo->GetShader("mitkShaderLighting");

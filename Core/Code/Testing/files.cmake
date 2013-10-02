@@ -136,12 +136,9 @@ set(MODULE_RESOURCE_FILES
 
 # Create an artificial module initializing class for
 # the usServiceListenerTest.cpp
-usFunctionGenerateModuleInit(testdriver_init_file
-                             NAME ${MODULE_NAME}TestDriver
-                             DEPENDS "Mitk"
-                             VERSION "0.1.0"
-                             EXECUTABLE
-                            )
+usFunctionGenerateExecutableInit(testdriver_init_file
+                                 IDENTIFIER ${MODULE_NAME}TestDriver
+                                )
 
 # Embed the resources
 set(testdriver_resources )

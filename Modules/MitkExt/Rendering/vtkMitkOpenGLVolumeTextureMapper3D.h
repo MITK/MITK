@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __vtkMitkOpenGLVolumeTextureMapper3D_h
 
 #include "vtkMitkVolumeTextureMapper3D.h"
+#include "mitkBaseRenderer.h"
 #include "MitkExtExports.h"
 
 #ifndef VTK_IMPLEMENT_MESA_CXX
@@ -74,7 +75,14 @@ public:
   // Release any graphics resources that are being consumed by this texture.
   // The parameter window could be used to determine which graphic
   // resources to release.
-  void ReleaseGraphicsResources(vtkWindow *);
+  // deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
+  DEPRECATED(void ReleaseGraphicsResources(vtkWindow *));
+
+   // Description:
+  // Release any graphics resources that are being consumed by this texture.
+  // The parameter renderer could be used to determine which graphic
+  // resources to release.
+  void ReleaseGraphicsResources(mitk::BaseRenderer * renderer);
 
 protected:
   vtkMitkOpenGLVolumeTextureMapper3D();

@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAffineDataInteractor3D.h"
 
-
 #include "mitkDispatcher.h"
 #include "mitkInteractionConst.h" // TODO: refactor file
 #include "mitkInteractionPositionEvent.h"
@@ -51,8 +50,12 @@ mitk::AffineDataInteractor3D::~AffineDataInteractor3D()
 
 void mitk::AffineDataInteractor3D::ConnectActionsAndFunctions()
 {
+  // **Conditions** that can be used in the state machine,
+  // to ensure that certain conditions are met, before
+  // actually executing an action
   CONNECT_CONDITION("isOverObject", CheckOverObject);
 
+  // **Function** in the statmachine patterns also referred to as **Actions**
   CONNECT_FUNCTION("selectObject",SelectObject);
   CONNECT_FUNCTION("deselectObject",DeselectObject);
   CONNECT_FUNCTION("initTranslate",InitTranslate);
@@ -61,34 +64,8 @@ void mitk::AffineDataInteractor3D::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("rotateObject",RotateObject);
 }
 
-/*
-* Check whether the DataNode contains a pointset, if not create one and add it.
-*/
 void mitk::AffineDataInteractor3D::DataNodeChanged()
 {
-  //if (GetDataNode().IsNotNull())
-  //{
-  //  // find proper place for this command!
-  //  // maybe when DN is created ?
-  //  GetDataNode()->SetBoolProperty("show contour", true);
-  //  PointSet* points = dynamic_cast<PointSet*>(GetDataNode()->GetData());
-  //  if (points == NULL)
-  //  {
-  //    m_PointSet = PointSet::New();
-  //    GetDataNode()->SetData(m_PointSet);
-  //  }
-  //  else
-  //  {
-  //    m_PointSet = points;
-  //  }
-  //  // load config file parameter: maximal number of points
-  //  mitk::PropertyList::Pointer properties = GetAttributes();
-  //  std::string strNumber;
-  //  if (properties->GetStringProperty("MaxPoints", strNumber))
-  //  {
-  //    m_MaxNumberOfPoints = atoi(strNumber.c_str());
-  //  }
-  //}
 }
 
 bool mitk::AffineDataInteractor3D::CheckOverObject(const InteractionEvent* interactionEvent)
@@ -147,11 +124,6 @@ bool mitk::AffineDataInteractor3D::DeselectObject(StateMachineAction*, Interacti
 
 bool mitk::AffineDataInteractor3D::InitTranslate(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  ////Is only a copy of the old AffineInteractor3D. Not sure if is still needed.
-  //// Disable VTK interactor until MITK interaction has been completed
-  //    if ( renderWindowInteractor != NULL )
-  //      renderWindowInteractor->Disable();
-
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
     return false;
@@ -176,11 +148,6 @@ bool mitk::AffineDataInteractor3D::InitTranslate(StateMachineAction*, Interactio
 
 bool mitk::AffineDataInteractor3D::InitRotate(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  ////Is only a copy of the old AffineInteractor3D. Not sure if is still needed.
-  //// Disable VTK interactor until MITK interaction has been completed
-  //    if ( renderWindowInteractor != NULL )
-  //      renderWindowInteractor->Disable();
-
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
     return false;
@@ -199,7 +166,6 @@ bool mitk::AffineDataInteractor3D::InitRotate(StateMachineAction*, InteractionEv
   // Make deep copy of current Geometry3D of the plane
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // make sure that the Geometry is up-to-date
   m_OriginalGeometry = static_cast< Geometry3D * >(this->GetDataNode()->GetData()->GetGeometry( timeStep )->Clone().GetPointer() );
-
   return true;
 }
 
@@ -298,7 +264,6 @@ bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, Interactio
     interactionMove[0] = m_CurrentPickedPoint[0] - m_InitialPickedPoint[0];
     interactionMove[1] = m_CurrentPickedPoint[1] - m_InitialPickedPoint[1];
     interactionMove[2] = m_CurrentPickedPoint[2] - m_InitialPickedPoint[2];
-
 
     if (interactionMove[0]==0 && interactionMove[1]==0  && interactionMove[2]==0)
       return true;

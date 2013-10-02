@@ -50,12 +50,12 @@ bool mitk::ThinPlateSplineCurvedGeometry::IsValid() const
   return m_TargetLandmarks.IsNotNull() && (m_TargetLandmarks->Size() >= 3) && m_LandmarkProjector.IsNotNull();
 }
 
-void mitk::ThinPlateSplineCurvedGeometry::SetSigma(float sigma)
+void mitk::ThinPlateSplineCurvedGeometry::SetSigma(double sigma)
 {
   m_ThinPlateSplineTransform->SetSigma(sigma);
 }
 
-float mitk::ThinPlateSplineCurvedGeometry::GetSigma() const
+double mitk::ThinPlateSplineCurvedGeometry::GetSigma() const
 {
   return m_ThinPlateSplineTransform->GetSigma();
 

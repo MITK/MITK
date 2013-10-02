@@ -92,7 +92,7 @@ float mitk::PointSetInteractor::CanHandleEvent(StateEvent const* stateEvent) con
       //if we have one point or more, then check if the have been picked
       if ( (pointSet->GetSize( timeStep ) > 0)
         && (pointSet->SearchPoint(
-        disPosEvent->GetWorldPosition(), m_Precision, timeStep) > -1) )
+        disPosEvent->GetWorldPosition(), (ScalarType) m_Precision, timeStep) > -1) )
       {returnValue = 1.0;}
     }
   }

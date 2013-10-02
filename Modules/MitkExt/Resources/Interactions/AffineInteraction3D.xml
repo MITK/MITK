@@ -46,4 +46,17 @@
             <action name="selectObject"/>
         </transition>
      </state>
+     <state name="deform" >
+         <transition event_class="InteractionPositionEvent" event_variant="ObjectDeformation" target="deform">
+             <action name="deformObject"/>
+         </transition>
+         <transition event_class="InteractionPositionEvent" event_variant="EndDeformation" target="start">
+             <condition name="isOverObject" inverted="true"/>
+             <action name="deselectObject"/>
+         </transition>
+         <transition event_class="InteractionPositionEvent" event_variant="EndDeformation" target="select">
+             <condition name="isOverObject"/>
+             <action name="selectObject"/>
+         </transition>
+     </state>
 </statemachine>

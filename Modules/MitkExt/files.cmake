@@ -106,6 +106,7 @@ set(CPP_FILES
   Interactions/mitkPointSelectorInteractor.cpp
   #Interactions/mitkPositionTracker.cpp
   Interactions/mitkSeedsInteractor.cpp
+  Interactions/mitkSurfaceDeformationDataInteractor3D.cpp
   Interactions/mitkSocketClient.cpp
   Interactions/mitkSurfaceDeformationInteractor3D.cpp
   Interactions/mitkSurfaceInteractor.cpp
@@ -143,5 +144,6 @@ set(RESOURCE_FILES
 Interactions/AffineInteraction3D.xml
 Interactions/AffineTranslationConfig.xml
 Interactions/AffineRotationConfig.xml
+Interactions/AffineDeformationConfig.xml
 )
 

@@ -30,7 +30,12 @@ namespace mitk
 /**
  * Encapsulates the enumeration for rendering modes. Valid values are:
  * \li LEVELWINDOW_COLOR: Level window and color will be applied to the image.
+ * Our default level window setup for a test image looks like this:
+ * \image html ExampleLevelWindowColor.png
+ * If this property is used inside the mitkWorkbench, the level window slider will change
+ * the rendering of the image. I.e. will change the values of the internal lookuptable.
  * \li LOOKUPTABLE_LEVELWINDOW_COLOR: A lookup table, level window and color will be applied to the image.
+ *
  * \li COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR: A colortransferfunction, level window and color will be applied to the image.
  * \li LOOKUPTABLE_COLOR: A lookup table and color will be applied to the image.
  * \li COLORTRANSFERFUNCTION_COLOR: A colortransferfunction and color will be applied to the image.

@@ -1181,7 +1181,7 @@ void ImageStatisticsCalculator::CalculateHotspotStatistics(
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
 
-  typedef itk::ImageRegionIterator<ImageType> InputImageIteratorType;
+  typedef itk::ImageConstIteratorWithIndex<ImageType> IteratorType;
 
   typedef typename ImageType::SpacingType SpacingType;
   typedef typename ImageType::SizeType SizeType;
@@ -1198,10 +1198,10 @@ void ImageStatisticsCalculator::CalculateHotspotStatistics(
   start[1] = 0;
   start[2] = 0;
 
-  SizeType size; //TODO: ob 1 rauskommt, float statt int
-  size[0] = spacing[0] * RadiusInMM * 2.0;
-  size[1] = spacing[1] * RadiusInMM * 2.0;
-  size[2] = spacing[2] * RadiusInMM * 2.0;
+  SizeType size;
+  size[0] = 2.0 * RadiusInMM / spacing[0];
+  size[1] = 2.0 * RadiusInMM / spacing[1];
+  size[2] = 2.0 * RadiusInMM / spacing[2];
 
   PointType pixelCoordinate;
   pixelCoordinate[0] = 0.0;
@@ -1215,88 +1215,50 @@ void ImageStatisticsCalculator::CalculateHotspotStatistics(
   Sizetype spacing = inputImage->GetSpacing();
 
   ConvolutionMask->SetRegions(region);
-  ConvolutionMask->SetOrigin(pixelCoordinate);
+  ConvolutionMask->SetrOrigin(pixelCoordinate);
   ConvolutionMask->SetSpacing(spacing);
   ConvolutionMask->Allocate();
 
-  const double ConvolutionMaskOriginX = size[0]/2;
-  const double ConvolutionMaskOriginY = size[1]/2;
-  const double ConvolutionMaskOriginZ = size[2]/2;
+  PointType convolutionMaskCenterCoordinate;
+  convolutionMaskCenterCoordinate[0] = size[0]/2.00;
+  convolutionMaskCenterCoordinate[1] = size[1]/2.00;
+  convolutionMaskCenterCoordinate[2] = size[2]/2.00;
 
-  typename ImageType::RegionType inputRegionOfInterest = inputImage->GetLargestPossibleRegion();
-  InputImageIteratorType imageIt(inputImage, inputRegionOfInterest);
-
-  IndexType pixelIndex;
+  float subPixelDimensionX = spacing[0]/2;
+  float subPixelDimensionY = spacing[1]/2;
+  float subPixelDimensionZ = spacing[2]/2;
 
   int countSubPixel = 0;
 
-  /*
-  for (all pixels in convolution-kernel)
-    for (all sub-pixels in pixel)
-      if (distance (sub-pixel-center - convolution-kernel-pixel-center) < radius)
-        count sub-pixel as part of mask
-    value of convolution-kernel at position of convolution-kernel-pixel = 1 / sub-pixel-count(in-radius)
+  IteratorType maskIt(convolutionMask,convolutionMask->GetLargestPossibleRegion());
 
-    for (all sub-pixels in pixel):
-
-    subpixel-dimension-x = x-spacing / 2;
-    subpixel-dimension-y =
-    subpixel-dimension-y =
-    for ( x = pixel-center - subpixel-dimension-x/2;
-          x <= pixel-center + subpixel-dimension-x/2;
-          x += subpixel-dimension-x )
-      for (y = ...)
-        for (z = ...)
-          if ( (x,y,z) - (center) < radius ) .. count sub-pixel
-
-  */
-
-  for(imageIt.GoToBegin(); !imageIt.IsAtEnd(); imageIt++)
+  for(maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)
   {
-    //Calculate first Subpixel (left upper corner of Subpixel)
-    pixelCoordinate[0] -= spacing[0]/4;
-    pixelCoordinate[1] += spacing[1]/4;
+    for(float x = pixelCoordinate[0] - subPixelDimensionX / 2;
+        x <= pixelCoordinate[0] + subPixelDimensionX / 2;
+        x += subPixelDimensionX)
+    {
+      for(float y = pixelCoordinate[1] - subPixelDimensionY /2;
+          y <= pixelCoordinate[1] + subPixelDimensionY / 2;
+          y += subPixelDimensionY)
+      {
+        for(float z = pixelCoordinate[2] - subPixelDimensionZ / 2;
+            z <= pixelCoordinate[2] - subPixelDimensionZ / 2;
+            z += subPixelDimensionZ)
+        {
+          PointType subPixelCenterCoordinate;
+          subPixelCenterCoordinate[0] = x;
+          subPixelCenterCoordinate[1] = y;
+          subPixelCenterCoordinate[2] = z;
 
-    //Compute distance between Subpixel and origin of ConvolutionMask
-    double distanceSubPixelX = pixelCoordinate[0] - ConvolutionMaskOriginX;
-    double distanceSubPixelY = pixelCoordinate[1] - ConvolutionMaskOriginY;
-    double distanceSubPixelFromOrigin = sqrt(distanceSubPixelX * distanceSubPixelX + distanceSubPixelY * distanceSubPixelY);
+          if(subPixelCoordinate.EuclideanDistanceTo(convolutionMaskCenterCoordinate) <= RadiusInMM)
+            countSubPixel++;
+        }
+      }
+    }
+    int pixelValue = countSubPixel/8;
 
-    //Check if Subpixel is in the sphere and increase countSubPixel by 1
-    if(distanceSubPixelFromOrigin <= RadiusInMM)
-      countSubPixel++;
-
-    //Calculate second Subpixel (right upper corner of Subpixel)
-    pixelCoordinate[0] += spacing[0]/2;
-    distanceSubPixelX = pixelCoordinate[0] - ConvolutionMaskOriginX;
-    distanceSubPixelY = pixelCoordinate[1] - ConvolutionMaskOriginY;
-    distanceSubPixelFromOrigin = sqrt(distanceSubPixelX * distanceSubPixelX + distanceSubPixelY * distanceSubPixelY);
-
-    if(distanceSubPixelFromOrigin <= RadiusInMM)
-      countSubPixel++;
-
-    //Calculate third Subpixel (right upper corner of Subpixel)
-    pixelCoordinate[1] -= spacing[0]/2;
-    distanceSubPixelX = pixelCoordinate[0] - ConvolutionMaskOriginX;
-    distanceSubPixelY = pixelCoordinate[1] - ConvolutionMaskOriginY;
-    distanceSubPixelFromOrigin = sqrt(distanceSubPixelX * distanceSubPixelX + distanceSubPixelY * distanceSubPixelY);
-
-    if(distanceSubPixelFromOrigin <= RadiusInMM)
-      countSubPixel++;
-
-    //Calculate 4th Subpixel (right upper corner of Subpixel)
-    pixelCoordinate[0] -= spacing[0]/2;
-    distanceSubPixelX = pixelCoordinate[0] - ConvolutionMaskOriginX;
-    distanceSubPixelY = pixelCoordinate[1] - ConvolutionMaskOriginY;
-    distanceSubPixelFromOrigin = sqrt(distanceSubPixelX * distanceSubPixelX + distanceSubPixelY * distanceSubPixelY);
-
-    if(distanceSubPixelFromOrigin <= RadiusInMM)
-      countSubPixel++;
-
-    //Divide counted Subpixels by 4 and assign this value the pixel
-    int pixelValue = countSubPixel/4;
-
-    bool isInside = image->TransformPhysicalPointToIndex(pixelCoordinate, pixelIndex)
+    bool isInside = image->TransformPhysicalPointToIndex(pixelCoordinate, maskIt.GetIndex())
 
     if(isInside)
     {
@@ -1305,22 +1267,6 @@ void ImageStatisticsCalculator::CalculateHotspotStatistics(
 
     countSubPixel = 0;
   }
-
-  //Convolution of InputImage and ConvolutionMask
-  typedef itk::ConvolutionImageFilte<ImageType> FilterType;
-  FilterType::Pointer convolutionFilter = FilterType::New();
-
-  convolutionFilter->SetInput(inputImage);
-  convolutionFilter->SetKernelImage(ConvolutionMask);
-
-  //Create Outputimage (PeakImage)
-  convolutionFilter->UpdateLargestPossibleRegion();
-
-  ImageType::Pointer PeakImage = convolutionFilter->GetOutput();
-
-  //Calculate Statistics from PeakImage
-  //CalculateMinMaxIndex(PeakImage.GetPointer(), maskImage);
-
 }
 
 

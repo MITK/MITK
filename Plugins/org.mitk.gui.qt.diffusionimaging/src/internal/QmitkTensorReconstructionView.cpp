@@ -1121,7 +1121,7 @@ void QmitkTensorReconstructionView::PreviewThreshold(int threshold)
             node = mitk::DataNode::New();
             GetDefaultDataStorage()->Add( node, *itemiter );
             node->SetProperty( "name", mitk::StringProperty::New("ThresholdOverlay"));
-            node->SetBoolProperty("helper object", false);
+            node->SetBoolProperty("helper object", true);
         }
         node->SetData( mitkImage );
         itemiter++;

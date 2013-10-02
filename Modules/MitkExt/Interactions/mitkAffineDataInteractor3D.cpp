@@ -264,6 +264,9 @@ bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, Interactio
   if(positionEvent == NULL)
     return false;
 
+  m_CurrentPickedPoint = positionEvent->GetPositionInWorld();
+  m_CurrentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+
   vtkCamera* camera = NULL;
   vtkRenderer *currentVtkRenderer = NULL;
 
@@ -296,6 +299,9 @@ bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, Interactio
     interactionMove[1] = m_CurrentPickedPoint[1] - m_InitialPickedPoint[1];
     interactionMove[2] = m_CurrentPickedPoint[2] - m_InitialPickedPoint[2];
 
+
+    if (interactionMove[0]==0 && interactionMove[1]==0  && interactionMove[2]==0)
+      return true;
 
     Vector3D rotationAxis = itk::CrossProduct( viewPlaneNormal, interactionMove );
     rotationAxis.Normalize();

@@ -20,13 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingModeProperty.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkLookupTable.h>
-#include <mitkImageStatisticsHolder.h>
-
 #include <mitkIOUtil.h>
+#include <mitkNodePredicateDataType.h>
 
 //VTK
 #include <vtkLookupTable.h>
-#include <mitkNodePredicateDataType.h>
 
 int mitkImageVtkMapper2DLookupTableTest(int argc, char* argv[])
 {

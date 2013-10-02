@@ -274,6 +274,9 @@ void mitk::ClaronTrackingDevice::TrackTools()
           //write tip quaternion into tool
           mitk::Quaternion orientation(quat[1], quat[2], quat[3], quat[0]);
           currentTool->SetOrientation(orientation);
+
+          //TODO: read the timestamp data from the tracking device interface
+          currentTool->SetIGTTimeStamp(mitk::IGTTimeStamp::GetInstance()->GetElapsed());
         }
         else
         {

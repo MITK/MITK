@@ -90,7 +90,10 @@ void mitk::TrackingDeviceSource::GenerateData()
     nd->SetOrientation(o);
     nd->SetOrientationAccuracy(t->GetTrackingError());
     nd->SetPositionAccuracy(t->GetTrackingError());
-    nd->SetIGTTimeStamp( mitk::IGTTimeStamp::GetInstance()->GetElapsed() );
+    nd->SetIGTTimeStamp(t->GetIGTTimeStamp());
+
+    //for backward compatibility: check if the timestamp was set, if not create a default timestamp
+    if (nd->GetIGTTimeStamp()==0) nd->SetIGTTimeStamp(mitk::IGTTimeStamp::GetInstance()->GetElapsed());
   }
 }
 

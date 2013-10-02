@@ -21,7 +21,7 @@ typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
 mitk::TrackingTool::TrackingTool()
-: itk::Object(), m_ToolName(""), m_ErrorMessage("")
+: itk::Object(), m_ToolName(""), m_ErrorMessage(""), m_IGTTimeStamp(0)
 {
   m_MyMutex = itk::FastMutexLock::New();
 }

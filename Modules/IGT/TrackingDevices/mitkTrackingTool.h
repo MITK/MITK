@@ -48,11 +48,15 @@ namespace mitk
     virtual float GetTrackingError() const = 0;      ///< returns one value that corresponds to the overall tracking error.
     virtual const char* GetToolName() const;         ///< every tool has a name that can be used to identify it.
     virtual const char* GetErrorMessage() const;     ///< if the data is not valid, ErrorMessage should contain a string explaining why it is invalid (the Set-method should be implemented in subclasses, it should not be accessible by the user)
+    itkSetMacro(IGTTimeStamp, double);               ///< Sets the IGT timestamp of the tracking tool object
+    itkGetConstMacro(IGTTimeStamp, double);          ///< Gets the IGT timestamp of the tracking tool object. Returns 0 if the timestamp was not set.
+
   protected:
     TrackingTool();
     virtual ~TrackingTool();
     std::string m_ToolName;                          ///< every tool has a name that can be used to identify it.
     std::string m_ErrorMessage;                      ///< if a tool is invalid, this member should contain a human readable explanation of why it is invalid
+    double m_IGTTimeStamp;                           ///< contains the time at which the tracking data was recorded
     itk::FastMutexLock::Pointer m_MyMutex;           ///< mutex to control concurrent access to the tool
   };
 } // namespace mitk

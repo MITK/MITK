@@ -36,15 +36,14 @@ int mitkImageVtkMapper2DOpacityTest(int argc, char* argv[])
   //for now this test renders in coronal view direction
   renderingHelper.SetViewDirection(mitk::SliceNavigationController::Frontal);
 
+  //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
+  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
+
   //use this to generate a reference screenshot or save the file:
-  bool generateReferenceScreenshot = false;
-  if(generateReferenceScreenshot)
+  if(false)
   {
     renderingHelper.SaveReferenceScreenShot("/home/kilgus/Pictures/RenderingTestData/output.png");
   }
-
-  //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
-  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
 
   MITK_TEST_END();
 }

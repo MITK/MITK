@@ -45,8 +45,8 @@ int mitkImageVtkMapper2DLookupTableTest(int argc, char* argv[])
   lookupTable->Build();
 
   // Fill in a few known colors, the rest will be generated
-  lookupTable->SetTableValue(0, 0, 0, 0, 1);
-  lookupTable->SetTableValue(255, 0, 0, 1, 1);
+  lookupTable->SetTableValue(0,   1.0, 0.0, 0.0, 1.0); //map from red
+  lookupTable->SetTableValue(255, 0.0, 0.0, 1.0, 1.0); //to blue
 
   mitk::LookupTable::Pointer myLookupTable = mitk::LookupTable::New();
   myLookupTable->SetVtkLookupTable( lookupTable );
@@ -62,7 +62,7 @@ int mitkImageVtkMapper2DLookupTableTest(int argc, char* argv[])
   //use this to generate a reference screenshot or save the file:
   if(false)
   {
-    renderingHelper.SaveReferenceScreenShot("/home/kilgus/Pictures/RenderingTestData/output.png");
+    renderingHelper.SaveReferenceScreenShot("/media/hdd/thomasHdd/Pictures/tmp/output.png");
   }
 
   MITK_TEST_END();

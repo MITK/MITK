@@ -235,6 +235,33 @@ void QmitkTensorReconstructionView::Activated()
 
 void QmitkTensorReconstructionView::Deactivated()
 {
+
+    // Get all current nodes
+
+    mitk::DataStorage::SetOfObjects::ConstPointer objects =  this->GetDefaultDataStorage()->GetAll();
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( objects->begin() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( objects->end() );
+    while ( itemiter != itemiterend ) // for all items
+    {
+        mitk::DataNode::Pointer node = *itemiter;
+        if (node.IsNull())
+            continue;
+
+        // only look at interesting types
+        if(dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData()))
+        {
+            if (this->GetDefaultDataStorage()->GetNamedDerivedNode("ThresholdOverlay", *itemiter))
+            {
+                node = this->GetDefaultDataStorage()->GetNamedDerivedNode("ThresholdOverlay", *itemiter);
+                this->GetDefaultDataStorage()->Remove(node);
+            }
+        }
+        itemiter++;
+    }
+
+
+
+
     QmitkFunctionality::Deactivated();
 }
 
@@ -1094,7 +1121,7 @@ void QmitkTensorReconstructionView::PreviewThreshold(int threshold)
             node = mitk::DataNode::New();
             GetDefaultDataStorage()->Add( node, *itemiter );
             node->SetProperty( "name", mitk::StringProperty::New("ThresholdOverlay"));
-            node->SetBoolProperty("helper object", true);
+            node->SetBoolProperty("helper object", false);
         }
         node->SetData( mitkImage );
         itemiter++;

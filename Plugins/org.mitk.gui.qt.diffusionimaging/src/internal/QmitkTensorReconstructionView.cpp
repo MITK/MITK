@@ -44,7 +44,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVector.h"
 #include "itkB0ImageExtractionImageFilter.h"
 #include "itkTensorReconstructionWithEigenvalueCorrectionFilter.h"
-//#include "itkFreeWaterEliminationFilter.h"
+
+#include "mitkImageCast.h"
+#include "mitkImageAccessByItk.h"
+#include <itkBinaryThresholdImageFilter.h>
+
 
 #include "mitkProperties.h"
 #include "mitkDataNodeObject.h"
@@ -122,6 +126,7 @@ void QmitkTensorReconstructionView::CreateConnections()
         connect( (QObject*)(m_Controls->m_TensorsToQbiButton), SIGNAL(clicked()), this, SLOT(TensorsToQbi()) );
         connect( (QObject*)(m_Controls->m_ResidualButton), SIGNAL(clicked()), this, SLOT(ResidualCalculation()) );
         connect( (QObject*)(m_Controls->m_PerSliceView), SIGNAL(pointSelected(int, int)), this, SLOT(ResidualClicked(int, int)) );
+        connect( (QObject*)(m_Controls->m_TensorReconstructionThreshold), SIGNAL(valueChanged(int)), this, SLOT(PreviewThreshold(int)) );
     }
 }
 
@@ -1042,5 +1047,57 @@ void QmitkTensorReconstructionView::DoTensorsToDWI(mitk::DataStorage::SetOfObjec
         MITK_INFO << ex ;
         QMessageBox::information(0, "DWI estimation failed:", ex.GetDescription());
         return ;
+    }
+}
+
+
+void QmitkTensorReconstructionView::PreviewThreshold(int threshold)
+{
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_DiffusionImages->begin() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_DiffusionImages->end() );
+    while ( itemiter != itemiterend ) // for all items
+    {
+        mitk::DiffusionImage<DiffusionPixelType>* vols =
+                static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
+                    (*itemiter)->GetData());
+
+        // Extract b0 image
+        typedef itk::B0ImageExtractionImageFilter<short, short> FilterType;
+        FilterType::Pointer filterB0 = FilterType::New();
+        filterB0->SetInput(vols->GetVectorImage());
+        filterB0->SetDirections(vols->GetDirections());
+        filterB0->Update();
+
+        mitk::Image::Pointer mitkImage = mitk::Image::New();
+
+        typedef itk::Image<short, 3> ImageType;
+        typedef itk::Image<short, 3> SegmentationType;
+        typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;
+        // apply threshold
+        ThresholdFilterType::Pointer filterThreshold = ThresholdFilterType::New();
+        filterThreshold->SetInput(filterB0->GetOutput());
+        filterThreshold->SetLowerThreshold(threshold);
+        filterThreshold->SetInsideValue(0);
+        filterThreshold->SetOutsideValue(1); // mark cut off values red
+        filterThreshold->Update();
+
+        mitkImage->InitializeByItk( filterThreshold->GetOutput() );
+        mitkImage->SetVolume( filterThreshold->GetOutput()->GetBufferPointer() );
+        mitk::DataNode::Pointer node;
+        if (this->GetDefaultDataStorage()->GetNamedDerivedNode("ThresholdOverlay", *itemiter))
+        {
+            node = this->GetDefaultDataStorage()->GetNamedDerivedNode("ThresholdOverlay", *itemiter);
+        }
+        else
+        {
+            // create a new node, to show thresholded values
+            node = mitk::DataNode::New();
+            GetDefaultDataStorage()->Add( node, *itemiter );
+            node->SetProperty( "name", mitk::StringProperty::New("ThresholdOverlay"));
+            node->SetBoolProperty("helper object", true);
+        }
+        node->SetData( mitkImage );
+        itemiter++;
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 }

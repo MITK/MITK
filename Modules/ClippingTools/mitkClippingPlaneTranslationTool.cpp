@@ -18,12 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseRenderer.h"
 #include "mitkGlobalInteraction.h"
-#include "mitkModule.h"
-#include "mitkModuleContext.h"
-#include "mitkGetModuleContext.h"
-#include "mitkModuleRegistry.h"
+
 #include "mitkRenderingManager.h"
 #include "mitkToolManager.h"
+
+
+// us
+#include "usGetModuleContext.h"
+#include "usModule.h"
+#include "usModuleRegistry.h"
+
 
 namespace mitk
 {
@@ -68,8 +72,8 @@ void mitk::ClippingPlaneTranslationTool::Activated()
     }
 
     m_AffineDataInteractor->SetDataNode(m_ClippingPlaneNode);
-    m_AffineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", ModuleRegistry::GetModule("MitkExt"));
-    m_AffineDataInteractor->SetEventConfig("AffineTranslationConfig.xml", ModuleRegistry::GetModule("MitkExt"));
+    m_AffineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkExt"));
+    m_AffineDataInteractor->SetEventConfig("AffineTranslationConfig.xml", us::ModuleRegistry::GetModule("MitkExt"));
 }
 
 void mitk::ClippingPlaneTranslationTool::Deactivated()

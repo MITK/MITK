@@ -25,6 +25,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTool.h"
 #include "mitkVector.h"
 
+
+namespace us {
+  class Module;
+}
+
+
 namespace mitk
 {
 

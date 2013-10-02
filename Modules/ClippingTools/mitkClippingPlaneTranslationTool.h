@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkDataNode.h"
 #include "mitkTool.h"
-#include "mitkVector.h"
 
 
 namespace us {
@@ -57,7 +56,7 @@ namespace mitk
     virtual void Activated();
     virtual void Deactivated();
 
-    mitk::DataNode::Pointer           m_ClippingPlaneNode;
+    mitk::DataNode::Pointer               m_ClippingPlaneNode;
     mitk::AffineDataInteractor3D::Pointer m_AffineDataInteractor;
 
   };

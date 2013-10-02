@@ -152,7 +152,7 @@ struct SelListenerRigidRegistration : ISelectionListener
     if (part)
     {
       QString partname(part->GetPartName().c_str());
-      if(partname.compare("Datamanager")==0)
+      if(partname.compare("Data Manager")==0)
       {
         // apply selection
         DoSelectionChanged(selection);
@@ -535,12 +535,13 @@ bool QmitkRigidRegistrationView::CheckCalculate()
 void QmitkRigidRegistrationView::AddNewTransformationToUndoList()
 {
   mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
-  m_UndoGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingData->GetGeometry(0)->Clone().GetPointer()));
+  m_UndoGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingData->GetGeometry()->Clone().GetPointer()));
 
-  std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> childGeometries = std::map<mitk::DataNode::Pointer, mitk::Geometry3D*>();
+  GeometryMapType childGeometries = GeometryMapType();
   if(m_MovingMaskNode.IsNotNull())
   {
-    childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(m_MovingMaskNode, m_MovingMaskNode->GetData()->GetGeometry()));
+    childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(m_MovingMaskNode,
+      static_cast<mitk::Geometry3D *>(m_MovingMaskNode->GetData()->GetGeometry()->Clone().GetPointer())));
   }
 
   mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
@@ -550,7 +551,8 @@ void QmitkRigidRegistrationView::AddNewTransformationToUndoList()
     size = children->Size();
     for (unsigned long i = 0; i < size; ++i)
     {
-      childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(children->GetElement(i), children->GetElement(i)->GetData()->GetGeometry()));
+      childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(children->GetElement(i),
+        static_cast<mitk::Geometry3D *>(children->GetElement(i)->GetData()->GetGeometry()->Clone().GetPointer())));
     }
   }
   m_UndoChildGeometryList.push_back(childGeometries);
@@ -582,11 +584,13 @@ void QmitkRigidRegistrationView::UndoTransformation()
       {
         if(i==0)
         {
-          childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(m_MovingMaskNode, m_MovingMaskNode->GetData()->GetGeometry()));
+          childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(m_MovingMaskNode,
+            static_cast<mitk::Geometry3D *>(m_MovingMaskNode->GetData()->GetGeometry()->Clone().GetPointer())));
         }
         else
         {
-          childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(children->GetElement(i), children->GetElement(i)->GetData()->GetGeometry()));
+          childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(children->GetElement(i),
+            static_cast<mitk::Geometry3D *>(children->GetElement(i)->GetData()->GetGeometry()->Clone().GetPointer())));
         }
       }
    // }
@@ -605,8 +609,10 @@ void QmitkRigidRegistrationView::UndoTransformation()
       if(j == 0)    // we have put the geometry for the moving mask at position one
       {
         iter = oldChildGeometries.find(m_MovingMaskNode);
-        m_MovingMaskNode->GetData()->SetGeometry((*iter).second);
-        m_MovingMaskNode->SetMapper(1, NULL);
+        mitk::Geometry3D* geo = static_cast<mitk::Geometry3D*>((*iter).second);
+        //geo->ChangeImageGeometryConsideringOriginOffset(true);
+        m_MovingMaskNode->GetData()->SetGeometry(geo);
+        //m_MovingMaskNode->SetMapper(1, NULL);
         m_MovingMaskNode->GetData()->GetTimeSlicedGeometry()->UpdateInformation();
       }
       else
@@ -618,12 +624,13 @@ void QmitkRigidRegistrationView::UndoTransformation()
 
     //\FIXME when geometry is substituted the matrix referenced by the actor created by the mapper
     //is still pointing to the old one. Workaround: delete mapper
-    m_MovingNode->SetMapper(1, NULL);
-    mitk::RenderingManager::GetInstance()->RequestUpdate(m_MultiWidget->mitkWidget4->GetRenderWindow());
 
-    movingData->GetTimeSlicedGeometry()->UpdateInformation();
-    this->SetRedoEnabled(true);
+    m_MovingNode->SetMapper(1, NULL);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    //mitk::RenderingManager::GetInstance()->RequestUpdate(m_MultiWidget->mitkWidget4->GetRenderWindow());
+
+    //movingData->GetTimeSlicedGeometry()->UpdateInformation();
+    this->SetRedoEnabled(true);
   }
   if(!m_UndoGeometryList.empty())
   {
@@ -658,11 +665,13 @@ void QmitkRigidRegistrationView::RedoTransformation()
       {
         if(i == 0)
         {
-          childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(m_MovingMaskNode, m_MovingMaskNode->GetData()->GetGeometry()));
+          childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(m_MovingMaskNode,
+            static_cast<mitk::Geometry3D *>(m_MovingMaskNode->GetData()->GetGeometry()->Clone().GetPointer())));
         }
         else
         {
-          childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(children->GetElement(i), children->GetElement(i)->GetData()->GetGeometry()));
+          childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(children->GetElement(i),
+            static_cast<mitk::Geometry3D *>(children->GetElement(i)->GetData()->GetGeometry()->Clone().GetPointer())));
         }
      //}
     }
@@ -693,11 +702,11 @@ void QmitkRigidRegistrationView::RedoTransformation()
     //\FIXME when geometry is substituted the matrix referenced by the actor created by the mapper
     //is still pointing to the old one. Workaround: delete mapper
     m_MovingNode->SetMapper(1, NULL);
-    mitk::RenderingManager::GetInstance()->RequestUpdate(m_MultiWidget->mitkWidget4->GetRenderWindow());
-
     movingData->GetTimeSlicedGeometry()->UpdateInformation();
-    this->SetUndoEnabled(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    //mitk::RenderingManager::GetInstance()->RequestUpdate(m_MultiWidget->mitkWidget4->GetRenderWindow());
+
+    this->SetUndoEnabled(true);
   }
   if(!m_RedoGeometryList.empty())
   {
@@ -1451,10 +1460,16 @@ void QmitkRigidRegistrationView::OnUseMaskingChanged( int state )
 
 void QmitkRigidRegistrationView::OnFixedMaskImageChanged( const mitk::DataNode* node )
 {
-  m_FixedMaskNode = const_cast<mitk::DataNode*>(node);
+  if(m_Controls.m_UseMaskingCB->isChecked())
+    m_FixedMaskNode = const_cast<mitk::DataNode*>(node);
+  else
+    m_FixedMaskNode = NULL;
 }
 
 void QmitkRigidRegistrationView::OnMovingMaskImageChanged( const mitk::DataNode* node )
 {
-  m_MovingMaskNode = const_cast<mitk::DataNode*>(node);
+  if(m_Controls.m_UseMaskingCB->isChecked())
+    m_MovingMaskNode = const_cast<mitk::DataNode*>(node);
+  else
+    m_MovingMaskNode = NULL;
 }

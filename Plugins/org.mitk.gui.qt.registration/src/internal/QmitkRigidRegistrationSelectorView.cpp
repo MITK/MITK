@@ -236,7 +236,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     m_MovingGeometry = m_MovingNode->GetData()->GetGeometry();
 
     // container that holds all derived moving data, that needs to be transformed with the transformation found by registration
-    if(m_MovingNode.IsNotNull())
+    if(m_MovingMaskNode.IsNotNull())
     {
       m_ChildNodes.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(m_MovingMaskNode, m_MovingMaskNode->GetData()->GetGeometry()));
       m_ChildNodes2.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(m_MovingMaskNode, m_MovingMaskNode->GetData()->GetGeometry()->Clone()));

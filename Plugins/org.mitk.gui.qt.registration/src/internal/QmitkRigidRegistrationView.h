@@ -294,7 +294,7 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     // A node to store the contour of the fixed image in
     mitk::DataNode::Pointer m_ContourHelperNode;
 
-    typedef std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> GeometryMapType,
+    typedef std::map<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer> GeometryMapType;
     typedef std::list< GeometryMapType > GeometryMapListType;
     typedef std::list<mitk::Geometry3D::Pointer> GeometryListType;
 

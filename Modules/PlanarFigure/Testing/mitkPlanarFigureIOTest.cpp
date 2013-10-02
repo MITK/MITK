@@ -32,6 +32,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itksys/SystemTools.hxx>
 
+static mitk::PlanarFigure::Pointer Clone(mitk::PlanarFigure::Pointer original)
+{
+  return original->Clone();
+}
 
 /** \brief Helper class for testing PlanarFigure reader and writer classes. */
 class PlanarFigureIOTestClass
@@ -267,6 +271,13 @@ public:
     return copiedPlanarFigures;
   }
 
+  static PlanarFigureList CreateClonedPlanarFigures(PlanarFigureList original)
+  {
+    PlanarFigureList clonedPlanarFigures;
+    clonedPlanarFigures.resize(original.size());
+    std::transform(original.begin(), original.end(), clonedPlanarFigures.begin(), Clone);
+    return clonedPlanarFigures;
+  }
 
   static void VerifyPlanarFigures( PlanarFigureList &planarFigures1, PlanarFigureList &planarFigures2 )
   {
@@ -532,11 +543,17 @@ int mitkPlanarFigureIOTest(int /* argc */, char* /*argv*/[])
   PlanarFigureIOTestClass::PlanarFigureList originalPlanarFigures =
       PlanarFigureIOTestClass::CreatePlanarFigures();
 
-  // Create a number of "deep-copied" planar figures to test the DeepCopy function
+  // Create a number of "deep-copied" planar figures to test the DeepCopy function (deprecated)
   PlanarFigureIOTestClass::PlanarFigureList copiedPlanarFigures =
       PlanarFigureIOTestClass::CreateDeepCopiedPlanarFigures(originalPlanarFigures);
 
   PlanarFigureIOTestClass::VerifyPlanarFigures(originalPlanarFigures, copiedPlanarFigures );
+
+  // Create a number of cloned planar figures to test the Clone function
+  PlanarFigureIOTestClass::PlanarFigureList clonedPlanarFigures =
+      PlanarFigureIOTestClass::CreateClonedPlanarFigures(originalPlanarFigures);
+
+  PlanarFigureIOTestClass::VerifyPlanarFigures(originalPlanarFigures, clonedPlanarFigures );
 
   // Write PlanarFigure objects into temp file
   // tmpname

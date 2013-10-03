@@ -306,6 +306,7 @@ bool mitk::QmitkIOUtil::SaveToFileWriter( mitk::FileWriterWithInformation::Point
         qProposedFileName.append(fileWriter->GetDefaultFilename());
     }
     qProposedFileName.append(fileWriter->GetDefaultExtension());
+
     qFileName = GetFileNameWithQDialog("Save file", qProposedFileName,
                                        QString::fromAscii(fileWriter->GetFileDialogPattern()));
     //do nothing if the user presses cancel

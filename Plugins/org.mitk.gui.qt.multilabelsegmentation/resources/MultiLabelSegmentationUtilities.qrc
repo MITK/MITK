@@ -4,7 +4,6 @@
      <file>ImageMasking_48x48.png</file>
      <file>MorphologicalOperations_48x48.png</file>
      <file>SurfaceToImage_48x48.png</file>
-     <file>LabeledImageImport_48x48.png</file>
      <file>MultiLabelSegmentationUtilities_48x48.png</file>
      <file>CTKWidgets_48x48.png</file>
   </qresource>

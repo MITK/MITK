@@ -247,8 +247,19 @@ mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer ref
   mitk::MaskImageFilter::Pointer maskFilter = mitk::MaskImageFilter::New();
   maskFilter->SetInput( referenceImage );
   maskFilter->SetMask( maskImage );
-  maskFilter->OverrideOutsideValueOn();
-  maskFilter->SetOutsideValue( referenceImage->GetStatistics()->GetScalarValueMin() );
+  if ( m_Controls.m_chkMakeOutputBinary->isChecked() )
+  {
+    maskFilter->SetInsideValue(1.0);
+    maskFilter->SetOutsideValue(0.0);
+    maskFilter->SetOverrideOutsideValue(true);
+    maskFilter->SetOverrideInsideValue(true);
+  }
+
+  maskFilter->SetOverrideOutsideValue( m_Controls.m_chkOverwriteBackground->isChecked() );
+  maskFilter->SetOverrideInsideValue( m_Controls.m_chkOverwriteForeground->isChecked() );
+  maskFilter->SetInsideValue( m_Controls.m_leForegroundValue->text().toFloat() );//referenceImage->GetStatistics()->GetScalarValueMin() );
+  maskFilter->SetOutsideValue( m_Controls.m_leBackgroundValue->text().toFloat() );//referenceImage->GetStatistics()->GetScalarValueMin() );
+
   try
   {
     maskFilter->Update();

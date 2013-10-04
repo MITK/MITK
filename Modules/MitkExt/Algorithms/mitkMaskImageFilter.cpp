@@ -36,7 +36,9 @@ mitk::MaskImageFilter::MaskImageFilter() : m_Mask(NULL)
   m_MaskTimeSelector   = mitk::ImageTimeSelector::New();
   m_OutputTimeSelector = mitk::ImageTimeSelector::New();
   m_OverrideOutsideValue = false;
-  m_OutsideValue = 0;
+  m_OverrideInsideValue = false;
+  m_OutsideValue = 0.0;
+  m_InsideValue = 1.0;
 }
 
 mitk::MaskImageFilter::~MaskImageFilter()
@@ -118,8 +120,8 @@ void mitk::MaskImageFilter::InternalComputeMask(itk::Image<TPixel, VImageDimensi
   ItkOutputImageIteratorType outputIt( outputItkImage, inputRegionOfInterest );
 
   //typename ItkOutputImageType::PixelType outsideValue = itk::NumericTraits<typename ItkOutputImageType::PixelType>::min();
-  if ( !m_OverrideOutsideValue )
-    m_OutsideValue = itk::NumericTraits<typename ItkOutputImageType::PixelType>::min();
+//  if ( !m_OverrideOutsideValue )
+//    m_OutsideValue = itk::NumericTraits<typename ItkOutputImageType::PixelType>::min();
 
   m_MinValue = std::numeric_limits<mitk::ScalarType>::max();
   m_MaxValue = std::numeric_limits<mitk::ScalarType>::min();
@@ -128,13 +130,20 @@ void mitk::MaskImageFilter::InternalComputeMask(itk::Image<TPixel, VImageDimensi
   {
     if ( maskIt.Get() > itk::NumericTraits<typename ItkMaskImageType::PixelType>::Zero )
     {
-      outputIt.Set(inputIt.Get());
+      if (m_OverrideInsideValue)
+        outputIt.Set( m_InsideValue );
+      else
+        outputIt.Set( inputIt.Get() );
       m_MinValue = vnl_math_min((float)inputIt.Get(), (float)m_MinValue);
       m_MaxValue = vnl_math_max((float)inputIt.Get(), (float)m_MaxValue);
     }
+    else if (m_OverrideOutsideValue)
+    {
+      outputIt.Set( m_OutsideValue );
+    }
     else
     {
-      outputIt.Set(m_OutsideValue);
+      outputIt.Set( inputIt.Get() );
     }
   }
 }

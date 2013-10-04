@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MAPPERS
 #include "mitkMapper.h"
-#include "mitkImageVtkMapper2D.h"
 #include "mitkVtkMapper.h"
 #include "mitkGLMapper.h"
 #include "mitkGeometry2DDataVtkMapper3D.h"

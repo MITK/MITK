@@ -52,6 +52,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkRescaleIntensityImageFilter.h>
 #include <itkConvolutionImageFilter.h>
 
+#include <itkContinuousIndex.h>
+
 #include <list>
 
 #define _USE_MATH_DEFINES
@@ -1090,6 +1092,24 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
           }
         }
 // FIX END
+      ImageType::Pointer testImage = ImageType::New();
+
+      ImageType::IndexType start;
+      start[0] = 0;
+      start[1] = 0;
+
+      ImageType::SizeType size;
+      size[0] = 3;
+      size[1] = 3;
+
+      ImageType::RegionType region;
+      region.SetSize(size);
+      region.SetIndex(start);
+
+      testImage->SetRegions(region);
+      testImage->Allocate();
+
+
       Statistics hotspotStatistics = CalculateMinMaxIndex<TPixel, VImageDimension >(adaptedImage.GetPointer(), adaptedMaskImage.GetPointer());
       statistics.HotspotMean = hotspotStatistics.HotspotMean;
       statistics.HotspotMax = hotspotStatistics.HotspotMax;
@@ -1097,6 +1117,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       statistics.HotspotMaxIndex = hotspotStatistics.HotspotMaxIndex;
       statistics.HotspotMinIndex = hotspotStatistics.HotspotMinIndex;
       statisticsContainer->push_back( statistics );
+      CalculateHotspotStatistics<TPixel, VImageDimension >(adaptedImage.GetPointer(), adaptedMaskImage.GetPointer(), 100);
     }
   }
   else
@@ -1174,14 +1195,16 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateMinMax
 }
 template < typename TPixel, unsigned int VImageDimension>
 void ImageStatisticsCalculator::CalculateHotspotStatistics(
-    const itk::Image<TPixel, VImageDimension> inputImage,
+    const itk::Image<TPixel, VImageDimension> *inputImage,
     itk::Image<unsigned short, VImageDimension> *maskImage,
     double RadiusInMM)
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
 
-  typedef itk::ImageConstIteratorWithIndex<ImageType> IteratorType;
+  typedef itk::ContinuousIndex<double, VImageDimension> ContinuousIndexType;
+
+  typedef itk::ImageRegionConstIteratorWithIndex<ImageType> IteratorType;
 
   typedef typename ImageType::SpacingType SpacingType;
   typedef typename ImageType::SizeType SizeType;
@@ -1189,83 +1212,107 @@ void ImageStatisticsCalculator::CalculateHotspotStatistics(
   typedef typename ImageType::PointType PointType;
   typedef typename ImageType::RegionType RegionType;
 
+  typedef itk::ImageFileWriter<ImageType> WriterType;
+  WriterType::Pointer writer = WriterType::New();
+
   ImageType::Pointer ConvolutionMask = ImageType::New();
 
-  Sizetype spacing = inputImage->GetSpacing();
+  SpacingType spacing = inputImage->GetSpacing();
 
   IndexType start;
   start[0] = 0;
   start[1] = 0;
-  start[2] = 0;
+  //start[2] = 0;
 
   SizeType size;
   size[0] = 2.0 * RadiusInMM / spacing[0];
   size[1] = 2.0 * RadiusInMM / spacing[1];
-  size[2] = 2.0 * RadiusInMM / spacing[2];
+  //size[2] = 2.0 * RadiusInMM / spacing[2];
 
-  PointType pixelCoordinate;
+  ContinuousIndexType pixelCoordinate;
   pixelCoordinate[0] = 0.0;
   pixelCoordinate[1] = 0.0;
-  pixelCoordinate[2] = 0.0;
+  //pixelCoordinate[2] = 0.0;
 
   RegionType region;
   region.SetSize(size);
   region.SetIndex(start);
 
-  Sizetype spacing = inputImage->GetSpacing();
-
   ConvolutionMask->SetRegions(region);
-  ConvolutionMask->SetrOrigin(pixelCoordinate);
+  ConvolutionMask->SetOrigin(pixelCoordinate);
   ConvolutionMask->SetSpacing(spacing);
   ConvolutionMask->Allocate();
 
   PointType convolutionMaskCenterCoordinate;
   convolutionMaskCenterCoordinate[0] = size[0]/2.00;
   convolutionMaskCenterCoordinate[1] = size[1]/2.00;
-  convolutionMaskCenterCoordinate[2] = size[2]/2.00;
+  //convolutionMaskCenterCoordinate[2] = size[2]/2.00;
 
   float subPixelDimensionX = spacing[0]/2;
   float subPixelDimensionY = spacing[1]/2;
-  float subPixelDimensionZ = spacing[2]/2;
+  //float subPixelDimensionZ = spacing[2]/2;
 
   int countSubPixel = 0;
 
-  IteratorType maskIt(convolutionMask,convolutionMask->GetLargestPossibleRegion());
+  IteratorType maskIt(ConvolutionMask,region);
 
   for(maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)
   {
-    for(float x = pixelCoordinate[0] - subPixelDimensionX / 2;
+    ConvolutionMask->TransformIndexToPhysicalPoint(maskIt.GetIndex(),pixelCoordinate);
+
+    for(double x = pixelCoordinate[0] - subPixelDimensionX / 2;
         x <= pixelCoordinate[0] + subPixelDimensionX / 2;
         x += subPixelDimensionX)
     {
-      for(float y = pixelCoordinate[1] - subPixelDimensionY /2;
+      for(double y = pixelCoordinate[1] - subPixelDimensionY /2;
           y <= pixelCoordinate[1] + subPixelDimensionY / 2;
           y += subPixelDimensionY)
       {
-        for(float z = pixelCoordinate[2] - subPixelDimensionZ / 2;
-            z <= pixelCoordinate[2] - subPixelDimensionZ / 2;
-            z += subPixelDimensionZ)
-        {
-          PointType subPixelCenterCoordinate;
+          ContinuousIndexType subPixelCenterCoordinate;
           subPixelCenterCoordinate[0] = x;
           subPixelCenterCoordinate[1] = y;
-          subPixelCenterCoordinate[2] = z;
+          double distance = subPixelCenterCoordinate.EuclideanDistanceTo(convolutionMaskCenterCoordinate);
 
-          if(subPixelCoordinate.EuclideanDistanceTo(convolutionMaskCenterCoordinate) <= RadiusInMM)
+          if(distance <= RadiusInMM)
             countSubPixel++;
-        }
       }
     }
-    int pixelValue = countSubPixel/8;
 
-    bool isInside = image->TransformPhysicalPointToIndex(pixelCoordinate, maskIt.GetIndex())
-
-    if(isInside)
+    float pixelValue = 0;
+    pixelValue = countSubPixel / 4;
+    if(countSubPixel != 0)
     {
-      ConvolutionMask->SetPixel(pixelIndex,pixelValue);
+      if(pixelValue == 1)
+        ConvolutionMask->SetPixel(maskIt.GetIndex(),5000);
+
+      if(pixelValue == 0.75)
+        ConvolutionMask->SetPixel(maskIt.GetIndex(),2500);
+
+      if(pixelValue == 0.5)
+        ConvolutionMask->SetPixel(maskIt.GetIndex(),2000);
+
+      if(pixelValue == 0.25)
+        ConvolutionMask->SetPixel(maskIt.GetIndex(),1750);
     }
 
+    if(pixelValue == 0)
+      ConvolutionMask->SetPixel(maskIt.GetIndex(),0);
+
+    if(pixelValue > 1)
+      ConvolutionMask->SetPixel(maskIt.GetIndex(),10000);
+
     countSubPixel = 0;
+  }
+
+  writer->SetFileName("D:\\test.png");
+  writer->SetInput(ConvolutionMask);
+  writer->Update();
+  AllocConsole();
+
+  for(maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)
+  {
+    double x = maskIt.Get();
+    std::cout << "PixelValue"  << maskIt.GetIndex() << ": " << x << std::endl;
   }
 }
 

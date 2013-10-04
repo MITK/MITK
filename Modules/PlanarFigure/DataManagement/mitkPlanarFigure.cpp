@@ -51,6 +51,28 @@ mitk::PlanarFigure::~PlanarFigure()
 }
 
 
+mitk::PlanarFigure::PlanarFigure(const Self& other)
+  : m_ControlPoints(other.m_ControlPoints),
+    m_NumberOfControlPoints(other.m_NumberOfControlPoints),
+    m_SelectedControlPoint(other.m_SelectedControlPoint),
+    m_PolyLines(other.m_PolyLines),
+    m_HelperPolyLines(other.m_HelperPolyLines),
+    m_HelperPolyLinesToBePainted(other.m_HelperPolyLinesToBePainted->Clone()),
+    m_PreviewControlPoint(other.m_PreviewControlPoint),
+    m_PreviewControlPointVisible(other.m_PreviewControlPointVisible),
+    m_FigurePlaced(other.m_FigurePlaced),
+    m_Geometry2D(other.m_Geometry2D), // do not clone since SetGeometry2D() doesn't clone either
+    m_PolyLineUpToDate(other.m_PolyLineUpToDate),
+    m_HelperLinesUpToDate(other.m_HelperLinesUpToDate),
+    m_FeaturesUpToDate(other.m_FeaturesUpToDate),
+    m_Features(other.m_Features),
+    m_FeaturesMTime(other.m_FeaturesMTime),
+    m_DisplaySize(other.m_DisplaySize)
+{
+  this->SetPropertyList(other.GetPropertyList()->Clone());
+}
+
+
 void mitk::PlanarFigure::SetGeometry2D( mitk::Geometry2D *geometry )
 {
   this->SetGeometry( geometry );

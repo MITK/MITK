@@ -47,7 +47,7 @@ public:
 
 
   /** Image type definitions */
-  typedef itk::Image<char,3> CharImageType;
+  typedef itk::Image<unsigned char,3> CharImageType;
   typedef itk::Image<float,3> FloatImageType;
 
 

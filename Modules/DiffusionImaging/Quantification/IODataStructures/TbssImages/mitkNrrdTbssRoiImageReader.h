@@ -35,7 +35,7 @@ namespace mitk
   public:
 
     typedef mitk::TbssRoiImage OutputType;
-    typedef itk::Image<char,3>     ImageType;
+    typedef itk::Image<unsigned char,3>     ImageType;
     typedef TbssRoiImageSource  TbssVolSourceType;
 
 

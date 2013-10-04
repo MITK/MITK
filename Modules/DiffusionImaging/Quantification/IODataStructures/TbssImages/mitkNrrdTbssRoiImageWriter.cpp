@@ -84,7 +84,7 @@ void mitk::NrrdTbssRoiImageWriter::GenerateData()
   std::string structure = input->GetStructure();
   itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(), "structure", structure);
 
-  typedef itk::Image<char,3> ImageType;
+  typedef itk::Image<unsigned char,3> ImageType;
   ImageType::Pointer img = input->GetImage();
 
   itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();

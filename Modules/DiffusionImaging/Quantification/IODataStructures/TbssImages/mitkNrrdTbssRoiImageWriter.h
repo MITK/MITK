@@ -35,7 +35,7 @@ class Quantification_EXPORT NrrdTbssRoiImageWriter : public mitk::FileWriterWith
 {
 public:
 
-    typedef itk::Image<char,3>     ImageType;
+    typedef itk::Image<unsigned char,3>     ImageType;
 
     mitkClassMacro( NrrdTbssRoiImageWriter, mitk::FileWriterWithInformation )
 

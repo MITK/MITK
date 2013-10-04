@@ -52,7 +52,8 @@ mitk::PlanarFigure::~PlanarFigure()
 
 
 mitk::PlanarFigure::PlanarFigure(const Self& other)
-  : m_ControlPoints(other.m_ControlPoints),
+  : BaseData(other),
+    m_ControlPoints(other.m_ControlPoints),
     m_NumberOfControlPoints(other.m_NumberOfControlPoints),
     m_SelectedControlPoint(other.m_SelectedControlPoint),
     m_PolyLines(other.m_PolyLines),
@@ -69,7 +70,6 @@ mitk::PlanarFigure::PlanarFigure(const Self& other)
     m_FeaturesMTime(other.m_FeaturesMTime),
     m_DisplaySize(other.m_DisplaySize)
 {
-  this->SetPropertyList(other.GetPropertyList()->Clone());
 }
 
 

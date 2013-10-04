@@ -213,8 +213,8 @@ void QmitkLabelSetTableWidget::LabelRemoved( )
 void QmitkLabelSetTableWidget::AllLabelsModified( )
 {
   // this is an event function, avoid calling ourself
-    for(int i=0; i<this->rowCount(); i++)
-        this->LabelModified(i);
+  for(int i=0; i<this->rowCount(); i++)
+    this->LabelModified(i);
 }
 
 void QmitkLabelSetTableWidget::LabelModified( int index )
@@ -256,7 +256,7 @@ void QmitkLabelSetTableWidget::LabelModified( int index )
   QPushButton* vbutton = (QPushButton*) this->cellWidget(index,VISIBLE_COL);
   if (vbutton)
   {
-       vbutton->setChecked(!m_LabelSetImage->GetLabelVisible(index));
+    vbutton->setChecked(!m_LabelSetImage->GetLabelVisible(index));
   }
 
   this->clearSelection();
@@ -272,17 +272,17 @@ void QmitkLabelSetTableWidget::SetAutoSelectNewItems( bool value )
 
 void QmitkLabelSetTableWidget::OnColorButtonClicked()
 {
-   int row;
-   for(int i=0; i<this->rowCount(); i++)
-   {
-      if (sender() == this->cellWidget(i,COLOR_COL))
-      {
-        row = i;
-      }
-   }
+  int row;
+  for(int i=0; i<this->rowCount(); i++)
+  {
+    if (sender() == this->cellWidget(i,COLOR_COL))
+    {
+      row = i;
+    }
+  }
 
-   if (row >= 0 && row < this->rowCount())
-   {
+  if (row >= 0 && row < this->rowCount())
+  {
     const mitk::Color& color = m_LabelSetImage->GetLabelColor(row);
     QColor initial(color.GetRed()*255,color.GetGreen()*255,color.GetBlue()*255);
     QColor qcolor = QColorDialog::getColor(initial,0,QString("Change color"));
@@ -309,7 +309,7 @@ void QmitkLabelSetTableWidget::OnColorButtonClicked()
     newColor.SetBlue(qcolor.blue()/255.0);
 
     m_LabelSetImage->SetLabelColor(row,newColor);
-   }
+  }
 }
 
 void QmitkLabelSetTableWidget::OnLockedButtonClicked()
@@ -877,13 +877,13 @@ void QmitkLabelSetTableWidget::Reset()
 
   if (this->m_LabelSetImage.IsNotNull()) // sometimes Reset() is called without a labelset image
   {
-      // add all labels
-      int counter = 0;
-      while (counter != this->m_LabelSetImage->GetNumberOfLabels())
-      {
-          this->InsertItem();
-          ++counter;
-      }
+    // add all labels
+    int counter = 0;
+    while (counter != this->m_LabelSetImage->GetNumberOfLabels())
+    {
+      this->InsertItem();
+      ++counter;
+    }
   }
 }
 

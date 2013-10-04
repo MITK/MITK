@@ -67,9 +67,6 @@ private slots:
   // reaction to the signal "renameLabel" from QmitkLabelSetTableWidget
   void OnRenameLabel(int index, const mitk::Color& color, const std::string& name);
 
-  // reaction to the signal "newlabel" from QmitkLabelSetTableWidget
-  void OnNewLabel();
-
   // reaction to the signal "createSurface" from QmitkLabelSetTableWidget
   void OnCreateSurface(int);
 
@@ -88,8 +85,26 @@ private slots:
   // reaction to the signal "combineAndCreateSurface" from QmitkLabelSetTableWidget
   void OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>& ranges );
 
+  // reaction to the button "New Label"
+  void OnNewLabel();
+
+  // reaction to the button "Add Layer"
+  void OnAddLayer();
+
+  // reaction to the button "Delete Layer"
+  void OnDeleteLayer();
+
+  // reaction to the button "Previous Layer"
+  void OnPreviousLayer();
+
+  // reaction to the button "Next Layer"
+  void OnNextLayer();
+
   // reaction to the button "New Segmentation"
   void OnNewSegmentation();
+
+  // reaction to the button "Delete Segmentation"
+  void OnDeleteSegmentation();
 
   // reaction to the button "Load Segmentation"
   void OnLoadSegmentation();

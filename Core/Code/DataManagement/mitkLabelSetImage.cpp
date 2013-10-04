@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkInteractionConst.h"
 #include "mitkRenderingManager.h"
-#include "mitkColormapProperty.h"
 #include "mitkImageCast.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkLookupTableProperty.h"
@@ -36,24 +35,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkBinaryMedianImageFilter.h>
 #include <itkBinaryThresholdImageFilter.h>
 
-mitk::LabelSetImage::LabelSetImage() : mitk::Image()
+mitk::LabelSetImage::LabelSetImage() : mitk::Image(),
+m_ActiveLayer(0)
 {
-  this->CreateDefaultLabelSet();
+  this->CreateDefaultLabelSet(m_ActiveLayer);
 }
 
-mitk::LabelSetImage::LabelSetImage(mitk::LabelSetImage* other) : mitk::Image()
+mitk::LabelSetImage::LabelSetImage(mitk::LabelSetImage* other) : mitk::Image(),
+m_ActiveLayer(0)
 {
   this->Initialize(other);
-  m_LabelSet = other->GetLabelSet();
-
-  this->GetPropertyList()->SetProperty( "LookupTable", other->GetPropertyList()->GetProperty( "LookupTable") );
+  m_LabelSetContainer.push_back( other->GetLabelSet() );
 }
 
 void mitk::LabelSetImage::Initialize(const mitk::Image* image)
 {
   try
   {
-    mitk::PixelType pixelType(mitk::MakeScalarPixelType<unsigned char>() );
+    mitk::PixelType pixelType(mitk::MakeScalarPixelType<LabelSetPixelType>() );
     if (image->GetDimension() == 2)
     {
       const unsigned int dimensions[] = { image->GetDimension(0), image->GetDimension(1), 1 };
@@ -64,7 +63,10 @@ void mitk::LabelSetImage::Initialize(const mitk::Image* image)
       Superclass::Initialize(pixelType, image->GetDimension(), image->GetDimensions());
     }
 
-    unsigned int byteSize = sizeof(unsigned char);
+    mitk::TimeSlicedGeometry::Pointer originalGeometry = image->GetTimeSlicedGeometry()->Clone();
+    this->SetGeometry( originalGeometry );
+/*
+    unsigned int byteSize = sizeof(LabelSetPixelType);
     for (unsigned int dim = 0; dim < this->GetDimension(); ++dim)
     {
       byteSize *= this->GetDimension(dim);
@@ -73,9 +75,37 @@ void mitk::LabelSetImage::Initialize(const mitk::Image* image)
     mitk::ImageWriteAccessor* accessor = new mitk::ImageWriteAccessor(static_cast<mitk::Image*>(this));
     memset( accessor->GetData(), 0, byteSize );
     delete accessor;
+*/
+//    LabelSetImageType::Pointer itkImage;
+//    mitk::CastToItkImage(this, itkImage);
 
-    mitk::TimeSlicedGeometry::Pointer originalGeometry = image->GetTimeSlicedGeometry()->Clone();
-    this->SetGeometry( originalGeometry );
+    VectorImageType::SizeType size;
+    VectorImageType::IndexType index;
+    VectorImageType::RegionType region;
+    unsigned int* dimensions = this->GetDimensions();
+    size[0] = dimensions[0];
+    size[1] = dimensions[1];
+    size[2] = dimensions[2];
+    region.SetSize( size);
+    index.Fill(0);
+    region.SetIndex( index );
+
+    m_VectorImage = VectorImageType::New();
+    m_VectorImage->SetRegions( region );
+    m_VectorImage->SetNumberOfComponentsPerPixel(1);
+    m_VectorImage->Allocate();
+
+    typedef itk::VariableLengthVector<LabelSetPixelType> VariableVectorType;
+    VariableVectorType defaultValue;
+    defaultValue.SetSize(1);
+    defaultValue.Fill(0);
+    m_VectorImage->FillBuffer(defaultValue);
+
+    m_ImageToVectorAdaptor = ImageAdaptorType::New();
+    m_ImageToVectorAdaptor->SetImage( m_VectorImage );
+    m_ImageToVectorAdaptor->SetExtractComponentIndex( 0 );
+    m_ImageToVectorAdaptor->Update();
+    this->SetImportVolume(m_ImageToVectorAdaptor->GetBufferPointer(),0,0,Image::CopyMemory);
   }
   catch(mitk::Exception& e)
   {
@@ -85,11 +115,156 @@ void mitk::LabelSetImage::Initialize(const mitk::Image* image)
 
 mitk::LabelSetImage::~LabelSetImage()
 {
+  m_LabelSetContainer.clear();
 }
 
-void mitk::LabelSetImage::CreateDefaultLabelSet()
+unsigned char* mitk::LabelSetImage::GetImageLayer(int layer)
 {
-  m_LabelSet = mitk::LabelSet::New();
+  m_ImageToVectorAdaptor->SetExtractComponentIndex( layer );
+  m_ImageToVectorAdaptor->Update();
+  return m_ImageToVectorAdaptor->GetBufferPointer();
+//  this->SetImportVolume(m_ImageToVectorAdaptor->GetBufferPointer(),0,0,Image::CopyMemory);
+}
+
+unsigned int mitk::LabelSetImage::GetActiveLayer()
+{
+  return m_ActiveLayer;
+}
+
+unsigned int mitk::LabelSetImage::GetNumberOfLayers()
+{
+  return m_LabelSetContainer.size();
+}
+
+void mitk::LabelSetImage::RemoveLayer(int layer)
+{
+  try
+  {
+    if ( (m_LabelSetContainer.size()>1) && (layer >= 0) && (layer < m_LabelSetContainer.size()) )
+    {
+      m_LabelSetContainer.erase( m_LabelSetContainer.begin() + layer);
+      this->SetActiveLayer(m_LabelSetContainer.size() - 1);
+      this->Modified();
+    }
+  }
+  catch(...)
+  {
+    mitkThrow() << "Could not add a layer.";
+  }
+}
+
+void mitk::LabelSetImage::AddLayer()
+{
+  try
+  {
+    AccessByItk_1(this, ImageToVectorProcessing, m_ActiveLayer);
+
+    // set the active layer to the latest available plus one
+    m_ActiveLayer = m_LabelSetContainer.size();
+
+    // push a new label set for the new layer
+    this->CreateDefaultLabelSet(m_ActiveLayer);
+
+    // create a new vector image
+    VectorImageType::Pointer newVectorImage = VectorImageType::New();
+
+    VectorImageType::SizeType size;
+    VectorImageType::IndexType index;
+    VectorImageType::RegionType region;
+    unsigned int* dimensions = this->GetDimensions();
+    size[0] = dimensions[0];
+    size[1] = dimensions[1];
+    size[2] = dimensions[2];
+    region.SetSize( size );
+    index.Fill(0);
+    region.SetIndex( index );
+
+    newVectorImage->SetRegions(region);
+    newVectorImage->SetNumberOfComponentsPerPixel(m_LabelSetContainer.size());
+    newVectorImage->Allocate();
+
+    // fill inside
+    VariableVectorType defaultValue;
+    defaultValue.SetSize(m_LabelSetContainer.size());
+    defaultValue.Fill(0);
+    newVectorImage->FillBuffer(defaultValue);
+
+    ImageAdaptorType::Pointer sourceAdaptor = ImageAdaptorType::New();
+    sourceAdaptor->SetImage( m_VectorImage );
+
+    ImageAdaptorType::Pointer targetAdaptor = ImageAdaptorType::New();
+    targetAdaptor->SetImage( newVectorImage );
+
+    // transfer vector components to new vector. Note that m_VectorImage has
+    // one component less than newVectorImage
+    for (int layer = 0; layer < m_LabelSetContainer.size() - 1; ++layer)
+    {
+      sourceAdaptor->SetExtractComponentIndex(layer);
+      sourceAdaptor->Update();
+
+      targetAdaptor->SetExtractComponentIndex(layer);
+      targetAdaptor->Update();
+
+      typedef itk::ImageRegionConstIterator< ImageAdaptorType > SourceIteratorType;
+      typedef itk::ImageRegionIterator< ImageAdaptorType >      TargetIteratorType;
+
+      SourceIteratorType sourceIter( sourceAdaptor, sourceAdaptor->GetLargestPossibleRegion() );
+      sourceIter.GoToBegin();
+
+      TargetIteratorType targetIter( targetAdaptor, targetAdaptor->GetLargestPossibleRegion() );
+      targetIter.GoToBegin();
+
+      while(!sourceIter.IsAtEnd())
+      {
+        targetIter.Set( sourceIter.Get() );
+        ++sourceIter;
+        ++targetIter;
+      }
+    }
+
+    // take the new vector
+
+//    m_VectorImage = NULL;
+    m_VectorImage = newVectorImage;
+/*
+    m_ImageToVectorAdaptor = ImageAdaptorType::New();
+    m_ImageToVectorAdaptor->SetImage( m_VectorImage );
+    m_ImageToVectorAdaptor->SetExtractComponentIndex( m_ActiveLayer );
+    m_ImageToVectorAdaptor->Update();
+    this->SetImportVolume(m_ImageToVectorAdaptor->GetBufferPointer(),0,0,Image::CopyMemory);
+*/
+    AccessByItk_1(this, VectorToImageProcessing, m_ActiveLayer);
+  }
+  catch( itk::ExceptionObject& e )
+  {
+    mitkThrow() << "Exception caught: " << e.GetDescription();
+  }
+
+  this->Modified();
+}
+
+void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
+{
+  try
+  {
+    if ( (layer != m_ActiveLayer) && (layer >= 0) && (layer < m_LabelSetContainer.size()) )
+    {
+      AccessByItk_1(this, ImageToVectorProcessing, m_ActiveLayer);
+      m_ActiveLayer = layer;
+      AccessByItk_1(this, VectorToImageProcessing, m_ActiveLayer);
+
+      this->Modified();
+    }
+  }
+  catch(...)
+  {
+    mitkThrow() << "Could not set the active layer.";
+  }
+}
+
+void mitk::LabelSetImage::CreateDefaultLabelSet(int layer)
+{
+  mitk::LabelSet::Pointer ls = mitk::LabelSet::New(layer);
   mitk::Color color;
   color.SetRed(0.0);
   color.SetGreen(0.0);
@@ -100,35 +275,29 @@ void mitk::LabelSetImage::CreateDefaultLabelSet()
   label->SetExterior(true);
   label->SetOpacity(0.0);
   label->SetLocked(false);
-  m_LabelSet->AddLabel(*label);
+  ls->AddLabel(*label);
 
-  mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-  lut->SetActiveColormap(mitk::ColormapProperty::CM_MULTILABEL);
-
-  mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New();
-  lutProp->SetLookupTable(lut);
-
-  this->GetPropertyList()->SetProperty( "LookupTable", lutProp );
+  m_LabelSetContainer.push_back(ls);
 }
 
 void mitk::LabelSetImage::SetName(const std::string& name)
 {
-  this->m_LabelSet->SetName(name);
+  m_LabelSetContainer[m_ActiveLayer]->SetName(name); // todo: fixme (why a name for the labelset?)
 }
 
 std::string mitk::LabelSetImage::GetLabelSetName()
 {
-  return this->m_LabelSet->GetName();
+  return m_LabelSetContainer[m_ActiveLayer]->GetName(); // todo: fixme
 }
 
 void mitk::LabelSetImage::SetLabelSetLastModified(const std::string& name)
 {
-  this->m_LabelSet->SetLastModified(name);
+  m_LabelSetContainer[m_ActiveLayer]->SetLastModified(name);
 }
 
 std::string mitk::LabelSetImage::GetLabelSetLastModified()
 {
-  return this->m_LabelSet->GetLastModified();
+  return m_LabelSetContainer[m_ActiveLayer]->GetLastModified();
 }
 
 void mitk::LabelSetImage::CalculateLabelVolume(int index)
@@ -143,7 +312,7 @@ void mitk::LabelSetImage::SmoothLabel(int index)
     AccessByItk_1(this, SmoothLabelProcessing, index);
     this->Modified();
   }
-  catch( ... )
+  catch(...)
   {
     mitkThrow() << "Could not erase label.";
   }
@@ -178,7 +347,6 @@ void mitk::LabelSetImage::Concatenate(mitk::LabelSetImage* other)
     {
       this->AddLabel( *ls->GetLabel(i) );
     }
-
     this->Modified();
   }
   catch( ... )
@@ -200,15 +368,15 @@ void mitk::LabelSetImage::ClearBuffer()
   }
 }
 
-template < typename LabelSetImageType >
-void mitk::LabelSetImage::CalculateCenterOfMassProcessing(LabelSetImageType* itkImage, int index)
+template < typename ImageType >
+void mitk::LabelSetImage::CalculateCenterOfMassProcessing(ImageType* itkImage, int index)
 {
   // for now, we just retrieve the voxel in the middle
-  typename typedef itk::ImageRegionConstIterator< LabelSetImageType > IteratorType;
+  typename typedef itk::ImageRegionConstIterator< ImageType > IteratorType;
   IteratorType iter( itkImage, itkImage->GetLargestPossibleRegion() );
   iter.GoToBegin();
 
-  typename std::vector< LabelSetImageType::IndexType > indexVector;
+  typename std::vector< ImageType::IndexType > indexVector;
 
   while ( !iter.IsAtEnd() )
   {
@@ -224,32 +392,32 @@ void mitk::LabelSetImage::CalculateCenterOfMassProcessing(LabelSetImageType* itk
 
   if (!indexVector.empty())
   {
-   typename itk::ImageRegionConstIteratorWithIndex< LabelSetImageType >::IndexType centerIndex;
+   typename itk::ImageRegionConstIteratorWithIndex< ImageType >::IndexType centerIndex;
    centerIndex = indexVector.at(indexVector.size()/2);
    pos[0] = centerIndex[0];
    pos[1] = centerIndex[1];
    pos[2] = centerIndex[2];
   }
 
-  this->m_LabelSet->SetLabelCenterOfMassIndex(index, pos);
+  m_LabelSetContainer[m_ActiveLayer]->SetLabelCenterOfMassIndex(index, pos);
   this->GetSlicedGeometry()->IndexToWorld(pos, pos);
-  this->m_LabelSet->SetLabelCenterOfMassCoordinates(index, pos);
+  m_LabelSetContainer[m_ActiveLayer]->SetLabelCenterOfMassCoordinates(index, pos);
 }
 
-template < typename LabelSetImageType >
-void mitk::LabelSetImage::ClearBufferProcessing(LabelSetImageType* itkImage)
+template < typename ImageType >
+void mitk::LabelSetImage::ClearBufferProcessing(ImageType* itkImage)
 {
   itkImage->FillBuffer(0);
 }
 
-template < typename LabelSetImageType >
-void mitk::LabelSetImage::ConcatenateProcessing(LabelSetImageType* itkTarget, mitk::LabelSetImage* other)
+template < typename ImageType >
+void mitk::LabelSetImage::ConcatenateProcessing(ImageType* itkTarget, mitk::LabelSetImage* other)
 {
-  typename LabelSetImageType::Pointer itkSource = LabelSetImageType::New();
+  typename ImageType::Pointer itkSource = ImageType::New();
   mitk::CastToItkImage( other, itkSource );
 
-  typedef itk::ImageRegionConstIterator< LabelSetImageType > ConstIteratorType;
-  typedef itk::ImageRegionIterator< LabelSetImageType >      IteratorType;
+  typedef itk::ImageRegionConstIterator< ImageType > ConstIteratorType;
+  typedef itk::ImageRegionIterator< ImageType >      IteratorType;
 
   ConstIteratorType sourceIter( itkSource, itkSource->GetLargestPossibleRegion() );
   IteratorType      targetIter( itkTarget, itkTarget->GetLargestPossibleRegion() );
@@ -271,11 +439,65 @@ void mitk::LabelSetImage::ConcatenateProcessing(LabelSetImageType* itkTarget, mi
   }
 }
 
-template < typename LabelSetImageType >
-void mitk::LabelSetImage::SmoothLabelProcessing(LabelSetImageType* input, int index)
+template < typename PixelType, unsigned int VImageDimension >
+void mitk::LabelSetImage::VectorToImageProcessing( itk::Image< PixelType, VImageDimension>* input, int layer)
 {
-  typedef itk::BinaryThresholdImageFilter< LabelSetImageType, LabelSetImageType > ThresholdFilterType;
-  typedef itk::BinaryMedianImageFilter< LabelSetImageType, LabelSetImageType > MedianFilterType;
+  typedef itk::Image< PixelType, VImageDimension> ImageType;
+
+  ImageAdaptorType::Pointer adaptor = ImageAdaptorType::New();
+  adaptor->SetExtractComponentIndex(layer);
+  adaptor->SetImage( m_VectorImage );
+  adaptor->Update();
+
+  typedef itk::ImageRegionConstIterator< ImageAdaptorType >  SourceIteratorType;
+  typedef itk::ImageRegionIterator< ImageType >              TargetIteratorType;
+
+  SourceIteratorType sourceIter( adaptor, adaptor->GetLargestPossibleRegion() );
+  sourceIter.GoToBegin();
+
+  TargetIteratorType targetIter( input, input->GetLargestPossibleRegion() );
+  targetIter.GoToBegin();
+
+  while(!sourceIter.IsAtEnd())
+  {
+   targetIter.Set( sourceIter.Get() );
+   ++sourceIter;
+   ++targetIter;
+  }
+}
+
+template < typename PixelType, unsigned int VImageDimension >
+void mitk::LabelSetImage::ImageToVectorProcessing( itk::Image< PixelType, VImageDimension>* input, int layer)
+{
+  typedef itk::Image< PixelType, VImageDimension> ImageType;
+
+  ImageAdaptorType::Pointer adaptor = ImageAdaptorType::New();
+  adaptor->SetExtractComponentIndex(layer);
+  adaptor->SetImage( m_VectorImage );
+  adaptor->Update();
+
+  typedef itk::ImageRegionConstIterator< ImageType >   SourceIteratorType;
+  typedef itk::ImageRegionIterator< ImageAdaptorType > TargetIteratorType;
+
+  SourceIteratorType sourceIter( input, input->GetLargestPossibleRegion() );
+  sourceIter.GoToBegin();
+
+  TargetIteratorType targetIter( adaptor, adaptor->GetLargestPossibleRegion() );
+  targetIter.GoToBegin();
+
+  while(!sourceIter.IsAtEnd())
+  {
+   targetIter.Set( sourceIter.Get() );
+   ++sourceIter;
+   ++targetIter;
+  }
+}
+
+template < typename ImageType >
+void mitk::LabelSetImage::SmoothLabelProcessing(ImageType* input, int index)
+{
+  typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;
+  typedef itk::BinaryMedianImageFilter< ImageType, ImageType > MedianFilterType;
 
   typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
   thresholdFilter->SetInput(input);
@@ -285,7 +507,7 @@ void mitk::LabelSetImage::SmoothLabelProcessing(LabelSetImageType* input, int in
   thresholdFilter->SetInsideValue(index);
   thresholdFilter->Update();
 
-  typename LabelSetImageType::SizeType radius;
+  typename ImageType::SizeType radius;
   radius.Fill(1);
 
   typename MedianFilterType::Pointer medianFilter = MedianFilterType::New();
@@ -296,11 +518,11 @@ void mitk::LabelSetImage::SmoothLabelProcessing(LabelSetImageType* input, int in
 
   medianFilter->Update();
 
-  LabelSetImageType::Pointer result = medianFilter->GetOutput();
+  ImageType::Pointer result = medianFilter->GetOutput();
   result->DisconnectPipeline();
 
-  typedef itk::ImageRegionConstIterator< LabelSetImageType > SourceIteratorType;
-  typedef itk::ImageRegionIterator< LabelSetImageType > TargetIteratorType;
+  typedef itk::ImageRegionConstIterator< ImageType > SourceIteratorType;
+  typedef itk::ImageRegionIterator< ImageType > TargetIteratorType;
 
   SourceIteratorType sourceIter( result, result->GetLargestPossibleRegion() );
   sourceIter.GoToBegin();
@@ -323,10 +545,10 @@ void mitk::LabelSetImage::SmoothLabelProcessing(LabelSetImageType* input, int in
   }
 }
 
-template < typename LabelSetImageType >
-void mitk::LabelSetImage::EraseLabelProcessing(LabelSetImageType* itkImage, int index, bool reorder)
+template < typename ImageType >
+void mitk::LabelSetImage::EraseLabelProcessing(ImageType* itkImage, int index, bool reorder)
 {
- typedef itk::ImageRegionIterator< LabelSetImageType > IteratorType;
+ typedef itk::ImageRegionIterator< ImageType > IteratorType;
 
  IteratorType iter( itkImage, itkImage->GetLargestPossibleRegion() );
  iter.GoToBegin();
@@ -355,12 +577,12 @@ void mitk::LabelSetImage::EraseLabelProcessing(LabelSetImageType* itkImage, int 
  }
 }
 
-template < typename LabelSetImageType >
-void mitk::LabelSetImage::MergeLabelsProcessing(LabelSetImageType* itkImage, int index)
+template < typename ImageType >
+void mitk::LabelSetImage::MergeLabelsProcessing(ImageType* itkImage, int index)
 {
- typedef itk::ImageRegionIterator< LabelSetImageType > IteratorType;
+ typedef itk::ImageRegionIterator< ImageType > IteratorType;
 
- const mitk::Label* activeLabel = this->m_LabelSet->GetActiveLabel();
+ const mitk::Label* activeLabel = m_LabelSetContainer[m_ActiveLayer]->GetActiveLabel();
 
  IteratorType iter( itkImage, itkImage->GetLargestPossibleRegion() );
  iter.GoToBegin();
@@ -377,8 +599,7 @@ void mitk::LabelSetImage::MergeLabelsProcessing(LabelSetImageType* itkImage, int
 
 void mitk::LabelSetImage::AddLabel(const mitk::Label& label)
 {
-  this->m_LabelSet->AddLabel(label);
-  mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetPropertyList()->GetProperty( "LookupTable" ));
+  m_LabelSetContainer[m_ActiveLayer]->AddLabel(label);
   const mitk::Color& color = label.GetColor();
   double rgba[4];
   rgba[0] = color.GetRed();
@@ -386,107 +607,102 @@ void mitk::LabelSetImage::AddLabel(const mitk::Label& label)
   rgba[2] = color.GetBlue();
   rgba[3] = label.GetOpacity();
   // the active label is the one we just added
-  lutProp->GetLookupTable()->SetTableValue( m_LabelSet->GetActiveLabelIndex(), rgba );
+  m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->SetTableValue( m_LabelSetContainer[m_ActiveLayer]->GetActiveLabelIndex(), rgba );
   AddLabelEvent.Send();
 }
 
 void mitk::LabelSetImage::AddLabel(const std::string& name, const mitk::Color& color)
 {
-  this->m_LabelSet->AddLabel(name, color);
-  mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetPropertyList()->GetProperty( "LookupTable" ));
+  m_LabelSetContainer[m_ActiveLayer]->AddLabel(name, color);
   double rgba[4];
   rgba[0] = color.GetRed();
   rgba[1] = color.GetGreen();
   rgba[2] = color.GetBlue();
-  rgba[3] = m_LabelSet->GetActiveLabel()->GetOpacity();
-  lutProp->GetLookupTable()->SetTableValue( m_LabelSet->GetActiveLabelIndex(), rgba );
+  rgba[3] = m_LabelSetContainer[m_ActiveLayer]->GetActiveLabel()->GetOpacity();
+  m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->SetTableValue( m_LabelSetContainer[m_ActiveLayer]->GetActiveLabelIndex(), rgba );
   AddLabelEvent.Send();
 }
 
 const mitk::Color& mitk::LabelSetImage::GetLabelColor(int index)
 {
-  return this->m_LabelSet->GetLabelColor(index);
+  return m_LabelSetContainer[m_ActiveLayer]->GetLabelColor(index);
 }
 
 void mitk::LabelSetImage::SetLabelColor(int index, const mitk::Color& color)
 {
-  mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetPropertyList()->GetProperty( "LookupTable" ));
   double rgba[4];
-  lutProp->GetLookupTable()->GetTableValue( index, rgba );
+  m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->GetTableValue( index, rgba );
   rgba[0] = color.GetRed();
   rgba[1] = color.GetGreen();
   rgba[2] = color.GetBlue();
-  rgba[3] = this->m_LabelSet->GetLabelOpacity(index);
-  lutProp->GetLookupTable()->SetTableValue( index, rgba );
-  this->m_LabelSet->SetLabelColor(index, color);
+  rgba[3] = m_LabelSetContainer[m_ActiveLayer]->GetLabelOpacity(index);
+  m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->SetTableValue( index, rgba );
+  m_LabelSetContainer[m_ActiveLayer]->SetLabelColor(index, color);
   ModifyLabelEvent.Send(index);
 }
 
 float mitk::LabelSetImage::GetLabelOpacity(int index)
 {
-  return this->m_LabelSet->GetLabelOpacity(index);
+  return m_LabelSetContainer[m_ActiveLayer]->GetLabelOpacity(index);
 }
 
 float mitk::LabelSetImage::GetLabelVolume(int index)
 {
-  return this->m_LabelSet->GetLabelVolume(index);
+  return m_LabelSetContainer[m_ActiveLayer]->GetLabelVolume(index);
 }
 
 void mitk::LabelSetImage::SetLabelOpacity(int index, float value)
 {
-  mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetPropertyList()->GetProperty( "LookupTable" ));
   double rgba[4];
-  lutProp->GetLookupTable()->GetTableValue(index,rgba);
+  m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->GetTableValue(index,rgba);
   rgba[3] = value;
-  lutProp->GetLookupTable()->SetTableValue(index,rgba);
-  m_LabelSet->SetLabelOpacity(index,value);
+  m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->SetTableValue(index,rgba);
+  m_LabelSetContainer[m_ActiveLayer]->SetLabelOpacity(index,value);
   ModifyLabelEvent.Send(index);
 }
 
 void mitk::LabelSetImage::SetLabelVolume(int index, float value)
 {
-  m_LabelSet->SetLabelVolume(index,value);
+  m_LabelSetContainer[m_ActiveLayer]->SetLabelVolume(index,value);
   ModifyLabelEvent.Send(index);
 }
 
 void mitk::LabelSetImage::RenameLabel(int index, const std::string& name, const mitk::Color& color)
 {
-  m_LabelSet->SetLabelName(index, name);
-  m_LabelSet->SetLabelColor(index, color);
-  mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetPropertyList()->GetProperty( "LookupTable" ));
+  m_LabelSetContainer[m_ActiveLayer]->SetLabelName(index, name);
+  m_LabelSetContainer[m_ActiveLayer]->SetLabelColor(index, color);
   double rgba[4];
-  lutProp->GetLookupTable()->GetTableValue(index,rgba);
+  m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->GetTableValue(index,rgba);
   rgba[0] = color.GetRed();
   rgba[1] = color.GetGreen();
   rgba[2] = color.GetBlue();
-  lutProp->GetLookupTable()->SetTableValue(index,rgba);
+  m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->SetTableValue(index,rgba);
   ModifyLabelEvent.Send(index);
 }
 
 void mitk::LabelSetImage::SetLabelName(int index, const std::string& name)
 {
-  this->m_LabelSet->SetLabelName(index, name);
+  m_LabelSetContainer[m_ActiveLayer]->SetLabelName(index, name);
   ModifyLabelEvent.Send(index);
 }
 
 void mitk::LabelSetImage::SetAllLabelsLocked(bool value)
 {
-  this->m_LabelSet->SetAllLabelsLocked(value);
+  m_LabelSetContainer[m_ActiveLayer]->SetAllLabelsLocked(value);
   AllLabelsModifiedEvent.Send();
 }
 
 void mitk::LabelSetImage::SetAllLabelsVisible(bool value)
 {
-  this->m_LabelSet->SetAllLabelsVisible(value);
-  mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetPropertyList()->GetProperty( "LookupTable" ));
-  mitk::LabelSet::LabelContainerConstIteratorType _it = this->m_LabelSet->IteratorBegin();
-  mitk::LabelSet::LabelContainerConstIteratorType _end = this->m_LabelSet->IteratorEnd();
+  m_LabelSetContainer[m_ActiveLayer]->SetAllLabelsVisible(value);
+  mitk::LabelSet::LabelContainerConstIteratorType _it = m_LabelSetContainer[m_ActiveLayer]->IteratorBegin();
+  mitk::LabelSet::LabelContainerConstIteratorType _end = m_LabelSetContainer[m_ActiveLayer]->IteratorEnd();
   double rgba[4];
   for(; _it!=_end; ++_it)
   {
-      lutProp->GetLookupTable()->GetTableValue((*_it)->GetIndex(),rgba);
-      rgba[3] = value ? (*_it)->GetOpacity() : 0.0;
-      lutProp->GetLookupTable()->SetTableValue((*_it)->GetIndex(),rgba);
+    m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->GetTableValue((*_it)->GetIndex(),rgba);
+    rgba[3] = value ? (*_it)->GetOpacity() : 0.0;
+    m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->SetTableValue((*_it)->GetIndex(),rgba);
   }
   AllLabelsModifiedEvent.Send();
 }
@@ -494,17 +710,16 @@ void mitk::LabelSetImage::SetAllLabelsVisible(bool value)
 void mitk::LabelSetImage::RemoveLabel(int index)
 {
   this->EraseLabel(index, true);
-  this->m_LabelSet->RemoveLabel(index);
+  m_LabelSetContainer[m_ActiveLayer]->RemoveLabel(index);
   this->ResetLabels();
   RemoveLabelEvent.Send();
 }
 
 void mitk::LabelSetImage::ResetLabels()
 {
-  this->m_LabelSet->ResetLabels();
-  mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetPropertyList()->GetProperty( "LookupTable" ));
-  mitk::LabelSet::LabelContainerConstIteratorType _it = this->m_LabelSet->IteratorBegin();
-  mitk::LabelSet::LabelContainerConstIteratorType _end = this->m_LabelSet->IteratorEnd();
+  m_LabelSetContainer[m_ActiveLayer]->ResetLabels();
+  mitk::LabelSet::LabelContainerConstIteratorType _it = m_LabelSetContainer[m_ActiveLayer]->IteratorBegin();
+  mitk::LabelSet::LabelContainerConstIteratorType _end = m_LabelSetContainer[m_ActiveLayer]->IteratorEnd();
   double rgba[4];
   for(; _it!=_end; ++_it)
   {
@@ -513,7 +728,7 @@ void mitk::LabelSetImage::ResetLabels()
     rgba[1] = color.GetGreen();
     rgba[2] = color.GetBlue();
     rgba[3] = (*_it)->GetOpacity();
-    lutProp->GetLookupTable()->SetTableValue((*_it)->GetIndex(),rgba);
+    m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->SetTableValue((*_it)->GetIndex(),rgba);
   }
 }
 
@@ -539,7 +754,7 @@ void mitk::LabelSetImage::RemoveLabels(std::vector<int>& indexes)
   for (int i=0; i<indexes.size(); i++)
   {
 //    this->EraseLabel(indexes[i]-i, true);
-    this->m_LabelSet->RemoveLabel(indexes[i]-i);
+    m_LabelSetContainer[m_ActiveLayer]->RemoveLabel(indexes[i]-i);
     this->ResetLabels();
   }
   RemoveLabelEvent.Send();
@@ -567,59 +782,64 @@ void mitk::LabelSetImage::SmoothLabels(std::vector<int>& indexes)
 
 std::string mitk::LabelSetImage::GetLabelName(int index)
 {
-  return this->m_LabelSet->GetLabelName(index);
+  return m_LabelSetContainer[m_ActiveLayer]->GetLabelName(index);
 }
 
 unsigned int mitk::LabelSetImage::GetActiveLabelIndex() const
 {
-  return this->m_LabelSet->GetActiveLabel()->GetIndex();
+  return m_LabelSetContainer[m_ActiveLayer]->GetActiveLabel()->GetIndex();
 }
 
 unsigned int mitk::LabelSetImage::GetLabelLayer(int index) const
 {
-  return this->m_LabelSet->GetLabelLayer(index);
+  return m_LabelSetContainer[m_ActiveLayer]->GetLabelLayer(index);
 }
 
 unsigned int mitk::LabelSetImage::GetActiveLabelLayer() const
 {
-  return this->m_LabelSet->GetActiveLabel()->GetLayer();
+  return m_LabelSetContainer[m_ActiveLayer]->GetActiveLabel()->GetLayer();
 }
 
 const mitk::Label* mitk::LabelSetImage::GetActiveLabel() const
 {
-  return this->m_LabelSet->GetActiveLabel();
+  return m_LabelSetContainer[m_ActiveLayer]->GetActiveLabel();
 }
 
 const mitk::Color& mitk::LabelSetImage::GetActiveLabelColor() const
 {
-  return this->m_LabelSet->GetActiveLabel()->GetColor();
+  return m_LabelSetContainer[m_ActiveLayer]->GetActiveLabel()->GetColor();
 }
 
 bool mitk::LabelSetImage::GetLabelLocked(int index) const
 {
-  return this->m_LabelSet->GetLabelLocked(index);
+  return m_LabelSetContainer[m_ActiveLayer]->GetLabelLocked(index);
 }
 
 bool mitk::LabelSetImage::GetLabelSelected(int index) const
 {
-  return this->m_LabelSet->GetLabelSelected(index);
+  return m_LabelSetContainer[m_ActiveLayer]->GetLabelSelected(index);
 }
 
 mitk::LabelSet::ConstPointer mitk::LabelSetImage::GetConstLabelSet() const
 {
-  return m_LabelSet.GetPointer();
+  return m_LabelSetContainer[m_ActiveLayer].GetPointer();
 }
 
 mitk::LabelSet* mitk::LabelSetImage::GetLabelSet()
 {
-  return m_LabelSet.GetPointer();
+  return m_LabelSetContainer[m_ActiveLayer].GetPointer();
+}
+
+const mitk::LookupTable* mitk::LabelSetImage::GetLookupTable()
+{
+  return m_LabelSetContainer[m_ActiveLayer]->GetLookupTable();
 }
 
 void mitk::LabelSetImage::SetLabelSet(mitk::LabelSet* labelset)
 {
-  if (m_LabelSet != labelset)
+  if (m_LabelSetContainer[m_ActiveLayer] != labelset)
   {
-    m_LabelSet = labelset;
+    m_LabelSetContainer[m_ActiveLayer] = labelset;
     this->ResetLabels();
   }
 }
@@ -631,17 +851,16 @@ bool mitk::LabelSetImage::IsLabelSelected(mitk::Label::Pointer label)
 
 bool mitk::LabelSetImage::GetLabelVisible(int index) const
 {
-  return this->m_LabelSet->GetLabelVisible(index);
+  return m_LabelSetContainer[m_ActiveLayer]->GetLabelVisible(index);
 }
 
 void mitk::LabelSetImage::SetLabelVisible(int index, bool value)
 {
-  this->m_LabelSet->SetLabelVisible(index, value);
-  mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetPropertyList()->GetProperty( "LookupTable" ));
+  m_LabelSetContainer[m_ActiveLayer]->SetLabelVisible(index, value);
   double rgba[4];
-  lutProp->GetLookupTable()->GetTableValue(index,rgba);
-  rgba[3] = value ? this->m_LabelSet->GetLabelOpacity(index) : 0.0;
-  lutProp->GetLookupTable()->SetTableValue(index,rgba);
+  m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->GetTableValue(index,rgba);
+  rgba[3] = value ? m_LabelSetContainer[m_ActiveLayer]->GetLabelOpacity(index) : 0.0;
+  m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->SetTableValue(index,rgba);
   ModifyLabelEvent.Send(index);
 }
 
@@ -651,7 +870,7 @@ const mitk::Point3D& mitk::LabelSetImage::GetLabelCenterOfMassIndex(int index, b
   {
     AccessByItk_1( this, CalculateCenterOfMassProcessing, index );
   }
-  return this->m_LabelSet->GetLabelCenterOfMassIndex(index);
+  return m_LabelSetContainer[m_ActiveLayer]->GetLabelCenterOfMassIndex(index);
 }
 
 const mitk::Point3D& mitk::LabelSetImage::GetLabelCenterOfMassCoordinates(int index, bool forceUpdate)
@@ -660,12 +879,13 @@ const mitk::Point3D& mitk::LabelSetImage::GetLabelCenterOfMassCoordinates(int in
   {
     AccessByItk_1( this, CalculateCenterOfMassProcessing, index );
   }
-  return this->m_LabelSet->GetLabelCenterOfMassCoordinates(index);
+  return m_LabelSetContainer[m_ActiveLayer]->GetLabelCenterOfMassCoordinates(index);
 }
 
 void mitk::LabelSetImage::SetActiveLabel(int index, bool sendEvent)
 {
-  this->m_LabelSet->SetActiveLabel(index);
+  m_LabelSetContainer[m_ActiveLayer]->SetActiveLabel(index);
+
   if (sendEvent)
   {
     ModifyLabelEvent.Send(index);
@@ -675,25 +895,25 @@ void mitk::LabelSetImage::SetActiveLabel(int index, bool sendEvent)
 
 void mitk::LabelSetImage::SetLabelLocked(int index, bool value)
 {
-  this->m_LabelSet->SetLabelLocked(index, value);
+  m_LabelSetContainer[m_ActiveLayer]->SetLabelLocked(index, value);
 }
 
 void mitk::LabelSetImage::SetLabelSelected(int index, bool value)
 {
-  this->m_LabelSet->SetLabelSelected(index, value);
+  m_LabelSetContainer[m_ActiveLayer]->SetLabelSelected(index, value);
 }
 
 void mitk::LabelSetImage::RemoveAllLabels()
 {
-  this->m_LabelSet->RemoveAllLabels();
+  m_LabelSetContainer[m_ActiveLayer]->RemoveAllLabels();
   this->ClearBuffer();
   this->Modified();
   RemoveLabelEvent.Send();
 }
 
-int mitk::LabelSetImage::GetNumberOfLabels()
+unsigned int mitk::LabelSetImage::GetNumberOfLabels()
 {
-  return this->m_LabelSet->GetNumberOfLabels();
+  return m_LabelSetContainer[m_ActiveLayer]->GetNumberOfLabels();
 }
 
 void mitk::LabelSetImage::MaskStamp(mitk::Image* mask, bool forceOverwrite)
@@ -724,16 +944,16 @@ void mitk::LabelSetImage::MaskStamp(mitk::Image* mask, bool forceOverwrite)
   }
 }
 
-template < typename LabelSetImageType >
-void mitk::LabelSetImage::MaskStampProcessing(LabelSetImageType* itkImage, mitk::Image* mask, bool forceOverwrite)
+template < typename ImageType >
+void mitk::LabelSetImage::MaskStampProcessing(ImageType* itkImage, mitk::Image* mask, bool forceOverwrite)
 {
-  typedef itk::ImageRegionIterator< LabelSetImageType > IteratorType;
+  typedef itk::ImageRegionIterator< ImageType > IteratorType;
 
-  typename LabelSetImageType::Pointer itkMask;
+  typename ImageType::Pointer itkMask;
   mitk::CastToItkImage(mask, itkMask);
 
-  typedef itk::ImageRegionConstIterator< LabelSetImageType > SourceIteratorType;
-  typedef itk::ImageRegionIterator< LabelSetImageType > TargetIteratorType;
+  typedef itk::ImageRegionConstIterator< ImageType > SourceIteratorType;
+  typedef itk::ImageRegionIterator< ImageType > TargetIteratorType;
 
   SourceIteratorType sourceIter( itkMask, itkMask->GetLargestPossibleRegion() );
   sourceIter.GoToBegin();
@@ -741,7 +961,7 @@ void mitk::LabelSetImage::MaskStampProcessing(LabelSetImageType* itkImage, mitk:
   TargetIteratorType targetIter( itkImage, itkImage->GetLargestPossibleRegion() );
   targetIter.GoToBegin();
 
-  int activeLabel = this->GetActiveLabelIndex();
+  unsigned int activeLabel = this->GetActiveLabelIndex();
 
   while ( !sourceIter.IsAtEnd() )
   {
@@ -766,7 +986,7 @@ mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(int index)
   {
     mask->Initialize(this);
 
-    unsigned int byteSize = sizeof(unsigned char);
+    unsigned int byteSize = sizeof(LabelSetPixelType);
     for (unsigned int dim = 0; dim < mask->GetDimension(); ++dim)
     {
       byteSize *= mask->GetDimension(dim);
@@ -789,16 +1009,16 @@ mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(int index)
   return mask;
 }
 
-template < typename LabelSetImageType >
-void mitk::LabelSetImage::CreateLabelMaskProcessing(LabelSetImageType* itkImage, mitk::Image* mask, int index)
+template < typename ImageType >
+void mitk::LabelSetImage::CreateLabelMaskProcessing(ImageType* itkImage, mitk::Image* mask, int index)
 {
-  typedef itk::ImageRegionIterator< LabelSetImageType > IteratorType;
+  typedef itk::ImageRegionIterator< ImageType > IteratorType;
 
-  typename LabelSetImageType::Pointer itkMask;
+  typename ImageType::Pointer itkMask;
   mitk::CastToItkImage(mask, itkMask);
 
-  typedef itk::ImageRegionConstIterator< LabelSetImageType > SourceIteratorType;
-  typedef itk::ImageRegionIterator< LabelSetImageType > TargetIteratorType;
+  typedef itk::ImageRegionConstIterator< ImageType > SourceIteratorType;
+  typedef itk::ImageRegionIterator< ImageType > TargetIteratorType;
 
   SourceIteratorType sourceIter( itkImage, itkImage->GetLargestPossibleRegion() );
   sourceIter.GoToBegin();
@@ -820,9 +1040,11 @@ void mitk::LabelSetImage::CreateLabelMaskProcessing(LabelSetImageType* itkImage,
 
 void mitk::LabelSetImage::SurfaceStamp(mitk::Surface* surface, bool forceOverwrite)
 {
-  if (!surface) return;
-
-  typedef itk::Image< unsigned char, 3 > LabelSetImageType;
+  if (!surface)
+  {
+    MITK_ERROR << "Input surface is NULL.";
+    return;
+  }
 
   try
   {
@@ -946,7 +1168,7 @@ void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
 
     this->Initialize(image);
 
-    unsigned int byteSize = sizeof(unsigned char);
+    unsigned int byteSize = sizeof(LabelSetPixelType);
     for (unsigned int dim = 0; dim < image->GetDimension(); ++dim)
     {
       byteSize *= image->GetDimension(dim);
@@ -959,7 +1181,12 @@ void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
     mitk::TimeSlicedGeometry::Pointer geometry = image->GetTimeSlicedGeometry()->Clone();
     this->SetGeometry( geometry );
 
-    this->CreateDefaultLabelSet();
+    if (m_LabelSetContainer.size())
+      m_LabelSetContainer.clear();
+
+    m_ActiveLayer = 0;
+
+    this->CreateDefaultLabelSet(m_ActiveLayer);
 
     AccessTwoImagesFixedDimensionByItk(this, image, InitializeByLabeledImageProcessing,3);
   }
@@ -970,11 +1197,11 @@ void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
   this->Modified();
 }
 
-template < typename LabelSetImageType, typename LabeledImageType >
-void mitk::LabelSetImage::InitializeByLabeledImageProcessing(LabelSetImageType* input, LabeledImageType* labeled)
+template < typename ImageType, typename LabeledImageType >
+void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType* input, LabeledImageType* labeled)
 {
   typedef itk::ImageRegionConstIterator< LabeledImageType > SourceIteratorType;
-  typedef itk::ImageRegionIterator< LabelSetImageType > TargetIteratorType;
+  typedef itk::ImageRegionIterator< ImageType > TargetIteratorType;
   typedef itk::RelabelComponentImageFilter<LabeledImageType, LabeledImageType> FilterType;
 
   typename FilterType::Pointer relabelFilter = FilterType::New();
@@ -988,7 +1215,6 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(LabelSetImageType* 
   sourceIter.GoToBegin();
 
   int numberOfObjects = relabelFilter->GetNumberOfObjects();
-  mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetPropertyList()->GetProperty( "LookupTable" ));
 
   for (int i=0; i<numberOfObjects; ++i)
   {
@@ -997,7 +1223,7 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(LabelSetImageType* 
     mitk::Label::Pointer label = mitk::Label::New();
     label->SetName( name.str().c_str() );
     double rgba[4];
-    lutProp->GetLookupTable()->GetTableValue(i+1, rgba );
+    m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->GetTableValue(i+1, rgba );
     mitk::Color newColor;
     newColor.SetRed(rgba[0]);
     newColor.SetGreen(rgba[1]);

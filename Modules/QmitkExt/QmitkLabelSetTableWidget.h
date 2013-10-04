@@ -45,18 +45,18 @@ class QmitkExt_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     enum TableColumns { NAME_COL=0, LOCKED_COL, COLOR_COL, VISIBLE_COL };
 
     /// \brief Sets the active label. It will be shown as selected.
-    void SetActiveLabel( int );
+    virtual void SetActiveLabel( int );
 
     /// \brief Sets the active label. It will be shown as selected.
-    void SetActiveLabel( const std::string& );
+    virtual void SetActiveLabel( const std::string& );
 
     /// \brief Returns whether a new labels is automatically set as active.
     virtual bool GetAutoSelectNewLabels();
 
     /// \brief Set the LabelSetImage the widget should listen to.
-    void SetActiveLabelSetImage(mitk::LabelSetImage*);
+    virtual void SetActiveLabelSetImage(mitk::LabelSetImage*);
 
-    int RetrieveIndex(const QString&);
+   // virtual int RetrieveIndex(const QString&);
 
     /// \brief Toggles all labels visibility.
     virtual void SetAllLabelsVisible(bool);
@@ -75,6 +75,9 @@ class QmitkExt_EXPORT QmitkLabelSetTableWidget : public QTableWidget
 
     /// \brief
     virtual void setEnabled(bool enabled);
+
+    /// \brief Reset function to populate available labels again
+    virtual void Reset();
 
     /// Sets AutoSelectNewItems flag. If set to true new Nodes will be automatically selected. Default is false.
     virtual void SetAutoSelectNewItems(bool _AutoSelectNewItems);
@@ -163,9 +166,6 @@ class QmitkExt_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     void BusyCursorOff();
 
     void RestoreOverrideCursor();
-
-    /// \brief Reset function to populate available labels again
-    void Reset();
 
   protected:
 

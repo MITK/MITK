@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include <mitkCommon.h>
 #include <mitkMessage.h>
+#include <mitkLookupTable.h>
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
@@ -40,11 +41,13 @@ public:
 
     mitkClassMacro( LabelSet, itk::Object );
 
-    itkNewMacro( Self );
+    mitkNewMacro1Param( Self, int );
 
     typedef std::vector <mitk::Label::Pointer>    LabelContainerType;
     typedef LabelContainerType::const_iterator    LabelContainerConstIteratorType;
     typedef LabelContainerType::iterator          LabelContainerIteratorType;
+
+    void Initialize(const LabelSet* other);
 
     /** \brief Returns a const iterator poiting to the begining of the container.
     */
@@ -112,132 +115,137 @@ public:
 
     /** \brief
     */
-    virtual int GetNumberOfLabels() const;
+    int GetNumberOfLabels() const;
 
     /** \brief
     */
-    virtual void SetAllLabelsVisible(bool);
+    void SetAllLabelsVisible(bool);
 
     /** \brief
     */
-    virtual void SetAllLabelsLocked(bool);
+    void SetAllLabelsLocked(bool);
 
     /** \brief
     */
-    virtual void RemoveAllLabels();
+    void RemoveAllLabels();
 
     /** \brief
     */
-    virtual void SetLabelVisible(int index, bool value);
+    void SetLabelVisible(int index, bool value);
 
     /** \brief
     */
-    virtual bool GetLabelVisible(int index);
+    bool GetLabelVisible(int index);
 
     /** \brief
     */
-    virtual void SetLabelLocked(int index, bool value);
+    void SetLabelLocked(int index, bool value);
 
     /** \brief
     */
-    virtual bool GetLabelLocked(int index);
+    bool GetLabelLocked(int index);
 
     /** \brief
     */
-    virtual unsigned int GetLabelLayer(int index) const;
+    unsigned int GetLabelLayer(int index) const;
 
     /** \brief
     */
-    virtual void SetLabelSelected(int index, bool value);
+    void SetLabelSelected(int index, bool value);
 
     /** \brief
     */
-    virtual bool GetLabelSelected(int index);
+    bool GetLabelSelected(int index);
 
     /** \brief
     */
-    virtual void SetLabelOpacity(int index, float value);
+    void SetLabelOpacity(int index, float value);
 
     /** \brief
     */
-    virtual float GetLabelOpacity(int index);
+    float GetLabelOpacity(int index);
 
     /** \brief
     */
-    virtual void SetLabelVolume(int index, float value);
+    void SetLabelVolume(int index, float value);
 
     /** \brief
     */
-    virtual float GetLabelVolume(int index);
+    float GetLabelVolume(int index);
 
     /** \brief
     */
-    virtual void SetLabelName(int index, const std::string &name);
+    void SetLabelName(int index, const std::string &name);
 
     /** \brief
     */
-    virtual std::string GetLabelName(int index);
+    std::string GetLabelName(int index);
 
     /** \brief
     */
-    virtual void SetLabelColor(int index, const mitk::Color &color);
+    void SetLabelColor(int index, const mitk::Color &color);
 
     /** \brief
     */
-    virtual const mitk::Color& GetLabelColor(int index);
+    const mitk::Color& GetLabelColor(int index);
 
     /** \brief
     */
-    virtual const mitk::Label* GetActiveLabel() const { return m_ActiveLabel; };
+    const mitk::Label* GetActiveLabel() const { return m_ActiveLabel; };
 
     /** \brief
     */
-    virtual mitk::Label::ConstPointer GetLabel(int index) const;
+    mitk::Label::ConstPointer GetLabel(int index) const;
 
     /** \brief
     */
-    virtual int GetActiveLabelIndex() const;
+    int GetActiveLabelIndex() const;
 
     /** \brief
     */
-    virtual int GetActiveLabelLayer() const;
+    int GetActiveLabelLayer() const;
 
     /** \brief
     */
-    virtual void SetLabelCenterOfMassIndex(int index, const mitk::Point3D& center);
+    void SetLabelCenterOfMassIndex(int index, const mitk::Point3D& center);
 
     /** \brief
     */
-    virtual const mitk::Point3D& GetLabelCenterOfMassIndex(int index);
+    const mitk::Point3D& GetLabelCenterOfMassIndex(int index);
 
     /** \brief
     */
-    virtual void SetLabelCenterOfMassCoordinates(int index, const mitk::Point3D& center);
+    void SetLabelCenterOfMassCoordinates(int index, const mitk::Point3D& center);
 
     /** \brief
     */
-    virtual const mitk::Point3D& GetLabelCenterOfMassCoordinates(int index);
+    const mitk::Point3D& GetLabelCenterOfMassCoordinates(int index);
 
     /** \brief
     */
-    virtual void ResetLabels();
+    void ResetLabels();
 
-    void Initialize(const LabelSet* other);
+    unsigned int GetLayer() { return m_Layer; };
 
+    mitk::LookupTable* GetLookupTable();
+
+    void SetLookupTable( mitk::LookupTable* lut);
     /** \brief
     */
     static bool IsSelected(mitk::Label::Pointer label);
 
 protected:
 
-    LabelSet();
+    LabelSet(int layer);
     virtual ~LabelSet();
 
-    LabelSet(const LabelSet& other);
+//    LabelSet(const LabelSet& other);
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const;
 
     LabelContainerType m_LabelContainer;
+
+    mitk::LookupTable::Pointer m_LookupTable;
 
     mitk::Label* m_ActiveLabel;
 
@@ -246,6 +254,8 @@ protected:
     std::string m_LastModified;
 
     std::string m_Name;
+
+    unsigned int m_Layer;
 
 private:
 

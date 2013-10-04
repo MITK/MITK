@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurface.h>
 
 #include <itkImage.h>
+#include <itkVectorImage.h>
+#include <itkVectorImageToImageAdaptor.h>
+
 
 namespace mitk
 {
@@ -43,6 +46,13 @@ public:
   itkNewMacro(Self);
 
   mitkNewMacro1Param(Self, LabelSetImage*);
+
+  typedef unsigned char LabelSetPixelType;
+
+  typedef itk::Image<LabelSetPixelType, 3>             LabelSetImageType;
+  typedef itk::VariableLengthVector<LabelSetPixelType> VariableVectorType;
+  typedef itk::VectorImage<LabelSetPixelType, 3>       VectorImageType;
+  typedef itk::VectorImageToImageAdaptor< LabelSetPixelType, 3 > ImageAdaptorType;
 
   /**
   * \brief this constructor creates a labelset image out of the provided reference image.
@@ -101,6 +111,8 @@ public:
   /**
     * \brief  */
   virtual void Initialize(const mitk::Image* image);
+
+  unsigned char* GetImageLayer(int layer);
 
   /**
     * \brief  */
@@ -269,7 +281,7 @@ public:
 
   /**
     * \brief  */
-  int GetNumberOfLabels();
+  unsigned int GetNumberOfLabels();
 
   /**
     * \brief  */
@@ -282,6 +294,8 @@ public:
   /**
     * \brief  */
   mitk::LabelSet* GetLabelSet();
+
+  const mitk::LookupTable* GetLookupTable();
 
   /**
     * \brief  */
@@ -311,21 +325,47 @@ public:
     * \brief  */
   void MaskStamp(mitk::Image* mask, bool forceOverwrite);
 
+  /**
+    * \brief  */
+  void SetActiveLayer(unsigned int layer);
+
+  /**
+    * \brief  */
+  unsigned int GetNumberOfLayers();
+
+  /**
+    * \brief  */
+  void AddLayer();
+
+  /**
+    * \brief  */
+  void RemoveLayer(int layer);
+
+  /**
+    * \brief  */
+  unsigned int GetActiveLayer();
+
 protected:
   LabelSetImage();
   LabelSetImage(mitk::LabelSetImage*);
   virtual ~LabelSetImage();
 
-  virtual void CreateDefaultLabelSet();
+  void CreateDefaultLabelSet(int layer);
 
-  /**
-  * \brief this constructor creates a labelset image out of the provided reference image.
-  * @throw mitk::Exception Throws an exception if there is a problem while creating the labelset image.
-  */
- // LabelSetImage(mitk::Image::Pointer image);
+  template < typename ImageType1, typename ImageType2 >
+  void ChangeLayerProcessing( ImageType1* source, ImageType2* target );
+
+  template < typename PixelType, unsigned int VImageDimension >
+  void AddLayerProcessing( itk::Image< PixelType, VImageDimension >* input);
+
+  template < typename PixelType, unsigned int VImageDimension >
+  void VectorToImageProcessing(itk::Image< PixelType, VImageDimension >* input, int layer);
+
+  template < typename PixelType, unsigned int VImageDimension >
+  void ImageToVectorProcessing(itk::Image< PixelType, VImageDimension >* input, int layer);
 
   template < typename LabelSetImageType >
-  void CalculateCenterOfMassProcessing(LabelSetImageType * input,int index);
+  void CalculateCenterOfMassProcessing(LabelSetImageType * input, int index);
 
   template < typename LabelSetImageType >
   void ClearBufferProcessing(LabelSetImageType * input);
@@ -351,7 +391,16 @@ protected:
   template < typename LabelSetImageType, typename LabeledImageType >
   void InitializeByLabeledImageProcessing(LabelSetImageType* input, LabeledImageType* labeled);
 
-  mitk::LabelSet::Pointer m_LabelSet;
+  //mitk::LabelSet::Pointer m_LabelSet;
+
+  std::vector< mitk::LabelSet::Pointer > m_LabelSetContainer;
+
+  //std::vector< mitk::LabelSetImage::Pointer > m_LayerContainer;
+
+  unsigned int m_ActiveLayer;
+
+  VectorImageType::Pointer  m_VectorImage;
+  ImageAdaptorType::Pointer m_ImageToVectorAdaptor;
 };
 
 } // namespace mitk

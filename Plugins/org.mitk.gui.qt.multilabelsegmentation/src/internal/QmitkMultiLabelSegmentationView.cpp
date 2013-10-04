@@ -145,7 +145,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer2D );
   //m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' 'FastMarching2D'");
   m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Fill Erase 'Region Growing' 'FastMarching2D'");
-  m_Controls.m_ManualToolSelectionBox2D->SetLayoutColumns(3);
+  m_Controls.m_ManualToolSelectionBox2D->SetLayoutColumns(2);
   m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );
   connect( m_Controls.m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
 
@@ -155,7 +155,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   //specify tools to be added to 3D Tool area
 //  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'Two Thresholds' Otsu FastMarching3D RegionGrowing Watershed");
   m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold FastMarching3D MedianTool3D");
-  m_Controls.m_ManualToolSelectionBox3D->SetLayoutColumns(3);
+  m_Controls.m_ManualToolSelectionBox3D->SetLayoutColumns(2);
   m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );
 
   //Hide 3D selection box, show 2D selection box

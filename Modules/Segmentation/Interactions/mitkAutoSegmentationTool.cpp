@@ -140,7 +140,7 @@ void mitk::AutoSegmentationTool::InitializeUndoController()
     mitkThrow() << "Could not retrieve working node!";
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
-  if (!workingNode)
+  if (!workingImage)
     mitkThrow() << "Could not retrieve working image!";
 
   mitk::LabelSetImage::Pointer diffImage = mitk::LabelSetImage::New(workingImage);

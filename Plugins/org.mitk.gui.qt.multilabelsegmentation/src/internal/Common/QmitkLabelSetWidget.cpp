@@ -225,9 +225,11 @@ void QmitkLabelSetWidget::OnRenameLabel(int index, const mitk::Color& color, con
   if (!workingNode) return;
 
   mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-  if ( !lsImage ) return;
+  if (!lsImage) return;
 
   lsImage->RenameLabel(index, dialog->GetSegmentationName().toStdString(), dialog->GetColor());
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnPreviousLayer()
@@ -284,22 +286,30 @@ void QmitkLabelSetWidget::OnDeleteLayer()
   toolManager->ActivateTool(-1);
 
   mitk::DataNode* workingNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
-  if (!workingNode) return;
+  if (!workingNode)
+    return;
 
   mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-  if ( !lsImage ) return;
+  if ( !lsImage )
+    return;
 
-  this->BusyCursorOn();
+  if (lsImage->GetNumberOfLayers() < 2)
+    return;
 
-  lsImage->RemoveLayer(lsImage->GetActiveLayer());
+  QString question = "Do you really want to delete the current layer?";
 
-  this->BusyCursorOff();
+  QMessageBox::StandardButton answerButton = QMessageBox::question( this, "Delete layer",
+     question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
-  m_Controls.m_LabelSetTableWidget->Reset();
-
-  m_Controls.m_leActiveLayer->setText( QString::number(lsImage->GetActiveLayer()) );
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if (answerButton == QMessageBox::Yes)
+  {
+    this->BusyCursorOn();
+    lsImage->RemoveLayer();
+    this->BusyCursorOff();
+    m_Controls.m_LabelSetTableWidget->Reset();
+    m_Controls.m_leActiveLayer->setText( QString::number(lsImage->GetActiveLayer()) );
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 void QmitkLabelSetWidget::OnAddLayer()
@@ -313,17 +323,20 @@ void QmitkLabelSetWidget::OnAddLayer()
   mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
   if ( !lsImage ) return;
 
-  this->BusyCursorOn();
+  QString question = "Do you really want to add a layer the current segmentation session?";
 
-  lsImage->AddLayer();
+  QMessageBox::StandardButton answerButton = QMessageBox::question( this, "Add layer",
+     question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
-  this->BusyCursorOff();
-
-  m_Controls.m_LabelSetTableWidget->Reset();
-
-  m_Controls.m_leActiveLayer->setText( QString::number(lsImage->GetActiveLayer()) );
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if (answerButton == QMessageBox::Yes)
+  {
+    this->BusyCursorOn();
+    lsImage->AddLayer();
+    this->BusyCursorOff();
+    m_Controls.m_LabelSetTableWidget->Reset();
+    m_Controls.m_leActiveLayer->setText( QString::number(lsImage->GetActiveLayer()) );
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 void QmitkLabelSetWidget::OnNewLabel()
@@ -589,7 +602,7 @@ void QmitkLabelSetWidget::OnImportSegmentation()
   if (!segImage) return;
 
   std::string fileExtensions("Segmentation files (*.lset);;");
-  QString qfileName = QFileDialog::getOpenFileName(this, "Import Segmentation", "", fileExtensions.c_str() );
+  QString qfileName = QFileDialog::getOpenFileName(this, "Import Segmentation", this->GetLastFileOpenPath(), fileExtensions.c_str() );
   if (qfileName.isEmpty() ) return;
 
   mitk::NrrdLabelSetImageReader<unsigned char>::Pointer reader = mitk::NrrdLabelSetImageReader<unsigned char>::New();
@@ -600,19 +613,7 @@ void QmitkLabelSetWidget::OnImportSegmentation()
   try
   {
     reader->Update();
-  }
-  catch ( mitk::Exception& e )
-  {
-    this->WaitCursorOff();
-    MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::information(this, "Import Segmentation", "Could not load the selected segmentation. See error log for details.\n");
-    return;
-  }
-
-  mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
-
-  try
-  {
+    mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
     segImage->Concatenate(lsImage);
   }
   catch ( mitk::Exception& e )

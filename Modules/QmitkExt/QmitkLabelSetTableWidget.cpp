@@ -353,10 +353,9 @@ void QmitkLabelSetTableWidget::OnItemClicked(QTableWidgetItem *item)
   int row = item->row();
 
   if (row >= 0 && row < this->rowCount())
-  {
     m_LabelSetImage->SetActiveLabel(row, false);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetTableWidget::OnItemDoubleClicked(QTableWidgetItem *item)

@@ -339,7 +339,7 @@ public:
 
   /**
     * \brief  */
-  void RemoveLayer(int layer);
+  void RemoveLayer();
 
   /**
     * \brief  */

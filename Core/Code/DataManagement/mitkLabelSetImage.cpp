@@ -136,16 +136,13 @@ unsigned int mitk::LabelSetImage::GetNumberOfLayers()
   return m_LabelSetContainer.size();
 }
 
-void mitk::LabelSetImage::RemoveLayer(int layer)
+void mitk::LabelSetImage::RemoveLayer()
 {
   try
   {
-    if ( (m_LabelSetContainer.size()>1) && (layer >= 0) && (layer < m_LabelSetContainer.size()) )
-    {
-      m_LabelSetContainer.erase( m_LabelSetContainer.begin() + layer);
-      this->SetActiveLayer(m_LabelSetContainer.size() - 1);
-      this->Modified();
-    }
+    m_LabelSetContainer.erase( m_LabelSetContainer.begin() + m_ActiveLayer);
+    this->SetActiveLayer(m_LabelSetContainer.size() - 1);
+    this->Modified();
   }
   catch(...)
   {

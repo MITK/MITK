@@ -36,7 +36,7 @@ mitk::ContourUtils::~ContourUtils()
 {
 }
 
-void mitk::ContourUtils::ProjectContourTo2DSlice(Image* slice, ContourModel* contourIn3D, ContourModel* contourIn2D, int timestep)
+void mitk::ContourUtils::ProjectContourTo2DSlice(const Image* slice, ContourModel* contourIn3D, ContourModel* contourIn2D, int timestep)
 {
   if ( !slice || !contourIn3D ) return;
 

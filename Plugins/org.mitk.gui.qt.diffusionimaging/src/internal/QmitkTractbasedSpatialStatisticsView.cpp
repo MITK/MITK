@@ -88,7 +88,9 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
 
   m_CurrentStartRoi = NULL;
   m_CurrentEndRoi = NULL;
+  m_CurrentGeometry = NULL;
 
+  m_Controls->m_RoiPlotWidget->Clear();
 
 
   for ( int i=0; i<nodes.size(); i++ )
@@ -1109,7 +1111,6 @@ void QmitkTractbasedSpatialStatisticsView::Plot(mitk::TbssImage* image, mitk::Tb
     std::vector< itk::Index<3> > roi = roiImage->GetRoi();
     m_Roi = roi;
     m_CurrentGeometry = image->GetGeometry();
-
 
     std::string structure = roiImage->GetStructure();
 

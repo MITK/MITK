@@ -339,6 +339,7 @@ set(CPP_FILES
   Rendering/mitkRenderWindowBase.cpp
   Rendering/mitkShaderRepository.cpp
   Rendering/mitkImageVtkMapper2D.cpp
+  Rendering/mitkLabelSetImageVtkMapper2D.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
   Rendering/vtkMitkLevelWindowFilter.cpp
   Rendering/vtkNeverTranslucentTexture.cpp

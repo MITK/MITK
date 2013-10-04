@@ -260,7 +260,7 @@ void QmitkTensorReconstructionView::Deactivated()
     }
 
 
-
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
     QmitkFunctionality::Deactivated();
 }

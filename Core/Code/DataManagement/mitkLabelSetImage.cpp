@@ -635,6 +635,7 @@ void mitk::LabelSetImage::SetLabelColor(int index, const mitk::Color& color)
   rgba[3] = m_LabelSetContainer[m_ActiveLayer]->GetLabelOpacity(index);
   m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->SetTableValue( index, rgba );
   m_LabelSetContainer[m_ActiveLayer]->SetLabelColor(index, color);
+  this->Modified();
   ModifyLabelEvent.Send(index);
 }
 
@@ -655,6 +656,7 @@ void mitk::LabelSetImage::SetLabelOpacity(int index, float value)
   rgba[3] = value;
   m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->SetTableValue(index,rgba);
   m_LabelSetContainer[m_ActiveLayer]->SetLabelOpacity(index,value);
+  this->Modified();
   ModifyLabelEvent.Send(index);
 }
 
@@ -674,6 +676,7 @@ void mitk::LabelSetImage::RenameLabel(int index, const std::string& name, const 
   rgba[1] = color.GetGreen();
   rgba[2] = color.GetBlue();
   m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->SetTableValue(index,rgba);
+  this->Modified();
   ModifyLabelEvent.Send(index);
 }
 
@@ -701,6 +704,7 @@ void mitk::LabelSetImage::SetAllLabelsVisible(bool value)
     rgba[3] = value ? (*_it)->GetOpacity() : 0.0;
     m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->SetTableValue((*_it)->GetIndex(),rgba);
   }
+  this->Modified();
   AllLabelsModifiedEvent.Send();
 }
 

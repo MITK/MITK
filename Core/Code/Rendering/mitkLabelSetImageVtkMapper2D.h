@@ -175,7 +175,7 @@ public:
     /** \brief PolyData object containg all lines/points needed for outlining the contour.
     This container is used to save a computed contour for the next rendering execution.
     For instance, if you zoom or pann, there is no need to recompute the contour. */
-//    vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
+    vtkSmartPointer<vtkPolyData> m_ActiveLabelContour;
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastDataUpdateTime;
@@ -272,6 +272,9 @@ protected:
 
   /** \brief Set the opacity of the actor. */
   void ApplyOpacity( mitk::BaseRenderer* renderer );
+
+  /** \brief Set the color of the actor. */
+  void ApplyColor( mitk::BaseRenderer* renderer );
 
   /**
     * \brief Calculates whether the given rendering geometry intersects the

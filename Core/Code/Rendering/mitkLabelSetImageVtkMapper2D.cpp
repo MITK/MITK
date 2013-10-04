@@ -229,16 +229,13 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   localStorage->m_LevelWindowFilter->SetClippingBounds(textureClippingBounds);
 
   //generate contours/outlines
-//  localStorage->m_OutlinePolyData = ;
+  localStorage->m_ActiveLabelContour = this->CreateOutlinePolyData( renderer );
 
   float contourWidth = 1.0;
   datanode->GetFloatProperty( "labelset.contour.width", contourWidth, renderer );
   localStorage->m_ActiveLabelContourActor->GetProperty()->SetLineWidth( contourWidth );
 
-  const mitk::Color& activeLabelColor = input->GetActiveLabelColor();
-  double rgbConv[3] = {(double)activeLabelColor.GetRed(), (double)activeLabelColor.GetGreen(), (double)activeLabelColor.GetBlue()};
-  localStorage->m_ActiveLabelContourActor->GetProperty()->SetColor(rgbConv);
-
+  this->ApplyColor( renderer );
   this->ApplyOpacity( renderer );
   this->ApplyLookuptable( renderer );
   this->ApplyLevelWindow( renderer );
@@ -278,7 +275,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   this->TransformActor( renderer );
 
   //we need the contour for the binary outline property as actor
-  localStorage->m_ActiveLabelContourMapper->SetInput( this->CreateOutlinePolyData(renderer) );
+  localStorage->m_ActiveLabelContourMapper->SetInput( localStorage->m_ActiveLabelContour );
 //  localStorage->m_ActiveLabelContourActor->SetTexture(NULL); //no texture for contours
 
   //setup the textured plane
@@ -301,6 +298,15 @@ void mitk::LabelSetImageVtkMapper2D::ApplyLevelWindow(mitk::BaseRenderer *render
   //no opaque level window
   localStorage->m_LevelWindowFilter->SetMinOpacity(0.0);
   localStorage->m_LevelWindowFilter->SetMaxOpacity(255.0);
+}
+
+void mitk::LabelSetImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
+{
+  LocalStorage* localStorage = this->GetLocalStorage( renderer );
+  mitk::LabelSetImage *input = const_cast< mitk::LabelSetImage * >( this->GetInput() );
+  const mitk::Color& activeLabelColor = input->GetActiveLabelColor();
+  double rgbConv[3] = {(double)activeLabelColor.GetRed(), (double)activeLabelColor.GetGreen(), (double)activeLabelColor.GetBlue()};
+  localStorage->m_ActiveLabelContourActor->GetProperty()->SetColor(rgbConv);
 }
 
 void mitk::LabelSetImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
@@ -366,6 +372,7 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   else if ( (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
        || (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
   {
+    this->ApplyColor(renderer);
     this->ApplyOpacity(renderer);
     this->ApplyLookuptable( renderer );
     this->ApplyLevelWindow( renderer );
@@ -628,7 +635,7 @@ mitk::LabelSetImageVtkMapper2D::LocalStorage::LocalStorage()
   m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
   m_Reslicer = mitk::ExtractSliceFilter::New();
   m_LabelOutline = vtkSmartPointer<vtkImageLabelOutline>::New();
- // m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
+  m_ActiveLabelContour = vtkSmartPointer<vtkPolyData>::New();
   m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
   m_EmptyPolyData = vtkSmartPointer<vtkPolyData>::New();
 

@@ -116,16 +116,12 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   mitk::DataNode* datanode = this->GetDataNode();
 
   if ( input == NULL || input->IsInitialized() == false )
-  {
     return;
-  }
 
   //check if there is a valid worldGeometry
   const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
   if( ( worldGeometry == NULL ) || ( !worldGeometry->IsValid() ) || ( !worldGeometry->HasReferenceGeometry() ))
-  {
     return;
-  }
 
   input->Update();
 
@@ -137,7 +133,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     // the latest image is used there if the plane is out of the geometry
     // see bug-13275
     localStorage->m_ReslicedImage = NULL;
-    localStorage->m_Mapper->SetInput( localStorage->m_EmptyPolyData );
+    localStorage->m_ReslicedImageMapper->SetInput( localStorage->m_EmptyPolyData );
     return;
   }
 
@@ -159,8 +155,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   if ( (input->GetDimension() >= 3) && (input->GetDimension(2) > 1) )
   {
     VtkResliceInterpolationProperty *resliceInterpolationProperty;
-    datanode->GetProperty(
-          resliceInterpolationProperty, "reslice interpolation" );
+    datanode->GetProperty( resliceInterpolationProperty, "reslice interpolation" );
 
     int interpolationMode = VTK_RESLICE_NEAREST;
     if ( resliceInterpolationProperty != NULL )
@@ -193,9 +188,9 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
 
   //this is needed when thick mode was enable bevore. These variable have to be reset to default values
-  localStorage->m_Reslicer->SetOutputDimensionality( 2 );
+  localStorage->m_Reslicer->SetOutputDimensionality(2);
   localStorage->m_Reslicer->SetOutputSpacingZDirection(1.0);
-  localStorage->m_Reslicer->SetOutputExtentZDirection( 0, 0 );
+  localStorage->m_Reslicer->SetOutputExtentZDirection(0,0);
 
   localStorage->m_Reslicer->Modified();
   //start the pipeline with updating the largest possible, needed if the geometry of the input has changed
@@ -205,8 +200,8 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   // Bounds information for reslicing (only reuqired if reference geometry
   // is present)
   //this used for generating a vtkPLaneSource with the right size
-  vtkFloatingPointType sliceBounds[6];
-  for ( int i = 0; i < 6; ++i )
+  double sliceBounds[6];
+  for (int i=0; i<6; ++i)
   {
     sliceBounds[i] = 0.0;
   }
@@ -215,26 +210,34 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   //get the spacing of the slice
   localStorage->m_mmPerPixel = localStorage->m_Reslicer->GetOutputSpacing();
 
-  // calculate minimum bounding rect of IMAGE in texture
+  double textureClippingBounds[6];
+  for (int i=0; i<6; ++i)
   {
-    vtkFloatingPointType textureClippingBounds[6];
-    for ( int i = 0; i < 6; ++i )
-    {
-      textureClippingBounds[i] = 0.0;
-    }
-    // Calculate the actual bounds of the transformed plane clipped by the
-    // dataset bounding box; this is required for drawing the texture at the
-    // correct position during 3D mapping.
-    mitk::PlaneClipping::CalculateClippedPlaneBounds( input->GetGeometry(), planeGeometry, textureClippingBounds );
-
-    textureClippingBounds[0] = static_cast< int >( textureClippingBounds[0] / localStorage->m_mmPerPixel[0] + 0.5 );
-    textureClippingBounds[1] = static_cast< int >( textureClippingBounds[1] / localStorage->m_mmPerPixel[0] + 0.5 );
-    textureClippingBounds[2] = static_cast< int >( textureClippingBounds[2] / localStorage->m_mmPerPixel[1] + 0.5 );
-    textureClippingBounds[3] = static_cast< int >( textureClippingBounds[3] / localStorage->m_mmPerPixel[1] + 0.5 );
-
-    //clipping bounds for cutting the image
-    localStorage->m_LevelWindowFilter->SetClippingBounds(textureClippingBounds);
+    textureClippingBounds[i] = 0.0;
   }
+  // Calculate the actual bounds of the transformed plane clipped by the
+  // dataset bounding box; this is required for drawing the texture at the
+  // correct position during 3D mapping.
+  mitk::PlaneClipping::CalculateClippedPlaneBounds( input->GetGeometry(), planeGeometry, textureClippingBounds );
+
+  textureClippingBounds[0] = static_cast< int >( textureClippingBounds[0] / localStorage->m_mmPerPixel[0] + 0.5 );
+  textureClippingBounds[1] = static_cast< int >( textureClippingBounds[1] / localStorage->m_mmPerPixel[0] + 0.5 );
+  textureClippingBounds[2] = static_cast< int >( textureClippingBounds[2] / localStorage->m_mmPerPixel[1] + 0.5 );
+  textureClippingBounds[3] = static_cast< int >( textureClippingBounds[3] / localStorage->m_mmPerPixel[1] + 0.5 );
+
+  //clipping bounds for cutting the image
+  localStorage->m_LevelWindowFilter->SetClippingBounds(textureClippingBounds);
+
+  //generate contours/outlines
+//  localStorage->m_OutlinePolyData = ;
+
+  float contourWidth = 1.0;
+  datanode->GetFloatProperty( "labelset.contour.width", contourWidth, renderer );
+  localStorage->m_ActiveLabelContourActor->GetProperty()->SetLineWidth( contourWidth );
+
+  const mitk::Color& activeLabelColor = input->GetActiveLabelColor();
+  double rgbConv[3] = {(double)activeLabelColor.GetRed(), (double)activeLabelColor.GetGreen(), (double)activeLabelColor.GetBlue()};
+  localStorage->m_ActiveLabelContourActor->GetProperty()->SetColor(rgbConv);
 
   this->ApplyOpacity( renderer );
   this->ApplyLookuptable( renderer );
@@ -254,16 +257,6 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     localStorage->m_LabelOutline->SetBackground(0.0);
     localStorage->m_LabelOutline->Update();
     localStorage->m_ReslicedImage = localStorage->m_LabelOutline->GetOutput();
-/*
-    // set the contour of the active label to full opacity
-    if (contourActive)
-    {
-      double rgba[4];
-      input->GetLookupTable()->GetVtkLookupTable()->GetTableValue(input->GetActiveLabelIndex(),rgba);
-      rgba[3] = 1.0;
-      input->GetLookupTable()->GetVtkLookupTable()->SetTableValue(input->GetActiveLabelIndex(),rgba);
-    }
-*/
   }
 
   // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
@@ -284,16 +277,17 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
 
   this->TransformActor( renderer );
 
-  vtkActor* contourShadowActor = dynamic_cast<vtkActor*> (localStorage->m_Actors->GetParts()->GetItemAsObject(0));
+  //we need the contour for the binary outline property as actor
+  localStorage->m_ActiveLabelContourMapper->SetInput( this->CreateOutlinePolyData(renderer) );
+//  localStorage->m_ActiveLabelContourActor->SetTexture(NULL); //no texture for contours
 
   //setup the textured plane
   this->GeneratePlane( renderer, sliceBounds );
   //set the plane as input for the mapper
-  localStorage->m_Mapper->SetInputConnection(localStorage->m_Plane->GetOutputPort());
+  localStorage->m_ReslicedImageMapper->SetInputConnection(localStorage->m_Plane->GetOutputPort());
   //set the texture for the actor
 
-  localStorage->m_Actor->SetTexture(localStorage->m_Texture);
-  contourShadowActor->SetVisibility( false );
+  localStorage->m_ReslicedImageActor->SetTexture(localStorage->m_Texture);
 }
 
 void mitk::LabelSetImageVtkMapper2D::ApplyLevelWindow(mitk::BaseRenderer *renderer)
@@ -316,11 +310,8 @@ void mitk::LabelSetImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer 
   // check for opacity prop and use it for rendering if it exists
   GetDataNode()->GetOpacity( opacity, renderer, "opacity" );
   //set the opacity according to the properties
-  localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
-  if ( localStorage->m_Actors->GetParts()->GetNumberOfItems() > 1 )
-  {
-    dynamic_cast<vtkActor*>( localStorage->m_Actors->GetParts()->GetItemAsObject(0) )->GetProperty()->SetOpacity(opacity);
-  }
+  localStorage->m_ReslicedImageActor->GetProperty()->SetOpacity(opacity);
+  localStorage->m_ActiveLabelContourActor->GetProperty()->SetOpacity(opacity);
 }
 
 void mitk::LabelSetImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
@@ -392,34 +383,28 @@ void mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, 
   }
 
   // Properties common for both images and segmentations
-  node->AddProperty( "depthOffset", mitk::FloatProperty::New( 0.0 ), renderer, overwrite );
-  node->AddProperty( "outline binary", mitk::BoolProperty::New( false ), renderer, overwrite );
-  node->AddProperty( "outline width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
-  node->AddProperty( "outline binary shadow", mitk::BoolProperty::New( false ), renderer, overwrite );
-  node->AddProperty( "outline binary shadow color", ColorProperty::New(0.0,0.0,0.0), renderer, overwrite );
-  node->AddProperty( "outline shadow width", mitk::FloatProperty::New( 1.5 ), renderer, overwrite );
-  if(image->IsRotated()) node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_CUBIC) );
-  else node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() );
-  node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataNodeFactory::m_TextureInterpolationActive ) );  // set to user configurable default value (see global options)
-  node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
-  node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
+  node->AddProperty( "depthOffset", FloatProperty::New( 0.0 ), renderer, overwrite );
+  if(image->IsRotated()) node->AddProperty( "reslice interpolation", VtkResliceInterpolationProperty::New(VTK_RESLICE_CUBIC) );
+  else node->AddProperty( "reslice interpolation", VtkResliceInterpolationProperty::New() );
+  node->AddProperty( "texture interpolation", BoolProperty::New( mitk::DataNodeFactory::m_TextureInterpolationActive ) );  // set to user configurable default value (see global options)
+  node->AddProperty( "in plane resample extent by geometry", BoolProperty::New( false ) );
+  node->AddProperty( "bounding box", BoolProperty::New( false ) );
 
-  mitk::RenderingModeProperty::Pointer renderingModeProperty = mitk::RenderingModeProperty::New( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW );
+  mitk::RenderingModeProperty::Pointer renderingModeProperty = mitk::RenderingModeProperty::New( RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW );
   node->AddProperty( "Image Rendering.Mode", renderingModeProperty);
 
   mitk::ColormapProperty::Pointer colormapProperty = mitk::ColormapProperty::New();
   node->AddProperty( "colormap", colormapProperty, renderer, overwrite );
-  colormapProperty->SetValue(mitk::ColormapProperty::CM_MULTILABEL);
+  colormapProperty->SetValue( ColormapProperty::CM_MULTILABEL );
 
-//  mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New();
-//  node->AddProperty( "LookupTable", lutProp, renderer, overwrite );
-
-  node->AddProperty( "opacity", mitk::FloatProperty::New(1.0f), renderer, overwrite );
+  node->AddProperty( "opacity", FloatProperty::New(1.0f), renderer, overwrite );
   node->AddProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer, overwrite );
-  node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
-  node->AddProperty( "labelset.contour.all", mitk::BoolProperty::New( false ), renderer, overwrite );
-  node->AddProperty( "labelset.contour.active", mitk::BoolProperty::New( true ), renderer, overwrite );
-  node->AddProperty( "layer", mitk::IntProperty::New(100), renderer, overwrite);
+  node->AddProperty( "binary", BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "labelset.contour.all", BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "labelset.contour.active", BoolProperty::New( true ), renderer, overwrite );
+  node->AddProperty( "labelset.contour.width", FloatProperty::New( 2.0 ), renderer, overwrite );
+
+  node->AddProperty( "layer", IntProperty::New(100), renderer, overwrite);
 
   mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
   mitk::LevelWindow levelwindow;
@@ -454,7 +439,7 @@ vtkSmartPointer<vtkPolyData> mitk::LabelSetImageVtkMapper2D::CreateOutlinePolyDa
   LabelSetImage::LabelSetPixelType* currentPixel;
 
   //get the depth for each contour
-  float depth = CalculateLayerDepth(renderer);
+  float depth = this->CalculateLayerDepth(renderer);
 
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New(); //the points to draw
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
@@ -589,16 +574,11 @@ void mitk::LabelSetImageVtkMapper2D::TransformActor(mitk::BaseRenderer* renderer
   vtkSmartPointer<vtkMatrix4x4> matrix = localStorage->m_Reslicer->GetResliceAxes();
   trans->SetMatrix(matrix);
   //transform the plane/contour (the actual actor) to the corresponding view (axial, coronal or saggital)
-  localStorage->m_Actor->SetUserTransform(trans);
+  localStorage->m_ReslicedImageActor->SetUserTransform(trans);
   //transform the origin to center based coordinates, because MITK is center based.
-  localStorage->m_Actor->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
-
-  if ( localStorage->m_Actors->GetNumberOfPaths() > 1 )
-  {
-    vtkActor* secondaryActor = dynamic_cast<vtkActor*>( localStorage->m_Actors->GetParts()->GetItemAsObject(0) );
-    secondaryActor->SetUserTransform(trans);
-    secondaryActor->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
-  }
+  localStorage->m_ReslicedImageActor->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
+  localStorage->m_ActiveLabelContourActor->SetUserTransform(trans);
+  localStorage->m_ActiveLabelContourActor->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
 }
 
 bool mitk::LabelSetImageVtkMapper2D::RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry )
@@ -641,24 +621,24 @@ mitk::LabelSetImageVtkMapper2D::LocalStorage::LocalStorage()
   //Do as much actions as possible in here to avoid double executions.
   m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
   m_Texture = vtkSmartPointer<vtkNeverTranslucentTexture>::New().GetPointer();
-  m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  m_Actor = vtkSmartPointer<vtkActor>::New();
+  m_ReslicedImageMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_ReslicedImageActor = vtkSmartPointer<vtkActor>::New();
+  m_ActiveLabelContourMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_ActiveLabelContourActor = vtkSmartPointer<vtkActor>::New();
   m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
   m_Reslicer = mitk::ExtractSliceFilter::New();
   m_LabelOutline = vtkSmartPointer<vtkImageLabelOutline>::New();
-  m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
+ // m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
   m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
   m_EmptyPolyData = vtkSmartPointer<vtkPolyData>::New();
 
   //do not repeat the texture (the image)
   m_Texture->RepeatOff();
 
-  //set the mapper for the actor
-  m_Actor->SetMapper( m_Mapper );
+  //set corresponding mappers for the actors
+  m_ReslicedImageActor->SetMapper( m_ReslicedImageMapper );
+  m_ActiveLabelContourActor->SetMapper( m_ActiveLabelContourMapper );
 
-  vtkSmartPointer<vtkActor> outlineShadowActor = vtkSmartPointer<vtkActor>::New();
-  outlineShadowActor->SetMapper( m_Mapper );
-
-  m_Actors->AddPart( outlineShadowActor );
-  m_Actors->AddPart( m_Actor );
+  m_Actors->AddPart( m_ActiveLabelContourActor );
+  m_Actors->AddPart( m_ReslicedImageActor );
 }

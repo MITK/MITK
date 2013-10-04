@@ -145,12 +145,16 @@ public:
   class MITK_CORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
   {
   public:
-    /** \brief Actor of a 2D render window. */
-    vtkSmartPointer<vtkActor> m_Actor;
+    /** \brief Actor of the resliced image plane. */
+    vtkSmartPointer<vtkActor> m_ReslicedImageActor;
+
+    /** \brief Actor for the outline of the active label. */
+    vtkSmartPointer<vtkActor> m_ActiveLabelContourActor;
 
     vtkSmartPointer<vtkPropAssembly> m_Actors;
     /** \brief Mapper of a 2D render window. */
-    vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
+    vtkSmartPointer<vtkPolyDataMapper> m_ReslicedImageMapper;
+    vtkSmartPointer<vtkPolyDataMapper> m_ActiveLabelContourMapper;
     /** \brief Current slice of a 2D render window.*/
     vtkSmartPointer<vtkImageData> m_ReslicedImage;
     /** \brief Empty vtkPolyData that is set when rendering geometry does not
@@ -171,7 +175,7 @@ public:
     /** \brief PolyData object containg all lines/points needed for outlining the contour.
     This container is used to save a computed contour for the next rendering execution.
     For instance, if you zoom or pann, there is no need to recompute the contour. */
-    vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
+//    vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastDataUpdateTime;

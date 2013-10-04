@@ -88,6 +88,13 @@ protected slots:
   void AnalyticalQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages, int normalization);
   void MultiQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages);
 
+
+  /**
+   * @brief PreviewThreshold Generates a preview of the values that are cut off by the thresholds
+   * @param threshold
+   */
+  void PreviewThreshold(int threshold);
+
 protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
@@ -112,6 +119,7 @@ protected:
   berry::ISelectionListener::Pointer m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
+  mitk::DataStorage::SetOfObjects::Pointer m_DiffusionImages;
 
 private:
 

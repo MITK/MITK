@@ -41,6 +41,7 @@ QmitkAboutDialog::QmitkAboutDialog(QWidget* parent, Qt::WindowFlags f)
 
   m_GUI.m_CaptionLabel->setText(mitkDiffusionCaption);
   m_GUI.m_RevisionLabel->setText(mitkDiffusionVersion);
+  m_GUI.m_ToolkitVersionsLabel->setText(QString("ITK %1, VTK %2, Qt %3").arg(itkVersion, vtkVersion, QT_VERSION_STR));
 
   connect(m_GUI.m_ButtonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }

@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKIMAGEVTKMAPPER2D_H_HEADER_INCLUDED_C10E906E
-#define MITKIMAGEVTKMAPPER2D_H_HEADER_INCLUDED_C10E906E
+#ifndef __mitkLabelSetImageVtkMapper2D_H_
+#define __mitkLabelSetImageVtkMapper2D_H_
 
 //MITK
 #include <mitkCommon.h>
@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK Rendering
 #include "mitkBaseRenderer.h"
 #include "mitkVtkMapper.h"
+#include "mitkLabelSetImage.h"
 #include "mitkExtractSliceFilter.h"
 
 //VTK
@@ -39,6 +40,7 @@ class vtkPoints;
 class vtkMitkThickSlicesFilter;
 class vtkPolyData;
 class vtkMitkLevelWindowFilter;
+class vtkImageLabelOutline;
 
 namespace mitk {
 
@@ -111,18 +113,18 @@ namespace mitk {
 
  * \ingroup Mapper
  */
-class MITK_CORE_EXPORT ImageVtkMapper2D : public VtkMapper
+class MITK_CORE_EXPORT LabelSetImageVtkMapper2D : public VtkMapper
 {
 
 public:
   /** Standard class typedefs. */
-  mitkClassMacro( ImageVtkMapper2D,VtkMapper );
+  mitkClassMacro( LabelSetImageVtkMapper2D,VtkMapper );
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
   /** \brief Get the Image to map */
-  const mitk::Image *GetInput(void);
+  const mitk::LabelSetImage *GetInput(void);
 
   /** \brief Checks whether this mapper needs to update itself and generate
    * data. */
@@ -135,11 +137,11 @@ public:
 
   /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
   /**
-     * To render transveral, coronal, and sagittal, the mapper is called three times.
-     * For performance reasons, the corresponding data for each view is saved in the
-     * internal helper class LocalStorage. This allows rendering n views with just
-     * 1 mitkMapper using n vtkMapper.
-     * */
+  * To render transveral, coronal, and sagittal, the mapper is called three times.
+  * For performance reasons, the corresponding data for each view is saved in the
+  * internal helper class LocalStorage. This allows rendering n views with just
+  * 1 mitkMapper using n vtkMapper.
+  */
   class MITK_CORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
   {
   public:
@@ -156,8 +158,7 @@ public:
       *   \warning This member variable is set to NULL,
       *   if no image geometry is inside the plane geometry
       *   of the respective render window. Any user of this
-      *   slice has to check whether it is set to NULL!
-      */
+      *   slice has to check whether it is set to NULL! */
     vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
     /** \brief Plane on which the slice is rendered as texture. */
     vtkSmartPointer<vtkPlaneSource> m_Plane;
@@ -165,11 +166,11 @@ public:
     vtkSmartPointer<vtkTexture> m_Texture;
     /** \brief The actual reslicer (one per renderer) */
     mitk::ExtractSliceFilter::Pointer m_Reslicer;
-    /** \brief Filter for thick slices */
-    vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
+    /** \brief The filter for generating label outlines */
+    vtkSmartPointer<vtkImageLabelOutline> m_LabelOutline;
     /** \brief PolyData object containg all lines/points needed for outlining the contour.
-          This container is used to save a computed contour for the next rendering execution.
-          For instance, if you zoom or pann, there is no need to recompute the contour. */
+    This container is used to save a computed contour for the next rendering execution.
+    For instance, if you zoom or pann, there is no need to recompute the contour. */
     vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
 
     /** \brief Timestamp of last update of stored data. */
@@ -180,9 +181,6 @@ public:
 
     /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
     mitk::ScalarType* m_mmPerPixel;
-
-    /** \brief Currently active color map. */
-    int m_ColorMap;
 
     /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */
     vtkSmartPointer<vtkMitkLevelWindowFilter> m_LevelWindowFilter;
@@ -202,44 +200,38 @@ public:
   /** \brief Set the default properties for general image rendering. */
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
-  /** \brief This method switches between different rendering modes (e.g. use a lookup table or a transfer function).
-   * Detailed documentation about the modes can be found here: \link mitk::RenderingerModeProperty \endlink
-   */
-  void ApplyRenderingMode(mitk::BaseRenderer *renderer);
-
 protected:
   /** \brief Transforms the actor to the actual position in 3D.
-    *   \param renderer The current renderer corresponding to the render window.
-    */
+  *   \param renderer The current renderer corresponding to the render window.
+  */
   void TransformActor(mitk::BaseRenderer* renderer);
 
   /** \brief Generates a plane according to the size of the resliced image in milimeters.
-    *
-    * \image html texturedPlane.png
-    *
-    * In VTK a vtkPlaneSource is defined through three points. The origin and two
-    * points defining the axes of the plane (see VTK documentation). The origin is
-    * set to (xMin; yMin; Z), where xMin and yMin are the minimal bounds of the
-    * resliced image in space. Z is relevant for blending and the layer property.
-    * The center of the plane (C) is also the center of the view plane (cf. the image above).
-    *
-    * \note For the standard MITK view with three 2D render windows showing three
-    * different slices, three such planes are generated. All these planes are generated
-    * in the XY-plane (even if they depict a YZ-slice of the volume).
-    *
-    */
+  *
+  * \image html texturedPlane.png
+  *
+  * In VTK a vtkPlaneSource is defined through three points. The origin and two
+  * points defining the axes of the plane (see VTK documentation). The origin is
+  * set to (xMin; yMin; Z), where xMin and yMin are the minimal bounds of the
+  * resliced image in space. Z is relevant for blending and the layer property.
+  * The center of the plane (C) is also the center of the view plane (cf. the image above).
+  *
+  * \note For the standard MITK view with three 2D render windows showing three
+  * different slices, three such planes are generated. All these planes are generated
+  * in the XY-plane (even if they depict a YZ-slice of the volume).
+  */
   void GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6]);
 
   /** \brief Generates a vtkPolyData object containing the outline of a given binary slice.
       \param renderer: Pointer to the renderer containing the needed information
       \note This code is based on code from the iil library.
-      */
+  */
   vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer* renderer);
 
   /** Default constructor */
-  ImageVtkMapper2D();
+  LabelSetImageVtkMapper2D();
   /** Default deconstructor */
-  virtual ~ImageVtkMapper2D();
+  virtual ~LabelSetImageVtkMapper2D();
 
   /** \brief Does the actual resampling, without rendering the image yet.
     * All the data is generated inside this method. The vtkProp (or Actor)
@@ -257,21 +249,15 @@ protected:
 
   /** \brief This method uses the vtkCamera clipping range and the layer property
     * to calcualte the depth of the object (e.g. image or contour). The depth is used
-    * to keep the correct order for the final VTK rendering.*/
+    * to keep the correct order for the final VTK rendering.
+  */
   float CalculateLayerDepth(mitk::BaseRenderer* renderer);
 
   /** \brief This method applies (or modifies) the lookuptable for all types of images.
    * \warning To use the lookup table, the property 'Lookup Table' must be set and a 'Image Rendering.Mode'
    * which uses the lookup table must be set.
-*/
+  */
   void ApplyLookuptable(mitk::BaseRenderer* renderer);
-
-  /** \brief This method applies a color transfer function.
-   * Internally, a vtkColorTransferFunction is used. This is usefull for coloring continous
-   * images (e.g. float)
-   * \warning To use the color transfer function, the property 'Image Rendering.Transfer Function' must be set and a 'Image Rendering.Mode' which uses the color transfer function must be set.
-*/
-  void ApplyColorTransferFunction(mitk::BaseRenderer* renderer);
 
   /**
    * @brief ApplyLevelWindow Apply the level window for the given renderer.
@@ -279,9 +265,6 @@ protected:
    * @param renderer Level window for which renderer?
    */
   void ApplyLevelWindow(mitk::BaseRenderer* renderer);
-
-  /** \brief Set the color of the image/polydata */
-  void ApplyColor( mitk::BaseRenderer* renderer );
 
   /** \brief Set the opacity of the actor. */
   void ApplyOpacity( mitk::BaseRenderer* renderer );
@@ -301,4 +284,4 @@ protected:
 
 } // namespace mitk
 
-#endif /* MITKIMAGEVTKMAPPER2D_H_HEADER_INCLUDED_C10E906E */
+#endif /* MITKLabelSetImageVtkMapper2D_H_HEADER_INCLUDED_C10E906E */

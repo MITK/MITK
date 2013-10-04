@@ -27,7 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGeometry3D.h"
 #include "mitkGeometryData.h"
 #include "mitkImage.h"
-#include <mitkImageVtkMapper2D.h>
+#include "mitkLabelSetImage.h"
+#include "mitkImageVtkMapper2D.h"
+#include "mitkLabelSetImageVtkMapper2D.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkLookupTable.h"
 #include "mitkLookupTableProperty.h"
@@ -41,7 +43,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSlicedGeometry3D.h"
 #include "mitkSmartPointerProperty.h"
 #include "mitkStringProperty.h"
-#include "mitkSurface.h"
 #include "mitkSurface.h"
 #include "mitkSurfaceGLMapper2D.h"
 #include "mitkSurfaceVtkMapper3D.h"
@@ -107,8 +108,17 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode* node)
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNotNull() && image->IsInitialized())
   {
-    mitk::ImageVtkMapper2D::SetDefaultProperties(node);
-    mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
+    mitk::LabelSetImage::Pointer lsimage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+    if(lsimage.IsNotNull() && lsimage->IsInitialized())
+    {
+      mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(node);
+      mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
+    }
+    else
+    {
+      mitk::ImageVtkMapper2D::SetDefaultProperties(node);
+      mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
+    }
   }
 
   mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
@@ -175,7 +185,12 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
 
     if ( id == mitk::BaseRenderer::Standard2D )
     {
-      if((dynamic_cast<Image*>(data)!=NULL))
+      if((dynamic_cast<LabelSetImage*>(data)!=NULL))
+      {
+        newMapper = mitk::LabelSetImageVtkMapper2D::New();
+        newMapper->SetDataNode(node);
+      }
+      else if((dynamic_cast<Image*>(data)!=NULL))
       {
         newMapper = mitk::ImageVtkMapper2D::New();
         newMapper->SetDataNode(node);

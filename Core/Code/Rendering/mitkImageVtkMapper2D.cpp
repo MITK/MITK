@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkColormapProperty.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkPlaneClipping.h>
-#include <mitkLabelSetImage.h>
 
 //MITK Rendering
 #include "vtkMitkThickSlicesFilter.h"
@@ -47,15 +46,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkLookupTable.h>
 #include <vtkImageData.h>
 #include <vtkPoints.h>
-#include <vtkGeneralTransform.h>
 #include <vtkImageReslice.h>
-#include <vtkImageChangeInformation.h>
 #include <vtkPlaneSource.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkCellArray.h>
 #include <vtkCamera.h>
 #include <vtkColorTransferFunction.h>
-#include <vtkImageLabelOutline.h>
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -116,8 +112,6 @@ vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
   //return the actor corresponding to the renderer
   return m_LSH.GetLocalStorage(renderer)->m_Actors;
 }
-
-
 
 void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
@@ -374,24 +368,6 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   this->ApplyOpacity( renderer );
   this->ApplyRenderingMode(renderer);
 
-  bool outlineAll = false;
-  datanode->GetBoolProperty( "labelset.outline.all", outlineAll, renderer );
-
-  bool outlineActive = false;
-  datanode->GetBoolProperty( "labelset.outline.active", outlineActive, renderer );
-
-  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(datanode->GetData());
-  if ( (outlineAll || outlineActive) && lsImage )
-  {
-//    vtkSmartPointer<vtkImageLabelOutline> m_LabelOutline = vtkSmartPointer<vtkImageLabelOutline>::New();
-    localStorage->m_LabelOutline->SetInput( localStorage->m_ReslicedImage );
-    localStorage->m_LabelOutline->SetActiveLabel( lsImage->GetActiveLabelIndex() );
-    localStorage->m_LabelOutline->SetOutlineAll( outlineAll );
-    localStorage->m_LabelOutline->SetBackground(0.0);
-    localStorage->m_LabelOutline->Update();
-    localStorage->m_ReslicedImage = localStorage->m_LabelOutline->GetOutput();
-  }
-
   // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
   localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
@@ -627,18 +603,10 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
   mitk::ColormapProperty::Pointer cmProp = dynamic_cast<mitk::ColormapProperty*>(this->GetDataNode()->GetProperty( "colormap", renderer ));
   if(cmProp.IsNotNull())
   {
-      colormap = cmProp->GetColormap();
+    colormap = cmProp->GetColormap();
   }
 
-  // If lookup table or transfer function use is requested...
   mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataNode()->GetProperty("LookupTable"));
-
-  if (dynamic_cast<mitk::LabelSetImage*>(this->GetDataNode()->GetData()))
-  {
-    mitk::LabelSetImage::Pointer lsImage = dynamic_cast<mitk::LabelSetImage*>(this->GetDataNode()->GetData());
-    lutProp = dynamic_cast<mitk::LookupTableProperty*>(lsImage->GetPropertyList()->GetProperty( "LookupTable"));
-  }
-
   if( lutProp.IsNotNull() )
   {
     localStorage->m_LevelWindowFilter->SetLookupTable(lutProp->GetLookupTable()->GetVtkLookupTable());
@@ -765,7 +733,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   }
 
   bool isBinaryImage(false);
-  if ( ( !node->GetBoolProperty("binary", isBinaryImage)) && (!dynamic_cast<mitk::LabelSetImage*>(node->GetData())) )
+  if ( !node->GetBoolProperty("binary", isBinaryImage) )
   {
     // ok, property is not set, use heuristic to determine if this
     // is a binary image
@@ -803,40 +771,23 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   // some more properties specific for a binary...
   if (isBinaryImage)
   {
-    node->AddProperty( "opacity", mitk::FloatProperty::New(0.3f), renderer, overwrite );
+    node->AddProperty( "opacity", FloatProperty::New(0.3f), renderer, overwrite );
     node->AddProperty( "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
     node->AddProperty( "binaryimage.selectedcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
     node->AddProperty( "binaryimage.selectedannotationcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
     node->AddProperty( "binaryimage.hoveringcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
     node->AddProperty( "binaryimage.hoveringannotationcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
-    node->AddProperty( "binary", mitk::BoolProperty::New( true ), renderer, overwrite );
-    node->AddProperty( "layer", mitk::IntProperty::New(10), renderer, overwrite);
-    colormapProperty->SetValue(mitk::ColormapProperty::CM_LEGACYBINARY);
-  }
-  else if (dynamic_cast<mitk::LabelSetImage*>(node->GetData())) // a labelset image
-  {
-    node->AddProperty( "opacity", mitk::FloatProperty::New(1.0f), renderer, overwrite );
-    node->AddProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer, overwrite );
-    node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
-    node->AddProperty( "labelset.outline.all", mitk::BoolProperty::New( false ), renderer, overwrite );
-    node->AddProperty( "labelset.outline.active", mitk::BoolProperty::New( true ), renderer, overwrite );
-    node->AddProperty( "layer", mitk::IntProperty::New(100), renderer, overwrite);
-
-    mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
-    mitk::LevelWindow levelwindow;
-    levelwindow.SetLevelWindow(127.5, 255.0);
-    levelwindow.SetRangeMinMax(0, 255);
-    levWinProp->SetLevelWindow( levelwindow );
-    node->AddProperty( "levelwindow", levWinProp, renderer, overwrite );
-    colormapProperty->SetValue(mitk::ColormapProperty::CM_MULTILABEL);
+    node->AddProperty( "binary", BoolProperty::New( true ), renderer, overwrite );
+    node->AddProperty( "layer", IntProperty::New(10), renderer, overwrite);
+    colormapProperty->SetValue( ColormapProperty::CM_LEGACYBINARY );
   }
   else  // or regular image
   {
-    node->AddProperty( "opacity", mitk::FloatProperty::New(1.0f), renderer, overwrite );
+    node->AddProperty( "opacity", FloatProperty::New(1.0f), renderer, overwrite );
     node->AddProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer, overwrite );
-    node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
-    node->AddProperty( "layer", mitk::IntProperty::New(0), renderer, overwrite);
-    colormapProperty->SetValue(mitk::ColormapProperty::CM_BW);
+    node->AddProperty( "binary", BoolProperty::New( false ), renderer, overwrite );
+    node->AddProperty( "layer", IntProperty::New(0), renderer, overwrite );
+    colormapProperty->SetValue( ColormapProperty::CM_BW );
 
     // initialize level/window from DICOM tags
     std::string sLevel;
@@ -1104,7 +1055,6 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
   m_Reslicer = mitk::ExtractSliceFilter::New();
-  m_LabelOutline = vtkSmartPointer<vtkImageLabelOutline>::New();
   m_TSFilter = vtkSmartPointer<vtkMitkThickSlicesFilter>::New();
   m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
   m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();

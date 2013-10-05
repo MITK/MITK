@@ -118,14 +118,39 @@ mitk::LabelSetImage::~LabelSetImage()
   m_LabelSetContainer.clear();
 }
 
-unsigned char* mitk::LabelSetImage::GetImageLayer(int layer)
+mitk::LabelSetImage::LabelSetPixelType* mitk::LabelSetImage::GetLayerBufferPointer(unsigned int layer)
 {
   m_ImageToVectorAdaptor->SetExtractComponentIndex( layer );
   m_ImageToVectorAdaptor->Update();
   return m_ImageToVectorAdaptor->GetBufferPointer();
 //  this->SetImportVolume(m_ImageToVectorAdaptor->GetBufferPointer(),0,0,Image::CopyMemory);
 }
+/*
+mitk::ImageVtkAccessor* mitk::LabelSetImage::GetVtkImageData(int t, int n)
+{
+  if(m_Initialized==false)
+  {
+    if (GetSource().IsNull())
+      return NULL;
+    if (GetSource()->Updating()==false)
+      GetSource()->UpdateOutputInformation();
+  }
 
+
+  unsigned int numberOfLayers = this->GetNumberOfLayers();
+
+  for (int layer=0; layer<numberOfLayers; ++layer)
+  {
+      m_ImageToVectorAdaptor->SetExtractComponentIndex( layer );
+      m_ImageToVectorAdaptor->Update();
+      mitk::LabelSetPixelType* buffer = m_ImageToVectorAdaptor->GetBufferPointer();
+  }
+
+  if(m_VtkImageData==NULL)
+    ConstructVtkImageData(iP);
+  return m_VtkImageData;
+}
+*/
 unsigned int mitk::LabelSetImage::GetActiveLayer()
 {
   return m_ActiveLayer;
@@ -141,12 +166,13 @@ void mitk::LabelSetImage::RemoveLayer()
   try
   {
     m_LabelSetContainer.erase( m_LabelSetContainer.begin() + m_ActiveLayer);
-    this->SetActiveLayer(m_LabelSetContainer.size() - 1);
+    this->SetActiveLayer( m_LabelSetContainer.size() - 1 );
     this->Modified();
   }
-  catch(...)
+  catch(itk::ExceptionObject& e)
   {
-    mitkThrow() << "Could not add a layer.";
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    mitkThrow() << "Could not remove the active layer. See error log for details.";
   }
 }
 
@@ -220,21 +246,14 @@ void mitk::LabelSetImage::AddLayer()
     }
 
     // take the new vector
-
-//    m_VectorImage = NULL;
     m_VectorImage = newVectorImage;
-/*
-    m_ImageToVectorAdaptor = ImageAdaptorType::New();
-    m_ImageToVectorAdaptor->SetImage( m_VectorImage );
-    m_ImageToVectorAdaptor->SetExtractComponentIndex( m_ActiveLayer );
-    m_ImageToVectorAdaptor->Update();
-    this->SetImportVolume(m_ImageToVectorAdaptor->GetBufferPointer(),0,0,Image::CopyMemory);
-*/
+
     AccessByItk_1(this, VectorToImageProcessing, m_ActiveLayer);
   }
-  catch( itk::ExceptionObject& e )
+  catch(itk::ExceptionObject& e)
   {
-    mitkThrow() << "Exception caught: " << e.GetDescription();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    mitkThrow() << "Could not add a layer. See error log for details.";
   }
 
   this->Modified();
@@ -253,9 +272,10 @@ void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
       this->Modified();
     }
   }
-  catch(...)
+  catch(itk::ExceptionObject& e)
   {
-    mitkThrow() << "Could not set the active layer.";
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    mitkThrow() << "Could not set the active layer. See error log for details.";
   }
 }
 
@@ -309,9 +329,10 @@ void mitk::LabelSetImage::SmoothLabel(int index)
     AccessByItk_1(this, SmoothLabelProcessing, index);
     this->Modified();
   }
-  catch(...)
+  catch(itk::ExceptionObject& e)
   {
-    mitkThrow() << "Could not erase label.";
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    mitkThrow() << "Could not smooth the active label. See error log for details.";
   }
 }
 
@@ -322,9 +343,10 @@ void mitk::LabelSetImage::EraseLabel(int index, bool reorder)
     AccessByItk_2(this, EraseLabelProcessing, index, reorder);
     this->Modified();
   }
-  catch( ... )
+  catch(itk::ExceptionObject& e)
   {
-    mitkThrow() << "Could not erase label.";
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    mitkThrow() << "Could not erase the active label. See error log for details.";
   }
 }
 
@@ -346,9 +368,10 @@ void mitk::LabelSetImage::Concatenate(mitk::LabelSetImage* other)
     }
     this->Modified();
   }
-  catch( ... )
+  catch(itk::ExceptionObject& e)
   {
-    mitkThrow() << "Could not concatenate the two labelset images.";
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    mitkThrow() << "Could not concatenate the two labelset images. See error log for details.";
   }
 }
 
@@ -359,9 +382,10 @@ void mitk::LabelSetImage::ClearBuffer()
     AccessByItk(this, ClearBufferProcessing);
     this->Modified();
   }
-  catch( ... )
+  catch(itk::ExceptionObject& e)
   {
-    mitkThrow() << "Could not clear buffer.";
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    mitkThrow() << "Could not clear the internal buffer. See error log for details.";
   }
 }
 
@@ -1047,7 +1071,6 @@ template < typename PixelType, unsigned int VImageDimension >
 void mitk::LabelSetImage::VectorToImageProcessing( itk::Image< PixelType, VImageDimension>* input, int layer)
 {
   typedef itk::Image< PixelType, VImageDimension> ImageType;
-
   ImageAdaptorType::Pointer adaptor = ImageAdaptorType::New();
   adaptor->SetExtractComponentIndex(layer);
   adaptor->SetImage( m_VectorImage );

@@ -31,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+//class ImageVtkAccessor;
+
 //##Documentation
 //## @brief LabelSetImage class for storing labels in a segmentation session.
 //##
@@ -329,6 +331,8 @@ public:
     * \brief  */
   void SetActiveLayer(unsigned int layer);
 
+  unsigned int GetActiveLayer();
+
   /**
     * \brief  */
   unsigned int GetNumberOfLayers();
@@ -343,7 +347,9 @@ public:
 
   /**
     * \brief  */
-  unsigned int GetActiveLayer();
+  mitk::LabelSetImage::LabelSetPixelType* GetLayerBufferPointer(unsigned int layer);
+
+ // virtual ImageVtkAccessor* GetVtkImageData(int t = 0, int n = 0);
 
 protected:
   LabelSetImage();
@@ -351,6 +357,8 @@ protected:
   virtual ~LabelSetImage();
 
   void CreateDefaultLabelSet(int layer);
+
+  mutable ImageVtkAccessor* m_VtkImageData;
 
   template < typename ImageType1, typename ImageType2 >
   void ChangeLayerProcessing( ImageType1* source, ImageType2* target );

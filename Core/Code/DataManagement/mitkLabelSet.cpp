@@ -31,17 +31,7 @@ m_ActiveLabel(NULL)
   m_LookupTable = mitk::LookupTable::New();
   m_LookupTable->SetActiveColormap(mitk::ColormapProperty::CM_MULTILABEL);
 }
-/*
-mitk::LabelSet::LabelSet(const mitk::LabelSet& other) :
-m_Name(other.m_Name),
-m_LastModified(other.m_LastModified),
-m_Owner(other.m_Owner),
-m_LabelContainer(other.m_LabelContainer)
-{
-  this->m_ActiveLabel = m_LabelContainer[other.GetActiveLabelIndex()];
-  this->m_LookupTable = other.GetLookupTable();
-}
-*/
+
 void mitk::LabelSet::Initialize(const LabelSet* other)
 {
   if (!other) return;
@@ -75,9 +65,10 @@ mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorBegin()
   return m_LabelContainer.begin();
 }
 
-bool mitk::LabelSet::HasLabel(int index) const
+void mitk::LabelSet::CheckHasLabel(int index) const
 {
-  return ( (index >=0) && (index<m_LabelContainer.size()) );
+  if ( (index <0) || (index>m_LabelContainer.size()-1) )
+    mitkThrow() << "wrong label index";
 }
 
 void mitk::LabelSet::RemoveAllLabels()
@@ -88,14 +79,12 @@ void mitk::LabelSet::RemoveAllLabels()
 
 void mitk::LabelSet::SetLabelVisible(int index, bool value)
 {
-  if (this->HasLabel(index))
-  {
-    m_LabelContainer[index]->SetVisible(value);
-    double rgba[4];
-    m_LookupTable->GetTableValue(index,rgba);
-    rgba[3] = value ? this->GetLabelOpacity(index) : 0.0;
-    m_LookupTable->SetTableValue(index,rgba);
-  }
+  this->CheckHasLabel(index);
+  m_LabelContainer[index]->SetVisible(value);
+  double rgba[4];
+  m_LookupTable->GetTableValue(index,rgba);
+  rgba[3] = value ? this->GetLabelOpacity(index) : 0.0;
+  m_LookupTable->SetTableValue(index,rgba);
 }
 
 bool mitk::LabelSet::GetLabelVisible(int index)
@@ -105,112 +94,84 @@ bool mitk::LabelSet::GetLabelVisible(int index)
 
 void mitk::LabelSet::SetLabelSelected(int index, bool value)
 {
-  if (this->HasLabel(index))
-  {
-    m_LabelContainer[index]->SetSelected(value);
-  }
+  this->CheckHasLabel(index);
+  m_LabelContainer[index]->SetSelected(value);
 }
 
 bool mitk::LabelSet::GetLabelSelected(int index)
 {
-  if (this->HasLabel(index))
-    return m_LabelContainer[index]->GetSelected();
-  else
-    mitkThrow() << "wrong label index";
+  this->CheckHasLabel(index);
+  return m_LabelContainer[index]->GetSelected();
 }
 
 void mitk::LabelSet::SetLabelLocked(int index, bool value)
 {
-  if (this->HasLabel(index))
-    m_LabelContainer[index]->SetLocked(value);
-  else
-    mitkThrow() << "wrong label index";
+  this->CheckHasLabel(index);
+  m_LabelContainer[index]->SetLocked(value);
 }
 
 bool mitk::LabelSet::GetLabelLocked(int index)
 {
-  if (this->HasLabel(index))
-    return m_LabelContainer[index]->GetLocked();
-  else
-    mitkThrow() << "wrong label index";
+  this->CheckHasLabel(index);
+  return m_LabelContainer[index]->GetLocked();
 }
 
 void mitk::LabelSet::SetLabelOpacity(int index, float value)
 {
-  if (this->HasLabel(index))
-  {
-    double rgba[4];
-    m_LookupTable->GetTableValue(index,rgba);
-    rgba[3] = value;
-    m_LookupTable->SetTableValue(index,rgba);
-    m_LabelContainer[index]->SetOpacity(value);
-  }
-  else
-    mitkThrow() << "wrong label index";
+  this->CheckHasLabel(index);
+  double rgba[4];
+  m_LookupTable->GetTableValue(index,rgba);
+  rgba[3] = value;
+  m_LookupTable->SetTableValue(index,rgba);
+  m_LabelContainer[index]->SetOpacity(value);
 }
 
 float mitk::LabelSet::GetLabelOpacity(int index)
 {
-  if (this->HasLabel(index))
-    return m_LabelContainer[index]->GetOpacity();
-  else
-    mitkThrow() << "wrong label index";
+  this->CheckHasLabel(index);
+  return m_LabelContainer[index]->GetOpacity();
 }
 
 void mitk::LabelSet::SetLabelVolume(int index, float value)
 {
-  if (this->HasLabel(index))
-    m_LabelContainer[index]->SetVolume(value);
-  else
-    mitkThrow() << "wrong label index";
+  this->CheckHasLabel(index);
+  m_LabelContainer[index]->SetVolume(value);
 }
 
 float mitk::LabelSet::GetLabelVolume(int index)
 {
-  if (this->HasLabel(index))
-    return m_LabelContainer[index]->GetVolume();
-  else
-    mitkThrow() << "wrong label index";
+  this->CheckHasLabel(index);
+  return m_LabelContainer[index]->GetVolume();
 }
 
 void mitk::LabelSet::SetLabelName(int index, const std::string& name)
 {
-  if (this->HasLabel(index))
-    m_LabelContainer[index]->SetName(name);
-  else
-    mitkThrow() << "wrong label index";
+  this->CheckHasLabel(index);
+  m_LabelContainer[index]->SetName(name);
 }
 
 const mitk::Color& mitk::LabelSet::GetLabelColor(int index)
 {
-  if (this->HasLabel(index))
-    return m_LabelContainer[index]->GetColor();
-  else
-    mitkThrow() << "wrong label index";
+  this->CheckHasLabel(index);
+  return m_LabelContainer[index]->GetColor();
 }
 
 void mitk::LabelSet::SetLabelColor(int index, const mitk::Color& color)
 {
-  if (this->HasLabel(index))
-  {
-    m_LabelContainer[index]->SetColor(color);
-    double rgba[4];
-    m_LookupTable->GetTableValue(index,rgba);
-    rgba[0] = color.GetRed();
-    rgba[1] = color.GetGreen();
-    rgba[2] = color.GetBlue();
-    m_LookupTable->SetTableValue(index,rgba);
-  }
-  else
-    mitkThrow() << "wrong label index";
+  this->CheckHasLabel(index);
+  m_LabelContainer[index]->SetColor(color);
+  double rgba[4];
+  m_LookupTable->GetTableValue(index,rgba);
+  rgba[0] = color.GetRed();
+  rgba[1] = color.GetGreen();
+  rgba[2] = color.GetBlue();
+  m_LookupTable->SetTableValue(index,rgba);
 }
 
 std::string mitk::LabelSet::GetLabelName(int index)
 {
-  if (this->HasLabel(index))
-    return m_LabelContainer[index]->GetName();
-  else
-    mitkThrow() << "wrong label index";
+  this->CheckHasLabel(index);
+  return m_LabelContainer[index]->GetName();
 }
 
 void mitk::LabelSet::SetAllLabelsLocked(bool value)
@@ -244,18 +205,14 @@ int mitk::LabelSet::GetNumberOfLabels() const
 
 void mitk::LabelSet::SetActiveLabel(int index)
 {
-  if (this->HasLabel(index))
-    m_ActiveLabel = m_LabelContainer[index];
-  else
-    mitkThrow() << "wrong label index";
+  this->CheckHasLabel(index);
+  m_ActiveLabel = m_LabelContainer[index];
 }
 
 void mitk::LabelSet::RemoveLabel(int index)
 {
-  if (this->HasLabel(index))
-    m_LabelContainer.erase(m_LabelContainer.begin()+index);
-  else
-    mitkThrow() << "wrong label index";
+  this->CheckHasLabel(index);
+  m_LabelContainer.erase(m_LabelContainer.begin()+index);
 }
 
 bool mitk::LabelSet::IsSelected(mitk::Label::Pointer label)
@@ -326,12 +283,10 @@ void mitk::LabelSet::AddLabel(const std::string& name, const mitk::Color& color 
 
 void mitk::LabelSet::RenameLabel(int index, const std::string& name, const mitk::Color& color)
 {
-  if (this->HasLabel(index))
-  {
-    mitk::Label* label = m_LabelContainer[index];
-    label->SetName(name);
-    label->SetColor(color);
-  }
+  this->CheckHasLabel(index);
+  mitk::Label* label = m_LabelContainer[index];
+  label->SetName(name);
+  label->SetColor(color);
 }
 
 void mitk::LabelSet::PrintSelf(std::ostream &os, itk::Indent indent) const
@@ -376,10 +331,8 @@ int mitk::LabelSet::GetActiveLabelLayer() const
 
 unsigned int mitk::LabelSet::GetLabelLayer(int index) const
 {
-  if (this->HasLabel(index))
-    return m_LabelContainer[index]->GetLayer();
-  else
-    return 0;
+  this->CheckHasLabel(index);
+  return m_LabelContainer[index]->GetLayer();
 }
 
 int mitk::LabelSet::GetActiveLabelIndex() const
@@ -389,28 +342,30 @@ int mitk::LabelSet::GetActiveLabelIndex() const
 
 mitk::Label::ConstPointer mitk::LabelSet::GetLabel(int index) const
 {
-  if (this->HasLabel(index))
-    return m_LabelContainer[index].GetPointer();
-  else
-    return NULL;
+  this->CheckHasLabel(index);
+  return m_LabelContainer[index].GetPointer();
 }
 
 void mitk::LabelSet::SetLabelCenterOfMassIndex(int index, const mitk::Point3D& center)
 {
+  this->CheckHasLabel(index);
   m_LabelContainer[index]->SetCenterOfMassIndex(center);
 }
 
 const mitk::Point3D& mitk::LabelSet::GetLabelCenterOfMassIndex(int index)
 {
+  this->CheckHasLabel(index);
   return m_LabelContainer[index]->GetCenterOfMassIndex();
 }
 
 void mitk::LabelSet::SetLabelCenterOfMassCoordinates(int index, const mitk::Point3D& center)
 {
+  this->CheckHasLabel(index);
   m_LabelContainer[index]->SetCenterOfMassCoordinates(center);
 }
 
 const mitk::Point3D& mitk::LabelSet::GetLabelCenterOfMassCoordinates(int index)
 {
+  this->CheckHasLabel(index);
   return m_LabelContainer[index]->GetCenterOfMassCoordinates();
 }

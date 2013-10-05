@@ -83,10 +83,6 @@ public:
 
     /** \brief
     */
-    bool HasLabel(int) const;
-
-    /** \brief
-    */
     void SetActiveLabel(int);
 
     /** \brief
@@ -240,6 +236,10 @@ protected:
     virtual ~LabelSet();
 
 //    LabelSet(const LabelSet& other);
+
+    /** \brief
+    */
+    void CheckHasLabel(int);
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const;
 

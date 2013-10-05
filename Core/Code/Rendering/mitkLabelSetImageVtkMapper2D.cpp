@@ -51,6 +51,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCellArray.h>
 #include <vtkCamera.h>
 #include <vtkImageLabelOutline.h>
+#include <vtkImageBlend.h>
 
 mitk::LabelSetImageVtkMapper2D::LabelSetImageVtkMapper2D()
 {
@@ -90,7 +91,8 @@ float mitk::LabelSetImageVtkMapper2D::CalculateLayerDepth(mitk::BaseRenderer* re
   GetDataNode()->GetIntProperty( "layer", layer, renderer);
   //add the layer property for each image to render images with a higher layer on top of the others
   depth += layer*10; //*10: keep some room for each image (e.g. for QBalls in between)
-  if(depth > 0.0f) {
+  if (depth > 0.0f)
+  {
     depth = 0.0f;
     MITK_WARN << "Layer value exceeds clipping range. Set to minimum instead.";
   }
@@ -113,7 +115,6 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   mitk::LabelSetImage *input = const_cast< mitk::LabelSetImage * >( this->GetInput() );
-  mitk::DataNode* datanode = this->GetDataNode();
 
   if ( input == NULL || input->IsInitialized() == false )
     return;
@@ -137,7 +138,15 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     return;
   }
 
-  //set main input for ExtractSliceFilter
+  mitk::DataNode* datanode = this->GetDataNode();
+
+//  unsigned int numberOfLayers = input->GetNumberOfLayers();
+//  unsigned int activeLayer = input->GetActiveLayer();
+
+//  for (int layer=0; layer<numberOfLayers; ++layer)
+//  {
+//    LabelSetImage::LabelSetPixelType* layerBuffer = input->GetLayerBufferPointer(layer);
+    //set main input for ExtractSliceFilter
   localStorage->m_Reslicer->SetInput(input);
   localStorage->m_Reslicer->SetWorldGeometry(worldGeometry);
   localStorage->m_Reslicer->SetTimeStep( this->GetTimestep() );
@@ -150,52 +159,16 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   datanode->GetBoolProperty("in plane resample extent by geometry", inPlaneResampleExtentByGeometry, renderer);
   localStorage->m_Reslicer->SetInPlaneResampleExtentByGeometry(inPlaneResampleExtentByGeometry);
 
-  // Initialize the interpolation mode for resampling; switch to nearest
-  // neighbor if the input image is too small.
-  if ( (input->GetDimension() >= 3) && (input->GetDimension(2) > 1) )
-  {
-    VtkResliceInterpolationProperty *resliceInterpolationProperty;
-    datanode->GetProperty( resliceInterpolationProperty, "reslice interpolation" );
-
-    int interpolationMode = VTK_RESLICE_NEAREST;
-    if ( resliceInterpolationProperty != NULL )
-    {
-      interpolationMode = resliceInterpolationProperty->GetInterpolation();
-    }
-
-    switch ( interpolationMode )
-    {
-    case VTK_RESLICE_NEAREST:
-      localStorage->m_Reslicer->SetInterpolationMode(ExtractSliceFilter::RESLICE_NEAREST);
-      break;
-    case VTK_RESLICE_LINEAR:
-      localStorage->m_Reslicer->SetInterpolationMode(ExtractSliceFilter::RESLICE_LINEAR);
-      break;
-    case VTK_RESLICE_CUBIC:
-      localStorage->m_Reslicer->SetInterpolationMode(ExtractSliceFilter::RESLICE_CUBIC);
-      break;
-    }
-  }
-  else
-  {
-    localStorage->m_Reslicer->SetInterpolationMode(ExtractSliceFilter::RESLICE_NEAREST);
-  }
+  localStorage->m_Reslicer->SetInterpolationMode(ExtractSliceFilter::RESLICE_NEAREST);
 
   //set the vtk output property to true, makes sure that no unneeded mitk image convertion
   //is done.
   localStorage->m_Reslicer->SetVtkOutputRequest(true);
 
-  const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
-
   //this is needed when thick mode was enable bevore. These variable have to be reset to default values
   localStorage->m_Reslicer->SetOutputDimensionality(2);
   localStorage->m_Reslicer->SetOutputSpacingZDirection(1.0);
   localStorage->m_Reslicer->SetOutputExtentZDirection(0,0);
-
-  localStorage->m_Reslicer->Modified();
-  //start the pipeline with updating the largest possible, needed if the geometry of the input has changed
-  localStorage->m_Reslicer->UpdateLargestPossibleRegion();
-  localStorage->m_ReslicedImage = localStorage->m_Reslicer->GetVtkOutput();
 
   // Bounds information for reslicing (only reuqired if reference geometry
   // is present)
@@ -215,6 +188,42 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   {
     textureClippingBounds[i] = 0.0;
   }
+
+  localStorage->m_Reslicer->Modified();
+  //start the pipeline with updating the largest possible, needed if the geometry of the input has changed
+  localStorage->m_Reslicer->UpdateLargestPossibleRegion();
+  localStorage->m_ReslicedImage = localStorage->m_Reslicer->GetVtkOutput();
+
+  //generate contours/outlines
+  localStorage->m_ActiveLabelContour = this->CreateOutlinePolyData( renderer );
+
+//  if (layer == activeLayer)
+//  {
+    bool contourAll = false;
+    datanode->GetBoolProperty( "labelset.contour.all", contourAll, renderer );
+
+    bool contourActive = false;
+    datanode->GetBoolProperty( "labelset.contour.active", contourActive, renderer );
+
+    if ( contourAll || contourActive )
+    {
+      localStorage->m_LabelOutline->SetInput( localStorage->m_ReslicedImage );
+      localStorage->m_LabelOutline->SetActiveLabel( input->GetActiveLabelIndex() );
+      localStorage->m_LabelOutline->SetOutlineAll( contourAll );
+      localStorage->m_LabelOutline->SetBackground(0.0);
+      localStorage->m_LabelOutline->Update();
+      localStorage->m_ReslicedImage = localStorage->m_LabelOutline->GetOutput();
+    }
+//  }
+
+//    localStorage->m_ImageBlend->SetInput(layer, localStorage->m_ReslicedImage);
+//    localStorage->m_ImageBlend->SetOpacity(layer, 1-(double)layer/(double)numberOfLayers);
+// }
+
+//  localStorage->m_ImageBlend->Update();
+
+  const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
+
   // Calculate the actual bounds of the transformed plane clipped by the
   // dataset bounding box; this is required for drawing the texture at the
   // correct position during 3D mapping.
@@ -228,39 +237,19 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   //clipping bounds for cutting the image
   localStorage->m_LevelWindowFilter->SetClippingBounds(textureClippingBounds);
 
-  //generate contours/outlines
-  localStorage->m_ActiveLabelContour = this->CreateOutlinePolyData( renderer );
-
-  float contourWidth = 1.0;
+  float contourWidth = 2.5;
   datanode->GetFloatProperty( "labelset.contour.width", contourWidth, renderer );
   localStorage->m_ActiveLabelContourActor->GetProperty()->SetLineWidth( contourWidth );
 
   this->ApplyColor( renderer );
   this->ApplyOpacity( renderer );
   this->ApplyLookuptable( renderer );
-  this->ApplyLevelWindow( renderer );
-
-  bool contourAll = false;
-  datanode->GetBoolProperty( "labelset.contour.all", contourAll, renderer );
-
-  bool contourActive = false;
-  datanode->GetBoolProperty( "labelset.contour.active", contourActive, renderer );
-
-  if ( contourAll || contourActive )
-  {
-    localStorage->m_LabelOutline->SetInput( localStorage->m_ReslicedImage );
-    localStorage->m_LabelOutline->SetActiveLabel( input->GetActiveLabelIndex() );
-    localStorage->m_LabelOutline->SetOutlineAll( contourAll );
-    localStorage->m_LabelOutline->SetBackground(0.0);
-    localStorage->m_LabelOutline->Update();
-    localStorage->m_ReslicedImage = localStorage->m_LabelOutline->GetOutput();
-  }
 
   // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
   localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
   //connect the input with the levelwindow filter
-  localStorage->m_LevelWindowFilter->SetInput(localStorage->m_ReslicedImage);
+  localStorage->m_LevelWindowFilter->SetInput( localStorage->m_ReslicedImage ); //localStorage->m_ImageBlend->GetOutput() );
   //connect the texture with the output of the levelwindow filter
 
   // check for texture interpolation property
@@ -285,19 +274,6 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   //set the texture for the actor
 
   localStorage->m_ReslicedImageActor->SetTexture(localStorage->m_Texture);
-}
-
-void mitk::LabelSetImageVtkMapper2D::ApplyLevelWindow(mitk::BaseRenderer *renderer)
-{
-  LocalStorage *localStorage = this->GetLocalStorage( renderer );
-
-  LevelWindow levelWindow;
-  this->GetDataNode()->GetLevelWindow( levelWindow, renderer, "levelwindow" );
-  localStorage->m_LevelWindowFilter->GetLookupTable()->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
-
-  //no opaque level window
-  localStorage->m_LevelWindowFilter->SetMinOpacity(0.0);
-  localStorage->m_LevelWindowFilter->SetMaxOpacity(255.0);
 }
 
 void mitk::LabelSetImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
@@ -375,7 +351,6 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
     this->ApplyColor(renderer);
     this->ApplyOpacity(renderer);
     this->ApplyLookuptable( renderer );
-    this->ApplyLevelWindow( renderer );
     localStorage->m_LastPropertyUpdateTime.Modified();
   }
 }
@@ -409,7 +384,7 @@ void mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, 
   node->AddProperty( "binary", BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "labelset.contour.all", BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "labelset.contour.active", BoolProperty::New( true ), renderer, overwrite );
-  node->AddProperty( "labelset.contour.width", FloatProperty::New( 2.0 ), renderer, overwrite );
+  node->AddProperty( "labelset.contour.width", FloatProperty::New( 2.5 ), renderer, overwrite );
 
   node->AddProperty( "layer", IntProperty::New(100), renderer, overwrite);
 
@@ -638,6 +613,7 @@ mitk::LabelSetImageVtkMapper2D::LocalStorage::LocalStorage()
   m_ActiveLabelContour = vtkSmartPointer<vtkPolyData>::New();
   m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
   m_EmptyPolyData = vtkSmartPointer<vtkPolyData>::New();
+//  m_ImageBlend = vtkSmartPointer<vtkImageBlend>::New();
 
   //do not repeat the texture (the image)
   m_Texture->RepeatOff();

@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //VTK
 #include <vtkSmartPointer.h>
-#include <vtkPropAssembly.h>
 
 class vtkActor;
 class vtkPolyDataMapper;
@@ -41,6 +40,8 @@ class vtkMitkThickSlicesFilter;
 class vtkPolyData;
 class vtkMitkLevelWindowFilter;
 class vtkImageLabelOutline;
+class vtkImageBlend;
+class vtkPropAssembly;
 
 namespace mitk {
 
@@ -168,6 +169,8 @@ public:
     vtkSmartPointer<vtkPlaneSource> m_Plane;
     /** \brief The texture which is used to render the current slice. */
     vtkSmartPointer<vtkTexture> m_Texture;
+    /** \brief The filter to blend all available layers. */
+    vtkSmartPointer<vtkImageBlend> m_ImageBlend;
     /** \brief The actual reslicer (one per renderer) */
     mitk::ExtractSliceFilter::Pointer m_Reslicer;
     /** \brief The filter for generating label outlines */
@@ -262,13 +265,6 @@ protected:
    * which uses the lookup table must be set.
   */
   void ApplyLookuptable(mitk::BaseRenderer* renderer);
-
-  /**
-   * @brief ApplyLevelWindow Apply the level window for the given renderer.
-   * \warning To use the level window, the property 'LevelWindow' must be set and a 'Image Rendering.Mode' which uses the level window must be set.
-   * @param renderer Level window for which renderer?
-   */
-  void ApplyLevelWindow(mitk::BaseRenderer* renderer);
 
   /** \brief Set the opacity of the actor. */
   void ApplyOpacity( mitk::BaseRenderer* renderer );

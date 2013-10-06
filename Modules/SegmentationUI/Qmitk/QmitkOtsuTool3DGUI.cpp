@@ -100,7 +100,6 @@ void QmitkOtsuTool3DGUI::OnSegmentationRegionAccept()
   if (m_OtsuTool3DTool.IsNotNull() && m_Controls.m_selectionListWidget->currentItem() != NULL)
   {
     m_OtsuTool3DTool->ConfirmSegmentation();
-    m_OtsuTool3DTool->Deactivated();
   }
 }
 

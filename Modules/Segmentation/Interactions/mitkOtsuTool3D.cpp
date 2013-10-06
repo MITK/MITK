@@ -85,6 +85,8 @@ void mitk::OtsuTool3D::Deactivated()
   m_MultiLabelResultNode = NULL;
   m_ToolManager->GetDataStorage()->Remove( this->m_BinaryPreviewNode );
   m_BinaryPreviewNode = NULL;
+  m_ToolManager->GetDataStorage()->Remove( this->m_MaskedImagePreviewNode);
+  m_MaskedImagePreviewNode = NULL;
 }
 
 const char** mitk::OtsuTool3D::GetXPM() const
@@ -161,6 +163,7 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
 void mitk::OtsuTool3D::ConfirmSegmentation()
 {
   GetTargetSegmentationNode()->SetData(dynamic_cast<mitk::Image*>(m_BinaryPreviewNode->GetData()));
+  m_ToolManager->ActivateTool(-1);
 }
 
 void mitk::OtsuTool3D::UpdateBinaryPreview(int regionID)

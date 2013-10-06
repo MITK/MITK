@@ -1049,15 +1049,15 @@ void QmitkSegmentationView::RenderingManagerReinitialized()
     const mitk::Geometry3D* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
     if (mitk::Equal(workingNodeGeo->GetBoundingBox(), worldGeo->GetBoundingBox(), mitk::eps, true))
     {
-      this->UpdateWarningLabel("");
       this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), workingNode);
       this->SetToolSelectionBoxesEnabled(true);
+      this->UpdateWarningLabel("");
     }
     else
     {
-      this->UpdateWarningLabel("Please perform a reinit on the segmentation image!");
-      this->SetToolManagerSelection(NULL, NULL);
+      this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), NULL);
       this->SetToolSelectionBoxesEnabled(false);
+      this->UpdateWarningLabel("Please perform a reinit on the segmentation image!");
     }
   }
 }

@@ -19,13 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "mitkFileReader.h"
-//#include "mitkLabelSetImage.h"
 #include "mitkLabelSetImageSource.h"
 #include "SegmentationExports.h"
 
+#include "itkVectorImage.h"
+
 namespace mitk
 {
-
   /** \brief
   */
 
@@ -35,6 +35,7 @@ namespace mitk
   public:
 
     typedef itk::Image<TPixelType,3>              ImageType;
+    typedef itk::VectorImage<TPixelType,3>        VectorImageType;
     typedef LabelSetImageSource::OutputType       OutputType;
 
     mitkClassMacro( NrrdLabelSetImageReader, FileReader );

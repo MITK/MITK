@@ -159,7 +159,8 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
          initialWorkingOffset >= 0 )
     {
       // 3. determine the pixel value under the last click
-      bool inside = static_cast<ipMITKSegmentationTYPE*>(workingPicSlice->data)[initialWorkingOffset] == workingImage->GetActiveLabelIndex();
+      unsigned int activeLayer = workingImage->GetActiveLayer();
+      bool inside = static_cast<ipMITKSegmentationTYPE*>(workingPicSlice->data)[initialWorkingOffset] == workingImage->GetActiveLabelIndex(activeLayer);
 
       if (inside)
       {
@@ -168,8 +169,8 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
       }
       else
       {
-          m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
-          const mitk::Color& color = workingImage->GetActiveLabelColor();
+          m_PaintingPixelValue = workingImage->GetActiveLabelIndex(activeLayer);
+          const mitk::Color& color = workingImage->GetActiveLabelColor(activeLayer);
           FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
       }
 
@@ -397,21 +398,23 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
 
 bool mitk::RegionGrowingTool::OnChangeActiveLabel (Action* action, const StateEvent* stateEvent)
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
-
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   assert (workingNode);
 
-  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  assert (workingImage);
+
+  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if (!positionEvent) return false;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
-  int value = lsImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition(), timestep );
+  int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition(), timestep );
 
-  lsImage->SetActiveLabel(value, true);
+  unsigned int activeLayer = workingImage->GetActiveLayer();
+  workingImage->SetActiveLabel(activeLayer, pixelValue, true);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 

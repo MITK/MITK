@@ -20,12 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNrrdLabelSetImageReader.h"
 
 #include "mitkLabelSetImage.h"
-#include "mitkLookupTableProperty.h"
-#include "mitkColormapProperty.h"
+
 #include "itkImageFileReader.h"
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
-#include "itkNiftiImageIO.h"
 
 #include <iostream>
 #include <fstream>
@@ -45,151 +43,159 @@ namespace mitk
    {
    }
 
-  template <class TPixelType>
-  void NrrdLabelSetImageReader<TPixelType>::GenerateData()
+template <class TPixelType>
+void NrrdLabelSetImageReader<TPixelType>::GenerateData()
+{
+  if ( m_FileName == "")
+    mitkThrow() << "The filename to be read is empty!";
+
+  const std::string& locale = "C";
+  const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+  if ( locale.compare(currLocale)!=0 )
   {
-    if ( m_FileName == "")
+    try
     {
-      mitkThrow() << "The filename to be read is empty!";
+      setlocale(LC_ALL, locale.c_str());
     }
-    else
+    catch(...)
     {
-      const std::string& locale = "C";
-      const std::string& currLocale = setlocale( LC_ALL, NULL );
-
-      if ( locale.compare(currLocale)!=0 )
-      {
-        try
-        {
-          setlocale(LC_ALL, locale.c_str());
-        }
-        catch(...)
-        {
-          mitkThrow() << "Could not set locale!";
-        }
-      }
-
-      typename ImageType::Pointer image;
-
-      std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
-      ext = itksys::SystemTools::LowerCase(ext);
-      if (ext == ".lset")
-      {
-        typedef itk::ImageFileReader<ImageType> FileReaderType;
-        typename FileReaderType::Pointer reader = FileReaderType::New();
-        reader->SetFileName(this->m_FileName);
-        itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
-        reader->SetImageIO(io);
-        try
-        {
-          reader->Update();
-        }
-        catch(itk::ExceptionObject& e)
-        {
-          MITK_ERROR << "Exception caught: " << e.what();
-          mitkThrow() << e.what();
-        }
-        catch(...)
-        {
-          MITK_ERROR << "Unknown exception caught!";
-          mitkThrow() << "Unknown exception caught!";
-        }
-
-        image = reader->GetOutput();
-
-        if (image.IsNotNull())
-        {
-          mitk::LabelSetImage::Pointer output = static_cast<OutputType*>(this->GetOutput());
-          output->InitializeByItk<ImageType>( image );
-          output->SetVolume( reader->GetOutput()->GetBufferPointer() );
-
-          itk::MetaDataDictionary imgMetaDictionary = image->GetMetaDataDictionary();
-          std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
-          std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-          std::string metaString;
-
-          char keybuffer[256];
-
-          int numberOfLabels = 0;
-          std::string name, lastmodified;
-          for (; itKey != imgMetaKeys.end(); itKey ++)
-          {
-            itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-            if (itKey->find("name") != std::string::npos)
-            {
-              name = metaString;
-            }
-
-            itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-            if (itKey->find("last modified") != std::string::npos)
-            {
-              lastmodified = metaString;
-            }
-
-            if (itKey->find("number of labels") != std::string::npos)
-            {
-              numberOfLabels = atoi(metaString.c_str());
-            }
-          }
-
-          output->SetName(name);
-          output->SetLabelSetLastModified(lastmodified);
-
-          // skip first label (exterior) since it is created by mitkLabelSetImage constructor
-          for (int i=1; i<numberOfLabels; i++)
-          {
-            itKey = imgMetaKeys.begin();
-
-            mitk::Color color;
-            std::string name;
-            float opacity, volume;
-            int locked, visible, layer;
-            for (; itKey != imgMetaKeys.end(); itKey ++)
-            {
-              itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-              sprintf( keybuffer, "label_%03d_name", i );
-              if (itKey->find(keybuffer) != std::string::npos)
-              {
-                char str [512];
-                sscanf(metaString.c_str(), "%[^\n]s", &str);
-                name = str;
-              }
-              sprintf( keybuffer, "label_%03d_props", i );
-              if (itKey->find(keybuffer) != std::string::npos)
-              {
-                float rgba[4];
-                sscanf(metaString.c_str(), "%f %f %f %f %d %d %f %d", &rgba[0], &rgba[1], &rgba[2], &rgba[3], &locked, &visible, &volume, &layer);
-                color.SetRed(rgba[0]);
-                color.SetGreen(rgba[1]);
-                color.SetBlue(rgba[2]);
-                opacity = rgba[3];
-              }
-            }
-
-            mitk::Label::Pointer label = mitk::Label::New();
-            label->SetName(name);
-            label->SetOpacity(opacity);
-            label->SetColor(color);
-            label->SetLocked(locked);
-            label->SetVisible(visible);
-            label->SetVolume(volume);
-            label->SetLayer(layer);
-
-            output->AddLabel(*label);
-          }
-        }
-      }
-
-      try
-      {
-        setlocale(LC_ALL, currLocale.c_str());
-      }
-      catch(...)
-      {
-        mitkThrow() << "Could not reset locale!";
-      }
+      mitkThrow() << "Could not set locale.";
     }
   }
+
+  typename VectorImageType::Pointer vectorImage;
+
+  std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
+  ext = itksys::SystemTools::LowerCase(ext);
+  if (ext != ".lset")
+  {
+    MITK_WARN << "Selected file is not a segmentation";
+    return;
+  }
+
+  typedef itk::ImageFileReader<VectorImageType> FileReaderType;
+  typename FileReaderType::Pointer reader = FileReaderType::New();
+  reader->SetFileName(this->m_FileName);
+  itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+  reader->SetImageIO(io);
+  try
+  {
+    reader->Update();
+  }
+  catch(itk::ExceptionObject& e)
+  {
+    mitkThrow() << e.GetDescription();
+  }
+  catch(...)
+  {
+    mitkThrow() << "Unknown exception caught!";
+  }
+
+  vectorImage = reader->GetOutput();
+
+  if (vectorImage.IsNull())
+    mitkThrow() << "Could not retrieve the vector image.";
+
+  mitk::LabelSetImage::Pointer output = static_cast<OutputType*>(this->GetOutput());
+
+  typename ImageType::Pointer auximg = ImageType::New();
+  auximg->SetSpacing( vectorImage->GetSpacing() );
+  auximg->SetOrigin( vectorImage->GetOrigin() );
+  auximg->SetDirection( vectorImage->GetDirection() );
+  auximg->SetLargestPossibleRegion( vectorImage->GetLargestPossibleRegion());
+  auximg->SetBufferedRegion( vectorImage->GetLargestPossibleRegion());
+  auximg->Allocate();
+
+  // initialize output image based on vector image meta information
+  output->InitializeByItk<ImageType>( auximg.GetPointer() );
+
+  // set vector image
+  output->SetVectorImage(vectorImage);
+
+  itk::MetaDataDictionary imgMetaDictionary = vectorImage->GetMetaDataDictionary();
+  std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
+  std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
+  std::string metaString;
+
+  char keybuffer[256];
+
+  int numberOfLabels(0);
+  std::string name, lastmodified;
+  for (; itKey != imgMetaKeys.end(); itKey ++)
+  {
+    itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
+    if (itKey->find("name") != std::string::npos)
+    {
+      name = metaString;
+    }
+
+    itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
+    if (itKey->find("last modification time") != std::string::npos)
+    {
+      lastmodified = metaString;
+    }
+
+    itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
+    if (itKey->find("number of labels") != std::string::npos)
+    {
+      numberOfLabels = atoi(metaString.c_str());
+    }
+  }
+
+  output->SetName(name);
+  output->SetLastModificationTime(lastmodified);
+
+  for (int idx=0; idx<numberOfLabels; idx++)
+  {
+    itKey = imgMetaKeys.begin();
+    mitk::Color _color;
+    std::string _name;
+    float _opacity;
+    int _locked, _visible, _layer, _index;
+    for (; itKey != imgMetaKeys.end(); itKey ++)
+    {
+      itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
+      sprintf( keybuffer, "label_%03d_name", idx );
+      if (itKey->find(keybuffer) != std::string::npos)
+      {
+        char str[512];
+        sscanf(metaString.c_str(), "%[^\n]s", &str);
+        _name = str;
+      }
+      sprintf( keybuffer, "label_%03d_props", idx );
+      if (itKey->find(keybuffer) != std::string::npos)
+      {
+        float rgba[4];
+        sscanf(metaString.c_str(), "%f %f %f %f %d %d %d %d", &rgba[0], &rgba[1], &rgba[2], &rgba[3], &_locked, &_visible, &_layer, &_index);
+        _color.SetRed(rgba[0]);
+        _color.SetGreen(rgba[1]);
+        _color.SetBlue(rgba[2]);
+        _opacity = rgba[3];
+      }
+    }
+
+    mitk::Label::Pointer label = mitk::Label::New();
+    label->SetName(_name);
+    label->SetOpacity(_opacity);
+    label->SetColor(_color);
+    label->SetLocked(_locked);
+    label->SetVisible(_visible);
+    label->SetLayer(_layer);
+    label->SetIndex(_index);
+    if (_index != 0)
+      output->AddLabel(*label);
+  }
+
+  try
+  {
+    setlocale(LC_ALL, currLocale.c_str());
+  }
+  catch(...)
+  {
+    mitkThrow() << "Could not reset locale!";
+  }
+}
 
   template <class TPixelType>
   void NrrdLabelSetImageReader<TPixelType>::GenerateOutputInformation()
@@ -256,7 +262,7 @@ namespace mitk
     {
       itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
 
-      typedef itk::ImageFileReader<ImageType> FileReaderType;
+      typedef itk::ImageFileReader<VectorImageType> FileReaderType;
       typename FileReaderType::Pointer reader = FileReaderType::New();
       reader->SetImageIO(io);
       reader->SetFileName(filename);
@@ -267,29 +273,28 @@ namespace mitk
       }
       catch(itk::ExceptionObject e)
       {
-        MITK_INFO << e.GetDescription();
-        return false;
+        mitkThrow() << e.GetDescription();
       }
 
-      typename ImageType::Pointer image = reader->GetOutput();
+      typename VectorImageType::Pointer image = reader->GetOutput();
       if (image.IsNotNull())
       {
-          itk::MetaDataDictionary imgMetaDictionary = image->GetMetaDataDictionary();
-          std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
-          std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-          std::string metaString;
+        itk::MetaDataDictionary imgMetaDictionary = image->GetMetaDataDictionary();
+        std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
+        std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
+        std::string metaString;
 
-          for (; itKey != imgMetaKeys.end(); itKey ++)
+        for (; itKey != imgMetaKeys.end(); itKey ++)
+        {
+          itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
+          if (itKey->find("modality") != std::string::npos)
           {
-            itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-            if (itKey->find("modality") != std::string::npos)
+            if (metaString.find("LSET") != std::string::npos)
             {
-              if (metaString.find("LSET") != std::string::npos)
-              {
-                return true;
-              }
+              return true;
             }
           }
+        }
       }
     }
 

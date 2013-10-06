@@ -22,9 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::LabelSet::LabelSet(int layer) :
-m_Owner(""),
-m_Name(""),
-m_LastModified(""),
 m_Layer(layer),
 m_ActiveLabel(NULL)
 {
@@ -34,10 +31,8 @@ m_ActiveLabel(NULL)
 
 void mitk::LabelSet::Initialize(const LabelSet* other)
 {
-  if (!other) return;
-  m_Name = other->m_Name;
-  m_LastModified = other->m_LastModified;
-  m_Owner = other->m_Owner;
+  if (!other)
+    mitkThrow() << "Trying to initialize with NULL labelset.";
   m_LabelContainer = other->m_LabelContainer;
   m_ActiveLabel = m_LabelContainer[other->GetActiveLabelIndex()];
 }
@@ -65,12 +60,6 @@ mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorBegin()
   return m_LabelContainer.begin();
 }
 
-void mitk::LabelSet::CheckHasLabel(int index) const
-{
-  if ( (index <0) || (index>m_LabelContainer.size()-1) )
-    mitkThrow() << "wrong label index";
-}
-
 void mitk::LabelSet::RemoveAllLabels()
 {
   LabelContainerType::iterator _end = m_LabelContainer.end();
@@ -79,7 +68,6 @@ void mitk::LabelSet::RemoveAllLabels()
 
 void mitk::LabelSet::SetLabelVisible(int index, bool value)
 {
-  this->CheckHasLabel(index);
   m_LabelContainer[index]->SetVisible(value);
   double rgba[4];
   m_LookupTable->GetTableValue(index,rgba);
@@ -94,31 +82,26 @@ bool mitk::LabelSet::GetLabelVisible(int index)
 
 void mitk::LabelSet::SetLabelSelected(int index, bool value)
 {
-  this->CheckHasLabel(index);
   m_LabelContainer[index]->SetSelected(value);
 }
 
 bool mitk::LabelSet::GetLabelSelected(int index)
 {
-  this->CheckHasLabel(index);
   return m_LabelContainer[index]->GetSelected();
 }
 
 void mitk::LabelSet::SetLabelLocked(int index, bool value)
 {
-  this->CheckHasLabel(index);
   m_LabelContainer[index]->SetLocked(value);
 }
 
 bool mitk::LabelSet::GetLabelLocked(int index)
 {
-  this->CheckHasLabel(index);
   return m_LabelContainer[index]->GetLocked();
 }
 
 void mitk::LabelSet::SetLabelOpacity(int index, float value)
 {
-  this->CheckHasLabel(index);
   double rgba[4];
   m_LookupTable->GetTableValue(index,rgba);
   rgba[3] = value;
@@ -128,37 +111,31 @@ void mitk::LabelSet::SetLabelOpacity(int index, float value)
 
 float mitk::LabelSet::GetLabelOpacity(int index)
 {
-  this->CheckHasLabel(index);
   return m_LabelContainer[index]->GetOpacity();
 }
 
 void mitk::LabelSet::SetLabelVolume(int index, float value)
 {
-  this->CheckHasLabel(index);
   m_LabelContainer[index]->SetVolume(value);
 }
 
 float mitk::LabelSet::GetLabelVolume(int index)
 {
-  this->CheckHasLabel(index);
   return m_LabelContainer[index]->GetVolume();
 }
 
 void mitk::LabelSet::SetLabelName(int index, const std::string& name)
 {
-  this->CheckHasLabel(index);
   m_LabelContainer[index]->SetName(name);
 }
 
 const mitk::Color& mitk::LabelSet::GetLabelColor(int index)
 {
-  this->CheckHasLabel(index);
   return m_LabelContainer[index]->GetColor();
 }
 
 void mitk::LabelSet::SetLabelColor(int index, const mitk::Color& color)
 {
-  this->CheckHasLabel(index);
   m_LabelContainer[index]->SetColor(color);
   double rgba[4];
   m_LookupTable->GetTableValue(index,rgba);
@@ -170,7 +147,6 @@ void mitk::LabelSet::SetLabelColor(int index, const mitk::Color& color)
 
 std::string mitk::LabelSet::GetLabelName(int index)
 {
-  this->CheckHasLabel(index);
   return m_LabelContainer[index]->GetName();
 }
 
@@ -205,13 +181,11 @@ int mitk::LabelSet::GetNumberOfLabels() const
 
 void mitk::LabelSet::SetActiveLabel(int index)
 {
-  this->CheckHasLabel(index);
   m_ActiveLabel = m_LabelContainer[index];
 }
 
 void mitk::LabelSet::RemoveLabel(int index)
 {
-  this->CheckHasLabel(index);
   m_LabelContainer.erase(m_LabelContainer.begin()+index);
 }
 
@@ -283,7 +257,6 @@ void mitk::LabelSet::AddLabel(const std::string& name, const mitk::Color& color 
 
 void mitk::LabelSet::RenameLabel(int index, const std::string& name, const mitk::Color& color)
 {
-  this->CheckHasLabel(index);
   mitk::Label* label = m_LabelContainer[index];
   label->SetName(name);
   label->SetColor(color);
@@ -331,7 +304,6 @@ int mitk::LabelSet::GetActiveLabelLayer() const
 
 unsigned int mitk::LabelSet::GetLabelLayer(int index) const
 {
-  this->CheckHasLabel(index);
   return m_LabelContainer[index]->GetLayer();
 }
 
@@ -342,30 +314,25 @@ int mitk::LabelSet::GetActiveLabelIndex() const
 
 mitk::Label::ConstPointer mitk::LabelSet::GetLabel(int index) const
 {
-  this->CheckHasLabel(index);
   return m_LabelContainer[index].GetPointer();
 }
 
 void mitk::LabelSet::SetLabelCenterOfMassIndex(int index, const mitk::Point3D& center)
 {
-  this->CheckHasLabel(index);
   m_LabelContainer[index]->SetCenterOfMassIndex(center);
 }
 
 const mitk::Point3D& mitk::LabelSet::GetLabelCenterOfMassIndex(int index)
 {
-  this->CheckHasLabel(index);
   return m_LabelContainer[index]->GetCenterOfMassIndex();
 }
 
 void mitk::LabelSet::SetLabelCenterOfMassCoordinates(int index, const mitk::Point3D& center)
 {
-  this->CheckHasLabel(index);
   m_LabelContainer[index]->SetCenterOfMassCoordinates(center);
 }
 
 const mitk::Point3D& mitk::LabelSet::GetLabelCenterOfMassCoordinates(int index)
 {
-  this->CheckHasLabel(index);
   return m_LabelContainer[index]->GetCenterOfMassCoordinates();
 }

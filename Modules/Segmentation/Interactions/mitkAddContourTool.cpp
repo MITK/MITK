@@ -43,11 +43,12 @@ bool mitk::AddContourTool::OnMousePressed (Action* action, const StateEvent* sta
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   assert (workingNode);
 
-  LabelSetImage* lsImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-  assert (lsImage);
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  assert (workingImage);
 
-  m_PaintingPixelValue = lsImage->GetActiveLabelIndex();
-  const mitk::Color& color = lsImage->GetActiveLabelColor();
+  unsigned int activeLayer = workingImage->GetActiveLayer();
+  m_PaintingPixelValue = workingImage->GetActiveLabelIndex( activeLayer );
+  const mitk::Color& color = workingImage->GetActiveLabelColor( activeLayer );
   this->SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
 
   return Superclass::OnMousePressed(action, stateEvent);
@@ -90,9 +91,11 @@ bool mitk::AddContourTool::OnInvertLogic(Action* action, const StateEvent* state
   {
     DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
     assert (workingNode);
-    LabelSetImage* lsImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-    m_PaintingPixelValue = lsImage->GetActiveLabelIndex();
-    const mitk::Color& color = lsImage->GetActiveLabelColor();
+    LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+    assert (workingImage);
+    unsigned int activeLayer = workingImage->GetActiveLayer();
+    m_PaintingPixelValue = workingImage->GetActiveLabelIndex( activeLayer );
+    const mitk::Color& color = workingImage->GetActiveLabelColor( activeLayer );
     FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
   }
   return true;

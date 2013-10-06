@@ -59,30 +59,6 @@ public:
 
     /** \brief
     */
-    itkSetStringMacro(LastModified);
-
-    /** \brief
-    */
-    itkGetStringMacro(LastModified);
-
-    /** \brief
-    */
-    itkSetStringMacro(Owner);
-
-    /** \brief
-    */
-    itkGetStringMacro(Owner);
-
-    /** \brief
-    */
-    itkGetStringMacro(Name);
-
-    /** \brief
-    */
-    itkSetStringMacro(Name);
-
-    /** \brief
-    */
     void SetActiveLabel(int);
 
     /** \brief
@@ -221,11 +197,18 @@ public:
     */
     void ResetLabels();
 
-    unsigned int GetLayer() { return m_Layer; };
+    /** \brief
+    */
+    unsigned int GetLayer() { return m_Layer; }
 
+    /** \brief
+    */
     mitk::LookupTable* GetLookupTable();
 
+    /** \brief
+    */
     void SetLookupTable( mitk::LookupTable* lut);
+
     /** \brief
     */
     static bool IsSelected(mitk::Label::Pointer label);
@@ -237,10 +220,6 @@ protected:
 
 //    LabelSet(const LabelSet& other);
 
-    /** \brief
-    */
-    void CheckHasLabel(int);
-
     void PrintSelf(std::ostream &os, itk::Indent indent) const;
 
     LabelContainerType m_LabelContainer;
@@ -248,12 +227,6 @@ protected:
     mitk::LookupTable::Pointer m_LookupTable;
 
     mitk::Label* m_ActiveLabel;
-
-    std::string m_Owner;
-
-    std::string m_LastModified;
-
-    std::string m_Name;
 
     unsigned int m_Layer;
 

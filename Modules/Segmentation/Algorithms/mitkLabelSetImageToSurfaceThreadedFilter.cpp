@@ -40,27 +40,10 @@ void LabelSetImageToSurfaceThreadedFilter::Initialize(const NonBlockingAlgorithm
 
 bool LabelSetImageToSurfaceThreadedFilter::ReadyToRun()
 {
-  try
-  {
-    Image::Pointer image;
-    this->GetPointerParameter("Input", image);
+  Image::Pointer image;
+  GetPointerParameter("Input", image);
 
-    if (image.IsNull())
-       return false;
-
-//    ProcessObserver::Pointer obsv;
-//    this->GetPointerParameter("Observer", obsv);
-
-//    if (obsv.IsNull())
-//       return false;
-
-  }
-  catch (std::invalid_argument&)
-  {
-    return false;
-  }
-
-  return true;
+  return image.IsNotNull() && GetGroupNode();
 }
 
 bool LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateFunction()
@@ -129,14 +112,15 @@ void LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateSuccessful()
   LabelSetImage::Pointer image;
   this->GetPointerParameter("Input", image);
 
-  std::string name = image->GetLabelName(m_RequestedLabel);
+  std::string name = this->GetGroupNode()->GetName();
   name.append("-surf");
 
   mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetData(m_Result);
   node->SetName(name);
 
-  mitk::Color color = image->GetLabelColor(m_RequestedLabel);
+  int activeLayer = image->GetActiveLayer();
+  mitk::Color color = image->GetLabelColor(activeLayer, m_RequestedLabel);
   node->SetColor(color);
 
   this->InsertBelowGroupNode(node);

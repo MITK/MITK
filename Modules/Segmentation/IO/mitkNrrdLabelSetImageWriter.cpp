@@ -47,12 +47,12 @@ void mitk::NrrdLabelSetImageWriter<TPixelType>::GenerateData()
   InputType* input = this->GetInput();
   if (input == NULL)
   {
-    itkWarningMacro(<<"Sorry, input to NrrdLabelSetImageWriter is NULL!");
+    MITK_WARN << "Input to NrrdLabelSetImageWriter is NULL.";
     return;
   }
   if ( m_FileName == "" )
   {
-    itkWarningMacro( << "Sorry, filename has not been set!" );
+    MITK_WARN << "Filename has not been set.";
     return ;
   }
   const std::string& locale = "C";
@@ -66,76 +66,82 @@ void mitk::NrrdLabelSetImageWriter<TPixelType>::GenerateData()
     }
     catch(...)
     {
-      MITK_INFO << "Could not set locale " << locale;
+      MITK_ERROR << "Could not set locale " << currLocale;
+      mitkThrow() << "Could not set locale.";
     }
   }
 
   typedef itk::Image<TPixelType,3> ImageType;
+  typedef itk::VectorImage<TPixelType,3> VectorImageType;
 
   std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
   ext = itksys::SystemTools::LowerCase(ext);
   if (ext == ".lset")
   {
-    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
-    io->SetFileType( itk::ImageIOBase::Binary );
-    io->UseCompressionOn();
+    typedef itk::ImageFileWriter<VectorImageType> WriterType;
 
-    typedef itk::ImageFileWriter<ImageType> WriterType;
-    typename WriterType::Pointer nrrdWriter = WriterType::New();
-    nrrdWriter->UseInputMetaDataDictionaryOn();
-
-    ImageType::Pointer itkImage = ImageType::New();
-    mitk::CastToItkImage(input, itkImage);
+    VectorImageType::Pointer vectorImage = input->GetVectorImage(true); // force update
 
     char keybuffer[512];
     char valbuffer[512];
 
     sprintf( valbuffer, "LSET");
-    itk::EncapsulateMetaData<std::string>(itkImage->GetMetaDataDictionary(),std::string("modality"),std::string(valbuffer));
+    itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("modality"),std::string(valbuffer));
 
-    sprintf( valbuffer, input->GetLabelSetName().c_str() );
-    itk::EncapsulateMetaData<std::string>(itkImage->GetMetaDataDictionary(),std::string("name"),std::string(valbuffer));
+    sprintf( valbuffer, input->GetName().c_str() );
+    itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("name"),std::string(valbuffer));
 
-    sprintf( valbuffer, input->GetLabelSetLastModified().c_str() );
-    itk::EncapsulateMetaData<std::string>(itkImage->GetMetaDataDictionary(),std::string("last modified"),std::string(valbuffer));
+    sprintf( valbuffer, input->GetLastModificationTime().c_str() );
+    itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("last modification time"),std::string(valbuffer));
 
-    sprintf( valbuffer, "%1d", input->GetNumberOfLabels());
-    itk::EncapsulateMetaData<std::string>(itkImage->GetMetaDataDictionary(),std::string("number of labels"),std::string(valbuffer));
+    sprintf( valbuffer, "%1d", input->GetTotalNumberOfLabels());
+    itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("number of labels"),std::string(valbuffer));
 
-    for(int i=0; i<input->GetNumberOfLabels(); i++)
+    int idx = 0;
+    for (int layer=0; layer<input->GetNumberOfLayers(); layer++)
     {
-        sprintf( keybuffer, "label_%03d_name", i );
-        sprintf( valbuffer, "%s", input->GetLabelName(i).c_str());
+      for (int label=0; label<input->GetNumberOfLabels(layer); label++)
+      {
+        sprintf( keybuffer, "label_%03d_name", idx );
+        sprintf( valbuffer, "%s", input->GetLabelName(layer, label).c_str());
 
-        itk::EncapsulateMetaData<std::string>(itkImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
+        itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
 
-        sprintf( keybuffer, "label_%03d_props", i );
+        sprintf( keybuffer, "label_%03d_props", idx );
         float rgba[4];
-        rgba[0] = input->GetLabelColor(i).GetRed();
-        rgba[1] = input->GetLabelColor(i).GetGreen();
-        rgba[2] = input->GetLabelColor(i).GetBlue();
-        rgba[3] = input->GetLabelOpacity(i);
-        int locked = input->GetLabelLocked(i);
-        int visible = input->GetLabelVisible(i);
-        float volume = input->GetLabelVolume(i);
-        unsigned int component = input->GetLabelLayer(i);
-        sprintf( valbuffer, "%f %f %f %f %d %d %f %d", rgba[0], rgba[1], rgba[2], rgba[3], locked, visible, volume, component);
+        const mitk::Color& color = input->GetLabelColor(layer, label);
+        rgba[0] = color.GetRed();
+        rgba[1] = color.GetGreen();
+        rgba[2] = color.GetBlue();
+        rgba[3] = input->GetLabelOpacity(layer,label);
+        int locked = input->GetLabelLocked(layer,label);
+        int visible = input->GetLabelVisible(layer,label);
+        sprintf( valbuffer, "%f %f %f %f %d %d %d %d", rgba[0], rgba[1], rgba[2], rgba[3], locked, visible, layer, label);
 
-        itk::EncapsulateMetaData<std::string>(itkImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
+        itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
+        ++idx;
+      }
     }
 
-    nrrdWriter->SetInput( itkImage );
-    nrrdWriter->SetImageIO(io);
+    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+    io->SetFileType( itk::ImageIOBase::Binary );
+    io->UseCompressionOn();
+
+    typename WriterType::Pointer nrrdWriter = WriterType::New();
+    nrrdWriter->UseInputMetaDataDictionaryOn();
+    nrrdWriter->SetInput(vectorImage);
     nrrdWriter->SetFileName(m_FileName);
+    nrrdWriter->UseCompressionOn();
     nrrdWriter->SetImageIO(io);
+
     try
     {
       nrrdWriter->Update();
     }
     catch (itk::ExceptionObject e)
     {
-      MITK_ERROR << "Could not write segmentation. See error log for details.\n " << e.GetDescription();
-      throw;
+      MITK_ERROR << "Could not write segmentation. See error log for details.";
+      mitkThrow() << e.GetDescription();
     }
   }
 
@@ -145,7 +151,8 @@ void mitk::NrrdLabelSetImageWriter<TPixelType>::GenerateData()
   }
   catch(...)
   {
-    MITK_INFO << "Could not reset locale " << currLocale;
+    MITK_ERROR << "Could not reset locale " << currLocale;
+    mitkThrow() << "Could not reset locale.";
   }
   m_Success = true;
 }

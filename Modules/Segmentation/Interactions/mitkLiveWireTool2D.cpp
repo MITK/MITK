@@ -148,10 +148,13 @@ void mitk::LiveWireTool2D::Deactivated()
   this->FinishTool();
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  if ( !workingNode ) return;
+  assert (workingNode);
 
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-  if ( !workingImage ) return;
+  assert (workingImage);
+
+  unsigned int activeLayer = workingImage->GetActiveLayer();
+  unsigned int activeLabel = workingImage->GetActiveLabelIndex(activeLayer);
 
   /*+++++++++++++++++++++++ for all contours in list (currently created by tool) ++++++++++++++++++++++++++++++++++++*/
   std::vector< std::pair<mitk::DataNode*, mitk::PlaneGeometry::Pointer> >::iterator it = m_Contours.begin();
@@ -176,7 +179,7 @@ void mitk::LiveWireTool2D::Deactivated()
 
           mitk::ContourModel::Pointer projectedContour = mitk::ContourModel::New();
           mitk::ContourUtils::ProjectContourTo2DSlice(workingSlice, contourModel, projectedContour, currentTimestep);
-          mitk::ContourUtils::FillContourInSlice(projectedContour, workingSlice, workingImage->GetActiveLabelIndex(), currentTimestep);
+          mitk::ContourUtils::FillContourInSlice(projectedContour, workingSlice, activeLabel, currentTimestep);
 
           //write back to image volume
           this->WriteBackSegmentationResult(it->second, workingSlice, currentTimestep);

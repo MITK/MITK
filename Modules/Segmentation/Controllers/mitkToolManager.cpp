@@ -470,20 +470,20 @@ const mitk::Label* mitk::ToolManager::GetActiveLabel()
 {
   if (m_WorkingData.empty()) return NULL;
 
-  mitk::LabelSetImage* lsImage = dynamic_cast< mitk::LabelSetImage* > ( m_WorkingData.at(0)->GetData() );
-  if (!lsImage) return NULL;
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* > ( m_WorkingData.at(0)->GetData() );
+  if (!workingImage) return NULL;
 
-  return lsImage->GetActiveLabel();
+  return workingImage->GetActiveLabel( workingImage->GetActiveLayer() );
 }
 
 bool mitk::ToolManager::GetLabelLocked(int index)
 {
   if (m_WorkingData.empty()) return false;
 
-  mitk::LabelSetImage* lsImage = dynamic_cast< mitk::LabelSetImage* > ( m_WorkingData.at(0)->GetData() );
-  if (!lsImage) return true;
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* > ( m_WorkingData.at(0)->GetData() );
+  if (!workingImage) return true;
 
-  return lsImage->GetLabelLocked(index);
+  return workingImage->GetLabelLocked(workingImage->GetActiveLayer(), index);
 }
 
 

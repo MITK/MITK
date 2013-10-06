@@ -44,7 +44,6 @@ mitk::SegmentationInterpolationController* mitk::SegmentationInterpolationContro
 }
 
 mitk::SegmentationInterpolationController::SegmentationInterpolationController() :
-m_CurrentNumberOfLabels(0),
 m_WorkingImage(NULL),
 m_ReferenceImage(NULL)
 {
@@ -67,28 +66,26 @@ mitk::SegmentationInterpolationController::~SegmentationInterpolationController(
 
 void mitk::SegmentationInterpolationController::ResetLabelCount()
 {
-//  if ( m_WorkingImage->GetNumberOfLabels() != m_CurrentNumberOfLabels )
-//  {
-    m_LabelCountInSlice.clear();
-    m_CurrentNumberOfLabels = m_WorkingImage->GetNumberOfLabels();
-    m_LabelCountInSlice.resize( m_WorkingImage->GetTimeSteps() );
+  m_LabelCountInSlice.clear();
+  int activeLayer = m_WorkingImage->GetActiveLayer();
+  int numberOfLabels = m_WorkingImage->GetNumberOfLabels(activeLayer);
+  m_LabelCountInSlice.resize( m_WorkingImage->GetTimeSteps() );
 
-    for (unsigned int timeStep = 0; timeStep < m_WorkingImage->GetTimeSteps(); ++timeStep)
+  for (unsigned int timeStep = 0; timeStep < m_WorkingImage->GetTimeSteps(); ++timeStep)
+  {
+    m_LabelCountInSlice[timeStep].resize(3);
+    for (unsigned int dim = 0; dim < 3; ++dim)
     {
-      m_LabelCountInSlice[timeStep].resize(3);
-      for (unsigned int dim = 0; dim < 3; ++dim)
+      m_LabelCountInSlice[timeStep][dim].clear();
+      m_LabelCountInSlice[timeStep][dim].resize( m_WorkingImage->GetDimension(dim) );
+      for (unsigned int slice = 0; slice < m_WorkingImage->GetDimension(dim); ++slice)
       {
-        m_LabelCountInSlice[timeStep][dim].clear();
-        m_LabelCountInSlice[timeStep][dim].resize( m_WorkingImage->GetDimension(dim) );
-        for (unsigned int slice = 0; slice < m_WorkingImage->GetDimension(dim); ++slice)
-        {
-          m_LabelCountInSlice[timeStep][dim][slice].clear();
-          m_LabelCountInSlice[timeStep][dim][slice].resize( m_CurrentNumberOfLabels );
-          m_LabelCountInSlice[timeStep][dim][slice].assign( m_CurrentNumberOfLabels, 0 );
-        }
+        m_LabelCountInSlice[timeStep][dim][slice].clear();
+        m_LabelCountInSlice[timeStep][dim][slice].resize( numberOfLabels );
+        m_LabelCountInSlice[timeStep][dim][slice].assign( numberOfLabels, 0 );
       }
     }
-//  }
+  }
 }
 
 void mitk::SegmentationInterpolationController::SetWorkingImage( LabelSetImage* newImage )
@@ -210,7 +207,9 @@ void mitk::SegmentationInterpolationController::ScanSliceITKProcessing( itk::Ima
   unsigned int dim1(options.dim1);
 
   std::vector <int> numberOfPixels; // number of pixels in the current slice that are equal to the active label
-  numberOfPixels.resize(m_WorkingImage->GetNumberOfLabels());
+  int activeLayer = m_WorkingImage->GetActiveLayer();
+  int numberOfLabels = m_WorkingImage->GetNumberOfLabels(activeLayer);
+  numberOfPixels.resize( numberOfLabels );
 
   typedef itk::Image<PixelType, 2> ImageType;
   typedef itk::ImageRegionConstIteratorWithIndex< ImageType > IteratorType;
@@ -230,7 +229,7 @@ void mitk::SegmentationInterpolationController::ScanSliceITKProcessing( itk::Ima
     ++iter;
   }
 
-  for (unsigned int label=0; label<m_WorkingImage->GetNumberOfLabels(); ++label)
+  for (unsigned int label=0; label<numberOfLabels; ++label)
   {
     m_LabelCountInSlice[timeStep][sliceDimension][sliceIndex][label] = numberOfPixels[label];
   }
@@ -251,7 +250,9 @@ void mitk::SegmentationInterpolationController::ScanImageITKProcessing( itk::Ima
   unsigned int z = 0;
 
   std::vector <int> numberOfPixels; // number of pixels per slice that are equal to the active label
-  numberOfPixels.resize(m_WorkingImage->GetNumberOfLabels());
+  int activeLayer = m_WorkingImage->GetActiveLayer();
+  int numberOfLabels = m_WorkingImage->GetNumberOfLabels(activeLayer);
+  numberOfPixels.resize( numberOfLabels );
 
   iter.GoToBegin();
   while ( !iter.IsAtEnd() )
@@ -275,11 +276,11 @@ void mitk::SegmentationInterpolationController::ScanImageITKProcessing( itk::Ima
       iter.NextLine();
     }
 
-    for (unsigned int label = 0; label < m_WorkingImage->GetNumberOfLabels(); ++label)
+    for (unsigned int label = 0; label < numberOfLabels; ++label)
       m_LabelCountInSlice[timeStep][2][z][label] += numberOfPixels[label];
 
     // clear label counter
-    numberOfPixels.assign(m_WorkingImage->GetNumberOfLabels(), 0);
+    numberOfPixels.assign(numberOfLabels, 0);
     iter.NextSlice();
   }
 }
@@ -297,7 +298,8 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
   if ( sliceIndex >= upperLimit - 1 ) return NULL; // can't interpolate first and last slice
   if ( sliceIndex < 1  ) return NULL;
 
-  const unsigned int& activeLabel = m_WorkingImage->GetActiveLabelIndex();
+  unsigned int activeLayer = m_WorkingImage->GetActiveLayer();
+  unsigned int activeLabel = m_WorkingImage->GetActiveLabelIndex(activeLayer);
 
   // slice contains a segmentation, won't interpolate anything then
   if ( m_LabelCountInSlice[timeStep][sliceDimension][sliceIndex][activeLabel] > 0 ) return NULL;

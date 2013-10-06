@@ -69,20 +69,17 @@ bool mitk::FillRegionTool::OnMousePressed (Action* action, const StateEvent* sta
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   assert (workingNode);
 
-  LabelSetImage* lsImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-  assert (lsImage);
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  assert (workingImage);
 
-  m_PaintingPixelValue = lsImage->GetActiveLabelIndex();
-  const mitk::Color& color = lsImage->GetActiveLabelColor();
+  unsigned int activeLayer = workingImage->GetActiveLayer();
+  m_PaintingPixelValue = workingImage->GetActiveLabelIndex(activeLayer);
+  const mitk::Color& color = workingImage->GetActiveLabelColor(activeLayer);
   this->SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
 
   return Superclass::OnMousePressed(action, stateEvent);
 }
 
-/**
-  Called when the CTRL key is pressed. Will change the painting pixel value from 0 to the active label
-  and viceversa.
-*/
 bool mitk::FillRegionTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
 {
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
@@ -92,10 +89,12 @@ bool mitk::FillRegionTool::OnInvertLogic(Action* action, const StateEvent* state
   if (m_LogicInverted)
   {
     DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-    if (!workingNode) return false;
-    LabelSetImage* image = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-    m_PaintingPixelValue = image->GetActiveLabelIndex();
-    const mitk::Color& color = image->GetActiveLabelColor();
+    assert (workingNode);
+    LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+    assert (workingImage);
+    unsigned int activeLayer = workingImage->GetActiveLayer();
+    m_PaintingPixelValue = workingImage->GetActiveLabelIndex(activeLayer);
+    const mitk::Color& color = workingImage->GetActiveLabelColor(activeLayer);
     FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
   }
   else

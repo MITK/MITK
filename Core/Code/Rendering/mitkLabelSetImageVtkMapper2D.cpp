@@ -50,7 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyDataMapper.h>
 #include <vtkCellArray.h>
 #include <vtkCamera.h>
-#include <vtkImageLabelOutline.h>
+//#include <vtkImageLabelOutline.h>
 #include <vtkImageBlend.h>
 
 mitk::LabelSetImageVtkMapper2D::LabelSetImageVtkMapper2D()
@@ -204,16 +204,18 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
 
     bool contourActive = false;
     datanode->GetBoolProperty( "labelset.contour.active", contourActive, renderer );
-
+/*
     if ( contourAll || contourActive )
     {
+      int activeLayer = input->GetActiveLayer();
       localStorage->m_LabelOutline->SetInput( localStorage->m_ReslicedImage );
-      localStorage->m_LabelOutline->SetActiveLabel( input->GetActiveLabelIndex() );
+      localStorage->m_LabelOutline->SetActiveLabel( input->GetActiveLabelIndex(activeLayer) );
       localStorage->m_LabelOutline->SetOutlineAll( contourAll );
       localStorage->m_LabelOutline->SetBackground(0.0);
       localStorage->m_LabelOutline->Update();
       localStorage->m_ReslicedImage = localStorage->m_LabelOutline->GetOutput();
     }
+*/
 //  }
 
 //    localStorage->m_ImageBlend->SetInput(layer, localStorage->m_ReslicedImage);
@@ -279,8 +281,8 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
 void mitk::LabelSetImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
 {
   LocalStorage* localStorage = this->GetLocalStorage( renderer );
-  mitk::LabelSetImage *input = const_cast< mitk::LabelSetImage * >( this->GetInput() );
-  const mitk::Color& activeLabelColor = input->GetActiveLabelColor();
+  mitk::LabelSetImage *input = dynamic_cast<mitk::LabelSetImage*>(this->GetDataNode()->GetData());
+  const mitk::Color& activeLabelColor = input->GetActiveLabelColor( input->GetActiveLayer() );
   double rgbConv[3] = {(double)activeLabelColor.GetRed(), (double)activeLabelColor.GetGreen(), (double)activeLabelColor.GetBlue()};
   localStorage->m_ActiveLabelContourActor->GetProperty()->SetColor(rgbConv);
 }
@@ -289,9 +291,7 @@ void mitk::LabelSetImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer 
 {
   LocalStorage* localStorage = this->GetLocalStorage( renderer );
   float opacity = 1.0f;
-  // check for opacity prop and use it for rendering if it exists
-  GetDataNode()->GetOpacity( opacity, renderer, "opacity" );
-  //set the opacity according to the properties
+  this->GetDataNode()->GetOpacity( opacity, renderer, "opacity" );
   localStorage->m_ReslicedImageActor->GetProperty()->SetOpacity(opacity);
   localStorage->m_ActiveLabelContourActor->GetProperty()->SetOpacity(opacity);
 }
@@ -299,10 +299,8 @@ void mitk::LabelSetImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer 
 void mitk::LabelSetImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
 {
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
-  mitk::DataNode* node = this->GetDataNode();
-
-  mitk::LabelSetImage::Pointer lsImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
-  localStorage->m_LevelWindowFilter->SetLookupTable(lsImage->GetLookupTable()->GetVtkLookupTable());
+  mitk::LabelSetImage* input = dynamic_cast<mitk::LabelSetImage*>(this->GetDataNode()->GetData());
+  localStorage->m_LevelWindowFilter->SetLookupTable( input->GetLookupTable(input->GetActiveLayer())->GetVtkLookupTable() );
 }
 
 void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
@@ -418,7 +416,7 @@ vtkSmartPointer<vtkPolyData> mitk::LabelSetImageVtkMapper2D::CreateOutlinePolyDa
   int line = dims[0]; //how many pixels per line?
   int x = xMin; //pixel index x
   int y = yMin; //pixel index y
-  LabelSetImage::LabelSetPixelType* currentPixel;
+  LabelSetImage::PixelType* currentPixel;
 
   //get the depth for each contour
   float depth = this->CalculateLayerDepth(renderer);
@@ -427,9 +425,10 @@ vtkSmartPointer<vtkPolyData> mitk::LabelSetImageVtkMapper2D::CreateOutlinePolyDa
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
 
   // We take the pointer to the first pixel of the image
-  currentPixel = static_cast<LabelSetImage::LabelSetPixelType*>( localStorage->m_ReslicedImage->GetScalarPointer() );
+  currentPixel = static_cast< LabelSetImage::PixelType* >( localStorage->m_ReslicedImage->GetScalarPointer() );
 
-  unsigned int activeLabel = this->GetInput()->GetActiveLabelIndex();
+  unsigned int activeLayer = this->GetInput()->GetActiveLayer();
+  unsigned int activeLabel = this->GetInput()->GetActiveLabelIndex(activeLayer);
 
   while (y <= yMax)
   {
@@ -609,7 +608,7 @@ mitk::LabelSetImageVtkMapper2D::LocalStorage::LocalStorage()
   m_ActiveLabelContourActor = vtkSmartPointer<vtkActor>::New();
   m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
   m_Reslicer = mitk::ExtractSliceFilter::New();
-  m_LabelOutline = vtkSmartPointer<vtkImageLabelOutline>::New();
+//  m_LabelOutline = vtkSmartPointer<vtkImageLabelOutline>::New();
   m_ActiveLabelContour = vtkSmartPointer<vtkPolyData>::New();
   m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
   m_EmptyPolyData = vtkSmartPointer<vtkPolyData>::New();

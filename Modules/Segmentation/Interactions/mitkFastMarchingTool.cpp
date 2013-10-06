@@ -260,7 +260,7 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
 
   this->ClearSeeds();
 
-  m_FeedbackImage->EraseLabel(1,false);
+  m_FeedbackImage->EraseLabel(0,1,false);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -369,7 +369,7 @@ void mitk::FastMarchingTool::Update()
 
     const mitk::Color& color = m_ToolManager->GetActiveLabel()->GetColor();
 
-    m_FeedbackImage->SetLabelColor(1, color);
+    m_FeedbackImage->SetLabelColor(0,1,color);
     m_FeedbackNode->SetData(m_FeedbackImage);
 
     m_NeedUpdate = false;

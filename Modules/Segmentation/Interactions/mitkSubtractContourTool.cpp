@@ -77,24 +77,25 @@ const char* mitk::SubtractContourTool::GetName() const
 */
 bool mitk::SubtractContourTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
 {
-    if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
-    m_LogicInverted = !m_LogicInverted;
+  m_LogicInverted = !m_LogicInverted;
 
-    if (m_LogicInverted)
-    {
-        DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-        if (!workingNode) return false;
-        LabelSetImage* image = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-        m_PaintingPixelValue = image->GetActiveLabelIndex();
-        const mitk::Color& color = image->GetActiveLabelColor();
-        FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
-    }
-    else
-    {
-        m_PaintingPixelValue = 0;
-        FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
-    }
+  if (m_LogicInverted)
+  {
+    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+    if (!workingNode) return false;
+    LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+    int activeLayer = workingImage->GetActiveLayer();
+    m_PaintingPixelValue = workingImage->GetActiveLabelIndex(activeLayer);
+    const mitk::Color& color = workingImage->GetActiveLabelColor(activeLayer);
+    FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
+  }
+  else
+  {
+    m_PaintingPixelValue = 0;
+    FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+  }
 
-  return true;
+return true;
 }

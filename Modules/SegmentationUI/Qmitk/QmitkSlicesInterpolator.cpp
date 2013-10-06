@@ -442,9 +442,9 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
     {
       contourExtractor->Update();
     }
-    catch ( itk::ExceptionObject & excep )
+    catch ( itk::ExceptionObject& e )
     {
-      MITK_ERROR << "Exception caught: " << excep.GetDescription();
+      MITK_ERROR << "Exception caught: " << e.GetDescription();
       return;
     }
 
@@ -455,7 +455,8 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
 
     m_FeedbackContourNode->SetData( m_FeedbackContour );
 
-    const mitk::Color& color = m_WorkingImage->GetActiveLabelColor();
+    unsigned int activeLayer = m_WorkingImage->GetActiveLayer();
+    const mitk::Color& color = m_WorkingImage->GetActiveLabelColor(activeLayer);
     m_FeedbackContourNode->SetProperty("contour.color", mitk::ColorProperty::New(color));
   }
   else
@@ -564,7 +565,8 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     mitk::ContourUtils::ProjectContourTo2DSlice( slice, m_FeedbackContour, projectedContour, timeStep );
     if (projectedContour.IsNull()) return;
 
-    mitk::ContourUtils::FillContourInSlice( projectedContour, slice, m_WorkingImage->GetActiveLabelIndex(), timeStep );
+    unsigned int activeLayer = m_WorkingImage->GetActiveLayer();
+    mitk::ContourUtils::FillContourInSlice( projectedContour, slice, m_WorkingImage->GetActiveLabelIndex(activeLayer), timeStep );
 
     //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
     vtkSmartPointer<mitkVtkImageOverwrite> overwrite = vtkSmartPointer<mitkVtkImageOverwrite>::New();
@@ -657,7 +659,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       {
         contourExtractor->Update();
       }
-      catch ( itk::ExceptionObject & e )
+      catch ( itk::ExceptionObject& e )
       {
         MITK_ERROR << "Exception caught: " << e.GetDescription();
         return;
@@ -678,7 +680,8 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       mitk::ContourUtils::ProjectContourTo2DSlice( slice, m_FeedbackContour, projectedContour, timeStep );
       if (projectedContour.IsNull()) return;
 
-      mitk::ContourUtils::FillContourInSlice( projectedContour, slice, m_WorkingImage->GetActiveLabelIndex(), timeStep );
+      unsigned int activeLayer = m_WorkingImage->GetActiveLayer();
+      mitk::ContourUtils::FillContourInSlice( projectedContour, slice, m_WorkingImage->GetActiveLabelIndex(activeLayer), timeStep );
 
       //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
       vtkSmartPointer<mitkVtkImageOverwrite> overwrite = vtkSmartPointer<mitkVtkImageOverwrite>::New();
@@ -700,7 +703,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       {
         extractor->Update();
       }
-      catch ( itk::ExceptionObject & e )
+      catch ( itk::ExceptionObject& e )
       {
         MITK_ERROR << "Exception caught: " << e.GetDescription();
         return;

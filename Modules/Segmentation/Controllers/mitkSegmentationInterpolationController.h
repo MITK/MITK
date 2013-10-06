@@ -176,9 +176,6 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
 
     LabelSetImage::Pointer m_WorkingImage;
     Image::Pointer m_ReferenceImage;
-
-    int m_NumberOfLabels;
-    int m_CurrentNumberOfLabels;
 };
 
 } // namespace

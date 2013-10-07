@@ -245,16 +245,22 @@ void QmitkLabelSetWidget::OnPreviousLayer()
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
   assert(workingImage);
 
-  this->BusyCursorOn();
-
-  workingImage->SetActiveLayer( workingImage->GetActiveLayer() - 1 );
+  try
+  {
+    this->WaitCursorOn();
+    workingImage->SetActiveLayer( workingImage->GetActiveLayer() - 1 );
+    this->WaitCursorOff();
+  }
+  catch ( mitk::Exception& e )
+  {
+    this->WaitCursorOff();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(this, "Previous layer", "Could not change to previous layer.\n See error log for details.\n");
+    return;
+  }
 
   m_Controls.m_LabelSetTableWidget->Reset();
-
-  this->BusyCursorOff();
-
   m_Controls.m_leActiveLayer->setText( QString::number(workingImage->GetActiveLayer()) );
-
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -270,16 +276,22 @@ void QmitkLabelSetWidget::OnNextLayer()
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
   assert(workingImage);
 
-  this->BusyCursorOn();
-
-  workingImage->SetActiveLayer( workingImage->GetActiveLayer() + 1 );
+  try
+  {
+    this->WaitCursorOn();
+    workingImage->SetActiveLayer( workingImage->GetActiveLayer() + 1 );
+    this->WaitCursorOff();
+  }
+  catch ( mitk::Exception& e )
+  {
+    this->WaitCursorOff();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(this, "Next layer", "Could not change to next layer.\n See error log for details.\n");
+    return;
+  }
 
   m_Controls.m_LabelSetTableWidget->Reset();
-
-  this->BusyCursorOff();
-
   m_Controls.m_leActiveLayer->setText( QString::number(workingImage->GetActiveLayer()) );
-
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -434,11 +446,11 @@ void QmitkLabelSetWidget::OnCreateMask(int index)
 
   mitk::Image::Pointer maskImage;
 
-  this->WaitCursorOn();
-
   try
   {
+    this->WaitCursorOn();
     maskImage = workingImage->CreateLabelMask(index);
+    this->WaitCursorOff();
   }
   catch ( mitk::Exception& e )
   {
@@ -468,8 +480,6 @@ void QmitkLabelSetWidget::OnCreateMask(int index)
   maskNode->SetOpacity(1.0);
 
   this->m_DataStorage->Add(maskNode, m_WorkingNode);
-
-  this->WaitCursorOff();
 }
 
 void QmitkLabelSetWidget::OnToggleOutline(bool value)

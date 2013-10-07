@@ -251,7 +251,7 @@ void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
 {
   try
   {
-    if ( layer != m_ActiveLayer )
+    if ( (layer != m_ActiveLayer) && (layer>=0) && (layer<this->GetNumberOfLayers()) )
     {
       AccessByItk_1(this, ImageToVectorProcessing, m_ActiveLayer);
       m_ActiveLayer = layer;

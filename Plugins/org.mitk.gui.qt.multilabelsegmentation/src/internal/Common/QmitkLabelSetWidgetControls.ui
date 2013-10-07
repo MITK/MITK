@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>312</width>
+    <width>260</width>
     <height>869</height>
    </rect>
   </property>
@@ -183,7 +183,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>15</width>
+          <width>5</width>
           <height>20</height>
          </size>
         </property>
@@ -238,6 +238,9 @@
           <height>32</height>
          </size>
         </property>
+        <property name="shortcut">
+         <string>N</string>
+        </property>
         <property name="autoRaise">
          <bool>true</bool>
         </property>
@@ -250,7 +253,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>70</width>
+          <width>5</width>
           <height>20</height>
          </size>
         </property>

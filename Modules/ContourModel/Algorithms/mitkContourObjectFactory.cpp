@@ -32,8 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::ContourObjectFactory::ContourObjectFactory()
-: CoreObjectFactoryBase()
-, m_ContourModelIOFactory(mitk::ContourModelIOFactory::New().GetPointer())
+  : CoreObjectFactoryBase()
+  , m_ContourModelIOFactory(mitk::ContourModelIOFactory::New().GetPointer())
+  , m_ContourModelWriterFactory(mitk::ContourModelWriterFactory::New().GetPointer())
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
@@ -41,8 +42,7 @@ mitk::ContourObjectFactory::ContourObjectFactory()
     MITK_DEBUG << "ContourObjectFactory c'tor" << std::endl;
 
     itk::ObjectFactoryBase::RegisterFactory( m_ContourModelIOFactory );
-
-    mitk::ContourModelWriterFactory::RegisterOneFactory();
+    itk::ObjectFactoryBase::RegisterFactory( m_ContourModelWriterFactory );
 
     this->m_FileWriters.push_back(mitk::ContourModelWriter::New().GetPointer());
 
@@ -54,8 +54,8 @@ mitk::ContourObjectFactory::ContourObjectFactory()
 
 mitk::ContourObjectFactory::~ContourObjectFactory()
 {
-  mitk::ContourModelWriterFactory::UnRegisterOneFactory();
   itk::ObjectFactoryBase::UnRegisterFactory(m_ContourModelIOFactory);
+  itk::ObjectFactoryBase::UnRegisterFactory(m_ContourModelWriterFactory);
 }
 
 mitk::Mapper::Pointer mitk::ContourObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)

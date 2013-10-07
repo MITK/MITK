@@ -108,8 +108,10 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
   DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  if (!workingNode) return false;
+  assert(workingNode);
+
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  assert(workingImage);
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
 
@@ -132,6 +134,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
 
   if ( workingSliceGeometry->IsIndexInside( projectedPointInWorkingSlice2D ) )
   {
+/*
     // Convert to ipMITKSegmentationTYPE (because getting pixels relys on that data type)
     itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
     CastToItkImage( m_WorkingSlice, correctPixelTypeImage );
@@ -149,9 +152,9 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
     Image::Pointer temporarySlice = Image::New();
     //  temporarySlice = ImportItkImage( correctPixelTypeImage );
     CastToMitkImage( correctPixelTypeImage, temporarySlice );
-
+*/
     mitkIpPicDescriptor* workingPicSlice = mitkIpPicNew();
-    CastToIpPicDescriptor(temporarySlice, workingPicSlice);
+    CastToIpPicDescriptor(m_WorkingSlice, workingPicSlice);
 
     int initialWorkingOffset = projectedPointInWorkingSlice2D[1] * workingPicSlice->n[0] + projectedPointInWorkingSlice2D[0];
 
@@ -160,6 +163,14 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
     {
       // 3. determine the pixel value under the last click
       unsigned int activeLayer = workingImage->GetActiveLayer();
+      m_PaintingPixelValue = workingImage->GetActiveLabelIndex(activeLayer);
+      const mitk::Color& color = workingImage->GetActiveLabelColor(activeLayer);
+      FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
+      m_OriginalPicSlice = mitkIpPicNew();
+      CastToIpPicDescriptor(m_ReferenceSlice, m_OriginalPicSlice);
+      OnMousePressedOutside(action, stateEvent);
+//todo: fix click inside
+/*
       bool inside = static_cast<ipMITKSegmentationTYPE*>(workingPicSlice->data)[initialWorkingOffset] == workingImage->GetActiveLabelIndex(activeLayer);
 
       if (inside)
@@ -192,6 +203,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
       {
         OnMousePressedOutside(action, stateEvent);
       }
+*/
     }
   }
 
@@ -391,7 +403,8 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
 
   m_ReferenceSlice = NULL; // don't leak
   m_WorkingSlice = NULL;
-  m_OriginalPicSlice = NULL;
+//  mitkIpPicFree( m_OriginalPicSlice );
+//  m_OriginalPicSlice = NULL;
 
   return true;
 }

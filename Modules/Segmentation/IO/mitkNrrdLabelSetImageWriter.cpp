@@ -18,11 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkNrrdLabelSetImageWriter__cpp
 
 #include "mitkNrrdLabelSetImageWriter.h"
-#include "mitkImageCast.h"
+//#include "mitkImageCast.h"
 #include "itkMetaDataDictionary.h"
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
-//#include "itkNiftiImageIO.h"
 #include "itkImageFileWriter.h"
 #include "itksys/SystemTools.hxx"
 
@@ -63,13 +62,9 @@ void mitk::NrrdLabelSetImageWriter::GenerateData()
     }
     catch(...)
     {
-      MITK_ERROR << "Could not set locale " << currLocale;
-      mitkThrow() << "Could not set locale.";
+      mitkThrow() << "Could not set locale " << currLocale;
     }
   }
-
-//  typedef itk::Image<TPixelType,3> ImageType;
-//  typedef itk::VectorImage<TPixelType,3> VectorImageType;
 
   std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
   ext = itksys::SystemTools::LowerCase(ext);

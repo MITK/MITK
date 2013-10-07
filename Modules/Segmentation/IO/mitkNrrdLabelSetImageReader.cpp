@@ -110,9 +110,6 @@ void NrrdLabelSetImageReader::GenerateData()
   // initialize output image based on vector image meta information
   output->InitializeByItk<ImageType>( auxImg.GetPointer() );
 
-  // set vector image
-  output->SetVectorImage(vectorImage);
-
   itk::MetaDataDictionary imgMetaDictionary = vectorImage->GetMetaDataDictionary();
   std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
   std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
@@ -186,6 +183,9 @@ void NrrdLabelSetImageReader::GenerateData()
     if (_index != 0)
       output->AddLabel(*label);
   }
+
+  // set vector image
+  output->SetVectorImage(vectorImage);
 
   try
   {

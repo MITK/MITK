@@ -143,7 +143,7 @@ mitk::LabelSetImage::VectorImageType::Pointer mitk::LabelSetImage::GetVectorImag
   return m_VectorImage;
 }
 
-void mitk::LabelSetImage::SetVectorImage(VectorImageType::Pointer image )
+void mitk::LabelSetImage::SetVectorImage( VectorImageType::Pointer image )
 {
   try
   {

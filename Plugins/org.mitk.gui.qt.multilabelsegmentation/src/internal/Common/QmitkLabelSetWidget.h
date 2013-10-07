@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkWeakPointer.h"
 #include "mitkDataNode.h"
-#include "mitkNodePredicateBase.h"
 
 #include <berryIBerryPreferences.h>
 

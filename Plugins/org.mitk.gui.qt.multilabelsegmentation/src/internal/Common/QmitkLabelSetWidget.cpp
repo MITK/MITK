@@ -38,11 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkDataStorageComboBox.h>
 #include <QmitkNewSegmentationDialog.h>
 
-// STL
-#include <algorithm>
-#include <cassert>
-#include <iterator>
-
 // Qt
 #include <QCompleter>
 #include <QStringListModel>

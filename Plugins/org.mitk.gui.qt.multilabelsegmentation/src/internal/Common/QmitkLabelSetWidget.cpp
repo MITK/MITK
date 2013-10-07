@@ -476,7 +476,7 @@ void QmitkLabelSetWidget::OnNewLabel()
 void QmitkLabelSetWidget::OnCreateMask(int index)
 {
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(tooolManager);
+  assert(toolManager);
   toolManager->ActivateTool(-1);
 
   mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
@@ -503,7 +503,6 @@ void QmitkLabelSetWidget::OnCreateMask(int index)
 
   if (maskImage.IsNull())
   {
-    this->WaitCursorOff();
     QMessageBox::information(this, "Create Mask", "Could not create a mask out of the selected label.\n");
     return;
   }

@@ -156,9 +156,9 @@ void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
     m_Controls.m_btDeleteSegmentation->setEnabled(true);
     m_Controls.m_btImportSegmentation->setEnabled(true);
 
-    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
-    assert(workingImage);
-    m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(workingImage);
+//    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
+//    assert(workingImage);
+//    m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(workingImage);
   }
   else
   {
@@ -173,7 +173,7 @@ void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
     m_Controls.m_btDeleteSegmentation->setEnabled(false);
     m_Controls.m_btImportSegmentation->setEnabled(false);
 
-    m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(NULL);
+//    m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(NULL);
   }
 }
 
@@ -389,8 +389,8 @@ void QmitkLabelSetWidget::UpdateControls()
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
   assert(workingImage);
 
-  unsigned int activeLayer = workingImage->GetActiveLayer();
-  unsigned int numberOfLayers = workingImage->GetNumberOfLayers();
+  int activeLayer = workingImage->GetActiveLayer();
+  int numberOfLayers = workingImage->GetNumberOfLayers();
   m_Controls.m_btAddLayer->setEnabled(true);
   m_Controls.m_btDeleteLayer->setEnabled(numberOfLayers>1);
   m_Controls.m_btPreviousLayer->setEnabled(activeLayer>0);
@@ -544,7 +544,7 @@ void QmitkLabelSetWidget::OnSmoothLabel(int index)
   try
   {
     this->WaitCursorOn();
-    unsigned int activeLayer = workingImage->GetActiveLayer();
+    int activeLayer = workingImage->GetActiveLayer();
     workingImage->SmoothLabel(activeLayer,index);
     this->WaitCursorOff();
   }

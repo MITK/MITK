@@ -155,11 +155,7 @@ class QmitkLabelSetTableWidget : public QTableWidget
 
     void WaitCursorOn();
 
-    void BusyCursorOn();
-
     void WaitCursorOff();
-
-    void BusyCursorOff();
 
     void RestoreOverrideCursor();
 

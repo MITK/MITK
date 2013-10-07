@@ -97,8 +97,6 @@ set(CPP_FILES
  QmitkHistogramJSWidget.cpp
 
  QmitkLineEdit.cpp
-
- QmitkLabelSetTableWidget.cpp
 )
 
 if( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
@@ -184,8 +182,6 @@ set(MOC_H_FILES
  QmitkHistogramJSWidget.h
 
  QmitkLineEdit.h
-
- QmitkLabelSetTableWidget.h
 )
 
 if( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )

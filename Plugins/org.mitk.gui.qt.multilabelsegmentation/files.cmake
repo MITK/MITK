@@ -10,6 +10,7 @@ set(INTERNAL_CPP_FILES
   QmitkAutocropAction.cpp
   QmitkConvertToMultiLabelSegmentationAction.cpp
   QmitkCreateMultiLabelSegmentationAction.cpp
+  Common/QmitkLabelSetTableWidget.cpp
   Common/QmitkLabelSetWidget.cpp
   Common/QmitkDataSelectionWidget.cpp
   SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesView.cpp
@@ -40,6 +41,7 @@ set(MOC_H_FILES
   src/internal/QmitkAutocropAction.h
   src/internal/QmitkConvertToMultiLabelSegmentationAction.h
   src/internal/QmitkCreateMultiLabelSegmentationAction.h
+  src/internal/Common/QmitkLabelSetTableWidget.h
   src/internal/Common/QmitkLabelSetWidget.h
   src/internal/Common/QmitkDataSelectionWidget.h
   src/internal/SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesView.h

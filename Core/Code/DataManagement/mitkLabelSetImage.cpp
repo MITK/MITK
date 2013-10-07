@@ -96,7 +96,7 @@ void mitk::LabelSetImage::Initialize(const mitk::Image* other)
     m_ImageToVectorAdaptor->SetExtractComponentIndex( m_ActiveLayer );
     m_ImageToVectorAdaptor->Update();
 
-    this->SetImportVolume(m_ImageToVectorAdaptor->GetBufferPointer(),0,0,Image::CopyMemory);
+    AccessByItk_1(this, VectorToImageProcessing, m_ActiveLayer);
   }
   catch(itk::ExceptionObject& e)
   {

@@ -107,6 +107,8 @@ protected:
 
   mitk::IRenderWindowPart* m_IRenderWindowPart;
 
+  mitk::ToolManager* m_ToolManager;
+
   mitk::DataNode::Pointer m_ReferenceNode;
   mitk::DataNode::Pointer m_WorkingNode;
 

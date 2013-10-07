@@ -52,6 +52,8 @@ QmitkMultiLabelSegmentationView::QmitkMultiLabelSegmentationView() :
 m_Parent(NULL),
 m_IRenderWindowPart(NULL),
 m_ReferenceNode(NULL),
+m_WorkingNode(NULL),
+m_ToolManager(NULL),
 m_DataSelectionChanged(false),
 m_MouseCursorSet(false)
 {
@@ -94,8 +96,7 @@ QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
 {
   m_Controls.m_ManualToolSelectionBox2D->setEnabled(false);
   m_Controls.m_ManualToolSelectionBox3D->setEnabled( false );
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 /*
   m_Controls.m_SlicesInterpolator->EnableInterpolation(false);
   ctkPluginContext* context = mitk::PluginActivator::getContext();
@@ -104,8 +105,8 @@ QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
   service->RemoveAllPlanePositions();
   context->ungetService(ppmRef);
 */
-  toolManager->SetReferenceData(NULL);
-  toolManager->SetWorkingData(NULL);
+  m_ToolManager->SetReferenceData(NULL);
+  m_ToolManager->SetWorkingData(NULL);
 }
 
 void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
@@ -124,12 +125,14 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_cbWorkingNodeSelector->SetPredicate(m_SegmentationPredicate);
   m_Controls.m_cbWorkingNodeSelector->SetAutoSelectNewItems(true);
 
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->SetDataStorage( *(this->GetDataStorage()) );
-  toolManager->InitializeTools();
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  assert(m_ToolManager);
+
+  m_ToolManager->SetDataStorage( *(this->GetDataStorage()) );
+  m_ToolManager->InitializeTools();
 
   //use the same ToolManager instance for our 3D Tools
-  m_Controls.m_ManualToolSelectionBox3D->SetToolManager(*toolManager);
+  m_Controls.m_ManualToolSelectionBox3D->SetToolManager(*m_ToolManager);
 
   m_Controls.m_LabelSetWidget->SetDataStorage( *(this->GetDataStorage()) );
   m_Controls.m_LabelSetWidget->SetPreferences( this->GetPreferences() );
@@ -218,8 +221,7 @@ void QmitkMultiLabelSegmentationView::RenderWindowPartActivated(mitk::IRenderWin
 
 void QmitkMultiLabelSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
   m_IRenderWindowPart = 0;
   m_Parent->setEnabled(false);
 }
@@ -304,9 +306,8 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
 {
   m_ReferenceNode = const_cast<mitk::DataNode*>(node);
 
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->ActivateTool(-1);
-  toolManager->SetReferenceData(m_ReferenceNode);
+  m_ToolManager->ActivateTool(-1);
+  m_ToolManager->SetReferenceData(m_ReferenceNode);
 
   if( m_ReferenceNode.IsNotNull() )
   {
@@ -355,8 +356,7 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
 {
   m_WorkingNode = const_cast<mitk::DataNode*>(node);
 
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->SetWorkingData(m_WorkingNode);
+  m_ToolManager->SetWorkingData(m_WorkingNode);
 
   m_Controls.m_LabelSetWidget->SetWorkingNode(m_WorkingNode);
 
@@ -388,12 +388,10 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
 
 void QmitkMultiLabelSegmentationView::On2DInterpolationEnabled(bool state)
 {
-  mitk::SegTool2D::Pointer tool;
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  unsigned int numberOfExistingTools = toolManager->GetTools().size();
+  unsigned int numberOfExistingTools = m_ToolManager->GetTools().size();
   for(unsigned int i = 0; i < numberOfExistingTools; i++)
   {
-    tool = dynamic_cast<mitk::SegTool2D*>(toolManager->GetToolById(i));
+    mitk::SegTool2D* tool = dynamic_cast<mitk::SegTool2D*>(m_ToolManager->GetToolById(i));
     if (tool)
       tool->SetEnable2DInterpolation( state );
   }
@@ -401,12 +399,10 @@ void QmitkMultiLabelSegmentationView::On2DInterpolationEnabled(bool state)
 
 void QmitkMultiLabelSegmentationView::OnShowMarkerNodes(bool state)
 {
-  mitk::SegTool2D::Pointer tool;
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  unsigned int numberOfExistingTools = toolManager->GetTools().size();
+  unsigned int numberOfExistingTools = m_ToolManager->GetTools().size();
   for(unsigned int i = 0; i < numberOfExistingTools; i++)
   {
-    tool = dynamic_cast<mitk::SegTool2D*>(toolManager->GetToolById(i));
+    mitk::SegTool2D* tool = dynamic_cast<mitk::SegTool2D*>(m_ToolManager->GetToolById(i));
     if (tool)
       tool->SetShowMarkerNodes( state );
   }
@@ -415,7 +411,7 @@ void QmitkMultiLabelSegmentationView::OnShowMarkerNodes(bool state)
 void QmitkMultiLabelSegmentationView::OnTabWidgetChanged(int id)
 {
   //always disable tools on tab changed
-  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
   if (id == 0)
   {
@@ -435,12 +431,11 @@ void QmitkMultiLabelSegmentationView::OnManualTool2DSelected(int id)
   if (id >= 0)
   {
     std::string text = "Active Tool: \"";
-    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-    text += toolManager->GetToolById(id)->GetName();
+    text += m_ToolManager->GetToolById(id)->GetName();
     text += "\"";
     mitk::StatusBar::GetInstance()->DisplayText(text.c_str());
 
-    mitk::ModuleResource resource = toolManager->GetToolById(id)->GetCursorIconResource();
+    mitk::ModuleResource resource = m_ToolManager->GetToolById(id)->GetCursorIconResource();
     this->SetMouseCursor(resource, 0, 0);
   }
   else
@@ -487,11 +482,10 @@ void QmitkMultiLabelSegmentationView::OnMaskStamp()
     return;
   }
 
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
   mitk::Image* mask = dynamic_cast<mitk::Image*>(maskNode->GetData() );
-  if ( !mask )
+  if (!mask)
   {
     QMessageBox::information( m_Parent, "Mask Stamp", "Please load and select a mask before starting some action.");
     return;
@@ -541,8 +535,7 @@ void QmitkMultiLabelSegmentationView::OnSurfaceStamp()
     return;
   }
 
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
   mitk::Surface* surface = dynamic_cast<mitk::Surface*>(surfaceNode->GetData() );
   if ( !surface )

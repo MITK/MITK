@@ -49,9 +49,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent) : QWidget(parent),
-m_WorkingNode(0)
+m_WorkingNode(0),
+m_ToolManager(0)
 {
   m_Controls.setupUi(this);
+
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  assert(m_ToolManager);
 
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(newLabel()), this, SLOT(OnNewLabel()) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(renameLabel(int, const mitk::Color&, const std::string&)), this, SLOT(OnRenameLabel(int, const mitk::Color&, const std::string&)) );
@@ -175,9 +179,7 @@ void QmitkLabelSetWidget::OnLabelListModified(const QStringList& list)
 
 void QmitkLabelSetWidget::OnRenameLabel(int index, const mitk::Color& color, const std::string& name)
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(toolManager);
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
   // ask about the name and organ type of the new segmentation
   QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this );
@@ -222,7 +224,7 @@ void QmitkLabelSetWidget::OnRenameLabel(int index, const mitk::Color& color, con
 
   if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
 
-  mitk::DataNode* workingNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
@@ -235,11 +237,9 @@ void QmitkLabelSetWidget::OnRenameLabel(int index, const mitk::Color& color, con
 
 void QmitkLabelSetWidget::OnPreviousLayer()
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(toolManager);
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode* workingNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
@@ -266,11 +266,9 @@ void QmitkLabelSetWidget::OnPreviousLayer()
 
 void QmitkLabelSetWidget::OnNextLayer()
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(toolManager);
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
@@ -297,11 +295,9 @@ void QmitkLabelSetWidget::OnNextLayer()
 
 void QmitkLabelSetWidget::OnDeleteLayer()
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(toolManager);
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
@@ -338,11 +334,9 @@ void QmitkLabelSetWidget::OnDeleteLayer()
 
 void QmitkLabelSetWidget::OnAddLayer()
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(toolManager);
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
@@ -376,11 +370,9 @@ void QmitkLabelSetWidget::OnAddLayer()
 
 void QmitkLabelSetWidget::UpdateControls()
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(toolManager);
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
@@ -397,9 +389,7 @@ void QmitkLabelSetWidget::UpdateControls()
 
 void QmitkLabelSetWidget::OnNewLabel()
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(toolManager);
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
   // ask about the name and organ type of the new segmentation
   QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this );
@@ -464,7 +454,7 @@ void QmitkLabelSetWidget::OnNewLabel()
 
   mitk::Color color = dialog->GetColor();
 
-  mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
@@ -475,11 +465,9 @@ void QmitkLabelSetWidget::OnNewLabel()
 
 void QmitkLabelSetWidget::OnCreateMask(int index)
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(toolManager);
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
@@ -524,10 +512,7 @@ void QmitkLabelSetWidget::OnCreateMask(int index)
 
 void QmitkLabelSetWidget::OnToggleOutline(bool value)
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(toolManager);
-
-  mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
   workingNode->SetBoolProperty( "labelset.contour.all", value);
@@ -537,11 +522,9 @@ void QmitkLabelSetWidget::OnToggleOutline(bool value)
 
 void QmitkLabelSetWidget::OnSmoothLabel(int index)
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(toolManager);
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
@@ -564,11 +547,9 @@ void QmitkLabelSetWidget::OnSmoothLabel(int index)
 
 void QmitkLabelSetWidget::OnCreateSurface(int index)
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(toolManager);
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
@@ -606,11 +587,10 @@ void QmitkLabelSetWidget::OnCreateSurface(int index)
 
 void QmitkLabelSetWidget::OnImportLabeledImage()
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode* referenceNode = toolManager->GetReferenceData(0);
-  if (!referenceNode) return;
+  mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
+  assert(referenceNode);
 
   // Ask the user for a list of files to open
   QStringList fileNames = QFileDialog::getOpenFileNames( this, "Open Image", this->GetLastFileOpenPath(),
@@ -656,14 +636,13 @@ void QmitkLabelSetWidget::OnImportLabeledImage()
 
 void QmitkLabelSetWidget::OnImportSegmentation()
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
-  if (!workingNode) return;
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
-  if (!workingImage) return;
+  assert(workingImage);
 
   std::string fileExtensions("Segmentation files (*.lset);;");
   QString qfileName = QFileDialog::getOpenFileName(this, "Import Segmentation", this->GetLastFileOpenPath(), fileExtensions.c_str() );
@@ -692,17 +671,13 @@ void QmitkLabelSetWidget::OnImportSegmentation()
 
 void QmitkLabelSetWidget::OnLoadSegmentation()
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(toolManager);
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode* referenceNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
+  mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
   assert(referenceNode);
-  if (!referenceNode) return;
 
   mitk::Image* referenceImage = dynamic_cast<mitk::Image*>( referenceNode->GetData() );
   assert(referenceImage);
-  if (!referenceImage) return;
 
   std::string fileExtensions("Segmentation files (*.lset);;");
   QString qfileName = QFileDialog::getOpenFileName(this, "Load Segmentation", this->GetLastFileOpenPath(), fileExtensions.c_str() );
@@ -741,15 +716,13 @@ void QmitkLabelSetWidget::OnLoadSegmentation()
 
 void QmitkLabelSetWidget::OnSaveSegmentation()
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert (toolManager);
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
-  assert (workingNode);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-  assert (workingImage);
+  assert(workingImage);
 
   // update the name in case has changed
   workingImage->SetName( workingNode->GetName() );
@@ -785,11 +758,9 @@ void QmitkLabelSetWidget::OnSaveSegmentation()
 
 void QmitkLabelSetWidget::OnDeleteSegmentation()
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(toolManager);
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
   m_DataStorage->Remove(workingNode);
@@ -797,15 +768,13 @@ void QmitkLabelSetWidget::OnDeleteSegmentation()
 
 void QmitkLabelSetWidget::OnNewSegmentation()
 {
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert (toolManager);
-  toolManager->ActivateTool(-1);
+  m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode* referenceNode = toolManager->GetReferenceData(0);
-  assert (referenceNode);
+  mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
+  assert(referenceNode);
 
   mitk::Image* referenceImage = dynamic_cast<mitk::Image*>( referenceNode->GetData() );
-  assert (referenceImage);
+  assert(referenceImage);
 
   QString name = QString::fromStdString(referenceNode->GetName());
   QString cTime = QDateTime::currentDateTime().time().toString();

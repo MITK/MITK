@@ -31,6 +31,7 @@ class QCompleter;
 namespace mitk {
   class LabelSetImage;
   class DataStorage;
+  class ToolManager;
 }
 
 class QmitkLabelSetWidget : public QWidget
@@ -126,8 +127,9 @@ private:
 
     berry::IPreferences::Pointer m_Preferences;
 
-
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+
+    mitk::ToolManager * m_ToolManager;
 
     mitk::DataNode::Pointer m_WorkingNode;
 

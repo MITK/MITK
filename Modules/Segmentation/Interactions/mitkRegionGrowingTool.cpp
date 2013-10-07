@@ -162,7 +162,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
          initialWorkingOffset >= 0 )
     {
       // 3. determine the pixel value under the last click
-      unsigned int activeLayer = workingImage->GetActiveLayer();
+      int activeLayer = workingImage->GetActiveLayer();
       m_PaintingPixelValue = workingImage->GetActiveLabelIndex(activeLayer);
       const mitk::Color& color = workingImage->GetActiveLabelColor(activeLayer);
       FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
@@ -426,7 +426,7 @@ bool mitk::RegionGrowingTool::OnChangeActiveLabel (Action* action, const StateEv
 
   int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition(), timestep );
 
-  unsigned int activeLayer = workingImage->GetActiveLayer();
+  int activeLayer = workingImage->GetActiveLayer();
   workingImage->SetActiveLabel(activeLayer, pixelValue, true);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

@@ -140,8 +140,8 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
 
   mitk::DataNode* datanode = this->GetDataNode();
 
-//  unsigned int numberOfLayers = input->GetNumberOfLayers();
-//  unsigned int activeLayer = input->GetActiveLayer();
+//  int numberOfLayers = input->GetNumberOfLayers();
+//  int activeLayer = input->GetActiveLayer();
 
 //  for (int layer=0; layer<numberOfLayers; ++layer)
 //  {
@@ -282,9 +282,12 @@ void mitk::LabelSetImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
 {
   LocalStorage* localStorage = this->GetLocalStorage( renderer );
   mitk::LabelSetImage *input = dynamic_cast<mitk::LabelSetImage*>(this->GetDataNode()->GetData());
-  const mitk::Color& activeLabelColor = input->GetActiveLabelColor( input->GetActiveLayer() );
+  int activeLayer = input->GetActiveLayer();
+  const mitk::Color& activeLabelColor = input->GetActiveLabelColor( activeLayer );
   double rgbConv[3] = {(double)activeLabelColor.GetRed(), (double)activeLabelColor.GetGreen(), (double)activeLabelColor.GetBlue()};
   localStorage->m_ActiveLabelContourActor->GetProperty()->SetColor(rgbConv);
+  float opacity = input->GetActiveLabelOpacity( activeLayer );
+  localStorage->m_ActiveLabelContourActor->GetProperty()->SetOpacity(opacity);
 }
 
 void mitk::LabelSetImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
@@ -293,7 +296,6 @@ void mitk::LabelSetImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer 
   float opacity = 1.0f;
   this->GetDataNode()->GetOpacity( opacity, renderer, "opacity" );
   localStorage->m_ReslicedImageActor->GetProperty()->SetOpacity(opacity);
-  localStorage->m_ActiveLabelContourActor->GetProperty()->SetOpacity(opacity);
 }
 
 void mitk::LabelSetImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
@@ -427,8 +429,8 @@ vtkSmartPointer<vtkPolyData> mitk::LabelSetImageVtkMapper2D::CreateOutlinePolyDa
   // We take the pointer to the first pixel of the image
   currentPixel = static_cast< LabelSetImage::PixelType* >( localStorage->m_ReslicedImage->GetScalarPointer() );
 
-  unsigned int activeLayer = this->GetInput()->GetActiveLayer();
-  unsigned int activeLabel = this->GetInput()->GetActiveLabelIndex(activeLayer);
+  int activeLayer = this->GetInput()->GetActiveLayer();
+  int activeLabel = this->GetInput()->GetActiveLabelIndex(activeLayer);
 
   while (y <= yMax)
   {

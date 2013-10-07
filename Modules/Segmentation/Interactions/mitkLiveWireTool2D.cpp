@@ -153,8 +153,8 @@ void mitk::LiveWireTool2D::Deactivated()
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
   assert (workingImage);
 
-  unsigned int activeLayer = workingImage->GetActiveLayer();
-  unsigned int activeLabel = workingImage->GetActiveLabelIndex(activeLayer);
+  int activeLayer = workingImage->GetActiveLayer();
+  int activeLabel = workingImage->GetActiveLabelIndex(activeLayer);
 
   /*+++++++++++++++++++++++ for all contours in list (currently created by tool) ++++++++++++++++++++++++++++++++++++*/
   std::vector< std::pair<mitk::DataNode*, mitk::PlaneGeometry::Pointer> >::iterator it = m_Contours.begin();

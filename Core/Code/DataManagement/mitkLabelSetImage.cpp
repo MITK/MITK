@@ -109,7 +109,7 @@ mitk::LabelSetImage::~LabelSetImage()
   m_LabelSetContainer.clear();
 }
 
-mitk::LabelSetImage::PixelType* mitk::LabelSetImage::GetLayerBufferPointer(unsigned int layer)
+mitk::LabelSetImage::PixelType* mitk::LabelSetImage::GetLayerBufferPointer(int layer)
 {
   m_ImageToVectorAdaptor->SetExtractComponentIndex( layer );
   m_ImageToVectorAdaptor->Update();
@@ -117,12 +117,12 @@ mitk::LabelSetImage::PixelType* mitk::LabelSetImage::GetLayerBufferPointer(unsig
 //  this->SetImportVolume(m_ImageToVectorAdaptor->GetBufferPointer(),0,0,Image::CopyMemory);
 }
 
-unsigned int mitk::LabelSetImage::GetActiveLayer() const
+int mitk::LabelSetImage::GetActiveLayer() const
 {
   return m_ActiveLayer;
 }
 
-unsigned int mitk::LabelSetImage::GetNumberOfLayers()
+int mitk::LabelSetImage::GetNumberOfLayers()
 {
   return m_LabelSetContainer.size();
 }
@@ -162,8 +162,75 @@ void mitk::LabelSetImage::RemoveLayer()
 {
   try
   {
+    // create a new vector image
+    VectorImageType::Pointer newVectorImage = VectorImageType::New();
+    newVectorImage->SetSpacing( m_VectorImage->GetSpacing() );
+    newVectorImage->SetOrigin( m_VectorImage->GetOrigin() );
+    newVectorImage->SetDirection( m_VectorImage->GetDirection() );
+    newVectorImage->SetLargestPossibleRegion( m_VectorImage->GetLargestPossibleRegion());
+    newVectorImage->SetBufferedRegion( m_VectorImage->GetLargestPossibleRegion());
+    newVectorImage->SetNumberOfComponentsPerPixel( m_LabelSetContainer.size() - 1 );
+    newVectorImage->Allocate();
+
+    // fill inside
+    VariableVectorType defaultValue;
+    defaultValue.SetSize( m_LabelSetContainer.size() - 1);
+    defaultValue.Fill(0);
+    newVectorImage->FillBuffer(defaultValue);
+
+    ImageAdaptorType::Pointer sourceAdaptor = ImageAdaptorType::New();
+    sourceAdaptor->SetImage( m_VectorImage );
+
+    ImageAdaptorType::Pointer targetAdaptor = ImageAdaptorType::New();
+    targetAdaptor->SetImage( newVectorImage );
+
+    int newLayer = 0;
+    // transfer vector components to new vector. All components except
+    // the active layer should be transfered
+    for (int layer = 0; layer < m_LabelSetContainer.size(); ++layer)
+    {
+      if (layer == m_ActiveLayer)
+        continue;
+
+      sourceAdaptor->SetExtractComponentIndex(layer);
+      sourceAdaptor->Update();
+
+      targetAdaptor->SetExtractComponentIndex(newLayer);
+      targetAdaptor->Update();
+
+      typedef itk::ImageRegionConstIterator< ImageAdaptorType > SourceIteratorType;
+      typedef itk::ImageRegionIterator< ImageAdaptorType >      TargetIteratorType;
+
+      SourceIteratorType sourceIter( sourceAdaptor, sourceAdaptor->GetLargestPossibleRegion() );
+      sourceIter.GoToBegin();
+
+      TargetIteratorType targetIter( targetAdaptor, targetAdaptor->GetLargestPossibleRegion() );
+      targetIter.GoToBegin();
+
+      while(!sourceIter.IsAtEnd())
+      {
+        targetIter.Set( sourceIter.Get() );
+        ++sourceIter;
+        ++targetIter;
+      }
+
+      newLayer++;
+    }
+
+    // take the new vector
+    m_VectorImage = newVectorImage;
+
+    // remove corresponding labelset
     m_LabelSetContainer.erase( m_LabelSetContainer.begin() + m_ActiveLayer);
-    this->SetActiveLayer( m_LabelSetContainer.size() - 1 );
+
+    // set the active layer to the one below
+    --m_ActiveLayer;
+
+    // make sure a valid one is set
+    if (m_ActiveLayer<0)
+      m_ActiveLayer = 0;
+
+    AccessByItk_1(this, VectorToImageProcessing, m_ActiveLayer);
   }
   catch(itk::ExceptionObject& e)
   {
@@ -247,7 +314,7 @@ void mitk::LabelSetImage::AddLayer()
   this->Modified();
 }
 
-void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
+void mitk::LabelSetImage::SetActiveLayer(int layer)
 {
   try
   {
@@ -536,7 +603,7 @@ const mitk::Label* mitk::LabelSetImage::GetActiveLabel(int layer) const
   return m_LabelSetContainer[layer]->GetActiveLabel();
 }
 
-unsigned int mitk::LabelSetImage::GetActiveLabelIndex(int layer) const
+int mitk::LabelSetImage::GetActiveLabelIndex(int layer) const
 {
   return m_LabelSetContainer[layer]->GetActiveLabel()->GetIndex();
 }
@@ -544,6 +611,11 @@ unsigned int mitk::LabelSetImage::GetActiveLabelIndex(int layer) const
 const mitk::Color& mitk::LabelSetImage::GetActiveLabelColor(int layer) const
 {
   return m_LabelSetContainer[layer]->GetActiveLabel()->GetColor();
+}
+
+double mitk::LabelSetImage::GetActiveLabelOpacity(int layer) const
+{
+  return m_LabelSetContainer[layer]->GetActiveLabel()->GetOpacity();
 }
 
 mitk::LabelSet::ConstPointer mitk::LabelSetImage::GetLabelSet(int layer) const
@@ -632,14 +704,14 @@ void mitk::LabelSetImage::RemoveAllLabels(int layer)
   RemoveLabelEvent.Send();
 }
 
-unsigned int mitk::LabelSetImage::GetNumberOfLabels(int layer) const
+int mitk::LabelSetImage::GetNumberOfLabels(int layer) const
 {
   return m_LabelSetContainer[layer]->GetNumberOfLabels();
 }
 
-unsigned int mitk::LabelSetImage::GetTotalNumberOfLabels() const
+int mitk::LabelSetImage::GetTotalNumberOfLabels() const
 {
-  unsigned int totalLabels(0);
+  int totalLabels(0);
   std::vector< LabelSet::Pointer >::const_iterator layerIter = m_LabelSetContainer.begin();
   for (; layerIter != m_LabelSetContainer.end(); ++layerIter)
     totalLabels += (*layerIter)->GetNumberOfLabels();
@@ -737,7 +809,7 @@ void mitk::LabelSetImage::SurfaceStamp(mitk::Surface* surface, bool forceOverwri
 
     MeshType::Pointer mesh = MeshType::New();
     mesh->SetCellsAllocationMethod( MeshType::CellsAllocatedDynamicallyCellByCell );
-    unsigned int numberOfPoints = polydata->GetNumberOfPoints();
+    int numberOfPoints = polydata->GetNumberOfPoints();
     mesh->GetPoints()->Reserve( numberOfPoints );
 
     vtkPoints* points = polydata->GetPoints();
@@ -930,7 +1002,7 @@ void mitk::LabelSetImage::MaskStampProcessing(ImageType* itkImage, mitk::Image* 
   TargetIteratorType targetIter( itkImage, itkImage->GetLargestPossibleRegion() );
   targetIter.GoToBegin();
 
-  unsigned int activeLabel = this->GetActiveLabelIndex(m_ActiveLayer);
+  int activeLabel = this->GetActiveLabelIndex(m_ActiveLayer);
 
   while ( !sourceIter.IsAtEnd() )
   {

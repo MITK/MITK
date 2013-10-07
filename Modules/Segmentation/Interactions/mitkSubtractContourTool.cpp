@@ -84,8 +84,9 @@ bool mitk::SubtractContourTool::OnInvertLogic(Action* action, const StateEvent* 
   if (m_LogicInverted)
   {
     DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-    if (!workingNode) return false;
+    assert(workingNode);
     LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+    assert(workingImage);
     int activeLayer = workingImage->GetActiveLayer();
     m_PaintingPixelValue = workingImage->GetActiveLabelIndex(activeLayer);
     const mitk::Color& color = workingImage->GetActiveLabelColor(activeLayer);

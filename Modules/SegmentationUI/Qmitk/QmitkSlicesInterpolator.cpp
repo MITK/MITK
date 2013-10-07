@@ -451,7 +451,7 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
 
     m_FeedbackContourNode->SetData( m_FeedbackContour );
 
-    unsigned int activeLayer = m_WorkingImage->GetActiveLayer();
+    int activeLayer = m_WorkingImage->GetActiveLayer();
     const mitk::Color& color = m_WorkingImage->GetActiveLabelColor(activeLayer);
     m_FeedbackContourNode->SetProperty("contour.color", mitk::ColorProperty::New(color));
   }
@@ -561,7 +561,7 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     mitk::ContourUtils::ProjectContourTo2DSlice( slice, m_FeedbackContour, projectedContour, timeStep );
     if (projectedContour.IsNull()) return;
 
-    unsigned int activeLayer = m_WorkingImage->GetActiveLayer();
+    int activeLayer = m_WorkingImage->GetActiveLayer();
     mitk::ContourUtils::FillContourInSlice( projectedContour, slice, m_WorkingImage->GetActiveLabelIndex(activeLayer), timeStep );
 
     //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
@@ -676,7 +676,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       mitk::ContourUtils::ProjectContourTo2DSlice( slice, m_FeedbackContour, projectedContour, timeStep );
       if (projectedContour.IsNull()) return;
 
-      unsigned int activeLayer = m_WorkingImage->GetActiveLayer();
+      int activeLayer = m_WorkingImage->GetActiveLayer();
       mitk::ContourUtils::FillContourInSlice( projectedContour, slice, m_WorkingImage->GetActiveLabelIndex(activeLayer), timeStep );
 
       //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer

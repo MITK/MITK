@@ -243,11 +243,15 @@ public:
 
   /**
     * \brief  */
-  unsigned int GetActiveLabelIndex(int layer) const;
+  int GetActiveLabelIndex(int layer) const;
 
   /**
     * \brief  */
   const mitk::Color& GetActiveLabelColor(int layer) const;
+
+   /**
+    * \brief  */
+  double GetActiveLabelOpacity(int layer) const;
 
   /**
     * \brief  */
@@ -255,7 +259,7 @@ public:
 
   /**
   * \brief  */
-  unsigned int GetActiveLayer() const;
+  int GetActiveLayer() const;
 
   /**
     * \brief  */
@@ -279,11 +283,11 @@ public:
 
   /**
     * \brief  */
-  unsigned int GetNumberOfLabels(int layer) const;
+  int GetNumberOfLabels(int layer) const;
 
   /**
     * \brief  */
-  unsigned int GetTotalNumberOfLabels() const;
+  int GetTotalNumberOfLabels() const;
 
   /**
     * \brief  */
@@ -331,11 +335,11 @@ public:
 
   /**
     * \brief  */
-  void SetActiveLayer(unsigned int layer);
+  void SetActiveLayer(int layer);
 
   /**
     * \brief  */
-  unsigned int GetNumberOfLayers();
+  int GetNumberOfLayers();
 
   VectorImageType::Pointer GetVectorImage(bool forceUpdate);
 
@@ -351,7 +355,7 @@ public:
 
   /**
     * \brief  */
-  PixelType* GetLayerBufferPointer(unsigned int layer);
+  PixelType* GetLayerBufferPointer(int layer);
 
 protected:
   LabelSetImage();
@@ -403,7 +407,7 @@ protected:
 
   std::vector< LabelSet::Pointer > m_LabelSetContainer;
 
-  unsigned int m_ActiveLayer;
+  int m_ActiveLayer;
 
   std::string m_LastModificationTime;
 

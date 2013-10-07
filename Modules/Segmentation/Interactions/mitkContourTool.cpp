@@ -59,13 +59,11 @@ bool mitk::ContourTool::OnChangeActiveLabel (Action* action, const StateEvent* s
   assert (workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  assert (workingImage);
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
-
   int value = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition(), timestep );
-
   workingImage->SetActiveLabel(workingImage->GetActiveLayer(), value, true);
-
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return true;
@@ -80,9 +78,6 @@ bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateE
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
-
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert (workingNode);
 
   ContourModel* feedbackContour = mitk::FeedbackContourTool::GetFeedbackContour();
   assert (feedbackContour);
@@ -136,12 +131,14 @@ bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* state
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   assert(workingNode);
 
-  LabelSetImage* lsImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  assert(workingImage);
+
   const PlaneGeometry* planeGeometry = dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() );
-  if ( !lsImage || !planeGeometry ) return false;
+  if ( !planeGeometry ) return false;
 
   // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
-  mitk::Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( planeGeometry, lsImage, timestep );
+  mitk::Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( planeGeometry, workingImage, timestep );
   if ( slice.IsNull() )
   {
     MITK_ERROR << "Unable to extract slice.";
@@ -150,7 +147,7 @@ bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* state
 
   // 3. Get our feedback contour
   ContourModel* feedbackContour = mitk::FeedbackContourTool::GetFeedbackContour();
-  assert( feedbackContour);
+  assert(feedbackContour);
 
   // 4. Project it into the extracted plane
   ContourModel::Pointer projectedContour = ContourModel::New();

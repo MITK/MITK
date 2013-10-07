@@ -57,10 +57,10 @@ bool mitk::SetRegionTool::OnChangeActiveLabel (Action* action, const StateEvent*
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert (workingNode);
+  assert(workingNode);
 
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-  assert (workingImage);
+  assert(workingImage);
 
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -69,7 +69,7 @@ bool mitk::SetRegionTool::OnChangeActiveLabel (Action* action, const StateEvent*
 
   int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition(), timestep );
 
-  unsigned int activeLayer = workingImage->GetActiveLayer();
+  int activeLayer = workingImage->GetActiveLayer();
   workingImage->SetActiveLabel(activeLayer, pixelValue, true);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

@@ -47,11 +47,11 @@ public:
 
   void SetPreferences( berry::IPreferences::Pointer prefs );
 
-  void SetWorkingNode(mitk::DataNode *node);
-
   virtual void setEnabled(bool enabled);
 
   void SetDataStorage(mitk::DataStorage& storage);
+
+  void OnToolManagerWorkingDataModified();
 
 signals:
 
@@ -130,8 +130,6 @@ private:
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
     mitk::ToolManager * m_ToolManager;
-
-    mitk::DataNode::Pointer m_WorkingNode;
 
     // handling of a list of known (organ name, organ color) combination
     // ATTENTION these methods are defined in QmitkSegmentationOrganNamesHandling.cpp

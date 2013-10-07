@@ -360,27 +360,12 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
 
   m_ToolManager->SetWorkingData(m_WorkingNode);
 
-  m_Controls.m_LabelSetWidget->SetWorkingNode(m_WorkingNode);
-
   if ( m_WorkingNode.IsNotNull() )
   {
-/*
-    m_WorkingNode->SetVisibility(true);
-
-    mitk::DataStorage::SetOfObjects::ConstPointer others = this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
-    for(mitk::DataStorage::SetOfObjects::const_iterator iter = others->begin(); iter != others->end(); ++iter)
-    {
-      mitk::DataNode* _other = *iter;
-      if (_other != m_WorkingNode)
-        _other->SetVisibility(false);
-    }
-*/
-    //m_Controls.m_LabelSetWidget->setEnabled(true);
     m_Controls.m_SlicesInterpolator->setEnabled(true);
   }
   else
   {
-    //m_Controls.m_LabelSetWidget->setEnabled(false);
     m_Controls.m_SlicesInterpolator->setChecked(false);
     m_Controls.m_SlicesInterpolator->setEnabled(false);
   }

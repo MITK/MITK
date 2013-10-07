@@ -26,13 +26,11 @@ namespace mitk
 
 NrrdLabelSetImageIOFactory::NrrdLabelSetImageIOFactory()
 {
-  typedef unsigned char LabelSetPixelType;
-  typedef NrrdLabelSetImageReader<LabelSetPixelType> NrrdLabelSetImageReaderType;
   this->RegisterOverride("mitkIOAdapter",
                          "mitkNrrdLabelSetImageReader",
-                         "mitk Diffusion Image IO",
+                         "mitk LabelSet Image IO",
                          1,
-                         itk::CreateObjectFunction<IOAdapter<NrrdLabelSetImageReaderType> >::New());
+                         itk::CreateObjectFunction<IOAdapter<NrrdLabelSetImageReader> >::New());
 }
 
 NrrdLabelSetImageIOFactory::~NrrdLabelSetImageIOFactory()

@@ -114,7 +114,7 @@ public:
     * \brief  */
   virtual void Initialize(const mitk::Image* image);
 
-  unsigned char* GetImageLayer(int layer);
+  PixelType* GetImageLayer(int layer);
 
   /**
     * \brief  */

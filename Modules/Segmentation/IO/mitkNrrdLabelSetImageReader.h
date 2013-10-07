@@ -18,7 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkNrrdLabelSetImageReader_h
 
 #include "mitkCommon.h"
+#include "SegmentationExports.h"
 #include "mitkFileReader.h"
+#include "mitkLabelSetImage.h"
 #include "mitkLabelSetImageSource.h"
 #include "SegmentationExports.h"
 
@@ -26,17 +28,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  /** \brief
-  */
-
-  template < class TPixelType >
-  class NrrdLabelSetImageReader : public LabelSetImageSource, public FileReader
-  {
+/**
+ * Reads a labelset image from file
+ * @ingroup Process
+ */
+class Segmentation_EXPORT NrrdLabelSetImageReader : public LabelSetImageSource, public FileReader
+{
   public:
-
-    typedef itk::Image<TPixelType,3>              ImageType;
-    typedef itk::VectorImage<TPixelType,3>        VectorImageType;
-    typedef LabelSetImageSource::OutputType       OutputType;
+    typedef LabelSetImage::PixelType            PixelType;
+    typedef LabelSetImage::LabelSetImageType    ImageType;
+    typedef LabelSetImage::VectorImageType      VectorImageType;
+    typedef LabelSetImageSource::OutputType     OutputType;
 
     mitkClassMacro( NrrdLabelSetImageReader, FileReader );
     itkNewMacro(Self);
@@ -52,12 +54,10 @@ namespace mitk
 
   protected:
 
-    /** Does the real work. */
     virtual void GenerateData();
     virtual void GenerateOutputInformation();
 
     NrrdLabelSetImageReader();
-
     ~NrrdLabelSetImageReader();
 
     std::string m_FileName;
@@ -72,6 +72,6 @@ namespace mitk
 
 } //namespace MITK
 
-#include "mitkNrrdLabelSetImageReader.cpp"
+//#include "mitkNrrdLabelSetImageReader.cpp"
 
 #endif // __mitkNrrdLabelSetImageReader_h

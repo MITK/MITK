@@ -46,6 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QDateTime>
 
+#include <itksys/SystemTools.hxx>
 
 QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent) : QWidget(parent),
 m_ToolManager(0)
@@ -659,7 +660,7 @@ void QmitkLabelSetWidget::OnImportSegmentation()
   QString qfileName = QFileDialog::getOpenFileName(this, "Import Segmentation", this->GetLastFileOpenPath(), fileExtensions.c_str() );
   if (qfileName.isEmpty() ) return;
 
-  mitk::NrrdLabelSetImageReader<unsigned char>::Pointer reader = mitk::NrrdLabelSetImageReader<unsigned char>::New();
+  mitk::NrrdLabelSetImageReader::Pointer reader = mitk::NrrdLabelSetImageReader::New();
   reader->SetFileName(qfileName.toLatin1());
 
   try
@@ -694,7 +695,7 @@ void QmitkLabelSetWidget::OnLoadSegmentation()
   QString qfileName = QFileDialog::getOpenFileName(this, "Load Segmentation", this->GetLastFileOpenPath(), fileExtensions.c_str() );
   if (qfileName.isEmpty() ) return;
 
-  mitk::NrrdLabelSetImageReader<unsigned char>::Pointer reader = mitk::NrrdLabelSetImageReader<unsigned char>::New();
+  mitk::NrrdLabelSetImageReader::Pointer reader = mitk::NrrdLabelSetImageReader::New();
   reader->SetFileName(qfileName.toLatin1());
 
   try
@@ -746,7 +747,7 @@ void QmitkLabelSetWidget::OnSaveSegmentation()
   QString qfileName = QFileDialog::getSaveFileName(this, "Save Segmentation", this->GetLastFileOpenPath(), selected_suffix);
   if (qfileName.isEmpty()) return;
 
-  mitk::NrrdLabelSetImageWriter<unsigned char>::Pointer writer = mitk::NrrdLabelSetImageWriter<unsigned char>::New();
+  mitk::NrrdLabelSetImageWriter::Pointer writer = mitk::NrrdLabelSetImageWriter::New();
   writer->SetFileName(qfileName.toStdString());
   std::string newName = itksys::SystemTools::GetFilenameWithoutExtension(qfileName.toStdString());
   workingImage->SetName(newName);

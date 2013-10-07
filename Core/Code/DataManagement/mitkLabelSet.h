@@ -43,7 +43,7 @@ public:
 
     mitkNewMacro1Param( Self, int );
 
-    typedef std::vector <mitk::Label::Pointer>    LabelContainerType;
+    typedef std::vector <Label::Pointer>          LabelContainerType;
     typedef LabelContainerType::const_iterator    LabelContainerConstIteratorType;
     typedef LabelContainerType::iterator          LabelContainerIteratorType;
 
@@ -75,15 +75,15 @@ public:
 
     /** \brief
     */
-    void AddLabel(const mitk::Label& label);
+    void AddLabel(const Label& label);
 
     /** \brief
     */
-    void AddLabel(const std::string& name, const mitk::Color& color);
+    void AddLabel(const std::string& name, const Color& color);
 
     /** \brief
     */
-    void RenameLabel(int, const std::string&, const mitk::Color&);
+    void RenameLabel(int, const std::string&, const Color&);
 
     /** \brief
     */
@@ -119,7 +119,7 @@ public:
 
     /** \brief
     */
-    unsigned int GetLabelLayer(int index) const;
+    int GetLabelLayer(int index) const;
 
     /** \brief
     */
@@ -155,19 +155,19 @@ public:
 
     /** \brief
     */
-    void SetLabelColor(int index, const mitk::Color &color);
+    void SetLabelColor(int index, const Color &color);
 
     /** \brief
     */
-    const mitk::Color& GetLabelColor(int index);
+    const Color& GetLabelColor(int index);
 
     /** \brief
     */
-    const mitk::Label* GetActiveLabel() const { return m_ActiveLabel; };
+    const Label* GetActiveLabel() const { return m_ActiveLabel; };
 
     /** \brief
     */
-    mitk::Label::ConstPointer GetLabel(int index) const;
+    Label::ConstPointer GetLabel(int index) const;
 
     /** \brief
     */
@@ -179,19 +179,19 @@ public:
 
     /** \brief
     */
-    void SetLabelCenterOfMassIndex(int index, const mitk::Point3D& center);
+    void SetLabelCenterOfMassIndex(int index, const Point3D& center);
 
     /** \brief
     */
-    const mitk::Point3D& GetLabelCenterOfMassIndex(int index);
+    const Point3D& GetLabelCenterOfMassIndex(int index);
 
     /** \brief
     */
-    void SetLabelCenterOfMassCoordinates(int index, const mitk::Point3D& center);
+    void SetLabelCenterOfMassCoordinates(int index, const Point3D& center);
 
     /** \brief
     */
-    const mitk::Point3D& GetLabelCenterOfMassCoordinates(int index);
+    const Point3D& GetLabelCenterOfMassCoordinates(int index);
 
     /** \brief
     */
@@ -199,19 +199,19 @@ public:
 
     /** \brief
     */
-    unsigned int GetLayer() { return m_Layer; }
+    int GetLayer() { return m_Layer; }
 
     /** \brief
     */
-    mitk::LookupTable* GetLookupTable();
+    LookupTable* GetLookupTable();
 
     /** \brief
     */
-    void SetLookupTable( mitk::LookupTable* lut);
+    void SetLookupTable( LookupTable* lut );
 
     /** \brief
     */
-    static bool IsSelected(mitk::Label::Pointer label);
+    static bool IsSelected( Label::Pointer label );
 
 protected:
 
@@ -224,11 +224,11 @@ protected:
 
     LabelContainerType m_LabelContainer;
 
-    mitk::LookupTable::Pointer m_LookupTable;
+    LookupTable::Pointer m_LookupTable;
 
-    mitk::Label* m_ActiveLabel;
+    Label* m_ActiveLabel;
 
-    unsigned int m_Layer;
+    int m_Layer;
 
 private:
 

@@ -32,19 +32,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-   template <class TPixelType>
-   NrrdLabelSetImageReader<TPixelType>::NrrdLabelSetImageReader()
-        : m_FileName(""), m_FilePrefix(""), m_FilePattern("")
-   {
-   }
 
-   template <class TPixelType>
-   NrrdLabelSetImageReader<TPixelType>::~NrrdLabelSetImageReader()
-   {
-   }
+NrrdLabelSetImageReader::NrrdLabelSetImageReader() :
+m_FileName(""),
+m_FilePrefix(""),
+m_FilePattern("")
+{
+}
 
-template <class TPixelType>
-void NrrdLabelSetImageReader<TPixelType>::GenerateData()
+NrrdLabelSetImageReader::~NrrdLabelSetImageReader()
+{
+}
+
+void NrrdLabelSetImageReader::GenerateData()
 {
   if ( m_FileName == "")
     mitkThrow() << "The filename to be read is empty!";
@@ -64,7 +64,7 @@ void NrrdLabelSetImageReader<TPixelType>::GenerateData()
     }
   }
 
-  typename VectorImageType::Pointer vectorImage;
+  LabelSetImage::VectorImageType::Pointer vectorImage;
 
   std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
   ext = itksys::SystemTools::LowerCase(ext);
@@ -75,7 +75,7 @@ void NrrdLabelSetImageReader<TPixelType>::GenerateData()
   }
 
   typedef itk::ImageFileReader<VectorImageType> FileReaderType;
-  typename FileReaderType::Pointer reader = FileReaderType::New();
+  FileReaderType::Pointer reader = FileReaderType::New();
   reader->SetFileName(this->m_FileName);
   itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
   reader->SetImageIO(io);
@@ -97,18 +97,18 @@ void NrrdLabelSetImageReader<TPixelType>::GenerateData()
   if (vectorImage.IsNull())
     mitkThrow() << "Could not retrieve the vector image.";
 
-  mitk::LabelSetImage::Pointer output = static_cast<OutputType*>(this->GetOutput());
+  LabelSetImage::Pointer output = static_cast<OutputType*>(this->GetOutput());
 
-  typename ImageType::Pointer auximg = ImageType::New();
-  auximg->SetSpacing( vectorImage->GetSpacing() );
-  auximg->SetOrigin( vectorImage->GetOrigin() );
-  auximg->SetDirection( vectorImage->GetDirection() );
-  auximg->SetLargestPossibleRegion( vectorImage->GetLargestPossibleRegion());
-  auximg->SetBufferedRegion( vectorImage->GetLargestPossibleRegion());
-  auximg->Allocate();
+  ImageType::Pointer auxImg = ImageType::New();
+  auxImg->SetSpacing( vectorImage->GetSpacing() );
+  auxImg->SetOrigin( vectorImage->GetOrigin() );
+  auxImg->SetDirection( vectorImage->GetDirection() );
+  auxImg->SetLargestPossibleRegion( vectorImage->GetLargestPossibleRegion() );
+  auxImg->SetBufferedRegion( vectorImage->GetLargestPossibleRegion() );
+  auxImg->Allocate();
 
   // initialize output image based on vector image meta information
-  output->InitializeByItk<ImageType>( auximg.GetPointer() );
+  output->InitializeByItk<ImageType>( auxImg.GetPointer() );
 
   // set vector image
   output->SetVectorImage(vectorImage);
@@ -197,109 +197,93 @@ void NrrdLabelSetImageReader<TPixelType>::GenerateData()
   }
 }
 
-  template <class TPixelType>
-  void NrrdLabelSetImageReader<TPixelType>::GenerateOutputInformation()
-  {
+void NrrdLabelSetImageReader::GenerateOutputInformation()
+{
+}
 
+const char* NrrdLabelSetImageReader::GetFileName() const
+{
+  return m_FileName.c_str();
+}
+
+void NrrdLabelSetImageReader::SetFileName(const char* aFileName)
+{
+  m_FileName = aFileName;
+}
+
+const char* NrrdLabelSetImageReader::GetFilePrefix() const
+{
+  return m_FilePrefix.c_str();
+}
+
+void NrrdLabelSetImageReader::SetFilePrefix(const char* aFilePrefix)
+{
+  m_FilePrefix = aFilePrefix;
+}
+
+const char* NrrdLabelSetImageReader::GetFilePattern() const
+{
+  return m_FilePattern.c_str();
+}
+
+void NrrdLabelSetImageReader::SetFilePattern(const char* aFilePattern)
+{
+  m_FilePattern = aFilePattern;
+}
+
+bool NrrdLabelSetImageReader::CanReadFile(const std::string filename,
+                                          const std::string /*filePrefix*/, const std::string /*filePattern*/)
+{
+  // First check the extension
+  if(  filename == "" )
+  {
+    return false;
   }
+  std::string ext = itksys::SystemTools::GetFilenameLastExtension(filename);
+  ext = itksys::SystemTools::LowerCase(ext);
 
-
-  template <class TPixelType>
-      const char* NrrdLabelSetImageReader<TPixelType>
-      ::GetFileName() const
+  if (ext == ".lset")
   {
-    return m_FileName.c_str();
-  }
+    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
 
-  template <class TPixelType>
-      void NrrdLabelSetImageReader<TPixelType>
-      ::SetFileName(const char* aFileName)
-  {
-    m_FileName = aFileName;
-  }
+    typedef itk::ImageFileReader<LabelSetImage::VectorImageType> FileReaderType;
+    FileReaderType::Pointer reader = FileReaderType::New();
+    reader->SetImageIO(io);
+    reader->SetFileName(filename);
 
-  template <class TPixelType>
-      const char* NrrdLabelSetImageReader<TPixelType>
-      ::GetFilePrefix() const
-  {
-    return m_FilePrefix.c_str();
-  }
-
-  template <class TPixelType>
-      void NrrdLabelSetImageReader<TPixelType>
-      ::SetFilePrefix(const char* aFilePrefix)
-  {
-    m_FilePrefix = aFilePrefix;
-  }
-
-  template <class TPixelType>
-      const char* NrrdLabelSetImageReader<TPixelType>
-      ::GetFilePattern() const
-  {
-    return m_FilePattern.c_str();
-  }
-
-  template <class TPixelType>
-      void NrrdLabelSetImageReader<TPixelType>
-      ::SetFilePattern(const char* aFilePattern)
-  {
-    m_FilePattern = aFilePattern;
-  }
-
-  template <class TPixelType>
-      bool NrrdLabelSetImageReader<TPixelType>
-      ::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/)
-  {
-    // First check the extension
-    if(  filename == "" )
+    try
     {
-      return false;
+      reader->Update();
     }
-    std::string ext = itksys::SystemTools::GetFilenameLastExtension(filename);
-    ext = itksys::SystemTools::LowerCase(ext);
-
-    if (ext == ".lset")
+    catch(itk::ExceptionObject& e)
     {
-      itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+      mitkThrow() << e.GetDescription();
+    }
 
-      typedef itk::ImageFileReader<VectorImageType> FileReaderType;
-      typename FileReaderType::Pointer reader = FileReaderType::New();
-      reader->SetImageIO(io);
-      reader->SetFileName(filename);
+    LabelSetImage::VectorImageType::Pointer image = reader->GetOutput();
+    if (image.IsNotNull())
+    {
+      itk::MetaDataDictionary imgMetaDictionary = image->GetMetaDataDictionary();
+      std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
+      std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
+      std::string metaString;
 
-      try
+      for (; itKey != imgMetaKeys.end(); itKey ++)
       {
-        reader->Update();
-      }
-      catch(itk::ExceptionObject e)
-      {
-        mitkThrow() << e.GetDescription();
-      }
-
-      typename VectorImageType::Pointer image = reader->GetOutput();
-      if (image.IsNotNull())
-      {
-        itk::MetaDataDictionary imgMetaDictionary = image->GetMetaDataDictionary();
-        std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
-        std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-        std::string metaString;
-
-        for (; itKey != imgMetaKeys.end(); itKey ++)
+        itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
+        if (itKey->find("modality") != std::string::npos)
         {
-          itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-          if (itKey->find("modality") != std::string::npos)
+          if (metaString.find("LSET") != std::string::npos)
           {
-            if (metaString.find("LSET") != std::string::npos)
-            {
-              return true;
-            }
+            return true;
           }
         }
       }
     }
-
-    return false;
   }
+
+  return false;
+}
 
 } //namespace MITK
 

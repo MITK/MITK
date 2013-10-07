@@ -29,19 +29,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <fstream>
 
-template<typename TPixelType>
-mitk::NrrdLabelSetImageWriter<TPixelType>::NrrdLabelSetImageWriter()
+mitk::NrrdLabelSetImageWriter::NrrdLabelSetImageWriter()
   : m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
 {
   this->SetNumberOfRequiredInputs( 1 );
 }
 
-template<typename TPixelType>
-mitk::NrrdLabelSetImageWriter<TPixelType>::~NrrdLabelSetImageWriter()
+mitk::NrrdLabelSetImageWriter::~NrrdLabelSetImageWriter()
 {}
 
-template<typename TPixelType>
-void mitk::NrrdLabelSetImageWriter<TPixelType>::GenerateData()
+void mitk::NrrdLabelSetImageWriter::GenerateData()
 {
   m_Success = false;
   InputType* input = this->GetInput();
@@ -71,8 +68,8 @@ void mitk::NrrdLabelSetImageWriter<TPixelType>::GenerateData()
     }
   }
 
-  typedef itk::Image<TPixelType,3> ImageType;
-  typedef itk::VectorImage<TPixelType,3> VectorImageType;
+//  typedef itk::Image<TPixelType,3> ImageType;
+//  typedef itk::VectorImage<TPixelType,3> VectorImageType;
 
   std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
   ext = itksys::SystemTools::LowerCase(ext);
@@ -127,7 +124,7 @@ void mitk::NrrdLabelSetImageWriter<TPixelType>::GenerateData()
     io->SetFileType( itk::ImageIOBase::Binary );
     io->UseCompressionOn();
 
-    typename WriterType::Pointer nrrdWriter = WriterType::New();
+    WriterType::Pointer nrrdWriter = WriterType::New();
     nrrdWriter->UseInputMetaDataDictionaryOn();
     nrrdWriter->SetInput(vectorImage);
     nrrdWriter->SetFileName(m_FileName);
@@ -151,21 +148,17 @@ void mitk::NrrdLabelSetImageWriter<TPixelType>::GenerateData()
   }
   catch(...)
   {
-    MITK_ERROR << "Could not reset locale " << currLocale;
-    mitkThrow() << "Could not reset locale.";
+    mitkThrow() << "Could not reset locale " << currLocale;
   }
   m_Success = true;
 }
 
-template<typename TPixelType>
-void mitk::NrrdLabelSetImageWriter<TPixelType>::SetInput( InputType* diffVolumes )
+void mitk::NrrdLabelSetImageWriter::SetInput( InputType* diffVolumes )
 {
   this->ProcessObject::SetNthInput( 0, diffVolumes );
 }
 
-template<typename TPixelType>
-//mitk::LabelSetImage<TPixelType>* mitk::NrrdLabelSetImageWriter<TPixelType>::GetInput()
-mitk::LabelSetImage* mitk::NrrdLabelSetImageWriter<TPixelType>::GetInput()
+mitk::LabelSetImage* mitk::NrrdLabelSetImageWriter::GetInput()
 {
   if ( this->GetNumberOfInputs() < 1 )
   {
@@ -177,8 +170,7 @@ mitk::LabelSetImage* mitk::NrrdLabelSetImageWriter<TPixelType>::GetInput()
   }
 }
 
-template<typename TPixelType>
-std::vector<std::string> mitk::NrrdLabelSetImageWriter<TPixelType>::GetPossibleFileExtensions()
+std::vector<std::string> mitk::NrrdLabelSetImageWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
   possibleFileExtensions.push_back(".lset");

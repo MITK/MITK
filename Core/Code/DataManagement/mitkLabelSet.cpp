@@ -302,7 +302,7 @@ int mitk::LabelSet::GetActiveLabelLayer() const
   return this->GetActiveLabel()->GetLayer();
 }
 
-unsigned int mitk::LabelSet::GetLabelLayer(int index) const
+int mitk::LabelSet::GetLabelLayer(int index) const
 {
   return m_LabelContainer[index]->GetLayer();
 }

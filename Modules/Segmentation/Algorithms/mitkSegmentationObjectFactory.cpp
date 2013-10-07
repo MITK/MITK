@@ -106,9 +106,7 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
 
 void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
-
-  if(node==NULL)
-    return;
+  if(!node) return;
 
   mitk::DataNode::Pointer nodePointer = node;
 
@@ -178,7 +176,7 @@ void mitk::SegmentationObjectFactory::RegisterIOFactories()
 
   mitk::NrrdLabelSetImageWriterFactory::RegisterOneFactory();
 
-  this->m_FileWriters.push_back(mitk::NrrdLabelSetImageWriter<unsigned char>::New().GetPointer());
+  this->m_FileWriters.push_back(mitk::NrrdLabelSetImageWriter::New().GetPointer());
 
   CreateFileExtensionsMap();
 }

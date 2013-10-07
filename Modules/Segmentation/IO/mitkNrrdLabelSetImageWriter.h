@@ -14,9 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITK_NRRDDIFFVOL_WRITER__H_
-#define _MITK_NRRDDIFFVOL_WRITER__H_
+#ifndef __mitkNrrdLabelSetImageWriter_h
+#define __mitkNrrdLabelSetImageWriter_h
 
+#include "mitkCommon.h"
+#include "SegmentationExports.h"
 #include <itkProcessObject.h>
 #include <mitkFileWriterWithInformation.h>
 #include <mitkLabelSetImage.h>
@@ -25,11 +27,10 @@ namespace mitk
 {
 
 /**
- * Writes a labelset to a file
+ * Writes a labelset image to a file
  * @ingroup Process
  */
-template < class TPixelType >
-class NrrdLabelSetImageWriter : public mitk::FileWriterWithInformation
+class Segmentation_EXPORT NrrdLabelSetImageWriter : public mitk::FileWriterWithInformation
 {
 public:
 
@@ -39,7 +40,10 @@ public:
 
     itkNewMacro( Self );
 
-//    typedef mitk::LabelSetImage<TPixelType> InputType;
+    typedef LabelSetImage::PixelType            PixelType;
+    typedef LabelSetImage::LabelSetImageType    ImageType;
+    typedef LabelSetImage::VectorImageType      VectorImageType;
+
     typedef mitk::LabelSetImage InputType;
 
     /**
@@ -134,6 +138,6 @@ protected:
 
 } // end of namespace mitk
 
-#include "mitkNrrdLabelSetImageWriter.cpp"
+//#include "mitkNrrdLabelSetImageWriter.cpp"
 
-#endif
+#endif // __mitkNrrdLabelSetImageWriter_h

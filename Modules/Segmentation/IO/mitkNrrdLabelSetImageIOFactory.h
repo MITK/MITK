@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_H_HEADER__
-#define __MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_H_HEADER__
+#ifndef __MITK_NRRD_LABELSET_IMAGE_IO_FACTORY_H_HEADER__
+#define __MITK_NRRD_LABELSET_IMAGE_IO_FACTORY_H_HEADER__
 
 #ifdef _MSC_VER
 #pragma warning ( disable : 4786 )
@@ -71,7 +71,6 @@ private:
 
 };
 
-
 } // end namespace mitk
 
-#endif  // __MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_H_HEADER__
+#endif  // __MITK_NRRD_LABELSET_IMAGE_IO_FACTORY_H_HEADER__

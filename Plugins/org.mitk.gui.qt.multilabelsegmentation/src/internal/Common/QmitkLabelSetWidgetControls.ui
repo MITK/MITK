@@ -39,7 +39,7 @@
        <number>2</number>
       </property>
       <item>
-       <widget class="QToolButton" name="m_btNewLabelSet">
+       <widget class="QToolButton" name="m_btNewSegmentation">
         <property name="toolTip">
          <string>Create a new segmentation session</string>
         </property>
@@ -62,7 +62,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="m_btLoadLabelSet">
+       <widget class="QToolButton" name="m_btLoadSegmentation">
         <property name="toolTip">
          <string>Load a segmentation session</string>
         </property>
@@ -108,7 +108,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="m_btSaveLabelSet">
+       <widget class="QToolButton" name="m_btSaveSegmentation">
         <property name="toolTip">
          <string>Save current segmentation session</string>
         </property>
@@ -131,7 +131,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="m_btImportLabelSet">
+       <widget class="QToolButton" name="m_btImportSegmentation">
         <property name="toolTip">
          <string>Import labels from another segmentation session</string>
         </property>
@@ -154,7 +154,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="m_btDeleteLabelSet">
+       <widget class="QToolButton" name="m_btDeleteSegmentation">
         <property name="toolTip">
          <string>Delete active segmentation</string>
         </property>
@@ -344,11 +344,17 @@
         </property>
         <property name="font">
          <font>
-          <pointsize>10</pointsize>
+          <pointsize>12</pointsize>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Currently active layer</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

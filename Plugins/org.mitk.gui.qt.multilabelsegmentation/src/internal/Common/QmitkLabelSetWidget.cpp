@@ -66,11 +66,11 @@ m_WorkingNode(0)
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(combineAndCreateMask( const QList<QTableWidgetSelectionRange>& )),
       this, SLOT(OnCombineAndCreateMask( const QList<QTableWidgetSelectionRange>&)) );
 
-  connect( m_Controls.m_btNewLabelSet, SIGNAL(clicked()), this, SLOT( OnNewSegmentation()) );
-  connect( m_Controls.m_btSaveLabelSet, SIGNAL(clicked()), this, SLOT( OnSaveSegmentation()) );
-  connect( m_Controls.m_btLoadLabelSet, SIGNAL(clicked()), this, SLOT( OnLoadSegmentation()) );
-  connect( m_Controls.m_btDeleteLabelSet, SIGNAL(clicked()), this, SLOT( OnDeleteSegmentation()) );
-  connect( m_Controls.m_btImportLabelSet, SIGNAL(clicked()), this, SLOT( OnImportSegmentation()) );
+  connect( m_Controls.m_btNewSegmentation, SIGNAL(clicked()), this, SLOT( OnNewSegmentation()) );
+  connect( m_Controls.m_btSaveSegmentation, SIGNAL(clicked()), this, SLOT( OnSaveSegmentation()) );
+  connect( m_Controls.m_btLoadSegmentation, SIGNAL(clicked()), this, SLOT( OnLoadSegmentation()) );
+  connect( m_Controls.m_btDeleteSegmentation, SIGNAL(clicked()), this, SLOT( OnDeleteSegmentation()) );
+  connect( m_Controls.m_btImportSegmentation, SIGNAL(clicked()), this, SLOT( OnImportSegmentation()) );
   connect( m_Controls.m_btImportLabeledImage, SIGNAL(clicked()), this, SLOT( OnImportLabeledImage()) );
   connect( m_Controls.m_btNewLabel, SIGNAL(clicked()), this, SLOT( OnNewLabel()) );
   connect( m_Controls.m_btAddLayer, SIGNAL(clicked()), this, SLOT( OnAddLayer()) );
@@ -95,17 +95,17 @@ m_WorkingNode(0)
 
  // m_Controls.m_LabelSetTableWidget->setEnabled(false);
   m_Controls.m_LabelSearchBox->setEnabled(false);
-  m_Controls.m_btNewLabelSet->setEnabled(false);
-  m_Controls.m_btLoadLabelSet->setEnabled(false);
-  m_Controls.m_btSaveLabelSet->setEnabled(false);
+  m_Controls.m_btNewSegmentation->setEnabled(false);
+  m_Controls.m_btLoadSegmentation->setEnabled(false);
+  m_Controls.m_btSaveSegmentation->setEnabled(false);
   m_Controls.m_btNewLabel->setEnabled(false);
   m_Controls.m_btAddLayer->setEnabled(false);
   m_Controls.m_btDeleteLayer->setEnabled(false);
   m_Controls.m_btPreviousLayer->setEnabled(false);
   m_Controls.m_btNextLayer->setEnabled(false);
 
-  m_Controls.m_btDeleteLabelSet->setEnabled(false);
-  m_Controls.m_btImportLabelSet->setEnabled(false);
+  m_Controls.m_btDeleteSegmentation->setEnabled(false);
+  m_Controls.m_btImportSegmentation->setEnabled(false);
   m_Controls.m_btImportLabeledImage->setEnabled(false);
 }
 
@@ -117,8 +117,8 @@ QmitkLabelSetWidget::~QmitkLabelSetWidget()
 void QmitkLabelSetWidget::setEnabled(bool enabled)
 {
 //  m_Controls.m_LabelSetTableWidget->setEnabled(enabled);
-  m_Controls.m_btNewLabelSet->setEnabled(enabled);
-  m_Controls.m_btLoadLabelSet->setEnabled(enabled);
+  m_Controls.m_btNewSegmentation->setEnabled(enabled);
+  m_Controls.m_btLoadSegmentation->setEnabled(enabled);
   m_Controls.m_btImportLabeledImage->setEnabled(enabled);
 
   QWidget::setEnabled(enabled);
@@ -141,14 +141,14 @@ void QmitkLabelSetWidget::SetWorkingNode(mitk::DataNode *node)
     m_WorkingNode = node;
     m_Controls.m_LabelSetTableWidget->setEnabled(m_WorkingNode.IsNotNull());
     m_Controls.m_LabelSearchBox->setEnabled(m_WorkingNode.IsNotNull());
-    m_Controls.m_btSaveLabelSet->setEnabled(m_WorkingNode.IsNotNull());
+    m_Controls.m_btSaveSegmentation->setEnabled(m_WorkingNode.IsNotNull());
     m_Controls.m_btNewLabel->setEnabled(m_WorkingNode.IsNotNull());
     m_Controls.m_btAddLayer->setEnabled(m_WorkingNode.IsNotNull());
     m_Controls.m_btDeleteLayer->setEnabled(m_WorkingNode.IsNotNull());
     m_Controls.m_btPreviousLayer->setEnabled(m_WorkingNode.IsNotNull());
     m_Controls.m_btNextLayer->setEnabled(m_WorkingNode.IsNotNull());
-    m_Controls.m_btDeleteLabelSet->setEnabled(m_WorkingNode.IsNotNull());
-    m_Controls.m_btImportLabelSet->setEnabled(m_WorkingNode.IsNotNull());
+    m_Controls.m_btDeleteSegmentation->setEnabled(m_WorkingNode.IsNotNull());
+    m_Controls.m_btImportSegmentation->setEnabled(m_WorkingNode.IsNotNull());
 
     if (m_WorkingNode.IsNotNull())
     {
@@ -255,12 +255,12 @@ void QmitkLabelSetWidget::OnPreviousLayer()
   {
     this->WaitCursorOff();
     MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::information(this, "Previous layer", "Could not change to previous layer.\n See error log for details.\n");
+    QMessageBox::information(this, "Previous Layer", "Could not change to previous layer. See error log for details.\n");
     return;
   }
 
   m_Controls.m_LabelSetTableWidget->Reset();
-  m_Controls.m_leActiveLayer->setText( QString::number(workingImage->GetActiveLayer()) );
+  this->UpdateControls();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -286,12 +286,12 @@ void QmitkLabelSetWidget::OnNextLayer()
   {
     this->WaitCursorOff();
     MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::information(this, "Next layer", "Could not change to next layer.\n See error log for details.\n");
+    QMessageBox::information(this, "Next Layer", "Could not change to next layer. See error log for details.\n");
     return;
   }
 
   m_Controls.m_LabelSetTableWidget->Reset();
-  m_Controls.m_leActiveLayer->setText( QString::number(workingImage->GetActiveLayer()) );
+  this->UpdateControls();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -315,15 +315,25 @@ void QmitkLabelSetWidget::OnDeleteLayer()
   QMessageBox::StandardButton answerButton = QMessageBox::question( this, "Delete layer",
      question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
-  if (answerButton == QMessageBox::Yes)
+  if (answerButton != QMessageBox::Yes) return;
+
+  try
   {
-    this->BusyCursorOn();
+    this->WaitCursorOn();
     workingImage->RemoveLayer();
-    this->BusyCursorOff();
-    m_Controls.m_LabelSetTableWidget->Reset();
-    m_Controls.m_leActiveLayer->setText( QString::number(workingImage->GetActiveLayer()) );
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    this->WaitCursorOff();
   }
+  catch ( mitk::Exception& e )
+  {
+    this->WaitCursorOff();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(this, "Delete Layer", "Could not delete the currently active layer. See error log for details.\n");
+    return;
+  }
+
+  this->UpdateControls();
+  m_Controls.m_LabelSetTableWidget->Reset();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnAddLayer()
@@ -343,15 +353,46 @@ void QmitkLabelSetWidget::OnAddLayer()
   QMessageBox::StandardButton answerButton = QMessageBox::question( this, "Add layer",
      question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
-  if (answerButton == QMessageBox::Yes)
+  if (answerButton != QMessageBox::Yes) return;
+
+  try
   {
-    this->BusyCursorOn();
+    this->WaitCursorOn();
     workingImage->AddLayer();
-    this->BusyCursorOff();
-    m_Controls.m_LabelSetTableWidget->Reset();
-    m_Controls.m_leActiveLayer->setText( QString::number(workingImage->GetActiveLayer()) );
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    this->WaitCursorOff();
   }
+  catch ( mitk::Exception& e )
+  {
+    this->WaitCursorOff();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(this, "Add Layer", "Could not add a new layer. See error log for details.\n");
+    return;
+  }
+
+  m_Controls.m_LabelSetTableWidget->Reset();
+  this->UpdateControls();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkLabelSetWidget::UpdateControls()
+{
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  assert(toolManager);
+  toolManager->ActivateTool(-1);
+
+  mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
+  assert(workingNode);
+
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  assert(workingImage);
+
+  unsigned int activeLayer = workingImage->GetActiveLayer();
+  unsigned int numberOfLayers = workingImage->GetNumberOfLayers();
+  m_Controls.m_btAddLayer->setEnabled(true);
+  m_Controls.m_btDeleteLayer->setEnabled(numberOfLayers>1);
+  m_Controls.m_btPreviousLayer->setEnabled(activeLayer>0);
+  m_Controls.m_btNextLayer->setEnabled(activeLayer!=numberOfLayers-1);
+  m_Controls.m_leActiveLayer->setText( QString::number( activeLayer ) );
 }
 
 void QmitkLabelSetWidget::OnNewLabel()
@@ -507,21 +548,19 @@ void QmitkLabelSetWidget::OnSmoothLabel(int index)
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
   assert(workingImage);
 
-  this->WaitCursorOn();
-
   try
   {
+    this->WaitCursorOn();
     unsigned int activeLayer = workingImage->GetActiveLayer();
     workingImage->SmoothLabel(activeLayer,index);
+    this->WaitCursorOff();
   }
   catch ( mitk::Exception& e )
   {
     this->WaitCursorOff();
     MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::information(this, "Smooth Label", "Could not smooth the selected label.\n See error log for details.\n");
+    QMessageBox::information(this, "Smooth Label", "Could not smooth the selected label. See error log for details.\n");
   }
-
-  this->WaitCursorOff();
 }
 
 void QmitkLabelSetWidget::OnCreateSurface(int index)
@@ -562,7 +601,7 @@ void QmitkLabelSetWidget::OnCreateSurface(int index)
   catch ( mitk::Exception & e )
   {
     MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::information(this, "Create Surface", "Could not create a surface mesh out of the selected label.\n See error log for details.\n");
+    QMessageBox::information(this, "Create Surface", "Could not create a surface mesh out of the selected label. See error log for details.\n");
   }
 }
 
@@ -581,22 +620,27 @@ void QmitkLabelSetWidget::OnImportLabeledImage()
   if (fileNames.empty())
     return;
 
-  this->WaitCursorOn();
-
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage( fileNames.front().toStdString() );
-  if (image.IsNull()) return;
-
   try
   {
-    mitk::LabelSetImage::Pointer lsImage = mitk::LabelSetImage::New();
-    lsImage->InitializeByLabeledImage(image);
+    this->WaitCursorOn();
+    mitk::Image::Pointer image = mitk::IOUtil::LoadImage( fileNames.front().toStdString() );
+    if (image.IsNull())
+    {
+      this->WaitCursorOff();
+      QMessageBox::information(this, "Import Labeled Image", "Could not load the selected segmentation.\n");
+      return;
+    }
+
+    mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New();
+    newImage->InitializeByLabeledImage(image);
 
     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
     std::string newName = referenceNode->GetName();
     newName += "-labels";
     newNode->SetName(newName);
-    newNode->SetData(lsImage);
+    newNode->SetData(newImage);
     m_DataStorage->Add(newNode, referenceNode);
+    this->WaitCursorOff();
   }
   catch (mitk::Exception & e)
   {
@@ -606,7 +650,7 @@ void QmitkLabelSetWidget::OnImportLabeledImage()
     return;
    }
 
-  this->WaitCursorOff();
+  this->UpdateControls();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -629,22 +673,20 @@ void QmitkLabelSetWidget::OnImportSegmentation()
   mitk::NrrdLabelSetImageReader<unsigned char>::Pointer reader = mitk::NrrdLabelSetImageReader<unsigned char>::New();
   reader->SetFileName(qfileName.toLatin1());
 
-  this->WaitCursorOn();
-
   try
   {
+    this->WaitCursorOn();
     reader->Update();
-    mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
-    workingImage->Concatenate(lsImage);
+    mitk::LabelSetImage::Pointer newImage = reader->GetOutput();
+    workingImage->Concatenate(newImage);
+    this->WaitCursorOff();
   }
   catch ( mitk::Exception& e )
   {
     this->WaitCursorOff();
     MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::information(this, "Import segmentation", "Could not import the selected segmentation session.\n See error log for details.\n");
+    QMessageBox::information(this, "Import Segmentation", "Could not import the selected segmentation session.\n See error log for details.\n");
   }
-
-  this->WaitCursorOff();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -652,12 +694,15 @@ void QmitkLabelSetWidget::OnImportSegmentation()
 void QmitkLabelSetWidget::OnLoadSegmentation()
 {
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  assert(toolManager);
   toolManager->ActivateTool(-1);
 
   mitk::DataNode* referenceNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
+  assert(referenceNode);
   if (!referenceNode) return;
 
   mitk::Image* referenceImage = dynamic_cast<mitk::Image*>( referenceNode->GetData() );
+  assert(referenceImage);
   if (!referenceImage) return;
 
   std::string fileExtensions("Segmentation files (*.lset);;");
@@ -667,11 +712,11 @@ void QmitkLabelSetWidget::OnLoadSegmentation()
   mitk::NrrdLabelSetImageReader<unsigned char>::Pointer reader = mitk::NrrdLabelSetImageReader<unsigned char>::New();
   reader->SetFileName(qfileName.toLatin1());
 
-  this->WaitCursorOn();
-
   try
   {
+    this->WaitCursorOn();
     reader->Update();
+    this->WaitCursorOff();
   }
   catch ( mitk::Exception& e )
   {
@@ -682,17 +727,15 @@ void QmitkLabelSetWidget::OnLoadSegmentation()
 
   this->SetLastFileOpenPath(qfileName);
 
-  mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
+  mitk::LabelSetImage::Pointer newImage = reader->GetOutput();
 
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-  newNode->SetData(lsImage);
-  newNode->SetName( lsImage->GetName() );
-
-  m_Controls.m_leActiveLayer->setText( QString::number(lsImage->GetActiveLayer()) );
+  newNode->SetData(newImage);
+  newNode->SetName(newImage->GetName());
 
   m_DataStorage->Add(newNode,referenceNode);
 
-  this->WaitCursorOff();
+  this->UpdateControls();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -727,29 +770,28 @@ void QmitkLabelSetWidget::OnSaveSegmentation()
   workingNode->SetName(newName);
   writer->SetInput(workingImage);
 
-  this->WaitCursorOn();
-
   try
   {
+    this->WaitCursorOn();
     writer->Update();
+    this->WaitCursorOff();
   }
   catch (mitk::Exception& e)
   {
     this->WaitCursorOff();
     MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::information(this, "Save Segmenation", "Could not save the active segmentation.\n See error log for details.");
+    QMessageBox::information(this, "Save Segmenation", "Could not save the active segmentation. See error log for details.");
   }
-
-  this->WaitCursorOff();
 }
 
 void QmitkLabelSetWidget::OnDeleteSegmentation()
 {
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  assert(toolManager);
   toolManager->ActivateTool(-1);
 
-  mitk::DataNode::Pointer workingNode = toolManager->GetWorkingData(0);
-  if (workingNode.IsNull()) return;
+  mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
+  assert(workingNode);
 
   m_DataStorage->Remove(workingNode);
 }
@@ -783,9 +825,9 @@ void QmitkLabelSetWidget::OnNewSegmentation()
   newNode->SetName(name.toStdString());
   newImage->SetName(name.toStdString());
 
-  m_Controls.m_leActiveLayer->setText( QString::number(newImage->GetActiveLayer()) );
-
   m_DataStorage->Add(newNode,referenceNode);
+
+  this->UpdateControls();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
@@ -807,17 +849,7 @@ void QmitkLabelSetWidget::WaitCursorOn()
   QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 }
 
-void QmitkLabelSetWidget::BusyCursorOn()
-{
-  QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
-}
-
 void QmitkLabelSetWidget::WaitCursorOff()
-{
-  this->RestoreOverrideCursor();
-}
-
-void QmitkLabelSetWidget::BusyCursorOff()
 {
   this->RestoreOverrideCursor();
 }

@@ -139,13 +139,11 @@ private:
 
     void WaitCursorOn();
 
-    void BusyCursorOn();
-
     void WaitCursorOff();
 
-    void BusyCursorOff();
-
     void RestoreOverrideCursor();
+
+    void UpdateControls();
 
     void OnThreadedCalculationDone();
 

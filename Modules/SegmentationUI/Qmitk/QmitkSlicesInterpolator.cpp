@@ -50,17 +50,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVBoxLayout>
 #include <QMessageBox>
 
-QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /*name*/)
-  :QWidget(parent),
-//    ACTION_TO_SLICEDIMENSION( createActionToSliceDimension() ),
-    m_SliceInterpolatorController( mitk::SegmentationInterpolationController::New() ),
-    m_SurfaceInterpolator(mitk::SurfaceInterpolationController::GetInstance()),
-    m_ToolManager(NULL),
-    m_Initialized(false),
-    m_LastSNC(0),
-    m_LastSliceIndex(0),
-    m_2DInterpolationEnabled(false),
-    m_3DInterpolationEnabled(false)
+QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /*name*/) : QWidget(parent),
+m_SliceInterpolatorController( mitk::SegmentationInterpolationController::New() ),
+m_SurfaceInterpolator(mitk::SurfaceInterpolationController::GetInstance()),
+m_ToolManager(NULL),
+m_Initialized(false),
+m_LastSNC(0),
+m_LastSliceIndex(0),
+m_2DInterpolationEnabled(false),
+m_3DInterpolationEnabled(false)
 {
   m_gbControls = new QGroupBox("Interpolation", this);
   m_gbControls->setCheckable(true);
@@ -233,8 +231,6 @@ void QmitkSlicesInterpolator::Uninitialize()
   }
 
   m_ActionToSliceDimensionMap.clear();
-
-  m_ToolManager = NULL;
 
   m_Initialized = false;
 }

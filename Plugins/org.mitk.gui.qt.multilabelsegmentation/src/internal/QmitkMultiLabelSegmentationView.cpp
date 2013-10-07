@@ -309,6 +309,8 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
   m_ToolManager->ActivateTool(-1);
   m_ToolManager->SetReferenceData(m_ReferenceNode);
 
+  m_Controls.m_LabelSetWidget->setEnabled(m_ReferenceNode.IsNotNull());
+
   if( m_ReferenceNode.IsNotNull() )
   {
     m_ReferenceNode->SetVisibility(true);
@@ -345,7 +347,7 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
       m_SegmentationDataStorage->Add(_newNode);
     }
 
-    m_Controls.m_LabelSetWidget->setEnabled(true);
+    //m_Controls.m_LabelSetWidget->setEnabled(true);
 //    m_Controls.m_SlicesInterpolator->setEnabled(true);
   }
 

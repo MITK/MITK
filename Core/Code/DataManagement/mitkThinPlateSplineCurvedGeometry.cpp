@@ -96,7 +96,7 @@ void mitk::ThinPlateSplineCurvedGeometry::ComputeGeometry()
 
 itk::LightObject::Pointer mitk::ThinPlateSplineCurvedGeometry::InternalClone() const
 {
- mitk::AffineGeometryFrame3D::Pointer newGeometry = new Self(*this);
- newGeometry->UnRegister();
- return newGeometry.GetPointer();
+  mitk::Geometry3D::Pointer newGeometry = new Self(*this);
+  newGeometry->UnRegister();
+  return newGeometry.GetPointer();
 }

@@ -237,7 +237,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
       m_BoundingBoxActor->VisibilityOn();
 
       const BoundingBox::BoundsArrayType &bounds =
-        input->GetTimeSlicedGeometry()->GetBounds();
+        input->GetTimeGeometry()->GetBoundsInWorld();
 
       m_BoundingBox->SetBounds(
         bounds[0], bounds[1],
@@ -316,7 +316,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
 */
   m_VolumeLOD->SetSelectedLODID( m_HiResID );
 
-  assert(input->GetTimeSlicedGeometry());
+  assert(input->GetTimeGeometry());
 
   const Geometry3D* worldgeometry = renderer->GetCurrentWorldGeometry();
   if(worldgeometry==NULL)

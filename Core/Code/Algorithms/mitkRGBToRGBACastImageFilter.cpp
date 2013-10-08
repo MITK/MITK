@@ -98,23 +98,23 @@ void mitk::RGBToRGBACastImageFilter::GenerateOutputInformation()
   if ( inputPixelType == mitk::MakePixelType< UCRGBItkImageType>() )
   {
     const mitk::PixelType refPtype = MakePixelType<UCRGBItkImageType>();
-    output->Initialize( refPtype, *input->GetTimeSlicedGeometry() );
+    output->Initialize( refPtype, *input->GetTimeGeometry() );
 
   }
   else if ( inputPixelType == mitk::MakePixelType< USRGBItkImageType>( ) )
   {
     const mitk::PixelType refPtype = MakePixelType<USRGBItkImageType>();
-    output->Initialize( refPtype, *input->GetTimeSlicedGeometry() );
+    output->Initialize( refPtype, *input->GetTimeGeometry() );
   }
   else if ( inputPixelType == mitk::MakePixelType< FloatCRGBItkImageType>( ) )
   {
     const mitk::PixelType refPtype = MakePixelType<FloatCRGBItkImageType>();
-    output->Initialize( refPtype, *input->GetTimeSlicedGeometry() );
+    output->Initialize( refPtype, *input->GetTimeGeometry() );
   }
   else if ( inputPixelType == mitk::MakePixelType< DoubleRGBItkImageType>( ) )
   {
     const mitk::PixelType refPtype = MakePixelType<DoubleRGBItkImageType>();
-    output->Initialize( refPtype, *input->GetTimeSlicedGeometry() );
+    output->Initialize( refPtype, *input->GetTimeGeometry() );
   }
 
   output->SetPropertyList(input->GetPropertyList()->Clone());
@@ -137,9 +137,9 @@ void mitk::RGBToRGBACastImageFilter::GenerateData()
   m_OutputTimeSelector->SetInput(this->GetOutput());
 
   mitk::Image::RegionType outputRegion = output->GetRequestedRegion();
-  const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
-  const mitk::TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
-  ScalarType timeInMS;
+  const mitk::TimeGeometry *outputTimeGeometry = output->GetTimeGeometry();
+  const mitk::TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
+  TimePointType timeInMS;
 
   int timestep=0;
   int tstart=outputRegion.GetIndex(3);
@@ -148,9 +148,8 @@ void mitk::RGBToRGBACastImageFilter::GenerateData()
   int t;
   for(t=tstart;t<tmax;++t)
   {
-    timeInMS = outputTimeGeometry->TimeStepToMS( t );
-
-    timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
+    timeInMS = outputTimeGeometry->TimeStepToTimePoint( t );
+    timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
 
     m_InputTimeSelector->SetTimeNr(timestep);
     m_InputTimeSelector->UpdateLargestPossibleRegion();

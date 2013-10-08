@@ -178,7 +178,7 @@ void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWin
 
         mitk::DataStorage::SetOfObjects::ConstPointer rs = dataStorage->GetSubset(pred);
         // calculate bounding geometry of these nodes
-        mitk::TimeSlicedGeometry::Pointer bounds = dataStorage->ComputeBoundingGeometry3D(rs);
+        mitk::TimeGeometry::Pointer bounds = dataStorage->ComputeBoundingGeometry3D(rs);
         // initialize the views to the bounding geometry
         renderingManager->InitializeViews(bounds);
       }

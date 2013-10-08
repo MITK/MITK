@@ -26,7 +26,7 @@ mitk::BoundingObject::BoundingObject()
   /* bounding box around the unscaled bounding object */
   ScalarType bounds[6]={-1,1,-1,1,-1,1};  //{xmin,x_max, ymin,y_max,zmin,z_max}
   GetGeometry()->SetBounds(bounds);
-  GetTimeSlicedGeometry()->UpdateInformation();
+  GetTimeGeometry()->Update();
 }
 
 mitk::BoundingObject::~BoundingObject()
@@ -67,6 +67,6 @@ void mitk::BoundingObject::FitGeometry(mitk::Geometry3D* aGeometry3D)
   for(unsigned int i=0; i < 3; ++i)
     size[i] = (aGeometry3D->GetExtentInMM(i)/2.0);
   GetGeometry()->SetSpacing( size );
-  GetTimeSlicedGeometry()->UpdateInformation();
+  GetTimeGeometry()->Update();
 
 }

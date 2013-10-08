@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImageRegionConstIterator.h>
 #include <itkRegionOfInterestImageFilter.h>
+#include <mitkProportionalTimeGeometry.h>
 
 
 mitk::AutoCropImageFilter::AutoCropImageFilter()
@@ -33,20 +34,17 @@ mitk::AutoCropImageFilter::AutoCropImageFilter()
   m_TimeSelector(NULL),
   m_OverrideCroppingRegion(false)
 {
-
 }
 
 
 mitk::AutoCropImageFilter::~AutoCropImageFilter()
 {
-
 }
 
 
 template < typename TPixel, unsigned int VImageDimension>
 void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage, unsigned int timestep)
 {
-
   if (inputItkImage == NULL)
   {
     mitk::StatusBar::GetInstance()->DisplayErrorText ("An internal error occurred. Can't convert Image. Please report to bugs@mitk.org");
@@ -75,7 +73,6 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
 
   mitk::ImageReadAccessor newMitkImgAcc(newMitkImage);
   this->GetOutput()->SetVolume( newMitkImgAcc.GetData(), timestep);
-
 }
 
 void mitk::AutoCropImageFilter::GenerateOutputInformation()
@@ -183,9 +180,9 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   slicedGeometry->InitializeEvenlySpaced( plane, inputGeometry->GetSpacing()[2], output->GetSlicedGeometry()->GetSlices() );
 
 
-  mitk::TimeSlicedGeometry* timeSlicedGeometry = output->GetTimeSlicedGeometry();
-  timeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, output->GetDimension(3));
-  timeSlicedGeometry->CopyTimes(input->GetTimeSlicedGeometry());
+  mitk::TimeGeometry* timeSlicedGeometry = output->GetTimeGeometry();
+  mitk::ProportionalTimeGeometry* propTimeGeometry = dynamic_cast<ProportionalTimeGeometry*>(timeSlicedGeometry);
+  propTimeGeometry->Initialize(slicedGeometry, output->GetDimension(3));
 
   m_TimeOfHeaderInitialization.Modified();
 
@@ -261,7 +258,6 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
     {
       m_RegionIndex[i] = m_CroppingRegion.GetIndex()[i];
       m_RegionSize[i] = m_CroppingRegion.GetSize()[i];
-
     }
   }
   else
@@ -353,7 +349,6 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
 
 void mitk::AutoCropImageFilter::GenerateInputRequestedRegion()
 {
-
 }
 
 const mitk::PixelType mitk::AutoCropImageFilter::GetOutputPixelType()

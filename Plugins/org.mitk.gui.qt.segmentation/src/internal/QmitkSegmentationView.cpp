@@ -228,7 +228,6 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
 
 void QmitkSegmentationView::CreateNewSegmentation()
 {
-
   mitk::DataNode::Pointer node = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
   if (node.IsNotNull())
   {
@@ -658,7 +657,6 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
         this->UpdateWarningLabel("");
         this->SetToolManagerSelection(refNode, node);
       }
-
     }
     else if (refNode && this->CheckForSameGeometry(node, refNode))
     {
@@ -718,7 +716,6 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
       this->OnContourMarkerSelected( nodes.at( 0 ) );
       return;
     }
-
   }
   if (m_AutoSelectionEnabled && this->IsActivated())
   {
@@ -747,7 +744,6 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
 
         if (isASegmentation)
         {
-
           //If a segmentation is selected find a possible reference image:
           mitk::DataStorage::SetOfObjects::ConstPointer sources = this->GetDataStorage()->GetSources(selectedNode, m_IsNotABinaryImagePredicate);
           mitk::DataNode::Pointer refNode;
@@ -815,7 +811,6 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
               }
             }
             this->SetToolManagerSelection(NULL, selectedNode);
-
           }
         }
         else
@@ -832,7 +827,6 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
       }
     }
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
   }
 }
 
@@ -950,8 +944,6 @@ void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* refere
     if (workingData)
     {
       this->FireNodeSelected(const_cast<mitk::DataNode*>(workingData));
-//      mitk::RenderingManager::GetInstance()->InitializeViews(workingData->GetData()->GetTimeSlicedGeometry(),
-//                                                             mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
 
 //      if( m_Controls->widgetStack->currentIndex() == 0 )
 //      {

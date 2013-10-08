@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkVtkAbstractTransformPlaneGeometry.h"
 #include "mitkPlaneGeometry.h"
-#include "mitkTimeSlicedGeometry.h"
 #include "mitkSlicedGeometry3D.h"
 
 #include <vtkSphericalTransform.h>

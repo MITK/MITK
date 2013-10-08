@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkStepperAdapter.h>
 #include <QmitkRenderWindow.h>
 
+#include <mitkTimeGeometry.h>
+
 #include <berryConstants.h>
 
 
@@ -274,7 +276,7 @@ void QmitkImageNavigatorView::SetStepSize(int axis)
 {
   if (m_IRenderWindowPart)
   {
-    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
+    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry3D();
 
     if (geometry.IsNotNull())
     {
@@ -320,7 +322,7 @@ void QmitkImageNavigatorView::OnMillimetreCoordinateValueChanged()
 {
   if (m_IRenderWindowPart)
   {
-    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
+    mitk::TimeGeometry::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldTimeGeometry();
 
     if (geometry.IsNotNull())
     {
@@ -338,11 +340,18 @@ void QmitkImageNavigatorView::OnRefetch()
 {
   if (m_IRenderWindowPart)
   {
-    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
+    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry3D();
+    mitk::TimeGeometry::ConstPointer timeGeometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldTimeGeometry();
+
+    if (geometry.IsNull() && timeGeometry.IsNotNull())
+    {
+      mitk::TimeStepType timeStep = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetTime()->GetPos();
+      geometry = timeGeometry->GetGeometryForTimeStep(timeStep);
+    }
 
     if (geometry.IsNotNull())
     {
-      mitk::Geometry3D::BoundsArrayType bounds = geometry->GetBounds();
+      mitk::BoundingBox::BoundsArrayType bounds = geometry->GetBounds();
 
       mitk::Point3D cornerPoint1InIndexCoordinates;
       cornerPoint1InIndexCoordinates[0] = bounds[0];

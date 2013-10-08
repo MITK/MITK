@@ -49,12 +49,18 @@ mitk::GeometryClipImageFilter::~GeometryClipImageFilter()
 
 }
 
+
+void mitk::GeometryClipImageFilter::SetClippingGeometry(const mitk::TimeGeometry* timeClippingGeometry)
+{
+  m_TimeClippingGeometry = timeClippingGeometry;
+  SetClippingGeometry(timeClippingGeometry->GetGeometryForTimeStep(0));
+}
+
 void mitk::GeometryClipImageFilter::SetClippingGeometry(const mitk::Geometry3D* aClippingGeometry)
 {
   if(aClippingGeometry != m_ClippingGeometry.GetPointer())
   {
     m_ClippingGeometry = aClippingGeometry;
-    m_TimeSlicedClippingGeometry = dynamic_cast<const TimeSlicedGeometry*>(aClippingGeometry);
     m_ClippingGeometryData->SetGeometry(const_cast<mitk::Geometry3D*>(aClippingGeometry));
     SetNthInput(1, m_ClippingGeometryData);
     Modified();
@@ -64,6 +70,11 @@ void mitk::GeometryClipImageFilter::SetClippingGeometry(const mitk::Geometry3D* 
 const mitk::Geometry3D* mitk::GeometryClipImageFilter::GetClippingGeometry() const
 {
   return m_ClippingGeometry;
+}
+
+const mitk::TimeGeometry* mitk::GeometryClipImageFilter::GetClippingTimeGeometry() const
+{
+  return m_TimeClippingGeometry;
 }
 
 void mitk::GeometryClipImageFilter::GenerateInputRequestedRegion()
@@ -201,13 +212,13 @@ void mitk::GeometryClipImageFilter::GenerateData()
 
   const Geometry2D * clippingGeometryOfCurrentTimeStep = NULL;
 
-  if(m_TimeSlicedClippingGeometry.IsNull())
+  if(m_TimeClippingGeometry.IsNull())
   {
     clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_ClippingGeometry.GetPointer());
   }
   else
   {
-    clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_TimeSlicedClippingGeometry->GetGeometry3D(0));
+    clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_TimeClippingGeometry->GetGeometryForTimeStep(0).GetPointer());
   }
 
   if(clippingGeometryOfCurrentTimeStep == NULL)
@@ -217,8 +228,8 @@ void mitk::GeometryClipImageFilter::GenerateData()
   m_OutputTimeSelector->SetInput(this->GetOutput());
 
   mitk::Image::RegionType outputRegion = output->GetRequestedRegion();
-  const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
-  const mitk::TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
+  const mitk::TimeGeometry *outputTimeGeometry = output->GetTimeGeometry();
+  const mitk::TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
   ScalarType timeInMS;
 
   int timestep=0;
@@ -228,22 +239,21 @@ void mitk::GeometryClipImageFilter::GenerateData()
   int t;
   for(t=tstart;t<tmax;++t)
   {
-    timeInMS = outputTimeGeometry->TimeStepToMS( t );
-
-    timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
+    timeInMS = outputTimeGeometry->TimeStepToTimePoint( t );
+    timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
 
     m_InputTimeSelector->SetTimeNr(timestep);
     m_InputTimeSelector->UpdateLargestPossibleRegion();
     m_OutputTimeSelector->SetTimeNr(t);
     m_OutputTimeSelector->UpdateLargestPossibleRegion();
 
-    if(m_TimeSlicedClippingGeometry.IsNotNull())
+    if(m_TimeClippingGeometry.IsNotNull())
     {
-      timestep = m_TimeSlicedClippingGeometry->MSToTimeStep( timeInMS );
-      if(m_TimeSlicedClippingGeometry->IsValidTime(timestep) == false)
+      timestep = m_TimeClippingGeometry->TimePointToTimeStep( timeInMS );
+      if(m_TimeClippingGeometry->IsValidTimeStep(timestep) == false)
         continue;
 
-      clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_TimeSlicedClippingGeometry->GetGeometry3D(timestep));
+      clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_TimeClippingGeometry->GetGeometryForTimeStep(timestep).GetPointer());
     }
 
     AccessByItk_2(m_InputTimeSelector->GetOutput(),_InternalComputeClippedImage,this,clippingGeometryOfCurrentTimeStep);

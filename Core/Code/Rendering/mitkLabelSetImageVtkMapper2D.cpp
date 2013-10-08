@@ -135,6 +135,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     // see bug-13275
     localStorage->m_ReslicedImage = NULL;
     localStorage->m_ReslicedImageMapper->SetInput( localStorage->m_EmptyPolyData );
+    localStorage->m_ActiveLabelContourMapper->SetInput( NULL);
     return;
   }
 
@@ -286,8 +287,6 @@ void mitk::LabelSetImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
   const mitk::Color& activeLabelColor = input->GetActiveLabelColor( activeLayer );
   double rgbConv[3] = {(double)activeLabelColor.GetRed(), (double)activeLabelColor.GetGreen(), (double)activeLabelColor.GetBlue()};
   localStorage->m_ActiveLabelContourActor->GetProperty()->SetColor(rgbConv);
-  float opacity = input->GetActiveLabelOpacity( activeLayer );
-  localStorage->m_ActiveLabelContourActor->GetProperty()->SetOpacity(opacity);
 }
 
 void mitk::LabelSetImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
@@ -296,6 +295,7 @@ void mitk::LabelSetImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer 
   float opacity = 1.0f;
   this->GetDataNode()->GetOpacity( opacity, renderer, "opacity" );
   localStorage->m_ReslicedImageActor->GetProperty()->SetOpacity(opacity);
+  localStorage->m_ActiveLabelContourActor->GetProperty()->SetOpacity(opacity);
 }
 
 void mitk::LabelSetImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )

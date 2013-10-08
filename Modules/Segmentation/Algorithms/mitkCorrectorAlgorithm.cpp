@@ -51,8 +51,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
 
   if (inputImage->GetTimeGeometry() )
   {
-    itk::LightObject::Pointer cloned = inputImage->GetTimeGeometry()->Clone();
-    originalGeometry = dynamic_cast<TimeGeometry *> (cloned.GetPointer());
+    originalGeometry = inputImage->GetTimeGeometry()->Clone();
     m_WorkingImage->SetTimeGeometry( originalGeometry );
   }
   else

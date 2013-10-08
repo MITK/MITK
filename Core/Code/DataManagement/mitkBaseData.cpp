@@ -140,8 +140,8 @@ void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D)
 
 void mitk::BaseData::SetClonedTimeGeometry(const TimeGeometry* geometry)
 {
-  itk::LightObject::Pointer clonedGeometry = geometry->Clone();
-  SetTimeGeometry(dynamic_cast<TimeGeometry *>(clonedGeometry.GetPointer()));
+  TimeGeometry::Pointer clonedGeometry = geometry->Clone();
+  SetTimeGeometry(clonedGeometry.GetPointer());
 }
 
 
@@ -246,8 +246,7 @@ void mitk::BaseData::CopyInformation( const itk::DataObject* data )
     m_PropertyList = bd->GetPropertyList()->Clone();
     if (bd->GetTimeGeometry()!=NULL)
     {
-      itk::LightObject::Pointer clon = bd->GetTimeGeometry()->Clone();
-      m_TimeGeometry = dynamic_cast<TimeGeometry *> (clon.GetPointer());
+      m_TimeGeometry = bd->GetTimeGeometry()->Clone();
     }
   }
   else

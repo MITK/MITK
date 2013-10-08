@@ -1,12 +1,18 @@
 #ifndef mitkTimeSlicedGeometry_h
 #define mitkTimeSlicedGeometry_h
 
+#include <mitkCommon.h>
+
 namespace mitk
 {
   /**
   * \deprecatedSince{2013_06} Please use TimeGeometry instead. For more information see @TimeGeometryGuide@
   */
-  DEPRECATED( class TimeSlicedGeometry;);
+  class TimeSlicedGeometry{
+      DEPRECATED(TimeSlicedGeometry());
+  };
+
+  //DEPRECATED( class TimeSlicedGeometry{};);
 }
 
 /*

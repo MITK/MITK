@@ -361,8 +361,7 @@ RenderingManager
   TimeGeometry::Pointer modifiedGeometry = NULL;
   if (dataGeometry!=NULL)
   {
-    itk::LightObject::Pointer clon = dataGeometry->Clone();
-    modifiedGeometry = dynamic_cast<TimeGeometry *> (clon.GetPointer());
+    modifiedGeometry = dataGeometry->Clone();
   }
 
 

@@ -536,8 +536,8 @@ void QmitkThresholdComponent::CreateThresholdSegmentation()
 
   if (original->GetTimeGeometry() )
   {
-    itk::LightObject::Pointer originalGeometry = original->GetTimeGeometry()->Clone();
-    segmentation->SetTimeGeometry( dynamic_cast<mitk::TimeGeometry *> (originalGeometry.GetPointer()) );
+    mitk::TimeGeometry::Pointer originalGeometry = original->GetTimeGeometry()->Clone();
+    segmentation->SetTimeGeometry( originalGeometry.GetPointer() );
   }
   else
   {

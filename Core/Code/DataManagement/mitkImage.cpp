@@ -51,8 +51,8 @@ mitk::Image::Image(const Image &other) : SlicedData(other), m_Dimension(0), m_Di
 
   //Since the above called "Initialize" method doesn't take the geometry into account we need to set it
   //here manually
-  itk::LightObject::Pointer cloned = other.GetTimeGeometry()->Clone();
-  this->SetTimeGeometry(dynamic_cast<TimeGeometry*>(cloned.GetPointer()));
+  TimeGeometry::Pointer cloned = other.GetTimeGeometry()->Clone();
+  this->SetTimeGeometry(cloned.GetPointer());
 
   if (this->GetDimension() > 3)
   {
@@ -809,7 +809,6 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D
 
 void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::TimeGeometry& geometry, unsigned int channels, int tDim )
 {
-  const ProportionalTimeGeometry& ptG = dynamic_cast<const ProportionalTimeGeometry&>(geometry);
   unsigned int dimensions[5];
   dimensions[0] = (unsigned int)(geometry.GetGeometryForTimeStep(0)->GetExtent(0)+0.5);
   dimensions[1] = (unsigned int)(geometry.GetGeometryForTimeStep(0)->GetExtent(1)+0.5);
@@ -826,8 +825,8 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::TimeGeomet
   Initialize( type, dimension, dimensions, channels );
   if (geometry.GetNumberOfTimeSteps() > 1)
   {
-    itk::LightObject::Pointer cloned = geometry.Clone();
-    SetTimeGeometry(dynamic_cast<TimeGeometry *>(cloned.GetPointer()));
+    TimeGeometry::Pointer cloned = geometry.Clone();
+    SetTimeGeometry(cloned.GetPointer());
   }
   else
     Superclass::SetGeometry(geometry.GetGeometryForTimeStep(0));

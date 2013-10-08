@@ -254,8 +254,7 @@ SliceNavigationController::Update(
     case Original:
       if ( worldTimeGeometry.IsNotNull())
       {
-        itk::LightObject::Pointer cloned = worldTimeGeometry->Clone();
-        m_CreatedWorldGeometry = dynamic_cast<TimeGeometry *> (cloned.GetPointer());
+        m_CreatedWorldGeometry = worldTimeGeometry->Clone();
 
         worldTimeGeometry = m_CreatedWorldGeometry.GetPointer();
 

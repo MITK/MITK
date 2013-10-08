@@ -65,7 +65,7 @@ bool mitk::ProportionalTimeGeometry::IsValidTimePoint (TimePointType timePoint) 
 
 bool mitk::ProportionalTimeGeometry::IsValidTimeStep (TimeStepType timeStep) const
 {
-  return 0 <= timeStep && timeStep <  this->GetNumberOfTimeSteps();
+  return timeStep <  this->GetNumberOfTimeSteps();
 }
 
 mitk::TimePointType mitk::ProportionalTimeGeometry::TimeStepToTimePoint( TimeStepType timeStep) const
@@ -152,7 +152,6 @@ void mitk::ProportionalTimeGeometry::Expand(mitk::TimeStepType size)
 void mitk::ProportionalTimeGeometry::SetTimeStepGeometry(Geometry3D* geometry, TimeStepType timeStep)
 {
   assert(timeStep<=m_GeometryVector.size());
-  assert(timeStep >= 0);
 
   if (timeStep == m_GeometryVector.size())
     m_GeometryVector.push_back(geometry);

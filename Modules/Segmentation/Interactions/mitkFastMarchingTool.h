@@ -97,7 +97,7 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
     void SetBeta(double);
 
     /// \brief Adds the feedback image to the current working image.
-    void ConfirmSegmentation();
+    void AcceptPreview();
 
     /// \brief Updates the itk pipeline and shows the result of FastMarching.
     void Update();
@@ -112,8 +112,8 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
 
     virtual float CanHandleEvent( StateEvent const *stateEvent) const;
 
-    void Activated();
-    void Deactivated();
+    virtual void Activated();
+    virtual void Deactivated();
 
     /// \brief Add point action of StateMachine pattern
     bool OnAddPoint (Action*, const StateEvent*);
@@ -123,7 +123,6 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
 
     mitk::ToolCommand::Pointer m_ProgressCommand;
 
-    Image::Pointer m_ReferenceImage;
     Image::Pointer m_ReferenceImageSlice;
 
     bool m_NeedUpdate;
@@ -141,19 +140,22 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
     float m_Alpha; //used in Sigmoid filter
     float m_Beta; //used in Sigmoid filter
 
-    NodeContainer::Pointer m_SeedContainer; //seed points for FastMarching
+    //used to visualize the preview segmentation
+    mitk::DataNode::Pointer             m_FeedbackNode;
+    mitk::LabelSetImage::Pointer        m_FeedbackImage;
 
-    mitk::DataNode::Pointer       m_FeedbackNode;
-    mitk::LabelSetImage::Pointer  m_FeedbackImage;
+    //seed points for FastMarching
+    NodeContainer::Pointer m_SeedContainer;
 
-    mitk::DataNode::Pointer m_SeedsAsPointSetNode;//used to visualize the seed points
-    mitk::PointSet::Pointer m_SeedsAsPointSet;
+    //used to visualize the seed points
+    mitk::DataNode::Pointer             m_SeedsAsPointSetNode;
+    mitk::PointSet::Pointer             m_SeedsAsPointSet;
 
-    ThresholdingFilterType::Pointer m_ThresholdFilter;
-    SmoothingFilterType::Pointer m_SmoothFilter;
-    GradientFilterType::Pointer m_GradientMagnitudeFilter;
-    SigmoidFilterType::Pointer m_SigmoidFilter;
-    FastMarchingFilterType::Pointer m_FastMarchingFilter;
+    ThresholdingFilterType::Pointer     m_ThresholdFilter;
+    SmoothingFilterType::Pointer        m_SmoothFilter;
+    GradientFilterType::Pointer         m_GradientMagnitudeFilter;
+    SigmoidFilterType::Pointer          m_SigmoidFilter;
+    FastMarchingFilterType::Pointer     m_FastMarchingFilter;
 
 };
 

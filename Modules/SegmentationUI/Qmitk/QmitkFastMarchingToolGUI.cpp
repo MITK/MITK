@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkDoubleSlider.h>
 #include <ctkRangeWidget.h>
 #include <ctkSliderWidget.h>
+#include <ctkSpinbox.h>
+
 #include <qpushbutton.h>
 #include <qlayout.h>
 #include <QGroupBox>
@@ -67,14 +69,15 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI()
   }
 
   m_slSigma = new ctkSliderWidget(this);
-  m_slSigma->setDecimals(2);
   m_slSigma->setTracking(false);
   m_slSigma->setPageStep(0.1);
-  m_slSigma->setTickInterval(0.01);
+//  m_slSigma->setTickInterval(0.01);
   m_slSigma->setSingleStep(0.01);
   m_slSigma->setMinimum(0.1);
   m_slSigma->setMaximum(5.0);
   m_slSigma->setValue(1.0);
+  m_slSigma->setDecimals(2);
+  m_slSigma->spinBox()->setDecimals(2);
 
   m_slSigma->setToolTip("The \"sigma\" parameter in the Gradient Magnitude filter.");
   connect( m_slSigma, SIGNAL(valueChanged(double)), this, SLOT(OnSigmaChanged(double)));
@@ -196,7 +199,7 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI()
   m_btConfirm = new QPushButton("Accept");
   m_btConfirm->setToolTip("Incorporate current result in your working session.");
   widgetLayout->addWidget(m_btConfirm);
-  connect( m_btConfirm, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()) );
+  connect( m_btConfirm, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
@@ -291,11 +294,11 @@ void QmitkFastMarchingToolGUI::OnStoppingValueChanged(double value)
   }
 }
 
-void QmitkFastMarchingToolGUI::OnConfirmSegmentation()
+void QmitkFastMarchingToolGUI::OnAcceptPreview()
 {
   if (m_FastMarchingTool.IsNotNull() && (!m_SelfCall))
   {
-    m_FastMarchingTool->ConfirmSegmentation();
+    m_FastMarchingTool->AcceptPreview();
   }
 }
 

@@ -52,7 +52,7 @@ public:
     void OnBetaChanged(double);
     void OnSigmaChanged(double);
     void OnStoppingValueChanged(double);
-    void OnConfirmSegmentation();
+    void OnAcceptPreview();
     void Refetch();
     void SetStepper(mitk::Stepper *);
     void OnClearSeeds();

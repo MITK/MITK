@@ -45,6 +45,19 @@ void TestTempMethods()
   tmpFile2.close();
   MITK_TEST_CONDITION(std::remove(tmpFilePath2.c_str()) == 0, "Remove temp file 2")
 
+  std::ofstream tmpFile3;
+  std::string tmpFilePath3 = mitk::IOUtil::CreateTemporaryFile(tmpFile3, std::ios_base::binary,
+                                                               "my-XXXXXX.TXT", programPath);
+  MITK_TEST_CONDITION_REQUIRED(tmpFile3 && tmpFile3.is_open(), "Temp file 3 stream")
+  MITK_TEST_CONDITION_REQUIRED(tmpFilePath3.size() > programPath.size(), "Temp file 3 path size")
+  MITK_TEST_CONDITION(tmpFilePath3.substr(0, programPath.size()) == programPath, "Temp file 23 is in program path")
+  MITK_TEST_CONDITION(tmpFilePath3.substr(tmpFilePath3.size() - 13, 3) == "my-", "Temp file 3 starts with 'my-'")
+  MITK_TEST_CONDITION(tmpFilePath3.substr(tmpFilePath3.size() - 4) == ".TXT", "Temp file 3 ends with '.TXT'")
+  tmpFile3.close();
+  //MITK_TEST_CONDITION(std::remove(tmpFilePath3.c_str()) == 0, "Remove temp file 3")
+
+  MITK_TEST_FOR_EXCEPTION(mitk::Exception&, mitk::IOUtil::CreateTemporaryFile(tmpFile2, "XX"))
+
   std::string tmpDir = mitk::IOUtil::CreateTemporaryDirectory();
   MITK_TEST_CONDITION_REQUIRED(tmpDir.size() > tmpPath.size(), "Temp dir size")
   MITK_TEST_CONDITION(tmpDir.substr(0, tmpPath.size()) == tmpPath, "Temp dir is in temp path")

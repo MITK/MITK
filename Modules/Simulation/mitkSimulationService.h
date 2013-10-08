@@ -14,27 +14,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkSimulationIOFactory_h
-#define mitkSimulationIOFactory_h
+#ifndef mitkSimulationService_h
+#define mitkSimulationService_h
 
-#include <mitkCommon.h>
-#include <itkObjectFactoryBase.h>
-#include <SimulationExports.h>
+#include <mitkISimulationService.h>
 
 namespace mitk
 {
-  class Simulation_EXPORT SimulationIOFactory : public itk::ObjectFactoryBase
+  class SimulationService : public ISimulationService
   {
   public:
-    mitkClassMacro(SimulationIOFactory, itk::ObjectFactoryBase);
-    itkFactorylessNewMacro(Self);
+    SimulationService();
+    ~SimulationService();
 
-    const char* GetDescription() const;
-    const char* GetITKSourceVersion() const;
+    Simulation::Pointer GetSimulation() const;
+    void SetSimulation(Simulation::Pointer simulation);
 
   private:
-    SimulationIOFactory();
-    ~SimulationIOFactory();
+    Simulation::Pointer m_Simulation;
   };
 }
 

@@ -4,17 +4,11 @@
     <view id="org.mitk.views.simulation"
           name="Simulation"
           class="QmitkSimulationView"
-          icon="resources/icon.png" />
+          icon="resources/SOFAIcon.png" />
   </extension>
   <extension point="org.blueberry.ui.preferencePages">
     <page id="org.mitk.gui.qt.application.SimulationPreferencePage"
           name="Simulation"
           class="QmitkSimulationPreferencePage" />
-  </extension>
-  <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
-    <contextMenuAction nodeDescriptorName="SimulationTemplate"
-                       label="Create Simulation"
-                       icon=""
-                       class="QmitkCreateSimulationAction" />
   </extension>
 </plugin>

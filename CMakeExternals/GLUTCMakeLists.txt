@@ -1,0 +1,77 @@
+cmake_minimum_required(VERSION 2.8.4)
+
+project(GLUT)
+
+set(${PROJECT_NAME}_MAJOR_VERSION 2)
+set(${PROJECT_NAME}_MINOR_VERSION 8)
+set(${PROJECT_NAME}_PATCH_VERSION 1)
+set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
+
+find_package(OpenGL REQUIRED)
+
+include_directories(${OPENGL_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+if(NOT BUILD_SHARED_LIBS)
+  add_definitions(-DFREEGLUT_STATIC)
+endif()
+
+set(freeglut_HEADERS
+  include/GL/freeglut.h
+  include/GL/freeglut_ext.h
+  include/GL/freeglut_std.h
+  include/GL/glut.h
+  src/freeglut_internal.h
+  src/freeglut_teapot_data.h
+)
+
+set(freeglut_SOURCES
+  src/freeglut_cursor.c
+  src/freeglut_display.c
+  src/freeglut_ext.c
+  src/freeglut_font.c
+  src/freeglut_font_data.c
+  src/freeglut_gamemode.c
+  src/freeglut_geometry.c
+  src/freeglut_glutfont_definitions.c
+  src/freeglut_init.c
+  src/freeglut_input_devices.c
+  src/freeglut_joystick.c
+  src/freeglut_main.c
+  src/freeglut_menu.c
+  src/freeglut_misc.c
+  src/freeglut_overlay.c
+  src/freeglut_spaceball.c
+  src/freeglut_state.c
+  src/freeglut_stroke_mono_roman.c
+  src/freeglut_stroke_roman.c
+  src/freeglut_structure.c
+  src/freeglut_teapot.c
+  src/freeglut_videoresize.c
+  src/freeglut_window.c
+)
+
+if(MSVC)
+  list(APPEND freeglut_SOURCES src/freeglut_callbacks.c)
+elseif(UNIX)
+  list(APPEND freeglut_SOURCES src/freeglut_xinput.c)
+endif()
+
+add_library(freeglut ${freeglut_HEADERS} ${freeglut_SOURCES})
+target_link_libraries(freeglut ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY})
+set_target_properties(freeglut PROPERTIES
+                      DEFINE_SYMBOL FREEGLUT_EXPORTS
+                      SOVERSION ${${PROJECT_NAME}_VERSION})
+
+# Config files
+set(${PROJECT_NAME}_LIBRARIES freeglut)
+set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+configure_file(${PROJECT_NAME}Config.cmake.in
+               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY)
+export(TARGETS ${${PROJECT_NAME}_LIBRARIES} FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Exports.cmake)
+
+# Version information
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  @ONLY
+)

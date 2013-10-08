@@ -14,27 +14,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkSimulationIOFactory_h
-#define mitkSimulationIOFactory_h
+#ifndef mitkMeshMitkLoader_h
+#define mitkMeshMitkLoader_h
 
-#include <mitkCommon.h>
-#include <itkObjectFactoryBase.h>
-#include <SimulationExports.h>
+#include <sofa/core/loader/MeshLoader.h>
+#include <org_mitk_simulation_Export.h>
 
 namespace mitk
 {
-  class Simulation_EXPORT SimulationIOFactory : public itk::ObjectFactoryBase
+  class SIMULATION_INIT_EXPORT MeshMitkLoader : public sofa::core::loader::MeshLoader
   {
   public:
-    mitkClassMacro(SimulationIOFactory, itk::ObjectFactoryBase);
-    itkFactorylessNewMacro(Self);
+    SOFA_CLASS(MeshMitkLoader, sofa::core::loader::MeshLoader);
 
-    const char* GetDescription() const;
-    const char* GetITKSourceVersion() const;
+    bool canLoad();
+    bool load();
 
   private:
-    SimulationIOFactory();
-    ~SimulationIOFactory();
+    MeshMitkLoader();
+    ~MeshMitkLoader();
+
+    MeshMitkLoader(const MyType&);
+    MyType& operator=(const MyType&);
   };
 }
 

@@ -14,27 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef org_mitk_gui_qt_simulation_Activator_h
-#define org_mitk_gui_qt_simulation_Activator_h
+#include "mitkGetSimulationService.h"
+#include <mitkISimulationService.h>
+#include <usModuleContext.h>
+#include <usServiceReference.h>
 
-#include <ctkPluginActivator.h>
-
-namespace mitk
+mitk::ISimulationService* mitk::GetSimulationService(us::ModuleContext* moduleContext)
 {
-  class org_mitk_gui_qt_simulation_Activator : public QObject, public ctkPluginActivator
-  {
-    Q_OBJECT
-    Q_INTERFACES(ctkPluginActivator);
+  if (moduleContext == NULL)
+    return NULL;
 
-  public:
-    static ctkPluginContext* GetContext();
-
-    void start(ctkPluginContext* context);
-    void stop(ctkPluginContext*);
-
-  private:
-    static ctkPluginContext* Context;
-  };
+  us::ServiceReference<mitk::ISimulationService> serviceReference = moduleContext->GetServiceReference<mitk::ISimulationService>();
+  return moduleContext->GetService<mitk::ISimulationService>(serviceReference);
 }
-
-#endif

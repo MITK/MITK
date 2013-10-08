@@ -14,11 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "mitkGetSimulationService.h"
+#include "mitkISimulationService.h"
 #include "mitkSimulation.h"
 #include "mitkSimulationReader.h"
-#include <algorithm>
-#include <sofa/core/visual/VisualParams.h>
 #include <sofa/helper/system/SetDirectory.h>
+#include <algorithm>
 
 bool mitk::SimulationReader::CanReadFile(const std::string& filename, const std::string&, const std::string&)
 {
@@ -50,34 +51,34 @@ mitk::SimulationReader::~SimulationReader()
 
 void mitk::SimulationReader::GenerateData()
 {
-  Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(this->GetOutput());
+  Simulation::Pointer simulation = static_cast<mitk::Simulation*>(this->GetOutput());
   sofa::simulation::Simulation::SPtr sofaSimulation = simulation->GetSimulation();
 
-  sofa::simulation::Simulation::SPtr currentSofaSimulation = sofa::simulation::getSimulation();
-  sofa::core::visual::VisualParams* visualParams = sofa::core::visual::VisualParams::defaultInstance();
-  sofa::core::visual::DrawTool* currentDrawTool = visualParams->drawTool();
+  ISimulationService* simulationService = GetSimulationService();
+  Simulation::Pointer currentSimulation = simulationService->GetSimulation();
 
-  simulation->SetAsActiveSimulation();
+  simulationService->SetSimulation(simulation);
 
   std::string path = sofa::helper::system::SetDirectory::GetParentDir(m_FileName.c_str());
   sofa::helper::system::DataRepository.addFirstPath(path);
+
   sofa::simulation::Node::SPtr rootNode = sofa::core::objectmodel::SPtr_dynamic_cast<sofa::simulation::Node>(sofaSimulation->load(m_FileName.c_str()));
 
-  if (rootNode == NULL)
+  if (!rootNode)
   {
     sofa::helper::system::DataRepository.removePath(path);
     mitkThrow() << "Could not load '" << m_FileName << "'!";
   }
 
-  simulation->SetRootNode(rootNode.get());
-  simulation->SetDefaultDT(rootNode->getDt());
+  simulation->SetRootNode(rootNode);
+
   sofaSimulation->init(rootNode.get());
   sofaSimulation->reset(rootNode.get());
+  simulation->UpdateOutputInformation();
 
   sofa::helper::system::DataRepository.removePath(path);
 
-  sofa::simulation::setSimulation(currentSofaSimulation.get());
-  visualParams->drawTool() = currentDrawTool;
+  simulationService->SetSimulation(currentSimulation);
 }
 
 void mitk::SimulationReader::GenerateOutputInformation()

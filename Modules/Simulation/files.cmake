@@ -1,13 +1,15 @@
 set(CPP_FILES
+  mitkGetSimulationService.cpp
+  mitkIndexROI.cpp
+  mitkISimulationService.cpp
+  mitkSetVtkRendererVisitor.cpp
   mitkSimulation.cpp
-  mitkSimulationDrawTool.cpp
+  mitkSimulationActivator.cpp
   mitkSimulationIOFactory.cpp
-  mitkSimulationMapper3D.cpp
-  mitkSimulationModel.cpp
   mitkSimulationObjectFactory.cpp
-  mitkSimulationPropAssemblyVisitor.cpp
   mitkSimulationReader.cpp
-  mitkSimulationTemplate.cpp
-  mitkSimulationTemplateIOFactory.cpp
-  mitkSimulationTemplateReader.cpp
+  mitkSimulationService.cpp
+  mitkSimulationVtkMapper3D.cpp
+  mitkVtkModel.cpp
+  mitkVtkSimulationPolyDataMapper.cpp
 )

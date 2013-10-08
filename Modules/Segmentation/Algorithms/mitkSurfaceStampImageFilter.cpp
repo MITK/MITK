@@ -238,13 +238,15 @@ void mitk::SurfaceStampImageFilter::SurfaceStampProcessing(itk::Image< TPixel, 3
 
   typedef itk::TriangleMeshToBinaryImageFilter<MeshType, BinaryImageType> FilterType;
 
-  typename BinaryImageType::Pointer binaryInput = BinaryImageType::New();
-  binaryInput->SetRegions( input->GetLargestPossibleRegion() );
+  BinaryImageType::Pointer binaryInput = BinaryImageType::New();
   binaryInput->SetSpacing( input->GetSpacing() );
+  binaryInput->SetOrigin( input->GetOrigin() );
+  binaryInput->SetDirection( input->GetDirection() );
+  binaryInput->SetRegions( input->GetLargestPossibleRegion() );
   binaryInput->Allocate();
   binaryInput->FillBuffer(0);
 
-  typename FilterType::Pointer filter = FilterType::New();
+  FilterType::Pointer filter = FilterType::New();
   filter->SetInput(mesh);
   filter->SetInfoImage(binaryInput);
   filter->SetInsideValue(1);
@@ -274,13 +276,13 @@ void mitk::SurfaceStampImageFilter::SurfaceStampProcessing(itk::Image< TPixel, 3
   typename ImageType::PixelType inputValue;
   unsigned char sourceValue;
 
-  typename ImageType::PixelType fgValue = static_cast< ImageType::PixelType >(m_ForegroundValue);
-  typename ImageType::PixelType bgValue = static_cast< ImageType::PixelType >(m_BackgroundValue);
+  typename ImageType::PixelType fgValue = static_cast< typename ImageType::PixelType >(m_ForegroundValue);
+  typename ImageType::PixelType bgValue = static_cast< typename ImageType::PixelType >(m_BackgroundValue);
 
   while ( !sourceIter.IsAtEnd() )
   {
     sourceValue = static_cast< unsigned char >(sourceIter.Get());
-    inputValue =  static_cast< ImageType::PixelType >(inputIter.Get());
+    inputValue =  static_cast< typename ImageType::PixelType >(inputIter.Get());
 
     if (sourceValue != 0)
       outputIter.Set( fgValue );

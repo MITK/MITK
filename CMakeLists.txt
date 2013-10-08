@@ -204,6 +204,13 @@ if(MITK_USE_SOFA AND APPLE)
   message(WARNING "Switched off MITK_USE_SOFA\n  Apple is currently not supported.")
 endif()
 
+if(MITK_USE_SOFA AND MSVC_VERSION)
+  if(MSVC_VERSION LESS 1600)
+    set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
+    message(WARNING "Switched off MITK_USE_SOFA\n  MSVC versions less than 2010 are currently not supported.")
+  endif()
+endif()
+
 if(MITK_USE_SOFA)
   # SOFA requires at least CMake 2.8.8
   set(SOFA_CMAKE_VERSION 2.8.8)

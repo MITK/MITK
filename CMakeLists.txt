@@ -199,6 +199,11 @@ if(MITK_USE_QT)
   find_package(Qt4 4.6.2 REQUIRED)
 endif()
 
+if(MITK_USE_SOFA AND APPLE)
+  set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
+  message(WARNING "Switched off MITK_USE_SOFA\n  Apple is currently not supported.")
+endif()
+
 if(MITK_USE_SOFA)
   # SOFA requires at least CMake 2.8.8
   set(SOFA_CMAKE_VERSION 2.8.8)

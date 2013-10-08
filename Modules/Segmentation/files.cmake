@@ -26,6 +26,7 @@ set(CPP_FILES
   Algorithms/mitkVtkImageOverwrite.cpp
   Algorithms/mitkLabelSetImageToSurfaceFilter.cpp
   Algorithms/mitkLabelSetImageToSurfaceThreadedFilter.cpp
+  Algorithms/mitkSurfaceStampImageFilter.cpp
   Controllers/mitkSegmentationInterpolationController.cpp
   Controllers/mitkToolManager.cpp
   Controllers/mitkSegmentationModuleActivator.cpp

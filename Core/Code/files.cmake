@@ -48,7 +48,6 @@ set(H_FILES
   Algorithms/mitkExtractSliceFilter.h
   Algorithms/mitkConvert2Dto3DImageFilter.h
   Algorithms/mitkPlaneClipping.h
-  Algorithms/mitkSurfaceStampImageFilter.h
 
   Common/mitkExceptionMacro.h
   Common/mitkServiceBaseObject.h
@@ -98,7 +97,6 @@ set(CPP_FILES
   Algorithms/mitkExtractSliceFilter.cpp
   Algorithms/mitkConvert2Dto3DImageFilter.cpp
   Algorithms/mitkPadImageFilter.cpp
-  Algorithms/mitkSurfaceStampImageFilter.cpp
   Controllers/mitkBaseController.cpp
   Controllers/mitkCallbackFromGUIThread.cpp
   Controllers/mitkCameraController.cpp

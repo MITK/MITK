@@ -143,39 +143,18 @@ void QmitkLabelSetWidget::SetPreferences( berry::IPreferences::Pointer prefs )
 void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
 {
   mitk::DataNode* workingNode = this->m_ToolManager->GetWorkingData(0);
+  bool enabled = workingNode != NULL;
 
-  if (workingNode)
-  {
-    m_Controls.m_LabelSetTableWidget->setEnabled(true);
-    m_Controls.m_LabelSearchBox->setEnabled(true);
-    m_Controls.m_btSaveSegmentation->setEnabled(true);
-    m_Controls.m_btNewLabel->setEnabled(true);
-    m_Controls.m_btAddLayer->setEnabled(true);
-    m_Controls.m_btDeleteLayer->setEnabled(true);
-    m_Controls.m_btPreviousLayer->setEnabled(true);
-    m_Controls.m_btNextLayer->setEnabled(true);
-    m_Controls.m_btDeleteSegmentation->setEnabled(true);
-    m_Controls.m_btImportSegmentation->setEnabled(true);
-
-//    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
-//    assert(workingImage);
-//    m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(workingImage);
-  }
-  else
-  {
-    m_Controls.m_LabelSetTableWidget->setEnabled(false);
-    m_Controls.m_LabelSearchBox->setEnabled(false);
-    m_Controls.m_btSaveSegmentation->setEnabled(false);
-    m_Controls.m_btNewLabel->setEnabled(false);
-    m_Controls.m_btAddLayer->setEnabled(false);
-    m_Controls.m_btDeleteLayer->setEnabled(false);
-    m_Controls.m_btPreviousLayer->setEnabled(false);
-    m_Controls.m_btNextLayer->setEnabled(false);
-    m_Controls.m_btDeleteSegmentation->setEnabled(false);
-    m_Controls.m_btImportSegmentation->setEnabled(false);
-
-//    m_Controls.m_LabelSetTableWidget->SetActiveLabelSetImage(NULL);
-  }
+  m_Controls.m_LabelSetTableWidget->setEnabled(enabled);
+  m_Controls.m_LabelSearchBox->setEnabled(enabled);
+  m_Controls.m_btSaveSegmentation->setEnabled(enabled);
+  m_Controls.m_btNewLabel->setEnabled(enabled);
+  m_Controls.m_btAddLayer->setEnabled(enabled);
+  m_Controls.m_btDeleteLayer->setEnabled(enabled);
+  m_Controls.m_btPreviousLayer->setEnabled(enabled);
+  m_Controls.m_btNextLayer->setEnabled(enabled);
+  m_Controls.m_btDeleteSegmentation->setEnabled(enabled);
+  m_Controls.m_btImportSegmentation->setEnabled(enabled);
 }
 
 void QmitkLabelSetWidget::OnSearchLabel()

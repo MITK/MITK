@@ -114,7 +114,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::LabelSetImage *input = const_cast< mitk::LabelSetImage * >( this->GetInput() );
+  mitk::LabelSetImage *input = const_cast< mitk::LabelSetImage* >( this->GetInput() );
 
   if ( input == NULL || input->IsInitialized() == false )
     return;
@@ -135,7 +135,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     // see bug-13275
     localStorage->m_ReslicedImage = NULL;
     localStorage->m_ReslicedImageMapper->SetInput( localStorage->m_EmptyPolyData );
-    localStorage->m_ActiveLabelContourMapper->SetInput( NULL);
+    localStorage->m_ActiveLabelContourActor->SetVisibility(false);
     return;
   }
 
@@ -243,6 +243,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   float contourWidth = 2.5;
   datanode->GetFloatProperty( "labelset.contour.width", contourWidth, renderer );
   localStorage->m_ActiveLabelContourActor->GetProperty()->SetLineWidth( contourWidth );
+  localStorage->m_ActiveLabelContourActor->SetVisibility(true);
 
   this->ApplyColor( renderer );
   this->ApplyOpacity( renderer );

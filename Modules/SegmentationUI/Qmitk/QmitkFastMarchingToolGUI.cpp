@@ -195,7 +195,7 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI()
   widgetLayout->addWidget( m_slwThreshold );
 
   m_btClearSeeds = new QPushButton("Clear");
-  m_btClearSeeds->setToolTip("Clear current result and start over again");
+  m_btClearSeeds->setToolTip("Clear current preview and start over again");
   widgetLayout->addWidget(m_btClearSeeds);
   connect( m_btClearSeeds, SIGNAL(clicked()), this, SLOT(OnClearSeeds()) );
 
@@ -309,7 +309,7 @@ void QmitkFastMarchingToolGUI::OnAcceptPreview()
 
 void QmitkFastMarchingToolGUI::SetStepper(mitk::Stepper *stepper)
 {
-    this->m_TimeStepper = stepper;
+  this->m_TimeStepper = stepper;
 }
 
 void QmitkFastMarchingToolGUI::Refetch()

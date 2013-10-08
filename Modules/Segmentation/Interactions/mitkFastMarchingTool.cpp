@@ -190,6 +190,7 @@ void mitk::FastMarchingTool::Activated()
   m_SeedsAsPointSetNode->SetData(m_SeedsAsPointSet);
   m_SeedsAsPointSetNode->SetName("seeds");
   m_SeedsAsPointSetNode->SetBoolProperty("helper object", true);
+  m_SeedsAsPointSetNode->SetBoolProperty("updateDataOnRender", true);
   m_SeedsAsPointSetNode->SetColor(0.0, 1.0, 0.0);
   m_SeedsAsPointSetNode->SetVisibility(true);
   m_ToolManager->GetDataStorage()->Add( m_SeedsAsPointSetNode, m_ToolManager->GetWorkingData(0) );
@@ -310,21 +311,41 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
 bool mitk::FastMarchingTool::OnDelete(Action* action, const StateEvent* stateEvent)
 {
   // delete last seed point
-  if(!(this->m_SeedContainer->empty()))
+  if( this->m_SeedContainer->empty() ) return false;
+
+  // get the timestep to support 3D+t
+  const mitk::Event *theEvent = stateEvent->GetEvent();
+  mitk::ScalarType timeInMS = 0.0;
+
+  //check if the current timestep has to be changed
+  if ( theEvent && theEvent->GetSender())
   {
-    //delete last element of seeds container
-    this->m_SeedContainer->pop_back();
+    //additionaly to m_TimeStep we need timeInMS to satisfy the execution of the operations
+    timeInMS = theEvent->GetSender()->GetTime();
+  }
+
+  //search the point in the list
+  int position = m_SeedsAsPointSet->GetSize() - 1;
+
+  PointSet::PointType pt = m_SeedsAsPointSet->GetPoint(position, m_TimeStep);
+
+  PointOperation* doOp = new mitk::PointOperation(OpREMOVE, timeInMS, pt, position);
+  //execute the Operation
+  m_SeedsAsPointSet->ExecuteOperation(doOp);
+  delete doOp;
+
+  //delete last element of seeds container
+  this->m_SeedContainer->pop_back();
+
+  m_FastMarchingFilter->Modified();
+
+  if(this->m_FastMarchingFilter.IsNotNull())
     m_FastMarchingFilter->Modified();
 
-    //delete last point in pointset - somehow ugly
-    m_SeedsAsPointSet->GetPointSet()->GetPoints()->DeleteIndex(m_SeedsAsPointSet->GetSize() - 1);
+  m_NeedUpdate = true;
 
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  this->Update();
 
-    m_NeedUpdate = true;
-
-    this->Update();
-  }
   return true;
 }
 

@@ -19,7 +19,7 @@ if(NOT DEFINED GLUT_DIR)
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
      PREFIX ${proj}-cmake
-     URL http://dl.dropboxusercontent.com/u/5822501/freeglut-2.8.1.tar.gz
+     URL http://mitk.org/download/thirdparty/freeglut-2.8.1.tar.gz
      URL_MD5 918ffbddcffbac83c218bc52355b6d5a
      PATCH_COMMAND ${patch_cmd}
      INSTALL_COMMAND ""

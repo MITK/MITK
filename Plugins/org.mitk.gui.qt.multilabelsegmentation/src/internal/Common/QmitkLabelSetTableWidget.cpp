@@ -246,7 +246,6 @@ void QmitkLabelSetTableWidget::LabelModified( int index )
   QString text = fontMetrics().elidedText(m_LabelSetImage->GetLabelName(activeLayer, index).c_str(), Qt::ElideMiddle, colWidth);
 //  QString text = fontMetrics().elidedText(m_LabelSetImage->GetLabelName(index).c_str(), Qt::ElideMiddle, this->columnWidth(NAME_COL)-2);
   nameItem->setText(text);
-  nameItem->setToolTip(text);
 
   QPushButton* button;
   button = (QPushButton*) this->cellWidget(index,LOCKED_COL);
@@ -416,7 +415,6 @@ void QmitkLabelSetTableWidget::InsertItem()
   int colWidth = (this->columnWidth(NAME_COL) < 180) ? 180 : this->columnWidth(NAME_COL)-2;
   QString text = fontMetrics().elidedText(m_LabelSetImage->GetLabelName(activeLayer,index).c_str(), Qt::ElideMiddle, colWidth);
   QTableWidgetItem *nameItem = new QTableWidgetItem(text);
-  nameItem->setToolTip(m_LabelSetImage->GetLabelName(activeLayer,index).c_str());
   nameItem->setTextAlignment(Qt::AlignCenter | Qt::AlignLeft);
 
   QPushButton * pbColor = new QPushButton(this);
@@ -424,7 +422,7 @@ void QmitkLabelSetTableWidget::InsertItem()
 //  pbColor->setFlat(true);
   pbColor->setCheckable(false);
   pbColor->setAutoFillBackground(true);
-  pbColor->setToolTip(QString("Change label color"));
+  pbColor->setToolTip("Change label color");
   pbColor->setStyleSheet(styleSheet);
 //  pbColor->setEnabled(!isBackground);
 
@@ -439,7 +437,7 @@ void QmitkLabelSetTableWidget::InsertItem()
   pbLocked->setIcon(*iconLocked);
   pbLocked->setIconSize(QSize(24,24));
   pbLocked->setCheckable(true);
-  pbLocked->setToolTip(QString("Lock/unlock label"));
+  pbLocked->setToolTip("Lock/unlock label");
   pbLocked->setChecked(!m_LabelSetImage->GetLabelLocked(activeLayer,index));
   //pbLocked->setEnabled(!isBackground);
   connect( pbLocked, SIGNAL(clicked()), this, SLOT(OnLockedButtonClicked()) );
@@ -454,7 +452,7 @@ void QmitkLabelSetTableWidget::InsertItem()
   pbVisible->setIcon(*iconVisible);
   pbVisible->setIconSize(QSize(24,24));
   pbVisible->setCheckable(true);
-  pbVisible->setToolTip(QString("Show/hide label"));
+  pbVisible->setToolTip("Show/hide label");
 //  pbVisible->setEnabled(!isBackground);
   pbVisible->setChecked(!m_LabelSetImage->GetLabelVisible(activeLayer,index));
 

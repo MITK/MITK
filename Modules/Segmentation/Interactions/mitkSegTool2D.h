@@ -137,7 +137,7 @@ class Segmentation_EXPORT SegTool2D : public Tool
     unsigned int AddContourmarker ( const PositionEvent* );
 
     BaseRenderer*  m_LastEventSender;
-    unsigned int   m_LastEventSlice;
+    int   m_LastEventSlice;
 
   private:
     //The prefix of the contourmarkername. Suffix is a consecutive number

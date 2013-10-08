@@ -56,10 +56,10 @@ bool mitk::ContourTool::OnChangeActiveLabel (Action* action, const StateEvent* s
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert (workingNode);
+  assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-  assert (workingImage);
+  assert(workingImage);
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
   int value = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition(), timestep );
@@ -90,7 +90,6 @@ bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateE
   feedbackContour->AddVertex( positionEvent->GetWorldPosition(), timestep );
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
-  assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 
   return true;
@@ -109,7 +108,6 @@ bool mitk::ContourTool::OnMouseMoved (Action* action, const StateEvent* stateEve
   assert( feedbackContour );
   feedbackContour->AddVertex( positionEvent->GetWorldPosition(), timestep );
 
-  assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 
   return true;

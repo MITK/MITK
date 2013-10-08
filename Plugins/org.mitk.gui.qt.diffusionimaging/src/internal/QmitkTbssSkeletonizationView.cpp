@@ -39,6 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Boost
 #include <boost/lexical_cast.hpp>
 
+
+
 const std::string QmitkTbssSkeletonizationView::VIEW_ID = "org.mitk.views.tbssskeletonization";
 
 using namespace berry;
@@ -58,6 +60,8 @@ QmitkTbssSkeletonizationView::~QmitkTbssSkeletonizationView()
 
 void QmitkTbssSkeletonizationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
+
+
   //datamanager selection changed
   if (!this->IsActivated())
     return;
@@ -72,19 +76,48 @@ void QmitkTbssSkeletonizationView::OnSelectionChanged(std::vector<mitk::DataNode
 
     // only look at interesting types from valid nodes
     mitk::BaseData* nodeData = nodes[i]->GetData();
+    std::string name = "";
+    nodes[i]->GetStringProperty("name", name);
+
 
     if(nodeData)
     {
       if(QString("Image").compare(nodeData->GetNameOfClass())==0)
       {
         mitk::Image* img = static_cast<mitk::Image*>(nodeData);
+        if(img->GetPixelType().GetBpe() < 4)
+        {
+          std::cout << "mask selected";
+        }
         if(img->GetDimension() == 3)
         {
-          found3dImage = true;
+          bool isBinary(false);
+          nodes[i]->GetBoolProperty("binary", isBinary);
+
+
+          if(isBinary)
+          {
+            QString label("Tubular Structure Mask: ");
+            label.append(QString(name.c_str()));
+            this->m_Controls->m_TubularName->setText(label);
+            this->m_Controls->m_TubularName->setEnabled(true);
+          }
+          else
+          {
+            found3dImage = true;
+            QString label("Mean: ");
+            label.append(QString(name.c_str()));
+            this->m_Controls->m_MeanLabel->setText(label);
+            this->m_Controls->m_MeanLabel->setEnabled(true);
+          }
         }
         else if(img->GetDimension() == 4)
         {
           found4dImage = true;
+          QString label("Patient Data: ");
+          label.append(QString(name.c_str()));
+          this->m_Controls->m_PatientDataLabel->setText(label);
+          this->m_Controls->m_PatientDataLabel->setEnabled(true);
         }
       }
     }
@@ -148,6 +181,10 @@ void QmitkTbssSkeletonizationView::StdMultiWidgetNotAvailable()
 
 void QmitkTbssSkeletonizationView::Skeletonize()
 {
+
+
+
+
   typedef itk::SkeletonizationFilter<FloatImageType, FloatImageType> SkeletonisationFilterType;
   SkeletonisationFilterType::Pointer skeletonizer = SkeletonisationFilterType::New();
 
@@ -211,6 +248,7 @@ void QmitkTbssSkeletonizationView::Project()
 
   mitk::Image::Pointer meanImage = mitk::Image::New();
   mitk::Image::Pointer subjects = mitk::Image::New();
+  mitk::Image::Pointer tubular = mitk::Image::New();
 
   for ( int i=0; i<nodes.size(); i++ )
   {
@@ -224,8 +262,21 @@ void QmitkTbssSkeletonizationView::Project()
         mitk::Image* img = static_cast<mitk::Image*>(nodeData);
         if(img->GetDimension() == 3)
         {
-          meanImage = img;
+
+          bool isBinary(false);
+          nodes[i]->GetBoolProperty("binary", isBinary);
+
+
+          if(isBinary)
+          {
+            tubular = img;
+          }
+          else
+          {
+            meanImage = img;
+          }
         }
+
         else if(img->GetDimension() == 4)
         {
           subjects = img;
@@ -313,19 +364,16 @@ void QmitkTbssSkeletonizationView::Project()
 
 
 
-  typedef itk::ImageFileReader< CharImageType > CharReaderType;
-  CharReaderType::Pointer reader = CharReaderType::New();
-  reader->SetFileName("/local/testing/LowerCingulum_1mm.nii.gz");
-  reader->Update();
-  CharImageType::Pointer cingulum = reader->GetOutput();
 
+  CharImageType::Pointer itkTubular = CharImageType::New();
+  mitk::CastToItkImage(tubular, itkTubular);
 
 
   ProjectionFilterType::Pointer projectionFilter = ProjectionFilterType::New();
   projectionFilter->SetDistanceMap(distanceMap);
   projectionFilter->SetDirections(directionImg);
   projectionFilter->SetAllFA(allFA);
-  projectionFilter->SetTube(cingulum);
+  projectionFilter->SetTube(itkTubular);
   projectionFilter->SetSkeleton(thresholdedImg);
   projectionFilter->Project();
 

@@ -297,10 +297,7 @@ void QmitkTbssSkeletonizationView::Project()
 
   Float4DImageType::Pointer allFA = ConvertToItk(subjects);
 
-
-
-
-  // Calculate skeleton
+    // Calculate skeleton
   FloatImageType::Pointer itkImg = FloatImageType::New();
   mitk::CastToItkImage(meanImage, itkImg);
   skeletonizer->SetInput(itkImg);
@@ -464,7 +461,6 @@ Float4DImageType::Pointer QmitkTbssSkeletonizationView::ConvertToItk(mitk::Image
 
     try{
       // REPLACE THIS METHODE()ConvertToItk) WITH mitk::CastToItk
-      mitk::ImagePixelReadAccessor<float,4> imageAccessor(image, image->GetSliceData());
 
       // iterate through the subjects and copy data to output
       for(int t=0; t<timesteps; t++)
@@ -475,19 +471,17 @@ Float4DImageType::Pointer QmitkTbssSkeletonizationView::ConvertToItk(mitk::Image
           {
             for(int z=0; z<image->GetDimension(2); z++)
             {
-              itk::Index<4> ix4;
-              ix4[0] = x;
-              ix4[1] = y;
-              ix4[2] = z;
-              ix4[3] = t;
+              itk::Index<3> ix = {x, y, z};
+              itk::Index<4> ix4 = {x, y, z, t};
 
-              output->SetPixel(ix4, imageAccessor.GetPixelByIndex(ix4));
+              output->SetPixel(ix4, image->GetPixelValueByIndex(ix, t));
 
             }
           }
         }
       }
-    }catch(std::exception & e)
+    }
+    catch(std::exception & e)
     {
       MITK_INFO << e.what();
     }

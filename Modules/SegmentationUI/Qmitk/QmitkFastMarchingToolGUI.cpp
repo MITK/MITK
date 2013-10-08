@@ -68,16 +68,17 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI()
    widgetLayout->addItem(hlayout);
   }
 
-  m_slSigma = new ctkSliderWidget(this);
+  m_slSigma = new ctkDoubleSlider(this);
   m_slSigma->setTracking(false);
+  m_slSigma->setOrientation(Qt::Horizontal);
   m_slSigma->setPageStep(0.1);
 //  m_slSigma->setTickInterval(0.01);
   m_slSigma->setSingleStep(0.01);
   m_slSigma->setMinimum(0.1);
   m_slSigma->setMaximum(5.0);
   m_slSigma->setValue(1.0);
-  m_slSigma->setDecimals(2);
-  m_slSigma->spinBox()->setDecimals(2);
+//  m_slSigma->setDecimals(2);
+//  m_slSigma->spinBox()->setDecimals(2);
 
   m_slSigma->setToolTip("The \"sigma\" parameter in the Gradient Magnitude filter.");
   connect( m_slSigma, SIGNAL(valueChanged(double)), this, SLOT(OnSigmaChanged(double)));
@@ -98,14 +99,15 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI()
    widgetLayout->addItem(hlayout);
   }
 
-  m_slAlpha = new ctkSliderWidget(this);
-  m_slAlpha->setDecimals(2);
+  m_slAlpha = new ctkDoubleSlider(this);
+//  m_slAlpha->setDecimals(2);
+  m_slAlpha->setTracking(false);
+  m_slAlpha->setOrientation(Qt::Horizontal);
   m_slAlpha->setMinimum(-10);
   m_slAlpha->setMaximum(0);
   m_slAlpha->setPageStep(0.1);
   m_slAlpha->setSingleStep(0.01);
   m_slAlpha->setValue(-2.5);
-  m_slAlpha->setTracking(false);
   m_slAlpha->setToolTip("The \"alpha\" parameter in the Sigmoid mapping filter.");
   connect( m_slAlpha, SIGNAL(valueChanged(double)), this, SLOT(OnAlphaChanged(double)));
   widgetLayout->addWidget( m_slAlpha );
@@ -125,18 +127,19 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI()
    widgetLayout->addLayout(hlayout);
   }
 
-  m_slBeta = new ctkSliderWidget(this);
-  m_slBeta->setDecimals(2);
+  m_slBeta = new ctkDoubleSlider(this);
+//  m_slBeta->setDecimals(2);
+  m_slBeta->setTracking(false);
+  m_slBeta->setOrientation(Qt::Horizontal);
   m_slBeta->setMinimum(0);
   m_slBeta->setMaximum(100);
   m_slBeta->setPageStep(0.1);
   m_slBeta->setSingleStep(0.01);
   m_slBeta->setValue(3.5);
-  m_slBeta->setTracking(false);
   m_slBeta->setToolTip("The \"beta\" parameter in the Sigmoid mapping filter.");
   connect( m_slBeta, SIGNAL(valueChanged(double)), this, SLOT(OnBetaChanged(double)));
   widgetLayout->addWidget( m_slBeta );
-
+/*
   // stopping value controls
   {
    QHBoxLayout *hlayout = new QHBoxLayout();
@@ -163,7 +166,7 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI()
   m_slStoppingValue->setToolTip("The \"stopping value\" parameter in the fast marching 3D algorithm");
   connect( m_slStoppingValue, SIGNAL(valueChanged(double)), this, SLOT(OnStoppingValueChanged(double)));
   widgetLayout->addWidget( m_slStoppingValue );
-
+*/
   // threshold controls
   {
    QHBoxLayout *hlayout = new QHBoxLayout();
@@ -196,10 +199,10 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI()
   widgetLayout->addWidget(m_btClearSeeds);
   connect( m_btClearSeeds, SIGNAL(clicked()), this, SLOT(OnClearSeeds()) );
 
-  m_btConfirm = new QPushButton("Accept");
-  m_btConfirm->setToolTip("Incorporate current result in your working session.");
-  widgetLayout->addWidget(m_btConfirm);
-  connect( m_btConfirm, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
+  m_btAcceptPreview = new QPushButton("Accept");
+  m_btAcceptPreview->setToolTip("Incorporate current preview in your working session.");
+  widgetLayout->addWidget(m_btAcceptPreview);
+  connect( m_btAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
@@ -241,7 +244,7 @@ void QmitkFastMarchingToolGUI::Update()
 {
   m_FastMarchingTool->SetLowerThreshold( this->m_slwThreshold->minimumValue());
   m_FastMarchingTool->SetUpperThreshold( this->m_slwThreshold->maximumValue());
-  m_FastMarchingTool->SetStoppingValue( this->m_slStoppingValue->value());
+//  m_FastMarchingTool->SetStoppingValue( this->m_slStoppingValue->value());
   m_FastMarchingTool->SetSigma( this->m_slSigma->value());
   m_FastMarchingTool->SetAlpha( this->m_slAlpha->value());
   m_FastMarchingTool->SetBeta( this->m_slBeta->value());
@@ -287,11 +290,13 @@ void QmitkFastMarchingToolGUI::OnAlphaChanged(double value)
 
 void QmitkFastMarchingToolGUI::OnStoppingValueChanged(double value)
 {
+  /*
   if (m_FastMarchingTool.IsNotNull() && (!m_SelfCall))
   {
     m_FastMarchingTool->SetStoppingValue( value );
     this->Update();
   }
+  */
 }
 
 void QmitkFastMarchingToolGUI::OnAcceptPreview()

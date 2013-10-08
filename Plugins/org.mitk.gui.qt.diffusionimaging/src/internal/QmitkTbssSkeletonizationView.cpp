@@ -69,6 +69,14 @@ void QmitkTbssSkeletonizationView::OnSelectionChanged(std::vector<mitk::DataNode
   bool found3dImage = false;
   bool found4dImage = false;
 
+  this->m_Controls->m_TubularName->setText(QString("Tubular Structure Mask: "));
+  this->m_Controls->m_TubularName->setEnabled(false);
+  this->m_Controls->m_MeanLabel->setText(QString("Mean: "));
+  this->m_Controls->m_MeanLabel->setEnabled(false);
+  this->m_Controls->m_PatientDataLabel->setText(QString("Patient Data: "));
+  this->m_Controls->m_PatientDataLabel->setEnabled(false);
+
+
   // iterate selection
   for ( int i=0; i<nodes.size(); i++ )
   {
@@ -85,10 +93,7 @@ void QmitkTbssSkeletonizationView::OnSelectionChanged(std::vector<mitk::DataNode
       if(QString("Image").compare(nodeData->GetNameOfClass())==0)
       {
         mitk::Image* img = static_cast<mitk::Image*>(nodeData);
-        if(img->GetPixelType().GetBpe() < 4)
-        {
-          std::cout << "mask selected";
-        }
+
         if(img->GetDimension() == 3)
         {
           bool isBinary(false);
@@ -204,8 +209,12 @@ void QmitkTbssSkeletonizationView::Skeletonize()
     {
       if(QString("Image").compare(nodeData->GetNameOfClass())==0)
       {
+
+        bool isBinary(false);
+        nodes[i]->GetBoolProperty("binary", isBinary);
+
         mitk::Image* img = static_cast<mitk::Image*>(nodeData);
-        if(img->GetDimension() == 3)
+        if(img->GetDimension() == 3 && !isBinary)
         {
           meanImage = img;
           name = nodes[i]->GetName();

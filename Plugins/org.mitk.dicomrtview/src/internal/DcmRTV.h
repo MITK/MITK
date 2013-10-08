@@ -27,6 +27,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_DcmRTVControls.h"
 
+#include <mitkLookupTable.h>
+#include <vtkLookupTable.h>
+#include <mitkLookupTableProperty.h>
+#include <mitkRenderingModeProperty.h>
+#include <mitkDicomSeriesReader.h>
+//#include <QmitkFileOpenAction.h>
+
+#include <QFileDialog>
 
 /**
   \brief DcmRTV
@@ -50,6 +58,7 @@ class DcmRTV : public QmitkAbstractView
 
     /// \brief Called when the user clicks the GUI button
     void DoImageProcessing();
+    void LoadRTDoseFile();
 
   protected:
 

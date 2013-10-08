@@ -26,7 +26,9 @@ int mitkDicomRTReaderTest(int  argc , char* argv[])
 
   mitk::DicomRTReader::Pointer _DicomRTReader = mitk::DicomRTReader::New();
 
-  char* h  = "/home/riecker/DicomRT/DICOMRT_Bilder/Patient19_anonym/Pat19-Spezial^01HIT_ BPL _Schaedel _S4-Vsim_RTStructureSetSeries_5-RTSTRUCT-00001-1.2.826.0.1.3680043.2.1143.5364730193977184707660191712117743577.dcm";
+  char* h = "/home/riecker/DicomRT/DICOMRT_Bilder/DICOM-RT/W_K/RD1.2.826.0.1.3680043.8.176.2013826103830726.377.2260480657.dcm";
+  char* i = "/home/riecker/DicomRT/DICOMRT_Bilder/RD.1.2.246.352.71.7.2088656855.452083.20110920153746.dcm";
+  char* j = "/home/riecker/DicomRT/DICOMRT_Bilder/2/RTDOSE.2.16.840.1.113669.2.931128.509887832.20120106104806.483734.dcm";
 
   mitk::ContourModelSet::Pointer emptyItem;
   std::deque<mitk::ContourModelSet::Pointer> result;

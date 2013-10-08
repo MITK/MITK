@@ -38,6 +38,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "dcmtk/dcmrt/drtionpl.h"
 #include "dcmtk/dcmrt/drtiontr.h"
 
+//######################################################
+#include <mitkLookupTable.h>
+#include <mitkLookupTableProperty.h>
+#include <vtkLookupTable.h>
+
+//######################################################
+
 #include "dcmtk/dcmrt/drtstrct.h"
 
 #include <vtkObjectFactory.h>
@@ -115,7 +122,7 @@ namespace mitk
     ContourModelSetVector ReadDicomFile(char* filename);
     ContourModelSetVector ReadStructureSet(DcmDataset* dataset);
     int LoadRTPlan(DcmDataset* dataset);
-    int LoadRTDose(DcmDataset* dataset);
+    mitk::LookupTable::Pointer LoadRTDose(DcmDataset* dataset);
     size_t GetNumberOfRois();
     RoiEntry* FindRoiByNumber(int roiNumber);
     OFString GetReferencedFrameOfReferenceSOPInstanceUID(DRTStructureSetIOD &structSetObject);

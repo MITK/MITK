@@ -96,7 +96,7 @@ namespace mitk
       {
         if(sopClass == UID_RTDoseStorage)
         {
-          int x = this->DicomRTReader::LoadRTDose(dataset);
+          mitk::LookupTable::Pointer x = this->DicomRTReader::LoadRTDose(dataset);
           ContourModelSetVector y;
           return y;
         }
@@ -443,7 +443,7 @@ namespace mitk
     return 1;
   }
 
-  int DicomRTReader::LoadRTDose(DcmDataset* dataset)
+  mitk::LookupTable::Pointer DicomRTReader::LoadRTDose(DcmDataset* dataset)
   {
     DRTDoseIOD doseObject;
 
@@ -535,8 +535,8 @@ namespace mitk
 //    std::cout << "Samples per Pixel: " << samplesperPixel << "\n\n";
 
 
-    Uint16 rows, columns, frames;
-    OFString nrframes, doseUnits, doseType, summationType, gridScaling;
+    Uint16 rows, columns, frames, planarConfig, samplesPP;
+    OFString nrframes, doseUnits, doseType, summationType, gridScaling, photoInterpret, lutShape;
     Uint16 &rows_ref = rows;
     Uint16 &columns_ref = columns;
     Float32 gridscale;
@@ -550,6 +550,10 @@ namespace mitk
     doseObject.getDoseType(doseType);
     doseObject.getDoseSummationType(summationType);
     doseObject.getDoseGridScaling(gridScaling);
+    doseObject.getPhotometricInterpretation(photoInterpret);
+    doseObject.getPlanarConfiguration(planarConfig);
+    doseObject.getSamplesPerPixel(samplesPP);
+    doseObject.getPresentationLUTShape(lutShape);
 
     gridscale = OFStandard::atof(gridScaling.c_str());
     frames = atoi(nrframes.c_str());
@@ -563,8 +567,8 @@ namespace mitk
         {
           for(int k=0;k<columns;k++)
           {
-            std::cout << pixelData[i*rows*columns + j*columns + k] << "\n";
-            std::cout << static_cast<Float32>(pixelData[i*rows*columns + j*columns + k]) * gridscale << "\n\n";
+//            std::cout << pixelData[i*rows*columns + j*columns + k] << "\n";
+//            std::cout << static_cast<Float32>(pixelData[i*rows*columns + j*columns + k]) * gridscale << "\n\n";
             counter++;
           }
         }
@@ -573,13 +577,29 @@ namespace mitk
       std::cout << "Number of Data in file: " << counter << "\n\n";
       std::cout << "Number of Data in file expacted overall: " << rows*columns*frames << "\n\n";
       std::cout << "Number of Data in file expacted per frame: " << rows*columns << "\n\n";
-      std::cout << "Resolution: " << rows << "x" << columns << "\n\n";
+      std::cout << "Resolution: " << columns << "x" << rows << "\n\n";
+      std::cout << "Photometricinterpretation: " << photoInterpret << "\n\n";
+      std::cout << "Planar Configuration: " << planarConfig << "\n\n";
+      std::cout << "Samples per Pixel: " << samplesPP << "\n\n";
+      std::cout << "LUT Shape: " << lutShape << "\n\n";
     }
 
 //#############################################################################################################
 //#############################################################################################################
 
-    return 1;
+    mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+    vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
+    vtkLut->SetTableRange(0,1000);
+    vtkLut->Build();
+    //vtkLut->SetNumberOfTableValues(8);
+    //                     I    R     G     B     A
+    vtkLut->SetTableValue( 0 , 0.0 , 0.0 , 0.0 , 0.3 );
+    vtkLut->SetTableValue( 1 , 0.5 , 0.0 , 0.0 , 0.3 );
+    vtkLut->SetTableValue( 2 , 1.0 , 0.0 , 0.0 , 0.3 );
+    mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
+    mitkLutProp->SetLookupTable(mitkLut);
+
+    return mitkLut;
   }
 
   bool DicomRTReader::Equals(mitk::ContourModel::Pointer first, mitk::ContourModel::Pointer second)

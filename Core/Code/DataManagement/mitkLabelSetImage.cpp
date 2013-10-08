@@ -78,8 +78,8 @@ void mitk::LabelSetImage::Initialize(const mitk::Image* other)
     m_VectorImage->SetOrigin( itkImage->GetOrigin() );
     m_VectorImage->SetDirection( itkImage->GetDirection() );
     m_VectorImage->SetRegions( itkImage->GetLargestPossibleRegion());
-    m_VectorImage->SetLargestPossibleRegion( itkImage->GetLargestPossibleRegion());
-    m_VectorImage->SetBufferedRegion( itkImage->GetLargestPossibleRegion());
+//    m_VectorImage->SetLargestPossibleRegion( itkImage->GetLargestPossibleRegion());
+//    m_VectorImage->SetBufferedRegion( itkImage->GetLargestPossibleRegion());
     m_VectorImage->SetNumberOfComponentsPerPixel(1);
     m_VectorImage->Allocate();
 

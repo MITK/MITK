@@ -103,8 +103,9 @@ void NrrdLabelSetImageReader::GenerateData()
   auxImg->SetSpacing( vectorImage->GetSpacing() );
   auxImg->SetOrigin( vectorImage->GetOrigin() );
   auxImg->SetDirection( vectorImage->GetDirection() );
-  auxImg->SetLargestPossibleRegion( vectorImage->GetLargestPossibleRegion() );
-  auxImg->SetBufferedRegion( vectorImage->GetLargestPossibleRegion() );
+  auxImg->SetRegions( vectorImage->GetLargestPossibleRegion() );
+//  auxImg->SetLargestPossibleRegion( vectorImage->GetLargestPossibleRegion() );
+//  auxImg->SetBufferedRegion( vectorImage->GetLargestPossibleRegion() );
   auxImg->Allocate();
 
   // initialize output image based on vector image meta information

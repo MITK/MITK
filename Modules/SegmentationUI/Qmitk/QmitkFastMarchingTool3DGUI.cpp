@@ -18,16 +18,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkConfirmSegmentationDialog.h"
 
+#include "mitkStepper.h"
+#include "mitkBaseRenderer.h"
+
 #include <qlabel.h>
-#include <ctkSliderWidget.h>
-#include <ctkRangeWidget.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
 #include <QGroupBox>
 #include <QApplication>
 #include <QMessageBox>
-#include "mitkStepper.h"
-#include "mitkBaseRenderer.h"
+
+#include <ctkSliderWidget.h>
+#include <ctkRangeWidget.h>
 
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkFastMarchingTool3DGUI, "")
@@ -320,26 +322,26 @@ void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
 
 void QmitkFastMarchingTool3DGUI::SetStepper(mitk::Stepper *stepper)
 {
-    this->m_TimeStepper = stepper;
+  this->m_TimeStepper = stepper;
 }
 
 void QmitkFastMarchingTool3DGUI::Refetch()
 {
   //event from image navigator recieved - timestep has changed
-    m_FastMarchingTool->SetCurrentTimeStep(m_TimeStepper->GetPos());
+  m_FastMarchingTool->SetCurrentTimeStep(m_TimeStepper->GetPos());
 }
 
 void QmitkFastMarchingTool3DGUI::OnClearSeeds()
 {
   //event from image navigator recieved - timestep has changed
-   m_FastMarchingTool->ClearSeeds();
-   this->Update();
+  m_FastMarchingTool->ClearSeeds();
+  this->Update();
 }
 
 void QmitkFastMarchingTool3DGUI::BusyStateChanged(bool value)
 {
   if (value)
-      QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
+    QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
   else
-      QApplication::restoreOverrideCursor();
+    QApplication::restoreOverrideCursor();
 }

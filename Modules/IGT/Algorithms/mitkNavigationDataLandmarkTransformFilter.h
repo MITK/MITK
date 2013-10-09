@@ -35,7 +35,7 @@ namespace mitk {
   * If source or target points are changed after calling SetXXXPoints, the corresponding SetXXXPoints
   * method has to be called again to apply the changes.
   * If UseICPInitialization is false (standard value, or set with SetUseICPInitialization(false) or UseICPInitializationOff())
-  * then source landmarks and target landmarks with the same ID must correspondent to each other.
+  * then source landmarks and target landmarks with the same ID must correspond to each other.
   * (--> source landmark with ID x will be mapped to target landmark with ID x).
   * If you do not know the correspondences, call SetUseICPInitialization(true) or UseICPInitializationOn()
   * to let the filter guess the correspondences during initialization with an iterative closest point search.

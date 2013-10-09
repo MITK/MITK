@@ -61,7 +61,9 @@ void mitk::NavigationDataLandmarkTransformFilter::InitializeLandmarkTransform(La
   }
 
   if(m_SourcePoints.size() != m_TargetPoints.size())// check whether target and source points size are equal itk registration won't work otherways
-    return;
+  {
+    itkExceptionMacro("Cannot initialize Filter, number of input datas does not equal number of output datas.");
+  }
 
   this->UpdateLandmarkTransform(sources, targets); // if size of source and target points is equal
 }

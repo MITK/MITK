@@ -81,8 +81,8 @@ public:
   void SetPathModeToPlanarFigure();
 
 
-  /** Fill the graphical widget with intensity profile from currently specified image/path . */
-  void UpdateItemModelFromPath();
+  ///** Fill the graphical widget with intensity profile from currently specified image/path . */
+  //void UpdateItemModelFromPath();
 
   /** \brief Clear the intensity profile (nothing is displayed). */
   void ClearItemModel();

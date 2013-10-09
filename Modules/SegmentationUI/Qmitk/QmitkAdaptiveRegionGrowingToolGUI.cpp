@@ -39,6 +39,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "QmitkConfirmSegmentationDialog.h"
 
+#include "mitkPixelTypeMultiplex.h"
+#include "mitkImagePixelReadAccessor.h"
+
 
 MITK_TOOL_GUI_MACRO( , QmitkAdaptiveRegionGrowingToolGUI, "")
 
@@ -150,6 +153,13 @@ void QmitkAdaptiveRegionGrowingToolGUI::SetInputImageNode(mitk::DataNode* node)
   }
 }
 
+template <typename TPixel>
+static void AccessPixel(mitk::PixelType ptype, const mitk::Image::Pointer im, mitk::Point3D p, int & val)
+{
+  mitk::ImagePixelReadAccessor<TPixel,3> access(im);
+  val = access.GetPixelByWorldCoordinates(p);
+}
+
 void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 {
   if (m_RegionGrow3DTool.IsNull())
@@ -173,7 +183,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
       mitk::Point3D seedPoint = pointSet->GetPointSet(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep())->GetPoints()->ElementAt(0);
 
-      m_SeedpointValue = image->GetPixelValueByWorldCoordinate(seedPoint);
+      mitkPixelTypeMultiplex3(AccessPixel,image->GetChannelDescriptor().GetPixelType(),image,seedPoint,m_SeedpointValue);
 
       /* In this case the seedpoint is placed e.g. in the lung or bronchialtree
        * The lowerFactor sets the windowsize depending on the regiongrowing direction

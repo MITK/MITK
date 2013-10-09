@@ -143,6 +143,8 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
       item = new QListWidgetItem(itemName);
       m_Controls.m_selectionListWidget->addItem(item);
     }
+    //deactivate 'confirm segmentation'-button
+    m_Controls.m_ConfSegButton->setEnabled(false);
   }
 }
 

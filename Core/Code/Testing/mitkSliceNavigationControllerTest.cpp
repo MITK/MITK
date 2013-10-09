@@ -361,8 +361,8 @@ int testReorientPlanes ()
 
    if (
        (newCenterIdx != orientCenterIdx) ||
-      ( !mitk::Equal(orientAxis0, newAxis0) )  ||
-      ( !mitk::Equal(orientAxis1, newAxis1) )
+      ( !mitk::Equal(orientAxis0, newAxis0, 1E-12) )  ||
+      ( !mitk::Equal(orientAxis1, newAxis1, 1E-12 ))
       )
    {
       MITK_INFO << "Reorient Planes (point, vec, vec) not working as it should";

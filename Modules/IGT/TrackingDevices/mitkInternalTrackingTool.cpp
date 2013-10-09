@@ -48,6 +48,19 @@ mitk::InternalTrackingTool::~InternalTrackingTool()
 {
 }
 
+void mitk::InternalTrackingTool::PrintSelf(std::ostream& os, itk::Indent indent) const
+{
+  Superclass::PrintSelf(os, indent);
+
+  os << indent << "Position: " << m_Position << std::endl;
+  os << indent << "Orientation: " << m_Orientation << std::endl;
+  os << indent << "TrackingError: " << m_TrackingError << std::endl;
+  os << indent << "Enabled: " << m_Enabled << std::endl;
+  os << indent << "DataValid: " << m_DataValid << std::endl;
+  os << indent << "ToolTip: " << m_ToolTip << std::endl;
+  os << indent << "ToolTipRotation: " << m_ToolTipRotation << std::endl;
+  os << indent << "ToolTipSet: " << m_ToolTipSet << std::endl;
+}
 
 void mitk::InternalTrackingTool::SetToolName(const char* _arg)
 {
@@ -100,12 +113,15 @@ void mitk::InternalTrackingTool::GetPosition(mitk::Point3D& position) const
 }
 
 
-void mitk::InternalTrackingTool::SetPosition(mitk::Point3D position)
+void mitk::InternalTrackingTool::SetPosition(mitk::Point3D position, mitk::ScalarType eps)
 {
   itkDebugMacro("setting  m_Position to " << position);
-  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
-  m_Position = position;
-  this->Modified();
+  if (!Equal(m_Position, position, eps))
+  {
+    MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
+    m_Position = position;
+    this->Modified();
+  }
 }
 
 
@@ -127,32 +143,42 @@ void mitk::InternalTrackingTool::GetOrientation(mitk::Quaternion& orientation) c
     }
 }
 
-void mitk::InternalTrackingTool::SetToolTip(mitk::Point3D toolTipPosition, mitk::Quaternion orientation)
+void mitk::InternalTrackingTool::SetToolTip(mitk::Point3D toolTipPosition,
+                                            mitk::Quaternion orientation,
+                                            mitk::ScalarType eps)
 {
-if( (toolTipPosition[0] == 0) &&
-    (toolTipPosition[1] == 0) &&
-    (toolTipPosition[2] == 0) &&
-    (orientation.x() == 0) &&
-    (orientation.y() == 0) &&
-    (orientation.z() == 0) &&
-    (orientation.r() == 1))
+  if ( !Equal(m_ToolTip, toolTipPosition, eps) ||
+       !Equal(m_ToolTipRotation, orientation, eps) )
+  {
+    if( (toolTipPosition[0] == 0) &&
+        (toolTipPosition[1] == 0) &&
+        (toolTipPosition[2] == 0) &&
+        (orientation.x() == 0) &&
+        (orientation.y() == 0) &&
+        (orientation.z() == 0) &&
+        (orientation.r() == 1))
     {
-    m_ToolTipSet = false;
+      m_ToolTipSet = false;
     }
-else
+    else
     {
-    m_ToolTipSet = true;
+      m_ToolTipSet = true;
     }
-m_ToolTip = toolTipPosition;
-m_ToolTipRotation = orientation;
+    m_ToolTip = toolTipPosition;
+    m_ToolTipRotation = orientation;
+    this->Modified();
+  }
 }
 
-void mitk::InternalTrackingTool::SetOrientation(mitk::Quaternion orientation)
+void mitk::InternalTrackingTool::SetOrientation(mitk::Quaternion orientation, mitk::ScalarType eps)
 {
   itkDebugMacro("setting  m_Orientation to " << orientation);
-  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
-  m_Orientation = orientation;
-  this->Modified();
+  if (!Equal(m_Orientation, orientation, eps))
+  {
+    MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
+    m_Orientation = orientation;
+    this->Modified();
+  }
 }
 
 

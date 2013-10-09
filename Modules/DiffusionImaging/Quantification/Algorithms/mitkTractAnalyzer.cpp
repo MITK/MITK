@@ -192,6 +192,7 @@ namespace mitk {
         ShortestPathFilterType::Pointer pathFinder = ShortestPathFilterType::New();
         pathFinder->SetCostFunction(costFunction);
         pathFinder->SetFullNeighborsMode(true);
+        pathFinder->SetGraph_fullNeighbors(true);
         //pathFinder->SetCalcMode(ShortestPathFilterType::A_STAR);
         pathFinder->SetInput(meanSkeleton);
         pathFinder->SetStartIndex(startPoint);

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkProjectionFilter.h"
 
 #include "mitkProgressBar.h"
-#include <itkSignedMaurerDistanceMapImageFilter.h>
+//#include <itkSignedMaurerDistanceMapImageFilter.h>
 
 #define SEARCHSIGMA 10 /* length in linear voxel dimensions */
 #define MAXSEARCHLENGTH (3*SEARCHSIGMA)

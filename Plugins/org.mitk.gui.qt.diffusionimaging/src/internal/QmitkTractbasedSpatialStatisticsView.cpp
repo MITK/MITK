@@ -1046,6 +1046,8 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
   analyzer.SetInputImage(image);
   analyzer.SetThreshold(threshold);
 
+  m_PointSetNode = this->m_Controls->m_PointWidget->GetPointSet();
+
   // Set Pointset to analyzer
   analyzer.SetPointSet(m_PointSetNode);
 

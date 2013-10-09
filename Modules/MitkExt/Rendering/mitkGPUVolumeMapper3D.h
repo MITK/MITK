@@ -128,6 +128,9 @@ protected:
   {
     public:
 
+    // NO SMARTPOINTER HERE
+    vtkRenderWindow * m_VtkRenderWindow;
+
     bool m_cpuInitialized;
     vtkSmartPointer<vtkVolume> m_VolumeCPU;
     vtkSmartPointer<vtkFixedPointVolumeRayCastMapper> m_MapperCPU;
@@ -152,6 +155,8 @@ protected:
 
     LocalStorage()
     {
+      m_VtkRenderWindow = 0;
+
       m_cpuInitialized = false;
 
       m_gpuInitialized = false;
@@ -166,24 +171,16 @@ protected:
 
     ~LocalStorage()
     {
-      if(m_cpuInitialized)
-      {
-        m_cpuInitialized=false;
-      }
+      if(m_cpuInitialized && m_MapperCPU && m_VtkRenderWindow)
+        m_MapperCPU->ReleaseGraphicsResources(m_VtkRenderWindow);
 
-      if(m_gpuInitialized)
-      {
-        m_gpuInitialized=false;
-      }
+      if(m_gpuInitialized && m_MapperGPU && m_VtkRenderWindow)
+        m_MapperGPU->ReleaseGraphicsResources(m_VtkRenderWindow);
 
 // Only with VTK 5.6 or above
 #if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
-
-      if(m_rayInitialized)
-      {
-        m_rayInitialized=false;
-      }
-
+      if(m_rayInitialized && m_MapperRAY && m_VtkRenderWindow)
+        m_MapperRAY->ReleaseGraphicsResources(m_VtkRenderWindow);
 #endif
 
     }

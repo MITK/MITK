@@ -129,9 +129,9 @@ namespace mitk
   void FromArray(itk::FixedArray<TCoordRep, NVectorDimension>& vectorOrPoint, const ArrayType& array)
   {
     for (unsigned short int var = 0; var < NVectorDimension; ++var)
-      {
-        vectorOrPoint[var] =  array[var];
-      }
+    {
+      vectorOrPoint[var] =  array[var];
+    }
   }
 
 

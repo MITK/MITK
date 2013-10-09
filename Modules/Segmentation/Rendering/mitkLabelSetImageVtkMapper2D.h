@@ -18,11 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkLabelSetImageVtkMapper2D_H_
 
 //MITK
-#include <mitkCommon.h>
+#include "mitkCommon.h"
+#include "SegmentationExports.h"
 
 //MITK Rendering
 #include "mitkBaseRenderer.h"
-#include "mitkVtkMapper.h"
+#include "mitkImageVtkMapper2D.h"
 #include "mitkLabelSetImage.h"
 #include "mitkExtractSliceFilter.h"
 
@@ -32,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class vtkActor;
 class vtkPolyDataMapper;
 class vtkPlaneSource;
+class vtkTexture;
 class vtkImageData;
 class vtkLookupTable;
 class vtkImageReslice;
@@ -114,95 +116,58 @@ namespace mitk {
 
  * \ingroup Mapper
  */
-class MITK_CORE_EXPORT LabelSetImageVtkMapper2D : public VtkMapper
+class Segmentation_EXPORT LabelSetImageVtkMapper2D : public ImageVtkMapper2D
 {
 
 public:
   /** Standard class typedefs. */
-  mitkClassMacro( LabelSetImageVtkMapper2D,VtkMapper );
+  mitkClassMacro( LabelSetImageVtkMapper2D,ImageVtkMapper2D );
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
   /** \brief Get the Image to map */
-  const mitk::LabelSetImage *GetInput(void);
+  //const mitk::LabelSetImage *GetInput(void);
 
   /** \brief Checks whether this mapper needs to update itself and generate
    * data. */
   virtual void Update(mitk::BaseRenderer * renderer);
 
   //### methods of MITK-VTK rendering pipeline
-  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+//  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
   //### end of methods of MITK-VTK rendering pipeline
 
-
-  /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
-  /**
-  * To render transveral, coronal, and sagittal, the mapper is called three times.
-  * For performance reasons, the corresponding data for each view is saved in the
-  * internal helper class LocalStorage. This allows rendering n views with just
-  * 1 mitkMapper using n vtkMapper.
-  */
-  class MITK_CORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
+/*
+  class Segmentation_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
   {
   public:
-    /** \brief Actor of the resliced image plane. */
     vtkSmartPointer<vtkActor> m_ReslicedImageActor;
-
-    /** \brief Actor for the outline of the active label. */
     vtkSmartPointer<vtkActor> m_ActiveLabelContourActor;
-
     vtkSmartPointer<vtkPropAssembly> m_Actors;
-    /** \brief Mapper of a 2D render window. */
     vtkSmartPointer<vtkPolyDataMapper> m_ReslicedImageMapper;
     vtkSmartPointer<vtkPolyDataMapper> m_ActiveLabelContourMapper;
-    /** \brief Current slice of a 2D render window.*/
     vtkSmartPointer<vtkImageData> m_ReslicedImage;
-    /** \brief Empty vtkPolyData that is set when rendering geometry does not
-      *   intersect the image geometry.
-      *   \warning This member variable is set to NULL,
-      *   if no image geometry is inside the plane geometry
-      *   of the respective render window. Any user of this
-      *   slice has to check whether it is set to NULL! */
     vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
-    /** \brief Plane on which the slice is rendered as texture. */
     vtkSmartPointer<vtkPlaneSource> m_Plane;
-    /** \brief The texture which is used to render the current slice. */
     vtkSmartPointer<vtkTexture> m_Texture;
-    /** \brief The filter to blend all available layers. */
     vtkSmartPointer<vtkImageBlend> m_ImageBlend;
-    /** \brief The actual reslicer (one per renderer) */
     mitk::ExtractSliceFilter::Pointer m_Reslicer;
-    /** \brief The filter for generating label outlines */
     vtkSmartPointer<vtkImageLabelOutline> m_LabelOutline;
-    /** \brief PolyData object containg all lines/points needed for outlining the contour.
-    This container is used to save a computed contour for the next rendering execution.
-    For instance, if you zoom or pann, there is no need to recompute the contour. */
     vtkSmartPointer<vtkPolyData> m_ActiveLabelContour;
-
-    /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastDataUpdateTime;
-
-    /** \brief Timestamp of last update of a property. */
     itk::TimeStamp m_LastPropertyUpdateTime;
-
-    /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
     mitk::ScalarType* m_mmPerPixel;
-
-    /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */
     vtkSmartPointer<vtkMitkLevelWindowFilter> m_LevelWindowFilter;
 
-    /** \brief Default constructor of the local storage. */
     LocalStorage();
-    /** \brief Default deconstructor of the local storage. */
     ~LocalStorage();
   };
-
+*/
   /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
-  mitk::LocalStorageHandler<LocalStorage> m_LSH;
+  //mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
   /** \brief Get the LocalStorage corresponding to the current renderer. */
-  LocalStorage* GetLocalStorage(mitk::BaseRenderer* renderer);
+  //LocalStorage* GetLocalStorage(mitk::BaseRenderer* renderer);
 
   /** \brief Set the default properties for general image rendering. */
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
@@ -227,7 +192,7 @@ protected:
   * different slices, three such planes are generated. All these planes are generated
   * in the XY-plane (even if they depict a YZ-slice of the volume).
   */
-  void GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6]);
+//  void GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6]);
 
   /** \brief Generates a vtkPolyData object containing the outline of a given binary slice.
       \param renderer: Pointer to the renderer containing the needed information
@@ -258,7 +223,7 @@ protected:
     * to calcualte the depth of the object (e.g. image or contour). The depth is used
     * to keep the correct order for the final VTK rendering.
   */
-  float CalculateLayerDepth(mitk::BaseRenderer* renderer);
+//  float CalculateLayerDepth(mitk::BaseRenderer* renderer);
 
   /** \brief This method applies (or modifies) the lookuptable for all types of images.
    * \warning To use the lookup table, the property 'Lookup Table' must be set and a 'Image Rendering.Mode'
@@ -282,9 +247,9 @@ protected:
     * sign (all positive or all negative) there is no intersection.
     * If the distances have different sign, there is an intersection.
     **/
-  bool RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry );
+  //bool RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry );
 };
 
 } // namespace mitk
 
-#endif /* MITKLabelSetImageVtkMapper2D_H_HEADER_INCLUDED_C10E906E */
+#endif // __mitkLabelSetImageVtkMapper2D_H_

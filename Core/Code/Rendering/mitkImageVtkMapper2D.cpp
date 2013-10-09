@@ -143,8 +143,12 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     // see bug-13275
     localStorage->m_ReslicedImage = NULL;
     localStorage->m_Mapper->SetInput( localStorage->m_EmptyPolyData );
+    localStorage->m_OutlineActor->SetVisibility(false);
+    localStorage->m_OutlineShadowActor->SetVisibility(false);
     return;
   }
+
+  localStorage->m_OutlineActor->SetVisibility(true);
 
   //set main input for ExtractSliceFilter
   localStorage->m_Reslicer->SetInput(input);
@@ -332,16 +336,11 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
         float binaryOutlineWidth(1.0);
         if ( datanode->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ) )
         {
-          if ( localStorage->m_Actors->GetNumberOfPaths() > 1 )
-          {
-            float binaryOutlineShadowWidth(1.5);
-            datanode->GetFloatProperty( "outline shadow width", binaryOutlineShadowWidth, renderer );
+          float binaryOutlineShadowWidth(1.5);
+          datanode->GetFloatProperty( "outline shadow width", binaryOutlineShadowWidth, renderer );
 
-            dynamic_cast<vtkActor*>(localStorage->m_Actors->GetParts()->GetItemAsObject(0))
-                ->GetProperty()->SetLineWidth( binaryOutlineWidth * binaryOutlineShadowWidth );
-          }
-
-          localStorage->m_Actor->GetProperty()->SetLineWidth( binaryOutlineWidth );
+          localStorage->m_OutlineShadowActor->GetProperty()->SetLineWidth( binaryOutlineWidth * binaryOutlineShadowWidth );
+          localStorage->m_OutlineActor->GetProperty()->SetLineWidth( binaryOutlineWidth );
         }
       }
       else
@@ -386,21 +385,20 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   this->TransformActor( renderer );
 
-  vtkActor* contourShadowActor = dynamic_cast<vtkActor*> (localStorage->m_Actors->GetParts()->GetItemAsObject(0));
-
   if(binary && binaryOutline) //connect the mapper with the polyData which contains the lines
   {
     //We need the contour for the binary outline property as actor
     localStorage->m_Mapper->SetInput(localStorage->m_OutlinePolyData);
+    localStorage->m_OutlineMapper->SetInput(localStorage->m_OutlinePolyData);
     localStorage->m_Actor->SetTexture(NULL); //no texture for contours
 
     bool binaryOutlineShadow( false );
     datanode->GetBoolProperty( "outline binary shadow", binaryOutlineShadow, renderer );
 
     if ( binaryOutlineShadow )
-      contourShadowActor->SetVisibility( true );
+      localStorage->m_OutlineShadowActor->SetVisibility( true );
     else
-      contourShadowActor->SetVisibility( false );
+      localStorage->m_OutlineShadowActor->SetVisibility( false );
   }
   else
   { //Connect the mapper with the input texture. This is the standard case.
@@ -411,7 +409,8 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     //set the texture for the actor
 
     localStorage->m_Actor->SetTexture(localStorage->m_Texture);
-    contourShadowActor->SetVisibility( false );
+    localStorage->m_OutlineActor->SetVisibility( false );
+    localStorage->m_OutlineShadowActor->SetVisibility( false );
   }
 
   // We have been modified => save this for next Update()
@@ -492,23 +491,16 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
 
       if(isOutlined)
       {
-        if ( localStorage->m_Actors->GetParts()->GetNumberOfItems() > 1 )
+        float rgb[3]= { 1.0f, 1.0f, 1.0f };
+        mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
+                                                                                    ("outline binary shadow color", renderer));
+        if(colorprop.IsNotNull())
         {
-          float rgb[3]= { 1.0f, 1.0f, 1.0f };
-          mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-                                                                                      ("outline binary shadow color", renderer));
-          if(colorprop.IsNotNull())
-          {
-            memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
-          }
-          double rgbConv[3] = {(double)rgb[0], (double)rgb[1], (double)rgb[2]}; //conversion to double for VTK
-
-          vtkActor* contourShadowActor = dynamic_cast<vtkActor*> (localStorage->m_Actors->GetParts()->GetItemAsObject(0));
-          if (contourShadowActor)
-          {
-              contourShadowActor->GetProperty()->SetColor(rgbConv);
-          }
+          memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
         }
+        double rgbConv[3] = {(double)rgb[0], (double)rgb[1], (double)rgb[2]}; //conversion to double for VTK
+
+        localStorage->m_OutlineShadowActor->GetProperty()->SetColor(rgbConv);
       }
   }
   else
@@ -529,10 +521,8 @@ void mitk::ImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
   GetDataNode()->GetOpacity( opacity, renderer, "opacity" );
   //set the opacity according to the properties
   localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
-  if ( localStorage->m_Actors->GetParts()->GetNumberOfItems() > 1 )
-  {
-    dynamic_cast<vtkActor*>( localStorage->m_Actors->GetParts()->GetItemAsObject(0) )->GetProperty()->SetOpacity(opacity);
-  }
+  localStorage->m_OutlineActor->GetProperty()->SetOpacity(opacity);
+  localStorage->m_OutlineShadowActor->GetProperty()->SetOpacity(opacity);
 }
 
 void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
@@ -733,7 +723,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   }
 
   bool isBinaryImage(false);
-  if ( !node->GetBoolProperty("binary", isBinaryImage) )
+  if ( !node->GetBoolProperty("binary", isBinaryImage) && overwrite )
   {
     // ok, property is not set, use heuristic to determine if this
     // is a binary image
@@ -771,7 +761,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   // some more properties specific for a binary...
   if (isBinaryImage)
   {
-    node->AddProperty( "opacity", FloatProperty::New(0.3f), renderer, overwrite );
+    node->AddProperty( "opacity", FloatProperty::New(1.0f), renderer, overwrite );
     node->AddProperty( "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
     node->AddProperty( "binaryimage.selectedcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
     node->AddProperty( "binaryimage.selectedannotationcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
@@ -1002,13 +992,12 @@ void mitk::ImageVtkMapper2D::TransformActor(mitk::BaseRenderer* renderer)
   localStorage->m_Actor->SetUserTransform(trans);
   //transform the origin to center based coordinates, because MITK is center based.
   localStorage->m_Actor->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
-
-  if ( localStorage->m_Actors->GetNumberOfPaths() > 1 )
-  {
-    vtkActor* secondaryActor = dynamic_cast<vtkActor*>( localStorage->m_Actors->GetParts()->GetItemAsObject(0) );
-    secondaryActor->SetUserTransform(trans);
-    secondaryActor->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
-  }
+  //same for outline actor
+  localStorage->m_OutlineActor->SetUserTransform(trans);
+  localStorage->m_OutlineActor->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
+  //same for outline shadow actor
+  localStorage->m_OutlineShadowActor->SetUserTransform(trans);
+  localStorage->m_OutlineShadowActor->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
 }
 
 bool mitk::ImageVtkMapper2D::RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry )
@@ -1059,6 +1048,9 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
   m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
   m_EmptyPolyData = vtkSmartPointer<vtkPolyData>::New();
+  m_OutlineActor = vtkSmartPointer<vtkActor>::New();
+  m_OutlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_OutlineShadowActor = vtkSmartPointer<vtkActor>::New();
 
   m_ColorMap = -1;
 
@@ -1069,12 +1061,15 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   //do not repeat the texture (the image)
   m_Texture->RepeatOff();
 
-  //set the mapper for the actor
+  //set corresponding mappers for the actors
   m_Actor->SetMapper( m_Mapper );
+  m_OutlineActor->SetMapper( m_OutlineMapper );
+  m_OutlineShadowActor->SetMapper( m_OutlineMapper );
 
-  vtkSmartPointer<vtkActor> outlineShadowActor = vtkSmartPointer<vtkActor>::New();
-  outlineShadowActor->SetMapper( m_Mapper );
+  m_OutlineActor->SetVisibility( false );
+  m_OutlineShadowActor->SetVisibility( false );
 
-  m_Actors->AddPart( outlineShadowActor );
+  m_Actors->AddPart( m_OutlineShadowActor );
+  m_Actors->AddPart( m_OutlineActor );
   m_Actors->AddPart( m_Actor );
 }

@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _mitkLabelSetImageToSurfaceThreadedFilter_H_
-#define _mitkLabelSetImageToSurfaceThreadedFilter_H_
+#ifndef __mitkLabelSetImageToSurfaceThreadedFilter_H_
+#define __mitkLabelSetImageToSurfaceThreadedFilter_H_
 
 #include "mitkSegmentationSink.h"
 #include "mitkSurface.h"
@@ -50,4 +50,4 @@ class Segmentation_EXPORT LabelSetImageToSurfaceThreadedFilter : public Segmenta
 
 } // namespace
 
-#endif // _mitkLabelSetImageToSurfaceThreadedFilter_H_
+#endif // __mitkLabelSetImageToSurfaceThreadedFilter_H_

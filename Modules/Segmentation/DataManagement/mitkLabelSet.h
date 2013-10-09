@@ -15,11 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef _mitkLabelSet_H_
-#define _mitkLabelSet_H_
+#ifndef __mitkLabelSet_H_
+#define __mitkLabelSet_H_
 
-#include <MitkExports.h>
-#include <mitkCommon.h>
+#include "SegmentationExports.h"
 #include <mitkMessage.h>
 #include <mitkLookupTable.h>
 
@@ -35,7 +34,7 @@ namespace mitk
 // @brief LabelSet containing the labels corresponding to a segmentation session.
 // @ingroup Data
 //
-class MITK_CORE_EXPORT LabelSet : public itk::Object
+class Segmentation_EXPORT LabelSet : public itk::Object
 {
 public:
 
@@ -241,4 +240,4 @@ private:
 
 } // namespace mitk
 
-#endif // _mitkLabelSet_H_
+#endif // __mitkLabelSet_H_

@@ -27,9 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGeometry3D.h"
 #include "mitkGeometryData.h"
 #include "mitkImage.h"
-#include "mitkLabelSetImage.h"
 #include "mitkImageVtkMapper2D.h"
-#include "mitkLabelSetImageVtkMapper2D.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkLookupTable.h"
 #include "mitkLookupTableProperty.h"
@@ -108,17 +106,8 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode* node)
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNotNull() && image->IsInitialized())
   {
-    mitk::LabelSetImage::Pointer lsimage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
-    if(lsimage.IsNotNull() && lsimage->IsInitialized())
-    {
-      mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(node);
-      mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
-    }
-    else
-    {
       mitk::ImageVtkMapper2D::SetDefaultProperties(node);
       mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
-    }
   }
 
   mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
@@ -185,12 +174,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
 
     if ( id == mitk::BaseRenderer::Standard2D )
     {
-      if((dynamic_cast<LabelSetImage*>(data)!=NULL))
-      {
-        newMapper = mitk::LabelSetImageVtkMapper2D::New();
-        newMapper->SetDataNode(node);
-      }
-      else if((dynamic_cast<Image*>(data)!=NULL))
+      if((dynamic_cast<Image*>(data)!=NULL))
       {
         newMapper = mitk::ImageVtkMapper2D::New();
         newMapper->SetDataNode(node);
@@ -355,7 +339,6 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.obj", "Surface files"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii", "NIfTI format"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii.gz", "NIfTI format"));
-//  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation files"));
 
   //m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic", "DKFZ Pic"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.mhd", "MetaImage"));
@@ -378,7 +361,6 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", "Diffusion Weighted Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.qbi", "Q-Ball Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hqbi", "Q-Ball Images"));
-//  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation Files"));
 }
 
 /**

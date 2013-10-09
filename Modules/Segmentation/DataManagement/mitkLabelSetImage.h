@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkLabelSetImage_H_
 
 #include "mitkImage.h"
-#include "MitkExports.h"
+#include "SegmentationExports.h"
 #include <mitkLabelSet.h>
 #include <mitkSurface.h>
 
@@ -39,7 +39,7 @@ namespace mitk
 //## Handles operations for editing labels.
 //## @ingroup Data
 
-class MITK_CORE_EXPORT LabelSetImage : public Image
+class Segmentation_EXPORT LabelSetImage : public Image
 {
 
 public:

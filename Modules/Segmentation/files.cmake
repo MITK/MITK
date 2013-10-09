@@ -36,6 +36,9 @@ set(CPP_FILES
   DataManagement/mitkContourModel.cpp
   DataManagement/mitkContourSet.cpp
   DataManagement/mitkExtrudedContour.cpp
+  DataManagement/mitkLabel.cpp
+  DataManagement/mitkLabelSet.cpp
+  DataManagement/mitkLabelSetImage.cpp
   Interactions/mitkAdaptiveRegionGrowingTool.cpp
   Interactions/mitkAddContourTool.cpp
   Interactions/mitkAutoCropTool.cpp
@@ -89,6 +92,7 @@ set(CPP_FILES
   Rendering/mitkContourSetMapper2D.cpp
   Rendering/mitkContourSetVtkMapper3D.cpp
   Rendering/mitkContourVtkMapper3D.cpp
+  Rendering/mitkLabelSetImageVtkMapper2D.cpp
   SegmentationUtilities/BooleanOperations/mitkBooleanOperation.cpp
   SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.cpp
 )

@@ -15,11 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef _mitkLabel_H_
-#define _mitkLabel_H_
+#ifndef __mitkLabel_H_
+#define __mitkLabel_H_
 
-#include <MitkExports.h>
-#include <mitkCommon.h>
+#include "SegmentationExports.h"
 #include <mitkColorProperty.h>
 #include <mitkVector.h>
 
@@ -34,7 +33,7 @@ namespace mitk
 //## @brief A data structure describing a label.
 //## @ingroup Data
 //##
-class MITK_CORE_EXPORT Label : public itk::Object
+class Segmentation_EXPORT Label : public itk::Object
 {
 public:
 
@@ -61,10 +60,6 @@ public:
     itkSetMacro(Selected, bool );
     itkGetConstMacro( Selected, bool );
     itkBooleanMacro(Selected);
-
-    itkSetMacro(StickyBorders, bool);
-    itkGetConstMacro(StickyBorders, bool);
-    itkBooleanMacro(StickyBorders);
 
     itkSetMacro(Opacity, float);
     itkGetConstMacro(Opacity, float);
@@ -111,7 +106,6 @@ protected:
     bool m_Filled;
     bool m_Exterior;
     float m_Opacity;
-    bool m_StickyBorders;
     bool m_Selected;
     std::string m_Name;
     std::string m_LatinName;
@@ -126,4 +120,4 @@ protected:
 
 } // namespace mitk
 
-#endif // _mitkLabel_H_
+#endif // __mitkLabel_H_

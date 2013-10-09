@@ -55,6 +55,14 @@ elseif(UNIX)
   list(APPEND freeglut_SOURCES src/freeglut_xinput.c)
 endif()
 
+if(UNIX AND NOT APPLE)
+  add_definitions(
+    -DHAVE_SYS_IOCTL_H
+    -DHAVE_FCNTL_H
+    -DHAVE_ERRNO_H
+  )
+endif()
+
 add_library(freeglut ${freeglut_HEADERS} ${freeglut_SOURCES})
 target_link_libraries(freeglut ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY})
 set_target_properties(freeglut PROPERTIES

@@ -1104,8 +1104,8 @@ void QmitkTensorReconstructionView::PreviewThreshold(int threshold)
         ThresholdFilterType::Pointer filterThreshold = ThresholdFilterType::New();
         filterThreshold->SetInput(filterB0->GetOutput());
         filterThreshold->SetLowerThreshold(threshold);
-        filterThreshold->SetInsideValue(0);
-        filterThreshold->SetOutsideValue(1); // mark cut off values red
+        filterThreshold->SetInsideValue(1);// mark selected values red
+        filterThreshold->SetOutsideValue(0);
         filterThreshold->Update();
 
         mitkImage->InitializeByItk( filterThreshold->GetOutput() );

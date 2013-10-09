@@ -136,19 +136,19 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk:
     if (levelWindowProperty.IsNull())
       continue;
 
-    int currMode;
     int nonLvlWinMode1 = mitk::RenderingModeProperty::LOOKUPTABLE_COLOR;
     int nonLvlWinMode2 = mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR;
 
     mitk::RenderingModeProperty::Pointer mode = dynamic_cast<mitk::RenderingModeProperty*>(node->GetProperty( "Image Rendering.Mode" ));
-    if(mode.IsNotNull())
+    if( mode.IsNotNull() )
     {
-      currMode = mode->GetRenderingMode();
+      int currMode = mode->GetRenderingMode();
+      if ( currMode == nonLvlWinMode1 || currMode == nonLvlWinMode2 )
+      {
+        continue;
+      }
     }
-    if ( currMode == nonLvlWinMode1 || currMode == nonLvlWinMode2 )
-    {
-      continue;
-    }
+    else continue;
 
     m_LevelWindowProperty = levelWindowProperty;
     m_CurrentImage = dynamic_cast<mitk::Image*>(node->GetData());

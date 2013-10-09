@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkRenderingManager.h>
+#include "mitkCoreExtObjectFactory.h"
 
 #include <itksys/SystemTools.hxx>
 
@@ -49,6 +50,8 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  // Register MitkExt Factory to use new volumerendering
+  RegisterCoreExtObjectFactory();
   // Register Qmitk-dependent global instances
   QmitkRegisterClasses();
 

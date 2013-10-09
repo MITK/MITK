@@ -28,23 +28,63 @@ namespace mitk
 #endif
 
 /**
- * Encapsulates the enumeration for rendering modes. Valid values are:
- * \li LEVELWINDOW_COLOR: Level window and color will be applied to the image.
- * Our default level window setup for a test image looks like this:
- * \image html ExampleLevelWindowColor.png
- * If this property is used inside the mitkWorkbench, the level window slider will change
- * the rendering of the image. I.e. will change the values of the internal lookuptable.
- * \li LOOKUPTABLE_LEVELWINDOW_COLOR: A lookup table, level window and color will be applied to the image.
+ * Encapsulates the enumeration for rendering modes. The property human-readable name is
+ * "Image Rendering.Mode". This property affects rendering of images and is used inside
+ * the mitkImageVtkMapper2D to define which rendering mode is applied to images.
+ * Valid values are:
  *
- * \li COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR: A colortransferfunction, level window and color will be applied to the image.
+ * \li LEVELWINDOW_COLOR: Level window and color will be applied to the image.
+ * Our default level-window (or sometimes called window-level) setup for a test image looks like this:
+ * \image html ExampleLevelWindowColor.png
+ * This image can be reproduced with the mitkImageVtkMapper2DColorTest or mitkImageVtkMapper2DLevelWindowTest.
+ * If "Image Rendering.Mode" is set to LEVELWINDOW_COLOR inside the mitkWorkbench, the level window slider will change
+ * the rendering of the image. I.e. will change the values of an internally used default lookup table.
+ * Note, the level window slider changes the property "levelwindow" which modifies the range of
+ * the internally used default lookup table. There is no way to modify the default lookup table.
+ * In case you want to modify a lookup table, use any LOOKUPTABLE mode as "Image Rendering.Mode".
+ * This mode will apply the "color" property. The default color is white. If you change the "color"
+ * property to yellow, the test image will be rendered like this:
+ * \image html ExampleColorYellow.png
+ * This image can be reproduced with the mitkImageVtkMapper2DColorTest.
+ *
+ * \li LOOKUPTABLE_LEVELWINDOW_COLOR: A lookup table, level window and color will be applied to the image.
+ * As lookup table, the one supplied by the property "LookupTable" will be used. If the user does not
+ * supply any lookup table, a default rainbow-like lookup table will be used instead. This lookup table
+ * will be influenced by the property "levelwindow" and the actor will be colored by the
+ * "color" property.
+ * Our test image with a lookup table mapping everything from red to blue looks like this:
+ * \image html ExampleLookupTable.png
+ * This image can be reproduced with the mitkImageVtkMapper2DLookupTableTest.
+ * \note Changing a lookup table via the "levelwindow" property can be unintuitive and unwanted. Use LOOKUPTABLE_COLOR if you
+ * don't want your lookuptable to be influenced by the level window.
+ *
+ * \li COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR: A color transfer function, level window and color will be applied to the image.
+ * Very similar mode to LOOKUPTABLE_LEVELWINDOW_COLOR. Instead of the lookup table a color transfer function will be used.
+ * Color transfer functions are useful to colorize floating point images and allow more sometimes more flexibility than
+ * a lookup table. The "Image Rendering.Transfer Function" property defines the transfer function. Our test image
+ * with a transfer function mapping everything from to red, green and blue looks like this:
+ * \image html ExampleTransferFunction.png
+ * This image can be reproduced with the mitkImageVtkMapper2DTransferFunctionTest. This transfer function
+ * will be influenced by the property "levelwindow" and the actor will be colored by the
+ * "color" property.
+ * \note Changing a transfer function table via the "levelwindow" property can be unintuitive and unwanted.
+ * Use COLORTRANSFERFUNCTION_COLOR if you don't want your transfer function to be influenced by the level window.
+ *
  * \li LOOKUPTABLE_COLOR: A lookup table and color will be applied to the image.
- * \li COLORTRANSFERFUNCTION_COLOR: A colortransferfunction and color will be applied to the image.
+ * Similar mode to LOOKUPTABLE_LEVELWINDOW_COLOR, except that the "levelwindow" property will not
+ * modify the range of the lookup table.
+ *
+ * \li COLORTRANSFERFUNCTION_COLOR: A color trans ferfunction and color will be applied to the image.
+ * Similar mode to COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR, except that the "levelwindow" property will not
+ * modify the range of the transfer function.
  *
  * The order is given by the names (e.g. LOOKUPTABLE_COLOR applies first a lookup table and next a color).
  * Currently, there is no GUI (in mitkWorkbench) support for controlling lookup tables or transfer functions.
- * This has to be done by the programmer. Color and level window are controled by color widget and level window slider.
+ * This has to be done by the programmer. Color and level window are controlled by color widget and level window slider.
  * Currently, the color is always applied. We do not set the color to white, if the user changes the mode. We assume
  * that users who change the mode know that a previously set color will still be applied (on top of the mode).
+ *
+ * \note See VTK documentation for examples how to use vtkTransferfunction and vtkLookupTable.
  */
 
 class MITK_CORE_EXPORT RenderingModeProperty : public EnumerationProperty

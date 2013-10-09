@@ -315,6 +315,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
     return;
   }
 
+  QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
   mitk::PointSet::PointType seedPoint = seedPointSet->GetPointSet(timeStep)->GetPoints()->Begin().Value();
 
@@ -333,18 +334,21 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
       }
       else if (orgImage->GetDimension() == 3)
       {
-          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor)); //set the cursor to waiting
+          //QApplication::setOverrideCursor(QCursor(Qt::WaitCursor)); //set the cursor to waiting
           AccessByItk_2(orgImage, StartRegionGrowing, orgImage->GetGeometry(), seedPoint);
-          QApplication::restoreOverrideCursor();//reset cursor
+          //QApplication::restoreOverrideCursor();//reset cursor
       }
       else
       {
+          QApplication::restoreOverrideCursor();//reset cursor
           QMessageBox::information( NULL, "Adaptive Region Growing functionality", "Only images of dimension 3 or 4 can be processed!");
           return;
       }
   }
   EnableControls(true); // Segmentation ran successfully, so enable all controls.
   node->SetVisibility(true);
+  QApplication::restoreOverrideCursor();//reset cursor
+
 }
 
 template<typename TPixel, unsigned int VImageDimension>

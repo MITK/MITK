@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QtGui>
 
+#include <mitkIPropertyFilters.h>
+#include <mitkPropertyFilter.h>
 #include <mitkVtkLayerController.h>
 #include <mitkWeakPointer.h>
 #include <mitkPlanarCircle.h>
@@ -39,8 +41,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <QmitkRenderWindow.h>
 
+#include "mitkPluginActivator.h"
 #include "usModuleRegistry.h"
 
+template <class T>
+static T* GetService()
+{
+  ctkPluginContext* context = mitk::PluginActivator::GetContext();
+  ctkServiceReference serviceRef = context->getServiceReference<T>();
+
+  return serviceRef
+    ? context->getService<T>(serviceRef)
+    : NULL;
+}
 
 struct QmitkPlanarFigureData
 {
@@ -545,6 +558,16 @@ void QmitkMeasurementView::ActionDrawLineTriggered(bool checked)
 void QmitkMeasurementView::ActionDrawPathTriggered(bool checked)
 {
   Q_UNUSED(checked)
+
+  mitk::IPropertyFilters* propertyFilters = GetService<mitk::IPropertyFilters>();
+
+  if (propertyFilters != NULL)
+  {
+    mitk::PropertyFilter filter;
+    filter.AddEntry("ClosedPlanarPolygon", mitk::PropertyFilter::Blacklist);
+
+    propertyFilters->AddFilter(filter, "PlanarPolygon");
+  }
 
   mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
   figure->ClosedOff();

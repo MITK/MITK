@@ -36,9 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::SurfaceDeformationDataInteractor3D::SurfaceDeformationDataInteractor3D()
   :m_Precision( 6.5 ),
-    m_PickedSurfaceNode( NULL ),
-    m_PickedSurface( NULL ),
-    m_GaussSigma( 30.0 )
+  m_GaussSigma( 30.0 )
 {
   m_OriginalPolyData = vtkPolyData::New();
 
@@ -50,7 +48,12 @@ mitk::SurfaceDeformationDataInteractor3D::SurfaceDeformationDataInteractor3D()
 
 mitk::SurfaceDeformationDataInteractor3D::~SurfaceDeformationDataInteractor3D()
 {
+  m_OriginalPolyData->Delete();
+}
 
+void mitk::SurfaceDeformationDataInteractor3D::SetPrecision( mitk::ScalarType precision )
+{
+  m_Precision = precision;
 }
 
 void mitk::SurfaceDeformationDataInteractor3D::ConnectActionsAndFunctions()
@@ -70,6 +73,19 @@ void mitk::SurfaceDeformationDataInteractor3D::ConnectActionsAndFunctions()
 
 void mitk::SurfaceDeformationDataInteractor3D::DataNodeChanged()
 {
+  if(this->GetDataNode() != NULL)
+  {
+    m_Surface = dynamic_cast< Surface * >(this->GetDataNode()->GetData());
+
+    if ( m_Surface == NULL )
+    {
+      MITK_ERROR << "SurfaceDeformationDataInteractor3D::DataNodeChanged(): DataNode has to contain a surface.";
+    }
+  }
+  else
+  {
+    m_Surface = NULL;
+  }
 }
 
 bool mitk::SurfaceDeformationDataInteractor3D::CheckOverObject(const InteractionEvent* interactionEvent)
@@ -92,47 +108,124 @@ bool mitk::SurfaceDeformationDataInteractor3D::CheckOverObject(const Interaction
 
 bool mitk::SurfaceDeformationDataInteractor3D::SelectObject(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  DataNode::Pointer node = this->GetDataNode();
-
-  if (node.IsNull())
+  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  if(positionEvent == NULL)
     return false;
 
-  node->SetColor( 1.0, 0.0, 0.0 );
+  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+
+  mitk::Point3D surfaceColorizationCenter = positionEvent->GetPositionInWorld();
+
+  this->GetDataNode()->SetColor( 1.0, 0.0, 0.0 );
   //TODO: Only 3D reinit
   RenderingManager::GetInstance()->RequestUpdateAll();
 
   // Colorize surface / wireframe dependend on distance from picked point
   //TODO Check the return value
-  this->ColorizeSurface( interactionEvent->GetSender(), 0.0 );
+  this->ColorizeSurface( interactionEvent->GetSender(), m_Surface->GetVtkPolyData(timeStep),
+    surfaceColorizationCenter, COLORIZATION_GAUSS );
 
   return true;
 }
 
 bool mitk::SurfaceDeformationDataInteractor3D::DeselectObject(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  DataNode::Pointer node = this->GetDataNode();
-
-  if (node.IsNull())
+  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  if(positionEvent == NULL)
     return false;
 
-  node->SetColor( 1.0, 1.0, 1.0 );
+  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+
+  mitk::Point3D surfaceColorizationCenter = positionEvent->GetPositionInWorld();
+
+  this->GetDataNode()->SetColor( 1.0, 1.0, 1.0 );
   //TODO: Only 3D reinit
   RenderingManager::GetInstance()->RequestUpdateAll();
 
   // Colorize surface / wireframe as inactive
   //TODO Check the return value
-  this->ColorizeSurface( interactionEvent->GetSender(), -1.0 );
+  this->ColorizeSurface( interactionEvent->GetSender(), m_Surface->GetVtkPolyData(timeStep),
+    surfaceColorizationCenter, COLORIZATION_CONSTANT, -1.0 );
 
   return true;
 }
 
 bool mitk::SurfaceDeformationDataInteractor3D::InitDeformation(StateMachineAction*, InteractionEvent* interactionEvent)
 {
+  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  if(positionEvent == NULL)
+    return false;
 
+  // Store current picked point
+  m_InitialPickedPoint = positionEvent->GetPositionInWorld();
+
+  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode->GetData());
+
+  // Make deep copy of vtkPolyData interacted on
+  m_OriginalPolyData->DeepCopy(m_Surface->GetVtkPolyData(timeStep));
 }
 
 bool mitk::SurfaceDeformationDataInteractor3D::DeformObject (StateMachineAction*, InteractionEvent* interactionEvent)
 {
+
+  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  if(positionEvent == NULL)
+    return false;
+
+  // Calculate mouse move in 3D space
+  mitk::Vector3D interactionMove;
+  interactionMove[0] = m_CurrentPickedPoint[0] - m_InitialPickedPoint[0];
+  interactionMove[1] = m_CurrentPickedPoint[1] - m_InitialPickedPoint[1];
+  interactionMove[2] = m_CurrentPickedPoint[2] - m_InitialPickedPoint[2];
+
+  this->GetDataNode()->GetData()->UpdateOutputInformation();
+
+  mitk::Point3D origin; origin.Fill( 0.0 );
+  mitk::Vector3D interactionMoveIndex;
+
+  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode->GetData());
+
+  mitk::Geometry3D::Pointer geometry = this->GetDataNode()->GetData()->GetGeometry(timeStep);
+  geometry->WorldToIndex(interactionMove, interactionMoveIndex);
+
+   // Get picked point and transform into local coordinates
+      mitk::Point3D pickedPoint;
+      geometry->WorldToIndex(m_InitialPickedPoint, pickedPoint);
+      mitk::Vector3D v1 = pickedPoint.GetVectorFromOrigin();
+
+      mitk::Vector3D v2 = m_ObjectNormal * (interactionMoveIndex * m_ObjectNormal);
+
+      vtkPoints* originalPoints = m_OriginalPolyData->GetPoints();
+      vtkPoints* deformedPoints = m_Surface->GetVtkPolyData(timeStep)->GetPoints();
+       double denom = m_GaussSigma * m_GaussSigma * 2;
+      double point[3];
+      for ( unsigned int i = 0; i < deformedPoints->GetNumberOfPoints(); ++i )
+      {
+        // Get original point
+        vtkFloatingPointType *originalPoint = originalPoints->GetPoint( i );
+        mitk::Vector3D v0;
+        v0[0] = originalPoint[0];
+        v0[1] = originalPoint[1];
+        v0[2] = originalPoint[2];
+
+
+        // Calculate distance of this point from line through picked point
+        double d = itk::CrossProduct( m_ObjectNormal, (v1 - v0) ).GetNorm();
+
+        mitk::Vector3D t = v2 * exp( - d * d / denom );
+
+        point[0] = originalPoint[0] + t[0];
+        point[1] = originalPoint[1] + t[1];
+        point[2] = originalPoint[2] + t[2];
+        deformedPoints->SetPoint( i, point );
+      }
+
+      // TOODODOODODODODODODOODODOODODODODODOODODODODODO
+
+      m_PolyData->Modified();
+      m_Surface->Modified();
+
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
 }
 

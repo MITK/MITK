@@ -32,6 +32,7 @@ The \ref FirstSteps section will then show you how to extend MITK for your own p
   <li> \subpage FirstSteps </li>
   <ul>
     <li> \ref NewPluginPage </li>
+    <li> \ref NewViewPage </li>
     <li> \ref NewModulePage</li>
   <li> \ref CMAKE_FAQ </li>
     <li> \ref StatemachineEditor </li>

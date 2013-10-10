@@ -14,16 +14,21 @@ if(MITK_USE_SOFA)
 
   set(additional_cmake_args
     -DGLEW_DIR:PATH=${GLEW_DIR}
-    -DGLUT_DIR:PATH=${GLUT_DIR}
     -DSOFA-EXTERNAL_BOOST_PATH:PATH=${CMAKE_BINARY_DIR}/Boost-install/lib
     -DSOFA-EXTERNAL_HAVE_BOOST:BOOL=ON
-    -DSOFA-EXTERNAL_HAVE_FREEGLUT:BOOL=ON
     -DSOFA-EXTERNAL_HAVE_GLEW:BOOL=ON
     -DSOFA-EXTERNAL_HAVE_ZLIB:BOOL=OFF
     -DSOFA-EXTERNAL_HAVE_PNG:BOOL=OFF
     -DSOFA-LIB_GUI_GLUT:BOOL=OFF
     -DSOFA-LIB_GUI_QTVIEWER:BOOL=OFF
   )
+
+  if(NOT APPLE)
+    list(APPEND additional_cmake_args
+      -DGLUT_DIR:PATH=${GLUT_DIR}
+      -DSOFA-EXTERNAL_HAVE_FREEGLUT:BOOL=ON
+    )
+  endif()
 
   set(preconfigure_cmake_args
     -DSOFA-APPLICATION_MODELER:BOOL=OFF
@@ -37,7 +42,7 @@ if(MITK_USE_SOFA)
   )
 
   if(NOT MITK_USE_SYSTEM_Boost)
-    list(APPEND boost_cmake_args
+    set(boost_cmake_args
       -DBoost_NO_SYSTEM_PATHS:BOOL=ON
       -DBOOST_INCLUDEDIR:PATH=${CMAKE_BINARY_DIR}/Boost-install/include
       -DBOOST_LIBRARYDIR:PATH=${CMAKE_BINARY_DIR}/Boost-install/lib

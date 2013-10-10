@@ -54,7 +54,7 @@ static void ApplyMaterial(mitk::DataNode::Pointer dataNode, const sofa::core::lo
 
   dataNode->SetFloatProperty("material.specularCoefficient", 1.0f);
   dataNode->SetProperty("material.specularColor", mitk::ColorProperty::New(specular.elems));
-  dataNode->SetIntProperty("material.specularPower", shininess);
+  dataNode->SetFloatProperty("material.specularPower", shininess);
 }
 
 mitk::ExportMitkVisitor::ExportMitkVisitor(const sofa::core::ExecParams* params)

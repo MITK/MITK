@@ -361,7 +361,7 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   output->GetSlicedGeometry()->SetTimeBounds(input->GetSlicedGeometry()->GetTimeBounds());
 
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
-  timeGeometry->Initialize(output->GetSlicedGeometry(), output->GetTimeGeometry()->GetNumberOfTimeSteps());
+  timeGeometry->Initialize(output->GetSlicedGeometry(), output->GetTimeGeometry()->CountTimeSteps());
   output->SetTimeGeometry(timeGeometry);
 
   output->SetPropertyList(input->GetPropertyList()->Clone());

@@ -296,7 +296,7 @@ void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
 
   mitk::SlicedGeometry3D* slicedGeometry;
 
-  unsigned int steps = timeGeometry->GetNumberOfTimeSteps();
+  unsigned int steps = timeGeometry->CountTimeSteps();
 
   for(unsigned int timestep = 0; timestep < steps; ++timestep)
   {
@@ -328,7 +328,7 @@ void mitk::SlicedData::SetSpacing(mitk::Vector3D aSpacing)
 
   mitk::SlicedGeometry3D* slicedGeometry;
 
-  unsigned int steps = timeGeometry->GetNumberOfTimeSteps();
+  unsigned int steps = timeGeometry->CountTimeSteps();
 
   for(unsigned int timestep = 0; timestep < steps; ++timestep)
   {

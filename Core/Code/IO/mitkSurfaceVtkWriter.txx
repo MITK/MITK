@@ -75,7 +75,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
   vtkPolyData * polyData;
   Geometry3D* geometry;
 
-  unsigned int t, timesteps = input->GetTimeGeometry()->GetNumberOfTimeSteps();
+  unsigned int t, timesteps = input->GetTimeGeometry()->CountTimeSteps();
 
   for(t = 0; t < timesteps; ++t)
   {

@@ -637,7 +637,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
 
     //select single 3D volume if we have more than one time step
     typename SegmentationType::Pointer originalSegmentationInITK = SegmentationType::New();
-    if(originalSegmentation->GetTimeGeometry()->GetNumberOfTimeSteps() > 1)
+    if(originalSegmentation->GetTimeGeometry()->CountTimeSteps() > 1)
     {
       mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
       timeSelector->SetInput( originalSegmentation );

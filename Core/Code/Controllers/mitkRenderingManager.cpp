@@ -475,7 +475,7 @@ RenderingManager
     // clone the input geometry
     //Old Geometry3D::Pointer modifiedGeometry = dynamic_cast<Geometry3D*>( dataGeometry->Clone().GetPointer() );
     assert(modifiedGeometry.IsNotNull());
-    for (TimeStepType step = 0; step < modifiedGeometry->GetNumberOfTimeSteps(); ++step)
+    for (TimeStepType step = 0; step < modifiedGeometry->CountTimeSteps(); ++step)
     {
       Geometry3D::BoundsArrayType newBounds = modifiedGeometry->GetGeometryForTimeStep(step)->GetBounds();
       for( unsigned int dimension = 0; ( 2 * dimension ) < newBounds.Size() ; dimension++ )

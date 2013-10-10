@@ -56,7 +56,7 @@ public:
     translationVector[1] = expectedOrigin[1];
     translationVector[2] = expectedOrigin[2];
 
-    for (mitk::TimeStepType timeStep = 0; timeStep < image->GetTimeGeometry()->GetNumberOfTimeSteps(); ++timeStep)
+    for (mitk::TimeStepType timeStep = 0; timeStep < image->GetTimeGeometry()->CountTimeSteps(); ++timeStep)
     {
       image->GetTimeGeometry()->GetGeometryForTimeStep(timeStep)->Translate(translationVector);
     }
@@ -67,7 +67,7 @@ public:
     expectedOrigin[1] = 2*translationVector[1];
     expectedOrigin[2] = 2*translationVector[2];
 
-    for (mitk::TimeStepType timeStep = 0; timeStep < image->GetTimeGeometry()->GetNumberOfTimeSteps(); ++timeStep)
+    for (mitk::TimeStepType timeStep = 0; timeStep < image->GetTimeGeometry()->CountTimeSteps(); ++timeStep)
     {
       image->GetTimeGeometry()->GetGeometryForTimeStep(timeStep)->Translate(translationVector);
     }
@@ -167,10 +167,10 @@ public:
     MITK_TEST_CONDITION(mitk::Equal(expectedTimePoint, DimT), "Returns correct maximum time point ");
   }
 
-    void GetNumberOfTimeSteps_Image_ReturnDimT(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+    void CountTimeSteps_Image_ReturnDimT(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
-    mitk::TimeStepType expectedTimeSteps = geometry->GetNumberOfTimeSteps();
+    mitk::TimeStepType expectedTimeSteps = geometry->CountTimeSteps();
     MITK_TEST_CONDITION(mitk::Equal(expectedTimeSteps, DimT), "Returns correct number of time Steps ");
   }
 
@@ -422,10 +422,10 @@ public:
   void Expand_BaseDataDoubleSize_SizeChanged(mitk::BaseData* baseData, int DimT)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
-    MITK_TEST_CONDITION(geometry->GetNumberOfTimeSteps()==DimT, "Number of time Steps match expection. ");
+    MITK_TEST_CONDITION(geometry->CountTimeSteps()==DimT, "Number of time Steps match expection. ");
 
     geometry->Expand(DimT * 2);
-    MITK_TEST_CONDITION(geometry->GetNumberOfTimeSteps()==DimT*2, "Number of time Steps match expection. ");
+    MITK_TEST_CONDITION(geometry->CountTimeSteps()==DimT*2, "Number of time Steps match expection. ");
 
     mitk::Geometry3D::Pointer geometry3D = geometry->GetGeometryForTimeStep(DimT*2 -1);
     MITK_TEST_CONDITION(geometry3D.IsNotNull(), "Non-zero geometry is generated. ");
@@ -634,7 +634,7 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   testClass.Translation_Image_MovedOrigin(30,25,20,1);
   testClass.Rotate_Image_RotatedPoint(image->Clone(),30,25,20,1);
   testClass.Scale_Image_ScaledPoint(30,25,20,1);
-  testClass.GetNumberOfTimeSteps_Image_ReturnDimT(image->Clone(),30,25,20,1);
+  testClass.CountTimeSteps_Image_ReturnDimT(image->Clone(),30,25,20,1);
   testClass.GetMinimumTimePoint_3DImage_Min(image->Clone(),30,25,20,1);
   testClass.GetMaximumTimePoint_3DImage_Max(image->Clone(),30,25,20,1);
   testClass.GetTimeBounds_3DImage_ZeroAndDimT(image->Clone(),30,25,20,1);
@@ -666,7 +666,7 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   testClass.Translation_Image_MovedOrigin(30,25,1,1);
   testClass.Rotate_Image_RotatedPoint(image->Clone(),30,25,1,1);
   testClass.Scale_Image_ScaledPoint(30,25,1,1);
-  testClass.GetNumberOfTimeSteps_Image_ReturnDimT(image->Clone(),30,25,1,1);
+  testClass.CountTimeSteps_Image_ReturnDimT(image->Clone(),30,25,1,1);
   testClass.GetMinimumTimePoint_3DImage_Min(image->Clone(),30,25,1,1);
   testClass.GetMaximumTimePoint_3DImage_Max(image->Clone(),30,25,1,1);
   testClass.GetTimeBounds_3DImage_ZeroAndDimT(image->Clone(),30,25,1,1);
@@ -695,7 +695,7 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   testClass.Translation_Image_MovedOrigin(30,25,20,5); // Test with 3D+t-Image
   testClass.Rotate_Image_RotatedPoint(image->Clone(),30,25,20,5); // Test with 3D+t-Image
   testClass.Scale_Image_ScaledPoint(30,25,20,5); // Test with 3D+t-Image
-  testClass.GetNumberOfTimeSteps_Image_ReturnDimT(image->Clone(),30,25,20,5);
+  testClass.CountTimeSteps_Image_ReturnDimT(image->Clone(),30,25,20,5);
   testClass.GetMinimumTimePoint_4DBaseData_Zero(image->Clone(),5);
   testClass.GetMaximumTimePoint_4DBaseData_DimT(image->Clone(),5);
   testClass.GetTimeBounds_4DImage_ZeroAndDimT(30,25,20,5);
@@ -742,7 +742,7 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   pointSet->SetPoint(0,pointA);
   pointSet->SetPoint(1,pointB);
   pointSet->SetPoint(2,pointC);
-  testClass.GetNumberOfTimeSteps_Image_ReturnDimT(pointSet->Clone(),30,25,20,1);
+  testClass.CountTimeSteps_Image_ReturnDimT(pointSet->Clone(),30,25,20,1);
   testClass.GetMinimumTimePoint_3DImage_Min(pointSet->Clone(),30,25,20,1);
   testClass.GetMaximumTimePoint_3DImage_Max(pointSet->Clone(),30,25,20,1);
   testClass.GetTimeBounds_3DImage_ZeroAndDimT(pointSet->Clone(),30,25,20,1);

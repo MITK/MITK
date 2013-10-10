@@ -71,7 +71,7 @@ void mitk::ProbeFilter::GenerateOutputInformation()
   if(input->GetGeometry()==NULL) return;
   if(source->GetGeometry()==NULL) return;
 
-  if( (input->GetTimeGeometry()->GetNumberOfTimeSteps()==1) && (source->GetTimeGeometry()->GetNumberOfTimeSteps()>1) )
+  if( (input->GetTimeGeometry()->CountTimeSteps()==1) && (source->GetTimeGeometry()->CountTimeSteps()>1) )
   {
     Geometry3D::Pointer geometry3D = Geometry3D::New();
     geometry3D->Initialize();
@@ -79,9 +79,9 @@ void mitk::ProbeFilter::GenerateOutputInformation()
     geometry3D->SetTimeBounds(source->GetTimeGeometry()->GetGeometryForTimeStep(0)->GetTimeBounds());
 
     ProportionalTimeGeometry::Pointer outputTimeGeometry = ProportionalTimeGeometry::New();
-    outputTimeGeometry->Initialize(geometry3D, source->GetTimeGeometry()->GetNumberOfTimeSteps());
+    outputTimeGeometry->Initialize(geometry3D, source->GetTimeGeometry()->CountTimeSteps());
 
-    output->Expand(outputTimeGeometry->GetNumberOfTimeSteps());
+    output->Expand(outputTimeGeometry->CountTimeSteps());
     output->SetTimeGeometry( outputTimeGeometry );
   }
   else

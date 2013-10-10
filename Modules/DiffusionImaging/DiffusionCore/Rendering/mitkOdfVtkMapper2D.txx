@@ -634,7 +634,7 @@ bool mitk::OdfVtkMapper2D<T,N>
 {
     mitk::Image::Pointer input  = const_cast<mitk::Image*>(this->GetInput());
     const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
-    if(inputTimeGeometry==NULL || inputTimeGeometry->GetNumberOfTimeSteps()==0 || !inputTimeGeometry->IsValidTimeStep(this->GetTimestep()))
+    if(inputTimeGeometry==NULL || inputTimeGeometry->CountTimeSteps()==0 || !inputTimeGeometry->IsValidTimeStep(this->GetTimestep()))
         return false;
 
     if(this->IsPlaneRotated(renderer))

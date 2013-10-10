@@ -96,7 +96,7 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   //geometry3d->SetOrigin(center);
 
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
-  timeGeometry->Initialize(geometry3d, GetTimeGeometry()->GetNumberOfTimeSteps());
+  timeGeometry->Initialize(geometry3d, GetTimeGeometry()->CountTimeSteps());
   SetTimeGeometry(timeGeometry);
 }
 

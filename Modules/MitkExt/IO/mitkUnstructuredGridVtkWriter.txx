@@ -68,12 +68,12 @@ void UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
   vtkUnstructuredGrid * unstructuredGrid;
   Geometry3D* geometry;
 
-  if(input->GetTimeGeometry()->GetNumberOfTimeSteps()>1)
+  if(input->GetTimeGeometry()->CountTimeSteps()>1)
   {
 
     int t, timesteps;
 
-    timesteps = input->GetTimeGeometry()->GetNumberOfTimeSteps();
+    timesteps = input->GetTimeGeometry()->CountTimeSteps();
     for(t = 0; t < timesteps; ++t)
     {
       std::ostringstream filename;

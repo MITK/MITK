@@ -356,7 +356,7 @@ public:
   //## a better implementation could be over the length of the data vector.
   unsigned int GetTimeSteps() const
   {
-    return m_TimeGeometry->GetNumberOfTimeSteps();
+    return m_TimeGeometry->CountTimeSteps();
   }
 
 

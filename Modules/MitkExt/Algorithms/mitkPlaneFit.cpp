@@ -52,7 +52,7 @@ void mitk::PlaneFit::GenerateOutputInformation()
   bool update = false;
   if ( output->GetGeometry() == NULL || output->GetTimeGeometry() == NULL )
     update = true;
-  if ( ( ! update ) && ( output->GetTimeGeometry()->GetNumberOfTimeSteps() != input->GetTimeGeometry()->GetNumberOfTimeSteps() ) )
+  if ( ( ! update ) && ( output->GetTimeGeometry()->CountTimeSteps() != input->GetTimeGeometry()->CountTimeSteps() ) )
     update = true;
   if ( update )
   {

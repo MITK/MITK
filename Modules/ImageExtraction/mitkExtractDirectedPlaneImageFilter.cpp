@@ -73,7 +73,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 
   const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
   if ( ( inputTimeGeometry == NULL )
-    || ( inputTimeGeometry->GetNumberOfTimeSteps() == 0 ) )
+    || ( inputTimeGeometry->CountTimeSteps() == 0 ) )
   {
     itkWarningMacro(<<"Error reading input image geometry.");
     return;

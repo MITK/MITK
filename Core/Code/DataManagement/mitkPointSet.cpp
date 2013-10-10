@@ -696,9 +696,9 @@ void mitk::PointSet::UpdateOutputInformation()
   // the same number of geometry 3d's as PointSets are present
   //
   TimeGeometry* timeGeometry = GetTimeGeometry();
-  if ( timeGeometry->GetNumberOfTimeSteps() != m_PointSetSeries.size() )
+  if ( timeGeometry->CountTimeSteps() != m_PointSetSeries.size() )
   {
-    itkExceptionMacro(<<"timeGeometry->GetNumberOfTimeSteps() != m_PointSetSeries.size() -- use Initialize(timeSteps) with correct number of timeSteps!");
+    itkExceptionMacro(<<"timeGeometry->CountTimeSteps() != m_PointSetSeries.size() -- use Initialize(timeSteps) with correct number of timeSteps!");
   }
 
   // This is needed to detect zero objects

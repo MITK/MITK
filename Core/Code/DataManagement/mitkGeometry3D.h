@@ -624,7 +624,7 @@ typedef BoundingBoxType::Pointer                       BoundingBoxPointer;
     {
     assert(m_BoundingBox.IsNotNull());
     if (direction>=NDimensions)
-      mitkThrow() << "Direction is too big. This geometry is for " << NDimensions << " Data";
+      mitkThrow() << "Direction is too big. This geometry is for 3D Data";
     BoundsArrayType bounds = m_BoundingBox->GetBounds();
     return bounds[direction*2+1]-bounds[direction*2];
     }

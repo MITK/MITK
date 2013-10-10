@@ -413,8 +413,8 @@ void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)
 
     if (m_TimeWorldGeometry.IsNotNull())
     {
-      if (m_TimeStep >= m_TimeWorldGeometry->GetNumberOfTimeSteps())
-        m_TimeStep = m_TimeWorldGeometry->GetNumberOfTimeSteps() - 1;
+      if (m_TimeStep >= m_TimeWorldGeometry->CountTimeSteps())
+        m_TimeStep = m_TimeWorldGeometry->CountTimeSteps() - 1;
       SlicedGeometry3D* slicedWorldGeometry = dynamic_cast<SlicedGeometry3D*>(m_TimeWorldGeometry->GetGeometryForTimeStep(m_TimeStep).GetPointer());
       if (slicedWorldGeometry != NULL)
       {
@@ -465,8 +465,8 @@ void mitk::BaseRenderer::SetWorldTimeGeometry(mitk::TimeGeometry* geometry)
     m_TimeWorldGeometry = geometry;
     itkDebugMacro("setting TimeWorldGeometry to " << m_TimeWorldGeometry);
 
-    if (m_TimeStep >= m_TimeWorldGeometry->GetNumberOfTimeSteps())
-        m_TimeStep = m_TimeWorldGeometry->GetNumberOfTimeSteps() - 1;
+    if (m_TimeStep >= m_TimeWorldGeometry->CountTimeSteps())
+        m_TimeStep = m_TimeWorldGeometry->CountTimeSteps() - 1;
 
     Geometry3D* geometry3d;
     geometry3d = m_TimeWorldGeometry->GetGeometryForTimeStep(m_TimeStep);

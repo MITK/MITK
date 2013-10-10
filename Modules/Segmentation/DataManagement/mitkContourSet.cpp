@@ -86,7 +86,7 @@ void mitk::ContourSet::UpdateOutputInformation()
   geometry3d->SetBounds(boundingBox->GetBounds());
 
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
-  timeGeometry->Initialize(geometry3d,GetTimeGeometry()->GetNumberOfTimeSteps());
+  timeGeometry->Initialize(geometry3d,GetTimeGeometry()->CountTimeSteps());
   SetTimeGeometry(timeGeometry);
 
 }

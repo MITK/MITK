@@ -114,7 +114,7 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   //Test method CopyInformation()
   mitk::BaseDataTestImplementation::Pointer newBaseData =  mitk::BaseDataTestImplementation::New();
   newBaseData->CopyInformation(baseDataImpl);
-  MITK_TEST_CONDITION_REQUIRED(  newBaseData->GetTimeGeometry()->GetNumberOfTimeSteps() == 5, "Check copying of of Basedata Data Object!");
+  MITK_TEST_CONDITION_REQUIRED(  newBaseData->GetTimeGeometry()->CountTimeSteps() == 5, "Check copying of of Basedata Data Object!");
 
   MITK_TEST_END()
 }

@@ -99,7 +99,7 @@ void mitk::LabeledImageToSurfaceFilter::GenerateOutputInformation()
   //
   mitk::Image* image =  ( mitk::Image* )GetInput();
 
-  unsigned int numberOfTimeSteps = image->GetTimeGeometry()->GetNumberOfTimeSteps();
+  unsigned int numberOfTimeSteps = image->GetTimeGeometry()->CountTimeSteps();
 
   //
   // set the number of outputs to the number of labels used.

@@ -165,7 +165,7 @@ bool mitk::BaseData::IsEmpty() const
   const TimeGeometry* timeGeometry = const_cast<BaseData*>(this)->GetUpdatedTimeGeometry();
   if(timeGeometry == NULL)
     return true;
-  unsigned int timeSteps = timeGeometry->GetNumberOfTimeSteps();
+  unsigned int timeSteps = timeGeometry->CountTimeSteps();
   for ( unsigned int t = 0 ; t < timeSteps ; ++t )
   {
     if(IsEmptyTimeStep(t) == false)
@@ -208,7 +208,7 @@ void mitk::BaseData::SetOrigin(const mitk::Point3D& origin)
   assert (timeGeom != NULL);
   Geometry3D* geometry;
 
-  TimeStepType steps = timeGeom->GetNumberOfTimeSteps();
+  TimeStepType steps = timeGeom->CountTimeSteps();
   for (TimeStepType timestep = 0; timestep < steps; ++timestep)
   {
     geometry = GetGeometry(timestep);

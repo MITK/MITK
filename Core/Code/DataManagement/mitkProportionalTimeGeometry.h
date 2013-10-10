@@ -55,7 +55,7 @@ namespace mitk {
     * is also the upper bound of the time steps. The
     * minimum time steps is always 0.
     */
-    virtual TimeStepType     GetNumberOfTimeSteps() const;
+    virtual TimeStepType     CountTimeSteps() const;
     /**
     * \brief Returns the first time point for which the object is valid.
     *

@@ -214,7 +214,7 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
       {
 
         // for each timestep of this contourModel
-        for( TimeStepType currentTimestep = 0; currentTimestep < contourModel->GetTimeGeometry()->GetNumberOfTimeSteps(); ++currentTimestep)
+        for( TimeStepType currentTimestep = 0; currentTimestep < contourModel->GetTimeGeometry()->CountTimeSteps(); ++currentTimestep)
         {
 
           //get the segmentation image slice at current timestep
@@ -507,7 +507,7 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
 
 void mitk::LiveWireTool2D::FinishTool()
 {
-  TimeStepType numberOfTimesteps = m_Contour->GetTimeGeometry()->GetNumberOfTimeSteps();
+  TimeStepType numberOfTimesteps = m_Contour->GetTimeGeometry()->CountTimeSteps();
 
   //close contour in each timestep
   for( int i = 0; i <= numberOfTimesteps; i++)

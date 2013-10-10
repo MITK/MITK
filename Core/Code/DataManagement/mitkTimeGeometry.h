@@ -68,9 +68,9 @@ namespace mitk {
 
 
   public:
-    mitkClassMacro(TimeGeometry, itk::Object);
-    itkCloneMacro(Self);
-    itkCreateAnotherMacro(Self);
+    mitkClassMacro(TimeGeometry, itk::Object)
+    itkCloneMacro(Self)
+    itkCreateAnotherMacro(Self)
     /**
     * \brief Returns the number of time steps.
     *
@@ -79,7 +79,7 @@ namespace mitk {
     * is also the upper bound of the time steps. The
     * minimum time steps is always 0.
     */
-    virtual TimeStepType     GetNumberOfTimeSteps() const = 0;
+    virtual TimeStepType     CountTimeSteps() const = 0;
     /**
     * \brief Returns the first time point for which the object is valid.
     *

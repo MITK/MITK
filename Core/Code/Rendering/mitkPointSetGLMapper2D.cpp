@@ -119,7 +119,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
 
     // Get the TimeGeometry of the input object
     const TimeGeometry* inputTimeGeometry = input->GetTimeGeometry();
-    if (( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetNumberOfTimeSteps() == 0 ) )
+    if (( inputTimeGeometry == NULL ) || ( inputTimeGeometry->CountTimeSteps() == 0 ) )
     {
       return;
     }

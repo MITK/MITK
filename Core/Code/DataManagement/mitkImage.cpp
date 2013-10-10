@@ -778,7 +778,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
-  for (TimeStepType step = 0; step < timeGeometry->GetNumberOfTimeSteps(); ++step)
+  for (TimeStepType step = 0; step < timeGeometry->CountTimeSteps(); ++step)
   {
     timeGeometry->GetGeometryForTimeStep(step)->ImageGeometryOn();
   }
@@ -813,7 +813,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::TimeGeomet
   dimensions[0] = (unsigned int)(geometry.GetGeometryForTimeStep(0)->GetExtent(0)+0.5);
   dimensions[1] = (unsigned int)(geometry.GetGeometryForTimeStep(0)->GetExtent(1)+0.5);
   dimensions[2] = (unsigned int)(geometry.GetGeometryForTimeStep(0)->GetExtent(2)+0.5);
-  dimensions[3] = (tDim > 0) ? tDim : geometry.GetNumberOfTimeSteps();
+  dimensions[3] = (tDim > 0) ? tDim : geometry.CountTimeSteps();
   dimensions[4] = 0;
 
   unsigned int dimension = 2;
@@ -823,7 +823,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::TimeGeomet
     dimension = 4;
 
   Initialize( type, dimension, dimensions, channels );
-  if (geometry.GetNumberOfTimeSteps() > 1)
+  if (geometry.CountTimeSteps() > 1)
   {
     TimeGeometry::Pointer cloned = geometry.Clone();
     SetTimeGeometry(cloned.GetPointer());
@@ -1164,7 +1164,7 @@ void mitk::Image::SetGeometry(Geometry3D* aGeometry3D)
     MITK_INFO << "WARNING: Applied a non-image geometry onto an image. Please be SURE that this geometry is pixel-center-based! If it is not, you need to call Geometry3D->ChangeImageGeometryConsideringOriginOffset(true) before calling image->setGeometry(..)\n";
   }
   Superclass::SetGeometry(aGeometry3D);
-  for (TimeStepType step = 0; step < GetTimeGeometry()->GetNumberOfTimeSteps(); ++step)
+  for (TimeStepType step = 0; step < GetTimeGeometry()->CountTimeSteps(); ++step)
     GetTimeGeometry()->GetGeometryForTimeStep(step)->ImageGeometryOn();
 }
 

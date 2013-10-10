@@ -119,7 +119,7 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
   // Check if time step is valid
   const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
   if ( ( dataTimeGeometry == NULL )
-    || ( dataTimeGeometry->GetNumberOfTimeSteps() == 0 )
+    || ( dataTimeGeometry->CountTimeSteps() == 0 )
     || ( !dataTimeGeometry->IsValidTimeStep( m_TimeStep ) ) )
   {
     // TimeGeometry or time step is not valid for this data:

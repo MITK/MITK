@@ -100,7 +100,7 @@ void mitk::Surface::ClearData()
 const mitk::Surface::RegionType& mitk::Surface::GetLargestPossibleRegion() const
 {
   m_LargestPossibleRegion.SetIndex(3, 0);
-  m_LargestPossibleRegion.SetSize(3, GetTimeGeometry()->GetNumberOfTimeSteps());
+  m_LargestPossibleRegion.SetSize(3, GetTimeGeometry()->CountTimeSteps());
 
   return m_LargestPossibleRegion;
 }
@@ -194,7 +194,7 @@ void mitk::Surface::CalculateBoundingBox()
 {
   TimeGeometry* timeGeometry = this->GetTimeGeometry();
 
-  if (timeGeometry->GetNumberOfTimeSteps() != m_PolyDatas.size())
+  if (timeGeometry->CountTimeSteps() != m_PolyDatas.size())
     mitkThrow() << "Number of geometry time steps is inconsistent with number of poly data pointers.";
 
   for (unsigned int i = 0; i < m_PolyDatas.size(); ++i)

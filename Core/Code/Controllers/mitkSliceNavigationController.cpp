@@ -210,7 +210,7 @@ SliceNavigationController::Update(
 
   if( m_BlockUpdate ||
       ( m_InputWorldTimeGeometry.IsNull() && m_InputWorldGeometry3D.IsNull() ) ||
-      ( (worldTimeGeometry.IsNotNull()) && (worldTimeGeometry->GetNumberOfTimeSteps() == 0) )
+      ( (worldTimeGeometry.IsNotNull()) && (worldTimeGeometry->CountTimeSteps() == 0) )
     )
   {
     return;
@@ -325,7 +325,7 @@ SliceNavigationController::Update(
     else
     {
       m_BlockUpdate = true;
-      m_Time->SetSteps( worldTimeGeometry->GetNumberOfTimeSteps() );
+      m_Time->SetSteps( worldTimeGeometry->CountTimeSteps() );
       m_Time->SetPos( 0 );
 
       const TimeBounds &timeBounds = worldTimeGeometry->GetTimeBounds();
@@ -340,7 +340,7 @@ SliceNavigationController::Update(
 
       //@todo implement for non-evenly-timed geometry!
       m_CreatedWorldGeometry = ProportionalTimeGeometry::New();
-      dynamic_cast<ProportionalTimeGeometry *>(m_CreatedWorldGeometry.GetPointer())->Initialize(slicedWorldGeometry, worldTimeGeometry->GetNumberOfTimeSteps());
+      dynamic_cast<ProportionalTimeGeometry *>(m_CreatedWorldGeometry.GetPointer())->Initialize(slicedWorldGeometry, worldTimeGeometry->CountTimeSteps());
     }
   }
 

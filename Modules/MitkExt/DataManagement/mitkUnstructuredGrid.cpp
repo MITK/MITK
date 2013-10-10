@@ -139,9 +139,9 @@ void mitk::UnstructuredGrid::CalculateBoundingBox()
   // the same number of geometry 3d's as vtkUnstructuredGrids are present
   //
   TimeGeometry* timeGeometry = GetTimeGeometry();
-  if ( timeGeometry->GetNumberOfTimeSteps() != m_GridSeries.size() )
+  if ( timeGeometry->CountTimeSteps() != m_GridSeries.size() )
   {
-    itkExceptionMacro(<<"timeGeometry->GetNumberOfTimeSteps() != m_GridSeries.size() -- use Initialize(timeSteps) with correct number of timeSteps!");
+    itkExceptionMacro(<<"timeGeometry->CountTimeSteps() != m_GridSeries.size() -- use Initialize(timeSteps) with correct number of timeSteps!");
   }
 
   //

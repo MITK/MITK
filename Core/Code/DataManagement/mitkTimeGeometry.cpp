@@ -113,8 +113,8 @@ void mitk::TimeGeometry::UpdateBoundingBox ()
   unsigned long currentModifiedTime = 0;
 
   ContainerType::Pointer points = ContainerType::New();
-  points->reserve(2*GetNumberOfTimeSteps());
-  for (TimeStepType step = 0; step <GetNumberOfTimeSteps(); ++step)
+  points->reserve(2*CountTimeSteps());
+  for (TimeStepType step = 0; step <CountTimeSteps(); ++step)
   {
     currentModifiedTime = GetGeometryForTimeStep(step)->GetMTime();
     if (currentModifiedTime > lastModifiedTime)
@@ -148,7 +148,7 @@ void mitk::TimeGeometry::Update()
 
 void mitk::TimeGeometry::ExecuteOperation(mitk::Operation* op)
 {
-  for (TimeStepType step = 0; step < GetNumberOfTimeSteps(); ++step)
+  for (TimeStepType step = 0; step < CountTimeSteps(); ++step)
   {
     GetGeometryForTimeStep(step)->ExecuteOperation(op);
   }
@@ -157,7 +157,7 @@ void mitk::TimeGeometry::ExecuteOperation(mitk::Operation* op)
 void mitk::TimeGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
   //Superclass::PrintSelf(os,indent);
-  os << indent << " TimeSteps: " << this->GetNumberOfTimeSteps() << std::endl;
+  os << indent << " TimeSteps: " << this->CountTimeSteps() << std::endl;
 
   os << std::endl;
   os << indent << " GetGeometryForTimeStep(0): ";

@@ -50,7 +50,7 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateOutputInformation()
   if ( input.IsNull() )
     itkGenericExceptionMacro ( "Input point set is NULL!" );
 
-  if ( input->GetTimeGeometry()->GetNumberOfTimeSteps() != 1 )
+  if ( input->GetTimeGeometry()->CountTimeSteps() != 1 )
     itkWarningMacro ( "More than one time step is not yet supported!" );
 
   if ( output.IsNull() )
@@ -62,7 +62,7 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateOutputInformation()
   bool update = false;
   if ( output->GetGeometry() == NULL || output->GetGeometry2D() == NULL || output->GetTimeGeometry() == NULL )
     update = true;
-  if ( ( ! update ) && ( output->GetTimeGeometry()->GetNumberOfTimeSteps() != input->GetTimeGeometry()->GetNumberOfTimeSteps() ) )
+  if ( ( ! update ) && ( output->GetTimeGeometry()->CountTimeSteps() != input->GetTimeGeometry()->CountTimeSteps() ) )
     update = true;
   if ( update )
   {

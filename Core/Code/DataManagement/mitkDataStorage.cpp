@@ -315,7 +315,7 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const 
           // time bounds
           // iterate over all time steps
           // Attention: Objects with zero bounding box are not respected in time bound calculation
-          for (TimeStepType i=0; i<timeGeometry->GetNumberOfTimeSteps(); i++)
+          for (TimeStepType i=0; i<timeGeometry->CountTimeSteps(); i++)
           {
             Vector3D spacing = node->GetData()->GetGeometry(i)->GetSpacing();
             for (int axis = 0; axis < 3; ++ axis)

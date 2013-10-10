@@ -115,8 +115,8 @@ void mitk::SurfaceGLMapper2D::SetDataNode( mitk::DataNode* node )
     Surface::Pointer input  = const_cast< Surface* >(dynamic_cast<const Surface*>( this->GetDataNode()->GetData() ));
     if(input.IsNull()) return;
     const TimeGeometry::Pointer inputTimeGeometry = input->GetTimeGeometry();
-    if(( inputTimeGeometry.IsNull() ) || ( inputTimeGeometry->GetNumberOfTimeSteps() == 0 ) ) return;
-    for (unsigned int timestep=0; timestep<inputTimeGeometry->GetNumberOfTimeSteps(); timestep++)
+    if(( inputTimeGeometry.IsNull() ) || ( inputTimeGeometry->CountTimeSteps() == 0 ) ) return;
+    for (unsigned int timestep=0; timestep<inputTimeGeometry->CountTimeSteps(); timestep++)
     {
       vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
       if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 )) continue;
@@ -156,7 +156,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   // get the TimeGeometry of the input object
   //
   const TimeGeometry* inputTimeGeometry = input->GetTimeGeometry();
-  if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetNumberOfTimeSteps() == 0 ) )
+  if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->CountTimeSteps() == 0 ) )
     return;
 
   if (dynamic_cast<IntProperty *>(this->GetDataNode()->GetProperty("line width")) == NULL)

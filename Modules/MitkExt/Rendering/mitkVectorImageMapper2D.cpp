@@ -509,7 +509,7 @@ int mitk::VectorImageMapper2D::GetCurrentTimeStep( mitk::BaseData* data, mitk::B
   // get the TimeGeometry of the input object
   //
   const TimeGeometry * dataTimeGeometry = data->GetUpdatedTimeGeometry();
-  if ( ( dataTimeGeometry == NULL ) || ( dataTimeGeometry->GetNumberOfTimeSteps() == 0 ) )
+  if ( ( dataTimeGeometry == NULL ) || ( dataTimeGeometry->CountTimeSteps() == 0 ) )
   {
     itkWarningMacro( << "The given object is missing a mitk::TimeGeometry, or the number of time steps is 0!" );
     return 0;

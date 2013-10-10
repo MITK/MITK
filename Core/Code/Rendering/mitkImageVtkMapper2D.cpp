@@ -723,7 +723,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   }
 
   bool isBinaryImage(false);
-  if ( !node->GetBoolProperty("binary", isBinaryImage) && overwrite )
+  if ( ! node->GetBoolProperty("binary", isBinaryImage) )
   {
     // ok, property is not set, use heuristic to determine if this
     // is a binary image

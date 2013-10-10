@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
 #include <mitkTimeSlicedGeometry.h>
-//#include <mitkPixelType.h>
 #include <mitkColormapProperty.h>
 #include <mitkPlaneClipping.h>
 #include <mitkLabelSetImage.h>
@@ -333,7 +332,7 @@ void mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, 
   levWinProp->SetLevelWindow( levelwindow );
   node->AddProperty( "levelwindow", levWinProp, renderer, overwrite );
 
-  Superclass::SetDefaultProperties(node, renderer, false);
+  Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
 vtkSmartPointer<vtkPolyData> mitk::LabelSetImageVtkMapper2D::CreateOutlinePolyData(mitk::BaseRenderer* renderer )

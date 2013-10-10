@@ -37,6 +37,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCropImageFilter.h>
 #include <mitkAstroStickModel.h>
 #include <vtkTransform.h>
+#include <iostream>
+#include <fstream>
 
 namespace itk
 {
@@ -73,7 +75,6 @@ TractsToDWIImageFilter< PixelType >::TractsToDWIImageFilter()
 
     m_MaxTranslation.Fill(0.0);
     m_MaxRotation.Fill(0.0);
-    m_MaskSurface = vtkSmartPointer<vtkPolyData>::New();
 }
 
 template< class PixelType >
@@ -235,7 +236,6 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                     pix3D[g] = newSlice->GetPixel(index2D);
                     newImage->SetPixel(index3D, pix3D);
                 }
-
             ++disp;
         }
     }
@@ -428,6 +428,10 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     }
     maxVolume = 0;
 
+    ofstream logFile;
+    logFile.open("/local/fiberfox.log");
+    logFile << "0,0,0,0\n";
+
     for (unsigned int i=0; i<m_NonFiberModels.size(); i++)
         if (dynamic_cast< mitk::AstroStickModel<double>* >(m_NonFiberModels.at(i)))
         {
@@ -435,7 +439,9 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             model->SetSeed(8111984);
         }
 
+    // TEMP
     //vtkTransform* transform; transform->RotateX();
+    FiberBundleType fiberBundleBackup = fiberBundle->GetDeepCopy();
 
     for (int g=0; g<m_FiberModels.at(0)->GetNumGradients(); g++)
     {
@@ -471,6 +477,9 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                     dir = GetItkVector(points->GetPoint(j+1))-v;
                 else
                     dir = v-GetItkVector(points->GetPoint(j-1));
+
+                if (dir.GetSquaredNorm()<0.0001)
+                    continue;
 
                 itk::Index<3> idx;
                 itk::ContinuousIndex<float, 3> contIndex;
@@ -662,10 +671,31 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 //            tfilter->Update();
 //            fib->SetFiberPolyData(tfilter->GetOutput());
 
-            fiberBundle->RotateAroundAxis(m_MaxRotation[0]/m_FiberModels.at(0)->GetNumGradients(), m_MaxRotation[1]/m_FiberModels.at(0)->GetNumGradients(), m_MaxRotation[2]/m_FiberModels.at(0)->GetNumGradients());
-            fiberBundle->TranslateFibers(m_MaxTranslation[0]/m_FiberModels.at(0)->GetNumGradients(),m_MaxTranslation[1]/m_FiberModels.at(0)->GetNumGradients(),m_MaxTranslation[2]/m_FiberModels.at(0)->GetNumGradients());
+            //MITK_INFO << "Rotating: " << m_MaxRotation[0]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxRotation[1]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxRotation[2]/m_FiberModels.at(0)->GetNumGradients();
+            //fiberBundle->RotateAroundAxis(m_MaxRotation[0]/m_FiberModels.at(0)->GetNumGradients(), m_MaxRotation[1]/m_FiberModels.at(0)->GetNumGradients(), m_MaxRotation[2]/m_FiberModels.at(0)->GetNumGradients());
+
+//            MITK_INFO << "Translating: " << m_MaxTranslation[0]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxTranslation[1]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxTranslation[2]/m_FiberModels.at(0)->GetNumGradients();
+//            fiberBundle->TranslateFibers(m_MaxTranslation[0]/m_FiberModels.at(0)->GetNumGradients(),m_MaxTranslation[1]/m_FiberModels.at(0)->GetNumGradients(),m_MaxTranslation[2]/m_FiberModels.at(0)->GetNumGradients());
+
+            itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer rGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+            rGen->SetSeed();
+            fiberBundle = fiberBundleBackup->GetDeepCopy();
+
+            double transX = (double)rGen->GetIntegerVariate(10)-5;
+            double transY = (double)rGen->GetIntegerVariate(10)-5;
+            double transZ = (double)rGen->GetIntegerVariate(10)-5;
+            transX *= 1.25;
+            transY *= 1.25;
+            transZ *= 1.25;
+
+            fiberBundle->TranslateFibers(transX, transY, transZ);
+            logFile << g+1 << "," << transX << "," << transY << "," << transZ << "\n";
+
+
+            //fiberBundle->TranslateFibers(rGen->GetVariateWithClosedRange(12.5)-6.25, rGen->GetVariateWithClosedRange(12.5)-6.25, rGen->GetVariateWithClosedRange(12.5)-6.25);
         }
     }
+    logFile.close();
 
     // do k-space stuff
     DoubleDwiType::Pointer doubleOutImage;

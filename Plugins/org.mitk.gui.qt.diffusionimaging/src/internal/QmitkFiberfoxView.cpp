@@ -1504,8 +1504,7 @@ void QmitkFiberfoxView::GenerateImage()
         tractsToDwiFilter->SetSignalScale(m_ImageGenParameters.signalScale);
         if (m_ImageGenParameters.interpolationShrink>0)
             tractsToDwiFilter->SetUseInterpolation(true);
-        if (m_ImageGenParameters.maskSurface)
-            tractsToDwiFilter->SetMaskSurface(m_ImageGenParameters.maskSurface);
+        tractsToDwiFilter->SetTissueMask(m_ImageGenParameters.maskImage);
         tractsToDwiFilter->SetFrequencyMap(m_ImageGenParameters.frequencyMap);
         tractsToDwiFilter->SetSpikeAmplitude(m_ImageGenParameters.spikeAmplitude);
         tractsToDwiFilter->SetSpikes(m_ImageGenParameters.spikes);
@@ -1854,7 +1853,7 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
     m_SelectedImages.clear();
     m_SelectedFiducials.clear();
     m_SelectedFiducial = NULL;
-    m_ImageGenParameters.maskSurface = NULL;
+    m_ImageGenParameters.maskImage = NULL;
     m_SelectedBundles.clear();
     m_SelectedImage = NULL;
     m_SelectedDWI = NULL;
@@ -1875,12 +1874,14 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
         {
             m_SelectedImages.push_back(node);
             m_SelectedImage = node;
-        }
-        else if( node.IsNotNull() && dynamic_cast<mitk::Surface*>(node->GetData()) )
-        {
-            mitk::Surface::Pointer surf = dynamic_cast<mitk::Surface*>(node->GetData());
-            m_ImageGenParameters.maskSurface = surf->GetVtkPolyData();
-            m_Controls->m_TissueMaskLabel->setText(node->GetName().c_str());
+            mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+            bool isbinary = false;
+            node->GetPropertyValue<bool>("binary", isbinary);
+            if (isbinary)
+            {
+                mitk::CastToItkImage<ItkUcharImgType>(image, m_ImageGenParameters.maskImage);
+                m_Controls->m_TissueMaskLabel->setText(node->GetName().c_str());
+            }
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
         {

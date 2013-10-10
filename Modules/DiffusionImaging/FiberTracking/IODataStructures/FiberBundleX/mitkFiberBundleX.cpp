@@ -1235,7 +1235,6 @@ void mitk::FiberBundleX::SetColorCoding(const char* requestedColorCoding)
 
 void mitk::FiberBundleX::RotateAroundAxis(double x, double y, double z)
 {
-    MITK_INFO << "rotate " << z;
     x = x*M_PI/180;
     y = y*M_PI/180;
     z = z*M_PI/180;

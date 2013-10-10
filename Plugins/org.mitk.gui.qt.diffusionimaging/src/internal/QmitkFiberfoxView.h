@@ -184,7 +184,7 @@ protected:
         QString signalModelString, artifactModelString;
 
         ItkDoubleImgType::Pointer           frequencyMap;
-        vtkPolyData*                        maskSurface;
+        ItkUcharImgType::Pointer            maskImage;
 
         mitk::DataNode::Pointer             resultNode;
     };

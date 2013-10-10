@@ -142,6 +142,7 @@ void QmitkLabelSetWidget::SetPreferences( berry::IPreferences::Pointer prefs )
 
 void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
 {
+  /*
   mitk::DataNode* workingNode = this->m_ToolManager->GetWorkingData(0);
   bool enabled = workingNode != NULL;
 
@@ -155,6 +156,8 @@ void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
   m_Controls.m_btNextLayer->setEnabled(enabled);
   m_Controls.m_btDeleteSegmentation->setEnabled(enabled);
   m_Controls.m_btImportSegmentation->setEnabled(enabled);
+  */
+  this->UpdateControls();
 }
 
 void QmitkLabelSetWidget::OnSearchLabel()
@@ -318,8 +321,8 @@ void QmitkLabelSetWidget::OnDeleteLayer()
     return;
   }
 
-  this->UpdateControls();
   m_Controls.m_LabelSetTableWidget->Reset();
+  this->UpdateControls();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -361,10 +364,22 @@ void QmitkLabelSetWidget::OnAddLayer()
 
 void QmitkLabelSetWidget::UpdateControls()
 {
-  m_ToolManager->ActivateTool(-1);
-
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
+  bool enabled = workingNode != NULL;
+
+  m_Controls.m_LabelSetTableWidget->setEnabled(enabled);
+  m_Controls.m_LabelSearchBox->setEnabled(enabled);
+  m_Controls.m_btSaveSegmentation->setEnabled(enabled);
+  m_Controls.m_btNewLabel->setEnabled(enabled);
+  m_Controls.m_btAddLayer->setEnabled(enabled);
+  m_Controls.m_btDeleteLayer->setEnabled(enabled);
+  m_Controls.m_btPreviousLayer->setEnabled(enabled);
+  m_Controls.m_btNextLayer->setEnabled(enabled);
+  m_Controls.m_btDeleteSegmentation->setEnabled(enabled);
+  m_Controls.m_btImportSegmentation->setEnabled(enabled);
+
+ // mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  if (!workingNode) return;
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
   assert(workingImage);
@@ -786,7 +801,7 @@ void QmitkLabelSetWidget::OnNewSegmentation()
 
   m_DataStorage->Add(newNode,referenceNode);
 
-  this->UpdateControls();
+  //this->UpdateControls();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 

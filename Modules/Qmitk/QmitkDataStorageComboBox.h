@@ -140,7 +140,10 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     virtual void OnDataNodeDeleteOrModified(const itk::Object *caller, const itk::EventObject &event);
 
-
+    ///
+    /// \brief Reset function whenever datastorage or predicate changes.
+    ///
+    virtual void Reset();
 
   signals:
     ///
@@ -187,10 +190,6 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     void Init();
 
-    ///
-    /// \brief Reset function whenever datastorage or predicate changes.
-    ///
-    virtual void Reset();
 
   protected:
     //#PROTECTED MEMBER VARS

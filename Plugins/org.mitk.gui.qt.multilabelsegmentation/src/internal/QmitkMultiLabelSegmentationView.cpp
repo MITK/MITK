@@ -120,8 +120,6 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_cbReferenceNodeSelector->SetPredicate(m_ReferencePredicate);
   m_Controls.m_cbReferenceNodeSelector->SetAutoSelectNewItems(true);
 
-  //m_SegmentationDataStorage = mitk::StandaloneDataStorage::New();
-
   m_Controls.m_cbWorkingNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.m_cbWorkingNodeSelector->SetPredicate(m_SegmentationPredicate);
   m_Controls.m_cbWorkingNodeSelector->SetAutoSelectNewItems(true);
@@ -305,20 +303,21 @@ void QmitkMultiLabelSegmentationView::NodeRemoved(const mitk::DataNode* node)
 
 void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::DataNode* node )
 {
+   m_ToolManager->ActivateTool(-1);
+
   if (m_ReferenceNode.IsNotNull())
   {
-    mitk::DataStorage::SetOfObjects::ConstPointer previousNodes = this->GetDataStorage()->GetDerivations(m_ReferenceNode, m_SegmentationPredicate);
-    for(mitk::DataStorage::SetOfObjects::const_iterator iter = previousNodes->begin(); iter != previousNodes->end(); ++iter)
+    mitk::DataStorage::SetOfObjects::ConstPointer segNodes = this->GetDataStorage()->GetDerivations(m_ReferenceNode);
+    for(mitk::DataStorage::SetOfObjects::const_iterator iter = segNodes->begin(); iter != segNodes->end(); ++iter)
     {
-      mitk::DataNode* _prevNode = *iter;
-      _prevNode->SetVisibility(false);
+      mitk::DataNode* _segNode = *iter;
+      _segNode->SetVisibility(false);
     }
     m_ReferenceNode->SetVisibility(false);
   }
 
   m_ReferenceNode = const_cast<mitk::DataNode*>(node);
 
-  m_ToolManager->ActivateTool(-1);
   m_ToolManager->SetReferenceData(m_ReferenceNode);
 
   m_Controls.m_LabelSetWidget->setEnabled(m_ReferenceNode.IsNotNull());
@@ -326,34 +325,19 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
   if( m_ReferenceNode.IsNotNull() )
   {
     m_ReferenceNode->SetVisibility(true);
-/*
-    mitk::DataStorage::SetOfObjects::ConstPointer others = this->GetDataStorage()->GetSubset(m_ReferenceNode);
-    for(mitk::DataStorage::SetOfObjects::const_iterator iter = others->begin(); iter != others->end(); ++iter)
-    {
-      mitk::DataNode* _other = *iter;
-      if (_other != m_ReferenceNode)
-      {
-        _other->SetVisibility(false);
-        mitk::DataStorage::SetOfObjects::ConstPointer derivedNodes = this->GetDataStorage()->GetDerivations(_other, m_SegmentationPredicate);
-        for(mitk::DataStorage::SetOfObjects::const_iterator iter2 = derivedNodes->begin(); iter2 != derivedNodes->end(); ++iter2)
-        {
-          mitk::DataNode* _derivedNode = *iter2;
-          _derivedNode->SetVisibility(false);
-        }
-      }
-    }
-*/
 
-    mitk::DataStorage::SetOfObjects::ConstPointer newNodes = this->GetDataStorage()->GetDerivations(m_ReferenceNode, m_SegmentationPredicate);
-    for(mitk::DataStorage::SetOfObjects::const_iterator iter = newNodes->begin(); iter != newNodes->end(); ++iter)
+    mitk::DataStorage::SetOfObjects::ConstPointer segNodes = this->GetDataStorage()->GetDerivations(m_ReferenceNode);
+    for(mitk::DataStorage::SetOfObjects::const_iterator iter = segNodes->begin(); iter != segNodes->end(); ++iter)
     {
-      mitk::DataNode* _newNode = *iter;
-      if (_newNode)
+      mitk::DataNode* _segNode = *iter;
+      if (_segNode)
       {
-        _newNode->SetVisibility(true);
-        _newNode->Modified();
+        _segNode->SetVisibility(true);
+        _segNode->Modified();
       }
     }
+
+    m_Controls.m_cbWorkingNodeSelector->Reset();
   }
 
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
@@ -372,26 +356,25 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
 
   m_ToolManager->SetWorkingData(m_WorkingNode);
 
-  int layer(0);
-  m_ReferenceNode->GetIntProperty("layer", layer);
-  int othersLayer = layer+1;
-
-  mitk::DataStorage::SetOfObjects::ConstPointer otherNodes = this->GetDataStorage()->GetDerivations(m_ReferenceNode, m_SegmentationPredicate);
-  for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherNodes->begin(); iter != otherNodes->end(); ++iter)
-  {
-    mitk::DataNode* _otherNode = *iter;
-    if (_otherNode != m_WorkingNode)
-    {
-      _otherNode->SetIntProperty("layer", othersLayer);
-      othersLayer++;
-    }
-  }
-
-  //finally, set the layer to the current working node
-  m_WorkingNode->SetIntProperty("layer", othersLayer);
-
   if ( m_WorkingNode.IsNotNull() )
   {
+    int layer(0);
+    m_ReferenceNode->GetIntProperty("layer", layer);
+    int othersLayer = layer+1;
+
+    mitk::DataStorage::SetOfObjects::ConstPointer otherNodes = this->GetDataStorage()->GetDerivations(m_ReferenceNode, m_SegmentationPredicate);
+    for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherNodes->begin(); iter != otherNodes->end(); ++iter)
+    {
+      mitk::DataNode* _otherNode = *iter;
+      if (_otherNode != m_WorkingNode)
+      {
+      _otherNode->SetIntProperty("layer", othersLayer);
+      othersLayer++;
+      }
+    }
+
+    //finally, set the layer to the current working node
+    m_WorkingNode->SetIntProperty("layer", othersLayer);
     m_Controls.m_SlicesInterpolator->setEnabled(true);
   }
   else
@@ -567,9 +550,9 @@ void QmitkMultiLabelSegmentationView::OnSurfaceStamp()
    return;
   }
 
-  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>( m_WorkingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( m_WorkingNode->GetData() );
 
-  if (!lsImage)
+  if (!workingImage)
   {
     QMessageBox::information( m_Parent, "Surface Stamp", "Please load and select a segmentation before starting some action.");
     return;
@@ -579,7 +562,7 @@ void QmitkMultiLabelSegmentationView::OnSurfaceStamp()
 
   try
   {
-    lsImage->SurfaceStamp( surface, m_Controls.m_chkSurfaceStampOverwrite->isChecked() );
+    workingImage->SurfaceStamp( surface, m_Controls.m_chkSurfaceStampOverwrite->isChecked() );
   }
   catch ( mitk::Exception & e )
   {

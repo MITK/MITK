@@ -198,6 +198,10 @@ QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
       s->RemovePostSelectionListener(m_SelListener);
     m_SelListener = NULL;
   }
+
+  this->GetDataStorage()->RemoveNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkRigidRegistrationView,
+    const mitk::DataNode*> ( this, &QmitkRigidRegistrationView::DataNodeHasBeenRemoved ));
+
 }
 
 void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)

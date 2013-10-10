@@ -8,6 +8,8 @@ set(INTERNAL_CPP_FILES
   QmitkThresholdAction.cpp
   QmitkCreatePolygonModelAction.cpp
   QmitkAutocropAction.cpp
+  QmitkConvertSurfaceToLabelAction.cpp
+  QmitkConvertMaskToLabelAction.cpp
   QmitkConvertToMultiLabelSegmentationAction.cpp
   QmitkCreateMultiLabelSegmentationAction.cpp
   Common/QmitkLabelSetTableWidget.cpp
@@ -39,6 +41,8 @@ set(MOC_H_FILES
   src/internal/QmitkThresholdAction.h
   src/internal/QmitkCreatePolygonModelAction.h
   src/internal/QmitkAutocropAction.h
+  src/internal/QmitkConvertSurfaceToLabelAction.h
+  src/internal/QmitkConvertMaskToLabelAction.h
   src/internal/QmitkConvertToMultiLabelSegmentationAction.h
   src/internal/QmitkCreateMultiLabelSegmentationAction.h
   src/internal/Common/QmitkLabelSetTableWidget.h

@@ -176,7 +176,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   //clipping bounds for cutting the image
   localStorage->m_LevelWindowFilter->SetClippingBounds(textureClippingBounds);
 
-  float contourWidth(2.5);
+  float contourWidth(2.0);
   node->GetFloatProperty( "labelset.contour.width", contourWidth, renderer );
 
   localStorage->m_OutlineActor->GetProperty()->SetLineWidth( contourWidth );
@@ -307,7 +307,7 @@ void mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, 
   assert(image);
 
   // add/replace the following properties
-  node->SetProperty( "opacity", FloatProperty::New(0.9f), renderer );
+  node->SetProperty( "opacity", FloatProperty::New(1.0f), renderer );
   node->SetProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer );
   node->SetProperty( "binary", BoolProperty::New( false ), renderer );
 
@@ -326,7 +326,7 @@ void mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, 
 
   node->SetProperty( "labelset.contour.all", BoolProperty::New( false ), renderer );
   node->SetProperty( "labelset.contour.active", BoolProperty::New( true ), renderer );
-  node->SetProperty( "labelset.contour.width", FloatProperty::New( 2.5 ), renderer );
+  node->SetProperty( "labelset.contour.width", FloatProperty::New( 2.0 ), renderer );
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

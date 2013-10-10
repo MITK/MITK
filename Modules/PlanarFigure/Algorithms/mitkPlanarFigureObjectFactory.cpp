@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigureWriterFactory.h"
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarFigureMapper2D.h"
+#include "mitkPlanarFigureVtkMapper3D.h"
 
 typedef std::multimap<std::string, std::string> MultimapType;
 
@@ -57,16 +58,18 @@ mitk::Mapper::Pointer mitk::PlanarFigureObjectFactory::CreateMapper(mitk::DataNo
   mitk::Mapper::Pointer newMapper=NULL;
   mitk::BaseData *data = node->GetData();
 
-  if ( id == mitk::BaseRenderer::Standard2D )
+  if ( dynamic_cast<PlanarFigure*>(data) != NULL )
   {
-    if ( dynamic_cast<PlanarFigure*>(data) != NULL )
+    if ( id == mitk::BaseRenderer::Standard2D )
     {
       newMapper = mitk::PlanarFigureMapper2D::New();
       newMapper->SetDataNode(node);
     }
-  }
-  else if ( id == mitk::BaseRenderer::Standard3D )
-  {
+    else if ( id == mitk::BaseRenderer::Standard3D )
+    {
+      newMapper = mitk::PlanarFigureVtkMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
   }
 
   return newMapper;
@@ -88,6 +91,7 @@ void mitk::PlanarFigureObjectFactory::SetDefaultProperties(mitk::DataNode* node)
     mitk::PlanarFigureMapper2D::SetDefaultProperties(node);
     node->AddProperty( "color", mitk::ColorProperty::New(1.0,1.0,1.0), NULL, true );
     node->AddProperty( "opacity", mitk::FloatProperty::New(0.8), NULL, true );
+    node->AddProperty( "planarfigure.3drendering", mitk::BoolProperty::New(false), NULL, true );
   }
 }
 

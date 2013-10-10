@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
-
+#include <mitkStandaloneDataStorage.h>
 
 #include "ui_QmitkMultiLabelSegmentationControls.h"
 
@@ -114,7 +114,7 @@ protected:
 
   bool m_DataSelectionChanged;
 
-  mitk::DataStorage::Pointer m_SegmentationDataStorage;
+  //mitk::StandaloneDataStorage::Pointer m_SegmentationDataStorage;
   mitk::NodePredicateAnd::Pointer m_ReferencePredicate;
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
   mitk::NodePredicateAnd::Pointer m_SurfacePredicate;

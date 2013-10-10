@@ -837,9 +837,14 @@ mitk::ImageVtkMapper2D::LocalStorage* mitk::ImageVtkMapper2D::GetLocalStorage(mi
   return m_LSH.GetLocalStorage(renderer);
 }
 
-vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk::BaseRenderer* renderer )
+vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk::BaseRenderer* renderer, int pixelValue )
 {
   LocalStorage* localStorage = this->GetLocalStorage(renderer);
+
+  const DataNode *node = this->GetDataNode();
+  assert(node);
+  mitk::Image *image = dynamic_cast< mitk::Image* >( node->GetData() );
+  assert( image && image->IsInitialized() );
 
   //get the min and max index values of each direction
   int* extent = localStorage->m_ReslicedImage->GetExtent();
@@ -852,29 +857,28 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
   int line = dims[0]; //how many pixels per line?
   int x = xMin; //pixel index x
   int y = yMin; //pixel index y
-  char* currentPixel;
 
 
   //get the depth for each contour
-  float depth = CalculateLayerDepth(renderer);
+  float depth = this->CalculateLayerDepth(renderer);
 
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New(); //the points to draw
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
 
   // We take the pointer to the first pixel of the image
-  currentPixel = static_cast<char*>(localStorage->m_ReslicedImage->GetScalarPointer() );
+  unsigned char* currentPixel = static_cast< unsigned char* >( localStorage->m_ReslicedImage->GetScalarPointer() );
 
   while (y <= yMax)
   {
     //if the current pixel value is set to something
-    if ((currentPixel) && (*currentPixel != 0))
+    if ((currentPixel) && (*currentPixel == pixelValue))
     {
       //check in which direction a line is necessary
       //a line is added if the neighbor of the current pixel has the value 0
       //and if the pixel is located at the edge of the image
 
       //if   vvvvv  not the first line vvvvv
-      if (y > yMin && *(currentPixel-line) == 0)
+      if (y > yMin && *(currentPixel-line) != pixelValue)
       { //x direction - bottom edge of the pixel
         //add the 2 points
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
@@ -886,7 +890,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
       //if   vvvvv  not the last line vvvvv
-      if (y < yMax && *(currentPixel+line) == 0)
+      if (y < yMax && *(currentPixel+line) != pixelValue)
       { //x direction - top edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
@@ -896,7 +900,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
       //if   vvvvv  not the first pixel vvvvv
-      if ( (x > xMin || y > yMin) && *(currentPixel-1) == 0)
+      if ( (x > xMin || y > yMin) && *(currentPixel-1) != pixelValue)
       { //y direction - left edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
@@ -906,7 +910,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
       //if   vvvvv  not the last pixel vvvvv
-      if ( (y < yMax || (x < xMax) ) && *(currentPixel+1) == 0)
+      if ( (y < yMax || (x < xMax) ) && *(currentPixel+1) != pixelValue)
       { //y direction - right edge of the pixel
         vtkIdType p1 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);

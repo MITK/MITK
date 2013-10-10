@@ -240,7 +240,7 @@ protected:
       \param renderer: Pointer to the renderer containing the needed information
       \note This code is based on code from the iil library.
       */
-  vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer* renderer);
+  vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer* renderer, int pixelValue = 1);
 
   /** Default constructor */
   ImageVtkMapper2D();

@@ -80,13 +80,13 @@ void PointSetDifferenceStatisticsCalculator_TwoSimplePointSetsOfSizeTwo_ResultsI
 m_myPointSetDifferenceStatisticsCalculator->SetPointSets( m_myTestPointSet1, m_myTestPointSet2);
 
   MITK_TEST_CONDITION_REQUIRED((m_myPointSetDifferenceStatisticsCalculator->GetNumberOfPoints()==m_myTestPointSet1->GetSize()),".. Testing GetNumberOfPoints");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMean(),mean),".. Testing GetMean");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetSD(),sd),".. Testing GetSD");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetVariance(),variance),".. Testing GetVariance");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetRMS(),rms),".. Testing GetRMS");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMin(),min),".. Testing GetMin");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMax(),max),".. Testing GetMax");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMedian(),median),".. Testing GetMedian");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMean(),mean, 1E-5),".. Testing GetMean");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetSD(),sd,1E-6),".. Testing GetSD");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetVariance(),variance,1E-4),".. Testing GetVariance");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetRMS(),rms,1E-5),".. Testing GetRMS");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMin(),min,1E-6),".. Testing GetMin");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMax(),max,1E-5),".. Testing GetMax");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMedian(),median,1E-5),".. Testing GetMedian");
 }
 
 void PointSetDifferenceStatisticsCalculator_PointSetsOfSameSizeWithDifferentPointIDs_ResultsInGroundTruth()

@@ -79,6 +79,11 @@ void mitk::PlanarFigureVtkMapper3D::ApplyPlanarFigureProperties(BaseRenderer* re
   if (dataNode == NULL)
     return;
 
+  bool render = false;
+  dataNode->GetBoolProperty("planarfigure.3drendering", render);
+
+  actor->SetVisibility(render);
+
   float lineWidth = 1.0f;
   dataNode->GetFloatProperty("planarfigure.line.width", lineWidth, renderer);
 

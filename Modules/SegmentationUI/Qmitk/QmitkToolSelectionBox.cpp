@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkModuleResource.h"
 #include "mitkModuleResourceStream.h"
+#include "mitkLabelSetImage.h"
 
 #include "mitkToolManagerProvider.h"
 
@@ -295,6 +296,14 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 {
   mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  int hasLabels = false;
+  if (workingNode)
+  {
+    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
+    assert(workingImage);
+    int activeLayer = workingImage->GetActiveLayer();
+    hasLabels = workingImage->GetNumberOfLabels(activeLayer) > 1;
+  }
 
   //MITK_DEBUG << this->name() << ": SetGUIEnabledAccordingToToolManagerState: referenceNode " << (void*)referenceNode << " workingNode " << (void*)workingNode << " isVisible() " << isVisible();
 
@@ -304,7 +313,7 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
   {
     default:
     case EnabledWithReferenceAndWorkingData:
-      enabled = referenceNode && workingNode && isVisible();
+      enabled = referenceNode && workingNode && isVisible();// && hasLabels;
       break;
     case EnabledWithReferenceData:
       enabled = referenceNode && isVisible();

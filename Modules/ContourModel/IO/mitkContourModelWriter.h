@@ -211,7 +211,7 @@ protected:
     * @param geometry the TimeGeometry of the contour.
     * @param the stream to write to.
     *
-    * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+    * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
     */
     DEPRECATED(void WriteGeometryInformation( mitk::TimeSlicedGeometry* geometry, std::ofstream& out ));
 

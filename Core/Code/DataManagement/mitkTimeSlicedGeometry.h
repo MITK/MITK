@@ -6,17 +6,12 @@
 namespace mitk
 {
   /**
-  * \deprecatedSince{2013_06} Please use TimeGeometry instead. For more information see @TimeGeometryGuide@
+  * \deprecatedSince{2013_09} Please use TimeGeometry instead. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
   */
   class TimeSlicedGeometry{
       DEPRECATED(TimeSlicedGeometry());
   };
-
-  //DEPRECATED( class TimeSlicedGeometry{};);
 }
 
-/*
-  * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
-  */
 #endif
 

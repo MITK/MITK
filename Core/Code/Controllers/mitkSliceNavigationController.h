@@ -204,11 +204,11 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
      *
      * Any previous previous set input geometry (3D or Time) will
      * be ignored in future.
-     * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+     * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
      */
     DEPRECATED(void SetInputWorldGeometry(const mitk::TimeSlicedGeometry* geometry));
     /**
-     * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+     * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
      */
     DEPRECATED(TimeSlicedGeometry* GetInputWorldGeometry());
 
@@ -344,7 +344,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     };
 
    /**
-   * \deprecatedSince{2013_06} Please use TimeGeometryEvent instead: For additional information see  @TimeGeometryGuide@
+   * \deprecatedSince{2013_09} Please use TimeGeometryEvent instead: For additional information see  http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
    */
    DEPRECATED(typedef TimeGeometryEvent TimeSlicedGeometryEvent);
 

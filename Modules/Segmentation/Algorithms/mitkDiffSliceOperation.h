@@ -65,7 +65,7 @@ namespace mitk
 
     /** \brief
     *
-    * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+    * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
     */
     DEPRECATED(DiffSliceOperation( mitk::Image* imageVolume, vtkImageData* slice, TimeSlicedGeometry* sliceGeometry, unsigned int timestep, Geometry3D* currentWorldGeometry));
 
@@ -94,7 +94,7 @@ namespace mitk
 
 
     /** \brief Set the axis where the slice has to be applied in the volume.
-    * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+    * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
     */
     void SetSliceGeometry(TimeSlicedGeometry* sliceGeometry);
 
@@ -105,7 +105,7 @@ namespace mitk
 
 
     /** \brief Set the axis where the slice has to be applied in the volume.
-    * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+    * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
     */
     void SetCurrentWorldGeometry(TimeSlicedGeometry* worldGeometry);
 

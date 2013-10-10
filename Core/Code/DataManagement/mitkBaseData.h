@@ -62,7 +62,7 @@ public:
   * be sure that the geometry is up-to-date.
   *
   * Normally used in GenerateOutputInformation of subclasses of BaseProcess.
-   * \deprecatedSince{2013_06} Please use GetTimeGeometry instead: For additional information see  @TimeGeometryGuide@
+   * \deprecatedSince{2013_09} Please use GetTimeGeometry instead: For additional information see  http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
   */
   DEPRECATED(const mitk::TimeGeometry* GetTimeSlicedGeometry() const)
   {
@@ -99,7 +99,7 @@ public:
   * member. Before doing this, it makes sure that the TimeGeometry
   * is up-to-date (by setting the update extent to largest possible and
   * calling UpdateOutputInformation).
-  * \deprecatedSince{2013_06} Please use GetUpdatedTimeGeometry instead: For additional information see  @TimeGeometryGuide@
+  * \deprecatedSince{2013_09} Please use GetUpdatedTimeGeometry instead: For additional information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
   */
   DEPRECATED(const mitk::TimeGeometry* GetUpdatedTimeSliceGeometry())
   {
@@ -385,7 +385,7 @@ protected:
   * \brief Initialize the TimeGeometry for a number of time steps.
   * The TimeGeometry is initialized empty and evenly timed.
   * In many cases it will be necessary to overwrite this in sub-classes.
-  * \deprecatedSince{2013_06} Please use GetUpdatedTimeGeometry instead: For additional information see  @TimeGeometryGuide@
+  * \deprecatedSince{2013_09} Please use GetUpdatedTimeGeometry instead: For additional information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
   */
   DEPRECATED(virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 ))
   {

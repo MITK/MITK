@@ -185,13 +185,13 @@ namespace mitk
 
 
     /**
-    * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+    * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
     */
     DEPRECATED(void SetWorldGeometry3D(TimeSlicedGeometry* geometry));
 
 
-    itkGetConstObjectMacro(WorldGeometry, Geometry3D);
-    itkGetConstObjectMacro(TimeWorldGeometry, TimeGeometry);
+    itkGetConstObjectMacro(WorldGeometry, Geometry3D)
+    itkGetConstObjectMacro(TimeWorldGeometry, TimeGeometry)
 
     //##Documentation
     //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering

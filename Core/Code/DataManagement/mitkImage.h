@@ -245,9 +245,9 @@ public:
   * initialize new (or re-initialize) image information by a Geometry3D
   *
   * @param tDim defines the number of time steps for which the Image should be initialized
-  * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+  * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
   */
-  DEPRECATED(virtual void Initialize(const mitk::PixelType& type, const mitk::TimeSlicedGeometry* geometry, unsigned int channels = 1, int tDim=1)){};
+  DEPRECATED(virtual void Initialize(const mitk::PixelType& type, const mitk::TimeSlicedGeometry* geometry, unsigned int channels = 1, int tDim=1)){}
 
   /**
   * \brief Initialize new (or re-initialize) image information by a TimeGeometry

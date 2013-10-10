@@ -117,11 +117,6 @@ int compareGeometry(const mitk::Geometry3D & geometry,
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing offset: ";
-  float gcp1 = (geometry.GetCornerPoint(0))[1];
-  float cp01 = cornerpoint0[1];
-
-  float gcp2 = (geometry.GetCornerPoint(0))[2];
-  float cp02 = cornerpoint0[2];
   if((mitk::Equal(geometry.GetCornerPoint(0),cornerpoint0, (double) vnl_math::float_eps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;

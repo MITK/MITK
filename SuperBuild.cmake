@@ -77,7 +77,7 @@ if(MITK_USE_BLUEBERRY)
   set(MITK_USE_CppUnit 1)
 endif()
 
-if(MITK_USE_SOFA)
+if(MITK_USE_SOFA AND NOT APPLE)
   set(MITK_USE_GLUT 1)
 endif()
 

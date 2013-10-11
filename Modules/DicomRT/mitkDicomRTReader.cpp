@@ -560,6 +560,8 @@ namespace mitk
 
     if(dataset->findAndGetUint16Array(DCM_PixelData, pixelData, &count).good())
     {
+      fstream f;
+      f.open("PixelData.txt", ios::out);
       int counter = 0;
       for(int i=0;i<frames;i++)
       {
@@ -567,12 +569,15 @@ namespace mitk
         {
           for(int k=0;k<columns;k++)
           {
-//            std::cout << pixelData[i*rows*columns + j*columns + k] << "\n";
-//            std::cout << static_cast<Float32>(pixelData[i*rows*columns + j*columns + k]) * gridscale << "\n\n";
+            if(pixelData[i*rows*columns + j*columns + k]>0){
+              f << pixelData[i*rows*columns + j*columns + k] << "\n";
+//              f << static_cast<Float32>(pixelData[i*rows*columns + j*columns + k]) * gridscale << "\n\n";
+            }
             counter++;
           }
         }
       }
+      f.close();
       std::cout << "Number of Frames: " << frames << "\n\n";
       std::cout << "Number of Data in file: " << counter << "\n\n";
       std::cout << "Number of Data in file expacted overall: " << rows*columns*frames << "\n\n";
@@ -589,13 +594,25 @@ namespace mitk
 
     mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
     vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
-    vtkLut->SetTableRange(0,1000);
+    vtkLut->SetHueRange(0.66666666666666666666666666666666666666666666,0.0);
+//    vtkLut->SetTableValue(0,0.0,1.0,0.0);
+//    vtkLut->SetTableValue(1,1.0,1.0,0.0);
+//    vtkLut->SetTableValue(2,0.0,1.0,0.0);
+//    vtkLut->SetTableValue(3,1.0,0.0,1.0);
+//    vtkLut->SetTableValue(1175,1.0,0.0,0.0);
+//    vtkLut->SetTableRange(0.0, 100000.0);
+    vtkLut->SetNumberOfTableValues(100);
+    vtkLut->SetTableRange(0,100);
     vtkLut->Build();
-    //vtkLut->SetNumberOfTableValues(8);
-    //                     I    R     G     B     A
-    vtkLut->SetTableValue( 0 , 0.0 , 0.0 , 0.0 , 0.3 );
-    vtkLut->SetTableValue( 1 , 0.5 , 0.0 , 0.0 , 0.3 );
-    vtkLut->SetTableValue( 2 , 1.0 , 0.0 , 0.0 , 0.3 );
+
+    for(int i=0;i<100;i++)
+    {
+      vtkLut->SetTableValue(i,0,0,0);
+    }
+    vtkLut->SetTableValue(5,1,0,0);
+    vtkLut->SetTableValue(10,0,1,0);
+    vtkLut->SetTableValue(50,0,0,1);
+
     mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
     mitkLutProp->SetLookupTable(mitkLut);
 

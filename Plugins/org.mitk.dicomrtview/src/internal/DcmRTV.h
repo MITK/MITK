@@ -34,6 +34,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDicomSeriesReader.h>
 //#include <QmitkFileOpenAction.h>
 
+#include <vtkContourFilter.h>
+#include <vtkPolyData.h>
+#include <mitkSurface.h>
+#include <vtkDICOMImageReader.h>
+
 #include <QFileDialog>
 
 /**

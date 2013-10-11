@@ -42,7 +42,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLookupTable.h>
 #include <mitkLookupTableProperty.h>
 #include <vtkLookupTable.h>
-
+#include <vtkContourFilter.h>
+#include <fstream>
 //######################################################
 
 #include "dcmtk/dcmrt/drtstrct.h"

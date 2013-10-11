@@ -162,9 +162,28 @@ void DcmRTV::LoadRTDoseFile()
   mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries( files );
   node->SetProperty("LookupTable", mitkLutProp);
   node->SetProperty("Image Rendering.Mode", renderingMode);
-  node->SetProperty("opacity", mitk::FloatProperty::New(0.3));
+  node->SetProperty("opacity", mitk::FloatProperty::New(0.2));
   node->SetName("DicomRT Dose");
   GetDataStorage()->Add(node);
+
+  vtkContourFilter* contourFilter = vtkContourFilter::New();
+  vtkPolyData* polyData = vtkPolyData::New();
+  vtkDICOMImageReader* reader = vtkDICOMImageReader::New();
+
+  reader->SetDirectoryName(filename);
+  reader->Update();
+
+  contourFilter->SetInputConnection(reader->GetOutputPort());
+  contourFilter->SetNumberOfContours(1);
+  contourFilter->SetValue(0,1000);
+  polyData = contourFilter->GetOutput();
+
+  mitk::Surface::Pointer c = mitk::Surface::New();
+  c->SetVtkPolyData(polyData);
+
+  mitk::DataNode::Pointer contourNode = mitk::DataNode::New();
+  contourNode->SetData(c);
+  GetDataStorage()->Add(contourNode);
 
   mitk::TimeSlicedGeometry::Pointer geo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews( geo );

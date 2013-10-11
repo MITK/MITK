@@ -179,7 +179,7 @@ mitk::PointSet::PointsConstIterator mitk::PointSet::End(int t) const
   return PointsConstIterator();
 }
 
-int mitk::PointSet::SearchPoint( Point3D point, float distance, int t  ) const
+int mitk::PointSet::SearchPoint( Point3D point, ScalarType distance, int t  ) const
 {
   if ( t >= (int)m_PointSetSeries.size() )
   {

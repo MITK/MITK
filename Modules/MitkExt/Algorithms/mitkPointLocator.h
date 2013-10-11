@@ -51,7 +51,7 @@ public:
   itkNewMacro( Self );
 
   typedef int IdType;
-  typedef float DistanceType;
+  typedef ScalarType DistanceType;
 
   typedef float   PixelType;
   typedef double  CoordRepType;

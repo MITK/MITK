@@ -564,7 +564,7 @@ void mitk::ContourModel::UpdateOutputInformation()
   {
 
     //update the bounds of the geometry according to the stored vertices
-    float mitkBounds[6];
+  ScalarType mitkBounds[6];
 
     //calculate the boundingbox at each timestep
     typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;

@@ -101,7 +101,7 @@ static void Equal_DifferentBoundingBox_ReturnsFalse()
     Setup();
 
     //create different bounds to make the comparison false
-    float bounds[ ] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    mitk::ScalarType bounds[ ] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     m_AnotherGeometry3D->SetBounds(bounds);
 
     MITK_TEST_NOT_EQUAL( m_Geometry3D, m_AnotherGeometry3D, "Bounds are different. Result should be false.");

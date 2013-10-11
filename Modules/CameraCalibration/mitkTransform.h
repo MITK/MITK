@@ -135,9 +135,9 @@ namespace mitk {
     ///
     void SetOrientation( const vnl_quaternion<mitk::ScalarType>& orientation);
     ///
-    /// method to set double valued orientation quat
+    /// method to set float valued orientation quat
     ///
-    void SetOrientation( const vnl_quaternion<double>& orientation);
+    void SetOrientation( const vnl_quaternion<float>& orientation);
     ///
     /// method to set translation
     ///

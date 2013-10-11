@@ -258,7 +258,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   // initialize points with a random start value
 
   // current point in point set
-  itk::Point<float> point = pointsIter->Value();
+  itk::Point<ScalarType> point = pointsIter->Value();
 
   mitk::Point3D p = point;              // currently visited point
   mitk::Point3D lastP = point;          // last visited point (predecessor in point set of "point")

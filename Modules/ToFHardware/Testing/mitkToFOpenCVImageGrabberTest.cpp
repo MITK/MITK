@@ -30,7 +30,7 @@ static bool CompareImages(mitk::Image::Pointer mitkImage, cv::Mat openCVImage)
   {
     equal = false;
   }
-  mitk::ImagePixelReadAccessor<mitk::ScalarType,2> imageAcces(mitkImage, mitkImage->GetSliceData(0));
+  mitk::ImagePixelReadAccessor<float,2> imageAcces(mitkImage, mitkImage->GetSliceData(0));
   for (unsigned int i=0; i<openCVImage.cols; i++)
   {
     for (unsigned int j=0; j<openCVImage.rows; j++)

@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
-#include <mitkStandaloneDataStorage.h>
 
 #include "ui_QmitkMultiLabelSegmentationControls.h"
 
@@ -52,16 +51,13 @@ public:
   virtual int GetSizeFlags(bool width);
   virtual int ComputePreferredSize(bool width, int /*availableParallel*/, int /*availablePerpendicular*/, int preferredResult);
 
-  // observer to mitk::SliceController's SliceRotation event
-  void SliceRotation(const itk::EventObject&);
-
 protected slots:
 
   void OnReferenceSelectionChanged(const mitk::DataNode* node);
 
   void OnSegmentationSelectionChanged(const mitk::DataNode *node);
 
-  void OnGoToLabel( const mitk::Point3D& pos );
+  void OnGoToLabel(const mitk::Point3D& pos);
 
   void OnManualTool2DSelected(int id);
 
@@ -82,10 +78,7 @@ protected:
   void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart);
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart);
 
-  // checks if given render window aligns with the slices of given image
-  bool IsRenderWindowAligned(QmitkRenderWindow* renderWindow, mitk::Image* image);
-
-  void ResetMouseCursor( );
+  void ResetMouseCursor();
 
   void SetMouseCursor(const mitk::ModuleResource, int hotspotX, int hotspotY );
 
@@ -112,9 +105,6 @@ protected:
   mitk::DataNode::Pointer m_ReferenceNode;
   mitk::DataNode::Pointer m_WorkingNode;
 
-  bool m_DataSelectionChanged;
-
-  //mitk::StandaloneDataStorage::Pointer m_SegmentationDataStorage;
   mitk::NodePredicateAnd::Pointer m_ReferencePredicate;
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
   mitk::NodePredicateAnd::Pointer m_SurfacePredicate;

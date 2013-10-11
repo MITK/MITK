@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegmentationObjectFactory.h"
 #include "mitkSegTool2D.h"
 #include "mitkPlanePositionManager.h"
-#include "mitkStandaloneDataStorage.h"
 
 // Qmitk
 #include "QmitkMultiLabelSegmentationOrganNamesHandling.cpp"
@@ -54,7 +53,6 @@ m_IRenderWindowPart(NULL),
 m_ReferenceNode(NULL),
 m_WorkingNode(NULL),
 m_ToolManager(NULL),
-m_DataSelectionChanged(false),
 m_MouseCursorSet(false)
 {
   RegisterSegmentationObjectFactory();
@@ -333,7 +331,6 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
       if (_segNode)
       {
         _segNode->SetVisibility(true);
-        _segNode->Modified();
       }
     }
 

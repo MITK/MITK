@@ -22,15 +22,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk
 #include <mitkIDataStorageService.h>
 #include <mitkLabelSetImage.h>
-#include <mitkProperties.h>
 #include <mitkToolManagerProvider.h>
 #include <mitkLabelSetImageToSurfaceThreadedFilter.h>
 #include <mitkNrrdLabelSetImageReader.h>
 #include <mitkNrrdLabelSetImageWriter.h>
 #include <mitkRenderingManager.h>
-#include <mitkImageWriteAccessor.h>
 #include <mitkStatusBar.h>
-#include <mitkShowSegmentationAsSmoothedSurface.h>
 #include <mitkIOUtil.h>
 #include <mitkCoreObjectFactory.h>
 
@@ -142,21 +139,6 @@ void QmitkLabelSetWidget::SetPreferences( berry::IPreferences::Pointer prefs )
 
 void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
 {
-  /*
-  mitk::DataNode* workingNode = this->m_ToolManager->GetWorkingData(0);
-  bool enabled = workingNode != NULL;
-
-  m_Controls.m_LabelSetTableWidget->setEnabled(enabled);
-  m_Controls.m_LabelSearchBox->setEnabled(enabled);
-  m_Controls.m_btSaveSegmentation->setEnabled(enabled);
-  m_Controls.m_btNewLabel->setEnabled(enabled);
-  m_Controls.m_btAddLayer->setEnabled(enabled);
-  m_Controls.m_btDeleteLayer->setEnabled(enabled);
-  m_Controls.m_btPreviousLayer->setEnabled(enabled);
-  m_Controls.m_btNextLayer->setEnabled(enabled);
-  m_Controls.m_btDeleteSegmentation->setEnabled(enabled);
-  m_Controls.m_btImportSegmentation->setEnabled(enabled);
-  */
   this->UpdateControls();
 }
 

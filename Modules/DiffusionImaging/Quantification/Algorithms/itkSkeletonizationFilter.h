@@ -28,8 +28,11 @@ namespace itk
 /**
   * \brief Skeletonization part of the TBSS pipeline
   *
-  * This class takes a 3D image (typically the mean FA image as calculated in the standard TBSS pipeline)
-  * and performs the non-maximum-suppression (see Smith et al., 2009. http://dx.doi.org/10.1016/j.neuroimage.2006.02.024 )
+  * This class takes a 3D image which is typically the mean FA image that is calculated after registration by the FSL TBSS pipeline (see
+  * http://fsl.fmrib.ox.ac.uk/fsl/fsl4.0/tbss/index for the user manual) and performs the non-maximum-suppression to create a white matter skeleton.
+  *
+  *
+  * The skeletonization algorithm is described in Smith et al., 2009. http://dx.doi.org/10.1016/j.neuroimage.2006.02.024 )
   */
 
 

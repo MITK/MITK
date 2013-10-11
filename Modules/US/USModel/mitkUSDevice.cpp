@@ -31,18 +31,19 @@ const std::string mitk::USDevice::US_PROPKEY_CLASS = US_INTERFACE_NAME + ".class
 mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
 {
   MITK_INFO << "Return Crop Area L:" << m_CropArea.cropLeft
-            << " R:" << m_CropArea.cropRight << " T:" << m_CropArea.cropTop
-            << " B:" << m_CropArea.cropBottom;
+    << " R:" << m_CropArea.cropRight << " T:" << m_CropArea.cropTop
+    << " B:" << m_CropArea.cropBottom;
   return m_CropArea;
 }
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model)
-  : mitk::ImageSource(),
-    m_MultiThreader(itk::MultiThreader::New()),
-    m_ImageMutex(itk::FastMutexLock::New()),
-    m_CameraActiveMutex(itk::FastMutexLock::New()),
-    m_DeviceState(State_NoState),
-    m_UnregisteringStarted(false)
+: mitk::ImageSource(),
+m_MultiThreader(itk::MultiThreader::New()),
+m_ImageMutex(itk::FastMutexLock::New()),
+m_CameraActiveMutex(itk::FastMutexLock::New()),
+m_IsFreezed(false),
+m_DeviceState(State_NoState),
+m_UnregisteringStarted(false)
 {
   // Initialize Members
   m_Metadata = mitk::USImageMetadata::New();
@@ -65,12 +66,13 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
 }
 
 mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
-  : mitk::ImageSource(),
-    m_MultiThreader(itk::MultiThreader::New()),
-    m_ImageMutex(itk::FastMutexLock::New()),
-    m_CameraActiveMutex(itk::FastMutexLock::New()),
-    m_DeviceState(State_NoState),
-    m_UnregisteringStarted(false)
+: mitk::ImageSource(),
+m_MultiThreader(itk::MultiThreader::New()),
+m_ImageMutex(itk::FastMutexLock::New()),
+m_CameraActiveMutex(itk::FastMutexLock::New()),
+m_IsFreezed(false),
+m_DeviceState(State_NoState),
+m_UnregisteringStarted(false)
 {
   m_Metadata = metadata;
 
@@ -217,7 +219,7 @@ bool mitk::USDevice::Disconnect()
     return false;
   }
   // Prepare connection, fail if this fails.
-   if (! this->OnDisconnection()) return false;
+  if (! this->OnDisconnection()) return false;
 
   // Update state
   m_DeviceState = State_Initialized;
@@ -240,6 +242,8 @@ bool mitk::USDevice::Activate()
   {
     m_DeviceState = State_Activated;
 
+    m_FreezeBarrier = itk::ConditionVariable::New();
+
     // spawn thread for aquire images if us device is active
     this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->Acquire, this);
   }
@@ -257,6 +261,40 @@ void mitk::USDevice::Deactivate()
   us::ServiceProperties props = ConstructServiceProperties();
   m_ServiceRegistration.SetProperties(props);
   OnDeactivation();
+}
+
+void mitk::USDevice::SetIsFreezed(bool freeze)
+{
+  if ( ! this->GetIsActive() )
+  {
+    MITK_WARN("mitkUSDevice")
+      << "Cannot freeze or unfreeze if device is not active.";
+    return;
+  }
+
+  if ( freeze )
+  {
+    m_IsFreezed = true;
+  }
+  else
+  {
+    m_IsFreezed = false;
+
+    // wake up the image acquisition thread
+    m_FreezeBarrier->Signal();
+  }
+}
+
+bool mitk::USDevice::GetIsFreezed()
+{
+  if ( ! this->GetIsActive() )
+  {
+    MITK_WARN("mitkUSDevice")("mitkUSTelemedDevice")
+      << "Cannot get freeze state if the hardware interface is not ready. Returning false...";
+    return false;
+  }
+
+  return m_IsFreezed;
 }
 
 void mitk::USDevice::AddProbe(mitk::USProbe::Pointer probe)
@@ -309,7 +347,7 @@ void mitk::USDevice::GraftNthOutput(unsigned int idx, itk::DataObject *graft)
   if ( idx >= this->GetNumberOfOutputs() )
   {
     itkExceptionMacro(<<"Requested to graft output " << idx <<
-                      " but this filter only has " << this->GetNumberOfOutputs() << " Outputs.");
+      " but this filter only has " << this->GetNumberOfOutputs() << " Outputs.");
   }
 
   if ( !graft )
@@ -394,6 +432,18 @@ ITK_THREAD_RETURN_TYPE mitk::USDevice::Acquire(void* pInfoStruct)
   mitk::USDevice * device = (mitk::USDevice *) pInfo->UserData;
   while (device->GetIsActive())
   {
+    // lock this thread when ultrasound device is freezed
+    if ( device->m_IsFreezed )
+    {
+      itk::SimpleMutexLock* mutex = &(device->m_FreezeMutex);
+      mutex->Lock();
+
+      if (device->m_FreezeBarrier.IsNotNull())
+      {
+        device->m_FreezeBarrier->Wait(mutex);
+      }
+    }
+
     device->GrabImage();
   }
   return ITK_THREAD_RETURN_VALUE;

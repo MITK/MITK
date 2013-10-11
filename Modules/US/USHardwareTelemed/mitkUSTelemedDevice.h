@@ -100,6 +100,11 @@ namespace mitk {
     virtual bool OnDeactivation();
 
     /**
+      * \brief Changes scan state of the device if freeze is toggeled in mitk::USDevice.
+      */
+    virtual void OnFreeze(bool freeze);
+
+    /**
       * \brief Grabs the next frame from the Video input.
       * This method is called internally, whenever Update() is invoked by an Output.
       */

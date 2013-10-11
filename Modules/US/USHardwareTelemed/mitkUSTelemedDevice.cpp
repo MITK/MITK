@@ -130,6 +130,18 @@ bool mitk::USTelemedDevice::OnDeactivation()
   return true;
 }
 
+void mitk::USTelemedDevice::OnFreeze(bool freeze)
+{
+    if ( freeze )
+    {
+        m_UsgDataView->put_ScanState(SCAN_STATE_FREEZE);
+    }
+    else
+    {
+        m_UsgDataView->put_ScanState(SCAN_STATE_RUN);
+    }
+}
+
 void mitk::USTelemedDevice::GenerateData()
 {
   mitk::USImage::Pointer result;

@@ -30,11 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTime>
 
 /*!
-  \brief UltrasoundSupport
-  This plugin provides functionality to manage Ultrasound devices, create video devices and to view device images.
+\brief UltrasoundSupport
+This plugin provides functionality to manage Ultrasound devices, create video devices and to view device images.
 
-  \sa QmitkFunctionality
-  \ingroup ${plugin_target}_internal
+\sa QmitkFunctionality
+\ingroup ${plugin_target}_internal
 */
 class UltrasoundSupport : public QmitkAbstractView
 {
@@ -42,16 +42,16 @@ class UltrasoundSupport : public QmitkAbstractView
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-  public:
+public:
 
-    virtual void SetFocus();
+  virtual void SetFocus();
 
-    static const std::string VIEW_ID;
+  static const std::string VIEW_ID;
 
-    virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent);
 
-    UltrasoundSupport();
-    virtual ~UltrasoundSupport();
+  UltrasoundSupport();
+  virtual ~UltrasoundSupport();
 
   public slots:
     /*
@@ -59,60 +59,62 @@ class UltrasoundSupport : public QmitkAbstractView
     */
     void OnNewDeviceWidgetDone();
 
-  protected slots:
+    protected slots:
 
-    void OnClickedAddNewDevice();
+      void OnClickedAddNewDevice();
 
-    void OnClickedViewDevice();
+      void OnClickedViewDevice();
 
-    void OnChangedFramerateLimit(int);
+      void OnChangedFramerateLimit(int);
 
-    /*
-    * \brief This is the main imaging loop that is called regularily during the imaging process
-    */
-    void DisplayImage();
+      void OnClickedFreezeButton();
 
-  protected:
-
-    /**
-      * \brief Reinits the view globally.
+      /*
+      * \brief This is the main imaging loop that is called regularily during the imaging process
       */
-    void GlobalReinit();
+      void DisplayImage();
 
-    int m_FrameCounter;
+protected:
 
-    /*
-    * \brief This timer triggers periodic updates to the pipeline
-    */
-    QTimer *m_Timer;
+  /**
+  * \brief Reinits the view globally.
+  */
+  void GlobalReinit();
 
-    QTime m_Clock;
+  int m_FrameCounter;
 
-    /*
-    * \brief The device that is currently used to aquire images
-    */
-    mitk::USDevice::Pointer m_Device;
+  /*
+  * \brief This timer triggers periodic updates to the pipeline
+  */
+  QTimer *m_Timer;
 
-    /*
-    * \brief The node that we feed images into
-    */
-    mitk::DataNode::Pointer m_Node;
+  QTime m_Clock;
 
-    mitk::Image::Pointer m_Image;
+  /*
+  * \brief The device that is currently used to aquire images
+  */
+  mitk::USDevice::Pointer m_Device;
 
-    Ui::UltrasoundSupportControls m_Controls;
+  /*
+  * \brief The node that we feed images into
+  */
+  mitk::DataNode::Pointer m_Node;
 
-    QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;
-    QmitkUSControlsBModeWidget*   m_ControlBModeWidget;
-    QmitkUSControlsDopplerWidget* m_ControlDopplerWidget;
-    QmitkUSControlsProbesWidget*  m_ControlProbesWidget;
+  mitk::Image::Pointer m_Image;
 
-    QList<ctkServiceReference>    m_CustomWidgetServiceReference;
+  Ui::UltrasoundSupportControls m_Controls;
 
-    unsigned int m_CurrentImageWidth;
-    unsigned int m_CurrentImageHeight;
+  QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;
+  QmitkUSControlsBModeWidget*   m_ControlBModeWidget;
+  QmitkUSControlsDopplerWidget* m_ControlDopplerWidget;
+  QmitkUSControlsProbesWidget*  m_ControlProbesWidget;
 
-    //void OnPreferencesChanged(const berry::IBerryPreferences*);
+  QList<ctkServiceReference>    m_CustomWidgetServiceReference;
+
+  unsigned int m_CurrentImageWidth;
+  unsigned int m_CurrentImageHeight;
+
+  //void OnPreferencesChanged(const berry::IBerryPreferences*);
 };
 
 #endif // UltrasoundSupport_h

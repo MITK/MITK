@@ -50,9 +50,7 @@ mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, mitk::USImageMetad
 
 mitk::USVideoDevice::~USVideoDevice()
 {
-
 }
-
 
 void mitk::USVideoDevice::Init()
 {
@@ -98,7 +96,6 @@ bool mitk::USVideoDevice::OnDisconnection()
   return true;
 }
 
-
 bool mitk::USVideoDevice::OnActivation()
 {
   // make sure that video device is ready before aquiring images
@@ -111,7 +108,6 @@ bool mitk::USVideoDevice::OnActivation()
   MITK_INFO << "Activated UsVideoDevice!";
   return true;
 }
-
 
 bool mitk::USVideoDevice::OnDeactivation()
 {

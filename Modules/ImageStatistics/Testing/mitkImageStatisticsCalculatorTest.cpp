@@ -28,6 +28,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNodeFactory.h>
 #include <mitkStandaloneDataStorage.h>
 
+#include "itkImage.h"
+#include <itkImageRegionConstIteratorWithIndex.h>
+#include <itkSimilarityIndexImageFilter.h>
+#include <itkImageFileWriter.h>
+
 //#include <QtCore>
 
 /**
@@ -396,6 +401,224 @@ public:
       testCases.push_back( test );
     }
     return testCases;
+  }
+
+  static void GetTestConvolutionMask(itk::Image< float, 2 > *mask,
+                                      double RadiusInMM)
+  {
+    /*****************************
+      * radius of 2.5 mm
+      * -> expected ConvolutionMask:
+      * 0,25 0,75 1 0,75 0,25
+      * 0,75  1   1   1  0,75
+      *  1    1   1   1   1
+      * 0,75  1   1   1  0,75
+      * 0,25 0,75 1 0,75 0,25
+      ******************************/
+
+    typedef itk::Image<float, 2> ImageType;
+
+    ImageType::Pointer convolutionMask = ImageType::New();
+
+    ImageType::RegionType region;
+    ImageType::IndexType start;
+    ImageType::SizeType size;
+    ImageType::IndexType pixelIndex;
+    ImageType::SpacingType spacing;
+    ImageType::IndexType origin;
+
+
+    for(unsigned int i = 0; i < 2; ++i)
+    {
+      spacing[i] = 1.0;
+      start[i] = 0.0;
+
+      double countIndex =  2.0 * RadiusInMM / spacing[i];
+
+      //Rounding up to the next integer by cast
+      countIndex += 0.9;
+      int castedIndex = static_cast<int>(countIndex);
+
+      //We always have an uneven number in size to determine a center-point in the convolution mask
+      if(castedIndex % 2 > 0 )
+      {
+        size[i] = castedIndex;
+      }
+      else
+      {
+        size[i] = castedIndex +1;
+      }
+    }
+
+    region.SetSize(size);
+    region.SetIndex(start);
+
+    convolutionMask->SetRegions(region);
+    convolutionMask->SetSpacing(spacing);
+    convolutionMask->Allocate();
+
+    //y = 0
+    pixelIndex[0] = 0;
+    pixelIndex[1] = 0;
+    convolutionMask->SetPixel(pixelIndex, 0.25);
+
+    pixelIndex[0] = 1;
+    pixelIndex[1] = 0;
+    convolutionMask->SetPixel(pixelIndex, 0.75);
+
+    pixelIndex[0] = 2;
+    pixelIndex[1] = 0;
+    convolutionMask->SetPixel(pixelIndex, 1.0);
+
+    pixelIndex[0] = 3;
+    pixelIndex[1] = 0;
+    convolutionMask->SetPixel(pixelIndex, 0.75);
+
+    pixelIndex[0] = 4;
+    pixelIndex[1] = 0;
+    convolutionMask->SetPixel(pixelIndex, 0.25);
+
+    //y = 1
+    pixelIndex[1] = 0;
+    pixelIndex[1] = 1;
+    convolutionMask->SetPixel(pixelIndex, 0.75);
+
+    pixelIndex[0] = 1;
+    pixelIndex[1] = 1;
+    convolutionMask->SetPixel(pixelIndex, 1.0);
+
+    pixelIndex[0] = 2;
+    pixelIndex[1] = 1;
+    convolutionMask->SetPixel(pixelIndex, 1.0);
+
+    pixelIndex[0] = 3;
+    pixelIndex[1] = 1;
+    convolutionMask->SetPixel(pixelIndex, 1.0);
+
+    pixelIndex[0] = 4;
+    pixelIndex[1] = 1;
+    convolutionMask->SetPixel(pixelIndex, 0.75);
+
+    //y = 2
+    pixelIndex[1] = 0;
+    pixelIndex[1] = 2;
+    convolutionMask->SetPixel(pixelIndex, 1.0);
+
+    pixelIndex[0] = 1;
+    pixelIndex[1] = 2;
+    convolutionMask->SetPixel(pixelIndex, 1.0);
+
+    pixelIndex[0] = 2;
+    pixelIndex[1] = 2;
+    convolutionMask->SetPixel(pixelIndex, 1.0);
+
+    pixelIndex[0] = 3;
+    pixelIndex[1] = 2;
+    convolutionMask->SetPixel(pixelIndex, 1.0);
+
+    pixelIndex[0] = 4;
+    pixelIndex[1] = 2;
+    convolutionMask->SetPixel(pixelIndex, 1.0);
+
+    //y = 3
+    pixelIndex[1] = 0;
+    pixelIndex[1] = 3;
+    convolutionMask->SetPixel(pixelIndex, 0.75);
+
+    pixelIndex[0] = 1;
+    pixelIndex[1] = 3;
+    convolutionMask->SetPixel(pixelIndex, 1.0);
+
+    pixelIndex[0] = 2;
+    pixelIndex[1] = 3;
+    convolutionMask->SetPixel(pixelIndex, 1.0);
+
+    pixelIndex[0] = 3;
+    pixelIndex[1] = 3;
+    convolutionMask->SetPixel(pixelIndex, 1.0);
+
+    pixelIndex[0] = 4;
+    pixelIndex[1] = 3;
+    convolutionMask->SetPixel(pixelIndex, 0.75);
+
+    //y = 4
+    pixelIndex[1] = 0;
+    pixelIndex[1] = 4;
+    convolutionMask->SetPixel(pixelIndex, 0.25);
+
+    pixelIndex[0] = 1;
+    pixelIndex[1] = 4;
+    convolutionMask->SetPixel(pixelIndex, 0.75);
+
+    pixelIndex[0] = 2;
+    pixelIndex[1] = 4;
+    convolutionMask->SetPixel(pixelIndex, 1.0);
+
+    pixelIndex[0] = 3;
+    pixelIndex[1] = 4;
+    convolutionMask->SetPixel(pixelIndex, 0.75);
+
+    pixelIndex[0] = 4;
+    pixelIndex[1] = 4;
+    convolutionMask->SetPixel(pixelIndex, 0.25);
+
+    typedef itk::ImageRegionConstIteratorWithIndex<ImageType> IteratorType;
+    IteratorType it(convolutionMask, convolutionMask->GetLargestPossibleRegion());
+
+    std::cout << std::endl << std::endl;
+    std::cout << "Selbsterzeugtes Bild: "<< std::endl;
+
+      //#ifdef DEBUG_SEGMENTATION_CORRECTION
+        // Debug Ausgabe:
+    unsigned int lastZ = 1000000000;
+    unsigned int lastY = 1000000000;
+    for(it.GoToBegin(); !it.IsAtEnd(); ++it)
+    {
+      double x = it.Get();
+        if (it.GetIndex()[1] != lastY)
+        {
+          std::cout << std::endl;
+          lastY = it.GetIndex()[1];
+        }
+        if (it.GetIndex()[0] != lastZ)
+        {
+          std::cout << x << " ";
+          lastZ = it.GetIndex()[0];
+        }
+      }
+    //#endif
+
+    typedef itk::SimilarityIndexImageFilter<ImageType, ImageType> FilterType;
+    FilterType::Pointer similiarityFilter = FilterType::New();
+
+    similiarityFilter->SetInput1(mask);
+    similiarityFilter->SetInput2(convolutionMask);
+    similiarityFilter->Update();
+
+    ImageType::Pointer similarityImage = similiarityFilter->GetOutput();
+    IteratorType iterator(similarityImage, similarityImage->GetLargestPossibleRegion());
+
+    std::cout << "Bild nach Filter: "<< std::endl;
+      //#ifdef DEBUG_SEGMENTATION_CORRECTION
+        // Debug Ausgabe:
+    lastZ = 1000000000;
+    lastY = 1000000000;
+    for(iterator.GoToBegin(); !iterator.IsAtEnd(); ++iterator)
+    {
+      double x = iterator.Get();
+        if (iterator.GetIndex()[1] != lastY)
+        {
+          std::cout << std::endl;
+          lastY = iterator.GetIndex()[1];
+        }
+        if (iterator.GetIndex()[0] != lastZ)
+        {
+          std::cout << x << " ";
+          lastZ = iterator.GetIndex()[0];
+        }
+      }
+    //#endif
+
   }
 
   // loads the test image

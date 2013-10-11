@@ -255,7 +255,7 @@ protected:
     itk::Image<unsigned short, VImageDimension> *maskImage);
 
   template < typename TPixel, unsigned int VImageDimension>
-  void CalculateHotspotStatistics(
+  Statistics CalculateHotspotStatistics(
     const itk::Image<TPixel, VImageDimension> *inputImage,
     itk::Image<unsigned short, VImageDimension> *maskImage,
     double RadiusInMM);

@@ -14,16 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef UltrasoundSupport_h
 #define UltrasoundSupport_h
 
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
-#include <mitkUSDevicePersistence.h>
 
 #include "ui_UltrasoundSupportControls.h"
+#include "QmitkUSAbstractCustomWidget.h"
+#include "QmitkUSControlsBModeWidget.h"
+#include "QmitkUSControlsDopplerWidget.h"
+#include "QmitkUSControlsProbesWidget.h"
 
 #include <QTime>
 
@@ -63,7 +65,7 @@ class UltrasoundSupport : public QmitkAbstractView
 
     void OnClickedViewDevice();
 
-    void OnCropAreaChanged();
+    void OnChangedFramerateLimit(int);
 
     /*
     * \brief This is the main imaging loop that is called regularily during the imaging process
@@ -72,7 +74,10 @@ class UltrasoundSupport : public QmitkAbstractView
 
   protected:
 
-
+    /**
+      * \brief Reinits the view globally.
+      */
+    void GlobalReinit();
 
     int m_FrameCounter;
 
@@ -97,12 +102,17 @@ class UltrasoundSupport : public QmitkAbstractView
 
     Ui::UltrasoundSupportControls m_Controls;
 
-    /** @brief reinits the view globally. */
-    void GlobalReinit();
+    QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;
+    QmitkUSControlsBModeWidget*   m_ControlBModeWidget;
+    QmitkUSControlsDopplerWidget* m_ControlDopplerWidget;
+    QmitkUSControlsProbesWidget*  m_ControlProbesWidget;
 
-    mitk::USDevicePersistence::Pointer m_DevicePersistence;
+    QList<ctkServiceReference>    m_CustomWidgetServiceReference;
 
+    unsigned int m_CurrentImageWidth;
+    unsigned int m_CurrentImageHeight;
+
+    //void OnPreferencesChanged(const berry::IBerryPreferences*);
 };
 
 #endif // UltrasoundSupport_h
-

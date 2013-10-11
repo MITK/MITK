@@ -23,6 +23,11 @@ mitk::USProbe::USProbe() : itk::Object()
 
 }
 
+mitk::USProbe::USProbe(std::string identifier)
+ : m_Name(identifier)
+{
+}
+
 mitk::USProbe::~USProbe()
 {
 

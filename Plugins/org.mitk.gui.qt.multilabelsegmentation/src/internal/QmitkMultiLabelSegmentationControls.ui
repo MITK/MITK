@@ -294,7 +294,10 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="m_gbSurfaceStamp">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Surface Stamp</string>
      </property>
@@ -337,7 +340,10 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_3">
+    <widget class="QGroupBox" name="m_gbMaskStamp">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Mask Stamp</string>
      </property>

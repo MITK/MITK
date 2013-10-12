@@ -119,7 +119,7 @@ QmitkLabelSetWidget::~QmitkLabelSetWidget()
 
 void QmitkLabelSetWidget::setEnabled(bool enabled)
 {
-//  m_Controls.m_LabelSetTableWidget->setEnabled(enabled);
+  m_Controls.m_LabelSetTableWidget->setEnabled(enabled);
   m_Controls.m_btNewSegmentation->setEnabled(enabled);
   m_Controls.m_btLoadSegmentation->setEnabled(enabled);
   m_Controls.m_btImportLabeledImage->setEnabled(enabled);

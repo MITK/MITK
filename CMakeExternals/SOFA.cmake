@@ -9,7 +9,7 @@ if(MITK_USE_SOFA)
   endif()
 
   set(proj SOFA)
-  set(proj_DEPENDENCIES Boost GLUT GLEW)
+  set(proj_DEPENDENCIES Boost GLEW)
   set(SOFA_DEPENDS ${proj})
 
   set(additional_cmake_args
@@ -24,6 +24,8 @@ if(MITK_USE_SOFA)
   )
 
   if(NOT APPLE)
+    list(APPEND proj_DEPENDENCIES GLUT)
+
     list(APPEND additional_cmake_args
       -DGLUT_DIR:PATH=${GLUT_DIR}
       -DSOFA-EXTERNAL_HAVE_FREEGLUT:BOOL=ON

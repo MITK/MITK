@@ -30,7 +30,7 @@ namespace mitk
     if (dataStorage.IsNull())
       return NULL;
 
-    TNodePredicateDataType<T>::Pointer predicate = TNodePredicateDataType<T>::New();
+    typename TNodePredicateDataType<T>::Pointer predicate = TNodePredicateDataType<T>::New();
     DataStorage::SetOfObjects::ConstPointer subset = dataStorage->GetSubset(predicate);
 
     for (DataStorage::SetOfObjects::ConstIterator it = subset->Begin(); it != subset->End(); ++it)

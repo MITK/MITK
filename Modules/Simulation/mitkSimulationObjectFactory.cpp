@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSimulationVtkMapper3D.h"
 #include "mitkVtkModel.h"
 #include <mitkCoreObjectFactory.h>
-#include <GL/freeglut.h>
+#include <sofa/helper/system/glut.h>
 #include <sofa/component/init.h>
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/simulation/common/xml/initXml.h>

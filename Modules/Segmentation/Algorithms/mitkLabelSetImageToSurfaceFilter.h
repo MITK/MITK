@@ -131,9 +131,6 @@ protected:
   void ITKProcessing( itk::Image<TPixel, VImageDimension>* input, mitk::Surface* surface );
 
   template < typename TPixel, unsigned int VImageDimension >
-  void ITKProcessing2( itk::Image<TPixel, VImageDimension>* input, mitk::Surface* surface );
-
-  template < typename TPixel, unsigned int VImageDimension >
   void GetAvailableLabelsInternal( itk::Image<TPixel, VImageDimension>* input, LabelMapType& availableLabels );
 
   bool m_GenerateAllLabels;

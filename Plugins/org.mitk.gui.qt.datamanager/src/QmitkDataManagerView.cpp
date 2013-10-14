@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIDataStorageService.h"
 #include "mitkIRenderingManager.h"
 #include "mitkImageCast.h"
-#include "mitkLabelSetImage.h"
+//#include "mitkLabelSetImage.h"
 #include "mitkDataNodeObject.h"
 #include "mitkIContextMenuAction.h"
 
@@ -186,13 +186,13 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QmitkNodeDescriptor* surfaceDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Surface");
 
-  mitk::TNodePredicateDataType<mitk::LabelSetImage>::Pointer isLabelSetImage =
-      mitk::TNodePredicateDataType<mitk::LabelSetImage>::New();
+//  mitk::TNodePredicateDataType<mitk::LabelSetImage>::Pointer isLabelSetImage =
+//      mitk::TNodePredicateDataType<mitk::LabelSetImage>::New();
 
-  QmitkNodeDescriptor* labelSetImageDataNodeDescriptor = new
-      QmitkNodeDescriptor("LabelSetImage", QString(":/Qmitk/LabelSetImage_48.png"), isLabelSetImage, this);
+//  QmitkNodeDescriptor* labelSetImageDataNodeDescriptor = new
+//      QmitkNodeDescriptor("LabelSetImage", QString(":/Qmitk/LabelSetImage_48.png"), isLabelSetImage, this);
 
-  QmitkNodeDescriptorManager::GetInstance()->AddDescriptor(labelSetImageDataNodeDescriptor);
+//  QmitkNodeDescriptorManager::GetInstance()->AddDescriptor(labelSetImageDataNodeDescriptor);
 
   QAction* renameAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Rename_48.png"), "Rename...", this);
   QObject::connect( renameAction, SIGNAL( triggered(bool) ) , this, SLOT( RenameSelectedNode(bool) ) );
@@ -325,9 +325,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QObject::connect( m_TextureInterpolation, SIGNAL( toggled(bool) )
     , this, SLOT( TextureInterpolationToggled(bool) ) );
   imageDataNodeDescriptor->AddAction(m_TextureInterpolation, false);
-  labelSetImageDataNodeDescriptor->AddAction(m_TextureInterpolation, false);
+//  labelSetImageDataNodeDescriptor->AddAction(m_TextureInterpolation, false);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,m_TextureInterpolation));
-  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(labelSetImageDataNodeDescriptor,m_TextureInterpolation));
+//  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(labelSetImageDataNodeDescriptor,m_TextureInterpolation));
 
   m_ColormapAction = new QAction("Colormap", this);
   m_ColormapAction->setMenu(new QMenu);

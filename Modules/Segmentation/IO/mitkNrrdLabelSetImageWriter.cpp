@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkNrrdLabelSetImageWriter__cpp
 
 #include "mitkNrrdLabelSetImageWriter.h"
-//#include "mitkImageCast.h"
 #include "itkMetaDataDictionary.h"
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"

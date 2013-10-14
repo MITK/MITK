@@ -105,9 +105,8 @@ public:
     virtual bool CanWriteBaseDataType(BaseData::Pointer data)
     {
       //return (dynamic_cast<mitk::LabelSetImage<TPixelType>*>(data.GetPointer()) != NULL);
-        return (dynamic_cast<mitk::LabelSetImage*>(data.GetPointer()) != NULL);
+      return (dynamic_cast<mitk::LabelSetImage*>(data.GetPointer()) != NULL);
     }
-
 
     virtual void DoWrite(BaseData::Pointer data) {
       if (CanWriteBaseDataType(data)) {
@@ -135,9 +134,6 @@ protected:
 
 };
 
-
 } // end of namespace mitk
-
-//#include "mitkNrrdLabelSetImageWriter.cpp"
 
 #endif // __mitkNrrdLabelSetImageWriter_h

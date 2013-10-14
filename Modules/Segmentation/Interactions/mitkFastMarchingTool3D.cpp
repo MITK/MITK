@@ -234,7 +234,7 @@ void mitk::FastMarchingTool3D::Deactivated()
 void mitk::FastMarchingTool3D::Initialize()
 {
   m_ReferenceImage = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
-  if(m_ReferenceImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
+  if(m_ReferenceImage->GetTimeGeometry()->CountTimeSteps() > 1)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
     timeSelector->SetInput( m_ReferenceImage );
@@ -256,7 +256,7 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
     OutputImageType::Pointer segmentationImageInITK = OutputImageType::New();
 
     mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(GetTargetSegmentationNode()->GetData());
-    if(workingImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
+    if(workingImage->GetTimeGeometry()->CountTimeSteps() > 1)
     {
       mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
       timeSelector->SetInput( workingImage );

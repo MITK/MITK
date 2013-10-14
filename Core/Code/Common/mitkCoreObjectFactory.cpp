@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurface.h"
 #include "mitkSurfaceGLMapper2D.h"
 #include "mitkSurfaceVtkMapper3D.h"
-#include "mitkTimeSlicedGeometry.h"
+#include "mitkTimeGeometry.h"
 #include "mitkTransferFunctionProperty.h"
 #include "mitkVolumeDataVtkMapper3D.h"
 #include "mitkVtkInterpolationProperty.h"

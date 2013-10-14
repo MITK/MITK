@@ -168,7 +168,7 @@ void mitk::ToFCompositeFilter::GenerateOutputInformation()
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
-  output->Initialize(input->GetPixelType(), *input->GetTimeSlicedGeometry());
+  output->Initialize(input->GetPixelType(), *input->GetTimeGeometry());
   output->SetPropertyList(input->GetPropertyList()->Clone());
 }
 

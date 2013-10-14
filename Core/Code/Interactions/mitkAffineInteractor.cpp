@@ -61,11 +61,11 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
 {
   bool ok = false;
 
-  TimeSlicedGeometry* inputtimegeometry = GetData()->GetTimeSlicedGeometry();
-  if (inputtimegeometry == NULL)
+  TimeGeometry* inputTimeGeometry = GetData()->GetTimeGeometry();
+  if (inputTimeGeometry == NULL)
     return false;
 
-  Geometry3D* geometry = inputtimegeometry->GetGeometry3D(m_TimeStep);
+  Geometry3D* geometry = inputTimeGeometry->GetGeometryForTimeStep(m_TimeStep);
 
   mitk::DisplayPositionEvent const *event = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
   switch (action->GetActionId())
@@ -314,7 +314,8 @@ bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint, int 
   else    // use the data objects bounding box to determine if hit
   */
   {
-    const Geometry3D* geometry = GetData()->GetUpdatedTimeSlicedGeometry()->GetGeometry3D( timestep );
+    GetData()->GetTimeGeometry()->Update();
+    const Geometry3D* geometry = GetData()->GetGeometry( timestep );
     selected = geometry->IsInside(worldPoint);
   }
   return selected;

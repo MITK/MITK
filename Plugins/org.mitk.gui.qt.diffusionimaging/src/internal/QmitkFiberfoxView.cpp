@@ -1452,7 +1452,7 @@ void QmitkFiberfoxView::GenerateImage()
         mitk::BaseData::Pointer basedata = node->GetData();
         if (basedata.IsNotNull())
         {
-            mitk::RenderingManager::GetInstance()->InitializeViews( basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+            mitk::RenderingManager::GetInstance()->InitializeViews( basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         }
         UpdateGui();
@@ -1540,7 +1540,7 @@ void QmitkFiberfoxView::GenerateImage()
         if (basedata.IsNotNull())
         {
             mitk::RenderingManager::GetInstance()->InitializeViews(
-                        basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+                        basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         }
     }

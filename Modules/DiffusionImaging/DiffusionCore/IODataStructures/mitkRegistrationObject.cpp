@@ -33,7 +33,7 @@ void mitk::RegistrationObject::SetReferenceGeometry(mitk::Geometry3D::Pointer ge
 
 void mitk::RegistrationObject::SetReferenceImage(mitk::Image::Pointer image)
 {
-    this->SetReferenceGeometry( image->GetTimeSlicedGeometry()->GetGeometry() );
+    this->SetReferenceGeometry( image->GetTimeGeometry()->GetGeometryForTimeStep() );
 }
 
 void mitk::RegistrationObject::SetTransformation(itk::AffineGeometryFrame::Pointer transform)

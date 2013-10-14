@@ -63,7 +63,7 @@ void mitk::MaskImageFilter::GenerateInputRequestedRegion()
   mitk::Image* output = this->GetOutput();
   mitk::Image* input = const_cast< mitk::Image * > ( this->GetInput() );
   mitk::Image* mask  = m_Mask ;
-  if((output->IsInitialized()==false) || (mask == NULL) || (mask->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
+  if((output->IsInitialized()==false) || (mask == NULL) || (mask->GetTimeGeometry()->CountTimeSteps() == 0))
     return;
 
   input->SetRequestedRegionToLargestPossibleRegion();
@@ -83,7 +83,7 @@ void mitk::MaskImageFilter::GenerateOutputInformation()
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
-  output->Initialize(input->GetPixelType(), *input->GetTimeSlicedGeometry());
+  output->Initialize(input->GetPixelType(), *input->GetTimeGeometry());
 
   output->SetPropertyList(input->GetPropertyList()->Clone());
 
@@ -145,7 +145,7 @@ void mitk::MaskImageFilter::GenerateData()
   mitk::Image::Pointer mask  = m_Mask;
   mitk::Image::Pointer output = this->GetOutput();
 
-  if((output->IsInitialized()==false) || (mask.IsNull()) || (mask->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
+  if((output->IsInitialized()==false) || (mask.IsNull()) || (mask->GetTimeGeometry()->CountTimeSteps() == 0))
     return;
 
   m_InputTimeSelector->SetInput(input);
@@ -153,9 +153,9 @@ void mitk::MaskImageFilter::GenerateData()
   m_OutputTimeSelector->SetInput(this->GetOutput());
 
   mitk::Image::RegionType outputRegion = output->GetRequestedRegion();
-  const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
-  const mitk::TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
-  const mitk::TimeSlicedGeometry *maskTimeGeometry = mask->GetTimeSlicedGeometry();
+  const mitk::TimeGeometry *outputTimeGeometry = output->GetTimeGeometry();
+  const mitk::TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
+  const mitk::TimeGeometry *maskTimeGeometry = mask->GetTimeGeometry();
   ScalarType timeInMS;
 
   int timestep=0;
@@ -165,16 +165,16 @@ void mitk::MaskImageFilter::GenerateData()
   int t;
   for(t=tstart;t<tmax;++t)
   {
-    timeInMS = outputTimeGeometry->TimeStepToMS( t );
+    timeInMS = outputTimeGeometry->TimeStepToTimePoint( t );
 
-    timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
+    timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
 
     m_InputTimeSelector->SetTimeNr(timestep);
     m_InputTimeSelector->UpdateLargestPossibleRegion();
     m_OutputTimeSelector->SetTimeNr(t);
     m_OutputTimeSelector->UpdateLargestPossibleRegion();
 
-    timestep = maskTimeGeometry->MSToTimeStep( timeInMS );
+    timestep = maskTimeGeometry->TimePointToTimeStep( timeInMS );
     m_MaskTimeSelector->SetTimeNr(timestep);
     m_MaskTimeSelector->UpdateLargestPossibleRegion();
 

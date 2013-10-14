@@ -160,17 +160,21 @@ float mitk::Interactor::CanHandleEvent(StateEvent const* stateEvent) const
   //compute the center of the data taken care of if != NULL
   if (GetData() != NULL)
   {
-    const BoundingBox *bBox = GetData()->GetUpdatedTimeSlicedGeometry()->GetBoundingBox();
-    if (bBox == NULL)
-      return 0;
-
 
     DisplayPositionEvent const  *event = dynamic_cast <const DisplayPositionEvent *> (stateEvent->GetEvent());
     if (event != NULL)
     {
       //transforming the world position to local coordinate system
       Point3D point;
-      GetData()->GetTimeSlicedGeometry()->WorldToIndex(event->GetWorldPosition(), point);
+
+      GetData()->GetTimeGeometry()->Update();
+
+      TimeStepType timeStep = stateEvent->GetEvent()->GetSender()->GetTimeStep();
+      GetData()->GetGeometry(timeStep)->WorldToIndex(event->GetWorldPosition(), point);
+
+      const BoundingBox *bBox = GetData()->GetGeometry(timeStep)->GetBoundingBox();
+      if (bBox == NULL)
+        return 0;
 
       //distance between center and point
       BoundingBox::PointType center = bBox->GetCenter();

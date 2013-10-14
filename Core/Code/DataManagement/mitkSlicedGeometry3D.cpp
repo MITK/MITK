@@ -64,7 +64,7 @@ mitk::SlicedGeometry3D::SlicedGeometry3D(const SlicedGeometry3D& other)
       }
       else
       {
-        Geometry2D* geometry2D = other.m_Geometry2Ds[0]->Clone();
+        Geometry2D* geometry2D = other.m_Geometry2Ds[s]->Clone();
         assert(geometry2D!=NULL);
         SetGeometry2D(geometry2D, s);
       }
@@ -474,7 +474,7 @@ double mitk::SlicedGeometry3D::CalculateSpacing( const mitk::Vector3D spacing, c
 mitk::Vector3D
 mitk::SlicedGeometry3D::AdjustNormal( const mitk::Vector3D &normal ) const
 {
-  Geometry3D::TransformType::Pointer inverse = Geometry3D::TransformType::New();
+  TransformType::Pointer inverse = TransformType::New();
   m_ReferenceGeometry->GetIndexToWorldTransform()->GetInverse( inverse );
 
   Vector3D transformedNormal = inverse->TransformVector( normal );
@@ -764,7 +764,11 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
               iter != m_Geometry2Ds.end();
               ++iter)
            {
-              (*iter)->ExecuteOperation(operation);
+              // Test for empty slices, which can happen if evenly spaced geometry
+              if ((*iter).IsNotNull())
+              {
+                (*iter)->ExecuteOperation(operation);
+              }
            }
 
           // rotate overall geometry

@@ -62,12 +62,12 @@ void mitk::SurfaceToImageFilter::GenerateOutputInformation()
 
   if((inputImage == NULL) ||
      (inputImage->IsInitialized() == false) ||
-     (inputImage->GetTimeSlicedGeometry() == NULL)) return;
+     (inputImage->GetTimeGeometry() == NULL)) return;
 
   if (m_MakeOutputBinary)
-    output->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *inputImage->GetTimeSlicedGeometry());
+    output->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *inputImage->GetTimeGeometry());
   else
-    output->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeSlicedGeometry());
+    output->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeGeometry());
 
   output->SetPropertyList(inputImage->GetPropertyList()->Clone());
 }
@@ -104,11 +104,12 @@ void mitk::SurfaceToImageFilter::GenerateData()
 
 void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
 {
-  const mitk::TimeSlicedGeometry *surfaceTimeGeometry = GetInput()->GetTimeSlicedGeometry();
-  const mitk::TimeSlicedGeometry *imageTimeGeometry = GetImage()->GetTimeSlicedGeometry();
+  const mitk::TimeGeometry *surfaceTimeGeometry = GetInput()->GetTimeGeometry();
+  const mitk::TimeGeometry *imageTimeGeometry = GetImage()->GetTimeGeometry();
 
   // Convert time step from image time-frame to surface time-frame
-  int surfaceTimeStep = surfaceTimeGeometry->TimeStepToTimeStep( imageTimeGeometry, time );
+  mitk::TimePointType matchingTimePoint = imageTimeGeometry->TimeStepToTimePoint(time);
+  mitk::TimeStepType surfaceTimeStep = surfaceTimeGeometry->TimePointToTimeStep(matchingTimePoint);
 
   vtkPolyData * polydata = ( (mitk::Surface*)GetInput() )->GetVtkPolyData( surfaceTimeStep );
 
@@ -117,12 +118,12 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   move->ReleaseDataFlagOn();
 
   vtkTransform *transform=vtkTransform::New();
-  Geometry3D* geometry = surfaceTimeGeometry->GetGeometry3D( surfaceTimeStep );
+  Geometry3D* geometry = surfaceTimeGeometry->GetGeometryForTimeStep( surfaceTimeStep );
   geometry->TransferItkToVtkTransform();
   transform->PostMultiply();
   transform->Concatenate(geometry->GetVtkTransform()->GetMatrix());
   // take image geometry into account. vtk-Image information will be changed to unit spacing and zero origin below.
-  Geometry3D* imageGeometry = imageTimeGeometry->GetGeometry3D(time);
+  Geometry3D* imageGeometry = imageTimeGeometry->GetGeometryForTimeStep(time);
   imageGeometry->TransferItkToVtkTransform();
   transform->Concatenate(imageGeometry->GetVtkTransform()->GetLinearInverse());
   move->SetTransform(transform);
@@ -149,7 +150,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
 
   if (m_MakeOutputBinary)
   {
-    binaryImage->Initialize(mitk::MakeScalarPixelType<unsigned char>(), *this->GetImage()->GetTimeSlicedGeometry());
+    binaryImage->Initialize(mitk::MakeScalarPixelType<unsigned char>(), *this->GetImage()->GetTimeGeometry());
 
     unsigned int size = sizeof(unsigned char);
     for (unsigned int i = 0; i < binaryImage->GetDimension(); ++i)

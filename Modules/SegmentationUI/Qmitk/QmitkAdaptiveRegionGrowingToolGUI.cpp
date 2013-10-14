@@ -282,7 +282,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
 void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
 {
-
   if (m_InputImageNode.IsNull())
   {
     QMessageBox::information( NULL, "Adaptive Region Growing functionality", "Please specify the image in Datamanager!");
@@ -519,7 +518,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::InitializeLevelWindow()
 
   if (m_UseVolumeRendering)
   this->UpdateVolumeRenderingThreshold((int) (*level + 0.5));//lower threshold for labeled image
-
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::ChangeLevelWindow(double newValue)
@@ -635,7 +633,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
   newNode->SetVisibility(false);
   m_Controls.m_cbVolumeRendering->setChecked(false);
   //TODO disable slider etc...
-
 }
 
 template<typename TPixel, unsigned int VImageDimension>
@@ -654,7 +651,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
 
     //select single 3D volume if we have more than one time step
     typename SegmentationType::Pointer originalSegmentationInITK = SegmentationType::New();
-    if(originalSegmentation->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
+    if(originalSegmentation->GetTimeGeometry()->CountTimeSteps() > 1)
     {
       mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
       timeSelector->SetInput( originalSegmentation );
@@ -813,7 +810,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::UpdateVolumeRenderingThreshold(int thVal
   mitk::TransferFunctionProperty::Pointer tfp = mitk::TransferFunctionProperty::New();
   tfp->SetValue(tf);
   node->SetProperty("TransferFunction", tfp);
-
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::UseVolumeRendering(bool on)
@@ -849,5 +845,4 @@ void QmitkAdaptiveRegionGrowingToolGUI::Deactivated()
 
 void QmitkAdaptiveRegionGrowingToolGUI::Activated()
 {
-
 }

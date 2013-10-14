@@ -1043,7 +1043,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
 
   //Do as much actions as possible in here to avoid double executions.
   m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
-  m_Texture = vtkSmartPointer<vtkNeverTranslucentTexture>::New().GetPointer();
+  m_Texture = vtkSmartPointer<vtkNeverTranslucentTexture>::New();
   m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_Actors = vtkSmartPointer<vtkPropAssembly>::New();

@@ -85,7 +85,6 @@ void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer 
 
   if (dynamic_cast<DiffusionImageType*> (img.GetPointer()) == NULL)
   {
-
     itk::Image<float,3>::Pointer itkImage = itk::Image<float,3>::New();
     CastToItkImage(img, itkImage);
 

@@ -86,6 +86,36 @@ void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer 
   if (dynamic_cast<DiffusionImageType*> (img.GetPointer()) == NULL)
   {
     img = registrationMethod->GetResampledMovingImage(img, transformation);
+
+    itk::Image<float,3>::Pointer itkImage = itk::Image<float,3>::New();
+    CastToItkImage(img, itkImage);
+
+    //
+
+    typedef itk::Euler3DTransform< double > RigidTransformType;
+    RigidTransformType::Pointer rtransform = RigidTransformType::New();
+    RigidTransformType::ParametersType parameters(RigidTransformType::ParametersDimension);
+
+    for (int i = 0; i<6;++i)
+      parameters[i] = transformation[i];
+
+    rtransform->SetParameters( parameters );
+
+    mitk::Point3D origin = img->GetOrigin();
+    origin[0]-=offset[0];
+    origin[1]-=offset[1];
+    origin[2]-=offset[2];
+
+    mitk::Point3D newOrigin = rtransform->GetInverseTransform()->TransformPoint(origin);
+
+    itk::Matrix<double,3,3> dir = img->GetDirection();
+    itk::Matrix<double,3,3> transM  ( vnl_inverse(rtransform->GetMatrix().GetVnlMatrix()));
+    itk::Matrix<double,3,3> newDirection = transM * dir;
+
+    itkImage->SetOrigin(newOrigin);
+    itkImage->SetDirection(newDirection);
+    GrabItkImageMemory(itkImage, img);
+
   }
   else
   {

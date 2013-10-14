@@ -396,15 +396,14 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
         }
 
         FeedbackContourTool::SetFeedbackContourVisible(false);
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
       }
     }
   }
 
   m_ReferenceSlice = NULL; // don't leak
   m_WorkingSlice = NULL;
-//  mitkIpPicFree( m_OriginalPicSlice );
-//  m_OriginalPicSlice = NULL;
+  m_OriginalPicSlice = NULL;
 
   return true;
 }

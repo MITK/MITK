@@ -105,13 +105,17 @@ m_3DInterpolationEnabled(false)
   command2->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged );
   m_SurfaceInterpolationInfoChangedObserverTag = m_SurfaceInterpolator->AddObserver( itk::ModifiedEvent(), command2 );
 
-  // feedback node and its visualization properties
   m_FeedbackContour = mitk::ContourModel::New();
   m_FeedbackContourNode = mitk::DataNode::New();
   m_FeedbackContourNode->SetData( m_FeedbackContour );
-  m_FeedbackContourNode->SetName( "2D interpolation preview" );
-  m_FeedbackContourNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
-  m_FeedbackContourNode->SetProperty( "contour.width", mitk::FloatProperty::New(2));
+  m_FeedbackContourNode->SetName("2D interpolation preview");
+  m_FeedbackContourNode->SetProperty("visible", mitk::BoolProperty::New(true));
+  m_FeedbackContourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+  m_FeedbackContourNode->SetProperty("layer", mitk::IntProperty::New(1000));
+  m_FeedbackContourNode->SetProperty("contour.project-onto-plane", mitk::BoolProperty::New(true));
+  m_FeedbackContourNode->SetProperty("contour.width", mitk::FloatProperty::New(2.0));
+
+  this->Disable3DRendering();
 
   m_InterpolatedSurfaceNode = mitk::DataNode::New();
   m_InterpolatedSurfaceNode->SetName( "3D interpolation preview" );
@@ -257,6 +261,21 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
   m_SurfaceInterpolator->RemoveObserver( m_SurfaceInterpolationInfoChangedObserverTag );
 
   //delete m_Timer;
+}
+
+void QmitkSlicesInterpolator::Disable3DRendering()
+{
+  // set explicitly visible=false for all 3D renderer (that exist already ...)
+  const mitk::RenderingManager::RenderWindowVector& renderWindows = mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
+  for (mitk::RenderingManager::RenderWindowVector::const_iterator iter = renderWindows.begin();
+    iter != renderWindows.end(); ++iter)
+  {
+    if ( mitk::BaseRenderer::GetInstance((*iter))->GetMapperID() == mitk::BaseRenderer::Standard3D )
+      //if ( (*iter)->GetRenderer()->GetMapperID() == BaseRenderer::Standard3D )
+    {
+      m_FeedbackContourNode->SetProperty("visible", mitk::BoolProperty::New(false), mitk::BaseRenderer::GetInstance((*iter)));
+    }
+  }
 }
 
 void QmitkSlicesInterpolator::HideAllInterpolationControls()

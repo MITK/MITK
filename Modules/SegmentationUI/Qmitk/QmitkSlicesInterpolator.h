@@ -216,6 +216,7 @@ private:
     void HideAllInterpolationControls();
     void Show2DInterpolationControls(bool show);
     void Show3DInterpolationControls(bool show);
+    void Disable3DRendering();
 
     mitk::SegmentationInterpolationController::Pointer m_SliceInterpolatorController;
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;

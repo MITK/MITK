@@ -34,9 +34,11 @@ mitk::FeedbackContourTool::FeedbackContourTool(const char* type)
   m_FeedbackContourNode = DataNode::New();
   m_FeedbackContourNode->SetData( m_FeedbackContour );
   m_FeedbackContourNode->SetName("feedback contour");
+  m_FeedbackContourNode->SetProperty("visible", BoolProperty::New(true));
   m_FeedbackContourNode->SetProperty("helper object", BoolProperty::New(true));
-  m_FeedbackContourNode->SetProperty("layer", IntProperty::New(100));
-  m_FeedbackContourNode->SetProperty("contour.width", FloatProperty::New(2));
+  m_FeedbackContourNode->SetProperty("layer", IntProperty::New(1000));
+  m_FeedbackContourNode->SetProperty("contour.project-onto-plane", BoolProperty::New(true));
+  m_FeedbackContourNode->SetProperty("contour.width", FloatProperty::New(2.0));
 
   this->SetFeedbackContourColorDefault();
 }

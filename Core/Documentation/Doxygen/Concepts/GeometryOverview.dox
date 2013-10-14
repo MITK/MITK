@@ -51,32 +51,22 @@ As the superclass of all MITK geometries Geometry3D holds:
 	- <b> VERY IMPORTANT:</b>\n A flag called <i>isImageGeometry</i>, which indicates whether the coordinates are center-based or not!\n 
 	  See also: \ref GeometryOverviewPage_Introduction "Introduction to Geometries" and \ref GeometryOverviewPage_Putting_Together "IMPORTANT: Putting it together for an Image"\n\n	
 
-Every data object which is (sub-)class of BaseData has a Geometry3D, to be more specific, a TimeSlicedGeometry, to be accessed by BaseData::GetTimeSlicedGeometry().\n 
-This is because all data objects are objects in space and time. The data values are often stored in index coordinates, e.g., integer pixel/voxel or time indices.\n 
-The information required to convert these index coordinates into a world coordinate system, with spatiotemporal coordinates in millimeters and milliseconds, is stored in Geometry3D\n
-class and its sub-classes.
 
-TimeSlicedGeometry describes a spatiotemporal geometry consisting of spatial geometries existing at different times, and allocates each geometry at a valid time step a discrete number. It contains a list of Geometry3D instances to be accessed by\n
-TimeSlicedGeometry::GetGeometry3D(t), with t between 0 and TimeSlicedGeometry::GetTimeSteps().\n
-To convert between world time in milliseconds and the integer timestep number use TimeSlicedGeometry::MSToTimeStep(), for conversion in the opposite direction\n
-TimeSlicedGeometry::TimeStepToMS().
+Every data object (sub-)class of BaseData has a TimeGeometry which is accessed by BaseData::GetTimeGeometry(). This TimeGeometry holds one or more Geometry3D objects which describes the object at specific time points, e.g. provides conversion between world and index coordinates and contains bounding boxes covering the area in which the data are placed. There is the possibility of using different implementations of the abstract TimeGeometry class which may differ in how the time steps are saved and the times are calculated.
 
-Often all Geometry3D instances contained in a TimeSlicedGeometry have the same temporal extent.\n
-The initialization for this case can be done using TimeSlicedGeometry::InitializeEvenlyTimed(Geometry3D *geometry3D, unsigned int timeSteps). 
-The Geometry3D parameter must have a limited life span set by Geometry3D::SetTimeBounds(). It is used as the first Geometry3D contained in the TimeSlicedGeometry (thus returned by TimeSlicedGeometry:: GetGeometry3D(0)). 
-The next one will start to have a valid time range immediately at the end of validness of the processor. The bounding boxes and spacial transformations are copied.\n
-The instance of Geometry3D provided to TimeSlicedGeometry::InitializeEvenlyTimed is referenced, not copied!
+There are two ways to represent a time, either by a TimePointType or a TimeStepType. The first is similar to the continous index coordinates and defines a Time Point in milliseconds from timepoint zero. The second type is similar to index coordinates. These are discrete values which specify the number of the current time step going from 0 to GetNumberOfTimeSteps(). The conversion between a time point and a time step is done by calling the method TimeGeometry::TimeStepToTimePoint() or TimeGeometry::TimePointToTimeStep(). Note that the duration of a time step may differ from object to object, so in general it is better to calculate the corresponding time steps by using time points. Also the distance of the time steps does not need to be equidistant over time, it depends on the used TimeGeometry implementation. 
 
-TimeSlicedGeometry is a Geometry3D itself. Its bounding box and transformation is usually the same as the bounding box and transformations of the contained Geometry3D instances.\n 
-Its life span (to be accessed by TimeSlicedGeometry::GetTimeBounds()) is the span from the initial valid time of the first contained Geometry3D to the termination of the last valid time of contained Geometry3Ds.
+Each TimeGeometry has a bounding box covering the whole area in which the corresponding object is situated during all time steps. This bounding box may be accessed by calling TimeGeometry::GetBoundingBoxInWorld() and is always in world coordinates. The bounding box is calculated from all time steps, to manually start this calculation process call TimeGeometry::Update().  The bounding box is not updated if the getter is called. 
 
-TimeSlicedGeometry can also contain Geometry3D instances that do not have the same Euclidean geometry. In that case, TimeSlicedGeometry::GetEvenlyTimed() has to be false.
+The TimeGeometry does not provide a transformation of world coordinates into image coordinates since each time step may has a different transformation. If a conversion between image and world is needed, the Geometry3D for a specific time step or time point must be fetched either by TimeGeometry::GetGeometryForTimeStep() or TimeGeometry::GetGeometryForTimePoint() and then the conversion is calculated by using this geometry. 
+
+The TimeGeometry class is an abstract class therefore it is not possible to instantiate it. instead a derived class must be used. Currently the only class that can be chosen is ProportionalTimeGeometry() which assumes that the time steps are ordered equidistant. To initialize an object with given geometries call ProportionalTimeGeometry::Initialize() with an existing Geometry3D and the number of time steps. The given geometries will be copied and not referenced!
 
 SlicedGeometry3D is a sub-class of Geometry3D, which describes data objects consisting of slices, e.g., objects of type Image (or SlicedData, which is the super-class of Image). 
-Therefore, Image::GetTimeSlicedGeometry() will contain a list of SlicedGeometry3D instances. There is a special method SlicedData::GetSlicedGeometry(t) which directly returns\n
+Therefore, Image::GetTimeGeometry() will contain a list of SlicedGeometry3D instances. There is a special method SlicedData::GetSlicedGeometry(t) which directly returns\n
 a SlicedGeometry3D to avoid the need of casting.
 
-Comparable to TimeSlicedGeometry the class SlicedGeometry3D contains a list of Geometry2D objects describing the slices in the image. Instead of time steps we have spatial steps here from 0 to GetSlices(). 
+The class SlicedGeometry3D contains a list of Geometry2D objects describing the slices in the image.We have here spatial steps from 0 to GetSlices(). 
 SlicedGeometry3D::InitializeEvenlySpaced (Geometry2D *geometry2D, unsigned int slices) initializes a stack of slices with the same thickness, one starting at the position where the previous one ends.
 
 Geometry2D provides methods for working with 2D manifolds (i.e., simply spoken, an object that can be described using a 2D coordinate-system) in 3D space.\n
@@ -119,7 +109,7 @@ The change can be done in two ways:\n
 
 If you experience displaced contours, figures or other stuff, it is an indicator that you have not considered the origin offset mentioned above.</b>\n\n
 
-An image has a TimeSlicedGeometry, which contains one or more SlicedGeometry3D instances (one for each time step), all of which contain one or more instances of (sub-classes of) Geometry2D (usually PlaneGeometry).\n
+An image has a TimeGeometry, which contains one or more SlicedGeometry3D instances (one for each time step), all of which contain one or more instances of (sub-classes of) Geometry2D (usually PlaneGeometry).\n
 As a reminder: Geometry instances referring to images need a slightly different definition of corners, see Geometry3D::SetImageGeometry. This is usualy automatically called by Image.\n\n
 
 \section GeometryOverviewPage_Connection Connection between MITK, ITK and VTK Geometries

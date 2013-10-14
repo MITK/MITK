@@ -523,8 +523,8 @@ void mitk::ContourModel::Initialize()
 
 void mitk::ContourModel::Initialize(mitk::ContourModel &other)
 {
-  unsigned int numberOfTimesteps = other.GetTimeSlicedGeometry()->GetTimeSteps();
-  this->InitializeTimeSlicedGeometry(numberOfTimesteps);
+  unsigned int numberOfTimesteps = other.GetTimeGeometry()->CountTimeSteps();
+  this->InitializeTimeGeometry(numberOfTimesteps);
 
   for(int currentTimestep = 0; currentTimestep < numberOfTimesteps; currentTimestep++)
   {
@@ -546,7 +546,7 @@ void mitk::ContourModel::InitializeEmpty()
   this->m_ContourSeries.push_back(mitk::ContourElement::New());
 
   //set number of timesteps to one
-  this->InitializeTimeSlicedGeometry(1);
+  this->InitializeTimeGeometry(1);
 
   m_SelectedVertex = NULL;
   this->m_lineInterpolation = ContourModel::LINEAR;
@@ -562,7 +562,6 @@ void mitk::ContourModel::UpdateOutputInformation()
 
   if(this->m_UpdateBoundingBox)
   {
-
     //update the bounds of the geometry according to the stored vertices
     float mitkBounds[6];
 
@@ -629,7 +628,7 @@ void mitk::ContourModel::UpdateOutputInformation()
     }
     this->m_UpdateBoundingBox = false;
   }
-  GetTimeSlicedGeometry()->UpdateInformation();
+  GetTimeGeometry()->Update();
 }
 
 

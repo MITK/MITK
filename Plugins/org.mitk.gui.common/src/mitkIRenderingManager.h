@@ -71,6 +71,10 @@ struct IRenderingManager {
   virtual bool InitializeViews( const Geometry3D *geometry,
                                 RenderingManager::RequestType type = RenderingManager::REQUEST_UPDATE_ALL,
                                 bool preserveRoughOrientationInWorldSpace = false ) = 0;
+  virtual bool InitializeViews( const TimeGeometry *geometry,
+                                RenderingManager::RequestType type = RenderingManager::REQUEST_UPDATE_ALL,
+                                bool preserveRoughOrientationInWorldSpace = false ) = 0;
+
 
   /**
    * Initializes the windows to the default viewing direction
@@ -81,7 +85,7 @@ struct IRenderingManager {
   /**
    * Initializes the specified window to the given geometry. Set
    * "initializeGlobalTimeSNC" to true in order to use this geometry as
-   * global TimeSlicedGeometry.
+   * global TimeGeometry.
    */
   virtual bool InitializeView( vtkRenderWindow *renderWindow, const Geometry3D *geometry,
                                bool initializeGlobalTimeSNC = false) = 0;

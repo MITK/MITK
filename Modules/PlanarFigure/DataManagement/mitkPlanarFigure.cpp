@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigure.h"
 #include "mitkGeometry2D.h"
 #include "mitkProperties.h"
+#include <mitkProportionalTimeGeometry.h>
 
 #include "algorithm"
 
@@ -42,7 +43,7 @@ mitk::PlanarFigure::PlanarFigure()
   this->SetProperty( "closed", mitk::BoolProperty::New( false ) );
 
   // Currently only single-time-step geometries are supported
-  this->InitializeTimeSlicedGeometry( 1 );
+  this->InitializeTimeGeometry( 1 );
 }
 
 
@@ -76,7 +77,7 @@ mitk::PlanarFigure::PlanarFigure(const Self& other)
 void mitk::PlanarFigure::SetGeometry2D( mitk::Geometry2D *geometry )
 {
   this->SetGeometry( geometry );
-  m_Geometry2D = geometry;
+  m_Geometry2D = dynamic_cast<Geometry2D *>(GetGeometry(0));//geometry;
 }
 
 
@@ -445,7 +446,7 @@ void mitk::PlanarFigure::UpdateOutputInformation()
   // Bounds are NOT calculated here, since the Geometry2D defines a fixed
   // frame (= bounds) for the planar figure.
   Superclass::UpdateOutputInformation();
-  this->GetTimeSlicedGeometry()->UpdateInformation();
+  this->GetTimeGeometry()->Update();
 }
 
 
@@ -557,11 +558,13 @@ void mitk::PlanarFigure::DeactivateFeature( unsigned int index )
   }
 }
 
-
 void mitk::PlanarFigure::InitializeTimeSlicedGeometry( unsigned int timeSteps )
 {
-  mitk::TimeSlicedGeometry::Pointer timeGeometry = this->GetTimeSlicedGeometry();
+  InitializeTimeGeometry(timeSteps);
+}
 
+void mitk::PlanarFigure::InitializeTimeGeometry( unsigned int timeSteps )
+{
   mitk::Geometry2D::Pointer geometry2D = mitk::Geometry2D::New();
   geometry2D->Initialize();
 
@@ -573,7 +576,9 @@ void mitk::PlanarFigure::InitializeTimeSlicedGeometry( unsigned int timeSteps )
 
   // The geometry is propagated automatically to all time steps,
   // if EvenlyTimed is true...
-  timeGeometry->InitializeEvenlyTimed( geometry2D, timeSteps );
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(geometry2D, timeSteps);
+  SetTimeGeometry(timeGeometry);
 }
 
 
@@ -679,7 +684,8 @@ void mitk::PlanarFigure::DeepCopy(Self::Pointer oldFigure)
   m_NumberOfControlPoints       = oldFigure->m_NumberOfControlPoints;
 
   //copy geometry 2D of planar figure
-  SetGeometry2D((mitk::Geometry2D*)oldFigure->m_Geometry2D->Clone().GetPointer());
+  Geometry2D::Pointer affineGeometry = oldFigure->m_Geometry2D->Clone();
+  SetGeometry2D(affineGeometry.GetPointer());
 
   for(unsigned long index=0; index < oldFigure->GetNumberOfControlPoints(); index++)
   {

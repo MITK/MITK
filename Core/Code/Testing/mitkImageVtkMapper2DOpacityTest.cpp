@@ -38,9 +38,9 @@ int mitkImageVtkMapper2DOpacityTest(int argc, char* argv[])
 
   //use this to generate a reference screenshot or save the file:
   bool generateReferenceScreenshot = false;
-  if(generateReferenceScreenshot)
+  if(true)
   {
-    renderingHelper.SaveReferenceScreenShot("/home/kilgus/Pictures/RenderingTestData/output.png");
+    renderingHelper.SaveReferenceScreenShot("d:/tmp/renderingtest.png");
   }
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
@@ -48,4 +48,3 @@ int mitkImageVtkMapper2DOpacityTest(int argc, char* argv[])
 
   MITK_TEST_END();
 }
-

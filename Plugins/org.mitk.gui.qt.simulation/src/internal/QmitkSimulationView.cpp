@@ -116,6 +116,7 @@ void QmitkSimulationView::OnRecordButtonToggled(bool toggled)
 {
   if (!toggled)
   {
+
     m_Controls.stepsRecordedLabel->hide();
     m_Controls.stepsRecordedLabel->setText("0 steps recorded");
   }

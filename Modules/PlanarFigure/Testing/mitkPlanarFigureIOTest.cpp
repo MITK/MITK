@@ -363,7 +363,7 @@ public:
     const mitk::PlaneGeometry* planeGeometry2 = dynamic_cast<const mitk::PlaneGeometry*>(figure2->GetGeometry2D());
 
     // Test Geometry transform parameters
-    typedef mitk::AffineGeometryFrame3D::TransformType TransformType;
+    typedef mitk::Geometry3D::TransformType TransformType;
     const TransformType* affineGeometry1 = planeGeometry1->GetIndexToWorldTransform();
     const TransformType::ParametersType& parameters1 = affineGeometry1->GetParameters();
     const TransformType::ParametersType& parameters2 = planeGeometry2->GetIndexToWorldTransform()->GetParameters();

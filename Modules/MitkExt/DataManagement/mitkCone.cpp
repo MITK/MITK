@@ -57,9 +57,9 @@ bool mitk::Cone::IsInside(const Point3D& worldPoint) const
 
 mitk::ScalarType mitk::Cone::GetVolume()
 {
-  Geometry3D* geometry = GetTimeSlicedGeometry();
-  return   geometry->GetExtentInMM(0) * 0.5
-    * geometry->GetExtentInMM(2) * 0.5
+  TimeGeometry* geometry = GetTimeGeometry();
+  return   geometry->GetExtentInWorld(0) * 0.5
+    * geometry->GetExtentInWorld(2) * 0.5
     * vnl_math::pi / 3.0
-    * geometry->GetExtentInMM(1);
+    * geometry->GetExtentInWorld(1);
 }

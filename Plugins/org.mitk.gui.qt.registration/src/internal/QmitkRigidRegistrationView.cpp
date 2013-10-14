@@ -693,7 +693,7 @@ void QmitkRigidRegistrationView::RedoTransformation()
       }
     }
 
-    movingData->GetTimeSlicedGeometry()->UpdateInformation();
+    movingData->GetTimeGeometry()->Update();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
     this->SetUndoEnabled(true);

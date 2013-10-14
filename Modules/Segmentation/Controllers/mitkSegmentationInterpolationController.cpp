@@ -452,7 +452,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
     mitk::ExtractSliceFilter::Pointer extractor = ExtractSliceFilter::New();
     extractor->SetInput(m_Segmentation);
     extractor->SetTimeStep(timeStep);
-    extractor->SetResliceTransformByGeometry( m_Segmentation->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+    extractor->SetResliceTransformByGeometry( m_Segmentation->GetTimeGeometry()->GetGeometryForTimeStep( timeStep ) );
     extractor->SetVtkOutputRequest(false);
 
     //Reslicing the current plane
@@ -518,4 +518,3 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
                                  timeStep,
                                  m_ReferenceImage );
 }
-

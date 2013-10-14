@@ -57,8 +57,8 @@ bool mitk::Cuboid::IsInside(const Point3D& worldPoint) const
 
 mitk::ScalarType mitk::Cuboid::GetVolume()
 {
-  Geometry3D* geometry = GetTimeSlicedGeometry();
-  return   geometry->GetExtentInMM(0)
-    * geometry->GetExtentInMM(1)
-    * geometry->GetExtentInMM(2);
+  TimeGeometry* geometry = GetTimeGeometry();
+  return   geometry->GetExtentInWorld(0)
+    * geometry->GetExtentInWorld(1)
+    * geometry->GetExtentInWorld(2);
 }

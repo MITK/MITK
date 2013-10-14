@@ -52,7 +52,7 @@ void mitk::ContourModelToPointSetFilter::GenerateData()
     {
       mitk::Point3D p = (*it)->Coordinates;
       mitk::PointOperation popInsert( mitk::OpINSERT,
-                                      inputContour->GetTimeSlicedGeometry()->TimeStepToMS(timestep),
+                                      inputContour->GetTimeGeometry()->TimeStepToTimePoint(timestep),
                                       p,
                                       pointId++,
                                       false );

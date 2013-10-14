@@ -41,7 +41,7 @@ namespace mitk {
   choose between rotation and slice selection. Such functionality could not be implemented
   by a single SliceNavigationController.
 
-  Rotation is achieved by modifying (rotating) the generated TimeSlicedGeometry of the
+  Rotation is achieved by modifying (rotating) the generated TimeGeometry of the
   corresponding SliceNavigationControllers.
 
   \section mitkSlicesRotator_StandardCase The standard case: three orthogonal views (MPR)

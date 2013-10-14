@@ -31,12 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-//class ImageVtkAccessor;
-
 //##Documentation
-//## @brief LabelSetImage class for storing labels in a segmentation session.
+//## @brief LabelSetImage class for multi-label segmentation.
 //##
-//## Handles operations for editing labels.
+//## Handles operations for adding, removing, erasing and editing labels.
 //## @ingroup Data
 
 class Segmentation_EXPORT LabelSetImage : public Image
@@ -355,14 +353,14 @@ public:
 
   /**
     * \brief  */
-  PixelType* GetLayerBufferPointer(int layer);
+  mitk::Image* GetLayerImage(int layer);
 
 protected:
   LabelSetImage();
   LabelSetImage(mitk::LabelSetImage*);
   virtual ~LabelSetImage();
 
-  void CreateDefaultLabelSet(int layer);
+  LabelSet::Pointer CreateDefaultLabelSet();
 
   //mutable ImageVtkAccessor* m_VtkImageData;
 
@@ -373,10 +371,10 @@ protected:
   void AddLayerProcessing( ImageType* input);
 
   template < typename ImageType >
-  void VectorToImageProcessing( ImageType* input, int layer);
+  void LayerContainerToImageProcessing( ImageType* input, int layer);
 
   template < typename ImageType >
-  void ImageToVectorProcessing( ImageType* input, int layer);
+  void ImageToLayerContainerProcessing( ImageType* input, int layer);
 
   template < typename ImageType >
   void CalculateCenterOfMassProcessing( ImageType* input, int index);
@@ -406,6 +404,7 @@ protected:
   void InitializeByLabeledImageProcessing( ImageType1* input, ImageType2* other);
 
   std::vector< LabelSet::Pointer > m_LabelSetContainer;
+  std::vector< Image::Pointer > m_LayerContainer;
 
   int m_ActiveLayer;
 
@@ -413,8 +412,6 @@ protected:
 
   std::string m_Name;
 
-  VectorImageType::Pointer  m_VectorImage;
-  ImageAdaptorType::Pointer m_ImageToVectorAdaptor;
 };
 
 } // namespace mitk

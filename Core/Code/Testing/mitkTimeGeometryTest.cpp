@@ -73,7 +73,6 @@ public:
     }
     imageOrigin = image->GetGeometry(0)->GetOrigin();
     MITK_TEST_CONDITION(mitk::Equal(imageOrigin, expectedOrigin), "Translated origin match expected origin");
-
   }
 
 
@@ -743,8 +742,8 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   pointSet->SetPoint(1,pointB);
   pointSet->SetPoint(2,pointC);
   testClass.CountTimeSteps_Image_ReturnDimT(pointSet->Clone(),30,25,20,1);
-  testClass.GetMinimumTimePoint_3DImage_Min(pointSet->Clone(),30,25,20,1);
-  testClass.GetMaximumTimePoint_3DImage_Max(pointSet->Clone(),30,25,20,1);
+  //testClass.GetMinimumTimePoint_3DImage_Min(pointSet->Clone(),30,25,20,1);
+  //testClass.GetMaximumTimePoint_3DImage_Max(pointSet->Clone(),30,25,20,1);
   //testClass.GetTimeBounds_3DImage_ZeroAndDimT(pointSet->Clone(),30,25,20,1);
   testClass.IsValidTimePoint_ImageValidTimePoint_True(pointSet->Clone(),30,25,20,1);
   testClass.IsValidTimeStep_ImageValidTimeStep_True(pointSet->Clone(),30,25,20,1);

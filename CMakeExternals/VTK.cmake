@@ -48,13 +48,15 @@ if(NOT DEFINED VTK_DIR)
   endif()
 
   if(MITK_USE_QT)
-    list(APPEND additional_cmake_args
-        -DDESIRED_QT_VERSION:STRING=4
-        -DVTK_USE_GUISUPPORT:BOOL=ON
-        -DVTK_USE_QVTK_QTOPENGL:BOOL=OFF
-        -DVTK_USE_QT:BOOL=ON
-        -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
-     )
+    if(DESIRED_QT_VERSION MATCHES 4) # current VTK package has a HARD Qt 4 dependency
+      list(APPEND additional_cmake_args
+          -DDESIRED_QT_VERSION:STRING=${DESIRED_QT_VERSION}
+          -DVTK_USE_GUISUPPORT:BOOL=ON
+          -DVTK_USE_QVTK_QTOPENGL:BOOL=OFF
+          -DVTK_USE_QT:BOOL=ON
+          -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+       )
+     endif()
   endif()
 
   set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-5.10.0.tar.gz)

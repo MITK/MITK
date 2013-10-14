@@ -14,8 +14,8 @@ mitk::DataStorage::Pointer FillDataStorage(int argc, char **argv)
 {
   if (argc < 2)
   {
-    fprintf(stderr, "Usage:   %s [filename1] [filename2] ...\n\n", "");
-    return NULL;
+    fprintf(stderr, "Usage:   %s [filename1] [filename2] ...\n", "");
+    exit(EXIT_FAILURE);
   }
 
   // Create a DataStorage

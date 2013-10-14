@@ -39,10 +39,11 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
                              # automatic loading of this module
       ADDITIONAL_LIBS        # list of addidtional libraries linked to this module
       GENERATED_CPP          # not used (?)
+      QT_MODULES             # the module depends on a given list of Qt modules
      )
 
   set(_macro_options
-      QT_MODULE              # the module makes use of Qt features and needs moc and ui generated files
+      QT_MODULE              # the module makes use of Qt4 features and needs moc and ui generated files
       FORCE_STATIC           # force building this module as a static library
       HEADERS_ONLY           # this module is a headers-only library
       GCC_DEFAULT_VISIBILITY # do not use gcc visibility flags - all symbols will be exported
@@ -53,6 +54,25 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
   MACRO_PARSE_ARGUMENTS(MODULE "${_macro_params}" "${_macro_options}" ${ARGN})
 
   set(MODULE_NAME ${MODULE_NAME_IN})
+
+  # QT_MODULE defines just a default set of dependencies
+  if (MODULE_QT_MODULE)
+    if (MODULE_QT_MODULES)
+      message(WARNING "Both QT_MODULE and QT_MODULES set for module ${MODULE_NAME}. Please remove QT_MODULE and be specific with QT_MODULES")
+    else()
+      if (DESIRED_QT_VERSION MATCHES 4)
+        set(MODULE_QT_MODULES 1) # TODO there should really be some module names
+      endif()
+      if (DESIRED_QT_VERSION MATCHES 5)
+        set (MODULE_QT_MODULES Qt5Core)
+      endif()
+    endif(MODULE_QT_MODULES)
+  endif(MODULE_QT_MODULE)
+
+  # QT_MODULES is just an alias for PACKAGE_DEPENDS
+  if (MODULE_QT_MODULES)
+    list(APPEND MODULE_PACKAGE_DEPENDS ${MODULE_QT_MODULES})
+  endif()
 
   if(MODULE_HEADERS_ONLY)
     set(MODULE_PROVIDES )
@@ -103,7 +123,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
       set(MODULE_IS_EXCLUDED 1)
     endif()
   endif()
-  if(NOT MODULE_IS_EXCLUDED AND NOT (MODULE_QT_MODULE AND NOT MITK_USE_QT))
+  if(NOT MODULE_IS_EXCLUDED AND NOT (MODULE_QT_MODULES AND NOT MITK_USE_QT))
     # first of all we check for the dependencies
     MITK_CHECK_MODULE(_MISSING_DEP ${MODULE_DEPENDS})
     if(_MISSING_DEP)
@@ -115,7 +135,11 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
       # MITK_CHECK_MODULE ...
       foreach(_package ${MODULE_PACKAGE_DEPENDS})
         if((DEFINED MITK_USE_${_package}) AND NOT (MITK_USE_${_package}))
-          message("Module ${MODULE_NAME} won't be built. Turn on MITK_USE_${_package} if you want to use it.")
+          if (${_package} MATCHES "Qt[45]")
+            message("Module ${MODULE_NAME} won't be built because we lack ${_package}. Check CMake switches MITK_USE_QT and DESIRED_QT_VERSION.")
+          else()
+            message("Module ${MODULE_NAME} won't be built. Turn on MITK_USE_${_package} if you want to use it.")
+          endif()
           set(MODULE_IS_ENABLED 0)
         endif()
       endforeach()
@@ -285,18 +309,32 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
 
         endif()
 
-        if(MODULE_QT_MODULE)
-          # TODO: here we would need handling of both Qt 4 and Qt 5
+        if(MODULE_QT_MODULES)
           if(UI_FILES)
-            QT4_WRAP_UI(Q${KITNAME}_GENERATED_UI_CPP ${UI_FILES})
+            if (DESIRED_QT_VERSION MATCHES 4)
+              qt4_wrap_ui(Q${KITNAME}_GENERATED_UI_CPP ${UI_FILES})
+            endif()
+            if (DESIRED_QT_VERSION MATCHES 5)
+              qt5_wrap_ui(Q${KITNAME}_GENERATED_UI_CPP ${UI_FILES})
+            endif()
           endif(UI_FILES)
 
           if(MOC_H_FILES)
-            QT4_WRAP_CPP(Q${KITNAME}_GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+            if (DESIRED_QT_VERSION MATCHES 4)
+              qt4_wrap_cpp(Q${KITNAME}_GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+            endif()
+            if (DESIRED_QT_VERSION MATCHES 5)
+              qt5_wrap_cpp(Q${KITNAME}_GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+            endif()
           endif(MOC_H_FILES)
 
           if(QRC_FILES)
-            QT4_ADD_RESOURCES(Q${KITNAME}_GENERATED_QRC_CPP ${QRC_FILES})
+            if (DESIRED_QT_VERSION MATCHES 4)
+              qt4_add_resources(Q${KITNAME}_GENERATED_QRC_CPP ${QRC_FILES})
+            endif()
+            if (DESIRED_QT_VERSION MATCHES 5)
+              qt5_add_resources(Q${KITNAME}_GENERATED_QRC_CPP ${QRC_FILES})
+            endif()
           endif(QRC_FILES)
 
           set(Q${KITNAME}_GENERATED_CPP ${Q${KITNAME}_GENERATED_CPP} ${Q${KITNAME}_GENERATED_UI_CPP} ${Q${KITNAME}_GENERATED_MOC_CPP} ${Q${KITNAME}_GENERATED_QRC_CPP})
@@ -344,10 +382,6 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           if(ALL_LIBRARIES)
             target_link_libraries(${MODULE_PROVIDES} ${ALL_LIBRARIES})
           endif(ALL_LIBRARIES)
-
-          if(MODULE_QT_MODULE AND QT_LIBRARIES)
-            target_link_libraries(${MODULE_PROVIDES} ${QT_LIBRARIES})
-          endif()
 
           if(MINGW)
             target_link_libraries(${MODULE_PROVIDES} ssp) # add stack smash protection lib
@@ -420,7 +454,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
 
       endif(MODULE_IS_ENABLED)
     endif(_MISSING_DEP)
-  endif(NOT MODULE_IS_EXCLUDED AND NOT (MODULE_QT_MODULE AND NOT MITK_USE_QT))
+  endif(NOT MODULE_IS_EXCLUDED AND NOT (MODULE_QT_MODULES AND NOT MITK_USE_QT))
 
   if(NOT MODULE_IS_ENABLED)
     _MITK_CREATE_MODULE_CONF()

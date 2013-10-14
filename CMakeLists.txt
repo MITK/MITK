@@ -149,6 +149,7 @@ option(MITK_USE_Boost "Use the Boost C++ library" OFF)
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
 option(MITK_USE_QT "Use Nokia's Qt library" ${MITK_USE_CTK})
+set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
 option(MITK_USE_DCMTK "EXPERIMENTAL, superbuild only: Use DCMTK in MITK" ${MITK_USE_CTK})
 option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
 option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
@@ -174,6 +175,13 @@ if(MITK_USE_Boost)
 endif()
 
 if(MITK_USE_BLUEBERRY)
+  if(NOT DESIRED_QT_VERSION MATCHES 4)
+    message("Forcing MITK_USE_BLUEBERRY to OFF because of DESIRED_QT_VERSION ${DESIRED_QT_VERSION}")
+    set(MITK_USE_BLUEBERRY OFF CACHE BOOL "Build the BlueBerry application platform" FORCE)
+  endif()
+endif()
+
+if(MITK_USE_BLUEBERRY)
   option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
   mark_as_advanced(MITK_BUILD_ALL_PLUGINS)
 
@@ -187,6 +195,11 @@ if(MITK_USE_CTK)
   if(NOT MITK_USE_QT)
     message("Forcing MITK_USE_QT to ON because of MITK_USE_CTK")
     set(MITK_USE_QT ON CACHE BOOL "Use Nokia's Qt library in MITK" FORCE)
+  else()
+    if(NOT DESIRED_QT_VERSION MATCHES 4)
+      message("Forcing MITK_USE_CTK to OFF because of DESIRED_QT_VERSION ${DESIRED_QT_VERSION}")
+      set(MITK_USE_CTK OFF CACHE BOOL "Use CTK in MITK" FORCE)
+    endif()
   endif()
   if(NOT MITK_USE_DCMTK)
     message("Setting MITK_USE_DCMTK to ON because DCMTK needs to be build for CTK")
@@ -196,7 +209,16 @@ endif()
 
 if(MITK_USE_QT)
   # find the package at the very beginning, so that QT4_FOUND is available
-  find_package(Qt4 4.6.2 REQUIRED)
+  if(DESIRED_QT_VERSION MATCHES 4)
+    find_package(Qt4 4.6.2 REQUIRED)
+    set(MITK_USE_Qt4 TRUE)
+    set(MITK_USE_Qt5 FALSE)
+  endif(DESIRED_QT_VERSION MATCHES 4)
+  if(DESIRED_QT_VERSION MATCHES 5)
+    find_package(Qt5Core REQUIRED) # at least Core required
+    set(MITK_USE_Qt4 FALSE)
+    set(MITK_USE_Qt5 TRUE)
+  endif(DESIRED_QT_VERSION MATCHES 5)
 endif()
 
 if(MITK_USE_SOFA)
@@ -524,7 +546,7 @@ set(MITK_EXE_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})
 #-----------------------------------------------------------------------------
 
 set(MITK_MODULES_PACKAGE_DEPENDS_DIR ${MITK_SOURCE_DIR}/CMake/PackageDepends)
-set(MODULES_PACKAGE_DEPENDS_DIRS ${MITK_MODULES_PACKAGE_DEPENDS_DIR})
+set(MODULES_PACKAGE_DEPENDS_DIRS ${MITK_MODULES_PACKAGE_DEPENDS_DIR} ${MITK_MODULES_PACKAGE_DEPENDS_DIR}/Qt)
 
 #-----------------------------------------------------------------------------
 # Testing
@@ -737,11 +759,13 @@ if(MITK_USE_BLUEBERRY)
     list(APPEND mitk_apps_fullpath "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${mitk_app}")
   endforeach()
 
-  ctkMacroSetupPlugins(${mitk_plugins_fullpath}
-                       BUILD_OPTION_PREFIX MITK_BUILD_
-                       APPS ${mitk_apps_fullpath}
-                       BUILD_ALL ${MITK_BUILD_ALL_PLUGINS}
-                       COMPACT_OPTIONS)
+  if (mitk_plugins_fullpath)
+    ctkMacroSetupPlugins(${mitk_plugins_fullpath}
+                         BUILD_OPTION_PREFIX MITK_BUILD_
+                         APPS ${mitk_apps_fullpath}
+                         BUILD_ALL ${MITK_BUILD_ALL_PLUGINS}
+                         COMPACT_OPTIONS)
+  endif()
 
   set(MITK_PLUGIN_USE_FILE "${MITK_BINARY_DIR}/MitkPluginUseFile.cmake")
   if(${PROJECT_NAME}_PLUGIN_LIBRARIES)

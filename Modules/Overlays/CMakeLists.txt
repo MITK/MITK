@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE( Overlays
                     DEPENDS Qmitk
-                    PACKAGE_DEPENDS QT QVTK
+                    PACKAGE_DEPENDS Qt4 QVTK
                     QT_MODULE
 )

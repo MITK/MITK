@@ -46,14 +46,22 @@ set(_example_dirs
   MbiLog
   QtFreeRender
 #  Overlays# depends on QmitkExt..
-  QuickRender
 )
 
 if(MITK_USE_QT)
-  list(APPEND _example_dirs
-    Tutorial
-    QtAppExample
-  )
+  # some examples depend on Qt 4
+  if (MITK_USE_Qt4)
+    list(APPEND _example_dirs
+      Tutorial
+      QtAppExample
+    )
+  endif()
+  # some examples depend on Qt 5
+  if (MITK_USE_Qt5)
+    list(APPEND _example_dirs
+      QuickRender
+      )
+    endif()
 endif()
 
 if(MITK_USE_BLUEBERRY)

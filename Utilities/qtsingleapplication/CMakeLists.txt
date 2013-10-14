@@ -1,5 +1,5 @@
 
-if(MITK_USE_QT) # only if MITK is built with Qt
+if(MITK_USE_Qt4) # only if MITK is built with Qt 4
 
 project(QtSingleApplication)
 
@@ -9,7 +9,7 @@ set(_MOC_HEADERS
   qtsinglecoreapplication.h
 )
 
-set(_HEADERS 
+set(_HEADERS
   qthandlenewappinstance.h
   qtlockedfile.h
 )
@@ -33,5 +33,5 @@ target_link_libraries(qtsingleapplication ${QT_LIBRARIES})
 
 MITK_CREATE_MODULE_CONF(qtsingleapplication)
 
-endif(MITK_USE_QT) # only if MITK is built with Qt
+endif(MITK_USE_Qt4) # only if MITK is built with Qt 4
 

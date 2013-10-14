@@ -101,16 +101,32 @@ set(MITK_LINK_DIRECTORIES
 
 # Qt support
 if(MITK_USE_QT)
-  find_package(Qt4 REQUIRED)
 
-  set(QMITK_INCLUDE_DIRS
-      ${MITK_INCLUDE_DIRS}
-      ${CMAKE_CURRENT_SOURCE_DIR}/Modules/Qmitk
-      ${PROJECT_BINARY_DIR}/Modules/Qmitk
-     )
+  if(DESIRED_QT_VERSION MATCHES 4)
+    find_package(Qt4 REQUIRED)
 
-  set(QMITK_LIBRARIES Qmitk ${MITK_LIBRARIES})
-  set(QMITK_LINK_DIRECTORIES ${MITK_LINK_DIRECTORIES})
+    set(QMITK_INCLUDE_DIRS
+        ${MITK_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modules/Qmitk
+        ${PROJECT_BINARY_DIR}/Modules/Qmitk
+       )
+
+    set(QMITK_LIBRARIES Qmitk ${MITK_LIBRARIES})
+    set(QMITK_LINK_DIRECTORIES ${MITK_LINK_DIRECTORIES})
+  endif(DESIRED_QT_VERSION MATCHES 4)
+
+  if(DESIRED_QT_VERSION MATCHES 5)
+    find_package(Qt5Core REQUIRED) # at least Core required
+
+    set(QMITK_INCLUDE_DIRS
+        ${MITK_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modules/QmlMitk
+        ${PROJECT_BINARY_DIR}/Modules/QmlMitk
+       )
+
+    set(QMITK_LIBRARIES QmlMitk ${MITK_LIBRARIES})
+    set(QMITK_LINK_DIRECTORIES ${MITK_LINK_DIRECTORIES})
+  endif(DESIRED_QT_VERSION MATCHES 5)
 endif()
 
 if(MITK_BUILD_ALL_PLUGINS)

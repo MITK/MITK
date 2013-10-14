@@ -21,8 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 
 
-mitk::LabelSet::LabelSet(int layer) :
-m_Layer(layer),
+mitk::LabelSet::LabelSet() :
+m_Layer(0),
 m_ActiveLabel(NULL)
 {
   m_LookupTable = mitk::LookupTable::New();
@@ -177,6 +177,11 @@ void mitk::LabelSet::SetAllLabelsVisible(bool value)
 int mitk::LabelSet::GetNumberOfLabels() const
 {
   return m_LabelContainer.size();
+}
+
+void mitk::LabelSet::SetLayer(int layer)
+{
+  m_Layer = layer;
 }
 
 void mitk::LabelSet::SetActiveLabel(int index)

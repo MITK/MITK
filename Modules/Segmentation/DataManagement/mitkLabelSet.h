@@ -40,7 +40,7 @@ public:
 
     mitkClassMacro( LabelSet, itk::Object );
 
-    mitkNewMacro1Param( Self, int );
+    itkNewMacro(Self);
 
     typedef std::vector <Label::Pointer>          LabelContainerType;
     typedef LabelContainerType::const_iterator    LabelContainerConstIteratorType;
@@ -55,6 +55,10 @@ public:
     /** \brief Returns a const iterator pointing to the end of the container.
     */
     LabelContainerConstIteratorType IteratorEnd();
+
+    /** \brief
+    */
+    void SetLayer(int);
 
     /** \brief
     */
@@ -214,10 +218,8 @@ public:
 
 protected:
 
-    LabelSet(int layer);
+    LabelSet();
     virtual ~LabelSet();
-
-//    LabelSet(const LabelSet& other);
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const;
 

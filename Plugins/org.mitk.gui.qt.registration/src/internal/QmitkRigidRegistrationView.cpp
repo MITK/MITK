@@ -201,7 +201,6 @@ QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
 
   this->GetDataStorage()->RemoveNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkRigidRegistrationView,
     const mitk::DataNode*> ( this, &QmitkRigidRegistrationView::DataNodeHasBeenRemoved ));
-
 }
 
 void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
@@ -337,7 +336,6 @@ void QmitkRigidRegistrationView::Activated()
   this->ShowRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
   this->ClearTransformationLists();
   this->CheckCalculateEnabled();*/
-
 }
 
 void QmitkRigidRegistrationView::Visible()
@@ -471,7 +469,6 @@ void QmitkRigidRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImag
     int avg = (min+max) / 2;
     m_Controls.m_ContourSlider->setSliderPosition(avg);
     m_Controls.m_ThresholdLabel->setText(QString::number(avg));
-
   }
   else
   {
@@ -611,7 +608,7 @@ void QmitkRigidRegistrationView::UndoTransformation()
         iter = oldChildGeometries.find(m_MovingMaskNode);
         mitk::Geometry3D* geo = static_cast<mitk::Geometry3D*>((*iter).second);
         m_MovingMaskNode->GetData()->SetGeometry(geo);
-        m_MovingMaskNode->GetData()->GetTimeSlicedGeometry()->UpdateInformation();
+        m_MovingMaskNode->GetData()->GetTimeGeometry()->Update();
       }
       else
       {
@@ -727,7 +724,6 @@ void QmitkRigidRegistrationView::EnableContour(bool show)
   m_ContourHelperNode->SetProperty("visible", mitk::BoolProperty::New(show));
 
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-
 }
 
 void QmitkRigidRegistrationView::ShowContour()
@@ -795,7 +791,6 @@ void QmitkRigidRegistrationView::ShowContour()
     m_ContourHelperNode->SetProperty("color", mitk::ColorProperty::New(1.0, 0.0, 0.0));
     m_ContourHelperNode->SetBoolProperty("helper object", true);
     this->GetDataStorage()->Add(m_ContourHelperNode);
-
   }
   else
   {
@@ -804,8 +799,6 @@ void QmitkRigidRegistrationView::ShowContour()
 
 
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-
-
 }
 
 
@@ -860,7 +853,6 @@ void QmitkRigidRegistrationView::Translate(int* translateVector)
 {
   if (m_MovingNode.IsNotNull())
   {
-
     mitk::Vector3D translateVec;
 
     translateVec[0] = translateVector[0] - m_TranslateSliderPos[0];
@@ -995,7 +987,6 @@ void QmitkRigidRegistrationView::Scale(int* scaleVector)
 {
   if (m_MovingNode.IsNotNull())
   {
-
     mitk::Vector3D scaleVec;
 
     scaleVec[0] = scaleVector[0] - m_ScaleSliderPos[0];

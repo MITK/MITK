@@ -80,6 +80,7 @@ m_ToolManager(0)
   connect( m_Controls.m_btDeleteLayer, SIGNAL(clicked()), this, SLOT( OnDeleteLayer()) );
   connect( m_Controls.m_btPreviousLayer, SIGNAL(clicked()), this, SLOT( OnPreviousLayer()) );
   connect( m_Controls.m_btNextLayer, SIGNAL(clicked()), this, SLOT( OnNextLayer()) );
+  connect( m_Controls.m_cbActiveLayer, SIGNAL(currentIndexChanged(int)), this, SLOT( OnChangetLayer(int)) );
 
   m_Controls.m_LabelSearchBox->setAlwaysShowClearIcon(true);
   m_Controls.m_LabelSearchBox->setShowSearchIcon(true);
@@ -269,6 +270,35 @@ void QmitkLabelSetWidget::OnNextLayer()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+void QmitkLabelSetWidget::OnChangetLayer(int layer)
+{
+  m_ToolManager->ActivateTool(-1);
+
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  assert(workingNode);
+
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  assert(workingImage);
+
+  try
+  {
+    this->WaitCursorOn();
+    workingImage->SetActiveLayer( layer );
+    this->WaitCursorOff();
+  }
+  catch ( mitk::Exception& e )
+  {
+    this->WaitCursorOff();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(this, "Next Layer", "Could not change to next layer. See error log for details.\n");
+    return;
+  }
+
+  m_Controls.m_LabelSetTableWidget->Reset();
+  this->UpdateControls();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 void QmitkLabelSetWidget::OnDeleteLayer()
 {
   m_ToolManager->ActivateTool(-1);
@@ -304,6 +334,11 @@ void QmitkLabelSetWidget::OnDeleteLayer()
   }
 
   m_Controls.m_LabelSetTableWidget->Reset();
+  m_Controls.m_cbActiveLayer->clear();
+  for (int lidx=0; lidx<workingImage->GetNumberOfLayers(); ++lidx)
+  {
+    m_Controls.m_cbActiveLayer->addItem(QString::number(lidx));
+  }
   this->UpdateControls();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -340,6 +375,12 @@ void QmitkLabelSetWidget::OnAddLayer()
   }
 
   m_Controls.m_LabelSetTableWidget->Reset();
+
+  m_Controls.m_cbActiveLayer->clear();
+  for (int lidx=0; lidx<workingImage->GetNumberOfLayers(); ++lidx)
+  {
+    m_Controls.m_cbActiveLayer->addItem(QString::number(lidx));
+  }
   this->UpdateControls();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -360,7 +401,6 @@ void QmitkLabelSetWidget::UpdateControls()
   m_Controls.m_btDeleteSegmentation->setEnabled(enabled);
   m_Controls.m_btImportSegmentation->setEnabled(enabled);
 
- // mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   if (!workingNode) return;
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
@@ -372,7 +412,8 @@ void QmitkLabelSetWidget::UpdateControls()
   m_Controls.m_btDeleteLayer->setEnabled(numberOfLayers>1);
   m_Controls.m_btPreviousLayer->setEnabled(activeLayer>0);
   m_Controls.m_btNextLayer->setEnabled(activeLayer!=numberOfLayers-1);
-  m_Controls.m_leActiveLayer->setText( QString::number( activeLayer ) );
+  m_Controls.m_cbActiveLayer->setEnabled(numberOfLayers>1);
+  m_Controls.m_cbActiveLayer->setCurrentIndex(activeLayer);
 }
 
 void QmitkLabelSetWidget::OnNewLabel()
@@ -697,6 +738,12 @@ void QmitkLabelSetWidget::OnLoadSegmentation()
 
   m_DataStorage->Add(newNode,referenceNode);
 
+  m_Controls.m_cbActiveLayer->clear();
+  for (int lidx=0; lidx<newImage->GetNumberOfLayers(); ++lidx)
+  {
+    m_Controls.m_cbActiveLayer->addItem(QString::number(lidx));
+  }
+
   this->UpdateControls();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -765,13 +812,7 @@ void QmitkLabelSetWidget::OnNewSegmentation()
   assert(referenceImage);
 
   QString name = QString::fromStdString(referenceNode->GetName());
-  QString cTime = QDateTime::currentDateTime().time().toString();
-  name.append("-labels-");
-  name.append(cTime);
-
-//  bool ok = false;
-//  QString newName = QInputDialog::getText(this, "New Segmentation", "Set a name:", QLineEdit::Normal, name, &ok);
-//  if (!ok) return;
+  name.append("-labels");
 
   mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New();
   newImage->Initialize(referenceImage);
@@ -782,8 +823,6 @@ void QmitkLabelSetWidget::OnNewSegmentation()
   newImage->SetName(name.toStdString());
 
   m_DataStorage->Add(newNode,referenceNode);
-
-  //this->UpdateControls();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 

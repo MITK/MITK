@@ -100,6 +100,9 @@ private slots:
   // reaction to the button "Next Layer"
   void OnNextLayer();
 
+  // reaction to the combobox change "Change Layer"
+  void OnChangetLayer(int);
+
   // reaction to the button "New Segmentation"
   void OnNewSegmentation();
 

@@ -61,6 +61,7 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone()) ); // After NewDeviceWidget finished editing
   connect( m_Controls.m_BtnView, SIGNAL(clicked()), this, SLOT(OnClickedViewDevice()) );
   connect( m_Controls.m_FrameRate, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit(int)) );
+  connect( m_Controls.m_FreezeButton, SIGNAL(clicked()), this, SLOT(OnClickedFreezeButton()) );
   connect( m_Timer, SIGNAL(timeout()), this, SLOT(DisplayImage()));
 
   // Initializations
@@ -91,7 +92,8 @@ void UltrasoundSupport::DisplayImage()
 {
   m_Device->UpdateOutputData(0);
   mitk::Image::Pointer curOutput = m_Device->GetOutput();
-  m_Node->SetData(curOutput->Clone());
+  //m_Node->SetData(curOutput->Clone());
+  m_Node->SetData(curOutput);
   this->RequestRenderWindowUpdate();
 
   if ( curOutput->GetDimension() > 1
@@ -252,6 +254,20 @@ void UltrasoundSupport::OnChangedFramerateLimit(int value)
   m_Timer->setInterval(1000 / value);
 }
 
+void UltrasoundSupport::OnClickedFreezeButton()
+{
+  if ( m_Device->GetIsFreezed() )
+  {
+    m_Device->SetIsFreezed(false);
+    m_Controls.m_FreezeButton->setText("Freeze");
+  }
+  else
+  {
+    m_Device->SetIsFreezed(true);
+    m_Controls.m_FreezeButton->setText("Start Viewing Again");
+  }
+}
+
 void UltrasoundSupport::OnNewDeviceWidgetDone()
 {
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
@@ -274,11 +290,11 @@ void UltrasoundSupport::GlobalReinit()
 }
 
 UltrasoundSupport::UltrasoundSupport()
-  : m_ControlCustomWidget(0),
-    m_ControlBModeWidget(0),
-    m_ControlProbesWidget(0),
-    m_CurrentImageWidth(0),
-    m_CurrentImageHeight(0)
+: m_ControlCustomWidget(0),
+m_ControlBModeWidget(0),
+m_ControlProbesWidget(0),
+m_CurrentImageWidth(0),
+m_CurrentImageHeight(0)
 {
 }
 

@@ -185,6 +185,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="m_FreezeButton">
+         <property name="text">
+          <string>Freeze</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label_3">
          <property name="text">
           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;

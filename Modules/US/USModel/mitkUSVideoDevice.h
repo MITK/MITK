@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSVideoDeviceCustomControls.h"
 
 namespace mitk {
-
 /**
   * \brief A mitk::USVideoDevice is the common class for video only devices.
   * They capture video input either from a file or from a device and
@@ -164,7 +163,6 @@ protected:
     */
   mitk::USVideoDeviceCustomControls::Pointer m_ControlInterfaceCustom;
 };
-
 } // namespace mitk
 
 #endif // MITKUSVideoDevice_H_HEADER_INCLUDED_

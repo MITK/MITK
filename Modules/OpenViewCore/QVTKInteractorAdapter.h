@@ -38,7 +38,7 @@
 
 #include <QtCore/QObject>
 
-#include "OpenViewExports.h"
+#include "OpenViewCoreExports.h"
 
 class vtkRenderWindowInteractor;
 class QEvent;

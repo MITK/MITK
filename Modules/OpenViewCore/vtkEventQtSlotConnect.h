@@ -44,7 +44,7 @@
 #include "vtkCommand.h"  // for event defines
 #include <QObject>          // for version info
 
-#include "OpenViewExports.h"
+#include "OpenViewCoreExports.h"
 
 class QObject;
 class vtkQtConnections;

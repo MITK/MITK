@@ -15,7 +15,7 @@ set(module_dirs
     SurfaceInterpolation
     Segmentation
     PlanarFigureSegmentation
-    OpenView
+    OpenViewCore
     QmlMitk
     Qmitk
     QmitkExt

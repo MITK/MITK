@@ -35,7 +35,7 @@
 #include "vtkCommand.h"  // for event defines
 #include "qobject.h"
 
-#include "OpenViewExports.h"
+#include "OpenViewCoreExports.h"
 
 class QObject;
 class vtkCallbackCommand;

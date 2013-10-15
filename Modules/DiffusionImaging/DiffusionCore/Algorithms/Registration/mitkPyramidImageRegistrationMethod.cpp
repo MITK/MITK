@@ -25,8 +25,11 @@ mitk::PyramidImageRegistrationMethod::PyramidImageRegistrationMethod()
     m_CrossModalityRegistration(true),
     m_UseAffineTransform(true),
     m_UseWindowedSincInterpolator(false),
+    m_UseNearestNeighborInterpolator(false),
+    m_UseMask(false),
     m_EstimatedParameters(NULL),
-    m_Verbose(false)
+    m_Verbose(false),
+    m_InitializeByGeometry(false)
 {
 
 }
@@ -53,6 +56,12 @@ void mitk::PyramidImageRegistrationMethod::SetMovingImage(mitk::Image::Pointer m
   {
     m_MovingImage = moving;
   }
+}
+
+
+void mitk::PyramidImageRegistrationMethod::SetFixedImageMask(mitk::Image::Pointer mask)
+{
+  m_FixedImageMask = mask;
 }
 
 void mitk::PyramidImageRegistrationMethod::Update()
@@ -106,7 +115,6 @@ mitk::PyramidImageRegistrationMethod::TransformMatrixType mitk::PyramidImageRegi
     this->GetParameters( &affine_params[0] );
 
     transform->SetParameters( affine_params );
-
     base_transform = transform;
   }
   else
@@ -134,6 +142,38 @@ mitk::Image::Pointer mitk::PyramidImageRegistrationMethod
   //output->Initialize( this->m_FixedImage );
 
   AccessFixedDimensionByItk_1( this->m_MovingImage, ResampleMitkImage, 3, output );
+
+  return output;
+
+}
+
+mitk::Image::Pointer mitk::PyramidImageRegistrationMethod::GetResampledMovingImage(mitk::Image::Pointer movingImage, double* transform)
+{
+  mitk::Image::Pointer output = mitk::Image::New();
+
+
+  unsigned int dim = 12;
+  if( !m_UseAffineTransform )
+    dim = 6;
+
+  if (m_EstimatedParameters == NULL)
+    m_EstimatedParameters = new double[dim];
+
+  double tmpParams[12];
+  // save and set temporal transformation values
+  for( unsigned int i=0; i<dim; i++)
+  {
+    tmpParams[i] = m_EstimatedParameters[i];
+    m_EstimatedParameters[i] = transform[i];
+  }
+
+  AccessFixedDimensionByItk_1( movingImage, ResampleMitkImage, 3, output );
+
+  // Restore old values
+  for( unsigned int i=0; i<dim; i++)
+  {
+    m_EstimatedParameters[i] = tmpParams[i];
+  }
 
   return output;
 

@@ -50,7 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   nonConstImage2->Update();                                                                         \
   _checkSpecificDimension(mitkImage1, (dimension));                                                 \
   _checkSpecificDimension(mitkImage2, (dimension));                                                 \
-  _accessTwoImagesByItkForEach(itkImageTypeFunction, ((short, dimension))((float, dimension)), ((short, dimension))((float, dimension)) ) \
+  _accessTwoImagesByItkForEach(itkImageTypeFunction, ((short, dimension))((unsigned short, dimension))((float, dimension))((double, dimension)), ((short, dimension))((unsigned short, dimension))((float, dimension))((double, dimension)) ) \
   {                                                                                                 \
     std::string msg("Pixel type ");                                                                 \
     msg.append(pixelType1.GetComponentTypeAsString() );                                             \

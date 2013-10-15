@@ -58,9 +58,8 @@ set(CPP_FILES
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
   Algorithms/itkDwiGradientLengthCorrectionFilter.cpp
 
-
-
   # Registration Algorithms & Co.
+  Algorithms/Registration/mitkRegistrationWrapper.cpp
   Algorithms/Registration/mitkPyramidImageRegistrationMethod.cpp
 
 

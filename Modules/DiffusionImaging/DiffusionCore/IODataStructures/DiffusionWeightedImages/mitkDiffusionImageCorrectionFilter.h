@@ -63,6 +63,13 @@ public:
    */
   void CorrectDirections( const TransformsVectorType& );
 
+  /**
+   * @brief Correct all gradient directions according to the given transform
+   *
+   * This will apply the same rotation to all directions.
+   */
+  void CorrectDirections( const TransformMatrixType& );
+
 
 protected:
   DiffusionImageCorrectionFilter();

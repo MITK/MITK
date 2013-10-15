@@ -2,24 +2,18 @@
 #include "mitkPyramidImageRegistrationMethod.h"
 #include "mitkDiffusionImage.h"
 
-#include <mitkRotationOperation.h>
+//#include <mitkRotationOperation.h>
 #include <mitkDiffusionImageCorrectionFilter.h>
 #include "itkB0ImageExtractionImageFilter.h"
 
-#include <itkScalableAffineTransform.h>
 #include <vnl/vnl_inverse.h>
-// VTK
-#include <vtkTransform.h>
-
-// DEBUG
-#include <mitkIOUtil.h>
 
 
-mitk::BatchedRegistration::BatchedRegistration()
+mitk::RegistrationWrapper::RegistrationWrapper()
 {
 }
 
-void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer &img, const mitk::BatchedRegistration::RidgidTransformType &transformation,double* offset, mitk::Image::Pointer resampleReference,  bool binary) const
+void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer &img, const mitk::RegistrationWrapper::RidgidTransformType &transformation,double* offset, mitk::Image::Pointer resampleReference,  bool binary) const
 {
   typedef mitk::DiffusionImage<short> DiffusionImageType;
 
@@ -107,7 +101,7 @@ void mitk::BatchedRegistration::ApplyTransformationToImage(mitk::Image::Pointer 
   }
 }
 
-void mitk::BatchedRegistration::GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage, RidgidTransformType transformation,double* offset, mitk::Image::Pointer mask)
+void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage, RidgidTransformType transformation,double* offset, mitk::Image::Pointer mask)
 {
   // Handle the case that fixed/moving image is a DWI image
   mitk::DiffusionImage<short>* fixedDwi = dynamic_cast<mitk::DiffusionImage<short>*> (fixedImage.GetPointer());

@@ -28,11 +28,28 @@ public:
 
   typedef double* RidgidTransformType;
 
-  mitkClassMacro(BatchedRegistration, itk::LightObject)
+  mitkClassMacro(RegistrationWrapper, itk::LightObject)
   itkNewMacro(Self)
 
   void ApplyTransformationToImage(mitk::Image::Pointer& img, const RidgidTransformType& transformation, double *offset, mitk::Image::Pointer resampleReference = NULL , bool binary = false) const;
 
+  /**
+   * @brief GetTransformation Registeres the moving to the fixed image and returns the according transformation
+   *
+   * \note Does not return a registered image \see  ApplyTransformationToImage for this.
+   *
+   * Both images are set to the same origin (the one of the fixed image), this is supposed to ensure overlapping,
+   * the correction of the moving image is returned in the offset.
+   *
+   * It is possible mask a certain area and thereby excluding it from the registration metric (e.g. a tumor that is operated on),
+   * this can be set as mitk::Image where all non-zero voxels are excluded.
+   *
+   * @param fixedImage
+   * @param movingImage
+   * @param transformation
+   * @param offset -
+   * @param mask
+   */
   void GetTransformation(mitk::Image::Pointer fixedImage , mitk::Image::Pointer movingImage, RidgidTransformType transformation, double* offset, mitk::Image::Pointer mask = NULL);
 
 

@@ -12,15 +12,17 @@
 namespace mitk
 {
 /**
- * @brief The BatchedRegistration class Wrapper to calculate and apply a reference transformation to several images.
+ * @brief The RegistrationWrapper class wraps the pyramid registration to calculate and apply a reference transformation to several images.
  *
  *  Use if several pictures with the same world geometry are to be registered
- *  to one reference image, the registration is only computed once (for the moving image) and the geometry transformed for the complete
+ *  to one reference image, the registration is only computed once (for the moving image) and the geometry can be transformed for the complete
  *  image batch accordingly. Can handle image types that are usually not supported by registrations filters, e.g. fiber bundles and segmentations:
  *  these can be registered if a "registerable" image such as B0/T2 from which they are derived is supplied, since the transformation can be calculated
  *  on those and applied to the derived objects.
+ *
+ *  For DWI images a registerable B0 Image will automatically be extracted.
  */
-class DiffusionCore_EXPORT BatchedRegistration : public itk::LightObject
+class DiffusionCore_EXPORT RegistrationWrapper : public itk::LightObject
 {
 public:
 
@@ -29,51 +31,18 @@ public:
   mitkClassMacro(BatchedRegistration, itk::LightObject)
   itkNewMacro(Self)
 
-
-  void SetFixedImage(Image::Pointer &fixedImage);
-
-  void SetMovingReferenceImage(mitk::Image::Pointer& movingImage);
-
-  void SetBatch(std::vector<mitk::Image::Pointer> imageBatch);
-
-  /**
-   * @brief GetRegisteredImages returns registered images ,
-   *
-   * at position 0 the registered moving reference image is supplied followed all registered images from the batch.
-   */
-  std::vector<mitk::Image::Pointer> GetRegisteredImages();
-
   void ApplyTransformationToImage(mitk::Image::Pointer& img, const RidgidTransformType& transformation, double *offset, mitk::Image::Pointer resampleReference = NULL , bool binary = false) const;
 
   void GetTransformation(mitk::Image::Pointer fixedImage , mitk::Image::Pointer movingImage, RidgidTransformType transformation, double* offset, mitk::Image::Pointer mask = NULL);
 
 
 protected:
-  BatchedRegistration();
-  ~BatchedRegistration(){};
+  RegistrationWrapper();
+  ~RegistrationWrapper(){};
 
 private:
-  BatchedRegistration(const Self &); //purposely not implemented
+  RegistrationWrapper(const Self &); //purposely not implemented
   void operator=(const Self &);  //purposely not implemented
-
-  bool m_RegisteredImagesValid;
-
-
-  mitk::Image::Pointer m_FixedImage;
-  mitk::Image::Pointer m_MovingReference;
-
-  /**
-   * @brief m_ImageBatch List of images on which that the reference transformation is applied
-   *
-   */
-  std::vector<mitk::Image::Pointer> m_ImageBatch;
-
-  /**
-   * @brief m_RegisteredImages List of references to registered images.
-   *
-   */
-  std::vector<mitk::Image::Pointer> m_RegisteredImages;
-
 };
 
 }

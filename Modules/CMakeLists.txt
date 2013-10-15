@@ -2,6 +2,7 @@ set(LIBPOSTFIX "Ext")
 
 # Modules must be listed according to their dependencies
 set(module_dirs
+    Qt4Qt5TestModule
     SceneSerializationBase
     PlanarFigure
     ImageExtraction

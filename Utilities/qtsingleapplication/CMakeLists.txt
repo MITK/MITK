@@ -31,7 +31,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(qtsingleapplication STATIC ${_SOURCES})
 target_link_libraries(qtsingleapplication ${QT_LIBRARIES})
 
+set(MODULE_QT4_MODULES QtNetworking)
 MITK_CREATE_MODULE_CONF(qtsingleapplication)
 
 endif(MITK_USE_Qt4) # only if MITK is built with Qt 4
-

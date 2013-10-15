@@ -58,12 +58,15 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
 
   if (MODULE_QT_MODULE)
     message(WARNING "QT_MODULE keyword is deprecated (in module ${MODULE_NAME}). Please replace QT_MODULE by the more specific QT4_MODULES / QT5_MODULES!")
+    if (NOT MODULE_QT4_MODULES)
+      set(MODULE_QT4_MODULES Qt4Gui)
+    endif()
   endif()
 
   if (MODULE_QT4_MODULES)
     set (MODULE_QT_MODULE TRUE) # defines that we want to process UIC_FILES, QRC_FILES etc. from files.cmake
     if (DESIRED_QT_VERSION MATCHES 4)
-      list(APPEND MODULE_PACKAGE_DEPENDS Qt4) # QT4_MODULES will create package dependency to Qt4 and define a list of Qt 4 components
+      list(APPEND MODULE_PACKAGE_DEPENDS Qt4) # QT4_MODULES will create package dependencies to Qt4 modules and define a list of Qt 4 components
     endif()
   endif()
   if (MODULE_QT5_MODULES)
@@ -124,7 +127,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
   endif()
   if(NOT MODULE_IS_EXCLUDED AND NOT (MODULE_QT_MODULE AND NOT MITK_USE_QT))
     # first of all we check for the dependencies
-    MITK_CHECK_MODULE(_MISSING_DEP ${MODULE_DEPENDS})
+    MITK_CHECK_MODULE(_MISSING_DEP ${MODULE_DEPENDS} ${MODULE_PACKAGE_DEPENDS})
     if(_MISSING_DEP)
       message("Module ${MODULE_NAME} won't be built, missing dependency: ${_MISSING_DEP}")
       set(MODULE_IS_ENABLED 0)
@@ -139,8 +142,8 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           else()
             message("Module ${MODULE_NAME} won't be built. Turn on MITK_USE_${_package} if you want to use it.")
           endif()
-            set(MODULE_IS_ENABLED 0)
-          endif()
+          set(MODULE_IS_ENABLED 0)
+        endif()
       endforeach()
 
       if (MODULE_QT_MODULE) # disable module if it 1. needs Qt 2. has only one of QT4_MODULES/QT5_MODULES set and 3. DESIRED_QT_VERSION does not match the module

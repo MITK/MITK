@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QWonderString_h
 #define QWonderString_h
 
-#include <QtCore>
+#include <QObject>
 
 #include "Qt4Qt5TestModuleExports.h"
 

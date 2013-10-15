@@ -1,7 +1,6 @@
 project(org_mitk_gui_qt_cmdlinemodules)
 
-set(QT_USE_QTUITOOLS 1)
-include(${QT_USE_FILE})
+set(PLUGIN_QT4_MODULES QtUiTools)
 
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE CLI_EXPORT

@@ -745,7 +745,7 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   testClass.CountTimeSteps_Image_ReturnDimT(pointSet->Clone(),30,25,20,1);
   testClass.GetMinimumTimePoint_3DImage_Min(pointSet->Clone(),30,25,20,1);
   testClass.GetMaximumTimePoint_3DImage_Max(pointSet->Clone(),30,25,20,1);
-  testClass.GetTimeBounds_3DImage_ZeroAndDimT(pointSet->Clone(),30,25,20,1);
+  //testClass.GetTimeBounds_3DImage_ZeroAndDimT(pointSet->Clone(),30,25,20,1);
   testClass.IsValidTimePoint_ImageValidTimePoint_True(pointSet->Clone(),30,25,20,1);
   testClass.IsValidTimeStep_ImageValidTimeStep_True(pointSet->Clone(),30,25,20,1);
   testClass.IsValidTimeStep_ImageNegativInvalidTimeStep_False(pointSet->Clone(),30,25,20,1);

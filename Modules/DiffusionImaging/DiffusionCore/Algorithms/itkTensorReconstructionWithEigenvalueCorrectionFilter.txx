@@ -167,19 +167,6 @@ namespace itk
     vnl_matrix<double> pseudoInverse = eig.pinverse()*H.transpose();
 
 
-
-    ImageType::Pointer corrected_diffusion_temp = ImageType::New();
-
-    typedef itk::VariableLengthVector<short> VariableVectorType;
-    VariableVectorType variableLengthVector;
-    variableLengthVector.SetSize(nof);
-
-
-    typedef itk::VariableLengthVector<short> VariableVectorType;
-    VariableVectorType corrected_single;
-    corrected_single.SetSize(nof-1);
-
-
     typedef itk::Image<short, 3> MaskImageType;
     MaskImageType::Pointer mask = MaskImageType::New();
     mask->SetRegions(m_GradientImagePointer->GetLargestPossibleRegion().GetSize());
@@ -264,8 +251,13 @@ namespace itk
    //Smoothing is done by aproximation of negative voxel value by its correct ( positive) 27-th neighborhood.
 
 
+ //   typename TensorImageType::Pointer someimg;
+   // someimg = TensorImageType::New();
+
+
+
     double mask_val=0.0;
-    vnl_vector<double> org_vec(nof-numberb0);
+    vnl_vector<double> org_vec(nof);
 
     int counter_corrected =0;
 
@@ -275,7 +267,7 @@ namespace itk
       {
         for ( int z=0;z<size[2];z++)
         {
-          itk::Index<3> ix = {{x,y,z}};
+          itk::Index<3> ix = {x,y,z};
 
           mask_val = mask->GetPixel(ix);
 
@@ -321,7 +313,12 @@ namespace itk
 
 
 
-    typename TensorImageType::Pointer tensorImg = TensorImageType::New();
+
+
+
+
+    typename TensorImageType::Pointer tensorImg;
+    tensorImg = TensorImageType::New();
     tensorImg->SetRegions(m_GradientImagePointer->GetLargestPossibleRegion().GetSize());
     tensorImg->SetSpacing(m_GradientImagePointer->GetSpacing());
     tensorImg->SetOrigin(m_GradientImagePointer->GetOrigin());
@@ -513,9 +510,9 @@ namespace itk
     // to the value of 0.
 
     // Definition of neighbourhood avoiding crossing the image boundaries
-    int x_max=size[0];
-    int y_max=size[1];
-    int z_max=size[2];
+    int x_max=size[0]-1;
+    int y_max=size[1]-1;
+    int z_max=size[2]-1;
 
     double back_x=std::max(0,x-1);
     double back_y=std::max(0,y-1);
@@ -541,8 +538,6 @@ namespace itk
 
 
           GradientVectorType p = corrected_diffusion_temp->GetPixel(ix);
-
-          //double test= p[f];
 
           if (p[f] > 0.0 )// taking only positive values and counting them
           {
@@ -765,9 +760,9 @@ namespace itk
               if(atten[cnt_atten]<pixel_min[cnt_atten] || atten[cnt_atten]> pixel_max[cnt_atten])
               {
 
-                  int x_max=size[0];
-                  int y_max=size[1];
-                  int z_max=size[2];
+                  int x_max=size[0]-1;
+                  int y_max=size[1]-1;
+                  int z_max=size[2]-1;
 
                   double back_x=std::max(0,x-1);
                   double back_y=std::max(0,y-1);

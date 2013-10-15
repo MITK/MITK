@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLegacyAdaptors.h"
 #include <ipPic/mitkIpPicTypeMultiplex.h>
+#include <mitkProportionalTimeGeometry.h>
 
 template <class T>
 void _transform(mitkIpPicDescriptor *pic, mitkIpPicDescriptor *dest, float _outsideValue, float *fr, float *fphi, float *fz, short *rt, unsigned int *phit, unsigned int *zt, mitkIpPicDescriptor *coneCutOff_pic)  //...t=truncated
@@ -358,10 +359,12 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   //set the timebounds - after SetGeometry2D, so that the already created PlaneGeometry will also receive this timebounds.
   //@fixme!!! will not work for not evenly timed data!
   output->GetSlicedGeometry()->SetTimeBounds(input->GetSlicedGeometry()->GetTimeBounds());
-  output->GetTimeSlicedGeometry()->InitializeEvenlyTimed(output->GetSlicedGeometry(), output->GetTimeSlicedGeometry()->GetTimeSteps());
+
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(output->GetSlicedGeometry(), output->GetTimeGeometry()->CountTimeSteps());
+  output->SetTimeGeometry(timeGeometry);
 
   output->SetPropertyList(input->GetPropertyList()->Clone());
-
   m_TimeOfHeaderInitialization.Modified();
 }
 

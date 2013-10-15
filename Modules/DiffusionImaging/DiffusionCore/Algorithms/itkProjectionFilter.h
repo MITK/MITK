@@ -33,6 +33,9 @@ namespace itk
   * (see Smith et al., 2009. http://dx.doi.org/10.1016/j.neuroimage.2006.02.024 )
   * As input it takes a binary skeleton, a distance map, and a vector image containing the image gradients
   * that are typically provided by the itkSkeletonizationFilter and the itkDistanceMapFilter.
+  * Furthermore it requires a 4d dataset with patient data registered to the same space as the mean FA image.
+  * This 4D dataset is typically created by the TBSS pipeline (see http://fsl.fmrib.ox.ac.uk/fsl/fsl4.0/tbss/index),
+  * in which case it is often named all_FA.nii.gz
   */
 
 

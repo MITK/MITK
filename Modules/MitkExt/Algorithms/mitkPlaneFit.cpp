@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPlaneGeometry.h"
 #include "mitkGeometryData.h"
+#include <mitkProportionalTimeGeometry.h>
 
 #include <vnl/algo/vnl_svd.h>
 #include <vcl_iostream.h>
@@ -26,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::PlaneFit::PlaneFit()
 : m_PointSet( NULL )
 {
-  m_TimeSlicedGeometry = mitk::TimeSlicedGeometry::New();
+  m_TimeGeometry = mitk::ProportionalTimeGeometry::New();
 }
 
 mitk::PlaneFit::~PlaneFit()
@@ -49,27 +50,29 @@ void mitk::PlaneFit::GenerateOutputInformation()
   }
 
   bool update = false;
-  if ( output->GetGeometry() == NULL || output->GetTimeSlicedGeometry() == NULL )
+  if ( output->GetGeometry() == NULL || output->GetTimeGeometry() == NULL )
     update = true;
-  if ( ( ! update ) && ( output->GetTimeSlicedGeometry()->GetTimeSteps() != input->GetTimeSlicedGeometry()->GetTimeSteps() ) )
+  if ( ( ! update ) && ( output->GetTimeGeometry()->CountTimeSteps() != input->GetTimeGeometry()->CountTimeSteps() ) )
     update = true;
   if ( update )
   {
     mitk::PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
 
-    m_TimeSlicedGeometry->InitializeEvenlyTimed(
-      planeGeometry, m_PointSet->GetPointSetSeriesSize() );
+    ProportionalTimeGeometry::Pointer timeGeometry = dynamic_cast<ProportionalTimeGeometry *>(m_TimeGeometry.GetPointer());
+    timeGeometry->Initialize(planeGeometry, m_PointSet->GetPointSetSeriesSize());
+    //m_TimeGeometry->InitializeEvenlyTimed(
+    //  planeGeometry, m_PointSet->GetPointSetSeriesSize() );
 
-    unsigned int t;
-    for ( t = 0;
-          (t < m_PointSet->GetPointSetSeriesSize())
-          && (t < m_Planes.size());
-          ++t )
+    TimeStepType timeStep;
+    for ( timeStep = 0;
+          (timeStep < m_PointSet->GetPointSetSeriesSize())
+          && (timeStep < m_Planes.size());
+          ++timeStep )
     {
-      m_TimeSlicedGeometry->SetGeometry3D( m_Planes[t], (int) t );
+      timeGeometry->SetTimeStepGeometry( m_Planes[timeStep], timeStep );
     }
 
-    output->SetGeometry( m_TimeSlicedGeometry );
+    output->SetTimeGeometry( m_TimeGeometry );
   }
 }
 

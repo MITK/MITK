@@ -237,7 +237,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   // Correct origin of real geometry (changed by cropping and padding)
 
-  typedef AffineGeometryFrame3D::TransformType TransformType;
+  typedef Geometry3D::TransformType TransformType;
 
   TransformType::Pointer transform = TransformType::New();
   TransformType::OutputVectorType translation;

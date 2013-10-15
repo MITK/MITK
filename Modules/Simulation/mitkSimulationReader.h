@@ -51,9 +51,6 @@ namespace mitk
     SimulationReader();
     ~SimulationReader();
 
-    SimulationReader(const Self &);
-    Self & operator=(const Self &);
-
     std::string m_FileName;
     std::string m_FilePattern;
     std::string m_FilePrefix;

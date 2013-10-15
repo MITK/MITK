@@ -102,14 +102,14 @@ void mitk::PicFileReader::GenerateOutputInformation()
         if( header->dim > 3 )
             timesteps = header->n[3];
 
-        TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
-        timeSliceGeometry->InitializeEvenlyTimed(slicedGeometry, timesteps);
-        timeSliceGeometry->ImageGeometryOn();
+        slicedGeometry->ImageGeometryOn();
+        ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+        timeGeometry->Initialize(slicedGeometry, timesteps);
 
         // Cast the pic descriptor to ImageDescriptor and initialize the output
 
         output->Initialize( CastToImageDescriptor(header));
-        output->SetGeometry( timeSliceGeometry );
+        output->SetTimeGeometry( timeGeometry );
         mitkIpPicFree ( header );
     }
     else

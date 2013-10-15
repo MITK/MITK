@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurface.h"
 #include "mitkSurfaceGLMapper2D.h"
 #include "mitkSurfaceVtkMapper3D.h"
-#include "mitkTimeSlicedGeometry.h"
+#include "mitkTimeGeometry.h"
 #include "mitkTransferFunctionProperty.h"
 #include "mitkVolumeDataVtkMapper3D.h"
 #include "mitkVtkInterpolationProperty.h"
@@ -130,30 +130,52 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 }
 
 mitk::CoreObjectFactory::CoreObjectFactory()
+  : m_PointSetIOFactory(PointSetIOFactory::New().GetPointer())
+  , m_STLFileIOFactory(STLFileIOFactory::New().GetPointer())
+  , m_VtkSurfaceIOFactory(VtkSurfaceIOFactory::New().GetPointer())
+  , m_VtkImageIOFactory(VtkImageIOFactory::New().GetPointer())
+  , m_VtiFileIOFactory(VtiFileIOFactory::New().GetPointer())
+  , m_ItkImageFileIOFactory(ItkImageFileIOFactory::New().GetPointer())
+  , m_SurfaceVtkWriterFactory(SurfaceVtkWriterFactory::New().GetPointer())
+  , m_PointSetWriterFactory(PointSetWriterFactory::New().GetPointer())
+  , m_ImageWriterFactory(ImageWriterFactory::New().GetPointer())
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
     MITK_DEBUG << "CoreObjectFactory c'tor" << std::endl;
 
-    // FIXME itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( PointSetIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( STLFileIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( VtkSurfaceIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( VtkImageIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( VtiFileIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( ItkImageFileIOFactory::New() );
-    // FIXME itk::ObjectFactoryBase::RegisterFactory( PicVolumeTimeSeriesIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( m_PointSetIOFactory );
+    itk::ObjectFactoryBase::RegisterFactory( m_STLFileIOFactory );
+    itk::ObjectFactoryBase::RegisterFactory( m_VtkSurfaceIOFactory );
+    itk::ObjectFactoryBase::RegisterFactory( m_VtkImageIOFactory );
+    itk::ObjectFactoryBase::RegisterFactory( m_VtiFileIOFactory );
+    itk::ObjectFactoryBase::RegisterFactory( m_ItkImageFileIOFactory );
 
-    mitk::SurfaceVtkWriterFactory::RegisterOneFactory();
-    mitk::PointSetWriterFactory::RegisterOneFactory();
-    mitk::ImageWriterFactory::RegisterOneFactory();
+    itk::ObjectFactoryBase::RegisterFactory( m_SurfaceVtkWriterFactory );
+    itk::ObjectFactoryBase::RegisterFactory( m_PointSetWriterFactory );
+    itk::ObjectFactoryBase::RegisterFactory( m_ImageWriterFactory );
+
     m_FileWriters.push_back(mitk::ImageWriter::New().GetPointer());
 
     CreateFileExtensionsMap();
 
     alreadyDone = true;
   }
+}
+
+mitk::CoreObjectFactory::~CoreObjectFactory()
+{
+  itk::ObjectFactoryBase::UnRegisterFactory( m_PointSetIOFactory );
+  itk::ObjectFactoryBase::UnRegisterFactory( m_STLFileIOFactory );
+  itk::ObjectFactoryBase::UnRegisterFactory( m_VtkSurfaceIOFactory );
+  itk::ObjectFactoryBase::UnRegisterFactory( m_VtkImageIOFactory );
+  itk::ObjectFactoryBase::UnRegisterFactory( m_VtiFileIOFactory );
+  itk::ObjectFactoryBase::UnRegisterFactory( m_ItkImageFileIOFactory );
+
+  itk::ObjectFactoryBase::UnRegisterFactory( m_SurfaceVtkWriterFactory );
+  itk::ObjectFactoryBase::UnRegisterFactory( m_PointSetWriterFactory );
+  itk::ObjectFactoryBase::UnRegisterFactory( m_ImageWriterFactory );
 }
 
 mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)

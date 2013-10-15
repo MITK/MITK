@@ -97,10 +97,10 @@ void mitk::ContourModelMapper2D::Update(mitk::BaseRenderer* renderer)
     LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   // Check if time step is valid
-  const TimeSlicedGeometry *dataTimeGeometry = data->GetTimeSlicedGeometry();
+    const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
   if ( ( dataTimeGeometry == NULL )
-    || ( dataTimeGeometry->GetTimeSteps() == 0 )
-    || ( !dataTimeGeometry->IsValidTime( renderer->GetTimeStep() ) ) )
+    || ( dataTimeGeometry->CountTimeSteps() == 0 )
+    || ( !dataTimeGeometry->IsValidTimeStep( renderer->GetTimeStep() ) ) )
   {
     //clear the rendered polydata
     localStorage->m_Mapper->RemoveAllInputs();//SetInput(vtkSmartPointer<vtkPolyData>::New());

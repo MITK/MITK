@@ -192,7 +192,7 @@ void UltrasoundSupport::GlobalReinit()
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
 
   // calculate bounding geometry of these nodes
-  mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
+  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
 
   // initialize the views to the bounding geometry
   mitk::RenderingManager::GetInstance()->InitializeViews(bounds);

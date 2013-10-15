@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include "mitkBaseController.h"
 #include "mitkRenderingManager.h"
-#include "mitkTimeSlicedGeometry.h"
+#include "mitkTimeGeometry.h"
 #include "mitkMessage.h"
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
@@ -31,22 +31,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkDataStorage.h"
 
+//DEPRECATED
+#include <mitkTimeSlicedGeometry.h>
 
 namespace mitk {
 
 #define mitkTimeSlicedGeometryEventMacro( classname , super ) \
- class MITK_CORE_EXPORT classname : public super { \
+ class MITK_CORE_EXPORT DEPRECATED(classname) : public super { \
    public: \
      typedef classname Self; \
      typedef super Superclass; \
-     classname(TimeSlicedGeometry* aTimeSlicedGeometry, unsigned int aPos) \
-     : Superclass(aTimeSlicedGeometry, aPos) {} \
+     classname(TimeGeometry* aTimeGeometry, unsigned int aPos) \
+     : Superclass(aTimeGeometry, aPos) {} \
      virtual ~classname() {} \
      virtual const char * GetEventName() const { return #classname; } \
      virtual bool CheckEvent(const ::itk::EventObject* e) const \
        { return dynamic_cast<const Self*>(e); } \
      virtual ::itk::EventObject* MakeObject() const \
-       { return new Self(GetTimeSlicedGeometry(), GetPos()); } \
+       { return new Self(GetTimeGeometry(), GetPos()); } \
+   private: \
+     void operator=(const Self&); \
+ }
+
+#define mitkTimeGeometryEventMacro( classname , super ) \
+ class MITK_CORE_EXPORT classname : public super { \
+   public: \
+     typedef classname Self; \
+     typedef super Superclass; \
+     classname(TimeGeometry* aTimeGeometry, unsigned int aPos) \
+     : Superclass(aTimeGeometry, aPos) {} \
+     virtual ~classname() {} \
+     virtual const char * GetEventName() const { return #classname; } \
+     virtual bool CheckEvent(const ::itk::EventObject* e) const \
+       { return dynamic_cast<const Self*>(e); } \
+     virtual ::itk::EventObject* MakeObject() const \
+       { return new Self(GetTimeGeometry(), GetPos()); } \
    private: \
      void operator=(const Self&); \
  }
@@ -59,15 +78,15 @@ class BaseRenderer;
  * \brief Controls the selection of the slice the associated BaseRenderer
  * will display
  *
- * A SliceNavigationController takes a Geometry3D as input world geometry
- * (TODO what are the exact requirements?) and generates a TimeSlicedGeometry
- * as output. The TimeSlicedGeometry holds a number of SlicedGeometry3Ds and
+ * A SliceNavigationController takes a Geometry3D or a TimeGeometry as input world geometry
+ * (TODO what are the exact requirements?) and generates a TimeGeometry
+ * as output. The TimeGeometry holds a number of SlicedGeometry3Ds and
  * these in turn hold a series of Geometry2Ds. One of these Geometry2Ds is
  * selected as world geometry for the BaseRenderers associated to 2D views.
  *
  * The SliceNavigationController holds has Steppers (one for the slice, a
  * second for the time step), which control the selection of a single
- * Geometry2D from the TimeSlicedGeometry. SliceNavigationController generates
+ * Geometry2D from the TimeGeometry. SliceNavigationController generates
  * ITK events to tell observers, like a BaseRenderer,  when the selected slice
  * or timestep changes.
  *
@@ -169,16 +188,38 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
 #endif
 
     /**
-     * \brief Set the input world geometry out of which the
+     * \brief Set the input world geometry3D out of which the
      * geometries for slicing will be created.
+     *
+     * Any previous previous set input geometry (3D or Time) will
+     * be ignored in future.
      */
-    void SetInputWorldGeometry(const mitk::Geometry3D* geometry);
-    itkGetConstObjectMacro(InputWorldGeometry, mitk::Geometry3D);
+    void SetInputWorldGeometry3D(const mitk::Geometry3D* geometry);
+    itkGetConstObjectMacro(InputWorldGeometry3D, mitk::Geometry3D);
+
+
+    /**
+     * \brief Set the input world geometry3D out of which the
+     * geometries for slicing will be created.
+     *
+     * Any previous previous set input geometry (3D or Time) will
+     * be ignored in future.
+     * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
+     */
+    DEPRECATED(void SetInputWorldGeometry(const mitk::TimeSlicedGeometry* geometry));
+    /**
+     * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
+     */
+    DEPRECATED(TimeSlicedGeometry* GetInputWorldGeometry());
+
+
+    void SetInputWorldTimeGeometry(const mitk::TimeGeometry* geometry);
+    itkGetConstObjectMacro(InputWorldTimeGeometry, mitk::TimeGeometry);
 
     /**
      * \brief Access the created geometry
      */
-    itkGetConstObjectMacro(CreatedWorldGeometry, mitk::Geometry3D);
+    itkGetConstObjectMacro(CreatedWorldGeometry, mitk::TimeGeometry);
 
     /**
      * \brief Set the desired view directions
@@ -266,50 +307,55 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     itkEventMacro( UpdateEvent, itk::AnyEvent );
     #pragma GCC visibility pop
 
-    class MITK_CORE_EXPORT TimeSlicedGeometryEvent : public itk::AnyEvent
+    class MITK_CORE_EXPORT TimeGeometryEvent : public itk::AnyEvent
     {
       public:
-        typedef TimeSlicedGeometryEvent Self;
+        typedef TimeGeometryEvent Self;
         typedef itk::AnyEvent Superclass;
 
-        TimeSlicedGeometryEvent(
-          TimeSlicedGeometry* aTimeSlicedGeometry, unsigned int aPos)
-          : m_TimeSlicedGeometry(aTimeSlicedGeometry), m_Pos(aPos)
+        TimeGeometryEvent(
+          TimeGeometry* aTimeGeometry, unsigned int aPos)
+          : m_TimeGeometry(aTimeGeometry), m_Pos(aPos)
           {}
 
-        virtual ~TimeSlicedGeometryEvent()
+        virtual ~TimeGeometryEvent()
           {}
 
         virtual const char * GetEventName() const
-          { return "TimeSlicedGeometryEvent"; }
+          { return "TimeGeometryEvent"; }
 
         virtual bool CheckEvent(const ::itk::EventObject* e) const
           { return dynamic_cast<const Self*>(e); }
 
         virtual ::itk::EventObject* MakeObject() const
-          { return new Self(m_TimeSlicedGeometry, m_Pos); }
+          { return new Self(m_TimeGeometry, m_Pos); }
 
-        TimeSlicedGeometry* GetTimeSlicedGeometry() const
-          { return m_TimeSlicedGeometry; }
+        TimeGeometry* GetTimeGeometry() const
+          { return m_TimeGeometry; }
 
         unsigned int GetPos() const
           { return m_Pos; }
 
       private:
-        TimeSlicedGeometry::Pointer m_TimeSlicedGeometry;
+        TimeGeometry::Pointer m_TimeGeometry;
         unsigned int m_Pos;
-        // TimeSlicedGeometryEvent(const Self&);
+        // TimeGeometryEvent(const Self&);
         void operator=(const Self&); //just hide
     };
 
-    mitkTimeSlicedGeometryEventMacro(
-      GeometrySendEvent,TimeSlicedGeometryEvent );
-    mitkTimeSlicedGeometryEventMacro(
-      GeometryUpdateEvent, TimeSlicedGeometryEvent );
-    mitkTimeSlicedGeometryEventMacro(
-      GeometryTimeEvent, TimeSlicedGeometryEvent );
-    mitkTimeSlicedGeometryEventMacro(
-      GeometrySliceEvent, TimeSlicedGeometryEvent );
+   /**
+   * \deprecatedSince{2013_09} Please use TimeGeometryEvent instead: For additional information see  http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
+   */
+   DEPRECATED(typedef TimeGeometryEvent TimeSlicedGeometryEvent);
+
+    mitkTimeGeometryEventMacro(
+      GeometrySendEvent,TimeGeometryEvent );
+    mitkTimeGeometryEventMacro(
+      GeometryUpdateEvent, TimeGeometryEvent );
+    mitkTimeGeometryEventMacro(
+      GeometryTimeEvent, TimeGeometryEvent );
+    mitkTimeGeometryEventMacro(
+      GeometrySliceEvent, TimeGeometryEvent );
 
     template <typename T>
     void ConnectGeometrySendEvent(T* receiver)
@@ -411,10 +457,8 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     /** \brief Positions the SNC according to the specified point */
     void SelectSliceByPoint( const mitk::Point3D &point );
 
-
-    /** \brief Returns the TimeSlicedGeometry created by the SNC. */
-    const mitk::TimeSlicedGeometry *GetCreatedWorldGeometry();
-
+    /** \brief Returns the TimeGeometry created by the SNC. */
+    mitk::TimeGeometry *GetCreatedWorldGeometry();
 
     /** \brief Returns the Geometry3D of the currently selected time step. */
     const mitk::Geometry3D *GetCurrentGeometry3D();
@@ -518,10 +562,10 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
       }
     };
 */
-    mitk::Geometry3D::ConstPointer m_InputWorldGeometry;
-    mitk::Geometry3D::Pointer m_ExtendedInputWorldGeometry;
+    mitk::Geometry3D::ConstPointer m_InputWorldGeometry3D;
+    mitk::TimeGeometry::ConstPointer m_InputWorldTimeGeometry;
 
-    mitk::TimeSlicedGeometry::Pointer m_CreatedWorldGeometry;
+    mitk::TimeGeometry::Pointer m_CreatedWorldGeometry;
 
     ViewDirection m_ViewDirection;
     ViewDirection m_DefaultViewDirection;

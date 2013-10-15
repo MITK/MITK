@@ -48,8 +48,11 @@ public:
   /** Run-time type information (and related methods). */
   itkTypeMacro(PointSetIOFactory, ObjectFactoryBase);
 
-  /** Register one factory of this type  */
-  static void RegisterOneFactory(void)
+  /**
+   * Register one factory of this type
+   * \deprecatedSince{2013_09}
+   */
+  DEPRECATED(static void RegisterOneFactory(void))
   {
     PointSetIOFactory::Pointer PointSetIOFactory = PointSetIOFactory::New();
     ObjectFactoryBase::RegisterFactory(PointSetIOFactory);

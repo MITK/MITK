@@ -34,7 +34,7 @@ namespace mitk {
 //## @brief Filter for clipping an image with a Geometry2D
 //##
 //## The given geometry for clipping can be either a Geometry2D
-//## or a TimeSlicedGeometry containing multiple instances
+//## or a TimeGeometry containing multiple instances
 //## of Geometry2D
 //##
 //## \todo add AutoOrientLabels, which makes the "left" side (minimum X value) side of the image get one defined label.
@@ -49,14 +49,24 @@ public:
 
   itkNewMacro(Self);
 
-  //##Description
-  //## Set the geometry to be used for clipping
-  //##
-  //## The given geometry for clipping can be either a Geometry2D
-  //## or a TimeSlicedGeometry containing multiple instances
-  //## of Geometry2D
+  /**
+  * Set the geometry to be used for clipping
+  *
+  * The given geometry for clipping must be a Geometry2D.
+  */
   void SetClippingGeometry(const mitk::Geometry3D* aClippingGeometry);
+
+  /**
+  * Set the geometry to be used for clipping
+  *
+  * The given geometry for clipping must a
+  * TimeGeometry containing multiple instances
+  * of Geometry2D
+  */
+  void SetClippingGeometry(const mitk::TimeGeometry* aClippingGeometry);
+
   const mitk::Geometry3D* GetClippingGeometry() const;
+  const mitk::TimeGeometry* GetClippingTimeGeometry() const;
 
   //##Description
   //## @brief Get whether the part above or below the geometry
@@ -121,7 +131,7 @@ public:
 
   mitk::Geometry3D::ConstPointer m_ClippingGeometry;
   mitk::GeometryData::Pointer m_ClippingGeometryData;
-  mitk::TimeSlicedGeometry::ConstPointer m_TimeSlicedClippingGeometry;
+  mitk::TimeGeometry::ConstPointer m_TimeClippingGeometry;
   mitk::ImageTimeSelector::Pointer m_InputTimeSelector;
   mitk::ImageTimeSelector::Pointer m_OutputTimeSelector;
 

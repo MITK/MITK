@@ -31,9 +31,9 @@ mitk::DiffSliceOperation::DiffSliceOperation():Operation(1)
 
 mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image* imageVolume,
                                              vtkImageData* slice,
-                                             AffineGeometryFrame3D* sliceGeometry,
+                                             Geometry3D* sliceGeometry,
                                              unsigned int timestep,
-                                             AffineGeometryFrame3D* currentWorldGeometry):Operation(1)
+                                             Geometry3D* currentWorldGeometry):Operation(1)
 
 {
   m_WorldGeometry = currentWorldGeometry->Clone();

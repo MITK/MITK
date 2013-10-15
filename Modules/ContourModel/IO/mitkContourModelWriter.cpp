@@ -134,7 +134,7 @@ void mitk::ContourModelWriter::GenerateData()
     //write the geometry informations to the stream
       InputType::Pointer contourModel = this->GetInput();
       assert( contourModel.IsNotNull() );
-      WriteGeometryInformation( contourModel->GetTimeSlicedGeometry(), out);;
+      WriteGeometryInformation( contourModel->GetTimeGeometry(), out);;
 
 
     /*++++ </geometryInfo> ++++*/
@@ -252,7 +252,7 @@ void mitk::ContourModelWriter::WriteXML( mitk::ContourModel* contourModel, std::
 
 
 
-void mitk::ContourModelWriter::WriteGeometryInformation( mitk::TimeSlicedGeometry* geometry, std::ofstream& out )
+void mitk::ContourModelWriter::WriteGeometryInformation( mitk::TimeGeometry* geometry, std::ofstream& out )
 {
   WriteCharacterData("<!-- geometry information -->", out);
 }

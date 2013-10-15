@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkImageWriteAccessor.h"
+#include <mitkTimeGeometry.h>
 
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateProperty.h>
@@ -533,10 +534,10 @@ void QmitkThresholdComponent::CreateThresholdSegmentation()
   mitk::ImageWriteAccessor writeAccess(segmentation, segmentation->GetVolumeData(0));
   memset( writeAccess.GetData() , 0, byteSize );
 
-  if (original->GetTimeSlicedGeometry() )
+  if (original->GetTimeGeometry() )
   {
-    mitk::TimeSlicedGeometry::Pointer originalGeometry = original->GetTimeSlicedGeometry()->Clone();
-    segmentation->SetGeometry( originalGeometry );
+    mitk::TimeGeometry::Pointer originalGeometry = original->GetTimeGeometry()->Clone();
+    segmentation->SetTimeGeometry( originalGeometry.GetPointer() );
   }
   else
   {

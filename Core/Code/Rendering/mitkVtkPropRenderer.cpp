@@ -145,12 +145,12 @@ bool mitk::VtkPropRenderer::SetWorldGeometryToDataStorageBounds()
     return false;
 
   //initialize world geometry
-  mitk::TimeSlicedGeometry::Pointer geometry = m_DataStorage->ComputeVisibleBoundingGeometry3D( NULL, "includeInBoundingBox" );
+  mitk::TimeGeometry::Pointer geometry = m_DataStorage->ComputeVisibleBoundingGeometry3D( NULL, "includeInBoundingBox" );
 
   if ( geometry.IsNull() )
     return false;
 
-  this->SetWorldGeometry(geometry);
+  this->SetWorldTimeGeometry(geometry);
   //this->GetDisplayGeometry()->SetSizeInDisplayUnits( this->m_TextRenderer->GetRenderWindow()->GetSize()[0], this->m_TextRenderer->GetRenderWindow()->GetSize()[1] );
   this->GetDisplayGeometry()->Fit();
   this->GetVtkRenderer()->ResetCamera();

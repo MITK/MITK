@@ -90,6 +90,8 @@ bool mitk::GPUVolumeMapper3D::InitGPU(mitk::BaseRenderer* renderer)
   if(ls->m_gpuInitialized)
     return ls->m_gpuSupported;
 
+  ls->m_VtkRenderWindow = renderer->GetVtkRenderer()->GetRenderWindow();
+
   GPU_INFO << "initializing gpu-slicing-vr (vtkMitkOpenGLVolumeTextureMapper3D)";
 
   ls->m_MapperGPU = vtkSmartPointer<vtkMitkOpenGLVolumeTextureMapper3D>::New();
@@ -124,6 +126,8 @@ void mitk::GPUVolumeMapper3D::InitCPU(mitk::BaseRenderer* renderer)
 
   if(ls->m_cpuInitialized)
     return;
+
+  ls->m_VtkRenderWindow = renderer->GetVtkRenderer()->GetRenderWindow();
 
   ls->m_MapperCPU = vtkSmartPointer<vtkFixedPointVolumeRayCastMapper>::New();
   int numThreads = ls->m_MapperCPU->GetNumberOfThreads( );
@@ -617,6 +621,8 @@ bool mitk::GPUVolumeMapper3D::InitRAY(mitk::BaseRenderer* renderer)
 
   if(ls->m_rayInitialized)
     return ls->m_raySupported;
+
+  ls->m_VtkRenderWindow = renderer->GetVtkRenderer()->GetRenderWindow();
 
   GPU_INFO << "initializing gpu-raycast-vr (vtkOpenGLGPUVolumeRayCastMapper)";
 

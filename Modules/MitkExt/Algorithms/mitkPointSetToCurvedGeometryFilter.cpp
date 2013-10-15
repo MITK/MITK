@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkThinPlateSplineCurvedGeometry.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkImage.h"
-#include "mitkTimeSlicedGeometry.h"
 #include "mitkDataNode.h"
 #include "mitkGeometryData.h"
 #include "mitkGeometry2DData.h"
@@ -51,7 +50,7 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateOutputInformation()
   if ( input.IsNull() )
     itkGenericExceptionMacro ( "Input point set is NULL!" );
 
-  if ( input->GetTimeSlicedGeometry()->GetTimeSteps() != 1 )
+  if ( input->GetTimeGeometry()->CountTimeSteps() != 1 )
     itkWarningMacro ( "More than one time step is not yet supported!" );
 
   if ( output.IsNull() )
@@ -61,29 +60,14 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateOutputInformation()
     itkGenericExceptionMacro ( "Image to be mapped is NULL!" );
 
   bool update = false;
-  if ( output->GetGeometry() == NULL || output->GetGeometry2D() == NULL || output->GetTimeSlicedGeometry() == NULL )
+  if ( output->GetGeometry() == NULL || output->GetGeometry2D() == NULL || output->GetTimeGeometry() == NULL )
     update = true;
-  if ( ( ! update ) && ( output->GetTimeSlicedGeometry()->GetTimeSteps() != input->GetTimeSlicedGeometry()->GetTimeSteps() ) )
+  if ( ( ! update ) && ( output->GetTimeGeometry()->CountTimeSteps() != input->GetTimeGeometry()->CountTimeSteps() ) )
     update = true;
   if ( update )
   {
     mitk::ThinPlateSplineCurvedGeometry::Pointer curvedGeometry = mitk::ThinPlateSplineCurvedGeometry::New();
     output->SetGeometry(curvedGeometry);
-
-    /*
-    mitk::TimeSlicedGeometry::Pointer timeGeometry = mitk::TimeSlicedGeometry::New();
-    mitk::ThinPlateSplineCurvedGeometry::Pointer curvedGeometry = mitk::ThinPlateSplineCurvedGeometry::New();
-
-    timeGeometry->InitializeEvenlyTimed ( curvedGeometry, input->GetPointSetSeriesSize() );
-
-    for ( unsigned int t = 1; t < input->GetPointSetSeriesSize(); ++t )
-    {
-      mitk::ThinPlateSplineCurvedGeometry::Pointer tmpCurvedGeometry = mitk::ThinPlateSplineCurvedGeometry::New();
-      timeGeometry->SetGeometry3D ( tmpCurvedGeometry.GetPointer(), t );
-    }
-    output->SetGeometry ( timeGeometry );
-    output->SetGeometry2D ( curvedGeometry ); // @FIXME SetGeometry2D of mitk::Geometry2DData reinitializes the TimeSlicedGeometry to 1 time step
-    */
   }
 }
 
@@ -99,11 +83,11 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateData()
     itkGenericExceptionMacro ( "Input point set is NULL!" );
   if ( output.IsNull() )
     itkGenericExceptionMacro ( "output geometry data is NULL!" );
-  if ( output->GetTimeSlicedGeometry() == NULL )
+  if ( output->GetTimeGeometry() == NULL )
     itkGenericExceptionMacro ( "Output time sliced geometry is NULL!" );
-  if ( output->GetTimeSlicedGeometry()->GetGeometry3D ( 0 ) == NULL )
+  if ( output->GetTimeGeometry()->GetGeometryForTimeStep ( 0 ).IsNull() )
     itkGenericExceptionMacro ( "Output geometry3d is NULL!" );
-  mitk::ThinPlateSplineCurvedGeometry::Pointer curvedGeometry = dynamic_cast<mitk::ThinPlateSplineCurvedGeometry*> ( output->GetTimeSlicedGeometry()->GetGeometry3D ( 0 ) );
+  mitk::ThinPlateSplineCurvedGeometry::Pointer curvedGeometry = dynamic_cast<mitk::ThinPlateSplineCurvedGeometry*> ( output->GetTimeGeometry()->GetGeometryForTimeStep( 0 ).GetPointer() );
   if ( curvedGeometry.IsNull() )
     itkGenericExceptionMacro ( "Output geometry3d is not an instance of mitk::ThinPlateSPlineCurvedGeometry!" );
   if ( m_ImageToBeMapped.IsNull() )

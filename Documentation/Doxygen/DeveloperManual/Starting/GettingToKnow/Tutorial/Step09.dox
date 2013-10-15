@@ -7,7 +7,7 @@ application framework (for example the MITK Workbench) consists of several bundl
 resources and program logic. It can also contribute so-called Views to the main application, which provide a specific
 user interface for controlling the bundles functions.
 
-The creation of a MITK plug-in is considerably facilitated by using the MITK PluginGenerator as described in \ref NewPluginPage .
+The creation of a MITK plug-in is considerably facilitated by using the MITK PluginGenerator as described in \ref NewPluginPage if you want to add a new view to an existing plugin see \ref NewViewPage.
 
 The mentioned tool was used to create a plug-in called org.mitk.example.gui.regiongrowing.
 Let's first take a look at which files the PluginGenerator has created:
@@ -35,6 +35,8 @@ If you are not familiar with Qt development, please look into
 <a href="http://doc.qt.digia.com/4.7/designer-manual.html">this Digia page describing .ui files</a> (no, forget about the please, DO it!)
 
 The C++ files implement a subclass of QmitkAbstractView. In this special case of QmitkRegionGrowing, we added the option to set some seed points and run a region grower. If you are interested in the concrete changes necessary to turn a freshly generated QmitkRegionGrowing into an integrated one:
+
+The plug-in will be build as part of MITK Workbench. Do use it start MITK Workbench an select the region growing view in the view menu.
 
 To add a mitk::PointSet for the seed points:
 QmitkRegionGrowingView.h

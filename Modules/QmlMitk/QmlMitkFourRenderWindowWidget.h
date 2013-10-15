@@ -9,6 +9,14 @@
 
 #include "QmlMitkExports.h"
 
+/**
+  \brief QML replacement for QmitkStdMultiWidget.
+
+  A proof-of-concept "multi-widget". Currently exclusively
+  for use in the QuickRender demo application.
+
+  \warning Subject to change.
+*/
 class QmlMitk_EXPORT QmlMitkFourRenderWindowWidget : public QQuickItem
 {
     Q_OBJECT

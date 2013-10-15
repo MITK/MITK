@@ -9,6 +9,14 @@
 
 #include "QmlMitkExports.h"
 
+/**
+  \brief QML replacement for QmitkRenderWindow.
+
+  A proof-of-concept render window. Currently exclusively
+  for use in the QuickRender demo application.
+
+  \warning Subject to change.
+*/
 class QmlMitk_EXPORT QmlMitkRenderWindowItem : public QVTKQuickItem, public mitk::RenderWindowBase
 {
     Q_OBJECT

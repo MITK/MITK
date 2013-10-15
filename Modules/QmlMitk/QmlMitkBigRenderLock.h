@@ -5,6 +5,18 @@
 
 #include "QmlMitkExports.h"
 
+/**
+  \brief Workaround lock around MITK rendering.
+
+  QtQuick renders in a thread, MITK datastructures do not
+  tolerate this well. The current work-around is a big
+  lock that delays signal delivery while rendering is in
+  progress.
+
+  The proper solution would be to make data structures
+  in rendering thread safe. This solution is much more
+  work though, so it will come later.
+*/
 class QmlMitk_EXPORT QmlMitkBigRenderLock : public QObject
 {
   Q_OBJECT

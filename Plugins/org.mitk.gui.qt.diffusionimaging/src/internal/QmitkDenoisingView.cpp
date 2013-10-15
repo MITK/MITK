@@ -65,8 +65,8 @@ void QmitkDenoisingView::CreateQtPartControl( QWidget *parent )
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls = new Ui::QmitkDenoisingViewControls;
     m_Controls->setupUi( parent );
-    m_Controls->m_OdfBox->setVisible(false);
-    m_Controls->m_ODFRenderWidget->setVisible(false);
+//    m_Controls->m_OdfBox->setVisible(false);
+//    m_Controls->m_ODFRenderWidget->setVisible(false);
   }
 }
 
@@ -153,7 +153,7 @@ void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes 
 void QmitkDenoisingView::UpdateOdf()
 {
 
-  try
+  /*try
   {
     m_Controls->m_OverviewBox->setVisible(true);
     if (m_ImageNode.IsNull() || !m_MultiWidget)
@@ -291,8 +291,10 @@ void QmitkDenoisingView::UpdateOdf()
         odf.InitFromTensor(tensor);
 
         /** Array of eigen-values. */
+        /*
         typedef itk::FixedArray<float, 3> EigenValuesArrayType;
         /** Matrix of eigen-vectors. */
+        /*
         typedef itk::Matrix<float, 3, 3> MatrixType;
         typedef itk::Matrix<float, 3, 3> EigenVectorsMatrixType;
 
@@ -357,7 +359,7 @@ void QmitkDenoisingView::UpdateOdf()
   catch(...)
   {
     QMessageBox::critical(0, "Error", "Data could not be analyzed. The image might be corrupted.");
-  }
+  }*/
 }
 
 void QmitkDenoisingView::OnSliceChanged(const itk::EventObject& /*e*/)

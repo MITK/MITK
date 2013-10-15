@@ -45,7 +45,7 @@
      <item>
       <widget class="QPushButton" name="m_BtnNewDevice">
        <property name="text">
-        <string>New Device</string>
+        <string>New Video Device</string>
        </property>
       </widget>
      </item>

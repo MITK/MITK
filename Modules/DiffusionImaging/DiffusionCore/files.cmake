@@ -138,6 +138,7 @@ set(H_FILES
 
   Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.h
   Algorithms/mitkDiffusionImageToDiffusionImageFilter.h
+  Algorithms/itkNonLocalMeansDenoisingFilter.h
 
 
 )

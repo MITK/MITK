@@ -13,38 +13,31 @@ namespace mitk {
 /* class @EXPORT_MACRO@ @FACTORY_NAME@ : public ::itk::ObjectFactoryBase */
 class @FACTORY_NAME@ : public ::itk::ObjectFactoryBase
 {
-  public:  
+  public:
 
     /* ITK typedefs */
     typedef @FACTORY_NAME@  Self;
     typedef itk::ObjectFactoryBase  Superclass;
     typedef itk::SmartPointer<Self>  Pointer;
     typedef itk::SmartPointer<const Self>  ConstPointer;
-     
+
     /* Methods from ObjectFactoryBase */
     virtual const char* GetITKSourceVersion() const
     {
       return ITK_VERSION_STRING;
     }\
-    
+
     virtual const char* GetDescription() const
     {
       return "@FACTORY_DESCRIPTION@";
     }\
-    
+
     /* Method for class instantiation. */
     itkFactorylessNewMacro(Self);
-      
+
     /* Run-time type information (and related methods). */
     itkTypeMacro(@FACTORY_NAME@, itkObjectFactoryBase);
 
-    /* Register one factory of this type  */
-    static void RegisterOneFactory()
-    {
-      @FACTORY_NAME@::Pointer factory = @FACTORY_NAME@::New();
-      itk::ObjectFactoryBase::RegisterFactory(factory);
-    }
-    
   protected:
 
     @FACTORY_NAME@()
@@ -67,5 +60,26 @@ class @FACTORY_NAME@ : public ::itk::ObjectFactoryBase
 
 };
 
+class @FACTORY_NAME@RegistrationMethod
+{
+  public:
+
+    @FACTORY_NAME@RegistrationMethod()
+    {
+      m_Factory = @FACTORY_NAME@::New();
+      itk::ObjectFactoryBase::RegisterFactory( m_Factory );
+    }
+
+    ~@FACTORY_NAME@RegistrationMethod()
+    {
+      itk::ObjectFactoryBase::UnRegisterFactory( m_Factory );
+    }
+
+  private:
+
+    @FACTORY_NAME@::Pointer m_Factory;
+};
+
 } // end namespace
 
+static mitk::@FACTORY_NAME@RegistrationMethod somestaticinitializer_@FACTORY_NAME@;

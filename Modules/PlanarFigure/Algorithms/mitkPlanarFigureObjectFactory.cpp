@@ -29,15 +29,13 @@ typedef std::multimap<std::string, std::string> MultimapType;
 
 mitk::PlanarFigureObjectFactory::PlanarFigureObjectFactory()
 : m_PlanarFigureIOFactory(PlanarFigureIOFactory::New().GetPointer())
+, m_PlanarFigureWriterFactory(PlanarFigureWriterFactory::New().GetPointer())
 {
   static bool alreadyDone = false;
   if ( !alreadyDone )
   {
-    RegisterIOFactories();
-
     itk::ObjectFactoryBase::RegisterFactory( m_PlanarFigureIOFactory );
-
-    PlanarFigureWriterFactory::RegisterOneFactory();
+    itk::ObjectFactoryBase::RegisterFactory( m_PlanarFigureWriterFactory );
 
     m_FileWriters.push_back( PlanarFigureWriter::New().GetPointer() );
 
@@ -49,7 +47,7 @@ mitk::PlanarFigureObjectFactory::PlanarFigureObjectFactory()
 
 mitk::PlanarFigureObjectFactory::~PlanarFigureObjectFactory()
 {
-  PlanarFigureWriterFactory::UnRegisterOneFactory();
+  itk::ObjectFactoryBase::UnRegisterFactory(m_PlanarFigureWriterFactory);
   itk::ObjectFactoryBase::UnRegisterFactory(m_PlanarFigureIOFactory);
 }
 

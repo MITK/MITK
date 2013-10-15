@@ -932,7 +932,7 @@ namespace itk
 
 
       itk::Index<3> ix;
-      vnl_vector<double> org_data(nof-numberb0);
+      vnl_vector<double> org_data(nof);
       vnl_vector<double> atten(nof-numberb0);
       vnl_vector<double> tensor(6);
       itk::DiffusionTensor3D<float> ten;
@@ -1020,6 +1020,7 @@ namespace itk
               // for voxels with mask value 0 - tensor is simply 0 ( outside brain value)
               else if (mask_val < 1.0)
               {
+
                   ten(0,0) = 0;
                   ten(0,1) = 0;
                   ten(0,2) = 0;

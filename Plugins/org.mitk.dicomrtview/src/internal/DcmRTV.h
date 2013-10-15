@@ -38,6 +38,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <mitkSurface.h>
 #include <vtkDICOMImageReader.h>
+#include <vtkMarchingSquares.h>
+#include <vtkMarchingCubes.h>
 
 #include <QFileDialog>
 

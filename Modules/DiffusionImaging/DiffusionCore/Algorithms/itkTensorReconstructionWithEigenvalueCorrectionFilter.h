@@ -105,9 +105,9 @@ namespace itk
     itkGetMacro(B0Mask, vnl_vector<short>)
 
 
-    ImageType::Pointer GetCorrectedDiffusionVolumes()
+    ImageType::Pointer GetGradientImagePointer()
     {
-      return m_CorrectedDiffusionVolumes;
+      return m_GradientImagePointer;
     }
 
     itk::Image<short, 3>::Pointer GetMask()

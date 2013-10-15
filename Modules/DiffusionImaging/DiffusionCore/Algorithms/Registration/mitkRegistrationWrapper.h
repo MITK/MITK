@@ -21,6 +21,8 @@ namespace mitk
  *  on those and applied to the derived objects.
  *
  *  For DWI images a registerable B0 Image will automatically be extracted.
+ *
+ *  TBD Include Resampling, ++ with special resampling for Binary files
  */
 class DiffusionCore_EXPORT RegistrationWrapper : public itk::LightObject
 {

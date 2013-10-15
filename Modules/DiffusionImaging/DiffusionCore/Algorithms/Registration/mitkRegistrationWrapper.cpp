@@ -1,8 +1,7 @@
-#include "mitkBatchedRegistration.h"
+#include "mitkRegistrationWrapper.h"
+
 #include "mitkPyramidImageRegistrationMethod.h"
 #include "mitkDiffusionImage.h"
-
-//#include <mitkRotationOperation.h>
 #include <mitkDiffusionImageCorrectionFilter.h>
 #include "itkB0ImageExtractionImageFilter.h"
 

@@ -117,10 +117,6 @@ set(CPP_FILES
 
  )
 endif()
-
-QT4_ADD_RESOURCES(CPP_FILES resources/QmitkResources.qrc)
-
-
 set(MOC_H_FILES
 
 
@@ -217,6 +213,8 @@ set(UI_FILES
   QmitkAboutDialog/QmitkAboutDialogGUI.ui
 )
 
+
 set(QRC_FILES
   QmitkExt.qrc
+  resources/QmitkResources.qrc
 )

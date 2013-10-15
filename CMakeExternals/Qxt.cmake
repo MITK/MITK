@@ -26,7 +26,7 @@ if(NOT DEFINED ${proj}_DIR)
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
-       -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+       ${qt_project_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
 

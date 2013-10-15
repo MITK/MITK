@@ -31,6 +31,19 @@ if(UNIX AND NOT APPLE)
 
 endif()
 
+#-----------------------------------------------------------------------------
+# Qt options for external projects and MITK
+#-----------------------------------------------------------------------------
+
+set(qt_project_args -DDESIRED_QT_VERSION:STRING=${DESIRED_QT_VERSION})
+if(MITK_USE_Qt4)
+  list(APPEND qt_project_args
+       -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE} )
+endif()
+if(MITK_USE_Qt5)
+  list(APPEND qt_project_args
+       -DQt5Core_DIR:PATH=${Qt5Core_DIR})
+endif()
 
 #-----------------------------------------------------------------------------
 # ExternalProjects
@@ -54,8 +67,12 @@ set(external_projects
   SOFA
   MITKData
   Qwt
-  Qxt
   )
+
+# Qxt supports Qt5. We need to also support it in QxtCMakeLists.txt
+if(MITK_USE_Qt4)
+  list(APPEND external_projects Qxt)
+endif()
 
 # These are "hard" dependencies and always set to ON
 set(MITK_USE_tinyxml 1)
@@ -68,8 +85,10 @@ set(MITK_USE_VTK 1)
 # Semi-hard dependencies, enabled by user-controlled variables
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 if(MITK_USE_QT)
-  set(MITK_USE_Qwt 1) #TODO: Check if/how Qwt builds with Qt 5
-  set(MITK_USE_Qxt 1) #TODO: Check if/how Qwt builds with Qt 5
+  set(MITK_USE_Qwt 1)
+  if(MITK_USE_Qt4)
+    set(MITK_USE_Qxt 1) #TODO: Check how Qxt builds with Qt 5
+  endif()
 endif()
 
 if(MITK_USE_BLUEBERRY)
@@ -282,6 +301,7 @@ foreach(type RUNTIME ARCHIVE LIBRARY)
     list(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
   endif()
 endforeach()
+
 # Optional python variables
 if(MITK_USE_Python)
     list(APPEND mitk_optional_cache_args
@@ -334,13 +354,12 @@ ExternalProject_Add(${proj}
     -DMITK_CTEST_SCRIPT_MODE:STRING=${MITK_CTEST_SCRIPT_MODE}
     -DMITK_SUPERBUILD_BINARY_DIR:PATH=${MITK_BINARY_DIR}
     -DMITK_MODULES_TO_BUILD:INTERNAL=${MITK_MODULES_TO_BUILD}
-    -DDESIRED_QT_VERSION:STRING=${DESIRED_QT_VERSION}
+    ${qt_project_args}
     -DMITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_FLOATING_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_DIMENSIONS:STRING=${MITK_ACCESSBYITK_DIMENSIONS}
     # --------------- External project dirs ---------------
-    -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
     -DMITK_KWSTYLE_EXECUTABLE:FILEPATH=${MITK_KWSTYLE_EXECUTABLE}
     -DCTK_DIR:PATH=${CTK_DIR}
     -DDCMTK_DIR:PATH=${DCMTK_DIR}

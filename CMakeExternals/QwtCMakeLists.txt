@@ -1,5 +1,8 @@
-
-cmake_minimum_required(VERSION 2.8.4)
+if(DESIRED_QT_VERSION MATCHES 5)
+  cmake_minimum_required(VERSION 2.8.9)
+else()
+  cmake_minimum_required(VERSION 2.8.4)
+endif()
 
 project(Qwt)
 
@@ -166,21 +169,28 @@ foreach(_source ${QWT_SOURCES})
   list(APPEND _qwt_sources src/${_source})
 endforeach()
 
-find_package(Qt4 REQUIRED)
+if(DESIRED_QT_VERSION MATCHES 4)
+  find_package(Qt4 REQUIRED QtCore QtGui QtSvg QtOpenGL QtDesigner)
+  include(${QT_USE_FILE})
+  qt4_wrap_cpp(_qwt_sources ${_qwt_moc_headers})
 
-set(QT_USE_QTSVG 1)
-set(QT_USE_QTOPENGL 1)
-set(QT_USE_QTDESIGNER 1)
-include(${QT_USE_FILE})
-qt4_wrap_cpp(_qwt_sources ${_qwt_moc_headers})
+  add_library(qwt SHARED ${_qwt_sources})
+  target_link_libraries(qwt ${QT_LIBRARIES})
+elseif(DESIRED_QT_VERSION MATCHES 5)
+  find_package(Qt5Svg REQUIRED)
+  find_package(Qt5OpenGL REQUIRED)
+  find_package(Qt5PrintSupport REQUIRED)
+  find_package(Qt5Concurrent REQUIRED)
 
-add_library(qwt SHARED ${_qwt_sources})
-target_link_libraries(qwt ${QT_LIBRARIES})
+  qt5_wrap_cpp(_qwt_sources ${_qwt_moc_headers})
+
+  add_library(qwt SHARED ${_qwt_sources})
+  qt5_use_modules(qwt Svg OpenGL PrintSupport Concurrent)
+endif()
 
 set_target_properties(qwt PROPERTIES
                       SOVERSION ${${PROJECT_NAME}_VERSION}
                       COMPILE_DEFINITIONS "QWT_DLL;QWT_MAKEDLL")
-
 
 
 # Build the designer plug-in
@@ -192,18 +202,31 @@ set(_qwt_designer_sources
   designer/qwt_designer_plugin.cpp
 )
 
-qt4_wrap_cpp(_qwt_designer_sources
-  designer/qwt_designer_plugin.h
-  designer/qwt_designer_plotdialog.h
-)
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/designer)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/designer)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/designer)
 
-qt4_add_resources(_qwt_designer_sources designer/qwt_designer_plugin.qrc)
-add_library(qwt_designer_plugin SHARED ${_qwt_designer_sources})
-target_link_libraries(qwt_designer_plugin qwt ${QT_LIBRARIES})
+if(DESIRED_QT_VERSION MATCHES 4)
+  qt4_wrap_cpp(_qwt_designer_sources
+    designer/qwt_designer_plugin.h
+    designer/qwt_designer_plotdialog.h
+  )
+  qt4_add_resources(_qwt_designer_sources designer/qwt_designer_plugin.qrc)
+  add_library(qwt_designer_plugin SHARED ${_qwt_designer_sources})
+  target_link_libraries(qwt_designer_plugin qwt ${QT_LIBRARIES})
+elseif(DESIRED_QT_VERSION MATCHES 5)
+  find_package(Qt5Designer REQUIRED)
+  include_directories(${Qt5Designer_INCLUDE_DIRS})
+  qt5_wrap_cpp(_qwt_designer_sources
+    designer/qwt_designer_plugin.h
+    designer/qwt_designer_plotdialog.h
+  )
+  qt5_add_resources(_qwt_designer_sources designer/qwt_designer_plugin.qrc)
+
+  add_library(qwt_designer_plugin SHARED ${_qwt_designer_sources})
+  target_link_libraries(qwt_designer_plugin qwt)
+  qt5_use_modules(qwt_designer_plugin Designer)
+endif()
 
 set_target_properties(qwt_designer_plugin PROPERTIES
                       SOVERSION ${${PROJECT_NAME}_VERSION}

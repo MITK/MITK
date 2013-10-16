@@ -47,13 +47,14 @@ namespace itk
 
       typename TInputImageType::SpacingType spacing = this->m_Image->GetSpacing();
 
-      double dx = abs(p1[0]-p2[0]) * spacing[0];
-      double dy = abs(p1[1]-p2[1]) * spacing[1];
-      double dz = abs(p1[2]-p2[2]) * spacing[2];
+        double dxSqt = (p1[0]-p2[0]) * (p1[0]-p2[0]);// * (p1[0]-p2[0]);
+        double dySqt = (p1[1]-p2[1]) * (p1[1]-p2[1]);
+        double dzSqt = (p1[2]-p2[2]) * (p1[2]-p2[2]);
 
-      double weight = this->m_Image->GetPixel(p2);
+        double weight = this->m_Image->GetPixel(p2);
 
-      c = sqrt(dx + dy + dz) + 100 * (1-weight);
+        c = sqrt(dxSqt + dySqt + dzSqt) + 1000 * (1-weight);
+
     }
 
 

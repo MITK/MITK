@@ -85,7 +85,7 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
      std::cout << ix[0] << ", " << ix[1] << ", " << ix[2] << "\n";
   }
   std::cout << std::endl;
-
+/*
 
   // Output refroi for debug purposes
   std::cout << "Reference ROI\n";
@@ -97,13 +97,20 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
   std::cout << std::endl;
 
 
-  bool equalSize(roi.size() == refRoi.size());
 
   std::cout << "roi size: " << roi.size() << '\n';
   std::cout << "ref roi size: " << refRoi.size() << std::endl;
+  */
+  double cost = analyzer.GetCostSum();
 
-  //MITK_TEST_EQUAL(roi.size(), refRoi.size(), "Size of roi and control roi are the same.");
+  std::cout << "Cost: " << cost << std::endl;
 
+  bool equal = mitk::Equal(cost, 5162.854, 0.001);
+
+  MITK_TEST_CONDITION(equal, "Checking cost of found ROI");
+
+  //MITK_TEST_EQUAL(cot, refRoi.size(), "Size of roi and control roi are the same.");
+/*
   if(equalSize)
   {
     bool samePath = true;
@@ -121,6 +128,6 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
     MITK_TEST_CONDITION(samePath, "Calculated ROI matches reference ROI.");
   }
 
-
+*/
   MITK_TEST_END();
 }

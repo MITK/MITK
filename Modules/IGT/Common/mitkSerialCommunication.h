@@ -120,21 +120,33 @@ namespace mitk
     * \brief Read numberOfBytes characters from the serial interface
     *
     * This method tries to read numberOfBytes characters from the serial
-    * interface. If The ReceiveTimeout is set to 0, the Receive() method will
-    * wait indefinetly until all characters are received. If the ReceiveTimeout
-    * is set to another value, it will return after m_ReceiveTimeout milliseconds
-    * (or after all characters are read).
-    * The received characters are stored in the string answer. Note that this will
-    * overwrite the content of answer!
+    * interface or until an eol byte is received, whichever comes first. If
+    * The ReceiveTimeout is set to 0, the Receive() method will wait
+    * indefinetly until all characters are received or an eol character is
+    * received. If the ReceiveTimeout is set to another value, it will return
+    * after m_ReceiveTimeout milliseconds (or after all characters are read or
+    * an eol character is received).
+    *
+    * \param[out] answer  String that stores the received characters. Note
+    *                     that this will overwrite the content of answer!
+    * \param[in] numberOfBytes  The number of bytes to read. When an eol
+    *                           character is used this is interpretted as the
+    *                           maximum number of bytes to read.
+    * \param[in] eol  Pointer to an End-of-Line character. If this is NULL
+    *                 (the default) then no End-of-Line character is used.
     */
-    int Receive(std::string& answer, unsigned int numberOfBytes);
+    int Receive(std::string& answer, unsigned int numberOfBytes, const char *eol=0);
+
     /**
     * \brief Send the string input
     *
-    * This method will send the string input to the serial interface.
-    * It does not send the string termination character \\0.
+    * \param[in] input  The string to send to the serial interface. The string
+    *                   termination character \\0 is not sent.
+    * \param[in] block  If false, the this method will return immediately. If
+    *                   true, this method will block until all bytes have been
+    *                   physically transmitted over the serial interface.
     */
-    int Send(const std::string& input);
+    int Send(const std::string& input, bool block = false);
 
     /**
     * \brief Send the break signal for ms milliseconds

@@ -77,8 +77,24 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
   std::vector< itk::Index<3> > refRoi = referenceRoi->GetRoi();
 
 
+  // Output roi for debug purposes
+  std::cout << "ROI\n";
+  for(int t=0; t<roi.size(); t++)
+  {
+     itk::Index<3> ix = roi.at(t);
+     std::cout << ix[0] << ", " << ix[1] << ", " << ix[2] << "\n";
+  }
+  std::cout << std::endl;
 
 
+  // Output refroi for debug purposes
+  std::cout << "Reference ROI\n";
+  for(int t=0; t<refRoi.size(); t++)
+  {
+     itk::Index<3> ix = refRoi.at(t);
+     std::cout << ix[0] << ", " << ix[1] << ", " << ix[2] << "\n";
+  }
+  std::cout << std::endl;
 
 
   bool equalSize(roi.size() == refRoi.size());
@@ -86,7 +102,7 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
   std::cout << "roi size: " << roi.size() << '\n';
   std::cout << "ref roi size: " << refRoi.size() << std::endl;
 
- // MITK_TEST_EQUAL(roi.size(), refRoi.size(), "Size of roi and control roi are the same.");
+  //MITK_TEST_EQUAL(roi.size(), refRoi.size(), "Size of roi and control roi are the same.");
 
   if(equalSize)
   {

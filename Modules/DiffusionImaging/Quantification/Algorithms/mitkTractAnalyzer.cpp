@@ -192,11 +192,26 @@ namespace mitk {
         ShortestPathFilterType::Pointer pathFinder = ShortestPathFilterType::New();
         pathFinder->SetCostFunction(costFunction);
         pathFinder->SetFullNeighborsMode(true);
+        pathFinder->SetGraph_fullNeighbors(true);
         //pathFinder->SetCalcMode(ShortestPathFilterType::A_STAR);
         pathFinder->SetInput(meanSkeleton);
         pathFinder->SetStartIndex(startPoint);
         pathFinder->SetEndIndex(endPoint);
         pathFinder->Update();
+
+        double totalCost = 0.0;
+        std::vector< itk::Index<3> > path = pathFinder->GetVectorPath();
+
+        for(int i=0; i<path.size()-1; i++)
+        {
+            itk::Index<3> ix1 = path[i];
+            itk::Index<3> ix2 = path[i+1];
+
+            totalCost += costFunction->GetCost(ix1, ix2);
+        }
+
+        std::cout << "Cost: " << totalCost << std::endl;
+
 
         return pathFinder->GetVectorPath();
 

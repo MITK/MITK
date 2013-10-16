@@ -220,3 +220,17 @@ void mitk::ProportionalTimeGeometry::Initialize (TimeStepType timeSteps)
   }
   this->Initialize(geometry.GetPointer(), timeSteps);
 }
+
+void mitk::ProportionalTimeGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
+{
+  os << indent << " TimeSteps: " << this->CountTimeSteps() << std::endl;
+  os << indent << " FirstTimePoint: " << this->GetFirstTimePoint() << std::endl;
+  os << indent << " StepDuration: " << this->GetStepDuration() << " ms" << std::endl;
+
+  os << std::endl;
+  os << indent << " GetGeometryForTimeStep(0): ";
+  if(GetGeometryForTimeStep(0).IsNull())
+    os << "NULL" << std::endl;
+  else
+    GetGeometryForTimeStep(0)->Print(os, indent);
+}

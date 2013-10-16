@@ -51,6 +51,7 @@ namespace mitk {
     virtual bool IsEnabled() const;                             ///< returns whether the tool is enabled or disabled
     virtual bool IsDataValid() const;                           ///< returns true if the current position data is valid (no error during tracking, tracking error below threshold, ...)
     virtual float GetTrackingError() const;                     ///< return one value that corresponds to the overall tracking error. The dimension of this value is specific to each tracking device
+    virtual bool IsTooltipSet() const;                          ///< returns true if a tooltip is set, false if not
     virtual void SetToolName(const std::string _arg);           ///< Sets the name of the tool
     virtual void SetToolName(const char* _arg);                 ///< Sets the name of the tool
     virtual void SetPosition(Point3D position, ScalarType eps=0.0);           ///< sets the position

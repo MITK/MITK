@@ -56,9 +56,10 @@ set(RESOURCE_FILES
   NDIAuroraPlanarFG_Dome.stl
   NDIAuroraTabletopFG_Dome.stl
   NDIAuroraTabletopFG_Prototype_Dome.stl
-  NDIPolaris.stl
+  NDIPolarisOldModel.stl
+  NDIPolarisSpectra.stl
+  NDIPolarisSpectraExtendedPyramid.stl
   NDIPolarisVicra.stl
-  StandardVolume.stl
 )
 
 

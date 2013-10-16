@@ -48,9 +48,8 @@ namespace mitk
 
   public:
     typedef std::vector<NDIPassiveTool::Pointer> Tool6DContainerType;  ///< List of 6D tools of the correct type for this tracking device
-    typedef std::vector<int> TrackingVolumeDimensionType;          ///< List of the supported tracking volume dimensions.
+
     typedef mitk::TrackingDeviceType NDITrackingDeviceType;  ///< This enumeration includes the two types of NDI tracking devices (Polaris, Aurora).
-    typedef std::vector<NDITrackingVolume> NDITrackingVolumeContainerType;  ///< vector of tracking volumes
     typedef mitk::SerialCommunication::PortNumber PortNumber; ///< Port number of the serial connection
     typedef mitk::SerialCommunication::BaudRate BaudRate;     ///< Baud rate of the serial connection
     typedef mitk::SerialCommunication::DataBits DataBits;     ///< Number of data bits used in the serial connection
@@ -58,7 +57,6 @@ namespace mitk
     typedef mitk::SerialCommunication::StopBits StopBits;     ///< Number of stop bits used in the serial connection
     typedef mitk::SerialCommunication::HardwareHandshake HardwareHandshake; ///< Hardware handshake mode of the serial connection
     typedef mitk::NDIPassiveTool::TrackingPriority TrackingPriority; ///< Tracking priority used for tracking a tool
-
 
     mitkClassMacro(NDITrackingDevice, TrackingDevice);
     itkNewMacro(Self);
@@ -208,20 +206,26 @@ namespace mitk
     virtual const char* GetFirmwareRevisionNumber();
 
 
-    /**
+
+
+
+  protected:
+
+    typedef std::vector<std::string> NDITrackingVolumeContainerType;  ///< vector of tracking volumes
+    typedef std::vector<int> TrackingVolumeDimensionType;          ///< List of the supported tracking volume dimensions.
+
+        /**
     * \brief Get number of supported tracking volumes, a vector containing the supported volumes and
     * a vector containing the signed dimensions in mm. For each volume 10 boundaries are stored in the order of
     * the supported volumes (see AURORA API GUIDE: SFLIST p.54).
     **/
     virtual bool GetSupportedVolumes(unsigned int* numberOfVolumes, NDITrackingVolumeContainerType* volumes, TrackingVolumeDimensionType* volumesDimensions);
 
-    /**
-    * \brief Sets the desired tracking volume. Returns true if the volume type could be set. Usage: ndiTracker->SetVolume(mitk::Dome);
+       /**
+    * \brief Sets the desired tracking volume. Returns true if the volume type could be set. It is set in the OpenConnection() Method and sets the tracking volume out of m_Data.
     * @throw mitk::IGTHardwareException Throws an IGT hardware exception if the volume could not be set.
     **/
-    virtual bool SetVolume(NDITrackingVolume volume);
-
-  protected:
+    virtual bool SetVolume(mitk::TrackingDeviceData volume);
 
     /**
     * \brief Add a passive 6D tool to the list of tracked tools. This method is used by AddTool
@@ -300,7 +304,7 @@ public:
     Parity m_Parity;         ///< Parity mode for communication
     StopBits m_StopBits;     ///< number of stop bits per token
     HardwareHandshake m_HardwareHandshake; ///< use hardware handshake for serial port connection
-    NDITrackingVolume m_NDITrackingVolume; ///< which tracking volume is currently used (if device supports multiple volumes) (\warning This parameter is not used yet)
+    ///< which tracking volume is currently used (if device supports multiple volumes) (\warning This parameter is not used yet)
     IlluminationActivationRate m_IlluminationActivationRate; ///< update rate of IR illuminator for Polaris
     DataTransferMode m_DataTransferMode;  ///< use TX (text) or BX (binary) (\warning currently, only TX mode is supported)
     Tool6DContainerType m_6DTools;        ///< list of 6D tools

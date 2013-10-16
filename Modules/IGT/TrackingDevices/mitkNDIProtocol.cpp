@@ -1744,28 +1744,22 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
           reply += s;
           currentVolume += s;
         }
-
         //analyze volume here
-        static const std::string standard = "0";
-        static const std::string pyramid = "4";
-        static const std::string spectraPyramid = "5";
-        static const std::string vicraVolume = "7";
-        static const std::string cube = "9";
-        static const std::string dome = "A";
-        if (currentVolume.compare(0,1,standard)==0)
+
+        if (currentVolume.compare(0,1,mitk::DeviceDataPolarisOldModel.HardwareCode)==0)
           MITK_INFO<<"Standard volume supported \n";
-        else if (currentVolume.compare(0,1,pyramid)==0)
-          MITK_INFO<<"Pyramid volume supported \n";
-        else if (currentVolume.compare(0,1,spectraPyramid)==0)
+        else if (currentVolume.compare(0,3,mitk::DeviceDataPolarisSpectra.HardwareCode)==0)
           MITK_INFO<<"Spectra pyramid volume supported \n";
-        else if (currentVolume.compare(0,1,vicraVolume)==0)
-            MITK_INFO<<"Vicra volume supported \n";
-        else if (currentVolume.compare(0,1,cube)==0)
+        else if (currentVolume.compare(0,3,mitk::DeviceDataSpectraExtendedPyramid.HardwareCode)==0)
+          MITK_INFO<<"Spectra extended pyramid volume supported \n";
+        else if (currentVolume.compare(0,1,mitk::DeviceDataPolarisVicra.HardwareCode)==0)
+          MITK_INFO<<"Vicra volume supported \n";
+        else if (currentVolume.compare(0,1,mitk::DeviceDataAuroraPlanarCube.HardwareCode)==0)
           MITK_INFO<<"Cube volume supported \n";
-        else if (currentVolume.compare(0,1,dome)==0)
-            MITK_INFO<<"Dome volume supported \n";
+        else if (currentVolume.compare(0,1,mitk::DeviceDataAuroraPlanarDome.HardwareCode)==0)
+          MITK_INFO<<"Dome volume supported \n";
         else
-            MITK_INFO<<"Message not understood!\n";
+          MITK_WARN<<"Message not understood!\n";
       }
     }
 
@@ -1774,10 +1768,15 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
     std::string readCRC;                                          // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);                       // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
 
+    /* CRC check is commented out at the moment, because there is a bug (see bug 16285 for more information)
     if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code
-      returnValue = NDIOKAY;
+       returnValue = NDIOKAY;
     else                                      // return error in CRC
-      returnValue = NDICRCERROR;
+       returnValue = NDICRCERROR;
+    */
+
+    returnValue = NDIOKAY;
+
   }
 
   *info = reply;
@@ -1785,7 +1784,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
   return returnValue;
 }
 
-mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::NDITrackingVolume volume)
+mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::TrackingDeviceData deviceData)
 {
   if (m_TrackingDevice == NULL)
     return TRACKINGDEVICENOTSET;
@@ -1810,8 +1809,11 @@ mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::NDITrackingVolume volume)
   mitk::NDITrackingDevice::NDITrackingVolumeContainerType::iterator it = volumes.begin();
   while (it != volumes.end())
   {
-    if ((*it) == volume)
+    if ((*it) == deviceData.Model)
+    {
+      MITK_INFO << deviceData.Model << " selected.";
       break;
+    }
     it++, index++;
   }
   if (it == volumes.end() || index > numberOfVolumes) //not found / volume not supported
@@ -1876,7 +1878,6 @@ mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::NDITrackingVolume volume)
     else                                      // return error in CRC
       returnValue = NDICRCERROR;
   }
-
   m_TrackingDevice->ClearReceiveBuffer();
   return returnValue;
 }

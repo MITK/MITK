@@ -32,7 +32,7 @@ const unsigned char LF = 0xA; // == '\n' - line feed
 mitk::NDITrackingDevice::NDITrackingDevice() :
 TrackingDevice(),m_DeviceName(""), m_PortNumber(mitk::SerialCommunication::COM5), m_BaudRate(mitk::SerialCommunication::BaudRate9600),
 m_DataBits(mitk::SerialCommunication::DataBits8), m_Parity(mitk::SerialCommunication::None), m_StopBits(mitk::SerialCommunication::StopBits1),
-m_HardwareHandshake(mitk::SerialCommunication::HardwareHandshakeOff), m_NDITrackingVolume(Standard),
+m_HardwareHandshake(mitk::SerialCommunication::HardwareHandshakeOff),
 m_IlluminationActivationRate(Hz20), m_DataTransferMode(TX), m_6DTools(), m_ToolsMutex(NULL),
 m_SerialCommunication(NULL), m_SerialCommunicationMutex(NULL), m_DeviceProtocol(NULL),
 m_MultiThreader(NULL), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_MarkerPointsMutex(NULL), m_MarkerPoints()
@@ -428,6 +428,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   m_SerialCommunication->SetReceiveTimeout(5000);
   m_SerialCommunication->OpenConnection();
 
+
   /* initialize the tracking device */
   returnvalue = m_DeviceProtocol->INIT();
   if (returnvalue != NDIOKAY)
@@ -542,6 +543,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   }
   /* finish  - now all tools should be added, initialized and enabled, so that tracking can be started */
   this->SetState(Ready);
+  SetVolume(this->m_Data);
   return true;
 }
 
@@ -1226,25 +1228,21 @@ bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes,
     // if i>0 then we have a return statement <LF> infront
     if (i>0)
       currentVolume = currentVolume.substr(1, currentVolume.size());
-
-    std::string standard = "0";
-    std::string pyramid = "4";
-    std::string spectraPyramid = "5";
-    std::string vicraVolume = "7";
-    std::string cube = "9";
-    std::string dome = "A";
-    if (currentVolume.compare(0,1,standard)==0)
-      volumes->push_back(mitk::Standard);
-    if (currentVolume.compare(0,1,pyramid)==0)
-      volumes->push_back(mitk::Pyramid);
-    if (currentVolume.compare(0,1,spectraPyramid)==0)
-      volumes->push_back(mitk::SpectraPyramid);
-    if (currentVolume.compare(0,1,vicraVolume)==0)
-      volumes->push_back(mitk::VicraVolume);
-    else if (currentVolume.compare(0,1,cube)==0)
-      volumes->push_back(mitk::Cube);//alias cube
-    else if (currentVolume.compare(0,1,dome)==0)
-      volumes->push_back(mitk::Dome);
+    if (currentVolume.compare(0,1,mitk::DeviceDataPolarisOldModel.HardwareCode)==0)
+      volumes->push_back(mitk::DeviceDataPolarisOldModel.Model);
+    if (currentVolume.compare(0,3,mitk::DeviceDataPolarisSpectra.HardwareCode)==0)
+      volumes->push_back(mitk::DeviceDataPolarisSpectra.Model);
+    if (currentVolume.compare(1,3,mitk::DeviceDataSpectraExtendedPyramid.HardwareCode)==0)
+    {
+      currentVolume = currentVolume.substr(1,currentVolume.size());
+      volumes->push_back(mitk::DeviceDataSpectraExtendedPyramid.Model);
+    }
+    if (currentVolume.compare(0,1,mitk::DeviceDataPolarisVicra.HardwareCode)==0)
+      volumes->push_back(mitk::DeviceDataPolarisVicra.Model);
+    else if (currentVolume.compare(0,1,mitk::DeviceDataAuroraPlanarCube.HardwareCode)==0)
+      volumes->push_back(mitk::DeviceDataAuroraPlanarCube.Model);//alias cube
+    else if (currentVolume.compare(0,1,mitk::DeviceDataAuroraPlanarDome.HardwareCode)==0)
+      volumes->push_back(mitk::DeviceDataAuroraPlanarDome.Model);
 
     //fill volumesDimensions
     for (unsigned int index = 0; index < 10; index++)
@@ -1261,7 +1259,7 @@ bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes,
   return true;
 }
 
-bool mitk::NDITrackingDevice::SetVolume(NDITrackingVolume volume)
+bool mitk::NDITrackingDevice::SetVolume(mitk::TrackingDeviceData volume)
 {
   if (m_DeviceProtocol->VSEL(volume) != mitk::NDIOKAY)
   {

@@ -79,7 +79,7 @@ namespace mitk
 
     /**Documentation
     * \brief identifier for tracking device. The way it is currently used
-  * represents a product line rather than an actal type. Refactoring is a future option.
+    * represents a product line rather than an actal type. Refactoring is a future option.
     */
     enum TrackingDeviceType
     {
@@ -106,33 +106,20 @@ namespace mitk
       HybridTracking
     };
 
-    /**
-    * \brief This enum is deprecated. In future, please use the new TrackingDeviceData to model Specific tracking Volumes
-  * Represents the setting of the tracking volume of a NDI tracking device. The tracking volume of
-    * a tracking device itself (as 3d-Object) is represented by an instance of the class mitk::TrackingVolume
-    * as defined by NDI API SFLIST (Aurora and Polaris API guide)
-  *
-    */
-    enum NDITrackingVolume
-    {
-    Standard,
-      Pyramid,
-      SpectraPyramid,
-      VicraVolume,
-      Cube,
-      Dome
-    };
-
   /**
   * /brief This structure defines key variables of a device model and type.
   * It is specifically used to find out which models belong to which vendor, and what volume
   * to use for a specific Model. Leaving VolumeModelLocation set to null will instruct the Generator
-  * to generate a field to the best of his ability
+  * to generate a field to the best of his ability. HardwareCode stands for a hexadecimal string,
+  * that represents the tracking volume. "X" stands for "hardwarecode is not known" or "tracking device has
+  * no hardware code". For NDI devices it is used in the SetVolume() Method in  mitkNDITrackingDevice.cpp.
+  * The Pyramid Volume has the hardwarecode "4", but it is not supported yet.
   */
   struct TrackingDeviceData {
-      TrackingDeviceType Line;
+    TrackingDeviceType Line;
     std::string Model;
     std::string VolumeModelLocation;
+    std::string HardwareCode;
     };
 
 
@@ -141,25 +128,36 @@ namespace mitk
   * If a model does not have a corresponding tracking volume yet, pass an empty string to denote "No Model". pass "cube" to render
   * a default cube of 400x400 px. You can define additional magic strings in the TrackingVolumeGenerator.
   */
-  static TrackingDeviceData DeviceDataAuroraCompact = {NDIAurora, "Aurora Compact", "NDIAuroraCompactFG_Dome.stl"};
-  static TrackingDeviceData DeviceDataAuroraPlanarCube = {NDIAurora, "Aurora Planar (Cube)", "NDIAurora.stl"};
-  static TrackingDeviceData DeviceDataAuroraPlanarDome = {NDIAurora, "Aurora Planar (Dome)","NDIAuroraPlanarFG_Dome.stl"};
-  static TrackingDeviceData DeviceDataAuroraTabletop = {NDIAurora, "Aurora Tabletop", "NDIAuroraTabletopFG_Dome.stl"};
+
+  //############## NDI Aurora device data #############
+  static TrackingDeviceData DeviceDataAuroraCompact = {NDIAurora, "Aurora Compact", "NDIAuroraCompactFG_Dome.stl", "A"};
+  static TrackingDeviceData DeviceDataAuroraPlanarCube = {NDIAurora, "Aurora Planar (Cube)", "NDIAurora.stl", "9"};
+  static TrackingDeviceData DeviceDataAuroraPlanarDome = {NDIAurora, "Aurora Planar (Dome)","NDIAuroraPlanarFG_Dome.stl", "A"};
+  static TrackingDeviceData DeviceDataAuroraTabletop = {NDIAurora, "Aurora Tabletop", "NDIAuroraTabletopFG_Dome.stl", "A"};
   // The following entry is for the tabletop prototype, which had an lower barrier of 8cm. The new version has a lower barrier of 12cm.
   //static TrackingDeviceData DeviceDataAuroraTabletopPrototype = {NDIAurora, "Aurora Tabletop Prototype", "NDIAuroraTabletopFG_Prototype_Dome.stl"};
-  static TrackingDeviceData DeviceDataMicronTrackerH40 = {ClaronMicron, "Micron Tracker H40", "ClaronMicron.stl"};
-  static TrackingDeviceData DeviceDataPolarisSpectra = {NDIPolaris, "Polaris Spectra", "NDIPolaris.stl"};
-  static TrackingDeviceData DeviceDataPolarisVicra = {NDIPolaris, "Polaris Vicra", "NDIPolarisVicra.stl"};
-  static TrackingDeviceData DeviceDataDaVinci = {IntuitiveDaVinci, "Intuitive DaVinci", "IntuitiveDaVinci.stl"};
-  static TrackingDeviceData DeviceDataMicroBird = {AscensionMicroBird, "Ascension MicroBird", ""};
-  static TrackingDeviceData DeviceDataVirtualTracker = {VirtualTracker, "Virtual Tracker", "cube"};
-  static TrackingDeviceData DeviceDataUnspecified = {TrackingSystemNotSpecified, "Unspecified System", "cube"};
-  // Careful when changing the "invalid" device: The mitkTrackingTypeTest is using it's data.
-  static TrackingDeviceData DeviceDataInvalid = {TrackingSystemInvalid, "Invalid Tracking System", ""};
 
+  //############## NDI Polaris device data ############
+  static TrackingDeviceData DeviceDataPolarisOldModel = {NDIPolaris, "Polaris (Old Model)", "NDIPolarisOldModel.stl", "0"};
+  //full hardware code of polaris spectra: 5-240000-153200-095000+057200+039800+056946+024303+029773+999999+99999924
+  static TrackingDeviceData DeviceDataPolarisSpectra = {NDIPolaris, "Polaris Spectra", "NDIPolarisSpectra.stl", "5-2"};
+  //full hardware code of polaris spectra (extended pyramid): 5-300000-153200-095000+057200+039800+056946+024303+029773+999999+07350024
+  static TrackingDeviceData DeviceDataSpectraExtendedPyramid = {NDIPolaris, "Polaris Spectra (Extended Pyramid)", "NDIPolarisSpectraExtendedPyramid.stl","5-3"};
+  static TrackingDeviceData DeviceDataPolarisVicra = {NDIPolaris, "Polaris Vicra", "NDIPolarisVicra.stl","7"};
+
+  //############## other device data ##################
+  static TrackingDeviceData DeviceDataDaVinci = {IntuitiveDaVinci, "Intuitive DaVinci", "IntuitiveDaVinci.stl","X"};
+  static TrackingDeviceData DeviceDataMicroBird = {AscensionMicroBird, "Ascension MicroBird", "X"};
+  static TrackingDeviceData DeviceDataVirtualTracker = {VirtualTracker, "Virtual Tracker", "cube","X"};
+  static TrackingDeviceData DeviceDataMicronTrackerH40 = {ClaronMicron, "Micron Tracker H40", "ClaronMicron.stl", "X"};
+  static TrackingDeviceData DeviceDataUnspecified = {TrackingSystemNotSpecified, "Unspecified System", "cube","X"};
+  // Careful when changing the "invalid" device: The mitkTrackingTypeTest is using it's data.
+  static TrackingDeviceData DeviceDataInvalid = {TrackingSystemInvalid, "Invalid Tracking System", "", "X"};
+
+  //This list should hold all devices defined above!
   static TrackingDeviceData TrackingDeviceList[] = {DeviceDataAuroraPlanarCube, DeviceDataAuroraPlanarDome, DeviceDataAuroraCompact,
   DeviceDataAuroraTabletop, DeviceDataMicronTrackerH40, DeviceDataPolarisSpectra, DeviceDataPolarisVicra,
-  DeviceDataDaVinci, DeviceDataMicroBird, DeviceDataVirtualTracker, DeviceDataUnspecified, DeviceDataInvalid};
+  DeviceDataDaVinci, DeviceDataMicroBird, DeviceDataVirtualTracker, DeviceDataUnspecified, DeviceDataSpectraExtendedPyramid, DeviceDataInvalid, DeviceDataPolarisOldModel};
 
   /**
   * /brief Returns all devices compatibel to the given Line of Devices

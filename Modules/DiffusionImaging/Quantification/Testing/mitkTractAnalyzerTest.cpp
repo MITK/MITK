@@ -63,16 +63,6 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
 
 
 
-  // load reference roi
-  mitk::NrrdTbssRoiImageReader::Pointer roiReader = mitk::NrrdTbssRoiImageReader::New();
-  roiReader->SetFileName(argv[3]);
-  roiReader->Update();
-
-  mitk::TbssRoiImage* referenceRoi = roiReader->GetOutput(0);
-
-
-  // compare point sets of tbssRoi and reference roi
-
   std::vector< itk::Index<3> > roi = tbssRoi->GetRoi();
 
 
@@ -84,8 +74,11 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
      itk::Index<3> ix = roi.at(t);
      std::cout << ix[0] << ", " << ix[1] << ", " << ix[2] << "\n";
   }
+
+
   std::cout << std::endl;
 
+   // check the cost of the roi
   double cost = analyzer.GetCostSum();
 
   std::cout << "Cost: " << cost << std::endl;

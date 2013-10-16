@@ -60,6 +60,7 @@ void mitk::BaseData::InitializeTimeGeometry(unsigned int timeSteps)
   //Old timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
 
   TimeGeometry::Pointer timeGeometry = this->GetTimeGeometry();
+  timeGeometry->Initialize();
   timeGeometry->Expand(timeSteps);
   for (TimeStepType step = 0; step < timeSteps; ++step)
   {

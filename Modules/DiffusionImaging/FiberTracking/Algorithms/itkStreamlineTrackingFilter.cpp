@@ -44,7 +44,8 @@ TPDPixelType>
     m_F(1.0),
     m_G(0.0),
     m_Interpolate(true),
-    m_MinTractLength(0.0)
+    m_MinTractLength(0.0),
+    m_ResampleFibers(false)
 {
     // At least 1 inputs is necessary for a vector image.
     // For images added one at a time we need at least six
@@ -91,10 +92,10 @@ TPDPixelType>
     else
         minSpacing = m_ImageSpacing[2];
     if (m_StepSize<0.1*minSpacing)
-    {
         m_StepSize = 0.1*minSpacing;
+
+    if (m_ResampleFibers)
         m_PointPistance = 0.5*minSpacing;
-    }
 
     m_PolyDataContainer = itk::VectorContainer< int, FiberPolyDataType >::New();
     for (int i=0; i<this->GetNumberOfThreads(); i++)
@@ -184,8 +185,6 @@ TPDPixelType>
 
     if (m_MinCurvatureRadius<0.0)
         m_MinCurvatureRadius = 0.5*minSpacing;
-
-    m_PointPistance = 0;
 
     std::cout << "StreamlineTrackingFilter: Min. curvature radius: " << m_MinCurvatureRadius << std::endl;
     std::cout << "StreamlineTrackingFilter: FA threshold: " << m_FaThreshold << std::endl;

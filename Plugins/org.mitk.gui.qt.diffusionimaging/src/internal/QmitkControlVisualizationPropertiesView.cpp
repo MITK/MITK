@@ -485,7 +485,10 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
 {
   currentThickSlicesMode = 1;
   m_MyMenu = NULL;
-  itk::MultiThreader::SetGlobalDefaultNumberOfThreads(itk::MultiThreader::GetGlobalMaximumNumberOfThreads());
+  int numThread = itk::MultiThreader::GetGlobalMaximumNumberOfThreads();
+  if (numThread > 12)
+    numThread = 12;
+  itk::MultiThreader::SetGlobalDefaultNumberOfThreads(numThread);
 }
 
 QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView(const QmitkControlVisualizationPropertiesView& other)

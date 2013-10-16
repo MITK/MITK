@@ -199,6 +199,20 @@ namespace mitk {
         pathFinder->SetEndIndex(endPoint);
         pathFinder->Update();
 
+        double totalCost = 0.0;
+        std::vector< itk::Index<3> > path = pathFinder->GetVectorPath();
+
+        for(int i=0; i<path.size()-1; i++)
+        {
+            itk::Index<3> ix1 = path[i];
+            itk::Index<3> ix2 = path[i+1];
+
+            totalCost += costFunction->GetCost(ix1, ix2);
+        }
+
+        std::cout << "Cost: " << totalCost << std::endl;
+
+
         return pathFinder->GetVectorPath();
 
 

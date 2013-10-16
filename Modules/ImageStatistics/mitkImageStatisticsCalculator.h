@@ -85,11 +85,13 @@ public:
     double HotspotMin;
     double HotspotMax;
     double HotspotMean;
-    double HotspotVariance;
+    double HotspotSigma;
+    double HotspotPeak;
     vnl_vector< int > MinIndex;
     vnl_vector< int > MaxIndex;
-    vnl_vector<int>  HotspotMaxIndex;
-    vnl_vector<int>  HotspotMinIndex;
+    vnl_vector<int> HotspotMaxIndex;
+    vnl_vector<int> HotspotMinIndex;
+    vnl_vector<int> HotspotPeakIndex;
 
     void Reset()
     {
@@ -105,7 +107,8 @@ public:
       HotspotMin = 0.0;
       HotspotMax = 0.0;
       HotspotMean = 0.0;
-      HotspotVariance = 0.0;
+      HotspotPeak = 0.0;
+      HotspotSigma = 0.0;
     }
   };
 

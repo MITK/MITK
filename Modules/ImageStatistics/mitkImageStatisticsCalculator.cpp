@@ -1091,71 +1091,15 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
           }
         }
 // FIX END
-
-      //Test-Image
-      /*ImageType::Pointer testImage = ImageType::New();
-
-      ImageType::IndexType start;
-      start[0] = 0;
-      start[1] = 0;
-
-      ImageType::SizeType size;
-      size[0] = 100;
-      size[1] = 100;
-
-      ImageType::PointType origin;
-      origin[0] = 0;
-      origin[1] = 0;
-
-      ImageType::SpacingType spacing;
-      spacing[0] = 1;
-      spacing[1] = 1;
-
-      ImageType::RegionType region;
-      region.SetSize(size);
-      region.SetIndex(start);
-
-      testImage->SetRegions(region);
-      testImage->SetOrigin(origin);
-      testImage->Allocate();
-
-      typedef itk::ImageRegionIterator<ImageType> IteratorType;
-      IteratorType it(testImage, region);
-
-
-      double setValueBegin = 1.00;
-
-      unsigned int lastZ = 1000000000;
-      unsigned int lastY = 1000000000;
-      for(it.GoToBegin();!it.IsAtEnd();++it)
-      {
-        if(setValueBegin <= 1000) {
-
-        it.Set(setValueBegin );
-        double value = it.Get();
-        if (it.GetIndex()[1] != lastY)
-        {
-          std::cout << std::endl;
-          lastY = it.GetIndex()[1];
-        }
-        if (it.GetIndex()[0] != lastZ)
-        {
-          std::cout << value << " ";
-          lastZ = it.GetIndex()[0];
-        }
-        setValueBegin++;
-        } else {
-          setValueBegin = 1.00;
-        }
-      }
-      std::cout << std::endl << std::endl;*/
-
       Statistics hotspotStatistics = CalculateHotspotStatistics<TPixel, VImageDimension >(adaptedImage.GetPointer(), adaptedMaskImage.GetPointer(),10.0);
       statistics.HotspotMean = hotspotStatistics.HotspotMean;
       statistics.HotspotMax = hotspotStatistics.HotspotMax;
       statistics.HotspotMin = hotspotStatistics.HotspotMin;
+      statistics.HotspotPeak = hotspotStatistics.HotspotPeak;
       statistics.HotspotMaxIndex = hotspotStatistics.HotspotMaxIndex;
       statistics.HotspotMinIndex = hotspotStatistics.HotspotMinIndex;
+      statistics.HotspotPeakIndex = hotspotStatistics.HotspotPeakIndex;
+      statistics.HotspotSigma = hotspotStatistics.HotspotSigma;
       statisticsContainer->push_back( statistics );
     }
   }
@@ -1189,8 +1133,8 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateMinMax
   ImageType::IndexType maxIndex; // TODO: initialize
   ImageType::IndexType minIndex;
 
-  double sumPixelValue = 0.0;
-  double countPixel = 0.0;
+  double sumPixelValue = 0.00;
+  double countPixel = 0.00;
 
   for(maskIt.GoToBegin(), imageIndexIt.GoToBegin();
       !maskIt.IsAtEnd() && !imageIndexIt.IsAtEnd();
@@ -1198,11 +1142,11 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateMinMax
   {
     if(maskIt.Get() > itk::NumericTraits<typename MaskImageType::PixelType>::Zero) // TODO: was ist der Unterschied zwischen itk::NumericTraits<typename MaskImageType::PixelType>::Zero und "0"
     {
-      //Calculate coefficients for Mean-Value
+      //Calculate coefficients for Mean-Value / StdDev
       sumPixelValue = sumPixelValue + imageIndexIt.Get();
       countPixel++;
 
-      //Calculate Min and Max and corresponding Index-Values
+      //Calculate minimum, maximum and corresponding index-values
       if(imageIndexIt.Get() > maxValue)
       {
        maxIndex = imageIndexIt.GetIndex();
@@ -1217,20 +1161,35 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateMinMax
     }
   }
 
-  Statistics stats;
-  stats.HotspotMinIndex.set_size(inputImage->GetImageDimension());
-  stats.HotspotMaxIndex.set_size(inputImage->GetImageDimension());
+  double mean = sumPixelValue / countPixel;
+  double stdDevNumerator = 0.00;
 
-  for (int i = 0; i<stats.HotspotMinIndex.size(); i++)
+  //Calculation Numerator StdDev
+  for(maskIt.GoToBegin(), imageIndexIt.GoToBegin();
+      !maskIt.IsAtEnd() && !imageIndexIt.IsAtEnd();
+      ++maskIt, ++imageIndexIt)
   {
-    stats.HotspotMaxIndex[i] = maxIndex[i];
-    stats.HotspotMinIndex[i] = minIndex[i];
+    if(maskIt.Get() > itk::NumericTraits<typename MaskImageType::PixelType>::Zero)
+    {
+      stdDevNumerator += pow((imageIndexIt.Get() - mean), 2.00);
+    }
   }
 
-  stats.HotspotMean = sumPixelValue / countPixel;
-  stats.HotspotMax = maxValue;
-  stats.HotspotMin = minValue;
-  return stats;
+  Statistics statistics;
+  statistics.HotspotSigma = sqrt(stdDevNumerator / countPixel);
+  statistics.HotspotMinIndex.set_size(inputImage->GetImageDimension());
+  statistics.HotspotMaxIndex.set_size(inputImage->GetImageDimension());
+
+  for (int i = 0; i<statistics.HotspotMinIndex.size(); i++)
+  {
+    statistics.HotspotMaxIndex[i] = maxIndex[i];
+    statistics.HotspotMinIndex[i] = minIndex[i];
+  }
+
+  statistics.HotspotMean = mean;
+  statistics.HotspotMax = maxValue;
+  statistics.HotspotMin = minValue;
+  return statistics;
 }
 template < typename TPixel, unsigned int VImageDimension>
 ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspotStatistics(
@@ -1240,11 +1199,13 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< float, VImageDimension > MaskImageType;
+  typedef itk::Image<unsigned short, VImageDimension> SphereMaskImageType;
 
   typedef itk::ContinuousIndex<double, VImageDimension> ContinuousIndexType;
 
   typedef itk::ImageRegionConstIteratorWithIndex<ImageType> IteratorType;
   typedef itk::ImageRegionConstIteratorWithIndex<MaskImageType> MaskIteratorType;
+  typedef itk::ImageRegionIteratorWithIndex<SphereMaskImageType> SphereMaskIteratorType;
 
   typedef typename ImageType::SpacingType SpacingType;
   typedef typename ImageType::SizeType SizeType;
@@ -1293,7 +1254,6 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
 
   convolutionMask->SetRegions(region);
-  convolutionMask->SetOrigin(origin);
   convolutionMask->SetSpacing(spacing);
   convolutionMask->Allocate();
 
@@ -1301,19 +1261,12 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   float subPixelDimensionX = spacing[0]/2;
   float subPixelDimensionY = spacing[1]/2;
 
-  double amountOfPixels = size[0] * size[1];
   double distance = 0.0;
-  int countSubPixel = 0;
+  double countSubPixel = 0.0;
   double pixelValue = 0.0;
 
   MaskIteratorType maskIt(convolutionMask,region);
 
-
-
-  ////#ifdef DEBUG_SEGMENTATION_CORRECTION
-  //  unsigned int lastZ = 1000000000;
-  //  unsigned int lastY = 1000000000;
-  ////#endif
   for(maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)
   {
     ContinuousIndexType indexPoint(maskIt.GetIndex());
@@ -1342,31 +1295,13 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
     //pixelValue is the counted SubPixel divided by factor 4
     pixelValue = countSubPixel / 4.00;
-
-
     convolutionMask->SetPixel(maskIt.GetIndex(),pixelValue);
 
-    ////#ifdef DEBUG_SEGMENTATION_CORRECTION
-    //  // Debug Ausgabe:
-    //double value = maskIt.Get();
-    //  if (maskIt.GetIndex()[1] != lastY)
-    //  {
-    //    std::cout << std::endl;
-    //    lastY = maskIt.GetIndex()[1];
-    //  }
-    //  if (maskIt.GetIndex()[0] != lastZ)
-    //  {
-    //    std::cout << value << " ";
-    //    lastZ = maskIt.GetIndex()[0];
-    //  }
-    ////#endif
-
-    countSubPixel = 0;
+    countSubPixel = 0.00;
   }
 
-  std::cout << std::endl << std::endl;
 
-
+  //Initialize Convolution-Filter
   typedef itk::ConvolutionImageFilter<ImageType, MaskImageType, MaskImageType> FilterType;
   FilterType::Pointer convolutionFilter = FilterType::New();
 
@@ -1378,27 +1313,71 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   MaskImageType::Pointer peakImage = convolutionFilter->GetOutput();
   MaskIteratorType peakImageIt(peakImage, peakImage->GetLargestPossibleRegion());
 
-  //#ifdef DEBUG_SEGMENTATION_CORRECTION
-      // Debug Ausgabe:
-  unsigned int lastZ = 1000000000;
-  unsigned int lastY = 1000000000;
-  for(peakImageIt.GoToBegin(); !peakImageIt.IsAtEnd(); ++peakImageIt)
-  {
-    double x = peakImageIt.Get();
-      if (peakImageIt.GetIndex()[1] != lastY)
-      {
-        std::cout << std::endl;
-        lastY = peakImageIt.GetIndex()[1];
-      }
-      if (peakImageIt.GetIndex()[0] != lastZ)
-      {
-        std::cout << x << " ";
-        lastZ = peakImageIt.GetIndex()[0];
-      }
-    }
-  //#endif
+
   Statistics hotspotStatistics;
   hotspotStatistics = CalculateMinMaxIndex(peakImage.GetPointer(),maskImage);
+
+  //Save Peak-Value (Peak-Value is MaxValue in a peakImage)
+  double hotspotPeak = hotspotStatistics.HotspotMax;
+
+  SphereMaskImageType::IndexType hotspotPeakIndex;
+
+  //Save Peak-Index
+  hotspotStatistics.HotspotMaxIndex.set_size(inputImage->GetImageDimension());
+  for (int i = 0; i < hotspotStatistics.HotspotMaxIndex.size(); i++)
+  {
+    hotspotPeakIndex[i] = hotspotStatistics.HotspotMaxIndex[i];
+  }
+
+  SphereMaskImageType::Pointer hotspotMask = SphereMaskImageType::New();
+
+  SpacingType hotspotSpacing = inputImage->GetSpacing();
+  const double radiusSUVHotspot = 6.2035049089940;
+  IndexType hotspotStart;
+
+  hotspotStart.Fill(0);
+  ContinuousIndexType hotspotMaskCenterIndex;
+
+  //Set hotspotMask-origin on position of Peak-Index
+  hotspotStatistics.HotspotMaxIndex.set_size(inputImage->GetImageDimension());
+  for (int i = 0; i<hotspotStatistics.HotspotMaxIndex.size(); i++)
+  {
+    hotspotMaskCenterIndex[i] = hotspotStatistics.HotspotMaxIndex[i];
+  }
+
+  RegionType hotspotRegion;
+  hotspotRegion.SetSize(peakImage->GetLargestPossibleRegion().GetSize());
+  hotspotRegion.SetIndex(hotspotStart);
+
+  hotspotMask->SetRegions(hotspotRegion);
+  hotspotMask->SetSpacing(hotspotSpacing);
+  hotspotMask->Allocate();
+
+  SphereMaskIteratorType hotspotMaskIt(hotspotMask,hotspotRegion);
+
+  //Calculate which pixels belong to hotspotMask
+  for(hotspotMaskIt.GoToBegin(); !hotspotMaskIt.IsAtEnd(); ++hotspotMaskIt)
+  {
+    ContinuousIndexType indexPoint(hotspotMaskIt.GetIndex());
+    double distance = 0.0;
+    distance = indexPoint.EuclideanDistanceTo(hotspotMaskCenterIndex);
+
+    if(distance <= radiusSUVHotspot)
+        hotspotMask->SetPixel(hotspotMaskIt.GetIndex(), 1.00);
+    else
+      hotspotMask->SetPixel(hotspotMaskIt.GetIndex(), 0.00);
+  }
+
+  //Calculate statistics in Hotspot
+  hotspotStatistics = CalculateMinMaxIndex(inputImage, hotspotMask.GetPointer());
+  hotspotStatistics.HotspotPeak = hotspotPeak;
+
+  hotspotStatistics.HotspotPeakIndex.set_size(inputImage->GetImageDimension());
+  for (int i = 0; i< hotspotStatistics.HotspotPeakIndex.size(); ++i)
+  {
+    hotspotStatistics.HotspotPeakIndex[i] = hotspotPeakIndex[i];
+  }
+
   return hotspotStatistics;
 }
 

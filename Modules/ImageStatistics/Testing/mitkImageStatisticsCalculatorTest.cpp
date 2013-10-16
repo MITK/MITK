@@ -712,6 +712,9 @@ int mitkImageStatisticsCalculatorTest(int, char* [])
       << test.sd <<"' for testcase #" << test.id );
   }
 
+  // static method TestHotspotSearch(image):
+  // -> formuliert verschiedene TestFälle: Polygon und Masken (Segmentierung)
+
   TestUnitilizedImage();
 
   MITK_TEST_END()

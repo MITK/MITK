@@ -30,6 +30,7 @@ void mitk::ProportionalTimeGeometry::Initialize()
 {
   m_FirstTimePoint = 0.0;
   m_StepDuration = 1.0;
+  m_GeometryVector.resize(1);
 }
 
 mitk::TimeStepType mitk::ProportionalTimeGeometry::CountTimeSteps () const

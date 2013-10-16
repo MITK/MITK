@@ -34,13 +34,6 @@ mitk::NavigationDataObjectVisualizationFilter::~NavigationDataObjectVisualizatio
 
 const mitk::BaseData* mitk::NavigationDataObjectVisualizationFilter::GetRepresentationObject(unsigned int idx)
 {
-  //if (idx >= this->GetNumberOfInputs())
-  //  return NULL;
-
-  //const NavigationData* nd = this->GetInput(idx);
-  //if (nd == NULL)
-  //  return NULL;
-
   RepresentationPointerMap::const_iterator iter = m_RepresentationList.find(idx);
   if (iter != m_RepresentationList.end())
     return iter->second;
@@ -59,18 +52,7 @@ mitk::AffineTransform3D::Pointer mitk::NavigationDataObjectVisualizationFilter::
 
 void mitk::NavigationDataObjectVisualizationFilter::SetRepresentationObject(unsigned int idx, BaseData* data)
 {
-  //if (idx >= this->GetNumberOfInputs())
-  //  return false;
-
-  //const NavigationData* nd = this->GetInput(idx);
-
-  //if (nd == NULL || data == NULL)
-  //  return false;
-
   m_RepresentationList[idx] = RepresentationPointer(data);
-  //std::pair<RepresentationPointerMap::iterator, bool> returnEl; //pair for returning the result
-  //returnEl = m_RepresentationList.insert( RepresentationPointerMap::value_type(nd, data) ); //insert the given elements
-  //return returnEl.second; // return if insert was successful
 }
 
 void mitk::NavigationDataObjectVisualizationFilter::SetOffset(int index, mitk::AffineTransform3D::Pointer offset)
@@ -108,17 +90,16 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
     const mitk::BaseData* data = this->GetRepresentationObject(index);
     if (data == NULL)
     {
-      itkWarningMacro("NavigationDataObjectVisualizationFilter: Wrong/No BaseData associated with input.");
-      return;
+      MITK_WARN << "No BaseData associated with input " << index;
+      continue;
     }
 
     //get the transform from data
     mitk::AffineTransform3D::Pointer affineTransform = data->GetGeometry()->GetIndexToWorldTransform();
     if (affineTransform.IsNull())
     {
-      //replace with mitk standard output
-      itkWarningMacro("NavigationDataObjectVisualizationFilter: AffineTransform IndexToWorldTransform not initialized!");
-      return;
+      MITK_WARN << "AffineTransform IndexToWorldTransform not initialized!";
+      continue;
     }
 
     //check for offset

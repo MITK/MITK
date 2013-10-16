@@ -1,2 +1,2 @@
-include (${MITK_MODULES_PACKAGE_DEPENDS_DIR}/Qt/MITK_Qt5_Config.cmake)
-use_qt5_module(Qt5Designer)
+find_package(Qt5Designer REQUIRED)
+qt5_use_modules(${MODULE_NAME} Designer)

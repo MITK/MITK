@@ -3,11 +3,6 @@ if(MISSING)
   message("Tutorial won't be built because QmitkExt is missing.")
 else(MISSING)
 
-  MITK_USE_MODULE(QmitkExt)
-  MITK_USE_MODULE(MitkExt)
-
-  include_directories(${ALL_INCLUDE_DIRECTORIES})
-
   # initialize only the source lists which need additional files
   # Step6 is reused in Step7 and Step8. Step6.cpp has to be added
   # explicitly since it is not a member of ${STEP6_CPP} at this point
@@ -29,7 +24,7 @@ else(MISSING)
   foreach(stepNo RANGE 1 8)
     set(STEP${stepNo}_CPP ${STEP${stepNo}_CPP} Step${stepNo}.cpp QtTesting.cpp)
     add_executable(Step${stepNo} ${STEP${stepNo}_CPP})
-    target_link_libraries(Step${stepNo} ${ALL_LIBRARIES})
+    mitk_use_modules(TARGET Step${stepNo} MODULES QmitkExt)
   endforeach(stepNo)
 
 

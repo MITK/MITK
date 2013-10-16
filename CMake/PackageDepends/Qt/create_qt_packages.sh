@@ -8,8 +8,8 @@ do
   config_filename=MITK_${libname}_Config.cmake
   echo "Creating ${config_filename}"
   cat << EOF > ${config_filename}
-include (\${MITK_MODULES_PACKAGE_DEPENDS_DIR}/Qt/MITK_Qt5_Config.cmake)
-use_qt5_module($libname)
+find_package($libname REQUIRED)
+qt5_use_modules(\${MODULE_NAME} ${libname#Qt5})
 EOF
 
 done

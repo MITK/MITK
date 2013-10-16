@@ -1,2 +1,2 @@
-include (${MITK_MODULES_PACKAGE_DEPENDS_DIR}/Qt/MITK_Qt5_Config.cmake)
-use_qt5_module(Qt5QuickTest)
+find_package(Qt5QuickTest REQUIRED)
+qt5_use_modules(${MODULE_NAME} QuickTest)

@@ -15,6 +15,10 @@ macro(MITK_CREATE_MODULE_TESTS)
     include(files.cmake)
     include_directories(.)
 
+    if(MODULE_TEST_EXTRA_DEPENDS)
+      message(WARNING "The keyword EXTRA_DEPENDS is deprecated. Use a separate call to mitk_use_modules instead.")
+    endif()
+
     if(DEFINED MOC_H_FILES)
       QT4_WRAP_CPP(MODULE_TEST_GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
     endif(DEFINED MOC_H_FILES)

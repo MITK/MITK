@@ -646,6 +646,11 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         for(unsigned int i=0; i<hc.size(); i++)
         {
           vnl_vector_fixed<double, 3> vect = hc[i]->DiffusionVector;
+          if (vect.magnitude()<0.0001 && b_vals[i]>0)
+          {
+              vect.fill(0.0);
+              vect[0] = 1;
+          }
           vect.normalize();
           vect *= sqrt(b_vals[i]/maxb);
           directions->push_back(vect);

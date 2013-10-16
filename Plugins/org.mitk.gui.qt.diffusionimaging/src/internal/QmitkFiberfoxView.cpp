@@ -135,7 +135,6 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_TensionBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnTensionChanged(double)));
         connect((QObject*) m_Controls->m_ContinuityBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnContinuityChanged(double)));
         connect((QObject*) m_Controls->m_BiasBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnBiasChanged(double)));
-        connect((QObject*) m_Controls->m_AddGibbsRinging, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddGibbsRinging(int)));
         connect((QObject*) m_Controls->m_AddNoise, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddNoise(int)));
         connect((QObject*) m_Controls->m_AddGhosts, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddGhosts(int)));
         connect((QObject*) m_Controls->m_AddDistortions, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddDistortions(int)));
@@ -233,7 +232,7 @@ void QmitkFiberfoxView::UpdateImageParameters()
 
     // signal relaxation
     m_ImageGenParameters.doSimulateRelaxation = m_Controls->m_RelaxationBox->isChecked();
-    if (m_ImageGenParameters.doSimulateRelaxation)
+    if (m_ImageGenParameters.doSimulateRelaxation && m_SelectedBundles.size()>0 )
         m_ImageGenParameters.artifactModelString += "_RELAX";
 
     // N/2 ghosts
@@ -254,13 +253,17 @@ void QmitkFiberfoxView::UpdateImageParameters()
 
     // Motion
     m_ImageGenParameters.doAddMotion = m_Controls->m_AddMotion->isChecked();
+    m_ImageGenParameters.randomMotion = m_Controls->m_RandomMotion->isChecked();
     m_ImageGenParameters.translation[0] = m_Controls->m_MaxTranslationBoxX->value();
     m_ImageGenParameters.translation[1] = m_Controls->m_MaxTranslationBoxY->value();
     m_ImageGenParameters.translation[2] = m_Controls->m_MaxTranslationBoxZ->value();
     m_ImageGenParameters.rotation[0] = m_Controls->m_MaxRotationBoxX->value();
     m_ImageGenParameters.rotation[1] = m_Controls->m_MaxRotationBoxY->value();
     m_ImageGenParameters.rotation[2] = m_Controls->m_MaxRotationBoxZ->value();
+    if ( m_Controls->m_AddMotion->isChecked() && m_SelectedBundles.size()>0 )
+        m_ImageGenParameters.artifactModelString += "_MOTION";
 
+    // other imaging parameters
     m_ImageGenParameters.tLine = m_Controls->m_LineReadoutTimeBox->value();
     m_ImageGenParameters.tInhom = m_Controls->m_T2starBox->value();
     m_ImageGenParameters.tEcho = m_Controls->m_TEbox->value();

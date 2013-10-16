@@ -101,6 +101,7 @@ public:
     itkSetMacro( MaxTranslation, VectorType )
     itkSetMacro( MaxRotation, VectorType )
     itkSetMacro( AddMotionArtifact, bool )
+    itkSetMacro( RandomMotion, bool )
 
     // output
     std::vector< ItkDoubleImgType::Pointer > GetVolumeFractions(){ return m_VolumeFractions; }
@@ -156,6 +157,8 @@ protected:
     VectorType                          m_MaxTranslation;
     VectorType                          m_MaxRotation;
     bool                                m_AddMotionArtifact;
+    bool                                m_RandomMotion;
+    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 };
 }
 

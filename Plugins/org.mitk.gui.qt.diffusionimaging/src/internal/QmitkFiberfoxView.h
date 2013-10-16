@@ -176,6 +176,7 @@ protected:
         bool                                doSimulateEddyCurrents;
         bool                                doDisablePartialVolume;
         bool                                doAddMotion;
+        bool                                randomMotion;
 
         mitk::RicianNoiseModel<double>       ricianNoiseModel;
         mitk::DiffusionSignalModel<double>::GradientListType  gradientDirections;

@@ -75,6 +75,9 @@ TractsToDWIImageFilter< PixelType >::TractsToDWIImageFilter()
 
     m_MaxTranslation.Fill(0.0);
     m_MaxRotation.Fill(0.0);
+
+    m_RandGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+    m_RandGen->SetSeed();
 }
 
 template< class PixelType >
@@ -429,9 +432,10 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     maxVolume = 0;
 
     ofstream logFile;
-    logFile.open("/local/fiberfox.log");
+    logFile.open("fiberfox_motion.log");
     logFile << "0,0,0,0\n";
 
+    // astrosticks überarbeiten!!!!!!!!!!!!!!!!!!!!!
     for (unsigned int i=0; i<m_NonFiberModels.size(); i++)
         if (dynamic_cast< mitk::AstroStickModel<double>* >(m_NonFiberModels.at(i)))
         {
@@ -441,11 +445,11 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
     // TEMP
     //vtkTransform* transform; transform->RotateX();
-    FiberBundleType fiberBundleBackup = fiberBundle->GetDeepCopy();
+    FiberBundleType fiberBundleTransformed = fiberBundle->GetDeepCopy();
 
     for (int g=0; g<m_FiberModels.at(0)->GetNumGradients(); g++)
     {
-        vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
+        vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundleTransformed->GetFiberPolyData();
 
         ItkDoubleImgType::Pointer intraAxonalVolume = ItkDoubleImgType::New();
         intraAxonalVolume->SetSpacing( m_UpsampledSpacing );
@@ -576,7 +580,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             ++disp;
         }
 
-        // "Generating signal of " << m_NonFiberModels.size() << " non-fiber compartments";
         ImageRegionIterator<ItkUcharImgType> it3(m_TissueMask, m_TissueMask->GetLargestPossibleRegion());
 
         double fact = 1;
@@ -642,57 +645,30 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
         if (m_AddMotionArtifact)
         {
-//            mitk::Geometry3D::Pointer geom = fib->GetGeometry();
-//            mitk::Point3D center = geom->GetCenter();
+            if (m_RandomMotion)
+            {
+                fiberBundleTransformed = fiberBundle->GetDeepCopy();
 
-//            vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
-//            trans->Translate(-center[0], -center[1], -center[2]);
-//            vtkSmartPointer<vtkTransformPolyDataFilter> tfilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-//            tfilter->SetTransform(trans);
-//            tfilter->SetInput(fib->GetFiberPolyData());
-//            tfilter->Update();
-//            fib->SetFiberPolyData(tfilter->GetOutput());
+                double rotX = m_RandGen->GetVariateWithClosedRange(m_MaxRotation[0]*2)-m_MaxRotation[0];
+                double rotY = m_RandGen->GetVariateWithClosedRange(m_MaxRotation[1]*2)-m_MaxRotation[1];
+                double rotZ = m_RandGen->GetVariateWithClosedRange(m_MaxRotation[2]*2)-m_MaxRotation[2];
+                fiberBundleTransformed->TranslateFibers(rotX, rotY, rotZ);
+                logFile << g+1 << " rotation:" << rotX << "," << rotY << "," << rotZ << "\n";
 
-//            tfilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-//            trans = vtkSmartPointer<vtkTransform>::New();
-//            trans->RotateX(m_Controls->m_XrotBox->value());
-//            trans->RotateY(m_Controls->m_YrotBox->value());
-//            trans->RotateZ(m_Controls->m_ZrotBox->value());
-//            tfilter->SetTransform(trans);
-//            tfilter->SetInput(fib->GetFiberPolyData());
-//            tfilter->Update();
-//            fib->SetFiberPolyData(tfilter->GetOutput());
+                double transX = m_RandGen->GetVariateWithClosedRange(m_MaxTranslation[0]*2)-m_MaxTranslation[0];
+                double transY = m_RandGen->GetVariateWithClosedRange(m_MaxTranslation[1]*2)-m_MaxTranslation[1];
+                double transZ = m_RandGen->GetVariateWithClosedRange(m_MaxTranslation[2]*2)-m_MaxTranslation[2];
+                fiberBundleTransformed->TranslateFibers(transX, transY, transZ);
+                logFile << g+1 << " translation:" << transX << "," << transY << "," << transZ << "\n";
+            }
+            else
+            {
+                logFile << g+1 << " rotation:" << m_MaxRotation[0]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxRotation[1]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxRotation[2]/m_FiberModels.at(0)->GetNumGradients();
+                fiberBundleTransformed->RotateAroundAxis(m_MaxRotation[0]/m_FiberModels.at(0)->GetNumGradients(), m_MaxRotation[1]/m_FiberModels.at(0)->GetNumGradients(), m_MaxRotation[2]/m_FiberModels.at(0)->GetNumGradients());
 
-//            tfilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-//            trans = vtkSmartPointer<vtkTransform>::New();
-//            trans->Translate(center[0], center[1], center[2]);
-//            tfilter->SetTransform(trans);
-//            tfilter->SetInput(fib->GetFiberPolyData());
-//            tfilter->Update();
-//            fib->SetFiberPolyData(tfilter->GetOutput());
-
-            //MITK_INFO << "Rotating: " << m_MaxRotation[0]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxRotation[1]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxRotation[2]/m_FiberModels.at(0)->GetNumGradients();
-            //fiberBundle->RotateAroundAxis(m_MaxRotation[0]/m_FiberModels.at(0)->GetNumGradients(), m_MaxRotation[1]/m_FiberModels.at(0)->GetNumGradients(), m_MaxRotation[2]/m_FiberModels.at(0)->GetNumGradients());
-
-//            MITK_INFO << "Translating: " << m_MaxTranslation[0]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxTranslation[1]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxTranslation[2]/m_FiberModels.at(0)->GetNumGradients();
-//            fiberBundle->TranslateFibers(m_MaxTranslation[0]/m_FiberModels.at(0)->GetNumGradients(),m_MaxTranslation[1]/m_FiberModels.at(0)->GetNumGradients(),m_MaxTranslation[2]/m_FiberModels.at(0)->GetNumGradients());
-
-            itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer rGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
-            rGen->SetSeed();
-            fiberBundle = fiberBundleBackup->GetDeepCopy();
-
-            double transX = (double)rGen->GetIntegerVariate(10)-5;
-            double transY = (double)rGen->GetIntegerVariate(10)-5;
-            double transZ = (double)rGen->GetIntegerVariate(10)-5;
-            transX *= 1.25;
-            transY *= 1.25;
-            transZ *= 1.25;
-
-            fiberBundle->TranslateFibers(transX, transY, transZ);
-            logFile << g+1 << "," << transX << "," << transY << "," << transZ << "\n";
-
-
-            //fiberBundle->TranslateFibers(rGen->GetVariateWithClosedRange(12.5)-6.25, rGen->GetVariateWithClosedRange(12.5)-6.25, rGen->GetVariateWithClosedRange(12.5)-6.25);
+                logFile << g+1 << " translation:" << m_MaxTranslation[0]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxTranslation[1]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxTranslation[2]/m_FiberModels.at(0)->GetNumGradients();
+                fiberBundleTransformed->TranslateFibers(m_MaxTranslation[0]/m_FiberModels.at(0)->GetNumGradients(),m_MaxTranslation[1]/m_FiberModels.at(0)->GetNumGradients(),m_MaxTranslation[2]/m_FiberModels.at(0)->GetNumGradients());
+            }
         }
     }
     logFile.close();

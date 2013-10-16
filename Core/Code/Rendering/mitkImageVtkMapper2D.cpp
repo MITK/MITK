@@ -598,7 +598,10 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
   }
   else
   {
-    MITK_WARN << "Image Rendering.Mode was set to use a lookup table but there is no property 'LookupTable'. A default (rainbow) lookup table will be used.";
+    //"Image Rendering.Mode was set to use a lookup table but there is no property 'LookupTable'.
+    //A default (rainbow) lookup table will be used.
+    //Here have to do nothing. Warning for the user has been removed, due to unwanted console output
+    //in every interation of the rendering.
   }
   localStorage->m_LevelWindowFilter->SetLookupTable(usedLookupTable);
 }

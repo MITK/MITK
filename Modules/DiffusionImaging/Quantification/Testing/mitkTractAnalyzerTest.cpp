@@ -74,7 +74,7 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
   // compare point sets of tbssRoi and reference roi
 
   std::vector< itk::Index<3> > roi = tbssRoi->GetRoi();
-  std::vector< itk::Index<3> > refRoi = referenceRoi->GetRoi();
+
 
 
   // Output roi for debug purposes
@@ -85,22 +85,7 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
      std::cout << ix[0] << ", " << ix[1] << ", " << ix[2] << "\n";
   }
   std::cout << std::endl;
-/*
 
-  // Output refroi for debug purposes
-  std::cout << "Reference ROI\n";
-  for(int t=0; t<refRoi.size(); t++)
-  {
-     itk::Index<3> ix = refRoi.at(t);
-     std::cout << ix[0] << ", " << ix[1] << ", " << ix[2] << "\n";
-  }
-  std::cout << std::endl;
-
-
-
-  std::cout << "roi size: " << roi.size() << '\n';
-  std::cout << "ref roi size: " << refRoi.size() << std::endl;
-  */
   double cost = analyzer.GetCostSum();
 
   std::cout << "Cost: " << cost << std::endl;
@@ -109,25 +94,6 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
 
   MITK_TEST_CONDITION(equal, "Checking cost of found ROI");
 
-  //MITK_TEST_EQUAL(cot, refRoi.size(), "Size of roi and control roi are the same.");
-/*
-  if(equalSize)
-  {
-    bool samePath = true;
-    for(int t=0; t<roi.size(); t++)
-    {
-      itk::Index<3> ix = roi.at(t);
-      itk::Index<3> refIx = refRoi.at(t);
 
-      if(ix != refIx)
-      {
-        samePath = false;
-      }
-    }
-
-    MITK_TEST_CONDITION(samePath, "Calculated ROI matches reference ROI.");
-  }
-
-*/
   MITK_TEST_END();
 }

@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 using namespace mitk;
 
 /**
- * these private variables are used in the test functions
+ * these static variables are used in the test functions
  *
  * The variable which should be copied into is set to its original value.
  * The value which should be copied is set to valuesToCopy.

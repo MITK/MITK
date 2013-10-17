@@ -51,6 +51,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileWriter.h>
 #include <itkRescaleIntensityImageFilter.h>
 #include <itkConvolutionImageFilter.h>
+#include <itkEllipseSpatialObject.h>
+#include <itkSpatialObjectToImageFilter.h>
 
 #include <itkContinuousIndex.h>
 #include <itkmath.h.>
@@ -259,7 +261,7 @@ bool ImageStatisticsCalculator::GetDoIgnorePixelValue()
 
 void ImageStatisticsCalculator::SetHotspotSize(double value)
 {
-  m_HotspotSize = (4/3) * M_PI * value * value * value;
+  m_HotspotSize = value;
 }
 
 double ImageStatisticsCalculator::GetHotspotSize()
@@ -1122,8 +1124,6 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateMinMax
   typedef itk::ImageRegionConstIterator<MaskImageType> MaskImageIteratorType;
   typedef itk::ImageRegionConstIteratorWithIndex<ImageType> InputImageIndexIteratorType;
 
-  StatisticsContainer statisticsContainer;
-
   MaskImageIteratorType maskIt(maskImage, maskImage->GetLargestPossibleRegion());
   InputImageIndexIteratorType imageIndexIt(inputImage, inputImage->GetLargestPossibleRegion());
 
@@ -1142,11 +1142,11 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateMinMax
   {
     if(maskIt.Get() > itk::NumericTraits<typename MaskImageType::PixelType>::Zero) // TODO: was ist der Unterschied zwischen itk::NumericTraits<typename MaskImageType::PixelType>::Zero und "0"
     {
-      //Calculate coefficients for Mean-Value / StdDev
+      // Calculate coefficients for Mean-Value / StdDev
       sumPixelValue = sumPixelValue + imageIndexIt.Get();
       countPixel++;
 
-      //Calculate minimum, maximum and corresponding index-values
+      // Calculate minimum, maximum and corresponding index-values
       if(imageIndexIt.Get() > maxValue)
       {
        maxIndex = imageIndexIt.GetIndex();
@@ -1164,7 +1164,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateMinMax
   double mean = sumPixelValue / countPixel;
   double stdDevNumerator = 0.00;
 
-  //Calculation Numerator StdDev
+  // Calculation numerator StdDev
   for(maskIt.GoToBegin(), imageIndexIt.GoToBegin();
       !maskIt.IsAtEnd() && !imageIndexIt.IsAtEnd();
       ++maskIt, ++imageIndexIt)
@@ -1224,6 +1224,9 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   SizeType size;
   ContinuousIndexType convolutionMaskCenterCoordinate;
 
+  typedef itk::EllipseSpatialObject<3> EllipseType;
+  EllipseType::Pointer sphere = EllipseType::New();
+
 
   for(unsigned int i = 0; i < VImageDimension; ++i)
   {
@@ -1231,11 +1234,11 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
     double countIndex =  2.0 * RadiusInMM / spacing[i];
 
-    //Rounding up to the next integer by cast
+    // Rounding up to the next integer by cast
     countIndex += 0.9;
     int castedIndex = static_cast<int>(countIndex);
 
-    //We always have an uneven number in size to determine a center-point in the convolution mask
+    // We always have an uneven number in size to determine a center-point in the convolution mask
     if(castedIndex % 2 > 0 )
     {
       size[i] = castedIndex;
@@ -1251,7 +1254,6 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   RegionType region;
   region.SetSize(size);
   region.SetIndex(start);
-
 
   convolutionMask->SetRegions(region);
   convolutionMask->SetSpacing(spacing);
@@ -1293,7 +1295,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
       }
     }
 
-    //pixelValue is the counted SubPixel divided by factor 4
+    // pixelValue is the counted SubPixel divided by factor 4
     pixelValue = countSubPixel / 4.00;
     convolutionMask->SetPixel(maskIt.GetIndex(),pixelValue);
 
@@ -1301,7 +1303,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   }
 
 
-  //Initialize Convolution-Filter
+  // Initialize Convolution-Filter
   typedef itk::ConvolutionImageFilter<ImageType, MaskImageType, MaskImageType> FilterType;
   FilterType::Pointer convolutionFilter = FilterType::New();
 
@@ -1317,12 +1319,12 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   Statistics hotspotStatistics;
   hotspotStatistics = CalculateMinMaxIndex(peakImage.GetPointer(),maskImage);
 
-  //Save Peak-Value (Peak-Value is MaxValue in a peakImage)
+  // Save Peak-Value (Peak-Value is MaxValue in a peakImage)
   double hotspotPeak = hotspotStatistics.HotspotMax;
 
   SphereMaskImageType::IndexType hotspotPeakIndex;
 
-  //Save Peak-Index
+  // Save Peak-Index
   hotspotStatistics.HotspotMaxIndex.set_size(inputImage->GetImageDimension());
   for (int i = 0; i < hotspotStatistics.HotspotMaxIndex.size(); i++)
   {
@@ -1338,7 +1340,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   hotspotStart.Fill(0);
   ContinuousIndexType hotspotMaskCenterIndex;
 
-  //Set hotspotMask-origin on position of Peak-Index
+  // Set hotspotMask-origin on position of Peak-Index
   hotspotStatistics.HotspotMaxIndex.set_size(inputImage->GetImageDimension());
   for (int i = 0; i<hotspotStatistics.HotspotMaxIndex.size(); i++)
   {
@@ -1355,7 +1357,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   SphereMaskIteratorType hotspotMaskIt(hotspotMask,hotspotRegion);
 
-  //Calculate which pixels belong to hotspotMask
+  // Calculate which pixels belong to hotspotMask
   for(hotspotMaskIt.GoToBegin(); !hotspotMaskIt.IsAtEnd(); ++hotspotMaskIt)
   {
     ContinuousIndexType indexPoint(hotspotMaskIt.GetIndex());
@@ -1368,7 +1370,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
       hotspotMask->SetPixel(hotspotMaskIt.GetIndex(), 0.00);
   }
 
-  //Calculate statistics in Hotspot
+  // Calculate statistics in Hotspot
   hotspotStatistics = CalculateMinMaxIndex(inputImage, hotspotMask.GetPointer());
   hotspotStatistics.HotspotPeak = hotspotPeak;
 

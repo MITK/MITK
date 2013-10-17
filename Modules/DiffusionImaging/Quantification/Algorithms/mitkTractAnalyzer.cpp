@@ -46,6 +46,8 @@ namespace mitk {
   void TractAnalyzer::MakeRoi()
   {
 
+    m_CostSum = 0.0;
+
     int n = 0;
     if(m_PointSetNode.IsNotNull())
     {
@@ -199,7 +201,7 @@ namespace mitk {
         pathFinder->SetEndIndex(endPoint);
         pathFinder->Update();
 
-        double totalCost = 0.0;
+        double segmentCost = 0.0;
         std::vector< itk::Index<3> > path = pathFinder->GetVectorPath();
 
         for(int i=0; i<path.size()-1; i++)
@@ -207,10 +209,10 @@ namespace mitk {
             itk::Index<3> ix1 = path[i];
             itk::Index<3> ix2 = path[i+1];
 
-            totalCost += costFunction->GetCost(ix1, ix2);
+            segmentCost += costFunction->GetCost(ix1, ix2);
         }
 
-        std::cout << "Cost: " << totalCost << std::endl;
+        m_CostSum += segmentCost;
 
 
         return pathFinder->GetVectorPath();

@@ -1596,25 +1596,25 @@ void QmitkFiberfoxView::ApplyTransform()
                         double y = m_Controls->m_YrotBox->value()*M_PI/180;
                         double z = m_Controls->m_ZrotBox->value()*M_PI/180;
 
-                        itk::Matrix< float, 3, 3 > rotX; rotX.SetIdentity();
+                        itk::Matrix< double, 3, 3 > rotX; rotX.SetIdentity();
                         rotX[1][1] = cos(x);
                         rotX[2][2] = rotX[1][1];
                         rotX[1][2] = -sin(x);
                         rotX[2][1] = -rotX[1][2];
 
-                        itk::Matrix< float, 3, 3 > rotY; rotY.SetIdentity();
+                        itk::Matrix< double, 3, 3 > rotY; rotY.SetIdentity();
                         rotY[0][0] = cos(y);
                         rotY[2][2] = rotY[0][0];
                         rotY[0][2] = sin(y);
                         rotY[2][0] = -rotY[0][2];
 
-                        itk::Matrix< float, 3, 3 > rotZ; rotZ.SetIdentity();
+                        itk::Matrix< double, 3, 3 > rotZ; rotZ.SetIdentity();
                         rotZ[0][0] = cos(z);
                         rotZ[1][1] = rotZ[0][0];
                         rotZ[0][1] = -sin(z);
                         rotZ[1][0] = -rotZ[0][1];
 
-                        itk::Matrix< float, 3, 3 > rot = rotZ*rotY*rotX;
+                        itk::Matrix< double, 3, 3 > rot = rotZ*rotY*rotX;
 
                         // transform control point coordinate into geometry translation
                         geom->SetOrigin(pe->GetWorldControlPoint(0));
@@ -1655,22 +1655,22 @@ void QmitkFiberfoxView::ApplyTransform()
             double x = m_Controls->m_XrotBox->value()*M_PI/180;
             double y = m_Controls->m_YrotBox->value()*M_PI/180;
             double z = m_Controls->m_ZrotBox->value()*M_PI/180;
-            itk::Matrix< float, 3, 3 > rotX; rotX.SetIdentity();
+            itk::Matrix< double, 3, 3 > rotX; rotX.SetIdentity();
             rotX[1][1] = cos(x);
             rotX[2][2] = rotX[1][1];
             rotX[1][2] = -sin(x);
             rotX[2][1] = -rotX[1][2];
-            itk::Matrix< float, 3, 3 > rotY; rotY.SetIdentity();
+            itk::Matrix< double, 3, 3 > rotY; rotY.SetIdentity();
             rotY[0][0] = cos(y);
             rotY[2][2] = rotY[0][0];
             rotY[0][2] = sin(y);
             rotY[2][0] = -rotY[0][2];
-            itk::Matrix< float, 3, 3 > rotZ; rotZ.SetIdentity();
+            itk::Matrix< double, 3, 3 > rotZ; rotZ.SetIdentity();
             rotZ[0][0] = cos(z);
             rotZ[1][1] = rotZ[0][0];
             rotZ[0][1] = -sin(z);
             rotZ[1][0] = -rotZ[0][1];
-            itk::Matrix< float, 3, 3 > rot = rotZ*rotY*rotX;
+            itk::Matrix< double, 3, 3 > rot = rotZ*rotY*rotX;
 
             // transform control point coordinate into geometry translation
             geom->SetOrigin(pe->GetWorldControlPoint(0));

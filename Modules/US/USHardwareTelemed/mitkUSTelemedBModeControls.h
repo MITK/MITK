@@ -76,6 +76,8 @@ namespace mitk {
       */
     void SetUsgDataView( Usgfw2Lib::IUsgDataView* );
 
+    void ReinitializeControls( );
+
   protected:
     USTelemedBModeControls();
     virtual ~USTelemedBModeControls();

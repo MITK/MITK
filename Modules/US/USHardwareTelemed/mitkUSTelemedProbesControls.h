@@ -57,6 +57,9 @@ namespace mitk {
       */
     void SetTelemedDevice(itk::SmartPointer<USTelemedDevice> telemedDevice);
 
+    void ProbeRemoved(unsigned int index);
+    void ProbeAdded(unsigned int index);
+
   protected:
     /**
       * Constructs an empty object.

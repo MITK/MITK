@@ -41,6 +41,12 @@ void mitk::USTelemedBModeControls::SetUsgDataView( Usgfw2Lib::IUsgDataView* usgD
   m_UsgDataView = usgDataView;
 }
 
+void mitk::USTelemedBModeControls::ReinitializeControls( )
+{
+  this->ReleaseControls();
+  this->CreateControls();
+}
+
 void mitk::USTelemedBModeControls::SetIsActive(bool active)
 {
   if (active)

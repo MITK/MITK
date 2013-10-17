@@ -38,7 +38,7 @@ void mitk::USTelemedProbesControls::SetIsActive(bool isActive)
     return;
   }
 
-  if ( isActive )
+  if ( isActive && m_ProbesCollection == 0 )
   {
     this->CreateProbesCollection();
     this->CreateProbesSet();
@@ -92,6 +92,30 @@ unsigned int mitk::USTelemedProbesControls::GetProbesCount() const
 void mitk::USTelemedProbesControls::SetTelemedDevice(itk::SmartPointer<USTelemedDevice> telemedDevice)
 {
   m_TelemedDevice = telemedDevice;
+}
+
+void mitk::USTelemedProbesControls::ProbeRemoved(unsigned int index)
+{
+  MITK_INFO << "Probe removed...";
+
+  if ( m_ProbesSet.size() > index )
+  {
+    m_ProbesSet.erase(m_ProbesSet.begin() + index);
+  }
+}
+
+void mitk::USTelemedProbesControls::ProbeAdded(unsigned int index)
+{
+  MITK_INFO << "Probe arrived...";
+
+  this->CreateProbesCollection();
+  this->CreateProbesSet();
+
+  // Activate the added probe, if the added probe is the first probe
+  if (m_ProbesSet.size() == 1)
+  {
+    m_TelemedDevice->SetActiveDataView(m_ProbesSet.at(0)->GetUsgDataView());
+  }
 }
 
 bool mitk::USTelemedProbesControls::CreateProbesCollection()

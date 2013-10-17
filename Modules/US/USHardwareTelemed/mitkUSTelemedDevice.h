@@ -170,9 +170,6 @@ namespace mitk {
       */
     void StopScanning( );
 
-    void OnProbeArrived( );
-    void OnProbeRemoved( );
-
     USTelemedProbesControls::Pointer    m_ControlsProbes;
     USTelemedBModeControls::Pointer     m_ControlsBMode;
     USTelemedDopplerControls::Pointer   m_ControlsDoppler;

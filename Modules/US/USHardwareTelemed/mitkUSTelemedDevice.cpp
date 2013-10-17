@@ -78,18 +78,6 @@ bool mitk::USTelemedDevice::OnConnection()
 
   this->ConnectDeviceChangeSink();
 
-  // probe controls are available now
-  m_ControlsProbes->SetIsActive(true);
-
-  if ( m_ControlsProbes->GetProbesCount() < 1 )
-  {
-    MITK_WARN("USDevice")("USTelemedDevice") << "No probe found.";
-    return false;
-  }
-
-  // select first probe as a default
-  m_ControlsProbes->SelectProbe(0);
-
   return true;
 }
 
@@ -107,6 +95,18 @@ bool mitk::USTelemedDevice::OnDisconnection()
 
 bool mitk::USTelemedDevice::OnActivation()
 {
+  // probe controls are available now
+  m_ControlsProbes->SetIsActive(true);
+
+  if ( m_ControlsProbes->GetProbesCount() < 1 )
+  {
+    MITK_WARN("USDevice")("USTelemedDevice") << "No probe found.";
+    return false;
+  }
+
+  // select first probe as a default
+  m_ControlsProbes->SelectProbe(0);
+
   // set scan mode b as default for activation -
   // control interfaces can override this later
   HRESULT hr = m_UsgDataView->put_ScanMode(Usgfw2Lib::SCAN_MODE_B);
@@ -123,6 +123,8 @@ bool mitk::USTelemedDevice::OnActivation()
     MITK_ERROR("USDevice")("USTelemedDevice") << "Start scanning failed (" << hr << ").";
     return false;
   }
+
+  m_ControlsBMode->ReinitializeControls();
 
   return true;
 }
@@ -185,16 +187,6 @@ void mitk::USTelemedDevice::StopScanning()
   }
 }
 
-void mitk::USTelemedDevice::OnProbeArrived( )
-{
-  MITK_INFO << "Probe arrived...";
-}
-
-void mitk::USTelemedDevice::OnProbeRemoved( )
-{
-  MITK_INFO << "Probe removed...";
-}
-
 Usgfw2Lib::IUsgfw2* mitk::USTelemedDevice::GetUsgMainInterface()
 {
   return m_UsgMainInterface;
@@ -234,15 +226,21 @@ void mitk::USTelemedDevice::ConnectDeviceChangeSink( )
 
 // --- Methods for Telemed API Interfaces
 
-HRESULT __stdcall mitk::USTelemedDevice::raw_OnProbeArrive(IUnknown *pUsgProbe, ULONG *reserved)
+HRESULT __stdcall mitk::USTelemedDevice::raw_OnProbeArrive(IUnknown*, ULONG* probeIndex)
 {
-  this->OnProbeArrived();
+  m_ControlsProbes->ProbeAdded(static_cast<unsigned int>(*probeIndex));
+
+  this->Activate();
+
   return S_OK;
 };
 
-HRESULT __stdcall mitk::USTelemedDevice::raw_OnProbeRemove(IUnknown *pUsgProbe, ULONG *reserved)
+HRESULT __stdcall mitk::USTelemedDevice::raw_OnProbeRemove(IUnknown*, ULONG* probeIndex)
 {
-  this->OnProbeRemoved();
+  m_ControlsProbes->ProbeRemoved(static_cast<unsigned int>(*probeIndex));
+
+  this->Deactivate();
+
   return S_OK;
 };
 

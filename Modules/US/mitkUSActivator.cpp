@@ -40,7 +40,7 @@ void mitk::USActivator::Load(us::ModuleContext* context)
     (*it)->Initialize();
   }
 
-  // to be notified about every register and unregister of a USDevice
+  // to be notified about every register and unregister of an USDevice
   context->AddServiceListener(this, &mitk::USActivator::OnServiceEvent,
     "(" + us::ServiceConstants::OBJECTCLASS() + "=" + us_service_interface_iid<mitk::USDevice>() + ")");
 }

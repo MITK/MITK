@@ -121,131 +121,11 @@ void UltrasoundSupport::OnClickedViewDevice()
   // We use the activity state of the timer to determine whether we are currently viewing images
   if ( ! m_Timer->isActive() ) // Activate Imaging
   {
-    m_Controls.tabWidget->setTabEnabled(1, true);
-    m_Controls.tabWidget->setCurrentIndex(1);
-
-    //get device & set data node
-    m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedService<mitk::USDevice>();
-    if (m_Device.IsNull()){
-      m_Timer->stop();
-      return;
-    }
-    m_Device->Update();
-    m_Node->SetData(m_Device->GetOutput());
-
-    //start timer
-    int interval = (1000 / m_Controls.m_FrameRate->value());
-    m_Timer->setInterval(interval);
-    m_Timer->start();
-
-    //reinit view
-    //this->GlobalReinit();
-
-    //change UI elements
-    m_Controls.m_BtnView->setText("Stop Viewing");
-
-    m_ControlProbesWidget = new QmitkUSControlsProbesWidget(m_Device->GetControlInterfaceProbes(), m_Controls.m_ToolBoxControlWidgets);
-    m_Controls.probesWidgetContainer->addWidget(m_ControlProbesWidget);
-
-    unsigned int firstEnabledControl = -1;
-
-    // create b mode widget for current device
-    m_ControlBModeWidget = new QmitkUSControlsBModeWidget(m_Device->GetControlInterfaceBMode(), m_Controls.m_ToolBoxControlWidgets);
-    m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlBModeWidget, "B Mode Controls");
-    if ( ! m_Device->GetControlInterfaceBMode() )
-    {
-      m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
-    }
-    else
-    {
-      if ( firstEnabledControl == -1 ) { firstEnabledControl = 0; }
-    }
-
-    // create doppler widget for current device
-    m_ControlDopplerWidget = new QmitkUSControlsDopplerWidget(m_Device->GetControlInterfaceDoppler(), m_Controls.m_ToolBoxControlWidgets);
-    m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlDopplerWidget, "Doppler Controls");
-    if ( ! m_Device->GetControlInterfaceDoppler() )
-    {
-      m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
-    }
-    else
-    {
-      if ( firstEnabledControl == -1 ) { firstEnabledControl = 0; }
-    }
-
-    ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
-    if ( pluginContext )
-    {
-      std::string filter = "(ork.mitk.services.UltrasoundCustomWidget.deviceClass=" + m_Device->GetDeviceClass() + ")";
-
-      QString interfaceName ( us_service_interface_iid<QmitkUSAbstractCustomWidget>() );
-      m_CustomWidgetServiceReference = pluginContext->getServiceReferences(interfaceName, QString::fromStdString(filter));
-
-      if (m_CustomWidgetServiceReference.size() > 0)
-      {
-        m_ControlCustomWidget = pluginContext->getService<QmitkUSAbstractCustomWidget>
-          (m_CustomWidgetServiceReference.at(0))->CloneForQt(m_Controls.tab2);
-        m_ControlCustomWidget->SetDevice(m_Device);
-        //m_Controls.tab2->layout()->addWidget(m_ControlCustomWidget);
-        m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlCustomWidget, "Custom Controls");
-      }
-      else
-      {
-        m_Controls.m_ToolBoxControlWidgets->addItem(new QWidget(m_Controls.m_ToolBoxControlWidgets), "Custom Controls");
-        m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
-      }
-    }
-
-    // select first enabled control widget
-    for ( unsigned int n = 0; n < m_Controls.m_ToolBoxControlWidgets->count(); ++n)
-    {
-      if ( m_Controls.m_ToolBoxControlWidgets->isItemEnabled(n) )
-      {
-        m_Controls.m_ToolBoxControlWidgets->setCurrentIndex(n);
-        break;
-      }
-    }
+    this->StartViewing();
   }
   else //deactivate imaging
   {
-    m_Controls.tabWidget->setTabEnabled(1, false);
-
-    while (m_Controls.m_ToolBoxControlWidgets->count() > 0)
-    {
-      m_Controls.m_ToolBoxControlWidgets->removeItem(0);
-    }
-
-    m_Controls.probesWidgetContainer->removeWidget(m_ControlProbesWidget);
-    //m_Controls.tab2->layout()->removeWidget(m_ControlProbesWidget);
-    delete m_ControlProbesWidget;
-    m_ControlProbesWidget = 0;
-
-    //m_Controls.tab2->layout()->removeWidget(m_ControlBModeWidget);
-    delete m_ControlBModeWidget;
-    m_ControlBModeWidget = 0;
-
-    delete m_ControlDopplerWidget;
-    m_ControlDopplerWidget = 0;
-
-    if ( m_ControlCustomWidget )
-    {
-      ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
-      //m_Controls.tab2->layout()->removeWidget(m_ControlCustomWidget);
-      delete m_ControlCustomWidget; m_ControlCustomWidget = 0;
-
-      if ( m_CustomWidgetServiceReference.size() > 0 )
-      {
-        pluginContext->ungetService(m_CustomWidgetServiceReference.at(0));
-      }
-    }
-
-    //stop timer & release data
-    m_Timer->stop();
-    m_Node->ReleaseData();
-    this->RequestRenderWindowUpdate();
-
-    //change UI elements
-    m_Controls.m_BtnView->setText("Start Viewing");
+    this->StopViewing();
   }
 }
 
@@ -289,13 +169,177 @@ void UltrasoundSupport::GlobalReinit()
   mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }
 
-UltrasoundSupport::UltrasoundSupport()
-: m_ControlCustomWidget(0),
-m_ControlBModeWidget(0),
-m_ControlProbesWidget(0),
-m_CurrentImageWidth(0),
-m_CurrentImageHeight(0)
+void UltrasoundSupport::StartViewing()
 {
+  m_Controls.tabWidget->setTabEnabled(1, true);
+  m_Controls.tabWidget->setCurrentIndex(1);
+
+  //get device & set data node
+  m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedService<mitk::USDevice>();
+  if (m_Device.IsNull())
+  {
+    m_Timer->stop();
+    return;
+  }
+  m_Device->Update();
+  m_Node->SetData(m_Device->GetOutput());
+
+  //start timer
+  int interval = (1000 / m_Controls.m_FrameRate->value());
+  m_Timer->setInterval(interval);
+  m_Timer->start();
+
+  //reinit view
+  //this->GlobalReinit();
+
+  //change UI elements
+  m_Controls.m_BtnView->setText("Stop Viewing");
+
+  this->CreateControlWidgets();
+}
+
+void UltrasoundSupport::StopViewing()
+{
+  m_Controls.tabWidget->setTabEnabled(1, false);
+
+  this->RemoveControlWidgets();
+
+  //stop timer & release data
+  m_Timer->stop();
+  m_Node->ReleaseData();
+  this->RequestRenderWindowUpdate();
+
+  //change UI elements
+  m_Controls.m_BtnView->setText("Start Viewing");
+}
+
+void UltrasoundSupport::CreateControlWidgets()
+{
+  m_ControlProbesWidget = new QmitkUSControlsProbesWidget(m_Device->GetControlInterfaceProbes(), m_Controls.m_ToolBoxControlWidgets);
+  m_Controls.probesWidgetContainer->addWidget(m_ControlProbesWidget);
+
+  unsigned int firstEnabledControl = -1;
+
+  // create b mode widget for current device
+  m_ControlBModeWidget = new QmitkUSControlsBModeWidget(m_Device->GetControlInterfaceBMode(), m_Controls.m_ToolBoxControlWidgets);
+  m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlBModeWidget, "B Mode Controls");
+  if ( ! m_Device->GetControlInterfaceBMode() )
+  {
+    m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
+  }
+  else
+  {
+    if ( firstEnabledControl == -1 ) { firstEnabledControl = 0; }
+  }
+
+  // create doppler widget for current device
+  m_ControlDopplerWidget = new QmitkUSControlsDopplerWidget(m_Device->GetControlInterfaceDoppler(), m_Controls.m_ToolBoxControlWidgets);
+  m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlDopplerWidget, "Doppler Controls");
+  if ( ! m_Device->GetControlInterfaceDoppler() )
+  {
+    m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
+  }
+  else
+  {
+    if ( firstEnabledControl == -1 ) { firstEnabledControl = 0; }
+  }
+
+  ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
+  if ( pluginContext )
+  {
+    std::string filter = "(ork.mitk.services.UltrasoundCustomWidget.deviceClass=" + m_Device->GetDeviceClass() + ")";
+
+    QString interfaceName ( us_service_interface_iid<QmitkUSAbstractCustomWidget>() );
+    m_CustomWidgetServiceReference = pluginContext->getServiceReferences(interfaceName, QString::fromStdString(filter));
+
+    if (m_CustomWidgetServiceReference.size() > 0)
+    {
+      m_ControlCustomWidget = pluginContext->getService<QmitkUSAbstractCustomWidget>
+        (m_CustomWidgetServiceReference.at(0))->CloneForQt(m_Controls.tab2);
+      m_ControlCustomWidget->SetDevice(m_Device);
+      m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlCustomWidget, "Custom Controls");
+    }
+    else
+    {
+      m_Controls.m_ToolBoxControlWidgets->addItem(new QWidget(m_Controls.m_ToolBoxControlWidgets), "Custom Controls");
+      m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
+    }
+  }
+
+  // select first enabled control widget
+  for ( unsigned int n = 0; n < m_Controls.m_ToolBoxControlWidgets->count(); ++n)
+  {
+    if ( m_Controls.m_ToolBoxControlWidgets->isItemEnabled(n) )
+    {
+      m_Controls.m_ToolBoxControlWidgets->setCurrentIndex(n);
+      break;
+    }
+  }
+}
+
+void UltrasoundSupport::RemoveControlWidgets()
+{
+  // remove all control widgets from the tool box widget
+  while (m_Controls.m_ToolBoxControlWidgets->count() > 0)
+  {
+    m_Controls.m_ToolBoxControlWidgets->removeItem(0);
+  }
+
+  // remove probes widget (which is not part of the tool box widget)
+  m_Controls.probesWidgetContainer->removeWidget(m_ControlProbesWidget);
+  delete m_ControlProbesWidget;
+  m_ControlProbesWidget = 0;
+
+  delete m_ControlBModeWidget;
+  m_ControlBModeWidget = 0;
+
+  delete m_ControlDopplerWidget;
+  m_ControlDopplerWidget = 0;
+
+  // delete custom widget if it is present
+  if ( m_ControlCustomWidget )
+  {
+    ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
+    delete m_ControlCustomWidget; m_ControlCustomWidget = 0;
+
+    if ( m_CustomWidgetServiceReference.size() > 0 )
+    {
+      pluginContext->ungetService(m_CustomWidgetServiceReference.at(0));
+    }
+  }
+}
+
+void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
+{
+  if ( ! m_Device || event.getType() != us::ServiceEvent::MODIFIED ) { return; }
+
+  ctkServiceReference service = event.getServiceReference();
+
+  if ( m_Device->GetDeviceManufacturer() != service.getProperty(mitk::USImageMetadata::PROP_DEV_MANUFACTURER).toString().toStdString()
+    && m_Device->GetDeviceModel() != service.getProperty(mitk::USImageMetadata::PROP_DEV_MODEL).toString().toStdString() )
+  {
+    return;
+  }
+
+  if ( ! m_Device->GetIsActive() && m_Timer->isActive() )
+  {
+    this->StopViewing();
+  }
+}
+
+UltrasoundSupport::UltrasoundSupport()
+: m_ControlCustomWidget(0), m_ControlBModeWidget(0),
+  m_ControlProbesWidget(0), m_CurrentImageWidth(0),
+  m_CurrentImageHeight(0)
+{
+  ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
+
+  if ( pluginContext )
+  {
+    // to be notified about service event of an USDevice
+    pluginContext->connectServiceListener(this, "OnDeciveServiceEvent",
+      QString::fromStdString("(" + us::ServiceConstants::OBJECTCLASS() + "=" + us_service_interface_iid<mitk::USDevice>() + ")"));
+  }
 }
 
 UltrasoundSupport::~UltrasoundSupport()

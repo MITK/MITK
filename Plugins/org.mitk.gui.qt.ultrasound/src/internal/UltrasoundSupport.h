@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QTime>
 
+#include <ctkServiceEvent.h>
+
 /*!
 \brief UltrasoundSupport
 This plugin provides functionality to manage Ultrasound devices, create video devices and to view device images.
@@ -69,6 +71,8 @@ public:
 
       void OnClickedFreezeButton();
 
+      void OnDeciveServiceEvent(const ctkServiceEvent event);
+
       /*
       * \brief This is the main imaging loop that is called regularily during the imaging process
       */
@@ -80,6 +84,12 @@ protected:
   * \brief Reinits the view globally.
   */
   void GlobalReinit();
+
+  void StartViewing();
+  void StopViewing();
+
+  void CreateControlWidgets();
+  void RemoveControlWidgets();
 
   int m_FrameCounter;
 

@@ -47,16 +47,16 @@ public:
     * \brief Connect this object to the Telemed API.
     * This method is for being used by mitk::USTelemedDevice.
     */
-  bool CreateAndConnectConverterPlugin( IUsgDataView*, tagScanMode );
+  bool CreateAndConnectConverterPlugin( Usgfw2Lib::IUsgDataView*, Usgfw2Lib::tagScanMode );
 
 protected:
   USTelemedImageSource( );
   virtual ~USTelemedImageSource( );
 
-  IUsgScanConverterPlugin*        m_Plugin;
-  USTelemedScanConverterPlugin*   m_PluginCallback;
+  Usgfw2Lib::IUsgScanConverterPlugin*         m_Plugin;
+  USTelemedScanConverterPlugin*               m_PluginCallback;
 
-  mitk::Image::Pointer            m_Image;
+  mitk::Image::Pointer                        m_Image;
 };
 } // namespace mitk
 

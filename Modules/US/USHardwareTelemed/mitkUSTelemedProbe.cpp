@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSTelemedProbe.h"
 #include "mitkUSTelemedSDKHeader.h"
 
-mitk::USTelemedProbe::USTelemedProbe(IProbe* probe, IUsgDataView* dataView)
+mitk::USTelemedProbe::USTelemedProbe(Usgfw2Lib::IProbe* probe, Usgfw2Lib::IUsgDataView* dataView)
   : m_UsgProbe(probe), m_UsgDataView(dataView)
 {
   BSTR probeName;
@@ -31,12 +31,12 @@ mitk::USTelemedProbe::~USTelemedProbe()
   SAFE_RELEASE(m_UsgDataView);
 }
 
-IProbe* mitk::USTelemedProbe::GetUsgProbe()
+Usgfw2Lib::IProbe* mitk::USTelemedProbe::GetUsgProbe()
 {
   return m_UsgProbe;
 }
 
-IUsgDataView* mitk::USTelemedProbe::GetUsgDataView()
+Usgfw2Lib::IUsgDataView* mitk::USTelemedProbe::GetUsgDataView()
 {
   return m_UsgDataView;
 }

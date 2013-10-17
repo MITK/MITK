@@ -35,8 +35,11 @@ namespace mitk {
     * b mode, doppler and probes controls.
     * Images given by the device are put into an object of
     * mitk::USTelemedImageSource.
+    *
+    * It implements IUsgDeviceChangeSink of the Telemed API to be notified
+    * of changes to beamformer device or probes (e.g. probe change).
     */
-  class USTelemedDevice : public USDevice
+  class USTelemedDevice : public USDevice, public Usgfw2Lib::IUsgDeviceChangeSink
   {
   public:
     mitkClassMacro(USTelemedDevice, mitk::USDevice);
@@ -114,13 +117,32 @@ namespace mitk {
       * \brief Getter for main Telemed API object.
       * This method is for being called by Telemed control interfaces.
       */
-    IUsgfw2* GetUsgMainInterface();
+    Usgfw2Lib::IUsgfw2* GetUsgMainInterface();
 
     /**
       * \brief Changes active IUsgDataView of the device.
       * This method is for being called by Telemed control interfaces.
       */
-    void SetActiveDataView(IUsgDataView*);
+    void SetActiveDataView(Usgfw2Lib::IUsgDataView*);
+
+    // Methods implemented for IUsgDeviceChangeSink
+    virtual HRESULT __stdcall raw_OnProbeArrive(IUnknown *pUsgProbe, ULONG *reserved);
+    virtual HRESULT __stdcall raw_OnBeamformerArrive(IUnknown *pUsgBeamformer, ULONG *reserved) { return S_OK; };
+    virtual HRESULT __stdcall raw_OnProbeRemove(IUnknown *pUsgProbe, ULONG *reserved);
+    virtual HRESULT __stdcall raw_OnBeamformerRemove(IUnknown *pUsgBeamformer, ULONG *reserved) { return S_OK; };
+    virtual HRESULT __stdcall raw_OnProbeStateChanged(IUnknown *pUsgProbe, ULONG *reserved) { return S_OK; };
+    virtual HRESULT __stdcall raw_OnBeamformerStateChanged(IUnknown *pUsgBeamformer, ULONG *reserved) { return S_OK; };
+
+    // Methods implemented for IUnknown (necessary for IUsgDeviceChangeSink)
+    STDMETHODIMP_(ULONG) AddRef();
+    STDMETHODIMP_(ULONG) Release();
+    STDMETHODIMP QueryInterface(REFIID riid, void** ppv);
+
+    // Methods implemented for IDispatch (necessary for IUsgDeviceChangeSink)
+    virtual HRESULT STDMETHODCALLTYPE GetTypeInfoCount(UINT *pctinfo);
+    virtual HRESULT STDMETHODCALLTYPE GetTypeInfo(UINT itinfo, LCID lcid, ITypeInfo** pptinfo);
+    virtual HRESULT STDMETHODCALLTYPE GetIDsOfNames(const IID &riid, LPOLESTR* rgszNames, UINT cNames, LCID lcid, DISPID* rgdispid);
+    virtual HRESULT STDMETHODCALLTYPE Invoke(DISPID dispIdMember, const IID &riid, LCID lcid, WORD wFlags, DISPPARAMS *pDispParams, VARIANT *pVarResult, EXCEPINFO *pExcepInfo, UINT *puArgErr);
 
   protected:
     /**
@@ -139,6 +161,8 @@ namespace mitk {
 
     void ReleaseUsgControls( );
 
+    void ConnectDeviceChangeSink( );
+
     /**
       * \brief Stop ultrasound scanning by Telemed API call.
       *
@@ -146,16 +170,23 @@ namespace mitk {
       */
     void StopScanning( );
 
+    void OnProbeArrived( );
+    void OnProbeRemoved( );
+
     USTelemedProbesControls::Pointer    m_ControlsProbes;
     USTelemedBModeControls::Pointer     m_ControlsBMode;
     USTelemedDopplerControls::Pointer   m_ControlsDoppler;
 
     USTelemedImageSource::Pointer       m_ImageSource;
 
-    IUsgfw2*                            m_UsgMainInterface;
-    IProbe*                             m_Probe;
-    IUsgDataView*                       m_UsgDataView;
-    IUsgCollection*                     m_ProbesCollection;
+    Usgfw2Lib::IUsgfw2*                 m_UsgMainInterface;
+    Usgfw2Lib::IProbe*                  m_Probe;
+    Usgfw2Lib::IUsgDataView*            m_UsgDataView;
+    Usgfw2Lib::IUsgCollection*          m_ProbesCollection;
+
+    ULONG                               m_RefCount;
+    IConnectionPoint*                   m_UsgDeviceChangeCpnt;
+    DWORD                               m_UsgDeviceChangeCpntCookie;
   };
 } // namespace mitk
 

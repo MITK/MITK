@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::USTelemedActivator::USTelemedActivator()
 {
+  MITK_INFO << "USTelemedActivator created";
 }
 
 mitk::USTelemedActivator::~USTelemedActivator()

@@ -39,12 +39,12 @@ void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
   }
 }
 
-bool mitk::USTelemedImageSource::CreateAndConnectConverterPlugin(IUsgDataView* usgDataView, tagScanMode scanMode)
+bool mitk::USTelemedImageSource::CreateAndConnectConverterPlugin(Usgfw2Lib::IUsgDataView* usgDataView, Usgfw2Lib::tagScanMode scanMode)
 {
   IUnknown* tmp_obj = NULL;
 
   // create control object from Telemed API
-  mitk::telemed::CreateUsgControl( usgDataView, IID_IUsgScanConverterPlugin, scanMode, 0, (void**)&tmp_obj );
+  mitk::telemed::CreateUsgControl( usgDataView, Usgfw2Lib::IID_IUsgScanConverterPlugin, scanMode, 0, (void**)&tmp_obj );
   if ( ! tmp_obj )
   {
     MITK_ERROR("USImageSource")("USTelemedImageSource") << "Could not create scan converter plugin.";
@@ -52,7 +52,7 @@ bool mitk::USTelemedImageSource::CreateAndConnectConverterPlugin(IUsgDataView* u
   }
 
   SAFE_RELEASE(m_Plugin);
-  m_Plugin = (IUsgScanConverterPlugin*)tmp_obj;
+  m_Plugin = (Usgfw2Lib::IUsgScanConverterPlugin*)tmp_obj;
 
   // now the ScanConverterPlugin can be created and set as plugin
   SAFE_RELEASE(m_PluginCallback);

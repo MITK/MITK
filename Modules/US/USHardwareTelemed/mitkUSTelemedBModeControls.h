@@ -74,7 +74,7 @@ namespace mitk {
       * \brief Setter for the IUsgDataView necesary for communicating with the Telemed API.
       * This method is just for internal use of the mitk::USTelemedDevice.
       */
-    void SetUsgDataView( IUsgDataView* );
+    void SetUsgDataView( Usgfw2Lib::IUsgDataView* );
 
   protected:
     USTelemedBModeControls();
@@ -85,12 +85,12 @@ namespace mitk {
 
     double GetScanningFrequencyAPI( );
 
-    IUsgDataView*             m_UsgDataView;      // main SDK object for comminucating with the Telemed API
-    IUsgPower*                m_PowerControl;     // control for scanning power
-    IUsgProbeFrequency2*      m_FrequencyControl; // control for scanning frequency
-    IUsgDepth*                m_DepthControl;     // control for B mode scanning depth
-    IUsgGain*                 m_GainControl;      // control for B mode scanning gain
-    IUsgRejection2*           m_RejectionControl; // control for B mode scanning rejection
+    Usgfw2Lib::IUsgDataView*             m_UsgDataView;      // main SDK object for comminucating with the Telemed API
+    Usgfw2Lib::IUsgPower*                m_PowerControl;     // control for scanning power
+    Usgfw2Lib::IUsgProbeFrequency2*      m_FrequencyControl; // control for scanning frequency
+    Usgfw2Lib::IUsgDepth*                m_DepthControl;     // control for B mode scanning depth
+    Usgfw2Lib::IUsgGain*                 m_GainControl;      // control for B mode scanning gain
+    Usgfw2Lib::IUsgRejection2*           m_RejectionControl; // control for B mode scanning rejection
 
     bool                      m_Active;
 

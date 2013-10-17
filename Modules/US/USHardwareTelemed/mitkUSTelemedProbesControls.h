@@ -84,8 +84,8 @@ namespace mitk {
     std::vector<USTelemedProbe::Pointer>  m_ProbesSet;
     itk::SmartPointer<USTelemedDevice>    m_TelemedDevice;
 
-    IUsgCollection*                       m_ProbesCollection;
-    IProbe*                               m_Probe;
+    Usgfw2Lib::IUsgCollection*            m_ProbesCollection;
+    Usgfw2Lib::IProbe*                    m_Probe;
   };
 }
 

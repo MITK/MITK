@@ -36,7 +36,7 @@ mitk::USTelemedBModeControls::~USTelemedBModeControls()
   delete[] m_RejectionSteps;
 }
 
-void mitk::USTelemedBModeControls::SetUsgDataView( IUsgDataView* usgDataView)
+void mitk::USTelemedBModeControls::SetUsgDataView( Usgfw2Lib::IUsgDataView* usgDataView)
 {
   m_UsgDataView = usgDataView;
 }
@@ -45,14 +45,14 @@ void mitk::USTelemedBModeControls::SetIsActive(bool active)
 {
   if (active)
   {
-    HRESULT hr = m_UsgDataView->put_ScanState(SCAN_STATE_STOP);
+    HRESULT hr = m_UsgDataView->put_ScanState(Usgfw2Lib::SCAN_STATE_STOP);
     if (FAILED(hr)) { mitkThrow() << "Could not stop scanning (" << hr << ")."; }
 
     // make sure that current scan mode is b mode now
-    hr = m_UsgDataView->put_ScanMode(SCAN_MODE_B);
+    hr = m_UsgDataView->put_ScanMode(Usgfw2Lib::SCAN_MODE_B);
     if (FAILED(hr)) { mitkThrow() << "Could not set scan mode b (" << hr << ")."; }
 
-    hr = m_UsgDataView->put_ScanState(SCAN_STATE_RUN);
+    hr = m_UsgDataView->put_ScanState(Usgfw2Lib::SCAN_STATE_RUN);
     if (FAILED(hr)) { mitkThrow() << "Could not start scanning (" << hr << ")."; }
 
     this->CreateControls();
@@ -75,7 +75,7 @@ bool mitk::USTelemedBModeControls::GetIsActive( )
   HRESULT hr = m_UsgDataView->get_ScanMode(&scanMode);
   if (FAILED(hr)) { mitkThrow() << "Could not get scan mode (" << hr << ")."; }
 
-  return m_Active && scanMode == SCAN_MODE_B;
+  return m_Active && scanMode == Usgfw2Lib::SCAN_MODE_B;
 }
 
 double mitk::USTelemedBModeControls::GetScanningFrequencyAPI( )
@@ -191,21 +191,21 @@ double mitk::USTelemedBModeControls::GetScanningRejectionTick( )
 void mitk::USTelemedBModeControls::CreateControls()
 {
   // create frequency control
-  CREATE_TelemedControl(m_FrequencyControl, m_UsgDataView, IID_IUsgProbeFrequency2, IUsgProbeFrequency2, SCAN_MODE_B);
+  CREATE_TelemedControl(m_FrequencyControl, m_UsgDataView, Usgfw2Lib::IID_IUsgProbeFrequency2, Usgfw2Lib::IUsgProbeFrequency2, Usgfw2Lib::SCAN_MODE_B);
 
   // create power control
-  CREATE_TelemedControl(m_PowerControl, m_UsgDataView, IID_IUsgPower, IUsgPower, SCAN_MODE_B);
+  CREATE_TelemedControl(m_PowerControl, m_UsgDataView, Usgfw2Lib::IID_IUsgPower, Usgfw2Lib::IUsgPower, Usgfw2Lib::SCAN_MODE_B);
   GETINOUTPUT_TelemedAvailableValuesBounds(m_PowerControl, m_PowerSteps); // get min, max and tick for gain
 
   // create B mode depth control
-  CREATE_TelemedControl(m_DepthControl, m_UsgDataView, IID_IUsgDepth, IUsgDepth, SCAN_MODE_B);
+  CREATE_TelemedControl(m_DepthControl, m_UsgDataView, Usgfw2Lib::IID_IUsgDepth, Usgfw2Lib::IUsgDepth, Usgfw2Lib::SCAN_MODE_B);
 
   // create B mode gain control
-  CREATE_TelemedControl(m_GainControl, m_UsgDataView, IID_IUsgGain, IUsgGain, SCAN_MODE_B);
+  CREATE_TelemedControl(m_GainControl, m_UsgDataView, Usgfw2Lib::IID_IUsgGain, Usgfw2Lib::IUsgGain, Usgfw2Lib::SCAN_MODE_B);
   GETINOUTPUT_TelemedAvailableValuesBounds(m_GainControl, m_GainSteps); // get min, max and tick for gain
 
   // create B mode rejection control
-  CREATE_TelemedControl(m_RejectionControl, m_UsgDataView, IID_IUsgRejection2, IUsgRejection2, SCAN_MODE_B);
+  CREATE_TelemedControl(m_RejectionControl, m_UsgDataView, Usgfw2Lib::IID_IUsgRejection2, Usgfw2Lib::IUsgRejection2, Usgfw2Lib::SCAN_MODE_B);
   GETINOUTPUT_TelemedAvailableValuesBounds(m_RejectionControl, m_RejectionSteps); // get min, max and tick for rejection
 }
 

@@ -100,7 +100,7 @@ bool mitk::USTelemedProbesControls::CreateProbesCollection()
   HRESULT hr;
 
   // get the main API interface from the Telemed device
-  IUsgfw2* usgMainInterface = m_TelemedDevice->GetUsgMainInterface();
+  Usgfw2Lib::IUsgfw2* usgMainInterface = m_TelemedDevice->GetUsgMainInterface();
   if ( ! usgMainInterface )
   {
     MITK_ERROR("USTelemedProbesControls")("USControlInterfaceProbes")
@@ -119,7 +119,7 @@ bool mitk::USTelemedProbesControls::CreateProbesCollection()
 
   // second step for getting probes collection from Telemed API
   SAFE_RELEASE(m_ProbesCollection);
-  hr = tmp_obj->QueryInterface(IID_IUsgCollection,(void**)&m_ProbesCollection);
+  hr = tmp_obj->QueryInterface(Usgfw2Lib::IID_IUsgCollection,(void**)&m_ProbesCollection);
   SAFE_RELEASE(tmp_obj);
   if (FAILED(hr) || ! m_ProbesCollection)
   {
@@ -153,7 +153,7 @@ void mitk::USTelemedProbesControls::CreateProbesSet()
   }
 
   // get the main API interface from the Telemed device
-  IUsgfw2* usgMainInterface = m_TelemedDevice->GetUsgMainInterface();
+  Usgfw2Lib::IUsgfw2* usgMainInterface = m_TelemedDevice->GetUsgMainInterface();
   if ( ! usgMainInterface )
   {
     MITK_ERROR("USTelemedProbesControls")("USControlInterfaceProbes")
@@ -177,8 +177,8 @@ void mitk::USTelemedProbesControls::CreateProbesSet()
     }
 
     // convert this item to a probe
-    IProbe* probe;
-    hr = tmp_obj->QueryInterface(IID_IProbe,(void**)&probe);
+    Usgfw2Lib::IProbe* probe;
+    hr = tmp_obj->QueryInterface(Usgfw2Lib::IID_IProbe,(void**)&probe);
     if (FAILED(hr))
     {
       MITK_ERROR("USTelemedProbesControls")("USControlInterfaceProbes")
@@ -187,9 +187,11 @@ void mitk::USTelemedProbesControls::CreateProbesSet()
     }
 
     // create main ultrasound scanning object for selected probe
-    IUsgDataView* usgDataView;
-    HRESULT hr = usgMainInterface->CreateDataView(probe, &usgDataView);
-    if (FAILED(hr) || ! usgDataView)
+    Usgfw2Lib::IUsgDataView* usgDataView;
+    Usgfw2Lib::IUsgDataViewPtr usgDataViewTmp;
+    usgDataViewTmp = usgMainInterface->CreateDataView(probe);
+    usgDataViewTmp->QueryInterface(Usgfw2Lib::IID_IUsgDataView, (void**)&usgDataView);
+    if (! usgDataView)
     {
       MITK_ERROR("USTelemedProbesControls")("USControlInterfaceProbes")
         << "Could not create data view for selected probe.";

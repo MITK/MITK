@@ -17,10 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKUSTelemedSDKHeader_H
 #define MITKUSTelemedSDKHeader_H
 
-#include <Usgfw2_i.c>
+/*#include <strmif.h>
 #include <usgfw2.h>
 #include <usgfw.h>
-#include <usgscanb.h>
+#include <usgscanb.h>*/
+
+#include <Usgfw2.tlh>
 
 #include <mitkCommon.h>
 
@@ -56,7 +58,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 }
 
 #define RETURN_TelemedAvailableValuesWithFactor(control, factor) { \
-  IUsgValues *usgValues; \
+  Usgfw2Lib::IUsgValues *usgValues; \
   HRESULT hr = control->get_Values(&usgValues); \
   \
   LONG usgValuesNum; \
@@ -67,7 +69,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   VARIANT item; \
   for (int n = 0; n < usgValuesNum; n++) \
   { \
-    usgValues->Item(n, &item); \
+    item = usgValues->Item(n); \
     values.at(n) = static_cast<double>(item.lVal) / factor; \
     VariantClear(&item); \
   } \
@@ -83,7 +85,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   * c array with three elements.
   */
 #define GETINOUTPUT_TelemedAvailableValuesBounds(control, output) { \
-  IUsgValues *usgValues; \
+  Usgfw2Lib::IUsgValues *usgValues; \
   HRESULT hr = control->get_Values(&usgValues); \
   if (FAILED(hr)) { mitkThrow() << "Values couldn't be read from Teleme API (" << hr << ")."; } \
   \
@@ -93,11 +95,11 @@ See LICENSE.txt or http://www.mitk.org for details.
   \
   VARIANT item; \
   \
-  usgValues->Item(0, &item); \
+  item = usgValues->Item(0); \
   output[0] = static_cast<double>(item.lVal); \
   VariantClear(&item); \
   \
-  usgValues->Item(usgValuesNum-1, &item); \
+  item = usgValues->Item(usgValuesNum-1); \
   output[1] = static_cast<double>(item.lVal); \
   VariantClear(&item); \
   \
@@ -126,7 +128,7 @@ namespace mitk {
       * a Telemed API control. This function is from the Telemed API documentation
       * thus a description of the interface can be found there.
       */
-    bool CreateUsgControl( IUsgDataView* dataView, const IID& typeId, ULONG scanMode, ULONG streamId, void** ctrl );
+    bool CreateUsgControl( Usgfw2Lib::IUsgDataView* dataView, const IID& typeId, ULONG scanMode, ULONG streamId, void** ctrl );
 
     /**
       * Converts given BSTR (which is in fact a wchar*) to std::string.

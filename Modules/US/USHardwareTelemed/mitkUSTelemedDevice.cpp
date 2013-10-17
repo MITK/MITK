@@ -20,11 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::USTelemedDevice::USTelemedDevice(std::string manufacturer, std::string model)
 : mitk::USDevice(manufacturer, model),
-  m_ControlsProbes(mitk::USTelemedProbesControls::New()),
-  m_ControlsBMode(mitk::USTelemedBModeControls::New()),
-  m_ControlsDoppler(mitk::USTelemedDopplerControls::New()),
-  m_ImageSource(mitk::USTelemedImageSource::New()), m_UsgMainInterface(0),
-  m_Probe(0), m_UsgDataView(0), m_ProbesCollection(0)
+m_ControlsProbes(mitk::USTelemedProbesControls::New()),
+m_ControlsBMode(mitk::USTelemedBModeControls::New()),
+m_ControlsDoppler(mitk::USTelemedDopplerControls::New()),
+m_ImageSource(mitk::USTelemedImageSource::New()), m_UsgMainInterface(0),
+m_Probe(0), m_UsgDataView(0), m_ProbesCollection(0)
 {
   SetNumberOfOutputs(1);
   SetNthOutput(0, this->MakeOutput(0));
@@ -58,7 +58,8 @@ mitk::USControlInterfaceDoppler::Pointer mitk::USTelemedDevice::GetControlInterf
 
 bool mitk::USTelemedDevice::OnInitialization()
 {
-  // there is no initialization necessary for this class
+  CoInitialize(NULL); // initialize COM library
+
   return true;
 }
 
@@ -67,13 +68,15 @@ bool mitk::USTelemedDevice::OnConnection()
   // create main Telemed API COM library object
   HRESULT hr;
 
-  hr = CoCreateInstance(CLSID_Usgfw2, NULL, CLSCTX_INPROC_SERVER, IID_IUsgfw2,(LPVOID*) &m_UsgMainInterface);
+  hr = CoCreateInstance(Usgfw2Lib::CLSID_Usgfw2, NULL, CLSCTX_INPROC_SERVER, Usgfw2Lib::IID_IUsgfw2,(LPVOID*) &m_UsgMainInterface);
   if (FAILED(hr))
   {
     SAFE_RELEASE(m_UsgMainInterface);
     MITK_ERROR("USDevice")("USTelemedDevice") << "Error at connecting to ultrasound device (" << hr << ").";
     return false;
   }
+
+  this->ConnectDeviceChangeSink();
 
   // probe controls are available now
   m_ControlsProbes->SetIsActive(true);
@@ -106,7 +109,7 @@ bool mitk::USTelemedDevice::OnActivation()
 {
   // set scan mode b as default for activation -
   // control interfaces can override this later
-  HRESULT hr = m_UsgDataView->put_ScanMode(SCAN_MODE_B);
+  HRESULT hr = m_UsgDataView->put_ScanMode(Usgfw2Lib::SCAN_MODE_B);
   if (FAILED(hr))
   {
     MITK_ERROR("USDevice")("USTelemedDevice") << "Could not set scan mode b (" << hr << ").";
@@ -114,7 +117,7 @@ bool mitk::USTelemedDevice::OnActivation()
   }
 
   // start ultrasound scanning with selected scan mode
-  hr = m_UsgDataView->put_ScanState(SCAN_STATE_RUN);
+  hr = m_UsgDataView->put_ScanState(Usgfw2Lib::SCAN_STATE_RUN);
   if (FAILED(hr))
   {
     MITK_ERROR("USDevice")("USTelemedDevice") << "Start scanning failed (" << hr << ").";
@@ -132,14 +135,14 @@ bool mitk::USTelemedDevice::OnDeactivation()
 
 void mitk::USTelemedDevice::OnFreeze(bool freeze)
 {
-    if ( freeze )
-    {
-        m_UsgDataView->put_ScanState(SCAN_STATE_FREEZE);
-    }
-    else
-    {
-        m_UsgDataView->put_ScanState(SCAN_STATE_RUN);
-    }
+  if ( freeze )
+  {
+    m_UsgDataView->put_ScanState(Usgfw2Lib::SCAN_STATE_FREEZE);
+  }
+  else
+  {
+    m_UsgDataView->put_ScanState(Usgfw2Lib::SCAN_STATE_RUN);
+  }
 }
 
 void mitk::USTelemedDevice::GenerateData()
@@ -173,7 +176,7 @@ void mitk::USTelemedDevice::ReleaseUsgControls()
 void mitk::USTelemedDevice::StopScanning()
 {
   HRESULT hr;
-  hr = m_UsgDataView->put_ScanState(SCAN_STATE_STOP);
+  hr = m_UsgDataView->put_ScanState(Usgfw2Lib::SCAN_STATE_STOP);
 
   if (FAILED(hr))
   {
@@ -182,18 +185,151 @@ void mitk::USTelemedDevice::StopScanning()
   }
 }
 
-IUsgfw2* mitk::USTelemedDevice::GetUsgMainInterface()
+void mitk::USTelemedDevice::OnProbeArrived( )
+{
+  MITK_INFO << "Probe arrived...";
+}
+
+void mitk::USTelemedDevice::OnProbeRemoved( )
+{
+  MITK_INFO << "Probe removed...";
+}
+
+Usgfw2Lib::IUsgfw2* mitk::USTelemedDevice::GetUsgMainInterface()
 {
   return m_UsgMainInterface;
 }
 
-void mitk::USTelemedDevice::SetActiveDataView(IUsgDataView* usgDataView)
+void mitk::USTelemedDevice::SetActiveDataView(Usgfw2Lib::IUsgDataView* usgDataView)
 {
   // scan converter plugin is conected to IUsgDataView -> a new plugin
   // must be created when changing IUsgDataView
   m_UsgDataView = usgDataView;
-  if ( ! m_ImageSource->CreateAndConnectConverterPlugin(m_UsgDataView, SCAN_MODE_B)) { return; }
+  if ( ! m_ImageSource->CreateAndConnectConverterPlugin(m_UsgDataView, Usgfw2Lib::SCAN_MODE_B)) { return; }
 
   // b mode control object must know about active data view
   m_ControlsBMode->SetUsgDataView(m_UsgDataView);
+}
+
+void mitk::USTelemedDevice::ConnectDeviceChangeSink( )
+{
+  IConnectionPointContainer* cpc = NULL;
+  HRESULT hr = m_UsgMainInterface->QueryInterface(IID_IConnectionPointContainer, (void**)&cpc);
+  if (hr != S_OK)
+    cpc = NULL;
+
+  if (cpc != NULL)
+    hr = cpc->FindConnectionPoint(Usgfw2Lib::IID_IUsgDeviceChangeSink, &m_UsgDeviceChangeCpnt);
+
+  if (hr != S_OK)
+  {
+    m_UsgDeviceChangeCpnt = NULL;
+    m_UsgDeviceChangeCpntCookie = 0;
+  }
+  SAFE_RELEASE(cpc);
+
+  if (m_UsgDeviceChangeCpnt != NULL)
+    hr = m_UsgDeviceChangeCpnt->Advise((IUnknown*)((Usgfw2Lib::IUsgDeviceChangeSink*)this), &m_UsgDeviceChangeCpntCookie);
+}
+
+// --- Methods for Telemed API Interfaces
+
+HRESULT __stdcall mitk::USTelemedDevice::raw_OnProbeArrive(IUnknown *pUsgProbe, ULONG *reserved)
+{
+  this->OnProbeArrived();
+  return S_OK;
+};
+
+HRESULT __stdcall mitk::USTelemedDevice::raw_OnProbeRemove(IUnknown *pUsgProbe, ULONG *reserved)
+{
+  this->OnProbeRemoved();
+  return S_OK;
+};
+
+STDMETHODIMP_(ULONG) mitk::USTelemedDevice::AddRef()
+{
+  ++m_RefCount;
+  return m_RefCount;
+}
+
+STDMETHODIMP_(ULONG) mitk::USTelemedDevice::Release()
+{
+  --m_RefCount;
+  return m_RefCount;
+}
+
+STDMETHODIMP  mitk::USTelemedDevice::QueryInterface(REFIID riid, void** ppv)
+{
+  if (riid == IID_IUnknown || riid == Usgfw2Lib::IID_IUsgDeviceChangeSink)
+  {
+    *ppv = (IUsgDeviceChangeSink*)this;
+    return S_OK;
+  }
+  if (riid == IID_IDispatch)
+  {
+    *ppv = (IDispatch*)this;
+    return S_OK;
+  }
+  return E_NOINTERFACE;
+}
+
+HRESULT mitk::USTelemedDevice::GetTypeInfoCount(UINT *pctinfo)
+{
+  if (pctinfo == NULL) return E_INVALIDARG;
+  *pctinfo = 0;
+  return S_OK;
+}
+
+HRESULT mitk::USTelemedDevice::GetTypeInfo(UINT itinfo, LCID lcid, ITypeInfo** pptinfo)
+{
+  if (pptinfo == NULL) return E_INVALIDARG;
+  *pptinfo = NULL;
+  if(itinfo != 0) return DISP_E_BADINDEX;
+  return S_OK;
+}
+
+HRESULT mitk::USTelemedDevice::GetIDsOfNames(const IID &riid, LPOLESTR* rgszNames, UINT cNames, LCID lcid, DISPID* rgdispid)
+{
+  // this is not used - must use the same fixed dispid's from Usgfw2 idl file
+  return S_OK;
+}
+
+HRESULT mitk::USTelemedDevice::Invoke(DISPID dispIdMember, const IID &riid, LCID lcid, WORD wFlags, DISPPARAMS *pDispParams, VARIANT *pVarResult, EXCEPINFO *pExcepInfo, UINT *puArgErr)
+{
+  if ( (dispIdMember >= 1) && (dispIdMember <= 6) )
+  {
+    if (pDispParams->cArgs != 2) // we need 2 arguments
+      return S_OK;
+
+    IUnknown *unkn = NULL;
+    ULONG *res = NULL;
+
+    VARIANTARG* p1;
+    VARIANTARG* p;
+    p1 = pDispParams->rgvarg;
+
+    p = p1;
+    if (p->vt == (VT_BYREF|VT_UI4))
+      res = p->pulVal;
+    p1++;
+
+    p = p1;
+    if (p->vt == VT_UNKNOWN)
+      unkn = (IUnknown*)(p->punkVal);
+
+    if (dispIdMember == 1)
+      OnProbeArrive(unkn, res);
+    else if (dispIdMember == 2)
+      OnBeamformerArrive(unkn, res);
+    else if (dispIdMember == 3)
+      OnProbeRemove(unkn, res);
+    else if (dispIdMember == 4)
+      OnBeamformerRemove(unkn, res);
+    else if (dispIdMember == 5)
+      OnProbeStateChanged(unkn, res);
+    else if (dispIdMember == 6)
+      OnBeamformerStateChanged(unkn, res);
+  }
+
+  return S_OK;
 }

@@ -19,8 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSProbe.h"
 
-struct IProbe;
-struct IUsgDataView;
+namespace Usgfw2Lib {
+  struct IProbe;
+  struct IUsgDataView;
+}
 
 namespace mitk
 {
@@ -35,19 +37,19 @@ namespace mitk
   {
   public:
     mitkClassMacro(USTelemedProbe, USProbe);
-    mitkNewMacro2Param(Self, IProbe*, IUsgDataView*);
+    mitkNewMacro2Param(Self, Usgfw2Lib::IProbe*, Usgfw2Lib::IUsgDataView*);
 
     /**
       * Returns the Telemed API probe connected with this object.
       * This method is just for being called by mitk::USTelemedProbesControls.
       */
-    IProbe* GetUsgProbe();
+    Usgfw2Lib::IProbe* GetUsgProbe();
 
     /**
       * Returns the Telemed API data view connected with this object.
       * This method is just for being called by mitk::USTelemedProbesControls.
       */
-    IUsgDataView* GetUsgDataView();
+    Usgfw2Lib::IUsgDataView* GetUsgDataView();
 
   protected:
     /**
@@ -56,11 +58,11 @@ namespace mitk
       * \param probe API probe object which should be represented by the constructed object
       * \param dataView API data view object conected to this probe object
       */
-    USTelemedProbe(IProbe* probe, IUsgDataView* dataView);
+    USTelemedProbe(Usgfw2Lib::IProbe* probe, Usgfw2Lib::IUsgDataView* dataView);
     virtual ~USTelemedProbe();
 
-    IProbe*                         m_UsgProbe;
-    IUsgDataView*                   m_UsgDataView;
+    Usgfw2Lib::IProbe*                         m_UsgProbe;
+    Usgfw2Lib::IUsgDataView*                   m_UsgDataView;
   };
 } // namespace mitk
 

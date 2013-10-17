@@ -110,8 +110,8 @@ STDMETHODIMP USTelemedScanConverterPlugin::SetScanConverterPlugin(IDispatch* plu
   }
 
   // get Telemed API plugin from the COM library
-  IUsgScanConverterPlugin* tmp_plugin;
-  hr = plugin->QueryInterface(__uuidof(IUsgScanConverterPlugin), (void**)&tmp_plugin);
+  Usgfw2Lib::IUsgScanConverterPlugin* tmp_plugin;
+  hr = plugin->QueryInterface(__uuidof(Usgfw2Lib::IUsgScanConverterPlugin), (void**)&tmp_plugin);
 
   if (FAILED(hr))
   {

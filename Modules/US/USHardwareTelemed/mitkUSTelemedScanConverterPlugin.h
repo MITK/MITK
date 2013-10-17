@@ -18,6 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKUSTelemedScanConverterPlugin_H_HEADER_INCLUDED_
 
 #include <initguid.h>
+#include <strmif.h>
+#include <usgfw2.h>
+#include <usgfw.h>
+#include <usgscanb.h>
+
 #include "mitkUSTelemedSDKHeader.h"
 
 #include "mitkImage.h"

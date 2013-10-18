@@ -290,7 +290,7 @@ static void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage,
   typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
   typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;
 
-  ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
+  typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
   filter->SetInput(originalImage);
   filter->SetLowerThreshold(lower);
   filter->SetUpperThreshold(upper);

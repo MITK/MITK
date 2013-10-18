@@ -49,15 +49,14 @@ int mitkImageVtkMapper2DTransferFunctionTest(int argc, char* argv[])
   //set the property for the image
   renderingHelper.SetImageProperty("Image Rendering.Transfer Function", mitk::TransferFunctionProperty::New(transferFucntion));
 
-  //use this to generate a reference screenshot or save the file:
-  bool generateReferenceScreenshot = false;
-  if(generateReferenceScreenshot)
-  {
-    renderingHelper.SaveReferenceScreenShot("/home/kilgus/Pictures/RenderingTestData/output.png");
-  }
-
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
   MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv, 20.0) == true, "CompareRenderWindowAgainstReference test result positive?" );
+
+  //use this to generate a reference screenshot or save the file:
+  if(false)
+  {
+    renderingHelper.SaveReferenceScreenShot("/media/hdd/thomasHdd/Pictures/tmp/output2.png");
+  }
 
   MITK_TEST_END();
 }

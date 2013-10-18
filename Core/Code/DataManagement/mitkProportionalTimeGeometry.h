@@ -170,9 +170,9 @@ namespace mitk {
     */
     virtual itk::LightObject::Pointer InternalClone () const;
 
-    itkGetMacro(FirstTimePoint, TimePointType);
+    itkGetConstMacro(FirstTimePoint, TimePointType);
     itkSetMacro(FirstTimePoint, TimePointType);
-    itkGetMacro(StepDuration, TimePointType);
+    itkGetConstMacro(StepDuration, TimePointType);
     itkSetMacro(StepDuration, TimePointType);
 
 //    void SetGeometryForTimeStep(TimeStepType timeStep, BaseGeometry& geometry);
@@ -190,6 +190,8 @@ namespace mitk {
     * \brief Initialize the TimeGeometry with empty Geometry3D
     */
     void Initialize (TimeStepType timeSteps);
+
+    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
   protected:
     virtual ~ProportionalTimeGeometry();

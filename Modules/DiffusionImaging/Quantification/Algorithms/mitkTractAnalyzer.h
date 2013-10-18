@@ -113,6 +113,8 @@ public:
     return m_PathDescription;
   }
 
+  itkGetMacro(CostSum, double)
+
 protected:
 
 
@@ -140,6 +142,8 @@ protected:
   /** \brief Path description in as string for display in GUI */
   std::string m_PathDescription;
 
+  /** \brief Total cost of the path */
+  double m_CostSum;
 
 
 private:

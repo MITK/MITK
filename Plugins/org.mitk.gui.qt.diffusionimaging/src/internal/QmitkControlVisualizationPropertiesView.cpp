@@ -485,7 +485,10 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
 {
   currentThickSlicesMode = 1;
   m_MyMenu = NULL;
-  itk::MultiThreader::SetGlobalDefaultNumberOfThreads(itk::MultiThreader::GetGlobalMaximumNumberOfThreads());
+  int numThread = itk::MultiThreader::GetGlobalMaximumNumberOfThreads();
+  if (numThread > 12)
+    numThread = 12;
+  itk::MultiThreader::SetGlobalDefaultNumberOfThreads(numThread);
 }
 
 QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView(const QmitkControlVisualizationPropertiesView& other)
@@ -661,8 +664,6 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     m_Controls->frame_tube->setVisible(false);
     m_Controls->frame_wire->setVisible(false);
   }
-
-
 
   m_IsInitialized = false;
   m_SelListener = berry::ISelectionListener::Pointer(new CvpSelListener(this));
@@ -913,6 +914,7 @@ void QmitkControlVisualizationPropertiesView::NodeAdded(const mitk::DataNode *no
 implement SelectionService Listener explicitly */
 void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
+
   // deactivate channel slider if no diffusion weighted image or tbss image is selected
   m_Controls->m_DisplayIndex->setVisible(false);
   m_Controls->m_DisplayIndexSpinBox->setVisible(false);
@@ -981,6 +983,13 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
     else
       m_Controls->m_TSMenu->setVisible(true);
   }
+
+  // if selection changes, set the current selction member and call SellListener::DoSelectionChanged
+  berry::ISelection::ConstPointer sel(
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+  m_CurrentSelection = sel.Cast<const IStructuredSelection>();
+  m_SelListener.Cast<CvpSelListener>()->DoSelectionChanged(sel);
+
 }
 
 mitk::DataStorage::SetOfObjects::Pointer

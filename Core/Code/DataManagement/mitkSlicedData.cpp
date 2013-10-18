@@ -201,6 +201,21 @@ void mitk::SlicedData::SetRequestedRegion(SlicedData::RegionType *region)
   }
 }
 
+void mitk::SlicedData::SetLargestPossibleRegion(SlicedData::RegionType *region)
+{
+
+  if(region!=NULL)
+  {
+    m_LargestPossibleRegion = *region;
+    m_UseLargestPossibleRegion=true;
+  }
+  else
+  {
+    // pointer could not be cast back down
+    itkExceptionMacro( << "mitk::SlicedData::SetLargestPossibleRegion(SlicedData::RegionType*) cannot cast " << typeid(region).name() << " to " << typeid(SlicedData*).name() );
+  }
+}
+
 void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
 {
   // Standard call to the superclass' method

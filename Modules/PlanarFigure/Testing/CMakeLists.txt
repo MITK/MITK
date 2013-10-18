@@ -71,7 +71,7 @@ endfunction()
 #  - Landscape
 #  - Portrait
 #
-if(WIN32 OR APPLE OR MITK_ENABLE_GUI_TESTING) ### since the rendering test's do not run in ubuntu, yet, we build them only for other systems or if the user explicitly sets the variable MITK_ENABLE_GUI_TESTING
+if(MITK_ENABLE_RENDERING_TESTING) ### since the rendering test's do not run in ubuntu, yet, we build them only for other systems or if the user explicitly sets the variable MITK_ENABLE_RENDERING_TESTING
 foreach(renderWindowAspect Square Landscape Portrait)
   foreach(viewportAspect Square Landscape Portrait)
     foreach(worldAspect Square Landscape Portrait)
@@ -151,6 +151,6 @@ foreach(renderWindowAspect Square Landscape Portrait)
     endforeach()
   endforeach()
 endforeach()
-endif() # endif MITK_ENABLE_GUI_TESTING
+endif() # endif MITK_ENABLE_RENDERING_TESTING
 
 endif() # BUILD_TESTING

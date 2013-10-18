@@ -19,13 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 
+#include <mitkDiffusionImage.h>
+
 #include <QmitkFunctionality.h>
 
 #include "ui_QmitkDenoisingViewControls.h"
 
 #include <itkVectorImage.h>
 #include <itkImage.h>
-#include <mitkDiffusionImage.h>
 #include <itkOrientationDistributionFunction.h>
 #include <mitkQBallImage.h>
 #include <vtkTransform.h>
@@ -38,14 +39,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCamera.h>
 #include <itkDiffusionTensor3D.h>
 
+#include <mitkDiffusionImage.h>
+
+//
+
 /*!
   \brief View displaying details of the orientation distribution function in the voxel at the current crosshair position.
 
   \sa QmitkFunctionality
   \ingroup Functionalities
 */
-
-class QmitkDenoisingView : public QmitkFunctionality
+//template <typename mitk::DiffusionPixelType>
+class QmitkDenoisingView : public QmitkFunctionality//, public mitk::DiffusionImageSource< DiffusionPixelType >
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -58,12 +63,14 @@ public:
   QmitkDenoisingView();
   virtual ~QmitkDenoisingView();
 
-  typedef float TOdfPixelType;
+/*  typedef float TOdfPixelType;
   typedef itk::Vector<TOdfPixelType,QBALL_ODFSIZE> OdfVectorType;
   typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
 
   typedef itk::DiffusionTensor3D< TOdfPixelType >  TensorPixelType;
-  typedef itk::Image< TensorPixelType, 3 >         TensorImageType;
+  typedef itk::Image< TensorPixelType, 3 >         TensorImageType;*/
+  typedef short DiffusionPixelType;
+  typedef mitk::DiffusionImage< DiffusionPixelType > DiffusionImageType;
 
   virtual void CreateQtPartControl(QWidget *parent);
 
@@ -84,29 +91,13 @@ protected:
   Ui::QmitkDenoisingViewControls*  m_Controls;
   QmitkStdMultiWidget*              m_MultiWidget;
 
-  /** observer flags */
+
+  mitk::DataNode::Pointer m_ImageNode;
+
   int m_SliceObserverTag1;
   int m_SliceObserverTag2;
   int m_SliceObserverTag3;
   int m_PropertyObserverTag;
-
-  /** ODF related variables like mesh structure, values etc. */
-  vtkPolyData*                      m_TemplateOdf;  ///< spherical base mesh
-  vtkSmartPointer<vtkTransform>     m_OdfTransform;
-  vtkSmartPointer<vtkDoubleArray>   m_OdfVals;
-  vtkSmartPointer<vtkOdfSource>     m_OdfSource;
-
-  int                               m_OdfNormalization; ///< normalization method defined in the visualization view
-
-  /** rendering of the ODF */
-  vtkActor*                     m_VtkActor;
-  vtkPolyDataMapper*            m_VtkMapper;
-  vtkRenderer*                  m_Renderer;
-  vtkRenderWindow*              m_VtkRenderWindow;
-  vtkRenderWindowInteractor*    m_RenderWindowInteractor;
-  vtkCamera*                    m_Camera;
-
-  mitk::DataNode::Pointer m_ImageNode;
 };
 
 

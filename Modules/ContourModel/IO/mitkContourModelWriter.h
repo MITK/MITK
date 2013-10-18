@@ -34,6 +34,27 @@ namespace mitk
  * XML-based writer for mitk::ContourModels. Multiple ContourModels can be written in
  * a single XML file by simply setting multiple inputs to the filter.
  *
+ * The xml file will look like:
+ *
+ *   <?xml version="1.0" encoding="utf-8"?>
+ *   <contourModel>
+ *      <head>
+ *        <geometryInfo>
+ *        </geometryInfo>
+ *      </head>
+ *      <data>
+ *        <timestep n="0">
+ *          <controlPoints>
+ *            <point>
+ *              <x></x>
+ *              <y></y>
+ *              <z></z>
+ *            </point>
+ *          </controlPoint>
+ *        </timestep>
+ *      </data>
+ *    </contourModel>
+ *
  * @ingroup PSIO
  * @ingroup Process
  */

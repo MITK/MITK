@@ -41,6 +41,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMarchingSquares.h>
 #include <vtkMarchingCubes.h>
 
+#include <mitkExtractImageFilter.h>
+
 #include <QFileDialog>
 
 /**

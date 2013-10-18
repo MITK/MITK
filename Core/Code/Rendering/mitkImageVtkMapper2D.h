@@ -29,6 +29,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkPropAssembly.h>
 
+#include <vtkMarchingSquares.h>
+#include <vtkContourFilter.h>
+#include <vtkMarchingCubes.h>
+#include <mitkSurface.h>
+#include <mitkIOUtil.h>
+
 class vtkActor;
 class vtkPolyDataMapper;
 class vtkPlaneSource;

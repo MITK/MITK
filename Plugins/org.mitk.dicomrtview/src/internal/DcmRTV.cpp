@@ -170,18 +170,27 @@ void DcmRTV::LoadRTDoseFile()
   mitk::DataNode::Pointer doseNode = GetDataStorage()->GetNamedNode("DicomRT Dose");
   mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(doseNode->GetData());
 //  vtkMarchingSquares* contourFilter = vtkMarchingSquares::New();
-  int numberOfIsoLines = 5;
+  int numberOfIsoLines = 2;
   std::deque<mitk::Surface::Pointer> surfaceStorage;
 
-  for(int i=0; i<numberOfIsoLines;i++)
-  {
+//  for(int i=0; i<numberOfIsoLines;i++)
+//  {
+    mitk::ExtractImageFilter::Pointer imageExtractor = mitk::ExtractImageFilter::New();
+    mitk::DataNode::Pointer img = this->GetDataStorage()->GetNamedNode("abc");
+    mitk::Image::Pointer picture = dynamic_cast<mitk::Image*>(img->GetData());
+    imageExtractor->SetInput( picture );
+    imageExtractor->SetSliceDimension( 0 );
+    imageExtractor->SetSliceIndex( 12 );
+    imageExtractor->Update();
+
     vtkContourFilter* contourFilter = vtkContourFilter::New();
     vtkPolyData* polyData = vtkPolyData::New();
 
-    contourFilter->SetInput(doseImage->GetVtkImageData());
-  //  contourFilter->SetNumberOfContours(5);
-  //  contourFilter->SetValue(0,50000);
-    contourFilter->GenerateValues(1,i*100*i,(i+1)*200*(i+1));
+//    contourFilter->SetInput(doseImage->GetVtkImageData());
+    contourFilter->SetInput(imageExtractor->GetOutput()->GetVtkImageData());
+    contourFilter->SetNumberOfContours(1);
+    contourFilter->SetValue(0,1);
+//    contourFilter->GenerateValues(1,i*5000*i,(i+1)*6000*(i+1));
     polyData = contourFilter->GetOutput();
 
     mitk::Surface::Pointer c = mitk::Surface::New();
@@ -193,7 +202,7 @@ void DcmRTV::LoadRTDoseFile()
     geo->SetSpacing(spacing);
     c->SetGeometry(geo);
     surfaceStorage.push_back(c);
-  }
+//  }
 
   for(int i=0; i<numberOfIsoLines;i++)
   {

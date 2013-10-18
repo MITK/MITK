@@ -177,6 +177,11 @@ if(DESIRED_QT_VERSION MATCHES 4)
   add_library(qwt SHARED ${_qwt_sources})
   target_link_libraries(qwt ${QT_LIBRARIES})
 elseif(DESIRED_QT_VERSION MATCHES 5)
+
+  if (WIN32)
+    cmake_policy(SET CMP0020 NEW) # Automatically link Qt executables to qtmain target on Windows
+  endif()
+
   find_package(Qt5Svg REQUIRED)
   find_package(Qt5OpenGL REQUIRED)
   find_package(Qt5PrintSupport REQUIRED)

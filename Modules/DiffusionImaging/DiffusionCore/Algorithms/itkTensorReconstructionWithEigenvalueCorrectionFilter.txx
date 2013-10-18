@@ -1069,6 +1069,8 @@ namespace itk
 
 
 
+  /*
+
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
   TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
@@ -1118,6 +1120,9 @@ namespace itk
       ++outputIterator;
       }
   }
+
+
+  */
 
 
 

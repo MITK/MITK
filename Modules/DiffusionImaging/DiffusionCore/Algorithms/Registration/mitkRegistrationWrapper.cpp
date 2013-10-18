@@ -48,9 +48,9 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
     rtransform->SetParameters( parameters );
 
     mitk::Point3D origin = itkImage->GetOrigin();
-    origin[0]-=offset[0];
-    origin[1]-=offset[1];
-    origin[2]-=offset[2];
+//    origin[0]-=offset[0];
+//    origin[1]-=offset[1];
+//    origin[2]-=offset[2];
 
     mitk::Point3D newOrigin = rtransform->GetInverseTransform()->TransformPoint(origin);
 
@@ -131,11 +131,12 @@ void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImag
   // align the offsets of the two images. this is done to avoid non-overlapping initialization
   Point3D origin = fixedImage->GetGeometry()->GetOrigin();
   Point3D originMoving = movingImage->GetGeometry()->GetOrigin();
-  offset[0] = originMoving[0]-origin[0];
-  offset[1] = originMoving[1]-origin[1];
-  offset[2] = originMoving[2]-origin[2];
+// -------------------- DO NOT change the original data!!!!!!!!!!!!!!!!!
+  //  offset[0] = originMoving[0]-origin[0];
+//  offset[1] = originMoving[1]-origin[1];
+//  offset[2] = originMoving[2]-origin[2];
 
-  movingImage->GetGeometry()->SetOrigin(origin);
+//  movingImage->GetGeometry()->SetOrigin(origin);
   // Start registration
   mitk::PyramidImageRegistrationMethod::Pointer registrationMethod = mitk::PyramidImageRegistrationMethod::New();
   registrationMethod->SetFixedImage( fixedImage );

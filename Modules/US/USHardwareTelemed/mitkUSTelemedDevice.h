@@ -127,9 +127,9 @@ namespace mitk {
 
     // Methods implemented for IUsgDeviceChangeSink
     virtual HRESULT __stdcall raw_OnProbeArrive(IUnknown *pUsgProbe, ULONG *reserved);
-    virtual HRESULT __stdcall raw_OnBeamformerArrive(IUnknown *pUsgBeamformer, ULONG *reserved) { return S_OK; };
+    virtual HRESULT __stdcall raw_OnBeamformerArrive(IUnknown *pUsgBeamformer, ULONG *reserved);
     virtual HRESULT __stdcall raw_OnProbeRemove(IUnknown *pUsgProbe, ULONG *reserved);
-    virtual HRESULT __stdcall raw_OnBeamformerRemove(IUnknown *pUsgBeamformer, ULONG *reserved) { return S_OK; };
+    virtual HRESULT __stdcall raw_OnBeamformerRemove(IUnknown *pUsgBeamformer, ULONG *reserved);
     virtual HRESULT __stdcall raw_OnProbeStateChanged(IUnknown *pUsgProbe, ULONG *reserved) { return S_OK; };
     virtual HRESULT __stdcall raw_OnBeamformerStateChanged(IUnknown *pUsgBeamformer, ULONG *reserved) { return S_OK; };
 

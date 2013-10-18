@@ -177,6 +177,12 @@ void mitk::USTelemedDevice::ReleaseUsgControls()
 
 void mitk::USTelemedDevice::StopScanning()
 {
+  if ( ! m_UsgDataView )
+  {
+    MITK_WARN("USDevice")("USTelemedDevice") << "Cannot stop scanning as Telemed Data View is null.";
+    return;
+  }
+
   HRESULT hr;
   hr = m_UsgDataView->put_ScanState(Usgfw2Lib::SCAN_STATE_STOP);
 
@@ -226,6 +232,22 @@ void mitk::USTelemedDevice::ConnectDeviceChangeSink( )
 
 // --- Methods for Telemed API Interfaces
 
+HRESULT __stdcall mitk::USTelemedDevice::raw_OnBeamformerArrive(IUnknown *pUsgBeamformer, ULONG *reserved)
+{
+  this->Connect();
+
+  return S_OK;
+}
+
+HRESULT __stdcall mitk::USTelemedDevice::raw_OnBeamformerRemove(IUnknown *pUsgBeamformer, ULONG *reserved)
+{
+  if ( this->GetIsActive() ) { this->Deactivate(); }
+
+  this->Disconnect();
+
+  return S_OK;
+}
+
 HRESULT __stdcall mitk::USTelemedDevice::raw_OnProbeArrive(IUnknown*, ULONG* probeIndex)
 {
   m_ControlsProbes->ProbeAdded(static_cast<unsigned int>(*probeIndex));
@@ -239,7 +261,7 @@ HRESULT __stdcall mitk::USTelemedDevice::raw_OnProbeRemove(IUnknown*, ULONG* pro
 {
   m_ControlsProbes->ProbeRemoved(static_cast<unsigned int>(*probeIndex));
 
-  this->Deactivate();
+  if ( this->GetIsActive() ) { this->Deactivate(); }
 
   return S_OK;
 };

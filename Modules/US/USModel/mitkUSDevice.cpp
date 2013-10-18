@@ -256,6 +256,13 @@ bool mitk::USDevice::Activate()
 
 void mitk::USDevice::Deactivate()
 {
+  if ( ! this->GetIsActive() )
+  {
+    MITK_WARN("mitkUSDevice")
+      << "Cannot deactivate a device which is not activae.";
+    return;
+  }
+
   m_DeviceState = State_Connected;
 
   us::ServiceProperties props = ConstructServiceProperties();

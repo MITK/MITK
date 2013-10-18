@@ -209,5 +209,5 @@ void mitk::ContourModelSet::UpdateOutputInformation()
 
     this->m_UpdateBoundingBox = false;
   }
-  GetTimeSlicedGeometry()->UpdateInformation();
+  GetTimeGeometry()->Update();
 }

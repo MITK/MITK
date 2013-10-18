@@ -1,4 +1,4 @@
-3/*===================================================================
+/*===================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
@@ -162,7 +162,7 @@ void mitk::ContourModelWriter::WriteXML( mitk::ContourModel* contourModel, std::
     /*++++ <geometryInfo> ++++*/
     WriteStartElement( XML_GEOMETRY_INFO, out);
 
-    WriteGeometryInformation( contourModel->GetTimeSlicedGeometry(), out);;
+    WriteGeometryInformation( contourModel->GetTimeGeometry(), out);;
 
     /*++++ </geometryInfo> ++++*/
     WriteEndElement( XML_GEOMETRY_INFO, out);

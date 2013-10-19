@@ -61,6 +61,7 @@ namespace mitk
 
     mitkCloneMacro(Self);
 
+
     /*+++++++++++++++ typedefs +++++++++++++++++++++++++++++++*/
     typedef mitk::ContourElement::VertexType VertexType;
     typedef mitk::ContourElement::VertexListType VertexListType;

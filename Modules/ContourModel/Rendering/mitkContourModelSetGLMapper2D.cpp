@@ -358,8 +358,6 @@ void mitk::ContourModelSetGLMapper2D::DrawContour(mitk::ContourModel* renderingC
       //------------------------------------
     }
   }
-
-  ls->UpdateGenerateDataTime();
 }
 
 void mitk::ContourModelSetGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)

@@ -28,6 +28,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourVtkMapper3D.h"
 
 
+#include "mitkLabelSetImage.h"
+#include "mitkLabelSetImageVtkMapper2D.h"
+#include "mitkNrrdLabelSetImageWriter.h"
+#include "mitkNrrdLabelSetImageWriterFactory.h"
+#include "mitkNrrdLabelSetImageIOFactory.h"
+
 mitk::SegmentationObjectFactory::SegmentationObjectFactory()
 :CoreObjectFactoryBase()
 {
@@ -59,6 +65,16 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
       newMapper = mitk::ContourSetMapper2D::New();
       newMapper->SetDataNode(node);
     }
+    else if((dynamic_cast<ContourModel*>(data)!=NULL))
+    {
+      newMapper = mitk::ContourModelGLMapper2D::New();
+      newMapper->SetDataNode(node);
+    }
+    else if((dynamic_cast<LabelSetImage*>(data)!=NULL))
+    {
+      newMapper = mitk::LabelSetImageVtkMapper2D::New();
+      newMapper->SetDataNode(node);
+    }
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
@@ -72,18 +88,25 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
       newMapper = mitk::ContourSetVtkMapper3D::New();
       newMapper->SetDataNode(node);
     }
+    else if((dynamic_cast<ContourModel*>(data)!=NULL))
+    {
+      newMapper = mitk::ContourModelMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
   }
   return newMapper;
 }
 
 void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
+  if(!node) return;
 
-  if(node==NULL)
-    return;
-
-  mitk::DataNode::Pointer nodePointer = node;
-
+  mitk::ContourModel::Pointer contourModel = dynamic_cast<mitk::ContourModel*>(node->GetData());
+  if(contourModel.IsNotNull())
+  {
+    mitk::ContourModelGLMapper2D::SetDefaultProperties(node);
+    mitk::ContourModelMapper3D::SetDefaultProperties(node);
+  }
 
 //  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 //  if(image.IsNotNull() && image->IsInitialized())
@@ -96,6 +119,11 @@ void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 //    mitk::UnstructuredGridVtkMapper3D::SetDefaultProperties(node);
 //  }
 
+  mitk::LabelSetImage::Pointer lsImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+  if(lsImage.IsNotNull())
+  {
+    mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(node);
+  }
 }
 
 const char* mitk::SegmentationObjectFactory::GetFileExtensions()
@@ -117,7 +145,13 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::SegmentationObjectFactory::GetSa
 
 void mitk::SegmentationObjectFactory::CreateFileExtensionsMap()
 {
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour Files"));
+//  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation Files"));
 
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour File"));
+//  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation Files"));
+
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.lst", "Segmentation File"));
 }
 
 const char* mitk::SegmentationObjectFactory::GetSaveFileExtensions()
@@ -129,6 +163,20 @@ const char* mitk::SegmentationObjectFactory::GetSaveFileExtensions()
 
 void mitk::SegmentationObjectFactory::RegisterIOFactories()
 {
+  //register io classes of mitkContourModel
+  mitk::ContourModelIOFactory::RegisterOneFactory();
+
+  mitk::ContourModelWriterFactory::RegisterOneFactory();
+
+  this->m_FileWriters.push_back(mitk::ContourModelWriter::New().GetPointer());
+
+  mitk::NrrdLabelSetImageIOFactory::RegisterOneFactory();
+
+  mitk::NrrdLabelSetImageWriterFactory::RegisterOneFactory();
+
+  this->m_FileWriters.push_back(mitk::NrrdLabelSetImageWriter::New().GetPointer());
+
+  CreateFileExtensionsMap();
 }
 
 struct RegisterSegmentationObjectFactory{

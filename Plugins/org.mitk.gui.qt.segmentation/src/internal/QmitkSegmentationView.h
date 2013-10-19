@@ -128,7 +128,6 @@ protected:
 
   void SetMouseCursor(const us::ModuleResource&, int hotspotX, int hotspotY );
 
-  void SetToolSelectionBoxesEnabled(bool);
 
   bool m_MouseCursorSet;
 
@@ -178,4 +177,3 @@ protected:
 };
 
 #endif /*QMITKsegmentationVIEW_H_*/
-

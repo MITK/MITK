@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
-#include "mitkImage.h"
+#include "mitkLabelSetImage.h"
 
 #include <itkImage.h>
 #include <itkObjectFactory.h>
@@ -68,7 +68,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
   public:
 
     mitkClassMacro(SegmentationInterpolationController, itk::Object);
-    itkNewMacro(SegmentationInterpolationController); /// specify the segmentation image that should be interpolated
+    itkNewMacro(SegmentationInterpolationController);
 
     /**
       \brief Find interpolator for a given image.
@@ -80,16 +80,6 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     static SegmentationInterpolationController* InterpolatorForImage(const Image*);
 
     /**
-      \brief Block reaction to an images Modified() events.
-
-      Blocking the scan of the whole image is especially useful when you are about to change a single slice
-      of the image. Then you would send a difference image of this single slice to SegmentationInterpolationController
-      but call image->Modified() anyway. Before calling image->Modified() you should block
-      SegmentationInterpolationController's reactions to this modified by using this method.
-    */
-    void BlockModified(bool);
-
-    /**
       \brief Initialize with a whole volume.
 
       Will scan the volume for segmentation pixels (values other than 0) and fill some internal data structures.
@@ -98,7 +88,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
 
       When you change a single slice, call SetChangedSlice() instead.
     */
-    void SetSegmentationVolume( const Image* segmentation );
+    void SetWorkingImage( LabelSetImage* image );
 
     /**
       \brief Set a reference image (original patient image) - optional.
@@ -107,7 +97,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
       the interpolation algorithm may consider image content to improve the interpolated
       (estimated) segmentation.
      */
-    void SetReferenceVolume( const Image* segmentation );
+    void SetReferenceImage( Image* image );
 
     /**
       \brief Update after changing a single slice.
@@ -135,12 +125,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     */
     Image::Pointer Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, const mitk::PlaneGeometry* currentPlane, unsigned int timeStep );
 
-    void OnImageModified(const itk::EventObject&);
-
-    /**
-     * Activate/Deactivate the 2D interpolation.
-    */
-    void Activate2DInterpolation(bool);
+    void ResetLabelCount();
 
   protected:
 
@@ -150,8 +135,8 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     class Segmentation_EXPORT SetChangedSliceOptions
     {
       public:
-        SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t, void* pixels )
-          : sliceDimension(sd), sliceIndex(si), dim0(d0), dim1(d1), timeStep(t), pixelData(pixels)
+        SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t)
+          : sliceDimension(sd), sliceIndex(si), dim0(d0), dim1(d1), timeStep(t)
         {
         }
 
@@ -160,45 +145,37 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
         unsigned int dim0;
         unsigned int dim1;
         unsigned int timeStep;
-        void* pixelData;
+//        void* pixelData;
     };
 
-    typedef std::vector<unsigned int> DirtyVectorType;
-    //typedef std::vector< DirtyVectorType[3] > TimeResolvedDirtyVectorType; // cannot work with C++, so next line is used for implementation
-    typedef std::vector< std::vector<DirtyVectorType> > TimeResolvedDirtyVectorType;
+    typedef std::vector<unsigned int> LabelCounterVectorType;
+    typedef std::vector< LabelCounterVectorType > LabelCounterSliceVectorType;
+    typedef std::vector< std::vector< LabelCounterSliceVectorType > > LabelCounterSliceTimeVectorType;
     typedef std::map< const Image*, SegmentationInterpolationController* > InterpolatorMapType;
 
     SegmentationInterpolationController();// purposely hidden
     virtual ~SegmentationInterpolationController();
 
     /// internal scan of a single slice
-    template < typename DATATYPE >
-    void ScanChangedSlice( itk::Image<DATATYPE, 2>*, const SetChangedSliceOptions& options );
+    template < typename PixelType >
+    void ScanSliceITKProcessing( itk::Image<PixelType, 2>*, const SetChangedSliceOptions& options );
 
+    /// internal scan of the whole image
     template < typename TPixel, unsigned int VImageDimension >
-    void ScanChangedVolume( itk::Image<TPixel, VImageDimension>*, unsigned int timeStep );
-
-    template < typename DATATYPE >
-    void ScanWholeVolume( itk::Image<DATATYPE, 3>*, const Image* volume, unsigned int timeStep );
-
-    void PrintStatus();
+    void ScanImageITKProcessing( itk::Image<TPixel, VImageDimension>*, unsigned int timeStep );
 
     /**
-      An array of flags. One for each dimension of the image. A flag is set, when a slice in a certain dimension
+      An array that of flags. One for each dimension of the image. A flag is set, when a slice in a certain dimension
       has at least one pixel that is not 0 (which would mean that it has to be considered by the interpolation algorithm).
-
       E.g. flags for axial slices are stored in m_SegmentationCountInSlice[0][index].
-
       Enhanced with time steps it is now m_SegmentationCountInSlice[timeStep][0][index]
     */
-    TimeResolvedDirtyVectorType m_SegmentationCountInSlice;
+    LabelCounterSliceTimeVectorType m_LabelCountInSlice;
 
     static InterpolatorMapType s_InterpolatorForImage;
 
-    Image::ConstPointer m_Segmentation;
-    Image::ConstPointer m_ReferenceImage;
-    bool m_BlockModified;
-    bool m_2DInterpolationActivated;
+    LabelSetImage::Pointer m_WorkingImage;
+    Image::Pointer m_ReferenceImage;
 };
 
 } // namespace

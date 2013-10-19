@@ -211,34 +211,11 @@ namespace mitk
 
   private:
 
-    // for reference data
-    NodePredicateDataType::Pointer m_PredicateImages;
-    NodePredicateDimension::Pointer m_PredicateDim3;
-    NodePredicateDimension::Pointer m_PredicateDim4;
-    NodePredicateOr::Pointer m_PredicateDimension;
-    NodePredicateAnd::Pointer m_PredicateImage3D;
-
-    NodePredicateProperty::Pointer m_PredicateBinary;
-    NodePredicateNot::Pointer m_PredicateNotBinary;
-
-    NodePredicateProperty::Pointer m_PredicateSegmentation;
-    NodePredicateNot::Pointer m_PredicateNotSegmentation;
-
-    NodePredicateProperty::Pointer m_PredicateHelper;
-    NodePredicateNot::Pointer m_PredicateNotHelper;
-
-    NodePredicateAnd::Pointer m_PredicateImageColorful;
-
-    NodePredicateAnd::Pointer m_PredicateImageColorfulNotHelper;
-
-    NodePredicateAnd::Pointer m_PredicateReference;
-
-    // for working data
-    NodePredicateAnd::Pointer m_IsSegmentationPredicate;
+    mitk::NodePredicateAnd::Pointer m_PredicateReference;
+    mitk::NodePredicateAnd::Pointer m_PredicateWorking;
 
   };
 
 } // namespace
 
 #endif
-

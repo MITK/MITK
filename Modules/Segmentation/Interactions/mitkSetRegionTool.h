@@ -51,7 +51,7 @@ class Segmentation_EXPORT SetRegionTool : public FeedbackContourTool
 
   protected:
 
-    SetRegionTool(int paintingPixelValue = 1); // purposely hidden
+    SetRegionTool(); // purposely hidden
     virtual ~SetRegionTool();
 
     virtual void Activated();
@@ -59,15 +59,18 @@ class Segmentation_EXPORT SetRegionTool : public FeedbackContourTool
 
     virtual bool OnMousePressed (Action*, const StateEvent*);
     virtual bool OnMouseReleased(Action*, const StateEvent*);
-    virtual bool OnInvertLogic  (Action*, const StateEvent*);
+  //  virtual bool OnInvertLogic  (Action*, const StateEvent*);
+    /**
+     Set the label under clicked position as the active one.
+    */
+    virtual bool OnChangeActiveLabel(Action*, const StateEvent*);
 
     int m_PaintingPixelValue;
 
+    bool m_LogicInverted;
+
     bool m_FillContour;
     bool m_StatusFillWholeSlice;
-
-    ContourModel::Pointer m_SegmentationContourInWorldCoordinates;
-    ContourModel::Pointer m_WholeImageContourInWorldCoordinates;
 };
 
 } // namespace

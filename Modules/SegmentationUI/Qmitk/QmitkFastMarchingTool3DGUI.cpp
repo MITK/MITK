@@ -18,16 +18,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkConfirmSegmentationDialog.h"
 
+#include "mitkStepper.h"
+#include "mitkBaseRenderer.h"
+
 #include <qlabel.h>
-#include <ctkSliderWidget.h>
-#include <ctkRangeWidget.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
 #include <QGroupBox>
 #include <QApplication>
 #include <QMessageBox>
-#include "mitkStepper.h"
-#include "mitkBaseRenderer.h"
+
+#include <ctkSliderWidget.h>
+#include <ctkRangeWidget.h>
 
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkFastMarchingTool3DGUI, "")
@@ -98,7 +100,7 @@ m_TimeIsConnected(false)
   m_slAlpha->setMaximum(0);
   m_slAlpha->setPageStep(0.1);
   m_slAlpha->setSingleStep(0.01);
-  m_slAlpha->setValue(-2.5);
+  m_slAlpha->setValue(-0.5);
   m_slAlpha->setDecimals(2);
   m_slAlpha->setTracking(false);
   m_slAlpha->setToolTip("The \"alpha\" parameter in the Sigmoid mapping filter.");
@@ -125,7 +127,7 @@ m_TimeIsConnected(false)
   m_slBeta->setMaximum(100);
   m_slBeta->setPageStep(0.1);
   m_slBeta->setSingleStep(0.01);
-  m_slBeta->setValue(3.5);
+  m_slBeta->setValue(3.0);
   m_slBeta->setDecimals(2);
   m_slBeta->setTracking(false);
   m_slBeta->setToolTip("The \"beta\" parameter in the Sigmoid mapping filter.");
@@ -176,7 +178,7 @@ m_TimeIsConnected(false)
 
   m_slwThreshold = new ctkRangeWidget(this);
   m_slwThreshold->setMinimum(-100);
-  m_slwThreshold->setMaximum(5000);
+  m_slwThreshold->setMaximum(500);
   m_slwThreshold->setMinimumValue(-100);
   m_slwThreshold->setMaximumValue(2000);
   m_slwThreshold->setDecimals(0);
@@ -299,6 +301,7 @@ void QmitkFastMarchingTool3DGUI::OnStoppingValueChanged(double value)
 
 void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
 {
+/*
   QmitkConfirmSegmentationDialog dialog;
   QString segName = QString::fromStdString(m_FastMarchingTool->GetCurrentSegmentationName());
 
@@ -316,6 +319,7 @@ void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
   case QmitkConfirmSegmentationDialog::CANCEL_SEGMENTATION:
     return;
   }
+*/
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->ConfirmSegmentation();
@@ -325,29 +329,28 @@ void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
 
 void QmitkFastMarchingTool3DGUI::SetStepper(mitk::Stepper *stepper)
 {
-    this->m_TimeStepper = stepper;
+  this->m_TimeStepper = stepper;
 }
 
 void QmitkFastMarchingTool3DGUI::Refetch()
 {
   //event from image navigator recieved - timestep has changed
-    m_FastMarchingTool->SetCurrentTimeStep(m_TimeStepper->GetPos());
+  m_FastMarchingTool->SetCurrentTimeStep(m_TimeStepper->GetPos());
 }
 
 void QmitkFastMarchingTool3DGUI::OnClearSeeds()
 {
   //event from image navigator recieved - timestep has changed
-   m_FastMarchingTool->ClearSeeds();
-   m_btConfirm->setEnabled(false);
-   this->Update();
+  m_FastMarchingTool->ClearSeeds();
+  this->Update();
 }
 
 void QmitkFastMarchingTool3DGUI::BusyStateChanged(bool value)
 {
   if (value)
-      QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
+    QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
   else
-      QApplication::restoreOverrideCursor();
+    QApplication::restoreOverrideCursor();
 }
 
 void QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady()

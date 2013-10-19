@@ -76,9 +76,14 @@ class Segmentation_EXPORT SegTool2D : public Tool
     void SetShowMarkerNodes(bool);
 
     /**
-     * \brief Enables or disables the 3D interpolation after writing back the 2D segmentation result, and defaults to true.
+     * \brief Enables or disables the 3D interpolation after writing back the 2D segmentation result, and defaults to false.
      */
     void SetEnable3DInterpolation(bool);
+
+    /**
+     * \brief Enables or disables the 2D interpolation after writing back the 2D segmentation result, and defaults to false.
+     */
+    void SetEnable2DInterpolation(bool);
 
   protected:
 
@@ -118,6 +123,8 @@ class Segmentation_EXPORT SegTool2D : public Tool
     */
     Image::Pointer GetAffectedReferenceSlice(const PositionEvent*);
 
+    void PasteSegmentationOnWorkingImage( Image* targetSlice, Image* sourceSlice, int paintingPixelValue, int timestep );
+
     void WriteBackSegmentationResult (const PositionEvent*, Image*);
 
     void WriteBackSegmentationResult (const PlaneGeometry* planeGeometry, Image*, unsigned int timeStep);
@@ -129,11 +136,8 @@ class Segmentation_EXPORT SegTool2D : public Tool
 
     unsigned int AddContourmarker ( const PositionEvent* );
 
-    void InteractiveSegmentationBugMessage( const std::string& message );
-
-
-    BaseRenderer*         m_LastEventSender;
-    unsigned int          m_LastEventSlice;
+    BaseRenderer*  m_LastEventSender;
+    int   m_LastEventSlice;
 
   private:
     //The prefix of the contourmarkername. Suffix is a consecutive number
@@ -141,9 +145,13 @@ class Segmentation_EXPORT SegTool2D : public Tool
 
     bool m_ShowMarkerNodes;
     bool m_3DInterpolationEnabled;
+    bool m_2DInterpolationEnabled;
 
     DiffSliceOperation* m_doOperation;
     DiffSliceOperation* m_undoOperation;
+
+    template<typename TPixel, unsigned int VImageDimension>
+    void ItkPasteSegmentationOnWorkingImage( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, int pixelvalue );
 };
 
 } // namespace

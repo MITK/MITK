@@ -62,7 +62,7 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);
-    void OnAcceptThresholdPreview();
+    void OnAcceptPreview();
 
     /// \brief Called when Spinner value has changed. Consider: Spinner contains DOUBLE values
     void OnSpinnerValueChanged();
@@ -73,6 +73,8 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
   protected:
     QmitkBinaryThresholdToolGUI();
     virtual ~QmitkBinaryThresholdToolGUI();
+
+    void BusyStateChanged(bool);
 
     /// \brief When Slider (int value) has changed, we need to convert it to a respective double value for the spinner
     double SliderIntToDouble(int val);

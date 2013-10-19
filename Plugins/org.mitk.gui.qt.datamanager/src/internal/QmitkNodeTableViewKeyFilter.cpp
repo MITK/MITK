@@ -43,6 +43,7 @@ bool QmitkNodeTableViewKeyFilter::eventFilter( QObject *obj, QEvent *event )
     QKeySequence _Save = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Save selected nodes", "Ctrl+, S")));
     QKeySequence _Load = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Load", "Ctrl+, L")));
     QKeySequence _ShowInfo = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Show Node Information", "Ctrl+, I")));
+    QKeySequence _RenameNode = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Rename selected node", "F2")));
 
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
@@ -95,6 +96,11 @@ bool QmitkNodeTableViewKeyFilter::eventFilter( QObject *obj, QEvent *event )
     else if(_KeySequence == _ShowInfo)
     {
       _DataManagerView->ShowInfoDialogForSelectedNodes(true);
+      return true;
+    }
+    else if(_KeySequence == _RenameNode)
+    {
+      _DataManagerView->RenameSelectedNode(true);
       return true;
     }
   }

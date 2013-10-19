@@ -62,6 +62,12 @@ namespace mitk {
       void SetProgress(int steps);
 
       /**
+      * \brief Brings back the progress bar to its initial state.
+      *
+      */
+      void Reset();
+
+      /**
       * \brief Returns the current progress value.
       *
       */

@@ -19,8 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkNewSegmentationDialog.h"
 
 #include <qlabel.h>
-#include <ctkSliderWidget.h>
+#include <ctkDoubleSlider.h>
 #include <ctkRangeWidget.h>
+#include <ctkSliderWidget.h>
+#include <ctkSpinbox.h>
+
 #include <qpushbutton.h>
 #include <qlayout.h>
 #include <QGroupBox>
@@ -33,8 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkFastMarchingToolGUI, "")
 
 QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI()
-:QmitkToolGUI(),
-m_TimeIsConnected(false)
+:QmitkToolGUI(), m_TimeIsConnected(false), m_SelfCall(false)
 {
   this->setContentsMargins( 0, 0, 0, 0 );
 
@@ -66,14 +68,18 @@ m_TimeIsConnected(false)
    widgetLayout->addItem(hlayout);
   }
 
-  m_slSigma = new ctkSliderWidget(this);
+  m_slSigma = new ctkDoubleSlider(this);
+  m_slSigma->setTracking(false);
+  m_slSigma->setOrientation(Qt::Horizontal);
+  m_slSigma->setPageStep(0.1);
+//  m_slSigma->setTickInterval(0.01);
+  m_slSigma->setSingleStep(0.01);
   m_slSigma->setMinimum(0.1);
   m_slSigma->setMaximum(5.0);
-  m_slSigma->setPageStep(0.1);
-  m_slSigma->setSingleStep(0.01);
   m_slSigma->setValue(1.0);
-  m_slSigma->setDecimals(2);
-  m_slSigma->setTracking(false);
+//  m_slSigma->setDecimals(2);
+//  m_slSigma->spinBox()->setDecimals(2);
+
   m_slSigma->setToolTip("The \"sigma\" parameter in the Gradient Magnitude filter.");
   connect( m_slSigma, SIGNAL(valueChanged(double)), this, SLOT(OnSigmaChanged(double)));
   widgetLayout->addWidget( m_slSigma );
@@ -93,14 +99,15 @@ m_TimeIsConnected(false)
    widgetLayout->addItem(hlayout);
   }
 
-  m_slAlpha = new ctkSliderWidget(this);
+  m_slAlpha = new ctkDoubleSlider(this);
+//  m_slAlpha->setDecimals(2);
+  m_slAlpha->setTracking(false);
+  m_slAlpha->setOrientation(Qt::Horizontal);
   m_slAlpha->setMinimum(-10);
   m_slAlpha->setMaximum(0);
   m_slAlpha->setPageStep(0.1);
   m_slAlpha->setSingleStep(0.01);
   m_slAlpha->setValue(-2.5);
-  m_slAlpha->setDecimals(2);
-  m_slAlpha->setTracking(false);
   m_slAlpha->setToolTip("The \"alpha\" parameter in the Sigmoid mapping filter.");
   connect( m_slAlpha, SIGNAL(valueChanged(double)), this, SLOT(OnAlphaChanged(double)));
   widgetLayout->addWidget( m_slAlpha );
@@ -120,18 +127,19 @@ m_TimeIsConnected(false)
    widgetLayout->addLayout(hlayout);
   }
 
-  m_slBeta = new ctkSliderWidget(this);
+  m_slBeta = new ctkDoubleSlider(this);
+//  m_slBeta->setDecimals(2);
+  m_slBeta->setTracking(false);
+  m_slBeta->setOrientation(Qt::Horizontal);
   m_slBeta->setMinimum(0);
   m_slBeta->setMaximum(100);
   m_slBeta->setPageStep(0.1);
   m_slBeta->setSingleStep(0.01);
   m_slBeta->setValue(3.5);
-  m_slBeta->setDecimals(2);
-  m_slBeta->setTracking(false);
   m_slBeta->setToolTip("The \"beta\" parameter in the Sigmoid mapping filter.");
   connect( m_slBeta, SIGNAL(valueChanged(double)), this, SLOT(OnBetaChanged(double)));
   widgetLayout->addWidget( m_slBeta );
-
+/*
   // stopping value controls
   {
    QHBoxLayout *hlayout = new QHBoxLayout();
@@ -148,17 +156,17 @@ m_TimeIsConnected(false)
   }
 
   m_slStoppingValue = new ctkSliderWidget(this);
+  m_slStoppingValue->setDecimals(0);
   m_slStoppingValue->setMinimum(0);
   m_slStoppingValue->setMaximum(10000);
   m_slStoppingValue->setPageStep(10);
   m_slStoppingValue->setSingleStep(1);
   m_slStoppingValue->setValue(2000);
-  m_slStoppingValue->setDecimals(0);
   m_slStoppingValue->setTracking(false);
   m_slStoppingValue->setToolTip("The \"stopping value\" parameter in the fast marching 3D algorithm");
   connect( m_slStoppingValue, SIGNAL(valueChanged(double)), this, SLOT(OnStoppingValueChanged(double)));
   widgetLayout->addWidget( m_slStoppingValue );
-
+*/
   // threshold controls
   {
    QHBoxLayout *hlayout = new QHBoxLayout();
@@ -177,6 +185,7 @@ m_TimeIsConnected(false)
   m_slwThreshold = new ctkRangeWidget(this);
   m_slwThreshold->setMinimum(-100);
   m_slwThreshold->setMaximum(5000);
+  m_slwThreshold->setTickInterval(1);
   m_slwThreshold->setMinimumValue(-100);
   m_slwThreshold->setMaximumValue(2000);
   m_slwThreshold->setDecimals(0);
@@ -186,15 +195,14 @@ m_TimeIsConnected(false)
   widgetLayout->addWidget( m_slwThreshold );
 
   m_btClearSeeds = new QPushButton("Clear");
-  m_btClearSeeds->setToolTip("Clear current result and start over again");
+  m_btClearSeeds->setToolTip("Clear current preview and start over again");
   widgetLayout->addWidget(m_btClearSeeds);
   connect( m_btClearSeeds, SIGNAL(clicked()), this, SLOT(OnClearSeeds()) );
 
-  m_btConfirm = new QPushButton("Confirm Segmentation");
-  m_btConfirm->setToolTip("Incorporate current result in your working session.");
-  m_btConfirm->setEnabled(false);
-  widgetLayout->addWidget(m_btConfirm);
-  connect( m_btConfirm, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()) );
+  m_btAcceptPreview = new QPushButton("Accept");
+  m_btAcceptPreview->setToolTip("Incorporate current preview in your working session.");
+  widgetLayout->addWidget(m_btAcceptPreview);
+  connect( m_btAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 
@@ -239,18 +247,18 @@ void QmitkFastMarchingToolGUI::OnNewToolAssociated(mitk::Tool* tool)
 
 void QmitkFastMarchingToolGUI::Update()
 {
-    m_FastMarchingTool->SetLowerThreshold( this->m_slwThreshold->minimumValue());
-    m_FastMarchingTool->SetUpperThreshold( this->m_slwThreshold->maximumValue());
-    m_FastMarchingTool->SetStoppingValue( this->m_slStoppingValue->value());
-    m_FastMarchingTool->SetSigma( this->m_slSigma->value());
-    m_FastMarchingTool->SetAlpha( this->m_slAlpha->value());
-    m_FastMarchingTool->SetBeta( this->m_slBeta->value());
-    m_FastMarchingTool->Update();
+  m_FastMarchingTool->SetLowerThreshold( this->m_slwThreshold->minimumValue());
+  m_FastMarchingTool->SetUpperThreshold( this->m_slwThreshold->maximumValue());
+//  m_FastMarchingTool->SetStoppingValue( this->m_slStoppingValue->value());
+  m_FastMarchingTool->SetSigma( this->m_slSigma->value());
+  m_FastMarchingTool->SetAlpha( this->m_slAlpha->value());
+  m_FastMarchingTool->SetBeta( this->m_slBeta->value());
+  m_FastMarchingTool->Update();
 }
 
 void QmitkFastMarchingToolGUI::OnThresholdChanged(double lower, double upper)
 {
-  if (m_FastMarchingTool.IsNotNull())
+  if (m_FastMarchingTool.IsNotNull() && (!m_SelfCall))
   {
     m_FastMarchingTool->SetLowerThreshold( lower );
     m_FastMarchingTool->SetUpperThreshold( upper );
@@ -260,7 +268,7 @@ void QmitkFastMarchingToolGUI::OnThresholdChanged(double lower, double upper)
 
 void QmitkFastMarchingToolGUI::OnBetaChanged(double value)
 {
-  if (m_FastMarchingTool.IsNotNull())
+  if (m_FastMarchingTool.IsNotNull() && (!m_SelfCall))
   {
     m_FastMarchingTool->SetBeta( value );
     this->Update();
@@ -269,7 +277,7 @@ void QmitkFastMarchingToolGUI::OnBetaChanged(double value)
 
 void QmitkFastMarchingToolGUI::OnSigmaChanged(double value)
 {
-  if (m_FastMarchingTool.IsNotNull())
+  if (m_FastMarchingTool.IsNotNull() && (!m_SelfCall))
   {
     m_FastMarchingTool->SetSigma( value );
     this->Update();
@@ -278,7 +286,7 @@ void QmitkFastMarchingToolGUI::OnSigmaChanged(double value)
 
 void QmitkFastMarchingToolGUI::OnAlphaChanged(double value)
 {
-  if (m_FastMarchingTool.IsNotNull())
+  if (m_FastMarchingTool.IsNotNull() && (!m_SelfCall))
   {
     m_FastMarchingTool->SetAlpha( value );
     this->Update();
@@ -287,39 +295,38 @@ void QmitkFastMarchingToolGUI::OnAlphaChanged(double value)
 
 void QmitkFastMarchingToolGUI::OnStoppingValueChanged(double value)
 {
-  if (m_FastMarchingTool.IsNotNull())
+  /*
+  if (m_FastMarchingTool.IsNotNull() && (!m_SelfCall))
   {
     m_FastMarchingTool->SetStoppingValue( value );
     this->Update();
   }
+  */
 }
 
-void QmitkFastMarchingToolGUI::OnConfirmSegmentation()
+void QmitkFastMarchingToolGUI::OnAcceptPreview()
 {
-  if (m_FastMarchingTool.IsNotNull())
+  if (m_FastMarchingTool.IsNotNull() && (!m_SelfCall))
   {
-    m_FastMarchingTool->ConfirmSegmentation();
-    m_btConfirm->setEnabled(false);
+    m_FastMarchingTool->AcceptPreview();
   }
 }
 
 void QmitkFastMarchingToolGUI::SetStepper(mitk::Stepper *stepper)
 {
-    this->m_TimeStepper = stepper;
+  this->m_TimeStepper = stepper;
 }
 
 void QmitkFastMarchingToolGUI::Refetch()
 {
   //event from image navigator recieved - timestep has changed
-    m_FastMarchingTool->SetCurrentTimeStep(m_TimeStepper->GetPos());
+//    m_FastMarchingTool->SetCurrentTimeStep(m_TimeStepper->GetPos());
 }
 
 void QmitkFastMarchingToolGUI::OnClearSeeds()
 {
-  //event from image navigator recieved - timestep has changed
-   m_FastMarchingTool->ClearSeeds();
-   m_btConfirm->setEnabled(false);
-   this->Update();
+  m_FastMarchingTool->ClearSeeds();
+  this->Update();
 }
 
 void QmitkFastMarchingToolGUI::BusyStateChanged(bool value)

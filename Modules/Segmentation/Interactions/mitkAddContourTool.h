@@ -58,6 +58,13 @@ class Segmentation_EXPORT AddContourTool : public ContourTool
     us::ModuleResource GetIconResource() const;
 
     virtual const char* GetName() const;
+    virtual bool OnMousePressed (Action*, const StateEvent*);
+    /**
+      Called when the CTRL key is pressed. Will change the painting pixel value from 0 to the active label
+      and viceversa.
+    */
+    virtual bool OnInvertLogic  (Action*, const StateEvent*);
+
 
   protected:
 

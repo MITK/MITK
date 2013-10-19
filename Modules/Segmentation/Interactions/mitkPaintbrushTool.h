@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
 #include "mitkFeedbackContourTool.h"
+#include "mitkContour.h"
 #include "mitkPointSet.h"
 #include "mitkPointOperation.h"
 #include "mitkLegacyAdaptors.h"
@@ -38,6 +39,7 @@ namespace mitk
 
   Simple paintbrush drawing tool. Right now there are only circular pens of varying size.
 
+  \todo Bug #1727: Should be modified, so that the contour is always visible, i.e.without pressing a mouse button.
 
   \warning Only to be instantiated by mitk::ToolManager.
   $Author: maleike $
@@ -86,7 +88,7 @@ class Segmentation_EXPORT PaintbrushTool : public FeedbackContourTool
     int m_PaintingPixelValue;
     static int m_Size;
 
-    ContourModel::Pointer m_MasterContour;
+    Contour::Pointer m_MasterContour;
 
     int m_LastContourSize;
 

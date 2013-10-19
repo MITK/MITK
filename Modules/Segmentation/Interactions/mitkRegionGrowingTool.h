@@ -64,26 +64,57 @@ class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
     itkNewMacro(RegionGrowingTool);
 
     virtual const char** GetXPM() const;
-    virtual us::ModuleResource GetCursorIconResource() const;
-    us::ModuleResource GetIconResource() const;
-
     virtual const char* GetName() const;
+    virtual ModuleResource GetCursorIconResource() const;
+    virtual ModuleResource GetIconResource() const;
 
   protected:
 
     RegionGrowingTool(); // purposely hidden
     virtual ~RegionGrowingTool();
 
-    virtual void Activated();
-    virtual void Deactivated();
-
+    /**
+      1 Determine which slice is clicked into
+      2 Determine if the user clicked inside or outside of the segmentation
+      3 Depending on the pixel value under the mouse click position, two different things happen: (separated out into OnMousePressedInside and OnMousePressedOutside)
+       3.1 Create a skeletonization of the segmentation and try to find a nice cut
+         3.1.1 Call a ipSegmentation algorithm to create a nice cut
+         3.1.2 Set the result of this algorithm as the feedback contour
+       3.2 Initialize region growing
+         3.2.1 Determine memory offset inside the original image
+         3.2.2 Determine initial region growing parameters from the level window settings of the image
+         3.2.3 Perform a region growing (which generates a new feedback contour)
+    */
     virtual bool OnMousePressed (Action*, const StateEvent*);
+    /**
+      3.1 Create a skeletonization of the segmentation and try to find a nice cut
+      3.1.1 Call a ipSegmentation algorithm to create a nice cut
+      3.1.2 Set the result of this algorithm as the feedback contour
+    */
     virtual bool OnMousePressedInside (Action*, const StateEvent*, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset);
+    /**
+     3.2 Initialize region growing
+       3.2.1 Determine memory offset inside the original image
+       3.2.2 Determine initial region growing parameters from the level window settings of the image
+       3.2.3 Perform a region growing (which generates a new feedback contour)
+    */
     virtual bool OnMousePressedOutside (Action*, const StateEvent*);
+    /**
+     If in region growing mode (m_ReferenceSlice != NULL), then
+     1. Calculate the new thresholds from mouse position (relative to first position)
+     2. Perform a new region growing and update the feedback contour
+    */
     virtual bool OnMouseMoved   (Action*, const StateEvent*);
+    /**
+     If the feedback contour should be filled, then it is done here. (Contour is NOT filled, when skeletonization is done but no nice cut was found)
+    */
     virtual bool OnMouseReleased(Action*, const StateEvent*);
-
-    mitkIpPicDescriptor* PerformRegionGrowingAndUpdateContour(int timestep=0);
+    virtual bool OnChangeActiveLabel(Action*, const StateEvent*);
+    /**
+      Uses ipSegmentation algorithms to do the actual region growing. The result (binary image) is first smoothed by a 5x5 circle mask, then
+      its contour is extracted and converted to MITK coordinates.
+    */
+    mitkIpPicDescriptor* PerformRegionGrowingAndUpdateContour(int timestep);
 
     Image::Pointer m_ReferenceSlice;
     Image::Pointer m_WorkingSlice;
@@ -98,7 +129,22 @@ class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
 
   private:
 
+    /**
+      Smoothes a binary ipPic image with a 5x5 mask. The image borders (some first and last rows) are treated differently.
+    */
     mitkIpPicDescriptor* SmoothIPPicBinaryImage( mitkIpPicDescriptor* image, int &contourOfs, mitkIpPicDescriptor* dest = NULL );
+
+    /**
+      Helper method for SmoothIPPicBinaryImage. Smoothes a given part of and image.
+
+      \param sourceImage The original binary image.
+      \param dest The smoothed image (will be written without bounds checking).
+      \param contourOfs One offset of the contour. Is updated if a pixel is changed (which might change the contour).
+      \param maskOffsets Memory offsets that describe the smoothing mask.
+      \param maskSize Entries of the mask.
+      \param startOffset First pixel that should be smoothed using this mask.
+      \param endOffset Last pixel that should be smoothed using this mask.
+    */
     void SmoothIPPicBinaryImageHelperForRows( mitkIpPicDescriptor* source, mitkIpPicDescriptor* dest, int &contourOfs, int* maskOffsets, int maskSize, int startOffset, int endOffset );
 
     mitkIpPicDescriptor* m_OriginalPicSlice;

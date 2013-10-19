@@ -36,11 +36,9 @@ class vtkImageData;
 class vtkLookupTable;
 class vtkImageExtractComponents;
 class vtkImageReslice;
-class vtkImageChangeInformation;
 class vtkPoints;
 class vtkMitkThickSlicesFilter;
 class vtkPolyData;
-class vtkMitkApplyLevelWindowToRGBFilter;
 class vtkMitkLevelWindowFilter;
 
 namespace mitk {
@@ -167,10 +165,6 @@ public:
     vtkSmartPointer<vtkPlaneSource> m_Plane;
     /** \brief The texture which is used to render the current slice. */
     vtkSmartPointer<vtkTexture> m_Texture;
-    /** \brief The lookuptables for colors and level window */
-    vtkSmartPointer<vtkLookupTable> m_DefaultLookupTable;
-    vtkSmartPointer<vtkLookupTable> m_BinaryLookupTable;
-    vtkSmartPointer<vtkLookupTable> m_ColorLookupTable;
     /** \brief The actual reslicer (one per renderer) */
     mitk::ExtractSliceFilter::Pointer m_Reslicer;
     /** \brief Filter for thick slices */
@@ -179,12 +173,24 @@ public:
           This container is used to save a computed contour for the next rendering execution.
           For instance, if you zoom or pann, there is no need to recompute the contour. */
     vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
+    /** \brief An actor for the outline */
+    vtkSmartPointer<vtkActor> m_OutlineActor;
+    /** \brief An actor for the outline shadow*/
+    vtkSmartPointer<vtkActor> m_OutlineShadowActor;
+    /** \brief A mapper for the outline */
+    vtkSmartPointer<vtkPolyDataMapper> m_OutlineMapper;
 
     /** \brief Timestamp of last update of stored data. */
-    itk::TimeStamp m_LastUpdateTime;
+    itk::TimeStamp m_LastDataUpdateTime;
+
+    /** \brief Timestamp of last update of a property. */
+    itk::TimeStamp m_LastPropertyUpdateTime;
 
     /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
     mitk::ScalarType* m_mmPerPixel;
+
+    /** \brief Currently active color map. */
+    int m_ColorMap;
 
     /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */
     vtkSmartPointer<vtkMitkLevelWindowFilter> m_LevelWindowFilter;
@@ -236,7 +242,7 @@ protected:
       \param renderer: Pointer to the renderer containing the needed information
       \note This code is based on code from the iil library.
       */
-  vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer* renderer);
+  vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer* renderer, int pixelValue = 1);
 
   /** Default constructor */
   ImageVtkMapper2D();

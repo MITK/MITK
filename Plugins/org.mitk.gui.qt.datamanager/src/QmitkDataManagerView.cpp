@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkDataManagerView.h"
 
-#include <itkOtsuThresholdImageFilter.h>
-
 //# Own Includes
 //## mitk
 #include "mitkDataStorageEditorInput.h"
@@ -33,20 +31,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkEnumerationProperty.h"
+#include "mitkRenderingModeProperty.h"
 #include "mitkProperties.h"
+#include "mitkLookupTableProperty.h"
 #include <mitkNodePredicateAnd.h>
-#include <mitkITKImageImport.h>
-#include <mitkIDataStorageService.h>
-#include <mitkIRenderingManager.h>
-#include <mitkImageCast.h>
+#include "mitkITKImageImport.h"
+#include "mitkIDataStorageService.h"
+#include "mitkIRenderingManager.h"
+#include "mitkImageCast.h"
+//#include "mitkLabelSetImage.h"
+#include "mitkDataNodeObject.h"
+#include "mitkIContextMenuAction.h"
+
 //## Qmitk
 #include <QmitkDnDFrameWidget.h>
 #include <QmitkDataStorageTableModel.h>
+#include <QmitkPropertiesTableEditor.h>
 #include <QmitkIOUtil.h>
+#include <QmitkRenderWindow.h>
 #include <QmitkDataStorageTreeModel.h>
 #include <QmitkCustomVariants.h>
 #include "src/internal/QmitkNodeTableViewKeyFilter.h"
 #include "src/internal/QmitkInfoDialog.h"
+
 //## Berry
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
@@ -54,10 +61,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatform.h>
 #include <berryPlatformUI.h>
 #include <berryIEditorRegistry.h>
+#include "berryIExtensionPointService.h"
 
 //# Toolkit Includes
 #include <QTableView>
-#include <QGroupBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -65,27 +72,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QListView>
 #include <QMenu>
 #include <QAction>
-#include <QComboBox>
 #include <QApplication>
 #include <QCursor>
 #include <QHeaderView>
 #include <QTreeView>
 #include <QWidgetAction>
-#include <QSplitter>
 #include <QPushButton>
 #include <QMotifStyle>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QToolBar>
 #include <QKeyEvent>
 #include <QColor>
 #include <QColorDialog>
 #include <QSizePolicy>
 #include <QSignalMapper>
-
-#include "mitkDataNodeObject.h"
-#include "mitkIContextMenuAction.h"
-#include "berryIExtensionPointService.h"
+#include <QInputDialog>
+#include <QLineEdit>
 
 const std::string QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 
@@ -183,6 +185,19 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   QmitkNodeDescriptor* surfaceDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Surface");
+
+//  mitk::TNodePredicateDataType<mitk::LabelSetImage>::Pointer isLabelSetImage =
+//      mitk::TNodePredicateDataType<mitk::LabelSetImage>::New();
+
+//  QmitkNodeDescriptor* labelSetImageDataNodeDescriptor = new
+//      QmitkNodeDescriptor("LabelSetImage", QString(":/Qmitk/LabelSetImage_48.png"), isLabelSetImage, this);
+
+//  QmitkNodeDescriptorManager::GetInstance()->AddDescriptor(labelSetImageDataNodeDescriptor);
+
+  QAction* renameAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Rename_48.png"), "Rename...", this);
+  QObject::connect( renameAction, SIGNAL( triggered(bool) ) , this, SLOT( RenameSelectedNode(bool) ) );
+  unknownDataNodeDescriptor->AddAction(renameAction);
+  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,renameAction));
 
   QAction* globalReinitAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"), "Global Reinit", this);
   QObject::connect( globalReinitAction, SIGNAL( triggered(bool) )
@@ -298,6 +313,11 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   unknownDataNodeDescriptor->AddAction(colorAction, false);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,colorAction));
 
+  m_ActionCenterRotation = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/CenterRotation_48.png"),"Center Rotation", this);
+  QObject::connect( m_ActionCenterRotation, SIGNAL( triggered() ), this, SLOT( CenterRotationChanged() ) );
+  surfaceDataNodeDescriptor->AddAction(m_ActionCenterRotation);
+  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(surfaceDataNodeDescriptor, m_ActionCenterRotation));
+
   m_TextureInterpolation = new QAction("Texture Interpolation", this);
   m_TextureInterpolation->setCheckable ( true );
   QObject::connect( m_TextureInterpolation, SIGNAL( changed() )
@@ -305,7 +325,20 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QObject::connect( m_TextureInterpolation, SIGNAL( toggled(bool) )
     , this, SLOT( TextureInterpolationToggled(bool) ) );
   imageDataNodeDescriptor->AddAction(m_TextureInterpolation, false);
+//  labelSetImageDataNodeDescriptor->AddAction(m_TextureInterpolation, false);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,m_TextureInterpolation));
+//  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(labelSetImageDataNodeDescriptor,m_TextureInterpolation));
+
+  m_ColormapAction = new QAction("Colormap", this);
+  m_ColormapAction->setMenu(new QMenu);
+//  m_ColormapAction->setCheckable(true);
+//  m_ColormapAction->setChecked(false);
+//  QObject::connect( m_ColormapAction, SIGNAL( toggled (bool) )
+//    , this, SLOT( ColormapActionEnabled(bool) ) );
+  QObject::connect( m_ColormapAction->menu(), SIGNAL( aboutToShow() )
+    , this, SLOT( ColormapMenuAboutToShow() ) );
+  imageDataNodeDescriptor->AddAction(m_ColormapAction, false);
+  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor, m_ColormapAction));
 
   m_SurfaceRepresentation = new QAction("Surface Representation", this);
   m_SurfaceRepresentation->setMenu(new QMenu);
@@ -337,14 +370,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( ShowInfoDialogForSelectedNodes(bool) ) );
   unknownDataNodeDescriptor->AddAction(actionShowInfoDialog);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,actionShowInfoDialog));
-
-  //obsolete...
-  //QAction* otsuFilterAction = new QAction("Apply Otsu Filter", this);
-  //QObject::connect( otsuFilterAction, SIGNAL( triggered(bool) )
-  //  , this, SLOT( OtsuFilter(bool) ) );
-  // //Otsu filter does not work properly, remove it temporarily
-  // imageDataNodeDescriptor->AddAction(otsuFilterAction);
-  // m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,otsuFilterAction));
 
   QGridLayout* _DndFrameWidgetLayout = new QGridLayout;
   _DndFrameWidgetLayout->addWidget(m_NodeTreeView, 0, 0);
@@ -395,6 +420,14 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
       contextMenuAction->SetSmoothed(true);
     }
     contextMenuAction->SetDecimated(m_SurfaceDecimation);
+  }
+  else if(className == "QmitkCreateMultiLabelSegmentationAction")
+  {
+    contextMenuAction->SetDataStorage(this->GetDataStorage());
+  }
+  else if(className == "QmitkConvertToMultiLabelSegmentationAction")
+  {
+    contextMenuAction->SetDataStorage(this->GetDataStorage());
   }
   else if(className == "QmitkStatisticsAction")
   {
@@ -486,10 +519,10 @@ void QmitkDataManagerView::OpacityActionChanged()
 }
 
 void QmitkDataManagerView::ColorChanged()
- {
-   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
-   if(node)
-   {
+{
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  if(node)
+  {
     mitk::Color color;
     mitk::ColorProperty::Pointer colorProp;
     node->GetProperty(colorProp,"color");
@@ -529,6 +562,39 @@ void QmitkDataManagerView::ColorActionChanged()
   }
 }
 
+void QmitkDataManagerView::CenterRotationChanged()
+{
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  if (node)
+  {
+    mitk::Surface* surface = dynamic_cast<mitk::Surface*> (node->GetData());
+    if (!surface) return;
+
+    mitk::Geometry3D* surfaceGeometry = surface->GetGeometry(0);
+    if (!surfaceGeometry) return;
+
+    mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
+
+    if (renderWindowPart == NULL)
+      renderWindowPart = this->OpenRenderWindowPart(false);
+
+  //  QmitkStdMultiWidget *multiwidget = this->GetActiveStdMultiWidget();
+
+    QmitkRenderWindow* renderWindow = renderWindowPart->GetQmitkRenderWindow("3d");
+    if (!renderWindow) return;
+
+    mitk::BaseRenderer* baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow->GetVtkRenderWindow());
+    if (!baseRenderer) return;
+
+    mitk::CameraController* controller = baseRenderer->GetCameraController();
+
+    mitk::Point3D center = surfaceGeometry->GetCenter();
+    controller->SetCameraFocalPoint(center);
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+  }
+}
+
 void QmitkDataManagerView::TextureInterpolationChanged()
 {
   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
@@ -546,9 +612,70 @@ void QmitkDataManagerView::TextureInterpolationToggled( bool checked )
   if(node)
   {
     node->SetBoolProperty("texture interpolation", checked);
+    node->GetData()->Modified(); // fixme: workaround to force data-type rendering (and not only property-type)
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 
+}
+
+void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
+{
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  if(!node)
+    return;
+
+  mitk::EnumerationProperty* cmProp =
+      dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("colormap"));
+  if(!cmProp)
+    return;
+
+  QAction* senderAction = qobject_cast<QAction*> ( QObject::sender() );
+
+  if(!senderAction)
+    return;
+
+  std::string activatedItem = senderAction->text().toStdString();
+
+  if ( activatedItem != cmProp->GetValueAsString() )
+  {
+    if ( cmProp->IsValidEnumerationValue( activatedItem ) )
+    {
+        cmProp->SetValue( activatedItem );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+  }
+}
+
+void QmitkDataManagerView::ColormapMenuAboutToShow()
+{
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  if(!node)
+    return;
+
+  mitk::EnumerationProperty* cmProp =
+      dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("colormap"));
+  if(!cmProp)
+    return;
+
+  // clear menu
+  m_ColormapAction->menu()->clear();
+  QAction* tmp;
+
+  // create menu entries
+  for(mitk::EnumerationProperty::EnumConstIterator it=cmProp->Begin(); it!=cmProp->End()
+    ; it++)
+  {
+    tmp = m_ColormapAction->menu()->addAction(QString::fromStdString(it->second));
+    tmp->setCheckable(true);
+
+    if(it->second == cmProp->GetValueAsString())
+    {
+      tmp->setChecked(true);
+    }
+
+    QObject::connect( tmp, SIGNAL( triggered(bool) )
+      , this, SLOT( ColormapActionToggled(bool) ) );
+  }
 }
 
 void QmitkDataManagerView::SurfaceRepresentationMenuAboutToShow()
@@ -612,7 +739,28 @@ void QmitkDataManagerView::SurfaceRepresentationActionToggled( bool /*checked*/ 
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
+}
 
+void QmitkDataManagerView::RenameSelectedNode( bool )
+{
+  QModelIndexList indexesOfSelectedRows = m_NodeTreeView->selectionModel()->selectedRows();
+  if (indexesOfSelectedRows.size() != 1)
+  {
+    return;
+  }
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(indexesOfSelectedRows.at(0));
+  if ( node == 0 )
+  {
+    return;
+  }
+  bool ok = false;
+  QString oldName = QString::fromStdString(node->GetName());
+  QString newName = QInputDialog::getText(m_Parent, "MITK", "New name:", QLineEdit::Normal, oldName, &ok);
+
+  if(ok)
+  {
+    node->SetName(newName.toStdString());
+  }
 }
 
 void QmitkDataManagerView::SaveSelectedNodes( bool )
@@ -833,58 +981,6 @@ void QmitkDataManagerView::GlobalReinit( bool )
   renderWindow->GetRenderingManager()->InitializeViews(bounds);
 }
 
-void QmitkDataManagerView::OtsuFilter( bool )
-{
-  QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
-
-  mitk::Image::Pointer mitkImage = 0;
-  foreach(mitk::DataNode::Pointer node, selectedNodes)
-  {
-    mitkImage = dynamic_cast<mitk::Image*>( node->GetData() );
-
-    if(mitkImage.IsNull())
-      continue;
-
-    try
-    {
-      // get selected mitk image
-      const unsigned short dim = 3;
-      typedef short InputPixelType;
-      typedef unsigned char OutputPixelType;
-
-      typedef itk::Image< InputPixelType, dim > InputImageType;
-      typedef itk::Image< OutputPixelType, dim > OutputImageType;
-
-      typedef itk::OtsuThresholdImageFilter< InputImageType, OutputImageType > FilterType;
-      FilterType::Pointer filter = FilterType::New();
-
-      filter->SetOutsideValue( 1 );
-      filter->SetInsideValue( 0 );
-
-      InputImageType::Pointer itkImage;
-      mitk::CastToItkImage(mitkImage, itkImage);
-
-      filter->SetInput( itkImage );
-
-      filter->Update();
-
-      mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
-      std::string nameOfResultImage = node->GetName();
-      nameOfResultImage.append("Otsu");
-      resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
-      resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
-      resultNode->SetData( mitk::ImportItkImage(filter->GetOutput())->Clone());
-
-      this->GetDataStorage()->Add(resultNode, node);
-
-    }
-    catch( std::exception& err )
-    {
-      MITK_ERROR(this->GetClassName()) << err.what();
-    }
-
-  }
-}
 void QmitkDataManagerView::NodeTreeViewRowsRemoved (
   const QModelIndex & /*parent*/, int /*start*/, int /*end*/ )
 {
@@ -928,8 +1024,7 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
     if ( node.IsNotNull() )
       node->SetBoolProperty("selected", true);
   }
-  //changing the selection does NOT require any rendering processes!
-  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ShowIn(const QString &editorId)

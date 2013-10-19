@@ -581,6 +581,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::IncreaseSlider()
 
 void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
 {
+  /*
   //get image node
   if(m_InputImageNode.IsNull())
   {
@@ -633,6 +634,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
   newNode->SetVisibility(false);
   m_Controls.m_cbVolumeRendering->setChecked(false);
   //TODO disable slider etc...
+*/
 }
 
 template<typename TPixel, unsigned int VImageDimension>

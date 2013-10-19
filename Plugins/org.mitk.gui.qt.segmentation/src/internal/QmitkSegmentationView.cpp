@@ -164,8 +164,6 @@ void QmitkSegmentationView::Deactivated()
     }
     m_BinaryPropertyObserverTags.clear();
 
-    mitk::RenderingManager::GetInstance()->RemoveObserver(m_RenderingManagerObserverTag);
-
     ctkPluginContext* context = mitk::PluginActivator::getContext();
     ctkServiceReference ppmRef = context->getServiceReference<mitk::PlanePositionManagerService>();
     mitk::PlanePositionManagerService* service = context->getService<mitk::PlanePositionManagerService>(ppmRef);
@@ -364,12 +362,15 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
 
   if (!selectedNodeIsVisible)
   {
-    this->SetToolSelectionBoxesEnabled(false);
+    m_Controls->m_ManualToolSelectionBox2D->setEnabled(false);
+    m_Controls->m_SlicesInterpolator->setEnabled(false);
     this->UpdateWarningLabel("The selected segmentation is currently not visible!");
+    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
   }
   else
   {
-    this->SetToolSelectionBoxesEnabled(true);
+    m_Controls->m_ManualToolSelectionBox2D->setEnabled(true);
+    m_Controls->m_SlicesInterpolator->setEnabled(true);
     this->UpdateWarningLabel("");
   }
 }

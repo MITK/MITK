@@ -57,7 +57,7 @@ mitk::BinaryThresholdULTool::BinaryThresholdULTool()
   m_ThresholdFeedbackNode->SetProperty( "color", ColorProperty::New(0.0, 1.0, 0.0) );
   m_ThresholdFeedbackNode->SetProperty( "name", StringProperty::New("Thresholding feedback") );
   m_ThresholdFeedbackNode->SetProperty( "opacity", FloatProperty::New(0.3) );
-  m_ThresholdFeedbackNode->SetProperty("binary", BoolProperty::New(true));
+  m_ThresholdFeedbackNode->SetProperty( "binary", BoolProperty::New(true));
   m_ThresholdFeedbackNode->SetProperty( "helper object", BoolProperty::New(true) );
 }
 
@@ -192,6 +192,7 @@ static void ITKSetVolume( itk::Image<TPixel, VImageDimension>* originalImage, mi
 
 void mitk::BinaryThresholdULTool::CreateNewSegmentationFromThreshold(DataNode* node)
 {
+  /*
   if (node)
   {
     Image::Pointer feedBackImage = dynamic_cast<Image*>( m_ThresholdFeedbackNode->GetData() );
@@ -249,6 +250,7 @@ void mitk::BinaryThresholdULTool::CreateNewSegmentationFromThreshold(DataNode* n
       }
     }
   }
+  */
 }
 
 

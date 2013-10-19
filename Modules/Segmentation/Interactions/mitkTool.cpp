@@ -29,32 +29,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::Tool::Tool(const char* type)
 : StateMachine(type),
-  m_SupportRoi(false),
-  // for reference images
-  m_PredicateImages(NodePredicateDataType::New("Image")),
-  m_PredicateDim3(NodePredicateDimension::New(3, 1)),
-  m_PredicateDim4(NodePredicateDimension::New(4, 1)),
-  m_PredicateDimension( mitk::NodePredicateOr::New(m_PredicateDim3, m_PredicateDim4) ),
-  m_PredicateImage3D( NodePredicateAnd::New(m_PredicateImages, m_PredicateDimension) ),
-
-  m_PredicateBinary(NodePredicateProperty::New("binary", BoolProperty::New(true))),
-  m_PredicateNotBinary( NodePredicateNot::New(m_PredicateBinary) ),
-
-  m_PredicateSegmentation(NodePredicateProperty::New("segmentation", BoolProperty::New(true))),
-  m_PredicateNotSegmentation( NodePredicateNot::New(m_PredicateSegmentation) ),
-
-  m_PredicateHelper(NodePredicateProperty::New("helper object", BoolProperty::New(true))),
-  m_PredicateNotHelper( NodePredicateNot::New(m_PredicateHelper) ),
-
-  m_PredicateImageColorful( NodePredicateAnd::New(m_PredicateNotBinary, m_PredicateNotSegmentation) ),
-
-  m_PredicateImageColorfulNotHelper( NodePredicateAnd::New(m_PredicateImageColorful, m_PredicateNotHelper) ),
-
-  m_PredicateReference( NodePredicateAnd::New(m_PredicateImage3D, m_PredicateImageColorfulNotHelper) ),
-
-  // for working image
-  m_IsSegmentationPredicate(NodePredicateAnd::New(NodePredicateOr::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper))
+  m_SupportRoi(false)
 {
+  m_PredicateWorking = mitk::NodePredicateAnd::New();
+  m_PredicateWorking->AddPredicate(NodePredicateDimension::New(3, 1));
+  m_PredicateWorking->AddPredicate(mitk::NodePredicateDataType::New("LabelSetImage"));
+  m_PredicateWorking->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+
+  mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
+  mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
+  mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
+
+  mitk::NodePredicateOr::Pointer validImages = mitk::NodePredicateOr::New();
+  validImages->AddPredicate( mitk::TNodePredicateDataType<mitk::Image>::New() );
+  validImages->AddPredicate(isDwi);
+  validImages->AddPredicate(isDti);
+  validImages->AddPredicate(isQbi);
+
+  m_PredicateReference = mitk::NodePredicateAnd::New();
+  m_PredicateReference->AddPredicate(validImages);
+  m_PredicateReference->AddPredicate(mitk::NodePredicateNot::New(m_PredicateWorking));
+  m_PredicateReference->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
 }
 
 mitk::Tool::~Tool()
@@ -114,7 +109,7 @@ mitk::NodePredicateBase::ConstPointer mitk::Tool::GetReferenceDataPreference() c
 
 mitk::NodePredicateBase::ConstPointer mitk::Tool::GetWorkingDataPreference() const
 {
-  return m_IsSegmentationPredicate.GetPointer();
+  return m_PredicateWorking.GetPointer();
 }
 
 mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original, const std::string& organName, const mitk::Color& color )
@@ -190,7 +185,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, const 
   segmentationNode->SetProperty( "name", StringProperty::New( organName ) );
 
   // visualization properties
-  segmentationNode->SetProperty( "binary", BoolProperty::New(true) );
+  //segmentationNode->SetProperty( "binary", BoolProperty::New(true) );
   segmentationNode->SetProperty( "color", ColorProperty::New(color) );
   segmentationNode->SetProperty( "texture interpolation", BoolProperty::New(false) );
   segmentationNode->SetProperty( "layer", IntProperty::New(10) );

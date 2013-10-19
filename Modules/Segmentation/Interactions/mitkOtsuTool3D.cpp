@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLevelWindowProperty.h>
 #include <mitkLookupTableProperty.h>
 #include "mitkOtsuSegmentationFilter.h"
+#include "mitkLabelSetImage.h"
 
 // ITK
 #include <itkOtsuMultipleThresholdsImageFilter.h>
@@ -133,10 +134,11 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
   m_MultiLabelResultNode->SetOpacity(1.0);
 
   this->m_MultiLabelResultNode->SetData( otsuFilter->GetOutput() );
-  m_MultiLabelResultNode->SetProperty("binary", mitk::BoolProperty::New(false));
+//  m_MultiLabelResultNode->SetProperty("binary", mitk::BoolProperty::New(false));
   mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-  renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
-  m_MultiLabelResultNode->SetProperty("Image Rendering.Mode", renderingMode);
+  renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW );
+//  m_MultiLabelResultNode->SetProperty("Image Rendering.Mode", renderingMode);
+/*
   mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
   mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
   vtkLookupTable *lookupTable = vtkLookupTable::New();
@@ -153,6 +155,7 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
   levelwindow.SetRangeMinMax(0, numberOfThresholds + 1);
   levWinProp->SetLevelWindow( levelwindow );
   m_MultiLabelResultNode->SetProperty( "levelwindow", levWinProp );
+  */
 
   //m_BinaryPreviewNode->SetVisibility(false);
 //  m_MultiLabelResultNode->SetVisibility(true);
@@ -162,14 +165,15 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
 
 void mitk::OtsuTool3D::ConfirmSegmentation()
 {
-  GetTargetSegmentationNode()->SetData(dynamic_cast<mitk::Image*>(m_BinaryPreviewNode->GetData()));
-  m_ToolManager->ActivateTool(-1);
+//  GetTargetSegmentationNode()->SetData(dynamic_cast<mitk::Image*>(m_BinaryPreviewNode->GetData()));
 }
 
 void mitk::OtsuTool3D::UpdateBinaryPreview(int regionID)
 {
-  m_MultiLabelResultNode->SetVisibility(false);
+  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(m_MultiLabelResultNode->GetData());
+ // m_MultiLabelResultNode->SetVisibility(false);
   //pixel with regionID -> binary image
+/*
   const unsigned short dim = 3;
   typedef unsigned char PixelType;
 
@@ -194,7 +198,8 @@ void mitk::OtsuTool3D::UpdateBinaryPreview(int regionID)
   m_BinaryPreviewNode->SetData(binarySegmentation);
   m_BinaryPreviewNode->SetVisibility(true);
   m_BinaryPreviewNode->SetProperty("outline binary", mitk::BoolProperty::New(false));
-
+  m_BinaryPreviewNode->SetOpacity(1.0);
+*/
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

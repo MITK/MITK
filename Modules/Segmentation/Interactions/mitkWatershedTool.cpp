@@ -111,7 +111,7 @@ void mitk::WatershedTool::DoIt()
     dataNode->SetProperty("binary", mitk::BoolProperty::New(false));
     dataNode->SetProperty("name", mitk::StringProperty::New("Watershed Result"));
     mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-    renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
+    renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW );
     dataNode->SetProperty("Image Rendering.Mode", renderingMode);
 
     // since we create a multi label image, define a vtk lookup table

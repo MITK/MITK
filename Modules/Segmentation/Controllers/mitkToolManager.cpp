@@ -27,6 +27,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDisplayInteractor.h"
 #include "mitkSegTool2D.h"
 
+#include "mitkLabelSetImage.h"
+
+// MicroServices
+#include "mitkGetModuleContext.h"
+#include "mitkModule.h"
+#include "mitkModuleRegistry.h"
 
 
 mitk::ToolManager::ToolManager(DataStorage* storage)
@@ -214,8 +220,6 @@ void mitk::ToolManager::SetReferenceData(DataVectorType data)
     m_ReferenceDataObserverTags.clear();
     for ( DataVectorType::iterator dataIter = m_ReferenceData.begin(); dataIter != m_ReferenceData.end(); ++dataIter )
     {
-
-
       //MITK_INFO << "Observing " << (void*)(*dataIter) << std::endl;
       itk::MemberCommand<ToolManager>::Pointer command = itk::MemberCommand<ToolManager>::New();
       command->SetCallbackFunction( this, &ToolManager::OnOneOfTheReferenceDataDeleted );
@@ -464,6 +468,25 @@ void mitk::ToolManager::SetDataStorage(DataStorage& storage)
   m_DataStorage = &storage;
 }
 
+const mitk::Label* mitk::ToolManager::GetActiveLabel()
+{
+  if (m_WorkingData.empty()) return NULL;
+
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* > ( m_WorkingData.at(0)->GetData() );
+  assert(workingImage);
+
+  return workingImage->GetActiveLabel( workingImage->GetActiveLayer() );
+}
+
+bool mitk::ToolManager::GetLabelLocked(int index)
+{
+  if (m_WorkingData.empty()) return false;
+
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* > ( m_WorkingData.at(0)->GetData() );
+  assert(workingImage);
+
+  return workingImage->GetLabelLocked(workingImage->GetActiveLayer(), index);
+}
 
 
 mitk::DataNode* mitk::ToolManager::GetWorkingData(int idx)

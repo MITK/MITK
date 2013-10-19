@@ -8,5 +8,19 @@
         <file>PlanarRectangle_48.png</file>
         <file>PlanarCircle_48.png</file>
         <file>icon_seedpoint.png</file>
+        <file>lock.png</file>
+        <file>unlock.png</file>
+        <file>visible.png</file>
+        <file>invisible.png</file>
+        <file>newlabel.png</file>
+        <file>removelabel.png</file>
+        <file>randomcolor.png</file>
+        <file>renamelabel.png</file>
+        <file>createsurface.png</file>
+        <file>createmask.png</file>
+        <file>mergelabels.png</file>
+        <file>eraselabel.png</file>
+        <file>smoothlabel.png</file>
+        <file>outline.png</file>
     </qresource>
 </RCC>

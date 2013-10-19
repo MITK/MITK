@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "usModuleResource.h"
 #include "usModuleResourceStream.h"
+#include "mitkLabelSetImage.h"
 
 #include "mitkToolManagerProvider.h"
 
@@ -45,7 +46,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage*
  m_LastToolGUI(NULL),
  m_ToolButtonGroup(NULL),
  m_ButtonLayout(NULL),
- m_EnabledMode(EnabledWithReferenceAndWorkingDataVisible)
+ m_EnabledMode(EnabledWithReferenceAndWorkingData)
 {
   QFont currentFont = QWidget::font();
   currentFont.setBold(true);
@@ -94,11 +95,6 @@ void QmitkToolSelectionBox::SetEnabledMode(EnabledMode mode)
 {
   m_EnabledMode = mode;
   SetGUIEnabledAccordingToToolManagerState();
-}
-
-mitk::ToolManager* QmitkToolSelectionBox::GetToolManager()
-{
-  return m_ToolManager;
 }
 
 void QmitkToolSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no NULL pointer allowed here, a manager is required
@@ -298,6 +294,14 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 {
   mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  int hasLabels = false;
+  if (workingNode)
+  {
+    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
+    assert(workingImage);
+    int activeLayer = workingImage->GetActiveLayer();
+    hasLabels = workingImage->GetNumberOfLabels(activeLayer) > 1;
+  }
 
   //MITK_DEBUG << this->name() << ": SetGUIEnabledAccordingToToolManagerState: referenceNode " << (void*)referenceNode << " workingNode " << (void*)workingNode << " isVisible() " << isVisible();
 
@@ -306,11 +310,8 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
   switch ( m_EnabledMode )
   {
     default:
-    case EnabledWithReferenceAndWorkingDataVisible:
-      enabled = referenceNode && workingNode
-                  && referenceNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")))
-                  && workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")))
-                  && isVisible();
+    case EnabledWithReferenceAndWorkingData:
+      enabled = referenceNode && workingNode && isVisible();// && hasLabels;
       break;
     case EnabledWithReferenceData:
       enabled = referenceNode && isVisible();
@@ -340,7 +341,6 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 
     emit ToolSelected(-1);
   }
-
 }
 
 /**

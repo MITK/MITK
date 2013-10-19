@@ -24,6 +24,9 @@ set(CPP_FILES
   Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
   Algorithms/mitkShowSegmentationAsSurface.cpp
   Algorithms/mitkVtkImageOverwrite.cpp
+  Algorithms/mitkLabelSetImageToSurfaceFilter.cpp
+  Algorithms/mitkLabelSetImageToSurfaceThreadedFilter.cpp
+  Algorithms/mitkSurfaceStampImageFilter.cpp
   Controllers/mitkSegmentationInterpolationController.cpp
   Controllers/mitkToolManager.cpp
   Controllers/mitkSegmentationModuleActivator.cpp
@@ -33,6 +36,9 @@ set(CPP_FILES
   #DataManagement/mitkContourModel.cpp
   DataManagement/mitkContourSet.cpp
   DataManagement/mitkExtrudedContour.cpp
+  DataManagement/mitkLabel.cpp
+  DataManagement/mitkLabelSet.cpp
+  DataManagement/mitkLabelSetImage.cpp
   Interactions/mitkAdaptiveRegionGrowingTool.cpp
   Interactions/mitkAddContourTool.cpp
   Interactions/mitkAutoCropTool.cpp
@@ -53,6 +59,7 @@ set(CPP_FILES
   Interactions/mitkExtrudedContourInteractor.cpp
   Interactions/mitkFastMarchingTool.cpp
   Interactions/mitkFastMarchingTool3D.cpp
+  Interactions/mitkMedianTool3D.cpp
   Interactions/mitkFeedbackContourTool.cpp
   Interactions/mitkFillRegionTool.cpp
   Interactions/mitkLiveWireTool2D.cpp
@@ -64,6 +71,7 @@ set(CPP_FILES
   Interactions/mitkSegmentationsProcessingTool.cpp
   Interactions/mitkSetRegionTool.cpp
   Interactions/mitkSegTool2D.cpp
+  Interactions/mitkSegTool3D.cpp
   Interactions/mitkSubtractContourTool.cpp
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
@@ -72,6 +80,11 @@ set(CPP_FILES
   #IO/mitkContourModelReader.cpp
   #IO/mitkContourModelWriter.cpp
   #IO/mitkContourModelWriterFactory.cpp
+  IO/mitkNrrdLabelSetImageIOFactory.cpp
+  IO/mitkNrrdLabelSetImageWriterFactory.cpp
+  IO/mitkNrrdLabelSetImageReader.cpp
+  IO/mitkNrrdLabelSetImageWriter.cpp
+  IO/mitkLabelSetImageSource.cpp
   Rendering/mitkContourMapper2D.cpp
   #Rendering/mitkContourModelGLMapper2D.cpp
   #Rendering/mitkContourModelMapper2D.cpp
@@ -79,6 +92,7 @@ set(CPP_FILES
   Rendering/mitkContourSetMapper2D.cpp
   Rendering/mitkContourSetVtkMapper3D.cpp
   Rendering/mitkContourVtkMapper3D.cpp
+  Rendering/mitkLabelSetImageVtkMapper2D.cpp
   SegmentationUtilities/BooleanOperations/mitkBooleanOperation.cpp
   SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.cpp
 )
@@ -109,4 +123,5 @@ set(RESOURCE_FILES
   Watershed_Cursor_32x32.png
   Wipe_48x48.png
   Wipe_Cursor_32x32.png
+  MedianTool3D_48x48.png
 )

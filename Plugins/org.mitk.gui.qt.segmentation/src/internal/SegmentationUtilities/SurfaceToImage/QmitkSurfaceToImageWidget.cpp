@@ -153,4 +153,3 @@ mitk::Image::Pointer QmitkSurfaceToImageWidget::ConvertSurfaceToImage( mitk::Ima
 
   return resultImage;
 }
-

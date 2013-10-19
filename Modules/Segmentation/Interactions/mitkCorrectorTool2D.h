@@ -21,10 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationExports.h"
 #include "mitkFeedbackContourTool.h"
 
+<<<<<<< HEAD
 namespace us {
 class ModuleResource;
 }
 
+=======
+>>>>>>> bug-15696-multi-label-segmentation-v3
 namespace mitk
 {
 
@@ -58,9 +61,12 @@ class Segmentation_EXPORT CorrectorTool2D : public FeedbackContourTool
     itkNewMacro(CorrectorTool2D);
 
     virtual const char** GetXPM() const;
+<<<<<<< HEAD
     virtual us::ModuleResource GetCursorIconResource() const;
     us::ModuleResource GetIconResource() const;
 
+=======
+>>>>>>> bug-15696-multi-label-segmentation-v3
     virtual const char* GetName() const;
 
   protected:

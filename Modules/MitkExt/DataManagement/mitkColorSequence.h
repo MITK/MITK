@@ -13,6 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+
 #ifndef MITKCOLORSEQUENCE_H_URTESEINDEUTIGEKENNUNG_01
 #define MITKCOLORSEQUENCE_H_URTESEINDEUTIGEKENNUNG_01
 
@@ -27,11 +28,12 @@ namespace mitk
 
   See derived classes for implemented sequences.
 */
-class MitkExt_EXPORT ColorSequence
+class MitkExt_EXPORT ColorSequence : public itk::Object
 {
-public:
-  ColorSequence();
-  virtual ~ColorSequence();
+  public:
+
+    mitkClassMacro( ColorSequence, itk::Object );
+//    itkNewMacro(Self);
 
   /*!
   \brief Return another color
@@ -42,6 +44,11 @@ public:
   \brief Set the color-index to begin again
   */
   virtual void GoToBegin() = 0;
+
+protected:
+
+  ColorSequence();
+  virtual ~ColorSequence();
 
 };
 

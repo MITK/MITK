@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
+#include "mitkOperation.h"
 #include "mitkTool.h"
 
 namespace mitk
@@ -35,33 +36,42 @@ class Segmentation_EXPORT AutoSegmentationTool : public Tool
 
     mitkClassMacro(AutoSegmentationTool, Tool);
 
-    void SetOverwriteExistingSegmentation(bool overwrite);
-
-    /**
-     * @brief Gets the name of the currently selected segmentation node
-     * @return the name of the segmentation node or an empty string if
-     *         none is selected
-     */
-    std::string GetCurrentSegmentationName();
-
-    /**
-     * @brief Depending on the selected mode either returns the currently selected segmentation
-     *        or creates a new one from the selected reference data and adds the new segmentation
-     *        to the datastorage
-     * @return a mitk::DataNode which contains a segmentation image
-     */
-    virtual mitk::DataNode* GetTargetSegmentationNode();
-
   protected:
+
+    /// Operation base class, which holds pointers to a node of the data tree (mitk::DataNode)
+    /// and to two data sets (mitk::BaseData) instances
+    class opExchangeNodes: public mitk::Operation
+    {
+    public: opExchangeNodes( mitk::OperationType type,  mitk::DataNode* node,
+                                                        mitk::BaseData* oldData,
+                                                        mitk::BaseData* newData );
+            mitk::DataNode* GetNode() { return m_Node; }
+            mitk::BaseData* GetOldData() { return m_OldData; }
+            mitk::BaseData* GetNewData() { return m_NewData; }
+    private: mitk::DataNode::Pointer m_Node;
+             mitk::BaseData::Pointer m_OldData;
+             mitk::BaseData::Pointer m_NewData;
+    };
 
     AutoSegmentationTool(); // purposely hidden
     virtual ~AutoSegmentationTool();
 
     virtual const char* GetGroup() const;
 
+    // operation constant
+    static const mitk::OperationType OP_EXCHANGE;
+
+    /// \brief Interface of a mitk::StateMachine (for undo/redo)
+    void  ExecuteOperation (mitk::Operation*);
+
     virtual Image::Pointer Get3DImage(Image::Pointer image, unsigned int timestep);
 
-    bool m_OverwriteExistingSegmentation;
+    void InitializeUndoController();
+
+    void PasteSegmentation( Image* targetImage, Image* sourceImage, int pixelvalue, int timestep );
+
+    template<typename TPixel, unsigned int VImageDimension>
+    void ItkPasteSegmentation( itk::Image<TPixel,VImageDimension>* targetImage, const mitk::Image* sourceImage, int pixelvalue );
  };
 
 } // namespace

@@ -23,6 +23,7 @@ Qmitk/QmitkToolRoiDataSelectionBox.cpp
 Qmitk/QmitkToolSelectionBox.cpp
 Qmitk/QmitkToolWorkingDataSelectionBox.cpp
 Qmitk/QmitkWatershedToolGUI.cpp
+Qmitk/QmitkMedianTool3DGUI.cpp
 )
 
 set(MOC_H_FILES
@@ -50,6 +51,7 @@ Qmitk/QmitkToolRoiDataSelectionBox.h
 Qmitk/QmitkToolSelectionBox.h
 Qmitk/QmitkToolWorkingDataSelectionBox.h
 Qmitk/QmitkWatershedToolGUI.h
+Qmitk/QmitkMedianTool3DGUI.h
 )
 
 set(UI_FILES

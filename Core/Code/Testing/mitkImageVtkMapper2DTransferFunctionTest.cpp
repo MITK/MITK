@@ -45,7 +45,7 @@ int mitkImageVtkMapper2DTransferFunctionTest(int argc, char* argv[])
   transferFucntion->SetColorTransferFunction( colorTransferFunction );
 
   //set the rendering mode to use the transfer function
-  renderingHelper.SetImageProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR));
+  renderingHelper.SetImageProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION));
   //set the property for the image
   renderingHelper.SetImageProperty("Image Rendering.Transfer Function", mitk::TransferFunctionProperty::New(transferFucntion));
 

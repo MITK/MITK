@@ -58,4 +58,3 @@ namespace mitk
 }// end namespace mitk
 
 #endif /* define MITKPROGRESSBARIMPLEMENTATION_H */
-

@@ -221,6 +221,7 @@ set(CPP_FILES
   DataManagement/mitkPropertyDescriptions.cpp
   DataManagement/mitkPropertyExtensions.cpp
   DataManagement/mitkPropertyFilters.cpp
+  DataManagement/mitkColormapProperty.cpp
 
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp

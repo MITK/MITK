@@ -26,8 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStateEvent.h"
 #include "mitkLabelSetImage.h"
 
-#include "mitkMessage.h"
-
 #include "itkImage.h"
 
 //itk filter
@@ -56,8 +54,6 @@ namespace mitk
 */
 class Segmentation_EXPORT FastMarchingTool : public SegTool2D
 {
-    mitkNewMessageMacro(Ready);
-
   public:
 
     mitkClassMacro(FastMarchingTool, SegTool2D);
@@ -78,16 +74,11 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
     typedef FastMarchingFilterType::NodeType                                                            NodeType;
 
     /* icon stuff */
-    const char** GetXPM() const;
-    const char* GetName() const;
+    virtual const char** GetXPM() const;
+    virtual const char* GetName() const;
 
-<<<<<<< HEAD
     virtual us::ModuleResource GetCursorIconResource() const;
     us::ModuleResource GetIconResource() const;
-=======
-    ModuleResource GetCursorIconResource() const;
-    ModuleResource GetIconResource() const;
->>>>>>> bug-15696-multi-label-segmentation-v3
 
     /// \brief Set parameter used in Threshold filter.
     void SetUpperThreshold(double);

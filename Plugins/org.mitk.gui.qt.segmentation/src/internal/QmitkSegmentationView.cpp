@@ -149,7 +149,7 @@ void QmitkSegmentationView::Deactivated()
     m_Controls->m_ManualToolSelectionBox3D->setEnabled( false );
     //deactivate all tools
     mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
-    m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
+//    m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
 
     //Removing all observers
     for ( NodeTagMapType::iterator dataIter = m_WorkingDataObserverTags.begin(); dataIter != m_WorkingDataObserverTags.end(); ++dataIter )
@@ -163,6 +163,8 @@ void QmitkSegmentationView::Deactivated()
       (*dataIter).first->GetProperty("binary")->RemoveObserver( (*dataIter).second );
     }
     m_BinaryPropertyObserverTags.clear();
+
+    mitk::RenderingManager::GetInstance()->RemoveObserver(m_RenderingManagerObserverTag);
 
     ctkPluginContext* context = mitk::PluginActivator::getContext();
     ctkServiceReference ppmRef = context->getServiceReference<mitk::PlanePositionManagerService>();
@@ -207,7 +209,7 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
     controllers.push_back(m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController());
     controllers.push_back(m_MultiWidget->GetRenderWindow2()->GetSliceNavigationController());
     controllers.push_back(m_MultiWidget->GetRenderWindow3()->GetSliceNavigationController());
-    m_Controls->m_SlicesInterpolator->Initialize( toolManager, controllers );
+//    m_Controls->m_SlicesInterpolator->Initialize( toolManager, controllers );
   }
 }
 
@@ -362,15 +364,12 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
 
   if (!selectedNodeIsVisible)
   {
-    m_Controls->m_ManualToolSelectionBox2D->setEnabled(false);
-    m_Controls->m_SlicesInterpolator->setEnabled(false);
+    this->SetToolSelectionBoxesEnabled(false);
     this->UpdateWarningLabel("The selected segmentation is currently not visible!");
-    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
   }
   else
   {
-    m_Controls->m_ManualToolSelectionBox2D->setEnabled(true);
-    m_Controls->m_SlicesInterpolator->setEnabled(true);
+    this->SetToolSelectionBoxesEnabled(true);
     this->UpdateWarningLabel("");
   }
 }
@@ -1122,7 +1121,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer2D );
   m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' '2D Fast Marching'");
   m_Controls->m_ManualToolSelectionBox2D->SetLayoutColumns(3);
-  m_Controls->m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
+//  m_Controls->m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
   connect( m_Controls->m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
 
   //setup 3D Tools
@@ -1131,7 +1130,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   //specify tools to be added to 3D Tool area
   m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'UL Threshold' Otsu 'Fast Marching 3D' 'Region Growing 3D' Watershed");
   m_Controls->m_ManualToolSelectionBox3D->SetLayoutColumns(3);
-  m_Controls->m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
+//  m_Controls->m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
 
   //Hide 3D selection box, show 2D selection box
   m_Controls->m_ManualToolSelectionBox3D->hide();

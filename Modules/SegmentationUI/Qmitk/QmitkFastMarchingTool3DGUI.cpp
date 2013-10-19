@@ -192,15 +192,12 @@ m_TimeIsConnected(false)
   widgetLayout->addWidget(m_btClearSeeds);
   connect( m_btClearSeeds, SIGNAL(clicked()), this, SLOT(OnClearSeeds()) );
 
-  m_btConfirm = new QPushButton("Confirm Segmentation");
+  m_btConfirm = new QPushButton("Accept");
   m_btConfirm->setToolTip("Incorporate current result in your working session.");
-  m_btConfirm->setEnabled(false);
   widgetLayout->addWidget(m_btConfirm);
   connect( m_btConfirm, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()) );
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
-
-  this->setEnabled(false);
 }
 
 QmitkFastMarchingTool3DGUI::~QmitkFastMarchingTool3DGUI()
@@ -208,7 +205,6 @@ QmitkFastMarchingTool3DGUI::~QmitkFastMarchingTool3DGUI()
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>( this, &QmitkFastMarchingTool3DGUI::BusyStateChanged );
-    m_FastMarchingTool->RemoveReadyListener(mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady) );
   }
 }
 
@@ -217,7 +213,6 @@ void QmitkFastMarchingTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>( this, &QmitkFastMarchingTool3DGUI::BusyStateChanged );
-    m_FastMarchingTool->RemoveReadyListener(mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady) );
   }
 
   m_FastMarchingTool = dynamic_cast<mitk::FastMarchingTool3D*>( tool );
@@ -225,7 +220,6 @@ void QmitkFastMarchingTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->CurrentlyBusy += mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>( this, &QmitkFastMarchingTool3DGUI::BusyStateChanged );
-    m_FastMarchingTool->AddReadyListener(mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady) );
 
     //listen to timestep change events
     mitk::BaseRenderer::Pointer renderer;
@@ -323,7 +317,6 @@ void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->ConfirmSegmentation();
-    m_btConfirm->setEnabled(false);
   }
 }
 
@@ -351,10 +344,4 @@ void QmitkFastMarchingTool3DGUI::BusyStateChanged(bool value)
     QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
   else
     QApplication::restoreOverrideCursor();
-}
-
-void QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady()
-{
-  this->setEnabled(true);
-  this->m_btConfirm->setEnabled(true);
 }

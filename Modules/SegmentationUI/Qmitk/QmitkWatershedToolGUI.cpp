@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkWatershedToolGUI.h"
 
 #include "QmitkNewSegmentationDialog.h"
-#include "mitkProgressBar.h"
 
 #include <qlabel.h>
 #include <qslider.h>
@@ -50,7 +49,7 @@ QmitkWatershedToolGUI::QmitkWatershedToolGUI()
   label2->setFont( f );
   layout->addWidget(label2,2,0);
 
-  m_ThresholdLabel = new QLabel( " 0.04", this );
+  m_ThresholdLabel = new QLabel( " 0.5", this );
   f = m_ThresholdLabel->font();
   f.setBold(false);
   m_ThresholdLabel->setFont( f );
@@ -60,11 +59,11 @@ QmitkWatershedToolGUI::QmitkWatershedToolGUI()
   m_SliderThreshold->setMinimum(0);
   m_SliderThreshold->setMaximum(100);
   m_SliderThreshold->setPageStep(1);
-  m_SliderThreshold->setValue(4);
+  m_SliderThreshold->setValue(50);
   connect( m_SliderThreshold, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueThresholdChanged(int)));
   layout->addWidget( m_SliderThreshold, 1, 0, 1, 2 );
 
-  m_LevelLabel = new QLabel( " 0.35", this );
+  m_LevelLabel = new QLabel( " 0.5", this );
   f = m_LevelLabel->font();
   f.setBold(false);
   m_LevelLabel->setFont( f );
@@ -74,11 +73,11 @@ QmitkWatershedToolGUI::QmitkWatershedToolGUI()
   m_SliderLevel->setMinimum(0);
   m_SliderLevel->setMaximum(100);
   m_SliderLevel->setPageStep(1);
-  m_SliderLevel->setValue(35);
+  m_SliderLevel->setValue(50);
   connect( m_SliderLevel, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueLevelChanged(int)));
   layout->addWidget( m_SliderLevel, 3, 0, 1, 2 );
 
-  QPushButton* okButton = new QPushButton("Run Segmentation", this);
+  QPushButton* okButton = new QPushButton("Create Segmentation", this);
   connect( okButton, SIGNAL(clicked()), this, SLOT(OnCreateSegmentation()));
   okButton->setFont( f );
   layout->addWidget( okButton, 4, 0, 1, 2 );
@@ -109,8 +108,6 @@ void QmitkWatershedToolGUI::OnNewToolAssociated(mitk::Tool* tool)
   }
 
   m_WatershedTool = dynamic_cast<mitk::WatershedTool*>( tool );
-  OnSliderValueLevelChanged(35);
-  OnSliderValueThresholdChanged(4);
 
   if (m_WatershedTool.IsNotNull())
   {
@@ -140,6 +137,7 @@ void QmitkWatershedToolGUI::OnSliderValueLevelChanged(int value)
 
 void QmitkWatershedToolGUI::OnCreateSegmentation()
 {
+  QCursor oldCursor = *QApplication::overrideCursor();
   QApplication::setOverrideCursor(Qt::BusyCursor);
   m_InformationLabel->setText(QString("Please wait some time for computation..."));
   m_InformationLabel->repaint();
@@ -147,10 +145,5 @@ void QmitkWatershedToolGUI::OnCreateSegmentation()
 
   m_WatershedTool->DoIt();
   m_InformationLabel->setText(QString(""));
-  QApplication::setOverrideCursor(Qt::ArrowCursor);
-
-  for(int i=0; i<60; ++i)
-  {
-    mitk::ProgressBar::GetInstance()->Progress();
-  }
+  QApplication::setOverrideCursor(oldCursor);
 }

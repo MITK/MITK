@@ -199,8 +199,8 @@ void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* ori
   // start the whole pipeline
   cast->Update();
 
-  // reset the progress bar by setting progress
-  command->SetProgress(10);
+  // reset the progress bar
+  command->Reset();
 
   // since we obtain a new image from our pipeline, we have to make sure, that our mitk::Image::Pointer
   // is responsible for the memory management of the output image

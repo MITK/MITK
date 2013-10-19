@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageDataItem.h"
 #include "mitkToolManagerProvider.h"
 #include "mitkToolManager.h"
+#include "mitkLabelSetImage.h"
 
 #include <itkBinaryThresholdImageFilter.h>
 #include "ipSegmentation.h"
@@ -32,7 +33,9 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   typedef itk::Image< ipMITKSegmentationTYPE, 2 > InputSliceType;
 
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  const int& activeLabel = toolManager->GetActiveLabel()->GetIndex();
+  mitk::LabelSetImage* image = dynamic_cast<mitk::LabelSetImage*>(toolManager->GetWorkingData(0)->GetData());
+  int activeLayer = image->GetActiveLayer();
+  int activePixelValue = image->GetActiveLabel(activeLayer)->GetIndex();
 
   // convert these slices to the ipSegmentation data type (into an ITK image)
   itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeLowerITKSlice;
@@ -54,8 +57,8 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
 
   InputThresholdType::Pointer thresholder1 = InputThresholdType::New();
   thresholder1->SetInput(correctPixelTypeLowerITKSlice);
-  thresholder1->SetUpperThreshold( activeLabel );
-  thresholder1->SetLowerThreshold( activeLabel );
+  thresholder1->SetUpperThreshold( activePixelValue );
+  thresholder1->SetLowerThreshold( activePixelValue );
   thresholder1->SetInsideValue( 1 );
   thresholder1->SetOutsideValue( 0 );
   thresholder1->ReleaseDataFlagOn();
@@ -79,8 +82,8 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
 
   InputThresholdType::Pointer thresholder2 = InputThresholdType::New();
   thresholder2->SetInput(correctPixelTypeUpperITKSlice);
-  thresholder2->SetUpperThreshold( activeLabel );
-  thresholder2->SetLowerThreshold( activeLabel );
+  thresholder2->SetUpperThreshold( activePixelValue );
+  thresholder2->SetLowerThreshold( activePixelValue );
   thresholder2->SetInsideValue( 1 );
   thresholder2->SetOutsideValue( 0 );
   thresholder2->ReleaseDataFlagOn();
@@ -139,8 +142,8 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
     const int targetValue = targetIterator.Get();
     if ( sourceIterator.Get() != 0 )
     {
-      if (!toolManager->GetLabelLocked(targetValue))
-        targetIterator.Set( activeLabel );
+      if (!image->GetLabelLocked(activeLayer,targetValue))
+        targetIterator.Set( activePixelValue );
     }
     else
     {

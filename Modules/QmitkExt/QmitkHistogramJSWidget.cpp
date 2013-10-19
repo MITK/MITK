@@ -39,7 +39,6 @@ QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
   page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
 
   m_ParametricPath = ParametricPathType::New();
-
 }
 
 QmitkHistogramJSWidget::~QmitkHistogramJSWidget()
@@ -126,20 +125,14 @@ bool QmitkHistogramJSWidget::GetUseLineGraph()
 
 void QmitkHistogramJSWidget::OnBarRadioButtonSelected()
 {
-  if (m_UseLineGraph)
-  {
-    m_UseLineGraph = false;
-    this->SignalGraphChanged();
-  }
+  m_UseLineGraph = false;
+  this->SignalGraphChanged();
 }
 
 void QmitkHistogramJSWidget::OnLineRadioButtonSelected()
 {
-  if (!m_UseLineGraph)
-  {
-    m_UseLineGraph = true;
-    this->SignalGraphChanged();
-  }
+  m_UseLineGraph = true;
+  this->SignalGraphChanged();
 }
 
 void QmitkHistogramJSWidget::SetImage(mitk::Image* image)

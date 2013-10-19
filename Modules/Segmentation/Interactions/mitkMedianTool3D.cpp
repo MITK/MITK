@@ -32,9 +32,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMedianImageFilter.h>
 
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include <mitkGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, MedianTool3D, "MedianTool3D tool");
@@ -54,10 +55,10 @@ const char** mitk::MedianTool3D::GetXPM() const
   return NULL;//mitkMedianTool3D_xpm;
 }
 
-mitk::ModuleResource mitk::MedianTool3D::GetIconResource() const
+us::ModuleResource mitk::MedianTool3D::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("MedianTool3D_48x48.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("MedianTool3D_48x48.png");
   return resource;
 }
 

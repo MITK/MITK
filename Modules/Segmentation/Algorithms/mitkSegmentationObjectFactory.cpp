@@ -65,11 +65,6 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
       newMapper = mitk::ContourSetMapper2D::New();
       newMapper->SetDataNode(node);
     }
-    else if((dynamic_cast<ContourModel*>(data)!=NULL))
-    {
-      newMapper = mitk::ContourModelGLMapper2D::New();
-      newMapper->SetDataNode(node);
-    }
     else if((dynamic_cast<LabelSetImage*>(data)!=NULL))
     {
       newMapper = mitk::LabelSetImageVtkMapper2D::New();
@@ -88,25 +83,18 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
       newMapper = mitk::ContourSetVtkMapper3D::New();
       newMapper->SetDataNode(node);
     }
-    else if((dynamic_cast<ContourModel*>(data)!=NULL))
-    {
-      newMapper = mitk::ContourModelMapper3D::New();
-      newMapper->SetDataNode(node);
-    }
   }
   return newMapper;
 }
 
 void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
-  if(!node) return;
 
-  mitk::ContourModel::Pointer contourModel = dynamic_cast<mitk::ContourModel*>(node->GetData());
-  if(contourModel.IsNotNull())
-  {
-    mitk::ContourModelGLMapper2D::SetDefaultProperties(node);
-    mitk::ContourModelMapper3D::SetDefaultProperties(node);
-  }
+  if(node==NULL)
+    return;
+
+  mitk::DataNode::Pointer nodePointer = node;
+
 
 //  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 //  if(image.IsNotNull() && image->IsInitialized())
@@ -145,12 +133,7 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::SegmentationObjectFactory::GetSa
 
 void mitk::SegmentationObjectFactory::CreateFileExtensionsMap()
 {
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour Files"));
-//  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation Files"));
-
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour File"));
-//  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation Files"));
-
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation Files"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.lst", "Segmentation File"));
 }
 
@@ -163,19 +146,9 @@ const char* mitk::SegmentationObjectFactory::GetSaveFileExtensions()
 
 void mitk::SegmentationObjectFactory::RegisterIOFactories()
 {
-  //register io classes of mitkContourModel
-  mitk::ContourModelIOFactory::RegisterOneFactory();
-
-  mitk::ContourModelWriterFactory::RegisterOneFactory();
-
-  this->m_FileWriters.push_back(mitk::ContourModelWriter::New().GetPointer());
-
   mitk::NrrdLabelSetImageIOFactory::RegisterOneFactory();
-
   mitk::NrrdLabelSetImageWriterFactory::RegisterOneFactory();
-
   this->m_FileWriters.push_back(mitk::NrrdLabelSetImageWriter::New().GetPointer());
-
   CreateFileExtensionsMap();
 }
 

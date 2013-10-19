@@ -214,6 +214,9 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     return;
   }
 
+  //iterator for point set
+  mitk::PointSet::PointsContainer::Iterator pointsIter = itkPointSet->GetPoints()->Begin();
+
   // PointDataContainer has additional information to each point, e.g. whether
   // it is selected or not
   mitk::PointSet::PointDataContainer::Iterator pointDataIter;
@@ -225,7 +228,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
   if(itkPointSet->GetPointData()->size() == 0  || pointDataBroken)
   {
-    ls->m_PropAssembly->VisibilityOff();
     return;
   }
 
@@ -254,9 +256,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   const int text2dDistance = 10;
 
   // initialize points with a random start value
-
-  //iterator for point set
-  mitk::PointSet::PointsContainer::Iterator pointsIter = itkPointSet->GetPoints()->Begin();
 
   // current point in point set
   itk::Point<float> point = pointsIter->Value();

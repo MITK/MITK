@@ -86,7 +86,7 @@ us::ModuleResource mitk::FastMarchingTool::GetCursorIconResource() const
 
 const char* mitk::FastMarchingTool::GetName() const
 {
-  return "2D Fast Marching";
+  return "FastMarching2D";
 }
 
 void mitk::FastMarchingTool::SetUpperThreshold(double value)
@@ -211,59 +211,16 @@ void mitk::FastMarchingTool::Deactivated()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-<<<<<<< HEAD
-void mitk::FastMarchingTool::Initialize()
-{
-  m_ReferenceImage = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
-  if(m_ReferenceImage->GetTimeGeometry()->CountTimeSteps() > 1)
-  {
-    mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
-    timeSelector->SetInput( m_ReferenceImage );
-    timeSelector->SetTimeNr( m_CurrentTimeStep );
-    timeSelector->UpdateLargestPossibleRegion();
-    m_ReferenceImage = timeSelector->GetOutput();
-  }
-  m_NeedUpdate = true;
-}
-
-void mitk::FastMarchingTool::ConfirmSegmentation()
-=======
 void mitk::FastMarchingTool::AcceptPreview()
->>>>>>> bug-15696-multi-label-segmentation-v3
 {
   mitk::Image::Pointer workingImageSlice = SegTool2D::GetAffectedWorkingSlice( m_PositionEvent );
 
-<<<<<<< HEAD
-    mitk::Image::Pointer workingImageSlice;
-    mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(this->m_ToolManager->GetWorkingData(0)->GetData());
-    if(workingImage->GetTimeGeometry()->CountTimeSteps() > 1)
-    {
-      mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-      timeSelector->SetInput( workingImage );
-      timeSelector->SetTimeNr( m_CurrentTimeStep );
-      timeSelector->UpdateLargestPossibleRegion();
-      // todo: make GetAffectedWorkingSlice dependant of current time step
-      workingImageSlice = GetAffectedWorkingSlice( m_PositionEvent );
-      CastToItkImage( workingImageSlice, workingImageSliceInITK );
-    }
-    else
-    {
-      workingImageSlice = GetAffectedWorkingSlice( m_PositionEvent );
-      CastToItkImage( workingImageSlice, workingImageSliceInITK );
-    }
+  mitk::LabelSetImage* image = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
+  int activeLayer = image->GetActiveLayer();
+  int activePixelValue = image->GetActiveLabel(activeLayer)->GetIndex();
 
-    typedef itk::OrImageFilter<OutputImageType, OutputImageType> OrImageFilterType;
-    OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
-
-    orFilter->SetInput(0, m_ThresholdFilter->GetOutput());
-    orFilter->SetInput(1, workingImageSliceInITK);
-    orFilter->Update();
-
-    mitk::Image::Pointer segmentationResult = mitk::Image::New();
-=======
   // paste the binary segmentation to the current working slice
-  mitk::SegTool2D::PasteSegmentationOnWorkingImage( workingImageSlice, m_FeedbackImage, m_ToolManager->GetActiveLabel()->GetIndex(), m_CurrentTimeStep );
->>>>>>> bug-15696-multi-label-segmentation-v3
+  mitk::SegTool2D::PasteSegmentationOnWorkingImage( workingImageSlice, m_FeedbackImage, activePixelValue, m_CurrentTimeStep );
 
   // paste current working slice back to the working image
   mitk::SegTool2D::WriteBackSegmentationResult(m_PositionEvent, workingImageSlice);
@@ -351,8 +308,6 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
 
   m_NeedUpdate = true;
 
-  m_ReadyMessage.Send();
-
   this->Update();
 
   return true;
@@ -401,12 +356,10 @@ bool mitk::FastMarchingTool::OnDelete(Action* action, const StateEvent* stateEve
 
 void mitk::FastMarchingTool::Update()
 {
-  const unsigned int progress_steps = 20;
-
   // update FastMarching pipeline and show result
   if (m_NeedUpdate)
   {
-    m_ProgressCommand->AddStepsToDo(progress_steps);
+    m_ProgressCommand->AddStepsToDo(20);
     CurrentlyBusy.Send(true);
     try
     {
@@ -414,25 +367,14 @@ void mitk::FastMarchingTool::Update()
     }
     catch( itk::ExceptionObject& e )
     {
-<<<<<<< HEAD
-     MITK_ERROR << "Exception caught: " << excep.GetDescription();
-
-     // progress by max step count, will force
-     m_ProgressCommand->SetProgress(progress_steps);
-=======
      m_ProgressCommand->Reset();
->>>>>>> bug-15696-multi-label-segmentation-v3
      CurrentlyBusy.Send(false);
      std::string msg = e.GetDescription();
      ErrorMessage.Send(msg);
      return;
     }
-<<<<<<< HEAD
-    m_ProgressCommand->SetProgress(progress_steps);
-=======
 
     m_ProgressCommand->Reset();
->>>>>>> bug-15696-multi-label-segmentation-v3
     CurrentlyBusy.Send(false);
 
     OutputImageType::Pointer output = m_ThresholdFilter->GetOutput();
@@ -457,20 +399,8 @@ void mitk::FastMarchingTool::ClearSeeds()
   if(this->m_SeedContainer.IsNotNull())
     this->m_SeedContainer->Initialize();
 
-<<<<<<< HEAD
-  if(this->m_SeedsAsPointSet.IsNotNull())
-  {
-    this->m_SeedsAsPointSet = mitk::PointSet::New();
-    this->m_SeedsAsPointSetNode->SetData(this->m_SeedsAsPointSet);
-    m_SeedsAsPointSetNode->SetName("Seeds_Preview");
-    m_SeedsAsPointSetNode->SetBoolProperty("helper object", true);
-    m_SeedsAsPointSetNode->SetColor(0.0, 1.0, 0.0);
-    m_SeedsAsPointSetNode->SetVisibility(true);
-  }
-=======
   this->m_SeedsAsPointSet = mitk::PointSet::New(); // m_SeedsAsPointSet->Clear() does not work
   this->m_SeedsAsPointSetNode->SetData(this->m_SeedsAsPointSet);
->>>>>>> bug-15696-multi-label-segmentation-v3
 
   if(this->m_FastMarchingFilter.IsNotNull())
     m_FastMarchingFilter->Modified();

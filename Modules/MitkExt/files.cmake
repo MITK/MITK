@@ -18,6 +18,7 @@ set(CPP_FILES
   Algorithms/mitkMaskImageFilter.cpp
   Algorithms/mitkMeshSource.cpp
   Algorithms/mitkNonBlockingAlgorithm.cpp
+  Algorithms/mitkPadImageFilter.cpp
   Algorithms/mitkPlaneCutFilter.cpp
   Algorithms/mitkPlaneFit.cpp
   Algorithms/mitkPlanesPerpendicularToLinesFilter.cpp

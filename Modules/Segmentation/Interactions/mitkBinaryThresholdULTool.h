@@ -45,7 +45,7 @@ namespace mitk
   {
   public:
 
-    Message2<double,double> IntervalBordersChanged;
+    Message2<mitk::ScalarType,mitk::ScalarType> IntervalBordersChanged;
     Message2<mitk::ScalarType, mitk::ScalarType>     ThresholdingValuesChanged;
 
     mitkClassMacro(BinaryThresholdULTool, AutoSegmentationTool);
@@ -58,7 +58,7 @@ namespace mitk
     virtual void Activated();
     virtual void Deactivated();
 
-    virtual void SetThresholdValues(double lower, double upper);
+    virtual void SetThresholdValues(int lower, int upper);
     virtual void AcceptCurrentThresholdValue();
     virtual void CancelThresholding();
 
@@ -74,6 +74,9 @@ namespace mitk
 
     void OnRoiDataChanged();
     void UpdatePreview();
+
+    template <typename TPixel, unsigned int VImageDimension>
+    void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, unsigned int timeStep );
 
     DataNode::Pointer m_ThresholdFeedbackNode;
     DataNode::Pointer m_OriginalImageNode;

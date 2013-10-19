@@ -64,7 +64,6 @@ m_3DInterpolationEnabled(false)
   m_gbControls->setCheckable(true);
   m_gbControls->setChecked(false);
 
-
   QVBoxLayout* vboxLayout = new QVBoxLayout(m_gbControls);
 
   m_cbInterpolationMode = new QComboBox(m_gbControls);
@@ -83,7 +82,6 @@ m_3DInterpolationEnabled(false)
 
   m_chkShowPositionNodes = new QCheckBox("Show Position Nodes", m_gbControls);
   vboxLayout->addWidget(m_chkShowPositionNodes);
-
 
   this->HideAllInterpolationControls();
 
@@ -419,15 +417,15 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
 
   const mitk::SliceNavigationController::GeometrySliceEvent& event = dynamic_cast<const mitk::SliceNavigationController::GeometrySliceEvent&>(e);
 
-  mitk::TimeSlicedGeometry* tsg = event.GetTimeSlicedGeometry();
-  if (tsg && m_TimeStep.contains(slicer))
+  mitk::TimeGeometry* tsg = event.GetTimeGeometry();
+    if (tsg && m_TimeStep.contains(slicer))
   {
-    mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(tsg->GetGeometry3D(m_TimeStep[slicer]));
+    mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(tsg->GetGeometryForTimeStep(m_TimeStep[slicer]).GetPointer());
     if (slicedGeometry)
     {
       m_LastSNC = slicer;
       mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetGeometry2D( event.GetPos() ));
-      if (plane != NULL)
+      if (plane)
       {
         this->Interpolate( plane, m_TimeStep[slicer], slicer );
         return true;
@@ -453,7 +451,7 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
   {
     mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
     contourExtractor->SetInput(interpolation);
-    contourExtractor->SetUseProgressBar(false);
+//    contourExtractor->SetUseProgressBar(false);
 
     try
     {
@@ -540,7 +538,7 @@ mitk::Image::Pointer QmitkSlicesInterpolator::GetWorkingSlice(const mitk::PlaneG
   extractor->SetTimeStep( timeStep );
   extractor->SetWorldGeometry( planeGeometry );
   extractor->SetVtkOutputRequest(false);
-  extractor->SetResliceTransformByGeometry( m_WorkingImage->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+  extractor->SetResliceTransformByGeometry( m_WorkingImage->GetTimeGeometry()->GetGeometryForTimeStep(timeStep) );
 
   extractor->Modified();
 
@@ -597,7 +595,7 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     extractor->SetTimeStep( timeStep );
     extractor->SetWorldGeometry( planeGeometry );
     extractor->SetVtkOutputRequest(true);
-    extractor->SetResliceTransformByGeometry( m_WorkingImage->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+    extractor->SetResliceTransformByGeometry( m_WorkingImage->GetTimeGeometry()->GetGeometryForTimeStep(timeStep) );
 
     extractor->Modified();
 
@@ -670,7 +668,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     {
       mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
       contourExtractor->SetInput(interpolation);
-      contourExtractor->SetUseProgressBar(false);
+//      contourExtractor->SetUseProgressBar(false);
 
       try
       {
@@ -712,7 +710,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       extractor->SetTimeStep( timeStep );
       extractor->SetWorldGeometry( reslicePlane );
       extractor->SetVtkOutputRequest(true);
-      extractor->SetResliceTransformByGeometry( m_WorkingImage->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+      extractor->SetResliceTransformByGeometry( m_WorkingImage->GetTimeGeometry()->GetGeometryForTimeStep(timeStep) );
 
       extractor->Modified();
 
@@ -864,8 +862,6 @@ void QmitkSlicesInterpolator::Activate3DInterpolation(bool on)
 {
   m_3DInterpolationEnabled = on;
 
-  this->CheckSupportedImageDimension();
-
   try
   {
     if ( m_DataStorage.IsNotNull() && m_ToolManager && m_3DInterpolationEnabled)
@@ -942,7 +938,7 @@ void QmitkSlicesInterpolator::UpdateVisibleSuggestion()
       const mitk::TimeGeometry* timeGeometry = dynamic_cast<const mitk::TimeGeometry*>( renderer->GetWorldGeometry() );
       if (timeGeometry)
       {
-        mitk::SliceNavigationController::GeometrySliceEvent event( const_cast<mitk::TimeSlicedGeometry*>(timeSlicedGeometry), renderer->GetSlice() );
+        mitk::SliceNavigationController::GeometrySliceEvent event( const_cast<mitk::TimeGeometry*>(timeGeometry), renderer->GetSlice() );
         this->TranslateAndInterpolateChangedSlice(event, m_LastSNC);
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
@@ -1007,11 +1003,7 @@ void QmitkSlicesInterpolator::SetCurrentContourListID()
         m_SurfaceInterpolator->SetMinSpacing(minSpacing);
         m_SurfaceInterpolator->SetDistanceImageVolume(50000);
 
-        mitk::Image* segmentationImage = dynamic_cast<mitk::Image*>(workingNode->GetData());
-        if (segmentationImage->GetDimension() == 3)
-          m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(segmentationImage);
-        else
-          MITK_INFO<<"3D Interpolation is only supported for 3D images at the moment!";
+        m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(dynamic_cast<mitk::Image*>(workingNode->GetData()));
 
         if (m_3DInterpolationEnabled)
         {
@@ -1038,19 +1030,6 @@ void QmitkSlicesInterpolator::Show3DInterpolationResult(bool status)
       m_3DContourNode->SetVisibility(status, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
 
    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkSlicesInterpolator::CheckSupportedImageDimension()
-{
-  if (m_3DInterpolationEnabled && m_Segmentation->GetDimension() != 3)
-  {
-    QMessageBox info;
-    info.setWindowTitle("3D Interpolation Process");
-    info.setIcon(QMessageBox::Information);
-    info.setText("3D Interpolation is only supported for 3D images at the moment!");
-    info.exec();
-    m_CmbInterpolation->setCurrentIndex(0);
-  }
 }
 
 void QmitkSlicesInterpolator::OnSliceNavigationControllerDeleted(const itk::Object *sender, const itk::EventObject& /*e*/)

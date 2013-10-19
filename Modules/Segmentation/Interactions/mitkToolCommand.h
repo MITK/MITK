@@ -59,7 +59,7 @@ namespace mitk {
       * \brief Sets the remaining progress to the progress bar when the optimization process is done.
       *
       */
-      void SetProgress(int steps);
+      void SetRemainingProgress(int steps);
 
       /**
       * \brief Brings back the progress bar to its initial state.

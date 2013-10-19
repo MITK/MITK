@@ -128,6 +128,7 @@ protected:
 
   void SetMouseCursor(const us::ModuleResource&, int hotspotX, int hotspotY );
 
+  void SetToolSelectionBoxesEnabled(bool);
 
   bool m_MouseCursorSet;
 

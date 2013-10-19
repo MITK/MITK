@@ -155,27 +155,29 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     */
   unsigned int size = originalPicSlice->n[0] * originalPicSlice->n[1];
 
-  int activeLabel = m_ToolManager->GetActiveLabel()->GetIndex();
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
+  int activeLayer = workingImage->GetActiveLayer();
+  int activePixelValue = workingImage->GetActiveLabel(activeLayer)->GetIndex();
 
 /*
   unsigned int rowSize = originalPicSlice->n[0];
 */
   ipMITKSegmentationTYPE* data = static_cast<ipMITKSegmentationTYPE*>(originalPicSlice->data);
 
-  if ( data[oneContourOffset] != activeLabel ) // ) // initial seed 0
+  if ( data[oneContourOffset] != activePixelValue ) // ) // initial seed 0
   {
     for ( ; oneContourOffset < size; ++oneContourOffset )
     {
-      if ( data[oneContourOffset] == activeLabel ) break;
+      if ( data[oneContourOffset] == activePixelValue ) break;
     }
   }
-  else if ( data[oneContourOffset] == activeLabel ) // initial seed 1
+  else if ( data[oneContourOffset] == activePixelValue ) // initial seed 1
   {
     unsigned int lastValidPixel = size-1; // initialization, will be changed lateron
     bool inSeg = true;    // inside segmentation?
     for ( ; oneContourOffset < size; ++oneContourOffset )
     {
-      if ( (data[oneContourOffset] != activeLabel) && inSeg ) // pixel 0 and inside-flag set: this happens at the first pixel outside a filled region
+      if ( (data[oneContourOffset] != activePixelValue) && inSeg ) // pixel 0 and inside-flag set: this happens at the first pixel outside a filled region
       {
         inSeg = false;
         lastValidPixel = oneContourOffset - 1; // store the last pixel position inside a filled region

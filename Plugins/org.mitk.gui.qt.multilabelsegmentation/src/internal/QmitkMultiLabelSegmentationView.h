@@ -80,7 +80,7 @@ protected:
 
   void ResetMouseCursor();
 
-  void SetMouseCursor(const mitk::ModuleResource, int hotspotX, int hotspotY );
+  void SetMouseCursor(const us::ModuleResource, int hotspotX, int hotspotY );
 
   /**
   * Reimplemented from QmitkAbstractView

@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOtsuTool3D.h"
 #include "mitkToolManager.h"
 #include "mitkRenderingManager.h"
-#include <mitkSliceNavigationController.h>
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 #include <mitkRenderingModeProperty.h>
@@ -60,8 +59,6 @@ void mitk::OtsuTool3D::Activated()
 
     m_BinaryPreviewNode = mitk::DataNode::New();
     m_BinaryPreviewNode->SetName("Binary_Preview");
-    m_BinaryPreviewNode->SetProperty( "color", ColorProperty::New(0.0, 1.0, 0.0) );
-    m_BinaryPreviewNode->SetProperty( "opacity", FloatProperty::New(0.3) );
     //m_BinaryPreviewNode->SetBoolProperty("helper object", true);
     //m_BinaryPreviewNode->SetProperty("binary", mitk::BoolProperty::New(true));
     m_ToolManager->GetDataStorage()->Add( this->m_BinaryPreviewNode );
@@ -86,8 +83,7 @@ void mitk::OtsuTool3D::Deactivated()
   m_MultiLabelResultNode = NULL;
   m_ToolManager->GetDataStorage()->Remove( this->m_BinaryPreviewNode );
   m_BinaryPreviewNode = NULL;
-  m_ToolManager->GetDataStorage()->Remove( this->m_MaskedImagePreviewNode);
-  m_MaskedImagePreviewNode = NULL;
+  m_ToolManager->ActivateTool(-1);
 }
 
 const char** mitk::OtsuTool3D::GetXPM() const
@@ -108,13 +104,9 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
 
   int numberOfThresholds = regions - 1;
 
-  unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
-
-  mitk::Image::Pointer image3D = Get3DImage(m_OriginalImage, timestep);
-
   mitk::OtsuSegmentationFilter::Pointer otsuFilter = mitk::OtsuSegmentationFilter::New();
   otsuFilter->SetNumberOfThresholds( numberOfThresholds );
-  otsuFilter->SetInput( image3D );
+  otsuFilter->SetInput( m_OriginalImage );
 
   try
   {

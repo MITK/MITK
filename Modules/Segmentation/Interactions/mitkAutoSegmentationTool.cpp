@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAutoSegmentationTool.h"
 #include "mitkToolManager.h"
-#include <mitkImageTimeSelector.h>
 #include "mitkUndoController.h"
 #include "mitkLabelSetImage.h"
 #include "mitkImageCast.h"
@@ -104,12 +103,19 @@ void mitk::AutoSegmentationTool::ItkPasteSegmentation( itk::Image<TPixel,VImageD
   sourceIterator.GoToBegin();
   targetIterator.GoToBegin();
 
-  int activePixelValue = m_ToolManager->GetActiveLabel()->GetIndex();
+  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  assert (workingNode);
+
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  assert (workingImage);
+
+  int activeLayer = workingImage->GetActiveLayer();
+  int activePixelValue = workingImage->GetActiveLabelIndex(activeLayer);
 
   while ( !targetIterator.IsAtEnd() )
   {
     int targetValue = static_cast< int >( targetIterator.Get() );
-    if ( !m_ToolManager->GetLabelLocked(targetValue) && sourceIterator.Get() )
+    if ( !workingImage->GetLabelLocked(activeLayer,targetValue) && sourceIterator.Get() )
     {
       targetIterator.Set( overwritevalue );
     }

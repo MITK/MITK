@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInstantiateAccessFunctions.h"
 #include "mitkToolManagerProvider.h"
 #include "mitkToolManager.h"
+#include "mitkLabelSetImage.h"
 #include "ipSegmentation.h"
 
 #define InstantiateAccessFunction_ItkCopyFilledContourToSlice(pixelType, dim) \
@@ -128,8 +129,6 @@ void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDi
   typename SliceType::Pointer filledContourSliceITK;
   CastToItkImage( filledContourSlice, filledContourSliceITK );
 
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-
   // now the original slice and the ipSegmentation-painted slice are in the same format, and we can just copy all pixels that are non-zero
   typedef itk::ImageRegionIterator< SliceType >       OutputIteratorType;
   typedef itk::ImageRegionConstIterator< SliceType >   InputIteratorType;
@@ -140,7 +139,10 @@ void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDi
   outputIterator.GoToBegin();
   inputIterator.GoToBegin();
 
-  const int& activePixelValue = toolManager->GetActiveLabel()->GetIndex();
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  mitk::LabelSetImage* image = dynamic_cast<mitk::LabelSetImage*>(toolManager->GetWorkingData(0)->GetData());
+  int activeLayer = image->GetActiveLayer();
+  int activePixelValue = image->GetActiveLabel(activeLayer)->GetIndex();
 
   if (activePixelValue == 0) // if exterior is the active label
   {
@@ -161,7 +163,7 @@ void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDi
       const int targetValue = outputIterator.Get();
       if ( inputIterator.Get() != 0 )
       {
-        if (!toolManager->GetLabelLocked(targetValue))
+        if (!image->GetLabelLocked(activeLayer,targetValue))
           outputIterator.Set( overwritevalue );
       }
 

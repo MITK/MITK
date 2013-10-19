@@ -129,7 +129,6 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
     void Signal2DInterpolationEnabled(bool);
     void Signal3DInterpolationEnabled(bool);
 
-
   protected slots:
 
     /**
@@ -217,7 +216,6 @@ private:
     void HideAllInterpolationControls();
     void Show2DInterpolationControls(bool show);
     void Show3DInterpolationControls(bool show);
-
     void Disable3DRendering();
 
     mitk::SegmentationInterpolationController::Pointer m_SliceInterpolatorController;

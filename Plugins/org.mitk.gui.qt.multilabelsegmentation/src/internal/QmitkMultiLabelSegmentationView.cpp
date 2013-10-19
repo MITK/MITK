@@ -28,17 +28,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegmentationObjectFactory.h"
 #include "mitkSegTool2D.h"
 #include "mitkPlanePositionManager.h"
+#include "mitkPluginActivator.h"
 
 // Qmitk
 #include "QmitkMultiLabelSegmentationOrganNamesHandling.cpp"
 #include "QmitkRenderWindow.h"
 
 // us
-#include "mitkGetModuleContext.h"
-#include "mitkModule.h"
-#include "mitkModuleRegistry.h"
-#include "mitkModuleResource.h"
-#include "mitkPluginActivator.h"
+#include "usModuleResource.h"
+#include "usModuleResourceStream.h"
 
 // Qt
 #include <QMessageBox>
@@ -55,7 +53,7 @@ m_WorkingNode(NULL),
 m_ToolManager(NULL),
 m_MouseCursorSet(false)
 {
-  RegisterSegmentationObjectFactory();
+//  RegisterSegmentationObjectFactory();
 
   m_SegmentationPredicate = mitk::NodePredicateAnd::New();
   m_SegmentationPredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
@@ -276,16 +274,12 @@ void QmitkMultiLabelSegmentationView::NodeRemoved(const mitk::DataNode* node)
   if (m_ReferenceNode.IsNotNull() && dynamic_cast<mitk::LabelSetImage*>(node->GetData()))
   {
     //First of all remove all possible contour markers of the segmentation
-    mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers =
-        this->GetDataStorage()->GetDerivations(node, mitk::NodePredicateProperty::New("isContourMarker", mitk::BoolProperty::New(true)));
+    mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = this->GetDataStorage()->GetDerivations(node, mitk::NodePredicateProperty::New("isContourMarker"
+                                                                            , mitk::BoolProperty::New(true)));
 
-    // gets the context of the "Mitk" (Core) module (always has id 1)
-    // TODO Workaround until CTK plugincontext is available
-    mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
-    // Workaround end
-    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::PlanePositionManagerService>();
-
-    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(context->GetService(serviceRef));
+    ctkPluginContext* context = mitk::PluginActivator::getContext();
+    ctkServiceReference ppmRef = context->getServiceReference<mitk::PlanePositionManagerService>();
+    mitk::PlanePositionManagerService* service = context->getService<mitk::PlanePositionManagerService>(ppmRef);
 
     for (mitk::DataStorage::SetOfObjects::ConstIterator it = allContourMarkers->Begin(); it != allContourMarkers->End(); ++it)
     {
@@ -297,6 +291,9 @@ void QmitkMultiLabelSegmentationView::NodeRemoved(const mitk::DataNode* node)
 
       this->GetDataStorage()->Remove(it->Value());
     }
+
+    context->ungetService(ppmRef);
+    service = NULL;
   }
 }
 
@@ -442,7 +439,7 @@ void QmitkMultiLabelSegmentationView::OnManualTool2DSelected(int id)
     text += "\"";
     mitk::StatusBar::GetInstance()->DisplayText(text.c_str());
 
-    mitk::ModuleResource resource = m_ToolManager->GetToolById(id)->GetCursorIconResource();
+    us::ModuleResource resource = m_ToolManager->GetToolById(id)->GetCursorIconResource();
     this->SetMouseCursor(resource, 0, 0);
   }
   else
@@ -461,7 +458,7 @@ void QmitkMultiLabelSegmentationView::ResetMouseCursor()
   }
 }
 
-void QmitkMultiLabelSegmentationView::SetMouseCursor( const mitk::ModuleResource resource, int hotspotX, int hotspotY )
+void QmitkMultiLabelSegmentationView::SetMouseCursor( const us::ModuleResource resource, int hotspotX, int hotspotY )
 {
   // Remove previously set mouse cursor
   if ( m_MouseCursorSet )
@@ -469,7 +466,8 @@ void QmitkMultiLabelSegmentationView::SetMouseCursor( const mitk::ModuleResource
     mitk::ApplicationCursor::GetInstance()->PopCursor();
   }
 
-  mitk::ApplicationCursor::GetInstance()->PushCursor( resource, hotspotX, hotspotY );
+  us::ModuleResourceStream cursor(resource, std::ios::binary);
+  mitk::ApplicationCursor::GetInstance()->PushCursor( cursor, hotspotX, hotspotY );
   m_MouseCursorSet = true;
 }
 

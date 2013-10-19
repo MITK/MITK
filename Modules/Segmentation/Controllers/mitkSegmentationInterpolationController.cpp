@@ -339,7 +339,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
   mitk::ExtractSliceFilter::Pointer extractor = ExtractSliceFilter::New();
   extractor->SetInput(m_WorkingImage);
   extractor->SetTimeStep(timeStep);
-  extractor->SetResliceTransformByGeometry( m_WorkingImage->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+  extractor->SetResliceTransformByGeometry( m_WorkingImage->GetTimeGeometry()->GetGeometryForTimeStep( timeStep ) );
   extractor->SetVtkOutputRequest(false);
 
   //Reslicing the current plane

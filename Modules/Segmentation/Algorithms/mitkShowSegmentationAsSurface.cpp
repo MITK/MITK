@@ -167,62 +167,80 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
 
 void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
 {
-  m_Node = DataNode::New();
+  m_Node = LookForPointerTargetBelowGroupNode("Surface representation");
 
-  bool wireframe(false);
-  GetParameter("Wireframe", wireframe );
-  if (wireframe)
+  m_AddToTree = m_Node.IsNull();
+
+  if (m_AddToTree)
   {
-    VtkRepresentationProperty *np = dynamic_cast<VtkRepresentationProperty*>(m_Node->GetProperty("material.representation"));
-    if (np)
-      np->SetRepresentationToWireframe();
+    m_Node = DataNode::New();
+
+    bool wireframe(false);
+    GetParameter("Wireframe", wireframe );
+    if (wireframe)
+    {
+      VtkRepresentationProperty *np = dynamic_cast<VtkRepresentationProperty*>(m_Node->GetProperty("material.representation"));
+      if (np)
+        np->SetRepresentationToWireframe();
+    }
+
+    m_Node->SetProperty("opacity", FloatProperty::New(0.3) );
+    m_Node->SetProperty("line width", IntProperty::New(1) );
+    m_Node->SetProperty("scalar visibility", BoolProperty::New(false) );
+
+    std::string uid = m_UIDGeneratorSurfaces.GetUID();
+    m_Node->SetProperty( "FILENAME", StringProperty::New( uid + ".vtk" ) ); // undocumented feature of Image::WriteXMLData
+    std::string groupNodesName ("surface");
+
+    DataNode* groupNode = GetGroupNode();
+    if (groupNode)
+    {
+      groupNode->GetName( groupNodesName );
+    }
+    m_Node->SetProperty( "name", StringProperty::New(groupNodesName) );
+
+    // synchronize this object's color with the parent's color
+    //surfaceNode->SetProperty( "color", parentNode->GetProperty( "color" ) );
+    //surfaceNode->SetProperty( "visible", parentNode->GetProperty( "visible" ) );
   }
-
-  m_Node->SetProperty("opacity", FloatProperty::New(0.3) );
-  m_Node->SetProperty("line width", IntProperty::New(1) );
-  m_Node->SetProperty("scalar visibility", BoolProperty::New(false) );
-
-  std::string groupNodesName ("surface");
-
-  DataNode* groupNode = GetGroupNode();
-  if (groupNode)
-  {
-    groupNode->GetName( groupNodesName );
-  }
-  m_Node->SetProperty( "name", StringProperty::New(groupNodesName) );
-
-  // synchronize this object's color with the parent's color
-  //surfaceNode->SetProperty( "color", parentNode->GetProperty( "color" ) );
-  //surfaceNode->SetProperty( "visible", parentNode->GetProperty( "visible" ) );
 
   m_Node->SetData( m_Surface );
 
-  BaseProperty* colorProp = groupNode->GetProperty("color");
-  if (colorProp)
-    m_Node->ReplaceProperty("color", colorProp);
-  else
-    m_Node->SetProperty("color", ColorProperty::New(1.0, 1.0, 0.0));
+  if (m_AddToTree)
+  {
 
-  bool showResult(true);
-  GetParameter("Show result", showResult );
+    DataNode* groupNode = GetGroupNode();
+    if (groupNode)
+    {
+      groupNode->SetProperty( "Surface representation", SmartPointerProperty::New(m_Node) );
+      BaseProperty* colorProp = groupNode->GetProperty("color");
+      if (colorProp)
+        m_Node->ReplaceProperty("color", colorProp);
+      else
+        m_Node->SetProperty("color", ColorProperty::New(1.0, 1.0, 0.0));
 
-  bool syncVisibility(false);
-  GetParameter("Sync visibility", syncVisibility );
+      bool showResult(true);
+      GetParameter("Show result", showResult );
 
-  Image::Pointer image;
-  GetPointerParameter("Input", image);
+      bool syncVisibility(false);
+      GetParameter("Sync visibility", syncVisibility );
 
-  BaseProperty* organTypeProp = image->GetProperty("organ type");
-  if (organTypeProp)
-    m_Surface->SetProperty("organ type", organTypeProp);
+      Image::Pointer image;
+      GetPointerParameter("Input", image);
 
-  BaseProperty* visibleProp = groupNode->GetProperty("visible");
-  if (visibleProp && syncVisibility)
-    m_Node->ReplaceProperty("visible", visibleProp);
-  else
-    m_Node->SetProperty("visible", BoolProperty::New(showResult));
+      BaseProperty* organTypeProp = image->GetProperty("organ type");
+      if (organTypeProp)
+        m_Surface->SetProperty("organ type", organTypeProp);
 
-  InsertBelowGroupNode(m_Node);
+      BaseProperty* visibleProp = groupNode->GetProperty("visible");
+      if (visibleProp && syncVisibility)
+        m_Node->ReplaceProperty("visible", visibleProp);
+      else
+        m_Node->SetProperty("visible", BoolProperty::New(showResult));
+     }
+
+    InsertBelowGroupNode(m_Node);
+  }
 
   Superclass::ThreadedUpdateSuccessful();
 }

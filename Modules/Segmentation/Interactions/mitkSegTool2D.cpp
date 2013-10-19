@@ -21,12 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkPlanarCircle.h"
-#include "mitkGetModuleContext.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkImageToContourFilter.h"
 #include "mitkSurfaceInterpolationController.h"
 #include "mitkSegmentationInterpolationController.h"
+
+#include "usGetModuleContext.h"
 
 //includes for resling and overwriting
 #include <mitkExtractSliceFilter.h>
@@ -304,7 +305,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
   extractor->SetTimeStep( timeStep );
   extractor->SetWorldGeometry( planeGeometry );
   extractor->SetVtkOutputRequest(true);
-  extractor->SetResliceTransformByGeometry( workingImage->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+  extractor->SetResliceTransformByGeometry( workingImage->GetTimeGeometry()->GetGeometryForTimeStep( timeStep ) );
   extractor->Modified();
 
   try
@@ -354,10 +355,9 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
 {
   const mitk::Geometry2D* plane = dynamic_cast<const Geometry2D*> (dynamic_cast< const mitk::SlicedGeometry3D*>(
     positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D())->GetGeometry2D(0));
-
   us::ServiceReference<PlanePositionManagerService> serviceRef =
-      us::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
-  PlanePositionManagerService* service = us::GetModuleContext()->GetService(serviceRef);
+          us::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
+      PlanePositionManagerService* service = us::GetModuleContext()->GetService(serviceRef);
   unsigned int size = service->GetNumberOfPlanePositions();
   unsigned int id = service->AddNewPlanePosition(plane, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos());
 
@@ -445,7 +445,14 @@ void mitk::SegTool2D::ItkPasteSegmentationOnWorkingImage( itk::Image<TPixel,VIma
   outputIterator.GoToBegin();
   inputIterator.GoToBegin();
 
-  const int& activePixelValue = m_ToolManager->GetActiveLabel()->GetIndex();
+  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  assert (workingNode);
+
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  assert (workingImage);
+
+  int activeLayer = workingImage->GetActiveLayer();
+  int activePixelValue = workingImage->GetActiveLabelIndex(activeLayer);
 
   if (activePixelValue == 0) // if exterior is the active label
   {
@@ -466,7 +473,7 @@ void mitk::SegTool2D::ItkPasteSegmentationOnWorkingImage( itk::Image<TPixel,VIma
       const int targetValue = outputIterator.Get();
       if ( inputIterator.Get() != 0 )
       {
-        if (!m_ToolManager->GetLabelLocked(targetValue))
+        if (!workingImage->GetLabelLocked(activeLayer,targetValue))
           outputIterator.Set( overwritevalue );
       }
 

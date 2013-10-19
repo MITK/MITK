@@ -76,10 +76,6 @@ set(CPP_FILES
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
   Interactions/mitkWatershedTool.cpp
-  #IO/mitkContourModelIOFactory.cpp
-  #IO/mitkContourModelReader.cpp
-  #IO/mitkContourModelWriter.cpp
-  #IO/mitkContourModelWriterFactory.cpp
   IO/mitkNrrdLabelSetImageIOFactory.cpp
   IO/mitkNrrdLabelSetImageWriterFactory.cpp
   IO/mitkNrrdLabelSetImageReader.cpp

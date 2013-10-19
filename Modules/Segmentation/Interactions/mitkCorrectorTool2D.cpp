@@ -18,21 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCorrectorAlgorithm.h"
 
 #include "mitkToolManager.h"
-//#include "mitkOverwriteSliceImageFilter.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 
 #include "mitkCorrectorTool2D.xpm"
 
-<<<<<<< HEAD
 // us
 #include <usModule.h>
 #include <usModuleResource.h>
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
-=======
-#include "mitkOverwriteDirectedPlaneImageFilter.h"
->>>>>>> bug-15696-multi-label-segmentation-v3
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, CorrectorTool2D, "Correction tool");
@@ -59,7 +54,6 @@ const char** mitk::CorrectorTool2D::GetXPM() const
   return mitkCorrectorTool2D_xpm;
 }
 
-<<<<<<< HEAD
 us::ModuleResource mitk::CorrectorTool2D::GetIconResource() const
 {
   us::Module* module = us::GetModuleContext()->GetModule();
@@ -74,8 +68,6 @@ us::ModuleResource mitk::CorrectorTool2D::GetCursorIconResource() const
   return resource;
 }
 
-=======
->>>>>>> bug-15696-multi-label-segmentation-v3
 const char* mitk::CorrectorTool2D::GetName() const
 {
   return "Correction";

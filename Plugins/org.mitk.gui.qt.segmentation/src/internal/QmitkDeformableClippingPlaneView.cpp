@@ -495,7 +495,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
   }
 
   //set the rendering mode to use the lookup table and level window
-  clippedNode->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR));
+  clippedNode->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW));
   mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New(lut.GetPointer());
   clippedNode->SetProperty("LookupTable", lutProp);
   // it is absolutely important, to use the LevelWindow settings provided by

@@ -45,8 +45,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkLookupTable.h>
 #include <vtkImageData.h>
 #include <vtkPoints.h>
-#include <vtkGeneralTransform.h>
-#include <vtkImageExtractComponents.h>
 #include <vtkImageReslice.h>
 #include <vtkPlaneSource.h>
 #include <vtkPolyDataMapper.h>
@@ -360,26 +358,20 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     }
   }
 
+  if (!(numberOfComponents == 1 || numberOfComponents == 3 || numberOfComponents == 4))
+  {
+    MITK_WARN << "Unknown number of components!";
+  }
+
   this->ApplyOpacity( renderer );
   this->ApplyRenderingMode(renderer);
 
   // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
   localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
-  int displayedComponent = 0;
-
-  if (datanode->GetIntProperty("Image.Displayed Component", displayedComponent, renderer) && numberOfComponents > 1)
-  {
-    localStorage->m_VectorComponentExtractor->SetComponents(displayedComponent);
-    localStorage->m_VectorComponentExtractor->SetInput(localStorage->m_ReslicedImage);
-
-    localStorage->m_LevelWindowFilter->SetInputConnection(localStorage->m_VectorComponentExtractor->GetOutputPort(0));
-  }
-  else
-  {
-    //connect the input with the levelwindow filter
-    localStorage->m_LevelWindowFilter->SetInput(localStorage->m_ReslicedImage);
-  }
+  //connect the input with the levelwindow filter
+  localStorage->m_LevelWindowFilter->SetInput(localStorage->m_ReslicedImage);
+  //connect the texture with the output of the levelwindow filter
 
   // check for texture interpolation property
   bool textureInterpolation = false;
@@ -388,7 +380,6 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   //set the interpolation modus according to the property
   localStorage->m_Texture->SetInterpolate(textureInterpolation);
 
-  // connect the texture with the output of the levelwindow filter
   localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
 
   this->TransformActor( renderer );
@@ -611,10 +602,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
   }
   else
   {
-    //"Image Rendering.Mode was set to use a lookup table but there is no property 'LookupTable'.
-    //A default (rainbow) lookup table will be used.
-    //Here have to do nothing. Warning for the user has been removed, due to unwanted console output
-    //in every interation of the rendering.
+    MITK_WARN << "Image Rendering.Mode was set to use a lookup table but there is no property 'LookupTable'. A default (rainbow) lookup table will be used.";
   }
 }
 
@@ -655,7 +643,7 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   this->CalculateTimeStep( renderer );
 
   // Check if time step is valid
-  const TimeSlicedGeometry *dataTimeGeometry = image->GetTimeSlicedGeometry();
+  const TimeGeometry *dataTimeGeometry = image->GetTimeGeometry();
   if ( ( dataTimeGeometry == NULL )
     || ( dataTimeGeometry->CountTimeSteps() == 0 )
     || ( !dataTimeGeometry->IsValidTimeStep( this->GetTimestep() ) ) )
@@ -1048,7 +1036,6 @@ mitk::ImageVtkMapper2D::LocalStorage::~LocalStorage()
 }
 
 mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
-  : m_VectorComponentExtractor(vtkSmartPointer<vtkImageExtractComponents>::New())
 {
 
   m_LevelWindowFilter = vtkSmartPointer<vtkMitkLevelWindowFilter>::New();

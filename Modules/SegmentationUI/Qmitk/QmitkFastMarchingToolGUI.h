@@ -81,8 +81,6 @@ protected:
   bool m_TimeIsConnected;
   bool m_SelfCall;
   mitk::Stepper::Pointer m_TimeStepper;
-
-  void OnFastMarchingToolReady();
 };
 
 #endif

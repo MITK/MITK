@@ -57,8 +57,6 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
   //  - the operation class (must hold a binary diff or something)
   //  - observer commands to know when the image is deleted (no further action then, perhaps even remove the operations from the undo stack)
   //
-  MITK_INFO << "OverwriteSLiceImageFilter GenerateData entered!";
-
   Image::ConstPointer input = ImageToImageFilter::GetInput(0);
   Image::ConstPointer input3D = input;
 
@@ -119,7 +117,6 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
   if (interpolator)
   {
     interpolator->BlockModified(true);
-    MITK_INFO << "calling SetChangedSlice";
     interpolator->SetChangedSlice( m_SliceDifferenceImage, m_SliceDimension, m_SliceIndex, m_TimeStep );
   }
 */

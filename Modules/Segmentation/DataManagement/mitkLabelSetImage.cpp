@@ -68,8 +68,8 @@ void mitk::LabelSetImage::Initialize(const mitk::Image* other)
     Superclass::Initialize(pixelType, other->GetDimension(), other->GetDimensions());
   }
 
-  mitk::TimeSlicedGeometry::Pointer originalGeometry = other->GetTimeSlicedGeometry()->Clone();
-  this->SetGeometry( originalGeometry );
+  mitk::TimeGeometry::Pointer originalGeometry = other->GetTimeGeometry()->Clone();
+  this->SetTimeGeometry( originalGeometry );
 
   try
   {
@@ -800,7 +800,7 @@ mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(int index)
     memset( accessor->GetData(), 0, byteSize );
     delete accessor;
 
-    mitk::TimeSlicedGeometry::Pointer geometry = this->GetTimeSlicedGeometry()->Clone();
+    mitk::SlicedGeometry3D::Pointer geometry = this->GetSlicedGeometry()->Clone();
     mask->SetGeometry( geometry );
 
     AccessByItk_2(this, CreateLabelMaskProcessing, mask, index);
@@ -952,7 +952,7 @@ void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
     memset( accessor->GetData(), 0, byteSize );
     delete accessor;
 
-    mitk::TimeSlicedGeometry::Pointer geometry = image->GetTimeSlicedGeometry()->Clone();
+    mitk::SlicedGeometry3D::Pointer geometry = image->GetSlicedGeometry()->Clone();
     this->SetGeometry( geometry );
 
     if (m_LabelSetContainer.size())

@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usModule.h"
 #include "usModuleResource.h"
 #include "usGetModuleContext.h"
+#include "usModuleContext.h"
 
 //itk
 #include <itkImageRegionIterator.h>
@@ -257,7 +258,9 @@ void mitk::BinaryThresholdTool::ITKThresholding( itk::Image<TPixel1, VDimension1
   typename SourceIteratorType sourceIterator( sourceImage, sourceImage->GetLargestPossibleRegion() );
   typename TargetIteratorType targetIterator( targetImage, targetImage->GetLargestPossibleRegion() );
 
-  int overwriteValue = m_ToolManager->GetActiveLabel()->GetIndex();
+  mitk::LabelSetImage* image = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
+  int activeLayer = image->GetActiveLayer();
+  int activePixelValue = image->GetActiveLabel(activeLayer)->GetIndex();
 
   sourceIterator.GoToBegin();
   targetIterator.GoToBegin();
@@ -267,9 +270,9 @@ void mitk::BinaryThresholdTool::ITKThresholding( itk::Image<TPixel1, VDimension1
     int targetValue = targetIterator.Get();
     if ( sourceIterator.Get() >= m_CurrentThresholdValue )
     {
-      if (!m_ToolManager->GetLabelLocked(targetValue))
+      if (!image->GetLabelLocked(activeLayer,targetValue))
       {
-        targetIterator.Set( overwriteValue );
+        targetIterator.Set( activePixelValue );
       }
     }
     ++sourceIterator;

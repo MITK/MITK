@@ -34,6 +34,7 @@ usFunctionGenerateModuleInit(testdriver_init_file
                              NAME SegmentationTestDriver
                              DEPENDS "Segmentation"
                              VERSION "0.1.0"
+                             EXECUTABLE
                             )
 
 set(TEST_CPP_FILES ${testdriver_init_file})

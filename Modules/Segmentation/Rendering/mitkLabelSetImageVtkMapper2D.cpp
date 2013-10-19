@@ -166,7 +166,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     localStorage->m_ReslicerVector[lidx]->SetTimeStep( this->GetTimestep() );
 
     //set the transformation of the image to adapt reslice axis
-    localStorage->m_ReslicerVector[lidx]->SetResliceTransformByGeometry( imageLayer->GetTimeSlicedGeometry()->GetGeometry3D( this->GetTimestep() ) );
+    localStorage->m_ReslicerVector[lidx]->SetResliceTransformByGeometry( imageLayer->GetTimeGeometry()->GetGeometryForTimeStep( this->GetTimestep() ) );
 
     //is the geometry of the slice based on the image image or the worldgeometry?
     bool inPlaneResampleExtentByGeometry = false;
@@ -514,11 +514,11 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   // Calculate time step of the image data for the specified renderer (integer value)
   this->CalculateTimeStep( renderer );
 
-  // Check if time step is valid
-  const TimeSlicedGeometry *dataTimeGeometry = image->GetTimeSlicedGeometry();
+   // Check if time step is valid
+  const TimeGeometry *dataTimeGeometry = image->GetTimeGeometry();
   if ( ( dataTimeGeometry == NULL )
-       || ( dataTimeGeometry->GetTimeSteps() == 0 )
-       || ( !dataTimeGeometry->IsValidTime( this->GetTimestep() ) ) )
+    || ( dataTimeGeometry->CountTimeSteps() == 0 )
+    || ( !dataTimeGeometry->IsValidTimeStep( this->GetTimestep() ) ) )
   {
     return;
   }

@@ -49,7 +49,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
   m_WorkingImage->Initialize( inputImage );
   m_WorkingImage->SetVolume( inputImage.GetPointer()->GetData() );
 
-  TimeGeometry::Pointer originalGeometry = NULL;
+  TimeGeometry::Pointer originalGeometry;
 
   if (inputImage->GetTimeGeometry() )
   {

@@ -451,62 +451,82 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
 void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
 {
-  DataNode::Pointer node = DataNode::New();
+  DataNode::Pointer node = LookForPointerTargetBelowGroupNode("Surface representation");
+  bool addToTree = node.IsNull();
 
-  bool wireframe = false;
-  GetParameter("Wireframe", wireframe);
-
-  if (wireframe)
+  if (addToTree)
   {
-    VtkRepresentationProperty *representation = dynamic_cast<VtkRepresentationProperty *>(
-      node->GetProperty("material.representation"));
+    node = DataNode::New();
 
-    if (representation != NULL)
-      representation->SetRepresentationToWireframe();
+    bool wireframe = false;
+    GetParameter("Wireframe", wireframe);
+
+    if (wireframe)
+    {
+      VtkRepresentationProperty *representation = dynamic_cast<VtkRepresentationProperty *>(
+        node->GetProperty("material.representation"));
+
+      if (representation != NULL)
+        representation->SetRepresentationToWireframe();
+    }
+
+    node->SetProperty("opacity", FloatProperty::New(1.0));
+    node->SetProperty("line width", IntProperty::New(1));
+    node->SetProperty("scalar visibility", BoolProperty::New(false));
+
+    UIDGenerator uidGenerator("Surface_");
+    node->SetProperty("FILENAME", StringProperty::New(uidGenerator.GetUID() + ".vtk"));
+
+    std::string groupNodeName = "surface";
+    DataNode *groupNode = GetGroupNode();
+
+    if (groupNode != NULL)
+      groupNode->GetName(groupNodeName);
+
+    node->SetProperty("name", StringProperty::New(groupNodeName));
   }
 
-  node->SetProperty("opacity", FloatProperty::New(1.0));
-  node->SetProperty("line width", IntProperty::New(1));
-  node->SetProperty("scalar visibility", BoolProperty::New(false));
-
-  std::string groupNodeName = "surface";
-  DataNode *groupNode = GetGroupNode();
-
-  if (groupNode != NULL)
-    groupNode->GetName(groupNodeName);
-
-  node->SetProperty("name", StringProperty::New(groupNodeName));
   node->SetData(m_Surface);
 
-  BaseProperty *colorProperty = groupNode->GetProperty("color");
+  if (addToTree)
+  {
+    DataNode* groupNode = GetGroupNode();
 
-  if (colorProperty != NULL)
-    node->ReplaceProperty("color", colorProperty);
-  else
-    node->SetProperty("color", ColorProperty::New(1.0f, 0.0f, 0.0f));
+    if (groupNode != NULL)
+    {
+      groupNode->SetProperty("Surface representation", SmartPointerProperty::New(node));
 
-  bool showResult = true;
-  GetParameter("Show result", showResult);
+      BaseProperty *colorProperty = groupNode->GetProperty("color");
 
-  bool syncVisibility = false;
-  GetParameter("Sync visibility", syncVisibility);
+      if (colorProperty != NULL)
+        node->ReplaceProperty("color", colorProperty);
+      else
+        node->SetProperty("color", ColorProperty::New(1.0f, 0.0f, 0.0f));
 
-  Image::Pointer image;
-  GetPointerParameter("Input", image);
+      bool showResult = true;
+      GetParameter("Show result", showResult);
 
-  BaseProperty *organTypeProperty = image->GetProperty("organ type");
+      bool syncVisibility = false;
+      GetParameter("Sync visibility", syncVisibility);
 
-  if (organTypeProperty != NULL)
-    m_Surface->SetProperty("organ type", organTypeProperty);
+      Image::Pointer image;
+      GetPointerParameter("Input", image);
 
-  BaseProperty *visibleProperty = groupNode->GetProperty("visible");
+      BaseProperty *organTypeProperty = image->GetProperty("organ type");
 
-  if (visibleProperty != NULL && syncVisibility)
-    node->ReplaceProperty("visible", visibleProperty);
-  else
-    node->SetProperty("visible", BoolProperty::New(showResult));
+      if (organTypeProperty != NULL)
+        m_Surface->SetProperty("organ type", organTypeProperty);
 
-  InsertBelowGroupNode(node);
+      BaseProperty *visibleProperty = groupNode->GetProperty("visible");
+
+      if (visibleProperty != NULL && syncVisibility)
+        node->ReplaceProperty("visible", visibleProperty);
+      else
+        node->SetProperty("visible", BoolProperty::New(showResult));
+    }
+
+    InsertBelowGroupNode(node);
+  }
 
   Superclass::ThreadedUpdateSuccessful();
 }

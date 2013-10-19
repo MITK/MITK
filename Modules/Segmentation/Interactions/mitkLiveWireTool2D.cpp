@@ -32,6 +32,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkGradientMagnitudeImageFilter.h>
 
+// us
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, LiveWireTool2D, "LiveWire tool");
@@ -116,15 +121,24 @@ float mitk::LiveWireTool2D::CanHandleEvent( StateEvent const *stateEvent) const
 
 }
 
-
-
-
 const char** mitk::LiveWireTool2D::GetXPM() const
 {
   return mitkLiveWireTool2D_xpm;
 }
 
+us::ModuleResource mitk::LiveWireTool2D::GetIconResource() const
+{
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("LiveWire_48x48.png");
+  return resource;
+}
 
+us::ModuleResource mitk::LiveWireTool2D::GetCursorIconResource() const
+{
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("LiveWire_Cursor_32x32.png");
+  return resource;
+}
 
 const char* mitk::LiveWireTool2D::GetName() const
 {
@@ -133,10 +147,12 @@ const char* mitk::LiveWireTool2D::GetName() const
 
 
 
+
 void mitk::LiveWireTool2D::Activated()
 {
   Superclass::Activated();
 }
+
 
 
 
@@ -168,7 +184,7 @@ void mitk::LiveWireTool2D::Deactivated()
       {
 
         //++++++++++++++++++++++ for each timestep of this contourModel
-        for( int currentTimestep = 0; currentTimestep < contourModel->GetTimeSlicedGeometry()->GetTimeSteps(); currentTimestep++)
+        for( int currentTimestep = 0; currentTimestep < contourModel->GetTimeGeometry()->CountTimeSteps(); currentTimestep++)
         {
 
           //get the segmentation image slice at current timestep
@@ -438,7 +454,7 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
 void mitk::LiveWireTool2D::FinishTool()
 {
 
-  unsigned int numberOfTimesteps = m_Contour->GetTimeSlicedGeometry()->GetTimeSteps();
+  unsigned int numberOfTimesteps = m_Contour->GetTimeSlicedGeometry()->CountTimeSteps();
 
   //close contour in each timestep
   for( int i = 0; i <= numberOfTimesteps; i++)

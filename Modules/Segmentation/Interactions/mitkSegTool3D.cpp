@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToolManager.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkLabelSetImage.h"
 
 mitk::SegTool3D::SegTool3D(const char* type) : Tool(type)
 {
@@ -72,7 +73,9 @@ void mitk::SegTool3D::ItkPasteSegmentationOnWorkingImage(
   sourceIterator.GoToBegin();
   targetIterator.GoToBegin();
 
-  const int& activePixelValue = m_ToolManager->GetActiveLabel()->GetIndex();
+  mitk::LabelSetImage* image = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
+  int activeLayer = image->GetActiveLayer();
+  int activePixelValue = image->GetActiveLabel(activeLayer)->GetIndex();
 
   if (activePixelValue == 0) // if exterior is the active label
   {
@@ -93,7 +96,7 @@ void mitk::SegTool3D::ItkPasteSegmentationOnWorkingImage(
       const int targetValue = targetIterator.Get();
       if ( sourceIterator.Get() != 0 )
       {
-        if (!m_ToolManager->GetLabelLocked(targetValue))
+        if (!image->GetLabelLocked(activeLayer, targetValue))
           targetIterator.Set( overwritevalue );
       }
 

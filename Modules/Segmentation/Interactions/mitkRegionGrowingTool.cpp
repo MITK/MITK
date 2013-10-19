@@ -56,6 +56,7 @@ mitk::RegionGrowingTool::RegionGrowingTool()
  m_LastWorkingSeed(-1),
  m_FillFeedbackContour(true)
 {
+  // great magic numbers
   CONNECT_ACTION( 80, OnMousePressed );
   CONNECT_ACTION( 90, OnMouseMoved );
   CONNECT_ACTION( 42, OnMouseReleased );
@@ -71,12 +72,7 @@ const char** mitk::RegionGrowingTool::GetXPM() const
   return mitkRegionGrowingTool_xpm;
 }
 
-const char* mitk::RegionGrowingTool::GetName() const
-{
-  return "Region Growing";
-}
-
-mitk::ModuleResource mitk::RegionGrowingTool::GetIconResource() const
+us::ModuleResource mitk::RegionGrowingTool::GetIconResource() const
 {
   us::Module* module = us::GetModuleContext()->GetModule();
   us::ModuleResource resource = module->GetResource("RegionGrowing_48x48.png");
@@ -89,6 +85,12 @@ us::ModuleResource mitk::RegionGrowingTool::GetCursorIconResource() const
   us::ModuleResource resource = module->GetResource("RegionGrowing_Cursor_32x32.png");
   return resource;
 }
+
+const char* mitk::RegionGrowingTool::GetName() const
+{
+  return "Region Growing";
+}
+
 
 bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
 {

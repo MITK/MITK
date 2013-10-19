@@ -59,12 +59,12 @@ void mitk::SurfaceStampImageFilter::GenerateOutputInformation()
 
   if( inputImage.IsNull() ||
      (inputImage->IsInitialized() == false) ||
-     (inputImage->GetTimeSlicedGeometry() == NULL)) return;
+     (inputImage->GetTimeGeometry() == NULL)) return;
 
   if (m_MakeOutputBinary)
-    outputImage->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *inputImage->GetTimeSlicedGeometry());
+    outputImage->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *inputImage->GetTimeGeometry());
   else
-    outputImage->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeSlicedGeometry());
+    outputImage->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeGeometry());
 
   outputImage->SetPropertyList(inputImage->GetPropertyList()->Clone());
 }
@@ -109,13 +109,15 @@ void mitk::SurfaceStampImageFilter::GenerateData()
 
 void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
 {
+
   mitk::Image::ConstPointer inputImage = this->GetInput();
 
-  const mitk::TimeSlicedGeometry *surfaceTimeGeometry = inputImage->GetTimeSlicedGeometry();
-  const mitk::TimeSlicedGeometry *imageTimeGeometry = inputImage->GetTimeSlicedGeometry();
+  const mitk::TimeGeometry *surfaceTimeGeometry = GetInput()->GetTimeGeometry();
+  const mitk::TimeGeometry *imageTimeGeometry = inputImage->GetTimeGeometry();
 
   // Convert time step from image time-frame to surface time-frame
-  int surfaceTimeStep = surfaceTimeGeometry->TimeStepToTimeStep( imageTimeGeometry, time );
+  mitk::TimePointType matchingTimePoint = imageTimeGeometry->TimeStepToTimePoint(time);
+  mitk::TimeStepType surfaceTimeStep = surfaceTimeGeometry->TimePointToTimeStep(matchingTimePoint);
 
   vtkPolyData * polydata = m_Surface->GetVtkPolyData( surfaceTimeStep );
   if (!polydata)
@@ -126,12 +128,12 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
 //  transformFilter->ReleaseDataFlagOn();
 
   vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
-  Geometry3D* geometry = surfaceTimeGeometry->GetGeometry3D( surfaceTimeStep );
+  Geometry3D* geometry = surfaceTimeGeometry->GetGeometryForTimeStep( surfaceTimeStep );
   geometry->TransferItkToVtkTransform();
   transform->PostMultiply();
   transform->Concatenate(geometry->GetVtkTransform()->GetMatrix());
   // take image geometry into account. vtk-Image information will be changed to unit spacing and zero origin below.
-  Geometry3D* imageGeometry = imageTimeGeometry->GetGeometry3D(time);
+  Geometry3D* imageGeometry = imageTimeGeometry->GetGeometryForTimeStep(time);
   imageGeometry->TransferItkToVtkTransform();
   transform->Concatenate(imageGeometry->GetVtkTransform()->GetLinearInverse());
   transformFilter->SetTransform(transform);

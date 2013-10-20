@@ -233,7 +233,7 @@ void QtStylePreferencePage::Update()
     AddPath(it.next(), false);
   }
 
-  QString iconTheme = QString::fromStdString(m_StylePref->Get(berry::QtPreferences::QT_ICON_THEME, "<<default>>"));
+  QString iconTheme = m_StylePref->Get(berry::QtPreferences::QT_ICON_THEME, "<<default>>");
   styleManager->SetIconTheme( iconTheme );
 
   QString name = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");

@@ -43,7 +43,7 @@ public:
 
 private:
 
-  QmitkFunctionalityCoordinator::Pointer m_FunctionalityCoordinator;
+  QmitkFunctionalityCoordinator m_FunctionalityCoordinator;
 
 };
 

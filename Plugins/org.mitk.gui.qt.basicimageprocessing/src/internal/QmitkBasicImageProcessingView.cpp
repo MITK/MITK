@@ -143,8 +143,7 @@ QmitkBasicImageProcessing::QmitkBasicImageProcessing()
 : QmitkFunctionality(),
   m_Controls(NULL),
   m_SelectedImageNode(NULL),
-  m_TimeStepperAdapter(NULL),
-  m_SelectionListener(NULL)
+  m_TimeStepperAdapter(NULL)
 {
 }
 

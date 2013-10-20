@@ -84,7 +84,7 @@ struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocato
    */
   virtual bool Close() = 0;
 
-  virtual SmartPointer<IWorkbenchPage> GetPage(int i) = 0;
+  virtual SmartPointer<IWorkbenchPage> GetPage(int i) const = 0;
 
   /**
    * Returns the currently active page for this workbench window.
@@ -198,11 +198,11 @@ struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocato
    */
   virtual SmartPointer<IWorkbenchPage> OpenPage(IAdaptable* input) = 0;
 
-  virtual void SetPerspectiveExcludeList(std::vector<std::string> v) = 0;
-  virtual std::vector<std::string> GetPerspectiveExcludeList() = 0;
+  virtual void SetPerspectiveExcludeList(const QStringList& v) = 0;
+  virtual QStringList GetPerspectiveExcludeList() const = 0;
 
-  virtual void SetViewExcludeList(std::vector<std::string> v) = 0;
-  virtual std::vector<std::string> GetViewExcludeList() = 0;
+  virtual void SetViewExcludeList(const QStringList& v) = 0;
+  virtual QStringList GetViewExcludeList() const = 0;
 
   virtual ~IWorkbenchWindow();
 

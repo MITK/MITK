@@ -15,11 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkCoreExtActivator.h"
-#include "mitkPicFileReader.h"
 
-#include <mitkCoreExtObjectFactory.h>
 #include "mitkCoreExtConstants.h"
-
+#include "mitkLogMacros.h"
 #include "mitkInputDeviceRegistry.h"
 
 #include <berryPlatform.h>
@@ -44,7 +42,7 @@ namespace mitk
     Q_UNUSED(context)
   }
 
-  void mitk::CoreExtActivator::StartInputDeviceModules(ctkPluginContext* context)
+  void CoreExtActivator::StartInputDeviceModules(ctkPluginContext* context)
   {
     m_InputDeviceRegistry.reset(new InputDeviceRegistry());
     context->registerService<mitk::IInputDeviceRegistry>(m_InputDeviceRegistry.data());

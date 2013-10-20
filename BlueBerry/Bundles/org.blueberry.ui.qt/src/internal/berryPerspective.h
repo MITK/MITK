@@ -48,7 +48,7 @@ public:
 
   friend class WorkbenchPage;
 
-  bool ContainsView(const std::string& viewId);
+  bool ContainsView(const QString& viewId) const;
 
 private:
 

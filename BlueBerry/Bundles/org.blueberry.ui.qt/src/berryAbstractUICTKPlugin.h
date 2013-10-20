@@ -106,6 +106,7 @@ struct ImageDescriptor;
  */
 class BERRY_UI_QT AbstractUICTKPlugin : public Plugin
 {
+  Q_OBJECT
 
 private:
 

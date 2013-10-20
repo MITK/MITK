@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 #include <berryIBerryPreferences.h>
 #include <berryIEditorPart.h>
+#include <berryPlatform.h>
 
 // Qmitk Includes
 #include <QmitkStdMultiWidgetEditor.h>
@@ -46,8 +47,6 @@ QmitkFunctionality::QmitkFunctionality()
  , m_HandlesMultipleDataStorages(false)
  , m_InDataStorageChanged(false)
 {
-  m_PreferencesService =
-    berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 }
 
 void QmitkFunctionality::SetHandleMultipleDataStorages(bool multiple)
@@ -63,10 +62,9 @@ bool QmitkFunctionality::HandlesMultipleDataStorages() const
 mitk::DataStorage::Pointer
 QmitkFunctionality::GetDataStorage() const
 {
-  mitk::IDataStorageService::Pointer service =
-    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+  mitk::IDataStorageService* service = this->GetSite()->GetService<mitk::IDataStorageService>();
 
-  if (service.IsNotNull())
+  if (service != nullptr)
   {
     if (m_HandlesMultipleDataStorages)
       return service->GetActiveDataStorage()->GetDataStorage();
@@ -79,10 +77,12 @@ QmitkFunctionality::GetDataStorage() const
 
 mitk::DataStorage::Pointer QmitkFunctionality::GetDefaultDataStorage() const
 {
-  mitk::IDataStorageService::Pointer service =
-    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
-
-  return service->GetDefaultDataStorage()->GetDataStorage();
+  mitk::IDataStorageService* service = this->GetSite()->GetService<mitk::IDataStorageService>();
+  if (service != nullptr)
+  {
+    return service->GetDefaultDataStorage()->GetDataStorage();
+  }
+  return 0;
 }
 
 void QmitkFunctionality::CreatePartControl(void* parent)
@@ -138,13 +138,16 @@ void QmitkFunctionality::AfterCreateQtPartControl()
     , const berry::IBerryPreferences*>(this, &QmitkFunctionality::OnPreferencesChanged));
 
   // REGISTER FOR WORKBENCH SELECTION EVENTS
-  m_BlueBerrySelectionListener = berry::ISelectionListener::Pointer(new berry::SelectionChangedAdapter<QmitkFunctionality>(this
-    , &QmitkFunctionality::BlueBerrySelectionChanged));
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_BlueBerrySelectionListener);
+  m_BlueBerrySelectionListener.reset(new berry::SelectionChangedAdapter<QmitkFunctionality>(
+                                       this,
+                                       &QmitkFunctionality::BlueBerrySelectionChanged)
+                                     );
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(
+        /*"org.mitk.views.datamanager",*/ m_BlueBerrySelectionListener.data());
 
   // REGISTER A SELECTION PROVIDER
-  QmitkFunctionalitySelectionProvider::Pointer _SelectionProvider
-    = QmitkFunctionalitySelectionProvider::New(this);
+  QmitkFunctionalitySelectionProvider::Pointer _SelectionProvider(
+        new QmitkFunctionalitySelectionProvider(this));
   m_SelectionProvider = _SelectionProvider.GetPointer();
   this->GetSite()->SetSelectionProvider(berry::ISelectionProvider::Pointer(m_SelectionProvider));
 
@@ -189,10 +192,10 @@ void QmitkFunctionality::ClosePartProxy()
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
   {
-    s->RemovePostSelectionListener(m_BlueBerrySelectionListener);
+    s->RemovePostSelectionListener(m_BlueBerrySelectionListener.data());
   }
 
-    this->ClosePart();
+  this->ClosePart();
 }
 
 QmitkFunctionality::~QmitkFunctionality()
@@ -207,7 +210,8 @@ void QmitkFunctionality::OnPreferencesChanged( const berry::IBerryPreferences* )
 {
 }
 
-void QmitkFunctionality::BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection)
+void QmitkFunctionality::BlueBerrySelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,
+                                                   const berry::ISelection::ConstPointer& selection)
 {
   if(sourcepart.IsNull() || sourcepart->GetSite()->GetId() != "org.mitk.views.datamanager")
     return;
@@ -257,11 +261,10 @@ QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget( bool reCreateW
       || editor.Cast<QmitkStdMultiWidgetEditor>().IsNull()
      )
   {
-    mitk::IDataStorageService::Pointer service =
-      berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+    mitk::IDataStorageService* service = this->GetSite()->GetService<mitk::IDataStorageService>();
 
-    mitk::DataStorageEditorInput::Pointer editorInput;
-    editorInput = new mitk::DataStorageEditorInput( service->GetActiveDataStorage() );
+    mitk::DataStorageEditorInput::Pointer editorInput(
+          new mitk::DataStorageEditorInput( service->GetActiveDataStorage() ));
     // open a new multi-widget editor, but do not give it the focus
     berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID, false, berry::IWorkbenchPage::MATCH_ID);
     activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
@@ -321,10 +324,10 @@ void QmitkFunctionality::RestoreOverrideCursor()
 
 berry::IPreferences::Pointer QmitkFunctionality::GetPreferences() const
 {
-  berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
   // const_cast workaround for bad programming: const uncorrectness this->GetViewSite() should be const
-  std::string id = "/" + (const_cast<QmitkFunctionality*>(this))->GetViewSite()->GetId();
-  return prefService.IsNotNull() ? prefService->GetSystemPreferences()->Node(id): berry::IPreferences::Pointer(0);
+  QString id = "/" + (const_cast<QmitkFunctionality*>(this))->GetViewSite()->GetId();
+  return prefService != nullptr ? prefService->GetSystemPreferences()->Node(id): berry::IPreferences::Pointer(0);
 }
 
 void QmitkFunctionality::Visible()

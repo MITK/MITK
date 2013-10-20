@@ -198,7 +198,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
 #ifdef Q_OS_WIN
   QString provisioningFile = QString::fromStdString(this->GetConfiguration().getString(Platform::ARG_PROVISIONING.toStdString()));
 #else
-  QString provisioningFile = QString::fromUtf8(this->GetConfiguration().getString(Platform::ARG_PROVISIONING.toStdString()));
+  QString provisioningFile = QString::fromUtf8(this->GetConfiguration().getString(Platform::ARG_PROVISIONING.toStdString()).c_str());
 #endif
   if (!provisioningFile.isEmpty())
   {

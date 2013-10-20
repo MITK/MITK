@@ -1991,21 +1991,21 @@ PerspectiveHelper* WorkbenchPage::GetPerspectivePresentation()
   return 0;
 }
 
-bool WorkbenchPage::HasView(const std::string& perspectiveId, const std::string& viewId)
+bool WorkbenchPage::HasView(const QString& perspectiveId, const QString& viewId)
 {
-    PerspectiveList::PerspectiveListType list = perspList.GetSortedPerspectives();
-    for ( PerspectiveList::PerspectiveListType::iterator it = list.begin(); it!=list.end(); it++)
+  PerspectiveList::PerspectiveListType list = perspList.GetSortedPerspectives();
+  for ( PerspectiveList::PerspectiveListType::iterator it = list.begin(); it!=list.end(); it++)
+  {
+    SmartPointer<Perspective> p = *it;
+    if (p->GetDesc()->GetId() == perspectiveId)
     {
-        SmartPointer<Perspective> p = *it;
-        if ( p->GetDesc()->GetId()==perspectiveId)
-        {
-            if (p->ContainsView(viewId) )
-            {
-                return true;
-            }
-        }
+      if (p->ContainsView(viewId))
+      {
+        return true;
+      }
     }
-    return false;
+  }
+  return false;
 }
 
 /**

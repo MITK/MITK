@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDir>
 #include <QDesktopServices>
 #include <QStringList>
+#include <QString>
+#include <QMap>
+#include <QHash>
 
 #include <usModuleSettings.h>
 

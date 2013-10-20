@@ -18,45 +18,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryTestDescriptor.h"
 
 #include <berryPlatform.h>
-#include <service/berryIExtensionPointService.h>
+#include <berryIExtensionRegistry.h>
 
 namespace berry
 {
 
-const std::string TestRegistry::TAG_TEST = "test";
-const std::string TestRegistry::ATT_ID = "id";
-const std::string TestRegistry::ATT_CLASS = "class";
-const std::string TestRegistry::ATT_DESCRIPTION = "description";
-const std::string TestRegistry::ATT_UITEST = "uitest";
-
-const std::string TestRegistry::TEST_MANIFEST = "CppUnitTest";
+const QString TestRegistry::TAG_TEST = "test";
+const QString TestRegistry::ATT_ID = "id";
+const QString TestRegistry::ATT_CLASS = "class";
+const QString TestRegistry::ATT_DESCRIPTION = "description";
+const QString TestRegistry::ATT_UITEST = "uitest";
 
 TestRegistry::TestRegistry()
 {
-  std::vector<IConfigurationElement::Pointer> elements(
-      Platform::GetExtensionPointService()->GetConfigurationElementsFor(
+  QList<IConfigurationElement::Pointer> elements(
+      Platform::GetExtensionRegistry()->GetConfigurationElementsFor(
           "org.blueberry.tests"));
 
-  for (std::vector<IConfigurationElement::Pointer>::iterator i =
-      elements.begin(); i != elements.end(); ++i)
+  foreach (const IConfigurationElement::Pointer& configElem, elements)
   {
-    if ((*i)->GetName() == TAG_TEST)
+    if (configElem->GetName() == TAG_TEST)
     {
-      this->ReadTest(*i);
+      this->ReadTest(configElem);
     }
   }
 }
 
-const std::vector<ITestDescriptor::Pointer>&
-TestRegistry::GetTestsForId(const std::string& pluginid)
+const QList<ITestDescriptor::Pointer>&
+TestRegistry::GetTestsForId(const QString& pluginid)
 {
   return mapIdToTests[pluginid];
 }
 
-void TestRegistry::ReadTest(IConfigurationElement::Pointer testElem)
+void TestRegistry::ReadTest(const IConfigurationElement::Pointer& testElem)
 {
   ITestDescriptor::Pointer descriptor(new TestDescriptor(testElem));
-  poco_assert(descriptor->GetId() != "");
+  Q_ASSERT(!descriptor->GetId().isEmpty());
   mapIdToTests[descriptor->GetContributor()].push_back(descriptor);
 }
 

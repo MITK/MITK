@@ -30,9 +30,9 @@ struct ITestDescriptor : public Object
   berryObjectMacro(berry::ITestDescriptor)
 
   virtual CppUnit::Test* CreateTest() = 0;
-  virtual std::string GetId() const = 0;
-  virtual std::string GetContributor() const = 0;
-  virtual std::string GetDescription() const = 0;
+  virtual QString GetId() const = 0;
+  virtual QString GetContributor() const = 0;
+  virtual QString GetDescription() const = 0;
 
   virtual bool IsUITest() const = 0;
 };

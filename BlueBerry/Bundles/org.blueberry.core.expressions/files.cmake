@@ -1,4 +1,5 @@
 set(MOC_H_FILES
+  src/internal/berryExpressionPlugin.h
 )
 
 set(CACHED_RESOURCE_FILES

@@ -539,7 +539,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
     berry::IPreferences::Pointer stylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
-    QString iconTheme = stylePref->Get(berry::QtPreferences::QT_ICON_THEME, "<<default>>"));
+    QString iconTheme = stylePref->Get(berry::QtPreferences::QT_ICON_THEME, "<<default>>");
     if( iconTheme == QString( "<<default>>" ) )
     {
       iconTheme = QString( "tango" );

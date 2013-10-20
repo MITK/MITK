@@ -485,7 +485,7 @@ namespace berry
     virtual void PutByteArray(const QString& key, const QByteArray& value) = 0;
 
     /**
-     * Returns the <code>std::vector<char></code> value represented by the <code>QString</code>
+     * Returns the <code>QByteArray</code> value represented by the <code>QString</code>
      * object associated with the specified <code>key</code> in this node. Valid
      * <code>QString</code> objects are <i>Base64 </i> encoded binary data, as
      * defined in <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045 </a>,

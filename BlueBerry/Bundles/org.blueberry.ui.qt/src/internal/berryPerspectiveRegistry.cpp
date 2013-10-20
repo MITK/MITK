@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchPlugin.h"
 #include "berryPerspectiveRegistryReader.h"
 
-
 namespace berry
 {
 
@@ -70,7 +69,7 @@ IPerspectiveDescriptor::Pointer PerspectiveRegistry::CreatePerspective(const QSt
   PerspectiveDescriptor::Pointer desc(
       new PerspectiveDescriptor(id, label, originalDescriptor.Cast<PerspectiveDescriptor>()));
   this->Add(desc);
-  return desc.GetPointer();
+  return IPerspectiveDescriptor::Pointer(static_cast<IPerspectiveDescriptor*>(desc.GetPointer()));
 }
 
 void PerspectiveRegistry::RevertPerspectives(

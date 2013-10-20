@@ -21,8 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIViewDescriptor.h"
 #include "berryIPluginContribution.h"
 
-#include <string>
-#include <vector>
+#include <QStringList>
 
 namespace berry
 {
@@ -41,7 +40,7 @@ private:
   QString id;
   mutable SmartPointer<ImageDescriptor> imageDescriptor;
   IConfigurationElement::Pointer configElement;
-  QList<QString> categoryPath;
+  QStringList categoryPath;
 
   /**
    * The activation token returned when activating the show view handler with
@@ -69,7 +68,7 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.registry.IViewDescriptor#getCategoryPath()
    */
-  const QList<QString>& GetCategoryPath() const;
+  QStringList GetCategoryPath() const;
 
   /**
    * Return the configuration element for this descriptor.
@@ -83,7 +82,7 @@ public:
    */
   QString GetDescription() const;
 
-  std::vector<std::string> GetKeywordReferences() const;
+  QStringList GetKeywordReferences() const;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IWorkbenchPartDescriptor#getId()

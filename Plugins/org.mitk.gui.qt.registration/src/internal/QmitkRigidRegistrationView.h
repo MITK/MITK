@@ -271,7 +271,7 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
 
   protected:
 
-    berry::ISelectionListener::Pointer m_SelListener;
+    QScopedPointer<berry::ISelectionListener> m_SelListener;
     berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
     /*!

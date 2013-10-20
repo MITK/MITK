@@ -25,7 +25,7 @@ class SelectionServiceMITKWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
 
 public:
 
-  static const std::string DEFAULT_PERSPECTIVE_ID;
+  static const QString DEFAULT_PERSPECTIVE_ID;
 
   berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
       berry::IWorkbenchWindowConfigurer::Pointer configurer)
@@ -39,7 +39,7 @@ public:
     return wwAdvisor.data();
   }
 
-  std::string GetInitialWindowPerspectiveId()
+  QString GetInitialWindowPerspectiveId()
   {
     return DEFAULT_PERSPECTIVE_ID;
   }
@@ -50,7 +50,7 @@ private:
 
 };
 
-const std::string SelectionServiceMITKWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.extendedperspective";
+const QString SelectionServiceMITKWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.extendedperspective";
 
 SelectionServiceMitk::SelectionServiceMitk()
 {

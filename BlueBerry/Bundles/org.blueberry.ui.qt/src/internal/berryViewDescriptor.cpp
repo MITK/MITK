@@ -46,7 +46,7 @@ IViewPart::Pointer ViewDescriptor::CreateView()
   return part;
 }
 
-const QList<QString>& ViewDescriptor::GetCategoryPath() const
+QStringList ViewDescriptor::GetCategoryPath() const
 {
   return categoryPath;
 }
@@ -165,18 +165,14 @@ ViewDescriptor::DeactivateHandler()
 //  }
 }
 
-std::vector< std::string> ViewDescriptor::GetKeywordReferences() const
+QStringList ViewDescriptor::GetKeywordReferences() const
 {
-  std::vector<std::string> result;
-  std::string keywordRefId;
-  std::vector<berry::IConfigurationElement::Pointer> keywordRefs;
-  berry::IConfigurationElement::vector::iterator keywordRefsIt;
-  keywordRefs = configElement->GetChildren("keywordReference");
-  for (keywordRefsIt = keywordRefs.begin()
-          ; keywordRefsIt != keywordRefs.end(); ++keywordRefsIt) // iterate over all refs
+  QStringList result;
+  auto keywordRefs = configElement->GetChildren("keywordReference");
+  for (auto keywordRefsIt = keywordRefs.begin();
+       keywordRefsIt != keywordRefs.end(); ++keywordRefsIt) // iterate over all refs
   {
-    (*keywordRefsIt)->GetAttribute("id", keywordRefId);
-    result.push_back(keywordRefId);
+    result.push_back((*keywordRefsIt)->GetAttribute("id"));
   }
   return result;
 }

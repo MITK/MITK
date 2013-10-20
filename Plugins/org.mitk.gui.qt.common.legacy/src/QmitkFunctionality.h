@@ -340,7 +340,7 @@ protected:
   ///
   /// reactions to selection events from data manager (and potential other senders)
   ///
-  void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);
+  void BlueBerrySelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart, const berry::ISelection::ConstPointer& selection);
   ///
   /// Converts a mitk::DataNodeSelection to a std::vector<mitk::DataNode*> (possibly empty
   ///
@@ -374,7 +374,7 @@ private:
   ///
   /// object to observe BlueBerry selections
   ///
-  berry::ISelectionListener::Pointer m_BlueBerrySelectionListener;
+  QScopedPointer<berry::ISelectionListener> m_BlueBerrySelectionListener;
   ///
   /// Saves if this view handles multiple datastorages
   ///
@@ -387,10 +387,6 @@ private:
   /// saves all visible functionalities
   ///
   std::set<std::string> m_VisibleFunctionalities;
-  ///
-  /// The Preferences Service to retrieve and store preferences.
-  ///
-  berry::IPreferencesService::WeakPtr m_PreferencesService;
 };
 
 #endif /*QMITKFUNCTIONALITY_H_*/

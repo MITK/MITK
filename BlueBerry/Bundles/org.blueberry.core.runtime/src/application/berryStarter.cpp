@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryIExtensionRegistry.h>
 #include <berryIConfigurationElement.h>
-//#include <berryIConfigurationElementLegacy.h>
 #include <berryIContributor.h>
 #include <berryIApplication.h>
 
@@ -57,7 +56,7 @@ int Starter::Run(int& argc, char** argv,
     platform->Initialize(argc, argv, config);
   }
   // the Initialize call can throw exceptions so catch them properly
-  catch( const berry::PlatformException &e)
+  catch( const std::exception& e)
   {
     BERRY_ERROR << "Caught exception while initializing the Platform : " << e.what();
     BERRY_FATAL << "Platform initialization failed. Aborting... \n";
@@ -146,15 +145,6 @@ int Starter::Run(int& argc, char** argv,
       QList<IConfigurationElement::Pointer> runs(
           extensions[0]->GetChildren("run"));
       app = runs.front()->CreateExecutableExtension<IApplication>("class");
-      if (app == 0)
-      {
-//        // support legacy BlueBerry extensions
-//        if (IConfigurationElementLegacy* legacyConfigElement =
-//            dynamic_cast<IConfigurationElementLegacy*>(runs.front().GetPointer()))
-//        {
-//          app = legacyConfigElement->CreateExecutableExtension<IApplication> ("class", IApplication::GetManifestName());
-//        }
-      }
     }
     else
     {
@@ -188,15 +178,6 @@ int Starter::Run(int& argc, char** argv,
             {
               QList<IConfigurationElement::Pointer> runs((*iter)->GetChildren("run"));
               app = runs.front()->CreateExecutableExtension<IApplication>("class");
-//              if (app == 0)
-//              {
-//                // try legacy BlueBerry extensions
-//                if (IConfigurationElementLegacy* legacyConfigElement =
-//                    dynamic_cast<IConfigurationElementLegacy*>(runs.front().GetPointer()))
-//                {
-//                  app = legacyConfigElement->CreateExecutableExtension<IApplication> ("class", IApplication::GetManifestName());
-//                }
-//              }
               break;
             }
           }

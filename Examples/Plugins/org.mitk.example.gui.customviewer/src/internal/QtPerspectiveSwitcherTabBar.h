@@ -59,7 +59,7 @@ private Q_SLOTS:
 private:
 
   berry::IWorkbenchWindow::Pointer window;
-  berry::IPerspectiveListener::Pointer perspListener;
+  QScopedPointer<berry::IPerspectiveListener> perspListener;
 
   QHash<QString, QAction*> perspIdToActionMap;
 

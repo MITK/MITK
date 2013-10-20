@@ -138,6 +138,11 @@ QString PerspectiveDescriptor::GetDescription() const
       configElement);
 }
 
+void PerspectiveDescriptor::SetDescription(const QString& desc)
+{
+  description = desc;
+}
+
 bool PerspectiveDescriptor::GetFixed() const
 {
   if (configElement == 0)
@@ -146,23 +151,19 @@ bool PerspectiveDescriptor::GetFixed() const
   return configElement->GetAttribute(WorkbenchRegistryConstants::ATT_FIXED).compare("true", Qt::CaseInsensitive) == 0;
 }
 
-std::vector< std::string> PerspectiveDescriptor::GetKeywordReferences() const
+QStringList PerspectiveDescriptor::GetKeywordReferences() const
 {
-  std::vector<std::string> result;
+  QStringList result;
   if (configElement.IsNull())
   {
     return result;
   }
 
-  std::string keywordRefId;
-  std::vector<berry::IConfigurationElement::Pointer> keywordRefs;
-  berry::IConfigurationElement::vector::iterator keywordRefsIt;
-  keywordRefs = configElement->GetChildren("keywordReference");
-  for (keywordRefsIt = keywordRefs.begin()
-          ; keywordRefsIt != keywordRefs.end(); ++keywordRefsIt) // iterate over all refs
+  auto keywordRefs = configElement->GetChildren("keywordReference");
+  for (auto keywordRefsIt = keywordRefs.begin();
+       keywordRefsIt != keywordRefs.end(); ++keywordRefsIt) // iterate over all refs
   {
-    (*keywordRefsIt)->GetAttribute("id", keywordRefId);
-    result.push_back(keywordRefId);
+    result.push_back((*keywordRefsIt)->GetAttribute("id"));
   }
   return result;
 }
@@ -201,19 +202,14 @@ ImageDescriptor::Pointer PerspectiveDescriptor::GetImageDescriptor() const
   return imageDescriptor;
 }
 
-std::vector<std::string> PerspectiveDescriptor::GetCategoryPath()
+QStringList PerspectiveDescriptor::GetCategoryPath() const
 {
-  std::string category;
-  categoryPath.clear();
+  if(!categoryPath.empty()) return categoryPath;
 
-  if (configElement.IsNotNull() && configElement->GetAttribute(WorkbenchRegistryConstants::TAG_CATEGORY, category))
+  if (configElement.IsNotNull())
   {
-    Poco::StringTokenizer stok(category, "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
-    // Parse the path tokens and store them
-    for (Poco::StringTokenizer::Iterator iter = stok.begin(); iter != stok.end(); ++iter)
-    {
-      categoryPath.push_back(*iter);
-    }
+    QString category = configElement->GetAttribute(WorkbenchRegistryConstants::TAG_CATEGORY);
+    categoryPath = category.split('/', QString::SkipEmptyParts);
   }
   return categoryPath;
 }

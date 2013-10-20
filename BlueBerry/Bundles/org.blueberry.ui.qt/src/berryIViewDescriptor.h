@@ -26,9 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIAdaptable.h>
 #include "berryImageDescriptor.h"
 
-#include <string>
-#include <vector>
-
 namespace berry
 {
 
@@ -62,7 +59,7 @@ struct BERRY_UI_QT IViewDescriptor : public IWorkbenchPartDescriptor, public IAd
    */
   virtual IViewPart::Pointer CreateView() = 0;
 
-  virtual std::vector< std::string> GetKeywordReferences() const = 0;
+  virtual QStringList GetKeywordReferences() const = 0;
 
   /**
    * Returns an array of strings that represent
@@ -71,7 +68,7 @@ struct BERRY_UI_QT IViewDescriptor : public IWorkbenchPartDescriptor, public IAd
    * view in places like submenus.
    * @return array of category tokens or null if not specified.
    */
-  virtual const QList<QString>& GetCategoryPath() const = 0;
+  virtual QStringList GetCategoryPath() const = 0;
 
   /**
    * Returns the description of this view.

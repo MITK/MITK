@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <berryPlatform.h>
-#include <berryIExtensionPointService.h>
+#include <berryIExtensionRegistry.h>
 #include <berryIConfigurationElement.h>
 #include "ChangeTextRegistry.h"
 #include "ExtensionPointDefinitionConstants.h"
@@ -23,22 +23,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 ChangeTextRegistry::ChangeTextRegistry()
 {
   //initialize the registry by copying all available extension points into a local variable
-  berry::IExtensionPointService::Pointer extensionPointService = berry::Platform::GetExtensionPointService();
-  std::vector<berry::IConfigurationElement::Pointer> allExtensionsChangeTexts
-    = extensionPointService->GetConfigurationElementsFor(ExtensionPointDefinitionConstants::CHANGETEXT_XP_NAME);
+  berry::IExtensionRegistry* extensionRegistry = berry::Platform::GetExtensionRegistry();
+  QList<berry::IConfigurationElement::Pointer> allExtensionsChangeTexts
+    = extensionRegistry->GetConfigurationElementsFor(ExtensionPointDefinitionConstants::CHANGETEXT_XP_NAME);
 
-  for(std::vector<berry::IConfigurationElement::Pointer>::const_iterator it = allExtensionsChangeTexts.begin();
-    it != allExtensionsChangeTexts.end();++it)
+  foreach(const berry::IConfigurationElement::Pointer& it, allExtensionsChangeTexts)
   {
-    ChangeTextDescriptor::Pointer temp(new ChangeTextDescriptor(*it));
-
-    if(!this->m_ListRegisteredTexts.contains(temp->GetID()))
+    QString id = it->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_ID);
+    if(id.isEmpty() || this->m_ListRegisteredTexts.contains(id))
     {
-      m_ListRegisteredTexts.insert(temp->GetID(),temp);
+      BERRY_WARN << "The ChangeText ID: " << id << " is already registered.";
     }
     else
     {
-      BERRY_WARN << "The ChangeText ID: " << qPrintable(temp->GetID()) << " is already registered.";
+      ChangeTextDescriptor::Pointer tmp(new ChangeTextDescriptor(it));
+      m_ListRegisteredTexts.insert(id, tmp);
     }
   }
 }

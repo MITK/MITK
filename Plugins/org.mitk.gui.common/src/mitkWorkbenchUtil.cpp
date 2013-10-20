@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkWorkbenchUtil.h"
 
+#include <berryPlatform.h>
 #include <berryPlatformUI.h>
 #include <berryIEditorRegistry.h>
 #include <berryCoreException.h>

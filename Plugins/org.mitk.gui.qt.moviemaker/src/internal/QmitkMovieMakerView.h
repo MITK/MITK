@@ -83,6 +83,8 @@ private:
   QmitkAnimationItem* GetSelectedAnimationItem() const;
   QVector<QPair<QmitkAnimationItem*, double> > GetActiveAnimations(double t) const;
 
+  QString GetFFmpegPath() const;
+
   QmitkFFmpegWriter* m_FFmpegWriter;
   Ui::QmitkMovieMakerView* m_Ui;
   QStandardItemModel* m_AnimationModel;

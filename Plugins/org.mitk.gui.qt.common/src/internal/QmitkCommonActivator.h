@@ -46,7 +46,7 @@ public:
   static ctkPluginContext* GetContext();
   static QmitkCommonActivator* GetInstance();
 
-  berry::IPreferencesService::Pointer GetPreferencesService();
+  berry::IPreferencesService* GetPreferencesService();
 
   /**
    * Sets default StateMachine to EventMapper.

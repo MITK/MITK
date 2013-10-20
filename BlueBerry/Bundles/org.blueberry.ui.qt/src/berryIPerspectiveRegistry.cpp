@@ -22,4 +22,5 @@ namespace berry
 IPerspectiveRegistry::~IPerspectiveRegistry()
 {
 }
+
 }

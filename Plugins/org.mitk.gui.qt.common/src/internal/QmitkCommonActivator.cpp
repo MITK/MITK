@@ -32,9 +32,9 @@ QmitkCommonActivator* QmitkCommonActivator::GetInstance()
   return m_Instance;
 }
 
-berry::IPreferencesService::Pointer QmitkCommonActivator::GetPreferencesService()
+berry::IPreferencesService* QmitkCommonActivator::GetPreferencesService()
 {
-  return berry::IPreferencesService::Pointer(m_PrefServiceTracker->getService());
+  return m_PrefServiceTracker->getService();
 }
 
 void

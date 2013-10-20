@@ -387,7 +387,7 @@ private:
   /**
    * Returns true if perspective with given id contains view with given id
    */
-  bool HasView(const std::string& perspectiveId, const std::string& viewId);
+  bool HasView(const QString& perspectiveId, const QString& viewId);
 
   /**
    * If we're in the process of activating a part, this points to the new part.

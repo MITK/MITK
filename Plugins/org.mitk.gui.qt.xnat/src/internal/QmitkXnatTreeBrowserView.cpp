@@ -94,7 +94,7 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
   if (!index.isValid()) return;
 
   berry::IWorkbenchPage::Pointer page = GetSite()->GetPage();
-  QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( index.data(Qt::UserRole).value<ctkXnatObject*>() );
+  QmitkXnatObjectEditorInput::Pointer oPtr(new QmitkXnatObjectEditorInput(index.data(Qt::UserRole).value<ctkXnatObject*>()));
   berry::IEditorInput::Pointer editorInput( oPtr );
   berry::IEditorPart::Pointer reuseEditor = page->FindEditor(editorInput);
 
@@ -105,17 +105,17 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
   }
   else
   {
-    std::vector<berry::IEditorReference::Pointer> editors =
+    QList<berry::IEditorReference::Pointer> editors =
       page->FindEditors(berry::IEditorInput::Pointer(0), QmitkXnatEditor::EDITOR_ID, berry::IWorkbenchPage::MATCH_ID);
 
-    if (editors.empty())
+    if (editors.isEmpty())
     {
       // No XnatEditor is currently open, create a new one
       ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(oPtr->GetXnatObject());
       if(file != NULL)
       {
         // If a file is activated take the parent and open a new editor
-        QmitkXnatObjectEditorInput::Pointer oPtr2 = QmitkXnatObjectEditorInput::New( file->parent() );
+        QmitkXnatObjectEditorInput::Pointer oPtr2(new QmitkXnatObjectEditorInput( file->parent() ));
         berry::IEditorInput::Pointer editorInput2( oPtr2 );
         page->OpenEditor(editorInput2, QmitkXnatEditor::EDITOR_ID);
       }

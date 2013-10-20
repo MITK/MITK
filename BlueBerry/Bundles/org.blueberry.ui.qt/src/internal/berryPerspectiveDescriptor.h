@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIPerspectiveFactory.h"
 #include "berryIMemento.h"
 
+#include <QStringList>
 
 namespace berry {
 
@@ -70,7 +71,7 @@ private:
 
    IConfigurationElement::Pointer configElement;
 
-   std::vector<std::string> categoryPath;
+   mutable QStringList categoryPath;
 
   /**
    * Create a new empty descriptor.
@@ -119,9 +120,9 @@ private:
    */
   public: QString GetDescription() const;
 
-  public: void SetDescription(std::string desc) {description = desc; }
+  public: void SetDescription(const QString& desc);
 
-  std::vector<std::string> GetKeywordReferences() const;
+  QStringList GetKeywordReferences() const;
 
   /**
    * Returns whether or not this perspective is fixed.
@@ -236,7 +237,7 @@ private:
    *
    * @return the category path of this descriptor
    */
-  public: std::vector<std::string> GetCategoryPath();
+  public: QStringList GetCategoryPath() const;
 };
 
 }

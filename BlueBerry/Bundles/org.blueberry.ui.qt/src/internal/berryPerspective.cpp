@@ -82,7 +82,7 @@ bool Perspective::ContainsView(IViewPart::Pointer view)
   return (view.Cast<IWorkbenchPart>() == ref->GetPart(false));
 }
 
-bool Perspective::ContainsView(const std::string& viewId)
+bool Perspective::ContainsView(const QString& viewId) const
 {
   return mapIDtoViewLayoutRec.contains(viewId);
 }
@@ -721,7 +721,7 @@ void Perspective::FixOrphan()
     {
       newDescId = localCopyLabel.arg(newDescId);
     }
-    PerspectiveDescriptor::Pointer newDesc = reg->CreatePerspective(newDescId, descriptor);
+    IPerspectiveDescriptor::Pointer newDesc = reg->CreatePerspective(newDescId, descriptor);
     page->SavePerspectiveAs(newDesc);
   }
 }

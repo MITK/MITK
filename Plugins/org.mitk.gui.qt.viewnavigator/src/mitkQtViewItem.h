@@ -37,7 +37,7 @@ public:
     }
 
     berry::IViewDescriptor::Pointer m_View;
-    std::vector<QString> m_Tags;
+    QStringList m_Tags;
     QString m_Description;
 
 private:

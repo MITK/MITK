@@ -54,8 +54,7 @@ void QmitkDicomPreferencePage::Init(berry::IWorkbench::Pointer )
 
 void QmitkDicomPreferencePage::CreateQtControl(QWidget* parent)
 {
-  berry::IPreferencesService::Pointer prefService=
-    berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
   m_DicomPreferencesNode = prefService->GetSystemPreferences()->Node("/org.mitk.views.dicomreader");
 
@@ -95,14 +94,14 @@ void QmitkDicomPreferencePage::PerformCancel()
 
 bool QmitkDicomPreferencePage::PerformOk()
 {
-  m_DicomPreferencesNode->Put("default dicom path",m_PathEdit->text().toStdString());
+  m_DicomPreferencesNode->Put("default dicom path",m_PathEdit->text());
   return true;
 }
 
 void QmitkDicomPreferencePage::Update()
 {
-  std::string path = m_DicomPreferencesNode->Get("default dicom path", CreateDefaultPath().toStdString());
-  m_PathEdit->setText(path.c_str());
+  QString path = m_DicomPreferencesNode->Get("default dicom path", CreateDefaultPath());
+  m_PathEdit->setText(path);
 }
 
 void QmitkDicomPreferencePage::DefaultButtonPushed()

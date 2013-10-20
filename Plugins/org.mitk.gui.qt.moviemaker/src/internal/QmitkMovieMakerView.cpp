@@ -46,14 +46,12 @@ static QmitkAnimationItem* CreateDefaultAnimation(const QString& widgetKey)
   return NULL;
 }
 
-static QString GetFFmpegPath()
+QString QmitkMovieMakerView::GetFFmpegPath() const
 {
-  berry::IPreferencesService::Pointer preferencesService =
-    berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-
+  berry::IPreferencesService* preferencesService = this->GetSite()->GetService<berry::IPreferencesService>();
   berry::IPreferences::Pointer preferences = preferencesService->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
 
-  return QString::fromStdString(preferences->Get("ffmpeg", ""));
+  return preferences->Get("ffmpeg", "");
 }
 
 static unsigned char* ReadPixels(vtkRenderWindow* renderWindow, int x, int y, int width, int height)

@@ -67,7 +67,7 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   if (!loggingPathWithoutFilename.isEmpty()) //if there already is a path for the MITK logging file use this one
     {
     //extract path from path+filename (if someone knows a better way to do this feel free to change it)
-    int lengthOfFilename = Poco::Path(mitk::LoggingBackend::GetLogFile()).getFileName().size();
+    int lengthOfFilename = QFileInfo(QString::fromStdString(mitk::LoggingBackend::GetLogFile())).fileName().size();
     loggingPathWithoutFilename.resize(loggingPathWithoutFilename.size()-lengthOfFilename);
     m_AutoSaveFilename = loggingPathWithoutFilename + "TrackingToolboxAutoSave.IGTToolStorage";
     }
@@ -189,7 +189,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
       Compatibles = mitk::GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
     }
     m_Controls->m_VolumeSelectionBox->clear();
-    for(int i = 0; i < Compatibles.size(); i++)
+    for(std::size_t i = 0; i < Compatibles.size(); i++)
     {
       m_Controls->m_VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
     }
@@ -215,7 +215,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
 
     //Update List of available models for selected tool.
     m_Controls->m_VolumeSelectionBox->clear();
-    for(int i = 0; i < Compatibles.size(); i++)
+    for(std::size_t i = 0; i < Compatibles.size(); i++)
     {
       m_Controls->m_VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
     }
@@ -420,7 +420,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
   m_Controls->m_TrackingControlLabel->setText("Status: tracking");
 
   //connect the tool visualization widget
-  for(int i=0; i<m_TrackingDeviceSource->GetNumberOfOutputs(); i++)
+  for(std::size_t i=0; i<m_TrackingDeviceSource->GetNumberOfOutputs(); i++)
   {
     m_Controls->m_TrackingToolsStatusWidget->AddNavigationData(m_TrackingDeviceSource->GetOutput(i));
   }
@@ -506,7 +506,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
   // Code to select appropriate tracking volume for current type
   std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine(Type);
   m_Controls->m_VolumeSelectionBox->clear();
-  for(int i = 0; i < Compatibles.size(); i++)
+  for(std::size_t i = 0; i < Compatibles.size(); i++)
   {
     m_Controls->m_VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
   }
@@ -672,7 +672,7 @@ void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
   MITK_DEBUG << "Number of inputs ToolVisualizationFilter: " << m_ToolVisualizationFilter->GetNumberOfIndexedInputs();
 
   //update tool colors to show tool status
-  for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfIndexedOutputs(); i++)
+  for(unsigned int i=0; i<m_ToolVisualizationFilter->GetNumberOfIndexedOutputs(); i++)
     {
     mitk::NavigationData::Pointer currentTool = m_ToolVisualizationFilter->GetOutput(i);
     if(currentTool->IsDataValid())
@@ -1056,8 +1056,8 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
 
 void QmitkMITKIGTTrackingToolboxView::UpdateToolStorageLabel(QString pathOfLoadedStorage)
 {
-  Poco::Path myPath = Poco::Path(pathOfLoadedStorage.toStdString()); //use this to seperate filename from path
-  QString toolLabel = myPath.getFileName().c_str();
+  QFileInfo myPath(pathOfLoadedStorage); //use this to seperate filename from path
+  QString toolLabel = myPath.fileName();
   if (toolLabel.size() > 45) //if the tool storage name is to long trimm the string
     {
     toolLabel.resize(40);
@@ -1151,7 +1151,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()
     return;
   }
 
-  for (int i=0; i<currentDevice->GetToolCount(); i++)
+  for (unsigned int i=0; i<currentDevice->GetToolCount(); i++)
   {
     //create a navigation tool with sphere as surface
     std::stringstream toolname;

@@ -114,9 +114,9 @@ struct BERRY_UI_QT IPerspectiveDescriptor : public Object
      *
      * @return the category path of this descriptor
      */
-    virtual std::vector<std::string> GetCategoryPath() = 0;
+    virtual QStringList GetCategoryPath() const = 0;
 
-    virtual std::vector< std::string> GetKeywordReferences() const = 0;
+    virtual QStringList GetKeywordReferences() const = 0;
 };
 
 }

@@ -627,41 +627,38 @@ WWinActionBars* WorkbenchWindow::GetActionBars()
   return actionBars.GetPointer();
 }
 
-void WorkbenchWindow::SetPerspectiveExcludeList(std::vector<std::string> v)
+void WorkbenchWindow::SetPerspectiveExcludeList(const QStringList& v)
 {
-    perspectiveExcludeList = v;
+  perspectiveExcludeList = v;
 }
 
-std::vector<std::string> WorkbenchWindow::GetPerspectiveExcludeList()
+QStringList WorkbenchWindow::GetPerspectiveExcludeList() const
 {
-    return perspectiveExcludeList;
+  return perspectiveExcludeList;
 }
 
-void WorkbenchWindow::SetViewExcludeList(std::vector<std::string> v)
+void WorkbenchWindow::SetViewExcludeList(const QStringList& v)
 {
-    viewExcludeList = v;
+  viewExcludeList = v;
 }
 
-std::vector<std::string> WorkbenchWindow::GetViewExcludeList()
+QStringList WorkbenchWindow::GetViewExcludeList() const
 {
-    return viewExcludeList;
+  return viewExcludeList;
 }
 
-IWorkbenchPage::Pointer WorkbenchWindow::GetPage(int i)
+IWorkbenchPage::Pointer WorkbenchWindow::GetPage(int i) const
 {
-    std::list<IWorkbenchPage::Pointer> pages = pageList.GetPages();
-    std::list<IWorkbenchPage::Pointer>::iterator it;
-    int j=-1;
-    for (it = pages.begin(); it!=pages.end(); it++)
-    {
-        j++;
-        if (j==i)
-            break;
-    }
+  QList<IWorkbenchPage::Pointer> pages = pageList.GetPages();
+  int j = 0;
+  for (auto it = pages.begin(); it!=pages.end(); it++, j++)
+  {
     if (j==i)
-        return *it;
-
-    return IWorkbenchPage::Pointer();
+    {
+      return *it;
+    }
+  }
+  return IWorkbenchPage::Pointer();
 }
 
 IWorkbenchPage::Pointer WorkbenchWindow::GetActivePage() const
@@ -1769,7 +1766,7 @@ bool WorkbenchWindow::PageList::IsEmpty()
   return pagesInCreationOrder.empty();
 }
 
-const QList<IWorkbenchPage::Pointer>& WorkbenchWindow::PageList::GetPages()
+QList<IWorkbenchPage::Pointer> WorkbenchWindow::PageList::GetPages() const
 {
   return pagesInCreationOrder;
 }

@@ -256,7 +256,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
       // check if the user specified an icon attribute
       if ( !cmIcon.isEmpty() )
       {
-        contextMenuAction = new QAction( QIcon(cmIco), cmLabel, parent);
+        contextMenuAction = new QAction( QIcon(cmIcon), cmLabel, parent);
       }
       else
       {

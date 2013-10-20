@@ -122,10 +122,12 @@ namespace berry
 
   void Preferences::Clear()
   {
-    QMutexLocker scopedMutex(&m_Mutex);
-    AssertValid_unlocked();
-    m_Properties.clear();
-    this->SetDirty_unlocked(true);
+    {
+      QMutexLocker scopedMutex(&m_Mutex);
+      AssertValid_unlocked();
+      m_Properties.clear();
+    }
+    this->SetDirty(true);
   }
 
   void Preferences::Flush()
@@ -335,11 +337,13 @@ namespace berry
 
   void Preferences::Put(const QString& key, const QString& value)
   {
-    QMutexLocker scopedMutex(&m_Mutex);
-    AssertValid_unlocked();
+    {
+      QMutexLocker scopedMutex(&m_Mutex);
+      AssertValid_unlocked();
 
-    m_Properties[key] = value;
-    this->SetDirty_unlocked(true);
+      m_Properties[key] = value;
+    }
+    this->SetDirty(true);
   }
 
   void Preferences::PutByteArray(const QString& key, const QByteArray& value)
@@ -439,8 +443,14 @@ namespace berry
 
   void Preferences::SetDirty( bool _Dirty )
   {
-    QMutexLocker scopedMutex(&m_Mutex);
-    this->SetDirty_unlocked(_Dirty);
+    {
+      QMutexLocker scopedMutex(&m_Mutex);
+      m_Dirty = _Dirty;
+    }
+    if(_Dirty)
+    {
+      this->OnChanged.Send(this);
+    }
   }
 
   void Preferences::SetDirty_unlocked( bool _Dirty )

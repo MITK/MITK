@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkIOUtil.h>
 
+#include <berryIPreferences.h>
+
 #include <QFileDialog>
 
 class QmitkFileOpenActionPrivate
@@ -40,8 +42,8 @@ public:
 
   berry::IPreferences::Pointer GetPreferences() const
   {
-    berry::IPreferencesService::Pointer prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
-    if (prefService.IsNotNull())
+    berry::IPreferencesService* prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
+    if (prefService)
     {
       return prefService->GetSystemPreferences()->Node("/General");
     }

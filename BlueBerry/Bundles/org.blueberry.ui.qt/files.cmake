@@ -118,7 +118,7 @@ set(SRC_CPP_FILES
   actions/berryIContributionManager.h
   actions/berryIContributionManagerOverrides.cpp
   actions/berryIMenuManager.h
-  #actions/berryManuBarManager.cpp
+  #actions/berryMenuBarManager.cpp
   actions/berryMenuManager.cpp
   actions/berrySeparator.cpp
   actions/berrySubContributionItem.cpp
@@ -401,6 +401,7 @@ set(INTERNAL_CPP_FILES
 
 set(MOC_H_FILES
 
+  src/berryAbstractUICTKPlugin.h
   src/berryEditorPart.h
   src/berryQtSelectionProvider.h
   src/berryViewPart.h
@@ -416,7 +417,6 @@ set(MOC_H_FILES
   src/internal/berryHandlerServiceFactory.h
   src/internal/berryMenuServiceFactory.h
   src/internal/berryMMMenuListener.h
-  src/internal/berryWorkbenchSourceProvider.h
   src/internal/berryQtDisplay.h
   src/internal/berryQtDnDTweaklet.h
   src/internal/berryQtGlobalEventFilter.h
@@ -434,6 +434,8 @@ set(MOC_H_FILES
   src/internal/berryQtWidgetsTweakletImpl.h
   src/internal/berryQtWorkbenchTweaklet.h
   src/internal/berryQtWorkbenchPageTweaklet.h
+  src/internal/berryWorkbenchPlugin.h
+  src/internal/berryWorkbenchSourceProvider.h
 
   src/internal/defaultpresentation/berryNativeTabFolder.h
   src/internal/defaultpresentation/berryNativeTabItem.h

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPerspectiveRegistry.h>
 #include <berryWorkbenchPreferenceConstants.h>
 #include <berryIPreferences.h>
+#include <berryIPreferencesService.h>
 #include <berryIEditorReference.h>
 
 #include <mitkLogMacros.h>
@@ -150,9 +151,8 @@ void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
       // the simplified method removes every whitespace
       // ( whitespace means any character for which the standard C++ isspace() method returns true)
       urlPath = urlPath.simplified();
-      QString tmpPerspectiveId(urlPath.data());
-      tmpPerspectiveId.replace(QString("/"), QString("") );
-      std::string perspectiveId  = tmpPerspectiveId.toStdString();
+      QString perspectiveId(urlPath.data());
+      perspectiveId.replace(QString("/"), QString("") );
 
       // is working fine as long as the perspective id is valid, if not the application crashes
       GetIntroSite()->GetWorkbenchWindow()->GetWorkbench()->ShowPerspective(perspectiveId, GetIntroSite()->GetWorkbenchWindow() );
@@ -227,9 +227,8 @@ void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
       // the simplified method removes every whitespace
       // ( whitespace means any character for which the standard C++ isspace() method returns true)
       urlPath = urlPath.simplified();
-      QString tmpPerspectiveId(urlPath.data());
-      tmpPerspectiveId.replace(QString("/"), QString("") );
-      std::string perspectiveId  = tmpPerspectiveId.toStdString();
+      QString perspectiveId(urlPath.data());
+      perspectiveId.replace(QString("/"), QString("") );
 
       // is working fine as long as the perspective id is valid, if not the application crashes
       GetIntroSite()->GetWorkbenchWindow()->GetWorkbench()->ShowPerspective(perspectiveId, GetIntroSite()->GetWorkbenchWindow() );

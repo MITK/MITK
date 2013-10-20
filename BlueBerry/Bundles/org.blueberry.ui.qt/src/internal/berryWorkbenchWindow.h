@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "application/berryWorkbenchWindowAdvisor.h"
 #include "application/berryActionBarAdvisor.h"
 
-#include <list>
+#include <QStringList>
 
 namespace berry
 {
@@ -112,13 +112,13 @@ public:
 
   SmartPointer<IWorkbenchPage> GetActivePage() const;
 
-  SmartPointer<IWorkbenchPage> GetPage(int i);
+  SmartPointer<IWorkbenchPage> GetPage(int i) const;
 
-  void SetPerspectiveExcludeList(std::vector<std::string> v);
-  std::vector<std::string> GetPerspectiveExcludeList();
+  void SetPerspectiveExcludeList(const QStringList& v);
+  QStringList GetPerspectiveExcludeList() const;
 
-  void SetViewExcludeList(std::vector<std::string> v);
-  std::vector<std::string> GetViewExcludeList();
+  void SetViewExcludeList(const QStringList& v);
+  QStringList GetViewExcludeList() const;
 
   /**
    * Sets the active page within the window.
@@ -416,8 +416,8 @@ private:
 
   WWinPartService partService;
 
-  std::vector<std::string> perspectiveExcludeList;
-  std::vector<std::string> viewExcludeList;
+  QStringList perspectiveExcludeList;
+  QStringList viewExcludeList;
 
   struct ServiceLocatorOwner: public IDisposable
   {
@@ -461,7 +461,7 @@ private:
 
     bool IsEmpty();
 
-    const QList<SmartPointer<IWorkbenchPage> >& GetPages();
+    QList<SmartPointer<IWorkbenchPage> > GetPages() const;
 
     void SetActive(SmartPointer<IWorkbenchPage> page);
 

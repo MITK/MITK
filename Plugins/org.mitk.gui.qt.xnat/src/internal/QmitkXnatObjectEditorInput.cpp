@@ -35,14 +35,14 @@ bool QmitkXnatObjectEditorInput::Exists() const
   return m_Object->exists();
 }
 
-std::string QmitkXnatObjectEditorInput::GetName() const
+QString QmitkXnatObjectEditorInput::GetName() const
 {
-  return m_Object->id().toStdString();
+  return m_Object->id();
 }
 
-std::string QmitkXnatObjectEditorInput::GetToolTipText() const
+QString QmitkXnatObjectEditorInput::GetToolTipText() const
 {
-  return m_Object->description().toStdString();
+  return m_Object->description();
 }
 
 bool QmitkXnatObjectEditorInput::operator==(const berry::Object* o) const

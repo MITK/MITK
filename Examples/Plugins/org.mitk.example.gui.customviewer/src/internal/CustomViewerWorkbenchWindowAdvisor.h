@@ -18,7 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define CUSTOMVIEWERWORKBENCHWINDOWADVISOR_H_
 
 #include <berryWorkbenchWindowAdvisor.h>
-#include <QObject>
+#include <berryIWorkbenchWindowConfigurer.h>
+
 #include <QmitkFileOpenAction.h>
 
 /**

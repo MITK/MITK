@@ -677,7 +677,7 @@ void PerspectiveHelper::DescribeLayout(QString& buf) const
       {
         DetachedWindow::ConstPointer window = *winIter;
         QList<LayoutPart::Pointer> children = window->GetChildren();
-        unsigned int j = 0;
+        int j = 0;
         if (children.size() != 0)
         {
           buf.append("dWindow ("); //$NON-NLS-1$

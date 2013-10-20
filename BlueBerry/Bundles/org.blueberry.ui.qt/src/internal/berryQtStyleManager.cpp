@@ -318,7 +318,7 @@ void QtStyleManager::SetIconTheme(const QString& themeName)
   }
 }
 
-void QtStyleManager::SetIconTheme(const QString& themeName, bool update)
+void QtStyleManager::SetIconTheme(const QString& themeName, bool /*update*/)
 {
   QIcon::setThemeName( themeName );
 }

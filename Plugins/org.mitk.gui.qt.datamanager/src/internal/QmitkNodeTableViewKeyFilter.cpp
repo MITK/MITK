@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "../QmitkDataManagerView.h"
 
 #include "berryIPreferencesService.h"
+#include "berryPlatform.h"
 
 QmitkNodeTableViewKeyFilter::QmitkNodeTableViewKeyFilter( QObject* _DataManagerView )
 : QObject(_DataManagerView)

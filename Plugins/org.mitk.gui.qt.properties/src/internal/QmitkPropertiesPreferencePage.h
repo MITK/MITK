@@ -26,11 +26,11 @@ class QmitkPropertiesPreferencePage : public QObject, public berry::IQtPreferenc
   Q_INTERFACES(berry::IPreferencePage)
 
 public:
-  static const std::string FILTER_PROPERTIES;
-  static const std::string SHOW_ALIASES;
-  static const std::string SHOW_DESCRIPTIONS;
-  static const std::string SHOW_ALIASES_IN_DESCRIPTION;
-  static const std::string DEVELOPER_MODE;
+  static const QString FILTER_PROPERTIES;
+  static const QString SHOW_ALIASES;
+  static const QString SHOW_DESCRIPTIONS;
+  static const QString SHOW_ALIASES_IN_DESCRIPTION;
+  static const QString DEVELOPER_MODE;
 
   QmitkPropertiesPreferencePage();
   ~QmitkPropertiesPreferencePage();

@@ -17,12 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKPLUGINACTIVATOR_H
 
 // Parent classes
-#include <QObject>
-#include <ctkPluginActivator.h>
+#include <berryAbstractUICTKPlugin.h>
 
 namespace mitk
 {
-  class PluginActivator : public QObject, public ctkPluginActivator
+  class PluginActivator : public berry::AbstractUICTKPlugin
   {
     Q_OBJECT
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
@@ -31,14 +30,21 @@ namespace mitk
     Q_INTERFACES(ctkPluginActivator)
 
   public:
+
+    PluginActivator();
+    ~PluginActivator();
+
     void start(ctkPluginContext *context);
     void stop(ctkPluginContext *context);
+
+    static PluginActivator* getDefault();
 
     static ctkPluginContext* getContext();
 
   private:
 
     static ctkPluginContext* m_context;
+    static PluginActivator* m_Instance;
   };
 }
 

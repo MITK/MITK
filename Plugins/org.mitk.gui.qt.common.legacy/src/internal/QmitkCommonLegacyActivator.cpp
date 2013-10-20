@@ -29,8 +29,7 @@ QmitkCommonLegacyActivator::start(ctkPluginContext* context)
 
   if(berry::PlatformUI::IsWorkbenchRunning())
   {
-    m_FunctionalityCoordinator = QmitkFunctionalityCoordinator::Pointer(new QmitkFunctionalityCoordinator);
-    m_FunctionalityCoordinator->Start();
+    m_FunctionalityCoordinator.Start();
   }
   else
   {
@@ -43,8 +42,7 @@ QmitkCommonLegacyActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 
-  m_FunctionalityCoordinator->Stop();
-  m_FunctionalityCoordinator = 0;
+  m_FunctionalityCoordinator.Stop();
 }
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)

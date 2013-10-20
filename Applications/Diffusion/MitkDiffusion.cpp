@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QBitmap>
 #include <QTimer>
 #include <QTime>
+#include <QDir>
+#include <QMap>
 
 class QtSafeApplication : public QtSingleApplication
 {
@@ -110,20 +112,18 @@ int main(int argc, char** argv)
   // These paths replace the .ini file and are tailored for installation
   // packages created with CPack. If a .ini file is presented, it will
   // overwrite the settings in MapConfiguration
-  Poco::Path basePath(argv[0]);
-  basePath.setFileName("");
+  QDir basePath(argv[0]);
 
-  Poco::Path provFile(basePath);
-  provFile.setFileName("MitkDiffusion.provisioning");
+  QString provFile = basePath.absoluteFilePath("MitkDiffusion.provisioning");
 
   Poco::Util::MapConfiguration* diffConfig(new Poco::Util::MapConfiguration());
   if (!storageDir.isEmpty())
   {
-    diffConfig->setString(berry::Platform::ARG_STORAGE_DIR, storageDir.toStdString());
+    diffConfig->setString(berry::Platform::ARG_STORAGE_DIR.toStdString(), storageDir.toStdString());
   }
 
-  diffConfig->setString(berry::Platform::ARG_PROVISIONING, provFile.toString());
-  diffConfig->setString(berry::Platform::ARG_APPLICATION, "org.mitk.qt.diffusionimagingapp");
+  diffConfig->setString(berry::Platform::ARG_PROVISIONING.toStdString(), provFile.toStdString());
+  diffConfig->setString(berry::Platform::ARG_APPLICATION.toStdString(), "org.mitk.qt.diffusionimagingapp");
 
   QStringList preloadLibs;
 
@@ -176,7 +176,7 @@ int main(int argc, char** argv)
   }
   preloadConfig.chop(1);
 
-  diffConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY, preloadConfig.toStdString());
+  diffConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY.toStdString(), preloadConfig.toStdString());
 
   // Seed the random number generator, once at startup.
   QTime time = QTime::currentTime();

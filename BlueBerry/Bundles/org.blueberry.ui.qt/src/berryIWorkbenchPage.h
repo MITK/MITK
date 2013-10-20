@@ -470,7 +470,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
   /**
    * Returns true if perspective with given id contains view with given id
    */
-  virtual bool HasView(const std::string& perspectiveId, const std::string& viewId) = 0;
+  virtual bool HasView(const QString& perspectiveId, const QString& viewId) = 0;
 
   /**
    * Returns whether the specified part is visible.

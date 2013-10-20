@@ -79,20 +79,20 @@ protected:
    *
    * If two different colors are chosen, a gradient background appears.
    */
-  std::string m_WidgetBackgroundColor1[4];
-  std::string m_WidgetBackgroundColor2[4];
+  QString m_WidgetBackgroundColor1[4];
+  QString m_WidgetBackgroundColor2[4];
 
   /**
    * @brief m_WidgetDecorationColor the decoration color.
    *
    * The rectangle prop, the crosshair, the 3D planes and the corner annotation use this.
    */
-  std::string m_WidgetDecorationColor[4];
+  QString m_WidgetDecorationColor[4];
 
   /**
    * @brief m_Widget1Annotation the text of the corner annotation.
    */
-  std::string m_WidgetAnnotation[4];
+  QString m_WidgetAnnotation[4];
 
   /**
    * @brief m_Preferences the berry preferences.
@@ -105,13 +105,6 @@ protected:
    * @param button the button.
    */
   void SetStyleSheetToColorChooserButton(QColor backgroundcolor, QPushButton* button);
-
-  /**
-   * @brief StringToColor convert a hexadecimal std::string to QColor.
-   * @param colorInHex string in the form of "#123456" where each digit is a hex value (0-F).
-   * @return color in Qt format.
-   */
-  QColor HexStringToQtColor(std::string colorInHex);
 
 protected slots:
 

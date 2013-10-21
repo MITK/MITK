@@ -140,9 +140,12 @@ void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDi
   inputIterator.GoToBegin();
 
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  mitk::LabelSetImage* image = dynamic_cast<mitk::LabelSetImage*>(toolManager->GetWorkingData(0)->GetData());
-  int activeLayer = image->GetActiveLayer();
-  int activePixelValue = image->GetActiveLabel(activeLayer)->GetIndex();
+  assert(toolManager);
+
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(toolManager->GetWorkingData(0)->GetData());
+  assert(workingImage);
+
+  int activePixelValue = workingImage->GetActiveLabel()->GetIndex();
 
   if (activePixelValue == 0) // if exterior is the active label
   {
@@ -163,8 +166,8 @@ void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDi
       const int targetValue = outputIterator.Get();
       if ( inputIterator.Get() != 0 )
       {
-        if (!image->GetLabelLocked(activeLayer,targetValue))
-          outputIterator.Set( overwritevalue );
+        if (!workingImage->GetLabelLocked(targetValue))
+          outputIterator.Set(overwritevalue);
       }
 
       ++outputIterator;

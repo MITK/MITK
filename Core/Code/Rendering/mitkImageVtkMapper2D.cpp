@@ -760,7 +760,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   // some more properties specific for a binary...
   if (isBinaryImage)
   {
-    node->AddProperty( "opacity", FloatProperty::New(1.0f), renderer, overwrite );
+    node->AddProperty( "opacity", FloatProperty::New(0.4f), renderer, overwrite );
     node->AddProperty( "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
     node->AddProperty( "binaryimage.selectedcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
     node->AddProperty( "binaryimage.selectedannotationcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );

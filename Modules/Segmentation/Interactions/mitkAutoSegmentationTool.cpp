@@ -109,13 +109,12 @@ void mitk::AutoSegmentationTool::ItkPasteSegmentation( itk::Image<TPixel,VImageD
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
   assert (workingImage);
 
-  int activeLayer = workingImage->GetActiveLayer();
   int activePixelValue = workingImage->GetActiveLabelIndex();
 
   while ( !targetIterator.IsAtEnd() )
   {
-    int targetValue = static_cast< int >( targetIterator.Get() );
-    if ( !workingImage->GetLabelLocked(activeLayer,targetValue) && sourceIterator.Get() )
+    int targetValue = static_cast< int >(targetIterator.Get());
+    if ( !workingImage->GetLabelLocked(targetValue) && sourceIterator.Get() )
     {
       targetIterator.Set( overwritevalue );
     }

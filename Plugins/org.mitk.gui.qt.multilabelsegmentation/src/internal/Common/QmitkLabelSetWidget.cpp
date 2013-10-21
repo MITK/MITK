@@ -527,15 +527,15 @@ void QmitkLabelSetWidget::OnCreateMask(int index)
   }
 
   mitk::DataNode::Pointer maskNode = mitk::DataNode::New();
-  std::string name = workingImage->GetLabelName( workingImage->GetActiveLayer(), index);
+  std::string name = workingImage->GetLabelName(index, workingImage->GetActiveLayer());
   name += "-mask";
   maskNode->SetName(name);
   maskNode->SetData(maskImage);
-  maskNode->SetBoolProperty("binary",true);
-  maskNode->SetBoolProperty("outline binary",true);
-  maskNode->SetBoolProperty("outline binary shadow",true);
-  maskNode->SetFloatProperty("outline width",2.0);
-  maskNode->SetColor(workingImage->GetLabelColor( workingImage->GetActiveLayer(), index));
+  maskNode->SetBoolProperty("binary", true);
+  maskNode->SetBoolProperty("outline binary", true);
+  maskNode->SetBoolProperty("outline binary shadow", true);
+  maskNode->SetFloatProperty("outline width", 2.0);
+  maskNode->SetColor(workingImage->GetLabelColor(index));
   maskNode->SetOpacity(1.0);
 
   this->m_DataStorage->Add(maskNode, workingNode);

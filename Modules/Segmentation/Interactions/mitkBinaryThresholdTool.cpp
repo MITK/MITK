@@ -132,11 +132,11 @@ void mitk::BinaryThresholdTool::SetThresholdValue(double value)
 
 void mitk::BinaryThresholdTool::AcceptPreview()
 {
-  Image::Pointer referenceImage = dynamic_cast<Image*>( m_ToolManager->GetReferenceData(0)->GetData() );
-  if (referenceImage.IsNull()) return;
+  Image* referenceImage = dynamic_cast<Image*>( m_ToolManager->GetReferenceData(0)->GetData() );
+  assert(referenceImage);
 
-  LabelSetImage::Pointer workingImage = dynamic_cast<LabelSetImage*>( m_ToolManager->GetWorkingData(0)->GetData() );
-  if (workingImage.IsNull()) return;
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>( m_ToolManager->GetWorkingData(0)->GetData() );
+  assert(workingImage);
 
   CurrentlyBusy.Send(true);
 
@@ -153,11 +153,11 @@ void mitk::BinaryThresholdTool::AcceptPreview()
 
     if (workingImageTimeStep->GetDimension() == 2)
     {
-      AccessTwoImagesFixedDimensionByItk( workingImageTimeStep.GetPointer(), referenceImage.GetPointer(), ITKThresholding, 2 );
+      AccessTwoImagesFixedDimensionByItk( workingImageTimeStep.GetPointer(), referenceImage, ITKThresholding, 2 );
     }
     else
     {
-      AccessTwoImagesFixedDimensionByItk( workingImageTimeStep.GetPointer(), referenceImage.GetPointer(), ITKThresholding, 3 );
+      AccessTwoImagesFixedDimensionByItk( workingImageTimeStep.GetPointer(), referenceImage, ITKThresholding, 3 );
     }
 
     workingImageTimeStep->Modified();
@@ -258,9 +258,10 @@ void mitk::BinaryThresholdTool::ITKThresholding( itk::Image<TPixel1, VDimension1
   typename SourceIteratorType sourceIterator( sourceImage, sourceImage->GetLargestPossibleRegion() );
   typename TargetIteratorType targetIterator( targetImage, targetImage->GetLargestPossibleRegion() );
 
-  mitk::LabelSetImage* image = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
-  int activeLayer = image->GetActiveLayer();
-  int activePixelValue = image->GetActiveLabel(activeLayer)->GetIndex();
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
+  assert(workingImage);
+
+  int activePixelValue = workingImage->GetActiveLabel()->GetIndex();
 
   sourceIterator.GoToBegin();
   targetIterator.GoToBegin();
@@ -270,9 +271,9 @@ void mitk::BinaryThresholdTool::ITKThresholding( itk::Image<TPixel1, VDimension1
     int targetValue = targetIterator.Get();
     if ( sourceIterator.Get() >= m_CurrentThresholdValue )
     {
-      if (!image->GetLabelLocked(activeLayer,targetValue))
+      if (!workingImage->GetLabelLocked(targetValue))
       {
-        targetIterator.Set( activePixelValue );
+        targetIterator.Set(activePixelValue);
       }
     }
     ++sourceIterator;

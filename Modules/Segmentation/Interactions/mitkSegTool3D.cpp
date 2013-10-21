@@ -73,9 +73,10 @@ void mitk::SegTool3D::ItkPasteSegmentationOnWorkingImage(
   sourceIterator.GoToBegin();
   targetIterator.GoToBegin();
 
-  mitk::LabelSetImage* image = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
-  int activeLayer = image->GetActiveLayer();
-  int activePixelValue = image->GetActiveLabel(activeLayer)->GetIndex();
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
+  assert(workingImage);
+
+  int activePixelValue = workingImage->GetActiveLabel()->GetIndex();
 
   if (activePixelValue == 0) // if exterior is the active label
   {
@@ -96,8 +97,8 @@ void mitk::SegTool3D::ItkPasteSegmentationOnWorkingImage(
       const int targetValue = targetIterator.Get();
       if ( sourceIterator.Get() != 0 )
       {
-        if (!image->GetLabelLocked(activeLayer, targetValue))
-          targetIterator.Set( overwritevalue );
+        if (!workingImage->GetLabelLocked(targetValue))
+          targetIterator.Set(overwritevalue);
       }
 
       ++targetIterator;

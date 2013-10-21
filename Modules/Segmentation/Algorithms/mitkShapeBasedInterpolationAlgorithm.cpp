@@ -33,9 +33,9 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   typedef itk::Image< ipMITKSegmentationTYPE, 2 > InputSliceType;
 
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  mitk::LabelSetImage* image = dynamic_cast<mitk::LabelSetImage*>(toolManager->GetWorkingData(0)->GetData());
-  int activeLayer = image->GetActiveLayer();
-  int activePixelValue = image->GetActiveLabel(activeLayer)->GetIndex();
+  assert(toolManager);
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(toolManager->GetWorkingData(0)->GetData());
+  int activePixelValue = workingImage->GetActiveLabel()->GetIndex();
 
   // convert these slices to the ipSegmentation data type (into an ITK image)
   itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeLowerITKSlice;
@@ -142,7 +142,7 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
     const int targetValue = targetIterator.Get();
     if ( sourceIterator.Get() != 0 )
     {
-      if (!image->GetLabelLocked(activeLayer,targetValue))
+      if (!workingImage->GetLabelLocked(targetValue))
         targetIterator.Set( activePixelValue );
     }
     else

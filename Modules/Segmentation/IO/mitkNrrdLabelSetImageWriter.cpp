@@ -94,22 +94,22 @@ void mitk::NrrdLabelSetImageWriter::GenerateData()
       for (int label=0; label<input->GetNumberOfLabels(layer); label++)
       {
         sprintf( keybuffer, "label_%03d_name", idx );
-        sprintf( valbuffer, "%s", input->GetLabelName(layer, label).c_str());
+        sprintf( valbuffer, "%s", input->GetLabelName(label,layer).c_str());
 
         itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
 
         sprintf( keybuffer, "label_%03d_props", idx );
         float rgba[4];
-        const mitk::Color& color = input->GetLabelColor(layer, label);
+        const mitk::Color& color = input->GetLabelColor(label, layer);
         rgba[0] = color.GetRed();
         rgba[1] = color.GetGreen();
         rgba[2] = color.GetBlue();
-        rgba[3] = input->GetLabelOpacity(layer,label);
-        int locked = input->GetLabelLocked(layer,label);
-        int visible = input->GetLabelVisible(layer,label);
+        rgba[3] = input->GetLabelOpacity(label, layer);
+        int locked = input->GetLabelLocked(label, layer);
+        int visible = input->GetLabelVisible(label, layer);
         sprintf( valbuffer, "%f %f %f %f %d %d %d %d", rgba[0], rgba[1], rgba[2], rgba[3], locked, visible, layer, label);
 
-        itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
+        itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
         ++idx;
       }
     }

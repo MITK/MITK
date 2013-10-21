@@ -189,10 +189,6 @@ public:
 
   /**
     * \brief  */
-  std::string GetLabelName(int index, int layer = -1) const;
-
-  /**
-    * \brief  */
   void SetAllLabelsLocked(bool sendEvent, int layer = -1);
 
   /**
@@ -223,9 +219,13 @@ public:
     * \brief  */
   void EraseLabels(std::vector<int>& indexes, int layer = -1);
 
-/**
+  /**
     * \brief  */
   void SmoothLabels(std::vector<int>& indexes, int layer = -1);
+
+  /**
+    * \brief  */
+  std::string GetLabelName(int index, int layer = -1) const;
 
   /**
     * \brief  */
@@ -256,12 +256,12 @@ public:
   const mitk::Label* GetActiveLabel(int layer = -1) const;
 
   /**
-  * \brief  */
-  int GetActiveLayer() const;
-
-  /**
     * \brief  */
   void SetActiveLabel(int index, bool sendEvent = false, int layer = -1);
+
+  /**
+  * \brief  */
+  int GetActiveLayer() const;
 
   /**
     * \brief  */

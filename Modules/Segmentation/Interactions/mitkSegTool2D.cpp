@@ -451,7 +451,6 @@ void mitk::SegTool2D::ItkPasteSegmentationOnWorkingImage( itk::Image<TPixel,VIma
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
   assert (workingImage);
 
-  int activeLayer = workingImage->GetActiveLayer();
   int activePixelValue = workingImage->GetActiveLabelIndex();
 
   if (activePixelValue == 0) // if exterior is the active label
@@ -473,7 +472,7 @@ void mitk::SegTool2D::ItkPasteSegmentationOnWorkingImage( itk::Image<TPixel,VIma
       const int targetValue = outputIterator.Get();
       if ( inputIterator.Get() != 0 )
       {
-        if (!workingImage->GetLabelLocked(activeLayer,targetValue))
+        if (!workingImage->GetLabelLocked(targetValue))
           outputIterator.Set( overwritevalue );
       }
 

@@ -38,7 +38,7 @@ namespace mitk{
   void OpenCVToMitkImageFilter::SetOpenCVImage(const IplImage* image)
   {
     this->m_OpenCVImage = image;
-    this->m_OpenCVMat = NULL;
+    this->m_OpenCVMat.release();
     this->Modified();
   }
 

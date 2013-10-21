@@ -13,95 +13,70 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-/*=========================================================================
 
-Program:   Tensor ToolKit - TTK
-Module:    $URL: svn://scm.gforge.inria.fr/svn/ttk/trunk/Algorithms/itkNonLocalMeansDenoisingFilter.h $
-Language:  C++
-Date:      $Date: 2010-06-07 13:39:13 +0200 (Mo, 07 Jun 2010) $
-Version:   $Revision: 68 $
+/*===================================================================
 
-Copyright (c) INRIA 2010. All rights reserved.
-See LICENSE.txt for details.
+This file is based heavily on a corresponding ITK filter.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
-
-=========================================================================*/
-#ifndef _itk_NonLocalMeansDenoisingFilter_h_
-#define _itk_NonLocalMeansDenoisingFilter_h_
+===================================================================*/
+#ifndef __itkNonLocalMeansDenoisingFilter_h_
+#define __itkNonLocalMeansDenoisingFilter_h_
 
 #include "itkImageToImageFilter.h"
-#include <itkDiffusionTensor3D.h>
-#include <itkVectorImage.h>
-#include <itkVectorContainer.h>
+#include "itkVectorImage.h"
+#include <mitkDiffusionImage.h>
+#include <itkNeighborhoodIterator.h>
 
-namespace itk
-{
+namespace itk{
+/** \class NonLocalMeansDenoisingFilter
+ */
 
-/**
-* \brief Merges diffusion weighted images, e.g. to generate one multishell volume from several single shell volumes.   */
-
-template <class TScalarType>
-class NonLocalMeansDenoisingFilter
-        : public ImageSource<itk::VectorImage<TScalarType,3> >
+template< class TInPixelType, class TOutPixelType >
+class NonLocalMeansDenoisingFilter :
+        public ImageToImageFilter< VectorImage < TInPixelType, 3 >, VectorImage < TOutPixelType, 3 > >
 {
 
 public:
 
-
     typedef NonLocalMeansDenoisingFilter Self;
-    typedef ImageSource< itk::VectorImage<TScalarType,3> > Superclass;
-    typedef SmartPointer<Self> Pointer;
-    typedef SmartPointer<const Self> ConstPointer;
+    typedef SmartPointer<Self>                      Pointer;
+    typedef SmartPointer<const Self>                ConstPointer;
+    typedef ImageToImageFilter< VectorImage < TInPixelType, 3 >, VectorImage < TOutPixelType, 3 > >  Superclass;
+    typedef mitk::DiffusionImage< short >::GradientDirectionType GradientDirectionType;
+    typedef mitk::DiffusionImage< short >::GradientDirectionContainerType::Pointer GradientContainerType;
 
     /** Method for creation through the object factory. */
-   itkNewMacro(Self)
+    itkNewMacro(Self)
 
-   /** Runtime information support. */
-   itkTypeMacro(NonLocalMeansDenoisingFilter, ImageSource)
+    /** Runtime information support. */
+    itkTypeMacro(NonLocalMeansDenoisingFilter, ImageToImageFilter)
 
-    typedef itk::VectorImage<TScalarType,3>                  DwiImageType;
-    typedef typename DwiImageType::PixelType                DwiPixelType;
-    typedef typename DwiImageType::RegionType               DwiRegionType;
-    typedef typename std::vector< typename DwiImageType::Pointer >   DwiImageContainerType;
+    typedef typename Superclass::InputImageType InputImageType;
+    typedef typename Superclass::OutputImageType OutputImageType;
+    typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
 
-    typedef vnl_vector_fixed< double, 3 >                       GradientType;
-    typedef itk::VectorContainer< unsigned int, GradientType >  GradientListType;
-    typedef typename std::vector< GradientListType::Pointer >   GradientListContainerType;
+    itkSetMacro( B_value, double )
+    itkSetMacro( GradientDirections, GradientContainerType )
 
-   // input
-    void SetImageVolumes(DwiImageContainerType cont);       ///< input DWI image volume container
-    void SetGradientLists(GradientListContainerType cont);  ///< gradients of all input images
-    void SetBValues(std::vector< double > bvals);           ///< b-values of all input images
+    protected:
+        NonLocalMeansDenoisingFilter();
+    ~NonLocalMeansDenoisingFilter() {}
+    void PrintSelf(std::ostream& os, Indent indent) const;
 
-    // output
-    GradientListType::Pointer GetOutputGradients();         ///< gradient list of the merged output image
-    double GetB_Value();                                    ///< main b-value of the merged output image
+    void BeforeThreadedGenerateData();
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType);
 
-protected:
+    double    m_B_value;
+    GradientContainerType m_GradientDirections;
 
-    NonLocalMeansDenoisingFilter();
-    ~NonLocalMeansDenoisingFilter();
-
-    void GenerateData();
-
-    DwiImageContainerType       m_ImageVolumes;     ///< contains input images
-    GradientListContainerType   m_GradientLists;    ///< contains gradients of all input images
-    std::vector< double >       m_BValues;          ///< contains b-values of all input images
-    int                         m_NumGradients;     ///< number of gradients in the output image
-    GradientListType::Pointer   m_OutputGradients;  ///< container for output gradients
-    double                      m_BValue;           ///< main output b-value
+    typename NeighborhoodIterator < VectorImage < TInPixelType, 3 > >::RadiusType m_V_Radius;
+    typename NeighborhoodIterator < VectorImage < TInPixelType, 3 > >::RadiusType m_N_Radius;
 };
 
-
-} // end of namespace
-
+}
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #include "itkNonLocalMeansDenoisingFilter.cpp"
 #endif
 
-
-#endif
+#endif //__itkNonLocalMeansDenoisingFilter_h_

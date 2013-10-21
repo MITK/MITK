@@ -13,164 +13,127 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-/*=========================================================================
-   2
-   3 Program:   Tensor ToolKit - TTK
-   4 Module:    $URL: svn://scm.gforge.inria.fr/svn/ttk/trunk/Algorithms/itkNonLocalMeansDenoisingFilter.txx $
-   5 Language:  C++
-   6 Date:      $Date: 2010-06-07 13:39:13 +0200 (Mo, 07 Jun 2010) $
-   7 Version:   $Revision: 68 $
-   8
-   9 Copyright (c) INRIA 2010. All rights reserved.
-  10 See LICENSE.txt for details.
-  11
-  12 This software is distributed WITHOUT ANY WARRANTY; without even
-  13 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-  14 PURPOSE.  See the above copyright notices for more information.
-  15
-  16 =========================================================================*/
-#ifndef _itk_NonLocalMeansDenoisingFilter_txx_
-#define _itk_NonLocalMeansDenoisingFilter_txx_
-#endif
 
-#include "itkNonLocalMeansDenoisingFilter.h"
-#include "itkTensorToL2NormImageFilter.h"
-#include "itkRescaleIntensityImageFilter.h"
-#include <itkImageRegionIterator.h>
-#include <itkImageRegionConstIterator.h>
-#include <boost/progress.hpp>
+#ifndef __itkNonLocalMeansDenoisingFilter_txx
+#define __itkNonLocalMeansDenoisingFilter_txx
 
-namespace itk
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+#include "itkImageRegionConstIterator.h"
+#include "itkImageRegionConstIteratorWithIndex.h"
+#include "itkImageRegionIterator.h"
+#include "itkNeighborhoodIterator.h"
+
+namespace itk {
+
+
+template< class TInPixelType, class TOutPixelType >
+NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
+::NonLocalMeansDenoisingFilter()
 {
-
-template <class TScalarType>
-NonLocalMeansDenoisingFilter<TScalarType>::NonLocalMeansDenoisingFilter()
-{
-
+    this->SetNumberOfRequiredInputs( 1 );
 }
 
-template <class TScalarType>
-NonLocalMeansDenoisingFilter<TScalarType>::~NonLocalMeansDenoisingFilter()
-{
-
-}
-
-template <class TScalarType>
-void NonLocalMeansDenoisingFilter<TScalarType>
-::SetImageVolumes(DwiImageContainerType cont)
-{
-    m_ImageVolumes=cont;
-}
-
-template <class TScalarType>
-void NonLocalMeansDenoisingFilter<TScalarType>
-::SetGradientLists(GradientListContainerType cont)
-{
-    m_GradientLists=cont;
-}
-
-template <class TScalarType>
-void NonLocalMeansDenoisingFilter<TScalarType>
-::SetBValues(std::vector< double > bvals)
-{
-    m_BValues=bvals;
-}
-
-template <class TScalarType>
-NonLocalMeansDenoisingFilter<TScalarType>::GradientListType::Pointer NonLocalMeansDenoisingFilter<TScalarType>
-::GetOutputGradients()
-{
-    return m_OutputGradients;
-}
-
-template <class TScalarType>
-double NonLocalMeansDenoisingFilter<TScalarType>
-::GetB_Value()
-{
-    return m_BValue;
-}
-
-template <class TScalarType>
+template< class TInPixelType, class TOutPixelType >
 void
-NonLocalMeansDenoisingFilter<TScalarType>
-::GenerateData ()
+NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
+::BeforeThreadedGenerateData()
 {
+    typename OutputImageType::Pointer outputImage =
+            static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+    outputImage->FillBuffer(0.0);
+}
 
-    if( m_ImageVolumes.size()<2 )
-      throw itk::ExceptionObject (__FILE__,__LINE__,"Error: cannot combine less than two DWIs.");
+template< class TInPixelType, class TOutPixelType >
+void
+NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
+::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType )
+{
+    typename OutputImageType::Pointer outputImage =
+            static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 
-    if( m_GradientLists.size()!=m_ImageVolumes.size() || m_ImageVolumes.size()!=m_BValues.size() || m_BValues.size()!=m_GradientLists.size() )
-      throw itk::ExceptionObject (__FILE__,__LINE__,"Error: need same number of b-values, image volumes and gradient containers.");
+    ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
+    oit.GoToBegin();
 
-    typename DwiImageType::Pointer img = m_ImageVolumes.at(0);
+    typedef ConstNeighborhoodIterator <InputImageType> InputIteratorType;
+    typename InputImageType::Pointer inputImagePointer = NULL;
+    inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
 
-    m_NumGradients = 0;
-    for (int i=0; i<m_GradientLists.size(); i++)
+    InputIteratorType git(m_V_Radius, inputImagePointer, outputRegionForThread );
+    git.GoToBegin();
+    while( !git.IsAtEnd() )
     {
-        m_NumGradients += m_GradientLists.at(i)->Size();
-        typename DwiImageType::Pointer tmp = m_ImageVolumes.at(i);
-        if ( img->GetLargestPossibleRegion()!=tmp->GetLargestPossibleRegion() )
-            throw itk::ExceptionObject (__FILE__,__LINE__,"Error: images are not of same size.");
-    }
-
-    m_BValue = m_BValues.at(0);
-    m_OutputGradients = GradientListType::New();
-
-    typename DwiImageType::Pointer outImage = DwiImageType::New();
-    outImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
-    outImage->SetOrigin( img->GetOrigin() );     // Set the image origin
-    outImage->SetDirection( img->GetDirection() );  // Set the image direction
-    outImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
-    outImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
-    outImage->SetRequestedRegion( img->GetLargestPossibleRegion() );
-    outImage->SetVectorLength(m_NumGradients);
-    outImage->Allocate();
-
-    this->SetNumberOfRequiredOutputs(1);
-    this->SetNthOutput (0, outImage);
-
-    typedef ImageRegionIterator<DwiImageType>               IteratorOutputType;
-    IteratorOutputType      itOut (this->GetOutput(), this->GetOutput()->GetLargestPossibleRegion());
-
-    MITK_INFO << "NonLocalMeansDenoisingFilter: merging images";
-    GradientType zeroG; zeroG.fill(0.0);
-    boost::progress_display disp(this->GetOutput()->GetLargestPossibleRegion().GetNumberOfPixels());
-    while(!itOut.IsAtEnd())
-    {
-        ++disp;
-        DwiPixelType out;
-        out.SetSize(m_NumGradients);
-        out.Fill(0);
-
-        int c=0;
-        for (int i=0; i<m_GradientLists.size(); i++)
+      typename TInPixelType xi = git.GetCenterPixel();
+      for (int i=0; i < git.Size(); ++i)
+      {
+        typename TInPixelType xj = git.GetPixel(i);
+        if (xi == xj && git.GetCenterPixel.GetIndex() != i)
         {
-            GradientListType::Pointer gradients = m_GradientLists.at(i);
-            typename DwiImageType::Pointer img = m_ImageVolumes.at(i);
-
-            for (int j=0; j<gradients->Size(); j++)
+          typename ConstNeighborhoodIterator <InputImageType> nit1(m_N_Radius, inputImagePointer, xi);
+          typename ConstNeighborhoodIterator <InputImageType> nit2(m_N_Radius, inputImagePointer, xj);
+          for (int k = 0; )
+        }
+      }
+        /*double S0 = 0;
+        int c = 0;
+        for (int i=0; i<inputImagePointer->GetVectorLength(); i++)
+        {
+            GradientDirectionType g = m_GradientDirections->GetElement(i);
+            if (g.magnitude()<0.001)
             {
-                GradientType g = gradients->GetElement(j);
-                double mag = g.two_norm();
-
-                if (mag>0.0001)
-                {
-                    double frac = m_BValues.at(i)*mag*mag/m_BValue;
-                    g.normalize();
-                    g *= sqrt(frac);
-                }
-                else
-                    g = zeroG;
-
-                m_OutputGradients->InsertElement(c, g);
-                out[c] = static_cast<TScalarType>(img->GetPixel(itOut.GetIndex())[j]);
+                S0 += pix[i];
                 c++;
             }
         }
+        if (c>0)
+            S0 /= c;
 
-        itOut.Set(out);
-        ++itOut;
+        if (S0>0)
+        {
+            c = 0;
+            for (int i=0; i<inputImagePointer->GetVectorLength(); i++)
+            {
+                GradientDirectionType g = m_GradientDirections->GetElement(i);
+                if (g.magnitude()>0.001)
+                {
+                    double twonorm = g.two_norm();
+                    double b = m_B_value*twonorm*twonorm;
+                    if (b>0)
+                    {
+                        double S = pix[i];
+                        outval -= std::log(S/S0)/b;
+                        c++;
+                    }
+                }
+            }
+
+            if (c>0)
+                outval /= c;
+        }
+
+        if (outval==outval && outval<10000)
+            oit.Set( outval );*/
+
+        ++oit;
+        ++git;
     }
+
+    std::cout << "One Thread finished calculation" << std::endl;
 }
 
-} // end of namespace
+template< class TInPixelType, class TOutPixelType >
+void
+NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
+::PrintSelf(std::ostream& os, Indent indent) const
+{
+    Superclass::PrintSelf(os,indent);
+}
+
+}
+
+#endif // __itkNonLocalMeansDenoisingFilter_txx

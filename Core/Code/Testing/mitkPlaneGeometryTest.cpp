@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 #include <iomanip>
 
+static const mitk::ScalarType testEps = 1E-9; // the epsilon used in this test == at least float precision.
+
 int mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarType& width, const mitk::ScalarType& height, const mitk::ScalarType& widthInMM, const mitk::ScalarType& heightInMM, const mitk::Point3D& origin, const mitk::Vector3D& right, const mitk::Vector3D& bottom)
 {
 
@@ -37,7 +39,7 @@ int mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarT
   pt2d_mm[0] = widthInMM/2.3; pt2d_mm[1] = heightInMM/2.5;
   expected_pt3d_mm = origin+right*(pt2d_mm[0]/right.GetNorm())+bottom*(pt2d_mm[1]/bottom.GetNorm());
   planegeometry->Map(pt2d_mm, pt3d_mm);
-  if(mitk::Equal(pt3d_mm, expected_pt3d_mm) == false)
+  if(mitk::Equal(pt3d_mm, expected_pt3d_mm, testEps) == false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -337,9 +339,9 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
 
   std::cout << "Testing width, height and thickness (in units): ";
-  if((mitk::Equal(planegeometry->GetExtent(0),width)==false) ||
-     (mitk::Equal(planegeometry->GetExtent(1),height)==false) ||
-     (mitk::Equal(planegeometry->GetExtent(2),1)==false)
+  if((mitk::Equal(planegeometry->GetExtent(0),width, testEps)==false) ||
+     (mitk::Equal(planegeometry->GetExtent(1),height, testEps)==false) ||
+     (mitk::Equal(planegeometry->GetExtent(2),1, testEps)==false)
     )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -348,9 +350,9 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in mm): ";
-  if((mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM)==false) ||
-     (mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM)==false) ||
-     (mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM)==false)
+  if((mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM, testEps)==false) ||
+     (mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM, testEps)==false) ||
+     (mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps)==false)
     )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -359,7 +361,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing GetAxisVector(): ";
-  if((mitk::Equal(planegeometry->GetAxisVector(0), right)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), bottom)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), normal)==false))
+  if((mitk::Equal(planegeometry->GetAxisVector(0), right, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -376,9 +378,9 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector(), &spacing);
 
   std::cout << "Testing width, height and thickness (in units): ";
-  if((mitk::Equal(planegeometry->GetExtent(0),width)==false) ||
-     (mitk::Equal(planegeometry->GetExtent(1),height)==false) ||
-     (mitk::Equal(planegeometry->GetExtent(2),1)==false)
+  if((mitk::Equal(planegeometry->GetExtent(0),width, testEps)==false) ||
+     (mitk::Equal(planegeometry->GetExtent(1),height, testEps)==false) ||
+     (mitk::Equal(planegeometry->GetExtent(2),1, testEps)==false)
     )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -387,9 +389,9 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in mm): ";
-  if((mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM)==false) ||
-     (mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM)==false) ||
-     (mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM)==false)
+  if((mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM, testEps)==false) ||
+     (mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM, testEps)==false) ||
+     (mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps)==false)
     )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -398,7 +400,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing GetAxisVector(): ";
-  if((mitk::Equal(planegeometry->GetAxisVector(0), right)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), bottom)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), normal)==false))
+  if((mitk::Equal(planegeometry->GetAxisVector(0), right, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -411,7 +413,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   thicknessInMM = 3.5;
   normal.Normalize(); normal *= thicknessInMM;
   planegeometry->SetExtentInMM(2, thicknessInMM);
-  if(mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM)==false)
+  if(mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -419,7 +421,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing SetExtentInMM(2, ...), querying by GetAxisVector(2) and comparing to normal: ";
-  if(mitk::Equal(planegeometry->GetAxisVector(2), normal)==false)
+  if(mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -428,7 +430,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
 
   std::cout << "Testing SetOrigin: ";
   planegeometry->SetOrigin(origin);
-  if(mitk::Equal(planegeometry->GetOrigin(), origin)==false)
+  if(mitk::Equal(planegeometry->GetOrigin(), origin, testEps)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -436,7 +438,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing GetAxisVector() after SetOrigin: ";
-  if((mitk::Equal(planegeometry->GetAxisVector(0), right)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), bottom)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), normal)==false))
+  if((mitk::Equal(planegeometry->GetAxisVector(0), right, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -475,7 +477,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   mitk::Point3D cornerpoint0 = planegeometry->GetCornerPoint(0);
 
   std::cout << "Testing whether SetIndexToWorldTransform kept origin: ";
-  if(mitk::Equal(planegeometry->GetOrigin(), origin)==false)
+  if(mitk::Equal(planegeometry->GetOrigin(), origin, testEps)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -491,9 +493,9 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in mm) of rotated version: ";
-  if((mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM)==false) ||
-     (mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM)==false) ||
-     (mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM)==false)
+  if((mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM, testEps)==false) ||
+     (mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM, testEps)==false) ||
+     (mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps)==false)
     )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -502,7 +504,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing GetAxisVector() of rotated version: ";
-  if((mitk::Equal(planegeometry->GetAxisVector(0), right)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), bottom)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), normal)==false))
+  if((mitk::Equal(planegeometry->GetAxisVector(0), right, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -510,9 +512,9 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing GetAxisVector(direction).GetNorm() != planegeometry->GetExtentInMM(direction) of rotated version: ";
-  if((mitk::Equal(planegeometry->GetAxisVector(0).GetNorm(),planegeometry->GetExtentInMM(0))==false) ||
-     (mitk::Equal(planegeometry->GetAxisVector(1).GetNorm(),planegeometry->GetExtentInMM(1))==false) ||
-     (mitk::Equal(planegeometry->GetAxisVector(2).GetNorm(),planegeometry->GetExtentInMM(2))==false)
+  if((mitk::Equal(planegeometry->GetAxisVector(0).GetNorm(),planegeometry->GetExtentInMM(0), testEps)==false) ||
+     (mitk::Equal(planegeometry->GetAxisVector(1).GetNorm(),planegeometry->GetExtentInMM(1), testEps)==false) ||
+     (mitk::Equal(planegeometry->GetAxisVector(2).GetNorm(),planegeometry->GetExtentInMM(2), testEps)==false)
     )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -530,9 +532,9 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   planegeometry->SetSizeInUnits(width, height);
 
   std::cout << "Testing width, height and thickness (in units): ";
-  if((mitk::Equal(planegeometry->GetExtent(0),width)==false) ||
-     (mitk::Equal(planegeometry->GetExtent(1),height)==false) ||
-     (mitk::Equal(planegeometry->GetExtent(2),1)==false)
+  if((mitk::Equal(planegeometry->GetExtent(0),width, testEps)==false) ||
+     (mitk::Equal(planegeometry->GetExtent(1),height, testEps)==false) ||
+     (mitk::Equal(planegeometry->GetExtent(2),1, testEps)==false)
     )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -541,7 +543,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in mm) of version with changed size in units: ";
-  if(!mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM) || !mitk::Equal(planegeometry->GetExtentInMM(1), heightInMM) || !mitk::Equal(planegeometry->GetExtentInMM(2), thicknessInMM))
+  if(!mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps) || !mitk::Equal(planegeometry->GetExtentInMM(1), heightInMM, testEps) || !mitk::Equal(planegeometry->GetExtentInMM(2), thicknessInMM, testEps))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -549,7 +551,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing GetAxisVector() of version with changed size in units: ";
-  if((mitk::Equal(planegeometry->GetAxisVector(0), right)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), bottom)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), normal)==false))
+  if((mitk::Equal(planegeometry->GetAxisVector(0), right, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -557,9 +559,9 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing GetAxisVector(direction).GetNorm() != planegeometry->GetExtentInMM(direction) of rotated version: ";
-  if((mitk::Equal(planegeometry->GetAxisVector(0).GetNorm(),planegeometry->GetExtentInMM(0))==false) ||
-     (mitk::Equal(planegeometry->GetAxisVector(1).GetNorm(),planegeometry->GetExtentInMM(1))==false) ||
-     (mitk::Equal(planegeometry->GetAxisVector(2).GetNorm(),planegeometry->GetExtentInMM(2))==false)
+  if((mitk::Equal(planegeometry->GetAxisVector(0).GetNorm(),planegeometry->GetExtentInMM(0), testEps)==false) ||
+     (mitk::Equal(planegeometry->GetAxisVector(1).GetNorm(),planegeometry->GetExtentInMM(1), testEps)==false) ||
+     (mitk::Equal(planegeometry->GetAxisVector(2).GetNorm(),planegeometry->GetExtentInMM(2), testEps)==false)
     )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -583,7 +585,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing origin of cloned version: ";
-  if(mitk::Equal(clonedplanegeometry->GetOrigin(), origin)==false)
+  if(mitk::Equal(clonedplanegeometry->GetOrigin(), origin, testEps)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -591,9 +593,9 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in units) of cloned version: ";
-  if((mitk::Equal(clonedplanegeometry->GetExtent(0),width)==false) ||
-     (mitk::Equal(clonedplanegeometry->GetExtent(1),height)==false) ||
-     (mitk::Equal(clonedplanegeometry->GetExtent(2),1)==false)
+  if((mitk::Equal(clonedplanegeometry->GetExtent(0),width, testEps)==false) ||
+     (mitk::Equal(clonedplanegeometry->GetExtent(1),height, testEps)==false) ||
+     (mitk::Equal(clonedplanegeometry->GetExtent(2),1, testEps)==false)
     )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -602,7 +604,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in mm) of cloned version: ";
-  if(!mitk::Equal(clonedplanegeometry->GetExtentInMM(0), widthInMM) || !mitk::Equal(clonedplanegeometry->GetExtentInMM(1), heightInMM) || !mitk::Equal(clonedplanegeometry->GetExtentInMM(2), thicknessInMM))
+  if(!mitk::Equal(clonedplanegeometry->GetExtentInMM(0), widthInMM, testEps) || !mitk::Equal(clonedplanegeometry->GetExtentInMM(1), heightInMM, testEps) || !mitk::Equal(clonedplanegeometry->GetExtentInMM(2), thicknessInMM, testEps))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -610,7 +612,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing GetAxisVector() of cloned version: ";
-  if((mitk::Equal(clonedplanegeometry->GetAxisVector(0), right)==false) || (mitk::Equal(clonedplanegeometry->GetAxisVector(1), bottom)==false) || (mitk::Equal(clonedplanegeometry->GetAxisVector(2), normal)==false))
+  if((mitk::Equal(clonedplanegeometry->GetAxisVector(0), right, testEps)==false) || (mitk::Equal(clonedplanegeometry->GetAxisVector(1), bottom, testEps)==false) || (mitk::Equal(clonedplanegeometry->GetAxisVector(2), normal, testEps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -737,7 +739,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in units) of axially initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ";
-  if(!mitk::Equal(planegeometry->GetExtent(0), width) || !mitk::Equal(planegeometry->GetExtent(1), height) || !mitk::Equal(planegeometry->GetExtent(2), 1))
+  if(!mitk::Equal(planegeometry->GetExtent(0), width, testEps) || !mitk::Equal(planegeometry->GetExtent(1), height, testEps) || !mitk::Equal(planegeometry->GetExtent(2), 1, testEps))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -745,7 +747,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in mm) of axially initialized version: ";
-  if(!mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM) || !mitk::Equal(planegeometry->GetExtentInMM(1), heightInMM) || !mitk::Equal(planegeometry->GetExtentInMM(2), thicknessInMM))
+  if(!mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps) || !mitk::Equal(planegeometry->GetExtentInMM(1), heightInMM, testEps) || !mitk::Equal(planegeometry->GetExtentInMM(2), thicknessInMM, testEps))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -753,7 +755,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing GetAxisVector() of axially initialized version: ";
-  if((mitk::Equal(planegeometry->GetAxisVector(0), right)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), bottom)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), normal)==false))
+  if((mitk::Equal(planegeometry->GetAxisVector(0), right, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -776,7 +778,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   newnormal = -bottom; newnormal.Normalize(); newnormal *= newthicknessInMM;
 
   std::cout << "Testing GetCornerPoint(0) of frontally initialized version: ";
-  if(mitk::Equal(planegeometry->GetCornerPoint(0), cornerpoint0)==false)
+  if(mitk::Equal(planegeometry->GetCornerPoint(0), cornerpoint0, testEps)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -786,7 +788,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   origin = planegeometry->GetOrigin();
 
   std::cout << "Testing width, height and thickness (in units) of frontally initialized version: ";
-  if(!mitk::Equal(planegeometry->GetExtent(0), width) || !mitk::Equal(planegeometry->GetExtent(1), 1) || !mitk::Equal(planegeometry->GetExtent(2), 1))
+  if(!mitk::Equal(planegeometry->GetExtent(0), width, testEps) || !mitk::Equal(planegeometry->GetExtent(1), 1, testEps) || !mitk::Equal(planegeometry->GetExtent(2), 1, testEps))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -794,7 +796,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in mm) of frontally initialized version: ";
-  if(!mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM) || !mitk::Equal(planegeometry->GetExtentInMM(1), thicknessInMM) || !mitk::Equal(planegeometry->GetExtentInMM(2), newthicknessInMM))
+  if(!mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps) || !mitk::Equal(planegeometry->GetExtentInMM(1), thicknessInMM, testEps) || !mitk::Equal(planegeometry->GetExtentInMM(2), newthicknessInMM, testEps))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -802,7 +804,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing GetAxisVector() of frontally initialized version: ";
-  if((mitk::Equal(planegeometry->GetAxisVector(0), newright)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), newbottom)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), newnormal)==false))
+  if((mitk::Equal(planegeometry->GetAxisVector(0), newright, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), newbottom, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), newnormal, testEps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -819,7 +821,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   planegeometry->SetSizeInUnits(planegeometry->GetExtentInMM(0), planegeometry->GetExtentInMM(1));
 
   std::cout << "Testing origin of unit spaced, frontally initialized version: ";
-  if(mitk::Equal(planegeometry->GetOrigin(), origin)==false)
+  if(mitk::Equal(planegeometry->GetOrigin(), origin, testEps)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -827,7 +829,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in units) of unit spaced, frontally initialized version: ";
-  if(!mitk::Equal(planegeometry->GetExtent(0), widthInMM) || !mitk::Equal(planegeometry->GetExtent(1), thicknessInMM) || !mitk::Equal(planegeometry->GetExtent(2), 1))
+  if(!mitk::Equal(planegeometry->GetExtent(0), widthInMM, testEps) || !mitk::Equal(planegeometry->GetExtent(1), thicknessInMM, testEps) || !mitk::Equal(planegeometry->GetExtent(2), 1, testEps))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -835,7 +837,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in mm) of unit spaced, frontally initialized version: ";
-  if(!mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM) || !mitk::Equal(planegeometry->GetExtentInMM(1), thicknessInMM) || !mitk::Equal(planegeometry->GetExtentInMM(2), newthicknessInMM))
+  if(!mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps) || !mitk::Equal(planegeometry->GetExtentInMM(1), thicknessInMM, testEps) || !mitk::Equal(planegeometry->GetExtentInMM(2), newthicknessInMM, testEps))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -843,7 +845,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing GetAxisVector() of unit spaced, frontally initialized version: ";
-  if((mitk::Equal(planegeometry->GetAxisVector(0), newright)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), newbottom)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), newnormal)==false))
+  if((mitk::Equal(planegeometry->GetAxisVector(0), newright, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), newbottom, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), newnormal, testEps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -861,7 +863,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   newnormal.Normalize();
 
   std::cout << "Testing origin of unit spaced, frontally initialized version: ";
-  if(mitk::Equal(planegeometry->GetOrigin(), origin)==false)
+  if(mitk::Equal(planegeometry->GetOrigin(), origin, testEps)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -869,7 +871,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in units) of unit spaced, frontally initialized version: ";
-  if(!mitk::Equal(planegeometry->GetExtent(0), widthInMM) || !mitk::Equal(planegeometry->GetExtent(1), thicknessInMM) || !mitk::Equal(planegeometry->GetExtent(2), 1))
+  if(!mitk::Equal(planegeometry->GetExtent(0), widthInMM, testEps) || !mitk::Equal(planegeometry->GetExtent(1), thicknessInMM, testEps) || !mitk::Equal(planegeometry->GetExtent(2), 1, testEps))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -877,7 +879,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in mm) of unit spaced, frontally initialized version: ";
-  if(!mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM) || !mitk::Equal(planegeometry->GetExtentInMM(1), thicknessInMM) || !mitk::Equal(planegeometry->GetExtentInMM(2), 1.0))
+  if(!mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps) || !mitk::Equal(planegeometry->GetExtentInMM(1), thicknessInMM, testEps) || !mitk::Equal(planegeometry->GetExtentInMM(2), 1.0, testEps))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -885,7 +887,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing GetAxisVector() of unit spaced, frontally initialized version: ";
-  if((mitk::Equal(planegeometry->GetAxisVector(0), newright)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), newbottom)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), newnormal)==false))
+  if((mitk::Equal(planegeometry->GetAxisVector(0), newright, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), newbottom, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), newnormal, testEps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -905,7 +907,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   newnormal = right; newnormal.Normalize(); newnormal *= newthicknessInMM;
 
   std::cout << "Testing GetCornerPoint(0) of sagitally initialized version: ";
-  if(mitk::Equal(planegeometry->GetCornerPoint(0), cornerpoint0)==false)
+  if(mitk::Equal(planegeometry->GetCornerPoint(0), cornerpoint0, testEps)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -915,7 +917,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   origin = planegeometry->GetOrigin();
 
   std::cout << "Testing width, height and thickness (in units) of sagitally initialized version: ";
-  if(!mitk::Equal(planegeometry->GetExtent(0), height) || !mitk::Equal(planegeometry->GetExtent(1), 1) || !mitk::Equal(planegeometry->GetExtent(2), 1))
+  if(!mitk::Equal(planegeometry->GetExtent(0), height, testEps) || !mitk::Equal(planegeometry->GetExtent(1), 1, testEps) || !mitk::Equal(planegeometry->GetExtent(2), 1, testEps))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -923,7 +925,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in mm) of sagitally initialized version: ";
-  if(!mitk::Equal(planegeometry->GetExtentInMM(0), heightInMM) || !mitk::Equal(planegeometry->GetExtentInMM(1), thicknessInMM) || !mitk::Equal(planegeometry->GetExtentInMM(2), newthicknessInMM))
+  if(!mitk::Equal(planegeometry->GetExtentInMM(0), heightInMM, testEps) || !mitk::Equal(planegeometry->GetExtentInMM(1), thicknessInMM, testEps) || !mitk::Equal(planegeometry->GetExtentInMM(2), newthicknessInMM, testEps))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -931,7 +933,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing GetAxisVector() of sagitally initialized version: ";
-  if((mitk::Equal(planegeometry->GetAxisVector(0), newright)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), newbottom)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), newnormal)==false))
+  if((mitk::Equal(planegeometry->GetAxisVector(0), newright, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), newbottom, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), newnormal, testEps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -952,7 +954,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   backsideorigin=origin+clonedplanegeometry->GetAxisVector(1);//+clonedplanegeometry->GetAxisVector(2);
 
   std::cout << "Testing origin of backsidedly, axially initialized version: ";
-  if(mitk::Equal(planegeometry->GetOrigin(), backsideorigin)==false)
+  if(mitk::Equal(planegeometry->GetOrigin(), backsideorigin, testEps)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -962,7 +964,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout << "Testing GetCornerPoint(0) of sagitally initialized version: ";
   mitk::Point3D backsidecornerpoint0;
   backsidecornerpoint0 = cornerpoint0+clonedplanegeometry->GetAxisVector(1);//+clonedplanegeometry->GetAxisVector(2);
-  if(mitk::Equal(planegeometry->GetCornerPoint(0), backsidecornerpoint0)==false)
+  if(mitk::Equal(planegeometry->GetCornerPoint(0), backsidecornerpoint0, testEps)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -970,7 +972,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in units) of backsidedly, axially initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ";
-  if(!mitk::Equal(planegeometry->GetExtent(0), width) || !mitk::Equal(planegeometry->GetExtent(1), height) || !mitk::Equal(planegeometry->GetExtent(2), 1))
+  if(!mitk::Equal(planegeometry->GetExtent(0), width, testEps) || !mitk::Equal(planegeometry->GetExtent(1), height, testEps) || !mitk::Equal(planegeometry->GetExtent(2), 1, testEps))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -978,7 +980,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in mm) of backsidedly, axially initialized version: ";
-  if(!mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM) || !mitk::Equal(planegeometry->GetExtentInMM(1), heightInMM) || !mitk::Equal(planegeometry->GetExtentInMM(2), thicknessInMM))
+  if(!mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps) || !mitk::Equal(planegeometry->GetExtentInMM(1), heightInMM, testEps) || !mitk::Equal(planegeometry->GetExtentInMM(2), thicknessInMM, testEps))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -986,7 +988,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing GetAxisVector() of backsidedly, axially initialized version: ";
-  if((mitk::Equal(planegeometry->GetAxisVector(0), right)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), -bottom)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), -normal)==false))
+  if((mitk::Equal(planegeometry->GetAxisVector(0), right, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), -bottom, testEps)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), -normal, testEps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

@@ -97,7 +97,7 @@ void mitk::ItkImageFileReader::GenerateData()
   dimensions[ 2 ] = 0;
   dimensions[ 3 ] = 0;
 
-  float spacing[ MAXDIM ];
+  ScalarType spacing[ MAXDIM ];
   spacing[ 0 ] = 1.0f;
   spacing[ 1 ] = 1.0f;
   spacing[ 2 ] = 1.0f;

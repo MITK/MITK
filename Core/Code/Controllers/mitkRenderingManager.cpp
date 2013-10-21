@@ -406,7 +406,7 @@ RenderingManager
       unsigned int matchingRow = 0;
 
       // maximum value in the column
-      float max = std::numeric_limits<float>::min();
+      ScalarType max = std::numeric_limits<ScalarType>::min();
 
       // sign of the maximum value (-1 or 1)
       int sign = 1;

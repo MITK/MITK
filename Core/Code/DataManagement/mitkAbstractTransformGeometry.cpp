@@ -140,7 +140,7 @@ bool mitk::AbstractTransformGeometry::Map(const mitk::Point3D & atPt3d_mm, const
 {
   assert((m_ItkVtkAbstractTransform.IsNotNull()) && (m_Plane.IsNotNull()));
 
-  float vtkpt[3], vtkvec[3];
+  ScalarType vtkpt[3], vtkvec[3];
   itk2vtk(atPt3d_mm, vtkpt);
   itk2vtk(vec3d_mm, vtkvec);
   m_ItkVtkAbstractTransform->GetInverseVtkAbstractTransform()->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
@@ -263,7 +263,7 @@ unsigned long mitk::AbstractTransformGeometry::GetMTime() const
   return Superclass::GetMTime();
 }
 
-void mitk::AbstractTransformGeometry::SetOversampling(float oversampling)
+void mitk::AbstractTransformGeometry::SetOversampling(mitk::ScalarType oversampling)
 {
   if(m_Plane.IsNull())
   {

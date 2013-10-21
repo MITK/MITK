@@ -130,7 +130,7 @@ public:
   typedef itk::Mesh<PointDataType, PointDimension, MeshTraits> MeshType;
 
   typedef MeshType DataType;
-  typedef DataType::PointType PointType;
+  typedef Point3D PointType;
   typedef DataType::PointIdentifier PointIdentifier;
   typedef DataType::PointsContainer PointsContainer;
   typedef DataType::PointsContainerIterator PointsIterator;
@@ -232,7 +232,7 @@ public:
    * returns -1 if no point is found
    * or the position in the list of the first match
    */
-  int SearchPoint( Point3D point, float distance, int t = 0 ) const;
+  int SearchPoint( Point3D point, ScalarType distance, int t = 0 ) const;
 
   virtual bool IsEmptyTimeStep(unsigned int t) const;
 

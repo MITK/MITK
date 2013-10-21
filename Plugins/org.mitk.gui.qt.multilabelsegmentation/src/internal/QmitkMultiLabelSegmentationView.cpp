@@ -352,14 +352,14 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
     m_Controls.m_gbMaskStamp->setEnabled(false);
     return;
   }
-
+/*
   if (m_WorkingNode.IsNotNull())
   {
     mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( m_WorkingNode->GetData() );
     assert(workingImage);
-    workingImage->SetActiveLabel(0,0,true);
+    workingImage->SetActiveLabel(0,true);
   }
-
+*/
   m_WorkingNode = const_cast<mitk::DataNode*>(node);
 
   m_ToolManager->SetWorkingData(m_WorkingNode);

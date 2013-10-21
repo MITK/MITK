@@ -580,8 +580,7 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     mitk::ContourUtils::ProjectContourTo2DSlice( slice, m_FeedbackContour, projectedContour, timeStep );
     if (projectedContour.IsNull()) return;
 
-    int activeLayer = m_WorkingImage->GetActiveLayer();
-    mitk::ContourUtils::FillContourInSlice( projectedContour, slice, m_WorkingImage->GetActiveLabelIndex(activeLayer), timeStep );
+    mitk::ContourUtils::FillContourInSlice( projectedContour, slice, m_WorkingImage->GetActiveLabelIndex(), timeStep );
 
     //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
     vtkSmartPointer<mitkVtkImageOverwrite> overwrite = vtkSmartPointer<mitkVtkImageOverwrite>::New();
@@ -695,8 +694,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       mitk::ContourUtils::ProjectContourTo2DSlice( slice, m_FeedbackContour, projectedContour, timeStep );
       if (projectedContour.IsNull()) return;
 
-      int activeLayer = m_WorkingImage->GetActiveLayer();
-      mitk::ContourUtils::FillContourInSlice( projectedContour, slice, m_WorkingImage->GetActiveLabelIndex(activeLayer), timeStep );
+      mitk::ContourUtils::FillContourInSlice( projectedContour, slice, m_WorkingImage->GetActiveLabelIndex(), timeStep );
 
       //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
       vtkSmartPointer<mitkVtkImageOverwrite> overwrite = vtkSmartPointer<mitkVtkImageOverwrite>::New();

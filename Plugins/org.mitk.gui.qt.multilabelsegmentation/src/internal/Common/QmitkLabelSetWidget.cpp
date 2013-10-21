@@ -207,7 +207,7 @@ void QmitkLabelSetWidget::OnRenameLabel(int index, const mitk::Color& color, con
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
   assert(workingImage);
 
-  workingImage->RenameLabel( workingImage->GetActiveLayer(), index, dialog->GetSegmentationName().toStdString(), dialog->GetColor());
+  workingImage->RenameLabel(index, dialog->GetSegmentationName().toStdString(), dialog->GetColor());
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -364,6 +364,7 @@ void QmitkLabelSetWidget::OnAddLayer()
   {
     this->WaitCursorOn();
     workingImage->AddLayer();
+    workingImage->SetActiveLayer( workingImage->GetActiveLayer() - 1 );
     this->WaitCursorOff();
   }
   catch ( mitk::Exception& e )
@@ -381,6 +382,7 @@ void QmitkLabelSetWidget::OnAddLayer()
   {
     m_Controls.m_cbActiveLayer->addItem(QString::number(lidx));
   }
+
   this->UpdateControls();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -562,8 +564,7 @@ void QmitkLabelSetWidget::OnSmoothLabel(int index)
   try
   {
     this->WaitCursorOn();
-    int activeLayer = workingImage->GetActiveLayer();
-    workingImage->SmoothLabel(activeLayer,index);
+    workingImage->SmoothLabel(index);
     this->WaitCursorOff();
   }
   catch ( mitk::Exception& e )

@@ -452,7 +452,7 @@ void mitk::SegTool2D::ItkPasteSegmentationOnWorkingImage( itk::Image<TPixel,VIma
   assert (workingImage);
 
   int activeLayer = workingImage->GetActiveLayer();
-  int activePixelValue = workingImage->GetActiveLabelIndex(activeLayer);
+  int activePixelValue = workingImage->GetActiveLabelIndex();
 
   if (activePixelValue == 0) // if exterior is the active label
   {

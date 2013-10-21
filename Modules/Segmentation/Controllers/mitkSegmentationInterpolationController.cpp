@@ -298,8 +298,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
   if ( sliceIndex >= upperLimit - 1 ) return NULL; // can't interpolate first and last slice
   if ( sliceIndex < 1  ) return NULL;
 
-  int activeLayer = m_WorkingImage->GetActiveLayer();
-  int activeLabel = m_WorkingImage->GetActiveLabelIndex(activeLayer);
+  int activeLabel = m_WorkingImage->GetActiveLabelIndex();
 
   // slice contains a segmentation, won't interpolate anything then
   if ( m_LabelCountInSlice[timeStep][sliceDimension][sliceIndex][activeLabel] > 0 ) return NULL;

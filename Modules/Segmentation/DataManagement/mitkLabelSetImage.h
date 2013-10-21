@@ -133,19 +133,19 @@ public:
   /**
     * \brief
   */
-  void MergeLabels(int layer, std::vector<int>& indexes, int index);
+  void MergeLabels(std::vector<int>& indexes, int index, int layer = -1);
 
   /**
     * \brief  */
-  void EraseLabel(int layer, int index, bool reorder);
+  void EraseLabel(int index, bool reorder, int layer = -1);
 
   /**
     * \brief  */
-  void SmoothLabel(int layer, int index);
+  void SmoothLabel(int index, int layer = -1);
 
   /**
     * \brief  */
-  void CalculateLabelVolume(int layer, int index);
+  void CalculateLabelVolume(int index, int layer = -1);
 
   /**
     * \brief  */
@@ -165,95 +165,95 @@ public:
 
   /**
     * \brief  */
-  void SetLabelColor(int layer, int index, const mitk::Color &color);
+  void SetLabelColor(int index, const mitk::Color &color, int layer = -1);
 
   /**
     * \brief  */
-  const mitk::Color& GetLabelColor(int layer, int index);
+  const mitk::Color& GetLabelColor(int index, int layer = -1);
 
   /**
     * \brief  */
-  void SetLabelOpacity(int layer, int index, float value);
+  void SetLabelOpacity(int index, float value, int layer = -1);
 
   /**
     * \brief  */
-  void SetLabelVolume(int layer, int index, float value);
+  void SetLabelVolume(int index, float value, int layer = -1);
 
   /**
     * \brief  */
-  void RenameLabel(int layer, int index, const std::string& name, const mitk::Color& color);
+  void RenameLabel(int index, const std::string& name, const mitk::Color& color, int layer = -1);
 
   /**
     * \brief  */
-  void SetLabelName(int layer, int index, const std::string& name);
+  void SetLabelName(int index, const std::string& name, int layer = -1);
 
   /**
     * \brief  */
-  std::string GetLabelName(int layer, int index);
+  std::string GetLabelName(int index, int layer = -1) const;
 
   /**
     * \brief  */
-  void SetAllLabelsLocked(int layer, bool);
+  void SetAllLabelsLocked(bool sendEvent, int layer = -1);
 
   /**
     * \brief  */
-  void SetAllLabelsVisible(int layer, bool);
+  void SetAllLabelsVisible(bool sendEvent, int layer = -1);
 
   /**
     * \brief  */
-  void SetLabelLocked(int layer, int index, bool value);
+  void SetLabelLocked(int index, bool value, int layer = -1);
 
   /**
     * \brief  */
-  void SetLabelSelected(int layer, int index, bool value);
+  void SetLabelSelected(int index, bool value, int layer = -1);
 
   /**
     * \brief  */
-  void SetLabelVisible(int layer, int index, bool value);
+  void SetLabelVisible(int index, bool value = false, int layer = -1);
 
   /**
     * \brief  */
-  void RemoveLabel(int layer, int index);
+  void RemoveLabel(int index, int layer = -1);
 
   /**
     * \brief  */
-  void RemoveLabels(int layer, std::vector<int>& indexes);
+  void RemoveLabels(std::vector<int>& indexes, int layer = -1);
 
   /**
     * \brief  */
-  void EraseLabels(int layer, std::vector<int>& indexes);
+  void EraseLabels(std::vector<int>& indexes, int layer = -1);
 
 /**
     * \brief  */
-  void SmoothLabels(int layer, std::vector<int>& indexes);
+  void SmoothLabels(std::vector<int>& indexes, int layer = -1);
 
   /**
     * \brief  */
-  bool GetLabelSelected(int layer, int index) const;
+  bool GetLabelSelected(int index, int layer = -1) const;
 
   /**
     * \brief  */
-  bool GetLabelLocked(int layer, int index) const;
+  bool GetLabelLocked(int index, int layer = -1) const;
 
   /**
     * \brief  */
-  bool GetLabelVisible(int layer, int index) const;
+  bool GetLabelVisible(int index, int layer = -1) const;
 
   /**
     * \brief  */
-  int GetActiveLabelIndex(int layer) const;
+  int GetActiveLabelIndex(int layer = -1) const;
 
   /**
     * \brief  */
-  const mitk::Color& GetActiveLabelColor(int layer) const;
+  const mitk::Color& GetActiveLabelColor(int layer = -1) const;
 
    /**
     * \brief  */
-  double GetActiveLabelOpacity(int layer) const;
+  double GetActiveLabelOpacity(int layer = -1) const;
 
   /**
     * \brief  */
-  const mitk::Label* GetActiveLabel(int layer) const;
+  const mitk::Label* GetActiveLabel(int layer = -1) const;
 
   /**
   * \brief  */
@@ -261,27 +261,27 @@ public:
 
   /**
     * \brief  */
-  void SetActiveLabel(int layer, int index, bool sendEvent);
+  void SetActiveLabel(int index, bool sendEvent = false, int layer = -1);
 
   /**
     * \brief  */
-  const mitk::Point3D& GetLabelCenterOfMassIndex(int layer, int index, bool forceUpdate);
+  const mitk::Point3D& GetLabelCenterOfMassIndex(int index, bool forceUpdate = false, int layer = -1);
 
   /**
     * \brief  */
-  const mitk::Point3D& GetLabelCenterOfMassCoordinates(int layer, int index, bool forceUpdate);
+  const mitk::Point3D& GetLabelCenterOfMassCoordinates(int index, bool forceUpdate = false, int layer = -1);
 
   /**
     * \brief  */
-  float GetLabelOpacity(int layer, int index);
+  float GetLabelOpacity(int index, int layer = -1);
 
   /**
     * \brief  */
-  float GetLabelVolume(int layer, int index);
+  float GetLabelVolume(int index, int layer = -1);
 
   /**
     * \brief  */
-  int GetNumberOfLabels(int layer) const;
+  int GetNumberOfLabels(int layer = -1) const;
 
   /**
     * \brief  */
@@ -289,19 +289,19 @@ public:
 
   /**
     * \brief  */
-  void RemoveAllLabels(int layer);
+  void RemoveAllLabels(int layer = -1);
 
   /**
     * \brief  */
-  mitk::LabelSet::ConstPointer GetLabelSet(int layer) const;
+  mitk::LabelSet::ConstPointer GetLabelSet(int layer = -1) const;
 
   /**
     * \brief  */
-  mitk::LabelSet* GetLabelSet(int layer);
+  mitk::LabelSet* GetLabelSet(int layer = -1);
 
   /**
     * \brief  */
-  const mitk::LookupTable* GetLookupTable(int layer);
+  const mitk::LookupTable* GetLookupTable(int layer = -1);
 
   /**
     * \brief  */
@@ -313,7 +313,7 @@ public:
 
   /**
     * \brief  */
-  void ResetLabels(int layer);
+  void ResetLabels(int layer = -1);
 
   /**
     * \brief  */
@@ -339,8 +339,12 @@ public:
     * \brief  */
   int GetNumberOfLayers();
 
+  /**
+    * \brief  */
   VectorImageType::Pointer GetVectorImage(bool forceUpdate);
 
+  /**
+    * \brief  */
   void SetVectorImage(VectorImageType::Pointer image );
 
   /**
@@ -362,8 +366,6 @@ protected:
 
   LabelSet::Pointer CreateDefaultLabelSet();
 
-  //mutable ImageVtkAccessor* m_VtkImageData;
-
   template < typename ImageType1, typename ImageType2 >
   void ChangeLayerProcessing( ImageType1* source, ImageType2* target );
 
@@ -377,16 +379,19 @@ protected:
   void ImageToLayerContainerProcessing( ImageType* input, int layer);
 
   template < typename ImageType >
-  void CalculateCenterOfMassProcessing( ImageType* input, int index);
+  void CalculateCenterOfMassProcessing( ImageType* input, int index, int layer);
 
   template < typename ImageType >
   void ClearBufferProcessing( ImageType* input);
 
   template < typename ImageType >
-  void EraseLabelProcessing( ImageType* input, int index, bool reorder);
+  void EraseLabelProcessing( ImageType* input, int index, int layer);
 
   template < typename ImageType >
-  void SmoothLabelProcessing( ImageType* input, int layer, int index);
+  void ReorderLabelProcessing( ImageType* input, int index, int layer);
+
+  template < typename ImageType >
+  void SmoothLabelProcessing( ImageType* input, int index);
 
   template < typename ImageType >
   void MergeLabelsProcessing( ImageType* input, int index);

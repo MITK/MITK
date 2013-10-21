@@ -47,9 +47,8 @@ bool mitk::AddContourTool::OnMousePressed (Action* action, const StateEvent* sta
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
   assert (workingImage);
 
-  int activeLayer = workingImage->GetActiveLayer();
-  m_PaintingPixelValue = workingImage->GetActiveLabelIndex( activeLayer );
-  const mitk::Color& color = workingImage->GetActiveLabelColor( activeLayer );
+  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+  const mitk::Color& color = workingImage->GetActiveLabelColor();
   this->SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
 
   return Superclass::OnMousePressed(action, stateEvent);
@@ -94,9 +93,8 @@ bool mitk::AddContourTool::OnInvertLogic(Action* action, const StateEvent* state
     assert (workingNode);
     LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
     assert (workingImage);
-    int activeLayer = workingImage->GetActiveLayer();
-    m_PaintingPixelValue = workingImage->GetActiveLabelIndex( activeLayer );
-    const mitk::Color& color = workingImage->GetActiveLabelColor( activeLayer );
+    m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+    const mitk::Color& color = workingImage->GetActiveLabelColor();
     FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
   }
   return true;

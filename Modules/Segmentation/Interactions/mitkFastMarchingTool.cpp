@@ -227,7 +227,7 @@ void mitk::FastMarchingTool::AcceptPreview()
 
   this->ClearSeeds();
 
-  m_FeedbackImage->EraseLabel(0,1,false);
+  m_FeedbackImage->EraseLabel(1,false);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

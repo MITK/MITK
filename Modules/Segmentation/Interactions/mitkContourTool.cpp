@@ -62,8 +62,8 @@ bool mitk::ContourTool::OnChangeActiveLabel (Action* action, const StateEvent* s
   assert(workingImage);
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
-  int value = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition(), timestep );
-  workingImage->SetActiveLabel(workingImage->GetActiveLayer(), value, true);
+  int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition(), timestep );
+  workingImage->SetActiveLabel(pixelValue, true);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return true;

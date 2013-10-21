@@ -289,7 +289,7 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
   workingImage->Modified();
 //  workingImage->GetVtkImageData()->Modified();
 
-  m_FeedbackImage->EraseLabel(0, 1, false);
+  m_FeedbackImage->EraseLabel(1, false);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -381,7 +381,7 @@ void mitk::FastMarchingTool3D::Update()
     int activeLayer = workingImage->GetActiveLayer();
     const mitk::Color& color = workingImage->GetActiveLabelColor(activeLayer);
 
-    m_FeedbackImage->SetLabelColor(0, 1, color);
+    m_FeedbackImage->SetLabelColor(1, color);
     m_FeedbackNode->SetData(m_FeedbackImage);
 
     m_NeedUpdate = false;

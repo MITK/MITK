@@ -69,8 +69,7 @@ bool mitk::SetRegionTool::OnChangeActiveLabel (Action* action, const StateEvent*
 
   int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition(), timestep );
 
-  int activeLayer = workingImage->GetActiveLayer();
-  workingImage->SetActiveLabel(activeLayer, pixelValue, true);
+  workingImage->SetActiveLabel(pixelValue, true);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 

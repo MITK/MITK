@@ -110,7 +110,7 @@ void mitk::AutoSegmentationTool::ItkPasteSegmentation( itk::Image<TPixel,VImageD
   assert (workingImage);
 
   int activeLayer = workingImage->GetActiveLayer();
-  int activePixelValue = workingImage->GetActiveLabelIndex(activeLayer);
+  int activePixelValue = workingImage->GetActiveLabelIndex();
 
   while ( !targetIterator.IsAtEnd() )
   {

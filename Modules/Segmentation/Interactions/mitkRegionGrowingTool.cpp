@@ -165,16 +165,15 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
          initialWorkingOffset >= 0 )
     {
       // 3. determine the pixel value under the last click
-      int activeLayer = workingImage->GetActiveLayer();
-      m_PaintingPixelValue = workingImage->GetActiveLabelIndex(activeLayer);
-      const mitk::Color& color = workingImage->GetActiveLabelColor(activeLayer);
+      m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+      const mitk::Color& color = workingImage->GetActiveLabelColor();
       FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
       m_OriginalPicSlice = mitkIpPicNew();
       CastToIpPicDescriptor(m_ReferenceSlice, m_OriginalPicSlice);
       OnMousePressedOutside(action, stateEvent);
 //todo: fix click inside
 /*
-      bool inside = static_cast<ipMITKSegmentationTYPE*>(workingPicSlice->data)[initialWorkingOffset] == workingImage->GetActiveLabelIndex(activeLayer);
+      bool inside = static_cast<ipMITKSegmentationTYPE*>(workingPicSlice->data)[initialWorkingOffset] == workingImage->GetActiveLabelIndex();
 
       if (inside)
       {
@@ -183,8 +182,8 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
       }
       else
       {
-          m_PaintingPixelValue = workingImage->GetActiveLabelIndex(activeLayer);
-          const mitk::Color& color = workingImage->GetActiveLabelColor(activeLayer);
+          m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+          const mitk::Color& color = workingImage->GetActiveLabelColor();
           FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
       }
 
@@ -427,9 +426,7 @@ bool mitk::RegionGrowingTool::OnChangeActiveLabel (Action* action, const StateEv
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
   int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition(), timestep );
-
-  int activeLayer = workingImage->GetActiveLayer();
-  workingImage->SetActiveLabel(activeLayer, pixelValue, true);
+  workingImage->SetActiveLabel(pixelValue, true);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 

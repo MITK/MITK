@@ -470,8 +470,7 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
 
     m_FeedbackContourNode->SetData( m_FeedbackContour );
 
-    int activeLayer = m_WorkingImage->GetActiveLayer();
-    const mitk::Color& color = m_WorkingImage->GetActiveLabelColor(activeLayer);
+    const mitk::Color& color = m_WorkingImage->GetActiveLabelColor();
     m_FeedbackContourNode->SetProperty("contour.color", mitk::ColorProperty::New(color));
   }
   else

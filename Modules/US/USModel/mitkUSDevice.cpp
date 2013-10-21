@@ -22,11 +22,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 #include <usModuleContext.h>
 
+const std::string yes = "true";
+const std::string no = "false";
+
 const std::string mitk::USDevice::US_INTERFACE_NAME = "org.mitk.services.UltrasoundDevice";
 const std::string mitk::USDevice::US_PROPKEY_LABEL = US_INTERFACE_NAME + ".label";
 const std::string mitk::USDevice::US_PROPKEY_ISCONNECTED = US_INTERFACE_NAME + ".isConnected";
 const std::string mitk::USDevice::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
 const std::string mitk::USDevice::US_PROPKEY_CLASS = US_INTERFACE_NAME + ".class";
+
+const std::string mitk::USDevice::US_PROPKEY_PROBES_SELECTED = US_INTERFACE_NAME + ".probes.selected";
+
+const std::string mitk::USDevice::US_PROPKEY_BMODE_FREQUENCY = US_INTERFACE_NAME + ".bmode.frequency";
+const std::string mitk::USDevice::US_PROPKEY_BMODE_POWER = US_INTERFACE_NAME + ".bmode.power";
+const std::string mitk::USDevice::US_PROPKEY_BMODE_DEPTH = US_INTERFACE_NAME + ".bmode.depth";
+const std::string mitk::USDevice::US_PROPKEY_BMODE_GAIN = US_INTERFACE_NAME + ".bmode.gain";
+const std::string mitk::USDevice::US_PROPKEY_BMODE_REJECTION = US_INTERFACE_NAME + ".bmode.rejection";
 
 mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
 {
@@ -125,26 +136,13 @@ mitk::USControlInterfaceDoppler::Pointer mitk::USDevice::GetControlInterfaceDopp
 us::ServiceProperties mitk::USDevice::ConstructServiceProperties()
 {
   us::ServiceProperties props;
-  std::string yes = "true";
-  std::string no = "false";
 
   props[mitk::USDevice::US_PROPKEY_ISCONNECTED] = this->GetIsConnected() ? yes : no;
+  props[mitk::USDevice::US_PROPKEY_ISACTIVE] = this->GetIsActive() ? yes : no;
 
-  if(this->GetIsActive())
-    props[mitk::USDevice::US_PROPKEY_ISACTIVE] = yes;
-  else
-    props[mitk::USDevice::US_PROPKEY_ISACTIVE] = no;
+  props[ mitk::USDevice::US_PROPKEY_LABEL] = this->GetServicePropertyLabel();
 
-  std::string isActive;
-  if (GetIsActive()) isActive = " (Active)";
-  else isActive = " (Inactive)";
-  // e.g.: Zonare MyLab5 (Active)
-  props[ mitk::USDevice::US_PROPKEY_LABEL] = m_Metadata->GetDeviceManufacturer() + " " + m_Metadata->GetDeviceModel() + isActive;
-
-  if( m_Calibration.IsNotNull() )
-    props[ mitk::USImageMetadata::PROP_DEV_ISCALIBRATED ] = yes;
-  else
-    props[ mitk::USImageMetadata::PROP_DEV_ISCALIBRATED ] = no;
+  props[ mitk::USImageMetadata::PROP_DEV_ISCALIBRATED ] = m_Calibration.IsNotNull() ? yes : no;
 
   props[ mitk::USDevice::US_PROPKEY_CLASS ] = GetDeviceClass();
   props[ mitk::USImageMetadata::PROP_DEV_MANUFACTURER ] = m_Metadata->GetDeviceManufacturer();
@@ -153,6 +151,8 @@ us::ServiceProperties mitk::USDevice::ConstructServiceProperties()
   props[ mitk::USImageMetadata::PROP_PROBE_NAME ] = m_Metadata->GetProbeName();
   props[ mitk::USImageMetadata::PROP_PROBE_FREQUENCY ] = m_Metadata->GetProbeFrequency();
   props[ mitk::USImageMetadata::PROP_ZOOM ] = m_Metadata->GetZoom();
+
+  m_ServiceProperties = props;
 
   return props;
 }
@@ -205,9 +205,7 @@ bool mitk::USDevice::Connect()
   // Update state
   m_DeviceState = State_Connected;
 
-  us::ServiceProperties props = this->ConstructServiceProperties();
-  m_ServiceRegistration.SetProperties(props);
-
+  this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_ISCONNECTED, true);
   return true;
 }
 
@@ -224,8 +222,7 @@ bool mitk::USDevice::Disconnect()
   // Update state
   m_DeviceState = State_Initialized;
 
-  us::ServiceProperties props = this->ConstructServiceProperties();
-  this->m_ServiceRegistration.SetProperties(props);
+  this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_ISCONNECTED, false);
 
   return true;
 }
@@ -246,10 +243,10 @@ bool mitk::USDevice::Activate()
 
     // spawn thread for aquire images if us device is active
     this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->Acquire, this);
-  }
 
-  us::ServiceProperties props = this->ConstructServiceProperties();
-  m_ServiceRegistration.SetProperties(props);
+    this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_ISACTIVE, true);
+    this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_LABEL, this->GetServicePropertyLabel());
+  }
 
   return m_DeviceState == State_Activated;
 }
@@ -263,11 +260,12 @@ void mitk::USDevice::Deactivate()
     return;
   }
 
+  if ( ! OnDeactivation() ) { return; }
+
   m_DeviceState = State_Connected;
 
-  us::ServiceProperties props = ConstructServiceProperties();
-  m_ServiceRegistration.SetProperties(props);
-  OnDeactivation();
+  this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_ISACTIVE, false);
+  this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_LABEL, this->GetServicePropertyLabel());
 }
 
 void mitk::USDevice::SetIsFreezed(bool freeze)
@@ -327,6 +325,24 @@ void mitk::USDevice::ActivateProbe(mitk::USProbe::Pointer probe){
 
 void mitk::USDevice::DeactivateProbe(){
   m_ActiveProbe = 0;
+}
+
+void mitk::USDevice::UpdateServiceProperty(std::string key, std::string value)
+{
+  m_ServiceProperties[ key ] = value;
+  m_ServiceRegistration.SetProperties(m_ServiceProperties);
+}
+
+void mitk::USDevice::UpdateServiceProperty(std::string key, double value)
+{
+  std::stringstream stream;
+  stream << value;
+  this->UpdateServiceProperty(key, stream.str());
+}
+
+void mitk::USDevice::UpdateServiceProperty(std::string key, bool value)
+{
+  this->UpdateServiceProperty(key, value ? std::string("true") : std::string("false"));
 }
 
 mitk::USImage* mitk::USDevice::GetOutput()
@@ -395,8 +411,7 @@ void mitk::USDevice::setCalibration (mitk::AffineTransform3D::Pointer calibratio
   m_Metadata->SetDeviceIsCalibrated(true);
   if (m_ServiceRegistration != 0)
   {
-    us::ServiceProperties props = ConstructServiceProperties();
-    this->m_ServiceRegistration.SetProperties(props);
+    this->UpdateServiceProperty(mitk::USImageMetadata::PROP_DEV_ISCALIBRATED, m_Calibration.IsNotNull());
   }
 }
 
@@ -430,6 +445,15 @@ std::string mitk::USDevice::GetDeviceComment(){
 std::vector<mitk::USProbe::Pointer> mitk::USDevice::GetConnectedProbes()
 {
   return m_ConnectedProbes;
+}
+
+std::string mitk::USDevice::GetServicePropertyLabel()
+{
+  std::string isActive;
+  if (this->GetIsActive()) { isActive = " (Active)"; }
+  else { isActive = " (Inactive)"; }
+  // e.g.: Zonare MyLab5 (Active)
+  return m_Metadata->GetDeviceManufacturer() + " " + m_Metadata->GetDeviceModel() + isActive;
 }
 
 ITK_THREAD_RETURN_TYPE mitk::USDevice::Acquire(void* pInfoStruct)

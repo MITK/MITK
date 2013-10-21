@@ -15,8 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSControlInterfaceDoppler.h"
+#include "mitkUSDevice.h"
 
-mitk::USControlInterfaceDoppler::USControlInterfaceDoppler()
+mitk::USControlInterfaceDoppler::USControlInterfaceDoppler(itk::SmartPointer<USDevice> device)
+  : mitk::USAbstractControlInterface(device)
 {
 }
 

@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSAbstractControlInterface.h"
 
 namespace mitk {
-
   /**
     * \brief Interface defining methods for scanning mode doppler of ultrasound devices.
     * There are no methods defined, yet! At the moment, this is just an empty
@@ -32,10 +31,9 @@ namespace mitk {
     mitkClassMacro(USControlInterfaceDoppler, USAbstractControlInterface);
 
   protected:
-    USControlInterfaceDoppler( );
+    USControlInterfaceDoppler( itk::SmartPointer<USDevice> device );
     virtual ~USControlInterfaceDoppler( );
   };
-
 } // namespace mitk
 
 #endif // MITKUSControlInterfaceDoppler_H_HEADER_INCLUDED_

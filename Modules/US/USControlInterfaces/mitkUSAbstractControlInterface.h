@@ -14,14 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKUSAbstractControlInterface_H_HEADER_INCLUDED_
 #define MITKUSAbstractControlInterface_H_HEADER_INCLUDED_
 
 #include <mitkCommon.h>
 #include <MitkUSExports.h>
 
+namespace itk {
+  template<class T> class SmartPointer;
+}
+
 namespace mitk {
+  class USDevice;
 
 /**
   * \brief Superclass for all ultrasound device control interfaces.
@@ -48,10 +52,11 @@ public:
   virtual bool GetIsActive( ) = 0;
 
 protected:
-  USAbstractControlInterface( );
+  USAbstractControlInterface( itk::SmartPointer<USDevice> device );
   virtual ~USAbstractControlInterface( );
-};
 
+  itk::SmartPointer<USDevice> m_Device;
+};
 } // namespace mitk
 
 #endif // MITKUSAbstractControlInterface_H_HEADER_INCLUDED_

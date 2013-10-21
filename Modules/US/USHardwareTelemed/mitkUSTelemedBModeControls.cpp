@@ -15,12 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSTelemedBModeControls.h"
+#include "mitkUSTelemedDevice.h"
 #include <mitkException.h>
 
 #define TELEMED_FREQUENCY_FACTOR 1000000
 
-mitk::USTelemedBModeControls::USTelemedBModeControls()
-: m_UsgDataView(0), m_PowerControl(0), m_FrequencyControl(0),
+mitk::USTelemedBModeControls::USTelemedBModeControls(itk::SmartPointer<USTelemedDevice> device)
+: mitk::USControlInterfaceBMode(device.GetPointer()),
+  m_UsgDataView(0), m_PowerControl(0), m_FrequencyControl(0),
   m_DepthControl(0), m_GainControl(0), m_RejectionControl(0),
   m_Active(false), m_PowerSteps(new double[3]),
   m_GainSteps(new double[3]), m_RejectionSteps(new double[3])
@@ -94,7 +96,7 @@ double mitk::USTelemedBModeControls::GetScanningFrequency( )
   return this->GetScanningFrequencyAPI() / TELEMED_FREQUENCY_FACTOR;
 }
 
-void mitk::USTelemedBModeControls::SetScanningFrequency( double value )
+void mitk::USTelemedBModeControls::OnSetScanningFrequency( double value )
 {
   SET_TelemedValue(m_FrequencyControl, value * TELEMED_FREQUENCY_FACTOR);
 }
@@ -109,7 +111,7 @@ double mitk::USTelemedBModeControls::GetScanningPower( )
   RETURN_TelemedValue(m_PowerControl);
 }
 
-void mitk::USTelemedBModeControls::SetScanningPower(double value)
+void mitk::USTelemedBModeControls::OnSetScanningPower(double value)
 {
   SET_TelemedValue(m_PowerControl, value);
 }
@@ -134,7 +136,7 @@ double mitk::USTelemedBModeControls::GetScanningDepth()
   RETURN_TelemedValue(m_DepthControl);
 }
 
-void mitk::USTelemedBModeControls::SetScanningDepth(double value)
+void mitk::USTelemedBModeControls::OnSetScanningDepth(double value)
 {
   SET_TelemedValue(m_DepthControl,value);
 }
@@ -149,7 +151,7 @@ double mitk::USTelemedBModeControls::GetScanningGain( )
   RETURN_TelemedValue(m_GainControl);
 }
 
-void mitk::USTelemedBModeControls::SetScanningGain(double value)
+void mitk::USTelemedBModeControls::OnSetScanningGain(double value)
 {
   SET_TelemedValue(m_GainControl, value);
 }
@@ -174,7 +176,7 @@ double mitk::USTelemedBModeControls::GetScanningRejection()
   RETURN_TelemedValue(m_RejectionControl);
 }
 
-void mitk::USTelemedBModeControls::SetScanningRejection(double value)
+void mitk::USTelemedBModeControls::OnSetScanningRejection(double value)
 {
   SET_TelemedValue(m_RejectionControl, value);
 }

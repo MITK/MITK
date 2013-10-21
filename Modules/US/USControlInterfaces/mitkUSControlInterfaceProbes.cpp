@@ -15,8 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSControlInterfaceProbes.h"
+#include "mitkUSDevice.h"
 
-mitk::USControlInterfaceProbes::USControlInterfaceProbes()
+mitk::USControlInterfaceProbes::USControlInterfaceProbes(itk::SmartPointer<USDevice> device)
+  : mitk::USAbstractControlInterface(device)
 {
 }
 

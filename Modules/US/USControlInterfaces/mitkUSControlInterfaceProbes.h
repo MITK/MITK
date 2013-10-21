@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSProbe.h"
 
 namespace mitk {
-
 /**
   * \brief Interface defining methods for probe selection of ultrasound devices.
   * It consists of methods for getting all available probes and selecting one of
@@ -65,10 +64,9 @@ public:
   virtual unsigned int GetProbesCount( ) const = 0;
 
 protected:
-  USControlInterfaceProbes( );
+  USControlInterfaceProbes( itk::SmartPointer<USDevice> device );
   virtual ~USControlInterfaceProbes( );
 };
-
 } // namespace mitk
 
 #endif // MITKUSControlInterfaceProbes_H_HEADER_INCLUDED_

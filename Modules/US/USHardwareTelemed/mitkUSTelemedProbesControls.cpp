@@ -15,11 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSTelemedProbesControls.h"
-#include <mitkException.h>
 #include "mitkUSTelemedDevice.h"
+#include <mitkException.h>
 
-mitk::USTelemedProbesControls::USTelemedProbesControls()
-  : m_IsActive(false), m_TelemedDevice(0),
+mitk::USTelemedProbesControls::USTelemedProbesControls(itk::SmartPointer<USTelemedDevice> device)
+  : mitk::USControlInterfaceProbes(device.GetPointer()),
+    m_IsActive(false), m_TelemedDevice(device),
     m_ProbesCollection(0), m_Probe(0)
 {
 }
@@ -34,7 +35,7 @@ void mitk::USTelemedProbesControls::SetIsActive(bool isActive)
   if ( ! m_TelemedDevice )
   {
     MITK_WARN("USTelemedProbesControls")("USControlInterfaceProbes")
-      << "Cannot activate probe controls while device is not set. Call SetTelemedDevice() first.";
+      << "Cannot activate probe controls while device is not set.";
     return;
   }
 
@@ -89,10 +90,10 @@ unsigned int mitk::USTelemedProbesControls::GetProbesCount() const
   return m_ProbesSet.size();
 }
 
-void mitk::USTelemedProbesControls::SetTelemedDevice(itk::SmartPointer<USTelemedDevice> telemedDevice)
+/*void mitk::USTelemedProbesControls::SetTelemedDevice(itk::SmartPointer<USTelemedDevice> telemedDevice)
 {
   m_TelemedDevice = telemedDevice;
-}
+}*/
 
 void mitk::USTelemedProbesControls::ProbeRemoved(unsigned int index)
 {

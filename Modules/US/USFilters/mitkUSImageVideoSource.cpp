@@ -42,6 +42,8 @@ mitk::USImageVideoSource::USImageVideoSource()
 
 mitk::USImageVideoSource::~USImageVideoSource()
 {
+  m_VideoCapture->release();
+  delete m_VideoCapture;
 }
 
 void mitk::USImageVideoSource::SetVideoFileInput(std::string path)

@@ -20,16 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::USTelemedDevice::USTelemedDevice(std::string manufacturer, std::string model)
 : mitk::USDevice(manufacturer, model),
-m_ControlsProbes(mitk::USTelemedProbesControls::New()),
-m_ControlsBMode(mitk::USTelemedBModeControls::New()),
-m_ControlsDoppler(mitk::USTelemedDopplerControls::New()),
+m_ControlsProbes(mitk::USTelemedProbesControls::New(this)),
+m_ControlsBMode(mitk::USTelemedBModeControls::New(this)),
+m_ControlsDoppler(mitk::USTelemedDopplerControls::New(this)),
 m_ImageSource(mitk::USTelemedImageSource::New()), m_UsgMainInterface(0),
 m_Probe(0), m_UsgDataView(0), m_ProbesCollection(0)
 {
   SetNumberOfOutputs(1);
   SetNthOutput(0, this->MakeOutput(0));
-
-  m_ControlsProbes->SetTelemedDevice(this);
 }
 
 mitk::USTelemedDevice::~USTelemedDevice()

@@ -41,9 +41,12 @@ namespace mitk {
   * there is one method Get<VALUE>Values() which shoule return a list of all
   * possible values.
   *
-  * All of the methods of this interface must be implemented in a concrete
-  * subclass. There are some pure virtual methods in the superclass
-  * mitk::USAbstractControlInterface which must be implemente, too.
+  * All getters of this interface must be implemented in a concrete
+  * subclass. Additionally all OnSet* methods must be implemented. They handle
+  * the acutal setting of the values at the device api. The Set* methods are
+  * already implemented in this class and should not be overwritten. There are
+  * some pure virtual methods in the superclass
+  * mitk::USAbstractControlInterface which must be implemented, too.
   *
   */
 class MitkUS_EXPORT USControlInterfaceBMode : public USAbstractControlInterface
@@ -58,8 +61,15 @@ public:
 
   /**
     * \param depth new frequency value
+    * Do not override this method in a subclass. Implement
+    * mitk::USControlInterfaceBMode::OnSetScanningFrequency instead.
     */
-  virtual void SetScanningFrequency( double frequency ) = 0;
+  void SetScanningFrequency( double frequency );
+
+  /**
+    * \brief Virtual method which is called inside mitk::USControlInterfaceBMode::SetScanningFrequency.
+    */
+  virtual void OnSetScanningFrequency( double frequency ) = 0;
 
   /**
     * \return vector of all possible frequency values for the utrasound device
@@ -73,8 +83,17 @@ public:
 
   /**
     * \param depth new power value
+    * Do not override this method in a subclass. Implement
+    * mitk::USControlInterfaceBMode::OnSetScanningPower instead.
     */
-  virtual void SetScanningPower( double power ) = 0;
+  void SetScanningPower( double power );
+
+  /**
+    * \brief Virtual method which is called inside mitk::USControlInterfaceBMode::SetScanningPower.
+    * Implement this method to handle the actual setting of the
+    * value at the device api.
+    */
+  virtual void OnSetScanningPower( double power ) = 0;
 
   /**
     * \return minimum power value for the ultrasound device
@@ -98,8 +117,17 @@ public:
 
   /**
     * \param depth new depth value
+    * Do not override this method in a subclass. Implement
+    * mitk::USControlInterfaceBMode::OnSetScanningDepth instead.
     */
-  virtual void SetScanningDepth( double depth ) = 0;
+  void SetScanningDepth( double depth );
+
+  /**
+    * \brief Virtual method which is called inside mitk::USControlInterfaceBMode::SetScanningDepth.
+    * Implement this method to handle the actual setting of the
+    * value at the device api.
+    */
+  virtual void OnSetScanningDepth( double depth ) = 0;
 
   /**
     * \return vector of all possible depth values for the utrasound device
@@ -113,8 +141,17 @@ public:
 
   /**
     * \param gain new gain value
+    * Do not override this method in a subclass. Implement
+    * mitk::USControlInterfaceBMode::OnSetScanningGain instead.
     */
-  virtual void SetScanningGain( double gain ) = 0;
+  void SetScanningGain( double gain );
+
+  /**
+    * \brief Virtual method which is called inside mitk::USControlInterfaceBMode::SetScanningGain.
+    * Implement this method to handle the actual setting of the
+    * value at the device api.
+    */
+  virtual void OnSetScanningGain( double gain ) = 0;
 
   /**
     * \return minimum gain value for the ultrasound device
@@ -138,8 +175,17 @@ public:
 
   /**
     * \param rejection new rejection value
+    * Do not override this method in a subclass. Implement
+    * mitk::USControlInterfaceBMode::OnSetScanningRejection instead.
     */
-  virtual void SetScanningRejection( double rejection ) = 0;
+  void SetScanningRejection( double rejection );
+
+  /**
+    * \brief Virtual method which is called inside mitk::USControlInterfaceBMode::SetScanningRejection.
+    * Implement this method to handle the actual setting of the
+    * value at the device api.
+    */
+  virtual void OnSetScanningRejection( double rejection ) = 0;
 
   /**
     * \return minimum rejection value for the ultrasound device
@@ -157,7 +203,7 @@ public:
   virtual double GetScanningRejectionTick( ) = 0;
 
 protected:
-  USControlInterfaceBMode( );
+  USControlInterfaceBMode( itk::SmartPointer<USDevice> device );
   virtual ~USControlInterfaceBMode( );
 };
 } // namespace mitk

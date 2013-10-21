@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactory.h>
 
 namespace mitk {
+  class USTelemedDevice;
+
   /**
     * \brief Implementation of mitk::USControlInterfaceBMode for Telemed ultrasound devices.
     * See documentation of mitk::USControlInterfaceBMode for a description of the interface methods.
@@ -31,7 +33,7 @@ namespace mitk {
   {
   public:
     mitkClassMacro(USTelemedBModeControls, USControlInterfaceBMode);
-    itkNewMacro(Self);
+    mitkNewMacro1Param(Self, itk::SmartPointer<USTelemedDevice>);
 
     /**
       * Scan mode is set to b mode when this controls are activated.
@@ -45,27 +47,27 @@ namespace mitk {
     virtual bool GetIsActive( );
 
     virtual double GetScanningFrequency( );
-    virtual void SetScanningFrequency( double frequency );
+    virtual void OnSetScanningFrequency( double frequency );
     virtual std::vector<double> GetScanningFrequencyValues( );
 
     virtual double GetScanningPower( );
-    virtual void SetScanningPower( double power );
+    virtual void OnSetScanningPower( double power );
     virtual double GetScanningPowerMin( );
     virtual double GetScanningPowerMax( );
     virtual double GetScanningPowerTick( );
 
     virtual double GetScanningDepth( );
-    virtual void SetScanningDepth( double );
+    virtual void OnSetScanningDepth( double );
     virtual std::vector<double> GetScanningDepthValues( );
 
     virtual double GetScanningGain( );
-    virtual void SetScanningGain( double );
+    virtual void OnSetScanningGain( double );
     virtual double GetScanningGainMin( );
     virtual double GetScanningGainMax( );
     virtual double GetScanningGainTick( );
 
     virtual double GetScanningRejection( );
-    virtual void SetScanningRejection( double );
+    virtual void OnSetScanningRejection( double );
     virtual double GetScanningRejectionMin( );
     virtual double GetScanningRejectionMax( );
     virtual double GetScanningRejectionTick( );
@@ -79,7 +81,7 @@ namespace mitk {
     void ReinitializeControls( );
 
   protected:
-    USTelemedBModeControls();
+    USTelemedBModeControls(itk::SmartPointer<USTelemedDevice> device);
     virtual ~USTelemedBModeControls();
 
     void CreateControls( );

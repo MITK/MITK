@@ -16,9 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSVideoDeviceCustomControls.h"
 
-mitk::USVideoDeviceCustomControls::USVideoDeviceCustomControls(mitk::USImageVideoSource::Pointer imageSource)
-: m_IsActive(false), m_ImageSource(imageSource)
+mitk::USVideoDeviceCustomControls::USVideoDeviceCustomControls(itk::SmartPointer<USVideoDevice> device)
+  : mitk::USAbstractControlInterface(device.GetPointer()), m_IsActive(false)
 {
+  m_ImageSource = dynamic_cast<mitk::USImageVideoSource*>(m_Device->GetUSImageSource().GetPointer());
 }
 
 mitk::USVideoDeviceCustomControls::~USVideoDeviceCustomControls()

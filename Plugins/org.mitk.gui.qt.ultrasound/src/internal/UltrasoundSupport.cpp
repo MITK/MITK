@@ -92,8 +92,8 @@ void UltrasoundSupport::DisplayImage()
 {
   m_Device->UpdateOutputData(0);
   mitk::Image::Pointer curOutput = m_Device->GetOutput();
-  //m_Node->SetData(curOutput->Clone());
-  m_Node->SetData(curOutput);
+  m_Node->SetData(curOutput->Clone());
+  //m_Node->SetData(curOutput);
   this->RequestRenderWindowUpdate();
 
   if ( curOutput->GetDimension() > 1

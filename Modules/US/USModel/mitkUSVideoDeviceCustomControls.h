@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSAbstractControlInterface.h"
 #include "mitkUSImageVideoSource.h"
+#include "mitkUSVideoDevice.h"
 
 #include <itkObjectFactory.h>
 
@@ -31,7 +32,7 @@ class MitkUS_EXPORT USVideoDeviceCustomControls : public USAbstractControlInterf
 {
 public:
   mitkClassMacro(USVideoDeviceCustomControls, USAbstractControlInterface);
-  mitkNewMacro1Param(Self, mitk::USImageVideoSource::Pointer);
+  mitkNewMacro1Param(Self, itk::SmartPointer<USVideoDevice>);
 
   /**
     * Activate or deactivate the custom controls. This is just for handling
@@ -63,7 +64,7 @@ protected:
     * Class needs an mitk::USImageVideoSource object for beeing constructed.
     * This object will be manipulated by the custom controls methods.
     */
-  USVideoDeviceCustomControls( mitk::USImageVideoSource::Pointer );
+  USVideoDeviceCustomControls( itk::SmartPointer<USVideoDevice> device );
   virtual ~USVideoDeviceCustomControls( );
 
   bool                          m_IsActive;

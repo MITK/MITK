@@ -85,6 +85,14 @@ namespace mitk {
     static const std::string US_PROPKEY_ISACTIVE;     // Whether this device is active or not.
     static const std::string US_PROPKEY_CLASS;        // Class Name of this Object
 
+    static const std::string US_PROPKEY_PROBES_SELECTED;
+
+    static const std::string US_PROPKEY_BMODE_FREQUENCY;
+    static const std::string US_PROPKEY_BMODE_POWER;
+    static const std::string US_PROPKEY_BMODE_DEPTH;
+    static const std::string US_PROPKEY_BMODE_GAIN;
+    static const std::string US_PROPKEY_BMODE_REJECTION;
+
     /**
     * \brief Default getter for the custom control interface.
     * Has to be implemented in a subclass if a custom control interface is
@@ -201,6 +209,16 @@ namespace mitk {
     *  \brief Returns a vector containing all connected probes.
     */
     std::vector<mitk::USProbe::Pointer> GetConnectedProbes();
+
+    /**
+    * \brief Given property is updated in the device micro service.
+    * This method is mainly for being used by the control interface
+    * superclasses. You do not need to call it by yoursefs in your
+    * concrete control interface classes.
+    */
+    void UpdateServiceProperty(std::string key, std::string value);
+    void UpdateServiceProperty(std::string key, double value);
+    void UpdateServiceProperty(std::string key, bool value);
 
     /**
     *\brief return the output (output with id 0) of the filter
@@ -415,12 +433,19 @@ namespace mitk {
     */
     bool ApplyCalibration(mitk::USImage::Pointer image);
 
+    std::string GetServicePropertyLabel();
+
   private:
 
     /**
     *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
     */
     us::ServiceRegistration<Self> m_ServiceRegistration;
+
+    /**
+    * \brief Properties of device microservice.
+    */
+    us::ServiceProperties m_ServiceProperties;
 
     // Threading-Related
     itk::ConditionVariable::Pointer m_FreezeBarrier;

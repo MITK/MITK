@@ -23,10 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkObjectFactory.h>
 
-namespace itk {
-  template<class T> class SmartPointer;
-}
-
 namespace mitk {
   class USTelemedDevice;
 
@@ -38,7 +34,7 @@ namespace mitk {
   {
   public:
     mitkClassMacro(USTelemedProbesControls, USControlInterfaceProbes);
-    itkNewMacro(Self);
+    mitkNewMacro1Param(Self, itk::SmartPointer<USTelemedDevice>);
 
     /**
       * Probe informations are fetched on activation. On deactivation there is nothing done.
@@ -52,11 +48,6 @@ namespace mitk {
     virtual void SelectProbe(USProbe::Pointer probe);
     virtual unsigned int GetProbesCount() const;
 
-    /**
-      * Setter for the mitk::USTelemedDevice necessary to communicate with the Telemed API.
-      */
-    void SetTelemedDevice(itk::SmartPointer<USTelemedDevice> telemedDevice);
-
     void ProbeRemoved(unsigned int index);
     void ProbeAdded(unsigned int index);
 
@@ -67,7 +58,7 @@ namespace mitk {
       * mitk::USTelemedProbesControls::SetTelemedDevice before the
       * object can be used.
       */
-    USTelemedProbesControls();
+    USTelemedProbesControls(itk::SmartPointer<USTelemedDevice> device);
     virtual ~USTelemedProbesControls();
 
     /**

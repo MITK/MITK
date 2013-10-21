@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSVideoDevice.h"
+#include "mitkUSVideoDeviceCustomControls.h"
 
 const std::string mitk::USVideoDevice::DeviceClassIdentifier = "org.mitk.modules.us.USVideoDevice";
 
@@ -50,12 +51,14 @@ mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, mitk::USImageMetad
 
 mitk::USVideoDevice::~USVideoDevice()
 {
+  //m_Source->UnRegister();
+  m_Source = 0;
 }
 
 void mitk::USVideoDevice::Init()
 {
   m_Source = mitk::USImageVideoSource::New();
-  m_ControlInterfaceCustom = mitk::USVideoDeviceCustomControls::New(m_Source);
+  m_ControlInterfaceCustom = mitk::USVideoDeviceCustomControls::New(this);
   //this->SetNumberOfInputs(1);
   this->SetNumberOfOutputs(1);
 

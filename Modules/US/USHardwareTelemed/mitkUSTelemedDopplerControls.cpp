@@ -15,9 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSTelemedDopplerControls.h"
+#include "mitkUSTelemedDevice.h"
 #include <mitkException.h>
 
-mitk::USTelemedDopplerControls::USTelemedDopplerControls()
+mitk::USTelemedDopplerControls::USTelemedDopplerControls(itk::SmartPointer<USTelemedDevice> device)
+  : mitk::USControlInterfaceDoppler(device.GetPointer())
 {
 }
 

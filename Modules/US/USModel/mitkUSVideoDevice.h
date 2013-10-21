@@ -22,9 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSDevice.h"
 #include <itkObjectFactory.h>
 #include "mitkUSImageVideoSource.h"
-#include "mitkUSVideoDeviceCustomControls.h"
+
+namespace itk {
+  template<class T> class SmartPointer;
+}
 
 namespace mitk {
+  class USVideoDeviceCustomControls;
 /**
   * \brief A mitk::USVideoDevice is the common class for video only devices.
   * They capture video input either from a file or from a device and
@@ -161,7 +165,7 @@ protected:
   /**
     * \brief custom control interface for us video device
     */
-  mitk::USVideoDeviceCustomControls::Pointer m_ControlInterfaceCustom;
+  itk::SmartPointer<USVideoDeviceCustomControls> m_ControlInterfaceCustom;
 };
 } // namespace mitk
 

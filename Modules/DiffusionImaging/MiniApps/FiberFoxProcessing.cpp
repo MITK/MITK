@@ -502,7 +502,7 @@ int FiberFoxProcessing(int argc, char* argv[])
 
     tractsToDwiFilter->SetSimulateEddyCurrents(m_ImageGenParameters.doSimulateEddyCurrents);
     tractsToDwiFilter->SetEddyGradientStrength(m_ImageGenParameters.eddyStrength);
-    tractsToDwiFilter->SetUpsampling(m_ImageGenParameters.upsampling);
+    //tractsToDwiFilter->SetUpsampling(m_ImageGenParameters.upsampling);
     tractsToDwiFilter->SetSimulateRelaxation(m_ImageGenParameters.doSimulateRelaxation);
     tractsToDwiFilter->SetImageRegion(m_ImageGenParameters.imageRegion);
     tractsToDwiFilter->SetSpacing(m_ImageGenParameters.imageSpacing);

@@ -34,6 +34,17 @@ namespace us {
 /**
   * \brief Abstract superclass for all custom control widgets of mitk::USDevice classes.
   *
+  * The custom control widgets are made available using a us::PrototypeServiceFactory. This means that each
+  * concrete subclass should be registered in the microservice by calling
+  * QmitkUSAbstractCustomWidget::RegisterService() on an object. The best place for doing this would be in
+  * the corresponding module or plugin activator.
+  *
+  * Afterwards a copy of the registered object can be obtained from the microservice as shown in the example
+  * below. Do not forget to call QmitkUSAbstractCustomWidget::CloneForQt() on the object received from the
+  * microservice. This is necessary to allow deleting the object as it is necessary in Qt for removing it from
+  * a layout.
+  *
+  *
   * Subclasses must implement three methods:
   * - QmitkUSAbstractCustomWidget::OnDeviceSet() -> should handle initialization when mitk:USDevice was set
   * - QmitkUSAbstractCustomWidget::GetDeviceClass() -> must return device class of corresponding mitk::USDevice

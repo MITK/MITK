@@ -1120,7 +1120,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
         Vector3D originError = assumedOrigin - thisOrigin;
         double norm = originError.GetNorm();
-        double toleratedError(0.005); // max. 1/10mm error when measurement crosses 20 slices in z direction
+        double toleratedError(0.1); // max. 1/10mm error when measurement crosses 20 slices in z direction
 
         if (norm > toleratedError)
         {

@@ -191,7 +191,7 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   mitk::TimeGeometry* tsg = splittedImage->GetTimeGeometry();
   mitk::ProportionalTimeGeometry* ptg = dynamic_cast<ProportionalTimeGeometry*>(tsg);
   ptg->Expand(maxImageIdx+1);
-  ptg->SetTimeStepGeometry( ptg->GetGeometryForTimeStep(0), 6 );
+  ptg->SetTimeStepGeometry( ptg->GetGeometryForTimeStep(0), maxImageIdx );
 
 
   mitk::Image::Pointer registeredWeighted = mitk::Image::New();

@@ -159,7 +159,7 @@ void QmitkIGTTutorialView::OnStartIGT()
     //to show it inside of the rendering windows. After that you can change the properties of the cone
     //to manipulate rendering, e.g. the position and orientation as in our case.
     mitk::Cone::Pointer cone = mitk::Cone::New();                 //instantiate a new cone
-    float scale[] = {10.0, 10.0, 10.0};
+    double scale[] = {10.0, 10.0, 10.0};
     cone->GetGeometry()->SetSpacing(scale);                       //scale it a little that so we can see something
     mitk::DataNode::Pointer node = mitk::DataNode::New(); //generate a new node to store the cone into
                                                                   //the DataStorage.

@@ -263,12 +263,14 @@ int testRemoveAll()
 
 int mitkPlanePositionManagerTest(int, char* [])
 {
-    MITK_TEST_OUTPUT(<<"Starting Test PlanePositionManager");
+    MITK_TEST_BEGIN("PlanePositionManager");
+
     SetUpBeforeTest();
     int result;
     MITK_TEST_CONDITION_REQUIRED( (result = testAddPlanePosition()) == EXIT_SUCCESS, "");
     MITK_TEST_CONDITION_REQUIRED( (result = testGetPlanePosition()) == EXIT_SUCCESS, "");
     MITK_TEST_CONDITION_REQUIRED( (result = testRemovePlanePosition()) == EXIT_SUCCESS, "");
     MITK_TEST_CONDITION_REQUIRED( (result = testRemoveAll()) == EXIT_SUCCESS, "");
-    return EXIT_SUCCESS;
+
+    MITK_TEST_END();
 }

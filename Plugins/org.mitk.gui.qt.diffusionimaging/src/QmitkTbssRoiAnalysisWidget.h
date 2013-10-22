@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 typedef itk::VectorImage<float,3>     VectorImageType;
 typedef std::vector< itk::Index<3> > RoiType;
 
-typedef itk::Point<float,3>               PointType;
+typedef mitk::Point3D                     PointType;
 typedef std::vector< PointType>           TractType;
 typedef std::vector< TractType > TractContainerType;
 

@@ -605,7 +605,7 @@ SliceNavigationController::AdjustSliceStepperRange()
   int i, k = 0;
   for ( i = 0; i < 3; ++i )
   {
-    if ( fabs( (float) direction[i] ) < 0.000000001 ) { ++c; }
+    if ( fabs(direction[i]) < 0.000000001 ) { ++c; }
     else { k = i; }
   }
 

@@ -60,7 +60,7 @@ void mitk::Contour::AddVertex(mitk::Point3D newPoint)
 void mitk::Contour::UpdateOutputInformation()
 {
   // \todo probably we should do this additionally for each time-step
-  float mitkBounds[6];
+  ScalarType mitkBounds[6];
   if (m_Vertices->Size() == 0)  {
     mitkBounds[0] = 0.0;
     mitkBounds[1] = 0.0;

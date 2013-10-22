@@ -52,9 +52,9 @@ class SceneSerializationBase_EXPORT Vector3DPropertySerializer : public BaseProp
       if (!element) return NULL;
 
       Vector3D v;
-      if ( element->QueryFloatAttribute( "x", &v[0] ) != TIXML_SUCCESS ) return NULL;
-      if ( element->QueryFloatAttribute( "y", &v[1] ) != TIXML_SUCCESS ) return NULL;
-      if ( element->QueryFloatAttribute( "z", &v[2] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryDoubleAttribute( "x", &v[0] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryDoubleAttribute( "y", &v[1] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryDoubleAttribute( "z", &v[2] ) != TIXML_SUCCESS ) return NULL;
 
      return Vector3DProperty::New( v ).GetPointer();
     }

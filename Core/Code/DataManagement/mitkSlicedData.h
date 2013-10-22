@@ -203,7 +203,7 @@ public:
   //##Documentation
   //## @brief Convenience method for setting the spacing of
   //## the SlicedGeometry3D instances of all time steps
-  virtual void SetSpacing(const float aSpacing[3]);
+  virtual void SetSpacing(const ScalarType aSpacing[]);
 
   //##Documentation
   //## @brief Convenience method for setting the spacing of

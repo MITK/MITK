@@ -142,7 +142,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
     //------------------------update output2 and check result2------------------------
     output2->Update();
     MITK_TEST_CONDITION(
-      mitk::Equal(output2->GetPosition(),  resultPos2),
+      mitk::Equal(output2->GetPosition(),  resultPos2, 1E-2),
       "Testing ND2 position correctly transformed after updating value");
 
 
@@ -167,7 +167,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
       "Testing ND1 position correctly transformed after targetPointSet changed");
 
     MITK_TEST_CONDITION(
-      mitk::Equal(output2->GetPosition(),  resultPos2),
+      mitk::Equal(output2->GetPosition(),  resultPos2, 1E-1),
       "Testing ND2 position correctly transformed after targetPointSet changed");
 
 
@@ -192,7 +192,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
       "Testing ND1 position correctly transformed after sourcePointSet changed");
 
     MITK_TEST_CONDITION(
-      mitk::Equal(output2->GetPosition(),  resultPos2),
+      mitk::Equal(output2->GetPosition(),  resultPos2,1E-1),
       "Testing ND2 position correctly transformed after sourcePointSet changed");
 
     //--------------------- Test ICP initialization --------------------------
@@ -313,7 +313,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
       "Testing ND1 position correctly transformed ");
 
     MITK_TEST_CONDITION(
-      mitk::Equal(output1->GetOrientation(), resultQuat),
+      mitk::Equal(output1->GetOrientation(), resultQuat, 1E-4),
       "Testing ND1 orientation correctly transformed ");
     MITK_TEST_OUTPUT(<<"Orientation1");
     MITK_TEST_OUTPUT(<<output1->GetOrientation());
@@ -387,12 +387,12 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
 
     //very simple test case, everything is the same (min = max = mean = RMS = abs max error)
     //but still ok to see if the methods work without a crash
-    MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetFRE() == (float) sqrt(3.0),"Testing mean error calculation");
-    MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetMaxError() == (float) sqrt(3.0),"Testing max error calculation");
-    MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetMinError() == (float) sqrt(3.0),"Testing min error calculation");
-    MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetRMSError() == (float) sqrt(3.0),"Testing RMS error calculation");
-    MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetFREStdDev() == (float) 0.0,"Testing SD calculation");
-    MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetAbsMaxError() == (float) sqrt(3.0),"Testing abs max error calculation");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myFREFilter->GetFRE(), (mitk::ScalarType) sqrt(3.0)),"Testing mean error calculation");
+    MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetMaxError() == (mitk::ScalarType) sqrt(3.0),"Testing max error calculation");
+    MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetMinError() == (mitk::ScalarType) sqrt(3.0),"Testing min error calculation");
+    MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetRMSError() == (mitk::ScalarType) sqrt(3.0),"Testing RMS error calculation");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myFREFilter->GetFREStdDev(), (mitk::ScalarType) 0.0),"Testing SD calculation");
+    MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetAbsMaxError() == (mitk::ScalarType) sqrt(3.0),"Testing abs max error calculation");
     MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetErrorVector().size() == 8,"Testing method GetErrorVector");
 
     //todo: extend by a more complex test case with different values?

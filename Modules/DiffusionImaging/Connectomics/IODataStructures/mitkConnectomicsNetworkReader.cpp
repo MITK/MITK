@@ -87,7 +87,7 @@ void mitk::ConnectomicsNetworkReader::GenerateOutputInformation()
       geometry->SetOrigin(origin);
 
       // read spacing
-      float spacing[3];
+      ScalarType spacing[3];
       pElem->Attribute(mitk::ConnectomicsNetworkDefinitions::XML_SPACING_X, &temp);
       spacing[0] = temp;
       pElem->Attribute(mitk::ConnectomicsNetworkDefinitions::XML_SPACING_Y, &temp);

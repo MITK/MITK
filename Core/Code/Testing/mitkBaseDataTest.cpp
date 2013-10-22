@@ -74,7 +74,7 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION(baseDataImpl->GetMTime()!= 0, "Check if modified time is set");
   baseDataImpl->SetClonedGeometry(geo3, 1);
 
-  float x[3];
+  mitk::ScalarType x[3];
   x[0] = 2;
   x[1] = 4;
   x[2] = 6;

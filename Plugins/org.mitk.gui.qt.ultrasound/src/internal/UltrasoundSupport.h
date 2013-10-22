@@ -14,25 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef UltrasoundSupport_h
 #define UltrasoundSupport_h
 
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
-#include <mitkUSDevicePersistence.h>
 
 #include "ui_UltrasoundSupportControls.h"
+#include "QmitkUSAbstractCustomWidget.h"
+#include "QmitkUSControlsBModeWidget.h"
+#include "QmitkUSControlsDopplerWidget.h"
+#include "QmitkUSControlsProbesWidget.h"
 
 #include <QTime>
 
-/*!
-  \brief UltrasoundSupport
-  This plugin provides functionality to manage Ultrasound devices, create video devices and to view device images.
+#include <ctkServiceEvent.h>
 
-  \sa QmitkFunctionality
-  \ingroup ${plugin_target}_internal
+/*!
+\brief UltrasoundSupport
+This plugin provides functionality to manage Ultrasound devices, create video devices and to view device images.
+
+\sa QmitkFunctionality
+\ingroup ${plugin_target}_internal
 */
 class UltrasoundSupport : public QmitkAbstractView
 {
@@ -40,16 +44,16 @@ class UltrasoundSupport : public QmitkAbstractView
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-  public:
+public:
 
-    virtual void SetFocus();
+  virtual void SetFocus();
 
-    static const std::string VIEW_ID;
+  static const std::string VIEW_ID;
 
-    virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent);
 
-    UltrasoundSupport();
-    virtual ~UltrasoundSupport();
+  UltrasoundSupport();
+  virtual ~UltrasoundSupport();
 
   public slots:
     /*
@@ -57,52 +61,70 @@ class UltrasoundSupport : public QmitkAbstractView
     */
     void OnNewDeviceWidgetDone();
 
-  protected slots:
+    protected slots:
 
-    void OnClickedAddNewDevice();
+      void OnClickedAddNewDevice();
 
-    void OnClickedViewDevice();
+      void OnClickedViewDevice();
 
-    void OnCropAreaChanged();
+      void OnChangedFramerateLimit(int);
 
-    /*
-    * \brief This is the main imaging loop that is called regularily during the imaging process
-    */
-    void DisplayImage();
+      void OnClickedFreezeButton();
 
-  protected:
+      void OnDeciveServiceEvent(const ctkServiceEvent event);
 
+      /*
+      * \brief This is the main imaging loop that is called regularily during the imaging process
+      */
+      void DisplayImage();
 
+protected:
 
-    int m_FrameCounter;
+  /**
+  * \brief Reinits the view globally.
+  */
+  void GlobalReinit();
 
-    /*
-    * \brief This timer triggers periodic updates to the pipeline
-    */
-    QTimer *m_Timer;
+  void StartViewing();
+  void StopViewing();
 
-    QTime m_Clock;
+  void CreateControlWidgets();
+  void RemoveControlWidgets();
 
-    /*
-    * \brief The device that is currently used to aquire images
-    */
-    mitk::USDevice::Pointer m_Device;
+  int m_FrameCounter;
 
-    /*
-    * \brief The node that we feed images into
-    */
-    mitk::DataNode::Pointer m_Node;
+  /*
+  * \brief This timer triggers periodic updates to the pipeline
+  */
+  QTimer *m_Timer;
 
-    mitk::Image::Pointer m_Image;
+  QTime m_Clock;
 
-    Ui::UltrasoundSupportControls m_Controls;
+  /*
+  * \brief The device that is currently used to aquire images
+  */
+  mitk::USDevice::Pointer m_Device;
 
-    /** @brief reinits the view globally. */
-    void GlobalReinit();
+  /*
+  * \brief The node that we feed images into
+  */
+  mitk::DataNode::Pointer m_Node;
 
-    mitk::USDevicePersistence::Pointer m_DevicePersistence;
+  mitk::Image::Pointer m_Image;
 
+  Ui::UltrasoundSupportControls m_Controls;
+
+  QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;
+  QmitkUSControlsBModeWidget*   m_ControlBModeWidget;
+  QmitkUSControlsDopplerWidget* m_ControlDopplerWidget;
+  QmitkUSControlsProbesWidget*  m_ControlProbesWidget;
+
+  QList<ctkServiceReference>    m_CustomWidgetServiceReference;
+
+  unsigned int m_CurrentImageWidth;
+  unsigned int m_CurrentImageHeight;
+
+  //void OnPreferencesChanged(const berry::IBerryPreferences*);
 };
 
 #endif // UltrasoundSupport_h
-

@@ -33,7 +33,14 @@ public:
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
 
+  static ctkPluginContext* GetContext();
+
+private:
+  static ctkPluginContext* m_Context;
+
 }; // org_mitk_gui_qt_ultrasound_Activator
+
+typedef org_mitk_gui_qt_ultrasound_Activator PluginActivator;
 
 }
 

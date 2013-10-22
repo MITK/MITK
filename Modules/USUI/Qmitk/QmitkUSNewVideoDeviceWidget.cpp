@@ -19,12 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //QT headers
 
-
 //mitk headers
 
-
 //itk headers
-
 
 const std::string QmitkUSNewVideoDeviceWidget::VIEW_ID = "org.mitk.views.QmitkUSNewVideoDeviceWidget";
 
@@ -47,7 +44,6 @@ QmitkUSNewVideoDeviceWidget::~QmitkUSNewVideoDeviceWidget()
 
 //////////////////// INITIALIZATION /////////////////////
 
-
 void QmitkUSNewVideoDeviceWidget::CreateQtPartControl(QWidget *parent)
 {
   if (!m_Controls)
@@ -67,12 +63,10 @@ void QmitkUSNewVideoDeviceWidget::CreateConnections()
     connect( m_Controls->m_BtnCancel, SIGNAL(clicked()), this, SLOT(OnClickedCancel()) );
     connect( m_Controls->m_RadioDeviceSource, SIGNAL(clicked()), this, SLOT(OnDeviceTypeSelection()) );
     connect( m_Controls->m_RadioFileSource,   SIGNAL(clicked()), this, SLOT(OnDeviceTypeSelection()) );
-
   }
   // Hide & show stuff
   m_Controls->m_FilePathSelector->setVisible(false);
 }
-
 
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
 
@@ -87,7 +81,6 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone(){
   metadata->SetProbeName(m_Controls->m_Probe->text().toStdString());
   metadata->SetZoom(m_Controls->m_Zoom->text().toStdString());
 
-
   // Create Device
   mitk::USVideoDevice::Pointer newDevice;
   if (m_Controls->m_RadioDeviceSource->isChecked()){
@@ -98,19 +91,28 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone(){
     newDevice = mitk::USVideoDevice::New(filepath, metadata);
   }
 
+  // get USImageVideoSource from new device
+  mitk::USImageVideoSource::Pointer imageSource =
+    dynamic_cast<mitk::USImageVideoSource*>(newDevice->GetUSImageSource().GetPointer());
+  if ( ! imageSource )
+  {
+    MITK_ERROR << "There is no USImageVideoSource at the current device.";
+    mitkThrow() << "There is no USImageVideoSource at the current device.";
+  }
+
   // Set Video Options
-   newDevice->GetSource()->SetColorOutput(! m_Controls->m_CheckGreyscale->isChecked());
+  imageSource->SetColorOutput(! m_Controls->m_CheckGreyscale->isChecked());
 
   // If Resolution override is activated, apply it
   if (m_Controls->m_CheckResolutionOverride->isChecked())
   {
     int width  = m_Controls->m_ResolutionWidth->value();
     int height = m_Controls->m_ResolutionHeight->value();
-    newDevice->GetSource()->OverrideResolution(width, height);
-    newDevice->GetSource()->SetResolutionOverride(true);
+    imageSource->OverrideResolution(width, height);
+    imageSource->SetResolutionOverride(true);
   }
 
-  newDevice->Connect();
+  newDevice->Initialize();
 
   emit Finished();
 }
@@ -126,10 +128,7 @@ void QmitkUSNewVideoDeviceWidget::OnDeviceTypeSelection(){
   m_Controls->m_DeviceSelector->setVisible(m_Controls->m_RadioDeviceSource->isChecked());
 }
 
-
-
 ///////////////// Methods & Slots Handling Logic //////////////////////////
-
 
 void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
 {
@@ -142,14 +141,12 @@ void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
   m_Active = true;
 }
 
-
 void QmitkUSNewVideoDeviceWidget::CreateNewDevice()
 {
   m_TargetDevice = 0;
   InitFields(mitk::USImageMetadata::New());
   m_Active = true;
 }
-
 
 /////////////////////// HOUSEHOLDING CODE ///////////////////////////////
 

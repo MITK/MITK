@@ -29,7 +29,7 @@ mitk::ContourModelSet::ContourModelSet() :
 mitk::ContourModelSet::ContourModelSet(const mitk::ContourModelSet &other) :
   m_Contours(other.m_Contours)
 {
-  this->InitializeTimeSlicedGeometry(1);
+  this->GetUpdatedTimeGeometry();
 }
 
 
@@ -42,7 +42,7 @@ mitk::ContourModelSet::~ContourModelSet()
 
 void mitk::ContourModelSet::InitializeEmpty()
 {
-  this->InitializeTimeSlicedGeometry(1);
+  this->GetUpdatedTimeGeometry();
   m_Contours.resize(0);
 }
 

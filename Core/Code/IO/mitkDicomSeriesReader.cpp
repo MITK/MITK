@@ -2050,6 +2050,145 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
   }
 }
 
+void
+DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames, gdcm::Scanner& scanner)
+{
+  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); //Image position (Patient)
+  scanner.AddTag(tagImagePositionPatient);
+
+  const gdcm::Tag tagSeriesInstanceUID(0x0020, 0x000e); // Series Instance UID
+  scanner.AddTag(tagSeriesInstanceUID);
+
+  const gdcm::Tag tagImageOrientation(0x0020,0x0037); //Image orientation
+  scanner.AddTag(tagImageOrientation);
+
+  const gdcm::Tag tagSliceLocation(0x0020, 0x1041); // slice location
+  scanner.AddTag( tagSliceLocation );
+
+  const gdcm::Tag tagInstanceNumber(0x0020, 0x0013); // (image) instance number
+  scanner.AddTag( tagInstanceNumber );
+
+  const gdcm::Tag tagSOPInstanceNumber(0x0008, 0x0018); // SOP instance number
+  scanner.AddTag( tagSOPInstanceNumber );
+
+  const gdcm::Tag tagPixelSpacing(0x0028, 0x0030); // Pixel Spacing
+  scanner.AddTag( tagPixelSpacing );
+
+  const gdcm::Tag tagImagerPixelSpacing(0x0018, 0x1164); // Imager Pixel Spacing
+  scanner.AddTag( tagImagerPixelSpacing );
+
+  const gdcm::Tag tagModality(0x0008, 0x0060); // Modality
+  scanner.AddTag( tagModality );
+
+  const gdcm::Tag tagSOPClassUID(0x0008, 0x0016); // SOP Class UID
+  scanner.AddTag( tagSOPClassUID );
+
+  const gdcm::Tag tagNumberOfFrames(0x0028, 0x0008); // number of frames
+    scanner.AddTag( tagNumberOfFrames );
+
+  scanner.Scan(filenames); // make available image information for each file
+}
+
+std::list<DicomSeriesReader::StringContainer>
+DicomSeriesReader::SortIntoBlocksFor3DplusT(
+    const StringContainer& presortedFilenames,
+    const gdcm::Scanner::MappingType& tagValueMappings,
+    bool /*sort*/,
+    bool& canLoadAs4D )
+{
+  std::list<StringContainer> imageBlocks;
+
+  // ignore sort request, because most likely re-sorting is now needed due to changes in GetSeries(bug #8022)
+  StringContainer sorted_filenames = DicomSeriesReader::SortSeriesSlices(presortedFilenames);
+
+  std::string firstPosition;
+  unsigned int numberOfBlocks(0); // number of 3D image blocks
+
+  static const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); //Image position (Patient)
+
+  // loop files to determine number of image blocks
+  for (StringContainer::const_iterator fileIter = sorted_filenames.begin();
+       fileIter != sorted_filenames.end();
+       ++fileIter)
+  {
+    gdcm::Scanner::TagToValue tagToValueMap = tagValueMappings.find( fileIter->c_str() )->second;
+
+    if(tagToValueMap.find(tagImagePositionPatient) == tagToValueMap.end())
+    {
+      // we expect to get images w/ missing position information ONLY as separated blocks.
+      assert( presortedFilenames.size() == 1 );
+      numberOfBlocks = 1;
+      break;
+    }
+
+    std::string position = tagToValueMap.find(tagImagePositionPatient)->second;
+    MITK_DEBUG << "  " << *fileIter << " at " << position;
+    if (firstPosition.empty())
+    {
+      firstPosition = position;
+    }
+
+    if ( position == firstPosition )
+    {
+      ++numberOfBlocks;
+    }
+    else
+    {
+      break; // enough information to know the number of image blocks
+    }
+  }
+
+  MITK_DEBUG << "  ==> Assuming " << numberOfBlocks << " time steps";
+
+  if (numberOfBlocks == 0) return imageBlocks; // only possible if called with no files
+
+
+  // loop files to sort them into image blocks
+  unsigned int numberOfExpectedSlices(0);
+  for (unsigned int block = 0; block < numberOfBlocks; ++block)
+  {
+    StringContainer filesOfCurrentBlock;
+
+    for ( StringContainer::const_iterator fileIter = sorted_filenames.begin() + block;
+         fileIter != sorted_filenames.end();
+         //fileIter += numberOfBlocks) // TODO shouldn't this work? give invalid iterators on first attempts
+         )
+    {
+      filesOfCurrentBlock.push_back( *fileIter );
+      for (unsigned int b = 0; b < numberOfBlocks; ++b)
+      {
+        if (fileIter != sorted_filenames.end())
+          ++fileIter;
+      }
+    }
+
+    imageBlocks.push_back(filesOfCurrentBlock);
+
+    if (block == 0)
+    {
+      numberOfExpectedSlices = filesOfCurrentBlock.size();
+    }
+    else
+    {
+      if (filesOfCurrentBlock.size() != numberOfExpectedSlices)
+      {
+        MITK_WARN << "DicomSeriesReader expected " << numberOfBlocks
+                  << " image blocks of "
+                  << numberOfExpectedSlices
+                  << " images each. Block "
+                  << block
+                  << " got "
+                  << filesOfCurrentBlock.size()
+                  << " instead. Cannot load this as 3D+t"; // TODO implement recovery (load as many slices 3D+t as much as possible)
+        canLoadAs4D = false;
+      }
+    }
+  }
+
+  return imageBlocks;
+}
+
+
 Image::Pointer
 DicomSeriesReader
 ::MultiplexLoadDICOMByITKScalar(const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock)

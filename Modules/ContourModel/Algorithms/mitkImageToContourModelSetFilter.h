@@ -14,13 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _mitkImageToContourModelFilter_h__
-#define _mitkImageToContourModelFilter_h__
+#ifndef _mitkImageToContourModelSetFilter_h__
+#define _mitkImageToContourModelSetFilter_h__
 
 #include "mitkCommon.h"
 #include "ContourModelExports.h"
-#include "mitkContourModel.h"
-#include "mitkContourModelSource.h"
+#include "mitkContourModelSet.h"
+#include "mitkContourModelSetSource.h"
 #include <mitkImage.h>
 
 #include "itkPolyLineParametricPath.h"
@@ -34,12 +34,12 @@ namespace mitk {
   * \ingroup ContourModelFilters
   * \ingroup Process
   */
-  class ContourModel_EXPORT ImageToContourModelFilter : public ContourModelSource
+  class ContourModel_EXPORT ImageToContourModelSetFilter : public ContourModelSetSource
   {
 
   public:
 
-    mitkClassMacro(ImageToContourModelFilter, ContourModelSource);
+    mitkClassMacro(ImageToContourModelSetFilter, ContourModelSetSource);
     itkNewMacro(Self);
 
     typedef mitk::Image InputType;
@@ -67,8 +67,8 @@ namespace mitk {
    void SetUseProgressBar(bool);
 
   protected:
-    ImageToContourModelFilter();
-    virtual ~ImageToContourModelFilter();
+    ImageToContourModelSetFilter();
+    virtual ~ImageToContourModelSetFilter();
 
    virtual void GenerateData();
    virtual void GenerateOutputInformation();

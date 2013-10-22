@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLabelSetImage.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkImageTimeSelector.h>
-#include <mitkImageToContourModelFilter.h>
+#include <mitkImageToContourModelSetFilter.h>
 #include <mitkContourUtils.h>
 #include <mitkToolManagerProvider.h>
 #include <itkCommand.h>
@@ -105,7 +105,7 @@ m_3DInterpolationEnabled(false)
   command2->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged );
   m_SurfaceInterpolationInfoChangedObserverTag = m_SurfaceInterpolator->AddObserver( itk::ModifiedEvent(), command2 );
 
-  m_FeedbackContour = mitk::ContourModel::New();
+  m_FeedbackContour = mitk::ContourModelSet::New();
   m_FeedbackContourNode = mitk::DataNode::New();
   m_FeedbackContourNode->SetData( m_FeedbackContour );
   m_FeedbackContourNode->SetName("2D interpolation preview");
@@ -451,9 +451,8 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
 
   if (interpolation.IsNotNull())
   {
-    mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
+    mitk::ImageToContourModelSetFilter::Pointer contourExtractor = mitk::ImageToContourModelSetFilter::New();
     contourExtractor->SetInput(interpolation);
-//    contourExtractor->SetUseProgressBar(false);
 
     try
     {
@@ -465,9 +464,9 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
       return;
     }
 
-    int numberOfContours = contourExtractor->GetNumberOfIndexedOutputs();
+//    int numberOfContours = contourExtractor->GetNumberOfIndexedOutputs();
 
-    m_FeedbackContour = contourExtractor->GetOutput(0);
+    m_FeedbackContour = contourExtractor->GetOutput();
     m_FeedbackContour->DisconnectPipeline();
 
     m_FeedbackContourNode->SetData( m_FeedbackContour );
@@ -477,7 +476,7 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
   }
   else
   {
-    m_FeedbackContour->Clear(timeStep);
+    m_FeedbackContour->Clear();
   }
 
   m_LastSNC = slicer;
@@ -574,13 +573,14 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 
     unsigned int timeStep = m_LastSNC->GetTime()->GetPos();
 
-//    const mitk::PlaneGeometry* planeGeometry = m_LastSNC->GetCurrentPlaneGeometry();
-//    if (!planeGeometry) return;
-
-    mitk::ContourModel::Pointer projectedContour = mitk::ContourModel::New();
-    const mitk::Geometry3D* sliceGeometry = sliceImage->GetGeometry(timeStep);
-    mitk::ContourUtils::ProjectContourTo2DSlice( sliceGeometry, m_FeedbackContour, projectedContour );
-    mitk::ContourUtils::FillContourInSlice( projectedContour, sliceImage, m_WorkingImage->GetActiveLabelIndex() );
+    int numberOfContours = m_FeedbackContour->GetSize();
+    for (int i=0; i<numberOfContours; i++)
+    {
+      mitk::ContourModel::Pointer projectedContour = mitk::ContourModel::New();
+      const mitk::Geometry3D* sliceGeometry = sliceImage->GetGeometry(timeStep);
+      mitk::ContourUtils::ProjectContourTo2DSlice( sliceGeometry, m_FeedbackContour->GetContourModelAt(i), projectedContour );
+      mitk::ContourUtils::FillContourInSlice( projectedContour, sliceImage, m_WorkingImage->GetActiveLabelIndex() );
+    }
 
     //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
     vtkSmartPointer<mitkVtkImageOverwrite> overwrite = vtkSmartPointer<mitkVtkImageOverwrite>::New();
@@ -665,9 +665,8 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
     if (interpolation.IsNotNull())
     {
-      mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
+      mitk::ImageToContourModelSetFilter::Pointer contourExtractor = mitk::ImageToContourModelSetFilter::New();
       contourExtractor->SetInput(interpolation);
-//      contourExtractor->SetUseProgressBar(false);
 
       try
       {
@@ -682,7 +681,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       // todo: consider all contours
       //int numberOfContours = contourExtractor->GetNumberOfIndexedOutputs();
 
-      m_FeedbackContour = contourExtractor->GetOutput(0);
+      m_FeedbackContour = contourExtractor->GetOutput();
       m_FeedbackContour->DisconnectPipeline();
 
       m_FeedbackContourNode->SetData( m_FeedbackContour );
@@ -690,12 +689,14 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       mitk::Image::Pointer sliceImage = this->GetWorkingSlice(reslicePlane);
       if (sliceImage.IsNull()) return;
 
-      mitk::ContourModel::Pointer projectedContour = mitk::ContourModel::New();
-      const mitk::Geometry3D* sliceGeometry = sliceImage->GetGeometry();
-      mitk::ContourUtils::ProjectContourTo2DSlice( sliceGeometry, m_FeedbackContour, projectedContour );
-      if (projectedContour.IsNull()) return;
-
-      mitk::ContourUtils::FillContourInSlice( projectedContour, sliceImage, m_WorkingImage->GetActiveLabelIndex() );
+      int numberOfContours = m_FeedbackContour->GetSize();
+      for (int i=0; i<numberOfContours; i++)
+      {
+         mitk::ContourModel::Pointer projectedContour = mitk::ContourModel::New();
+         const mitk::Geometry3D* sliceGeometry = sliceImage->GetGeometry();
+         mitk::ContourUtils::ProjectContourTo2DSlice( sliceGeometry, m_FeedbackContour->GetContourModelAt(i), projectedContour );
+         mitk::ContourUtils::FillContourInSlice( projectedContour, sliceImage, m_WorkingImage->GetActiveLabelIndex() );
+      }
 
       //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
       vtkSmartPointer<mitkVtkImageOverwrite> overwrite = vtkSmartPointer<mitkVtkImageOverwrite>::New();

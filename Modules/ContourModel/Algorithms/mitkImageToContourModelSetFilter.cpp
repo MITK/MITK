@@ -14,29 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkImageToContourModelFilter.h"
+#include "mitkImageToContourModelSetFilter.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkProgressBar.h"
 
 #include "itkContourExtractor2DImageFilter.h"
 
-mitk::ImageToContourModelFilter::ImageToContourModelFilter() :
+mitk::ImageToContourModelSetFilter::ImageToContourModelSetFilter() :
 m_UseProgressBar(false),
 m_ProgressStepSize(1)
 {
 }
 
-mitk::ImageToContourModelFilter::~ImageToContourModelFilter()
+mitk::ImageToContourModelSetFilter::~ImageToContourModelSetFilter()
 {
 
 }
 
-void mitk::ImageToContourModelFilter::SetInput ( const mitk::ImageToContourModelFilter::InputType* input )
+void mitk::ImageToContourModelSetFilter::SetInput ( const mitk::ImageToContourModelSetFilter::InputType* input )
 {
   this->SetInput( 0, input );
 }
 
-void mitk::ImageToContourModelFilter::SetInput ( unsigned int idx, const mitk::ImageToContourModelFilter::InputType* input )
+void mitk::ImageToContourModelSetFilter::SetInput ( unsigned int idx, const mitk::ImageToContourModelSetFilter::InputType* input )
 {
   if ( idx + 1 > this->GetNumberOfInputs() )
   {
@@ -49,35 +49,35 @@ void mitk::ImageToContourModelFilter::SetInput ( unsigned int idx, const mitk::I
   }
 }
 
-const mitk::ImageToContourModelFilter::InputType* mitk::ImageToContourModelFilter::GetInput( void )
+const mitk::ImageToContourModelSetFilter::InputType* mitk::ImageToContourModelSetFilter::GetInput( void )
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
-  return static_cast<const mitk::ImageToContourModelFilter::InputType*>(this->ProcessObject::GetInput(0));
+  return static_cast<const mitk::ImageToContourModelSetFilter::InputType*>(this->ProcessObject::GetInput(0));
 }
 
-const mitk::ImageToContourModelFilter::InputType* mitk::ImageToContourModelFilter::GetInput( unsigned int idx )
+const mitk::ImageToContourModelSetFilter::InputType* mitk::ImageToContourModelSetFilter::GetInput( unsigned int idx )
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
-  return static_cast<const mitk::ImageToContourModelFilter::InputType*>(this->ProcessObject::GetInput(idx));
+  return static_cast<const mitk::ImageToContourModelSetFilter::InputType*>(this->ProcessObject::GetInput(idx));
 }
 
-void mitk::ImageToContourModelFilter::GenerateData()
+void mitk::ImageToContourModelSetFilter::GenerateData()
 {
-  mitk::Image::ConstPointer sliceImage = ImageToContourModelFilter::GetInput();
+  mitk::Image::ConstPointer sliceImage = ImageToContourModelSetFilter::GetInput();
 
   if ( !sliceImage )
   {
-    MITK_ERROR << "mitk::ImageToContourFilter: No input available. Please set the input!" << std::endl;
-    itkExceptionMacro("mitk::ImageToContourFilter: No input available. Please set the input!");
+    MITK_ERROR << "No input available. Please set the input!" << std::endl;
+    itkExceptionMacro("No input available. Please set the input!");
     return;
   }
 
   if ( sliceImage->GetDimension() > 2 || sliceImage->GetDimension() < 2)
   {
-    MITK_ERROR << "mitk::ImageToImageFilter::GenerateData() works only with 2D images. Please assure that your input image is 2D!" << std::endl;
-    itkExceptionMacro("mitk::ImageToImageFilter::GenerateData() works only with 2D images. Please assure that your input image is 2D!");
+    MITK_ERROR << "Please assure that your input image is 2D!" << std::endl;
+    itkExceptionMacro("Please assure that your input image is 2D!");
     return;
   }
 
@@ -87,7 +87,7 @@ void mitk::ImageToContourModelFilter::GenerateData()
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::ImageToContourModelFilter::ExtractContoursITKProcessing (itk::Image<TPixel, VImageDimension>* sliceImage)
+void mitk::ImageToContourModelSetFilter::ExtractContoursITKProcessing (itk::Image<TPixel, VImageDimension>* sliceImage)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::ContourExtractor2DImageFilter<ImageType> ContourExtractorType;
@@ -123,8 +123,7 @@ void mitk::ImageToContourModelFilter::ExtractContoursITKProcessing (itk::Image<T
     }
   }
 */
-
-  mitk::ContourModel::Pointer output = ImageToContourModelFilter::GetOutput();
+  mitk::ContourModelSet::Pointer output = this->GetOutput();
   assert ( output.IsNotNull() );
   output->Initialize();
 
@@ -134,9 +133,7 @@ void mitk::ImageToContourModelFilter::ExtractContoursITKProcessing (itk::Image<T
   {
     if (!contourExtractor->GetOutput(i)) return;
     const ContourPath* currentPath = contourExtractor->GetOutput(i)->GetVertexList();
-
-    if (m_UseProgressBar)
-      mitk::ProgressBar::GetInstance()->AddStepsToDo( currentPath->Size() );
+    mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
     for (unsigned int j = 0; j < currentPath->Size(); j++)
     {
@@ -146,20 +143,18 @@ void mitk::ImageToContourModelFilter::ExtractContoursITKProcessing (itk::Image<T
       currentWorldPoint[2] = 0;
 
       m_SliceGeometry->IndexToWorld(currentWorldPoint, currentWorldPoint);
-      output->AddVertex(currentWorldPoint);
-
-      if (m_UseProgressBar)
-        mitk::ProgressBar::GetInstance()->Progress(1);
+      contour->AddVertex(currentWorldPoint);
     }
+    output->AddContourModel(contour);
   }
 }
 
-void mitk::ImageToContourModelFilter::GenerateOutputInformation()
+void mitk::ImageToContourModelSetFilter::GenerateOutputInformation()
 {
   Superclass::GenerateOutputInformation();
 }
 
-void mitk::ImageToContourModelFilter::SetUseProgressBar(bool status)
+void mitk::ImageToContourModelSetFilter::SetUseProgressBar(bool status)
 {
   m_UseProgressBar = status;
 }

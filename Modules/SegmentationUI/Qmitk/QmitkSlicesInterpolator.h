@@ -21,12 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationUIExports.h"
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
-//#include "mitkWeakPointer.h"
 #include "mitkSurfaceInterpolationController.h"
 #include "mitkSegmentationInterpolationController.h"
 #include "mitkToolManager.h"
 #include "mitkDiffSliceOperation.h"
-#include "mitkContourModel.h"
+#include "mitkContourModelSet.h"
 
 #include <map>
 
@@ -242,7 +241,7 @@ private:
     QCheckBox* m_chkShowPositionNodes;
 
     mitk::DataNode::Pointer m_FeedbackContourNode;
-    mitk::ContourModel::Pointer m_FeedbackContour;
+    mitk::ContourModelSet::Pointer m_FeedbackContour;
     mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
     mitk::DataNode::Pointer m_3DContourNode;
 

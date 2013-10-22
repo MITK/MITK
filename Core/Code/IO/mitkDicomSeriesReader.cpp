@@ -456,81 +456,10 @@ DicomSeriesReader::LoadDicomSeries(
       io->SetFileName(filenames.front().c_str());
       io->ReadImageInformation();
 
-      if (io->GetPixelType() == itk::ImageIOBase::SCALAR)
+      if (io->GetPixelType() == itk::ImageIOBase::SCALAR ||
+          io->GetPixelType() == itk::ImageIOBase::RGB)
       {
-        switch (io->GetComponentType())
-        {
-          case DcmIoType::UCHAR:
-            DicomSeriesReader::LoadDicom<unsigned char>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::CHAR:
-            DicomSeriesReader::LoadDicom<char>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::USHORT:
-            DicomSeriesReader::LoadDicom<unsigned short>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::SHORT:
-            DicomSeriesReader::LoadDicom<short>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::UINT:
-            DicomSeriesReader::LoadDicom<unsigned int>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::INT:
-            DicomSeriesReader::LoadDicom<int>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::ULONG:
-            DicomSeriesReader::LoadDicom<long unsigned int>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::LONG:
-            DicomSeriesReader::LoadDicom<long int>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::FLOAT:
-            DicomSeriesReader::LoadDicom<float>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::DOUBLE:
-            DicomSeriesReader::LoadDicom<double>(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          default:
-            MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
-        }
-      }
-      else if (io->GetPixelType() == itk::ImageIOBase::RGB)
-      {
-        switch (io->GetComponentType())
-        {
-          case DcmIoType::UCHAR:
-            DicomSeriesReader::LoadDicom< itk::RGBPixel<unsigned char> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::CHAR:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<char> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::USHORT:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<unsigned short> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::SHORT:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<short> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::UINT:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<unsigned int> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::INT:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<int> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::ULONG:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<long unsigned int> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::LONG:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<long int> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::FLOAT:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<float> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          case DcmIoType::DOUBLE:
-            DicomSeriesReader::LoadDicom<itk::RGBPixel<double> >(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
-            break;
-          default:
-            MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
-        }
+        LoadDicom(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
       }
 
       if (node.GetData())
@@ -1974,6 +1903,325 @@ void DicomSeriesReader::FixSpacingInformation( mitk::Image* image, const ImageBl
   imageSpacing[1] = desiredSpacingY;
   image->GetGeometry()->SetSpacing( imageSpacing );
 }
+
+void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, bool correctTilt, UpdateCallBackMethod callback, Image::Pointer preLoadedImageBlock)
+{
+  const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
+  setlocale(LC_NUMERIC, "C");
+  std::locale previousCppLocale( std::cin.getloc() );
+  std::locale l( "C" );
+  std::cin.imbue(l);
+
+  ImageBlockDescriptor imageBlockDescriptor;
+
+  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
+  const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
+  const gdcm::Tag tagSeriesInstanceUID(0x0020, 0x000e); // Series Instance UID
+  const gdcm::Tag tagSOPClassUID(0x0008, 0x0016); // SOP class UID
+  const gdcm::Tag tagModality(0x0008, 0x0060); // modality
+  const gdcm::Tag tagPixelSpacing(0x0028, 0x0030); // pixel spacing
+  const gdcm::Tag tagImagerPixelSpacing(0x0018, 0x1164); // imager pixel spacing
+  const gdcm::Tag tagNumberOfFrames(0x0028, 0x0008); // number of frames
+
+  try
+  {
+    Image::Pointer image = preLoadedImageBlock.IsNull() ? Image::New() : preLoadedImageBlock;
+    CallbackCommand *command = callback ? new CallbackCommand(callback) : 0;
+    bool initialize_node = false;
+
+    /* special case for Philips 3D+t ultrasound images */
+    if ( DicomSeriesReader::IsPhilips3DDicom(filenames.front().c_str())  )
+    {
+      // TODO what about imageBlockDescriptor?
+      // TODO what about preLoadedImageBlock?
+      ReadPhilips3DDicom(filenames.front().c_str(), image);
+      initialize_node = true;
+    }
+    else
+    {
+      /* default case: assume "normal" image blocks, possibly 3D+t */
+      bool canLoadAs4D(true);
+      gdcm::Scanner scanner;
+      ScanForSliceInformation(filenames, scanner);
+
+      // need non-const access for map
+      gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(scanner.GetMappings());
+
+      std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, tagValueMappings, sort, canLoadAs4D );
+      unsigned int volume_count = imageBlocks.size();
+
+      imageBlockDescriptor.SetSeriesInstanceUID( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagSeriesInstanceUID ) ) );
+      imageBlockDescriptor.SetSOPClassUID( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagSOPClassUID ) ) );
+      imageBlockDescriptor.SetModality( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagModality ) ) );
+      imageBlockDescriptor.SetNumberOfFrames( ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagNumberOfFrames ) ) );
+      imageBlockDescriptor.SetPixelSpacingInformation( ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagPixelSpacing ) ),
+                                                       ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagImagerPixelSpacing ) ) );
+
+      GantryTiltInformation tiltInfo;
+
+      // check possibility of a single slice with many timesteps. In this case, don't check for tilt, no second slice possible
+      if ( !imageBlocks.empty() && imageBlocks.front().size() > 1 && correctTilt)
+      {
+        // check tiltedness here, potentially fixup ITK's loading result by shifting slice contents
+        // check first and last position slice from tags, make some calculations to detect tilt
+
+        std::string firstFilename(imageBlocks.front().front());
+        // calculate from first and last slice to minimize rounding errors
+        std::string secondFilename(imageBlocks.front().back());
+
+        std::string imagePosition1(    ConstCharStarToString( tagValueMappings[ firstFilename.c_str() ][ tagImagePositionPatient ] ) );
+        std::string imageOrientation( ConstCharStarToString( tagValueMappings[ firstFilename.c_str() ][ tagImageOrientation ] ) );
+        std::string imagePosition2(    ConstCharStarToString( tagValueMappings[secondFilename.c_str() ][ tagImagePositionPatient ] ) );
+
+        bool ignoredConversionError(-42); // hard to get here, no graceful way to react
+        Point3D origin1( DICOMStringToPoint3D( imagePosition1, ignoredConversionError ) );
+        Point3D origin2( DICOMStringToPoint3D( imagePosition2, ignoredConversionError ) );
+
+        Vector3D right; right.Fill(0.0);
+        Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
+        DICOMStringToOrientationVectors( imageOrientation, right, up, ignoredConversionError );
+
+        tiltInfo = GantryTiltInformation ( origin1, origin2, right, up, filenames.size()-1 );
+        correctTilt = tiltInfo.IsSheared() && tiltInfo.IsRegularGantryTilt();
+      }
+      else
+      {
+        correctTilt = false; // we CANNOT do that
+      }
+
+      imageBlockDescriptor.SetHasGantryTiltCorrected( correctTilt );
+
+      if (volume_count == 1 || !canLoadAs4D || !load4D)
+      {
+
+        DcmIoType::Pointer io;
+        image = MultiplexLoadDICOMByITK( imageBlocks.front(), correctTilt, tiltInfo, io, command, preLoadedImageBlock ); // load first 3D block
+
+        imageBlockDescriptor.AddFiles(imageBlocks.front()); // only the first part is loaded
+        imageBlockDescriptor.SetHasMultipleTimePoints( false );
+
+        FixSpacingInformation( image, imageBlockDescriptor );
+        CopyMetaDataToImageProperties( imageBlocks.front(), scanner.GetMappings(), io, imageBlockDescriptor, image);
+
+        initialize_node = true;
+      }
+      else if (volume_count > 1)
+      {
+        imageBlockDescriptor.AddFiles(filenames); // all is loaded
+        imageBlockDescriptor.SetHasMultipleTimePoints( true );
+
+        DcmIoType::Pointer io;
+        image = MultiplexLoadDICOMByITK4D( imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command, preLoadedImageBlock );
+
+        initialize_node = true;
+      }
+
+    }
+
+    if (initialize_node)
+    {
+      // forward some image properties to node
+      node.GetPropertyList()->ConcatenatePropertyList( image->GetPropertyList(), true );
+
+      node.SetData( image );
+      setlocale(LC_NUMERIC, previousCLocale);
+      std::cin.imbue(previousCppLocale);
+    }
+
+    MITK_DEBUG << "--------------------------------------------------------------------------------";
+    MITK_DEBUG << "DICOM files loaded (from series UID " << imageBlockDescriptor.GetSeriesInstanceUID() << "):";
+    MITK_DEBUG << "  " << imageBlockDescriptor.GetFilenames().size() << " '" << imageBlockDescriptor.GetModality() << "' files (" << imageBlockDescriptor.GetSOPClassUIDAsString() << ") loaded into 1 mitk::Image";
+    MITK_DEBUG << "  multi-frame: " << (imageBlockDescriptor.IsMultiFrameImage()?"Yes":"No");
+    MITK_DEBUG << "  reader support: " << ReaderImplementationLevelToString(imageBlockDescriptor.GetReaderImplementationLevel());
+    MITK_DEBUG << "  pixel spacing type: " << PixelSpacingInterpretationToString( imageBlockDescriptor.GetPixelSpacingType() ) << " " << image->GetGeometry()->GetSpacing()[0] << "/" << image->GetGeometry()->GetSpacing()[0];
+    MITK_DEBUG << "  gantry tilt corrected: " << (imageBlockDescriptor.HasGantryTiltCorrected()?"Yes":"No");
+    MITK_DEBUG << "  3D+t: " << (imageBlockDescriptor.HasMultipleTimePoints()?"Yes":"No");
+    MITK_DEBUG << "--------------------------------------------------------------------------------";
+  }
+  catch (std::exception& e)
+  {
+    // reset locale then throw up
+    setlocale(LC_NUMERIC, previousCLocale);
+    std::cin.imbue(previousCppLocale);
+
+    MITK_DEBUG << "Caught exception in DicomSeriesReader::LoadDicom";
+
+    throw e;
+  }
+}
+
+Image::Pointer
+DicomSeriesReader
+::MultiplexLoadDICOMByITKScalar(const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock)
+{
+  switch (io->GetComponentType())
+  {
+    case DcmIoType::UCHAR:
+      return LoadDICOMByITK<unsigned char>(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::CHAR:
+      return LoadDICOMByITK<char>(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::USHORT:
+      return LoadDICOMByITK<unsigned short>(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::SHORT:
+      return LoadDICOMByITK<short>(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::UINT:
+      return LoadDICOMByITK<unsigned int>(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::INT:
+      return LoadDICOMByITK<int>(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::ULONG:
+      return LoadDICOMByITK<long unsigned int>(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::LONG:
+      return LoadDICOMByITK<long int>(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::FLOAT:
+      return LoadDICOMByITK<float>(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::DOUBLE:
+      return LoadDICOMByITK<double>(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    default:
+      MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
+      return NULL;
+  }
+}
+
+Image::Pointer
+DicomSeriesReader
+::MultiplexLoadDICOMByITKRGBPixel(const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock)
+{
+  switch (io->GetComponentType())
+  {
+    case DcmIoType::UCHAR:
+      return LoadDICOMByITK< itk::RGBPixel<unsigned char> >(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::CHAR:
+      return LoadDICOMByITK<itk::RGBPixel<char> >(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::USHORT:
+      return LoadDICOMByITK<itk::RGBPixel<unsigned short> >(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::SHORT:
+      return LoadDICOMByITK<itk::RGBPixel<short> >(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::UINT:
+      return LoadDICOMByITK<itk::RGBPixel<unsigned int> >(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::INT:
+      return LoadDICOMByITK<itk::RGBPixel<int> >(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::ULONG:
+      return LoadDICOMByITK<itk::RGBPixel<long unsigned int> >(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::LONG:
+      return LoadDICOMByITK<itk::RGBPixel<long int> >(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::FLOAT:
+      return LoadDICOMByITK<itk::RGBPixel<float> >(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::DOUBLE:
+      return LoadDICOMByITK<itk::RGBPixel<double> >(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    default:
+      MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
+      return NULL;
+  }
+}
+
+Image::Pointer
+DicomSeriesReader
+::MultiplexLoadDICOMByITK(const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock)
+{
+  io = DcmIoType::New();
+  io->SetFileName(filenames.front().c_str());
+  io->ReadImageInformation();
+
+  if (io->GetPixelType() == itk::ImageIOBase::SCALAR)
+  {
+    return MultiplexLoadDICOMByITKScalar(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+  }
+  else if (io->GetPixelType() == itk::ImageIOBase::RGB)
+  {
+    return MultiplexLoadDICOMByITKRGBPixel(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
+Image::Pointer
+DicomSeriesReader
+::MultiplexLoadDICOMByITK4DScalar( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock)
+{
+  switch (io->GetComponentType())
+  {
+    case DcmIoType::UCHAR:
+      return LoadDICOMByITK4D<unsigned char>(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::CHAR:
+      return LoadDICOMByITK4D<char>(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::USHORT:
+      return LoadDICOMByITK4D<unsigned short>(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::SHORT:
+      return LoadDICOMByITK4D<short>(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::UINT:
+      return LoadDICOMByITK4D<unsigned int>(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::INT:
+      return LoadDICOMByITK4D<int>(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::ULONG:
+      return LoadDICOMByITK4D<long unsigned int>(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::LONG:
+      return LoadDICOMByITK4D<long int>(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::FLOAT:
+      return LoadDICOMByITK4D<float>(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::DOUBLE:
+      return LoadDICOMByITK4D<double>(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    default:
+      MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
+      return NULL;
+  }
+}
+
+Image::Pointer
+DicomSeriesReader
+::MultiplexLoadDICOMByITK4DRGBPixel( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock)
+{
+  switch (io->GetComponentType())
+  {
+    case DcmIoType::UCHAR:
+      return LoadDICOMByITK4D< itk::RGBPixel<unsigned char> >(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::CHAR:
+      return LoadDICOMByITK4D<itk::RGBPixel<char> >(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::USHORT:
+      return LoadDICOMByITK4D<itk::RGBPixel<unsigned short> >(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::SHORT:
+      return LoadDICOMByITK4D<itk::RGBPixel<short> >(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::UINT:
+      return LoadDICOMByITK4D<itk::RGBPixel<unsigned int> >(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::INT:
+      return LoadDICOMByITK4D<itk::RGBPixel<int> >(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::ULONG:
+      return LoadDICOMByITK4D<itk::RGBPixel<long unsigned int> >(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::LONG:
+      return LoadDICOMByITK4D<itk::RGBPixel<long int> >(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::FLOAT:
+      return LoadDICOMByITK4D<itk::RGBPixel<float> >(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    case DcmIoType::DOUBLE:
+      return LoadDICOMByITK4D<itk::RGBPixel<double> >(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+    default:
+      MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
+      return NULL;
+  }
+}
+
+Image::Pointer
+DicomSeriesReader
+::MultiplexLoadDICOMByITK4D( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock)
+{
+  io = DcmIoType::New();
+  io->SetFileName(imageBlocks.front().front().c_str());
+  io->ReadImageInformation();
+
+  if (io->GetPixelType() == itk::ImageIOBase::SCALAR)
+  {
+    return MultiplexLoadDICOMByITK4DScalar(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+  }
+  else if (io->GetPixelType() == itk::ImageIOBase::RGB)
+  {
+    return MultiplexLoadDICOMByITK4DRGBPixel(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
 
 } // end namespace mitk
 

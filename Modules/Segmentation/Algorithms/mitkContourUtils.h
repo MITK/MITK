@@ -40,17 +40,17 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
     /**
       \brief Projects a contour onto an image point by point. Converts from world to index coordinates.
     */
-    static void ProjectContourTo2DSlice(const Image* slice, ContourModel* contourIn3D, ContourModel* contourIn2D, int timestep);
+    static void ProjectContourTo2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn3D, ContourModel* contourIn2D);
 
     /**
       \brief Projects a slice index coordinates of a contour back into world coordinates.
     */
-    static void BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D, ContourModel* contourIn3D, int timestep);
+    static void BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D, ContourModel* contourIn3D);
 
     /**
       \brief Fill a contour in a 2D slice with a specified pixel value.
     */
-    static void FillContourInSlice( ContourModel* projectedContour, Image* slice, int paintingPixelValue, int timestep );
+    static void FillContourInSlice( ContourModel* projectedContour, Image* slice, int paintingPixelValue );
 
   protected:
 

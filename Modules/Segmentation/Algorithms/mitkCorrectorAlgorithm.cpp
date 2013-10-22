@@ -128,7 +128,8 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
 
   ContourModel* contour3D = const_cast<ContourModel*>(m_Contour.GetPointer());
   ContourModel::Pointer projectedContour = ContourModel::New();
-  mitk::ContourUtils::ProjectContourTo2DSlice( m_WorkingImage, contour3D, projectedContour, m_TimeStep );
+  const mitk::Geometry3D* sliceGeometry = m_WorkingImage->GetGeometry();
+  mitk::ContourUtils::ProjectContourTo2DSlice( sliceGeometry, contour3D, projectedContour );
 
   if (projectedContour->IsEmpty( m_TimeStep ))
   {

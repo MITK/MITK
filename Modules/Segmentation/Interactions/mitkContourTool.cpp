@@ -149,15 +149,11 @@ bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* state
 
   // 4. Project it into the extracted plane
   ContourModel::Pointer projectedContour = ContourModel::New();
-  ContourUtils::ProjectContourTo2DSlice( slice, feedbackContour, projectedContour, timestep );
-  if (projectedContour.IsNull())
-  {
-    MITK_ERROR << "Unable to project the contour.";
-    return false;
-  }
+  const mitk::Geometry3D* sliceGeometry = slice->GetGeometry();
+  ContourUtils::ProjectContourTo2DSlice( sliceGeometry, feedbackContour, projectedContour );
 
   // 5. Transfer contour to working slice taking into account whether neighboring labels are locked or editable
-  ContourUtils::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue, timestep );
+  ContourUtils::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue );
 
   // 6. Write back the slice into our working image
   SegTool2D::WriteBackSegmentationResult(positionEvent, slice);

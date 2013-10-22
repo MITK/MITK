@@ -113,7 +113,7 @@ m_3DInterpolationEnabled(false)
   m_FeedbackContourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
   m_FeedbackContourNode->SetProperty("layer", mitk::IntProperty::New(1000));
   m_FeedbackContourNode->SetProperty("contour.project-onto-plane", mitk::BoolProperty::New(true));
-  m_FeedbackContourNode->SetProperty("contour.width", mitk::FloatProperty::New(2.0));
+  m_FeedbackContourNode->SetProperty("contour.width", mitk::FloatProperty::New(2.5));
 
   this->Disable3DRendering();
 
@@ -569,8 +569,8 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
   if (m_WorkingImage.IsNotNull() && m_FeedbackContourNode->GetData())
   {
     const mitk::PlaneGeometry* planeGeometry = m_LastSNC->GetCurrentPlaneGeometry();
-    mitk::Image::Pointer slice = this->GetWorkingSlice(planeGeometry);
-    if (slice.IsNull()) return;
+    mitk::Image::Pointer sliceImage = this->GetWorkingSlice(planeGeometry);
+    if (sliceImage.IsNull()) return;
 
     unsigned int timeStep = m_LastSNC->GetTime()->GetPos();
 
@@ -578,14 +578,13 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 //    if (!planeGeometry) return;
 
     mitk::ContourModel::Pointer projectedContour = mitk::ContourModel::New();
-    mitk::ContourUtils::ProjectContourTo2DSlice( slice, m_FeedbackContour, projectedContour, timeStep );
-    if (projectedContour.IsNull()) return;
-
-    mitk::ContourUtils::FillContourInSlice( projectedContour, slice, m_WorkingImage->GetActiveLabelIndex(), timeStep );
+    const mitk::Geometry3D* sliceGeometry = sliceImage->GetGeometry(timeStep);
+    mitk::ContourUtils::ProjectContourTo2DSlice( sliceGeometry, m_FeedbackContour, projectedContour );
+    mitk::ContourUtils::FillContourInSlice( projectedContour, sliceImage, m_WorkingImage->GetActiveLabelIndex() );
 
     //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
     vtkSmartPointer<mitkVtkImageOverwrite> overwrite = vtkSmartPointer<mitkVtkImageOverwrite>::New();
-    overwrite->SetInputSlice(slice->GetVtkImageData());
+    overwrite->SetInputSlice(sliceImage->GetVtkImageData());
     //set overwrite mode to true to write back to the image volume
     overwrite->SetOverwriteMode(true);
     overwrite->Modified();
@@ -615,11 +614,11 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     int clickedSliceDimension(-1);
     int clickedSliceIndex(-1);
     mitk::SegTool2D::DetermineAffectedImageSlice( m_WorkingImage, planeGeometry, clickedSliceDimension, clickedSliceIndex );
-    m_SliceInterpolatorController->SetChangedSlice( slice, clickedSliceDimension, clickedSliceIndex, timeStep );
+    m_SliceInterpolatorController->SetChangedSlice( sliceImage, clickedSliceDimension, clickedSliceIndex, timeStep );
 
     //specify the undo operation with the edited slice
     m_doOperation = new mitk::DiffSliceOperation(
-      m_WorkingImage, extractor->GetVtkOutput(),slice->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+      m_WorkingImage, extractor->GetVtkOutput(),sliceImage->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
 
     //create an operation event for the undo stack
     mitk::OperationEvent* undoStackItem = new mitk::OperationEvent(
@@ -688,18 +687,19 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
       m_FeedbackContourNode->SetData( m_FeedbackContour );
 
-      mitk::Image::Pointer slice = this->GetWorkingSlice(reslicePlane);
-      if (slice.IsNull()) return;
+      mitk::Image::Pointer sliceImage = this->GetWorkingSlice(reslicePlane);
+      if (sliceImage.IsNull()) return;
 
       mitk::ContourModel::Pointer projectedContour = mitk::ContourModel::New();
-      mitk::ContourUtils::ProjectContourTo2DSlice( slice, m_FeedbackContour, projectedContour, timeStep );
+      const mitk::Geometry3D* sliceGeometry = sliceImage->GetGeometry();
+      mitk::ContourUtils::ProjectContourTo2DSlice( sliceGeometry, m_FeedbackContour, projectedContour );
       if (projectedContour.IsNull()) return;
 
-      mitk::ContourUtils::FillContourInSlice( projectedContour, slice, m_WorkingImage->GetActiveLabelIndex(), timeStep );
+      mitk::ContourUtils::FillContourInSlice( projectedContour, sliceImage, m_WorkingImage->GetActiveLabelIndex() );
 
       //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
       vtkSmartPointer<mitkVtkImageOverwrite> overwrite = vtkSmartPointer<mitkVtkImageOverwrite>::New();
-      overwrite->SetInputSlice(slice->GetVtkImageData());
+      overwrite->SetInputSlice(sliceImage->GetVtkImageData());
       //set overwrite mode to true to write back to the image volume
       overwrite->SetOverwriteMode(true);
       overwrite->Modified();

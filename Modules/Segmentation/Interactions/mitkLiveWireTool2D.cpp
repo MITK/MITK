@@ -190,8 +190,9 @@ void mitk::LiveWireTool2D::Deactivated()
           mitk::Image::Pointer workingSlice = this->GetAffectedImageSliceAs2DImage(it->second, workingImage, currentTimestep);
 
           mitk::ContourModel::Pointer projectedContour = mitk::ContourModel::New();
-          mitk::ContourUtils::ProjectContourTo2DSlice(workingSlice, contourModel, projectedContour, currentTimestep);
-          mitk::ContourUtils::FillContourInSlice(projectedContour, workingSlice, activeLabel, currentTimestep);
+          const mitk::Geometry3D* sliceGeometry = workingSlice->GetGeometry();
+          mitk::ContourUtils::ProjectContourTo2DSlice(sliceGeometry, contourModel, projectedContour);
+          mitk::ContourUtils::FillContourInSlice(projectedContour, workingSlice, activeLabel);
 
           //write back to image volume
           this->WriteBackSegmentationResult(it->second, workingSlice, currentTimestep);

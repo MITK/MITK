@@ -233,7 +233,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
 
     mitk::ContourModel* feedbackContour = FeedbackContourTool::GetFeedbackContour();
     assert( feedbackContour );
-    ContourUtils::BackProjectContourFrom2DSlice( workingSlice->GetGeometry(), contourInImageIndexCoordinates, feedbackContour, timestep);
+    ContourUtils::BackProjectContourFrom2DSlice( workingSlice->GetGeometry(), contourInImageIndexCoordinates, feedbackContour );
     feedbackContour->Modified();
 
     // Show the contour
@@ -308,11 +308,11 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
   ContourModel* feedbackContour = FeedbackContourTool::GetFeedbackContour();
   assert(feedbackContour);
   ContourModel::Pointer projectedContour = ContourModel::New();
-  ContourUtils::ProjectContourTo2DSlice( slice, feedbackContour, projectedContour, timestep );
-  if (projectedContour.IsNull()) return false;
+  const mitk::Geometry3D* sliceGeometry = slice->GetGeometry();
+  ContourUtils::ProjectContourTo2DSlice( sliceGeometry, feedbackContour, projectedContour );
 
   // stamp contour in 3D ooords into working slice
-  ContourUtils::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue, timestep );
+  ContourUtils::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue );
   // write working slice back into working volume
   this->WriteBackSegmentationResult(positionEvent, slice);
 

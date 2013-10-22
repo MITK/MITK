@@ -253,7 +253,7 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
 
       mitk::ContourModel* feedbackContour = FeedbackContourTool::GetFeedbackContour();
       assert( feedbackContour );
-      ContourUtils::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), contourInIndexCoordinates, feedbackContour, timestep);
+      ContourUtils::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), contourInIndexCoordinates, feedbackContour );
       feedbackContour->Modified();
 
       mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
@@ -386,12 +386,13 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
           ContourModel* feedbackContour = FeedbackContourTool::GetFeedbackContour();
           assert(feedbackContour);
           ContourModel::Pointer projectedContour = ContourModel::New();
-          ContourUtils::ProjectContourTo2DSlice( m_WorkingSlice, feedbackContour, projectedContour, timestep);
-          if (projectedContour.IsNotNull())
+          const mitk::Geometry3D* sliceGeometry = m_WorkingSlice->GetGeometry();
+          ContourUtils::ProjectContourTo2DSlice( sliceGeometry, feedbackContour, projectedContour );
+          if (!projectedContour->IsEmpty())
           {
             // 4. stamp contour in 3D ooords into working slice
-            ContourUtils::FillContourInSlice( projectedContour, m_WorkingSlice, m_PaintingPixelValue, timestep );
-            const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D()) );
+            ContourUtils::FillContourInSlice( projectedContour, m_WorkingSlice, m_PaintingPixelValue );
+            //const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D()) );
            // 5. write working slice back into working volume
            this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
           }
@@ -539,7 +540,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
 
     ContourModel* feedbackContour = FeedbackContourTool::GetFeedbackContour();
     assert( feedbackContour );
-    ContourUtils::BackProjectContourFrom2DSlice( m_ReferenceSlice->GetGeometry(), contourInIndexCoordinates, feedbackContour, timestep);
+    ContourUtils::BackProjectContourFrom2DSlice( m_ReferenceSlice->GetGeometry(), contourInIndexCoordinates, feedbackContour );
     feedbackContour->Modified();
   }
 

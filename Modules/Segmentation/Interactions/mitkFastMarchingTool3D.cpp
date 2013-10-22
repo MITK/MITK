@@ -378,8 +378,9 @@ void mitk::FastMarchingTool3D::Update()
     m_FeedbackImage->SetGeometry( m_ReferenceImage->GetGeometry(0)->Clone().GetPointer() );
 
     mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
-    int activeLayer = workingImage->GetActiveLayer();
-    const mitk::Color& color = workingImage->GetActiveLabelColor(activeLayer);
+    assert(workingImage);
+
+    const mitk::Color& color = workingImage->GetActiveLabelColor();
 
     m_FeedbackImage->SetLabelColor(1, color);
     m_FeedbackNode->SetData(m_FeedbackImage);

@@ -94,7 +94,7 @@ void mitk::SegTool3D::ItkPasteSegmentationOnWorkingImage(
   {
     while ( !targetIterator.IsAtEnd() )
     {
-      const int targetValue = targetIterator.Get();
+      int targetValue = static_cast<int>(targetIterator.Get());
       if ( sourceIterator.Get() != 0 )
       {
         if (!workingImage->GetLabelLocked(targetValue))

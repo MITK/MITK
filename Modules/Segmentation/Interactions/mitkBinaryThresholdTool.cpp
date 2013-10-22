@@ -268,7 +268,7 @@ void mitk::BinaryThresholdTool::ITKThresholding( itk::Image<TPixel1, VDimension1
 
   while (!targetIterator.IsAtEnd())
   {
-    int targetValue = targetIterator.Get();
+    int targetValue = static_cast<int>( targetIterator.Get() );
     if ( sourceIterator.Get() >= m_CurrentThresholdValue )
     {
       if (!workingImage->GetLabelLocked(targetValue))

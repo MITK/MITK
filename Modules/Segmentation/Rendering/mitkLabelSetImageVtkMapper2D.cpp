@@ -292,11 +292,10 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     localStorage->m_LayerActorVector[lidx]->GetProperty()->SetOpacity(opacity);
   }
 
-
   localStorage->m_OutlineActor->GetProperty()->SetOpacity(opacity);
   localStorage->m_OutlineShadowActor->GetProperty()->SetOpacity(opacity);
 
-  const mitk::Color& color = image->GetActiveLabelColor(activeLayer);
+  const mitk::Color& color = image->GetActiveLabelColor();
   localStorage->m_OutlineActor->GetProperty()->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
   localStorage->m_OutlineShadowActor->GetProperty()->SetColor(0,0,0);
 }

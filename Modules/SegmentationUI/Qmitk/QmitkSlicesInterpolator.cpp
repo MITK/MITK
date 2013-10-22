@@ -361,6 +361,8 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
     }
 
     mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+    assert(workingImage);
+
     if (workingImage->GetDimension() > 4 || workingImage->GetDimension() < 3)
     {
       MITK_ERROR << "slices interpolator needs a 3D or 3D+t segmentation, not 2D.";

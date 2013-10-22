@@ -737,21 +737,19 @@ const mitk::Point3D& mitk::LabelSetImage::GetLabelCenterOfMassIndex(int index, b
 
 const mitk::Point3D& mitk::LabelSetImage::GetLabelCenterOfMassCoordinates(int index, bool forceUpdate, int layer)
 {
-  if (layer < 0)
-    layer = m_ActiveLayer;
+  if (layer < 0) layer = m_ActiveLayer;
 
   if (forceUpdate)
   {
     AccessByItk_2( this, CalculateCenterOfMassProcessing, index, layer );
   }
+
   return m_LabelSetContainer[layer]->GetLabelCenterOfMassCoordinates(index);
 }
 
 void mitk::LabelSetImage::SetActiveLabel(int index, bool sendEvent, int layer)
 {
-  if (layer < 0)
-    layer = m_ActiveLayer;
-
+  if (layer < 0) layer = m_ActiveLayer;
   m_LabelSetContainer[layer]->SetActiveLabel(index);
 
   if (sendEvent)
@@ -762,28 +760,21 @@ void mitk::LabelSetImage::SetActiveLabel(int index, bool sendEvent, int layer)
 
 void mitk::LabelSetImage::SetLabelLocked(int index, bool value, int layer)
 {
-  if (layer < 0)
-    layer = m_ActiveLayer;
-
+  if (layer < 0) layer = m_ActiveLayer;
   m_LabelSetContainer[layer]->SetLabelLocked(index, value);
-
   this->Modified();
 }
 
 void mitk::LabelSetImage::SetLabelSelected(int index, bool value, int layer)
 {
-  if (layer < 0)
-    layer = m_ActiveLayer;
-
+  if (layer < 0) layer = m_ActiveLayer;
   m_LabelSetContainer[layer]->SetLabelSelected(index, value);
   this->Modified();
 }
 
 void mitk::LabelSetImage::RemoveAllLabels(int layer)
 {
-  if (layer < 0)
-    layer = m_ActiveLayer;
-
+  if (layer < 0) layer = m_ActiveLayer;
   m_LabelSetContainer[layer]->RemoveAllLabels();
   this->ClearBuffer();
   this->Modified();
@@ -792,9 +783,7 @@ void mitk::LabelSetImage::RemoveAllLabels(int layer)
 
 int mitk::LabelSetImage::GetNumberOfLabels(int layer) const
 {
-  if (layer < 0)
-    layer = m_ActiveLayer;
-
+  if (layer < 0) layer = m_ActiveLayer;
   return m_LabelSetContainer[layer]->GetNumberOfLabels();
 }
 
@@ -926,9 +915,8 @@ void mitk::LabelSetImage::SurfaceStamp(mitk::Surface* surface, bool forceOverwri
     vtkCellArray* polys = polydata->GetPolys();
 
     PointIdentifierType numberOfCellPoints = 3;
-    CellIdentifierType i = 0;
 
-    for (i=0; i<numberOfPolygons; i++)
+    for (CellIdentifierType i=0; i<numberOfPolygons; i++)
     {
       vtkIdList *cellIds;
       vtkCell *vcell = polydata->GetCell(i);

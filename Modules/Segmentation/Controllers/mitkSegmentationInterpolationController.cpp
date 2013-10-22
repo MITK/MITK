@@ -194,7 +194,7 @@ void mitk::SegmentationInterpolationController::SetChangedSlice( const Image* sl
 }
 
 template < typename PixelType >
-void mitk::SegmentationInterpolationController::ScanSliceITKProcessing( itk::Image<PixelType, 2>* diffImage, const SetChangedSliceOptions& options )
+void mitk::SegmentationInterpolationController::ScanSliceITKProcessing( itk::Image<PixelType, 2>* input, const SetChangedSliceOptions& options )
 {
   unsigned int timeStep = options.timeStep;
   unsigned int sliceDimension = options.sliceDimension;
@@ -207,14 +207,13 @@ void mitk::SegmentationInterpolationController::ScanSliceITKProcessing( itk::Ima
   unsigned int dim1(options.dim1);
 
   std::vector <int> numberOfPixels; // number of pixels in the current slice that are equal to the active label
-  int activeLayer = m_WorkingImage->GetActiveLayer();
-  int numberOfLabels = m_WorkingImage->GetNumberOfLabels(activeLayer);
+  int numberOfLabels = m_WorkingImage->GetNumberOfLabels();
   numberOfPixels.resize( numberOfLabels );
 
   typedef itk::Image<PixelType, 2> ImageType;
   typedef itk::ImageRegionConstIteratorWithIndex< ImageType > IteratorType;
 
-  typename IteratorType iter( diffImage, diffImage->GetLargestPossibleRegion() );
+  typename IteratorType iter( input, input->GetLargestPossibleRegion() );
   iter.GoToBegin();
 
   typename IteratorType::IndexType index;
@@ -236,11 +235,11 @@ void mitk::SegmentationInterpolationController::ScanSliceITKProcessing( itk::Ima
 }
 
 template < typename TPixel, unsigned int VImageDimension >
-void mitk::SegmentationInterpolationController::ScanImageITKProcessing( itk::Image<TPixel, VImageDimension>* diffImage, unsigned int timeStep )
+void mitk::SegmentationInterpolationController::ScanImageITKProcessing( itk::Image<TPixel, VImageDimension>* input, unsigned int timeStep )
 {
   typedef itk::ImageSliceConstIteratorWithIndex< itk::Image<TPixel, VImageDimension> > IteratorType;
 
-  IteratorType iter( diffImage, diffImage->GetLargestPossibleRegion() );
+  IteratorType iter( input, input->GetLargestPossibleRegion() );
   iter.SetFirstDirection(0);
   iter.SetSecondDirection(1);
 
@@ -250,8 +249,7 @@ void mitk::SegmentationInterpolationController::ScanImageITKProcessing( itk::Ima
   unsigned int z = 0;
 
   std::vector <int> numberOfPixels; // number of pixels per slice that are equal to the active label
-  int activeLayer = m_WorkingImage->GetActiveLayer();
-  int numberOfLabels = m_WorkingImage->GetNumberOfLabels(activeLayer);
+  int numberOfLabels = m_WorkingImage->GetNumberOfLabels();
   numberOfPixels.resize( numberOfLabels );
 
   iter.GoToBegin();

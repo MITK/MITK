@@ -49,8 +49,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   \sa QmitkFunctionality
   \ingroup Functionalities
 */
-//template <typename mitk::DiffusionPixelType>
-class QmitkDenoisingView : public QmitkFunctionality//, public mitk::DiffusionImageSource< DiffusionPixelType >
+class QmitkDenoisingView : public QmitkFunctionality
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -63,23 +62,17 @@ public:
   QmitkDenoisingView();
   virtual ~QmitkDenoisingView();
 
-/*  typedef float TOdfPixelType;
-  typedef itk::Vector<TOdfPixelType,QBALL_ODFSIZE> OdfVectorType;
-  typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
-
-  typedef itk::DiffusionTensor3D< TOdfPixelType >  TensorPixelType;
-  typedef itk::Image< TensorPixelType, 3 >         TensorImageType;*/
   typedef short DiffusionPixelType;
   typedef mitk::DiffusionImage< DiffusionPixelType > DiffusionImageType;
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
-
-  void OnSliceChanged(const itk::EventObject& e);
+  /// \brief Creation of the connections of main and control widget
+  virtual void CreateConnections();
 
 protected slots:
+
+  void StartDenoising();
 
 protected:
 
@@ -94,9 +87,6 @@ protected:
 
   mitk::DataNode::Pointer m_ImageNode;
 
-  int m_SliceObserverTag1;
-  int m_SliceObserverTag2;
-  int m_SliceObserverTag3;
   int m_PropertyObserverTag;
 };
 

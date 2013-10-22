@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkRenderingManager.h>
 
 #include <mitkImageReadAccessor.h>
+#include <itkNonLocalMeansDenoisingFilter.h>
 
 
 
@@ -41,7 +42,6 @@ const std::string QmitkDenoisingView::VIEW_ID = "org.mitk.views.denoisingview";
 QmitkDenoisingView::QmitkDenoisingView()
   : QmitkFunctionality()
   , m_Controls( 0 )
-  , m_MultiWidget( NULL )
   , m_ImageNode(NULL)
 {
 }
@@ -58,53 +58,16 @@ void QmitkDenoisingView::CreateQtPartControl( QWidget *parent )
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls = new Ui::QmitkDenoisingViewControls;
     m_Controls->setupUi( parent );
+    this->CreateConnections();
   }
 }
 
-void QmitkDenoisingView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
+void QmitkDenoisingView::CreateConnections()
 {
-  //m_MultiWidget = &stdMultiWidget;
-
-  /*{
-    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
-    itk::ReceptorMemberCommand<QmitkDenoisingView>::Pointer command = itk::ReceptorMemberCommand<QmitkDenoisingView>::New();
-    command->SetCallbackFunction( this, &QmitkDenoisingView::OnSliceChanged );
-    m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
-  }
-
+  if ( m_Controls )
   {
-    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget2->GetSliceNavigationController();
-    itk::ReceptorMemberCommand<QmitkDenoisingView>::Pointer command = itk::ReceptorMemberCommand<QmitkDenoisingView>::New();
-    command->SetCallbackFunction( this, &QmitkDenoisingView::OnSliceChanged );
-    m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+    connect( (QObject*)(m_Controls->m_ApplyButton), SIGNAL(clicked()), this, SLOT(StartDenoising()));
   }
-
-  {
-    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget3->GetSliceNavigationController();
-    itk::ReceptorMemberCommand<QmitkDenoisingView>::Pointer command = itk::ReceptorMemberCommand<QmitkDenoisingView>::New();
-    command->SetCallbackFunction( this, &QmitkDenoisingView::OnSliceChanged );
-    m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
-  }*/
-}
-
-
-void QmitkDenoisingView::StdMultiWidgetNotAvailable()
-{
-  /*{
-    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
-    slicer->RemoveObserver( m_SliceObserverTag1 );
-  }
-
-  {
-    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget2->GetSliceNavigationController();
-    slicer->RemoveObserver( m_SliceObserverTag2 );
-  }
-
-  {
-    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget3->GetSliceNavigationController();
-    slicer->RemoveObserver( m_SliceObserverTag3 );
-  }*/
-  //m_MultiWidget = NULL;
 }
 
 void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
@@ -132,18 +95,21 @@ void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes 
   if (m_ImageNode.IsNotNull())
   {
     itk::ReceptorMemberCommand<QmitkDenoisingView>::Pointer command = itk::ReceptorMemberCommand<QmitkDenoisingView>::New();
-    command->SetCallbackFunction( this, &QmitkDenoisingView::OnSliceChanged );
     m_PropertyObserverTag = m_ImageNode->AddObserver( itk::ModifiedEvent(), command );
 
     m_Controls->m_InputData->setTitle("Input Data");
   }
 }
 
-/**
-*
-* ist das Interessant für mich?
-*
-**/
-void QmitkDenoisingView::OnSliceChanged(const itk::EventObject& /*e*/)
+void QmitkDenoisingView::StartDenoising()
 {
+  if (m_ImageNode.IsNotNull())
+  {
+    MITK_INFO << "JOPP";
+    typedef itk::NonLocalMeansDenoisingFilter<DiffusionPixelType, DiffusionPixelType> NonLocalMeansDenoisingFilterType;
+    NonLocalMeansDenoisingFilterType::Pointer denoisingFilter = NonLocalMeansDenoisingFilterType::New();
+    denoisingFilter->SetVRadius((unsigned int)m_Controls->m_Parameter1);
+    denoisingFilter->SetNRadius((unsigned int)m_Controls->m_Parameter2);
+    denoisingFilter->Update();
+  }
 }

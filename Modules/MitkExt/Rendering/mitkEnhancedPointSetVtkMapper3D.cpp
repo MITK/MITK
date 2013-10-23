@@ -81,12 +81,6 @@ mitk::EnhancedPointSetVtkMapper3D::~EnhancedPointSetVtkMapper3D()
 //
 }
 
-void mitk::EnhancedPointSetVtkMapper3D::ReleaseGraphicsResources(vtkWindow * /*renWin*/)
-{
-  // TODO: Do we have to call this for all actors??
-  //m_Actor->ReleaseGraphicsResources(renWin);
-}
-
 void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
 {
   // get and update the PointSet

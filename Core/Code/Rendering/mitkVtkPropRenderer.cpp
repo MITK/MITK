@@ -772,7 +772,7 @@ void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
         VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>( mapper );
 
        if(vtkmapper)
-         vtkmapper->ReleaseGraphicsResources(renWin);
+         vtkmapper->ReleaseGraphicsResources(this);
       }
    }
 }

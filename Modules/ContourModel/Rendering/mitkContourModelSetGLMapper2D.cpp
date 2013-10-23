@@ -67,7 +67,7 @@ mitk::ContourModelSet* mitk::ContourModelSetGLMapper2D::GetInput(void)
   return const_cast<mitk::ContourModelSet*>(static_cast<const mitk::ContourModelSet * > ( GetDataNode()->GetData() ));
 }
 
-
+/*
 void mitk::ContourModelSetGLMapper2D::DrawContour(mitk::ContourModel* renderingContour, mitk::BaseRenderer* renderer)
 {
   if(!renderingContour) return;
@@ -359,7 +359,7 @@ void mitk::ContourModelSetGLMapper2D::DrawContour(mitk::ContourModel* renderingC
     }
   }
 }
-
+*/
 void mitk::ContourModelSetGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "contour.color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite );

@@ -96,7 +96,8 @@ namespace mitk
       {
         if(sopClass == UID_RTDoseStorage)
         {
-          mitk::LookupTable::Pointer x = this->DicomRTReader::LoadRTDose(dataset);
+          vtkSmartPointer<vtkColorTransferFunction> x = vtkSmartPointer<vtkColorTransferFunction>::New();
+          x = this->DicomRTReader::LoadRTDose(dataset);
           ContourModelSetVector y;
           return y;
         }
@@ -443,7 +444,7 @@ namespace mitk
     return 1;
   }
 
-  mitk::LookupTable::Pointer DicomRTReader::LoadRTDose(DcmDataset* dataset)
+  vtkSmartPointer<vtkColorTransferFunction> DicomRTReader::LoadRTDose(DcmDataset* dataset)
   {
     DRTDoseIOD doseObject;
 
@@ -602,23 +603,20 @@ namespace mitk
     vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
     vtkLut->SetHueRange(0.667,0.0);
 
-//    vtkLut->SetNumberOfTableValues(100000);
-//    vtkLut->SetTableRange(0,100000);
-//    vtkLut->Build();
-
-//    for(int i=0;i<100000;i++)
-//    {
-//      vtkLut->SetTableValue(i,0,0,1);
-//    }
-//    for(int i=99990; i<100000;i++)
-//    {
-//      vtkLut->SetTableValue(i,1,0,0);
-//    }
-
     mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
     mitkLutProp->SetLookupTable(mitkLut);
 
-    return mitkLut;
+    vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
+    transferFunction->AddHSVPoint(0,0.5666712,1,1,1,1);
+    transferFunction->AddHSVPoint(10000,0.5666712,0.53,0.98,1,1);
+    transferFunction->AddHSVPoint(20000,0.513893,0.97,0.97,1,1);
+    transferFunction->AddHSVPoint(30000,0.4055588,0.96,0.68,1,1);
+    transferFunction->AddHSVPoint(40000,0.1472234,0.97,0.97,1,1);
+    transferFunction->AddHSVPoint(50000,0.902785,0.47,0.98,1,1);
+    transferFunction->AddHSVPoint(60000,0.944452,0.97,0.83,1,1);
+    transferFunction->Build();
+
+    return transferFunction;
   }
 
   bool DicomRTReader::Equals(mitk::ContourModel::Pointer first, mitk::ContourModel::Pointer second)

@@ -150,17 +150,23 @@ void DcmRTV::LoadRTDoseFile()
   }
   DcmDataset *dataset = file.getDataset();
 
-  mitk::LookupTable::Pointer mitkLUT;
-  mitkLUT = _DicomRTReader->LoadRTDose(dataset);
+//  mitk::LookupTable::Pointer mitkLUT;
+  vtkSmartPointer<vtkColorTransferFunction> transFunc = vtkSmartPointer<vtkColorTransferFunction>::New();
+  transFunc = _DicomRTReader->LoadRTDose(dataset);
 
-  mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
-  mitkLutProp->SetLookupTable(mitkLUT);
+//  mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
+//  mitkLutProp->SetLookupTable(mitkLUT);
 
   mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-  renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
+  renderingMode->SetValue( mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR);
 
   mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries( files );
-  node->SetProperty("LookupTable", mitkLutProp);
+  mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
+  mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
+  mitkTransFunc->SetColorTransferFunction(transFunc);
+  mitkTransFuncProp->SetValue(mitkTransFunc);
+  node->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
+//  node->SetProperty("LookupTable", mitkLutProp);
   node->SetProperty("Image Rendering.Mode", renderingMode);
   node->SetProperty("opacity", mitk::FloatProperty::New(1.0));
   node->SetName("DicomRT Dose");
@@ -170,53 +176,49 @@ void DcmRTV::LoadRTDoseFile()
   mitk::DataNode::Pointer doseNode = GetDataStorage()->GetNamedNode("DicomRT Dose");
   mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(doseNode->GetData());
 //  vtkMarchingSquares* contourFilter = vtkMarchingSquares::New();
-  int numberOfIsoLines = 2;
   std::deque<mitk::Surface::Pointer> surfaceStorage;
 
-//  for(int i=0; i<numberOfIsoLines;i++)
-//  {
-    mitk::ExtractImageFilter::Pointer imageExtractor = mitk::ExtractImageFilter::New();
-    mitk::DataNode::Pointer img = this->GetDataStorage()->GetNamedNode("abc");
-    mitk::Image::Pointer picture = dynamic_cast<mitk::Image*>(img->GetData());
-    imageExtractor->SetInput( picture );
-    imageExtractor->SetSliceDimension( 0 );
-    imageExtractor->SetSliceIndex( 12 );
-    imageExtractor->Update();
+//    mitk::ExtractImageFilter::Pointer imageExtractor = mitk::ExtractImageFilter::New();
+//    mitk::DataNode::Pointer img = this->GetDataStorage()->GetNamedNode("abc");
+//    mitk::Image::Pointer picture = dynamic_cast<mitk::Image*>(img->GetData());
+//    imageExtractor->SetInput( picture );
+//    imageExtractor->SetSliceDimension( 2 );
+//    imageExtractor->SetSliceIndex( 12 );
+//    imageExtractor->Update();
 
-    vtkContourFilter* contourFilter = vtkContourFilter::New();
-    vtkPolyData* polyData = vtkPolyData::New();
+//    vtkMarchingSquares* contourFilter = vtkMarchingSquares::New();
+//    vtkPolyData* polyData = vtkPolyData::New();
 
-//    contourFilter->SetInput(doseImage->GetVtkImageData());
-    contourFilter->SetInput(imageExtractor->GetOutput()->GetVtkImageData());
-    contourFilter->SetNumberOfContours(1);
-    contourFilter->SetValue(0,1);
-//    contourFilter->GenerateValues(1,i*5000*i,(i+1)*6000*(i+1));
-    polyData = contourFilter->GetOutput();
+//    contourFilter->SetInput(imageExtractor->GetOutput()->GetVtkImageData());
+//    contourFilter->SetNumberOfContours(1);
+//    contourFilter->SetValue(0,0.5);
+//    polyData = contourFilter->GetOutput();
 
-    mitk::Surface::Pointer c = mitk::Surface::New();
-    c->SetVtkPolyData(polyData);
-    mitk::Geometry3D::Pointer geo = doseImage->GetGeometry()->Clone();
-  //  geo->ChangeImageGeometryConsideringOriginOffset(false);
-    mitk::Vector3D spacing;
-    spacing.Fill(1);
-    geo->SetSpacing(spacing);
-    c->SetGeometry(geo);
-    surfaceStorage.push_back(c);
-//  }
+//    mitk::Surface::Pointer c = mitk::Surface::New();
+//    c->SetVtkPolyData(polyData);
+//    mitk::Geometry3D::Pointer geo = doseImage->GetGeometry()->Clone();
+//    mitk::Vector3D spacing;
+//    spacing.Fill(1);
+//    geo->SetSpacing(spacing);
+//    surfaceStorage.push_back(c);
 
-  for(int i=0; i<numberOfIsoLines;i++)
-  {
-    mitk::DataNode::Pointer contourNode = mitk::DataNode::New();
-    contourNode->SetData(surfaceStorage.at(i));
-    mitk::Color green;
-    green[0] = 0.5;
-    green[1] = 0.0;
-    green[2] = 1.5;
-    contourNode->SetColor(green);
-    contourNode->SetName("IsoDose");
-    GetDataStorage()->Add(contourNode);
-  }
+//    mitk::DataNode::Pointer extractNode = mitk::DataNode::New();
+//    mitk::Image::Pointer stuff = dynamic_cast<mitk::Image*>(imageExtractor->GetOutput());
+//    mitk::Geometry3D::Pointer geo2 = stuff->GetGeometry()->Clone();
+//    mitk::Vector3D spacing2;
+//    spacing2.Fill(1);
+//    geo2->SetSpacing(spacing2);
+//    stuff->SetGeometry(geo);
+//    extractNode->SetData(stuff);
+//    extractNode->SetName("ExtractImage");
+//    GetDataStorage()->Add(extractNode);
 
-  mitk::TimeSlicedGeometry::Pointer geo2 = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
-  mitk::RenderingManager::GetInstance()->InitializeViews( geo2 );
+//    mitk::DataNode::Pointer contourNode = mitk::DataNode::New();
+//    c->SetGeometry(geo2);
+//    contourNode->SetData(c);
+//    contourNode->SetName("IsoDose");
+//    GetDataStorage()->Add(contourNode);
+
+  mitk::TimeSlicedGeometry::Pointer geo3 = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
+  mitk::RenderingManager::GetInstance()->InitializeViews( geo3 );
 }

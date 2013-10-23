@@ -40,6 +40,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkDICOMImageReader.h>
 #include <vtkMarchingSquares.h>
 #include <vtkMarchingCubes.h>
+#include <mitkTransferFunction.h>
+#include <mitkTransferFunctionProperty.h>
 
 #include <mitkExtractImageFilter.h>
 

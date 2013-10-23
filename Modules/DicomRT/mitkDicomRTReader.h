@@ -44,6 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkLookupTable.h>
 #include <vtkContourFilter.h>
 #include <fstream>
+#include <vtkColorTransferFunction.h>
 //######################################################
 
 #include "dcmtk/dcmrt/drtstrct.h"
@@ -123,7 +124,7 @@ namespace mitk
     ContourModelSetVector ReadDicomFile(char* filename);
     ContourModelSetVector ReadStructureSet(DcmDataset* dataset);
     int LoadRTPlan(DcmDataset* dataset);
-    mitk::LookupTable::Pointer LoadRTDose(DcmDataset* dataset);
+    vtkSmartPointer<vtkColorTransferFunction> LoadRTDose(DcmDataset* dataset);
     size_t GetNumberOfRois();
     RoiEntry* FindRoiByNumber(int roiNumber);
     OFString GetReferencedFrameOfReferenceSOPInstanceUID(DRTStructureSetIOD &structSetObject);

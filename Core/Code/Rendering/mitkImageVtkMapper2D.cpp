@@ -840,19 +840,28 @@ mitk::ImageVtkMapper2D::LocalStorage* mitk::ImageVtkMapper2D::GetLocalStorage(mi
 vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk::BaseRenderer* renderer ){
   LocalStorage* localStorage = this->GetLocalStorage(renderer);
 
-  vtkContourFilter* squares = vtkContourFilter::New();
+  vtkMarchingSquares* squares = vtkMarchingSquares::New();
   vtkPolyData* polyData = vtkPolyData::New();
+
+//  float depth = CalculateLayerDepth(renderer);
 
   squares->SetInput(localStorage->m_ReslicedImage);
   squares->SetNumberOfContours(1);
-  squares->SetValue(0,0.5);
+  squares->SetValue(0,1);
   squares->Update();
 
   polyData = squares->GetOutput();
-  mitk::Surface::Pointer surface = mitk::Surface::New();
-  surface->SetVtkPolyData(polyData);
 
-  mitk::IOUtil::SaveSurface(surface, "/home/riecker/surface.stl");
+//  vtkIdType numberOfPoints = polyData->GetNumberOfPoints();
+
+//  for(int i=0;i<numberOfPoints;i++)
+//  {
+//    double* x = polyData->Get
+//  }
+
+  fstream f;
+  f.open("/home/riecker/PolyData.txt", ios::out);
+  polyData->PrintSelf(f,vtkIndent(0));
 
   return polyData;
 }

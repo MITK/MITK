@@ -411,6 +411,10 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
     //If no workingdata is set, remove the interpolation feedback
     this->GetDataStorage()->Remove(m_FeedbackNode);
     m_FeedbackNode->SetData(NULL);
+    this->GetDataStorage()->Remove(m_3DContourNode);
+    m_3DContourNode->SetData(NULL);
+    this->GetDataStorage()->Remove(m_InterpolatedSurfaceNode);
+    m_InterpolatedSurfaceNode->SetData(NULL);
     return;
   }
   //Updating the current selected segmentation for the 3D interpolation

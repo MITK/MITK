@@ -106,10 +106,6 @@ class SegmentationUI_EXPORT QmitkSliceBasedInterpolator : public QWidget
 
     void signalSliceBasedInterpolationEnabled(bool);
 
-  public slots:
-
-     virtual void setEnabled(bool);
-
   protected slots:
 
     /**

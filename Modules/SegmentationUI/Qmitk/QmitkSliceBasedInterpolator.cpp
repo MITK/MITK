@@ -174,21 +174,6 @@ QmitkSliceBasedInterpolator::~QmitkSliceBasedInterpolator()
   m_SliceInterpolatorController->RemoveObserver( m_InterpolationInfoChangedObserverTag );
 }
 
-void QmitkSliceBasedInterpolator::setEnabled(bool enabled)
-{
-  if ( m_ToolManager.IsNotNull() )
-  {
-    unsigned int numberOfExistingTools = m_ToolManager->GetTools().size();
-    for(unsigned int i = 0; i < numberOfExistingTools; i++)
-    {
-      mitk::SegTool2D* tool = dynamic_cast<mitk::SegTool2D*>(m_ToolManager->GetToolById(i));
-      if (tool) tool->SetEnable2DInterpolation( enabled );
-    }
-  }
-
-  QWidget::setEnabled(enabled);
-}
-
 void QmitkSliceBasedInterpolator::OnToolManagerWorkingDataModified()
 {
   mitk::DataNode* workingNode = this->m_ToolManager->GetWorkingData(0);
@@ -360,6 +345,17 @@ void QmitkSliceBasedInterpolator::OnActivateWidget(bool enabled)
   if ( m_DataStorage.IsNotNull() )
   {
     m_Activated = enabled;
+
+    if ( m_ToolManager.IsNotNull() )
+    {
+      unsigned int numberOfExistingTools = m_ToolManager->GetTools().size();
+      for(unsigned int i = 0; i < numberOfExistingTools; i++)
+      {
+        mitk::SegTool2D* tool = dynamic_cast<mitk::SegTool2D*>(m_ToolManager->GetToolById(i));
+        if (tool) tool->SetEnable2DInterpolation( m_Activated );
+      }
+    }
+
     if (m_Activated)
     {
       if (!m_DataStorage->Exists(m_FeedbackContourNode))

@@ -106,10 +106,14 @@ void QmitkDenoisingView::StartDenoising()
   if (m_ImageNode.IsNotNull())
   {
     MITK_INFO << "JOPP";
+    DiffusionImageType::Pointer inImage = dynamic_cast<DiffusionImageType*> (m_ImageNode->GetData());
     typedef itk::NonLocalMeansDenoisingFilter<DiffusionPixelType, DiffusionPixelType> NonLocalMeansDenoisingFilterType;
     NonLocalMeansDenoisingFilterType::Pointer denoisingFilter = NonLocalMeansDenoisingFilterType::New();
-    denoisingFilter->SetVRadius((unsigned int)m_Controls->m_Parameter1);
-    denoisingFilter->SetNRadius((unsigned int)m_Controls->m_Parameter2);
+    denoisingFilter->SetNumberOfThreads(1);
+    denoisingFilter->SetInput(inImage->GetVectorImage());
+    denoisingFilter->SetVRadius((unsigned int)m_Controls->m_Parameter1->value());
+    denoisingFilter->SetNRadius((unsigned int)m_Controls->m_Parameter2->value());
+    denoisingFilter->SetH((unsigned int)m_Controls->m_Parameter3->value());
     denoisingFilter->Update();
   }
 }

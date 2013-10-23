@@ -109,13 +109,25 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QSpinBox" name="m_Parameter1"/>
+       <widget class="QSpinBox" name="m_Parameter1">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QSpinBox" name="m_Parameter2"/>
+       <widget class="QSpinBox" name="m_Parameter2">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QSpinBox" name="m_Parameter3"/>
+       <widget class="QSpinBox" name="m_Parameter3">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageRegionIterator.h"
 #include "itkNeighborhoodIterator.h"
 
+
 namespace itk {
 
 
@@ -46,7 +47,7 @@ NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
 {
     typename OutputImageType::Pointer outputImage =
             static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
-    outputImage->FillBuffer(0.0);
+//    outputImage->FillBuffer(0.0);
 }
 
 template< class TInPixelType, class TOutPixelType >
@@ -65,59 +66,33 @@ NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
     inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
 
     InputIteratorType git(m_V_Radius, inputImagePointer, outputRegionForThread );
+    InputIteratorType njit(m_N_Radius, inputImagePointer, outputRegionForThread );
+    InputIteratorType niit(m_N_Radius, inputImagePointer, outputRegionForThread );
     git.GoToBegin();
     while( !git.IsAtEnd() )
     {
-      typename TInPixelType xi = git.GetCenterPixel();
-      for (int i=0; i < git.Size(); ++i)
+      TInPixelType xi = git.GetCenterPixel()[0];
+      double sumj = 0;
+      double wj = 0;
+      for (int j = 0; j < git.Size(); ++j)
       {
-        typename TInPixelType xj = git.GetPixel(i);
-        if (xi == xj && git.GetCenterPixel.GetIndex() != i)
+        TInPixelType xj = git.GetPixel(j)[0];
+
+        if (xi == xj && git.Size()/2 != j)
         {
-          typename ConstNeighborhoodIterator <InputImageType> nit1(m_N_Radius, inputImagePointer, xi);
-          typename ConstNeighborhoodIterator <InputImageType> nit2(m_N_Radius, inputImagePointer, xj);
-          for (int k = 0; )
+          niit.SetLocation(git.GetIndex());
+          njit.SetLocation(git.GetIndex(j));
+          double sumk = 0;
+          for (int k = 0; k < niit.Size(); ++k)
+          {
+            sumk += std::pow( (niit.GetPixel(k)[0] - njit.GetPixel(k)[0]), 2);
+          }
+          wj = std::exp( - ( std::sqrt( (1 / niit.Size()) * sumk) / m_H));
+          sumj += wj * std::pow(xj, 2) - 2 * std::pow(m_H, 2);
         }
       }
-        /*double S0 = 0;
-        int c = 0;
-        for (int i=0; i<inputImagePointer->GetVectorLength(); i++)
-        {
-            GradientDirectionType g = m_GradientDirections->GetElement(i);
-            if (g.magnitude()<0.001)
-            {
-                S0 += pix[i];
-                c++;
-            }
-        }
-        if (c>0)
-            S0 /= c;
-
-        if (S0>0)
-        {
-            c = 0;
-            for (int i=0; i<inputImagePointer->GetVectorLength(); i++)
-            {
-                GradientDirectionType g = m_GradientDirections->GetElement(i);
-                if (g.magnitude()>0.001)
-                {
-                    double twonorm = g.two_norm();
-                    double b = m_B_value*twonorm*twonorm;
-                    if (b>0)
-                    {
-                        double S = pix[i];
-                        outval -= std::log(S/S0)/b;
-                        c++;
-                    }
-                }
-            }
-
-            if (c>0)
-                outval /= c;
-        }
-
-        if (outval==outval && outval<10000)
-            oit.Set( outval );*/
+      TOutPixelType outval = /*dynamic_cast<TOutPixelType>*/ (std::sqrt(sumj));
+      oit.Set(outval); //TODO work with Gradients!!!
 
         ++oit;
         ++git;
@@ -127,11 +102,27 @@ NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
 }
 
 template< class TInPixelType, class TOutPixelType >
-void
-NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
-::PrintSelf(std::ostream& os, Indent indent) const
+void NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>::PrintSelf(std::ostream& os, Indent indent) const
 {
     Superclass::PrintSelf(os,indent);
+}
+
+template < class TInPixelType, class TOutPixelType >
+void NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>::SetNRadius(unsigned int n)
+{
+  for (int i = 0; i < InputImageType::ImageDimension; ++i)
+  {
+    m_N_Radius [i] = n;
+  }
+}
+
+template < class TInPixelType, class TOutPixelType >
+void NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>::SetVRadius(unsigned int v)
+{
+  for (int i = 0; i < InputImageType::ImageDimension; ++i)
+  {
+    m_V_Radius [i] = v;
+  }
 }
 
 }

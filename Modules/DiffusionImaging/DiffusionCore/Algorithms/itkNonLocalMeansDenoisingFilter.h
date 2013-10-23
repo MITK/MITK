@@ -58,6 +58,10 @@ public:
     itkSetMacro( B_value, double )
     itkSetMacro( GradientDirections, GradientContainerType )
 
+    itkSetMacro( H, unsigned int)
+    void SetNRadius(unsigned int n);
+    void SetVRadius(unsigned int v);
+
     protected:
         NonLocalMeansDenoisingFilter();
     ~NonLocalMeansDenoisingFilter() {}
@@ -71,6 +75,7 @@ public:
 
     typename NeighborhoodIterator < VectorImage < TInPixelType, 3 > >::RadiusType m_V_Radius;
     typename NeighborhoodIterator < VectorImage < TInPixelType, 3 > >::RadiusType m_N_Radius;
+    unsigned int m_H;
 };
 
 }

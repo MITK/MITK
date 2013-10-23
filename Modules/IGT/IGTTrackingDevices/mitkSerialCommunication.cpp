@@ -16,32 +16,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSerialCommunication.h"
 
-
 #ifdef WIN32
 //#include <atlstr.h>
-  #include <itksys/SystemTools.hxx>
+#include <itksys/SystemTools.hxx>
 #else // Posix
-  #include <sys/types.h>
-  #include <sys/stat.h>
-  #include <sys/time.h>
-  #include <sys/ioctl.h>
-  #include <fcntl.h>
-  #include <unistd.h>
-  #include <termios.h>
-  #include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <termios.h>
+#include <errno.h>
 
-  #define INVALID_HANDLE_VALUE -1
+#define INVALID_HANDLE_VALUE -1
 #endif
 
 #define OK 1
 #define ERROR_VALUE 0
 
-
 mitk::SerialCommunication::SerialCommunication() : itk::Object(),
-m_DeviceName(""), m_PortNumber(COM1), m_BaudRate(BaudRate9600),
-m_DataBits(DataBits8), m_Parity(None), m_StopBits(StopBits1),
-m_HardwareHandshake(HardwareHandshakeOff),
-m_ReceiveTimeout(500), m_SendTimeout(500), m_Connected(false)
+  m_DeviceName(""), m_PortNumber(COM1), m_BaudRate(BaudRate9600),
+  m_DataBits(DataBits8), m_Parity(None), m_StopBits(StopBits1),
+  m_HardwareHandshake(HardwareHandshakeOff),
+  m_ReceiveTimeout(500), m_SendTimeout(500), m_Connected(false)
 {
 #ifdef  WIN32 // Windows
   m_ComPortHandle = INVALID_HANDLE_VALUE;
@@ -50,12 +48,10 @@ m_ReceiveTimeout(500), m_SendTimeout(500), m_Connected(false)
 #endif
 }
 
-
 mitk::SerialCommunication::~SerialCommunication()
 {
   CloseConnection();
 }
-
 
 int mitk::SerialCommunication::OpenConnection()
 {
@@ -116,7 +112,6 @@ int mitk::SerialCommunication::OpenConnection()
 #endif
 }
 
-
 void mitk::SerialCommunication::CloseConnection()
 {
 #ifdef WIN32
@@ -144,7 +139,6 @@ void mitk::SerialCommunication::CloseConnection()
   return;
 #endif
 }
-
 
 int mitk::SerialCommunication::Receive(std::string& answer, unsigned int numberOfBytes)
 {
@@ -184,7 +178,6 @@ int mitk::SerialCommunication::Receive(std::string& answer, unsigned int numberO
   delete buffer;
   return OK;
 
-
 #else  // Posix
   if (m_FileDescriptor == INVALID_HANDLE_VALUE)
     return ERROR_VALUE;
@@ -218,7 +211,6 @@ int mitk::SerialCommunication::Receive(std::string& answer, unsigned int numberO
     return ERROR_VALUE;  // some data was received, but not as much as expected
 #endif
 }
-
 
 int mitk::SerialCommunication::Send(const std::string& input)
 {
@@ -256,7 +248,6 @@ int mitk::SerialCommunication::Send(const std::string& input)
 #endif
 }
 
-
 int mitk::SerialCommunication::ApplyConfiguration()
 {
 #ifdef WIN32 // Windows implementation
@@ -292,7 +283,6 @@ int mitk::SerialCommunication::ApplyConfiguration()
     return GetLastError();
 
   COMMTIMEOUTS timeouts;
-
 
   timeouts.ReadIntervalTimeout = m_ReceiveTimeout;
   timeouts.ReadTotalTimeoutMultiplier = 0;
@@ -400,6 +390,9 @@ int mitk::SerialCommunication::ApplyConfiguration()
   case BaudRate1152000:
     baudrate = B1152000;
     break;
+  case BaudRate1228739:
+    baudrate = B1228739;
+    break;
   case BaudRate1500000:
     baudrate = B1500000;
     break;
@@ -435,7 +428,6 @@ int mitk::SerialCommunication::ApplyConfiguration()
 #endif
 }
 
-
 void mitk::SerialCommunication::SendBreak(unsigned int ms)
 {
 #ifdef WIN32
@@ -455,7 +447,6 @@ void mitk::SerialCommunication::SendBreak(unsigned int ms)
 #endif
 }
 
-
 void mitk::SerialCommunication::ClearReceiveBuffer()
 {
 #ifdef WIN32
@@ -466,7 +457,6 @@ void mitk::SerialCommunication::ClearReceiveBuffer()
     tcflush(m_FileDescriptor, TCIFLUSH);
 #endif
 }
-
 
 void mitk::SerialCommunication::ClearSendBuffer()
 {

@@ -33,13 +33,15 @@ namespace mitk
 };
 
 /*!
-  \brief Heidelberg Minimally Invasive Navigation Device
+\brief Heidelberg Minimally Invasive Navigation Device
 
-  Functionality for visualizing a tracking instrument in relation to a tracked patient.
+Functionality for visualizing a tracking instrument in relation to a tracked patient.
 
-  \sa QmitkFunctionality
-  \sa IGT
-  \ingroup Functionalities
+THIS CLASS IS DEPRECATED! Use qmitkTrackingDeviceConfigurationWidget instead.
+
+\sa QmitkFunctionality
+\sa IGT
+\ingroup Functionalities
 */
 class MitkIGTUI_EXPORT QmitkNDIConfigurationWidget : public QWidget
 {
@@ -65,16 +67,15 @@ public:
   QList<unsigned int> GetToolsByToolType(QString toolType) const;
   mitk::DataNode* GetNode(unsigned int index) const;
 
-
-  signals:
-    void ToolsAdded(QStringList tools);
-    void ToolsChanged();
-    void Connected();
-    void Disconnected();
-    void RepresentationChanged( int row , mitk::Surface::Pointer surface ); // returns the row number of the clicked tableitem for changing tool representation
-    void SignalToolNameChanged(int id, QString name);
-    void SignalSavedTool(int id, QString surfaceFilename);
-    void SignalLoadTool(int id, mitk::DataNode::Pointer dn);
+signals:
+  void ToolsAdded(QStringList tools);
+  void ToolsChanged();
+  void Connected();
+  void Disconnected();
+  void RepresentationChanged( int row , mitk::Surface::Pointer surface ); // returns the row number of the clicked tableitem for changing tool representation
+  void SignalToolNameChanged(int id, QString name);
+  void SignalSavedTool(int id, QString surfaceFilename);
+  void SignalLoadTool(int id, mitk::DataNode::Pointer dn);
 
   public slots:
     void SetDeviceName(const char* dev);  ///< set the device name (e.g. "COM1", "/dev/ttyS0") that will be used to connect to the tracking device
@@ -82,19 +83,18 @@ public:
     void EnableAddToolsButton(bool enable); ///< enables or disables the Add Tools button
     void EnableDiscoverNewToolsButton(bool enable); ; ///< enables or disables the Discover new Tools button
 
-  protected slots:
-    void OnConnect();
-    void OnDisconnect();
-    void OnDiscoverTools();
-    void OnDiscoverDevices();
-    void OnAddPassiveTool();
-    void UpdateTrackerFromToolTable(const QModelIndex & topLeft, const QModelIndex & /*bottomRight*/);
-    void OnTableItemClicked(const QModelIndex & topLeft); ///< for clicking on tooltable items
-    void OnDisoverDevicesBtnInfo();
-    void OnTableCellChanged(int row, int column);
-    void OnSaveTool();
-    void OnLoadTool();
-
+    protected slots:
+      void OnConnect();
+      void OnDisconnect();
+      void OnDiscoverTools();
+      void OnDiscoverDevices();
+      void OnAddPassiveTool();
+      void UpdateTrackerFromToolTable(const QModelIndex & topLeft, const QModelIndex & /*bottomRight*/);
+      void OnTableItemClicked(const QModelIndex & topLeft); ///< for clicking on tooltable items
+      void OnDisoverDevicesBtnInfo();
+      void OnTableCellChanged(int row, int column);
+      void OnSaveTool();
+      void OnLoadTool();
 
 protected:
   typedef QMap<QString, mitk::TrackingDeviceType> PortDeviceMap;  // key is port name (e.g. "COM1", "/dev/ttyS0"), value will be filled with the type of tracking device at this port
@@ -131,7 +131,5 @@ protected:
   QString m_RepresentatonCellDefaultText;
 
   mitk::Surface::Pointer LoadSurfaceFromSTLFile(QString surfaceFilename);
-
 };
 #endif // _QmitkNDIConfigurationWidget_H_INCLUDED
-

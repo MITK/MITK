@@ -1,60 +1,67 @@
 /**
 \page org_mitk_views_deformableclippingplane The Clipping Plane 
 
-\image html icon.png "Icon of the Plugin"
+\image html org_mitk_views_clippingPlaneIcon.png "Icon of the Plugin"
 
 <i>Some of the features described below are closed source additions to the open source toolkit MITK and are not  available in every application.</i>
 
 Available sections:
 
- \li \ref org_mitk_gui_qt_clippingPlaneManualOverview
- \li \ref org_mitk_gui_qt_clippingPlaneTechnicalIssue
- \li \ref org_mitk_gui_qt_clippingPlane
+ - \ref org_mitk_views_clippingPlaneManualOverview
+ - \ref org_mitk_views_clippingPlaneTechnicalIssue
+ - \ref org_mitk_views_clippingPlaneManualImageSelection
+ - \ref org_mitk_views_clippingPlaneCreating
+ - \ref org_mitk_views_clippingPlaneInteraction
+    - \ref org_mitk_views_clippingPlaneTranslation
+    - \ref org_mitk_views_clippingPlaneRotation
+    - \ref org_mitk_views_clippingPlaneDeformation
+ - \ref org_mitk_views_clippingPlaneUpdateVolumina
+ 
 
-\section org_mitk_gui_qt_clippingPlaneManualOverview Overview
+\section org_mitk_views_clippingPlaneManualOverview Overview
 
 The <b>Clipping Plane perspective</b> allows you to create clipping planes and calculate the volumina between them.
 
-\image html org_mitk_gui_qt_clippingPlaneOverview.png Clipping Plane perspective with segmentation and two clipping planes
+\image html org_mitk_views_clippingPlaneOverview.png Clipping Plane perspective with segmentation and two clipping planes
 
-\section org_mitk_gui_qt_clippingPlaneTechnicalIssue Technical Issue
+\section org_mitk_views_clippingPlaneTechnicalIssue Technical Issue
 
 To use the Update Volumina function your picture or segmentation should be binary.
 
-\section org_mitk_gui_qt_clippingPlaneManualImageSelection Image Selection
+\section org_mitk_views_clippingPlaneManualImageSelection Image Selection
 
 The Clipping Plane perspective makes use of the Data Manager view to give you an overview of all images, segmentations and clipping planes. 
 
-\image html org_mitk_gui_qt_clippingPlaneDataManager.png Data Manager is used for selecting the current clipping plane. The reference plane is selected in the drop down box of the control area.
+\image html org_mitk_views_clippingPlaneDataManager.png Data Manager is used for selecting the current clipping plane. The reference plane is selected in the drop down box of the control area.
 
 To select the reference plane use the drop down box in the control area of the Clipping Plane view or the Data Manager. The clipping plane selected in the Data Manager is displayed below the drop down box. If no clipping plane exists or none is selected create a new clipping plane by using the "Create new clipping plane" button.
 Some items of the graphical user interface might be disabled when no plane is selected.
 In any case, the application will give you hints if a selection is needed.
 
-\section org_mitk_gui_qt_clippingPlaneCreating Creating New Clipping Plane
+\section org_mitk_views_clippingPlaneCreating Creating New Clipping Plane
 
 If you want to create a new clipping plane select a binary image or segmentation from the Data Manager and press the button "Create new clipping plane". Optionally you can enable the "...with surface model" option. Es bringt viel!
 
-\section org_mitk_gui_qt_clippingPlaneInteraction Interaction with the planes
-\image html org_mitk_gui_qt_clippingPlaneInteraction.png The interaction buttons
+\section org_mitk_views_clippingPlaneInteraction Interaction with the planes
+\image html org_mitk_views_clippingPlaneInteraction.png The interaction buttons
 
 You have different options to interact with the clipping planes:
 
-\subsection org_mitk_gui_qt_clippingPlaneTranslation Translation
+\subsection org_mitk_views_clippingPlaneTranslation Translation
 
 In Translation mode you can change the position of the clipping plane.
  - Click the Translation Button 
  - Move mouse over the selected clipping plane (the plane changes its color from blue to green)
  - Hold mouse-left button and move the mouse orthogonally to the plane
 
-\subsection org_mitk_gui_qt_clippingPlaneRotation Rotation
+\subsection org_mitk_views_clippingPlaneRotation Rotation
 
 In Rotation mode you can change the angle of the clipping plane.
  - Click the Rotation Button
  - Move mouse over the selected clipping plane (the plane changes its color from blue to green)
  - Hold mouse-left button and move the mouse in the direction it should be rotated
 
-\subsection org_mitk_gui_qt_clippingPlaneDeformation Deformation
+\subsection org_mitk_views_clippingPlaneDeformation Deformation
 
 In Deformation mode you can change the surface of the clipping plane.
  - Click the Deformation Button
@@ -62,8 +69,8 @@ In Deformation mode you can change the surface of the clipping plane.
  - On mouse-scrolling you can change the size of the deformation area (Scroll-Down = smaller / Scroll-Up = bigger).
  - Hold mouse-left button and move the mouse orthogonally to the plane to deformate the plane
 
-\section org_mitk_gui_qt_clippingPlaneUpdateVolumina Update Volumina
-\image html org_mitk_gui_qt_clippingPlaneUpdateVolumina.png The "Update Volumina" button
+\section org_mitk_views_clippingPlaneUpdateVolumina Update Volumina
+\image html org_mitk_views_clippingPlaneUpdateVolumina.png The "Update Volumina" button
 
 Calculating the volumina of the segmentation parts, which are devided by the clipping plane(s).
  - Create a segmentation (see Segmentation-Manual)
@@ -72,3 +79,4 @@ Calculating the volumina of the segmentation parts, which are devided by the cli
  - Click button "Update Volumina" button
  - The intersected parts are displayed in different colors and their volumina are shown beneath the "Update Volumina" button
 
+**/

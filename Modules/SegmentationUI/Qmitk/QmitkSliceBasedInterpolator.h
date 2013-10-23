@@ -14,14 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkSlicesInterpolator_h_Included
-#define QmitkSlicesInterpolator_h_Included
+#ifndef QmitkSliceBasedInterpolator_h_Included
+#define QmitkSliceBasedInterpolator_h_Included
 
 #include "mitkSliceNavigationController.h"
 #include "SegmentationUIExports.h"
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
-#include "mitkSurfaceInterpolationController.h"
 #include "mitkSegmentationInterpolationController.h"
 #include "mitkToolManager.h"
 #include "mitkDiffSliceOperation.h"
@@ -34,12 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QGroupBox>
 #include <QCheckBox>
 
-//For running 3D interpolation in background
-#include <QtConcurrentRun>
-#include <QFuture>
-#include <QFutureWatcher>
-#include <QTimer>
 
+#include "ui_QmitkSliceBasedInterpolatorControls.h"
 
 namespace mitk
 {
@@ -63,7 +58,7 @@ class QPushButton;
 
   While mitk::SegmentationInterpolation does the bookkeeping of interpolation
   (keeping track of which slices contain how much segmentation) and the algorithmic work,
-  QmitkSlicesInterpolator is responsible to watch the GUI, to notice, which slice is currently
+  QmitkSliceBasedInterpolator is responsible to watch the GUI, to notice, which slice is currently
   visible. It triggers generation of interpolation suggestions and also triggers acception of
   suggestions.
 
@@ -71,13 +66,14 @@ class QPushButton;
 
   Last contributor: $Author: maleike $
 */
-class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
+
+class SegmentationUI_EXPORT QmitkSliceBasedInterpolator : public QWidget
 {
   Q_OBJECT
 
   public:
 
-    QmitkSlicesInterpolator(QWidget* parent = 0, const char* name = 0);
+    QmitkSliceBasedInterpolator(QWidget* parent = 0, const char* name = 0);
 
     /**
       Initializes the widget. To be called once before real use.
@@ -89,7 +85,7 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
     */
     void Uninitialize();
 
-    virtual ~QmitkSlicesInterpolator();
+    virtual ~QmitkSliceBasedInterpolator();
 
     void SetDataStorage( mitk::DataStorage::Pointer storage );
 
@@ -106,29 +102,20 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
     */
     void OnSliceInterpolationInfoChanged(const itk::EventObject&);
 
-    /**
-      Just public because it is called by itk::Commands. You should not need to call this.
-    */
-    void OnSurfaceInterpolationInfoChanged(const itk::EventObject&);
-
-    /**
-     * @brief Set the visibility of the 3d interpolation
-    */
-    void Show3DInterpolationResult(bool);
-
-    /**
-     * @brief Set the groupbox checkd via software
-    */
-    void setChecked(bool);
-
   signals:
 
-    void SignalRememberContourPositions(bool);
-    void SignalShowMarkerNodes(bool);
-    void Signal2DInterpolationEnabled(bool);
-    void Signal3DInterpolationEnabled(bool);
+    void signalSliceBasedInterpolationEnabled(bool);
+
+  public slots:
+
+     virtual void setEnabled(bool);
 
   protected slots:
+
+    /**
+      Reaction to groupbox checked
+    */
+    void OnActivateWidget(bool);
 
     /**
       Reaction to button clicks.
@@ -141,30 +128,9 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
     void OnAcceptAllInterpolationsClicked();
 
     /*
-     Reaction to button clicks
-    */
-    void OnAccept3DInterpolationClicked();
-
-    /*
      * Will trigger interpolation for all slices in given orientation (called from popup menu of OnAcceptAllInterpolationsClicked)
     */
     void OnAcceptAllPopupActivated(QAction* action);
-
-    void ActivateInterpolation(bool);
-
-    void OnInterpolationMethodChanged(int index);
-
-    void OnShowMarkers(bool);
-
-    void Run3DInterpolation();
-
-    void OnSurfaceInterpolationFinished();
-
-    void StartUpdateInterpolationTimer();
-
-    void StopUpdateInterpolationTimer();
-
-    void ChangeSurfaceColor();
 
   protected:
 
@@ -189,7 +155,7 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
       \param e is a actually a mitk::SliceNavigationController::GeometrySliceEvent, sent by a SliceNavigationController
       \param slice the SliceNavigationController
     */
-    bool TranslateAndInterpolateChangedSlice(const itk::EventObject& e, mitk::SliceNavigationController* slicer);
+    void TranslateAndInterpolateChangedSlice(const itk::EventObject& e, mitk::SliceNavigationController* slicer);
 
     /**
       Given a PlaneGeometry, this method figures out which slice of the first working image (of the associated ToolManager)
@@ -197,53 +163,34 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
     */
     void Interpolate( mitk::PlaneGeometry* plane, unsigned int timeStep, mitk::SliceNavigationController *slicer );
 
-    //void InterpolateSurface();
-
     /**
       Called internally to update the interpolation suggestion. Finds out about the focused render window and requests an interpolation.
      */
     void UpdateVisibleSuggestion();
 
-    void SetCurrentContourListID();
-
-    void Activate2DInterpolation(bool);
-
-    void Activate3DInterpolation(bool);
-
 private:
 
-    void HideAllInterpolationControls();
-    void Show2DInterpolationControls(bool show);
-    void Show3DInterpolationControls(bool show);
-    void Disable3DRendering();
-
     mitk::SegmentationInterpolationController::Pointer m_SliceInterpolatorController;
-    mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
     mitk::ToolManager::Pointer m_ToolManager;
+
+    Ui::QmitkSliceBasedInterpolatorControls m_Controls;
+
     bool m_Initialized;
+
+    bool m_Activated;
 
     QHash<mitk::SliceNavigationController*, int> m_ControllerToTimeObserverTag;
     QHash<mitk::SliceNavigationController*, int> m_ControllerToSliceObserverTag;
     QHash<mitk::SliceNavigationController*, int> m_ControllerToDeleteObserverTag;
 
     unsigned int m_InterpolationInfoChangedObserverTag;
-    unsigned int m_SurfaceInterpolationInfoChangedObserverTag;
 
     mitk::DiffSliceOperation* m_doOperation;
     mitk::DiffSliceOperation* m_undoOperation;
 
-    QGroupBox* m_gbControls;
-    QComboBox* m_cbInterpolationMode;
-    QPushButton* m_btApply2D;
-    QPushButton* m_btApplyForAllSlices2D;
-    QPushButton* m_btApply3D;
-    QCheckBox* m_chkShowPositionNodes;
-
     mitk::DataNode::Pointer m_FeedbackContourNode;
     mitk::ContourModelSet::Pointer m_FeedbackContour;
-    mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
-    mitk::DataNode::Pointer m_3DContourNode;
 
     mitk::LabelSetImage::Pointer m_WorkingImage;
 
@@ -253,16 +200,7 @@ private:
 
     QHash<mitk::SliceNavigationController*, unsigned int> m_TimeStep;
 
-    bool m_2DInterpolationEnabled;
-    bool m_3DInterpolationEnabled;
-    //unsigned int m_CurrentListID;
-
     mitk::DataStorage::Pointer m_DataStorage;
-
-   // QFuture<void> m_Future;
-   // QFutureWatcher<void> m_Watcher;
-   // QTimer* m_Timer;
 };
 
 #endif
-

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>239</width>
-    <height>645</height>
+    <height>907</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -136,7 +136,7 @@
       <enum>QTabWidget::Triangular</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab2DTools">
       <property name="sizePolicy">
@@ -272,7 +272,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkSlicesInterpolator" name="m_SlicesInterpolator" native="true">
+    <widget class="QmitkSliceBasedInterpolator" name="m_SliceBasedInterpolator" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
        <horstretch>0</horstretch>
@@ -400,11 +400,6 @@
    <header location="global">QmitkToolSelectionBox.h</header>
   </customwidget>
   <customwidget>
-   <class>QmitkSlicesInterpolator</class>
-   <extends>QWidget</extends>
-   <header location="global">QmitkSlicesInterpolator.h</header>
-  </customwidget>
-  <customwidget>
    <class>QmitkToolGUIArea</class>
    <extends>QWidget</extends>
    <header location="global">QmitkToolGUIArea.h</header>
@@ -413,6 +408,12 @@
    <class>QmitkLabelSetWidget</class>
    <extends>QWidget</extends>
    <header location="global">internal/Common/QmitkLabelSetWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkSliceBasedInterpolator</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSliceBasedInterpolator.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -424,7 +425,7 @@
  </includes>
  <resources>
   <include location="../../resources/multilabelsegmentation.qrc"/>
-  <include location="../../../../../mitk-master2/Plugins/org.mitk.gui.qt.segmentation/resources/segmentation.qrc"/>
+  <include location="../../resources/multilabelsegmentation.qrc"/>
  </resources>
  <connections/>
 </ui>

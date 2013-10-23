@@ -15,7 +15,6 @@ Qmitk/QmitkOtsuTool3DGUI.cpp
 Qmitk/QmitkPaintbrushToolGUI.cpp
 Qmitk/QmitkPixelManipulationToolGUI.cpp
 Qmitk/QmitkRegionGrow3DToolGUI.cpp
-Qmitk/QmitkSlicesInterpolator.cpp
 Qmitk/QmitkToolGUI.cpp
 Qmitk/QmitkToolGUIArea.cpp
 Qmitk/QmitkToolReferenceDataSelectionBox.cpp
@@ -24,6 +23,7 @@ Qmitk/QmitkToolSelectionBox.cpp
 Qmitk/QmitkToolWorkingDataSelectionBox.cpp
 Qmitk/QmitkWatershedToolGUI.cpp
 Qmitk/QmitkMedianTool3DGUI.cpp
+Qmitk/QmitkSliceBasedInterpolator.cpp
 )
 
 set(MOC_H_FILES
@@ -43,7 +43,6 @@ Qmitk/QmitkOtsuTool3DGUI.h
 Qmitk/QmitkPaintbrushToolGUI.h
 Qmitk/QmitkPixelManipulationToolGUI.h
 Qmitk/QmitkRegionGrow3DToolGUI.h
-Qmitk/QmitkSlicesInterpolator.h
 Qmitk/QmitkToolGUI.h
 Qmitk/QmitkToolGUIArea.h
 Qmitk/QmitkToolReferenceDataSelectionBox.h
@@ -52,6 +51,7 @@ Qmitk/QmitkToolSelectionBox.h
 Qmitk/QmitkToolWorkingDataSelectionBox.h
 Qmitk/QmitkWatershedToolGUI.h
 Qmitk/QmitkMedianTool3DGUI.h
+Qmitk/QmitkSliceBasedInterpolator.h
 )
 
 set(UI_FILES
@@ -59,4 +59,5 @@ Qmitk/QmitkAdaptiveRegionGrowingToolGUIControls.ui
 Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
+Qmitk/QmitkSliceBasedInterpolatorControls.ui
 )

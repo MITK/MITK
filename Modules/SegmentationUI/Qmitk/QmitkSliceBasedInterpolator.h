@@ -78,7 +78,7 @@ class SegmentationUI_EXPORT QmitkSliceBasedInterpolator : public QWidget
     /**
       Initializes the widget. To be called once before real use.
     */
-    void Initialize(const QList<mitk::SliceNavigationController*> &controllers);
+    void Initialize(const QList<mitk::SliceNavigationController*> &controllers, mitk::DataStorage* storage);
 
     /**
       Removal of observers.
@@ -86,8 +86,6 @@ class SegmentationUI_EXPORT QmitkSliceBasedInterpolator : public QWidget
     void Uninitialize();
 
     virtual ~QmitkSliceBasedInterpolator();
-
-    void SetDataStorage( mitk::DataStorage::Pointer storage );
 
     void OnToolManagerWorkingDataModified();
 

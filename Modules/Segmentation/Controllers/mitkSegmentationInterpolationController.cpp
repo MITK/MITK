@@ -67,8 +67,7 @@ mitk::SegmentationInterpolationController::~SegmentationInterpolationController(
 void mitk::SegmentationInterpolationController::ResetLabelCount()
 {
   m_LabelCountInSlice.clear();
-  int activeLayer = m_WorkingImage->GetActiveLayer();
-  int numberOfLabels = m_WorkingImage->GetNumberOfLabels(activeLayer);
+  int numberOfLabels = m_WorkingImage->GetNumberOfLabels();
   m_LabelCountInSlice.resize( m_WorkingImage->GetTimeSteps() );
 
   for (unsigned int timeStep = 0; timeStep < m_WorkingImage->GetTimeSteps(); ++timeStep)
@@ -90,11 +89,11 @@ void mitk::SegmentationInterpolationController::ResetLabelCount()
 
 void mitk::SegmentationInterpolationController::SetWorkingImage( LabelSetImage* newImage )
 {
-  if (!newImage) return;
+  assert(newImage);
 
   if (m_WorkingImage != newImage)
   {
-    // delete this from the list of interpolators
+    // delete the current working image from the list of interpolators
     InterpolatorMapType::iterator iter = s_InterpolatorForImage.find( m_WorkingImage);
     if ( iter != s_InterpolatorForImage.end() )
     {
@@ -106,9 +105,11 @@ void mitk::SegmentationInterpolationController::SetWorkingImage( LabelSetImage* 
     s_InterpolatorForImage.insert( std::make_pair( m_WorkingImage, this ) );
   }
 
-  this->SetChangedVolume( m_WorkingImage.GetPointer(), 0 );
+  this->ResetLabelCount();
 
- // for all timesteps, scan whole image
+  AccessFixedDimensionByItk_1( m_WorkingImage, ScanImageITKProcessing, 3, 0 );
+
+ // for all timesteps, scan whole image: TODO: enable this again for 3D+time
 /*
   for (unsigned int timeStep = 0; timeStep < m_WorkingImage->GetTimeSteps(); ++timeStep)
   {
@@ -120,7 +121,7 @@ void mitk::SegmentationInterpolationController::SetWorkingImage( LabelSetImage* 
     this->SetChangedVolume( segmentation3D.GetPointer(), timeStep );
   }
 */
-   this->Modified();
+//   this->Modified();
 }
 
 void mitk::SegmentationInterpolationController::SetReferenceImage( Image* newImage )
@@ -152,8 +153,8 @@ void mitk::SegmentationInterpolationController::SetReferenceImage( Image* newIma
     }
   }
 }
-
-void mitk::SegmentationInterpolationController::SetChangedVolume( const Image* image, unsigned int timeStep )
+/*
+void mitk::SegmentationInterpolationController::SetChangedImage( const Image* image, unsigned int timeStep )
 {
   if ( !image ) return;
   if ( image->GetDimension() != 3 ) return;
@@ -165,13 +166,18 @@ void mitk::SegmentationInterpolationController::SetChangedVolume( const Image* i
 
   this->Modified();
 }
-
+*/
 void mitk::SegmentationInterpolationController::SetChangedSlice( const Image* slice, unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep )
 {
   if ( !slice ) return;
   if ( slice->GetDimension() != 2 ) return;
   if ( sliceDimension > 2 ) return;
   if ( m_WorkingImage.IsNull() ) return;
+
+  // check if the number of labels has changed
+  int numberOfLabels = m_WorkingImage->GetNumberOfLabels();
+  if (m_LabelCountInSlice[0][0][0].size() != numberOfLabels)
+    return;
 
   unsigned int dim0(0);
   unsigned int dim1(1);
@@ -190,7 +196,7 @@ void mitk::SegmentationInterpolationController::SetChangedSlice( const Image* sl
 
   AccessFixedDimensionByItk_1( slice, ScanSliceITKProcessing, 2, SetChangedSliceOptions(sliceDimension, sliceIndex, dim0, dim1, timeStep) );
 
-  this->Modified();
+//  this->Modified();
 }
 
 template < typename PixelType >

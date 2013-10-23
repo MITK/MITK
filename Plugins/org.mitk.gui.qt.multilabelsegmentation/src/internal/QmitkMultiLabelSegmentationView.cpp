@@ -173,8 +173,6 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.m_pbSurfaceStamp, SIGNAL(clicked()), this, SLOT(OnSurfaceStamp()));
   connect(m_Controls.m_pbMaskStamp, SIGNAL(clicked()), this, SLOT(OnMaskStamp()));
 
-  m_Controls.m_SliceBasedInterpolator->SetDataStorage(this->GetDataStorage());
-
   this->OnReferenceSelectionChanged( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode() );
 
   m_IRenderWindowPart = this->GetRenderWindowPart();
@@ -184,7 +182,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
     controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
     controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
     controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
-    m_Controls.m_SliceBasedInterpolator->Initialize(controllers);
+    m_Controls.m_SliceBasedInterpolator->Initialize(controllers, this->GetDataStorage());
   }
 }
 
@@ -204,7 +202,7 @@ void QmitkMultiLabelSegmentationView::RenderWindowPartActivated(mitk::IRenderWin
     controllers.push_back(renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
     controllers.push_back(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
     controllers.push_back(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
-    m_Controls.m_SliceBasedInterpolator->Initialize(controllers);
+    m_Controls.m_SliceBasedInterpolator->Initialize(controllers, this->GetDataStorage());
   }
 }
 
@@ -271,8 +269,8 @@ void QmitkMultiLabelSegmentationView::NodeRemoved(const mitk::DataNode* node)
   if (m_ReferenceNode.IsNotNull() && dynamic_cast<mitk::LabelSetImage*>(node->GetData()))
   {
     //First of all remove all possible contour markers of the segmentation
-    mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = this->GetDataStorage()->GetDerivations(node, mitk::NodePredicateProperty::New("isContourMarker"
-                                                                            , mitk::BoolProperty::New(true)));
+    mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers =
+      this->GetDataStorage()->GetDerivations(node, mitk::NodePredicateProperty::New("isContourMarker", mitk::BoolProperty::New(true)));
 
     ctkPluginContext* context = mitk::PluginActivator::getContext();
     ctkServiceReference ppmRef = context->getServiceReference<mitk::PlanePositionManagerService>();

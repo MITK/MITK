@@ -98,20 +98,19 @@ const QmitkSliceBasedInterpolator::ActionToSliceDimensionMapType QmitkSliceBased
   return actionToSliceDimension;
 }
 
-void QmitkSliceBasedInterpolator::SetDataStorage( mitk::DataStorage::Pointer storage )
-{
-  m_DataStorage = storage;
-}
-
-void QmitkSliceBasedInterpolator::Initialize(const QList<mitk::SliceNavigationController *> &controllers)
+void QmitkSliceBasedInterpolator::Initialize(const QList<mitk::SliceNavigationController *> &controllers, mitk::DataStorage* storage)
 {
   Q_ASSERT(!controllers.empty());
+
+  Q_ASSERT(!storage);
 
   if (m_Initialized)
   {
     // remove old observers
     this->Uninitialize();
   }
+
+  m_DataStorage = storage;
 
   m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 
@@ -176,6 +175,8 @@ QmitkSliceBasedInterpolator::~QmitkSliceBasedInterpolator()
 
 void QmitkSliceBasedInterpolator::OnToolManagerWorkingDataModified()
 {
+  if (!m_Initialized) return;
+
   mitk::DataNode* workingNode = this->m_ToolManager->GetWorkingData(0);
   if (!workingNode)
   {
@@ -184,7 +185,7 @@ void QmitkSliceBasedInterpolator::OnToolManagerWorkingDataModified()
   }
 
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
-  assert(workingImage);
+  Q_ASSERT(workingImage);
 
   if (workingImage->GetDimension() > 4 || workingImage->GetDimension() < 3)
   {
@@ -193,10 +194,6 @@ void QmitkSliceBasedInterpolator::OnToolManagerWorkingDataModified()
   }
 
   m_WorkingImage = workingImage;
-/*
-  m_SliceInterpolatorController->SetWorkingImage( m_WorkingImage );
-  this->UpdateVisibleSuggestion();
-*/
 }
 
 void QmitkSliceBasedInterpolator::OnTimeChanged(itk::Object* sender, const itk::EventObject& e)
@@ -342,39 +339,40 @@ mitk::Image::Pointer QmitkSliceBasedInterpolator::GetWorkingSlice(const mitk::Pl
 
 void QmitkSliceBasedInterpolator::OnActivateWidget(bool enabled)
 {
-  if ( m_DataStorage.IsNotNull() )
+  if (!m_Initialized) return;
+
+  m_Activated = enabled;
+
+  if ( m_ToolManager.IsNotNull() )
   {
-    m_Activated = enabled;
-
-    if ( m_ToolManager.IsNotNull() )
+    unsigned int numberOfExistingTools = m_ToolManager->GetTools().size();
+    for(unsigned int i = 0; i < numberOfExistingTools; i++)
     {
-      unsigned int numberOfExistingTools = m_ToolManager->GetTools().size();
-      for(unsigned int i = 0; i < numberOfExistingTools; i++)
-      {
-        mitk::SegTool2D* tool = dynamic_cast<mitk::SegTool2D*>(m_ToolManager->GetToolById(i));
-        if (tool) tool->SetEnable2DInterpolation( m_Activated );
-      }
-    }
-
-    if (m_Activated)
-    {
-      if (!m_DataStorage->Exists(m_FeedbackContourNode))
-      {
-        m_DataStorage->Add( m_FeedbackContourNode );
-      }
-      m_SliceInterpolatorController->SetWorkingImage( m_WorkingImage );
-      this->UpdateVisibleSuggestion();
-    }
-    else
-    {
-      if (m_DataStorage->Exists(m_FeedbackContourNode))
-      {
-        m_DataStorage->Remove( m_FeedbackContourNode );
-      }
-
-      mitk::UndoController::GetCurrentUndoModel()->Clear();
+      mitk::SegTool2D* tool = dynamic_cast<mitk::SegTool2D*>(m_ToolManager->GetToolById(i));
+      if (tool) tool->SetEnable2DInterpolation( m_Activated );
     }
   }
+
+  if (m_Activated)
+  {
+    if (!m_DataStorage->Exists(m_FeedbackContourNode))
+    {
+      m_DataStorage->Add( m_FeedbackContourNode );
+    }
+    m_SliceInterpolatorController->SetWorkingImage( m_WorkingImage );
+    this->UpdateVisibleSuggestion();
+  }
+  else
+  {
+    if (m_DataStorage->Exists(m_FeedbackContourNode))
+    {
+      m_DataStorage->Remove( m_FeedbackContourNode );
+    }
+
+    mitk::UndoController::GetCurrentUndoModel()->Clear();
+  }
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSliceBasedInterpolator::OnAcceptInterpolationClicked()

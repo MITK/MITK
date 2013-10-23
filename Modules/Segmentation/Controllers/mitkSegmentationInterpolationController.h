@@ -93,16 +93,16 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     /**
       \brief Set a reference image (original patient image) - optional.
 
-      If this volume is set (must exactly match the dimensions of the segmentation),
+      If this image is set (must exactly match the dimensions of the segmentation),
       the interpolation algorithm may consider image content to improve the interpolated
       (estimated) segmentation.
      */
     void SetReferenceImage( Image* image );
 
     /**
-      \brief Update after changing a single slice.
+      \brief Update after changing a single slice in the working image.
 
-      \param sliceDiff is a 2D image with the difference image of the slice determined by sliceDimension and sliceIndex.
+      \param image is a 2D image with the difference image of the slice determined by sliceDimension and sliceIndex.
              The difference is (pixel value in the new slice minus pixel value in the old slice).
 
       \param sliceDimension Number of the dimension which is constant for all pixels of the meant slice.
@@ -111,8 +111,17 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
 
       \param timeStep Which time step is changed
     */
-    void SetChangedSlice( const Image* sliceDiff, unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep );
-    void SetChangedVolume( const Image* sliceDiff, unsigned int timeStep );
+    void SetChangedSlice( const Image* image, unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep );
+
+    /**
+      \brief Update after changing the whole working image.
+
+      \param image is a 3D image with the difference image of the slice determined by sliceDimension and sliceIndex.
+             The difference is (pixel value in the new slice minus pixel value in the old slice).
+
+      \param timeStep Which time step is changed
+    */
+//    void SetChangedImage( const Image* image, unsigned int timeStep );
 
     /**
       \brief Generates an interpolated image for the given slice.
@@ -125,6 +134,9 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     */
     Image::Pointer Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, const mitk::PlaneGeometry* currentPlane, unsigned int timeStep );
 
+    /**
+      \brief Initializes the internal container with the number of voxels per label.
+    */
     void ResetLabelCount();
 
   protected:

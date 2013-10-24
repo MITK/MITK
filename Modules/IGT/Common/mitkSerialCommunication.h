@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKSERIALCOMMUNICATION_H_HEADER_INCLUDED_
 #define MITKSERIALCOMMUNICATION_H_HEADER_INCLUDED_
 
@@ -24,14 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactory.h>
 
 #ifdef WIN32
-  #include <windows.h>
+#include <windows.h>
 #else // Posix
-  #include <termios.h>
+#include <termios.h>
 #endif
 
 namespace mitk
 {
-
   /**Documentation
   * \brief serial communication interface
   *
@@ -71,12 +69,26 @@ namespace mitk
 
     enum BaudRate
     {
-      BaudRate9600   = 9600,
-      BaudRate14400  = 14400,
-      BaudRate19200  = 19200,
-      BaudRate38400  = 38400,
-      BaudRate57600  = 57600,
-      BaudRate115200 = 115200
+      BaudRate9600    = 9600,
+      BaudRate14400   = 14400,
+      BaudRate19200   = 19200,
+      BaudRate38400   = 38400,
+      BaudRate57600   = 57600,
+      BaudRate115200  = 115200, // Highest supported rate for NDI Polaris
+      BaudRate230400  = 230400,
+      BaudRate460800  = 460800,
+      BaudRate500000  = 500000,
+      BaudRate576000  = 576000,
+      BaudRate921600  = 921600,
+      BaudRate1000000 = 1000000,
+      BaudRate1152000 = 1152000,
+      BaudRate1228739 = 1228739, // Highest supported rate for NDI Polaris
+      BaudRate1500000 = 1500000,
+      BaudRate2000000 = 2000000,
+      BaudRate2500000 = 2500000,
+      BaudRate3000000 = 3000000,
+      BaudRate3500000 = 3500000,
+      BaudRate4000000 = 4000000
     };
 
     enum DataBits
@@ -261,6 +273,8 @@ namespace mitk
 
     /**
     * \brief set the send timeout in milliseconds
+    *
+    * Only applies to WIN32, not POSIX
     */
     itkSetMacro(SendTimeout, unsigned int);
 
@@ -299,15 +313,14 @@ namespace mitk
 
     bool m_Connected;       ///< is set to true if a connection currently established
 
-  #ifdef WIN32
+#ifdef WIN32
     HANDLE m_ComPortHandle;
     DWORD m_PreviousMask;
     COMMTIMEOUTS m_PreviousTimeout;
     DCB m_PreviousDeviceControlBlock;
-  #else
+#else
     int m_FileDescriptor;
-  #endif
+#endif
   };
-
 } // namespace mitk
 #endif /* MITKSERIALCOMMUNICATION_H_HEADER_INCLUDED_ */

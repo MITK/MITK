@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>239</width>
-    <height>907</height>
+    <height>901</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -136,7 +136,7 @@
       <enum>QTabWidget::Triangular</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab2DTools">
       <property name="sizePolicy">
@@ -294,6 +294,28 @@
     </widget>
    </item>
    <item>
+    <widget class="QmitkSurfaceBasedInterpolator" name="m_SurfaceBasedInterpolator" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>50</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="m_gbSurfaceStamp">
      <property name="enabled">
       <bool>false</bool>
@@ -416,15 +438,19 @@
    <header location="global">QmitkSliceBasedInterpolator.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>QmitkSurfaceBasedInterpolator</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSurfaceBasedInterpolator.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <includes>
   <include location="global">QmitkToolReferenceDataSelectionBox.h</include>
   <include location="global">QmitkToolGUIArea.h</include>
   <include location="global">QmitkToolSelectionBox.h</include>
-  <include location="global">QmitkSlicesInterpolator.h</include>
  </includes>
  <resources>
-  <include location="../../resources/multilabelsegmentation.qrc"/>
   <include location="../../resources/multilabelsegmentation.qrc"/>
  </resources>
  <connections/>

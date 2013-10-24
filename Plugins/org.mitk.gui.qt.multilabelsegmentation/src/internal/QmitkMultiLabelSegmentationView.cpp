@@ -166,7 +166,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls.m_cbWorkingNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
        this, SLOT( OnSegmentationSelectionChanged( const mitk::DataNode* ) ) );
 
-  connect( m_Controls.m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
+  //connect( m_Controls.m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
 
   connect( m_Controls.tabWidgetSegmentationTools, SIGNAL(currentChanged(int)), this, SLOT(OnTabWidgetChanged(int)));
 
@@ -183,6 +183,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
     controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
     controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
     m_Controls.m_SliceBasedInterpolator->Initialize(controllers, this->GetDataStorage());
+    m_Controls.m_LabelSetWidget->SetRenderWindowPart(this->m_IRenderWindowPart);
   }
 }
 
@@ -203,6 +204,7 @@ void QmitkMultiLabelSegmentationView::RenderWindowPartActivated(mitk::IRenderWin
     controllers.push_back(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
     controllers.push_back(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
     m_Controls.m_SliceBasedInterpolator->Initialize(controllers, this->GetDataStorage());
+    m_Controls.m_LabelSetWidget->SetRenderWindowPart(this->m_IRenderWindowPart);
   }
 }
 
@@ -441,12 +443,6 @@ void QmitkMultiLabelSegmentationView::SetMouseCursor( const us::ModuleResource r
   us::ModuleResourceStream cursor(resource, std::ios::binary);
   mitk::ApplicationCursor::GetInstance()->PushCursor( cursor, hotspotX, hotspotY );
   m_MouseCursorSet = true;
-}
-
-void QmitkMultiLabelSegmentationView::OnGoToLabel(const mitk::Point3D& pos)
-{
-  if (m_IRenderWindowPart)
-    m_IRenderWindowPart->SetSelectedPosition(pos);
 }
 
 void QmitkMultiLabelSegmentationView::OnMaskStamp()

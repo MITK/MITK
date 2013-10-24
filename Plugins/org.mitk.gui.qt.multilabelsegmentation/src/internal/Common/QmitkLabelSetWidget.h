@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkWeakPointer.h"
 #include "mitkDataNode.h"
+#include "mitkIRenderWindowPart.h"
 
 #include <berryIBerryPreferences.h>
 
@@ -46,20 +47,21 @@ public:
 
   void SetPreferences( berry::IPreferences::Pointer prefs );
 
-  virtual void setEnabled(bool enabled);
+  void SetDataStorage( mitk::DataStorage& storage );
 
-  void SetDataStorage(mitk::DataStorage& storage);
+  void SetRenderWindowPart( mitk::IRenderWindowPart* part );
 
   void OnToolManagerWorkingDataModified();
 
-signals:
-
-  /// \brief Send a signal when it was requested to position the crosshairs on a label.
-  void goToLabel(const mitk::Point3D&);
+  virtual void setEnabled(bool enabled);
 
 private slots:
 
+  // reaction to ...
   void OnSearchLabel();
+
+  // reaction to signal "goToLabel"
+  void OnGoToLabel(const mitk::Point3D& pos);
 
   // reaction to signal "labelListModified" from QmitkLabelSetTableWidget
   void OnLabelListModified(const QStringList& list);
@@ -127,11 +129,13 @@ private:
 
     QCompleter* m_Completer;
 
+    mitk::IRenderWindowPart* m_IRenderWindowPart;
+
     berry::IPreferences::Pointer m_Preferences;
 
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
-    mitk::ToolManager * m_ToolManager;
+    mitk::ToolManager* m_ToolManager;
 
     // handling of a list of known (organ name, organ color) combination
     // ATTENTION these methods are defined in QmitkSegmentationOrganNamesHandling.cpp

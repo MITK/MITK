@@ -57,8 +57,6 @@ protected slots:
 
   void OnSegmentationSelectionChanged(const mitk::DataNode *node);
 
-  void OnGoToLabel(const mitk::Point3D& pos);
-
   void OnManualTool2DSelected(int id);
 
   void OnTabWidgetChanged(int);

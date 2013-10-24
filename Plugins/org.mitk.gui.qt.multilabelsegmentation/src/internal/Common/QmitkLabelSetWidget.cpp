@@ -46,7 +46,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 
 QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent) : QWidget(parent),
-m_ToolManager(0)
+m_ToolManager(NULL),
+m_IRenderWindowPart(NULL)
 {
   m_Controls.setupUi(this);
 
@@ -61,7 +62,7 @@ m_ToolManager(0)
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createSurface(int)), this, SLOT(OnCreateSurface(int)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(smoothLabel(int)), this, SLOT(OnSmoothLabel(int)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(toggleOutline(bool)), this, SLOT(OnToggleOutline(bool)) );
-  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SIGNAL(goToLabel(const mitk::Point3D&)) );
+  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(combineAndCreateSurface( const QList<QTableWidgetSelectionRange>& )),
       this, SLOT(OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>&)) );
 
@@ -133,6 +134,11 @@ void QmitkLabelSetWidget::SetDataStorage( mitk::DataStorage& storage )
   m_DataStorage = &storage;
 }
 
+void QmitkLabelSetWidget::SetRenderWindowPart( mitk::IRenderWindowPart* renderWindowPart )
+{
+  m_IRenderWindowPart = renderWindowPart;
+}
+
 void QmitkLabelSetWidget::SetPreferences( berry::IPreferences::Pointer prefs )
 {
   m_Preferences = prefs;
@@ -141,6 +147,12 @@ void QmitkLabelSetWidget::SetPreferences( berry::IPreferences::Pointer prefs )
 void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
 {
   this->UpdateControls();
+}
+
+void QmitkLabelSetWidget::OnGoToLabel(const mitk::Point3D& pos)
+{
+  if (m_IRenderWindowPart)
+    m_IRenderWindowPart->SetSelectedPosition(pos);
 }
 
 void QmitkLabelSetWidget::OnSearchLabel()
@@ -237,7 +249,9 @@ void QmitkLabelSetWidget::OnPreviousLayer()
   }
 
   m_Controls.m_LabelSetTableWidget->Reset();
+
   this->UpdateControls();
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -266,7 +280,9 @@ void QmitkLabelSetWidget::OnNextLayer()
   }
 
   m_Controls.m_LabelSetTableWidget->Reset();
+
   this->UpdateControls();
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -295,7 +311,9 @@ void QmitkLabelSetWidget::OnChangetLayer(int layer)
   }
 
   m_Controls.m_LabelSetTableWidget->Reset();
+
   this->UpdateControls();
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -339,7 +357,9 @@ void QmitkLabelSetWidget::OnDeleteLayer()
   {
     m_Controls.m_cbActiveLayer->addItem(QString::number(lidx));
   }
+
   this->UpdateControls();
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -384,13 +404,14 @@ void QmitkLabelSetWidget::OnAddLayer()
   }
 
   this->UpdateControls();
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::UpdateControls()
 {
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  bool enabled = workingNode != NULL;
+  bool enabled = (workingNode != NULL);
 
   m_Controls.m_LabelSetTableWidget->setEnabled(enabled);
   m_Controls.m_LabelSearchBox->setEnabled(enabled);
@@ -403,7 +424,7 @@ void QmitkLabelSetWidget::UpdateControls()
   m_Controls.m_btDeleteSegmentation->setEnabled(enabled);
   m_Controls.m_btImportSegmentation->setEnabled(enabled);
 
-  if (!workingNode) return;
+  if (!enabled) return;
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
   assert(workingImage);

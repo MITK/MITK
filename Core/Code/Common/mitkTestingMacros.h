@@ -269,7 +269,7 @@ namespace mitk {
  * @ingroup MITKTestingAPI
  *
  * Use this macro after the CPPUNIT_TEST_SUITE() macro to add test cases
- * which need parameters (e.g. from the command line).
+ * which need parameters from the command line.
  *
  * @param TESTMETHOD The name of the member function test.
  */
@@ -278,4 +278,27 @@ namespace mitk {
       ( new mitk::ParameterizedTestCaller<TestFixtureType>(    \
                 context.getTestNameFor( #TESTMETHOD),          \
                 &TestFixtureType::TESTMETHOD,                  \
-                context.makeFixture() ) ) )
+                context.makeFixture() ) ) );
+
+/**
+ * @brief Adds a parameterized test to the current test suite.
+ *
+ * @ingroup MITKTestingAPI
+ *
+ * Use this macro after the CPPUNIT_TEST_SUITE() macro to add test cases
+ * which need one custom parameter.
+ *
+ * @param TESTMETHOD The name of the member function test.
+ * @param arg1 A custom string parameter being passed to the fixture.
+ */
+#define MITK_PARAMETERIZED_TEST_1(TESTMETHOD, arg1)            \
+{                                                              \
+  std::vector<std::string> args;                               \
+  args.push_back(arg1);                                        \
+  CPPUNIT_TEST_SUITE_ADD_TEST(                                 \
+      ( new mitk::ParameterizedTestCaller<TestFixtureType>(    \
+                context.getTestNameFor( #TESTMETHOD "_" arg1), \
+                &TestFixtureType::TESTMETHOD,                  \
+                context.makeFixture(),                         \
+                args ) ) );                                    \
+}

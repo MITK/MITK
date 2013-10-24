@@ -38,12 +38,6 @@ mitkAddCustomModuleTest(mitkImageTest_brainImage mitkImageTest ${MITK_DATA_DIR}/
 #mitkAddCustomModuleTest(mitkImageTest_color2DImage mitkImageTest ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg)
 mitkAddCustomModuleTest(mitkImageTest_3DImageData mitkImageGeneratorTest ${MITK_DATA_DIR}/Pic3D.nrrd)
 
-mitkAddCustomModuleTest(mitkIOUtilTest mitkIOUtilTest #test for a randomly chosen Pic3D swivelled slice
-                        ${MITK_DATA_DIR}/Pic3D.nrrd
-                        ${MITK_DATA_DIR}/pointSet.mps
-                        ${MITK_DATA_DIR}/binary.stl
-)
-
 
 mitkAddCustomModuleTest(mitkLevelWindowManagerTest mitkLevelWindowManagerTest
                         ${MITK_DATA_DIR}/Pic3D.nrrd

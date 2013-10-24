@@ -1,82 +1,83 @@
 
 # tests with no extra command line parameter
 set(MODULE_TESTS
+  itkTotalVariationDenoisingImageFilterTest.cpp
+  #mitkAbstractTransformGeometryTest.cpp
   mitkAccessByItkTest.cpp
-  mitkCoreObjectFactoryTest.cpp
-  mitkMaterialTest.cpp
   mitkActionTest.cpp
+  mitkAffineTransformBaseTest.cpp
+  mitkBaseDataTest.cpp
+  mitkClippedSurfaceBoundsCalculatorTest.cpp
+  mitkCoreObjectFactoryTest.cpp
   mitkDispatcherTest.cpp
   mitkEnumerationPropertyTest.cpp
   mitkEventTest.cpp
+  mitkExceptionTest.cpp
+  mitkExtractSliceFilterTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry2DTest.cpp
-  mitkGeometry3DTest.cpp
   mitkGeometry3DEqualTest.cpp
+  mitkGeometry3DTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkGlobalInteractionTest.cpp
-  mitkImageEqualTest.cpp
+  mitkGrabItkImageMemoryTest.cpp
   mitkImageDataItemTest.cpp
-  #mitkImageMapper2DTest.cpp
+  mitkImageDimensionConverterTest.cpp
+  mitkImageEqualTest.cpp
   mitkImageGeneratorTest.cpp
-  mitkBaseDataTest.cpp
+  #mitkImageMapper2DTest.cpp
   #mitkImageToItkTest.cpp
   mitkImportItkImageTest.cpp
-  mitkGrabItkImageMemoryTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
   mitkInteractorTest.cpp
+  mitkIOUtilTest.cpp
   #mitkITKThreadingTest.cpp
   mitkLevelWindowTest.cpp
+  mitkLoggingAdapterTest.cpp
+  mitkLogTest.cpp
+  mitkMaterialTest.cpp
   mitkMessageTest.cpp
+  mitkNodePredicateSourceTest.cpp
   #mitkPipelineSmartPointerCorrectnessTest.cpp
   mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
+  mitkPlanePositionManagerTest.cpp
   mitkPointSetEqualTest.cpp
   mitkPointSetFileIOTest.cpp
+  mitkPointSetInteractorTest.cpp
+  mitkPointSetReaderTest.cpp
   mitkPointSetTest.cpp
   mitkPointSetWriterTest.cpp
-  mitkPointSetReaderTest.cpp
-  mitkPointSetInteractorTest.cpp
-  mitkPropertyTest.cpp
-  mitkPropertyListTest.cpp
-  #mitkRegistrationBaseTest.cpp
-  #mitkSegmentationInterpolationTest.cpp
-  mitkSlicedGeometry3DTest.cpp
-  mitkSliceNavigationControllerTest.cpp
-  mitkStateMachineTest.cpp
-  ##mitkStateMachineContainerTest.cpp ## rewrite test, indirect since no longer exported Bug 14529
-  mitkStateTest.cpp
-  mitkSurfaceTest.cpp
-  mitkSurfaceEqualTest.cpp
-  mitkSurfaceToSurfaceFilterTest.cpp
-  mitkTimeGeometryTest.cpp
-  mitkTransitionTest.cpp
-  mitkUndoControllerTest.cpp
-  mitkVtkWidgetRenderingTest.cpp
-  mitkVerboseLimitedLinearUndoTest.cpp
-  mitkWeakPointerTest.cpp
-  mitkTransferFunctionTest.cpp
-  #mitkAbstractTransformGeometryTest.cpp
-  mitkStepperTest.cpp
-  itkTotalVariationDenoisingImageFilterTest.cpp
-  mitkRenderingManagerTest.cpp
-  vtkMitkThickSlicesFilterTest.cpp
-  mitkNodePredicateSourceTest.cpp
-  mitkVectorTest.cpp
-  mitkClippedSurfaceBoundsCalculatorTest.cpp
-  mitkExceptionTest.cpp
-  mitkExtractSliceFilterTest.cpp
-  mitkLogTest.cpp
-  mitkImageDimensionConverterTest.cpp
-  mitkLoggingAdapterTest.cpp
-  mitkUIDGeneratorTest.cpp
-  mitkShaderRepositoryTest.cpp
-  mitkPlanePositionManagerTest.cpp
-  mitkAffineTransformBaseTest.cpp
   mitkPropertyAliasesTest.cpp
   mitkPropertyDescriptionsTest.cpp
   mitkPropertyExtensionsTest.cpp
   mitkPropertyFiltersTest.cpp
+  mitkPropertyListTest.cpp
+  mitkPropertyTest.cpp
+  #mitkRegistrationBaseTest.cpp
+  mitkRenderingManagerTest.cpp
+  #mitkSegmentationInterpolationTest.cpp
+  mitkShaderRepositoryTest.cpp
+  mitkSlicedGeometry3DTest.cpp
+  mitkSliceNavigationControllerTest.cpp
+  ##mitkStateMachineContainerTest.cpp ## rewrite test, indirect since no longer exported Bug 14529
+  mitkStateMachineTest.cpp
+  mitkStateTest.cpp
+  mitkStepperTest.cpp
+  mitkSurfaceEqualTest.cpp
+  mitkSurfaceTest.cpp
+  mitkSurfaceToSurfaceFilterTest.cpp
+  mitkTimeGeometryTest.cpp
+  mitkTransferFunctionTest.cpp
+  mitkTransitionTest.cpp
+  mitkUIDGeneratorTest.cpp
+  mitkUndoControllerTest.cpp
+  mitkVectorTest.cpp
+  mitkVerboseLimitedLinearUndoTest.cpp
+  mitkVtkWidgetRenderingTest.cpp
+  mitkWeakPointerTest.cpp
+  vtkMitkThickSlicesFilterTest.cpp
 )
 
 # test with image filename as an extra command line parameter
@@ -105,45 +106,44 @@ set(MODULE_TESTSURFACES
 )
 
 set(MODULE_CUSTOM_TESTS
-    #mitkLabeledImageToSurfaceFilterTest.cpp
-    #mitkExternalToolsTest.cpp
-    mitkDataStorageTest.cpp
     mitkDataNodeTest.cpp
-    mitkDicomSeriesReaderTest.cpp
+    mitkDataStorageTest.cpp
     mitkDICOMLocaleTest.cpp
-    mitkEventMapperTest.cpp
+    mitkDicomSeriesReaderTest.cpp
     mitkEventConfigTest.cpp
-    mitkNodeDependentPointSetInteractorTest.cpp
-    mitkStateMachineFactoryTest.cpp
-    mitkPointSetLocaleTest.cpp
+    mitkEventMapperTest.cpp
+    #mitkExternalToolsTest.cpp
     mitkImageTest.cpp
-    mitkImageWriterTest.cpp
-    mitkImageVtkMapper2DTest.cpp
+    mitkImageVtkMapper2DColorTest.cpp
     mitkImageVtkMapper2DLevelWindowTest.cpp
+    mitkImageVtkMapper2DLookupTableTest.cpp
     mitkImageVtkMapper2DOpacityTest.cpp
     mitkImageVtkMapper2DResliceInterpolationPropertyTest.cpp
-    mitkImageVtkMapper2DColorTest.cpp
     mitkImageVtkMapper2DSwivelTest.cpp
+    mitkImageVtkMapper2DTest.cpp
     mitkImageVtkMapper2DTransferFunctionTest.cpp
-    mitkImageVtkMapper2DLookupTableTest.cpp
-    mitkIOUtilTest.cpp
-    mitkSurfaceVtkMapper3DTest
-    mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
-    mitkSurfaceGLMapper2DColorTest.cpp
-    mitkSurfaceGLMapper2DOpacityTest.cpp
-    mitkVolumeCalculatorTest.cpp
-    mitkLevelWindowManagerTest.cpp
-    mitkPointSetVtkMapper2DTest.cpp
-    mitkPointSetVtkMapper2DImageTest.cpp
-    mitkPointSetVtkMapper2DGlyphTypeTest.cpp
-    mitkPointSetVtkMapper2DTransformedPointsTest.cpp
+    mitkImageWriterTest.cpp
+    #mitkLabeledImageToSurfaceFilterTest.cpp
     mitkLabelOverlay3DRendering2DTest.cpp
     mitkLabelOverlay3DRendering3DTest.cpp
-    mitkTextOverlay2DRenderingTest.cpp
+    mitkLevelWindowManagerTest.cpp
+    mitkNodeDependentPointSetInteractorTest.cpp
+    mitkPointSetLocaleTest.cpp
+    mitkPointSetVtkMapper2DGlyphTypeTest.cpp
+    mitkPointSetVtkMapper2DImageTest.cpp
+    mitkPointSetVtkMapper2DTest.cpp
+    mitkPointSetVtkMapper2DTransformedPointsTest.cpp
+    mitkStateMachineFactoryTest.cpp
+    mitkSurfaceGLMapper2DColorTest.cpp
+    mitkSurfaceGLMapper2DOpacityTest.cpp
+    mitkSurfaceVtkMapper3DTest
+    mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
     mitkTextOverlay2DLayouterRenderingTest.cpp
+    mitkTextOverlay2DRenderingTest.cpp
+    mitkTextOverlay3DColorRenderingTest.cpp
     mitkTextOverlay3DRendering2DTest.cpp
     mitkTextOverlay3DRendering3DTest.cpp
-    mitkTextOverlay3DColorRenderingTest.cpp
+    mitkVolumeCalculatorTest.cpp
     mitkVTKRenderWindowSizeTest.cpp
 )
 

@@ -44,6 +44,7 @@ public:
     , m_OwnFixture(true)
     , m_Fixture(new ParameterizedFixture())
     , m_Test(test)
+    , m_Parameter(globalCmdLineArgs)
   {
   }
 
@@ -61,6 +62,7 @@ public:
     , m_OwnFixture(false)
     , m_Fixture(&fixture)
     , m_Test(test)
+    , m_Parameter(globalCmdLineArgs)
   {
   }
 
@@ -78,6 +80,27 @@ public:
     , m_OwnFixture(true)
     , m_Fixture(fixture)
     , m_Test(test)
+    , m_Parameter(globalCmdLineArgs)
+    {
+    }
+
+  /**
+   * Constructor for ParameterizedTestCaller.
+   * This constructor does not create a new ParameterizedFixture instance but accepts
+   * an existing one as parameter. The ParameterizedTestCaller will own the
+   * ParameterizedFixture object and delete it in its destructor.
+   * \param name name of this TestCaller
+   * \param test the method this TestCaller calls in runTest()
+   * \param fixture the Fixture to invoke the test method on.
+   * \param param A list of string parameters for the fixture.
+   */
+  ParameterizedTestCaller(const std::string& name, TestMethod test, ParameterizedFixture* fixture,
+                          const std::vector<std::string>& param)
+    : TestCase(name)
+    , m_OwnFixture(true)
+    , m_Fixture(fixture)
+    , m_Test(test)
+    , m_Parameter(param)
     {
     }
 
@@ -94,7 +117,10 @@ public:
 
   void setUp()
   {
-    m_Fixture->setUpParameter(globalCmdLineArgs);
+    if (!m_Parameter.empty())
+    {
+      m_Fixture->setUpParameter(m_Parameter);
+    }
     m_Fixture->setUp();
   }
 

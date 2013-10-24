@@ -28,31 +28,21 @@ class mitkIOUtilTestSuite : public mitk::ParameterizedTestFixture
 
   CPPUNIT_TEST_SUITE(mitkIOUtilTestSuite);
   CPPUNIT_TEST(TestTempMethods);
-  MITK_PARAMETERIZED_TEST(TestLoadAndSaveMethods);
+  MITK_PARAMETERIZED_TEST_1(TestLoadAndSaveImage, "Pic3D.nrrd");
+  MITK_PARAMETERIZED_TEST_1(TestLoadAndSavePointSet, "pointSet.mps");
+  MITK_PARAMETERIZED_TEST_1(TestLoadAndSaveSurface, "binary.stl");
   CPPUNIT_TEST_SUITE_END();
 
 private:
 
-  std::string pathToImage;
-  std::string pathToPointSet;
-  std::string pathToSurface;
+  std::string testData;
 
 public:
 
-  static CppUnit::Test* suite(int argc, char* argv[])
-  {
-    CppUnit::TestSuite* testSuite = new CppUnit::TestSuite("mitkIOUtilTest");
-    testSuite->addTest(new mitk::ParameterizedTestCaller<mitkIOUtilTestSuite>(
-                         "bla", &mitkIOUtilTestSuite::TestTempMethods));
-    return testSuite;
-  }
-
   void setUpParameter(const std::vector<std::string>& parameter)
   {
-    CPPUNIT_ASSERT(parameter.size() == 3);
-    pathToImage = parameter[0];
-    pathToPointSet = parameter[1];
-    pathToSurface = parameter[2];
+    CPPUNIT_ASSERT(parameter.size() == 1);
+    testData = getTestDataFilePath(parameter[0]);
   }
 
   void TestTempMethods()
@@ -103,49 +93,79 @@ public:
     CPPUNIT_ASSERT(itksys::SystemTools::RemoveADirectory(tmpDir2.c_str()));
   }
 
-  void TestLoadAndSaveMethods()
+  void TestLoadAndSaveImage()
   {
-    mitk::Image::Pointer img1 = mitk::IOUtil::LoadImage(pathToImage);
+    mitk::Image::Pointer img1 = mitk::IOUtil::LoadImage(testData);
     CPPUNIT_ASSERT( img1.IsNotNull());
-    mitk::PointSet::Pointer pointset = mitk::IOUtil::LoadPointSet(pathToPointSet);
-    CPPUNIT_ASSERT( pointset.IsNotNull());
-    mitk::Surface::Pointer surface = mitk::IOUtil::LoadSurface(pathToSurface);
-    CPPUNIT_ASSERT( surface.IsNotNull());
 
-    std::string outDir = MITK_TEST_OUTPUT_DIR;
-    std::string imagePath = outDir+"/diffpic3d.nrrd";
-    std::string imagePath2 = outDir+"/diffpic3d.nii.gz";
-    std::string pointSetPath = outDir + "/diffpointset.mps";
-    std::string surfacePath = outDir + "/diffsurface.stl";
-    std::string pointSetPathWithDefaultExtension = outDir + "/diffpointset2.mps";
-    std::string pointSetPathWithoutDefaultExtension = outDir + "/diffpointset2.xXx";
+    std::ofstream tmpStream;
+    std::string imagePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "diffpic3d-XXXXXX.nrrd");
+    tmpStream.close();
+    std::string imagePath2 = mitk::IOUtil::CreateTemporaryFile(tmpStream, "diffpic3d-XXXXXX.nii.gz");
+    tmpStream.close();
 
     // the cases where no exception should be thrown
     CPPUNIT_ASSERT(mitk::IOUtil::SaveImage(img1, imagePath));
     CPPUNIT_ASSERT(mitk::IOUtil::SaveBaseData(img1.GetPointer(), imagePath2));
-    CPPUNIT_ASSERT(mitk::IOUtil::SavePointSet(pointset, pointSetPath));
-    CPPUNIT_ASSERT(mitk::IOUtil::SaveSurface(surface, surfacePath));
 
-    // test if defaultextension is inserted if no extension is present
-    CPPUNIT_ASSERT(mitk::IOUtil::SavePointSet(pointset, pointSetPathWithoutDefaultExtension.c_str()));
-
-    // test if exception is thrown as expected on unknown extsension
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::SaveSurface(surface,"testSurface.xXx"), mitk::Exception);
     //load data which does not exist
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::LoadImage("fileWhichDoesNotExist.nrrd"), mitk::Exception);
 
     //delete the files after the test is done
-    remove(imagePath.c_str());
-    remove(pointSetPath.c_str());
-    remove(surfacePath.c_str());
-    //remove the pointset with default extension and not the one without
-    remove(pointSetPathWithDefaultExtension.c_str());
+    std::remove(imagePath.c_str());
+    std::remove(imagePath2.c_str());
 
     mitk::Image::Pointer relativImage = mitk::ImageGenerator::GenerateGradientImage<float>(4,4,4,1);
-    mitk::IOUtil::SaveImage(relativImage, "tempfile.nrrd");
-    CPPUNIT_ASSERT_NO_THROW(mitk::IOUtil::LoadImage("tempfile.nrrd"));
-    remove("tempfile.nrrd");
+    std::string imagePath3 = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.nrrd");
+    tmpStream.close();
+    mitk::IOUtil::SaveImage(relativImage, imagePath3);
+    CPPUNIT_ASSERT_NO_THROW(mitk::IOUtil::LoadImage(imagePath3));
+    std::remove(imagePath3.c_str());
   }
+
+  void TestLoadAndSavePointSet()
+  {
+    mitk::PointSet::Pointer pointset = mitk::IOUtil::LoadPointSet(testData);
+    CPPUNIT_ASSERT( pointset.IsNotNull());
+
+    std::ofstream tmpStream;
+    std::string pointSetPath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.mps");
+    tmpStream.close();
+    std::string pointSetPathWithDefaultExtension = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.mps");
+    tmpStream.close();
+    std::string pointSetPathWithoutDefaultExtension = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.xXx");
+    tmpStream.close();
+
+    // the cases where no exception should be thrown
+    CPPUNIT_ASSERT(mitk::IOUtil::SavePointSet(pointset, pointSetPathWithDefaultExtension));
+
+    // test if defaultextension is inserted if no extension is present
+    CPPUNIT_ASSERT(mitk::IOUtil::SavePointSet(pointset, pointSetPathWithoutDefaultExtension.c_str()));
+
+    //delete the files after the test is done
+    std::remove(pointSetPath.c_str());
+    std::remove(pointSetPathWithDefaultExtension.c_str());
+    std::remove(pointSetPathWithoutDefaultExtension.c_str());
+  }
+
+  void TestLoadAndSaveSurface()
+  {
+    mitk::Surface::Pointer surface = mitk::IOUtil::LoadSurface(testData);
+    CPPUNIT_ASSERT( surface.IsNotNull());
+
+    std::ofstream tmpStream;
+    std::string surfacePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "diffsurface-XXXXXX.stl");
+
+    // the cases where no exception should be thrown
+    CPPUNIT_ASSERT(mitk::IOUtil::SaveSurface(surface, surfacePath));
+
+    // test if exception is thrown as expected on unknown extsension
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::SaveSurface(surface,"testSurface.xXx"), mitk::Exception);
+
+    //delete the files after the test is done
+    std::remove(surfacePath.c_str());
+  }
+
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkIOUtil)

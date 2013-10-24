@@ -38,35 +38,13 @@ void mitk::ImageToContourModelSetFilter::SetInput ( const mitk::ImageToContourMo
   this->Modified();
 }
 
-/*
-void mitk::ImageToContourModelSetFilter::SetInput ( unsigned int idx, const mitk::ImageToContourModelSetFilter::InputType* input )
-{
-  if ( idx + 1 > this->GetNumberOfInputs() )
-  {
-    this->SetNumberOfRequiredInputs(idx + 1);
-  }
-  if ( input != static_cast<InputType*> ( ProcessObject::GetInput ( idx ) ) )
-  {
-    this->ProcessObject::SetNthInput ( idx, const_cast<InputType*> ( input ) );
-    this->Modified();
-  }
-}
-*/
-
 const mitk::ImageToContourModelSetFilter::InputType* mitk::ImageToContourModelSetFilter::GetInput( void )
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
   return static_cast<const mitk::ImageToContourModelSetFilter::InputType*>(this->ProcessObject::GetInput(0));
 }
-/*
-const mitk::ImageToContourModelSetFilter::InputType* mitk::ImageToContourModelSetFilter::GetInput( unsigned int idx )
-{
-  if (this->GetNumberOfInputs() < 1)
-    return NULL;
-  return static_cast<const mitk::ImageToContourModelSetFilter::InputType*>(this->ProcessObject::GetInput(idx));
-}
-*/
+
 void mitk::ImageToContourModelSetFilter::GenerateData()
 {
   mitk::Image::ConstPointer sliceImage = ImageToContourModelSetFilter::GetInput();
@@ -85,7 +63,7 @@ void mitk::ImageToContourModelSetFilter::GenerateData()
     return;
   }
 
-  m_SliceGeometry = sliceImage->GetGeometry();
+//  m_SliceGeometry = sliceImage->GetGeometry();
 
   AccessFixedDimensionByItk(sliceImage, ExtractContoursITKProcessing, 2);
 }
@@ -127,8 +105,9 @@ void mitk::ImageToContourModelSetFilter::ExtractContoursITKProcessing (itk::Imag
       currentWorldPoint[0] = currentPath->ElementAt(j)[0];
       currentWorldPoint[1] = currentPath->ElementAt(j)[1];
       currentWorldPoint[2] = 0;
-// fix me: either here or in the mapper this transformation should be applied
-//      m_SliceGeometry->IndexToWorld(currentWorldPoint, currentWorldPoint);
+
+      if (m_SliceGeometry)
+        m_SliceGeometry->IndexToWorld(currentWorldPoint, currentWorldPoint);
 
       contour->AddVertex(currentWorldPoint);
     }

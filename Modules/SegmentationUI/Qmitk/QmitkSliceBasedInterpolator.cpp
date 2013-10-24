@@ -389,10 +389,10 @@ void QmitkSliceBasedInterpolator::OnAcceptInterpolationClicked()
     int numberOfContours = m_FeedbackContour->GetSize();
     for (int i=0; i<numberOfContours; i++)
     {
-      mitk::ContourModel::Pointer projectedContour = mitk::ContourModel::New();
-      const mitk::Geometry3D* sliceGeometry = sliceImage->GetGeometry(timeStep);
-      mitk::ContourUtils::ProjectContourTo2DSlice( sliceGeometry, m_FeedbackContour->GetContourModelAt(i), projectedContour );
-      mitk::ContourUtils::FillContourInSlice( projectedContour, sliceImage, m_WorkingImage->GetActiveLabelIndex() );
+ //     mitk::ContourModel::Pointer projectedContour = mitk::ContourModel::New();
+//      const mitk::Geometry3D* sliceGeometry = sliceImage->GetGeometry(timeStep);
+//      mitk::ContourUtils::ProjectContourTo2DSlice( sliceGeometry, m_FeedbackContour->GetContourModelAt(i), projectedContour );
+      mitk::ContourUtils::FillContourInSlice( m_FeedbackContour->GetContourModelAt(i), sliceImage, m_WorkingImage->GetActiveLabelIndex() );
     }
 
     //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
@@ -502,10 +502,10 @@ void QmitkSliceBasedInterpolator::AcceptAllInterpolations(mitk::SliceNavigationC
       int numberOfContours = m_FeedbackContour->GetSize();
       for (int i=0; i<numberOfContours; i++)
       {
-         mitk::ContourModel::Pointer projectedContour = mitk::ContourModel::New();
-         const mitk::Geometry3D* sliceGeometry = sliceImage->GetGeometry();
-         mitk::ContourUtils::ProjectContourTo2DSlice( sliceGeometry, m_FeedbackContour->GetContourModelAt(i), projectedContour );
-         mitk::ContourUtils::FillContourInSlice( projectedContour, sliceImage, m_WorkingImage->GetActiveLabelIndex() );
+//         mitk::ContourModel::Pointer projectedContour = mitk::ContourModel::New();
+//         const mitk::Geometry3D* sliceGeometry = sliceImage->GetGeometry();
+//         mitk::ContourUtils::ProjectContourTo2DSlice( sliceGeometry, m_FeedbackContour->GetContourModelAt(i), projectedContour );
+         mitk::ContourUtils::FillContourInSlice( m_FeedbackContour->GetContourModelAt(i), sliceImage, m_WorkingImage->GetActiveLabelIndex() );
       }
 
       //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer

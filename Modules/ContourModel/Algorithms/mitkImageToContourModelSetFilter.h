@@ -47,10 +47,8 @@ namespace mitk {
     typedef PolyLineParametricPath2D::VertexListType ContourPath;
 
     virtual void SetInput( const InputType *input);
-//    virtual void SetInput( unsigned int idx, const InputType * input);
 
     const InputType* GetInput(void);
-//    const InputType* GetInput(unsigned int idx);
 
    /**
      \brief Set macro to apply a geometry to the extracted contours.

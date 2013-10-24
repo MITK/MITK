@@ -23,6 +23,7 @@ macro(MITK_CREATE_MODULE_TESTS)
     include_directories(${ALL_INCLUDE_DIRECTORIES})
 
     set(TESTDRIVER ${MODULE_NAME}TestDriver)
+    set(MODULE_TEST_EXTRA_DRIVER_INIT "${MODULE_TEST_EXTRA_DRIVER_INIT}")
 
     # Write a header file containing include directives and custom code
     # for the test driver.
@@ -30,7 +31,7 @@ macro(MITK_CREATE_MODULE_TESTS)
     list(APPEND MODULE_TEST_EXTRA_DRIVER_INCLUDE "mitkLog.h")
     list(REMOVE_DUPLICATES MODULE_TEST_EXTRA_DRIVER_INCLUDE)
     foreach(_include ${MODULE_TEST_EXTRA_DRIVER_INCLUDE})
-      set(_extra_include_content "${extra_include_content}
+      set(_extra_include_content "${_extra_include_content}
 #include <${_include}>")
     endforeach()
     set(_extra_include_content "${_extra_include_content}
@@ -40,9 +41,9 @@ std::vector<std::string> globalCmdLineArgs;")
     file(WRITE ${_extra_include_file} "${_extra_include_content}")
 
     set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "
-for (std::size_t avIndex = 1; avIndex < ac; ++avIndex) globalCmdLineArgs.push_back(av[avIndex]);
+for (int avIndex = 1; avIndex < ac; ++avIndex) globalCmdLineArgs.push_back(av[avIndex]);
 mitk::LoggingBackend::Register();
-${MODULE_TEST_EXTRA_DRIVER_INIT}"
+${MODULE_TEST_EXTRA_DRIVER_INIT};"
 )
     set(CMAKE_TESTDRIVER_AFTER_TESTMAIN "mitk::LoggingBackend::Unregister();")
 

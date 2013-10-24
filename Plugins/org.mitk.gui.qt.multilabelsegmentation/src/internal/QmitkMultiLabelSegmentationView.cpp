@@ -183,6 +183,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
     controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
     controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
     m_Controls.m_SliceBasedInterpolator->Initialize(controllers, this->GetDataStorage());
+    m_Controls.m_SurfaceBasedInterpolator->Initialize(this->GetDataStorage());
     m_Controls.m_LabelSetWidget->SetRenderWindowPart(this->m_IRenderWindowPart);
   }
 }
@@ -204,6 +205,7 @@ void QmitkMultiLabelSegmentationView::RenderWindowPartActivated(mitk::IRenderWin
     controllers.push_back(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
     controllers.push_back(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
     m_Controls.m_SliceBasedInterpolator->Initialize(controllers, this->GetDataStorage());
+    m_Controls.m_SurfaceBasedInterpolator->Initialize(this->GetDataStorage());
     m_Controls.m_LabelSetWidget->SetRenderWindowPart(this->m_IRenderWindowPart);
   }
 }

@@ -49,9 +49,7 @@ m_SurfaceInterpolator(mitk::SurfaceInterpolationController::GetInstance()),
 m_ToolManager(NULL),
 m_DataStorage(NULL),
 m_Initialized(false),
-m_Activated(false),
-m_LastSNC(0),
-m_LastSliceIndex(0)
+m_Activated(false)
 {
   m_Controls.setupUi(this);
 
@@ -63,8 +61,8 @@ m_LastSliceIndex(0)
   m_SurfaceInterpolationInfoChangedObserverTag = m_SurfaceInterpolator->AddObserver( itk::ModifiedEvent(), command );
 
   m_InterpolatedSurfaceNode = mitk::DataNode::New();
+  m_InterpolatedSurfaceNode->SetName( "Surface Interpolation feedback" );
   m_InterpolatedSurfaceNode->SetProperty( "color", mitk::ColorProperty::New(255.0,255.0,0.0) );
-  m_InterpolatedSurfaceNode->SetProperty( "name", mitk::StringProperty::New("Surface Interpolation feedback") );
   m_InterpolatedSurfaceNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5) );
   m_InterpolatedSurfaceNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
   m_InterpolatedSurfaceNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
@@ -95,8 +93,6 @@ m_LastSliceIndex(0)
 
 void QmitkSurfaceBasedInterpolator::Initialize(mitk::DataStorage* storage)
 {
-  Q_ASSERT(!controllers.empty());
-
   Q_ASSERT(!storage);
 
   if (m_Initialized)
@@ -161,10 +157,9 @@ void QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationFinished()
   mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
 
-  if(interpolatedSurface.IsNotNull() && workingNode &&
+  if (interpolatedSurface.IsNotNull() && workingNode &&
      workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))))
   {
-    m_Controls.m_btAccept->setEnabled(true);
     m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
     m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
 
@@ -178,8 +173,6 @@ void QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationFinished()
   }
   else if (interpolatedSurface.IsNull())
   {
-    m_Controls.m_btAccept->setEnabled(false);
-
     if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
     {
       this->Show3DInterpolationResult(false);
@@ -196,7 +189,7 @@ void QmitkSurfaceBasedInterpolator::StopUpdateInterpolationTimer()
 {
   m_Timer->stop();
   m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(255.0,255.0,0.0));
-  mitk::RenderingManager::GetInstance()->RequestUpdate(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow() );
 }
 
 void QmitkSurfaceBasedInterpolator::ChangeSurfaceColor()
@@ -238,26 +231,13 @@ void QmitkSurfaceBasedInterpolator::OnToolManagerWorkingDataModified()
     return;
   }
 
-//  m_WorkingImage = workingImage;
-}
-
-void QmitkSurfaceBasedInterpolator::CheckSupportedImageDimension()
-{
-  if (m_Activated && m_WorkingImage->GetDimension() != 3)
-  {
-    QMessageBox info;
-    info.setWindowTitle("Surface-Based interpolation");
-    info.setIcon(QMessageBox::Information);
-    info.setText("Only supported for 3D images at the moment!");
-    info.exec();
-  }
+  m_WorkingImage = workingImage;
 }
 
 void QmitkSurfaceBasedInterpolator::On3DInterpolationActivated(bool enabled)
 {
   m_Activated = enabled;
 
-  this->CheckSupportedImageDimension();
 
   try
   {
@@ -297,7 +277,7 @@ void QmitkSurfaceBasedInterpolator::On3DInterpolationActivated(bool enabled)
         else if (!m_Activated)
         {
           this->Show3DInterpolationResult(false);
-          m_Controls.m_btAccept->setEnabled(m_Activated);
+//          m_Controls.m_btAccept->setEnabled(m_Activated);
         }
       }
       else
@@ -309,7 +289,7 @@ void QmitkSurfaceBasedInterpolator::On3DInterpolationActivated(bool enabled)
     if (!m_Activated)
     {
        this->Show3DInterpolationResult(false);
-       m_Controls.m_btAccept->setEnabled(m_Activated);
+//       m_Controls.m_btAccept->setEnabled(m_Activated);
     }
   }
   catch(...)
@@ -336,7 +316,7 @@ void QmitkSurfaceBasedInterpolator::OnActivateWidget(bool enabled)
     for(unsigned int i = 0; i < numberOfExistingTools; i++)
     {
       mitk::SegTool2D* tool = dynamic_cast<mitk::SegTool2D*>(m_ToolManager->GetToolById(i));
-      if (tool) tool->SetEnable2DInterpolation( m_Activated );
+      if (tool) tool->SetEnable3DInterpolation( m_Activated );
     }
   }
 

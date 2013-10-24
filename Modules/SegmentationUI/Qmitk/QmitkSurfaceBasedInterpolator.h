@@ -114,12 +114,6 @@ class SegmentationUI_EXPORT QmitkSurfaceBasedInterpolator : public QWidget
 
     void On3DInterpolationActivated(bool);
 
-  protected:
-
-    void AcceptAllInterpolations(mitk::SliceNavigationController* slicer);
-
-    void CheckSupportedImageDimension();
-
 private:
 
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
@@ -139,12 +133,6 @@ private:
 
     mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
     mitk::DataNode::Pointer m_3DContourNode;
-
-    mitk::SliceNavigationController* m_LastSNC;
-
-    unsigned int m_LastSliceIndex;
-
-    QHash<mitk::SliceNavigationController*, unsigned int> m_TimeStep;
 
     mitk::DataStorage::Pointer m_DataStorage;
 

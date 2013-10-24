@@ -304,7 +304,7 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
   this->m_SeedContainer->InsertElement(this->m_SeedContainer->Size(), node);
   m_FastMarchingFilter->Modified();
 
-  m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), m_PositionEvent->GetWorldPosition());
+  m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->End().Index(), m_PositionEvent->GetWorldPosition());
 
   m_NeedUpdate = true;
 

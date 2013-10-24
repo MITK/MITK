@@ -9,6 +9,7 @@ set(MODULE_TESTS
   mitkBaseDataTest.cpp
   mitkClippedSurfaceBoundsCalculatorTest.cpp
   mitkCoreObjectFactoryTest.cpp
+  mitkDICOMLocaleTest.cpp
   mitkDispatcherTest.cpp
   mitkEnumerationPropertyTest.cpp
   mitkEventTest.cpp
@@ -108,7 +109,6 @@ set(MODULE_TESTSURFACES
 set(MODULE_CUSTOM_TESTS
     mitkDataNodeTest.cpp
     mitkDataStorageTest.cpp
-    mitkDICOMLocaleTest.cpp
     mitkDicomSeriesReaderTest.cpp
     mitkEventConfigTest.cpp
     mitkEventMapperTest.cpp

@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/Qmitk" >
+    <file>AcceptCurrentInterpolation.png</file>
+    <file>AcceptAllInterpolations.png</file>
+  </qresource>
+</RCC>

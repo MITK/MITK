@@ -24,6 +24,7 @@ Qmitk/QmitkToolWorkingDataSelectionBox.cpp
 Qmitk/QmitkWatershedToolGUI.cpp
 Qmitk/QmitkMedianTool3DGUI.cpp
 Qmitk/QmitkSliceBasedInterpolator.cpp
+Qmitk/QmitkSurfaceBasedInterpolator.cpp
 )
 
 set(MOC_H_FILES
@@ -52,6 +53,7 @@ Qmitk/QmitkToolWorkingDataSelectionBox.h
 Qmitk/QmitkWatershedToolGUI.h
 Qmitk/QmitkMedianTool3DGUI.h
 Qmitk/QmitkSliceBasedInterpolator.h
+Qmitk/QmitkSurfaceBasedInterpolator.h
 )
 
 set(UI_FILES
@@ -60,4 +62,9 @@ Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
 Qmitk/QmitkSliceBasedInterpolatorControls.ui
+Qmitk/QmitkSurfaceBasedInterpolatorControls.ui
+)
+
+set(QRC_FILES
+  resources/SegmentationUI.qrc
 )

@@ -87,46 +87,12 @@ void mitk::LabelSetImage::Initialize(const mitk::Image* other)
     newItkImage->Allocate();
     newItkImage->FillBuffer(0);
 
-//    this->SetVolume(newItkImage->GetBufferPointer());
-
-    //m_ActiveLayer = 0;
-
     newImage->InitializeByItk<LabelSetImageType>(newItkImage);
     newImage->SetImportVolume(newItkImage->GetBufferPointer(),0,0,Image::CopyMemory);
 
     m_LayerContainer.push_back(newImage);
 
     AccessByItk_1(this, LayerContainerToImageProcessing, m_ActiveLayer);
-/*
-    mitk::CastToItkImage(newImage, itkImage);
-
-    this->SetImportVolume(itkImage->GetBufferPointer(),0,0,Image::ReferenceMemory);
-*/
-
-/*
-    m_VectorImage = VectorImageType::New();
-    m_VectorImage->SetSpacing( itkImage->GetSpacing() );
-    m_VectorImage->SetOrigin( itkImage->GetOrigin() );
-    m_VectorImage->SetDirection( itkImage->GetDirection() );
-    m_VectorImage->SetRegions( itkImage->GetLargestPossibleRegion());
-    m_VectorImage->SetNumberOfComponentsPerPixel(1);
-    m_VectorImage->Allocate();
-
-    typedef itk::VariableLengthVector<LabelSetImage::PixelType> VariableVectorType;
-    VariableVectorType defaultValue;
-    defaultValue.SetSize(1);
-    defaultValue.Fill(0);
-    m_VectorImage->FillBuffer(defaultValue);
-
-    m_ActiveLayer = 0;
-
-    m_ImageToVectorAdaptor = ImageAdaptorType::New();
-    m_ImageToVectorAdaptor->SetImage( m_VectorImage );
-    m_ImageToVectorAdaptor->SetExtractComponentIndex( m_ActiveLayer );
-    m_ImageToVectorAdaptor->Update();
-
-    AccessByItk_1(this, VectorToImageProcessing, m_ActiveLayer);
-*/
   }
   catch(itk::ExceptionObject& e)
   {
@@ -341,19 +307,6 @@ void mitk::LabelSetImage::SetActiveLayer(int layer)
       AccessByItk_1(this, ImageToLayerContainerProcessing, m_ActiveLayer);
       m_ActiveLayer = layer;
       AccessByItk_1(this, LayerContainerToImageProcessing, m_ActiveLayer);
-
-//      m_ActiveLayer = layer;
-/*
-      m_ImageToVectorAdaptor = ImageAdaptorType::New();
-      m_ImageToVectorAdaptor->SetImage( m_VectorImage );
-      m_ImageToVectorAdaptor->SetExtractComponentIndex( m_ActiveLayer );
-      m_ImageToVectorAdaptor->Update();
-*/
-/*
-      LabelSetImageType::Pointer itkImage;
-      mitk::CastToItkImage(m_LayerContainer[m_ActiveLayer], itkImage);
-      this->SetImportVolume( itkImage->GetBufferPointer() ,0,0,Image::ReferenceMemory);
-*/
     }
   }
   catch(itk::ExceptionObject& e)
@@ -1203,7 +1156,7 @@ template < typename ImageType >
 void mitk::LabelSetImage::LayerContainerToImageProcessing( ImageType* input, int layer)
 {
   typename ImageType::Pointer itkSource;
-  mitk::CastToItkImage(m_LayerContainer[m_ActiveLayer],itkSource);
+  mitk::CastToItkImage(m_LayerContainer[m_ActiveLayer], itkSource);
   typedef itk::ImageRegionConstIterator< ImageType >  SourceIteratorType;
   typedef itk::ImageRegionIterator< ImageType >       TargetIteratorType;
 

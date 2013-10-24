@@ -32,9 +32,9 @@ namespace mitk
 {
 
 //##Documentation
-//## @brief LabelSetImage class for multi-label segmentation.
+//## @brief LabelSetImage class for handling labels and layers in a segmentation session.
 //##
-//## Handles operations for adding, removing, erasing and editing labels.
+//## Handles operations for adding, removing, erasing and editing labels and layers.
 //## @ingroup Data
 
 class Segmentation_EXPORT LabelSetImage : public Image
@@ -53,12 +53,6 @@ public:
   typedef itk::VariableLengthVector< PixelType >         VariableVectorType;
   typedef itk::VectorImage< PixelType, 3 >               VectorImageType;
   typedef itk::VectorImageToImageAdaptor< PixelType, 3 > ImageAdaptorType;
-
-  /**
-  * \brief this constructor creates a labelset image out of the provided reference image.
-  * @throw mitk::Exception Throws an exception if there is a problem while creating the labelset image.
-  */
- // mitkNewMacro1Param(Self, Image::Pointer);
 
   /**
   * \brief AddLabelEvent is emitted whenever a new label has been added to the LabelSet.

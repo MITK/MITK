@@ -22,7 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ImageToContourModelSetFilter::ImageToContourModelSetFilter() :
 m_UseProgressBar(false),
-m_ProgressStepSize(1)
+m_ProgressStepSize(1),
+m_SliceGeometry(NULL)
 {
 }
 
@@ -33,9 +34,11 @@ mitk::ImageToContourModelSetFilter::~ImageToContourModelSetFilter()
 
 void mitk::ImageToContourModelSetFilter::SetInput ( const mitk::ImageToContourModelSetFilter::InputType* input )
 {
-  this->SetInput( 0, input );
+  this->ProcessObject::SetNthInput ( 0, const_cast<InputType*> ( input ) );
+  this->Modified();
 }
 
+/*
 void mitk::ImageToContourModelSetFilter::SetInput ( unsigned int idx, const mitk::ImageToContourModelSetFilter::InputType* input )
 {
   if ( idx + 1 > this->GetNumberOfInputs() )
@@ -48,6 +51,7 @@ void mitk::ImageToContourModelSetFilter::SetInput ( unsigned int idx, const mitk
     this->Modified();
   }
 }
+*/
 
 const mitk::ImageToContourModelSetFilter::InputType* mitk::ImageToContourModelSetFilter::GetInput( void )
 {
@@ -55,14 +59,14 @@ const mitk::ImageToContourModelSetFilter::InputType* mitk::ImageToContourModelSe
     return NULL;
   return static_cast<const mitk::ImageToContourModelSetFilter::InputType*>(this->ProcessObject::GetInput(0));
 }
-
+/*
 const mitk::ImageToContourModelSetFilter::InputType* mitk::ImageToContourModelSetFilter::GetInput( unsigned int idx )
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
   return static_cast<const mitk::ImageToContourModelSetFilter::InputType*>(this->ProcessObject::GetInput(idx));
 }
-
+*/
 void mitk::ImageToContourModelSetFilter::GenerateData()
 {
   mitk::Image::ConstPointer sliceImage = ImageToContourModelSetFilter::GetInput();
@@ -99,8 +103,6 @@ void mitk::ImageToContourModelSetFilter::ExtractContoursITKProcessing (itk::Imag
 
   unsigned int foundPaths = contourExtractor->GetNumberOfOutputs();
 
-//  unsigned int pointId (0);
-
   //
   // set the number of outputs to the number of paths found
   // initialize the output contour models according to the available time steps
@@ -108,21 +110,6 @@ void mitk::ImageToContourModelSetFilter::ExtractContoursITKProcessing (itk::Imag
   const mitk::Image* image = this->GetInput();
   unsigned int numberOfTimeSteps = image->GetTimeGeometry()->CountTimeSteps();
 
-  // todo: add the following when contour model sets become available
-/*
-  this->SetNumberOfIndexedOutputs( foundPaths );
-  this->SetNumberOfRequiredOutputs( foundPaths );
-  for ( unsigned int i = 0 ; i < foundPaths; ++i )
-  {
-    if ( ! this->GetOutput( i ) )
-    {
-      mitk::ContourModel::Pointer output = static_cast<mitk::ContourModel*>( this->MakeOutput(i).GetPointer() );
-      assert ( output.IsNotNull() );
-      output->Expand( numberOfTimeSteps );
-      this->SetNthOutput( i, output.GetPointer() );
-    }
-  }
-*/
   mitk::ContourModelSet::Pointer output = this->GetOutput();
   assert ( output.IsNotNull() );
   output->Initialize();
@@ -134,15 +121,15 @@ void mitk::ImageToContourModelSetFilter::ExtractContoursITKProcessing (itk::Imag
     if (!contourExtractor->GetOutput(i)) return;
     const ContourPath* currentPath = contourExtractor->GetOutput(i)->GetVertexList();
     mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
-
     for (unsigned int j = 0; j < currentPath->Size(); j++)
     {
       mitk::Point3D currentWorldPoint;
       currentWorldPoint[0] = currentPath->ElementAt(j)[0];
       currentWorldPoint[1] = currentPath->ElementAt(j)[1];
       currentWorldPoint[2] = 0;
+// fix me: either here or in the mapper this transformation should be applied
+//      m_SliceGeometry->IndexToWorld(currentWorldPoint, currentWorldPoint);
 
-      m_SliceGeometry->IndexToWorld(currentWorldPoint, currentWorldPoint);
       contour->AddVertex(currentWorldPoint);
     }
     output->AddContourModel(contour);

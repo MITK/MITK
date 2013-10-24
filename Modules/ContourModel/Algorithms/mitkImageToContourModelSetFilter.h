@@ -47,19 +47,17 @@ namespace mitk {
     typedef PolyLineParametricPath2D::VertexListType ContourPath;
 
     virtual void SetInput( const InputType *input);
-    virtual void SetInput( unsigned int idx, const InputType * input);
+//    virtual void SetInput( unsigned int idx, const InputType * input);
 
     const InputType* GetInput(void);
-    const InputType* GetInput(unsigned int idx);
+//    const InputType* GetInput(unsigned int idx);
 
-    /**
-      \brief Set macro for the geometry of the slice. If it is not set explicitly the geometry will be taken from the slice
-
-      \a Parameter The slice`s geometry
-    */
+   /**
+     \brief Set macro to apply a geometry to the extracted contours.
+   */
    itkSetMacro(SliceGeometry, Geometry3D*);
 
-    /**
+   /**
      \brief Set whether the mitkProgressBar should be used
 
      \a Parameter true for using the progress bar, false otherwise

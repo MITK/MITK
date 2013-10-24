@@ -59,6 +59,11 @@ public:
   virtual void SelectProbe( USProbe::Pointer probe ) = 0;
 
   /**
+    * \return Ultrasound probe which is currently selected as the active probe.
+    */
+  virtual USProbe::Pointer GetSelectedProbe() = 0;
+
+  /**
     * \return number of probes currently available at the ultrasound device
     */
   virtual unsigned int GetProbesCount( ) const = 0;

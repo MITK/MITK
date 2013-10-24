@@ -79,10 +79,26 @@ void mitk::USTelemedProbesControls::SelectProbe(unsigned int index)
   }
 
   m_TelemedDevice->SetActiveDataView(m_ProbesSet.at(index)->GetUsgDataView());
+
+  m_SelectedProbeIndex = index;
 }
 
 void mitk::USTelemedProbesControls::SelectProbe(mitk::USProbe::Pointer probe)
 {
+}
+
+USProbe::Pointer mitk::USTelemedProbesControls::GetSelectedProbe()
+{
+  if (m_SelectedProbeIndex >= m_ProbesSet.size())
+  {
+    MITK_ERROR("USTelemedProbesControls")("USControlInterfaceProbes")
+      << "Cannot get active probe as the current index is" << index <<
+      ". Maximum possible index is " << m_ProbesSet.size()-1 << ".";
+    mitkThrow() << "Cannot get active probe as the current index is" << index <<
+      ". Maximum possible index is " << m_ProbesSet.size()-1 << ".";
+  }
+
+  return m_ProbesSet.at(m_SelectedProbeIndex);
 }
 
 unsigned int mitk::USTelemedProbesControls::GetProbesCount() const

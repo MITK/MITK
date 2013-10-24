@@ -38,11 +38,21 @@ public:
 
     itkGetMacro(UltrasoundDevice, itk::SmartPointer<USDevice>);
     itkGetMacro(TrackingDevice, itk::SmartPointer<NavigationDataSource>);
-    itkGetMacro(Calibration, AffineTransform3D::Pointer);
 
     itkSetMacro(UltrasoundDevice, itk::SmartPointer<USDevice>);
     itkSetMacro(TrackingDevice, itk::SmartPointer<NavigationDataSource>);
-    itkSetMacro(Calibration, AffineTransform3D::Pointer);
+
+    /**
+      *
+      */
+    AffineTransform3D::Pointer GetCalibration();
+
+    /**
+      * \brief Sets a transformation as calibration data.
+      * Calibration data is set for the currently activated probe and their current
+      * zoom factor. It also marks the device as calibrated.
+      */
+    void SetCalibration(AffineTransform3D::Pointer calibration);
 
     /**
       * \brief Returns the Class of the Device.
@@ -104,9 +114,13 @@ protected:
       */
     void GenerateData();
 
-    USDevice::Pointer                       m_UltrasoundDevice;
-    itk::SmartPointer<NavigationDataSource> m_TrackingDevice;
-    AffineTransform3D::Pointer              m_Calibration;
+    std::string GetIdentifierForCurrentCalibration();
+
+    USDevice::Pointer                                   m_UltrasoundDevice;
+    itk::SmartPointer<NavigationDataSource>             m_TrackingDevice;
+    //AffineTransform3D::Pointer                          m_Calibration;
+
+    std::map<std::string, AffineTransform3D::Pointer>   m_Calibrations;
 
 private:
     /**

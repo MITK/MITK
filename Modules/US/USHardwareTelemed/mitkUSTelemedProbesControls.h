@@ -46,6 +46,7 @@ namespace mitk {
     virtual std::vector<USProbe::Pointer> GetProbeSet();
     virtual void SelectProbe(unsigned int index);
     virtual void SelectProbe(USProbe::Pointer probe);
+    virtual USProbe::Pointer GetSelectedProbe();
     virtual unsigned int GetProbesCount() const;
 
     void ProbeRemoved(unsigned int index);
@@ -75,6 +76,7 @@ namespace mitk {
     void CreateProbesSet();
 
     bool                                  m_IsActive;
+    unsigned int                          m_SelectedProbeIndex;
     std::vector<USTelemedProbe::Pointer>  m_ProbesSet;
     itk::SmartPointer<USTelemedDevice>    m_TelemedDevice;
 

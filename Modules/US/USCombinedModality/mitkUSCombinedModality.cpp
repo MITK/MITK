@@ -120,8 +120,6 @@ void mitk::USCombinedModality::SetCalibration (mitk::AffineTransform3D::Pointer 
 
   m_Calibrations[calibrationKey] = calibration;
 
-
-  m_Calibration = calibration;
   m_Metadata->SetDeviceIsCalibrated(true);
 
   if (m_ServiceRegistration != 0)
@@ -192,13 +190,17 @@ void mitk::USCombinedModality::GenerateData()
     m_UltrasoundDevice->Update();
     mitk::USImage::Pointer image = m_UltrasoundDevice->GetOutput();
 
-    if (m_Calibration.IsNotNull())
+    std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
+    if ( ! calibrationKey.empty() )
     {
-        image->GetGeometry()->SetIndexToWorldTransform(m_Calibration);
-    }
-    else
-    {
-        MITK_WARN << "Cannot transform image data as no calibration is set.";
+        std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator calibrationIterator
+                = m_Calibrations.find(calibrationKey);
+        if ( calibrationIterator != m_Calibrations.end())
+        {
+            // transform image according to callibration if one is set
+            // for current configuration of probe and depth
+            image->GetGeometry()->SetIndexToWorldTransform(calibrationIterator->second);
+        }
     }
 
     // TODO: do processing here

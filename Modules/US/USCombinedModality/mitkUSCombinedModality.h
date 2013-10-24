@@ -43,7 +43,9 @@ public:
     itkSetMacro(TrackingDevice, itk::SmartPointer<NavigationDataSource>);
 
     /**
+      * \brief Getter for calibration data of the currently active probe and depth.
       *
+      * \return Transformation for calibration or null if no calibration is available.
       */
     AffineTransform3D::Pointer GetCalibration();
 
@@ -118,8 +120,6 @@ protected:
 
     USDevice::Pointer                                   m_UltrasoundDevice;
     itk::SmartPointer<NavigationDataSource>             m_TrackingDevice;
-    //AffineTransform3D::Pointer                          m_Calibration;
-
     std::map<std::string, AffineTransform3D::Pointer>   m_Calibrations;
 
 private:

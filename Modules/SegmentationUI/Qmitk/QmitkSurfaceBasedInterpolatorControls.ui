@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>257</width>
-    <height>61</height>
+    <width>179</width>
+    <height>77</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -48,24 +48,19 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPushButton" name="m_btApply">
+       <widget class="QPushButton" name="m_btAccept">
         <property name="text">
-         <string>Accept Current</string>
+         <string/>
         </property>
         <property name="icon">
          <iconset resource="../resources/SegmentationUI.qrc">
-          <normaloff>:/Qmitk/AcceptCurrentInterpolation.png</normaloff>:/Qmitk/AcceptCurrentInterpolation.png</iconset>
+          <normaloff>:/Qmitk/AcceptSurfaceInterpolation.png</normaloff>:/Qmitk/AcceptSurfaceInterpolation.png</iconset>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="m_btApplyForAllSlices">
-        <property name="text">
-         <string>Accept All</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/SegmentationUI.qrc">
-          <normaloff>:/Qmitk/AcceptAllInterpolations.png</normaloff>:/Qmitk/AcceptAllInterpolations.png</iconset>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
         </property>
        </widget>
       </item>

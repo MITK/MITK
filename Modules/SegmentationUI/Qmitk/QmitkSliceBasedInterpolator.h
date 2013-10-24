@@ -29,9 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <map>
 
 #include <QWidget>
-#include <QComboBox>
-#include <QGroupBox>
-#include <QCheckBox>
 
 
 #include "ui_QmitkSliceBasedInterpolatorControls.h"
@@ -134,6 +131,12 @@ class SegmentationUI_EXPORT QmitkSliceBasedInterpolator : public QWidget
     ActionToSliceDimensionMapType m_ActionToSliceDimensionMap;
 
     void AcceptAllInterpolations(mitk::SliceNavigationController* slicer);
+
+    void WaitCursorOn();
+
+    void WaitCursorOff();
+
+    void RestoreOverrideCursor();
 
     /**
       Gets the working slice based on the given plane geometry and last saved interaction

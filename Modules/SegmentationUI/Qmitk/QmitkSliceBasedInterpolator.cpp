@@ -16,19 +16,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkSliceBasedInterpolator.h"
 
-#include "mitkColorProperty.h"
-#include "mitkProperties.h"
-#include "mitkRenderingManager.h"
-#include "mitkProgressBar.h"
-#include "mitkOperationEvent.h"
-#include "mitkInteractionConst.h"
-#include "mitkApplyDiffImageOperation.h"
-#include "mitkDiffImageApplier.h"
+#include <mitkColorProperty.h>
+#include <mitkProperties.h>
+#include <mitkRenderingManager.h>
+#include <mitkProgressBar.h>
+#include <mitkOperationEvent.h>
+#include <mitkInteractionConst.h>
+#include <mitkApplyDiffImageOperation.h>
+#include <mitkDiffImageApplier.h>
 #include <mitkDiffSliceOperationApplier.h>
-#include "mitkUndoController.h"
-#include "mitkSegTool2D.h"
-#include "mitkSurfaceToImageFilter.h"
-#include "mitkSliceNavigationController.h"
+#include <mitkUndoController.h>
+#include <mitkSegTool2D.h>
+#include <mitkSliceNavigationController.h>
 #include <mitkVtkImageOverwrite.h>
 #include <mitkExtractSliceFilter.h>
 #include <mitkLabelSetImage.h>
@@ -41,12 +40,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkCommand.h>
 
-#include <QCheckBox>
-#include <QPushButton>
 #include <QMenu>
 #include <QCursor>
-#include <QVBoxLayout>
 #include <QMessageBox>
+#include <QApplication>
 
 QmitkSliceBasedInterpolator::QmitkSliceBasedInterpolator(QWidget* parent, const char*  /*name*/) : QWidget(parent),
 m_SliceInterpolatorController( mitk::SegmentationInterpolationController::New() ),
@@ -607,4 +604,19 @@ void QmitkSliceBasedInterpolator::OnSliceNavigationControllerDeleted(const itk::
     m_ControllerToSliceObserverTag.remove(slicer);
     m_ControllerToDeleteObserverTag.remove(slicer);
   }
+}
+
+void QmitkSliceBasedInterpolator::WaitCursorOn()
+{
+  QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+}
+
+void QmitkSliceBasedInterpolator::WaitCursorOff()
+{
+  this->RestoreOverrideCursor();
+}
+
+void QmitkSliceBasedInterpolator::RestoreOverrideCursor()
+{
+  QApplication::restoreOverrideCursor();
 }

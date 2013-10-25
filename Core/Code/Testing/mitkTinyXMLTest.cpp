@@ -21,16 +21,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 
 
-static const std::string filename = itksys::SystemTools::GetCurrentWorkingDirectory() + "/TinyXMLTest.txt";
-static const std::string elementToStoreAttributeName = "DoubleTest";
-static const std::string attributeToStoreName        = "CommaValue";
+static const std::string  filename = itksys::SystemTools::GetCurrentWorkingDirectory() + "/TinyXMLTest.txt";
+static const std::string  elementToStoreAttributeName = "DoubleTest";
+static const std::string  attributeToStoreName        = "CommaValue";
 
 /**
  * create a simple xml document which stores the values
  * @param valueToWrite  value which should be stored
  * @return  true, if document was successfully created.
  */
-static bool Setup(double valueToWrite)
+static bool Setup(double valueToWrite, const unsigned int requiredDecimalPlaces)
 {
   // 1. create simple document
   TiXmlDocument document;
@@ -45,7 +45,7 @@ static bool Setup(double valueToWrite)
 
   // 2. store one element containing a double value with potentially many after comma digits.
   TiXmlElement* vElement = new TiXmlElement( elementToStoreAttributeName );
-  vElement->SetDoubleAttribute( attributeToStoreName, valueToWrite );
+  vElement->SetDoubleAttribute( attributeToStoreName, valueToWrite, requiredDecimalPlaces );
   document.LinkEndChild(vElement);
 
   // 3. store in file.
@@ -68,14 +68,19 @@ static int readValueFromSetupDocument(double& readOutValue)
   }
 }
 
-static void TearDown()
+/**
+ *
+ * @return true if TearDown was successful.
+ */
+static bool TearDown()
 {
-  // TODO delete created file, ...
+  return !remove(filename.c_str());
 }
 
 static void Test_Setup_works()
 {
-  MITK_TEST_CONDITION_REQUIRED(Setup(1.0), "Test if setup correctly writes data to " << filename);
+  MITK_TEST_CONDITION_REQUIRED(Setup(1.0, 1) && TearDown(),
+      "Test if setup and teardown correctly writes data to " << filename << " and deletes the file after the test");
 }
 
 /**
@@ -84,7 +89,7 @@ static void Test_Setup_works()
  */
 static void Test_ReadOutValue_works()
 {
-  Setup(1.0);
+  Setup(1.0, 1);
 
   double readValue;
 
@@ -101,9 +106,7 @@ static void Test_DoubleValueWriteOut()
   const double neededPrecision       = 1.0 / ((double) validDigitsAfterComma + 1);
   double       readValue;
 
-  Setup(valueToWrite);
-
-  TiXmlBase::SetRequiredDecimalPlaces(validDigitsAfterComma);
+  Setup(valueToWrite, validDigitsAfterComma);
 
   readValueFromSetupDocument(readValue);
 
@@ -122,9 +125,7 @@ static void Test_DoubleValueWriteOut_manyDecimalPlaces()
   const double neededPrecision       = 1.0 / ((double) validDigitsAfterComma + 1);
   double       readValue;
 
-  Setup(valueToWrite);
-
-  TiXmlBase::SetRequiredDecimalPlaces(validDigitsAfterComma);
+  Setup(valueToWrite, validDigitsAfterComma);
 
   readValueFromSetupDocument(readValue);
 
@@ -136,6 +137,7 @@ static void Test_DoubleValueWriteOut_manyDecimalPlaces()
   TearDown();
 }
 
+
 static void Test_DoubleValueWriteOut_tooLittlePrecision()
 {
   const double valueToWrite          = -1.12345678910111;
@@ -143,18 +145,14 @@ static void Test_DoubleValueWriteOut_tooLittlePrecision()
   const double neededPrecision       = 1.0 / ((double) validDigitsAfterComma + 1);
   double       readValue;
 
-  Setup(valueToWrite);
-
-  // this should lead the readout value to be different since
-  // only the first 4 digits are written to xml.
-  TiXmlBase::SetRequiredDecimalPlaces(4);
+  Setup(valueToWrite, validDigitsAfterComma);
 
   readValueFromSetupDocument(readValue);
 
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(valueToWrite, readValue, neededPrecision),
+  MITK_TEST_CONDITION_REQUIRED(!mitk::Equal(valueToWrite, readValue, neededPrecision),
       std::setprecision(validDigitsAfterComma) <<
-      "Testing if value " << valueToWrite << " equals " << readValue
-      << " which was retrieved from TinyXML document");
+      "Testing if value " << valueToWrite << " doesn't equal " << readValue
+      << " which was retrieved from TinyXML document because decimal places are set too low.");
 
   TearDown();
 }

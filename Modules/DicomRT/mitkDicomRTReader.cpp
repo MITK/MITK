@@ -509,13 +509,13 @@ namespace mitk
     double hsvValue = 0.002778;
 
     vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-    transferFunction->AddHSVPoint(0,0.538932,1,1,1,1);
-    transferFunction->AddHSVPoint(highest*0.2,0.455592,1,1,1,1);
-    transferFunction->AddHSVPoint(highest*0.4,0.16668,1,1,1,1);
-    transferFunction->AddHSVPoint(highest*0.5,(34*hsvValue),1,1,1,1);
-    transferFunction->AddHSVPoint(highest*0.6,(295*hsvValue),1,1,1,1);
-    transferFunction->AddHSVPoint(highest*0.7,(325*hsvValue),1,1,1,1);
-    transferFunction->AddHSVPoint(prescripeDose,(26*hsvValue),1,1,1,1);
+    transferFunction->AddHSVPoint(highest*0.0,(240*hsvValue),1.0,1.0,1.0,1.0);
+    transferFunction->AddHSVPoint(highest*0.2,(180*hsvValue),1.0,1.0,1.0,1.0);
+    transferFunction->AddHSVPoint(highest*0.4,(120*hsvValue),1.0,0.5,1.0,1.0);
+    transferFunction->AddHSVPoint(highest*0.5,(120*hsvValue),1.0,1.0,1.0,1.0);
+    transferFunction->AddHSVPoint(highest*0.6,(060*hsvValue),1.0,1.0,1.0,1.0);
+    transferFunction->AddHSVPoint(highest*0.7,(026*hsvValue),1.0,1.0,1.0,1.0);
+    transferFunction->AddHSVPoint(prescripeDose,(0*hsvValue),1.0,1.0,1.0,1.0);
     transferFunction->Build();
 
     mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();

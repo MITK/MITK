@@ -43,14 +43,9 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
     mitkClassMacro(ContourUtils, itk::Object);
     itkNewMacro(ContourUtils);
 
-    typedef float  PixelType;
-    typedef itk::Mesh< PixelType , 3 > MeshType;
-    typedef MeshType::CellType CellType;
-    typedef itk::Image< unsigned char, 3 > ImageType;
-    typedef itk::VertexCell< CellType >    VertexType;
-    typedef itk::LineCell< CellType >      LineType;
-    typedef itk::TriangleCell< CellType > TriangleCellType;
-    typedef itk::TriangleMeshToBinaryImageFilter<MeshType,ImageType> MeshFilterType;
+    typedef unsigned char PixelType;
+    typedef itk::Image< PixelType, 2 > ImageType;
+    typedef itk::PolyLineParametricPath< 2 > PathType;
 
     /**
       \brief Projects a contour onto an image point by point. Converts from world to index coordinates.
@@ -95,7 +90,7 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
     */
     void FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue = 1 );
 
-    MeshType::Pointer contourModel2itkMesh(ContourModel* contourModel);
+    //MeshType::Pointer contourModel2itkMesh(ContourModel* contourModel);
 
 protected:
 

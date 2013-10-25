@@ -25,6 +25,8 @@ set(MODULE_TESTIMAGES
   Pic2DplusT.nrrd
   BallBinary30x30x30.nrrd
   Png2D-bw.png
+  Sigmoid.nrrd
+  Sigmoid-2D-as-3D.nrrd
 )
 
 # Create an artificial module initializing class for

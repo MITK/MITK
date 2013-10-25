@@ -20,6 +20,48 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInstantiateAccessFunctions.h"
 #include "ipSegmentation.h"
 
+#include "mitkIOUtil.h"
+
+
+//testing some stuff
+#include "mitkContourModelToPointSetFilter.h"
+#include "mitkPointSet.h"
+#include "mitkContourModel.h"
+#include "itkPolylineMask2DImageFilter.h"
+#include "itkImageFileWriter.h"
+#include "itkCastImageFilter.h"
+#include "itkVTKPolyDataWriter.h"
+#include "itkPoint.h"
+#include "mitkImage.h"
+#include "itkPolyLineParametricPath.h"
+
+#include "mitkSurface.h"
+#include "mitkContourModelToSurfaceFilter.h"
+#include "mitkSurfaceToImageFilter.h"
+#include "mitkImageWriter.h"
+#include "mitkSurfaceVtkWriter.h"
+#include "vtkPolyDataToImageStencil.h"
+#include "vtkImageStencil.h"
+#include "mitkImageVtkAccessor.h"
+#include "vtkMetaImageWriter.h"
+#include "vtkXMLImageDataWriter.h"
+#include "vtkImageStencilToImage.h"
+#include "vtkPNGWriter.h"
+#include "vtkPointData.h"
+#include "vtkDataArray.h"
+#include "vtkPolyData.h"
+#include "vtkSmartPointer.h"
+#include "vtkImageData.h"
+#include "vtkSphereSource.h"
+#include "vtkVersion.h"
+
+#include <vtkCutter.h>
+#include <vtkPlane.h>
+#include <vtkStripper.h>
+#include <vtkLinearExtrusionFilter.h>
+#include <vtkXMLPolyDataWriter.h>
+#include "vtkTriangleFilter.h"
+
 #define InstantiateAccessFunction_ItkCopyFilledContourToSlice(pixelType, dim) \
   template void mitk::ContourUtils::ItkCopyFilledContourToSlice(itk::Image<pixelType,dim>*, const mitk::Image*, int);
 
@@ -162,6 +204,277 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, Ima
 
 void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue )
 {
+
+    // 3D source sphere
+
+      // generate circle by cutting the sphere with an implicit plane
+      // (through its center, axis-aligned)
+      mitk::Surface::Pointer surface = mitk::Surface::New();
+      mitk::ContourModelToSurfaceFilter::Pointer contourModelFilter = mitk::ContourModelToSurfaceFilter::New();
+      contourModelFilter->SetInput(projectedContour);
+      contourModelFilter->Update();
+      surface = contourModelFilter->GetOutput();
+      contourModelFilter->Update();
+
+      /*vtkSmartPointer<vtkTriangleFilter> triangleFilter = vtkSmartPointer<vtkTriangleFilter>::New();
+      triangleFilter->SetInput(surface->GetVtkPolyData());
+      triangleFilter->Update();
+      */
+      //create triangle strips and/or poly-lines from an input polygon
+      vtkSmartPointer<vtkStripper> stripper = vtkSmartPointer<vtkStripper>::New();
+      stripper->SetInput(surface->GetVtkPolyData()); // valid surface
+      stripper->Update();
+      // that's our surface in 2D
+      vtkSmartPointer<vtkPolyData> surface2D = stripper->GetOutput();
+
+      // write circle out
+      vtkSmartPointer<vtkXMLPolyDataWriter> polyDataWriter =
+          vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+
+      polyDataWriter->SetInput(surface2D);
+      polyDataWriter->SetFileName("/home/lars/TestingMethodeOutput/surface2D.vtp");
+      polyDataWriter->SetCompressorTypeToNone();
+      polyDataWriter->SetDataModeToAscii();
+      polyDataWriter->Write();
+
+      polyDataWriter->SetInput(surface->GetVtkPolyData());
+      polyDataWriter->SetFileName("/home/lars/TestingMethodeOutput/surface->GetVtkPolyData.vtp");
+      polyDataWriter->SetCompressorTypeToNone();
+      polyDataWriter->SetDataModeToAscii();
+      polyDataWriter->Write();
+
+
+      // prepare the binary image's voxel grid
+      vtkSmartPointer<vtkImageData> whiteImage =
+          vtkSmartPointer<vtkImageData>::New();
+      whiteImage = sliceImage->GetVtkImageData();
+      vtkIdType count = whiteImage->GetNumberOfPoints();
+      MITK_INFO << "White Image Data Number of Points: " << whiteImage->GetNumberOfPoints();
+      MITK_INFO << "Slice Image Number of Points: " << sliceImage->GetVtkImageData()->GetNumberOfPoints();
+
+      whiteImage->SetScalarTypeToUnsignedChar();
+      whiteImage->AllocateScalars();
+
+      // fill the image with foreground voxels:
+      unsigned char inval = 255;
+      unsigned char outval = 0;
+      for (vtkIdType i = 0; i < count; ++i)
+        {
+        whiteImage->GetPointData()->GetScalars()->SetTuple1(i, inval);
+        }
+
+      //show the pixels of the empty Image / for testing
+      for (vtkIdType i = 0; i < count; ++i)
+      {
+          MITK_INFO << "Pixel an der Stelle " << i << " hat den Wert: " << whiteImage->GetPointData()->GetScalars()->GetTuple(i)[0];
+      }
+
+      // sweep polygonal data (this is the important thing with contours!)
+      vtkSmartPointer<vtkLinearExtrusionFilter> extruder =
+          vtkSmartPointer<vtkLinearExtrusionFilter>::New();
+
+      extruder->SetInput(surface2D);
+      extruder->SetScaleFactor(1.0);
+      extruder->SetExtrusionTypeToNormalExtrusion();
+      extruder->SetVector(0, 0, 1);
+      extruder->Update();
+
+      // polygonal data --> image stencil:
+      vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc =
+        vtkSmartPointer<vtkPolyDataToImageStencil>::New();
+      pol2stenc->SetTolerance(0); // important if extruder->SetVector(0, 0, 1) !!!
+      pol2stenc->SetInputConnection(extruder->GetOutputPort());
+      pol2stenc->SetOutputOrigin(whiteImage->GetOrigin());
+      pol2stenc->SetOutputSpacing(whiteImage->GetSpacing());
+      pol2stenc->SetOutputWholeExtent(whiteImage->GetExtent());
+      pol2stenc->Update();
+
+      // cut the corresponding white image and set the background:
+      vtkSmartPointer<vtkImageStencil> imgstenc =
+        vtkSmartPointer<vtkImageStencil>::New();
+
+      imgstenc->SetInput(whiteImage);
+      imgstenc->SetStencil(pol2stenc->GetOutput());
+      imgstenc->ReverseStencilOff();
+      imgstenc->SetBackgroundValue(outval);
+      imgstenc->Update();
+
+      vtkSmartPointer<vtkMetaImageWriter> imageWriter =
+        vtkSmartPointer<vtkMetaImageWriter>::New();
+      imageWriter->SetFileName("/home/lars/TestingMethodeOutput/labelImage.mhd");
+      imageWriter->SetInputConnection(imgstenc->GetOutputPort());
+      imageWriter->Write();
+   /* mitk::Surface::Pointer surface = mitk::Surface::New();
+    mitk::ContourModelToSurfaceFilter::Pointer contourModelFilter = mitk::ContourModelToSurfaceFilter::New();
+    contourModelFilter->SetInput(projectedContour);
+    contourModelFilter->Update();
+    surface = contourModelFilter->GetOutput();
+
+    //MITK_INFO << "vtkPolyData: " << surface->GetVtkPolyData()->GetCenter();
+
+    vtkPolyData* pd = vtkPolyData::New();
+    pd = surface->GetVtkPolyData();
+
+    //surface writer
+    vtkSmartPointer<vtkPolyDataWriter> surfaceWriter = vtkSmartPointer<vtkPolyDataWriter>::New();
+    surfaceWriter->SetFileName("/home/woitzik/TestingMethodeOutput/surface.vtk");
+    surfaceWriter->SetInput(pd);
+    surfaceWriter->Update();
+
+    vtkSmartPointer<vtkImageData> whiteImage =
+    vtkSmartPointer<vtkImageData>::New();
+
+    whiteImage = sliceImage->GetVtkImageData();
+    whiteImage->SetScalarTypeToUnsignedChar();
+    whiteImage->AllocateScalars();
+
+    unsigned char inval = 255;
+    unsigned char outval = 0;
+    vtkIdType count = whiteImage->GetNumberOfPoints();
+    for(vtkIdType i = 0; i < count; ++i)
+    {
+        whiteImage->GetPointData()->GetScalars()->SetTuple1(i, inval);
+    }
+
+    if(whiteImage->GetDataDimension() == 2)
+    {
+        MITK_INFO << "White Image has Dimension = " << 2;
+        MITK_INFO << "White Image Data: " << whiteImage->GetNumberOfPoints();
+        MITK_INFO << "whiteImage->GetOrigin(): " << whiteImage->GetOrigin()[0] << ", " << whiteImage->GetOrigin()[1];
+        MITK_INFO << "whiteImage->GetSpacing(): " << whiteImage->GetSpacing()[0] << ", " << whiteImage->GetSpacing()[1];
+        MITK_INFO << "whiteImage->GetExtent(): " << whiteImage->GetExtent()[0] << " - " << whiteImage->GetExtent()[1] << ", " << whiteImage->GetExtent()[2]<< " - " << whiteImage->GetExtent()[3];
+    }
+
+    if(sliceImage->GetDimension() == 2)
+    {
+        MITK_INFO << "Slice Image has Dimension = " << 2;
+        MITK_INFO << "Slice Image Data: " << sliceImage->GetVtkImageData();
+        MITK_INFO << "SliceImage->GetOrigin(): " << sliceImage->GetGeometry()->GetOrigin()[0] << ", " << sliceImage->GetGeometry()->GetOrigin()[1];
+        MITK_INFO << "SliceImage->GetSpacing(): " << sliceImage->GetGeometry()->GetSpacing()[0] << ", " << sliceImage->GetGeometry()->GetSpacing()[1];
+        MITK_INFO << "SliceImage->GetExtent(): " << sliceImage->GetDimensions()[0] << ", " << sliceImage->GetDimensions()[1];
+    }
+      // polygonal data --> image stencil:
+      vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc =
+        vtkSmartPointer<vtkPolyDataToImageStencil>::New();
+
+      pol2stenc->SetInput(pd);
+      pol2stenc->SetOutputOrigin(whiteImage->GetOrigin());
+      pol2stenc->SetOutputSpacing(whiteImage->GetSpacing());
+      pol2stenc->SetOutputWholeExtent(whiteImage->GetExtent());
+      pol2stenc->Update();
+
+      // cut the corresponding white image and set the background:
+      vtkSmartPointer<vtkImageStencil> imgstenc =
+        vtkSmartPointer<vtkImageStencil>::New();
+
+      imgstenc->SetInput(whiteImage);
+      imgstenc->SetStencil(pol2stenc->GetOutput());
+      imgstenc->ReverseStencilOff();
+      imgstenc->SetBackgroundValue(0.0);
+      imgstenc->Update();
+
+      vtkSmartPointer<vtkMetaImageWriter> writer =
+        vtkSmartPointer<vtkMetaImageWriter>::New();
+      writer->SetFileName("/home/woitzik/TestingMethodeOutput/BoxVolume.mhd");
+
+      writer->SetInput(imgstenc->GetOutput());
+      writer->Write();
+    */
+    /*mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer surfaceWriter = mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
+    surfaceWriter->SetDefaultExtension();
+    surfaceWriter->SetFileName("/home/woitzik/TestingMethodeOutput/surfaceWriterOutput.vtk");
+    surfaceWriter->SetInput(surface);
+    surfaceWriter->Update();
+    surfaceWriter->Write();
+
+
+    vtkSmartPointer<vtkPolyDataToImageStencil> polyData2ImageStencil = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
+
+
+    vtkSmartPointer<vtkImageData> whiteImage = vtkSmartPointer<vtkImageData>::New();
+    //whiteImage
+    //imgsten->SetInputData(sliceImage->GetVtkImageData());
+
+    whiteImage = sliceImage->GetVtkImageData();
+    whiteImage->SetScalarTypeToUnsignedChar();
+    whiteImage->AllocateScalars();
+
+
+    //polyData2ImageStencil->SetTolerance(0);
+    polyData2ImageStencil->SetInput(surface->GetVtkPolyData());
+    polyData2ImageStencil->SetOutputOrigin(whiteImage->GetOrigin());
+    polyData2ImageStencil->SetOutputSpacing(whiteImage->GetSpacing());
+    polyData2ImageStencil->SetOutputWholeExtent(whiteImage->GetExtent());
+    polyData2ImageStencil->Update();
+
+    vtkSmartPointer<vtkImageStencilToImage> imageStencilToImage = vtkSmartPointer<vtkImageStencilToImage>::New();
+    imageStencilToImage->SetInputConnection(polyData2ImageStencil->GetOutputPort());
+    imageStencilToImage->SetInsideValue(255);
+    imageStencilToImage->Update();
+
+    vtkSmartPointer<vtkPNGWriter> pngWriter = vtkSmartPointer<vtkPNGWriter>::New();
+    pngWriter->SetFileName("/home/woitzik/TestingMethodeOutput/pngWriterOutput.png");
+    pngWriter->SetInputConnection(imageStencilToImage->GetOutputPort());
+    pngWriter->Write();
+    */
+    /*vtkSmartPointer<vtkImageStencil> imgsten = vtkSmartPointer<vtkImageStencil>::New();
+    imgsten->SetInput(whiteImage);
+    imgsten->SetStencil(polyData2ImageStencil->GetOutput());
+    imgsten->ReverseStencilOff();
+    unsigned char outval = 0;
+    imgsten->SetBackgroundValue(outval);
+    imgsten->Update();
+
+    MITK_INFO << "imgsten: " << imgsten->GetOutput();
+    MITK_INFO << "imgsten - vtkDataObject:";
+
+    mitk::Image::Pointer mitkImage = mitk::Image::New();
+
+    mitk::ImageWriter::Pointer mitkImageWriter = mitk::ImageWriter::New();
+    mitkImageWriter->SetFileName("/home/woitzik/TestingMethodeOutput/mitkImageWriter.nrrd");
+    mitkImageWriter->SetInput(mitkImage);
+    mitkImageWriter->Update();
+
+    vtkSmartPointer<vtkMetaImageWriter> metaWriter = vtkSmartPointer<vtkMetaImageWriter>::New();
+    metaWriter->SetFileName("/home/woitzik/TestingMethodeOutput/metaImage.mhd");
+    metaWriter->SetCompression(false);
+    metaWriter->SetInput(imgsten->GetOutput());
+    metaWriter->Write();
+
+    vtkSmartPointer<vtkXMLImageDataWriter> imageWriter = vtkSmartPointer<vtkXMLImageDataWriter>::New();
+    imageWriter->SetFileName("/home/woitzik/TestingMethodeOutput/imageWriter.vti");
+    imageWriter->SetInput(imgsten->GetOutput());
+    imageWriter->Update();
+    imageWriter->Write();
+    */
+
+    //polyData2ImageStencil->SetOutput();
+
+
+    /*mitk::SurfaceToImageFilter::Pointer surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
+
+    mitk::Image::Pointer mitkImage = mitk::Image::New();
+    mitkImage = sliceImage->Clone();
+
+    surfaceToImageFilter->MakeOutputBinaryOn();
+
+    surfaceToImageFilter->SetImage(sliceImage);
+
+    surfaceToImageFilter->SetBackgroundValue(0.0);
+
+    surfaceToImageFilter->SetInput(surface);
+
+    surfaceToImageFilter->GenerateOutputInformation();
+
+    surfaceToImageFilter->Update();
+
+    mitkImage = surfaceToImageFilter->GetOutput();
+
+    mitk::ImageWriter::Pointer Imagewriter = mitk::ImageWriter::New();
+    Imagewriter->SetFileName("/home/woitzik/TestingMethodeOutput/surface.nrrd");
+    Imagewriter->SetInput(mitkImage);
+    Imagewriter->Update();
+    */
   /*// 1. Use ipSegmentation to draw a filled(!) contour into a new 8 bit 2D image, which will later be copied back to the slice.
   //    We don't work on the "real" working data, because ipSegmentation would restrict us to 8 bit images
 
@@ -205,7 +518,7 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
 
   ipsegmentationModifiedSlice = NULL; // free MITK header information
   ipMITKSegmentationFree( picSlice ); // free actual memory
-  */
+
 
 
     /*MeshFilterType::Pointer meshFilter = MeshFilterType::New();
@@ -247,120 +560,168 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
     */
     // Create ROI from Mesh with desired dimension, etc.
 
-    itk::TriangleMeshToBinaryImageFilter<MeshType, ImageType>::Pointer roiSampler = itk::TriangleMeshToBinaryImageFilter<MeshType, ImageType>::New();
-    MeshType::Pointer mesh = contourModel2itkMesh(projectedContour);
-    roiSampler->SetInput(mesh);
-    ImageType::Pointer output = ImageType::New();
-    MITK_INFO << "sliceImage->GetSliceData(): " << sliceImage->GetSliceData();
-    CastToItkImage(sliceImage, output);
-    roiSampler->SetInfoImage( output );
-    roiSampler->Update();
-    MITK_INFO << "roiSampler->Update();";
-    MITK_INFO << "infoImage: " << roiSampler->GetOutput();
+    /*itk::TriangleMeshToBinaryImageFilter<MeshType, OutputImageType>::Pointer meshFilter = itk::TriangleMeshToBinaryImageFilter<MeshType, OutputImageType>::New();
+    MeshType::Pointer mesh = contourModel2itkMesh(projectedContour); //convert the contourModel to a itk::mesh
+
+    //testing mesh
+    typedef itk::VTKPolyDataWriter<MeshType> WriterType;
+    WriterType::Pointer writer = WriterType::New();
+    writer->SetInput(mesh);
+    writer->SetFileName("/home/woitzik/TestingMethodeOutput/test.vtk");
+    writer->Update();
+
+
+    itk::Image<unsigned char, 2>::Pointer workingImageSliceInITK = itk::Image<unsigned char, 2>::New();
+    OutputImageType::Pointer outputImage = OutputImageType::New();
+
+    //CastToItkImage(sliceImage, workingImageSliceInITK);
+
+    mitk::Image::Pointer sliceImageInMITK = mitk::Image::New();
+    sliceImageInMITK->Initialize(sliceImage->GetImageDescriptor());
+
+    mitk::CastToItkImage(sliceImageInMITK, outputImage);
+
+
+    /*typedef itk::Image<unsigned char, 2> InputImageType;
+    typedef itk::Image<unsigned char, 3> OutputIm;
+    typedef itk::CastImageFilter<InputImageType, OutputIm> Cast2DTo3DFilterType;
+    Cast2DTo3DFilterType::Pointer cast2DTo3DFilter = Cast2DTo3DFilterType::New();
+    cast2DTo3DFilter->SetInput(workingImageSliceInITK);
+    cast2DTo3DFilter->Update();
+    */
+    //variables for the filter
+    /*const OutputImageType::PointType orgOrigin = workingImageSliceInITK->GetOrigin();
+    const OutputImageType::SizeType orgSize = workingImageSliceInITK->GetLargestPossibleRegion().GetSize();
+    const OutputImageType::SpacingType orgSpacing = workingImageSliceInITK->GetSpacing();
+    const OutputImageType::DirectionType orgDirection = workingImageSliceInITK->GetDirection();
+
+    outputImage->SetRegions(orgSize);
+    outputImage->SetSpacing(orgSpacing);
+    outputImage->SetOrigin(orgOrigin);
+    outputImage->SetDirection(orgDirection);
+    outputImage->Allocate();
+    */
+    /*OutputImageType::PointType orgi;
+    orgi.Fill(0.0);
+    orgi[0] = orgOrigin[0];
+    orgi[1] = orgOrigin[1];
+    */
+
+    /*itk::Point<float, 3> orgi;
+    orgi.Fill(0.0);
+    */
+    //roiSampler->SetInfoImage( workingImageSliceInITK );
+    /*meshFilter->SetOrigin(orgi);
+    meshFilter->SetSpacing(orgSpacing);
+    meshFilter->SetSize(orgSize);
+    meshFilter->SetIndex(orgIndex);
+    meshFilter->SetTolerance(1.0);
+    */
+    /*typedef unsigned char OutputPixelType;
+
+    const OutputPixelType empty = 0;
+    const OutputPixelType fill = 256;
+
+    meshFilter->SetInput(mesh);
+    meshFilter->SetInfoImage( outputImage );
+    meshFilter->SetTolerance(1.0);
+    meshFilter->SetInsideValue(fill);
+    meshFilter->SetOutsideValue(empty);
+
+    //meshFilter->SetOrigin(workingImageSliceInITK);
+    //write the output to a file
+    itk::ImageFileWriter< OutputImageType >::Pointer writer1 = itk::ImageFileWriter< OutputImageType >::New();
+    writer1->SetFileName("/home/woitzik/test.png");
+    writer1->SetInput(meshFilter->GetOutput());
+    try
+    {
+    meshFilter->Update();
+    writer1->Update();
+    }
+    catch( itk::ExceptionObject &err )
+    {
+        MITK_INFO << "ExceptionObject caught !";
+        MITK_INFO << err;
+    }
+    //MITK_INFO << "roiSampler->Update();";
+    //MITK_INFO << "infoImage: " << roiSampler->GetOutput();
+
+    //mitk::Image::Pointer workingImageSliceInMITK = mitk::Image::New();
+
+    //mitk::CastToMitkImage(meshFilter->GetOutput(), workingImageSliceInMITK);
+
+    //workingImageSliceInITK = meshFilter->GetOutput();
+    //workingImageSliceInMITK->GetGeometry()->SetOrigin(sliceImage->GetGeometry()->GetOrigin());
+    //workingImageSliceInMITK->GetGeometry()->SetIndexToWorldTransform(sliceImage->GetGeometry()->GetIndexToWorldTransform());
+
+    //MITK_INFO << "MITK Image: " << workingImageSliceInMITK;
+
+    //mitk::IOUtil::SaveImage(workingImageSliceInMITK, "/home/woitzik/TestingMethodeOutput/workingImage.nrrd");
+    */
 }
 
-itk::Mesh< float , 3 >::Pointer mitk::ContourUtils::contourModel2itkMesh(ContourModel* contourModel)
+/*itk::Mesh< float , 2 >::Pointer mitk::ContourUtils::contourModel2itkMesh(ContourModel* contourModel)
 {
-    //mitk::ContourModel::VertexType* vertex;
     mitk::ContourModel::VertexIterator it = contourModel->Begin();
     mitk::ContourModel::VertexIterator itEnd = contourModel->End();
 
     MeshType::Pointer mesh = MeshType::New();
     MeshType::PointType point;
 
-    mitk::Point3D center;
+    mitk::Point2D center;
     center[0] = 0;
     center[1] = 0;
-    center[2] = 0;
 
     int i;
 
     for( i=0 ; it!=itEnd ; i++ )
     {
-        point = (*it)->Coordinates;
+        mitk::Point3D contourVertex = (*it)->Coordinates;
+        point[0] = contourVertex[0];
+        point[1] = contourVertex[1];
         MITK_INFO << point;
         mesh->SetPoint( i , point );
         it++;
         center[0] = center[0] + point[0];
         center[1] = center[1] + point[1];
-        center[2] = center[2] + point[2];
     }
 
     center[0] = center[0]/i;
     center[1] = center[1]/i;
-    center[2] = center[2]/i;
     MITK_INFO << "center" << center;
 
     mesh->SetPoint( i, center);
-
-    CellType::CellAutoPointer cellpointer;
-
-    MeshType::PointType point2;
-
-    //create a line between all points
-    /*for( int j = 1; j!=mesh->GetNumberOfPoints(); j++)
-    {
-        cellpointer.TakeOwnership( new LineType );
-        cellpointer->SetPointId( 0, j-1 );
-        cellpointer->SetPointId( 1, j );
-        mesh->SetCell( j-1, cellpointer );
-        j++;
-    }*/
-    /*cellpointer.TakeOwnership( new LineType );
-    cellpointer->SetPointId( 0, 0 );
-    cellpointer->SetPointId( 1, 1 );
-    mesh->SetCell( 0, cellpointer );
-
-    cellpointer.TakeOwnership( new LineType );
-    cellpointer->SetPointId( 0, 1 );
-    cellpointer->SetPointId( 1, 2 );
-    mesh->SetCell( 1, cellpointer );
-
-    cellpointer.TakeOwnership( new LineType );
-    cellpointer->SetPointId( 0, 2 );
-    cellpointer->SetPointId( 1, 0 );
-    mesh->SetCell( 2, cellpointer );
-    */
 
     int centerPointId = i;
     TriangleCellType::CellAutoPointer trianglepointer;
 
     for( int j = 1; j!=mesh->GetNumberOfPoints(); j++)
     {
-    trianglepointer.TakeOwnership( new TriangleCellType );
-    trianglepointer->SetPointId( 0, j );
+        trianglepointer.TakeOwnership( new TriangleCellType );
+
+    //every point and his next neighbour are combined with the center point to a triangle cell of the mesh
+    if(j!=(mesh->GetNumberOfPoints()-1))
+    {
+    trianglepointer->SetPointId( 0, j-1 );
+    trianglepointer->SetPointId( 1, j );
+    trianglepointer->SetPointId( 2, centerPointId );
+    mesh->SetCell( j-1, trianglepointer );
+    }
+    //for the last triangle cell between the first point and the last point
+    else
+    {
+    trianglepointer->SetPointId( 0, 0 );
     trianglepointer->SetPointId( 1, j-1 );
     trianglepointer->SetPointId( 2, centerPointId );
     mesh->SetCell( j-1, trianglepointer );
+    }
     }
 
     MITK_INFO << "Points: " << mesh->GetNumberOfPoints();
     MITK_INFO << "Cells: " << mesh->GetNumberOfCells();
 
-   /*typedef MeshType::CellsContainer::ConstIterator CellIterator;
-
-   CellIterator cellIterator = mesh->GetCells()->Begin();
-   CellIterator cellEnd = mesh->GetCells()->End();
-   while( cellIterator != cellEnd )
-   {
-   CellType * cell = cellIterator.Value();
-   MITK_INFO << "cell with " << cell->GetNumberOfPoints();
-   MITK_INFO << " points " << std::endl;
-   // Software Guide : BeginCodeSnippet
-   typedef CellType::PointIdIterator PointIdIterator;
-   PointIdIterator pointIditer = cell->PointIdsBegin();
-   PointIdIterator pointIdend = cell->PointIdsEnd();
-   while( pointIditer != pointIdend )
-   {
-   MITK_INFO << *pointIditer << std::endl;
-   ++pointIditer;
-   }
-   // Software Guide : EndCodeSnippet
-   ++cellIterator;
-   }
-   */
    return mesh;
-}
+}*/
 
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDimension>* originalSlice, const Image* filledContourSlice, int overwritevalue )

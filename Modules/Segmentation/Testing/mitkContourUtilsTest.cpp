@@ -21,34 +21,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 #include "mitkDataNodeFactory.h"
 
+#include "mitkContourModelReader.h"
+
   void TestContourModel2itkMesh()
   {
-    mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+    mitk::ContourModel::Pointer contourModel = mitk::ContourModel::New();
     mitk::ContourUtils::Pointer utils = mitk::ContourUtils::New();
 
-    mitk::Point3D p,p1,p2;
-
-    p[0] = 0;
-    p[1] = 0;
-    p[2] = 0;
-
-    p1[0] = 1;
-    p1[1] = 0;
-    p1[2] = 0;
-
-    p2[0] = 1;
-    p2[1] = 0;
-    p2[2] = 1;
-
-    contour->AddVertex(p);
-    contour->AddVertex(p1);
-    contour->AddVertex(p2);
-
-    MITK_INFO << "test";
-    MITK_TEST_CONDITION(contour->GetNumberOfVertices() > 0, "Add a Vertex, size increased");
+    mitk::Point3D p,p1,p2,p3;
 
     //load a image file for testing
-    std::string path = "/home/woitzik/mitk/src/MITK/Modules/Segmentation/Testing/Data/img.nrrd";
+    std::string path = "/home/woitzik/mitk/src/MITK/Modules/Segmentation/Testing/Data/Sigmoid.nrrd";
 
     mitk::Image::Pointer image = NULL;
     mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
@@ -78,8 +61,35 @@ See LICENSE.txt or http://www.mitk.org for details.
       return;
     }
 
+
+    p[0] = 0;
+    p[1] = 0;
+    p[2] = 0;
+
+    p1[0] = 100;
+    p1[1] = 0;
+    p1[2] = 0;
+
+    p2[0] = 100;
+    p2[1] = 100;
+    p2[2] = 0;
+
+    p3[0] = 0;
+    p3[1] = 100;
+    p3[2] = 0;
+
+    contourModel->AddVertex(p);
+    contourModel->AddVertex(p1);
+    contourModel->AddVertex(p2);
+    contourModel->AddVertex(p3);
+
+    //mitk::ContourModelReader::Pointer contourReader = mitk::ContourModelReader::New();
+    //contourReader->SetFileName("/home/woitzik/TestingMethodeOutput/workingContourNode.cnt");
+    //contourReader->Update();
+    //contour = contourReader->GetOutput();
+
     //test FillContourInSlice
-    utils->FillContourInSlice( contour, 0, image, 1 );
+    utils->FillContourInSlice( contourModel, 0, image, 1 );
 
     //MITK_INFO << utils->m_mesh;
     MITK_INFO << "should be done";

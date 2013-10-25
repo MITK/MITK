@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>179</width>
+    <width>260</width>
     <height>77</height>
    </rect>
   </property>
@@ -48,7 +48,17 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
+       <widget class="QCheckBox" name="m_ChkShowPositionNodes">
+        <property name="text">
+         <string>Show Position Nodes</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="m_btAccept">
+        <property name="toolTip">
+         <string>Accept Interpolation</string>
+        </property>
         <property name="text">
          <string/>
         </property>

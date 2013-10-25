@@ -23,8 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataStorage.h"
 #include "mitkSurfaceInterpolationController.h"
 #include "mitkToolManager.h"
-#include "mitkDiffSliceOperation.h"
-#include "mitkContourModelSet.h"
+//#include "mitkDiffSliceOperation.h"
+//#include "mitkContourModelSet.h"
 #include "mitkLabelSetImage.h"
 
 #include <map>
@@ -82,37 +82,31 @@ class SegmentationUI_EXPORT QmitkSurfaceBasedInterpolator : public QWidget
     void OnSurfaceInterpolationInfoChanged(const itk::EventObject&);
 
     /**
-     * @brief Set the visibility of the 3d interpolation
+     * @brief Set the visibility of the interpolation
      */
-    void Show3DInterpolationResult(bool);
+    void ShowInterpolationResult(bool);
 
   signals:
 
-    void signalSliceBasedInterpolationEnabled(bool);
+    void SignalShowMarkerNodes(bool);
 
   protected slots:
 
-    /**
-      Reaction to groupbox checked
-    */
     void OnActivateWidget(bool);
 
-    /*
-     Reaction to button clicks
-    */
-    void OnAccept3DInterpolationClicked();
+    void OnAcceptInterpolationClicked();
 
     void OnSurfaceInterpolationFinished();
 
-    void Run3DInterpolation();
+    void OnRunInterpolation();
+
+    void OnShowMarkers(bool);
 
     void StartUpdateInterpolationTimer();
 
     void StopUpdateInterpolationTimer();
 
     void ChangeSurfaceColor();
-
-    void On3DInterpolationActivated(bool);
 
 private:
 
@@ -130,8 +124,8 @@ private:
 
     unsigned int m_SurfaceInterpolationInfoChangedObserverTag;
 
-    mitk::DiffSliceOperation* m_doOperation;
-    mitk::DiffSliceOperation* m_undoOperation;
+//    mitk::DiffSliceOperation* m_doOperation;
+//    mitk::DiffSliceOperation* m_undoOperation;
 
     mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
     mitk::DataNode::Pointer m_3DContourNode;

@@ -22,19 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProgressBar.h"
 #include "mitkOperationEvent.h"
 #include "mitkInteractionConst.h"
-#include "mitkApplyDiffImageOperation.h"
-#include "mitkDiffImageApplier.h"
-#include <mitkDiffSliceOperationApplier.h>
+//#include "mitkApplyDiffImageOperation.h"
+//#include "mitkDiffImageApplier.h"
+//#include <mitkDiffSliceOperationApplier.h>
 #include "mitkUndoController.h"
 #include "mitkSegTool2D.h"
 #include "mitkSurfaceToImageFilter.h"
 #include "mitkSliceNavigationController.h"
-//#include <mitkVtkImageOverwrite.h>
-//#include <mitkExtractSliceFilter.h>
-#include <mitkLabelSetImage.h>
-//#include <mitkImageTimeSelector.h>
-//#include <mitkImageToContourModelSetFilter.h>
-//#include <mitkContourUtils.h>
 #include <mitkToolManagerProvider.h>
 
 #include "QmitkStdMultiWidget.h"
@@ -54,7 +48,9 @@ m_Activated(false)
   m_Controls.setupUi(this);
 
   connect(m_Controls.m_gbControls, SIGNAL(toggled(bool)), this, SLOT(OnActivateWidget(bool)));
-  connect(m_Controls.m_btAccept, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
+  connect(m_Controls.m_btAccept, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
+  connect(m_Controls.m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
+  connect(m_Controls.m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SIGNAL(SignalShowMarkerNodes(bool)));
 
   itk::ReceptorMemberCommand<QmitkSurfaceBasedInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSurfaceBasedInterpolator>::New();
   command->SetCallbackFunction( this, &QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationInfoChanged );
@@ -141,7 +137,7 @@ QmitkSurfaceBasedInterpolator::~QmitkSurfaceBasedInterpolator()
   delete m_Timer;
 }
 
-void QmitkSurfaceBasedInterpolator::Show3DInterpolationResult(bool status)
+void QmitkSurfaceBasedInterpolator::ShowInterpolationResult(bool status)
 {
    if (m_InterpolatedSurfaceNode.IsNotNull())
       m_InterpolatedSurfaceNode->SetVisibility(status);
@@ -163,7 +159,7 @@ void QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationFinished()
     m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
     m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
 
-    this->Show3DInterpolationResult(true);
+    this->ShowInterpolationResult(true);
 
     if( !m_DataStorage->Exists(m_InterpolatedSurfaceNode) && !m_DataStorage->Exists(m_3DContourNode))
     {
@@ -175,8 +171,19 @@ void QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationFinished()
   {
     if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
     {
-      this->Show3DInterpolationResult(false);
+      this->ShowInterpolationResult(false);
     }
+  }
+}
+
+void QmitkSurfaceBasedInterpolator::OnShowMarkers(bool state)
+{
+  mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = m_DataStorage->GetSubset(
+    mitk::NodePredicateProperty::New("isContourMarker", mitk::BoolProperty::New(true)));
+
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = allContourMarkers->Begin(); it != allContourMarkers->End(); ++it)
+  {
+    it->Value()->SetProperty("helper object", mitk::BoolProperty::New(!state));
   }
 }
 
@@ -234,75 +241,14 @@ void QmitkSurfaceBasedInterpolator::OnToolManagerWorkingDataModified()
   m_WorkingImage = workingImage;
 
   //Updating the current selected segmentation for the 3D interpolation
-  this->SetCurrentContourListID();
+  bool isInterpolationResult(false);
+  workingNode->GetBoolProperty("3DInterpolationResult", isInterpolationResult);
+
+  if (!isInterpolationResult)
+    this->SetCurrentContourListID();
 }
 
-void QmitkSurfaceBasedInterpolator::On3DInterpolationActivated(bool enabled)
-{
-  m_Activated = enabled;
-
-
-  try
-  {
-    if ( m_DataStorage.IsNotNull() && m_ToolManager && m_Activated)
-    {
-      mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-
-      if (workingNode)
-      {
-        bool isInterpolationResult(false);
-        workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
-
-        if ((workingNode->IsSelected() &&
-             workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")))) &&
-            !isInterpolationResult && m_Activated)
-        {
-          int ret = QMessageBox::Yes;
-
-          if (m_SurfaceInterpolator->EstimatePortionOfNeededMemory() > 0.5)
-          {
-            QMessageBox msgBox;
-            msgBox.setText("Due to short handed system memory the 3D interpolation may be very slow!");
-            msgBox.setInformativeText("Are you sure you want to activate the 3D interpolation?");
-            msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
-            ret = msgBox.exec();
-          }
-
-          if (m_Watcher.isRunning())
-            m_Watcher.waitForFinished();
-
-          if (ret == QMessageBox::Yes)
-          {
-            m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolator::Run3DInterpolation);
-            m_Watcher.setFuture(m_Future);
-          }
-        }
-        else if (!m_Activated)
-        {
-          this->Show3DInterpolationResult(false);
-//          m_Controls.m_btAccept->setEnabled(m_Activated);
-        }
-      }
-      else
-      {
-        QWidget::setEnabled( false );
-//        m_ChkShowPositionNodes->setEnabled(m_3DInterpolationEnabled);
-      }
-    }
-    if (!m_Activated)
-    {
-       this->Show3DInterpolationResult(false);
-//       m_Controls.m_btAccept->setEnabled(m_Activated);
-    }
-  }
-  catch(...)
-  {
-    MITK_ERROR<<"Error with 3D surface interpolation!";
-  }
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkSurfaceBasedInterpolator::Run3DInterpolation()
+void QmitkSurfaceBasedInterpolator::OnRunInterpolation()
 {
   m_SurfaceInterpolator->Interpolate();
 }
@@ -310,52 +256,35 @@ void QmitkSurfaceBasedInterpolator::Run3DInterpolation()
 void QmitkSurfaceBasedInterpolator:: SetCurrentContourListID()
 {
   // New ContourList = hide current interpolation
-  this->Show3DInterpolationResult(false);
+  this->ShowInterpolationResult(false);
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-
-  if (workingNode)
+  mitk::Vector3D spacing = m_WorkingImage->GetGeometry(0)->GetSpacing();
+  double minSpacing (100);
+  double maxSpacing (0);
+  for (int i =0; i < 3; i++)
   {
-    bool isInterpolationResult(false);
-    workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
-
-    if (!isInterpolationResult)
+    if (spacing[i] < minSpacing)
     {
-      //TODO Aufruf hier pruefen!
-      mitk::Vector3D spacing = workingNode->GetData()->GetGeometry(0)->GetSpacing();
-      double minSpacing (100);
-      double maxSpacing (0);
-      for (int i =0; i < 3; i++)
-      {
-        if (spacing[i] < minSpacing)
-        {
-          minSpacing = spacing[i];
-        }
-        else if (spacing[i] > maxSpacing)
-        {
-          maxSpacing = spacing[i];
-        }
-      }
-
-      m_SurfaceInterpolator->SetSegmentationImage(dynamic_cast<mitk::Image*>(workingNode->GetData()));
-      m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
-      m_SurfaceInterpolator->SetMinSpacing(minSpacing);
-      m_SurfaceInterpolator->SetDistanceImageVolume(50000);
-
-      mitk::Image* segmentationImage = dynamic_cast<mitk::Image*>(workingNode->GetData());
-      if (segmentationImage->GetDimension() == 3)
-        m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(segmentationImage);
-      else
-        MITK_INFO<<"3D Interpolation is only supported for 3D images at the moment!";
-
-      if (m_Activated)
-      {
-        if (m_Watcher.isRunning())
-          m_Watcher.waitForFinished();
-        m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolator::Run3DInterpolation);
-        m_Watcher.setFuture(m_Future);
-      }
+      minSpacing = spacing[i];
     }
+    else if (spacing[i] > maxSpacing)
+    {
+      maxSpacing = spacing[i];
+    }
+  }
+
+  m_SurfaceInterpolator->SetSegmentationImage(m_WorkingImage);
+  m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
+  m_SurfaceInterpolator->SetMinSpacing(minSpacing);
+  m_SurfaceInterpolator->SetDistanceImageVolume(50000);
+  m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(m_WorkingImage);
+
+  if (m_Activated)
+  {
+    if (m_Watcher.isRunning())
+      m_Watcher.waitForFinished();
+    m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolator::OnRunInterpolation);
+    m_Watcher.setFuture(m_Future);
   }
 }
 
@@ -409,7 +338,7 @@ void QmitkSurfaceBasedInterpolator::OnActivateWidget(bool enabled)
 
     if (ret == QMessageBox::Yes)
     {
-      m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolator::Run3DInterpolation);
+      m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolator::OnRunInterpolation);
       m_Watcher.setFuture(m_Future);
     }
   }
@@ -424,21 +353,18 @@ void QmitkSurfaceBasedInterpolator::OnActivateWidget(bool enabled)
       m_DataStorage->Remove( m_3DContourNode );
     }
 
-    this->Show3DInterpolationResult(false);
-
     mitk::UndoController::GetCurrentUndoModel()->Clear();
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkSurfaceBasedInterpolator::OnAccept3DInterpolationClicked()
+void QmitkSurfaceBasedInterpolator::OnAcceptInterpolationClicked()
 {
   if (m_InterpolatedSurfaceNode.IsNotNull() && m_InterpolatedSurfaceNode->GetData())
   {
     m_WorkingImage->SurfaceStamp(dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData()), false);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    this->Show3DInterpolationResult(false);
+    this->ShowInterpolationResult(false);
   }
 }
 
@@ -448,7 +374,7 @@ void QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationInfoChanged(const itk:
   {
     if (m_Watcher.isRunning())
       m_Watcher.waitForFinished();
-    m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolator::Run3DInterpolation);
+    m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolator::OnRunInterpolation);
     m_Watcher.setFuture(m_Future);
   }
 }

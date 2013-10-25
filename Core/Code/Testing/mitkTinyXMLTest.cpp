@@ -25,6 +25,11 @@ static const std::string filename = itksys::SystemTools::GetCurrentWorkingDirect
 static const std::string elementToStoreAttributeName = "DoubleTest";
 static const std::string attributeToStoreName        = "CommaValue";
 
+/**
+ * create a simple xml document which stores the values
+ * @param valueToWrite  value which should be stored
+ * @return  true, if document was successfully created.
+ */
 static bool Setup(double valueToWrite)
 {
   // 1. create simple document
@@ -49,7 +54,6 @@ static bool Setup(double valueToWrite)
 
 static int readValueFromSetupDocument(double& readOutValue)
 {
-
   TiXmlDocument document;
 
   if (!document.LoadFile(filename))
@@ -71,7 +75,7 @@ static void TearDown()
 
 static void Test_Setup_works()
 {
-  MITK_TEST_CONDITION_REQUIRED(Setup(1.0), "Test Setup failed, could not write xml to " << filename);
+  MITK_TEST_CONDITION_REQUIRED(Setup(1.0), "Test if setup correctly writes data to " << filename);
 }
 
 /**
@@ -89,20 +93,67 @@ static void Test_ReadOutValue_works()
 }
 
 
+
 static void Test_DoubleValueWriteOut()
 {
   const double valueToWrite          = -1.123456;
-  const int    validDigitsAfterComma = 7; // indicates the number of valid digits after comma of valueToWrite
-  const double neededPrecision       = 1.0 / ((double) validDigitsAfterComma);
+  const int    validDigitsAfterComma = 6; // indicates the number of valid digits after comma of valueToWrite
+  const double neededPrecision       = 1.0 / ((double) validDigitsAfterComma + 1);
+  double       readValue;
 
   Setup(valueToWrite);
 
-  double readValue;
+  TiXmlBase::SetRequiredDecimalPlaces(validDigitsAfterComma);
 
   readValueFromSetupDocument(readValue);
 
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(valueToWrite, neededPrecision),
-      std::setprecision(validDigitsAfterComma) << "Testing if value " << valueToWrite << " equals " << readValue
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(valueToWrite, readValue, neededPrecision),
+      std::setprecision(validDigitsAfterComma) <<
+      "Testing if value " << valueToWrite << " equals " << readValue
+      << " which was retrieved from TinyXML document");
+
+  TearDown();
+}
+
+static void Test_DoubleValueWriteOut_manyDecimalPlaces()
+{
+  const double valueToWrite          = -1.12345678910111;
+  const int    validDigitsAfterComma = 14; // indicates the number of valid digits after comma of valueToWrite
+  const double neededPrecision       = 1.0 / ((double) validDigitsAfterComma + 1);
+  double       readValue;
+
+  Setup(valueToWrite);
+
+  TiXmlBase::SetRequiredDecimalPlaces(validDigitsAfterComma);
+
+  readValueFromSetupDocument(readValue);
+
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(valueToWrite, readValue, neededPrecision),
+      std::setprecision(validDigitsAfterComma) <<
+      "Testing if value " << valueToWrite << " equals " << readValue
+      << " which was retrieved from TinyXML document");
+
+  TearDown();
+}
+
+static void Test_DoubleValueWriteOut_tooLittlePrecision()
+{
+  const double valueToWrite          = -1.12345678910111;
+  const int    validDigitsAfterComma = 14; // indicates the number of valid digits after comma of valueToWrite
+  const double neededPrecision       = 1.0 / ((double) validDigitsAfterComma + 1);
+  double       readValue;
+
+  Setup(valueToWrite);
+
+  // this should lead the readout value to be different since
+  // only the first 4 digits are written to xml.
+  TiXmlBase::SetRequiredDecimalPlaces(4);
+
+  readValueFromSetupDocument(readValue);
+
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(valueToWrite, readValue, neededPrecision),
+      std::setprecision(validDigitsAfterComma) <<
+      "Testing if value " << valueToWrite << " equals " << readValue
       << " which was retrieved from TinyXML document");
 
   TearDown();
@@ -115,6 +166,8 @@ int mitkTinyXMLTest(int /* argc */, char* /*argv*/[])
   Test_Setup_works();
   Test_ReadOutValue_works();
   Test_DoubleValueWriteOut();
+  Test_DoubleValueWriteOut_manyDecimalPlaces();
+  Test_DoubleValueWriteOut_tooLittlePrecision();
 
   MITK_TEST_END()
 }

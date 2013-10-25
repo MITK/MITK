@@ -15,14 +15,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkSurfaceInterpolationController.h"
+
 #include "mitkMemoryUtilities.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
-
 #include "mitkImageToSurfaceFilter.h"
+#include "mitkInteractionConst.h"
+#include "mitkColorProperty.h"
+#include "mitkProperties.h"
 
-mitk::SurfaceInterpolationController::SurfaceInterpolationController()
-  :m_SelectedSegmentation(0)
+#include "vtkPolygon.h"
+#include "vtkPoints.h"
+#include "vtkCellArray.h"
+#include "vtkPolyData.h"
+#include "vtkSmartPointer.h"
+#include "vtkAppendPolyData.h"
+#include "vtkMarchingCubes.h"
+#include "vtkImageData.h"
+#include "mitkVtkRepresentationProperty.h"
+#include "vtkProperty.h"
+
+#include <itkCommand.h>
+
+mitk::SurfaceInterpolationController::SurfaceInterpolationController() :
+m_SelectedSegmentation(0)
 {
   m_ReduceFilter = ReduceContourSetFilter::New();
   m_NormalsFilter = ComputeContourSetNormalsFilter::New();
@@ -74,7 +90,7 @@ mitk::SurfaceInterpolationController* mitk::SurfaceInterpolationController::GetI
   return m_Instance;
 }
 
-void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer newContour ,RestorePlanePositionOperation* op)
+void mitk::SurfaceInterpolationController::AddNewContour(mitk::Surface::Pointer newContour, RestorePlanePositionOperation* op)
 {
   AffineTransform3D::Pointer transform = AffineTransform3D::New();
   transform = op->GetTransform();
@@ -84,23 +100,22 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
 
   for (unsigned int i = 0; i < m_MapOfContourLists[m_SelectedSegmentation].size(); i++)
   {
-      itk::Matrix<float> diffM = transform->GetMatrix()-m_MapOfContourLists[m_SelectedSegmentation].at(i).position->GetTransform()->GetMatrix();
-      bool isSameMatrix(true);
-      for (unsigned int j = 0; j < 3; j++)
+    itk::Matrix<float> diffM = transform->GetMatrix()-m_MapOfContourLists[m_SelectedSegmentation].at(i).position->GetTransform()->GetMatrix();
+    bool isSameMatrix(true);
+    for (unsigned int j = 0; j < 3; j++)
+    {
+      if (fabs(diffM[j][0]) > 0.0001 && fabs(diffM[j][1]) > 0.0001 && fabs(diffM[j][2]) > 0.0001)
       {
-        if (fabs(diffM[j][0]) > 0.0001 && fabs(diffM[j][1]) > 0.0001 && fabs(diffM[j][2]) > 0.0001)
-        {
-          isSameMatrix = false;
-          break;
-        }
-      }
-      itk::Vector<float> diffV = m_MapOfContourLists[m_SelectedSegmentation].at(i).position->GetTransform()->GetOffset()-transform->GetOffset();
-      if ( isSameMatrix && m_MapOfContourLists[m_SelectedSegmentation].at(i).position->GetPos() == op->GetPos() && (fabs(diffV[0]) < 0.0001 && fabs(diffV[1]) < 0.0001 && fabs(diffV[2]) < 0.0001) )
-      {
-        pos = i;
+        isSameMatrix = false;
         break;
       }
-
+    }
+    itk::Vector<float> diffV = m_MapOfContourLists[m_SelectedSegmentation].at(i).position->GetTransform()->GetOffset()-transform->GetOffset();
+    if ( isSameMatrix && m_MapOfContourLists[m_SelectedSegmentation].at(i).position->GetPos() == op->GetPos() && (fabs(diffV[0]) < 0.0001 && fabs(diffV[1]) < 0.0001 && fabs(diffV[2]) < 0.0001) )
+    {
+      pos = i;
+      break;
+    }
   }
 
   //Don't save a new empty contour
@@ -143,12 +158,6 @@ void mitk::SurfaceInterpolationController::Interpolate()
     return;
   }
 
-  //Setting up progress bar
-   /*
-    * Removed due to bug 12441. ProgressBar messes around with Qt event queue which is fatal for segmentation
-    */
-  //mitk::ProgressBar::GetInstance()->AddStepsToDo(8);
-
   // update the filter and get teh resulting distance-image
   m_InterpolateSurfaceFilter->Update();
   Image::Pointer distanceImage = m_InterpolateSurfaceFilter->GetOutput();
@@ -160,7 +169,6 @@ void mitk::SurfaceInterpolationController::Interpolate()
   imageToSurfaceFilter->Update();
   m_InterpolationResult = imageToSurfaceFilter->GetOutput();
 
-
   vtkSmartPointer<vtkAppendPolyData> polyDataAppender = vtkSmartPointer<vtkAppendPolyData>::New();
   for (unsigned int i = 0; i < m_ReduceFilter->GetNumberOfOutputs(); i++)
   {
@@ -169,28 +177,17 @@ void mitk::SurfaceInterpolationController::Interpolate()
   polyDataAppender->Update();
   m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());
 
-  //Last progress step
-  /*
-   * Removed due to bug 12441. ProgressBar messes around with Qt event queue which is fatal for segmentation
-   */
-  //mitk::ProgressBar::GetInstance()->Progress(8);
-
   m_InterpolationResult->DisconnectPipeline();
 }
 
 mitk::Surface::Pointer mitk::SurfaceInterpolationController::GetInterpolationResult()
 {
-    return m_InterpolationResult;
+  return m_InterpolationResult;
 }
 
 mitk::Surface* mitk::SurfaceInterpolationController::GetContoursAsSurface()
 {
   return m_Contours;
-}
-
-void mitk::SurfaceInterpolationController::SetDataStorage(DataStorage::Pointer ds)
-{
-  m_DataStorage = ds;
 }
 
 void mitk::SurfaceInterpolationController::SetMinSpacing(double minSpacing)
@@ -251,7 +248,6 @@ void mitk::SurfaceInterpolationController::SetCurrentSegmentationInterpolationLi
   ContourListMap::iterator it = m_MapOfContourLists.find(segmentation);
 
   m_SelectedSegmentation = segmentation;
-
 
   itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
   AccessFixedDimensionByItk_1( m_SelectedSegmentation, GetImageBase, 3, itkImage );

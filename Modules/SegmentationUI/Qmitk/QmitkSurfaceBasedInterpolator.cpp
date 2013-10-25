@@ -22,9 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProgressBar.h"
 #include "mitkOperationEvent.h"
 #include "mitkInteractionConst.h"
-//#include "mitkApplyDiffImageOperation.h"
-//#include "mitkDiffImageApplier.h"
-//#include <mitkDiffSliceOperationApplier.h>
+#include "mitkVtkRepresentationProperty.h"
 #include "mitkUndoController.h"
 #include "mitkSegTool2D.h"
 #include "mitkSurfaceToImageFilter.h"
@@ -34,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkStdMultiWidget.h"
 
 #include <itkCommand.h>
+#include <vtkProperty.h>
 
 #include <QMessageBox>
 
@@ -50,7 +49,6 @@ m_Activated(false)
   connect(m_Controls.m_gbControls, SIGNAL(toggled(bool)), this, SLOT(OnActivateWidget(bool)));
   connect(m_Controls.m_btAccept, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
   connect(m_Controls.m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
-  connect(m_Controls.m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SIGNAL(SignalShowMarkerNodes(bool)));
 
   itk::ReceptorMemberCommand<QmitkSurfaceBasedInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSurfaceBasedInterpolator>::New();
   command->SetCallbackFunction( this, &QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationInfoChanged );
@@ -185,6 +183,20 @@ void QmitkSurfaceBasedInterpolator::OnShowMarkers(bool state)
   {
     it->Value()->SetProperty("helper object", mitk::BoolProperty::New(!state));
   }
+
+  mitk::SegTool2D::Pointer manualSegmentationTool;
+
+  unsigned int numberOfExistingTools = m_ToolManager->GetTools().size();
+
+  for(unsigned int i = 0; i < numberOfExistingTools; i++)
+  {
+    manualSegmentationTool = dynamic_cast<mitk::SegTool2D*>(m_ToolManager->GetToolById(i));
+
+    if (manualSegmentationTool)
+    {
+      manualSegmentationTool->SetShowMarkerNodes( state );
+    }
+  }
 }
 
 void QmitkSurfaceBasedInterpolator::StartUpdateInterpolationTimer()
@@ -255,7 +267,6 @@ void QmitkSurfaceBasedInterpolator::OnRunInterpolation()
 
 void QmitkSurfaceBasedInterpolator:: SetCurrentContourListID()
 {
-  // New ContourList = hide current interpolation
   this->ShowInterpolationResult(false);
 
   mitk::Vector3D spacing = m_WorkingImage->GetGeometry(0)->GetSpacing();

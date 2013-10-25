@@ -21,29 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SurfaceInterpolationExports.h"
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkSurface.h"
-#include "mitkInteractionConst.h"
-#include "mitkColorProperty.h"
-#include "mitkProperties.h"
 
 #include "mitkCreateDistanceImageFromSurfaceFilter.h"
 #include "mitkReduceContourSetFilter.h"
 #include "mitkComputeContourSetNormalsFilter.h"
-
-#include "mitkDataNode.h"
-#include "mitkDataStorage.h"
-#include "mitkWeakPointer.h"
-
-#include "vtkPolygon.h"
-#include "vtkPoints.h"
-#include "vtkCellArray.h"
-#include "vtkPolyData.h"
-#include "vtkSmartPointer.h"
-#include "vtkAppendPolyData.h"
-
-#include "vtkMarchingCubes.h"
-#include "vtkImageData.h"
-#include "mitkVtkRepresentationProperty.h"
-#include "vtkProperty.h"
 
 #include "mitkProgressBar.h"
 
@@ -70,17 +51,20 @@ namespace mitk
      */
     void Interpolate ();
 
+    /**
+     * Retrieves the result of the inteporlation
+     */
     mitk::Surface::Pointer GetInterpolationResult();
 
     /**
      * Sets the minimum spacing of the current selected segmentation
-     * This is needed since the contour points we reduced before they are used to interpolate the surface
+     * This is needed since the contour points we reduced before, are used to interpolate the surface
      */
     void SetMinSpacing(double minSpacing);
 
     /**
      * Sets the minimum spacing of the current selected segmentation
-     * This is needed since the contour points we reduced before they are used to interpolate the surface
+     * This is needed since the contour points we reduced before, are used to interpolate the surface
      */
     void SetMaxSpacing(double maxSpacing);
 
@@ -96,21 +80,22 @@ namespace mitk
      */
     void SetSegmentationImage(Image* workingImage);
 
+    /**
+     * Retrieves the input contours as mitk::Surface
+     */
     Surface* GetContoursAsSurface();
 
-    void SetDataStorage(DataStorage::Pointer ds);
-
     /**
-     * Sets the current list of contourpoints which is used for the surface interpolation
-     * @param segmentation The current selected segmentation
+     * Sets the current list of contour points which is used for the surface interpolation
+     * @param workingImage The current selected working image
      */
-    void SetCurrentSegmentationInterpolationList(mitk::Image* segmentation);
+    void SetCurrentSegmentationInterpolationList(mitk::Image* workingImage);
 
     /**
      * Removes the segmentation and all its contours from the list
-     * @param segmentation The segmentation to be removed
+     * @param workingImage The working image to be removed
      */
-    void RemoveSegmentationFromContourList(mitk::Image* segmentation);
+    void RemoveSegmentationFromContourList(mitk::Image* workingImage);
 
     mitk::Image* GetImage();
 
@@ -126,7 +111,8 @@ namespace mitk
 
    ~SurfaceInterpolationController();
 
-   template<typename TPixel, unsigned int VImageDimension> void GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& result);
+   template<typename TPixel, unsigned int VImageDimension>
+   void GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& result);
 
  private:
 
@@ -156,8 +142,6 @@ namespace mitk
     vtkSmartPointer<vtkPolyData> m_PolyData;
 
     unsigned int m_DistImageVolume;
-
-    mitk::DataStorage::Pointer m_DataStorage;
 
     ContourListMap m_MapOfContourLists;
 

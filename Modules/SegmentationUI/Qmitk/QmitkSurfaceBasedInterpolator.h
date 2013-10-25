@@ -17,14 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkSurfaceBasedInterpolator_h_Included
 #define QmitkSurfaceBasedInterpolator_h_Included
 
-#include "mitkSliceNavigationController.h"
 #include "SegmentationUIExports.h"
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "mitkSurfaceInterpolationController.h"
 #include "mitkToolManager.h"
-//#include "mitkDiffSliceOperation.h"
-//#include "mitkContourModelSet.h"
 #include "mitkLabelSetImage.h"
 
 #include <map>
@@ -85,10 +82,6 @@ class SegmentationUI_EXPORT QmitkSurfaceBasedInterpolator : public QWidget
      * @brief Set the visibility of the interpolation
      */
     void ShowInterpolationResult(bool);
-
-  signals:
-
-    void SignalShowMarkerNodes(bool);
 
   protected slots:
 

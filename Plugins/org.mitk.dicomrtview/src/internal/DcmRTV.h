@@ -43,6 +43,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
 
+#include <mitkImage.h>
+#include <mitkPixelType.h>
+
 #include <mitkExtractImageFilter.h>
 
 #include <QFileDialog>

@@ -151,8 +151,9 @@ void DcmRTV::LoadRTDoseFile()
   DcmDataset *dataset = file.getDataset();
 
 //  mitk::LookupTable::Pointer mitkLUT;
-  vtkSmartPointer<vtkColorTransferFunction> transFunc = vtkSmartPointer<vtkColorTransferFunction>::New();
-  transFunc = _DicomRTReader->LoadRTDose(dataset);
+//  vtkSmartPointer<vtkColorTransferFunction> transFunc = vtkSmartPointer<vtkColorTransferFunction>::New();
+  mitk::Image::Pointer mitkImage = mitk::Image::New();
+  mitkImage = _DicomRTReader->LoadRTDose(dataset);
 
 //  mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
 //  mitkLutProp->SetLookupTable(mitkLUT);
@@ -163,20 +164,21 @@ void DcmRTV::LoadRTDoseFile()
   mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries( files );
   mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
   mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
-  mitkTransFunc->SetColorTransferFunction(transFunc);
-  mitkTransFuncProp->SetValue(mitkTransFunc);
-  node->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
+//  mitkTransFunc->SetColorTransferFunction(transFunc);
+//  mitkTransFuncProp->SetValue(mitkTransFunc);
+//  node->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
 //  node->SetProperty("LookupTable", mitkLutProp);
-  node->SetProperty("Image Rendering.Mode", renderingMode);
+  node->SetData(mitkImage);
+//  node->SetProperty("Image Rendering.Mode", renderingMode);
   node->SetProperty("opacity", mitk::FloatProperty::New(1.0));
   node->SetName("DicomRT Dose");
   GetDataStorage()->Add(node);
 
 
-  mitk::DataNode::Pointer doseNode = GetDataStorage()->GetNamedNode("DicomRT Dose");
-  mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(doseNode->GetData());
+//  mitk::DataNode::Pointer doseNode = GetDataStorage()->GetNamedNode("DicomRT Dose");
+//  mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(doseNode->GetData());
 //  vtkMarchingSquares* contourFilter = vtkMarchingSquares::New();
-  std::deque<mitk::Surface::Pointer> surfaceStorage;
+//  std::deque<mitk::Surface::Pointer> surfaceStorage;
 
 //    mitk::ExtractImageFilter::Pointer imageExtractor = mitk::ExtractImageFilter::New();
 //    mitk::DataNode::Pointer img = this->GetDataStorage()->GetNamedNode("abc");
@@ -218,6 +220,31 @@ void DcmRTV::LoadRTDoseFile()
 //    contourNode->SetData(c);
 //    contourNode->SetName("IsoDose");
 //    GetDataStorage()->Add(contourNode);
+
+  mitk::Image::Pointer image = mitk::Image::New();
+  mitk::PixelType pt = mitk::MakeScalarPixelType<int>();
+  unsigned int dim[] = {2,2,2};
+
+  image->Initialize(pt,3,dim);
+  image->SetSpacing(1.0);
+  mitk::Point3D m_origin;
+  m_origin[0] = 0.0;
+  m_origin[1] = 0.0;
+  m_origin[2] = 0.0;
+  image->SetOrigin(m_origin);
+
+  int *pixel = (int*)image->GetData();
+  int size = dim[0]*dim[1]*dim[2];
+  for(int i=0;i<size;++i,++pixel)
+  {
+    *pixel=i*1000;
+  }
+
+  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+  imageNode->SetName("TestPixture");
+  imageNode->SetData(image);
+
+  GetDataStorage()->Add(imageNode);
 
   mitk::TimeSlicedGeometry::Pointer geo3 = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews( geo3 );

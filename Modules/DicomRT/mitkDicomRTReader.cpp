@@ -96,7 +96,7 @@ namespace mitk
       {
         if(sopClass == UID_RTDoseStorage)
         {
-          vtkSmartPointer<vtkColorTransferFunction> x = vtkSmartPointer<vtkColorTransferFunction>::New();
+          mitk::Image::Pointer x = mitk::Image::New();
           x = this->DicomRTReader::LoadRTDose(dataset);
           ContourModelSetVector y;
           return y;
@@ -444,7 +444,7 @@ namespace mitk
     return 1;
   }
 
-  vtkSmartPointer<vtkColorTransferFunction> DicomRTReader::LoadRTDose(DcmDataset* dataset)
+  mitk::Image::Pointer DicomRTReader::LoadRTDose(DcmDataset* dataset)
   {
     DRTDoseIOD doseObject;
 
@@ -559,42 +559,60 @@ namespace mitk
     gridscale = OFStandard::atof(gridScaling.c_str());
     frames = atoi(nrframes.c_str());
 
-    if(dataset->findAndGetUint16Array(DCM_PixelData, pixelData, &count).good())
+    mitk::Image::Pointer image = mitk::Image::New();
+    mitk::PixelType pt = mitk::MakeScalarPixelType<float>();
+    unsigned int dim[] = {columns,rows,frames};
+
+    image->Initialize( pt, 3, dim);
+    image->SetSpacing(1.0);
+    mitk::Point3D m_origin;
+    m_origin[0] = 0.0;
+    m_origin[1] = 0.0;
+    m_origin[2] = 0.0;
+    image->SetOrigin(m_origin);
+
+    float* pixel = (float*)image->GetData();
+    int size = dim[0]*dim[1]*dim[2];
+
+    for(int i=0; i<size; ++i, ++pixel)
     {
-      fstream f;
-      f.open("PixelData.txt", ios::out);
-      int counter = 0;
-      long highest = 0;
-      for(int i=0;i<frames;i++)
-      {
-        for(int j=0;j<rows;j++)
-        {
-          for(int k=0;k<columns;k++)
-          {
-            if(pixelData[i*rows*columns + j*columns + k]>0){
-              if(pixelData[i*rows*columns + j*columns + k]>highest)
-              {
-                highest = pixelData[i*rows*columns + j*columns + k];
-              }
-//              f << pixelData[i*rows*columns + j*columns + k] << "\n";
-//              f << static_cast<Float32>(pixelData[i*rows*columns + j*columns + k]) * gridscale << "\n\n";
-            }
-            counter++;
-          }
-        }
-      }
-      f << highest;
-      f.close();
-      std::cout << "Number of Frames: " << frames << "\n\n";
-      std::cout << "Number of Data in file: " << counter << "\n\n";
-      std::cout << "Number of Data in file expacted overall: " << rows*columns*frames << "\n\n";
-      std::cout << "Number of Data in file expacted per frame: " << rows*columns << "\n\n";
-      std::cout << "Resolution: " << columns << "x" << rows << "\n\n";
-      std::cout << "Photometricinterpretation: " << photoInterpret << "\n\n";
-      std::cout << "Planar Configuration: " << planarConfig << "\n\n";
-      std::cout << "Samples per Pixel: " << samplesPP << "\n\n";
-      std::cout << "LUT Shape: " << lutShape << "\n\n";
+      *pixel=pixelData[i] * gridscale;
     }
+
+//    if(dataset->findAndGetUint16Array(DCM_PixelData, pixelData, &count).good())
+//    {
+//      fstream f;
+//      f.open("PixelData.txt", ios::out);
+//      long highest = 0;
+//      for(int i=0;i<frames;i++)
+//      {
+//        for(int j=0;j<rows;j++)
+//        {
+//          for(int k=0;k<columns;k++)
+//          {
+//            if(pixelData[i*rows*columns + j*columns + k]>0)
+//            {
+//              if(pixelData[i*rows*columns + j*columns + k]>highest)
+//              {
+//                highest = pixelData[i*rows*columns + j*columns + k];
+//              }
+//              std::cout << pixelData[i*rows*columns + j*columns + k] << "\n";
+//              f << static_cast<Float32>(pixelData[i*rows*columns + j*columns + k]) * gridscale << "\n\n";
+//            }
+//          }
+//        }
+//      }
+//      f << highest;
+//      f.close();
+//      std::cout << "Number of Frames: " << frames << "\n\n";
+//      std::cout << "Number of Data in file expacted overall: " << rows*columns*frames << "\n\n";
+//      std::cout << "Number of Data in file expacted per frame: " << rows*columns << "\n\n";
+//      std::cout << "Resolution: " << columns << "x" << rows << "\n\n";
+//      std::cout << "Photometricinterpretation: " << photoInterpret << "\n\n";
+//      std::cout << "Planar Configuration: " << planarConfig << "\n\n";
+//      std::cout << "Samples per Pixel: " << samplesPP << "\n\n";
+//      std::cout << "LUT Shape: " << lutShape << "\n\n";
+//    }
 
 //#############################################################################################################
 //#############################################################################################################
@@ -606,17 +624,19 @@ namespace mitk
     mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
     mitkLutProp->SetLookupTable(mitkLut);
 
+    double hsvValue = 0.002778;
+
     vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-    transferFunction->AddHSVPoint(0,0.5666712,1,1,1,1);
-    transferFunction->AddHSVPoint(10000,0.5666712,0.53,0.98,1,1);
-    transferFunction->AddHSVPoint(20000,0.513893,0.97,0.97,1,1);
-    transferFunction->AddHSVPoint(30000,0.4055588,0.96,0.68,1,1);
-    transferFunction->AddHSVPoint(40000,0.1472234,0.97,0.97,1,1);
-    transferFunction->AddHSVPoint(50000,0.902785,0.47,0.98,1,1);
-    transferFunction->AddHSVPoint(60000,0.944452,0.97,0.83,1,1);
+    transferFunction->AddHSVPoint(0,0.538932,1,1,1,1);
+    transferFunction->AddHSVPoint(10000,0.455592,1,1,1,1);
+    transferFunction->AddHSVPoint(20000,0.16668,1,1,1,1);
+    transferFunction->AddHSVPoint(30000,(34*hsvValue),1,1,1,1);
+    transferFunction->AddHSVPoint(40000,(295*hsvValue),1,1,1,1);
+    transferFunction->AddHSVPoint(50000,(325*hsvValue),1,1,1,1);
+    transferFunction->AddHSVPoint(60000,(26*hsvValue),1,1,1,1);
     transferFunction->Build();
 
-    return transferFunction;
+    return image;
   }
 
   bool DicomRTReader::Equals(mitk::ContourModel::Pointer first, mitk::ContourModel::Pointer second)

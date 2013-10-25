@@ -51,6 +51,9 @@ namespace mitk
 
     virtual ~NamedContourModelSet();
 
+    std::vector<mitk::NamedContourModelSet::NamedContourModelSetInt> namedContourModelSetVector;
+    void SetNamedContourModelSet(mitk::ContourModelSet::Pointer, char*);
+
   protected:
 
     NamedContourModelSet();

@@ -15,12 +15,15 @@ set(CPP_FILES
   IGTFilters/mitkNavigationDataToNavigationDataFilter.cpp
   IGTFilters/mitkNavigationDataToPointSetFilter.cpp
   IGTFilters/mitkNavigationDataEvaluationFilter.cpp
+  IGTFilters/mitkNavigationDataSmoothingFilter.cpp
 
   IGTFilters/mitkTrackingDeviceSource.cpp
   IGTFilters/mitkTrackingVolumeGenerator.cpp
   IGTFilters/mitkIGTTimeStamp.cpp
   IGTFilters/mitkRealTimeClock.cpp
   IGTFilters/mitkTrackingDeviceSourceConfigurator.cpp
+
+  IGTFilters/mitkDelayFilter.cpp
 
   IGTTrackingDevices/mitkClaronTool.cpp
   IGTTrackingDevices/mitkClaronTrackingDevice.cpp

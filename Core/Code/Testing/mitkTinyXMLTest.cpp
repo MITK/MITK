@@ -25,6 +25,11 @@ static const std::string  filename = itksys::SystemTools::GetCurrentWorkingDirec
 static const std::string  elementToStoreAttributeName = "DoubleTest";
 static const std::string  attributeToStoreName        = "CommaValue";
 
+static double calcPrecision(const unsigned int requiredDecimalPlaces)
+{
+  return pow(1.0, -1.0 * ((double) requiredDecimalPlaces));
+}
+
 /**
  * create a simple xml document which stores the values
  * @param valueToWrite  value which should be stored
@@ -145,7 +150,7 @@ static void Test_DoubleValueWriteOut_tooLittlePrecision()
   const double neededPrecision       = 1.0 / ((double) validDigitsAfterComma + 1);
   double       readValue;
 
-  Setup(valueToWrite, validDigitsAfterComma);
+  Setup(valueToWrite, 6);
 
   readValueFromSetupDocument(readValue);
 

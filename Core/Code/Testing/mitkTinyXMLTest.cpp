@@ -27,7 +27,7 @@ static const std::string  attributeToStoreName        = "CommaValue";
 
 static double calcPrecision(const unsigned int requiredDecimalPlaces)
 {
-  return pow(1.0, -1.0 * ((double) requiredDecimalPlaces));
+  return pow(10.0, -1.0 * ((double) requiredDecimalPlaces));
 }
 
 /**
@@ -108,7 +108,7 @@ static void Test_DoubleValueWriteOut()
 {
   const double valueToWrite          = -1.123456;
   const int    validDigitsAfterComma = 6; // indicates the number of valid digits after comma of valueToWrite
-  const double neededPrecision       = 1.0 / ((double) validDigitsAfterComma + 1);
+  const double neededPrecision       = calcPrecision(validDigitsAfterComma + 1);
   double       readValue;
 
   Setup(valueToWrite, validDigitsAfterComma);
@@ -127,7 +127,7 @@ static void Test_DoubleValueWriteOut_manyDecimalPlaces()
 {
   const double valueToWrite          = -1.12345678910111;
   const int    validDigitsAfterComma = 14; // indicates the number of valid digits after comma of valueToWrite
-  const double neededPrecision       = 1.0 / ((double) validDigitsAfterComma + 1);
+  const double neededPrecision       = calcPrecision(validDigitsAfterComma + 1);
   double       readValue;
 
   Setup(valueToWrite, validDigitsAfterComma);
@@ -147,7 +147,7 @@ static void Test_DoubleValueWriteOut_tooLittlePrecision()
 {
   const double valueToWrite          = -1.12345678910111;
   const int    validDigitsAfterComma = 14; // indicates the number of valid digits after comma of valueToWrite
-  const double neededPrecision       = 1.0 / ((double) validDigitsAfterComma + 1);
+  const double neededPrecision       = calcPrecision(validDigitsAfterComma + 1);
   double       readValue;
 
   Setup(valueToWrite, 6);

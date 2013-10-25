@@ -494,22 +494,28 @@ namespace mitk
 
     float* pixel = (float*)image->GetData();
     int size = dim[0]*dim[1]*dim[2];
+    int highest = 0;
 
     for(int i=0; i<size; ++i, ++pixel)
     {
+      if((pixelData[i]*gridscale)>highest)
+      {
+        highest = pixelData[i] * gridscale;
+      }
       *pixel=pixelData[i] * gridscale;
     }
 
+    double prescripeDose = highest * 0.8;
     double hsvValue = 0.002778;
 
     vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
     transferFunction->AddHSVPoint(0,0.538932,1,1,1,1);
-    transferFunction->AddHSVPoint(10000,0.455592,1,1,1,1);
-    transferFunction->AddHSVPoint(20000,0.16668,1,1,1,1);
-    transferFunction->AddHSVPoint(30000,(34*hsvValue),1,1,1,1);
-    transferFunction->AddHSVPoint(40000,(295*hsvValue),1,1,1,1);
-    transferFunction->AddHSVPoint(50000,(325*hsvValue),1,1,1,1);
-    transferFunction->AddHSVPoint(60000,(26*hsvValue),1,1,1,1);
+    transferFunction->AddHSVPoint(highest*0.2,0.455592,1,1,1,1);
+    transferFunction->AddHSVPoint(highest*0.4,0.16668,1,1,1,1);
+    transferFunction->AddHSVPoint(highest*0.5,(34*hsvValue),1,1,1,1);
+    transferFunction->AddHSVPoint(highest*0.6,(295*hsvValue),1,1,1,1);
+    transferFunction->AddHSVPoint(highest*0.7,(325*hsvValue),1,1,1,1);
+    transferFunction->AddHSVPoint(prescripeDose,(26*hsvValue),1,1,1,1);
     transferFunction->Build();
 
     mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
@@ -517,8 +523,12 @@ namespace mitk
     mitkTransFunc->SetColorTransferFunction(transferFunction);
     mitkTransFuncProp->SetValue(mitkTransFunc);
 
+    mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
+    renderingMode->SetValue(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR);
+
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetName("DicomRT Dosis");
+    node->SetProperty("Image Rendering.Mode", renderingMode);
     node->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
     node->SetProperty("opacity", mitk::FloatProperty::New(0.3));
     node->SetData(image);

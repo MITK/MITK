@@ -150,33 +150,10 @@ void DcmRTV::LoadRTDoseFile()
   }
   DcmDataset *dataset = file.getDataset();
 
-//  mitk::LookupTable::Pointer mitkLUT;
-//  vtkSmartPointer<vtkColorTransferFunction> transFunc = vtkSmartPointer<vtkColorTransferFunction>::New();
   mitk::DataNode::Pointer mitkImage = mitk::DataNode::New();
   mitkImage = _DicomRTReader->LoadRTDose(dataset);
 
-//  mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
-//  mitkLutProp->SetLookupTable(mitkLUT);
-
-//  mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-//  renderingMode->SetValue( mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR);
-
-//  mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
-//  mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
-//  mitkTransFunc->SetColorTransferFunction(transFunc);
-//  mitkTransFuncProp->SetValue(mitkTransFunc);
-
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-//  node->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
-//  node->SetProperty("LookupTable", mitkLutProp);
-//  node->SetProperty("Image Rendering.Mode", renderingMode);
-//  node->SetData(mitkImage);
-//  node->SetProperty("opacity", mitk::FloatProperty::New(1.0));
-//  node->SetName("DicomRT Dose");
-//  GetDataStorage()->Add(node);
-
-    GetDataStorage()->Add(mitkImage);
-
+  GetDataStorage()->Add(mitkImage);
 
 //  mitk::DataNode::Pointer doseNode = GetDataStorage()->GetNamedNode("DicomRT Dose");
 //  mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(doseNode->GetData());

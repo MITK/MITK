@@ -32,18 +32,22 @@ namespace mitk
 
   public:
 
-    char* roiName;
-    mitk::ContourModelSet::Pointer contourModelSet;
+    class NamedContourModelSetInt
+    {
+    public:
+      NamedContourModelSetInt();
+      virtual ~NamedContourModelSetInt();
+      void SetRoiName(char*);
+      void SetContourModelSet(mitk::ContourModelSet::Pointer);
+      char* GetRoiName();
+      mitk::ContourModelSet::Pointer GetContourModelSet();
+
+      char* roiName;
+      mitk::ContourModelSet::Pointer contourModelSet;
+    };
 
     mitkClassMacro( NamedContourModelSet, itk::Object )
     itkNewMacro( Self )
-
-    void SetRoiName(char*);
-    void SetContourModelSet(mitk::ContourModelSet::Pointer);
-
-    char* GetRoiName();
-    mitk::ContourModelSet::Pointer GetContourModelSet();
-
 
     virtual ~NamedContourModelSet();
 

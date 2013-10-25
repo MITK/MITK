@@ -400,9 +400,9 @@ int mitk::SerialCommunication::ApplyConfiguration()
   case BaudRate1152000:
     baudrate = B1152000;
     break;
-  case BaudRate1228739:
-    baudrate = B1228739;
-    break;
+  //case BaudRate1228739:
+  //  baudrate = B1228739;
+  //  break;
   case BaudRate1500000:
     baudrate = B1500000;
     break;

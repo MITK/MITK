@@ -112,6 +112,14 @@ public:
     }
   };
 
+  struct MinMaxIndex
+  {
+    double Max;
+    double Min;
+    vnl_vector<int> MaxIndex;
+    vnl_vector<int> MinIndex;
+  };
+
   typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
   typedef std::vector< Statistics > StatisticsContainer;
 
@@ -252,16 +260,23 @@ protected:
     const itk::Image< TPixel, VImageDimension > *image,
     itk::Image< unsigned short, VImageDimension > *maskImage );
 
-  template < typename TPixel, unsigned int VImageDimension>
-  Statistics CalculateMinMaxIndex(
+  template <typename TPixel, unsigned int VImageDimension >
+  MinMaxIndex CalculateMinMaxIndex(
     const itk::Image<TPixel, VImageDimension> *inputImage,
-    itk::Image<unsigned short, VImageDimension> *maskImage);
+    itk::Image<unsigned short, VImageDimension> *maskImage,
+    float minBoundary,
+    float maxBoundary);
 
   template < typename TPixel, unsigned int VImageDimension>
   Statistics CalculateHotspotStatistics(
-    const itk::Image<TPixel, VImageDimension> *inputImage,
+    itk::Image<TPixel, VImageDimension> *inputImage,
     itk::Image<unsigned short, VImageDimension> *maskImage,
     double RadiusInMM);
+
+  template < typename TPixel, unsigned int VImageDimension>
+  bool IsSphereInsideRegion(
+    const itk::Image<TPixel, VImageDimension>  *inputImage,
+    itk::Image<unsigned short, VImageDimension> *sphereImage);
 
   /** Connection from ITK to VTK */
   template <typename ITK_Exporter, typename VTK_Importer>

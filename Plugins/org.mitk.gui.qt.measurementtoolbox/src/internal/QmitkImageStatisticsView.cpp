@@ -658,8 +658,6 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
       "NA" ) );
   }
 
-  this->m_Controls->m_StatisticsTable->setItem( 0, 7, new QTableWidgetItem(
-      QString("%1").arg(s.HotspotMean, 0, 'f', decimals) ) );
 
   QString hotspotPeak; hotspotPeak.append(QString("%1").arg(s.HotspotPeak, 0, 'f', decimals));
     hotspotPeak += " (";
@@ -671,7 +669,7 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
     }
     hotspotPeak += ")";
 
-  this->m_Controls->m_StatisticsTable->setItem( 0, 8, new QTableWidgetItem( hotspotPeak ) );
+  this->m_Controls->m_StatisticsTable->setItem( 0, 7, new QTableWidgetItem( hotspotPeak ) );
 
 
   QString hotspotMax; hotspotMax.append(QString("%1").arg(s.HotspotMax, 0, 'f', decimals));
@@ -684,7 +682,7 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
     }
     hotspotMax += ")";
 
-  this->m_Controls->m_StatisticsTable->setItem( 0, 9, new QTableWidgetItem( hotspotMax ) );
+  this->m_Controls->m_StatisticsTable->setItem( 0, 8, new QTableWidgetItem( hotspotMax ) );
 
 
   QString hotspotMin; hotspotMin.append(QString("%1").arg(s.HotspotMin, 0, 'f', decimals));
@@ -697,11 +695,7 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
     }
     hotspotMin += ")";
 
-  this->m_Controls->m_StatisticsTable->setItem( 0, 10, new QTableWidgetItem( hotspotMin ) );
-
-  this->m_Controls->m_StatisticsTable->setItem( 0, 11, new QTableWidgetItem(
-    QString("%1").arg(s.HotspotSigma, 0, 'f', decimals) ) );
-
+  this->m_Controls->m_StatisticsTable->setItem( 0, 9, new QTableWidgetItem( hotspotMin ) );
 
 
 }

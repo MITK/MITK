@@ -197,11 +197,6 @@
         </row>
         <row>
          <property name="text">
-          <string>Hotspot Mean</string>
-         </property>
-        </row>
-        <row>
-         <property name="text">
           <string>Hotspot Peak</string>
          </property>
         </row>
@@ -213,11 +208,6 @@
         <row>
          <property name="text">
           <string>Hotspot Min</string>
-         </property>
-        </row>
-        <row>
-         <property name="text">
-          <string>Hotspot StdDev</string>
          </property>
         </row>
         <column>

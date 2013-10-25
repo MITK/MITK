@@ -96,7 +96,7 @@ namespace mitk
       {
         if(sopClass == UID_RTDoseStorage)
         {
-          mitk::Image::Pointer x = mitk::Image::New();
+          mitk::DataNode::Pointer x = mitk::DataNode::New();
           x = this->DicomRTReader::LoadRTDose(dataset);
           ContourModelSetVector y;
           return y;
@@ -444,12 +444,9 @@ namespace mitk
     return 1;
   }
 
-  mitk::Image::Pointer DicomRTReader::LoadRTDose(DcmDataset* dataset)
+  mitk::DataNode::Pointer DicomRTReader::LoadRTDose(DcmDataset* dataset)
   {
     DRTDoseIOD doseObject;
-
-//#############################################################################################################
-//######################################## READING CHECK ######################################################
 
     OFCondition result = doseObject.read(*dataset);
     if(result.bad())
@@ -457,84 +454,6 @@ namespace mitk
       std::cout << "Error reading the RT Dose dataset\n\n";
       return 0;
     }
-
-//#############################################################################################################
-//###################################### GRID SCALING CHECK ###################################################
-
-    OFString doseGridScaling;
-    if(doseObject.getDoseGridScaling(doseGridScaling).bad())
-    {
-      std::cout << "Error reading the Dose Grid Scaling\n\n";
-      return 0;
-    }
-    doseObject.setDoseGridScaling(doseGridScaling.c_str());
-
-    std::cout << "Dose Grid Scaling: " << doseGridScaling << "\n\n";
-
-//#############################################################################################################
-//####################################### DOSE UNITS CHECK ####################################################
-
-//    OFString doseUnits;
-//    if(doseObject.getDoseUnits(doseUnits).bad())
-//    {
-//      std::cout << "Error reading the dose units\n\n";
-//      return 0;
-//    }
-//    doseObject.setDoseUnits(doseUnits.c_str());
-
-//    std::cout << "Dose Units: " << doseUnits << "\n\n";
-
-//#############################################################################################################
-//##################################### PIXEL SPACING CHECK ###################################################
-
-    OFVector<Float64> pixelSpacingOFVector;
-    if(doseObject.getPixelSpacing(pixelSpacingOFVector).bad() || pixelSpacingOFVector.size() < 2)
-    {
-      std::cout << "Error reading the pixel spacing for dose object\n\n";
-      return 0;
-    }
-
-    for(int i=0; i<pixelSpacingOFVector.size(); i++)
-    {
-      std::cout << "Pixel Spacing Vector at: " << i << " -> " << pixelSpacingOFVector.at(i) << "\n";
-    }
-    std::cout << "\n";
-
-//#############################################################################################################
-//######################################### TESTING CHECK #####################################################
-
-//    DcmPixelData pixelData = doseObject.getPixelData();
-//    if(pixelData.isEmpty())
-//    {
-//      std::cout << "Error reading the pixel data \n\n";
-//      return 0;
-//    }
-//    std::cout << "Pixel Data Length: " << pixelData.getLength() << "\n\n";
-
-
-//    OFVector<Float64> imagePositionPatient;
-//    doseObject.getImagePositionPatient(imagePositionPatient);
-//    for(int i=0; i<imagePositionPatient.size(); i++)
-//    {
-//      std::cout << "Image Position Patient " << i << " : " << imagePositionPatient.at(i) << "\n\n";
-//    }
-
-
-//    OFVector<Float64> gridFrameOffsetVector;
-//    doseObject.getGridFrameOffsetVector(gridFrameOffsetVector);
-//    for(int i=0; i<gridFrameOffsetVector.size(); i++)
-//    {
-//      if(i < 3 || i == gridFrameOffsetVector.size() - 1 )
-//      {
-//        std::cout << "Grid Frame Offset Vector " << i << " : " << gridFrameOffsetVector.at(i) << "\n\n";
-//      }
-//    }
-
-
-//    Uint16 samplesperPixel;
-//    doseObject.getSamplesPerPixel(samplesperPixel);
-//    std::cout << "Samples per Pixel: " << samplesperPixel << "\n\n";
-
 
     Uint16 rows, columns, frames, planarConfig, samplesPP;
     OFString nrframes, doseUnits, doseType, summationType, gridScaling, photoInterpret, lutShape;
@@ -558,6 +477,8 @@ namespace mitk
 
     gridscale = OFStandard::atof(gridScaling.c_str());
     frames = atoi(nrframes.c_str());
+
+    dataset->findAndGetUint16Array(DCM_PixelData, pixelData, &count);
 
     mitk::Image::Pointer image = mitk::Image::New();
     mitk::PixelType pt = mitk::MakeScalarPixelType<float>();
@@ -614,29 +535,30 @@ namespace mitk
 //      std::cout << "LUT Shape: " << lutShape << "\n\n";
 //    }
 
-//#############################################################################################################
-//#############################################################################################################
+//    mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+//    vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
+//    vtkLut->SetHueRange(0.667,0.0);
 
-    mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
-    vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
-    vtkLut->SetHueRange(0.667,0.0);
+//    mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
+//    mitkLutProp->SetLookupTable(mitkLut);
 
-    mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
-    mitkLutProp->SetLookupTable(mitkLut);
+//    double hsvValue = 0.002778;
 
-    double hsvValue = 0.002778;
+//    vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
+//    transferFunction->AddHSVPoint(0,0.538932,1,1,1,1);
+//    transferFunction->AddHSVPoint(10000,0.455592,1,1,1,1);
+//    transferFunction->AddHSVPoint(20000,0.16668,1,1,1,1);
+//    transferFunction->AddHSVPoint(30000,(34*hsvValue),1,1,1,1);
+//    transferFunction->AddHSVPoint(40000,(295*hsvValue),1,1,1,1);
+//    transferFunction->AddHSVPoint(50000,(325*hsvValue),1,1,1,1);
+//    transferFunction->AddHSVPoint(60000,(26*hsvValue),1,1,1,1);
+//    transferFunction->Build();
 
-    vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-    transferFunction->AddHSVPoint(0,0.538932,1,1,1,1);
-    transferFunction->AddHSVPoint(10000,0.455592,1,1,1,1);
-    transferFunction->AddHSVPoint(20000,0.16668,1,1,1,1);
-    transferFunction->AddHSVPoint(30000,(34*hsvValue),1,1,1,1);
-    transferFunction->AddHSVPoint(40000,(295*hsvValue),1,1,1,1);
-    transferFunction->AddHSVPoint(50000,(325*hsvValue),1,1,1,1);
-    transferFunction->AddHSVPoint(60000,(26*hsvValue),1,1,1,1);
-    transferFunction->Build();
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetName("DicomRT Dosis");
+    node->SetData(image);
 
-    return image;
+    return node;
   }
 
   bool DicomRTReader::Equals(mitk::ContourModel::Pointer first, mitk::ContourModel::Pointer second)

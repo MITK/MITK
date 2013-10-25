@@ -48,6 +48,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkPixelType.h>
 #include <mitkDataNode.h>
+#include <mitkTransferFunction.h>
+#include <mitkTransferFunctionProperty.h>
+#include <mitkProperties.h>
 //######################################################
 
 #include "dcmtk/dcmrt/drtstrct.h"

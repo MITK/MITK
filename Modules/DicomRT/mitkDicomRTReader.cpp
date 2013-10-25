@@ -500,62 +500,27 @@ namespace mitk
       *pixel=pixelData[i] * gridscale;
     }
 
-//    if(dataset->findAndGetUint16Array(DCM_PixelData, pixelData, &count).good())
-//    {
-//      fstream f;
-//      f.open("PixelData.txt", ios::out);
-//      long highest = 0;
-//      for(int i=0;i<frames;i++)
-//      {
-//        for(int j=0;j<rows;j++)
-//        {
-//          for(int k=0;k<columns;k++)
-//          {
-//            if(pixelData[i*rows*columns + j*columns + k]>0)
-//            {
-//              if(pixelData[i*rows*columns + j*columns + k]>highest)
-//              {
-//                highest = pixelData[i*rows*columns + j*columns + k];
-//              }
-//              std::cout << pixelData[i*rows*columns + j*columns + k] << "\n";
-//              f << static_cast<Float32>(pixelData[i*rows*columns + j*columns + k]) * gridscale << "\n\n";
-//            }
-//          }
-//        }
-//      }
-//      f << highest;
-//      f.close();
-//      std::cout << "Number of Frames: " << frames << "\n\n";
-//      std::cout << "Number of Data in file expacted overall: " << rows*columns*frames << "\n\n";
-//      std::cout << "Number of Data in file expacted per frame: " << rows*columns << "\n\n";
-//      std::cout << "Resolution: " << columns << "x" << rows << "\n\n";
-//      std::cout << "Photometricinterpretation: " << photoInterpret << "\n\n";
-//      std::cout << "Planar Configuration: " << planarConfig << "\n\n";
-//      std::cout << "Samples per Pixel: " << samplesPP << "\n\n";
-//      std::cout << "LUT Shape: " << lutShape << "\n\n";
-//    }
+    double hsvValue = 0.002778;
 
-//    mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
-//    vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
-//    vtkLut->SetHueRange(0.667,0.0);
+    vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
+    transferFunction->AddHSVPoint(0,0.538932,1,1,1,1);
+    transferFunction->AddHSVPoint(10000,0.455592,1,1,1,1);
+    transferFunction->AddHSVPoint(20000,0.16668,1,1,1,1);
+    transferFunction->AddHSVPoint(30000,(34*hsvValue),1,1,1,1);
+    transferFunction->AddHSVPoint(40000,(295*hsvValue),1,1,1,1);
+    transferFunction->AddHSVPoint(50000,(325*hsvValue),1,1,1,1);
+    transferFunction->AddHSVPoint(60000,(26*hsvValue),1,1,1,1);
+    transferFunction->Build();
 
-//    mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
-//    mitkLutProp->SetLookupTable(mitkLut);
-
-//    double hsvValue = 0.002778;
-
-//    vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-//    transferFunction->AddHSVPoint(0,0.538932,1,1,1,1);
-//    transferFunction->AddHSVPoint(10000,0.455592,1,1,1,1);
-//    transferFunction->AddHSVPoint(20000,0.16668,1,1,1,1);
-//    transferFunction->AddHSVPoint(30000,(34*hsvValue),1,1,1,1);
-//    transferFunction->AddHSVPoint(40000,(295*hsvValue),1,1,1,1);
-//    transferFunction->AddHSVPoint(50000,(325*hsvValue),1,1,1,1);
-//    transferFunction->AddHSVPoint(60000,(26*hsvValue),1,1,1,1);
-//    transferFunction->Build();
+    mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
+    mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
+    mitkTransFunc->SetColorTransferFunction(transferFunction);
+    mitkTransFuncProp->SetValue(mitkTransFunc);
 
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetName("DicomRT Dosis");
+    node->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
+    node->SetProperty("opacity", mitk::FloatProperty::New(0.3));
     node->SetData(image);
 
     return node;

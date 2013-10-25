@@ -203,11 +203,6 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, Ima
 
 void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue )
 {
-
-    // 3D source sphere
-
-      // generate circle by cutting the sphere with an implicit plane
-      // (through its center, axis-aligned)
       mitk::Surface::Pointer surface = mitk::Surface::New();
       mitk::ContourModelToSurfaceFilter::Pointer contourModelFilter = mitk::ContourModelToSurfaceFilter::New();
       contourModelFilter->SetInput(projectedContour);
@@ -223,33 +218,60 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
       vtkSmartPointer<vtkStripper> stripper = vtkSmartPointer<vtkStripper>::New();
       stripper->SetInput(surface->GetVtkPolyData()); // valid surface
       stripper->Update();
-      // that's our surface in 2D
-      vtkSmartPointer<vtkPolyData> surface2D = stripper->GetOutput();
 
-      // write circle out
+      // that's our surface in 2D
+      vtkSmartPointer<vtkPolyData> surface2D = surface->GetVtkPolyData();
+
       vtkSmartPointer<vtkXMLPolyDataWriter> polyDataWriter =
           vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-
       polyDataWriter->SetInput(surface2D);
       polyDataWriter->SetFileName("/home/lars/TestingMethodeOutput/surface2D.vtp");
-      polyDataWriter->SetCompressorTypeToNone();
-      polyDataWriter->SetDataModeToAscii();
+      //polyDataWriter->SetCompressorTypeToNone();
+      //polyDataWriter->SetDataModeToAscii();
       polyDataWriter->Write();
 
-      polyDataWriter->SetInput(surface->GetVtkPolyData());
-      polyDataWriter->SetFileName("/home/lars/TestingMethodeOutput/surface->GetVtkPolyData.vtp");
-      polyDataWriter->SetCompressorTypeToNone();
-      polyDataWriter->SetDataModeToAscii();
+      polyDataWriter->SetInput(stripper->GetOutput());
+      polyDataWriter->SetFileName("/home/lars/TestingMethodeOutput/stripperGetOutput.vtp");
+      //polyDataWriter->SetCompressorTypeToNone();
+      //polyDataWriter->SetDataModeToAscii();
       polyDataWriter->Write();
 
 
       // prepare the binary image's voxel grid
       vtkSmartPointer<vtkImageData> whiteImage =
           vtkSmartPointer<vtkImageData>::New();
-      whiteImage = sliceImage->GetVtkImageData();
-      vtkIdType count = whiteImage->GetNumberOfPoints();
-      MITK_INFO << "White Image Data Number of Points: " << whiteImage->GetNumberOfPoints();
-      MITK_INFO << "Slice Image Number of Points: " << sliceImage->GetVtkImageData()->GetNumberOfPoints();
+
+      //duplicate the input slice image
+      //whiteImage = sliceImage->GetVtkImageData();
+      //vtkIdType count = whiteImage->GetNumberOfPoints();
+
+      //create a new image with the size of the surface
+      double bounds[6];
+      surface2D->GetBounds(bounds);
+      double spacing[3];
+      spacing[0] = sliceImage->GetGeometry()->GetSpacing()[0];
+      spacing[1] = sliceImage->GetGeometry()->GetSpacing()[1];
+      spacing[2] = sliceImage->GetGeometry()->GetSpacing()[2];
+      whiteImage->SetSpacing(spacing);
+
+      // compute dimensions
+        int dim[3];
+        for (int i = 0; i < 3; i++)
+          {
+          dim[i] = static_cast<int>(ceil((bounds[i * 2 + 1] - bounds[i * 2]) /
+              spacing[i])) + 1;
+          if (dim[i] < 1)
+            dim[i] = 1;
+          }
+        whiteImage->SetDimensions(dim);
+        whiteImage->SetExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, dim[2] - 1);
+        double origin[3];
+        // NOTE: I am not sure whether or not we had to add some offset!
+        origin[0] = bounds[0];// + spacing[0] / 2;
+        origin[1] = bounds[2];// + spacing[1] / 2;
+        origin[2] = bounds[4];// + spacing[2] / 2;
+        whiteImage->SetOrigin(origin);
+
 
       whiteImage->SetScalarTypeToUnsignedChar();
       whiteImage->AllocateScalars();
@@ -257,6 +279,7 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
       // fill the image with foreground voxels:
       unsigned char inval = 255;
       unsigned char outval = 0;
+      vtkIdType count = whiteImage->GetNumberOfPoints();
       for (vtkIdType i = 0; i < count; ++i)
         {
         whiteImage->GetPointData()->GetScalars()->SetTuple1(i, inval);
@@ -265,11 +288,15 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
       //show the pixels of the empty Image / for testing
       for (vtkIdType i = 0; i < count; ++i)
       {
-          MITK_INFO << "Pixel an der Stelle " << i << " hat den Wert: " << whiteImage->GetPointData()->GetScalars()->GetTuple(i)[0];
+          //MITK_INFO << "Pixel an der Stelle " << i << " hat den Wert: " << whiteImage->GetPointData()->GetScalars()->GetTuple(i)[0];
       }
 
+      MITK_INFO << "ContourUtils-WhiteImage/origin: " << whiteImage->GetOrigin()[0] << ", " << whiteImage->GetOrigin()[1] << ", " << whiteImage->GetOrigin()[2];
+      MITK_INFO << "ContourUtils-WhiteImage/spacing: " << whiteImage->GetSpacing()[0] << ", " << whiteImage->GetSpacing()[1] << ", " << whiteImage->GetSpacing()[2];
+      MITK_INFO << "ContourUtils-WhiteImage/Dimension: " << whiteImage->GetDimensions()[0] << ", " << whiteImage->GetDimensions()[1] << ", " << whiteImage->GetDimensions()[2];
+
       // sweep polygonal data (this is the important thing with contours!)
-      vtkSmartPointer<vtkLinearExtrusionFilter> extruder =
+      /*vtkSmartPointer<vtkLinearExtrusionFilter> extruder =
           vtkSmartPointer<vtkLinearExtrusionFilter>::New();
 
       extruder->SetInput(surface2D);
@@ -277,16 +304,22 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
       extruder->SetExtrusionTypeToNormalExtrusion();
       extruder->SetVector(0, 0, 1);
       extruder->Update();
-
+      */
       // polygonal data --> image stencil:
       vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc =
         vtkSmartPointer<vtkPolyDataToImageStencil>::New();
-      pol2stenc->SetTolerance(0); // important if extruder->SetVector(0, 0, 1) !!!
-      pol2stenc->SetInputConnection(extruder->GetOutputPort());
+      //pol2stenc->SetTolerance(0); // important if extruder->SetVector(0, 0, 1) !!!
+      pol2stenc->SetInput(surface2D);
       pol2stenc->SetOutputOrigin(whiteImage->GetOrigin());
       pol2stenc->SetOutputSpacing(whiteImage->GetSpacing());
       pol2stenc->SetOutputWholeExtent(whiteImage->GetExtent());
       pol2stenc->Update();
+
+      polyDataWriter->SetInput(pol2stenc->GetInput());
+      polyDataWriter->SetFileName("/home/lars/TestingMethodeOutput/polyDataToImageStencilInput.vtp");
+      polyDataWriter->SetCompressorTypeToNone();
+      polyDataWriter->SetDataModeToAscii();
+      polyDataWriter->Write();
 
       // cut the corresponding white image and set the background:
       vtkSmartPointer<vtkImageStencil> imgstenc =
@@ -301,7 +334,7 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
       vtkSmartPointer<vtkMetaImageWriter> imageWriter =
         vtkSmartPointer<vtkMetaImageWriter>::New();
       imageWriter->SetFileName("/home/lars/TestingMethodeOutput/labelImage.mhd");
-      imageWriter->SetInputConnection(imgstenc->GetOutputPort());
+      imageWriter->SetInput(imgstenc->GetOutput());
       imageWriter->Write();
    /* mitk::Surface::Pointer surface = mitk::Surface::New();
     mitk::ContourModelToSurfaceFilter::Pointer contourModelFilter = mitk::ContourModelToSurfaceFilter::New();

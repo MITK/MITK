@@ -158,7 +158,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
     return;
   }
 
-  // update the filter and get teh resulting distance-image
+  // update the filter and get the resulting distance-image
   m_InterpolateSurfaceFilter->Update();
   Image::Pointer distanceImage = m_InterpolateSurfaceFilter->GetOutput();
 
@@ -240,11 +240,12 @@ void mitk::SurfaceInterpolationController::SetCurrentSegmentationInterpolationLi
   m_NormalsFilter->Reset();
   m_InterpolateSurfaceFilter->Reset();
 
-  if (segmentation == 0)
+  if (segmentation == NULL)
   {
-    m_SelectedSegmentation = 0;
+    m_SelectedSegmentation = NULL;
     return;
   }
+
   ContourListMap::iterator it = m_MapOfContourLists.find(segmentation);
 
   m_SelectedSegmentation = segmentation;

@@ -117,9 +117,6 @@ private:
 
     unsigned int m_SurfaceInterpolationInfoChangedObserverTag;
 
-//    mitk::DiffSliceOperation* m_doOperation;
-//    mitk::DiffSliceOperation* m_undoOperation;
-
     mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
     mitk::DataNode::Pointer m_3DContourNode;
 

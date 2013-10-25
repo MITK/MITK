@@ -63,7 +63,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
 
   if (numberOfInputs == 0)
   {
-    MITK_ERROR << "mitk::CreateDistanceImageFromSurfaceFilter: No input available. Please set an input!" << std::endl;
+    MITK_ERROR << "No input available. Please set an input!" << std::endl;
     itkExceptionMacro("mitk::CreateDistanceImageFromSurfaceFilter: No input available. Please set an input!");
     return;
   }

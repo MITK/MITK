@@ -75,13 +75,13 @@ namespace mitk
     void SetDistanceImageVolume(unsigned int distImageVolume);
 
     /**
-     * Sets the current segmentation which is used by the interpolation
-     * This is needed because the calculation of the normals needs to now wheather a normal points inside a segmentation or not
+     * Sets the working image used by the interpolation method.
+     * This is needed because the calculation of the normals needs to now wheather a normal points toward the inside of a segmentation or not
      */
     void SetSegmentationImage(Image* workingImage);
 
     /**
-     * Retrieves the input contours as mitk::Surface
+     * Retrieves the input contours as a mitk::Surface
      */
     Surface* GetContoursAsSurface();
 
@@ -100,8 +100,8 @@ namespace mitk
     mitk::Image* GetImage();
 
     /**
-     * Estimates the memory which is needed to build up the equationsystem for the interpolation.
-     * \returns The percentage of the real memory which will be used by the interpolation
+     * Estimates the memory that is needed to build up the equation system for the interpolation.
+     * \returns The percentage of the real memory which will be used by the interpolation calculation
      */
     double EstimatePortionOfNeededMemory();
 

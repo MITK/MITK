@@ -186,29 +186,24 @@ namespace mitk {
     * \brief Add a probe to the device without connecting to it.
     *  This should usually be done before connecting to the probe.
     */
-    virtual void AddProbe(mitk::USProbe::Pointer probe);
+    DEPRECATED( virtual void AddProbe(mitk::USProbe::Pointer probe) );
 
     /**
     * \brief Connect to a probe and activate it. The probe should be added first.
     *  Usually, a VideoDevice will simply add a probe it wants to connect to,
     *  but an SDK Device might require adding a probe first.
     */
-    virtual void ActivateProbe(mitk::USProbe::Pointer probe);
+    DEPRECATED( virtual void ActivateProbe(mitk::USProbe::Pointer probe) );
 
     /**
     * \brief Deactivates the currently active probe.
     */
-    virtual void DeactivateProbe();
-
-    /**
-    * \brief Removes a probe from the ist of currently added probes.
-    */
-    //virtual void removeProbe(mitk::USProbe::Pointer probe);
+    DEPRECATED( virtual void DeactivateProbe() );
 
     /**
     *  \brief Returns a vector containing all connected probes.
     */
-    std::vector<mitk::USProbe::Pointer> GetConnectedProbes();
+    DEPRECATED( std::vector<mitk::USProbe::Pointer> GetConnectedProbes() );
 
     /**
     * \brief Given property is updated in the device micro service.
@@ -285,17 +280,17 @@ namespace mitk {
     * \brief Sets a transformation as Calibration data. It also marks the device as Calibrated. This data is not automatically applied to the image. Subclasses must call ApplyTransformation
     * to achieve this.
     */
-    void setCalibration (mitk::AffineTransform3D::Pointer calibration);
+    DEPRECATED( void setCalibration (mitk::AffineTransform3D::Pointer calibration) );
 
     /**
     * \brief Returns the current Calibration
     */
-    itkGetMacro(Calibration, mitk::AffineTransform3D::Pointer);
+    DEPRECATED( itkGetMacro(Calibration, mitk::AffineTransform3D::Pointer) );
 
     /**
     * \brief Returns the currently active probe or null, if none is active
     */
-    itkGetMacro(ActiveProbe, mitk::USProbe::Pointer);
+    DEPRECATED( itkGetMacro(ActiveProbe, mitk::USProbe::Pointer) );
 
     /* @return Returns the area that will be cropped from the US image. Is disabled / [0,0,0,0] by default. */
     mitk::USDevice::USImageCropArea GetCropArea();
@@ -311,8 +306,8 @@ namespace mitk {
   protected:
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
 
-    mitk::USProbe::Pointer m_ActiveProbe;
-    std::vector<mitk::USProbe::Pointer> m_ConnectedProbes;
+    DEPRECATED( mitk::USProbe::Pointer m_ActiveProbe );
+    DEPRECATED( std::vector<mitk::USProbe::Pointer> m_ConnectedProbes );
     mitk::USImage::Pointer m_Image;
 
     bool m_IsFreezed;
@@ -389,7 +384,7 @@ namespace mitk {
     * Subclasses can overwrite this method to do additional actions. Default
     * implementation does noting.
     */
-    virtual void OnFreeze(bool) { };
+    virtual void OnFreeze(bool) { }
 
     /**
     * \brief This metadata set is privately used to imprint USImages with Metadata later.
@@ -422,7 +417,7 @@ namespace mitk {
     * \brief The Calibration Transformation of this US-Device.
     * This will automatically be written into the image once
     */
-    mitk::AffineTransform3D::Pointer m_Calibration;
+    DEPRECATED( mitk::AffineTransform3D::Pointer m_Calibration );
 
     /**
     *  \brief Convenience method that can be used by subclasses to apply the Calibration Data to the image.
@@ -431,7 +426,7 @@ namespace mitk {
     *
     * \return true if a Calibration was set and false otherwise (usually happens when no transformation was set yet)
     */
-    bool ApplyCalibration(mitk::USImage::Pointer image);
+    DEPRECATED( bool ApplyCalibration(mitk::USImage::Pointer image) );
 
     std::string GetServicePropertyLabel();
 
@@ -443,7 +438,7 @@ namespace mitk {
     us::ServiceRegistration<Self> m_ServiceRegistration;
 
     /**
-    * \brief Properties of device microservice.
+    * \brief Properties of the device's Microservice.
     */
     us::ServiceProperties m_ServiceProperties;
 

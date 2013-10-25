@@ -346,6 +346,7 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
   {
     m_ToolManager->SetWorkingData(NULL);
     m_Controls.m_SliceBasedInterpolator->setEnabled(false);
+    m_Controls.m_SurfaceBasedInterpolator->setEnabled(false);
     m_Controls.m_gbSurfaceStamp->setEnabled(false);
     m_Controls.m_gbMaskStamp->setEnabled(false);
     return;
@@ -382,6 +383,7 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
 
   // and enable GUI controls
   m_Controls.m_SliceBasedInterpolator->setEnabled(true);
+  m_Controls.m_SurfaceBasedInterpolator->setEnabled(true);
   m_Controls.m_gbSurfaceStamp->setEnabled(true);
   m_Controls.m_gbMaskStamp->setEnabled(true);
 

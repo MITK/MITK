@@ -116,6 +116,8 @@ class SegmentationUI_EXPORT QmitkSurfaceBasedInterpolator : public QWidget
 
 private:
 
+    void SetCurrentContourListID();
+
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
     mitk::ToolManager::Pointer m_ToolManager;

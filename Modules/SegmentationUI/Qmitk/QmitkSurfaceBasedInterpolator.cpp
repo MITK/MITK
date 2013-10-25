@@ -29,12 +29,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegTool2D.h"
 #include "mitkSurfaceToImageFilter.h"
 #include "mitkSliceNavigationController.h"
-#include <mitkVtkImageOverwrite.h>
-#include <mitkExtractSliceFilter.h>
+//#include <mitkVtkImageOverwrite.h>
+//#include <mitkExtractSliceFilter.h>
 #include <mitkLabelSetImage.h>
-#include <mitkImageTimeSelector.h>
-#include <mitkImageToContourModelSetFilter.h>
-#include <mitkContourUtils.h>
+//#include <mitkImageTimeSelector.h>
+//#include <mitkImageToContourModelSetFilter.h>
+//#include <mitkContourUtils.h>
 #include <mitkToolManagerProvider.h>
 
 #include "QmitkStdMultiWidget.h"
@@ -232,6 +232,9 @@ void QmitkSurfaceBasedInterpolator::OnToolManagerWorkingDataModified()
   }
 
   m_WorkingImage = workingImage;
+
+  //Updating the current selected segmentation for the 3D interpolation
+  this->SetCurrentContourListID();
 }
 
 void QmitkSurfaceBasedInterpolator::On3DInterpolationActivated(bool enabled)
@@ -304,9 +307,65 @@ void QmitkSurfaceBasedInterpolator::Run3DInterpolation()
   m_SurfaceInterpolator->Interpolate();
 }
 
+void QmitkSurfaceBasedInterpolator:: SetCurrentContourListID()
+{
+  // New ContourList = hide current interpolation
+  this->Show3DInterpolationResult(false);
+
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+
+  if (workingNode)
+  {
+    bool isInterpolationResult(false);
+    workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
+
+    if (!isInterpolationResult)
+    {
+      //TODO Aufruf hier pruefen!
+      mitk::Vector3D spacing = workingNode->GetData()->GetGeometry(0)->GetSpacing();
+      double minSpacing (100);
+      double maxSpacing (0);
+      for (int i =0; i < 3; i++)
+      {
+        if (spacing[i] < minSpacing)
+        {
+          minSpacing = spacing[i];
+        }
+        else if (spacing[i] > maxSpacing)
+        {
+          maxSpacing = spacing[i];
+        }
+      }
+
+      m_SurfaceInterpolator->SetSegmentationImage(dynamic_cast<mitk::Image*>(workingNode->GetData()));
+      m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
+      m_SurfaceInterpolator->SetMinSpacing(minSpacing);
+      m_SurfaceInterpolator->SetDistanceImageVolume(50000);
+
+      mitk::Image* segmentationImage = dynamic_cast<mitk::Image*>(workingNode->GetData());
+      if (segmentationImage->GetDimension() == 3)
+        m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(segmentationImage);
+      else
+        MITK_INFO<<"3D Interpolation is only supported for 3D images at the moment!";
+
+      if (m_Activated)
+      {
+        if (m_Watcher.isRunning())
+          m_Watcher.waitForFinished();
+        m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolator::Run3DInterpolation);
+        m_Watcher.setFuture(m_Future);
+      }
+    }
+  }
+}
+
+
 void QmitkSurfaceBasedInterpolator::OnActivateWidget(bool enabled)
 {
   if (!m_Initialized) return;
+
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  if (!workingNode) return;
 
   m_Activated = enabled;
 
@@ -330,6 +389,29 @@ void QmitkSurfaceBasedInterpolator::OnActivateWidget(bool enabled)
     {
       m_DataStorage->Add( m_3DContourNode );
     }
+
+    bool isInterpolationResult(false);
+    workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
+
+    int ret = QMessageBox::Yes;
+
+    if (m_SurfaceInterpolator->EstimatePortionOfNeededMemory() > 0.5)
+    {
+      QMessageBox msgBox;
+      msgBox.setText("Due to short handed system memory the 3D interpolation may be very slow!");
+      msgBox.setInformativeText("Are you sure you want to activate the 3D interpolation?");
+      msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+      ret = msgBox.exec();
+    }
+
+    if (m_Watcher.isRunning())
+      m_Watcher.waitForFinished();
+
+    if (ret == QMessageBox::Yes)
+    {
+      m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolator::Run3DInterpolation);
+      m_Watcher.setFuture(m_Future);
+    }
   }
   else
   {
@@ -341,6 +423,9 @@ void QmitkSurfaceBasedInterpolator::OnActivateWidget(bool enabled)
     {
       m_DataStorage->Remove( m_3DContourNode );
     }
+
+    this->Show3DInterpolationResult(false);
+
     mitk::UndoController::GetCurrentUndoModel()->Clear();
   }
 
@@ -351,20 +436,7 @@ void QmitkSurfaceBasedInterpolator::OnAccept3DInterpolationClicked()
 {
   if (m_InterpolatedSurfaceNode.IsNotNull() && m_InterpolatedSurfaceNode->GetData())
   {
-    mitk::SurfaceToImageFilter::Pointer s2iFilter = mitk::SurfaceToImageFilter::New();
-    s2iFilter->MakeOutputBinaryOn();
-    s2iFilter->SetInput(dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData()));
-
-    // check if ToolManager holds valid ReferenceData
-    if (m_ToolManager->GetReferenceData(0) == NULL || m_ToolManager->GetWorkingData(0) == NULL)
-    {
-        return;
-    }
-    s2iFilter->SetImage(dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData()));
-    s2iFilter->Update();
-
-    mitk::DataNode* segmentationNode = m_ToolManager->GetWorkingData(0);
-    segmentationNode->SetData(s2iFilter->GetOutput());
+    m_WorkingImage->SurfaceStamp(dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData()), false);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     this->Show3DInterpolationResult(false);
   }

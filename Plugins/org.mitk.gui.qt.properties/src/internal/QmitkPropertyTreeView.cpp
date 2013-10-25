@@ -53,7 +53,19 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.setupUi(parent);
 
-  m_Controls.propertyListComboBox->addItem("global");
+  m_Controls.propertyListComboBox->addItem("independent");
+
+  mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
+
+  if (renderWindowPart != NULL)
+  {
+    QHash<QString, QmitkRenderWindow*> renderWindows = renderWindowPart->GetQmitkRenderWindows();
+
+    Q_FOREACH(QString renderWindow, renderWindows.keys())
+    {
+      m_Controls.propertyListComboBox->addItem(renderWindow);
+    }
+  }
 
   m_Controls.newButton->setEnabled(false);
 
@@ -74,7 +86,7 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.treeView->setItemDelegateForColumn(1, m_Delegate);
   m_Controls.treeView->setModel(m_ProxyModel);
-  m_Controls.treeView->setColumnWidth(0, 180);
+  m_Controls.treeView->setColumnWidth(0, 160);
   m_Controls.treeView->sortByColumn(0, Qt::AscendingOrder);
   m_Controls.treeView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_Controls.treeView->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -206,7 +218,7 @@ void QmitkPropertyTreeView::OnPreferencesChanged(const berry::IBerryPreferences*
   bool showAliases = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES, true);
   bool showDescriptions = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_DESCRIPTIONS, true);
   bool showAliasesInDescription = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES_IN_DESCRIPTION, true);
-  bool developerMode = preferences->GetBool(QmitkPropertiesPreferencePage::DEVELOPER_MODE, true);
+  bool developerMode = preferences->GetBool(QmitkPropertiesPreferencePage::DEVELOPER_MODE, false);
 
   bool updateAliases = showAliases != (m_PropertyAliases != NULL);
   bool updateDescriptions = showDescriptions != (m_PropertyDescriptions != NULL);
@@ -326,18 +338,24 @@ void QmitkPropertyTreeView::SetFocus()
 
 void QmitkPropertyTreeView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-  QHash<QString, QmitkRenderWindow*> renderWindows = this->GetRenderWindowPart()->GetQmitkRenderWindows();
-
-  Q_FOREACH(QString renderWindow, renderWindows.keys())
+  if (m_Controls.propertyListComboBox->count() == 1)
   {
-    m_Controls.propertyListComboBox->addItem(renderWindow);
+    QHash<QString, QmitkRenderWindow*> renderWindows = this->GetRenderWindowPart()->GetQmitkRenderWindows();
+
+    Q_FOREACH(QString renderWindow, renderWindows.keys())
+    {
+      m_Controls.propertyListComboBox->addItem(renderWindow);
+    }
   }
 }
 
 void QmitkPropertyTreeView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
 {
-  m_Controls.propertyListComboBox->clear();
-  m_Controls.propertyListComboBox->addItem("global");
+  if (m_Controls.propertyListComboBox->count() > 1)
+  {
+    m_Controls.propertyListComboBox->clear();
+    m_Controls.propertyListComboBox->addItem("independent");
+  }
 }
 
 void QmitkPropertyTreeView::OnPropertyListChanged(int index)
@@ -345,10 +363,10 @@ void QmitkPropertyTreeView::OnPropertyListChanged(int index)
   if (index == -1)
     return;
 
-  QString renderWindow = m_Controls.propertyListComboBox->itemText(index);
+  QString renderer = m_Controls.propertyListComboBox->itemText(index);
 
-  m_Renderer = renderWindow != "global"
-    ? this->GetRenderWindowPart()->GetQmitkRenderWindow(renderWindow)->GetRenderer()
+  m_Renderer = renderer != "independent"
+    ? this->GetRenderWindowPart()->GetQmitkRenderWindow(renderer)->GetRenderer()
     : NULL;
 
   QList<mitk::DataNode::Pointer> nodes;
@@ -364,7 +382,7 @@ void QmitkPropertyTreeView::OnPropertyListChanged(int index)
 void QmitkPropertyTreeView::OnAddNewProperty()
 {
   QmitkAddNewPropertyDialog dialog(m_SelectedNode, m_Renderer, m_Parent);
-  
+
   if (dialog.exec() == QDialog::Accepted)
     this->m_Model->Update();
 }

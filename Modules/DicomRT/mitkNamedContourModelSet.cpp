@@ -20,8 +20,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  NamedContourModelSet::NamedContourModelSet(){}
+  NamedContourModelSet::NamedContourModelSet()
+  {
+    roiName = "ContourModelSet";
+    contourModelSet = mitk::ContourModelSet::New();
+  }
 
   NamedContourModelSet::~NamedContourModelSet(){}
+
+  void NamedContourModelSet::SetRoiName(char* name)
+  {
+    this->roiName = name;
+  }
+
+  char* NamedContourModelSet::GetRoiName()
+  {
+    return this->roiName;
+  }
+
+  void NamedContourModelSet::SetContourModelSet(mitk::ContourModelSet::Pointer pContourModelSet)
+  {
+    this->contourModelSet = pContourModelSet;
+  }
+
+  mitk::ContourModelSet::Pointer NamedContourModelSet::GetContourModelSet()
+  {
+    return this->contourModelSet;
+  }
 
 }

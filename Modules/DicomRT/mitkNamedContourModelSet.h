@@ -22,28 +22,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactory.h>
 #include <mitkCommon.h>
 
+#include <mitkContourModelSet.h>
+
 namespace mitk
 {
 
-  class mitkDicomRT_EXPORT NamedContourModelSet: public itk::Object
+  class mitkDicomRT_EXPORT NamedContourModelSet: public mitk::ContourModelSet
   {
 
   public:
 
-    mitkClassMacro( NamedContourModelSet, itk::Object );
+    char* roiName;
+    mitk::ContourModelSet::Pointer contourModelSet;
 
-    itkNewMacro( Self );
+    mitkClassMacro( NamedContourModelSet, itk::Object )
+    itkNewMacro( Self )
 
-    /**
-    * Virtual destructor.
-    */
+    void SetRoiName(char*);
+    void SetContourModelSet(mitk::ContourModelSet::Pointer);
+
+    char* GetRoiName();
+    mitk::ContourModelSet::Pointer GetContourModelSet();
+
+
     virtual ~NamedContourModelSet();
 
   protected:
 
-    /**
-    * Constructor.
-    */
     NamedContourModelSet();
 
   };

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKUSCombinedModality_H_HEADER_INCLUDED_
 
 #include <MitkUSCombinedModalityExports.h>
+#include <mitkNavigationDataSmoothingFilter.h>
 
 #include "mitkUSDevice.h"
 
@@ -37,7 +38,7 @@ public:
     mitkNewMacro2Param(USCombinedModality, std::string, std::string);
 
     itkGetMacro(UltrasoundDevice, itk::SmartPointer<USDevice>);
-    itkGetMacro(TrackingDevice, itk::SmartPointer<NavigationDataSource>);
+    //itkGetMacro(TrackingDevice, itk::SmartPointer<NavigationDataSource>);
 
     itkSetMacro(UltrasoundDevice, itk::SmartPointer<USDevice>);
     itkSetMacro(TrackingDevice, itk::SmartPointer<NavigationDataSource>);
@@ -121,6 +122,8 @@ protected:
     USDevice::Pointer                                   m_UltrasoundDevice;
     itk::SmartPointer<NavigationDataSource>             m_TrackingDevice;
     std::map<std::string, AffineTransform3D::Pointer>   m_Calibrations;
+
+    mitk::NavigationDataSmoothingFilter::Pointer m_SmoothingFilter;
 
 private:
     /**

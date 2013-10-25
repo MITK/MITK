@@ -21,9 +21,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string mitk::USCombinedModality::DeviceClassIdentifier = "org.mitk.modules.us.USCombinedModality";
 
 mitk::USCombinedModality::USCombinedModality(std::string manufacturer, std::string model)
-    : mitk::USDevice(manufacturer, model)
+    : mitk::USDevice(manufacturer, model),
+      m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New())
 {
 
+    // build tracking filter pipeline
+    m_SmoothingFilter->SetInput(0, m_TrackingDevice->GetOutput());
+    m_SmoothingFilter->SetNumerOfValues(10);
+    //m_ZoneFilter->SetInput(0, m_SmoothingFilter->GetOutput(0));
 }
 
 mitk::USCombinedModality::~USCombinedModality()
@@ -204,6 +209,7 @@ void mitk::USCombinedModality::GenerateData()
     }
 
     // TODO: do processing here
+
 
     this->SetNthOutput(0, image);
 }

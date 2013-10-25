@@ -388,13 +388,7 @@ namespace itk
     //The final DWI should be the one that has a smaller or equal number of bad voxels as in the
     //previous iteration. To obtain this temporary DWI image must be stored in memory.
 
-    //14.10.2013
-    //DeepCopyDiffusionImage(m_CorrectedDiffusionVolumes,corrected_diffusion_temp,nof);
 
-    // generating of initial tensor image
-
-    //14.10.2013
-    //GenerateTensorImage(nof,numberb0,size,corrected_diffusion_temp,mask,what_mask,tensorImg);
     GenerateTensorImage(nof,numberb0,size,m_GradientImagePointer,mask,what_mask,tensorImg);
 
 
@@ -406,12 +400,7 @@ namespace itk
     std::cout << "Number of negative eigenvalues: " << old_number_negative_eigs << std::endl;
 
 
-    //Smoothing DWI - method is described when it is defined
-    //CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion_temp,mask,pixel_max,pixel_min);
-    //CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion,mask,pixel_max,pixel_min);
 
-    //14.10.2013
-    //CorrectDiffusionImage(nof,numberb0,size,m_CorrectedDiffusionVolumes,mask,pixel_max,pixel_min);
     CorrectDiffusionImage(nof,numberb0,size,m_GradientImagePointer,mask,pixel_max,pixel_min);
 
 
@@ -432,7 +421,7 @@ namespace itk
         // smoothed DWI is used to substitute DWI from previous iteration
         stil_correcting=true;
         old_number_negative_eigs=new_number_negative_eigs;
-        //DeepCopyDiffusionImage(corrected_diffusion_temp,m_CorrectedDiffusionVolumes,nof);
+
       }
 
       else

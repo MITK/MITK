@@ -47,7 +47,10 @@ NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
 {
     typename OutputImageType::Pointer outputImage =
             static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
-//    outputImage->FillBuffer(0.0);
+    typename OutputImageType::PixelType px;
+    px.SetSize(1);
+    px.SetElement(0,0);
+    outputImage->FillBuffer(px);
 }
 
 template< class TInPixelType, class TOutPixelType >
@@ -71,31 +74,39 @@ NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
     git.GoToBegin();
     while( !git.IsAtEnd() )
     {
-      TInPixelType xi = git.GetCenterPixel()[0];
-      double sumj = 0;
-      double wj = 0;
-      for (int j = 0; j < git.Size(); ++j)
+      typename OutputImageType::PixelType outpix;
+      outpix.SetSize (inputImagePointer->GetVectorLength());
+
+      for (int i = 0; i < inputImagePointer->GetVectorLength(); ++i)
       {
-        TInPixelType xj = git.GetPixel(j)[0];
-
-        if (xi == xj && git.Size()/2 != j)
+        TInPixelType xi = git.GetCenterPixel()[i];
+        double sumj = 0;
+        double wj = 0;
+        for (int j = 0; j < git.Size(); ++j)
         {
-          niit.SetLocation(git.GetIndex());
-          njit.SetLocation(git.GetIndex(j));
-          double sumk = 0;
-          for (int k = 0; k < niit.Size(); ++k)
-          {
-            sumk += std::pow( (niit.GetPixel(k)[0] - njit.GetPixel(k)[0]), 2);
-          }
-          wj = std::exp( - ( std::sqrt( (1 / niit.Size()) * sumk) / m_H));
-          sumj += wj * std::pow(xj, 2) - 2 * std::pow(m_H, 2);
-        }
-      }
-      TOutPixelType outval = /*dynamic_cast<TOutPixelType>*/ (std::sqrt(sumj));
-      oit.Set(outval); //TODO work with Gradients!!!
+          TInPixelType xj = git.GetPixel(j)[i];
 
-        ++oit;
-        ++git;
+          if (xi == xj && git.Size()/2 != j)
+          {
+            niit.SetLocation(git.GetIndex());
+            njit.SetLocation(git.GetIndex(j));
+            double sumk = 0;
+            for (int k = 0; k < niit.Size(); ++k)
+            {
+              sumk += std::pow( (niit.GetPixel(k)[i] - njit.GetPixel(k)[i]), 2);
+            }
+            sumk = sumk >= 0 ? sumk : 0;
+            wj = std::exp( - ( std::sqrt( (1 / niit.Size()) * sumk) / m_H));
+            sumj += wj * std::pow(xj, 2) - 2 * std::pow(m_H, 2);
+          }
+        }
+        sumj = sumj >= 0 ? sumj : 0;
+        TOutPixelType outval = xi - static_cast<TOutPixelType>(std::sqrt(sumj));
+        outpix.SetElement(i, outval);
+      }
+      oit.Set(outpix);
+      ++oit;
+      ++git;
     }
 
     std::cout << "One Thread finished calculation" << std::endl;

@@ -33,7 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkRenderingManager.h>
 
 #include <mitkImageReadAccessor.h>
-#include <itkNonLocalMeansDenoisingFilter.h>
+
+
 
 
 
@@ -59,6 +60,7 @@ void QmitkDenoisingView::CreateQtPartControl( QWidget *parent )
     m_Controls = new Ui::QmitkDenoisingViewControls;
     m_Controls->setupUi( parent );
     this->CreateConnections();
+    this->UpdateLabelText();
   }
 }
 
@@ -107,13 +109,47 @@ void QmitkDenoisingView::StartDenoising()
   {
     MITK_INFO << "JOPP";
     DiffusionImageType::Pointer inImage = dynamic_cast<DiffusionImageType*> (m_ImageNode->GetData());
-    typedef itk::NonLocalMeansDenoisingFilter<DiffusionPixelType, DiffusionPixelType> NonLocalMeansDenoisingFilterType;
+
+
+    AdaptorType::Pointer imageAdaptor = AdaptorType::New();
+    imageAdaptor->SetImage(inImage->GetVectorImage());
+    imageAdaptor->SetExtractComponentIndex(0);
+    imageAdaptor->Update();
+    //imageAdaptor->
+    StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
+   // statisticsFilter->SetInput(inImage->GetVectorImage());
+    //statisticsFilter->Update();
+
     NonLocalMeansDenoisingFilterType::Pointer denoisingFilter = NonLocalMeansDenoisingFilterType::New();
-    denoisingFilter->SetNumberOfThreads(1);
+//    denoisingFilter->SetNumberOfThreads(1);
     denoisingFilter->SetInput(inImage->GetVectorImage());
-    denoisingFilter->SetVRadius((unsigned int)m_Controls->m_Parameter1->value());
-    denoisingFilter->SetNRadius((unsigned int)m_Controls->m_Parameter2->value());
-    denoisingFilter->SetH((unsigned int)m_Controls->m_Parameter3->value());
+    denoisingFilter->SetGradientDirections(inImage->GetDirections());
+    denoisingFilter->SetVRadius(/*(unsigned int)*/m_Controls->m_SpinBoxParameter1->value());
+    denoisingFilter->SetNRadius(/*(unsigned int)*/m_Controls->m_SpinBoxParameter2->value());
+    denoisingFilter->SetH(/*(unsigned double)*/m_Controls->m_DoubleSpinBoxParameter3->value());
     denoisingFilter->Update();
+
+    DiffusionImageType::Pointer image = DiffusionImageType::New();
+    image->SetVectorImage(denoisingFilter->GetOutput());
+    image->SetB_Value(inImage->GetB_Value());
+    image->SetDirections(inImage->GetDirections());
+    image->InitializeFromVectorImage();
+   // mitk::Image::Pointer image = mitk::Image::New();
+    /*DiffusionImageType::Pointer image = DiffusionImageType::New();
+    image->InitializeByItk( denoisingFilter->GetOutput() );
+    image->SetVolume( denoisingFilter->GetOutput()->GetBufferPointer() );*/
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+    QString name = m_ImageNode->GetName().c_str();
+
+    imageNode->SetName((name+"_NLMr").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode);
   }
+}
+
+void QmitkDenoisingView::UpdateLabelText()
+{
+  m_Controls->m_LabelParameter_1->setText("Neighborhood V:");
+  m_Controls->m_LabelParameter_2->setText("Neighborhood N:");
+  m_Controls->m_LabelParameter_3->setText("Denoisingparameter H:");
 }

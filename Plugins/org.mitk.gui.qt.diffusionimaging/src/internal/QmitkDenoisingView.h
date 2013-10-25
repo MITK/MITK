@@ -40,6 +40,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiffusionTensor3D.h>
 
 #include <mitkDiffusionImage.h>
+#include <itkStatisticsImageFilter.h>
+#include <itkNonLocalMeansDenoisingFilter.h>
+#include <itkVectorImageToImageAdaptor.h>
 
 //
 
@@ -64,6 +67,9 @@ public:
 
   typedef short DiffusionPixelType;
   typedef mitk::DiffusionImage< DiffusionPixelType > DiffusionImageType;
+  typedef itk::VectorImageToImageAdaptor< DiffusionPixelType, 3 > AdaptorType;
+  typedef itk::StatisticsImageFilter < itk::Image<DiffusionPixelType, 3> > StatisticsFilterType;
+  typedef itk::NonLocalMeansDenoisingFilter<DiffusionPixelType, DiffusionPixelType> NonLocalMeansDenoisingFilterType;
 
   virtual void CreateQtPartControl(QWidget *parent);
 
@@ -79,7 +85,7 @@ protected:
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
-  void UpdateOdf(); ///< called if slice position or datamanager selection has changed
+  void UpdateLabelText();
 
   Ui::QmitkDenoisingViewControls*  m_Controls;
   QmitkStdMultiWidget*              m_MultiWidget;

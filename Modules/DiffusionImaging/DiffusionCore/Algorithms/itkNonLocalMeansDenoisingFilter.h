@@ -75,7 +75,7 @@ public:
 
     typename NeighborhoodIterator < VectorImage < TInPixelType, 3 > >::RadiusType m_V_Radius;
     typename NeighborhoodIterator < VectorImage < TInPixelType, 3 > >::RadiusType m_N_Radius;
-    unsigned int m_H;
+    unsigned double m_H;
 };
 
 }

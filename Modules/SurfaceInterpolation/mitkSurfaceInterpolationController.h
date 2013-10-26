@@ -44,15 +44,15 @@ namespace mitk
     /**
      * Adds a new extracted contour to the list
      */
-    void AddNewContour(Surface::Pointer newContour, RestorePlanePositionOperation *op);
+    void AddNewContour(Surface::Pointer newContour, RestorePlanePositionOperation *op, int activeLabel);
 
     /**
-     * Interpolates the 3D surface from the given extracted contours
+     * Launches the interpolation method. A surface mesh is generated out of the given extracted contours.
      */
-    void Interpolate ();
+    void Interpolate();
 
     /**
-     * Retrieves the result of the inteporlation
+     * Retrieves a surface mesh resulting from the interpolation of the given extracted contours.
      */
     mitk::Surface::Pointer GetInterpolationResult();
 
@@ -78,7 +78,7 @@ namespace mitk
      * Sets the working image used by the interpolation method.
      * This is needed because the calculation of the normals needs to now wheather a normal points toward the inside of a segmentation or not
      */
-    void SetSegmentationImage(Image* workingImage);
+    void SetWorkingImage(Image* workingImage);
 
     /**
      * Retrieves the input contours as a mitk::Surface
@@ -87,15 +87,15 @@ namespace mitk
 
     /**
      * Sets the current list of contour points which is used for the surface interpolation
-     * @param workingImage The current selected working image
+     * @param activeLabel The active label in the current working image
      */
-    void SetCurrentSegmentationInterpolationList(mitk::Image* workingImage);
+    void SetActiveLabel(int activeLabel);
 
     /**
      * Removes the segmentation and all its contours from the list
      * @param workingImage The working image to be removed
      */
-    void RemoveSegmentationFromContourList(mitk::Image* workingImage);
+  //  void RemoveSegmentationFromContourList(mitk::Image* workingImage);
 
     mitk::Image* GetImage();
 
@@ -116,15 +116,15 @@ namespace mitk
 
  private:
 
-   void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
+//   void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
 
    struct ContourPositionPair {
      Surface::Pointer contour;
      RestorePlanePositionOperation* position;
-   };
+    };
 
     typedef std::vector<ContourPositionPair> ContourPositionPairList;
-    typedef std::map<mitk::Image* , ContourPositionPairList> ContourListMap;
+    typedef std::map<unsigned int, ContourPositionPairList> ContourListMap;
 
     ContourPositionPairList::iterator m_Iterator;
 
@@ -135,7 +135,7 @@ namespace mitk
     double m_MinSpacing;
     double m_MaxSpacing;
 
-    const Image* m_WorkingImage;
+    Image* m_WorkingImage;
 
     Surface::Pointer m_Contours;
 
@@ -149,7 +149,7 @@ namespace mitk
 
     unsigned int m_CurrentNumberOfReducedContours;
 
-    mitk::Image* m_SelectedSegmentation;
+    int m_ActiveLabel;
 
     std::map<mitk::Image*, unsigned long> m_SegmentationObserverTags;
  };

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarCircle.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkLabelSetImage.h"
 #include "mitkImageToContourFilter.h"
 #include "mitkSurfaceInterpolationController.h"
 #include "mitkSegmentationInterpolationController.h"
@@ -223,7 +224,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
-  Image* workingImage = dynamic_cast<Image*>(workingNode->GetData());
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
   assert(workingImage);
 
   unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( workingImage );
@@ -251,7 +252,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     }
   }
 
-  if (m_3DInterpolationEnabled )
+  if (true)//m_3DInterpolationEnabled )
   {
     ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
     contourExtractor->SetInput(slice);
@@ -274,7 +275,9 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
       unsigned int pos = this->AddContourmarker(positionEvent);
       us::ServiceReference<PlanePositionManagerService> serviceRef = us::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
       PlanePositionManagerService* service = us::GetModuleContext()->GetService(serviceRef);
-      mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, service->GetPlanePosition(pos));
+      mitk::SurfaceInterpolationController* interpolator = mitk::SurfaceInterpolationController::GetInstance();
+      if (interpolator)
+        interpolator->AddNewContour( contour, service->GetPlanePosition(pos), workingImage->GetActiveLabelIndex() );
     }
   }
 }

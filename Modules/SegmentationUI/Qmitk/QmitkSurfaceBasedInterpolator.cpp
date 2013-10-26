@@ -68,7 +68,7 @@ m_Activated(false)
   m_3DContourNode->SetProperty( "helper object", mitk::BoolProperty::New(true));
   m_3DContourNode->SetProperty( "material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
   m_3DContourNode->SetProperty( "material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
-  m_3DContourNode->SetProperty( "3DContourContainer", mitk::BoolProperty::New(true));
+//  m_3DContourNode->SetProperty( "3DContourContainer", mitk::BoolProperty::New(true));
   m_3DContourNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
   m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
   m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
@@ -99,7 +99,7 @@ void QmitkSurfaceBasedInterpolator::Initialize(mitk::DataStorage* storage)
 
   m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 
-  // react whenever the set of selected segmentation changes
+  // react whenever the active working image changes
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkSurfaceBasedInterpolator>( this, &QmitkSurfaceBasedInterpolator::OnToolManagerWorkingDataModified );
 
   m_Initialized = true;
@@ -158,19 +158,13 @@ void QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationFinished()
     m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
 
     this->ShowInterpolationResult(true);
-
+/*
     if( !m_DataStorage->Exists(m_InterpolatedSurfaceNode) && !m_DataStorage->Exists(m_3DContourNode))
     {
       m_DataStorage->Add(m_3DContourNode);
       m_DataStorage->Add(m_InterpolatedSurfaceNode);
     }
-  }
-  else if (interpolatedSurface.IsNull())
-  {
-    if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
-    {
-      this->ShowInterpolationResult(false);
-    }
+*/
   }
 }
 
@@ -284,11 +278,12 @@ void QmitkSurfaceBasedInterpolator:: SetCurrentContourListID()
     }
   }
 
-  m_SurfaceInterpolator->SetSegmentationImage(m_WorkingImage);
+  m_SurfaceInterpolator->SetWorkingImage(m_WorkingImage);
+  m_SurfaceInterpolator->SetActiveLabel(m_WorkingImage->GetActiveLabelIndex());
   m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
   m_SurfaceInterpolator->SetMinSpacing(minSpacing);
   m_SurfaceInterpolator->SetDistanceImageVolume(50000);
-  m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(m_WorkingImage);
+  //m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(m_WorkingImage);
 
   if (m_Activated)
   {

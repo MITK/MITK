@@ -68,7 +68,6 @@ m_Activated(false)
   m_3DContourNode->SetProperty( "helper object", mitk::BoolProperty::New(true));
   m_3DContourNode->SetProperty( "material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
   m_3DContourNode->SetProperty( "material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
-//  m_3DContourNode->SetProperty( "3DContourContainer", mitk::BoolProperty::New(true));
   m_3DContourNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
   m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
   m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
@@ -87,7 +86,7 @@ m_Activated(false)
 
 void QmitkSurfaceBasedInterpolator::Initialize(mitk::DataStorage* storage)
 {
-  Q_ASSERT(!storage);
+  Q_ASSERT(storage);
 
   if (m_Initialized)
   {
@@ -145,28 +144,40 @@ void QmitkSurfaceBasedInterpolator::ShowInterpolationResult(bool status)
 
    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
-
+/*
 void QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationFinished()
 {
   mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
 
-  if (interpolatedSurface.IsNotNull() && workingNode &&
-     workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))))
-  {
-    m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
-    m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
+  mitk::Surface::Pointer contoursAsSurface = m_SurfaceInterpolator->GetContoursAsSurface();
+  m_3DContourNode->SetData(contoursAsSurface);
+}
+*/
 
-    this->ShowInterpolationResult(true);
-/*
-    if( !m_DataStorage->Exists(m_InterpolatedSurfaceNode) && !m_DataStorage->Exists(m_3DContourNode))
-    {
+ void QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationFinished()
+ {
+   mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
+
+   if ( interpolatedSurface.IsNotNull() )
+   {
+     m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
+     m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
+     this->ShowInterpolationResult(true);
+   }
+   else
+   {
+     this->ShowInterpolationResult(false);
+   }
+
+ /*
+     if( !m_DataStorage->Exists(m_InterpolatedSurfaceNode) && !m_DataStorage->Exists(m_3DContourNode))
+     {
       m_DataStorage->Add(m_3DContourNode);
       m_DataStorage->Add(m_InterpolatedSurfaceNode);
     }
 */
-  }
-}
+ }
 
 void QmitkSurfaceBasedInterpolator::OnShowMarkers(bool state)
 {
@@ -245,55 +256,12 @@ void QmitkSurfaceBasedInterpolator::OnToolManagerWorkingDataModified()
   }
 
   m_WorkingImage = workingImage;
-
-  //Updating the current selected segmentation for the 3D interpolation
-  bool isInterpolationResult(false);
-  workingNode->GetBoolProperty("3DInterpolationResult", isInterpolationResult);
-
-  if (!isInterpolationResult)
-    this->SetCurrentContourListID();
 }
 
 void QmitkSurfaceBasedInterpolator::OnRunInterpolation()
 {
   m_SurfaceInterpolator->Interpolate();
 }
-
-void QmitkSurfaceBasedInterpolator:: SetCurrentContourListID()
-{
-  this->ShowInterpolationResult(false);
-
-  mitk::Vector3D spacing = m_WorkingImage->GetGeometry(0)->GetSpacing();
-  double minSpacing (100);
-  double maxSpacing (0);
-  for (int i =0; i < 3; i++)
-  {
-    if (spacing[i] < minSpacing)
-    {
-      minSpacing = spacing[i];
-    }
-    else if (spacing[i] > maxSpacing)
-    {
-      maxSpacing = spacing[i];
-    }
-  }
-
-  m_SurfaceInterpolator->SetWorkingImage(m_WorkingImage);
-  m_SurfaceInterpolator->SetActiveLabel(m_WorkingImage->GetActiveLabelIndex());
-  m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
-  m_SurfaceInterpolator->SetMinSpacing(minSpacing);
-  m_SurfaceInterpolator->SetDistanceImageVolume(50000);
-  //m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(m_WorkingImage);
-
-  if (m_Activated)
-  {
-    if (m_Watcher.isRunning())
-      m_Watcher.waitForFinished();
-    m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolator::OnRunInterpolation);
-    m_Watcher.setFuture(m_Future);
-  }
-}
-
 
 void QmitkSurfaceBasedInterpolator::OnActivateWidget(bool enabled)
 {
@@ -325,8 +293,26 @@ void QmitkSurfaceBasedInterpolator::OnActivateWidget(bool enabled)
       m_DataStorage->Add( m_3DContourNode );
     }
 
-    bool isInterpolationResult(false);
-    workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
+    mitk::Vector3D spacing = m_WorkingImage->GetGeometry(0)->GetSpacing();
+    double minSpacing (100);
+    double maxSpacing (0);
+    for (int i =0; i < 3; i++)
+    {
+      if (spacing[i] < minSpacing)
+      {
+        minSpacing = spacing[i];
+      }
+      else if (spacing[i] > maxSpacing)
+      {
+        maxSpacing = spacing[i];
+      }
+    }
+
+    m_SurfaceInterpolator->SetWorkingImage(m_WorkingImage);
+    m_SurfaceInterpolator->SetActiveLabel(m_WorkingImage->GetActiveLabelIndex());
+    m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
+    m_SurfaceInterpolator->SetMinSpacing(minSpacing);
+    m_SurfaceInterpolator->SetDistanceImageVolume(50000);
 
     int ret = QMessageBox::Yes;
 
@@ -380,6 +366,7 @@ void QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationInfoChanged(const itk:
   {
     if (m_Watcher.isRunning())
       m_Watcher.waitForFinished();
+    MITK_INFO << "OnSurfaceInterpolationInfoChanged entered!";
     m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolator::OnRunInterpolation);
     m_Watcher.setFuture(m_Future);
   }

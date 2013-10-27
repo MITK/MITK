@@ -252,7 +252,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     }
   }
 
-  if (true)//m_3DInterpolationEnabled )
+  if (m_3DInterpolationEnabled)
   {
     ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
     contourExtractor->SetInput(slice);
@@ -277,7 +277,9 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
       PlanePositionManagerService* service = us::GetModuleContext()->GetService(serviceRef);
       mitk::SurfaceInterpolationController* interpolator = mitk::SurfaceInterpolationController::GetInstance();
       if (interpolator)
+      {
         interpolator->AddNewContour( contour, service->GetPlanePosition(pos), workingImage->GetActiveLabelIndex() );
+      }
     }
   }
 }

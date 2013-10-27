@@ -56,12 +56,13 @@ public:
   mitkClassMacro(ComputeContourSetNormalsFilter,SurfaceToSurfaceFilter);
   itkNewMacro(Self);
 
-  //itkSetMacro(SegmentationBinaryImage, mitk::Image::Pointer);
-
+  /**
+    \brief Sets the working image and the current active label.
+  */
   void SetWorkingImage(Image* image, int activeLabel);
 
-   /*
-      \brief Returns the computed normals as a surface
+  /**
+    \brief Returns the computed normals as a surface.
   */
   mitk::Surface::Pointer GetNormalsAsSurface();
 

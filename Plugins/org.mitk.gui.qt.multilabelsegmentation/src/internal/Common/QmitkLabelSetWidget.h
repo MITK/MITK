@@ -87,6 +87,9 @@ private slots:
   // reaction to the signal "combineAndCreateSurface" from QmitkLabelSetTableWidget
   void OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>& ranges );
 
+  // reaction to the button "Change Label"
+  void OnActiveLabelChanged(int);
+
   // reaction to the button "New Label"
   void OnNewLabel();
 

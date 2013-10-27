@@ -85,11 +85,11 @@ namespace mitk
      */
     Surface* GetContoursAsSurface();
 
-    /**
-     * Sets the current list of contour points which is used for the surface interpolation
-     * @param activeLabel The active label in the current working image
-     */
-    void SetActiveLabel(int activeLabel);
+   /**
+    * Sets the current list of contour points which is used for the surface interpolation
+    * @param activeLabel The active label in the current working image
+    */
+   void SetActiveLabel(int activeLabel);
 
     /**
      * Removes the segmentation and all its contours from the list

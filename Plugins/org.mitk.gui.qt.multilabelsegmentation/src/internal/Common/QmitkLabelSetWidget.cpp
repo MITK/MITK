@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStatusBar.h>
 #include <mitkIOUtil.h>
 #include <mitkCoreObjectFactory.h>
+#include <mitkSurfaceInterpolationController.h>
+#include <mitkSegmentationInterpolationController.h>
 
 // Qmitk
 #include <QmitkDataStorageComboBox.h>
@@ -57,6 +59,7 @@ m_IRenderWindowPart(NULL)
   // react whenever the set of selected segmentation changes
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerWorkingDataModified );
 
+  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(activeLabelChanged(int)), this, SLOT(OnActiveLabelChanged(int)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(newLabel()), this, SLOT(OnNewLabel()) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(renameLabel(int, const mitk::Color&, const std::string&)), this, SLOT(OnRenameLabel(int, const mitk::Color&, const std::string&)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createSurface(int)), this, SLOT(OnCreateSurface(int)) );
@@ -437,6 +440,13 @@ void QmitkLabelSetWidget::UpdateControls()
   m_Controls.m_btNextLayer->setEnabled(activeLayer!=numberOfLayers-1);
   m_Controls.m_cbActiveLayer->setEnabled(numberOfLayers>1);
   m_Controls.m_cbActiveLayer->setCurrentIndex(activeLayer);
+}
+
+void QmitkLabelSetWidget::OnActiveLabelChanged(int activeLabel)
+{
+  mitk::SurfaceInterpolationController* interpolator = mitk::SurfaceInterpolationController::GetInstance();
+  if (interpolator)
+    interpolator->SetActiveLabel(activeLabel);
 }
 
 void QmitkLabelSetWidget::OnNewLabel()

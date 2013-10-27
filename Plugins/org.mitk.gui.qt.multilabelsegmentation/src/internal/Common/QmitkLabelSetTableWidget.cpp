@@ -186,6 +186,7 @@ void QmitkLabelSetTableWidget::SetActiveLabel(int index)
   if (index >= 0 && index < this->rowCount())
   {
     m_LabelSetImage->SetActiveLabel(index,true);
+    emit activeLabelChanged(index);
   }
 }
 
@@ -360,7 +361,10 @@ void QmitkLabelSetTableWidget::OnItemClicked(QTableWidgetItem *item)
   if (!item) return;
   int row = item->row();
   if (row >= 0 && row < this->rowCount())
+  {
     m_LabelSetImage->SetActiveLabel(row, false);
+    emit activeLabelChanged(row);
+  }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -372,6 +376,7 @@ void QmitkLabelSetTableWidget::OnItemDoubleClicked(QTableWidgetItem *item)
   if (row >= 0 && row < this->rowCount())
   {
     m_LabelSetImage->SetActiveLabel(row,false);
+    emit activeLabelChanged(row);
     this->WaitCursorOn();
     const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(row, true);
     this->WaitCursorOff();
@@ -460,6 +465,7 @@ void QmitkLabelSetTableWidget::InsertItem()
   {
     this->selectRow(row);
     m_LabelSetImage->SetActiveLabel(row,true);
+    emit activeLabelChanged(row);
   }
 
   emit labelListModified(m_LabelStringList);

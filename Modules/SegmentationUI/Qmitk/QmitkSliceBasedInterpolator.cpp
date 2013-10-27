@@ -99,7 +99,7 @@ void QmitkSliceBasedInterpolator::Initialize(const QList<mitk::SliceNavigationCo
 {
   Q_ASSERT(!controllers.empty());
 
-  Q_ASSERT(!storage);
+  Q_ASSERT(storage);
 
   if (m_Initialized)
   {

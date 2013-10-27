@@ -54,6 +54,8 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* rendering
     ApplyProperties(renderer);
 
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("contour.color", renderer));
+    float opacity = 0.5;
+    dataNode->GetFloatProperty("opacity", opacity, renderer);
 
     if(colorprop)
     {
@@ -61,7 +63,7 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* rendering
       double red = colorprop->GetColor().GetRed();
       double green = colorprop->GetColor().GetGreen();
       double blue = colorprop->GetColor().GetBlue();
-      glColor4f(red,green,blue,0.5);
+      glColor4f(red, green, blue, opacity);
     }
 
     mitk::ColorProperty::Pointer selectedcolor = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("contour.points.color", renderer));

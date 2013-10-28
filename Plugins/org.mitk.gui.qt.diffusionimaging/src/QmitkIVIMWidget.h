@@ -51,7 +51,7 @@ public:
 
 private:
 
-  std::vector<double> vec(vnl_vector<double> vector);
+  std::vector<double> vec(const vnl_vector<double>& vector);
 
 };
 

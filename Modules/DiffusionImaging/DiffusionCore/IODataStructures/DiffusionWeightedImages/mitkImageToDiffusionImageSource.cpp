@@ -44,7 +44,7 @@ void mitk::ImageToDiffusionImageSource<TPixelType>
 ::GenerateOutputInformation()
 {
   // sanity checks ( input not null, timesteps corresponds to number of directions specified )
-  if( m_GradientDirections->empty() )
+  if( m_GradientDirections.IsNull() || m_GradientDirections->empty() )
   {
     mitkThrow() << "No gradient directions were set. Cannot proceed.";
   }

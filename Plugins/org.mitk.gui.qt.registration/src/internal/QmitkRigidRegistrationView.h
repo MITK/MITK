@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITKRIGIDREGISTRATION_H
 #define QMITKRIGIDREGISTRATION_H
 
@@ -246,15 +245,29 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
 
     void SetImagesVisible(berry::ISelection::ConstPointer /*selection*/);
 
-    void CheckForMaskImages();
+    //void CheckForMaskImages();
 
-    void UseFixedMaskImageChecked(bool checked);
+    //void UseFixedMaskImageChecked(bool checked);
 
-    void UseMovingMaskImageChecked(bool checked);
+    //void UseMovingMaskImageChecked(bool checked);
 
     void TabChanged(int index);
 
     void SwitchImages();
+
+    /*!
+    * indicates if the masking option shall be used.
+    */
+    void OnUseMaskingChanged(int state);
+
+    /*!
+    * method called if the fixed mask image selector changed.
+    */
+    void OnFixedMaskImageChanged(const mitk::DataNode* node);
+    /*!
+    * method called if the moving mask image selector changed.
+    */
+    void OnMovingMaskImageChanged(const mitk::DataNode* node);
 
   protected:
 
@@ -281,12 +294,14 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     // A node to store the contour of the fixed image in
     mitk::DataNode::Pointer m_ContourHelperNode;
 
+    typedef std::map<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer> GeometryMapType;
+    typedef std::list< GeometryMapType > GeometryMapListType;
+    typedef std::list<mitk::Geometry3D::Pointer> GeometryListType;
 
-
-    std::list<mitk::Geometry3D::Pointer> m_UndoGeometryList;
-    std::list<std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> > m_UndoChildGeometryList;
-    std::list<mitk::Geometry3D::Pointer> m_RedoGeometryList;
-    std::list<std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> > m_RedoChildGeometryList;
+    GeometryListType m_UndoGeometryList;
+    GeometryMapListType m_UndoChildGeometryList;
+    GeometryListType m_RedoGeometryList;
+    GeometryMapListType m_RedoChildGeometryList;
     bool m_ShowRedGreen;
     float m_Opacity;
     float m_OriginalOpacity;

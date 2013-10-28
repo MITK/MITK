@@ -80,6 +80,7 @@ namespace itk{
     itkGetMacro( MinTractLength, float )
     itkSetMacro( MinCurvatureRadius, float )
     itkGetMacro( MinCurvatureRadius, float )
+    itkSetMacro( ResampleFibers, bool )
 
   protected:
     StreamlineTrackingFilter();
@@ -120,6 +121,7 @@ namespace itk{
     ItkUcharImgType::Pointer m_MaskImage;
     bool m_Interpolate;
     float m_PointPistance;
+    bool m_ResampleFibers;
 
     itk::VectorContainer< int, FiberPolyDataType >::Pointer m_PolyDataContainer;
 

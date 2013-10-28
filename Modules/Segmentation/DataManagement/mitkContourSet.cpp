@@ -16,12 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkContourSet.h"
+#include <mitkProportionalTimeGeometry.h>
 
 mitk::ContourSet::ContourSet() :
   m_ContourVector( ContourVectorType() ),
   m_NumberOfContours (0)
 {
-  GetTimeSlicedGeometry()->InitializeEvenlyTimed(1);
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(1);
+  SetTimeGeometry(timeGeometry);
 }
 
 mitk::ContourSet::~ContourSet()
@@ -51,7 +54,7 @@ void mitk::ContourSet::UpdateOutputInformation()
   mitk::BoundingBox::PointIdentifier pointid=0;
   mitk::Point3D point;
 
-  mitk::AffineTransform3D* transform = GetTimeSlicedGeometry()->GetIndexToWorldTransform();
+  mitk::AffineTransform3D* transform = GetGeometry(0)->GetIndexToWorldTransform();
   mitk::AffineTransform3D::Pointer inverse = mitk::AffineTransform3D::New();
   transform->GetInverse(inverse);
 
@@ -59,11 +62,11 @@ void mitk::ContourSet::UpdateOutputInformation()
   // \todo probably we should do this additionally for each time-step
   while (contoursIterator != contoursIteratorEnd)
   {
-    const Geometry3D* geometry = (*contoursIterator).second->GetUpdatedTimeSlicedGeometry();
+    const TimeGeometry* geometry = (*contoursIterator).second->GetUpdatedTimeGeometry();
     unsigned char i;
     for(i=0; i<8; ++i)
     {
-      point = inverse->TransformPoint(geometry->GetCornerPoint(i));
+      point = inverse->TransformPoint(geometry->GetCornerPointInWorld(i));
       if(point[0]*point[0]+point[1]*point[1]+point[2]*point[2] < mitk::large)
         pointscontainer->InsertElement( pointid++, point);
       else
@@ -82,7 +85,10 @@ void mitk::ContourSet::UpdateOutputInformation()
   geometry3d->SetIndexToWorldTransform(transform);
   geometry3d->SetBounds(boundingBox->GetBounds());
 
-  GetTimeSlicedGeometry()->InitializeEvenlyTimed(geometry3d, GetTimeSlicedGeometry()->GetTimeSteps());
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(geometry3d,GetTimeGeometry()->CountTimeSteps());
+  SetTimeGeometry(timeGeometry);
+
 }
 
 void mitk::ContourSet::SetRequestedRegionToLargestPossibleRegion()
@@ -106,7 +112,9 @@ void mitk::ContourSet::SetRequestedRegion( const itk::DataObject*)
 void mitk::ContourSet::Initialize()
 {
   m_ContourVector = ContourVectorType();
-  GetTimeSlicedGeometry()->InitializeEvenlyTimed(1);
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(1);
+  SetTimeGeometry(timeGeometry);
 }
 
 

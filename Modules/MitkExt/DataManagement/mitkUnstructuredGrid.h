@@ -69,7 +69,7 @@ public:
   const RegionType& GetLargestPossibleRegion() const
   {
     m_LargestPossibleRegion.SetIndex(3, 0);
-    m_LargestPossibleRegion.SetSize(3, GetTimeSlicedGeometry()->GetTimeSteps());
+    m_LargestPossibleRegion.SetSize(3, GetTimeGeometry()->CountTimeSteps());
     return m_LargestPossibleRegion;
   }
 

@@ -18,14 +18,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBoundingObjectGroup.h"
 #include "mitkBaseProcess.h"
 #include <vtkLinearTransform.h>
+#include <mitkProportionalTimeGeometry.h>
 
 mitk::BoundingObjectGroup::BoundingObjectGroup()
 :m_BoundingObjects(0),
 m_Counter(0),
 m_CSGMode(Union)// m_CSGMode(Difference) //m_CSGMode(Intersection)
 {
-  GetTimeSlicedGeometry()->InitializeEvenlyTimed(1);
-  GetGeometry(0)->SetIndexToWorldTransform(GetTimeSlicedGeometry()->GetIndexToWorldTransform());
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(1);
+  SetTimeGeometry(timeGeometry);
+
   SetVtkPolyData(NULL);
 }
 
@@ -45,9 +48,11 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   {
     mitk::BoundingBox::BoundsArrayType boundsArray;
     boundsArray.Fill(0);
-    GetTimeSlicedGeometry()->InitializeEvenlyTimed(1);
+    ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+    timeGeometry->Initialize(1);
+    SetTimeGeometry(timeGeometry);
     GetGeometry()->SetBounds(boundsArray);
-    GetTimeSlicedGeometry()->UpdateInformation();
+    GetTimeGeometry()->Update();
     return;
   }
 
@@ -57,7 +62,7 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   mitk::BoundingBox::PointIdentifier pointid=0;
   mitk::Point3D point;
 
-  mitk::AffineTransform3D* transform = GetTimeSlicedGeometry()->GetIndexToWorldTransform();
+  mitk::AffineTransform3D* transform = GetGeometry()->GetIndexToWorldTransform();
   mitk::AffineTransform3D::Pointer inverse = mitk::AffineTransform3D::New();
   transform->GetInverse(inverse);
 
@@ -66,11 +71,11 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   //while (boundingObjectsIterator != boundingObjectsIteratorEnd)
   for(unsigned int j = 0; j<m_BoundingObjects.size();j++)
   {
-    const Geometry3D* geometry = m_BoundingObjects.at(j)->GetUpdatedTimeSlicedGeometry();
+    const TimeGeometry* geometry = m_BoundingObjects.at(j)->GetUpdatedTimeGeometry();
     unsigned char i;
     for(i=0; i<8; ++i)
     {
-      point = inverse->TransformPoint(geometry->GetCornerPoint(i));
+      point = inverse->TransformPoint(geometry->GetCornerPointInWorld(i));
       if(point[0]*point[0]+point[1]*point[1]+point[2]*point[2] < mitk::large)
         pointscontainer->InsertElement( pointid++, point);
       else
@@ -84,24 +89,15 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   boundingBox->SetPoints(pointscontainer);
   boundingBox->ComputeBoundingBox();
 
-  /* BoundingBox is centered around the center of all sub bounding objects */
-  //Point3D center = boundingBox->GetCenter();
-
-  //Point3D minimum, maximum;
-  //minimum.Fill(0); maximum.Fill(0);
-  //minimum += boundingBox->GetMinimum() - center;
-  //maximum += boundingBox->GetMaximum() - center;
-
-  //boundingBox->SetMinimum(minimum);
-  //boundingBox->SetMaximum(maximum);
-
   Geometry3D* geometry3d = GetGeometry(0);
   geometry3d->SetIndexToWorldTransform(transform);
   geometry3d->SetBounds(boundingBox->GetBounds());
   /* the objects position is the center of all sub bounding objects */
   //geometry3d->SetOrigin(center);
 
-  GetTimeSlicedGeometry()->InitializeEvenlyTimed(geometry3d, GetTimeSlicedGeometry()->GetTimeSteps());
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(geometry3d, GetTimeGeometry()->CountTimeSteps());
+  SetTimeGeometry(timeGeometry);
 }
 
 void mitk::BoundingObjectGroup::AddBoundingObject(mitk::BoundingObject::Pointer boundingObject)

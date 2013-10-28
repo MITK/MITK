@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkExports.h>
 #include "mitkBaseData.h"
-#include "mitkTimeSlicedGeometry.h"
 #include "mitkSlicedGeometry3D.h"
 #include "itkIndex.h"
 #include "itkOffset.h"
@@ -120,6 +119,13 @@ public:
   //## implemented in the concrete subclasses of DataObject.
   virtual void SetRequestedRegion(SlicedData::RegionType *region);
 
+  /*! Documentation
+  \brief Sets the largest possible region.
+  The largest possible region is the entire region occupied by the data object.
+  Note that the largest possible region should always be bigger then the requested region
+  of a certain operation.*/
+  void SetLargestPossibleRegion(SlicedData::RegionType *region);
+
   const RegionType& GetLargestPossibleRegion() const
   {
     return m_LargestPossibleRegion;
@@ -209,7 +215,6 @@ protected:
   SlicedData();
   SlicedData(const SlicedData &other);
   virtual ~SlicedData();
-
   RegionType m_LargestPossibleRegion;
 
   RegionType          m_RequestedRegion;

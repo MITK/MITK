@@ -78,6 +78,7 @@ namespace mitk
 
   /**
   * @brief Equal Compare two surfaces for equality, returns true if found equal.
+  * @ingroup MITKTestingAPI
   * @param rightHandSide Surface to compare.
   * @param leftHandSide Surface to compare.
   * @param eps Epsilon to use for floating point comparison. Most of the time mitk::eps will be sufficient.
@@ -88,6 +89,7 @@ MITK_CORE_EXPORT bool Equal( mitk::Surface* leftHandSide, mitk::Surface* rightHa
 
   /**
   * @brief Equal Compare two vtk PolyDatas for equality, returns true if found equal.
+  * @ingroup MITKTestingAPI
   * @param rightHandSide Surface to compare.
   * @param leftHandSide Surface to compare.
   * @param eps Epsilon to use for floating point comparison. Most of the time mitk::eps will be sufficient.

@@ -99,16 +99,16 @@ void mitk::ExtractSliceFilter::GenerateData(){
   }
 
 
-  const TimeSlicedGeometry *inputTimeGeometry = this->GetInput()->GetTimeSlicedGeometry();
+  const TimeGeometry* inputTimeGeometry = this->GetInput()->GetTimeGeometry();
   if ( ( inputTimeGeometry == NULL )
-    || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
+    || ( inputTimeGeometry->CountTimeSteps() <= 0 ) )
   {
-    itkWarningMacro(<<"Error reading input image TimeSlicedGeometry.");
+    itkWarningMacro(<<"Error reading input image TimeGeometry.");
     return;
   }
 
   // is it a valid timeStep?
-  if ( inputTimeGeometry->IsValidTime( m_TimeStep ) == false )
+  if ( inputTimeGeometry->IsValidTimeStep( m_TimeStep ) == false )
   {
     itkWarningMacro(<<"This is not a valid timestep: "<< m_TimeStep );
     return;
@@ -158,8 +158,8 @@ void mitk::ExtractSliceFilter::GenerateData(){
       // associated input image, regardless of the currently selected world
       // geometry.
       Vector3D rightInIndex, bottomInIndex;
-      inputTimeGeometry->GetGeometry3D( m_TimeStep )->WorldToIndex( right, rightInIndex );
-      inputTimeGeometry->GetGeometry3D( m_TimeStep )->WorldToIndex( bottom, bottomInIndex );
+      inputTimeGeometry->GetGeometryForTimeStep( m_TimeStep )->WorldToIndex( right, rightInIndex );
+      inputTimeGeometry->GetGeometryForTimeStep( m_TimeStep )->WorldToIndex( bottom, bottomInIndex );
       extent[0] = rightInIndex.GetNorm();
       extent[1] = bottomInIndex.GetNorm();
     }
@@ -239,7 +239,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
       vtkSmartPointer<vtkGeneralTransform> composedResliceTransform = vtkSmartPointer<vtkGeneralTransform>::New();
       composedResliceTransform->Identity();
       composedResliceTransform->Concatenate(
-        inputTimeGeometry->GetGeometry3D( m_TimeStep )->GetVtkTransform()->GetLinearInverse() );
+        inputTimeGeometry->GetGeometryForTimeStep( m_TimeStep )->GetVtkTransform()->GetLinearInverse() );
       composedResliceTransform->Concatenate(
         abstractGeometry->GetVtkAbstractTransform()
         );

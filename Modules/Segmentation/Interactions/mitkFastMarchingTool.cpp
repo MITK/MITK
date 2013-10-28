@@ -103,7 +103,7 @@ us::ModuleResource mitk::FastMarchingTool::GetCursorIconResource() const
 
 const char* mitk::FastMarchingTool::GetName() const
 {
-  return "FastMarching2D";
+  return "2D Fast Marching";
 }
 
 void mitk::FastMarchingTool::BuildITKPipeline()
@@ -264,7 +264,7 @@ void mitk::FastMarchingTool::Deactivated()
 void mitk::FastMarchingTool::Initialize()
 {
   m_ReferenceImage = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
-  if(m_ReferenceImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
+  if(m_ReferenceImage->GetTimeGeometry()->CountTimeSteps() > 1)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
     timeSelector->SetInput( m_ReferenceImage );
@@ -285,7 +285,7 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
 
     mitk::Image::Pointer workingImageSlice;
     mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(this->m_ToolManager->GetWorkingData(0)->GetData());
-    if(workingImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
+    if(workingImage->GetTimeGeometry()->CountTimeSteps() > 1)
     {
       mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
       timeSelector->SetInput( workingImage );
@@ -366,6 +366,8 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
 
   m_NeedUpdate = true;
 
+  m_ReadyMessage.Send();
+
   this->Update();
 
   return true;
@@ -396,10 +398,12 @@ bool mitk::FastMarchingTool::OnDelete(Action* action, const StateEvent* stateEve
 
 void mitk::FastMarchingTool::Update()
 {
+  const unsigned int progress_steps = 20;
+
   // update FastMarching pipeline and show result
   if (m_NeedUpdate)
   {
-    m_ProgressCommand->AddStepsToDo(20);
+    m_ProgressCommand->AddStepsToDo(progress_steps);
     CurrentlyBusy.Send(true);
     try
     {
@@ -409,7 +413,8 @@ void mitk::FastMarchingTool::Update()
     {
      MITK_ERROR << "Exception caught: " << excep.GetDescription();
 
-     m_ProgressCommand->SetRemainingProgress(100);
+     // progress by max step count, will force
+     m_ProgressCommand->SetProgress(progress_steps);
      CurrentlyBusy.Send(false);
 
      std::string msg = excep.GetDescription();
@@ -417,7 +422,7 @@ void mitk::FastMarchingTool::Update()
 
      return;
     }
-    m_ProgressCommand->SetRemainingProgress(100);
+    m_ProgressCommand->SetProgress(progress_steps);
     CurrentlyBusy.Send(false);
 
     //make output visible
@@ -439,7 +444,14 @@ void mitk::FastMarchingTool::ClearSeeds()
     this->m_SeedContainer->Initialize();
 
   if(this->m_SeedsAsPointSet.IsNotNull())
-    this->m_SeedsAsPointSet->Clear();
+  {
+    this->m_SeedsAsPointSet = mitk::PointSet::New();
+    this->m_SeedsAsPointSetNode->SetData(this->m_SeedsAsPointSet);
+    m_SeedsAsPointSetNode->SetName("Seeds_Preview");
+    m_SeedsAsPointSetNode->SetBoolProperty("helper object", true);
+    m_SeedsAsPointSetNode->SetColor(0.0, 1.0, 0.0);
+    m_SeedsAsPointSetNode->SetVisibility(true);
+  }
 
   if(this->m_FastMarchingFilter.IsNotNull())
     m_FastMarchingFilter->Modified();

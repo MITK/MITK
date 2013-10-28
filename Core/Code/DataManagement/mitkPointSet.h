@@ -273,6 +273,8 @@ protected:
 /**
  * @brief Equal A function comparing two pointsets for beeing identical.
  *
+ * @ingroup MITKTestingAPI
+ *
  * The function compares the Geometry, the size and all points element-wise.
  * The parameter eps is a tolarence value for all methods which are internally used for comparion.
  *

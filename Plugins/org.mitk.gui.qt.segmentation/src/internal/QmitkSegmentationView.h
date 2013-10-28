@@ -67,7 +67,7 @@ public:
   virtual void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
 
   // observer to mitk::RenderingManager's RenderingManagerViewsInitializedEvent event
-  void RenderingManagerReinitialized(const itk::EventObject&);
+  void RenderingManagerReinitialized();
 
   // observer to mitk::SliceController's SliceRotation event
   void SliceRotation(const itk::EventObject&);
@@ -83,13 +83,6 @@ protected slots:
   void CreateNewSegmentation();
 
   void OnManualTool2DSelected(int id);
-  // reaction to the button "New segmentation"
-//  void CreateSegmentationFromSurface();
-
-  // called when one of "Manual", "Organ", "Lesion" pages of the QToolbox is selected
-//  void ToolboxStackPageChanged(int id);
-
-//  void OnSurfaceSelectionChanged();
 
   void OnWorkingNodeVisibilityChanged();
 
@@ -135,6 +128,8 @@ protected:
 
   void SetMouseCursor(const us::ModuleResource&, int hotspotX, int hotspotY );
 
+  void SetToolSelectionBoxesEnabled(bool);
+
   bool m_MouseCursorSet;
 
   // handling of a list of known (organ name, organ color) combination
@@ -170,6 +165,8 @@ protected:
   NodeTagMapType  m_WorkingDataObserverTags;
 
   NodeTagMapType  m_BinaryPropertyObserverTags;
+
+  unsigned int m_RenderingManagerObserverTag;
 
   bool m_AutoSelectionEnabled;
 

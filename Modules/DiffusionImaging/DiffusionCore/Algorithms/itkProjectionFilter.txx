@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkProjectionFilter.h"
 
 #include "mitkProgressBar.h"
-#include <itkSignedMaurerDistanceMapImageFilter.h>
+//#include <itkSignedMaurerDistanceMapImageFilter.h>
 
 #define SEARCHSIGMA 10 /* length in linear voxel dimensions */
 #define MAXSEARCHLENGTH (3*SEARCHSIGMA)
@@ -64,7 +64,6 @@ namespace itk
         for(int y=1; y<size[1]-1; y++)
         {
 
-          std::cout << "x";
           for(int x=1; x<size[0]-1; x++)
           {
 
@@ -78,8 +77,9 @@ namespace itk
 
               Float4DImageType::IndexType ix4d;
               ix4d[0]=x; ix4d[1]=y; ix4d[2]=z; ix4d[3]=t;
-              float maxval = m_AllFA->GetPixel(ix4d), maxval_weighted = maxval,
-                exponentfactor = -0.5 * (dir[0]*dir[0]+dir[1]*dir[1]+dir[2]*dir[2]) / (float)(SEARCHSIGMA*SEARCHSIGMA);
+              float maxval = m_AllFA->GetPixel(ix4d);
+              float maxval_weighted = maxval;
+              float exponentfactor = -0.5 * (dir[0]*dir[0]+dir[1]*dir[1]+dir[2]*dir[2]) / (float)(SEARCHSIGMA*SEARCHSIGMA);
 
 
               // No tubular structure here
@@ -179,6 +179,7 @@ namespace itk
               }
 
               ix4d[0]=x; ix4d[1]=y; ix4d[2]=z; ix4d[3]=t;
+
               data_4d_projected->SetPixel(ix4d, maxval);
 
             }

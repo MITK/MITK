@@ -98,6 +98,8 @@ protected:
   PlanarCross();
   virtual ~PlanarCross();
 
+  mitkCloneMacro(Self);
+
   /** \brief Spatially constrain control points of second (orthogonal) line */
   virtual Point2D ApplyControlPointConstraints( unsigned int index, const Point2D& point );
 

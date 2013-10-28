@@ -57,6 +57,16 @@ void DftImageFilter< TPixelType >
         int kx = oit.GetIndex()[0];
         int ky = oit.GetIndex()[1];
 
+        if( kx <  szx/2 )
+            kx = kx + szx/2;
+        else
+            kx = kx - szx/2;
+
+        if( ky <  szy/2 )
+            ky = ky + szy/2;
+        else
+            ky = ky - szy/2;
+
         vcl_complex<double> s(0,0);
         InputIteratorType it(inputImage, inputImage->GetLargestPossibleRegion() );
         while( !it.IsAtEnd() )

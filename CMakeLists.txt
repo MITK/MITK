@@ -211,6 +211,11 @@ if(MITK_USE_SOFA)
     set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
     message(WARNING "Switched off MITK_USE_SOFA\n  Clang is not supported, use GCC instead.")
   endif()
+  # SOFA/ITK combination requires at least MSVC 2010
+  if(MSVC_VERSION AND MSVC_VERSION LESS 1600)
+    set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
+    message(WARNING "Switched off MITK_USE_SOFA\n  MSVC versions less than 2010 are not supported.")
+  endif()
   # SOFA requires boost library
   if(MITK_USE_SOFA AND NOT MITK_USE_Boost)
     message("Forcing MITK_USE_Boost to ON because of MITK_USE_SOFA")
@@ -535,7 +540,13 @@ if(BUILD_TESTING)
   include(CTest)
   mark_as_advanced(TCL_TCLSH DART_ROOT)
 
-  option(MITK_ENABLE_GUI_TESTING OFF "Enable the MITK GUI tests")
+  option(MITK_ENABLE_RENDERING_TESTING OFF "Enable the MITK rendering tests. Requires x-server in Linux.")
+  #Rendering testing does not work for Linux nightlies, thus it is disabled per default
+  #and activated for Mac and Windows.
+  if(WIN32 OR APPLE)
+    set(MITK_ENABLE_RENDERING_TESTING ON)
+  endif()
+  mark_as_advanced( MITK_ENABLE_RENDERING_TESTING )
 
   # Setup file for setting custom ctest vars
   configure_file(

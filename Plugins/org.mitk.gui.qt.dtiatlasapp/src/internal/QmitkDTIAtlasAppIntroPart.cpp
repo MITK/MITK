@@ -232,7 +232,7 @@ void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
         if(rs->Size() > 0)
         {
           // calculate bounding geometry of these nodes
-          mitk::TimeSlicedGeometry::Pointer bounds = dataStorage->ComputeBoundingGeometry3D(rs);
+          mitk::TimeGeometry::Pointer bounds = dataStorage->ComputeBoundingGeometry3D(rs);
           // initialize the views to the bounding geometry
           mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
         }

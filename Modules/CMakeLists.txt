@@ -11,6 +11,7 @@ set(module_dirs
     MitkExt
     SceneSerialization
     GraphAlgorithms
+    ContourModel
     SurfaceInterpolation
     Segmentation
     PlanarFigureSegmentation

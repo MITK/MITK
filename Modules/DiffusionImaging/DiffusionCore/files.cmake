@@ -64,6 +64,12 @@ set(CPP_FILES
   Algorithms/Registration/mitkPyramidImageRegistrationMethod.cpp
 
 
+  # MultishellProcessing
+  Algorithms/Reconstruction/MultishellProcessing/itkADCAverageFunctor.cpp
+  Algorithms/Reconstruction/MultishellProcessing/itkADCFitFunctor.cpp
+  Algorithms/Reconstruction/MultishellProcessing/itkKurtosisFitFunctor.cpp
+  Algorithms/Reconstruction/MultishellProcessing/itkBiExpFitFunctor.cpp
+
   # Function Collection
   mitkDiffusionFunctionCollection.cpp
 )
@@ -85,8 +91,14 @@ set(H_FILES
   Algorithms/Reconstruction/itkPointShell.h
   Algorithms/Reconstruction/itkOrientationDistributionFunction.h
   Algorithms/Reconstruction/itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h
-  Algorithms/Reconstruction/itkMultiShellAdcAverageReconstructionImageFilter.h
-  Algorithms/Reconstruction/itkMultiShellRadialAdcKurtosisImageFilter.h
+
+  # MultishellProcessing
+  Algorithms/Reconstruction/MultishellProcessing/itkRadialMultishellToSingleshellImageFilter.h
+  Algorithms/Reconstruction/MultishellProcessing/itkDWIVoxelFunctor.h
+  Algorithms/Reconstruction/MultishellProcessing/itkADCAverageFunctor.h
+  Algorithms/Reconstruction/MultishellProcessing/itkKurtosisFitFunctor.h
+  Algorithms/Reconstruction/MultishellProcessing/itkBiExpFitFunctor.h
+  Algorithms/Reconstruction/MultishellProcessing/itkADCFitFunctor.h
 
   # IO Datastructures
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h

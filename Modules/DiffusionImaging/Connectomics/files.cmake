@@ -40,7 +40,8 @@ set(CPP_FILES
   Algorithms/mitkConnectomicsSimulatedAnnealingManager.cpp
   Algorithms/mitkConnectomicsSimulatedAnnealingCostFunctionBase.cpp
   Algorithms/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.cpp
-
+  Algorithms/mitkConnectomicsStatisticsCalculator.cpp
+  Algorithms/mitkConnectomicsNetworkConverter.cpp
 )
 
 set(H_FILES
@@ -82,8 +83,8 @@ set(H_FILES
   Algorithms/mitkConnectomicsSimulatedAnnealingCostFunctionBase.h
   Algorithms/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h
   Algorithms/itkConnectomicsNetworkToConnectivityMatrixImageFilter.h
-
-
+  Algorithms/mitkConnectomicsStatisticsCalculator.h
+  Algorithms/mitkConnectomicsNetworkConverter.h
 )
 
 

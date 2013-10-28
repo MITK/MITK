@@ -170,7 +170,6 @@ void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * rend
 // vtkActors and Mappers are feeded here
 void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
-
     //the handler of local storage gets feeded in this method with requested data for related renderwindow
     FBXLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
@@ -178,11 +177,7 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
     //not needed after initializaton anymore
     mitk::DataNode* node = this->GetDataNode();
     if ( node == NULL )
-    {
-        MITK_INFO << "check DATANODE: ....[Fail] ";
         return;
-    }
-    ///////////////////////////////////
 
     ///THIS GET INPUT
     mitk::FiberBundleX* fbx = this->GetInput();
@@ -205,35 +200,28 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
             localStorage->m_PointActor->GetProperty()->SetColor(trgb);
         }
     }
-
-
-
+    int lineWidth = 1;
+    node->GetIntProperty("LineWidth",lineWidth);
     localStorage->m_PointMapper->SetInput(fbx->GetFiberPolyData());
     localStorage->m_PointActor->SetMapper(localStorage->m_PointMapper);
     localStorage->m_PointActor->GetProperty()->ShadingOn();
+    localStorage->m_PointActor->GetProperty()->SetLineWidth(lineWidth);
 
     // Applying shading properties
     CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
     shaderRepo->ApplyProperties(this->GetDataNode(),localStorage->m_PointActor,renderer, localStorage->m_LastUpdateTime);
-
-
     this->UpdateShaderParameter(renderer);
-
 
     // We have been modified => save this for next Update()
     localStorage->m_LastUpdateTime.Modified();
-
-
 }
 
 
 vtkProp* mitk::FiberBundleXMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
-
     //MITK_INFO << "FiberBundleMapper2D GetVtkProp(renderer)";
     this->Update(renderer);
     return m_LSH.GetLocalStorage(renderer)->m_PointActor;
-
 }
 
 
@@ -247,7 +235,6 @@ void mitk::FiberBundleXMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk
     //add other parameters to propertylist
     node->AddProperty( "Fiber2DSliceThickness", mitk::FloatProperty::New(2.0f), renderer, overwrite );
     node->AddProperty( "Fiber2DfadeEFX", mitk::BoolProperty::New(true), renderer, overwrite );
-
 
     Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

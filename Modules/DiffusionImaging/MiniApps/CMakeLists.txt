@@ -37,6 +37,9 @@ IF(BUILD_DiffusionMiniApps)
     TractogramAngularError.cpp
     FiberDirectionExtraction.cpp
     PeakExtraction.cpp
+    PeaksAngularError.cpp
+    MultishellMethods.cpp
+    FiberFoxProcessing.cpp
   )
 
   # create an executable foreach tool (only one at the moment)

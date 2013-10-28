@@ -40,6 +40,9 @@ int mitkPlayerLoadAndRenderDepthDataTest(int argc, char* argv[])
     std::string distanceFileName = dirname + "/" + argv[1];
     playerDevice->SetProperty("DistanceImageFileName",mitk::StringProperty::New(distanceFileName));
 
+    for (int i = 0; i < argc; ++i)
+      MITK_INFO << argv[i];
+
     MITK_TEST_CONDITION_REQUIRED(playerDevice->IsCameraActive()==false,"The device (player) should not be active before starting.");
     MITK_TEST_CONDITION_REQUIRED(playerDevice->ConnectCamera()==true,"ConnectCamera() should return true in case of success.");
     MITK_TEST_OUTPUT(<< "Device connected");

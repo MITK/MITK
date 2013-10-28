@@ -22,7 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::Mapper::Mapper()
-  :m_TimeStep( 0 )
+  : m_DataNode(NULL)
+  , m_TimeStep( 0 )
 {
 }
 
@@ -34,7 +35,7 @@ mitk::Mapper::~Mapper()
 
 mitk::BaseData* mitk::Mapper::GetData() const
 {
-return m_DataNode->GetData();
+  return m_DataNode == NULL ? NULL : m_DataNode->GetData();
 }
 
 
@@ -116,12 +117,12 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
   this->CalculateTimeStep( renderer );
 
   // Check if time step is valid
-  const TimeSlicedGeometry *dataTimeGeometry = data->GetTimeSlicedGeometry();
+  const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
   if ( ( dataTimeGeometry == NULL )
-    || ( dataTimeGeometry->GetTimeSteps() == 0 )
-    || ( !dataTimeGeometry->IsValidTime( m_TimeStep ) ) )
+    || ( dataTimeGeometry->CountTimeSteps() == 0 )
+    || ( !dataTimeGeometry->IsValidTimeStep( m_TimeStep ) ) )
   {
-    // TimeSlicedGeometry or time step is not valid for this data:
+    // TimeGeometry or time step is not valid for this data:
     // reset mapper so that nothing is displayed
     this->ResetMapper( renderer );
     return;

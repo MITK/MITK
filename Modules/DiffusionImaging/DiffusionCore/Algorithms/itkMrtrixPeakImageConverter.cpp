@@ -102,7 +102,12 @@ void MrtrixPeakImageConverter< PixelType >
         directionImage->Allocate();
         Vector< PixelType, 3 > nullVec; nullVec.Fill(0.0);
         directionImage->FillBuffer(nullVec);
+        m_DirectionImageContainer->InsertElement(m_DirectionImageContainer->Size(), directionImage);
+    }
 
+    double minangle = 0;
+    for (int i=0; i<numDirs; i++)
+    {
         for (int a=0; a<x; a++)
             for (int b=0; b<y; b++)
                 for (int c=0; c<z; c++)
@@ -161,16 +166,38 @@ void MrtrixPeakImageConverter< PixelType >
                     typename ItkDirectionImageType::IndexType index2;
                     index2[0] = a; index2[1] = b; index2[2] = c;
 
+//                    // workaround *********************************************
+//                    dirVec = m_InputImage->GetDirection()*dirVec;
+//                    dirVec.normalize();
+//                    // workaround *********************************************
 
                     Vector< PixelType, 3 > pixel;
                     pixel.SetElement(0, dirVec[0]);
                     pixel.SetElement(1, dirVec[1]);
                     pixel.SetElement(2, dirVec[2]);
-                    directionImage->SetPixel(index2, pixel);
+
+                    for (int j=0; j<numDirs; j++)
+                    {
+                        ItkDirectionImageType::Pointer directionImage = m_DirectionImageContainer->ElementAt(j);
+                        Vector< PixelType, 3 > tempPix = directionImage->GetPixel(index2);
+
+                        if (tempPix.GetNorm()<0.01)
+                        {
+                            directionImage->SetPixel(index2, pixel);
+                            break;
+                        }
+                        else
+                        {
+                            if ( fabs(dot_product(tempPix.GetVnlVector(), pixel.GetVnlVector()))>minangle )
+                            {
+                                minangle = fabs(dot_product(tempPix.GetVnlVector(), pixel.GetVnlVector()));
+                                MITK_INFO << "Minimum angle: " << acos(minangle)*180.0/M_PI;
+                            }
+                        }
+                    }
 
                     m_NumDirectionsImage->SetPixel(index2, m_NumDirectionsImage->GetPixel(index2)+1);
                 }
-        m_DirectionImageContainer->InsertElement(m_DirectionImageContainer->Size(), directionImage);
     }
 
     vtkSmartPointer<vtkPolyData> directionsPolyData = vtkSmartPointer<vtkPolyData>::New();

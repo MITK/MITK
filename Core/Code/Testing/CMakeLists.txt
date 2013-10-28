@@ -50,7 +50,7 @@ mitkAddCustomModuleTest(mitkLevelWindowManagerTest mitkLevelWindowManagerTest
 )
 
 
-if(WIN32 OR APPLE OR MITK_ENABLE_GUI_TESTING) ### since the rendering test's do not run in ubuntu, yet, we build them only for other systems or if the user explicitly sets the variable MITK_ENABLE_GUI_TESTING
+if(MITK_ENABLE_RENDERING_TESTING) ### since the rendering test's do not run in ubuntu, yet, we build them only for other systems or if the user explicitly sets the variable MITK_ENABLE_RENDERING_TESTING
 mitkAddCustomModuleTest(mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2DTest
                         ${MITK_DATA_DIR}/RenderingTestData/rgbaImage.png #input image to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/rgbaImage640x480REF.png #corresponding reference screenshot
@@ -86,6 +86,10 @@ mitkAddCustomModuleTest(mitkPointSetVtkMapper2D_Pic3DPointSetForPic3D640x480 mit
 mitkAddCustomModuleTest(mitkPointSetVtkMapper2D_openMeAloneGlyphType640x480 mitkPointSetVtkMapper2DGlyphTypeTest
                          ${MITK_DATA_DIR}/RenderingTestData/openMeAlone.mps #input point set to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/openMeAloneGlyphType640x480REF.png #corresponding reference screenshot
+)
+mitkAddCustomModuleTest(mitkPointSetVtkMapper2D_openMeAloneTransformed640x480 mitkPointSetVtkMapper2DTransformedPointsTest
+                         ${MITK_DATA_DIR}/RenderingTestData/openMeAlone.mps #input point set to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/openMeAloneTransformedPoints640x480REF.png #corresponding reference screenshot
 )
 
 #Test reslice interpolation
@@ -166,6 +170,11 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw mitkIm
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Png2D-bw-TransferFunctionRGBImage640x480REF.png #corresponding reference screenshot
 )
 
+#mitkAddCustomModuleTest(mitkImageVtkMapper2DLookupTableTest_Png2D-bw mitkImageVtkMapper2DLookupTableTest
+#                        ${MITK_DATA_DIR}/Png2D-bw.png
+#                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Png2D-bw-LookupTableRGBImage640x480REF.png #corresponding reference screenshot
+#)
+
 mitkAddCustomModuleTest(mitkSurfaceGLMapper2DColorTest_RedBall mitkSurfaceGLMapper2DColorTest
                         ${MITK_DATA_DIR}/ball.stl
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/ballColorRed640x480REF.png #corresponding reference screenshot
@@ -188,7 +197,7 @@ mitkAddCustomModuleTest(mitkSurfaceGLMapper2DOpacityTest_BallOpacity mitkSurface
 #                        ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/texturedSphere640x480REF.png corresponding reference screenshot
 #)
 
-SET_PROPERTY(TEST mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw mitkImageVtkMapper2D_pic3dOpacity640x480 mitkSurfaceGLMapper2DOpacityTest_BallOpacity mitkSurfaceGLMapper2DColorTest_DasArmeSchwein mitkSurfaceGLMapper2DColorTest_RedBall mitkSurfaceVtkMapper3DTest_TextureProperty mitkPointSetVtkMapper2D_Pic3DPointSetForPic3D640x480 mitkPointSetVtkMapper2D_openMeAlone640x480 mitkPointSetVtkMapper2D_openMeAloneGlyphType640x480 #mitkSurfaceVtkMapper3DTexturedSphereTest_Football
+SET_PROPERTY(TEST mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw mitkImageVtkMapper2D_pic3dOpacity640x480 mitkSurfaceGLMapper2DOpacityTest_BallOpacity mitkSurfaceGLMapper2DColorTest_DasArmeSchwein mitkSurfaceGLMapper2DColorTest_RedBall mitkSurfaceVtkMapper3DTest_TextureProperty mitkPointSetVtkMapper2D_Pic3DPointSetForPic3D640x480 mitkPointSetVtkMapper2D_openMeAlone640x480 mitkPointSetVtkMapper2D_openMeAloneGlyphType640x480 mitkPointSetVtkMapper2D_openMeAloneTransformed640x480 #mitkSurfaceVtkMapper3DTexturedSphereTest_Football
 PROPERTY RUN_SERIAL TRUE)
 
 endif()

@@ -42,6 +42,7 @@ QmitkCommonActivator::start(ctkPluginContext* context)
 {
   this->m_Instance = this;
   this->m_Context = context;
+  this->m_PrefServiceTracker.reset(new ctkServiceTracker<berry::IPreferencesService*>(context));
 
   if(berry::PlatformUI::IsWorkbenchRunning())
   {
@@ -61,6 +62,8 @@ QmitkCommonActivator::stop(ctkPluginContext* context)
 
   m_ViewCoordinator->Stop();
   m_ViewCoordinator = 0;
+
+  this->m_PrefServiceTracker.reset();
 
   this->m_Context = 0;
   this->m_Instance = 0;

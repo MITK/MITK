@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkPlotWidget::QmitkPlotWidget(QWidget* parent, const char* title, const char*  /*name*/, Qt::WindowFlags f)
   : QWidget(parent, f)
-  , m_SeriesData(NULL)
 {
   QVBoxLayout* boxLayout = new QVBoxLayout(this);
   m_Plot = new QwtPlot( QwtText(title), this ) ;
@@ -35,7 +34,6 @@ QmitkPlotWidget::~QmitkPlotWidget()
 {
   this->Clear();
   delete m_Plot;
-  delete m_SeriesData;
 }
 
 
@@ -77,22 +75,18 @@ bool QmitkPlotWidget::SetCurveData( unsigned int curveId, const QmitkPlotWidget:
   }
   double* rawDataX = ConvertToRawArray( xValues );
   double* rawDataY = ConvertToRawArray( yValues );
-  delete m_SeriesData;
-  m_SeriesData = new QwtPointArrayData(rawDataX, rawDataY, static_cast<int>(xValues.size()));
-  m_PlotCurveVector[curveId]->setSamples(m_SeriesData);
+  m_PlotCurveVector[curveId]->setSamples(new QwtPointArrayData(rawDataX, rawDataY, static_cast<int>(xValues.size())));
   delete[] rawDataX;
   delete[] rawDataY;
   return true;
 }
 
 
-bool QmitkPlotWidget::SetCurveData( unsigned int curveId, const QmitkPlotWidget::XYDataVector& data )
+bool QmitkPlotWidget::SetCurveData(unsigned int curveId, const XYDataVector& data )
 {
   double* rawDataX = ConvertToRawArray( data, 0 );
   double* rawDataY = ConvertToRawArray( data, 1 );
-  delete m_SeriesData;
-  m_SeriesData = new QwtPointArrayData(rawDataX, rawDataY, static_cast<int>(data.size()));
-  m_PlotCurveVector[curveId]->setData(m_SeriesData);
+  m_PlotCurveVector[curveId]->setData(new QwtPointArrayData(rawDataX, rawDataY, static_cast<int>(data.size())));
   delete[] rawDataX;
   delete[] rawDataY;
   return true;
@@ -133,9 +127,10 @@ void QmitkPlotWidget::Replot()
 
 void QmitkPlotWidget::Clear()
 {
+  m_Plot->detachItems();
   m_PlotCurveVector.clear();
   m_PlotCurveVector.resize(0);
-  m_Plot->detachItems();
+
 }
 
 

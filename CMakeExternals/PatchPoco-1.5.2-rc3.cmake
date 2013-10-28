@@ -21,6 +21,33 @@ endif ()"
 set(CONTENTS ${sourceCode})
 configure_file(${CMAKE_CURRENT_LIST_DIR}/EmptyFileForPatching.dummy CMakeLists.txt @ONLY)
 
+# Fix check for ODBC, see https://github.com/pocoproject/poco/issues/285
+file(STRINGS cmake/FindODBC.cmake sourceCode NEWLINE_CONSUME)
+
+# Check if header files exist
+string(REPLACE
+
+"exec_program(\${UNIX_ODBC_CONFIG} ARGS \"--include-prefix\" OUTPUT_VARIABLE ODBC_INCLUDE_DIR)
+\tinclude_directories(\${ODBC_INCLUDE_DIR})
+\texec_program(\${UNIX_ODBC_CONFIG} ARGS \"--libs\" OUTPUT_VARIABLE ODBC_LINK_FLAGS)
+\tadd_definitions(-DPOCO_UNIXODBC)"
+
+"exec_program(\${UNIX_ODBC_CONFIG} ARGS \"--include-prefix\" OUTPUT_VARIABLE ODBC_INCLUDE_DIR)
+\tif(EXISTS \"\${ODBC_INCLUDE_DIR}/sqlext.h\")
+\t\tinclude_directories(\${ODBC_INCLUDE_DIR})
+\t\texec_program(\${UNIX_ODBC_CONFIG} ARGS \"--libs\" OUTPUT_VARIABLE ODBC_LINK_FLAGS)
+\t\tadd_definitions(-DPOCO_UNIXODBC)
+\telse()
+\t\tset(UNIX_ODBC_CONFIG \"UNIX_ODBC_CONFIG-NOTFOUND\")
+\tendif()"
+
+  sourceCode ${sourceCode})
+
+# set variable CONTENTS, which is substituted in TEMPLATE_FILE
+set(CONTENTS ${sourceCode})
+configure_file(${CMAKE_CURRENT_LIST_DIR}/EmptyFileForPatching.dummy cmake/FindODBC.cmake @ONLY)
+
+
 # For the next fixes, see https://github.com/pocoproject/poco/issues/274
 
 # read whole Foundation/CMakeLists.txt

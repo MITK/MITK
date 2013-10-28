@@ -146,125 +146,126 @@ void QmitkVtkLineProfileWidget::SetPathModeToPlanarFigure()
 }
 
 
-void QmitkVtkLineProfileWidget::UpdateItemModelFromPath()
-{
-  this->ComputePath();
-
-  if ( m_DerivedPath.IsNull() )
-  {
-    throw std::invalid_argument("QmitkVtkLineProfileWidget: no path set");
-  }
-
-  // TODO: indices according to mm
-
-  //// Clear the item model
-  m_ItemModel->clear();
-
-  MITK_INFO << "Intensity profile (t)";
-  MITK_INFO << "Start: " << m_DerivedPath->StartOfInput();
-  MITK_INFO << "End:   " << m_DerivedPath->EndOfInput();
-
-  // Get geometry from image
-  mitk::Geometry3D *imageGeometry = m_Image->GetGeometry();
-
-  // Fill item model with line profile data
-  double distance = 0.0;
-  mitk::Point3D currentWorldPoint;
-
-  double t;
-  unsigned int i = 0;
-  int t_tmp = 0;
-  QStandardItemModel *tmp_ItemModel = new QStandardItemModel();
-  vtkQtChartTableSeriesModel *table;
-  vtkQtChartArea* area = m_ChartWidget->getChartArea();
-  for(unsigned int j = 0; j < m_VectorLineCharts.size(); j++)
-  {
-      area->removeLayer(m_VectorLineCharts[j]);
-      m_VectorLineCharts[j]->getModel()->deleteLater();
-      m_VectorLineCharts[j]->deleteLater();
-  }
-  m_VectorLineCharts.clear();
-
-  int k = 0;
-  for ( i = 0, t = m_DerivedPath->StartOfInput(); ;++i )
-  {
-    const PathType::OutputType &continuousIndex = m_DerivedPath->Evaluate( t );
-
-    mitk::Point3D worldPoint;
-    imageGeometry->IndexToWorld( continuousIndex, worldPoint );
-
-    if ( i == 0 )
-    {
-      currentWorldPoint = worldPoint;
-    }
-
-    distance += currentWorldPoint.EuclideanDistanceTo( worldPoint );
-
-    mitk::Index3D indexPoint;
-    imageGeometry->WorldToIndex( worldPoint, indexPoint );
-    double intensity = m_Image->GetPixelValueByIndex( indexPoint );
-
-    MITK_INFO << t << "/" << distance << ": " << indexPoint << " (" << intensity << ")";
-
-    m_ItemModel->setVerticalHeaderItem( i, new QStandardItem() );
-    m_ItemModel->verticalHeaderItem( i )->setData(
-      QVariant( distance ), Qt::DisplayRole );
-
-    m_ItemModel->setItem( i, 0, new QStandardItem() );
-    m_ItemModel->item( i, 0 )->setData( intensity, Qt::DisplayRole );
-
-    tmp_ItemModel->setVerticalHeaderItem( k, new QStandardItem() );
-    tmp_ItemModel->verticalHeaderItem( k )->setData(
-      QVariant( distance ), Qt::DisplayRole );
-
-    tmp_ItemModel->setItem( k, 0, new QStandardItem() );
-    tmp_ItemModel->item( k, 0 )->setData( intensity, Qt::DisplayRole );
-
-    if ((int)t > t_tmp){
-        t_tmp = (int)t;
-
-        vtkQtLineChart *tmp_LineChart = new vtkQtLineChart();
-        table = new vtkQtChartTableSeriesModel( tmp_ItemModel, tmp_LineChart );
-        tmp_LineChart->setModel( table );
-
-        m_VectorLineCharts.push_back(tmp_LineChart);
-
-        tmp_ItemModel = new QStandardItemModel();
-
-        k = 0;
-
-        tmp_ItemModel->setVerticalHeaderItem( k, new QStandardItem() );
-        tmp_ItemModel->verticalHeaderItem( k )->setData(
-            QVariant( distance ), Qt::DisplayRole );
-
-        tmp_ItemModel->setItem( k, 0, new QStandardItem() );
-        tmp_ItemModel->item( k, 0 )->setData( intensity, Qt::DisplayRole );
-    }
-    k++;
-
-    // Go to next index; when iteration offset reaches zero, iteration is finished
-    PathType::OffsetType offset = m_DerivedPath->IncrementInput( t );
-    if ( !(offset[0] || offset[1] || offset[2]) )
-    {
-      break;
-    }
-
-    currentWorldPoint = worldPoint;
-  }
-  for(unsigned int j = 0; j < m_VectorLineCharts.size() ; j++)
-  {
-/*    int styleIndex = styleManager->getStyleIndex(m_LineChart, m_LineChart->getSeriesOptions(0));
-
-    vtkQtChartStylePen *stylePen = qobject_cast<vtkQtChartStylePen *>(
-      styleManager->getGenerator("Pen"));
-    stylePen->getStylePen(styleIndex).setStyle(Qt::SolidLine);*/
-    area->insertLayer(area->getAxisLayerIndex() + j +1, m_VectorLineCharts[j]);
-  }
-
-  table =
-    new vtkQtChartTableSeriesModel( m_ItemModel, m_LineChart );
-  //m_LineChart->setModel( table );
-}
+//void QmitkVtkLineProfileWidget::UpdateItemModelFromPath()
+//{
+//  this->ComputePath();
+//
+//  if ( m_DerivedPath.IsNull() )
+//  {
+//    throw std::invalid_argument("QmitkVtkLineProfileWidget: no path set");
+//  }
+//
+//  // TODO: indices according to mm
+//
+//  //// Clear the item model
+//  m_ItemModel->clear();
+//
+//  MITK_INFO << "Intensity profile (t)";
+//  MITK_INFO << "Start: " << m_DerivedPath->StartOfInput();
+//  MITK_INFO << "End:   " << m_DerivedPath->EndOfInput();
+//
+//  // Get geometry from image
+//  mitk::Geometry3D *imageGeometry = m_Image->GetGeometry();
+//
+//  // Fill item model with line profile data
+//  double distance = 0.0;
+//  mitk::Point3D currentWorldPoint;
+//
+//  double t;
+//  unsigned int i = 0;
+//  int t_tmp = 0;
+//  QStandardItemModel *tmp_ItemModel = new QStandardItemModel();
+//  vtkQtChartTableSeriesModel *table;
+//  vtkQtChartArea* area = m_ChartWidget->getChartArea();
+//  for(unsigned int j = 0; j < m_VectorLineCharts.size(); j++)
+//  {
+//      area->removeLayer(m_VectorLineCharts[j]);
+//      m_VectorLineCharts[j]->getModel()->deleteLater();
+//      m_VectorLineCharts[j]->deleteLater();
+//  }
+//  m_VectorLineCharts.clear();
+//
+//  int k = 0;
+//
+//  for ( i = 0, t = m_DerivedPath->StartOfInput(); ;++i )
+//  {
+//    const PathType::OutputType &continuousIndex = m_DerivedPath->Evaluate( t );
+//
+//    mitk::Point3D worldPoint;
+//    imageGeometry->IndexToWorld( continuousIndex, worldPoint );
+//
+//    if ( i == 0 )
+//    {
+//      currentWorldPoint = worldPoint;
+//    }
+//
+//    distance += currentWorldPoint.EuclideanDistanceTo( worldPoint );
+//
+//    mitk::Index3D indexPoint;
+//    imageGeometry->WorldToIndex( worldPoint, indexPoint );
+//    double intensity = m_Image->GetPixelValueByIndex( indexPoint );
+//
+//    MITK_INFO << t << "/" << distance << ": " << indexPoint << " (" << intensity << ")";
+//
+//    m_ItemModel->setVerticalHeaderItem( i, new QStandardItem() );
+//    m_ItemModel->verticalHeaderItem( i )->setData(
+//      QVariant( distance ), Qt::DisplayRole );
+//
+//    m_ItemModel->setItem( i, 0, new QStandardItem() );
+//    m_ItemModel->item( i, 0 )->setData( intensity, Qt::DisplayRole );
+//
+//    tmp_ItemModel->setVerticalHeaderItem( k, new QStandardItem() );
+//    tmp_ItemModel->verticalHeaderItem( k )->setData(
+//      QVariant( distance ), Qt::DisplayRole );
+//
+//    tmp_ItemModel->setItem( k, 0, new QStandardItem() );
+//    tmp_ItemModel->item( k, 0 )->setData( intensity, Qt::DisplayRole );
+//
+//    if ((int)t > t_tmp){
+//        t_tmp = (int)t;
+//
+//        vtkQtLineChart *tmp_LineChart = new vtkQtLineChart();
+//        table = new vtkQtChartTableSeriesModel( tmp_ItemModel, tmp_LineChart );
+//        tmp_LineChart->setModel( table );
+//
+//        m_VectorLineCharts.push_back(tmp_LineChart);
+//
+//        tmp_ItemModel = new QStandardItemModel();
+//
+//        k = 0;
+//
+//        tmp_ItemModel->setVerticalHeaderItem( k, new QStandardItem() );
+//        tmp_ItemModel->verticalHeaderItem( k )->setData(
+//            QVariant( distance ), Qt::DisplayRole );
+//
+//        tmp_ItemModel->setItem( k, 0, new QStandardItem() );
+//        tmp_ItemModel->item( k, 0 )->setData( intensity, Qt::DisplayRole );
+//    }
+//    k++;
+//
+//    // Go to next index; when iteration offset reaches zero, iteration is finished
+//    PathType::OffsetType offset = m_DerivedPath->IncrementInput( t );
+//    if ( !(offset[0] || offset[1] || offset[2]) )
+//    {
+//      break;
+//    }
+//
+//    currentWorldPoint = worldPoint;
+//  }
+//  for(unsigned int j = 0; j < m_VectorLineCharts.size() ; j++)
+//  {
+///*    int styleIndex = styleManager->getStyleIndex(m_LineChart, m_LineChart->getSeriesOptions(0));
+//
+//    vtkQtChartStylePen *stylePen = qobject_cast<vtkQtChartStylePen *>(
+//      styleManager->getGenerator("Pen"));
+//    stylePen->getStylePen(styleIndex).setStyle(Qt::SolidLine);*/
+//    area->insertLayer(area->getAxisLayerIndex() + j +1, m_VectorLineCharts[j]);
+//  }
+//
+//  table =
+//    new vtkQtChartTableSeriesModel( m_ItemModel, m_LineChart );
+//  //m_LineChart->setModel( table );
+//}
 
 
 void QmitkVtkLineProfileWidget::ClearItemModel()

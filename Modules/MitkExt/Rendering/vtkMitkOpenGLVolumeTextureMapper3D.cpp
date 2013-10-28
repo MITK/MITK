@@ -355,6 +355,39 @@ void vtkMitkOpenGLVolumeTextureMapper3D::ReleaseGraphicsResources(vtkWindow
   this->Modified();
 }
 
+
+// Release the graphics resources used by this texture.
+void vtkMitkOpenGLVolumeTextureMapper3D::ReleaseGraphicsResources(mitk::BaseRenderer* renderer)
+{
+  //GPU_INFO << "ReleaseGraphicsResources";
+
+  vtkWindow * renWin = renderer->GetVtkRenderer()->GetRenderWindow();
+
+  if (( this->Volume1Index || this->Volume2Index ||
+        this->Volume3Index || this->ColorLookupIndex) && renWin)
+    {
+    static_cast<vtkRenderWindow *>(renWin)->MakeCurrent();
+#ifdef GL_VERSION_1_1
+    // free any textures
+    this->DeleteTextureIndex( &this->Volume1Index );
+    this->DeleteTextureIndex( &this->Volume2Index );
+    this->DeleteTextureIndex( &this->Volume3Index );
+    this->DeleteTextureIndex( &this->ColorLookupIndex );
+    this->DeleteTextureIndex( &this->AlphaLookupIndex );
+#endif
+    }
+  this->Volume1Index     = 0;
+  this->Volume2Index     = 0;
+  this->Volume3Index     = 0;
+  this->ColorLookupIndex = 0;
+  this->RenderWindow     = NULL;
+  this->SupportsCompressedTexture=false;
+  this->SupportsNonPowerOfTwoTextures=false;
+
+  this->Modified();
+}
+
+
 void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol)
 {
   //GPU_INFO << "Render";

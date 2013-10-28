@@ -16,14 +16,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkBaseData.h"
+
+#include <mitkProportionalTimeGeometry.h>
 #include <itkObjectFactoryBase.h>
+#include <mitkException.h>
 
 
 mitk::BaseData::BaseData() :
   m_RequestedRegionInitialized(false),
   m_SourceOutputIndexDuplicate(0), m_Initialized(true)
 {
-  m_TimeSlicedGeometry = TimeSlicedGeometry::New();
+  m_TimeGeometry = mitk::ProportionalTimeGeometry::New();
   m_PropertyList = PropertyList::New();
 }
 
@@ -33,19 +36,16 @@ m_RequestedRegionInitialized(other.m_RequestedRegionInitialized),
 m_SourceOutputIndexDuplicate(other.m_SourceOutputIndexDuplicate),
 m_Initialized(other.m_Initialized)
 {
-  m_TimeSlicedGeometry = dynamic_cast<mitk::TimeSlicedGeometry*>(other.m_TimeSlicedGeometry->Clone().GetPointer());
+  m_TimeGeometry = dynamic_cast<TimeGeometry *>(other.m_TimeGeometry->Clone().GetPointer());
   m_PropertyList = other.m_PropertyList->Clone();
 }
 
 mitk::BaseData::~BaseData()
 {
-
 }
 
-void mitk::BaseData::InitializeTimeSlicedGeometry(unsigned int timeSteps)
+void mitk::BaseData::InitializeTimeGeometry(unsigned int timeSteps)
 {
-  mitk::TimeSlicedGeometry::Pointer timeGeometry = this->GetTimeSlicedGeometry();
-
   mitk::Geometry3D::Pointer g3d = mitk::Geometry3D::New();
   g3d->Initialize();
 
@@ -57,7 +57,15 @@ void mitk::BaseData::InitializeTimeSlicedGeometry(unsigned int timeSteps)
 
   // The geometry is propagated automatically to the other items,
   // if EvenlyTimed is true...
-  timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
+  //Old timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
+
+  TimeGeometry::Pointer timeGeometry = this->GetTimeGeometry();
+  timeGeometry->Initialize();
+  timeGeometry->Expand(timeSteps);
+  for (TimeStepType step = 0; step < timeSteps; ++step)
+  {
+    timeGeometry->SetTimeStepGeometry(g3d.GetPointer(),step);
+  }
 }
 
 void mitk::BaseData::UpdateOutputInformation()
@@ -66,23 +74,38 @@ void mitk::BaseData::UpdateOutputInformation()
   {
     this->GetSource()->UpdateOutputInformation();
   }
-  if(m_TimeSlicedGeometry.IsNotNull())
-    m_TimeSlicedGeometry->UpdateInformation();
+  if (m_TimeGeometry.IsNotNull())
+  {
+    m_TimeGeometry->UpdateBoundingBox();
+  }
 }
 
-const mitk::TimeSlicedGeometry* mitk::BaseData::GetUpdatedTimeSlicedGeometry()
+const mitk::TimeGeometry* mitk::BaseData::GetUpdatedTimeGeometry()
 {
   SetRequestedRegionToLargestPossibleRegion();
 
   UpdateOutputInformation();
 
-  return GetTimeSlicedGeometry();
+  return GetTimeGeometry();
 }
 
 void mitk::BaseData::Expand( unsigned int timeSteps )
 {
-  if( m_TimeSlicedGeometry.IsNotNull() )
-    m_TimeSlicedGeometry->ExpandToNumberOfTimeSteps( timeSteps );
+  if (m_TimeGeometry.IsNotNull() )
+  {
+    ProportionalTimeGeometry * propTimeGeometry = dynamic_cast<ProportionalTimeGeometry*> (m_TimeGeometry.GetPointer());
+    if (propTimeGeometry)
+    {
+      propTimeGeometry->Expand(timeSteps);
+      return;
+    }
+
+    mitkThrow() << "TimeGeometry is of an unkown Type. Could not expand it. ";
+  }
+  else
+  {
+    this->InitializeTimeGeometry(timeSteps);
+  }
 }
 
 const mitk::Geometry3D* mitk::BaseData::GetUpdatedGeometry(int t)
@@ -94,27 +117,21 @@ const mitk::Geometry3D* mitk::BaseData::GetUpdatedGeometry(int t)
   return GetGeometry(t);
 }
 
-void mitk::BaseData::SetGeometry(Geometry3D* aGeometry3D)
+void mitk::BaseData::SetGeometry(Geometry3D* geometry)
 {
-if(aGeometry3D!=NULL)
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  if(geometry!=NULL)
   {
-    TimeSlicedGeometry::Pointer timeSlicedGeometry = dynamic_cast<TimeSlicedGeometry*>(aGeometry3D);
-    if ( timeSlicedGeometry.IsNotNull() )
-      m_TimeSlicedGeometry = timeSlicedGeometry;
-    else
-    {
-      timeSlicedGeometry = TimeSlicedGeometry::New();
-      m_TimeSlicedGeometry = timeSlicedGeometry;
-      timeSlicedGeometry->InitializeEvenlyTimed(aGeometry3D, 1);
-    }
-    Modified();
+    timeGeometry->Initialize(geometry, 1);
   }
-  else if( m_TimeSlicedGeometry.IsNotNull() )
-  {
-    m_TimeSlicedGeometry = NULL;
-    Modified();
-  }
+  SetTimeGeometry(timeGeometry);
   return;
+}
+
+void mitk::BaseData::SetTimeGeometry(TimeGeometry* geometry)
+{
+  m_TimeGeometry = geometry;
+  this->Modified();
 }
 
 void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D)
@@ -122,11 +139,18 @@ void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D)
   SetGeometry(static_cast<mitk::Geometry3D*>(aGeometry3D->Clone().GetPointer()));
 }
 
+void mitk::BaseData::SetClonedTimeGeometry(const TimeGeometry* geometry)
+{
+  TimeGeometry::Pointer clonedGeometry = geometry->Clone();
+  SetTimeGeometry(clonedGeometry.GetPointer());
+}
+
+
 void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D, unsigned int time)
 {
-  if (m_TimeSlicedGeometry)
+  if (m_TimeGeometry)
   {
-    m_TimeSlicedGeometry->SetGeometry3D(static_cast<mitk::Geometry3D*>(aGeometry3D->Clone().GetPointer()), time);
+    m_TimeGeometry->SetTimeStepGeometry(static_cast<mitk::Geometry3D*>(aGeometry3D->Clone().GetPointer()),time);
   }
 }
 
@@ -139,10 +163,10 @@ bool mitk::BaseData::IsEmpty() const
 {
   if(IsInitialized() == false)
     return true;
-  const TimeSlicedGeometry* timeGeometry = const_cast<BaseData*>(this)->GetUpdatedTimeSlicedGeometry();
+  const TimeGeometry* timeGeometry = const_cast<BaseData*>(this)->GetUpdatedTimeGeometry();
   if(timeGeometry == NULL)
     return true;
-  unsigned int timeSteps = timeGeometry->GetTimeSteps();
+  unsigned int timeSteps = timeGeometry->CountTimeSteps();
   for ( unsigned int t = 0 ; t < timeSteps ; ++t )
   {
     if(IsEmptyTimeStep(t) == false)
@@ -180,25 +204,18 @@ void mitk::BaseData::SetPropertyList(PropertyList *pList)
 
 void mitk::BaseData::SetOrigin(const mitk::Point3D& origin)
 {
-  mitk::TimeSlicedGeometry* timeSlicedGeometry = GetTimeSlicedGeometry();
+  TimeGeometry* timeGeom = GetTimeGeometry();
 
-  assert(timeSlicedGeometry!=NULL);
+  assert (timeGeom != NULL);
+  Geometry3D* geometry;
 
-  mitk::Geometry3D* geometry;
-
-  unsigned int steps = timeSlicedGeometry->GetTimeSteps();
-
-  for(unsigned int timestep = 0; timestep < steps; ++timestep)
+  TimeStepType steps = timeGeom->CountTimeSteps();
+  for (TimeStepType timestep = 0; timestep < steps; ++timestep)
   {
     geometry = GetGeometry(timestep);
-    if(geometry != NULL)
+    if (geometry != NULL)
     {
       geometry->SetOrigin(origin);
-    }
-    if(GetTimeSlicedGeometry()->GetEvenlyTimed())
-    {
-      GetTimeSlicedGeometry()->InitializeEvenlyTimed(geometry, steps);
-      break;
     }
   }
 }
@@ -206,18 +223,13 @@ void mitk::BaseData::SetOrigin(const mitk::Point3D& origin)
 unsigned long mitk::BaseData::GetMTime() const
 {
   unsigned long time = Superclass::GetMTime();
-  if(m_TimeSlicedGeometry.IsNotNull())
+  if(m_TimeGeometry.IsNotNull())
   {
-    if((time < m_TimeSlicedGeometry->GetMTime()))
+    if((time < m_TimeGeometry->GetMTime()))
     {
       Modified();
       return Superclass::GetMTime();
     }
-    //unsigned long geometryTime = m_TimeSlicedGeometry->GetMTime();
-    //if(time < geometryTime)
-    //{
-    //  return geometryTime;
-    //}
   }
   return time;
 }
@@ -232,8 +244,11 @@ void mitk::BaseData::CopyInformation( const itk::DataObject* data )
   const Self* bd = dynamic_cast<const Self*>(data);
   if (bd != NULL)
   {
-    m_TimeSlicedGeometry = dynamic_cast<TimeSlicedGeometry*>(bd->GetTimeSlicedGeometry()->Clone().GetPointer());
     m_PropertyList = bd->GetPropertyList()->Clone();
+    if (bd->GetTimeGeometry()!=NULL)
+    {
+      m_TimeGeometry = bd->GetTimeGeometry()->Clone();
+    }
   }
   else
   {
@@ -243,7 +258,6 @@ void mitk::BaseData::CopyInformation( const itk::DataObject* data )
       << typeid(data).name() << " to "
       << typeid(Self*).name() );
   }
-
 }
 
 bool mitk::BaseData::IsInitialized() const
@@ -274,10 +288,9 @@ void mitk::BaseData::ExecuteOperation(mitk::Operation* /*operation*/)
 void mitk::BaseData::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
   os << std::endl;
-  os << indent << " TimeSlicedGeometry: ";
-  if(GetTimeSlicedGeometry() == NULL)
+  os << indent << " TimeGeometry: ";
+  if(GetTimeGeometry() == NULL)
     os << "NULL" << std::endl;
   else
-    GetTimeSlicedGeometry()->Print(os, indent);
+    GetTimeGeometry()->Print(os, indent);
 }
-

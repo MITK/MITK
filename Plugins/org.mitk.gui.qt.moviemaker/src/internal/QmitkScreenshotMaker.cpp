@@ -105,8 +105,8 @@ void QmitkScreenshotMaker::Deactivated()
 void QmitkScreenshotMaker::GenerateScreenshot()
 {
     if (m_LastFile.size()==0)
-        m_LastFile = QDir::currentPath()+"/screenshot.jpg";
-    QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", m_LastFile, "JPEG file (*.jpg);;PNG file (*.png)");
+        m_LastFile = QDir::currentPath()+"/screenshot.png";
+    QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", m_LastFile, "PNG file (*.png);;JPEG file (*.jpg)");
     if (fileName.size()>0)
         m_LastFile = fileName;
 
@@ -211,8 +211,8 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
 void QmitkScreenshotMaker::Generate3DHighresScreenshot()
 {
     if (m_LastFile.size()==0)
-        m_LastFile = QDir::currentPath()+"/3D_screenshot.jpg";
-    QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", m_LastFile, "JPEG file (*.jpg);;PNG file (*.png)");
+        m_LastFile = QDir::currentPath()+"/3D_screenshot.png";
+    QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", m_LastFile, "PNG file (*.png);;JPEG file (*.jpg)");
     if (fileName.size()>0)
         m_LastFile = fileName;
     GenerateHR3DAtlasScreenshots(fileName);
@@ -370,16 +370,17 @@ void QmitkScreenshotMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int ma
 
     QFileInfo fi(fileName);
     QString suffix = fi.suffix();
-    if (suffix.compare("png", Qt::CaseInsensitive) == 0)
-    {
-        fileWriter = vtkPNGWriter::New();
-    }
-    else  // default is jpeg
+    if (suffix.compare("jpg", Qt::CaseInsensitive) == 0)
     {
         vtkJPEGWriter* w = vtkJPEGWriter::New();
         w->SetQuality(100);
         w->ProgressiveOff();
         fileWriter = w;
+
+    }
+    else  // default is png
+    {
+        fileWriter = vtkPNGWriter::New();
     }
     vtkRenderLargeImage* magnifier = vtkRenderLargeImage::New();
     magnifier->SetInput(renderer);

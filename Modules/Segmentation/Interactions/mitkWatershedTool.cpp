@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
 #include "mitkRenderingManager.h"
+#include <mitkSliceNavigationController.h>
 #include "mitkRenderingModeProperty.h"
 #include "mitkLookupTable.h"
 #include "mitkLookupTableProperty.h"
@@ -74,13 +75,6 @@ us::ModuleResource mitk::WatershedTool::GetIconResource() const
   return resource;
 }
 
-us::ModuleResource mitk::WatershedTool::GetCursorIconResource() const
-{
-  us::Module* module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Watershed_Cursor_32x32.png");
-  return resource;
-}
-
 const char** mitk::WatershedTool::GetXPM() const
 {
   return NULL;
@@ -97,6 +91,11 @@ void mitk::WatershedTool::DoIt()
   // get image from tool manager
   mitk::DataNode::Pointer referenceData = m_ToolManager->GetReferenceData(0);
   mitk::Image::Pointer input = dynamic_cast<mitk::Image*>(referenceData->GetData());
+  if (input.IsNull())
+    return;
+
+  unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+  input = Get3DImage(input, timestep);
 
   mitk::Image::Pointer output;
 
@@ -162,7 +161,7 @@ void mitk::WatershedTool::DoIt()
   }
   catch(itk::ExceptionObject& e)
   {
-      MITK_ERROR<<"Watershed Filter Error: " << e.GetDescription();
+    MITK_ERROR<<"Watershed Filter Error: " << e.GetDescription();
   }
 
   RenderingManager::GetInstance()->RequestUpdateAll();
@@ -182,7 +181,7 @@ void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* ori
 
   // use the progress bar
   mitk::ToolCommand::Pointer command = mitk::ToolCommand::New();
-  command->AddStepsToDo(15);
+  command->AddStepsToDo(60);
 
   // then add the watershed filter to the pipeline
   typename WatershedFilter::Pointer watershed = WatershedFilter::New();
@@ -199,6 +198,9 @@ void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* ori
 
   // start the whole pipeline
   cast->Update();
+
+  // reset the progress bar by setting progress
+  command->SetProgress(10);
 
   // since we obtain a new image from our pipeline, we have to make sure, that our mitk::Image::Pointer
   // is responsible for the memory management of the output image

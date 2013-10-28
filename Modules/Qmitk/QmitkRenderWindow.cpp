@@ -90,8 +90,8 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mousePressMitkEvent(&myevent);
+    QVTKWidget::mousePressEvent(me);
   }
-  QVTKWidget::mousePressEvent(me);
 
   if (m_ResendQtEvents)
     me->ignore();
@@ -106,8 +106,8 @@ void QmitkRenderWindow::mouseDoubleClickEvent( QMouseEvent *me )
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mousePressMitkEvent(&myevent);
+    QVTKWidget::mousePressEvent(me);
   }
-  QVTKWidget::mousePressEvent(me);
 
   if (m_ResendQtEvents)
     me->ignore();
@@ -123,8 +123,8 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mouseReleaseMitkEvent(&myevent);
+    QVTKWidget::mouseReleaseEvent(me);
   }
-  QVTKWidget::mouseReleaseEvent(me);
 
   if (m_ResendQtEvents)
     me->ignore();
@@ -141,8 +141,8 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mouseMoveMitkEvent(&myevent);
+    QVTKWidget::mouseMoveEvent(me);
   }
-  QVTKWidget::mouseMoveEvent(me);
 }
 
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
@@ -154,8 +154,8 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
   { // TODO: INTERACTION_LEGACY
     mitk::WheelEvent myevent(QmitkEventAdapter::AdaptWheelEvent(m_Renderer, we));
     this->wheelMitkEvent(&myevent);
+    QVTKWidget::wheelEvent(we);
   }
-  QVTKWidget::wheelEvent(we);
 
   if (m_ResendQtEvents)
     we->ignore();
@@ -173,9 +173,8 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
     mitk::KeyEvent mke(QmitkEventAdapter::AdaptKeyEvent(m_Renderer, ke, cp));
     this->keyPressMitkEvent(&mke);
     ke->accept();
+    QVTKWidget::keyPressEvent(ke);
   }
-
-  QVTKWidget::keyPressEvent(ke);
 
   if (m_ResendQtEvents)
     ke->ignore();
@@ -200,9 +199,6 @@ void QmitkRenderWindow::leaveEvent(QEvent *e)
   mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(this->m_Renderer, NULL, "LeaveRenderWindow");
 
   if (!this->HandleEvent(internalEvent.GetPointer()))
-
-    // TODO implement new event
-    MITK_DEBUG << "QmitkRenderWindow::leaveEvent";
 
   if (m_MenuWidget)
     m_MenuWidget->smoothHide();

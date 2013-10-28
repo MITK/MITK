@@ -1,9 +1,13 @@
 /**
 \page AboutTestingPage Testing
 
-TODO
-\subpage GeneralTests
-\subpage RenderingTests
-\subpage DICOMTesting
+Testing is a very important part of ensuring code quality. We use <a href="http://www.cdash.org/">CDash</a> for testing whether MITK builds on a variety of platforms and configurations. You can find our dashboard <a href="http://cdash.mitk.org/index.php?project=MITK&display=project">here</a>.
 
+Additionally we support tests of software function as well. More detailed information on testing in MITK can be found below.
+
+<ul>
+ <li> \subpage GeneralTests
+ <li> \subpage RenderingTests
+ <li> \subpage DICOMTesting
+</ul>
 */

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>892</width>
-    <height>1306</height>
+    <height>1351</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -67,25 +67,6 @@
       <string>Info</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="7" column="0">
-       <widget class="QCommandLinkButton" name="m_ShowGradientsButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Generate pointset displaying the gradient vectors (applied measurement frame).</string>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="whatsThis">
-         <string notr="true"/>
-        </property>
-        <property name="text">
-         <string>Show gradients</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QTableWidget" name="m_B_ValueMap_TableWidget">
         <property name="sizePolicy">
@@ -158,6 +139,53 @@
         </property>
        </widget>
       </item>
+      <item row="10" column="0">
+       <widget class="QSpinBox" name="m_targetBValueSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximum">
+         <number>100000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QCommandLinkButton" name="m_AdcSignalAverage">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a new Diffusion Weighted Image (DWI) using an ADC average over all q-shells.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>ADC Signal Average</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCommandLinkButton" name="m_AkcSignalFit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>AKC Signal Fit</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCommandLinkButton" name="m_BiExpSignalFit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Bi-Exponential Signal Fit</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
       <item row="1" column="0">
        <layout class="QFormLayout" name="formLayout">
         <item row="0" column="0">
@@ -194,32 +222,34 @@
         </item>
        </layout>
       </item>
-      <item row="9" column="0">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QCommandLinkButton" name="m_AdcSignalFit">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a new Diffusion Weighted Image (DWI) using an ADC average over all q-shells.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>ADC Signal Fit</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCommandLinkButton" name="m_AkcSignalFit">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>AKC Signal Fit</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+      <item row="7" column="0">
+       <widget class="QCommandLinkButton" name="m_ShowGradientsButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Generate pointset displaying the gradient vectors (applied measurement frame).</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Show gradients</string>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="0">
+       <widget class="QCheckBox" name="m_OutputRMSErrorImage">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Output RMS-Error Image</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

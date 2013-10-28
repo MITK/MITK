@@ -506,12 +506,12 @@ mitk::VectorImageMapper2D::~VectorImageMapper2D()
 int mitk::VectorImageMapper2D::GetCurrentTimeStep( mitk::BaseData* data, mitk::BaseRenderer* renderer )
 {
   //
-  // get the TimeSlicedGeometry of the input object
+  // get the TimeGeometry of the input object
   //
-  const TimeSlicedGeometry * dataTimeGeometry = data->GetUpdatedTimeSlicedGeometry();
-  if ( ( dataTimeGeometry == NULL ) || ( dataTimeGeometry->GetTimeSteps() == 0 ) )
+  const TimeGeometry * dataTimeGeometry = data->GetUpdatedTimeGeometry();
+  if ( ( dataTimeGeometry == NULL ) || ( dataTimeGeometry->CountTimeSteps() == 0 ) )
   {
-    itkWarningMacro( << "geometry of the given data object isn't a mitk::TimeSlicedGeometry, or the number of time steps is 0!" );
+    itkWarningMacro( << "The given object is missing a mitk::TimeGeometry, or the number of time steps is 0!" );
     return 0;
   }
 
@@ -527,8 +527,8 @@ int mitk::VectorImageMapper2D::GetCurrentTimeStep( mitk::BaseData* data, mitk::B
   //
   int timestep = 0;
   if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
-    timestep = dataTimeGeometry->MSToTimeStep( time );
-  if ( dataTimeGeometry->IsValidTime( timestep ) == false )
+    timestep = dataTimeGeometry->TimePointToTimeStep( time );
+  if ( dataTimeGeometry->IsValidTimeStep( timestep ) == false )
   {
     itkWarningMacro( << timestep << " is not a valid time of the given data object!" );
     return 0;

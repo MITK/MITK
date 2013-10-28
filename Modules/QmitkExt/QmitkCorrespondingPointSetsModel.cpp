@@ -430,7 +430,7 @@ void QmitkCorrespondingPointSetsModel::MoveSelectedPointUp()
   if (selectedID==-1)
     return;
   mitk::PointSet::PointType point = pointSet->GetPoint(selectedID, m_TimeStepper->GetPos());
-  mitk::ScalarType tsInMS = pointSet->GetTimeSlicedGeometry()->TimeStepToMS(m_TimeStepper->GetPos());
+  mitk::ScalarType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStepper->GetPos());
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTUP,tsInMS, pointSet->GetPoint(selectedID, m_TimeStepper->GetPos()), selectedID, true);
   pointSet->ExecuteOperation(doOp);
   QAbstractTableModel::reset();
@@ -459,7 +459,7 @@ void QmitkCorrespondingPointSetsModel::MoveSelectedPointDown()
   selectedID = pointSet->SearchSelectedPoint(m_TimeStepper->GetPos());
   if (selectedID==-1)
     return;
-  mitk::ScalarType tsInMS = pointSet->GetTimeSlicedGeometry()->TimeStepToMS(m_TimeStepper->GetPos());
+  mitk::ScalarType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStepper->GetPos());
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTDOWN, tsInMS, pointSet->GetPoint(selectedID, m_TimeStepper->GetPos()), selectedID, true);
   pointSet->ExecuteOperation(doOp);
 
@@ -556,7 +556,7 @@ void QmitkCorrespondingPointSetsModel::MoveSelectedPoint(mitk::PointSet::PointId
     direction = mitk::OpMOVEPOINTDOWN;
 
   while (selectedID!=targetID){
-    mitk::ScalarType tsInMS = pointSet->GetTimeSlicedGeometry()->TimeStepToMS(m_TimeStepper->GetPos());
+    mitk::ScalarType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStepper->GetPos());
     mitk::PointOperation* doOp = new mitk::PointOperation(direction, tsInMS, pointSet->GetPoint(selectedID, m_TimeStepper->GetPos()), selectedID, true);
     pointSet->ExecuteOperation(doOp);
     selectedID = pointSet->SearchSelectedPoint(m_TimeStepper->GetPos());

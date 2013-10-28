@@ -19,19 +19,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QtPlugin>
 
-namespace mitk {
+ctkPluginContext* mitk::PluginActivator::m_Context = NULL;
 
-void PluginActivator::start(ctkPluginContext* context)
+ctkPluginContext* mitk::PluginActivator::GetContext()
+{
+  return m_Context;
+}
+
+void mitk::PluginActivator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMeasurementView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkImageStatisticsView, context)
+  m_Context = context;
 }
 
-void PluginActivator::stop(ctkPluginContext* context)
+void mitk::PluginActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
-}
-
+  m_Context = NULL;
 }
 
 Q_EXPORT_PLUGIN2(org.mitk.gui.qt.measurementtoolbox, mitk::PluginActivator)

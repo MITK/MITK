@@ -37,6 +37,15 @@ mitk::PlanarFigureComposite::~PlanarFigureComposite()
 
 }
 
+mitk::PlanarFigureComposite::PlanarFigureComposite(const Self& other)
+  : PlanarFigure(other),
+    m_PFVector(other.m_PFVector->Clone()),
+    m_compOperation(other.m_compOperation),
+    m_DNVector(other.m_DNVector->Clone()),
+    m_name(other.m_name)
+{
+}
+
 void mitk::PlanarFigureComposite::addDataNode(mitk::DataNode::Pointer dnode)
 {
 

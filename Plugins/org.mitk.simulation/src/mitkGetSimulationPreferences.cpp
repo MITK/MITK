@@ -21,8 +21,5 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 berry::IPreferences::Pointer mitk::GetSimulationPreferences()
 {
-  berry::ServiceRegistry& serviceRegistry = berry::Platform::GetServiceRegistry();
-  berry::IPreferencesService::Pointer preferencesService = serviceRegistry.GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-  berry::IPreferences::Pointer preferences = preferencesService->GetSystemPreferences();
-  return preferences->Node("/org.mitk.views.simulation");
+  return berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID)->GetSystemPreferences()->Node("/org.mitk.views.simulation");
 }

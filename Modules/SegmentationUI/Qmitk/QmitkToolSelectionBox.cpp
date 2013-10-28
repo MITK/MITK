@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <qtoolbutton.h>
 #include <QList>
-#include <QResizeEvent>
 #include <qtooltip.h>
 #include <qmessagebox.h>
 #include <qlayout.h>
@@ -41,7 +40,6 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage*
  m_DisplayedGroups("default"),
  m_LayoutColumns(2),
  m_ShowNames(true),
- m_AutoShowNamesWidth(0),
  m_GenerateAccelerators(false),
  m_ToolGUIWidget(NULL),
  m_LastToolGUI(NULL),
@@ -348,9 +346,8 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 /**
  External enableization...
 */
-void QmitkToolSelectionBox::setEnabled( bool enable )
+void QmitkToolSelectionBox::setEnabled( bool /*enable*/ )
 {
-  QWidget::setEnabled(enable);
   SetGUIEnabledAccordingToToolManagerState();
 }
 
@@ -645,21 +642,6 @@ void QmitkToolSelectionBox::SetShowNames(bool show)
   }
 }
 
-void QmitkToolSelectionBox::SetAutoShowNamesWidth(int width)
-{
-  width = std::max(0, width);
-
-  if (m_AutoShowNamesWidth != width)
-  {
-    m_AutoShowNamesWidth = width;
-
-    if (width != 0)
-      this->SetShowNames(this->width() >= m_AutoShowNamesWidth);
-    else
-      this->SetShowNames(true);
-  }
-}
-
 void QmitkToolSelectionBox::SetGenerateAccelerators(bool accel)
 {
   if (accel != m_GenerateAccelerators)
@@ -688,12 +670,4 @@ void QmitkToolSelectionBox::hideEvent( QHideEvent* e )
 {
   QWidget::hideEvent(e);
   SetGUIEnabledAccordingToToolManagerState();
-}
-
-void QmitkToolSelectionBox::resizeEvent( QResizeEvent* e )
-{
-  QWidget::resizeEvent(e);
-
-  if (m_AutoShowNamesWidth != 0)
-      this->SetShowNames(e->size().width() >= m_AutoShowNamesWidth);
 }

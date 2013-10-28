@@ -182,7 +182,10 @@ public:
   // Release any graphics resources that are being consumed by this mapper.
   // The parameter window could be used to determine which graphic
   // resources to release.
-  void ReleaseGraphicsResources(vtkWindow *) {};
+  // \deprecatedSince{2013_12}
+  DEPRECATED(void ReleaseGraphicsResources(vtkWindow *))
+  {
+  };
 
   // Description:
   // Return how much the dataset has to be reduced in each dimension to

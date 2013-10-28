@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPointSet.h"
 #include "MitkExtExports.h"
-#include "mitkTimeSlicedGeometry.h"
+#include "mitkTimeGeometry.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkGeometryDataSource.h"
 
@@ -131,7 +131,7 @@ namespace mitk {
       const mitk::PointSet* m_PointSet;
 
       /* output object - a time sliced geometry.*/
-      mitk::TimeSlicedGeometry::Pointer m_TimeSlicedGeometry;
+      mitk::TimeGeometry::Pointer m_TimeGeometry;
 
       std::vector< mitk::PlaneGeometry::Pointer > m_Planes;
 

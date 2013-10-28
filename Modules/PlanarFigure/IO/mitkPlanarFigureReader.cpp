@@ -242,7 +242,7 @@ void mitk::PlanarFigureReader::GenerateData()
         // Extract and set plane transform parameters
         DoubleList transformList = this->GetDoubleAttributeListFromXMLNode( geoElement->FirstChildElement( "transformParam" ), "param", 12 );
 
-        typedef mitk::AffineGeometryFrame3D::TransformType TransformType;
+        typedef mitk::Geometry3D::TransformType TransformType;
         TransformType::ParametersType parameters;
         parameters.SetSize( 12 );
 
@@ -255,7 +255,7 @@ void mitk::PlanarFigureReader::GenerateData()
           parameters.SetElement( i, *it );
         }
 
-        typedef mitk::AffineGeometryFrame3D::TransformType TransformType;
+        typedef mitk::Geometry3D::TransformType TransformType;
         TransformType::Pointer affineGeometry = TransformType::New();
         affineGeometry->SetParameters( parameters );
         planeGeo->SetIndexToWorldTransform( affineGeometry );

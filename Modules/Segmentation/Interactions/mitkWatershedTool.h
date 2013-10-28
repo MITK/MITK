@@ -73,7 +73,6 @@ class Segmentation_EXPORT WatershedTool : public AutoSegmentationTool
     const char** GetXPM() const;
     const char* GetName() const;
     us::ModuleResource GetIconResource() const;
-    us::ModuleResource GetCursorIconResource() const;
 
   protected:
 

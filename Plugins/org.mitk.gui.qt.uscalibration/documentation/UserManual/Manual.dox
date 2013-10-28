@@ -1,0 +1,19 @@
+/**
+\page org_mitk_gui_qt_uscalibration Ultrasound Calibration
+
+\image html icon.xpm "Icon of Ultrasound Calibration"
+
+Available sections:
+  - \ref org_mitk_gui_qt_uscalibrationOverview
+
+\section org_mitk_gui_qt_uscalibrationOverview Overview
+Describe the features of your awesome plugin here
+<ul>
+<li>Increases productivity
+<li>Creates beautiful images
+<li>Generates PhD thesis
+<li>Brings world peace
+</ul>
+
+*/
+

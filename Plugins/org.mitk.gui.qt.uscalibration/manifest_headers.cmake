@@ -1,0 +1,5 @@
+set(Plugin-Name "Ultrasound Calibration")
+set(Plugin-Version "0.2")
+set(Plugin-Vendor "DKFZ, Medical and Biological Informatics")
+set(Plugin-ContactAddress "")
+set(Require-Plugin org.mitk.gui.qt.common)

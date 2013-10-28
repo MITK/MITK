@@ -93,4 +93,28 @@ throw std::invalid_argument(s.str()); }
   static const std::string DIR_SEPARATOR = "/";
 #endif
 
+#define endoSetInput(name, type) \
+public: \
+    virtual void Set##name (const type _arg) \
+    { \
+        if ( this->m_##name != _arg ) \
+        { \
+            this->m_##name = _arg; \
+        } \
+    } \
+protected: \
+    const type m_##name;
+
+#define endoSetOutput(name, type) \
+public: \
+    virtual void Set##name (type _arg) \
+    { \
+        if ( this->m_##name != _arg ) \
+        { \
+            this->m_##name = _arg; \
+        } \
+    } \
+protected: \
+    type m_##name;
+
 #endif // mitkEndoMacros_h

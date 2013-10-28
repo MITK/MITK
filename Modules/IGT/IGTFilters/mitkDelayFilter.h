@@ -18,26 +18,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDELAYFILTER_H
 
 #include "MitkIGTExports.h"
-#include "mitkBaseDataSource.h"
+#include "mitkNavigationDataToNavigationDataFilter.h"
 
 namespace mitk {
-
-class MitkIGT_EXPORT DelayFilter : public mitk::BaseDataSource
-{
+  class MitkIGT_EXPORT DelayFilter : public mitk::NavigationDataToNavigationDataFilter
+  {
     /**
-     * @sa itk::ProcessObject::MakeOutput(DataObjectPointerArraySizeType)
-     */
-    virtual DataObjectPointer MakeOutput ( DataObjectPointerArraySizeType idx );
+    * @sa itk::ProcessObject::MakeOutput(DataObjectPointerArraySizeType)
+    */
+    //    virtual DataObjectPointer MakeOutput ( DataObjectPointerArraySizeType idx );
 
     /**
-     * @sa itk::ProcessObject::MakeOutput(const DataObjectIdentifierType&)
-     */
-    virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType& name);
+    * @sa itk::ProcessObject::MakeOutput(const DataObjectIdentifierType&)
+    */
+    //    virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType& name);
 
-protected:
+  protected:
     virtual void GenerateData();
-};
-
+  };
 } // namespace mitk
 
 #endif // MITKDELAYFILTER_H

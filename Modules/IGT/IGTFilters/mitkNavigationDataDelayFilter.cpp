@@ -16,16 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataDelayFilter.h"
 
-/**mitk::NavigationDataDelayFilter::DataObjectPointer mitk::NavigationDataDelayFilter::MakeOutput ( DataObjectPointerArraySizeType )
+mitk::NavigationDataDelayFilter::NavigationDataDelayFilter(unsigned int delay) : m_Delay(delay)
 {
-mitkThrow() << "Unsupported Operation. Please override method in sublclass if you need this functionality.";
 }
-
-mitk::NavigationDataDelayFilter::DataObjectPointer mitk::NavigationDataDelayFilter::MakeOutput( const DataObjectIdentifierType& )
+mitk::NavigationDataDelayFilter::~NavigationDataDelayFilter()
 {
-mitkThrow() << "Unsupported Operation. Please override method in sublclass if you need this functionality.";
 }
-*/
 
 void mitk::NavigationDataDelayFilter::GenerateData()
 {
@@ -47,12 +43,12 @@ void mitk::NavigationDataDelayFilter::GenerateData()
 
   m_Buffer.push( std::make_pair(now.GetMTime(), ndList) );
 
-  // Find most recent member from buffer that is old enough to output, considering DeltaT
+  // Find most recent member from buffer that is old enough to output, considering the Delay
   // remove all sets that are too old already in the process
   BufferType current;
   bool foundCurrent = false;
 
-  while ( m_Buffer.front().first + m_DeltaT <= now.GetMTime() + m_Tolerance )
+  while ( m_Buffer.front().first + m_Delay <= now.GetMTime() + m_Tolerance )
   {
     foundCurrent = true;
     current = m_Buffer.front();

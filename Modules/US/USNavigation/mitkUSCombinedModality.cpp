@@ -22,7 +22,7 @@ const std::string mitk::USCombinedModality::DeviceClassIdentifier = "org.mitk.mo
 
 mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, NavigationDataSource::Pointer trackingDevice, std::string manufacturer, std::string model)
   : mitk::USDevice(manufacturer, model), m_UltrasoundDevice(usDevice), m_TrackingDevice(trackingDevice),
-    m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New())
+  m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New()), m_DelayFilter(mitk::NavigationDataDelayFilter::New(0))
 {
   // build tracking filter pipeline
   m_SmoothingFilter->SetInput(0, m_TrackingDevice->GetOutput());

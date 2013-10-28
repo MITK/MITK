@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKDELAYFILTER_H
-#define MITKDELAYFILTER_H
+#ifndef MITKNavigationDataDelayFilter_H
+#define MITKNavigationDataDelayFilter_H
 
 // MITK Header
 #include "MitkIGTExports.h"
@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <queue>
 
 namespace mitk {
-  class MitkIGT_EXPORT DelayFilter : public mitk::NavigationDataToNavigationDataFilter
+  class MitkIGT_EXPORT NavigationDataDelayFilter : public mitk::NavigationDataToNavigationDataFilter
   {
     typedef std::pair<long, std::vector<mitk::NavigationData::Pointer>> BufferType;
 
@@ -60,4 +60,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif // MITKDELAYFILTER_H
+#endif // MITKNavigationDataDelayFilter_H

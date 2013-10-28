@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkUSNavigationExports.h>
 #include <mitkNavigationDataSmoothingFilter.h>
-#include <mitkDelayFilter.h>
+#include <mitkNavigationDataDelayFilter.h>
 
 #include "mitkUSDevice.h"
 
@@ -127,7 +127,7 @@ namespace mitk {
     std::map<std::string, AffineTransform3D::Pointer>   m_Calibrations;
 
     mitk::NavigationDataSmoothingFilter::Pointer m_SmoothingFilter;
-    mitk::DelayFilter::Pointer m_DelayFilter;
+    mitk::NavigationDataDelayFilter::Pointer m_DelayFilter;
 
   private:
     /**

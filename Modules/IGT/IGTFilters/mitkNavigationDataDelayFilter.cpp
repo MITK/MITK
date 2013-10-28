@@ -14,20 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkDelayFilter.h"
+#include "mitkNavigationDataDelayFilter.h"
 
-/**mitk::DelayFilter::DataObjectPointer mitk::DelayFilter::MakeOutput ( DataObjectPointerArraySizeType )
+/**mitk::NavigationDataDelayFilter::DataObjectPointer mitk::NavigationDataDelayFilter::MakeOutput ( DataObjectPointerArraySizeType )
 {
 mitkThrow() << "Unsupported Operation. Please override method in sublclass if you need this functionality.";
 }
 
-mitk::DelayFilter::DataObjectPointer mitk::DelayFilter::MakeOutput( const DataObjectIdentifierType& )
+mitk::NavigationDataDelayFilter::DataObjectPointer mitk::NavigationDataDelayFilter::MakeOutput( const DataObjectIdentifierType& )
 {
 mitkThrow() << "Unsupported Operation. Please override method in sublclass if you need this functionality.";
 }
 */
 
-void mitk::DelayFilter::GenerateData()
+void mitk::NavigationDataDelayFilter::GenerateData()
 {
   // Check if number of outputs has changed since the previous call. If yes, reset buffer.
   // This actually compares the number of Navigation Datas in each step and compares it to the current number of inputs.

@@ -1,4 +1,5 @@
 set(CPP_FILES
+  IGTFilters/mitkNavigationDataDelayFilter.cpp
   IGTFilters/mitkNavigationDataLandmarkTransformFilter.cpp
   IGTFilters/mitkNavigationDataReferenceTransformFilter.cpp
   IGTFilters/mitkNavigationDataTransformFilter.cpp
@@ -22,8 +23,6 @@ set(CPP_FILES
   IGTFilters/mitkIGTTimeStamp.cpp
   IGTFilters/mitkRealTimeClock.cpp
   IGTFilters/mitkTrackingDeviceSourceConfigurator.cpp
-
-  IGTFilters/mitkDelayFilter.cpp
 
   IGTTrackingDevices/mitkClaronTool.cpp
   IGTTrackingDevices/mitkClaronTrackingDevice.cpp

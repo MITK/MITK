@@ -377,5 +377,7 @@ void mitk::ContourModelSetGLMapper2D::SetDefaultProperties(mitk::DataNode* node,
 
   node->AddProperty( "contour.project-onto-plane", mitk::BoolProperty::New( false ), renderer, overwrite );
 
+  node->AddProperty( "opacity", mitk::FloatProperty::New(1.0f), renderer, overwrite );
+
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

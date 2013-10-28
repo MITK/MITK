@@ -253,6 +253,7 @@ namespace mitk
           }
           contourSequence->Close();
           contourSet->AddContourModel(contourSequence);
+          contourSet->SetProperty("name", mitk::StringProperty::New("blabal"));
         }
         while(contourSeqObject.gotoNextItem().good());
       }
@@ -530,7 +531,8 @@ namespace mitk
     node->SetName("DicomRT Dosis");
     node->SetProperty("Image Rendering.Mode", renderingMode);
     node->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
-    node->SetProperty("opacity", mitk::FloatProperty::New(0.3));
+    node->SetProperty("opacity", mitk::FloatProperty::New(1.0));
+    node->SetProperty("texture interpolation", mitk::BoolProperty::New( true ) );
     node->SetData(image);
 
     return node;

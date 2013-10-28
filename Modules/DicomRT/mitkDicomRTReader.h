@@ -52,6 +52,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTransferFunctionProperty.h>
 #include <mitkProperties.h>
 #include <mitkRenderingModeProperty.h>
+#include <mitkDataNodeFactory.h>
 //######################################################
 
 #include "dcmtk/dcmrt/drtstrct.h"

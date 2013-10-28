@@ -83,6 +83,8 @@ namespace mitk {
     */
     virtual USControlInterfaceDoppler::Pointer GetControlInterfaceDoppler();
 
+    virtual mitk::NavigationDataSource::Pointer GetNavigationDataSource();
+
   protected:
     USCombinedModality(std::string manufacturer, std::string model);
     virtual ~USCombinedModality();
@@ -111,8 +113,6 @@ namespace mitk {
     * \brief Deactivates UltrasoundDevice.
     */
     virtual bool OnDeactivation();
-
-    virtual mitk::NavigationDataSource::Pointer GetNavigationDataSource();
 
     /**
     * \brief Grabs the next frame from the input.

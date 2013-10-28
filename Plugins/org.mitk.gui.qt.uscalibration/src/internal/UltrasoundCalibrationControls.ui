@@ -22,89 +22,21 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="m_TabWidget">
-     <property name="currentIndex">
-      <number>1</number>
+     <property name="enabled">
+      <bool>true</bool>
      </property>
-     <widget class="QWidget" name="t1devices">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QmitkUSCombinedModalityManagerWidget" name="t1devices">
       <attribute name="title">
        <string>Devices</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Please select an ultrasound device and a tracking device from the list above. These devices will be used to perform the procedure. Both devices must be active to appear on their respective List.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Ultrasound Device:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QmitkServiceListWidget" name="m_USDevices" native="true"/>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Tracking Device:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QmitkServiceListWidget" name="m_TrackingDevices" native="true"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="m_BtnSelectDevices">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Select Devices</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="spacer1">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Expanding</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>75</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
      </widget>
      <widget class="QWidget" name="t2calibration">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <attribute name="title">
        <string>Calibration</string>
       </attribute>
@@ -411,15 +343,15 @@ p, li { white-space: pre-wrap; }
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkServiceListWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">QmitkServiceListWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QmitkToolTrackingStatusWidget</class>
    <extends>QWidget</extends>
    <header location="global">QmitkToolTrackingStatusWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkUSCombinedModalityManagerWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkUSCombinedModalityManagerWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

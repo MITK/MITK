@@ -3,15 +3,35 @@
 
 #include <QWidget>
 
+#include "MitkUSNavigationUIExports.h"
+#include "mitkUSCombinedModality.h"
+
 namespace Ui {
 class QmitkUSCombinedModalityManagerWidget;
 }
 
-class QmitkUSCombinedModalityManagerWidget : public QWidget
+class MitkUSNavigationUI_EXPORT QmitkUSCombinedModalityManagerWidget : public QWidget
 {
     Q_OBJECT
 
+signals:
+    /**
+     * \brief Signals the selected combined modality.
+     * The given object will be null if no combined modality is selected.
+     */
+    void SignalCombinedModalitySelected(mitk::USCombinedModality::Pointer);
+
 protected slots:
+    /**
+     * \brief Triggered, when the user selects a device from either the list of USDevices or Tracking Devices
+     */
+    void OnSelectedUltrasoundOrTrackingDevice();
+
+    /**
+     * \brief Triggered, when the user selects a defice from the list of USCombinedModilites
+     */
+    void OnSelectedCombinedModality();
+
     void OnCreateCombinedModalityButtonClicked();
     void OnRemoveCombinedModalityButtonClicked();
 

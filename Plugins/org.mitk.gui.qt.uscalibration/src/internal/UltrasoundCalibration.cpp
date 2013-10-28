@@ -29,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 
 // MITK
-#include <mitkUSDevice.h>
 #include <mitkVector.h>
 //#include <mitkPointSetModifier.h>
 #include <mitkPointSetWriter.h>
@@ -65,7 +64,7 @@ UltrasoundCalibration::~UltrasoundCalibration()
 
 void UltrasoundCalibration::SetFocus()
 {
-  m_Controls.m_BtnSelectDevices->setFocus();
+  m_Controls.m_TabWidget->setFocus();
 }
 
 void UltrasoundCalibration::CreateQtPartControl( QWidget *parent )
@@ -77,9 +76,6 @@ void UltrasoundCalibration::CreateQtPartControl( QWidget *parent )
   // General & Device Selection
   connect( m_Timer, SIGNAL(timeout()), this, SLOT(Update()));
   connect( m_Controls.m_TabWidget,        SIGNAL(currentChanged ( int )), this, SLOT(OnTabSwitch( int )) );
-  connect( m_Controls.m_BtnSelectDevices, SIGNAL(clicked()), this, SLOT(OnSelectDevices()) );
-  connect( m_Controls.m_USDevices,        SIGNAL( ServiceSelectionChanged(us::ServiceReference<mitk::USDevice>) ), this, SLOT(OnClickDevices()) );
-  connect( m_Controls.m_TrackingDevices,  SIGNAL( ServiceSelectionChanged(us::ServiceReference<mitk::TrackingDevice>) ), this, SLOT(OnClickDevices()) );
   // Calibration
   connect( m_Controls.m_CalibBtnFreeze,    SIGNAL(clicked()), this, SLOT(SwitchFreeze()) );       // Freeze
   connect( m_Controls.m_CalibBtnAddPoint,  SIGNAL(clicked()), this, SLOT(OnAddCalibPoint()) );    // Tracking & Image Points (Calibration)
@@ -92,10 +88,9 @@ void UltrasoundCalibration::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_CalibBtnSaveCalibration,  SIGNAL(clicked()), this, SLOT(OnSaveCalibration()) );         // Save Evaluation Results
   connect( m_Controls.m_BtnReset,     SIGNAL(clicked()), this, SLOT(OnReset()) );                 // Reset Pointsets
 
+  connect( m_Controls.t1devices, SIGNAL(SignalCombinedModalitySelected(mitk::USCombinedModality::Pointer)),
+           this, SLOT(OnSelectDevice(mitk::USCombinedModality::Pointer)));
 
-  // Initializations currently fail under linux
-  m_Controls.m_USDevices->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL);
-  m_Controls.m_TrackingDevices->Initialize<mitk::NavigationDataSource>( mitk::NavigationDataSource::US_PROPKEY_DEVICENAME);
   m_Controls.m_TabWidget->setTabEnabled(1, false);
   m_Controls.m_TabWidget->setTabEnabled(2, false);
 
@@ -143,31 +138,32 @@ void UltrasoundCalibration::OnTabSwitch(int index){
 
 }
 
+void UltrasoundCalibration::OnSelectDevice(mitk::USCombinedModality::Pointer combinedModality)
+{
+  m_CombinedModality = combinedModality;
 
-void UltrasoundCalibration::OnClickDevices(){
+  if (combinedModality.IsNotNull())
+  {
+    m_Tracker = m_CombinedModality->GetNavigationDataSource();
 
-  if ( (m_Controls.m_USDevices->GetIsServiceSelected()) && (m_Controls.m_TrackingDevices->GetIsServiceSelected()) )
-    m_Controls.m_BtnSelectDevices->setEnabled(true);
+    // Construct Pipeline
+    this->m_NeedleProjectionFilter->SetInput(0, m_Tracker->GetOutput(0));
+
+    this->SwitchFreeze();
+
+    // Todo: Maybe display this elsewhere
+    this->ShowNeedlePath();
+
+    // Switch active tab to Calibration page
+    m_Controls.m_TabWidget->setTabEnabled(1, true);
+    m_Controls.m_TabWidget->setCurrentIndex(1);
+  }
   else
-    m_Controls.m_BtnSelectDevices->setEnabled(false);
-}
-
-void UltrasoundCalibration::OnSelectDevices(){
-  m_USDevice = m_Controls.m_USDevices->GetSelectedService<mitk::USDevice>();
-
-  m_Tracker = m_Controls.m_TrackingDevices->GetSelectedService<mitk::NavigationDataSource>();
-
-  // Construct Pipeline
-  this->m_NeedleProjectionFilter->SetInput(0, m_Tracker->GetOutput(0));
-
-  this->SwitchFreeze();
-
-  // Todo: Maybe display this elsewhere
-  this->ShowNeedlePath();
-
-  // Switch active tab to Calibration page
-  m_Controls.m_TabWidget->setTabEnabled(1, true);
-  m_Controls.m_TabWidget->setCurrentIndex(1);
+  {
+    m_Controls.m_TabWidget->setCurrentIndex(0);
+    m_Controls.m_TabWidget->setTabEnabled(1, false);
+    m_Controls.m_TabWidget->setTabEnabled(2, false);
+  }
 }
 
 void UltrasoundCalibration::OnAddCalibPoint()
@@ -225,7 +221,7 @@ void UltrasoundCalibration::OnCalibration()
   plane->SetIndexToWorldTransform(m_Transformation);
 
   // Save to US-Device
-  m_USDevice->setCalibration(m_Transformation);
+  m_CombinedModality->SetCalibration(m_Transformation);
   m_Controls.m_TabWidget->setTabEnabled(2, true);
 
   // Save to NeedleProjectionFilter
@@ -330,7 +326,7 @@ void UltrasoundCalibration::OnReset()
 
   m_Transformation->SetIdentity();
 
-  m_USDevice->setCalibration(m_Transformation);
+  m_CombinedModality->SetCalibration(m_Transformation);
 
   mitk::SlicedGeometry3D::Pointer sliced3d  = dynamic_cast< mitk::SlicedGeometry3D* > (m_Node->GetData()->GetGeometry());
   mitk::PlaneGeometry::Pointer plane = dynamic_cast< mitk::PlaneGeometry* > (sliced3d->GetGeometry2D(0));
@@ -356,8 +352,8 @@ void UltrasoundCalibration::Update()
   m_Controls.m_EvalTrackingStatus->Refresh();
 
   // Update US Image
-  m_USDevice->UpdateOutputData(0);
-  mitk::USImage::Pointer image = m_USDevice->GetOutput();
+  m_CombinedModality->UpdateOutputData(0);
+  mitk::USImage::Pointer image = m_CombinedModality->GetOutput();
   m_Node->SetData(image);
   //m_Image->Update();
 
@@ -374,13 +370,13 @@ void UltrasoundCalibration::SwitchFreeze()
   if ( ! m_Timer->isActive() ) // Activate Imaging
   {
     // if (m_Node) m_Node->ReleaseData();
-    if (m_USDevice.IsNull()){
+    if (m_CombinedModality.IsNull()){
       m_Timer->stop();
       return;
     }
-    m_USDevice->UpdateOutputData(0);
-    m_Image = m_USDevice->GetOutput(0);
-    m_Node->SetData(m_USDevice->GetOutput(0));
+    m_CombinedModality->UpdateOutputData(0);
+    m_Image = m_CombinedModality->GetOutput(0);
+    m_Node->SetData(m_CombinedModality->GetOutput(0));
 
     std::vector<mitk::NavigationData::Pointer> datas;
     datas.push_back(m_Tracker->GetOutput());

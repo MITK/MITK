@@ -26,8 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <QTimer>
 
 //MITK
-#include <mitkUSDevice.h>
-#include <mitkNavigationDataSource.h>
+#include <mitkUSCombinedModality.h>
 #include <mitkPointSet.h>
 #include <mitkNeedleProjectionFilter.h>
 #include <mitkPointSetDifferenceStatisticsCalculator.h>
@@ -67,16 +66,10 @@ class UltrasoundCalibration : public QmitkAbstractView
     void OnTabSwitch(int index);
 
     /**
-    * \brief Triggered, when the user selects a device from either the list of USDevices or Tracking Devices
-    *
-    */
-    void OnClickDevices();
-
-    /**
     * \brief Triggered, when the user has clicked "select Devices".
     *
     */
-    void OnSelectDevices();
+    void OnSelectDevice(mitk::USCombinedModality::Pointer);
 
     /**
     * \brief Triggered, when the user clicks "Add Point"
@@ -146,12 +139,13 @@ class UltrasoundCalibration : public QmitkAbstractView
     void ShowNeedlePath();
 
     /**
-    * \brief The US-Device used for imaging.
+    * \brief The combined modality used for imaging and tracking.
     */
-    mitk::USDevice::Pointer m_USDevice;
+    mitk::USCombinedModality::Pointer m_CombinedModality;
 
     /**
     * \brief NavigationDataSource used for tracking data.
+    * This will be gotten by the combined modality.
     */
     mitk::NavigationDataSource::Pointer m_Tracker;
 

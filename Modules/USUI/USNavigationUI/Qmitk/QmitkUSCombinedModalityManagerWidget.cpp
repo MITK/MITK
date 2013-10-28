@@ -1,8 +1,6 @@
 #include "QmitkUSCombinedModalityManagerWidget.h"
 #include "ui_QmitkUSCombinedModalityManagerWidget.h"
 
-#include "mitkUSDevice.h"
-#include "mitkUSCombinedModality.h"
 #include "mitkNavigationDataSource.h"
 
 QmitkUSCombinedModalityManagerWidget::QmitkUSCombinedModalityManagerWidget(QWidget* parent) :
@@ -15,11 +13,51 @@ QmitkUSCombinedModalityManagerWidget::QmitkUSCombinedModalityManagerWidget(QWidg
     ui->m_TrackingDevices->Initialize<mitk::NavigationDataSource>(mitk::NavigationDataSource::US_PROPKEY_DEVICENAME);
     ui->m_CombinedModalities->Initialize<mitk::USDevice>(mitk::USCombinedModality::US_PROPKEY_LABEL,
                                                          "(" + mitk::USDevice::US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + ")");
+
+    connect( ui->m_USDevices,          SIGNAL( ServiceSelectionChanged(us::ServiceReferenceU) ), this, SLOT(OnSelectedUltrasoundOrTrackingDevice()) );
+    connect( ui->m_TrackingDevices,    SIGNAL( ServiceSelectionChanged(us::ServiceReferenceU) ), this, SLOT(OnSelectedUltrasoundOrTrackingDevice()) );
+    connect( ui->m_CombinedModalities, SIGNAL( ServiceSelectionChanged(us::ServiceReferenceU) ), this, SLOT(OnSelectedCombinedModality()) );
 }
 
 QmitkUSCombinedModalityManagerWidget::~QmitkUSCombinedModalityManagerWidget()
 {
     delete ui;
+}
+
+void QmitkUSCombinedModalityManagerWidget::OnSelectedUltrasoundOrTrackingDevice()
+{
+    // create button is enabled only if an ultrasound and a tracking device
+    // is selected
+    ui->m_CreateCombinedModalityButton->setEnabled(
+                ui->m_USDevices->GetIsServiceSelected()
+            && ui->m_TrackingDevices->GetIsServiceSelected());
+}
+
+void QmitkUSCombinedModalityManagerWidget::OnSelectedCombinedModality()
+{
+    if ( ui->m_CombinedModalities->GetIsServiceSelected() )
+    {
+        // remove button is enabled only if a combined modality is selected
+        ui->m_RemoveCombinedModalityButton->setEnabled(true);
+
+        mitk::USCombinedModality::Pointer combinedModality =
+                dynamic_cast<mitk::USCombinedModality*>(ui->m_CombinedModalities->GetSelectedService<mitk::USDevice>());
+
+        if ( combinedModality.IsNull())
+        {
+            MITK_WARN << "Cannot get selected combined modality from service list widget. Is the selected item really a USCombinedModality?";
+        }
+
+        emit(SignalCombinedModalitySelected(combinedModality));
+    }
+    else
+    {
+        // remove button is enabled only if a combined modality is selected
+        ui->m_RemoveCombinedModalityButton->setEnabled(false);
+
+        // emit that no combined modality is selected now
+        emit(SignalCombinedModalitySelected(0));
+    }
 }
 
 void QmitkUSCombinedModalityManagerWidget::OnCreateCombinedModalityButtonClicked()

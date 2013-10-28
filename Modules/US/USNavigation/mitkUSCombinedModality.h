@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkUSNavigationExports.h>
 #include <mitkNavigationDataSmoothingFilter.h>
+#include <mitkDelayFilter.h>
 
 #include "mitkUSDevice.h"
 
@@ -29,7 +30,7 @@ namespace itk {
 namespace mitk {
   class NavigationDataSource;
 
-  class MitkUSCombinedModality_EXPORT USCombinedModality : public USDevice
+  class MitkUSNavigation_EXPORT USCombinedModality : public USDevice
   {
   public:
     static const std::string DeviceClassIdentifier;

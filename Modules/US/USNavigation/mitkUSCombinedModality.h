@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKUSCombinedModality_H_HEADER_INCLUDED_
 #define MITKUSCombinedModality_H_HEADER_INCLUDED_
 
-#include <MitkUSCombinedModalityExports.h>
+#include <MitkUSNavigationExports.h>
 #include <mitkNavigationDataSmoothingFilter.h>
 
 #include "mitkUSDevice.h"
@@ -29,7 +29,7 @@ namespace itk {
 namespace mitk {
 class NavigationDataSource;
 
-class MitkUSCombinedModality_EXPORT USCombinedModality : public USDevice
+class MitkUSNavigation_EXPORT USCombinedModality : public USDevice
 {
 public:
     static const std::string DeviceClassIdentifier;

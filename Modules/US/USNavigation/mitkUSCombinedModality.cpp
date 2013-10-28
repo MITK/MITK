@@ -20,9 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string mitk::USCombinedModality::DeviceClassIdentifier = "org.mitk.modules.us.USCombinedModality";
 
-mitk::USCombinedModality::USCombinedModality(std::string manufacturer, std::string model)
-  : mitk::USDevice(manufacturer, model),
-  m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New())
+mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, NavigationDataSource::Pointer trackingDevice, std::string manufacturer, std::string model)
+  : mitk::USDevice(manufacturer, model), m_UltrasoundDevice(usDevice), m_TrackingDevice(trackingDevice),
+    m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New())
 {
   // build tracking filter pipeline
   m_SmoothingFilter->SetInput(0, m_TrackingDevice->GetOutput());

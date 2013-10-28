@@ -36,7 +36,7 @@ namespace mitk {
     static const std::string DeviceClassIdentifier;
 
     mitkClassMacro(USCombinedModality, USDevice);
-    mitkNewMacro2Param(USCombinedModality, std::string, std::string);
+    mitkNewMacro4Param(USCombinedModality, USDevice::Pointer, NavigationDataSource::Pointer, std::string, std::string);
 
     itkGetMacro(UltrasoundDevice, itk::SmartPointer<USDevice>);
     //itkGetMacro(TrackingDevice, itk::SmartPointer<NavigationDataSource>);
@@ -86,7 +86,7 @@ namespace mitk {
     virtual mitk::NavigationDataSource::Pointer GetNavigationDataSource();
 
   protected:
-    USCombinedModality(std::string manufacturer, std::string model);
+    USCombinedModality(USDevice::Pointer usDevice, NavigationDataSource::Pointer trackingDevice, std::string manufacturer = "", std::string model = "");
     virtual ~USCombinedModality();
 
     /**

@@ -76,14 +76,13 @@ void QmitkUSCombinedModalityManagerWidget::OnCreateCombinedModalityButtonClicked
         return;
     }
 
-    mitk::USCombinedModality::Pointer combinedModality = mitk::USCombinedModality::New("", "");
+    mitk::USCombinedModality::Pointer combinedModality = mitk::USCombinedModality::New(usDevice, trackingDevice, "", "");
 
-    combinedModality->SetUltrasoundDevice(usDevice);
-    combinedModality->SetTrackingDevice(trackingDevice);
+    //combinedModality->SetUltrasoundDevice(usDevice);
+    //combinedModality->SetTrackingDevice(trackingDevice);
     combinedModality->Initialize();
 }
 
 void QmitkUSCombinedModalityManagerWidget::OnRemoveCombinedModalityButtonClicked()
 {
-
 }

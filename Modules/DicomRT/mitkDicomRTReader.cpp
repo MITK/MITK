@@ -97,7 +97,7 @@ namespace mitk
         if(sopClass == UID_RTDoseStorage)
         {
           mitk::DataNode::Pointer x = mitk::DataNode::New();
-          x = this->DicomRTReader::LoadRTDose(dataset);
+          x = this->DicomRTReader::LoadRTDose(dataset, filename);
           ContourModelSetVector y;
           return y;
         }
@@ -253,6 +253,7 @@ namespace mitk
           }
           contourSequence->Close();
           contourSet->AddContourModel(contourSequence);
+          //Hier den namen des contoumodelsets setzen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           contourSet->SetProperty("name", mitk::StringProperty::New("blabal"));
         }
         while(contourSeqObject.gotoNextItem().good());
@@ -445,8 +446,19 @@ namespace mitk
     return 1;
   }
 
-  mitk::DataNode::Pointer DicomRTReader::LoadRTDose(DcmDataset* dataset)
+  mitk::DataNode::Pointer DicomRTReader::LoadRTDose(DcmDataset* dataset, char* filename)
   {
+    std::string name = filename;
+    itk::FilenamesContainer file;
+    file.push_back(name);
+
+    mitk::DicomSeriesReader* reader = new mitk::DicomSeriesReader;
+
+    mitk::DataNode::Pointer originalNode = reader->LoadDicomSeries(file,false);
+    mitk::Image::Pointer originalImage = dynamic_cast<mitk::Image*>(originalNode->GetData());
+
+    mitk::Geometry3D::Pointer geo = originalImage->GetGeometry()->Clone();
+
     DRTDoseIOD doseObject;
 
     OFCondition result = doseObject.read(*dataset);
@@ -506,6 +518,8 @@ namespace mitk
       *pixel=pixelData[i] * gridscale;
     }
 
+    image->SetGeometry(geo);
+
     double prescripeDose = highest * 0.8;
     double hsvValue = 0.002778;
 
@@ -531,7 +545,7 @@ namespace mitk
     node->SetName("DicomRT Dosis");
     node->SetProperty("Image Rendering.Mode", renderingMode);
     node->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
-    node->SetProperty("opacity", mitk::FloatProperty::New(1.0));
+    node->SetProperty("opacity", mitk::FloatProperty::New(0.3));
     node->SetProperty("texture interpolation", mitk::BoolProperty::New( true ) );
     node->SetData(image);
 

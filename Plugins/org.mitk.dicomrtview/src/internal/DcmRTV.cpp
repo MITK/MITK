@@ -139,6 +139,7 @@ void DcmRTV::LoadRTDoseFile()
 
   std::string tmp = files.front();
   const char* filename = tmp.c_str();
+  char* ncFilename = const_cast<char*>(filename);
 
   mitk::DicomRTReader::Pointer _DicomRTReader = mitk::DicomRTReader::New();
 
@@ -151,7 +152,7 @@ void DcmRTV::LoadRTDoseFile()
   DcmDataset *dataset = file.getDataset();
 
   mitk::DataNode::Pointer mitkImage = mitk::DataNode::New();
-  mitkImage = _DicomRTReader->LoadRTDose(dataset);
+  mitkImage = _DicomRTReader->LoadRTDose(dataset,ncFilename);
 
   GetDataStorage()->Add(mitkImage);
 

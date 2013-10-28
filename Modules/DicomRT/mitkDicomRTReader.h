@@ -53,6 +53,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 #include <mitkRenderingModeProperty.h>
 #include <mitkDataNodeFactory.h>
+#include <itkGDCMSeriesFileNames.h>
+#include <mitkDicomSeriesReader.h>
 //######################################################
 
 #include "dcmtk/dcmrt/drtstrct.h"
@@ -132,7 +134,7 @@ namespace mitk
     ContourModelSetVector ReadDicomFile(char* filename);
     ContourModelSetVector ReadStructureSet(DcmDataset* dataset);
     int LoadRTPlan(DcmDataset* dataset);
-    mitk::DataNode::Pointer LoadRTDose(DcmDataset* dataset);
+    mitk::DataNode::Pointer LoadRTDose(DcmDataset* dataset, char* filename);
     size_t GetNumberOfRois();
     RoiEntry* FindRoiByNumber(int roiNumber);
     OFString GetReferencedFrameOfReferenceSOPInstanceUID(DRTStructureSetIOD &structSetObject);

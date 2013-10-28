@@ -29,18 +29,38 @@ mitkThrow() << "Unsupported Operation. Please override method in sublclass if yo
 
 void mitk::DelayFilter::GenerateData()
 {
-  //get each input and transfer the data
-  DataObjectPointerArray inputs = this->GetInputs(); //get all inputs
-  for (unsigned int index=0; index < inputs.size(); index++)
+  // Check if number of outputs has changed since the previous call. If yes, reset buffer.
+  // This actually compares the number of Navigation Datas in each step and compares it to the current number of inputs.
+  // If these values differ, the number of inputrs have changed.
+  if ( (m_Buffer.size() > 0) &&  (this->GetNumberOfInputs() != m_Buffer.front().second.size()) )
+    m_Buffer.clear();
+
+  // Put current navigationdatas from input into buffer
+  itk::TimeStamp timestamp;
+  timestamp.Modified();
+
+  std::vector<mitk::NavigationData::Pointer> ndList;
+  for (unsigned int i = 0; i < this->GetNumberOfInputs() ; ++i)
   {
-    //get the needed variables
-    //const mitk::BaseData* input = this->GetInput(index);
-    //assert(input);
+    ndList.push_back( this->GetInput(i)->Clone());
+  }
 
-    //mitk::BaseData* output = this->GetOutput(index);
-    //assert(output);
+  m_Buffer.push_back( std::make_pair(timestamp, ndList) );
 
-    // TODO: this should be delayed for this filter
-    //output->Graft(input); // copy all information from input to output
+  /* update outputs with tracking data from tools */
+  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
+  {
+    mitk::NavigationData* output = this->GetOutput(i);
+    assert(output);
+    const mitk::NavigationData* input = this->GetInput(i);
+    assert(input);
+
+    if (input->IsDataValid() == false)
+    {
+      output->SetDataValid(false);
+      continue;
+    }
+    output->Graft(input); // First, copy all information from input to output
+    output->SetDataValid(true); // operation was successful, therefore data of output is valid.
   }
 }

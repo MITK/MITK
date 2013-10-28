@@ -25,9 +25,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 //ITK header
 #include <itkTimeStamp.h>
 
+#include <queue>
+
 namespace mitk {
   class MitkIGT_EXPORT DelayFilter : public mitk::NavigationDataToNavigationDataFilter
   {
+    typedef std::pair<long, std::vector<mitk::NavigationData::Pointer>> BufferType;
+
     /**
     * @sa itk::ProcessObject::MakeOutput(DataObjectPointerArraySizeType)
     */
@@ -46,9 +50,13 @@ namespace mitk {
     * In more clarity: The top level vector contains (one Navigation Data for each inout and the time these NDs have been recorded at).
     * The last line of this comment is meant to be viewed in the header file directly:
     |list of    |pairs of| timestamp and |one navigation Data for each input       |*/
-    std::vector<std::pair<itk::TimeStamp, std::vector<mitk::NavigationData::Pointer>>> m_Buffer;
+    std::queue<BufferType> m_Buffer;
 
-    long m_DeltaT;
+    /**
+    * The amount of time by which the Navigationdatas are delayed in milliseconds
+    */
+    unsigned int m_DeltaT;
+    unsigned int m_Tolerance;
   };
 } // namespace mitk
 

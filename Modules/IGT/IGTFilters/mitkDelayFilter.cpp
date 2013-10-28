@@ -33,11 +33,11 @@ void mitk::DelayFilter::GenerateData()
   // This actually compares the number of Navigation Datas in each step and compares it to the current number of inputs.
   // If these values differ, the number of inputrs have changed.
   if ( (m_Buffer.size() > 0) &&  (this->GetNumberOfInputs() != m_Buffer.front().second.size()) )
-    m_Buffer.clear();
+    m_Buffer.empty();
 
   // Put current navigationdatas from input into buffer
-  itk::TimeStamp timestamp;
-  timestamp.Modified();
+  itk::TimeStamp now;
+  now.Modified();
 
   std::vector<mitk::NavigationData::Pointer> ndList;
   for (unsigned int i = 0; i < this->GetNumberOfInputs() ; ++i)
@@ -45,14 +45,28 @@ void mitk::DelayFilter::GenerateData()
     ndList.push_back( this->GetInput(i)->Clone());
   }
 
-  m_Buffer.push_back( std::make_pair(timestamp, ndList) );
+  m_Buffer.push( std::make_pair(now.GetMTime(), ndList) );
 
-  /* update outputs with tracking data from tools */
+  // Find most recent member from buffer that is old enough to output, considering DeltaT
+  // remove all sets that are too old already in the process
+  BufferType current;
+  bool foundCurrent = false;
+
+  while ( m_Buffer.front().first + m_DeltaT <= now.GetMTime() + m_Tolerance )
+  {
+    foundCurrent = true;
+    current = m_Buffer.front();
+    m_Buffer.pop();
+  }
+
+  // update outputs with tracking data from previous step, or none if empty
+  if ( !foundCurrent) return;
+
   for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
   {
     mitk::NavigationData* output = this->GetOutput(i);
     assert(output);
-    const mitk::NavigationData* input = this->GetInput(i);
+    const mitk::NavigationData* input = current.second[i];
     assert(input);
 
     if (input->IsDataValid() == false)

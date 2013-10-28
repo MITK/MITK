@@ -91,13 +91,7 @@ namespace mitk
     */
    void SetActiveLabel(int activeLabel);
 
-    /**
-     * Removes the segmentation and all its contours from the list
-     * @param workingImage The working image to be removed
-     */
-  //  void RemoveSegmentationFromContourList(mitk::Image* workingImage);
-
-    mitk::Image* GetImage();
+   mitk::Image* GetImage();
 
     /**
      * Estimates the memory that is needed to build up the equation system for the interpolation.
@@ -113,6 +107,8 @@ namespace mitk
 
    template<typename TPixel, unsigned int VImageDimension>
    void GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& result);
+
+   void Initialize();
 
  private:
 
@@ -139,7 +135,7 @@ namespace mitk
 
     Surface::Pointer m_Contours;
 
-    vtkSmartPointer<vtkPolyData> m_PolyData;
+//    vtkSmartPointer<vtkPolyData> m_PolyData;
 
     unsigned int m_DistImageVolume;
 
@@ -151,7 +147,7 @@ namespace mitk
 
     int m_ActiveLabel;
 
-    std::map<mitk::Image*, unsigned long> m_SegmentationObserverTags;
+//    std::map<mitk::Image*, unsigned long> m_SegmentationObserverTags;
  };
 }
 #endif

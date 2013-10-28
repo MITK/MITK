@@ -229,7 +229,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
 
   unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( workingImage );
   this->WriteBackSegmentationResult(planeGeometry, slice, timeStep);
-  //slice->DisconnectPipeline();
+  slice->DisconnectPipeline();
 
   if (m_2DInterpolationEnabled)
   {

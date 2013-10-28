@@ -446,7 +446,9 @@ void QmitkLabelSetWidget::OnActiveLabelChanged(int activeLabel)
 {
   mitk::SurfaceInterpolationController* interpolator = mitk::SurfaceInterpolationController::GetInstance();
   if (interpolator)
+  {
     interpolator->SetActiveLabel(activeLabel);
+  }
 }
 
 void QmitkLabelSetWidget::OnNewLabel()

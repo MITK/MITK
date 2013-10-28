@@ -167,16 +167,10 @@ void QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationFinished()
    }
    else
    {
+     m_InterpolatedSurfaceNode->SetData(NULL);
+     m_3DContourNode->SetData(NULL);
      this->ShowInterpolationResult(false);
    }
-
- /*
-     if( !m_DataStorage->Exists(m_InterpolatedSurfaceNode) && !m_DataStorage->Exists(m_3DContourNode))
-     {
-      m_DataStorage->Add(m_3DContourNode);
-      m_DataStorage->Add(m_InterpolatedSurfaceNode);
-    }
-*/
  }
 
 void QmitkSurfaceBasedInterpolator::OnShowMarkers(bool state)

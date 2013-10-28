@@ -50,6 +50,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <list>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #if ( ( VTK_MAJOR_VERSION <= 5 ) && ( VTK_MINOR_VERSION<=8)  )
   #include "mitkvtkLassoStencilSource.h"
 #else
@@ -246,6 +249,26 @@ void ImageStatisticsCalculator::SetDoIgnorePixelValue(bool value)
 bool ImageStatisticsCalculator::GetDoIgnorePixelValue()
 {
   return m_DoIgnorePixelValue;
+}
+
+void ImageStatisticsCalculator::SetHotspotSize(double value)
+{
+  m_HotspotSize = (4/3) * M_PI * value * value * value;
+}
+
+double ImageStatisticsCalculator::GetHotspotSize()
+{
+  return m_HotspotSize;
+}
+
+void ImageStatisticsCalculator::SetCalculateHotspot(bool value)
+{
+  m_CalculateHotspot = value;
+}
+
+bool ImageStatisticsCalculator::IsHotspotCalculated()
+{
+  return m_CalculateHotspot;
 }
 
 bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )

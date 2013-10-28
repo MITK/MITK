@@ -21,91 +21,88 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string mitk::USCombinedModality::DeviceClassIdentifier = "org.mitk.modules.us.USCombinedModality";
 
 mitk::USCombinedModality::USCombinedModality(std::string manufacturer, std::string model)
-    : mitk::USDevice(manufacturer, model),
-      m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New())
+  : mitk::USDevice(manufacturer, model),
+  m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New())
 {
-
-    // build tracking filter pipeline
-    m_SmoothingFilter->SetInput(0, m_TrackingDevice->GetOutput());
-    m_SmoothingFilter->SetNumerOfValues(10);
-    //m_ZoneFilter->SetInput(0, m_SmoothingFilter->GetOutput(0));
+  // build tracking filter pipeline
+  m_SmoothingFilter->SetInput(0, m_TrackingDevice->GetOutput());
+  m_SmoothingFilter->SetNumerOfValues(10);
+  //m_ZoneFilter->SetInput(0, m_SmoothingFilter->GetOutput(0));
 }
 
 mitk::USCombinedModality::~USCombinedModality()
 {
-
 }
-
 
 std::string mitk::USCombinedModality::GetDeviceClass()
 {
-    return DeviceClassIdentifier;
+  return DeviceClassIdentifier;
 }
 
 mitk::USImageSource::Pointer mitk::USCombinedModality::GetUSImageSource()
 {
-    if (m_UltrasoundDevice.IsNull())
-    {
-        MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-        mitkThrow() << "UltrasoundDevice must not be null.";
-    }
+  if (m_UltrasoundDevice.IsNull())
+  {
+    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
+    mitkThrow() << "UltrasoundDevice must not be null.";
+  }
 
-    return m_UltrasoundDevice->GetUSImageSource();
+  return m_UltrasoundDevice->GetUSImageSource();
 }
 
 mitk::USControlInterfaceBMode::Pointer mitk::USCombinedModality::GetControlInterfaceBMode()
 {
-    if (m_UltrasoundDevice.IsNull())
-    {
-        MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-        mitkThrow() << "UltrasoundDevice must not be null.";
-    }
+  if (m_UltrasoundDevice.IsNull())
+  {
+    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
+    mitkThrow() << "UltrasoundDevice must not be null.";
+  }
 
-    return m_UltrasoundDevice->GetControlInterfaceBMode();
+  return m_UltrasoundDevice->GetControlInterfaceBMode();
 }
 
 mitk::USControlInterfaceProbes::Pointer mitk::USCombinedModality::GetControlInterfaceProbes()
 {
-    if (m_UltrasoundDevice.IsNull())
-    {
-        MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-        mitkThrow() << "UltrasoundDevice must not be null.";
-    }
+  if (m_UltrasoundDevice.IsNull())
+  {
+    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
+    mitkThrow() << "UltrasoundDevice must not be null.";
+  }
 
-    return m_UltrasoundDevice->GetControlInterfaceProbes();
+  return m_UltrasoundDevice->GetControlInterfaceProbes();
 }
 
 mitk::USControlInterfaceDoppler::Pointer mitk::USCombinedModality::GetControlInterfaceDoppler()
 {
-    if (m_UltrasoundDevice.IsNull())
-    {
-        MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-        mitkThrow() << "UltrasoundDevice must not be null.";
-    }
+  if (m_UltrasoundDevice.IsNull())
+  {
+    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
+    mitkThrow() << "UltrasoundDevice must not be null.";
+  }
 
-    return m_UltrasoundDevice->GetControlInterfaceDoppler();
+  return m_UltrasoundDevice->GetControlInterfaceDoppler();
 }
 
 mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration()
 {
-    std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
-    if (calibrationKey.empty())
-    {
-        MITK_WARN << "Could not get a key for the calibration.";
-        return 0;
-    }
+  std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
+  if (calibrationKey.empty())
+  {
+    MITK_WARN << "Could not get a key for the calibration.";
+    return 0;
+  }
 
-    // find calibration for combination of probe identifier and depth
-    std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator calibrationIterator
-            = m_Calibrations.find(calibrationKey);
+  // find calibration for combination of probe identifier and depth
+  std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator calibrationIterator
+    = m_Calibrations.find(calibrationKey);
 
-    if (calibrationIterator == m_Calibrations.end())
-    {
-        MITK_WARN << "No calibration found for selected probe and depth.";
-        return 0;
-    }
+  if (calibrationIterator == m_Calibrations.end())
+  {
+    MITK_WARN << "No calibration found for selected probe and depth.";
+    return 0;
+  }
 
-    return calibrationIterator->second;
+  return calibrationIterator->second;
 }
 
 void mitk::USCombinedModality::SetCalibration (mitk::AffineTransform3D::Pointer calibration)
@@ -119,8 +116,8 @@ void mitk::USCombinedModality::SetCalibration (mitk::AffineTransform3D::Pointer 
   std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
   if (calibrationKey.empty())
   {
-      MITK_WARN << "Could not get a key for the calibration -> Calibration cannot be set.";
-      return;
+    MITK_WARN << "Could not get a key for the calibration -> Calibration cannot be set.";
+    return;
   }
 
   m_Calibrations[calibrationKey] = calibration;
@@ -135,123 +132,127 @@ void mitk::USCombinedModality::SetCalibration (mitk::AffineTransform3D::Pointer 
 
 bool mitk::USCombinedModality::OnInitialization()
 {
-    if (m_UltrasoundDevice.IsNull())
-    {
-        MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-        mitkThrow() << "UltrasoundDevice must not be null.";
-    }
+  if (m_UltrasoundDevice.IsNull())
+  {
+    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
+    mitkThrow() << "UltrasoundDevice must not be null.";
+  }
 
-    return m_UltrasoundDevice->Initialize();
+  return m_UltrasoundDevice->Initialize();
 }
 
 bool mitk::USCombinedModality::OnConnection()
 {
-    if (m_UltrasoundDevice.IsNull())
-    {
-        MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-        mitkThrow() << "UltrasoundDevice must not be null.";
-    }
+  if (m_UltrasoundDevice.IsNull())
+  {
+    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
+    mitkThrow() << "UltrasoundDevice must not be null.";
+  }
 
-    return m_UltrasoundDevice->Connect();
+  return m_UltrasoundDevice->Connect();
 }
 
 bool mitk::USCombinedModality::OnDisconnection()
 {
-    if (m_UltrasoundDevice.IsNull())
-    {
-        MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-        mitkThrow() << "UltrasoundDevice must not be null.";
-    }
+  if (m_UltrasoundDevice.IsNull())
+  {
+    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
+    mitkThrow() << "UltrasoundDevice must not be null.";
+  }
 
-    return m_UltrasoundDevice->Disconnect();
+  return m_UltrasoundDevice->Disconnect();
 }
 
 bool mitk::USCombinedModality::OnActivation()
 {
-    if (m_UltrasoundDevice.IsNull())
-    {
-        MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-        mitkThrow() << "UltrasoundDevice must not be null.";
-    }
+  if (m_UltrasoundDevice.IsNull())
+  {
+    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
+    mitkThrow() << "UltrasoundDevice must not be null.";
+  }
 
-    return m_UltrasoundDevice->Activate();
+  return m_UltrasoundDevice->Activate();
 }
 
 bool mitk::USCombinedModality::OnDeactivation()
 {
-    if (m_UltrasoundDevice.IsNull())
-    {
-        MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-        mitkThrow() << "UltrasoundDevice must not be null.";
-    }
+  if (m_UltrasoundDevice.IsNull())
+  {
+    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
+    mitkThrow() << "UltrasoundDevice must not be null.";
+  }
 
-    m_UltrasoundDevice->Deactivate();
+  m_UltrasoundDevice->Deactivate();
 
-    return m_UltrasoundDevice->GetIsInitialized();
+  return m_UltrasoundDevice->GetIsInitialized();
+}
+
+mitk::NavigationDataSource::Pointer mitk::USCombinedModality::GetNavigationDataSource()
+{
+  return m_DelayFilter;
 }
 
 void mitk::USCombinedModality::GenerateData()
 {
-    m_UltrasoundDevice->Update();
-    mitk::USImage::Pointer image = m_UltrasoundDevice->GetOutput();
+  m_UltrasoundDevice->Update();
+  mitk::USImage::Pointer image = m_UltrasoundDevice->GetOutput();
 
-    std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
-    if ( ! calibrationKey.empty() )
+  std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
+  if ( ! calibrationKey.empty() )
+  {
+    std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator calibrationIterator
+      = m_Calibrations.find(calibrationKey);
+    if ( calibrationIterator != m_Calibrations.end())
     {
-        std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator calibrationIterator
-                = m_Calibrations.find(calibrationKey);
-        if ( calibrationIterator != m_Calibrations.end())
-        {
-            // transform image according to callibration if one is set
-            // for current configuration of probe and depth
-            image->GetGeometry()->SetIndexToWorldTransform(calibrationIterator->second);
-        }
+      // transform image according to callibration if one is set
+      // for current configuration of probe and depth
+      image->GetGeometry()->SetIndexToWorldTransform(calibrationIterator->second);
     }
+  }
 
-    // TODO: do processing here
+  // TODO: do processing here
 
-
-    this->SetNthOutput(0, image);
+  this->SetNthOutput(0, image);
 }
 
 std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()
 {
-    mitk::USControlInterfaceProbes::Pointer probesInterface = this->GetControlInterfaceProbes();
-    if ( probesInterface && ! probesInterface->GetIsActive())
+  mitk::USControlInterfaceProbes::Pointer probesInterface = this->GetControlInterfaceProbes();
+  if ( probesInterface && ! probesInterface->GetIsActive())
+  {
+    MITK_WARN << "Cannot get calibration as probes interface is not active.";
+    return std::string();
+  }
+
+  // get probe identifier from control interface for probes
+  std::string probeName;
+  if ( ! probesInterface )
+  {
+    probeName = "default";
+  }
+  else
+  {
+    mitk::USProbe::Pointer curProbe = this->GetControlInterfaceProbes()->GetSelectedProbe();
+    if (curProbe.IsNull())
     {
-        MITK_WARN << "Cannot get calibration as probes interface is not active.";
-        return std::string();
+      MITK_WARN << "Cannot get calibration as current probe is null.";
+      return std::string();
     }
 
-    // get probe identifier from control interface for probes
-    std::string probeName;
-    if ( ! probesInterface )
-    {
-        probeName = "default";
-    }
-    else
-    {
-        mitk::USProbe::Pointer curProbe = this->GetControlInterfaceProbes()->GetSelectedProbe();
-        if (curProbe.IsNull())
-        {
-            MITK_WARN << "Cannot get calibration as current probe is null.";
-            return std::string();
-        }
+    probeName = curProbe->GetName();
+  }
 
-        probeName = curProbe->GetName();
-    }
+  // get string for depth value from the micro service properties
+  std::string depth;
+  us::ServiceProperties::iterator depthIterator = m_ServiceProperties.find(US_PROPKEY_BMODE_DEPTH);
+  if (depthIterator == m_ServiceProperties.end())
+  {
+    depth = depthIterator->second.ToString();
+  }
+  else
+  {
+    depth = "0";
+  }
 
-    // get string for depth value from the micro service properties
-    std::string depth;
-    us::ServiceProperties::iterator depthIterator = m_ServiceProperties.find(US_PROPKEY_BMODE_DEPTH);
-    if (depthIterator == m_ServiceProperties.end())
-    {
-        depth = depthIterator->second.ToString();
-    }
-    else
-    {
-        depth = "0";
-    }
-
-    return probeName + depth;
+  return probeName + depth;
 }

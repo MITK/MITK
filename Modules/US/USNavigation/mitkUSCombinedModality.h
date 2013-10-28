@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkUSNavigationExports.h>
 #include <mitkNavigationDataSmoothingFilter.h>
+#include <mitkDelayFilter.h>
 
 #include "mitkUSDevice.h"
 
@@ -27,11 +28,11 @@ namespace itk {
 }
 
 namespace mitk {
-class NavigationDataSource;
+  class NavigationDataSource;
 
-class MitkUSNavigation_EXPORT USCombinedModality : public USDevice
-{
-public:
+  class MitkUSNavigation_EXPORT USCombinedModality : public USDevice
+  {
+  public:
     static const std::string DeviceClassIdentifier;
 
     mitkClassMacro(USCombinedModality, USDevice);
@@ -44,77 +45,79 @@ public:
     itkSetMacro(TrackingDevice, itk::SmartPointer<NavigationDataSource>);
 
     /**
-      * \brief Getter for calibration data of the currently active probe and depth.
-      *
-      * \return Transformation for calibration or null if no calibration is available.
-      */
+    * \brief Getter for calibration data of the currently active probe and depth.
+    *
+    * \return Transformation for calibration or null if no calibration is available.
+    */
     AffineTransform3D::Pointer GetCalibration();
 
     /**
-      * \brief Sets a transformation as calibration data.
-      * Calibration data is set for the currently activated probe and their current
-      * zoom factor. It also marks the device as calibrated.
-      */
+    * \brief Sets a transformation as calibration data.
+    * Calibration data is set for the currently activated probe and their current
+    * zoom factor. It also marks the device as calibrated.
+    */
     void SetCalibration(AffineTransform3D::Pointer calibration);
 
     /**
-      * \brief Returns the Class of the Device.
-      */
+    * \brief Returns the Class of the Device.
+    */
     virtual std::string GetDeviceClass();
 
     /**
-      * \brief Wrapper for returning USImageSource of the UltrasoundDevice.
-      */
+    * \brief Wrapper for returning USImageSource of the UltrasoundDevice.
+    */
     virtual USImageSource::Pointer GetUSImageSource();
 
     /**
-      * \brief Wrapper for returning B mode control interface of the UltrasoundDevice.
-      */
+    * \brief Wrapper for returning B mode control interface of the UltrasoundDevice.
+    */
     virtual USControlInterfaceBMode::Pointer GetControlInterfaceBMode();
 
     /**
-      * \brief Wrapper for returning probes control interface of the UltrasoundDevice.
-      */
+    * \brief Wrapper for returning probes control interface of the UltrasoundDevice.
+    */
     virtual USControlInterfaceProbes::Pointer GetControlInterfaceProbes();
 
     /**
-      * \brief Wrapper for returning doppler control interface of the UltrasoundDevice.
-      */
+    * \brief Wrapper for returning doppler control interface of the UltrasoundDevice.
+    */
     virtual USControlInterfaceDoppler::Pointer GetControlInterfaceDoppler();
 
-protected:
+  protected:
     USCombinedModality(std::string manufacturer, std::string model);
     virtual ~USCombinedModality();
 
     /**
-      * \brief Initializes UltrasoundDevice.
-      */
+    * \brief Initializes UltrasoundDevice.
+    */
     virtual bool OnInitialization();
 
     /**
-      * \brief Connects UltrasoundDevice.
-      */
+    * \brief Connects UltrasoundDevice.
+    */
     virtual bool OnConnection();
 
     /**
-      * \brief Disconnects UltrasoundDevice.
-      */
+    * \brief Disconnects UltrasoundDevice.
+    */
     virtual bool OnDisconnection();
 
     /**
-      * \brief Activates UltrasoundDevice.
-      */
+    * \brief Activates UltrasoundDevice.
+    */
     virtual bool OnActivation();
 
     /**
-      * \brief Deactivates UltrasoundDevice.
-      */
+    * \brief Deactivates UltrasoundDevice.
+    */
     virtual bool OnDeactivation();
 
+    virtual mitk::NavigationDataSource::Pointer GetNavigationDataSource();
+
     /**
-      * \brief Grabs the next frame from the input.
-      * This method is called internally, whenever Update() is invoked by an Output.
-      */
+    * \brief Grabs the next frame from the input.
+    * This method is called internally, whenever Update() is invoked by an Output.
+    */
     void GenerateData();
 
     std::string GetIdentifierForCurrentCalibration();
@@ -124,8 +127,9 @@ protected:
     std::map<std::string, AffineTransform3D::Pointer>   m_Calibrations;
 
     mitk::NavigationDataSmoothingFilter::Pointer m_SmoothingFilter;
+    mitk::DelayFilter::Pointer m_DelayFilter;
 
-private:
+  private:
     /**
     *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
     */
@@ -135,8 +139,7 @@ private:
     * \brief Properties of the device's Microservice.
     */
     us::ServiceProperties                   m_ServiceProperties;
-};
-
+  };
 } // namespace mitk
 
 #endif // MITKUSCombinedModality_H_HEADER_INCLUDED_

@@ -118,6 +118,65 @@ static void TestTooltipFunctionality()
 
 
   }
+
+static void TestModiciationTimeCorrectness()
+{
+  mitk::InternalTrackingTool::Pointer tool = InternalTrackingToolTestClass::New().GetPointer();
+  unsigned long mTime1 = tool->GetMTime();
+
+  mitk::Point3D position1;
+  mitk::FillVector3D(position1, 1.1, 2.2, 3.3);
+  tool->SetPosition(position1);
+  MITK_TEST_CONDITION( mTime1 < tool->GetMTime(),
+                       "Testing MTime updated after initial position set" );
+
+  mitk::Quaternion quat1 = mitk::Quaternion(0,0,0.70710678118654757,0.70710678118654757);
+  tool->SetOrientation(quat1);
+  MITK_TEST_CONDITION( mTime1 < tool->GetMTime(),
+                       "Testing MTime updated after initial orientation set" );
+
+  unsigned long mTime2 = tool->GetMTime();
+
+  tool->SetPosition(position1);
+  MITK_TEST_CONDITION( mTime2 == tool->GetMTime(),
+                       "Testing MTime NOT updated after same initial position set" );
+
+  tool->SetOrientation(quat1);
+  MITK_TEST_CONDITION( mTime2 == tool->GetMTime(),
+                       "Testing MTime NOT updated after same initial orientation set" );
+
+  mitk::Point3D position2;
+  mitk::FillVector3D(position2, 1.10001, 2.2, 3.3);
+  tool->SetPosition(position2);
+  MITK_TEST_CONDITION( mTime2 < tool->GetMTime(),
+                       "Testing MTime updated after new position set" );
+
+  unsigned long mTime3 = tool->GetMTime();
+
+  mitk::Quaternion quat2 = mitk::Quaternion(0.0,
+                                            0.0,
+                                            0.70710678118654757,
+                                            0.70710678118654757 + 0.00001);
+  tool->SetOrientation(quat2);
+  MITK_TEST_CONDITION( mTime3 < tool->GetMTime(),
+                       "Testing MTime updated after new orientation set" );
+
+  unsigned long mTime4 = tool->GetMTime();
+
+  mitk::Point3D position3;
+  mitk::FillVector3D(position3, 1.10002, 2.2, 3.3);
+  tool->SetPosition(position3, 0.001);
+  MITK_TEST_CONDITION( mTime4 == tool->GetMTime(),
+                       "Testing MTime NOT updated after position set within epsilon tolerance" );
+
+  mitk::Quaternion quat3 = mitk::Quaternion(0.0,
+                                            0.0,
+                                            0.70710678118654757,
+                                            0.70710678118654757 + 0.00002);
+  tool->SetOrientation(quat3, 0.001);
+  MITK_TEST_CONDITION( mTime4 == tool->GetMTime(),
+                       "Testing MTime NOT updated after orientation set within epsilon tolerance" );
+}
 };
 
 /**
@@ -135,6 +194,7 @@ int mitkInternalTrackingToolTest(int /* argc */, char* /*argv*/[])
 
   InternalTrackingToolTestClass::TestBasicFunctionality();
   InternalTrackingToolTestClass::TestTooltipFunctionality();
+  InternalTrackingToolTestClass::TestModiciationTimeCorrectness();
 
 
   // always end with this!

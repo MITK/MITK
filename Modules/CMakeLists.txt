@@ -20,6 +20,7 @@ set(module_dirs
     SegmentationUI
     DiffusionImaging
     GPGPU
+    IGTBase
     IGT
     CameraCalibration
     IGTUI

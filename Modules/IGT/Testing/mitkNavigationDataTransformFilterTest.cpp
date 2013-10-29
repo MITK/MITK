@@ -48,6 +48,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   mitk::FillVector3D(initialPos, 1.1, 2.2, 3.3);
   mitk::FillVector3D(resultPos, 5.0, 5.0,5.0);
 
+
   mitk::NavigationData::OrientationType initialOri(0.0, 0.0, -0.7071, 0.7071);
   mitk::ScalarType initialError(0.0);
   bool initialValid(true);
@@ -56,6 +57,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   nd1->SetPosition(initialPos);
   nd1->SetOrientation(initialOri);
   nd1->SetPositionAccuracy(initialError);
+  nd1->SetOrientationAccuracy(initialError);
   nd1->SetDataValid(initialValid);
 
   myFilter->SetInput(nd1);
@@ -85,7 +87,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   output->Update(); // execute filter
 
   MITK_TEST_CONDITION(output->GetPosition() == resultPos, "Testing if translation was calculated correct");
-  MITK_TEST_CONDITION( mitk::Equal(output->GetOrientation(),initialOri),"Testing if Orientation remains unchanged ");
+  MITK_TEST_CONDITION( mitk::Equal( output->GetOrientation(),initialOri, 0.00001 ),"Testing if Orientation remains unchanged ");
   MITK_TEST_CONDITION(output->IsDataValid() == initialValid, "Testing if DataValid remains unchanged");
 
 
@@ -130,8 +132,8 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 
   output2->Update(); // execute filter
 
-  MITK_TEST_CONDITION(output2->GetPosition() == resultPos, "Testing if position after rotation is correctly calculated");
-  MITK_TEST_CONDITION( mitk::Equal(output2->GetOrientation(), resultOri),"Testing if orientation after rotation is correctly caclculated  ");
+  MITK_TEST_CONDITION(mitk::Equal(output2->GetPosition(), resultPos, 0.00001), "Testing if position after rotation is correctly calculated");
+  MITK_TEST_CONDITION( mitk::Equal(output2->GetOrientation(), resultOri, 0.00001),"Testing if orientation after rotation is correctly caclculated  ");
   MITK_TEST_CONDITION(output2->IsDataValid() == initialValid, "Testing if DataValid remains unchanged");
 
 
@@ -194,28 +196,30 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   output2->Update(); // execute filter pipeline. this should update both outputs!
   MITK_TEST_CONDITION_REQUIRED(((output != NULL) && (output2 != NULL)), "Testing GetOutput(index)");
 
-  MITK_TEST_CONDITION(output->GetPosition() == resultPos, "Testing if position rotation was calculated correct [output 0]");
-  MITK_TEST_CONDITION(mitk::Equal(output->GetOrientation(), resultOri),"Testing if orientation rotation was calculated correct [output 0]");
+  MITK_TEST_CONDITION(mitk::Equal(output->GetPosition(), resultPos, 0.00001), "Testing if position rotation was calculated correct [output 0]");
+  MITK_TEST_CONDITION(mitk::Equal(output->GetOrientation(), resultOri, 0.00001),"Testing if orientation rotation was calculated correct [output 0]");
   MITK_TEST_CONDITION(output->IsDataValid() == initialValid, "Testing if DataValid remains unchanged for output 0");
 
-  MITK_TEST_CONDITION(output2->GetPosition() == resultPos2, "Testing if rotation was calculated correct [output 1]");
-  MITK_TEST_CONDITION(mitk::Equal(output2->GetOrientation(), resultOri2),"Testing if orientation rotation was calculated correct [output 1]");
+  MITK_TEST_CONDITION(mitk::Equal(output2->GetPosition(), resultPos2, 0.0001), "Testing if rotation was calculated correct [output 1]");
+  MITK_TEST_CONDITION(mitk::Equal(output2->GetOrientation(), resultOri2, 0.00001),"Testing if orientation rotation was calculated correct [output 1]");
   MITK_TEST_CONDITION(output2->IsDataValid() == initialValid, "Testing if DataValid remains unchanged for output 1");
   //
   //  /* test if anything changes on second ->Update() */
   output->Update(); // nothing should change, since inputs remain unchanged
-  MITK_TEST_CONDITION((output->GetPosition() == (resultPos)) && (output2->GetPosition() == (resultPos2)), "Testing translation calculation after second update()");
+  MITK_TEST_CONDITION(mitk::Equal(output->GetPosition(), resultPos, 0.0001) &&
+    mitk::Equal(output2->GetPosition(), resultPos2, 0.0001), "Testing translation calculation after second update()");
 
   /* change an input, see if output changes too */
   mitk::NavigationData::PositionType pos3, resultPos3;
   mitk::FillVector3D(pos3, 123.456, -234.567, 789.987);
   mitk::FillVector3D(resultPos3, -234.567, -123.456, 789.987);
   nd1->SetPosition(pos3);  // nd1 is modified, but nothing should change until pipe gets updated
-  MITK_TEST_CONDITION((output->GetPosition() == (resultPos))
-    &&(output2->GetPosition() == (resultPos2)), "Testing transfomr calculation after input change, before update()");
+  MITK_TEST_CONDITION(mitk::Equal(output->GetPosition(),resultPos, 0.00001)
+    && mitk::Equal(output2->GetPosition(), resultPos2, 0.0001), "Testing transform calculation after input change, before update()");
 
   output->Update(); // update pipeline. should recalculate positions, because input has changed
-  MITK_TEST_CONDITION((output->GetPosition() == (resultPos3)) && (output2->GetPosition() == (resultPos2)), "Testing transform calculation after input change, after update()");
+  MITK_TEST_CONDITION(mitk::Equal(output->GetPosition(), resultPos3, 0.00001) &&
+    mitk::Equal(output2->GetPosition(), resultPos2, 0.0001), "Testing transform calculation after input change, after update()");
 
   // always end with this!
   MITK_TEST_END();

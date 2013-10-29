@@ -131,6 +131,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
     mitk::NavigationToolStorage::Pointer m_toolStorage;  ///>stores the loaded tools
     mitk::DataNode::Pointer m_TrackingVolumeNode;        ///>holds the data node of the tracking volume if volume is visualized
+    bool lastTrackingVolumeState;                        ///>temporary holds the state of the tracking volume (activated/not activated) during some methods
 
     /** @brief Shows a message box with the text given as parameter. */
     void MessageBox(std::string s);
@@ -153,6 +154,11 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    void EnableOptionsButtons();
    void EnableTrackingConfigurationButtons();
    void DisableTrackingConfigurationButtons();
+   /** Replaces the current navigation tool storage which is stored in m_toolStorage.
+    *  Basically handles the microservice stuff: unregisteres the old storage, then
+    *  replaces the storage and registers the new one.
+    */
+   void ReplaceCurrentToolStorage(mitk::NavigationToolStorage::Pointer newStorage, std::string newStorageName);
 
 };
 

@@ -84,13 +84,25 @@ class QmitkIGTTrackingLabView : public QmitkAbstractView
      */
     void UpdateTimer();
 
+    /** This method does some initialization when the tabs (Configuration,
+     *  Initial Registration, Permanent Registration, ...) is changed. Some
+     *  of the tabs need special initialization.
+     */
+    void OnToolBoxCurrentChanged(int index);
+
+    void OnInstrumentSelected();
+
+    void OnObjectmarkerSelected();
+
     //############## Configuration Step #####################
+
     /**
     \brief This method sets up the navigation pipeline during initialization.
     */
     void OnSetupNavigation();
 
     //############## Initial Registration Step ##############
+
     /**
     \brief This method adds a new fiducial to the tracker fiducials PointSet.
     */
@@ -101,44 +113,30 @@ class QmitkIGTTrackingLabView : public QmitkAbstractView
     */
     void OnRegisterFiducials();
 
-    //############## Permanent Registration Step ############
-
-    //############## Pointset Recording Step ################
-
-    //############## Camera View Step #######################
-
-
-
-
-
-
-
-    /**
-    \brief This method reacts on toolbox item changes.
-    */
-    void OnToolBoxCurrentChanged(int index);
     /**
     \brief This method initializes the registration for the FiducialRegistrationWidget.
     */
     void InitializeRegistration();
-    /**
-    \brief This method starts the PointSet recording.
-    */
-    void OnPointSetRecording(bool record);
-    /**
-    \brief This method activates the virtual camera.
-    */
-    void OnVirtualCamera(bool on);
+
+    //############## Permanent Registration Step ############
+
     /**
     \brief This method activates the permanent registration based on one tool's position.
     */
     void OnPermanentRegistration(bool on);
 
-    void OnInstrumentSelected();
+    //############## Pointset Recording Step ################
 
-    void OnObjectmarkerSelected();
+    /**
+    \brief This method starts the PointSet recording.
+    */
+    void OnPointSetRecording(bool record);
 
-
+    //############## Camera View Step #######################
+    /**
+    \brief This method activates the virtual camera.
+    */
+    void OnVirtualCamera(bool on);
 
   protected:
 

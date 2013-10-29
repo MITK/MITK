@@ -137,12 +137,12 @@ void TestRestartWithNewNavigationDataSet()
   std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData_2ToolsDouble.xml", "Modules/IGT/Testing/Data");
 
   player->SetNavigationDataSet(reader->Read(file));
-  mitk::NavigationData::Pointer nd1 = player->GetOutput(0);
+  mitk::NavigationData::PositionType nd1 = player->GetOutput(0)->GetPosition();
   player->SetNavigationDataSet(reader->Read(file));
   player->Update();
-  mitk::NavigationData::Pointer nd2 = player->GetOutput(0);
+  mitk::NavigationData::PositionType nd2 = player->GetOutput(0)->GetPosition();
 
-  MITK_TEST_CONDITION(nd1->GetPosition() == nd2->GetPosition(), "First output must be the same after setting same navigation data again.");
+  MITK_TEST_CONDITION(nd1 == nd2, "First output must be the same after setting same navigation data again.");
 
   // setting new NavigationDataSet with different tool count should result in an exception
   file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData.xml", "Modules/IGT/Testing/Data");

@@ -649,9 +649,7 @@ void mitk::LookupTable::BuildVRBonesLookupTable()
 void mitk::LookupTable::BuildHotMetalLookupTable()
 {
 //convert RGB to HSV
-  double hue = 0.0;
   double saturation = 0.0;
-  double value = 1.0;
 
   vtkLookupTable* lut = vtkLookupTable::New();
   lut->SetNumberOfTableValues(256);

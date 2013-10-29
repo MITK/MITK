@@ -59,6 +59,8 @@ void mitk::NavigationDataRecorder::GenerateData()
       clonedDatas[index]->SetIGTTimeStamp(igtTimestamp);
     }
   }
+  // We can skip the rest of the method, if recording is deactivated
+  if  (!m_Recording) return;
   // if limitation is set and has been reached, stop recording
   if ((m_RecordCountLimit > 0) && (m_NavigationDataSet->Size() >= m_RecordCountLimit)) m_Recording = false;
 

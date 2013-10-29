@@ -127,6 +127,27 @@ void TestStandardWorkflow()
 
 }
 
+void TestRestartWithNewNavigationDataSet()
+{
+  mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+
+  mitk::NavigationDataSequentialPlayer::Pointer player(mitk::NavigationDataSequentialPlayer::New());
+
+  std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData_2ToolsDouble.xml", "Modules/IGT/Testing/Data");
+
+  player->SetNavigationDataSet(reader->Read(file));
+  mitk::NavigationData::Pointer nd1 = player->GetOutput(0);
+  player->SetNavigationDataSet(reader->Read(file));
+  player->Update();
+  mitk::NavigationData::Pointer nd2 = player->GetOutput(0);
+
+  MITK_TEST_CONDITION(nd1->GetPosition() == nd2->GetPosition(), "First output must be the same after setting same navigation data again.");
+
+  // setting new NavigationDataSet with different tool count should result in an exception
+  file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData.xml", "Modules/IGT/Testing/Data");
+  MITK_TEST_FOR_EXCEPTION(mitk::IGTException, player->SetNavigationDataSet(reader->Read(file)));
+}
+
 void TestSetFileNameException()
 { //testing exception if file name hasnt been set
   mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer = mitk::NavigationDataSequentialPlayer::New();
@@ -211,9 +232,11 @@ int mitkNavigationDataSequentialPlayerTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("NavigationDataSequentialPlayer");
 
   TestStandardWorkflow();
+  TestRestartWithNewNavigationDataSet();
   //TestSetFileNameException();
   TestSetXMLStringException();
   TestGoToSnapshotException();
+
 
   MITK_TEST_END();
 }

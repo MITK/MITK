@@ -86,7 +86,7 @@ public:
     MITK_TEST_CONDITION_REQUIRED(recorder->GetNavigationDataSet()->Size() == 100, "Test if SetRecordCountLimit works as intended.");
   }
 
-  static bool mitkNavigationDataRecorderTestClass::CompareFiles(std::string file1, std::string file2)
+  static bool CompareFiles(std::string file1, std::string file2)
   {
     FILE* f1 = fopen (file1.c_str() , "r");
     FILE* f2 = fopen (file2.c_str() , "r");

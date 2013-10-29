@@ -62,25 +62,31 @@ void mitk::NavigationDataPlayerBase::InitPlayer()
         << "NavigationDataSet has to be set before initializing player.";
   }
 
-  // remove all outputs before creating the new ones
-  for (unsigned int n = 0; n < this->GetNumberOfIndexedOutputs(); ++n)
-  {
-    this->RemoveOutput(n);
-  }
 
-  m_NumberOfOutputs = m_NavigationDataSet->GetNumberOfTools();
-  this->SetNumberOfRequiredOutputs(m_NumberOfOutputs);
-
-  for (unsigned int n = 0; n < m_NumberOfOutputs; ++n)
+  if (m_NumberOfOutputs == 0)
   {
-    mitk::NavigationData* output = this->GetOutput(n);
-    if (!output)
+    m_NumberOfOutputs = m_NavigationDataSet->GetNumberOfTools();
+    this->SetNumberOfRequiredOutputs(m_NumberOfOutputs);
+
+    for (unsigned int n = 0; n < m_NumberOfOutputs; ++n)
     {
-      DataObjectPointer newOutput = this->MakeOutput(n);
-      this->SetNthOutput(n, newOutput);
-      this->Modified();
+      mitk::NavigationData* output = this->GetOutput(n);
+      if (!output)
+      {
+        DataObjectPointer newOutput = this->MakeOutput(n);
+        this->SetNthOutput(n, newOutput);
+        this->Modified();
+      }
     }
   }
+  else if (m_NumberOfOutputs != m_NavigationDataSet->GetNumberOfTools())
+  {
+    mitkThrowException(mitk::IGTException)
+        << "Number of tools cannot be changed in existing player. Please create "
+        << "a new player, if the NavigationDataSet has another number of tools now.";
+  }
+
+  this->Modified();
 }
 
 void mitk::NavigationDataPlayerBase::GraftEmptyOutput()

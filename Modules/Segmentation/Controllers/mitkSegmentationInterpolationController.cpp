@@ -219,7 +219,7 @@ void mitk::SegmentationInterpolationController::ScanSliceITKProcessing( itk::Ima
   typedef itk::Image<PixelType, 2> ImageType;
   typedef itk::ImageRegionConstIteratorWithIndex< ImageType > IteratorType;
 
-  typename IteratorType iter( input, input->GetLargestPossibleRegion() );
+  IteratorType iter( input, input->GetLargestPossibleRegion() );
   iter.GoToBegin();
 
   typename IteratorType::IndexType index;
@@ -423,7 +423,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
   // interpolation algorithm can use e.g. itk::ImageSliceConstIteratorWithIndex to
   //   inspect the original patient image at appropriate positions
 
-  mitk::SegmentationInterpolationAlgorithm::Pointer algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();
+  mitk::SegmentationInterpolationAlgorithm::Pointer algorithm = mitk::ShapeBasedInterpolationAlgorithm::New().GetPointer();
   algorithm->Interpolate( lowerMITKSlice.GetPointer(), lowerBound,
                           upperMITKSlice.GetPointer(), upperBound,
                           sliceIndex,

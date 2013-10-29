@@ -255,8 +255,8 @@ void mitk::BinaryThresholdTool::ITKThresholding( itk::Image<TPixel1, VDimension1
   typedef itk::ImageRegionConstIterator< SourceImageType > SourceIteratorType;
   typedef typename itk::ImageRegionIterator< TargetImageType > TargetIteratorType;
 
-  typename SourceIteratorType sourceIterator( sourceImage, sourceImage->GetLargestPossibleRegion() );
-  typename TargetIteratorType targetIterator( targetImage, targetImage->GetLargestPossibleRegion() );
+  SourceIteratorType sourceIterator( sourceImage, sourceImage->GetLargestPossibleRegion() );
+  TargetIteratorType targetIterator( targetImage, targetImage->GetLargestPossibleRegion() );
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
   assert(workingImage);

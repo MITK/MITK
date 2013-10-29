@@ -1084,11 +1084,11 @@ template < typename ImageType >
 void mitk::LabelSetImage::CalculateCenterOfMassProcessing(ImageType* itkImage, int index, int layer)
 {
   // for now, we just retrieve the voxel in the middle
-  typename typedef itk::ImageRegionConstIterator< ImageType > IteratorType;
+  typedef itk::ImageRegionConstIterator< ImageType > IteratorType;
   IteratorType iter( itkImage, itkImage->GetLargestPossibleRegion() );
   iter.GoToBegin();
 
-  typename std::vector< ImageType::IndexType > indexVector;
+  std::vector< typename ImageType::IndexType > indexVector;
 
   while ( !iter.IsAtEnd() )
   {
@@ -1222,7 +1222,7 @@ void mitk::LabelSetImage::SmoothLabelProcessing(ImageType* input, int index)
 
   medianFilter->Update();
 
-  ImageType::Pointer result = medianFilter->GetOutput();
+  typename ImageType::Pointer result = medianFilter->GetOutput();
   result->DisconnectPipeline();
 
   typedef itk::ImageRegionConstIterator< ImageType > SourceIteratorType;

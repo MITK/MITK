@@ -116,7 +116,7 @@ void mitk::LabelSetImageToSurfaceFilter::ITKProcessing( itk::Image<TPixel, VImag
   filter->SetInput( thresholdFilter->GetOutput() );
   filter->Update();
 */
-  MeshSourceType::Pointer meshSource = MeshSourceType::New();
+  typename MeshSourceType::Pointer meshSource = MeshSourceType::New();
   meshSource->SetInput( thresholdFilter->GetOutput() );
   meshSource->SetObjectValue( 1 );
   meshSource->Update();

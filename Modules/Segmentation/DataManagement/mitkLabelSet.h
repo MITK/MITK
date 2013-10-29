@@ -39,7 +39,6 @@ class Segmentation_EXPORT LabelSet : public itk::Object
 public:
 
     mitkClassMacro( LabelSet, itk::Object );
-
     itkNewMacro(Self);
 
     typedef std::vector <Label::Pointer>          LabelContainerType;
@@ -230,14 +229,6 @@ protected:
     Label* m_ActiveLabel;
 
     int m_Layer;
-
-private:
-
-  // purposely not implemented
-  LabelSet& operator=(const LabelSet&);
-
-  itk::LightObject::Pointer InternalClone() const;
-
 };
 
 } // namespace mitk

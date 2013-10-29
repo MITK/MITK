@@ -37,14 +37,6 @@ void mitk::LabelSet::Initialize(const LabelSet* other)
   m_ActiveLabel = m_LabelContainer[other->GetActiveLabelIndex()];
 }
 
-itk::LightObject::Pointer
-mitk::LabelSet::InternalClone() const
-{
-  Self::Pointer newLabelSet = new LabelSet(*this);
-  newLabelSet->UnRegister();
-  return newLabelSet.GetPointer();
-}
-
 mitk::LabelSet::~LabelSet()
 {
   m_LabelContainer.clear();

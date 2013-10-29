@@ -33,7 +33,7 @@ namespace mitk {
   *  Please use the new implementation described in \see DataInteractionPage .
   */
 
-  typedef float         TimePointType;
+  typedef mitk::ScalarType         TimePointType;
   typedef std::size_t   TimeStepType;
 
   /**
@@ -43,7 +43,7 @@ namespace mitk {
   * depends on the way the different time steps are managed.
   *
   * The time is defined either by a time step or a time point. Time steps
-  * are non-negativ integers starting from 0. A time point is is an float value
+  * are non-negativ integers starting from 0. A time point is is a ScalarType value
   * which gives the passed time since start in ms. Be aware that the starting
   * point is not fixed so it is possible that the same time point  defines two
   * different time depending on the start time of the used time geometry.

@@ -63,9 +63,6 @@ QmitkIGTTrackingLabView::QmitkIGTTrackingLabView()
 ,m_Visualizer(NULL)
 ,m_VirtualView(NULL)
 ,m_PSRecordingPointSet(NULL)
-,m_RegistrationTrackingFiducialsName("Tracking Fiducials")
-,m_RegistrationImageFiducialsName("Image Fiducials")
-,m_PointSetRecordingDataNodeName("Recorded Points")
 ,m_PointSetRecording(false)
 ,m_PermanentRegistration(false)
 ,m_CameraView(false)
@@ -84,9 +81,6 @@ void QmitkIGTTrackingLabView::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
-
-  m_ToolBox = m_Controls.m_ToolBox;
-
   this->CreateBundleWidgets( parent );
   this->CreateConnections();
 }
@@ -95,10 +89,9 @@ void QmitkIGTTrackingLabView::CreateQtPartControl( QWidget *parent )
 void QmitkIGTTrackingLabView::CreateBundleWidgets( QWidget* parent )
 {
   //initialize registration widget
-  m_RegistrationWidget = m_Controls.m_RegistrationWidget;
-  m_RegistrationWidget->HideStaticRegistrationRadioButton(true);
-  m_RegistrationWidget->HideContinousRegistrationRadioButton(true);
-  m_RegistrationWidget->HideUseICPRegistrationCheckbox(true);
+  m_Controls.m_RegistrationWidget->HideStaticRegistrationRadioButton(true);
+  m_Controls.m_RegistrationWidget->HideContinousRegistrationRadioButton(true);
+  m_Controls.m_RegistrationWidget->HideUseICPRegistrationCheckbox(true);
 }
 
 
@@ -109,13 +102,13 @@ void QmitkIGTTrackingLabView::CreateConnections()
 
   //create connections
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(UpdateTimer()));
-  connect( m_ToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnToolBoxCurrentChanged(int)) );
+  connect( m_Controls.m_ToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnToolBoxCurrentChanged(int)) );
   connect( m_Controls.m_UsePermanentRegistrationToggle, SIGNAL(toggled(bool)), this, SLOT(OnPermanentRegistration(bool)) );
   connect( m_Controls.m_TrackingDeviceSelectionWidget, SIGNAL(NavigationDataSourceSelected(mitk::NavigationDataSource::Pointer)), this, SLOT(OnSetupNavigation()) );
   connect( m_Controls.m_UseAsPointerButton, SIGNAL(clicked()), this, SLOT(OnInstrumentSelected()) );
   connect( m_Controls.m_UseAsObjectmarkerButton, SIGNAL(clicked()), this, SLOT(OnObjectmarkerSelected()) );
-  connect( m_RegistrationWidget, SIGNAL(AddedTrackingFiducial()), this, SLOT(OnAddRegistrationTrackingFiducial()) );
-  connect( m_RegistrationWidget, SIGNAL(PerformFiducialRegistration()), this, SLOT(OnRegisterFiducials()) );
+  connect( m_Controls.m_RegistrationWidget, SIGNAL(AddedTrackingFiducial()), this, SLOT(OnAddRegistrationTrackingFiducial()) );
+  connect( m_Controls.m_RegistrationWidget, SIGNAL(PerformFiducialRegistration()), this, SLOT(OnRegisterFiducials()) );
   connect( m_Controls.m_PointSetRecordCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnPointSetRecording(bool)) );
   connect( m_Controls.m_ActivateNeedleView, SIGNAL(toggled(bool)), this, SLOT(OnVirtualCamera(bool)) );
 
@@ -384,7 +377,7 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
   // in the active render window part (crosshair updates)
   foreach(QmitkRenderWindow* renderWindow, this->GetRenderWindowPart()->GetQmitkRenderWindows().values())
   {
-    m_RegistrationWidget->AddSliceNavigationController(renderWindow->GetSliceNavigationController());
+    m_Controls.m_RegistrationWidget->AddSliceNavigationController(renderWindow->GetSliceNavigationController());
   }
 
   if(m_ImageFiducialsDataNode.IsNull())
@@ -396,13 +389,13 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
 
     mitk::Color color;
     color.Set(1.0f, 0.0f, 0.0f);
-    m_ImageFiducialsDataNode->SetName(m_RegistrationImageFiducialsName);
+    m_ImageFiducialsDataNode->SetName("Image Fiducials");
     m_ImageFiducialsDataNode->SetColor(color);
     m_ImageFiducialsDataNode->SetBoolProperty( "updateDataOnRender", false );
 
     ds->Add(m_ImageFiducialsDataNode);
   }
-  m_RegistrationWidget->SetImageFiducialsNode(m_ImageFiducialsDataNode);
+  m_Controls.m_RegistrationWidget->SetImageFiducialsNode(m_ImageFiducialsDataNode);
 
   if(m_TrackerFiducialsDataNode.IsNull())
   {
@@ -412,14 +405,14 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
 
     mitk::Color color;
     color.Set(0.0f, 1.0f, 0.0f);
-    m_TrackerFiducialsDataNode->SetName(m_RegistrationTrackingFiducialsName);
+    m_TrackerFiducialsDataNode->SetName("Tracking Fiducials");
     m_TrackerFiducialsDataNode->SetColor(color);
     m_TrackerFiducialsDataNode->SetBoolProperty( "updateDataOnRender", false );
 
     ds->Add(m_TrackerFiducialsDataNode);
   }
 
-  m_RegistrationWidget->SetTrackerFiducialsNode(m_TrackerFiducialsDataNode);
+  m_Controls.m_RegistrationWidget->SetTrackerFiducialsNode(m_TrackerFiducialsDataNode);
 }
 
 
@@ -451,13 +444,13 @@ void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
     m_PointSetRecordingNavigationData = m_Controls.m_PointSetRecordingToolSelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_Controls.m_PointSetRecordingToolSelectionWidget->GetSelectedToolID());
 
     //initialize point set
-    mitk::DataNode::Pointer psRecND = ds->GetNamedNode(m_PointSetRecordingDataNodeName);
+    mitk::DataNode::Pointer psRecND = ds->GetNamedNode("Recorded Points");
     if(m_PSRecordingPointSet.IsNull() || psRecND.IsNull())
     {
       m_PSRecordingPointSet = NULL;
       m_PSRecordingPointSet = mitk::PointSet::New();
       mitk::DataNode::Pointer dn = mitk::DataNode::New();
-      dn->SetName(m_PointSetRecordingDataNodeName);
+      dn->SetName("Recorded Points");
       dn->SetColor(0.,1.,0.);
       dn->SetData(m_PSRecordingPointSet);
       ds->Add(dn);

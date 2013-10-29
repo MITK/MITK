@@ -188,17 +188,9 @@ private:
 
   QTimer* m_Timer;
 
-  QToolBox* m_ToolBox;
 
   mitk::PointSet::Pointer m_PSRecordingPointSet;
 
-
-  QmitkFiducialRegistrationWidget* m_RegistrationWidget; // landmark registration widget
-
-  std::string m_RegistrationTrackingFiducialsName;
-  std::string m_RegistrationImageFiducialsName;
-
-  std::string m_PointSetRecordingDataNodeName;
   bool m_PointSetRecording;
   bool m_PermanentRegistration;
   bool m_CameraView;

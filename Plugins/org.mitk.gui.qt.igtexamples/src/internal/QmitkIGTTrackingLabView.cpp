@@ -418,9 +418,18 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
 
 void QmitkIGTTrackingLabView::OnToolBoxCurrentChanged(const int index)
 {
+  enum ToolBoxElement  // ids of the different ToolBox item tabs.
+    {
+      Configuration = 0,
+      InitialRegistration = 1,
+      PermanentRegistration = 2,
+      PointSetRecording = 3,
+      VirtualCamera = 4
+    };
+
   switch (index)
   {
-  case RegistrationWidget:
+  case InitialRegistration:
     this->InitializeRegistration();
     break;
 

@@ -146,17 +146,6 @@ class QmitkIGTTrackingLabView : public QmitkAbstractView
 
   protected:
 
-
-    enum ToolBoxElement  // enums for the different ToolBox item tabs.
-    {
-      NDIConfigurationWidget = 0,
-      RegistrationWidget = 1,
-      PermanentRecording = 2,
-      PointSetRecording = 3,
-      VirtualCamera = 4
-    };
-
-
     Ui::QmitkIGTTrackingLabViewControls m_Controls;
     /**
     \brief This method creates all widgets this bundle needs.
@@ -167,6 +156,10 @@ class QmitkIGTTrackingLabView : public QmitkAbstractView
     */
     void CreateConnections();
     /**
+     * Checks if everything is initialized for registration. Gives error messages and returns false if not.
+     */
+    bool CheckRegistrationInitialization();
+    /**
     \brief This method sets up the filter pipeline.
     */
     void SetupIGTPipeline();
@@ -175,16 +168,23 @@ class QmitkIGTTrackingLabView : public QmitkAbstractView
     */
     void DestroyIGTPipeline();
 
-
-
-    mitk::TrackingDeviceSource::Pointer m_Source; ///< source that connects to the tracking device
-
+    //####################### Members for the IGT pipeline ######################################
+    // The IGT pipeline is basically initialized in the method OnSetupNavigation(). Further initialization
+    // is done in the methods OnPermanentRegistration(), OnPointSetRecording() and OnVirtualCamera().
+    // The pipline is updated in the method UpdateTimer(). When the complete pipeline is active, it is
+    // structured as follows:
+    //           -> m_PermanentRegistrationFilter
+    //          /
+    // m_Source -> m_Visualizer
+    //          \
+    //           -> m_VirtualView
+    mitk::TrackingDeviceSource::Pointer m_Source;                                         ///< source that connects to the tracking device
     mitk::NavigationDataObjectVisualizationFilter::Pointer m_PermanentRegistrationFilter; ///< this filter transforms from tracking coordinates into mitk world coordinates if needed it is interconnected before the FiducialEegistrationFilter
-    mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer; ///< visualization filter
-    mitk::CameraVisualization::Pointer m_VirtualView; ///< filter to update the vtk camera according to the reference navigation data
+    mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer;                  ///< visualization filter
+    mitk::CameraVisualization::Pointer m_VirtualView;                                     ///< filter to update the vtk camera according to the reference navigation data
 
 
-    bool CheckRegistrationInitialization();///< Checks if everything is initialized for registration. Gives error messages and returns false if not.
+
 
 
 

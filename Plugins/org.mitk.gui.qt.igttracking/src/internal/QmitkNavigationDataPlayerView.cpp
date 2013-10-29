@@ -27,38 +27,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 
-
 // Qt
 #include <QMessageBox>
 
 // vtk
 #include <vtkConeSource.h>
 
-
 const std::string QmitkNavigationDataPlayerView::VIEW_ID = "org.mitk.views.navigationdataplayer";
 
 QmitkNavigationDataPlayerView::QmitkNavigationDataPlayerView()
-: QmitkFunctionality()
-, m_Controls( 0 )
-, m_MultiWidget( NULL )
-, m_Trajectory( NULL )
-, m_TrajectoryIndex( -1 )
-, m_ReloadData( true )
-, m_ShowTrajectory( false )
-, m_SplineMapper( NULL )
-, m_PointSetMapper( NULL )
+  : QmitkFunctionality()
+  , m_Controls( 0 )
+  , m_MultiWidget( NULL )
+  , m_Trajectory( NULL )
+  , m_TrajectoryIndex( -1 )
+  , m_ReloadData( true )
+  , m_ShowTrajectory( false )
+  , m_SplineMapper( NULL )
+  , m_PointSetMapper( NULL )
 {
-
   m_TrajectoryPointSet = mitk::PointSet::New(); // PointSet for trajectory points
 }
-
-
 
 QmitkNavigationDataPlayerView::~QmitkNavigationDataPlayerView()
 {
   delete m_PlayerWidget;
 }
-
 
 void QmitkNavigationDataPlayerView::CreateQtPartControl( QWidget *parent )
 {
@@ -74,13 +68,10 @@ void QmitkNavigationDataPlayerView::CreateQtPartControl( QWidget *parent )
   }
 }
 
-
-
 void QmitkNavigationDataPlayerView::CreateBundleWidgets(QWidget* parent)
 {
   m_PlayerWidget = new QmitkIGTPlayerWidget( parent );   // this bundle's ND player widget
 }
-
 
 void QmitkNavigationDataPlayerView::CreateConnections()
 {
@@ -92,18 +83,15 @@ void QmitkNavigationDataPlayerView::CreateConnections()
   connect( m_PlayerWidget, SIGNAL(SignalSplineModeToggled(bool)), this, SLOT(OnEnableSplineTrajectoryMapper(bool)) );
 }
 
-
 void QmitkNavigationDataPlayerView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {
   m_MultiWidget = &stdMultiWidget;
 }
 
-
 void QmitkNavigationDataPlayerView::StdMultiWidgetNotAvailable()
 {
   m_MultiWidget = NULL;
 }
-
 
 void QmitkNavigationDataPlayerView::OnPlayingStarted()
 {
@@ -138,12 +126,10 @@ void QmitkNavigationDataPlayerView::OnCreatePlaybackVisualization()
 
       // add new representation object to DataStorage
       this->AddRepresentationObject(this->GetDefaultDataStorage(), playbackRepresentation);
-
     }
 
     this->m_PlayerWidget->SetTrajectoryNames(toolNames); // set names in player widget trajectory selection combobox
     m_ReloadData = false;
-
 
     /// request global reiinit
     mitk::NodePredicateNot::Pointer pred
@@ -158,11 +144,7 @@ void QmitkNavigationDataPlayerView::OnCreatePlaybackVisualization()
     mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 
     /// global reinit end
-
-
-
   }
-
 }
 
 mitk::DataNode::Pointer QmitkNavigationDataPlayerView::CreateTrajectory( mitk::PointSet::Pointer points, const std::string& name, const mitk::Color color )
@@ -191,7 +173,6 @@ mitk::DataNode::Pointer QmitkNavigationDataPlayerView::CreateTrajectory( mitk::P
 
   return result;
 }
-
 
 mitk::DataNode::Pointer QmitkNavigationDataPlayerView::CreateRepresentationObject(const std::string& name, const mitk::Color color)
 {
@@ -225,7 +206,6 @@ mitk::DataNode::Pointer QmitkNavigationDataPlayerView::CreateRepresentationObjec
   return representationNode;
 }
 
-
 void QmitkNavigationDataPlayerView::OnPerformPlaybackVisualization()
 {
   if(m_PlayerWidget == NULL || m_Visualizer.IsNull())
@@ -238,11 +218,9 @@ void QmitkNavigationDataPlayerView::OnPerformPlaybackVisualization()
   {
     m_Visualizer->SetInput(i, m_PlayerWidget->GetNavigationDatas().at(i)); // pass updated tool NDs to visualizer
 
-
     // show trajectory for selected tool with user given resolution
     if(m_ShowTrajectory && (i == m_TrajectoryIndex) && (update++ % m_PlayerWidget->GetResolution() == 0) )
     {
-
       mitk::PointSet::PointType currentPoint = m_PlayerWidget->GetNavigationDataPoint(i); // current ND point for tool trajectory
 
       // if realtime mode is selected, trajectory points that are equal in position to their antecessor
@@ -273,7 +251,6 @@ void QmitkNavigationDataPlayerView::OnPerformPlaybackVisualization()
       {
         m_TrajectoryPointSet->InsertPoint(++counter, currentPoint); // insert point in trajectory PointSet
       }
-
     }
   }
 
@@ -314,7 +291,6 @@ void QmitkNavigationDataPlayerView::RenderScene()
 
 void QmitkNavigationDataPlayerView::OnReinit()
 {
-
   std::vector<mitk::DataNode::Pointer>::iterator it;
 
   mitk::DataStorage* ds = this->GetDefaultDataStorage();
@@ -337,7 +313,6 @@ void QmitkNavigationDataPlayerView::OnReinit()
   this->m_PlayerWidget->ClearTrajectorySelectCombobox(); // clear trajectory selection combobox in player widget
 
   m_ReloadData = true; // set flag to true so representation data will be reload if play is triggered again
-
 }
 
 void QmitkNavigationDataPlayerView::AddTrajectory(mitk::DataStorage* ds, mitk::DataNode::Pointer trajectoryNode)
@@ -347,7 +322,6 @@ void QmitkNavigationDataPlayerView::AddTrajectory(mitk::DataStorage* ds, mitk::D
 
   if(m_Trajectory.IsNotNull())
     ds->Remove(m_Trajectory);  // remove trajectory from DataStorage if already exists
-
 
   // add trajectory to DataStorage
   if(ds != NULL && trajectoryNode.IsNotNull())
@@ -379,9 +353,7 @@ void QmitkNavigationDataPlayerView::RemoveRepresentationObject(mitk::DataStorage
 
 void QmitkNavigationDataPlayerView::OnShowTrajectory(int index)
 {
-
   mitk::DataStorage* ds = this->GetDefaultDataStorage();
-
 
   // no trajectory selected
   if(index == 0)
@@ -415,7 +387,6 @@ void QmitkNavigationDataPlayerView::OnShowTrajectory(int index)
   }
 }
 
-
 void QmitkNavigationDataPlayerView::OnEnableSplineTrajectoryMapper(bool enable)
 {
   if(m_Trajectory.IsNull())
@@ -429,11 +400,8 @@ void QmitkNavigationDataPlayerView::OnEnableSplineTrajectoryMapper(bool enable)
   else
     m_Trajectory->SetMapper(mitk::BaseRenderer::Standard3D, this->GetTrajectoryMapper(Points));
 
-
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // request update after mapper change
 }
-
-
 
 mitk::Color QmitkNavigationDataPlayerView::GetColorCircleColor(int index)
 {
@@ -448,7 +416,6 @@ mitk::Color QmitkNavigationDataPlayerView::GetColorCircleColor(int index)
 
   return result;
 }
-
 
 mitk::PointSetVtkMapper3D::Pointer QmitkNavigationDataPlayerView::GetTrajectoryMapper(TrajectoryStyle style)
 {
@@ -470,7 +437,3 @@ mitk::PointSetVtkMapper3D::Pointer QmitkNavigationDataPlayerView::GetTrajectoryM
   else
     return NULL;
 }
-
-
-
-

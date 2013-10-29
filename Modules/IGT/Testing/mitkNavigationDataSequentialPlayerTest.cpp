@@ -45,6 +45,7 @@ bool runLoop()
   mitk::NavigationData::Pointer nd1;
   for(unsigned int i=0; i<player->GetNumberOfSnapshots();++i)
   {
+    player->GoToNextSnapshot();
     player->Update();
     nd0 = player->GetOutput();
     nd1 = player->GetOutput(1);
@@ -97,13 +98,13 @@ void TestStandardWorkflow()
   mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
   player->SetNavigationDataSet(reader->Read(file));
 
-  MITK_TEST_CONDITION_REQUIRED(player->GetNumberOfSnapshots() == 3,"Testing method SetXMLString with 3 navigation datas.");
-  MITK_TEST_CONDITION_REQUIRED(player->GetNumberOfIndexedOutputs() == 2,"Testing number of outputs");
+  MITK_TEST_CONDITION(player->GetNumberOfSnapshots() == 3,"Testing method SetXMLString with 3 navigation datas.");
+  MITK_TEST_CONDITION(player->GetNumberOfIndexedOutputs() == 2,"Testing number of outputs");
 
   //rest repeat
   player->SetRepeat(true);
-  MITK_TEST_CONDITION_REQUIRED(runLoop(),"Testing first run.");
-  MITK_TEST_CONDITION_REQUIRED(runLoop(),"Testing second run."); //repeat is on should work a second time
+  MITK_TEST_CONDITION(runLoop(),"Testing first run.");
+  MITK_TEST_CONDITION(runLoop(),"Testing second run."); //repeat is on should work a second time
 
   // now test the go to snapshot function
   player->GoToSnapshot(2);
@@ -123,7 +124,7 @@ void TestStandardWorkflow()
   player->GoToSnapshot(2);
 
   // and a third time
-  MITK_TEST_CONDITION_REQUIRED(runLoop(),"Tested if repeat works again.");
+  MITK_TEST_CONDITION(runLoop(),"Tested if repeat works again.");
 
 }
 
@@ -162,7 +163,7 @@ void TestSetFileNameException()
    exceptionThrown=true;
     MITK_TEST_OUTPUT(<<"Tested exception for the case when file version is wrong in SetFileName. Application should not crash.");
   }
-  MITK_TEST_CONDITION_REQUIRED(exceptionThrown, "Testing SetFileName method if exception (if file name hasnt been set) was thrown.");
+  MITK_TEST_CONDITION(exceptionThrown, "Testing SetFileName method if exception (if file name hasnt been set) was thrown.");
 
   //testing ReInItXML method if data element is not found
   mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer1 = mitk::NavigationDataSequentialPlayer::New();
@@ -177,7 +178,7 @@ void TestSetFileNameException()
   {
    exceptionThrown1=true;
   }
-  MITK_TEST_CONDITION_REQUIRED(exceptionThrown1, "Testing SetFileName method if exception (if data element not found) was thrown.");
+  MITK_TEST_CONDITION(exceptionThrown1, "Testing SetFileName method if exception (if data element not found) was thrown.");
 
 }
 
@@ -198,7 +199,7 @@ void TestGoToSnapshotException()
   {
     exceptionThrown2=true;
   }
-  MITK_TEST_CONDITION_REQUIRED(exceptionThrown2, "Testing if exception is thrown when GoToSnapShot method is called with an index that doesn't exist.");
+  MITK_TEST_CONDITION(exceptionThrown2, "Testing if exception is thrown when GoToSnapShot method is called with an index that doesn't exist.");
 }
 
 void TestSetXMLStringException()
@@ -218,7 +219,29 @@ void TestSetXMLStringException()
   {
     exceptionThrown3=true;
   }
- MITK_TEST_CONDITION_REQUIRED(exceptionThrown3, "Testing SetXMLString method with an invalid XML string.");
+ MITK_TEST_CONDITION(exceptionThrown3, "Testing SetXMLString method with an invalid XML string.");
+}
+
+void TestDoubleUpdate()
+{
+  std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData_2Tools.xml", "Modules/IGT/Testing/Data");
+
+  mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+  player->SetNavigationDataSet(reader->Read(file));
+
+  player->Update();
+  mitk::Quaternion nd1Orientation = player->GetOutput()->GetOrientation();
+
+  player->Update();
+  mitk::Quaternion nd2Orientation = player->GetOutput()->GetOrientation();
+
+  MITK_TEST_CONDITION(nd1Orientation.as_vector() == nd2Orientation.as_vector(), "Output must be the same no matter if Update() was called between.");
+
+  MITK_TEST_CONDITION(player->GoToNextSnapshot(), "There must be a next snapshot available.");
+  player->Update();
+  mitk::Quaternion nd3Orientation = player->GetOutput()->GetOrientation();
+
+  MITK_TEST_CONDITION(nd1Orientation.as_vector() != nd3Orientation.as_vector(), "Output must be different if GoToNextSnapshot() was called between.");
 }
 
 
@@ -233,9 +256,10 @@ int mitkNavigationDataSequentialPlayerTest(int /* argc */, char* /*argv*/[])
 
   TestStandardWorkflow();
   TestRestartWithNewNavigationDataSet();
-  //TestSetFileNameException();
+  TestSetFileNameException();
   TestSetXMLStringException();
   TestGoToSnapshotException();
+  TestDoubleUpdate();
 
 
   MITK_TEST_END();

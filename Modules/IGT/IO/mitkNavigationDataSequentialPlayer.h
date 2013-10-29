@@ -60,6 +60,15 @@ namespace mitk
     void GoToSnapshot(unsigned int i);
 
     /**
+     * \brief Advance the output to the next snapshot of mitk::NavigationData.
+     * Filter output is updated inside the function.
+     *
+     * \return false if no next snapshot is available (happens only if m_Repeat is set to false).
+     * @throw mitk::IGTException Throws an exception if an output is null.
+     */
+    bool GoToNextSnapshot();
+
+    /**
     * \brief Used for pipeline update just to tell the pipeline
     * that we always have to update
     */
@@ -70,8 +79,9 @@ namespace mitk
     virtual ~NavigationDataSequentialPlayer();
 
     /**
-     *
-     * @throw mitk::IGTException Throws an exception if an output is null.
+     * \brief Does nothing.
+     * mitk::NavigationDataSequentialPlayer::GoToNextSnapshot() should be called
+     * for generating next data.
      */
     virtual void GenerateData();
 

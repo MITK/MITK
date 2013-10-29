@@ -45,10 +45,10 @@ void mitk::NavigationDataSequentialPlayer::GoToSnapshot(unsigned int i)
   m_NavigationDataSetIterator = m_NavigationDataSet->Begin() + ( i % this->GetNumberOfSnapshots() );
 
   // set outputs to selected snapshot
-  this->Update();
+  this->GoToNextSnapshot();
 }
 
-void mitk::NavigationDataSequentialPlayer::GenerateData()
+bool mitk::NavigationDataSequentialPlayer::GoToNextSnapshot()
 {
   if ( m_NavigationDataSetIterator == m_NavigationDataSet->End() )
   {
@@ -61,7 +61,7 @@ void mitk::NavigationDataSequentialPlayer::GenerateData()
      {
        // no more data available
        this->GraftEmptyOutput();
-       return;
+       return false;
      }
   }
 
@@ -75,6 +75,14 @@ void mitk::NavigationDataSequentialPlayer::GenerateData()
   }
 
   ++m_NavigationDataSetIterator;
+
+  return true;
+}
+
+void mitk::NavigationDataSequentialPlayer::GenerateData()
+{
+  // nothing done here, as GoToNextSnapshot() should be called to update the
+  // output data
 }
 
 void mitk::NavigationDataSequentialPlayer::UpdateOutputInformation()

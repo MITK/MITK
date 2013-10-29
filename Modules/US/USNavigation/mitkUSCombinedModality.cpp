@@ -25,8 +25,8 @@ mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, Navigat
   m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New()), m_DelayFilter(mitk::NavigationDataDelayFilter::New(0))
 {
   // build tracking filter pipeline
-  //m_SmoothingFilter->SetInput(0, m_TrackingDevice->GetOutput());
-  //m_SmoothingFilter->SetNumerOfValues(10);
+  m_SmoothingFilter->SetInput(0, m_TrackingDevice->GetOutput());
+  m_SmoothingFilter->SetNumerOfValues(10);
   //m_ZoneFilter->SetInput(0, m_SmoothingFilter->GetOutput(0));
 }
 
@@ -81,6 +81,14 @@ mitk::USControlInterfaceDoppler::Pointer mitk::USCombinedModality::GetControlInt
   }
 
   return m_UltrasoundDevice->GetControlInterfaceDoppler();
+}
+
+void mitk::USCombinedModality::UnregisterOnService()
+{
+  if (m_DeviceState == State_Activated) { this->Deactivate(); }
+  if (m_DeviceState == State_Connected) { this->Disconnect(); }
+
+  mitk::USDevice::UnregisterOnService();
 }
 
 mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration()

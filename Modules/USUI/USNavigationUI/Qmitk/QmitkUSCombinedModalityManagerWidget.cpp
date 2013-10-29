@@ -3,8 +3,6 @@
 
 #include "mitkNavigationDataSource.h"
 
-#include "mitkUSVideoDevice.h"
-
 QmitkUSCombinedModalityManagerWidget::QmitkUSCombinedModalityManagerWidget(QWidget* parent) :
     QWidget(parent),
     ui(new Ui::QmitkUSCombinedModalityManagerWidget)
@@ -52,6 +50,7 @@ void QmitkUSCombinedModalityManagerWidget::OnSelectedCombinedModality()
             MITK_WARN << "Cannot get selected combined modality from service list widget. Is the selected item really a USCombinedModality?";
         }
 
+        m_CombinedModality = combinedModality;
         emit(SignalCombinedModalitySelected(combinedModality));
     }
     else
@@ -81,12 +80,14 @@ void QmitkUSCombinedModalityManagerWidget::OnCreateCombinedModalityButtonClicked
     }
 
     mitk::USCombinedModality::Pointer combinedModality = mitk::USCombinedModality::New(usDevice, trackingDevice, "", "");
-
-    //combinedModality->SetUltrasoundDevice(usDevice);
-    //combinedModality->SetTrackingDevice(trackingDevice);
-    combinedModality->Initialize();
+    combinedModality->Initialize(); // register as micro service
 }
 
 void QmitkUSCombinedModalityManagerWidget::OnRemoveCombinedModalityButtonClicked()
 {
+  // local variable is necessary as selected modality will change during
+  // process of unregistering
+  mitk::USCombinedModality::Pointer combinedModality = m_CombinedModality;
+
+  if ( combinedModality.IsNotNull() ) { combinedModality->UnregisterOnService(); }
 }

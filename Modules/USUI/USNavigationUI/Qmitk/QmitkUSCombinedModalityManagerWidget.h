@@ -39,6 +39,9 @@ public:
     explicit QmitkUSCombinedModalityManagerWidget(QWidget *parent = 0);
     ~QmitkUSCombinedModalityManagerWidget();
 
+protected:
+    mitk::USCombinedModality::Pointer m_CombinedModality;
+
 private:
     Ui::QmitkUSCombinedModalityManagerWidget *ui;
 };

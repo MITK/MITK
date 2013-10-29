@@ -85,6 +85,14 @@ namespace mitk {
 
     virtual mitk::NavigationDataSource::Pointer GetNavigationDataSource();
 
+      /**
+    * \brief Remove this device from the micro service.
+    * This method is public for mitk::USCombinedModality, because this devices
+    * can be completly removed. This is not possible for API devices, which
+    * should be available while their sub module is loaded.
+    */
+  void UnregisterOnService();
+
   protected:
     USCombinedModality(USDevice::Pointer usDevice, NavigationDataSource::Pointer trackingDevice, std::string manufacturer = "", std::string model = "");
     virtual ~USCombinedModality();

@@ -40,7 +40,7 @@ bool mitk::NavigationDataSet::AddNavigationDatas( std::vector<mitk::NavigationDa
     for (int i = 0; i < navigationDatas.size(); i++)
       if (navigationDatas[i]->GetIGTTimeStamp() <= m_NavigationDataVectors.back()[i]->GetIGTTimeStamp())
       {
-        MITK_WARN("NavigationDataSet") << "IGTTimeStamp of new NavigationData should be newer then timestamp of last NavigationData.";
+        MITK_WARN("NavigationDataSet") << "IGTTimeStamp of new NavigationData should be newer than timestamp of last NavigationData.";
         return false;
       }
   }

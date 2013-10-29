@@ -52,26 +52,15 @@ bool mitk::NavigationDataSequentialPlayer::GoToNextSnapshot()
 {
   if ( m_NavigationDataSetIterator == m_NavigationDataSet->End() )
   {
-     if ( m_Repeat )
-     {
-       // set data back to start if repeat is enabled
-       m_NavigationDataSetIterator = m_NavigationDataSet->Begin();
-     }
-     else
-     {
-       // no more data available
-       this->GraftEmptyOutput();
-       return false;
-     }
-  }
-
-
-  for (unsigned int index = 0; index < m_NumberOfOutputs; index++)
-  {
-    mitk::NavigationData* output = this->GetOutput(index);
-    if( !output ) { mitkThrowException(mitk::IGTException) << "Output of index "<<index<<" is null."; }
-
-    output->Graft(m_NavigationDataSetIterator->at(index));
+    if ( m_Repeat )
+    {
+      // set data back to start if repeat is enabled
+      m_NavigationDataSetIterator = m_NavigationDataSet->Begin();
+    }
+    else
+    {
+      return false;
+    }
   }
 
   ++m_NavigationDataSetIterator;
@@ -81,8 +70,21 @@ bool mitk::NavigationDataSequentialPlayer::GoToNextSnapshot()
 
 void mitk::NavigationDataSequentialPlayer::GenerateData()
 {
-  // nothing done here, as GoToNextSnapshot() should be called to update the
-  // output data
+  if ( m_NavigationDataSetIterator == m_NavigationDataSet->End() )
+  {
+    // no more data available
+    this->GraftEmptyOutput();
+  }
+  else
+  {
+    for (unsigned int index = 0; index < m_NumberOfOutputs; index++)
+    {
+      mitk::NavigationData* output = this->GetOutput(index);
+      if( !output ) { mitkThrowException(mitk::IGTException) << "Output of index "<<index<<" is null."; }
+
+      output->Graft(m_NavigationDataSetIterator->at(index));
+    }
+  }
 }
 
 void mitk::NavigationDataSequentialPlayer::UpdateOutputInformation()

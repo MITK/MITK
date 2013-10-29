@@ -37,7 +37,7 @@ public:
     // again, write the result to xml , and compare the output
 
     mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-    std::string path = "F://Build//MITK-Data//IGT-Data//NavigationDataSet.xml";
+    std::string path = "F://Build//MITK-Data//IGT-Data//RecordedNavigationData.xml";
     mitk::NavigationDataSet::Pointer set = reader->Read(path);
 
     mitk::NavigationDataSequentialPlayer::Pointer player = mitk::NavigationDataSequentialPlayer::New();
@@ -56,6 +56,7 @@ public:
     while (!player->IsAtEnd())
     {
       recorder->Update();
+      player->GoToNextSnapshot();
     }
 
     mitk::NavigationDataSetWriterXML writer;
@@ -80,6 +81,7 @@ public:
     while (!player->IsAtEnd())
     {
       recorder->Update();
+      player->GoToNextSnapshot();
     }
 
     MITK_TEST_CONDITION_REQUIRED(recorder->GetNavigationDataSet()->Size() == 100, "Test if SetRecordCountLimit works as intended.");

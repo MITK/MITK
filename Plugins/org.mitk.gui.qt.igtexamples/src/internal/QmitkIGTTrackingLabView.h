@@ -75,20 +75,44 @@ class QmitkIGTTrackingLabView : public QmitkAbstractView
 
   protected slots:
 
+    /** This timer updates the IGT pipline, when nessecary:
+     *   1: if permanent registration is activated, then the permanent
+     *      registration filter has to be updated
+     *   2: if the camera view is on it also must be updated
+     *   3: point set recording is based on another filter which needs to be
+     *      updated when activated
+     */
     void UpdateTimer();
 
+    //############## Configuration Step #####################
+    /**
+    \brief This method sets up the navigation pipeline during initialization.
+    */
+    void OnSetupNavigation();
+
+    //############## Initial Registration Step ##############
     /**
     \brief This method adds a new fiducial to the tracker fiducials PointSet.
     */
     void OnAddRegistrationTrackingFiducial();
+
     /**
     \brief This method calls the fiducial registration.
     */
     void OnRegisterFiducials();
-    /**
-    \brief This method sets up the navigation pipeline before tracking is started.
-    */
-    void OnSetupNavigation();
+
+    //############## Permanent Registration Step ############
+
+    //############## Pointset Recording Step ################
+
+    //############## Camera View Step #######################
+
+
+
+
+
+
+
     /**
     \brief This method reacts on toolbox item changes.
     */

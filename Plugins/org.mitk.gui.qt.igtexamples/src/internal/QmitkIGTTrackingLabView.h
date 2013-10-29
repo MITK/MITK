@@ -90,16 +90,22 @@ class QmitkIGTTrackingLabView : public QmitkAbstractView
      */
     void OnToolBoxCurrentChanged(int index);
 
-    void OnInstrumentSelected();
-
-    void OnObjectmarkerSelected();
-
     //############## Configuration Step #####################
 
     /**
     \brief This method sets up the navigation pipeline during initialization.
     */
     void OnSetupNavigation();
+
+    /** This method is called when the instrument is selected.
+     *  It stores the navigation data of the instrument.
+     */
+    void OnInstrumentSelected();
+
+    /** This method is called when the object marker is selected.
+     *  It stores the navigation data of the object marker.
+     */
+    void OnObjectmarkerSelected();
 
     //############## Initial Registration Step ##############
 

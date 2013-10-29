@@ -33,10 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkColorSequenceCycleH.h>
 #include <mitkNavigationDataObjectVisualizationFilter.h>
 
-
-
-
-
 /*!
 \brief QmitkNavigationDataPlayerView
 
@@ -65,10 +61,8 @@ public:
   */
   virtual void CreateConnections();
 
-
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
   virtual void StdMultiWidgetNotAvailable();
-
 
   protected slots:
 
@@ -97,7 +91,6 @@ public:
     */
     void OnEnableSplineTrajectoryMapper(bool enable);
 
-
 protected:
 
   enum TrajectoryStyle {
@@ -107,36 +100,33 @@ protected:
 
   void CreateBundleWidgets(QWidget* parent);
 
-   /**
-    \brief Refreshes the visualization of the playback object DataNodes.
-    */
+  /**
+  \brief Refreshes the visualization of the playback object DataNodes.
+  */
   void RenderScene();
 
   /**
-    \brief Creates representation DataNode with given name and color
+  \brief Creates representation DataNode with given name and color
   */
   mitk::DataNode::Pointer CreateRepresentationObject( const std::string& name , const mitk::Color color );
   /**
-    \brief Adds representation DataNode to the DataStorage
+  \brief Adds representation DataNode to the DataStorage
   */
   void AddRepresentationObject(mitk::DataStorage* ds, mitk::DataNode::Pointer reprObject);
   /**
-    \brief Removes representation DataNode from the DataStorage
+  \brief Removes representation DataNode from the DataStorage
   */
   void RemoveRepresentationObject(mitk::DataStorage* ds, mitk::DataNode::Pointer reprObject);
 
   /**
-    \brief Adds trajectory DataNode to the DataStorage
+  \brief Adds trajectory DataNode to the DataStorage
   */
   void AddTrajectory(mitk::DataStorage* ds, mitk::DataNode::Pointer trajectoryNode);
 
   /**
-    \brief Creates a trajectory DataNode from given PointSet with given name and color
+  \brief Creates a trajectory DataNode from given PointSet with given name and color
   */
   mitk::DataNode::Pointer CreateTrajectory( mitk::PointSet::Pointer points, const std::string& name, const mitk::Color color );
-
-
-
 
   Ui::QmitkNavigationDataPlayerViewControls* m_Controls;
 
@@ -157,22 +147,15 @@ protected:
   mitk::SplineVtkMapper3D::Pointer m_SplineMapper; ///< spline trajectory mapper
   mitk::PointSetVtkMapper3D::Pointer m_PointSetMapper; ///< standard trajectroy mapper
 
-
-
-
 private:
   /**
-    \brief Returns color from colorcycle with given index
+  \brief Returns color from colorcycle with given index
   */
   mitk::Color GetColorCircleColor(int index);
   /**
-    \brief Returns the trajectory mapper for the given style if stýle is not Points or Splines NULL will be returned.
+  \brief Returns the trajectory mapper for the given style if stýle is not Points or Splines NULL will be returned.
   */
   mitk::PointSetVtkMapper3D::Pointer GetTrajectoryMapper(TrajectoryStyle style);
-
 };
 
-
-
 #endif // _QMITKNAVIGATIONDATAPLAYERVIEW_H_INCLUDED
-

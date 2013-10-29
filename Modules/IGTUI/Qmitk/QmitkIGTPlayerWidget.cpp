@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkNavigationToolStorageSerializer.h>
 #include <mitkIGTException.h>
+#include "mitkNavigationDataReaderXML.h"
 
 
 //qt headers
@@ -154,10 +155,26 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
     {
       if( (isRealTimeMode && m_RealTimePlayer.IsNull()) || (isSequentialMode && m_SequentialPlayer.IsNull()))  // start play
       {
+
+        mitk::NavigationDataSet::Pointer navigationDataSet;
+        try
+        {
+          mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+          navigationDataSet = reader->Read(m_CmpFilename.toStdString());
+        }
+        catch(mitk::IGTException)
+        {
+          std::string errormessage = "Error during start playing. Invalid or wrong file?";
+          QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+          m_Controls->playPushButton->setChecked(false);
+          m_RealTimePlayer = NULL;
+          return;
+        }
+
         if(isRealTimeMode)
         {
           m_RealTimePlayer = mitk::NavigationDataPlayer::New();
-          m_RealTimePlayer->SetFileName(m_CmpFilename.toStdString());
+          m_RealTimePlayer->SetNavigationDataSet(navigationDataSet);
           try
             {
             m_RealTimePlayer->StartPlaying();
@@ -176,7 +193,7 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
           m_SequentialPlayer = mitk::NavigationDataSequentialPlayer::New();
           try
           {
-          m_SequentialPlayer->SetFileName(m_CmpFilename.toStdString());
+            m_SequentialPlayer->SetNavigationDataSet(navigationDataSet);
           }
           catch(mitk::IGTException)
           {

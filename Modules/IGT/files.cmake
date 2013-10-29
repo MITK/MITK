@@ -12,6 +12,7 @@ set(CPP_FILES
   Common/mitkSerialCommunication.cpp
 
   DataManagement/mitkNavigationData.cpp
+  DataManagement/mitkNavigationDataSet.cpp
   DataManagement/mitkNavigationDataSource.cpp
   DataManagement/mitkNavigationTool.cpp
   DataManagement/mitkNavigationToolStorage.cpp
@@ -30,6 +31,11 @@ set(CPP_FILES
   IO/mitkNavigationToolStorageSerializer.cpp
   IO/mitkNavigationToolStorageDeserializer.cpp
   IO/mitkNavigationToolWriter.cpp
+  IO/mitkNavigationDataReaderInterface.cpp
+  IO/mitkNavigationDataReaderXML.cpp
+  IO/mitkNavigationDataReaderCSV.cpp
+  IO/mitkNavigationDataSetWriterXML.cpp
+  IO/mitkNavigationDataSetWriterCSV.cpp
 
   Rendering/mitkCameraVisualization.cpp
   Rendering/mitkNavigationDataObjectVisualizationFilter.cpp

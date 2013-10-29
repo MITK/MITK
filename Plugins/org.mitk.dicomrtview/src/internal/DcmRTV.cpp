@@ -103,16 +103,8 @@ void DcmRTV::DoImageProcessing()
   {
     mitk::DataNode::Pointer x = mitk::DataNode::New();
     x->SetData(modelVector.at(i));
-    std::stringstream strstr;
-    if(i+1<10)
-    {
-      strstr << "ContourModel0" << i+1;
-    }
-    else
-    {
-      strstr << "ContourModel" << i+1;
-    }
-    x->SetName(strstr.str());
+    x->SetProperty("name", modelVector.at(i)->GetProperty("name"));
+//    x->SetName(modelVector.at(i)->GetProperty("name"));
     x->SetVisibility(true);
     GetDataStorage()->Add(x);
   }

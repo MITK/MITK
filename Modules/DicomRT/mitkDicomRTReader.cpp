@@ -153,9 +153,12 @@ namespace mitk
 
   std::deque<mitk::ContourModelSet::Pointer> DicomRTReader::ReadStructureSet(DcmDataset* dataset)
   {
-    //For storing contourmodelsets that belongs to the same object
-    //e.g. An eye consists of several contourmodels (contourmodel consists of several 3D-Points)
-    //and together they are a contourmodelset
+    /**
+     * @brief For storing contourmodelsets that belongs to the same object
+     *
+     * e.g. An eye consists of several contourmodels (contourmodel consists of several 3D-Points)
+     * and together they are a contourmodelset
+     */
     ContourModelSetVector contourModelSetVector;
 
     DRTStructureSetIOD structureSetObject;
@@ -198,7 +201,6 @@ namespace mitk
 
     OFString refSOPInstUID = GetReferencedFrameOfReferenceSOPInstanceUID(structureSetObject);
 
-    //default slice thickness -> reads the thickness from a database ?!
     double sliceThickness = 2.0;
 
     Sint32 refRoiNumber;
@@ -253,8 +255,6 @@ namespace mitk
           }
           contourSequence->Close();
           contourSet->AddContourModel(contourSequence);
-          //Hier den namen des contoumodelsets setzen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          contourSet->SetProperty("name", mitk::StringProperty::New("blabal"));
         }
         while(contourSeqObject.gotoNextItem().good());
       }
@@ -272,25 +272,15 @@ namespace mitk
       for(int j=0;j<3;j++)
       {
         currentRoiObject.getROIDisplayColor(roiColor, j);
-        //what?
         refROI->DisplayColor[j] = roiColor/255.0;
       }
-
-      //save all contours to one set here !
+      contourSet->SetProperty("name", mitk::StringProperty::New(refROI->Name));
       contourModelSetVector.push_back(contourSet);
-//      std::cout << "Before clearing: " << contourSet->GetSize() << "\n\n";
-//      contourSet->Clear();
-//      std::cout << "After clearing: " << contourSet->GetSize() << "\n\n";
 
     }
     while(roiContourSeqObject.gotoNextItem().good());
 
     std::cout << "Anzahl von ROI: " << contourModelSetVector.size() << "\n\n";
-
-    for(int i=0; i<contourModelSetVector.size(); i++)
-    {
-      std::cout << "dingens " << contourModelSetVector.at(i)->GetSize() << "\n\n";
-    }
 
     return contourModelSetVector;
   }

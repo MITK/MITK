@@ -82,6 +82,9 @@ namespace mitk
 
     typedef std::deque<mitk::ContourModelSet::Pointer> ContourModelSetVector;
 
+    /**
+     * @brief Describes and holds some information about the beams.
+     */
     class BeamEntry
     {
     public:
@@ -108,6 +111,9 @@ namespace mitk
       double LeafJawPositions[2][2];
     };
 
+    /**
+     * @brief Describes and holds some information about the Rois.
+     */
     class RoiEntry
     {
     public:
@@ -122,23 +128,84 @@ namespace mitk
       std::string  Name;
       std::string  Description;
       double       DisplayColor[3];
+      //vllt direkt durch die contourmodels ersetzen ?!
       vtkPolyData* PolyData;
     };
 
   public:
 
     mitkClassMacro( DicomRTReader, itk::Object );
-
     itkNewMacro( Self );
 
+    /**
+     * @brief Used for reading a DicomRT file
+     * @param filename The path with your file which you want to read
+     *
+     * Calls the right method for reading a dose, structure or plan file.
+     */
     ContourModelSetVector ReadDicomFile(char* filename);
+
+    /**
+     * @brief Reads a DcmDataset from a DicomRT structureset file
+     * @param dataset DcmDataset-object from DCMTK
+     * @return Returns a Deque with mitk::ContourModelSet
+     *
+     * The returned mitk::ContourModelSet represent exactly one Roi/Structureset.
+     * So the size of the returned deque is the number of Rois. The names of the
+     * rois is stored in their mitk::Property.
+     */
     ContourModelSetVector ReadStructureSet(DcmDataset* dataset);
+
+    /**
+     * @brief Reads a DcmDataset from a DicomRT plan file
+     * @param dataset DcmDataset-object from DCMTK
+     * @return The return doesnt make senese at the moment
+     *
+     * This method isnt ready for use at the moment. Dont use it!
+     */
     int LoadRTPlan(DcmDataset* dataset);
+
+    /**
+     * @brief Reads a DcmDataset from a DicomRT dose file
+     * @param dataset  DcmDataset-object from DCMTK
+     * @param filename The path with the dose file used for getting the geometry
+     * @return Returns a mitk::DataNode::Pointer in which a mitk::Image is stored
+     *
+     * The method reads the PixelData from the DicomRT dose file and scales them
+     * with a factor for getting Gray-values instead of pixel-values.
+     * The Gray-values are stored in a mitk::Image with an vtkColorTransferFunction.
+     * Relative values are used for coloring the image. The relative values are
+     * relative to a PrescriptionDose definied in the RT-Plan. If there is no
+     * RT-Plan file PrescriptionDose is set to 80% of the maximum dose.
+     */
     mitk::DataNode::Pointer LoadRTDose(DcmDataset* dataset, char* filename);
+
+    /**
+     * @brief Returns the number of Rois stored in the RoiSequenceVector
+     * @return unsigned long size_t Number of Rois
+     */
     size_t GetNumberOfRois();
+
+    /**
+     * @brief Find a Roi stored in the RoiSequenceVector by his number
+     * @param roiNumber The number of the searched roi
+     * @return Returns a mitk::DicomRTReader::RoiEntry object
+     */
     RoiEntry* FindRoiByNumber(int roiNumber);
+
+    /**
+     * @brief GetReferencedFrameOfReferenceSOPInstanceUID
+     * @param structSetObject
+     * @return
+     */
     OFString GetReferencedFrameOfReferenceSOPInstanceUID(DRTStructureSetIOD &structSetObject);
 
+    /**
+     * @brief Compares two mitk::ContourModel::Pointer for testing the Structuresets.
+     * @param first The first mitk::ContourModel::Pointer
+     * @param second The second mitk::ContourModel::Pointer
+     * @return Returns true if they are equal and false if they are different
+     */
     bool Equals(mitk::ContourModel::Pointer first, mitk::ContourModel::Pointer second);
 
     /**
@@ -148,7 +215,14 @@ namespace mitk
 
   protected:
 
+    /**
+     * @brief Storing the Rois found in the Structureset file
+     */
     std::vector<RoiEntry> RoiSequenceVector;
+
+    /**
+     * @brief Storing the Beams foud in the RT Plan file
+     */
     std::vector<BeamEntry> BeamSequenceVector;
 
     /**
@@ -157,8 +231,6 @@ namespace mitk
     DicomRTReader();
 
   };
-
-
 
 }
 

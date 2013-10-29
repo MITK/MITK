@@ -35,7 +35,7 @@ static double calcPrecision(const unsigned int requiredDecimalPlaces)
  * @param valueToWrite  value which should be stored
  * @return  true, if document was successfully created.
  */
-static bool Setup(double valueToWrite, const unsigned int requiredDecimalPlaces)
+static bool Setup(double valueToWrite)
 {
   // 1. create simple document
   TiXmlDocument document;
@@ -50,7 +50,7 @@ static bool Setup(double valueToWrite, const unsigned int requiredDecimalPlaces)
 
   // 2. store one element containing a double value with potentially many after comma digits.
   TiXmlElement* vElement = new TiXmlElement( elementToStoreAttributeName );
-  vElement->SetDoubleAttribute( attributeToStoreName, valueToWrite, requiredDecimalPlaces );
+  vElement->SetDoubleAttribute( attributeToStoreName, valueToWrite );
   document.LinkEndChild(vElement);
 
   // 3. store in file.
@@ -84,7 +84,7 @@ static bool TearDown()
 
 static void Test_Setup_works()
 {
-  MITK_TEST_CONDITION_REQUIRED(Setup(1.0, 1) && TearDown(),
+  MITK_TEST_CONDITION_REQUIRED(Setup(1.0) && TearDown(),
       "Test if setup and teardown correctly writes data to " << filename << " and deletes the file after the test");
 }
 
@@ -94,7 +94,7 @@ static void Test_Setup_works()
  */
 static void Test_ReadOutValue_works()
 {
-  Setup(1.0, 1);
+  Setup(1.0);
 
   double readValue;
 
@@ -111,7 +111,7 @@ static void Test_DoubleValueWriteOut()
   const double neededPrecision       = calcPrecision(validDigitsAfterComma + 1);
   double       readValue;
 
-  Setup(valueToWrite, validDigitsAfterComma);
+  Setup(valueToWrite);
 
   readValueFromSetupDocument(readValue);
 
@@ -130,7 +130,7 @@ static void Test_DoubleValueWriteOut_manyDecimalPlaces()
   const double neededPrecision       = calcPrecision(validDigitsAfterComma + 1);
   double       readValue;
 
-  Setup(valueToWrite, validDigitsAfterComma);
+  Setup(valueToWrite);
 
   readValueFromSetupDocument(readValue);
 
@@ -143,24 +143,6 @@ static void Test_DoubleValueWriteOut_manyDecimalPlaces()
 }
 
 
-static void Test_DoubleValueWriteOut_tooLittlePrecision()
-{
-  const double valueToWrite          = -1.12345678910111;
-  const int    validDigitsAfterComma = 14; // indicates the number of valid digits after comma of valueToWrite
-  const double neededPrecision       = calcPrecision(validDigitsAfterComma + 1);
-  double       readValue;
-
-  Setup(valueToWrite, 6);
-
-  readValueFromSetupDocument(readValue);
-
-  MITK_TEST_CONDITION_REQUIRED(!mitk::Equal(valueToWrite, readValue, neededPrecision),
-      std::setprecision(validDigitsAfterComma) <<
-      "Testing if value " << valueToWrite << " doesn't equal " << readValue
-      << " which was retrieved from TinyXML document because decimal places are set too low.");
-
-  TearDown();
-}
 
 int mitkTinyXMLTest(int /* argc */, char* /*argv*/[])
 {
@@ -170,7 +152,6 @@ int mitkTinyXMLTest(int /* argc */, char* /*argv*/[])
   Test_ReadOutValue_works();
   Test_DoubleValueWriteOut();
   Test_DoubleValueWriteOut_manyDecimalPlaces();
-  Test_DoubleValueWriteOut_tooLittlePrecision();
 
   MITK_TEST_END()
 }

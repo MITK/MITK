@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkUSActivator_h
-#define __mitkUSActivator_h
+#ifndef __mitkUSNavigationActivator_h
+#define __mitkUSNavigationActivator_h
 
-#include "mitkUSVideoDevice.h"
+#include "mitkUSDevice.h"
 
 // Microservices
 #include <usModuleContext.h>
@@ -35,11 +35,11 @@ namespace mitk
   * registered, so that pointers to devices which are registered into micro
   * service from a plugin for example can be held here, too.
   */
-class USActivator : public us::ModuleActivator {
+class USNavigationActivator : public us::ModuleActivator {
 public:
 
-  USActivator();
-  virtual ~USActivator();
+  USNavigationActivator();
+  virtual ~USNavigationActivator();
 
   /**
     * \brief The mitk::USVideoDevice obejcts are loaded from hard disk and registered into micro service.
@@ -57,11 +57,11 @@ protected:
     */
   void OnServiceEvent(const us::ServiceEvent event);
 
-  us::ModuleContext*                    m_Context;
-  std::vector<USDevice::Pointer>        m_Devices;
+  us::ModuleContext*                        m_Context;
+  std::vector<USDevice::Pointer>  m_Devices;
 };
 } // namespace mitk
 
-US_EXPORT_MODULE_ACTIVATOR(MitkUS, mitk::USActivator)
+US_EXPORT_MODULE_ACTIVATOR(MitkUSNavigation, mitk::USNavigationActivator)
 
-#endif // __mitkUSActivator_h
+#endif // __mitkUSNavigationActivator_h

@@ -299,6 +299,8 @@ namespace mitk {
     std::string GetDeviceModel();
     std::string GetDeviceComment();
 
+    itkGetMacro(DeviceState, DeviceStates);
+
     void GrabImage();
 
     virtual USImageSource::Pointer GetUSImageSource() = 0;

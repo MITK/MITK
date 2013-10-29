@@ -25,8 +25,8 @@ mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, Navigat
     m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New())
 {
   // build tracking filter pipeline
-  m_SmoothingFilter->SetInput(0, m_TrackingDevice->GetOutput());
-  m_SmoothingFilter->SetNumerOfValues(10);
+  //m_SmoothingFilter->SetInput(0, m_TrackingDevice->GetOutput());
+  //m_SmoothingFilter->SetNumerOfValues(10);
   //m_ZoneFilter->SetInput(0, m_SmoothingFilter->GetOutput(0));
 }
 
@@ -138,7 +138,14 @@ bool mitk::USCombinedModality::OnInitialization()
     mitkThrow() << "UltrasoundDevice must not be null.";
   }
 
-  return m_UltrasoundDevice->Initialize();
+  if ( m_UltrasoundDevice->GetDeviceState() < mitk::USDevice::State_Initialized )
+  {
+    return m_UltrasoundDevice->Initialize();
+  }
+  else
+  {
+    return true;
+  }
 }
 
 bool mitk::USCombinedModality::OnConnection()

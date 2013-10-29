@@ -3,16 +3,20 @@
 
 #include "mitkNavigationDataSource.h"
 
+#include "mitkUSVideoDevice.h"
+
 QmitkUSCombinedModalityManagerWidget::QmitkUSCombinedModalityManagerWidget(QWidget* parent) :
     QWidget(parent),
     ui(new Ui::QmitkUSCombinedModalityManagerWidget)
 {
     ui->setupUi(this);
 
-    ui->m_USDevices->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL);
+    std::string filterExcludeCombinedModalities = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(!(" + mitk::USDevice::US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + ")))";
+    std::string filterOnlyCombinedModalities = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(" + mitk::USDevice::US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + "))";
+
+    ui->m_USDevices->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL, filterExcludeCombinedModalities);
     ui->m_TrackingDevices->Initialize<mitk::NavigationDataSource>(mitk::NavigationDataSource::US_PROPKEY_DEVICENAME);
-    ui->m_CombinedModalities->Initialize<mitk::USDevice>(mitk::USCombinedModality::US_PROPKEY_LABEL,
-                                                         "(" + mitk::USDevice::US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + ")");
+    ui->m_CombinedModalities->Initialize<mitk::USDevice>(mitk::USCombinedModality::US_PROPKEY_LABEL, filterOnlyCombinedModalities);
 
     connect( ui->m_USDevices,          SIGNAL( ServiceSelectionChanged(us::ServiceReferenceU) ), this, SLOT(OnSelectedUltrasoundOrTrackingDevice()) );
     connect( ui->m_TrackingDevices,    SIGNAL( ServiceSelectionChanged(us::ServiceReferenceU) ), this, SLOT(OnSelectedUltrasoundOrTrackingDevice()) );

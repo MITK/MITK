@@ -102,7 +102,6 @@ void QmitkIGTTrackingLabView::CreateConnections()
 
   //create connections
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(UpdateTimer()));
-  connect( m_Controls.m_ToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnToolBoxCurrentChanged(int)) );
   connect( m_Controls.m_UsePermanentRegistrationToggle, SIGNAL(toggled(bool)), this, SLOT(OnPermanentRegistration(bool)) );
   connect( m_Controls.m_TrackingDeviceSelectionWidget, SIGNAL(NavigationDataSourceSelected(mitk::NavigationDataSource::Pointer)), this, SLOT(OnSetupNavigation()) );
   connect( m_Controls.m_UseAsPointerButton, SIGNAL(clicked()), this, SLOT(OnInstrumentSelected()) );
@@ -415,29 +414,6 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
   m_Controls.m_RegistrationWidget->SetTrackerFiducialsNode(m_TrackerFiducialsDataNode);
 }
 
-
-void QmitkIGTTrackingLabView::OnToolBoxCurrentChanged(const int index)
-{
-  enum ToolBoxElement  // ids of the different ToolBox item tabs.
-    {
-      Configuration = 0,
-      InitialRegistration = 1,
-      PermanentRegistration = 2,
-      PointSetRecording = 3,
-      VirtualCamera = 4
-    };
-
-  switch (index)
-  {
-  case InitialRegistration:
-    this->InitializeRegistration();
-    break;
-
-  default:
-    break;
-  }
-}
-
 void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
 {
   mitk::DataStorage* ds = this->GetDataStorage();
@@ -531,46 +507,59 @@ else
 
 bool QmitkIGTTrackingLabView::CheckRegistrationInitialization()
 {
-  mitk::DataStorage* ds = this->GetDataStorage();
-  mitk::PointSet::Pointer imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsDataNode->GetData());
-  mitk::PointSet::Pointer trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
+  // a couple of variables which we need in this method
+  std::string warningMessage = "";
+  bool initializationErrorDetected = false;
+  mitk::PointSet::Pointer imageFiducials,trackerFiducials;
 
+  // check some initialization stuff
+  if (m_ImageFiducialsDataNode.IsNull() || m_TrackerFiducialsDataNode.IsNull())
+  {
+    warningMessage = "Initialization not finished!";
+    MITK_WARN << warningMessage;
+    QMessageBox::warning(NULL, "Registration not possible", warningMessage.c_str());
+    return false;
+  }
+  else
+  {
+    imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsDataNode->GetData());
+    trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
+  }
+
+  // now, do a lot of other checks...
   if (m_Controls.m_SurfaceActive->isChecked() && m_Controls.m_ObjectComboBox->GetSelectedNode().IsNull())
   {
-    std::string warningMessage = "No surface selected for registration.\nRegistration is not possible";
-    MITK_WARN << warningMessage;
-    QMessageBox::warning(NULL, "Registration not possible", warningMessage.c_str());
-    return false;
+    warningMessage = "No surface selected for registration.\nRegistration is not possible";
+    initializationErrorDetected = true;
   }
-
-  if (m_Controls.m_ImageActive->isChecked() && m_Controls.m_ImageComboBox->GetSelectedNode().IsNull())
+  else if (m_Controls.m_ImageActive->isChecked() && m_Controls.m_ImageComboBox->GetSelectedNode().IsNull())
   {
-    std::string warningMessage = "No image selected for registration.\nRegistration is not possible";
-    MITK_WARN << warningMessage;
-    QMessageBox::warning(NULL, "Registration not possible", warningMessage.c_str());
-    return false;
+    warningMessage = "No image selected for registration.\nRegistration is not possible";
+    initializationErrorDetected = true;
   }
-
-  if (imageFiducials.IsNull() || trackerFiducials.IsNull())
+  else if (imageFiducials.IsNull() || trackerFiducials.IsNull())
   {
-    std::string warningMessage = "Fiducial data objects not found. \n"
+   warningMessage = "Fiducial data objects not found. \n"
       "Please set 3 or more fiducials in the image and with the tracking system.\n\n"
       "Registration is not possible";
+    initializationErrorDetected = true;
+  }
+  else if ((imageFiducials->GetSize() < 3) || (trackerFiducials->GetSize() < 3) || (imageFiducials->GetSize() != trackerFiducials->GetSize()))
+  {
+    warningMessage = "Not enough fiducial pairs found. At least 3 fiducial must exist for the image and the tracking system respectively.";
+    initializationErrorDetected = true;
+  }
+
+  // finaly: if an err was detected, give a warning and an error popup, then return false
+  if(initializationErrorDetected)
+  {
     MITK_WARN << warningMessage;
     QMessageBox::warning(NULL, "Registration not possible", warningMessage.c_str());
     return false;
   }
+  //if no error was detected simply return true
+  else {return true;}
 
-  unsigned int minFiducialCount = 3; // \Todo: move to view option
-  if ((imageFiducials->GetSize() < minFiducialCount) || (trackerFiducials->GetSize() < minFiducialCount) || (imageFiducials->GetSize() != trackerFiducials->GetSize()))
-  {
-    QMessageBox::warning(NULL, "Registration not possible", QString("Not enough fiducial pairs found. At least %1 fiducial must "
-      "exist for the image and the tracking system respectively.\n"
-      "Currently, %2 fiducials exist for the image, %3 fiducials exist for the tracking system").arg(minFiducialCount).arg(imageFiducials->GetSize()).arg(trackerFiducials->GetSize()));
-    return false;
-  }
-
-  return true;
 }
 
 bool QmitkIGTTrackingLabView::IsTransformDifferenceHigh(mitk::NavigationData::Pointer transformA, mitk::NavigationData::Pointer transformB)

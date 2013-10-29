@@ -84,12 +84,6 @@ class QmitkIGTTrackingLabView : public QmitkAbstractView
      */
     void UpdateTimer();
 
-    /** This method does some initialization when the tabs (Configuration,
-     *  Initial Registration, Permanent Registration, ...) is changed. Some
-     *  of the tabs need special initialization.
-     */
-    void OnToolBoxCurrentChanged(int index);
-
     //############## Configuration Step #####################
 
     /**
@@ -184,42 +178,31 @@ class QmitkIGTTrackingLabView : public QmitkAbstractView
     mitk::CameraVisualization::Pointer m_VirtualView;                                     ///< filter to update the vtk camera according to the reference navigation data
 
 
+    QTimer* m_Timer;
 
+    mitk::PointSet::Pointer m_PSRecordingPointSet;
 
+    bool m_PointSetRecording;
+    bool m_PermanentRegistration;
+    bool m_CameraView;
 
+    mitk::DataNode::Pointer m_ImageFiducialsDataNode;
+    mitk::DataNode::Pointer m_TrackerFiducialsDataNode;
 
-private:
+    mitk::PointSet::Pointer m_PermanentRegistrationSourcePoints;
 
-  QTimer* m_Timer;
+    mitk::NavigationData::Pointer m_InstrumentNavigationData;
+    mitk::NavigationData::Pointer m_ObjectmarkerNavigationData;
+    mitk::NavigationData::Pointer m_PointSetRecordingNavigationData;
 
+    mitk::NavigationData::Pointer m_T_MarkerRel;
+    mitk::NavigationData::Pointer m_T_ObjectReg;
+    mitk::AffineTransform3D::Pointer m_T_ImageReg;
+    mitk::AffineTransform3D::Pointer m_T_ImageGeo;
+    mitk::NavigationData::Pointer m_ObjectmarkerNavigationDataLastUpdate;
 
-  mitk::PointSet::Pointer m_PSRecordingPointSet;
+    bool IsTransformDifferenceHigh(mitk::NavigationData::Pointer transformA, mitk::NavigationData::Pointer transformB);
 
-  bool m_PointSetRecording;
-  bool m_PermanentRegistration;
-  bool m_CameraView;
-
-  mitk::DataNode::Pointer m_ImageFiducialsDataNode;
-  mitk::DataNode::Pointer m_TrackerFiducialsDataNode;
-
-  mitk::PointSet::Pointer m_PermanentRegistrationSourcePoints;
-
-  mitk::NavigationData::Pointer m_InstrumentNavigationData;
-  mitk::NavigationData::Pointer m_ObjectmarkerNavigationData;
-  mitk::NavigationData::Pointer m_PointSetRecordingNavigationData;
-
-  mitk::NavigationData::Pointer m_T_MarkerRel;
-  mitk::NavigationData::Pointer m_T_ObjectReg;
-  mitk::AffineTransform3D::Pointer m_T_ImageReg;
-  mitk::AffineTransform3D::Pointer m_T_ImageGeo;
-  mitk::NavigationData::Pointer m_ObjectmarkerNavigationDataLastUpdate;
-
-  bool IsTransformDifferenceHigh(mitk::NavigationData::Pointer transformA, mitk::NavigationData::Pointer transformB);
-
-  /**
-    \brief This method performs GlobalReinit() for the rendering widgets.
-    */
-  //void GlobalReinit();
 
 };
 

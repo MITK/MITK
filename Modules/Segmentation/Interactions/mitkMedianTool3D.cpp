@@ -103,7 +103,7 @@ void mitk::MedianTool3D::Run()
 
 
 template < typename ImageType >
-void mitk::MedianTool3D::ITKProcessing( typename ImageType* input )
+void mitk::MedianTool3D::ITKProcessing( ImageType* input )
 {
   typedef itk::MedianImageFilter< ImageType, ImageType > MedianFilterType;
 
@@ -127,7 +127,7 @@ void mitk::MedianTool3D::ITKProcessing( typename ImageType* input )
     m_ProgressCommand->Reset(); // todo: use m_ProgressCommand->Reset()
   }
 
-  ImageType::Pointer result = medianFilter->GetOutput();
+  typename ImageType::Pointer result = medianFilter->GetOutput();
   result->DisconnectPipeline();
 
   typedef itk::ImageRegionConstIterator< ImageType > SourceIteratorType;

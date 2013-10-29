@@ -63,7 +63,7 @@ class Segmentation_EXPORT MedianTool3D : public AutoSegmentationTool
     mitk::ToolCommand::Pointer m_ProgressCommand;
 
     template < typename ImageType >
-    void ITKProcessing( typename ImageType* input );
+    void ITKProcessing( ImageType* input );
 };
 
 } // namespace

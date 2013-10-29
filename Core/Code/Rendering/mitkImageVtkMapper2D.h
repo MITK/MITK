@@ -188,7 +188,7 @@ public:
     mitk::ScalarType* m_mmPerPixel;
 
     /** \brief Currently active color map. */
-    int m_ColorMap;
+    unsigned int m_ColorMap;
 
     /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */
     vtkSmartPointer<vtkMitkLevelWindowFilter> m_LevelWindowFilter;

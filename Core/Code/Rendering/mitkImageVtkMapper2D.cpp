@@ -1055,7 +1055,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_OutlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_OutlineShadowActor = vtkSmartPointer<vtkActor>::New();
 
-  m_ColorMap = -1;
+  m_ColorMap = 0;
 
   //the following actions are always the same and thus can be performed
   //in the constructor for each image (i.e. the image-corresponding local storage)

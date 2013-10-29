@@ -75,14 +75,14 @@ public:
     player->SetNavigationDataSet(set);
 
     // Check if Limiting recording works
-    //recorder->SetRecordCountLimit(100);
+    recorder->SetRecordCountLimit(100);
     recorder->StartRecording();
     while (!player->IsAtEnd())
     {
       recorder->Update();
     }
 
-    MITK_TEST_CONDITION_REQUIRED(recorder->GetNavigationDataSet()->Size() == 152, "Test if SetRecordCountLimit works as intended.");
+    MITK_TEST_CONDITION_REQUIRED(recorder->GetNavigationDataSet()->Size() == 100, "Test if SetRecordCountLimit works as intended.");
   }
 
   static bool CompareFiles(std::string file1, std::string file2)

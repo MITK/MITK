@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkLabelSetImage.h"
 #include "mitkContourUtils.h"
+#include "mitkSurfaceInterpolationController.h"
+
+#include "usGetModuleContext.h"
 
 mitk::ContourTool::ContourTool()
 :FeedbackContourTool("PressMoveReleaseWithCTRLInversion"),
@@ -146,6 +149,21 @@ bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* state
   // 3. Get our feedback contour
   ContourModel* feedbackContour = mitk::FeedbackContourTool::GetFeedbackContour();
   assert(feedbackContour);
+
+  if (m_3DInterpolationEnabled)
+  {
+    if ( feedbackContour->GetNumberOfVertices() > 0 )
+    {
+      unsigned int pos = this->AddContourmarker(positionEvent);
+      us::ServiceReference<PlanePositionManagerService> serviceRef = us::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
+      PlanePositionManagerService* service = us::GetModuleContext()->GetService(serviceRef);
+      mitk::SurfaceInterpolationController* interpolator = mitk::SurfaceInterpolationController::GetInstance();
+      if (interpolator)
+      {
+        interpolator->AddNewContour( feedbackContour, service->GetPlanePosition(pos), workingImage->GetActiveLabelIndex() );
+      }
+    }
+  }
 
   // 4. Project it into the extracted plane
   ContourModel::Pointer projectedContour = ContourModel::New();

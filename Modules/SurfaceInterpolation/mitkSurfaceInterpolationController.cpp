@@ -20,11 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
 #include "mitkImageToSurfaceFilter.h"
+#include "mitkContourModelToSurfaceFilter.h"
 #include "mitkInteractionConst.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
+#include "mitkIOUtil.h"
 
-#include "vtkPoints.h"
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
 #include "vtkAppendPolyData.h"
@@ -91,15 +92,19 @@ mitk::SurfaceInterpolationController* mitk::SurfaceInterpolationController::GetI
   return m_Instance;
 }
 
-void mitk::SurfaceInterpolationController::AddNewContour(mitk::Surface::Pointer newContour, RestorePlanePositionOperation* op, int activeLabel)
+void mitk::SurfaceInterpolationController::AddNewContour(mitk::ContourModel::Pointer newContour, RestorePlanePositionOperation* op, int activeLabel)
 {
+  MITK_INFO << "AddNewContour 1";
+
   AffineTransform3D::Pointer transform = AffineTransform3D::New();
   transform = op->GetTransform();
 
   mitk::Vector3D direction = op->GetDirectionVector();
-  int pos (-1);
+  int pos(-1);
 
-  for (unsigned int i = 0; i < m_MapOfContourLists[activeLabel].size(); i++)
+  MITK_INFO << "AddNewContour 2";
+
+  for (unsigned int i=0; i < m_MapOfContourLists[activeLabel].size(); i++)
   {
     itk::Matrix<float> diffM = transform->GetMatrix()-m_MapOfContourLists[activeLabel].at(i).position->GetTransform()->GetMatrix();
     bool isSameMatrix(true);
@@ -119,8 +124,18 @@ void mitk::SurfaceInterpolationController::AddNewContour(mitk::Surface::Pointer 
     }
   }
 
+  MITK_INFO << "AddNewContour 3";
+
+  mitk::ContourModelToSurfaceFilter::Pointer converter = mitk::ContourModelToSurfaceFilter::New();
+  converter->SetInput(newContour);
+  converter->Update();
+
+  mitk::Surface::Pointer surface = converter->GetOutput();
+
+  MITK_INFO << "AddNewContour 4 pos: " << pos << " num vertices: " << newContour->GetNumberOfVertices();
+
   //Don't save a new empty contour
-  if (pos == -1 && newContour->GetVtkPolyData()->GetNumberOfPoints() > 0)
+  if (pos == -1 && newContour->GetNumberOfVertices() > 0)
   {
     mitk::RestorePlanePositionOperation* newOp = new mitk::RestorePlanePositionOperation (OpRESTOREPLANEPOSITION, op->GetWidth(),
       op->GetHeight(), op->GetSpacing(), op->GetPos(), direction, transform);
@@ -128,24 +143,34 @@ void mitk::SurfaceInterpolationController::AddNewContour(mitk::Surface::Pointer 
     newData.contour = newContour;
     newData.position = newOp;
 
-    m_ReduceFilter->SetInput(m_MapOfContourLists[activeLabel].size(), newContour);
+    MITK_INFO << "AddNewContour 4.5";
+
+    m_ReduceFilter->SetInput(m_MapOfContourLists[activeLabel].size(), surface);
+
+    MITK_INFO << "AddNewContour 4.6";
     m_MapOfContourLists[activeLabel].push_back(newData);
   }
   //Edit an existing contour. If the contour is empty, edit it anyway so that the interpolation will always be consistent
   else if (pos != -1)
   {
     m_MapOfContourLists[activeLabel].at(pos).contour = newContour;
-    m_ReduceFilter->SetInput(pos, newContour);
+    m_ReduceFilter->SetInput(pos, surface);
   }
+
+  MITK_INFO << "AddNewContour 5";
 
   m_ReduceFilter->Update();
   m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
 
-  for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
+  MITK_INFO << "AddNewContour 6";
+
+  for (unsigned int i=0; i < m_CurrentNumberOfReducedContours; i++)
   {
     m_NormalsFilter->SetInput(i, m_ReduceFilter->GetOutput(i));
     m_InterpolateSurfaceFilter->SetInput(i, m_NormalsFilter->GetOutput(i));
   }
+
+  MITK_INFO << "AddNewContour 7";
 
   this->Modified();
 }
@@ -158,6 +183,8 @@ void mitk::SurfaceInterpolationController::Interpolate()
     m_InterpolationResult = 0;
     return;
   }
+
+  MITK_INFO << "Interpolate 1";
 
 /*
   ContourListMap::iterator it = m_MapOfContourLists.find(m_ActiveLabel);
@@ -190,9 +217,19 @@ void mitk::SurfaceInterpolationController::Interpolate()
     }
   }
   */
+
   // update the filter and get the resulting distance-image
+  m_InterpolateSurfaceFilter->SetDistanceImageVolume(m_DistanceImageVolume);
+
+  itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
+  AccessFixedDimensionByItk_1( m_WorkingImage, GetImageBase, 3, itkImage );
+  m_InterpolateSurfaceFilter->SetReferenceImage( itkImage.GetPointer() );
+  m_NormalsFilter->SetWorkingImage(m_WorkingImage, m_ActiveLabel);
+
   m_InterpolateSurfaceFilter->Update();
   Image::Pointer distanceImage = m_InterpolateSurfaceFilter->GetOutput();
+
+  MITK_INFO << "Interpolate 2";
 
   // create a surface from the distance-image
   mitk::ImageToSurfaceFilter::Pointer imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
@@ -200,6 +237,9 @@ void mitk::SurfaceInterpolationController::Interpolate()
   imageToSurfaceFilter->SetThreshold( 0 );
   imageToSurfaceFilter->Update();
   m_InterpolationResult = imageToSurfaceFilter->GetOutput();
+  m_InterpolationResult->DisconnectPipeline();
+
+  MITK_INFO << "Interpolate 3";
 
   vtkSmartPointer<vtkAppendPolyData> polyDataAppender = vtkSmartPointer<vtkAppendPolyData>::New();
   for (unsigned int i = 0; i < m_ReduceFilter->GetNumberOfOutputs(); i++)
@@ -209,7 +249,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
   polyDataAppender->Update();
   m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());
 
-  m_InterpolationResult->DisconnectPipeline();
+  MITK_INFO << "Interpolate 4";
 }
 
 mitk::Surface::Pointer mitk::SurfaceInterpolationController::GetInterpolationResult()
@@ -233,18 +273,14 @@ void mitk::SurfaceInterpolationController::SetMaxSpacing(double maxSpacing)
   m_NormalsFilter->SetMaxSpacing(maxSpacing);
 }
 
-void mitk::SurfaceInterpolationController::SetDistanceImageVolume(unsigned int distImgVolume)
+void mitk::SurfaceInterpolationController::SetDistanceImageVolume(unsigned int value)
 {
-  m_InterpolateSurfaceFilter->SetDistanceImageVolume(distImgVolume);
+  m_DistanceImageVolume = value;
 }
 
 void mitk::SurfaceInterpolationController::SetWorkingImage(Image* workingImage)
 {
   m_WorkingImage = workingImage;
-  itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
-  AccessFixedDimensionByItk_1( m_WorkingImage, GetImageBase, 3, itkImage );
-  m_InterpolateSurfaceFilter->SetReferenceImage( itkImage.GetPointer() );
-  m_NormalsFilter->SetWorkingImage(m_WorkingImage, m_ActiveLabel);
 }
 
 mitk::Image* mitk::SurfaceInterpolationController::GetImage()
@@ -272,6 +308,8 @@ void mitk::SurfaceInterpolationController::SetActiveLabel(int activeLabel)
   if (m_ActiveLabel == activeLabel)
     return;
 
+  MITK_INFO << "SetActiveLabel 1";
+
   m_ActiveLabel = activeLabel;
 
   m_ReduceFilter->Reset();
@@ -279,11 +317,24 @@ void mitk::SurfaceInterpolationController::SetActiveLabel(int activeLabel)
   m_InterpolateSurfaceFilter->Reset();
 
   m_InterpolationResult = NULL;
-  m_CurrentNumberOfReducedContours = 0;
 
   m_Contours->SetVtkPolyData(NULL);
 
-  m_NormalsFilter->SetWorkingImage(m_WorkingImage, m_ActiveLabel);
+  MITK_INFO << "SetActiveLabel 2";
+
+  m_CurrentNumberOfReducedContours = m_MapOfContourLists[m_ActiveLabel].size();
+
+  for (unsigned int i=0; i < m_CurrentNumberOfReducedContours; i++)
+  {
+    mitk::ContourModelToSurfaceFilter::Pointer converter = mitk::ContourModelToSurfaceFilter::New();
+    converter->SetInput( m_MapOfContourLists[m_ActiveLabel].at(i).contour );
+    converter->Update();
+    mitk::Surface::Pointer surface = converter->GetOutput();
+    MITK_INFO << "re adding: " << i;
+    m_ReduceFilter->SetInput(i, surface);
+    m_NormalsFilter->SetInput(i, m_ReduceFilter->GetOutput(i));
+    m_InterpolateSurfaceFilter->SetInput(i, m_NormalsFilter->GetOutput(i));
+  }
 
   this->Modified();
 }

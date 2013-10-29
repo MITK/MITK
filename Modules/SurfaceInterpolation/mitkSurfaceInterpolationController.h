@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SurfaceInterpolationExports.h"
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkSurface.h"
+#include "mitkContourModel.h"
 
 #include "mitkCreateDistanceImageFromSurfaceFilter.h"
 #include "mitkReduceContourSetFilter.h"
@@ -44,7 +45,7 @@ namespace mitk
     /**
      * Adds a new extracted contour to the list
      */
-    void AddNewContour(Surface::Pointer newContour, RestorePlanePositionOperation *op, int activeLabel);
+    void AddNewContour(ContourModel::Pointer newContour, RestorePlanePositionOperation *op, int activeLabel);
 
     /**
      * Launches the interpolation method. A surface mesh is generated out of the given extracted contours.
@@ -72,7 +73,7 @@ namespace mitk
      * Sets the volume i.e. the number of pixels that the distance image should have
      * By evaluation we found out that 50.000 pixel delivers a good result
      */
-    void SetDistanceImageVolume(unsigned int distImageVolume);
+    void SetDistanceImageVolume(unsigned int value);
 
     /**
      * Sets the working image used by the interpolation method.
@@ -115,7 +116,7 @@ namespace mitk
 //   void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
 
    struct ContourPositionPair {
-     Surface::Pointer contour;
+     ContourModel::Pointer contour;
      RestorePlanePositionOperation* position;
     };
 
@@ -130,6 +131,8 @@ namespace mitk
 
     double m_MinSpacing;
     double m_MaxSpacing;
+
+    unsigned int m_DistanceImageVolume;
 
     Image* m_WorkingImage;
 

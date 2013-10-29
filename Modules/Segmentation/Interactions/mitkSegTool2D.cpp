@@ -251,7 +251,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
       }
     }
   }
-
+  /*
   if (m_3DInterpolationEnabled)
   {
     ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
@@ -282,6 +282,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
       }
     }
   }
+  */
 }
 
 void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeometry, Image* slice, unsigned int timeStep)

@@ -38,6 +38,8 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
   unsigned int numberOfInputs = this->GetNumberOfIndexedInputs();
   this->CreateOutputsForAllInputs(numberOfInputs);
 
+  MITK_INFO << "ComputeContourSetNormalsFilter GenerateData(): " << numberOfInputs;
+
   //Iterating over each input
   for(unsigned int i = 0; i < numberOfInputs; i++)
   {
@@ -298,6 +300,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateOutputInformation()
 
 void mitk::ComputeContourSetNormalsFilter::Reset()
 {
+  MITK_INFO << "ComputeContourSetNormalsFilter Reset(): " << this->GetNumberOfIndexedInputs();
   for (unsigned int i = 0; i < this->GetNumberOfIndexedInputs(); i++)
   {
     this->PopBackInput();

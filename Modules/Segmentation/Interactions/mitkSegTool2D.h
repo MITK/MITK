@@ -138,14 +138,14 @@ class Segmentation_EXPORT SegTool2D : public Tool
 
     BaseRenderer*  m_LastEventSender;
     int   m_LastEventSlice;
+    bool m_3DInterpolationEnabled;
+    bool m_2DInterpolationEnabled;
 
   private:
     //The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string     m_Contourmarkername;
 
     bool m_ShowMarkerNodes;
-    bool m_3DInterpolationEnabled;
-    bool m_2DInterpolationEnabled;
 
     DiffSliceOperation* m_doOperation;
     DiffSliceOperation* m_undoOperation;

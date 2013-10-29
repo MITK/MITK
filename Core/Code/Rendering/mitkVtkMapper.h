@@ -136,7 +136,7 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
     * determine which graphic resources to release.  The local storage is accessible
     * by the parameter renderer. Should be overwritten in subclasses.
     */
-    virtual void ReleaseGraphicsResources(mitk::BaseRenderer* renderer)
+    virtual void ReleaseGraphicsResources(mitk::BaseRenderer* /*renderer*/)
     {
     };
 

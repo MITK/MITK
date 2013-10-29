@@ -32,7 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSet.h"
 #include <limits>
 
-static mitk::ScalarType test_eps = 1E-6;
+static const mitk::ScalarType test_eps = 1E-6; /* some reference values in the test seem
+to have been calculated with float precision. Thus, set this to float precision epsilon.*/
+static const mitk::ScalarType test_eps_square = 1E-3;
 
 class mitkTimeGeometryTestClass
 {
@@ -513,7 +515,7 @@ public:
     MITK_TEST_CONDITION(mitk::Equal(dimension,length, test_eps ), "Length  as expected ");
 
     dimension = geometry->GetDiagonalLength2InWorld();
-    MITK_TEST_CONDITION(mitk::Equal(dimension, squareLength, test_eps ), "Square length as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(dimension, squareLength, test_eps_square ), "Square length as expected ");
   }
 
   void CheckPointInside_BaseDataPointInside_True(mitk::BaseData* baseData, mitk::ScalarType pointX, mitk::ScalarType pointY, mitk::ScalarType pointZ)

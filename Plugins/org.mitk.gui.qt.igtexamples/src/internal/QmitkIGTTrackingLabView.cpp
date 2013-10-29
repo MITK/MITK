@@ -562,11 +562,8 @@ bool QmitkIGTTrackingLabView::CheckRegistrationInitialization()
 
 }
 
-bool QmitkIGTTrackingLabView::IsTransformDifferenceHigh(mitk::NavigationData::Pointer transformA, mitk::NavigationData::Pointer transformB)
+bool QmitkIGTTrackingLabView::IsTransformDifferenceHigh(mitk::NavigationData::Pointer transformA, mitk::NavigationData::Pointer transformB, double euclideanDistanceThreshold, double angularDifferenceThreshold)
 {
-  double euclideanDistanceThreshold = .8;
-  double angularDifferenceThreshold = .8;
-
   if(transformA.IsNull() || transformA.IsNull())
     {return false;}
   mitk::Point3D posA,posB;

@@ -3,4 +3,5 @@ SET(CPP_FILES
   mitkUSCombinedModality.cpp
 
   Filter/mitkNeedleProjectionFilter.cpp
+  Filter/mitkNodeDisplacementFilter.cpp
 )

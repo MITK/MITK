@@ -281,14 +281,14 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     m_Plane->SetNormal(vnormal);
 
     //set data into cutter
-    m_Cutter->SetInput(vtkpolydata);
+    m_Cutter->SetInputData(vtkpolydata);
     m_Cutter->Update();
     //    m_Cutter->GenerateCutScalarsOff();
     //    m_Cutter->SetSortByToSortByCell();
 
     if (m_DrawNormals)
     {
-      m_Stripper->SetInput( m_Cutter->GetOutput() );
+      m_Stripper->SetInputData( m_Cutter->GetOutput() );
       // calculate the cut
       m_Stripper->Update();
       PaintCells(renderer, m_Stripper->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut, vtkpolydata);

@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkMapper3D.h"
 
 #include <vtkPolyData.h>
-#include <vtkPolyDataSource.h>
 #include <vtkPlane.h>
 #include <vtkCutter.h>
 #include <vtkPoints.h>
@@ -115,7 +114,7 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
           m_Plane->SetNormal( vnormal );
 
           // set data into cutter
-          m_Cutter->SetInput( vtkpolydata );
+          m_Cutter->SetInputData( vtkpolydata );
           //    m_Cutter->GenerateCutScalarsOff();
           //    m_Cutter->SetSortByToSortByCell();
 

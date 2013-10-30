@@ -80,21 +80,21 @@ namespace mitk
     // Make sure that the FeatureEdge algorithm is initialized with a "valid"
     // (though empty) input
     vtkPolyData *emptyPolyData = vtkPolyData::New();
-    m_Cleaner->SetInput( emptyPolyData );
+    m_Cleaner->SetInputData( emptyPolyData );
     emptyPolyData->Delete();
 
-    m_Edges->SetInput(m_Cleaner->GetOutput());
-    m_EdgeTransformer->SetInput( m_Edges->GetOutput() );
+    m_Edges->SetInputData(m_Cleaner->GetOutput());
+    m_EdgeTransformer->SetInputData( m_Edges->GetOutput() );
 
-    m_EdgeTuber->SetInput( m_EdgeTransformer->GetOutput() );
+    m_EdgeTuber->SetInputData( m_EdgeTransformer->GetOutput() );
     m_EdgeTuber->SetVaryRadiusToVaryRadiusOff();
     m_EdgeTuber->SetNumberOfSides( 12 );
     m_EdgeTuber->CappingOn();
 
-    m_EdgeMapper->SetInput( m_EdgeTuber->GetOutput() );
+    m_EdgeMapper->SetInputData( m_EdgeTuber->GetOutput() );
     m_EdgeMapper->ScalarVisibilityOff();
 
-    m_BackgroundMapper->SetInput(emptyPolyData);
+    m_BackgroundMapper->SetInputData(emptyPolyData);
 
     m_EdgeActor->SetMapper( m_EdgeMapper );
 
@@ -112,7 +112,7 @@ namespace mitk
     m_BackHedgeHog  = vtkHedgeHog::New();
 
     m_FrontNormalsMapper = vtkPolyDataMapper::New();
-    m_FrontNormalsMapper->SetInput( m_FrontHedgeHog->GetOutput() );
+    m_FrontNormalsMapper->SetInputData( m_FrontHedgeHog->GetOutput() );
     m_BackNormalsMapper = vtkPolyDataMapper::New();
 
     m_Prop3DAssembly->AddPart( m_EdgeActor );
@@ -337,16 +337,16 @@ namespace mitk
 
         if ( displayNormals )
         {
-          m_NormalsTransformer->SetInput( surface->GetVtkPolyData() );
+          m_NormalsTransformer->SetInputData( surface->GetVtkPolyData() );
           m_NormalsTransformer->SetTransform(node->GetVtkTransform(this->GetTimestep()) );
 
-          m_FrontHedgeHog->SetInput( m_NormalsTransformer->GetOutput() );
+          m_FrontHedgeHog->SetInputData( m_NormalsTransformer->GetOutput() );
           m_FrontHedgeHog->SetVectorModeToUseNormal();
           m_FrontHedgeHog->SetScaleFactor( invertNormals ? 1.0 : -1.0 );
 
           m_FrontNormalsActor->GetProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );
 
-          m_BackHedgeHog->SetInput( m_NormalsTransformer->GetOutput() );
+          m_BackHedgeHog->SetInputData( m_NormalsTransformer->GetOutput() );
           m_BackHedgeHog->SetVectorModeToUseNormal();
           m_BackHedgeHog->SetScaleFactor( invertNormals ? -1.0 : 1.0 );
 
@@ -384,7 +384,7 @@ namespace mitk
       }
 
       // Add black background for all images (which may be transparent)
-      m_BackgroundMapper->SetInput( surface->GetVtkPolyData() );
+      m_BackgroundMapper->SetInputData( surface->GetVtkPolyData() );
       m_ImageAssembly->AddPart( m_BackgroundActor );
 
       LayerSortedActorList layerSortedActors;
@@ -413,7 +413,7 @@ namespace mitk
       // Configurate the tube-shaped frame: size according to the surface
       // bounds, color as specified in the plane's properties
       vtkPolyData *surfacePolyData = surface->GetVtkPolyData();
-      m_Cleaner->SetInput(surfacePolyData);
+      m_Cleaner->SetInputData(surfacePolyData);
       m_EdgeTransformer->SetTransform(this->GetDataNode()->GetVtkTransform(this->GetTimestep()) );
 
       // Adjust the radius according to extent
@@ -520,7 +520,7 @@ namespace mitk
             // switching between planar and curved geometries)
             if ( (dataSetMapper != NULL) && (dataSetMapper->GetInput() != surface->GetVtkPolyData()) )
             {
-              dataSetMapper->SetInput( surface->GetVtkPolyData() );
+              dataSetMapper->SetInputData( surface->GetVtkPolyData() );
             }
 
             //Check if the m_ReslicedImage is NULL.

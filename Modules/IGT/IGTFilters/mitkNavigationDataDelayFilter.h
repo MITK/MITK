@@ -40,7 +40,7 @@ namespace mitk {
   class MitkIGT_EXPORT NavigationDataDelayFilter : public NavigationDataToNavigationDataFilter
   {
     //     |pairs of| timestamp and |one navigation Data for each input
-    typedef std::pair<long, std::vector<mitk::NavigationData::Pointer>> BufferType;
+    typedef std::pair<long, std::vector<mitk::NavigationData::Pointer> > BufferType;
 
   public:
 

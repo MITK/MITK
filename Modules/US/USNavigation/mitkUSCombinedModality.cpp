@@ -204,7 +204,7 @@ bool mitk::USCombinedModality::OnDeactivation()
 
 mitk::NavigationDataSource::Pointer mitk::USCombinedModality::GetNavigationDataSource()
 {
-  return m_DelayFilter;
+  return m_DelayFilter.GetPointer();
 }
 
 void mitk::USCombinedModality::GenerateData()

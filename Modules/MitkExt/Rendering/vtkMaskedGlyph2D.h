@@ -93,7 +93,7 @@ protected:
   vtkMaskedGlyph2D();
   ~vtkMaskedGlyph2D();
 
-  virtual void Execute();
+  virtual int RequestData(vtkInformation* info,vtkInformationVector** inInfoVec,vtkInformationVector* outInfoVec);
 
   vtkMaskPoints *MaskPoints;
   int MaximumNumberOfPoints;

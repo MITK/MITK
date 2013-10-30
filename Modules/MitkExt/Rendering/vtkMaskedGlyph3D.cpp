@@ -41,7 +41,7 @@ vtkMaskedGlyph3D::~vtkMaskedGlyph3D()
 
 void vtkMaskedGlyph3D::SetInput(vtkDataSet *input)
 {
-  this->MaskPoints->SetInput(input);
+  this->MaskPoints->SetInputData(input);
   this->Superclass::SetInputConnection(this->MaskPoints->GetOutputPort());
 }
 
@@ -61,24 +61,6 @@ int vtkMaskedGlyph3D::GetRandomMode()
   return this->MaskPoints->GetRandomMode();
 }
 
-void vtkMaskedGlyph3D::Execute()
-{
-  if (this->UseMaskPoints)
-    {
-    vtkIdType numPts = this->MaskPoints->GetPolyDataInput(0)->GetNumberOfPoints();
-    this->MaskPoints->SetMaximumNumberOfPoints( MaximumNumberOfPoints );
-    this->MaskPoints->SetOnRatio( numPts / MaximumNumberOfPoints );
-    this->MaskPoints->Update();
-    this->Superclass::SetInput(this->MaskPoints->GetOutput());
-    }
-  else
-    {
-    this->Superclass::SetInput(this->MaskPoints->GetInput());
-    }
-
-  this->Superclass::Execute();
-}
-
 int vtkMaskedGlyph3D::RequestData(
   vtkInformation *request,
   vtkInformationVector **inputVector,
@@ -86,7 +68,7 @@ int vtkMaskedGlyph3D::RequestData(
 {
   if (this->UseMaskPoints)
   {
-    this->Superclass::SetInput(this->MaskPoints->GetOutput());
+    this->Superclass::SetInputData(this->MaskPoints->GetOutput());
     vtkIdType numPts = this->MaskPoints->GetPolyDataInput(0)->GetNumberOfPoints();
     this->MaskPoints->SetMaximumNumberOfPoints( MaximumNumberOfPoints );
     this->MaskPoints->SetOnRatio( numPts / MaximumNumberOfPoints );
@@ -94,7 +76,7 @@ int vtkMaskedGlyph3D::RequestData(
   }
   else
   {
-    this->Superclass::SetInput(this->MaskPoints->GetInput());
+    this->Superclass::SetInputData(this->MaskPoints->GetInput());
   }
 
   return this->Superclass::RequestData(

@@ -72,7 +72,6 @@ protected:
   vtkMaskedGlyph3D();
   ~vtkMaskedGlyph3D();
 
-  virtual void Execute();
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
   vtkMaskPoints *MaskPoints;

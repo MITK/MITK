@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGeometry3D.h"
 #include "mitkTestingMacros.h"
 
-#include "cppunit/TestFixture.h"
+#include <cppunit/TestFixture.h>
 
 class mitkGeometry3DEqualTestSuite : public CppUnit::TestFixture
 {

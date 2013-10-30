@@ -41,8 +41,8 @@ static void Delete(vtkPolyData* polyData)
 
 static void Update(vtkPolyData* polyData)
 {
-  if (polyData != NULL)
-    polyData->Update();
+//  if (polyData != NULL)
+//    polyData->Update(); //VTK6_TODO vtk pipeline
 }
 
 mitk::Surface::Surface()
@@ -204,7 +204,7 @@ void mitk::Surface::CalculateBoundingBox()
 
     if (polyData != NULL && polyData->GetNumberOfPoints() > 0)
     {
-      polyData->Update();
+//      polyData->Update(); //VTK6_TODO vtk pipeline
       polyData->ComputeBounds();
       polyData->GetBounds(bounds);
     }

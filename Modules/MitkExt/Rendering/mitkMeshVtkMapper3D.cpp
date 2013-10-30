@@ -124,7 +124,7 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* rendere
     int j;
 
     float floatRgba[4] = {1.0f,1.0f,1.0f,1.0f};
-    vtkFloatingPointType doubleRgba[4]={1.0f,1.0f,1.0f,1.0f};
+    double doubleRgba[4]={1.0f,1.0f,1.0f,1.0f};
     mitk::Color tmpColor;
 
     // check for color prop and use it for rendering if it exists

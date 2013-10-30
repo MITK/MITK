@@ -62,7 +62,7 @@ public:
    * @param b The blue component of the rgba color value. Values sould be given in the range [0,1]
    * @param a The alpha component of the rgba color value. Values sould be given in the range [0,1]. Default is 1.
    */
-  virtual void SetColorForLabel( const LabelType& label, const vtkFloatingPointType& r, const vtkFloatingPointType& g, const vtkFloatingPointType& b, const vtkFloatingPointType a = 1.0 );
+  virtual void SetColorForLabel( const LabelType& label, const double& r, const double& g, const double& b, const double a = 1.0 );
 
   /**
    * Determines the color which will be used for coloring a given label.
@@ -70,7 +70,7 @@ public:
    * @returns an rgba array containing the color information for the given label.
    *          Color components are expressed as [0,1] double values.
    */
-  virtual vtkFloatingPointType* GetColorForLabel(const LabelType& label);
+  virtual double* GetColorForLabel(const LabelType& label);
 
   /**
    * Provides access to level window settings, which should be used
@@ -97,12 +97,12 @@ protected:
    * Generates a random rgb color value. Values for rgb are in the range
    * [0,1]
    */
-  virtual void GenerateRandomColor( vtkFloatingPointType& r, vtkFloatingPointType& g, vtkFloatingPointType& b);
+  virtual void GenerateRandomColor( double& r, double& g, double& b);
   /**
    * Generates a radnom number drawn from a uniform
    * distribution in the range [0,1].
    */
-  virtual vtkFloatingPointType GenerateRandomNumber();
+  virtual double GenerateRandomNumber();
 
 
   mitk::LevelWindow m_LevelWindow;

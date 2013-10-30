@@ -119,7 +119,7 @@ void mitk::SplineVtkMapper3D::ApplyAllProperties(BaseRenderer *renderer, vtkActo
   Superclass::ApplyColorAndOpacityProperties(renderer, actor);
 
   //vtk changed the type of rgba during releases. Due to that, the following convert is done
-  vtkFloatingPointType rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};//white
+  double rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};//white
 
   //getting the color from DataNode
   float temprgba[4];

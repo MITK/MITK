@@ -294,7 +294,7 @@ typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry mitk::OdfVtkMapper2D<T,N>
 
     // set up the cutter orientation according to the current geometry of
     // the renderers plane
-    vtkFloatingPointType vp[ 3 ], vnormal[ 3 ];
+    double vp[ 3 ], vnormal[ 3 ];
     Point3D point = worldPlaneGeometry->GetOrigin();
     Vector3D normal = worldPlaneGeometry->GetNormal(); normal.Normalize();
     vnl2vtk( point.Get_vnl_vector(), vp );
@@ -838,7 +838,7 @@ bool mitk::OdfVtkMapper2D<T,N>
     PlaneGeometry::ConstPointer worldPlaneGeometry =
             dynamic_cast<const PlaneGeometry*>( worldGeometry.GetPointer() );
 
-    vtkFloatingPointType vnormal[ 3 ];
+    double vnormal[ 3 ];
     Vector3D normal = worldPlaneGeometry->GetNormal(); normal.Normalize();
     vnl2vtk( normal.Get_vnl_vector(), vnormal );
 

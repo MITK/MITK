@@ -109,7 +109,7 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
     mitk::Contour::PointsContainerPointer contourPoints = input->GetPoints();
     mitk::Contour::PointsContainerIterator pointsIt = contourPoints->Begin();
 
-    vtkFloatingPointType vtkpoint[3];
+    double vtkpoint[3];
 
     int i;
     float pointSize = 2;
@@ -169,7 +169,7 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
     {
       m_VtkPolyDataMapper->SetInput(m_TubeFilter->GetOutput());
     }
-    vtkFloatingPointType rgba[4]={0.0f,1.0f,0.0f,0.6f};
+    double rgba[4]={0.0f,1.0f,0.0f,0.6f};
     m_Actor->GetProperty()->SetColor(rgba);
     m_Actor->SetMapper(m_VtkPolyDataMapper);
   }

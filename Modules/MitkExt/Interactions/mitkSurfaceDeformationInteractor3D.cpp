@@ -367,7 +367,7 @@ bool mitk::SurfaceDeformationInteractor3D
       for ( unsigned int i = 0; i < deformedPoints->GetNumberOfPoints(); ++i )
       {
         // Get original point
-        vtkFloatingPointType *originalPoint = originalPoints->GetPoint( i );
+        double *originalPoint = originalPoints->GetPoint( i );
         mitk::Vector3D v0;
         v0[0] = originalPoint[0];
         v0[1] = originalPoint[1];
@@ -470,7 +470,7 @@ bool mitk::SurfaceDeformationInteractor3D::ColorizeSurface( vtkPolyData *polyDat
     for ( unsigned int i = 0; i < points->GetNumberOfPoints(); ++i )
     {
       // Get original point
-      vtkFloatingPointType *point = points->GetPoint( i );
+      double *point = points->GetPoint( i );
       mitk::Vector3D v0;
       v0[0] = point[0];
       v0[1] = point[1];

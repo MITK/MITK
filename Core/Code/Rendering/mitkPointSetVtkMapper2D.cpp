@@ -628,8 +628,8 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   //due to different params in VTK (double/float) we have to convert
 
   float unselectedColor[4];
-  vtkFloatingPointType selectedColor[4]={1.0f,0.0f,0.0f,1.0f};    //red
-  vtkFloatingPointType contourColor[4]={1.0f,0.0f,0.0f,1.0f};     //red
+  double selectedColor[4]={1.0f,0.0f,0.0f,1.0f};    //red
+  double contourColor[4]={1.0f,0.0f,0.0f,1.0f};     //red
 
   float opacity = 1.0;
 

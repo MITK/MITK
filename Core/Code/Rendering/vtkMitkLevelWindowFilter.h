@@ -58,7 +58,7 @@ public:
   inline double GetMaxOpacity() const;
 
   /** \brief Set clipping bounds for the opaque part of the resliced 2d image */
-  void SetClippingBounds(vtkFloatingPointType*);
+  void SetClippingBounds(double*);
 
   /** Default constructor. */
   vtkMitkLevelWindowFilter();
@@ -87,6 +87,6 @@ private:
   /** m_MaxOpacity contains the upper bound for the alpha level window.*/
   double m_MaxOpacity;
 
-  vtkFloatingPointType m_ClippingBounds[4];
+  double m_ClippingBounds[4];
 };
 #endif

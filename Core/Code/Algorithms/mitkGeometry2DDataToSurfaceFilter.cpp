@@ -228,7 +228,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       // mapping information
       m_PlaneTriangler->Update();
       m_PlaneTriangler->GetOutput()->ComputeBounds();
-      vtkFloatingPointType *surfaceBounds =
+      double *surfaceBounds =
         m_PlaneTriangler->GetOutput()->GetBounds();
 
       origin[0] = surfaceBounds[0];

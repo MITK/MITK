@@ -136,7 +136,7 @@ void vtkApplyLookupTableOnRGBA(vtkMitkLevelWindowFilter* self,
                                vtkImageData* inData,
                                vtkImageData* outData,
                                int outExt[6],
-                               vtkFloatingPointType* clippingBounds,
+                               double* clippingBounds,
                                T*)
 {
   vtkImageIterator<T> inputIt(inData, outExt);
@@ -315,7 +315,7 @@ void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
                                   vtkImageData *inData,
                                   vtkImageData *outData,
                                   int outExt[6],
-                                  vtkFloatingPointType* clippingBounds,
+                                  double* clippingBounds,
                                   T *)
 {
   vtkImageIterator<T> inputIt(inData, outExt);
@@ -385,7 +385,7 @@ void vtkApplyLookupTableOnScalarsCTF(vtkMitkLevelWindowFilter *self,
                                   vtkImageData *inData,
                                   vtkImageData *outData,
                                   int outExt[6],
-                                  vtkFloatingPointType* clippingBounds,
+                                  double* clippingBounds,
                                   T *)
 {
   vtkImageIterator<T> inputIt(inData, outExt);
@@ -593,7 +593,7 @@ inline double vtkMitkLevelWindowFilter::GetMaxOpacity() const
   return m_MaxOpacity;
 }
 
-void vtkMitkLevelWindowFilter::SetClippingBounds(vtkFloatingPointType* bounds) // TODO does vtkFloatingPointType[4] work??
+void vtkMitkLevelWindowFilter::SetClippingBounds(double* bounds) // TODO does double[4] work??
 {
   for (unsigned int i = 0 ; i < 4; ++i)
     m_ClippingBounds[i] = bounds[i];

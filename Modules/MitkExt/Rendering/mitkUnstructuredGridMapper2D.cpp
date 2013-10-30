@@ -170,7 +170,7 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
       return;
   }
 
-  vtkFloatingPointType vp[ 3 ], vnormal[ 3 ];
+  double vp[ 3 ], vnormal[ 3 ];
 
   vnl2vtk(point.Get_vnl_vector(), vp);
   vnl2vtk(normal.Get_vnl_vector(), vnormal);

@@ -456,9 +456,9 @@ void mitk::PointSetVtkMapper3D::ApplyAllProperties(mitk::BaseRenderer* renderer,
   //due to different params in VTK (double/float) we have to convert!
 
   //vars to convert to
-  vtkFloatingPointType unselectedColor[4]={1.0f,1.0f,0.0f,1.0f};//yellow
-  vtkFloatingPointType selectedColor[4]={1.0f,0.0f,0.0f,1.0f};//red
-  vtkFloatingPointType contourColor[4]={1.0f,0.0f,0.0f,1.0f};//red
+  double unselectedColor[4]={1.0f,1.0f,0.0f,1.0f};//yellow
+  double selectedColor[4]={1.0f,0.0f,0.0f,1.0f};//red
+  double contourColor[4]={1.0f,0.0f,0.0f,1.0f};//red
 
   //different types for color!!!
   mitk::Color tmpColor;

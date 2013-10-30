@@ -70,7 +70,7 @@ mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
 }
 
 //set the two points defining the textured plane according to the dimension and spacing
-void mitk::ImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6])
+void mitk::ImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer, double planeBounds[6])
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
@@ -289,7 +289,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   // Bounds information for reslicing (only reuqired if reference geometry
   // is present)
   //this used for generating a vtkPLaneSource with the right size
-  vtkFloatingPointType sliceBounds[6];
+  double sliceBounds[6];
   for ( int i = 0; i < 6; ++i )
   {
     sliceBounds[i] = 0.0;
@@ -301,7 +301,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   // calculate minimum bounding rect of IMAGE in texture
   {
-    vtkFloatingPointType textureClippingBounds[6];
+    double textureClippingBounds[6];
     for ( int i = 0; i < 6; ++i )
     {
       textureClippingBounds[i] = 0.0;

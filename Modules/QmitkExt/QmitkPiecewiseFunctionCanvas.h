@@ -43,12 +43,12 @@ public:
     update();
   }
 
-  void AddFunctionPoint(vtkFloatingPointType x,vtkFloatingPointType val)
+  void AddFunctionPoint(double x,double val)
   {
     m_PiecewiseFunction->AddPoint(x,val);
   }
 
-  void RemoveFunctionPoint(vtkFloatingPointType x)
+  void RemoveFunctionPoint(double x)
   {
     int old_size = GetFunctionSize();
     m_PiecewiseFunction->RemovePoint(x);
@@ -59,7 +59,7 @@ public:
     }
   }
 
-  vtkFloatingPointType GetFunctionX(int index)
+  double GetFunctionX(int index)
   {
     return m_PiecewiseFunction->GetDataPointer()[index*2];
   }
@@ -77,7 +77,7 @@ public:
   void DoubleClickOnHandle(int /*handle*/)
   {}
 
-  void MoveFunctionPoint(int index, std::pair<vtkFloatingPointType,vtkFloatingPointType> pos);
+  void MoveFunctionPoint(int index, std::pair<double,double> pos);
 
   double GetFunctionMax()
   {

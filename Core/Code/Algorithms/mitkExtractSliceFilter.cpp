@@ -329,7 +329,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
   xMax = static_cast< int >( extent[0]);
   yMax = static_cast< int >( extent[1]);
 
-  vtkFloatingPointType sliceBounds[6];
+  double sliceBounds[6];
   if (m_WorldGeometry->GetReferenceGeometry())
   {
     for ( int i = 0; i < 6; ++i )
@@ -467,7 +467,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 }
 
 
-bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(vtkFloatingPointType bounds[6]){
+bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(double bounds[6]){
 
   if(!m_WorldGeometry || !this->GetInput())
     return false;
@@ -478,7 +478,7 @@ bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(vtkFloatingPointType bounds
 
 
 bool mitk::ExtractSliceFilter::GetClippedPlaneBounds( const Geometry3D *boundingGeometry,
-                                                     const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
+                                                     const PlaneGeometry *planeGeometry, double *bounds )
 {
   bool b =  mitk::PlaneClipping::CalculateClippedPlaneBounds(boundingGeometry, planeGeometry, bounds);
 

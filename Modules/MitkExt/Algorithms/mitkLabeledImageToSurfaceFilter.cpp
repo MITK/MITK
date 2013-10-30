@@ -259,7 +259,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
         matrix[i][j]/=spacing[j];
 
     unsigned int n = points->GetNumberOfPoints();
-    vtkFloatingPointType point[3];
+    double point[3];
 
     for (i = 0; i < n; i++)
     {

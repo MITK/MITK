@@ -200,7 +200,7 @@ void mitk::Surface::CalculateBoundingBox()
   for (unsigned int i = 0; i < m_PolyDatas.size(); ++i)
   {
     vtkPolyData* polyData = m_PolyDatas[i];
-    vtkFloatingPointType bounds[6] = {0};
+    double bounds[6] = {0};
 
     if (polyData != NULL && polyData->GetNumberOfPoints() > 0)
     {

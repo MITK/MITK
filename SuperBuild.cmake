@@ -299,6 +299,7 @@ endif()
 
 set(proj MITK-Configure)
 
+message("SUPERBUILD_CMAKE: ${QT_QMAKE_EXECUTABLE}")
 ExternalProject_Add(${proj}
   LIST_SEPARATOR ^^
   DOWNLOAD_COMMAND ""

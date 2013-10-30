@@ -38,7 +38,7 @@ public:
 
   // default VTK c'tor
   static mitkVtkInteractorStyle *New();
-  vtkTypeRevisionMacro(mitkVtkInteractorStyle,vtkInteractorStyleUser);
+  vtkTypeMacro(mitkVtkInteractorStyle,vtkInteractorStyleUser);
 
   /**
   * \brief Called when scrolling forwards with the mouse-wheel.

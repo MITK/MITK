@@ -294,7 +294,6 @@ const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 
 
 //#ifndef VTK_IMPLEMENT_MESA_CXX
-vtkCxxRevisionMacro(vtkMitkOpenGLVolumeTextureMapper3D, "$Revision: 1.21 $");
 vtkStandardNewMacro(vtkMitkOpenGLVolumeTextureMapper3D);
 //#endif
 

@@ -34,7 +34,7 @@ class vtkMaskPoints;
 class MitkExt_EXPORT vtkMaskedGlyph2D : public vtkGlyph2D
 {
 public:
-  vtkTypeRevisionMacro(vtkMaskedGlyph2D,vtkGlyph2D);
+  vtkTypeMacro(vtkMaskedGlyph2D,vtkGlyph2D);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**

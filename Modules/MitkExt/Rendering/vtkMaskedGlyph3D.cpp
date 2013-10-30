@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkPolyData.h"
 
 vtkStandardNewMacro(vtkMaskedGlyph3D);
-vtkCxxRevisionMacro(vtkMaskedGlyph3D, "");
 
 vtkMaskedGlyph3D::vtkMaskedGlyph3D()
 {

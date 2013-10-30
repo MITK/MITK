@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkPolyData.h"
 
 vtkStandardNewMacro(vtkMaskedProgrammableGlyphFilter);
-vtkCxxRevisionMacro(vtkMaskedProgrammableGlyphFilter, "");
 
 vtkMaskedProgrammableGlyphFilter::vtkMaskedProgrammableGlyphFilter()
 {

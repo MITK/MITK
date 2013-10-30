@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkVolumeProperty.h"
 #include "vtkVolumeRenderingFactory.h"
 
-vtkCxxRevisionMacro(vtkMitkVolumeTextureMapper3D, "$Revision: 1.16 $");
 
 //----------------------------------------------------------------------------
 // Needed when we don't use the vtkStandardNewMacro.

@@ -150,7 +150,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   {
     vtkPolyDataNormals* normalsGen = vtkPolyDataNormals::New();
 
-    normalsGen->SetInput( polyData );
+    normalsGen->SetInputData( polyData );
     normalsGen->Update();
 
     m_Surface->SetVtkPolyData( normalsGen->GetOutput() );

@@ -646,13 +646,21 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 
 
       // Extract slice with given position and direction from image
-      ExtractImageFilter::Pointer imageExtractor = ExtractImageFilter::New();
-      imageExtractor->SetInput( timeSliceImage );
-      imageExtractor->SetSliceDimension( axis );
-      imageExtractor->SetSliceIndex( slice );
-      imageExtractor->Update();
-      m_InternalImage = imageExtractor->GetOutput();
+      unsigned int dimension = timeSliceImage->GetDimension();
 
+      if (dimension != 2)
+      {
+        ExtractImageFilter::Pointer imageExtractor = ExtractImageFilter::New();
+        imageExtractor->SetInput( timeSliceImage );
+        imageExtractor->SetSliceDimension( axis );
+        imageExtractor->SetSliceIndex( slice );
+        imageExtractor->Update();
+        m_InternalImage = imageExtractor->GetOutput();
+      }
+      else
+      {
+        m_InternalImage = timeSliceImage;
+      }
 
       // Compute mask from PlanarFigure
       AccessFixedDimensionByItk_1(

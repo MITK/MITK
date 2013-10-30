@@ -57,8 +57,8 @@ if(NOT DEFINED VTK_DIR)
      )
   endif()
 
-  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-5.10.0.tar.gz)
-  set(VTK_URL_MD5 a0363f78910f466ba8f1bd5ab5437cb9)
+  set(VTK_URL /home/christoph/dev/bugsquashing/vtk-6.0.0.tar.gz)
+  set(VTK_URL_MD5 72ede4812c90bdc55172702f0cad02bb)
 
   set(VTK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -DWIN32_OPENGL_RW_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/vtkWin32OpenGLRenderWindow.cxx.vtk-5.10.patched -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchVTK-5.10.cmake)
 
@@ -84,6 +84,8 @@ if(NOT DEFINED VTK_DIR)
         -DVTK_USE_SYSTEM_FREETYPE:BOOL=${VTK_USE_SYSTEM_FREETYPE}
         -DVTK_USE_QVTK_QTOPENGL:BOOL=OFF
         -DVTK_LEGACY_REMOVE:BOOL=ON
+        -DModule_vtkTestingRendering:BOOL=ON
+        -DModule_vtkGUISupportQt:BOOL=ON
         ${additional_cmake_args}
      DEPENDS ${proj_DEPENDENCIES}
     )

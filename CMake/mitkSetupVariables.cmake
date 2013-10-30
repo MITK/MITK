@@ -166,6 +166,7 @@ set(VTK_FOR_MITK_LIBRARIES
     vtkViewsGeovis
     vtkViewsInfovis
     vtkzlib
+    vtkGUISupportQt
     ${VTK_JPEG_LIBRARIES}
     ${VTK_PNG_LIBRARIES}
     ${VTK_ZLIB_LIBRARIES}

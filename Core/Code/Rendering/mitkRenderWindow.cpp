@@ -27,10 +27,11 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow* renWin, const char* name, mitk
 : m_vtkRenderWindow(renWin)
 {
   if(m_vtkRenderWindow == NULL)
+  {
     m_vtkRenderWindow = vtkRenderWindow::New();
-
-  //disable Antialiasing by default
-  m_vtkRenderWindow->SetMultiSamples(0);
+   //disable Antialiasing by default
+   m_vtkRenderWindow->SetMultiSamples(0);
+  }
 
   if ( m_vtkRenderWindow->GetSize()[0] <= 10
     || m_vtkRenderWindow->GetSize()[0] <= 10 )

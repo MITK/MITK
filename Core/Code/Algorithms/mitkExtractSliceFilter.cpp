@@ -266,14 +266,14 @@ void mitk::ExtractSliceFilter::GenerateData(){
     unitSpacingImageFilter->ReleaseDataFlagOn();
 
     unitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
-    unitSpacingImageFilter->SetInput( input->GetVtkImageData(m_TimeStep) );
+    unitSpacingImageFilter->SetInputData( input->GetVtkImageData(m_TimeStep) );
 
-    m_Reslicer->SetInput(unitSpacingImageFilter->GetOutput() );
+    m_Reslicer->SetInputData(unitSpacingImageFilter->GetOutput() );
   }
   else
   {
     //if no tranform is set the image can be used directly
-    m_Reslicer->SetInput(input->GetVtkImageData(m_TimeStep));
+    m_Reslicer->SetInputData(input->GetVtkImageData(m_TimeStep));
   }
 
 

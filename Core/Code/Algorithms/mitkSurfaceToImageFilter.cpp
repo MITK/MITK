@@ -114,7 +114,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   vtkPolyData * polydata = ( (mitk::Surface*)GetInput() )->GetVtkPolyData( surfaceTimeStep );
 
   vtkTransformPolyDataFilter * move=vtkTransformPolyDataFilter::New();
-  move->SetInput(polydata);
+  move->SetInputData(polydata);
   move->ReleaseDataFlagOn();
 
   vtkTransform *transform=vtkTransform::New();
@@ -136,14 +136,14 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   normalsFilter->SetFlipNormals(0);
   normalsFilter->ReleaseDataFlagOn();
 
-  normalsFilter->SetInput( move->GetOutput() );
+  normalsFilter->SetInputData( move->GetOutput() );
   move->Delete();
 
   vtkPolyDataToImageStencil * surfaceConverter = vtkPolyDataToImageStencil::New();
   surfaceConverter->SetTolerance( 0.0 );
   surfaceConverter->ReleaseDataFlagOn();
 
-  surfaceConverter->SetInput( normalsFilter->GetOutput() );
+  surfaceConverter->SetInputData( normalsFilter->GetOutput() );
   normalsFilter->Delete();
 
   mitk::Image::Pointer binaryImage = mitk::Image::New();
@@ -166,10 +166,10 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
 
   // Create stencil and use numerical minimum of pixel type as background value
   vtkImageStencil *stencil = vtkImageStencil::New();
-  stencil->SetInput(image);
+  stencil->SetInputData(image);
   stencil->ReverseStencilOff();
   stencil->ReleaseDataFlagOn();
-  stencil->SetStencil(surfaceConverter->GetOutput());
+  stencil->SetStencilData(surfaceConverter->GetOutput());
   surfaceConverter->Delete();
 
   stencil->SetBackgroundValue(m_MakeOutputBinary ? 0 : m_BackgroundValue);

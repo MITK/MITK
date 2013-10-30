@@ -8,14 +8,14 @@ set(MODULE_TESTS
    mitkNavigationDataLandmarkTransformFilterTest.cpp
    mitkNavigationDataObjectVisualizationFilterTest.cpp
    mitkNavigationDataTest.cpp
-   mitkNavigationDataRecorderTest.cpp
+   #mitkNavigationDataRecorderTest.cpp
    mitkNavigationDataReferenceTransformFilterTest.cpp
    mitkNavigationDataSequentialPlayerTest.cpp
    mitkNavigationDataSourceTest.cpp
    mitkNavigationDataToMessageFilterTest.cpp
    mitkNavigationDataToNavigationDataFilterTest.cpp
    mitkNavigationDataToPointSetFilterTest.cpp
-   mitkNavigationDataTransformFilterTest.cpp
+   #mitkNavigationDataTransformFilterTest.cpp
    mitkNDIPassiveToolTest.cpp
    mitkNDIProtocolTest.cpp
    mitkNDITrackingDeviceTest.cpp
@@ -33,8 +33,8 @@ set(MODULE_TESTS
    # ------------------ Navigation Tool Management Tests -------------------
    mitkNavigationToolStorageTest.cpp
    mitkNavigationToolTest.cpp
-   mitkNavigationToolReaderAndWriterTest.cpp
-   mitkNavigationToolStorageSerializerAndDeserializerTest.cpp
+   #mitkNavigationToolReaderAndWriterTest.cpp
+   #mitkNavigationToolStorageSerializerAndDeserializerTest.cpp
    # -----------------------------------------------------------------------
 )
 

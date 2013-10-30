@@ -124,6 +124,7 @@ if(NOT MITK_VTK_Config_INCLUDED)
     vtkViewsGeovis
     vtkViewsInfovis
     vtkzlib
+    vtkGUISupportQt
       ${VTK_JPEG_LIBRARIES}
       ${VTK_PNG_LIBRARIES}
       ${VTK_ZLIB_LIBRARIES}

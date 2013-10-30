@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE( Qmitk
                DEPENDS Mitk
-               PACKAGE_DEPENDS QT QVTK
+               PACKAGE_DEPENDS QT
                SUBPROJECTS MITK-CoreUI
                EXPORT_DEFINE QMITK_EXPORT
                QT_MODULE

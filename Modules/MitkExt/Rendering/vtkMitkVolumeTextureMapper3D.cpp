@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkRenderer.h"
 #include "vtkVolume.h"
 #include "vtkVolumeProperty.h"
-#include "vtkVolumeRenderingFactory.h"
+//#include "vtkVolumeRenderingFactory.h" //VTK6_TODO
 
 
 //----------------------------------------------------------------------------
@@ -103,15 +103,15 @@ vtkMitkVolumeTextureMapper3D::~vtkMitkVolumeTextureMapper3D()
 
 
 //-----------------------------------------------------------------------------
-vtkMitkVolumeTextureMapper3D *vtkMitkVolumeTextureMapper3D::New()
-{
-  //GPU_INFO << "New";
+//vtkMitkVolumeTextureMapper3D *vtkMitkVolumeTextureMapper3D::New() //VTK6_TODO
+//{
+//  //GPU_INFO << "New";
 
-   // First try to create the object from the vtkObjectFactory
-  vtkObject* ret =
-    vtkVolumeRenderingFactory::CreateInstance("vtkMitkVolumeTextureMapper3D");
-  return static_cast<vtkMitkVolumeTextureMapper3D *>(ret);
-}
+//   // First try to create the object from the vtkObjectFactory
+//  vtkObject* ret =
+//    vtkVolumeRenderingFactory::CreateInstance("vtkMitkVolumeTextureMapper3D");
+//  return static_cast<vtkMitkVolumeTextureMapper3D *>(ret);
+//}
 
 //-----------------------------------------------------------------------------
 void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
@@ -441,7 +441,7 @@ int vtkMitkVolumeTextureMapper3D::UpdateColorLookup( vtkVolume *vol )
 
   // Get the image data
   vtkImageData *input = this->GetInput();
-  input->Update();
+//  input->Update(); //VTK6_TODO
 
   // Has the volume changed in some way?
   if ( this->SavedParametersInput != input ||

@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>UltrasoundCalibrationControls</class>
  <widget class="QWidget" name="UltrasoundCalibrationControls">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -28,10 +31,25 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QmitkUSCombinedModalityManagerWidget" name="t1devices">
+     <widget class="QWidget" name="t1devices">
       <attribute name="title">
        <string>Devices</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QmitkUSCombinedModalityManagerWidget" name="m_CombinedModalityManagerWidget" native="true"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_StartCalibrationButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Start Calibration for Selected Device</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="t2calibration">
       <property name="enabled">
@@ -357,4 +375,7 @@ p, li { white-space: pre-wrap; }
  </customwidgets>
  <resources/>
  <connections/>
+ <slots>
+  <slot>OnStartCalibrationProcess()</slot>
+ </slots>
 </ui>

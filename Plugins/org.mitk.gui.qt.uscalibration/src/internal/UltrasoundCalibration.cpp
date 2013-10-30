@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
@@ -43,6 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMatrix4x4.h>
 #include <vtkPlane.h>
 
+#include <vtkVertexGlyphFilter.h>
 
 const std::string UltrasoundCalibration::VIEW_ID = "org.mitk.views.ultrasoundcalibration";
 
@@ -88,8 +88,10 @@ void UltrasoundCalibration::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_CalibBtnSaveCalibration,  SIGNAL(clicked()), this, SLOT(OnSaveCalibration()) );         // Save Evaluation Results
   connect( m_Controls.m_BtnReset,     SIGNAL(clicked()), this, SLOT(OnReset()) );                 // Reset Pointsets
 
-  connect( m_Controls.t1devices, SIGNAL(SignalCombinedModalitySelected(mitk::USCombinedModality::Pointer)),
-           this, SLOT(OnSelectDevice(mitk::USCombinedModality::Pointer)));
+  connect( m_Controls.m_CombinedModalityManagerWidget, SIGNAL(SignalCombinedModalitySelected(mitk::USCombinedModality::Pointer)),
+           this, SLOT(OnSelectDevice(mitk::USCombinedModality::Pointer)) );
+
+  connect( m_Controls.m_StartCalibrationButton, SIGNAL(clicked()), this, SLOT(OnStartCalibrationProcess()) );
 
   m_Controls.m_TabWidget->setTabEnabled(1, false);
   m_Controls.m_TabWidget->setTabEnabled(2, false);
@@ -131,39 +133,51 @@ void UltrasoundCalibration::CreateQtPartControl( QWidget *parent )
 void UltrasoundCalibration::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
                                              const QList<mitk::DataNode::Pointer>& nodes )
 {
-
 }
 
 void UltrasoundCalibration::OnTabSwitch(int index){
-
 }
 
 void UltrasoundCalibration::OnSelectDevice(mitk::USCombinedModality::Pointer combinedModality)
 {
   m_CombinedModality = combinedModality;
 
-  if (combinedModality.IsNotNull())
+  if (m_CombinedModality.IsNotNull())
   {
     m_Tracker = m_CombinedModality->GetNavigationDataSource();
 
     // Construct Pipeline
     this->m_NeedleProjectionFilter->SetInput(0, m_Tracker->GetOutput(0));
 
-    this->SwitchFreeze();
-
-    // Todo: Maybe display this elsewhere
-    this->ShowNeedlePath();
-
-    // Switch active tab to Calibration page
-    m_Controls.m_TabWidget->setTabEnabled(1, true);
-    m_Controls.m_TabWidget->setCurrentIndex(1);
+    m_Controls.m_StartCalibrationButton->setEnabled(true);
   }
   else
   {
+    m_Controls.m_StartCalibrationButton->setEnabled(false);
     m_Controls.m_TabWidget->setCurrentIndex(0);
     m_Controls.m_TabWidget->setTabEnabled(1, false);
     m_Controls.m_TabWidget->setTabEnabled(2, false);
   }
+}
+
+void UltrasoundCalibration::OnStartCalibrationProcess()
+{
+  if ( m_CombinedModality.IsNull() ) { return; }
+
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  // make sure that the combined modality is in connected state before using it
+  if ( m_CombinedModality->GetDeviceState() < mitk::USDevice::State_Activated ) { m_CombinedModality->Activate(); }
+  if ( m_CombinedModality->GetDeviceState() < mitk::USDevice::State_Connected ) { m_CombinedModality->Connect(); }
+  QApplication::restoreOverrideCursor();
+
+  this->SwitchFreeze();
+
+  // Todo: Maybe display this elsewhere
+  this->ShowNeedlePath();
+
+  // Switch active tab to Calibration page
+  m_Controls.m_TabWidget->setTabEnabled(1, true);
+  m_Controls.m_TabWidget->setCurrentIndex(1);
 }
 
 void UltrasoundCalibration::OnAddCalibPoint()
@@ -185,12 +199,11 @@ void UltrasoundCalibration::OnCalibration()
 {
   // Compute transformation
   vtkSmartPointer<vtkLandmarkTransform> transform = vtkSmartPointer<vtkLandmarkTransform>::New();
-  // TODO: must be activated again, when ConvertPointSetTVtkPolyData() is possible in MITK
-  //mitk::PointSetModifier::Pointer myModifier = mitk::PointSetModifier::New();
-  //transform->SetSourceLandmarks(myModifier->ConvertPointSetToVtkPolyData(m_CalibPointsImage)->GetPoints());
-  //transform->SetTargetLandmarks(myModifier->ConvertPointSetToVtkPolyData(m_CalibPointsTool)->GetPoints());
-  //transform->Modified();
-  //transform->Update();
+
+  transform->SetSourceLandmarks(this->ConvertPointSetToVtkPolyData(m_CalibPointsImage)->GetPoints());
+  transform->SetTargetLandmarks(this->ConvertPointSetToVtkPolyData(m_CalibPointsTool)->GetPoints());
+  transform->Modified();
+  transform->Update();
 
   // Convert from vtk to itk data types
   itk::Matrix<float,3,3> rotationFloat = itk::Matrix<float,3,3>();
@@ -291,7 +304,6 @@ void UltrasoundCalibration::OnSaveEvaluation()
   psWriter->SetInput(4, m_EvalPointsProjected);
   psWriter->SetFileName(filename.toStdString() + ".xml");
   psWriter->Write();
-
 
   // TODO: New writer for transformations must be implemented.
   /*mitk::TransformationFileWriter::Pointer tWriter = mitk::TransformationFileWriter::New();
@@ -402,7 +414,6 @@ void UltrasoundCalibration::SwitchFreeze()
   }
 }
 
-
 void UltrasoundCalibration::ShowNeedlePath()
 {
   // Init Filter
@@ -418,4 +429,25 @@ void UltrasoundCalibration::ShowNeedlePath()
     node->SetBoolProperty("show contour", true);
     this->GetDataStorage()->Add(node);
   }
+}
+
+vtkSmartPointer<vtkPolyData> UltrasoundCalibration::ConvertPointSetToVtkPolyData(mitk::PointSet::Pointer PointSet)
+{
+  vtkSmartPointer<vtkPolyData> returnValue = vtkSmartPointer<vtkPolyData>::New();
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+  for(int i=0; i<PointSet->GetSize(); i++)
+  {
+    double point[3] = {PointSet->GetPoint(i)[0],PointSet->GetPoint(i)[1],PointSet->GetPoint(i)[2]};
+    points->InsertNextPoint(point);
+  }
+  vtkSmartPointer<vtkPolyData> temp = vtkSmartPointer<vtkPolyData>::New();
+  temp->SetPoints(points);
+
+  vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
+  vertexFilter->SetInputConnection(temp->GetProducerPort());
+  vertexFilter->Update();
+
+  returnValue->ShallowCopy(vertexFilter->GetOutput());
+
+  return returnValue;
 }

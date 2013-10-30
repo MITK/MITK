@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef UltrasoundCalibration_h
 #define UltrasoundCalibration_h
 
@@ -34,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Microservices
 #include "ui_UltrasoundCalibrationControls.h"
 
+#include <vtkPolyData.h>
+#include <vtkSmartPointer.h>
 
 /*!
   \brief UltrasoundCalibration
@@ -123,6 +124,11 @@ class UltrasoundCalibration : public QmitkAbstractView
     */
     void SwitchFreeze();
 
+    /**
+    *
+    */
+    void OnStartCalibrationProcess();
+
   protected:
 
     virtual void SetFocus();
@@ -161,7 +167,6 @@ class UltrasoundCalibration : public QmitkAbstractView
     */
     mitk::Point3D m_FreezePoint;
 
-
     /**
     * \brief Pointset containing all tool points.
     */
@@ -182,7 +187,6 @@ class UltrasoundCalibration : public QmitkAbstractView
     * \brief Pointset containing tracked evaluation points.
     */
     mitk::PointSet::Pointer m_EvalPointsTool;
-
 
     /**
     * \brief Pointset containing points along the needle's prohected path. Only used for visualization. The first point is the needle tip.
@@ -214,11 +218,16 @@ class UltrasoundCalibration : public QmitkAbstractView
     */
     mitk::PointSetDifferenceStatisticsCalculator::Pointer m_CalibrationStatistics;
 
-
     /**
     * \brief Result of the Calibration.
     */
     mitk::AffineTransform3D::Pointer m_Transformation;
+
+    /**
+    * This method is copied from PointSetModifier which is part of MBI. It should be replaced
+    * by external method call as soon as this functionality will be available in MITK.
+    */
+    vtkSmartPointer<vtkPolyData> ConvertPointSetToVtkPolyData(mitk::PointSet::Pointer PointSet);
 };
 
 #endif // UltrasoundCalibration_h

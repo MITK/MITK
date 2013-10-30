@@ -184,7 +184,7 @@ void DicomSeriesReader::ImageBlockDescriptor::SetPixelSpacingInformation(const s
   m_ImagerPixelSpacing = imagerPixelSpacing;
 }
 
-void DicomSeriesReader::ImageBlockDescriptor::GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const
+void DicomSeriesReader::ImageBlockDescriptor::GetDesiredMITKImagePixelSpacing( ScalarType& spacingX, ScalarType& spacingY) const
 {
   // preference for "in patient" pixel spacing
   if ( !DICOMStringToSpacing( m_PixelSpacing, spacingX, spacingY ) )

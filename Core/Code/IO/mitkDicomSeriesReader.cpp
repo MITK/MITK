@@ -386,7 +386,7 @@ DicomSeriesReader::ConstCharStarToString(const char* s)
 }
 
 bool
-DicomSeriesReader::DICOMStringToSpacing(const std::string& s, float& spacingX, float& spacingY)
+DicomSeriesReader::DICOMStringToSpacing(const std::string& s, ScalarType& spacingX, ScalarType& spacingY)
 {
   bool successful = false;
 

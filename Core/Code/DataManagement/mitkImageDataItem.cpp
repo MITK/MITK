@@ -153,14 +153,14 @@ void mitk::ImageDataItem::ConstructVtkImageData(ImagePointer iP) const
   {
     inData->SetDimensions( dims[0] -1, 1, 1);
     size = dims[0];
-    inData->SetOrigin( ((float) dims[0]) / 2.0f, 0, 0 );
+    inData->SetOrigin( ((mitk::ScalarType) dims[0]) / 2.0, 0, 0 );
   }
   else
   if ( dim == 2 )
   {
     inData->SetDimensions( dims[0] , dims[1] , 1 );
     size = dims[0] * dims[1];
-    inData->SetOrigin( ((float) dims[0]) / 2.0f, ((float) dims[1]) / 2.0f, 0 );
+    inData->SetOrigin( ((mitk::ScalarType) dims[0]) / 2.0f, ((mitk::ScalarType) dims[1]) / 2.0f, 0 );
   }
   else
   if ( dim >= 3 )

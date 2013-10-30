@@ -133,7 +133,7 @@ public:
   //## The change is done once (immediately). Later changes of the bounds
   //## of m_Plane will not influence the parametric bounds. (Consequently,
   //## there is no method to get the oversampling.)
-  virtual void SetOversampling(float oversampling);
+  virtual void SetOversampling(mitk::ScalarType oversampling);
 
   virtual void Initialize();
 

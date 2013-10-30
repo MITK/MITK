@@ -32,13 +32,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSet.h"
 #include <limits>
 
+static const mitk::ScalarType test_eps = 1E-6; /* some reference values in the test seem
+to have been calculated with float precision. Thus, set this to float precision epsilon.*/
+static const mitk::ScalarType test_eps_square = 1E-3;
+
 class mitkTimeGeometryTestClass
 {
 public:
   void Translation_Image_MovedOrigin(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
   {
     // DimX, DimY, DimZ,
-    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<mitk::ScalarType>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
     mitk::Geometry3D::Pointer geometry = image->GetTimeGeometry()->GetGeometryForTimeStep(0);
     mitk::Point3D imageOrigin = geometry->GetOrigin();
     mitk::Point3D expectedOrigin;
@@ -95,7 +99,7 @@ public:
     originalPoint[2] = 3;
     mitk::Point3D worldPoint;
     geometry->IndexToWorld(originalPoint, worldPoint);
-    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint), "Index-to-World without rotation as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint, test_eps), "Index-to-World without rotation as expected ");
 
     mitk::Point3D pointOfRotation;
     pointOfRotation[0] = 0;
@@ -105,7 +109,7 @@ public:
     vectorOfRotation[0] = 1;
     vectorOfRotation[1] = 0.5;
     vectorOfRotation[2] = 0.2;
-    float angleOfRotation = 73.0;
+    mitk::ScalarType angleOfRotation = 73.0;
     mitk::RotationOperation* rotation = new mitk::RotationOperation(mitk::OpROTATE,pointOfRotation, vectorOfRotation, angleOfRotation);
 
     baseData->GetTimeGeometry()->ExecuteOperation(rotation);
@@ -116,13 +120,13 @@ public:
     expectedPoint[2] = 1.1564401;
 
     baseData->GetGeometry(0)->IndexToWorld(originalPoint,worldPoint);
-    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint), "Rotation returns expected values ");
+    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint, test_eps), "Rotation returns expected values ");
   }
 
   void Scale_Image_ScaledPoint(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
   {
     // DimX, DimY, DimZ,
-    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<mitk::ScalarType>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
     mitk::Geometry3D::Pointer geometry = image->GetTimeGeometry()->GetGeometryForTimeStep(0);
     mitk::Point3D expectedPoint;
     expectedPoint[0] = 3*0.5;
@@ -134,7 +138,7 @@ public:
     originalPoint[2] = 3;
     mitk::Point3D worldPoint;
     geometry->IndexToWorld(originalPoint, worldPoint);
-    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint), "Index-to-World with old Scaling as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint, test_eps), "Index-to-World with old Scaling as expected ");
 
     mitk::Vector3D newSpacing;
     newSpacing[0] = 2;
@@ -191,7 +195,7 @@ public:
 
   void GetTimeBounds_4DImage_ZeroAndDimT(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
   {
-    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<mitk::ScalarType>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
     mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
     mitk::TimeBounds expectedTimeBounds = geometry->GetTimeBounds();
     MITK_TEST_CONDITION(mitk::Equal(expectedTimeBounds[0], 0), "Returns correct minimum time point ");
@@ -217,7 +221,7 @@ public:
 
   void IsValidTimePoint_ImageNegativInvalidTimePoint_False(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
   {
-    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<mitk::ScalarType>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
     mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
     bool isValid = geometry->IsValidTimePoint(-DimT);
     MITK_TEST_CONDITION(mitk::Equal(isValid, false), "Is invalid time Point correct minimum time point ");
@@ -225,7 +229,7 @@ public:
 
   void IsValidTimePoint_ImageInvalidTimePoint_False(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
   {
-    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<mitk::ScalarType>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
     mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
     bool isValid = geometry->IsValidTimePoint(DimT+1);
     MITK_TEST_CONDITION(mitk::Equal(isValid, false), "Is invalid time Point correct minimum time point ");
@@ -275,7 +279,7 @@ public:
 
   void TimePointToTimeStep_4DImageInvalidTimePoint_TimePoint(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
   {
-    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<mitk::ScalarType>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
     mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
     mitk::TimeStepType timePoint= geometry->TimePointToTimeStep(DimT+1.5);
     MITK_TEST_CONDITION(mitk::Equal(timePoint, DimT+1), "Calculated right time step for invalid time point");
@@ -283,7 +287,7 @@ public:
 
   void TimePointToTimeStep_4DImageNegativInvalidTimePoint_TimePoint(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
   {
-    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<mitk::ScalarType>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
     mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
     mitk::TimePointType negativTimePoint = (-1.0*DimT) - 1.5;
     mitk::TimeStepType timePoint= geometry->TimePointToTimeStep(negativTimePoint);
@@ -291,8 +295,8 @@ public:
   }
 
   void GetGeometryForTimeStep_BaseDataValidTimeStep_CorrectGeometry(mitk::BaseData* baseData,
-    float inputX, float inputY, float inputZ,
-    float outputX, float outputY, float outputZ, unsigned int DimT)
+    mitk::ScalarType inputX, mitk::ScalarType inputY, mitk::ScalarType inputZ,
+    mitk::ScalarType outputX, mitk::ScalarType outputY, mitk::ScalarType outputZ, unsigned int DimT)
   {
     baseData->Update();
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
@@ -309,7 +313,7 @@ public:
     originalPoint[2] = inputZ;
     mitk::Point3D worldPoint;
     geometry3D->IndexToWorld(originalPoint, worldPoint);
-    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint), "Geometry transformation match expection. ");
+    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint, test_eps), "Geometry transformation match expection. ");
   }
 
   void GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
@@ -320,8 +324,8 @@ public:
   }
 
   void GetGeometryForTimePoint_BaseDataValidTimePoint_CorrectGeometry(mitk::BaseData* baseData,
-    float inputX, float inputY, float inputZ,
-    float outputX, float outputY, float outputZ, unsigned int DimT)
+    mitk::ScalarType inputX, mitk::ScalarType inputY, mitk::ScalarType inputZ,
+    mitk::ScalarType outputX, mitk::ScalarType outputY, mitk::ScalarType outputZ, unsigned int DimT)
   {
     baseData->Update();
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
@@ -338,12 +342,12 @@ public:
     originalPoint[2] = inputZ;
     mitk::Point3D worldPoint;
     geometry3D->IndexToWorld(originalPoint, worldPoint);
-    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint), "Geometry transformation match expection. ");
+    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint, test_eps), "Geometry transformation match expection. ");
   }
 
   void GetGeometryForTimePoint_4DImageInvalidTimePoint_NullPointer(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
   {
-    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<mitk::ScalarType>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
     mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
     mitk::Geometry3D::Pointer geometry3D = geometry->GetGeometryForTimePoint(DimT+1);
     MITK_TEST_CONDITION(geometry3D.IsNull(), "Null-Pointer geometry returned with invalid time point");
@@ -351,7 +355,7 @@ public:
 
   void GetGeometryForTimePoint_4DImageNEgativInvalidTimePoint_NullPointer(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
   {
-    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<mitk::ScalarType>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
     mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
     mitk::TimePointType timePoint = (-1.0*(DimT)) -1;
     mitk::Geometry3D::Pointer geometry3D = geometry->GetGeometryForTimePoint(timePoint);
@@ -390,7 +394,7 @@ public:
     MITK_TEST_CONDITION(geometry3D.IsNull(), "Null-Pointer geometry returned");
   }
 
-  void SetTimeStepGeometry_BaseDataValidTimeStep_CorrectGeometry(mitk::BaseData* baseData, float scaleX, float scaleY, float scaleZ, unsigned int DimT)
+  void SetTimeStepGeometry_BaseDataValidTimeStep_CorrectGeometry(mitk::BaseData* baseData, mitk::ScalarType scaleX, mitk::ScalarType scaleY, mitk::ScalarType scaleZ, unsigned int DimT)
   {
     baseData->Update();
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
@@ -415,7 +419,7 @@ public:
     originalPoint[2] = 3;
     mitk::Point3D worldPoint;
     geometry->GetGeometryForTimeStep(DimT-1)->IndexToWorld(originalPoint, worldPoint);
-    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint), "Geometry transformation match expection. ");
+    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint, test_eps), "Geometry transformation match expection. ");
   }
 
   void Expand_BaseDataDoubleSize_SizeChanged(mitk::BaseData* baseData, int DimT)
@@ -430,7 +434,7 @@ public:
     MITK_TEST_CONDITION(geometry3D.IsNotNull(), "Non-zero geometry is generated. ");
   }
 
-  void CheckBounds_BaseData_PointsAsExpected(mitk::BaseData* baseData, float minX, float minY, float minZ, float maxX, float maxY, float maxZ)
+  void CheckBounds_BaseData_PointsAsExpected(mitk::BaseData* baseData, mitk::ScalarType minX, mitk::ScalarType minY, mitk::ScalarType minZ, mitk::ScalarType maxX, mitk::ScalarType maxY, mitk::ScalarType maxZ)
   {
     baseData->Update();
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
@@ -441,65 +445,65 @@ public:
     expectedPoint[1] = minY;
     expectedPoint[2] = minZ;
     mitk::Point3D point =  geometry->GetCornerPointInWorld(0);
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 0 as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "Bounding Point 0 as expected ");
     point =  geometry->GetCornerPointInWorld(true,true,true);
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 0 as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "Bounding Point 0 as expected ");
 
     point =  geometry->GetCornerPointInWorld(1);
     expectedPoint[0] = minX;
     expectedPoint[1] = minY;
     expectedPoint[2] = maxZ;
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "GBounding Point 1 as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "GBounding Point 1 as expected ");
     point =  geometry->GetCornerPointInWorld(true,true,false);
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 1 as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "Bounding Point 1 as expected ");
 
     point =  geometry->GetCornerPointInWorld(2);
     expectedPoint[0] = minX;
     expectedPoint[1] = maxY;
     expectedPoint[2] = minZ;
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 2 as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "Bounding Point 2 as expected ");
     point =  geometry->GetCornerPointInWorld(true,false,true);
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 2 as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "Bounding Point 2 as expected ");
 
     point =  geometry->GetCornerPointInWorld(3);
     expectedPoint[0] = minX;
     expectedPoint[1] = maxY;
     expectedPoint[2] = maxZ;
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 3 as expected  ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "Bounding Point 3 as expected  ");
     point =  geometry->GetCornerPointInWorld(true,false,false);
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 3 as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "Bounding Point 3 as expected ");
 
     point =  geometry->GetCornerPointInWorld(4);
     expectedPoint[0] = maxX;
     expectedPoint[1] = minY;
     expectedPoint[2] = minZ;
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 4 as expected  ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "Bounding Point 4 as expected  ");
     point =  geometry->GetCornerPointInWorld(false,true,true);
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 4 as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "Bounding Point 4 as expected ");
 
     point =  geometry->GetCornerPointInWorld(5);
     expectedPoint[0] = maxX;
     expectedPoint[1] = minY;
     expectedPoint[2] = maxZ;
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 5 as expected  ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "Bounding Point 5 as expected  ");
     point =  geometry->GetCornerPointInWorld(false,true,false);
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 5 as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "Bounding Point 5 as expected ");
 
     point =  geometry->GetCornerPointInWorld(6);
     expectedPoint[0] = maxX;
     expectedPoint[1] = maxY;
     expectedPoint[2] = minZ;
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 6 as expected  ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "Bounding Point 6 as expected  ");
     point =  geometry->GetCornerPointInWorld(false,false,true);
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 6 as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "Bounding Point 6 as expected ");
 
     point =  geometry->GetCornerPointInWorld(7);
     expectedPoint[0] = maxX;
     expectedPoint[1] = maxY;
     expectedPoint[2] = maxZ;
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 7 as expected  ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "Bounding Point 7 as expected  ");
     point =  geometry->GetCornerPointInWorld(false,false,false);
-    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 7 as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point, test_eps), "Bounding Point 7 as expected ");
   }
 
   void CheckLength_BaseData_AsExpected(mitk::BaseData* baseData, double length, double squareLength)
@@ -508,13 +512,13 @@ public:
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
 
     double dimension = geometry->GetDiagonalLengthInWorld();
-    MITK_TEST_CONDITION(mitk::Equal(dimension,length ), "Length  as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(dimension,length, test_eps ), "Length  as expected ");
 
     dimension = geometry->GetDiagonalLength2InWorld();
-    MITK_TEST_CONDITION(mitk::Equal(dimension, squareLength ), "Square length as expected ");
+    MITK_TEST_CONDITION(mitk::Equal(dimension, squareLength, test_eps_square ), "Square length as expected ");
   }
 
-  void CheckPointInside_BaseDataPointInside_True(mitk::BaseData* baseData, float pointX, float pointY, float pointZ)
+  void CheckPointInside_BaseDataPointInside_True(mitk::BaseData* baseData, mitk::ScalarType pointX, mitk::ScalarType pointY, mitk::ScalarType pointZ)
   {
     baseData->Update();
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
@@ -528,7 +532,7 @@ public:
     MITK_TEST_CONDITION(isInside, "Point is inside Image...");
   }
 
-  void CheckPointInside_BaseDataPointOutside_False(mitk::BaseData* baseData, float pointX, float pointY, float pointZ)
+  void CheckPointInside_BaseDataPointOutside_False(mitk::BaseData* baseData, mitk::ScalarType pointX, mitk::ScalarType pointY, mitk::ScalarType pointZ)
   {
     baseData->Update();
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
@@ -544,22 +548,22 @@ public:
 
   void CheckBounds_Image_AsSet(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
   {
-    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<mitk::ScalarType>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
     mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
 
     mitk::BoundingBox::BoundsArrayType bound =  geometry->GetBoundsInWorld();
     bool isEqual = true;
-    isEqual = isEqual && mitk::Equal(bound[0], -0.5*0.5);
-    isEqual = isEqual && mitk::Equal(bound[1], 29.5*0.5);
-    isEqual = isEqual && mitk::Equal(bound[2], -0.5*0.33);
-    isEqual = isEqual && mitk::Equal(bound[3], 24.5*0.33);
-    isEqual = isEqual && mitk::Equal(bound[4], -0.5*0.78);
-    isEqual = isEqual && mitk::Equal(bound[5], 19.5*0.78);
+    isEqual = isEqual && mitk::Equal(bound[0], -0.5*0.5, test_eps);
+    isEqual = isEqual && mitk::Equal(bound[1], 29.5*0.5, test_eps);
+    isEqual = isEqual && mitk::Equal(bound[2], -0.5*0.33, test_eps);
+    isEqual = isEqual && mitk::Equal(bound[3], 24.5*0.33, test_eps);
+    isEqual = isEqual && mitk::Equal(bound[4], -0.5*0.78, test_eps);
+    isEqual = isEqual && mitk::Equal(bound[5], 19.5*0.78, test_eps);
 
     MITK_TEST_CONDITION(isEqual, "Bounds as precalculated...");
   }
 
-  void CheckBounds_BaseData_AsSet(mitk::BaseData* baseData, float minBoundX, float maxBoundX, float minBoundY, float maxBoundY, float minBoundZ, float maxBoundZ)
+  void CheckBounds_BaseData_AsSet(mitk::BaseData* baseData, mitk::ScalarType minBoundX, mitk::ScalarType maxBoundX, mitk::ScalarType minBoundY, mitk::ScalarType maxBoundY, mitk::ScalarType minBoundZ, mitk::ScalarType maxBoundZ)
   {
     baseData->Update();
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
@@ -583,9 +587,9 @@ public:
 
     mitk::BoundingBox::BoundsArrayType bound =  geometry->GetBoundsInWorld();
     bool isEqual = true;
-    isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(0), extentX);//30*0.5);
-    isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(1), extentY);//25*0.33);
-    isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(2), extentZ);//20*0.78);
+    isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(0), extentX, test_eps);//30*0.5);
+    isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(1), extentY, test_eps);//25*0.33);
+    isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(2), extentZ, test_eps);//20*0.78);
 
     MITK_TEST_CONDITION(isEqual, "Extent as precalculated...");
   }
@@ -629,7 +633,7 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   mitkTimeGeometryTestClass testClass;
 
   MITK_TEST_OUTPUT(<< "Test for 3D image");
-  mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(30, 25, 20, 1,0.5,0.33,0.78,100);
+  mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<mitk::ScalarType>(30, 25, 20, 1,0.5,0.33,0.78,100);
   testClass.Translation_Image_MovedOrigin(30,25,20,1);
   testClass.Rotate_Image_RotatedPoint(image->Clone(),30,25,20,1);
   testClass.Scale_Image_ScaledPoint(30,25,20,1);
@@ -661,7 +665,7 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
 
 
   MITK_TEST_OUTPUT(<< "Test for 2D image");
-  image = mitk::ImageGenerator::GenerateRandomImage<float>(30, 25, 1, 1,0.5,0.33,0.78,100);
+  image = mitk::ImageGenerator::GenerateRandomImage<mitk::ScalarType>(30, 25, 1, 1,0.5,0.33,0.78,100);
   testClass.Translation_Image_MovedOrigin(30,25,1,1);
   testClass.Rotate_Image_RotatedPoint(image->Clone(),30,25,1,1);
   testClass.Scale_Image_ScaledPoint(30,25,1,1);
@@ -690,7 +694,7 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   testClass.CheckExtent_BaseData_AsSet(image->Clone(), 30*0.5,25*0.33,1*0.78);
 
   MITK_TEST_OUTPUT(<< "Test for 3D+time image");
-  image = mitk::ImageGenerator::GenerateRandomImage<float>(30, 25, 20, 5,0.5,0.33,0.78,100);
+  image = mitk::ImageGenerator::GenerateRandomImage<mitk::ScalarType>(30, 25, 20, 5,0.5,0.33,0.78,100);
   testClass.Translation_Image_MovedOrigin(30,25,20,5); // Test with 3D+t-Image
   testClass.Rotate_Image_RotatedPoint(image->Clone(),30,25,20,5); // Test with 3D+t-Image
   testClass.Scale_Image_ScaledPoint(30,25,20,5); // Test with 3D+t-Image

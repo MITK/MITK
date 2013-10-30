@@ -81,7 +81,7 @@ void mitk::InternalTrackingTool::GetPosition(mitk::Point3D& position) const
   if (m_ToolTipSet)
     {
     //compute position of tooltip
-    vnl_vector<float> pos_vnl = (m_ToolTipRotation.rotate(m_Position.GetVnlVector()))+ m_ToolTip.GetVnlVector();
+    vnl_vector<ScalarType> pos_vnl = (m_ToolTipRotation.rotate(m_Position.GetVnlVector()))+ m_ToolTip.GetVnlVector();
     position[0] = pos_vnl[0];
     position[1] = pos_vnl[1];
     position[2] = pos_vnl[2];

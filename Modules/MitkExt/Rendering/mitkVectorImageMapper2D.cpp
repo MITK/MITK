@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkGlyph2D.h>
 #include <vtkGlyphSource2D.h>
 #include <vtkPolyData.h>
-#include <vtkPolyDataSource.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
@@ -188,7 +187,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
         (dims[2] == 1 && vnormal[2] != 0) ))
   {
     m_Cutter->SetCutFunction( m_Plane );
-    m_Cutter->SetInput( vtkImage );
+    m_Cutter->SetInputData( vtkImage );
     m_Cutter->GenerateCutScalarsOff();//!
     m_Cutter->Update();
     cuttedPlane = m_Cutter->GetOutput();
@@ -317,8 +316,8 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     }
 
     vtkMaskedGlyph3D* glyphGenerator = vtkMaskedGlyph3D::New();
-    glyphGenerator->SetSource( glyphSource->GetOutput() );
-    glyphGenerator->SetInputConnection(cuttedPlane->GetProducerPort());
+    glyphGenerator->SetSourceData(glyphSource->GetOutput() );
+    glyphGenerator->SetInput(cuttedPlane);
     glyphGenerator->SetInputArrayToProcess (1, 0,0, vtkDataObject::FIELD_ASSOCIATION_POINTS , "vector");
     glyphGenerator->SetVectorModeToUseVector();
     glyphGenerator->OrientOn();

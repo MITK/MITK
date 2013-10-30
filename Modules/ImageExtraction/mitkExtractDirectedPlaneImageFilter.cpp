@@ -282,9 +282,9 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 
   vtkImageChangeInformation * unitSpacingImageFilter = vtkImageChangeInformation::New() ;
   unitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
-  unitSpacingImageFilter->SetInput( inputData );
+  unitSpacingImageFilter->SetInputData( inputData );
 
-  m_Reslicer->SetInput( unitSpacingImageFilter->GetOutput() );
+  m_Reslicer->SetInputData( unitSpacingImageFilter->GetOutput() );
   unitSpacingImageFilter->Delete();
 
   //m_Reslicer->SetInput( inputData );

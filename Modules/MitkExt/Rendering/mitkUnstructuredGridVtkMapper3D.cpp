@@ -186,7 +186,7 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
 
   m_Assembly->VisibilityOn();
 
-  m_VtkTriangleFilter->SetInput(grid);
+  m_VtkTriangleFilter->SetInputData(grid);
   m_VtkDataSetMapper->SetInput(grid);
   m_VtkDataSetMapper2->SetInput(grid);
 
@@ -260,7 +260,7 @@ void mitk::UnstructuredGridVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mit
         case mitk::GridVolumeMapperProperty::RAYCAST:
           if (m_VtkVolumeRayCastMapper == 0) {
             m_VtkVolumeRayCastMapper = vtkUnstructuredGridVolumeRayCastMapper::New();
-            m_VtkVolumeRayCastMapper->SetInput(m_VtkTriangleFilter->GetOutput());
+            m_VtkVolumeRayCastMapper->SetInputData(m_VtkTriangleFilter->GetOutput());
           }
           m_Volume->SetMapper(m_VtkVolumeRayCastMapper);
           break;

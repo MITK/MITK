@@ -167,11 +167,11 @@ void mitk::LabeledImageToSurfaceFilter::GenerateData()
 void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *vtkimage, mitk::Surface * surface, mitk::LabeledImageToSurfaceFilter::LabelType label )
 {
   vtkImageChangeInformation *indexCoordinatesImageFilter = vtkImageChangeInformation::New();
-  indexCoordinatesImageFilter->SetInput(vtkimage);
+  indexCoordinatesImageFilter->SetInputData(vtkimage);
   indexCoordinatesImageFilter->SetOutputOrigin(0.0,0.0,0.0);
 
     vtkImageThreshold* threshold = vtkImageThreshold::New();
-    threshold->SetInput( indexCoordinatesImageFilter->GetOutput() );
+    threshold->SetInputData( indexCoordinatesImageFilter->GetOutput() );
     //indexCoordinatesImageFilter->Delete();
     threshold->SetInValue( 100 );
     threshold->SetOutValue( 0 );
@@ -180,7 +180,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     threshold->ReleaseDataFlagOn();
 
     vtkImageGaussianSmooth *gaussian = vtkImageGaussianSmooth::New();
-    gaussian->SetInput( threshold->GetOutput() );
+    gaussian->SetInputData( threshold->GetOutput() );
     //threshold->Delete();
     gaussian->SetDimensionality( 3  );
     gaussian->SetRadiusFactor( 0.49 );
@@ -192,7 +192,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
   //MarchingCube -->create Surface
   vtkMarchingCubes *skinExtractor = vtkMarchingCubes::New();
   skinExtractor->ReleaseDataFlagOn();
-  skinExtractor->SetInput(gaussian->GetOutput());//RC++
+  skinExtractor->SetInputData(gaussian->GetOutput());//RC++
   indexCoordinatesImageFilter->Delete();
   skinExtractor->SetValue(0, 50);
 
@@ -205,7 +205,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
   {
     vtkSmoothPolyDataFilter *smoother = vtkSmoothPolyDataFilter::New();
     //read poly1 (poly1 can be the original polygon, or the decimated polygon)
-    smoother->SetInput(polydata);//RC++
+    smoother->SetInputData(polydata);//RC++
     smoother->SetNumberOfIterations( m_SmoothIteration );
     smoother->SetRelaxationFactor( m_SmoothRelaxation );
     smoother->SetFeatureAngle( 60 );
@@ -230,7 +230,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     decimate->BoundaryVertexDeletionOff();
     decimate->SetDegree(10); //std-value is 25!
 
-    decimate->SetInput(polydata);//RC++
+    decimate->SetInputData(polydata);//RC++
     decimate->SetTargetReduction(m_TargetReduction);
     decimate->SetMaximumError(0.002);
 
@@ -240,9 +240,8 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     decimate->Delete();
   }
 
-  polydata->Update();
-
-  polydata->SetSource(NULL);
+//  polydata->Update(); //VTK6_TODO
+//  polydata->SetSource(NULL);
 
   if(polydata->GetNumberOfPoints() > 0)
   {

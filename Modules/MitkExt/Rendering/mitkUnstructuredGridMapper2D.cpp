@@ -186,7 +186,7 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
   m_Plane->SetNormal( vnormal );
 
   // set data into cutter
-  m_Slicer->SetInput( m_VtkPointSet );
+  m_Slicer->SetInputData( m_VtkPointSet );
   //    m_Cutter->GenerateCutScalarsOff();
   //    m_Cutter->SetSortByToSortByCell();
 

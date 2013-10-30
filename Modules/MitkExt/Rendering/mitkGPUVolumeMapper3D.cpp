@@ -111,7 +111,7 @@ bool mitk::GPUVolumeMapper3D::InitGPU(mitk::BaseRenderer* renderer)
   ls->m_VolumeGPU->SetProperty( ls->m_VolumePropertyGPU );
   ls->m_VolumeGPU->VisibilityOn();
 
-  ls->m_MapperGPU->SetInput( this->m_UnitSpacingImageFilter->GetOutput() );
+  ls->m_MapperGPU->SetInputData( this->m_UnitSpacingImageFilter->GetOutput() );
 
   ls->m_gpuSupported = ls->m_MapperGPU->IsRenderSupported(renderer->GetVtkRenderer(),ls->m_VolumePropertyGPU);
 
@@ -153,7 +153,7 @@ void mitk::GPUVolumeMapper3D::InitCPU(mitk::BaseRenderer* renderer)
   ls->m_VolumeCPU->SetProperty( ls->m_VolumePropertyCPU );
   ls->m_VolumeCPU->VisibilityOn();
 
-  ls->m_MapperCPU->SetInput( m_UnitSpacingImageFilter->GetOutput() );//m_Resampler->GetOutput());
+  ls->m_MapperCPU->SetInputData( m_UnitSpacingImageFilter->GetOutput() );//m_Resampler->GetOutput());
 
   ls->m_cpuInitialized=true;
 }
@@ -338,7 +338,7 @@ void mitk::GPUVolumeMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *rende
 
   mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
   vtkImageData *inputData = input->GetVtkImageData( this->GetTimestep() );
-  m_UnitSpacingImageFilter->SetInput( inputData );
+  m_UnitSpacingImageFilter->SetInputData( inputData );
 
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 

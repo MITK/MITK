@@ -1537,7 +1537,7 @@ bool vtkMitkOpenGLVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol
 {
   // Get the image data
   vtkImageData *input = this->GetInput();
-  input->Update();
+//  input->Update(); //VTK6_TODO
 
   bool needUpdate = false;
 
@@ -1641,7 +1641,7 @@ bool vtkMitkOpenGLVolumeTextureMapper3D::UpdateVolumesRGBA(vtkVolume *vtkNotUsed
 {
   // Get the image data
   vtkImageData *input = this->GetInput();
-  input->Update();
+//  input->Update(); //VTK6_TODO
 
   bool needUpdate = false;
 

@@ -218,7 +218,7 @@ void mitk::SplineVtkMapper3D::UpdateSpline()
     //profileTubes->SetRadius(.005);
 
     vtkPolyDataMapper* profileMapper = vtkPolyDataMapper::New();
-    profileMapper->SetInput( profileData );
+    profileMapper->SetInputData( profileData );
 
     m_SplinesActor->SetMapper( profileMapper );
   }

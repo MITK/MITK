@@ -199,7 +199,7 @@ void mitk::RenderingTestHelper::SaveAsPNG(std::string fileName)
   magnifier->SetMagnification(1);
 
   vtkSmartPointer<vtkImageWriter> fileWriter = vtkSmartPointer<vtkPNGWriter>::New();
-  fileWriter->SetInput(magnifier->GetOutput());
+  fileWriter->SetInputData(magnifier->GetOutput());
   fileWriter->SetFileName(fileName.c_str());
 
   fileWriter->Write();

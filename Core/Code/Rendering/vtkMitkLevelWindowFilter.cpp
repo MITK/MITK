@@ -455,29 +455,29 @@ void vtkApplyLookupTableOnScalarsCTF(vtkMitkLevelWindowFilter *self,
 
 
 
-void vtkMitkLevelWindowFilter::ExecuteInformation()
-{
-  vtkImageData *input = this->GetInput();
-  vtkImageData *output = this->GetOutput();
+//void vtkMitkLevelWindowFilter::ExecuteInformation()
+//{
+//  vtkImageData *input = this->GetInput();
+//  vtkImageData *output = this->GetOutput();
 
-  if (!input)
-  {
-    vtkErrorMacro(<< "Input not set.");
-    return;
-  }
-  output->CopyTypeSpecificInformation( input );
+//  if (!input)
+//  {
+//    vtkErrorMacro(<< "Input not set.");
+//    return;
+//  }
+//  output->CopyTypeSpecificInformation( input );
 
-  // TODO make output RGBA
-  output->SetScalarTypeToUnsignedChar();
-  output->SetNumberOfScalarComponents(4);
+//  // TODO make output RGBA
+//  output->SetScalarTypeToUnsignedChar();
+//  output->SetNumberOfScalarComponents(4);
 
-  int extent[6];
-  input->GetWholeExtent(extent);
-  output->SetExtent(extent);
-  output->SetWholeExtent(extent);
-  output->SetUpdateExtent(extent);
-  output->AllocateScalars();
-}
+//  int extent[6];
+//  input->GetWholeExtent(extent);
+//  output->SetExtent(extent);
+//  output->SetWholeExtent(extent);
+//  output->SetUpdateExtent(extent);
+//  output->AllocateScalars();
+//}
 
 //Method to run the filter in different threads.
 void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,
@@ -568,10 +568,10 @@ void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,
   }
 }
 
-void vtkMitkLevelWindowFilter::ExecuteInformation(
-    vtkImageData *vtkNotUsed(inData), vtkImageData *vtkNotUsed(outData))
-{
-}
+//void vtkMitkLevelWindowFilter::ExecuteInformation(
+//    vtkImageData *vtkNotUsed(inData), vtkImageData *vtkNotUsed(outData))
+//{
+//}
 
 void vtkMitkLevelWindowFilter::SetMinOpacity(double minOpacity)
 {

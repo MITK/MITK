@@ -13,35 +13,53 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include "mitkCompareImageFilter.h"
+
+// mitk includes
+#include "mitkCompareImageDataFilter.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkITKImageImport.h"
+#include "mitkImageCaster.h"
+#include "mitkMultiChannelImageDataComparisonFilter.h"
 
+// itk includes
 #include <itkTestingComparisonImageFilter.h>
 
-mitk::CompareImageFilter::CompareImageFilter()
+mitk::CompareImageDataFilter::CompareImageDataFilter()
 {
   this->SetNumberOfRequiredInputs(2);
 }
 
 
-void mitk::CompareImageFilter::GenerateData()
+void mitk::CompareImageDataFilter::GenerateData()
 {
   // check inputs
 
   const mitk::Image* input1 = this->GetInput(0);
   const mitk::Image* input2 = this->GetInput(1);
 
-  // check input validity
-  if( input1->GetDimension() == input2->GetDimension() )
+  //   Generally this filter is part of the mitk::Image::Equal() method and only checks the equality of the image data
+  //   so no further image type comparison is performed!
+  //   CAVE: If the images differ in a parameter other then the image data, the filter may fail!!
+
+  // check what number of components the inputs have
+  if(input1->GetPixelType().GetNumberOfComponents() == 1 &&
+    input2->GetPixelType().GetNumberOfComponents() == 1)
   {
     AccessByItk_1( input1, EstimateValueDifference, input2);
   }
+  else if(input1->GetPixelType().GetNumberOfComponents() > 1 &&
+    input2->GetPixelType().GetNumberOfComponents() > 1 )
+  {
+    MultiChannelImageDataComparisonFilter::Pointer mcComparator = MultiChannelImageDataComparisonFilter::New();
+    mcComparator->SetTestImage(input1);
+    mcComparator->SetValidImage(input2);
+    mcComparator->SetCompareFilterResult( &m_CompareDetails);
+    mcComparator->Update();
+    //mcComparator->GetCompareFilterResult()
+  }
 }
 
-#include "mitkImageCaster.h"
-
-bool mitk::CompareImageFilter::GetResult(size_t threshold)
+bool mitk::CompareImageDataFilter::GetResult(size_t threshold)
 {
   if (! m_CompareResult)
   {
@@ -57,7 +75,7 @@ bool mitk::CompareImageFilter::GetResult(size_t threshold)
 }
 
 template< typename TPixel, unsigned int VImageDimension>
-void mitk::CompareImageFilter::EstimateValueDifference(itk::Image< TPixel, VImageDimension>* itkImage1,
+void mitk::CompareImageDataFilter::EstimateValueDifference(itk::Image< TPixel, VImageDimension>* itkImage1,
                               const mitk::Image* referenceImage)
 {
 
@@ -101,6 +119,4 @@ void mitk::CompareImageFilter::EstimateValueDifference(itk::Image< TPixel, VImag
 
   mitk::Image::Pointer output = mitk::GrabItkImageMemory( compare_filter->GetOutput() );
   this->SetOutput( MakeNameFromOutputIndex(0), output.GetPointer() );
-
-
 }

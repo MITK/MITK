@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKCOMPAREIMAGEFILTER_H
-#define MITKCOMPAREIMAGEFILTER_H
+#ifndef MITKCOMPAREIMAGEDATAFILTER_H
+#define MITKCOMPAREIMAGEDATAFILTER_H
 
 //MITK
 #include "mitkImageToImageFilter.h"
@@ -67,11 +67,11 @@ struct CompareFilterResults
  * to find differences. The filter expects two images as input, provide them by using the SetInput( int, mitk::Image)
  * method.
  */
-class MITK_CORE_EXPORT CompareImageFilter
+class MITK_CORE_EXPORT CompareImageDataFilter
     : public ImageToImageFilter
 {
 public:
-  mitkClassMacro(CompareImageFilter,
+  mitkClassMacro(CompareImageDataFilter,
                  ImageToImageFilter)
 
   itkSimpleNewMacro(Self)
@@ -99,8 +99,8 @@ public:
   }
 
 protected:
-  CompareImageFilter();
-  virtual ~CompareImageFilter() {}
+  CompareImageDataFilter();
+  virtual ~CompareImageDataFilter() {}
 
   virtual void GenerateData();
 
@@ -115,4 +115,4 @@ protected:
 };
 } // end namespace mitk
 
-#endif // MITKCOMPAREIMAGEFILTER_H
+#endif // MITKCompareImageDataFilter_H

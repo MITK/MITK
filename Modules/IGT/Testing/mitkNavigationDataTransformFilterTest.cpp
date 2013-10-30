@@ -111,7 +111,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   myFilter->PrecomposeOn();
   MITK_TEST_CONDITION(output->GetPosition() == resultPos,
                       "Testing if precomposed translation was calculated correct");
-  MITK_TEST_CONDITION(mitk::Equal(output->GetOrientation(),initialOri),
+  MITK_TEST_CONDITION(mitk::Equal(output->GetOrientation(),initialOri,0.00001),
                       "Testing if precomposed Orientation remains unchanged ");
   MITK_TEST_CONDITION(output->IsDataValid() == initialValid,
                       "Testing if precomposed DataValid remains unchanged");
@@ -164,7 +164,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   mitk::FillVector3D(resultPos,  2.2, -1.1, 3.3);
   mitk::NavigationData::OrientationType resultOri(0.0, 0.0, -0.7071067690849304, 0.7071067690849304);
   MITK_TEST_CONDITION(mitk::Equal(output2->GetPosition(), resultPos, 0.00001), "Testing if position after rotation is correctly calculated");
-  MITK_TEST_CONDITION( mitk::Equal(output2->GetOrientation(), resultOri, 0.00001),"Testing if orientation after rotation is correctly caclculated  ");
+  MITK_TEST_CONDITION(mitk::Equal(output2->GetOrientation(), resultOri, 0.00001),"Testing if orientation after rotation is correctly caclculated  ");
   MITK_TEST_CONDITION(output2->IsDataValid() == initialValid, "Testing if DataValid remains unchanged");
 
   //
@@ -176,7 +176,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   // Output position should be the same as input position for rotation-only with PrecomposeOn
   MITK_TEST_CONDITION(output2->GetPosition() == initialPos,
                       "Testing if precomposed position after rotation is correctly calculated");
-  MITK_TEST_CONDITION(mitk::Equal(output2->GetOrientation(), resultOri),
+  MITK_TEST_CONDITION(mitk::Equal(output2->GetOrientation(), resultOri, 0.00001),
                       "Testing if precomposed orientation after rotation is correctly calculated");
   MITK_TEST_CONDITION(output2->IsDataValid() == initialValid,
                       "Testing if precomposed DataValid remains unchanged");

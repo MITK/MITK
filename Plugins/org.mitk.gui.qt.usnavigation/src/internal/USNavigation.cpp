@@ -264,7 +264,7 @@ void USNavigation::OnSaveZone()
 {
   QString name = m_Controls.m_ZoneList->currentItem()->text();
   mitk::DataNode::Pointer node = GetDataStorage()->GetNamedNode(name.toStdString());
-  FormatZoneNode(node, node->GetData()->GetGeometry()->GetCenter());
+  this->FormatZoneNode(node, node->GetData()->GetGeometry()->GetCenter());
   m_Controls.m_ZoneList->currentItem()->setText(node->GetName().c_str());
 }
 

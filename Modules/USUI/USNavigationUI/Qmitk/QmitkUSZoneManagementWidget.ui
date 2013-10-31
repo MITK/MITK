@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkUSZoneManagementWidget</class>
+ <widget class="QWidget" name="QmitkUSZoneManagementWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>330</width>
+    <height>492</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="ZonesTitleLabel">
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Current Zones:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableView" name="CurrentZonesTable"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QPushButton" name="AddZoneButton">
+       <property name="text">
+        <string>&amp;Add</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USNavigationUI.qrc">
+         <normaloff>:/USNavigationUI/112.png</normaloff>:/USNavigationUI/112.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="DeleteZoneButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>&amp;Delete</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USNavigationUI.qrc">
+         <normaloff>:/USNavigationUI/117.png</normaloff>:/USNavigationUI/117.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../resources/USNavigationUI.qrc"/>
+ </resources>
+ <connections/>
+</ui>

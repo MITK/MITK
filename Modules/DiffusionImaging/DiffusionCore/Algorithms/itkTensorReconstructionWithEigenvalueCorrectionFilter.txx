@@ -595,7 +595,7 @@ namespace itk
   template <class TDiffusionPixelType, class TTensorPixelType>
   double
   TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
-  ::CheckNegatives ( itk::Size<3> size, itk::Image<short, 3>::Pointer mask, itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer tensorImg )
+  ::CheckNegatives ( itk::Size<3> size, itk::Image<short, 3>::Pointer mask, typename itk::Image< itk::DiffusionTensor3D<TTensorPixelType>, 3 >::Pointer tensorImg )
   {
 
       // The method was created to simplif the flow of negative eigenvalue correction process. The method itself just return the number
@@ -605,7 +605,7 @@ namespace itk
       // declaration of important structures and variables
       double badvoxels=0;
       double pixel=0;
-      itk::DiffusionTensor3D<float> ten;
+      itk::DiffusionTensor3D<double> ten;
       vnl_matrix<double> temp_tensor(3,3);
       vnl_vector<double> eigen_vals(3);
       vnl_vector<double> tensor (6);
@@ -915,7 +915,7 @@ namespace itk
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
   TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
-  ::GenerateTensorImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,double what_mask,itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer tensorImg)
+  ::GenerateTensorImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,double what_mask, typename itk::Image< itk::DiffusionTensor3D<TTensorPixelType>, 3 >::Pointer tensorImg)
   {
       // in this method the whole tensor image is updated with a tensors for defined voxels ( defined by a value of mask);
 
@@ -924,7 +924,7 @@ namespace itk
       vnl_vector<double> org_data(nof);
       vnl_vector<double> atten(nof-numberb0);
       vnl_vector<double> tensor(6);
-      itk::DiffusionTensor3D<float> ten;
+      itk::DiffusionTensor3D<double> ten;
       double mask_val=0;
 
 
@@ -1088,7 +1088,7 @@ namespace itk
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
   TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
-  ::DeepCopyTensorImage(itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer tensorImg, itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer temp_tensorImg)
+  ::DeepCopyTensorImage(itk::Image< itk::DiffusionTensor3D<double>, 3 >::Pointer tensorImg, itk::Image< itk::DiffusionTensor3D<double>, 3 >::Pointer temp_tensorImg)
   {
 
       temp_tensorImg->SetSpacing(tensorImg->GetSpacing());

@@ -841,9 +841,9 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
   LocalStorage* localStorage = this->GetLocalStorage(renderer);
 
   vtkMarchingSquares* squares = vtkMarchingSquares::New();
-  vtkPolyData* polyData = vtkPolyData::New();
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
 
-//  float depth = CalculateLayerDepth(renderer);
+  float depth = CalculateLayerDepth(renderer);
 
   squares->SetInput(localStorage->m_ReslicedImage);
   squares->SetNumberOfContours(1);
@@ -852,17 +852,18 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
 
   polyData = squares->GetOutput();
 
-//  vtkIdType numberOfPoints = polyData->GetNumberOfPoints();
+  vtkIdType numberOfPoints = polyData->GetNumberOfPoints();
 
-//  for(int i=0;i<numberOfPoints;i++)
-//  {
-//    double* x = polyData->Get
-//  }
+  for(int i=0;i<numberOfPoints;i++)
+  {
+    double* x = polyData->GetPoint(i);
+    std::cout << "Alt: " << "x[0]:" << x[0] << "\n" << "x[1]:" << x[1] << "\n" << "x[2]" << x[2] << "\n\n";
+    x[2] = depth;
+    std::cout << "Neu: " << "x[0]:" << x[0] << "\n" << "x[1]:" << x[1] << "\n" << "x[2]" << x[2] << "\n\n";
+  }
 
-  fstream f;
-  f.open("/home/riecker/PolyData.txt", ios::out);
-  polyData->PrintSelf(f,vtkIndent(0));
-
+  polyData->BuildCells();
+  polyData->BuildLinks();
   return polyData;
 }
 

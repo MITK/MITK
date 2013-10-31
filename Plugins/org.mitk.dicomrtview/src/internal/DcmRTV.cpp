@@ -104,7 +104,6 @@ void DcmRTV::DoImageProcessing()
     mitk::DataNode::Pointer x = mitk::DataNode::New();
     x->SetData(modelVector.at(i));
     x->SetProperty("name", modelVector.at(i)->GetProperty("name"));
-//    x->SetName(modelVector.at(i)->GetProperty("name"));
     x->SetVisibility(true);
     GetDataStorage()->Add(x);
   }

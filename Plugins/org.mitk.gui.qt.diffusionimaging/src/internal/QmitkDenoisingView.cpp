@@ -34,10 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImageReadAccessor.h>
 
-
-
-
-
 const std::string QmitkDenoisingView::VIEW_ID = "org.mitk.views.denoisingview";
 
 QmitkDenoisingView::QmitkDenoisingView()
@@ -110,23 +106,11 @@ void QmitkDenoisingView::StartDenoising()
     MITK_INFO << "JOPP";
     DiffusionImageType::Pointer inImage = dynamic_cast<DiffusionImageType*> (m_ImageNode->GetData());
 
-
-    AdaptorType::Pointer imageAdaptor = AdaptorType::New();
-    imageAdaptor->SetImage(inImage->GetVectorImage());
-    imageAdaptor->SetExtractComponentIndex(0);
-    imageAdaptor->Update();
-    //imageAdaptor->
-    StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
-   // statisticsFilter->SetInput(inImage->GetVectorImage());
-    //statisticsFilter->Update();
-
     NonLocalMeansDenoisingFilterType::Pointer denoisingFilter = NonLocalMeansDenoisingFilterType::New();
-//    denoisingFilter->SetNumberOfThreads(1);
+    denoisingFilter->SetNumberOfThreads(1);
     denoisingFilter->SetInput(inImage->GetVectorImage());
-    denoisingFilter->SetGradientDirections(inImage->GetDirections());
-    denoisingFilter->SetVRadius(/*(unsigned int)*/m_Controls->m_SpinBoxParameter1->value());
-    denoisingFilter->SetNRadius(/*(unsigned int)*/m_Controls->m_SpinBoxParameter2->value());
-    denoisingFilter->SetH(/*(unsigned double)*/m_Controls->m_DoubleSpinBoxParameter3->value());
+    denoisingFilter->SetVRadius(m_Controls->m_SpinBoxParameter1->value());
+    denoisingFilter->SetNRadius(m_Controls->m_SpinBoxParameter2->value());
     denoisingFilter->Update();
 
     DiffusionImageType::Pointer image = DiffusionImageType::New();
@@ -134,10 +118,6 @@ void QmitkDenoisingView::StartDenoising()
     image->SetB_Value(inImage->GetB_Value());
     image->SetDirections(inImage->GetDirections());
     image->InitializeFromVectorImage();
-   // mitk::Image::Pointer image = mitk::Image::New();
-    /*DiffusionImageType::Pointer image = DiffusionImageType::New();
-    image->InitializeByItk( denoisingFilter->GetOutput() );
-    image->SetVolume( denoisingFilter->GetOutput()->GetBufferPointer() );*/
     mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
     imageNode->SetData( image );
     QString name = m_ImageNode->GetName().c_str();
@@ -152,4 +132,8 @@ void QmitkDenoisingView::UpdateLabelText()
   m_Controls->m_LabelParameter_1->setText("Neighborhood V:");
   m_Controls->m_LabelParameter_2->setText("Neighborhood N:");
   m_Controls->m_LabelParameter_3->setText("Denoisingparameter H:");
+  m_Controls->m_LabelParameter_3->setEnabled(false);
+  m_Controls->m_LabelParameter_3->setVisible(false);
+  m_Controls->m_DoubleSpinBoxParameter3->setEnabled(false);
+  m_Controls->m_DoubleSpinBoxParameter3->setVisible(false);
 }

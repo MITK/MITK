@@ -42,7 +42,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImage.h>
 #include <itkStatisticsImageFilter.h>
 #include <itkNonLocalMeansDenoisingFilter.h>
-#include <itkVectorImageToImageAdaptor.h>
 
 //
 
@@ -67,8 +66,6 @@ public:
 
   typedef short DiffusionPixelType;
   typedef mitk::DiffusionImage< DiffusionPixelType > DiffusionImageType;
-  typedef itk::VectorImageToImageAdaptor< DiffusionPixelType, 3 > AdaptorType;
-  typedef itk::StatisticsImageFilter < itk::Image<DiffusionPixelType, 3> > StatisticsFilterType;
   typedef itk::NonLocalMeansDenoisingFilter<DiffusionPixelType, DiffusionPixelType> NonLocalMeansDenoisingFilterType;
 
   virtual void CreateQtPartControl(QWidget *parent);

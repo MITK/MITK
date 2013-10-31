@@ -26,58 +26,55 @@ This file is based heavily on a corresponding ITK filter.
 #include "itkVectorImage.h"
 #include <mitkDiffusionImage.h>
 #include <itkNeighborhoodIterator.h>
+#include <itkVectorImageToImageFilter.h>
+#include <itkStatisticsImageFilter.h>
+#include <boost/progress.hpp>
 
 namespace itk{
-/** \class NonLocalMeansDenoisingFilter
- */
+  /** \class NonLocalMeansDenoisingFilter
+  */
 
-template< class TInPixelType, class TOutPixelType >
-class NonLocalMeansDenoisingFilter :
-        public ImageToImageFilter< VectorImage < TInPixelType, 3 >, VectorImage < TOutPixelType, 3 > >
-{
-
-public:
+  template< class TInPixelType, class TOutPixelType >
+  class NonLocalMeansDenoisingFilter :
+    public ImageToImageFilter< VectorImage < TInPixelType, 3 >, VectorImage < TOutPixelType, 3 > >
+  {
+  public:
 
     typedef NonLocalMeansDenoisingFilter Self;
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
     typedef ImageToImageFilter< VectorImage < TInPixelType, 3 >, VectorImage < TOutPixelType, 3 > >  Superclass;
-    typedef mitk::DiffusionImage< short >::GradientDirectionType GradientDirectionType;
-    typedef mitk::DiffusionImage< short >::GradientDirectionContainerType::Pointer GradientContainerType;
+    typedef VectorImageToImageFilter < TInPixelType > imageExtractorType;
+    typedef StatisticsImageFilter < itk::Image<TInPixelType, 3> > StatisticsFilterType;
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self)
 
-    /** Runtime information support. */
-    itkTypeMacro(NonLocalMeansDenoisingFilter, ImageToImageFilter)
+      /** Runtime information support. */
+      itkTypeMacro(NonLocalMeansDenoisingFilter, ImageToImageFilter)
 
-    typedef typename Superclass::InputImageType InputImageType;
+      typedef typename Superclass::InputImageType InputImageType;
     typedef typename Superclass::OutputImageType OutputImageType;
     typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
 
-    itkSetMacro( B_value, double )
-    itkSetMacro( GradientDirections, GradientContainerType )
-
-    itkSetMacro( H, unsigned int)
     void SetNRadius(unsigned int n);
     void SetVRadius(unsigned int v);
+    //void SetProgressbar(
 
-    protected:
-        NonLocalMeansDenoisingFilter();
+  protected:
+    NonLocalMeansDenoisingFilter();
     ~NonLocalMeansDenoisingFilter() {}
     void PrintSelf(std::ostream& os, Indent indent) const;
 
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType);
 
-    double    m_B_value;
-    GradientContainerType m_GradientDirections;
-
     typename NeighborhoodIterator < VectorImage < TInPixelType, 3 > >::RadiusType m_V_Radius;
     typename NeighborhoodIterator < VectorImage < TInPixelType, 3 > >::RadiusType m_N_Radius;
-    unsigned double m_H;
-};
+    itk::VariableLengthVector < double > deviations;
 
+    unsigned long m_Pixels;
+  };
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION

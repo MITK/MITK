@@ -24,10 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#include "itkImageRegionConstIterator.h"
-#include "itkImageRegionConstIteratorWithIndex.h"
 #include "itkImageRegionIterator.h"
 #include "itkNeighborhoodIterator.h"
+#include <boost/progress.hpp>
 
 
 namespace itk {
@@ -37,7 +36,7 @@ template< class TInPixelType, class TOutPixelType >
 NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
 ::NonLocalMeansDenoisingFilter()
 {
-    this->SetNumberOfRequiredInputs( 1 );
+  this->SetNumberOfRequiredInputs( 1 );
 }
 
 template< class TInPixelType, class TOutPixelType >
@@ -45,12 +44,28 @@ void
 NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
 ::BeforeThreadedGenerateData()
 {
-    typename OutputImageType::Pointer outputImage =
-            static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
-    typename OutputImageType::PixelType px;
-    px.SetSize(1);
-    px.SetElement(0,0);
-    outputImage->FillBuffer(px);
+  typename OutputImageType::Pointer outputImage =
+          static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+  typename OutputImageType::PixelType px;
+  px.SetSize(1);
+  px.SetElement(0,0);
+  outputImage->FillBuffer(px);
+
+  InputImageType::Pointer inImage = static_cast < InputImageType* > (this->ProcessObject::GetInput(0));
+  int size = inImage->GetVectorLength();
+  deviations.SetSize(size);
+  imageExtractorType::Pointer extractor = imageExtractorType::New();
+  extractor->SetInput(inImage);
+  for ( int i = 0; i < size; ++i)
+  {
+    extractor->SetIndex(i);
+    extractor->Update();
+    StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
+    statisticsFilter->SetInput(extractor->GetOutput());
+    statisticsFilter->Update();
+    deviations.SetElement(i, statisticsFilter->GetSigma());
+  }
+  m_Pixels = 0;
 }
 
 template< class TInPixelType, class TOutPixelType >
@@ -58,64 +73,72 @@ void
 NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType )
 {
-    typename OutputImageType::Pointer outputImage =
-            static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+  typename OutputImageType::Pointer outputImage =
+          static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 
-    ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
-    oit.GoToBegin();
+  ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
+  oit.GoToBegin();
 
-    typedef ConstNeighborhoodIterator <InputImageType> InputIteratorType;
-    typename InputImageType::Pointer inputImagePointer = NULL;
-    inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
+  typedef ConstNeighborhoodIterator <InputImageType> InputIteratorType;
+  typename InputImageType::Pointer inputImagePointer = NULL;
+  inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
 
-    InputIteratorType git(m_V_Radius, inputImagePointer, outputRegionForThread );
-    InputIteratorType njit(m_N_Radius, inputImagePointer, outputRegionForThread );
-    InputIteratorType niit(m_N_Radius, inputImagePointer, outputRegionForThread );
-    git.GoToBegin();
-    while( !git.IsAtEnd() )
+  InputIteratorType git(m_V_Radius, inputImagePointer, outputRegionForThread );
+  InputIteratorType njit(m_N_Radius, inputImagePointer, outputRegionForThread );
+  InputIteratorType niit(m_N_Radius, inputImagePointer, outputRegionForThread );
+  git.GoToBegin();
+  while( !git.IsAtEnd() )
+  {
+    typename OutputImageType::PixelType outpix;
+    outpix.SetSize (inputImagePointer->GetVectorLength());
+
+    for (int i = 0; i < inputImagePointer->GetVectorLength(); ++i)
     {
-      typename OutputImageType::PixelType outpix;
-      outpix.SetSize (inputImagePointer->GetVectorLength());
-
-      for (int i = 0; i < inputImagePointer->GetVectorLength(); ++i)
+      TInPixelType xi = git.GetCenterPixel()[i];
+      double sumj = 0;
+      double wj = 0;
+      for (int j = 0; j < git.Size(); ++j)
       {
-        TInPixelType xi = git.GetCenterPixel()[i];
-        double sumj = 0;
-        double wj = 0;
-        for (int j = 0; j < git.Size(); ++j)
+        bool isInBounds;
+        TInPixelType xj = git.GetPixel(j, isInBounds)[i];
+        /*MITK_INFO << git.GetIndex() << "; " << git.GetIndex(j);*/
+
+        if (xi == xj && git.Size()/2 != j && isInBounds)
         {
-          TInPixelType xj = git.GetPixel(j)[i];
-
-          if (xi == xj && git.Size()/2 != j)
+          niit.SetLocation(git.GetIndex());
+          njit.SetLocation(git.GetIndex(j));
+          double sumk = 0;
+          for (int k = 0; k < niit.Size(); ++k)
           {
-            niit.SetLocation(git.GetIndex());
-            njit.SetLocation(git.GetIndex(j));
-            double sumk = 0;
-            for (int k = 0; k < niit.Size(); ++k)
-            {
-              sumk += std::pow( (niit.GetPixel(k)[i] - njit.GetPixel(k)[i]), 2);
-            }
-            sumk = sumk >= 0 ? sumk : 0;
-            wj = std::exp( - ( std::sqrt( (1 / niit.Size()) * sumk) / m_H));
-            sumj += wj * std::pow(xj, 2) - 2 * std::pow(m_H, 2);
+            MITK_INFO << "Git: " << git.GetIndex() << "; " << git.GetPixel(k)[0] << " Niit: " << niit.GetIndex() << "; " << niit.GetPixel(k)[0];
+            sumk += std::pow( (niit.GetPixel(k)[i] - njit.GetPixel(k)[i]), 2);
           }
+          wj = std::exp( - ( std::sqrt( (1 / niit.Size()) * sumk) / deviations.GetElement(i)));
+          sumj += (wj * std::pow(xj, 2)) - (2 * std::pow(deviations.GetElement(i),2));
         }
-        sumj = sumj >= 0 ? sumj : 0;
-        TOutPixelType outval = xi - static_cast<TOutPixelType>(std::sqrt(sumj));
-        outpix.SetElement(i, outval);
       }
-      oit.Set(outpix);
-      ++oit;
-      ++git;
-    }
+      sumj = sumj >= 0 ? sumj : 0;
+      TOutPixelType outval = xi - static_cast<TOutPixelType>(std::sqrt(sumj));
 
-    std::cout << "One Thread finished calculation" << std::endl;
+      outpix.SetElement(i, outval);
+    }
+    oit.Set(outpix);
+    ++oit;
+    /*if (m_Pixels % 100 == 0)
+    {
+      MITK_INFO << m_Pixels << " Pixels";
+    }
+    m_Pixels++;*/
+    ++git;
+  }
+
+  MITK_INFO << "One Thread finished calculation";
 }
 
 template< class TInPixelType, class TOutPixelType >
 void NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>::PrintSelf(std::ostream& os, Indent indent) const
 {
-    Superclass::PrintSelf(os,indent);
+  Superclass::PrintSelf(os,indent);
 }
 
 template < class TInPixelType, class TOutPixelType >

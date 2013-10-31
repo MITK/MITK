@@ -125,6 +125,7 @@ if(NOT MITK_VTK_Config_INCLUDED)
     vtkViewsInfovis
     vtkzlib
     vtkGUISupportQt
+    vtkGUISupportQtWebkit
       ${VTK_JPEG_LIBRARIES}
       ${VTK_PNG_LIBRARIES}
       ${VTK_ZLIB_LIBRARIES}

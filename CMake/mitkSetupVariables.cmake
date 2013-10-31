@@ -167,6 +167,7 @@ set(VTK_FOR_MITK_LIBRARIES
     vtkViewsInfovis
     vtkzlib
     vtkGUISupportQt
+    vtkGUISupportQtWebkit
     ${VTK_JPEG_LIBRARIES}
     ${VTK_PNG_LIBRARIES}
     ${VTK_ZLIB_LIBRARIES}

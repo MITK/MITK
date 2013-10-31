@@ -74,6 +74,7 @@ if(NOT DEFINED VTK_DIR)
     CMAKE_ARGS
         ${ep_common_args}
         -DVTK_GROUP_QT:BOOL=ON
+        -DVTK_Group_Qt:BOOL=ON
         -DVTK_WRAP_TCL:BOOL=OFF
         -DVTK_WRAP_PYTHON:BOOL=OFF
         -DVTK_WRAP_JAVA:BOOL=OFF
@@ -82,6 +83,9 @@ if(NOT DEFINED VTK_DIR)
         -DVTK_LEGACY_REMOVE:BOOL=ON
         -DModule_vtkTestingRendering:BOOL=ON
         -DModule_vtkGUISupportQt:BOOL=ON
+        -DModule_vtkGUISupportQtWebkit:BOOL=ON
+        -DModule_vtkGUISupportQtSQL:BOOL=ON
+        -DModule_vtkRenderingQt:BOOL=ON
         ${additional_cmake_args}
      DEPENDS ${proj_DEPENDENCIES}
     )

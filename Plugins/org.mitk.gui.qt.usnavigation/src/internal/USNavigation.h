@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkNavigationDataSource.h>
 #include <mitkNavigationToolStorage.h>
-#include <mitkUSDevice.h>
+#include <mitkUSCombinedModality.h>
 #include <mitkNodeDisplacementFilter.h>
 #include <mitkNeedleProjectionFilter.h>
 #include <mitkNavigationDataSmoothingFilter.h>
@@ -137,9 +137,9 @@ class USNavigation : public QmitkAbstractView
 
 
     /**
-    * \brief The US-Device used for imaging.
+    * \brief The CombinedModality used for imaging.
     */
-    mitk::USDevice::Pointer m_USDevice;
+    mitk::USCombinedModality::Pointer m_USDevice;
 
     /**
     * \brief Temporary saving point for loaded calibration data.

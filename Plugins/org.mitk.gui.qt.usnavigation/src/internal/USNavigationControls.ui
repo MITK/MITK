@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="m_TabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="Devices">
       <attribute name="title">
@@ -53,35 +53,12 @@
           </font>
          </property>
          <property name="text">
-          <string>Ultrasound Device:</string>
+          <string>Combined Modalities:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QmitkServiceListWidget" name="m_USDevices" native="true">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>100</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Tracking Device:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QmitkServiceListWidget" name="m_TrackingDevices" native="true">
+        <widget class="QmitkServiceListWidget" name="m_CombinedModalitiesList" native="true">
          <property name="maximumSize">
           <size>
            <width>16777215</width>
@@ -99,7 +76,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Select Devices</string>
+          <string>Select Combined Modality</string>
          </property>
         </widget>
        </item>

@@ -57,8 +57,9 @@ void USNavigation::CreateQtPartControl( QWidget *parent )
 
   connect( m_Controls.m_BtnSelectDevices, SIGNAL(clicked()), this, SLOT(OnSelectDevices()) );
   connect( m_Controls.m_TabWidget, SIGNAL(currentChanged ( int )), this, SLOT(OnTabSwitch( int )) );
-  connect( m_Controls.m_USDevices, SIGNAL( ServiceSelectionChanged(mitk::ServiceReference) ), this, SLOT(OnClickDevices()) );
-  connect( m_Controls.m_TrackingDevices, SIGNAL( ServiceSelectionChanged(mitk::ServiceReference) ), this, SLOT(OnClickDevices()) );
+  connect( m_Controls.m_CombinedModalitiesList, SIGNAL( ServiceSelectionChanged(us::ServiceReferenceU) ), this, SLOT(OnClickDevices()) );
+  //connect( m_Controls.m_USDevices, SIGNAL( ServiceSelectionChanged(mitk::ServiceReference) ), this, SLOT(OnClickDevices()) );
+  //connect( m_Controls.m_TrackingDevices, SIGNAL( ServiceSelectionChanged(mitk::ServiceReference) ), this, SLOT(OnClickDevices()) );
   connect( m_Controls.m_BtnLoadCalibration, SIGNAL(clicked()), this, SLOT(OnLoadCalibration()) );
   // Zones
   connect( m_Controls.m_BtnFreeze, SIGNAL(clicked()), this, SLOT(OnFreeze()) );
@@ -76,8 +77,11 @@ void USNavigation::CreateQtPartControl( QWidget *parent )
   m_Freeze = false;
   m_IsNeedleViewActive = false;
 
-  m_Controls.m_USDevices->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL);
-  m_Controls.m_TrackingDevices->Initialize<mitk::NavigationDataSource>( mitk::NavigationDataSource::US_PROPKEY_DEVICENAME);
+  std::string filterOnlyCombinedModalities = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(" + mitk::USDevice::US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + "))";
+  m_Controls.m_CombinedModalitiesList->Initialize<mitk::USDevice>(mitk::USCombinedModality::US_PROPKEY_LABEL, filterOnlyCombinedModalities);
+
+  //m_Controls.m_USDevices->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL);
+  //m_Controls.m_TrackingDevices->Initialize<mitk::NavigationDataSource>( mitk::NavigationDataSource::US_PROPKEY_DEVICENAME);
   //m_Controls.m_TabWidget->setTabEnabled(1, false);
   //m_Controls.m_TabWidget->setTabEnabled(2, false);
   m_ZoneFilter = mitk::NodeDisplacementFilter::New();
@@ -94,20 +98,26 @@ void USNavigation::CreateQtPartControl( QWidget *parent )
 
 void USNavigation::OnClickDevices(){
 
-  if ( (m_Controls.m_USDevices->GetIsServiceSelected()) && (m_Controls.m_TrackingDevices->GetIsServiceSelected()) )
+  if ( m_Controls.m_CombinedModalitiesList->GetIsServiceSelected() )
     m_Controls.m_BtnSelectDevices->setEnabled(true);
   else
     m_Controls.m_BtnSelectDevices->setEnabled(false);
 }
 
 void USNavigation::OnSelectDevices(){
-  m_USDevice = m_Controls.m_USDevices->GetSelectedService<mitk::USDevice>();
+  m_USDevice = dynamic_cast<mitk::USCombinedModality*>(m_Controls.m_CombinedModalitiesList->GetSelectedService<mitk::USDevice>());
+  if (m_USDevice.IsNull())
+  {
+    MITK_WARN << "Selected device is no USCmbinedModality.";
+    return;
+  }
+
   if (! m_USDevice->GetIsActive()) m_USDevice->Activate();
 
-  m_Tracker = m_Controls.m_TrackingDevices->GetSelectedService<mitk::NavigationDataSource>();
+  m_Tracker = m_USDevice->GetNavigationDataSource();
 
-  // Set Calibration, if necessary
-  if (m_LoadedCalibration.IsNotNull()) m_USDevice->setCalibration(m_LoadedCalibration);
+  // Set Calibration, if necessary (TODO: must be done for the new calibration processing)
+  //if (m_LoadedCalibration.IsNotNull()) m_USDevice->setCalibration(m_LoadedCalibration);
 
   // Build Pipeline
   //m_SmoothingFilter->SetInput(0, m_Tracker->GetOutput());

@@ -99,11 +99,13 @@ namespace itk
     itkSetMacro( BValue, TTensorPixelType)
 
     /** Set the b0 threshold */
-    itkSetMacro( B0Threshold, float)
+    itkSetMacro( B0Threshold, double)
 
     /** Get the pseudeInverse that was calculated in the process of tensor estimation */
     itkGetMacro(PseudoInverse, vnl_matrix<double>)
 
+    /** FIXME: added by Sebastian Wirkert due to compile error otherwise. */
+    itkGetMacro(CorrectedDiffusionVolumes, ImageType::Pointer)
 
     /** Outputs the design matrix that was calculated in the process of tensor estimation */
     itkGetMacro(H, vnl_matrix<double>)
@@ -158,16 +160,16 @@ namespace itk
     void CorrectDiffusionImage(int nof,int numberb0,itk::Size<3> size,typename GradientImagesType::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,vnl_vector< double> pixel_max,vnl_vector< double> pixel_min);
 
     /** Calculte a tensor iamge from a diffusion data set*/
-    void GenerateTensorImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,double what_mask,itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer tensorImg );
+    void GenerateTensorImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,double what_mask, typename itk::Image< itk::DiffusionTensor3D<TTensorPixelType>, 3 >::Pointer tensorImg );
 
-    //void DeepCopyTensorImage(itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer tensorImg, itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer temp_tensorImg);
+    //void DeepCopyTensorImage(itk::Image< itk::DiffusionTensor3D<double>, 3 >::Pointer tensorImg, itk::Image< itk::DiffusionTensor3D<double>, 3 >::Pointer temp_tensorImg);
 
     //void DeepCopyDiffusionImage(itk::VectorImage<short, 3>::Pointer corrected_diffusion, itk::VectorImage<short, 3>::Pointer corrected_diffusion_temp,int nof);
 
 
     void TurnMask( itk::Size<3> size, itk::Image<short, 3>::Pointer mask, double previous_mask, double set_mask);
 
-    double CheckNegatives ( itk::Size<3> size, itk::Image<short, 3>::Pointer mask, itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer tensorImg );
+    double CheckNegatives ( itk::Size<3> size, itk::Image<short, 3>::Pointer mask, typename itk::Image< itk::DiffusionTensor3D<TTensorPixelType>, 3 >::Pointer tensorImg );
 
 
     /** Gradient image was specified in a single image or in multiple images */
@@ -188,7 +190,7 @@ namespace itk
 
     ImageType::Pointer                                m_CorrectedDiffusionVolumes;
 
-    float                                             m_B0Threshold;
+    double                                             m_B0Threshold;
 
 
     /** decodes what is to be done with every single voxel */

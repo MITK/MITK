@@ -71,8 +71,10 @@ message("Coverage: ${WITH_COVERAGE}, MemCheck: ${WITH_MEMCHECK}")
 #
 # Set initial cache options
 #
-set(CTEST_USE_LAUNCHERS 1)
-set(ENV{CTEST_USE_LAUNCHERS_DEFAULT} 1)
+if(${CMAKE_VERSION} VERSION_GREATER "2.8.9")
+  set(CTEST_USE_LAUNCHERS 1)
+  set(ENV{CTEST_USE_LAUNCHERS_DEFAULT} 1)
+endif()
 
 # Remove this if block after all dartclients work
 if(DEFINED ADDITIONNAL_CMAKECACHE_OPTION)

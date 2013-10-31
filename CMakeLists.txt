@@ -9,7 +9,9 @@ endif()
 #-----------------------------------------------------------------------------
 # Include ctest launchers for dashboard in case of makefile generator
 #-----------------------------------------------------------------------------
-include(CTestUseLaunchers)
+if(${CMAKE_VERSION} VERSION_GREATER "2.8.9")
+  include(CTestUseLaunchers)
+endif()
 
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified

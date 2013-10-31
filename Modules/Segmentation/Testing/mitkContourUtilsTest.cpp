@@ -56,6 +56,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     contourModel->AddVertex(p1);
     contourModel->AddVertex(p2);
     contourModel->AddVertex(p3);
+    contourModel->SetIsClosed(true);
 
     //Create Image out of nowhere
     mitk::Image::Pointer image = mitk::Image::New();
@@ -77,10 +78,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
     //write out all interesting values
-    MITK_INFO << "ContourUtils-EmptyImage/origin: " << image->GetGeometry()->GetOrigin();
-    MITK_INFO << "ContourUtils-EmptyImage/spacing: " << image->GetGeometry()->GetSpacing();
-    MITK_INFO << "ContourUtils-EmptyImage/Dimension: " << image->GetDimension();
-    if(mitk::IOUtil::SaveImage(image, "/home/lars/TestingMethodeOutput/testClassEmptyImage.mhd"))
+    MITK_INFO << "ContourUtilsTest-EmptyImage/origin: " << image->GetGeometry()->GetOrigin();
+    MITK_INFO << "ContourUtilsTest-EmptyImage/spacing: " << image->GetGeometry()->GetSpacing();
+    MITK_INFO << "ContourUtilsTest-EmptyImage/Dimension: " << image->GetDimension();
+    if(mitk::IOUtil::SaveImage(image, "/mes/TestingMethodeOutput/testClassEmptyImage.mhd"))
         MITK_INFO << "Saved Image";
 
 
@@ -91,13 +92,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
     sliceFilter->Update();
 
-    mitk::Image::Pointer sliceImage = mitk::Image::New();
-    sliceImage = sliceFilter->GetOutput();
+    mitk::Image::Pointer sliceImage(sliceFilter->GetOutput());
 
-    MITK_INFO << "ContourUtils-SliceImage/origin: " << sliceImage->GetGeometry()->GetOrigin();
-    MITK_INFO << "ContourUtils-SliceImage/spacing: " << sliceImage->GetGeometry()->GetSpacing();
-    MITK_INFO << "ContourUtils-SliceImage/Dimension: " << sliceImage->GetDimension();
-    if(mitk::IOUtil::SaveImage(sliceImage, "/home/lars/TestingMethodeOutput/testClassSliceImage.mhd"))
+    MITK_INFO << "ContourUtilsTest-SliceImage/origin: " << sliceImage->GetGeometry()->GetOrigin();
+    MITK_INFO << "ContourUtilsTest-SliceImage/spacing: " << sliceImage->GetGeometry()->GetSpacing();
+    MITK_INFO << "ContourUtilsTest-SliceImage/Dimension: " << sliceImage->GetDimension();
+    if(mitk::IOUtil::SaveImage(sliceImage, "/mes/TestingMethodeOutput/testClassSliceImage.mhd"))
         MITK_INFO << "Saved Image";
 
     //test FillContourInSlice

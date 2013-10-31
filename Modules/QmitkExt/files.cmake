@@ -100,8 +100,8 @@ set(CPP_FILES
 if( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
   set(CPP_FILES
     ${CPP_FILES}
-    QmitkVtkHistogramWidget.cpp
-    QmitkVtkLineProfileWidget.cpp
+    #QmitkVtkHistogramWidget.cpp
+    #QmitkVtkLineProfileWidget.cpp //VTK6_TODO
   )
 endif()
 
@@ -183,8 +183,8 @@ set(MOC_H_FILES
 if( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
   set(MOC_H_FILES
     ${MOC_H_FILES}
-    QmitkVtkHistogramWidget.h
-    QmitkVtkLineProfileWidget.h
+    #QmitkVtkHistogramWidget.h
+    #QmitkVtkLineProfileWidget.h //VTK6_TODO
   )
 endif()
 

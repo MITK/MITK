@@ -45,7 +45,7 @@ namespace mitk
     /**
      * Adds a new extracted contour to the list
      */
-    void AddNewContour(ContourModel::Pointer newContour, RestorePlanePositionOperation *op, int activeLabel);
+    void AddNewContour(ContourModel::Pointer newContour, RestorePlanePositionOperation *op);
 
     /**
      * Launches the interpolation method. A surface mesh is generated out of the given extracted contours.
@@ -114,16 +114,17 @@ namespace mitk
  private:
 
 //   void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
-
+   /*
    struct ContourPositionPair {
      ContourModel::Pointer contour;
      RestorePlanePositionOperation* position;
     };
-
-    typedef std::vector<ContourPositionPair> ContourPositionPairList;
+    */
+    typedef std::pair< ContourModel::Pointer, RestorePlanePositionOperation* > ContourPositionPair;
+    typedef std::vector< ContourPositionPair > ContourPositionPairList;
     typedef std::map<unsigned int, ContourPositionPairList> ContourListMap;
 
-    ContourPositionPairList::iterator m_Iterator;
+   // ContourPositionPairList::iterator m_Iterator;
 
     ReduceContourSetFilter::Pointer m_ReduceFilter;
     ComputeContourSetNormalsFilter::Pointer m_NormalsFilter;

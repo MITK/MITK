@@ -38,7 +38,12 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
   unsigned int numberOfInputs = this->GetNumberOfIndexedInputs();
   this->CreateOutputsForAllInputs(numberOfInputs);
 
-  MITK_INFO << "ComputeContourSetNormalsFilter GenerateData(): " << numberOfInputs;
+  if (numberOfInputs == 0)
+  {
+    MITK_ERROR << "No input available. Please set an input!";
+    itkExceptionMacro("mitk::ComputeContourSetNormalsFilter: No input available. Please set an input!");
+    return;
+  }
 
   //Iterating over each input
   for(unsigned int i = 0; i < numberOfInputs; i++)
@@ -290,7 +295,7 @@ mitk::Surface::Pointer mitk::ComputeContourSetNormalsFilter::GetNormalsAsSurface
 
 void mitk::ComputeContourSetNormalsFilter::SetMaxSpacing(double maxSpacing)
 {
-    m_MaxSpacing = maxSpacing;
+  m_MaxSpacing = maxSpacing;
 }
 
 void mitk::ComputeContourSetNormalsFilter::GenerateOutputInformation()
@@ -300,7 +305,6 @@ void mitk::ComputeContourSetNormalsFilter::GenerateOutputInformation()
 
 void mitk::ComputeContourSetNormalsFilter::Reset()
 {
-  MITK_INFO << "ComputeContourSetNormalsFilter Reset(): " << this->GetNumberOfIndexedInputs();
   for (unsigned int i = 0; i < this->GetNumberOfIndexedInputs(); i++)
   {
     this->PopBackInput();

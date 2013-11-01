@@ -39,6 +39,15 @@ mitk::ReduceContourSetFilter::~ReduceContourSetFilter()
 void mitk::ReduceContourSetFilter::GenerateData()
 {
   unsigned int numberOfInputs = this->GetNumberOfIndexedInputs();
+  this->CreateOutputsForAllInputs(numberOfInputs);
+
+  if (numberOfInputs == 0)
+  {
+    MITK_ERROR << "No input available. Please set an input!";
+    itkExceptionMacro("mitk::ReduceContourSetFilter: No input available. Please set an input!");
+    return;
+  }
+
   unsigned int numberOfOutputs (0);
 
   vtkSmartPointer<vtkPolyData> newPolyData;

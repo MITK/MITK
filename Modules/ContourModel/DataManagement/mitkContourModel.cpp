@@ -23,15 +23,25 @@ mitk::ContourModel::ContourModel() :
   this->InitializeEmpty();
 }
 
-
-
 mitk::ContourModel::ContourModel(const mitk::ContourModel &other) :
-m_ContourSeries(other.m_ContourSeries), m_lineInterpolation(other.m_lineInterpolation)
+m_ContourSeries(other.m_ContourSeries),
+m_lineInterpolation(other.m_lineInterpolation)
 {
   m_SelectedVertex = NULL;
 }
 
-
+itk::LightObject::Pointer mitk::ContourModel::InternalClone() const
+{
+  itk::LightObject::Pointer parent = Superclass::InternalClone();
+  Self::Pointer rval = dynamic_cast<Self *> (parent.GetPointer());
+  if (rval.IsNull())
+  {
+    mitkThrow() << " Downcast to type " << this->GetNameOfClass() << " failed.";
+  }
+  rval->m_ContourSeries= this->m_ContourSeries;
+  rval->m_lineInterpolation = this->m_lineInterpolation;
+  return parent;
+}
 
 mitk::ContourModel::~ContourModel()
 {
@@ -523,18 +533,27 @@ void mitk::ContourModel::Initialize()
 
 void mitk::ContourModel::Initialize(mitk::ContourModel &other)
 {
+  MITK_INFO << "Initialize 1";
   unsigned int numberOfTimesteps = other.GetTimeGeometry()->CountTimeSteps();
   this->InitializeTimeGeometry(numberOfTimesteps);
+
+  MITK_INFO << "Initialize 2";
 
   for(int currentTimestep = 0; currentTimestep < numberOfTimesteps; currentTimestep++)
   {
     this->m_ContourSeries.push_back(mitk::ContourElement::New());
+    MITK_INFO << "Initialize 2.5";
     this->SetIsClosed(other.IsClosed(currentTimestep),currentTimestep);
   }
 
+  MITK_INFO << "Initialize 3";
+
   m_SelectedVertex = NULL;
   this->m_lineInterpolation = other.m_lineInterpolation;
-  this->Modified();this->m_UpdateBoundingBox = true;
+  this->m_UpdateBoundingBox = true;
+
+  MITK_INFO << "Initialize 4";
+  this->Modified();
 }
 
 

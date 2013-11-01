@@ -37,7 +37,7 @@ namespace mitk
 
     itkNewMacro(ContourModelSet);
 
-    mitkCloneMacro(ContourModelSet);
+//    mitkCloneMacro(ContourModelSet);
 
     typedef std::deque<mitk::ContourModel::Pointer> ContourModelListType;
     typedef ContourModelListType::iterator ContourModelSetIterator;
@@ -128,6 +128,11 @@ namespace mitk
     ContourModelSet();
     ContourModelSet(const mitk::ContourModelSet &other);
     virtual ~ContourModelSet();
+
+    /**
+    * \brief Makes a deep copy of the current object
+    */
+    virtual LightObject::Pointer InternalClone() const;
 
     //inherit from BaseData. Initial state with no contours and a single timestep.
     virtual void InitializeEmpty();

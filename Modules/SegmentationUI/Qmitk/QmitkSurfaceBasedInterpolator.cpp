@@ -360,7 +360,7 @@ void QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationInfoChanged(const itk:
   {
     if (m_Watcher.isRunning())
       m_Watcher.waitForFinished();
-    MITK_INFO << "OnSurfaceInterpolationInfoChanged entered!";
+
     m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolator::OnRunInterpolation);
     m_Watcher.setFuture(m_Future);
   }

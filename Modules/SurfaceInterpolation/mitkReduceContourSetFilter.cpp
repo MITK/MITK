@@ -39,7 +39,7 @@ mitk::ReduceContourSetFilter::~ReduceContourSetFilter()
 void mitk::ReduceContourSetFilter::GenerateData()
 {
   unsigned int numberOfInputs = this->GetNumberOfIndexedInputs();
-  this->CreateOutputsForAllInputs(numberOfInputs);
+//  this->CreateOutputsForAllInputs(numberOfInputs);
 
   if (numberOfInputs == 0)
   {

@@ -36,7 +36,7 @@ mitk::ComputeContourSetNormalsFilter::~ComputeContourSetNormalsFilter()
 void mitk::ComputeContourSetNormalsFilter::GenerateData()
 {
   unsigned int numberOfInputs = this->GetNumberOfIndexedInputs();
-  this->CreateOutputsForAllInputs(numberOfInputs);
+  //this->CreateOutputsForAllInputs(numberOfInputs);
 
   if (numberOfInputs == 0)
   {

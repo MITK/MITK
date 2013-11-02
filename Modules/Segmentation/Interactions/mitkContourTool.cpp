@@ -150,21 +150,6 @@ bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* state
   ContourModel* feedbackContour = mitk::FeedbackContourTool::GetFeedbackContour();
   assert(feedbackContour);
 
-  if (m_3DInterpolationEnabled)
-  {
-    if ( feedbackContour->GetNumberOfVertices() > 0 )
-    {
-      unsigned int pos = this->AddContourmarker(positionEvent);
-      us::ServiceReference<PlanePositionManagerService> serviceRef = us::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
-      PlanePositionManagerService* service = us::GetModuleContext()->GetService(serviceRef);
-      mitk::SurfaceInterpolationController* interpolator = mitk::SurfaceInterpolationController::GetInstance();
-      if (interpolator)
-      {
-        interpolator->AddNewContour( feedbackContour, service->GetPlanePosition(pos), workingImage->GetActiveLabelIndex() );
-      }
-    }
-  }
-
   // 4. Project it into the extracted plane
   ContourModel::Pointer projectedContour = ContourModel::New();
   const mitk::Geometry3D* sliceGeometry = slice->GetGeometry();

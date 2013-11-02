@@ -54,32 +54,16 @@ mitk::SurfaceInterpolationController::~SurfaceInterpolationController()
     }
     m_MapOfContourLists.erase(it);
   }
-
-/*
-  //Removing all observers
-  std::map<mitk::Image*, unsigned long>::iterator dataIter = m_SegmentationObserverTags.begin();
-  for (; dataIter != m_SegmentationObserverTags.end(); ++dataIter )
-  {
-    (*dataIter).first->GetProperty("visible")->RemoveObserver( (*dataIter).second );
-  }
-  m_SegmentationObserverTags.clear();
-*/
 }
 
 void mitk::SurfaceInterpolationController::Initialize()
 {
-  m_ReduceFilter = ReduceContourSetFilter::New();
-  m_NormalsFilter = ComputeContourSetNormalsFilter::New();
   m_InterpolateSurfaceFilter = CreateDistanceImageFromSurfaceFilter::New();
-
-  m_ReduceFilter->SetUseProgressBar(false);
-  m_NormalsFilter->SetUseProgressBar(false);
   m_InterpolateSurfaceFilter->SetUseProgressBar(false);
 
   m_Contours = Surface::New();
 
   m_InterpolationResult = NULL;
-  m_CurrentNumberOfReducedContours = 0;
 }
 
 mitk::SurfaceInterpolationController* mitk::SurfaceInterpolationController::GetInstance()
@@ -125,67 +109,31 @@ void mitk::SurfaceInterpolationController::AddNewContour(mitk::ContourModel::Poi
     }
   }
 
-  mitk::ContourModelToSurfaceFilter::Pointer converter = mitk::ContourModelToSurfaceFilter::New();
-  converter->SetInput(newContour);
-  converter->Update();
-
-  mitk::Surface::Pointer surface = converter->GetOutput();
-  surface->DisconnectPipeline();
-
-  //Don't save a new empty contour
-  if (pos == -1 && newContour->GetNumberOfVertices() > 0)
+  if (pos == -1 && newContour->GetNumberOfVertices() > 0) // add a new contour
   {
     mitk::RestorePlanePositionOperation* newOp = new mitk::RestorePlanePositionOperation (OpRESTOREPLANEPOSITION, op->GetWidth(),
       op->GetHeight(), op->GetSpacing(), op->GetPos(), direction, transform);
     ContourPositionPair newData = std::make_pair(newContour,newOp);
-    m_ReduceFilter->SetInput(m_MapOfContourLists[m_ActiveLabel].size(), surface);
     m_MapOfContourLists[m_ActiveLabel].push_back(newData);
   }
-  //Edit an existing contour. If the contour is empty, edit it anyway so that the interpolation will always be consistent
-  else if (pos != -1)
+  else if (pos != -1) // replace existing contour
   {
     m_MapOfContourLists[m_ActiveLabel].at(pos).first = newContour;
-    m_ReduceFilter->SetInput(pos, surface);
-  }
-
-  m_ReduceFilter->Update();
-  m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
-
-  for (unsigned int i=0; i < m_CurrentNumberOfReducedContours; i++)
-  {
-    m_NormalsFilter->SetInput(i, m_ReduceFilter->GetOutput(i));
-    m_InterpolateSurfaceFilter->SetInput(i, m_NormalsFilter->GetOutput(i));
   }
 
   this->Modified();
-
 }
 
 void mitk::SurfaceInterpolationController::Interpolate()
 {
-  if (m_CurrentNumberOfReducedContours < 2)
+  if (m_MapOfContourLists[m_ActiveLabel].size() < 2)
   {
     //If no interpolation is possible reset the interpolation result
     m_InterpolationResult = NULL;
     return;
   }
 
-  m_ReduceFilter->SetMinSpacing(m_MinSpacing);
-  m_ReduceFilter->SetMaxSpacing(m_MaxSpacing);
-  m_NormalsFilter->SetMaxSpacing(m_MaxSpacing);
-
-  m_ReduceFilter->Update();
-
-  m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfInputs();
-
-  m_NormalsFilter->SetWorkingImage(m_WorkingImage, m_ActiveLabel);
-
-  for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
-  {
-    m_NormalsFilter->SetInput(i, m_ReduceFilter->GetOutput(i));
-  }
-
-  m_NormalsFilter->Update();
+  m_InterpolateSurfaceFilter->Reset();
 
   // update the filter and get the resulting distance-image
   m_InterpolateSurfaceFilter->SetDistanceImageVolume(m_DistanceImageVolume);
@@ -194,12 +142,40 @@ void mitk::SurfaceInterpolationController::Interpolate()
   AccessFixedDimensionByItk_1( m_WorkingImage, GetImageBase, 3, itkImage );
   m_InterpolateSurfaceFilter->SetReferenceImage( itkImage.GetPointer() );
 
-  for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
+  //CreateDistanceImageFromSurfaceFilter::Pointer interpolateSurfaceFilter = CreateDistanceImageFromSurfaceFilter::New();
+  vtkSmartPointer<vtkAppendPolyData> polyDataAppender = vtkSmartPointer<vtkAppendPolyData>::New();
+
+  for (unsigned int i = 0; i < m_MapOfContourLists[m_ActiveLabel].size(); i++)
   {
-    m_InterpolateSurfaceFilter->SetInput(i, m_NormalsFilter->GetOutput(i));
+    mitk::ContourModelToSurfaceFilter::Pointer converter = mitk::ContourModelToSurfaceFilter::New();
+    converter->SetInput(m_MapOfContourLists[m_ActiveLabel].at(i).first);
+    converter->Update();
+
+    mitk::Surface::Pointer surface = converter->GetOutput();
+    surface->DisconnectPipeline();
+
+    ReduceContourSetFilter::Pointer reduceFilter = ReduceContourSetFilter::New();
+    reduceFilter->SetUseProgressBar(false);
+    reduceFilter->SetInput(surface);
+    reduceFilter->SetMinSpacing(m_MinSpacing);
+    reduceFilter->SetMaxSpacing(m_MaxSpacing);
+    reduceFilter->Update();
+
+    ComputeContourSetNormalsFilter::Pointer normalsFilter = ComputeContourSetNormalsFilter::New();
+    normalsFilter->SetUseProgressBar(false);
+    normalsFilter->SetInput(reduceFilter->GetOutput());
+    normalsFilter->SetMaxSpacing(m_MaxSpacing);
+    normalsFilter->SetWorkingImage(m_WorkingImage, m_ActiveLabel);
+    normalsFilter->Update();
+
+    m_InterpolateSurfaceFilter->SetInput(i, normalsFilter->GetOutput());
+
+    polyDataAppender->AddInput(reduceFilter->GetOutput()->GetVtkPolyData());
   }
 
-  m_NormalsFilter->Update();
+  polyDataAppender->Update();
+  m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());
+
 
   m_InterpolateSurfaceFilter->Update();
 
@@ -212,14 +188,6 @@ void mitk::SurfaceInterpolationController::Interpolate()
   imageToSurfaceFilter->Update();
   m_InterpolationResult = imageToSurfaceFilter->GetOutput();
   m_InterpolationResult->DisconnectPipeline();
-
-  vtkSmartPointer<vtkAppendPolyData> polyDataAppender = vtkSmartPointer<vtkAppendPolyData>::New();
-  for (unsigned int i = 0; i < m_ReduceFilter->GetNumberOfOutputs(); i++)
-  {
-    polyDataAppender->AddInput(m_ReduceFilter->GetOutput(i)->GetVtkPolyData());
-  }
-  polyDataAppender->Update();
-  m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());
 }
 
 mitk::Surface::Pointer mitk::SurfaceInterpolationController::GetInterpolationResult()
@@ -259,8 +227,13 @@ mitk::Image* mitk::SurfaceInterpolationController::GetImage()
 
 double mitk::SurfaceInterpolationController::EstimatePortionOfNeededMemory()
 {
-  double numberOfPointsAfterReduction = m_ReduceFilter->GetNumberOfPointsAfterReduction()*3;
-  double sizeOfPoints = pow(numberOfPointsAfterReduction,2)*sizeof(double);
+  double numberOfPoints = 0.0;
+  for (unsigned int i = 0; i < m_MapOfContourLists[m_ActiveLabel].size(); i++)
+  {
+    numberOfPoints += m_MapOfContourLists[m_ActiveLabel].at(i).first->GetNumberOfVertices()*3;
+  }
+
+  double sizeOfPoints = pow(numberOfPoints,2)*sizeof(double);
   double totalMem = mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam();
   double percentage = sizeOfPoints/totalMem;
   return percentage;
@@ -282,10 +255,6 @@ void mitk::SurfaceInterpolationController::SetActiveLabel(int activeLabel)
 
   m_ActiveLabel = activeLabel;
 
-  m_ReduceFilter->Reset();
-  m_NormalsFilter->Reset();
-  m_InterpolateSurfaceFilter->Reset();
-
   ContourListMap::iterator it = m_MapOfContourLists.find(m_ActiveLabel);
 
   if (it == m_MapOfContourLists.end())
@@ -293,21 +262,6 @@ void mitk::SurfaceInterpolationController::SetActiveLabel(int activeLabel)
     ContourPositionPairList newList;
     m_MapOfContourLists.insert(std::pair<unsigned int, ContourPositionPairList>(m_ActiveLabel, newList));
     m_InterpolationResult = NULL;
-    m_CurrentNumberOfReducedContours = 0;
-  }
-  else
-  {
-    m_CurrentNumberOfReducedContours = m_MapOfContourLists[m_ActiveLabel].size();
-
-    for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
-    {
-      mitk::ContourModelToSurfaceFilter::Pointer converter = mitk::ContourModelToSurfaceFilter::New();
-      converter->SetInput( m_MapOfContourLists[m_ActiveLabel].at(i).first );
-      converter->Update();
-      mitk::Surface::Pointer surface = converter->GetOutput();
-      surface->DisconnectPipeline();
-      m_ReduceFilter->SetInput(i, surface);
-    }
   }
 
   this->Modified();
@@ -327,6 +281,7 @@ void mitk::SurfaceInterpolationController::RemoveSegmentationFromContourList(mit
   }
 }
 */
+
 /*
 void mitk::SurfaceInterpolationController::OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event)
 {

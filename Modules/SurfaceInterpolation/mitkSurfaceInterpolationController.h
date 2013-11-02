@@ -94,11 +94,11 @@ namespace mitk
 
    mitk::Image* GetImage();
 
-    /**
-     * Estimates the memory that is needed to build up the equation system for the interpolation.
-     * \returns The percentage of the real memory which will be used by the interpolation calculation
-     */
-    double EstimatePortionOfNeededMemory();
+   /**
+    * Estimates the memory that is needed to build up the equation system for the interpolation.
+    * \returns The percentage of the real memory which will be used by the interpolation calculation
+    */
+   double EstimatePortionOfNeededMemory();
 
  protected:
 
@@ -124,10 +124,8 @@ namespace mitk
     typedef std::vector< ContourPositionPair > ContourPositionPairList;
     typedef std::map<unsigned int, ContourPositionPairList> ContourListMap;
 
-   // ContourPositionPairList::iterator m_Iterator;
-
-    ReduceContourSetFilter::Pointer m_ReduceFilter;
-    ComputeContourSetNormalsFilter::Pointer m_NormalsFilter;
+    //ReduceContourSetFilter::Pointer m_ReduceFilter;
+    //ComputeContourSetNormalsFilter::Pointer m_NormalsFilter;
     CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter;
 
     double m_MinSpacing;
@@ -147,7 +145,7 @@ namespace mitk
 
     mitk::Surface::Pointer m_InterpolationResult;
 
-    unsigned int m_CurrentNumberOfReducedContours;
+//    unsigned int m_CurrentNumberOfReducedContours;
 
     int m_ActiveLabel;
 

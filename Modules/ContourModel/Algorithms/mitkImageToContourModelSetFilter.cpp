@@ -76,10 +76,10 @@ void mitk::ImageToContourModelSetFilter::ExtractContoursITKProcessing (itk::Imag
 
   typename ContourExtractorType::Pointer contourExtractor = ContourExtractorType::New();
   contourExtractor->SetInput(sliceImage);
-  contourExtractor->SetContourValue(0.5);
+  contourExtractor->SetContourValue(m_ContourValue-0.5);
   contourExtractor->Update();
 
-  unsigned int foundPaths = contourExtractor->GetNumberOfOutputs();
+  unsigned int foundPaths = contourExtractor->GetNumberOfIndexedOutputs();
 
   //
   // set the number of outputs to the number of paths found

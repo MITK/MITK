@@ -55,6 +55,7 @@ namespace mitk {
    */
    itkSetMacro(SliceGeometry, Geometry3D*);
 
+   itkSetMacro(ContourValue, double);
    /**
      \brief Set whether the mitkProgressBar should be used
 
@@ -73,6 +74,8 @@ namespace mitk {
    const Geometry3D* m_SliceGeometry;
    bool m_UseProgressBar;
    unsigned int m_ProgressStepSize;
+
+   double m_ContourValue;
 
    template<typename TPixel, unsigned int VImageDimension>
    void ExtractContoursITKProcessing (itk::Image<TPixel, VImageDimension>* sliceImage);

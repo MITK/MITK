@@ -2,6 +2,8 @@
 set(CPP_FILES
   Qmitk/QmitkUSZonesDataModel.cpp
   Qmitk/QmitkUSCombinedModalityManagerWidget.cpp
+  Qmitk/QmitkUSZoneManagementComboBoxDelegate.cpp
+  Qmitk/QmitkUSZoneManagementSliderDelegate.cpp
   Qmitk/QmitkUSZoneManagementWidget.cpp
 )
 set(UI_FILES
@@ -12,6 +14,8 @@ set(UI_FILES
 set(MOC_H_FILES
   Qmitk/QmitkUSZonesDataModel.h
   Qmitk/QmitkUSCombinedModalityManagerWidget.h
+  Qmitk/QmitkUSZoneManagementComboBoxDelegate.h
+  Qmitk/QmitkUSZoneManagementSliderDelegate.h
   Qmitk/QmitkUSZoneManagementWidget.h
 )
 

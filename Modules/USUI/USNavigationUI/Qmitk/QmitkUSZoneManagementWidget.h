@@ -2,21 +2,38 @@
 #define QMITKUSZONEMANAGEMENTWIDGET_H
 
 #include <QWidget>
+#include "MitkUSNavigationUIExports.h"
+#include "mitkDataStorage.h"
 
 namespace Ui {
 class QmitkUSZoneManagementWidget;
 }
 
-class QmitkUSZoneManagementWidget : public QWidget
+class QmitkUSZonesDataModel;
+class QItemSelection;
+
+class MitkUSNavigationUI_EXPORT QmitkUSZoneManagementWidget : public QWidget
 {
   Q_OBJECT
+
+public slots:
+  void AddRow();
+  void RemoveSelectedRows();
+
+protected slots:
+  void OnSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
 
 public:
   explicit QmitkUSZoneManagementWidget(QWidget *parent = 0);
   ~QmitkUSZoneManagementWidget();
 
+  void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
+
+protected:
+    QmitkUSZonesDataModel* m_ZonesDataModel;
+
 private:
-  Ui::QmitkUSZoneManagementWidget *ui;
+  Ui::QmitkUSZoneManagementWidget* ui;
 };
 
 #endif // QMITKUSZONEMANAGEMENTWIDGET_H

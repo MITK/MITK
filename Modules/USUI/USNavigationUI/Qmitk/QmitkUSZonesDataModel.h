@@ -19,6 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkCommon.h>
 #include <mitkDataNode.h>
+#include <mitkDataStorage.h>
+#include <mitkVector.h>
+#include <mitkSurface.h>
+
 #include <QAbstractTableModel>
 
 class QmitkUSZonesDataModel : public QAbstractTableModel
@@ -30,7 +34,12 @@ signals:
 public slots:
 
 public:
+  typedef std::vector<mitk::DataNode::Pointer> DataNodeVector;
+
   explicit QmitkUSZonesDataModel(QObject *parent = 0);
+
+  void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
+  void AddNode(mitk::Point3D center);
 
   virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
   virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
@@ -44,7 +53,12 @@ public:
   virtual bool removeRows ( int row, int count, const QModelIndex & parent = QModelIndex() );
 
 protected:
-  std::vector<mitk::DataNode::Pointer> m_ZoneNodes;
+  mitk::Surface::Pointer MakeSphere(const mitk::DataNode::Pointer dataNode) const;
+
+  DataNodeVector m_ZoneNodes;
+
+  mitk::DataStorage::Pointer m_DataStorage;
+  mitk::DataNode::Pointer m_BaseNode;
 };
 
 #endif // QMITKUSZONESDATAMODEL_H

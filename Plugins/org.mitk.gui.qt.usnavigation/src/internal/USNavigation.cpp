@@ -36,6 +36,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QBoxLayout>
 #include <QShortcut>
 
+
+#include "mitkStandaloneDataStorage.h"
+
 const std::string USNavigation::VIEW_ID = "org.mitk.views.usnavigation";
 
 
@@ -51,6 +54,8 @@ void USNavigation::CreateQtPartControl( QWidget *parent )
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
 
+  m_Controls.m_ZonesWidget->SetDataStorage(this->GetDataStorage());
+
   // Timer
   connect( m_Timer, SIGNAL(timeout()), this, SLOT(Update()));
   connect( m_RangeMeterTimer, SIGNAL(timeout()), this, SLOT(UpdateMeters()));
@@ -58,8 +63,6 @@ void USNavigation::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_BtnSelectDevices, SIGNAL(clicked()), this, SLOT(OnSelectDevices()) );
   connect( m_Controls.m_TabWidget, SIGNAL(currentChanged ( int )), this, SLOT(OnTabSwitch( int )) );
   connect( m_Controls.m_CombinedModalitiesList, SIGNAL( ServiceSelectionChanged(us::ServiceReferenceU) ), this, SLOT(OnClickDevices()) );
-  //connect( m_Controls.m_USDevices, SIGNAL( ServiceSelectionChanged(mitk::ServiceReference) ), this, SLOT(OnClickDevices()) );
-  //connect( m_Controls.m_TrackingDevices, SIGNAL( ServiceSelectionChanged(mitk::ServiceReference) ), this, SLOT(OnClickDevices()) );
   connect( m_Controls.m_BtnLoadCalibration, SIGNAL(clicked()), this, SLOT(OnLoadCalibration()) );
   // Zones
   connect( m_Controls.m_BtnFreeze, SIGNAL(clicked()), this, SLOT(OnFreeze()) );
@@ -71,7 +74,6 @@ void USNavigation::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_BtnStartIntervention, SIGNAL(clicked ()), this, SLOT(OnStartIntervention()) );
   connect( m_Controls.m_BtnReset, SIGNAL(clicked ()), this, SLOT(OnReset()) );
   connect( m_Controls.m_BtnNeedleView, SIGNAL(clicked ()), this, SLOT(OnNeedleViewToogle()) );
-
 
 
   m_Freeze = false;
@@ -229,7 +231,7 @@ void USNavigation::OnAddZone()
   mitk::Point3D target = this->GetRenderWindowPart()->GetSelectedPosition();
   mitk::DataNode::Pointer node = mitk::DataNode::New();
 
-  FormatZoneNode(node, target);
+  this->FormatZoneNode(node, target);
 
   this->GetDataStorage()->Add(node);
   m_Zones.push_back(node);
@@ -438,7 +440,7 @@ void USNavigation::UpdateMeters()
 void USNavigation::OnStartIntervention()
 {
   this->m_Controls.m_TabWidget->setCurrentIndex(2);
-  SetupProximityView();
+  this->SetupProximityView();
 }
 
 void USNavigation::OnFreeze()

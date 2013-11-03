@@ -29,7 +29,14 @@
     </widget>
    </item>
    <item>
-    <widget class="QTableView" name="CurrentZonesTable"/>
+    <widget class="QTableView" name="CurrentZonesTable">
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -39,7 +46,7 @@
         <string>&amp;Add</string>
        </property>
        <property name="icon">
-        <iconset resource="../resources/USNavigationUI.qrc">
+        <iconset>
          <normaloff>:/USNavigationUI/112.png</normaloff>:/USNavigationUI/112.png</iconset>
        </property>
       </widget>
@@ -53,7 +60,7 @@
         <string>&amp;Delete</string>
        </property>
        <property name="icon">
-        <iconset resource="../resources/USNavigationUI.qrc">
+        <iconset>
          <normaloff>:/USNavigationUI/117.png</normaloff>:/USNavigationUI/117.png</iconset>
        </property>
       </widget>
@@ -62,8 +69,43 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../resources/USNavigationUI.qrc"/>
- </resources>
- <connections/>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>AddZoneButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkUSZoneManagementWidget</receiver>
+   <slot>AddRow()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>83</x>
+     <y>474</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>164</x>
+     <y>245</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>DeleteZoneButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkUSZoneManagementWidget</receiver>
+   <slot>RemoveSelectedRows()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>245</x>
+     <y>474</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>164</x>
+     <y>245</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>AddRow()</slot>
+  <slot>RemoveSelectedRows()</slot>
+ </slots>
 </ui>

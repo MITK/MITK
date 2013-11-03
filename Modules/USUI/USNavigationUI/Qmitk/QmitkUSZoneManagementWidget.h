@@ -5,6 +5,14 @@
 #include "MitkUSNavigationUIExports.h"
 #include "mitkDataStorage.h"
 
+namespace itk {
+  template<class T> class SmartPointer;
+}
+
+namespace mitk {
+  class USZonesInteractor;
+}
+
 namespace Ui {
 class QmitkUSZoneManagementWidget;
 }
@@ -31,6 +39,8 @@ public:
 
 protected:
     QmitkUSZonesDataModel* m_ZonesDataModel;
+
+    itk::SmartPointer<mitk::USZonesInteractor> m_Interactor;
 
 private:
   Ui::QmitkUSZoneManagementWidget* ui;

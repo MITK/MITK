@@ -38,7 +38,7 @@ public:
 
   explicit QmitkUSZonesDataModel(QObject *parent = 0);
 
-  void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
+  void SetDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::DataNode::Pointer baseNode);
   void AddNode(mitk::Point3D center);
 
   virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;

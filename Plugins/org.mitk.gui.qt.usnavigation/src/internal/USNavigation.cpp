@@ -36,9 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QBoxLayout>
 #include <QShortcut>
 
-
-#include "mitkStandaloneDataStorage.h"
-
 const std::string USNavigation::VIEW_ID = "org.mitk.views.usnavigation";
 
 
@@ -49,6 +46,7 @@ void USNavigation::SetFocus()
 
 void USNavigation::CreateQtPartControl( QWidget *parent )
 {
+
   m_Timer = new QTimer(this);
   m_RangeMeterTimer = new QTimer(this);
   // create GUI widgets from the Qt Designer's .ui file

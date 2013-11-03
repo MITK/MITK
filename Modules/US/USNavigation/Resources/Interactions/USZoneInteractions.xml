@@ -1,0 +1,20 @@
+<statemachine>
+  <state name="start" startstate="true">
+      <!--<transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="radius">-->
+      <transition event_class="MousePressEvent" target="radius">
+        <action name="addCenter"/>
+    </transition>
+  </state>
+  <state name="radius">
+    <transition event_class="MouseMoveEvent" target="radius">
+      <action name="changeRadius"/>
+    </transition>
+    <!--<transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="final">-->
+    <transition event_class="MousePressEvent" target="start">
+      <action name="endCreation"/>
+    </transition>
+  </state>
+   <state name="final">
+     <!-- dead state, nothing happens any more, once we reached this -->
+   </state>
+</statemachine>

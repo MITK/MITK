@@ -5,6 +5,11 @@
 #include "QmitkUSZoneManagementSliderDelegate.h"
 #include "QmitkUSZoneManagementComboBoxDelegate.h"
 
+#include "mitkUSZonesInteractor.h"
+#include "usModuleRegistry.h"
+#include "usModule.h"
+#include "mitkGlobalInteraction.h"
+
 QmitkUSZoneManagementWidget::QmitkUSZoneManagementWidget(QWidget *parent) :
     QWidget(parent), m_ZonesDataModel(new QmitkUSZonesDataModel(this)),
     ui(new Ui::QmitkUSZoneManagementWidget)
@@ -26,7 +31,19 @@ QmitkUSZoneManagementWidget::~QmitkUSZoneManagementWidget()
 
 void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
 {
-  m_ZonesDataModel->SetDataStorage(dataStorage);
+  mitk::DataNode::Pointer baseNode = mitk::DataNode::New();
+  baseNode->SetName("Zones");
+  baseNode->SetData(mitk::Surface::New());
+  dataStorage->Add(baseNode);
+
+  m_ZonesDataModel->SetDataStorage(dataStorage, baseNode);
+
+  m_Interactor = mitk::USZonesInteractor::New(dataStorage, baseNode);
+  m_Interactor->LoadStateMachine("USZoneInteractions.xml", us::ModuleRegistry::GetModule("MitkUSNavigation"));
+  m_Interactor->SetDataNode(baseNode);
+
+
+  //  mitk::BaseRenderer::GetInstance()
 }
 
 void QmitkUSZoneManagementWidget::AddRow()

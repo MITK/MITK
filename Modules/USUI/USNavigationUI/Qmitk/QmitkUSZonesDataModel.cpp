@@ -27,14 +27,10 @@ QmitkUSZonesDataModel::QmitkUSZonesDataModel(QObject *parent) :
 {
 }
 
-void QmitkUSZonesDataModel::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
+void QmitkUSZonesDataModel::SetDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::DataNode::Pointer baseNode)
 {
   m_DataStorage = dataStorage;
-
-  m_BaseNode = mitk::DataNode::New();
-  m_BaseNode->SetName("Zones");
-  m_BaseNode->SetData(mitk::Surface::New());
-  m_DataStorage->Add(m_BaseNode);
+  m_BaseNode = baseNode;
 }
 
 void QmitkUSZonesDataModel::AddNode(mitk::Point3D center)

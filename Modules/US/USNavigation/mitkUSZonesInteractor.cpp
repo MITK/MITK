@@ -22,8 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "vtkSphereSource.h"
 
-mitk::USZonesInteractor::USZonesInteractor(mitk::DataStorage::Pointer dataStorage, mitk::DataNode::Pointer baseNode)
-  : m_DataStorage(dataStorage), m_BaseNode(baseNode)
+mitk::USZonesInteractor::USZonesInteractor()
 {
 }
 
@@ -40,7 +39,10 @@ void mitk::USZonesInteractor::ConnectActionsAndFunctions()
 
 void mitk::USZonesInteractor::DataNodeChanged()
 {
-
+  if ( this->GetDataNode()->GetData() == 0 )
+  {
+    this->GetDataNode()->SetData(mitk::Surface::New());
+  }
 }
 
 bool mitk::USZonesInteractor::AddCenter(mitk::StateMachineAction* , mitk::InteractionEvent* interactionEvent)
@@ -73,7 +75,7 @@ bool mitk::USZonesInteractor::ChangeRadius(mitk::StateMachineAction* , mitk::Int
   MITK_INFO << "Radius: " << radius;
 
   mitk::Point3D origin = curNode->GetData()->GetGeometry()->GetOrigin();
-  curNode->SetData(this->MakeSphere(curNode, radius / 5));
+  curNode->SetData(this->MakeSphere(curNode, radius));
   this->GetDataNode()->GetData()->GetGeometry()->SetOrigin(origin);
 
   // update the RenderWindow to show new points
@@ -100,4 +102,3 @@ mitk::Surface::Pointer mitk::USZonesInteractor::MakeSphere(const mitk::DataNode:
 
   return zone;
 }
-

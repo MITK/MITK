@@ -38,12 +38,8 @@ void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer data
 
   m_ZonesDataModel->SetDataStorage(dataStorage, baseNode);
 
-  m_Interactor = mitk::USZonesInteractor::New(dataStorage, baseNode);
-  m_Interactor->LoadStateMachine("USZoneInteractions.xml", us::ModuleRegistry::GetModule("MitkUSNavigation"));
-  m_Interactor->SetDataNode(baseNode);
-
-
-  //  mitk::BaseRenderer::GetInstance()
+  m_BaseNode = baseNode;
+  m_DataStorage = dataStorage;
 }
 
 void QmitkUSZoneManagementWidget::AddRow()
@@ -73,6 +69,21 @@ void QmitkUSZoneManagementWidget::RemoveSelectedRows()
   {
     m_ZonesDataModel->removeRow(i.previous().row());
   }
+}
+
+void QmitkUSZoneManagementWidget::OnStartAddingZone()
+{
+  m_Interactor = mitk::USZonesInteractor::New();
+  m_Interactor->LoadStateMachine("USZoneInteractions.xml", us::ModuleRegistry::GetModule("MitkUSNavigation"));
+  m_Interactor->SetEventConfig("globalConfig.xml");
+
+  mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
+  dataNode->SetName("Zone");
+  dataNode->SetColor(1, 0, 0);
+  m_DataStorage->Add(dataNode, m_BaseNode);
+  m_Interactor->SetDataNode(dataNode);
+
+  m_ZonesDataModel->AddNode(dataNode);
 }
 
 void QmitkUSZoneManagementWidget::OnSelectionChanged(const QItemSelection & selected, const QItemSelection & /*deselected*/)

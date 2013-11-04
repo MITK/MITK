@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSphereSource.h>
 
 #include "mitkProperties.h"
+#include "mitkRenderingManager.h"
 
 QmitkUSZonesDataModel::QmitkUSZonesDataModel(QObject *parent) :
   QAbstractTableModel(parent)
@@ -33,15 +34,10 @@ void QmitkUSZonesDataModel::SetDataStorage(mitk::DataStorage::Pointer dataStorag
   m_BaseNode = baseNode;
 }
 
-void QmitkUSZonesDataModel::AddNode(mitk::Point3D center)
+void QmitkUSZonesDataModel::AddNode(mitk::DataNode::Pointer node)
 {
-  this->insertRow(this->columnCount()-1);
-
-  mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
-  dataNode->SetData(this->MakeSphere(dataNode));
-  dataNode->GetData()->GetGeometry()->SetOrigin(center);
-
-  if (m_DataStorage.IsNotNull()) { m_DataStorage->Add(dataNode, m_BaseNode); }
+  this->insertRow(this->rowCount());
+  m_ZoneNodes.at(m_ZoneNodes.size()-1) = node;
 }
 
 int QmitkUSZonesDataModel::rowCount ( const QModelIndex& /*parent*/ ) const
@@ -96,11 +92,11 @@ QVariant QmitkUSZonesDataModel::data ( const QModelIndex& index, int role ) cons
   {
   case Qt::BackgroundColorRole:
   {
-    std::string stringValue;
-    if ( curNode->GetStringProperty("zone.color", stringValue) && ! stringValue.empty())
+    mitk::ScalarType color[3];
+    if ( curNode->GetColor(color) )
     {
-      QColor color(stringValue.c_str());
-      if (color.isValid()) { return QVariant(QBrush(color)); }
+      QColor qColor(color[0] * 255, color[1] * 255, color[2] * 255);
+      if (qColor.isValid()) { return QVariant(QBrush(qColor)); }
     }
 
     break;
@@ -123,8 +119,17 @@ QVariant QmitkUSZonesDataModel::data ( const QModelIndex& index, int role ) cons
     }
     case 2:
     {
-      std::string stringValue;
-      if ( curNode->GetStringProperty("zone.color", stringValue) ) { return QString::fromStdString(stringValue); }
+      mitk::ScalarType color[3];
+      if ( curNode->GetColor(color) )
+      {
+        QColor qColor(color[0] * 255, color[1] * 255, color[2] * 255);
+
+        if (qColor == Qt::green) { return QVariant("Green"); }
+        else if (qColor == Qt::red) { return QVariant("Red"); }
+        else if (qColor == Qt::blue) { return QVariant("Blue"); }
+        else if (qColor == Qt::yellow) { return QVariant("Yellow"); }
+        else { return QVariant(QVariant::Invalid); }
+      }
       else { return QVariant(QVariant::Invalid); }
     }
     }
@@ -161,7 +166,8 @@ bool QmitkUSZonesDataModel::setData ( const QModelIndex & index, const QVariant 
     }
     case 2:
     {
-      curNode->SetStringProperty("zone.color", value.toString().toStdString().c_str());
+      QColor color(value.toString());
+      curNode->SetColor(color.redF(), color.greenF(), color.blueF());
       break;
     }
     default:
@@ -169,16 +175,10 @@ bool QmitkUSZonesDataModel::setData ( const QModelIndex & index, const QVariant 
     }
 
     emit dataChanged(index, index);
-
-    // add node to data storage if it isn't there already
-    /*if ( m_DataStorage.IsNotNull() && ! m_DataStorage->Exists(curNode) )
-    {
-      mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
-      curNode->SetData(pointSet);
-      m_DataStorage->Add(curNode, m_BaseNode);
-    }*/
-
   }
+
+  // update the RenderWindow to show new points
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return true;
 }
@@ -213,21 +213,4 @@ bool QmitkUSZonesDataModel::removeRows ( int row, int count, const QModelIndex &
   this->endRemoveRows();
 
   return true;
-}
-
-mitk::Surface::Pointer QmitkUSZonesDataModel::MakeSphere(const mitk::DataNode::Pointer dataNode) const
-{
-  int radius;
-  if ( ! dataNode->GetIntProperty("zone.size", radius) ) { radius = 5; }
-
-  mitk::Surface::Pointer zone= mitk::Surface::New();
-
-  vtkSphereSource *vtkData = vtkSphereSource::New();
-  vtkData->SetRadius( radius );
-  vtkData->SetCenter(0,0,0);
-  vtkData->Update();
-  zone->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
-
-  return zone;
 }

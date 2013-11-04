@@ -27,6 +27,7 @@ class MitkUSNavigationUI_EXPORT QmitkUSZoneManagementWidget : public QWidget
 public slots:
   void AddRow();
   void RemoveSelectedRows();
+  void OnStartAddingZone();
 
 protected slots:
   void OnSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
@@ -41,6 +42,8 @@ protected:
     QmitkUSZonesDataModel* m_ZonesDataModel;
 
     itk::SmartPointer<mitk::USZonesInteractor> m_Interactor;
+    mitk::DataStorage::Pointer m_DataStorage;
+    mitk::DataNode::Pointer m_BaseNode;
 
 private:
   Ui::QmitkUSZoneManagementWidget* ui;

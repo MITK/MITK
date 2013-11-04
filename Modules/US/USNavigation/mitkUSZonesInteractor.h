@@ -26,7 +26,6 @@ namespace itk {
 
 namespace mitk
 {
-class DataStorage;
 class DataNode;
 class Surface;
 
@@ -34,10 +33,10 @@ class MitkUSNavigation_EXPORT USZonesInteractor : public DataInteractor
 {
 public:
   mitkClassMacro(USZonesInteractor, DataInteractor)
-  mitkNewMacro2Param(Self, itk::SmartPointer<DataStorage>, itk::SmartPointer<DataNode>)
+  itkNewMacro(Self)
 
 protected:
-  USZonesInteractor(itk::SmartPointer<DataStorage> dataStorage, itk::SmartPointer<DataNode> baseNode);
+  USZonesInteractor();
   virtual ~USZonesInteractor();
 
   virtual void ConnectActionsAndFunctions();
@@ -48,10 +47,6 @@ protected:
   bool EndCreation(StateMachineAction* , InteractionEvent*);
 
   itk::SmartPointer<Surface> MakeSphere(const  itk::SmartPointer<DataNode> dataNode, mitk::ScalarType radius) const;
-
-  itk::SmartPointer<DataStorage>  m_DataStorage;
-  itk::SmartPointer<DataNode>     m_BaseNode;
-  itk::SmartPointer<DataNode>     m_CurrentNode;
 };
 
 } // namespace mitk

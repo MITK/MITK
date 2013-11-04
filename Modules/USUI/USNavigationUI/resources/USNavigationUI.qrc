@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/USNavigationUI">
-        <file>zoom-in.png</file>
-        <file>zoom-out.png</file>
+        <file>112.png</file>
+        <file>117.png</file>
     </qresource>
 </RCC>

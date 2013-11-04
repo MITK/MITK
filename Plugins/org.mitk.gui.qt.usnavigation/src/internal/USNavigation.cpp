@@ -445,6 +445,11 @@ void USNavigation::OnFreeze()
 {
   // Swap Freeze State
   m_Freeze = ! m_Freeze;
+
+  if ( m_Freeze )
+  {
+    m_Controls.m_ZonesWidget->OnStartAddingZone();
+  }
 }
 
 void USNavigation::OnReset()

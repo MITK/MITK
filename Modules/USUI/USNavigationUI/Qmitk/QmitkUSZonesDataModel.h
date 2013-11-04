@@ -39,7 +39,7 @@ public:
   explicit QmitkUSZonesDataModel(QObject *parent = 0);
 
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::DataNode::Pointer baseNode);
-  void AddNode(mitk::Point3D center);
+  void AddNode(mitk::DataNode::Pointer);
 
   virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
   virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
@@ -53,8 +53,6 @@ public:
   virtual bool removeRows ( int row, int count, const QModelIndex & parent = QModelIndex() );
 
 protected:
-  mitk::Surface::Pointer MakeSphere(const mitk::DataNode::Pointer dataNode) const;
-
   DataNodeVector m_ZoneNodes;
 
   mitk::DataStorage::Pointer m_DataStorage;

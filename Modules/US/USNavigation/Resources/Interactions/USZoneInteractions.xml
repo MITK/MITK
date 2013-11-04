@@ -1,16 +1,15 @@
 <statemachine>
   <state name="start" startstate="true">
-      <!--<transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="radius">-->
-      <transition event_class="MousePressEvent" target="radius">
-        <action name="addCenter"/>
+    <transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="radius">
+      <!--<transition event_class="MousePressEvent" target="radius">-->
+      <action name="addCenter"/>
     </transition>
   </state>
   <state name="radius">
-    <transition event_class="MouseMoveEvent" target="radius">
+    <transition event_class="MouseMoveEvent" event_variant="StdMouseMove" target="radius">
       <action name="changeRadius"/>
     </transition>
-    <!--<transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="final">-->
-    <transition event_class="MousePressEvent" target="start">
+    <transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="final">
       <action name="endCreation"/>
     </transition>
   </state>

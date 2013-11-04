@@ -238,11 +238,15 @@ protected:
     if( m_CrossModalityRegistration )
     {
       metric = MMIMetricType::New();
+
+      // for release : use only single thread execution as the MMIMetric is not thread-safe
+      metric->SetNumberOfThreads(1);
     }
     else
     {
       metric = NCMetricType::New();
     }
+
 
 
 

@@ -65,6 +65,8 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
                 this, SLOT(OnSeriesSelectionChanged(const QStringList&)));
         connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesSelectionChanged(const QStringList&)),
                 this, SLOT(OnSeriesSelectionChanged(const QStringList&)));
+        connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesDoubleClicked(const QModelIndex&)),
+                this, SLOT(OnViewButtonClicked()));
     }
 }
 

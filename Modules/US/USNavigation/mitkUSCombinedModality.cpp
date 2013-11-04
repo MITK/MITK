@@ -25,9 +25,14 @@ mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, Navigat
   m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New()), m_DelayFilter(mitk::NavigationDataDelayFilter::New(0))
 {
   // build tracking filter pipeline
-  m_SmoothingFilter->SetInput(0, m_TrackingDevice->GetOutput());
+  for (int i = 0; i < m_TrackingDevice->GetNumberOfOutputs(); i++)
+  {
+    m_SmoothingFilter->SetInput(i, m_TrackingDevice->GetOutput(i));
+    mitk::NavigationData::Pointer nd1 = m_TrackingDevice->GetOutput(i);
+    m_DelayFilter->SetInput(i, m_SmoothingFilter->GetOutput(i));
+    mitk::NavigationData::Pointer nd2 = m_SmoothingFilter->GetOutput(i);
+  }
   m_SmoothingFilter->SetNumerOfValues(10);
-  //m_ZoneFilter->SetInput(0, m_SmoothingFilter->GetOutput(0));
 }
 
 mitk::USCombinedModality::~USCombinedModality()
@@ -260,7 +265,7 @@ std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()
   // get string for depth value from the micro service properties
   std::string depth;
   us::ServiceProperties::iterator depthIterator = m_ServiceProperties.find(US_PROPKEY_BMODE_DEPTH);
-  if (depthIterator == m_ServiceProperties.end())
+  if (depthIterator != m_ServiceProperties.end())
   {
     depth = depthIterator->second.ToString();
   }

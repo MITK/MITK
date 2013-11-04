@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::NavigationDataDelayFilter::NavigationDataDelayFilter(unsigned int delay) : m_Delay(delay)
 {
+  m_Tolerance = 0;
 }
 mitk::NavigationDataDelayFilter::~NavigationDataDelayFilter()
 {
@@ -38,7 +39,9 @@ void mitk::NavigationDataDelayFilter::GenerateData()
   std::vector<mitk::NavigationData::Pointer> ndList;
   for (unsigned int i = 0; i < this->GetNumberOfInputs() ; ++i)
   {
-    ndList.push_back( this->GetInput(i)->Clone());
+    mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
+    nd->Graft(this->GetInput(i));
+    ndList.push_back(nd);
   }
 
   m_Buffer.push( std::make_pair(now.GetMTime(), ndList) );
@@ -48,7 +51,7 @@ void mitk::NavigationDataDelayFilter::GenerateData()
   BufferType current;
   bool foundCurrent = false;
 
-  while ( m_Buffer.front().first + m_Delay <= now.GetMTime() + m_Tolerance )
+  while ( (m_Buffer.size() > 0) && (m_Buffer.front().first + m_Delay <= now.GetMTime() + m_Tolerance ) )
   {
     foundCurrent = true;
     current = m_Buffer.front();

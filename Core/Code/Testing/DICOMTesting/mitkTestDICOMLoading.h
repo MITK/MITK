@@ -91,7 +91,7 @@ class mitkDICOMTesting_EXPORT TestDICOMLoading
     {
       std::stringstream stream(s);
       stream >> value;
-      return !stream.fail();
+      return (!stream.fail()) && std::isfinite(value);
     }
 
     const char* m_PreviousCLocale;

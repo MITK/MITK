@@ -7,6 +7,13 @@ else()
 endif()
 
 #-----------------------------------------------------------------------------
+# Include ctest launchers for dashboard in case of makefile generator
+#-----------------------------------------------------------------------------
+if(${CMAKE_VERSION} VERSION_GREATER "2.8.9")
+  include(CTestUseLaunchers)
+endif()
+
+#-----------------------------------------------------------------------------
 # Set a default build type if none was specified
 #-----------------------------------------------------------------------------
 
@@ -972,4 +979,3 @@ if(MITK_BUILD_EXAMPLES)
   # might do a find_package(MITK REQUIRED).
   add_subdirectory(Examples)
 endif()
-

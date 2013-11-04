@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
 #include "mitkBoundingObject.h"
+#include "mitkBaseRenderer.h"
 
 #include "vtkMapper.h"
 
@@ -43,7 +44,16 @@ public:
   // Release any graphics resources that are being consumed by this mapper.
   // The parameter window could be used to determine which graphic
   // resources to release.
-  void ReleaseGraphicsResources(vtkWindow *);
+   // deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
+  DEPRECATED(void ReleaseGraphicsResources(vtkWindow *));
+
+   // Description:
+  // Release any graphics resources that are being consumed by this mapper.
+  // The parameter renderer could be used to determine which graphic
+  // resources to release.
+   // deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
+  void ReleaseGraphicsResources(mitk::BaseRenderer * renderer);
+
 
   // Description:
   // Get the mtime also considering the lookup table.

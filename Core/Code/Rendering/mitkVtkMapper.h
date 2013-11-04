@@ -118,11 +118,27 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
 
     /**
     * \brief  Release vtk-based graphics resources that are being consumed by this mapper.
+    *
     * The parameter window could be used to determine which graphic
-    * resources to releases. Must be overwritten in individual subclasses
+    * resources to release. Must be overwritten in individual subclasses
     * if vtkProps are used.
+    *
+    * \deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
     */
-    virtual void ReleaseGraphicsResources(vtkWindow* /*renWin*/) { };
+    DEPRECATED(virtual void ReleaseGraphicsResources(vtkWindow* /*renWin*/))
+    {
+    };
+
+    /**
+    * \brief  Release vtk-based graphics resources that are being consumed by this mapper.
+    *
+    * Method called by mitk::VtkPropRenderer. The parameter renderer could be used to
+    * determine which graphic resources to release.  The local storage is accessible
+    * by the parameter renderer. Should be overwritten in subclasses.
+    */
+    virtual void ReleaseGraphicsResources(mitk::BaseRenderer* /*renderer*/)
+    {
+    };
 
   protected:
 

@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 //#define MBILOG_ENABLE_DEBUG
 
+#include <cmath>
 #include "mitkTestDICOMLoading.h"
 
 #include <stack>

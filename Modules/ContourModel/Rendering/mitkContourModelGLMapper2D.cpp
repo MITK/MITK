@@ -100,5 +100,7 @@ void mitk::ContourModelGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mi
   node->AddProperty( "subdivision curve", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "contour.project-onto-plane", mitk::BoolProperty::New( false ), renderer, overwrite );
 
+  node->AddProperty( "opacity", mitk::FloatProperty::New(1.0f), renderer, overwrite );
+
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

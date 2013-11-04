@@ -50,17 +50,9 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
     {
         m_Controls = new Ui::QmitkDicomLocalStorageWidgetControls;
         m_Controls->setupUi( parent );
-        m_Controls->groupBox->setVisible(false);
-        m_Controls->CancelButton->setVisible(false);
-        m_Controls->addSortingTagButton_2->setVisible(false);
-        m_Controls->deleteSortingTagButton_2->setVisible(false);
-//        m_Controls->InternalDataTreeView->setSortingEnabled(true);
-//        m_Controls->InternalDataTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
-//        m_Controls->InternalDataTreeView->setModel(m_LocalModel);
+
         connect(m_Controls->deleteButton,SIGNAL(clicked()),this,SLOT(OnDeleteButtonClicked()));
-        connect(m_Controls->CancelButton, SIGNAL(clicked()), this , SLOT(OnCancelButtonClicked()));
         connect(m_Controls->viewInternalDataButton, SIGNAL(clicked()), this , SLOT(OnViewButtonClicked()));
-//        connect(m_Controls->SearchOption, SIGNAL(parameterChanged()), this, SLOT(OnSearchParameterChanged()));
 
         connect(m_LocalIndexer, SIGNAL(indexingComplete()),this, SLOT(OnFinishedImport()));
         connect(m_LocalIndexer, SIGNAL(indexingComplete()),this, SIGNAL(SignalFinishedImport()));
@@ -68,6 +60,11 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
         connect(m_LocalIndexer, SIGNAL(indexingFilePath(QString)),this, SIGNAL(SignalProcessingFile(QString)));
         connect(m_LocalIndexer, SIGNAL(progress(int)),this, SIGNAL(SignalProgress(int)));
         connect(this, SIGNAL(SignalCancelImport()),m_LocalIndexer, SLOT(cancel()));
+
+        connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesSelectionChanged(const QStringList&)),
+                this, SLOT(OnSeriesSelectionChanged(const QStringList&)));
+        connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesSelectionChanged(const QStringList&)),
+                this, SLOT(OnSeriesSelectionChanged(const QStringList&)));
     }
 }
 
@@ -94,56 +91,35 @@ void QmitkDicomLocalStorageWidget::OnFinishedImport()
 
 void QmitkDicomLocalStorageWidget::OnDeleteButtonClicked()
 {
-  m_Controls->ctkDICOMBrowser->deleteSelectedRows();
-//    QModelIndex currentIndex = m_Controls->InternalDataTreeView->currentIndex();
-//    QString currentUID = m_LocalModel->data(currentIndex,ctkDICOMModel::UIDRole).toString();
-//    if(m_LocalModel->data(currentIndex,ctkDICOMModel::TypeRole)==static_cast<int>(ctkDICOMModel::SeriesType))
-//    {
-//        m_LocalDatabase->removeSeries(currentUID);
-//    }
-//    else if(m_LocalModel->data(currentIndex,ctkDICOMModel::TypeRole)==static_cast<int>(ctkDICOMModel::StudyType))
-//    {
-//        m_LocalDatabase->removeStudy(currentUID);
-//    }
-//    else if(m_LocalModel->data(currentIndex,ctkDICOMModel::TypeRole)==static_cast<int>(ctkDICOMModel::PatientType))
-//    {
-//        m_LocalDatabase->removePatient(currentUID);
-//    }
-//    m_LocalModel->reset();
+  QStringList selectedSeriesUIDs = m_Controls->ctkDICOMBrowser->currentSeriesSelection();
+  QString uid;
+  foreach (uid, selectedSeriesUIDs)
+  {
+    m_LocalDatabase->removeSeries(uid);
+  }
+  QStringList selectedStudiesUIDs = m_Controls->ctkDICOMBrowser->currentStudiesSelection();
+  foreach(uid, selectedStudiesUIDs)
+  {
+    m_LocalDatabase->removeStudy(uid);
+  }
+  QStringList selectedPatientUIDs = m_Controls->ctkDICOMBrowser->currentPatientsSelection();
+  foreach(uid, selectedPatientUIDs)
+  {
+    m_LocalDatabase->removePatient(uid);
+  }
 }
 
 void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
 {
-//    QModelIndex currentIndex = m_Controls->InternalDataTreeView->currentIndex();
-//    if(m_LocalModel->data(currentIndex,ctkDICOMModel::TypeRole)==static_cast<int>(ctkDICOMModel::SeriesType))
-//    {
-//        QString seriesUID = m_LocalModel->data(currentIndex,ctkDICOMModel::UIDRole).toString();
-//        QString seriesName = m_LocalModel->data(currentIndex).toString();
-
-//        QModelIndex studyIndex = m_LocalModel->parent(currentIndex);
-//        QString studyUID = m_LocalModel->data(studyIndex,ctkDICOMModel::UIDRole).toString();
-//        QString studyName = m_LocalModel->data(studyIndex).toString();
-
-//        QModelIndex patientIndex = m_LocalModel->parent(studyIndex);
-//        QString patientName = m_LocalModel->data(patientIndex).toString();
-
-//        QStringList filesForSeries;
-//        filesForSeries = m_LocalDatabase->filesForSeries(seriesUID);
-
-//        QHash<QString,QVariant> eventProperties;
-//        eventProperties.insert("PatientName",patientName);
-//        eventProperties.insert("StudyUID",studyUID);
-//        eventProperties.insert("StudyName",studyName);
-//        eventProperties.insert("SeriesUID",seriesUID);
-//        eventProperties.insert("SeriesName",seriesName);
-//        eventProperties.insert("FilesForSeries",filesForSeries);
-//        emit SignalDicomToDataManager(eventProperties);
-//    }
-}
-
-void QmitkDicomLocalStorageWidget::OnSearchParameterChanged()
-{
-//    m_LocalModel->setDatabase(m_LocalDatabase->database(),m_Controls->SearchOption->parameters());
+  QStringList uids = m_Controls->ctkDICOMBrowser->currentSeriesSelection();
+  QString uid;
+  foreach (uid, uids)
+  {
+    QStringList filesForSeries = m_LocalDatabase->filesForSeries(uid);
+    QHash<QString, QVariant> eventProperty;
+    eventProperty.insert("FilesForSeries", filesForSeries);
+    emit SignalDicomToDataManager(eventProperty);
+  }
 }
 
 void QmitkDicomLocalStorageWidget::SetDatabaseDirectory(QString newDatatbaseDirectory)
@@ -161,6 +137,9 @@ void QmitkDicomLocalStorageWidget::SetDatabase(QString databaseFile)
 {
     m_LocalDatabase = new ctkDICOMDatabase(databaseFile);
     m_Controls->ctkDICOMBrowser->setCTKDICOMDatabase(m_LocalDatabase);
-//    m_LocalModel->setEndLevel(ctkDICOMModel::SeriesType);
-//    m_LocalModel->setDatabase(m_LocalDatabase->database());
+}
+
+void QmitkDicomLocalStorageWidget::OnSeriesSelectionChanged(const QStringList &s)
+{
+  m_Controls->viewInternalDataButton->setEnabled((s.size() != 0));
 }

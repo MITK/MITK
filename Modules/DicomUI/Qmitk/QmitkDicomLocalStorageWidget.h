@@ -114,8 +114,8 @@ public slots:
     /// @brief   Called when adding a list of dicom files. Starts a thread adding the dicom files.
     void OnStartDicomImport(const QStringList& dicomData);
 
-    /// @brief   Called when search parameters change.
-    void OnSearchParameterChanged();
+    /// @brief Called when the selection in the series table has changed
+    void OnSeriesSelectionChanged(const QStringList&);
 
 protected:
 

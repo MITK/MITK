@@ -39,8 +39,10 @@ public:
     explicit QmitkUSCombinedModalityManagerWidget(QWidget *parent = 0);
     ~QmitkUSCombinedModalityManagerWidget();
 
+    itkGetMacro(SelectedCombinedModality, mitk::USCombinedModality::Pointer)
+
 protected:
-    mitk::USCombinedModality::Pointer m_CombinedModality;
+    mitk::USCombinedModality::Pointer m_SelectedCombinedModality;
 
 private:
     Ui::QmitkUSCombinedModalityManagerWidget *ui;

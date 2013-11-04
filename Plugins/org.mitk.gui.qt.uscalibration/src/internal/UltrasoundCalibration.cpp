@@ -140,14 +140,14 @@ void UltrasoundCalibration::OnTabSwitch(int index){
 
 void UltrasoundCalibration::OnSelectDevice(mitk::USCombinedModality::Pointer combinedModality)
 {
-  m_CombinedModality = combinedModality;
+  //m_CombinedModality = combinedModality;
 
-  if (m_CombinedModality.IsNotNull())
+  if (combinedModality.IsNotNull())
   {
-    m_Tracker = m_CombinedModality->GetNavigationDataSource();
+    //m_Tracker = m_CombinedModality->GetNavigationDataSource();
 
     // Construct Pipeline
-    this->m_NeedleProjectionFilter->SetInput(0, m_Tracker->GetOutput(0));
+    //this->m_NeedleProjectionFilter->SetInput(0, m_Tracker->GetOutput(0));
 
     m_Controls.m_StartCalibrationButton->setEnabled(true);
   }
@@ -162,7 +162,13 @@ void UltrasoundCalibration::OnSelectDevice(mitk::USCombinedModality::Pointer com
 
 void UltrasoundCalibration::OnStartCalibrationProcess()
 {
+  m_CombinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
   if ( m_CombinedModality.IsNull() ) { return; }
+
+  m_Tracker = m_CombinedModality->GetNavigationDataSource();
+
+  // Construct Pipeline
+  this->m_NeedleProjectionFilter->SetInput(0, m_Tracker->GetOutput(0));
 
   QApplication::setOverrideCursor(Qt::WaitCursor);
   // make sure that the combined modality is in connected state before using it

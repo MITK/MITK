@@ -50,7 +50,7 @@ void QmitkUSCombinedModalityManagerWidget::OnSelectedCombinedModality()
             MITK_WARN << "Cannot get selected combined modality from service list widget. Is the selected item really a USCombinedModality?";
         }
 
-        m_CombinedModality = combinedModality;
+        m_SelectedCombinedModality = combinedModality;
         emit(SignalCombinedModalitySelected(combinedModality));
     }
     else
@@ -87,7 +87,7 @@ void QmitkUSCombinedModalityManagerWidget::OnRemoveCombinedModalityButtonClicked
 {
   // local variable is necessary as selected modality will change during
   // process of unregistering
-  mitk::USCombinedModality::Pointer combinedModality = m_CombinedModality;
+  mitk::USCombinedModality::Pointer combinedModality = m_SelectedCombinedModality;
 
   if ( combinedModality.IsNotNull() ) { combinedModality->UnregisterOnService(); }
 }

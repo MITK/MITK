@@ -83,7 +83,7 @@ void QmitkUSZoneManagementWidget::OnStartAddingZone()
   m_DataStorage->Add(dataNode, m_BaseNode);
   m_Interactor->SetDataNode(dataNode);
 
-  m_ZonesDataModel->AddNode(dataNode);
+  //m_ZonesDataModel->AddNode(dataNode);
 }
 
 void QmitkUSZoneManagementWidget::OnSelectionChanged(const QItemSelection & selected, const QItemSelection & /*deselected*/)

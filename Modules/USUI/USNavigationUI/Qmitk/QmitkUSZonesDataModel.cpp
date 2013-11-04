@@ -20,8 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkSphereSource.h>
 
+#include "mitkMessage.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
+#include "mitkNodePredicateSource.h"
 
 QmitkUSZonesDataModel::QmitkUSZonesDataModel(QObject *parent) :
   QAbstractTableModel(parent)
@@ -32,12 +34,59 @@ void QmitkUSZonesDataModel::SetDataStorage(mitk::DataStorage::Pointer dataStorag
 {
   m_DataStorage = dataStorage;
   m_BaseNode = baseNode;
+
+  if (m_DataStorage.IsNotNull())
+  {
+    m_DataStorage->AddNodeEvent.AddListener(
+        mitk::MessageDelegate1<QmitkUSZonesDataModel, const mitk::DataNode*>
+          (this, &QmitkUSZonesDataModel::AddNode));
+
+    m_DataStorage->RemoveNodeEvent.AddListener(
+        mitk::MessageDelegate1<QmitkUSZonesDataModel, const mitk::DataNode*>
+          (this, &QmitkUSZonesDataModel::RemoveNode));
+
+    /*m_DataStorage->InteractorChangedNodeEvent.AddListener(
+        MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));*/
+  }
 }
 
-void QmitkUSZonesDataModel::AddNode(mitk::DataNode::Pointer node)
+void QmitkUSZonesDataModel::AddNode(const mitk::DataNode* node)
 {
+  // get source node of given node and test if m_BaseNode is a source node
+  mitk::DataStorage::SetOfObjects::ConstPointer sourceNodes = m_DataStorage->GetSources(node);
+  mitk::DataStorage::SetOfObjects::ConstIterator baseNodeIt = sourceNodes->Begin();
+  while ( baseNodeIt != sourceNodes->End() && baseNodeIt->Value() != m_BaseNode ) { ++baseNodeIt; }
+
+  // only nodes below m_BaseNode should be added to the model
+  if ( baseNodeIt == sourceNodes->End() ) { return; }
+
   this->insertRow(this->rowCount());
-  m_ZoneNodes.at(m_ZoneNodes.size()-1) = node;
+  m_ZoneNodes.at(m_ZoneNodes.size()-1) = const_cast<mitk::DataNode*>(node);
+
+  /*mitk::DataStorage::SetOfObjects::ConstPointer zoneNodes =
+      m_DataStorage->GetSubset(mitk::NodePredicateSource::New(m_BaseNode, false, m_DataStorage));*/
+}
+
+void QmitkUSZonesDataModel::RemoveNode(const mitk::DataNode* node)
+{
+  // find index of the given node in the nodes vector
+  unsigned int index = 0;
+  DataNodeVector::iterator current = m_ZoneNodes.begin();
+  while (current != m_ZoneNodes.end())
+  {
+    if ( *current == node ) { break; }
+    ++index;
+    ++current;
+  }
+
+  // remove node from model if it was found
+  if ( current != m_ZoneNodes.end() )
+  {
+    // remove node from the model and make sure that there will be no
+    // recursive removing calls (as removing node from data storage inside
+    // removeRows function will lead into another call of RemoveNode).
+    this->removeRows(index, 1, QModelIndex(), false);
+  }
 }
 
 int QmitkUSZonesDataModel::rowCount ( const QModelIndex& /*parent*/ ) const
@@ -199,6 +248,11 @@ bool QmitkUSZonesDataModel::insertRows ( int row, int count, const QModelIndex &
 
 bool QmitkUSZonesDataModel::removeRows ( int row, int count, const QModelIndex & parent )
 {
+  this->removeRows(row, count, parent, true);
+}
+
+bool QmitkUSZonesDataModel::removeRows ( int row, int count, const QModelIndex & parent, bool removeFromDataStorage )
+{
   if ( static_cast<unsigned int>(row+count) > m_ZoneNodes.size() ) { return false; }
 
   this->beginRemoveRows(parent, row, row+count-1);
@@ -206,8 +260,13 @@ bool QmitkUSZonesDataModel::removeRows ( int row, int count, const QModelIndex &
   for ( int n = count-1; n >= 0; --n )
   {
     DataNodeVector::iterator it = m_ZoneNodes.begin()+row+n;
-    if (m_DataStorage.IsNotNull()) { m_DataStorage->Remove(*it); }
+    mitk::DataNode::Pointer curNode = *it;
     m_ZoneNodes.erase(it);
+
+    if ( removeFromDataStorage && m_DataStorage.IsNotNull() )
+    {
+      m_DataStorage->Remove(curNode);
+    }
   }
 
   this->endRemoveRows();

@@ -47,26 +47,15 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QPushButton" name="AddZoneButton">
-       <property name="text">
-        <string>&amp;Add</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/USNavigationUI/112.png</normaloff>:/USNavigationUI/112.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="DeleteZoneButton">
        <property name="enabled">
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>&amp;Delete</string>
+        <string>&amp;Delete Selected Zones</string>
        </property>
        <property name="icon">
-        <iconset>
+        <iconset resource="../resources/USNavigationUI.qrc">
          <normaloff>:/USNavigationUI/117.png</normaloff>:/USNavigationUI/117.png</iconset>
        </property>
       </widget>
@@ -75,24 +64,10 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/USNavigationUI.qrc"/>
+ </resources>
  <connections>
-  <connection>
-   <sender>AddZoneButton</sender>
-   <signal>clicked()</signal>
-   <receiver>QmitkUSZoneManagementWidget</receiver>
-   <slot>AddRow()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>83</x>
-     <y>474</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>164</x>
-     <y>245</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>DeleteZoneButton</sender>
    <signal>clicked()</signal>

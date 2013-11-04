@@ -39,7 +39,8 @@ public:
   explicit QmitkUSZonesDataModel(QObject *parent = 0);
 
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::DataNode::Pointer baseNode);
-  void AddNode(mitk::DataNode::Pointer);
+  void AddNode(const mitk::DataNode*);
+  void RemoveNode(const mitk::DataNode*);
 
   virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
   virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
@@ -50,7 +51,8 @@ public:
   virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
 
   virtual bool insertRows ( int row, int count, const QModelIndex& parent = QModelIndex() );
-  virtual bool removeRows ( int row, int count, const QModelIndex & parent = QModelIndex() );
+  virtual bool removeRows ( int row, int count, const QModelIndex& parent = QModelIndex() );
+  virtual bool removeRows ( int row, int count, const QModelIndex& parent, bool removeFromDataStorage );
 
 protected:
   DataNodeVector m_ZoneNodes;

@@ -69,6 +69,10 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(" + mitk::USDevice::US_PROPKEY_ISACTIVE + "=true))";
   m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL ,filter);
 
+  m_Node = mitk::DataNode::New();
+  m_Node->SetName("US Image Stream");
+  this->GetDataStorage()->Add(m_Node);
+
   m_Controls.tabWidget->setTabEnabled(1, false);
 
   /*ctkFlowLayout* flowLayout = ctkFlowLayout::replaceLayout(m_Controls.m_WidgetDevices);

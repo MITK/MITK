@@ -31,13 +31,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDicomSeriesReader.h"
 
 #include "mitkTestingMacros.h"
-#include "mitkParameterizedTestFixture.h"
+#include "mitkTestFixture.h"
 
 #include <list>
 #include <locale>
 #include <locale.h>
 
-class mitkDICOMLocaleTestSuite : public mitk::ParameterizedTestFixture
+class mitkDICOMLocaleTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkDICOMLocaleTestSuite);
   CPPUNIT_TEST_SUITE_ADD_CUSTOM_TESTS(addDICOMLocaleWithReferenceImageTests);

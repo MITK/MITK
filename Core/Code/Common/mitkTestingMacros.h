@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMacro.h>
 #include <mitkTestManager.h>
 #include <mitkTesting.h>
-#include <mitkParameterizedTestCaller.h>
+#include <mitkTestCaller.h>
 
 #include <cppunit/extensions/HelperMacros.h>
 #include "cppunit/ui/text/TestRunner.h"
@@ -75,7 +75,7 @@ namespace mitk {
 /**
  * @brief Must be called last in the main test function.
  *
- * @deprecatedSince{2013_09} Use MITK_TEST_SUITE_REGISTRATION isntead.
+ * @deprecatedSince{2013_09} Use MITK_TEST_SUITE_REGISTRATION instead.
  * @ingroup MITKTestingAPI
  */
 #define MITK_TEST_END()                                   \
@@ -264,6 +264,18 @@ namespace mitk {
   }
 
 /**
+ * @brief Adds a test to the current test suite.
+ *
+ * @ingroup MITKTestingAPI
+ *
+ * Use this macro after the CPPUNIT_TEST_SUITE() macro to add test cases.
+ * The macro internally just calls the CPPUNIT_TEST macro.
+ *
+ * @param TESTMETHOD The name of the member funtion test.
+ */
+#define MITK_TEST(TESTMETHOD) CPPUNIT_TEST(TESTMETHOD)
+
+/**
  * @brief Adds a parameterized test to the current test suite.
  *
  * @ingroup MITKTestingAPI
@@ -282,7 +294,7 @@ namespace mitk {
     testName += "_" + ARGS[i];                                 \
   }                                                            \
   CPPUNIT_TEST_SUITE_ADD_TEST(                                 \
-      ( new mitk::ParameterizedTestCaller<TestFixtureType>(    \
+      ( new mitk::TestCaller<TestFixtureType>(                 \
                 context.getTestNameFor(testName),              \
                 &TestFixtureType::TESTMETHOD,                  \
                 context.makeFixture(), args ) ) );             \
@@ -300,7 +312,7 @@ namespace mitk {
  */
 #define MITK_PARAMETERIZED_CMD_LINE_TEST(TESTMETHOD)           \
   CPPUNIT_TEST_SUITE_ADD_TEST(                                 \
-      ( new mitk::ParameterizedTestCaller<TestFixtureType>(    \
+      ( new mitk::TestCaller<TestFixtureType>(                 \
                 context.getTestNameFor( #TESTMETHOD),          \
                 &TestFixtureType::TESTMETHOD,                  \
                 context.makeFixture() ) ) );

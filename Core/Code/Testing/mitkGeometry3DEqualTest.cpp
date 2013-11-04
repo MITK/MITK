@@ -16,20 +16,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkGeometry3D.h"
 #include "mitkTestingMacros.h"
+#include "mitkTestFixture.h"
 
-#include <cppunit/TestFixture.h>
-
-class mitkGeometry3DEqualTestSuite : public CppUnit::TestFixture
+class mitkGeometry3DEqualTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkGeometry3DEqualTestSuite);
-  CPPUNIT_TEST(Equal_CloneAndOriginal_ReturnsTrue);
-  CPPUNIT_TEST(Equal_DifferentOrigin_ReturnsFalse);
-  CPPUNIT_TEST(Equal_DifferentIndexToWorldTransform_ReturnsFalse);
-  CPPUNIT_TEST(Equal_DifferentSpacing_ReturnsFalse);
-  CPPUNIT_TEST(Equal_InputIsNull_ReturnsFalse);
-  CPPUNIT_TEST(Equal_DifferentImageGeometry_ReturnsFalse);
-  CPPUNIT_TEST(Equal_DifferentBoundingBox_ReturnsFalse);
+  MITK_TEST(Equal_CloneAndOriginal_ReturnsTrue);
+  MITK_TEST(Equal_DifferentOrigin_ReturnsFalse);
+  MITK_TEST(Equal_DifferentIndexToWorldTransform_ReturnsFalse);
+  MITK_TEST(Equal_DifferentSpacing_ReturnsFalse);
+  MITK_TEST(Equal_InputIsNull_ReturnsFalse);
+  MITK_TEST(Equal_DifferentImageGeometry_ReturnsFalse);
+  MITK_TEST(Equal_DifferentBoundingBox_ReturnsFalse);
   CPPUNIT_TEST_SUITE_END();
 
 private:

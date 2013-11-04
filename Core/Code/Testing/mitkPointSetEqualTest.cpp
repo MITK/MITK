@@ -16,23 +16,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPointSet.h"
 #include "mitkTestingMacros.h"
-
-#include <cppunit/TestFixture.h>
+#include "mitkTestFixture.h"
 
 
 /**
  * @brief mitkPointSetEqualTestSuite A test class for Equal methods in mitk::PointSet.
  */
 
-class mitkPointSetEqualTestSuite : public CppUnit::TestFixture
+class mitkPointSetEqualTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkPointSetEqualTestSuite);
-  CPPUNIT_TEST(Equal_CloneAndOriginal_ReturnsTrue);
-  CPPUNIT_TEST(Equal_DifferentGeometries_ReturnsFalse);
-  CPPUNIT_TEST(Equal_DifferentNumberOfPoints_ReturnsFalse);
-  CPPUNIT_TEST(Equal_DifferentPoints_ReturnsFalse);
-  CPPUNIT_TEST(Equal_InputIsNull_ReturnsFalse);
+  MITK_TEST(Equal_CloneAndOriginal_ReturnsTrue);
+  MITK_TEST(Equal_DifferentGeometries_ReturnsFalse);
+  MITK_TEST(Equal_DifferentNumberOfPoints_ReturnsFalse);
+  MITK_TEST(Equal_DifferentPoints_ReturnsFalse);
+  MITK_TEST(Equal_InputIsNull_ReturnsFalse);
   CPPUNIT_TEST_SUITE_END();
 
 private:

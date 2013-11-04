@@ -23,23 +23,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyLine.h>
 #include <vtkCellArray.h>
 
-#include <cppunit/TestFixture.h>
+#include "mitkTestFixture.h"
 
 
 /**
  * @brief mitkPointSetEqualTestSuite A test class for Equal methods in mitk::PointSet.
  */
 
-class mitkSurfaceEqualTestSuite : public CppUnit::TestFixture
+class mitkSurfaceEqualTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkSurfaceEqualTestSuite);
-  CPPUNIT_TEST(Equal_InputIsNull_ReturnsFalse);
-  CPPUNIT_TEST(Equal_CloneAndOriginalOneTimestep_ReturnsTrue);
-  CPPUNIT_TEST(Equal_CloneAndOriginalTwoTimesteps_ReturnsTrue);
-  CPPUNIT_TEST(Equal_OneTimeStepVSTwoTimeStep_ReturnsFalse);
-  CPPUNIT_TEST(Equal_TwoTimeStepsDifferentPoints_ReturnsFalse);
-  CPPUNIT_TEST(Equal_DifferentPoints_ReturnsFalse);
-  CPPUNIT_TEST(Equal_SurfaceWithPolygonSurfaceWithPolyLine_ReturnsFalse);
+  MITK_TEST(Equal_InputIsNull_ReturnsFalse);
+  MITK_TEST(Equal_CloneAndOriginalOneTimestep_ReturnsTrue);
+  MITK_TEST(Equal_CloneAndOriginalTwoTimesteps_ReturnsTrue);
+  MITK_TEST(Equal_OneTimeStepVSTwoTimeStep_ReturnsFalse);
+  MITK_TEST(Equal_TwoTimeStepsDifferentPoints_ReturnsFalse);
+  MITK_TEST(Equal_DifferentPoints_ReturnsFalse);
+  MITK_TEST(Equal_SurfaceWithPolygonSurfaceWithPolyLine_ReturnsFalse);
   CPPUNIT_TEST_SUITE_END();
 
 private:

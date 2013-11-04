@@ -16,18 +16,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 #include <mitkTestingConfig.h>
-#include <mitkParameterizedTestFixture.h>
+#include <mitkTestFixture.h>
 
 #include <mitkIOUtil.h>
 #include <mitkImageGenerator.h>
 
 #include <itksys/SystemTools.hxx>
 
-class mitkIOUtilTestSuite : public mitk::ParameterizedTestFixture
+class mitkIOUtilTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkIOUtilTestSuite);
-  CPPUNIT_TEST(TestTempMethods);
+  MITK_TEST(TestTempMethods);
   MITK_PARAMETERIZED_TEST_1(TestLoadAndSaveImage, "Pic3D.nrrd");
   MITK_PARAMETERIZED_TEST_1(TestLoadAndSavePointSet, "pointSet.mps");
   MITK_PARAMETERIZED_TEST_1(TestLoadAndSaveSurface, "binary.stl");

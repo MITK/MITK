@@ -19,19 +19,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include "mitkImageSliceSelector.h"
 
-#include <cppunit/TestFixture.h>
+#include "mitkTestFixture.h"
 
-class mitkImageEqualTestSuite : public CppUnit::TestFixture
+class mitkImageEqualTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkImageEqualTestSuite);
-  CPPUNIT_TEST(Equal_CloneAndOriginal_ReturnsTrue);
-  CPPUNIT_TEST(Equal_InputIsNull_ReturnsFalse);
-  CPPUNIT_TEST(Equal_DifferentImageGeometry_ReturnsFalse);
-  CPPUNIT_TEST(Equal_DifferentPixelTypes_ReturnsFalse);
-  CPPUNIT_TEST(Equal_DifferentDimensions_ReturnsFalse);
-  CPPUNIT_TEST(Equal_DifferentDimensionalities_ReturnsFalse);
-  CPPUNIT_TEST(Equal_DifferentPixelValues_ReturnsFalse);
+  MITK_TEST(Equal_CloneAndOriginal_ReturnsTrue);
+  MITK_TEST(Equal_InputIsNull_ReturnsFalse);
+  MITK_TEST(Equal_DifferentImageGeometry_ReturnsFalse);
+  MITK_TEST(Equal_DifferentPixelTypes_ReturnsFalse);
+  MITK_TEST(Equal_DifferentDimensions_ReturnsFalse);
+  MITK_TEST(Equal_DifferentDimensionalities_ReturnsFalse);
+  MITK_TEST(Equal_DifferentPixelValues_ReturnsFalse);
   CPPUNIT_TEST_SUITE_END();
 
 private:

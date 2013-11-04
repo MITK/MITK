@@ -23,14 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // include ctk
 #include <ctkDICOMDatabase.h>
-#include <ctkDICOMModel.h>
 #include <ctkDICOMIndexer.h>
 
 //include QT
 #include <QWidget>
 #include <QString>
 #include <QStringList>
-#include <QModelIndex>
+
 //For running dicom import in background
 #include <QtConcurrentRun>
 #include <QFuture>
@@ -109,9 +108,6 @@ public slots:
     /// @brief Called when view button was clicked.
     void OnViewButtonClicked();
 
-    /// @brief   Called when search parameters change.
-    void OnSearchParameterChanged();
-
     /// @brief   Called when adding a dicom directory. Starts a thread adding the directory.
     void OnStartDicomImport(const QString&);
 
@@ -120,13 +116,14 @@ public slots:
     /// This causes a model update.
     void OnFinishedImport();
 
+    void OnSeriesSelectionChanged(const QStringList &s);
+
 protected:
 
     /// \brief Get the list of filepath from current selected index in TreeView. All file paths referring to the index will be returned.
     QStringList GetFileNamesFromIndex();
 
     ctkDICOMDatabase* m_ExternalDatabase;
-    ctkDICOMModel* m_ExternalModel;
     ctkDICOMIndexer* m_ExternalIndexer;
 
     Ui::QmitkDicomExternalDataWidgetControls* m_Controls;

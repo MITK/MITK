@@ -138,6 +138,37 @@ namespace mitk
     itkNewMacro( Self );
 
     /**
+     * @brief Used for getting a custom Isoline
+     * @param value The gray-value which the isoline represents
+     * @param dataObject The vtkDataObject from the DicomRT dose image
+     * @return Returns a vtkPolyData including the contour/isoline
+     *
+     * This method is used for a custom Isoline e.g. from the DicomRT IsoSlider.
+     * You define the value where the Isoline is by setting the value as a parameter.
+     */
+    vtkSmartPointer<vtkPolyData> GetIsoLine(double value, vtkDataObject* dataObject);
+
+    /**
+     * @brief Used for getting the StandardIsoLines
+     * @param dataObject The vtkDataObject from the DicomRT dose image
+     * @return Returns a vtkPolyData including the contours/isolines
+     *
+     * The IsoLines should be equal to the contours of the colorwash.
+     */
+    vtkSmartPointer<vtkPolyData> GetStandardIsoLines(vtkDataObject* dataObject);
+
+    /**
+     * @brief Get a default prescription dose
+     * @param dataSet The DcmDataset of the DicomRTDose file
+     * @return  The dose value
+     *
+     * If you dont define a prescription dose use this method, it calculates a
+     * default value by reading the dose values from the dose file and multiplys
+     * the highest value with 0.8.
+     */
+    double GetDefaultPrescriptionDose(DcmDataset* dataSet);
+
+    /**
      * @brief Used for reading a DicomRT file
      * @param filename The path with your file which you want to read
      *

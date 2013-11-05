@@ -497,30 +497,25 @@ namespace mitk
 
     float* pixel = (float*)image->GetData();
     int size = dim[0]*dim[1]*dim[2];
-    int highest = 0;
 
     for(int i=0; i<size; ++i, ++pixel)
     {
-      if((pixelData[i]*gridscale)>highest)
-      {
-        highest = pixelData[i] * gridscale;
-      }
       *pixel=pixelData[i] * gridscale;
     }
 
     image->SetGeometry(geo);
 
-    double prescripeDose = highest * 0.8;
+    double prescripeDose = this->GetDefaultPrescriptionDose(dataset);
     double hsvValue = 0.002778;
 
     vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-    transferFunction->AddHSVPoint(highest*0.0,(240*hsvValue),1.0,1.0,1.0,1.0);
-    transferFunction->AddHSVPoint(highest*0.2,(180*hsvValue),1.0,1.0,1.0,1.0);
-    transferFunction->AddHSVPoint(highest*0.4,(120*hsvValue),1.0,0.5,1.0,1.0);
-    transferFunction->AddHSVPoint(highest*0.5,(120*hsvValue),1.0,1.0,1.0,1.0);
-    transferFunction->AddHSVPoint(highest*0.6,(060*hsvValue),1.0,1.0,1.0,1.0);
-    transferFunction->AddHSVPoint(highest*0.7,(026*hsvValue),1.0,1.0,1.0,1.0);
-    transferFunction->AddHSVPoint(prescripeDose,(0*hsvValue),1.0,1.0,1.0,1.0);
+    transferFunction->AddHSVPoint(prescripeDose*0.0,(240*hsvValue),1.0,1.0,1.0,1.0);
+    transferFunction->AddHSVPoint(prescripeDose*0.2,(180*hsvValue),1.0,1.0,1.0,1.0);
+    transferFunction->AddHSVPoint(prescripeDose*0.4,(120*hsvValue),1.0,0.5,1.0,1.0);
+    transferFunction->AddHSVPoint(prescripeDose*0.5,(120*hsvValue),1.0,1.0,1.0,1.0);
+    transferFunction->AddHSVPoint(prescripeDose*0.6,(060*hsvValue),1.0,1.0,1.0,1.0);
+    transferFunction->AddHSVPoint(prescripeDose*0.7,(026*hsvValue),1.0,1.0,1.0,1.0);
+    transferFunction->AddHSVPoint(prescripeDose*1.0,(000*hsvValue),1.0,1.0,1.0,1.0);
     transferFunction->Build();
 
     mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
@@ -540,6 +535,73 @@ namespace mitk
     node->SetData(image);
 
     return node;
+  }
+
+  double DicomRTReader::GetDefaultPrescriptionDose(DcmDataset* dataSet)
+  {
+    DRTDoseIOD doseObject;
+    OFCondition result = doseObject.read(*dataSet);
+    if(result.bad())
+    {
+      std::cout << "Error reading the RT Dose dataset\n\n";
+      return 0;
+    }
+
+    Uint16 rows, columns, frames;
+    OFString nrframes, gridScaling;
+    const Uint16 *pixelData = NULL;
+    Float32 gridscale;
+
+    Uint16 &rows_ref = rows;
+    Uint16 &columns_ref = columns;
+
+    doseObject.getRows(rows_ref);
+    doseObject.getColumns(columns_ref);
+    doseObject.getNumberOfFrames(nrframes);
+    doseObject.getDoseGridScaling(gridScaling);
+
+    frames = atoi(nrframes.c_str());
+    gridscale = OFStandard::atof(gridScaling.c_str());
+    dataSet->findAndGetUint16Array(DCM_PixelData, pixelData, 0);
+
+    int size = columns*rows*frames;
+    double highest = 0;
+
+    for(int i=0; i<size; ++i)
+    {
+      if((pixelData[i]*gridscale)>highest)
+      {
+        highest = pixelData[i] * gridscale;
+      }
+    }
+
+    return highest * 0.8;
+  }
+
+  vtkSmartPointer<vtkPolyData> DicomRTReader::GetIsoLine(double value, vtkDataObject* dataObject)
+  {
+    vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
+    vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+
+    contourFilter->SetInput(dataObject);
+    contourFilter->SetNumberOfContours(1);
+    contourFilter->SetValue(0,value);
+
+    polyData = contourFilter->GetOutput();
+    return polyData;
+  }
+
+  vtkSmartPointer<vtkPolyData> DicomRTReader::GetStandardIsoLines(vtkDataObject* dataObject)
+  {
+    vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
+    vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+
+    contourFilter->SetInput(dataObject);
+    contourFilter->SetNumberOfContours(1);
+    contourFilter->SetValue(0,10);
+
+    polyData = contourFilter->GetOutput();
+    return polyData;
   }
 
   bool DicomRTReader::Equals(mitk::ContourModel::Pointer first, mitk::ContourModel::Pointer second)

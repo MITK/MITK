@@ -235,6 +235,15 @@ void mitk::USCombinedModality::GenerateData()
   this->SetNthOutput(0, image);
 }
 
+std::string mitk::USCombinedModality::SerializeCalibration()
+{
+  return "";
+}
+
+void mitk::USCombinedModality::DeserializeCalibration(std::string xmlString)
+{
+}
+
 std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()
 {
   mitk::USControlInterfaceProbes::Pointer probesInterface = this->GetControlInterfaceProbes();

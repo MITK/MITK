@@ -15,7 +15,6 @@
     <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="3D mouse"/>
     <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="WiiMote"/>
     <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="Input Devices"/>
-    
     <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="application instances"/>
     <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="scene"/>
   </extension>

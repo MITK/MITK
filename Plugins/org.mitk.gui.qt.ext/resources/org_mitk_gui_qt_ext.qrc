@@ -8,5 +8,6 @@
         <file>dcm-icon.png</file>
         <file>Slider.png</file>
         <file>index.html</file>
+        <file>xnat-icon.png</file>
     </qresource>
 </RCC>

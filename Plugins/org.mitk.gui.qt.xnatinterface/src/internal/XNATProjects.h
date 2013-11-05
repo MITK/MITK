@@ -1,25 +1,27 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision$ 
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 
 #ifndef XNATProjects_h
 #define XNATProjects_h
 
+#include <berryQtEditorPart.h>
 #include <berryISelectionListener.h>
+#include "berryIEditorInput.h"
+#include "berryIEditorSite.h"
 
 #include <QmitkAbstractView.h>
 
@@ -30,6 +32,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QScopedPointer>
 #include <QStandardItemModel>
+#include <QMap>
+
+#include "ctkXnatListModel.h"
+#include "ctkXnatConnectionFactory.h"
+#include "ctkXnatConnection.h"
 
 /*!
 \brief XNATProjects
@@ -39,27 +46,35 @@ PURPOSE.  See the above copyright notices for more information.
 \sa QmitkFunctionality
 \ingroup ${plugin_target}_internal
 */
-class XNATProjects : public QmitkAbstractView
-{  
+class XNATProjects : public berry::QtEditorPart
+{
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-public:  
-  QScopedPointer<QStandardItemModel> projectModel;
-  QScopedPointer<QStandardItemModel> subjectModel;
-  QScopedPointer<QStandardItemModel> experimentModel;
+public:
 
-  static const std::string VIEW_ID;
-
-  virtual void CreateQtPartControl(QWidget *parent);
-
+  XNATProjects();
+  ~XNATProjects();
+  static const std::string EDITOR_ID;
+  void CreateQtPartControl(QWidget *parent);
   void SearchWithXmlFilePath(QString filepath);
+
+  void DoSave(/*IProgressMonitor monitor*/);
+  void DoSaveAs();
+  void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input);
+  bool IsDirty() const;
+  bool IsSaveAsAllowed() const;
 
   protected slots:
 
     /// \brief Called when the user clicks the GUI button
     void GetAllProjects();
+    void OpenLoginDialog();
+    void projectSelected(const QModelIndex& index);
+    void subjectSelected(const QModelIndex& index);
+    void experimentSelected(const QModelIndex& index);
+    void scanSelected(const QModelIndex& index);
 
 protected:
 
@@ -73,10 +88,16 @@ protected:
 
 
 private:
-  
+  //QMap::QMap<QString, ctkXnatLoginProfile*> m_Profiles;
   QString ConvertFromXMLString(const Poco::XML::XMLString);
 
+  ctkXnatConnectionFactory* m_ConnectionFactory;
+  ctkXnatConnection* m_Connection;
+  ctkXnatListModel* m_ProjectsModel;
+  ctkXnatListModel* m_SubjectsModel;
+  ctkXnatListModel* m_ExperimentsModel;
+  ctkXnatListModel* m_ScansModel;
+  ctkXnatListModel* m_ResourceModel;
 };
 
 #endif // XNATProjects_h
-

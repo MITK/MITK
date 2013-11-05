@@ -73,6 +73,7 @@ class DcmRTV : public QmitkAbstractView
     /// \brief Called when the user clicks the GUI button
     void DoImageProcessing();
     void LoadRTDoseFile();
+    void UpdateIsoLines(int);
 
   protected:
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>235</width>
-    <height>237</height>
+    <width>244</width>
+    <height>303</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -52,7 +52,7 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>50</height>
+       <height>30</height>
       </size>
      </property>
      <property name="toolTip">
@@ -76,7 +76,7 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>50</height>
+         <height>30</height>
         </size>
        </property>
        <property name="text">
@@ -96,6 +96,31 @@
         <string>CheckBox</string>
        </property>
       </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item alignment="Qt::AlignHCenter">
+      <widget class="QLabel" name="IsolineSlider">
+       <property name="text">
+        <string>Isoline-Slider</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QSlider" name="isoSlider">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="spinBox"/>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

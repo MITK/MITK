@@ -586,6 +586,7 @@ namespace mitk
     contourFilter->SetInput(dataObject);
     contourFilter->SetNumberOfContours(1);
     contourFilter->SetValue(0,value);
+    contourFilter->Update();
 
     polyData = contourFilter->GetOutput();
     return polyData;

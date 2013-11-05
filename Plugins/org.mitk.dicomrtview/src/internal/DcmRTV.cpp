@@ -43,6 +43,8 @@ void DcmRTV::CreateQtPartControl( QWidget *parent )
   m_Controls.setupUi( parent );
   connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
   connect( m_Controls.pushButton, SIGNAL(clicked()), this, SLOT(LoadRTDoseFile()) );
+  connect( m_Controls.isoSlider, SIGNAL(valueChanged(int)), m_Controls.spinBox, SLOT(setValue(int)));
+  connect( m_Controls.spinBox, SIGNAL(valueChanged(int)), this, SLOT(UpdateIsoLines(int)));
 }
 
 void DcmRTV::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
@@ -59,6 +61,58 @@ void DcmRTV::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
   }
 
   m_Controls.buttonPerformImageProcessing->setEnabled( true );
+}
+
+void DcmRTV::UpdateIsoLines(int value)
+{
+  QFileDialog dialog;
+  dialog.setNameFilter(tr("Images (*.dcm"));
+
+  mitk::DicomSeriesReader::StringContainer files;
+  QStringList fileNames = dialog.getOpenFileNames();
+  if(fileNames.empty())
+  {
+    return;
+  }
+  QStringListIterator fileNamesIterator(fileNames);
+  while(fileNamesIterator.hasNext())
+  {
+    files.push_back(fileNamesIterator.next().toStdString());
+  }
+
+  std::string tmp = files.front();
+  const char* filename = tmp.c_str();
+  char* ncFilename = const_cast<char*>(filename);
+
+  mitk::DicomRTReader::Pointer _DicomRTReader = mitk::DicomRTReader::New();
+
+  DcmFileFormat file;
+  OFCondition outp = file.loadFile(filename, EXS_Unknown);
+  if(outp.bad())
+  {
+    QMessageBox::information(NULL,"Error","Cant read the file");
+  }
+  DcmDataset *dataset = file.getDataset();
+
+  mitk::DataNode::Pointer mitkImage = mitk::DataNode::New();
+  mitkImage = _DicomRTReader->LoadRTDose(dataset,ncFilename);
+
+  mitk::Image::Pointer picture = dynamic_cast<mitk::Image*>(mitkImage->GetData());
+
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+  double omg = value;
+  polyData = _DicomRTReader->GetIsoLine(omg, picture->GetVtkImageData());
+  mitk::Surface::Pointer surface = mitk::Surface::New();
+  surface->SetVtkPolyData(polyData);
+  for(int i=0;i<polyData->GetLength();++i)
+  {
+    double* ar;
+    polyData->GetPoint(i,ar);
+  }
+
+  mitk::DataNode::Pointer node = mitk::DataNode::New();
+  node->SetData(surface);
+  GetDataStorage()->Add(node);
 }
 
 void DcmRTV::DoImageProcessing()

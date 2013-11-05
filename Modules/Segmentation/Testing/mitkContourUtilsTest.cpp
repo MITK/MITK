@@ -81,7 +81,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     MITK_INFO << "ContourUtilsTest-EmptyImage/origin: " << image->GetGeometry()->GetOrigin();
     MITK_INFO << "ContourUtilsTest-EmptyImage/spacing: " << image->GetGeometry()->GetSpacing();
     MITK_INFO << "ContourUtilsTest-EmptyImage/Dimension: " << image->GetDimension();
-    if(mitk::IOUtil::SaveImage(image, "/mes/TestingMethodeOutput/testClassEmptyImage.mhd"))
+    if(mitk::IOUtil::SaveImage(image, "/home/lars/TestingMethodeOutput/testClassEmptyImage.mhd"))
         MITK_INFO << "Saved Image";
 
 
@@ -97,7 +97,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     MITK_INFO << "ContourUtilsTest-SliceImage/origin: " << sliceImage->GetGeometry()->GetOrigin();
     MITK_INFO << "ContourUtilsTest-SliceImage/spacing: " << sliceImage->GetGeometry()->GetSpacing();
     MITK_INFO << "ContourUtilsTest-SliceImage/Dimension: " << sliceImage->GetDimension();
-    if(mitk::IOUtil::SaveImage(sliceImage, "/mes/TestingMethodeOutput/testClassSliceImage.mhd"))
+    if(mitk::IOUtil::SaveImage(sliceImage, "/home/lars/TestingMethodeOutput/testClassSliceImage.mhd"))
         MITK_INFO << "Saved Image";
 
     //test FillContourInSlice

@@ -134,8 +134,8 @@ macro(_fixup_target)
     endif()
 
     set(GLOBBED_QT_PLUGINS )
-    if(CMAKE_SHARED_MODULE_SUFFIX AND NOT CMAKE_SHARED_MODULE_SUFFIX STREQUAL CMAKE_SHARED_LIBRARY_SUFFIX)
-      file(GLOB_RECURSE GLOBBED_QT_PLUGINS \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_MODULE_SUFFIX}\")
+    if(NOT \"${CMAKE_SHARED_MODULE_SUFFIX}\" STREQUAL \"\" AND NOT \"${CMAKE_SHARED_MODULE_SUFFIX}\" STREQUAL \"${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+      file(GLOB_RECURSE GLOBBED_QT_PLUGINS \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*/*${CMAKE_SHARED_MODULE_SUFFIX}\")
     endif()
 
     set(PLUGINS )

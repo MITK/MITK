@@ -554,7 +554,7 @@ void QmitkIGTPlayerWidget::OnSequencialModeToggled(bool toggled)
 
 void QmitkIGTPlayerWidget::OnSliderReleased()
 {
-  int currentSliderValue = m_Controls->samplePositionHorizontalSlider->value(); // current slider value selected through user movement
+  unsigned int currentSliderValue = m_Controls->samplePositionHorizontalSlider->value(); // current slider value selected through user movement
 
   if(currentSliderValue > m_CurrentSequentialPointNumber) // at the moment only forward scrolling is possible
   {

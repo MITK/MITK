@@ -161,3 +161,8 @@ mitk::VtkPropRenderer* mitk::RenderWindowBase::GetRenderer()
 {
   return m_Renderer;
 }
+
+bool mitk::RenderWindowBase::IsInResize() const
+{
+  return m_InResize;
+}

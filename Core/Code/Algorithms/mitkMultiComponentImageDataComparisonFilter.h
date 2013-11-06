@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKMULTICHANNELIMAGEDATACOMPARISONFILTER_H
-#define MITKMULTICHANNELIMAGEDATACOMPARISONFILTER_H
+#ifndef MITKMULTICOMPONENTIMAGEDATACOMPARISONFILTER_H
+#define MITKMULTICOMPONENTIMAGEDATACOMPARISONFILTER_H
 
 // mitk includes
 #include "mitkImageToImageFilter.h"
@@ -31,11 +31,11 @@ namespace mitk
   *
   * The comparison is channel- / pixel-wise.
   */
-  class MITK_CORE_EXPORT MultiChannelImageDataComparisonFilter : public ImageToImageFilter
+  class MITK_CORE_EXPORT MultiComponentImageDataComparisonFilter : public ImageToImageFilter
   {
   public:
 
-    mitkClassMacro(MultiChannelImageDataComparisonFilter, ImageToImageFilter);
+    mitkClassMacro(MultiComponentImageDataComparisonFilter, ImageToImageFilter);
     itkSimpleNewMacro(Self);
 
     /*! /brief
@@ -73,14 +73,14 @@ namespace mitk
 
   protected:
 
-    MultiChannelImageDataComparisonFilter();
+    MultiComponentImageDataComparisonFilter();
 
-    ~MultiChannelImageDataComparisonFilter();
+    ~MultiComponentImageDataComparisonFilter();
 
     virtual void GenerateData();
 
     template < typename TPixel >
-    void CompareMultiChannelImage( const Image* testImage, const Image* validImage);
+    void CompareMultiComponentImage( const Image* testImage, const Image* validImage);
 
     bool m_CompareResult;
     double m_Tolerance;
@@ -89,4 +89,4 @@ namespace mitk
   };
 } // end namespace mitk
 
-#endif // MITKMULTICHANNELIMAGEDATACOMPARISONFILTER_H
+#endif // MITKMULTICOMPONENTIMAGEDATACOMPARISONFILTER_H

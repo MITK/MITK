@@ -35,7 +35,7 @@ struct CompareFilterResults
   {
     if( !m_FilterCompleted )
     {
-      MITK_INFO << "Comparision filter terminated due to an exception: \n "
+      MITK_INFO << "Comparison filter terminated due to an exception: \n "
                 << m_ExceptionMessage;
 
       return;
@@ -77,7 +77,7 @@ public:
   itkSimpleNewMacro(Self)
 
   /**
-   * @brief Get the result of the comparision
+   * @brief Get the result of the comparison
    *
    * The method compares only the number of pixels with differences. It returns true if the amount
    * is under the specified threshold. To get the complete results, use the GetCompareResults method.
@@ -104,11 +104,13 @@ protected:
 
   virtual void GenerateData();
 
+  /*! \brief Method resets the compare detail memeber struct to its initial state */
+  void ResetCompareResultsToInitial();
+
   /** ITK-like method which calls the ComparisionFilter on the two inputs of the filter */
   template< typename TPixel, unsigned int VImageDimension>
   void EstimateValueDifference( itk::Image< TPixel, VImageDimension>* itkImage1,
                                 const mitk::Image* referenceImage);
-
   bool m_CompareResult;
 
   CompareFilterResults m_CompareDetails;

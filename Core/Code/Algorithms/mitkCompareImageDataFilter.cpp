@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkITKImageImport.h"
 #include "mitkImageCaster.h"
-#include "mitkMultiChannelImageDataComparisonFilter.h"
+#include "mitkMultiComponentImageDataComparisonFilter.h"
 
 // itk includes
 #include <itkTestingComparisonImageFilter.h>
@@ -27,8 +27,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::CompareImageDataFilter::CompareImageDataFilter()
 {
   this->SetNumberOfRequiredInputs(2);
+
+  this->ResetCompareResultsToInitial();
 }
 
+void mitk::CompareImageDataFilter::ResetCompareResultsToInitial()
+{
+  m_CompareDetails.m_MaximumDifference = 0.0f;
+  m_CompareDetails.m_MinimumDifference = itk::NumericTraits< double >::max();
+  m_CompareDetails.m_MeanDifference = 0.0f;
+  m_CompareDetails.m_TotalDifference = 0.0f;
+  m_CompareDetails.m_PixelsWithDifference = 0;
+  m_CompareDetails.m_FilterCompleted = false;
+  m_CompareDetails.m_ExceptionMessage = "";
+}
 
 void mitk::CompareImageDataFilter::GenerateData()
 {
@@ -50,12 +62,13 @@ void mitk::CompareImageDataFilter::GenerateData()
   else if(input1->GetPixelType().GetNumberOfComponents() > 1 &&
     input2->GetPixelType().GetNumberOfComponents() > 1 )
   {
-    MultiChannelImageDataComparisonFilter::Pointer mcComparator = MultiChannelImageDataComparisonFilter::New();
+    this->ResetCompareResultsToInitial();
+
+    MultiComponentImageDataComparisonFilter::Pointer mcComparator = MultiComponentImageDataComparisonFilter::New();
     mcComparator->SetTestImage(input1);
     mcComparator->SetValidImage(input2);
     mcComparator->SetCompareFilterResult( &m_CompareDetails);
     mcComparator->Update();
-    //mcComparator->GetCompareFilterResult()
   }
 }
 

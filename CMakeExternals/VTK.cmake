@@ -60,9 +60,7 @@ if(NOT DEFINED VTK_DIR)
   set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-5.10.0.tar.gz)
   set(VTK_URL_MD5 a0363f78910f466ba8f1bd5ab5437cb9)
 
-  if(APPLE)
-    set(VTK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchVTK-5.10-Mac.cmake)
-  endif()
+  set(VTK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -DWIN32_OPENGL_RW_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/vtkWin32OpenGLRenderWindow.cxx.vtk-5.10.patched -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchVTK-5.10.cmake)
 
     ExternalProject_Add(${proj}
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src

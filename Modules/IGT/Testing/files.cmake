@@ -23,16 +23,16 @@ set(MODULE_TESTS
    mitkTrackingVolumeGeneratorTest.cpp
    mitkTrackingDeviceTest.cpp
    mitkTrackingToolTest.cpp
-   mitkVirtualTrackingDeviceTest.cpp
+   #mitkVirtualTrackingDeviceTest.cpp # see bug 16385
    mitkNavigationDataPlayerTest.cpp # see bug 11636 (extend this test by microservices)
-   mitkTrackingDeviceSourceTest.cpp
+   #mitkTrackingDeviceSourceTest.cpp # see bug 16385
    mitkTrackingDeviceSourceConfiguratorTest.cpp
    mitkNavigationDataEvaluationFilterTest.cpp
    mitkTrackingTypesTest.cpp
 
    # ------------------ Navigation Tool Management Tests -------------------
-   mitkNavigationToolStorageTest.cpp
-   mitkNavigationToolTest.cpp
+   #mitkNavigationToolStorageTest.cpp # see bug 16385
+   #mitkNavigationToolTest.cpp # see bug 16385
    #mitkNavigationToolReaderAndWriterTest.cpp
    #mitkNavigationToolStorageSerializerAndDeserializerTest.cpp
    # -----------------------------------------------------------------------

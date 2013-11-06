@@ -30,7 +30,13 @@ public:
 
   static std::string GetSerializedReference()
   {
-    return "<calibrations>\n<default0 M00=\"1.1234\" M01=\"1.2234\" M02=\"1.3234\" M10=\"1.4234\" M11=\"1.5234\" M12=\"1.6234\" M20=\"1.7234\" M21=\"1.8234\" M22=\"1.9234\" O0=\"2.1234\" O1=\"2.2234\" O2=\"2.3234\" />\n<calibrations>";
+    return "<calibrations>\n<default0 M00=\"1.1234\" M01=\"1.2234\" M02=\"1.3234\" M10=\"1.4234\" M11=\"1.5234\" M12=\"1.6234\" M20=\"1.7234\" M21=\"1.8234\" M22=\"1.9234\" O0=\"2.1234\" O1=\"2.2234\" O2=\"2.3234\" />\n<calibrations>\n";
+  }
+
+  static bool CompareDoubles (double A, double B)
+  {
+    float diff = A - B;
+    return (diff < 0.0001) && (-diff < 0.0001);
   }
 
   /*
@@ -95,19 +101,19 @@ public:
 
     bool identical = true;
 
-    if (! matrix[0][0] == 1.1234f) identical = false;
-    if (! matrix[0][1] == 1.2234f) identical = false;
-    if (! matrix[0][2] == 1.3234f) identical = false;
-    if (! matrix[1][0] == 1.4234f) identical = false;
-    if (! matrix[1][1] == 1.5234f) identical = false;
-    if (! matrix[1][2] == 1.6234f) identical = false;
-    if (! matrix[2][0] == 1.7234f) identical = false;
-    if (! matrix[2][1] == 1.8234f) identical = false;
-    if (! matrix[2][2] == 1.9234f) identical = false;
+    if (! CompareDoubles(matrix[0][0], 1.1234f)) identical = false;
+    if (! CompareDoubles(matrix[0][1], 1.2234f)) identical = false;
+    if (! CompareDoubles(matrix[0][2], 1.3234f)) identical = false;
+    if (! CompareDoubles(matrix[1][0], 1.4234f)) identical = false;
+    if (! CompareDoubles(matrix[1][1], 1.5234f)) identical = false;
+    if (! CompareDoubles(matrix[1][2], 1.6234f)) identical = false;
+    if (! CompareDoubles(matrix[2][0], 1.7234f)) identical = false;
+    if (! CompareDoubles(matrix[2][1], 1.8234f)) identical = false;
+    if (! CompareDoubles(matrix[2][2], 1.9234f)) identical = false;
 
-    if (! offset[0] == 1.1234f) identical = false;
-    if (! offset[1] == 1.2234f) identical = false;
-    if (! offset[2] == 1.3234f) identical = false;
+    if (! CompareDoubles(offset[0], 2.1234f)) identical = false;
+    if (! CompareDoubles(offset[1], 2.2234f)) identical = false;
+    if (! CompareDoubles(offset[2], 2.3234f)) identical = false;
 
     MITK_TEST_CONDITION_REQUIRED(identical, "Testing if deserialized calibration is identical to serialized one...");
   }

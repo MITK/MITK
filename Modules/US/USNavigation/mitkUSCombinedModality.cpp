@@ -283,7 +283,7 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
 
   // Parse Input
   TiXmlDocument doc;
-  if(!doc.LoadFile(xmlString));
+  if(!doc.Parse(xmlString.c_str()));
   {
     MITK_WARN << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorDesc();
     return;

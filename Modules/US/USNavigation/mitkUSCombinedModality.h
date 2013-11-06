@@ -93,6 +93,22 @@ namespace mitk {
     */
     void UnregisterOnService();
 
+    /**
+    * \brief Serializes all contained calibrations into an xml fragment.
+    *
+    * The returned string contains one parent node named "calibrations" and several
+    * subnodes, one for each calibration that is present.
+    */
+    std::string SerializeCalibration();
+
+    /**
+    * \brief Deserializes a string provided by a prior call to Serialize().
+    * If the bool flag is true, all prior calibrations will be deleted.
+    * If the flag is set to false, prior calibrations will be retained, but overwritten
+    * if one of equal name is present.
+    */
+    void DeserializeCalibration(const std::string &xmlString, bool clearPreviousCalibrations = true);
+
   protected:
     USCombinedModality(USDevice::Pointer usDevice, NavigationDataSource::Pointer trackingDevice, std::string manufacturer = "", std::string model = "");
     virtual ~USCombinedModality();
@@ -127,10 +143,6 @@ namespace mitk {
     * This method is called internally, whenever Update() is invoked by an Output.
     */
     void GenerateData();
-
-    std::string SerializeCalibration();
-
-    void DeserializeCalibration(std::string xmlString);
 
     std::string GetIdentifierForCurrentCalibration();
 

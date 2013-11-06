@@ -265,7 +265,7 @@ std::string mitk::USCombinedModality::SerializeCalibration()
 
     result << elem << std::endl;
   }
-  result << "<\calibrations>" << std::endl;
+  result << "</calibrations>" << std::endl;
 
   return result.str();
 }
@@ -283,7 +283,7 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
 
   // Parse Input
   TiXmlDocument doc;
-  if(!doc.Parse(xmlString.c_str()));
+  if(!doc.Parse(xmlString.c_str()))
   {
     MITK_WARN << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorDesc();
     return;
@@ -315,8 +315,8 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
 
     // Deserialize Offset
     elem->QueryFloatAttribute("O0", &offset[0]);
-    elem->QueryFloatAttribute("O1", &offset[0]);
-    elem->QueryFloatAttribute("O2", &offset[0]);
+    elem->QueryFloatAttribute("O1", &offset[1]);
+    elem->QueryFloatAttribute("O2", &offset[2]);
 
     mitk::AffineTransform3D::Pointer calibration = mitk::AffineTransform3D::New();
     calibration->SetMatrix(matrix);

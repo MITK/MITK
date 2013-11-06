@@ -30,7 +30,7 @@ public:
 
   static std::string GetSerializedReference()
   {
-    return "<calibrations>\n<default0 M00=\"1.1234\" M01=\"1.2234\" M02=\"1.3234\" M10=\"1.4234\" M11=\"1.5234\" M12=\"1.6234\" M20=\"1.7234\" M21=\"1.8234\" M22=\"1.9234\" O0=\"2.1234\" O1=\"2.2234\" O2=\"2.3234\" />\n<calibrations>\n";
+    return "<calibrations>\n<default0 M00=\"1.1234\" M01=\"1.2234\" M02=\"1.3234\" M10=\"1.4234\" M11=\"1.5234\" M12=\"1.6234\" M20=\"1.7234\" M21=\"1.8234\" M22=\"1.9234\" O0=\"2.1234\" O1=\"2.2234\" O2=\"2.3234\" />\n</calibrations>\n";
   }
 
   static bool CompareDoubles (double A, double B)

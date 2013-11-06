@@ -46,11 +46,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "vtkOpenGLRenderWindow.h"
 
-
 #define myGL_COMPRESSED_RGB_S3TC_DXT1_EXT                   0x83F0
 #define myGL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT           0x8C72
 #define myGL_COMPRESSED_RGBA_S3TC_DXT5_EXT                  0x83F3
-
 
 const char *vtkMitkVolumeTextureMapper3D_FourDependentShadeFP =
 "!!ARBfp1.0\n"
@@ -90,13 +88,11 @@ const char *vtkMitkVolumeTextureMapper3D_FourDependentShadeFP =
 "RSQ temp, temp4.x;\n"
 "MUL normal, normal, temp;\n"
 
-
 //"RCP temp4,temp.x;\n"
 
 //"MUL temp2.w,temp2.w,temp4.x;\n"
 
 //"MUL_SAT temp2.w,temp2.w,6.0;\n"
-
 
 "TEX sampleColor, tex0, texture[1], 3D;\n"
 
@@ -178,7 +174,6 @@ const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 //# in the third volume
 "TEX temp2, tex0, texture[0], 3D;\n"
 
-
 // Gradient Compution
 
 //# Look up the scalar value / gradient
@@ -195,7 +190,6 @@ const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 
 "SUB normal.x,temp2.y,temp1.y;\n"
 
-
 "ADD temp3,tex0,{0,-0.005,0};\n"
 "TEX temp2,temp3, texture[0], 3D;\n"
 
@@ -204,7 +198,6 @@ const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 
 "SUB normal.y,temp2.y,temp1.y;\n"
 
-
 "ADD temp3,tex0,{0,0,-0.005};\n"
 "TEX temp2,temp3, texture[0], 3D;\n"
 
@@ -212,7 +205,6 @@ const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 //"TEX temp1,temp3, texture[0], 3D;\n"
 
 "SUB normal.z,temp2.y,temp1.y;\n"
-
 
                 */
 
@@ -291,8 +283,6 @@ const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 
 "END\n";
 
-
-
 //#ifndef VTK_IMPLEMENT_MESA_CXX
 vtkCxxRevisionMacro(vtkMitkOpenGLVolumeTextureMapper3D, "$Revision: 1.21 $");
 vtkStandardNewMacro(vtkMitkOpenGLVolumeTextureMapper3D);
@@ -355,7 +345,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::ReleaseGraphicsResources(vtkWindow
   this->Modified();
 }
 
-
 // Release the graphics resources used by this texture.
 void vtkMitkOpenGLVolumeTextureMapper3D::ReleaseGraphicsResources(mitk::BaseRenderer* renderer)
 {
@@ -387,7 +376,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::ReleaseGraphicsResources(mitk::BaseRend
   this->Modified();
 }
 
-
 void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol)
 {
   //GPU_INFO << "Render";
@@ -406,13 +394,11 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol
     return;
     }
 
-
   vtkMatrix4x4       *matrix = vtkMatrix4x4::New();
   vtkPlaneCollection *clipPlanes;
   vtkPlane           *plane;
   int                numClipPlanes = 0;
   double             planeEquation[4];
-
 
   // build transformation
   vol->GetMatrix(matrix);
@@ -452,8 +438,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol
       glClipPlane(static_cast<GLenum>(GL_CLIP_PLANE0+i),planeEquation);
       }
     }
-
-
 
   // insert model transformation
   glMatrixMode( GL_MODELVIEW );
@@ -674,7 +658,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
           bounds[j-1][k] = tmpBounds[k];
           }
         distance2[j-1] = tmpDistance2;
-
         }
       }
 
@@ -693,7 +676,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
     // Loop over the polygons
     for ( i = 0; i < this->NumberOfPolygons; i++ )
       {
-
       if ( renWin->CheckAbortStatus() )
         {
         return;
@@ -828,7 +810,6 @@ class ScalarGradientCompute
 
   inline void write(int x,int y,int z,float grayValue,float gx,float gy,float gz)
   {
-
  /*
     gx /= aspect[0];
     gy /= aspect[1];
@@ -886,7 +867,6 @@ class ScalarGradientCompute
   */
   }
 
-
   inline void compute(int x,int y,int z)
   {
     float grayValue = sample(x,y,z);
@@ -897,7 +877,6 @@ class ScalarGradientCompute
     gz = sample(x,y,z+1) - sample(x,y,z-1);
 
     write( x, y, z, grayValue, gx, gy, gz );
-
   }
 
   inline void computeClamp(int x,int y,int z)
@@ -958,7 +937,6 @@ class ScalarGradientCompute
       x++;
     }
   }
-
 
   inline void computeClamp1D(int y,int z)
   {
@@ -1059,8 +1037,6 @@ class ScalarGradientCompute
   }
 };
 
-
-
 template <class T>
 void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
                                                vtkMitkVolumeTextureMapper3D *me,
@@ -1149,7 +1125,6 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
  // delete tmpPtr2;
 }
 
-
 class RGBACompute
 {
   unsigned char *dataPtr;
@@ -1220,7 +1195,6 @@ class RGBACompute
 
   inline void write(int x,int y,int z,int iGrayValue,int gx,int gy,int gz)
   {
-
  /*
     gx /= aspect[0];
     gy /= aspect[1];
@@ -1252,7 +1226,6 @@ class RGBACompute
   */
   }
 
-
   inline void compute(int x,int y,int z)
   {
     int grayValue = sample(x,y,z);
@@ -1263,7 +1236,6 @@ class RGBACompute
     gz = sample(x,y,z+1) - sample(x,y,z-1);
 
     write( x, y, z, grayValue, gx, gy, gz );
-
   }
 
   inline void computeClamp(int x,int y,int z)
@@ -1318,7 +1290,6 @@ class RGBACompute
       x++;
     }
   }
-
 
   inline void computeClamp1D(int y,int z)
   {
@@ -1396,7 +1367,6 @@ class RGBACompute
     }
   }
 };
-
 
 void vtkVolumeTextureMapper3DComputeRGBA( unsigned char *dataPtr,
                                                vtkMitkVolumeTextureMapper3D *me,
@@ -1485,7 +1455,6 @@ void vtkVolumeTextureMapper3DComputeRGBA( unsigned char *dataPtr,
   delete tmpPtr;
   delete tmpPtr2;
 }
-
 
 //-----------------------------------------------------------------------------
 void vtkMitkOpenGLVolumeTextureMapper3D::ComputeVolumeDimensions()
@@ -1636,7 +1605,6 @@ bool vtkMitkOpenGLVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol
   return true;
 }
 
-
 //-----------------------------------------------------------------------------
 bool vtkMitkOpenGLVolumeTextureMapper3D::UpdateVolumesRGBA(vtkVolume *vtkNotUsed(vol))
 {
@@ -1754,11 +1722,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupOneIndependentTextures( vtkRendere
 
     glTexImage2D( GL_TEXTURE_2D, 0,colorLookupTextureFormat, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, this->ColorLookup );
   }
-
 }
-
-
-
 
 void vtkMitkOpenGLVolumeTextureMapper3D::SetupRGBATextures(
   vtkRenderer *vtkNotUsed(ren),
@@ -1767,7 +1731,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupRGBATextures(
   MITK_INFO << "SetupFourDependentTextures";
 
   this->UpdateVolumesRGBA(vol);
-
 
     /*
   vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
@@ -1929,7 +1892,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderRGBAShadeFP(
   glDisable( vtkgl::FRAGMENT_PROGRAM_ARB );
 }
 
-
 void vtkMitkOpenGLVolumeTextureMapper3D::GetLightInformation(
   vtkRenderer *ren,
   vtkVolume *vol,
@@ -1940,7 +1902,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::GetLightInformation(
   GLfloat ambientColor[4] )
 {
   //GPU_INFO << "GetLightInformation";
-
 
   float ambient = vol->GetProperty()->GetAmbient();
   float diffuse  = vol->GetProperty()->GetDiffuse();
@@ -1976,7 +1937,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::GetLightInformation(
   viewDirection[2] = cameraFocalPoint[2] - cameraPosition[2];
 
   vtkMath::Normalize( viewDirection );
-
 
   ambientColor[0] = 0.0;
   ambientColor[1] = 0.0;
@@ -2055,7 +2015,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::GetLightInformation(
     }
 
   volumeTransform->Delete();
-
 }
 
 void vtkMitkOpenGLVolumeTextureMapper3D::SetupProgramLocalsForShadingFP(
@@ -2234,17 +2193,13 @@ int  vtkMitkOpenGLVolumeTextureMapper3D::IsRenderSupported(  vtkRenderer *render
 
   if ( !this->RenderPossible )
     {
+      MITK_WARN<<"vtkMitkOpenGLVolumeTextureMapper3D::IsRenderSupported Rendering not possible";
     return 0;
     }
 
   if ( !this->GetInput() )
     {
-    return 0;
-    }
-
-  if ( this->GetInput()->GetNumberOfScalarComponents() > 1 &&
-       property->GetIndependentComponents() )
-    {
+      MITK_WARN<<"vtkMitkOpenGLVolumeTextureMapper3D::IsRenderSupported No input available";
     return 0;
     }
 
@@ -2372,12 +2327,10 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *renderer)
   }
 }
 
-
 // ----------------------------------------------------------------------------
 // Print the vtkMitkOpenGLVolumeTextureMapper3D
 void vtkMitkOpenGLVolumeTextureMapper3D::PrintSelf(ostream& os, vtkIndent indent)
 {
-
  // vtkOpenGLExtensionManager * extensions = vtkOpenGLExtensionManager::New();
  // extensions->SetRenderWindow(NULL); // set render window to current render window
 
@@ -2453,6 +2406,3 @@ void vtkMitkOpenGLVolumeTextureMapper3D::PrintSelf(ostream& os, vtkIndent indent
 
   this->Superclass::PrintSelf(os,indent);
 }
-
-
-

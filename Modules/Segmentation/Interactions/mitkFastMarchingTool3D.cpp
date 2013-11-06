@@ -310,9 +310,10 @@ void mitk::FastMarchingTool3D::OnAddPoint()
 
   m_NeedUpdate = true;
 
+  this->Update();
+
   m_ReadyMessage.Send();
 
-  this->Update();
 }
 
 

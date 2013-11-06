@@ -205,6 +205,7 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
 
   //build the IGT pipeline
   mitk::TrackingDevice::Pointer trackingDevice = this->m_Controls->m_configurationWidget->GetTrackingDevice();
+  trackingDevice->SetData(m_TrackingDeviceData);
 
   //set device to rotation mode transposed becaus we are working with VNL style quaternions
   if(m_Controls->m_InverseMode->isChecked())
@@ -389,6 +390,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingVolumeChanged(QString qstr)
     std::string str = qstr.toStdString();
 
     mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
+    m_TrackingDeviceData = data;
 
     volumeGenerator->SetTrackingDeviceData(data);
     volumeGenerator->Update();

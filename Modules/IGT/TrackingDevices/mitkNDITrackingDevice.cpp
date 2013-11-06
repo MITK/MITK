@@ -358,7 +358,6 @@ const std::string mitk::NDITrackingDevice::CalcCRC(const std::string* input)
   return std::string(returnvalue);
 }
 
-
 bool mitk::NDITrackingDevice::OpenConnection()
 {
 
@@ -405,7 +404,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
     mitkThrowException(mitk::IGTHardwareException) << "Hardware Reset of tracking device did not work";
   }
 
-  /* Now the tracking device is reset, start initialization */
+  /* Now the tracking device isSetData reset, start initialization */
   NDIErrorCode returnvalue;
 
   /* set device com settings to new values and wait for the device to change them */
@@ -543,7 +542,15 @@ bool mitk::NDITrackingDevice::OpenConnection()
   }
   /* finish  - now all tools should be added, initialized and enabled, so that tracking can be started */
   this->SetState(Ready);
-  SetVolume(this->m_Data);
+  try
+  {
+    SetVolume(this->m_Data);
+  }
+  catch (mitk::IGTHardwareException e)
+  {
+    MITK_WARN<<e.GetDescription();
+  }
+
   return true;
 }
 

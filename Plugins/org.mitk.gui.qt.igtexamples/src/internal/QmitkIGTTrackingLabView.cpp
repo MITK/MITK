@@ -663,7 +663,6 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     T_MarkerRel->Compose(T_Marker->GetInverse());
     m_T_MarkerRel = T_MarkerRel;
     m_PermanentRegistrationFilter->SetOffset(0,m_T_MarkerRel->GetAffineTransform3D());
-    itk::Matrix<mitk::ScalarType,3,3> rotation = itk::Matrix<mitk::ScalarType,3,3>();
 
     //first: image (if activated)
     //set interpolation mode

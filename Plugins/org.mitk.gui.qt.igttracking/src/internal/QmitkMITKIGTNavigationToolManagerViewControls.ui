@@ -21,6 +21,16 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Select Toolstorage:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkNavigationToolStorageSelectionWidget" name="m_ToolStorageListWidget"/>
+   </item>
+   <item>
     <widget class="QmitkNavigationToolManagementWidget" name="m_toolManagerWidget" native="true"/>
    </item>
    <item>
@@ -48,6 +58,11 @@
    <extends>QWidget</extends>
    <header>QmitkNavigationToolManagementWidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkNavigationToolStorageSelectionWidget</class>
+   <extends>QTextEdit</extends>
+   <header>QmitkNavigationToolStorageSelectionWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

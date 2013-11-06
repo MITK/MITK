@@ -63,6 +63,8 @@ public:
   virtual vtkRenderWindow* GetVtkRenderWindow() = 0;
   virtual vtkRenderWindowInteractor* GetVtkRenderWindowInteractor() = 0;
 
+  virtual bool IsInResize() const;
+
   /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
   DEPRECATED(virtual void mousePressMitkEvent(mitk::MouseEvent *me));
   /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */

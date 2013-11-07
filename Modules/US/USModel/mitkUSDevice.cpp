@@ -123,13 +123,13 @@ mitk::USControlInterfaceBMode::Pointer mitk::USDevice::GetControlInterfaceBMode(
 
 mitk::USControlInterfaceProbes::Pointer mitk::USDevice::GetControlInterfaceProbes()
 {
-  MITK_INFO << "Control interface BMode does not exist for this object.";
+  MITK_INFO << "Control interface Probes does not exist for this object.";
   return 0;
 }
 
 mitk::USControlInterfaceDoppler::Pointer mitk::USDevice::GetControlInterfaceDoppler()
 {
-  MITK_INFO << "Control interface BMode does not exist for this object.";
+  MITK_INFO << "Control interface Doppler does not exist for this object.";
   return 0;
 }
 
@@ -140,7 +140,16 @@ us::ServiceProperties mitk::USDevice::ConstructServiceProperties()
   props[mitk::USDevice::US_PROPKEY_ISCONNECTED] = this->GetIsConnected() ? yes : no;
   props[mitk::USDevice::US_PROPKEY_ISACTIVE] = this->GetIsActive() ? yes : no;
 
-  props[ mitk::USDevice::US_PROPKEY_LABEL] = this->GetServicePropertyLabel();
+  props[mitk::USDevice::US_PROPKEY_LABEL] = this->GetServicePropertyLabel();
+
+  // get identifier of selected probe if there is one selected
+  mitk::USControlInterfaceProbes::Pointer probesControls = this->GetControlInterfaceProbes();
+  if (probesControls.IsNotNull())
+  {
+    mitk::USProbe::Pointer probe = probesControls->GetSelectedProbe();
+    if (probe.IsNotNull())
+    props[mitk::USDevice::US_PROPKEY_PROBES_SELECTED] = probe->GetName();
+  }
 
   //TODO Handle in subclasses?
   //props[ mitk::USImageMetadata::PROP_DEV_ISCALIBRATED ] = m_Calibration.IsNotNull() ? yes : no;

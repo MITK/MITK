@@ -104,7 +104,8 @@ mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration()
   std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
   if (calibrationKey.empty())
   {
-    MITK_WARN << "Could not get a key for the calibration.";
+    MITK_WARN("USCombinedModality")("USDevice")
+        << "Could not get a key for the calibration.";
     return 0;
   }
 
@@ -114,7 +115,8 @@ mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration()
 
   if (calibrationIterator == m_Calibrations.end())
   {
-    MITK_WARN << "No calibration found for selected probe and depth.";
+    MITK_WARN("USCombinedModality")("USDevice")
+        << "No calibration found for selected probe and depth.";
     return 0;
   }
 
@@ -327,29 +329,13 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
 
 std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()
 {
-  mitk::USControlInterfaceProbes::Pointer probesInterface = this->GetControlInterfaceProbes();
-  if ( probesInterface && ! probesInterface->GetIsActive())
-  {
-    MITK_WARN << "Cannot get calibration as probes interface is not active.";
-    return std::string();
-  }
+  us::ServiceProperties::const_iterator probeIt = m_ServiceProperties.find(US_PROPKEY_PROBES_SELECTED);
 
   // get probe identifier from control interface for probes
-  std::string probeName;
-  if ( ! probesInterface )
+  std::string probeName = "default";
+  if (probeIt != m_ServiceProperties.end())
   {
-    probeName = "default";
-  }
-  else
-  {
-    mitk::USProbe::Pointer curProbe = this->GetControlInterfaceProbes()->GetSelectedProbe();
-    if (curProbe.IsNull())
-    {
-      MITK_WARN << "Cannot get calibration as current probe is null.";
-      return std::string();
-    }
-
-    probeName = curProbe->GetName();
+    probeName = (probeIt->second).ToString();
   }
 
   // get string for depth value from the micro service properties

@@ -230,8 +230,6 @@ namespace mitk {
   protected:
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
 
-    DEPRECATED( mitk::USProbe::Pointer m_ActiveProbe );
-    DEPRECATED( std::vector<mitk::USProbe::Pointer> m_ConnectedProbes );
     mitk::Image::Pointer m_Image;
 
     bool m_IsFreezed;

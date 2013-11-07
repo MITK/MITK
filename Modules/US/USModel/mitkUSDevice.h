@@ -191,44 +191,6 @@ namespace mitk {
     void UpdateServiceProperty(std::string key, double value);
     void UpdateServiceProperty(std::string key, bool value);
 
-    /**
-    *\brief return the output (output with id 0) of the filter
-    */
-    //Image* GetOutput(void);
-
-    /**
-    *\brief return the output with id idx of the filter
-    */
-    //Image* GetOutput(unsigned int idx);
-
-    /**
-    *\brief Graft the specified DataObject onto this ProcessObject's output.
-    *
-    * See itk::ImageSource::GraftNthOutput for details
-    */
-    //virtual void GraftNthOutput(unsigned int idx, itk::DataObject *graft);
-
-    /**
-    * \brief Graft the specified DataObject onto this ProcessObject's output.
-    *
-    * See itk::ImageSource::Graft Output for details
-    */
-    //virtual void GraftOutput(itk::DataObject *graft);
-
-    //      /**
-    //      * \brief Make a DataObject of the correct type to used as the specified output.
-    //      *
-    //      * This method is automatically called when DataObject::DisconnectPipeline()
-    //      * is called.  DataObject::DisconnectPipeline, disconnects a data object
-    //      * from being an output of its current source.  When the data object
-    //      * is disconnected, the ProcessObject needs to construct a replacement
-    //      * output data object so that the ProcessObject is in a valid state.
-    //      * Subclasses of USImageVideoSource that have outputs of different
-    //      * data types must overwrite this method so that proper output objects
-    //      * are created.
-    //      */
-    //      virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
-
     //########### GETTER & SETTER ##################//
 
     /**
@@ -268,8 +230,6 @@ namespace mitk {
   protected:
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
 
-    DEPRECATED( mitk::USProbe::Pointer m_ActiveProbe );
-    DEPRECATED( std::vector<mitk::USProbe::Pointer> m_ConnectedProbes );
     mitk::Image::Pointer m_Image;
 
     bool m_IsFreezed;

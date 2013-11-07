@@ -87,7 +87,7 @@ bool mitk::USVideoDevice::OnConnection()
   if (m_SourceIsFile){
     m_Source->SetVideoFileInput(m_FilePath);
   } else {
-     m_Source->SetCameraInput(m_DeviceID);
+    m_Source->SetCameraInput(m_DeviceID);
   }
   //SetSourceCropArea();
   return true;
@@ -120,13 +120,9 @@ bool mitk::USVideoDevice::OnDeactivation()
 
 void mitk::USVideoDevice::GenerateData()
 {
-  mitk::USImage::Pointer result;
+  mitk::Image::Pointer result;
   result = m_Image;
 
-  // Set Metadata
-  result->SetMetadata(this->m_Metadata);
-  // Apply Transformation
-  this->ApplyCalibration(result);
   // Set Output
   this->SetNthOutput(0, result);
 }
@@ -143,4 +139,3 @@ mitk::USImageSource::Pointer mitk::USVideoDevice::GetUSImageSource()
 {
   return m_Source.GetPointer();
 }
-

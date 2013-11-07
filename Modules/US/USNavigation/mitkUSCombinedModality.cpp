@@ -218,7 +218,7 @@ mitk::NavigationDataSource::Pointer mitk::USCombinedModality::GetNavigationDataS
 void mitk::USCombinedModality::GenerateData()
 {
   m_UltrasoundDevice->Update();
-  mitk::USImage::Pointer image = m_UltrasoundDevice->GetOutput();
+  mitk::Image::Pointer image = m_UltrasoundDevice->GetOutput();
 
   std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
   if ( ! calibrationKey.empty() )

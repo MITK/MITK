@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::USImageSource::USImageSource()
   : m_OpenCVToMitkFilter(mitk::OpenCVToMitkImageFilter::New()),
-    m_MitkToOpenCVFilter(0)
+  m_MitkToOpenCVFilter(0)
 {
   m_OpenCVToMitkFilter->SetCopyBuffer(false);
 }
@@ -27,7 +27,7 @@ mitk::USImageSource::~USImageSource()
 {
 }
 
-mitk::USImage::Pointer mitk::USImageSource::GetNextImage()
+mitk::Image::Pointer mitk::USImageSource::GetNextImage()
 {
   mitk::Image::Pointer result;
 
@@ -35,7 +35,6 @@ mitk::USImage::Pointer mitk::USImageSource::GetNextImage()
   {
     cv::Mat image;
     this->GetNextRawImage(image);
-
 
     // execute filter if a filter is specified
     if ( m_ImageFilter.IsNotNull() ) { m_ImageFilter->FilterImage(image); }
@@ -60,13 +59,13 @@ mitk::USImage::Pointer mitk::USImageSource::GetNextImage()
 
   if ( result )
   {
-    // we then transform standard mitk::Image into an USImage
-    return mitk::USImage::New(result);
+    // Everything as expected, return result
+    return result;
   }
   else
   {
     //MITK_WARN("mitkUSImageSource") << "Result image is not set.";
-    return mitk::USImage::New();
+    return mitk::Image::New();
   }
 }
 

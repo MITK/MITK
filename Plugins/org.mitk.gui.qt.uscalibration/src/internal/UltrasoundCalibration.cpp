@@ -89,14 +89,14 @@ void UltrasoundCalibration::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_BtnReset,     SIGNAL(clicked()), this, SLOT(OnReset()) );                 // Reset Pointsets
 
   connect( m_Controls.m_CombinedModalityManagerWidget, SIGNAL(SignalCombinedModalitySelected(mitk::USCombinedModality::Pointer)),
-           this, SLOT(OnSelectDevice(mitk::USCombinedModality::Pointer)) );
+    this, SLOT(OnSelectDevice(mitk::USCombinedModality::Pointer)) );
 
   connect( m_Controls.m_StartCalibrationButton, SIGNAL(clicked()), this, SLOT(OnStartCalibrationProcess()) );
 
   m_Controls.m_TabWidget->setTabEnabled(1, false);
   m_Controls.m_TabWidget->setTabEnabled(2, false);
 
-   // Pointset for Calibration Points
+  // Pointset for Calibration Points
   m_CalibPointsTool = mitk::PointSet::New();
   m_Node = mitk::DataNode::New();
   m_Node->SetName("Tool Calibration Points");
@@ -131,7 +131,7 @@ void UltrasoundCalibration::CreateQtPartControl( QWidget *parent )
 }
 
 void UltrasoundCalibration::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
-                                             const QList<mitk::DataNode::Pointer>& nodes )
+                                               const QList<mitk::DataNode::Pointer>& nodes )
 {
 }
 
@@ -320,9 +320,9 @@ void UltrasoundCalibration::OnSaveEvaluation()
 void UltrasoundCalibration::OnSaveCalibration()
 {
   QString filename = QFileDialog::getSaveFileName( QApplication::activeWindow(),
-                                                   "Save Calibration",
-                                                   "",
-                                                   "Calibration files *.cal" );
+    "Save Calibration",
+    "",
+    "Calibration files *.cal" );
 
   // TODO: New writer for transformations must be implemented.
   //mitk::TransformationFileWriter::Pointer tWriter = mitk::TransformationFileWriter::New();
@@ -371,7 +371,7 @@ void UltrasoundCalibration::Update()
 
   // Update US Image
   m_CombinedModality->UpdateOutputData(0);
-  mitk::USImage::Pointer image = m_CombinedModality->GetOutput();
+  mitk::Image::Pointer image = m_CombinedModality->GetOutput();
   m_Node->SetData(image);
   //m_Image->Update();
 

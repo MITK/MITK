@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MitkUS
 #include "mitkUSProbe.h"
 #include "mitkUSImageMetadata.h"
-#include "mitkUSImage.h"
 #include <MitkUSExports.h>
 #include "mitkUSImageSource.h"
 
@@ -183,29 +182,6 @@ namespace mitk {
     virtual bool GetIsFreezed();
 
     /**
-    * \brief Add a probe to the device without connecting to it.
-    *  This should usually be done before connecting to the probe.
-    */
-    DEPRECATED( virtual void AddProbe(mitk::USProbe::Pointer probe) );
-
-    /**
-    * \brief Connect to a probe and activate it. The probe should be added first.
-    *  Usually, a VideoDevice will simply add a probe it wants to connect to,
-    *  but an SDK Device might require adding a probe first.
-    */
-    DEPRECATED( virtual void ActivateProbe(mitk::USProbe::Pointer probe) );
-
-    /**
-    * \brief Deactivates the currently active probe.
-    */
-    DEPRECATED( virtual void DeactivateProbe() );
-
-    /**
-    *  \brief Returns a vector containing all connected probes.
-    */
-    DEPRECATED( std::vector<mitk::USProbe::Pointer> GetConnectedProbes() );
-
-    /**
     * \brief Given property is updated in the device micro service.
     * This method is mainly for being used by the control interface
     * superclasses. You do not need to call it by yoursefs in your
@@ -218,26 +194,26 @@ namespace mitk {
     /**
     *\brief return the output (output with id 0) of the filter
     */
-    USImage* GetOutput(void);
+    //Image* GetOutput(void);
 
     /**
     *\brief return the output with id idx of the filter
     */
-    USImage* GetOutput(unsigned int idx);
+    //Image* GetOutput(unsigned int idx);
 
     /**
     *\brief Graft the specified DataObject onto this ProcessObject's output.
     *
     * See itk::ImageSource::GraftNthOutput for details
     */
-    virtual void GraftNthOutput(unsigned int idx, itk::DataObject *graft);
+    //virtual void GraftNthOutput(unsigned int idx, itk::DataObject *graft);
 
     /**
     * \brief Graft the specified DataObject onto this ProcessObject's output.
     *
     * See itk::ImageSource::Graft Output for details
     */
-    virtual void GraftOutput(itk::DataObject *graft);
+    //virtual void GraftOutput(itk::DataObject *graft);
 
     //      /**
     //      * \brief Make a DataObject of the correct type to used as the specified output.
@@ -276,22 +252,6 @@ namespace mitk {
     */
     bool GetIsConnected();
 
-    /**
-    * \brief Sets a transformation as Calibration data. It also marks the device as Calibrated. This data is not automatically applied to the image. Subclasses must call ApplyTransformation
-    * to achieve this.
-    */
-    DEPRECATED( void setCalibration (mitk::AffineTransform3D::Pointer calibration) );
-
-    /**
-    * \brief Returns the current Calibration
-    */
-    DEPRECATED( itkGetMacro(Calibration, mitk::AffineTransform3D::Pointer) );
-
-    /**
-    * \brief Returns the currently active probe or null, if none is active
-    */
-    DEPRECATED( itkGetMacro(ActiveProbe, mitk::USProbe::Pointer) );
-
     /* @return Returns the area that will be cropped from the US image. Is disabled / [0,0,0,0] by default. */
     mitk::USDevice::USImageCropArea GetCropArea();
 
@@ -310,7 +270,7 @@ namespace mitk {
 
     DEPRECATED( mitk::USProbe::Pointer m_ActiveProbe );
     DEPRECATED( std::vector<mitk::USProbe::Pointer> m_ConnectedProbes );
-    mitk::USImage::Pointer m_Image;
+    mitk::Image::Pointer m_Image;
 
     bool m_IsFreezed;
 
@@ -414,21 +374,6 @@ namespace mitk {
     * This method is called internally, whenever Update() is invoked by an Output.
     */
     void GenerateData() = 0;
-
-    /**
-    * \brief The Calibration Transformation of this US-Device.
-    * This will automatically be written into the image once
-    */
-    DEPRECATED( mitk::AffineTransform3D::Pointer m_Calibration );
-
-    /**
-    *  \brief Convenience method that can be used by subclasses to apply the Calibration Data to the image.
-    * A subclass has to call this method or set the transformation itself for
-    * the output to be calibrated!
-    *
-    * \return true if a Calibration was set and false otherwise (usually happens when no transformation was set yet)
-    */
-    DEPRECATED( bool ApplyCalibration(mitk::USImage::Pointer image) );
 
     std::string GetServicePropertyLabel();
 

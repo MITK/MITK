@@ -48,13 +48,13 @@ mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
 }
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model)
-: mitk::ImageSource(),
-m_MultiThreader(itk::MultiThreader::New()),
-m_ImageMutex(itk::FastMutexLock::New()),
-m_CameraActiveMutex(itk::FastMutexLock::New()),
-m_IsFreezed(false),
-m_DeviceState(State_NoState),
-m_UnregisteringStarted(false)
+  : mitk::ImageSource(),
+  m_MultiThreader(itk::MultiThreader::New()),
+  m_ImageMutex(itk::FastMutexLock::New()),
+  m_CameraActiveMutex(itk::FastMutexLock::New()),
+  m_IsFreezed(false),
+  m_DeviceState(State_NoState),
+  m_UnregisteringStarted(false)
 {
   // Initialize Members
   m_Metadata = mitk::USImageMetadata::New();
@@ -72,18 +72,18 @@ m_UnregisteringStarted(false)
   this->SetNumberOfOutputs(1);
 
   //create a new output
-  mitk::USImage::Pointer newOutput = mitk::USImage::New();
+  mitk::Image::Pointer newOutput = mitk::Image::New();
   this->SetNthOutput(0,newOutput);
 }
 
 mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
-: mitk::ImageSource(),
-m_MultiThreader(itk::MultiThreader::New()),
-m_ImageMutex(itk::FastMutexLock::New()),
-m_CameraActiveMutex(itk::FastMutexLock::New()),
-m_IsFreezed(false),
-m_DeviceState(State_NoState),
-m_UnregisteringStarted(false)
+  : mitk::ImageSource(),
+  m_MultiThreader(itk::MultiThreader::New()),
+  m_ImageMutex(itk::FastMutexLock::New()),
+  m_CameraActiveMutex(itk::FastMutexLock::New()),
+  m_IsFreezed(false),
+  m_DeviceState(State_NoState),
+  m_UnregisteringStarted(false)
 {
   m_Metadata = metadata;
 
@@ -98,7 +98,7 @@ m_UnregisteringStarted(false)
   this->SetNumberOfOutputs(1);
 
   //create a new output
-  mitk::USImage::Pointer newOutput = mitk::USImage::New();
+  mitk::Image::Pointer newOutput = mitk::Image::New();
   this->SetNthOutput(0,newOutput);
 }
 
@@ -142,7 +142,8 @@ us::ServiceProperties mitk::USDevice::ConstructServiceProperties()
 
   props[ mitk::USDevice::US_PROPKEY_LABEL] = this->GetServicePropertyLabel();
 
-  props[ mitk::USImageMetadata::PROP_DEV_ISCALIBRATED ] = m_Calibration.IsNotNull() ? yes : no;
+  //TODO Handle in subclasses?
+  //props[ mitk::USImageMetadata::PROP_DEV_ISCALIBRATED ] = m_Calibration.IsNotNull() ? yes : no;
 
   props[ mitk::USDevice::US_PROPKEY_CLASS ] = GetDeviceClass();
   props[ mitk::USImageMetadata::PROP_DEV_MANUFACTURER ] = m_Metadata->GetDeviceManufacturer();
@@ -302,31 +303,6 @@ bool mitk::USDevice::GetIsFreezed()
   return m_IsFreezed;
 }
 
-void mitk::USDevice::AddProbe(mitk::USProbe::Pointer probe)
-{
-  for(unsigned int i = 0; i < m_ConnectedProbes.size(); i++)
-  {
-    if (m_ConnectedProbes[i]->IsEqualToProbe(probe)) return;
-  }
-  m_ConnectedProbes.push_back(probe);
-}
-
-void mitk::USDevice::ActivateProbe(mitk::USProbe::Pointer probe){
-  // currently, we may just add the probe. This behaviour should be changed, should more complicated SDK applications emerge
-  AddProbe(probe);
-  int index = -1;
-  for(unsigned int i = 0; i < m_ConnectedProbes.size(); i++)
-  {
-    if (m_ConnectedProbes[i]->IsEqualToProbe(probe)) index = i;
-  }
-  // index now contains the position of the original instance of this probe
-  m_ActiveProbe = m_ConnectedProbes[index];
-}
-
-void mitk::USDevice::DeactivateProbe(){
-  m_ActiveProbe = 0;
-}
-
 void mitk::USDevice::UpdateServiceProperty(std::string key, std::string value)
 {
   m_ServiceProperties[ key ] = value;
@@ -345,54 +321,50 @@ void mitk::USDevice::UpdateServiceProperty(std::string key, bool value)
   this->UpdateServiceProperty(key, value ? std::string("true") : std::string("false"));
 }
 
-mitk::USImage* mitk::USDevice::GetOutput()
+/**
+mitk::Image* mitk::USDevice::GetOutput()
 {
-  if (this->GetNumberOfOutputs() < 1)
-    return NULL;
+if (this->GetNumberOfOutputs() < 1)
+return NULL;
 
-  return static_cast<USImage*>(this->ProcessObject::GetPrimaryOutput());
+return static_cast<USImage*>(this->ProcessObject::GetPrimaryOutput());
 }
 
-mitk::USImage* mitk::USDevice::GetOutput(unsigned int idx)
+mitk::Image* mitk::USDevice::GetOutput(unsigned int idx)
 {
-  if (this->GetNumberOfOutputs() < 1)
-    return NULL;
-  return static_cast<USImage*>(this->ProcessObject::GetOutput(idx));
+if (this->GetNumberOfOutputs() < 1)
+return NULL;
+return static_cast<USImage*>(this->ProcessObject::GetOutput(idx));
 }
 
 void mitk::USDevice::GraftOutput(itk::DataObject *graft)
 {
-  this->GraftNthOutput(0, graft);
+this->GraftNthOutput(0, graft);
 }
 
 void mitk::USDevice::GraftNthOutput(unsigned int idx, itk::DataObject *graft)
 {
-  if ( idx >= this->GetNumberOfOutputs() )
-  {
-    itkExceptionMacro(<<"Requested to graft output " << idx <<
-      " but this filter only has " << this->GetNumberOfOutputs() << " Outputs.");
-  }
-
-  if ( !graft )
-  {
-    itkExceptionMacro(<<"Requested to graft output with a NULL pointer object" );
-  }
-
-  itk::DataObject* output = this->GetOutput(idx);
-  if ( !output )
-  {
-    itkExceptionMacro(<<"Requested to graft output that is a NULL pointer" );
-  }
-  // Call Graft on USImage to copy member data
-  output->Graft( graft );
+if ( idx >= this->GetNumberOfOutputs() )
+{
+itkExceptionMacro(<<"Requested to graft output " << idx <<
+" but this filter only has " << this->GetNumberOfOutputs() << " Outputs.");
 }
 
-bool mitk::USDevice::ApplyCalibration(mitk::USImage::Pointer image){
-  if ( m_Calibration.IsNull() ) return false;
-
-  image->GetGeometry()->SetIndexToWorldTransform(m_Calibration);
-  return true;
+if ( !graft )
+{
+itkExceptionMacro(<<"Requested to graft output with a NULL pointer object" );
 }
+
+itk::DataObject* output = this->GetOutput(idx);
+if ( !output )
+{
+itkExceptionMacro(<<"Requested to graft output that is a NULL pointer" );
+}
+// Call Graft on USImage to copy member data
+output->Graft( graft );
+}
+
+*/
 
 void mitk::USDevice::GrabImage()
 {
@@ -400,20 +372,6 @@ void mitk::USDevice::GrabImage()
 }
 
 //########### GETTER & SETTER ##################//
-
-void mitk::USDevice::setCalibration (mitk::AffineTransform3D::Pointer calibration){
-  if (calibration.IsNull())
-  {
-    MITK_ERROR << "Null pointer passed to SetCalibration of mitk::USDevice. Ignoring call.";
-    return;
-  }
-  m_Calibration = calibration;
-  m_Metadata->SetDeviceIsCalibrated(true);
-  if (m_ServiceRegistration != 0)
-  {
-    this->UpdateServiceProperty(mitk::USImageMetadata::PROP_DEV_ISCALIBRATED, m_Calibration.IsNotNull());
-  }
-}
 
 bool mitk::USDevice::GetIsInitialized()
 {
@@ -440,11 +398,6 @@ std::string mitk::USDevice::GetDeviceModel(){
 
 std::string mitk::USDevice::GetDeviceComment(){
   return this->m_Metadata->GetDeviceComment();
-}
-
-std::vector<mitk::USProbe::Pointer> mitk::USDevice::GetConnectedProbes()
-{
-  return m_ConnectedProbes;
 }
 
 std::string mitk::USDevice::GetServicePropertyLabel()

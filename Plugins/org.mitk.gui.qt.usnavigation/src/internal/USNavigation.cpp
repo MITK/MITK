@@ -205,7 +205,7 @@ void USNavigation::Update()
   if (m_UpdateImage)
   {
     m_USDevice->UpdateOutputData(0);
-    mitk::USImage::Pointer image = m_USDevice->GetOutput();
+    mitk::Image::Pointer image = m_USDevice->GetOutput();
     m_USStream->SetData(image);
     this->RequestRenderWindowUpdate();
   }

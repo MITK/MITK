@@ -27,15 +27,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::USImageVideoSource::USImageVideoSource()
   : m_VideoCapture(new cv::VideoCapture()),
-    m_IsVideoReady(false),
-    m_IsGreyscale(false),
-    m_IsCropped(false),
-    m_ResolutionOverrideWidth(0),
-    m_ResolutionOverrideHeight(0),
-    m_ResolutionOverride(false),
-    m_GrayscaleFilter(mitk::ConvertGrayscaleOpenCVImageFilter::New()),
-    m_CropFilter(mitk::CropOpenCVImageFilter::New()),
-    m_CombinationFilter(mitk::BasicCombinationOpenCVImageFilter::New())
+  m_IsVideoReady(false),
+  m_IsGreyscale(false),
+  m_IsCropped(false),
+  m_ResolutionOverrideWidth(0),
+  m_ResolutionOverrideHeight(0),
+  m_ResolutionOverride(false),
+  m_GrayscaleFilter(mitk::ConvertGrayscaleOpenCVImageFilter::New()),
+  m_CropFilter(mitk::CropOpenCVImageFilter::New()),
+  m_CombinationFilter(mitk::BasicCombinationOpenCVImageFilter::New())
 {
   SetImageFilter(m_CombinationFilter.GetPointer());
 }
@@ -201,7 +201,7 @@ void mitk::USImageVideoSource::GetNextRawImage( mitk::Image::Pointer& image )
   this->m_OpenCVToMitkFilter->Update();
 
   // OpenCVToMitkImageFilter returns a standard mitk::image. We then transform it into an USImage
-  image = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput());
+  image = this->m_OpenCVToMitkFilter->GetOutput();
 
   // clean up
   cv_img.release();

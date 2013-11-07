@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 
 namespace us {
-  class PrototypeServiceFactory;
+  struct PrototypeServiceFactory;
 }
 
 /**

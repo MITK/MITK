@@ -272,7 +272,7 @@ bool QmitkUSZonesDataModel::insertRows ( int row, int count, const QModelIndex &
 
 bool QmitkUSZonesDataModel::removeRows ( int row, int count, const QModelIndex & parent )
 {
-  this->removeRows(row, count, parent, true);
+  return this->removeRows(row, count, parent, true);
 }
 
 bool QmitkUSZonesDataModel::removeRows ( int row, int count, const QModelIndex & parent, bool removeFromDataStorage )

@@ -85,13 +85,29 @@ namespace mitk {
 
     virtual mitk::NavigationDataSource::Pointer GetNavigationDataSource();
 
-      /**
+    /**
     * \brief Remove this device from the micro service.
     * This method is public for mitk::USCombinedModality, because this devices
     * can be completly removed. This is not possible for API devices, which
     * should be available while their sub module is loaded.
     */
-  void UnregisterOnService();
+    void UnregisterOnService();
+
+    /**
+    * \brief Serializes all contained calibrations into an xml fragment.
+    *
+    * The returned string contains one parent node named "calibrations" and several
+    * subnodes, one for each calibration that is present.
+    */
+    std::string SerializeCalibration();
+
+    /**
+    * \brief Deserializes a string provided by a prior call to Serialize().
+    * If the bool flag is true, all prior calibrations will be deleted.
+    * If the flag is set to false, prior calibrations will be retained, but overwritten
+    * if one of equal name is present.
+    */
+    void DeserializeCalibration(const std::string &xmlString, bool clearPreviousCalibrations = true);
 
   protected:
     USCombinedModality(USDevice::Pointer usDevice, NavigationDataSource::Pointer trackingDevice, std::string manufacturer = "", std::string model = "");

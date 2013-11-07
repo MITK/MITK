@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSDevice.h"
 #include "mitkNavigationDataSource.h"
 
+//TempIncludes
+#include <tinyxml.h>
+
 const std::string mitk::USCombinedModality::DeviceClassIdentifier = "org.mitk.modules.us.USCombinedModality";
 
 mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, NavigationDataSource::Pointer trackingDevice, std::string manufacturer, std::string model)
@@ -233,6 +236,93 @@ void mitk::USCombinedModality::GenerateData()
   // TODO: do processing here
 
   this->SetNthOutput(0, image);
+}
+
+std::string mitk::USCombinedModality::SerializeCalibration()
+{
+  std::stringstream result;
+  result << "<calibrations>" << std::endl;
+  // For each calibration in the set
+  for (std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator it = m_Calibrations.begin(); it != m_Calibrations.end(); it++)
+  {
+    mitk::AffineTransform3D::MatrixType matrix = it->second->GetMatrix();
+    mitk::AffineTransform3D::OffsetType offset = it->second->GetOffset();
+    TiXmlElement elem(it->first);
+    // Serialize Matrix
+    elem.SetDoubleAttribute("M00", matrix[0][0]);
+    elem.SetDoubleAttribute("M01", matrix[0][1]);
+    elem.SetDoubleAttribute("M02", matrix[0][2]);
+    elem.SetDoubleAttribute("M10", matrix[1][0]);
+    elem.SetDoubleAttribute("M11", matrix[1][1]);
+    elem.SetDoubleAttribute("M12", matrix[1][2]);
+    elem.SetDoubleAttribute("M20", matrix[2][0]);
+    elem.SetDoubleAttribute("M21", matrix[2][1]);
+    elem.SetDoubleAttribute("M22", matrix[2][2]);
+    // Serialize Offset
+    elem.SetDoubleAttribute("O0", offset[0]);
+    elem.SetDoubleAttribute("O1", offset[1]);
+    elem.SetDoubleAttribute("O2", offset[2]);
+
+    result << elem << std::endl;
+  }
+  result << "</calibrations>" << std::endl;
+
+  return result.str();
+}
+
+void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlString, bool clearPreviousCalibrations)
+{
+  // Sanitize Input
+  if (xmlString == "")
+  {
+    MITK_WARN << "Empty string passed to Deserialize() method of CombinedModality. Aborting...";
+    return;
+  }
+  // Clear previous calibrations if necessary
+  if (clearPreviousCalibrations) m_Calibrations.clear();
+
+  // Parse Input
+  TiXmlDocument doc;
+  if(!doc.Parse(xmlString.c_str()))
+  {
+    MITK_WARN << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorDesc();
+    return;
+  }
+  TiXmlElement* root = doc.FirstChildElement();
+  if(root == NULL)
+  {
+    MITK_WARN << "Unable to deserialize calibrations in CombinedModality. String contained no root element.";
+    return;
+  }
+  // Read Calibrations
+  for(TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
+  {
+    mitk::AffineTransform3D::MatrixType matrix;
+    mitk::AffineTransform3D::OffsetType offset;
+
+    std::string calibName = elem->Value();
+
+    // Deserialize Matrix
+    elem->QueryFloatAttribute("M00", &matrix[0][0]);
+    elem->QueryFloatAttribute("M01", &matrix[0][1]);
+    elem->QueryFloatAttribute("M02", &matrix[0][2]);
+    elem->QueryFloatAttribute("M10", &matrix[1][0]);
+    elem->QueryFloatAttribute("M11", &matrix[1][1]);
+    elem->QueryFloatAttribute("M12", &matrix[1][2]);
+    elem->QueryFloatAttribute("M20", &matrix[2][0]);
+    elem->QueryFloatAttribute("M21", &matrix[2][1]);
+    elem->QueryFloatAttribute("M22", &matrix[2][2]);
+
+    // Deserialize Offset
+    elem->QueryFloatAttribute("O0", &offset[0]);
+    elem->QueryFloatAttribute("O1", &offset[1]);
+    elem->QueryFloatAttribute("O2", &offset[2]);
+
+    mitk::AffineTransform3D::Pointer calibration = mitk::AffineTransform3D::New();
+    calibration->SetMatrix(matrix);
+    calibration->SetOffset(offset);
+    m_Calibrations[calibName] = calibration;
+  }
 }
 
 std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()

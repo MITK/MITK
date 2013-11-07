@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkXnatListModel.h"
 #include "ctkXnatConnectionFactory.h"
 #include "ctkXnatConnection.h"
+#include "ctkXnatScanResource.h"
 
 /*!
 \brief XNATProjects
@@ -70,11 +71,14 @@ public:
 
     /// \brief Called when the user clicks the GUI button
     void GetAllProjects();
-    void OpenLoginDialog();
-    void projectSelected(const QModelIndex& index);
-    void subjectSelected(const QModelIndex& index);
-    void experimentSelected(const QModelIndex& index);
-    void scanSelected(const QModelIndex& index);
+    void DownloadResource();
+    void DownloadFile();
+
+    void ProjectSelected(const QModelIndex& index);
+    void SubjectSelected(const QModelIndex& index);
+    void ExperimentSelected(const QModelIndex& index);
+    void ScanSelected(const QModelIndex& index);
+    void ResourceSelected(const QModelIndex& index);
 
 protected:
 
@@ -98,6 +102,7 @@ private:
   ctkXnatListModel* m_ExperimentsModel;
   ctkXnatListModel* m_ScansModel;
   ctkXnatListModel* m_ResourceModel;
+  ctkXnatListModel* m_FileModel;
 };
 
 #endif // XNATProjects_h

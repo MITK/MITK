@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkXnatSubject.h"
 #include "ctkXnatListModel.h"
 #include "ctkXnatScanFolder.h"
+#include "ctkXnatScanResource.h"
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -80,7 +81,8 @@ XNATProjects::XNATProjects() :
   m_SubjectsModel(new ctkXnatListModel()),
   m_ExperimentsModel(new ctkXnatListModel()),
   m_ScansModel(new ctkXnatListModel()),
-  m_ResourceModel(new ctkXnatListModel())
+  m_ResourceModel(new ctkXnatListModel()),
+  m_FileModel(new ctkXnatListModel())
 {
 
 }
@@ -94,6 +96,7 @@ XNATProjects::~XNATProjects()
   delete m_ExperimentsModel;
   delete m_ScansModel;
   delete m_ResourceModel;
+  delete m_FileModel;
 }
 
 bool XNATProjects::IsDirty() const
@@ -123,7 +126,8 @@ void XNATProjects::DoSaveAs()
 void XNATProjects::SetFocus()
 {
   m_Controls.buttonGetAllProjects->setFocus();
-  m_Controls.buttonLoginDialog->setFocus();
+  m_Controls.buttonDownloadResource->setFocus();
+  m_Controls.buttonDownloadFile->setFocus();
 }
 
 void XNATProjects::CreateQtPartControl( QWidget *parent )
@@ -136,14 +140,17 @@ void XNATProjects::CreateQtPartControl( QWidget *parent )
   m_Controls.experimentTreeView->setModel(m_ExperimentsModel);
   m_Controls.scanTreeView->setModel(m_ScansModel);
   m_Controls.resourceTreeView->setModel(m_ResourceModel);
+  m_Controls.fileTreeView->setModel(m_FileModel);
 
   connect( m_Controls.buttonGetAllProjects, SIGNAL(clicked()), this, SLOT(GetAllProjects()) );
-  connect( m_Controls.projectTreeView, SIGNAL(clicked(QModelIndex)), SLOT(projectSelected(QModelIndex)) );
-  connect( m_Controls.subjectTreeView, SIGNAL(clicked(QModelIndex)), SLOT(subjectSelected(QModelIndex)) );
-  connect( m_Controls.experimentTreeView, SIGNAL(clicked(QModelIndex)), SLOT(experimentSelected(QModelIndex)) );
-  connect( m_Controls.scanTreeView, SIGNAL(clicked(QModelIndex)), SLOT(scanSelected(QModelIndex)) );
+  connect( m_Controls.buttonDownloadResource, SIGNAL(clicked()), this, SLOT(DownloadResource()) );
+  connect( m_Controls.buttonDownloadFile, SIGNAL(clicked()), this, SLOT(DownloadFile()) );
 
-  connect( m_Controls.buttonLoginDialog, SIGNAL(clicked()), this, SLOT(OpenLoginDialog()) );
+  connect( m_Controls.projectTreeView, SIGNAL(clicked(QModelIndex)), SLOT(ProjectSelected(QModelIndex)) );
+  connect( m_Controls.subjectTreeView, SIGNAL(clicked(QModelIndex)), SLOT(SubjectSelected(QModelIndex)) );
+  connect( m_Controls.experimentTreeView, SIGNAL(clicked(QModelIndex)), SLOT(ExperimentSelected(QModelIndex)) );
+  connect( m_Controls.scanTreeView, SIGNAL(clicked(QModelIndex)), SLOT(ScanSelected(QModelIndex)) );
+  connect( m_Controls.resourceTreeView, SIGNAL(clicked(QModelIndex)), SLOT(ResourceSelected(QModelIndex)) );
 }
 
 void XNATProjects::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/, const QList<mitk::DataNode::Pointer>& nodes )
@@ -172,10 +179,12 @@ void XNATProjects::GetAllProjects()
   m_ExperimentsModel->setRootObject(ctkXnatObject::Pointer());
   m_ScansModel->setRootObject(ctkXnatObject::Pointer());
   m_ResourceModel->setRootObject(ctkXnatObject::Pointer());
+  m_FileModel->setRootObject(ctkXnatObject::Pointer());
   m_Controls.subjectTreeView->reset();
   m_Controls.experimentTreeView->reset();
   m_Controls.scanTreeView->reset();
   m_Controls.resourceTreeView->reset();
+  m_Controls.fileTreeView->reset();
 
   // Validate user input
   if ( m_Controls.inHostAddress->text().isEmpty() || m_Controls.inUser->text().isEmpty() || m_Controls.inPassword->text().isEmpty() ) {
@@ -254,19 +263,12 @@ QString XNATProjects::ConvertFromXMLString(const Poco::XML::XMLString xmlstr)
 }
 
 /**
-\brief *****DOES NOT THAT WHAT IT IS THERE FOR*****
-*/
-void XNATProjects::OpenLoginDialog()
-{
-}
-
-/**
 \brief *****fetchs subjects from chosen project*****
 */
-void XNATProjects::projectSelected(const QModelIndex& index)
+void XNATProjects::ProjectSelected(const QModelIndex& index)
 {
   QVariant variant = m_ProjectsModel->data(index, Qt::UserRole);
-  if (variant.isValid())
+  if ( variant.isValid() )
   {
     ctkXnatObject::Pointer project = variant.value<ctkXnatObject::Pointer>();
     project->fetch();
@@ -278,10 +280,10 @@ void XNATProjects::projectSelected(const QModelIndex& index)
 /**
 \brief *****fetchs experiments from chosen subject*****
 */
-void XNATProjects::subjectSelected(const QModelIndex& index)
+void XNATProjects::SubjectSelected(const QModelIndex& index)
 {
   QVariant variant = m_SubjectsModel->data(index, Qt::UserRole);
-  if (variant.isValid())
+  if ( variant.isValid() )
   {
     ctkXnatObject::Pointer subject = variant.value<ctkXnatObject::Pointer>();
     subject->fetch();
@@ -293,10 +295,10 @@ void XNATProjects::subjectSelected(const QModelIndex& index)
 /**
 \brief *****fetchs data from chosen experiment*****
 */
-void XNATProjects::experimentSelected(const QModelIndex& index)
+void XNATProjects::ExperimentSelected(const QModelIndex& index)
 {
   QVariant variant = m_ExperimentsModel->data(index, Qt::UserRole);
-  if (variant.isValid())
+  if ( variant.isValid() )
   {
     ctkXnatObject::Pointer experiment = variant.value<ctkXnatObject::Pointer>();
     experiment->fetch();
@@ -304,22 +306,60 @@ void XNATProjects::experimentSelected(const QModelIndex& index)
     scanfolder->fetch();
     m_ScansModel->setRootObject(scanfolder);
     m_Controls.scanTreeView->reset();
-    MITK_INFO << scanfolder->children().takeFirst()->uri().toStdString();
   }
 }
 
 /**
 \brief *****fetchs download data from chosen experiment*****
 */
-void XNATProjects::scanSelected(const QModelIndex& index)
+void XNATProjects::ScanSelected(const QModelIndex& index)
 {
   QVariant variant = m_ScansModel->data(index, Qt::UserRole);
-  if (variant.isValid())
+  if ( variant.isValid() )
   {
     ctkXnatObject::Pointer scan = variant.value<ctkXnatObject::Pointer>();
     scan->fetch();
     m_ResourceModel->setRootObject(scan);
     m_Controls.resourceTreeView->reset();
-    MITK_INFO << scan->children().takeAt(2)->uri().toStdString();
+  }
+}
+
+void XNATProjects::ResourceSelected(const QModelIndex& index)
+{
+  QVariant variant = m_ResourceModel->data(index, Qt::UserRole);
+  if ( variant.isValid() )
+  {
+    ctkXnatObject::Pointer resource = variant.value<ctkXnatObject::Pointer>();
+    resource->fetch();
+    m_FileModel->setRootObject(resource);
+    m_Controls.fileTreeView->reset();
+  }
+}
+
+void XNATProjects::DownloadResource()
+{
+  const QModelIndex index = m_Controls.resourceTreeView->selectionModel()->currentIndex();
+  QVariant variant = m_ResourceModel->data(index, Qt::UserRole);
+  if ( variant.isValid() )
+  {
+    ctkXnatObject::Pointer resource = variant.value<ctkXnatObject::Pointer>();
+    MITK_INFO << "Download started ...";
+    MITK_INFO << "...";
+    resource->download(resource->id()+(".zip"));
+    MITK_INFO << "Download finished!";
+  }
+}
+
+void XNATProjects::DownloadFile()
+{
+  const QModelIndex index = m_Controls.fileTreeView->selectionModel()->currentIndex();
+  QVariant variant = m_FileModel->data(index, Qt::UserRole);
+  if ( variant.isValid() )
+  {
+    ctkXnatObject::Pointer file = variant.value<ctkXnatObject::Pointer>();
+    MITK_INFO << "Download started ...";
+    MITK_INFO << "...";
+    file->download(file->id());
+    MITK_INFO << "Download finished!";
   }
 }

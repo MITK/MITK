@@ -61,10 +61,6 @@ void USNavigation::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_BtnLoadCalibration, SIGNAL(clicked()), this, SLOT(OnLoadCalibration()) );
   // Zones
   connect( m_Controls.m_BtnFreeze, SIGNAL(clicked()), this, SLOT(OnFreeze()) );
-  connect( m_Controls.m_BtnAddZone, SIGNAL(clicked()), this, SLOT(OnAddZone()) );
-  connect( m_Controls.m_ZoneList, SIGNAL(itemClicked ( QListWidgetItem *)), this, SLOT(OnSelectZone(QListWidgetItem * )) );
-  connect( m_Controls.m_BtnSaveZone, SIGNAL(clicked ()), this, SLOT(OnSaveZone()) );
-  connect( m_Controls.m_BtnDeleteZone, SIGNAL(clicked ()), this, SLOT(OnDeleteZone()) );
   // Navigation
   connect( m_Controls.m_BtnStartIntervention, SIGNAL(clicked ()), this, SLOT(OnStartIntervention()) );
   connect( m_Controls.m_BtnReset, SIGNAL(clicked ()), this, SLOT(OnReset()) );
@@ -217,7 +213,7 @@ void USNavigation::Update()
 
 //////////////////////////////// Zones //////////////////////////////////
 
-void USNavigation::OnAddZone()
+/*void USNavigation::OnAddZone()
 {
   mitk::Point3D target = this->GetRenderWindowPart()->GetSelectedPosition();
   mitk::DataNode::Pointer node = mitk::DataNode::New();
@@ -227,8 +223,6 @@ void USNavigation::OnAddZone()
   this->GetDataStorage()->Add(node);
   m_Zones.push_back(node);
   this->m_Controls.m_ZoneList->addItem(new QListWidgetItem(node->GetName().c_str()));
-
-  this->m_ZoneFilter->AddNode(node);
 }
 
 void USNavigation::OnSelectZone( QListWidgetItem * current )
@@ -325,7 +319,7 @@ void USNavigation::FormatZoneNode(mitk::DataNode::Pointer node, mitk::Point3D ce
     node->SetColor(1.0f, 1.0f, 0.0f);
     node->SetStringProperty("zone.color", "yellow");
   }
-}
+}*/
 
 ///////////////////// Range Meter ////////////////
 
@@ -427,7 +421,17 @@ void USNavigation::UpdateMeters()
 
 void USNavigation::OnStartIntervention()
 {
-  this->m_Controls.m_TabWidget->setCurrentIndex(2);
+  m_Zones.clear();
+
+  mitk::DataStorage::SetOfObjects::ConstPointer zoneNodes = m_Controls.m_ZonesWidget->GetZoneNodes();
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = zoneNodes->Begin();
+       it != zoneNodes->End(); ++it)
+  {
+    m_Zones.push_back(it->Value());
+    m_ZoneFilter->AddNode(it->Value());
+  }
+
+  m_Controls.m_TabWidget->setCurrentIndex(2);
   this->SetupProximityView();
 }
 
@@ -446,10 +450,8 @@ void USNavigation::OnReset()
 {
   // Reset Zones
   m_ZoneFilter->ResetNodes();
-  for (int i = 0; i < m_Zones.size(); i++)
-    this->GetDataStorage()->Remove(m_Zones.at(i));
   m_Zones.clear();
-  m_Controls.m_ZoneList->clear();
+  m_Controls.m_ZonesWidget->OnResetZones();
 
   // Reset RangeMeters
   QLayout* layout = m_Controls.m_RangeBox->layout();

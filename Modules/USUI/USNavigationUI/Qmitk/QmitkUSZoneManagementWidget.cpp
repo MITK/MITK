@@ -42,6 +42,11 @@ void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer data
   m_DataStorage = dataStorage;
 }
 
+mitk::DataStorage::SetOfObjects::ConstPointer QmitkUSZoneManagementWidget::GetZoneNodes()
+{
+  return m_DataStorage->GetDerivations(m_BaseNode);
+}
+
 void QmitkUSZoneManagementWidget::AddRow()
 {
   m_ZonesDataModel->insertRow(m_ZonesDataModel->rowCount());
@@ -82,8 +87,14 @@ void QmitkUSZoneManagementWidget::OnStartAddingZone()
   dataNode->SetColor(1, 0, 0);
   m_DataStorage->Add(dataNode, m_BaseNode);
   m_Interactor->SetDataNode(dataNode);
+}
 
-  //m_ZonesDataModel->AddNode(dataNode);
+void QmitkUSZoneManagementWidget::OnResetZones()
+{
+  m_DataStorage->Remove(m_DataStorage->GetDerivations(m_BaseNode));
+
+  // remove all rows from the model
+  //while (m_ZonesDataModel->rowCount() > 0) { m_ZonesDataModel->removeRow(0); }
 }
 
 void QmitkUSZoneManagementWidget::OnSelectionChanged(const QItemSelection & selected, const QItemSelection & /*deselected*/)

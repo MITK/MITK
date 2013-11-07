@@ -28,6 +28,7 @@ public slots:
   void AddRow();
   void RemoveSelectedRows();
   void OnStartAddingZone();
+  void OnResetZones();
 
 protected slots:
   void OnSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
@@ -37,13 +38,14 @@ public:
   ~QmitkUSZoneManagementWidget();
 
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
+  mitk::DataStorage::SetOfObjects::ConstPointer GetZoneNodes();
 
 protected:
-    QmitkUSZonesDataModel* m_ZonesDataModel;
+    QmitkUSZonesDataModel*                      m_ZonesDataModel;
 
-    itk::SmartPointer<mitk::USZonesInteractor> m_Interactor;
-    mitk::DataStorage::Pointer m_DataStorage;
-    mitk::DataNode::Pointer m_BaseNode;
+    itk::SmartPointer<mitk::USZonesInteractor>  m_Interactor;
+    mitk::DataStorage::Pointer                  m_DataStorage;
+    mitk::DataNode::Pointer                     m_BaseNode;
 
 private:
   Ui::QmitkUSZoneManagementWidget* ui;

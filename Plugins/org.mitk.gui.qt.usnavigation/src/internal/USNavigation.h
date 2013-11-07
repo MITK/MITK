@@ -78,26 +78,6 @@ class USNavigation : public QmitkAbstractView
     /**
     * \brief
     */
-    void OnAddZone();
-
-    /**
-    * \brief
-    */
-    void OnSelectZone( QListWidgetItem * current );
-
-    /**
-    * \brief
-    */
-    void OnSaveZone();
-
-    /**
-    * \brief
-    */
-    void OnDeleteZone();
-
-    /**
-    * \brief
-    */
     void OnStartIntervention();
 
     /**

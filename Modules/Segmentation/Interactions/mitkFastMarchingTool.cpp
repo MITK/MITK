@@ -366,9 +366,9 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
 
   m_NeedUpdate = true;
 
-  m_ReadyMessage.Send();
-
   this->Update();
+
+  m_ReadyMessage.Send();
 
   return true;
 }

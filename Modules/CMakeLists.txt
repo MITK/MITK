@@ -14,6 +14,7 @@ set(module_dirs
     ContourModel
     SurfaceInterpolation
     Segmentation
+    DicomRT
     PlanarFigureSegmentation
     Qmitk
     QmitkExt

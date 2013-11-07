@@ -58,6 +58,7 @@ foreach(lib
     dcmimage
     dcmimgle
     dcmdata
+    dcmrt
     oflog
     ofstd
     ijg12
@@ -120,6 +121,7 @@ set(DCMTK_dcmsign_TEST_HEADER sicert.h)
 set(DCMTK_dcmsr_TEST_HEADER dsrtree.h)
 set(DCMTK_dcmtls_TEST_HEADER tlslayer.h)
 set(DCMTK_ofstd_TEST_HEADER ofstdinc.h)
+set(DCMTK_dcmrt_TEST_HEADER drtstrct.h)
 
 foreach(dir
     config
@@ -133,6 +135,7 @@ foreach(dir
     dcmsign
     dcmsr
     dcmtls
+    dcmrt
     ofstd)
   find_path(DCMTK_${dir}_INCLUDE_DIR
     ${DCMTK_${dir}_TEST_HEADER}

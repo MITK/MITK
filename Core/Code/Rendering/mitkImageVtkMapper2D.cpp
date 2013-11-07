@@ -838,6 +838,36 @@ mitk::ImageVtkMapper2D::LocalStorage* mitk::ImageVtkMapper2D::GetLocalStorage(mi
 }
 
 vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk::BaseRenderer* renderer ){
+//  LocalStorage* localStorage = this->GetLocalStorage(renderer);
+
+//  vtkMarchingSquares* squares = vtkMarchingSquares::New();
+//  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+
+//  float depth = CalculateLayerDepth(renderer);
+
+//  squares->SetInput(localStorage->m_ReslicedImage);
+//  squares->SetNumberOfContours(1);
+//  squares->SetValue(0,1);
+//  squares->Update();
+
+//  polyData = squares->GetOutput();
+
+//  vtkIdType numberOfPoints = polyData->GetNumberOfPoints();
+//  fstream f;
+//  f.open("mapper_neu.txt", ios::out);
+
+//  for(int i=0;i<numberOfPoints;i++)
+//  {
+//    double* x = polyData->GetPoint(i);
+//    x[2] = depth;
+//    f << "Point" << i << ": " << x[0] << ", " << x[1] << ", " << x[2] << endl;
+//  }
+
+//  polyData->BuildCells();
+//  polyData->BuildLinks();
+
+//  f.close();
+
   LocalStorage* localStorage = this->GetLocalStorage(renderer);
 
   //get the min and max index values of each direction
@@ -977,6 +1007,18 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
   polyData->SetPoints(points);
   // Add the lines to the dataset
   polyData->SetLines(lines);
+
+  fstream f;
+  f.open("mapper_alt.txt", ios::out);
+
+  for(int i=0;i<polyData->GetNumberOfPoints();i++)
+  {
+    double x[3];
+    polyData->GetPoint(i,x);
+    f << "Point" << i << ": " << x[0] << ", " << x[1] << ", " << x[2] << endl;
+  }
+
+  f.close();
   return polyData;
 }
 

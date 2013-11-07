@@ -72,7 +72,8 @@ bool mitk::USZonesInteractor::ChangeRadius(mitk::StateMachineAction* , mitk::Int
   mitk::Point3D mousePosition = positionEvent->GetPositionInWorld();
 
   mitk::ScalarType radius = mousePosition.EuclideanDistanceTo(curNode->GetData()->GetGeometry()->GetOrigin());
-  MITK_INFO << "Radius: " << radius;
+  //MITK_INFO << "Radius: " << radius;
+  curNode->SetFloatProperty("zone.size", radius);
 
   mitk::Point3D origin = curNode->GetData()->GetGeometry()->GetOrigin();
   curNode->SetData(this->MakeSphere(curNode, radius));

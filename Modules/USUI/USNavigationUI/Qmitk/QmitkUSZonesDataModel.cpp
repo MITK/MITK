@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkNodePredicateSource.h"
 
+const char* QmitkUSZonesDataModel::DataNodePropertySize = "zone.size";
+
+
 QmitkUSZonesDataModel::QmitkUSZonesDataModel(QObject *parent) :
   QAbstractTableModel(parent)
 {
@@ -45,8 +48,13 @@ void QmitkUSZonesDataModel::SetDataStorage(mitk::DataStorage::Pointer dataStorag
         mitk::MessageDelegate1<QmitkUSZonesDataModel, const mitk::DataNode*>
           (this, &QmitkUSZonesDataModel::RemoveNode));
 
-    /*m_DataStorage->InteractorChangedNodeEvent.AddListener(
-        MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));*/
+    m_DataStorage->ChangedNodeEvent.AddListener(
+          mitk::MessageDelegate1<QmitkUSZonesDataModel, const mitk::DataNode*>
+            (this, &QmitkUSZonesDataModel::ChangeNode));
+
+    m_DataStorage->InteractorChangedNodeEvent.AddListener(
+          mitk::MessageDelegate1<QmitkUSZonesDataModel, const mitk::DataNode*>
+            (this, &QmitkUSZonesDataModel::ChangeNode));
   }
 }
 
@@ -87,6 +95,17 @@ void QmitkUSZonesDataModel::RemoveNode(const mitk::DataNode* node)
     // removeRows function will lead into another call of RemoveNode).
     this->removeRows(index, 1, QModelIndex(), false);
   }
+}
+
+void QmitkUSZonesDataModel::ChangeNode(const mitk::DataNode* node)
+{
+
+  DataNodeVector::iterator oldNodeIt = find (m_ZoneNodes.begin(), m_ZoneNodes.end(), node);
+  if (oldNodeIt == m_ZoneNodes.end()) { return; };
+
+  // get row of the changed node and emit signal that the data of this row changed
+  unsigned int row = oldNodeIt - m_ZoneNodes.begin();
+  emit dataChanged(this->index(row, 0), this->index(row, this->columnCount()));
 }
 
 int QmitkUSZonesDataModel::rowCount ( const QModelIndex& /*parent*/ ) const
@@ -162,8 +181,8 @@ QVariant QmitkUSZonesDataModel::data ( const QModelIndex& index, int role ) cons
     }
     case 1:
     {
-      int intValue;
-      if ( curNode->GetIntProperty("zone.size", intValue) ) { return intValue; }
+      float floatValue;
+      if ( curNode->GetFloatProperty(DataNodePropertySize, floatValue) ) { return floatValue; }
       else { return QVariant(QVariant::Invalid); }
     }
     case 2:
@@ -210,7 +229,12 @@ bool QmitkUSZonesDataModel::setData ( const QModelIndex & index, const QVariant 
     }
     case 1:
     {
-      curNode->SetIntProperty("zone.size", value.toInt());
+      curNode->SetFloatProperty(DataNodePropertySize, value.toFloat());
+
+      mitk::Point3D origin = curNode->GetData()->GetGeometry()->GetOrigin();
+      curNode->SetData(this->MakeSphere(curNode, value.toFloat()));
+      curNode->GetData()->GetGeometry()->SetOrigin(origin);
+
       break;
     }
     case 2:
@@ -272,4 +296,18 @@ bool QmitkUSZonesDataModel::removeRows ( int row, int count, const QModelIndex &
   this->endRemoveRows();
 
   return true;
+}
+
+mitk::Surface::Pointer QmitkUSZonesDataModel::MakeSphere(const mitk::DataNode::Pointer dataNode, mitk::ScalarType radius) const
+{
+  mitk::Surface::Pointer zone = mitk::Surface::New();
+
+  vtkSphereSource *vtkData = vtkSphereSource::New();
+  vtkData->SetRadius( radius );
+  vtkData->SetCenter(0,0,0);
+  vtkData->Update();
+  zone->SetVtkPolyData(vtkData->GetOutput());
+  vtkData->Delete();
+
+  return zone;
 }

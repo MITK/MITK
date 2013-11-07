@@ -35,12 +35,15 @@ public slots:
 
 public:
   typedef std::vector<mitk::DataNode::Pointer> DataNodeVector;
+  static const char* DataNodePropertySize;
+
 
   explicit QmitkUSZonesDataModel(QObject *parent = 0);
 
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::DataNode::Pointer baseNode);
   void AddNode(const mitk::DataNode*);
   void RemoveNode(const mitk::DataNode*);
+  void ChangeNode(const mitk::DataNode*);
 
   virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
   virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
@@ -55,6 +58,9 @@ public:
   virtual bool removeRows ( int row, int count, const QModelIndex& parent, bool removeFromDataStorage );
 
 protected:
+
+  mitk::Surface::Pointer MakeSphere(const mitk::DataNode::Pointer dataNode, mitk::ScalarType radius) const;
+
   DataNodeVector m_ZoneNodes;
 
   mitk::DataStorage::Pointer m_DataStorage;

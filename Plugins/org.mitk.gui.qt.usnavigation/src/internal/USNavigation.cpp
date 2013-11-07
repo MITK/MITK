@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
@@ -38,15 +37,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string USNavigation::VIEW_ID = "org.mitk.views.usnavigation";
 
-
 void USNavigation::SetFocus()
 {
-//  m_Controls.buttonPerformImageProcessing->setFocus();
+  //  m_Controls.buttonPerformImageProcessing->setFocus();
 }
 
 void USNavigation::CreateQtPartControl( QWidget *parent )
 {
-
   m_Timer = new QTimer(this);
   m_RangeMeterTimer = new QTimer(this);
   // create GUI widgets from the Qt Designer's .ui file
@@ -73,7 +70,6 @@ void USNavigation::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_BtnReset, SIGNAL(clicked ()), this, SLOT(OnReset()) );
   connect( m_Controls.m_BtnNeedleView, SIGNAL(clicked ()), this, SLOT(OnNeedleViewToogle()) );
 
-
   m_Freeze = false;
   m_IsNeedleViewActive = false;
 
@@ -95,9 +91,7 @@ void USNavigation::CreateQtPartControl( QWidget *parent )
   QObject::connect(shortcut, SIGNAL(activated()), m_Controls.m_BtnNeedleView, SLOT(animateClick()) );
 }
 
-
 void USNavigation::OnClickDevices(){
-
   if ( m_Controls.m_CombinedModalitiesList->GetIsServiceSelected() )
     m_Controls.m_BtnSelectDevices->setEnabled(true);
   else
@@ -130,7 +124,6 @@ void USNavigation::OnSelectDevices(){
   m_NeedleProjectionFilter->SetInput(1, m_ZoneFilter->GetOutput(1));
   m_NeedleProjectionFilter->SelectInput(0);
   m_NeedleProjectionFilter->SetTargetPlane(m_USDevice->GetCalibration());
-
 
   // Setting up the Camera Visualization Filter
 
@@ -183,9 +176,9 @@ void USNavigation::OnSelectDevices(){
 
 void USNavigation::OnLoadCalibration(){
   QString filename = QFileDialog::getOpenFileName( QApplication::activeWindow(),
-                                                   "Load Calibration",
-                                                   "",
-                                                   "Calibration files *.cal" );
+    "Load Calibration",
+    "",
+    "Calibration files *.cal" );
 
   //TODO:  New reader for transformations must be implemented.
   //mitk::TransformationFileReader::Pointer tReader = mitk::TransformationFileReader::New();
@@ -334,8 +327,6 @@ void USNavigation::FormatZoneNode(mitk::DataNode::Pointer node, mitk::Point3D ce
   }
 }
 
-
-
 ///////////////////// Range Meter ////////////////
 
 void USNavigation::SetupProximityView()
@@ -411,7 +402,7 @@ void USNavigation::UpdateMeters()
       value = 100 -  100 * ((float) distance / (float )MAXRANGE);
     } // 3) Needle is away from zone
     else if (distance < MAXRANGE)
-        {
+    {
       style = style.replace("#StartColor#", zoneColor.c_str());
       style = style.replace("#StopColor#", zoneColor.c_str());
       text  = text + ": " + QString::number(distance) + " mm";
@@ -431,7 +422,6 @@ void USNavigation::UpdateMeters()
     meter->setValue(value);
   }
 }
-
 
 /////////////////// Intervention ///////////////////////
 
@@ -456,7 +446,7 @@ void USNavigation::OnReset()
 {
   // Reset Zones
   m_ZoneFilter->ResetNodes();
-  for (int i; i < m_Zones.size(); i++)
+  for (int i = 0; i < m_Zones.size(); i++)
     this->GetDataStorage()->Remove(m_Zones.at(i));
   m_Zones.clear();
   m_Controls.m_ZoneList->clear();
@@ -464,16 +454,15 @@ void USNavigation::OnReset()
   // Reset RangeMeters
   QLayout* layout = m_Controls.m_RangeBox->layout();
   QLayoutItem *item;
-    while((item = layout->takeAt(0))) {
-        if (item->widget()) {
-            delete item->widget();
-        }
-        delete item;
+  while((item = layout->takeAt(0))) {
+    if (item->widget()) {
+      delete item->widget();
     }
+    delete item;
+  }
 
   m_RangeMeters.clear();
   m_RangeMeterTimer->stop();
-
 }
 
 void USNavigation::OnNeedleViewToggle()
@@ -483,6 +472,4 @@ void USNavigation::OnNeedleViewToggle()
   mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode("Needle Path");
   if ( node.IsNotNull() )
     node->SetVisibility( ! m_IsNeedleViewActive );
-
-
 }

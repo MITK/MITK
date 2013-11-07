@@ -15,16 +15,6 @@ if(MITK_USE_BLUEBERRY)
     ctkMacroListFilter(_tmp_list re_ctkplugin_mitk OUTPUT_VARIABLE ${varname})
   endmacro()
 
-  include("${CMAKE_CURRENT_SOURCE_DIR}/Plugins/PluginList.cmake")
-  set(mitk_example_plugins_fullpath )
-  foreach(mitk_example_plugin ${MITK_EXAMPLE_PLUGINS})
-    list(APPEND mitk_example_plugins_fullpath Plugins/${mitk_example_plugin})
-  endforeach()
-
-  ctkMacroSetupPlugins(${mitk_example_plugins_fullpath}
-                       BUILD_OPTION_PREFIX MITK_BUILD_
-                       COMPACT_OPTIONS)
-
   set(MITK_EXAMPLE_PLUGIN_TARGETS )
   foreach(mitk_example_plugin ${MITK_EXAMPLE_PLUGINS})
     ctkFunctionExtractOptionNameAndValue(${mitk_example_plugin} plugin_name plugin_value)

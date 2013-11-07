@@ -44,8 +44,8 @@ namespace mitk {
     virtual bool GetIsActive();
 
     virtual std::vector<USProbe::Pointer> GetProbeSet();
-    virtual void SelectProbe(unsigned int index);
-    virtual void SelectProbe(USProbe::Pointer probe);
+    virtual void OnSelectProbe(unsigned int index);
+    virtual void OnSelectProbe(USProbe::Pointer probe);
     virtual USProbe::Pointer GetSelectedProbe();
     virtual unsigned int GetProbesCount() const;
 

@@ -68,7 +68,7 @@ std::vector<mitk::USProbe::Pointer> mitk::USTelemedProbesControls::GetProbeSet()
   return usProbes;
 }
 
-void mitk::USTelemedProbesControls::SelectProbe(unsigned int index)
+void mitk::USTelemedProbesControls::OnSelectProbe(unsigned int index)
 {
   if (index >= m_ProbesSet.size())
   {
@@ -83,18 +83,18 @@ void mitk::USTelemedProbesControls::SelectProbe(unsigned int index)
   m_SelectedProbeIndex = index;
 }
 
-void mitk::USTelemedProbesControls::SelectProbe(mitk::USProbe::Pointer probe)
+void mitk::USTelemedProbesControls::OnSelectProbe(mitk::USProbe::Pointer probe)
 {
 }
 
-USProbe::Pointer mitk::USTelemedProbesControls::GetSelectedProbe()
+mitk::USProbe::Pointer mitk::USTelemedProbesControls::GetSelectedProbe()
 {
   if (m_SelectedProbeIndex >= m_ProbesSet.size())
   {
     MITK_ERROR("USTelemedProbesControls")("USControlInterfaceProbes")
-      << "Cannot get active probe as the current index is" << index <<
+      << "Cannot get active probe as the current index is" << m_SelectedProbeIndex <<
       ". Maximum possible index is " << m_ProbesSet.size()-1 << ".";
-    mitkThrow() << "Cannot get active probe as the current index is" << index <<
+    mitkThrow() << "Cannot get active probe as the current index is" << m_SelectedProbeIndex <<
       ". Maximum possible index is " << m_ProbesSet.size()-1 << ".";
   }
 

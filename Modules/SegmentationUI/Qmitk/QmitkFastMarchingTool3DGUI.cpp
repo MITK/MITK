@@ -318,8 +318,8 @@ void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
   }
   if (m_FastMarchingTool.IsNotNull())
   {
-    m_FastMarchingTool->ConfirmSegmentation();
     m_btConfirm->setEnabled(false);
+    m_FastMarchingTool->ConfirmSegmentation();
   }
 }
 

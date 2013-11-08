@@ -227,6 +227,7 @@ void mitk::FastMarchingTool3D::Deactivated()
   }
   mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SeedPointInteractor);
   m_ToolManager->GetDataStorage()->Remove(m_SeedsAsPointSetNode);
+  m_SeedsAsPointSetNode = NULL;
   m_SeedsAsPointSet->RemoveObserver(m_PointSetAddObserverTag);
   m_SeedsAsPointSet->RemoveObserver(m_PointSetRemoveObserverTag);
 }
@@ -284,6 +285,7 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  m_ToolManager->ActivateTool(-1);
 }
 
 

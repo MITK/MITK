@@ -258,6 +258,7 @@ void mitk::FastMarchingTool::Deactivated()
   m_ToolManager->GetDataStorage()->Remove( this->m_SeedsAsPointSetNode );
   this->ClearSeeds();
   m_ResultImageNode = NULL;
+  m_SeedsAsPointSetNode = NULL;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -323,6 +324,7 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  m_ToolManager->ActivateTool(-1);
 }
 
 

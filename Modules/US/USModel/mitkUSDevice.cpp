@@ -144,11 +144,13 @@ us::ServiceProperties mitk::USDevice::ConstructServiceProperties()
 
   // get identifier of selected probe if there is one selected
   mitk::USControlInterfaceProbes::Pointer probesControls = this->GetControlInterfaceProbes();
-  if (probesControls.IsNotNull())
+  if (probesControls.IsNotNull() && probesControls->GetIsActive())
   {
     mitk::USProbe::Pointer probe = probesControls->GetSelectedProbe();
     if (probe.IsNotNull())
-    props[mitk::USDevice::US_PROPKEY_PROBES_SELECTED] = probe->GetName();
+    {
+      props[mitk::USDevice::US_PROPKEY_PROBES_SELECTED] = probe->GetName();
+    }
   }
 
   //TODO Handle in subclasses?

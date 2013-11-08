@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkUSExports.h>
 #include <mitkCommon.h>
 #include "mitkUSDevice.h"
-#include <itkObjectFactory.h>
 #include "mitkUSImageVideoSource.h"
+#include <itkObjectFactory.h>
 
 namespace itk {
   template<class T> class SmartPointer;

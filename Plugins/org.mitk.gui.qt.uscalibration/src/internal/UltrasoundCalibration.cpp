@@ -29,9 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkVector.h>
-//#include <mitkPointSetModifier.h>
 #include <mitkPointSetWriter.h>
-//#include <mitkTransformationFileWriter.h>
 
 // us
 #include <usServiceReference.h>

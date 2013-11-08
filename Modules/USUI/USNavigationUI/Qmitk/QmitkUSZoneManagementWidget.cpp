@@ -2,7 +2,7 @@
 #include "ui_QmitkUSZoneManagementWidget.h"
 
 #include "QmitkUSZonesDataModel.h"
-#include "QmitkUSZoneManagementSliderDelegate.h"
+#include "QmitkUSZoneManagementSpinBoxDelegate.h"
 #include "QmitkUSZoneManagementComboBoxDelegate.h"
 
 #include "mitkUSZonesInteractor.h"
@@ -12,16 +12,18 @@
 
 QmitkUSZoneManagementWidget::QmitkUSZoneManagementWidget(QWidget *parent) :
     QWidget(parent), m_ZonesDataModel(new QmitkUSZonesDataModel(this)),
-    ui(new Ui::QmitkUSZoneManagementWidget)
+    m_SelectedRow(-1), ui(new Ui::QmitkUSZoneManagementWidget)
 {
   ui->setupUi(this);
   ui->CurrentZonesTable->setModel(m_ZonesDataModel);
 
-  ui->CurrentZonesTable->setItemDelegateForColumn(1, new QmitkUSZoneManagementSliderDelegate(this));
+  ui->CurrentZonesTable->setItemDelegateForColumn(1, new QmitkUSZoneManagementSpinBoxDelegate(this));
   ui->CurrentZonesTable->setItemDelegateForColumn(2, new QmitkUSZoneManagementComboBoxDelegate(this));
 
   connect (ui->CurrentZonesTable->selectionModel(), SIGNAL(selectionChanged(const QItemSelection& , const QItemSelection&)),
            this, SLOT(OnSelectionChanged(const QItemSelection&, const QItemSelection&)));
+  connect (m_ZonesDataModel, SIGNAL(rowsInserted(const QModelIndex&, int, int )),
+           this, SLOT(OnRowInsertion(QModelIndex,int,int)));
 }
 
 QmitkUSZoneManagementWidget::~QmitkUSZoneManagementWidget()
@@ -47,13 +49,12 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkUSZoneManagementWidget::GetZo
   return m_DataStorage->GetDerivations(m_BaseNode);
 }
 
-void QmitkUSZoneManagementWidget::AddRow()
+/*void QmitkUSZoneManagementWidget::AddRow()
 {
   m_ZonesDataModel->insertRow(m_ZonesDataModel->rowCount());
   m_ZonesDataModel->setData(m_ZonesDataModel->index(m_ZonesDataModel->rowCount()-1,1), 5);
   m_ZonesDataModel->setData(m_ZonesDataModel->index(m_ZonesDataModel->rowCount()-1,2), "Red");
-
-}
+}*/
 
 void QmitkUSZoneManagementWidget::RemoveSelectedRows()
 {
@@ -91,13 +92,38 @@ void QmitkUSZoneManagementWidget::OnStartAddingZone()
 
 void QmitkUSZoneManagementWidget::OnResetZones()
 {
+  // remove all zone nodes from the data storage
   m_DataStorage->Remove(m_DataStorage->GetDerivations(m_BaseNode));
-
-  // remove all rows from the model
-  //while (m_ZonesDataModel->rowCount() > 0) { m_ZonesDataModel->removeRow(0); }
 }
 
 void QmitkUSZoneManagementWidget::OnSelectionChanged(const QItemSelection & selected, const QItemSelection & /*deselected*/)
 {
-  ui->DeleteZoneButton->setDisabled(selected.empty());
+  bool somethingSelected = ! selected.empty();
+  ui->ZoneSizeLabel->setEnabled(somethingSelected);
+  ui->ZoneSizeSlider->setEnabled(somethingSelected);
+  ui->DeleteZoneButton->setEnabled(somethingSelected);
+
+  if (somethingSelected)
+  {
+    m_SelectedRow = selected.at(0).top();
+    ui->ZoneSizeSlider->setValue(
+          m_ZonesDataModel->data(m_ZonesDataModel->index(m_SelectedRow, 1)).toInt());
+
+  }
+  else
+  {
+    m_SelectedRow = -1;
+  }
+}
+
+void QmitkUSZoneManagementWidget::OnZoneSizeSliderValueChanged(int value)
+{
+  if (m_SelectedRow < 0) { return; }
+
+  m_ZonesDataModel->setData(m_ZonesDataModel->index(m_SelectedRow, 1), value);
+}
+
+void QmitkUSZoneManagementWidget::OnRowInsertion( const QModelIndex & /*parent*/, int /*start*/, int end )
+{
+  //ui->CurrentZonesTable->selectRow(end);
 }

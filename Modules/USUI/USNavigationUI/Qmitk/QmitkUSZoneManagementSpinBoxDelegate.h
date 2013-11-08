@@ -1,16 +1,16 @@
-#ifndef QMITKUSZONEMANAGEMENTSLIDERDELEGATE_H
-#define QMITKUSZONEMANAGEMENTSLIDERDELEGATE_H
+#ifndef QMITKUSZONEMANAGEMENTSPINBOXDELEGATE_H
+#define QMITKUSZONEMANAGEMENTSPINBOXDELEGATE_H
 
 #include <QStyledItemDelegate>
 
-class QmitkUSZoneManagementSliderDelegate : public QStyledItemDelegate
+class QmitkUSZoneManagementSpinBoxDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
 public:
 
-    explicit QmitkUSZoneManagementSliderDelegate(QObject* parent = 0);
-    ~QmitkUSZoneManagementSliderDelegate();
+    explicit QmitkUSZoneManagementSpinBoxDelegate(QObject* parent = 0);
+    ~QmitkUSZoneManagementSpinBoxDelegate();
 
     QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
@@ -18,9 +18,6 @@ public:
     void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const;
 
     void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-
-
-    void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 };
 
-#endif // QMITKUSZONEMANAGEMENTSLIDERDELEGATE_H
+#endif // QMITKUSZONEMANAGEMENTSPINBOXDELEGATE_H

@@ -99,6 +99,13 @@ namespace mitk
       mitk::FromArray<ArrayType, TCoordRep, NVectorDimension>(*thisP, array);
     }
 
+    template <typename ArrayType >
+    ArrayType ToArray()
+    {
+      ArrayType result = mitk::ToArray<ArrayType, TCoordRep, NVectorDimension>(*this);
+      return result;
+    }
+
 
     /**
      * @brief User defined conversion of mitk::Vector to vnl_vector.

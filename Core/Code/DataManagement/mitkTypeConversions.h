@@ -23,6 +23,13 @@ namespace mitk {
    */
 
 
+  /**
+   * @brief Copies elements of an array to this Vector
+   * @param[in] array    the array whose values will be copied into the Vector. Must be of a type which overrides the [] operator
+   * @param[out] toArray  the FixedArrray (e.g., mitk::Vector or mitk::Point) which should hold the elements of array.
+   * @attention array must be of dimension NVectorDimension!
+   * @attention this method implicitly converts between data types.
+   */
   template <typename ArrayType, typename TCoordRep, unsigned int NVectorDimension>
   void FromArray(itk::FixedArray<TCoordRep, NVectorDimension>& toArray, const ArrayType& array)
   {
@@ -67,6 +74,23 @@ namespace mitk {
     }
   }
 
+
+  /**
+   * @brief Copies the elements of this into an array
+   * @param[in] vectorOrPoint   the itk::FixedArray which shall be copied into the array. Can e.g. be of type mitk::Vector or mitk::Point
+   * @return    the array which will hold the elements. Must be of a type which overrides the [] operator.
+   * @attention array must be of dimension NVectorDimension!
+   * @attention this method implicitly converts between data types.
+   */
+  template <typename ArrayType, typename TCoordRep, unsigned int NVectorDimension>
+  ArrayType ToArray(const itk::FixedArray<TCoordRep, NVectorDimension>& vectorOrPoint)
+  {
+    ArrayType result;
+
+    mitk::ToArray(result, vectorOrPoint);
+
+    return result;
+  }
 
 }
 

@@ -1,1 +1,3 @@
 MITK_CREATE_MODULE_TESTS()
+
+mitkAddCustomModuleTest(mitkImageStatisticsHotspotTest_Case1 mitkImageStatisticsHotspotTest ${CMAKE_CURRENT_SOURCE_DIR}/Data/Hotspot_Case1.xml)

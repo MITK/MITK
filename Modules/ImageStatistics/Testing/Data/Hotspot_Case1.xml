@@ -1,0 +1,21 @@
+<testcase>
+  <!--
+    Test case 1:
+    oben links heller als dunkel (TODO!)
+  -->
+
+  <testimage
+    x="1.42"
+    y="2.32"
+    />
+
+  <roi
+    u="3.0"
+    v="4.0"
+    />
+
+  <statistics
+    u="9.0"
+    v="7.1"
+    />
+</testcase>

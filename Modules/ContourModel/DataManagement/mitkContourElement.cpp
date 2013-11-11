@@ -69,7 +69,7 @@ void mitk::ContourElement::AddVertexAtFront(VertexType &vertex)
 
 void mitk::ContourElement::InsertVertexAtIndex(mitk::Point3D &vertex, bool isControlPoint, int index)
 {
-  if(index > 0 && this->GetSize() > index)
+  if(index >= 0 && this->GetSize() > index)
   {
     VertexIterator _where = this->m_Vertices->begin();
     _where += index;
@@ -81,7 +81,7 @@ void mitk::ContourElement::InsertVertexAtIndex(mitk::Point3D &vertex, bool isCon
 
 void mitk::ContourElement::SetVertexAt(int pointId, const Point3D &point)
 {
-  if(pointId > 0 && this->GetSize() > pointId)
+  if(pointId >= 0 && this->GetSize() > pointId)
   {
     this->m_Vertices->at(pointId)->Coordinates = point;
   }
@@ -91,7 +91,7 @@ void mitk::ContourElement::SetVertexAt(int pointId, const Point3D &point)
 
 void mitk::ContourElement::SetVertexAt(int pointId, const VertexType* vertex)
 {
-  if(pointId > 0 && this->GetSize() > pointId)
+  if(pointId >= 0 && this->GetSize() > pointId)
   {
     this->m_Vertices->at(pointId)->Coordinates = vertex->Coordinates;
     this->m_Vertices->at(pointId)->IsControlPoint = vertex->IsControlPoint;

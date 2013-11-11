@@ -388,10 +388,10 @@ static void TestSetVertices()
 
   contour->AddVertex(p);
 
-  contour->SetVertexAt(0, contour2->GetVertexAt(1));
+  contour->SetVertexAt(1, contour2->GetVertexAt(1));
 
   MITK_TEST_EQUAL(contour->GetVertexAt(1)->Coordinates, contour2->GetVertexAt(1)->Coordinates, "Use setter and getter combination");
-  MITK_TEST_CONDITION(contour->GetIndex(contour2->GetVertexAt(1)) == 0, "Index is correct");
+
 }
 
 
@@ -429,12 +429,9 @@ static void TestContourModelAPI()
 
   mitk::ContourModel::Pointer contour2 = mitk::ContourModel::New();
 
-  mitk::Point3D p3;
-  p3[0] = p3[1] = p3[2] = 3;
+  contour2->AddVertex(contour1->GetVertexAt(0));
 
-  contour2->AddVertex(p3);
-
-  contour1->AddVertex(contour2->GetVertexAt(0));
+  MITK_TEST_CONDITION(contour2->GetNumberOfVertices() == 1, "Add call with another contour");
 }
 
 

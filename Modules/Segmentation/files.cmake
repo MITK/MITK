@@ -60,6 +60,10 @@ set(CPP_FILES
   Interactions/mitkFastMarchingTool.cpp
   Interactions/mitkFastMarchingTool3D.cpp
   Interactions/mitkMedianTool3D.cpp
+  Interactions/mitkDilateTool3D.cpp
+  Interactions/mitkErodeTool3D.cpp
+  Interactions/mitkSmoothTool3D.cpp
+  Interactions/mitkFillHolesTool3D.cpp
   Interactions/mitkFeedbackContourTool.cpp
   Interactions/mitkFillRegionTool.cpp
   Interactions/mitkLiveWireTool2D.cpp
@@ -120,4 +124,8 @@ set(RESOURCE_FILES
   Wipe_48x48.png
   Wipe_Cursor_32x32.png
   MedianTool3D_48x48.png
+  ErodeTool3D_48x48.png
+  DilateTool3D_48x48.png
+  SmoothTool3D_48x48.png
+  FillHolesTool3D_48x48.png
 )

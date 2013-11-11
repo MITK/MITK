@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkMedianTool3D_h_Included
-#define mitkMedianTool3D_h_Included
+#ifndef mitkFillHolesTool3D_h_Included
+#define mitkFillHolesTool3D_h_Included
 
 #include "mitkAutoSegmentationTool.h"
 #include "mitkLegacyAdaptors.h"
@@ -37,16 +37,16 @@ namespace mitk
 {
 
 /**
-  \brief Median segmentation tool.
+  \brief Fill hole tool.
 
-  The segmentation smooths all labels by median filtering.
+  This tool remove holes not connected to the boundary of the label.
 */
-class Segmentation_EXPORT MedianTool3D : public AutoSegmentationTool
+class Segmentation_EXPORT FillHolesTool3D : public AutoSegmentationTool
 {
   public:
 
-    mitkClassMacro(MedianTool3D, AutoSegmentationTool)
-    itkNewMacro(MedianTool3D)
+    mitkClassMacro(FillHolesTool3D, AutoSegmentationTool)
+    itkNewMacro(FillHolesTool3D)
 
     /* icon stuff */
     virtual const char** GetXPM() const;
@@ -57,8 +57,8 @@ class Segmentation_EXPORT MedianTool3D : public AutoSegmentationTool
 
   protected:
 
-    MedianTool3D();
-    virtual ~MedianTool3D();
+    FillHolesTool3D();
+    virtual ~FillHolesTool3D();
 
     mitk::ToolCommand::Pointer m_ProgressCommand;
 

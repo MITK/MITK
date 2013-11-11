@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkMedianTool3D.h"
+#include "mitkFillHolesTool3D.h"
 
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
@@ -29,8 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 
 #include <itkBinaryThresholdImageFilter.h>
-#include <itkBinaryBallStructuringElement.h>
-#include <itkBinaryMedianImageFilter.h>
+#include <itkBinaryFillholeImageFilter.h>
 #include <itkLabelObject.h>
 #include <itkLabelMap.h>
 #include <itkLabelImageToLabelMapFilter.h>
@@ -44,35 +43,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, MedianTool3D, "MedianTool3D tool");
+  MITK_TOOL_MACRO(Segmentation_EXPORT, FillHolesTool3D, "FillHolesTool3D tool");
 }
 
-mitk::MedianTool3D::MedianTool3D()
+
+mitk::FillHolesTool3D::FillHolesTool3D()
 {
 }
 
-mitk::MedianTool3D::~MedianTool3D()
+mitk::FillHolesTool3D::~FillHolesTool3D()
 {
 }
 
-const char** mitk::MedianTool3D::GetXPM() const
+const char** mitk::FillHolesTool3D::GetXPM() const
 {
-  return NULL;//mitkMedianTool3D_xpm;
+  return NULL;//mitkFillHolesTool3D_xpm;
 }
 
-us::ModuleResource mitk::MedianTool3D::GetIconResource() const
+us::ModuleResource mitk::FillHolesTool3D::GetIconResource() const
 {
   us::Module* module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("MedianTool3D_48x48.png");
+  us::ModuleResource resource = module->GetResource("FillHolesTool3D_48x48.png");
   return resource;
 }
 
-const char* mitk::MedianTool3D::GetName() const
+const char* mitk::FillHolesTool3D::GetName() const
 {
-  return "MedianTool3D";
+  return "FillHolesTool3D";
 }
 
-void mitk::MedianTool3D::Run()
+void mitk::FillHolesTool3D::Run()
 {
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
@@ -107,18 +107,16 @@ void mitk::MedianTool3D::Run()
 
 
 template < typename TPixel, unsigned int VDimension >
-void mitk::MedianTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
+void mitk::FillHolesTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
-
+  typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;
   typedef itk::LabelObject< TPixel, VDimension > LabelObjectType;
   typedef itk::LabelMap< LabelObjectType > LabelMapType;
   typedef itk::LabelImageToLabelMapFilter< ImageType, LabelMapType > Image2LabelMapType;
   typedef itk::AutoCropLabelMapFilter< LabelMapType > AutoCropType;
   typedef itk::LabelMapToLabelImageFilter< LabelMapType, ImageType > LabelMap2ImageType;
-  typedef itk::BinaryBallStructuringElement<TPixel, VDimension> BallType;
-  typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;
-  typedef itk::BinaryMedianImageFilter< ImageType, ImageType > MedianFilterType;
+  typedef itk::BinaryFillholeImageFilter< ImageType > FillHolesFilterType;
 
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
@@ -145,37 +143,33 @@ void mitk::MedianTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
   typename LabelMap2ImageType::Pointer label2image = LabelMap2ImageType::New();
   label2image->SetInput( autoCropFilter->GetOutput() );
 
-  typename ImageType::SizeType radius;
-  radius.Fill(1);
-
-  typename MedianFilterType::Pointer medianFilter = MedianFilterType::New();
-  medianFilter->SetInput( label2image->GetOutput() );
-  medianFilter->SetForegroundValue( pixelValue );
-  medianFilter->SetRadius( radius );
+  typename FillHolesFilterType::Pointer fillHolesFilter = FillHolesFilterType::New();
+  fillHolesFilter->SetInput(label2image->GetOutput());
+  fillHolesFilter->SetForegroundValue(pixelValue);
 
   if (m_ProgressCommand.IsNotNull())
   {
     thresholdFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
     autoCropFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    medianFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+    fillHolesFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
     m_ProgressCommand->AddStepsToDo(100);
   }
 
-  medianFilter->Update();
+  fillHolesFilter->Update();
 
   if (m_ProgressCommand.IsNotNull())
   {
     m_ProgressCommand->Reset();
   }
 
-  typename ImageType::Pointer result = medianFilter->GetOutput();
+  typename ImageType::Pointer result = fillHolesFilter->GetOutput();
   result->DisconnectPipeline();
-
-  typedef itk::ImageRegionConstIterator< ImageType > SourceIteratorType;
-  typedef itk::ImageRegionIterator< ImageType > TargetIteratorType;
 
   typename ImageType::RegionType cropRegion;
   cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();
+
+  typedef itk::ImageRegionConstIterator< ImageType > SourceIteratorType;
+  typedef itk::ImageRegionIterator< ImageType > TargetIteratorType;
 
   typename const ImageType::SizeType& cropSize = cropRegion.GetSize();
   typename const ImageType::IndexType& cropIndex = cropRegion.GetIndex();

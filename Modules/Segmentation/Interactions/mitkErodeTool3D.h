@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkMedianTool3D_h_Included
-#define mitkMedianTool3D_h_Included
+#ifndef mitkErodeTool3D_h_Included
+#define mitkErodeTool3D_h_Included
 
 #include "mitkAutoSegmentationTool.h"
 #include "mitkLegacyAdaptors.h"
@@ -41,12 +41,12 @@ namespace mitk
 
   The segmentation smooths all labels by median filtering.
 */
-class Segmentation_EXPORT MedianTool3D : public AutoSegmentationTool
+class Segmentation_EXPORT ErodeTool3D : public AutoSegmentationTool
 {
   public:
 
-    mitkClassMacro(MedianTool3D, AutoSegmentationTool)
-    itkNewMacro(MedianTool3D)
+    mitkClassMacro(ErodeTool3D, AutoSegmentationTool)
+    itkNewMacro(ErodeTool3D)
 
     /* icon stuff */
     virtual const char** GetXPM() const;
@@ -57,8 +57,8 @@ class Segmentation_EXPORT MedianTool3D : public AutoSegmentationTool
 
   protected:
 
-    MedianTool3D();
-    virtual ~MedianTool3D();
+    ErodeTool3D();
+    virtual ~ErodeTool3D();
 
     mitk::ToolCommand::Pointer m_ProgressCommand;
 

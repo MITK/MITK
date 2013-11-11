@@ -56,10 +56,15 @@ namespace mitk
     struct ContourModelVertex
     {
       ContourModelVertex(mitk::Point3D &point, bool active=false)
-        : Coordinates(point), IsControlPoint(active)
+        : IsControlPoint(active), Coordinates(point)
       {
 
-      };
+      }
+
+      ContourModelVertex( const ContourModelVertex &other)
+        : IsControlPoint(other.IsControlPoint), Coordinates(other.Coordinates)
+      {
+      }
 
       /** \brief Treat point special. */
       bool IsControlPoint;
@@ -141,6 +146,18 @@ namespace mitk
     */
     virtual void InsertVertexAtIndex(mitk::Point3D &point, bool isControlPoint, int index);
 
+    /** \brief Set coordinates a given index.
+    \param pointId Index of vertex.
+    \param point Coordinates.
+    */
+    virtual void SetVertexAt(int pointId, const mitk::Point3D &point);
+
+    /** \brief Set vertex a given index.
+    \param pointId Index of vertex.
+    \param vertex Vertex.
+    */
+    virtual void SetVertexAt(int pointId, const VertexType* vertex);
+
     /** \brief Returns the vertex a given index
     \param index
     */
@@ -151,6 +168,12 @@ namespace mitk
     \param eps - the error bound for search algorithm.
     */
     virtual VertexType* GetVertexAt(const mitk::Point3D &point, float eps);
+
+    /** \brief Returns the index of the given vertex within the contour.
+    \param vertex - the vertex to be searched.
+    \return index of vertex. -1 if not found.
+    */
+    virtual int GetIndex(const VertexType* vertex);
 
     /** \brief Returns the container of the vertices.
     */
@@ -183,7 +206,7 @@ namespace mitk
     /** \brief Set the contours IsClosed property.
     \param isClosed - true = closed; false = open;
     */
-    virtual void SetIsClosed(bool isClosed);
+    virtual void SetClosed(bool isClosed);
 
     /** \brief Concatenate the contuor with a another contour.
     All vertices of the other contour will be added after last vertex.
@@ -195,7 +218,7 @@ namespace mitk
     /** \brief Remove the given vertex from the container if exists.
     \param vertex - the vertex to be removed.
     */
-    virtual bool RemoveVertex(VertexType* vertex);
+    virtual bool RemoveVertex(const VertexType* vertex);
 
     /** \brief Remove a vertex at given index within the container if exists.
     \param index - the index where the vertex should be removed.

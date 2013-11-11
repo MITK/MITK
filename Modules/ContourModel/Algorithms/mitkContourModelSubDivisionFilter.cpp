@@ -210,7 +210,7 @@ void mitk::ContourModelSubDivisionFilter::GenerateData()
   }
 
   //somehow the isClosed property is not set via copy constructor
-  contour->SetIsClosed(input->IsClosed());
+  contour->SetClosed(input->IsClosed());
 
   this->SetNthOutput(0, contour);
 

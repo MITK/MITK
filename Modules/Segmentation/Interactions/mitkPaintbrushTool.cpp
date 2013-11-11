@@ -285,7 +285,7 @@ bool mitk::PaintbrushTool::OnMousePressed (Action* action, const StateEvent* sta
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
-  m_MasterContour->SetIsClosed(true);
+  m_MasterContour->SetClosed(true);
 
   return this->OnMouseMoved(action, stateEvent);
 }
@@ -354,7 +354,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
 
   ContourModel::Pointer contour = ContourModel::New();
   contour->Expand(timestep + 1);
-  contour->SetIsClosed(true, timestep);
+  contour->SetClosed(true, timestep);
 
   ContourModel::VertexIterator it = m_MasterContour->Begin();
   ContourModel::VertexIterator end = m_MasterContour->End();

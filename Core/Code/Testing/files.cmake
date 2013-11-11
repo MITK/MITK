@@ -78,6 +78,10 @@ set(MODULE_TESTS
   mitkPropertyExtensionsTest.cpp
   mitkPropertyFiltersTest.cpp
   mitkTinyXMLTest.cpp
+  mitkTypePointConversionTest.cpp
+  mitkTypeVectorConversionTest.cpp
+  mitkTypeMatrixConversionTest.cpp
+  mitkTypeOperationTest.cpp
 )
 
 # test with image filename as an extra command line parameter

@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <set>
 #include "MitkExtExports.h"
 #include "mitkCommon.h"
-#include "mitkVector.h"
+#include "mitkTypes.h"
 #include "mitkStepper.h"
 #include <itkObject.h>
 #include <itkObjectFactory.h>

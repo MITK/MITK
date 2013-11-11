@@ -67,6 +67,13 @@ set(H_FILES
   DataManagement/mitkImageToItk.h
   DataManagement/mitkImageToItk.txx
   DataManagement/mitkTimeSlicedGeometry.h # Deprecated, empty for compatibilty reasons.
+  DataManagement/mitkOldTypeConversions.h
+  DataManagement/mitkTypedefs.h
+  DataManagement/mitkTypes.h
+  DataManagement/mitkVector.h
+  DataManagement/mitkPoint.h
+  DataManagement/mitkMatrix.h
+  DataManagement/mitkTypeOperations.h
 
   Interactions/mitkEventMapperAddOn.h
 
@@ -202,7 +209,7 @@ set(CPP_FILES
   DataManagement/mitkTransferFunctionProperty.cpp
   DataManagement/mitkTransferFunctionInitializer.cpp
   DataManagement/mitkVector.cpp
-
+  DataManagement/mitkTypeBasics.cpp
   DataManagement/mitkVtkInterpolationProperty.cpp
   DataManagement/mitkVtkRepresentationProperty.cpp
   DataManagement/mitkVtkResliceInterpolationProperty.cpp

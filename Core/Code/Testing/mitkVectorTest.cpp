@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkTestingMacros.h>
-#include <mitkVector.h>
+#include <mitkTypes.h>
 
 int mitkVectorTest(int /*argc*/, char* /*argv*/[])
 {

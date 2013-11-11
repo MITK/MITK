@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTDMouseEventThrower.h"
 #include "mitkTDMouseEvent.h"
 #include "mitkInteractionConst.h"
-#include "mitkVector.h"
+#include "mitkTypes.h"
 #include "mitkGlobalInteraction.h"
 #include "mitkStateEvent.h"
 #include "mitkSpaceNavigatorDriver.h"

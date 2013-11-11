@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKLINE_H_HEADER_INCLUDED_C19C01E2
 #define MITKLINE_H_HEADER_INCLUDED_C19C01E2
 
-#include "mitkVector.h"
+#include "mitkTypes.h"
 #include <vnl/vnl_vector.h>
 #include <vnl/vnl_cross.h>
 #include <itkTransform.h>

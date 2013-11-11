@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSplineMapper2D.h"
 #include "mitkSplineVtkMapper3D.h"
 #include <mitkPlaneGeometry.h>
-#include <mitkVector.h>
+#include <mitkTypes.h>
 #include <mitkGeometry2D.h>
 #include <mitkGL.h>
 #include <vtkLinearTransform.h>

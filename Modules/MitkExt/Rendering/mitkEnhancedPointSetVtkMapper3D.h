@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkPointSet.h"
-#include "mitkVector.h"
+#include "mitkTypes.h"
 
 class vtkActor;
 class vtkAssembly;

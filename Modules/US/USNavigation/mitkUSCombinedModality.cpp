@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSCombinedModality.h"
 #include "mitkUSDevice.h"
 #include "mitkNavigationDataSource.h"
+#include "mitkImageReadAccessor.h"
 
 //TempIncludes
 #include <tinyxml.h>
@@ -36,6 +37,10 @@ mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, Navigat
     mitk::NavigationData::Pointer nd2 = m_SmoothingFilter->GetOutput(i);
   }
   m_SmoothingFilter->SetNumerOfValues(10);
+
+  //create a new output (for the image data)
+  mitk::Image::Pointer newOutput = mitk::Image::New();
+  this->SetNthOutput(0,newOutput);
 }
 
 mitk::USCombinedModality::~USCombinedModality()
@@ -219,8 +224,17 @@ mitk::NavigationDataSource::Pointer mitk::USCombinedModality::GetNavigationDataS
 
 void mitk::USCombinedModality::GenerateData()
 {
+  // update ultrasound image source and get current output then
+  m_UltrasoundDevice->Modified();
   m_UltrasoundDevice->Update();
   mitk::Image::Pointer image = m_UltrasoundDevice->GetOutput();
+  if ( image.IsNull() || ! image->IsInitialized() ) {
+    return;
+  }
+
+  // get output and initialize it if it wasn't initialized before
+  mitk::Image::Pointer output = this->GetOutput();
+  if ( ! output->IsInitialized() ) { output->Initialize(image); }
 
   std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
   if ( ! calibrationKey.empty() )
@@ -237,7 +251,8 @@ void mitk::USCombinedModality::GenerateData()
 
   // TODO: do processing here
 
-  this->SetNthOutput(0, image);
+  mitk::ImageReadAccessor inputReadAccessor(image, image->GetSliceData(0,0,0));
+  output->SetSlice(inputReadAccessor.GetData());
 }
 
 std::string mitk::USCombinedModality::SerializeCalibration()

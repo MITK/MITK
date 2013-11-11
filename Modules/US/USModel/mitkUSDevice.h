@@ -228,6 +228,8 @@ namespace mitk {
     virtual USImageSource::Pointer GetUSImageSource() = 0;
 
   protected:
+    itkSetMacro(Image, mitk::Image::Pointer);
+
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
 
     mitk::Image::Pointer m_Image;

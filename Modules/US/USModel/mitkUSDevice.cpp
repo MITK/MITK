@@ -380,9 +380,7 @@ output->Graft( graft );
 
 void mitk::USDevice::GrabImage()
 {
-  m_Image = this->GetUSImageSource()->GetNextImage();
-  m_Image->Modified();
-  //this->Modified();
+  this->SetImage(this->GetUSImageSource()->GetNextImage());
 }
 
 //########### GETTER & SETTER ##################//

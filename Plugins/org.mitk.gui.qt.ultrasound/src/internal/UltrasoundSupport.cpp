@@ -90,6 +90,7 @@ void UltrasoundSupport::OnClickedAddNewDevice()
 
 void UltrasoundSupport::DisplayImage()
 {
+  m_Device->Modified();
   m_Device->UpdateOutputData(0);
   mitk::Image::Pointer curOutput = m_Device->GetOutput();
   m_Node->SetData(curOutput->Clone());

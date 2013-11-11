@@ -369,10 +369,13 @@ void UltrasoundCalibration::Update()
   m_Controls.m_EvalTrackingStatus->Refresh();
 
   // Update US Image
-  m_CombinedModality->UpdateOutputData(0);
+  m_CombinedModality->Modified();
+  m_CombinedModality->Update();
   mitk::Image::Pointer image = m_CombinedModality->GetOutput();
-  m_Node->SetData(image);
-  //m_Image->Update();
+  if (m_Image.IsNotNull() && m_Image->IsInitialized())
+  {
+    m_Node->SetData(image);
+  }
 
   // Update Needle Projection
   m_NeedleProjectionFilter->Update();
@@ -394,10 +397,12 @@ void UltrasoundCalibration::SwitchFreeze()
       return;
     }
 
-    //m_CombinedModality->UpdateOutputData(0);
     m_CombinedModality->Update();
     m_Image = m_CombinedModality->GetOutput();
-    m_Node->SetData(m_Image);
+    if (m_Image.IsNotNull() && m_Image->IsInitialized())
+    {
+      m_Node->SetData(m_Image);
+    }
 
     std::vector<mitk::NavigationData::Pointer> datas;
     datas.push_back(m_Tracker->GetOutput());

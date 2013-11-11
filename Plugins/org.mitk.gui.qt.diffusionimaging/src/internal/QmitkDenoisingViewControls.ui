@@ -23,16 +23,7 @@
    <property name="spacing">
     <number>6</number>
    </property>
-   <property name="leftMargin">
-    <number>9</number>
-   </property>
-   <property name="topMargin">
-    <number>9</number>
-   </property>
-   <property name="rightMargin">
-    <number>9</number>
-   </property>
-   <property name="bottomMargin">
+   <property name="margin">
     <number>9</number>
    </property>
    <item>
@@ -57,6 +48,35 @@
          <bool>true</bool>
         </property>
        </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Brainmask:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="m_InputBrainMaskLabel">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="gridGroupBox">
+     <property name="title">
+      <string>Denoisingfilter</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="margin">
+       <number>9</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QComboBox" name="m_SelectFilterComboBox"/>
       </item>
      </layout>
     </widget>

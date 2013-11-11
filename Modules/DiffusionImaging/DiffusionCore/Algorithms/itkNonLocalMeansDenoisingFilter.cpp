@@ -26,22 +26,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkImageRegionIterator.h"
 #include "itkNeighborhoodIterator.h"
-#include <boost/progress.hpp>
-
 
 namespace itk {
 
 
-template< class TInPixelType, class TOutPixelType >
-NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
+template< class TPixelType >
+NonLocalMeansDenoisingFilter< TPixelType >
 ::NonLocalMeansDenoisingFilter()
 {
-  this->SetNumberOfRequiredInputs( 1 );
+  this->SetNumberOfRequiredInputs( 2 );
 }
 
-template< class TInPixelType, class TOutPixelType >
+template< class TPixelType >
 void
-NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
+NonLocalMeansDenoisingFilter< TPixelType >
 ::BeforeThreadedGenerateData()
 {
   typename OutputImageType::Pointer outputImage =
@@ -51,26 +49,68 @@ NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
   px.SetElement(0,0);
   outputImage->FillBuffer(px);
 
-  InputImageType::Pointer inImage = static_cast < InputImageType* > (this->ProcessObject::GetInput(0));
+  typename InputImageType::Pointer inImage = static_cast< InputImageType* >(this->ProcessObject::GetInput(0));
+  typename MaskImageType::Pointer mask = static_cast< MaskImageType* >(this->ProcessObject::GetInput(1));
   int size = inImage->GetVectorLength();
-  deviations.SetSize(size);
-  imageExtractorType::Pointer extractor = imageExtractorType::New();
+  m_Deviations.SetSize(size);
+  typename ImageExtractorType::Pointer extractor = ImageExtractorType::New();
   extractor->SetInput(inImage);
+
+  typename MaskImageType::PointType imageOrigin = inImage->GetOrigin();
+  typename MaskImageType::PointType maskOrigin = mask->GetOrigin();
+  long offset[3];
+
+  typedef itk::ContinuousIndex<double, 3> ContinousIndexType;
+  ContinousIndexType maskOriginContinousIndex, imageOriginContinousIndex;
+
+  inImage->TransformPhysicalPointToContinuousIndex(maskOrigin, maskOriginContinousIndex);
+  inImage->TransformPhysicalPointToContinuousIndex(imageOrigin, imageOriginContinousIndex);
+
+  for ( unsigned int i = 0; i < 3; ++i )
+  {
+    double misalignment = maskOriginContinousIndex[i] - floor( maskOriginContinousIndex[i] + 0.5 );
+    if ( fabs( misalignment ) > mitk::eps )
+    {
+        itkExceptionMacro( << "Pixels/voxels of mask and image are not sufficiently aligned! (Misalignment: " << misalignment << ")" );
+    }
+
+    double indexCoordDistance = maskOriginContinousIndex[i] - imageOriginContinousIndex[i];
+    offset[i] = (int) indexCoordDistance + inImage->GetBufferedRegion().GetIndex()[i];
+  }
+
   for ( int i = 0; i < size; ++i)
   {
     extractor->SetIndex(i);
     extractor->Update();
-    StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
-    statisticsFilter->SetInput(extractor->GetOutput());
-    statisticsFilter->Update();
-    deviations.SetElement(i, statisticsFilter->GetSigma());
+    typename ChangeInformationType::Pointer adaptMaskFilter;
+    adaptMaskFilter = ChangeInformationType::New();
+    adaptMaskFilter->ChangeOriginOn();
+    adaptMaskFilter->ChangeRegionOn();
+    adaptMaskFilter->SetInput( mask );
+    adaptMaskFilter->SetOutputOrigin( extractor->GetOutput()->GetOrigin() /*image->GetOrigin()*/ );
+    adaptMaskFilter->SetOutputOffset( offset );
+    adaptMaskFilter->Update();
+    typename MaskImageType::Pointer adaptedMaskImage = adaptMaskFilter->GetOutput();
+    typename ExtractImageFilterType::Pointer extractImageFilter = ExtractImageFilterType::New();
+    extractImageFilter->SetInput( extractor->GetOutput() );
+    extractImageFilter->SetExtractionRegion( adaptedMaskImage->GetBufferedRegion() );
+    extractImageFilter->Update();
+    typename MaskImageType::Pointer adaptedImage = extractor->GetOutput();
+    typename LabelStatisticsFilterType::Pointer labelStatisticsFilter = LabelStatisticsFilterType::New();
+    labelStatisticsFilter->SetInput(adaptedImage);
+    labelStatisticsFilter->SetLabelInput(adaptedMaskImage);
+    labelStatisticsFilter->UseHistogramsOff();
+    labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
+    labelStatisticsFilter->Update();
+    m_Deviations.SetElement(i, labelStatisticsFilter->GetSigma(1));
   }
+
   m_Pixels = 0;
 }
 
-template< class TInPixelType, class TOutPixelType >
+template< class TPixelType >
 void
-NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
+NonLocalMeansDenoisingFilter< TPixelType >
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType )
 {
   typename OutputImageType::Pointer outputImage =
@@ -89,60 +129,102 @@ NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>
   git.GoToBegin();
   while( !git.IsAtEnd() )
   {
+    double sz = (double)niit.Size();
     typename OutputImageType::PixelType outpix;
     outpix.SetSize (inputImagePointer->GetVectorLength());
 
-    for (int i = 0; i < inputImagePointer->GetVectorLength(); ++i)
+    for (unsigned int i = 0; i < inputImagePointer->GetVectorLength(); ++i)
     {
-      TInPixelType xi = git.GetCenterPixel()[i];
+      TPixelType xi = git.GetCenterPixel()[i];
       double sumj = 0;
       double wj = 0;
-      for (int j = 0; j < git.Size(); ++j)
+      double Z = 0;
+      if (m_UseJointInformation)
       {
-        bool isInBounds;
-        TInPixelType xj = git.GetPixel(j, isInBounds)[i];
-        /*MITK_INFO << git.GetIndex() << "; " << git.GetIndex(j);*/
+        for (unsigned int n = 0; n < inputImagePointer->GetVectorLength(); ++n)
+        {
+          for (unsigned int j = 0; j < git.Size(); ++j)
+          {
+            bool isInBounds = false;
+            TPixelType xj = git.GetPixel(j, isInBounds)[n];
+            if (xi == xj && isInBounds)
+            {
+              ++Z;
+            }
+          }
+        }
+      }
+      else
+      {
+        for (unsigned int j = 0; j < git.Size(); ++j)
+        {
+          bool isInBounds = false;
+          TPixelType xj = git.GetPixel(j, isInBounds)[i];
+          if (xi == xj && isInBounds)
+          {
+            ++Z;
+          }
+        }
+      }
+      for (unsigned int j = 0; j < git.Size(); ++j)
+      {
+        bool isInBounds = false;
+        TPixelType xj = git.GetPixel(j, isInBounds)[i];
 
-        if (xi == xj && git.Size()/2 != j && isInBounds)
+        if (xi == xj && isInBounds)
         {
           niit.SetLocation(git.GetIndex());
           njit.SetLocation(git.GetIndex(j));
           double sumk = 0;
-          for (int k = 0; k < niit.Size(); ++k)
+          for (unsigned int k = 0; k < niit.Size(); ++k)
           {
-            MITK_INFO << "Git: " << git.GetIndex() << "; " << git.GetPixel(k)[0] << " Niit: " << niit.GetIndex() << "; " << niit.GetPixel(k)[0];
-            sumk += std::pow( (niit.GetPixel(k)[i] - njit.GetPixel(k)[i]), 2);
+
+            if (m_UseJointInformation)
+            {
+              for (unsigned int n = 0; n < inputImagePointer->GetVectorLength(); ++n)
+              {
+                /// ???
+                double diff = niit.GetPixel(k)[n] - njit.GetPixel(k)[n];
+                sumk += std::pow( diff, 2);
+              }
+            }
+            else
+            {
+              double diff = niit.GetPixel(k)[i] - njit.GetPixel(k)[i];
+              sumk += std::pow( diff, 2);
+            }
+
           }
-          wj = std::exp( - ( std::sqrt( (1 / niit.Size()) * sumk) / deviations.GetElement(i)));
-          sumj += (wj * std::pow(xj, 2)) - (2 * std::pow(deviations.GetElement(i),2));
+          wj = std::exp( - ( std::sqrt( (sumk / sz)) / m_Deviations.GetElement(i))) / Z;
+          sumj += (wj * std::pow(xj, 2)) - (2 * std::pow(m_Deviations.GetElement(i),2));
         }
       }
       sumj = sumj >= 0 ? sumj : 0;
-      TOutPixelType outval = xi - static_cast<TOutPixelType>(std::sqrt(sumj));
-
+      TPixelType outval = static_cast<TPixelType>(std::sqrt(sumj));
       outpix.SetElement(i, outval);
     }
     oit.Set(outpix);
     ++oit;
-    /*if (m_Pixels % 100 == 0)
+    if (m_Pixels % 100 == 0)
     {
       MITK_INFO << m_Pixels << " Pixels";
     }
-    m_Pixels++;*/
+
+    m_Pixels++;
     ++git;
   }
 
   MITK_INFO << "One Thread finished calculation";
 }
 
-template< class TInPixelType, class TOutPixelType >
-void NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>::PrintSelf(std::ostream& os, Indent indent) const
+template< class TPixelType >
+void NonLocalMeansDenoisingFilter< TPixelType >::PrintSelf(std::ostream& os, Indent indent) const
 {
   Superclass::PrintSelf(os,indent);
 }
 
-template < class TInPixelType, class TOutPixelType >
-void NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>::SetNRadius(unsigned int n)
+template< class TPixelType >
+void NonLocalMeansDenoisingFilter< TPixelType >::SetNRadius(unsigned int n)
 {
   for (int i = 0; i < InputImageType::ImageDimension; ++i)
   {
@@ -150,13 +232,25 @@ void NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>::SetNRadius(unsi
   }
 }
 
-template < class TInPixelType, class TOutPixelType >
-void NonLocalMeansDenoisingFilter< TInPixelType, TOutPixelType>::SetVRadius(unsigned int v)
+template< class TPixelType >
+void NonLocalMeansDenoisingFilter< TPixelType >::SetVRadius(unsigned int v)
 {
   for (int i = 0; i < InputImageType::ImageDimension; ++i)
   {
     m_V_Radius [i] = v;
   }
+}
+
+template< class TPixelType >
+void NonLocalMeansDenoisingFilter< TPixelType >::SetInputImage(const InputImageType* image)
+{
+  this->SetNthInput(0, const_cast< InputImageType* >(image));
+}
+
+template< class TPixelType >
+void NonLocalMeansDenoisingFilter< TPixelType >::SetInputMask(const MaskImageType* mask)
+{
+  this->SetNthInput(1, const_cast< MaskImageType* >(mask));
 }
 
 }

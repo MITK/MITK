@@ -19,28 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 
-#include <mitkDiffusionImage.h>
-
 #include <QmitkFunctionality.h>
 
 #include "ui_QmitkDenoisingViewControls.h"
 
 #include <itkVectorImage.h>
 #include <itkImage.h>
-#include <itkOrientationDistributionFunction.h>
-#include <mitkQBallImage.h>
-#include <vtkTransform.h>
-#include <vtkDoubleArray.h>
-#include <vtkOdfSource.h>
-#include <vtkSmartPointer.h>
-#include <QmitkRenderWindow.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkRenderer.h>
-#include <vtkCamera.h>
-#include <itkDiffusionTensor3D.h>
-
 #include <mitkDiffusionImage.h>
-#include <itkStatisticsImageFilter.h>
 #include <itkNonLocalMeansDenoisingFilter.h>
 
 //
@@ -66,31 +51,41 @@ public:
 
   typedef short DiffusionPixelType;
   typedef mitk::DiffusionImage< DiffusionPixelType > DiffusionImageType;
-  typedef itk::NonLocalMeansDenoisingFilter<DiffusionPixelType, DiffusionPixelType> NonLocalMeansDenoisingFilterType;
-
+  typedef itk::Image<short, 3> MaskImageType;
+  typedef itk::NonLocalMeansDenoisingFilter< DiffusionPixelType > NonLocalMeansDenoisingFilterType;
   virtual void CreateQtPartControl(QWidget *parent);
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
+  virtual void Activated();
 
 protected slots:
 
   void StartDenoising();
+  void SelectFilter(int filter);
 
 protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
-  void UpdateLabelText();
+
 
   Ui::QmitkDenoisingViewControls*  m_Controls;
-  QmitkStdMultiWidget*              m_MultiWidget;
 
 
   mitk::DataNode::Pointer m_ImageNode;
+  mitk::DataNode::Pointer m_BrainMaskNode;
 
-  int m_PropertyObserverTag;
+private:
+
+  enum FilterType {
+    NOFILTERSELECTED,
+    NLMR,
+    NLMV
+  }m_SelectedFilter;
+
+  void ResetParameterPanel();
 };
 
 

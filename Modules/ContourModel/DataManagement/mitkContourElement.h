@@ -206,7 +206,7 @@ namespace mitk
     /** \brief Set the contours IsClosed property.
     \param isClosed - true = closed; false = open;
     */
-    virtual void SetIsClosed(bool isClosed);
+    virtual void SetClosed(bool isClosed);
 
     /** \brief Concatenate the contuor with a another contour.
     All vertices of the other contour will be added after last vertex.

@@ -250,7 +250,7 @@ void mitk::ContourModel::SetClosed(bool isClosed, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
-    this->m_ContourSeries[timestep]->SetIsClosed(isClosed);
+    this->m_ContourSeries[timestep]->SetClosed(isClosed);
     this->InvokeEvent( ContourModelClosedEvent() );
     this->Modified();this->m_UpdateBoundingBox = true;
   }

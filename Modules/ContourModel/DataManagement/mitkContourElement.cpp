@@ -317,7 +317,7 @@ void mitk::ContourElement::Open()
 
 
 
-void mitk::ContourElement::SetIsClosed( bool isClosed)
+void mitk::ContourElement::SetClosed( bool isClosed)
 {
   isClosed ? this->Close() : this->Open();
 }

@@ -130,7 +130,8 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_ManualToolSelectionBox3D->SetToolManager(*m_ToolManager);
 
   m_Controls.m_LabelSetWidget->SetDataStorage( *(this->GetDataStorage()) );
-  m_Controls.m_LabelSetWidget->SetPreferences( this->GetPreferences() );
+  m_Controls.m_LabelSetWidget->SetOrganColors(this->GetDefaultOrganColorString());
+  m_Controls.m_LabelSetWidget->SetLastFileOpenPath(this->GetLastFileOpenPath());
 
   m_Controls.m_cbSurfaceNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.m_cbSurfaceNodeSelector->SetPredicate( m_SurfacePredicate );
@@ -151,8 +152,8 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
   m_Controls.m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer3D );
   //specify tools to be added to 3D Tool area
-//  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'Two Thresholds' Otsu FastMarching3D RegionGrowing Watershed");
-  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold FastMarching3D MedianTool3D");
+//  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("'Two Thresholds' Otsu FastMarching3D RegionGrowing Watershed");
+  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold FastMarching3D MedianTool3D DilateTool3D ErodeTool3D SmoothTool3D FillHolesTool3D");
   m_Controls.m_ManualToolSelectionBox3D->SetLayoutColumns(2);
   m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );
 
@@ -172,6 +173,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.m_pbSurfaceStamp, SIGNAL(clicked()), this, SLOT(OnSurfaceStamp()));
   connect(m_Controls.m_pbMaskStamp, SIGNAL(clicked()), this, SLOT(OnMaskStamp()));
+  connect(m_Controls.m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
 
   this->OnReferenceSelectionChanged( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode() );
 
@@ -184,7 +186,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
     controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
     m_Controls.m_SliceBasedInterpolator->Initialize(controllers, this->GetDataStorage());
     m_Controls.m_SurfaceBasedInterpolator->Initialize(this->GetDataStorage());
-    m_Controls.m_LabelSetWidget->SetRenderWindowPart(this->m_IRenderWindowPart);
+//    m_Controls.m_LabelSetWidget->SetRenderWindowPart(this->m_IRenderWindowPart);
   }
 }
 
@@ -206,7 +208,7 @@ void QmitkMultiLabelSegmentationView::RenderWindowPartActivated(mitk::IRenderWin
     controllers.push_back(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
     m_Controls.m_SliceBasedInterpolator->Initialize(controllers, this->GetDataStorage());
     m_Controls.m_SurfaceBasedInterpolator->Initialize(this->GetDataStorage());
-    m_Controls.m_LabelSetWidget->SetRenderWindowPart(this->m_IRenderWindowPart);
+//    m_Controls.m_LabelSetWidget->SetRenderWindowPart(this->m_IRenderWindowPart);
   }
 }
 
@@ -449,6 +451,12 @@ void QmitkMultiLabelSegmentationView::SetMouseCursor( const us::ModuleResource r
   m_MouseCursorSet = true;
 }
 
+void QmitkMultiLabelSegmentationView::OnGoToLabel(const mitk::Point3D& pos)
+{
+  if (m_IRenderWindowPart)
+    m_IRenderWindowPart->SetSelectedPosition(pos);
+}
+
 void QmitkMultiLabelSegmentationView::OnMaskStamp()
 {
   mitk::DataNode* maskNode = m_Controls.m_cbMaskNodeSelector->GetSelectedNode();
@@ -552,4 +560,15 @@ void QmitkMultiLabelSegmentationView::OnSurfaceStamp()
   this->WaitCursorOff();
 
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
+}
+
+QString QmitkMultiLabelSegmentationView::GetLastFileOpenPath()
+{
+  return QString::fromStdString(this->GetPreferences()->Get("LastFileOpenPath", ""));
+}
+
+void QmitkMultiLabelSegmentationView::SetLastFileOpenPath(const QString& path)
+{
+  this->GetPreferences()->Put("LastFileOpenPath", path.toStdString());
+  this->GetPreferences()->Flush();
 }

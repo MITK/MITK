@@ -61,9 +61,14 @@ protected slots:
 
   void OnTabWidgetChanged(int);
 
+  // reaction to button "Surface Stamp"
   void OnSurfaceStamp();
 
+  // reaction to button "Mask Stamp"
   void OnMaskStamp();
+
+  // reaction to signal "goToLabel" from labelset widget
+  void OnGoToLabel(const mitk::Point3D& pos);
 
 protected:
 
@@ -85,6 +90,16 @@ protected:
   * Reimplemented from QmitkAbstractView
   */
   virtual void NodeRemoved(const mitk::DataNode* node);
+
+  QString GetLastFileOpenPath();
+
+  void SetLastFileOpenPath(const QString& path);
+
+  // handling of a list of known (organ name, organ color) combination
+  // ATTENTION these methods are defined in QmitkSegmentationOrganNamesHandling.cpp
+  QStringList GetDefaultOrganColorString();
+  void UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color colorname);
+  void AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b);
 
   // the Qt parent of our GUI (NOT of this object)
   QWidget* m_Parent;

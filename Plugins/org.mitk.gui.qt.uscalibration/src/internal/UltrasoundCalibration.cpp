@@ -170,8 +170,8 @@ void UltrasoundCalibration::OnStartCalibrationProcess()
 
   QApplication::setOverrideCursor(Qt::WaitCursor);
   // make sure that the combined modality is in connected state before using it
-  if ( m_CombinedModality->GetDeviceState() < mitk::USDevice::State_Activated ) { m_CombinedModality->Activate(); }
   if ( m_CombinedModality->GetDeviceState() < mitk::USDevice::State_Connected ) { m_CombinedModality->Connect(); }
+  if ( m_CombinedModality->GetDeviceState() < mitk::USDevice::State_Activated ) { m_CombinedModality->Activate(); }
   QApplication::restoreOverrideCursor();
 
   this->SwitchFreeze();
@@ -356,6 +356,7 @@ void UltrasoundCalibration::OnReset()
 
 void UltrasoundCalibration::Update()
 {
+  MITK_INFO << "*** Calibration: Update Start";
   //QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   // if (nodes.empty()) return;
 
@@ -377,6 +378,8 @@ void UltrasoundCalibration::Update()
   m_NeedleProjectionFilter->Update();
 
   this->RequestRenderWindowUpdate();
+
+  MITK_INFO << "*** Calibration: Update End";
 }
 
 void UltrasoundCalibration::SwitchFreeze()
@@ -390,9 +393,11 @@ void UltrasoundCalibration::SwitchFreeze()
       m_Timer->stop();
       return;
     }
-    m_CombinedModality->UpdateOutputData(0);
-    m_Image = m_CombinedModality->GetOutput(0);
-    m_Node->SetData(m_CombinedModality->GetOutput(0));
+
+    //m_CombinedModality->UpdateOutputData(0);
+    m_CombinedModality->Update();
+    m_Image = m_CombinedModality->GetOutput();
+    m_Node->SetData(m_Image);
 
     std::vector<mitk::NavigationData::Pointer> datas;
     datas.push_back(m_Tracker->GetOutput());

@@ -36,6 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 
+#include <ctkServiceEvent.h>
+
 /*!
   \brief UltrasoundCalibration
 
@@ -52,6 +54,7 @@ class UltrasoundCalibration : public QmitkAbstractView
 
   public:
 
+    UltrasoundCalibration();
     ~UltrasoundCalibration();
 
     static const std::string VIEW_ID;
@@ -129,6 +132,13 @@ class UltrasoundCalibration : public QmitkAbstractView
     */
     void OnStartCalibrationProcess();
 
+    /**
+    *
+    */
+    void OnStopCalibrationProcess();
+
+    void OnDeciveServiceEvent(const ctkServiceEvent event);
+
   protected:
 
     virtual void SetFocus();
@@ -158,6 +168,9 @@ class UltrasoundCalibration : public QmitkAbstractView
     QTimer *m_Timer;
 
     mitk::DataNode::Pointer m_Node;
+    mitk::DataNode::Pointer m_CalibNode;
+    mitk::DataNode::Pointer m_WorldNode;
+
     /**
     * \brief The current Ultrasound Image.
     */
@@ -201,6 +214,8 @@ class UltrasoundCalibration : public QmitkAbstractView
     * \brief Total number of calibration points set.
     */
     int m_CalibPointsCount;
+
+    QString m_CurrentDepth;
 
     /**
     * \brief StatisticsRegarding Projection Accuracy.

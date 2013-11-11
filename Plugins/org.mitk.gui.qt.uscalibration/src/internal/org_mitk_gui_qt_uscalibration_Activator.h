@@ -14,14 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef org_mitk_gui_qt_uscalibration_Activator_h
 #define org_mitk_gui_qt_uscalibration_Activator_h
 
 #include <ctkPluginActivator.h>
 
 namespace mitk {
-
 class org_mitk_gui_qt_uscalibration_Activator :
   public QObject, public ctkPluginActivator
 {
@@ -33,8 +31,13 @@ public:
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
 
+  static ctkPluginContext* GetContext();
+
+private:
+  static ctkPluginContext* m_Context;
 }; // org_mitk_gui_qt_uscalibration_Activator
 
+typedef org_mitk_gui_qt_uscalibration_Activator PluginActivator;
 }
 
 #endif // org_mitk_gui_qt_uscalibration_Activator_h

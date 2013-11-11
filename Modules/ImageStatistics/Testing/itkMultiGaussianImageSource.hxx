@@ -27,8 +27,6 @@
  *=========================================================================*/
 #ifndef __itkMultiGaussianImageSource_hxx
 #define __itkMultiGaussianImageSource_hxx
-
-
 #include <iostream>
 #include <fstream>
 #include <time.h>
@@ -52,10 +50,10 @@ MultiGaussianImageSource< TOutputImage >
     m_Size[i] = 100;
     m_Spacing[i] = 1.0;
     m_Origin[i] = 0.0;
-    m_ShpereMidpoint[i] = 0;
+    m_SphereMidpoint[i] = 0;
     }
 
-  m_NumberOfGaussians = 1;
+  m_NumberOfGaussians = 0;
   m_Radius = 1;
   m_RadiusStepNumber = 5;
   m_MeanValue = 0;
@@ -279,11 +277,11 @@ MultiGaussianImageSource< TOutputImage >
 
 //----------------------------------------------------------------------------
 template< class TOutputImage >
-const typename MultiGaussianImageSource< TOutputImage >::IndexType
+const typename MultiGaussianImageSource< TOutputImage >::ItkVectorType
 MultiGaussianImageSource< TOutputImage >
 ::GetSphereMidpoint() const
 {
-  return m_ShpereMidpoint;
+  return m_SphereMidpoint;
 }
 
 template< class TOutputImage >
@@ -292,6 +290,7 @@ MultiGaussianImageSource< TOutputImage >
 ::MultiGaussianFunctionValueAtPoint(double x, double y, double z)
 {
   double summand0, summand1, summand2, power, value = 0;
+  // the for-loop represent  the sum of the gaussian function
   for(unsigned int n =0; n < m_NumberOfGaussians; ++n)
   {
     summand0 = (x - m_CenterX[n]) / m_SigmaX[n];
@@ -350,31 +349,40 @@ MultiGaussianImageSource< TOutputImage >
 ::GenerateData()
 {
   itkDebugMacro(<< "Generating a  image of scalars ");
-  double valueReal, value;
+  double valueReal;
   IndexType index;
-  // Support progress methods/callbacks
-  //ProgressReporter progress( this, threadId, outputRegionForThread.GetNumberOfPixels() );
-
-  // typedef typename TOutputImage::PixelType scalarType;
-  //typename TOutputImage::Pointer image = this->GetOutput(0);
-  m_Image = this->GetOutput(0);
-  m_Image->SetBufferedRegion( m_Image->GetRequestedRegion() );
-  m_Image->Allocate();
-  IteratorType imageIt(m_Image, m_Image->GetLargestPossibleRegion());
+  typedef typename TOutputImage::PixelType scalarType;
+  typename TOutputImage::Pointer image = this->GetOutput(0);
+  image = this->GetOutput(0);
+  image->SetBufferedRegion( image->GetRequestedRegion() );
+  image->Allocate();
+  IteratorType imageIt(image, image->GetLargestPossibleRegion());
   PointType globalCoordinate;
 
   for(imageIt.GoToBegin(); !imageIt.IsAtEnd(); ++imageIt)
   {
     valueReal = 0.0;
     index = imageIt.GetIndex();
-    m_Image->TransformIndexToPhysicalPoint(imageIt.GetIndex(), globalCoordinate);
+    image->TransformIndexToPhysicalPoint(imageIt.GetIndex(), globalCoordinate);
     valueReal = MultiGaussianFunctionValueAtPoint(globalCoordinate[0], globalCoordinate[1] ,globalCoordinate[2]);
     imageIt.Set(valueReal);
-    //progress.CompletedPixel();
   }
 }
 
 //----------------------------------------------------------------------------
+/*
+ This class allows by the method CalculateMidpointAndMeanValue() to find a sphere with a specified radius that has a maximal mean value over all      sphere with that radius with midpoint inside or at the boundary of the image. The parameter RadiusStepNumber controls the accuracy of that          calculation (the higher the value the higher the exactness).
+ The algorithm works as follows:
+  1. the first three for-loops traverse the image and assume the current point to be the wanted sphere midpoint
+  2. calculate the mean value for that sphere (use sphere coordinates):
+     2.1. traverse the radius of the sphere with step size Radius divided by RadiusStepNumber (the for-loop with index i)
+     2.2. define a variable dist, which gives a approximately distance between the points at the sphere surface
+          (here we take such a distance, that on the smallest sphere are located 8 points)
+     2.3. calculate the angles so that the points are equally spaced on the surface (for-loops with indexes j and k)
+     2.3. for all radius length add the values at the points on the sphere and divide by the number of points added
+          (the values at each point is calculate with the method MultiGaussianFunctionValueAtPoint())
+  3. Compare with the until-now-found-maximum and take the bigger one
+*/
 template< typename TOutputImage >
 void
 MultiGaussianImageSource< TOutputImage >
@@ -382,57 +390,57 @@ MultiGaussianImageSource< TOutputImage >
 {
   itkDebugMacro(<< "Generating a  image of scalars ");
   int numberSummand = 0, angleStepNumberOverTwo;
-  double valueReal, meanValueTemp, valueAdd, value, x, y, z, temp;
+  double meanValueTemp, valueAdd, value, x, y, z, temp;
   double riStep, fijStep, psikStep, ri, fij, psik;
   double dist = itk::Math::pi * m_Radius / (2 * m_RadiusStepNumber);
   m_MeanValue = 0;
   riStep = m_Radius / m_RadiusStepNumber;
-  IteratorType imageIt(m_Image, m_Image->GetLargestPossibleRegion());
-  PointType globalCoordinate;
-  IndexType  index;
-
-  for(imageIt.GoToBegin(); !imageIt.IsAtEnd(); ++imageIt)
+  for(unsigned int index0 = 0; index0 < m_Size[0]; ++index0)
   {
-    numberSummand = 1;
-    index = imageIt.GetIndex();
-    m_Image->TransformIndexToPhysicalPoint(imageIt.GetIndex(), globalCoordinate);
-    value = imageIt.Value();
-    ri = riStep;
-    for(unsigned int i = 0; i < m_RadiusStepNumber; ++i)
+    for(unsigned int index1 = 0; index1 < m_Size[1]; ++index1)
     {
-      angleStepNumberOverTwo = static_cast<int>( itk::Math::pi * ri / dist);
-      fij = 0;
-      fijStep = itk::Math::pi / angleStepNumberOverTwo;
-      for(unsigned int j = 0; j <= angleStepNumberOverTwo; ++j) // from 0 to pi
+      for(unsigned int index2 = 0; index2 < m_Size[2]; ++index2)
       {
-        z = ri * cos(fij);
-        psikStep = 2.0 * itk::Math::pi / (2.0 * angleStepNumberOverTwo);
-        psik =  -itk::Math::pi + psikStep;
-
-        temp =  ri * sin(fij);
-        for(unsigned int k = 0; k < 2 * angleStepNumberOverTwo; ++k) // from -pi to pi
+        numberSummand = 0;
+        value = 0.0;
+        ri = riStep;
+        for(unsigned int i = 0; i < m_RadiusStepNumber; ++i)
         {
-          x = temp * cos(psik);
-          y = temp * sin(psik);
-          numberSummand++;
-          valueAdd = MultiGaussianFunctionValueAtPoint(x + globalCoordinate[0], y + globalCoordinate[1], z + globalCoordinate[2]);
-          value = value + valueAdd;
+          angleStepNumberOverTwo = static_cast<int>( itk::Math::pi * ri / dist);
+          fij = 0;
+          fijStep = itk::Math::pi / angleStepNumberOverTwo;
+          for(unsigned int j = 0; j <= angleStepNumberOverTwo; ++j) // from 0 to pi
+          {
+            z = ri * cos(fij);
+            psikStep = 2.0 * itk::Math::pi / (2.0 * angleStepNumberOverTwo);
+            psik =  -itk::Math::pi + psikStep;
 
-          psik = psik + psikStep;
+            temp =  ri * sin(fij);
+            for(unsigned int k = 0; k < 2 * angleStepNumberOverTwo; ++k) // from -pi to pi
+            {
+              x = temp * cos(psik);
+              y = temp * sin(psik);
+              numberSummand++;
+              valueAdd = MultiGaussianFunctionValueAtPoint(x + index0, y + index1, z + index2);
+              value = value + valueAdd;
+              psik = psik + psikStep;
+            }
+            fij = fij  + fijStep;
+          }
+          ri = ri + riStep;
         }
-        fij = fij  + fijStep ;
-      }
-      ri = ri + riStep;
-    }
 
-    meanValueTemp = value / numberSummand;
-    if(meanValueTemp > m_MeanValue)
-    {
-      m_MeanValue   = meanValueTemp;
-      m_ShpereMidpoint = index;
+        meanValueTemp = value / numberSummand;
+        if(meanValueTemp > m_MeanValue)
+        {
+          m_MeanValue   = meanValueTemp;
+          m_SphereMidpoint.SetElement( 0, index0 );
+          m_SphereMidpoint.SetElement( 1, index1 );
+          m_SphereMidpoint.SetElement( 2, index2 );
+        }
+      }
     }
   }
 }
-
 } // end namespace itk
 #endif

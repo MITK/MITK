@@ -36,14 +36,20 @@
 namespace itk
 {
 /** \class MultiGaussianImageSource
- * \brief Generate an n-dimensional image TODO
+ * \brief Generate an 3-dimensional multigaussian image.
+ * This class defines an 3-dimensional Image, in which the value at one voxel equals the value of a multigaussian function evaluated at the voxel's   * coordinates. The multigaussian function is build as a sum of N gaussian function. This is defined by the following parameters:
+ *    1. CenterX, CenterY, CenterZ - vectors of the size of N determining the expectancy value at the x-, y- and the z-axis. That means: The i-th
+ * gaussian bell curve takes its maximal value at the voxel with index [CenterX(i); CenterY(i); Centerz(i)].
+ *    2. SigmaX, SigmaY, SigmaZ - vectors of the size of N determining the deviation at the x-, y- and the z-axis. That means: The width of the i-th
+ * gaussian bell curve in the x-axis is SigmaX(i), in the y-axis is SigmaY(i) and in the z-axis is SigmaZ(i).
+ *    3. Altitude - vector of the size of N determining the altitude: the i-th gaussian bell curve has a height of Altitude(i).
+ * This class allows by the method CalculateMidpointAndMeanValue() to find a sphere with a specified radius that has a maximal mean value over all    * sphere with that radius with midpoint inside or at the boundary of the image.
  *
- *
- * \ingroup DataSources MultiThreaded
+ * \ingroup DataSources
  * \ingroup ITKTestKernel
  *
  * \wiki
- * \wikiexample{SimpleOperations/RandomImageSource,Produce an image of noise}
+ * \wikiexample{}
  * \endwiki
  */
 template< typename TOutputImage >
@@ -62,27 +68,30 @@ public:
   /** Typedef to describe the output image region type. */
   typedef typename TOutputImage::RegionType OutputImageRegionType;
 
-  /** Run-time type information (and related methods). */
-  //itkTypeMacro(RandomImageSource, ImageSource);
-
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
   /** Basic types from the OutputImageType */
-  typedef typename TOutputImage::SizeType            SizeType;
-  typedef typename TOutputImage::IndexType           IndexType;
-  typedef typename TOutputImage::SpacingType         SpacingType;
-  typedef typename TOutputImage::PointType           PointType;
-  typedef typename SizeType::SizeValueType           SizeValueType;
-  typedef SizeValueType                              SizeValueArrayType[TOutputImage::ImageDimension];
-  typedef typename TOutputImage::SpacingValueType    SpacingValueType;
-  typedef SpacingValueType                           SpacingValueArrayType[TOutputImage::ImageDimension];
-  typedef typename TOutputImage::PointValueType      PointValueType;
-  typedef PointValueType                             PointValueArrayType[TOutputImage::ImageDimension];
-  typedef double                                     RadiusType;
-  typedef std::vector<double>                        VectorType;
-  typedef ImageRegionIteratorWithIndex<TOutputImage> IteratorType;
-  typedef typename TOutputImage::Pointer             ImageType;
+  typedef typename TOutputImage::SizeType                     SizeType;
+  typedef typename TOutputImage::IndexType                    IndexType;
+  typedef typename TOutputImage::SpacingType                  SpacingType;
+  typedef typename TOutputImage::PointType                    PointType;
+  typedef typename SizeType::SizeValueType                    SizeValueType;
+  typedef SizeValueType                                       SizeValueArrayType[TOutputImage::ImageDimension];
+  typedef typename TOutputImage::SpacingValueType             SpacingValueType;
+  typedef SpacingValueType                                    SpacingValueArrayType[TOutputImage::ImageDimension];
+  typedef typename TOutputImage::PointValueType               PointValueType;
+  typedef PointValueType                                      PointValueArrayType[TOutputImage::ImageDimension];
+  /** Typedef to describe the sphere radius type. */
+  typedef double                                              RadiusType;
+  /** Typedef to describe the standard vector type. */
+  typedef std::vector<double>                                 VectorType;
+  /** Typedef to describe the itk vector type. */
+  typedef itk::Vector<double, TOutputImage::ImageDimension>   ItkVectorType;
+  /** Typedef to describe the ImageRegionIteratorWithIndex type. */
+  typedef ImageRegionIteratorWithIndex<TOutputImage>          IteratorType;
+  /** Typedef to describe the Poiner type at the output image. */
+  typedef typename TOutputImage::Pointer                      ImageType;
 
   /** Set/Get size of the output image */
   itkSetMacro(Size, SizeType);
@@ -93,26 +102,34 @@ public:
   /** Set/Get spacing of the output image */
   itkSetMacro(Spacing, SpacingType);
   virtual void SetSpacing(SpacingValueArrayType spacingArray);
-
   virtual const SpacingValueType * GetSpacing() const;
 
   /** Set/Get origin of the output image */
   itkSetMacro(Origin, PointType);
   virtual void SetOrigin(PointValueArrayType originArray);
-
   virtual const PointValueType * GetOrigin() const;
 
 
+  /** Get the number of gaussian functions in the output image */
   virtual unsigned int GetNumberOfGaussians() const;
+
+  virtual void SetNumberOfGausssians( unsigned int );
+  /** Set/Get the radius of the sphere */
   virtual const RadiusType GetRadius() const;
   virtual void  SetRadius( RadiusType  radius );
+  /** Set/Get the number of steps to traverse the radius of the sphere */
   virtual const  int GetRadiusStepNumber() const;
   virtual void  SetRadiusStepNumber( unsigned int stepNumber );
+  /** Get the maximal mean value in a sphere over all possible spheres with midpoint in the image */
   virtual const double GetMaxMeanValue() const;
-  virtual const IndexType GetSphereMidpoint() const;
+  /** Get the index of the midpoint of a sphere with the maximal mean value */
+  virtual const ItkVectorType GetSphereMidpoint() const;
+  /** Calculates the value of the multigaussian function at a Point given by its coordinates [x;y;z] */
   virtual const double MultiGaussianFunctionValueAtPoint(double , double, double);
+  /** Adds a multigaussian defined by the parameter: CenterX, CenterY, CenterZ, SigmaX, SigmaY, SigmaZ, Altitude.
+   All parameters should have the same size, which determinates the number of the gaussian added. */
   virtual void AddGaussian( VectorType, VectorType, VectorType, VectorType, VectorType, VectorType, VectorType);
-  virtual void SetNumberOfGausssians( unsigned int );
+   /** Calculates and set the index of the midpoint of the sphere with the maximal mean value as well as the mean value*/
   virtual void CalculateMidpointAndMeanValue();
 
   /** Set the minimum possible pixel value. By default, it is
@@ -154,10 +171,10 @@ private:
 
 
   unsigned int          m_NumberOfGaussians; //number of Gaussians
-  RadiusType            m_Radius;            //radius of the shpere
-  unsigned int          m_RadiusStepNumber;  //number of steps to treverse the sphere radius
-  OutputImagePixelType  m_MeanValue;         //mean value in the wanted shpere
-  IndexType             m_ShpereMidpoint;    //midpoint of the wanted shpere
+  RadiusType            m_Radius;            //radius of the sphere
+  unsigned int          m_RadiusStepNumber;  //number of steps to traverse the sphere radius
+  OutputImagePixelType  m_MeanValue;         //mean value in the wanted sphere
+  ItkVectorType         m_SphereMidpoint;    //midpoint of the wanted sphere
   VectorType            m_SigmaX;            //deviation in the x-axis
   VectorType            m_SigmaY;            //deviation in the y-axis
   VectorType            m_SigmaZ;            //deviation in the z-axis
@@ -165,7 +182,6 @@ private:
   VectorType            m_CenterY;           //y-coordinate of the mean value of Gaussians
   VectorType            m_CenterZ;           //z-coordinate of the mean value of Gaussians
   VectorType            m_Altitude;          //amplitude
-  ImageType             m_Image;
 
   typename TOutputImage::PixelType m_Min; //minimum possible value
   typename TOutputImage::PixelType m_Max; //maximum possible value

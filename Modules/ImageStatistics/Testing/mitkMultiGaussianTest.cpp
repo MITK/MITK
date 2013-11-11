@@ -48,11 +48,12 @@ int mitkMultiGaussianTest(int, char* [])
   gaussianGenerator->SetRadiusStepNumber(5);
   gaussianGenerator->SetRadius(pow(itk::Math::one_over_pi * 0.75 , 1.0 / 3.0) * 10);
   gaussianGenerator->SetNumberOfGausssians(numberOfGaussians);
-  std::ofstream myfile;
-  myfile.open ("C:/temp/tempParameter3.txt");
-  myfile << " CentX \t" << "Y \t" << "Z \t"  << "SigX \t" << "Y \t" << "Z \t" << "Altit\n";
+ // std::ofstream myfile;
+ // myfile.open ("C:/temp/tempParameter3.txt");
+ // myfile << " CentX \t" << "Y \t" << "Z \t"  << "SigX \t" << "Y \t" << "Z \t" << "Altit\n";
 
-  for( unsigned int i = 0; i < numberOfGaussians; ++i)
+  int numberAddGaussian = numberOfGaussians;
+  for( unsigned int i = 0; i < numberAddGaussian; ++i)
   {
     centerX = rand() % size[0];
     centerY = rand() % size[1];
@@ -69,9 +70,8 @@ int mitkMultiGaussianTest(int, char* [])
     sigmaYVec.push_back(sigmaY);
     sigmaZVec.push_back(sigmaZ);
     altitudeVec.push_back(altitude);
-
-    myfile <<i << " " << centerX << "\t" << centerY << "\t" << centerZ
-           << "\t \t"<< sigmaX << "\t" << sigmaY <<"\t" <<sigmaZ << "\t \t" << altitude <<"\n";
+  //  myfile <<i << " " << centerX << "\t" << centerY << "\t" << centerZ
+  //         << "\t \t"<< sigmaX << "\t" << sigmaY <<"\t" <<sigmaZ << "\t \t" << altitude <<"\n";
   }
 
   gaussianGenerator->AddGaussian(centerXVec, centerYVec, centerZVec, sigmaXVec, sigmaYVec, sigmaZVec, altitudeVec);

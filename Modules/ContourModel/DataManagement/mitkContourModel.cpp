@@ -124,7 +124,7 @@ bool mitk::ContourModel::SetVertexAt(int pointId, const Point3D &point, unsigned
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
-    if(pointId > 0 && this->m_ContourSeries[timestep]->GetSize() > pointId)
+    if(pointId >= 0 && this->m_ContourSeries[timestep]->GetSize() > pointId)
     {
       this->m_ContourSeries[timestep]->SetVertexAt( pointId, point );
       this->Modified();
@@ -144,7 +144,7 @@ bool mitk::ContourModel::SetVertexAt(int pointId, const VertexType *vertex, unsi
 
   if(!this->IsEmptyTimeStep(timestep))
   {
-    if(pointId > 0 && this->m_ContourSeries[timestep]->GetSize() > pointId)
+    if(pointId >= 0 && this->m_ContourSeries[timestep]->GetSize() > pointId)
     {
       this->m_ContourSeries[timestep]->SetVertexAt( pointId, vertex );
       this->Modified();
@@ -162,7 +162,7 @@ void mitk::ContourModel::InsertVertexAtIndex(mitk::Point3D &vertex, int index, b
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
-    if(index > 0 && this->m_ContourSeries[timestep]->GetSize() > index)
+    if(index >= 0 && this->m_ContourSeries[timestep]->GetSize() > index)
     {
       this->m_ContourSeries[timestep]->InsertVertexAtIndex(vertex, isControlPoint, index);
       this->InvokeEvent( ContourModelSizeChangeEvent() );

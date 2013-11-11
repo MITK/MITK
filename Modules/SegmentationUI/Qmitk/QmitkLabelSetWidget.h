@@ -17,13 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkLabelSetWidget_h
 #define QmitkLabelSetWidget_h
 
+#include "SegmentationUIExports.h"
+
 #include <ui_QmitkLabelSetWidgetControls.h>
 
 #include "mitkWeakPointer.h"
 #include "mitkDataNode.h"
-#include "mitkIRenderWindowPart.h"
-
-#include <berryIBerryPreferences.h>
+//#include <mitkIRenderWindowPart.h>
+//#include <berryIBerryPreferences.h>
 
 class QmitkDataStorageComboBox;
 class QCompleter;
@@ -34,7 +35,7 @@ namespace mitk {
   class ToolManager;
 }
 
-class QmitkLabelSetWidget : public QWidget
+class SegmentationUI_EXPORT QmitkLabelSetWidget : public QWidget
 {
   Q_OBJECT
 
@@ -45,23 +46,25 @@ public:
 
   void SetActiveLabel(int);
 
-  void SetPreferences( berry::IPreferences::Pointer prefs );
-
   void SetDataStorage( mitk::DataStorage& storage );
 
-  void SetRenderWindowPart( mitk::IRenderWindowPart* part );
+  void SetLastFileOpenPath(const QString& path);
+
+  void SetOrganColors(const QStringList& organColors);
 
   void OnToolManagerWorkingDataModified();
 
   virtual void setEnabled(bool enabled);
 
+signals:
+
+  /// \brief Send a signal when it was requested to go to a label.
+  void goToLabel(const mitk::Point3D&);
+
 private slots:
 
   // reaction to ...
   void OnSearchLabel();
-
-  // reaction to signal "goToLabel"
-  void OnGoToLabel(const mitk::Point3D& pos);
 
   // reaction to signal "labelListModified" from QmitkLabelSetTableWidget
   void OnLabelListModified(const QStringList& list);
@@ -71,9 +74,6 @@ private slots:
 
   // reaction to the signal "createSurface" from QmitkLabelSetTableWidget
   void OnCreateSurface(int);
-
-  // reaction to the signal "smoothLabel" from QmitkLabelSetTableWidget
-  void OnSmoothLabel(int);
 
   // reaction to the signal "toggleOutline" from QmitkLabelSetTableWidget
   void OnToggleOutline(bool);
@@ -128,24 +128,6 @@ private slots:
 
 private:
 
-    Ui::QmitkLabelSetWidgetControls m_Controls;
-
-    QCompleter* m_Completer;
-
-    mitk::IRenderWindowPart* m_IRenderWindowPart;
-
-    berry::IPreferences::Pointer m_Preferences;
-
-    mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
-
-    mitk::ToolManager* m_ToolManager;
-
-    // handling of a list of known (organ name, organ color) combination
-    // ATTENTION these methods are defined in QmitkSegmentationOrganNamesHandling.cpp
-    QStringList GetDefaultOrganColorString();
-    void UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color colorname);
-    void AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b);
-
     void WaitCursorOn();
 
     void WaitCursorOff();
@@ -156,9 +138,17 @@ private:
 
     void OnThreadedCalculationDone();
 
-    void SetLastFileOpenPath(const QString& path) const;
+    Ui::QmitkLabelSetWidgetControls m_Controls;
 
-    QString GetLastFileOpenPath() const;
+    QCompleter* m_Completer;
+
+    mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+
+    mitk::ToolManager* m_ToolManager;
+
+    QStringList m_OrganColors;
+
+    QString m_LastFileOpenPath;
 };
 
 #endif

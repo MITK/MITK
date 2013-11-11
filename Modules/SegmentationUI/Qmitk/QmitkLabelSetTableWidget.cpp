@@ -495,11 +495,6 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
     QObject::connect( eraseLabelsAction, SIGNAL( triggered(bool) ), this, SLOT( OnEraseLabels(bool) ) );
     menu->addAction(eraseLabelsAction);
 
-    QAction* smoothLabelsAction = new QAction(QIcon(":/QmitkExt/smoothlabel.png"), "Smooth selected labels", this );
-    smoothLabelsAction->setEnabled(true);
-    QObject::connect( smoothLabelsAction, SIGNAL( triggered(bool) ), this, SLOT( OnEraseLabels(bool) ) );
-    menu->addAction(smoothLabelsAction);
-
     QAction* createSurfacesAction = new QAction(QIcon(":/QmitkExt/createsurface.png"), "Create a surface for each selected label", this );
     createSurfacesAction->setEnabled(true);
     QObject::connect( createSurfacesAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateSurfaces(bool) ) );
@@ -541,11 +536,6 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
     eraseAction->setEnabled(true);
     QObject::connect( eraseAction, SIGNAL( triggered(bool) ), this, SLOT( OnEraseLabel(bool) ) );
     menu->addAction(eraseAction);
-
-    QAction* smoothAction = new QAction(QIcon(":/QmitkExt/smoothlabel.png"), "Smooth label", this );
-    smoothAction->setEnabled(true);
-    QObject::connect( smoothAction, SIGNAL( triggered(bool) ), this, SLOT( OnSmoothLabel(bool) ) );
-    menu->addAction(smoothAction);
 
     QAction* randomColorAction = new QAction(QIcon(":/QmitkExt/randomcolor.png"), "Random color", this );
     randomColorAction->setEnabled(true);
@@ -697,45 +687,6 @@ void QmitkLabelSetTableWidget::OnRemoveLabels(bool value)
     this->WaitCursorOff();
   }
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-
-void QmitkLabelSetTableWidget::OnSmoothLabels(bool value)
-{
-  QString question = "Do you really want to smooth the selected labels?";
-  QMessageBox::StandardButton answerButton = QMessageBox::question( this, "Smooth selected labels",
-     question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
-
-  if (answerButton == QMessageBox::Yes)
-  {
-    QList<QTableWidgetSelectionRange> ranges = this->selectedRanges();
-    if ( ranges.isEmpty() )
-    return;
-
-    std::vector<int> indexes;
-    for (int i=0; i<ranges.size(); i++)
-    {
-        int begin = ranges.at(i).topRow();
-        for (int j=0; j<ranges.at(i).rowCount(); j++)
-        {
-            indexes.push_back(begin+j);
-        }
-    }
-
-    this->WaitCursorOn();
-    m_LabelSetImage->SmoothLabels(indexes);
-    this->WaitCursorOff();
-
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-}
-
-void QmitkLabelSetTableWidget::OnSmoothLabel(bool value)
-{
-  this->WaitCursorOn();
-  m_LabelSetImage->SmoothLabel(this->currentRow());
-  this->WaitCursorOff();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

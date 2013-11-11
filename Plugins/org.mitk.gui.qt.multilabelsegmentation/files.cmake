@@ -12,8 +12,6 @@ set(INTERNAL_CPP_FILES
   QmitkConvertMaskToLabelAction.cpp
   QmitkConvertToMultiLabelSegmentationAction.cpp
   QmitkCreateMultiLabelSegmentationAction.cpp
-  Common/QmitkLabelSetTableWidget.cpp
-  Common/QmitkLabelSetWidget.cpp
   Common/QmitkDataSelectionWidget.cpp
   SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesView.cpp
   SegmentationUtilities/QmitkSegmentationUtilityWidget.cpp
@@ -25,7 +23,6 @@ set(INTERNAL_CPP_FILES
 
 set(UI_FILES
   src/internal/QmitkMultiLabelSegmentationControls.ui
-  src/internal/Common/QmitkLabelSetWidgetControls.ui
   src/internal/Common/QmitkDataSelectionWidgetControls.ui
   src/internal/SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesViewControls.ui
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidgetControls.ui
@@ -45,8 +42,6 @@ set(MOC_H_FILES
   src/internal/QmitkConvertMaskToLabelAction.h
   src/internal/QmitkConvertToMultiLabelSegmentationAction.h
   src/internal/QmitkCreateMultiLabelSegmentationAction.h
-  src/internal/Common/QmitkLabelSetTableWidget.h
-  src/internal/Common/QmitkLabelSetWidget.h
   src/internal/Common/QmitkDataSelectionWidget.h
   src/internal/SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesView.h
   src/internal/SegmentationUtilities/QmitkSegmentationUtilityWidget.h

@@ -16,11 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkLabelSetWidget.h"
 
-// blueberry
-#include <berryPlatform.h>
-
 // mitk
-#include <mitkIDataStorageService.h>
 #include <mitkLabelSetImage.h>
 #include <mitkToolManagerProvider.h>
 #include <mitkLabelSetImageToSurfaceThreadedFilter.h>
@@ -48,24 +44,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 
 QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent) : QWidget(parent),
-m_ToolManager(NULL),
-m_IRenderWindowPart(NULL)
+m_ToolManager(NULL)
 {
   m_Controls.setupUi(this);
 
   m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   assert(m_ToolManager);
 
-  // react whenever the set of selected segmentation changes
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerWorkingDataModified );
 
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(activeLabelChanged(int)), this, SLOT(OnActiveLabelChanged(int)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(newLabel()), this, SLOT(OnNewLabel()) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(renameLabel(int, const mitk::Color&, const std::string&)), this, SLOT(OnRenameLabel(int, const mitk::Color&, const std::string&)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createSurface(int)), this, SLOT(OnCreateSurface(int)) );
-  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(smoothLabel(int)), this, SLOT(OnSmoothLabel(int)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(toggleOutline(bool)), this, SLOT(OnToggleOutline(bool)) );
-  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
+  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SIGNAL(goToLabel(const mitk::Point3D&)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(combineAndCreateSurface( const QList<QTableWidgetSelectionRange>& )),
       this, SLOT(OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>&)) );
 
@@ -137,25 +130,9 @@ void QmitkLabelSetWidget::SetDataStorage( mitk::DataStorage& storage )
   m_DataStorage = &storage;
 }
 
-void QmitkLabelSetWidget::SetRenderWindowPart( mitk::IRenderWindowPart* renderWindowPart )
-{
-  m_IRenderWindowPart = renderWindowPart;
-}
-
-void QmitkLabelSetWidget::SetPreferences( berry::IPreferences::Pointer prefs )
-{
-  m_Preferences = prefs;
-}
-
 void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
 {
   this->UpdateControls();
-}
-
-void QmitkLabelSetWidget::OnGoToLabel(const mitk::Point3D& pos)
-{
-  if (m_IRenderWindowPart)
-    m_IRenderWindowPart->SetSelectedPosition(pos);
 }
 
 void QmitkLabelSetWidget::OnSearchLabel()
@@ -169,46 +146,18 @@ void QmitkLabelSetWidget::OnLabelListModified(const QStringList& list)
   completeModel->setStringList(list);
 }
 
+void QmitkLabelSetWidget::SetOrganColors(const QStringList& organColors)
+{
+  m_OrganColors = organColors;
+}
+
 void QmitkLabelSetWidget::OnRenameLabel(int index, const mitk::Color& color, const std::string& name)
 {
   m_ToolManager->ActivateTool(-1);
 
-  // ask about the name and organ type of the new segmentation
   QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this );
-
-  QString storedList = QString::fromStdString( m_Preferences->GetByteArray("Organ-Color-List","") );
-  QStringList organColors;
-  if (storedList.isEmpty())
-  {
-    organColors = GetDefaultOrganColorString();
-  }
-  else
-  {
-    // recover string list from BlueBerry view's preferences
-    QString storedString = QString::fromStdString( m_Preferences->GetByteArray("Organ-Color-List","") );
-    // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
-    QRegExp onePart("(?:[^;]|\\\\;)*");
-    int count = 0;
-    int pos = 0;
-    while( (pos = onePart.indexIn( storedString, pos )) != -1 )
-    {
-      ++count;
-      int length = onePart.matchedLength();
-      if (length == 0) break;
-      QString matchedString = storedString.mid(pos, length);
-      MITK_DEBUG << "   Captured length " << length << ": " << matchedString.toStdString();
-      pos += length + 1; // skip separating ';'
-
-      // unescape possible occurrences of '\;' in the string
-      matchedString.replace("\\;", ";");
-
-      // add matched string part to output list
-      organColors << matchedString;
-    }
-  }
-
   dialog->setWindowTitle("Rename Label");
-  dialog->SetSuggestionList( organColors );
+  dialog->SetSuggestionList( m_OrganColors );
   dialog->SetColor(color);
   dialog->SetSegmentationName(name);
 
@@ -455,66 +404,13 @@ void QmitkLabelSetWidget::OnNewLabel()
 {
   m_ToolManager->ActivateTool(-1);
 
-  // ask about the name and organ type of the new segmentation
   QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this );
-
-  QString storedList = QString::fromStdString( m_Preferences->GetByteArray("Organ-Color-List","") );
-  QStringList organColors;
-  if (storedList.isEmpty())
-  {
-    organColors = GetDefaultOrganColorString();
-  }
-  else
-  {
-    /*
-    a couple of examples of how organ names are stored:
-
-    a simple item is built up like 'name#AABBCC' where #AABBCC is the hexadecimal notation of a color as known from HTML
-
-    items are stored separated by ';'
-    this makes it necessary to escape occurrences of ';' in name.
-    otherwise the string "hugo;ypsilon#AABBCC;eugen#AABBCC" could not be parsed as two organs
-    but we would get "hugo" and "ypsilon#AABBCC" and "eugen#AABBCC"
-
-    so the organ name "hugo;ypsilon" is stored as "hugo\;ypsilon"
-    and must be unescaped after loading
-
-    the following lines could be one split with Perl's negative lookbehind
-    */
-
-    // recover string list from BlueBerry view's preferences
-    QString storedString = QString::fromStdString( m_Preferences->GetByteArray("Organ-Color-List","") );
-    MITK_DEBUG << "storedString: " << storedString.toStdString();
-    // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
-    QRegExp onePart("(?:[^;]|\\\\;)*");
-    MITK_DEBUG << "matching " << onePart.pattern().toStdString();
-    int count = 0;
-    int pos = 0;
-    while( (pos = onePart.indexIn( storedString, pos )) != -1 )
-    {
-      ++count;
-      int length = onePart.matchedLength();
-      if (length == 0) break;
-      QString matchedString = storedString.mid(pos, length);
-      MITK_DEBUG << "   Captured length " << length << ": " << matchedString.toStdString();
-      pos += length + 1; // skip separating ';'
-
-      // unescape possible occurrences of '\;' in the string
-      matchedString.replace("\\;", ";");
-
-      // add matched string part to output list
-      organColors << matchedString;
-    }
-    MITK_DEBUG << "Captured " << count << " organ name/colors";
-  }
-
-  dialog->SetSuggestionList( organColors );
-
+  dialog->SetSuggestionList( m_OrganColors );
   dialog->setWindowTitle("New Label");
 
   int dialogReturnValue = dialog->exec();
 
-  if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
+  if ( dialogReturnValue == QDialog::Rejected ) return;
 
   mitk::Color color = dialog->GetColor();
 
@@ -584,30 +480,6 @@ void QmitkLabelSetWidget::OnToggleOutline(bool value)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkLabelSetWidget::OnSmoothLabel(int index)
-{
-  m_ToolManager->ActivateTool(-1);
-
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
-  assert(workingImage);
-
-  try
-  {
-    this->WaitCursorOn();
-    workingImage->SmoothLabel(index);
-    this->WaitCursorOff();
-  }
-  catch ( mitk::Exception& e )
-  {
-    this->WaitCursorOff();
-    MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::information(this, "Smooth Label", "Could not smooth the selected label. See error log for details.\n");
-  }
-}
-
 void QmitkLabelSetWidget::OnCreateSurface(int index)
 {
   m_ToolManager->ActivateTool(-1);
@@ -656,7 +528,7 @@ void QmitkLabelSetWidget::OnImportLabeledImage()
   assert(referenceNode);
 
   // Ask the user for a list of files to open
-  QStringList fileNames = QFileDialog::getOpenFileNames( this, "Open Image", this->GetLastFileOpenPath(),
+  QStringList fileNames = QFileDialog::getOpenFileNames( this, "Open Image", m_LastFileOpenPath,
                                                         mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
 
   if (fileNames.empty())
@@ -675,6 +547,7 @@ void QmitkLabelSetWidget::OnImportLabeledImage()
 
     mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New();
     newImage->InitializeByLabeledImage(image);
+    this->WaitCursorOff();
 
     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
     std::string newName = referenceNode->GetName();
@@ -682,7 +555,6 @@ void QmitkLabelSetWidget::OnImportLabeledImage()
     newNode->SetName(newName);
     newNode->SetData(newImage);
     m_DataStorage->Add(newNode, referenceNode);
-    this->WaitCursorOff();
   }
   catch (mitk::Exception & e)
   {
@@ -708,7 +580,7 @@ void QmitkLabelSetWidget::OnImportSegmentation()
   assert(workingImage);
 
   std::string fileExtensions("Segmentation files (*.lset);;");
-  QString qfileName = QFileDialog::getOpenFileName(this, "Import Segmentation", this->GetLastFileOpenPath(), fileExtensions.c_str() );
+  QString qfileName = QFileDialog::getOpenFileName(this, "Import Segmentation", m_LastFileOpenPath, fileExtensions.c_str() );
   if (qfileName.isEmpty() ) return;
 
   mitk::NrrdLabelSetImageReader::Pointer reader = mitk::NrrdLabelSetImageReader::New();
@@ -743,7 +615,7 @@ void QmitkLabelSetWidget::OnLoadSegmentation()
   assert(referenceImage);
 
   std::string fileExtensions("Segmentation files (*.lset);;");
-  QString qfileName = QFileDialog::getOpenFileName(this, "Load Segmentation", this->GetLastFileOpenPath(), fileExtensions.c_str() );
+  QString qfileName = QFileDialog::getOpenFileName(this, "Load Segmentation", m_LastFileOpenPath, fileExtensions.c_str() );
   if (qfileName.isEmpty() ) return;
 
   mitk::NrrdLabelSetImageReader::Pointer reader = mitk::NrrdLabelSetImageReader::New();
@@ -761,8 +633,6 @@ void QmitkLabelSetWidget::OnLoadSegmentation()
     MITK_ERROR << "Exception caught: " << e.GetDescription();
     QMessageBox::information(this, "Load Segmentation", "Could not load the selected file. See error log for details.\n");
   }
-
-  this->SetLastFileOpenPath(qfileName);
 
   mitk::LabelSetImage::Pointer newImage = reader->GetOutput();
 
@@ -801,7 +671,7 @@ void QmitkLabelSetWidget::OnSaveSegmentation()
   workingImage->SetLastModificationTime( cTime.toString().toStdString() );
 
   QString selected_suffix("segmentation files (*.lset)");
-  QString qfileName = QFileDialog::getSaveFileName(this, "Save Segmentation", this->GetLastFileOpenPath(), selected_suffix);
+  QString qfileName = QFileDialog::getSaveFileName(this, "Save Segmentation", m_LastFileOpenPath, selected_suffix);
   if (qfileName.isEmpty()) return;
 
   mitk::NrrdLabelSetImageWriter::Pointer writer = mitk::NrrdLabelSetImageWriter::New();
@@ -893,20 +763,7 @@ void QmitkLabelSetWidget::OnThreadedCalculationDone()
   mitk::StatusBar::GetInstance()->Clear();
 }
 
-QString QmitkLabelSetWidget::GetLastFileOpenPath() const
+void QmitkLabelSetWidget::SetLastFileOpenPath(const QString& path)
 {
-  if(m_Preferences.IsNotNull())
-  {
-    return QString::fromStdString(m_Preferences->Get("LastFileOpenPath", ""));
-  }
-  return QString();
-}
-
-void QmitkLabelSetWidget::SetLastFileOpenPath(const QString& path) const
-{
-  if(m_Preferences.IsNotNull())
-  {
-    m_Preferences->Put("LastFileOpenPath", path.toStdString());
-    m_Preferences->Flush();
-  }
+  m_LastFileOpenPath = path;
 }

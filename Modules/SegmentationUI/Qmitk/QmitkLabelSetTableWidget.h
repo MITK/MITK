@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __QmitkLabelSetTableWidget_h
 #define __QmitkLabelSetTableWidget_h
 
+#include "SegmentationUIExports.h"
 
 #include "mitkLabelSet.h"
 #include "mitkLabelSetImage.h"
@@ -32,7 +33,7 @@ namespace mitk {
   class ToolManager;
 }
 
-class QmitkLabelSetTableWidget : public QTableWidget
+class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
 {
 
   Q_OBJECT
@@ -102,9 +103,6 @@ class QmitkLabelSetTableWidget : public QTableWidget
     /// \brief Send a signal when it was requested to create a surface out of a label.
     void createSurface(int);
 
-    /// \brief Send a signal when it was requested to smooth the selected label.
-    void smoothLabel(int);
-
     void toggleOutline(bool);
 
     /// \brief Send a signal when it was requested to create a surface out of a selection (range) of labels.
@@ -155,11 +153,7 @@ class QmitkLabelSetTableWidget : public QTableWidget
 
     void WaitCursorOn();
 
-    void BusyCursorOn();
-
     void WaitCursorOff();
-
-    void BusyCursorOff();
 
     void RestoreOverrideCursor();
 
@@ -208,8 +202,6 @@ class QmitkLabelSetTableWidget : public QTableWidget
 
     void OnEraseLabel(bool);
 
-    void OnSmoothLabel(bool);
-
     void OnMergeLabels(bool);
 
     void OnToggleOutline(bool);
@@ -217,8 +209,6 @@ class QmitkLabelSetTableWidget : public QTableWidget
     void OnRemoveLabels(bool);
 
     void OnEraseLabels(bool);
-
-    void OnSmoothLabels(bool);
 
     void OnNewLabel(bool);
 

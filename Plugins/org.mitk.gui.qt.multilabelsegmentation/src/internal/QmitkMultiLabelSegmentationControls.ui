@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>239</width>
-    <height>901</height>
+    <width>230</width>
+    <height>947</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+   <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -429,7 +429,7 @@
   <customwidget>
    <class>QmitkLabelSetWidget</class>
    <extends>QWidget</extends>
-   <header location="global">internal/Common/QmitkLabelSetWidget.h</header>
+   <header location="global">Qmitk/QmitkLabelSetWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

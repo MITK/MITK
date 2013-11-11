@@ -120,7 +120,7 @@ void mitk::ContourModel::AddVertexAtFront(VertexType &vertex, int timestep)
 
 
 
-bool mitk::ContourModel::SetVertexAt(int pointId, mitk::Point3D &point, unsigned int timestep)
+bool mitk::ContourModel::SetVertexAt(int pointId, const Point3D &point, unsigned int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {

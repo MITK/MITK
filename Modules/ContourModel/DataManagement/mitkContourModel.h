@@ -209,7 +209,7 @@ namespace mitk
 
     /** \brief Set a coordinates for point at given index.
     */
-    bool SetVertexAt(int pointId, mitk::Point3D &point, unsigned int timestep=0);
+    bool SetVertexAt(int pointId, const mitk::Point3D &point, unsigned int timestep=0);
 
     /** \brief Set a coordinates for point at given index.
     */

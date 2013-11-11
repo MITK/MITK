@@ -79,7 +79,7 @@ void mitk::ContourElement::InsertVertexAtIndex(mitk::Point3D &vertex, bool isCon
 
 
 
-void mitk::ContourElement::SetVertexAt(int pointId, mitk::Point3D &point)
+void mitk::ContourElement::SetVertexAt(int pointId, const Point3D &point)
 {
   if(index > 0 && this->GetSize() > pointId)
   {

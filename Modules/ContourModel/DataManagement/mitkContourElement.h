@@ -150,7 +150,7 @@ namespace mitk
     \param pointId Index of vertex.
     \param point Coordinates.
     */
-    virtual void SetVertexAt(int pointId, mitk::Point3D &point);
+    virtual void SetVertexAt(int pointId, const mitk::Point3D &point);
 
     /** \brief Set vertex a given index.
     \param pointId Index of vertex.

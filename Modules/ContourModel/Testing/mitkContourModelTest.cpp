@@ -391,6 +391,7 @@ static void TestSetVertices()
   contour->SetVertexAt(1, contour2->GetVertexAt(1));
 
   MITK_TEST_EQUAL(contour->GetVertexAt(1)->Coordinates, contour2->GetVertexAt(1)->Coordinates, "Use setter and getter combination");
+  MITK_TEST_CONDITION(contour->GetIndex(contour2->GetVertexAt(1)) == 1, "Index is correct");
 }
 
 

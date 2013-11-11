@@ -23,8 +23,14 @@ Qmitk/QmitkToolSelectionBox.cpp
 Qmitk/QmitkToolWorkingDataSelectionBox.cpp
 Qmitk/QmitkWatershedToolGUI.cpp
 Qmitk/QmitkMedianTool3DGUI.cpp
+Qmitk/QmitkDilateTool3DGUI.cpp
+Qmitk/QmitkErodeTool3DGUI.cpp
+Qmitk/QmitkSmoothTool3DGUI.cpp
+Qmitk/QmitkFillHolesTool3DGUI.cpp
 Qmitk/QmitkSliceBasedInterpolator.cpp
 Qmitk/QmitkSurfaceBasedInterpolator.cpp
+Qmitk/QmitkLabelSetTableWidget.cpp
+Qmitk/QmitkLabelSetWidget.cpp
 )
 
 set(MOC_H_FILES
@@ -52,8 +58,14 @@ Qmitk/QmitkToolSelectionBox.h
 Qmitk/QmitkToolWorkingDataSelectionBox.h
 Qmitk/QmitkWatershedToolGUI.h
 Qmitk/QmitkMedianTool3DGUI.h
+Qmitk/QmitkDilateTool3DGUI.h
+Qmitk/QmitkErodeTool3DGUI.h
+Qmitk/QmitkSmoothTool3DGUI.h
+Qmitk/QmitkFillHolesTool3DGUI.h
 Qmitk/QmitkSliceBasedInterpolator.h
 Qmitk/QmitkSurfaceBasedInterpolator.h
+Qmitk/QmitkLabelSetTableWidget.h
+Qmitk/QmitkLabelSetWidget.h
 )
 
 set(UI_FILES
@@ -63,6 +75,7 @@ Qmitk/QmitkOtsuToolWidgetControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
 Qmitk/QmitkSliceBasedInterpolatorControls.ui
 Qmitk/QmitkSurfaceBasedInterpolatorControls.ui
+Qmitk/QmitkLabelSetWidgetControls.ui
 )
 
 set(QRC_FILES

@@ -35,6 +35,7 @@ void mitk::USZonesInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("addCenter", AddCenter);
   CONNECT_FUNCTION("changeRadius", ChangeRadius);
   CONNECT_FUNCTION("endCreation", EndCreation);
+  CONNECT_FUNCTION("abortCreation", AbortCreation);
 }
 
 void mitk::USZonesInteractor::DataNodeChanged()
@@ -51,13 +52,12 @@ bool mitk::USZonesInteractor::AddCenter(mitk::StateMachineAction* , mitk::Intera
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == NULL) { return false; }
 
+  this->GetDataNode()->SetData(mitk::Surface::New());
+
   // set origin of the data node to the mouse click position
   this->GetDataNode()->GetData()->GetGeometry()->SetOrigin(positionEvent->GetPositionInWorld());
 
   this->GetDataNode()->SetFloatProperty("opacity", 0.60f );
-
-  // update the RenderWindow to show new points
-  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return true;
 }
@@ -76,21 +76,31 @@ bool mitk::USZonesInteractor::ChangeRadius(mitk::StateMachineAction* , mitk::Int
   curNode->SetFloatProperty("zone.size", radius);
 
   mitk::Point3D origin = curNode->GetData()->GetGeometry()->GetOrigin();
-  curNode->SetData(this->MakeSphere(curNode, radius));
+  curNode->SetData(this->MakeSphere(radius));
   this->GetDataNode()->GetData()->GetGeometry()->SetOrigin(origin);
 
-  // update the RenderWindow to show new points
+  // update the RenderWindow to show the changed surface
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return true;
 }
 
-bool mitk::USZonesInteractor::EndCreation(mitk::StateMachineAction* , mitk::InteractionEvent* interactionEvent)
+bool mitk::USZonesInteractor::EndCreation(mitk::StateMachineAction* , mitk::InteractionEvent* /*interactionEvent*/)
 {
   return true;
 }
 
-mitk::Surface::Pointer mitk::USZonesInteractor::MakeSphere(const mitk::DataNode::Pointer dataNode, mitk::ScalarType radius) const
+bool mitk::USZonesInteractor::AbortCreation(mitk::StateMachineAction* , mitk::InteractionEvent*)
+{
+  this->GetDataNode()->SetData(mitk::Surface::New());
+
+  // update the RenderWindow to remove the surface
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  return true;
+}
+
+mitk::Surface::Pointer mitk::USZonesInteractor::MakeSphere(mitk::ScalarType radius) const
 {
   mitk::Surface::Pointer zone = mitk::Surface::New();
 

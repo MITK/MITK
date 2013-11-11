@@ -19,19 +19,23 @@ class QmitkUSZoneManagementWidget;
 
 class QmitkUSZonesDataModel;
 class QItemSelection;
+class QModelIndex;
 
 class MitkUSNavigationUI_EXPORT QmitkUSZoneManagementWidget : public QWidget
 {
   Q_OBJECT
 
 public slots:
-  void AddRow();
+  //void AddRow();
   void RemoveSelectedRows();
   void OnStartAddingZone();
   void OnResetZones();
 
 protected slots:
-  void OnSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
+  void OnSelectionChanged(const QItemSelection& selected, const QItemSelection & deselected);
+  void OnZoneSizeSliderValueChanged(int value);
+
+  void OnRowInsertion(const QModelIndex& parent, int start, int end);
 
 public:
   explicit QmitkUSZoneManagementWidget(QWidget *parent = 0);
@@ -46,6 +50,8 @@ protected:
     itk::SmartPointer<mitk::USZonesInteractor>  m_Interactor;
     mitk::DataStorage::Pointer                  m_DataStorage;
     mitk::DataNode::Pointer                     m_BaseNode;
+
+    int                                         m_SelectedRow;
 
 private:
   Ui::QmitkUSZoneManagementWidget* ui;

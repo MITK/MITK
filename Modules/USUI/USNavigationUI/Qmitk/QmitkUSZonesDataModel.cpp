@@ -139,8 +139,10 @@ QVariant QmitkUSZonesDataModel::headerData ( int section, Qt::Orientation orient
   return QVariant(QVariant::Invalid);
 }
 
-Qt::ItemFlags QmitkUSZonesDataModel::flags ( const QModelIndex& /*index*/ ) const
+Qt::ItemFlags QmitkUSZonesDataModel::flags ( const QModelIndex& index ) const
 {
+  if (index.column() == 1) { return Qt::ItemIsSelectable | Qt::ItemIsEnabled; }
+
   return Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled;
 }
 
@@ -182,7 +184,7 @@ QVariant QmitkUSZonesDataModel::data ( const QModelIndex& index, int role ) cons
     case 1:
     {
       float floatValue;
-      if ( curNode->GetFloatProperty(DataNodePropertySize, floatValue) ) { return floatValue; }
+      if ( curNode->GetFloatProperty(DataNodePropertySize, floatValue) ) { return static_cast<int>(floatValue); }
       else { return QVariant(QVariant::Invalid); }
     }
     case 2:
@@ -232,7 +234,7 @@ bool QmitkUSZonesDataModel::setData ( const QModelIndex & index, const QVariant 
       curNode->SetFloatProperty(DataNodePropertySize, value.toFloat());
 
       mitk::Point3D origin = curNode->GetData()->GetGeometry()->GetOrigin();
-      curNode->SetData(this->MakeSphere(curNode, value.toFloat()));
+      curNode->SetData(this->MakeSphere(value.toFloat()));
       curNode->GetData()->GetGeometry()->SetOrigin(origin);
 
       break;
@@ -298,7 +300,7 @@ bool QmitkUSZonesDataModel::removeRows ( int row, int count, const QModelIndex &
   return true;
 }
 
-mitk::Surface::Pointer QmitkUSZonesDataModel::MakeSphere(const mitk::DataNode::Pointer dataNode, mitk::ScalarType radius) const
+mitk::Surface::Pointer QmitkUSZonesDataModel::MakeSphere(mitk::ScalarType radius) const
 {
   mitk::Surface::Pointer zone = mitk::Surface::New();
 

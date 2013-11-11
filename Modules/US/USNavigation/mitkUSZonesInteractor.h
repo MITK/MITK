@@ -26,7 +26,6 @@ namespace itk {
 
 namespace mitk
 {
-class DataNode;
 class Surface;
 
 class MitkUSNavigation_EXPORT USZonesInteractor : public DataInteractor
@@ -45,8 +44,9 @@ protected:
   bool AddCenter(StateMachineAction* , InteractionEvent*);
   bool ChangeRadius(StateMachineAction* , InteractionEvent*);
   bool EndCreation(StateMachineAction* , InteractionEvent*);
+  bool AbortCreation(StateMachineAction* , InteractionEvent*);
 
-  itk::SmartPointer<Surface> MakeSphere(const  itk::SmartPointer<DataNode> dataNode, mitk::ScalarType radius) const;
+  itk::SmartPointer<Surface> MakeSphere(mitk::ScalarType radius) const;
 };
 
 } // namespace mitk

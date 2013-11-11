@@ -59,7 +59,7 @@ public:
 
 protected:
 
-  mitk::Surface::Pointer MakeSphere(const mitk::DataNode::Pointer dataNode, mitk::ScalarType radius) const;
+  mitk::Surface::Pointer MakeSphere(mitk::ScalarType radius) const;
 
   DataNodeVector m_ZoneNodes;
 

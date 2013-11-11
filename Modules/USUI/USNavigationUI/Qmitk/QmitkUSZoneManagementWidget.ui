@@ -36,6 +36,12 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
@@ -45,22 +51,45 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="DeleteZoneButton">
+      <widget class="QLabel" name="ZoneSizeLabel">
        <property name="enabled">
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>&amp;Delete Selected Zones</string>
+        <string>Zone Size:</string>
        </property>
-       <property name="icon">
-        <iconset resource="../resources/USNavigationUI.qrc">
-         <normaloff>:/USNavigationUI/117.png</normaloff>:/USNavigationUI/117.png</iconset>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSlider" name="ZoneSizeSlider">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="maximum">
+        <number>300</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="DeleteZoneButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>&amp;Delete Selected Zone</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/USNavigationUI.qrc">
+       <normaloff>:/USNavigationUI/117.png</normaloff>:/USNavigationUI/117.png</iconset>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
@@ -84,9 +113,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>ZoneSizeSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QmitkUSZoneManagementWidget</receiver>
+   <slot>OnZoneSizeSliderValueChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>201</x>
+     <y>191</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>164</x>
+     <y>118</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>AddRow()</slot>
   <slot>RemoveSelectedRows()</slot>
+  <slot>OnZoneSizeSliderValueChanged(int)</slot>
  </slots>
 </ui>

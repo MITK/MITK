@@ -438,7 +438,7 @@ static void TestContourModelAPI()
 }
 
 
-int mitkContourModelTest(int itkNotUsed(argc), char** itkNotUsed(argv))
+int mitkContourModelTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("mitkContourModelTest")
 

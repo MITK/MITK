@@ -64,8 +64,6 @@ namespace mitk {
     */
     virtual USAbstractControlInterface::Pointer GetControlInterfaceCustom();
 
-    void GenerateData();
-
     /**
     * \brief Remove this device from the micro service.
     * This method is public for mitk::USVideoDevice, because this devices

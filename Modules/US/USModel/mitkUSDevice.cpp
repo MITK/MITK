@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSDevice.h"
+#include "mitkImageReadAccessor.h"
 
 //Microservices
 #include <usGetModuleContext.h>
@@ -201,8 +202,8 @@ bool mitk::USDevice::Connect()
 {
   if ( this->GetIsConnected() )
   {
-    MITK_WARN("mitkUSDevice") << "Tried to connect an ultrasound device that was already connected. Ignoring call...";
-    return false;
+    MITK_INFO("mitkUSDevice") << "Tried to connect an ultrasound device that was already connected. Ignoring call...";
+    return true;
   }
 
   if ( ! this->GetIsInitialized() )
@@ -243,8 +244,8 @@ bool mitk::USDevice::Activate()
 {
   if (! this->GetIsConnected())
   {
-    MITK_WARN("mitkUSDevice") << "Cannot activate device if it is not in connected state.";
-    return false;
+    MITK_INFO("mitkUSDevice") << "Cannot activate device if it is not in connected state.";
+    return true;
   }
 
   if ( OnActivation() )
@@ -380,6 +381,8 @@ output->Graft( graft );
 void mitk::USDevice::GrabImage()
 {
   m_Image = this->GetUSImageSource()->GetNextImage();
+  m_Image->Modified();
+  //this->Modified();
 }
 
 //########### GETTER & SETTER ##################//
@@ -410,6 +413,25 @@ std::string mitk::USDevice::GetDeviceModel(){
 std::string mitk::USDevice::GetDeviceComment(){
   return this->m_Metadata->GetDeviceComment();
 }
+
+void mitk::USDevice::GenerateData()
+{
+  MITK_INFO << "*** USDevice Update Start";
+
+  if ( m_Image.IsNull() || ! m_Image->IsInitialized() ) { return; }
+
+  mitk::Image::Pointer output = this->GetOutput();
+
+  if ( ! output->IsInitialized() )
+  {
+    output->Initialize(m_Image);
+  }
+
+  mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(0,0,0));
+  output->SetSlice(inputReadAccessor.GetData());
+
+  MITK_INFO << "*** USDevice Update End";
+};
 
 std::string mitk::USDevice::GetServicePropertyLabel()
 {

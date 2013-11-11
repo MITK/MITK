@@ -135,10 +135,6 @@ public:
 
   /**
     * \brief  */
-  void SmoothLabel(int index, int layer = -1);
-
-  /**
-    * \brief  */
   void CalculateLabelVolume(int index, int layer = -1);
 
   /**
@@ -212,10 +208,6 @@ public:
   /**
     * \brief  */
   void EraseLabels(std::vector<int>& indexes, int layer = -1);
-
-  /**
-    * \brief  */
-  void SmoothLabels(std::vector<int>& indexes, int layer = -1);
 
   /**
     * \brief  */
@@ -383,9 +375,6 @@ protected:
 
   template < typename ImageType >
   void ReorderLabelProcessing( ImageType* input, int index, int layer);
-
-  template < typename ImageType >
-  void SmoothLabelProcessing( ImageType* input, int index);
 
   template < typename ImageType >
   void MergeLabelsProcessing( ImageType* input, int index);

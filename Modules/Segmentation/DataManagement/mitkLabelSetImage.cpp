@@ -32,8 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkQuadEdgeMesh.h>
 #include <itkTriangleMeshToBinaryImageFilter.h>
 #include <itkRelabelComponentImageFilter.h>
-#include <itkBinaryMedianImageFilter.h>
-#include <itkBinaryThresholdImageFilter.h>
 
 mitk::LabelSetImage::LabelSetImage() : mitk::Image(),
 m_ActiveLayer(0)
@@ -359,21 +357,6 @@ void mitk::LabelSetImage::CalculateLabelVolume(int index, int layer)
 // todo
 }
 
-void mitk::LabelSetImage::SmoothLabel(int index, int layer)
-{
-  if (layer < 0)
-    layer = m_ActiveLayer;
-  try
-  {
-    AccessByItk_1(this, SmoothLabelProcessing, index);
-  }
-  catch(itk::ExceptionObject& e)
-  {
-    mitkThrow() << e.GetDescription();
-  }
-  this->Modified();
-}
-
 void mitk::LabelSetImage::EraseLabel(int index, bool reorder, int layer)
 {
   try
@@ -576,16 +559,6 @@ void mitk::LabelSetImage::EraseLabels(std::vector<int>& indexes, int layer)
   for (int i=0; i<indexes.size(); i++)
   {
     this->EraseLabel(indexes[i], false, layer);
-  }
-}
-
-void mitk::LabelSetImage::SmoothLabels(std::vector<int>& indexes, int layer)
-{
-  if (layer < 0) layer = m_ActiveLayer;
-  std::sort(indexes.begin(), indexes.end());
-  for (int i=0; i<indexes.size(); i++)
-  {
-    this->SmoothLabel(layer, indexes[i]);
   }
 }
 
@@ -1194,58 +1167,6 @@ void mitk::LabelSetImage::ImageToLayerContainerProcessing( ImageType* input, int
    targetIter.Set( sourceIter.Get() );
    ++sourceIter;
    ++targetIter;
-  }
-}
-
-template < typename ImageType >
-void mitk::LabelSetImage::SmoothLabelProcessing(ImageType* input, int index)
-{
-  typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;
-  typedef itk::BinaryMedianImageFilter< ImageType, ImageType > MedianFilterType;
-
-  typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
-  thresholdFilter->SetInput(input);
-  thresholdFilter->SetLowerThreshold(index);
-  thresholdFilter->SetUpperThreshold(index);
-  thresholdFilter->SetOutsideValue(0);
-  thresholdFilter->SetInsideValue(index);
-  thresholdFilter->Update();
-
-  typename ImageType::SizeType radius;
-  radius.Fill(1);
-
-  typename MedianFilterType::Pointer medianFilter = MedianFilterType::New();
-  medianFilter->SetInput( thresholdFilter->GetOutput() );
-  medianFilter->SetRadius( radius );
-  medianFilter->SetBackgroundValue(0);
-  medianFilter->SetForegroundValue(index);
-
-  medianFilter->Update();
-
-  typename ImageType::Pointer result = medianFilter->GetOutput();
-  result->DisconnectPipeline();
-
-  typedef itk::ImageRegionConstIterator< ImageType > SourceIteratorType;
-  typedef itk::ImageRegionIterator< ImageType > TargetIteratorType;
-
-  SourceIteratorType sourceIter( result, result->GetLargestPossibleRegion() );
-  sourceIter.GoToBegin();
-
-  TargetIteratorType targetIter( input, input->GetLargestPossibleRegion() );
-  targetIter.GoToBegin();
-
-  while ( !sourceIter.IsAtEnd() )
-  {
-    int targetValue = static_cast< int >( targetIter.Get() );
-    int sourceValue = static_cast< int >( sourceIter.Get() );
-
-    if ( (targetValue == index) || ( sourceValue && (!this->GetLabelLocked(targetValue))) )
-    {
-      targetIter.Set( sourceValue );
-    }
-
-    ++sourceIter;
-    ++targetIter;
   }
 }
 

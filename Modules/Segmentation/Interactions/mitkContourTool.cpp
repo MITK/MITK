@@ -72,7 +72,7 @@ bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateE
   //expand time bounds because our contour was initialized
   contour->Expand( timestep + 1 );
   //draw as a closed contour
-  contour->SetIsClosed(true,timestep);
+  contour->SetClosed(true,timestep);
   //add first mouse position
   contour->AddVertex( positionEvent->GetWorldPosition(), timestep );
 

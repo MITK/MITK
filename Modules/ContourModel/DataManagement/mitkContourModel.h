@@ -256,12 +256,12 @@ namespace mitk
     */
     virtual void Open( int timestep=0);
 
-    /** \brief Set isClosed to given boolean.
+    /** \brief Set closed property to given boolean.
 
     false - The link between the last control point the first point will be removed.
     true - The last control point will be linked with the first point.
     */
-    virtual void SetIsClosed(bool isClosed, int timestep=0);
+    virtual void SetClosed(bool isClosed, int timestep=0);
 
     /** \brief Returns the number of vertices at a given timestep.
     \param timestep - default = 0

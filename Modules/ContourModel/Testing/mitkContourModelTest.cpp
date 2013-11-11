@@ -326,7 +326,7 @@ static void TestInvalidTimeStep()
   MITK_TEST_CONDITION(contour->IsClosed() == false, "test close for timestep 0");
   MITK_TEST_CONDITION(contour->IsClosed(invalidTimeStep) == false, "test close at invalid timestep");
 
-  contour->SetIsClosed(true, invalidTimeStep);
+  contour->SetClosed(true, invalidTimeStep);
   MITK_TEST_CONDITION(contour->GetNumberOfVertices(invalidTimeStep) == -1, "test number of vertices at invalid timestep");
 
   contour->AddVertex(p2, invalidTimeStep);

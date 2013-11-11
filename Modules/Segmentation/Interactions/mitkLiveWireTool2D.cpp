@@ -593,7 +593,7 @@ bool mitk::LiveWireTool2D::OnLastSegmentDelete( Action* action, const StateEvent
       it++;
     }
 
-    newContour->SetIsClosed(m_Contour->IsClosed());
+    newContour->SetClosed(m_Contour->IsClosed());
 
     //set new contour visible
     m_ContourModelNode->SetData(newContour);

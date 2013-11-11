@@ -246,7 +246,7 @@ void mitk::ContourModel::Open( int timestep)
 }
 
 
-void mitk::ContourModel::SetIsClosed(bool isClosed, int timestep)
+void mitk::ContourModel::SetClosed(bool isClosed, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -598,7 +598,7 @@ void mitk::ContourModel::Initialize(mitk::ContourModel &other)
   for(int currentTimestep = 0; currentTimestep < numberOfTimesteps; currentTimestep++)
   {
     this->m_ContourSeries.push_back(mitk::ContourElement::New());
-    this->SetIsClosed(other.IsClosed(currentTimestep),currentTimestep);
+    this->SetClosed(other.IsClosed(currentTimestep),currentTimestep);
   }
 
   m_SelectedVertex = NULL;

@@ -32,7 +32,7 @@ mitk::FeedbackContourTool::FeedbackContourTool(const char* type)
  m_ContourUtils(ContourUtils::New())
 {
   m_FeedbackContour = ContourModel::New();
-  m_FeedbackContour->SetIsClosed(true);
+  m_FeedbackContour->SetClosed(true);
   m_FeedbackContourNode = DataNode::New();
   m_FeedbackContourNode->SetData( m_FeedbackContour );
   m_FeedbackContourNode->SetProperty("name", StringProperty::New("One of FeedbackContourTool's feedback nodes"));

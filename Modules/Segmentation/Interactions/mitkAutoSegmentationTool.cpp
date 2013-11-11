@@ -138,16 +138,14 @@ mitk::Image::Pointer mitk::AutoSegmentationTool::Get3DImage(mitk::Image::Pointer
 
 void mitk::AutoSegmentationTool::InitializeUndoController()
 {
-//  mitk::UndoController::GetCurrentUndoModel()->Clear();
-//  mitk::UndoController::GetCurrentUndoModel()->ClearRedoList();
+  mitk::UndoController::GetCurrentUndoModel()->Clear();
+  mitk::UndoController::GetCurrentUndoModel()->ClearRedoList();
 
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  if (!workingNode)
-    mitkThrow() << "Could not retrieve working node!";
+  assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
-  if (!workingImage)
-    mitkThrow() << "Could not retrieve working image!";
+  assert(workingImage);
 
   mitk::LabelSetImage::Pointer diffImage = mitk::LabelSetImage::New(workingImage);
   diffImage->SetVolume(workingImage->GetData());

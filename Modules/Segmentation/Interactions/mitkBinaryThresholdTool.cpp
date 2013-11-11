@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 #include "mitkPadImageFilter.h"
 #include "mitkLabelSetImage.h"
-#include "mitkUndoController.h"
+//#include "mitkUndoController.h"
 
 // us
 #include "usModule.h"
@@ -76,6 +76,7 @@ const char** mitk::BinaryThresholdTool::GetXPM() const
 us::ModuleResource mitk::BinaryThresholdTool::GetIconResource() const
 {
   us::Module* module = us::GetModuleContext()->GetModule();
+  assert(module);
   us::ModuleResource resource = module->GetResource("Threshold_48x48.png");
   return resource;
 }
@@ -153,27 +154,22 @@ void mitk::BinaryThresholdTool::AcceptPreview()
 
     if (workingImageTimeStep->GetDimension() == 2)
     {
-      AccessTwoImagesFixedDimensionByItk( workingImageTimeStep.GetPointer(), referenceImage, ITKThresholding, 2 );
+      AccessTwoImagesFixedDimensionByItk( workingImageTimeStep, referenceImage, ITKThresholding, 2 );
     }
     else
     {
-      AccessTwoImagesFixedDimensionByItk( workingImageTimeStep.GetPointer(), referenceImage, ITKThresholding, 3 );
+      AccessTwoImagesFixedDimensionByItk( workingImageTimeStep, referenceImage, ITKThresholding, 3 );
     }
 
     workingImageTimeStep->Modified();
     workingImage->Modified();
   }
-  catch(mitk::Exception& e)
+  catch (itk::ExceptionObject& e)
   {
     MITK_ERROR << "Exception caught: " << e.GetDescription();
     Tool::ErrorMessage("Could not create segmentation.");
   }
-  catch(itk::ExceptionObject& e)
-  {
-    MITK_ERROR << "Exception caught: " << e.GetDescription();
-    Tool::ErrorMessage("Could not create segmentation.");
-  }
-  catch(...)
+  catch (...)
   {
     MITK_ERROR << "Unknown exception!";
     Tool::ErrorMessage("Could not create segmentation.");
@@ -258,7 +254,7 @@ void mitk::BinaryThresholdTool::ITKThresholding( itk::Image<TPixel1, VDimension1
   SourceIteratorType sourceIterator( sourceImage, sourceImage->GetLargestPossibleRegion() );
   TargetIteratorType targetIterator( targetImage, targetImage->GetLargestPossibleRegion() );
 
-  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
   assert(workingImage);
 
   int activePixelValue = workingImage->GetActiveLabel()->GetIndex();

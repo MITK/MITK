@@ -63,6 +63,7 @@ const char** mitk::FillHolesTool3D::GetXPM() const
 us::ModuleResource mitk::FillHolesTool3D::GetIconResource() const
 {
   us::Module* module = us::GetModuleContext()->GetModule();
+  assert(module);
   us::ModuleResource resource = module->GetResource("FillHolesTool3D_48x48.png");
   return resource;
 }
@@ -74,6 +75,8 @@ const char* mitk::FillHolesTool3D::GetName() const
 
 void mitk::FillHolesTool3D::Run()
 {
+  this->InitializeUndoController();
+
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 

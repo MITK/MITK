@@ -236,6 +236,9 @@ void mitk::USCombinedModality::GenerateData()
   mitk::Image::Pointer output = this->GetOutput();
   if ( ! output->IsInitialized() ) { output->Initialize(image); }
 
+  mitk::ImageReadAccessor inputReadAccessor(image, image->GetSliceData(0,0,0));
+  output->SetSlice(inputReadAccessor.GetData());
+
   std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
   if ( ! calibrationKey.empty() )
   {
@@ -245,14 +248,11 @@ void mitk::USCombinedModality::GenerateData()
     {
       // transform image according to callibration if one is set
       // for current configuration of probe and depth
-      image->GetGeometry()->SetIndexToWorldTransform(calibrationIterator->second);
+      output->GetGeometry()->SetIndexToWorldTransform(calibrationIterator->second);
     }
   }
 
   // TODO: do processing here
-
-  mitk::ImageReadAccessor inputReadAccessor(image, image->GetSliceData(0,0,0));
-  output->SetSlice(inputReadAccessor.GetData());
 }
 
 std::string mitk::USCombinedModality::SerializeCalibration()

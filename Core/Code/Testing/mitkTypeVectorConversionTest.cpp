@@ -195,7 +195,7 @@ static void Test_opencv2mitk()
   mitk::Vector3D vector3D = originalValues;
   cv::Vec3d opencvVector(valuesToCopy[0], valuesToCopy[1], valuesToCopy[2]);
 
-  FromArray(vector3D, opencvVector);
+  vector3D.FromArray(opencvVector);
 
   TestForEquality(vector3D, opencvVector, "mitk::Vector3D", "cv::Vec3d");
 }
@@ -223,7 +223,7 @@ static void Test_FromArray_DifferentType(void)
     podArray[var] = valuesToCopy[var];
   }
 
-  FromArray(vector3D, podArray);
+  vector3D.FromArray(podArray);
 
   TestForEquality(vector3D, podArray, "mitk::Vector3D", "float POD", epsDouble2Float);
 }

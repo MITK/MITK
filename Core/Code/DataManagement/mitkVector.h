@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_vector.h>
 
 #include "mitkTypeBasics.h"
+#include "mitkTypeConversions.h"
 #include "mitkExceptionMacro.h"
 
 namespace mitk
@@ -41,7 +42,7 @@ namespace mitk
     /**
      * @brief Copy constructor.
      */
-    Vector<TCoordRep, NVectorDimension>(const Vector<TCoordRep, NVectorDimension>& r)
+    Vector<TCoordRep, NVectorDimension>(const mitk::Vector<TCoordRep, NVectorDimension>& r)
       : itk::Vector<TCoordRep, NVectorDimension>(r) {}
 
     /**
@@ -83,13 +84,20 @@ namespace mitk
     /**
      * @brief Constructor for vnl_vector_fixed.
      */
-    Vector<TCoordRep, NVectorDimension>(const vnl_vector_fixed<TCoordRep, NVectorDimension> vnlVectorFixed)
+    Vector<TCoordRep, NVectorDimension>(const vnl_vector_fixed<TCoordRep, NVectorDimension>& vnlVectorFixed)
         : itk::Vector<TCoordRep, NVectorDimension>()
     {
-      for (int var = 0; var < 3; ++var) {
+      for (int var = 0; var < NVectorDimension; ++var) {
         this->SetElement(var,  vnlVectorFixed[var]);
       }
     };
+
+    template <typename ArrayType >
+    void FromArray(const ArrayType& array)
+    {
+      itk::FixedArray<TCoordRep, NVectorDimension>* thisP = dynamic_cast<itk::FixedArray<TCoordRep, NVectorDimension>* >(this);
+      mitk::FromArray<ArrayType, TCoordRep, NVectorDimension>(*thisP, array);
+    }
 
 
     /**
@@ -99,8 +107,7 @@ namespace mitk
      */
     operator vnl_vector<TCoordRep> () const
     {
-      vnl_vector<TCoordRep> vnlVector(this->GetVnlVector());
-      return vnlVector;
+      return this->GetVnlVector();
     }
 
 
@@ -111,44 +118,7 @@ namespace mitk
   typedef Vector<ScalarType,3> Vector3D;
   typedef Vector<ScalarType,4> Vector4D;
 
-  /**
-   *  Now methods to copy from and into ArrayTypes.
-   *  ArrayTypes here are all types who implement operator[].
-   *  The two methods were made free floating so you may template specifications for you concrete type.
-   */
 
-  /**
-   * @brief Copies elements of an array to this Vector
-   * @param[in] array    the array whose values will be copied into the Vector. Must be of a type which overrides the [] operator
-   * @param[out] vectorOrPoint          the FixedArrray (e.g., mitk::Vector or mitk::Point) which should hold the elements of array.
-   * @attention array must be of dimension NVectorDimension!
-   * @attention this method implicitly converts between data types.
-   */
-  template <typename ArrayType, typename TCoordRep, unsigned int NVectorDimension>
-  void FromArray(itk::FixedArray<TCoordRep, NVectorDimension>& vectorOrPoint, const ArrayType& array)
-  {
-    for (unsigned short int var = 0; var < NVectorDimension; ++var)
-    {
-      vectorOrPoint[var] =  array[var];
-    }
-  }
-
-
-  /**
-   * @brief Copies the elements of this into an array
-   * @param[in] vectorOrPoint   the itk::FixedArray which shall be copied into the array. Can e.g. be of type mitk::Vector or mitk::Point
-   * @param[out] array    the array which will hold the elements. Must be of a type which overrides the [] operator.
-   * @attention array must be of dimension NVectorDimension!
-   * @attention this method implicitly converts between data types.
-   */
-  template <typename ArrayType, typename TCoordRep, unsigned int NVectorDimension>
-  void ToArray(ArrayType& array, const itk::FixedArray<TCoordRep, NVectorDimension>& vectorOrPoint)
-  {
-    for (unsigned short int var = 0; var < NVectorDimension; ++var)
-    {
-      array[var] = vectorOrPoint[var];
-    }
-  }
 
 } // end namespace mitk
 

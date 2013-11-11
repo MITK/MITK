@@ -68,6 +68,7 @@ set(H_FILES
   DataManagement/mitkImageToItk.txx
   DataManagement/mitkTimeSlicedGeometry.h # Deprecated, empty for compatibilty reasons.
   DataManagement/mitkOldTypeConversions.h
+  DataManagement/mitkTypeConversions.h
   DataManagement/mitkTypedefs.h
   DataManagement/mitkTypes.h
   DataManagement/mitkVector.h

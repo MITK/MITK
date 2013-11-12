@@ -118,6 +118,8 @@ public:
     double Min;
     vnl_vector<int> MaxIndex;
     vnl_vector<int> MinIndex;
+    std::list< vnl_vector<int> > MaxIndexList;
+    std::list< vnl_vector<int> > MinIndexList;
   };
 
   typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
@@ -269,7 +271,7 @@ protected:
 
   template < typename TPixel, unsigned int VImageDimension>
   Statistics CalculateHotspotStatistics(
-    itk::Image<TPixel, VImageDimension> *inputImage,
+    const itk::Image<TPixel, VImageDimension> *inputImage,
     itk::Image<unsigned short, VImageDimension> *maskImage,
     double RadiusInMM);
 

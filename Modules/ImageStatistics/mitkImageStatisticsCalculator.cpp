@@ -58,6 +58,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkmath.h.>
 #include <list>
 
+
 //#define DEBUG_HOTSPOTSEARCH
 
 #define _USE_MATH_DEFINES
@@ -1096,8 +1097,8 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
         }
 // FIX END
     /*****************************************************Creating Test Image**********************************************/
-    typedef itk::Image<unsigned short, 3> ThreeDimensionalImageType;
-    ThreeDimensionalImageType::Pointer image = ThreeDimensionalImageType::New();
+    typedef itk::Image<TPixel, VImageDimension> ThreeDimensionalImageType;
+    ThreeDimensionalImageType::Pointer  image = ThreeDimensionalImageType::New();
 
     ThreeDimensionalImageType::SizeType size;
     ThreeDimensionalImageType::SpacingType spacing;
@@ -1105,7 +1106,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
     for(int i = 0; i < 3; ++i)
     {
-      size[i] = 100.00;
+      size[i] = 50.00;
       spacing[i] = 1.00;
       start[i] = 0.00;
     }
@@ -1126,7 +1127,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
         imageIt.Set(15);
     }
 
-    for(unsigned int x = 70; x <= 80; ++x)
+    /*for(unsigned int x = 70; x <= 80; ++x)
     {
       for(unsigned int y = 70; y <= 80; ++y)
       {
@@ -1140,24 +1141,24 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
           image->SetPixel(pixelIndex, 50);
         }
       }
-    }
+    }*/
 
     ThreeDimensionalImageType::IndexType pixelIndex;
-    pixelIndex[0] = 75;
-    pixelIndex[1] = 75;
-    pixelIndex[2] = 75;
+    pixelIndex[0] = 25;
+    pixelIndex[1] = 25;
+    pixelIndex[2] = 25;
 
-    image->SetPixel(pixelIndex, 1500);
+    image->SetPixel(pixelIndex, 20);
 
     pixelIndex[0] = 0;
     pixelIndex[1] = 0;
     pixelIndex[2] = 0;
 
-    image->SetPixel(pixelIndex, 10000000);
+    image->SetPixel(pixelIndex, 1000);
 
 
     /*****************************************************Creating Test Mask**********************************************/
-    typedef itk::Image<unsigned short, 3> ThreeDimensionalMaskImageType;
+    typedef itk::Image<unsigned short, VImageDimension> ThreeDimensionalMaskImageType;
     ThreeDimensionalMaskImageType::Pointer mask = ThreeDimensionalMaskImageType::New();
 
     ThreeDimensionalMaskImageType::SizeType maskSize;
@@ -1166,7 +1167,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
     for(int i = 0; i < 3; ++i)
     {
-      maskSize[i] = 100;
+      maskSize[i] = 50;
       maskSpacing[i] = 1.00;
       maskStart[i] = 0.00;
     }
@@ -1189,7 +1190,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
 
     /*****************************************************Calculate Hotspot Statistics**********************************************/
-      Statistics hotspotStatistics = CalculateHotspotStatistics(image.GetPointer(), mask.GetPointer(), 3.00);;
+      Statistics hotspotStatistics = CalculateHotspotStatistics (adaptedImage.GetPointer(), adaptedMaskImage.GetPointer(), 3.00);
       statistics.HotspotMax = hotspotStatistics.HotspotMax;
       statistics.HotspotMin = hotspotStatistics.HotspotMin;
       statistics.HotspotPeak = hotspotStatistics.HotspotPeak;
@@ -1213,7 +1214,6 @@ ImageStatisticsCalculator::MinMaxIndex ImageStatisticsCalculator::CalculateMinMa
   float minBoundary,
   float maxBoundary)
 {
-  // TODO: check if inputImage and maskImage have same dimensions
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
 
@@ -1229,41 +1229,84 @@ ImageStatisticsCalculator::MinMaxIndex ImageStatisticsCalculator::CalculateMinMa
   ImageType::IndexType maxIndex;
   ImageType::IndexType minIndex;
 
+  double maxBound = itk::NumericTraits<double>::min();
+  double minBound = itk::NumericTraits<double>::max();
+
+  std::list< ImageType::IndexType > maxIndexList;
+  std::list< ImageType::IndexType > minIndexList;
+
+  bool sameIndex = true;
+
   for(maskIt.GoToBegin(), imageIndexIt.GoToBegin();
-      !maskIt.IsAtEnd() && !imageIndexIt.IsAtEnd();
-      ++maskIt, ++imageIndexIt)
+    !maskIt.IsAtEnd() && !imageIndexIt.IsAtEnd();
+    ++maskIt, ++imageIndexIt)
   {
     if(maskIt.Get() > itk::NumericTraits<typename MaskImageType::PixelType>::Zero)
     {
-      double indexValue = imageIndexIt.Get();
-      // Calculate minimum, maximum and corresponding index-values
-      if(indexValue > maxValue && indexValue < maxBoundary)
+      double value = imageIndexIt.Get();
+      ImageType::IndexType index = imageIndexIt.GetIndex();
+      //Calculate minimum, maximum and corresponding index-values
+      if( value > maxValue && value < maxBoundary)
       {
-       maxIndex = imageIndexIt.GetIndex();
-       maxValue = indexValue;
+        maxIndexList.clear();
+        maxIndexList.push_back( index );
+        maxValue = value;
+      }
+      else if ( value == maxValue )
+      {
+        maxIndexList.push_back( index );
       }
 
-      if(indexValue < minValue && indexValue > minBoundary)
+      if(value < minValue && value > minBoundary)
       {
-       minIndex = imageIndexIt.GetIndex();
-       minValue = indexValue;
+        minIndexList.clear();
+        minIndexList.push_back( index );
+        minValue = value;
+      }
+      else if ( value == minValue )
+      {
+        minIndexList.push_back( index );
       }
     }
   }
 
+  std::list<vnl_vector<int>> tmpList;
+
+  for(std::list< ImageType::IndexType >::iterator it = maxIndexList.begin(); it != maxIndexList.end(); ++it)
+  {
+    vnl_vector<int> indexVector;
+    indexVector.set_size(inputImage->GetImageDimension());
+
+    ImageType::IndexType index = *it;
+
+    for(int i = 0; i < VImageDimension ; ++i)
+      indexVector[i] = index[i];
+
+    tmpList.push_back(indexVector);
+  }
+
   MinMaxIndex minMax;
+  minMax.MaxIndexList = tmpList;
+
+  tmpList.clear();
+
+  for(std::list< ImageType::IndexType >::iterator it = minIndexList.begin(); it != minIndexList.end(); ++it)
+  {
+    vnl_vector<int> indexVector;
+    indexVector.set_size(inputImage->GetImageDimension());
+
+    ImageType::IndexType index = *it;
+
+    for(int i = 0; i < indexVector.size(); ++i)
+      indexVector[i] = index[i];
+
+    tmpList.push_back(indexVector);
+  }
+
+  minMax.MinIndexList = tmpList;
+
   minMax.MinIndex.set_size(inputImage->GetImageDimension());
   minMax.MaxIndex.set_size(inputImage->GetImageDimension());
-
-  for (int i = 0; i<minMax.MinIndex.size(); i++)
-  {
-    minMax.MinIndex[i] = minIndex[i];
-  }
-
-  for (int i = 0; i<minMax.MaxIndex.size(); i++)
-  {
-    minMax.MaxIndex[i] = maxIndex[i];
-  }
 
   minMax.Max = maxValue;
   minMax.Min = minValue;
@@ -1273,7 +1316,7 @@ ImageStatisticsCalculator::MinMaxIndex ImageStatisticsCalculator::CalculateMinMa
 
 template < typename TPixel, unsigned int VImageDimension>
 ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspotStatistics(
-    itk::Image<TPixel, VImageDimension> *inputImage,
+    const itk::Image<TPixel, VImageDimension> *inputImage,
     itk::Image<unsigned short, VImageDimension> *maskImage,
     double RadiusInMM)
 {
@@ -1285,7 +1328,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   typedef itk::ImageRegionConstIteratorWithIndex<ImageType> IteratorType;
   typedef itk::ImageRegionConstIteratorWithIndex<MaskImageType> MaskIteratorType;
-  typedef itk::ImageRegionIteratorWithIndex<SphereMaskImageType> SphereMaskIteratorType;
+  typedef itk::ImageRegionConstIteratorWithIndex<SphereMaskImageType> SphereMaskIteratorType;
 
   typedef typename ImageType::SpacingType SpacingType;
   typedef typename ImageType::SizeType SizeType;
@@ -1391,6 +1434,38 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   MaskImageType::Pointer peakImage = convolutionFilter->GetOutput();
 
+  /*std::cout << std::endl << std::endl;
+    std::cout << "PeakImage: " << std::endl;
+    unsigned int lastZ = 1000000000;
+    unsigned int lastY = 1000000000;
+
+    unsigned int hotspotMaskIndexCounter = 0;
+    MaskIteratorType hotspotMaskIt(peakImage, peakImage->GetLargestPossibleRegion()  );
+    for(hotspotMaskIt.GoToBegin();!hotspotMaskIt.IsAtEnd();++hotspotMaskIt)
+    {
+
+      double tmp = hotspotMaskIt.Get();
+      if (hotspotMaskIt.GetIndex()[1] != lastY)
+      {
+        std::cout << std::endl;
+        lastY = hotspotMaskIt.GetIndex()[1];
+      }
+      if (hotspotMaskIt.GetIndex()[0] != lastZ)
+      {
+        std::cout << tmp << " ";
+        lastZ = hotspotMaskIt.GetIndex()[0];
+      }
+
+      hotspotMaskIndexCounter++;
+
+      if(hotspotMaskIndexCounter > 899) {
+        std::cout << std::endl;
+        hotspotMaskIndexCounter = 0;
+      }
+    }
+
+    std::cout << std::endl << std::endl;*/
+
 
   /*****************************************************Creating Hotspot Sphere**********************************************/
   SphereMaskImageType::Pointer hotspotSphere = SphereMaskImageType::New();
@@ -1413,9 +1488,27 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   bool isInside = false;
 
+  std::list<vnl_vector<int>> peakIndexList;
+
+ /* vnl_vector<int> headIndex;
+  headIndex.set_size(VImageDimension);
+
+  peakIndexList.push_back(head);*/
+
+  int i = 0;
+
   while (isInside == false)
   {
+
     MinMaxIndex peakInformations = CalculateMinMaxIndex(peakImage.GetPointer(), maskImage, minBoundary, maxBoundary);
+    peakIndexList = peakInformations.MaxIndexList;
+
+    for(std::list<vnl_vector<int>>::iterator it = peakIndexList.begin(); it != peakIndexList.end(); ++it)
+    {
+      vnl_vector<int> tmp;
+      tmp = *it;
+      std::cout << "List[" << i << "]: " << tmp << std::endl;
+    }
 
     if(maxBoundary == peakInformations.Max)
     {
@@ -1423,137 +1516,149 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
       break;
     }
 
-    SphereMaskImageType::IndexType peakIndex;
-
-    for(unsigned int i = 0; i < VImageDimension; ++i)
+    if(!peakIndexList.empty())
     {
-      double countIndex =  2.0 * radiusSUVHotspot / hotspotSphereSpacing[i];
-
-      // Rounding up to the next integer by cast
-      countIndex += 0.9;
-      int castedIndex = static_cast<int>(countIndex);
-
-      // We always have an uneven number in size to determine a center-point in the convolution mask
-      if(castedIndex % 2 > 0 )
+      for(std::list<vnl_vector<int>>::iterator iterator = peakIndexList.begin(); iterator != peakIndexList.end(); ++iterator)
       {
-        hotspotSphereSize[i] = castedIndex;
-      }
-      else
-      {
-        hotspotSphereSize[i] = castedIndex +1;
-      }
-      // Calculating peakIndex for Origin
-      peakIndex[i] =  peakInformations.MaxIndex[i];
-    }
+        vnl_vector<int> tmpIndex = *iterator;
+        SphereMaskImageType::IndexType peakIndex;
 
-    // Initialize SpatialObjectoToImageFilter
-    itk::SpatialObjectToImageFilter<EllipseType,SphereMaskImageType>::Pointer spatialObjectToImageFilter
-      = SpatialObjectToImageFilter::New();
+        for(unsigned int i = 0; i < VImageDimension; ++i)
+        {
+          // Converting vnl_vector<int> in IndexType for origin of sphere
+          peakIndex[i] = tmpIndex[i];
 
-    spatialObjectToImageFilter->SetSize(hotspotSphereSize);
-    spatialObjectToImageFilter->SetSpacing(hotspotSphereSpacing);
+          double countIndex =  2.0 * radiusSUVHotspot / hotspotSphereSpacing[i];
 
-    // Creating spatial sphere object
-    EllipseType::Pointer sphere = EllipseType::New();
-    sphere->SetRadius(radiusSUVHotspot);
+          // Rounding up to the next integer by cast
+          countIndex += 0.9;
+          int castedIndex = static_cast<int>(countIndex);
 
-    typedef EllipseType::TransformType TransformType;
-    TransformType::Pointer transform = TransformType::New();
+          // We always have an uneven number in size to determine a center-point in the convolution mask
+          if(castedIndex % 2 > 0 )
+          {
+            hotspotSphereSize[i] = castedIndex;
+          }
+          else
+          {
+            hotspotSphereSize[i] = castedIndex +1;
+          }
 
-    transform->SetIdentity();
+        }
 
-    TransformType::OutputVectorType translation;
+        // Initialize SpatialObjectoToImageFilter
+        itk::SpatialObjectToImageFilter<EllipseType,SphereMaskImageType>::Pointer spatialObjectToImageFilter
+          = SpatialObjectToImageFilter::New();
 
-    // Transform sphere on center-position, set pixelValues inside sphere on 1 and update
-    for(int i = 0; i < VImageDimension; ++i)
-      translation[i] =  (hotspotSphereSize[i] -1) / 2;
+        spatialObjectToImageFilter->SetSize(hotspotSphereSize);
+        spatialObjectToImageFilter->SetSpacing(hotspotSphereSpacing);
 
-    transform->Translate(translation, false);
+        // Creating spatial sphere object
+        EllipseType::Pointer sphere = EllipseType::New();
+        sphere->SetRadius(radiusSUVHotspot);
 
-    sphere->SetObjectToParentTransform(transform);
+        typedef EllipseType::TransformType TransformType;
+        TransformType::Pointer transform = TransformType::New();
 
-    spatialObjectToImageFilter->SetInput(sphere);
+        transform->SetIdentity();
 
-    sphere->SetDefaultInsideValue(1.00);
-    sphere->SetDefaultOutsideValue(0.00);
+        TransformType::OutputVectorType translation;
 
-    spatialObjectToImageFilter->SetUseObjectValue(true);
-    spatialObjectToImageFilter->SetOutsideValue(0);
+        // Transform sphere on center-position, set pixelValues inside sphere on 1 and update
+        for(int i = 0; i < VImageDimension; ++i)
+          translation[i] =  (hotspotSphereSize[i] -1) / 2;
 
-    spatialObjectToImageFilter->Update();
-    hotspotSphere = spatialObjectToImageFilter->GetOutput();
+        transform->Translate(translation, false);
+
+        sphere->SetObjectToParentTransform(transform);
+
+        spatialObjectToImageFilter->SetInput(sphere);
+
+        sphere->SetDefaultInsideValue(1.00);
+        sphere->SetDefaultOutsideValue(0.00);
+
+        spatialObjectToImageFilter->SetUseObjectValue(true);
+        spatialObjectToImageFilter->SetOutsideValue(0);
+
+        spatialObjectToImageFilter->Update();
+        hotspotSphere = spatialObjectToImageFilter->GetOutput();
 
 #ifdef DEBUG_HOTSPOTSEARCH
 
-    std::cout << std::endl << std::endl;
-    std::cout << "hotspotMask: " << std::endl;
-    unsigned int lastZ = 1000000000;
-    unsigned int lastY = 1000000000;
+        std::cout << std::endl << std::endl;
+        std::cout << "hotspotMask: " << std::endl;
+        unsigned int lastZ = 1000000000;
+        unsigned int lastY = 1000000000;
 
-    unsigned int hotspotMaskIndexCounter = 0;
-    SphereMaskIteratorType hotspotMaskIt(hotspotSphere, hotspotSphere->GetLargestPossibleRegion()  );
-    for(hotspotMaskIt.GoToBegin();!hotspotMaskIt.IsAtEnd();++hotspotMaskIt)
-    {
+        unsigned int hotspotMaskIndexCounter = 0;
+        SphereMaskIteratorType hotspotMaskIt(hotspotSphere, hotspotSphere->GetLargestPossibleRegion()  );
+        for(hotspotMaskIt.GoToBegin();!hotspotMaskIt.IsAtEnd();++hotspotMaskIt)
+        {
 
-      double tmp = hotspotMaskIt.Get();
-      if (hotspotMaskIt.GetIndex()[1] != lastY)
-      {
-        std::cout << std::endl;
-        lastY = hotspotMaskIt.GetIndex()[1];
-      }
-      if (hotspotMaskIt.GetIndex()[0] != lastZ)
-      {
-        std::cout << tmp << " ";
-        lastZ = hotspotMaskIt.GetIndex()[0];
-      }
+          double tmp = hotspotMaskIt.Get();
+          if (hotspotMaskIt.GetIndex()[1] != lastY)
+          {
+            std::cout << std::endl;
+            lastY = hotspotMaskIt.GetIndex()[1];
+          }
+          if (hotspotMaskIt.GetIndex()[0] != lastZ)
+          {
+            std::cout << tmp << " ";
+            lastZ = hotspotMaskIt.GetIndex()[0];
+          }
 
-      hotspotMaskIndexCounter++;
+          hotspotMaskIndexCounter++;
 
-      if(hotspotMaskIndexCounter > 168) {
-        std::cout << std::endl;
-        hotspotMaskIndexCounter = 0;
-      }
-    }
+          if(hotspotMaskIndexCounter > 168) {
+            std::cout << std::endl;
+            hotspotMaskIndexCounter = 0;
+          }
+        }
 
-    std::cout << std::endl << std::endl;
+        std::cout << std::endl << std::endl;
 #endif
 
-    // Calculate new origin for hotspot sphere
+        // Calculate new origin for hotspot sphere
 
-    for(int i = 0; i < VImageDimension; ++i)
-      offsetInIndex[i] = (hotspotSphereSize[i] -1) / 2;
+        for(int i = 0; i < VImageDimension; ++i)
+          offsetInIndex[i] = (hotspotSphereSize[i] -1) / 2;
 
-    peakImage->TransformIndexToPhysicalPoint(peakIndex, hotspotOrigin);
+        peakImage->TransformIndexToPhysicalPoint(peakIndex, hotspotOrigin);
 
-    PointType offsetInPhysicalPoint;
-    hotspotSphere->TransformIndexToPhysicalPoint(offsetInIndex, offsetInPhysicalPoint);
+        PointType offsetInPhysicalPoint;
+        hotspotSphere->TransformIndexToPhysicalPoint(offsetInIndex, offsetInPhysicalPoint);
 
-    for(int i = 0; i < VImageDimension; ++i)
-      hotspotOrigin[i] -= offsetInPhysicalPoint[i];
+        for(int i = 0; i < VImageDimension; ++i)
+          hotspotOrigin[i] -= offsetInPhysicalPoint[i];
 
 
-    hotspotSphere->SetOrigin(hotspotOrigin);
-    hotspotSphere->Allocate();
+        hotspotSphere->SetOrigin(hotspotOrigin);
+        hotspotSphere->Allocate();
 
-    // If sphere is not in peakImage we need a new peakValue
-    bool sphereInRegion = IsSphereInsideRegion(peakImage.GetPointer(), hotspotSphere.GetPointer() );
+        // If sphere is not in peakImage we need a new peakValue
+        bool sphereInRegion = IsSphereInsideRegion(peakImage.GetPointer(), hotspotSphere.GetPointer() );
 
-    if(sphereInRegion == false)
-    {
-      maxBoundary = peakInformations.Max;
-      minBoundary = peakInformations.Min;
+        if(sphereInRegion == false)
+        {
+          maxBoundary = peakInformations.Max;
+          minBoundary = peakInformations.Min;
+        }
+        else
+        {
+          hotspotPeak = peakInformations.Max;
 
-    }
-    else
-    {
-      hotspotPeak = peakInformations.Max;
+          for(int i = 0; i < VImageDimension; ++i)
+            hotspotPeakIndex[i] = peakIndex[i];
 
-      for(int i = 0; i < VImageDimension; ++i)
-        hotspotPeakIndex[i] = peakInformations.MaxIndex[i];
+          isInside = true;
+          break;
+        }
+      }
 
-      isInside = true;
+      i++;
     }
   }
+
   /*********************************Creating cropped inputImage for calculation of hotspot statistics****************************/
 
   IndexType croppedStart;
@@ -1578,14 +1683,16 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   croppedInputImage->SetRegions(outputRegion);
   croppedInputImage->Allocate();
 
-  typedef itk::ImageRegionIterator<ImageType> InputImageIteratorType;
+  typedef itk::ImageRegionConstIterator<ImageType> InputImageIteratorType;
   InputImageIteratorType inputIt(inputImage, inputRegion);
-  SphereMaskIteratorType croppedInputImageIt(croppedInputImage, outputRegion);
 
-    for(inputIt.GoToBegin(), croppedInputImageIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++croppedInputImageIt)
-    {
-      croppedInputImageIt.Set(inputIt.Get() );
-    }
+  InputImageIteratorType croppedInputImageIt(croppedInputImage, outputRegion);
+
+  for(inputIt.GoToBegin(), croppedInputImageIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++croppedInputImageIt)
+  {
+    croppedInputImage->SetPixel(croppedInputImageIt.GetIndex(), inputIt.Get());
+    //croppedInputImageIt.Set(inputIt.Get() );
+  }
 
 
   // Calculate statistics in Hotspot
@@ -1594,7 +1701,13 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   MinMaxIndex hotspotInformations;
   Statistics hotspotStatistics;
 
+  std::list<vnl_vector<int>> maxIndexList;
+
   hotspotInformations = CalculateMinMaxIndex(croppedInputImage.GetPointer(), hotspotSphere.GetPointer(), minBoundary, maxBoundary);
+
+  // Min and max index is the first item in the corresponding list
+  hotspotInformations.MaxIndex = hotspotInformations.MaxIndexList.front();
+  hotspotInformations.MinIndex = hotspotInformations.MinIndexList.front();
 
   // Add offset to cropped indices
   for(int i = 0; i < VImageDimension; ++i)
@@ -1614,6 +1727,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   {
     hotspotStatistics.HotspotPeakIndex[i] = hotspotPeakIndex[i];
   }
+
 
   return hotspotStatistics;
 }

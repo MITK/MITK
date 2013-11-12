@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStandaloneDataStorage.h>
 
 #include "itkImage.h"
-#include <itkImageRegionConstIteratorWithIndex.h>
+#include <itkImageRegionIteratorWithIndex.h>
 #include <itkSimilarityIndexImageFilter.h>
 #include <itkImageFileWriter.h>
 
@@ -69,7 +69,17 @@ public:
     return statisticsCalculator->GetStatistics();
   }
 
+  // calculate statistics for the given image and mask
+  static const mitk::ImageStatisticsCalculator::Statistics TestStatisticsWithMask(mitk::Image::Pointer image, mitk::Image::Pointer mask)
+  {
+    mitk::ImageStatisticsCalculator::Pointer statisticsCalculator = mitk::ImageStatisticsCalculator::New();
+    statisticsCalculator->SetImage(image);
+    statisticsCalculator->SetMaskingModeToImage();
+    statisticsCalculator->SetImageMask(mask);
 
+    statisticsCalculator->ComputeStatistics();
+    return statisticsCalculator->GetStatistics();
+  }
 
   // returns a vector of defined test-cases
   static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom )
@@ -403,230 +413,14 @@ public:
     return testCases;
   }
 
-  static void GetTestConvolutionMask(itk::Image< float, 2 > *mask,
-                                      double RadiusInMM)
-  {
-    /*****************************
-      * radius of 2.5 mm
-      * -> expected ConvolutionMask:
-      * 0,25 0,75 1 0,75 0,25
-      * 0,75  1   1   1  0,75
-      *  1    1   1   1   1
-      * 0,75  1   1   1  0,75
-      * 0,25 0,75 1 0,75 0,25
-      ******************************/
 
-    typedef itk::Image<float, 2> ImageType;
-
-    ImageType::Pointer convolutionMask = ImageType::New();
-
-    ImageType::RegionType region;
-    ImageType::IndexType start;
-    ImageType::SizeType size;
-    ImageType::IndexType pixelIndex;
-    ImageType::SpacingType spacing;
-    ImageType::IndexType origin;
-
-
-    for(unsigned int i = 0; i < 2; ++i)
-    {
-      spacing[i] = 1.0;
-      start[i] = 0.0;
-
-      double countIndex =  2.0 * RadiusInMM / spacing[i];
-
-      //Rounding up to the next integer by cast
-      countIndex += 0.9;
-      int castedIndex = static_cast<int>(countIndex);
-
-      //We always have an uneven number in size to determine a center-point in the convolution mask
-      if(castedIndex % 2 > 0 )
-      {
-        size[i] = castedIndex;
-      }
-      else
-      {
-        size[i] = castedIndex +1;
-      }
-    }
-
-    region.SetSize(size);
-    region.SetIndex(start);
-
-    convolutionMask->SetRegions(region);
-    convolutionMask->SetSpacing(spacing);
-    convolutionMask->Allocate();
-
-    //y = 0
-    pixelIndex[0] = 0;
-    pixelIndex[1] = 0;
-    convolutionMask->SetPixel(pixelIndex, 0.25);
-
-    pixelIndex[0] = 1;
-    pixelIndex[1] = 0;
-    convolutionMask->SetPixel(pixelIndex, 0.75);
-
-    pixelIndex[0] = 2;
-    pixelIndex[1] = 0;
-    convolutionMask->SetPixel(pixelIndex, 1.0);
-
-    pixelIndex[0] = 3;
-    pixelIndex[1] = 0;
-    convolutionMask->SetPixel(pixelIndex, 0.75);
-
-    pixelIndex[0] = 4;
-    pixelIndex[1] = 0;
-    convolutionMask->SetPixel(pixelIndex, 0.25);
-
-    //y = 1
-    pixelIndex[1] = 0;
-    pixelIndex[1] = 1;
-    convolutionMask->SetPixel(pixelIndex, 0.75);
-
-    pixelIndex[0] = 1;
-    pixelIndex[1] = 1;
-    convolutionMask->SetPixel(pixelIndex, 1.0);
-
-    pixelIndex[0] = 2;
-    pixelIndex[1] = 1;
-    convolutionMask->SetPixel(pixelIndex, 1.0);
-
-    pixelIndex[0] = 3;
-    pixelIndex[1] = 1;
-    convolutionMask->SetPixel(pixelIndex, 1.0);
-
-    pixelIndex[0] = 4;
-    pixelIndex[1] = 1;
-    convolutionMask->SetPixel(pixelIndex, 0.75);
-
-    //y = 2
-    pixelIndex[1] = 0;
-    pixelIndex[1] = 2;
-    convolutionMask->SetPixel(pixelIndex, 1.0);
-
-    pixelIndex[0] = 1;
-    pixelIndex[1] = 2;
-    convolutionMask->SetPixel(pixelIndex, 1.0);
-
-    pixelIndex[0] = 2;
-    pixelIndex[1] = 2;
-    convolutionMask->SetPixel(pixelIndex, 1.0);
-
-    pixelIndex[0] = 3;
-    pixelIndex[1] = 2;
-    convolutionMask->SetPixel(pixelIndex, 1.0);
-
-    pixelIndex[0] = 4;
-    pixelIndex[1] = 2;
-    convolutionMask->SetPixel(pixelIndex, 1.0);
-
-    //y = 3
-    pixelIndex[1] = 0;
-    pixelIndex[1] = 3;
-    convolutionMask->SetPixel(pixelIndex, 0.75);
-
-    pixelIndex[0] = 1;
-    pixelIndex[1] = 3;
-    convolutionMask->SetPixel(pixelIndex, 1.0);
-
-    pixelIndex[0] = 2;
-    pixelIndex[1] = 3;
-    convolutionMask->SetPixel(pixelIndex, 1.0);
-
-    pixelIndex[0] = 3;
-    pixelIndex[1] = 3;
-    convolutionMask->SetPixel(pixelIndex, 1.0);
-
-    pixelIndex[0] = 4;
-    pixelIndex[1] = 3;
-    convolutionMask->SetPixel(pixelIndex, 0.75);
-
-    //y = 4
-    pixelIndex[1] = 0;
-    pixelIndex[1] = 4;
-    convolutionMask->SetPixel(pixelIndex, 0.25);
-
-    pixelIndex[0] = 1;
-    pixelIndex[1] = 4;
-    convolutionMask->SetPixel(pixelIndex, 0.75);
-
-    pixelIndex[0] = 2;
-    pixelIndex[1] = 4;
-    convolutionMask->SetPixel(pixelIndex, 1.0);
-
-    pixelIndex[0] = 3;
-    pixelIndex[1] = 4;
-    convolutionMask->SetPixel(pixelIndex, 0.75);
-
-    pixelIndex[0] = 4;
-    pixelIndex[1] = 4;
-    convolutionMask->SetPixel(pixelIndex, 0.25);
-
-    typedef itk::ImageRegionConstIteratorWithIndex<ImageType> IteratorType;
-    IteratorType it(convolutionMask, convolutionMask->GetLargestPossibleRegion());
-
-    std::cout << std::endl << std::endl;
-    std::cout << "Selbsterzeugtes Bild: "<< std::endl;
-
-      //#ifdef DEBUG_SEGMENTATION_CORRECTION
-        // Debug Ausgabe:
-    unsigned int lastZ = 1000000000;
-    unsigned int lastY = 1000000000;
-    for(it.GoToBegin(); !it.IsAtEnd(); ++it)
-    {
-      double x = it.Get();
-        if (it.GetIndex()[1] != lastY)
-        {
-          std::cout << std::endl;
-          lastY = it.GetIndex()[1];
-        }
-        if (it.GetIndex()[0] != lastZ)
-        {
-          std::cout << x << " ";
-          lastZ = it.GetIndex()[0];
-        }
-      }
-    //#endif
-
-    typedef itk::SimilarityIndexImageFilter<ImageType, ImageType> FilterType;
-    FilterType::Pointer similiarityFilter = FilterType::New();
-
-    similiarityFilter->SetInput1(mask);
-    similiarityFilter->SetInput2(convolutionMask);
-    similiarityFilter->Update();
-
-    ImageType::Pointer similarityImage = similiarityFilter->GetOutput();
-    IteratorType iterator(similarityImage, similarityImage->GetLargestPossibleRegion());
-
-    std::cout << "Bild nach Filter: "<< std::endl;
-      //#ifdef DEBUG_SEGMENTATION_CORRECTION
-        // Debug Ausgabe:
-    lastZ = 1000000000;
-    lastY = 1000000000;
-    for(iterator.GoToBegin(); !iterator.IsAtEnd(); ++iterator)
-    {
-      double x = iterator.Get();
-        if (iterator.GetIndex()[1] != lastY)
-        {
-          std::cout << std::endl;
-          lastY = iterator.GetIndex()[1];
-        }
-        if (iterator.GetIndex()[0] != lastZ)
-        {
-          std::cout << x << " ";
-          lastZ = iterator.GetIndex()[0];
-        }
-      }
-    //#endif
-
-  }
 
   // loads the test image
-  static mitk::Image::Pointer GetTestImage()
+  static mitk::Image::Pointer GetTestImage(const char *nameOfFile, const char *path)
   {
     mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
 
-    const std::string filename = locator->FindFile("testimage.dcm", "Modules/MitkExt/Testing/Data");
+    const std::string filename = locator->FindFile(nameOfFile, path);
     if (filename.empty())
     {
       MITK_ERROR << "Could not find test file";
@@ -634,7 +428,7 @@ public:
     }
     else
     {
-      MITK_INFO << "Found testimage.dcm";
+      MITK_INFO << "Found " << nameOfFile;
     }
 
 
@@ -676,6 +470,116 @@ int TestUnitilizedImage()
   return 0;
 }
 
+// static method TestHotspotSearch(image):
+  // -> formuliert verschiedene TestFälle: Polygon und Masken (Segmentierung)
+  static void TestHotspotSearch(mitk::Image::Pointer image, unsigned int testCase)
+  {
+      // testCase for PlanarFigure-1
+      if(testCase == 0)
+      {
+
+      }
+
+      // testCase for Mask-1
+      if(testCase == 1)
+      {
+
+      }
+  }
+
+  static void CreateTestImage()
+  {
+
+    typedef itk::Image<unsigned short, 3> ThreeDimensionalImageType;
+    ThreeDimensionalImageType::Pointer image = ThreeDimensionalImageType::New();
+
+    ThreeDimensionalImageType::SizeType size;
+    ThreeDimensionalImageType::SpacingType spacing;
+    ThreeDimensionalImageType::IndexType start;
+
+    for(int i = 0; i < 3; ++i)
+    {
+      size[i] = 10;
+      spacing[i] = 1.00;
+      start[i] = 0.00;
+    }
+
+    ThreeDimensionalImageType::RegionType region;
+    region.SetIndex(start);
+    region.SetSize(size);
+
+    image->SetRegions(region);
+    image->Allocate();
+
+    typedef itk::ImageRegionIteratorWithIndex<ThreeDimensionalImageType> IteratorType;
+    IteratorType imageIt(image, region);
+
+
+    for(imageIt.GoToBegin(); !imageIt.IsAtEnd(); ++imageIt)
+    {
+        imageIt.Set(10);
+    }
+
+    for(unsigned int x = 2; x <= 8; ++x)
+    {
+      for(unsigned int y = 2; y <= 8; ++y)
+      {
+        for(unsigned int z = 2; z <= 8; ++z)
+        {
+          ThreeDimensionalImageType::IndexType pixelIndex;
+          pixelIndex[0] = x;
+          pixelIndex[1] = y;
+          pixelIndex[2] = z;
+
+          image->SetPixel(pixelIndex, 200);
+        }
+      }
+    }
+
+    ThreeDimensionalImageType::IndexType pixelIndex;
+    pixelIndex[0] = 5;
+    pixelIndex[1] = 5;
+    pixelIndex[2] = 5;
+
+    image->SetPixel(pixelIndex, 255);
+
+    typedef itk::Image<unsigned short, 3> ThreeDimensionalMaskImageType;
+    ThreeDimensionalMaskImageType::Pointer mask = ThreeDimensionalMaskImageType::New();
+
+    ThreeDimensionalMaskImageType::SizeType maskSize;
+    ThreeDimensionalMaskImageType::SpacingType maskSpacing;
+    ThreeDimensionalMaskImageType::IndexType maskStart;
+
+    for(int i = 0; i < 3; ++i)
+    {
+      maskSize[i] = 10;
+      maskSpacing[i] = 1.00;
+      maskStart[i] = 0.00;
+    }
+
+    ThreeDimensionalMaskImageType::RegionType maskRegion;
+    maskRegion.SetIndex(maskStart);
+    maskRegion.SetSize(maskSize);
+
+    mask->SetRegions(maskRegion);
+    mask->Allocate();
+
+    typedef itk::ImageRegionIteratorWithIndex<ThreeDimensionalMaskImageType> MaskIteratorType;
+    MaskIteratorType maskIt(mask, maskRegion);
+
+
+    for(maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)
+    {
+        maskIt.Set(1);
+    }
+
+    /*typedef itk::ImageFileWriter<ThreeDimensionalImageType> WriterType;
+    WriterType::Pointer writer = WriterType::New();
+    writer->SetInput(ThreeDimage);
+    writer->SetFileName("D:\\dreiD.dcm");
+    writer->Update();*/
+  }
+
 int mitkImageStatisticsCalculatorTest(int, char* [])
 {
   // always start with this!
@@ -683,7 +587,7 @@ int mitkImageStatisticsCalculatorTest(int, char* [])
 
     //QCoreApplication app(argc, argv);
 
-    mitk::Image::Pointer image = mitkImageStatisticsCalculatorTestClass::GetTestImage();
+    mitk::Image::Pointer image = mitkImageStatisticsCalculatorTestClass::GetTestImage(' ', ' ');
   MITK_TEST_CONDITION_REQUIRED( image.IsNotNull(), "Loading test image" );
 
   mitk::Geometry2D::Pointer geom = image->GetSlicedGeometry()->GetGeometry2D(0);
@@ -711,9 +615,6 @@ int mitkImageStatisticsCalculatorTest(int, char* [])
       "Calculated grayvalue sd '"<< calculatedSD <<"'  is equal to the desired value '"
       << test.sd <<"' for testcase #" << test.id );
   }
-
-  // static method TestHotspotSearch(image):
-  // -> formuliert verschiedene TestFälle: Polygon und Masken (Segmentierung)
 
   TestUnitilizedImage();
 

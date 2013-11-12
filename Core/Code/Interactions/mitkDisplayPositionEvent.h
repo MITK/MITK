@@ -55,7 +55,12 @@ public:
       return m_DisplayPosition;
   }
 
-  void SetDisplayPosition(const Point2D& displPosition) { m_DisplayPosition = displPosition; }
+  void SetDisplayPosition(const Point2D& displayPosition)
+  {
+    m_DisplayPosition = displayPosition;
+    m_WorldPositionIsSet = false;
+    m_PickedObjectIsSet = false;
+  }
 
   Point3D& GetWorldPosition() const;
 

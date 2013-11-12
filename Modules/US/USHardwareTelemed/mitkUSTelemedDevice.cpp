@@ -145,19 +145,6 @@ void mitk::USTelemedDevice::OnFreeze(bool freeze)
   }
 }
 
-void mitk::USTelemedDevice::GenerateData()
-{
-  if ( m_Image.IsNull() ) {
-    MITK_WARN("USDevice")("USTelemedDevice") << "No image set for generating data into.";
-    return;
-  }
-
-  mitk::Image::Pointer result;
-  result = m_Image;
-
-  this->SetNthOutput(0, result);
-}
-
 mitk::USImageSource::Pointer mitk::USTelemedDevice::GetUSImageSource()
 {
   return m_ImageSource.GetPointer();

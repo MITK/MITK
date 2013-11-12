@@ -118,15 +118,6 @@ bool mitk::USVideoDevice::OnDeactivation()
   return true;
 }
 
-void mitk::USVideoDevice::GenerateData()
-{
-  mitk::Image::Pointer result;
-  result = m_Image;
-
-  // Set Output
-  this->SetNthOutput(0, result);
-}
-
 void mitk::USVideoDevice::UnregisterOnService()
 {
   if (m_DeviceState == State_Activated) { this->Deactivate(); }

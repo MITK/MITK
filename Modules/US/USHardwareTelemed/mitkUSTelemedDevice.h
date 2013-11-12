@@ -108,12 +108,6 @@ namespace mitk {
     virtual void OnFreeze(bool freeze);
 
     /**
-      * \brief Grabs the next frame from the Video input.
-      * This method is called internally, whenever Update() is invoked by an Output.
-      */
-    void GenerateData();
-
-    /**
       * \brief Getter for main Telemed API object.
       * This method is for being called by Telemed control interfaces.
       */

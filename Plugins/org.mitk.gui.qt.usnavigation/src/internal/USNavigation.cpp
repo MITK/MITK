@@ -103,17 +103,30 @@ void USNavigation::OnSelectDevices(){
     return;
   }
 
-  if (! m_USDevice->GetIsActive()) m_USDevice->Activate();
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  // make sure that the combined modality is in connected state before using it
+  if ( m_USDevice->GetDeviceState() < mitk::USDevice::State_Connected ) { m_USDevice->Connect(); }
+  if ( m_USDevice->GetDeviceState() < mitk::USDevice::State_Activated ) { m_USDevice->Activate(); }
+  QApplication::restoreOverrideCursor();
 
   m_Tracker = m_USDevice->GetNavigationDataSource();
 
-  // Set Calibration, if necessary (TODO: must be done for the new calibration processing)
-  //if (m_LoadedCalibration.IsNotNull()) m_USDevice->setCalibration(m_LoadedCalibration);
+  // Set Calibration, if necessary
+  if ( ! m_LoadedCalibration.empty() )
+  {
+    try
+    {
+      m_USDevice->DeserializeCalibration(m_LoadedCalibration);
+    }
+    catch ( const mitk::Exception& exception )
+    {
+      MITK_WARN << "Failed to deserialize calibration. Unsuppoerted format?";
+      m_Controls.m_LblCalibrationLoadState->setText("Failed to deserialize calibration. Unsuppoerted format?");
+      return;
+    }
+  }
 
   // Build Pipeline
-  //m_SmoothingFilter->SetInput(0, m_Tracker->GetOutput());
-  //m_SmoothingFilter->SetNumerOfValues(10);
-  //m_ZoneFilter->SetInput(0, m_SmoothingFilter->GetOutput(0));
   m_ZoneFilter->SetInput(0, m_Tracker->GetOutput(0));
   m_ZoneFilter->SetInput(1, m_Tracker->GetOutput(1));
   m_ZoneFilter->SelectInput(1);
@@ -177,19 +190,39 @@ void USNavigation::OnLoadCalibration(){
     "",
     "Calibration files *.cal" );
 
-  //TODO:  New reader for transformations must be implemented.
-  //mitk::TransformationFileReader::Pointer tReader = mitk::TransformationFileReader::New();
-  //tReader->SetInputFilename(filename.toStdString());
-  //bool success = tReader->DoRead();
-  //if (! success){
-  //  m_Controls.m_LblCalibrationLoadState->setText("Failed to load file. Unsupported format?");
-  //  return;
-  //}
-  //m_LoadedCalibration = tReader->GetOutputTransform();
-  //m_Controls.m_LblCalibrationLoadState->setText("Loaded calibration : " + filename);
-  //if (m_USDevice.IsNotNull()){
-  //  m_USDevice->setCalibration(m_LoadedCalibration);
-  //}
+  QFile file(filename);
+  if ( ! file.open(QIODevice::ReadOnly | QIODevice::Text) )
+  {
+    MITK_WARN << "Cannot open file '" << filename.toStdString() << "' for reading.";
+    m_Controls.m_LblCalibrationLoadState->setText("Cannot open file '" + filename + "' for reading.");
+    return;
+  }
+
+  QTextStream inStream(&file);
+  m_LoadedCalibration = inStream.readAll().toStdString();
+
+  if ( m_LoadedCalibration.empty() )
+  {
+    MITK_WARN << "Failed to load file. Unsupported format?";
+    m_Controls.m_LblCalibrationLoadState->setText("Failed to load file. Unsupported format?");
+    return;
+  }
+
+  if ( m_USDevice.IsNotNull() )
+  {
+    try
+    {
+      m_USDevice->DeserializeCalibration(m_LoadedCalibration);
+    }
+    catch ( const mitk::Exception& exception )
+    {
+      MITK_WARN << "Failed to deserialize calibration. Unsuppoerted format?";
+      m_Controls.m_LblCalibrationLoadState->setText("Failed to deserialize calibration. Unsuppoerted format?");
+      return;
+    }
+  }
+
+  m_Controls.m_LblCalibrationLoadState->setText("Loaded calibration : " + filename);
 }
 
 void USNavigation::Update()
@@ -205,9 +238,13 @@ void USNavigation::Update()
   m_UpdateImage ++;
   if (m_UpdateImage)
   {
-    m_USDevice->UpdateOutputData(0);
+    m_USDevice->Modified();
+    m_USDevice->Update();
     mitk::Image::Pointer image = m_USDevice->GetOutput();
-    m_USStream->SetData(image);
+    if (image.IsNotNull() && image->IsInitialized())
+    {
+      m_USStream->SetData(image);
+    }
     this->RequestRenderWindowUpdate();
   }
 }

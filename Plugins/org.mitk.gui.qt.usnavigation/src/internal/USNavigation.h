@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef USNavigation_h
 #define USNavigation_h
 
@@ -36,7 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationDataSmoothingFilter.h>
 #include <mitkCameraVisualization.h>
 
-
 /*!
   \brief USNavigation
 
@@ -56,7 +54,6 @@ class USNavigation : public QmitkAbstractView
     static const std::string VIEW_ID;
 
     virtual void CreateQtPartControl(QWidget *parent);
-
 
   protected slots:
 
@@ -104,7 +101,6 @@ class USNavigation : public QmitkAbstractView
 
     void UpdateMeters();
 
-
   protected:
 
     mitk::NavigationToolStorage::Pointer m_ToolStorage;
@@ -115,7 +111,6 @@ class USNavigation : public QmitkAbstractView
 
     QString m_RangeMeterStyle;
 
-
     /**
     * \brief The CombinedModality used for imaging.
     */
@@ -124,7 +119,7 @@ class USNavigation : public QmitkAbstractView
     /**
     * \brief Temporary saving point for loaded calibration data.
     */
-    mitk::AffineTransform3D::Pointer m_LoadedCalibration;
+    std::string m_LoadedCalibration;
 
     /**
     * \brief NavigationDataSource used for tracking data.
@@ -169,7 +164,6 @@ class USNavigation : public QmitkAbstractView
     static const int WARNRANGE = 25;
 
     Ui::USNavigationControls m_Controls;
-
 };
 
 #endif // USNavigation_h

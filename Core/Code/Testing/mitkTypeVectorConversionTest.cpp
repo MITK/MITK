@@ -82,7 +82,7 @@ static void Test_mitk2pod(void)
   ScalarType podArray[3];
   mitk::Vector3D vector3D = valuesToCopy;
 
-  ToArray(podArray, vector3D);
+  vector3D.ToArray(podArray);
 
   TestForEquality(podArray, vector3D, "double POD", "mitk::Vector3D");
 }
@@ -209,8 +209,7 @@ static void Test_ToArray_DifferentType(void)
   }
   mitk::Vector3D vector3D = valuesToCopy;
 
-  //podArray = vector3D.ToArray<float[3]>();
-  ToArray(podArray, vector3D);
+  vector3D.ToArray(podArray);
 
   TestForEquality(podArray, vector3D, "float POD", "mitk::Vector3D", epsDouble2Float);
 }

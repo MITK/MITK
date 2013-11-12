@@ -106,6 +106,19 @@ namespace mitk
       return result;
     }
 
+    /**
+     * Copies the values stored in this vector into the array array.
+     * This method has to be used over the version returning the array when
+     * copying to pod arrays.
+     *
+     * @param array the array which should store the values of this.
+     */
+    template <typename ArrayType >
+    void ToArray(ArrayType array)
+    {
+      mitk::ToArray<ArrayType, TCoordRep, NVectorDimension>(array, *this);
+    }
+
 
     /**
      * @brief User defined conversion of mitk::Vector to vnl_vector.

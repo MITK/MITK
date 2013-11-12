@@ -28,6 +28,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNodeFactory.h>
 #include <mitkStandaloneDataStorage.h>
 
+#include "itkImage.h"
+#include <itkImageRegionIteratorWithIndex.h>
+#include <itkSimilarityIndexImageFilter.h>
+#include <itkImageFileWriter.h>
+
 //#include <QtCore>
 
 /**
@@ -64,7 +69,17 @@ public:
     return statisticsCalculator->GetStatistics();
   }
 
+  // calculate statistics for the given image and mask
+  static const mitk::ImageStatisticsCalculator::Statistics TestStatisticsWithMask(mitk::Image::Pointer image, mitk::Image::Pointer mask)
+  {
+    mitk::ImageStatisticsCalculator::Pointer statisticsCalculator = mitk::ImageStatisticsCalculator::New();
+    statisticsCalculator->SetImage(image);
+    statisticsCalculator->SetMaskingModeToImage();
+    statisticsCalculator->SetImageMask(mask);
 
+    statisticsCalculator->ComputeStatistics();
+    return statisticsCalculator->GetStatistics();
+  }
 
   // returns a vector of defined test-cases
   static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom )
@@ -398,12 +413,14 @@ public:
     return testCases;
   }
 
+
+
   // loads the test image
-  static mitk::Image::Pointer GetTestImage()
+  static mitk::Image::Pointer GetTestImage(const char *nameOfFile, const char *path)
   {
     mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
 
-    const std::string filename = locator->FindFile("testimage.dcm", "Modules/MitkExt/Testing/Data");
+    const std::string filename = locator->FindFile(nameOfFile, path);
     if (filename.empty())
     {
       MITK_ERROR << "Could not find test file";
@@ -411,7 +428,7 @@ public:
     }
     else
     {
-      MITK_INFO << "Found testimage.dcm";
+      MITK_INFO << "Found " << nameOfFile;
     }
 
 
@@ -453,6 +470,116 @@ int TestUnitilizedImage()
   return 0;
 }
 
+// static method TestHotspotSearch(image):
+  // -> formuliert verschiedene TestFälle: Polygon und Masken (Segmentierung)
+  static void TestHotspotSearch(mitk::Image::Pointer image, unsigned int testCase)
+  {
+      // testCase for PlanarFigure-1
+      if(testCase == 0)
+      {
+
+      }
+
+      // testCase for Mask-1
+      if(testCase == 1)
+      {
+
+      }
+  }
+
+  static void CreateTestImage()
+  {
+
+    typedef itk::Image<unsigned short, 3> ThreeDimensionalImageType;
+    ThreeDimensionalImageType::Pointer image = ThreeDimensionalImageType::New();
+
+    ThreeDimensionalImageType::SizeType size;
+    ThreeDimensionalImageType::SpacingType spacing;
+    ThreeDimensionalImageType::IndexType start;
+
+    for(int i = 0; i < 3; ++i)
+    {
+      size[i] = 10;
+      spacing[i] = 1.00;
+      start[i] = 0.00;
+    }
+
+    ThreeDimensionalImageType::RegionType region;
+    region.SetIndex(start);
+    region.SetSize(size);
+
+    image->SetRegions(region);
+    image->Allocate();
+
+    typedef itk::ImageRegionIteratorWithIndex<ThreeDimensionalImageType> IteratorType;
+    IteratorType imageIt(image, region);
+
+
+    for(imageIt.GoToBegin(); !imageIt.IsAtEnd(); ++imageIt)
+    {
+        imageIt.Set(10);
+    }
+
+    for(unsigned int x = 2; x <= 8; ++x)
+    {
+      for(unsigned int y = 2; y <= 8; ++y)
+      {
+        for(unsigned int z = 2; z <= 8; ++z)
+        {
+          ThreeDimensionalImageType::IndexType pixelIndex;
+          pixelIndex[0] = x;
+          pixelIndex[1] = y;
+          pixelIndex[2] = z;
+
+          image->SetPixel(pixelIndex, 200);
+        }
+      }
+    }
+
+    ThreeDimensionalImageType::IndexType pixelIndex;
+    pixelIndex[0] = 5;
+    pixelIndex[1] = 5;
+    pixelIndex[2] = 5;
+
+    image->SetPixel(pixelIndex, 255);
+
+    typedef itk::Image<unsigned short, 3> ThreeDimensionalMaskImageType;
+    ThreeDimensionalMaskImageType::Pointer mask = ThreeDimensionalMaskImageType::New();
+
+    ThreeDimensionalMaskImageType::SizeType maskSize;
+    ThreeDimensionalMaskImageType::SpacingType maskSpacing;
+    ThreeDimensionalMaskImageType::IndexType maskStart;
+
+    for(int i = 0; i < 3; ++i)
+    {
+      maskSize[i] = 10;
+      maskSpacing[i] = 1.00;
+      maskStart[i] = 0.00;
+    }
+
+    ThreeDimensionalMaskImageType::RegionType maskRegion;
+    maskRegion.SetIndex(maskStart);
+    maskRegion.SetSize(maskSize);
+
+    mask->SetRegions(maskRegion);
+    mask->Allocate();
+
+    typedef itk::ImageRegionIteratorWithIndex<ThreeDimensionalMaskImageType> MaskIteratorType;
+    MaskIteratorType maskIt(mask, maskRegion);
+
+
+    for(maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)
+    {
+        maskIt.Set(1);
+    }
+
+    /*typedef itk::ImageFileWriter<ThreeDimensionalImageType> WriterType;
+    WriterType::Pointer writer = WriterType::New();
+    writer->SetInput(ThreeDimage);
+    writer->SetFileName("D:\\dreiD.dcm");
+    writer->Update();*/
+  }
+
 int mitkImageStatisticsCalculatorTest(int, char* [])
 {
   // always start with this!
@@ -460,7 +587,7 @@ int mitkImageStatisticsCalculatorTest(int, char* [])
 
     //QCoreApplication app(argc, argv);
 
-    mitk::Image::Pointer image = mitkImageStatisticsCalculatorTestClass::GetTestImage();
+    mitk::Image::Pointer image = mitkImageStatisticsCalculatorTestClass::GetTestImage(' ', ' ');
   MITK_TEST_CONDITION_REQUIRED( image.IsNotNull(), "Loading test image" );
 
   mitk::Geometry2D::Pointer geom = image->GetSlicedGeometry()->GetGeometry2D(0);

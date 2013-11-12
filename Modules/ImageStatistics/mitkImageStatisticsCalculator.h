@@ -82,8 +82,16 @@ public:
     double Variance;
     double Sigma;
     double RMS;
+    double HotspotMin;
+    double HotspotMax;
+    double HotspotMean;
+    double HotspotSigma;
+    double HotspotPeak;
     vnl_vector< int > MinIndex;
     vnl_vector< int > MaxIndex;
+    vnl_vector<int> HotspotMaxIndex;
+    vnl_vector<int> HotspotMinIndex;
+    vnl_vector<int> HotspotPeakIndex;
 
     void Reset()
     {
@@ -96,12 +104,26 @@ public:
       Variance = 0.0;
       Sigma = 0.0;
       RMS = 0.0;
+      HotspotMin = 0.0;
+      HotspotMax = 0.0;
+      HotspotMean = 0.0;
+      HotspotPeak = 0.0;
+      HotspotSigma = 0.0;
     }
+  };
+
+  struct MinMaxIndex
+  {
+    double Max;
+    double Min;
+    vnl_vector<int> MaxIndex;
+    vnl_vector<int> MinIndex;
+    std::list< vnl_vector<int> > MaxIndexList;
+    std::list< vnl_vector<int> > MinIndexList;
   };
 
   typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
   typedef std::vector< Statistics > StatisticsContainer;
-
 
   mitkClassMacro( ImageStatisticsCalculator, itk::Object );
   itkNewMacro( ImageStatisticsCalculator );
@@ -143,6 +165,14 @@ public:
   /** \brief Get wether a pixel value will be ignored in the statistics */
   bool GetDoIgnorePixelValue();
 
+  void SetHotspotSize (double hotspotRadiusInMM);
+
+  double GetHotspotSize();
+
+  void SetCalculateHotspot(bool calculateHotspot);
+
+  bool IsHotspotCalculated();
+
   /** \brief Compute statistics (together with histogram) for the current
    * masking mode.
    *
@@ -165,6 +195,12 @@ public:
    * \param label The label for which to retrieve the statistics in multi-label situations (ascending order).
    */
   const Statistics &GetStatistics( unsigned int timeStep = 0, unsigned int label = 0 ) const;
+
+  /** \brief Retrieve statistics depending on the current masking mode.
+   * TODO: Kommentare anpassen!
+   * \param label The label for which to retrieve the statistics in multi-label situations (ascending order).
+   */
+  const Statistics &GetHotspotStatistics( unsigned int timeStep = 0, unsigned int label = 0 ) const;
 
   /** \brief Retrieve statistics depending on the current masking mode (for all image labels). */
   const StatisticsContainer &GetStatisticsVector( unsigned int timeStep = 0 ) const;
@@ -225,6 +261,24 @@ protected:
   void InternalMaskIgnoredPixels(
     const itk::Image< TPixel, VImageDimension > *image,
     itk::Image< unsigned short, VImageDimension > *maskImage );
+
+  template <typename TPixel, unsigned int VImageDimension >
+  MinMaxIndex CalculateMinMaxIndex(
+    const itk::Image<TPixel, VImageDimension> *inputImage,
+    itk::Image<unsigned short, VImageDimension> *maskImage,
+    float minBoundary,
+    float maxBoundary);
+
+  template < typename TPixel, unsigned int VImageDimension>
+  Statistics CalculateHotspotStatistics(
+    const itk::Image<TPixel, VImageDimension> *inputImage,
+    itk::Image<unsigned short, VImageDimension> *maskImage,
+    double RadiusInMM);
+
+  template < typename TPixel, unsigned int VImageDimension>
+  bool IsSphereInsideRegion(
+    const itk::Image<TPixel, VImageDimension>  *inputImage,
+    itk::Image<unsigned short, VImageDimension> *sphereImage);
 
   /** Connection from ITK to VTK */
   template <typename ITK_Exporter, typename VTK_Importer>
@@ -292,6 +346,7 @@ protected:
   StatisticsVector m_ImageStatisticsVector;
   StatisticsVector m_MaskedImageStatisticsVector;
   StatisticsVector m_PlanarFigureStatisticsVector;
+  StatisticsVector m_MaskedImageHotspotStatisticsVector;
 
   Statistics m_EmptyStatistics;
   StatisticsContainer m_EmptyStatisticsContainer;
@@ -315,6 +370,9 @@ protected:
   double m_IgnorePixelValue;
   bool m_DoIgnorePixelValue;
   bool m_IgnorePixelValueChanged;
+
+  double m_HotspotSize;
+  bool m_CalculateHotspot;
 
   unsigned int m_PlanarFigureAxis;    // Normal axis for PlanarFigure
   unsigned int m_PlanarFigureSlice;   // Slice which contains PlanarFigure

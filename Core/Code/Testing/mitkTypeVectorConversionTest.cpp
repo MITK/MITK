@@ -48,9 +48,7 @@ static const ScalarType valuesToCopy[]   =  {4.654789123321, 5.987456789321, 6.3
 /**
  * @brief Convenience method to test if one vector has been assigned successfully to the other.
  *
- * More specifically, tests if v1 = v2 was performed correctly. The method therefore assures that
- * 1. v1 equals v2 and
- * 2. both hold the values of v2.
+ * More specifically, tests if v1 = v2 was performed correctly.
  *
  * @param v1    The vector v1 of the assignment v1 = v2
  * @param v2    The vector v2 of the assignment v1 = v2
@@ -61,8 +59,7 @@ static const ScalarType valuesToCopy[]   =  {4.654789123321, 5.987456789321, 6.3
 template <typename T1, typename T2>
 static void TestForEquality(T1 v1, T2 v2, std::string v1Name, std::string v2Name, ScalarType eps = mitk::eps)
 {
-  MITK_TEST_CONDITION( EqualArray(v1, v2, 3, eps),  "\nAssigning " << v2Name << " to " << v1Name << ":\n1. both are equal")
-  MITK_TEST_CONDITION( EqualArray(v1, v2, 3, eps), "2. both hold values of " << v2Name)
+  MITK_TEST_CONDITION( EqualArray(v1, v2, 3, eps),  "\nAssigning " << v2Name << " to " << v1Name << ":\n both are equal")
 }
 
 const float epsDouble2Float = vnl_math::float_eps * 10.0;

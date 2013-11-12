@@ -36,13 +36,13 @@ namespace mitk
     /**
      * @brief Default constructor has nothing to do.
      */
-    Vector<TCoordRep, NVectorDimension>()
+    explicit Vector<TCoordRep, NVectorDimension>()
       : itk::Vector<TCoordRep, NVectorDimension>() {}
 
     /**
      * @brief Copy constructor.
      */
-    Vector<TCoordRep, NVectorDimension>(const mitk::Vector<TCoordRep, NVectorDimension>& r)
+    explicit Vector<TCoordRep, NVectorDimension>(const mitk::Vector<TCoordRep, NVectorDimension>& r)
       : itk::Vector<TCoordRep, NVectorDimension>(r) {}
 
     /**
@@ -92,6 +92,12 @@ namespace mitk
       }
     };
 
+    /**
+     * Copies the elements from array array to this.
+     * Note that this method will assign doubles to floats without complaining!
+     *
+     * @param array the array whose values shall be copied. Must overload [] operator.
+     */
     template <typename ArrayType >
     void FromArray(const ArrayType& array)
     {
@@ -99,6 +105,12 @@ namespace mitk
       mitk::FromArray<ArrayType, TCoordRep, NVectorDimension>(*thisP, array);
     }
 
+    /**
+     * Copies the elements of this vector to an array of type ArrayType
+     * Note that this method will assign doubles to floats without complaining!
+     *
+     * @return the array holding the elements of this. Only requierement is that it overloads the [] operator
+     */
     template <typename ArrayType >
     ArrayType ToArray()
     {
@@ -110,6 +122,8 @@ namespace mitk
      * Copies the values stored in this vector into the array array.
      * This method has to be used over the version returning the array when
      * copying to pod arrays.
+     * Furthermore, the syntax may be a little bit nicer because ArrayType can be
+     * inferred from the parameter.
      *
      * @param array the array which should store the values of this.
      */

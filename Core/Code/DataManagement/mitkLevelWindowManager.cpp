@@ -140,6 +140,7 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk:
     int nonLvlWinMode2 = mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR;
 
     mitk::RenderingModeProperty::Pointer mode = dynamic_cast<mitk::RenderingModeProperty*>(node->GetProperty( "Image Rendering.Mode" ));
+
     if( mode.IsNotNull() )
     {
       int currMode = mode->GetRenderingMode();

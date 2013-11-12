@@ -103,6 +103,7 @@ public:
 
   mitkNewMacro1Param(RenderingModeProperty, const std::string&);
 
+  //Never (!) change this without adaptation of mitkLevelWindowManagerTest::VerifyRenderingModes and mitkLevelWindowManagerTest::TestLevelWindowSliderVisibility !
   enum ImageRenderingMode
   {
     LEVELWINDOW_COLOR = 0,

@@ -6,11 +6,11 @@
 #include "mitkDataStorage.h"
 
 namespace itk {
-  template<class T> class SmartPointer;
+template<class T> class SmartPointer;
 }
 
 namespace mitk {
-  class USZonesInteractor;
+class USZonesInteractor;
 }
 
 namespace Ui {
@@ -25,10 +25,13 @@ class MitkUSNavigationUI_EXPORT QmitkUSZoneManagementWidget : public QWidget
 {
   Q_OBJECT
 
+signals:
+  void ZoneAdded();
+
 public slots:
-  //void AddRow();
   void RemoveSelectedRows();
   void OnStartAddingZone();
+  void OnAbortAddingZone();
   void OnResetZones();
 
 protected slots:
@@ -36,6 +39,7 @@ protected slots:
   void OnZoneSizeSliderValueChanged(int value);
 
   void OnRowInsertion(const QModelIndex& parent, int start, int end);
+  void OnDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 
 public:
   explicit QmitkUSZoneManagementWidget(QWidget *parent = 0);
@@ -45,16 +49,16 @@ public:
   mitk::DataStorage::SetOfObjects::ConstPointer GetZoneNodes();
 
 protected:
-    QmitkUSZonesDataModel*                      m_ZonesDataModel;
+  QmitkUSZonesDataModel*                      m_ZonesDataModel;
 
-    itk::SmartPointer<mitk::USZonesInteractor>  m_Interactor;
-    mitk::DataStorage::Pointer                  m_DataStorage;
-    mitk::DataNode::Pointer                     m_BaseNode;
-
-    int                                         m_SelectedRow;
+  itk::SmartPointer<mitk::USZonesInteractor>  m_Interactor;
+  mitk::DataStorage::Pointer                  m_DataStorage;
+  mitk::DataNode::Pointer                     m_BaseNode;
 
 private:
   Ui::QmitkUSZoneManagementWidget* ui;
+
+  unsigned int m_CurMaxNumOfZones;
 };
 
 #endif // QMITKUSZONEMANAGEMENTWIDGET_H

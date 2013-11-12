@@ -61,6 +61,7 @@ void USNavigation::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_BtnLoadCalibration, SIGNAL(clicked()), this, SLOT(OnLoadCalibration()) );
   // Zones
   connect( m_Controls.m_BtnFreeze, SIGNAL(clicked()), this, SLOT(OnFreeze()) );
+  connect( m_Controls.m_ZonesWidget, SIGNAL(ZoneAdded()), this, SLOT(OnZoneAdded()) );
   // Navigation
   connect( m_Controls.m_BtnStartIntervention, SIGNAL(clicked ()), this, SLOT(OnStartIntervention()) );
   connect( m_Controls.m_BtnReset, SIGNAL(clicked ()), this, SLOT(OnReset()) );
@@ -444,6 +445,10 @@ void USNavigation::OnFreeze()
   {
     m_Controls.m_ZonesWidget->OnStartAddingZone();
   }
+  else
+  {
+    m_Controls.m_ZonesWidget->OnAbortAddingZone();
+  }
 }
 
 void USNavigation::OnReset()
@@ -474,4 +479,13 @@ void USNavigation::OnNeedleViewToggle()
   mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode("Needle Path");
   if ( node.IsNotNull() )
     node->SetVisibility( ! m_IsNeedleViewActive );
+}
+
+void USNavigation::OnZoneAdded()
+{
+  if ( m_Freeze )
+  {
+    m_Controls.m_BtnFreeze->setChecked(false);
+    m_Freeze = false;
+  }
 }

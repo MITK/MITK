@@ -10,9 +10,12 @@
 #include "usModule.h"
 #include "mitkGlobalInteraction.h"
 
+#include <QLatin1Char>
+
 QmitkUSZoneManagementWidget::QmitkUSZoneManagementWidget(QWidget *parent) :
     QWidget(parent), m_ZonesDataModel(new QmitkUSZonesDataModel(this)),
-    m_SelectedRow(-1), ui(new Ui::QmitkUSZoneManagementWidget)
+    m_Interactor(mitk::USZonesInteractor::New()),
+    ui(new Ui::QmitkUSZoneManagementWidget), m_CurMaxNumOfZones(0)
 {
   ui->setupUi(this);
   ui->CurrentZonesTable->setModel(m_ZonesDataModel);
@@ -24,6 +27,12 @@ QmitkUSZoneManagementWidget::QmitkUSZoneManagementWidget(QWidget *parent) :
            this, SLOT(OnSelectionChanged(const QItemSelection&, const QItemSelection&)));
   connect (m_ZonesDataModel, SIGNAL(rowsInserted(const QModelIndex&, int, int )),
            this, SLOT(OnRowInsertion(QModelIndex,int,int)));
+  connect (m_ZonesDataModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+           this, SLOT(OnDataChanged(const QModelIndex&, const QModelIndex&)));
+
+  // load state machine and event config for data interactor
+  m_Interactor->LoadStateMachine("USZoneInteractions.xml", us::ModuleRegistry::GetModule("MitkUSNavigation"));
+  m_Interactor->SetEventConfig("globalConfig.xml");
 }
 
 QmitkUSZoneManagementWidget::~QmitkUSZoneManagementWidget()
@@ -49,13 +58,6 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkUSZoneManagementWidget::GetZo
   return m_DataStorage->GetDerivations(m_BaseNode);
 }
 
-/*void QmitkUSZoneManagementWidget::AddRow()
-{
-  m_ZonesDataModel->insertRow(m_ZonesDataModel->rowCount());
-  m_ZonesDataModel->setData(m_ZonesDataModel->index(m_ZonesDataModel->rowCount()-1,1), 5);
-  m_ZonesDataModel->setData(m_ZonesDataModel->index(m_ZonesDataModel->rowCount()-1,2), "Red");
-}*/
-
 void QmitkUSZoneManagementWidget::RemoveSelectedRows()
 {
   QItemSelectionModel* selectionModel = ui->CurrentZonesTable->selectionModel();
@@ -79,15 +81,22 @@ void QmitkUSZoneManagementWidget::RemoveSelectedRows()
 
 void QmitkUSZoneManagementWidget::OnStartAddingZone()
 {
+  // workaround for bug 16407
   m_Interactor = mitk::USZonesInteractor::New();
   m_Interactor->LoadStateMachine("USZoneInteractions.xml", us::ModuleRegistry::GetModule("MitkUSNavigation"));
   m_Interactor->SetEventConfig("globalConfig.xml");
 
   mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
-  dataNode->SetName("Zone");
+  // zone number is added to zone name (padding one zero)
+  dataNode->SetName((QString("Zone ")+QString("%1").arg(m_CurMaxNumOfZones+1, 2, 10, QLatin1Char('0'))).toStdString());
   dataNode->SetColor(1, 0, 0);
   m_DataStorage->Add(dataNode, m_BaseNode);
   m_Interactor->SetDataNode(dataNode);
+}
+
+void QmitkUSZoneManagementWidget::OnAbortAddingZone()
+{
+  m_DataStorage->Remove(m_Interactor->GetDataNode());
 }
 
 void QmitkUSZoneManagementWidget::OnResetZones()
@@ -98,32 +107,43 @@ void QmitkUSZoneManagementWidget::OnResetZones()
 
 void QmitkUSZoneManagementWidget::OnSelectionChanged(const QItemSelection & selected, const QItemSelection & /*deselected*/)
 {
-  bool somethingSelected = ! selected.empty();
+  bool somethingSelected = ! selected.empty() && m_ZonesDataModel->rowCount() > 0;
   ui->ZoneSizeLabel->setEnabled(somethingSelected);
   ui->ZoneSizeSlider->setEnabled(somethingSelected);
   ui->DeleteZoneButton->setEnabled(somethingSelected);
 
   if (somethingSelected)
   {
-    m_SelectedRow = selected.at(0).top();
     ui->ZoneSizeSlider->setValue(
-          m_ZonesDataModel->data(m_ZonesDataModel->index(m_SelectedRow, 1)).toInt());
-
-  }
-  else
-  {
-    m_SelectedRow = -1;
+          m_ZonesDataModel->data(m_ZonesDataModel->index(selected.at(0).top(), 1)).toInt());
   }
 }
 
 void QmitkUSZoneManagementWidget::OnZoneSizeSliderValueChanged(int value)
 {
-  if (m_SelectedRow < 0) { return; }
+  QItemSelectionModel* selection = ui->CurrentZonesTable->selectionModel();
+  if ( ! selection->hasSelection() ) { return; }
 
-  m_ZonesDataModel->setData(m_ZonesDataModel->index(m_SelectedRow, 1), value);
+  m_ZonesDataModel->setData(m_ZonesDataModel->index(selection->selectedRows().at(0).row(), 1), value);
 }
 
 void QmitkUSZoneManagementWidget::OnRowInsertion( const QModelIndex & /*parent*/, int /*start*/, int end )
 {
-  //ui->CurrentZonesTable->selectRow(end);
+  // increase zone number for unique names for every zone
+  m_CurMaxNumOfZones++;
+
+  ui->CurrentZonesTable->selectRow(end);
+  emit ZoneAdded();
+}
+
+void QmitkUSZoneManagementWidget::OnDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
+{
+  QItemSelectionModel* selection = ui->CurrentZonesTable->selectionModel();
+  if ( ! selection->hasSelection() || selection->selectedRows().size() < 1 ) { return; }
+
+  if ( selection->selectedRows().at(0) == topLeft )
+  {
+    ui->ZoneSizeSlider->setValue(
+          m_ZonesDataModel->data(m_ZonesDataModel->index(topLeft.row(), 1)).toInt());
+  }
 }

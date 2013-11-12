@@ -1,7 +1,6 @@
 <statemachine>
   <state name="start" startstate="true">
     <transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="radius">
-      <!--<transition event_class="MousePressEvent" target="radius">-->
       <action name="addCenter" />
     </transition>
   </state>
@@ -16,7 +15,5 @@
       <action name="abortCreation" />
     </transition>
   </state>
-   <state name="final">
-     <!-- dead state, nothing happens any more, once we reached this -->
-   </state>
+  <state name="final"><!-- final state in which nothing is done anymore --></state>
 </statemachine>

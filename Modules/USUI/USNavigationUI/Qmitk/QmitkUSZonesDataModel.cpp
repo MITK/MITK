@@ -60,6 +60,13 @@ void QmitkUSZonesDataModel::SetDataStorage(mitk::DataStorage::Pointer dataStorag
 
 void QmitkUSZonesDataModel::AddNode(const mitk::DataNode* node)
 {
+  // do not add nodes, which aren't fully created yet
+  bool boolValue;
+  if ( ! (node->GetBoolProperty("zone.created", boolValue) && boolValue) )
+  {
+    return;
+  }
+
   // get source node of given node and test if m_BaseNode is a source node
   mitk::DataStorage::SetOfObjects::ConstPointer sourceNodes = m_DataStorage->GetSources(node);
   mitk::DataStorage::SetOfObjects::ConstIterator baseNodeIt = sourceNodes->Begin();
@@ -68,11 +75,12 @@ void QmitkUSZonesDataModel::AddNode(const mitk::DataNode* node)
   // only nodes below m_BaseNode should be added to the model
   if ( baseNodeIt == sourceNodes->End() ) { return; }
 
-  this->insertRow(this->rowCount());
-  m_ZoneNodes.at(m_ZoneNodes.size()-1) = const_cast<mitk::DataNode*>(node);
+  int newRowIndex = this->rowCount();
+  this->insertRow(newRowIndex);
+  m_ZoneNodes.at(newRowIndex) = const_cast<mitk::DataNode*>(node);
 
-  /*mitk::DataStorage::SetOfObjects::ConstPointer zoneNodes =
-      m_DataStorage->GetSubset(mitk::NodePredicateSource::New(m_BaseNode, false, m_DataStorage));*/
+  // get row of the changed node and emit signal that the data of this row changed
+  emit dataChanged(this->index(newRowIndex, 0), this->index(newRowIndex, this->columnCount()));
 }
 
 void QmitkUSZonesDataModel::RemoveNode(const mitk::DataNode* node)
@@ -99,9 +107,18 @@ void QmitkUSZonesDataModel::RemoveNode(const mitk::DataNode* node)
 
 void QmitkUSZonesDataModel::ChangeNode(const mitk::DataNode* node)
 {
-
   DataNodeVector::iterator oldNodeIt = find (m_ZoneNodes.begin(), m_ZoneNodes.end(), node);
-  if (oldNodeIt == m_ZoneNodes.end()) { return; };
+  if (oldNodeIt == m_ZoneNodes.end())
+  {
+    // if node was not added yet, but it's creation is finished -> add it now
+    bool boolValue;
+    if ( node->GetBoolProperty("zone.created", boolValue) && boolValue )
+    {
+      this->AddNode(node);
+    }
+
+    return;
+  }
 
   // get row of the changed node and emit signal that the data of this row changed
   unsigned int row = oldNodeIt - m_ZoneNodes.begin();
@@ -194,7 +211,7 @@ QVariant QmitkUSZonesDataModel::data ( const QModelIndex& index, int role ) cons
       {
         QColor qColor(color[0] * 255, color[1] * 255, color[2] * 255);
 
-        if (qColor == Qt::green) { return QVariant("Green"); }
+        if (qColor == Qt::darkGreen) { return QVariant("Green"); }
         else if (qColor == Qt::red) { return QVariant("Red"); }
         else if (qColor == Qt::blue) { return QVariant("Blue"); }
         else if (qColor == Qt::yellow) { return QVariant("Yellow"); }
@@ -233,9 +250,12 @@ bool QmitkUSZonesDataModel::setData ( const QModelIndex & index, const QVariant 
     {
       curNode->SetFloatProperty(DataNodePropertySize, value.toFloat());
 
-      mitk::Point3D origin = curNode->GetData()->GetGeometry()->GetOrigin();
-      curNode->SetData(this->MakeSphere(value.toFloat()));
-      curNode->GetData()->GetGeometry()->SetOrigin(origin);
+      if (curNode->GetData() != 0)
+      {
+        mitk::Point3D origin = curNode->GetData()->GetGeometry()->GetOrigin();
+        curNode->SetData(this->MakeSphere(value.toFloat()));
+        curNode->GetData()->GetGeometry()->SetOrigin(origin);
+      }
 
       break;
     }

@@ -69,4 +69,8 @@ void QmitkDIAppPreprocessingReconstructionPerspective::CreateInitialLayout(berry
   bottomleft->AddView("org.mitk.views.odfdetails");
   lo2 = layout->GetViewLayout("org.mitk.views.odfdetails");
   lo2->SetCloseable(false);
+
+  bottomleft->AddView("org.mitk.views.denoisingview");
+  lo2 = layout->GetViewLayout("org.mitk.views.denoisingview");
+  lo2->SetCloseable(false);
 }

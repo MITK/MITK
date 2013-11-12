@@ -103,6 +103,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
     labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
     labelStatisticsFilter->Update();
     m_Deviations.SetElement(i, labelStatisticsFilter->GetSigma(1));
+    MITK_INFO << labelStatisticsFilter->GetSigma(1);
   }
 
   m_Pixels = 0;

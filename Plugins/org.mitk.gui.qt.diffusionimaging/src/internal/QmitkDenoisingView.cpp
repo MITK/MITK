@@ -22,13 +22,97 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDenoisingView.h"
 #include <mitkImageCast.h>
 
+QmitkDenoisingWorker::QmitkDenoisingWorker(QmitkDenoisingView *view)
+  : m_View(view)
+{
+
+}
+
+void QmitkDenoisingWorker::run()
+{
+  if (m_View->m_ImageNode.IsNotNull() && m_View->m_BrainMaskNode.IsNotNull())
+  {
+    switch (m_View->m_SelectedFilter)
+    {
+      case 0:
+      {
+        break;
+      }
+      case 1:
+      {
+        QmitkDenoisingView::DiffusionImageType::Pointer inImage = dynamic_cast<QmitkDenoisingView::DiffusionImageType*> (m_View->m_ImageNode->GetData());
+        QmitkDenoisingView::MaskImageType::Pointer imageMask = QmitkDenoisingView::MaskImageType::New();
+        mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_View->m_BrainMaskNode->GetData()), imageMask);
+
+        QmitkDenoisingView::NonLocalMeansDenoisingFilterType::Pointer denoisingFilter = QmitkDenoisingView::NonLocalMeansDenoisingFilterType::New();
+        denoisingFilter->SetNumberOfThreads(12);
+        denoisingFilter->SetInputImage(inImage->GetVectorImage());
+        denoisingFilter->SetInputMask(imageMask);
+        denoisingFilter->SetUseJointInformation(false);
+        denoisingFilter->SetVRadius(m_View->m_Controls->m_SpinBoxParameter1->value());
+        denoisingFilter->SetNRadius(m_View->m_Controls->m_SpinBoxParameter2->value());
+        denoisingFilter->Update();
+
+        QmitkDenoisingView::DiffusionImageType::Pointer image = QmitkDenoisingView::DiffusionImageType::New();
+        image->SetVectorImage(denoisingFilter->GetOutput());
+        image->SetB_Value(inImage->GetB_Value());
+        image->SetDirections(inImage->GetDirections());
+        image->InitializeFromVectorImage();
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( image );
+        QString name = m_View->m_ImageNode->GetName().c_str();
+
+        imageNode->SetName((name+"_NLMr").toStdString().c_str());
+        m_View->GetDefaultDataStorage()->Add(imageNode);
+
+        break;
+      }
+      case 2:
+      {
+        QmitkDenoisingView::DiffusionImageType::Pointer inImage = dynamic_cast<QmitkDenoisingView::DiffusionImageType*> (m_View->m_ImageNode->GetData());
+        QmitkDenoisingView::MaskImageType::Pointer imageMask = QmitkDenoisingView::MaskImageType::New();
+        mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_View->m_BrainMaskNode->GetData()), imageMask);
+
+        QmitkDenoisingView::NonLocalMeansDenoisingFilterType::Pointer denoisingFilter = QmitkDenoisingView::NonLocalMeansDenoisingFilterType::New();
+        denoisingFilter->SetNumberOfThreads(12);
+        denoisingFilter->SetInputImage(inImage->GetVectorImage());
+        denoisingFilter->SetInputMask(imageMask);
+        denoisingFilter->SetUseJointInformation(true);
+        denoisingFilter->SetVRadius(m_View->m_Controls->m_SpinBoxParameter1->value());
+        denoisingFilter->SetNRadius(m_View->m_Controls->m_SpinBoxParameter2->value());
+        denoisingFilter->Update();
+
+        QmitkDenoisingView::DiffusionImageType::Pointer image = QmitkDenoisingView::DiffusionImageType::New();
+        image->SetVectorImage(denoisingFilter->GetOutput());
+        image->SetB_Value(inImage->GetB_Value());
+        image->SetDirections(inImage->GetDirections());
+        image->InitializeFromVectorImage();
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( image );
+        QString name = m_View->m_ImageNode->GetName().c_str();
+
+        imageNode->SetName((name+"_NLMv").toStdString().c_str());
+        m_View->GetDefaultDataStorage()->Add(imageNode);
+
+        break;
+      }
+    }
+    m_View->m_DenoisingThread.quit();
+  }
+}
+
 const std::string QmitkDenoisingView::VIEW_ID = "org.mitk.views.denoisingview";
 
 QmitkDenoisingView::QmitkDenoisingView()
   : QmitkFunctionality()
   , m_Controls( 0 )
   , m_ImageNode(NULL)
+  , m_BrainMaskNode(NULL)
+  , m_DenoisingWorker(this)
+  , m_ThreadIsRunning(false)
 {
+  m_DenoisingWorker.moveToThread(&m_DenoisingThread);
+  connect(&m_DenoisingThread, SIGNAL(started()), &m_DenoisingWorker, SLOT(run()));
 }
 
 QmitkDenoisingView::~QmitkDenoisingView()
@@ -69,6 +153,9 @@ void QmitkDenoisingView::Activated()
 
 void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
+  if (m_ThreadIsRunning)
+    return;
+
   m_Controls->m_InputData->setTitle("Please Select Input Data");
   m_Controls->m_InputImageLabel->setText("<font color='red'>mandatory</font>");
   m_Controls->m_InputBrainMaskLabel->setText("<font color='red'>mandatory</font>");
@@ -110,6 +197,7 @@ void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes 
 
 void QmitkDenoisingView::StartDenoising()
 {
+//  m_DenoisingThread.start(QThread::HighestPriority);
   if (m_ImageNode.IsNotNull() && m_BrainMaskNode.IsNotNull())
   {
     switch (m_SelectedFilter)
@@ -248,4 +336,14 @@ void QmitkDenoisingView::SelectFilter(int filter)
   {
     m_Controls->m_ApplyButton->setEnabled(true);
   }
+}
+
+void QmitkDenoisingView::BeforeThread()
+{
+  m_ThreadIsRunning = true;
+}
+
+void QmitkDenoisingView::AfterThread()
+{
+  m_ThreadIsRunning = false;
 }

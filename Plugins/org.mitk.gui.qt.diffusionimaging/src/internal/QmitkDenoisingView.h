@@ -27,8 +27,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <mitkDiffusionImage.h>
 #include <itkNonLocalMeansDenoisingFilter.h>
+#include <QThread>
 
-//
+class QmitkDenoisingView;
+
+class QmitkDenoisingWorker : public QObject
+{
+  Q_OBJECT
+
+public:
+
+  QmitkDenoisingWorker(QmitkDenoisingView* view);
+
+public slots:
+
+  void run();
+
+private:
+
+  QmitkDenoisingView* m_View;
+};
 
 /*!
   \brief View displaying details of the orientation distribution function in the voxel at the current crosshair position.
@@ -63,21 +81,21 @@ protected slots:
 
   void StartDenoising();
   void SelectFilter(int filter);
+  void BeforeThread();
+  void AfterThread();
 
-protected:
+private:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
-
-
+  void ResetParameterPanel();
 
   Ui::QmitkDenoisingViewControls*  m_Controls;
-
-
   mitk::DataNode::Pointer m_ImageNode;
   mitk::DataNode::Pointer m_BrainMaskNode;
-
-private:
+  QmitkDenoisingWorker m_DenoisingWorker;
+  QThread m_DenoisingThread;
+  bool m_ThreadIsRunning;
 
   enum FilterType {
     NOFILTERSELECTED,
@@ -85,7 +103,7 @@ private:
     NLMV
   }m_SelectedFilter;
 
-  void ResetParameterPanel();
+  friend class QmitkDenoisingWorker;
 };
 
 

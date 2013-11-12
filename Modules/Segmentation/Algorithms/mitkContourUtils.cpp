@@ -229,7 +229,7 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
           vtkSmartPointer<vtkXMLPolyDataWriter>::New();
 
       polyDataWriter->SetInput(surface2D);
-      polyDataWriter->SetFileName("/home/lars/TestingMethodeOutput/surface2D.vtp");
+      polyDataWriter->SetFileName("/mes/TestingMethodeOutput/surface2D.vtp");
       polyDataWriter->SetCompressorTypeToNone();
       polyDataWriter->SetDataModeToAscii();
       polyDataWriter->Write();
@@ -238,11 +238,12 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
       vtkSmartPointer<vtkImageData> whiteImage =
           vtkSmartPointer<vtkImageData>::New();
 
-//      whiteImage = sliceImage->GetVtkImageData();
+     //whiteImage = sliceImage->GetVtkImageData();
 
       //create a new image with the size of the surface
       double bounds[6];
-      surface2D->GetBounds(bounds);
+      sliceImage->GetVtkImageData()->GetBounds(bounds);
+      MITK_INFO << "Bounds: " << bounds[0] << " - " << bounds[1] << ", " << bounds[2] << " - " << bounds[3] << ", " << bounds[4] << " - " << bounds[5];
       double spacing[3];
       spacing[0] = sliceImage->GetGeometry()->GetSpacing()[0];
       spacing[1] = sliceImage->GetGeometry()->GetSpacing()[1];
@@ -261,9 +262,9 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
         whiteImage->SetDimensions(dim);
         whiteImage->SetExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, dim[2] - 1);
         double origin[3];
-        origin[0] = bounds[0];
-        origin[1] = bounds[2];
-        origin[2] = bounds[4];
+        origin[0] = sliceImage->GetGeometry()->GetOrigin()[0];
+        origin[1] = sliceImage->GetGeometry()->GetOrigin()[1];
+        origin[2] = sliceImage->GetGeometry()->GetOrigin()[2];
         whiteImage->SetOrigin(origin);
 
       //define the ImageType and allocate it
@@ -283,26 +284,10 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
       MITK_INFO << "ContourUtils-WhiteImage/spacing: " << whiteImage->GetSpacing()[0] << ", " << whiteImage->GetSpacing()[1] << ", " << whiteImage->GetSpacing()[2];
       MITK_INFO << "ContourUtils-WhiteImage/Dimension: " << whiteImage->GetDimensions()[0] << ", " << whiteImage->GetDimensions()[1] << ", " << whiteImage->GetDimensions()[2];
 
-      // sweep polygonal data (this is the important thing with contours!)
-      /*vtkSmartPointer<vtkLinearExtrusionFilter> extruder =
-          vtkSmartPointer<vtkLinearExtrusionFilter>::New();
-
-      extruder->SetInput(surface2D);
-      extruder->SetScaleFactor(1.0);
-      extruder->SetExtrusionTypeToNormalExtrusion();
-      extruder->SetVector(0, 0, 1);
-      extruder->Update();
-      */
-      polyDataWriter->SetInput(surface2D);
-      polyDataWriter->SetFileName("/home/lars/TestingMethodeOutput/extruderGetOutput.vtp");
-      polyDataWriter->SetCompressorTypeToNone();
-      polyDataWriter->SetDataModeToAscii();
-      polyDataWriter->Write();
-
       // polygonal data --> image stencil:
       vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc =
         vtkSmartPointer<vtkPolyDataToImageStencil>::New();
-      pol2stenc->SetTolerance(0); // important if extruder->SetVector(0, 0, 1) !!!
+      //pol2stenc->SetTolerance(0); // important if extruder->SetVector(0, 0, 1) !!!
       pol2stenc->SetInput(surface2D);
       pol2stenc->SetOutputOrigin(whiteImage->GetOrigin());
       pol2stenc->SetOutputSpacing(whiteImage->GetSpacing());
@@ -319,48 +304,22 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
       imgstenc->SetBackgroundValue(0);
       imgstenc->Update();
 
+      mitk::Image::Pointer mitkImage = mitk::Image::New();
+
+      //sliceImage->Initialize(imgstenc->GetOutput());
+      sliceImage->SetVolume(imgstenc->GetOutput()->GetScalarPointer());
+
+      //sliceImage = mitkImage;
+
       vtkSmartPointer<vtkMetaImageWriter> imageWriter =
       vtkSmartPointer<vtkMetaImageWriter>::New();
-      imageWriter->SetFileName("/home/lars/TestingMethodeOutput/BinaryImage.mhd");
+      imageWriter->SetFileName("/mes/TestingMethodeOutput/BinaryImage.mhd");
       imageWriter->SetInputConnection(imgstenc->GetOutputPort());
       imageWriter->Write();
 
-      mitk::Image::Pointer mitkImage = mitk::Image::New();
-
-      mitkImage->Initialize(sliceImage->GetVtkImageData());
-      //mitkImage->SetVolume(sliceImage->GetVtkImageData()->GetScalarPointer());
-      int* pixel = (int*)mitkImage->GetData();
-      int size = mitkImage->GetDimensions()[0]*mitkImage->GetDimensions()[1]*mitkImage->GetDimensions()[2];
-      MITK_INFO << "mitkImage size: " << size;
-      mitk::ImagePixelWriteAccessor<unsigned char, 2> pixelWriter;
-//      int* poin = (int*)imgstenc->GetOutput()->GetScalarPointer();
-//      for(int i = poin; i<size; ++i, ++poin)
-//      {
-//          *pixel[poin[i]]=222;
-//      }
-
-      for(int i=0; i<size; ++i, ++pixel)
-      {
-          //*pixel=0;
-          pixelWriter.SetPixelByIndex(pixel, 255);
-      }
-
-      MITK_INFO << "sliceImage Origin: " << sliceImage->GetGeometry()->GetOrigin();
-      MITK_INFO << "mitkImage Origin: " << mitkImage->GetGeometry()->GetOrigin();
-      MITK_INFO << "imgstenc->GetOutput Origin: " << imgstenc->GetOutput()->GetOrigin()[0] << ", " << imgstenc->GetOutput()->GetOrigin()[1] << ", " << imgstenc->GetOutput()->GetOrigin()[2];
-
-
-//      mitk::Image::Pointer mitkImage = mitk::Image::New();
-//      mitkImage->Initialize(whiteImage);
-//      mitkImage = imgstenc->GetOutput();
-
       mitk::ImageWriter::Pointer mitkWriter = mitk::ImageWriter::New();
-      mitkWriter->SetFileName("/home/lars/TestingMethodeOutput/mitkImage.mhd");
-      mitkWriter->SetInput(mitkImage);
-      mitkWriter->Write();
-      mitkWriter->Update();
 
-      mitkWriter->SetFileName("/home/lars/TestingMethodeOutput/sliceImage.mhd");
+      mitkWriter->SetFileName("/mes/TestingMethodeOutput/sliceImage.mhd");
       mitkWriter->SetInput(sliceImage);
       mitkWriter->Write();
       mitkWriter->Update();

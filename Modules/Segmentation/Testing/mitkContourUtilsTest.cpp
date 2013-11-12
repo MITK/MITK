@@ -36,20 +36,20 @@ See LICENSE.txt or http://www.mitk.org for details.
     mitk::Point3D p,p1,p2,p3;
 
 
-    p[0] = 0;
-    p[1] = 0;
+    p[0] = 50;
+    p[1] = 50;
     p[2] = 0;
 
-    p1[0] = 10;
-    p1[1] = 0;
+    p1[0] = 100;
+    p1[1] = 50;
     p1[2] = 0;
 
-    p2[0] = 10;
-    p2[1] = 10;
+    p2[0] = 100;
+    p2[1] = 100;
     p2[2] = 0;
 
-    p3[0] = 0;
-    p3[1] = 10;
+    p3[0] = 50;
+    p3[1] = 100;
     p3[2] = 0;
 
     contourModel->AddVertex(p);
@@ -61,7 +61,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     //Create Image out of nowhere
     mitk::Image::Pointer image = mitk::Image::New();
     mitk::PixelType pt = mitk::MakeScalarPixelType<int>();
-    unsigned int dim[]={11,11,3};
+    unsigned int dim[]={256,256,3};
 
     // Initialize image
     image->Initialize( pt, 3, dim);
@@ -81,7 +81,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     MITK_INFO << "ContourUtilsTest-EmptyImage/origin: " << image->GetGeometry()->GetOrigin();
     MITK_INFO << "ContourUtilsTest-EmptyImage/spacing: " << image->GetGeometry()->GetSpacing();
     MITK_INFO << "ContourUtilsTest-EmptyImage/Dimension: " << image->GetDimension();
-    if(mitk::IOUtil::SaveImage(image, "/home/lars/TestingMethodeOutput/testClassEmptyImage.mhd"))
+    if(mitk::IOUtil::SaveImage(image, "/mes/TestingMethodeOutput/testClassEmptyImage.mhd"))
         MITK_INFO << "Saved Image";
 
 
@@ -97,7 +97,10 @@ See LICENSE.txt or http://www.mitk.org for details.
     MITK_INFO << "ContourUtilsTest-SliceImage/origin: " << sliceImage->GetGeometry()->GetOrigin();
     MITK_INFO << "ContourUtilsTest-SliceImage/spacing: " << sliceImage->GetGeometry()->GetSpacing();
     MITK_INFO << "ContourUtilsTest-SliceImage/Dimension: " << sliceImage->GetDimension();
-    if(mitk::IOUtil::SaveImage(sliceImage, "/home/lars/TestingMethodeOutput/testClassSliceImage.mhd"))
+    double bounds[6];
+    sliceImage->GetVtkImageData()->GetBounds(bounds);
+    MITK_INFO << "mitkContourUtilsTest - SliceBounds: " << bounds[0] << " - " << bounds[1] << ", " << bounds[2] << " - " << bounds[3] << ", " << bounds[4] << " - " << bounds[5];
+    if(mitk::IOUtil::SaveImage(sliceImage, "/mes/TestingMethodeOutput/testClassSliceImage.mhd"))
         MITK_INFO << "Saved Image";
 
     //test FillContourInSlice

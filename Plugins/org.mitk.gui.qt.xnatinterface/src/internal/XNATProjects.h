@@ -58,6 +58,7 @@ public:
   XNATProjects();
   ~XNATProjects();
   static const std::string EDITOR_ID;
+  static const QString DOWNLOAD_PATH;
   void CreateQtPartControl(QWidget *parent);
   void SearchWithXmlFilePath(QString filepath);
 
@@ -94,6 +95,7 @@ protected:
 private:
   //QMap::QMap<QString, ctkXnatLoginProfile*> m_Profiles;
   QString ConvertFromXMLString(const Poco::XML::XMLString);
+  bool DownloadExists(QString filename);
 
   ctkXnatConnectionFactory* m_ConnectionFactory;
   ctkXnatConnection* m_Connection;

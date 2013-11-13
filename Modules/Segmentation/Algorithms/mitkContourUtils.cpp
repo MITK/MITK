@@ -54,6 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkImageData.h"
 #include "vtkSphereSource.h"
 #include "vtkVersion.h"
+#include "vtkImageLogic.h"
 
 #include <vtkCutter.h>
 #include <vtkPlane.h>
@@ -219,79 +220,30 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
       // that's our vtkPolyData-Surface
       vtkSmartPointer<vtkPolyData> surface2D = vtkSmartPointer<vtkPolyData>::New();
 
-      surface2D->SetPoints(surface->GetVtkPolyData()->GetPoints());
-      surface2D->SetLines(surface->GetVtkPolyData()->GetLines());
+      surface2D->SetPoints(surface->GetVtkPolyData(timeStep)->GetPoints());
+      surface2D->SetLines(surface->GetVtkPolyData(timeStep)->GetLines());
       surface2D->Modified();
       surface2D->Update();
-
-      //write the surface to disc
-      vtkSmartPointer<vtkXMLPolyDataWriter> polyDataWriter =
-          vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-
-      polyDataWriter->SetInput(surface2D);
-      polyDataWriter->SetFileName("/mes/TestingMethodeOutput/surface2D.vtp");
-      polyDataWriter->SetCompressorTypeToNone();
-      polyDataWriter->SetDataModeToAscii();
-      polyDataWriter->Write();
 
       // prepare the binary image's voxel grid
       vtkSmartPointer<vtkImageData> whiteImage =
           vtkSmartPointer<vtkImageData>::New();
-
-     //whiteImage = sliceImage->GetVtkImageData();
-
-      //create a new image with the size of the surface
-      double bounds[6];
-      sliceImage->GetVtkImageData()->GetBounds(bounds);
-      MITK_INFO << "Bounds: " << bounds[0] << " - " << bounds[1] << ", " << bounds[2] << " - " << bounds[3] << ", " << bounds[4] << " - " << bounds[5];
-      double spacing[3];
-      spacing[0] = sliceImage->GetGeometry()->GetSpacing()[0];
-      spacing[1] = sliceImage->GetGeometry()->GetSpacing()[1];
-      spacing[2] = sliceImage->GetGeometry()->GetSpacing()[2];
-      whiteImage->SetSpacing(spacing);
-
-      // compute dimensions
-        int dim[3];
-        for (int i = 0; i < 3; i++)
-          {
-          dim[i] = static_cast<int>(ceil((bounds[i * 2 + 1] - bounds[i * 2]) /
-              spacing[i])) + 1;
-          if (dim[i] < 1)
-            dim[i] = 1;
-          }
-        whiteImage->SetDimensions(dim);
-        whiteImage->SetExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, dim[2] - 1);
-        double origin[3];
-        origin[0] = sliceImage->GetGeometry()->GetOrigin()[0];
-        origin[1] = sliceImage->GetGeometry()->GetOrigin()[1];
-        origin[2] = sliceImage->GetGeometry()->GetOrigin()[2];
-        whiteImage->SetOrigin(origin);
-
-      //define the ImageType and allocate it
-      whiteImage->SetScalarTypeToUnsignedChar();
-      whiteImage->AllocateScalars();
+      whiteImage->DeepCopy(sliceImage->GetVtkImageData(timeStep));
 
       // fill the image with foreground voxels:
       unsigned char inval = 255;
       unsigned char outval = 0;
       vtkIdType count = whiteImage->GetNumberOfPoints();
       for (vtkIdType i = 0; i < count; ++i)
-        {
+      {
         whiteImage->GetPointData()->GetScalars()->SetTuple1(i, inval);
-        }
-
-      MITK_INFO << "ContourUtils-WhiteImage/origin: " << whiteImage->GetOrigin()[0] << ", " << whiteImage->GetOrigin()[1] << ", " << whiteImage->GetOrigin()[2];
-      MITK_INFO << "ContourUtils-WhiteImage/spacing: " << whiteImage->GetSpacing()[0] << ", " << whiteImage->GetSpacing()[1] << ", " << whiteImage->GetSpacing()[2];
-      MITK_INFO << "ContourUtils-WhiteImage/Dimension: " << whiteImage->GetDimensions()[0] << ", " << whiteImage->GetDimensions()[1] << ", " << whiteImage->GetDimensions()[2];
+      }
 
       // polygonal data --> image stencil:
       vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc =
         vtkSmartPointer<vtkPolyDataToImageStencil>::New();
       //pol2stenc->SetTolerance(0); // important if extruder->SetVector(0, 0, 1) !!!
       pol2stenc->SetInput(surface2D);
-      pol2stenc->SetOutputOrigin(whiteImage->GetOrigin());
-      pol2stenc->SetOutputSpacing(whiteImage->GetSpacing());
-      pol2stenc->SetOutputWholeExtent(whiteImage->GetExtent());
       pol2stenc->Update();
 
       // cut the corresponding white image and set the background:
@@ -304,25 +256,34 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
       imgstenc->SetBackgroundValue(0);
       imgstenc->Update();
 
-      mitk::Image::Pointer mitkImage = mitk::Image::New();
 
-      //sliceImage->Initialize(imgstenc->GetOutput());
-      sliceImage->SetVolume(imgstenc->GetOutput()->GetScalarPointer());
+      //Fill according to painting value
+      vtkSmartPointer<vtkImageLogic> booleanOperation = vtkSmartPointer<vtkImageLogic>::New();
 
-      //sliceImage = mitkImage;
+      booleanOperation->SetInput2(sliceImage->GetVtkImageData(timeStep));
+      booleanOperation->SetOperationToOr();
 
-      vtkSmartPointer<vtkMetaImageWriter> imageWriter =
-      vtkSmartPointer<vtkMetaImageWriter>::New();
-      imageWriter->SetFileName("/mes/TestingMethodeOutput/BinaryImage.mhd");
-      imageWriter->SetInputConnection(imgstenc->GetOutputPort());
-      imageWriter->Write();
+      if(paintingPixelValue == 1)
+      {
+        //COMBINE
+        //slice or stencil
+        booleanOperation->SetInput1(imgstenc->GetOutput());
+        booleanOperation->SetOperationToOr();
+      } else
+      {
+        //CUT
+        //slice and not(stencil)
+        vtkSmartPointer<vtkImageLogic> booleanOperationNOT = vtkSmartPointer<vtkImageLogic>::New();
+        booleanOperationNOT->SetInput1(imgstenc->GetOutput());
+        booleanOperationNOT->SetOperationToNot();
+        booleanOperationNOT->Update();
+        booleanOperation->SetInput1(booleanOperationNOT->GetOutput());
+        booleanOperation->SetOperationToAnd();
+      }
+      booleanOperation->Update();
 
-      mitk::ImageWriter::Pointer mitkWriter = mitk::ImageWriter::New();
-
-      mitkWriter->SetFileName("/mes/TestingMethodeOutput/sliceImage.mhd");
-      mitkWriter->SetInput(sliceImage);
-      mitkWriter->Write();
-      mitkWriter->Update();
+      //copy scalars to output image slice
+      sliceImage->SetVolume(booleanOperation->GetOutput()->GetScalarPointer());
 }
 
 template<typename TPixel, unsigned int VImageDimension>

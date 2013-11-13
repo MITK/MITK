@@ -915,11 +915,12 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
         clipper->SetClipFunction(plane);
         clipper->GenerateClipScalarsOn();
         clipper->GenerateClippedOutputOn();
+        clipper->Update();
         vtkSmartPointer<vtkPolyData> clipperout = clipper->GetClippedOutput();
         MITK_DEBUG << "end clipping";
 
         MITK_DEBUG << "init and update clipperoutput";
-        clipperout->GetPointData()->Initialize();
+//        clipperout->GetPointData()->Initialize();
 //        clipperout->Update(); //VTK6_TODO
         MITK_DEBUG << "init and update clipperoutput completed";
 

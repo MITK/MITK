@@ -600,7 +600,6 @@ void mitk::PointSetVtkMapper3D::CreateContour()
   vtkSmartPointer<vtkPolyData> contour = vtkSmartPointer<vtkPolyData>::New();
   contour->SetPoints(points);
   contour->SetLines(polys);
-//  contour->Update(); //VTK6_TODO pipeline changes
 
   vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
   tubeFilter->SetNumberOfSides( 12 );

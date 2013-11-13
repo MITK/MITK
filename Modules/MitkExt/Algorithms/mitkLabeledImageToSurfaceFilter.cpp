@@ -197,6 +197,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
   skinExtractor->SetValue(0, 50);
 
   vtkPolyData *polydata;
+  skinExtractor->Update();
   polydata = skinExtractor->GetOutput();
   polydata->Register(NULL);//RC++
   skinExtractor->Delete();
@@ -214,6 +215,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     smoother->SetConvergence( 0 );
 
     polydata->Delete();//RC--
+    smoother->Update();
     polydata = smoother->GetOutput();
     polydata->Register(NULL);//RC++
     smoother->Delete();
@@ -235,13 +237,11 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     decimate->SetMaximumError(0.002);
 
     polydata->Delete();//RC--
+    decimate->Update();
     polydata = decimate->GetOutput();
     polydata->Register(NULL);//RC++
     decimate->Delete();
   }
-
-//  polydata->Update(); //VTK6_TODO
-//  polydata->SetSource(NULL);
 
   if(polydata->GetNumberOfPoints() > 0)
   {

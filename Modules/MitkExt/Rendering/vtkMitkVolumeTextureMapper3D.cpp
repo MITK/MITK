@@ -441,7 +441,7 @@ int vtkMitkVolumeTextureMapper3D::UpdateColorLookup( vtkVolume *vol )
 
   // Get the image data
   vtkImageData *input = this->GetInput();
-//  input->Update(); //VTK6_TODO
+  Update();
 
   // Has the volume changed in some way?
   if ( this->SavedParametersInput != input ||

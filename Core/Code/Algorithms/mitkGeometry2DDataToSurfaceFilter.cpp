@@ -153,8 +153,9 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       m_PlaneSource->SetPoint1( right[0], right[1], right[2] );
       m_PlaneSource->SetPoint2( bottom[0], bottom[1], bottom[2] );
 
+      m_PlaneSource->Update();
       planeSurface = m_PlaneSource->GetOutput();
-//      planeSurface->Update(); //VTK6_TODO vtk pipeline
+
     }
     else
     {

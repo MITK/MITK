@@ -153,7 +153,6 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
 
     m_Contour->SetPoints(points);
     m_Contour->SetLines(lines);
-//    m_Contour->Update(); //VTK6_TODO
 
     m_TubeFilter->SetInputData(m_Contour);
     m_TubeFilter->SetRadius(pointSize / 2.0f);

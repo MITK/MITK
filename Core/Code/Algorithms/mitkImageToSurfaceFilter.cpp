@@ -58,6 +58,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   skinExtractor->SetValue(0, threshold);
 
   vtkPolyData *polydata;
+  skinExtractor->Update();
   polydata = skinExtractor->GetOutput();
   polydata->Register(NULL);//RC++
   skinExtractor->Delete();
@@ -113,10 +114,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     decimate->Delete();
   }
 
-//  polydata->Update(); //VTK6_TODO vtk pipeline
   ProgressBar::GetInstance()->Progress();
-
-//  polydata->SetSource(NULL); //VTK6_TODO vtk pipeline
 
   if(polydata->GetNumberOfPoints() > 0)
   {

@@ -443,10 +443,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             model->SetSeed(8111984);
         }
 
-    // TEMP
-    //vtkTransform* transform; transform->RotateX();
-    FiberBundleType fiberBundleTransformed = fiberBundle->GetDeepCopy();
-
+    FiberBundleType fiberBundleTransformed = fiberBundle;
     for (int g=0; g<m_FiberModels.at(0)->GetNumGradients(); g++)
     {
         vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundleTransformed->GetFiberPolyData();

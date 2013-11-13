@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 
 using namespace mitk;
+
 /**
  * Perform Q-ball reconstruction using a spherical harmonics basis
  */
@@ -41,6 +42,7 @@ int QballReconstruction(int argc, char* argv[])
     parser.addArgument("lambda", "r", ctkCommandLineParser::Float, "ragularization factor lambda", 0.006, true);
     parser.addArgument("csa", "csa", ctkCommandLineParser::Bool, "use constant solid angle consideration");
     parser.addArgument("outputCoeffs", "shc", ctkCommandLineParser::Bool, "output file containing the SH coefficients");
+    parser.addArgument("mrtrix", "mb", ctkCommandLineParser::Bool, "use MRtrix compatible spherical harmonics definition");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -70,6 +72,10 @@ int QballReconstruction(int argc, char* argv[])
     if (parsedArgs.count("outputCoeffs"))
         outCoeffs = us::any_cast<bool>(parsedArgs["outputCoeffs"]);
 
+    bool mrTrix = false;
+    if (parsedArgs.count("mrtrix"))
+        mrTrix = us::any_cast<bool>(parsedArgs["mrtrix"]);
+
     try
     {
         RegisterDiffusionCoreObjectFactory();
@@ -96,6 +102,7 @@ int QballReconstruction(int argc, char* argv[])
             filter->SetBValue(dwi->GetB_Value());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
+            filter->SetUseMrtrixBasis(mrTrix);
             if (normalization==0)
                 filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
             else
@@ -115,6 +122,7 @@ int QballReconstruction(int argc, char* argv[])
             filter->SetBValue(dwi->GetB_Value());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
+            filter->SetUseMrtrixBasis(mrTrix);
             if (normalization==0)
                 filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
             else
@@ -134,6 +142,7 @@ int QballReconstruction(int argc, char* argv[])
             filter->SetBValue(dwi->GetB_Value());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
+            filter->SetUseMrtrixBasis(mrTrix);
             if (normalization==0)
                 filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
             else
@@ -153,6 +162,7 @@ int QballReconstruction(int argc, char* argv[])
             filter->SetBValue(dwi->GetB_Value());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
+            filter->SetUseMrtrixBasis(mrTrix);
             if (normalization==0)
                 filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
             else
@@ -173,6 +183,7 @@ int QballReconstruction(int argc, char* argv[])
             filter->SetBValue(dwi->GetB_Value());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
+            filter->SetUseMrtrixBasis(mrTrix);
             if (normalization==0)
                 filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
             else

@@ -129,6 +129,7 @@ set(H_FILES
   Algorithms/itkMrtrixPeakImageConverter.h
   Algorithms/itkFslPeakImageConverter.h
   Algorithms/itkShCoefficientImageImporter.h
+  Algorithms/itkShCoefficientImageExporter.h
   Algorithms/itkOdfMaximaExtractionFilter.h
   Algorithms/itkResampleDwiImageFilter.h
   Algorithms/itkDwiGradientLengthCorrectionFilter.h

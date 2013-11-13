@@ -38,6 +38,7 @@ IF(BUILD_DiffusionMiniApps)
     FiberDirectionExtraction.cpp
     PeakExtraction.cpp
     PeaksAngularError.cpp
+    ExportShImage.cpp
   )
 
   # create an executable foreach tool (only one at the moment)

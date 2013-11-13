@@ -34,9 +34,31 @@ namespace mitk {
  * enables test methods to access individual parameters. You can also
  * invoke one method multiple times with different parameters.
  *
+ *
+ * The following simple example creates a single test.
+ *
+ * \code
+ * class MySimpleTestSuite : public mitk::TestFixture
+ * {
+ *   CPPUNIT_TEST_SUITE(MySimpleTestSuite);
+ *   MITK_TEST(FivePlusFiveTest);
+ *   CPPUNIT_TEST_SUITE_END();
+ *
+ * public:
+ *   void FivePlusFiveTest()
+ *   {
+ *      CPPUNIT_ASSERT(5+5=10);
+ *   }
+ * };
+ * MITK_TEST_SUITE_REGISTRATION(MySimpleTestSuite)
+ * \endcode
+ *
+ *
  * The following example creates a test class containing only
  * one test method, but the associated test suite contains three tests,
- * using different parameters for each call of the same method.
+ * using different parameters for each call of the same method. Use
+ * the macro MITK_PARAMETERIZED_TEST_1 only if you know what you are
+ * doing. If you are not sure, use MITK_TEST instead.
  *
  * \code
  * class MyTestSuite : public mitk::TestFixture

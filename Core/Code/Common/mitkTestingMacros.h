@@ -285,6 +285,9 @@ namespace mitk {
  *
  * @param TESTMETHOD The name of the member function test.
  * @param ARGS A std::vector<std::string> object containing test parameter.
+ *
+ * @note Use the macro MITK_PARAMETERIZED_TEST only if you know what
+ * you are doing. If you are not sure, use MITK_TEST instead.
  */
 #define MITK_PARAMETERIZED_TEST(TESTMETHOD, ARGS)              \
 {                                                              \
@@ -308,6 +311,12 @@ namespace mitk {
  * Use this macro after the CPPUNIT_TEST_SUITE() macro to add test cases
  * which need parameters from the command line.
  *
+ * @warning Use the macro MITK_PARAMETERIZED_CMD_LINE_TEST only
+ * if you know what you are doing. If you are not sure, use
+ * MITK_TEST instead. MITK_PARAMETERIZED_CMD_LINE_TEST is meant
+ * for migrating from ctest to CppUnit. If you implement new
+ * tests, the MITK_TEST macro will be sufficient.
+ *
  * @param TESTMETHOD The name of the member function test.
  */
 #define MITK_PARAMETERIZED_CMD_LINE_TEST(TESTMETHOD)           \
@@ -328,6 +337,9 @@ namespace mitk {
  * @param TESTMETHOD The name of the member function test.
  * @param arg1 A custom string parameter being passed to the fixture.
  *
+ * @note Use the macro MITK_PARAMETERIZED_TEST_1 only if you know what
+ * you are doing. If you are not sure, use MITK_TEST instead.
+ *
  * @see MITK_PARAMETERIZED_TEST
  */
 #define MITK_PARAMETERIZED_TEST_1(TESTMETHOD, arg1)            \
@@ -347,6 +359,9 @@ namespace mitk {
  *
  * @param TESTMETHOD The name of the member function test.
  * @param arg1 A custom string parameter being passed to the fixture.
+ *
+ * @note Use the macro MITK_PARAMETERIZED_TEST_2 only if you know what
+ * you are doing. If you are not sure, use MITK_TEST instead.
  *
  * @see MITK_PARAMETERIZED_TEST
  */

@@ -58,6 +58,7 @@ void QmitkHistogramJSWidget::AddJSObject()
 void QmitkHistogramJSWidget::resizeEvent(QResizeEvent* resizeEvent)
 {
   QWebView::resizeEvent(resizeEvent);
+  page()->mainFrame()->evaluateJavaScript("disconnectSignals()");
   this->reload();
 }
 

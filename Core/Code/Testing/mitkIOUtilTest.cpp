@@ -28,21 +28,24 @@ class mitkIOUtilTestSuite : public mitk::TestFixture
 
   CPPUNIT_TEST_SUITE(mitkIOUtilTestSuite);
   MITK_TEST(TestTempMethods);
-  MITK_PARAMETERIZED_TEST_1(TestLoadAndSaveImage, "Pic3D.nrrd");
-  MITK_PARAMETERIZED_TEST_1(TestLoadAndSavePointSet, "pointSet.mps");
-  MITK_PARAMETERIZED_TEST_1(TestLoadAndSaveSurface, "binary.stl");
+  MITK_TEST(TestLoadAndSaveImage);
+  MITK_TEST(TestLoadAndSavePointSet);
+  MITK_TEST(TestLoadAndSaveSurface);
   CPPUNIT_TEST_SUITE_END();
 
 private:
 
-  std::string testData;
+  std::string m_ImagePath;
+  std::string m_SurfacePath;
+  std::string m_PointSetPath;
 
 public:
 
-  void setUpParameter(const std::vector<std::string>& parameter)
+  void setUp()
   {
-    CPPUNIT_ASSERT(parameter.size() == 1);
-    testData = getTestDataFilePath(parameter[0]);
+    m_ImagePath = std::string(MITK_DATA_DIR) + "/" + "Pic3D.nrrd";
+    m_SurfacePath = std::string(MITK_DATA_DIR) + "/" + "binary.stl";
+    m_PointSetPath = std::string(MITK_DATA_DIR) + "/" + "pointSet.mps";
   }
 
   void TestTempMethods()
@@ -95,7 +98,7 @@ public:
 
   void TestLoadAndSaveImage()
   {
-    mitk::Image::Pointer img1 = mitk::IOUtil::LoadImage(testData);
+    mitk::Image::Pointer img1 = mitk::IOUtil::LoadImage(m_ImagePath);
     CPPUNIT_ASSERT( img1.IsNotNull());
 
     std::ofstream tmpStream;
@@ -125,7 +128,7 @@ public:
 
   void TestLoadAndSavePointSet()
   {
-    mitk::PointSet::Pointer pointset = mitk::IOUtil::LoadPointSet(testData);
+    mitk::PointSet::Pointer pointset = mitk::IOUtil::LoadPointSet(m_PointSetPath);
     CPPUNIT_ASSERT( pointset.IsNotNull());
 
     std::ofstream tmpStream;
@@ -150,7 +153,7 @@ public:
 
   void TestLoadAndSaveSurface()
   {
-    mitk::Surface::Pointer surface = mitk::IOUtil::LoadSurface(testData);
+    mitk::Surface::Pointer surface = mitk::IOUtil::LoadSurface(m_SurfacePath);
     CPPUNIT_ASSERT( surface.IsNotNull());
 
     std::ofstream tmpStream;

@@ -115,6 +115,7 @@ if(NOT MITK_VTK_Config_INCLUDED)
     vtkRenderingVolume
     vtkRenderingVolumeAMR
     vtkRenderingVolumeOpenGL
+    vtkGUISupportQtOpenGL
     vtksqlite
     vtksys
     vtkTestingRendering

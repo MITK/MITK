@@ -157,6 +157,7 @@ set(VTK_FOR_MITK_LIBRARIES
     vtkRenderingVolume
     vtkRenderingVolumeAMR
     vtkRenderingVolumeOpenGL
+    vtkGUISupportQtOpenGL
     vtksqlite
     vtksys
     vtkTestingRendering

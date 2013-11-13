@@ -86,6 +86,7 @@ if(NOT DEFINED VTK_DIR)
         -DModule_vtkGUISupportQtWebkit:BOOL=ON
         -DModule_vtkGUISupportQtSQL:BOOL=ON
         -DModule_vtkRenderingQt:BOOL=ON
+        -DVTK_MAKE_INSTANTIATORS:BOOL=ON
         ${additional_cmake_args}
      DEPENDS ${proj_DEPENDENCIES}
     )

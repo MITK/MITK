@@ -195,7 +195,8 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   if (!provisioningFile.empty())
   {
     BERRY_INFO(m_ConsoleLog) << "Using provisioning file: " << provisioningFile;
-    ProvisioningInfo provInfo(QString::fromStdString(provisioningFile));
+
+    ProvisioningInfo provInfo(QString::fromUtf8(provisioningFile.c_str()));
     foreach(QString pluginPath, provInfo.getPluginDirs())
     {
       ctkPluginFrameworkLauncher::addSearchPath(pluginPath);

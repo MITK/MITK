@@ -59,6 +59,8 @@ public:
   /** Smart pointer support */
   itkNewMacro(Self)
 
+  typedef itk::OptimizerParameters<double> ParametersType;
+
   /** Typedef for the transformation matrix, corresponds to the InternalMatrixType from ITK transforms */
   typedef vnl_matrix_fixed< double, 3, 3> TransformMatrixType;
 
@@ -162,6 +164,28 @@ public:
     }
   }
 
+  ParametersType GetLastRegistrationParameters()
+  {
+    if( m_EstimatedParameters == NULL )
+    {
+      mitkThrow() << "No parameters were estimated yet, call Update() first.";
+    }
+
+    unsigned int dim = 12;
+    if( !m_UseAffineTransform )
+      dim = 6;
+
+    ParametersType params(dim);
+
+    params.SetData( m_EstimatedParameters );
+    return params;
+  }
+
+  void SetInitialParameters( ParametersType& params )
+  {
+    m_InitialParameters = params;
+  }
+
   /**
    * @brief Control the interpolator used for resampling.
    *
@@ -210,6 +234,8 @@ protected:
 
   double* m_EstimatedParameters;
 
+  ParametersType m_InitialParameters;
+
   /** Control the verbosity of the regsitistration output */
   bool m_Verbose;
 
@@ -238,6 +264,7 @@ protected:
     if( m_CrossModalityRegistration )
     {
       metric = MMIMetricType::New();
+      //metric->SetNumberOfThreads( 6 );
     }
     else
     {
@@ -267,6 +294,10 @@ protected:
       initialParams[0] = initialParams[4] = initialParams[8] = 1;
     }
 
+    if( m_InitialParameters.Size() == paramDim )
+    {
+      initialParams = m_InitialParameters;
+    }
 
     typename FixedImageType::Pointer referenceImage = itkImage1;
     typename MovingImageType::Pointer movingImage = itkImage2;
@@ -348,7 +379,12 @@ protected:
     typename PyramidOptControlCommand<RegistrationType>::Pointer pyramid_observer =
         PyramidOptControlCommand<RegistrationType>::New();
 
-    registration->AddObserver( itk::IterationEvent(), pyramid_observer );
+
+    unsigned int pyramid_tag = 0;
+    if(m_Verbose)
+    {
+        pyramid_tag = registration->AddObserver( itk::IterationEvent(), pyramid_observer );
+    }
 
     try
     {
@@ -373,10 +409,17 @@ protected:
       m_EstimatedParameters[i] = finalParameters[i];
     }
 
+    MITK_INFO("Params") << optimizer->GetValue() << " :: " << finalParameters;
+
     // remove optimizer tag if used
     if( vopt_tag )
     {
       optimizer->RemoveObserver( vopt_tag );
+    }
+
+    if( pyramid_tag )
+    {
+      registration->RemoveObserver( pyramid_tag );
     }
 
 
@@ -432,6 +475,8 @@ protected:
     resampler->SetInterpolator( linear_interpolator );
     if( m_UseWindowedSincInterpolator )
       resampler->SetInterpolator( sinc_interpolator );
+
+    //resampler->SetNumberOfThreads(1);
 
     resampler->SetInput( itkImage );
     resampler->SetTransform( base_transform );

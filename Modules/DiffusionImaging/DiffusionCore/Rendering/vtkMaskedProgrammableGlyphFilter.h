@@ -98,7 +98,6 @@ protected:
   vtkMaskedProgrammableGlyphFilter();
   ~vtkMaskedProgrammableGlyphFilter();
 
-  virtual void Execute();
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
   vtkMaskPoints *MaskPoints;

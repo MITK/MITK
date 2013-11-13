@@ -57,6 +57,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCubeSource.h>
 #include <vtkPolyDataMapper.h>
 
+
 // Only with VTK 5.6 or above
 #if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
 
@@ -643,7 +644,7 @@ bool mitk::GPUVolumeMapper3D::InitRAY(mitk::BaseRenderer* renderer)
   ls->m_VolumeRAY->SetProperty( ls->m_VolumePropertyRAY );
   ls->m_VolumeRAY->VisibilityOn();
 
-  ls->m_MapperRAY->SetInput( this->m_UnitSpacingImageFilter->GetOutput() );
+  ls->m_MapperRAY->SetInputData( this->m_UnitSpacingImageFilter->GetOutput() );
 
   ls->m_raySupported = ls->m_MapperRAY->IsRenderSupported(renderer->GetRenderWindow(),ls->m_VolumePropertyRAY);
 

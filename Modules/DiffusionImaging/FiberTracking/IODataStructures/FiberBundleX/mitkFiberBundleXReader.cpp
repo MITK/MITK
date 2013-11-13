@@ -197,7 +197,7 @@ void FiberBundleXReader::GenerateOutputInformation()
                 fiberPolyData->SetLines(cellArray);
 
                 vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
-                cleaner->SetInput(fiberPolyData);
+                cleaner->SetInputData(fiberPolyData);
                 cleaner->Update();
                 fiberPolyData = cleaner->GetOutput();
 

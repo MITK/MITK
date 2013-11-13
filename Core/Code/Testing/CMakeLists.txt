@@ -48,6 +48,9 @@ mitkAddCustomModuleTest(mitkIOUtilTest mitkIOUtilTest #test for a randomly chose
 mitkAddCustomModuleTest(mitkLevelWindowManagerTest mitkLevelWindowManagerTest
                         ${MITK_DATA_DIR}/Pic3D.nrrd
 )
+mitkAddCustomModuleTest(mitkMultiComponentImageDataComparisonFilterTest mitkMultiComponentImageDataComparisonFilterTest
+                        ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg
+)
 
 
 if(MITK_ENABLE_RENDERING_TESTING) ### since the rendering test's do not run in ubuntu, yet, we build them only for other systems or if the user explicitly sets the variable MITK_ENABLE_RENDERING_TESTING

@@ -149,7 +149,9 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
 
           double val = 0.0;
           mitk::ImagePixelReadAccessor<unsigned char> readAccess(m_SegmentationBinaryImage);
-          val = readAccess.GetPixelByWorldCoordinates(worldCoord);
+          mitk::Index3D idx;
+          m_SegmentationBinaryImage->GetGeometry()->WorldToIndex(worldCoord, idx);
+          val = readAccess.GetPixelByIndexSafe(idx);
 
           if (val == 1.0)
           {

@@ -38,6 +38,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkMitkLevelWindowFilter.h"
 #include "vtkNeverTranslucentTexture.h"
 
+#include <mitkIShaderRepository.h>
+
 //VTK
 #include <vtkProperty.h>
 #include <vtkTransform.h>
@@ -683,6 +685,24 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataNodeFactory::m_TextureInterpolationActive ) );  // set to user configurable default value (see global options)
   node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
+
+  const char* dosePropertyKey = "dose";
+  bool isSet;
+
+  if(node->GetBoolProperty(dosePropertyKey,isSet)&&isSet)
+  {
+    node->SetName("ItWorks!");
+//    std::string m_VolumeDir = MITK_ROOT;
+//    m_VolumeDir += "../mbi/Plugins/org.mbi.gui.qt.tofoscopy";
+//    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );
+//    mitk::ShaderRepository::Pointer shaderRepository = mitk::ShaderRepository::GetGlobalShaderRepository();
+    mitk::CoreServicePointer<mitk::IShaderRepository> shadoRepo(mitk::CoreServices::GetShaderRepository());
+
+    std::string path = "~/mitkShaderTOF.xml"; //mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderTOF.xml");
+    MITK_INFO << "shader found under: " << path;
+    std::ifstream str(path.c_str());
+    shadoRepo->LoadShader(str,"mitkShaderTOF");
+  }
 
   mitk::RenderingModeProperty::Pointer renderingModeProperty = mitk::RenderingModeProperty::New();
   node->AddProperty( "Image Rendering.Mode", renderingModeProperty);

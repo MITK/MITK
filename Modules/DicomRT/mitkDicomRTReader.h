@@ -55,6 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNodeFactory.h>
 #include <itkGDCMSeriesFileNames.h>
 #include <mitkDicomSeriesReader.h>
+#include <DataStructures/mitkRTConstants.h>
 //######################################################
 
 #include "dcmtk/dcmrt/drtstrct.h"

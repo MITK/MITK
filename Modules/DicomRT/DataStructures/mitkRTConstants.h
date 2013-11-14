@@ -19,13 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <string>
 
-#include "RTSupportExports.h"
+#include "mitkDicomRTExports.h"
 
 namespace mitk
 {
   namespace rt
   {
-    struct RTSupport_EXPORT Constants
+    struct mitkDicomRT_EXPORT Constants
     {
       /**
       * Name of the property that indicates if a data/node is a dose.

@@ -528,6 +528,7 @@ namespace mitk
 
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetName("DicomRT Dosis");
+    node->SetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),true);
     node->SetProperty("Image Rendering.Mode", renderingMode);
     node->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
     node->SetProperty("opacity", mitk::FloatProperty::New(0.3));

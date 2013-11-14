@@ -35,6 +35,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurface.h>
 #include <mitkIOUtil.h>
 
+#include <mitkStandardFileLocations.h>
+#include <mitkCoreServices.h>
+
 #include <fstream>
 
 class vtkActor;

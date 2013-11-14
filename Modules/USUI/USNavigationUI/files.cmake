@@ -20,5 +20,6 @@ set(MOC_H_FILES
 )
 
 set(QRC_FILES
+  ../resources/USUI.qrc
   resources/USNavigationUI.qrc
 )

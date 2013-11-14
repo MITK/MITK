@@ -86,15 +86,15 @@
       <string>&amp;Delete Selected Zone</string>
      </property>
      <property name="icon">
-      <iconset resource="../resources/USNavigationUI.qrc">
-       <normaloff>:/USNavigationUI/117.png</normaloff>:/USNavigationUI/117.png</iconset>
+      <iconset resource="../../resources/USUI.qrc">
+       <normaloff>:/USUI/minus.png</normaloff>:/USUI/minus.png</iconset>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
  <resources>
-  <include location="../resources/USNavigationUI.qrc"/>
+  <include location="../../resources/USUI.qrc"/>
  </resources>
  <connections>
   <connection>

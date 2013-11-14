@@ -1,8 +1,13 @@
 <RCC>
     <qresource prefix="/USUI">
+        <file>clock.png</file>
         <file>go-next.png</file>
         <file>go-previous.png</file>
         <file>zoom-in.png</file>
         <file>zoom-out.png</file>
+        <file>plus.png</file>
+        <file>minus.png</file>
+        <file>restart.png</file>
+        <file>star.png</file>
     </qresource>
 </RCC>

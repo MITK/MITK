@@ -112,13 +112,14 @@ public:
 
   /** Get the number of gaussian functions in the output image */
   virtual unsigned int GetNumberOfGaussians() const;
-
+  /** Set the number of gaussian function*/
   virtual void SetNumberOfGausssians( unsigned int );
   /** Set/Get the radius of the sphere */
   virtual const RadiusType GetRadius() const;
   virtual void  SetRadius( RadiusType  radius );
   /** Set/Get the number of steps to traverse the radius of the sphere */
   virtual const  int GetRadiusStepNumber() const;
+  /** Set the number of steps to traverse the radius */
   virtual void  SetRadiusStepNumber( unsigned int stepNumber );
   /** Get the maximal mean value in a sphere over all possible spheres with midpoint in the image */
   virtual const double GetMaxMeanValue() const;
@@ -129,9 +130,24 @@ public:
   /** Adds a multigaussian defined by the parameter: CenterX, CenterY, CenterZ, SigmaX, SigmaY, SigmaZ, Altitude.
    All parameters should have the same size, which determinates the number of the gaussian added. */
   virtual void AddGaussian( VectorType, VectorType, VectorType, VectorType, VectorType, VectorType, VectorType);
-   /** Calculates and set the index of the midpoint of the sphere with the maximal mean value as well as the mean value*/
+  /** Calculates and set the index of the midpoint of the sphere with the maximal mean value as well as the mean value*/
   virtual void CalculateMidpointAndMeanValue();
-
+  /** Calculates and set the index an the value of maximulm and minimum in the wanted sphere*/
+  virtual void CalculateMaxAndMinInSphere();
+  /** Get the index in the sphere with maximal value*/
+  virtual const ItkVectorType GetMaxValueIndexInSphere() const;
+  /** Get the maximal value in the sphere*/
+  virtual const double GetMaxValueInSphere() const;
+  /** Get the index in the sphere with minimal value*/
+  virtual const ItkVectorType GetMinValueIndexInSphere() const;
+  /** Get the minimal value in the sphere*/
+  virtual const double GetMinValueInSphere() const;
+  /** Set the region of interest */
+  virtual void SetRegionOfInterest(ItkVectorType, ItkVectorType);
+  /** Optimize the mean value in the wanted sphere*/
+  virtual void OptimizeMeanValue();
+  /** Check whether the point is in the region of interest */
+  virtual const bool IsInRegionOfInterest(unsigned int, unsigned int, unsigned int);
   /** Set the minimum possible pixel value. By default, it is
    * NumericTraits<TOutputImage::PixelType>::min(). */
   itkSetClampMacro( Min, OutputImagePixelType,
@@ -165,26 +181,29 @@ private:
   MultiGaussianImageSource(const MultiGaussianImageSource &); //purposely not implemented
   void operator=(const MultiGaussianImageSource &);    //purposely not implemented
 
-  SizeType              m_Size;               //size of the output image
-  SpacingType           m_Spacing;            //spacing
-  PointType             m_Origin;             //origin
-
-
-  unsigned int          m_NumberOfGaussians; //number of Gaussians
-  RadiusType            m_Radius;            //radius of the sphere
-  unsigned int          m_RadiusStepNumber;  //number of steps to traverse the sphere radius
-  OutputImagePixelType  m_MeanValue;         //mean value in the wanted sphere
-  ItkVectorType         m_SphereMidpoint;    //midpoint of the wanted sphere
-  VectorType            m_SigmaX;            //deviation in the x-axis
-  VectorType            m_SigmaY;            //deviation in the y-axis
-  VectorType            m_SigmaZ;            //deviation in the z-axis
-  VectorType            m_CenterX;           //x-coordinate of the mean value of Gaussians
-  VectorType            m_CenterY;           //y-coordinate of the mean value of Gaussians
-  VectorType            m_CenterZ;           //z-coordinate of the mean value of Gaussians
-  VectorType            m_Altitude;          //amplitude
-
-  typename TOutputImage::PixelType m_Min; //minimum possible value
-  typename TOutputImage::PixelType m_Max; //maximum possible value
+  SizeType              m_Size;                  //size of the output image
+  SpacingType           m_Spacing;               //spacing
+  PointType             m_Origin;                //origin
+  OutputImagePixelType  m_MaxValueInSphere;      //maximal value in the wanted sphere
+  ItkVectorType         m_MaxValueIndexInSphere; //index of the maximal value in the wanted sphere
+  OutputImagePixelType  m_MinValueInSphere;      //minimal value in the wanted sphere
+  ItkVectorType         m_MinValueIndexInSphere; //index of the minimal value in the wanted sphere
+  unsigned int          m_NumberOfGaussians;     //number of Gaussians
+  RadiusType            m_Radius;                //radius of the sphere
+  unsigned int          m_RadiusStepNumber;      //number of steps to traverse the sphere radius
+  OutputImagePixelType  m_MeanValue;             //mean value in the wanted sphere
+  ItkVectorType         m_SphereMidpoint;        //midpoint of the wanted sphere
+  VectorType            m_SigmaX;                //deviation in the x-axis
+  VectorType            m_SigmaY;                //deviation in the y-axis
+  VectorType            m_SigmaZ;                //deviation in the z-axis
+  VectorType            m_CenterX;               //x-coordinate of the mean value of Gaussians
+  VectorType            m_CenterY;               //y-coordinate of the mean value of Gaussians
+  VectorType            m_CenterZ;               //z-coordinate of the mean value of Gaussians
+  VectorType            m_Altitude;              //amplitude
+  ItkVectorType         m_RegionOfInterestMax;   // maximal values for the coordinates in the region of interest
+  ItkVectorType         m_RegionOfInterestMin;   // minimal values for the coordinates in the region of interest
+  typename TOutputImage::PixelType m_Min;        //minimum possible value
+  typename TOutputImage::PixelType m_Max;        //maximum possible value
 
   // The following variables are deprecated, and provided here just for
   // backward compatibility. It use is discouraged.

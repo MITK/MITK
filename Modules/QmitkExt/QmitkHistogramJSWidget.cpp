@@ -58,6 +58,8 @@ void QmitkHistogramJSWidget::AddJSObject()
 void QmitkHistogramJSWidget::resizeEvent(QResizeEvent* resizeEvent)
 {
   QWebView::resizeEvent(resizeEvent);
+
+  // workaround for Qt Bug: https://bugs.webkit.org/show_bug.cgi?id=75984
   page()->mainFrame()->evaluateJavaScript("disconnectSignals()");
   this->reload();
 }

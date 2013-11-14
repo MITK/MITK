@@ -25,7 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK
 //#include "mitkTransformationFileReader.h"
 #include <mitkBaseRenderer.h>
+#include <mitkIRenderingManager.h>
 #include <QmitkRenderWindow.h>
+#include <mitkDataStorage.h>
 
 // VTK
 #include <vtkSphereSource.h>
@@ -40,6 +42,11 @@ const std::string USNavigation::VIEW_ID = "org.mitk.views.usnavigation";
 void USNavigation::SetFocus()
 {
   //  m_Controls.buttonPerformImageProcessing->setFocus();
+}
+
+USNavigation::USNavigation()
+: m_ImageAlreadySetToNode(false)
+{
 }
 
 void USNavigation::CreateQtPartControl( QWidget *parent )
@@ -241,9 +248,19 @@ void USNavigation::Update()
     m_USDevice->Modified();
     m_USDevice->Update();
     mitk::Image::Pointer image = m_USDevice->GetOutput();
-    if (image.IsNotNull() && image->IsInitialized())
+    if ( ! m_ImageAlreadySetToNode && image.IsNotNull() && image->IsInitialized() )
     {
       m_USStream->SetData(image);
+      m_ImageAlreadySetToNode = true;
+
+      // make a reinit on the ultrasound image
+      mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+      if ( renderWindow != NULL && image->GetTimeGeometry()->IsValid() )
+      {
+        renderWindow->GetRenderingManager()->InitializeViews(
+          image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        renderWindow->GetRenderingManager()->RequestUpdateAll();
+      }
     }
     this->RequestRenderWindowUpdate();
   }

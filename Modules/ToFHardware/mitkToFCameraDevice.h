@@ -43,10 +43,17 @@ namespace mitk
 
     mitkClassMacro(ToFCameraDevice, itk::Object);
     /*!
-    \brief opens a connection to the ToF camera
+    \brief Opens a connection to the ToF camera. Has to be implemented
+    in the specialized inherited classes.
+    \return True for success.
     */
     virtual bool OnConnectCamera() = 0;
 
+    /**
+     * @brief ConnectCamera Internally calls OnConnectCamera() of the
+     * respective device implementation.
+     * @return True for success.
+     */
     virtual bool ConnectCamera();
     /*!
     \brief closes the connection to the camera
@@ -226,6 +233,9 @@ namespace mitk
 
   };
 } //END mitk namespace
-// This is the microservice declaration. Do not meddle!
+/**
+ToFCameraDevice is declared a MicroService interface. See
+MicroService documenation for more details.
+*/
 US_DECLARE_SERVICE_INTERFACE(mitk::ToFCameraDevice, "org.mitk.services.ToFCameraDevice")
 #endif

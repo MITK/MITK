@@ -52,7 +52,6 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   : mitk::ImageSource(),
   m_MultiThreader(itk::MultiThreader::New()),
   m_ImageMutex(itk::FastMutexLock::New()),
-  m_CameraActiveMutex(itk::FastMutexLock::New()),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
   m_UnregisteringStarted(false)
@@ -81,7 +80,6 @@ mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
   : mitk::ImageSource(),
   m_MultiThreader(itk::MultiThreader::New()),
   m_ImageMutex(itk::FastMutexLock::New()),
-  m_CameraActiveMutex(itk::FastMutexLock::New()),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
   m_UnregisteringStarted(false)
@@ -380,7 +378,10 @@ output->Graft( graft );
 
 void mitk::USDevice::GrabImage()
 {
-  this->SetImage(this->GetUSImageSource()->GetNextImage());
+  mitk::Image::Pointer image = this->GetUSImageSource()->GetNextImage();
+  m_ImageMutex->Lock();
+  this->SetImage(image);
+  m_ImageMutex->Unlock();
 }
 
 //########### GETTER & SETTER ##################//
@@ -414,21 +415,21 @@ std::string mitk::USDevice::GetDeviceComment(){
 
 void mitk::USDevice::GenerateData()
 {
-  MITK_INFO << "*** USDevice Update Start";
+  m_ImageMutex->Lock();
 
-  if ( m_Image.IsNull() || ! m_Image->IsInitialized() ) { return; }
+  if ( m_Image.IsNull() || ! m_Image->IsInitialized() ) { m_ImageMutex->Unlock(); return; }
 
   mitk::Image::Pointer output = this->GetOutput();
 
   if ( ! output->IsInitialized() )
   {
-    output->Initialize(m_Image);
+    output->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
   }
 
   mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(0,0,0));
   output->SetSlice(inputReadAccessor.GetData());
 
-  MITK_INFO << "*** USDevice Update End";
+  m_ImageMutex->Unlock();
 };
 
 std::string mitk::USDevice::GetServicePropertyLabel()

@@ -52,6 +52,8 @@ bool mitk::USZonesInteractor::AddCenter(mitk::StateMachineAction* , mitk::Intera
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == NULL) { return false; }
 
+  this->GetDataNode()->SetBoolProperty("zone.created", false);
+
   this->GetDataNode()->SetData(mitk::Surface::New());
 
   // set origin of the data node to the mouse click position
@@ -87,6 +89,7 @@ bool mitk::USZonesInteractor::ChangeRadius(mitk::StateMachineAction* , mitk::Int
 
 bool mitk::USZonesInteractor::EndCreation(mitk::StateMachineAction* , mitk::InteractionEvent* /*interactionEvent*/)
 {
+  this->GetDataNode()->SetBoolProperty("zone.created", true);
   return true;
 }
 

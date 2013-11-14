@@ -92,6 +92,8 @@ class USNavigation : public QmitkAbstractView
     */
     void OnNeedleViewToggle();
 
+    void OnZoneAdded();
+
     /**
     * \brief
     */

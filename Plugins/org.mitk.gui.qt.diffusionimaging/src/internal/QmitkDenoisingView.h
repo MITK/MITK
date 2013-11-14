@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImage.h>
 #include <itkNonLocalMeansDenoisingFilter.h>
 #include <QThread>
+#include <QTimer>
 
 class QmitkDenoisingView;
 
@@ -83,6 +84,7 @@ protected slots:
   void SelectFilter(int filter);
   void BeforeThread();
   void AfterThread();
+  void UpdateProgress();
 
 private:
 
@@ -96,6 +98,10 @@ private:
   QmitkDenoisingWorker m_DenoisingWorker;
   QThread m_DenoisingThread;
   bool m_ThreadIsRunning;
+  NonLocalMeansDenoisingFilterType::Pointer m_NonLocalMeansFilter;
+  DiffusionImageType::Pointer m_InputImage;
+  QTimer* m_DenoisingTimer;
+  unsigned int m_LastVoxelCount;
 
   enum FilterType {
     NOFILTERSELECTED,

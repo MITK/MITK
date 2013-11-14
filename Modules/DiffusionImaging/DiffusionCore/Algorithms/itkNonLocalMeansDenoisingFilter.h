@@ -30,6 +30,9 @@ This file is based heavily on a corresponding ITK filter.
 #include <itkChangeInformationImageFilter.h>
 #include <itkExtractImageFilter.h>
 #include <itkLabelStatisticsImageFilter.h>
+#include <itkInvertIntensityImageFilter.h>
+
+#include <itkStatisticsImageFilter.h>
 
 
 namespace itk{
@@ -62,14 +65,16 @@ namespace itk{
     typedef ChangeInformationImageFilter < MaskImageType > ChangeInformationType;
     typedef ExtractImageFilter < MaskImageType, MaskImageType > ExtractImageFilterType;
     typedef LabelStatisticsImageFilter < MaskImageType, MaskImageType > LabelStatisticsFilterType;
+    typedef InvertIntensityImageFilter < MaskImageType, MaskImageType > InvertImageFilterType;
+    typedef StatisticsImageFilter < MaskImageType > StatisticsFilterType;
 
     itkSetMacro(UseJointInformation, bool)
+    itkGetMacro(CurrentVoxelCount, unsigned int)
 
     void SetNRadius(unsigned int n);
     void SetVRadius(unsigned int v);
     void SetInputImage(const InputImageType* image);
     void SetInputMask(const MaskImageType* mask);
-    //void SetProgressbar(
 
   protected:
     NonLocalMeansDenoisingFilter();
@@ -84,7 +89,7 @@ namespace itk{
     VariableLengthVector< double > m_Deviations;
     bool m_UseJointInformation;
 
-    unsigned long m_Pixels;
+    unsigned int m_CurrentVoxelCount;
 
   private:
     void IndividualDenoising(const OutputImageRegionType &outputRegionForThread);

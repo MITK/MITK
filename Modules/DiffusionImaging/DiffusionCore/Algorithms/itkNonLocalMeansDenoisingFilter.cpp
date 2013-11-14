@@ -56,7 +56,15 @@ NonLocalMeansDenoisingFilter< TPixelType >
   typename ImageExtractorType::Pointer extractor = ImageExtractorType::New();
   extractor->SetInput(inImage);
 
+  typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
+  statisticsFilter->SetInput(mask);
+  statisticsFilter->Update();
+  typename InvertImageFilterType::Pointer inverter = InvertImageFilterType::New();
+  inverter->SetInput(mask);
+  inverter->SetMaximum(statisticsFilter->GetMaximum());
+  typename MaskImageType::Pointer invertedMask = inverter->GetOutput();
   typename MaskImageType::PointType imageOrigin = inImage->GetOrigin();
+  /// WHAT????
   typename MaskImageType::PointType maskOrigin = mask->GetOrigin();
   long offset[3];
 
@@ -86,7 +94,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
     adaptMaskFilter = ChangeInformationType::New();
     adaptMaskFilter->ChangeOriginOn();
     adaptMaskFilter->ChangeRegionOn();
-    adaptMaskFilter->SetInput( mask );
+    adaptMaskFilter->SetInput( invertedMask );
     adaptMaskFilter->SetOutputOrigin( extractor->GetOutput()->GetOrigin() /*image->GetOrigin()*/ );
     adaptMaskFilter->SetOutputOffset( offset );
     adaptMaskFilter->Update();
@@ -103,10 +111,9 @@ NonLocalMeansDenoisingFilter< TPixelType >
     labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
     labelStatisticsFilter->Update();
     m_Deviations.SetElement(i, labelStatisticsFilter->GetSigma(1));
-    MITK_INFO << labelStatisticsFilter->GetSigma(1);
   }
 
-  m_Pixels = 0;
+  m_CurrentVoxelCount = 0;
 }
 
 template< class TPixelType >
@@ -206,12 +213,12 @@ NonLocalMeansDenoisingFilter< TPixelType >
     }
     oit.Set(outpix);
     ++oit;
-    if (m_Pixels % 100 == 0)
-    {
-      MITK_INFO << m_Pixels << " Pixels";
-    }
+//    if (m_CurrentVoxelCount % 100 == 0)
+//    {
+//      MITK_INFO << m_CurrentVoxelCount << " Voxels";
+//    }
 
-    m_Pixels++;
+    ++m_CurrentVoxelCount;
     ++git;
   }
 

@@ -65,26 +65,6 @@ else \
   }
 
 ///
-/// an assert macro for throwing exceptions from an assert
-///
-#define endoAssert(a) if(!(a)) { \
-std::ostringstream s; \
-s << mitk::EndoDebug::GetInstance().GetFilenameWithoutExtension(__FILE__) << ", " \
-  << __LINE__ << ", failed: " << #a; \
-throw std::invalid_argument(s.str()); }
-
-///
-/// same as above but with an output error stream
-/// use it like this: endoAssertMsg( file.read() == true, file << "could not be read" );
-///
-#define endoAssertMsg(a, msg) if(!(a)) { \
-  std::ostringstream s; \
-  s << mitk::EndoDebug::GetInstance().GetFilenameWithoutExtension(__FILE__) << ", " \
-    << __LINE__ << ": " << msg; \
-  throw std::invalid_argument(s.str()); \
-  }
-
-///
 /// definition of the corresponding directory separator
 ///
 #ifdef WIN32

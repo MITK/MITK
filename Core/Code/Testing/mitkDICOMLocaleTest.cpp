@@ -79,22 +79,27 @@ private:
 
   char* m_OldLocale;
 
-public:
-
-  mitkDICOMLocaleTestSuite() : m_OldLocale(NULL) {}
-
-  void setUpParameter(const std::vector<std::string> &parameter)
+  void SetTestParameter()
   {
+    std::vector<std::string> parameter = GetTestParameter();
     CPPUNIT_ASSERT(parameter.size() == 2);
     m_FileName = getTestDataFilePath(parameter[0]);
     m_Locale = parameter[1];
   }
+
+public:
+
+  mitkDICOMLocaleTestSuite() : m_OldLocale(NULL) {}
+
+
 
   // Change the current locale to m_Locale
   void setUp()
   {
     m_SkipImageTest = false;
     m_OldLocale = NULL;
+    SetTestParameter();
+
     try
     {
       m_OldLocale = setlocale(LC_ALL, NULL);

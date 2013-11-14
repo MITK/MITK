@@ -51,8 +51,8 @@ public:
     , m_OwnFixture(true)
     , m_Fixture(new ParameterizedFixture())
     , m_Test(test)
-    , m_Parameter(globalCmdLineArgs)
   {
+    m_Fixture->m_Parameter = globalCmdLineArgs;
   }
 
   /**
@@ -69,8 +69,8 @@ public:
     , m_OwnFixture(false)
     , m_Fixture(&fixture)
     , m_Test(test)
-    , m_Parameter(globalCmdLineArgs)
   {
+    m_Fixture->m_Parameter = globalCmdLineArgs;
   }
 
   /**
@@ -87,8 +87,8 @@ public:
     , m_OwnFixture(true)
     , m_Fixture(fixture)
     , m_Test(test)
-    , m_Parameter(globalCmdLineArgs)
     {
+      m_Fixture->m_Parameter = globalCmdLineArgs;
     }
 
   /**
@@ -107,8 +107,8 @@ public:
     , m_OwnFixture(true)
     , m_Fixture(fixture)
     , m_Test(test)
-    , m_Parameter(param)
     {
+      m_Fixture->m_Parameter = param;
     }
 
   ~TestCaller()
@@ -124,10 +124,6 @@ public:
 
   void setUp()
   {
-    if (!m_Parameter.empty())
-    {
-      m_Fixture->setUpParameter(m_Parameter);
-    }
     m_Fixture->setUp();
   }
 
@@ -149,7 +145,6 @@ private:
   bool m_OwnFixture;
   ParameterizedFixture* m_Fixture;
   TestMethod m_Test;
-  std::vector<std::string> m_Parameter;
 };
 
 }

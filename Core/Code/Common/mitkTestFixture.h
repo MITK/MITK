@@ -35,7 +35,8 @@ namespace mitk {
  * invoke one method multiple times with different parameters.
  *
  *
- * The following simple example creates a single test.
+ * The following simple example creates a single test withoud custom
+ * parameters:
  *
  * \code
  * class MySimpleTestSuite : public mitk::TestFixture
@@ -47,7 +48,7 @@ namespace mitk {
  * public:
  *   void FivePlusFiveTest()
  *   {
- *      CPPUNIT_ASSERT(5+5=10);
+ *      CPPUNIT_ASSERT(5+5 == 10);
  *   }
  * };
  * MITK_TEST_SUITE_REGISTRATION(MySimpleTestSuite)
@@ -69,19 +70,15 @@ namespace mitk {
  *   MITK_PARAMETERIZED_TEST_1(TestSomething, "Three");
  *   CPPUNIT_TEST_SUITE_END();
  *
- * private:
- *   std::string testParam;
- *
  * public:
- *   void setUpParameter(const std::vector<std::string>& parameter)
- *   {
- *     CPPUNIT_ASSERT(parameter.size() == 1);
- *     testParam = parameter[0];
- *   }
  *
  *   void TestSomething()
  *   {
- *      MITK_INFO << "Parameter: " << testParam;
+ *     std::vector<std::string> parameter = GetTestParameter();
+ *     CPPUNIT_ASSERT(parameter.size() == 1);
+ *     std::string testParam = parameter[0];
+ *
+ *     MITK_INFO << "Parameter: " << testParam;
  *   }
  * };
  * MITK_TEST_SUITE_REGISTRATION(MyTestSuite)
@@ -93,25 +90,34 @@ namespace mitk {
 class TestFixture : public CppUnit::TestFixture
 {
 
-public:
+protected:
 
   /**
-   * \brief Set up parameters for this text fixture
+   * \brief Get parameters for this test fixture
    *
-   * This method is called for tests added via the MITK_PARAMETERZIED_TEST
-   * macro or one of its variants. You should override this method and
-   * set-up the test fixture using the supplied parameters.
+   * This method can be called in tests added via the MITK_PARAMETERIZED_TEST
+   * macro or one of its variants.
+   *
+   * \return The list of \c std::string parameters passed to previous calls
+   *         of the MITK_PARAMETERIZED_TEST macro or one of its variants.
    *
    */
-  virtual void setUpParameter(const std::vector<std::string>& parameter) {}
-
-protected:
+  std::vector<std::string> GetTestParameter() const
+  {
+    return m_Parameter;
+  }
 
   static std::string getTestDataFilePath(const std::string& testData)
   {
     if (itksys::SystemTools::FileIsFullPath(testData.c_str())) return testData;
     return std::string(MITK_DATA_DIR) + "/" + testData;
   }
+
+private:
+
+  template<class P> friend class TestCaller;
+
+  std::vector<std::string> m_Parameter;
 };
 
 }

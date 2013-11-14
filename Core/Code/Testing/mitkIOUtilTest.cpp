@@ -43,9 +43,9 @@ public:
 
   void setUp()
   {
-    m_ImagePath = std::string(MITK_DATA_DIR) + "/" + "Pic3D.nrrd";
-    m_SurfacePath = std::string(MITK_DATA_DIR) + "/" + "binary.stl";
-    m_PointSetPath = std::string(MITK_DATA_DIR) + "/" + "pointSet.mps";
+    m_ImagePath = getTestDataFilePath("Pic3D.nrrd");
+    m_SurfacePath = getTestDataFilePath("binary.stl");
+    m_PointSetPath = getTestDataFilePath("pointSet.mps");
   }
 
   void TestTempMethods()

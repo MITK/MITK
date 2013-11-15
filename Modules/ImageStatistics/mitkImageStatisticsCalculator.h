@@ -54,6 +54,12 @@ namespace mitk
  * switching back and forth between operation modes without modifying mask or
  * image, the information doesn't need to be recalculated.
  *
+ * The class also has the possibility to calculate minimum, maximum, mean
+ * and their corresponding indicies in the hottest spot in a given ROI / VOI.
+ * The size of the hotspot is defined by a sphere with a radius specified by
+ * the user. This procedure is required for the calculation of SUV-statistics
+ * in PET-images for example.
+ *
  * Note: currently time-resolved and multi-channel pictures are not properly
  * supported.
  */
@@ -159,18 +165,22 @@ public:
   /** \brief Get the pixel value for pixels that will be ignored in the statistics */
   double GetIgnorePixelValue();
 
-  /** \brief Set wether a pixel value should be ignored in the statistics */
+  /** \brief Set whether a pixel value should be ignored in the statistics */
   void SetDoIgnorePixelValue(bool doit);
 
-  /** \brief Get wether a pixel value will be ignored in the statistics */
+  /** \brief Get whether a pixel value will be ignored in the statistics */
   bool GetDoIgnorePixelValue();
 
+  /** \brief Sets the radius for the hotspot */
   void SetHotspotSize (double hotspotRadiusInMM);
 
+  /** \brief Returns the radius of the hotspot */
   double GetHotspotSize();
 
+  /** \brief Sets whether the hotspot should be calculated */
   void SetCalculateHotspot(bool calculateHotspot);
 
+  /** \brief Returns true whether the hotspot should be calculated, otherwise false */
   bool IsHotspotCalculated();
 
   /** \brief Compute statistics (together with histogram) for the current
@@ -196,11 +206,6 @@ public:
    */
   const Statistics &GetStatistics( unsigned int timeStep = 0, unsigned int label = 0 ) const;
 
-  /** \brief Retrieve statistics depending on the current masking mode.
-   * TODO: Kommentare anpassen!
-   * \param label The label for which to retrieve the statistics in multi-label situations (ascending order).
-   */
-  const Statistics &GetHotspotStatistics( unsigned int timeStep = 0, unsigned int label = 0 ) const;
 
   /** \brief Retrieve statistics depending on the current masking mode (for all image labels). */
   const StatisticsContainer &GetStatisticsVector( unsigned int timeStep = 0 ) const;
@@ -213,8 +218,6 @@ protected:
 
   typedef std::vector< itk::TimeStamp > TimeStampVectorType;
   typedef std::vector< bool > BoolVectorType;
-
-
 
   typedef itk::Image< unsigned short, 3 > MaskImage3DType;
   typedef itk::Image< unsigned short, 2 > MaskImage2DType;
@@ -262,6 +265,12 @@ protected:
     const itk::Image< TPixel, VImageDimension > *image,
     itk::Image< unsigned short, VImageDimension > *maskImage );
 
+ /** \brief Calculates minimum, maximum, mean value and their
+  * corresponding indices in a given ROI. As input the function
+  * needs an image, a mask and for limiting the searched value
+  * minimum- and maximum boundaries. The boundaries are set
+  * to the extent of float by default. It returns a
+  * MinMaxIndex-struct with the calculated values. */
   template <typename TPixel, unsigned int VImageDimension >
   MinMaxIndex CalculateMinMaxIndex(
     const itk::Image<TPixel, VImageDimension> *inputImage,
@@ -275,6 +284,12 @@ protected:
     itk::Image<unsigned short, VImageDimension> *maskImage,
     double radiusInMM);
 
+  /** \brief Calculates if a sphere is located within an image.
+   * As input the function needs an image for whose region should
+   * be check if the sphere is inside and an image of the sphere.
+   * To ensure speed only 14 points on the surface of the sphere
+   * are checked: six on the axis of coordinates and eight more.
+   * The functions returns true if every point is in the region. */
   template < typename TPixel, unsigned int VImageDimension>
   bool IsSphereInsideRegion(
     const itk::Image<TPixel, VImageDimension>  *inputImage,

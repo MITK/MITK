@@ -224,7 +224,7 @@ void UltrasoundCalibration::OnStartCalibrationProcess()
 
 void UltrasoundCalibration::OnStopCalibrationProcess()
 {
-  this->OnReset();
+  this->ClearTemporaryMembers();
 
   m_Timer->stop();
 
@@ -409,15 +409,7 @@ void UltrasoundCalibration::OnSaveCalibration()
 
 void UltrasoundCalibration::OnReset()
 {
-  m_CalibPointsTool->Clear();
-  m_CalibPointsImage->Clear();
-  m_CalibPointsCount = 0;
-
-  m_EvalPointsImage->Clear();
-  m_EvalPointsTool->Clear();
-  m_EvalPointsProjected->Clear();
-
-  this->m_Controls.m_CalibPointList->clear();
+  this->ClearTemporaryMembers();
 
   if ( m_Transformation.IsNull() ) { m_Transformation = mitk::AffineTransform3D::New(); }
 
@@ -527,6 +519,19 @@ void UltrasoundCalibration::ShowNeedlePath()
     node->SetBoolProperty("show contour", true);
     this->GetDataStorage()->Add(node);
   }
+}
+
+void UltrasoundCalibration::ClearTemporaryMembers()
+{
+  m_CalibPointsTool->Clear();
+  m_CalibPointsImage->Clear();
+  m_CalibPointsCount = 0;
+
+  m_EvalPointsImage->Clear();
+  m_EvalPointsTool->Clear();
+  m_EvalPointsProjected->Clear();
+
+  this->m_Controls.m_CalibPointList->clear();
 }
 
 vtkSmartPointer<vtkPolyData> UltrasoundCalibration::ConvertPointSetToVtkPolyData(mitk::PointSet::Pointer PointSet)

@@ -155,6 +155,11 @@ class UltrasoundCalibration : public QmitkAbstractView
     void ShowNeedlePath();
 
     /**
+     * \brief Clears all member attributes which are holding intermediate results for the calibration.
+     */
+    void ClearTemporaryMembers();
+
+    /**
     * \brief The combined modality used for imaging and tracking.
     */
     mitk::USCombinedModality::Pointer m_CombinedModality;

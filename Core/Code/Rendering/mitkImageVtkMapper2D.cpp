@@ -698,10 +698,13 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
 //    mitk::ShaderRepository::Pointer shaderRepository = mitk::ShaderRepository::GetGlobalShaderRepository();
     mitk::CoreServicePointer<mitk::IShaderRepository> shadoRepo(mitk::CoreServices::GetShaderRepository());
 
-    std::string path = "~/mitkShaderTOF.xml"; //mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderTOF.xml");
+    std::string path = "/home/riecker/mitkShaderLighting.xml"; //mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderTOF.xml");
+    std::string isoShaderName = "mitkIsoLineShader";
     MITK_INFO << "shader found under: " << path;
     std::ifstream str(path.c_str());
-    shadoRepo->LoadShader(str,"mitkShaderTOF");
+    shadoRepo->LoadShader(str,isoShaderName);
+
+    node->SetProperty("shader",mitk::ShaderProperty::New(isoShaderName));
   }
 
   mitk::RenderingModeProperty::Pointer renderingModeProperty = mitk::RenderingModeProperty::New();

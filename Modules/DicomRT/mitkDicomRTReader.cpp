@@ -438,6 +438,13 @@ namespace mitk
 
   mitk::DataNode::Pointer DicomRTReader::LoadRTDose(DcmDataset* dataset, char* filename)
   {
+//    mitk::CoreServicePointer<mitk::IShaderRepository> shadoRepo(mitk::CoreServices::GetShaderRepository());
+
+//    std::string path = "/home/riecker/mitkShaderLighting.xml"; //mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderTOF.xml");
+//    MITK_INFO << "shader found under: " << path;
+//    std::ifstream str(path.c_str());
+//    shadoRepo->LoadShader(str,"mitkIsoLineShader");
+
     std::string name = filename;
     itk::FilenamesContainer file;
     file.push_back(name);

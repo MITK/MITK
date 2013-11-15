@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkStandardFileLocations.h>
 #include <mitkCoreServices.h>
+#include <mitkShaderProperty.h>
 
 #include <fstream>
 

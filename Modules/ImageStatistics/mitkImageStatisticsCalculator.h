@@ -273,7 +273,7 @@ protected:
   Statistics CalculateHotspotStatistics(
     const itk::Image<TPixel, VImageDimension> *inputImage,
     itk::Image<unsigned short, VImageDimension> *maskImage,
-    double RadiusInMM);
+    double radiusInMM);
 
   template < typename TPixel, unsigned int VImageDimension>
   bool IsSphereInsideRegion(

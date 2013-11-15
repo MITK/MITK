@@ -369,7 +369,7 @@ struct mitkImageStatisticsHotspotTestClass
 
     for(int i = 0; i < 3; ++i)
     {
-      spacing[i] = 1.00;
+      spacing[i] = 1;
       start[i] = 0.00;
     }
 
@@ -381,6 +381,7 @@ struct mitkImageStatisticsHotspotTestClass
     region.SetIndex(start);
     region.SetSize(size);
 
+    mask->SetSpacing(spacing);
     mask->SetRegions(region);
     mask->Allocate();
 
@@ -483,6 +484,9 @@ struct mitkImageStatisticsHotspotTestClass
   }
 };
 
+
+#include <itkTimeProbe.h>
+
 /**
   \brief Verifies that TODO hotspot statistics part of ImageStatisticsCalculator.
 
@@ -499,11 +503,17 @@ int mitkImageStatisticsHotspotTest(int argc, char* argv[])
   mitk::Image::Pointer image = mitkImageStatisticsHotspotTestClass::BuildTestImage(parameters);
   MITK_TEST_CONDITION_REQUIRED( image.IsNotNull(), "Generate test image" );
 
+  itk::TimeProbe clock;
+  clock.Start();
+
   // calculate statistics for this image (potentially use parameters for statistics ROI)
   mitk::ImageStatisticsCalculator::Statistics statistics = mitkImageStatisticsHotspotTestClass::CalculateStatistics(image, parameters);
 
+  clock.Stop();
+  std::cout << "Statistics time consumed: " << clock.GetTotal() << std::endl;
   // compare statistics against stored expected values
   mitkImageStatisticsHotspotTestClass::ValidateStatistics(statistics, parameters);
+
 
   MITK_TEST_END()
 }

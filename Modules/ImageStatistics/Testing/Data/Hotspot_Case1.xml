@@ -1,21 +1,19 @@
 <testcase>
-  <!--
-    Test case 1:
-    oben links heller als dunkel (TODO!)
-  -->
-
-  <testimage
-    x="1.42"
-    y="2.32"
-    />
-
-  <roi
-    u="3.0"
-    v="4.0"
-    />
-
-  <statistics
-    u="9.0"
-    v="7.1"
-    />
+  <testimage image-rows="300" image-columns="300" image-slices="100" numberOfGaussians="13">
+    <gaussian centerIndexX="161" centerIndexY="89" centerIndexZ="69" deviationX="70" deviationY="72" deviationZ="45" altitude="46"/>
+    <gaussian centerIndexX="133" centerIndexY="144" centerIndexZ="12" deviationX="64" deviationY="45" deviationZ="59" altitude="103"/>
+    <gaussian centerIndexX="78" centerIndexY="40" centerIndexZ="36" deviationX="70" deviationY="41" deviationZ="46" altitude="177"/>
+    <gaussian centerIndexX="274" centerIndexY="60" centerIndexZ="42" deviationX="78" deviationY="57" deviationZ="46" altitude="166"/>
+    <gaussian centerIndexX="274" centerIndexY="195" centerIndexZ="68" deviationX="59" deviationY="78" deviationZ="46" altitude="67"/>
+    <gaussian centerIndexX="264" centerIndexY="167" centerIndexZ="69" deviationX="68" deviationY="65" deviationZ="77" altitude="30"/>
+    <gaussian centerIndexX="113" centerIndexY="221" centerIndexZ="18" deviationX="56" deviationY="56" deviationZ="40" altitude="176"/>
+    <gaussian centerIndexX="212" centerIndexY="108" centerIndexZ="54" deviationX="58" deviationY="62" deviationZ="59" altitude="31"/>
+    <gaussian centerIndexX="259" centerIndexY="46" centerIndexZ="60" deviationX="75" deviationY="64" deviationZ="64" altitude="132"/>
+    <gaussian centerIndexX="274" centerIndexY="145" centerIndexZ="8" deviationX="41" deviationY="56" deviationZ="69" altitude="32"/>
+    <gaussian centerIndexX="101" centerIndexY="217" centerIndexZ="48" deviationX="57" deviationY="76" deviationZ="64" altitude="27"/>
+    <gaussian centerIndexX="103" centerIndexY="156" centerIndexZ="85" deviationX="71" deviationY="62" deviationZ="71" altitude="35"/>
+    <gaussian centerIndexX="194" centerIndexY="285" centerIndexZ="53" deviationX="46" deviationY="72" deviationZ="51" altitude="62"/>
+  </testimage>
+  <roi maximumX="300" minimumX="0" maximumY="300" minimumY="0" maximumZ="100" minimumZ="0"/>
+  <statistic peakIndexX="252" peakIndexY="69" peakIndexZ="49"  peak="358.867" maximumIndexX="252" maximumIndexY="69" maximumIndexZ="49" maximum="359.949" minimumIndexX="251" minimumIndexY="70" minimumIndexZ="43" minimum="357.415"/>
 </testcase>

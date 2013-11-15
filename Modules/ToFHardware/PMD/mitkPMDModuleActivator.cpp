@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <usServiceRegistration.h>
-#include <usModuleActivator.h>
 #include <usModuleContext.h>
 #include <usModuleActivator.h>
 

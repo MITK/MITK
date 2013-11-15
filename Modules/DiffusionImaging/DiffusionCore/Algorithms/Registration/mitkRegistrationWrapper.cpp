@@ -155,7 +155,7 @@ void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImag
   registrationMethod->SetTransformToRigid();
   registrationMethod->SetCrossModalityOn();
 
-  registrationMethod->SetMovingImage(movingImage);
+  registrationMethod->SetMovingImage(tmpImage);
   registrationMethod->Update();
   registrationMethod->GetParameters(transformation); // first three: euler angles, last three translation
 }

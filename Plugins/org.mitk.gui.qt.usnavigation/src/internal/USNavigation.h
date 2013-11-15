@@ -53,6 +53,7 @@ class USNavigation : public QmitkAbstractView
 
     static const std::string VIEW_ID;
 
+    USNavigation();
     virtual void CreateQtPartControl(QWidget *parent);
 
   protected slots:
@@ -164,6 +165,8 @@ class USNavigation : public QmitkAbstractView
     static const int WARNRANGE = 25;
 
     Ui::USNavigationControls m_Controls;
+
+    bool m_ImageAlreadySetToNode;
 };
 
 #endif // USNavigation_h

@@ -263,7 +263,7 @@ std::string mitk::USCombinedModality::SerializeCalibration()
   for (std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator it = m_Calibrations.begin(); it != m_Calibrations.end(); it++)
   {
     mitk::AffineTransform3D::MatrixType matrix = it->second->GetMatrix();
-    mitk::AffineTransform3D::OffsetType offset = it->second->GetOffset();
+    mitk::AffineTransform3D::TranslationType translation = it->second->GetTranslation();
     TiXmlElement elem(it->first);
     // Serialize Matrix
     elem.SetDoubleAttribute("M00", matrix[0][0]);
@@ -276,9 +276,9 @@ std::string mitk::USCombinedModality::SerializeCalibration()
     elem.SetDoubleAttribute("M21", matrix[2][1]);
     elem.SetDoubleAttribute("M22", matrix[2][2]);
     // Serialize Offset
-    elem.SetDoubleAttribute("O0", offset[0]);
-    elem.SetDoubleAttribute("O1", offset[1]);
-    elem.SetDoubleAttribute("O2", offset[2]);
+    elem.SetDoubleAttribute("T0", translation[0]);
+    elem.SetDoubleAttribute("T1", translation[1]);
+    elem.SetDoubleAttribute("T2", translation[2]);
 
     result << elem << std::endl;
   }
@@ -315,7 +315,7 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
   for(TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
   {
     mitk::AffineTransform3D::MatrixType matrix;
-    mitk::AffineTransform3D::OffsetType offset;
+    mitk::AffineTransform3D::OffsetType translation;
 
     std::string calibName = elem->Value();
 
@@ -331,13 +331,13 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
     elem->QueryFloatAttribute("M22", &matrix[2][2]);
 
     // Deserialize Offset
-    elem->QueryFloatAttribute("O0", &offset[0]);
-    elem->QueryFloatAttribute("O1", &offset[1]);
-    elem->QueryFloatAttribute("O2", &offset[2]);
+    elem->QueryFloatAttribute("T0", &translation[0]);
+    elem->QueryFloatAttribute("T1", &translation[1]);
+    elem->QueryFloatAttribute("T2", &translation[2]);
 
     mitk::AffineTransform3D::Pointer calibration = mitk::AffineTransform3D::New();
     calibration->SetMatrix(matrix);
-    calibration->SetOffset(offset);
+    calibration->SetTranslation(translation);
     m_Calibrations[calibName] = calibration;
   }
 }

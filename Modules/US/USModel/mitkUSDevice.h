@@ -356,8 +356,7 @@ namespace mitk {
     itk::ConditionVariable::Pointer m_FreezeBarrier;
     itk::SimpleMutexLock        m_FreezeMutex;
     itk::MultiThreader::Pointer m_MultiThreader; ///< itk::MultiThreader used for thread handling
-    itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the range camera
-    itk::FastMutexLock::Pointer m_CameraActiveMutex; ///< mutex for the cameraActive flag
+    itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the image source
     int m_ThreadID; ///< ID of the started thread
 
     bool m_UnregisteringStarted;

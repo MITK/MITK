@@ -92,9 +92,10 @@ void UltrasoundSupport::DisplayImage()
 {
   m_Device->Modified();
   m_Device->UpdateOutputData(0);
+
   mitk::Image::Pointer curOutput = m_Device->GetOutput();
-  m_Node->SetData(curOutput->Clone());
-  //m_Node->SetData(curOutput);
+  if (curOutput.IsNotNull() && curOutput->IsInitialized()) { m_Node->SetData(curOutput); }
+
   this->RequestRenderWindowUpdate();
 
   if ( curOutput->GetDimension() > 1
@@ -182,8 +183,6 @@ void UltrasoundSupport::StartViewing()
     m_Timer->stop();
     return;
   }
-  m_Device->Update();
-  m_Node->SetData(m_Device->GetOutput());
 
   //start timer
   int interval = (1000 / m_Controls.m_FrameRate->value());

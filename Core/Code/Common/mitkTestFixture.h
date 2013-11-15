@@ -107,7 +107,14 @@ protected:
     return m_Parameter;
   }
 
-  static std::string getTestDataFilePath(const std::string& testData)
+  /**
+   * \brief Get the absolute path for test data.
+   *
+   * \param testData The realative path in the MITK test data repository.
+   *
+   * \return The absolute path for the test data.
+   */
+  static std::string GetTestDataFilePath(const std::string& testData)
   {
     if (itksys::SystemTools::FileIsFullPath(testData.c_str())) return testData;
     return std::string(MITK_DATA_DIR) + "/" + testData;

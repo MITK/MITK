@@ -83,7 +83,7 @@ private:
   {
     std::vector<std::string> parameter = GetTestParameter();
     CPPUNIT_ASSERT(parameter.size() == 2);
-    m_FileName = getTestDataFilePath(parameter[0]);
+    m_FileName = GetTestDataFilePath(parameter[0]);
     m_Locale = parameter[1];
   }
 

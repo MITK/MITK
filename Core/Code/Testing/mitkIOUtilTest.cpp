@@ -43,9 +43,9 @@ public:
 
   void setUp()
   {
-    m_ImagePath = getTestDataFilePath("Pic3D.nrrd");
-    m_SurfacePath = getTestDataFilePath("binary.stl");
-    m_PointSetPath = getTestDataFilePath("pointSet.mps");
+    m_ImagePath = GetTestDataFilePath("Pic3D.nrrd");
+    m_SurfacePath = GetTestDataFilePath("binary.stl");
+    m_PointSetPath = GetTestDataFilePath("pointSet.mps");
   }
 
   void TestTempMethods()

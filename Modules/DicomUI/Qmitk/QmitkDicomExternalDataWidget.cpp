@@ -53,6 +53,7 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
         m_Controls = new Ui::QmitkDicomExternalDataWidgetControls;
         m_Controls->setupUi( parent );
         m_Controls->viewExternalDataButton->setVisible(true);
+        m_Controls->ctkDICOMBrowser->setDynamicTableLayout(true);
 
         //connect Buttons
         connect(m_Controls->downloadButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));

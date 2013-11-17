@@ -53,6 +53,7 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
         m_Controls = new Ui::QmitkDicomExternalDataWidgetControls;
         m_Controls->setupUi( parent );
         m_Controls->viewExternalDataButton->setVisible(true);
+        m_Controls->directoryButton->setText("Open directory");
         m_Controls->ctkDICOMBrowser->setDynamicTableLayout(true);
 
         //connect Buttons
@@ -69,6 +70,7 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
                 this, SLOT(OnSeriesSelectionChanged(const QStringList&)));
         connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesDoubleClicked(const QModelIndex&)),
                 this, SLOT(OnViewButtonClicked()));
+        connect(m_Controls->directoryButton, SIGNAL(directoryChanged(const QString&)), this, SLOT(OnStartDicomImport(const QString&)));
     }
 }
 

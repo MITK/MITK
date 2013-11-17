@@ -67,6 +67,8 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
         connect(this, SIGNAL(SignalCancelImport()),m_ExternalIndexer, SLOT(cancel()));
         connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesSelectionChanged(const QStringList&)),
                 this, SLOT(OnSeriesSelectionChanged(const QStringList&)));
+        connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesDoubleClicked(const QModelIndex&)),
+                this, SLOT(OnViewButtonClicked()));
     }
 }
 

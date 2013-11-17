@@ -114,10 +114,11 @@ void QmitkDicomExternalDataWidget::OnViewButtonClicked()
 
 QStringList QmitkDicomExternalDataWidget::GetFileNamesFromIndex()
 {
-    QStringList filePaths = QStringList();
-    QStringList uids = m_Controls->ctkDICOMBrowser->currentSeriesSelection();
+    QStringList filePaths;
+
     QString uid;
-    foreach (uid, uids)
+    QStringList seriesUIDs = m_Controls->ctkDICOMBrowser->currentSeriesSelection();
+    foreach (uid, seriesUIDs)
     {
       filePaths.append(m_ExternalDatabase->filesForSeries(uid));
 
@@ -125,46 +126,34 @@ QStringList QmitkDicomExternalDataWidget::GetFileNamesFromIndex()
     if (!filePaths.empty())
       return filePaths;
 
-//    uids = m_Controls->ctkDICOMBrowser->currentStudiesSelection();
-//    foreach (uid, uids)
-//      {
-//        filePaths.append(m_ExternalDatabase->seriesForStudy());
-//      }
+    QStringList studyUIDs = m_Controls->ctkDICOMBrowser->currentStudiesSelection();
 
-//    QModelIndex currentIndex = m_Controls->ExternalDataTreeView->currentIndex();
-//    QString currentUID = m_ExternalModel->data(currentIndex,ctkDICOMModel::UIDRole).toString();
+    foreach (uid, studyUIDs)
+      {
+        seriesUIDs = m_ExternalDatabase->seriesForStudy(uid);
+        foreach (uid, seriesUIDs)
+          {
+            filePaths.append(m_ExternalDatabase->filesForSeries(uid));
+          }
+      }
+    if (!filePaths.empty())
+      return filePaths;
 
-//    if(m_ExternalModel->data(currentIndex,ctkDICOMModel::TypeRole)==static_cast<int>(ctkDICOMModel::SeriesType))
-//    {
-//        filePaths.append(m_ExternalDatabase->filesForSeries(currentUID));
-//    }
-//    else if(m_ExternalModel->data(currentIndex,ctkDICOMModel::TypeRole)==static_cast<int>(ctkDICOMModel::StudyType))
-//    {
-//        QStringList seriesList;
-//        seriesList.append( m_ExternalDatabase->seriesForStudy(currentUID) );
+    QStringList patientsUIDs = m_Controls->ctkDICOMBrowser->currentPatientsSelection();
 
-//        QStringList::Iterator serieIt;
-//        for(serieIt=seriesList.begin();serieIt!=seriesList.end();++serieIt)
-//        {
-//            filePaths.append(m_ExternalDatabase->filesForSeries(*serieIt));
-//        }
-//    }
-//    else if(m_ExternalModel->data(currentIndex,ctkDICOMModel::TypeRole)==static_cast<int>(ctkDICOMModel::PatientType))
-//    {
-//        QStringList studiesList,seriesList;
-//        studiesList.append( m_ExternalDatabase->studiesForPatient(currentUID) );
+    foreach (uid, patientsUIDs)
+      {
+        studyUIDs = m_ExternalDatabase->studiesForPatient(uid);
 
-//        QStringList::Iterator studyIt,serieIt;
-//        for(studyIt=studiesList.begin();studyIt!=studiesList.end();++studyIt)
-//        {
-//            seriesList.append( m_ExternalDatabase->seriesForStudy(*studyIt) );
-
-//            for(serieIt=seriesList.begin();serieIt!=seriesList.end();++serieIt)
-//            {
-//                filePaths.append(m_ExternalDatabase->filesForSeries(*serieIt));
-//            }
-//        }
-//    }
+        foreach (uid, studyUIDs)
+          {
+            seriesUIDs = m_ExternalDatabase->seriesForStudy(uid);
+            foreach (uid, seriesUIDs)
+              {
+                filePaths.append(m_ExternalDatabase->filesForSeries(uid));
+              }
+          }
+      }
     return filePaths;
 }
 

@@ -222,6 +222,11 @@ mitk::NavigationDataSource::Pointer mitk::USCombinedModality::GetNavigationDataS
   return m_DelayFilter.GetPointer();
 }
 
+bool mitk::USCombinedModality::GetIsCalibratedForCurrentStatus()
+{
+  return m_Calibrations.find(this->GetIdentifierForCurrentCalibration()) != m_Calibrations.end();
+}
+
 void mitk::USCombinedModality::GenerateData()
 {
   // update ultrasound image source and get current output then

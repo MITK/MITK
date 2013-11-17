@@ -84,8 +84,6 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
 {
     m_Controls.setupUi( parent );
     m_Controls.LocalStorageButton->setIcon(QIcon(":/org.mitk.gui.qt.dicom/drive-harddisk_32.png"));
-    m_Controls.FolderButton->setIcon(QIcon(":/org.mitk.gui.qt.dicom/folder_32.png"));
-    m_Controls.CDButton->setIcon(QIcon(":/org.mitk.gui.qt.dicom/media-optical_32.png"));
     m_Controls.QueryRetrieveButton->setIcon(QIcon(":/org.mitk.gui.qt.dicom/network-workgroup_32.png"));
     m_Controls.StoreSCPStatusLabel->setTextFormat(Qt::RichText);
     m_Controls.StoreSCPStatusLabel->setText("<img src=':/org.mitk.gui.qt.dicom/network-offline_16.png'>");
@@ -110,8 +108,7 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     connect(m_Controls.internalDataWidget,SIGNAL(SignalFinishedImport()),this,SLOT(OnDicomImportFinished()));
     connect(m_Controls.internalDataWidget,SIGNAL(SignalDicomToDataManager(QHash<QString,QVariant>)),this,SLOT(OnViewButtonAddToDataManager(QHash<QString,QVariant>)));
 
-    connect(m_Controls.CDButton, SIGNAL(clicked()), this, SLOT(OnFolderCDImport()));
-    connect(m_Controls.FolderButton, SIGNAL(clicked()), this, SLOT(OnFolderCDImport()));
+    connect(m_Controls.ImportButton, SIGNAL(clicked()), this, SLOT(OnFolderCDImport()));
     connect(m_Controls.QueryRetrieveButton, SIGNAL(clicked()), this, SLOT(OnQueryRetrieve()));
     connect(m_Controls.LocalStorageButton, SIGNAL(clicked()), this, SLOT(OnLocalStorage()));
 }
@@ -217,8 +214,7 @@ void QmitkDicomEditor::OnFileSelected(QString directory)
 
 void QmitkDicomEditor::OnFolderCDImport()
 {
-    m_ImportDialog->show();
-    m_ImportDialog->raise();
+  OnChangePage(1);
 }
 
 void QmitkDicomEditor::OnLocalStorage()

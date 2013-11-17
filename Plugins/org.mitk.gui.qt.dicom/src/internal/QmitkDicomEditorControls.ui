@@ -70,31 +70,16 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="CDButton">
-           <property name="toolTip">
-            <string>Imports dicom data to your local storage from CD.</string>
-           </property>
-           <property name="text">
-            <string>Import CD</string>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="FolderButton">
+          <widget class="QPushButton" name="ImportButton">
            <property name="toolTip">
             <string>Imports dicom data to your local storage from a folder.</string>
            </property>
            <property name="text">
-            <string>Import Folder</string>
+            <string>Import</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../resources/dicom.qrc">
+             <normaloff>:/org.mitk.gui.qt.dicom/import_32.png</normaloff>:/org.mitk.gui.qt.dicom/import_32.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -256,7 +241,9 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../resources/dicom.qrc"/>
+ </resources>
  <connections/>
  <slots>
   <slot>OnChangePage(int)</slot>

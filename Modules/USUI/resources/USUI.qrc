@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/USUI">
-        <file>clock.png</file>
         <file>go-next.png</file>
         <file>go-previous.png</file>
         <file>zoom-in.png</file>
@@ -9,5 +8,9 @@
         <file>minus.png</file>
         <file>restart.png</file>
         <file>star.png</file>
+        <file>preferences.png</file>
+        <file>document-open.png</file>
+        <file>document-save.png</file>
+        <file>system-lock-screen.png</file>
     </qresource>
 </RCC>

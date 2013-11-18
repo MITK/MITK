@@ -1,7 +1,0 @@
-project(org_mitk_gui_qt_usnavigation)
-
-MACRO_CREATE_MITK_CTK_PLUGIN(
-  EXPORT_DIRECTIVE USNAVIGATION_EXPORT
-  EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDENCIES QmitkExt MitkUSNavigation MitkUSNavigationUI MitkIGT MitkIGTUI
-)

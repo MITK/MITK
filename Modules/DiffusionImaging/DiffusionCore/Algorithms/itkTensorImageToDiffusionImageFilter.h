@@ -89,6 +89,18 @@ namespace itk
     void SetBValue( const double& bval)
     { m_BValue = bval; }
 
+
+    /**
+     * @brief Set an external baseline image for signal generation (optional)
+     *
+     * An option to enforce a specific baseline image. If none provided (default) the filter uses
+     * the itk::TensorToL2NormImageFilter to generate the modelled baseline image.
+     */
+    void SetExternalBaselineImage( typename BaselineImageType::Pointer bimage)
+    {
+      m_BaselineImage = bimage;
+    }
+
     itkSetMacro(Min, OutputScalarType);
     itkSetMacro(Max, OutputScalarType);
 
@@ -100,8 +112,9 @@ namespace itk
       m_BaselineImage = 0;
       m_Min = 0.0;
       m_Max = 10000.0;
-    };
-    ~TensorImageToDiffusionImageFilter(){};
+    }
+
+    ~TensorImageToDiffusionImageFilter(){}
 
     void PrintSelf (std::ostream& os, Indent indent) const
     {
@@ -114,7 +127,6 @@ namespace itk
       OutputImageRegionType &outputRegionForThread, ThreadIdType);
 
     //void GenerateData();
-
 
 
   private:

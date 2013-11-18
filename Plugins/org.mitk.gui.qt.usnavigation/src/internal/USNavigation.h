@@ -149,6 +149,7 @@ class USNavigation : public QmitkAbstractView
     void SetupProximityView();
 
     QProgressBar* CreateRangeMeter(int i);
+    void ResetRangeMeters();
 
     std::vector< QProgressBar* > m_RangeMeters;
 

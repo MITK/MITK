@@ -250,7 +250,7 @@ struct mitkImageStatisticsHotspotTestClass
 
       result.m_HotspotMinimum = GetDoubleAttribute(statistic, "minimum");
       result.m_HotspotMaximum = GetDoubleAttribute(statistic, "maximum");
-      result.m_HotspotPeak = GetDoubleAttribute(statistic, "peak");
+      result.m_HotspotPeak = GetDoubleAttribute(statistic, "peakOptimized");
 
       std::vector<int> tmpMinimumIndex(3,0);
 

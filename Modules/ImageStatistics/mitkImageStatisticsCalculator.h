@@ -172,10 +172,10 @@ public:
   bool GetDoIgnorePixelValue();
 
   /** \brief Sets the radius for the hotspot */
-  void SetHotspotSize (double hotspotRadiusInMM);
+  void SetHotspotRadius (double hotspotRadiusInMM);
 
   /** \brief Returns the radius of the hotspot */
-  double GetHotspotSize();
+  double GetHotspotRadius();
 
   /** \brief Sets whether the hotspot should be calculated */
   void SetCalculateHotspot(bool calculateHotspot);
@@ -270,7 +270,7 @@ protected:
   * needs an image, a mask and for limiting the searched value
   * minimum- and maximum boundaries. The boundaries are set
   * to the extent of float by default. It returns a
-  * MinMaxIndex-struct with the calculated values. */
+  * MinMaxIndex-struct. */
   template <typename TPixel, unsigned int VImageDimension >
   MinMaxIndex CalculateMinMaxIndex(
     const itk::Image<TPixel, VImageDimension> *inputImage,
@@ -278,6 +278,10 @@ protected:
     float minBoundary,
     float maxBoundary);
 
+  /** \brief Calculates the hotspot statistics within a given
+  * ROI. As input the function needs an image, a mask which
+  * represents the ROI and a radius which defines the size of
+  * the sphere. The function returns a statistics object. */
   template < typename TPixel, unsigned int VImageDimension>
   Statistics CalculateHotspotStatistics(
     const itk::Image<TPixel, VImageDimension> *inputImage,
@@ -289,7 +293,7 @@ protected:
    * be check if the sphere is inside and an image of the sphere.
    * To ensure speed only 14 points on the surface of the sphere
    * are checked: six on the axis of coordinates and eight more.
-   * The functions returns true if every point is in the region. */
+   * The function returns true if every point is in the region. */
   template < typename TPixel, unsigned int VImageDimension>
   bool IsSphereInsideRegion(
     const itk::Image<TPixel, VImageDimension>  *inputImage,
@@ -386,7 +390,7 @@ protected:
   bool m_DoIgnorePixelValue;
   bool m_IgnorePixelValueChanged;
 
-  double m_HotspotSize;
+  double m_HotspotRadius;
   bool m_CalculateHotspot;
 
   unsigned int m_PlanarFigureAxis;    // Normal axis for PlanarFigure

@@ -263,14 +263,14 @@ bool ImageStatisticsCalculator::GetDoIgnorePixelValue()
   return m_DoIgnorePixelValue;
 }
 
-void ImageStatisticsCalculator::SetHotspotSize(double value)
+void ImageStatisticsCalculator::SetHotspotRadius(double value)
 {
-  m_HotspotSize = value;
+  m_HotspotRadius = value;
 }
 
-double ImageStatisticsCalculator::GetHotspotSize()
+double ImageStatisticsCalculator::GetHotspotRadius()
 {
-  return m_HotspotSize;
+  return m_HotspotRadius;
 }
 
 void ImageStatisticsCalculator::SetCalculateHotspot(bool value)
@@ -530,13 +530,6 @@ ImageStatisticsCalculator::GetStatistics( unsigned int timeStep, unsigned int la
   }
 }
 
-const ImageStatisticsCalculator::Statistics & ImageStatisticsCalculator::GetHotspotStatistics( unsigned int timeStep, unsigned int label) const
-{
-  if(m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()) )
-    return m_EmptyStatistics;
-
-  return m_MaskedImageHotspotStatisticsVector[timeStep][label];
-}
 
 const ImageStatisticsCalculator::StatisticsContainer &
 ImageStatisticsCalculator::GetStatisticsVector( unsigned int timeStep ) const
@@ -1198,12 +1191,12 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     /*****************************************************Calculate Hotspot Statistics**********************************************/
     const double radiusSUVHotspot = 6.2035049089940; // radius of a 1cm3 sphere in a isotrope image of 1mm spacings
 
-    SetHotspotSize(radiusSUVHotspot);
+    SetHotspotRadius(radiusSUVHotspot);
     SetCalculateHotspot(true);
 
     if(IsHotspotCalculated())
     {
-      Statistics hotspotStatistics = CalculateHotspotStatistics (adaptedImage.GetPointer(), adaptedMaskImage.GetPointer(), GetHotspotSize());
+      Statistics hotspotStatistics = CalculateHotspotStatistics (adaptedImage.GetPointer(), adaptedMaskImage.GetPointer(), GetHotspotRadius());
       statistics.HotspotMax = hotspotStatistics.HotspotMax;
       statistics.HotspotMin = hotspotStatistics.HotspotMin;
       statistics.HotspotPeak = hotspotStatistics.HotspotPeak;
@@ -1449,39 +1442,6 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   convolutionFilter->Update();
 
   MaskImageType::Pointer peakImage = convolutionFilter->GetOutput();
-
-  /*std::cout << std::endl << std::endl;
-    std::cout << "PeakImage: " << std::endl;
-    unsigned int lastZ = 1000000000;
-    unsigned int lastY = 1000000000;
-
-    unsigned int hotspotMaskIndexCounter = 0;
-    MaskIteratorType hotspotMaskIt(peakImage, peakImage->GetLargestPossibleRegion()  );
-    for(hotspotMaskIt.GoToBegin();!hotspotMaskIt.IsAtEnd();++hotspotMaskIt)
-    {
-
-      double tmp = hotspotMaskIt.Get();
-      if (hotspotMaskIt.GetIndex()[1] != lastY)
-      {
-        std::cout << std::endl;
-        lastY = hotspotMaskIt.GetIndex()[1];
-      }
-      if (hotspotMaskIt.GetIndex()[0] != lastZ)
-      {
-        std::cout << tmp << " ";
-        lastZ = hotspotMaskIt.GetIndex()[0];
-      }
-
-      hotspotMaskIndexCounter++;
-
-      if(hotspotMaskIndexCounter > 899) {
-        std::cout << std::endl;
-        hotspotMaskIndexCounter = 0;
-      }
-    }
-
-    std::cout << std::endl << std::endl;*/
-
 
   /*****************************************************Creating Hotspot Sphere**********************************************/
   SphereMaskImageType::Pointer hotspotSphere = SphereMaskImageType::New();

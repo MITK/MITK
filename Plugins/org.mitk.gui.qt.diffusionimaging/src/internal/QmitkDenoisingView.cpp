@@ -23,6 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkProgressBar.h>
 
+
+#include <itkInvertIntensityImageFilter.h>
+
 QmitkDenoisingWorker::QmitkDenoisingWorker(QmitkDenoisingView *view)
   : m_View(view)
 {
@@ -165,13 +168,13 @@ void QmitkDenoisingView::StartDenoising()
       case 1:
       {
         m_InputImage = dynamic_cast<DiffusionImageType*> (m_ImageNode->GetData());
-        MaskImageType::Pointer imageMask = MaskImageType::New();
-        mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_BrainMaskNode->GetData()), imageMask);
+        m_ImageMask = MaskImageType::New();
+        mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_BrainMaskNode->GetData()), m_ImageMask);
 
         m_NonLocalMeansFilter = NonLocalMeansDenoisingFilterType::New();
         m_NonLocalMeansFilter->SetNumberOfThreads(12);
         m_NonLocalMeansFilter->SetInputImage(m_InputImage->GetVectorImage());
-        m_NonLocalMeansFilter->SetInputMask(imageMask);
+        m_NonLocalMeansFilter->SetInputMask(m_ImageMask);
         m_NonLocalMeansFilter->SetUseJointInformation(false);
         m_NonLocalMeansFilter->SetVRadius(m_Controls->m_SpinBoxParameter1->value());
         m_NonLocalMeansFilter->SetNRadius(m_Controls->m_SpinBoxParameter2->value());
@@ -181,13 +184,13 @@ void QmitkDenoisingView::StartDenoising()
       case 2:
       {
         m_InputImage = dynamic_cast<DiffusionImageType*> (m_ImageNode->GetData());
-        MaskImageType::Pointer imageMask = MaskImageType::New();
-        mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_BrainMaskNode->GetData()), imageMask);
+        m_ImageMask = MaskImageType::New();
+        mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_BrainMaskNode->GetData()), m_ImageMask);
 
         m_NonLocalMeansFilter = NonLocalMeansDenoisingFilterType::New();
         m_NonLocalMeansFilter->SetNumberOfThreads(12);
         m_NonLocalMeansFilter->SetInputImage(m_InputImage->GetVectorImage());
-        m_NonLocalMeansFilter->SetInputMask(imageMask);
+        m_NonLocalMeansFilter->SetInputMask(m_ImageMask);
         m_NonLocalMeansFilter->SetUseJointInformation(true);
         m_NonLocalMeansFilter->SetVRadius(m_Controls->m_SpinBoxParameter1->value());
         m_NonLocalMeansFilter->SetNRadius(m_Controls->m_SpinBoxParameter2->value());
@@ -290,7 +293,7 @@ void QmitkDenoisingView::AfterThread()
   m_ThreadIsRunning = false;
   m_DenoisingTimer->stop();
   unsigned int currentVoxelCount = m_NonLocalMeansFilter->GetCurrentVoxelCount();
-  mitk::ProgressBar::GetInstance()->Progress(currentVoxelCount-m_LastVoxelCount+1);
+  mitk::ProgressBar::GetInstance()->Progress(m_InputImage->GetDimension(0) * m_InputImage->GetDimension(1) * m_InputImage->GetDimension(2));
   m_LastVoxelCount = currentVoxelCount;
   switch (m_SelectedFilter)
   {

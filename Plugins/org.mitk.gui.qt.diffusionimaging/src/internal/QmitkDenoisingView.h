@@ -100,6 +100,7 @@ private:
   bool m_ThreadIsRunning;
   NonLocalMeansDenoisingFilterType::Pointer m_NonLocalMeansFilter;
   DiffusionImageType::Pointer m_InputImage;
+  MaskImageType::Pointer m_ImageMask;
   QTimer* m_DenoisingTimer;
   unsigned int m_LastVoxelCount;
 

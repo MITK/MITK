@@ -62,10 +62,14 @@ NonLocalMeansDenoisingFilter< TPixelType >
   typename InvertImageFilterType::Pointer inverter = InvertImageFilterType::New();
   inverter->SetInput(mask);
   inverter->SetMaximum(statisticsFilter->GetMaximum());
-  typename MaskImageType::Pointer invertedMask = inverter->GetOutput();
+  typename ChangeInformationType::Pointer changeMaskFilter = ChangeInformationType::New();
+  changeMaskFilter->ChangeOriginOn();
+  changeMaskFilter->SetInput(inverter->GetOutput());
+  changeMaskFilter->SetOutputOrigin(mask->GetOrigin());
+  changeMaskFilter->Update();
+  typename MaskImageType::Pointer invertedMask = changeMaskFilter->GetOutput();
   typename MaskImageType::PointType imageOrigin = inImage->GetOrigin();
-  /// WHAT????
-  typename MaskImageType::PointType maskOrigin = mask->GetOrigin();
+  typename MaskImageType::PointType maskOrigin = invertedMask->GetOrigin();
   long offset[3];
 
   typedef itk::ContinuousIndex<double, 3> ContinousIndexType;

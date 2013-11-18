@@ -393,9 +393,15 @@ void USNavigation::SetupProximityView()
 QProgressBar* USNavigation::CreateRangeMeter(int i)
 {
   mitk::DataNode::Pointer zone = m_Zones.at(i);
-  std::string zoneColor;
-  bool success = zone->GetStringProperty("zone.color", zoneColor);
-  if (!success) zoneColor = "grey";
+
+  mitk::ScalarType zoneColor[3];
+  bool success = m_Zones.at(i)->GetColor(zoneColor);
+  QString zoneColorString = "#555555";
+  if (success)
+  {
+    QString zoneColorString = QString("#%1%2%3").arg(static_cast<unsigned int>(zoneColor[0]*255), 2, 16, QChar('0'))
+      .arg(static_cast<unsigned int>(zoneColor[1]*255), 2, 16, QChar('0')).arg(static_cast<unsigned int>(zoneColor[2]*255), 2, 16, QChar('0'));
+  }
 
   QProgressBar* meter = new QProgressBar();
   meter->setMinimum(0);
@@ -404,8 +410,8 @@ QProgressBar* USNavigation::CreateRangeMeter(int i)
   QString zoneName = zone->GetName().c_str();
   meter->setFormat(zoneName + ": No Data");
   QString style = m_RangeMeterStyle;
-  style = style.replace("#StartColor#", zoneColor.c_str());
-  style = style.replace("#StopColor#", zoneColor.c_str());
+  style = style.replace("#StartColor#", zoneColorString);
+  style = style.replace("#StopColor#", zoneColorString);
   meter->setStyleSheet(style);
   meter->setVisible(true);
   return meter;
@@ -422,15 +428,17 @@ void USNavigation::UpdateMeters()
   {
     mitk::Point3D zoneOrigin = m_Zones.at(i)->GetData()->GetGeometry()->GetOrigin();
     // calculate absolute distance
-    int distance = sqrt( pow(zoneOrigin[0] - needlePosition[0], 2) + pow(zoneOrigin[1] - needlePosition[1], 2) + pow(zoneOrigin[2] - needlePosition[2], 2) );
+    mitk::ScalarType distance = sqrt( pow(zoneOrigin[0] - needlePosition[0], 2) + pow(zoneOrigin[1] - needlePosition[1], 2) + pow(zoneOrigin[2] - needlePosition[2], 2) );
     // Subtract zone size
-    int zoneSize;
-    m_Zones.at(i)->GetIntProperty("zone.size", zoneSize);
+    mitk::ScalarType zoneSize;
+    m_Zones.at(i)->GetFloatProperty("zone.size", zoneSize);
     distance = distance - zoneSize;
 
     // Prepare new Style
-    std::string zoneColor;
-    m_Zones.at(i)->GetStringProperty("zone.color", zoneColor);
+    mitk::ScalarType zoneColor[3];
+    m_Zones.at(i)->GetColor(zoneColor);
+    QString zoneColorString = QString("#%1%2%3").arg(static_cast<unsigned int>(zoneColor[0]*255), 2, 16, QChar('0'))
+      .arg(static_cast<unsigned int>(zoneColor[1]*255), 2, 16, QChar('0')).arg(static_cast<unsigned int>(zoneColor[2]*255), 2, 16, QChar('0'));
     QString style = m_RangeMeterStyle;
     QString text =  m_Zones.at(i)->GetName().c_str();
     int value = 0;
@@ -445,22 +453,22 @@ void USNavigation::UpdateMeters()
     } // 2) Needle is close to Zone
     else if (distance < WARNRANGE)
     {
-      style = style.replace("#StartColor#", zoneColor.c_str());
+      style = style.replace("#StartColor#", zoneColorString);
       style = style.replace("#StopColor#", "red");
       text  = text + ": " + QString::number(distance) + " mm";
       value = 100 -  100 * ((float) distance / (float )MAXRANGE);
     } // 3) Needle is away from zone
     else if (distance < MAXRANGE)
     {
-      style = style.replace("#StartColor#", zoneColor.c_str());
-      style = style.replace("#StopColor#", zoneColor.c_str());
+      style = style.replace("#StartColor#", zoneColorString);
+      style = style.replace("#StopColor#", zoneColorString);
       text  = text + ": " + QString::number(distance) + " mm";
       value = 100 -  100 * ((float) distance / (float )MAXRANGE);
     } // 4) Needle is far away from zone
     else
     {
-      style = style.replace("#StartColor#", zoneColor.c_str());
-      style = style.replace("#StopColor#", zoneColor.c_str());
+      style = style.replace("#StartColor#", zoneColorString);
+      style = style.replace("#StopColor#", zoneColorString);
       text  = text + ": " + QString::number(distance) + " mm";
       value = 0;
     }
@@ -476,15 +484,7 @@ void USNavigation::UpdateMeters()
 
 void USNavigation::OnStartIntervention()
 {
-  m_Zones.clear();
-
-  mitk::DataStorage::SetOfObjects::ConstPointer zoneNodes = m_Controls.m_ZonesWidget->GetZoneNodes();
-  for (mitk::DataStorage::SetOfObjects::ConstIterator it = zoneNodes->Begin();
-       it != zoneNodes->End(); ++it)
-  {
-    m_Zones.push_back(it->Value());
-    m_ZoneFilter->AddNode(it->Value());
-  }
+  this->ResetRangeMeters();
 
   m_Controls.m_TabWidget->setCurrentIndex(2);
   this->SetupProximityView();
@@ -512,15 +512,7 @@ void USNavigation::OnReset()
   m_Zones.clear();
   m_Controls.m_ZonesWidget->OnResetZones();
 
-  // Reset RangeMeters
-  QLayout* layout = m_Controls.m_RangeBox->layout();
-  QLayoutItem *item;
-  while((item = layout->takeAt(0))) {
-    if (item->widget()) {
-      delete item->widget();
-    }
-    delete item;
-  }
+  this->ResetRangeMeters();
 
   m_RangeMeters.clear();
   m_RangeMeterTimer->stop();
@@ -541,5 +533,31 @@ void USNavigation::OnZoneAdded()
   {
     m_Controls.m_BtnFreeze->setChecked(false);
     m_Freeze = false;
+  }
+
+  mitk::DataStorage::SetOfObjects::ConstPointer zoneNodes = m_Controls.m_ZonesWidget->GetZoneNodes();
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = zoneNodes->Begin();
+       it != zoneNodes->End(); ++it)
+  {
+    // add all zones to zone filter which aren't added until now
+    if ( find(m_Zones.begin(), m_Zones.end(), it->Value()) == m_Zones.end() )
+    {
+      m_Zones.push_back(it->Value());
+      m_ZoneFilter->AddNode(it->Value());
+    }
+  }
+}
+
+void USNavigation::ResetRangeMeters()
+{
+  m_RangeMeters.clear();
+
+  QLayout* layout = m_Controls.m_RangeBox->layout();
+  QLayoutItem *item;
+  while((item = layout->takeAt(0))) {
+    if (item->widget()) {
+      delete item->widget();
+    }
+    delete item;
   }
 }

@@ -137,6 +137,7 @@ void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes 
 
     bool isBinary = false;
     node->GetBoolProperty("binary", isBinary);
+    // look for a brainmask in selection
     if( node.IsNotNull() && static_cast<mitk::Image*>(node->GetData()) && isBinary)
     {
         m_Controls->m_InputBrainMaskLabel->setText(node->GetName().c_str());
@@ -167,6 +168,7 @@ void QmitkDenoisingView::StartDenoising()
       }
       case 1:
       {
+        // initialize NLMr
         m_InputImage = dynamic_cast<DiffusionImageType*> (m_ImageNode->GetData());
         m_ImageMask = MaskImageType::New();
         mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_BrainMaskNode->GetData()), m_ImageMask);
@@ -183,6 +185,7 @@ void QmitkDenoisingView::StartDenoising()
       }
       case 2:
       {
+        // initialize NLMv
         m_InputImage = dynamic_cast<DiffusionImageType*> (m_ImageNode->GetData());
         m_ImageMask = MaskImageType::New();
         mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_BrainMaskNode->GetData()), m_ImageMask);
@@ -198,9 +201,12 @@ void QmitkDenoisingView::StartDenoising()
         break;
       }
     }
+    // initialize the progressbar
     unsigned int maxVoxelCount = m_InputImage->GetDimension(0) * m_InputImage->GetDimension(1) * m_InputImage->GetDimension(2);
     mitk::ProgressBar::GetInstance()->AddStepsToDo(maxVoxelCount);
     m_LastVoxelCount = 0;
+
+    // start denoising in detached thread
     m_DenoisingThread.start(QThread::HighestPriority);
   }
 }
@@ -291,10 +297,10 @@ void QmitkDenoisingView::BeforeThread()
 void QmitkDenoisingView::AfterThread()
 {
   m_ThreadIsRunning = false;
+  // stop timer to stop updates of progressbar
   m_DenoisingTimer->stop();
-  unsigned int currentVoxelCount = m_NonLocalMeansFilter->GetCurrentVoxelCount();
+  // make sure progressbar is finished
   mitk::ProgressBar::GetInstance()->Progress(m_InputImage->GetDimension(0) * m_InputImage->GetDimension(1) * m_InputImage->GetDimension(2));
-  m_LastVoxelCount = currentVoxelCount;
   switch (m_SelectedFilter)
   {
     case 0:

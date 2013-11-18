@@ -27,6 +27,9 @@ This file is based heavily on a corresponding ITK filter.
 
 namespace itk{
 /** \class VectorImageToImageFilter
+ * \brief This class extracts an image out of a vectorimage
+ *
+ * An image is extracted at a designated index of a vectorimage. If non index is set, it is an index of 0 used.
  */
 
 template< class TPixelType >
@@ -67,7 +70,7 @@ public:
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkVectorImageToImageFilter.cpp"
+#include "itkVectorImageToImageFilter.txx"
 #endif
 
 #endif //__itkVectorImageToImageFilter_h_

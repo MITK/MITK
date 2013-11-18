@@ -50,7 +50,7 @@ private:
 };
 
 /*!
-  \brief View displaying details of the orientation distribution function in the voxel at the current crosshair position.
+  \brief View displaying details to denoise diffusionweighted images.
 
   \sa QmitkFunctionality
   \ingroup Functionalities
@@ -80,11 +80,11 @@ public:
 
 protected slots:
 
-  void StartDenoising();
-  void SelectFilter(int filter);
-  void BeforeThread();
-  void AfterThread();
-  void UpdateProgress();
+  void StartDenoising();                  ///< prepares filter condition and starts thread for denoising
+  void SelectFilter(int filter);          ///< updates which filter is selected
+  void BeforeThread();                    ///< starts timer & disables all buttons while denoising
+  void AfterThread();                     ///< stops timer & creates a new datanode of the denoised image
+  void UpdateProgress();                  ///< updates the progressbar each second
 
 private:
 

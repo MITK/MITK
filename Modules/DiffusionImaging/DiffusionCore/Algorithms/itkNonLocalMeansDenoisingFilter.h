@@ -37,6 +37,10 @@ This file is based heavily on a corresponding ITK filter.
 
 namespace itk{
   /** \class NonLocalMeansDenoisingFilter
+   * \brief This class denoises a vectorimage according to the non local means procedure.
+   *
+   * This Filter needs as an input the diffusion weigthed image and a related brainmask.
+   * Neighborhoodradius V & N need to be set!
   */
 
   template< class TPixelType >
@@ -84,21 +88,21 @@ namespace itk{
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType);
 
+
+
+  private:
+
     typename NeighborhoodIterator< VectorImage< TPixelType, 3 > >::RadiusType m_V_Radius;
     typename NeighborhoodIterator< VectorImage< TPixelType, 3 > >::RadiusType m_N_Radius;
     VariableLengthVector< double > m_Deviations;
     bool m_UseJointInformation;
 
     unsigned int m_CurrentVoxelCount;
-
-  private:
-    void IndividualDenoising(const OutputImageRegionType &outputRegionForThread);
-    void JointInformationDenoising(const OutputImageRegionType &outputRegionForThread);
   };
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkNonLocalMeansDenoisingFilter.cpp"
+#include "itkNonLocalMeansDenoisingFilter.txx"
 #endif
 
 #endif //__itkNonLocalMeansDenoisingFilter_h_

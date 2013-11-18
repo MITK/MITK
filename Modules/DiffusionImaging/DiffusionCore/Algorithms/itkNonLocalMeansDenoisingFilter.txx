@@ -56,6 +56,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
   typename ImageExtractorType::Pointer extractor = ImageExtractorType::New();
   extractor->SetInput(inImage);
 
+  // Generate backround mask out of brain mask to calculate stdev of noise
   typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
   statisticsFilter->SetInput(mask);
   statisticsFilter->Update();
@@ -90,6 +91,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
     offset[i] = (int) indexCoordDistance + inImage->GetBufferedRegion().GetIndex()[i];
   }
 
+  // Claculate stdev of noise for each channel of the vectorimage
   for ( int i = 0; i < size; ++i)
   {
     extractor->SetIndex(i);
@@ -125,6 +127,7 @@ void
 NonLocalMeansDenoisingFilter< TPixelType >
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType )
 {
+  // Initialize Iterators
   typename OutputImageType::Pointer outputImage =
           static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 
@@ -139,12 +142,15 @@ NonLocalMeansDenoisingFilter< TPixelType >
   InputIteratorType njit(m_N_Radius, inputImagePointer, outputRegionForThread );
   InputIteratorType niit(m_N_Radius, inputImagePointer, outputRegionForThread );
   git.GoToBegin();
+
+  // Iterate over complete image region
   while( !git.IsAtEnd() )
   {
     double sz = (double)niit.Size();
     typename OutputImageType::PixelType outpix;
     outpix.SetSize (inputImagePointer->GetVectorLength());
 
+    // Count amount of same voxels in neighborhood V around xi, to determine normalization constant Z
     for (unsigned int i = 0; i < inputImagePointer->GetVectorLength(); ++i)
     {
       TPixelType xi = git.GetCenterPixel()[i];
@@ -183,6 +189,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
         bool isInBounds = false;
         TPixelType xj = git.GetPixel(j, isInBounds)[i];
 
+        // Calculation of an L2 norm (wj) between two neigborhoods ni & nj
         if (xi == xj && isInBounds)
         {
           niit.SetLocation(git.GetIndex());
@@ -195,7 +202,6 @@ NonLocalMeansDenoisingFilter< TPixelType >
             {
               for (unsigned int n = 0; n < inputImagePointer->GetVectorLength(); ++n)
               {
-                /// ???
                 double diff = niit.GetPixel(k)[n] - njit.GetPixel(k)[n];
                 sumk += std::pow( diff, 2);
               }
@@ -208,6 +214,8 @@ NonLocalMeansDenoisingFilter< TPixelType >
 
           }
           wj = std::exp( - ( std::sqrt( (sumk / sz)) / m_Deviations.GetElement(i))) / Z;
+
+          // Estimation of NLMr for voxel xi with the neighborhood V
           sumj += (wj * std::pow(xj, 2)) - (2 * std::pow(m_Deviations.GetElement(i),2));
         }
       }
@@ -217,10 +225,6 @@ NonLocalMeansDenoisingFilter< TPixelType >
     }
     oit.Set(outpix);
     ++oit;
-//    if (m_CurrentVoxelCount % 100 == 0)
-//    {
-//      MITK_INFO << m_CurrentVoxelCount << " Voxels";
-//    }
 
     ++m_CurrentVoxelCount;
     ++git;

@@ -33,6 +33,7 @@ namespace itk {
 template< class TPixelType >
 VectorImageToImageFilter< TPixelType >
 ::VectorImageToImageFilter()
+  : m_Index(0)
 {
     this->SetNumberOfRequiredInputs( 1 );
 }

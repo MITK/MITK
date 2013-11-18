@@ -35,6 +35,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImageToImageFilter.h"
 #include <itkDiffusionTensor3D.h>
 
+#include <itkVectorContainer.h>
+
 namespace itk
 {
 
@@ -73,11 +75,11 @@ namespace itk
 
     itkNewMacro (Self);
 
-    typedef Vector<double,3>          GradientType;
-    typedef std::vector<GradientType> GradientListType;
+    typedef vnl_vector_fixed< double, 3 >               GradientType;
+    typedef itk::VectorContainer< unsigned int, GradientType >    GradientListType;
 
     /** Manually Set/Get a list of gradients */
-    void SetGradientList(const GradientListType list)
+    void SetGradientList(GradientListType::Pointer list)
     {
       m_GradientList = list;
       this->Modified();
@@ -134,7 +136,7 @@ namespace itk
     TensorImageToDiffusionImageFilter (const Self&);
     void operator=(const Self&);
 
-    GradientListType                     m_GradientList;
+    GradientListType::Pointer            m_GradientList;
     double                               m_BValue;
     typename BaselineImageType::Pointer  m_BaselineImage;
 

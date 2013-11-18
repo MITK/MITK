@@ -1,7 +1,0 @@
-project(org_mitk_gui_qt_uscalibration)
-
-MACRO_CREATE_MITK_CTK_PLUGIN(
-  EXPORT_DIRECTIVE USCALIBRATION_EXPORT
-  EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDENCIES QmitkExt MitkIGT MitkUS MitkUSNavigation MitkUSNavigationUI MitkIGTUI
-)

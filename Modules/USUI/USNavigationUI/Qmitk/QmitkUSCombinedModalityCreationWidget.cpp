@@ -1,0 +1,65 @@
+#include "QmitkUSCombinedModalityCreationWidget.h"
+#include "ui_QmitkUSCombinedModalityCreationWidget.h"
+
+QmitkUSCombinedModalityCreationWidget::QmitkUSCombinedModalityCreationWidget(QWidget *parent) :
+  QWidget(parent),
+  ui(new Ui::QmitkUSCombinedModalityCreationWidget)
+{
+  ui->setupUi(this);
+
+  std::string filterExcludeCombinedModalities = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(!(" + mitk::USDevice::US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + ")))";
+
+  ui->usDevicesServiceList->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL, filterExcludeCombinedModalities);
+  ui->trackingDevicesServiceList->Initialize<mitk::NavigationDataSource>(mitk::NavigationDataSource::US_PROPKEY_DEVICENAME);
+
+  connect( ui->usDevicesServiceList,       SIGNAL( ServiceSelectionChanged(us::ServiceReferenceU) ), this, SLOT(OnSelectedUltrasoundOrTrackingDevice()) );
+  connect( ui->trackingDevicesServiceList, SIGNAL( ServiceSelectionChanged(us::ServiceReferenceU) ), this, SLOT(OnSelectedUltrasoundOrTrackingDevice()) );
+
+  connect( ui->createButton, SIGNAL(clicked()), this, SLOT(OnCreation()) );
+  connect( ui->cancelButton, SIGNAL(clicked()), this, SLOT(OnAbortion()) );
+}
+
+QmitkUSCombinedModalityCreationWidget::~QmitkUSCombinedModalityCreationWidget()
+{
+  delete ui;
+}
+
+void QmitkUSCombinedModalityCreationWidget::OnCreation()
+{
+  mitk::USDevice::Pointer usDevice = ui->usDevicesServiceList->GetSelectedService<mitk::USDevice>();
+  if (usDevice.IsNull())
+  {
+      MITK_WARN << "No US Device selected for creation of Combined Modality.";
+      return;
+  }
+
+  mitk::NavigationDataSource::Pointer trackingDevice = ui->trackingDevicesServiceList->GetSelectedService<mitk::NavigationDataSource>();
+  if (trackingDevice.IsNull())
+  {
+      MITK_WARN << "No Traccking Device selected for creation of Combined Modality.";
+      return;
+  }
+
+  QString name = ui->nameLineEdit->text();
+  if (name.isEmpty()) { name = "Combined Modality"; }
+
+  mitk::USCombinedModality::Pointer combinedModality = mitk::USCombinedModality::New(usDevice, trackingDevice, "", name.toStdString());
+  combinedModality->Initialize(); // register as micro service
+
+  emit SignalCreated();
+  emit SignalCreated(combinedModality);
+}
+
+void QmitkUSCombinedModalityCreationWidget::OnAbortion()
+{
+  emit SignalAborted();
+}
+
+void QmitkUSCombinedModalityCreationWidget::OnSelectedUltrasoundOrTrackingDevice()
+{
+  // create button is enabled only if an ultrasound
+  // and a tracking device is selected
+  ui->createButton->setEnabled(
+              ui->usDevicesServiceList->GetIsServiceSelected()
+          && ui->trackingDevicesServiceList->GetIsServiceSelected());
+}

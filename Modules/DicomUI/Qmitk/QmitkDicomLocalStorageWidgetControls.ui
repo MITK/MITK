@@ -43,6 +43,16 @@
            <property name="text">
             <string>View</string>
            </property>
+           <property name="icon">
+            <iconset resource="../../../Plugins/org.mitk.gui.qt.dicom/resources/dicom.qrc">
+             <normaloff>:/org.mitk.gui.qt.dicom/viewIcon.png</normaloff>:/org.mitk.gui.qt.dicom/viewIcon.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>20</height>
+            </size>
+           </property>
           </widget>
          </item>
          <item>
@@ -52,6 +62,10 @@
            </property>
            <property name="text">
             <string>Delete</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../Plugins/org.mitk.gui.qt.datamanager/resources/datamanager.qrc">
+             <normaloff>:/org.mitk.gui.qt.datamanager/Remove_48.png</normaloff>:/org.mitk.gui.qt.datamanager/Remove_48.png</iconset>
            </property>
           </widget>
          </item>
@@ -103,6 +117,9 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../../Plugins/org.mitk.gui.qt.datamanager/resources/datamanager.qrc"/>
+  <include location="../../../Plugins/org.mitk.gui.qt.dicom/resources/dicom.qrc"/>
+ </resources>
  <connections/>
 </ui>

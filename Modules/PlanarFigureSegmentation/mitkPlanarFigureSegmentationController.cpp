@@ -120,6 +120,14 @@ void mitk::PlanarFigureSegmentationController::RemovePlanarFigure( mitk::PlanarF
   if ( !figureFound )
     return;
 
+  PlanarFigureListType::iterator whereIter = m_PlanarFigureList.begin();
+  whereIter += indexOfFigure;
+  m_PlanarFigureList.erase( whereIter );
+
+  SurfaceListType::iterator surfaceIter = m_SurfaceList.begin();
+  surfaceIter += indexOfFigure;
+  m_SurfaceList.erase( surfaceIter );
+
   // TODO: fix this! The following code had to be removed as the method
   // RemoveInputs() has been removed in ITK 4
   // The remaining code works correctly but is slower
@@ -145,21 +153,16 @@ void mitk::PlanarFigureSegmentationController::RemovePlanarFigure( mitk::PlanarF
 
     // and add all existing surfaces
     SurfaceListType::iterator surfaceIter = m_SurfaceList.begin();
+    int index = 0;
     for ( surfaceIter = m_SurfaceList.begin(); surfaceIter!=m_SurfaceList.end(); surfaceIter++ )
     {
-      m_ReduceFilter->SetInput( indexOfFigure, (*surfaceIter) );
-      m_NormalsFilter->SetInput( indexOfFigure, m_ReduceFilter->GetOutput( indexOfFigure ) );
-      m_DistanceImageCreator->SetInput( indexOfFigure, m_NormalsFilter->GetOutput( indexOfFigure ) );
+      m_ReduceFilter->SetInput( index, (*surfaceIter) );
+      m_NormalsFilter->SetInput( index, m_ReduceFilter->GetOutput( index ) );
+      m_DistanceImageCreator->SetInput( index, m_NormalsFilter->GetOutput( index ) );
+
+      ++index;
     }
   }
-
-  PlanarFigureListType::iterator whereIter = m_PlanarFigureList.begin();
-  whereIter += indexOfFigure;
-  m_PlanarFigureList.erase( whereIter );
-
-  SurfaceListType::iterator surfaceIter = m_SurfaceList.begin();
-  surfaceIter += indexOfFigure;
-  m_SurfaceList.erase( surfaceIter );
 }
 
 template<typename TPixel, unsigned int VImageDimension>

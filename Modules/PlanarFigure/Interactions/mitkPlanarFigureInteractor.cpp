@@ -662,8 +662,8 @@ bool mitk::PlanarFigureInteractor::CheckFigureOnRenderingGeometry( const Interac
   mitk::Geometry2D *planarFigureGeometry2D = dynamic_cast< Geometry2D * >( planarFigure->GetGeometry( 0 ) );
 
   double planeThickness = planarFigureGeometry2D->GetExtentInMM( 2 );
-
-  if ( planarFigureGeometry2D->Distance( worldPoint3D ) > planeThickness )
+  double distanceToFigure = planarFigureGeometry2D->Distance( worldPoint3D );
+  if ( distanceToFigure > planeThickness )
   {
     // don't react, when interaction is too far away
     return false;
@@ -713,8 +713,10 @@ bool mitk::PlanarFigureInteractor::TransformObjectToDisplay(
   // Map circle point from local 2D geometry into 3D world space
   objectGeometry->Map( point2D, point3D );
 
+  double planeThickness = objectGeometry->GetExtentInMM( 2 );
+
   // TODO: proper handling of distance tolerance
-  if ( displayGeometry->Distance( point3D ) < 0.1 )
+  if ( displayGeometry->Distance( point3D ) < planeThickness / 3.0 )
   {
     // Project 3D world point onto display geometry
     rendererGeometry->Map( point3D, displayPoint );

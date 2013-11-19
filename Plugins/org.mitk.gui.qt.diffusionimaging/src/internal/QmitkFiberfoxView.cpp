@@ -55,6 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include "usModuleRegistry.h"
 #include <mitkSurface.h>
+#include <itksys/SystemTools.hxx>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -111,6 +112,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_SpikeFrame->setVisible(false);
         m_Controls->m_AliasingFrame->setVisible(false);
         m_Controls->m_MotionArtifactFrame->setVisible(false);
+        m_ParameterFile = QDir::currentPath()+"/param.ffp";
 
         m_Controls->m_FrequencyMapBox->SetDataStorage(this->GetDataStorage());
         mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -248,7 +250,7 @@ void QmitkFiberfoxView::UpdateImageParameters()
     if (m_Controls->m_AddAliasing->isChecked())
     {
         m_ImageGenParameters.artifactModelString += "_ALIASING";
-        m_ImageGenParameters.wrap = 1/m_Controls->m_WrapBox->value();
+        m_ImageGenParameters.wrap = (100-m_Controls->m_WrapBox->value())/100;
     }
 
     // Motion
@@ -550,13 +552,15 @@ void QmitkFiberfoxView::SaveParameters()
     QString filename = QFileDialog::getSaveFileName(
                 0,
                 tr("Save Parameters"),
-                QDir::currentPath()+"/param.ffp",
+                m_ParameterFile,
                 tr("Fiberfox Parameters (*.ffp)") );
 
     if(filename.isEmpty() || filename.isNull())
         return;
     if(!filename.endsWith(".ffp"))
         filename += ".ffp";
+
+    m_ParameterFile = filename;
 
     boost::property_tree::ptree parameters;
 
@@ -617,6 +621,14 @@ void QmitkFiberfoxView::SaveParameters()
     parameters.put("fiberfox.image.artifacts.spikesscale", m_Controls->m_SpikeScaleBox->value());
     parameters.put("fiberfox.image.artifacts.addaliasing", m_Controls->m_AddAliasing->isChecked());
     parameters.put("fiberfox.image.artifacts.aliasingfactor", m_Controls->m_WrapBox->value());
+    parameters.put("fiberfox.image.artifacts.doAddMotion", m_Controls->m_AddMotion->isChecked());
+    parameters.put("fiberfox.image.artifacts.randomMotion", m_Controls->m_RandomMotion->isChecked());
+    parameters.put("fiberfox.image.artifacts.translation0", m_Controls->m_MaxTranslationBoxX->value());
+    parameters.put("fiberfox.image.artifacts.translation1", m_Controls->m_MaxTranslationBoxY->value());
+    parameters.put("fiberfox.image.artifacts.translation2", m_Controls->m_MaxTranslationBoxZ->value());
+    parameters.put("fiberfox.image.artifacts.rotation0", m_Controls->m_MaxRotationBoxX->value());
+    parameters.put("fiberfox.image.artifacts.rotation1", m_Controls->m_MaxRotationBoxY->value());
+    parameters.put("fiberfox.image.artifacts.rotation2", m_Controls->m_MaxRotationBoxZ->value());
 
     parameters.put("fiberfox.image.compartment1.index", m_Controls->m_Compartment1Box->currentIndex());
     parameters.put("fiberfox.image.compartment2.index", m_Controls->m_Compartment2Box->currentIndex());
@@ -664,9 +676,11 @@ void QmitkFiberfoxView::SaveParameters()
 
 void QmitkFiberfoxView::LoadParameters()
 {
-    QString filename = QFileDialog::getOpenFileName(0, tr("Load Parameters"), QDir::currentPath(), tr("Fiberfox Parameters (*.ffp)") );
+    QString filename = QFileDialog::getOpenFileName(0, tr("Load Parameters"), QString(itksys::SystemTools::GetFilenamePath(m_ParameterFile.toStdString()).c_str()), tr("Fiberfox Parameters (*.ffp)") );
     if(filename.isEmpty() || filename.isNull())
         return;
+
+    m_ParameterFile = filename;
 
     boost::property_tree::ptree parameters;
     boost::property_tree::xml_parser::read_xml(filename.toStdString(), parameters);
@@ -741,19 +755,25 @@ void QmitkFiberfoxView::LoadParameters()
             m_Controls->m_AddAliasing->setChecked(v1.second.get<bool>("artifacts.addaliasing"));
             m_Controls->m_WrapBox->setValue(v1.second.get<double>("artifacts.aliasingfactor"));
             m_Controls->m_AddDistortions->setChecked(v1.second.get<bool>("artifacts.distortions"));
-
             m_Controls->m_AddSpikes->setChecked(v1.second.get<bool>("artifacts.addspikes"));
             m_Controls->m_SpikeNumBox->setValue(v1.second.get<int>("artifacts.spikesnum"));
             m_Controls->m_SpikeScaleBox->setValue(v1.second.get<double>("artifacts.spikesscale"));
             m_Controls->m_AddEddy->setChecked(v1.second.get<bool>("artifacts.addeddy"));
             m_Controls->m_EddyGradientStrength->setValue(v1.second.get<double>("artifacts.eddyStrength"));
             m_Controls->m_AddGibbsRinging->setChecked(v1.second.get<bool>("artifacts.addringing"));
+            m_Controls->m_AddMotion->setChecked(v1.second.get<bool>("artifacts.doAddMotion"));
+            m_Controls->m_RandomMotion->setChecked(v1.second.get<bool>("artifacts.randomMotion"));
+            m_Controls->m_MaxTranslationBoxX->setValue(v1.second.get<double>("artifacts.translation0"));
+            m_Controls->m_MaxTranslationBoxY->setValue(v1.second.get<double>("artifacts.translation1"));
+            m_Controls->m_MaxTranslationBoxZ->setValue(v1.second.get<double>("artifacts.translation2"));
+            m_Controls->m_MaxRotationBoxX->setValue(v1.second.get<double>("artifacts.rotation0"));
+            m_Controls->m_MaxRotationBoxY->setValue(v1.second.get<double>("artifacts.rotation1"));
+            m_Controls->m_MaxRotationBoxZ->setValue(v1.second.get<double>("artifacts.rotation2"));
 
             m_Controls->m_Compartment1Box->setCurrentIndex(v1.second.get<int>("compartment1.index"));
             m_Controls->m_Compartment2Box->setCurrentIndex(v1.second.get<int>("compartment2.index"));
             m_Controls->m_Compartment3Box->setCurrentIndex(v1.second.get<int>("compartment3.index"));
             m_Controls->m_Compartment4Box->setCurrentIndex(v1.second.get<int>("compartment4.index"));
-
 
             m_Controls->m_StickWidget1->SetD(v1.second.get<double>("compartment1.stick.d"));
             m_Controls->m_StickWidget1->SetT2(v1.second.get<double>("compartment1.stick.t2"));

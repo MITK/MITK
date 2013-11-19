@@ -24,7 +24,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -1702,7 +1702,7 @@
                 <string/>
                </property>
                <property name="text">
-                <string>Undersampling:</string>
+                <string>Shrink FOV (%):</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
@@ -1712,22 +1712,22 @@
              <item row="0" column="1">
               <widget class="QDoubleSpinBox" name="m_WrapBox">
                <property name="toolTip">
-                <string>Shrink FOV by this factor.</string>
+                <string>Shrink FOV by this percentage.</string>
                </property>
                <property name="decimals">
-                <number>3</number>
+                <number>1</number>
                </property>
                <property name="minimum">
-                <double>1.000000000000000</double>
+                <double>0.000000000000000</double>
                </property>
                <property name="maximum">
-                <double>10.000000000000000</double>
+                <double>90.000000000000000</double>
                </property>
                <property name="singleStep">
                 <double>0.100000000000000</double>
                </property>
                <property name="value">
-                <double>1.300000000000000</double>
+                <double>25.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -1997,6 +1997,9 @@
              </property>
              <item row="0" column="0">
               <widget class="QCheckBox" name="m_RandomMotion">
+               <property name="toolTip">
+                <string>Toggle between random movement and linear movement.</string>
+               </property>
                <property name="text">
                 <string>Randomize motion</string>
                </property>
@@ -2083,7 +2086,7 @@
                 <item row="1" column="1">
                  <widget class="QDoubleSpinBox" name="m_MaxRotationBoxX">
                   <property name="toolTip">
-                   <string/>
+                   <string>Maximum rotation around x-axis.</string>
                   </property>
                   <property name="decimals">
                    <number>1</number>
@@ -2102,7 +2105,7 @@
                 <item row="1" column="3">
                  <widget class="QDoubleSpinBox" name="m_MaxRotationBoxZ">
                   <property name="toolTip">
-                   <string/>
+                   <string>Maximum rotation around z-axis.</string>
                   </property>
                   <property name="decimals">
                    <number>1</number>
@@ -2114,7 +2117,7 @@
                    <double>1.000000000000000</double>
                   </property>
                   <property name="value">
-                   <double>30.000000000000000</double>
+                   <double>15.000000000000000</double>
                   </property>
                  </widget>
                 </item>
@@ -2159,7 +2162,7 @@
                 <item row="1" column="2">
                  <widget class="QDoubleSpinBox" name="m_MaxRotationBoxY">
                   <property name="toolTip">
-                   <string/>
+                   <string>Maximum rotation around y-axis.</string>
                   </property>
                   <property name="decimals">
                    <number>1</number>
@@ -2291,7 +2294,7 @@
                 <item row="1" column="1">
                  <widget class="QDoubleSpinBox" name="m_MaxTranslationBoxX">
                   <property name="toolTip">
-                   <string/>
+                   <string>Maximum translation along x-axis.</string>
                   </property>
                   <property name="decimals">
                    <number>1</number>
@@ -2303,14 +2306,14 @@
                    <double>1.000000000000000</double>
                   </property>
                   <property name="value">
-                   <double>20.000000000000000</double>
+                   <double>0.000000000000000</double>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="2">
                  <widget class="QDoubleSpinBox" name="m_MaxTranslationBoxY">
                   <property name="toolTip">
-                   <string/>
+                   <string>Maximum translation along y-axis.</string>
                   </property>
                   <property name="decimals">
                    <number>1</number>
@@ -2329,7 +2332,7 @@
                 <item row="1" column="3">
                  <widget class="QDoubleSpinBox" name="m_MaxTranslationBoxZ">
                   <property name="toolTip">
-                   <string/>
+                   <string>Maximum translation along z-axis.</string>
                   </property>
                   <property name="decimals">
                    <number>1</number>
@@ -2891,8 +2894,18 @@
   <tabstop>m_SpikeScaleBox</tabstop>
   <tabstop>m_AddGhosts</tabstop>
   <tabstop>m_kOffsetBox</tabstop>
+  <tabstop>m_AddAliasing</tabstop>
+  <tabstop>m_WrapBox</tabstop>
   <tabstop>m_AddDistortions</tabstop>
   <tabstop>m_FrequencyMapBox</tabstop>
+  <tabstop>m_AddMotion</tabstop>
+  <tabstop>m_RandomMotion</tabstop>
+  <tabstop>m_MaxRotationBoxX</tabstop>
+  <tabstop>m_MaxRotationBoxY</tabstop>
+  <tabstop>m_MaxRotationBoxZ</tabstop>
+  <tabstop>m_MaxTranslationBoxX</tabstop>
+  <tabstop>m_MaxTranslationBoxY</tabstop>
+  <tabstop>m_MaxTranslationBoxZ</tabstop>
   <tabstop>m_AddEddy</tabstop>
   <tabstop>m_EddyGradientStrength</tabstop>
   <tabstop>m_AddGibbsRinging</tabstop>

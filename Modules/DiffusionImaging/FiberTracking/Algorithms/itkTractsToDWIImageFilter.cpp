@@ -449,25 +449,19 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     logFile.open("fiberfox_motion.log");
     logFile << "0 rotation: 0,0,0; translation: 0,0,0\n";
 
-    // astrosticks überarbeiten!!!!!!!!!!!!!!!!!!!!!
-    for (unsigned int i=0; i<m_NonFiberModels.size(); i++)
-        if (dynamic_cast< mitk::AstroStickModel<double>* >(m_NonFiberModels.at(i)))
-        {
-            mitk::AstroStickModel<double>* model = dynamic_cast< mitk::AstroStickModel<double>* >(m_NonFiberModels.at(i));
-            model->SetSeed(8111984);
-        }
-
     // get transform for motion artifacts
     FiberBundleType fiberBundleTransformed = fiberBundle;
     VectorType rotation = m_MaxRotation/m_FiberModels.at(0)->GetNumGradients();
     VectorType translation = m_MaxTranslation/m_FiberModels.at(0)->GetNumGradients();
 
+    // creat image to hold transformed mask (motion artifact)
     ItkUcharImgType::Pointer tempTissueMask = ItkUcharImgType::New();
     itk::ImageDuplicator<ItkUcharImgType>::Pointer duplicator = itk::ImageDuplicator<ItkUcharImgType>::New();
     duplicator->SetInputImage(m_TissueMask);
     duplicator->Update();
     tempTissueMask = duplicator->GetOutput();
 
+    // second upsampling needed for motion artifacts
     ImageRegion<3>                      upsampledImageRegion = m_UpsampledImageRegion;
     itk::Vector<double,3>               upsampledSpacing = m_UpsampledSpacing;
     upsampledSpacing[0] /= 4;
@@ -678,6 +672,11 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                     {
                         DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
                         DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index);
+//                        if (dynamic_cast< mitk::AstroStickModel<double>* >(m_NonFiberModels.at(i)))
+//                        {
+//                            mitk::AstroStickModel<double>* model = dynamic_cast< mitk::AstroStickModel<double>* >(m_NonFiberModels.at(i));
+//                            model->SetSeed(8111984);
+//                        }
                         pix[g] += m_NonFiberModels[i]->SimulateMeasurement(g)*other*m_NonFiberModels[i]->GetWeight();
                         doubleDwi->SetPixel(index, pix);
                         m_VolumeFractions.at(i+m_FiberModels.size())->SetPixel(index, other/voxelVolume*m_NonFiberModels[i]->GetWeight());

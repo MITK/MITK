@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_fiberfoxview Fiberfox
 
-This view provides the user interface for Fiberfox [1,2], an interactive simulation tool for defining artificial white matter fibers and generating corresponding diffusion weighted images. Arbitrary fiber configurations like bent, crossing, kissing, twisting, and fanning bundles can be intuitively defined by positioning only a few 3D waypoints to trigger the automated generation of synthetic fibers. From these fibers a diffusion weighted signal is simulated using a flexible combination of various diffusion models. It can be modified using specified acquisition settings such as gradient direction, b-value, signal-to-noise ratio, image size, and resolution. Additionally it enables the simulation of magnetic resonance artifacts including thermal noise, Gibbs ringing, N/2 ghosting and susceptibility distortions. The employed parameters can be saved and loaded as xml file with the ending ".ffp" (Fiberfox parameters).
+This view provides the user interface for Fiberfox [1,2,3], an interactive simulation tool for defining artificial white matter fibers and generating corresponding diffusion weighted images. Arbitrary fiber configurations like bent, crossing, kissing, twisting, and fanning bundles can be intuitively defined by positioning only a few 3D waypoints to trigger the automated generation of synthetic fibers. From these fibers a diffusion weighted signal is simulated using a flexible combination of various diffusion models. It can be modified using specified acquisition settings such as gradient direction, b-value, signal-to-noise ratio, image size, and resolution. Additionally it enables the simulation of magnetic resonance artifacts including thermal noise, Gibbs ringing, N/2 ghosting, susceptibility distortions and motion artifacts. The employed parameters can be saved and loaded as xml file with the ending ".ffp" (Fiberfox parameters).
 
 <b>Available sections:</b>
   - \ref QmitkFiberfoxViewUserManualFiberDefinition
@@ -89,11 +89,13 @@ For a detailed description of the single models, please refer to Panagiotaki <em
 
 <b>Noise and Artifacts:</b>
 \li <b>Rician Noise</b>: Add Rician noise with the specified variance to the signal.
-\li <b>Rician Spikes</b>: Add signal spikes to the k-space signal resulting in stripe artifacts across the corresponding image slice.
+\li <b>Spikes</b>: Add signal spikes to the k-space signal resulting in stripe artifacts across the corresponding image slice.
+\li <b>Aliasing</b>: Aliasing artifacts occur if the FOV in phase direction is smaller than the imaged object. The parameter defines the percentage by which the FOV is shrunk.
 \li <b>N/2 Ghosts</b>: Specify the offset between successive lines in k-space. This offset causes ghost images in distance N/2 in phase direction due to the alternating EPI readout directions.
 \li <b>Distortions</b>: Simulate distortions due to magnetic field inhomogeneities. This is achieved by adding an additional phase during the readout process. The input is a frequency map specifying the inhomogeneities. The "Fieldmap Generator" view provides an interface to generate simple artificial frequency maps.
+\li <b>Motion Artifacts</b>: To simulate motion artifacts, the fiber configuration is moved between the signal simulation of the individual gradient volumes. The motion can be performed randomly, where the parameters are used to define the +/- maximum of the corresponding motion, or linearly, where the parameters define the maximum rotation/translation around/along the corresponding axis at the and of the simulated acquisition.
 \li <b>Eddy Currents</b>: EXPERIMENTAL! This feature is currently being tested and might not yet behave as expected!
-\li <b>Gibbs Ringing</b>: Ringing artifacts occurring on edges in the image due to the frequency low-pass filtering caused by the limited size of the k-space. The higher the oversampling factor, the larger the distance from the corresponding edge in which the ringing is still visible. Keep in mind that increasing the oversampling factor results in a quadratic increase of computation time.
+\li <b>Gibbs Ringing</b>: Ringing artifacts occurring on edges in the image due to the frequency low-pass filtering caused by the limited size of the k-space.
 
 \section QmitkFiberfoxViewUserManualKnownIssues Known Issues
 
@@ -105,8 +107,10 @@ If any other issues or feature requests arises during the use of Fiberfox, pleas
 
 \section QmitkFiberfoxViewUserManualReferences References
 
-[1] Peter F. Neher, Bram Stieltjes, Frederik B. Laun, and Klaus H. Fritzsche: Fiberfox: An extensible system for generating realistic white matter software phantoms, MICCAI CDMRI Workshop, Nagoya; 09/2013
+[1] Peter F. Neher, Frederik B. Laun, Bram Stieltjes, and Klaus H. Fritzsche: Fiberfox: Facilitating the creation of realistic white matter software phantoms, Magn Reson Med, Accepted for publication.
 
-[2] Peter F. Neher, Bram Stieltjes, Frederik B. Laun, Hans-Peter Meinzer, and Klaus H. Fritzsche: Fiberfox: Fiberfox: A novel tool to generate software phantoms of complex fiber geometries, ISMRM, Salt Lake City; 04/2013
+[2] Peter F. Neher, Frederik B. Laun, Bram Stieltjes, and Klaus H. Fritzsche: Fiberfox: An extensible system for generating realistic white matter software phantoms, MICCAI CDMRI Workshop, Nagoya; 09/2013
+
+[3] Peter F. Neher, Bram Stieltjes, Frederik B. Laun, Hans-Peter Meinzer, and Klaus H. Fritzsche: Fiberfox: Fiberfox: A novel tool to generate software phantoms of complex fiber geometries, ISMRM, Salt Lake City; 04/2013
 
 */

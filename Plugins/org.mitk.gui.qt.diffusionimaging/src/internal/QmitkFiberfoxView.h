@@ -216,4 +216,6 @@ protected:
     mitk::AstroStickModel<double> m_AstrosticksModel2;
     mitk::DotModel<double> m_DotModel1;
     mitk::DotModel<double> m_DotModel2;
+
+    QString m_ParameterFile;
 };

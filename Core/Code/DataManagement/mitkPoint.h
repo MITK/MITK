@@ -50,6 +50,40 @@ namespace mitk {
     Point<TCoordRep, NPointDimension>(const TCoordRep & v):itk::Point<TCoordRep, NPointDimension>(v) {}
     Point<TCoordRep, NPointDimension>(const itk::Point<TCoordRep, NPointDimension> r) : itk::Point<TCoordRep, NPointDimension>(r) {}
 
+    /** Pass-through assignment operator for the Array base class. */
+    /**
+     * Assignment Operator
+     */
+    Point< TCoordRep, NPointDimension > &
+    operator=(const Point & r)
+    {
+      itk::Point<TCoordRep, NPointDimension>::operator=(r);
+      return *this;
+    }
+
+    /** Pass-through assignment operator for the Array base class. */
+    /**
+     * Assignment Operator
+     */
+    Point< TCoordRep, NPointDimension > &
+    operator=(const itk::FixedArray<TCoordRep, NPointDimension> & r)
+    {
+      itk::FixedArray<TCoordRep, NPointDimension>::operator=(r);
+      return *this;
+    }
+
+
+    /**
+     * Assignment from a plain array
+     */
+    Point< TCoordRep, NPointDimension > &
+    operator=(const TCoordRep r[NPointDimension])
+    {
+      itk::Point<TCoordRep, NPointDimension>::operator=(r);
+      return *this;
+    }
+
+
     /**
      * Warning: Array must have same dimension as Point
      */

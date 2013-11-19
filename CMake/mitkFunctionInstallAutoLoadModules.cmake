@@ -13,9 +13,10 @@
 #!
 #! \param PLUGINS A list of plug-in targets from which installable audo-load modules are derived.
 #! \param DESTINATION The install destination, e.g. "bin".
+#! \param RETURN_ADDITIONAL_PLUGINS Return variable name: will be filled with the list of the found auto-load modules (e.g. for feeding into MITK_INSTALL_TARGETS(PLUGINS ..)
 function(mitkFunctionInstallAutoLoadModules)
 
-  MACRO_PARSE_ARGUMENTS(_INSTALL "PLUGINS;DESTINATION" "" ${ARGN})
+  MACRO_PARSE_ARGUMENTS(_INSTALL "PLUGINS;DESTINATION;RETURN_ADDITIONAL_PLUGINS" "" ${ARGN})
 
   if(NOT _INSTALL_PLUGINS)
     message(SEND_ERROR "PLUGINS argument is required")
@@ -81,12 +82,25 @@ function(mitkFunctionInstallAutoLoadModules)
               endif()
             endif()
           endif()
+
+
+          if(_target_filename_debug)
+            list(APPEND additional_absolute_plugins_for_dependey_check ${CMAKE_INSTALL_PREFIX}/${_module_install_dir}/${_target_filename_debug})
+          endif()
+          if(_target_filename_release)
+            list(APPEND additional_absolute_plugins_for_dependey_check ${CMAKE_INSTALL_PREFIX}/${_module_install_dir}/${_target_filename_release})
+          endif()
+
         endforeach()
       endif()
     else()
       message(WARNING "Ignoring unknown target \"${_install_target}\" for installation.")
     endif()
   endforeach()
+
+  # return a list of additional targets that should be checked for dependencies
+  list(REMOVE_DUPLICATES additional_absolute_plugins_for_dependey_check)
+  set(${_INSTALL_RETURN_ADDITIONAL_PLUGINS} ${additional_absolute_plugins_for_dependey_check} PARENT_SCOPE)
 
 endfunction()
 

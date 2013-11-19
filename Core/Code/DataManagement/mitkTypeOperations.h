@@ -31,40 +31,44 @@ namespace mitk
    */
 
   /**
-   * @brief implements sum = addend1 + addend2
-   * Takes FixedArray so you sum all deriving classes like e.g.
-   * sum two points returning a point or
-   * sum a vector and a point, returning a vector.
+   * @brief implements sum = addend1 + addend2 for mitk::Point
    *
-   * @attention Please make sure, that you really want to add the types you specified.
+   * @attention Please make sure, that you really want to add mitk::Point s.
    * @attention E.g., summing two points does geometrically not make sense, which is why itk does
    * @attention not provide an operator+ for these types.
    *
    */
   template< typename TCoordRep, unsigned int NPointDimension>
-  void add(itk::FixedArray<TCoordRep, NPointDimension>& sum,
-      itk::FixedArray<TCoordRep, NPointDimension>& addend1, itk::FixedArray<TCoordRep, NPointDimension>& addend2)
+  mitk::Point<TCoordRep, NPointDimension> operator+(mitk::Point<TCoordRep, NPointDimension>& addend1, mitk::Point<TCoordRep, NPointDimension>& addend2)
   {
+    mitk::Point<TCoordRep, NPointDimension> sum;
+
     for (typename itk::FixedArray<TCoordRep, NPointDimension>::SizeType var = 0; var < NPointDimension; ++var)
     {
       sum[var] = addend1[var] + addend2[var];
     }
+
+    return sum;
   }
 
 
   /**
-   * @brief implements difference = minuend - subtrahend.
+   * @brief implements difference = minuend - subtrahend for mitk::Point.
    *
-   * result the result of the subtraction
+   * @return the result of the subtraction
    * @param minuend
    * @param subtrahend
+   *
+   * @attention Please make sure, that you really want to add mitk::Point s.
+   * @attention E.g., summing two points does geometrically not make sense, which is why itk does
+   * @attention not provide an operator+ for these types.
    */
   template< typename TCoordRep, unsigned int NPointDimension>
-  itk::FixedArray<TCoordRep, NPointDimension> sub(itk::FixedArray<TCoordRep, NPointDimension>& minuend, itk::FixedArray<TCoordRep, NPointDimension>& subtrahend)
+  mitk::Point<TCoordRep, NPointDimension> operator-(mitk::Point<TCoordRep, NPointDimension>& minuend, mitk::Point<TCoordRep, NPointDimension>& subtrahend)
   {
-    itk::FixedArray<TCoordRep, NPointDimension> difference;
+    mitk::Point<TCoordRep, NPointDimension> difference;
 
-    for (typename itk::FixedArray<TCoordRep, NPointDimension>::SizeType var = 0; var < NPointDimension; ++var)
+    for (typename mitk::Point<TCoordRep, NPointDimension>::SizeType var = 0; var < NPointDimension; ++var)
     {
       difference[var] = minuend[var] - subtrahend[var];
     }

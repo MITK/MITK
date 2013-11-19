@@ -53,7 +53,7 @@ static void Test_Addition(void)
 {
   Setup();
 
-  mitk::add(a, b, c);
+  a = b + c;
 
   TestForValuesHelper(a, 16.777777, 15.3, 7.6666879, "summation a = b + c correctly performed");
 }
@@ -62,9 +62,8 @@ static void Test_Addition(void)
 static void Test_Substraction(void)
 {
   Setup();
-  itk::FixedArray<double, 3> test;
 
-  a = mitk::sub(b, c);
+  a = b - c;
 
   TestForValuesHelper(a, 11.469135, 5.1, 2.580225678, "difference a = b - c correctly performed");
 }

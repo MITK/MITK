@@ -61,17 +61,6 @@ namespace mitk {
       return *this;
     }
 
-    /** Pass-through assignment operator for the Array base class. */
-    /**
-     * Assignment Operator
-     */
-    Point< TCoordRep, NPointDimension > &
-    operator=(const itk::FixedArray<TCoordRep, NPointDimension> & r)
-    {
-      itk::FixedArray<TCoordRep, NPointDimension>::operator=(r);
-      return *this;
-    }
-
 
     /**
      * Assignment from a plain array

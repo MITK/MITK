@@ -44,7 +44,6 @@ namespace mitk
 
     KinectDeviceFactory()
     {
-      this->m_DeviceNumber = 1;
     }
     /*!
     \brief Defining the Factorie´s Name, here for the Kinect.
@@ -53,20 +52,13 @@ namespace mitk
     {
       return std::string("Kinect Factory");
     }
-    //Interating the Device name on calling the Factory
-    std::string GetCurrentDeviceName()
+
+    /**
+     * @brief GetDeviceNamePrefix Main part of a device name.
+     */
+    std::string GetDeviceNamePrefix()
     {
-      std::stringstream name;
-      if (m_DeviceNumber>1)
-      {
-        name << "Kinect " << m_DeviceNumber;
-      }
-      else
-      {
-        name << "Kinect ";
-      }
-      m_DeviceNumber++;
-      return name.str();
+      return std::string("Kinect");
     }
 
   private:
@@ -91,9 +83,6 @@ namespace mitk
       us::Module* module = us::GetModuleContext()->GetModule();
       return module->GetResource("CalibrationFiles/Kinect_RGB_camera.xml");
     }
-
-    //Member variable as variable for our DeviceNumber
-    int m_DeviceNumber;
   };
 }
 #endif

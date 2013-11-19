@@ -47,6 +47,20 @@ struct MITK_TOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFacto
     */
    size_t GetNumberOfDevices();
 
+   std::string GetCurrentDeviceName()
+   {
+     std::stringstream name;
+     if(this->GetNumberOfDevices()>1)
+     {
+       name << this->GetDeviceNamePrefix()<< " "<< this->GetNumberOfDevices();
+     }
+     else
+     {
+       name << this->GetDeviceNamePrefix();
+     }
+     return name.str();
+   }
+
   protected:
 
    /**

@@ -31,10 +31,11 @@ namespace mitk
     */
     virtual ~IToFDeviceFactory();
 
-
     virtual std::string GetFactoryName() = 0;
 
     virtual std::string GetCurrentDeviceName() = 0;
+
+    virtual std::string GetDeviceNamePrefix() = 0;
 
     virtual ToFCameraDevice::Pointer CreateToFCameraDevice() = 0;
 

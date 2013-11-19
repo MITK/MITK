@@ -45,29 +45,21 @@ class MITK_PMDMODULE_EXPORT ToFCameraPMDCamCubeDeviceFactory : public itk::Light
 public:
   ToFCameraPMDCamCubeDeviceFactory()
   {
-    this->m_DeviceNumber=1;
   }
    /*!
    \brief Defining the Factorie´s Name, here for the ToFPMDCamCube.
    */
    std::string GetFactoryName()
    {
-       return std::string("PMD Camcube 2.0/3.0 Factory ");
+     return std::string("PMD Camcube 2.0/3.0 Factory ");
    }
 
-   std::string GetCurrentDeviceName()
+   /**
+    * @brief GetDeviceNamePrefix Main part of the device name.
+    */
+   std::string GetDeviceNamePrefix()
    {
-     std::stringstream name;
-     if(m_DeviceNumber>1)
-     {
-       name << "PMD CamCube 2.0/3.0 "<< m_DeviceNumber;
-     }
-     else
-     {
-       name << "PMD CamCube 2.0/3.0 ";
-     }
-     m_DeviceNumber++;
-     return name.str();
+     return std::string("PMD CamCube 2.0/3.0");
    }
 
 private:
@@ -90,8 +82,6 @@ private:
      us::Module* module = us::GetModuleContext()->GetModule();
      return module->GetResource("CalibrationFiles/PMDCamCube3_camera.xml");
    }
-
-   int m_DeviceNumber;
 };
 }
 #endif

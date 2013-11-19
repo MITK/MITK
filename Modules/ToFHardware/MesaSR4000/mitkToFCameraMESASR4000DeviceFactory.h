@@ -37,7 +37,6 @@ namespace mitk
   public:
     ToFCameraMESASR4000DeviceFactory()
     {
-      this->m_DeviceNumber = 1;
     }
     /*!
     \brief Defining the Factorie´s Name, here for the MESASR4000DeviceFactory
@@ -46,19 +45,13 @@ namespace mitk
     {
       return std::string("MESA SR4000 Factory");
     }
-    std::string GetCurrentDeviceName()
+
+    /**
+     * @brief GetDeviceNamePrefix Main part of the device name.
+     */
+    std::string GetDeviceNamePrefix()
     {
-      std::stringstream name;
-      if(m_DeviceNumber>1)
-      {
-        name << "MESA SR4000 "<< m_DeviceNumber;
-      }
-      else
-      {
-        name << "MESA SR4000";
-      }
-      m_DeviceNumber++;
-      return name.str();
+      return std::string("MESA SR4000");
     }
 
   private:
@@ -83,7 +76,6 @@ namespace mitk
 
       return device.GetPointer();
     }
-    int m_DeviceNumber;
   };
 }
 #endif

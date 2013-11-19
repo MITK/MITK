@@ -41,27 +41,18 @@ public:
   {
   }
 
-     /*!
-   \brief Defining the Factorie's Name, here for the ToFPlayer.
-   */
-   std::string GetFactoryName()
-   {
-     return std::string("MITK Player Factory");
-   }
+    /*!
+  \brief Defining the Factorie's Name, here for the ToFPlayer.
+  */
+  std::string GetFactoryName()
+  {
+    return std::string("MITK Player Factory");
+  }
 
-    std::string GetCurrentDeviceName()
-    {
-      std::stringstream name;
-      if(this->GetNumberOfDevices()>1)
-      {
-        name << "MITK Player "<< this->GetNumberOfDevices();
-      }
-      else
-      {
-        name << "MITK Player";
-      }
-      return name.str();
-    }
+  std::string GetDeviceNamePrefix()
+  {
+    return std::string("MITK Player");
+  }
 
 private:
    /*!

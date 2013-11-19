@@ -39,7 +39,6 @@ public:
 
   ToFCameraMITKPlayerDeviceFactory()
   {
-   m_DeviceNumber = 1;
   }
 
      /*!
@@ -47,21 +46,20 @@ public:
    */
    std::string GetFactoryName()
    {
-       return std::string("MITK Player Factory");
+     return std::string("MITK Player Factory");
    }
 
     std::string GetCurrentDeviceName()
     {
       std::stringstream name;
-      if(m_DeviceNumber>1)
+      if(this->GetNumberOfDevices()>1)
       {
-        name << "MITK Player "<< m_DeviceNumber;
+        name << "MITK Player "<< this->GetNumberOfDevices();
       }
       else
       {
         name << "MITK Player";
       }
-      m_DeviceNumber++;
       return name.str();
     }
 
@@ -86,9 +84,6 @@ private:
 
      return device.GetPointer();
    }
-
-   int m_DeviceNumber;
-
 };
 }
 #endif

@@ -38,6 +38,14 @@ struct MITK_TOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFacto
 
    void DisconnectToFDevice(const ToFCameraDevice::Pointer& device);
 
+   /**
+    * @brief GetNumberOfDevices Get the number of devices produced by this factory.
+    * This function will return the number of registered devices to account for
+    * created and disconnected devices.
+    *
+    * @return Number of registered devices.
+    */
+   size_t GetNumberOfDevices();
 
   protected:
 

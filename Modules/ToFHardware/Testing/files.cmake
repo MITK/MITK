@@ -1,5 +1,7 @@
 set(MODULE_TESTS
   #mitkThreadedToFRawDataReconstructionTest.cpp
+  mitkAbstractToFDeviceFactoryTest.cpp
+  mitkToFCameraMITKPlayerDeviceFactoryTest.cpp
   mitkToFImageCsvWriterTest.cpp
   mitkToFImageGrabberTest.cpp
   #mitkToFImageRecorderTest.cpp
@@ -10,8 +12,14 @@ set(MODULE_TESTS
 )
 
 set(MODULE_CUSTOM_TESTS
-  mitkAbstractToFDeviceFactoryTest.cpp
   mitkPlayerLoadAndRenderDepthDataTest.cpp
   mitkPlayerLoadAndRenderRGBDataTest.cpp
 )
 
+# Create an artificial module initializing class for
+# the mitkToFCameraMITKPlayerDeviceFactoryTest
+usFunctionGenerateExecutableInit(testdriver_init_file
+                                 IDENTIFIER ${MODULE_NAME}TestDriver
+                                )
+
+set(TEST_CPP_FILES ${testdriver_init_file})

@@ -39,6 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 #include <iostream>
 #include <fstream>
+#include <itkImageDuplicator.h>
+#include <boost/lexical_cast.hpp>
 
 namespace itk
 {
@@ -309,6 +311,10 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     m_UpsampledImageRegion = m_ImageRegion;
     m_UpsampledImageRegion.SetSize(0, m_ImageRegion.GetSize()[0]*upsampling);
     m_UpsampledImageRegion.SetSize(1, m_ImageRegion.GetSize()[1]*upsampling);
+    m_UpsampledOrigin = m_Origin;
+    m_UpsampledOrigin[0] -= m_Spacing[0]/2; m_UpsampledOrigin[0] += m_UpsampledSpacing[0]/2;
+    m_UpsampledOrigin[1] -= m_Spacing[1]/2; m_UpsampledOrigin[1] += m_UpsampledSpacing[1]/2;
+    m_UpsampledOrigin[2] -= m_Spacing[2]/2; m_UpsampledOrigin[2] += m_UpsampledSpacing[2]/2;
 
     // generate double images to store the individual compartment signals
     std::vector< DoubleDwiType::Pointer > compartments;
@@ -316,7 +322,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     {
         DoubleDwiType::Pointer doubleDwi = DoubleDwiType::New();
         doubleDwi->SetSpacing( m_UpsampledSpacing );
-        doubleDwi->SetOrigin( m_Origin );
+        doubleDwi->SetOrigin( m_UpsampledOrigin );
         doubleDwi->SetDirection( m_DirectionMatrix );
         doubleDwi->SetLargestPossibleRegion( m_UpsampledImageRegion );
         doubleDwi->SetBufferedRegion( m_UpsampledImageRegion );
@@ -336,7 +342,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     {
         ItkDoubleImgType::Pointer doubleImg = ItkDoubleImgType::New();
         doubleImg->SetSpacing( m_UpsampledSpacing );
-        doubleImg->SetOrigin( m_Origin );
+        doubleImg->SetOrigin( m_UpsampledOrigin );
         doubleImg->SetDirection( m_DirectionMatrix );
         doubleImg->SetLargestPossibleRegion( m_UpsampledImageRegion );
         doubleImg->SetBufferedRegion( m_UpsampledImageRegion );
@@ -364,6 +370,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             resampler->SetOutputParametersFromImage(m_TissueMask);
             resampler->SetSize(m_UpsampledImageRegion.GetSize());
             resampler->SetOutputSpacing(m_UpsampledSpacing);
+            resampler->SetOutputOrigin(m_UpsampledOrigin);
             resampler->Update();
             m_TissueMask = resampler->GetOutput();
         }
@@ -376,23 +383,30 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             resampler->SetOutputParametersFromImage(m_FrequencyMap);
             resampler->SetSize(m_UpsampledImageRegion.GetSize());
             resampler->SetOutputSpacing(m_UpsampledSpacing);
+            resampler->SetOutputOrigin(m_UpsampledOrigin);
             resampler->Update();
             m_FrequencyMap = resampler->GetOutput();
         }
     }
+
     // no input tissue mask is set -> create default
+    bool maskImageSet = true;
     if (m_TissueMask.IsNull())
     {
+        MITK_INFO << "No tissue mask set";
         m_TissueMask = ItkUcharImgType::New();
         m_TissueMask->SetSpacing( m_UpsampledSpacing );
-        m_TissueMask->SetOrigin( m_Origin );
+        m_TissueMask->SetOrigin( m_UpsampledOrigin );
         m_TissueMask->SetDirection( m_DirectionMatrix );
         m_TissueMask->SetLargestPossibleRegion( m_UpsampledImageRegion );
         m_TissueMask->SetBufferedRegion( m_UpsampledImageRegion );
         m_TissueMask->SetRequestedRegion( m_UpsampledImageRegion );
         m_TissueMask->Allocate();
         m_TissueMask->FillBuffer(1);
+        maskImageSet = false;
     }
+    else
+        MITK_INFO << "Using tissue mask";
 
     m_ImageRegion = croppedRegion;
     x=m_ImageRegion.GetSize(0); y=m_ImageRegion.GetSize(1);
@@ -433,7 +447,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
     ofstream logFile;
     logFile.open("fiberfox_motion.log");
-    logFile << "0,0,0,0\n";
+    logFile << "0 rotation: 0,0,0; translation: 0,0,0\n";
 
     // astrosticks überarbeiten!!!!!!!!!!!!!!!!!!!!!
     for (unsigned int i=0; i<m_NonFiberModels.size(); i++)
@@ -443,14 +457,49 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             model->SetSeed(8111984);
         }
 
+    // get transform for motion artifacts
     FiberBundleType fiberBundleTransformed = fiberBundle;
+    VectorType rotation = m_MaxRotation/m_FiberModels.at(0)->GetNumGradients();
+    VectorType translation = m_MaxTranslation/m_FiberModels.at(0)->GetNumGradients();
+
+    ItkUcharImgType::Pointer tempTissueMask = ItkUcharImgType::New();
+    itk::ImageDuplicator<ItkUcharImgType>::Pointer duplicator = itk::ImageDuplicator<ItkUcharImgType>::New();
+    duplicator->SetInputImage(m_TissueMask);
+    duplicator->Update();
+    tempTissueMask = duplicator->GetOutput();
+
+    ImageRegion<3>                      upsampledImageRegion = m_UpsampledImageRegion;
+    itk::Vector<double,3>               upsampledSpacing = m_UpsampledSpacing;
+    upsampledSpacing[0] /= 4;
+    upsampledSpacing[1] /= 4;
+    upsampledSpacing[2] /= 4;
+    upsampledImageRegion.SetSize(0, m_UpsampledImageRegion.GetSize()[0]*4);
+    upsampledImageRegion.SetSize(1, m_UpsampledImageRegion.GetSize()[1]*4);
+    upsampledImageRegion.SetSize(2, m_UpsampledImageRegion.GetSize()[2]*4);
+    itk::Point<double,3> upsampledOrigin = m_UpsampledOrigin;
+    upsampledOrigin[0] -= m_UpsampledSpacing[0]/2; upsampledOrigin[0] += upsampledSpacing[0]/2;
+    upsampledOrigin[1] -= m_UpsampledSpacing[1]/2; upsampledOrigin[1] += upsampledSpacing[1]/2;
+    upsampledOrigin[2] -= m_UpsampledSpacing[2]/2; upsampledOrigin[2] += upsampledSpacing[2]/2;
+    ItkUcharImgType::Pointer upsampledTissueMask = ItkUcharImgType::New();
+    itk::ResampleImageFilter<ItkUcharImgType, ItkUcharImgType>::Pointer upsampler = itk::ResampleImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
+    upsampler->SetInput(m_TissueMask);
+    upsampler->SetOutputParametersFromImage(m_TissueMask);
+    upsampler->SetSize(upsampledImageRegion.GetSize());
+    upsampler->SetOutputSpacing(upsampledSpacing);
+    upsampler->SetOutputOrigin(upsampledOrigin);
+    itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType>::Pointer nn_interpolator
+      = itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType>::New();
+    upsampler->SetInterpolator(nn_interpolator);
+    upsampler->Update();
+    upsampledTissueMask = upsampler->GetOutput();
+
     for (int g=0; g<m_FiberModels.at(0)->GetNumGradients(); g++)
     {
-        vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundleTransformed->GetFiberPolyData();
+        vtkPolyData* fiberPolyData = fiberBundleTransformed->GetFiberPolyData();
 
         ItkDoubleImgType::Pointer intraAxonalVolume = ItkDoubleImgType::New();
         intraAxonalVolume->SetSpacing( m_UpsampledSpacing );
-        intraAxonalVolume->SetOrigin( m_Origin );
+        intraAxonalVolume->SetOrigin( m_UpsampledOrigin );
         intraAxonalVolume->SetDirection( m_DirectionMatrix );
         intraAxonalVolume->SetLargestPossibleRegion( m_UpsampledImageRegion );
         intraAxonalVolume->SetBufferedRegion( m_UpsampledImageRegion );
@@ -458,6 +507,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         intraAxonalVolume->Allocate();
         intraAxonalVolume->FillBuffer(0);
 
+        // generate fiber signal
         for( int i=0; i<numFibers; i++ )
         {
             vtkCell* cell = fiberPolyData->GetCell(i);
@@ -484,12 +534,12 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
                 itk::Index<3> idx;
                 itk::ContinuousIndex<float, 3> contIndex;
-                m_TissueMask->TransformPhysicalPointToIndex(vertex, idx);
-                m_TissueMask->TransformPhysicalPointToContinuousIndex(vertex, contIndex);
+                tempTissueMask->TransformPhysicalPointToIndex(vertex, idx);
+                tempTissueMask->TransformPhysicalPointToContinuousIndex(vertex, contIndex);
 
                 if (!m_UseInterpolation)    // use nearest neighbour interpolation
                 {
-                    if (!m_TissueMask->GetLargestPossibleRegion().IsInside(idx) || m_TissueMask->GetPixel(idx)<=0)
+                    if (!tempTissueMask->GetLargestPossibleRegion().IsInside(idx) || tempTissueMask->GetPixel(idx)<=0)
                         continue;
 
                     // generate signal for each fiber compartment
@@ -510,9 +560,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                     continue;
                 }
 
-                double frac_x = contIndex[0] - idx[0];
-                double frac_y = contIndex[1] - idx[1];
-                double frac_z = contIndex[2] - idx[2];
+                double frac_x = contIndex[0] - idx[0]; double frac_y = contIndex[1] - idx[1]; double frac_z = contIndex[2] - idx[2];
                 if (frac_x<0)
                 {
                     idx[0] -= 1;
@@ -552,7 +600,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                             double frac = frac_x*frac_y*frac_z;
 
                             // is position valid?
-                            if (!m_TissueMask->GetLargestPossibleRegion().IsInside(newIdx) || m_TissueMask->GetPixel(newIdx)<=0)
+                            if (!tempTissueMask->GetLargestPossibleRegion().IsInside(newIdx) || tempTissueMask->GetPixel(newIdx)<=0)
                                 continue;
 
                             // generate signal for each fiber compartment
@@ -577,12 +625,11 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             ++disp;
         }
 
-        ImageRegionIterator<ItkUcharImgType> it3(m_TissueMask, m_TissueMask->GetLargestPossibleRegion());
-
+        // generate non-fiber signal
+        ImageRegionIterator<ItkUcharImgType> it3(tempTissueMask, tempTissueMask->GetLargestPossibleRegion());
         double fact = 1;
         if (m_FiberRadius<0.0001)
             fact = voxelVolume/maxVolume;
-
         while(!it3.IsAtEnd())
         {
             if (it3.Get()>0)
@@ -640,32 +687,53 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             ++it3;
         }
 
+        // move fibers
         if (m_AddMotionArtifact)
         {
             if (m_RandomMotion)
             {
                 fiberBundleTransformed = fiberBundle->GetDeepCopy();
-
-                double rotX = m_RandGen->GetVariateWithClosedRange(m_MaxRotation[0]*2)-m_MaxRotation[0];
-                double rotY = m_RandGen->GetVariateWithClosedRange(m_MaxRotation[1]*2)-m_MaxRotation[1];
-                double rotZ = m_RandGen->GetVariateWithClosedRange(m_MaxRotation[2]*2)-m_MaxRotation[2];
-                fiberBundleTransformed->TranslateFibers(rotX, rotY, rotZ);
-                logFile << g+1 << " rotation:" << rotX << "," << rotY << "," << rotZ << "\n";
-
-                double transX = m_RandGen->GetVariateWithClosedRange(m_MaxTranslation[0]*2)-m_MaxTranslation[0];
-                double transY = m_RandGen->GetVariateWithClosedRange(m_MaxTranslation[1]*2)-m_MaxTranslation[1];
-                double transZ = m_RandGen->GetVariateWithClosedRange(m_MaxTranslation[2]*2)-m_MaxTranslation[2];
-                fiberBundleTransformed->TranslateFibers(transX, transY, transZ);
-                logFile << g+1 << " translation:" << transX << "," << transY << "," << transZ << "\n";
+                rotation[0] = m_RandGen->GetVariateWithClosedRange(m_MaxRotation[0]*2)-m_MaxRotation[0];
+                rotation[1] = m_RandGen->GetVariateWithClosedRange(m_MaxRotation[1]*2)-m_MaxRotation[1];
+                rotation[2] = m_RandGen->GetVariateWithClosedRange(m_MaxRotation[2]*2)-m_MaxRotation[2];
+                translation[0] = m_RandGen->GetVariateWithClosedRange(m_MaxTranslation[0]*2)-m_MaxTranslation[0];
+                translation[1] = m_RandGen->GetVariateWithClosedRange(m_MaxTranslation[1]*2)-m_MaxTranslation[1];
+                translation[2] = m_RandGen->GetVariateWithClosedRange(m_MaxTranslation[2]*2)-m_MaxTranslation[2];
             }
-            else
+
+            // rotate mask image
+            if (maskImageSet)
             {
-                logFile << g+1 << " rotation:" << m_MaxRotation[0]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxRotation[1]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxRotation[2]/m_FiberModels.at(0)->GetNumGradients();
-                fiberBundleTransformed->RotateAroundAxis(m_MaxRotation[0]/m_FiberModels.at(0)->GetNumGradients(), m_MaxRotation[1]/m_FiberModels.at(0)->GetNumGradients(), m_MaxRotation[2]/m_FiberModels.at(0)->GetNumGradients());
+                ImageRegionIterator<ItkUcharImgType> maskIt(upsampledTissueMask, upsampledTissueMask->GetLargestPossibleRegion());
+                tempTissueMask->FillBuffer(0);
 
-                logFile << g+1 << " translation:" << m_MaxTranslation[0]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxTranslation[1]/m_FiberModels.at(0)->GetNumGradients() << ", " << m_MaxTranslation[2]/m_FiberModels.at(0)->GetNumGradients();
-                fiberBundleTransformed->TranslateFibers(m_MaxTranslation[0]/m_FiberModels.at(0)->GetNumGradients(),m_MaxTranslation[1]/m_FiberModels.at(0)->GetNumGradients(),m_MaxTranslation[2]/m_FiberModels.at(0)->GetNumGradients());
+                while(!maskIt.IsAtEnd())
+                {
+                    if (maskIt.Get()<=0)
+                    {
+                        ++maskIt;
+                        continue;
+                    }
+
+                    DoubleDwiType::IndexType index = maskIt.GetIndex();
+                    itk::Point<double, 3> point;
+                    upsampledTissueMask->TransformIndexToPhysicalPoint(index, point);
+                    if (m_RandomMotion)
+                        point = fiberBundle->TransformPoint(point.GetVnlVector(), rotation[0],rotation[1],rotation[2],translation[0],translation[1],translation[2]);
+                    else
+                        point = fiberBundle->TransformPoint(point.GetVnlVector(), rotation[0]*(g+1),rotation[1]*(g+1),rotation[2]*(g+1),translation[0]*(g+1),translation[1]*(g+1),translation[2]*(g+1));
+
+                    tempTissueMask->TransformPhysicalPointToIndex(point, index);
+                    if (tempTissueMask->GetLargestPossibleRegion().IsInside(index))
+                        tempTissueMask->SetPixel(index,100);
+                    ++maskIt;
+                }
             }
+
+            // rotate fibers
+            logFile << g+1 << " rotation:" << rotation[0] << "," << rotation[1] << "," << rotation[2] << ";";
+            logFile << " translation:" << translation[0] << "," << translation[1] << "," << translation[2] << "\n";
+            fiberBundleTransformed->TransformFibers(rotation[0],rotation[1],rotation[2],translation[0],translation[1],translation[2]);
         }
     }
     logFile.close();

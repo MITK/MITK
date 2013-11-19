@@ -41,6 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCleanPolyData.h>
 #include <cmath>
 #include <boost/progress.hpp>
+#include <vtkTransformPolyDataFilter.h>
 
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
 //const char* mitk::FiberBundleX::COLORCODING_FA_AS_OPACITY = "Color_Orient_FA_Opacity";
@@ -527,36 +528,36 @@ void mitk::FiberBundleX::ResetFiberOpacity() {
 
 void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
 {
-   mitkPixelTypeMultiplex1( SetFAMap, FAimage->GetPixelType(), FAimage );
+    mitkPixelTypeMultiplex1( SetFAMap, FAimage->GetPixelType(), FAimage );
 }
 
 template <typename TPixel>
 void mitk::FiberBundleX::SetFAMap(const mitk::PixelType pixelType, mitk::Image::Pointer FAimage)
 {
-  MITK_DEBUG << "SetFAMap";
-  vtkSmartPointer<vtkDoubleArray> faValues = vtkSmartPointer<vtkDoubleArray>::New();
-  faValues->SetName(COLORCODING_FA_BASED);
-  faValues->Allocate(m_FiberPolyData->GetNumberOfPoints());
-  faValues->SetNumberOfValues(m_FiberPolyData->GetNumberOfPoints());
+    MITK_DEBUG << "SetFAMap";
+    vtkSmartPointer<vtkDoubleArray> faValues = vtkSmartPointer<vtkDoubleArray>::New();
+    faValues->SetName(COLORCODING_FA_BASED);
+    faValues->Allocate(m_FiberPolyData->GetNumberOfPoints());
+    faValues->SetNumberOfValues(m_FiberPolyData->GetNumberOfPoints());
 
-  mitk::ImagePixelReadAccessor<TPixel,3> readFAimage (FAimage, FAimage->GetVolumeData(0));
+    mitk::ImagePixelReadAccessor<TPixel,3> readFAimage (FAimage, FAimage->GetVolumeData(0));
 
-  vtkPoints* pointSet = m_FiberPolyData->GetPoints();
-  for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); ++i)
-  {
-      Point3D px;
-      px[0] = pointSet->GetPoint(i)[0];
-      px[1] = pointSet->GetPoint(i)[1];
-      px[2] = pointSet->GetPoint(i)[2];
-      double faPixelValue = 1-readFAimage.GetPixelByWorldCoordinates(px);
-      faValues->InsertValue(i, faPixelValue);
-  }
+    vtkPoints* pointSet = m_FiberPolyData->GetPoints();
+    for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); ++i)
+    {
+        Point3D px;
+        px[0] = pointSet->GetPoint(i)[0];
+        px[1] = pointSet->GetPoint(i)[1];
+        px[2] = pointSet->GetPoint(i)[2];
+        double faPixelValue = 1-readFAimage.GetPixelByWorldCoordinates(px);
+        faValues->InsertValue(i, faPixelValue);
+    }
 
-  m_FiberPolyData->GetPointData()->AddArray(faValues);
-  this->GenerateFiberIds();
+    m_FiberPolyData->GetPointData()->AddArray(faValues);
+    this->GenerateFiberIds();
 
-  if(m_FiberPolyData->GetPointData()->HasArray(COLORCODING_FA_BASED))
-      MITK_DEBUG << "FA VALUE ARRAY SET";
+    if(m_FiberPolyData->GetPointData()->HasArray(COLORCODING_FA_BASED))
+        MITK_DEBUG << "FA VALUE ARRAY SET";
 
 }
 
@@ -964,8 +965,8 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
             {
                 //distance between circle radius and given point
                 double XdistPnt =  sqrt((double) (clipperout->GetPoint(PointsOnPlane[i])[0] - V1w[0]) * (clipperout->GetPoint(PointsOnPlane[i])[0] - V1w[0]) +
-                                        (clipperout->GetPoint(PointsOnPlane[i])[1] - V1w[1]) * (clipperout->GetPoint(PointsOnPlane[i])[1] - V1w[1]) +
-                                        (clipperout->GetPoint(PointsOnPlane[i])[2] - V1w[2]) * (clipperout->GetPoint(PointsOnPlane[i])[2] - V1w[2])) ;
+                        (clipperout->GetPoint(PointsOnPlane[i])[1] - V1w[1]) * (clipperout->GetPoint(PointsOnPlane[i])[1] - V1w[1]) +
+                        (clipperout->GetPoint(PointsOnPlane[i])[2] - V1w[2]) * (clipperout->GetPoint(PointsOnPlane[i])[2] - V1w[2])) ;
 
                 if( XdistPnt <= distPF)
                     PointsInROI.push_back(PointsOnPlane[i]);
@@ -1231,6 +1232,140 @@ void mitk::FiberBundleX::SetColorCoding(const char* requestedColorCoding)
         MITK_DEBUG << "FIBERBUNDLE X: UNKNOWN COLORCODING in FIBERBUNDLEX Datastructure";
         this->m_CurrentColorCoding = (char*) COLORCODING_CUSTOM; //will cause blank colorcoding of fibers
     }
+}
+
+itk::Matrix< double, 3, 3 > mitk::FiberBundleX::TransformMatrix(itk::Matrix< double, 3, 3 > m, double rx, double ry, double rz)
+{
+    rx = rx*M_PI/180;
+    ry = ry*M_PI/180;
+    rz = rz*M_PI/180;
+
+    itk::Matrix< double, 3, 3 > rotX; rotX.SetIdentity();
+    rotX[1][1] = cos(rx);
+    rotX[2][2] = rotX[1][1];
+    rotX[1][2] = -sin(rx);
+    rotX[2][1] = -rotX[1][2];
+
+    itk::Matrix< double, 3, 3 > rotY; rotY.SetIdentity();
+    rotY[0][0] = cos(ry);
+    rotY[2][2] = rotY[0][0];
+    rotY[0][2] = sin(ry);
+    rotY[2][0] = -rotY[0][2];
+
+    itk::Matrix< double, 3, 3 > rotZ; rotZ.SetIdentity();
+    rotZ[0][0] = cos(rz);
+    rotZ[1][1] = rotZ[0][0];
+    rotZ[0][1] = -sin(rz);
+    rotZ[1][0] = -rotZ[0][1];
+
+    itk::Matrix< double, 3, 3 > rot = rotZ*rotY*rotX;
+
+    m = rot*m;
+
+    return m;
+}
+
+itk::Point<float, 3> mitk::FiberBundleX::TransformPoint(vnl_vector_fixed< double, 3 > point, double rx, double ry, double rz, double tx, double ty, double tz)
+{
+    rx = rx*M_PI/180;
+    ry = ry*M_PI/180;
+    rz = rz*M_PI/180;
+
+    vnl_matrix_fixed< double, 3, 3 > rotX; rotX.set_identity();
+    rotX[1][1] = cos(rx);
+    rotX[2][2] = rotX[1][1];
+    rotX[1][2] = -sin(rx);
+    rotX[2][1] = -rotX[1][2];
+
+    vnl_matrix_fixed< double, 3, 3 > rotY; rotY.set_identity();
+    rotY[0][0] = cos(ry);
+    rotY[2][2] = rotY[0][0];
+    rotY[0][2] = sin(ry);
+    rotY[2][0] = -rotY[0][2];
+
+    vnl_matrix_fixed< double, 3, 3 > rotZ; rotZ.set_identity();
+    rotZ[0][0] = cos(rz);
+    rotZ[1][1] = rotZ[0][0];
+    rotZ[0][1] = -sin(rz);
+    rotZ[1][0] = -rotZ[0][1];
+
+    vnl_matrix_fixed< double, 3, 3 > rot = rotZ*rotY*rotX;
+
+    mitk::Geometry3D::Pointer geom = this->GetGeometry();
+    mitk::Point3D center = geom->GetCenter();
+
+    point[0] -= center[0];
+    point[1] -= center[1];
+    point[2] -= center[2];
+    point = rot*point;
+    point[0] += center[0]+tx;
+    point[1] += center[1]+ty;
+    point[2] += center[2]+tz;
+    itk::Point<float, 3> out; out[0] = point[0]; out[1] = point[1]; out[2] = point[2];
+    return out;
+}
+
+void mitk::FiberBundleX::TransformFibers(double rx, double ry, double rz, double tx, double ty, double tz)
+{
+    rx = rx*M_PI/180;
+    ry = ry*M_PI/180;
+    rz = rz*M_PI/180;
+
+    vnl_matrix_fixed< double, 3, 3 > rotX; rotX.set_identity();
+    rotX[1][1] = cos(rx);
+    rotX[2][2] = rotX[1][1];
+    rotX[1][2] = -sin(rx);
+    rotX[2][1] = -rotX[1][2];
+
+    vnl_matrix_fixed< double, 3, 3 > rotY; rotY.set_identity();
+    rotY[0][0] = cos(ry);
+    rotY[2][2] = rotY[0][0];
+    rotY[0][2] = sin(ry);
+    rotY[2][0] = -rotY[0][2];
+
+    vnl_matrix_fixed< double, 3, 3 > rotZ; rotZ.set_identity();
+    rotZ[0][0] = cos(rz);
+    rotZ[1][1] = rotZ[0][0];
+    rotZ[0][1] = -sin(rz);
+    rotZ[1][0] = -rotZ[0][1];
+
+    vnl_matrix_fixed< double, 3, 3 > rot = rotZ*rotY*rotX;
+
+    mitk::Geometry3D::Pointer geom = this->GetGeometry();
+    mitk::Point3D center = geom->GetCenter();
+
+    vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
+    vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
+
+    for (int i=0; i<m_NumFibers; i++)
+    {
+        vtkCell* cell = m_FiberPolyData->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
+
+        vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+        for (int j=0; j<numPoints; j++)
+        {
+            double* p = points->GetPoint(j);
+            vnl_vector_fixed< double, 3 > dir;
+            dir[0] = p[0]-center[0];
+            dir[1] = p[1]-center[1];
+            dir[2] = p[2]-center[2];
+            dir = rot*dir;
+            dir[0] += center[0]+tx;
+            dir[1] += center[1]+ty;
+            dir[2] += center[2]+tz;
+            vtkIdType id = vtkNewPoints->InsertNextPoint(dir.data_block());
+            container->GetPointIds()->InsertNextId(id);
+        }
+        vtkNewCells->InsertNextCell(container);
+    }
+
+    m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
+    m_FiberPolyData->SetPoints(vtkNewPoints);
+    m_FiberPolyData->SetLines(vtkNewCells);
+    UpdateColorCoding();
+    UpdateFiberGeometry();
 }
 
 void mitk::FiberBundleX::RotateAroundAxis(double x, double y, double z)

@@ -1515,6 +1515,7 @@ void QmitkFiberfoxView::GenerateImage()
         tractsToDwiFilter->SetAddMotionArtifact(m_ImageGenParameters.doAddMotion);
         tractsToDwiFilter->SetMaxTranslation(m_ImageGenParameters.translation);
         tractsToDwiFilter->SetMaxRotation(m_ImageGenParameters.rotation);
+        tractsToDwiFilter->SetRandomMotion(m_ImageGenParameters.randomMotion);
         tractsToDwiFilter->Update();
 
         mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();

@@ -123,6 +123,7 @@ protected:
     itk::Vector<double,3>               m_Spacing;              ///< output image spacing
     itk::Vector<double,3>               m_UpsampledSpacing;
     itk::Point<double,3>                m_Origin;               ///< output image origin
+    itk::Point<double,3>                m_UpsampledOrigin;
     MatrixType                          m_DirectionMatrix;      ///< output image rotation
     ImageRegion<3>                      m_ImageRegion;          ///< output image size
     ImageRegion<3>                      m_UpsampledImageRegion;

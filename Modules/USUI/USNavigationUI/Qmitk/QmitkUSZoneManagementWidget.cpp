@@ -38,14 +38,21 @@ QmitkUSZoneManagementWidget::QmitkUSZoneManagementWidget(QWidget *parent) :
 QmitkUSZoneManagementWidget::~QmitkUSZoneManagementWidget()
 {
   delete ui;
+
+  m_DataStorage->Remove(m_BaseNode);
 }
 
 void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
 {
-  mitk::DataNode::Pointer baseNode = mitk::DataNode::New();
-  baseNode->SetName("Zones");
+  mitk::DataNode::Pointer baseNode = dataStorage->GetNamedNode("Zones");
+  if ( baseNode.IsNull() )
+  {
+    baseNode = mitk::DataNode::New();
+    baseNode->SetName("Zones");
+    dataStorage->Add(baseNode);
+  }
+
   baseNode->SetData(mitk::Surface::New());
-  dataStorage->Add(baseNode);
 
   m_ZonesDataModel->SetDataStorage(dataStorage, baseNode);
 

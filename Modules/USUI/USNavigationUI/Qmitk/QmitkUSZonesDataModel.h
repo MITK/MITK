@@ -37,8 +37,8 @@ public:
   typedef std::vector<mitk::DataNode::Pointer> DataNodeVector;
   static const char* DataNodePropertySize;
 
-
   explicit QmitkUSZonesDataModel(QObject *parent = 0);
+  virtual ~QmitkUSZonesDataModel();
 
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::DataNode::Pointer baseNode);
   void AddNode(const mitk::DataNode*);
@@ -65,6 +65,11 @@ protected:
 
   mitk::DataStorage::Pointer m_DataStorage;
   mitk::DataNode::Pointer m_BaseNode;
+
+private:
+  mitk::MessageDelegate1<QmitkUSZonesDataModel, const mitk::DataNode*> m_ListenerAddNode;
+  mitk::MessageDelegate1<QmitkUSZonesDataModel, const mitk::DataNode*> m_ListenerChangeNode;
+  mitk::MessageDelegate1<QmitkUSZonesDataModel, const mitk::DataNode*> m_ListenerRemoveNode;
 };
 
 #endif // QMITKUSZONESDATAMODEL_H

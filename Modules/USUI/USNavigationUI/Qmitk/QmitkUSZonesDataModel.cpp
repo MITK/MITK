@@ -27,10 +27,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const char* QmitkUSZonesDataModel::DataNodePropertySize = "zone.size";
 
-
 QmitkUSZonesDataModel::QmitkUSZonesDataModel(QObject *parent) :
-  QAbstractTableModel(parent)
+  QAbstractTableModel(parent),
+  m_ListenerAddNode(this, &QmitkUSZonesDataModel::AddNode),
+  m_ListenerChangeNode(this, &QmitkUSZonesDataModel::RemoveNode),
+  m_ListenerRemoveNode(this, &QmitkUSZonesDataModel::ChangeNode)
 {
+}
+
+QmitkUSZonesDataModel::~QmitkUSZonesDataModel()
+{
+  m_DataStorage->AddNodeEvent.RemoveListener(m_ListenerAddNode);
+  m_DataStorage->ChangedNodeEvent.RemoveListener(m_ListenerChangeNode);
+  m_DataStorage->InteractorChangedNodeEvent.RemoveListener(m_ListenerChangeNode);
+  m_DataStorage->RemoveNodeEvent.RemoveListener(m_ListenerRemoveNode);
 }
 
 void QmitkUSZonesDataModel::SetDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::DataNode::Pointer baseNode)
@@ -40,21 +50,10 @@ void QmitkUSZonesDataModel::SetDataStorage(mitk::DataStorage::Pointer dataStorag
 
   if (m_DataStorage.IsNotNull())
   {
-    m_DataStorage->AddNodeEvent.AddListener(
-        mitk::MessageDelegate1<QmitkUSZonesDataModel, const mitk::DataNode*>
-          (this, &QmitkUSZonesDataModel::AddNode));
-
-    m_DataStorage->RemoveNodeEvent.AddListener(
-        mitk::MessageDelegate1<QmitkUSZonesDataModel, const mitk::DataNode*>
-          (this, &QmitkUSZonesDataModel::RemoveNode));
-
-    m_DataStorage->ChangedNodeEvent.AddListener(
-          mitk::MessageDelegate1<QmitkUSZonesDataModel, const mitk::DataNode*>
-            (this, &QmitkUSZonesDataModel::ChangeNode));
-
-    m_DataStorage->InteractorChangedNodeEvent.AddListener(
-          mitk::MessageDelegate1<QmitkUSZonesDataModel, const mitk::DataNode*>
-            (this, &QmitkUSZonesDataModel::ChangeNode));
+    m_DataStorage->AddNodeEvent.AddListener(m_ListenerAddNode);
+    m_DataStorage->RemoveNodeEvent.AddListener(m_ListenerRemoveNode);
+    m_DataStorage->ChangedNodeEvent.AddListener(m_ListenerChangeNode);
+    m_DataStorage->InteractorChangedNodeEvent.AddListener(m_ListenerChangeNode);
   }
 }
 
@@ -107,6 +106,8 @@ void QmitkUSZonesDataModel::RemoveNode(const mitk::DataNode* node)
 
 void QmitkUSZonesDataModel::ChangeNode(const mitk::DataNode* node)
 {
+  if ( static_cast<itk::SmartPointer<const mitk::DataNode> >(node).IsNull() ) { return; }
+
   DataNodeVector::iterator oldNodeIt = find (m_ZoneNodes.begin(), m_ZoneNodes.end(), node);
   if (oldNodeIt == m_ZoneNodes.end())
   {
@@ -173,7 +174,6 @@ QVariant QmitkUSZonesDataModel::data ( const QModelIndex& index, int role ) cons
   }
 
   mitk::DataNode::Pointer curNode = m_ZoneNodes.at(index.row());
-
 
   switch (role)
   {

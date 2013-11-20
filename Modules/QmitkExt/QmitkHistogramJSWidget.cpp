@@ -23,12 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 #include "mitkExtractSliceFilter.h"
 
+
 QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
   QWebView(parent)
 {
   // set histogram type to barchart in first instance
   m_UseLineGraph = false;
-
+  m_Page = new QmitkWebPage(this);
+  setPage(m_Page);
   // set html from source
   connect(page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(AddJSObject()));
   QUrl myUrl = QUrl("qrc:/qmitk/Histogram.html");
@@ -44,7 +46,7 @@ QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
 
 QmitkHistogramJSWidget::~QmitkHistogramJSWidget()
 {
-
+  delete m_Page;
 }
 
 // adds an Object of Type QmitkHistogramJSWidget to the JavaScript, using QtWebkitBridge
@@ -52,7 +54,6 @@ void QmitkHistogramJSWidget::AddJSObject()
 {
   page()->mainFrame()->addToJavaScriptWindowObject(QString("histogramData"), this);
 }
-
 
 // reloads WebView, everytime its size has been changed, so the size of the Histogram fits to the size of the widget
 void QmitkHistogramJSWidget::resizeEvent(QResizeEvent* resizeEvent)

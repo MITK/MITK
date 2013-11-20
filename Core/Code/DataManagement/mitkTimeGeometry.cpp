@@ -120,11 +120,11 @@ void mitk::TimeGeometry::UpdateBoundingBox ()
     if (currentModifiedTime > lastModifiedTime)
       lastModifiedTime = currentModifiedTime;
 
-    Point3D minimum = GetGeometryForTimeStep(step)->GetCornerPoint(false,false,false);
-    Point3D maximum = GetGeometryForTimeStep(step)->GetCornerPoint(true,true,true);
-
-    points->push_back(minimum);
-    points->push_back(maximum);
+    for (int i=0; i < 8; ++i)
+    {
+      Point3D cornerPoint = GetGeometryForTimeStep(step)->GetCornerPoint(i);
+      points->push_back(cornerPoint);
+    }
   }
   m_BoundingBox->SetPoints(points);
   m_BoundingBox->ComputeBoundingBox();

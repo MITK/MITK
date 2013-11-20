@@ -146,6 +146,7 @@ set(MODULE_CUSTOM_TESTS
     mitkTextOverlay3DRendering3DTest.cpp
     mitkTextOverlay3DColorRenderingTest.cpp
     mitkVTKRenderWindowSizeTest.cpp
+    mitkMultiComponentImageDataComparisonFilterTest.cpp
 )
 
 if (${VTK_MAJOR_VERSION} VERSION_LESS 6) # test can be removed with VTK 6

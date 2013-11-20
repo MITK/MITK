@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsHolder.h"
 #include "mitkPixelTypeMultiplex.h"
 #include <mitkProportionalTimeGeometry.h>
-#include "mitkCompareImageFilter.h"
+#include "mitkCompareImageDataFilter.h"
 
 //VTK
 #include <vtkImageData.h>
@@ -1364,7 +1364,7 @@ bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSi
   // compare only if all previous checks were successfull, otherwise the ITK filter will throw an exception
   if( returnValue )
   {
-    mitk::CompareImageFilter::Pointer compareFilter = mitk::CompareImageFilter::New();
+    mitk::CompareImageDataFilter::Pointer compareFilter = mitk::CompareImageDataFilter::New();
     compareFilter->SetInput(0, rightHandSide);
     compareFilter->SetInput(1, leftHandSide);
     compareFilter->Update();

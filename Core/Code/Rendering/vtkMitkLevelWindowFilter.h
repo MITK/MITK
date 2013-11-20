@@ -77,7 +77,7 @@ protected:
   void ThreadedExecute(vtkImageData *inData, vtkImageData *outData,int extent[6], int id);
 
 //  /** Standard VTK filter method to apply the filter. See VTK documentation.*/
-//  void ExecuteInformation();
+  int RequestInformation(vtkInformation* request,vtkInformationVector** inputVector, vtkInformationVector* outputVector);
 //  /** Standard VTK filter method to apply the filter. See VTK documentation. Not used at the moment.*/
 //  void ExecuteInformation(vtkImageData *vtkNotUsed(inData), vtkImageData *vtkNotUsed(outData));
 

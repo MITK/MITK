@@ -20,6 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkLookupTable.h>
 #include <vtkColorTransferFunction.h>
 #include "vtkObjectFactory.h"
+#include <vtkInformation.h>
+#include <vtkInformationVector.h>
+
+#include <vtkStreamingDemandDrivenPipeline.h>
 
 //used for acos etc.
 #include <cmath>
@@ -455,29 +459,20 @@ void vtkApplyLookupTableOnScalarsCTF(vtkMitkLevelWindowFilter *self,
 
 
 
-//void vtkMitkLevelWindowFilter::ExecuteInformation()
-//{
-//  vtkImageData *input = this->GetInput();
-//  vtkImageData *output = this->GetOutput();
+int vtkMitkLevelWindowFilter::RequestInformation(vtkInformation* request,
+                                                  vtkInformationVector** inputVector,
+                                                  vtkInformationVector* outputVector)
+{
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-//  if (!input)
-//  {
-//    vtkErrorMacro(<< "Input not set.");
-//    return;
-//  }
-//  output->CopyTypeSpecificInformation( input );
+  // do nothing except copy scalar type info
+  this->CopyInputArrayAttributesToOutput(request,inputVector,outputVector);
 
-//  // TODO make output RGBA
-//  output->SetScalarTypeToUnsignedChar();
-//  output->SetNumberOfScalarComponents(4);
+  vtkDataObject::SetPointDataActiveScalarInfo(outInfo, VTK_UNSIGNED_CHAR, 4);
 
-//  int extent[6];
-//  input->GetWholeExtent(extent);
-//  output->SetExtent(extent);
-//  output->SetWholeExtent(extent);
-//  output->SetUpdateExtent(extent);
-//  output->AllocateScalars();
-//}
+  return 1;
+
+}
 
 //Method to run the filter in different threads.
 void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,

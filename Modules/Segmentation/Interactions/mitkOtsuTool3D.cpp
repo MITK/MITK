@@ -188,6 +188,8 @@ void mitk::OtsuTool3D::UpdateBinaryPreview(int regionID)
   filter->SetInput(itkImage);
   filter->SetLowerThreshold(regionID);
   filter->SetUpperThreshold(regionID);
+  filter->SetInsideValue(1);
+  filter->SetOutsideValue(0);
   filter->Update();
   mitk::Image::Pointer binarySegmentation;
   mitk::CastToMitkImage( filter->GetOutput(), binarySegmentation);

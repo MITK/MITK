@@ -11,7 +11,6 @@
 
 #include <limits>
 
-vtkCxxRevisionMacro(vtkOdfSource, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkOdfSource);
 
 vtkOdfSource::vtkOdfSource()

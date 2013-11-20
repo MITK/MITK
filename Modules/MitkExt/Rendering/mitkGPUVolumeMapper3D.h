@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkVolumeProperty.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkSmartPointer.h>
+#include <vtkVersionMacros.h>
 
 // Only with VTK 5.6 or above
 #if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))

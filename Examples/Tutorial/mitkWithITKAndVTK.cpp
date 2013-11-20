@@ -69,7 +69,7 @@ int main( int /*argc*/, char ** argv )
   vtkRenderWindowInteractor* renderWindowInteractor
       =vtkRenderWindowInteractor ::New();
   viewer->SetupInteractor(renderWindowInteractor);
-  viewer->SetInput(mitkImage->GetVtkImageData());
+  viewer->SetInputData(mitkImage->GetVtkImageData());
   viewer->Render();
   viewer->SetColorWindow(255);
   viewer->SetColorLevel(128);

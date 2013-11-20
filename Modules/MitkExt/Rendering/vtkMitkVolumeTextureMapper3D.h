@@ -88,10 +88,10 @@ class vtkVolumeProperty;
 class MitkExt_EXPORT vtkMitkVolumeTextureMapper3D : public vtkVolumeMapper
 {
 public:
-  vtkTypeRevisionMacro(vtkMitkVolumeTextureMapper3D,vtkVolumeMapper);
+  vtkTypeMacro(vtkMitkVolumeTextureMapper3D,vtkVolumeMapper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static vtkMitkVolumeTextureMapper3D *New();
+//  static vtkMitkVolumeTextureMapper3D *New(); //VTK6_TODO
 
   // Description:
   // The distance at which to space sampling planes. This

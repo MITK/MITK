@@ -66,16 +66,16 @@ public:
 
   virtual void ApplyProperties ( mitk::BaseRenderer* renderer );
 
-  itkSetMacro ( MaxProjectionDistance, vtkFloatingPointType );
+  itkSetMacro ( MaxProjectionDistance, double );
 
-  itkGetMacro ( MaxProjectionDistance, vtkFloatingPointType );
+  itkGetMacro ( MaxProjectionDistance, double );
 
 protected:
   SplineMapper2D();
 
   virtual ~SplineMapper2D();
 
-  vtkFloatingPointType m_MaxProjectionDistance;
+  double m_MaxProjectionDistance;
 };
 
 } // namespace mitk

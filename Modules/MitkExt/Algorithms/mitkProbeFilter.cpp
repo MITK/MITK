@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurface.h"
 #include "mitkImage.h"
 
-#include <vtkPolyDataSource.h>
 #include <vtkProbeFilter.h>
 #include <itkImageRegion.h>
 #include <vtkDataSet.h>
@@ -124,10 +123,10 @@ void mitk::ProbeFilter::GenerateData()
     vtkProbeFilter* probe = vtkProbeFilter::New();
 
     timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
-    probe->SetInput( input->GetVtkPolyData(timestep) );
+    probe->SetInputData( input->GetVtkPolyData(timestep) );
 
     timestep = sourceTimeGeometry->TimePointToTimeStep( timeInMS );
-    probe->SetSource( source->GetVtkImageData(timestep) );
+    probe->SetSourceData( source->GetVtkImageData(timestep) );
 
     output->SetVtkPolyData( probe->GetPolyDataOutput(), t );
 

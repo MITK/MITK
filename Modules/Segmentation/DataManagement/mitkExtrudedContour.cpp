@@ -61,15 +61,15 @@ mitk::ExtrudedContour::ExtrudedContour()
   m_ExtrusionFilter->SetVector(vtkvector);
 
   m_TriangleFilter = vtkTriangleFilter::New();
-  m_TriangleFilter->SetInput(m_ExtrusionFilter->GetOutput());
+  m_TriangleFilter->SetInputData(m_ExtrusionFilter->GetOutput());
 
   m_SubdivisionFilter = vtkLinearSubdivisionFilter::New();
-  m_SubdivisionFilter->SetInput(m_TriangleFilter->GetOutput());
+  m_SubdivisionFilter->SetInputData(m_TriangleFilter->GetOutput());
   m_SubdivisionFilter->SetNumberOfSubdivisions(4);
 
   m_ClippingBox = vtkPlanes::New();
   m_ClipPolyDataFilter = vtkClipPolyData::New();
-  m_ClipPolyDataFilter->SetInput(m_SubdivisionFilter->GetOutput());
+  m_ClipPolyDataFilter->SetInputData(m_SubdivisionFilter->GetOutput());
   m_ClipPolyDataFilter->SetClipFunction(m_ClippingBox);
   m_ClipPolyDataFilter->InsideOutOn();
 
@@ -174,7 +174,7 @@ void mitk::ExtrudedContour::BuildSurface()
   polyData->SetPolys( polys );
   polys->Delete();
 
-  m_ExtrusionFilter->SetInput(polyData);
+  m_ExtrusionFilter->SetInputData(polyData);
 
   polyData->Delete();
 

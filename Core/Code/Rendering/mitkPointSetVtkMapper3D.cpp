@@ -267,18 +267,18 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
     {
       if (pointDataIter.Value().selected)
       {
-        m_vtkSelectedPointList->AddInput(source->GetOutput());
+        m_vtkSelectedPointList->AddInputData(source->GetOutput());
         ++m_NumberOfSelectedAdded;
       }
       else
       {
-        m_vtkUnselectedPointList->AddInput(source->GetOutput());
+        m_vtkUnselectedPointList->AddInputData(source->GetOutput());
         ++m_NumberOfUnselectedAdded;
       }
     }
     else
     {
-      m_vtkUnselectedPointList->AddInput(source->GetOutput());
+      m_vtkUnselectedPointList->AddInputData(source->GetOutput());
       ++m_NumberOfUnselectedAdded;
     }
 
@@ -305,17 +305,17 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
       //# Move the label to a new position.
       vtkSmartPointer<vtkTransformPolyDataFilter> labelTransform = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
       labelTransform->SetTransform(aLabelTransform);
-      labelTransform->SetInput(label->GetOutput());
+      labelTransform->SetInputData(label->GetOutput());
 
       //add it to the wright PointList
       if (pointType)
       {
-        m_vtkSelectedPointList->AddInput(labelTransform->GetOutput());
+        m_vtkSelectedPointList->AddInputData(labelTransform->GetOutput());
         ++m_NumberOfSelectedAdded;
       }
       else
       {
-        m_vtkUnselectedPointList->AddInput(labelTransform->GetOutput());
+        m_vtkUnselectedPointList->AddInputData(labelTransform->GetOutput());
         ++m_NumberOfUnselectedAdded;
       }
     }
@@ -329,7 +329,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
   if (m_NumberOfSelectedAdded > 0)
   {
     m_VtkSelectedPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    m_VtkSelectedPolyDataMapper->SetInput(m_vtkSelectedPointList->GetOutput());
+    m_VtkSelectedPolyDataMapper->SetInputData(m_vtkSelectedPointList->GetOutput());
 
     //create a new instance of the actor
     m_SelectedActor = vtkSmartPointer<vtkActor>::New();
@@ -341,7 +341,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
   if (m_NumberOfUnselectedAdded > 0)
   {
     m_VtkUnselectedPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    m_VtkUnselectedPolyDataMapper->SetInput(m_vtkUnselectedPointList->GetOutput());
+    m_VtkUnselectedPolyDataMapper->SetInputData(m_vtkUnselectedPointList->GetOutput());
 
     //create a new instance of the actor
     m_UnselectedActor = vtkSmartPointer<vtkActor>::New();
@@ -456,9 +456,9 @@ void mitk::PointSetVtkMapper3D::ApplyAllProperties(mitk::BaseRenderer* renderer,
   //due to different params in VTK (double/float) we have to convert!
 
   //vars to convert to
-  vtkFloatingPointType unselectedColor[4]={1.0f,1.0f,0.0f,1.0f};//yellow
-  vtkFloatingPointType selectedColor[4]={1.0f,0.0f,0.0f,1.0f};//red
-  vtkFloatingPointType contourColor[4]={1.0f,0.0f,0.0f,1.0f};//red
+  double unselectedColor[4]={1.0f,1.0f,0.0f,1.0f};//yellow
+  double selectedColor[4]={1.0f,0.0f,0.0f,1.0f};//red
+  double contourColor[4]={1.0f,0.0f,0.0f,1.0f};//red
 
   //different types for color!!!
   mitk::Color tmpColor;
@@ -600,11 +600,10 @@ void mitk::PointSetVtkMapper3D::CreateContour()
   vtkSmartPointer<vtkPolyData> contour = vtkSmartPointer<vtkPolyData>::New();
   contour->SetPoints(points);
   contour->SetLines(polys);
-  contour->Update();
 
   vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
   tubeFilter->SetNumberOfSides( 12 );
-  tubeFilter->SetInput(contour);
+  tubeFilter->SetInputData(contour);
 
   //check for property contoursize.
   m_ContourRadius = 0.5;
@@ -617,8 +616,8 @@ void mitk::PointSetVtkMapper3D::CreateContour()
   tubeFilter->Update();
 
   //add to pipeline
-  vtkContourPolyData->AddInput(tubeFilter->GetOutput());
-  vtkContourPolyDataMapper->SetInput(vtkContourPolyData->GetOutput());
+  vtkContourPolyData->AddInputData(tubeFilter->GetOutput());
+  vtkContourPolyDataMapper->SetInputData(vtkContourPolyData->GetOutput());
 
   m_ContourActor->SetMapper(vtkContourPolyDataMapper);
   m_PointsAssembly->AddPart(m_ContourActor);

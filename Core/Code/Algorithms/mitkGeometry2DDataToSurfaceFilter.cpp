@@ -62,7 +62,7 @@ mitk::Geometry2DDataToSurfaceFilter::Geometry2DDataToSurfaceFilter()
   m_PlaneClipper = vtkClipPolyData::New();
 
   m_VtkTransformPlaneFilter = vtkTransformPolyDataFilter::New();
-  m_VtkTransformPlaneFilter->SetInput( m_PlaneSource->GetOutput() );
+  m_VtkTransformPlaneFilter->SetInputData( m_PlaneSource->GetOutput() );
 }
 
 
@@ -153,8 +153,9 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       m_PlaneSource->SetPoint1( right[0], right[1], right[2] );
       m_PlaneSource->SetPoint2( bottom[0], bottom[1], bottom[2] );
 
+      m_PlaneSource->Update();
       planeSurface = m_PlaneSource->GetOutput();
-      planeSurface->Update();
+
     }
     else
     {
@@ -198,7 +199,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       }
 
       // Transform the cube accordingly (s.a.)
-      m_PolyDataTransformer->SetInput( m_CubeSource->GetOutput() );
+      m_PolyDataTransformer->SetInputData( m_CubeSource->GetOutput() );
       m_PolyDataTransformer->SetTransform( m_Transform );
 
       // Initialize the plane to clip the cube with, as lying on the z-plane
@@ -206,11 +207,11 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       m_Plane->SetNormal( 0.0, 0.0, 1.0 );
 
       // Cut the plane with the cube.
-      m_PlaneCutter->SetInput( m_PolyDataTransformer->GetOutput() );
+      m_PlaneCutter->SetInputData( m_PolyDataTransformer->GetOutput() );
       m_PlaneCutter->SetCutFunction( m_Plane );
 
       // The output of the cutter must be converted into appropriate poly data.
-      m_PlaneStripper->SetInput( m_PlaneCutter->GetOutput() );
+      m_PlaneStripper->SetInputData( m_PlaneCutter->GetOutput() );
       m_PlaneStripper->Update();
 
       if ( m_PlaneStripper->GetOutput()->GetNumberOfPoints() < 3 )
@@ -221,14 +222,14 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       m_PlanePolyData->SetPoints( m_PlaneStripper->GetOutput()->GetPoints() );
       m_PlanePolyData->SetPolys( m_PlaneStripper->GetOutput()->GetLines() );
 
-      m_PlaneTriangler->SetInput( m_PlanePolyData );
+      m_PlaneTriangler->SetInputData( m_PlanePolyData );
 
 
       // Get bounds of the resulting surface and use it to generate the texture
       // mapping information
       m_PlaneTriangler->Update();
       m_PlaneTriangler->GetOutput()->ComputeBounds();
-      vtkFloatingPointType *surfaceBounds =
+      double *surfaceBounds =
         m_PlaneTriangler->GetOutput()->GetBounds();
 
       origin[0] = surfaceBounds[0];
@@ -245,7 +246,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
 
       // Now we tell the data how it shall be textured afterwards;
       // description see above.
-      m_TextureMapToPlane->SetInput( m_PlaneTriangler->GetOutput() );
+      m_TextureMapToPlane->SetInputData( m_PlaneTriangler->GetOutput() );
       m_TextureMapToPlane->AutomaticPlaneGenerationOn();
       m_TextureMapToPlane->SetOrigin( origin[0], origin[1], origin[2] );
       m_TextureMapToPlane->SetPoint1( right[0], right[1], right[2] );
@@ -351,7 +352,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
 
     m_Box->SetTransform( m_Transform );
 
-    m_PlaneClipper->SetInput( m_VtkTransformPlaneFilter->GetOutput() );
+    m_PlaneClipper->SetInputData( m_VtkTransformPlaneFilter->GetOutput() );
     m_PlaneClipper->SetClipFunction( m_Box );
     m_PlaneClipper->GenerateClippedOutputOff(); // important to NOT generate normals data for clipped part
     m_PlaneClipper->InsideOutOn();
@@ -360,7 +361,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
     planeSurface = m_PlaneClipper->GetOutput();
   }
 
-  m_NormalsUpdater->SetInput( planeSurface );
+  m_NormalsUpdater->SetInputData( planeSurface );
   m_NormalsUpdater->AutoOrientNormalsOn(); // that's the trick! Brings consistency between
                                           //  normals direction and front/back faces direction (see bug 1440)
   m_NormalsUpdater->ComputePointNormalsOn();
@@ -378,7 +379,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateData()
   if (output.IsNull()) return;
   if (output->GetVtkPolyData()==NULL) return;
 
-  output->GetVtkPolyData()->Update();
+//  output->GetVtkPolyData()->Update(); //VTK6_TODO vtk pipeline
 }
 
 const mitk::Geometry2DData *mitk::Geometry2DDataToSurfaceFilter::GetInput()

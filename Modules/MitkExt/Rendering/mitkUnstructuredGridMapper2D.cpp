@@ -170,7 +170,7 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
       return;
   }
 
-  vtkFloatingPointType vp[ 3 ], vnormal[ 3 ];
+  double vp[ 3 ], vnormal[ 3 ];
 
   vnl2vtk(point.Get_vnl_vector(), vp);
   vnl2vtk(normal.Get_vnl_vector(), vnormal);
@@ -186,7 +186,7 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
   m_Plane->SetNormal( vnormal );
 
   // set data into cutter
-  m_Slicer->SetInput( m_VtkPointSet );
+  m_Slicer->SetInputData( m_VtkPointSet );
   //    m_Cutter->GenerateCutScalarsOff();
   //    m_Cutter->SetSortByToSortByCell();
 

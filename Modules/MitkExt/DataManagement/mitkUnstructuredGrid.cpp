@@ -151,10 +151,10 @@ void mitk::UnstructuredGrid::CalculateBoundingBox()
   for ( unsigned int i = 0 ; i < m_GridSeries.size() ; ++i )
   {
     vtkUnstructuredGrid* grid = m_GridSeries[ i ];
-    vtkFloatingPointType bounds[ ] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    double bounds[ ] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     if ( ( grid != 0 ) && ( grid->GetNumberOfCells() > 0 ) )
     {
-      grid->Update();
+//      grid->Update(); //VTK6_TODO
       grid->ComputeBounds();
       grid->GetBounds( bounds );
     }
@@ -240,8 +240,8 @@ void mitk::UnstructuredGrid::Update()
   {
     for ( VTKUnstructuredGridSeries::iterator it = m_GridSeries.begin() ; it != m_GridSeries.end() ; ++it )
     {
-      if ( ( *it ) != 0 )
-        ( *it )->Update();
+//      if ( ( *it ) != 0 )
+//        ( *it )->Update(); //VTK6_TODO
     }
   }
   Superclass::Update();

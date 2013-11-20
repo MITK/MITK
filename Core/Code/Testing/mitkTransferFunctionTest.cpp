@@ -119,7 +119,7 @@ int mitkTransferFunctionTest(int /* argc */, char* /*argv*/[])
     "Retrieving values at two points from gradient opacity transfer function" );
 
   // Retrieve two points from color transfer function
-  vtkFloatingPointType vrgb1[3], vrgb2[3];
+  double vrgb1[3], vrgb2[3];
   myTransferFunction->GetColorTransferFunction()->GetColor( 1.0, vrgb1 );
   myTransferFunction->GetColorTransferFunction()->GetColor( 4.0, vrgb2 );
   std::cout << vrgb2[0] << ", " << vrgb2[1] << ", " << vrgb2[2] << std::endl;

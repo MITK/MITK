@@ -41,10 +41,10 @@ void mitk::STLFileReader::GenerateData()
     stlReader->SetFileName( m_FileName.c_str() );
 
     vtkSmartPointer<vtkPolyDataNormals> normalsGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
-    normalsGenerator->SetInput( stlReader->GetOutput() );
+    normalsGenerator->SetInputData( stlReader->GetOutput() );
 
     vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-    cleanPolyDataFilter->SetInput(normalsGenerator->GetOutput());
+    cleanPolyDataFilter->SetInputData(normalsGenerator->GetOutput());
     cleanPolyDataFilter->PieceInvariantOff();
     cleanPolyDataFilter->ConvertLinesToPointsOff();
     cleanPolyDataFilter->ConvertPolysToLinesOff();

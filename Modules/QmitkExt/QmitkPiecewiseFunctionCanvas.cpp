@@ -80,7 +80,7 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
   painter.drawRect(0, 0, contentsRect.width()+1, contentsRect.height()+1);
   if (m_PiecewiseFunction && this->isEnabled())
   {
-    vtkFloatingPointType* dp = m_PiecewiseFunction->GetDataPointer();
+    double* dp = m_PiecewiseFunction->GetDataPointer();
 
     // Render lines
 
@@ -134,7 +134,7 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
 int QmitkPiecewiseFunctionCanvas::GetNearHandle(int x, int y,
     unsigned int maxSquaredDistance)
 {
-  vtkFloatingPointType* dp = m_PiecewiseFunction->GetDataPointer();
+  double* dp = m_PiecewiseFunction->GetDataPointer();
   for (int i = 0; i < m_PiecewiseFunction->GetSize(); i++)
   {
     std::pair<int,int> point = this->FunctionToCanvas(std::make_pair(dp[i * 2],
@@ -150,7 +150,7 @@ int QmitkPiecewiseFunctionCanvas::GetNearHandle(int x, int y,
 }
 
 void QmitkPiecewiseFunctionCanvas::MoveFunctionPoint(int index,
-    std::pair<vtkFloatingPointType,vtkFloatingPointType> pos)
+    std::pair<double,double> pos)
 {
   RemoveFunctionPoint(GetFunctionX(index));
   AddFunctionPoint(pos.first, pos.second);

@@ -267,7 +267,7 @@ mitk::PolygonToRingFilter
   int numberOfPoints = cell.GetNumberOfPoints();
 
   Mesh::PointType inputPoint;
-  vtkFloatingPointType t, tStart(0), tEnd(0);
+  double t, tStart(0), tEnd(0);
 
   // Add input points to the spline and assign each the parametric value t
   // derived from the point euclidean distances.
@@ -299,7 +299,7 @@ mitk::PolygonToRingFilter
   firstPoint.Fill(0);
   lastPoint.Fill(0);
   int numberOfSegments = numberOfPoints * m_SplineResolution;
-  vtkFloatingPointType step = (tEnd - tStart) / numberOfSegments;
+  double step = (tEnd - tStart) / numberOfSegments;
   for ( i = 0, t = tStart; i < numberOfSegments; ++i, t += step )
   {
     FillVector3D( point,

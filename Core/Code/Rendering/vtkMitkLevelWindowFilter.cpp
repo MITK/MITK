@@ -136,7 +136,7 @@ void vtkApplyLookupTableOnRGBA(vtkMitkLevelWindowFilter* self,
                                vtkImageData* inData,
                                vtkImageData* outData,
                                int outExt[6],
-                               vtkFloatingPointType* clippingBounds,
+                               double* clippingBounds,
                                T*)
 {
   vtkImageIterator<T> inputIt(inData, outExt);
@@ -315,7 +315,7 @@ void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
                                   vtkImageData *inData,
                                   vtkImageData *outData,
                                   int outExt[6],
-                                  vtkFloatingPointType* clippingBounds,
+                                  double* clippingBounds,
                                   T *)
 {
   vtkImageIterator<T> inputIt(inData, outExt);
@@ -385,7 +385,7 @@ void vtkApplyLookupTableOnScalarsCTF(vtkMitkLevelWindowFilter *self,
                                   vtkImageData *inData,
                                   vtkImageData *outData,
                                   int outExt[6],
-                                  vtkFloatingPointType* clippingBounds,
+                                  double* clippingBounds,
                                   T *)
 {
   vtkImageIterator<T> inputIt(inData, outExt);
@@ -455,29 +455,29 @@ void vtkApplyLookupTableOnScalarsCTF(vtkMitkLevelWindowFilter *self,
 
 
 
-void vtkMitkLevelWindowFilter::ExecuteInformation()
-{
-  vtkImageData *input = this->GetInput();
-  vtkImageData *output = this->GetOutput();
+//void vtkMitkLevelWindowFilter::ExecuteInformation()
+//{
+//  vtkImageData *input = this->GetInput();
+//  vtkImageData *output = this->GetOutput();
 
-  if (!input)
-  {
-    vtkErrorMacro(<< "Input not set.");
-    return;
-  }
-  output->CopyTypeSpecificInformation( input );
+//  if (!input)
+//  {
+//    vtkErrorMacro(<< "Input not set.");
+//    return;
+//  }
+//  output->CopyTypeSpecificInformation( input );
 
-  // TODO make output RGBA
-  output->SetScalarTypeToUnsignedChar();
-  output->SetNumberOfScalarComponents(4);
+//  // TODO make output RGBA
+//  output->SetScalarTypeToUnsignedChar();
+//  output->SetNumberOfScalarComponents(4);
 
-  int extent[6];
-  input->GetWholeExtent(extent);
-  output->SetExtent(extent);
-  output->SetWholeExtent(extent);
-  output->SetUpdateExtent(extent);
-  output->AllocateScalars();
-}
+//  int extent[6];
+//  input->GetWholeExtent(extent);
+//  output->SetExtent(extent);
+//  output->SetWholeExtent(extent);
+//  output->SetUpdateExtent(extent);
+//  output->AllocateScalars();
+//}
 
 //Method to run the filter in different threads.
 void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,
@@ -568,10 +568,10 @@ void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,
   }
 }
 
-void vtkMitkLevelWindowFilter::ExecuteInformation(
-    vtkImageData *vtkNotUsed(inData), vtkImageData *vtkNotUsed(outData))
-{
-}
+//void vtkMitkLevelWindowFilter::ExecuteInformation(
+//    vtkImageData *vtkNotUsed(inData), vtkImageData *vtkNotUsed(outData))
+//{
+//}
 
 void vtkMitkLevelWindowFilter::SetMinOpacity(double minOpacity)
 {
@@ -593,7 +593,7 @@ inline double vtkMitkLevelWindowFilter::GetMaxOpacity() const
   return m_MaxOpacity;
 }
 
-void vtkMitkLevelWindowFilter::SetClippingBounds(vtkFloatingPointType* bounds) // TODO does vtkFloatingPointType[4] work??
+void vtkMitkLevelWindowFilter::SetClippingBounds(double* bounds) // TODO does double[4] work??
 {
   for (unsigned int i = 0 ; i < 4; ++i)
     m_ClippingBounds[i] = bounds[i];

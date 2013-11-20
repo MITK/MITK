@@ -60,6 +60,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIDataStorageReference.h>
 #include <mitkDataStorageEditorInput.h>
 #include <mitkWorkbenchUtil.h>
+#include <vtkVersionMacros.h>
 
 // UGLYYY
 #include "internal/QmitkExtWorkbenchWindowAdvisorHack.h"

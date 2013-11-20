@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCommand.h>
 
 
-vtkCxxRevisionMacro(mitkVtkInteractorStyle, "$Revision: 1.35 $");
 vtkStandardNewMacro(mitkVtkInteractorStyle);
 
 mitkVtkInteractorStyle::mitkVtkInteractorStyle()

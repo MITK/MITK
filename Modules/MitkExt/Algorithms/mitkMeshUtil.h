@@ -54,14 +54,14 @@ template <typename MeshType>
 class NullScalarAccessor
 {
 public:
-  static inline vtkFloatingPointType GetPointScalar(typename MeshType::PointDataContainer* /*pointData*/, typename MeshType::PointIdentifier /*idx*/, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
+  static inline double GetPointScalar(typename MeshType::PointDataContainer* /*pointData*/, typename MeshType::PointIdentifier /*idx*/, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
   {
-    return (vtkFloatingPointType) 0.0;
+    return (double) 0.0;
   };
 
-  static inline vtkFloatingPointType GetCellScalar(typename MeshType::CellDataContainer* /*cellData*/, typename MeshType::CellIdentifier /*idx*/, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
+  static inline double GetCellScalar(typename MeshType::CellDataContainer* /*cellData*/, typename MeshType::CellIdentifier /*idx*/, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
   {
-    return (vtkFloatingPointType) 0.0;
+    return (double) 0.0;
   };
 };
 
@@ -69,14 +69,14 @@ template <typename MeshType>
 class MeshScalarAccessor
 {
 public:
-  static inline vtkFloatingPointType GetPointScalar(typename MeshType::PointDataContainer* pointData, typename MeshType::PointIdentifier idx, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
+  static inline double GetPointScalar(typename MeshType::PointDataContainer* pointData, typename MeshType::PointIdentifier idx, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
   {
-    return (vtkFloatingPointType)pointData->GetElement(idx);
+    return (double)pointData->GetElement(idx);
   };
 
-  static inline vtkFloatingPointType GetCellScalar(typename MeshType::CellDataContainer* cellData, typename MeshType::CellIdentifier idx, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
+  static inline double GetCellScalar(typename MeshType::CellDataContainer* cellData, typename MeshType::CellIdentifier idx, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
   {
-    return (vtkFloatingPointType)cellData->GetElement(idx);
+    return (double)cellData->GetElement(idx);
   };
 };
 
@@ -84,11 +84,11 @@ template <typename MeshType>
 class MeanCurvatureAccessor : public NullScalarAccessor<MeshType>
 {
 public:
-  static inline vtkFloatingPointType GetPointScalar(typename MeshType::PointDataContainer* /*point*/, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int /*type*/ = 0)
+  static inline double GetPointScalar(typename MeshType::PointDataContainer* /*point*/, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int /*type*/ = 0)
   {
     typename MeshType::PixelType dis = 0;
     mesh->GetPointData(idx, &dis);
-    return (vtkFloatingPointType) dis;
+    return (double) dis;
   };
 };
 
@@ -96,7 +96,7 @@ template <typename MeshType>
 class SimplexMeshAccessor : public NullScalarAccessor<MeshType>
 {
 public:
-  static inline vtkFloatingPointType GetPointScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int type = 0 )
+  static inline double GetPointScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int type = 0 )
   {
     typename MeshType::GeometryMapPointer geometryData = mesh->GetGeometryData();
 
@@ -127,14 +127,14 @@ public:
     {
       typename MeshType::PixelType dis = 0;
       mesh->GetPointData(idx, &dis);
-      return (vtkFloatingPointType) dis;
+      return (double) dis;
     }
     else if (type == 6)
     {
-      return (vtkFloatingPointType) ((geometryData->GetElement(idx))->allowSplitting);
+      return (double) ((geometryData->GetElement(idx))->allowSplitting);
     }
     else
-      return (vtkFloatingPointType) 0;
+      return (double) 0;
   };
 };
 
@@ -730,7 +730,7 @@ public:
     // points->Reserve(numPoints);
     // // Set the point container on the mesh
     //output->SetPoints(points);
-    vtkFloatingPointType vtkpoint[3];
+    double vtkpoint[3];
     typename MeshType::PointType itkPhysicalPoint;
     if(geometryFrame==NULL)
     {
@@ -1071,7 +1071,7 @@ public:
     pointScalars->SetNumberOfTuples(maxIndex+1);
     cellScalars->SetNumberOfTuples(mesh->GetNumberOfCells());
 
-    vtkFloatingPointType vtkpoint[3];
+    double vtkpoint[3];
     typename MeshType::PointType itkPhysicalPoint;
     if (geometryFrame == 0)
     {
@@ -1290,7 +1290,7 @@ public:
     // iterate over all the points in the itk mesh filling in
     // the vtkPoints object as we go
 
-    vtkFloatingPointType vtkpoint[3];
+    double vtkpoint[3];
     typename MeshType::PointType itkPhysicalPoint;
     if(geometryFrame==NULL)
     {

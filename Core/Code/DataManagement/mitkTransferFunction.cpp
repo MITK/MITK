@@ -171,7 +171,7 @@ TransferFunction::ControlPoints &TransferFunction::GetScalarOpacityPoints()
 {
   // Retrieve data points from VTK transfer function and store them in a vector
   m_ScalarOpacityPoints.clear();
-  vtkFloatingPointType *data = m_ScalarOpacityFunction->GetDataPointer();
+  double *data = m_ScalarOpacityFunction->GetDataPointer();
   for ( int i = 0; i < m_ScalarOpacityFunction->GetSize(); ++i )
   {
     m_ScalarOpacityPoints.push_back( std::make_pair( data[i*2], data[i*2+1] ));
@@ -185,7 +185,7 @@ TransferFunction::ControlPoints &TransferFunction::GetGradientOpacityPoints()
 {
   // Retrieve data points from VTK transfer function and store them in a vector
   m_GradientOpacityPoints.clear();
-  vtkFloatingPointType *data = m_GradientOpacityFunction->GetDataPointer();
+  double *data = m_GradientOpacityFunction->GetDataPointer();
   for ( int i = 0; i < m_GradientOpacityFunction->GetSize(); ++i )
   {
     m_GradientOpacityPoints.push_back( std::make_pair( data[i*2], data[i*2+1] ));
@@ -199,7 +199,7 @@ TransferFunction::RGBControlPoints &TransferFunction::GetRGBPoints()
 {
   // Retrieve data points from VTK transfer function and store them in a vector
   m_RGBPoints.clear();
-  vtkFloatingPointType *data = m_ColorTransferFunction->GetDataPointer();
+  double *data = m_ColorTransferFunction->GetDataPointer();
   for ( int i = 0; i < m_ColorTransferFunction->GetSize(); ++i )
   {
     double rgb[] = { data[i*4+1], data[i*4+2], data[i*4+3] };

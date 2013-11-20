@@ -1,6 +1,7 @@
 set(MODULE_TESTS
   #mitkThreadedToFRawDataReconstructionTest.cpp
   mitkAbstractToFDeviceFactoryTest.cpp
+  mitkToFCameraMITKPlayerDeviceTest.cpp
   mitkToFCameraMITKPlayerDeviceFactoryTest.cpp
   mitkToFImageCsvWriterTest.cpp
   mitkToFImageGrabberTest.cpp

@@ -124,8 +124,6 @@ public:
     double Min;
     vnl_vector<int> MaxIndex;
     vnl_vector<int> MinIndex;
-    std::list< vnl_vector<int> > MaxIndexList;
-    std::list< vnl_vector<int> > MinIndexList;
   };
 
   typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
@@ -270,7 +268,7 @@ protected:
   * needs an image, a mask and for limiting the searched value
   * minimum- and maximum boundaries. The boundaries are set
   * to the extent of float by default. It returns a
-  * MinMaxIndex-struct. */
+  * MinMaxIndex object. */
   template <typename TPixel, unsigned int VImageDimension >
   MinMaxIndex CalculateMinMaxIndex(
     const itk::Image<TPixel, VImageDimension> *inputImage,
@@ -281,7 +279,7 @@ protected:
   /** \brief Calculates the hotspot statistics within a given
   * ROI. As input the function needs an image, a mask which
   * represents the ROI and a radius which defines the size of
-  * the sphere. The function returns a statistics object. */
+  * the sphere. The function returns a Statistics object. */
   template < typename TPixel, unsigned int VImageDimension>
   Statistics CalculateHotspotStatistics(
     const itk::Image<TPixel, VImageDimension> *inputImage,

@@ -43,7 +43,10 @@ struct mitkImageStatisticsHotspotTestClass
     int m_ImageRows;                          // XML-Tag "image-rows"
     int m_ImageColumns;                       // XML-Tag "image-columns"
     int m_ImageSlices;                        // XML-Tag "image-slices"
+
     int m_NumberOfGaussian;                   // XML-Tag "numberOfGaussians"
+
+    std::vector<float> m_Spacing;               // XML-Tag "spacingX", "spacingY", "spacingZ"
 
     // XML-Tag <gaussian>
     std::vector<int> m_CenterX;                // XML-Tag "centerIndexX"
@@ -188,7 +191,16 @@ struct mitkImageStatisticsHotspotTestClass
 
       result.m_NumberOfGaussian = GetIntegerAttribute( testimage, "numberOfGaussians" );
 
+      std::vector<float> tmpSpacing(3,0);
+
+      tmpSpacing[0] = GetDoubleAttribute(testimage, "spacingX");
+      tmpSpacing[1] = GetDoubleAttribute(testimage, "spacingY");
+      tmpSpacing[2] = GetDoubleAttribute(testimage, "spacingZ");
+
+      result.m_Spacing = tmpSpacing;
+
       MITK_TEST_OUTPUT( << "Read size parameters (x,y,z): " << result.m_ImageRows << "," << result.m_ImageColumns << "," << result.m_ImageSlices);
+      MITK_TEST_OUTPUT( << "Read spacing parameters (x,y,z): " << result.m_Spacing[0] << "," << result.m_Spacing[1] << "," << result.m_Spacing[2]);
 
       NodeList gaussians;
       testimage->GetChildren("gaussian", gaussians);
@@ -331,8 +343,13 @@ struct mitkImageStatisticsHotspotTestClass
       altitudeVec.push_back(testParameters.m_Altitude[i]);
     }
 
+    ImageType::SpacingType spacing;
+
+    for(int i = 0; i < Dimension; ++i)
+      spacing[i] = testParameters.m_Spacing[i];
+
     gaussianGenerator->SetSize( size );
-    gaussianGenerator->SetSpacing( 1 );
+    gaussianGenerator->SetSpacing( spacing );
     gaussianGenerator->SetRadiusStepNumber(5);
     gaussianGenerator->SetRadius(pow(itk::Math::one_over_pi * 0.75 , 1.0 / 3.0) * 10);
     gaussianGenerator->SetNumberOfGausssians(testParameters.m_NumberOfGaussian);
@@ -367,11 +384,13 @@ struct mitkImageStatisticsHotspotTestClass
 
     mitk::ImageStatisticsCalculator::Pointer statisticsCalculator = mitk::ImageStatisticsCalculator::New();
 
-    for(int i = 0; i < 3; ++i)
+    for(int i = 0; i < Dimension; ++i)
     {
-      spacing[i] = 1;
       start[i] = 0.00;
+      spacing[i] = testParameters.m_Spacing[i];
     }
+
+
 
     size[0] = testParameters.m_ImageColumns;
     size[1] = testParameters.m_ImageRows;
@@ -495,7 +514,7 @@ struct mitkImageStatisticsHotspotTestClass
 int mitkImageStatisticsHotspotTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("mitkImageStatisticsHotspotTest")
-
+  try {
   // parse commandline parameters (see CMakeLists.txt)
   mitkImageStatisticsHotspotTestClass::Parameters parameters = mitkImageStatisticsHotspotTestClass::ParseParameters(argc,argv);
 
@@ -513,6 +532,12 @@ int mitkImageStatisticsHotspotTest(int argc, char* argv[])
   std::cout << "Statistics time consumed: " << clock.GetTotal() << std::endl;
   // compare statistics against stored expected values
   mitkImageStatisticsHotspotTestClass::ValidateStatistics(statistics, parameters);
+
+  }
+  catch (std::exception& e)
+  {
+    std::cout << "Error: " <<  e.what() << std::endl;
+  }
 
 
   MITK_TEST_END()

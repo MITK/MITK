@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include "mitkMultiComponentImageDataComparisonFilter.h"
 #include "mitkItkImageFileReader.h"
+#include "mitkImageReadAccessor.h"
 
 #include "itkNumericTraits.h"
 

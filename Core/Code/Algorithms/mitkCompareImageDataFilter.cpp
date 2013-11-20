@@ -69,6 +69,8 @@ void mitk::CompareImageDataFilter::GenerateData()
     mcComparator->SetValidImage(input2);
     mcComparator->SetCompareFilterResult( &m_CompareDetails);
     mcComparator->Update();
+
+    m_CompareResult = mcComparator->GetResult();
   }
 }
 

@@ -175,7 +175,7 @@ namespace mitk
         }
       }
     }
-    if(m_CompareDetails->m_PixelsWithDifference != 0)
+    if(m_CompareDetails->m_PixelsWithDifference > 0)
     {
       m_CompareDetails->m_MeanDifference = m_CompareDetails->m_TotalDifference / m_CompareDetails->m_PixelsWithDifference;
       m_CompareResult = false;
@@ -184,7 +184,7 @@ namespace mitk
     {
       m_CompareResult = true;
     }
-
+    m_CompareDetails->m_FilterCompleted = true;
   }
 
 } // end namespace mitk

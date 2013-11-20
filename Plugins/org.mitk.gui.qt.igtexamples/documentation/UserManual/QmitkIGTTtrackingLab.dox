@@ -1,19 +1,36 @@
 /**
-\page org_igttrackinglab The IGT-TrackingLab
-
-\image html icon.png "Icon of the Module"
+\page org_igttrackinglab IGT Tutorial Step 4: The IGT-TrackingLab
 
 Available sections:
   - \ref QmitkIGTTrackingLabUsersManualOverview
+  - \ref QmitkIGTTrackingLabUsersManualConf
+  - \ref QmitkIGTTrackingLabUsersManualIntialReg
+  - \ref QmitkIGTTrackingLabUsersManualPermReg
+  - \ref QmitkIGTTrackingLabUsersManualPtSetRec
+  - \ref QmitkIGTTrackingLabUsersManualCamView
 
-\section QmitkIGTTrackingLabUsersManualOverview
+\section QmitkIGTTrackingLabUsersManualOverview Introduction
 
-Describe the features of your awesome plugin here
+The IGT-TrackingLab is the last step of the IGT tutorial. It is a plugin which shows examples usage for many IGT classes and is also an example navigation application implemented with IGT. The plugin includes the following features, which you can learn by reading this manual together with the source code and playing around with the plugin:
 <ul>
-<li>Increases productivity
-<li>Creates beautiful images
-<li>Generates PhD thesis
-<li>Brings world peace
+<li> Configuration: Here the plugin ins configured by using
+<li> Unique identifier
+<li> Tool definition file
+<li> Serial number
+<li> Surface for visualization
+<li> Type of tracking device
+<li> Type of the tool
 </ul>
+
+
+\section QmitkIGTTrackingLabUsersManualConf Configuration
+
+\section QmitkIGTTrackingLabUsersManualIntialReg Initial Registration
+
+\section QmitkIGTTrackingLabUsersManualPermReg Permanent Registration
+
+\section QmitkIGTTrackingLabUsersManualPtSetRec PointSet Recording
+
+\section QmitkIGTTrackingLabUsersManualCamView Camera View
 
 */

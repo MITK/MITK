@@ -146,13 +146,13 @@ namespace mitk
     unsigned int noOfPixels = validImage->GetDimension(0)*validImage->GetDimension(1)*validImage->GetDimension(2);
     unsigned int noOfComponents = validImage->GetPixelType().GetNumberOfComponents();
 
-    for( int t = 0; t < noOfTimes; ++t)
+    for( unsigned int t = 0; t < noOfTimes; ++t)
     {
 
       ImageReadAccessor readAccTImage(const_cast<Image*>(testImage), const_cast<Image*>(testImage)->GetVolumeData(t));
       ImageReadAccessor readAccVImage(const_cast<Image*>(validImage), const_cast<Image*>(validImage)->GetVolumeData(t));
 
-      for( int p = 0; p < noOfPixels*noOfComponents; ++p )
+      for( unsigned int p = 0; p < noOfPixels*noOfComponents; ++p )
       {
         TPixel vDataItem = static_cast<TPixel*>(const_cast<void*>(readAccVImage.GetData()))[p];
         TPixel tDataItem = static_cast<TPixel*>(const_cast<void*>(readAccTImage.GetData()))[p];

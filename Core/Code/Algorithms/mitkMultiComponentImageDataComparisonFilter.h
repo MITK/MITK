@@ -82,8 +82,8 @@ namespace mitk
     template < typename TPixel >
     void CompareMultiComponentImage( const Image* testImage, const Image* validImage);
 
-    bool m_CompareResult;
     double m_Tolerance;
+    bool m_CompareResult;
 
     CompareFilterResults* m_CompareDetails;
   };

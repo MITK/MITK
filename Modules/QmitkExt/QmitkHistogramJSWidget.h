@@ -226,7 +226,7 @@ private:
   * Clears the QLists m_Measurement and m_Frequency
   */
   void ClearData();
-  QmitkWebPage* m_Page;
+  QmitkJSWebPage* m_Page;
 
 private slots:
 

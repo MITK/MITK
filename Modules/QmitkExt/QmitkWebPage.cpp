@@ -16,14 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkWebPage.h>
 
-QmitkWebPage::QmitkWebPage(QObject *parent) : QWebPage(parent)
+QmitkJSWebPage::QmitkJSWebPage(QObject *parent) : QWebPage(parent)
 {
 }
-QmitkWebPage::~QmitkWebPage()
+QmitkJSWebPage::~QmitkJSWebPage()
 {
 }
 
-bool QmitkWebPage::shouldInterruptJavaScript()
+bool QmitkJSWebPage::shouldInterruptJavaScript()
 {
   return false;
 }

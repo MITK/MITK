@@ -29,7 +29,7 @@ QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
 {
   // set histogram type to barchart in first instance
   m_UseLineGraph = false;
-  m_Page = new QmitkWebPage(this);
+  m_Page = new QmitkJSWebPage(this);
   setPage(m_Page);
   // set html from source
   connect(page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(AddJSObject()));
@@ -46,7 +46,6 @@ QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
 
 QmitkHistogramJSWidget::~QmitkHistogramJSWidget()
 {
-  delete m_Page;
 }
 
 // adds an Object of Type QmitkHistogramJSWidget to the JavaScript, using QtWebkitBridge

@@ -25,9 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
  * @brief The QmitkWebPage class
  *
- * This class reimplements QWebPage as a workaround for bug 16158.
+ * This class reimplements QWebPage as a fix for bug 16158.
  */
-class QmitkWebPage : public QWebPage
+class QmitkJSWebPage : public QWebPage
 {
   Q_OBJECT
 
@@ -35,12 +35,12 @@ public:
   /**
   * @brief Constructor
   */
-  QmitkWebPage(QObject *parent=0);
+  QmitkJSWebPage(QObject *parent=0);
 
   /**
   * @brief Destructor
   */
-  virtual  ~QmitkWebPage();
+  virtual  ~QmitkJSWebPage();
 
 public slots:
   /**

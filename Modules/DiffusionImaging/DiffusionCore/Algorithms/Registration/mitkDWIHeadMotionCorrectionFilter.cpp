@@ -153,7 +153,7 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   //
   typename SplitFilterType::Pointer split_filter = SplitFilterType::New();
   split_filter->SetInput (input->GetVectorImage() );
-  split_filter->SetExtractAllAboveThreshold(10, input->GetB_ValueMap() );
+  split_filter->SetExtractAllAboveThreshold(8, input->GetB_ValueMap() );
 
   try
   {

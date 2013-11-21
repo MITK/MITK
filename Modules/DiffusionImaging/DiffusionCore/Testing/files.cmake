@@ -6,5 +6,6 @@ set(MODULE_CUSTOM_TESTS
   mitkPyramidImageRegistrationMethodTest.cpp
   mitkDWHeadMotionCorrectionTest.cpp
   mitkConvertDWITypeTest.cpp
+  mitkExtractSingleShellTest.cpp
 )
 

@@ -392,6 +392,7 @@ protected:
     }
     catch (itk::ExceptionObject &e)
     {
+      registration->Print( std::cout );
       MITK_ERROR << "[Registration Update] Caught ITK exception: ";
       mitkThrow() << "Registration failed with exception: " << e.what();
     }

@@ -22,6 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk
 #include "DcmRTV.h"
 
+#include <DataStructures/mitkRTConstants.h>
+#include <DataStructures/mitkIsoDoseLevelSetProperty.h>
+#include <DataStructures/mitkIsoDoseLevelVectorProperty.h>
+
 #include "mitkSegmentationObjectFactory.h"
 
 
@@ -33,6 +37,13 @@ const std::string DcmRTV::VIEW_ID = "org.mitk.views.dcmrtv";
 
 DcmRTV::DcmRTV()
 {
+    mitk::IsoDoseLevel::ColorType color;
+    color[0] = 1.0;
+    color[1] = 1.0;
+    color[2] = 1.0;
+    m_freeIsoValues = mitk::IsoDoseLevelVector::New();
+    m_freeIsoValues->push_back(mitk::IsoDoseLevel::New(0.0,color,true,false));
+
   //    std::string m_VolumeDir = MITK_ROOT;
   //    m_VolumeDir += "../mbi/Plugins/org.mbi.gui.qt.tofoscopy";
   //    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );
@@ -60,10 +71,15 @@ void DcmRTV::CreateQtPartControl( QWidget *parent )
   m_Controls.setupUi( parent );
   connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
   connect( m_Controls.pushButton, SIGNAL(clicked()), this, SLOT(LoadRTDoseFile()) );
-  connect( m_Controls.isoSlider, SIGNAL(valueChanged(int)), m_Controls.spinBox, SLOT(setValue(int)));
-  connect( m_Controls.spinBox, SIGNAL(valueChanged(int)), this, SLOT(UpdateIsoLines(int)));
-  connect( m_Controls.contourModelExampleButton, SIGNAL(clicked()), this, SLOT(LoadContourModel()));
   connect( m_Controls.btn_isolines, SIGNAL(clicked()), this ,SLOT(LoadIsoLines()));
+}
+
+void DcmRTV::OnPrescribedDoseChanged(double value)
+{
+  if (m_selectedNode.IsNotNull())
+  {
+    m_selectedNode->SetFloatProperty(mitk::rt::Constants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(), m_Controls.spinPrescribedDose->value());
+  }
 }
 
 void DcmRTV::LoadIsoLines()
@@ -72,78 +88,180 @@ void DcmRTV::LoadIsoLines()
   doseNode->SetProperty("shader",mitk::ShaderProperty::New("mitkIsoLineShader"));
 }
 
-void DcmRTV::LoadContourModel()
+//void DcmRTV::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
+//                                             const QList<mitk::DataNode::Pointer>& nodes )
+//{
+//  // iterate all selected objects, adjust warning visibility
+//  foreach( mitk::DataNode::Pointer node, nodes )
+//  {
+//    if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+//    {
+//      m_Controls.buttonPerformImageProcessing->setEnabled( true );
+//      return;
+//    }
+//  }
+
+//  m_Controls.buttonPerformImageProcessing->setEnabled( true );
+//}
+
+void DcmRTV::OnFreeIsoValueChanged(int value)
 {
-  mitk::ContourModel::Pointer contourModel0 = mitk::ContourModel::New();
-  mitk::ContourModel::Pointer contourModel1 = mitk::ContourModel::New();
-  mitk::ContourModel::Pointer contourModel2 = mitk::ContourModel::New();
-
-  mitk::Point3D point0; point0[0] = 0; point0[1] = 0; point0[2] = 0;
-  mitk::Point3D point1; point1[0] = 2; point1[1] = 0; point1[2] = 0;
-  mitk::Point3D point2; point2[0] = 2; point2[1] = 2; point2[2] = 0;
-
-  mitk::Point3D point3; point3[0] = 0; point3[1] = 0; point3[2] = 5;
-  mitk::Point3D point4; point4[0] = 10; point4[1] = 10; point4[2] = 15;
-  mitk::Point3D point5; point5[0] = 20; point5[1] = 0; point5[2] = 5;
-
-  mitk::Point3D point6; point6[0] = -100; point6[1] = 100; point6[2] = 100;
-  mitk::Point3D point7; point7[0] = 100; point7[1] = -100; point7[2] = 100;
-  mitk::Point3D point8; point8[0] = 100; point8[1] = 100; point8[2] = -100;
-  mitk::Point3D point9; point9[0] = -100; point9[1] = -100; point9[2] = -100;
-
-  contourModel0->AddVertex(point0);
-  contourModel0->AddVertex(point1);
-  contourModel0->AddVertex(point2);
-  contourModel0->Close();
-
-  contourModel1->AddVertex(point3);
-  contourModel1->AddVertex(point4);
-  contourModel1->AddVertex(point5);
-  contourModel1->Close();
-
-  contourModel2->AddVertex(point6);
-  contourModel2->AddVertex(point7);
-  contourModel2->AddVertex(point8);
-  contourModel2->AddVertex(point9);
-  contourModel2->Close();
-
-  mitk::ContourModelSet::Pointer contourModelSet = mitk::ContourModelSet::New();
-
-  contourModelSet->AddContourModel(contourModel0);
-  contourModelSet->AddContourModel(contourModel1);
-  contourModelSet->AddContourModel(contourModel2);
-
-  for(mitk::ContourModelSet::ContourModelSetIterator iterator = contourModelSet->Begin(); iterator != contourModelSet->End(); iterator++)
+  if(m_selectedNode.IsNotNull())
   {
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(iterator->GetPointer());
-    node->SetName("ContourModel");
-    GetDataStorage()->Add(node);
+    (*m_freeIsoValues)[0]->SetDoseValue(value/100.0);
+    mitk::IsoDoseLevelVectorProperty::Pointer levelVecProp = mitk::IsoDoseLevelVectorProperty::New(m_freeIsoValues);
+    m_selectedNode->SetProperty(mitk::rt::Constants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(),levelVecProp);
+
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
+}
 
-//  mitk::DataNode::Pointer node = mitk::DataNode::New();
-//  node->SetData(contourModelSet);
-//  node->SetName("ContourModelSet");
-//  GetDataStorage()->Add(node);
+void DcmRTV::OnUpdateButtonClicked()
+{
+  if(m_selectedNode.IsNotNull())
+  {
+    m_selectedNode->SetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(), true);
+    m_selectedNode->SetBoolProperty(mitk::rt::Constants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(), true);
+    m_selectedNode->SetBoolProperty(mitk::rt::Constants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), true);
+    m_selectedNode->SetFloatProperty(mitk::rt::Constants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(), m_Controls.spinPrescribedDose->value());
 
-  mitk::TimeSlicedGeometry::Pointer geo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
-  mitk::RenderingManager::GetInstance()->InitializeViews( geo );
+    mitk::IsoDoseLevelSet::Pointer levelSet = mitk::IsoDoseLevelSet::New();
+
+    mitk::IsoDoseLevel::ColorType color;
+    color[0] = 0.0;
+    color[1] = 0.0;
+    color[2] = 0.4;
+    mitk::IsoDoseLevel::Pointer level = mitk::IsoDoseLevel::New(0.01,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 0.0;
+    color[1] = 0.2;
+    color[2] = 0.8;
+    level = mitk::IsoDoseLevel::New(0.1,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 0.0;
+    color[1] = 0.4;
+    color[2] = 1.0;
+    level = mitk::IsoDoseLevel::New(0.2,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 0.0;
+    color[1] = 0.7;
+    color[2] = 1.0;
+    level = mitk::IsoDoseLevel::New(0.3,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 0.0;
+    color[1] = 0.7;
+    color[2] = 0.6;
+    level = mitk::IsoDoseLevel::New(0.4,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 0.0;
+    color[1] = 1.0;
+    color[2] = 0.3;
+    level = mitk::IsoDoseLevel::New(0.5,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 1.0;
+    color[1] = 1.0;
+    color[2] = 0.6;
+    level = mitk::IsoDoseLevel::New(0.6,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 1.0;
+    color[1] = 1.0;
+    color[2] = 0.0;
+    level = mitk::IsoDoseLevel::New(0.7,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 1.0;
+    color[1] = 0.8;
+    color[2] = 0.0;
+    level = mitk::IsoDoseLevel::New(0.8,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 1.0;
+    color[1] = 0.5;
+    color[2] = 0.0;
+    level = mitk::IsoDoseLevel::New(0.9,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 1.0;
+    color[1] = 0.4;
+    color[2] = 0.0;
+    level = mitk::IsoDoseLevel::New(0.95,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 1.0;
+    color[1] = 0.2;
+    color[2] = 0.0;
+    level = mitk::IsoDoseLevel::New(1.0,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 1.0;
+    color[1] = 0.0;
+    color[2] = 0.3;
+    level = mitk::IsoDoseLevel::New(1.07,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 1.0;
+    color[1] = 0.0;
+    color[2] = 0.4;
+    level = mitk::IsoDoseLevel::New(1.1,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 1.0;
+    color[1] = 0.4;
+    color[2] = 0.4;
+    level = mitk::IsoDoseLevel::New(1.2,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 1.0;
+    color[1] = 0.7;
+    color[2] = 0.7;
+    level = mitk::IsoDoseLevel::New(1.3,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 0.8;
+    color[1] = 0.6;
+    color[2] = 0.6;
+    level = mitk::IsoDoseLevel::New(1.4,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    color[0] = 0.65;
+    color[1] = 0.4;
+    color[2] = 0.4;
+    level = mitk::IsoDoseLevel::New(1.5,color,true,true);
+    levelSet->SetIsoDoseLevel(level);
+
+    mitk::IsoDoseLevelSetProperty::Pointer levelSetProp = mitk::IsoDoseLevelSetProperty::New(levelSet);
+    m_selectedNode->SetProperty(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(),levelSetProp);
+
+
+    (*m_freeIsoValues)[0]->SetDoseValue(m_Controls.freeBox->value()/100.0);
+    mitk::IsoDoseLevelVectorProperty::Pointer levelVecProp = mitk::IsoDoseLevelVectorProperty::New(m_freeIsoValues);
+    m_selectedNode->SetProperty(mitk::rt::Constants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(),levelVecProp);
+
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+  }
 }
 
 void DcmRTV::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
-                                             const QList<mitk::DataNode::Pointer>& nodes )
+  const QList<mitk::DataNode::Pointer>& nodes )
 {
-  // iterate all selected objects, adjust warning visibility
-  foreach( mitk::DataNode::Pointer node, nodes )
+  QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
+  if (dataNodes.empty())
   {
-    if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
-    {
-      m_Controls.buttonPerformImageProcessing->setEnabled( true );
-      return;
-    }
+    m_selectedNode = NULL;
+  }
+  else
+  {
+    m_selectedNode = dataNodes[0];
   }
 
-  m_Controls.buttonPerformImageProcessing->setEnabled( true );
+  m_Controls.btnUpdate->setEnabled(m_selectedNode.IsNotNull());
 }
 
 void DcmRTV::UpdateIsoLines(int value)

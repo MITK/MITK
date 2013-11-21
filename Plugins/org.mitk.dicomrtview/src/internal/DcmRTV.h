@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingModeProperty.h>
 #include <mitkDicomSeriesReader.h>
 //#include <QmitkFileOpenAction.h>
+#include <DataStructures/mitkIsoDoseLevelCollections.h>
 
 #include <vtkContourFilter.h>
 #include <vtkPolyData.h>
@@ -76,11 +77,25 @@ class DcmRTV : public QmitkAbstractView
 
   protected slots:
 
+    /*!
+    *	@brief	Is triggered of the update button is clicked and the selected node should get the (new) iso level set.
+    */
+    void OnUpdateButtonClicked();
+
+    /*!
+    *	@brief	Is triggered of the test free iso value has been changed.
+    */
+    void OnFreeIsoValueChanged(int);
+
+    /*!
+    *	@brief	Is triggered of the test free iso value has been changed.
+    */
+    void OnPrescribedDoseChanged(double);
+
     /// \brief Called when the user clicks the GUI button
     void DoImageProcessing();
     void LoadRTDoseFile();
     void UpdateIsoLines(int);
-    void LoadContourModel();
     void LoadIsoLines();
 
   protected:
@@ -94,6 +109,8 @@ class DcmRTV : public QmitkAbstractView
                                      const QList<mitk::DataNode::Pointer>& nodes );
 
     Ui::DcmRTVControls m_Controls;
+    mitk::DataNode::Pointer m_selectedNode;
+    mitk::IsoDoseLevelVector::Pointer m_freeIsoValues;
 
 };
 

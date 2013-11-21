@@ -50,6 +50,7 @@ void QmitkDataManagerPreferencePage::CreateQtControl(QWidget* parent)
   m_ShowHelperObjects = new QCheckBox;
   m_ShowNodesContainingNoData = new QCheckBox;
   m_GlobalReinitOnNodeDelete = new QCheckBox;
+  m_GlobalReinitOnNodeAdded = new QCheckBox;
   m_UseSurfaceDecimation = new QCheckBox;
 
   QFormLayout *formLayout = new QFormLayout;
@@ -58,6 +59,7 @@ void QmitkDataManagerPreferencePage::CreateQtControl(QWidget* parent)
   formLayout->addRow("&Show helper objects:", m_ShowHelperObjects);
   formLayout->addRow("&Show nodes containing no data", m_ShowNodesContainingNoData);
   formLayout->addRow("&Call global reinit if node is deleted", m_GlobalReinitOnNodeDelete);
+  formLayout->addRow("&Call global reinit if node is added", m_GlobalReinitOnNodeAdded);
   formLayout->addRow("&Use surface decimation:", m_UseSurfaceDecimation);
 
   m_MainControl->setLayout(formLayout);
@@ -81,6 +83,8 @@ bool QmitkDataManagerPreferencePage::PerformOk()
                                         , m_ShowNodesContainingNoData->isChecked());
   m_DataManagerPreferencesNode->PutBool("Call global reinit if node is deleted"
                                         , m_GlobalReinitOnNodeDelete->isChecked());
+  m_DataManagerPreferencesNode->PutBool("Call global reinit if node is added"
+                                        , m_GlobalReinitOnNodeAdded->isChecked());
   m_DataManagerPreferencesNode->PutBool("Use surface decimation"
                                         , m_UseSurfaceDecimation->isChecked());
   return true;
@@ -99,4 +103,5 @@ void QmitkDataManagerPreferencePage::Update()
   m_ShowNodesContainingNoData->setChecked(m_DataManagerPreferencesNode->GetBool("Show nodes containing no data", false));
   m_UseSurfaceDecimation->setChecked(m_DataManagerPreferencesNode->GetBool("Use surface decimation", true));
   m_GlobalReinitOnNodeDelete->setChecked(m_DataManagerPreferencesNode->GetBool("Call global reinit if node is deleted", true));
+  m_GlobalReinitOnNodeAdded->setChecked(m_DataManagerPreferencesNode->GetBool("Call global reinit if node is added", true));
 }

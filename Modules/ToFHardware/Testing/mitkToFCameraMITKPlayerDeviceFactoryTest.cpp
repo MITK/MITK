@@ -44,11 +44,10 @@ public:
   {
     us::ModuleContext* context = us::GetModuleContext();
     //get the service which is generated in the mitkToFHardwareModuleActivator
-    us::ServiceReference<mitk::IToFDeviceFactory> serviceRef = context->GetServiceReference<mitk::IToFDeviceFactory>();
+    //filter for the player factory, because other factories could be registered
+    std::string filter = "(ToFFactoryName=MITK Player Factory)";
+    us::ServiceReference<mitk::IToFDeviceFactory> serviceRef = context->GetServiceReferences<mitk::IToFDeviceFactory>(filter).front();
     m_DummyPlayerDeviceFactory = dynamic_cast<mitk::ToFCameraMITKPlayerDeviceFactory*>( context->GetService<mitk::IToFDeviceFactory>(serviceRef) );
-
-//    us::ServiceReference<mitk::ToFCameraDevice> serviceRefDevice = context->GetServiceReference<mitk::ToFCameraDevice>();
-//    m_DefaultRegisteredDevice = dynamic_cast<mitk::ToFCameraDevice*>( context->GetService<mitk::ToFCameraDevice>(serviceRefDevice) );
   }
 
   void ConnectToFDevice_DeviceIsNotNull()

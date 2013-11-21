@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
+#include <mitkIOUtil.h>
 #include "mitkToFCameraMITKPlayerDevice.h"
 #include "mitkIToFDeviceFactory.h"
 
@@ -23,22 +24,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
 #include <usServiceReference.h>
-#include <mitkIOUtil.h>
 
 class mitkToFCameraMITKPlayerDeviceTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkToFCameraMITKPlayerDeviceTestSuite);
-  MITK_TEST(GetDistances_ValidData_ImagesEqual);
   MITK_TEST(DeviceNotConnected_NotActive);
   MITK_TEST(ConnectCamera_ValidData_ReturnsTrue);
+  MITK_TEST(GetDistances_ValidData_ImagesEqual);
   MITK_TEST(StartCamera_ValidData_DeviceIsConnected);
+  MITK_TEST(DisconnectCamera_ValidData_ReturnsTrue);
   CPPUNIT_TEST_SUITE_END();
 
 private:
 
   mitk::ToFCameraMITKPlayerDevice* m_PlayerDevice;
   std::string m_PathToDepthData;
+  float* m_DistanceArray;
 
 public:
 
@@ -46,22 +48,32 @@ public:
   {
     us::ModuleContext* context = us::GetModuleContext();
 
-    us::ServiceReference<mitk::ToFCameraDevice> serviceRefDevice = context->GetServiceReference<mitk::ToFCameraDevice>();
+    //Filter all registered devices for an ToFCameraMITKPlayerDevice via device name
+    std::string filter = "(ToFDeviceName=MITK Player)";
+    us::ServiceReference<mitk::ToFCameraDevice> serviceRefDevice = context->GetServiceReferences<mitk::ToFCameraDevice>(filter).front();
+    //Get the actual device
     m_PlayerDevice = dynamic_cast<mitk::ToFCameraMITKPlayerDevice*>( context->GetService<mitk::ToFCameraDevice>(serviceRefDevice) );
 
     //during the tests here, we use one special test data set located in MITK-Data
     m_PathToDepthData = GetTestDataFilePath("ToF-Data/Kinect_Lego_Phantom_DistanceImage.nrrd");
     m_PlayerDevice->SetProperty("DistanceImageFileName",mitk::StringProperty::New(m_PathToDepthData));
+
+    //initialize an array with the test data size
+    unsigned int numberOfPixels = 640*480;
+    m_DistanceArray = new float[numberOfPixels];
   }
 
   void tearDown()
   {
     //Wait some time to avoid threading issues.
-    itksys::SystemTools::Delay(1000);
+    itksys::SystemTools::Delay(10);
+    //Clean up
     if(m_PlayerDevice->IsCameraActive())
       m_PlayerDevice->StopCamera();
     if(m_PlayerDevice->IsCameraConnected())
       m_PlayerDevice->DisconnectCamera();
+
+    delete[] m_DistanceArray;
   }
 
   void DeviceNotConnected_NotActive()
@@ -90,33 +102,20 @@ public:
       unsigned int dimension[2];
       dimension[0] = m_PlayerDevice->GetCaptureWidth();
       dimension[1] = m_PlayerDevice->GetCaptureHeight();
-
-      //initialize an array with the correct size
-      unsigned int numberOfPixels = dimension[0]*dimension[1];
-      float* distances = new float[numberOfPixels];
       int imageSequence = 0;
 
       //fill the array with the device output
-      m_PlayerDevice->GetDistances(distances,imageSequence);
+      m_PlayerDevice->GetDistances(m_DistanceArray,imageSequence);
 
       //initialize an image and fill it with the array
       mitk::Image::Pointer resultDepthImage = mitk::Image::New();
       resultDepthImage->Initialize(mitk::PixelType(mitk::MakeScalarPixelType<float>()), 2, dimension,1);
-      resultDepthImage->SetSlice(distances);
+      resultDepthImage->SetSlice(m_DistanceArray);
 
       mitk::Image::Pointer expectedDepthImage = mitk::IOUtil::LoadImage(m_PathToDepthData);
 
       MITK_ASSERT_EQUAL( expectedDepthImage, resultDepthImage,
         "Image from the player should be the same as loaded from the harddisk, because we just load one slice.");
-
-//      m_PlayerDevice->StopCamera();
-//      MITK_TEST_OUTPUT(<< "Device stopped");
-//      CPPUNIT_ASSERT_MESSAGE("After stopping the device, the device should be inactive.", m_PlayerDevice->IsCameraActive()==false);
-//      CPPUNIT_ASSERT_MESSAGE("DisconnectCamera() should return true in case of success.", m_PlayerDevice->DisconnectCamera()==true);
-//      MITK_TEST_OUTPUT(<< "Device disconnected");
-
-
-      delete[] distances;
     }
     catch(std::exception  &e)
     {
@@ -128,31 +127,13 @@ public:
   {
     try
     {
+      int imageSequence = 0;
       m_PlayerDevice->ConnectCamera();
       m_PlayerDevice->StartCamera();
-      unsigned int dimension[2];
-      dimension[0] = m_PlayerDevice->GetCaptureWidth();
-      dimension[1] = m_PlayerDevice->GetCaptureHeight();
-
-      //initialize an array with the correct size
-      unsigned int numberOfPixels = dimension[0]*dimension[1];
-      float* distances = new float[numberOfPixels];
-      int imageSequence = 0;
-
-      //fill the array with the device output
-      m_PlayerDevice->GetDistances(distances,imageSequence);
-
-      //initialize an image and fill it with the array
-
-      mitk::Image::Pointer resultDepthImage = mitk::Image::New();
-      resultDepthImage->Initialize(mitk::PixelType(mitk::MakeScalarPixelType<float>()), 2, dimension,1);
-      resultDepthImage->SetSlice(distances);
-
+      m_PlayerDevice->GetDistances(m_DistanceArray,imageSequence);
       m_PlayerDevice->StopCamera();
       CPPUNIT_ASSERT_MESSAGE("After stopping the device, the device should be inactive.", m_PlayerDevice->IsCameraActive()==false);
       CPPUNIT_ASSERT_MESSAGE("DisconnectCamera() should return true in case of success.", m_PlayerDevice->DisconnectCamera()==true);
-
-      delete[] distances;
     }
     catch(std::exception  &e)
     {

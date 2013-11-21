@@ -48,6 +48,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkExtractImageFilter.h>
 
+#include <mitkCoreServices.h>
+#include <mitkIShaderRepository.h>
+#include <mitkShaderProperty.h>
+
 #include <QFileDialog>
 
 /**
@@ -66,6 +70,8 @@ class DcmRTV : public QmitkAbstractView
 
   public:
 
+    DcmRTV();
+    virtual ~DcmRTV();
     static const std::string VIEW_ID;
 
   protected slots:
@@ -74,6 +80,8 @@ class DcmRTV : public QmitkAbstractView
     void DoImageProcessing();
     void LoadRTDoseFile();
     void UpdateIsoLines(int);
+    void LoadContourModel();
+    void LoadIsoLines();
 
   protected:
 

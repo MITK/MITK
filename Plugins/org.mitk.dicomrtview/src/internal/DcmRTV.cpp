@@ -31,6 +31,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string DcmRTV::VIEW_ID = "org.mitk.views.dcmrtv";
 
+DcmRTV::DcmRTV()
+{
+  //    std::string m_VolumeDir = MITK_ROOT;
+  //    m_VolumeDir += "../mbi/Plugins/org.mbi.gui.qt.tofoscopy";
+  //    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );
+  //    mitk::ShaderRepository::Pointer shaderRepository = mitk::ShaderRepository::GetGlobalShaderRepository();
+      mitk::CoreServicePointer<mitk::IShaderRepository> shadoRepo(mitk::CoreServices::GetShaderRepository());
+
+      std::string path = "/home/riecker/mitkShaderLighting.xml"; //mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderTOF.xml");
+      std::string isoShaderName = "mitkIsoLineShader";
+      MITK_INFO << "shader found under: " << path;
+      std::ifstream str(path.c_str());
+      shadoRepo->LoadShader(str,isoShaderName);
+}
+
+DcmRTV::~DcmRTV(){}
+
 void DcmRTV::SetFocus()
 {
   m_Controls.buttonPerformImageProcessing->setFocus();
@@ -45,6 +62,72 @@ void DcmRTV::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.pushButton, SIGNAL(clicked()), this, SLOT(LoadRTDoseFile()) );
   connect( m_Controls.isoSlider, SIGNAL(valueChanged(int)), m_Controls.spinBox, SLOT(setValue(int)));
   connect( m_Controls.spinBox, SIGNAL(valueChanged(int)), this, SLOT(UpdateIsoLines(int)));
+  connect( m_Controls.contourModelExampleButton, SIGNAL(clicked()), this, SLOT(LoadContourModel()));
+  connect( m_Controls.btn_isolines, SIGNAL(clicked()), this ,SLOT(LoadIsoLines()));
+}
+
+void DcmRTV::LoadIsoLines()
+{
+  mitk::DataNode::Pointer doseNode = GetDataStorage()->GetNamedNode("abc");
+  doseNode->SetProperty("shader",mitk::ShaderProperty::New("mitkIsoLineShader"));
+}
+
+void DcmRTV::LoadContourModel()
+{
+  mitk::ContourModel::Pointer contourModel0 = mitk::ContourModel::New();
+  mitk::ContourModel::Pointer contourModel1 = mitk::ContourModel::New();
+  mitk::ContourModel::Pointer contourModel2 = mitk::ContourModel::New();
+
+  mitk::Point3D point0; point0[0] = 0; point0[1] = 0; point0[2] = 0;
+  mitk::Point3D point1; point1[0] = 2; point1[1] = 0; point1[2] = 0;
+  mitk::Point3D point2; point2[0] = 2; point2[1] = 2; point2[2] = 0;
+
+  mitk::Point3D point3; point3[0] = 0; point3[1] = 0; point3[2] = 5;
+  mitk::Point3D point4; point4[0] = 10; point4[1] = 10; point4[2] = 15;
+  mitk::Point3D point5; point5[0] = 20; point5[1] = 0; point5[2] = 5;
+
+  mitk::Point3D point6; point6[0] = -100; point6[1] = 100; point6[2] = 100;
+  mitk::Point3D point7; point7[0] = 100; point7[1] = -100; point7[2] = 100;
+  mitk::Point3D point8; point8[0] = 100; point8[1] = 100; point8[2] = -100;
+  mitk::Point3D point9; point9[0] = -100; point9[1] = -100; point9[2] = -100;
+
+  contourModel0->AddVertex(point0);
+  contourModel0->AddVertex(point1);
+  contourModel0->AddVertex(point2);
+  contourModel0->Close();
+
+  contourModel1->AddVertex(point3);
+  contourModel1->AddVertex(point4);
+  contourModel1->AddVertex(point5);
+  contourModel1->Close();
+
+  contourModel2->AddVertex(point6);
+  contourModel2->AddVertex(point7);
+  contourModel2->AddVertex(point8);
+  contourModel2->AddVertex(point9);
+  contourModel2->Close();
+
+  mitk::ContourModelSet::Pointer contourModelSet = mitk::ContourModelSet::New();
+
+  contourModelSet->AddContourModel(contourModel0);
+  contourModelSet->AddContourModel(contourModel1);
+  contourModelSet->AddContourModel(contourModel2);
+
+  for(mitk::ContourModelSet::ContourModelSetIterator iterator = contourModelSet->Begin(); iterator != contourModelSet->End(); iterator++)
+  {
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(iterator->GetPointer());
+    node->SetName("ContourModel");
+    GetDataStorage()->Add(node);
+  }
+
+//  mitk::DataNode::Pointer node = mitk::DataNode::New();
+//  node->SetData(contourModelSet);
+//  node->SetName("ContourModelSet");
+//  GetDataStorage()->Add(node);
+
+  mitk::TimeSlicedGeometry::Pointer geo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
+  mitk::RenderingManager::GetInstance()->InitializeViews( geo );
 }
 
 void DcmRTV::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,

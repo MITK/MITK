@@ -518,6 +518,15 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
   }
 }
 
+void mitk::ImageVtkMapper2D::ApplyShader( mitk::BaseRenderer* renderer)
+{
+  LocalStorage *localStorage = this->GetLocalStorage( renderer );
+
+  CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
+  itk::TimeStamp timestamp;
+  shaderRepo->ApplyProperties(this->GetDataNode(),localStorage->m_Actor,renderer,timestamp);
+}
+
 void mitk::ImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
 {
   LocalStorage* localStorage = this->GetLocalStorage( renderer );
@@ -585,6 +594,7 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
   }
   //we apply color for all images (including binaries).
   this->ApplyColor( renderer );
+  this->ApplyShader( renderer );
 }
 
 void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
@@ -686,26 +696,8 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
 
-  const char* dosePropertyKey = "dose";
-  bool isSet;
-
-  if(node->GetBoolProperty(dosePropertyKey,isSet)&&isSet)
-  {
-    node->SetName("ItWorks!");
-//    std::string m_VolumeDir = MITK_ROOT;
-//    m_VolumeDir += "../mbi/Plugins/org.mbi.gui.qt.tofoscopy";
-//    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );
-//    mitk::ShaderRepository::Pointer shaderRepository = mitk::ShaderRepository::GetGlobalShaderRepository();
-    mitk::CoreServicePointer<mitk::IShaderRepository> shadoRepo(mitk::CoreServices::GetShaderRepository());
-
-    std::string path = "/home/riecker/mitkShaderLighting.xml"; //mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderTOF.xml");
-    std::string isoShaderName = "mitkIsoLineShader";
-    MITK_INFO << "shader found under: " << path;
-    std::ifstream str(path.c_str());
-    shadoRepo->LoadShader(str,isoShaderName);
-
-    node->SetProperty("shader",mitk::ShaderProperty::New(isoShaderName));
-  }
+  CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
+  shaderRepo->AddDefaultProperties(node,renderer,overwrite);
 
   mitk::RenderingModeProperty::Pointer renderingModeProperty = mitk::RenderingModeProperty::New();
   node->AddProperty( "Image Rendering.Mode", renderingModeProperty);

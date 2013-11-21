@@ -125,6 +125,20 @@
     </layout>
    </item>
    <item>
+    <widget class="QPushButton" name="contourModelExampleButton">
+     <property name="text">
+      <string>BugSquContourModel</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btn_isolines">
+     <property name="text">
+      <string>Isolines</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="spacer1">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

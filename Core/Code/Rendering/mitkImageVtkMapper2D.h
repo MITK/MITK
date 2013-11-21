@@ -297,6 +297,9 @@ protected:
   /** \brief Set the color of the image/polydata */
   void ApplyColor( mitk::BaseRenderer* renderer );
 
+  /** \brief Set the shader of the image/polydata */
+  void ApplyShader( mitk::BaseRenderer* renderer );
+
   /** \brief Set the opacity of the actor. */
   void ApplyOpacity( mitk::BaseRenderer* renderer );
 

@@ -288,6 +288,8 @@ void mitk::USDevice::SetIsFreezed(bool freeze)
     return;
   }
 
+  this->OnFreeze(freeze);
+
   if ( freeze )
   {
     m_IsFreezed = true;

@@ -144,6 +144,11 @@ namespace mitk {
     virtual bool OnDeactivation();
 
     /**
+    * \brief Freezes or unfreezes UltrasoundDevice.
+    */
+    virtual void OnFreeze(bool);
+
+    /**
     * \brief Grabs the next frame from the input.
     * This method is called internally, whenever Update() is invoked by an Output.
     */

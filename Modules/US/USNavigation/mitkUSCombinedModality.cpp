@@ -217,6 +217,17 @@ bool mitk::USCombinedModality::OnDeactivation()
   return m_UltrasoundDevice->GetIsInitialized();
 }
 
+void mitk::USCombinedModality::OnFreeze(bool freeze)
+{
+  if (m_UltrasoundDevice.IsNull())
+  {
+    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
+    mitkThrow() << "UltrasoundDevice must not be null.";
+  }
+
+  m_UltrasoundDevice->SetIsFreezed(freeze);
+}
+
 mitk::NavigationDataSource::Pointer mitk::USCombinedModality::GetNavigationDataSource()
 {
   return m_DelayFilter.GetPointer();

@@ -48,17 +48,10 @@ TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
 ::BeforeThreadedGenerateData()
 {
 
-<<<<<<< HEAD
   if( m_GradientList->Size()==0 )
   {
     throw itk::ExceptionObject (__FILE__,__LINE__,"Error: gradient list is empty, cannot generate DWI.");
   }
-=======
-    if( m_GradientList->Size()==0 )
-    {
-      throw itk::ExceptionObject (__FILE__,__LINE__,"Error: gradient list is empty, cannot generate DWI.");
-    }
->>>>>>> 403342d8d75cc8db1c7e189bca59ae5584ff9ec4
 
   if( m_BaselineImage.IsNull() )
   {
@@ -98,7 +91,6 @@ TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
     m_BaselineImage = rescaler->GetOutput();
   }
 
-<<<<<<< HEAD
   typename OutputImageType::Pointer outImage = OutputImageType::New();
   outImage->SetSpacing( this->GetInput()->GetSpacing() );   // Set the image spacing
   outImage->SetOrigin( this->GetInput()->GetOrigin() );     // Set the image origin
@@ -108,17 +100,6 @@ TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
   outImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
   outImage->SetVectorLength(m_GradientList->Size());
   outImage->Allocate();
-=======
-    typename OutputImageType::Pointer outImage = OutputImageType::New();
-    outImage->SetSpacing( this->GetInput()->GetSpacing() );   // Set the image spacing
-    outImage->SetOrigin( this->GetInput()->GetOrigin() );     // Set the image origin
-    outImage->SetDirection( this->GetInput()->GetDirection() );  // Set the image direction
-    outImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
-    outImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
-    outImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
-    outImage->SetVectorLength(m_GradientList->Size());
-    outImage->Allocate();
->>>>>>> 403342d8d75cc8db1c7e189bca59ae5584ff9ec4
 
   this->SetNumberOfRequiredOutputs (1);
   this->SetNthOutput (0, outImage);

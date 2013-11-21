@@ -363,6 +363,7 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
       this->OnInterpolationActivated(false);
       this->On3DInterpolationActivated(false);
       this->Show3DInterpolationResult(false);
+      m_Interpolator->Activate2DInterpolation(false);
       break;
 
     case 1: // 2D
@@ -380,6 +381,7 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
       this->Show3DInterpolationControls(true);
       this->OnInterpolationActivated(false);
       this->On3DInterpolationActivated(true);
+      m_Interpolator->Activate2DInterpolation(false);
       break;
 
     default:

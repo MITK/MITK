@@ -67,8 +67,8 @@ void mitk::SegTool3D::ItkPasteSegmentationOnWorkingImage(
   typedef itk::ImageRegionConstIterator< ImageType > SourceIteratorType;
   typedef itk::ImageRegionIterator< ImageType >      TargetIteratorType;
 
-  typename SourceIteratorType sourceIterator( sourceImageITK, sourceImageITK->GetLargestPossibleRegion() );
-  typename TargetIteratorType targetIterator( targetImage, targetImage->GetLargestPossibleRegion() );
+  SourceIteratorType sourceIterator( sourceImageITK, sourceImageITK->GetLargestPossibleRegion() );
+  TargetIteratorType targetIterator( targetImage, targetImage->GetLargestPossibleRegion() );
 
   sourceIterator.GoToBegin();
   targetIterator.GoToBegin();

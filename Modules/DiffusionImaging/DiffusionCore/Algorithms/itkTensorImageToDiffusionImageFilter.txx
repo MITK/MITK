@@ -144,15 +144,22 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
     out.SetSize(m_GradientList->Size());
     out.Fill(0);
 
+    unsigned int b0index = 0;
+
     if( b0 > 0)
     {
-      for( unsigned int i=0; i<m_GradientList->Size()-1; i++)
+      for( unsigned int i=0; i<m_GradientList->Size(); i++)
       {
         GradientType g = m_GradientList->at(i);
 
-
         // normalize vector so the following computations work
         const double twonorm = g.two_norm();
+        if( twonorm < vnl_math::eps )
+        {
+          b0index = i;
+          continue;
+        }
+
         GradientType gn = g.normalize();
 
         InputPixelType S;
@@ -175,12 +182,12 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
           //   - because of this estimation the vector have to be normalized beforehand
           //     otherwise the modelled signal is wrong ( i.e. not scaled properly )
           const double bval = m_BValue * twonorm;
-          out[i+1] = static_cast<OutputScalarType>( 1.0 * b0 * exp ( -1.0 * bval * res ) );
+          out[i] = static_cast<OutputScalarType>( 1.0 * b0 * exp ( -1.0 * bval * res ) );
         }
       }
     }
 
-    out[0] = b0;
+    out[b0index] = b0;
 
     itOut.Set(out);
 

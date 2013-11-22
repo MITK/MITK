@@ -45,7 +45,7 @@ namespace mitk
   public:
 
     Message3<double,double, bool> IntervalBordersChanged;
-    Message1<double>     ThresholdingValueChanged;
+    Message1<double>              ThresholdingValueChanged;
 
     mitkClassMacro(BinaryThresholdTool, AutoSegmentationTool);
     itkNewMacro(BinaryThresholdTool);
@@ -76,10 +76,9 @@ namespace mitk
     template <typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>
     void ITKThresholding( itk::Image<TPixel1, VDimension1>* targetImage, const itk::Image<TPixel2, VDimension2>* sourceImage );
 
-    DataNode::Pointer m_ThresholdFeedbackNode;
+    DataNode::Pointer m_PreviewNode;
     DataNode::Pointer m_ReferenceNode;
     DataNode::Pointer m_NodeForThresholding;
-    int m_CurrentTimeStep;
 
     double m_SensibleMinimumThresholdValue;
     double m_SensibleMaximumThresholdValue;

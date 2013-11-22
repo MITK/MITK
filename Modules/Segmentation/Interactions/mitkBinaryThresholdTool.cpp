@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 #include "mitkPadImageFilter.h"
 #include "mitkLabelSetImage.h"
-//#include "mitkUndoController.h"
 
 // us
 #include "usModule.h"
@@ -49,19 +48,18 @@ mitk::BinaryThresholdTool::BinaryThresholdTool()
 :m_SensibleMinimumThresholdValue(-100),
 m_SensibleMaximumThresholdValue(+100),
 m_CurrentThresholdValue(0.0),
-m_CurrentTimeStep(0),
 m_IsFloatImage(false)
 {
-  m_ThresholdFeedbackNode = DataNode::New();
-  mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties( m_ThresholdFeedbackNode );
+  m_PreviewNode = DataNode::New();
+  mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties( m_PreviewNode );
 
-  m_ThresholdFeedbackNode->SetProperty( "color", ColorProperty::New(0.0, 1.0, 0.0) );
-  m_ThresholdFeedbackNode->SetProperty( "texture interpolation", BoolProperty::New(false) );
-  m_ThresholdFeedbackNode->SetProperty( "layer", IntProperty::New( 100 ) );
-  m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(100, 1) ) );
-  m_ThresholdFeedbackNode->SetProperty( "name", StringProperty::New("Thresholding feedback") );
-  m_ThresholdFeedbackNode->SetProperty( "opacity", FloatProperty::New(0.3) );
-  m_ThresholdFeedbackNode->SetProperty( "helper object", BoolProperty::New(true) );
+  m_PreviewNode->SetProperty( "color", ColorProperty::New(0.0, 1.0, 0.0) );
+  m_PreviewNode->SetProperty( "texture interpolation", BoolProperty::New(false) );
+  m_PreviewNode->SetProperty( "layer", IntProperty::New( 100 ) );
+  m_PreviewNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(100, 1) ) );
+  m_PreviewNode->SetProperty( "name", StringProperty::New("BinaryThresholdTool preview") );
+  m_PreviewNode->SetProperty( "opacity", FloatProperty::New(0.3) );
+  m_PreviewNode->SetProperty( "helper object", BoolProperty::New(true) );
 }
 
 mitk::BinaryThresholdTool::~BinaryThresholdTool()
@@ -108,7 +106,7 @@ void mitk::BinaryThresholdTool::Deactivated()
   {
     if (DataStorage* storage = m_ToolManager->GetDataStorage())
     {
-      storage->Remove( m_ThresholdFeedbackNode );
+      storage->Remove( m_PreviewNode );
       RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
@@ -116,7 +114,7 @@ void mitk::BinaryThresholdTool::Deactivated()
   {
     // don't care
   }
-  m_ThresholdFeedbackNode->SetData(NULL);
+  m_PreviewNode->SetData(NULL);
 //  mitk::UndoController::GetCurrentUndoModel()->Clear();
 //  mitk::UndoController::GetCurrentUndoModel()->ClearRedoList();
 }
@@ -126,7 +124,7 @@ void mitk::BinaryThresholdTool::SetThresholdValue(double value)
   if (value != m_CurrentThresholdValue)
   {
     m_CurrentThresholdValue = value;
-    m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(m_CurrentThresholdValue, 0.001) ) );
+    m_PreviewNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(m_CurrentThresholdValue, 0.001) ) );
     RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -143,7 +141,7 @@ void mitk::BinaryThresholdTool::AcceptPreview()
 
   try
   {
-    this->InitializeUndoController();
+//    this->InitializeUndoController();
 
     // perform the actual thresholding
     ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
@@ -201,17 +199,17 @@ void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataNode* nodeForThresholdi
   {
     // initialize a new node with the same image as our reference image
     // use the level window property of this image copy to display the result of a thresholding operation
-    m_ThresholdFeedbackNode->SetData( imageForThresholding );
+    m_PreviewNode->SetData( imageForThresholding );
     int layer(50);
     nodeForThresholding->GetIntProperty("layer", layer);
-    m_ThresholdFeedbackNode->SetIntProperty("layer", layer+1);
+    m_PreviewNode->SetIntProperty("layer", layer+1);
 
     if (DataStorage* storage = m_ToolManager->GetDataStorage())
     {
-      if (storage->Exists(m_ThresholdFeedbackNode))
-         storage->Remove(m_ThresholdFeedbackNode);
+      if (storage->Exists(m_PreviewNode))
+         storage->Remove(m_PreviewNode);
 
-      storage->Add( m_ThresholdFeedbackNode);
+      storage->Add( m_PreviewNode);
     }
 
     if (imageForThresholding.GetPointer() == originalImageTimeStep.GetPointer())
@@ -226,7 +224,7 @@ void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataNode* nodeForThresholdi
      m_SensibleMaximumThresholdValue = static_cast<double>( originalImageTimeStep->GetScalarValueMax() );
     }
 
-    LevelWindowProperty::Pointer lwp = dynamic_cast<LevelWindowProperty*>( m_ThresholdFeedbackNode->GetProperty( "levelwindow" ));
+    LevelWindowProperty::Pointer lwp = dynamic_cast<LevelWindowProperty*>( m_PreviewNode->GetProperty( "levelwindow" ));
     if ( !m_IsFloatImage )
     {
       m_CurrentThresholdValue = static_cast<double>( lwp->GetLevelWindow().GetLevel() );

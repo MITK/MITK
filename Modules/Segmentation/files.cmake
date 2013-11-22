@@ -62,7 +62,8 @@ set(CPP_FILES
   Interactions/mitkMedianTool3D.cpp
   Interactions/mitkDilateTool3D.cpp
   Interactions/mitkErodeTool3D.cpp
-  Interactions/mitkSmoothTool3D.cpp
+  Interactions/mitkOpenTool3D.cpp
+  Interactions/mitkCloseTool3D.cpp
   Interactions/mitkFillHolesTool3D.cpp
   Interactions/mitkFeedbackContourTool.cpp
   Interactions/mitkFillRegionTool.cpp
@@ -126,6 +127,7 @@ set(RESOURCE_FILES
   MedianTool3D_48x48.png
   ErodeTool3D_48x48.png
   DilateTool3D_48x48.png
-  SmoothTool3D_48x48.png
+  OpenTool3D_48x48.png
+  CloseTool3D_48x48.png
   FillHolesTool3D_48x48.png
 )

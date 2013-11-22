@@ -163,11 +163,11 @@ void QmitkDicomEditor::TestHandler()
 void QmitkDicomEditor::OnViewButtonAddToDataManager(QHash<QString, QVariant> eventProperties)
 {
     ctkDictionary properties;
-    properties["PatientName"] = eventProperties["PatientName"];
-    properties["StudyUID"] = eventProperties["StudyUID"];
-    properties["StudyName"] = eventProperties["StudyName"];
-    properties["SeriesUID"] = eventProperties["SeriesUID"];
-    properties["SeriesName"] = eventProperties["SeriesName"];
+//    properties["PatientName"] = eventProperties["PatientName"];
+//    properties["StudyUID"] = eventProperties["StudyUID"];
+//    properties["StudyName"] = eventProperties["StudyName"];
+//    properties["SeriesUID"] = eventProperties["SeriesUID"];
+//    properties["SeriesName"] = eventProperties["SeriesName"];
     properties["FilesForSeries"] = eventProperties["FilesForSeries"];
 
     m_Publisher->PublishSignals(mitk::PluginActivator::getContext());

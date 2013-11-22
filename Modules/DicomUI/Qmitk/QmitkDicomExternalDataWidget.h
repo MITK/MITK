@@ -17,28 +17,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkDicomExternalDataWidget_h
 #define QmitkDicomExternalDataWidget_h
 
-// #include <QmitkFunctionality.h>
-#include "ui_QmitkDicomExternalDataWidgetControls.h"
 #include "mitkDicomUIExports.h"
+#include "ui_QmitkDicomExternalDataWidgetControls.h"
 
 // include ctk
 #include <ctkDICOMDatabase.h>
 #include <ctkDICOMIndexer.h>
 
 //include QT
-#include <QWidget>
+#include <QHash>
+#include <QLabel>
+#include <QProgressDialog>
 #include <QString>
 #include <QStringList>
-
-//For running dicom import in background
-#include <QtConcurrentRun>
-#include <QFuture>
-#include <QFutureWatcher>
-#include <QTimer>
-#include <QProgressDialog>
-#include <QLabel>
-#include <QHash>
 #include <QVariant>
+#include <QWidget>
 
 class ctkFileDialog;
 

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkStatusBar.h>
 
 // Qmitk
 #include "QmitkDicomExternalDataWidget.h"
@@ -26,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qt
 #include <QCheckBox>
 #include <QMessageBox>
-#include <QMap>
-#include <QVariant>
 
 const std::string QmitkDicomExternalDataWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomExternalDataWidget";
 

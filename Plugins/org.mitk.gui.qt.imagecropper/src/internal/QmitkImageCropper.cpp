@@ -386,7 +386,7 @@ void QmitkImageCropper::AddBoundingObjectToNode(mitk::DataNode* node)
     mitk::GlobalInteraction::GetInstance()->AddInteractor( m_AffineInteractor );
   }
 
-  m_CroppingObject->FitGeometry(m_ImageToCrop->GetTimeSlicedGeometry());
+  m_CroppingObject->FitGeometry(m_ImageToCrop->GetSlicedGeometry());
 
   m_CroppingObjectNode->SetVisibility(true);
 }

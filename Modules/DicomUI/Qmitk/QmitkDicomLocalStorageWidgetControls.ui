@@ -103,7 +103,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="ctkDICOMTableManager" name="ctkDICOMBrowser" native="true"/>
+         <widget class="ctkDICOMTableManager" name="ctkDicomBrowser" native="true"/>
         </item>
        </layout>
       </item>

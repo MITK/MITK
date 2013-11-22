@@ -69,7 +69,7 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
         connect(m_ProgressDialog, SIGNAL(canceled()), m_ExternalIndexer, SLOT(cancel()));
         connect(m_ExternalIndexer, SIGNAL(indexingComplete()),this, SLOT(OnFinishedImport()));
 
-        connect(m_ExternalIndexer, SIGNAL(indexingFilePath(QString)), m_ProgressDialogLabel, SLOT(setText(QString)));
+        connect(m_ExternalIndexer, SIGNAL(indexingFilePath(const QString&)), m_ProgressDialogLabel, SLOT(setText(const QString&)));
         connect(m_ExternalIndexer, SIGNAL(progress(int)), m_ProgressDialog, SLOT(setValue(int)));
     }
 }

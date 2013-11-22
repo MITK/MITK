@@ -59,11 +59,15 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
 
     connect(m_Controls.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(OnTabChanged(int)));
 
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalStartDicomImport(const QStringList&)),m_Controls.internalDataWidget,SLOT(OnStartDicomImport(const QStringList&)));
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalDicomToDataManager(QHash<QString,QVariant>)),this,SLOT(OnViewButtonAddToDataManager(QHash<QString,QVariant>)));
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalStartDicomImport(const QStringList&)),
+            m_Controls.internalDataWidget,SLOT(OnStartDicomImport(const QStringList&)));
+
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalDicomToDataManager(const QHash<QString,QVariant>&)),
+            this,SLOT(OnViewButtonAddToDataManager(const QHash<QString,QVariant>&)));
 
     connect(m_Controls.internalDataWidget,SIGNAL(SignalFinishedImport()),this, SLOT(OnDicomImportFinished()));
-    connect(m_Controls.internalDataWidget,SIGNAL(SignalDicomToDataManager(QHash<QString,QVariant>)),this,SLOT(OnViewButtonAddToDataManager(QHash<QString,QVariant>)));
+    connect(m_Controls.internalDataWidget,SIGNAL(SignalDicomToDataManager(const QHash<QString,QVariant>&)),
+            this,SLOT(OnViewButtonAddToDataManager(const QHash<QString,QVariant>&)));
 }
 
 

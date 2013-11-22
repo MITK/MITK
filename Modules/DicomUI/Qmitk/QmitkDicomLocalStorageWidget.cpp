@@ -50,21 +50,21 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
         connect(m_Controls->deleteButton,SIGNAL(clicked()),this,SLOT(OnDeleteButtonClicked()));
         connect(m_Controls->viewInternalDataButton, SIGNAL(clicked()), this , SLOT(OnViewButtonClicked()));
 
-        connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesSelectionChanged(const QStringList&)),
+        connect(m_Controls->ctkDicomBrowser, SIGNAL(seriesSelectionChanged(const QStringList&)),
                 this, SLOT(OnSeriesSelectionChanged(const QStringList&)));
-        connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesSelectionChanged(const QStringList&)),
+        connect(m_Controls->ctkDicomBrowser, SIGNAL(seriesSelectionChanged(const QStringList&)),
                 this, SLOT(OnSeriesSelectionChanged(const QStringList&)));
-        connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesDoubleClicked(const QModelIndex&)),
+        connect(m_Controls->ctkDicomBrowser, SIGNAL(seriesDoubleClicked(const QModelIndex&)),
                 this, SLOT(OnViewButtonClicked()));
 
         connect(m_LocalIndexer, SIGNAL(indexingComplete()),this, SLOT(OnFinishedImport()));
         connect(m_LocalIndexer, SIGNAL(indexingComplete()),this, SIGNAL(SignalFinishedImport()));
         connect(m_LocalIndexer, SIGNAL(indexingComplete()),this, SLOT(OnFinishedImport()));
-        connect(m_LocalIndexer, SIGNAL(indexingFilePath(QString)), m_ProgressDialogLabel, SLOT(setText(QString)));
+        connect(m_LocalIndexer, SIGNAL(indexingFilePath(const QString&)), m_ProgressDialogLabel, SLOT(setText(const QString&)));
         connect(m_LocalIndexer, SIGNAL(progress(int)), m_ProgressDialog, SLOT(setValue(int)));
         connect(m_ProgressDialog, SIGNAL(canceled()), m_LocalIndexer, SLOT(cancel()));
 
-        m_Controls->ctkDICOMBrowser->setDynamicTableLayout(true);
+        m_Controls->ctkDicomBrowser->setDynamicTableLayout(true);
     }
 }
 
@@ -92,18 +92,18 @@ void QmitkDicomLocalStorageWidget::OnFinishedImport()
 
 void QmitkDicomLocalStorageWidget::OnDeleteButtonClicked()
 {
-  QStringList selectedSeriesUIDs = m_Controls->ctkDICOMBrowser->currentSeriesSelection();
+  QStringList selectedSeriesUIDs = m_Controls->ctkDicomBrowser->currentSeriesSelection();
   QString uid;
   foreach (uid, selectedSeriesUIDs)
   {
     m_LocalDatabase->removeSeries(uid);
   }
-  QStringList selectedStudiesUIDs = m_Controls->ctkDICOMBrowser->currentStudiesSelection();
+  QStringList selectedStudiesUIDs = m_Controls->ctkDicomBrowser->currentStudiesSelection();
   foreach(uid, selectedStudiesUIDs)
   {
     m_LocalDatabase->removeStudy(uid);
   }
-  QStringList selectedPatientUIDs = m_Controls->ctkDICOMBrowser->currentPatientsSelection();
+  QStringList selectedPatientUIDs = m_Controls->ctkDicomBrowser->currentPatientsSelection();
   foreach(uid, selectedPatientUIDs)
   {
     m_LocalDatabase->removePatient(uid);
@@ -112,7 +112,7 @@ void QmitkDicomLocalStorageWidget::OnDeleteButtonClicked()
 
 void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
 {
-  QStringList uids = m_Controls->ctkDICOMBrowser->currentSeriesSelection();
+  QStringList uids = m_Controls->ctkDicomBrowser->currentSeriesSelection();
   QString uid;
   foreach (uid, uids)
   {
@@ -138,7 +138,7 @@ void QmitkDicomLocalStorageWidget::SetDatabase(QString databaseFile)
 {
     m_LocalDatabase = new ctkDICOMDatabase(databaseFile);
     m_LocalDatabase->setParent(this);
-    m_Controls->ctkDICOMBrowser->setCTKDICOMDatabase(m_LocalDatabase);
+    m_Controls->ctkDicomBrowser->setCTKDICOMDatabase(m_LocalDatabase);
 }
 
 void QmitkDicomLocalStorageWidget::OnSeriesSelectionChanged(const QStringList &s)

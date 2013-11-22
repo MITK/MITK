@@ -67,6 +67,7 @@ public:
   virtual ~ImageReadAccessor()
   {
     // Future work: In case of non-coherent memory, copied area needs to be deleted
+    return;
 
     m_Image->m_ReadWriteLock.Lock();
 

@@ -261,6 +261,9 @@ protected:
 
     typename BaseMetricType::Pointer metric;
 
+    unsigned int glob_max_threads = itk::MultiThreader::GetGlobalMaximumNumberOfThreads();
+    itk::MultiThreader::SetGlobalMaximumNumberOfThreads(1);
+
     if( m_CrossModalityRegistration )
     {
       metric = MMIMetricType::New();
@@ -316,6 +319,7 @@ protected:
     if( min_value / max_schedule_val < 12 )
     {
       max_schedule_val /= 2;
+      max_pyramid_lvl--;
       optmaxstep *= 0.25f;
       optminstep *= 0.1f;
     }
@@ -423,6 +427,7 @@ protected:
       registration->RemoveObserver( pyramid_tag );
     }
 
+    itk::MultiThreader::SetGlobalMaximumNumberOfThreads( glob_max_threads );
 
   }
 

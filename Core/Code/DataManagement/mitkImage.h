@@ -640,12 +640,13 @@ private:
 template <typename ItkOutputImageType>
 void CastToMitkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
 {
-  if(mitkoutputimage.IsNull())
-  {
-    mitkoutputimage = mitk::Image::New();
-  }
-  mitkoutputimage->InitializeByItk(itkimage.GetPointer());
-  mitkoutputimage->SetChannel(itkimage->GetBufferPointer());
+//   if(mitkoutputimage.IsNull())
+//   {
+//     mitkoutputimage = mitk::Image::New();
+//   }
+//   mitkoutputimage->InitializeByItk(itkimage.GetPointer());
+//   mitkoutputimage->SetChannel(itkimage->GetBufferPointer());
+  CastToMitkImage<ItkOutputImageType>( itkimage.GetPointer(), mitkoutputimage );
 }
 
 //##Documentation
@@ -663,7 +664,14 @@ void CastToMitkImage(const ItkOutputImageType* itkimage, itk::SmartPointer<mitk:
   {
     mitkoutputimage = mitk::Image::New();
   }
-  mitkoutputimage->InitializeByItk(itkimage);
+  //mitkoutputimage->InitializeByItk(itkimage);
+
+  // allow in-place cast but warn the user
+  if( !mitkoutputimage->IsValidChannel(0) )
+  {
+    mitkoutputimage->InitializeByItk(itkimage);
+  }
+
   mitkoutputimage->SetChannel(itkimage->GetBufferPointer());
 }
 } // namespace mitk

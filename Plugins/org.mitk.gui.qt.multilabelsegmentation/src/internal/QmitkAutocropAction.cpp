@@ -50,6 +50,7 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
       mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
       cropFilter->SetInput( image );
       cropFilter->SetBackgroundValue( 0 );
+      cropFilter->SetMarginFactor(1.15);
       try
       {
         cropFilter->Update();

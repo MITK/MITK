@@ -29,7 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkDicomExternalDataWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomExternalDataWidget";
 
 QmitkDicomExternalDataWidget::QmitkDicomExternalDataWidget(QWidget *parent)
-:  m_Controls( 0 )
+  : QWidget(parent)
+  , m_Controls (0)
 {
     Initialize();
     CreateQtPartControl(this);
@@ -37,10 +38,6 @@ QmitkDicomExternalDataWidget::QmitkDicomExternalDataWidget(QWidget *parent)
 
 QmitkDicomExternalDataWidget::~QmitkDicomExternalDataWidget()
 {
-    delete m_ExternalDatabase;
-    delete m_ExternalIndexer;
-    m_ImportDialog->deleteLater();
-    delete m_Controls;
 }
 
 
@@ -79,7 +76,7 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
 
 void QmitkDicomExternalDataWidget::Initialize()
 {
-    m_ExternalDatabase = new ctkDICOMDatabase();
+    m_ExternalDatabase = new ctkDICOMDatabase(this);
 
     try{
         m_ExternalDatabase->openDatabase(QString(":memory:"),QString( "EXTERNAL-DB"));
@@ -89,7 +86,7 @@ void QmitkDicomExternalDataWidget::Initialize()
         return;
     }
 
-    m_ExternalIndexer = new ctkDICOMIndexer();
+    m_ExternalIndexer = new ctkDICOMIndexer(this);
 }
 
 void QmitkDicomExternalDataWidget::OnFinishedImport()
@@ -186,7 +183,7 @@ void QmitkDicomExternalDataWidget::OnSeriesSelectionChanged(const QStringList& s
 void QmitkDicomExternalDataWidget::SetupImportDialog()
 {
         //Initialize import widget
-        m_ImportDialog = new ctkFileDialog();
+        m_ImportDialog = new ctkFileDialog(this);
         // Since copy on import is not working at the moment
         // this feature is diabled
 //        QCheckBox* importCheckbox = new QCheckBox("Copy on import", m_ImportDialog);

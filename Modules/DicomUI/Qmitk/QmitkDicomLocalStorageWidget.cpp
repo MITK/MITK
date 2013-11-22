@@ -26,7 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkDicomLocalStorageWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomLocalStorageWidget";
 
 QmitkDicomLocalStorageWidget::QmitkDicomLocalStorageWidget(QWidget *parent)
-:  m_LocalIndexer(new ctkDICOMIndexer(parent))
+  : QWidget(parent)
+  , m_Controls(0)
+  , m_LocalIndexer(new ctkDICOMIndexer(parent))
 {
     CreateQtPartControl(this);
 }

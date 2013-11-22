@@ -26,9 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkDicomLocalStorageWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomLocalStorageWidget";
 
 QmitkDicomLocalStorageWidget::QmitkDicomLocalStorageWidget(QWidget *parent)
-:  m_Controls( 0 )
-,m_LocalIndexer(new ctkDICOMIndexer())
-,m_LocalModel(new ctkDICOMModel())
+:  m_LocalIndexer(new ctkDICOMIndexer(parent))
 {
     CreateQtPartControl(this);
 }
@@ -36,10 +34,6 @@ QmitkDicomLocalStorageWidget::QmitkDicomLocalStorageWidget(QWidget *parent)
 QmitkDicomLocalStorageWidget::~QmitkDicomLocalStorageWidget()
 {
     m_LocalDatabase->closeDatabase();
-    delete m_LocalDatabase;
-    delete m_LocalIndexer;
-    delete m_LocalModel;
-    delete m_Controls;
 }
 
 void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
@@ -92,7 +86,6 @@ void QmitkDicomLocalStorageWidget::OnStartDicomImport(const QStringList& dicomDa
 void QmitkDicomLocalStorageWidget::OnFinishedImport()
 {
     m_ProgressDialog->setValue(m_ProgressDialog->maximum());
-    m_LocalModel->setDatabase(m_LocalDatabase->database());
 }
 
 void QmitkDicomLocalStorageWidget::OnDeleteButtonClicked()
@@ -142,6 +135,7 @@ void QmitkDicomLocalStorageWidget::SetDatabaseDirectory(QString newDatatbaseDire
 void QmitkDicomLocalStorageWidget::SetDatabase(QString databaseFile)
 {
     m_LocalDatabase = new ctkDICOMDatabase(databaseFile);
+    m_LocalDatabase->setParent(this);
     m_Controls->ctkDICOMBrowser->setCTKDICOMDatabase(m_LocalDatabase);
 }
 

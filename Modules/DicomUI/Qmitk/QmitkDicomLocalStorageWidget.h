@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // include ctk
 #include <ctkDICOMDatabase.h>
 #include <ctkDICOMIndexer.h>
-#include <ctkDICOMModel.h>
 #include <ctkFileDialog.h>
 
 //include QT
@@ -125,7 +124,6 @@ protected:
     QLabel* m_ProgressDialogLabel;
 
     ctkDICOMDatabase* m_LocalDatabase;
-    ctkDICOMModel* m_LocalModel;
     ctkDICOMIndexer* m_LocalIndexer;
     Ui::QmitkDicomLocalStorageWidgetControls* m_Controls;
 };

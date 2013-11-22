@@ -22,16 +22,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // include ctk
 #include <ctkDICOMDatabase.h>
-#include <ctkDICOMModel.h>
 #include <ctkDICOMIndexer.h>
+#include <ctkDICOMModel.h>
 #include <ctkFileDialog.h>
 
 //include QT
-#include <QWidget>
+#include <QHash>
 #include <QString>
 #include <QStringList>
-#include <QHash>
 #include <QVariant>
+#include <QWidget>
 
 class QProgressDialog;
 class QLabel;

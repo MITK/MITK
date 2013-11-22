@@ -16,14 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkDicomLocalStorageWidget.h"
-#include <mitkLogMacros.h>
-#include <mitkProgressBar.h>
-#include <mitkStatusBar.h>
+//#include <mitkLogMacros.h>
+
 // Qt
-#include <QHash>
 #include <QLabel>
-#include <QMessageBox>
-#include <QModelIndex>
 #include <QProgressDialog>
 #include <QVariant>
 

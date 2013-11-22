@@ -52,6 +52,7 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
         m_Controls->setupUi( parent );
         m_Controls->viewExternalDataButton->setVisible(true);
         m_Controls->ctkDICOMBrowser->setDynamicTableLayout(true);
+        m_Controls->ctkDICOMBrowser->setCTKDICOMDatabase(m_ExternalDatabase);
 
         this->SetupImportDialog();
         this->SetupProgressDialog(parent);
@@ -92,7 +93,6 @@ void QmitkDicomExternalDataWidget::Initialize()
 void QmitkDicomExternalDataWidget::OnFinishedImport()
 {
   m_ProgressDialog->setValue(m_ProgressDialog->maximum());
-  m_Controls->ctkDICOMBrowser->setCTKDICOMDatabase(m_ExternalDatabase);
 }
 
 void QmitkDicomExternalDataWidget::OnDownloadButtonClicked()

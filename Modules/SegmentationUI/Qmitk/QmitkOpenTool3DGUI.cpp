@@ -24,11 +24,13 @@ QmitkOpenTool3DGUI::QmitkOpenTool3DGUI() : QmitkToolGUI()
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
+  m_Controls.m_AdvancedControlsWidget->hide();
 
   connect( m_Controls.m_pbRun, SIGNAL(clicked()), this, SLOT(OnRun()) );
   connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
   connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
   connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
+  connect( m_Controls.m_cbShowAdvancedControls, SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedControls(bool)) );
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
 
@@ -93,4 +95,12 @@ void QmitkOpenTool3DGUI::OnShowInformation( bool on )
     m_Controls.m_InformationWidget->show();
   else
     m_Controls.m_InformationWidget->hide();
+}
+
+void QmitkOpenTool3DGUI::OnShowAdvancedControls( bool on )
+{
+  if (on)
+    m_Controls.m_AdvancedControlsWidget->show();
+  else
+    m_Controls.m_AdvancedControlsWidget->hide();
 }

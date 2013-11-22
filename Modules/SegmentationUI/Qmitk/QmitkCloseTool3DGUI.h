@@ -54,6 +54,7 @@ class SegmentationUI_EXPORT QmitkCloseTool3DGUI : public QmitkToolGUI
     void OnAcceptPreview();
     void OnCalculateDifference();
     void OnShowInformation(bool);
+    void OnShowAdvancedControls(bool);
 
   protected:
     QmitkCloseTool3DGUI();

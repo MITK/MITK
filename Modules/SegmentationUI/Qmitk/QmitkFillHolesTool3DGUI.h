@@ -47,6 +47,7 @@ class SegmentationUI_EXPORT QmitkFillHolesTool3DGUI : public QmitkToolGUI
     void OnAcceptPreview();
     void OnCalculateDifference();
     void OnShowInformation(bool);
+    void OnShowAdvancedControls(bool);
 
   protected:
     QmitkFillHolesTool3DGUI();

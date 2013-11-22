@@ -46,6 +46,7 @@ class SegmentationUI_EXPORT QmitkErodeTool3DGUI : public QmitkToolGUI
     void OnAcceptPreview();
     void OnCalculateDifference();
     void OnShowInformation(bool);
+    void OnShowAdvancedControls(bool);
 
   protected:
     QmitkErodeTool3DGUI();

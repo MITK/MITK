@@ -22,6 +22,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "vtkSphereSource.h"
 
+void mitk::USZonesInteractor::UpdateSurface(mitk::DataNode::Pointer dataNode)
+{
+  if ( ! dataNode->GetData())
+  {
+    MITK_WARN("USZonesInteractor")("DataInteractor")
+        << "Cannot update surface for node as no data is set to the node.";
+    return;
+  }
+
+  mitk::Point3D origin = dataNode->GetData()->GetGeometry()->GetOrigin();
+
+  mitk::ScalarType radius;
+  if ( ! dataNode->GetFloatProperty("zone.size", radius) )
+  {
+    MITK_WARN("USZonesInteractor")("DataInteractor")
+        << "Cannut update surface for node as no radius is specified in the node properties.";
+    return;
+  }
+
+  mitk::Surface::Pointer zone = mitk::Surface::New();
+
+  vtkSphereSource *vtkData = vtkSphereSource::New();
+  vtkData->SetRadius( radius );
+  vtkData->SetCenter(0,0,0);
+  vtkData->Update();
+  zone->SetVtkPolyData(vtkData->GetOutput());
+  vtkData->Delete();
+
+  dataNode->SetData(zone);
+
+  dataNode->GetData()->GetGeometry()->SetOrigin(origin);
+
+  // update the RenderWindow to show the changed surface
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 mitk::USZonesInteractor::USZonesInteractor()
 {
 }
@@ -77,12 +113,13 @@ bool mitk::USZonesInteractor::ChangeRadius(mitk::StateMachineAction* , mitk::Int
   //MITK_INFO << "Radius: " << radius;
   curNode->SetFloatProperty("zone.size", radius);
 
-  mitk::Point3D origin = curNode->GetData()->GetGeometry()->GetOrigin();
+  mitk::USZonesInteractor::UpdateSurface(curNode);
+  /*mitk::Point3D origin = curNode->GetData()->GetGeometry()->GetOrigin();
   curNode->SetData(this->MakeSphere(radius));
-  this->GetDataNode()->GetData()->GetGeometry()->SetOrigin(origin);
+  this->GetDataNode()->GetData()->GetGeometry()->SetOrigin(origin);*/
 
   // update the RenderWindow to show the changed surface
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return true;
 }
@@ -101,18 +138,4 @@ bool mitk::USZonesInteractor::AbortCreation(mitk::StateMachineAction* , mitk::In
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return true;
-}
-
-mitk::Surface::Pointer mitk::USZonesInteractor::MakeSphere(mitk::ScalarType radius) const
-{
-  mitk::Surface::Pointer zone = mitk::Surface::New();
-
-  vtkSphereSource *vtkData = vtkSphereSource::New();
-  vtkData->SetRadius( radius );
-  vtkData->SetCenter(0,0,0);
-  vtkData->Update();
-  zone->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
-
-  return zone;
 }

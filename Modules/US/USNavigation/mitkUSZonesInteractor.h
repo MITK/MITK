@@ -27,12 +27,15 @@ namespace itk {
 namespace mitk
 {
 class Surface;
+class DataNode;
 
 class MitkUSNavigation_EXPORT USZonesInteractor : public DataInteractor
 {
 public:
   mitkClassMacro(USZonesInteractor, DataInteractor)
   itkNewMacro(Self)
+
+  static void UpdateSurface(itk::SmartPointer<mitk::DataNode>);
 
 protected:
   USZonesInteractor();
@@ -45,8 +48,6 @@ protected:
   bool ChangeRadius(StateMachineAction* , InteractionEvent*);
   bool EndCreation(StateMachineAction* , InteractionEvent*);
   bool AbortCreation(StateMachineAction* , InteractionEvent*);
-
-  itk::SmartPointer<Surface> MakeSphere(mitk::ScalarType radius) const;
 };
 
 } // namespace mitk

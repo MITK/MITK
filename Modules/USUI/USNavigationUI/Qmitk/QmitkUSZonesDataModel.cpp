@@ -18,20 +18,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QBrush>
 
-#include <vtkSphereSource.h>
-
 #include "mitkMessage.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
 #include "mitkNodePredicateSource.h"
+#include "mitkUSZonesInteractor.h"
 
 const char* QmitkUSZonesDataModel::DataNodePropertySize = "zone.size";
 
 QmitkUSZonesDataModel::QmitkUSZonesDataModel(QObject *parent) :
   QAbstractTableModel(parent),
   m_ListenerAddNode(this, &QmitkUSZonesDataModel::AddNode),
-  m_ListenerChangeNode(this, &QmitkUSZonesDataModel::RemoveNode),
-  m_ListenerRemoveNode(this, &QmitkUSZonesDataModel::ChangeNode)
+  m_ListenerChangeNode(this, &QmitkUSZonesDataModel::ChangeNode),
+  m_ListenerRemoveNode(this, &QmitkUSZonesDataModel::RemoveNode)
 {
 }
 
@@ -252,9 +251,8 @@ bool QmitkUSZonesDataModel::setData ( const QModelIndex & index, const QVariant 
 
       if (curNode->GetData() != 0)
       {
-        mitk::Point3D origin = curNode->GetData()->GetGeometry()->GetOrigin();
-        curNode->SetData(this->MakeSphere(value.toFloat()));
-        curNode->GetData()->GetGeometry()->SetOrigin(origin);
+        curNode->SetFloatProperty("zone.size", value.toFloat());
+        mitk::USZonesInteractor::UpdateSurface(curNode);
       }
 
       break;
@@ -318,18 +316,4 @@ bool QmitkUSZonesDataModel::removeRows ( int row, int count, const QModelIndex &
   this->endRemoveRows();
 
   return true;
-}
-
-mitk::Surface::Pointer QmitkUSZonesDataModel::MakeSphere(mitk::ScalarType radius) const
-{
-  mitk::Surface::Pointer zone = mitk::Surface::New();
-
-  vtkSphereSource *vtkData = vtkSphereSource::New();
-  vtkData->SetRadius( radius );
-  vtkData->SetCenter(0,0,0);
-  vtkData->Update();
-  zone->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
-
-  return zone;
 }

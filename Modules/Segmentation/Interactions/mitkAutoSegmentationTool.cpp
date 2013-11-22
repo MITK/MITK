@@ -21,9 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkImageTimeSelector.h"
+#include "mitkSliceNavigationController.h"
 #include "mitkRenderingManager.h"
 
-mitk::AutoSegmentationTool::AutoSegmentationTool() : Tool("dummy")
+mitk::AutoSegmentationTool::AutoSegmentationTool() : Tool("dummy"), m_CurrentTimeStep(0)
 {
 }
 
@@ -63,13 +64,19 @@ void mitk::AutoSegmentationTool::ExecuteOperation (mitk::Operation *operation)
   }
 }
 
-void mitk::AutoSegmentationTool::PasteSegmentation( Image* targetImage, Image* sourceImage, int pixelvalue, int timestep )
+void mitk::AutoSegmentationTool::AcceptPreview()
 {
-  if ((!targetImage)|| (!sourceImage)) return;
+  if ( m_PreviewImage.IsNull() ) return;
+
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  assert(workingNode);
+
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  assert(workingImage);
 
   try
   {
-    AccessFixedDimensionByItk_2( targetImage, ItkPasteSegmentation, 3, sourceImage, pixelvalue );
+    AccessFixedDimensionByItk_1( workingImage, InternalAcceptPreview, 3, m_PreviewImage );
   }
   catch( itk::ExceptionObject & e )
   {
@@ -83,25 +90,130 @@ void mitk::AutoSegmentationTool::PasteSegmentation( Image* targetImage, Image* s
     m_ToolManager->ActivateTool(-1);
     return;
   }
+
+  workingImage->Modified();
+
+  m_PreviewNode->SetData(NULL);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-template<typename TPixel, unsigned int VImageDimension>
-void mitk::AutoSegmentationTool::ItkPasteSegmentation( itk::Image<TPixel,VImageDimension>* targetImage,
-                                                       const mitk::Image* sourceImage, int overwritevalue )
+void mitk::AutoSegmentationTool::CalculateDifference()
 {
-  typedef itk::Image<TPixel,VImageDimension> ImageType;
+  if ( m_PreviewImage.IsNull() ) return;
 
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  assert(workingNode);
+
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  assert(workingImage);
+
+  try
+  {
+    AccessFixedDimensionByItk( workingImage, InternalDifference, 3 );
+  }
+  catch( itk::ExceptionObject & e )
+  {
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    m_ToolManager->ActivateTool(-1);
+    return;
+  }
+  catch (...)
+  {
+    MITK_ERROR << "Unkown exception caught!";
+    m_ToolManager->ActivateTool(-1);
+    return;
+  }
+
+  m_PreviewImage->Modified();
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void mitk::AutoSegmentationTool::CalculateUnion()
+{
+  if ( m_PreviewImage.IsNull() ) return;
+
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  assert(workingNode);
+
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  assert(workingImage);
+
+  try
+  {
+    AccessFixedDimensionByItk( workingImage, InternalUnion, 3 );
+  }
+  catch( itk::ExceptionObject & e )
+  {
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    m_ToolManager->ActivateTool(-1);
+    return;
+  }
+  catch (...)
+  {
+    MITK_ERROR << "Unkown exception caught!";
+    m_ToolManager->ActivateTool(-1);
+    return;
+  }
+
+  m_PreviewImage->Modified();
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void mitk::AutoSegmentationTool::Activated()
+{
+  m_CurrentTimeStep = 0; // todo: get the right time step e.g. from GUI
+
+  // feedback node and its visualization properties
+  m_PreviewNode = mitk::DataNode::New();
+  m_PreviewNode->SetName("preview");
+
+  m_PreviewNode->SetProperty("texture interpolation", BoolProperty::New(false) );
+  m_PreviewNode->SetProperty("layer", IntProperty::New(100) );
+  m_PreviewNode->SetProperty("binary", BoolProperty::New(true) );
+  m_PreviewNode->SetProperty("helper object", BoolProperty::New(true) );
+  m_PreviewNode->SetOpacity(0.8);
+  m_PreviewNode->SetColor(0.0, 1.0, 0.0);
+
+  m_ToolManager->GetDataStorage()->Add( m_PreviewNode, m_ToolManager->GetWorkingData(0) );
+}
+
+void mitk::AutoSegmentationTool::Deactivated()
+{
+  Superclass::Deactivated();
+  m_ToolManager->GetDataStorage()->Remove( this->m_PreviewNode );
+  m_PreviewNode = NULL;
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+template<typename ImageType>
+void mitk::AutoSegmentationTool::InternalAcceptPreview( ImageType* targetImage, const mitk::Image* sourceImage )
+{
   typename ImageType::Pointer sourceImageITK;
   CastToItkImage( sourceImage, sourceImageITK );
 
   typedef itk::ImageRegionConstIterator< ImageType > SourceIteratorType;
   typedef itk::ImageRegionIterator< ImageType >      TargetIteratorType;
 
-  SourceIteratorType sourceIterator( sourceImageITK, sourceImageITK->GetLargestPossibleRegion() );
-  TargetIteratorType targetIterator( targetImage, targetImage->GetLargestPossibleRegion() );
+  typename ImageType::IndexType cropIndex;
+  cropIndex[0] = m_RequestedRegion.GetIndex(0);
+  cropIndex[1] = m_RequestedRegion.GetIndex(1);
+  cropIndex[2] = m_RequestedRegion.GetIndex(2);
 
-  sourceIterator.GoToBegin();
-  targetIterator.GoToBegin();
+  typename ImageType::SizeType cropSize;
+  cropSize[0] = m_RequestedRegion.GetSize(0);
+  cropSize[1] = m_RequestedRegion.GetSize(1);
+  cropSize[2] = m_RequestedRegion.GetSize(2);
+
+  typename ImageType::RegionType cropRegion(cropIndex,cropSize);
+
+  SourceIteratorType sourceIter( sourceImageITK, sourceImageITK->GetLargestPossibleRegion() );
+  TargetIteratorType targetIter( targetImage, cropRegion );
+
+  sourceIter.GoToBegin();
+  targetIter.GoToBegin();
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   assert (workingNode);
@@ -109,18 +221,122 @@ void mitk::AutoSegmentationTool::ItkPasteSegmentation( itk::Image<TPixel,VImageD
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
   assert (workingImage);
 
-  int activePixelValue = workingImage->GetActiveLabelIndex();
+  int pixelValue = workingImage->GetActiveLabelIndex();
 
-  while ( !targetIterator.IsAtEnd() )
+  while ( !targetIter.IsAtEnd() )
   {
-    int targetValue = static_cast< int >(targetIterator.Get());
-    if ( !workingImage->GetLabelLocked(targetValue) && sourceIterator.Get() )
+    int targetValue = static_cast< int >( targetIter.Get() );
+    int sourceValue = static_cast< int >( sourceIter.Get() );
+   // bool isLabelLocked = workingImage->GetLabelLocked(targetValue);
+   // isLabelLocked &= (targetValue != pixelValue);
+    if ( (targetValue == pixelValue) || sourceValue )
     {
-      targetIterator.Set( overwritevalue );
+      if (sourceValue)
+        targetIter.Set( pixelValue );
+      else
+        targetIter.Set( 0 );
     }
 
-    ++targetIterator;
-    ++sourceIterator;
+    ++sourceIter;
+    ++targetIter;
+  }
+}
+
+template<typename ImageType>
+void mitk::AutoSegmentationTool::InternalDifference( ImageType* input )
+{
+  typedef itk::Image<unsigned char, 3> BinaryImageType;
+  BinaryImageType::Pointer previewItk;
+  CastToItkImage( m_PreviewImage, previewItk );
+
+  typedef itk::ImageRegionConstIterator< ImageType >  SourceIteratorType;
+  typedef itk::ImageRegionIterator< BinaryImageType > TargetIteratorType;
+
+  typename ImageType::IndexType cropIndex;
+  cropIndex[0] = m_RequestedRegion.GetIndex(0);
+  cropIndex[1] = m_RequestedRegion.GetIndex(1);
+  cropIndex[2] = m_RequestedRegion.GetIndex(2);
+
+  typename ImageType::SizeType cropSize;
+  cropSize[0] = m_RequestedRegion.GetSize(0);
+  cropSize[1] = m_RequestedRegion.GetSize(1);
+  cropSize[2] = m_RequestedRegion.GetSize(2);
+
+  typename ImageType::RegionType cropRegion(cropIndex,cropSize);
+
+  SourceIteratorType sourceIter( input, cropRegion );
+  TargetIteratorType targetIter( previewItk, previewItk->GetLargestPossibleRegion() );
+
+  sourceIter.GoToBegin();
+  targetIter.GoToBegin();
+
+  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  assert (workingNode);
+
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  assert (workingImage);
+
+  int pixelValue = workingImage->GetActiveLabelIndex();
+
+  while ( !targetIter.IsAtEnd() )
+  {
+    int targetValue = static_cast< int >( targetIter.Get() );
+    int sourceValue = static_cast< int >( sourceIter.Get() );
+
+    if ( (targetValue && (sourceValue != pixelValue)) || ((sourceValue==pixelValue) && !targetValue) )
+      targetIter.Set(1);
+    else
+      targetIter.Set(0);
+
+    ++sourceIter;
+    ++targetIter;
+  }
+}
+
+template<typename ImageType>
+void mitk::AutoSegmentationTool::InternalUnion( ImageType* input )
+{
+  typedef itk::Image<unsigned char, 3> BinaryImageType;
+  BinaryImageType::Pointer previewItk;
+  CastToItkImage( m_PreviewImage, previewItk );
+
+  typedef itk::ImageRegionConstIterator< ImageType >  SourceIteratorType;
+  typedef itk::ImageRegionIterator< BinaryImageType > TargetIteratorType;
+
+  typename ImageType::IndexType cropIndex;
+  cropIndex[0] = m_RequestedRegion.GetIndex(0);
+  cropIndex[1] = m_RequestedRegion.GetIndex(1);
+  cropIndex[2] = m_RequestedRegion.GetIndex(2);
+
+  typename ImageType::SizeType cropSize;
+  cropSize[0] = m_RequestedRegion.GetSize(0);
+  cropSize[1] = m_RequestedRegion.GetSize(1);
+  cropSize[2] = m_RequestedRegion.GetSize(2);
+
+  typename ImageType::RegionType cropRegion(cropIndex,cropSize);
+
+  SourceIteratorType sourceIter( input, cropRegion );
+  TargetIteratorType targetIter( previewItk, previewItk->GetLargestPossibleRegion() );
+
+  sourceIter.GoToBegin();
+  targetIter.GoToBegin();
+  /*
+  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  assert (workingNode);
+
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  assert (workingImage);
+  */
+  while ( !targetIter.IsAtEnd() )
+  {
+    int targetValue = static_cast< int >( targetIter.Get() );
+    int sourceValue = static_cast< int >( sourceIter.Get() );
+
+    if (sourceValue || targetValue)
+      targetIter.Set( 1 );
+
+    ++sourceIter;
+    ++targetIter;
   }
 }
 

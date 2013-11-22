@@ -20,10 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
 #include "mitkErodeTool3D.h"
+#include "ui_QmitkErodeTool3DGUIControls.h"
 
-#include <QDoubleSpinBox>
-
-class QSlider;
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::ErodeTool3D.
@@ -41,23 +39,21 @@ class SegmentationUI_EXPORT QmitkErodeTool3DGUI : public QmitkToolGUI
     mitkClassMacro(QmitkErodeTool3DGUI, QmitkToolGUI);
     itkNewMacro(QmitkErodeTool3DGUI);
 
-  signals:
-
-    /// \brief Emitted when button "Run" is pressed
-    void Run();
-
-  public slots:
-
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);
     void OnRun();
+    void OnAcceptPreview();
+    void OnCalculateDifference();
+    void OnShowInformation(bool);
 
   protected:
     QmitkErodeTool3DGUI();
     virtual ~QmitkErodeTool3DGUI();
 
     void BusyStateChanged(bool);
+
+    Ui::QmitkErodeTool3DGUIControls m_Controls;
 
     mitk::ErodeTool3D::Pointer m_ErodeTool3D;
 };

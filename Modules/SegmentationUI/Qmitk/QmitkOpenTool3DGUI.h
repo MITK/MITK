@@ -14,32 +14,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkSmoothTool3DGUI_h_Included
-#define QmitkSmoothTool3DGUI_h_Included
+#ifndef QmitkOpenTool3DGUI_h_Included
+#define QmitkOpenTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
-#include "mitkSmoothTool3D.h"
+#include "mitkOpenTool3D.h"
 
-#include <QDoubleSpinBox>
+#include "ui_QmitkOpenTool3DGUIControls.h"
 
-class QSlider;
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI for mitk::SmoothTool3D.
+  \brief GUI for mitk::OpenTool3D.
 
   This GUI shows ...
 
   Last contributor: $Author$
 */
-class SegmentationUI_EXPORT QmitkSmoothTool3DGUI : public QmitkToolGUI
+class SegmentationUI_EXPORT QmitkOpenTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
   public:
 
-    mitkClassMacro(QmitkSmoothTool3DGUI, QmitkToolGUI);
-    itkNewMacro(QmitkSmoothTool3DGUI);
+    mitkClassMacro(QmitkOpenTool3DGUI, QmitkToolGUI);
+    itkNewMacro(QmitkOpenTool3DGUI);
 
   signals:
 
@@ -52,14 +51,19 @@ class SegmentationUI_EXPORT QmitkSmoothTool3DGUI : public QmitkToolGUI
 
     void OnNewToolAssociated(mitk::Tool*);
     void OnRun();
+    void OnAcceptPreview();
+    void OnCalculateDifference();
+    void OnShowInformation(bool);
 
   protected:
-    QmitkSmoothTool3DGUI();
-    virtual ~QmitkSmoothTool3DGUI();
+    QmitkOpenTool3DGUI();
+    virtual ~QmitkOpenTool3DGUI();
 
     void BusyStateChanged(bool);
 
-    mitk::SmoothTool3D::Pointer m_SmoothTool3D;
+    Ui::QmitkOpenTool3DGUIControls m_Controls;
+
+    mitk::OpenTool3D::Pointer m_OpenTool3D;
 };
 
 #endif

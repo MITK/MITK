@@ -14,31 +14,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkMedianTool3DGUI_h_Included
-#define QmitkMedianTool3DGUI_h_Included
+#ifndef QmitkCloseTool3DGUI_h_Included
+#define QmitkCloseTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
-#include "mitkMedianTool3D.h"
+#include "mitkCloseTool3D.h"
 
-#include "ui_QmitkMedianTool3DGUIControls.h"
+#include "ui_QmitkCloseTool3DGUIControls.h"
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI for mitk::MedianTool3D.
+  \brief GUI for mitk::CloseTool3D.
 
   This GUI shows ...
 
   Last contributor: $Author$
 */
-class SegmentationUI_EXPORT QmitkMedianTool3DGUI : public QmitkToolGUI
+class SegmentationUI_EXPORT QmitkCloseTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
   public:
 
-    mitkClassMacro(QmitkMedianTool3DGUI, QmitkToolGUI);
-    itkNewMacro(QmitkMedianTool3DGUI);
+    mitkClassMacro(QmitkCloseTool3DGUI, QmitkToolGUI);
+    itkNewMacro(QmitkCloseTool3DGUI);
+
+  signals:
+
+    /// \brief Emitted when button "Run" is pressed
+    void Run();
+
+  public slots:
 
   protected slots:
 
@@ -46,18 +53,17 @@ class SegmentationUI_EXPORT QmitkMedianTool3DGUI : public QmitkToolGUI
     void OnRun();
     void OnAcceptPreview();
     void OnCalculateDifference();
-    void OnCalculateUnion();
     void OnShowInformation(bool);
 
   protected:
-    QmitkMedianTool3DGUI();
-    virtual ~QmitkMedianTool3DGUI();
+    QmitkCloseTool3DGUI();
+    virtual ~QmitkCloseTool3DGUI();
 
     void BusyStateChanged(bool);
 
-    Ui::QmitkMedianTool3DGUIControls m_Controls;
+    Ui::QmitkCloseTool3DGUIControls m_Controls;
 
-    mitk::MedianTool3D::Pointer m_MedianTool3D;
+    mitk::CloseTool3D::Pointer m_CloseTool3D;
 };
 
 #endif

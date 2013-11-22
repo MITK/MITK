@@ -15,27 +15,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkMedianTool3DGUI.h"
-#include "QmitkNewSegmentationDialog.h"
-#include "QmitkConfirmSegmentationDialog.h"
 
-#include <qlabel.h>
-#include <qslider.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
 #include <QApplication.h>
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkMedianTool3DGUI, "")
 
 QmitkMedianTool3DGUI::QmitkMedianTool3DGUI() : QmitkToolGUI()
 {
-  // create the visible widgets
-  QBoxLayout* mainLayout = new QVBoxLayout(this);
+  m_Controls.setupUi(this);
+  m_Controls.m_InformationWidget->hide();
 
-  QPushButton* btRun = new QPushButton("Run", this);
-  connect( btRun, SIGNAL(clicked()), this, SLOT(OnRun()));
-  mainLayout->addWidget( btRun );
-
- connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
+  connect( m_Controls.m_pbRun, SIGNAL(clicked()), this, SLOT(OnRun()) );
+  connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
+  connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
+  connect( m_Controls.m_pbUnion, SIGNAL(clicked()), this, SLOT(OnCalculateUnion()) );
+  connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
+  connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
 
 QmitkMedianTool3DGUI::~QmitkMedianTool3DGUI()
@@ -69,10 +64,42 @@ void QmitkMedianTool3DGUI::OnRun()
   }
 }
 
+void QmitkMedianTool3DGUI::OnAcceptPreview()
+{
+  if (m_MedianTool3D.IsNotNull())
+  {
+    m_MedianTool3D->AcceptPreview();
+  }
+}
+
+void QmitkMedianTool3DGUI::OnCalculateDifference()
+{
+  if (m_MedianTool3D.IsNotNull())
+  {
+    m_MedianTool3D->CalculateDifference();
+  }
+}
+
+void QmitkMedianTool3DGUI::OnCalculateUnion()
+{
+  if (m_MedianTool3D.IsNotNull())
+  {
+    m_MedianTool3D->CalculateUnion();
+  }
+}
+
 void QmitkMedianTool3DGUI::BusyStateChanged(bool value)
 {
   if (value)
     QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
   else
     QApplication::restoreOverrideCursor();
+}
+
+void QmitkMedianTool3DGUI::OnShowInformation( bool on )
+{
+  if (on)
+    m_Controls.m_InformationWidget->show();
+  else
+    m_Controls.m_InformationWidget->hide();
 }

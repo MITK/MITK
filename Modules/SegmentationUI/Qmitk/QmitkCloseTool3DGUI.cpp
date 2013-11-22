@@ -14,13 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkErodeTool3DGUI.h"
+#include "QmitkCloseTool3DGUI.h"
 
 #include <QApplication.h>
 
-MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkErodeTool3DGUI, "")
+MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkCloseTool3DGUI, "")
 
-QmitkErodeTool3DGUI::QmitkErodeTool3DGUI() : QmitkToolGUI()
+QmitkCloseTool3DGUI::QmitkCloseTool3DGUI() : QmitkToolGUI()
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
@@ -32,54 +32,54 @@ QmitkErodeTool3DGUI::QmitkErodeTool3DGUI() : QmitkToolGUI()
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
 
-QmitkErodeTool3DGUI::~QmitkErodeTool3DGUI()
+QmitkCloseTool3DGUI::~QmitkCloseTool3DGUI()
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_CloseTool3D.IsNotNull())
   {
-    m_ErodeTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkErodeTool3DGUI, bool>( this, &QmitkErodeTool3DGUI::BusyStateChanged );
+    m_CloseTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkCloseTool3DGUI, bool>( this, &QmitkCloseTool3DGUI::BusyStateChanged );
   }
 }
 
-void QmitkErodeTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
+void QmitkCloseTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_CloseTool3D.IsNotNull())
   {
-    m_ErodeTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkErodeTool3DGUI, bool>( this, &QmitkErodeTool3DGUI::BusyStateChanged );
+    m_CloseTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkCloseTool3DGUI, bool>( this, &QmitkCloseTool3DGUI::BusyStateChanged );
   }
 
-  m_ErodeTool3D = dynamic_cast<mitk::ErodeTool3D*>( tool );
+  m_CloseTool3D = dynamic_cast<mitk::CloseTool3D*>( tool );
 
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_CloseTool3D.IsNotNull())
   {
-    m_ErodeTool3D->CurrentlyBusy += mitk::MessageDelegate1<QmitkErodeTool3DGUI, bool>( this, &QmitkErodeTool3DGUI::BusyStateChanged );
+    m_CloseTool3D->CurrentlyBusy += mitk::MessageDelegate1<QmitkCloseTool3DGUI, bool>( this, &QmitkCloseTool3DGUI::BusyStateChanged );
   }
 }
 
-void QmitkErodeTool3DGUI::OnRun()
+void QmitkCloseTool3DGUI::OnRun()
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_CloseTool3D.IsNotNull())
   {
-    m_ErodeTool3D->Run();
+    m_CloseTool3D->Run();
   }
 }
 
-void QmitkErodeTool3DGUI::OnAcceptPreview()
+void QmitkCloseTool3DGUI::OnAcceptPreview()
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_CloseTool3D.IsNotNull())
   {
-    m_ErodeTool3D->AcceptPreview();
+    m_CloseTool3D->AcceptPreview();
   }
 }
 
-void QmitkErodeTool3DGUI::OnCalculateDifference()
+void QmitkCloseTool3DGUI::OnCalculateDifference()
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_CloseTool3D.IsNotNull())
   {
-    m_ErodeTool3D->CalculateDifference();
+    m_CloseTool3D->CalculateDifference();
   }
 }
 
-void QmitkErodeTool3DGUI::BusyStateChanged(bool value)
+void QmitkCloseTool3DGUI::BusyStateChanged(bool value)
 {
   if (value)
     QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
@@ -87,7 +87,7 @@ void QmitkErodeTool3DGUI::BusyStateChanged(bool value)
     QApplication::restoreOverrideCursor();
 }
 
-void QmitkErodeTool3DGUI::OnShowInformation( bool on )
+void QmitkCloseTool3DGUI::OnShowInformation( bool on )
 {
   if (on)
     m_Controls.m_InformationWidget->show();

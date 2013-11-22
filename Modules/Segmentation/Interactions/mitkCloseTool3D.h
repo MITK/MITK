@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkSmoothTool3D_h_Included
-#define mitkSmoothTool3D_h_Included
+#ifndef mitkCloseTool3D_h_Included
+#define mitkCloseTool3D_h_Included
 
 #include "mitkAutoSegmentationTool.h"
 #include "mitkLegacyAdaptors.h"
@@ -37,16 +37,16 @@ namespace mitk
 {
 
 /**
-  \brief Smooth segmentation tool.
+  \brief Morphologic opening tool.
 
-  The segmentation smooths all labels by median filtering.
+  The segmentation smooths the active label by morphologic opening.
 */
-class Segmentation_EXPORT SmoothTool3D : public AutoSegmentationTool
+class Segmentation_EXPORT CloseTool3D : public AutoSegmentationTool
 {
   public:
 
-    mitkClassMacro(SmoothTool3D, AutoSegmentationTool)
-    itkNewMacro(SmoothTool3D)
+    mitkClassMacro(CloseTool3D, AutoSegmentationTool)
+    itkNewMacro(CloseTool3D)
 
     /* icon stuff */
     virtual const char** GetXPM() const;
@@ -57,8 +57,8 @@ class Segmentation_EXPORT SmoothTool3D : public AutoSegmentationTool
 
   protected:
 
-    SmoothTool3D();
-    virtual ~SmoothTool3D();
+    CloseTool3D();
+    virtual ~CloseTool3D();
 
     mitk::ToolCommand::Pointer m_ProgressCommand;
 

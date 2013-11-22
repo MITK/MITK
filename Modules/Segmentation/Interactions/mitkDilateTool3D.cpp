@@ -18,21 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
-#include "mitkInteractionConst.h"
-#include "mitkApplyDiffImageOperation.h"
-#include "mitkOperationEvent.h"
-#include "mitkDiffImageApplier.h"
-#include "mitkUndoController.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkToolManager.h"
 #include "mitkImageCast.h"
-#include "mitkImageTimeSelector.h"
 
+// itk
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryDilateImageFilter.h>
-
-#include <itkMedianImageFilter.h>
 #include <itkLabelObject.h>
 #include <itkLabelMap.h>
 #include <itkLabelImageToLabelMapFilter.h>
@@ -52,6 +45,7 @@ namespace mitk {
 
 mitk::DilateTool3D::DilateTool3D()
 {
+  m_ProgressCommand = mitk::ToolCommand::New();
 }
 
 mitk::DilateTool3D::~DilateTool3D()
@@ -77,6 +71,8 @@ const char* mitk::DilateTool3D::GetName() const
 
 void mitk::DilateTool3D::Run()
 {
+//  this->InitializeUndoController();
+
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
@@ -86,13 +82,11 @@ void mitk::DilateTool3D::Run()
   // todo: use it later
   unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
-  m_ProgressCommand = mitk::ToolCommand::New();
-
   CurrentlyBusy.Send(true);
 
   try
   {
-    AccessByItk(workingImage, ITKProcessing);
+    AccessByItk(workingImage, InternalProcessing);
   }
   catch( itk::ExceptionObject& e )
   {
@@ -104,13 +98,12 @@ void mitk::DilateTool3D::Run()
 
   CurrentlyBusy.Send(false);
 
-  workingImage->Modified();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
 template < typename TPixel, unsigned int VDimension >
-void mitk::DilateTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
+void mitk::DilateTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* input )
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
   typedef itk::LabelObject< TPixel, VDimension > LabelObjectType;
@@ -135,13 +128,19 @@ void mitk::DilateTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
   thresholdFilter->SetLowerThreshold(pixelValue);
   thresholdFilter->SetUpperThreshold(pixelValue);
   thresholdFilter->SetOutsideValue(0);
-  thresholdFilter->SetInsideValue(pixelValue);
+  thresholdFilter->SetInsideValue(1);
 
   typename Image2LabelMapType::Pointer image2label = Image2LabelMapType::New();
   image2label->SetInput(thresholdFilter->GetOutput());
 
+  typename AutoCropType::SizeType border;
+  border[0] = 3;
+  border[1] = 3;
+  border[2] = 3;
+
   typename AutoCropType::Pointer autoCropFilter = AutoCropType::New();
   autoCropFilter->SetInput( image2label->GetOutput() );
+  autoCropFilter->SetCropBorder(border);
   autoCropFilter->InPlaceOn();
 
   typename LabelMap2ImageType::Pointer label2image = LabelMap2ImageType::New();
@@ -154,14 +153,14 @@ void mitk::DilateTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
   typename DilateFilterType::Pointer dilateFilter = DilateFilterType::New();
   dilateFilter->SetKernel(ball);
   dilateFilter->SetInput(label2image->GetOutput());
-  dilateFilter->SetDilateValue(pixelValue);
+  dilateFilter->SetDilateValue(1);
 
   if (m_ProgressCommand.IsNotNull())
   {
     thresholdFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
     autoCropFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
     dilateFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    m_ProgressCommand->AddStepsToDo(100);
+    m_ProgressCommand->AddStepsToDo(200);
   }
 
   dilateFilter->Update();
@@ -174,32 +173,52 @@ void mitk::DilateTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
   typename ImageType::Pointer result = dilateFilter->GetOutput();
   result->DisconnectPipeline();
 
+  // fix intersections with other labels
+  typedef itk::ImageRegionConstIterator< ImageType > InputIteratorType;
+  typedef itk::ImageRegionIterator< ImageType >      ResultIteratorType;
+
   typename ImageType::RegionType cropRegion;
   cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();
 
-  typedef itk::ImageRegionConstIterator< ImageType > SourceIteratorType;
-  typedef itk::ImageRegionIterator< ImageType > TargetIteratorType;
+  typename InputIteratorType  inputIter( input, cropRegion );
+  typename ResultIteratorType resultIter( result, result->GetLargestPossibleRegion() );
 
-  typename const ImageType::SizeType& cropSize = cropRegion.GetSize();
-  typename const ImageType::IndexType& cropIndex = cropRegion.GetIndex();
+  inputIter.GoToBegin();
+  resultIter.GoToBegin();
 
-  SourceIteratorType sourceIter( result, result->GetLargestPossibleRegion() );
-  sourceIter.GoToBegin();
-
-  TargetIteratorType targetIter( input, cropRegion );
-  targetIter.GoToBegin();
-
-  while ( !sourceIter.IsAtEnd() )
+  while ( !resultIter.IsAtEnd() )
   {
-    int targetValue = static_cast< int >( targetIter.Get() );
-    int sourceValue = static_cast< int >( sourceIter.Get() );
+    int inputValue = static_cast<int>( inputIter.Get() );
 
-    if ( (targetValue == pixelValue) || ( sourceValue && (!workingImage->GetLabelLocked(targetValue))) )
-    {
-      targetIter.Set( sourceValue );
-    }
+    if ( (inputValue != pixelValue) && workingImage->GetLabelLocked( inputValue ) )
+      resultIter.Set(0);
 
-    ++sourceIter;
-    ++targetIter;
+    ++inputIter;
+    ++resultIter;
   }
+
+  m_PreviewImage = mitk::Image::New();
+  m_PreviewImage->InitializeByItk(result.GetPointer());
+  m_PreviewImage->SetChannel(result->GetBufferPointer());
+
+  const typename ImageType::SizeType& cropSize = cropRegion.GetSize();
+  const typename ImageType::IndexType& cropIndex = cropRegion.GetIndex();
+
+  mitk::SlicedGeometry3D* slicedGeometry = m_PreviewImage->GetSlicedGeometry();
+  mitk::Point3D origin;
+  vtk2itk(cropIndex, origin);
+  workingImage->GetSlicedGeometry()->IndexToWorld(origin, origin);
+  slicedGeometry->SetOrigin(origin);
+
+  m_PreviewNode->SetData(m_PreviewImage);
+
+  m_RequestedRegion = workingImage->GetLargestPossibleRegion();
+
+  m_RequestedRegion.SetIndex(0,cropIndex[0]);
+  m_RequestedRegion.SetIndex(1,cropIndex[1]);
+  m_RequestedRegion.SetIndex(2,cropIndex[2]);
+
+  m_RequestedRegion.SetSize(0,cropSize[0]);
+  m_RequestedRegion.SetSize(1,cropSize[1]);
+  m_RequestedRegion.SetSize(2,cropSize[2]);
 }

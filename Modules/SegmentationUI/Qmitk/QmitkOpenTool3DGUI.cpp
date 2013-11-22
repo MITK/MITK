@@ -14,13 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkErodeTool3DGUI.h"
+#include "QmitkOpenTool3DGUI.h"
 
 #include <QApplication.h>
 
-MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkErodeTool3DGUI, "")
+MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkOpenTool3DGUI, "")
 
-QmitkErodeTool3DGUI::QmitkErodeTool3DGUI() : QmitkToolGUI()
+QmitkOpenTool3DGUI::QmitkOpenTool3DGUI() : QmitkToolGUI()
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
@@ -32,54 +32,54 @@ QmitkErodeTool3DGUI::QmitkErodeTool3DGUI() : QmitkToolGUI()
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
 
-QmitkErodeTool3DGUI::~QmitkErodeTool3DGUI()
+QmitkOpenTool3DGUI::~QmitkOpenTool3DGUI()
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_OpenTool3D.IsNotNull())
   {
-    m_ErodeTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkErodeTool3DGUI, bool>( this, &QmitkErodeTool3DGUI::BusyStateChanged );
+    m_OpenTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkOpenTool3DGUI, bool>( this, &QmitkOpenTool3DGUI::BusyStateChanged );
   }
 }
 
-void QmitkErodeTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
+void QmitkOpenTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_OpenTool3D.IsNotNull())
   {
-    m_ErodeTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkErodeTool3DGUI, bool>( this, &QmitkErodeTool3DGUI::BusyStateChanged );
+    m_OpenTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkOpenTool3DGUI, bool>( this, &QmitkOpenTool3DGUI::BusyStateChanged );
   }
 
-  m_ErodeTool3D = dynamic_cast<mitk::ErodeTool3D*>( tool );
+  m_OpenTool3D = dynamic_cast<mitk::OpenTool3D*>( tool );
 
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_OpenTool3D.IsNotNull())
   {
-    m_ErodeTool3D->CurrentlyBusy += mitk::MessageDelegate1<QmitkErodeTool3DGUI, bool>( this, &QmitkErodeTool3DGUI::BusyStateChanged );
+    m_OpenTool3D->CurrentlyBusy += mitk::MessageDelegate1<QmitkOpenTool3DGUI, bool>( this, &QmitkOpenTool3DGUI::BusyStateChanged );
   }
 }
 
-void QmitkErodeTool3DGUI::OnRun()
+void QmitkOpenTool3DGUI::OnRun()
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_OpenTool3D.IsNotNull())
   {
-    m_ErodeTool3D->Run();
+    m_OpenTool3D->Run();
   }
 }
 
-void QmitkErodeTool3DGUI::OnAcceptPreview()
+void QmitkOpenTool3DGUI::OnAcceptPreview()
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_OpenTool3D.IsNotNull())
   {
-    m_ErodeTool3D->AcceptPreview();
+    m_OpenTool3D->AcceptPreview();
   }
 }
 
-void QmitkErodeTool3DGUI::OnCalculateDifference()
+void QmitkOpenTool3DGUI::OnCalculateDifference()
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_OpenTool3D.IsNotNull())
   {
-    m_ErodeTool3D->CalculateDifference();
+    m_OpenTool3D->CalculateDifference();
   }
 }
 
-void QmitkErodeTool3DGUI::BusyStateChanged(bool value)
+void QmitkOpenTool3DGUI::BusyStateChanged(bool value)
 {
   if (value)
     QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
@@ -87,7 +87,7 @@ void QmitkErodeTool3DGUI::BusyStateChanged(bool value)
     QApplication::restoreOverrideCursor();
 }
 
-void QmitkErodeTool3DGUI::OnShowInformation( bool on )
+void QmitkOpenTool3DGUI::OnShowInformation( bool on )
 {
   if (on)
     m_Controls.m_InformationWidget->show();

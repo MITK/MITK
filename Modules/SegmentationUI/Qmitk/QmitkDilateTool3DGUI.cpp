@@ -15,27 +15,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkDilateTool3DGUI.h"
-#include "QmitkNewSegmentationDialog.h"
-#include "QmitkConfirmSegmentationDialog.h"
 
-#include <qlabel.h>
-#include <qslider.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
 #include <QApplication.h>
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkDilateTool3DGUI, "")
 
 QmitkDilateTool3DGUI::QmitkDilateTool3DGUI() : QmitkToolGUI()
 {
-  // create the visible widgets
-  QBoxLayout* mainLayout = new QVBoxLayout(this);
+  m_Controls.setupUi(this);
+  m_Controls.m_InformationWidget->hide();
+  m_Controls.m_AdvancedControlsWidget->hide();
 
-  QPushButton* btRun = new QPushButton("Run", this);
-  connect( btRun, SIGNAL(clicked()), this, SLOT(OnRun()));
-  mainLayout->addWidget( btRun );
-
- connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
+  connect( m_Controls.m_pbRun, SIGNAL(clicked()), this, SLOT(OnRun()) );
+  connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
+  connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
+  connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
+  connect( m_Controls.m_cbShowAdvancedControls, SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedControls(bool)) );
+  connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
 
 QmitkDilateTool3DGUI::~QmitkDilateTool3DGUI()
@@ -69,10 +65,42 @@ void QmitkDilateTool3DGUI::OnRun()
   }
 }
 
+void QmitkDilateTool3DGUI::OnAcceptPreview()
+{
+  if (m_DilateTool3D.IsNotNull())
+  {
+    m_DilateTool3D->AcceptPreview();
+  }
+}
+
+void QmitkDilateTool3DGUI::OnCalculateDifference()
+{
+  if (m_DilateTool3D.IsNotNull())
+  {
+    m_DilateTool3D->CalculateDifference();
+  }
+}
+
 void QmitkDilateTool3DGUI::BusyStateChanged(bool value)
 {
   if (value)
     QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
   else
     QApplication::restoreOverrideCursor();
+}
+
+void QmitkDilateTool3DGUI::OnShowInformation( bool on )
+{
+  if (on)
+    m_Controls.m_InformationWidget->show();
+  else
+    m_Controls.m_InformationWidget->hide();
+}
+
+void QmitkDilateTool3DGUI::OnShowAdvancedControls( bool on )
+{
+  if (on)
+    m_Controls.m_AdvancedControlsWidget->show();
+  else
+    m_Controls.m_AdvancedControlsWidget->hide();
 }

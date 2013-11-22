@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkErodeTool3D.h"
+#include "mitkOpenTool3D.h"
 
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
@@ -22,11 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkToolManager.h"
 #include "mitkImageCast.h"
+#include "mitkImageTimeSelector.h"
 
-// itk
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkBinaryBallStructuringElement.h>
-#include <itkBinaryErodeImageFilter.h>
+#include <itkBinaryMorphologicalOpeningImageFilter.h>
+
+#include <itkMedianImageFilter.h>
 #include <itkLabelObject.h>
 #include <itkLabelMap.h>
 #include <itkLabelImageToLabelMapFilter.h>
@@ -40,38 +42,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, ErodeTool3D, "ErodeTool3D tool");
+  MITK_TOOL_MACRO(Segmentation_EXPORT, OpenTool3D, "OpenTool3D tool");
 }
 
 
-mitk::ErodeTool3D::ErodeTool3D()
+mitk::OpenTool3D::OpenTool3D()
 {
   m_ProgressCommand = mitk::ToolCommand::New();
 }
 
-mitk::ErodeTool3D::~ErodeTool3D()
+mitk::OpenTool3D::~OpenTool3D()
 {
 }
 
-const char** mitk::ErodeTool3D::GetXPM() const
+const char** mitk::OpenTool3D::GetXPM() const
 {
-  return NULL;//mitkErodeTool3D_xpm;
+  return NULL;//mitkOpenTool3D_xpm;
 }
 
-us::ModuleResource mitk::ErodeTool3D::GetIconResource() const
+us::ModuleResource mitk::OpenTool3D::GetIconResource() const
 {
   us::Module* module = us::GetModuleContext()->GetModule();
   assert(module);
-  us::ModuleResource resource = module->GetResource("ErodeTool3D_48x48.png");
+  us::ModuleResource resource = module->GetResource("OpenTool3D_48x48.png");
   return resource;
 }
 
-const char* mitk::ErodeTool3D::GetName() const
+const char* mitk::OpenTool3D::GetName() const
 {
-  return "ErodeTool3D";
+  return "OpenTool3D";
 }
 
-void mitk::ErodeTool3D::Run()
+void mitk::OpenTool3D::Run()
 {
 //  this->InitializeUndoController();
 
@@ -82,13 +84,13 @@ void mitk::ErodeTool3D::Run()
   assert(workingImage);
 
   // todo: use it later
-  unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+  //unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
   CurrentlyBusy.Send(true);
 
   try
   {
-    AccessByItk(workingImage, InternalProcessing);
+    AccessByItk(workingImage, ITKProcessing);
   }
   catch( itk::ExceptionObject& e )
   {
@@ -100,12 +102,13 @@ void mitk::ErodeTool3D::Run()
 
   CurrentlyBusy.Send(false);
 
+  workingImage->Modified();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
 template < typename TPixel, unsigned int VDimension >
-void mitk::ErodeTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* input )
+void mitk::OpenTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
   typedef itk::LabelObject< TPixel, VDimension > LabelObjectType;
@@ -114,7 +117,7 @@ void mitk::ErodeTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* inp
   typedef itk::AutoCropLabelMapFilter< LabelMapType > AutoCropType;
   typedef itk::LabelMapToLabelImageFilter< LabelMapType, ImageType > LabelMap2ImageType;
   typedef itk::BinaryBallStructuringElement<TPixel, VDimension> BallType;
-  typedef itk::BinaryErodeImageFilter<ImageType, ImageType, BallType> ErodeFilterType;
+  typedef itk::BinaryMorphologicalOpeningImageFilter<ImageType, ImageType, BallType> OpeningFilterType;
   typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;
 
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
@@ -152,27 +155,28 @@ void mitk::ErodeTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* inp
   ball.SetRadius(1.0);
   ball.CreateStructuringElement();
 
-  typename ErodeFilterType::Pointer erodeFilter = ErodeFilterType::New();
-  erodeFilter->SetKernel(ball);
-  erodeFilter->SetInput(label2image->GetOutput());
-  erodeFilter->SetErodeValue(pixelValue);
+  typename OpeningFilterType::Pointer openingFilter = OpeningFilterType::New();
+  openingFilter->SetKernel(ball);
+  openingFilter->SetInput(label2image->GetOutput());
+  openingFilter->SetForegroundValue(pixelValue);
+  openingFilter->SetBackgroundValue(0);
 
   if (m_ProgressCommand.IsNotNull())
   {
     thresholdFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
     autoCropFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    erodeFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+    openingFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
     m_ProgressCommand->AddStepsToDo(200);
   }
 
-  erodeFilter->Update();
+  openingFilter->Update();
 
   if (m_ProgressCommand.IsNotNull())
   {
     m_ProgressCommand->Reset();
   }
 
-  typename ImageType::Pointer result = erodeFilter->GetOutput();
+  typename ImageType::Pointer result = openingFilter->GetOutput();
   result->DisconnectPipeline();
 
   m_PreviewImage = mitk::Image::New();

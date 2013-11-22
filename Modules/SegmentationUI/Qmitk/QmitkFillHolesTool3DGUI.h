@@ -21,9 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationUIExports.h"
 #include "mitkFillHolesTool3D.h"
 
-#include <QDoubleSpinBox>
+#include "ui_QmitkFillHolesTool3DGUIControls.h"
 
-class QSlider;
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::FillHolesTool3D.
@@ -41,23 +40,21 @@ class SegmentationUI_EXPORT QmitkFillHolesTool3DGUI : public QmitkToolGUI
     mitkClassMacro(QmitkFillHolesTool3DGUI, QmitkToolGUI);
     itkNewMacro(QmitkFillHolesTool3DGUI);
 
-  signals:
-
-    /// \brief Emitted when button "Run" is pressed
-    void Run();
-
-  public slots:
-
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);
     void OnRun();
+    void OnAcceptPreview();
+    void OnCalculateDifference();
+    void OnShowInformation(bool);
 
   protected:
     QmitkFillHolesTool3DGUI();
     virtual ~QmitkFillHolesTool3DGUI();
 
     void BusyStateChanged(bool);
+
+    Ui::QmitkFillHolesTool3DGUIControls m_Controls;
 
     mitk::FillHolesTool3D::Pointer m_FillHolesTool3D;
 };

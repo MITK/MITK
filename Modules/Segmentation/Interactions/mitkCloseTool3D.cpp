@@ -14,15 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkSmoothTool3D.h"
+#include "mitkCloseTool3D.h"
 
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkInteractionConst.h"
-#include "mitkApplyDiffImageOperation.h"
-#include "mitkOperationEvent.h"
-#include "mitkDiffImageApplier.h"
-#include "mitkUndoController.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkToolManager.h"
 #include "mitkImageCast.h"
@@ -30,8 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkBinaryBallStructuringElement.h>
-#include <itkBinaryErodeImageFilter.h>
-#include <itkBinaryDilateImageFilter.h>
+#include <itkBinaryMorphologicalClosingImageFilter.h>
 
 #include <itkMedianImageFilter.h>
 #include <itkLabelObject.h>
@@ -47,37 +42,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, SmoothTool3D, "SmoothTool3D tool");
+  MITK_TOOL_MACRO(Segmentation_EXPORT, CloseTool3D, "CloseTool3D tool");
 }
 
 
-mitk::SmoothTool3D::SmoothTool3D()
+mitk::CloseTool3D::CloseTool3D()
+{
+  m_ProgressCommand = mitk::ToolCommand::New();
+}
+
+mitk::CloseTool3D::~CloseTool3D()
 {
 }
 
-mitk::SmoothTool3D::~SmoothTool3D()
+const char** mitk::CloseTool3D::GetXPM() const
 {
+  return NULL;//mitkCloseTool3D_xpm;
 }
 
-const char** mitk::SmoothTool3D::GetXPM() const
-{
-  return NULL;//mitkSmoothTool3D_xpm;
-}
-
-us::ModuleResource mitk::SmoothTool3D::GetIconResource() const
+us::ModuleResource mitk::CloseTool3D::GetIconResource() const
 {
   us::Module* module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("SmoothTool3D_48x48.png");
+  assert(module);
+  us::ModuleResource resource = module->GetResource("CloseTool3D_48x48.png");
   return resource;
 }
 
-const char* mitk::SmoothTool3D::GetName() const
+const char* mitk::CloseTool3D::GetName() const
 {
-  return "SmoothTool3D";
+  return "CloseTool3D";
 }
 
-void mitk::SmoothTool3D::Run()
+void mitk::CloseTool3D::Run()
 {
+//  this->InitializeUndoController();
+
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
@@ -85,9 +84,7 @@ void mitk::SmoothTool3D::Run()
   assert(workingImage);
 
   // todo: use it later
-  unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
-
-  m_ProgressCommand = mitk::ToolCommand::New();
+  //unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
   CurrentlyBusy.Send(true);
 
@@ -111,7 +108,7 @@ void mitk::SmoothTool3D::Run()
 
 
 template < typename TPixel, unsigned int VDimension >
-void mitk::SmoothTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
+void mitk::CloseTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
   typedef itk::LabelObject< TPixel, VDimension > LabelObjectType;
@@ -120,8 +117,7 @@ void mitk::SmoothTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
   typedef itk::AutoCropLabelMapFilter< LabelMapType > AutoCropType;
   typedef itk::LabelMapToLabelImageFilter< LabelMapType, ImageType > LabelMap2ImageType;
   typedef itk::BinaryBallStructuringElement<TPixel, VDimension> BallType;
-  typedef itk::BinaryErodeImageFilter<ImageType, ImageType, BallType> ErodeFilterType;
-  typedef itk::BinaryDilateImageFilter<ImageType, ImageType, BallType> DilateFilterType;
+  typedef itk::BinaryMorphologicalClosingImageFilter<ImageType, ImageType, BallType> ClosingFilterType;
   typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;
 
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
@@ -142,8 +138,14 @@ void mitk::SmoothTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
   typename Image2LabelMapType::Pointer image2label = Image2LabelMapType::New();
   image2label->SetInput(thresholdFilter->GetOutput());
 
+  typename AutoCropType::SizeType border;
+  border[0] = 3;
+  border[1] = 3;
+  border[2] = 3;
+
   typename AutoCropType::Pointer autoCropFilter = AutoCropType::New();
   autoCropFilter->SetInput( image2label->GetOutput() );
+  autoCropFilter->SetCropBorder(border);
   autoCropFilter->InPlaceOn();
 
   typename LabelMap2ImageType::Pointer label2image = LabelMap2ImageType::New();
@@ -153,61 +155,54 @@ void mitk::SmoothTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
   ball.SetRadius(1.0);
   ball.CreateStructuringElement();
 
-  typename ErodeFilterType::Pointer erodeFilter = ErodeFilterType::New();
-  erodeFilter->SetKernel(ball);
-  erodeFilter->SetInput(label2image->GetOutput());
-  erodeFilter->SetErodeValue(pixelValue);
-
-  typename DilateFilterType::Pointer dilateFilter = DilateFilterType::New();
-  dilateFilter->SetKernel(ball);
-  dilateFilter->SetInput(erodeFilter->GetOutput());
-  dilateFilter->SetDilateValue(pixelValue);
+  typename ClosingFilterType::Pointer closingFilter = ClosingFilterType::New();
+  closingFilter->SetKernel(ball);
+  closingFilter->SetInput(label2image->GetOutput());
+  closingFilter->SetForegroundValue(pixelValue);
 
   if (m_ProgressCommand.IsNotNull())
   {
     thresholdFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
     autoCropFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    dilateFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    erodeFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    m_ProgressCommand->AddStepsToDo(100);
+    closingFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+    m_ProgressCommand->AddStepsToDo(200);
   }
 
-  dilateFilter->Update();
+  closingFilter->Update();
 
   if (m_ProgressCommand.IsNotNull())
   {
     m_ProgressCommand->Reset();
   }
 
-  typename ImageType::Pointer result = dilateFilter->GetOutput();
+  typename ImageType::Pointer result = closingFilter->GetOutput();
   result->DisconnectPipeline();
+
+  m_PreviewImage = mitk::Image::New();
+  m_PreviewImage->InitializeByItk(result.GetPointer());
+  m_PreviewImage->SetChannel(result->GetBufferPointer());
 
   typename ImageType::RegionType cropRegion;
   cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();
 
-  typedef itk::ImageRegionConstIterator< ImageType > SourceIteratorType;
-  typedef itk::ImageRegionIterator< ImageType > TargetIteratorType;
+  const typename ImageType::SizeType& cropSize = cropRegion.GetSize();
+  const typename ImageType::IndexType& cropIndex = cropRegion.GetIndex();
 
-  typename const ImageType::SizeType& cropSize = cropRegion.GetSize();
-  typename const ImageType::IndexType& cropIndex = cropRegion.GetIndex();
+  mitk::SlicedGeometry3D* slicedGeometry = m_PreviewImage->GetSlicedGeometry();
+  mitk::Point3D origin;
+  vtk2itk(cropIndex, origin);
+  workingImage->GetSlicedGeometry()->IndexToWorld(origin, origin);
+  slicedGeometry->SetOrigin(origin);
 
-  SourceIteratorType sourceIter( result, result->GetLargestPossibleRegion() );
-  sourceIter.GoToBegin();
+  m_PreviewNode->SetData(m_PreviewImage);
 
-  TargetIteratorType targetIter( input, cropRegion );
-  targetIter.GoToBegin();
+  m_RequestedRegion = workingImage->GetLargestPossibleRegion();
 
-  while ( !sourceIter.IsAtEnd() )
-  {
-    int targetValue = static_cast< int >( targetIter.Get() );
-    int sourceValue = static_cast< int >( sourceIter.Get() );
+  m_RequestedRegion.SetIndex(0,cropIndex[0]);
+  m_RequestedRegion.SetIndex(1,cropIndex[1]);
+  m_RequestedRegion.SetIndex(2,cropIndex[2]);
 
-    if ( (targetValue == pixelValue) || ( sourceValue && (!workingImage->GetLabelLocked(targetValue))) )
-    {
-      targetIter.Set( sourceValue );
-    }
-
-    ++sourceIter;
-    ++targetIter;
-  }
+  m_RequestedRegion.SetSize(0,cropSize[0]);
+  m_RequestedRegion.SetSize(1,cropSize[1]);
+  m_RequestedRegion.SetSize(2,cropSize[2]);
 }

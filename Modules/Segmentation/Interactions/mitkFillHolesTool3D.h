@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationExports.h"
 #include "mitkDataNode.h"
 #include "mitkLabelSetImage.h"
-#include "mitkToolCommand.h"
 #include "mitkStateEvent.h"
 
 #include "itkImage.h"
@@ -37,9 +36,9 @@ namespace mitk
 {
 
 /**
-  \brief Fill hole tool.
+  \brief Segmentation hole filling tool
 
-  This tool remove holes not connected to the boundary of the label.
+  This tool fills holes on the active label.
 */
 class Segmentation_EXPORT FillHolesTool3D : public AutoSegmentationTool
 {
@@ -60,10 +59,8 @@ class Segmentation_EXPORT FillHolesTool3D : public AutoSegmentationTool
     FillHolesTool3D();
     virtual ~FillHolesTool3D();
 
-    mitk::ToolCommand::Pointer m_ProgressCommand;
-
     template < typename TPixel, unsigned int VDimension >
-    void ITKProcessing( itk::Image< TPixel, VDimension>* input );
+    void InternalProcessing( itk::Image< TPixel, VDimension>* input );
 };
 
 } // namespace

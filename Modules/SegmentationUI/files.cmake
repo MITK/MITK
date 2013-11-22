@@ -25,7 +25,8 @@ Qmitk/QmitkWatershedToolGUI.cpp
 Qmitk/QmitkMedianTool3DGUI.cpp
 Qmitk/QmitkDilateTool3DGUI.cpp
 Qmitk/QmitkErodeTool3DGUI.cpp
-Qmitk/QmitkSmoothTool3DGUI.cpp
+Qmitk/QmitkOpenTool3DGUI.cpp
+Qmitk/QmitkCloseTool3DGUI.cpp
 Qmitk/QmitkFillHolesTool3DGUI.cpp
 Qmitk/QmitkSliceBasedInterpolator.cpp
 Qmitk/QmitkSurfaceBasedInterpolator.cpp
@@ -60,7 +61,8 @@ Qmitk/QmitkWatershedToolGUI.h
 Qmitk/QmitkMedianTool3DGUI.h
 Qmitk/QmitkDilateTool3DGUI.h
 Qmitk/QmitkErodeTool3DGUI.h
-Qmitk/QmitkSmoothTool3DGUI.h
+Qmitk/QmitkOpenTool3DGUI.h
+Qmitk/QmitkCloseTool3DGUI.h
 Qmitk/QmitkFillHolesTool3DGUI.h
 Qmitk/QmitkSliceBasedInterpolator.h
 Qmitk/QmitkSurfaceBasedInterpolator.h
@@ -76,6 +78,12 @@ Qmitk/QmitkLiveWireTool2DGUIControls.ui
 Qmitk/QmitkSliceBasedInterpolatorControls.ui
 Qmitk/QmitkSurfaceBasedInterpolatorControls.ui
 Qmitk/QmitkLabelSetWidgetControls.ui
+Qmitk/QmitkDilateTool3DGUIControls.ui
+Qmitk/QmitkErodeTool3DGUIControls.ui
+Qmitk/QmitkMedianTool3DGUIControls.ui
+Qmitk/QmitkCloseTool3DGUIControls.ui
+Qmitk/QmitkOpenTool3DGUIControls.ui
+Qmitk/QmitkFillHolesTool3DGUIControls.ui
 )
 
 set(QRC_FILES

@@ -37,9 +37,9 @@ namespace mitk
 {
 
 /**
-  \brief Median segmentation tool.
+  \brief Segmentation eroding tool
 
-  The segmentation smooths all labels by median filtering.
+  This tool applies morphologic eroding on the active label.
 */
 class Segmentation_EXPORT ErodeTool3D : public AutoSegmentationTool
 {
@@ -60,10 +60,8 @@ class Segmentation_EXPORT ErodeTool3D : public AutoSegmentationTool
     ErodeTool3D();
     virtual ~ErodeTool3D();
 
-    mitk::ToolCommand::Pointer m_ProgressCommand;
-
     template < typename TPixel, unsigned int VDimension >
-    void ITKProcessing( itk::Image< TPixel, VDimension>* input );
+    void InternalProcessing( itk::Image< TPixel, VDimension>* input );
 };
 
 } // namespace

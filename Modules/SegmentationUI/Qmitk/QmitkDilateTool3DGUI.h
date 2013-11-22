@@ -20,10 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
 #include "mitkDilateTool3D.h"
+#include "ui_QmitkDilateTool3DGUIControls.h"
 
-#include <QDoubleSpinBox>
-
-class QSlider;
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::DilateTool3D
@@ -41,23 +39,22 @@ class SegmentationUI_EXPORT QmitkDilateTool3DGUI : public QmitkToolGUI
     mitkClassMacro(QmitkDilateTool3DGUI, QmitkToolGUI);
     itkNewMacro(QmitkDilateTool3DGUI);
 
-  signals:
-
-    /// \brief Emitted when button "Run" is pressed
-    void Run();
-
-  public slots:
-
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);
     void OnRun();
+    void OnAcceptPreview();
+    void OnCalculateDifference();
+    void OnShowInformation(bool);
+    void OnShowAdvancedControls(bool);
 
   protected:
     QmitkDilateTool3DGUI();
     virtual ~QmitkDilateTool3DGUI();
 
     void BusyStateChanged(bool);
+
+    Ui::QmitkDilateTool3DGUIControls m_Controls;
 
     mitk::DilateTool3D::Pointer m_DilateTool3D;
 };

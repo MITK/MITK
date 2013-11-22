@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
 #include "mitkOperation.h"
+#include "mitkToolCommand.h"
 #include "mitkTool.h"
 
 
@@ -36,6 +37,15 @@ class Segmentation_EXPORT AutoSegmentationTool : public Tool
   public:
 
     mitkClassMacro(AutoSegmentationTool, Tool);
+
+    /// \brief Replaces the active label with the preview image.
+    virtual void AcceptPreview();
+
+    /// \brief Replaces the preview image by the difference between the active label and the current preview image.
+    virtual void CalculateDifference();
+
+    /// \brief Replaces the preview image by the union between the active label and the current preview image.
+    virtual void CalculateUnion();
 
   protected:
 
@@ -65,14 +75,34 @@ class Segmentation_EXPORT AutoSegmentationTool : public Tool
     /// \brief Interface of a mitk::StateMachine (for undo/redo)
     void  ExecuteOperation (mitk::Operation*);
 
+    virtual void Activated();
+
+    virtual void Deactivated();
+
     virtual Image::Pointer Get3DImage(Image::Pointer image, unsigned int timestep);
 
     void InitializeUndoController();
 
-    void PasteSegmentation( Image* targetImage, Image* sourceImage, int pixelvalue, int timestep );
+    mitk::SlicedData::RegionType m_RequestedRegion;
 
-    template<typename TPixel, unsigned int VImageDimension>
-    void ItkPasteSegmentation( itk::Image<TPixel,VImageDimension>* targetImage, const mitk::Image* sourceImage, int pixelvalue );
+    int m_CurrentTimeStep;
+
+    DataNode::Pointer  m_PreviewNode; //holds the result as a preview image
+    Image::Pointer     m_PreviewImage;
+
+    ToolCommand::Pointer m_ProgressCommand;
+
+private:
+
+    template<typename ImageType>
+    void InternalAcceptPreview( ImageType* targetImage, const mitk::Image* sourceImage );
+
+    template<typename ImageType>
+    void InternalDifference( ImageType* input );
+
+    template<typename ImageType>
+    void InternalUnion( ImageType* input );
+
  };
 
 } // namespace

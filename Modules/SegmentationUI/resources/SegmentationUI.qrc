@@ -3,5 +3,11 @@
     <file>AcceptCurrentInterpolation.png</file>
     <file>AcceptAllInterpolations.png</file>
     <file>AcceptSurfaceInterpolation.png</file>
+    <file>BooleanDifference_48x48.png</file>
+    <file>BooleanIntersection_48x48.png</file>
+    <file>BooleanUnion_48x48.png</file>
+    <file>Accept_48x48.png</file>
+    <file>Run_48x48.png</file>
+    <file>NewLabel_48x48.png</file>
   </qresource>
 </RCC>

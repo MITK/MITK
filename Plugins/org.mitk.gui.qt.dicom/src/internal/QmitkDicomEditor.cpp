@@ -14,47 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// Blueberry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
-#include <berryUIException.h>
-#include <berryIWorkbenchPage.h>
-#include <berryIPreferencesService.h>
-#include <berryIPartListener.h>
-#include <mitkGlobalInteraction.h>
-#include <mitkDataStorageEditorInput.h>
-#include "berryFileEditorInput.h"
-
 // Qmitk
 #include "QmitkDicomEditor.h"
 #include "mitkPluginActivator.h"
-#include <mitkDicomSeriesReader.h>
-
-//#include "mitkProgressBar.h"
-
-// Qt
-#include <QCheckBox>
-#include <QMessageBox>
-#include <QWidget>
-
-#include <QtSql>
-#include <QSqlDatabase>
-#include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QGridLayout>
-#include <QtGui/QHeaderView>
-#include <QtGui/QPushButton>
-#include <QtGui/QTextEdit>
-#include <QtGui/QWidget>
-
-//CTK
-#include <ctkDICOMModel.h>
-#include <ctkDICOMAppWidget.h>
-#include <ctkDICOMQueryWidget.h>
-#include <ctkFileDialog.h>
-#include <ctkDICOMQueryRetrieveWidget.h>
 
 
 const std::string QmitkDicomEditor::EDITOR_ID = "org.mitk.editors.dicomeditor";

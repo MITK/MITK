@@ -628,6 +628,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
 template<typename TPixel, unsigned int VImageDimension>
 void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImageDimension>* itkImage)
 {
+/*
   mitk::Image::Pointer originalSegmentation = dynamic_cast<mitk::Image*>(this->m_RegionGrow3DTool->
                                                                          GetTargetSegmentationNode()->GetData());
 
@@ -692,6 +693,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
     originalSegmentation->Modified();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
+*/
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::EnableControls(bool enable)

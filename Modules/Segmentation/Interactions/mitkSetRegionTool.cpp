@@ -228,7 +228,8 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
       newPoint[1] = contourPoints[ 2 * index + 1];
       newPoint[2] = 0;
 
-      contourInImageIndexCoordinates->AddVertex(newPoint - mitk::Point3D::VectorType(0.5), timestep);
+      newPoint -= Point3D::VectorType(0.5);
+      contourInImageIndexCoordinates->AddVertex(newPoint, timestep);
     }
 
     mitk::ContourModel* feedbackContour = FeedbackContourTool::GetFeedbackContour();

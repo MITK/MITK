@@ -244,7 +244,8 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
         newPoint[1] = cutContour.deleteCurve[ 2 * index + 1 ];
         newPoint[2] = 0.0;
 
-        contourInIndexCoordinates->AddVertex( newPoint - Point3D::VectorType(0.5), timestep);
+        newPoint -= Point3D::VectorType(0.5);
+        contourInIndexCoordinates->AddVertex( newPoint, timestep);
       }
 
       free(cutContour.traceline);
@@ -533,7 +534,8 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
       newPoint[1] = contourPoints[ 2 * index + 1 ];
       newPoint[2] = 0;
 
-      contourInIndexCoordinates->AddVertex( newPoint - Point3D::VectorType(0.5), timestep);
+      newPoint -= Point3D::VectorType(0.5);
+      contourInIndexCoordinates->AddVertex( newPoint, timestep);
     }
 
     free(contourPoints);

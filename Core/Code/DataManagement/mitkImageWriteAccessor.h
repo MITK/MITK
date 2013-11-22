@@ -59,6 +59,8 @@ public:
     // In case of non-coherent memory, copied area needs to be written back
     // TODO
 
+    return;
+
     m_Image->m_ReadWriteLock.Lock();
 
     // delete self from list of ImageReadAccessors in Image
@@ -84,6 +86,7 @@ private:
   /** \brief manages a consistent write access and locks the ordered image part */
   void OrganizeWriteAccess()
   {
+    return; // happy
     m_Image->m_ReadWriteLock.Lock();
 
     bool readOverlap = false;

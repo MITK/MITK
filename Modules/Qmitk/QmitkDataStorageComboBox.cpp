@@ -369,7 +369,9 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode* _Data
   if(nameProperty)
     _NonConstDataNodeName = nameProperty->GetValueAsString();
 
-  int colWidth = this->width() - 10;
+  int colWidth = this->width() - 20;
+  if (colWidth < 150)
+    colWidth = 150;
   QString text = this->fontMetrics().elidedText(_NonConstDataNodeName.c_str(), Qt::ElideMiddle, colWidth);
   _NonConstDataNodeName = text.toStdString();
 

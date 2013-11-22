@@ -92,7 +92,7 @@ m_MouseCursorSet(false)
 QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
 {
   m_Controls.m_ManualToolSelectionBox2D->setEnabled(false);
-  m_Controls.m_ManualToolSelectionBox3D->setEnabled( false );
+  m_Controls.m_ManualToolSelectionBox3D->setEnabled(false);
   m_ToolManager->ActivateTool(-1);
 /*
   m_Controls.m_SliceBasedInterpolator->EnableInterpolation(false);
@@ -153,7 +153,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer3D );
   //specify tools to be added to 3D Tool area
 //  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("'Two Thresholds' Otsu FastMarching3D RegionGrowing Watershed");
-  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold FastMarching3D MedianTool3D DilateTool3D ErodeTool3D SmoothTool3D FillHolesTool3D");
+  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold FastMarching3D MedianTool3D DilateTool3D ErodeTool3D OpenTool3D CloseTool3D FillHolesTool3D");
   m_Controls.m_ManualToolSelectionBox3D->SetLayoutColumns(2);
   m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );
 

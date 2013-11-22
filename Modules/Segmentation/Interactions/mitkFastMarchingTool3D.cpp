@@ -80,6 +80,7 @@ const char** mitk::FastMarchingTool3D::GetXPM() const
 us::ModuleResource mitk::FastMarchingTool3D::GetIconResource() const
 {
   us::Module* module = us::GetModuleContext()->GetModule();
+  assert(module);
   us::ModuleResource resource = module->GetResource("FastMarching_48x48.png");
   return resource;
 }
@@ -358,7 +359,7 @@ void mitk::FastMarchingTool3D::Update()
     {
      MITK_ERROR << "Exception caught: " << e.GetDescription();
 
-     m_ProgressCommand->SetRemainingProgress(200);
+     m_ProgressCommand->Reset();
      CurrentlyBusy.Send(false);
 
      std::string msg = e.GetDescription();
@@ -366,7 +367,7 @@ void mitk::FastMarchingTool3D::Update()
 
      return;
     }
-    m_ProgressCommand->SetRemainingProgress(200);
+    m_ProgressCommand->Reset();
     CurrentlyBusy.Send(false);
 
     OutputImageType::Pointer output = m_ThresholdFilter->GetOutput();

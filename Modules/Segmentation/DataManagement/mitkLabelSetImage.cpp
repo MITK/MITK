@@ -588,36 +588,31 @@ const mitk::Label* mitk::LabelSetImage::GetActiveLabel(int layer) const
 
 int mitk::LabelSetImage::GetActiveLabelIndex(int layer) const
 {
-  if (layer < 0)
-    layer = m_ActiveLayer;
+  if (layer < 0) layer = m_ActiveLayer;
   return m_LabelSetContainer[layer]->GetActiveLabel()->GetIndex();
 }
 
 const mitk::Color& mitk::LabelSetImage::GetActiveLabelColor(int layer) const
 {
-  if (layer < 0)
-    layer = m_ActiveLayer;
+  if (layer < 0) layer = m_ActiveLayer;
   return m_LabelSetContainer[layer]->GetActiveLabel()->GetColor();
 }
 
 double mitk::LabelSetImage::GetActiveLabelOpacity(int layer) const
 {
-  if (layer < 0)
-    layer = m_ActiveLayer;
+  if (layer < 0) layer = m_ActiveLayer;
   return m_LabelSetContainer[layer]->GetActiveLabel()->GetOpacity();
 }
 
 mitk::LabelSet::ConstPointer mitk::LabelSetImage::GetLabelSet(int layer) const
 {
-  if (layer < 0)
-    layer = m_ActiveLayer;
+  if (layer < 0) layer = m_ActiveLayer;
   return m_LabelSetContainer[layer].GetPointer();
 }
 
 mitk::LabelSet* mitk::LabelSetImage::GetLabelSet(int layer)
 {
-  if (layer < 0)
-    layer = m_ActiveLayer;
+  if (layer < 0) layer = m_ActiveLayer;
   return m_LabelSetContainer[layer].GetPointer();
 }
 
@@ -651,8 +646,7 @@ void mitk::LabelSetImage::SetLabelVisible(int index, bool value, int layer)
 
 const mitk::Point3D& mitk::LabelSetImage::GetLabelCenterOfMassIndex(int index, bool forceUpdate, int layer)
 {
-  if (layer < 0)
-      layer = m_ActiveLayer;
+  if (layer < 0) layer = m_ActiveLayer;
 
   if (forceUpdate)
   {
@@ -724,12 +718,6 @@ int mitk::LabelSetImage::GetTotalNumberOfLabels() const
 
 void mitk::LabelSetImage::MaskStamp(mitk::Image* mask, bool forceOverwrite)
 {
-  if (!mask)
-  {
-    MITK_ERROR << "Input mask is NULL.";
-    return;
-  }
-
   try
   {
     mitk::PadImageFilter::Pointer padImageFilter = mitk::PadImageFilter::New();

@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDicomExternalDataWidget.h"
 #include <mitkLogMacros.h>
 
+// CTK
+#include <ctkFileDialog.h>
+
 // Qt
 #include <QCheckBox>
 #include <QMessageBox>
@@ -39,6 +42,7 @@ QmitkDicomExternalDataWidget::~QmitkDicomExternalDataWidget()
 {
     delete m_ExternalDatabase;
     delete m_ExternalIndexer;
+    m_ImportDialog->deleteLater();
     delete m_Controls;
 }
 
@@ -53,24 +57,26 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
         m_Controls = new Ui::QmitkDicomExternalDataWidgetControls;
         m_Controls->setupUi( parent );
         m_Controls->viewExternalDataButton->setVisible(true);
-        m_Controls->directoryButton->setText("Open directory");
         m_Controls->ctkDICOMBrowser->setDynamicTableLayout(true);
+
+        this->SetupImportDialog();
+        this->SetupProgressDialog(parent);
 
         //connect Buttons
         connect(m_Controls->downloadButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
         connect(m_Controls->viewExternalDataButton, SIGNAL(clicked()),this,SLOT(OnViewButtonClicked()));
+        connect(m_Controls->directoryButton, SIGNAL(clicked()), this, SLOT(OnScanDirectory()));
 
-        connect(m_ExternalIndexer, SIGNAL(indexingComplete()),this, SLOT(OnFinishedImport()));
-        connect(m_ExternalIndexer, SIGNAL(indexingComplete()),this, SIGNAL(SignalFinishedImport()));
-
-        connect(m_ExternalIndexer, SIGNAL(indexingFilePath(QString)),this, SIGNAL(SignalProcessingFile(QString)));
-        connect(m_ExternalIndexer, SIGNAL(progress(int)),this, SIGNAL(SignalProgress(int)));
-        connect(this, SIGNAL(SignalCancelImport()),m_ExternalIndexer, SLOT(cancel()));
         connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesSelectionChanged(const QStringList&)),
                 this, SLOT(OnSeriesSelectionChanged(const QStringList&)));
         connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesDoubleClicked(const QModelIndex&)),
                 this, SLOT(OnViewButtonClicked()));
-        connect(m_Controls->directoryButton, SIGNAL(directoryChanged(const QString&)), this, SLOT(OnStartDicomImport(const QString&)));
+
+        connect(m_ProgressDialog, SIGNAL(canceled()), m_ExternalIndexer, SLOT(cancel()));
+        connect(m_ExternalIndexer, SIGNAL(indexingComplete()),this, SLOT(OnFinishedImport()));
+
+        connect(m_ExternalIndexer, SIGNAL(indexingFilePath(QString)), m_ProgressDialogLabel, SLOT(setText(QString)));
+        connect(m_ExternalIndexer, SIGNAL(progress(int)), m_ProgressDialog, SLOT(setValue(int)));
     }
 }
 
@@ -91,11 +97,20 @@ void QmitkDicomExternalDataWidget::Initialize()
 
 void QmitkDicomExternalDataWidget::OnFinishedImport()
 {
+  m_ProgressDialog->setValue(m_ProgressDialog->maximum());
   m_Controls->ctkDICOMBrowser->setCTKDICOMDatabase(m_ExternalDatabase);
 }
 
 void QmitkDicomExternalDataWidget::OnDownloadButtonClicked()
 {
+  QStringList filesToDownload = GetFileNamesFromIndex();
+  if (filesToDownload.size() == 0)
+  {
+    QMessageBox info;
+    info.setText("You have to select an entry in the dicom browser for import.");
+    info.exec();
+    return;
+  }
     emit SignalStartDicomImport(GetFileNamesFromIndex());
 }
 
@@ -159,11 +174,43 @@ QStringList QmitkDicomExternalDataWidget::GetFileNamesFromIndex()
 
 void QmitkDicomExternalDataWidget::OnStartDicomImport(const QString& directory)
 {
+  m_ImportDialog->close();
+  m_ProgressDialog->show();
+
     m_LastImportDirectory = directory;
     m_ExternalIndexer->addDirectory(*m_ExternalDatabase,m_LastImportDirectory);
 }
 
 void QmitkDicomExternalDataWidget::OnSeriesSelectionChanged(const QStringList& s)
 {
-  m_Controls->viewExternalDataButton->setEnabled((s.size() != 0));
+  m_Controls->viewExternalDataButton->setEnabled( (s.size() != 0) );
+}
+
+void QmitkDicomExternalDataWidget::SetupImportDialog()
+{
+        //Initialize import widget
+        m_ImportDialog = new ctkFileDialog();
+        // Since copy on import is not working at the moment
+        // this feature is diabled
+//        QCheckBox* importCheckbox = new QCheckBox("Copy on import", m_ImportDialog);
+//        m_ImportDialog->setBottomWidget(importCheckbox);
+        m_ImportDialog->setFileMode(QFileDialog::Directory);
+        m_ImportDialog->setLabelText(QFileDialog::Accept,"Import");
+        m_ImportDialog->setWindowTitle("Import DICOM files from directory ...");
+        m_ImportDialog->setWindowModality(Qt::ApplicationModal);
+        connect(m_ImportDialog, SIGNAL(fileSelected(QString)),this,SLOT(OnStartDicomImport(QString)));
+}
+
+void QmitkDicomExternalDataWidget::SetupProgressDialog(QWidget* parent)
+{
+    m_ProgressDialog = new QProgressDialog("DICOM Import", "Cancel", 0, 100, parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+    m_ProgressDialogLabel = new QLabel("Initialization...", m_ProgressDialog);
+    m_ProgressDialog->setLabel(m_ProgressDialogLabel);
+    m_ProgressDialog->setWindowModality(Qt::ApplicationModal);
+    m_ProgressDialog->setMinimumDuration(0);
+}
+
+void QmitkDicomExternalDataWidget::OnScanDirectory()
+{
+  m_ImportDialog->show();
 }

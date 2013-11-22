@@ -6,6 +6,7 @@
         <file>network-idle_16.png</file>
         <file>network-offline_16.png</file>
         <file>network-error_16.png</file>
+        <file>viewIcon.png</file>
         <file>folder_32.png</file>
     </qresource>
 </RCC>

@@ -33,6 +33,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QHash>
 #include <QVariant>
 
+class QProgressDialog;
+class QLabel;
+
 /**
 * \brief QmitkDicomLocalStorageWidget is a QWidget providing functionality for dicom storage and import.
 *
@@ -86,12 +89,6 @@ signals:
     */
     void SignalDicomToDataManager(QHash<QString,QVariant>);
 
-    /// \brief emitted when import progress changes.
-    void SignalProgress(int);
-
-    /// \brief emitted when anoter file is processed.
-    void SignalProcessingFile(QString);
-
     /// \brief emitted if cancel button is pressed.
     void SignalCancelImport();
 
@@ -120,6 +117,12 @@ public slots:
 protected:
 
     void SetDatabase(QString databaseFile);
+
+    /// \brief SetupProgressDialog Sets up progress dialog.
+    void SetupProgressDialog(QWidget* parent);
+
+    QProgressDialog* m_ProgressDialog;
+    QLabel* m_ProgressDialogLabel;
 
     ctkDICOMDatabase* m_LocalDatabase;
     ctkDICOMModel* m_LocalModel;

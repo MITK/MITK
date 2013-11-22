@@ -20,9 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProgressBar.h>
 #include <mitkStatusBar.h>
 // Qt
+#include <QHash>
+#include <QLabel>
 #include <QMessageBox>
 #include <QModelIndex>
-#include <QHash>
+#include <QProgressDialog>
 #include <QVariant>
 
 const std::string QmitkDicomLocalStorageWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomLocalStorageWidget";
@@ -51,15 +53,10 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
         m_Controls = new Ui::QmitkDicomLocalStorageWidgetControls;
         m_Controls->setupUi( parent );
 
+        this->SetupProgressDialog(this);
+
         connect(m_Controls->deleteButton,SIGNAL(clicked()),this,SLOT(OnDeleteButtonClicked()));
         connect(m_Controls->viewInternalDataButton, SIGNAL(clicked()), this , SLOT(OnViewButtonClicked()));
-
-        connect(m_LocalIndexer, SIGNAL(indexingComplete()),this, SLOT(OnFinishedImport()));
-        connect(m_LocalIndexer, SIGNAL(indexingComplete()),this, SIGNAL(SignalFinishedImport()));
-
-        connect(m_LocalIndexer, SIGNAL(indexingFilePath(QString)),this, SIGNAL(SignalProcessingFile(QString)));
-        connect(m_LocalIndexer, SIGNAL(progress(int)),this, SIGNAL(SignalProgress(int)));
-        connect(this, SIGNAL(SignalCancelImport()),m_LocalIndexer, SLOT(cancel()));
 
         connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesSelectionChanged(const QStringList&)),
                 this, SLOT(OnSeriesSelectionChanged(const QStringList&)));
@@ -67,6 +64,14 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
                 this, SLOT(OnSeriesSelectionChanged(const QStringList&)));
         connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesDoubleClicked(const QModelIndex&)),
                 this, SLOT(OnViewButtonClicked()));
+
+        connect(m_LocalIndexer, SIGNAL(indexingComplete()),this, SLOT(OnFinishedImport()));
+        connect(m_LocalIndexer, SIGNAL(indexingComplete()),this, SIGNAL(SignalFinishedImport()));
+        connect(m_LocalIndexer, SIGNAL(indexingComplete()),this, SLOT(OnFinishedImport()));
+        connect(m_LocalIndexer, SIGNAL(indexingFilePath(QString)), m_ProgressDialogLabel, SLOT(setText(QString)));
+        connect(m_LocalIndexer, SIGNAL(progress(int)), m_ProgressDialog, SLOT(setValue(int)));
+        connect(m_ProgressDialog, SIGNAL(canceled()), m_LocalIndexer, SLOT(cancel()));
+
         m_Controls->ctkDICOMBrowser->setDynamicTableLayout(true);
     }
 }
@@ -83,12 +88,14 @@ void QmitkDicomLocalStorageWidget::OnStartDicomImport(const QStringList& dicomDa
 {
     if(m_LocalDatabase->isOpen())
     {
+        m_ProgressDialog->show();
         m_LocalIndexer->addListOfFiles(*m_LocalDatabase,dicomData,m_LocalDatabase->databaseDirectory());
     }
 }
 
 void QmitkDicomLocalStorageWidget::OnFinishedImport()
 {
+    m_ProgressDialog->setValue(m_ProgressDialog->maximum());
     m_LocalModel->setDatabase(m_LocalDatabase->database());
 }
 
@@ -145,4 +152,13 @@ void QmitkDicomLocalStorageWidget::SetDatabase(QString databaseFile)
 void QmitkDicomLocalStorageWidget::OnSeriesSelectionChanged(const QStringList &s)
 {
   m_Controls->viewInternalDataButton->setEnabled((s.size() != 0));
+}
+
+void QmitkDicomLocalStorageWidget::SetupProgressDialog(QWidget* parent)
+{
+    m_ProgressDialog = new QProgressDialog("DICOM Import", "Cancel", 0, 100, parent,Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+    m_ProgressDialogLabel = new QLabel("Initialization...", m_ProgressDialog);
+    m_ProgressDialog->setLabel(m_ProgressDialogLabel);
+    m_ProgressDialog->setWindowModality(Qt::ApplicationModal);
+    m_ProgressDialog->setMinimumDuration(0);
 }

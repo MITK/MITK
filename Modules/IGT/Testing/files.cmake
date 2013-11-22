@@ -8,7 +8,7 @@ set(MODULE_TESTS
    mitkNavigationDataLandmarkTransformFilterTest.cpp
    mitkNavigationDataObjectVisualizationFilterTest.cpp
    mitkNavigationDataTest.cpp
-   mitkNavigationDataRecorderTest.cpp # see bug 16349
+   mitkNavigationDataRecorderTest.cpp
    mitkNavigationDataReferenceTransformFilterTest.cpp
    mitkNavigationDataSequentialPlayerTest.cpp
    mitkNavigationDataSourceTest.cpp
@@ -33,8 +33,8 @@ set(MODULE_TESTS
    # ------------------ Navigation Tool Management Tests -------------------
    mitkNavigationToolStorageTest.cpp
    mitkNavigationToolTest.cpp
-   mitkNavigationToolReaderAndWriterTest.cpp # see bug 16350
-   mitkNavigationToolStorageSerializerAndDeserializerTest.cpp # see bug 16351
+   mitkNavigationToolReaderAndWriterTest.cpp
+   mitkNavigationToolStorageSerializerAndDeserializerTest.cpp
    # -----------------------------------------------------------------------
 )
 

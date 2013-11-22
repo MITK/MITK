@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkWeakPointer.h"
 #include "mitkDataNode.h"
-//#include <mitkIRenderWindowPart.h>
-//#include <berryIBerryPreferences.h>
 
 class QmitkDataStorageComboBox;
 class QCompleter;
@@ -80,6 +78,9 @@ private slots:
 
   // reaction to the signal "createMask" from QmitkLabelSetTableWidget
   void OnCreateMask(int);
+
+  // reaction to the signal "createCroppedMask" from QmitkLabelSetTableWidget
+  void OnCreateCroppedMask(int);
 
   // reaction to the signal "combineAndCreateMask" from QmitkLabelSetTableWidget
   void OnCombineAndCreateMask( const QList<QTableWidgetSelectionRange>& ranges );

@@ -569,6 +569,12 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
 
     menu->addAction(createMaskAction);
 
+    QAction* createCroppedMaskAction = new QAction(QIcon(":/QmitkExt/createmask.png"), "Create cropped mask", this );
+    createCroppedMaskAction->setEnabled(true);
+    QObject::connect( createCroppedMaskAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateCroppedMask(bool) ) );
+
+    menu->addAction(createCroppedMaskAction);
+
     m_OpacitySlider = new QSlider;
     m_OpacitySlider->setMinimum(0);
     m_OpacitySlider->setMaximum(100);
@@ -762,6 +768,11 @@ void QmitkLabelSetTableWidget::OnCombineAndCreateSurface(bool value)
 void QmitkLabelSetTableWidget::OnCreateMask(bool value)
 {
   emit createMask( this->currentRow() );
+}
+
+void QmitkLabelSetTableWidget::OnCreateCroppedMask(bool value)
+{
+  emit createCroppedMask( this->currentRow() );
 }
 
 void QmitkLabelSetTableWidget::OnCreateMasks(bool value)

@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStatusBar.h>
 #include <mitkIOUtil.h>
 #include <mitkCoreObjectFactory.h>
+#include <mitkAutoCropImageFilter.h>
 #include <mitkSurfaceInterpolationController.h>
 #include <mitkSegmentationInterpolationController.h>
 
@@ -63,6 +64,7 @@ m_ToolManager(NULL)
       this, SLOT(OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>&)) );
 
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createMask(int)), this, SLOT(OnCreateMask(int)) );
+  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createCroppedMask(int)), this, SLOT(OnCreateCroppedMask(int)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(combineAndCreateMask( const QList<QTableWidgetSelectionRange>& )),
       this, SLOT(OnCombineAndCreateMask( const QList<QTableWidgetSelectionRange>&)) );
 
@@ -421,6 +423,61 @@ void QmitkLabelSetWidget::OnNewLabel()
   assert(workingImage);
 
   workingImage->AddLabel(dialog->GetSegmentationName().toStdString(), color);
+}
+
+void QmitkLabelSetWidget::OnCreateCroppedMask(int index)
+{
+  m_ToolManager->ActivateTool(-1);
+
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  assert(workingNode);
+
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
+  assert(workingImage);
+
+  mitk::Image::Pointer maskImage;
+
+  try
+  {
+    this->WaitCursorOn();
+
+    mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
+    cropFilter->SetInput( workingImage->CreateLabelMask(index) );
+    cropFilter->SetBackgroundValue( 0 );
+    cropFilter->SetMarginFactor(1.15);
+    cropFilter->Update();
+
+    maskImage = cropFilter->GetOutput();
+
+    this->WaitCursorOff();
+  }
+  catch ( mitk::Exception& e )
+  {
+    this->WaitCursorOff();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(this, "Create Mask", "Could not create a mask out of the selected label.\n");
+    return;
+  }
+
+  if (maskImage.IsNull())
+  {
+    QMessageBox::information(this, "Create Mask", "Could not create a mask out of the selected label.\n");
+    return;
+  }
+
+  mitk::DataNode::Pointer maskNode = mitk::DataNode::New();
+  std::string name = workingImage->GetLabelName(index, workingImage->GetActiveLayer());
+  name += "-mask";
+  maskNode->SetName(name);
+  maskNode->SetData(maskImage);
+  maskNode->SetBoolProperty("binary", true);
+  maskNode->SetBoolProperty("outline binary", true);
+  maskNode->SetBoolProperty("outline binary shadow", true);
+  maskNode->SetFloatProperty("outline width", 2.0);
+  maskNode->SetColor(workingImage->GetLabelColor(index));
+  maskNode->SetOpacity(1.0);
+
+  this->m_DataStorage->Add(maskNode, workingNode);
 }
 
 void QmitkLabelSetWidget::OnCreateMask(int index)

@@ -114,6 +114,9 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     /// \brief Send a signal when it was requested to create a mask out of a label.
     void createMask(int);
 
+    /// \brief Send a signal when it was requested to create a cropped mask out of a label.
+    void createCroppedMask(int);
+
     void createMasks(int);
 
     void createSurfaces(int);
@@ -193,6 +196,8 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     void OnCreateSurfaces(bool);
 
     void OnCreateMask(bool);
+
+    void OnCreateCroppedMask(bool);
 
     void OnCreateMasks(bool);
 

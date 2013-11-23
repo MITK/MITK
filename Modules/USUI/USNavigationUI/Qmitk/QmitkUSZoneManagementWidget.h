@@ -42,10 +42,10 @@ protected slots:
   void OnDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 
 public:
-  explicit QmitkUSZoneManagementWidget(QWidget *parent = 0);
+  explicit QmitkUSZoneManagementWidget(QWidget* parent = 0);
   ~QmitkUSZoneManagementWidget();
 
-  void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
+  void SetDataStorage(mitk::DataStorage::Pointer dataStorage, const char* baseNodeName = "Zones");
   mitk::DataStorage::SetOfObjects::ConstPointer GetZoneNodes();
 
 protected:

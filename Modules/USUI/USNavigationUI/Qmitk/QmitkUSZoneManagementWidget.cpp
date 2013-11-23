@@ -39,16 +39,16 @@ QmitkUSZoneManagementWidget::~QmitkUSZoneManagementWidget()
 {
   delete ui;
 
-  m_DataStorage->Remove(m_BaseNode);
+  if ( m_DataStorage.IsNotNull() && m_BaseNode.IsNotNull() ) { m_DataStorage->Remove(m_BaseNode); }
 }
 
-void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
+void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage, const char* baseNodeName)
 {
-  mitk::DataNode::Pointer baseNode = dataStorage->GetNamedNode("Zones");
+  mitk::DataNode::Pointer baseNode = dataStorage->GetNamedNode(baseNodeName);
   if ( baseNode.IsNull() )
   {
     baseNode = mitk::DataNode::New();
-    baseNode->SetName("Zones");
+    baseNode->SetName(baseNodeName);
     dataStorage->Add(baseNode);
   }
 
@@ -88,6 +88,12 @@ void QmitkUSZoneManagementWidget::RemoveSelectedRows()
 
 void QmitkUSZoneManagementWidget::OnStartAddingZone()
 {
+  if ( m_DataStorage.IsNull() )
+  {
+    MITK_ERROR << "DataStorage must be set before adding the first zone.";
+    mitkThrow() << "DataStorage must be set before adding the first zone.";
+  }
+
   // workaround for bug 16407
   m_Interactor = mitk::USZonesInteractor::New();
   m_Interactor->LoadStateMachine("USZoneInteractions.xml", us::ModuleRegistry::GetModule("MitkUSNavigation"));

@@ -36,10 +36,13 @@ QmitkUSZonesDataModel::QmitkUSZonesDataModel(QObject *parent) :
 
 QmitkUSZonesDataModel::~QmitkUSZonesDataModel()
 {
-  m_DataStorage->AddNodeEvent.RemoveListener(m_ListenerAddNode);
-  m_DataStorage->ChangedNodeEvent.RemoveListener(m_ListenerChangeNode);
-  m_DataStorage->InteractorChangedNodeEvent.RemoveListener(m_ListenerChangeNode);
-  m_DataStorage->RemoveNodeEvent.RemoveListener(m_ListenerRemoveNode);
+  if ( m_DataStorage.IsNotNull() )
+  {
+    m_DataStorage->AddNodeEvent.RemoveListener(m_ListenerAddNode);
+    m_DataStorage->ChangedNodeEvent.RemoveListener(m_ListenerChangeNode);
+    m_DataStorage->InteractorChangedNodeEvent.RemoveListener(m_ListenerChangeNode);
+    m_DataStorage->RemoveNodeEvent.RemoveListener(m_ListenerRemoveNode);
+  }
 }
 
 void QmitkUSZonesDataModel::SetDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::DataNode::Pointer baseNode)
@@ -47,7 +50,7 @@ void QmitkUSZonesDataModel::SetDataStorage(mitk::DataStorage::Pointer dataStorag
   m_DataStorage = dataStorage;
   m_BaseNode = baseNode;
 
-  if (m_DataStorage.IsNotNull())
+  if ( m_DataStorage.IsNotNull() )
   {
     m_DataStorage->AddNodeEvent.AddListener(m_ListenerAddNode);
     m_DataStorage->RemoveNodeEvent.AddListener(m_ListenerRemoveNode);
@@ -58,6 +61,12 @@ void QmitkUSZonesDataModel::SetDataStorage(mitk::DataStorage::Pointer dataStorag
 
 void QmitkUSZonesDataModel::AddNode(const mitk::DataNode* node)
 {
+  if ( m_DataStorage.IsNull() )
+  {
+    MITK_ERROR << "DataStorage has to be set before adding the first zone node.";
+    mitkThrow() << "DataStorage has to be set before adding the first zone node.";
+  }
+
   // do not add nodes, which aren't fully created yet
   bool boolValue;
   if ( ! (node->GetBoolProperty("zone.created", boolValue) && boolValue) )

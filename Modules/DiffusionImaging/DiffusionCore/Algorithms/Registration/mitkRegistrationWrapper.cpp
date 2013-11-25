@@ -72,7 +72,9 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
     RigidTransformType::ParametersType parameters(RigidTransformType::ParametersDimension);
 
     for (int i = 0; i<6;++i)
+    {
       parameters[i] = transformation[i];
+    }
 
     rtransform->SetParameters( parameters );
 

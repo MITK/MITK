@@ -72,6 +72,11 @@ void DcmRTV::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
   connect( m_Controls.pushButton, SIGNAL(clicked()), this, SLOT(LoadRTDoseFile()) );
   connect( m_Controls.btn_isolines, SIGNAL(clicked()), this ,SLOT(LoadIsoLines()));
+
+  connect(m_Controls.btnUpdate, SIGNAL(clicked()), this, SLOT(OnUpdateButtonClicked()));
+  connect(m_Controls.freeSlider, SIGNAL(valueChanged(int)), m_Controls.freeBox, SLOT(setValue(int)));
+  connect(m_Controls.freeBox, SIGNAL(valueChanged(int)), this, SLOT(OnFreeIsoValueChanged(int)));
+  connect(m_Controls.spinPrescribedDose, SIGNAL(valueChanged(double)), this, SLOT(OnPrescribedDoseChanged(double)));
 }
 
 void DcmRTV::OnPrescribedDoseChanged(double value)

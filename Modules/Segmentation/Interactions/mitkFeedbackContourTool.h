@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegTool2D.h"
 #include "mitkContourModel.h"
 #include "mitkImage.h"
-#include "mitkLabelSet.h"
+//#include "mitkLabelSet.h"
 
 namespace mitk
 {

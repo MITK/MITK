@@ -1036,6 +1036,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
   if ( maskNonEmpty )
   {
+    Statistics statistics;
     std::list< int >::iterator it;
     for ( it = relevantLabels.begin(), i = 0;
           it != relevantLabels.end();
@@ -1043,7 +1044,6 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     {
       histogramContainer->push_back( HistogramType::ConstPointer( labelStatisticsFilter->GetHistogram( (*it) ) ) );
 
-      Statistics statistics;
       statistics.Label = (*it);
       statistics.N = labelStatisticsFilter->GetCount( *it );
       statistics.Min = labelStatisticsFilter->GetMinimum( *it );
@@ -1099,97 +1099,9 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
             statistics.MinIndex[i] = tempMinIndex[i];
           }
         }
+     }
 // FIX END
-    /*****************************************************Creating Test Image**********************************************/
-    //typedef itk::Image<TPixel, VImageDimension> ThreeDimensionalImageType;
-    //ThreeDimensionalImageType::Pointer  image = ThreeDimensionalImageType::New();
 
-    //ThreeDimensionalImageType::SizeType size;
-    //ThreeDimensionalImageType::SpacingType spacing;
-    //ThreeDimensionalImageType::IndexType start;
-
-    //for(int i = 0; i < 3; ++i)
-    //{
-    //  size[i] = 50.00;
-    //  spacing[i] = 1.00;
-    //  start[i] = 0.00;
-    //}
-
-    //ThreeDimensionalImageType::RegionType region;
-    //region.SetIndex(start);
-    //region.SetSize(size);
-
-    //image->SetRegions(region);
-    //image->Allocate();
-
-    //typedef itk::ImageRegionIteratorWithIndex<ThreeDimensionalImageType> IteratorType;
-    //IteratorType imageIt(image, region);
-
-
-    //for(imageIt.GoToBegin(); !imageIt.IsAtEnd(); ++imageIt)
-    //{
-    //    imageIt.Set(15);
-    //}
-
-    ///*for(unsigned int x = 70; x <= 80; ++x)
-    //{
-    //  for(unsigned int y = 70; y <= 80; ++y)
-    //  {
-    //    for(unsigned int z = 70; z <= 80; ++z)
-    //    {
-    //      ThreeDimensionalImageType::IndexType pixelIndex;
-    //      pixelIndex[0] = x;
-    //      pixelIndex[1] = y;
-    //      pixelIndex[2] = z;
-
-    //      image->SetPixel(pixelIndex, 50);
-    //    }
-    //  }
-    //}*/
-
-    //ThreeDimensionalImageType::IndexType pixelIndex;
-    //pixelIndex[0] = 25;
-    //pixelIndex[1] = 25;
-    //pixelIndex[2] = 25;
-
-    //image->SetPixel(pixelIndex, 20);
-
-    //pixelIndex[0] = 0;
-    //pixelIndex[1] = 0;
-    //pixelIndex[2] = 0;
-
-    //image->SetPixel(pixelIndex, 1000);
-
-
-    ///*****************************************************Creating Test Mask**********************************************/
-    //typedef itk::Image<unsigned short, VImageDimension> ThreeDimensionalMaskImageType;
-    //ThreeDimensionalMaskImageType::Pointer mask = ThreeDimensionalMaskImageType::New();
-
-    //ThreeDimensionalMaskImageType::SizeType maskSize;
-    //ThreeDimensionalMaskImageType::SpacingType maskSpacing;
-    //ThreeDimensionalMaskImageType::IndexType maskStart;
-
-    //for(int i = 0; i < 3; ++i)
-    //{
-    //  maskSize[i] = 50;
-    //  maskSpacing[i] = 1.00;
-    //  maskStart[i] = 0.00;
-    //}
-
-    //ThreeDimensionalMaskImageType::RegionType maskRegion;
-    //maskRegion.SetIndex(maskStart);
-    //maskRegion.SetSize(maskSize);
-
-    //mask->SetRegions(maskRegion);
-    //mask->Allocate();
-
-    //typedef itk::ImageRegionIteratorWithIndex<ThreeDimensionalMaskImageType> MaskIteratorType;
-    //MaskIteratorType maskIt(mask, maskRegion);
-
-    //for(maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)
-    //{
-    //    maskIt.Set(1);
-    //}
     /*****************************************************Calculate Hotspot Statistics**********************************************/
     const double radiusSUVHotspot = 6.2035049089940; // radius of a 1cm3 sphere in a isotrope image of 1mm spacings
 
@@ -1207,7 +1119,6 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       statistics.HotspotPeakIndex = hotspotStatistics.HotspotPeakIndex;
     }
     statisticsContainer->push_back( statistics );
-    }
   }
   else
   {
@@ -1219,9 +1130,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 template <typename TPixel, unsigned int VImageDimension  >
 ImageStatisticsCalculator::MinMaxIndex ImageStatisticsCalculator::CalculateMinMaxIndex(
   const itk::Image<TPixel, VImageDimension> *inputImage,
-  itk::Image<unsigned short, VImageDimension> *maskImage,
-  float minBoundary,
-  float maxBoundary)
+  itk::Image<unsigned short, VImageDimension> *maskImage)
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
@@ -1238,11 +1147,6 @@ ImageStatisticsCalculator::MinMaxIndex ImageStatisticsCalculator::CalculateMinMa
   ImageType::IndexType maxIndex;
   ImageType::IndexType minIndex;
 
-  double maxBound = itk::NumericTraits<double>::min();
-  double minBound = itk::NumericTraits<double>::max();
-
-  bool sameIndex = true;
-
   for(maskIt.GoToBegin(), imageIndexIt.GoToBegin();
     !maskIt.IsAtEnd() && !imageIndexIt.IsAtEnd();
     ++maskIt, ++imageIndexIt)
@@ -1250,24 +1154,22 @@ ImageStatisticsCalculator::MinMaxIndex ImageStatisticsCalculator::CalculateMinMa
     if(maskIt.Get() > itk::NumericTraits<typename MaskImageType::PixelType>::Zero)
     {
       double value = imageIndexIt.Get();
-      ImageType::IndexType index = imageIndexIt.GetIndex();
 
       //Calculate minimum, maximum and corresponding index-values
-      if( value > maxValue && value < maxBoundary)
+      if( value > maxValue )
       {
-        maxIndex = index;
+        maxIndex = imageIndexIt.GetIndex();
         maxValue = value;
       }
 
-      if(value < minValue && value > minBoundary)
+      if(value < minValue )
       {
-        minIndex = index;
+        minIndex = imageIndexIt.GetIndex();
         minValue = value;
       }
 
     }
   }
-
 
   MinMaxIndex minMax;
 
@@ -1295,42 +1197,28 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< float, VImageDimension > MaskImageType;
-  typedef itk::Image<unsigned short, VImageDimension> SphereMaskImageType;
-
-  typedef itk::ContinuousIndex<double, VImageDimension> ContinuousIndexType;
-
-  typedef itk::ImageRegionConstIteratorWithIndex<ImageType> IteratorType;
-  typedef itk::ImageRegionConstIteratorWithIndex<MaskImageType> MaskIteratorType;
-  typedef itk::ImageRegionConstIteratorWithIndex<SphereMaskImageType> SphereMaskIteratorType;
-
-  typedef typename ImageType::SpacingType SpacingType;
-  typedef typename ImageType::SizeType SizeType;
-  typedef typename ImageType::IndexType IndexType;
-  typedef typename ImageType::PointType PointType;
-  typedef typename ImageType::RegionType RegionType;
-
-  itk::TimeProbesCollectorBase chronometer;
 
   MaskImageType::Pointer convolutionMask = MaskImageType::New();
 
+  typedef typename ImageType::SpacingType SpacingType;
   SpacingType spacing = inputImage->GetSpacing();
 
+  typedef typename ImageType::IndexType IndexType;
   IndexType start;
   start.Fill(0);
 
-  ContinuousIndexType origin;
+  typedef typename ImageType::SizeType SizeType;
   SizeType size;
+
+  typedef itk::ContinuousIndex<double, VImageDimension> ContinuousIndexType;
   ContinuousIndexType convolutionMaskCenterCoordinate;
   /*****************************************************Creating convolution mask**********************************************/
-  chronometer.Start("Mask");
   for(unsigned int i = 0; i < VImageDimension; ++i)
   {
-    origin[i] = 0.0;
-
     double countIndex =  2.0 * radiusInMM / spacing[i];
 
     // Rounding up to the next integer by cast
-    countIndex += 0.9;
+    countIndex += 0.999999;
     int castedIndex = static_cast<int>(countIndex);
 
     // We always have an uneven number in size to determine a center-point in the convolution mask
@@ -1346,6 +1234,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
     convolutionMaskCenterCoordinate[i] = (size[i] -1) / 2;
   }
 
+  typedef typename ImageType::RegionType RegionType;
   RegionType region;
   region.SetSize(size);
   region.SetIndex(start);
@@ -1354,14 +1243,12 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   convolutionMask->SetSpacing(spacing);
   convolutionMask->Allocate();
 
-
-  float subPixelDimensionX = spacing[0]/2;
-  float subPixelDimensionY = spacing[1]/2;
-
   double distance = 0.0;
   double countSubPixel = 0.0;
   double pixelValue = 0.0;
 
+  typedef typename MaskImageType::PointType PointType;
+  typedef itk::ImageRegionConstIteratorWithIndex<MaskImageType> MaskIteratorType;
   MaskIteratorType maskIt(convolutionMask,region);
 
   // Generate convolutionMask
@@ -1369,13 +1256,13 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   {
     ContinuousIndexType indexPoint(maskIt.GetIndex());
 
-    for(double x = indexPoint[0] - subPixelDimensionX / 2;
-      x <= indexPoint[0] + subPixelDimensionX / 2;
-      x += subPixelDimensionX)
+    for(double x = indexPoint[0] - 0.25;
+      x <= indexPoint[0] + 0.25;
+      x += 0.5)
     {
-      for(double y = indexPoint[1] - subPixelDimensionY /2;
-        y <= indexPoint[1] + subPixelDimensionY / 2;
-        y += subPixelDimensionY)
+      for(double y = indexPoint[1] - 0.25;
+        y <= indexPoint[1] + 0.25;
+        y += 0.5)
       {
         ContinuousIndexType subPixelCenterCoordinate;
         subPixelCenterCoordinate[0] = x;
@@ -1384,6 +1271,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
         {
           subPixelCenterCoordinate[i] = indexPoint[i];
         }
+
         PointType subPixelCenterCoordinateInPhysicalPoint;
         convolutionMask->TransformContinuousIndexToPhysicalPoint(subPixelCenterCoordinate, subPixelCenterCoordinateInPhysicalPoint);
 
@@ -1397,17 +1285,17 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
       }
     }
 
-    // pixelValue is the counted SubPixels divided by factor 4
+    // pixelValue is the counted subPixels divided by factor 4
     pixelValue = countSubPixel / 4.00;
     convolutionMask->SetPixel(maskIt.GetIndex(),pixelValue);
 
     countSubPixel = 0.00;
   }
 
-  chronometer.Stop("Mask");
   /*****************************************************Creating Peak Image**********************************************/
-  chronometer.Start("Convolution");
-  typedef itk::ConvolutionImageFilter<ImageType, MaskImageType, MaskImageType> FilterType;
+
+  typedef itk::Image< float, VImageDimension > PeakImageType;
+  typedef itk::ConvolutionImageFilter<ImageType, MaskImageType, PeakImageType> FilterType;
   FilterType::Pointer convolutionFilter = FilterType::New();
 
   typedef itk::ConstantBoundaryCondition<ImageType, ImageType> BoundaryConditionType;
@@ -1419,79 +1307,64 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   convolutionFilter->SetKernelImage(convolutionMask);
   convolutionFilter->SetNormalize(true);
   convolutionFilter->Update();
-  chronometer.Stop("Convolution");
-  MaskImageType::Pointer peakImage = convolutionFilter->GetOutput();
+
+  PeakImageType::Pointer peakImage = convolutionFilter->GetOutput();
+
+  delete boundaryCondition;
 
   peakImage->SetSpacing( inputImage->GetSpacing() ); // TODO: only workaround because convolution filter seems to ignore spacing of input image
 
 
   /*****************************************************Creating Hotspot Sphere**********************************************/
+  typedef itk::Image<unsigned short, VImageDimension> SphereMaskImageType;
   SphereMaskImageType::Pointer hotspotSphere = SphereMaskImageType::New();
-
-  SphereMaskImageType::SpacingType hotspotSphereSpacing = peakImage->GetSpacing();
-  SphereMaskImageType::SizeType hotspotSphereSize;
-  SphereMaskImageType::RegionType regionSphere;
-  SphereMaskImageType::IndexType hotspotPeakIndex;
-  PointType hotspotOrigin;
-  IndexType offsetInIndex;
 
   typedef itk::EllipseSpatialObject<VImageDimension> EllipseType;
   typedef itk::SpatialObjectToImageFilter<EllipseType, SphereMaskImageType> SpatialObjectToImageFilter;
 
-  float maxBoundary = itk::NumericTraits<float>::max();
-  float minBoundary = itk::NumericTraits<float>::min();
   double hotspotPeak = itk::NumericTraits<double>::min();
-
-  bool isInside = false;
 
   SphereMaskImageType::Pointer croppedRegionMask = SphereMaskImageType::New();
   SphereMaskImageType::SpacingType maskSpacing = peakImage->GetSpacing();
 
-  SphereMaskImageType::RegionType maskRegion;
-  SphereMaskImageType::IndexType maskStart;
-  maskStart.Fill(0);
+  SphereMaskImageType::IndexType peakStart;
+  peakStart.Fill(0);
   SphereMaskImageType::SizeType maskSize = peakImage->GetLargestPossibleRegion().GetSize();
 
-  maskRegion.SetIndex(maskStart);
-  maskRegion.SetSize(peakImage->GetLargestPossibleRegion().GetSize());
-  croppedRegionMask->SetRegions(maskRegion);
+  SphereMaskImageType::RegionType peakRegion;
+  peakRegion.SetIndex(peakStart);
+  peakRegion.SetSize(peakImage->GetLargestPossibleRegion().GetSize());
+
+  croppedRegionMask->SetRegions(peakRegion);
+  croppedRegionMask->Allocate();
 
   int offsetX = static_cast<int>((radiusInMM / maskSpacing[0]) + 0.99999);
   int offsetY = static_cast<int>((radiusInMM / maskSpacing[1]) + 0.99999);
   int offsetZ = static_cast<int>((radiusInMM / maskSpacing[2]) + 0.99999);
 
-  croppedRegionMask->Allocate();
-
   typedef itk::ImageRegionIteratorWithIndex<SphereMaskImageType> CroppedImageIteratorType;
-  CroppedImageIteratorType sphereMaskIt(croppedRegionMask, croppedRegionMask->GetLargestPossibleRegion());
+  CroppedImageIteratorType sphereMaskIt(croppedRegionMask, peakRegion);
 
   for(sphereMaskIt.GoToBegin(); !sphereMaskIt.IsAtEnd(); ++sphereMaskIt)
   {
-     sphereMaskIt.Set(0);
+    IndexType index = sphereMaskIt.GetIndex();
+
+     if((index[0] >= offsetX && index[0] <= maskSize[0] - offsetX -1) &&
+        (index[1] >= offsetY && index[1] <= maskSize[1] - offsetY -1) &&
+        (index[2] >= offsetZ && index[2] <= maskSize[2] - offsetZ -1))
+        sphereMaskIt.Set(1);
+     else
+      sphereMaskIt.Set(0);
   }
 
-  for(unsigned int x = offsetX ; x < maskSize[0] - offsetX; ++x)
-  {
-    for(unsigned int y = offsetY; y < maskSize[1] - offsetY; ++y)
-    {
-      for(unsigned int z = offsetZ; z < maskSize[2] - offsetZ; ++z)
-      {
-        SphereMaskImageType::IndexType pixelIndex;
-        pixelIndex[0] = x;
-        pixelIndex[1] = y;
-        pixelIndex[2] = z;
-
-        croppedRegionMask->SetPixel(pixelIndex, 1);
-      }
-    }
-  }
-
-  chronometer.Start("Find Peak");
-  MinMaxIndex peakInformations = CalculateMinMaxIndex(peakImage.GetPointer(), croppedRegionMask.GetPointer(), minBoundary, maxBoundary);
-  chronometer.Stop("Find Peak");
+  MinMaxIndex peakInformations = CalculateMinMaxIndex(peakImage.GetPointer(), croppedRegionMask.GetPointer());
 
   hotspotPeak = peakInformations.Max;
 
+  SphereMaskImageType::SizeType hotspotSphereSize;
+  SphereMaskImageType::SpacingType hotspotSphereSpacing = inputImage->GetSpacing();
+
+  SphereMaskImageType::IndexType hotspotPeakIndex;
 
   for(int i = 0; i < VImageDimension; ++i)
     hotspotPeakIndex[i] = peakInformations.MaxIndex[i];
@@ -1535,7 +1408,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   // Transform sphere on center-position, set pixelValues inside sphere on 1 and update
   for(int i = 0; i < VImageDimension; ++i)
-    translation[i] =  (hotspotSphereSize[i] -1) / 2;
+    translation[i] =  static_cast<int>((hotspotSphereSize[i] -1) * hotspotSphereSpacing[i] / 2);
 
   transform->Translate(translation, false);
 
@@ -1554,9 +1427,12 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   // Calculate new origin for hotspot sphere
 
-  for(int i = 0; i < VImageDimension; ++i)
-    offsetInIndex[i] = (hotspotSphereSize[i] -1) / 2;
+  IndexType offsetInIndex;
 
+  for(int i = 0; i < VImageDimension; ++i)
+    offsetInIndex[i] = hotspotSphereSize[i] / 2;
+
+  PeakImageType::PointType hotspotOrigin;
   peakImage->TransformIndexToPhysicalPoint(hotspotPeakIndex, hotspotOrigin);
 
   PointType offsetInPhysicalPoint;
@@ -1564,7 +1440,6 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   for(int i = 0; i < VImageDimension; ++i)
     hotspotOrigin[i] -= offsetInPhysicalPoint[i];
-
 
   hotspotSphere->SetOrigin(hotspotOrigin);
   hotspotSphere->Allocate();
@@ -1577,7 +1452,10 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
       unsigned int lastY = 1000000000;
 
       unsigned int hotspotMaskIndexCounter = 0;
+
+      typedef itk::ImageRegionConstIteratorWithIndex<SphereMaskImageType> SphereMaskIteratorType;
       SphereMaskIteratorType hotspotMaskIt(hotspotSphere, hotspotSphere->GetLargestPossibleRegion()  );
+
       for(hotspotMaskIt.GoToBegin();!hotspotMaskIt.IsAtEnd();++hotspotMaskIt)
       {
 
@@ -1595,7 +1473,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
         hotspotMaskIndexCounter++;
 
-        if(hotspotMaskIndexCounter > 168) {
+        if(hotspotMaskIndexCounter > hotspotSphereSize[0] * hotspotSphereSize[1] -1) {
           std::cout << std::endl;
           hotspotMaskIndexCounter = 0;
         }
@@ -1606,19 +1484,18 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   /*********************************Creating cropped inputImage for calculation of hotspot statistics****************************/
 
-  IndexType croppedStart;
-  ImageType::RegionType inputRegion;
+  ImageType::IndexType croppedStart;
   peakImage->TransformPhysicalPointToIndex(hotspotOrigin,croppedStart);
-  ImageType::RegionType::IndexType inputStart = croppedStart;
-  ImageType::RegionType::SizeType inputSize = hotspotSphere->GetLargestPossibleRegion().GetSize();
 
-  inputRegion.SetIndex(inputStart);
-  inputRegion.SetSize(inputSize);
+  ImageType::RegionType::SizeType croppedSize = hotspotSphere->GetLargestPossibleRegion().GetSize();
+  ImageType::RegionType inputRegion;
+  inputRegion.SetIndex(croppedStart);
+  inputRegion.SetSize(croppedSize);
+
+  ImageType::IndexType croppedOutputStart;
+  croppedOutputStart.Fill(0);
 
   ImageType::RegionType croppedOutputRegion;
-  ImageType::IndexType croppedOutputStart;
-
-  croppedOutputStart.Fill(0);
   croppedOutputRegion.SetIndex(croppedOutputStart);
   croppedOutputRegion.SetSize(hotspotSphere->GetLargestPossibleRegion().GetSize());
 
@@ -1637,15 +1514,10 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   }
 
   // Calculate statistics in Hotspot
-  maxBoundary = itk::NumericTraits<float>::max();
-  minBoundary = itk::NumericTraits<float>::min();
   MinMaxIndex hotspotInformations;
   Statistics hotspotStatistics;
 
-  chronometer.Start("Hotspot statistics");
-  hotspotInformations = CalculateMinMaxIndex(croppedOutputImage.GetPointer(), hotspotSphere.GetPointer(), minBoundary, maxBoundary);
-  chronometer.Stop("Hotspot statistics");
-
+  hotspotInformations = CalculateMinMaxIndex(croppedOutputImage.GetPointer(), hotspotSphere.GetPointer());
 
   // Add offset to cropped indices
   for(int i = 0; i < VImageDimension; ++i)
@@ -1666,193 +1538,8 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
     hotspotStatistics.HotspotPeakIndex[i] = hotspotPeakIndex[i];
   }
 
-  chronometer.Report( std::cout );
   return hotspotStatistics;
 }
-
-template < typename TPixel, unsigned int VImageDimension>
-bool ImageStatisticsCalculator::IsSphereInsideRegion(const itk::Image<TPixel, VImageDimension>  *inputImage,
-                                                      itk::Image<unsigned short, VImageDimension> *sphereImage)
-{
-  typedef itk::Image< TPixel, VImageDimension > ImageType;
-  typedef ImageType::RegionType RegionType;
-  typedef ImageType::SizeType SizeType;
-  typedef ImageType::PointType PointType;
-  typedef ImageType::IndexType IndexType;
-
-  RegionType region(inputImage->GetLargestPossibleRegion().GetIndex(), inputImage->GetLargestPossibleRegion().GetSize() );
-
-  typedef itk::Image<unsigned short, VImageDimension> SphereImageType;
-  typedef SphereImageType::SizeType SphereSizeType;
-  typedef SphereImageType::IndexType SphereIndexType;
-
-  SphereIndexType sphereCenterIndex;
-  SphereSizeType sphereSize = sphereImage->GetLargestPossibleRegion().GetSize();
-
-  double radius = (sphereSize[0] - 1)/2.00;
-  bool isInside = false;
-
-  for(int i = 0; i < VImageDimension; ++i)
-    sphereCenterIndex[i] = (sphereSize[i] -1) / 2;
-
-
-  // If the sphere is inside the given region is checked by 14 points which are on the surface of the sphere
-
-  /**********************************Calculation of sphere-points which are on axis of coordinates****************************/
-
-  // First 6 points
-
-  for(int i = 0; i < VImageDimension; ++i)
-  {
-    for(double j = sphereCenterIndex[i] - radius; j <= sphereCenterIndex[i]+ radius; j += 2*radius)
-    {
-        IndexType sphereIndex;
-        if(i == 0)
-        {
-          sphereIndex[0] = j;
-          sphereIndex[1] = sphereCenterIndex[1];
-          sphereIndex[2] = sphereCenterIndex[2];
-        }
-
-        if(i == 1)
-        {
-          sphereIndex[0] = sphereCenterIndex[0];
-          sphereIndex[1] = j;
-          sphereIndex[2] = sphereCenterIndex[2];
-        }
-
-        if(i == 2)
-        {
-          sphereIndex[0] = sphereCenterIndex[0];
-          sphereIndex[1] = sphereCenterIndex[1];
-          sphereIndex[2] = j;
-        }
-
-        PointType spherePoint;
-        sphereImage->TransformIndexToPhysicalPoint(sphereIndex, spherePoint);
-
-        IndexType regionIndex;
-        inputImage->TransformPhysicalPointToIndex(spherePoint, regionIndex);
-
-        if(region.IsInside(regionIndex) == true) {
-            isInside = true;
-          }
-          else
-          {
-            isInside = false;
-            return isInside;
-          }
-    }
-  }
-  /**********************************Calculation of sphere-coordinates which are not on axis of coordinates************************/
-  IndexType sphereIndex;
-  IndexType regionIndex;
-  PointType spherePoint;
-
-  // First run: summation, second run: subtraction
-   bool addOrSub = false;
-
-   int offsetXDirection = static_cast<int>(radius * sin(45.00 * itk::Math::pi / 180.00) * cos(45.00 * itk::Math::pi / 180.00));
-   int offsetYDirection = static_cast<int>(radius * sin(45.00 * itk::Math::pi / 180.00) * sin(45.00 * itk::Math::pi / 180.00));
-   int offsetZDirection = static_cast<int>(radius * cos(45.00 * itk::Math::pi / 180.00));
-
-   for(int i = 0; i < 2; ++i)
-   {
-    if(addOrSub == false)
-    {
-     // Point 7
-     sphereIndex[0] = sphereCenterIndex[0] + offsetXDirection;
-     sphereIndex[1] = sphereCenterIndex[1] + offsetYDirection;
-     sphereIndex[2] = sphereCenterIndex[2] + offsetZDirection;
-
-     sphereImage->TransformIndexToPhysicalPoint(sphereIndex, spherePoint);
-     inputImage->TransformPhysicalPointToIndex(spherePoint, regionIndex);
-
-     if(region.IsInside(regionIndex) == true) {
-            isInside = true;
-          }
-          else
-          {
-            isInside = false;
-            return isInside;
-          }
-    }
-    else
-    {
-      // Point 8
-     sphereIndex[0] = sphereCenterIndex[0] + offsetXDirection;
-     sphereIndex[1] = sphereCenterIndex[1] - offsetYDirection;
-     sphereIndex[2] = sphereCenterIndex[2] + offsetZDirection;
-
-     sphereImage->TransformIndexToPhysicalPoint(sphereIndex, spherePoint);
-     inputImage->TransformPhysicalPointToIndex(spherePoint, regionIndex);
-
-     if(region.IsInside(regionIndex) == true)
-     {
-        isInside = true;
-      }
-     else
-     {
-       isInside = false;
-       return isInside;
-      }
-    }
-
-    // Point 9/10
-   sphereIndex[2] = sphereCenterIndex[2] - offsetZDirection;
-
-   sphereImage->TransformIndexToPhysicalPoint(sphereIndex, spherePoint);
-   inputImage->TransformPhysicalPointToIndex(spherePoint, regionIndex);
-
-   if(region.IsInside(regionIndex) == true)
-     {
-        isInside = true;
-      }
-     else
-     {
-       isInside = false;
-       return isInside;
-      }
-
-
-    // Point 11/12
-   sphereIndex[0] = sphereCenterIndex[0] - offsetXDirection;
-
-   sphereImage->TransformIndexToPhysicalPoint(sphereIndex, spherePoint);
-   inputImage->TransformPhysicalPointToIndex(spherePoint, regionIndex);
-
-   if(region.IsInside(regionIndex) == true)
-     {
-        isInside = true;
-      }
-     else
-     {
-       isInside = false;
-       return isInside;
-      }
-
-    // Point 13/14
-   sphereIndex[2] = sphereCenterIndex[2] + offsetZDirection;
-
-   sphereImage->TransformIndexToPhysicalPoint(sphereIndex, spherePoint);
-   inputImage->TransformPhysicalPointToIndex(spherePoint, regionIndex);
-
-   if(region.IsInside(regionIndex) == true)
-     {
-        isInside = true;
-      }
-     else
-     {
-       isInside = false;
-       return isInside;
-      }
-
-    addOrSub = true;
-   }
- return isInside;
-}
-
-
 
 template < typename TPixel, unsigned int VImageDimension >
 void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(

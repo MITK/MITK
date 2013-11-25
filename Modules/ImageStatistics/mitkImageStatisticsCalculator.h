@@ -57,7 +57,8 @@ namespace mitk
  * The class also has the possibility to calculate minimum, maximum, mean
  * and their corresponding indicies in the hottest spot in a given ROI / VOI.
  * The size of the hotspot is defined by a sphere with a radius specified by
- * the user.
+ * the user. This procedure is required for the calculation of SUV-statistics
+ * in PET-images for example.
  *
  * Note: currently time-resolved and multi-channel pictures are not properly
  * supported.
@@ -264,11 +265,16 @@ protected:
 
  /** \brief Calculates minimum, maximum, mean value and their
   * corresponding indices in a given ROI. As input the function
-  * needs an image and a mask It returns a MinMaxIndex object. */
+  * needs an image, a mask and for limiting the searched value
+  * minimum- and maximum boundaries. The boundaries are set
+  * to the extent of float by default. It returns a
+  * MinMaxIndex object. */
   template <typename TPixel, unsigned int VImageDimension >
   MinMaxIndex CalculateMinMaxIndex(
     const itk::Image<TPixel, VImageDimension> *inputImage,
-    itk::Image<unsigned short, VImageDimension> *maskImage);
+    itk::Image<unsigned short, VImageDimension> *maskImage,
+    float minBoundary,
+    float maxBoundary);
 
   /** \brief Calculates the hotspot statistics within a given
   * ROI. As input the function needs an image, a mask which
@@ -280,6 +286,16 @@ protected:
     itk::Image<unsigned short, VImageDimension> *maskImage,
     double radiusInMM);
 
+  /** \brief Calculates if a sphere is located within an image.
+   * As input the function needs an image for whose region should
+   * be check if the sphere is inside and an image of the sphere.
+   * To ensure speed only 14 points on the surface of the sphere
+   * are checked: six on the axis of coordinates and eight more.
+   * The function returns true if every point is in the region. */
+  template < typename TPixel, unsigned int VImageDimension>
+  bool IsSphereInsideRegion(
+    const itk::Image<TPixel, VImageDimension>  *inputImage,
+    itk::Image<unsigned short, VImageDimension> *sphereImage);
 
   /** Connection from ITK to VTK */
   template <typename ITK_Exporter, typename VTK_Importer>

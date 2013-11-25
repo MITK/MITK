@@ -89,8 +89,15 @@ void DcmRTV::OnPrescribedDoseChanged(double value)
 
 void DcmRTV::LoadIsoLines()
 {
-  mitk::DataNode::Pointer doseNode = GetDataStorage()->GetNamedNode("abc");
-  doseNode->SetProperty("shader",mitk::ShaderProperty::New("mitkIsoLineShader"));
+  bool result;
+  if(m_selectedNode->GetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),result) && result)
+  {
+    m_selectedNode->SetProperty("shader",mitk::ShaderProperty::New("mitkIsoLineShader"));
+  }
+  else
+  {
+    MITK_WARN << "Selected file has to be a Dose file!";
+  }
 }
 
 //void DcmRTV::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
@@ -260,13 +267,23 @@ void DcmRTV::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
   if (dataNodes.empty())
   {
     m_selectedNode = NULL;
+    m_Controls.btn_isolines->setDisabled(true);
   }
   else
   {
     m_selectedNode = dataNodes[0];
+    bool result;
+    if(m_selectedNode->GetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),result) && result)
+    {
+      m_Controls.btn_isolines->setEnabled(m_selectedNode.IsNotNull());
+    }
+    else
+    {
+      m_Controls.btn_isolines->setDisabled(true);
+    }
   }
-
   m_Controls.btnUpdate->setEnabled(m_selectedNode.IsNotNull());
+//  m_Controls.btn_isolines->setEnabled(m_selectedNode.IsNotNull());
 }
 
 void DcmRTV::UpdateIsoLines(int value)

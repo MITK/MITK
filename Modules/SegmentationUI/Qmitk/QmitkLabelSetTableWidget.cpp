@@ -517,11 +517,12 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
   }
   else
   {
+/*
     QAction* toggleOutlineAction = new QAction(QIcon(":/QmitkExt/outline.png"), "Outline/Filled all", this );
     toggleOutlineAction->setEnabled(true);
     QObject::connect( toggleOutlineAction, SIGNAL( triggered(bool) ), this, SLOT( OnToggleOutline(bool) ) );
     menu->addAction(toggleOutlineAction);
-
+*/
     QAction* renameAction = new QAction(QIcon(":/QmitkExt/renamelabel.png"), "Rename...", this );
     renameAction->setEnabled(true);
     QObject::connect( renameAction, SIGNAL( triggered(bool) ), this, SLOT( OnRenameLabel(bool) ) );

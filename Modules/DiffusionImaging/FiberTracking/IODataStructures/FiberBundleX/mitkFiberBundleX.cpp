@@ -1765,15 +1765,48 @@ void mitk::FiberBundleX::UpdateColorCoding()
 bool mitk::FiberBundleX::Equals(mitk::FiberBundleX* fib)
 {
     if (fib==NULL)
+    {
+        MITK_INFO << "Reference bundle is NULL!";
         return false;
+    }
 
-    mitk::FiberBundleX::Pointer tempFib = this->SubtractBundle(fib);
-    mitk::FiberBundleX::Pointer tempFib2 = fib->SubtractBundle(this);
+    if (m_NumFibers!=fib->GetNumFibers())
+    {
+        MITK_INFO << "Unequal number of fibers!";
+        return false;
+    }
 
-    if (tempFib.IsNull() && tempFib2.IsNull())
-        return true;
+    for (int i=0; i<m_NumFibers; i++)
+    {
+        vtkCell* cell = m_FiberPolyData->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
 
-    return false;
+        vtkCell* cell2 = fib->GetFiberPolyData()->GetCell(i);
+        int numPoints2 = cell2->GetNumberOfPoints();
+        vtkPoints* points2 = cell2->GetPoints();
+
+        if (numPoints2!=numPoints)
+        {
+            MITK_INFO << "Unequal number of points in fiber " << i << "!";
+            return false;
+        }
+
+        for (int j=0; j<numPoints; j++)
+        {
+            double* p1 = points->GetPoint(j);
+            double* p2 = points2->GetPoint(j);
+            if (fabs(p1[0]-p2[0])>0.0001 || fabs(p1[1]-p2[1])>0.0001 || fabs(p1[2]-p2[2])>0.0001)
+            {
+                MITK_INFO << "Unequal points in fiber " << i << " at position " << j << "!";
+                MITK_INFO << "p1: " << p1[0] << ", " << p1[1] << ", " << p1[2];
+                MITK_INFO << "p2: " << p2[0] << ", " << p2[1] << ", " << p2[2];
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */

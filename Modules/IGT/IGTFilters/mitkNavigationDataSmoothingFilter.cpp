@@ -16,13 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataSmoothingFilter.h"
 
-
 mitk::NavigationDataSmoothingFilter::NavigationDataSmoothingFilter()
 : mitk::NavigationDataToNavigationDataFilter()
 {
 m_NumerOfValues = 5;
 }
-
 
 mitk::NavigationDataSmoothingFilter::~NavigationDataSmoothingFilter()
 {
@@ -44,7 +42,7 @@ void mitk::NavigationDataSmoothingFilter::GenerateData()
 
   //generate output
   for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
-    {
+  {
     const mitk::NavigationData* nd = this->GetInput(i);
     assert(nd);
 
@@ -54,7 +52,9 @@ void mitk::NavigationDataSmoothingFilter::GenerateData()
     output->Graft(nd); // copy all information from input to output
 
     output->SetPosition(GetMean(i));
-    }
+
+    output->SetDataValid(nd->IsDataValid());
+  }
 }
 
 void mitk::NavigationDataSmoothingFilter::InitializeLastValuesList()

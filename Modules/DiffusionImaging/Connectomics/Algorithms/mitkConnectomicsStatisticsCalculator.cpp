@@ -167,7 +167,7 @@ void mitk::ConnectomicsStatisticsCalculator::CalculateNumberOfConnectedComponent
 
 void mitk::ConnectomicsStatisticsCalculator::CalculateAverageComponentSize()
 {
-  m_AverageComponentSize = (double) m_NumberOfConnectedComponents / (double) m_NumberOfVertices ;
+  m_AverageComponentSize = (double) m_NumberOfVertices / (double) m_NumberOfConnectedComponents ;
 }
 
 void mitk::ConnectomicsStatisticsCalculator::CalculateLargestComponentSize()

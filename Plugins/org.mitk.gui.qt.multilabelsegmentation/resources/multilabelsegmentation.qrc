@@ -1,16 +1,5 @@
 <RCC>
   <qresource prefix="/multilabelsegmentation" >
     <file>multilabelsegmentation.png</file>
-    <file>LoadLabelSet_48x48.png</file>
-    <file>SaveLabelSet_48x48.png</file>
-    <file>NewLabelSet_48x48.png</file>
-    <file>ImportLabelSet_48x48.png</file>
-    <file>ImportLabeledImage_48x48.png</file>
-    <file>NewLabel_48x48.png</file>
-    <file>DeleteLabelSet_48x48.png</file>
-    <file>AddLayer_48x48.png</file>
-    <file>DeleteLayer_48x48.png</file>
-    <file>PreviousLayer_48x48.png</file>
-    <file>NextLayer_48x48.png</file>
   </qresource>
 </RCC>

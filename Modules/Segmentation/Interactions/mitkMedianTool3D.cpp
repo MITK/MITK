@@ -44,7 +44,8 @@ namespace mitk {
 
 mitk::MedianTool3D::MedianTool3D()
 {
-
+  m_ProgressCommand = mitk::ToolCommand::New();
+  m_Radius = 1;
 }
 
 mitk::MedianTool3D::~MedianTool3D()
@@ -66,6 +67,11 @@ us::ModuleResource mitk::MedianTool3D::GetIconResource() const
 const char* mitk::MedianTool3D::GetName() const
 {
   return "MedianTool3D";
+}
+
+void mitk::MedianTool3D::SetRadius(int value)
+{
+  m_Radius = value;
 }
 
 void mitk::MedianTool3D::Run()
@@ -147,14 +153,12 @@ void mitk::MedianTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* in
   label2image->SetInput( autoCropFilter->GetOutput() );
 
   typename ImageType::SizeType radius;
-  radius.Fill(1);
+  radius.Fill(m_Radius);
 
   typename MedianFilterType::Pointer medianFilter = MedianFilterType::New();
   medianFilter->SetInput( label2image->GetOutput() );
   medianFilter->SetForegroundValue( pixelValue );
   medianFilter->SetRadius( radius );
-
-  m_ProgressCommand = mitk::ToolCommand::New();
 
   if (m_ProgressCommand.IsNotNull())
   {

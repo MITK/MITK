@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkCloseTool3DGUI.h"
 
+#include "QmitkNewSegmentationDialog.h"
 #include <QApplication.h>
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkCloseTool3DGUI, "")
@@ -30,6 +31,7 @@ QmitkCloseTool3DGUI::QmitkCloseTool3DGUI() : QmitkToolGUI()
   connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
   connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
   connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
+  connect( m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
   connect( m_Controls.m_cbShowAdvancedControls, SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedControls(bool)) );
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
@@ -62,6 +64,14 @@ void QmitkCloseTool3DGUI::OnRun()
   if (m_CloseTool3D.IsNotNull())
   {
     m_CloseTool3D->Run();
+  }
+}
+
+void QmitkCloseTool3DGUI::OnKernelSizeChanged(int value)
+{
+  if (m_CloseTool3D.IsNotNull())
+  {
+    m_CloseTool3D->SetRadius(value);
   }
 }
 
@@ -103,4 +113,22 @@ void QmitkCloseTool3DGUI::OnShowAdvancedControls( bool on )
     m_Controls.m_AdvancedControlsWidget->show();
   else
     m_Controls.m_AdvancedControlsWidget->hide();
+}
+
+void QmitkCloseTool3DGUI::OnNewLabel()
+{
+  if (m_CloseTool3D.IsNotNull())
+  {
+    QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this );
+//    dialog->SetSuggestionList( m_OrganColors );
+    dialog->setWindowTitle("New Label");
+
+    int dialogReturnValue = dialog->exec();
+
+    if ( dialogReturnValue == QDialog::Rejected ) return;
+
+    mitk::Color color = dialog->GetColor();
+
+    m_CloseTool3D->CreateNewLabel(dialog->GetSegmentationName().toStdString(), color);
+  }
 }

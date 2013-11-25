@@ -48,6 +48,8 @@ class SegmentationUI_EXPORT QmitkMedianTool3DGUI : public QmitkToolGUI
     void OnCalculateDifference();
     void OnCalculateUnion();
     void OnShowInformation(bool);
+    void OnShowAdvancedControls(bool);
+    void OnKernelSizeChanged(int);
 
   protected:
     QmitkMedianTool3DGUI();

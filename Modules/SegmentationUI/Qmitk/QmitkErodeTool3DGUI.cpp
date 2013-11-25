@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkErodeTool3DGUI.h"
 
+#include "QmitkNewSegmentationDialog.h"
 #include <QApplication.h>
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkErodeTool3DGUI, "")
@@ -29,7 +30,9 @@ QmitkErodeTool3DGUI::QmitkErodeTool3DGUI() : QmitkToolGUI()
   connect( m_Controls.m_pbRun, SIGNAL(clicked()), this, SLOT(OnRun()) );
   connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
   connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
+  connect( m_Controls.m_sbKernelSize, SIGNAL(valueChanged(int)), this, SLOT(OnKernelSizeChanged(int)) );
   connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
+  connect( m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
   connect( m_Controls.m_cbShowAdvancedControls, SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedControls(bool)) );
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
@@ -62,6 +65,14 @@ void QmitkErodeTool3DGUI::OnRun()
   if (m_ErodeTool3D.IsNotNull())
   {
     m_ErodeTool3D->Run();
+  }
+}
+
+void QmitkErodeTool3DGUI::OnKernelSizeChanged(int value)
+{
+  if (m_ErodeTool3D.IsNotNull())
+  {
+    m_ErodeTool3D->SetRadius(value);
   }
 }
 
@@ -103,4 +114,22 @@ void QmitkErodeTool3DGUI::OnShowAdvancedControls( bool on )
     m_Controls.m_AdvancedControlsWidget->show();
   else
     m_Controls.m_AdvancedControlsWidget->hide();
+}
+
+void QmitkErodeTool3DGUI::OnNewLabel()
+{
+  if (m_ErodeTool3D.IsNotNull())
+  {
+    QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this );
+//    dialog->SetSuggestionList( m_OrganColors );
+    dialog->setWindowTitle("New Label");
+
+    int dialogReturnValue = dialog->exec();
+
+    if ( dialogReturnValue == QDialog::Rejected ) return;
+
+    mitk::Color color = dialog->GetColor();
+
+    m_ErodeTool3D->CreateNewLabel(dialog->GetSegmentationName().toStdString(), color);
+  }
 }

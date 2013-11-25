@@ -55,12 +55,14 @@ class Segmentation_EXPORT CloseTool3D : public AutoSegmentationTool
 
     void Run();
 
+    void SetRadius(int);
+
   protected:
 
     CloseTool3D();
     virtual ~CloseTool3D();
 
-    mitk::ToolCommand::Pointer m_ProgressCommand;
+    int m_Radius;
 
     template < typename TPixel, unsigned int VDimension >
     void ITKProcessing( itk::Image< TPixel, VDimension>* input );

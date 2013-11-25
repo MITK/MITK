@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSliceNavigationController.h"
 #include "mitkRenderingManager.h"
 
-mitk::AutoSegmentationTool::AutoSegmentationTool() : Tool("dummy"), m_CurrentTimeStep(0)
+mitk::AutoSegmentationTool::AutoSegmentationTool() : Tool("dummy"), m_CurrentTimeStep(0), m_OverwritePixelValue(0)
 {
 }
 
@@ -73,6 +73,8 @@ void mitk::AutoSegmentationTool::AcceptPreview()
 
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
   assert(workingImage);
+
+  m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
 
   try
   {
@@ -164,8 +166,6 @@ void mitk::AutoSegmentationTool::CalculateUnion()
 
 void mitk::AutoSegmentationTool::Activated()
 {
-  m_CurrentTimeStep = 0; // todo: get the right time step e.g. from GUI
-
   // feedback node and its visualization properties
   m_PreviewNode = mitk::DataNode::New();
   m_PreviewNode->SetName("preview");
@@ -173,8 +173,9 @@ void mitk::AutoSegmentationTool::Activated()
   m_PreviewNode->SetProperty("texture interpolation", BoolProperty::New(false) );
   m_PreviewNode->SetProperty("layer", IntProperty::New(100) );
   m_PreviewNode->SetProperty("binary", BoolProperty::New(true) );
+  m_PreviewNode->SetProperty("outline binary", BoolProperty::New(true) );
   m_PreviewNode->SetProperty("helper object", BoolProperty::New(true) );
-  m_PreviewNode->SetOpacity(0.8);
+  m_PreviewNode->SetOpacity(1.0);
   m_PreviewNode->SetColor(0.0, 1.0, 0.0);
 
   m_ToolManager->GetDataStorage()->Add( m_PreviewNode, m_ToolManager->GetWorkingData(0) );
@@ -183,9 +184,23 @@ void mitk::AutoSegmentationTool::Activated()
 void mitk::AutoSegmentationTool::Deactivated()
 {
   Superclass::Deactivated();
-  m_ToolManager->GetDataStorage()->Remove( this->m_PreviewNode );
+  m_ToolManager->GetDataStorage()->Remove( m_PreviewNode );
   m_PreviewNode = NULL;
+  m_PreviewImage = NULL;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void mitk::AutoSegmentationTool::CreateNewLabel(const std::string& name, const mitk::Color& color)
+{
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  assert(workingNode);
+
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  assert(workingImage);
+
+  workingImage->AddLabel(name,color);
+
+  this->AcceptPreview();
 }
 
 template<typename ImageType>
@@ -215,24 +230,15 @@ void mitk::AutoSegmentationTool::InternalAcceptPreview( ImageType* targetImage, 
   sourceIter.GoToBegin();
   targetIter.GoToBegin();
 
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert (workingNode);
-
-  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-  assert (workingImage);
-
-  int pixelValue = workingImage->GetActiveLabelIndex();
-
   while ( !targetIter.IsAtEnd() )
   {
     int targetValue = static_cast< int >( targetIter.Get() );
     int sourceValue = static_cast< int >( sourceIter.Get() );
-   // bool isLabelLocked = workingImage->GetLabelLocked(targetValue);
-   // isLabelLocked &= (targetValue != pixelValue);
-    if ( (targetValue == pixelValue) || sourceValue )
+
+    if ( (targetValue == m_OverwritePixelValue) || sourceValue )
     {
       if (sourceValue)
-        targetIter.Set( pixelValue );
+        targetIter.Set( m_OverwritePixelValue );
       else
         targetIter.Set( 0 );
     }
@@ -270,20 +276,12 @@ void mitk::AutoSegmentationTool::InternalDifference( ImageType* input )
   sourceIter.GoToBegin();
   targetIter.GoToBegin();
 
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert (workingNode);
-
-  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-  assert (workingImage);
-
-  int pixelValue = workingImage->GetActiveLabelIndex();
-
   while ( !targetIter.IsAtEnd() )
   {
     int targetValue = static_cast< int >( targetIter.Get() );
     int sourceValue = static_cast< int >( sourceIter.Get() );
 
-    if ( (targetValue && (sourceValue != pixelValue)) || ((sourceValue==pixelValue) && !targetValue) )
+    if ( (targetValue && (sourceValue != m_OverwritePixelValue)) || ((sourceValue==m_OverwritePixelValue) && !targetValue) )
       targetIter.Set(1);
     else
       targetIter.Set(0);
@@ -320,13 +318,7 @@ void mitk::AutoSegmentationTool::InternalUnion( ImageType* input )
 
   sourceIter.GoToBegin();
   targetIter.GoToBegin();
-  /*
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert (workingNode);
 
-  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-  assert (workingImage);
-  */
   while ( !targetIter.IsAtEnd() )
   {
     int targetValue = static_cast< int >( targetIter.Get() );

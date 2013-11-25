@@ -55,10 +55,14 @@ class Segmentation_EXPORT ErodeTool3D : public AutoSegmentationTool
 
     void Run();
 
+    void SetRadius(int value);
+
   protected:
 
     ErodeTool3D();
     virtual ~ErodeTool3D();
+
+    int m_Radius;
 
     template < typename TPixel, unsigned int VDimension >
     void InternalProcessing( itk::Image< TPixel, VDimension>* input );

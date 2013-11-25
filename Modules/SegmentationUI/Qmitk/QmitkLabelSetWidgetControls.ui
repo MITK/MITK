@@ -47,8 +47,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources/multilabelsegmentation.qrc">
-          <normaloff>:/multilabelsegmentation/NewLabelSet_48x48.png</normaloff>:/multilabelsegmentation/NewLabelSet_48x48.png</iconset>
+         <iconset resource="../resources/SegmentationUI.qrc">
+          <normaloff>:/Qmitk/NewLabelSet_48x48.png</normaloff>:/Qmitk/NewLabelSet_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -70,8 +70,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources/multilabelsegmentation.qrc">
-          <normaloff>:/multilabelsegmentation/LoadLabelSet_48x48.png</normaloff>:/multilabelsegmentation/LoadLabelSet_48x48.png</iconset>
+         <iconset resource="../resources/SegmentationUI.qrc">
+          <normaloff>:/Qmitk/LoadLabelSet_48x48.png</normaloff>:/Qmitk/LoadLabelSet_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -93,8 +93,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources/multilabelsegmentation.qrc">
-          <normaloff>:/multilabelsegmentation/ImportLabeledImage_48x48.png</normaloff>:/multilabelsegmentation/ImportLabeledImage_48x48.png</iconset>
+         <iconset resource="../resources/SegmentationUI.qrc">
+          <normaloff>:/Qmitk/ImportLabeledImage_48x48.png</normaloff>:/Qmitk/ImportLabeledImage_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -116,8 +116,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources/multilabelsegmentation.qrc">
-          <normaloff>:/multilabelsegmentation/SaveLabelSet_48x48.png</normaloff>:/multilabelsegmentation/SaveLabelSet_48x48.png</iconset>
+         <iconset resource="../resources/SegmentationUI.qrc">
+          <normaloff>:/Qmitk/SaveLabelSet_48x48.png</normaloff>:/Qmitk/SaveLabelSet_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -139,8 +139,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources/multilabelsegmentation.qrc">
-          <normaloff>:/multilabelsegmentation/ImportLabelSet_48x48.png</normaloff>:/multilabelsegmentation/ImportLabelSet_48x48.png</iconset>
+         <iconset resource="../resources/SegmentationUI.qrc">
+          <normaloff>:/Qmitk/ImportLabelSet_48x48.png</normaloff>:/Qmitk/ImportLabelSet_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -162,8 +162,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources/multilabelsegmentation.qrc">
-          <normaloff>:/multilabelsegmentation/DeleteLabelSet_48x48.png</normaloff>:/multilabelsegmentation/DeleteLabelSet_48x48.png</iconset>
+         <iconset resource="../resources/SegmentationUI.qrc">
+          <normaloff>:/Qmitk/DeleteLabelSet_48x48.png</normaloff>:/Qmitk/DeleteLabelSet_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -229,8 +229,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources/multilabelsegmentation.qrc">
-          <normaloff>:/multilabelsegmentation/NewLabel_48x48.png</normaloff>:/multilabelsegmentation/NewLabel_48x48.png</iconset>
+         <iconset resource="../resources/SegmentationUI.qrc">
+          <normaloff>:/Qmitk/NewLabel_48x48.png</normaloff>:/Qmitk/NewLabel_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -268,8 +268,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources/multilabelsegmentation.qrc">
-          <normaloff>:/multilabelsegmentation/AddLayer_48x48.png</normaloff>:/multilabelsegmentation/AddLayer_48x48.png</iconset>
+         <iconset resource="../resources/SegmentationUI.qrc">
+          <normaloff>:/Qmitk/AddLayer_48x48.png</normaloff>:/Qmitk/AddLayer_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -291,8 +291,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources/multilabelsegmentation.qrc">
-          <normaloff>:/multilabelsegmentation/DeleteLayer_48x48.png</normaloff>:/multilabelsegmentation/DeleteLayer_48x48.png</iconset>
+         <iconset resource="../resources/SegmentationUI.qrc">
+          <normaloff>:/Qmitk/DeleteLayer_48x48.png</normaloff>:/Qmitk/DeleteLayer_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -314,8 +314,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources/multilabelsegmentation.qrc">
-          <normaloff>:/multilabelsegmentation/PreviousLayer_48x48.png</normaloff>:/multilabelsegmentation/PreviousLayer_48x48.png</iconset>
+         <iconset resource="../resources/SegmentationUI.qrc">
+          <normaloff>:/Qmitk/PreviousLayer_48x48.png</normaloff>:/Qmitk/PreviousLayer_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -332,13 +332,13 @@
        <widget class="QComboBox" name="m_cbActiveLayer">
         <property name="minimumSize">
          <size>
-          <width>35</width>
+          <width>50</width>
           <height>30</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>35</width>
+          <width>50</width>
           <height>30</height>
          </size>
         </property>
@@ -363,8 +363,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources/multilabelsegmentation.qrc">
-          <normaloff>:/multilabelsegmentation/NextLayer_48x48.png</normaloff>:/multilabelsegmentation/NextLayer_48x48.png</iconset>
+         <iconset resource="../resources/SegmentationUI.qrc">
+          <normaloff>:/Qmitk/NextLayer_48x48.png</normaloff>:/Qmitk/NextLayer_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -414,7 +414,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../resources/multilabelsegmentation.qrc"/>
+  <include location="../resources/SegmentationUI.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -46,6 +46,7 @@ namespace mitk {
 mitk::DilateTool3D::DilateTool3D()
 {
   m_ProgressCommand = mitk::ToolCommand::New();
+  m_Radius = 1;
 }
 
 mitk::DilateTool3D::~DilateTool3D()
@@ -67,6 +68,11 @@ us::ModuleResource mitk::DilateTool3D::GetIconResource() const
 const char* mitk::DilateTool3D::GetName() const
 {
   return "DilateTool3D";
+}
+
+void mitk::DilateTool3D::SetRadius(int value)
+{
+  m_Radius = value;
 }
 
 void mitk::DilateTool3D::Run()
@@ -147,7 +153,7 @@ void mitk::DilateTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* in
   label2image->SetInput( autoCropFilter->GetOutput() );
 
   BallType ball;
-  ball.SetRadius(1.0);
+  ball.SetRadius(m_Radius);
   ball.CreateStructuringElement();
 
   typename DilateFilterType::Pointer dilateFilter = DilateFilterType::New();

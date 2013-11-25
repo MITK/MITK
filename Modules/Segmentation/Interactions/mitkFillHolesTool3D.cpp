@@ -84,6 +84,10 @@ void mitk::FillHolesTool3D::Run()
 
   CurrentlyBusy.Send(true);
 
+  m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
+  m_PreviewNode->SetProperty("outline binary", BoolProperty::New(false) );
+  m_PreviewNode->SetOpacity(0.6);
+
   try
   {
     AccessByItk(workingImage, InternalProcessing);
@@ -120,14 +124,12 @@ void mitk::FillHolesTool3D::InternalProcessing( itk::Image< TPixel, VDimension>*
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
   assert(workingImage);
 
-  int pixelValue = workingImage->GetActiveLabelIndex();
-
   typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
   thresholdFilter->SetInput(input);
-  thresholdFilter->SetLowerThreshold(pixelValue);
-  thresholdFilter->SetUpperThreshold(pixelValue);
+  thresholdFilter->SetLowerThreshold(m_OverwritePixelValue);
+  thresholdFilter->SetUpperThreshold(m_OverwritePixelValue);
   thresholdFilter->SetOutsideValue(0);
-  thresholdFilter->SetInsideValue(pixelValue);
+  thresholdFilter->SetInsideValue(1);
 
   typename Image2LabelMapType::Pointer image2label = Image2LabelMapType::New();
   image2label->SetInput(thresholdFilter->GetOutput());
@@ -147,7 +149,7 @@ void mitk::FillHolesTool3D::InternalProcessing( itk::Image< TPixel, VDimension>*
 
   typename FillHolesFilterType::Pointer fillHolesFilter = FillHolesFilterType::New();
   fillHolesFilter->SetInput(label2image->GetOutput());
-  fillHolesFilter->SetForegroundValue(pixelValue);
+  fillHolesFilter->SetForegroundValue(1);
 
   if (m_ProgressCommand.IsNotNull())
   {

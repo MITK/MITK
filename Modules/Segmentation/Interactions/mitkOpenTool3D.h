@@ -55,6 +55,8 @@ class Segmentation_EXPORT OpenTool3D : public AutoSegmentationTool
 
     void Run();
 
+    void SetRadius(int);
+
   protected:
 
     OpenTool3D();
@@ -64,6 +66,8 @@ class Segmentation_EXPORT OpenTool3D : public AutoSegmentationTool
 
     template < typename TPixel, unsigned int VDimension >
     void ITKProcessing( itk::Image< TPixel, VDimension>* input );
+
+    int m_Radius;
 };
 
 } // namespace

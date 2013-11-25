@@ -47,6 +47,7 @@ namespace mitk {
 mitk::ErodeTool3D::ErodeTool3D()
 {
   m_ProgressCommand = mitk::ToolCommand::New();
+  m_Radius = 1;
 }
 
 mitk::ErodeTool3D::~ErodeTool3D()
@@ -71,6 +72,11 @@ const char* mitk::ErodeTool3D::GetName() const
   return "ErodeTool3D";
 }
 
+void mitk::ErodeTool3D::SetRadius(int value)
+{
+  m_Radius = value;
+}
+
 void mitk::ErodeTool3D::Run()
 {
 //  this->InitializeUndoController();
@@ -80,6 +86,8 @@ void mitk::ErodeTool3D::Run()
 
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
   assert(workingImage);
+
+  m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
 
   // todo: use it later
   unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
@@ -123,14 +131,12 @@ void mitk::ErodeTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* inp
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
   assert(workingImage);
 
-  int pixelValue = workingImage->GetActiveLabelIndex();
-
   typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
   thresholdFilter->SetInput(input);
-  thresholdFilter->SetLowerThreshold(pixelValue);
-  thresholdFilter->SetUpperThreshold(pixelValue);
+  thresholdFilter->SetLowerThreshold(m_OverwritePixelValue);
+  thresholdFilter->SetUpperThreshold(m_OverwritePixelValue);
   thresholdFilter->SetOutsideValue(0);
-  thresholdFilter->SetInsideValue(pixelValue);
+  thresholdFilter->SetInsideValue(1);
 
   typename Image2LabelMapType::Pointer image2label = Image2LabelMapType::New();
   image2label->SetInput(thresholdFilter->GetOutput());
@@ -149,13 +155,13 @@ void mitk::ErodeTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* inp
   label2image->SetInput( autoCropFilter->GetOutput() );
 
   BallType ball;
-  ball.SetRadius(1.0);
+  ball.SetRadius(m_Radius);
   ball.CreateStructuringElement();
 
   typename ErodeFilterType::Pointer erodeFilter = ErodeFilterType::New();
   erodeFilter->SetKernel(ball);
   erodeFilter->SetInput(label2image->GetOutput());
-  erodeFilter->SetErodeValue(pixelValue);
+  erodeFilter->SetErodeValue(1);
 
   if (m_ProgressCommand.IsNotNull())
   {

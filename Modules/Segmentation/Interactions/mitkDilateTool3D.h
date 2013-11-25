@@ -55,10 +55,14 @@ class Segmentation_EXPORT DilateTool3D : public AutoSegmentationTool
 
     void Run();
 
+    void SetRadius(int);
+
   protected:
 
     DilateTool3D();
     virtual ~DilateTool3D();
+
+    int m_Radius;
 
     template < typename TPixel, unsigned int VDimension >
     void InternalProcessing( itk::Image< TPixel, VDimension>* input );

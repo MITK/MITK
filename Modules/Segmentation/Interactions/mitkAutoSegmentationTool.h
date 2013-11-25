@@ -47,6 +47,9 @@ class Segmentation_EXPORT AutoSegmentationTool : public Tool
     /// \brief Replaces the preview image by the union between the active label and the current preview image.
     virtual void CalculateUnion();
 
+    /// \brief Creates a new label out of the the current preview image.
+    virtual void CreateNewLabel(const std::string& name, const mitk::Color& color);
+
   protected:
 
     /// Operation base class, which holds pointers to a node of the data tree (mitk::DataNode)
@@ -86,6 +89,7 @@ class Segmentation_EXPORT AutoSegmentationTool : public Tool
     mitk::SlicedData::RegionType m_RequestedRegion;
 
     int m_CurrentTimeStep;
+    int m_OverwritePixelValue;
 
     DataNode::Pointer  m_PreviewNode; //holds the result as a preview image
     Image::Pointer     m_PreviewImage;

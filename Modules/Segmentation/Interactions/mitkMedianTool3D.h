@@ -54,10 +54,14 @@ class Segmentation_EXPORT MedianTool3D : public AutoSegmentationTool
 
     void Run();
 
+    void SetRadius(int);
+
   protected:
 
     MedianTool3D();
     virtual ~MedianTool3D();
+
+    int m_Radius;
 
     template < typename TPixel, unsigned int VDimension >
     void InternalProcessing( itk::Image< TPixel, VDimension>* input );

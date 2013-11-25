@@ -31,17 +31,11 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
 {
     MITK_TEST_BEGIN("mitkStreamlineTrackingTest");
 
-    MITK_INFO << "BLA1";
-
     MITK_TEST_CONDITION_REQUIRED(argc>3,"check for input data")
-
-    MITK_INFO << "BLA2";
 
     string dtiFileName = argv[1];
     string maskFileName = argv[2];
     string referenceFileName = argv[3];
-
-    MITK_INFO << "BLA3";
 
     MITK_INFO << "DTI file: " << dtiFileName;
     MITK_INFO << "Mask file: " << maskFileName;
@@ -109,10 +103,10 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
 
         vtkSmartPointer<vtkPolyData> fiberBundle = filter->GetFiberPolyData();
         mitk::FiberBundleX::Pointer fib1 = mitk::FiberBundleX::New(fiberBundle);
-        MITK_TEST_CONDITION_REQUIRED(fib1.IsNotNull(), "Check if reference tractogram is not null.");
 
         infile = mitk::BaseDataIO::LoadBaseDataFromFile( referenceFileName, s1, s2, false );
         mitk::FiberBundleX::Pointer fib2 = dynamic_cast<mitk::FiberBundleX*>(infile.at(0).GetPointer());
+        MITK_TEST_CONDITION_REQUIRED(fib2.IsNotNull(), "Check if reference tractogram is not null.");
         MITK_TEST_CONDITION_REQUIRED(fib1->Equals(fib2), "Check if tractograms are equal.");
     }
     catch (itk::ExceptionObject e)

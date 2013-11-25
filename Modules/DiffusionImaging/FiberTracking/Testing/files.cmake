@@ -3,6 +3,7 @@ SET(MODULE_CUSTOM_TESTS
   mitkFiberBundleXTest.cpp
   mitkGibbsTrackingTest.cpp
   mitkStreamlineTrackingTest.cpp
+  mitkPeakExtractionTest.cpp
 )
 
 

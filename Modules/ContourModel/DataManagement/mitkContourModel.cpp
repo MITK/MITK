@@ -78,7 +78,7 @@ void mitk::ContourModel::AddVertex(const VertexType* vertex, int timestep)
 {
   if(vertex != NULL)
   {
-    this->AddVertex(const_cast<mitk::ContourModel::VertexType*>(vertex), timestep);
+    this->m_ContourSeries[timestep]->AddVertex(*const_cast<VertexType*>(vertex));
   }
 }
 

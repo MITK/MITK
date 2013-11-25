@@ -210,13 +210,13 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     {
       //generate contours/outlines
       localStorage->m_OutlinePolyData = this->CreateOutlinePolyData( renderer, localStorage->m_ReslicedImageVector[lidx], activeLabel );
-
+/*
       bool contourAll = false;
       node->GetBoolProperty( "labelset.contour.all", contourAll, renderer );
 
       bool contourActive = false;
       node->GetBoolProperty( "labelset.contour.active", contourActive, renderer );
-  /*
+
       if ( contourAll || contourActive )
       {
         int activeLayer = image->GetActiveLayer();
@@ -227,7 +227,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
         localStorage->m_LabelOutline->Update();
         localStorage->m_ReslicedImage = localStorage->m_LabelOutline->GetOutput();
       }
-  */
+*/
     }
 
     const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
@@ -255,7 +255,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     node->GetFloatProperty( "labelset.contour.width", contourWidth, renderer );
 
     localStorage->m_OutlineActor->GetProperty()->SetLineWidth(contourWidth);
-    localStorage->m_OutlineShadowActor->GetProperty()->SetLineWidth(contourWidth * 2.5);
+    localStorage->m_OutlineShadowActor->GetProperty()->SetLineWidth(contourWidth * 1.5);
 
     localStorage->m_OutlineActor->SetVisibility(true);
     localStorage->m_OutlineShadowActor->SetVisibility(true);
@@ -296,8 +296,8 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   localStorage->m_OutlineShadowActor->GetProperty()->SetOpacity(opacity);
 
   const mitk::Color& color = image->GetActiveLabelColor();
-  localStorage->m_OutlineActor->GetProperty()->SetColor(0,0,0);//color.GetRed(), color.GetGreen(), color.GetBlue());
-  localStorage->m_OutlineShadowActor->GetProperty()->SetColor(1,1,1);
+  localStorage->m_OutlineActor->GetProperty()->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
+  localStorage->m_OutlineShadowActor->GetProperty()->SetColor(0,0,0);
 }
 
 bool mitk::LabelSetImageVtkMapper2D::RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry )
@@ -475,8 +475,8 @@ mitk::LabelSetImageVtkMapper2D::CreateOutlinePolyData(mitk::BaseRenderer* render
 void mitk::LabelSetImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer, const mitk::Color& color )
 {
   LocalStorage* localStorage = this->GetLocalStorage( renderer );
-  localStorage->m_OutlineActor->GetProperty()->SetColor(0,0,0);//(color.GetRed(), color.GetGreen(), color.GetBlue());
-  localStorage->m_OutlineShadowActor->GetProperty()->SetColor(1,1,1);
+  localStorage->m_OutlineActor->GetProperty()->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
+  localStorage->m_OutlineShadowActor->GetProperty()->SetColor(0,0,0);
 }
 
 void mitk::LabelSetImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer, int layer )

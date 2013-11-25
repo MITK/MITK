@@ -1,1 +1,3 @@
 MITK_CREATE_MODULE_TESTS()
+
+mitkAddCustomModuleTest(mitkConnectomicsNetworkCreationTest mitkConnectomicsNetworkCreationTest ${MITK_DATA_DIR}/DiffusionImaging/Connectomics/fiberBundle.fib ${MITK_DATA_DIR}/DiffusionImaging/Connectomics/parcellation.nrrd ${MITK_DATA_DIR}/DiffusionImaging/Connectomics/generated.cnf ${MITK_DATA_DIR}/DiffusionImaging/Connectomics/reference.cnf)

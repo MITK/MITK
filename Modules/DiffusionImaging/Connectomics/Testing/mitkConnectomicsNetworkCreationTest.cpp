@@ -92,7 +92,7 @@ static void CreateNetworkFromFibersAndParcellation(std::string fiberFilename, st
       mitk::BaseDataIO::LoadBaseDataFromFile( referenceFilename, s1, s2, false );
     if( referenceFile.empty() )
     {
-      std::string errorMessage = "Reference Fibers at " + referenceFilename + " could not be read. Aborting.";
+      std::string errorMessage = "Reference Network at " + referenceFilename + " could not be read. Aborting.";
       MITK_TEST_CONDITION_REQUIRED( false, errorMessage);
     }
     mitk::BaseData* referenceBaseData = referenceFile.at(0);

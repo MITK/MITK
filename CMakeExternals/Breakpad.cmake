@@ -21,10 +21,10 @@ if(MITK_USE_Breakpad)
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
-      #URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/BREAKPAD_${revision_tag}.tar.gz
-      #URL_MD5 70fadbc62ec5c7d83a6e672fd5be36b1
-      SVN_REPOSITORY http://google-breakpad.googlecode.com/svn/trunk
-      SVN_REVISION -r ${revision_tag}
+      URL http://www.mint-medical.de/downloads/Breakpad_${revision_tag}.tar.gz
+      URL_MD5 36fd68dc0e21f049417a4969b220ee89
+      #SVN_REPOSITORY http://google-breakpad.googlecode.com/svn/trunk
+      #SVN_REVISION -r ${revision_tag}
       PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/CMakeExternals/build-breakpad.cmake <SOURCE_DIR>/CMakeLists.txt
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""

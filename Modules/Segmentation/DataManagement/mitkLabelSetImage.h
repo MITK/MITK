@@ -382,7 +382,7 @@ protected:
   void ReorderLabelProcessing( ImageType* input, int index, int layer);
 
   template < typename ImageType >
-  void MergeLabelsProcessing( ImageType* input, int index);
+  void MergeLabelProcessing( ImageType* input, int pixelValue, int index);
 
   template < typename ImageType >
   void ConcatenateProcessing( ImageType* input, mitk::LabelSetImage* other);

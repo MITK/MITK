@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkKeepNConnectedRegionsTool3DGUI.h"
 
+#include <QmitkNewSegmentationDialog.h>
 #include <QApplication.h>
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkKeepNConnectedRegionsTool3DGUI, "")
@@ -31,6 +32,7 @@ QmitkKeepNConnectedRegionsTool3DGUI::QmitkKeepNConnectedRegionsTool3DGUI() : Qmi
   connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
   connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
   connect( m_Controls.m_sbConnectedRegionsToKeep, SIGNAL(valueChanged(int)), this, SLOT(OnNumberOfConnectedRegionsToKeepChanged(int)) );
+  connect( m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
   connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
   connect( m_Controls.m_cbShowAdvancedControls, SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedControls(bool)) );
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
@@ -63,6 +65,7 @@ void QmitkKeepNConnectedRegionsTool3DGUI::OnRun()
 {
   if (m_KeepNConnectedRegionsTool3D.IsNotNull())
   {
+    m_KeepNConnectedRegionsTool3D->SetNumberOfConnectedRegionsToKeep(m_Controls.m_sbConnectedRegionsToKeep->value());
     m_KeepNConnectedRegionsTool3D->Run();
   }
 }
@@ -129,4 +132,19 @@ void QmitkKeepNConnectedRegionsTool3DGUI::OnShowAdvancedControls( bool on )
     m_Controls.m_AdvancedControlsWidget->show();
   else
     m_Controls.m_AdvancedControlsWidget->hide();
+}
+
+void QmitkKeepNConnectedRegionsTool3DGUI::OnNewLabel()
+{
+  if (m_KeepNConnectedRegionsTool3D.IsNotNull())
+  {
+    QmitkNewSegmentationDialog dialog(this);
+//    dialog->SetSuggestionList( m_OrganColors );
+    dialog.setWindowTitle("New Label");
+    int dialogReturnValue = dialog.exec();
+    if ( dialogReturnValue == QDialog::Rejected ) return;
+    mitk::Color color = dialog.GetColor();
+    std::string name = dialog.GetSegmentationName().toStdString();
+    m_KeepNConnectedRegionsTool3D->CreateNewLabel(name, color);
+  }
 }

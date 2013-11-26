@@ -65,6 +65,7 @@ void QmitkCloseTool3DGUI::OnRun()
 {
   if (m_CloseTool3D.IsNotNull())
   {
+    m_CloseTool3D->SetRadius(m_Controls.m_sbKernelSize->value());
     m_CloseTool3D->Run();
   }
 }
@@ -129,16 +130,13 @@ void QmitkCloseTool3DGUI::OnNewLabel()
 {
   if (m_CloseTool3D.IsNotNull())
   {
-    QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this );
+    QmitkNewSegmentationDialog dialog(this);
 //    dialog->SetSuggestionList( m_OrganColors );
-    dialog->setWindowTitle("New Label");
-
-    int dialogReturnValue = dialog->exec();
-
+    dialog.setWindowTitle("New Label");
+    int dialogReturnValue = dialog.exec();
     if ( dialogReturnValue == QDialog::Rejected ) return;
-
-    mitk::Color color = dialog->GetColor();
-
-    m_CloseTool3D->CreateNewLabel(dialog->GetSegmentationName().toStdString(), color);
+    mitk::Color color = dialog.GetColor();
+    std::string name = dialog.GetSegmentationName().toStdString();
+    m_CloseTool3D->CreateNewLabel(name, color);
   }
 }

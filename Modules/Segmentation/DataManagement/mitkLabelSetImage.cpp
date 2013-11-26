@@ -528,9 +528,12 @@ void mitk::LabelSetImage::MergeLabels(std::vector<int>& indexes, int index, int 
 {
   if (layer < 0) layer = m_ActiveLayer;
   this->SetActiveLabel(index, false, layer);
+  // const mitk::Label* activeLabel = m_LabelSetContainer[m_ActiveLayer]->GetActiveLabel();
+  int pixelValue = this->GetActiveLabelIndex();
+
   for (int idx=0; idx<indexes.size(); idx++)
   {
-    AccessByItk_1(this, MergeLabelsProcessing, indexes[idx]);
+    AccessByItk_2(this, MergeLabelProcessing, pixelValue, indexes[idx]);
   }
   RemoveLabelEvent.Send();
 }
@@ -538,7 +541,8 @@ void mitk::LabelSetImage::MergeLabels(std::vector<int>& indexes, int index, int 
 void mitk::LabelSetImage::MergeLabel(int index, int layer)
 {
   if (layer < 0) layer = m_ActiveLayer;
-  AccessByItk_1(this, MergeLabelsProcessing, index);
+  int pixelValue = this->GetActiveLabelIndex();
+  AccessByItk_2(this, MergeLabelProcessing, pixelValue, index);
   RemoveLabelEvent.Send();
 }
 
@@ -1216,11 +1220,9 @@ void mitk::LabelSetImage::ReorderLabelProcessing(ImageType* itkImage, int index,
 }
 
 template < typename ImageType >
-void mitk::LabelSetImage::MergeLabelsProcessing(ImageType* itkImage, int index)
+void mitk::LabelSetImage::MergeLabelProcessing(ImageType* itkImage, int pixelValue, int index)
 {
  typedef itk::ImageRegionIterator< ImageType > IteratorType;
-
- const mitk::Label* activeLabel = m_LabelSetContainer[m_ActiveLayer]->GetActiveLabel();
 
  IteratorType iter( itkImage, itkImage->GetLargestPossibleRegion() );
  iter.GoToBegin();
@@ -1229,7 +1231,7 @@ void mitk::LabelSetImage::MergeLabelsProcessing(ImageType* itkImage, int index)
  {
    if (static_cast<int>(iter.Get()) == index)
    {
-     iter.Set( activeLabel->GetIndex() );
+     iter.Set( pixelValue );
    }
    ++iter;
  }

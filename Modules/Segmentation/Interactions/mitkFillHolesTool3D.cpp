@@ -169,12 +169,33 @@ void mitk::FillHolesTool3D::InternalProcessing( itk::Image< TPixel, VDimension>*
   typename ImageType::Pointer result = fillHolesFilter->GetOutput();
   result->DisconnectPipeline();
 
-  m_PreviewImage = mitk::Image::New();
-  m_PreviewImage->InitializeByItk(result.GetPointer());
-  m_PreviewImage->SetChannel(result->GetBufferPointer());
+  // fix intersections with other labels
+  typedef itk::ImageRegionConstIterator< ImageType > InputIteratorType;
+  typedef itk::ImageRegionIterator< ImageType >      ResultIteratorType;
 
   typename ImageType::RegionType cropRegion;
   cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();
+
+  typename InputIteratorType  inputIter( input, cropRegion );
+  typename ResultIteratorType resultIter( result, result->GetLargestPossibleRegion() );
+
+  inputIter.GoToBegin();
+  resultIter.GoToBegin();
+
+  while ( !resultIter.IsAtEnd() )
+  {
+    int inputValue = static_cast<int>( inputIter.Get() );
+
+    if ( (inputValue != m_OverwritePixelValue) && workingImage->GetLabelLocked( inputValue ) )
+      resultIter.Set(0);
+
+    ++inputIter;
+    ++resultIter;
+  }
+
+  m_PreviewImage = mitk::Image::New();
+  m_PreviewImage->InitializeByItk(result.GetPointer());
+  m_PreviewImage->SetChannel(result->GetBufferPointer());
 
   const typename ImageType::SizeType& cropSize = cropRegion.GetSize();
   const typename ImageType::IndexType& cropIndex = cropRegion.GetIndex();

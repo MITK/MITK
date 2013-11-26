@@ -65,6 +65,7 @@ void QmitkOpenTool3DGUI::OnRun()
 {
   if (m_OpenTool3D.IsNotNull())
   {
+    m_OpenTool3D->SetRadius(m_Controls.m_sbKernelSize->value());
     m_OpenTool3D->Run();
   }
 }

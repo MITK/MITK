@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkMedianTool3DGUI.h"
 
+#include <QmitkNewSegmentationDialog.h>
 #include <QApplication.h>
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkMedianTool3DGUI, "")
@@ -33,6 +34,7 @@ QmitkMedianTool3DGUI::QmitkMedianTool3DGUI() : QmitkToolGUI()
   connect( m_Controls.m_pbUnion, SIGNAL(clicked()), this, SLOT(OnCalculateUnion()) );
   connect( m_Controls.m_sbKernelSize, SIGNAL(valueChanged(int)), this, SLOT(OnKernelSizeChanged(int)) );
   connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
+  connect( m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
   connect( m_Controls.m_cbShowAdvancedControls, SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedControls(bool)) );
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
@@ -64,6 +66,7 @@ void QmitkMedianTool3DGUI::OnRun()
 {
   if (m_MedianTool3D.IsNotNull())
   {
+    m_MedianTool3D->SetRadius(m_Controls.m_sbKernelSize->value());
     m_MedianTool3D->Run();
   }
 }
@@ -130,4 +133,19 @@ void QmitkMedianTool3DGUI::OnShowAdvancedControls( bool on )
     m_Controls.m_AdvancedControlsWidget->show();
   else
     m_Controls.m_AdvancedControlsWidget->hide();
+}
+
+void QmitkMedianTool3DGUI::OnNewLabel()
+{
+  if (m_MedianTool3D.IsNotNull())
+  {
+    QmitkNewSegmentationDialog dialog(this);
+//    dialog->SetSuggestionList( m_OrganColors );
+    dialog.setWindowTitle("New Label");
+    int dialogReturnValue = dialog.exec();
+    if ( dialogReturnValue == QDialog::Rejected ) return;
+    mitk::Color color = dialog.GetColor();
+    std::string name = dialog.GetSegmentationName().toStdString();
+    m_MedianTool3D->CreateNewLabel(name, color);
+  }
 }

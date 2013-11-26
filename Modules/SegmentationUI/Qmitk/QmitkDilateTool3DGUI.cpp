@@ -65,6 +65,7 @@ void QmitkDilateTool3DGUI::OnRun()
 {
   if (m_DilateTool3D.IsNotNull())
   {
+    m_DilateTool3D->SetRadius(m_Controls.m_sbKernelSize->value());
     m_DilateTool3D->Run();
   }
 }
@@ -97,17 +98,14 @@ void QmitkDilateTool3DGUI::OnNewLabel()
 {
   if (m_DilateTool3D.IsNotNull())
   {
-    QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this );
+    QmitkNewSegmentationDialog dialog(this);
 //    dialog->SetSuggestionList( m_OrganColors );
-    dialog->setWindowTitle("New Label");
-
-    int dialogReturnValue = dialog->exec();
-
+    dialog.setWindowTitle("New Label");
+    int dialogReturnValue = dialog.exec();
     if ( dialogReturnValue == QDialog::Rejected ) return;
-
-    mitk::Color color = dialog->GetColor();
-
-    m_DilateTool3D->CreateNewLabel(dialog->GetSegmentationName().toStdString(), color);
+    mitk::Color color = dialog.GetColor();
+    std::string name = dialog.GetSegmentationName().toStdString();
+    m_DilateTool3D->CreateNewLabel(name, color);
   }
 }
 

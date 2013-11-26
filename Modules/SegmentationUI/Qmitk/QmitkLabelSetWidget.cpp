@@ -164,17 +164,7 @@ void QmitkLabelSetWidget::OnMergeLabel(int index)
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
   assert(workingImage);
 
-  QString question = "This operation will remove ";
-  question.append(QString::fromStdString(workingImage->GetLabelName(index)));
-  question.append("\n Are you ok with that?");
-
-  QMessageBox::StandardButton answerButton = QMessageBox::question(this, "Merge label...",
-     question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
-
-  if (answerButton == QMessageBox::Yes)
-  {
-    workingImage->MergeLabel(dialog.GetLabelIndex());
-  }
+  workingImage->MergeLabel(dialog.GetLabelIndex());
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

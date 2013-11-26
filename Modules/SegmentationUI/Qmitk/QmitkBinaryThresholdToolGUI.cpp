@@ -17,61 +17,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkBinaryThresholdToolGUI.h"
 #include "QmitkNewSegmentationDialog.h"
 
-#include <qlabel.h>
-#include <qslider.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
+#include <QmitkNewSegmentationDialog.h>
 #include <QApplication.h>
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkBinaryThresholdToolGUI, "")
 
 QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
 :QmitkToolGUI(),
- m_Slider(NULL),
- m_Spinner(NULL),
  m_isFloat(false),
  m_RangeMin(0),
  m_RangeMax(0),
  m_ChangingSlider(false),
  m_ChangingSpinner(false)
 {
-  // create the visible widgets
-  QBoxLayout* mainLayout = new QVBoxLayout(this);
+  m_Controls.setupUi(this);
+  m_Controls.m_InformationWidget->hide();
+  m_Controls.m_AdvancedControlsWidget->hide();
 
-  QLabel* label = new QLabel( "Threshold :", this );
-  QFont f = label->font();
-  f.setBold(false);
-  label->setFont( f );
-  mainLayout->addWidget(label);
+  connect( m_Controls.m_Spinner, SIGNAL(valueChanged(double)), this, SLOT(OnSpinnerValueChanged()) );
+  connect( m_Controls.m_Slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
 
-
-  QBoxLayout* layout = new QHBoxLayout();
-
-  m_Spinner = new QDoubleSpinBox();
-  m_Spinner->setMaximum(20);
-  m_Spinner->setMinimum(5);
-  m_Spinner->setValue(1);
-
-  connect(m_Spinner, SIGNAL(valueChanged(double)), this, SLOT(OnSpinnerValueChanged()) );
-  layout->addWidget(m_Spinner);
-
-  //m_Slider = new QSlider( 5, 20, 1, 1, Qt::Horizontal, this );
-  m_Slider = new QSlider( Qt::Horizontal, this );
-  m_Slider->setMinimum(5);
-  m_Slider->setMaximum(20);
-  m_Slider->setPageStep(1);
-  m_Slider->setValue(1);
-  connect( m_Slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
-  layout->addWidget( m_Slider );
-
-  mainLayout->addLayout(layout);
-
-  QPushButton* okButton = new QPushButton("Accept", this);
-  connect( okButton, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()));
-  okButton->setFont( f );
-  mainLayout->addWidget( okButton );
-
- connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
+//  connect( m_Controls.m_pbRun, SIGNAL(clicked()), this, SLOT(OnRun()) );
+  connect( m_Controls.m_pbCancel, SIGNAL(clicked()), this, SLOT(OnCancel()) );
+  connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
+  connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
+  connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
+  connect( m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
+  connect( m_Controls.m_cbShowAdvancedControls, SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedControls(bool)) );
+  connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
 
 QmitkBinaryThresholdToolGUI::~QmitkBinaryThresholdToolGUI()
@@ -108,11 +81,11 @@ void QmitkBinaryThresholdToolGUI::OnSpinnerValueChanged()
   if (m_BinaryThresholdTool.IsNotNull())
   {
     m_ChangingSpinner = true;
-    double doubleVal = m_Spinner->value();
+    double doubleVal = m_Controls.m_Spinner->value();
     int intVal = this->DoubleToSliderInt(doubleVal);
     m_BinaryThresholdTool->SetThresholdValue( doubleVal );
     if (m_ChangingSlider == false)
-       m_Slider->setValue( intVal );
+       m_Controls.m_Slider->setValue( intVal );
     m_ChangingSpinner = false;
   }
 }
@@ -124,8 +97,16 @@ void QmitkBinaryThresholdToolGUI::OnSliderValueChanged(int value)
      m_ChangingSlider = true;
     double doubleVal = SliderIntToDouble(value);
     if (m_ChangingSpinner == false)
-      m_Spinner->setValue(doubleVal);
+      m_Controls.m_Spinner->setValue(doubleVal);
     m_ChangingSlider = false;
+  }
+}
+
+void QmitkBinaryThresholdToolGUI::OnCancel()
+{
+  if (m_BinaryThresholdTool.IsNotNull())
+  {
+    m_BinaryThresholdTool->Cancel();
   }
 }
 
@@ -137,33 +118,41 @@ void QmitkBinaryThresholdToolGUI::OnAcceptPreview()
   }
 }
 
+void QmitkBinaryThresholdToolGUI::OnCalculateDifference()
+{
+  if (m_BinaryThresholdTool.IsNotNull())
+  {
+    m_BinaryThresholdTool->CalculateDifference();
+  }
+}
+
 void QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat)
 {
   m_isFloat = isFloat;
   m_RangeMin = lower;
   m_RangeMax = upper;
 
-  m_Spinner->setRange(lower, upper);
+  m_Controls.m_Spinner->setRange(lower, upper);
   if (!m_isFloat)
   {
-    m_Slider->setRange(int(lower), int(upper));
-    m_Spinner->setDecimals(0);
-    m_Spinner->setSingleStep(1);
+    m_Controls.m_Slider->setRange(int(lower), int(upper));
+    m_Controls.m_Spinner->setDecimals(0);
+    m_Controls.m_Spinner->setSingleStep(1);
   }
   else
   {
-    m_Slider->setRange(0, 99);
-    m_Spinner->setDecimals(2);
+    m_Controls.m_Slider->setRange(0, 99);
+    m_Controls.m_Spinner->setDecimals(2);
     m_Range = upper-lower;
-    m_Spinner->setSingleStep(m_Range/100);
+    m_Controls.m_Spinner->setSingleStep(m_Range/100);
   }
 
 }
 
 void QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged(double current)
 {
-  m_Slider->setValue(DoubleToSliderInt(current));
-  m_Spinner->setValue(current);
+  m_Controls.m_Slider->setValue(DoubleToSliderInt(current));
+  m_Controls.m_Spinner->setValue(current);
 }
 
 double QmitkBinaryThresholdToolGUI::SliderIntToDouble(int val)
@@ -197,4 +186,35 @@ void QmitkBinaryThresholdToolGUI::BusyStateChanged(bool value)
       QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
   else
       QApplication::restoreOverrideCursor();
+}
+
+void QmitkBinaryThresholdToolGUI::OnShowInformation( bool on )
+{
+  if (on)
+    m_Controls.m_InformationWidget->show();
+  else
+    m_Controls.m_InformationWidget->hide();
+}
+
+void QmitkBinaryThresholdToolGUI::OnShowAdvancedControls( bool on )
+{
+  if (on)
+    m_Controls.m_AdvancedControlsWidget->show();
+  else
+    m_Controls.m_AdvancedControlsWidget->hide();
+}
+
+void QmitkBinaryThresholdToolGUI::OnNewLabel()
+{
+  if (m_BinaryThresholdTool.IsNotNull())
+  {
+    QmitkNewSegmentationDialog dialog(this);
+//    dialog->SetSuggestionList( m_OrganColors );
+    dialog.setWindowTitle("New Label");
+    int dialogReturnValue = dialog.exec();
+    if ( dialogReturnValue == QDialog::Rejected ) return;
+    mitk::Color color = dialog.GetColor();
+    std::string name = dialog.GetSegmentationName().toStdString();
+    m_BinaryThresholdTool->CreateNewLabel(name, color);
+  }
 }

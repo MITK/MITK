@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkCommon.h>
 
-
 const std::string QmitkServiceListWidget::VIEW_ID = "org.mitk.views.QmitkServiceListWidget";
 
 QmitkServiceListWidget::QmitkServiceListWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
@@ -40,7 +39,6 @@ QmitkServiceListWidget::~QmitkServiceListWidget()
 {
   m_Context->RemoveServiceListener(this,  &QmitkServiceListWidget::OnServiceEvent);
 }
-
 
 //////////////////// INITIALIZATION /////////////////////
 
@@ -104,17 +102,20 @@ us::ServiceReferenceU QmitkServiceListWidget::GetSelectedServiceReference(){
   return this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
 }
 
-
 ///////////////// Methods & Slots Handling Logic //////////////////////////
 
 void QmitkServiceListWidget::OnServiceEvent(const us::ServiceEvent event){
-
   //MITK_INFO << "ServiceEvent" << event.GetType();
   switch (event.GetType())
   {
     case us::ServiceEvent::MODIFIED:
       emit(ServiceModified(event.GetServiceReference()));
-      this->ChangeServiceOnList(event.GetServiceReference());
+
+      // Change service; add a new entry if service wasn't on list before
+      if ( ! this->ChangeServiceOnList(event.GetServiceReference()) )
+      {
+        this->AddServiceToList(event.GetServiceReference());
+      }
       break;
     case us::ServiceEvent::REGISTERED:
       emit(ServiceRegistered(event.GetServiceReference()));
@@ -130,7 +131,6 @@ void QmitkServiceListWidget::OnServiceEvent(const us::ServiceEvent event){
       break;
   }
 }
-
 
 /////////////////////// HOUSEHOLDING CODE /////////////////////////////////
 
@@ -183,7 +183,6 @@ us::ServiceReferenceU QmitkServiceListWidget::GetServiceForListItem(QListWidgetI
   // Return invalid ServiceReference (will evaluate to false in bool expressions)
   return us::ServiceReferenceU();
 }
-
 
 std::vector<us::ServiceReferenceU> QmitkServiceListWidget::GetAllRegisteredServices(){
   //Get Service References

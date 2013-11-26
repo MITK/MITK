@@ -14,25 +14,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef mitkImageStatisticsCalculator_h
+#define mitkImageStatisticsCalculator_h
 
-#ifndef _MITK_IMAGESTATISTICSCALCULATOR_H
-#define _MITK_IMAGESTATISTICSCALCULATOR_H
+#include "mitkImage.h"
+#include "mitkPlanarFigure.h"
 
-#include <itkObject.h>
-#include "ImageStatisticsExports.h"
-#include <itkImage.h>
-#include <itkTimeStamp.h>
-
+// TODO DM: why the ifndef?
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
 #endif
 
 
-#include "mitkImage.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkPlanarFigure.h"
-
 #include <vtkSmartPointer.h>
+
+#include "ImageStatisticsExports.h"
 
 namespace mitk
 {
@@ -67,39 +63,49 @@ class ImageStatistics_EXPORT ImageStatisticsCalculator : public itk::Object
 {
 public:
 
+  /**
+    TODO DM: document
+  */
   enum
   {
     MASKING_MODE_NONE = 0,
-    MASKING_MODE_IMAGE,
-    MASKING_MODE_PLANARFIGURE
+    MASKING_MODE_IMAGE = 1,
+    MASKING_MODE_PLANARFIGURE = 2
   };
 
   typedef itk::Statistics::Histogram<double> HistogramType;
   typedef HistogramType::ConstIterator HistogramConstIteratorType;
 
+  /**
+    TODO DM: document
+  */
   struct Statistics
   {
     int Label;
-    unsigned int N;
-    double Min;
-    double Max;
-    double Mean;
-    double Median;
-    double Variance;
-    double Sigma;
-    double RMS;
-    double HotspotMin;
-    double HotspotMax;
-    double HotspotMean;
-    double HotspotSigma;
-    double HotspotPeak;
+    unsigned int N;      //< number of voxels
+    double Min;          //< mimimum value
+    double Max;          //< maximum value
+    double Mean;         //< mean value
+    double Median;       //< median value
+    double Variance;     //< variance of values // TODO DM: remove, was never filled with values ; check if any calling code within MITK used this member!
+    double Sigma;        //< standard deviation of values (== square root of variance)
+    double RMS;          //< root means square (TODO DM: check mesning)
+    double HotspotMin;   //< mimimum value inside hotspot
+    double HotspotMax;   //< maximum value inside hotspot
+    double HotspotMean;  //< mean value inside hotspot
+    double HotspotSigma; //< standard deviation of values inside hotspot
+                         //TODO DM: where is variance? does not make much sense, but should be consistent with usual statistics
+                         //TODO DM: same goes for N
+                         //TODO DM: same goes for RMS
+    double HotspotPeak;  //< TODO DM: should this not replace "mean" the two values could be irritating
     vnl_vector< int > MinIndex;
     vnl_vector< int > MaxIndex;
     vnl_vector<int> HotspotMaxIndex;
     vnl_vector<int> HotspotMinIndex;
-    vnl_vector<int> HotspotPeakIndex;
+    vnl_vector<int> HotspotPeakIndex; //< TODO DM: couldn't this be named "hotspot index"? We need to clear naming of hotspotmean, hotspotpeakindex, and hotspotpeak
 
-    void Reset()
+    // TODO DM: make this struct a real class and put this into a constructor
+    void Reset() // TODO DM: move to .cpp file (mitk::ImageStatisticsCalculator::Statistics::Reset() {...})
     {
       Label = 0;
       N = 0;
@@ -114,11 +120,11 @@ public:
       HotspotMax = 0.0;
       HotspotMean = 0.0;
       HotspotPeak = 0.0;
-      HotspotSigma = 0.0;
+      HotspotSigma = 0.0; // TODO DM: also reset index values! Check that everything is initialized
     }
   };
 
-  struct MinMaxIndex
+  struct MinMaxIndex // TODO DM: why this structure? could at least be private
   {
     double Max;
     double Min;
@@ -382,6 +388,6 @@ protected:
 
 };
 
-}
+} // namespace
 
-#endif // #define _MITK_IMAGESTATISTICSCALCULATOR_H
+#endif

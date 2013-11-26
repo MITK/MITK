@@ -94,6 +94,9 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     /// \brief Send a signal when the string list with label names has changed.
     void labelListModified(const QStringList&);
 
+    /// \brief Send a signal when user selects the Merge Label action.
+    void mergeLabel(int);
+
     /// \brief Send a signal when it was requested to create a label.
     void newLabel();
 
@@ -206,6 +209,8 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     void OnCombineAndCreateMask(bool);
 
     void OnEraseLabel(bool);
+
+    void OnMergeLabel(bool);
 
     void OnMergeLabels(bool);
 

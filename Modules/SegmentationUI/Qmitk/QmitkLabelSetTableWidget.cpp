@@ -528,15 +528,20 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
     QObject::connect( renameAction, SIGNAL( triggered(bool) ), this, SLOT( OnRenameLabel(bool) ) );
     menu->addAction(renameAction);
 
-    QAction* removeAction = new QAction(QIcon(":/QmitkExt/removelabel.png"), "Remove label", this );
+    QAction* removeAction = new QAction(QIcon(":/QmitkExt/removelabel.png"), "Remove...", this );
     removeAction->setEnabled(true);
     QObject::connect( removeAction, SIGNAL( triggered(bool) ), this, SLOT( OnRemoveLabel(bool) ) );
     menu->addAction(removeAction);
 
-    QAction* eraseAction = new QAction(QIcon(":/QmitkExt/eraselabel.png"), "Erase label", this );
+    QAction* eraseAction = new QAction(QIcon(":/QmitkExt/eraselabel.png"), "Erase...", this );
     eraseAction->setEnabled(true);
     QObject::connect( eraseAction, SIGNAL( triggered(bool) ), this, SLOT( OnEraseLabel(bool) ) );
     menu->addAction(eraseAction);
+
+    QAction* mergeAction = new QAction(QIcon(":/QmitkExt/mergelabels.png"), "Merge...", this );
+    mergeAction->setEnabled(true);
+    QObject::connect( mergeAction, SIGNAL( triggered(bool) ), this, SLOT( OnMergeLabel(bool) ) );
+    menu->addAction(mergeAction);
 
     QAction* randomColorAction = new QAction(QIcon(":/QmitkExt/randomcolor.png"), "Random color", this );
     randomColorAction->setEnabled(true);
@@ -630,6 +635,11 @@ void QmitkLabelSetTableWidget::OnToggleOutline(bool value)
   emit toggleOutline(m_AllOutlined);
 }
 
+void QmitkLabelSetTableWidget::OnMergeLabel(bool value)
+{
+  emit mergeLabel( this->currentRow() );
+}
+
 void QmitkLabelSetTableWidget::OnMergeLabels(bool value)
 {
   QString question = "Do you really want to merge selected labels into \"";
@@ -665,7 +675,6 @@ void QmitkLabelSetTableWidget::OnMergeLabels(bool value)
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
-
 
 void QmitkLabelSetTableWidget::OnRemoveLabels(bool value)
 {

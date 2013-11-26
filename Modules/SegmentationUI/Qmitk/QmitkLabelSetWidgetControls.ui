@@ -48,7 +48,7 @@
         </property>
         <property name="icon">
          <iconset resource="../resources/SegmentationUI.qrc">
-          <normaloff>:/Qmitk/NewLabelSet_48x48.png</normaloff>:/Qmitk/NewLabelSet_48x48.png</iconset>
+          <normaloff>:/Qmitk/NewSegmentationSession_48x48.png</normaloff>:/Qmitk/NewSegmentationSession_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -71,7 +71,7 @@
         </property>
         <property name="icon">
          <iconset resource="../resources/SegmentationUI.qrc">
-          <normaloff>:/Qmitk/LoadLabelSet_48x48.png</normaloff>:/Qmitk/LoadLabelSet_48x48.png</iconset>
+          <normaloff>:/Qmitk/LoadSegmentationSession_48x48.png</normaloff>:/Qmitk/LoadSegmentationSession_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -117,7 +117,7 @@
         </property>
         <property name="icon">
          <iconset resource="../resources/SegmentationUI.qrc">
-          <normaloff>:/Qmitk/SaveLabelSet_48x48.png</normaloff>:/Qmitk/SaveLabelSet_48x48.png</iconset>
+          <normaloff>:/Qmitk/SaveSegmentationSession_48x48.png</normaloff>:/Qmitk/SaveSegmentationSession_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -162,7 +162,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/SegmentationUI.qrc">
+         <iconset>
           <normaloff>:/Qmitk/DeleteLabelSet_48x48.png</normaloff>:/Qmitk/DeleteLabelSet_48x48.png</iconset>
         </property>
         <property name="iconSize">

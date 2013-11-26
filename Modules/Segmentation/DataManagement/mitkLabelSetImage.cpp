@@ -535,6 +535,13 @@ void mitk::LabelSetImage::MergeLabels(std::vector<int>& indexes, int index, int 
   RemoveLabelEvent.Send();
 }
 
+void mitk::LabelSetImage::MergeLabel(int index, int layer)
+{
+  if (layer < 0) layer = m_ActiveLayer;
+  AccessByItk_1(this, MergeLabelsProcessing, index);
+  RemoveLabelEvent.Send();
+}
+
 void mitk::LabelSetImage::RemoveLabels(std::vector<int>& indexes, int layer)
 {
   if (layer < 0) layer = m_ActiveLayer;

@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk
 #include <QmitkDataStorageComboBox.h>
 #include <QmitkNewSegmentationDialog.h>
+#include <QmitkSearchLabelDialog.h>
 
 // Qt
 #include <QCompleter>
@@ -92,6 +93,7 @@ m_ToolManager(NULL)
 
   connect( m_Controls.m_LabelSearchBox, SIGNAL(returnPressed()), this, SLOT(OnSearchLabel()) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(labelListModified(const QStringList&)), this, SLOT( OnLabelListModified(const QStringList&)) );
+  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(mergeLabel(int)), this, SLOT( OnMergeLabel(int)) );
 
   QStringListModel* completeModel = static_cast<QStringListModel*> (m_Completer->model());
   completeModel->setStringList(m_Controls.m_LabelSetTableWidget->GetLabelList());
@@ -148,6 +150,35 @@ void QmitkLabelSetWidget::OnLabelListModified(const QStringList& list)
   completeModel->setStringList(list);
 }
 
+void QmitkLabelSetWidget::OnMergeLabel(int index)
+{
+  QmitkSearchLabelDialog dialog(this);
+  dialog.setWindowTitle("Select a second label..");
+  dialog.SetLabelSuggestionList(m_Controls.m_LabelSetTableWidget->GetLabelList());
+  int dialogReturnValue = dialog.exec();
+  if ( dialogReturnValue == QDialog::Rejected ) return;
+
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  assert(workingNode);
+
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  assert(workingImage);
+
+  QString question = "This operation will remove ";
+  question.append(QString::fromStdString(workingImage->GetLabelName(index)));
+  question.append("\n Are you ok with that?");
+
+  QMessageBox::StandardButton answerButton = QMessageBox::question(this, "Merge label...",
+     question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
+
+  if (answerButton == QMessageBox::Yes)
+  {
+    workingImage->MergeLabel(dialog.GetLabelIndex());
+  }
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 void QmitkLabelSetWidget::SetOrganColors(const QStringList& organColors)
 {
   m_OrganColors = organColors;
@@ -157,13 +188,13 @@ void QmitkLabelSetWidget::OnRenameLabel(int index, const mitk::Color& color, con
 {
   m_ToolManager->ActivateTool(-1);
 
-  QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this );
-  dialog->setWindowTitle("Rename Label");
-  dialog->SetSuggestionList( m_OrganColors );
-  dialog->SetColor(color);
-  dialog->SetSegmentationName(name);
+  QmitkNewSegmentationDialog dialog(this);
+  dialog.setWindowTitle("Rename Label");
+  dialog.SetSuggestionList( m_OrganColors );
+  dialog.SetColor(color);
+  dialog.SetSegmentationName(name);
 
-  int dialogReturnValue = dialog->exec();
+  int dialogReturnValue = dialog.exec();
 
   if ( dialogReturnValue == QDialog::Rejected ) return;
 
@@ -173,7 +204,7 @@ void QmitkLabelSetWidget::OnRenameLabel(int index, const mitk::Color& color, con
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
   assert(workingImage);
 
-  workingImage->RenameLabel(index, dialog->GetSegmentationName().toStdString(), dialog->GetColor());
+  workingImage->RenameLabel(index, dialog.GetSegmentationName().toStdString(), dialog.GetColor());
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

@@ -64,6 +64,9 @@ private slots:
   // reaction to ...
   void OnSearchLabel();
 
+  // reaction to signal "mergeLabel" from QmitkLabelSetTableWidget
+  void OnMergeLabel(int);
+
   // reaction to signal "labelListModified" from QmitkLabelSetTableWidget
   void OnLabelListModified(const QStringList& list);
 

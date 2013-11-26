@@ -130,6 +130,11 @@ public:
   void MergeLabels(std::vector<int>& indexes, int index, int layer = -1);
 
   /**
+    * \brief
+  */
+  void MergeLabel(int index, int layer = -1);
+
+  /**
     * \brief  */
   void EraseLabel(int index, bool reorder, int layer = -1);
 

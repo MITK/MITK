@@ -37,9 +37,9 @@ namespace mitk
 {
 
 /**
-  \brief Morphologic opening tool.
+  \brief Morphologic closing tool.
 
-  The segmentation smooths the active label by morphologic opening.
+  This tool smooths the active label by morphologic opening.
 */
 class Segmentation_EXPORT CloseTool3D : public AutoSegmentationTool
 {
@@ -65,7 +65,7 @@ class Segmentation_EXPORT CloseTool3D : public AutoSegmentationTool
     int m_Radius;
 
     template < typename TPixel, unsigned int VDimension >
-    void ITKProcessing( itk::Image< TPixel, VDimension>* input );
+    void InternalProcessing( itk::Image< TPixel, VDimension>* input );
 };
 
 } // namespace

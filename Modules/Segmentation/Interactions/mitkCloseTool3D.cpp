@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryMorphologicalClosingImageFilter.h>
 
-#include <itkMedianImageFilter.h>
 #include <itkLabelObject.h>
 #include <itkLabelMap.h>
 #include <itkLabelImageToLabelMapFilter.h>
@@ -98,7 +97,7 @@ void mitk::CloseTool3D::Run()
 
   try
   {
-    AccessByItk(workingImage, ITKProcessing);
+    AccessByItk(workingImage, InternalProcessing);
   }
   catch( itk::ExceptionObject& e )
   {
@@ -116,9 +115,10 @@ void mitk::CloseTool3D::Run()
 
 
 template < typename TPixel, unsigned int VDimension >
-void mitk::CloseTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
+void mitk::CloseTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* input )
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
+  typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;
   typedef itk::LabelObject< TPixel, VDimension > LabelObjectType;
   typedef itk::LabelMap< LabelObjectType > LabelMapType;
   typedef itk::LabelImageToLabelMapFilter< ImageType, LabelMapType > Image2LabelMapType;
@@ -126,7 +126,6 @@ void mitk::CloseTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
   typedef itk::LabelMapToLabelImageFilter< LabelMapType, ImageType > LabelMap2ImageType;
   typedef itk::BinaryBallStructuringElement<TPixel, VDimension> BallType;
   typedef itk::BinaryMorphologicalClosingImageFilter<ImageType, ImageType, BallType> ClosingFilterType;
-  typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;
 
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);

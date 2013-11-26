@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKTRACKINGDEVICESOURCE_H_HEADER_INCLUDED_
 #define MITKTRACKINGDEVICESOURCE_H_HEADER_INCLUDED_
 
@@ -124,6 +123,8 @@ namespace mitk {
 
     /**
     * \brief Create the necessary outputs for the TrackingTool objects in m_TrackingDevice
+    *
+    * This Method is called internally whenever outputs need to be reset. Old Outputs are deleted when called.
     **/
     void CreateOutputs();
 

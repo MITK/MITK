@@ -1,43 +1,39 @@
-#include "OptiTrackTrackingTool.h"
+/*===================================================================
 
-#include <boost\math\special_functions\fpclassify.hpp>
+The Medical Imaging Interaction Toolkit (MITK)
 
-//Natural Point Optitrack include with helper
-#include "OptiTrackHelper.h"
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+#include "mitkOptitrackTrackingTool.h"
+
 
 // Constructors
-EMT::OptiTrackTrackingTool::OptiTrackTrackingTool()
+mitk::OptitrackTrackingTool::OptitrackTrackingTool()
   :  mitk::InternalTrackingTool(),
     ID(-1)
 {
 }
 
-EMT::OptiTrackTrackingTool::~OptiTrackTrackingTool()
+mitk::OptitrackTrackingTool::~OptitrackTrackingTool()
 {
     // Delete trackable using ID
     //if(this->ID >= 0) DeleteTrackable();
 }
 
 
-// Functions
-void EMT::OptiTrackTrackingTool::SetToolByName(std::string nameTool)
-{
-    // Preconfigured Tools for Testing
-    if(nameTool=="Wand250")
-    {
-        this->fileConfiguration = "J:\\Wand250.txt";
-        this->SetToolByFileName(this->fileConfiguration);
-        return;
-    }
-    else
-    {
-        MITK_INFO << "Name not recognised";
-    }
-}
 
-bool EMT::OptiTrackTrackingTool::SetToolByFileName(std::string nameFile)
+bool mitk::OptitrackTrackingTool::SetToolByFileName(std::string nameFile)
 {
-  MITK_INFO<<"DEBUG: OptiTrackTrackingTool::SetToolByFileName starts reading file "<<nameFile;
+  MITK_INFO<<"DEBUG: OptitrackTrackingTool::SetToolByFileName starts reading file "<<nameFile;
     this->fileConfiguration = nameFile;
 
     char* aux = new char[200];
@@ -110,7 +106,7 @@ bool EMT::OptiTrackTrackingTool::SetToolByFileName(std::string nameFile)
         {
       NPRESULT msg = TT_CreateTrackable(m_ToolName.c_str(), this->ID,this->numPoints,this->calibrationPoints);
       if(msg != NPRESULT_SUCCESS)
-        MITK_INFO<<"Cannot create Trackable... "<<OptiTrackHelper::GetOptiTrackErrorMessage(msg);
+        MITK_INFO<<"Cannot create Trackable... "<< GetOptitrackErrorMessage(msg);
       else
         MITK_INFO<<"Trackable Created";
             break;
@@ -124,7 +120,7 @@ bool EMT::OptiTrackTrackingTool::SetToolByFileName(std::string nameFile)
         {
             NPRESULT msg= TT_TrackableTranslatePivot(this->ID,this->pivotPoint[0],this->pivotPoint[1],this->pivotPoint[2]);
       if(msg != NPRESULT_SUCCESS)
-        MITK_INFO<<"Cannot update Pivot... "<<OptiTrackHelper::GetOptiTrackErrorMessage(msg);
+        MITK_INFO<<"Cannot update Pivot... "<< GetOptitrackErrorMessage(msg);
       else
         MITK_INFO<<"Pivot updated";
             break;
@@ -135,7 +131,7 @@ bool EMT::OptiTrackTrackingTool::SetToolByFileName(std::string nameFile)
   return true;
 }
 
-int EMT::OptiTrackTrackingTool::get_IDnext()
+int mitk::OptitrackTrackingTool::get_IDnext()
 {
     int num_trackables;
     while(true)
@@ -149,16 +145,16 @@ int EMT::OptiTrackTrackingTool::get_IDnext()
     return (num_trackables) ;
 }
 
-void EMT::OptiTrackTrackingTool::DeleteTrackable()
+void mitk::OptitrackTrackingTool::DeleteTrackable()
 {
   NPRESULT msg = TT_RemoveTrackable(this->ID);
   if(msg != NPRESULT_SUCCESS)
-    MITK_INFO<<"Cannot remove Trackable... "<<OptiTrackHelper::GetOptiTrackErrorMessage(msg);
+    MITK_INFO<<"Cannot remove Trackable... "<<GetOptitrackErrorMessage(msg);
   else
     MITK_INFO<<"Trackable removed";
 }
 
-void EMT::OptiTrackTrackingTool::SetPosition(mitk::Point3D position)
+void mitk::OptitrackTrackingTool::SetPosition(mitk::Point3D position)
 {
     ///< sets the position
     this->m_Position[0] = position[0];
@@ -166,7 +162,7 @@ void EMT::OptiTrackTrackingTool::SetPosition(mitk::Point3D position)
     this->m_Position[2] = position[2];
 }
 
-void EMT::OptiTrackTrackingTool::SetOrientation(mitk::Quaternion orientation)
+void mitk::OptitrackTrackingTool::SetOrientation(mitk::Quaternion orientation)
 {
     ///< sets the orientation as a quaternion
     this->m_Orientation.x() = orientation.x();
@@ -175,7 +171,7 @@ void EMT::OptiTrackTrackingTool::SetOrientation(mitk::Quaternion orientation)
     this->m_Orientation.r() = orientation.r();
 }
 
-void EMT::OptiTrackTrackingTool::GetPosition(mitk::Point3D& positionOutput) const
+void mitk::OptitrackTrackingTool::GetPosition(mitk::Point3D& positionOutput) const
 {
     ///< returns the current position of the tool as an array of three floats (in the tracking device coordinate system)
     positionOutput[0] = this->m_Position[0];
@@ -183,7 +179,7 @@ void EMT::OptiTrackTrackingTool::GetPosition(mitk::Point3D& positionOutput) cons
     positionOutput[2] = this->m_Position[2];
 }
 
-void EMT::OptiTrackTrackingTool::GetOrientation(mitk::Quaternion& orientation) const
+void mitk::OptitrackTrackingTool::GetOrientation(mitk::Quaternion& orientation) const
 {
     ///< returns the current orientation of the tool as a quaternion (in the tracking device coordinate system)
     orientation.x() = this->m_Orientation.x();
@@ -192,57 +188,57 @@ void EMT::OptiTrackTrackingTool::GetOrientation(mitk::Quaternion& orientation) c
     orientation.r() = this->m_Orientation.r();
 }
 
-bool EMT::OptiTrackTrackingTool::Enable()
+bool mitk::OptitrackTrackingTool::Enable()
 {
     ///< enablea the tool, so that it will be tracked. Returns true if enabling was successfull
     TT_SetTrackableEnabled(this->ID, true);
     return TT_TrackableEnabled(this->ID);
 }
 
-bool EMT::OptiTrackTrackingTool::Disable()
+bool mitk::OptitrackTrackingTool::Disable()
 {
     ///< disables the tool, so that it will not be tracked anymore. Returns true if disabling was successfull
     TT_SetTrackableEnabled(this->ID, false);
     return !TT_TrackableEnabled(this->ID); ;
 }
 
-bool EMT::OptiTrackTrackingTool::IsEnabled() const
+bool mitk::OptitrackTrackingTool::IsEnabled() const
 {
     ///< returns whether the tool is enabled or disabled
     return TT_TrackableEnabled(this->ID);
 }
 
-bool EMT::OptiTrackTrackingTool::IsDataValid() const
+bool mitk::OptitrackTrackingTool::IsDataValid() const
 {
     ///< returns true if the current position data is valid (no error during tracking, tracking error below threshold, ...)
     return TT_IsTrackableTracked(this->ID);
 }
 
-float EMT::OptiTrackTrackingTool::GetTrackingError() const
+float mitk::OptitrackTrackingTool::GetTrackingError() const
 {
     ///< return one value that corresponds to the overall tracking error. The dimension of this value is specific to each tracking device
     return 0.0;
 }
 
-void EMT::OptiTrackTrackingTool::SetTrackingError(float error)
+void mitk::OptitrackTrackingTool::SetTrackingError(float error)
 {
     ///< sets the tracking error
     this->m_TrackingError = error;
 }
 
-void EMT::OptiTrackTrackingTool::SetDataValid(bool _arg)
+void mitk::OptitrackTrackingTool::SetDataValid(bool _arg)
 {
     ///< sets if the tracking data (position & Orientation) is valid
     this->m_DataValid = _arg;
 }
 
-void EMT::OptiTrackTrackingTool::SetErrorMessage(const char* _arg)
+void mitk::OptitrackTrackingTool::SetErrorMessage(const char* _arg)
 {
     ///< sets the error message
     MITK_INFO << "[ERROR]: OptitrackTool";
 }
 
-void EMT::OptiTrackTrackingTool::updateTool()
+void mitk::OptitrackTrackingTool::updateTool()
 {
     int nFrameCounter=0;
     float yaw,pitch,roll;
@@ -258,7 +254,7 @@ void EMT::OptiTrackTrackingTool::updateTool()
                   &yaw,    &pitch,    &roll);
 
       for(unsigned int i=0; i<7; i++)
-        if(boost::math::isinf<float>(data[i]))
+        if (false)//if(boost::math::isinf<float>(data[i]))
         {
           this->SetDataValid(false);
           return;

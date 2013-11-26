@@ -14,9 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef OptiTrackTrackingDevice_H_HEADER_INCLUDED
-#define OptiTrackTrackingDevice_H_HEADER_INCLUDED
+#ifndef OptitrackTrackingDevice_H_HEADER_INCLUDED
+#define OptitrackTrackingDevice_H_HEADER_INCLUDED
 
+#include <MitkIGTExports.h>
 #include <mitkTrackingDevice.h>
 #include <itkMultiThreader.h>
 #include <mitkTrackingTypes.h>
@@ -28,17 +29,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include "igdTrackingTypes.h"
+
+/**
+* \brief IGT Exceptions
+*/
+#include "mitkIGTIOException.h"
+#include "mitkIGTTimeStamp.h"
+#include "mitkIGTException.h"
+
+
 
 /**
 * \brief API library header for Optitrack Systems
 */
-#include "OptiTrackTrackingTool.h"
+#include <NPTrackingTools.h>
+
+/**
+* \brief OptitrackTrackingTools
+*/
+#include "mitkOptitrackTrackingTool.h"
 
 /**
 * \brief MutexHolder to keep rest of Mutex
 */
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
+
+
+#include <mitkOptitrackErrorMessages.h>
 
 /**
 * \brief Maximum number of attempts for Initialization, Shutdown and CleanUp
@@ -52,6 +69,7 @@ typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 #define OPTITRACK_FRAME_RATE 25
 #endif
 
+
 namespace mitk
 {
   /** Documentation:
@@ -62,13 +80,16 @@ namespace mitk
   *       See  http://www.naturalpoint.com/ for details.
   *   \ingroup IGT
   */
-  class TRACKINGPROVIDER_EXPORT OptiTrackTrackingDevice : public mitk::TrackingDevice
+  class MitkIGT_EXPORT OptitrackTrackingDevice : public mitk::TrackingDevice
   {
 
-    mitkClassMacro(OptiTrackTrackingDevice, mitk::TrackingDevice);
-        itkNewMacro(Self);
+  friend class OptitrackTrackingTool;
 
   public:
+    mitkClassMacro(OptitrackTrackingDevice, mitk::TrackingDevice);
+        itkNewMacro(Self);
+
+
     // Define the Type of Tracker as DefinitionOfTool (MITK)
     typedef mitk::TrackingDeviceType OptiTrackTrackingDeviceType;
 
@@ -119,7 +140,7 @@ namespace mitk
     * no tool with this number.
     * @throw mitk::IGTHardwareException Throws an exception if there is an error. /////////////////////////^????????????????
     */
-    mitk::OptiTrackTrackingTool* OptiTrackTrackingDevice::GetOptiTrackTool(unsigned int toolNumber) const
+    OptitrackTrackingTool* OptitrackTrackingDevice::GetOptitrackTool(unsigned int toolNumber) const;
 
     /**
     * \brief Returns the number of defined tools
@@ -199,8 +220,8 @@ namespace mitk
     /**
     * \brief Constructor & Destructor of the class
     */
-    OptiTrackTrackingDevice();
-    ~OptiTrackTrackingDevice();
+    OptitrackTrackingDevice();
+    ~OptitrackTrackingDevice();
 
     /**
     * \brief Return the string associated with the error number
@@ -223,12 +244,11 @@ namespace mitk
     */
     bool m_initialized;
 
-    // Not neccesary ?
-    //typedef std::vector<ToolType::Pointer> ToolContainer; ///< container type for tracking tools
-    //ToolContainer m_AllTools;                       ///< container for all tracking tools
-    //itk::FastMutexLock::Pointer m_ToolsMutex; ///< mutex for coordinated access of tool container
-    //itk::MultiThreader::Pointer m_MultiThreader;    ///< MultiThreader that starts continuous tracking update
-    //int m_ThreadID;
+
+  std::vector<mitk::OptitrackTrackingTool::Pointer> m_AllTools; ///< container type for tracking tools
+    itk::FastMutexLock::Pointer m_ToolsMutex; ///< mutex for coordinated access of tool container
+    itk::MultiThreader::Pointer m_MultiThreader;    ///< MultiThreader that starts continuous tracking update
+    int m_ThreadID;
 
 
 /* TODO:
@@ -272,32 +292,8 @@ TTAPI   float    TT_CameraOrientationMatrix(int camera, int index); //== Orienta
 */
 
 
+};
 
-public:
-  /**
-  * \brief Helper function to get the error messages from Optitrack API
-  */
-  static std::string GetOptiTrackErrorMessage(NPRESULT result)
-  {
-      std::string message = "";
-      switch(result)
-      {
-        case NPRESULT_SUCCESS: message = "[Optitrack API] Successful Result"; break;
-        case NPRESULT_FILENOTFOUND: message = "[Optitrack API] File Not Found"; break;
-        case NPRESULT_LOADFAILED:  message = "[Optitrack API] Load Failed"; break;
-        case NPRESULT_FAILED:    message = "[Optitrack API] Failed"; break;
-        case NPRESULT_INVALIDFILE:  message = "[Optitrack API] Invalid File"; break;
-        case NPRESULT_INVALIDCALFILE:  message = "[Optitrack API] Invalid Calibration File"; break;
-        case NPRESULT_UNABLETOINITIALIZE:  message = "[Optitrack API] Unable To Initialize"; break;
-        case NPRESULT_INVALIDLICENSE:  message = "[Optitrack API] Invalid License"; break;
-        case NPRESULT_NOFRAMEAVAILABLE:  message = "[Optitrack API] No Frames Available"; break;
-        default: message = "[Optitrack API] Unknown error occured"; break;
-      }
-      return message;
-    }
-  };
-
-  };
 
 }
 #endif

@@ -32,16 +32,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkInternalTrackingTool.h>
 #include <mitkVector.h>
 #include <itkFastMutexLock.h>
-
-
 /**
 * \brief API library header for Optitrack Systems
 */
-#include "OptiTrackTrackingTool.h"
+#include <NPTrackingTools.h>
+
+#include <mitkOptitrackErrorMessages.h>
 
 
 namespace mitk
 {
+
+  //class OptitrackTragkingDevice;
 
   /** Documentation:
   *   \brief An object of this class represents the a Tool tracked by Optitrack System. You can define
@@ -51,14 +53,15 @@ namespace mitk
     *   \author E. Marinetto (emarinetto@hggm.es) Instituto de Investigación Sanitaria Gregorio Marañón, Madrid, Spain. & M. Noll (matthias.noll@igd.fraunhofer.de) Cognitive Computing & Medical Imaging | Fraunhofer IGD
   *   \ingroup IGT
   */
-  class TRACKINGPROVIDER_EXPORT OptiTrackTrackingTool : public mitk::InternalTrackingTool
+  class MitkIGT_EXPORT OptitrackTrackingTool : public InternalTrackingTool
   {
-    friend class OptiTrackTrackingDevice;
-
-    mitkClassMacro(OptiTrackTrackingTool, mitk::InternalTrackingTool);
-    itkNewMacro(Self);
+    friend class OptitrackTrackingDevice;
 
   public:
+    mitkClassMacro(mitk::OptitrackTrackingTool, mitk::InternalTrackingTool);
+    itkNewMacro(Self);
+
+
 
     /**
     * \brief Define the tool by a calibration File.
@@ -80,15 +83,13 @@ namespace mitk
     float GetTrackingError() const;                     ///< return one value that corresponds to the overall tracking error. The dimension of this value is specific to each tracking device
     void SetTrackingError(float error);                 ///< sets the tracking error
     void SetErrorMessage(const char* _arg);
-    void OptiTrackTrackingTool::SetDataValid(bool _arg);                       ///< sets if the tracking data (position & Orientation) is valid
+    void SetDataValid(bool _arg);                       ///< sets if the tracking data (position & Orientation) is valid
     void updateTool();
 
     //void readPivotPosicion(float seg = 0.5);
 
-
-    OptiTrackTrackingTool();
-    ~OptiTrackTrackingTool();
-
+    OptitrackTrackingTool();
+    ~OptitrackTrackingTool();
 
 
     std::string fileConfiguration;
@@ -99,8 +100,8 @@ namespace mitk
 
   private:
     // copy constructors deliberately not implemented
-    OptiTrackTrackingTool(const OptiTrackTrackingTool&);
-    const OptiTrackTrackingTool& operator=(const OptiTrackTrackingTool&);
+    OptitrackTrackingTool(const OptitrackTrackingTool&);
+    const OptitrackTrackingTool& operator=(const OptitrackTrackingTool&);
 
   };
 }

@@ -210,7 +210,7 @@ void QmitkNavigationToolManagementWidget::OnCreateStorage()
 void QmitkNavigationToolManagementWidget::OnLoadStorage()
   {
     mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(m_DataStorage);
-    std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Navigation Tool Storage"), "/", "*.IGTToolStorage").toAscii().data();
+    std::string filename = QFileDialog::getOpenFileName(NULL, tr("Open Navigation Tool Storage"), "/", tr("IGT Tool Storage (*.IGTToolStorage)")).toStdString();
     if (filename == "") return;
     mitk::NavigationToolStorage::Pointer tempStorage = myDeserializer->Deserialize(filename);
     if (tempStorage.IsNull()) MessageBox("Error" + myDeserializer->GetErrorMessage());
@@ -226,18 +226,21 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
 void QmitkNavigationToolManagementWidget::OnSaveStorage()
   {
     //read in filename
-    std::string filename = QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool Storage"), "/", "*.IGTToolStorage").toAscii().data();
-    if (filename == "") return; //canceled by the user
+    QString filename = QFileDialog::getSaveFileName(NULL, tr("Save Navigation Tool Storage"), "/", tr("IGT Tool Storage (*.IGTToolStorage)"));
+    if (filename.isEmpty()) return; //canceled by the user
+
+    // add file extension if it wasn't added by the file dialog
+    if ( filename.right(15) != ".IGTToolStorage" ) { filename += ".IGTToolStorage"; }
 
     //serialize tool storage
     mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
-    if (!mySerializer->Serialize(filename,m_NavigationToolStorage))
+    if (!mySerializer->Serialize(filename.toStdString(),m_NavigationToolStorage))
       {
       MessageBox("Error: " + mySerializer->GetErrorMessage());
       return;
       }
-    Poco::Path myPath = Poco::Path(filename.c_str());
-    m_Controls->m_StorageName->setText(myPath.getFileName().c_str());
+    Poco::Path myPath = Poco::Path(filename.toStdString());
+    m_Controls->m_StorageName->setText(QString::fromStdString(myPath.getFileName()));
 
   }
 

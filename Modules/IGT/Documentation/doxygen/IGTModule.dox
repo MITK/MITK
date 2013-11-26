@@ -17,7 +17,7 @@ MITK-IGT consists of two layers for hardware control (Tracking Layer) and proces
 If you want to learn more about IGT you can have a look
 on the IGT code tutorial, which can be found here:
 
- \li \subpage IGTCodeTutorialPage
+ \li \subpage IGTutorialOverview
 
 \section IGTGeneralModulePageModuleList List of IGT Plugins
 

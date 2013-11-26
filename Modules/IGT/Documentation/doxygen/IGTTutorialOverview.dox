@@ -1,0 +1,29 @@
+/**
+\page IGTTutorialOverview IGT Tutorial Overview
+
+The IGT tutorial consists of four steps which will introduce the reader to the basic concepts and functions of IGT.
+
+\section Step1 Step 1 - IGT filter pipeline
+
+The first step will introduce the concept of the navigation pipeline. Via a virtual tracking device, tracking data
+is written to the console. Everything is organized in a classic c++ main method.
+\li \subpage IGTTutorialStep1
+
+\section Step2 Step 2 - Visualization Filter and MITK Concepts
+
+Step 2 adds a broader view of basic MITK concepts. The objects are now added to an mitkDataStorage and rendered
+in an mitkRenderWindow. For visualization the NavigationDataObjectVisualizationFilter is used.
+Everything is organized in a classic c++ main method.
+\li \subpage IGTTutorialStep2
+
+\section Step3 Step 3 - Qt Gui Tutorial
+This step shows how to seamlessly integrate an IGT plugin (the QmitkIGTTutorialView) into the mitkWorkbench. The plugin uses the virtual
+tracking device to generate data and renders the result in the mitkWorkbench. It is also possible to connect an
+NDI tracking device and use real hardware to track. The code is written in the QmitkView manner.
+\li \subpage IGTTutorialStep3
+
+\section Step4 Step 4 - Tracking Lab
+The final step shows a variety of applications. To this point, for documentation a user manual is available.
+\li \subpage IGTTutorialStep4
+
+*/

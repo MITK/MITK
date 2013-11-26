@@ -1,0 +1,11 @@
+/**
+\page IGTTutorialStep4 Tracking Lab
+
+The tracking lab is an IGT plugin containing various functions.
+For more information see the user manual: \ref org_igttrackinglab "[Tracking Lab User Manual]"
+
+\include QmitkIGTTrackingLabView.h
+
+\ref IGTTutorialStep3 "[Previous step]" \ref IGTTutorialOverview "[IGT Tutorial Overview]"
+
+*/

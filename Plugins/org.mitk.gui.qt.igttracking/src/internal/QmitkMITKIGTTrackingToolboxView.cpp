@@ -223,7 +223,6 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
   //Create Navigation Data Source with the factory class
   mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,trackingDevice);
   m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
-  MITK_INFO << "Number of tools: " << m_TrackingDeviceSource->GetNumberOfOutputs();
 
   //set filter to rotation mode transposed becaus we are working with VNL style quaternions
   if(m_Controls->m_InverseMode->isChecked())
@@ -235,6 +234,8 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
     MessageBox(myTrackingDeviceSourceFactory->GetErrorMessage());
     return;
   }
+
+  MITK_INFO << "Number of tools: " << m_TrackingDeviceSource->GetNumberOfOutputs();
 
   //The tools are maybe reordered after initialization, e.g. in case of auto-detected tools of NDI Aurora
   mitk::NavigationToolStorage::Pointer toolsInNewOrder = myTrackingDeviceSourceFactory->GetUpdatedNavigationToolStorage();

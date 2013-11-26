@@ -1,5 +1,4 @@
 /*===================================================================
-
 The Medical Imaging Interaction Toolkit (MITK)
 
 Copyright (c) German Cancer Research Center,
@@ -24,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
 #endif
+
+#include <itkImageRegionIteratorWithIndex.h>
 
 
 #include <vtkSmartPointer.h>
@@ -334,6 +335,9 @@ protected:
 
   void MaskedStatisticsProgressUpdate();
 
+  template <unsigned int VImageDimension>
+  itk::SmartPointer< itk::Image<float, VImageDimension> >
+  GenerateHotspotSearchConvolutionMask(double spacing[VImageDimension], double radiusInMM);
 
   /** m_Image contains the input image (e.g. 2D, 3D, 3D+t)*/
   mitk::Image::ConstPointer m_Image;

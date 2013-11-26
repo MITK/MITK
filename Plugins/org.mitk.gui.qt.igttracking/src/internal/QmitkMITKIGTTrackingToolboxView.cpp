@@ -542,6 +542,13 @@ void QmitkMITKIGTTrackingToolboxView::OnChooseFileClicked()
 
 void QmitkMITKIGTTrackingToolboxView::StartLogging()
   {
+
+  if (m_ToolVisualizationFilter.IsNull())
+  {
+    MessageBox("Cannot activate logging without a connected device. Configure and connect a tracking device first.");
+    return;
+  }
+
   if (!m_logging)
     {
     //initialize logging filter

@@ -28,6 +28,7 @@ QmitkOpenTool3DGUI::QmitkOpenTool3DGUI() : QmitkToolGUI()
   m_Controls.m_AdvancedControlsWidget->hide();
 
   connect( m_Controls.m_pbRun, SIGNAL(clicked()), this, SLOT(OnRun()) );
+  connect( m_Controls.m_pbCancel, SIGNAL(clicked()), this, SLOT(OnCancel()) );
   connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
   connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
   connect( m_Controls.m_sbKernelSize, SIGNAL(valueChanged(int)), this, SLOT(OnKernelSizeChanged(int)) );
@@ -65,6 +66,14 @@ void QmitkOpenTool3DGUI::OnRun()
   if (m_OpenTool3D.IsNotNull())
   {
     m_OpenTool3D->Run();
+  }
+}
+
+void QmitkOpenTool3DGUI::OnCancel()
+{
+  if (m_OpenTool3D.IsNotNull())
+  {
+    m_OpenTool3D->Cancel();
   }
 }
 

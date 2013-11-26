@@ -40,17 +40,11 @@ class SegmentationUI_EXPORT QmitkOpenTool3DGUI : public QmitkToolGUI
     mitkClassMacro(QmitkOpenTool3DGUI, QmitkToolGUI);
     itkNewMacro(QmitkOpenTool3DGUI);
 
-  signals:
-
-    /// \brief Emitted when button "Run" is pressed
-    void Run();
-
-  public slots:
-
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);
     void OnRun();
+    void OnCancel();
     void OnAcceptPreview();
     void OnCalculateDifference();
     void OnKernelSizeChanged(int);

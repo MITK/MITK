@@ -164,6 +164,11 @@ void mitk::AutoSegmentationTool::CalculateUnion()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+void mitk::AutoSegmentationTool::Cancel()
+{
+  m_ToolManager->ActivateTool(-1);
+}
+
 void mitk::AutoSegmentationTool::Activated()
 {
   // feedback node and its visualization properties

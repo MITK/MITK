@@ -27,6 +27,7 @@ QmitkFillHolesTool3DGUI::QmitkFillHolesTool3DGUI() : QmitkToolGUI()
   m_Controls.m_AdvancedControlsWidget->hide();
 
   connect( m_Controls.m_pbRun, SIGNAL(clicked()), this, SLOT(OnRun()) );
+  connect( m_Controls.m_pbCancel, SIGNAL(clicked()), this, SLOT(OnCancel()) );
   connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
   connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
   connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
@@ -62,6 +63,14 @@ void QmitkFillHolesTool3DGUI::OnRun()
   if (m_FillHolesTool3D.IsNotNull())
   {
     m_FillHolesTool3D->Run();
+  }
+}
+
+void QmitkFillHolesTool3DGUI::OnCancel()
+{
+  if (m_FillHolesTool3D.IsNotNull())
+  {
+    m_FillHolesTool3D->Cancel();
   }
 }
 

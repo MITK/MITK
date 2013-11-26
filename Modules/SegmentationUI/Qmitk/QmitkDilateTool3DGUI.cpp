@@ -28,6 +28,7 @@ QmitkDilateTool3DGUI::QmitkDilateTool3DGUI() : QmitkToolGUI()
   m_Controls.m_AdvancedControlsWidget->hide();
 
   connect( m_Controls.m_pbRun, SIGNAL(clicked()), this, SLOT(OnRun()) );
+  connect( m_Controls.m_pbCancel, SIGNAL(clicked()), this, SLOT(OnCancel()) );
   connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
   connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
   connect( m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
@@ -65,6 +66,14 @@ void QmitkDilateTool3DGUI::OnRun()
   if (m_DilateTool3D.IsNotNull())
   {
     m_DilateTool3D->Run();
+  }
+}
+
+void QmitkDilateTool3DGUI::OnCancel()
+{
+  if (m_DilateTool3D.IsNotNull())
+  {
+    m_DilateTool3D->Cancel();
   }
 }
 

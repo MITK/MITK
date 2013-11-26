@@ -14,60 +14,53 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkCloseTool3DGUI_h_Included
-#define QmitkCloseTool3DGUI_h_Included
+#ifndef QmitkKeepNConnectedRegionsTool3DGUI_h_Included
+#define QmitkKeepNConnectedRegionsTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
-#include "mitkCloseTool3D.h"
+#include "mitkKeepNConnectedRegionsTool3D.h"
 
-#include "ui_QmitkCloseTool3DGUIControls.h"
+#include "ui_QmitkKeepNConnectedRegionsTool3DGUIControls.h"
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI for mitk::CloseTool3D.
+  \brief GUI for mitk::KeepNConnectedRegionsTool3D.
 
   This GUI shows ...
 
   Last contributor: $Author$
 */
-class SegmentationUI_EXPORT QmitkCloseTool3DGUI : public QmitkToolGUI
+class SegmentationUI_EXPORT QmitkKeepNConnectedRegionsTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
   public:
 
-    mitkClassMacro(QmitkCloseTool3DGUI, QmitkToolGUI);
-    itkNewMacro(QmitkCloseTool3DGUI);
-
-  signals:
-
-    /// \brief Emitted when button "Run" is pressed
-    void Run();
-
-  public slots:
+    mitkClassMacro(QmitkKeepNConnectedRegionsTool3DGUI, QmitkToolGUI);
+    itkNewMacro(QmitkKeepNConnectedRegionsTool3DGUI);
 
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);
     void OnRun();
     void OnCancel();
+    void OnNumberOfConnectedRegionsToKeepChanged(int);
     void OnAcceptPreview();
     void OnCalculateDifference();
-    void OnKernelSizeChanged(int);
-    void OnNewLabel();
+    void OnCalculateUnion();
     void OnShowInformation(bool);
     void OnShowAdvancedControls(bool);
 
   protected:
-    QmitkCloseTool3DGUI();
-    virtual ~QmitkCloseTool3DGUI();
+    QmitkKeepNConnectedRegionsTool3DGUI();
+    virtual ~QmitkKeepNConnectedRegionsTool3DGUI();
 
     void BusyStateChanged(bool);
 
-    Ui::QmitkCloseTool3DGUIControls m_Controls;
+    Ui::QmitkKeepNConnectedRegionsTool3DGUIControls m_Controls;
 
-    mitk::CloseTool3D::Pointer m_CloseTool3D;
+    mitk::KeepNConnectedRegionsTool3D::Pointer m_KeepNConnectedRegionsTool3D;
 };
 
 #endif

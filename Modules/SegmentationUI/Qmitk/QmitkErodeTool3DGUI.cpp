@@ -28,6 +28,7 @@ QmitkErodeTool3DGUI::QmitkErodeTool3DGUI() : QmitkToolGUI()
   m_Controls.m_AdvancedControlsWidget->hide();
 
   connect( m_Controls.m_pbRun, SIGNAL(clicked()), this, SLOT(OnRun()) );
+  connect( m_Controls.m_pbCancel, SIGNAL(clicked()), this, SLOT(OnCancel()) );
   connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
   connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
   connect( m_Controls.m_sbKernelSize, SIGNAL(valueChanged(int)), this, SLOT(OnKernelSizeChanged(int)) );
@@ -65,6 +66,14 @@ void QmitkErodeTool3DGUI::OnRun()
   if (m_ErodeTool3D.IsNotNull())
   {
     m_ErodeTool3D->Run();
+  }
+}
+
+void QmitkErodeTool3DGUI::OnCancel()
+{
+  if (m_ErodeTool3D.IsNotNull())
+  {
+    m_ErodeTool3D->Cancel();
   }
 }
 

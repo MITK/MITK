@@ -38,6 +38,9 @@ class Segmentation_EXPORT AutoSegmentationTool : public Tool
 
     mitkClassMacro(AutoSegmentationTool, Tool);
 
+    /// \brief Deactivates the current tool and sets internal resources to default values.
+    virtual void Cancel();
+
     /// \brief Replaces the active label with the preview image.
     virtual void AcceptPreview();
 

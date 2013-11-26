@@ -81,6 +81,7 @@ set(CPP_FILES
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
   Interactions/mitkWatershedTool.cpp
+  Interactions/mitkKeepNConnectedRegionsTool3D.cpp
   IO/mitkNrrdLabelSetImageIOFactory.cpp
   IO/mitkNrrdLabelSetImageWriterFactory.cpp
   IO/mitkNrrdLabelSetImageReader.cpp
@@ -130,4 +131,5 @@ set(RESOURCE_FILES
   OpenTool3D_48x48.png
   CloseTool3D_48x48.png
   FillHolesTool3D_48x48.png
+  KeepNConnectedRegionsTool3D_48x48.png
 )

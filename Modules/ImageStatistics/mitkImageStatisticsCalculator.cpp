@@ -91,7 +91,9 @@ ImageStatisticsCalculator::ImageStatisticsCalculator()
   m_PlanarFigureAxis (0),
   m_PlanarFigureSlice (0),
   m_PlanarFigureCoordinate0 (0),
-  m_PlanarFigureCoordinate1 (0) // TODO DM: check order of variable initialization
+  m_PlanarFigureCoordinate1 (0), // TODO DM: check order of variable initialization
+  m_HotspotRadius(6.2035049089940),   // radius of a 1cm3 sphere in a isotrope image of 1mm spacings
+  m_CalculateHotspot(true)
 {
   m_EmptyHistogram = HistogramType::New();
   m_EmptyHistogram->SetMeasurementVectorSize(1);
@@ -1109,15 +1111,6 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     // TODO DM: it would be more consistent if we calculate hotspot statistics for EACH label, not only for the "unequal 0" label (after all other TODOs)
     /*****************************************************Calculate Hotspot Statistics**********************************************/
 
-    // TODO DM: must be configurable
-    // TODO DM: should have the unit in its name
-    const double radiusSUVHotspot = 6.2035049089940; // radius of a 1cm3 sphere in a isotrope image of 1mm spacings
-
-    // TODO DM: should not be called from a method, but form the user of this class
-    SetHotspotRadius(radiusSUVHotspot);
-    // TODO DM: should not be called from a method, but form the user of this class
-    SetCalculateHotspot(true);
-
     if(IsHotspotCalculated())
     {
       // TODO DM: CalculateHotspotStatistics should
@@ -1256,9 +1249,9 @@ ImageStatisticsCalculator
   MaskIteratorType maskIt(convolutionMask,maskRegion);
 
   int numberOfSubVoxelsPerDimension = 2; // per dimension!
-  int numberOfSubVoxels = ::pow( numberOfSubVoxelsPerDimension, VImageDimension );
-  double subVoxelSize = 1.0 / (double)numberOfSubVoxels;
-  double valueOfOneSubVoxel = 1.0 / (double) numberOfSubVoxels;
+  int numberOfSubVoxels = ::pow( static_cast<float>(numberOfSubVoxelsPerDimension), static_cast<float>(VImageDimension) );
+  double subVoxelSize = 1.0 / (double)numberOfSubVoxelsPerDimension; //(double)numberOfSubVoxels;
+  double valueOfOneSubVoxel = 1.0 / (double)numberOfSubVoxels;
   double maskValue = 0.0;
   Point3D subVoxelPosition;
   double distanceSquared = 0.0;
@@ -1281,15 +1274,15 @@ ImageStatisticsCalculator
     Vector3D subVoxelOffset; subVoxelOffset.Fill(0.0);
     // iterate sub-voxels by iterating all possible offsets
     for (subVoxelOffset[0] = -0.5 + subVoxelSize / 2.0;
-        subVoxelOffset[0] > +0.5;
+        subVoxelOffset[0] < +0.5;
         subVoxelOffset[0] += subVoxelSize)
     {
       for (subVoxelOffset[1] = -0.5 + subVoxelSize / 2.0;
-          subVoxelOffset[1] > +0.5;
+          subVoxelOffset[1] < +0.5;
           subVoxelOffset[1] += subVoxelSize)
       {
         for (subVoxelOffset[2] = -0.5 + subVoxelSize / 2.0;
-            subVoxelOffset[2] > +0.5;
+            subVoxelOffset[2] < +0.5;
             subVoxelOffset[2] += subVoxelSize)
         {
           subVoxelPosition = voxelPosition + subVoxelOffset; // TODO DM: this COULD be integrated into the for-loops if neccessary (add voxelPosition to initializer and end condition)
@@ -1307,7 +1300,6 @@ ImageStatisticsCalculator
     }
     maskIt.Set( maskValue );
   }
-
   return convolutionMask;
 }
 
@@ -1399,6 +1391,24 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
         sphereMaskIt.Set(1);
      else
       sphereMaskIt.Set(0);
+  }
+
+  typedef typename itk::Image<unsigned short, VImageDimension> InputMaskImageType;
+  typedef itk::ImageRegionIteratorWithIndex<InputMaskImageType> MaskImageIteratorType;
+  MaskImageIteratorType inputMaskIt(maskImage, maskImage->GetLargestPossibleRegion());
+  CroppedImageIteratorType sphereMaskIterator(croppedRegionMask, croppedRegionMask->GetLargestPossibleRegion());
+
+  for(inputMaskIt.GoToBegin(), sphereMaskIterator.GoToBegin();
+      !inputMaskIt.IsAtEnd() &&!sphereMaskIterator.IsAtEnd();
+      ++inputMaskIt, ++sphereMaskIterator)
+  {
+    unsigned int maskValue = inputMaskIt.Get();
+    unsigned int sphereMaskValue = sphereMaskIterator.Get();
+
+     if(maskValue > 0 && sphereMaskValue > 0)
+        sphereMaskIterator.Set(1);
+     else
+      sphereMaskIterator.Set(0);
   }
 
   // TODO DM: sphereMaskIt seems to define a box region where a sphere could fit inside the input image

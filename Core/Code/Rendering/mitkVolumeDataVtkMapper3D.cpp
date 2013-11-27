@@ -129,7 +129,7 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_BoundingBox->SetZLength( 0.0 );
 
   m_BoundingBoxMapper = vtkPolyDataMapper::New();
-  m_BoundingBoxMapper->SetInputData( m_BoundingBox->GetOutput() );
+  m_BoundingBoxMapper->SetInputConnection( m_BoundingBox->GetOutputPort() );
 
   m_BoundingBoxActor = vtkActor::New();
   m_BoundingBoxActor->SetMapper( m_BoundingBoxMapper );
@@ -151,14 +151,14 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_ImageCast->ClampOverflowOn();
 
   m_UnitSpacingImageFilter = vtkImageChangeInformation::New();
-  m_UnitSpacingImageFilter->SetInputData(m_ImageCast->GetOutput());
+  m_UnitSpacingImageFilter->SetInputConnection(m_ImageCast->GetOutputPort());
   m_UnitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
 
   m_ImageMaskFilter = vtkImageMask::New();
   m_ImageMaskFilter->SetMaskedOutputValue(0xffff);
 
-  this->m_Resampler->SetInputData( this->m_UnitSpacingImageFilter->GetOutput() );
-  this->m_HiResMapper->SetInputData( this->m_UnitSpacingImageFilter->GetOutput() );
+  this->m_Resampler->SetInputConnection( this->m_UnitSpacingImageFilter->GetOutputPort() );
+  this->m_HiResMapper->SetInputConnection( this->m_UnitSpacingImageFilter->GetOutputPort() );
 
 //  m_T2DMapper->SetInput(m_Resampler->GetOutput());
 
@@ -335,14 +335,15 @@ void mitk::VolumeDataVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
   //If mask exists, process mask before resampling.
   if (this->m_Mask)
   {
+    this->m_UnitSpacingImageFilter->Update();
     this->m_ImageMaskFilter->SetImageInputData(this->m_UnitSpacingImageFilter->GetOutput());
-    this->m_Resampler->SetInputData(this->m_ImageMaskFilter->GetOutput());
-    this->m_HiResMapper->SetInputData(this->m_ImageMaskFilter->GetOutput());
+    this->m_Resampler->SetInputConnection(this->m_ImageMaskFilter->GetOutputPort());
+    this->m_HiResMapper->SetInputConnection(this->m_ImageMaskFilter->GetOutputPort());
   }
   else
   {
-    this->m_Resampler->SetInputData(this->m_UnitSpacingImageFilter->GetOutput());
-    this->m_HiResMapper->SetInputData(this->m_UnitSpacingImageFilter->GetOutput());
+    this->m_Resampler->SetInputConnection(this->m_UnitSpacingImageFilter->GetOutputPort());
+    this->m_HiResMapper->SetInputConnection(this->m_UnitSpacingImageFilter->GetOutputPort());
   }
 
   this->UpdateTransferFunctions( renderer );

@@ -42,7 +42,7 @@ vtkMaskedGlyph2D::~vtkMaskedGlyph2D()
 void vtkMaskedGlyph2D::SetInput(vtkDataSet *input)
 {
   this->MaskPoints->SetInputData(input);
-  this->Superclass::SetInputData(this->MaskPoints->GetOutput());
+  this->Superclass::SetInputConnection(this->MaskPoints->GetOutputPort());
 }
 
 void vtkMaskedGlyph2D::SetRandomMode(int mode)
@@ -59,7 +59,7 @@ int vtkMaskedGlyph2D::RequestData(vtkInformation* info, vtkInformationVector** i
 {
   if (this->UseMaskPoints)
     {
-    this->Superclass::SetInputData(this->MaskPoints->GetOutput());
+    this->Superclass::SetInputConnection(this->MaskPoints->GetOutputPort());
     vtkIdType numPts = this->MaskPoints->GetPolyDataInput(0)->GetNumberOfPoints();
     this->MaskPoints->SetMaximumNumberOfPoints(MaximumNumberOfPoints);
     this->MaskPoints->SetOnRatio(numPts / MaximumNumberOfPoints);

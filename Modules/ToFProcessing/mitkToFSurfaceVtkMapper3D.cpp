@@ -93,7 +93,7 @@ void mitk::ToFSurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
   if ( m_GenerateNormals )
   {
     ls->m_VtkPolyDataNormals->SetInputData( polydata );
-    ls->m_VtkPolyDataMapper->SetInputData( ls->m_VtkPolyDataNormals->GetOutput() );
+    ls->m_VtkPolyDataMapper->SetInputConnection( ls->m_VtkPolyDataNormals->GetOutputPort() );
   }
   else
   {

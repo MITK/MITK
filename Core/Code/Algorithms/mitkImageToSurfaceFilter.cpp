@@ -53,7 +53,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   //MarchingCube -->create Surface
   vtkMarchingCubes *skinExtractor = vtkMarchingCubes::New();
   skinExtractor->ComputeScalarsOff();
-  skinExtractor->SetInputData(indexCoordinatesImageFilter->GetOutput());//RC++
+  skinExtractor->SetInputConnection(indexCoordinatesImageFilter->GetOutputPort());//RC++
   indexCoordinatesImageFilter->Delete();
   skinExtractor->SetValue(0, threshold);
 
@@ -67,13 +67,14 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   {
     vtkSmoothPolyDataFilter *smoother = vtkSmoothPolyDataFilter::New();
     //read poly1 (poly1 can be the original polygon, or the decimated polygon)
-    smoother->SetInputData(polydata);//RC++
+    smoother->SetInputConnection(skinExtractor->GetOutputPort());//RC++
     smoother->SetNumberOfIterations( m_SmoothIteration );
     smoother->SetRelaxationFactor( m_SmoothRelaxation );
     smoother->SetFeatureAngle( 60 );
     smoother->FeatureEdgeSmoothingOff();
     smoother->BoundarySmoothingOff();
     smoother->SetConvergence( 0 );
+    smoother->Update();
 
     polydata->Delete();//RC--
     polydata = smoother->GetOutput();
@@ -96,6 +97,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     decimate->SetInputData(polydata);//RC++
     decimate->SetTargetReduction(m_TargetReduction);
     decimate->SetMaximumError(0.002);
+    decimate->Update();
 
     polydata->Delete();//RC--
     polydata = decimate->GetOutput();
@@ -108,6 +110,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     decimate->SetTargetReduction(m_TargetReduction);
 
     decimate->SetInputData(polydata);
+    decimate->Update();
     polydata->Delete();
     polydata = decimate->GetOutput();
     polydata->Register(NULL);
@@ -148,7 +151,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   normalsGenerator->SetInputData( polydata );
 
   vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-  cleanPolyDataFilter->SetInputData(normalsGenerator->GetOutput());
+  cleanPolyDataFilter->SetInputConnection(normalsGenerator->GetOutputPort());
   cleanPolyDataFilter->PieceInvariantOff();
   cleanPolyDataFilter->ConvertLinesToPointsOff();
   cleanPolyDataFilter->ConvertPolysToLinesOff();

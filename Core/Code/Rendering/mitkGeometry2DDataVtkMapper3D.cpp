@@ -83,19 +83,21 @@ namespace mitk
     m_Cleaner->SetInputData( emptyPolyData );
     emptyPolyData->Delete();
 
-    m_Edges->SetInputData(m_Cleaner->GetOutput());
-    m_EdgeTransformer->SetInputData( m_Edges->GetOutput() );
+    m_Edges->SetInputConnection(m_Cleaner->GetOutputPort());
+    m_EdgeTransformer->SetInputConnection( m_Edges->GetOutputPort() );
 
-    m_EdgeTuber->SetInputData( m_EdgeTransformer->GetOutput() );
+    m_EdgeTuber->SetInputConnection( m_EdgeTransformer->GetOutputPort() );
     m_EdgeTuber->SetVaryRadiusToVaryRadiusOff();
     m_EdgeTuber->SetNumberOfSides( 12 );
     m_EdgeTuber->CappingOn();
 
-    m_EdgeMapper->SetInputData( m_EdgeTuber->GetOutput() );
+    m_EdgeMapper->SetInputConnection( m_EdgeTuber->GetOutputPort() );
     m_EdgeMapper->ScalarVisibilityOff();
 
     m_BackgroundMapper->SetInputData(emptyPolyData);
+    m_BackgroundMapper->Update();
 
+    m_EdgeMapper->Update();
     m_EdgeActor->SetMapper( m_EdgeMapper );
 
     m_BackgroundActor->GetProperty()->SetAmbient( 0.5 );
@@ -112,11 +114,13 @@ namespace mitk
     m_BackHedgeHog  = vtkHedgeHog::New();
 
     m_FrontNormalsMapper = vtkPolyDataMapper::New();
-    m_FrontNormalsMapper->SetInputData( m_FrontHedgeHog->GetOutput() );
+    m_FrontNormalsMapper->SetInputConnection( m_FrontHedgeHog->GetOutputPort());
     m_BackNormalsMapper = vtkPolyDataMapper::New();
 
     m_Prop3DAssembly->AddPart( m_EdgeActor );
     m_Prop3DAssembly->AddPart( m_ImageAssembly );
+    m_FrontNormalsMapper->Update();
+    m_BackNormalsMapper->Update();
     m_FrontNormalsActor = vtkActor::New();
     m_FrontNormalsActor->SetMapper(m_FrontNormalsMapper);
     m_BackNormalsActor = vtkActor::New();
@@ -340,15 +344,17 @@ namespace mitk
           m_NormalsTransformer->SetInputData( surface->GetVtkPolyData() );
           m_NormalsTransformer->SetTransform(node->GetVtkTransform(this->GetTimestep()) );
 
-          m_FrontHedgeHog->SetInputData( m_NormalsTransformer->GetOutput() );
+          m_FrontHedgeHog->SetInputConnection(m_NormalsTransformer->GetOutputPort() );
           m_FrontHedgeHog->SetVectorModeToUseNormal();
           m_FrontHedgeHog->SetScaleFactor( invertNormals ? 1.0 : -1.0 );
+          m_FrontHedgeHog->Update();
 
           m_FrontNormalsActor->GetProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );
 
-          m_BackHedgeHog->SetInputData( m_NormalsTransformer->GetOutput() );
+          m_BackHedgeHog->SetInputConnection( m_NormalsTransformer->GetOutputPort() );
           m_BackHedgeHog->SetVectorModeToUseNormal();
           m_BackHedgeHog->SetScaleFactor( invertNormals ? -1.0 : 1.0 );
+          m_BackHedgeHog->Update();
 
           m_BackNormalsActor->GetProperty()->SetColor( backColor[0], backColor[1], backColor[2] );
 
@@ -522,6 +528,8 @@ namespace mitk
             {
               dataSetMapper->SetInputData( surface->GetVtkPolyData() );
             }
+
+            dataSetMapper->Update();
 
             //Check if the m_ReslicedImage is NULL.
             //This is the case when no image geometry is met by

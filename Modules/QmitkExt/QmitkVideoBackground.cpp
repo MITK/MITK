@@ -233,6 +233,7 @@ void QmitkVideoBackground::Modified()
   for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
     it != m_renderWindowVectorInfo.end(); it++)
   {
+    (*it).videoImport->Update();
     (*it).videoActor->SetInputData((*it).videoImport->GetOutput());
     (*it).videoRenderer->AddActor2D((*it).videoActor);
     (*it).videoRenderer->ResetCamera();

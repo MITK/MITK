@@ -1101,7 +1101,7 @@ namespace mitk
 
     // Make a stencil from the extruded polygon
     vtkPolyDataToImageStencil *polyDataToImageStencil = vtkPolyDataToImageStencil::New();
-    polyDataToImageStencil->SetInputData( extrudeFilter->GetOutput() );
+    polyDataToImageStencil->SetInputConnection( extrudeFilter->GetOutputPort() );
 
 
 
@@ -1120,7 +1120,7 @@ namespace mitk
     // Apply the generated image stencil to the input image
     vtkImageStencil *imageStencilFilter = vtkImageStencil::New();
     imageStencilFilter->SetInputData( vtkImporter->GetOutput() );
-    imageStencilFilter->SetStencilData(polyDataToImageStencil->GetOutput() );
+    imageStencilFilter->SetStencilConnection(polyDataToImageStencil->GetOutputPort() );
     imageStencilFilter->ReverseStencilOff();
     imageStencilFilter->SetBackgroundValue( 0 );
     imageStencilFilter->Update();

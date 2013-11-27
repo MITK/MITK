@@ -171,7 +171,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
   indexCoordinatesImageFilter->SetOutputOrigin(0.0,0.0,0.0);
 
     vtkImageThreshold* threshold = vtkImageThreshold::New();
-    threshold->SetInputData( indexCoordinatesImageFilter->GetOutput() );
+    threshold->SetInputConnection( indexCoordinatesImageFilter->GetOutputPort() );
     //indexCoordinatesImageFilter->Delete();
     threshold->SetInValue( 100 );
     threshold->SetOutValue( 0 );
@@ -180,7 +180,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     threshold->ReleaseDataFlagOn();
 
     vtkImageGaussianSmooth *gaussian = vtkImageGaussianSmooth::New();
-    gaussian->SetInputData( threshold->GetOutput() );
+    gaussian->SetInputConnection( threshold->GetOutputPort() );
     //threshold->Delete();
     gaussian->SetDimensionality( 3  );
     gaussian->SetRadiusFactor( 0.49 );
@@ -192,7 +192,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
   //MarchingCube -->create Surface
   vtkMarchingCubes *skinExtractor = vtkMarchingCubes::New();
   skinExtractor->ReleaseDataFlagOn();
-  skinExtractor->SetInputData(gaussian->GetOutput());//RC++
+  skinExtractor->SetInputConnection(gaussian->GetOutputPort());//RC++
   indexCoordinatesImageFilter->Delete();
   skinExtractor->SetValue(0, 50);
 

@@ -158,12 +158,12 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* rendere
         sphere->SetRadius(pointSize);
         sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
 
-        m_Spheres->AddInputData(sphere->GetOutput());
+        m_Spheres->AddInputConnection(sphere->GetOutputPort());
         sphere->Delete();
       }
 
       // setup mapper, actor and add to assembly
-      m_SpheresMapper->SetInputData(m_Spheres->GetOutput());
+      m_SpheresMapper->SetInputConnection(m_Spheres->GetOutputPort());
       m_SpheresActor->GetProperty()->SetColor(doubleRgba);
       m_PropAssembly->AddPart(m_SpheresActor);
     }

@@ -424,7 +424,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
     quadricDecimation->Update();
 
     vtkCleanPolyData* cleaner = vtkCleanPolyData::New();
-    cleaner->SetInputData(quadricDecimation->GetOutput());
+    cleaner->SetInputConnection(quadricDecimation->GetOutputPort());
     cleaner->PieceInvariantOn();
     cleaner->ConvertLinesToPointsOn();
     cleaner->ConvertStripsToPolysOn();

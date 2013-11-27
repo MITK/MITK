@@ -180,7 +180,7 @@ m_MaximumNumberOfPoints = 80*80*80;
     m_Glyph3DGenerator->SetRandomMode( m_RandomMode );
     m_Glyph3DGenerator->SetMaximumNumberOfPoints( m_MaximumNumberOfPoints );
     m_Glyph3DGenerator->Update();
-    m_Glyph3DMapper->SetInputData( m_Glyph3DGenerator->GetOutput() );
+    m_Glyph3DMapper->SetInputConnection( m_Glyph3DGenerator->GetOutputPort() );
     m_Glyph3DActor->SetMapper( m_Glyph3DMapper );
 
     if (GetDataNode()->GetProperty("LookupTable"))

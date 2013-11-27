@@ -120,7 +120,7 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
     {
     vtkGeometryFilter *gf = vtkGeometryFilter::New();
     vtkPolyDataMapper *pm = vtkPolyDataMapper::New();
-    pm->SetInputData(gf->GetOutput());
+    pm->SetInputConnection(gf->GetOutputPort());
 
     this->GeometryExtractor = gf;
     this->PolyDataMapper = pm;
@@ -146,7 +146,7 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
   }
 
   this->GeometryExtractor->SetInputData(this->GetInput());
-  this->PolyDataMapper->SetInputData(this->GeometryExtractor->GetOutput());
+  this->PolyDataMapper->SetInputConnection(this->GeometryExtractor->GetOutputPort());
 
   // update ourselves in case something has changed
   this->PolyDataMapper->SetLookupTable(this->GetLookupTable());

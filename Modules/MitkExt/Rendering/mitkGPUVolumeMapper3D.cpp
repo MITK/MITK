@@ -112,7 +112,7 @@ bool mitk::GPUVolumeMapper3D::InitGPU(mitk::BaseRenderer* renderer)
   ls->m_VolumeGPU->SetProperty( ls->m_VolumePropertyGPU );
   ls->m_VolumeGPU->VisibilityOn();
 
-  ls->m_MapperGPU->SetInputData( this->m_UnitSpacingImageFilter->GetOutput() );
+  ls->m_MapperGPU->SetInputConnection( this->m_UnitSpacingImageFilter->GetOutputPort() );
 
   ls->m_gpuSupported = ls->m_MapperGPU->IsRenderSupported(renderer->GetVtkRenderer(),ls->m_VolumePropertyGPU);
 
@@ -154,7 +154,7 @@ void mitk::GPUVolumeMapper3D::InitCPU(mitk::BaseRenderer* renderer)
   ls->m_VolumeCPU->SetProperty( ls->m_VolumePropertyCPU );
   ls->m_VolumeCPU->VisibilityOn();
 
-  ls->m_MapperCPU->SetInputData( m_UnitSpacingImageFilter->GetOutput() );//m_Resampler->GetOutput());
+  ls->m_MapperCPU->SetInputConnection( m_UnitSpacingImageFilter->GetOutputPort() );//m_Resampler->GetOutput());
 
   ls->m_cpuInitialized=true;
 }
@@ -644,7 +644,7 @@ bool mitk::GPUVolumeMapper3D::InitRAY(mitk::BaseRenderer* renderer)
   ls->m_VolumeRAY->SetProperty( ls->m_VolumePropertyRAY );
   ls->m_VolumeRAY->VisibilityOn();
 
-  ls->m_MapperRAY->SetInputData( this->m_UnitSpacingImageFilter->GetOutput() );
+  ls->m_MapperRAY->SetInputConnection( this->m_UnitSpacingImageFilter->GetOutputPort() );
 
   ls->m_raySupported = ls->m_MapperRAY->IsRenderSupported(renderer->GetRenderWindow(),ls->m_VolumePropertyRAY);
 

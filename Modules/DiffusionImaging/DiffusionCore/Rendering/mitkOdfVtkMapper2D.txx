@@ -616,7 +616,7 @@ void  mitk::OdfVtkMapper2D<T,N>
                 std::cout << err << std::endl;
             }
 
-            localStorage->m_OdfsPlanes[index]->AddInputData(glyphGenerator->GetOutput());
+            localStorage->m_OdfsPlanes[index]->AddInputConnection(glyphGenerator->GetOutputPort());
 
             localStorage->m_OdfsPlanes[index]->Update();
         }

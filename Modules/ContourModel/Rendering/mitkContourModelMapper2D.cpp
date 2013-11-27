@@ -227,7 +227,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
             sphere->SetRadius(1.2);
             sphere->SetCenter(coordinates[0], coordinates[1], coordinates[2]);
             sphere->Update();
-            appendPoly->AddInputData(sphere->GetOutput());
+            appendPoly->AddInputConnection(sphere->GetOutputPort());
           }
         }
 
@@ -252,7 +252,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
           sphere->SetRadius(1.2);
           sphere->SetCenter(coordinates[0], coordinates[1], coordinates[2]);
           sphere->Update();
-          appendPoly->AddInputData(sphere->GetOutput());
+          appendPoly->AddInputConnection(sphere->GetOutputPort());
         }
       }
 

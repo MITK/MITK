@@ -280,12 +280,11 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     return;
   }
 
-  vtkImageChangeInformation * unitSpacingImageFilter = vtkImageChangeInformation::New() ;
+  vtkSmartPointer<vtkImageChangeInformation> unitSpacingImageFilter = vtkImageChangeInformation::New() ;
   unitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
   unitSpacingImageFilter->SetInputData( inputData );
 
-  m_Reslicer->SetInputData( unitSpacingImageFilter->GetOutput() );
-  unitSpacingImageFilter->Delete();
+  m_Reslicer->SetInputConnection( unitSpacingImageFilter->GetOutputPort() );
 
   //m_Reslicer->SetInput( inputData );
 

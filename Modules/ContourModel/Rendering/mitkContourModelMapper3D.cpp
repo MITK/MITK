@@ -71,7 +71,7 @@ void mitk::ContourModelMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
   localStorage->m_TubeFilter->CappingOn();
   localStorage->m_TubeFilter->SetNumberOfSides(10);
   localStorage->m_TubeFilter->Update();
-  localStorage->m_Mapper->SetInputData(localStorage->m_TubeFilter->GetOutput());
+  localStorage->m_Mapper->SetInputConnection(localStorage->m_TubeFilter->GetOutputPort());
 
 }
 

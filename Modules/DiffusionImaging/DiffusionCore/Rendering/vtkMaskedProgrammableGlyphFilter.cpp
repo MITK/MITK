@@ -62,10 +62,10 @@ int vtkMaskedProgrammableGlyphFilter::RequestData(
 {
   if (this->UseMaskPoints)
   {
-    this->Superclass::SetInputData(this->MaskPoints->GetOutput());
     vtkIdType numPts = this->MaskPoints->GetPolyDataInput(0)->GetNumberOfPoints();
     this->MaskPoints->SetMaximumNumberOfPoints(MaximumNumberOfPoints);
     this->MaskPoints->SetOnRatio(numPts / MaximumNumberOfPoints);
+    this->Superclass::SetInputConnection(this->MaskPoints->GetOutputPort());
     this->MaskPoints->Update();
   }
   else

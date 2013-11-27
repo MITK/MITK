@@ -542,7 +542,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   ls->m_UnselectedGlyph3D->SetScaleModeToScaleByVector();
   ls->m_UnselectedGlyph3D->SetVectorModeToUseVector();
 
-  ls->m_VtkUnselectedPolyDataMapper->SetInputData(ls->m_UnselectedGlyph3D->GetOutput());
+  ls->m_VtkUnselectedPolyDataMapper->SetInputConnection(ls->m_UnselectedGlyph3D->GetOutputPort());
   ls->m_UnselectedActor->SetMapper(ls->m_VtkUnselectedPolyDataMapper);
   ls->m_UnselectedActor->GetProperty()->SetLineWidth(m_PointLineWidth);
 
@@ -570,7 +570,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   ls->m_SelectedGlyph3D->SetScaleModeToScaleByVector();
   ls->m_SelectedGlyph3D->SetVectorModeToUseVector();
 
-  ls->m_VtkSelectedPolyDataMapper->SetInputData(ls->m_SelectedGlyph3D->GetOutput());
+  ls->m_VtkSelectedPolyDataMapper->SetInputConnection(ls->m_SelectedGlyph3D->GetOutputPort());
   ls->m_SelectedActor->SetMapper(ls->m_VtkSelectedPolyDataMapper);
   ls->m_SelectedActor->GetProperty()->SetLineWidth(m_PointLineWidth);
 

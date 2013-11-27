@@ -85,7 +85,7 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
   if ( m_GenerateNormals )
   {
     ls->m_VtkPolyDataNormals->SetInputData( polydata );
-    ls->m_VtkPolyDataMapper->SetInputData( ls->m_VtkPolyDataNormals->GetOutput() );
+    ls->m_VtkPolyDataMapper->SetInputConnection( ls->m_VtkPolyDataNormals->GetOutputPort() );
   }
   else
   {
@@ -326,6 +326,7 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
         {
             vtkTxture->SetInputData(miktTexture->GetVtkImageData());
         }
+        vtkTxture->Update();
         //pass the texture to the actor
         ls->m_Actor->SetTexture(vtkTxture);
         if(ls->m_VtkPolyDataMapper->GetInput()->GetPointData()->GetTCoords() == NULL)

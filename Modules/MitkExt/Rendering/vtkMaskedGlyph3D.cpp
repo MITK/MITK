@@ -68,7 +68,7 @@ int vtkMaskedGlyph3D::RequestData(
 {
   if (this->UseMaskPoints)
   {
-    this->Superclass::SetInputData(this->MaskPoints->GetOutput());
+    this->Superclass::SetInputConnection(this->MaskPoints->GetOutputPort());
     vtkIdType numPts = this->MaskPoints->GetPolyDataInput(0)->GetNumberOfPoints();
     this->MaskPoints->SetMaximumNumberOfPoints( MaximumNumberOfPoints );
     this->MaskPoints->SetOnRatio( numPts / MaximumNumberOfPoints );

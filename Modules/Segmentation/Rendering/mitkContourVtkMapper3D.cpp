@@ -140,7 +140,7 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
         sphere->SetRadius(pointSize);
         sphere->SetCenter(vtkpoint);
 
-        m_VtkPointList->AddInputData(sphere->GetOutput());
+        m_VtkPointList->AddInputConnection(sphere->GetOutputPort());
         sphere->Update();
       }
     }
@@ -161,12 +161,12 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
 
     if ( showPoints )
     {
-      m_VtkPointList->AddInputData(m_TubeFilter->GetOutput());
-      m_VtkPolyDataMapper->SetInputData(m_VtkPointList->GetOutput());
+      m_VtkPointList->AddInputConnection(m_TubeFilter->GetOutputPort());
+      m_VtkPolyDataMapper->SetInputConnection(m_VtkPointList->GetOutputPort());
     }
     else
     {
-      m_VtkPolyDataMapper->SetInputData(m_TubeFilter->GetOutput());
+      m_VtkPolyDataMapper->SetInputConnection(m_TubeFilter->GetOutputPort());
     }
     double rgba[4]={0.0f,1.0f,0.0f,0.6f};
     m_Actor->GetProperty()->SetColor(rgba);

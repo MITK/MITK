@@ -1,5 +1,7 @@
 #Begin MicronTracker Hardware
 option(MITK_USE_MICRON_TRACKER "Enable support for micron tracker hardware" OFF)
+#Begin Optitrack Hardware
+option(MITK_USE_OPTITRACK_TRACKER "Enable support for Optitrack tracker hardware" OFF)
 
 # only if MicronTracker is enabled
 if(MITK_USE_MICRON_TRACKER)
@@ -12,6 +14,18 @@ if(MITK_USE_MICRON_TRACKER)
   MITK_INSTALL(FILES ${MICRON_TRACKER_SDK_DIR}/PGRFlyCapture.dll  CONFIGURATIONS Release)
 ENDIF(MITK_USE_MICRON_TRACKER)
 #End MicronTracker Hardware
+
+#only if Optitrack is enabled
+if(MITK_USE_OPTITRACK_TRACKER)
+  find_library(MITK_OPTITRACK_TRACKER_LIB NPTrackingTools DOC "Path which contains the Optitrack library. Please choose 32/64 bit version depending on your build.")
+  find_path(MITK_OPTITRACK_TRACKER_INCLUDE_DIR NPTrackinTools.h DOC  "Include directory of the Optitrack library.")
+  if(WIN32)
+  MITK_INSTALL(FILES ${MITK_OPTITRACK_TRACKER_LIB}/NPTrackingTools.dll  CONFIGURATIONS Release)
+  else(WIN32)
+  MITK_INSTALL(FILES ${MITK_OPTITRACK_TRACKER_LIB}/NPTrackingToolsx64.dll  CONFIGURATIONS Release)
+  endif(WIN32)
+ENDIF(MITK_USE_OPTITRACK_TRACKER)
+#End Optitrack Hardware
 
 
 # only on Win32

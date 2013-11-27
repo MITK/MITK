@@ -36,7 +36,8 @@ the recorded file from the harddisc and plays it by using the player as source. 
 
 \image html IGTTutorialStep1-2.png
 
-The full code of small navigation pipeline is shown below.
+The full code of small navigation pipeline is shown below and can be found in MITK-Source/Modules/IGT/Tutorial/mitkIGTTutorialStep1.cpp.
+This tutorial is an extra target which can be build separately.
 
 \include mitkIGTTutorialStep1.cpp
 

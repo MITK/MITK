@@ -157,6 +157,8 @@ void mitk::SurfaceInterpolationController::Interpolate()
   mitk::ImageToSurfaceFilter::Pointer imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
   imageToSurfaceFilter->SetInput( distanceImage );
   imageToSurfaceFilter->SetThreshold( 0 );
+  imageToSurfaceFilter->SetSmooth(true);
+  imageToSurfaceFilter->SetSmoothIteration(20);
   imageToSurfaceFilter->Update();
   m_InterpolationResult = imageToSurfaceFilter->GetOutput();
 

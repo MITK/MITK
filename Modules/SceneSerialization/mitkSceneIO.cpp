@@ -112,7 +112,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   if ( filename.empty() )
   {
     MITK_ERROR << "No filename given. Not possible to load scene.";
-    return NULL;
+    return storage;
   }
 
   // test if filename can be read
@@ -120,7 +120,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   if (!file.good())
   {
     MITK_ERROR << "Cannot open '" << filename << "' for reading";
-    return NULL;
+    return storage;
   }
 
   // get new temporary directory
@@ -128,7 +128,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   if (m_WorkingDirectory.empty())
   {
     MITK_ERROR << "Could not create temporary directory. Cannot open scene files.";
-    return NULL;
+    return storage;
   }
 
   // unzip all filenames contents to temp dir
@@ -151,7 +151,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   if (!document.LoadFile())
   {
     MITK_ERROR << "Could not open/read/parse " << m_WorkingDirectory << "/index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
-    return NULL;
+    return storage;
   }
 
   SceneReader::Pointer reader = SceneReader::New();

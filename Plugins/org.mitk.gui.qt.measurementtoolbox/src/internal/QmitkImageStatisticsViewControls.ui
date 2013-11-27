@@ -283,15 +283,6 @@
           </sizepolicy>
          </property>
         </widget>
-        <widget class="QmitkVtkHistogramWidget" name="m_HistogramWidget">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-        <widget class="QmitkVtkLineProfileWidget" name="m_LineProfileWidget"/>
        </widget>
       </item>
       <item row="3" column="0">
@@ -459,18 +450,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>QmitkVtkHistogramWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkVtkHistogramWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QmitkVtkLineProfileWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkVtkLineProfileWidget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>QmitkHistogramJSWidget</class>
    <extends>QWidget</extends>

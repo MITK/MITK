@@ -49,11 +49,16 @@ mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, mitk::USImageMetad
 
 mitk::USVideoDevice::~USVideoDevice()
 {
-  m_MultiThreader->TerminateThread(m_ThreadID);
+  if (m_ThreadID >= 0)
+  {
+    m_MultiThreader->TerminateThread(m_ThreadID);
+  }
 }
 
 void mitk::USVideoDevice::Init()
 {
+  m_ThreadID = -1; // initialize with invalid id
+
   m_Source = mitk::USImageVideoSource::New();
   //this->SetNumberOfInputs(1);
   this->SetNumberOfOutputs(1);

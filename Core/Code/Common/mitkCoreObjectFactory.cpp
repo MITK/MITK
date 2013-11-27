@@ -419,12 +419,37 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::CoreObjectFactory::GetSaveFileEx
 
 mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters() {
   FileWriterList allWriters = m_FileWriters;
-  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
-    FileWriterList list2 = (*it)->GetFileWriters();
-    allWriters.merge(list2);
+  //sort to merge lists later on
+  typedef std::set<mitk::FileWriterWithInformation::Pointer> FileWriterSet;
+  FileWriterSet fileWritersSet;
+
+  for( FileWriterList::iterator iter = allWriters.begin();
+       iter != allWriters.end(); ++iter) {
+      fileWritersSet.insert(*iter);
   }
+
+  //collect all extra factories
+  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin();
+       it != m_ExtraFactories.end(); it++ ) {
+      FileWriterList list2 = (*it)->GetFileWriters();
+
+    //add them to the sorted set
+    for( FileWriterList::iterator iter = list2.begin();
+       iter != list2.end(); ++iter) {
+        fileWritersSet.insert(*iter);
+    }
+  }
+
+  //write back to allWriters to return a list
+  allWriters.clear();
+  for (FileWriterSet::iterator iter = fileWritersSet.begin();
+       iter != fileWritersSet.end(); ++iter) {
+      allWriters.insert(allWriters.end(), *iter);
+  }
+
   return allWriters;
 }
+
 void mitk::CoreObjectFactory::MapEvent(const mitk::Event*, const int) {
 
 }

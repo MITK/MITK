@@ -55,7 +55,6 @@ int mitkImageVtkMapper2DLookupTableTest(int argc, char* argv[])
   renderingHelper.SetImageProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::LOOKUPTABLE_COLOR));
   //set the property for the image
   renderingHelper.SetImageProperty("LookupTable", mitk::LookupTableProperty::New(myLookupTable));
-  renderingHelper.SetImageProperty("texture interpolation", mitk::BoolProperty::New(false));
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
   MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv, 20.0) == true, "CompareRenderWindowAgainstReference test result positive?" );

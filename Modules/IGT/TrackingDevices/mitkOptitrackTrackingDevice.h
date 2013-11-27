@@ -50,24 +50,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOptitrackTrackingTool.h"
 
 /**
+* \brief Function to get the Error messages from API
+*/
+#include <mitkOptitrackErrorMessages.h>
+
+/**
 * \brief MutexHolder to keep rest of Mutex
 */
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
-#include <mitkOptitrackErrorMessages.h>
-
-/**
-* \brief Maximum number of attempts for Initialization, Shutdown and CleanUp
-*/
-#ifndef OPTITRACK_ATTEMPTS
-#define OPTITRACK_ATTEMPTS 10
-#endif
-
-// Time to refresh the tools location (ms)
-#ifndef OPTITRACK_FRAME_RATE
-#define OPTITRACK_FRAME_RATE 25
-#endif
 
 
 namespace mitk
@@ -78,6 +70,7 @@ namespace mitk
   *          continuously update the tool coordinates. Remember that it will be necessary to
   *       to have a license for using the Optitrack System.
   *       See  http://www.naturalpoint.com/ for details.
+  *   \author E. Marinetto (emarinetto@hggm.es) Instituto de Investigación Sanitaria Gregorio Marañón, Madrid, Spain. & M. Noll (matthias.noll@igd.fraunhofer.de) Cognitive Computing & Medical Imaging | Fraunhofer IGD
   *   \ingroup IGT
   */
   class MitkIGT_EXPORT OptitrackTrackingDevice : public mitk::TrackingDevice
@@ -97,7 +90,7 @@ namespace mitk
     * \brief Open the Connection with the Tracker. Calls LoadCalibration function and set the system up with the calibration file.
     * Remember that you have to set a calibration file first to open a correct connection to the Optical Tracking System.
     * \return Returns true if the connection is well done. Throws an exception if an error occures related to the Optitrack API messages.
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error during the connection with the system.
+    * @throw mitk::IGTException Throws an exception if InitializeCameras or LoadCalibration failed.
     */
     virtual bool OpenConnection();
 
@@ -105,7 +98,7 @@ namespace mitk
     * \brief Close the Connection with the Tracker. Also CleanUp the Optitrack variables using the API: TT_CleanUp and TT_ShutDown.
     * Sometimes API does not work properly and some problems during the Clean Up has been reported.
     * \return Returns true if the cleaning up and shutdown worked correctly. Throws an exception if an error occures related to the Optitrack API messages.
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error during the cleaning up and shutdown with the system.
+    * @throw mitk::IGTException Throws an exception if the System cannot ShutDown now or was not initialized.
     */
     virtual bool CloseConnection();
 
@@ -113,14 +106,14 @@ namespace mitk
     * \brief Start to Track the tools already defined. If no tools are defined for this tracker, it returns an error.
     * Tools can be added using either AddToolByDescriptionFile or AddToolsByConfigurationFiles
     * \return Returns true at least one tool was defined and the tracking is correct
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error during the checking of the tools.
+    * @throw mitk::IGTException Throws an exception if the System is not in State Ready .
     */
     virtual bool StartTracking();
 
     /**
     * \brief Stop the Tracking Thread and tools will not longer be updated.
     * \return Returns true if Tracking thread could be stopped.
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error during thread stopping.
+    * @throw mitk::IGTException Throws an exception if System is not in State Tracking.
     */
     virtual bool StopTracking();
 
@@ -129,7 +122,6 @@ namespace mitk
     * \param toolNumber The number of the tool which should be given back.
     * \return Returns the tool which the number "toolNumber". Returns NULL, if there is
     * no tool with this number.
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error. /////////////////////////^????????????????
     */
     TrackingTool* GetTool(unsigned int toolNumber) const;
 
@@ -138,14 +130,13 @@ namespace mitk
     * \param toolNumber The number of the tool which should be given back.
     * \return Returns the tool which the number "toolNumber". Returns NULL, if there is
     * no tool with this number.
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error. /////////////////////////^????????????????
+    * @throw mitk::IGTException Throws an exception if there is the required tool does not exist.
     */
     OptitrackTrackingTool* OptitrackTrackingDevice::GetOptitrackTool(unsigned int toolNumber) const;
 
     /**
     * \brief Returns the number of defined tools
     * \return Returns the number of defined tools in the Optitrack device.
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error. /////////////////////////^????????????????
     */
     unsigned int GetToolCount() const;
 
@@ -157,20 +148,20 @@ namespace mitk
 
     /**
     * \brief Start the Tracking Thread for the tools
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error. /////////////////////////^????????????????
+    * @throw mitk::IGTException Throws an exception if variable trackingDevice is NULL
     */
     static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);
 
     /**
     * \brief Update each tool location in the list m_AllTools
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error. /////////////////////////^????????????????
+    * @throw mitk::IGTException Throws an exception if the getting data operation failed for a defined tool
     */
     void TrackTools();
 
     /**
     * \brief Load the Calibration file to the Optitrack System and set the cameras in calibrated locations
     * \return Returns true if the calibration was uploaded correctly
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error during the uploading of the calibration, also a message related to the API eror messages.
+    * @throw mitk::IGTException Throws an exception if Calibration Path is empty, the System cannot load a calibration file or System is not ready for load a calibration file because it has not been initialized yet
     */
     bool LoadCalibration();
 
@@ -183,14 +174,14 @@ namespace mitk
         * //==     4 = Precision Mode
         * //==     6 = MJPEG Mode     (V100R2 only)
     * \return Returns true if all cameras were set up correctly
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error during the setting up of the cameras, also a message related to the API eror messages. // ????? Better just a message informing of a problem with the set up?
+    * @throw mitk::IGTException Throws an exception if System is not Initialized
     */
     bool SetCameraParams(int exposure, int threshold, int intensity, int videoType = 4);
 
     /**
     * \brief Initialize the Optitrack System
     * \return Returns true if system was initialized correctly
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error during the Initialization
+    * @throw mitk::IGTException Throws an exception if the Optitrack Tracking System cannot be initialized
     */
     bool InitializeCameras();
 
@@ -205,14 +196,14 @@ namespace mitk
     *    X Y Z - for the last marker, the number #NumberOfMarkers
     *    X Y Z - for the PIVOT point
     * \return Returns true if system was initialized correctly
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error during the Initialization
+    * @throw mitk::IGTException Throws an exception if Tool could not be added or System is not Initialized
     */
     bool AddToolByDefinitionFile(std::string fileName); // ^????? We should give an example of defined tool
 
     /**
     * \brief This function load a file with Tools definitions provided for the software
     * \return Returns true if file is correctly loaded with all the tools
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error during the Initialization
+    * @throw mitk::IGTException Throws an exception if there is an error during the Initialization
     */
 //    bool AddToolByConfigurationFil(std::string fileName); // For next release....
 
@@ -222,13 +213,6 @@ namespace mitk
     */
     OptitrackTrackingDevice();
     ~OptitrackTrackingDevice();
-
-    /**
-    * \brief Return the string associated with the error number
-    * \return Returns true if system was initialized correctly
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error during the Initialization
-    */
-    std::string GetErrorMessage(int errorNumber);
 
 
   private:
@@ -244,10 +228,24 @@ namespace mitk
     */
     bool m_initialized;
 
+    /**
+    * \brief Vector of pointers pointing to all defined tools
+    */
+    std::vector<mitk::OptitrackTrackingTool::Pointer> m_AllTools;
 
-  std::vector<mitk::OptitrackTrackingTool::Pointer> m_AllTools; ///< container type for tracking tools
-    itk::FastMutexLock::Pointer m_ToolsMutex; ///< mutex for coordinated access of tool container
-    itk::MultiThreader::Pointer m_MultiThreader;    ///< MultiThreader that starts continuous tracking update
+    /**
+    * \brief Mutex for coordinated access of tool container
+    */
+    itk::FastMutexLock::Pointer m_ToolsMutex;
+
+    /**
+    * \brief MultiThreader that starts continuous tracking update
+    */
+    itk::MultiThreader::Pointer m_MultiThreader;
+
+    /**
+    * \brief ThreadID number identification
+    */
     int m_ThreadID;
 
 

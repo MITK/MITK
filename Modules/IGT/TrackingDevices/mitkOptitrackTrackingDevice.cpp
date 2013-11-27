@@ -442,7 +442,7 @@ void OptitrackTrackingDevice::TrackTools()
                 if(currentTool != nullptr)
                 {
                     currentTool->updateTool();
-          //MITK_DEBUG << "Tool number " << i << " updated position";
+        //MITK_DEBUG << "Tool number " << i << " updated position";
                 }
                 else
           MITK_DEBUG << "Get data from tool number " << i << " failed";

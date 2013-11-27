@@ -158,7 +158,7 @@
          <bool>true</bool>
         </attribute>
         <attribute name="verticalHeaderVisible">
-         <bool>true</bool>
+         <bool>false</bool>
         </attribute>
         <attribute name="verticalHeaderCascadingSectionResizes">
          <bool>false</bool>
@@ -223,7 +223,16 @@
          <property name="spacing">
           <number>0</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
@@ -273,7 +282,7 @@
       <item row="2" column="0">
        <widget class="QStackedWidget" name="m_StatisticsWidgetStack">
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <widget class="QmitkHistogramJSWidget" name="m_JSHistogram">
          <property name="sizePolicy">
@@ -283,7 +292,7 @@
           </sizepolicy>
          </property>
         </widget>
-        <widget class="QmitkVtkHistogramWidget" name="m_HistogramWidget">
+        <widget class="QWidget" name="m_HistogramWidget">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -291,7 +300,7 @@
           </sizepolicy>
          </property>
         </widget>
-        <widget class="QmitkVtkLineProfileWidget" name="m_LineProfileWidget"/>
+        <widget class="QWidget" name="m_LineProfileWidget"/>
        </widget>
       </item>
       <item row="3" column="0">
@@ -300,7 +309,16 @@
          <property name="spacing">
           <number>0</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
@@ -459,18 +477,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>QmitkVtkHistogramWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkVtkHistogramWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QmitkVtkLineProfileWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkVtkLineProfileWidget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>QmitkHistogramJSWidget</class>
    <extends>QWidget</extends>

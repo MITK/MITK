@@ -208,7 +208,8 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     // in such case, the QStringList in provInfo is empty which we can easily check for
     if( provInfo.getPluginDirs().empty() )
     {
-      BERRY_ERROR << "No directories for search for provisioning file. ";
+      BERRY_ERROR << "Cannot search for provisioning file, the retrieved directory list is empty.\n" <<
+                     "This can occur if there are some special (non-ascii) characters in the install path.";
       throw berry::PlatformException("No provisioning file specified. Terminating...");
     }
 

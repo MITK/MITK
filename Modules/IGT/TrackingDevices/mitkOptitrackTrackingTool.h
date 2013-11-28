@@ -34,10 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkFastMutexLock.h>
 #include "mitkIGTException.h"
 
-/**
-* \brief API library header for Optitrack Systems
-*/
-#include <NPTrackingTools.h>
+
 
 /**
 * \brief Function to get the Error messages from API

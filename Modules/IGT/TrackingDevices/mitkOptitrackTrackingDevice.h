@@ -39,10 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-/**
-* \brief API library header for Optitrack Systems
-*/
-#include <NPTrackingTools.h>
+
 
 /**
 * \brief OptitrackTrackingTools

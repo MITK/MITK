@@ -15,6 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkOptitrackTrackingTool.h"
+/**
+* \brief API library header for Optitrack Systems
+*/
+#include <NPTrackingTools.h>
 
 //=======================================================
 // Constructor
@@ -198,13 +202,13 @@ bool mitk::OptitrackTrackingTool::SetToolByFileName(std::string nameFile)
       }
       else
       {
-        MITK_DEBUG << GetOptitrackErrorMessage(resultUpdate);
+        MITK_INFO << GetOptitrackErrorMessage(resultUpdate);
         MITK_DEBUG << "Trying again...";
       }
     }
     else
     {
-      MITK_DEBUG << GetOptitrackErrorMessage(resultUpdate);
+      MITK_INFO << GetOptitrackErrorMessage(resultUpdate);
       MITK_DEBUG << "Trying again...";
     }
   }

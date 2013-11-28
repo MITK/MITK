@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * \brief Time to refresh the tools location (ms)
 */
 #ifndef OPTITRACK_FRAME_RATE
-#define OPTITRACK_FRAME_RATE 5
+#define OPTITRACK_FRAME_RATE 10
 #endif
 
 
@@ -40,20 +40,20 @@ namespace mitk
   * \author E. Marinetto (emarinetto@hggm.es) Instituto de Investigación Sanitaria Gregorio Marañón, Madrid, Spain. & M. Noll (matthias.noll@igd.fraunhofer.de) Cognitive Computing & Medical Imaging | Fraunhofer IGD
   */
 
-  static std::string GetOptitrackErrorMessage(NPRESULT result)
+  static std::string GetOptitrackErrorMessage(int result)
   {
       std::string message = "";
       switch(result)
       {
-        case NPRESULT_SUCCESS: message = "[Optitrack API] Successful Result"; break;
-        case NPRESULT_FILENOTFOUND: message = "[Optitrack API] File Not Found"; break;
-        case NPRESULT_LOADFAILED:  message = "[Optitrack API] Load Failed"; break;
-        case NPRESULT_FAILED:    message = "[Optitrack API] Failed"; break;
-        case NPRESULT_INVALIDFILE:  message = "[Optitrack API] Invalid File"; break;
-        case NPRESULT_INVALIDCALFILE:  message = "[Optitrack API] Invalid Calibration File"; break;
-        case NPRESULT_UNABLETOINITIALIZE:  message = "[Optitrack API] Unable To Initialize"; break;
-        case NPRESULT_INVALIDLICENSE:  message = "[Optitrack API] Invalid License"; break;
-        case NPRESULT_NOFRAMEAVAILABLE:  message = "[Optitrack API] No Frames Available"; break;
+        case 0: message = "[Optitrack API] Successful Result"; break;
+        case 1: message = "[Optitrack API] File Not Found"; break;
+        case 2:  message = "[Optitrack API] Load Failed"; break;
+        case 3:    message = "[Optitrack API] Failed"; break;
+        case 8:  message = "[Optitrack API] Invalid File"; break;
+        case 9:  message = "[Optitrack API] Invalid Calibration File"; break;
+        case 10:  message = "[Optitrack API] Unable To Initialize"; break;
+        case 11:  message = "[Optitrack API] Invalid License"; break;
+        case 14:  message = "[Optitrack API] No Frames Available"; break;
         default: message = "[Optitrack API] Unknown error occured"; break;
       }
       return message;

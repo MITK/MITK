@@ -337,7 +337,13 @@ protected:
 
   template <unsigned int VImageDimension>
   itk::SmartPointer< itk::Image<float, VImageDimension> >
-  GenerateHotspotSearchConvolutionMask(double spacing[VImageDimension], double radiusInMM);
+  GenerateHotspotSearchConvolutionKernel(double spacing[VImageDimension], double radiusInMM);
+
+  /** Uses members m_HotspotRadiusInMM */
+  template <typename TPixel, unsigned int VImageDimension>
+  void
+  InternalUpdateConvolutionImage( itk::Image<TPixel, VImageDimension>* inputImage );
+
 
   /** m_Image contains the input image (e.g. 2D, 3D, 3D+t)*/
   mitk::Image::ConstPointer m_Image;
@@ -381,6 +387,8 @@ protected:
   double m_IgnorePixelValue;
   bool m_DoIgnorePixelValue;
   bool m_IgnorePixelValueChanged;
+
+  itk::Object::Pointer m_HotspotSearchConvolutionImage; // itk::Image<TPixel, VImageDimension>
 
   double m_HotspotRadiusInMM;
   bool m_CalculateHotspot;

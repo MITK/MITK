@@ -91,7 +91,14 @@ float mitk::LiveWireTool2D::CanHandleEvent( StateEvent const *stateEvent) const
   else
   {
     if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D )
+    {
       return 0.0; // we don't want anything but 2D
+    }
+
+    if (!m_ToolManager->GetWorkingData(0)->GetData()->GetGeometry()->IsInside(positionEvent->GetWorldPosition()))
+    {
+      return 0.0;
+    }
 
     return 1.0;
   }

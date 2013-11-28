@@ -93,7 +93,8 @@ ImageStatisticsCalculator::ImageStatisticsCalculator()
   m_PlanarFigureCoordinate0 (0),
   m_PlanarFigureCoordinate1 (0), // TODO DM: check order of variable initialization
   m_HotspotRadiusInMM(6.2035049089940),   // radius of a 1cm3 sphere in mm
-  m_CalculateHotspot(false)
+  m_CalculateHotspot(false),
+  m_HotspotRadiusInMMChanged(false)
 {
   m_EmptyHistogram = HistogramType::New();
   m_EmptyHistogram->SetMeasurementVectorSize(1);
@@ -270,7 +271,15 @@ bool ImageStatisticsCalculator::GetDoIgnorePixelValue()
 
 void ImageStatisticsCalculator::SetHotspotRadius(double value)
 {
-  m_HotspotRadiusInMM = value;
+  if ( m_HotspotRadiusInMM != value )
+  {
+    m_HotspotRadiusInMM = value;
+    if(m_CalculateHotspot)
+    {
+      m_HotspotRadiusInMMChanged = true;
+    }
+    this->Modified();
+  }
 }
 
 double ImageStatisticsCalculator::GetHotspotRadius()
@@ -278,9 +287,14 @@ double ImageStatisticsCalculator::GetHotspotRadius()
   return m_HotspotRadiusInMM;
 }
 
-void ImageStatisticsCalculator::SetCalculateHotspot(bool value)
+void ImageStatisticsCalculator::SetCalculateHotspot(bool on)
 {
-  m_CalculateHotspot = value;
+  if ( m_CalculateHotspot != on )
+  {
+    m_CalculateHotspot = on;
+    m_HotspotRadiusInMMChanged = true;
+    this->Modified();
+  }
 }
 
 bool ImageStatisticsCalculator::IsHotspotCalculated()
@@ -329,6 +343,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   bool planarFigureStatisticsCalculationTrigger = m_PlanarFigureStatisticsCalculationTriggerVector[timeStep];
 
   if ( !m_IgnorePixelValueChanged
+    && !m_HotspotRadiusInMMChanged
     && ((m_MaskingMode != MASKING_MODE_NONE) || (imageMTime > m_Image->GetMTime() && !imageStatisticsCalculationTrigger))
     && ((m_MaskingMode != MASKING_MODE_IMAGE) || (maskedImageMTime > m_ImageMask->GetMTime() && !maskedImageStatisticsCalculationTrigger))
     && ((m_MaskingMode != MASKING_MODE_PLANARFIGURE) || (planarFigureMTime > m_PlanarFigure->GetMTime() && !planarFigureStatisticsCalculationTrigger)) )
@@ -337,7 +352,6 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
     if ( m_MaskingModeChanged )
     {
       m_MaskingModeChanged = false;
-      return true;
     }
     else
     {

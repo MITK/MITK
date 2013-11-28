@@ -384,6 +384,7 @@ protected:
 
   double m_HotspotRadiusInMM;
   bool m_CalculateHotspot;
+  bool m_HotspotRadiusInMMChanged;
 
   unsigned int m_PlanarFigureAxis;    // Normal axis for PlanarFigure
   unsigned int m_PlanarFigureSlice;   // Slice which contains PlanarFigure

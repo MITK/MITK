@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOptitrackTrackingTool.h"
 
-#ifdef OPTITRACK_AVAILABLE
+#ifdef MITK_USE_OPTITRACK_TRACKER
 
 /**
 * \brief API library header for Optitrack Systems

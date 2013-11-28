@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * \brief Time to refresh the tools location (ms)
 */
 #ifndef OPTITRACK_FRAME_RATE
-#define OPTITRACK_FRAME_RATE 25
+#define OPTITRACK_FRAME_RATE 5
 #endif
 
 

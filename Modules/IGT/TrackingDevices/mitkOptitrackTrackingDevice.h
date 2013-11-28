@@ -141,7 +141,7 @@ namespace mitk
     unsigned int GetToolCount() const;
 
     /** @brief Sets the file where the calibration of the OptitrackTracker can be found. */
-    itkSetMacro(calibrationPath,std::string);
+  void SetcalibrationPath(std::string calibrationPath);
 
     /** @brief Gets the current calibration file. */
     itkGetMacro(calibrationPath,std::string);

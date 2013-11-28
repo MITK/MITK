@@ -92,8 +92,8 @@ ImageStatisticsCalculator::ImageStatisticsCalculator()
   m_PlanarFigureSlice (0),
   m_PlanarFigureCoordinate0 (0),
   m_PlanarFigureCoordinate1 (0), // TODO DM: check order of variable initialization
-  m_HotspotRadius(6.2035049089940),   // radius of a 1cm3 sphere in a isotrope image of 1mm spacings
-  m_CalculateHotspot(true)
+  m_HotspotRadiusInMM(6.2035049089940),   // radius of a 1cm3 sphere in mm
+  m_CalculateHotspot(false)
 {
   m_EmptyHistogram = HistogramType::New();
   m_EmptyHistogram->SetMeasurementVectorSize(1);
@@ -270,12 +270,12 @@ bool ImageStatisticsCalculator::GetDoIgnorePixelValue()
 
 void ImageStatisticsCalculator::SetHotspotRadius(double value)
 {
-  m_HotspotRadius = value;
+  m_HotspotRadiusInMM = value;
 }
 
 double ImageStatisticsCalculator::GetHotspotRadius()
 {
-  return m_HotspotRadius;
+  return m_HotspotRadiusInMM;
 }
 
 void ImageStatisticsCalculator::SetCalculateHotspot(bool value)
@@ -1120,10 +1120,10 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       Statistics hotspotStatistics = CalculateHotspotStatistics (adaptedImage.GetPointer(), adaptedMaskImage.GetPointer(), GetHotspotRadius());
       statistics.HotspotMax = hotspotStatistics.HotspotMax;
       statistics.HotspotMin = hotspotStatistics.HotspotMin;
-      statistics.HotspotPeak = hotspotStatistics.HotspotPeak;
+      statistics.HotspotMean = hotspotStatistics.HotspotMean;
       statistics.HotspotMaxIndex = hotspotStatistics.HotspotMaxIndex;
       statistics.HotspotMinIndex = hotspotStatistics.HotspotMinIndex;
-      statistics.HotspotPeakIndex = hotspotStatistics.HotspotPeakIndex;
+      statistics.HotspotIndex = hotspotStatistics.HotspotIndex;
       // TODO DM: add other statistics: N, RMS, ... ; clear role of peak/mean
     }
     statisticsContainer->push_back( statistics );
@@ -1358,7 +1358,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   typedef itk::EllipseSpatialObject<VImageDimension> EllipseType;
   typedef itk::SpatialObjectToImageFilter<EllipseType, SphereMaskImageType> SpatialObjectToImageFilter;
 
-  double hotspotPeak = itk::NumericTraits<double>::min();
+  double hotspotMean = itk::NumericTraits<double>::min();
 
   typename SphereMaskImageType::Pointer croppedRegionMask = SphereMaskImageType::New();
 
@@ -1420,11 +1420,10 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   // Besides the comment above, a spatial object is not useful here. A simple itk::ImageRegion would be enough! (and it would fit into the iterator initialization)
   MinMaxIndex peakInformations = CalculateMinMaxIndex(hotspotImage.GetPointer(), croppedRegionMask.GetPointer());
 
-  // TODO DM: hotspotPeak is irritating: why not only hotspotValue and hotspotIndex? The hotspot IS kind of a peak
-  hotspotPeak = peakInformations.Max;
-  typename SphereMaskImageType::IndexType hotspotPeakIndex;
+  hotspotMean = peakInformations.Max;
+  typename SphereMaskImageType::IndexType hotspotIndex;
   for(int i = 0; i < VImageDimension; ++i)
-    hotspotPeakIndex[i] = peakInformations.MaxIndex[i];
+    hotspotIndex[i] = peakInformations.MaxIndex[i];
 
   typename SphereMaskImageType::SizeType hotspotSphereSize;
   typename SphereMaskImageType::SpacingType hotspotSphereSpacing = inputImage->GetSpacing(); // TODO DM: we don't need a third spacing definition; all our calculations are for one and the same image with just one spacing in variable "spacing"
@@ -1494,7 +1493,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
     offsetInIndex[i] = hotspotSphereSize[i] / 2;
 
   typename ConvolutionImageType::PointType hotspotOrigin;
-  hotspotImage->TransformIndexToPhysicalPoint(hotspotPeakIndex, hotspotOrigin);
+  hotspotImage->TransformIndexToPhysicalPoint(hotspotIndex, hotspotOrigin);
 
   PointType offsetInPhysicalPoint;
   hotspotSphere->TransformIndexToPhysicalPoint(offsetInIndex, offsetInPhysicalPoint);
@@ -1596,12 +1595,12 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   hotspotStatistics.HotspotMinIndex = hotspotInformations.MinIndex;
   hotspotStatistics.HotspotMax = hotspotInformations.Max;
   hotspotStatistics.HotspotMaxIndex = hotspotInformations.MaxIndex;
-  hotspotStatistics.HotspotPeak = hotspotPeak;
+  hotspotStatistics.HotspotMean = hotspotMean;
 
-  hotspotStatistics.HotspotPeakIndex.set_size(inputImage->GetImageDimension());
-  for (int i = 0; i< hotspotStatistics.HotspotPeakIndex.size(); ++i)
+  hotspotStatistics.HotspotIndex.set_size(inputImage->GetImageDimension());
+  for (int i = 0; i< hotspotStatistics.HotspotIndex.size(); ++i)
   {
-    hotspotStatistics.HotspotPeakIndex[i] = hotspotPeakIndex[i];
+    hotspotStatistics.HotspotIndex[i] = hotspotIndex[i];
   }
 
   return hotspotStatistics;

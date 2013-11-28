@@ -103,7 +103,7 @@ public:
     vnl_vector< int > MaxIndex;
     vnl_vector<int> HotspotMaxIndex;
     vnl_vector<int> HotspotMinIndex;
-    vnl_vector<int> HotspotPeakIndex; //< TODO DM: couldn't this be named "hotspot index"? We need to clear naming of hotspotmean, hotspotpeakindex, and hotspotpeak
+    vnl_vector<int> HotspotIndex; //< TODO DM: couldn't this be named "hotspot index"? We need to clear naming of hotspotmean, hotspotpeakindex, and hotspotpeak
 
     // TODO DM: make this struct a real class and put this into a constructor
     void Reset() // TODO DM: move to .cpp file (mitk::ImageStatisticsCalculator::Statistics::Reset() {...})
@@ -177,10 +177,10 @@ public:
   bool GetDoIgnorePixelValue();
 
   /** \brief Sets the radius for the hotspot */
-  void SetHotspotRadius (double hotspotRadiusInMM);
+  void SetHotspotRadius (double hotspotRadiusInMM); // TODO in mm
 
   /** \brief Returns the radius of the hotspot */
-  double GetHotspotRadius();
+  double GetHotspotRadius(); // TODO in mm
 
   /** \brief Sets whether the hotspot should be calculated */
   void SetCalculateHotspot(bool calculateHotspot);
@@ -382,7 +382,7 @@ protected:
   bool m_DoIgnorePixelValue;
   bool m_IgnorePixelValueChanged;
 
-  double m_HotspotRadius;
+  double m_HotspotRadiusInMM;
   bool m_CalculateHotspot;
 
   unsigned int m_PlanarFigureAxis;    // Normal axis for PlanarFigure

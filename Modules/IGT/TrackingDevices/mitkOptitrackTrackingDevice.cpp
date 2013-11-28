@@ -15,18 +15,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "mitkOptitrackTrackingDevice.h"
 
+#ifdef MITK_USE_OPTITRACK_TRACKER
+
+
+
 /**
 * \brief API library header for Optitrack Systems
 */
 #include <NPTrackingTools.h>
 
-namespace mitk
-{
-
 //=======================================================
 // Constructor
 //=======================================================
-OptitrackTrackingDevice::OptitrackTrackingDevice()
+mitk::OptitrackTrackingDevice::OptitrackTrackingDevice()
     : mitk::TrackingDevice(),
       m_initialized(false)
 {
@@ -46,7 +47,7 @@ OptitrackTrackingDevice::OptitrackTrackingDevice()
 //=======================================================
 // Destructor
 //=======================================================
-OptitrackTrackingDevice::~OptitrackTrackingDevice()
+mitk::OptitrackTrackingDevice::~OptitrackTrackingDevice()
 {
   MITK_DEBUG << "Deleting OptitrackTrackingDevice";
   int result;
@@ -94,7 +95,7 @@ OptitrackTrackingDevice::~OptitrackTrackingDevice()
 //=======================================================
 // OpenConnection
 //=======================================================
-bool OptitrackTrackingDevice::OpenConnection()
+bool mitk::OptitrackTrackingDevice::OpenConnection()
 {
   // Not initialize the system twice.
   if(!m_initialized)
@@ -122,7 +123,7 @@ bool OptitrackTrackingDevice::OpenConnection()
 //=======================================================
 // InitializeCameras
 //=======================================================
-bool OptitrackTrackingDevice::InitializeCameras()
+bool mitk::OptitrackTrackingDevice::InitializeCameras()
 {
   MITK_DEBUG << "Initialize Optitrack";
   int result;
@@ -149,7 +150,7 @@ bool OptitrackTrackingDevice::InitializeCameras()
 //=======================================================
 // LoadCalibration
 //=======================================================
-bool OptitrackTrackingDevice::LoadCalibration()
+bool mitk::OptitrackTrackingDevice::LoadCalibration()
 {
   MITK_DEBUG << "Loading System Calibration";
   int resultLoadCalibration;
@@ -200,7 +201,7 @@ bool OptitrackTrackingDevice::LoadCalibration()
 //=======================================================
 // SetcalibrationPath
 //=======================================================
-void OptitrackTrackingDevice::SetcalibrationPath(std::string calibrationPath){
+void mitk::OptitrackTrackingDevice::SetcalibrationPath(std::string calibrationPath){
 
   MITK_DEBUG << "SetcalibrationPath";
   MITK_DEBUG << calibrationPath;
@@ -221,7 +222,7 @@ void OptitrackTrackingDevice::SetcalibrationPath(std::string calibrationPath){
 //=======================================================
 // CloseConnection
 //=======================================================
-bool OptitrackTrackingDevice::CloseConnection()
+bool mitk::OptitrackTrackingDevice::CloseConnection()
 {
   MITK_DEBUG << "CloseConnection";
   int resultStop, resultShutdown;
@@ -269,7 +270,7 @@ bool OptitrackTrackingDevice::CloseConnection()
 //=======================================================
 // StartTracking
 //=======================================================
-bool OptitrackTrackingDevice::StartTracking()
+bool mitk::OptitrackTrackingDevice::StartTracking()
 {
   MITK_DEBUG << "StartTracking";
   bool resultIsTrackableTracked;
@@ -323,7 +324,7 @@ bool OptitrackTrackingDevice::StartTracking()
 //=======================================================
 // StopTracking
 //=======================================================
-bool OptitrackTrackingDevice::StopTracking()
+bool mitk::OptitrackTrackingDevice::StopTracking()
 {
   MITK_DEBUG << "StopTracking";
 
@@ -355,7 +356,7 @@ bool OptitrackTrackingDevice::StopTracking()
 //=======================================================
 // ThreadStartTracking
 //=======================================================
-ITK_THREAD_RETURN_TYPE OptitrackTrackingDevice::ThreadStartTracking(void* pInfoStruct)
+ITK_THREAD_RETURN_TYPE mitk::OptitrackTrackingDevice::ThreadStartTracking(void* pInfoStruct)
 {
   MITK_DEBUG << "ThreadStartTracking";
 
@@ -391,7 +392,7 @@ ITK_THREAD_RETURN_TYPE OptitrackTrackingDevice::ThreadStartTracking(void* pInfoS
 //=======================================================
 // GetOptitrackTool
 //=======================================================
-mitk::OptitrackTrackingTool* OptitrackTrackingDevice::GetOptitrackTool( unsigned int toolNumber) const
+mitk::OptitrackTrackingTool* mitk::OptitrackTrackingDevice::GetOptitrackTool( unsigned int toolNumber) const
 {
   MITK_DEBUG << "ThreadStartTracking";
   OptitrackTrackingTool* t = nullptr;
@@ -412,7 +413,7 @@ mitk::OptitrackTrackingTool* OptitrackTrackingDevice::GetOptitrackTool( unsigned
 //=======================================================
 // GetToolCount
 //=======================================================
- unsigned int OptitrackTrackingDevice::GetToolCount() const
+ unsigned int mitk::OptitrackTrackingDevice::GetToolCount() const
 {
   MITK_DEBUG << "GetToolCount";
   MutexLockHolder lock(*m_ToolsMutex); // lock and unlock the mutex
@@ -422,7 +423,7 @@ mitk::OptitrackTrackingTool* OptitrackTrackingDevice::GetOptitrackTool( unsigned
 //=======================================================
 // TrackTools
 //=======================================================
-void OptitrackTrackingDevice::TrackTools()
+void mitk::OptitrackTrackingDevice::TrackTools()
 {
   MITK_DEBUG << "TrackTools";
 
@@ -480,7 +481,7 @@ void OptitrackTrackingDevice::TrackTools()
 //=======================================================
 // SetCameraParams
 //=======================================================
-bool OptitrackTrackingDevice::SetCameraParams(int exposure, int threshold , int intensity, int videoType )
+bool mitk::OptitrackTrackingDevice::SetCameraParams(int exposure, int threshold , int intensity, int videoType )
 {
   MITK_DEBUG << "SetCameraParams";
 
@@ -559,7 +560,7 @@ bool OptitrackTrackingDevice::SetCameraParams(int exposure, int threshold , int 
 //=======================================================
 // GetTool
 //=======================================================
-mitk::TrackingTool* OptitrackTrackingDevice::GetTool(unsigned int toolNumber) const
+mitk::TrackingTool* mitk::OptitrackTrackingDevice::GetTool(unsigned int toolNumber) const
 {
   return static_cast<mitk::TrackingTool*>(GetOptitrackTool(toolNumber));
 }
@@ -567,7 +568,7 @@ mitk::TrackingTool* OptitrackTrackingDevice::GetTool(unsigned int toolNumber) co
 //=======================================================
 // AddToolByFileName
 //=======================================================
-bool OptitrackTrackingDevice::AddToolByDefinitionFile(std::string fileName)
+bool mitk::OptitrackTrackingDevice::AddToolByDefinitionFile(std::string fileName)
 {
   bool resultSetToolByFileName;
   if(m_initialized)
@@ -596,4 +597,153 @@ bool OptitrackTrackingDevice::AddToolByDefinitionFile(std::string fileName)
   }
 }
 
-} // end namespace
+
+//=======================================================
+// IF Optitrack is not installed set functions to warnings
+//=======================================================
+
+#else
+
+//=======================================================
+// Constructor
+//=======================================================
+mitk::OptitrackTrackingDevice::OptitrackTrackingDevice()
+    : mitk::TrackingDevice(),
+      m_initialized(false)
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+}
+
+//=======================================================
+// Destructor
+//=======================================================
+mitk::OptitrackTrackingDevice::~OptitrackTrackingDevice()
+{
+ MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+}
+
+//=======================================================
+// OpenConnection
+//=======================================================
+bool mitk::OptitrackTrackingDevice::OpenConnection()
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return false;
+}
+
+//=======================================================
+// InitializeCameras
+//=======================================================
+bool mitk::OptitrackTrackingDevice::InitializeCameras()
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return false;
+}
+
+//=======================================================
+// LoadCalibration
+//=======================================================
+bool mitk::OptitrackTrackingDevice::LoadCalibration()
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return false;
+}
+
+//=======================================================
+// SetcalibrationPath
+//=======================================================
+void mitk::OptitrackTrackingDevice::SetcalibrationPath(std::string calibrationPath)
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+}
+
+//=======================================================
+// CloseConnection
+//=======================================================
+bool mitk::OptitrackTrackingDevice::CloseConnection()
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return false;
+}
+
+//=======================================================
+// StartTracking
+//=======================================================
+bool mitk::OptitrackTrackingDevice::StartTracking()
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return false;
+}
+
+//=======================================================
+// StopTracking
+//=======================================================
+bool mitk::OptitrackTrackingDevice::StopTracking()
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return false;
+}
+
+//=======================================================
+// ThreadStartTracking
+//=======================================================
+ITK_THREAD_RETURN_TYPE mitk::OptitrackTrackingDevice::ThreadStartTracking(void* pInfoStruct)
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return NULL;
+}
+
+//=======================================================
+// GetOptitrackTool
+//=======================================================
+mitk::OptitrackTrackingTool* mitk::OptitrackTrackingDevice::GetOptitrackTool( unsigned int toolNumber) const
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return NULL;
+}
+
+//=======================================================
+// GetToolCount
+//=======================================================
+ unsigned int mitk::OptitrackTrackingDevice::GetToolCount() const
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return 0;
+}
+
+//=======================================================
+// TrackTools
+//=======================================================
+void mitk::OptitrackTrackingDevice::TrackTools()
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+}
+
+//=======================================================
+// SetCameraParams
+//=======================================================
+bool mitk::OptitrackTrackingDevice::SetCameraParams(int exposure, int threshold , int intensity, int videoType )
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return false;
+}
+
+//=======================================================
+// GetTool
+//=======================================================
+mitk::TrackingTool* mitk::OptitrackTrackingDevice::GetTool(unsigned int toolNumber) const
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return NULL;
+}
+
+//=======================================================
+// AddToolByFileName
+//=======================================================
+bool mitk::OptitrackTrackingDevice::AddToolByDefinitionFile(std::string fileName)
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return false;
+}
+
+#endif

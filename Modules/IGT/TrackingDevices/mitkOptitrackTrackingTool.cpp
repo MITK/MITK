@@ -15,6 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkOptitrackTrackingTool.h"
+
+#ifdef OPTITRACK_AVAILABLE
+
 /**
 * \brief API library header for Optitrack Systems
 */
@@ -482,3 +485,157 @@ void mitk::OptitrackTrackingTool::updateTool()
     MITK_DEBUG << "Update Failed";
   }
 }
+
+//=======================================================
+// IF Optitrack is not installed set functions to warnings
+//=======================================================
+#else
+
+//=======================================================
+// Constructor
+//=======================================================
+mitk::OptitrackTrackingTool::OptitrackTrackingTool()
+  :  mitk::InternalTrackingTool(),
+    m_ID(-1)
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+}
+
+//=======================================================
+// Destructor
+//=======================================================
+mitk::OptitrackTrackingTool::~OptitrackTrackingTool()
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+}
+
+//=======================================================
+// SetToolByFileName
+//=======================================================
+bool mitk::OptitrackTrackingTool::SetToolByFileName(std::string nameFile)
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return false;
+}
+
+//=======================================================
+// get_IDnext
+//=======================================================
+int mitk::OptitrackTrackingTool::get_IDnext()
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return -1;
+}
+
+//=======================================================
+// DeleteTrackable
+//=======================================================
+bool mitk::OptitrackTrackingTool::DeleteTrackable()
+{
+ MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+ return false;
+}
+
+//=======================================================
+// SetPosition
+//=======================================================
+void mitk::OptitrackTrackingTool::SetPosition(mitk::Point3D position)
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+}
+
+//=======================================================
+// SetOrientation
+//=======================================================
+void mitk::OptitrackTrackingTool::SetOrientation(mitk::Quaternion orientation)
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+}
+
+//=======================================================
+// GetPosition
+//=======================================================
+void mitk::OptitrackTrackingTool::GetPosition(mitk::Point3D& positionOutput) const
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+}
+
+//=======================================================
+// GetOrientation
+//=======================================================
+void mitk::OptitrackTrackingTool::GetOrientation(mitk::Quaternion& orientation) const
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+}
+
+//=======================================================
+// Enable
+//=======================================================
+bool mitk::OptitrackTrackingTool::Enable()
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return false;
+}
+
+//=======================================================
+// Disable
+//=======================================================
+bool mitk::OptitrackTrackingTool::Disable()
+{
+ MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+ return false;
+}
+
+//=======================================================
+// IsEnabled
+//=======================================================
+bool mitk::OptitrackTrackingTool::IsEnabled() const
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return false;
+}
+
+//=======================================================
+// IsDataValid
+//=======================================================
+bool mitk::OptitrackTrackingTool::IsDataValid() const
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return false;
+}
+
+//=======================================================
+// GetTrackingError
+//=======================================================
+float mitk::OptitrackTrackingTool::GetTrackingError() const
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  return 0.0;
+}
+
+//=======================================================
+// SetTrackingError
+//=======================================================
+void mitk::OptitrackTrackingTool::SetTrackingError(float error)
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+}
+
+//=======================================================
+// SetDataValid
+//=======================================================
+void mitk::OptitrackTrackingTool::SetDataValid(bool validate)
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+}
+
+//=======================================================
+// updateTool
+//=======================================================
+void mitk::OptitrackTrackingTool::updateTool()
+{
+  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+}
+
+
+#endif

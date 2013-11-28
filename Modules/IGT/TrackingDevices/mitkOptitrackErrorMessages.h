@@ -54,6 +54,7 @@ namespace mitk
         case 10:  message = "[Optitrack API] Unable To Initialize"; break;
         case 11:  message = "[Optitrack API] Invalid License"; break;
         case 14:  message = "[Optitrack API] No Frames Available"; break;
+        case 100:  message = "Optitrack Tracking Tools is not installed in the computer"; break;
         default: message = "[Optitrack API] Unknown error occured"; break;
       }
       return message;

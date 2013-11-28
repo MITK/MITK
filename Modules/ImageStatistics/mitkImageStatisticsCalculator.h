@@ -98,12 +98,16 @@ public:
                          //TODO DM: where is variance? does not make much sense, but should be consistent with usual statistics
                          //TODO DM: same goes for N
                          //TODO DM: same goes for RMS
-    double HotspotPeak;  //< TODO DM: should this not replace "mean" the two values could be irritating
     vnl_vector< int > MinIndex;
     vnl_vector< int > MaxIndex;
     vnl_vector<int> HotspotMaxIndex;
     vnl_vector<int> HotspotMinIndex;
     vnl_vector<int> HotspotIndex; //< TODO DM: couldn't this be named "hotspot index"? We need to clear naming of hotspotmean, hotspotpeakindex, and hotspotpeak
+
+    Statistics()
+    {
+      this->Reset();
+    }
 
     // TODO DM: make this struct a real class and put this into a constructor
     void Reset() // TODO DM: move to .cpp file (mitk::ImageStatisticsCalculator::Statistics::Reset() {...})
@@ -120,17 +124,8 @@ public:
       HotspotMin = 0.0;
       HotspotMax = 0.0;
       HotspotMean = 0.0;
-      HotspotPeak = 0.0;
       HotspotSigma = 0.0; // TODO DM: also reset index values! Check that everything is initialized
     }
-  };
-
-  struct MinMaxIndex // TODO DM: why this structure? could at least be private
-  {
-    double Max;
-    double Min;
-    vnl_vector<int> MaxIndex;
-    vnl_vector<int> MinIndex;
   };
 
   typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
@@ -270,13 +265,27 @@ protected:
     const itk::Image< TPixel, VImageDimension > *image,
     itk::Image< unsigned short, VImageDimension > *maskImage );
 
+  struct ImageExtrema
+  {
+    double Max;
+    double Min;
+    vnl_vector<int> MaxIndex;
+    vnl_vector<int> MinIndex;
+  };
+
  /** \brief Calculates minimum, maximum, mean value and their
   * corresponding indices in a given ROI. As input the function
-  * needs an image and a mask. It returns a MinMaxIndex object. */
+  * needs an image and a mask. It returns a ImageExtrema object. */
   template <typename TPixel, unsigned int VImageDimension >
-  MinMaxIndex CalculateMinMaxIndex(
+  ImageExtrema CalculateExtrema(
     const itk::Image<TPixel, VImageDimension> *inputImage,
     itk::Image<unsigned short, VImageDimension> *maskImage);
+
+  template <typename TPixel, unsigned int VImageDimension >
+  ImageExtrema CalculateExtremaWorld(
+    const itk::Image<TPixel, VImageDimension> *inputImage,
+    itk::Image<unsigned short, VImageDimension> *maskImage);
+
 
   /** \brief Calculates the hotspot statistics within a given
   * ROI. As input the function needs an image, a mask which
@@ -336,6 +345,10 @@ protected:
   void MaskedStatisticsProgressUpdate();
 
   template <unsigned int VImageDimension>
+  itk::Size<VImageDimension>
+  CalculateConvolutionKernelSize(double spacing[VImageDimension], double radiusInMM);
+
+  template <unsigned int VImageDimension>
   itk::SmartPointer< itk::Image<float, VImageDimension> >
   GenerateHotspotSearchConvolutionKernel(double spacing[VImageDimension], double radiusInMM);
 
@@ -344,6 +357,11 @@ protected:
   void
   InternalUpdateConvolutionImage( itk::Image<TPixel, VImageDimension>* inputImage );
 
+  template < typename TPixel, unsigned int VImageDimension>
+  void
+  FillHotspotMaskPixels( itk::Image<TPixel, VImageDimension>* maskImage,
+                         itk::Point<double, VImageDimension> sphereCenter,
+                         double sphereRadiusInMM);
 
   /** m_Image contains the input image (e.g. 2D, 3D, 3D+t)*/
   mitk::Image::ConstPointer m_Image;

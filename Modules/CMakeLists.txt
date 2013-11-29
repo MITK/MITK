@@ -42,6 +42,7 @@ set(module_dirs
     Simulation
     Remeshing
     Python
+    BreakpadCrashReporting
 )
 
 set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

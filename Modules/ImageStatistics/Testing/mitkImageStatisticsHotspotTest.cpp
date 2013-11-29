@@ -460,7 +460,7 @@ struct mitkImageStatisticsHotspotTestClass
     //Peak Index
     std::vector<int> actualPeakIndex = testParameters.m_HotspotPeakIndex;
     vnl_vector<int> expectedVnlPeakIndex;
-    expectedVnlPeakIndex = statistics.HotspotPeakIndex;
+    expectedVnlPeakIndex = statistics.HotspotIndex;
 
     vnl_vector<int> actualVnlPeakIndex;
     actualVnlPeakIndex.set_size(3);
@@ -497,7 +497,7 @@ struct mitkImageStatisticsHotspotTestClass
     MITK_TEST_CONDITION( ::fabs(actualMaxValue - expectedMaxValue) < eps, "Actual hotspotMax value " << actualMaxValue << " (expected " << expectedMaxValue << ")" );
     MITK_TEST_CONDITION( ::fabs(actualMinValue - expectedMinValue) < eps, "Actual hotspotMin value " << actualMinValue << " (expected " << expectedMinValue << ")" );
 
-    MITK_TEST_CONDITION( expectedVnlPeakIndex == actualVnlPeakIndex, "Actual hotspotPeakIndex " << actualVnlPeakIndex << " (expected " << expectedVnlPeakIndex << ")" );
+    MITK_TEST_CONDITION( expectedVnlPeakIndex == actualVnlPeakIndex, "Actual hotspotIndex " << actualVnlPeakIndex << " (expected " << expectedVnlPeakIndex << ")" );
     MITK_TEST_CONDITION( expectedVnlMaxIndex == actualVnlMaxIndex, "Actual hotspotMaxIndex " << actualVnlMaxIndex << " (expected " << expectedVnlMaxIndex << ")" );
     MITK_TEST_CONDITION( expectedVnlMinIndex == actualVnlMinIndex, "Actual hotspotMinIndex " << actualVnlMinIndex << " (expected " << expectedVnlMinIndex << ")" );
   }

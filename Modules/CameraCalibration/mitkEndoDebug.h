@@ -175,8 +175,16 @@ namespace mitk
     #define endodebugimg(imgVariableName)
     #define endodebugbegin if( false ) {
     #define endodebugend }
-    #define endoAssert(a)
-    #define endoAssertMsg(a, msg)
+    #define endoAssert(a) \
+    if(!(a)) { \
+        throw std::invalid_argument("FAILED: " #a); \
+    }
+
+    #define endoAssertMsg(a, msg) \
+    if(!(a)) { \
+    throw std::invalid_argument( "FAILED: " #a ); \
+    }
+
     #define endodebugcode(code)
     #define endoAssertCode(assertCode)
 #else

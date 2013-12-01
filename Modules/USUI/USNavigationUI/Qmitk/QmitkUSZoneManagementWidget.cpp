@@ -42,6 +42,11 @@ QmitkUSZoneManagementWidget::~QmitkUSZoneManagementWidget()
   if ( m_DataStorage.IsNotNull() && m_BaseNode.IsNotNull() ) { m_DataStorage->Remove(m_BaseNode); }
 }
 
+void QmitkUSZoneManagementWidget::SetStateMachineFilename(const std::string& filename)
+{
+  m_Interactor->LoadStateMachine(filename, us::ModuleRegistry::GetModule("MitkUSNavigation"));
+}
+
 void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage, const char* baseNodeName)
 {
   if ( dataStorage.IsNull() )

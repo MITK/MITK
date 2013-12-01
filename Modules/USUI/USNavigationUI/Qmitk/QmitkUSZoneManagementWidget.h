@@ -45,6 +45,7 @@ public:
   explicit QmitkUSZoneManagementWidget(QWidget* parent = 0);
   ~QmitkUSZoneManagementWidget();
 
+  void SetStateMachineFilename(const std::string& filename);
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage, const char* baseNodeName = "Zones");
   mitk::DataStorage::SetOfObjects::ConstPointer GetZoneNodes();
 

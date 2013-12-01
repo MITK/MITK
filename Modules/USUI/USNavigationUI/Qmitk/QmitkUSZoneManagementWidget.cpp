@@ -18,8 +18,8 @@ QmitkUSZoneManagementWidget::QmitkUSZoneManagementWidget(QWidget *parent) :
     ui(new Ui::QmitkUSZoneManagementWidget), m_CurMaxNumOfZones(0)
 {
   ui->setupUi(this);
-  ui->CurrentZonesTable->setModel(m_ZonesDataModel);
 
+  ui->CurrentZonesTable->setModel(m_ZonesDataModel);
   ui->CurrentZonesTable->setItemDelegateForColumn(1, new QmitkUSZoneManagementSpinBoxDelegate(this));
   ui->CurrentZonesTable->setItemDelegateForColumn(2, new QmitkUSZoneManagementComboBoxDelegate(this));
 
@@ -44,6 +44,13 @@ QmitkUSZoneManagementWidget::~QmitkUSZoneManagementWidget()
 
 void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage, const char* baseNodeName)
 {
+  if ( dataStorage.IsNull() )
+  {
+    MITK_ERROR("QWidget")("QmitkUSZoneManagementWidget")
+        << "DataStorage must not be null.";
+    mitkThrow() << "DataStorage must not be null.";
+  }
+
   mitk::DataNode::Pointer baseNode = dataStorage->GetNamedNode(baseNodeName);
   if ( baseNode.IsNull() )
   {
@@ -62,7 +69,16 @@ void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer data
 
 mitk::DataStorage::SetOfObjects::ConstPointer QmitkUSZoneManagementWidget::GetZoneNodes()
 {
-  return m_DataStorage->GetDerivations(m_BaseNode);
+  if ( m_DataStorage.IsNotNull() && m_BaseNode.IsNotNull() )
+  {
+    return m_DataStorage->GetDerivations(m_BaseNode);
+  }
+  else
+  {
+    MITK_WARN("QWidget")("QmitkUSZoneManagementWidget")
+        << "Data storage or base node is null. Returning empty zone nodes set.";
+    return mitk::DataStorage::SetOfObjects::New().GetPointer();
+  }
 }
 
 void QmitkUSZoneManagementWidget::RemoveSelectedRows()
@@ -70,7 +86,7 @@ void QmitkUSZoneManagementWidget::RemoveSelectedRows()
   QItemSelectionModel* selectionModel = ui->CurrentZonesTable->selectionModel();
   if ( ! selectionModel->hasSelection() )
   {
-    MITK_WARN("QmitkUSZoneManagementWidget")
+    MITK_WARN("QWidget")("QmitkUSZoneManagementWidget")
         << "RemoveSelectedRows() called without any row being selected.";
     return;
   }
@@ -90,7 +106,8 @@ void QmitkUSZoneManagementWidget::OnStartAddingZone()
 {
   if ( m_DataStorage.IsNull() )
   {
-    MITK_ERROR << "DataStorage must be set before adding the first zone.";
+    MITK_ERROR("QWidget")("QmitkUSZoneManagementWidget")
+        << "DataStorage must be set before adding the first zone.";
     mitkThrow() << "DataStorage must be set before adding the first zone.";
   }
 
@@ -109,13 +126,23 @@ void QmitkUSZoneManagementWidget::OnStartAddingZone()
 
 void QmitkUSZoneManagementWidget::OnAbortAddingZone()
 {
+  if ( m_DataStorage.IsNull() )
+  {
+    MITK_ERROR("QWidget")("QmitkUSZoneManagementWidget")
+        << "DataStorage must be set before aborting adding a zone.";
+    mitkThrow() << "DataStorage must be set before aborting adding a zone.";
+  }
+
   m_DataStorage->Remove(m_Interactor->GetDataNode());
 }
 
 void QmitkUSZoneManagementWidget::OnResetZones()
 {
   // remove all zone nodes from the data storage
-  m_DataStorage->Remove(m_DataStorage->GetDerivations(m_BaseNode));
+  if ( m_DataStorage.IsNotNull() && m_BaseNode.IsNotNull() )
+  {
+    m_DataStorage->Remove(m_DataStorage->GetDerivations(m_BaseNode));
+  }
 }
 
 void QmitkUSZoneManagementWidget::OnSelectionChanged(const QItemSelection & selected, const QItemSelection & /*deselected*/)

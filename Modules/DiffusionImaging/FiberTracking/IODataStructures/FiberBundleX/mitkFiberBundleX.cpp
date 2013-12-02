@@ -229,9 +229,8 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
     vtkSmartPointer<vtkPoints> vNewPoints = vtkSmartPointer<vtkPoints>::New();
 
     // iterate over current fibers
-    int numFibers = GetNumFibers();
-    boost::progress_display disp(numFibers);
-    for( int i=0; i<numFibers; i++ )
+    boost::progress_display disp(m_NumFibers);
+    for( int i=0; i<m_NumFibers; i++ )
     {
         ++disp;
         vtkCell* cell = m_FiberPolyData->GetCell(i);
@@ -249,21 +248,24 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
             int numPoints2 = cell2->GetNumberOfPoints();
             vtkPoints* points2 = cell2->GetPoints();
 
-            if (points2==NULL || numPoints2<=0)
+            if (points2==NULL)// || numPoints2<=0)
                 continue;
 
             // check endpoints
-            itk::Point<float, 3> point_start = GetItkPoint(points->GetPoint(0));
-            itk::Point<float, 3> point_end = GetItkPoint(points->GetPoint(numPoints-1));
-            itk::Point<float, 3> point2_start = GetItkPoint(points2->GetPoint(0));
-            itk::Point<float, 3> point2_end = GetItkPoint(points2->GetPoint(numPoints2-1));
-
-            if (point_start.SquaredEuclideanDistanceTo(point2_start)<=mitk::eps && point_end.SquaredEuclideanDistanceTo(point2_end)<=mitk::eps ||
-                    point_start.SquaredEuclideanDistanceTo(point2_end)<=mitk::eps && point_end.SquaredEuclideanDistanceTo(point2_start)<=mitk::eps)
+            if (numPoints2==numPoints)
             {
-                // further checking ???
-                if (numPoints2==numPoints)
+                itk::Point<float, 3> point_start = GetItkPoint(points->GetPoint(0));
+                itk::Point<float, 3> point_end = GetItkPoint(points->GetPoint(numPoints-1));
+                itk::Point<float, 3> point2_start = GetItkPoint(points2->GetPoint(0));
+                itk::Point<float, 3> point2_end = GetItkPoint(points2->GetPoint(numPoints2-1));
+
+                if (point_start.SquaredEuclideanDistanceTo(point2_start)<=mitk::eps && point_end.SquaredEuclideanDistanceTo(point2_end)<=mitk::eps ||
+                        point_start.SquaredEuclideanDistanceTo(point2_end)<=mitk::eps && point_end.SquaredEuclideanDistanceTo(point2_start)<=mitk::eps)
+                {
+                    // further checking ???
                     contained = true;
+                    break;
+                }
             }
         }
 
@@ -286,8 +288,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
     vNewPolyData->SetLines(vNewLines);
 
     // initialize fiber bundle
-    mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New(vNewPolyData);
-    return newFib;
+    return mitk::FiberBundleX::New(vNewPolyData);
 }
 
 itk::Point<float, 3> mitk::FiberBundleX::GetItkPoint(double point[3])
@@ -1775,6 +1776,7 @@ bool mitk::FiberBundleX::Equals(mitk::FiberBundleX* fib)
     if (m_NumFibers!=fib->GetNumFibers())
     {
         MITK_INFO << "Unequal number of fibers!";
+        MITK_INFO << m_NumFibers << " vs. " << fib->GetNumFibers();
         return false;
     }
 
@@ -1791,6 +1793,7 @@ bool mitk::FiberBundleX::Equals(mitk::FiberBundleX* fib)
         if (numPoints2!=numPoints)
         {
             MITK_INFO << "Unequal number of points in fiber " << i << "!";
+            MITK_INFO << numPoints2 << " vs. " << numPoints;
             return false;
         }
 

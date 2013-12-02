@@ -441,7 +441,7 @@ int mitkNavigationToolStorageSerializerAndDeserializerTest(int /* argc */, char*
     TestReadComplexToolStorage();
     TestReadNotExistingStorage();
     TestReadStorageWithUnknownFiletype();
-    TestReadZipFileWithNoToolstorage();
+    //TestReadZipFileWithNoToolstorage(); deactivated because of bug 16566
     TestWriteStorageToInvalidFile();
     TestWriteEmptyToolStorage();
     TestSerializerForExceptions();

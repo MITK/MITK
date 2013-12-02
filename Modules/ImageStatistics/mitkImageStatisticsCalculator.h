@@ -91,13 +91,15 @@ public:
     double Variance;     //< variance of values // TODO DM: remove, was never filled with values ; check if any calling code within MITK used this member!
     double Sigma;        //< standard deviation of values (== square root of variance)
     double RMS;          //< root means square (TODO DM: check mesning)
+
+    unsigned int HotspotN;
     double HotspotMin;   //< mimimum value inside hotspot
     double HotspotMax;   //< maximum value inside hotspot
     double HotspotMean;  //< mean value inside hotspot
+    double HotspotMedian;
     double HotspotSigma; //< standard deviation of values inside hotspot
-                         //TODO DM: where is variance? does not make much sense, but should be consistent with usual statistics
-                         //TODO DM: same goes for N
-                         //TODO DM: same goes for RMS
+    double HotspotRMS;
+
     vnl_vector< int > MinIndex;
     vnl_vector< int > MaxIndex;
     vnl_vector<int> HotspotMaxIndex;

@@ -1180,6 +1180,9 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       statistics.HotspotMaxIndex = hotspotStatistics.HotspotMaxIndex;
       statistics.HotspotMinIndex = hotspotStatistics.HotspotMinIndex;
       statistics.HotspotIndex = hotspotStatistics.HotspotIndex;
+      statistics.HotspotMedian = hotspotStatistics.HotspotMedian;
+      statistics.HotspotN = hotspotStatistics.HotspotN;
+      statistics.HotspotRMS = hotspotStatistics.HotspotRMS;
       // TODO DM: add other statistics: N, RMS, ... ; clear role of peak/mean
     }
     statisticsContainer->push_back( statistics );
@@ -1479,7 +1482,7 @@ ImageStatisticsCalculator::InternalUpdateConvolutionImage( itk::Image<TPixel, VI
   convolutionFilter->SetInput(inputImage);
   convolutionFilter->SetKernelImage(convolutionKernel);
   convolutionFilter->SetNormalize(true);
-  MITK_INFO << "Update Convolution image for hotspot search";
+  //MITK_INFO << "Update Convolution image for hotspot search";
   convolutionFilter->UpdateLargestPossibleRegion(); // TODO check if we could benefit from restricting this for a region
 
   typename ConvolutionImageType::Pointer convolutionImage = convolutionFilter->GetOutput();
@@ -1520,7 +1523,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
     itk::Image<unsigned short, VImageDimension>* maskImage,
     double radiusInMM)
 {
-  MITK_INFO << "CalculateHotspotStatistics()";
+  //MITK_INFO << "CalculateHotspotStatistics()";
 
   // get convolution image (updated in InternalUpdateConvolutionImage())
   typedef itk::Image< TPixel, VImageDimension > ConvolutionImageType;
@@ -1535,11 +1538,11 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   // find maximum in convolution image, given the current mask (this might change over time, while we assume the input fixed (TODO wrong assumption))
   ImageExtrema pi = CalculateExtremaWorld(convolutionImage.GetPointer(), maskImage);
-  MITK_INFO <<"Initial search for hotspot: "
+ /* MITK_INFO <<"Initial search for hotspot: "
   "\n  Index: " << pi.MaxIndex[0] << "," << pi.MaxIndex[1] << "," << pi.MaxIndex[2] <<
     "\n  Value(hotspot): " << pi.Max<<
   "\n  Index(min): " << pi.MinIndex[0] << "," << pi.MinIndex[1] << "," << pi.MinIndex[2] <<
-    "\n  Value(min): " << pi.Min;
+    "\n  Value(min): " << pi.Min;*/
 
   // create mask corresponding to hotspot region
   // mask is defined on the inputImage grid and is
@@ -1555,7 +1558,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   typedef typename ConvolutionImageType::IndexType IndexType;
   IndexType maskIndex; maskIndex.Fill(0);
-  MITK_INFO << "Hotspot statistics mask started with size ["<<maskSize[0]<<"x"<<maskSize[1]<<"x"<<maskSize[2]<<"] at ["<<maskIndex[0]<<","<<maskIndex[1]<<","<<maskIndex[2]<<"]";
+  //MITK_INFO << "Hotspot statistics mask started with size ["<<maskSize[0]<<"x"<<maskSize[1]<<"x"<<maskSize[2]<<"] at ["<<maskIndex[0]<<","<<maskIndex[1]<<","<<maskIndex[2]<<"]";
   for (unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
   {
     maskIndex[dimension] = pi.MaxIndex[dimension] - (maskSize[dimension]-1)/2; // maskSize is always odd (size of 5 --> shift -2 required
@@ -1572,7 +1575,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
     */
   }
 
-  MITK_INFO << "Hotspot statistics mask corrected as region of size ["<<maskSize[0]<<"x"<<maskSize[1]<<"x"<<maskSize[2]<<"] at ["<<maskIndex[0]<<","<<maskIndex[1]<<","<<maskIndex[2]<<"]";
+  //MITK_INFO << "Hotspot statistics mask corrected as region of size ["<<maskSize[0]<<"x"<<maskSize[1]<<"x"<<maskSize[2]<<"] at ["<<maskIndex[0]<<","<<maskIndex[1]<<","<<maskIndex[2]<<"]";
 
   typename ConvolutionImageType::Pointer hotspotMaskITK = ConvolutionImageType::New();
   // copy origin and spacing of maskImage
@@ -1589,21 +1592,21 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   typename ConvolutionImageType::PointType maskOrigin;
   inputImage->TransformIndexToPhysicalPoint(maskIndex,maskOrigin);
-  MITK_INFO << "Mask origin at: " << maskOrigin;
+  //MITK_INFO << "Mask origin at: " << maskOrigin;
   hotspotMaskITK->SetOrigin(maskOrigin);
 
   IndexType maskCenterIndex;
   for (unsigned int d =0; d< VImageDimension;++d) maskCenterIndex[d]=pi.MaxIndex[d];
   typename ConvolutionImageType::PointType maskCenter;
   inputImage->TransformIndexToPhysicalPoint(maskCenterIndex,maskCenter);
-  MITK_INFO << "Mask center in input image: " << maskCenter;
+  //MITK_INFO << "Mask center in input image: " << maskCenter;
 
   FillHotspotMaskPixels(hotspotMaskITK.GetPointer(), maskCenter, m_HotspotRadiusInMM);
 
   Image::Pointer hotspotMaskMITK = ImportItkImage( hotspotMaskITK );
 
   Point3D maskCenterPosition = hotspotMaskMITK->GetGeometry()->GetCenter();
-  MITK_INFO << "Mask center: " << maskCenterPosition;
+  //MITK_INFO << "Mask center: " << maskCenterPosition;
 
   // use second instance of ImageStatisticsCalculator to calculate hotspot statistics
 
@@ -1622,16 +1625,20 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   hotspotStatistics.HotspotMax = hotspotMaskStatistics.Max;
   hotspotStatistics.HotspotMaxIndex = hotspotMaskStatistics.MaxIndex;
   hotspotStatistics.HotspotMean = hotspotMaskStatistics.Mean;
+  hotspotStatistics.HotspotMedian = hotspotMaskStatistics.Median;
   hotspotStatistics.HotspotIndex = pi.MaxIndex;
   hotspotStatistics.HotspotSigma = hotspotMaskStatistics.Sigma;
+  hotspotStatistics.HotspotRMS = sqrt( hotspotMaskStatistics.Mean * hotspotMaskStatistics.Mean
+    + hotspotMaskStatistics.Sigma * hotspotMaskStatistics.Sigma );
+  hotspotStatistics.HotspotN = hotspotMaskStatistics.N;
 
-  MITK_INFO << "----- Hotspot search results:"
+  /*MITK_INFO << "----- Hotspot search results:"
                "\n  Index: " << hotspotStatistics.HotspotIndex[0] << "," << hotspotStatistics.HotspotIndex[1] << "," << hotspotStatistics.HotspotIndex[2] <<
                "\n  Value: " << hotspotStatistics.HotspotMean <<
                "\n  Max Index: " << hotspotStatistics.HotspotMaxIndex[0] << "," << hotspotStatistics.HotspotMaxIndex[1] << "," << hotspotStatistics.HotspotMaxIndex[2] <<
                "\n  Max Value: " << hotspotStatistics.HotspotMax <<
                "\n  Min Index: " << hotspotStatistics.HotspotMinIndex[0] << "," << hotspotStatistics.HotspotMinIndex[1] << "," << hotspotStatistics.HotspotMinIndex[2] <<
-               "\n  Min Value: " << hotspotStatistics.HotspotMin;
+               "\n  Min Value: " << hotspotStatistics.HotspotMin;*/
 
   return hotspotStatistics;
 }

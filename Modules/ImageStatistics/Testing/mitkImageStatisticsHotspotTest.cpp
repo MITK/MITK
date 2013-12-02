@@ -40,41 +40,43 @@ struct mitkImageStatisticsHotspotTestClass
   struct Parameters
   {
     // XML-Tag <testimage>
-    int m_ImageRows;                          // XML-Tag "image-rows"
-    int m_ImageColumns;                       // XML-Tag "image-columns"
-    int m_ImageSlices;                        // XML-Tag "image-slices"
+    int m_ImageRows;                            // XML-Tag "image-rows"
+    int m_ImageColumns;                         // XML-Tag "image-columns"
+    int m_ImageSlices;                          // XML-Tag "image-slices"
 
-    int m_NumberOfGaussian;                   // XML-Tag "numberOfGaussians"
+    int m_NumberOfGaussian;                     // XML-Tag "numberOfGaussians"
 
-    std::vector<float> m_Spacing;               // XML-Tag "spacingX", "spacingY", "spacingZ"
+    float m_Spacing[3];                         // XML-Tag "spacingX", "spacingY", "spacingZ"
 
     // XML-Tag <gaussian>
-    std::vector<int> m_CenterX;                // XML-Tag "centerIndexX"
-    std::vector<int> m_CenterY;                // XML-Tag "centerIndexY"
-    std::vector<int> m_CenterZ;                // XML-Tag "centerIndexZ"
+    std::vector<int> m_CenterX;                 // XML-Tag "centerIndexX"
+    std::vector<int> m_CenterY;                 // XML-Tag "centerIndexY"
+    std::vector<int> m_CenterZ;                 // XML-Tag "centerIndexZ"
 
-    std::vector<int> m_SigmaX;                 // XML-Tag "deviationX"
-    std::vector<int> m_SigmaY;                 // XML-Tag "deviationY"
-    std::vector<int> m_SigmaZ;                 // XML-Tag "deviationZ"
+    std::vector<int> m_SigmaX;                  // XML-Tag "deviationX"
+    std::vector<int> m_SigmaY;                  // XML-Tag "deviationY"
+    std::vector<int> m_SigmaZ;                  // XML-Tag "deviationZ"
 
-    std::vector<int> m_Altitude;               // XML-Tag "altitude"
+    std::vector<int> m_Altitude;                // XML-Tag "altitude"
 
-    // XML-Tag <roiY
-    int m_RoiMaximumX;                        // XML-Tag "maximumX"
-    int m_RoiMinimumX;                        // XML-Tag "minimumX"
-    int m_RoiMaximumY;                        // XML-Tag "maximumY"
-    int m_RoiMinimumY;                        // XML-Tag "minimumY"
-    int m_RoiMaximumZ;                        // XML-Tag "maximumZ"
-    int m_RoiMinimumZ;                        // XML-Tag "minimumZ"
+    // XML-Tag <roi>
+    int m_MaxSizeX;                             // XML-Tag "maximumSizeX"
+    int m_MinSizeX;                             // XML-Tag "minimumSizeX"
+    int m_MaxSizeY;                             // XML-Tag "maximumSizeY"
+    int m_MinSizeY;                             // XML-Tag "minimumSizeY"
+    int m_MaxSizeZ;                             // XML-Tag "maximumSizeZ"
+    int m_MinSizeZ;                             // XML-Tag "minimumSizeZ"
+
+    float m_hotspotRadiusInMM;                  // XML-Tag "hotspotRadiusInMM"
 
     //XML-Tag <statistic>
-    float m_HotspotMinimum;                   // XML-Tag "minimum"
-    float m_HotspotMaximum;                   // XML-Tag "maximum"
-    float m_HotspotPeak;                      // XML-Tag "peak"
+    float m_HotspotMin;                         // XML-Tag "minimum"
+    float m_HotspotMax;                         // XML-Tag "maximum"
+    float m_HotspotMean;                        // XML-Tag "mean"
 
-    std::vector<int> m_HotspotMaximumIndex;   // XML-Tag "maximumIndexX", XML-Tag "maximumIndexY", XML-Tag "maximumIndexZ"
-    std::vector<int> m_HotspotMinimumIndex;   // XML-Tag "minimumIndexX", XML-Tag "minimumIndexY", XML-Tag "minimumIndexZ"
-    std::vector<int> m_HotspotPeakIndex;      // XML-Tag "peakIndexX", XML-Tag "peakIndexY", XML-Tag "peakIndexZ"
+    vnl_vector<int> m_HotspotMaxIndex;          // XML-Tag "maximumIndexX", XML-Tag "maximumIndexY", XML-Tag "maximumIndexZ"
+    vnl_vector<int> m_HotspotMinIndex;          // XML-Tag "minimumIndexX", XML-Tag "minimumIndexY", XML-Tag "minimumIndexZ"
+    vnl_vector<int> m_HotspotIndex;             // XML-Tag "hotspotIndexX", XML-Tag "hotspotIndexY", XML-Tag "hotspotIndexZ"
   };
 
   /**
@@ -191,13 +193,9 @@ struct mitkImageStatisticsHotspotTestClass
 
       result.m_NumberOfGaussian = GetIntegerAttribute( testimage, "numberOfGaussians" );
 
-      std::vector<float> tmpSpacing(3,0);
-
-      tmpSpacing[0] = GetDoubleAttribute(testimage, "spacingX");
-      tmpSpacing[1] = GetDoubleAttribute(testimage, "spacingY");
-      tmpSpacing[2] = GetDoubleAttribute(testimage, "spacingZ");
-
-      result.m_Spacing = tmpSpacing;
+      result.m_Spacing[0] = GetDoubleAttribute(testimage, "spacingX");
+      result.m_Spacing[1] = GetDoubleAttribute(testimage, "spacingY");
+      result.m_Spacing[2] = GetDoubleAttribute(testimage, "spacingZ");
 
       MITK_TEST_OUTPUT( << "Read size parameters (x,y,z): " << result.m_ImageRows << "," << result.m_ImageColumns << "," << result.m_ImageSlices);
       MITK_TEST_OUTPUT( << "Read spacing parameters (x,y,z): " << result.m_Spacing[0] << "," << result.m_Spacing[1] << "," << result.m_Spacing[2]);
@@ -206,40 +204,32 @@ struct mitkImageStatisticsHotspotTestClass
       testimage->GetChildren("gaussian", gaussians);
       MITK_TEST_CONDITION_REQUIRED( gaussians.size() >= 1, "At least one gaussian is defined" )
 
-      std::vector<int> tmpCenterX(result.m_NumberOfGaussian,0);
-      std::vector<int> tmpCenterY(result.m_NumberOfGaussian,0);
-      std::vector<int> tmpCenterZ(result.m_NumberOfGaussian,0);
+      result.m_CenterX.resize(result.m_NumberOfGaussian);
+      result.m_CenterY.resize(result.m_NumberOfGaussian);
+      result.m_CenterZ.resize(result.m_NumberOfGaussian);
 
-      std::vector<int> tmpSigmaX(result.m_NumberOfGaussian,0);
-      std::vector<int> tmpSigmaY(result.m_NumberOfGaussian,0);
-      std::vector<int> tmpSigmaZ(result.m_NumberOfGaussian,0);
+      result.m_SigmaX.resize(result.m_NumberOfGaussian);
+      result.m_SigmaY.resize(result.m_NumberOfGaussian);
+      result.m_SigmaZ.resize(result.m_NumberOfGaussian);
 
-      std::vector<int> tmpAltitude(result.m_NumberOfGaussian,0);
+      result.m_Altitude.resize(result.m_NumberOfGaussian);
+
 
       for(int i = 0; i < result.m_NumberOfGaussian ; ++i)
       {
         itk::DOMNode* gaussian = gaussians[i];
 
-        tmpCenterX[i] = GetIntegerAttribute(gaussian, "centerIndexX");
-        tmpCenterY[i] = GetIntegerAttribute(gaussian, "centerIndexY");
-        tmpCenterZ[i] = GetIntegerAttribute(gaussian, "centerIndexZ");
+        result.m_CenterX[i] = GetIntegerAttribute(gaussian, "centerIndexX");
+        result.m_CenterY[i] = GetIntegerAttribute(gaussian, "centerIndexY");
+        result.m_CenterZ[i] = GetIntegerAttribute(gaussian, "centerIndexZ");
 
-        tmpSigmaX[i] = GetIntegerAttribute(gaussian, "deviationX");
-        tmpSigmaY[i] = GetIntegerAttribute(gaussian, "deviationY");
-        tmpSigmaZ[i] = GetIntegerAttribute(gaussian, "deviationZ");
+        result.m_SigmaX[i] = GetIntegerAttribute(gaussian, "deviationX");
+        result.m_SigmaY[i] = GetIntegerAttribute(gaussian, "deviationY");
+        result.m_SigmaZ[i] = GetIntegerAttribute(gaussian, "deviationZ");
 
-        tmpAltitude[i] = GetIntegerAttribute(gaussian, "altitude");
+        result.m_Altitude[i] = GetIntegerAttribute(gaussian, "altitude");
       }
 
-      result.m_CenterX = tmpCenterX;
-      result.m_CenterY = tmpCenterY;
-      result.m_CenterZ = tmpCenterZ;
-
-      result.m_SigmaX = tmpSigmaX;
-      result.m_SigmaY = tmpSigmaY;
-      result.m_SigmaZ = tmpSigmaZ;
-
-      result.m_Altitude = tmpAltitude;
 
       // read ROI parameters, fill result structure
       NodeList rois;
@@ -247,12 +237,14 @@ struct mitkImageStatisticsHotspotTestClass
       MITK_TEST_CONDITION_REQUIRED( rois.size() == 1, "One ROI defined" )
       itk::DOMNode* roi = rois[0];
 
-      result.m_RoiMaximumX = GetIntegerAttribute(roi, "maximumX");
-      result.m_RoiMinimumX = GetIntegerAttribute(roi, "minimumX");
-      result.m_RoiMaximumY = GetIntegerAttribute(roi, "maximumY");
-      result.m_RoiMinimumY = GetIntegerAttribute(roi, "minimumY");
-      result.m_RoiMaximumZ = GetIntegerAttribute(roi, "maximumZ");
-      result.m_RoiMinimumZ = GetIntegerAttribute(roi, "minimumZ");
+      result.m_MaxSizeX = GetIntegerAttribute(roi, "maximumSizeX");
+      result.m_MinSizeX = GetIntegerAttribute(roi, "minimumSizeX");
+      result.m_MaxSizeY = GetIntegerAttribute(roi, "maximumSizeY");
+      result.m_MinSizeY = GetIntegerAttribute(roi, "minimumSizeY");
+      result.m_MaxSizeZ = GetIntegerAttribute(roi, "maximumSizeZ");
+      result.m_MinSizeZ = GetIntegerAttribute(roi, "minimumSizeZ");
+
+      result.m_hotspotRadiusInMM = GetDoubleAttribute(roi, "hotspotRadiusInMM");
 
       // read statistic parameters, fill result structure
       NodeList statistics;
@@ -260,34 +252,25 @@ struct mitkImageStatisticsHotspotTestClass
       MITK_TEST_CONDITION_REQUIRED( statistics.size() == 1, "One statistic defined" )
       itk::DOMNode* statistic = statistics[0];
 
-      result.m_HotspotMinimum = GetDoubleAttribute(statistic, "minimum");
-      result.m_HotspotMaximum = GetDoubleAttribute(statistic, "maximum");
-      result.m_HotspotPeak = GetDoubleAttribute(statistic, "peakOptimized");
+      result.m_HotspotMin = GetDoubleAttribute(statistic, "minimum");
+      result.m_HotspotMax = GetDoubleAttribute(statistic, "maximum");
+      result.m_HotspotMean = GetDoubleAttribute(statistic, "mean");
 
-      std::vector<int> tmpMinimumIndex(3,0);
+      result.m_HotspotMinIndex.set_size(3);
+      result.m_HotspotMinIndex[0] = GetIntegerAttribute(statistic, "minimumIndexX");
+      result.m_HotspotMinIndex[1] = GetIntegerAttribute(statistic, "minimumIndexY");
+      result.m_HotspotMinIndex[2] = GetIntegerAttribute(statistic, "minimumIndexZ");
 
-      tmpMinimumIndex[0] = GetIntegerAttribute(statistic, "minimumIndexX");
-      tmpMinimumIndex[1] = GetIntegerAttribute(statistic, "minimumIndexY");
-      tmpMinimumIndex[2] = GetIntegerAttribute(statistic, "minimumIndexZ");
+      result.m_HotspotMaxIndex.set_size(3);
+      result.m_HotspotMaxIndex[0] = GetIntegerAttribute(statistic, "maximumIndexX");
+      result.m_HotspotMaxIndex[1] = GetIntegerAttribute(statistic, "maximumIndexY");
+      result.m_HotspotMaxIndex[2] = GetIntegerAttribute(statistic, "maximumIndexZ");
 
-      result.m_HotspotMinimumIndex = tmpMinimumIndex;
+      result.m_HotspotIndex.set_size(3);
+      result.m_HotspotIndex[0] = GetIntegerAttribute(statistic, "hotspotIndexX");
+      result.m_HotspotIndex[1] = GetIntegerAttribute(statistic, "hotspotIndexY");
+      result.m_HotspotIndex[2] = GetIntegerAttribute(statistic, "hotspotIndexZ");
 
-
-      std::vector<int> tmpMaximumIndex(3,0);
-
-      tmpMaximumIndex[0] = GetIntegerAttribute(statistic, "maximumIndexX");
-      tmpMaximumIndex[1] = GetIntegerAttribute(statistic, "maximumIndexY");
-      tmpMaximumIndex[2] = GetIntegerAttribute(statistic, "maximumIndexZ");
-
-      result.m_HotspotMaximumIndex = tmpMaximumIndex;
-
-      std::vector<int> tmpPeakIndex(3,0);
-
-      tmpPeakIndex[0] = GetIntegerAttribute(statistic, "peakIndexX");
-      tmpPeakIndex[1] = GetIntegerAttribute(statistic, "peakIndexY");
-      tmpPeakIndex[2] = GetIntegerAttribute(statistic, "peakIndexZ");
-
-      result.m_HotspotPeakIndex = tmpPeakIndex;
 
       return result;
     }
@@ -373,7 +356,7 @@ struct mitkImageStatisticsHotspotTestClass
   */
   static mitk::ImageStatisticsCalculator::Statistics CalculateStatistics(mitk::Image* image, const Parameters& testParameters)
   {
-    mitk::ImageStatisticsCalculator::Statistics result;
+mitk::ImageStatisticsCalculator::Statistics result;
     const unsigned int Dimension = 3;
     typedef itk::Image<unsigned short, Dimension> MaskImageType;
     MaskImageType::Pointer mask = MaskImageType::New();
@@ -386,11 +369,9 @@ struct mitkImageStatisticsHotspotTestClass
 
     for(int i = 0; i < Dimension; ++i)
     {
-      start[i] = 0.00;
+      start[i] = 0;
       spacing[i] = testParameters.m_Spacing[i];
     }
-
-
 
     size[0] = testParameters.m_ImageColumns;
     size[1] = testParameters.m_ImageRows;
@@ -404,20 +385,19 @@ struct mitkImageStatisticsHotspotTestClass
     mask->SetRegions(region);
     mask->Allocate();
 
-    for(int x = testParameters.m_RoiMinimumX; x < testParameters.m_RoiMaximumX; ++x)
-    {
-      for(int y = testParameters.m_RoiMinimumY; y < testParameters.m_RoiMaximumY; ++y)
-      {
-        for(int z = testParameters.m_RoiMinimumZ; z < testParameters.m_RoiMaximumZ; ++z)
-        {
-          MaskImageType::IndexType pixelIndex;
-          pixelIndex[0] = x;
-          pixelIndex[1] = y;
-          pixelIndex[2] = z;
+    typedef itk::ImageRegionIteratorWithIndex<MaskImageType> MaskImageIteratorType;
+    MaskImageIteratorType maskIt(mask, region);
 
-          mask->SetPixel(pixelIndex, 1.00);
-        }
-      }
+    for(maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)
+    {
+      MaskImageType::IndexType index = maskIt.GetIndex();
+
+       if((index[0] >= testParameters.m_MinSizeX && index[0] <= testParameters.m_MaxSizeX) &&
+          (index[1] >= testParameters.m_MinSizeY && index[1] <= testParameters.m_MaxSizeY) &&
+          (index[2] >= testParameters.m_MinSizeZ && index[2] <= testParameters.m_MaxSizeZ))
+          maskIt.Set(1);
+       else
+        maskIt.Set(0);
     }
 
     mitk::Image::Pointer mitkMaskImage;
@@ -426,6 +406,8 @@ struct mitkImageStatisticsHotspotTestClass
     statisticsCalculator->SetImage(image);
     statisticsCalculator->SetImageMask(mitkMaskImage);
     statisticsCalculator->SetMaskingModeToImage();
+    statisticsCalculator->SetHotspotRadius(testParameters.m_hotspotRadiusInMM);
+    statisticsCalculator->SetCalculateHotspot(true);
     statisticsCalculator->ComputeStatistics();
     result = statisticsCalculator->GetStatistics();
 
@@ -447,59 +429,16 @@ struct mitkImageStatisticsHotspotTestClass
   {
     // check all expected test result against actual results
 
-    double actualPeakValue = testParameters.m_HotspotPeak;
-    double expectedPeakValue = statistics.HotspotPeak;
-
-    double actualMaxValue = testParameters.m_HotspotMaximum;
-    double expectedMaxValue = statistics.HotspotMax;
-
-    double actualMinValue = testParameters.m_HotspotMinimum;
-    double expectedMinValue = statistics.HotspotMin;
-
-
-    //Peak Index
-    std::vector<int> actualPeakIndex = testParameters.m_HotspotPeakIndex;
-    vnl_vector<int> expectedVnlPeakIndex;
-    expectedVnlPeakIndex = statistics.HotspotPeakIndex;
-
-    vnl_vector<int> actualVnlPeakIndex;
-    actualVnlPeakIndex.set_size(3);
-
-    for(int i = 0; i < actualVnlPeakIndex.size(); ++i)
-      actualVnlPeakIndex[i] = actualPeakIndex[i];
-
-    // MaxIndex
-    std::vector<int> actualMaxIndex = testParameters.m_HotspotMaximumIndex;
-    vnl_vector<int> expectedVnlMaxIndex;
-    expectedVnlMaxIndex = statistics.HotspotMaxIndex;
-
-    vnl_vector<int> actualVnlMaxIndex;
-    actualVnlMaxIndex.set_size(3);
-
-    for(int i = 0; i < actualVnlMaxIndex.size(); ++i)
-      actualVnlMaxIndex[i] = actualMaxIndex[i];
-
-    //MinIndex
-    std::vector<int> actualMinIndex = testParameters.m_HotspotMinimumIndex;
-    vnl_vector<int> expectedVnlMinIndex;
-    expectedVnlMinIndex = statistics.HotspotMinIndex;
-
-    vnl_vector<int> actualVnlMinIndex;
-    actualVnlMinIndex.set_size(3);
-
-    for(int i = 0; i < actualVnlMinIndex.size(); ++i)
-      actualVnlMinIndex[i] = actualMinIndex[i];
-
     double eps = 0.001;
 
     // float comparisons, allow tiny differences
-    MITK_TEST_CONDITION( ::fabs(actualPeakValue - expectedPeakValue) < eps, "Actual hotspotPeak value " << actualPeakValue << " (expected " << expectedPeakValue << ")" );
-    MITK_TEST_CONDITION( ::fabs(actualMaxValue - expectedMaxValue) < eps, "Actual hotspotMax value " << actualMaxValue << " (expected " << expectedMaxValue << ")" );
-    MITK_TEST_CONDITION( ::fabs(actualMinValue - expectedMinValue) < eps, "Actual hotspotMin value " << actualMinValue << " (expected " << expectedMinValue << ")" );
+    MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMean - statistics.HotspotMean) < eps, "Mean value of hotspot in XML-File: " << testParameters.m_HotspotMean << " (Mean value of hotspot calculated in mitkImageStatisticsCalculator: " << statistics.HotspotMean << ")" );
+    MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMax- statistics.HotspotMax) < eps, "Maximum of hotspot in XML-File:  " << testParameters.m_HotspotMax << " (Maximum of hotspot calculated in mitkImageStatisticsCalculator: "  << statistics.HotspotMax << ")" );
+    MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMin - statistics.HotspotMin) < eps, "Minimum of hotspot in XML-File: " << testParameters.m_HotspotMin << " (Minimum of hotspot calculated in mitkImageStatisticsCalculator: " << statistics.HotspotMin << ")" );
 
-    MITK_TEST_CONDITION( expectedVnlPeakIndex == actualVnlPeakIndex, "Actual hotspotPeakIndex " << actualVnlPeakIndex << " (expected " << expectedVnlPeakIndex << ")" );
-    MITK_TEST_CONDITION( expectedVnlMaxIndex == actualVnlMaxIndex, "Actual hotspotMaxIndex " << actualVnlMaxIndex << " (expected " << expectedVnlMaxIndex << ")" );
-    MITK_TEST_CONDITION( expectedVnlMinIndex == actualVnlMinIndex, "Actual hotspotMinIndex " << actualVnlMinIndex << " (expected " << expectedVnlMinIndex << ")" );
+    MITK_TEST_CONDITION( statistics.HotspotIndex == testParameters.m_HotspotIndex, "Index of hotspot in XML-File: " << testParameters.m_HotspotIndex << " (Index of hotspot calculated in mitkImageStatisticsCalculator: " << statistics.HotspotIndex << ")" );
+    MITK_TEST_CONDITION( statistics.HotspotMaxIndex == testParameters.m_HotspotMaxIndex, "Index of HotspotMaximum in XML-File: " << testParameters.m_HotspotMaxIndex << " (Index of HotspotMaximum calculated in mitkImageStatisticsCalculator: " << statistics.HotspotMaxIndex << ")" );
+    MITK_TEST_CONDITION( statistics.HotspotMinIndex == testParameters.m_HotspotMinIndex, "Index of HotspotMinimum in XML-File " << testParameters.m_HotspotMinIndex << " (Index of HotspotMinimum calculated in mitkImageStatisticsCalculator: " << statistics.HotspotMinIndex << ")" );
   }
 };
 

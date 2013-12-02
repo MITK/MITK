@@ -37,29 +37,21 @@ class MITK_PMDMODULE_EXPORT ToFCameraPMDPlayerDeviceFactory : public itk::LightO
 public:
   ToFCameraPMDPlayerDeviceFactory()
   {
-    this->m_DeviceNumber=1;
   }
   /*!
    \brief Defining the Factorie´s Name, here for the ToFPMDPlayer.
    */
    std::string GetFactoryName()
    {
-       return std::string("PMD Player Factory");
+     return std::string("PMD Player Factory");
    }
 
-   std::string GetCurrentDeviceName()
+   /**
+    * @brief GetDeviceNamePrefix Main part of the device name.
+    */
+   std::string GetDeviceNamePrefix()
    {
-     std::stringstream name;
-     if(m_DeviceNumber>1)
-     {
-       name << "PMD Player "<< m_DeviceNumber;
-     }
-     else
-     {
-       name << "PMD Player";
-     }
-     m_DeviceNumber++;
-     return name.str();
+     return std::string("PMD Player");
    }
 
 private:
@@ -76,8 +68,6 @@ private:
 
      return device.GetPointer();
    }
-
-   int m_DeviceNumber;
 };
 }
 #endif

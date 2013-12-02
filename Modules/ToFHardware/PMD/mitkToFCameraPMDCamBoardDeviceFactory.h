@@ -45,30 +45,22 @@ class MITK_PMDMODULE_EXPORT ToFCameraPMDCamBoardDeviceFactory : public itk::Ligh
 public:
   ToFCameraPMDCamBoardDeviceFactory()
   {
-    this->m_DeviceNumber=1;
   }
   /*!
    \brief Defining the Factorie´s Name, here for the ToFPMDCamBoard.
    */
    std::string GetFactoryName()
    {
-       return std::string("PMD CamBoard Factory ");
+     return std::string("PMD CamBoard Factory");
    }
 
-    std::string GetCurrentDeviceName()
-    {
-     std::stringstream name;
-     if(m_DeviceNumber>1)
-     {
-       name << "PMD CamBoard "<< m_DeviceNumber;
-     }
-     else
-     {
-       name << "PMD CamBoard";
-     }
-     m_DeviceNumber++;
-     return name.str();
-    }
+   /**
+    * @brief GetDeviceNamePrefix Main part of the device name.
+    */
+   std::string GetDeviceNamePrefix()
+   {
+     return std::string("PMD CamBoard");
+   }
 
 private:
 
@@ -91,9 +83,6 @@ private:
      us::Module* module = us::GetModuleContext()->GetModule();
      return module->GetResource("CalibrationFiles/PMDCamBoard_camera.xml");
    }
-
-
-   int m_DeviceNumber;
 };
 }
 #endif

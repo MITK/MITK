@@ -82,7 +82,7 @@ namespace mitk
     us::ModuleResource GetIntrinsicsResource()
     {
       us::Module* module = us::GetModuleContext()->GetModule();
-      return module->GetResource("CalibrationFiles/default.xml");
+      return module->GetResource("CalibrationFiles/Default_Parameters.xml");
     }
   };
 }

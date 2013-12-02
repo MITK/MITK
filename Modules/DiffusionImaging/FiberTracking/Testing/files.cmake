@@ -4,6 +4,7 @@ SET(MODULE_CUSTOM_TESTS
   mitkGibbsTrackingTest.cpp
   mitkStreamlineTrackingTest.cpp
   mitkPeakExtractionTest.cpp
+  mitkLocalFiberPlausibilityTest.cpp
 )
 
 

@@ -752,7 +752,9 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::RemoveFibersOutside(ItkUcharImgT
     vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
     newPolyData->SetPoints(vtkNewPoints);
     newPolyData->SetLines(vtkNewCells);
-    return mitk::FiberBundleX::New(newPolyData);
+    mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New(newPolyData);
+    newFib->ResampleFibers(minSpacing/2);
+    return newFib;
 }
 
 mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(mitk::PlanarFigure* pf)

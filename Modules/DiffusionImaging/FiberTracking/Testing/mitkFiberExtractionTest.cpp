@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundleX.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureComposite.h>
+#include <mitkImageCast.h>
 
 /**Documentation
  *  Test if fiber transfortaiom methods work correctly
@@ -29,13 +30,15 @@ int mitkFiberExtractionTest(int argc, char* argv[])
 {
     MITK_TEST_BEGIN("mitkFiberExtractionTest");
 
-    MITK_TEST_CONDITION_REQUIRED(argc==6,"check for input data")
+    MITK_TEST_CONDITION_REQUIRED(argc==11,"check for input data")
 
             try{
         RegisterFiberTrackingObjectFactory();
 
         mitk::FiberBundleX::Pointer groundTruthFibs = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(argv[1])->GetData());
         mitk::FiberBundleX::Pointer testFibs = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(argv[2])->GetData());
+
+        // test planar figure based extraction
         mitk::PlanarFigure::Pointer pf1 = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::LoadDataNode(argv[3])->GetData());
         mitk::PlanarFigure::Pointer pf2 = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::LoadDataNode(argv[4])->GetData());
         mitk::PlanarFigure::Pointer pf3 = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::LoadDataNode(argv[5])->GetData());
@@ -52,7 +55,31 @@ int mitkFiberExtractionTest(int argc, char* argv[])
 
         groundTruthFibs = groundTruthFibs->ExtractFiberSubset(pfc2);
 
-        MITK_TEST_CONDITION_REQUIRED(groundTruthFibs->Equals(testFibs),"check extraction")
+        MITK_TEST_CONDITION_REQUIRED(groundTruthFibs->Equals(testFibs),"check planar figure extraction")
+
+        // test binary image based extraction
+        mitk::Image::Pointer mitkRoiImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[6])->GetData());
+        typedef itk::Image< unsigned char, 3 >    itkUCharImageType;
+        itkUCharImageType::Pointer itkRoiImage = itkUCharImageType::New();
+        mitk::CastToItkImage<itkUCharImageType>(mitkRoiImage, itkRoiImage);
+
+        groundTruthFibs = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(argv[1])->GetData());
+        mitk::FiberBundleX::Pointer inside = groundTruthFibs->RemoveFibersOutside(itkRoiImage, false);
+        mitk::FiberBundleX::Pointer outside = groundTruthFibs->RemoveFibersOutside(itkRoiImage, true);
+        mitk::FiberBundleX::Pointer passing = groundTruthFibs->ExtractFiberSubset(itkRoiImage, true);
+        mitk::FiberBundleX::Pointer ending = groundTruthFibs->ExtractFiberSubset(itkRoiImage, false);
+
+        testFibs = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(argv[7])->GetData());
+        MITK_TEST_CONDITION_REQUIRED(inside->Equals(testFibs),"check inside mask extraction")
+
+        testFibs = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(argv[8])->GetData());
+        MITK_TEST_CONDITION_REQUIRED(outside->Equals(testFibs),"check outside mask extraction")
+
+        testFibs = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(argv[9])->GetData());
+        MITK_TEST_CONDITION_REQUIRED(passing->Equals(testFibs),"check passing mask extraction")
+
+        testFibs = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(argv[10])->GetData());
+        MITK_TEST_CONDITION_REQUIRED(ending->Equals(testFibs),"check ending in mask extraction")
     }
     catch(...) {
         return EXIT_FAILURE;

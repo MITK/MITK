@@ -688,8 +688,6 @@ namespace itk
     //is out of declared bounds for too high or too low attenuation.
 
     // declaration of important variables
-
-
     vnl_vector<double> org_data(nof);
     vnl_vector<double> atten(nof-numberb0);
     double cnt_atten=0;
@@ -739,7 +737,7 @@ namespace itk
 
             cnt_atten=0;
 
-            //smoothing certain gradient images taht are out of declared constraints
+            //smoothing certain gradient images that are out of declared constraints
 
             for (int f=0;f<nof;f++)
             {
@@ -822,9 +820,9 @@ namespace itk
               if(m_B0Mask[f]==1)
               {
 
-                  int x_max=size[0];
-                  int y_max=size[1];
-                  int z_max=size[2];
+                  int x_max=size[0] - 1;
+                  int y_max=size[1] - 1;
+                  int z_max=size[2] - 1;
 
                   double back_x=std::max(0,x-1);
                   double back_y=std::max(0,y-1);

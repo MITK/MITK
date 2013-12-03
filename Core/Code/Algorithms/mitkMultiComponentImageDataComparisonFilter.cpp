@@ -157,7 +157,7 @@ namespace mitk
         TPixel vDataItem = static_cast<TPixel*>(const_cast<void*>(readAccVImage.GetData()))[p];
         TPixel tDataItem = static_cast<TPixel*>(const_cast<void*>(readAccTImage.GetData()))[p];
 
-        if( tDataItem != vDataItem )
+        if( std::abs( static_cast<double>(tDataItem - vDataItem) )>m_Tolerance )
         {
           ++m_CompareDetails->m_PixelsWithDifference;
 

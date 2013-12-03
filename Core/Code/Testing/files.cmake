@@ -10,7 +10,7 @@ set(MODULE_TESTS
   mitkEventTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
-  mitkGeometry3DTest.cpp
+  #mitkGeometry3DTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkGlobalInteractionTest.cpp
   mitkImageDataItemTest.cpp
@@ -72,7 +72,7 @@ set(MODULE_TESTS
 # test with image filename as an extra command line parameter
 set(MODULE_IMAGE_TESTS
   mitkImageTimeSelectorTest.cpp #only runs on images
-  mitkImageAccessorTest.cpp #only runs on images
+  #mitkImageAccessorTest.cpp #only runs on images #TODO: activate test if bug 15821 has been fixed
   mitkDataNodeFactoryTest.cpp #runs on all types of data
 )
 

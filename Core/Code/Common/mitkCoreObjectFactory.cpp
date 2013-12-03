@@ -417,14 +417,32 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::CoreObjectFactory::GetSaveFileEx
   return m_SaveFileExtensionsMap;
 }
 
-mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters() {
+mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters()
+{
   FileWriterList allWriters = m_FileWriters;
-  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
+  //sort to merge lists later on
+  typedef std::set<mitk::FileWriterWithInformation::Pointer> FileWriterSet;
+  FileWriterSet fileWritersSet;
+
+  fileWritersSet.insert(allWriters.begin(), allWriters.end());
+
+  //collect all extra factories
+  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin();
+       it != m_ExtraFactories.end(); it++ )
+  {
     FileWriterList list2 = (*it)->GetFileWriters();
-    allWriters.merge(list2);
+
+    //add them to the sorted set
+    fileWritersSet.insert(list2.begin(), list2.end());
   }
+
+  //write back to allWriters to return a list
+  allWriters.clear();
+  allWriters.insert(allWriters.end(), fileWritersSet.begin(), fileWritersSet.end());
+
   return allWriters;
 }
+
 void mitk::CoreObjectFactory::MapEvent(const mitk::Event*, const int) {
 
 }

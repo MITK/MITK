@@ -33,8 +33,8 @@ IF(BUILD_DiffusionMiniApps)
     GibbsTracking.cpp
     StreamlineTracking.cpp
     FiberProcessing.cpp
-    TractometerAngularErrorTool.cpp
-    TractogramAngularError.cpp
+    LocalDirectionalFiberPlausibility.cpp
+    #TractogramAngularError.cpp
     FiberDirectionExtraction.cpp
     PeakExtraction.cpp
     PeaksAngularError.cpp

@@ -40,7 +40,7 @@ using namespace std;
 int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
 {
     MITK_TEST_BEGIN("mitkLocalFiberPlausibilityTest");
-    MITK_TEST_CONDITION_REQUIRED(argc==7,"check for input data")
+    MITK_TEST_CONDITION_REQUIRED(argc==11,"check for input data")
 
     string fibFile = argv[1];
     vector< string > referenceImages; referenceImages.push_back(argv[2]); referenceImages.push_back(argv[3]);
@@ -49,7 +49,6 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
     string LDFP_VECTOR_FIELD = argv[6];
 
     float angularThreshold = 25;
-    bool ignore = false;
 
     try
     {
@@ -107,7 +106,7 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         evaluationFilter->SetImageSet(directionImageContainer);
         evaluationFilter->SetReferenceImageSet(referenceImageContainer);
         evaluationFilter->SetMaskImage(itkMaskImage);
-        evaluationFilter->SetIgnoreMissingDirections(ignore);
+        evaluationFilter->SetIgnoreMissingDirections(false);
         evaluationFilter->Update();
 
         EvaluationFilterType::OutputImageType::Pointer angularErrorImage = evaluationFilter->GetOutput(0);
@@ -126,9 +125,36 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         mitk::Image::Pointer gtNumTestDirImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(LDFP_NUM_DIRECTIONS)->GetData());
         mitk::FiberBundleX::Pointer gtTestDirections = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(LDFP_VECTOR_FIELD)->GetData());
 
-        MITK_TEST_CONDITION_REQUIRED(testDirections->Equals(gtTestDirections), "Check if vector fields are equal.");
         MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtAngularErrorImage, mitkAngularErrorImage, 0.0001, true), "Check if error images are equal.");
+        MITK_TEST_CONDITION_REQUIRED(testDirections->Equals(gtTestDirections), "Check if vector fields are equal.");
         MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtNumTestDirImage, mitkNumDirImage, 0.0001, true), "Check if num direction images are equal.");
+
+        evaluationFilter = EvaluationFilterType::New();
+        evaluationFilter->SetImageSet(directionImageContainer);
+        evaluationFilter->SetReferenceImageSet(referenceImageContainer);
+        //evaluationFilter->SetMaskImage(itkMaskImage);
+        evaluationFilter->SetIgnoreMissingDirections(true);
+        evaluationFilter->Update();
+        angularErrorImage = evaluationFilter->GetOutput(0);
+        mitkAngularErrorImage = mitk::Image::New();
+        mitkAngularErrorImage->InitializeByItk( angularErrorImage.GetPointer() );
+        mitkAngularErrorImage->SetVolume( angularErrorImage->GetBufferPointer() );
+        mitk::IOUtil::SaveImage(mitkAngularErrorImage, "test.nrrd");
+        gtAngularErrorImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[10])->GetData());
+        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtAngularErrorImage, mitkAngularErrorImage, 0.0001, true), "Check if error images with ignored missing directions are equal.");
+
+
+        for (int i=0; i<directionImageContainer->Size(); i++)
+        {
+            MITK_INFO << "Checking direction image " << i;
+            itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = directionImageContainer->GetElement(i);
+            mitk::Image::Pointer dirImage = mitk::Image::New();
+            dirImage->InitializeByItk( itkImg.GetPointer() );
+            dirImage->SetVolume( itkImg->GetBufferPointer() );
+
+            mitk::Image::Pointer refDirImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[7+i])->GetData());
+            MITK_TEST_CONDITION_REQUIRED(mitk::Equal(dirImage, refDirImage, 0.0001, true), "Check if direction images are equal.");
+        }
     }
     catch (itk::ExceptionObject e)
     {

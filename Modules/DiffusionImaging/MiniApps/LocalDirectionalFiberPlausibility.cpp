@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-int TractometerAngularErrorTool(int argc, char* argv[])
+int LocalDirectionalFiberPlausibility(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
@@ -299,4 +299,4 @@ int TractometerAngularErrorTool(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(TractometerAngularErrorTool);
+RegisterDiffusionMiniApp(LocalDirectionalFiberPlausibility);

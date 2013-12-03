@@ -84,11 +84,11 @@ itk::ProcessObject::DataObjectPointerArraySizeType mitk::NavigationDataToNavigat
   throw std::invalid_argument("output name does not exist");
 }
 
-void mitk::NavigationDataToNavigationDataFilter::ConnectTo(mitk::NavigationDataSource::Pointer UpstreamFilter)
+void mitk::NavigationDataToNavigationDataFilter::ConnectTo(mitk::NavigationDataSource* UpstreamFilter)
 {
   for (int i = 0; i < UpstreamFilter->GetNumberOfOutputs(); i++)
   {
-    this->SetNthInput(i, UpstreamFilter->GetOutput(i));
+    this->SetInput(i, UpstreamFilter->GetOutput(i));
   }
 }
 

@@ -155,7 +155,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
     // Count amount of same voxels in neighborhood V around xi, to determine normalization constant Z
     for (unsigned int i = 0; i < inputImagePointer->GetVectorLength(); ++i)
     {
-      TPixelType pixelI = git.Get()[0];
+      TPixelType pixelI = git.Get()[i];
       double sumj = 0;
       double wj = 0;
       short Z = 0;
@@ -190,7 +190,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
               if (inputImagePointer->GetLargestPossibleRegion().IsInside(idx))
               {
                 hit.SetIndex(idx);
-                TPixelType pixelJ = hit.Get()[0];
+                TPixelType pixelJ = hit.Get()[i];
                 if (pixelI == pixelJ)
                 {
                   ++Z;
@@ -230,7 +230,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
               if (inputImagePointer->GetLargestPossibleRegion().IsInside(idx))
               {
                 hit.SetIndex(idx);
-                TPixelType pixelJ = hit.Get()[0];
+                TPixelType pixelJ = hit.Get()[i];
                 if (pixelI == pixelJ)
                 {
                   double sumk = 0;

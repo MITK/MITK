@@ -39,6 +39,7 @@ struct mitkImageStatisticsHotspotTestClass
   */
   struct Parameters
   {
+  public:
     // XML-Tag <testimage>
     int m_ImageRows;                            // XML-Tag "image-rows"
     int m_ImageColumns;                         // XML-Tag "image-columns"
@@ -406,7 +407,7 @@ mitk::ImageStatisticsCalculator::Statistics result;
     statisticsCalculator->SetImage(image);
     statisticsCalculator->SetImageMask(mitkMaskImage);
     statisticsCalculator->SetMaskingModeToImage();
-    statisticsCalculator->SetHotspotRadius(testParameters.m_hotspotRadiusInMM);
+    statisticsCalculator->SetHotspotRadiusInMM(testParameters.m_hotspotRadiusInMM);
     statisticsCalculator->SetCalculateHotspot(true);
     statisticsCalculator->ComputeStatistics();
     result = statisticsCalculator->GetStatistics();
@@ -432,13 +433,13 @@ mitk::ImageStatisticsCalculator::Statistics result;
     double eps = 0.001;
 
     // float comparisons, allow tiny differences
-    MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMean - statistics.HotspotMean) < eps, "Mean value of hotspot in XML-File: " << testParameters.m_HotspotMean << " (Mean value of hotspot calculated in mitkImageStatisticsCalculator: " << statistics.HotspotMean << ")" );
-    MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMax- statistics.HotspotMax) < eps, "Maximum of hotspot in XML-File:  " << testParameters.m_HotspotMax << " (Maximum of hotspot calculated in mitkImageStatisticsCalculator: "  << statistics.HotspotMax << ")" );
-    MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMin - statistics.HotspotMin) < eps, "Minimum of hotspot in XML-File: " << testParameters.m_HotspotMin << " (Minimum of hotspot calculated in mitkImageStatisticsCalculator: " << statistics.HotspotMin << ")" );
+    MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMean - statistics.GetHotspotMean() ) < eps, "Mean value of hotspot in XML-File: " << testParameters.m_HotspotMean << " (Mean value of hotspot calculated in mitkImageStatisticsCalculator: " << statistics.GetHotspotMean() << ")" );
+    MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMax- statistics.GetHotspotMax() ) < eps, "Maximum of hotspot in XML-File:  " << testParameters.m_HotspotMax << " (Maximum of hotspot calculated in mitkImageStatisticsCalculator: "  << statistics.GetHotspotMax() << ")" );
+    MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMin - statistics.GetHotspotMin() ) < eps, "Minimum of hotspot in XML-File: " << testParameters.m_HotspotMin << " (Minimum of hotspot calculated in mitkImageStatisticsCalculator: " << statistics.GetHotspotMin() << ")" );
 
-    MITK_TEST_CONDITION( statistics.HotspotIndex == testParameters.m_HotspotIndex, "Index of hotspot in XML-File: " << testParameters.m_HotspotIndex << " (Index of hotspot calculated in mitkImageStatisticsCalculator: " << statistics.HotspotIndex << ")" );
-    MITK_TEST_CONDITION( statistics.HotspotMaxIndex == testParameters.m_HotspotMaxIndex, "Index of HotspotMaximum in XML-File: " << testParameters.m_HotspotMaxIndex << " (Index of HotspotMaximum calculated in mitkImageStatisticsCalculator: " << statistics.HotspotMaxIndex << ")" );
-    MITK_TEST_CONDITION( statistics.HotspotMinIndex == testParameters.m_HotspotMinIndex, "Index of HotspotMinimum in XML-File " << testParameters.m_HotspotMinIndex << " (Index of HotspotMinimum calculated in mitkImageStatisticsCalculator: " << statistics.HotspotMinIndex << ")" );
+    MITK_TEST_CONDITION( statistics.GetHotspotIndex() == testParameters.m_HotspotIndex, "Index of hotspot in XML-File: " << testParameters.m_HotspotIndex << " (Index of hotspot calculated in mitkImageStatisticsCalculator: " << statistics.GetHotspotIndex() << ")" );
+    MITK_TEST_CONDITION( statistics.GetHotspotMaxIndex() == testParameters.m_HotspotMaxIndex, "Index of HotspotMaximum in XML-File: " << testParameters.m_HotspotMaxIndex << " (Index of HotspotMaximum calculated in mitkImageStatisticsCalculator: " << statistics.GetHotspotMaxIndex() << ")" );
+    MITK_TEST_CONDITION( statistics.GetHotspotMinIndex() == testParameters.m_HotspotMinIndex, "Index of HotspotMinimum in XML-File " << testParameters.m_HotspotMinIndex << " (Index of HotspotMinimum calculated in mitkImageStatisticsCalculator: " << statistics.GetHotspotMinIndex() << ")" );
   }
 };
 

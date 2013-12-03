@@ -51,15 +51,81 @@ namespace mitk
  * switching back and forth between operation modes without modifying mask or
  * image, the information doesn't need to be recalculated.
  *
- * The class also has the possibility to calculate minimum, maximum, mean
- * and their corresponding indicies in the hottest spot in a given ROI / VOI.
- * The size of the hotspot is defined by a sphere with a radius specified by
- * the user. This procedure is required for the calculation of SUV-statistics
- * in PET-images for example.
+ * The class also has the possibility to calculate the location and separate
+ * statistics for a region called “hotspot”. The hotspot is a sphere of
+ * user-defined size and its location is chosen in a way that the average
+ * pixel value within the sphere is maximized.
  *
  * Note: currently time-resolved and multi-channel pictures are not properly
  * supported.
  */
+
+  /**
+ * \section HotspotStatistics_caption Calculation of hotspot statistics
+ *
+ * Since calculation of hotspot location and statistics is not
+ * straight-forward, the following paragraphs will describe it in more detail.
+ *
+ * <b>Note: Calculation of hotspot statistics is optional.</b>
+ *
+ * \subsection HotspotStatistics_description Hotspot Definition
+ *
+ * The “hotspot” of an image is motivated from PET readings. It is defined
+ * as a spherical region of fixed size which maximizes the average pixel value
+ * within the region.  The following image illustrates the concept: the
+ * colored areas are different image intensities and the hotspot is located
+ * in the “hottest” region of the image.
+ *
+ * [image with pixelvalue scale]
+ *
+ * \subsection HotspotStatistics_calculation Hotspot Calculation
+ *
+ * Since only the size of the hotspot is known initially, we need to calculate
+ * two aspects (both implemented in ComputeHotspotStatistics):
+ * - the hotspot location
+ * - statistics of the pixels within the hotspot
+ * Finding the hotspot location requires to calculate the average value at each
+ * position. This is done by convolution of the image with a sperical kernel
+ * image which reflects partial volumes (important in the case of low-resolution
+ * PET images).
+ *
+ * Once the hotspot location is known, calculating the actual statistics is a
+ * simple task which is implemented in ...TODO...
+ *
+ * \b Step 1: Finding the hotspot by image convolution
+ *
+ * As described above, we use image convolution with a rasterized sphere to
+ * average the image at each position. To handle coarse resolutions, which would
+ * normally force us to decide for partially contained voxels whether to count
+ * them or not, we supersample the kernel image and use non-integer kernel values
+ * (see TODO-MethodName), which reflect the volume part that is contained in the
+ * sphere. For example, if three subvoxels are inside the sphere, the corresponding
+ *  kernel voxel gets a value of 0.75 (3 out of 4 subvoxels, see 2D example below).
+ *
+ * [image with subsampled pixel]
+ *
+ * Convolution itself is done by means of the itk::FFTConvolutionImageFilter.
+ * To find the hotspot location, we simply iterate the averaged image and find a
+ * maximum location (see CalculateExtrema()).
+ * TODO? Discuss cases with multiple maxima!?
+ * -> "In case of images with multiple maxima the method returns value and corresponding
+ * index of the extrema that is found by the iterator first"
+ *
+ * \b Step 2: Computation of hotspot statistics
+ *
+ * Once the hotspot location is found, statistics for the region are calculated
+ * by simply iterating the input image and regarding all pixel centers inside the
+ * hotspot-sphere for statistics.
+ *
+ * \subsection HotspotStatistics_tests Tests
+ *
+ * To check the correctness of the hotspot calculation, a special class
+ * (mitkImageStatisticsHotspotTest) has been created, which generates images with
+ * known hotspot location and statistics. A number of unit tests use this class
+ * to first generate an image of known properites and then verify that
+ * ImageStatisticsCalculator is able to reproduce the known statistics.
+ *
+*/
 class ImageStatistics_EXPORT ImageStatisticsCalculator : public itk::Object
 {
 public:
@@ -80,54 +146,90 @@ public:
   /**
     TODO DM: document
   */
-  struct Statistics
+  class ImageStatistics_EXPORT Statistics
   {
-    int Label;
-    unsigned int N;      //< number of voxels
-    double Min;          //< mimimum value
-    double Max;          //< maximum value
-    double Mean;         //< mean value
-    double Median;       //< median value
-    double Variance;     //< variance of values // TODO DM: remove, was never filled with values ; check if any calling code within MITK used this member!
-    double Sigma;        //< standard deviation of values (== square root of variance)
-    double RMS;          //< root means square (TODO DM: check mesning)
+  public:
 
-    unsigned int HotspotN;
-    double HotspotMin;   //< mimimum value inside hotspot
-    double HotspotMax;   //< maximum value inside hotspot
-    double HotspotMean;  //< mean value inside hotspot
-    double HotspotMedian;
-    double HotspotSigma; //< standard deviation of values inside hotspot
-    double HotspotRMS;
+    Statistics();
 
-    vnl_vector< int > MinIndex;
-    vnl_vector< int > MaxIndex;
-    vnl_vector<int> HotspotMaxIndex;
-    vnl_vector<int> HotspotMinIndex;
-    vnl_vector<int> HotspotIndex; //< TODO DM: couldn't this be named "hotspot index"? We need to clear naming of hotspotmean, hotspotpeakindex, and hotspotpeak
+    /** \brief Initialize every member of Statistics to zero. */
+    //void Reset()
 
-    Statistics()
-    {
-      this->Reset();
-    }
+    unsigned int GetN() const;
+    double GetMin() const;
+    double GetMax() const;
+    double GetMean() const;
+    double GetMedian() const;
+    double GetVariance() const;
+    double GetSigma() const;
+    double GetRMS() const;
+    vnl_vector<int> GetMaxIndex() const;
+    vnl_vector<int> GetMinIndex() const;
 
-    // TODO DM: make this struct a real class and put this into a constructor
-    void Reset() // TODO DM: move to .cpp file (mitk::ImageStatisticsCalculator::Statistics::Reset() {...})
-    {
-      Label = 0;
-      N = 0;
-      Min = 0.0;
-      Max = 0.0;
-      Mean = 0.0;
-      Median = 0.0;
-      Variance = 0.0;
-      Sigma = 0.0;
-      RMS = 0.0;
-      HotspotMin = 0.0;
-      HotspotMax = 0.0;
-      HotspotMean = 0.0;
-      HotspotSigma = 0.0; // TODO DM: also reset index values! Check that everything is initialized
-    }
+    void SetLabel(unsigned int label);
+    void SetN(unsigned int n);
+    void SetMin(double min);
+    void SetMax(double max);
+    void SetMean(double mean);
+    void SetMedian(double median);
+    void SetVariance(double variance);
+    void SetSigma(double sigma);
+    void SetRMS(double rms);
+    void SetMaxIndex(vnl_vector<int> maxIndex);
+    void SetMinIndex(vnl_vector<int> minIndex);
+
+    unsigned int GetHotspotN() const;
+    double GetHotspotMin() const;
+    double GetHotspotMax() const;
+    double GetHotspotMean() const;
+    double GetHotspotMedian() const;
+    double GetHotspotVariance() const;
+    double GetHotspotSigma() const;
+    double GetHotspotRMS() const;
+    vnl_vector<int> GetHotspotMaxIndex() const;
+    vnl_vector<int> GetHotspotMinIndex() const;
+    vnl_vector<int> GetHotspotIndex() const;
+
+    void SetHotspotLabel(unsigned int label);
+    void SetHotspotN(unsigned int n);
+    void SetHotspotMin(double min);
+    void SetHotspotMax(double max);
+    void SetHotspotMean(double mean);
+    void SetHotspotMedian(double median);
+    void SetHotspotVariance(double variance);
+    void SetHotspotSigma(double sigma);
+    void SetHotspotRMS(double rms);
+    void SetHotspotMaxIndex(vnl_vector<int> hotspotMaxIndex);
+    void SetHotspotMinIndex(vnl_vector<int> hotspotMinIndex);
+    void SetHotspotIndex(vnl_vector<int> hotspotIndex);
+
+  private:
+
+    int m_Label;
+    unsigned int m_N;                   //< number of voxels
+    double m_Min;                       //< mimimum value
+    double m_Max;                       //< maximum value
+    double m_Mean;                      //< mean value
+    double m_Median;                    //< median value
+    double m_Variance;
+    double m_Sigma;                     //< standard deviation of values (== square root of variance)
+    double m_RMS;                       //< root mean square
+
+    vnl_vector< int > m_MinIndex;       //< index of minimum value
+    vnl_vector< int > m_MaxIndex;       //< index of maximum value
+
+    unsigned int m_HotspotN;            //< number of voxels inside hotspot
+    double m_HotspotMin;                //< mimimum value inside hotspot
+    double m_HotspotMax;                //< maximum value inside hotspot
+    double m_HotspotMean;               //< mean value of hotspot
+    double m_HotspotMedian;             //< median value of hotspot
+    double m_HotspotVariance;
+    double m_HotspotSigma;              //< standard deviation of values inside hotspot
+    double m_HotspotRMS;                //< root mean square of hotspot
+
+    vnl_vector<int> m_HotspotMinIndex;  //< index of minimum value inside hotspot
+    vnl_vector<int> m_HotspotMaxIndex;  //< index of maximum value inside hotspot
+    vnl_vector<int> m_HotspotIndex;     //< index of hotspot origin
   };
 
   typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
@@ -174,10 +276,10 @@ public:
   bool GetDoIgnorePixelValue();
 
   /** \brief Sets the radius for the hotspot */
-  void SetHotspotRadius (double hotspotRadiusInMM); // TODO in mm
+  void SetHotspotRadiusInMM (double hotspotRadiusInMM);
 
   /** \brief Returns the radius of the hotspot */
-  double GetHotspotRadius(); // TODO in mm
+  double GetHotspotRadiusInMM();
 
   /** \brief Sets whether the hotspot should be calculated */
   void SetCalculateHotspot(bool calculateHotspot);
@@ -275,14 +377,10 @@ protected:
     vnl_vector<int> MinIndex;
   };
 
- /** \brief Calculates minimum, maximum, mean value and their
+
+  /** \brief Calculates minimum, maximum, mean value and their
   * corresponding indices in a given ROI. As input the function
   * needs an image and a mask. It returns a ImageExtrema object. */
-  template <typename TPixel, unsigned int VImageDimension >
-  ImageExtrema CalculateExtrema(
-    const itk::Image<TPixel, VImageDimension> *inputImage,
-    itk::Image<unsigned short, VImageDimension> *maskImage);
-
   template <typename TPixel, unsigned int VImageDimension >
   ImageExtrema CalculateExtremaWorld(
     const itk::Image<TPixel, VImageDimension> *inputImage,
@@ -410,14 +508,14 @@ protected:
 
   itk::Object::Pointer m_HotspotSearchConvolutionImage; // itk::Image<TPixel, VImageDimension>
 
-  double m_HotspotRadiusInMM;
-  bool m_CalculateHotspot;
-  bool m_HotspotRadiusInMMChanged;
-
   unsigned int m_PlanarFigureAxis;    // Normal axis for PlanarFigure
   unsigned int m_PlanarFigureSlice;   // Slice which contains PlanarFigure
   int m_PlanarFigureCoordinate0;      // First plane-axis for PlanarFigure
   int m_PlanarFigureCoordinate1;      // Second plane-axis for PlanarFigure
+
+  double m_HotspotRadiusInMM;
+  bool m_CalculateHotspot;
+  bool m_HotspotRadiusInMMChanged;
 
 };
 

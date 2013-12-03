@@ -476,13 +476,13 @@ int mitkImageStatisticsCalculatorTest(int, char* [])
     const mitk::ImageStatisticsCalculator::Statistics stats =
       mitkImageStatisticsCalculatorTestClass::TestStatistics( image, test.figure );
 
-    int tmpMean = stats.Mean * 100;
+    int tmpMean = stats.GetMean() * 100;
     double calculatedMean = tmpMean / 100.0;
     MITK_TEST_CONDITION( calculatedMean == test.mean,
       "Calculated mean grayvalue '"<< calculatedMean <<"'  is equal to the desired value '"
       << test.mean <<"' for testcase #" << test.id );
 
-    int tmpSD = stats.Sigma * 100;
+    int tmpSD = stats.GetSigma() * 100;
     double calculatedSD = tmpSD / 100.0;
     MITK_TEST_CONDITION( calculatedSD == test.sd,
       "Calculated grayvalue sd '"<< calculatedSD <<"'  is equal to the desired value '"

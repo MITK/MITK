@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>283</width>
+    <width>358</width>
     <height>945</height>
    </rect>
   </property>
@@ -33,7 +33,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
-       <number>1</number>
+       <number>2</number>
       </property>
       <property name="margin">
        <number>2</number>
@@ -162,8 +162,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>:/Qmitk/DeleteLabelSet_48x48.png</normaloff>:/Qmitk/DeleteLabelSet_48x48.png</iconset>
+         <iconset resource="../resources/SegmentationUI.qrc">
+          <normaloff>:/Qmitk/DeleteSegmentationSession_48x48.png</normaloff>:/Qmitk/DeleteSegmentationSession_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -195,10 +195,13 @@
    <item>
     <widget class="QmitkLabelSetTableWidget" name="m_LabelSetTableWidget">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
      </property>
     </widget>
    </item>
@@ -215,7 +218,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="spacing">
-       <number>1</number>
+       <number>2</number>
       </property>
       <property name="margin">
        <number>2</number>
@@ -247,17 +250,57 @@
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+       <widget class="QToolButton" name="m_btSegmentationInteractor">
+        <property name="toolTip">
+         <string>Disable any active tool and allow for label interaction (e.g. selection)</string>
         </property>
-        <property name="sizeHint" stdset="0">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/SegmentationUI.qrc">
+          <normaloff>:/Qmitk/SegmentationInteractor_48x48.png</normaloff>:/Qmitk/SegmentationInteractor_48x48.png</iconset>
+        </property>
+        <property name="iconSize">
          <size>
-          <width>5</width>
-          <height>20</height>
+          <width>32</width>
+          <height>32</height>
          </size>
         </property>
-       </spacer>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="m_btLockExterior">
+        <property name="toolTip">
+         <string>Lock/Unlock exterior</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/SegmentationUI.qrc">
+          <normaloff>:/Qmitk/UnlockExterior_48x48.png</normaloff>
+          <normalon>:/Qmitk/LockExterior_48x48.png</normalon>:/Qmitk/UnlockExterior_48x48.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QToolButton" name="m_btAddLayer">
@@ -332,13 +375,13 @@
        <widget class="QComboBox" name="m_cbActiveLayer">
         <property name="minimumSize">
          <size>
-          <width>50</width>
+          <width>40</width>
           <height>30</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>50</width>
+          <width>40</width>
           <height>30</height>
          </size>
         </property>
@@ -376,6 +419,19 @@
          <bool>true</bool>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>5</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>

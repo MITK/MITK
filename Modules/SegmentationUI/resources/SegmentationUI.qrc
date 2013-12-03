@@ -21,5 +21,8 @@
     <file>PreviousLayer_48x48.png</file>
     <file>NextLayer_48x48.png</file>
     <file>AddLayer_48x48.png</file>
+    <file>SegmentationInteractor_48x48.png</file>
+    <file>LockExterior_48x48.png</file>
+    <file>UnlockExterior_48x48.png</file>
   </qresource>
 </RCC>

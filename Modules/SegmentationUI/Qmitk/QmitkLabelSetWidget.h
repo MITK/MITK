@@ -110,7 +110,11 @@ private slots:
   void OnNextLayer();
 
   // reaction to the combobox change "Change Layer"
-  void OnChangetLayer(int);
+  void OnChangeLayer(int);
+
+  void OnSegmentationInteractorToggled(bool);
+
+  void OnLockExteriorToggled(bool);
 
   // reaction to the button "New Segmentation"
   void OnNewSegmentation();

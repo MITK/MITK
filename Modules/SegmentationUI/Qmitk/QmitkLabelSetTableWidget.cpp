@@ -40,8 +40,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkLabelSetTableWidget::QmitkLabelSetTableWidget( QWidget* parent ) : QTableWidget(parent),
 m_BlockEvents(false),
 m_AutoSelectNewLabels(true),
-m_AllVisible(true),
-m_AllLocked(false),
 m_AllOutlined(false),
 m_ColorSequenceRainbow(mitk::ColorSequenceRainbow::New())
 {
@@ -132,7 +130,7 @@ void QmitkLabelSetTableWidget::Initialize()
   this->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
-const QStringList& QmitkLabelSetTableWidget::GetLabelList()
+QStringList& QmitkLabelSetTableWidget::GetLabelStringList()
 {
   return m_LabelStringList;
 }
@@ -186,19 +184,27 @@ void QmitkLabelSetTableWidget::SetActiveLabel(int index)
   if (index >= 0 && index < this->rowCount())
   {
     m_LabelSetImage->SetActiveLabel(index,true);
+    QTableWidgetItem* nameItem = this->item(index,NAME_COL);
+    if (!nameItem) return;
+    this->scrollToItem(nameItem);
+    this->selectRow(index);
     emit activeLabelChanged(index);
   }
 }
 
 void QmitkLabelSetTableWidget::SetActiveLabel(const std::string& text)
 {
-  this->SetActiveLabel(m_LabelStringList.indexOf(text.c_str()));
-  this->WaitCursorOn();
-  int activeLabel = m_LabelSetImage->GetActiveLabelIndex();
-  const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(activeLabel, true);
-  this->WaitCursorOff();
-  if (pos.GetVnlVector().max_value() > 0.0)
-      emit goToLabel(pos);
+  int index = m_LabelStringList.indexOf(text.c_str());
+  if (index >= 0 && index < this->rowCount())
+  {
+    this->SetActiveLabel(index);
+    this->WaitCursorOn();
+    int activeLabel = m_LabelSetImage->GetActiveLabelIndex();
+    const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(activeLabel, true);
+    this->WaitCursorOff();
+    if (pos.GetVnlVector().max_value() > 0.0)
+        emit goToLabel(pos);
+  }
 }
 
 void QmitkLabelSetTableWidget::LabelAdded()
@@ -269,11 +275,14 @@ void QmitkLabelSetTableWidget::LabelModified( int index )
   if (!button) return;
 
   button->setChecked(!m_LabelSetImage->GetLabelVisible(index));
-
+  m_LabelStringList.replace(index, QString::fromStdString( m_LabelSetImage->GetLabelName(index) ) );
+/*
   this->clearSelection();
   this->setSelectionMode(QAbstractItemView::SingleSelection);
   this->selectRow(index);
+ // this->scrollToItem(nameItem);
   this->setSelectionMode(QAbstractItemView::ExtendedSelection);
+*/
 }
 
 void QmitkLabelSetTableWidget::SetAutoSelectNewItems( bool value )
@@ -383,12 +392,6 @@ void QmitkLabelSetTableWidget::OnItemDoubleClicked(QTableWidgetItem *item)
     if (pos.GetVnlVector().max_value() > 0.0)
         emit goToLabel(pos);
   }
-}
-
-void QmitkLabelSetTableWidget::SetAllLabelsVisible(bool value)
-{
-  m_AllVisible = true;
-  this->OnSetAllLabelsVisible(true);
 }
 
 void QmitkLabelSetTableWidget::InsertItem()
@@ -553,15 +556,25 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
     QObject::connect( viewOnlyAction, SIGNAL( triggered(bool) ), this, SLOT( OnSetOnlyActiveLabelVisible(bool) ) );
     menu->addAction(viewOnlyAction);
 
-    QAction* viewAllAction = new QAction(QIcon(":/QmitkExt/visible.png"), "View/Hide all", this );
+    QAction* viewAllAction = new QAction(QIcon(":/QmitkExt/visible.png"), "View all", this );
     viewAllAction->setEnabled(true);
     QObject::connect( viewAllAction, SIGNAL( triggered(bool) ), this, SLOT( OnSetAllLabelsVisible(bool) ) );
     menu->addAction(viewAllAction);
 
-    QAction* lockAllAction = new QAction(QIcon(":/QmitkExt/lock.png"), "Lock/Unlock all", this );
+    QAction* hideAllAction = new QAction(QIcon(":/QmitkExt/invisible.png"), "Hide all", this );
+    hideAllAction->setEnabled(true);
+    QObject::connect( hideAllAction, SIGNAL( triggered(bool) ), this, SLOT( OnSetAllLabelsInvisible(bool) ) );
+    menu->addAction(hideAllAction);
+
+    QAction* lockAllAction = new QAction(QIcon(":/QmitkExt/lock.png"), "Lock all", this );
     lockAllAction->setEnabled(true);
     QObject::connect( lockAllAction, SIGNAL( triggered(bool) ), this, SLOT( OnLockAllLabels(bool) ) );
     menu->addAction(lockAllAction);
+
+    QAction* unlockAllAction = new QAction(QIcon(":/QmitkExt/unlock.png"), "Unlock all", this );
+    unlockAllAction->setEnabled(true);
+    QObject::connect( unlockAllAction, SIGNAL( triggered(bool) ), this, SLOT( OnUnlockAllLabels(bool) ) );
+    menu->addAction(unlockAllAction);
 
     QAction* createSurfaceAction = new QAction(QIcon(":/QmitkExt/createsurface.png"), "Create surface", this );
     createSurfaceAction->setEnabled(true);
@@ -797,15 +810,25 @@ void QmitkLabelSetTableWidget::OnCombineAndCreateMask(bool value)
 
 void QmitkLabelSetTableWidget::OnLockAllLabels(bool value)
 {
-  m_AllLocked = !m_AllLocked;
-  m_LabelSetImage->SetAllLabelsLocked(m_AllLocked);
+  m_LabelSetImage->SetAllLabelsLocked(true);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkLabelSetTableWidget::OnUnlockAllLabels(bool value)
+{
+  m_LabelSetImage->SetAllLabelsLocked(false);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetTableWidget::OnSetAllLabelsVisible(bool value)
 {
-  m_AllVisible = !m_AllVisible;
-  m_LabelSetImage->SetAllLabelsVisible(m_AllVisible);
+  m_LabelSetImage->SetAllLabelsVisible(true);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkLabelSetTableWidget::OnSetAllLabelsInvisible(bool value)
+{
+  m_LabelSetImage->SetAllLabelsVisible(false);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -824,8 +847,7 @@ void QmitkLabelSetTableWidget::OnRemoveAllLabels(bool value)
 
 void QmitkLabelSetTableWidget::OnSetOnlyActiveLabelVisible(bool value)
 {
-  m_AllVisible = false;
-  m_LabelSetImage->SetAllLabelsVisible(m_AllVisible);
+  m_LabelSetImage->SetAllLabelsVisible(false);
   m_LabelSetImage->SetLabelVisible(this->currentRow(), true);
   this->WaitCursorOn();
   const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(this->currentRow(), true);
@@ -843,8 +865,7 @@ void QmitkLabelSetTableWidget::OnRenameLabel(bool value)
 
 void QmitkLabelSetTableWidget::OnRandomColor(bool value)
 {
-  int index = this->currentRow();
-  m_LabelSetImage->SetLabelColor( index, this->m_ColorSequenceRainbow->GetNextColor() );
+  m_LabelSetImage->SetLabelColor( this->currentRow(), m_ColorSequenceRainbow->GetNextColor() );
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

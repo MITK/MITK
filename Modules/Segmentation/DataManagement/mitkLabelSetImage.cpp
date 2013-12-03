@@ -693,13 +693,20 @@ void mitk::LabelSetImage::SetLabelLocked(int index, bool value, int layer)
 {
   if (layer < 0) layer = m_ActiveLayer;
   m_LabelSetContainer[layer]->SetLabelLocked(index, value);
+
+  ModifyLabelEvent.Send(index);
+
   this->Modified();
+
 }
 
 void mitk::LabelSetImage::SetLabelSelected(int index, bool value, int layer)
 {
   if (layer < 0) layer = m_ActiveLayer;
   m_LabelSetContainer[layer]->SetLabelSelected(index, value);
+
+  ModifyLabelEvent.Send(index);
+
   this->Modified();
 }
 

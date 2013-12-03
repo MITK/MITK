@@ -80,6 +80,10 @@ m_ToolManager(NULL)
   connect( m_Controls.m_btDeleteLayer, SIGNAL(clicked()), this, SLOT( OnDeleteLayer()) );
   connect( m_Controls.m_btPreviousLayer, SIGNAL(clicked()), this, SLOT( OnPreviousLayer()) );
   connect( m_Controls.m_btNextLayer, SIGNAL(clicked()), this, SLOT( OnNextLayer()) );
+
+  connect( m_Controls.m_btLockExterior, SIGNAL(toggled(bool)), this, SLOT( OnLockExteriorToggled(bool)) );
+  connect( m_Controls.m_btSegmentationInteractor, SIGNAL(toggled(bool)), this, SLOT( OnSegmentationInteractorToggled(bool)) );
+
   connect( m_Controls.m_cbActiveLayer, SIGNAL(currentIndexChanged(int)), this, SLOT( OnChangetLayer(int)) );
 
   m_Controls.m_LabelSearchBox->setAlwaysShowClearIcon(true);
@@ -96,7 +100,7 @@ m_ToolManager(NULL)
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(mergeLabel(int)), this, SLOT( OnMergeLabel(int)) );
 
   QStringListModel* completeModel = static_cast<QStringListModel*> (m_Completer->model());
-  completeModel->setStringList(m_Controls.m_LabelSetTableWidget->GetLabelList());
+  completeModel->setStringList(m_Controls.m_LabelSetTableWidget->GetLabelStringList());
 
  // m_Controls.m_LabelSetTableWidget->setEnabled(false);
   m_Controls.m_LabelSearchBox->setEnabled(false);
@@ -104,6 +108,8 @@ m_ToolManager(NULL)
   m_Controls.m_btLoadSegmentation->setEnabled(false);
   m_Controls.m_btSaveSegmentation->setEnabled(false);
   m_Controls.m_btNewLabel->setEnabled(false);
+  m_Controls.m_btLockExterior->setEnabled(false);
+  m_Controls.m_btSegmentationInteractor->setEnabled(false);
   m_Controls.m_btAddLayer->setEnabled(false);
   m_Controls.m_btDeleteLayer->setEnabled(false);
   m_Controls.m_btPreviousLayer->setEnabled(false);
@@ -154,7 +160,7 @@ void QmitkLabelSetWidget::OnMergeLabel(int index)
 {
   QmitkSearchLabelDialog dialog(this);
   dialog.setWindowTitle("Select a second label..");
-  dialog.SetLabelSuggestionList(m_Controls.m_LabelSetTableWidget->GetLabelList());
+  dialog.SetLabelSuggestionList(m_Controls.m_LabelSetTableWidget->GetLabelStringList());
   int dialogReturnValue = dialog.exec();
   if ( dialogReturnValue == QDialog::Rejected ) return;
 
@@ -176,8 +182,6 @@ void QmitkLabelSetWidget::SetOrganColors(const QStringList& organColors)
 
 void QmitkLabelSetWidget::OnRenameLabel(int index, const mitk::Color& color, const std::string& name)
 {
-  m_ToolManager->ActivateTool(-1);
-
   QmitkNewSegmentationDialog dialog(this);
   dialog.setWindowTitle("Rename Label");
   dialog.SetSuggestionList( m_OrganColors );
@@ -196,7 +200,7 @@ void QmitkLabelSetWidget::OnRenameLabel(int index, const mitk::Color& color, con
 
   workingImage->RenameLabel(index, dialog.GetSegmentationName().toStdString(), dialog.GetColor());
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  this->UpdateControls();
 }
 
 void QmitkLabelSetWidget::OnPreviousLayer()
@@ -261,7 +265,7 @@ void QmitkLabelSetWidget::OnNextLayer()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkLabelSetWidget::OnChangetLayer(int layer)
+void QmitkLabelSetWidget::OnChangeLayer(int layer)
 {
   m_ToolManager->ActivateTool(-1);
 
@@ -348,7 +352,7 @@ void QmitkLabelSetWidget::OnAddLayer()
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
   assert(workingImage);
 
-  QString question = "Do you really want to add a layer the current segmentation session?";
+  QString question = "Do you really want to add a layer to the current segmentation session?";
 
   QMessageBox::StandardButton answerButton = QMessageBox::question( this, "Add layer",
      question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
@@ -383,6 +387,22 @@ void QmitkLabelSetWidget::OnAddLayer()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+void QmitkLabelSetWidget::OnSegmentationInteractorToggled(bool checked)
+{
+  m_ToolManager->ActivateTool(-1);
+}
+
+void QmitkLabelSetWidget::OnLockExteriorToggled(bool checked)
+{
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  assert(workingNode);
+
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  assert(workingImage);
+
+  workingImage->SetLabelLocked(0, checked);
+}
+
 void QmitkLabelSetWidget::UpdateControls()
 {
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
@@ -392,6 +412,8 @@ void QmitkLabelSetWidget::UpdateControls()
   m_Controls.m_LabelSearchBox->setEnabled(enabled);
   m_Controls.m_btSaveSegmentation->setEnabled(enabled);
   m_Controls.m_btNewLabel->setEnabled(enabled);
+  m_Controls.m_btLockExterior->setEnabled(enabled);
+  m_Controls.m_btSegmentationInteractor->setEnabled(enabled);
   m_Controls.m_btAddLayer->setEnabled(enabled);
   m_Controls.m_btDeleteLayer->setEnabled(enabled);
   m_Controls.m_btPreviousLayer->setEnabled(enabled);
@@ -412,6 +434,10 @@ void QmitkLabelSetWidget::UpdateControls()
   m_Controls.m_btNextLayer->setEnabled(activeLayer!=numberOfLayers-1);
   m_Controls.m_cbActiveLayer->setEnabled(numberOfLayers>1);
   m_Controls.m_cbActiveLayer->setCurrentIndex(activeLayer);
+  m_Controls.m_btLockExterior->setChecked(workingImage->GetLabelLocked(0));
+
+  QStringListModel* completeModel = static_cast<QStringListModel*> (m_Completer->model());
+  completeModel->setStringList(m_Controls.m_LabelSetTableWidget->GetLabelStringList());
 }
 
 void QmitkLabelSetWidget::OnActiveLabelChanged(int activeLabel)

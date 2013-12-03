@@ -55,9 +55,6 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     /// \brief Returns whether a new labels is automatically set as active.
     bool GetAutoSelectNewLabels();
 
-    /// \brief Toggles all labels visibility.
-    void SetAllLabelsVisible(bool);
-
     /// \brief A label was added to LabelSet.
     void LabelAdded();
 
@@ -79,7 +76,7 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     /// Sets AutoSelectNewItems flag. If set to true new items will be automatically selected. Default is false.
     void SetAutoSelectNewItems(bool value);
 
-    const QStringList& GetLabelList();
+    QStringList& GetLabelStringList();
 
     void OnToolManagerWorkingDataModified();
 
@@ -178,10 +175,6 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     /// \brief If set to "true" new labels inserted will be automatically selected.
     bool m_AutoSelectNewLabels;
 
-    bool m_AllVisible;
-
-    bool m_AllLocked;
-
     bool m_AllOutlined;
 
     QSlider* m_OpacitySlider;
@@ -228,7 +221,11 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
 
     void OnLockAllLabels(bool);
 
+    void OnUnlockAllLabels(bool);
+
     void OnSetAllLabelsVisible(bool);
+
+    void OnSetAllLabelsInvisible(bool);
 
     void OnRemoveAllLabels(bool);
 

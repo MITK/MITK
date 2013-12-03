@@ -171,7 +171,7 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
         S[5] = gn[2]*gn[2];
 
         const double res =
-            T[0]*S[0] +
+                T[0]*S[0] +
             2 * T[1]*S[1] +     T[3]*S[3] +
             2 * T[2]*S[2] + 2 * T[4]*S[4] + T[5]*S[5];
 
@@ -181,7 +181,7 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
           // estimate the bvalue from the base value and the norm of the gradient
           //   - because of this estimation the vector have to be normalized beforehand
           //     otherwise the modelled signal is wrong ( i.e. not scaled properly )
-          const double bval = m_BValue * twonorm;
+          const double bval = m_BValue * twonorm * twonorm;
           out[i] = static_cast<OutputScalarType>( 1.0 * b0 * exp ( -1.0 * bval * res ) );
         }
       }

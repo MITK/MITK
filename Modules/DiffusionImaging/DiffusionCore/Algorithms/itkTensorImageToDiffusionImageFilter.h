@@ -117,25 +117,19 @@ namespace itk
       m_Max = 10000.0;
     }
 
-    ~TensorImageToDiffusionImageFilter(){}
+    virtual ~TensorImageToDiffusionImageFilter(){}
 
     void PrintSelf (std::ostream& os, Indent indent) const
     {
       Superclass::PrintSelf (os, indent);
     }
 
-    void BeforeThreadedGenerateData( void );
+    virtual void BeforeThreadedGenerateData( void );
 
-    void ThreadedGenerateData( const
+    virtual void ThreadedGenerateData( const
       OutputImageRegionType &outputRegionForThread, ThreadIdType);
 
     //void GenerateData();
-
-
-  private:
-
-    TensorImageToDiffusionImageFilter (const Self&);
-    void operator=(const Self&);
 
     GradientListPointerType              m_GradientList;
     double                               m_BValue;
@@ -143,6 +137,11 @@ namespace itk
 
     OutputScalarType                     m_Min;
     OutputScalarType                     m_Max;
+
+  private:
+
+    TensorImageToDiffusionImageFilter (const Self&);
+    void operator=(const Self&);
 
   };
 

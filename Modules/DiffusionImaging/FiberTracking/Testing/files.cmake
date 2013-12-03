@@ -6,6 +6,7 @@ SET(MODULE_CUSTOM_TESTS
   mitkLocalFiberPlausibilityTest.cpp
   mitkFiberTransformationTest.cpp
   mitkFiberExtractionTest.cpp
+  mitkFiberGenerationTest.cpp
 )
 
 

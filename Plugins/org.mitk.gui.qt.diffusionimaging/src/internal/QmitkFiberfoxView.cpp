@@ -54,6 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QMessageBox>
 #include "usModuleRegistry.h"
+#include <mitkChiSquareNoiseModel.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -65,13 +66,17 @@ QmitkFiberfoxView::QmitkFiberfoxView()
     , m_Controls( 0 )
     , m_SelectedImage( NULL )
 {
-
+    m_ImageGenParameters.noiseModel = NULL;
+    m_ImageGenParameters.noiseModelShort = NULL;
 }
 
 // Destructor
 QmitkFiberfoxView::~QmitkFiberfoxView()
 {
-
+    if (m_ImageGenParameters.noiseModel!=NULL)
+        delete m_ImageGenParameters.noiseModel;
+    if (m_ImageGenParameters.noiseModelShort!=NULL)
+        delete m_ImageGenParameters.noiseModelShort;
 }
 
 void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
@@ -133,7 +138,6 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_TensionBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnTensionChanged(double)));
         connect((QObject*) m_Controls->m_ContinuityBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnContinuityChanged(double)));
         connect((QObject*) m_Controls->m_BiasBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnBiasChanged(double)));
-        connect((QObject*) m_Controls->m_AddGibbsRinging, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddGibbsRinging(int)));
         connect((QObject*) m_Controls->m_AddNoise, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddNoise(int)));
         connect((QObject*) m_Controls->m_AddGhosts, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddGhosts(int)));
         connect((QObject*) m_Controls->m_AddDistortions, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddDistortions(int)));
@@ -161,7 +165,6 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
 
 void QmitkFiberfoxView::UpdateImageParameters()
 {
-    m_ImageGenParameters.artifactList.clear();
     m_ImageGenParameters.nonFiberModelList.clear();
     m_ImageGenParameters.fiberModelList.clear();
     m_ImageGenParameters.signalModelString = "";
@@ -284,14 +287,81 @@ void QmitkFiberfoxView::UpdateImageParameters()
     // rician noise
     if (m_Controls->m_AddNoise->isChecked())
     {
+        if (m_ImageGenParameters.noiseModel!=NULL)
+            delete m_ImageGenParameters.noiseModel;
+        if (m_ImageGenParameters.noiseModelShort!=NULL)
+            delete m_ImageGenParameters.noiseModelShort;
+
         double noiseVariance = m_Controls->m_NoiseLevel->value();
-        m_ImageGenParameters.ricianNoiseModel.SetNoiseVariance(noiseVariance);
-        m_ImageGenParameters.artifactModelString += "_NOISE";
+        {
+            switch (m_Controls->m_NoiseDistributionBox->currentIndex())
+            {
+            case 0:
+            {
+                mitk::RicianNoiseModel<double>* rician = new mitk::RicianNoiseModel<double>();
+                rician->SetNoiseVariance(noiseVariance);
+                m_ImageGenParameters.noiseModel = rician;
+                m_ImageGenParameters.artifactModelString += "_RICIAN";
+                break;
+            }
+            case 1:
+            {
+                mitk::ChiSquareNoiseModel<double>* chiSquare = new mitk::ChiSquareNoiseModel<double>();
+                chiSquare->SetDOF(noiseVariance/2);
+                m_ImageGenParameters.noiseModel = chiSquare;
+                m_ImageGenParameters.artifactModelString += "_CHISQUARE";
+                break;
+            }
+            default:
+            {
+                mitk::RicianNoiseModel<double>* rician = new mitk::RicianNoiseModel<double>();
+                rician->SetNoiseVariance(noiseVariance);
+                m_ImageGenParameters.noiseModel = rician;
+                m_ImageGenParameters.artifactModelString += "_RICIAN";
+            }
+            }
+        }
+        {
+            switch (m_Controls->m_NoiseDistributionBox->currentIndex())
+            {
+            case 0:
+            {
+                mitk::RicianNoiseModel<short>* rician = new mitk::RicianNoiseModel<short>();
+                rician->SetNoiseVariance(noiseVariance);
+                m_ImageGenParameters.noiseModelShort = rician;
+                break;
+            }
+            case 1:
+            {
+                mitk::ChiSquareNoiseModel<short>* chiSquare = new mitk::ChiSquareNoiseModel<short>();
+                chiSquare->SetDOF(noiseVariance/2);
+                m_ImageGenParameters.noiseModelShort = chiSquare;
+                break;
+            }
+            default:
+            {
+                mitk::RicianNoiseModel<short>* rician = new mitk::RicianNoiseModel<short>();
+                rician->SetNoiseVariance(noiseVariance);
+                m_ImageGenParameters.noiseModelShort = rician;
+            }
+            }
+        }
         m_ImageGenParameters.artifactModelString += QString::number(noiseVariance);
         m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Noise-Variance", DoubleProperty::New(noiseVariance));
     }
     else
-        m_ImageGenParameters.ricianNoiseModel.SetNoiseVariance(0);
+    {
+        if (m_ImageGenParameters.noiseModel!=NULL)
+        {
+            delete m_ImageGenParameters.noiseModel;
+            m_ImageGenParameters.noiseModel = NULL;
+        }
+        if (m_ImageGenParameters.noiseModelShort!=NULL)
+        {
+            delete m_ImageGenParameters.noiseModelShort;
+            m_ImageGenParameters.noiseModelShort = NULL;
+        }
+    }
 
     // gibbs ringing
     m_ImageGenParameters.addGibbsRinging = m_Controls->m_AddGibbsRinging->isChecked();
@@ -598,6 +668,7 @@ void QmitkFiberfoxView::SaveParameters()
     parameters.put("fiberfox.image.outputvolumefractions", m_Controls->m_VolumeFractionsBox->isChecked());
 
     parameters.put("fiberfox.image.artifacts.addnoise", m_Controls->m_AddNoise->isChecked());
+    parameters.put("fiberfox.image.artifacts.noisedistribution", m_Controls->m_NoiseDistributionBox->currentIndex());
     parameters.put("fiberfox.image.artifacts.noisevariance", m_Controls->m_NoiseLevel->value());
     parameters.put("fiberfox.image.artifacts.addghost", m_Controls->m_AddGhosts->isChecked());
     parameters.put("fiberfox.image.artifacts.kspaceLineOffset", m_Controls->m_kOffsetBox->value());
@@ -728,6 +799,7 @@ void QmitkFiberfoxView::LoadParameters()
             m_Controls->m_VolumeFractionsBox->setChecked(v1.second.get<bool>("outputvolumefractions"));
 
             m_Controls->m_AddNoise->setChecked(v1.second.get<bool>("artifacts.addnoise"));
+            m_Controls->m_NoiseDistributionBox->setCurrentIndex(v1.second.get<int>("artifacts.noisedistribution"));
             m_Controls->m_NoiseLevel->setValue(v1.second.get<double>("artifacts.noisevariance"));
             m_Controls->m_AddGhosts->setChecked(v1.second.get<bool>("artifacts.addghost"));
             m_Controls->m_kOffsetBox->setValue(v1.second.get<double>("artifacts.kspaceLineOffset"));
@@ -1248,11 +1320,11 @@ void QmitkFiberfoxView::OnDrawROI()
     mitk::PlanarFigureInteractor::Pointer figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
     if(figureInteractor.IsNull())
     {
-      figureInteractor = mitk::PlanarFigureInteractor::New();
-      us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
-      figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
-      figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
-      figureInteractor->SetDataNode( node );
+        figureInteractor = mitk::PlanarFigureInteractor::New();
+        us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+        figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+        figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+        figureInteractor->SetDataNode( node );
     }
 
     UpdateGui();
@@ -1396,14 +1468,11 @@ void QmitkFiberfoxView::GenerateImage()
 
                 mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedImages.at(i)->GetData());
 
-                mitk::RicianNoiseModel<short> noiseModel;
-                noiseModel.SetNoiseVariance(m_ImageGenParameters.ricianNoiseModel.GetNoiseVariance());
-
                 itk::AddArtifactsToDwiImageFilter< short >::Pointer filter = itk::AddArtifactsToDwiImageFilter< short >::New();
                 filter->SetInput(diffImg->GetVectorImage());
                 filter->SettLine(m_ImageGenParameters.tLine);
                 filter->SetkOffset(m_ImageGenParameters.kspaceLineOffset);
-                filter->SetNoiseModel(&noiseModel);
+                filter->SetNoiseModel(m_ImageGenParameters.noiseModelShort);
                 filter->SetGradientList(m_ImageGenParameters.gradientDirections);
                 filter->SetTE(m_ImageGenParameters.tEcho);
                 filter->SetSimulateEddyCurrents(m_ImageGenParameters.doSimulateEddyCurrents);
@@ -1479,8 +1548,7 @@ void QmitkFiberfoxView::GenerateImage()
         tractsToDwiFilter->SetFiberBundle(fiberBundle);
         tractsToDwiFilter->SetFiberModels(m_ImageGenParameters.fiberModelList);
         tractsToDwiFilter->SetNonFiberModels(m_ImageGenParameters.nonFiberModelList);
-        tractsToDwiFilter->SetNoiseModel(&m_ImageGenParameters.ricianNoiseModel);
-        tractsToDwiFilter->SetKspaceArtifacts(m_ImageGenParameters.artifactList);
+        tractsToDwiFilter->SetNoiseModel(m_ImageGenParameters.noiseModel);
         tractsToDwiFilter->SetkOffset(m_ImageGenParameters.kspaceLineOffset);
         tractsToDwiFilter->SettLine(m_ImageGenParameters.tLine);
         tractsToDwiFilter->SettInhom(m_ImageGenParameters.tInhom);
@@ -1510,11 +1578,11 @@ void QmitkFiberfoxView::GenerateImage()
                                                  +"-"+QString::number(m_ImageGenParameters.imageRegion.GetSize(1)).toStdString()
                                                  +"-"+QString::number(m_ImageGenParameters.imageRegion.GetSize(2)).toStdString()
                                                  +"_S"+QString::number(m_ImageGenParameters.imageSpacing[0]).toStdString()
-                                                 +"-"+QString::number(m_ImageGenParameters.imageSpacing[1]).toStdString()
-                                                 +"-"+QString::number(m_ImageGenParameters.imageSpacing[2]).toStdString()
-                                                 +"_b"+QString::number(m_ImageGenParameters.b_value).toStdString()
-                                                 +"_"+m_ImageGenParameters.signalModelString.toStdString()
-                                                 +m_ImageGenParameters.artifactModelString.toStdString());
+                +"-"+QString::number(m_ImageGenParameters.imageSpacing[1]).toStdString()
+                +"-"+QString::number(m_ImageGenParameters.imageSpacing[2]).toStdString()
+                +"_b"+QString::number(m_ImageGenParameters.b_value).toStdString()
+                +"_"+m_ImageGenParameters.signalModelString.toStdString()
+                +m_ImageGenParameters.artifactModelString.toStdString());
 
         GetDataStorage()->Add(m_ImageGenParameters.resultNode, m_SelectedBundles.at(i));
 
@@ -1971,11 +2039,11 @@ void QmitkFiberfoxView::NodeAdded( const mitk::DataNode* node )
         mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>( node );
         if(figureInteractor.IsNull())
         {
-          figureInteractor = mitk::PlanarFigureInteractor::New();
-          us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
-          figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
-          figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
-          figureInteractor->SetDataNode( nonConstNode );
+            figureInteractor = mitk::PlanarFigureInteractor::New();
+            us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+            figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+            figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+            figureInteractor->SetDataNode( nonConstNode );
         }
 
         MITK_DEBUG << "will now add observers for planarfigure";

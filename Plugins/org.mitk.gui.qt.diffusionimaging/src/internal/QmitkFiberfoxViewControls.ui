@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>435</width>
-    <height>1792</height>
+    <height>1845</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1646,7 +1646,7 @@
           <item row="0" column="0">
            <widget class="QCheckBox" name="m_AddNoise">
             <property name="text">
-             <string>Add Rician Noise</string>
+             <string>Add Noise</string>
             </property>
             <property name="checked">
              <bool>false</bool>
@@ -1662,6 +1662,9 @@
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QFormLayout" name="formLayout_5">
+             <property name="fieldGrowthPolicy">
+              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+             </property>
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -1674,14 +1677,14 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item row="0" column="0">
+             <item row="1" column="0">
               <widget class="QLabel" name="m_NoiseLabel">
                <property name="text">
                 <string>Variance:</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
+             <item row="1" column="1">
               <widget class="QDoubleSpinBox" name="m_NoiseLevel">
                <property name="toolTip">
                 <string>Variance of Rician noise model.</string>
@@ -1700,6 +1703,27 @@
                </property>
                <property name="value">
                 <double>50.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="m_NoiseDistributionBox">
+               <item>
+                <property name="text">
+                 <string>Rician</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Chi-square</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_NoiseLabel_5">
+               <property name="text">
+                <string>Distribution:</string>
                </property>
               </widget>
              </item>

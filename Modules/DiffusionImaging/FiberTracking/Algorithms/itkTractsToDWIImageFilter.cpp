@@ -60,6 +60,7 @@ TractsToDWIImageFilter< PixelType >::TractsToDWIImageFilter()
     , m_SimulateEddyCurrents(false)
     , m_Spikes(0)
     , m_Wrap(1.0)
+    , m_NoiseModel(NULL)
     , m_SpikeAmplitude(1)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
@@ -206,9 +207,6 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
 
             ComplexSliceType::Pointer fSlice;
             fSlice = idft->GetOutput();
-
-            for (unsigned int i=0; i<m_KspaceArtifacts.size(); i++)
-                fSlice = m_KspaceArtifacts.at(i)->AddArtifact(fSlice);
 
             // fourier transform slice
             SliceType::Pointer newSlice;
@@ -598,7 +596,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
     // do k-space stuff
     DoubleDwiType::Pointer doubleOutImage;
-    if (m_Spikes>0 || m_FrequencyMap.IsNotNull() || !m_KspaceArtifacts.empty() || m_kOffset>0 || m_SimulateRelaxation || m_SimulateEddyCurrents || m_AddGibbsRinging || m_Wrap<1.0)
+    if (m_Spikes>0 || m_FrequencyMap.IsNotNull() || m_kOffset>0 || m_SimulateRelaxation || m_SimulateEddyCurrents || m_AddGibbsRinging || m_Wrap<1.0)
     {
         MITK_INFO << "Adjusting complex signal";
         doubleOutImage = DoKspaceStuff(compartments);
@@ -631,7 +629,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         typename OutputImageType::IndexType index = it4.GetIndex();
         signal = doubleOutImage->GetPixel(index)*m_SignalScale;
 
-        if (m_NoiseModel->GetNoiseVariance() > 0)
+        if (m_NoiseModel!=NULL)
         {
             DoubleDwiType::PixelType accu = signal; accu.Fill(0.0);
             for (unsigned int i=0; i<m_NumberOfRepetitions; i++)

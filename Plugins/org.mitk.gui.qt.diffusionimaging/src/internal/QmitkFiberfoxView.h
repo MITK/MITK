@@ -167,20 +167,18 @@ protected:
         int                                 spikes;
         double                              spikeAmplitude;
         double                              wrap;
-
         bool                                doSimulateRelaxation;
         bool                                doSimulateEddyCurrents;
         bool                                doDisablePartialVolume;
 
-        mitk::RicianNoiseModel<double>       ricianNoiseModel;
+        mitk::DiffusionNoiseModel<double>* noiseModel;
+        mitk::DiffusionNoiseModel<short>* noiseModelShort;
         mitk::DiffusionSignalModel<double>::GradientListType  gradientDirections;
         itk::TractsToDWIImageFilter< short >::DiffusionModelList fiberModelList, nonFiberModelList;
-        itk::TractsToDWIImageFilter< short >::KspaceArtifactList artifactList;
         QString signalModelString, artifactModelString;
 
         ItkDoubleImgType::Pointer           frequencyMap;
         ItkUcharImgType::Pointer            tissueMaskImage;
-
         mitk::DataNode::Pointer             resultNode;
     };
 

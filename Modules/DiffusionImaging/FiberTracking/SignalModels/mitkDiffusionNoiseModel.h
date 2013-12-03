@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkVariableLengthVector.h>
 #include <itkVector.h>
 #include <vnl/vnl_vector_fixed.h>
+#include <boost/random.hpp>
 
 namespace mitk {
 
@@ -42,12 +43,8 @@ public:
     /** Adds noise according to model to the input pixel. Has to be implemented in subclass. **/
     virtual void AddNoise(PixelType& pixel) = 0;
 
-    void SetNoiseVariance(double var){ m_NoiseVariance = var; }
-    double GetNoiseVariance(){ return m_NoiseVariance; }
-
 protected:
 
-    double      m_NoiseVariance;    ///< variance of underlying distribution
 };
 
 }

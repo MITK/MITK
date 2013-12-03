@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITK_RicianNoiseModel_H
-#define _MITK_RicianNoiseModel_H
+#ifndef _MITK_ChiSquareNoiseModel_H
+#define _MITK_ChiSquareNoiseModel_H
 
 #include <mitkDiffusionNoiseModel.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
@@ -28,31 +28,30 @@ namespace mitk {
   */
 
 template< class ScalarType >
-class RicianNoiseModel : public DiffusionNoiseModel< ScalarType >
+class ChiSquareNoiseModel : public DiffusionNoiseModel< ScalarType >
 {
 public:
 
-    RicianNoiseModel();
-    ~RicianNoiseModel();
+    ChiSquareNoiseModel();
+    ~ChiSquareNoiseModel();
 
     typedef typename DiffusionNoiseModel< ScalarType >::PixelType      PixelType;
 
     /** Adds rician noise to the input pixel **/
     void AddNoise(PixelType& pixel);
 
-    void SetNoiseVariance(double var){ m_NoiseVariance = var; }
-    double GetNoiseVariance(){ return m_NoiseVariance; }
+    void SetDOF(double var){ m_Distribution = boost::random::chi_squared_distribution<double>(var); }
+    double GetNoiseVariance(){ return m_Distribution.n(); }
 
 protected:
 
-    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
-    double      m_NoiseVariance;    ///< variance of underlying distribution
-
+    boost::random::mt19937 m_Randgen;
+    boost::random::chi_squared_distribution<double> m_Distribution;
 };
 
 }
 
-#include "mitkRicianNoiseModel.cpp"
+#include "mitkChiSquareNoiseModel.cpp"
 
 #endif
 

@@ -151,8 +151,8 @@ public:
   public:
 
     Statistics();
+    virtual ~Statistics();
 
-    /** \brief Initialize every member of Statistics to zero. */
     //void Reset()
 
     unsigned int GetN() const;

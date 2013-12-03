@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __itkNonLocalMeansDenoisingFilter_txx
-#define __itkNonLocalMeansDenoisingFilter_txx
+#ifndef __itkNonLocalMeansDenoisingFilter_cpp
+#define __itkNonLocalMeansDenoisingFilter_cpp
 
 #include <time.h>
 #include <stdio.h>
@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkImageRegionIterator.h"
 #include "itkNeighborhoodIterator.h"
+#include <itkImageRegionIteratorWithIndex.h>
 
 namespace itk {
 
@@ -101,7 +102,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
     adaptMaskFilter->ChangeOriginOn();
     adaptMaskFilter->ChangeRegionOn();
     adaptMaskFilter->SetInput( invertedMask );
-    adaptMaskFilter->SetOutputOrigin( extractor->GetOutput()->GetOrigin() /*image->GetOrigin()*/ );
+    adaptMaskFilter->SetOutputOrigin( extractor->GetOutput()->GetOrigin() );
     adaptMaskFilter->SetOutputOffset( offset );
     adaptMaskFilter->Update();
     typename MaskImageType::Pointer adaptedMaskImage = adaptMaskFilter->GetOutput();
@@ -109,14 +110,14 @@ NonLocalMeansDenoisingFilter< TPixelType >
     extractImageFilter->SetInput( extractor->GetOutput() );
     extractImageFilter->SetExtractionRegion( adaptedMaskImage->GetBufferedRegion() );
     extractImageFilter->Update();
-    typename MaskImageType::Pointer adaptedImage = extractor->GetOutput();
+    typename MaskImageType::Pointer adaptedImage = extractImageFilter->GetOutput();
     typename LabelStatisticsFilterType::Pointer labelStatisticsFilter = LabelStatisticsFilterType::New();
     labelStatisticsFilter->SetInput(adaptedImage);
     labelStatisticsFilter->SetLabelInput(adaptedMaskImage);
     labelStatisticsFilter->UseHistogramsOff();
     labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
     labelStatisticsFilter->Update();
-    m_Deviations.SetElement(i, labelStatisticsFilter->GetSigma(1));
+    m_Deviations.SetElement(i, labelStatisticsFilter->GetSigma(0));
   }
 
   m_CurrentVoxelCount = 0;
@@ -134,93 +135,142 @@ NonLocalMeansDenoisingFilter< TPixelType >
   ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
   oit.GoToBegin();
 
-  typedef ConstNeighborhoodIterator <InputImageType> InputIteratorType;
+  typedef ImageRegionIteratorWithIndex <InputImageType> InputIteratorType;
   typename InputImageType::Pointer inputImagePointer = NULL;
   inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
 
-  InputIteratorType git(m_V_Radius, inputImagePointer, outputRegionForThread );
-  InputIteratorType njit(m_N_Radius, inputImagePointer, outputRegionForThread );
-  InputIteratorType niit(m_N_Radius, inputImagePointer, outputRegionForThread );
+  InputIteratorType git(/*m_V_Radius,*/ inputImagePointer, outputRegionForThread );
+  InputIteratorType njit(/*m_N_Radius,*/ inputImagePointer, outputRegionForThread );
+  InputIteratorType niit(/*m_N_Radius,*/ inputImagePointer, outputRegionForThread );
+  InputIteratorType hit(inputImagePointer, outputRegionForThread);
   git.GoToBegin();
 
   // Iterate over complete image region
   while( !git.IsAtEnd() )
   {
-    double sz = (double)niit.Size();
+//    double sz = (double)niit.Size();
     typename OutputImageType::PixelType outpix;
     outpix.SetSize (inputImagePointer->GetVectorLength());
 
     // Count amount of same voxels in neighborhood V around xi, to determine normalization constant Z
     for (unsigned int i = 0; i < inputImagePointer->GetVectorLength(); ++i)
     {
-      TPixelType xi = git.GetCenterPixel()[i];
+      TPixelType pixelI = git.Get()[0];
       double sumj = 0;
       double wj = 0;
-      double Z = 0;
+      short Z = 0;
+      double size = pow((m_N_Radius[0]*2+1), 3);
       if (m_UseJointInformation)
       {
-        for (unsigned int n = 0; n < inputImagePointer->GetVectorLength(); ++n)
-        {
-          for (unsigned int j = 0; j < git.Size(); ++j)
-          {
-            bool isInBounds = false;
-            TPixelType xj = git.GetPixel(j, isInBounds)[n];
-            if (xi == xj && isInBounds)
-            {
-              ++Z;
-            }
-          }
-        }
+//        for (unsigned int n = 0; n < inputImagePointer->GetVectorLength(); ++n)
+//        {
+//          for (unsigned int j = 0; j < git.Size(); ++j)
+//          {
+//            bool isInBounds = false;
+//            TPixelType xj = git.GetPixel(j, isInBounds)[n];
+//            if (xi == xj && isInBounds)
+//            {
+//              ++Z;
+//            }
+//          }
+//        }
       }
       else
       {
-        for (unsigned int j = 0; j < git.Size(); ++j)
+        for (int x = (int)git.GetIndex().GetElement(0) - (int)m_V_Radius[0]; x <= (int)git.GetIndex().GetElement(0) + (int)m_V_Radius[0]; ++x)
         {
-          bool isInBounds = false;
-          TPixelType xj = git.GetPixel(j, isInBounds)[i];
-          if (xi == xj && isInBounds)
+          for (int y = (int)git.GetIndex().GetElement(1) - (int)m_V_Radius[1]; y <= (int)git.GetIndex().GetElement(1) + (int)m_V_Radius[1]; ++y)
           {
-            ++Z;
-          }
-        }
-      }
-      for (unsigned int j = 0; j < git.Size(); ++j)
-      {
-        bool isInBounds = false;
-        TPixelType xj = git.GetPixel(j, isInBounds)[i];
-
-        // Calculation of an L2 norm (wj) between two neigborhoods ni & nj
-        if (xi == xj && isInBounds)
-        {
-          niit.SetLocation(git.GetIndex());
-          njit.SetLocation(git.GetIndex(j));
-          double sumk = 0;
-          for (unsigned int k = 0; k < niit.Size(); ++k)
-          {
-
-            if (m_UseJointInformation)
+            for (int z = (int)git.GetIndex().GetElement(2) - (int)m_V_Radius[2]; z <= (int)git.GetIndex().GetElement(2) + (int)m_V_Radius[2]; ++z)
             {
-              for (unsigned int n = 0; n < inputImagePointer->GetVectorLength(); ++n)
+              typename InputIteratorType::IndexType idx;
+              idx.SetElement(0, x);
+              idx.SetElement(1, y);
+              idx.SetElement(2, z);
+              if (inputImagePointer->GetLargestPossibleRegion().IsInside(idx))
               {
-                double diff = niit.GetPixel(k)[n] - njit.GetPixel(k)[n];
-                sumk += std::pow( diff, 2);
+                hit.SetIndex(idx);
+                TPixelType pixelJ = hit.Get()[0];
+                if (pixelI == pixelJ)
+                {
+                  ++Z;
+                }
               }
             }
-            else
-            {
-              double diff = niit.GetPixel(k)[i] - njit.GetPixel(k)[i];
-              sumk += std::pow( diff, 2);
-            }
-
           }
-          wj = std::exp( - ( std::sqrt( (sumk / sz)) / m_Deviations.GetElement(i))) / Z;
-
-          // Estimation of NLMr for voxel xi with the neighborhood V
-          sumj += (wj * std::pow(xj, 2)) - (2 * std::pow(m_Deviations.GetElement(i),2));
         }
       }
-      sumj = sumj >= 0 ? sumj : 0;
-      TPixelType outval = static_cast<TPixelType>(std::sqrt(sumj));
+      if (m_UseJointInformation)
+      {
+//        for (unsigned int n = 0; n < inputImagePointer->GetVectorLength(); ++n)
+//        {
+//          for (unsigned int j = 0; j < git.Size(); ++j)
+//          {
+//            bool isInBounds = false;
+//            TPixelType xj = git.GetPixel(j, isInBounds)[n];
+//            if (xi == xj && isInBounds)
+//            {
+//              ++Z;
+//            }
+//          }
+//        }
+      }
+      else
+      {
+        for (int x = (int)git.GetIndex().GetElement(0) - (int)m_V_Radius[0]; x <= (int)git.GetIndex().GetElement(0) + (int)m_V_Radius[0]; ++x)
+        {
+          for (int y = (int)git.GetIndex().GetElement(1) - (int)m_V_Radius[1]; y <= (int)git.GetIndex().GetElement(1) + (int)m_V_Radius[1]; ++y)
+          {
+            for (int z = (int)git.GetIndex().GetElement(2) - (int)m_V_Radius[2]; z <= (int)git.GetIndex().GetElement(2) + (int)m_V_Radius[2]; ++z)
+            {
+              typename InputIteratorType::IndexType idx;
+              idx.SetElement(0, x);
+              idx.SetElement(1, y);
+              idx.SetElement(2, z);
+              if (inputImagePointer->GetLargestPossibleRegion().IsInside(idx))
+              {
+                hit.SetIndex(idx);
+                TPixelType pixelJ = hit.Get()[0];
+                if (pixelI == pixelJ)
+                {
+                  double sumk = 0;
+                  for (int xi = git.GetIndex().GetElement(0) - (int) m_N_Radius[0], xj = hit.GetIndex().GetElement(0) - (int) m_N_Radius[0]; xi <= git.GetIndex().GetElement(0) + (int) m_N_Radius[0]; ++xi, ++xj)
+                  {
+                    for (int yi = git.GetIndex().GetElement(1) - (int) m_N_Radius[1], yj = hit.GetIndex().GetElement(1) - (int) m_N_Radius[1]; yi <= git.GetIndex().GetElement(1) + (int) m_N_Radius[1]; ++yi, ++yj)
+                    {
+                      for (int zi = git.GetIndex().GetElement(2) - (int) m_N_Radius[2], zj = hit.GetIndex().GetElement(2) - (int) m_N_Radius[2]; zi <= git.GetIndex().GetElement(2) + (int) m_N_Radius[2]; ++zi, ++zj)
+                      {
+                        typename InputIteratorType::IndexType indexI, indexJ;
+                        indexI.SetElement(0, xi);
+                        indexI.SetElement(1, yi);
+                        indexI.SetElement(2, zi);
+                        indexJ.SetElement(0, xj);
+                        indexJ.SetElement(1, yj);
+                        indexJ.SetElement(2, zj);
+                        if (inputImagePointer->GetLargestPossibleRegion().IsInside(indexI) && inputImagePointer->GetLargestPossibleRegion().IsInside(indexJ))
+                        {
+                          niit.SetIndex(indexI);
+                          njit.SetIndex(indexJ);
+                          int diff = niit.Get()[i] - njit.Get()[i];
+                          sumk += std::pow((double)diff, 2);
+                        }
+                      }
+                    }
+                  }
+                  wj = std::exp( - (std::sqrt((sumk / size)) / m_Deviations.GetElement(i)) / Z);
+                  sumj += (wj * std::pow((double) (pixelJ), 2)) - (2 * std::pow(m_Deviations.GetElement(i), 2));
+                }
+              }
+            }
+          }
+        }
+      }
+      if (sumj < 0)
+      {
+        sumj = 0;
+      }
+
+      TPixelType outval = std::floor(std::sqrt(sumj) + 0.5);
       outpix.SetElement(i, outval);
     }
     oit.Set(outpix);

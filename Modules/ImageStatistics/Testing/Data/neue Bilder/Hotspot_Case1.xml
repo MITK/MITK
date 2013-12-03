@@ -1,0 +1,7 @@
+<testcase>
+  <testimage image-rows="30" image-columns="30" image-slices="15" numberOfGaussians="1" spacingX="1" spacingY="1" spacingZ="2">
+    <gaussian centerIndexX="9" centerIndexY="14" centerIndexZ="7" deviationX="8" deviationY="7" deviationZ="6" altitude="118"/>
+  </testimage>
+  <roi maximumX="30" minimumX="0" maximumY="30" minimumY="0" maximumZ="15" minimumZ="0"/>
+  <statistic peakIndexX="9" peakIndexY="14" peakIndexZ="3" peak="88.4226" peakOptimized="89.6374" maximumIndexX="9" maximumIndexY="14" maximumIndexZ="3" maximum="116.372" minimumIndexX="8" minimumIndexY="13" minimumIndexZ="0" minimum="58.6808"/>
+</testcase>

@@ -193,7 +193,7 @@ if( (NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_
     QmitkVtkLineProfileWidget.h
   )
 else()
-  message("QmitkVtkHistogramWidget and QmitkVtkLineProfileWidget won't be build. Use a Vtk version between 5.4.0 and 5.10.1 if you need this classes.")
+  message("QmitkVtkHistogramWidget and QmitkVtkLineProfileWidget won't be build. Use Vtk version 5.10.0 if you need this classes.")
 
 endif()
 

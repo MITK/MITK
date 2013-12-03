@@ -149,7 +149,6 @@ void QmitkDicomEditor::StartStoreSCP()
     m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&m_Builder);
     connect(m_StoreSCPLauncher, SIGNAL(SignalStatusOfStoreSCP(const QString&)), this, SLOT(OnStoreSCPStatusChanged(const QString&)));
     connect(m_StoreSCPLauncher ,SIGNAL(SignalStartImport(const QStringList&)),m_Controls.internalDataWidget,SLOT(OnStartDicomImport(const QStringList&)));
-    connect(m_StoreSCPLauncher ,SIGNAL(SignalStoreSCPError(const QString&)),m_Controls.internalDataWidget,SLOT(SignalCancelImport()));
     connect(m_StoreSCPLauncher ,SIGNAL(SignalStoreSCPError(const QString&)),m_DicomDirectoryListener,SLOT(OnDicomNetworkError(const QString&)),Qt::DirectConnection);
     connect(m_StoreSCPLauncher ,SIGNAL(SignalStoreSCPError(const QString&)),this,SLOT(OnDicomNetworkError(const QString&)),Qt::DirectConnection);
     m_StoreSCPLauncher->StartStoreSCP();

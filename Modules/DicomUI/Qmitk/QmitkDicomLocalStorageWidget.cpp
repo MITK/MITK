@@ -138,7 +138,7 @@ void QmitkDicomLocalStorageWidget::SetDatabase(QString databaseFile)
 {
     m_LocalDatabase = new ctkDICOMDatabase(databaseFile);
     m_LocalDatabase->setParent(this);
-    m_Controls->ctkDicomBrowser->setCTKDICOMDatabase(m_LocalDatabase);
+    m_Controls->ctkDicomBrowser->setDICOMDatabase(m_LocalDatabase);
 }
 
 void QmitkDicomLocalStorageWidget::OnSeriesSelectionChanged(const QStringList &s)

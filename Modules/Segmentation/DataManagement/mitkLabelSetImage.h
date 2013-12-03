@@ -79,7 +79,7 @@ public:
   Message<> RemoveLabelEvent;
 
   /**
-  * \brief ModifyLabelEvent is emitted whenever a new label has been removed from the LabelSet.
+  * \brief ModifyLabelEvent is emitted whenever a label has been modified from the LabelSet.
   *
   * Observers should register to this event by calling myLabelSet->ModifyLabelEvent.AddListener(myObject, MyObject::MyMethod).
   * After registering, myObject->MyMethod() will be called every time a new label has been removed from the LabelSet.
@@ -89,6 +89,11 @@ public:
   * a Message object which is thread safe
   */
   Message1<int> ModifyLabelEvent;
+
+  /**
+  * \brief ActiveLabelEvent is emitted whenever a label has been set as active in the LabelSet.
+  */
+  Message1<int> ActiveLabelEvent;
 
   /**
   * \brief AllLabelsModifiedEvent is emitted whenever a new label has been removed from the LabelSet.
@@ -248,7 +253,7 @@ public:
 
   /**
     * \brief  */
-  void SetActiveLabel(int index, bool sendEvent = false, int layer = -1);
+  void SetActiveLabel(int index, int layer = -1);
 
   /**
   * \brief  */

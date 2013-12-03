@@ -154,6 +154,9 @@ void QmitkLabelSetTableWidget::SetActiveLabelSetImage(mitk::LabelSetImage* _imag
     m_LabelSetImage->ModifyLabelEvent.RemoveListener( mitk::MessageDelegate1<QmitkLabelSetTableWidget
       , int>( this, &QmitkLabelSetTableWidget::LabelModified ) );
 
+    m_LabelSetImage->ActiveLabelEvent.RemoveListener( mitk::MessageDelegate1<QmitkLabelSetTableWidget
+      , int>( this, &QmitkLabelSetTableWidget::ActiveLabelChanged ) );
+
     m_LabelSetImage->AllLabelsModifiedEvent.RemoveListener( mitk::MessageDelegate<QmitkLabelSetTableWidget>(
         this, &QmitkLabelSetTableWidget::AllLabelsModified ) );
   }
@@ -172,6 +175,9 @@ void QmitkLabelSetTableWidget::SetActiveLabelSetImage(mitk::LabelSetImage* _imag
     m_LabelSetImage->ModifyLabelEvent.AddListener( mitk::MessageDelegate1<QmitkLabelSetTableWidget
       , int>( this, &QmitkLabelSetTableWidget::LabelModified ) );
 
+    m_LabelSetImage->ActiveLabelEvent.AddListener( mitk::MessageDelegate1<QmitkLabelSetTableWidget
+      , int>( this, &QmitkLabelSetTableWidget::ActiveLabelChanged ) );
+
     m_LabelSetImage->AllLabelsModifiedEvent.AddListener( mitk::MessageDelegate<QmitkLabelSetTableWidget>(
         this, &QmitkLabelSetTableWidget::AllLabelsModified ) );
   }
@@ -181,13 +187,18 @@ void QmitkLabelSetTableWidget::SetActiveLabelSetImage(mitk::LabelSetImage* _imag
 
 void QmitkLabelSetTableWidget::SetActiveLabel(int index)
 {
-  if (index >= 0 && index < this->rowCount())
+  if ( (index >= 0) && (index < this->rowCount()) )
   {
-    m_LabelSetImage->SetActiveLabel(index,true);
+    m_LabelSetImage->SetActiveLabel(index);
+
     QTableWidgetItem* nameItem = this->item(index,NAME_COL);
     if (!nameItem) return;
-    this->scrollToItem(nameItem);
+    this->clearSelection();
+    this->setSelectionMode(QAbstractItemView::SingleSelection);
     this->selectRow(index);
+    this->scrollToItem(nameItem);
+    this->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
     emit activeLabelChanged(index);
   }
 }
@@ -238,6 +249,18 @@ void QmitkLabelSetTableWidget::AllLabelsModified( )
   // this is an event function, avoid calling ourself
   for(int i=0; i<this->rowCount(); i++)
     this->LabelModified(i);
+}
+
+void QmitkLabelSetTableWidget::ActiveLabelChanged(int index)
+{
+    QTableWidgetItem* nameItem = this->item(index,NAME_COL);
+    if (!nameItem) return;
+    this->clearSelection();
+    this->setSelectionMode(QAbstractItemView::SingleSelection);
+    this->selectRow(index);
+    this->scrollToItem(nameItem);
+    this->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    emit activeLabelChanged(index);
 }
 
 void QmitkLabelSetTableWidget::LabelModified( int index )
@@ -371,7 +394,7 @@ void QmitkLabelSetTableWidget::OnItemClicked(QTableWidgetItem *item)
   int row = item->row();
   if (row >= 0 && row < this->rowCount())
   {
-    m_LabelSetImage->SetActiveLabel(row, false);
+    m_LabelSetImage->SetActiveLabel(row);
     emit activeLabelChanged(row);
   }
 
@@ -384,7 +407,7 @@ void QmitkLabelSetTableWidget::OnItemDoubleClicked(QTableWidgetItem *item)
   int row = item->row();
   if (row >= 0 && row < this->rowCount())
   {
-    m_LabelSetImage->SetActiveLabel(row,false);
+    m_LabelSetImage->SetActiveLabel(row);
     emit activeLabelChanged(row);
     this->WaitCursorOn();
     const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(row, true);
@@ -467,7 +490,7 @@ void QmitkLabelSetTableWidget::InsertItem()
   if (m_AutoSelectNewLabels)
   {
     this->selectRow(row);
-    m_LabelSetImage->SetActiveLabel(row,true);
+    m_LabelSetImage->SetActiveLabel(row);
     emit activeLabelChanged(row);
   }
 

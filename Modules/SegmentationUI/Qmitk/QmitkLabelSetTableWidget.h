@@ -64,6 +64,9 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     /// \brief A label was modified in the LabelSet.
     void LabelModified(int);
 
+    /// \brief The active label was changed in the LabelSet.
+    void ActiveLabelChanged(int);
+
     /// \brief All labels were modified in the LabelSet.
     void AllLabelsModified();
 

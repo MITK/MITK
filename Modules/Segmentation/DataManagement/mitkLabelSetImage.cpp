@@ -527,7 +527,7 @@ void mitk::LabelSetImage::ResetLabels(int layer)
 void mitk::LabelSetImage::MergeLabels(std::vector<int>& indexes, int index, int layer)
 {
   if (layer < 0) layer = m_ActiveLayer;
-  this->SetActiveLabel(index, false, layer);
+  this->SetActiveLabel(index, layer);
   // const mitk::Label* activeLabel = m_LabelSetContainer[m_ActiveLayer]->GetActiveLabel();
   int pixelValue = this->GetActiveLabelIndex();
 
@@ -678,13 +678,12 @@ const mitk::Point3D& mitk::LabelSetImage::GetLabelCenterOfMassCoordinates(int in
   return m_LabelSetContainer[layer]->GetLabelCenterOfMassCoordinates(index);
 }
 
-void mitk::LabelSetImage::SetActiveLabel(int index, bool sendEvent, int layer)
+void mitk::LabelSetImage::SetActiveLabel(int index, int layer)
 {
   if (layer < 0) layer = m_ActiveLayer;
   m_LabelSetContainer[layer]->SetActiveLabel(index);
 
-  if (sendEvent)
-    ModifyLabelEvent.Send(index);
+  ActiveLabelEvent.Send(index);
 
   this->Modified();
 }

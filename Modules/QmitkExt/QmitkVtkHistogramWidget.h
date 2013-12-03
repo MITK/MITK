@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \brief Widget for displaying image histograms based on the vtkQtChart
  * framework
  */
-class QmitkExt_EXPORT QmitkVtkHistogramWidget : public QDialog
+class DEPRECATED() QmitkExt_EXPORT QmitkVtkHistogramWidget : public QDialog
 {
   Q_OBJECT
 

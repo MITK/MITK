@@ -16,12 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkErodeTool3DGUI.h"
 
-#include "QmitkNewSegmentationDialog.h"
+#include <mitkErodeTool3D.h>
+#include <QmitkNewSegmentationDialog.h>
 #include <QApplication.h>
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkErodeTool3DGUI, "")
 
-QmitkErodeTool3DGUI::QmitkErodeTool3DGUI() : QmitkToolGUI()
+QmitkErodeTool3DGUI::QmitkErodeTool3DGUI() : QmitkToolGUI(), m_ErodeTool3D(NULL)
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
@@ -40,7 +41,7 @@ QmitkErodeTool3DGUI::QmitkErodeTool3DGUI() : QmitkToolGUI()
 
 QmitkErodeTool3DGUI::~QmitkErodeTool3DGUI()
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_ErodeTool3D)
   {
     m_ErodeTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkErodeTool3DGUI, bool>( this, &QmitkErodeTool3DGUI::BusyStateChanged );
   }
@@ -48,22 +49,23 @@ QmitkErodeTool3DGUI::~QmitkErodeTool3DGUI()
 
 void QmitkErodeTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_ErodeTool3D)
   {
     m_ErodeTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkErodeTool3DGUI, bool>( this, &QmitkErodeTool3DGUI::BusyStateChanged );
   }
 
   m_ErodeTool3D = dynamic_cast<mitk::ErodeTool3D*>( tool );
 
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_ErodeTool3D)
   {
+    m_Controls.m_sbKernelSize->setValue( m_ErodeTool3D->GetRadius() );
     m_ErodeTool3D->CurrentlyBusy += mitk::MessageDelegate1<QmitkErodeTool3DGUI, bool>( this, &QmitkErodeTool3DGUI::BusyStateChanged );
   }
 }
 
 void QmitkErodeTool3DGUI::OnRun()
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_ErodeTool3D)
   {
     m_ErodeTool3D->SetRadius(m_Controls.m_sbKernelSize->value());
     m_ErodeTool3D->Run();
@@ -72,7 +74,7 @@ void QmitkErodeTool3DGUI::OnRun()
 
 void QmitkErodeTool3DGUI::OnCancel()
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_ErodeTool3D)
   {
     m_ErodeTool3D->Cancel();
   }
@@ -80,7 +82,7 @@ void QmitkErodeTool3DGUI::OnCancel()
 
 void QmitkErodeTool3DGUI::OnKernelSizeChanged(int value)
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_ErodeTool3D)
   {
     m_ErodeTool3D->SetRadius(value);
   }
@@ -88,7 +90,7 @@ void QmitkErodeTool3DGUI::OnKernelSizeChanged(int value)
 
 void QmitkErodeTool3DGUI::OnAcceptPreview()
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_ErodeTool3D)
   {
     m_ErodeTool3D->AcceptPreview();
   }
@@ -96,7 +98,7 @@ void QmitkErodeTool3DGUI::OnAcceptPreview()
 
 void QmitkErodeTool3DGUI::OnCalculateDifference()
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_ErodeTool3D)
   {
     m_ErodeTool3D->CalculateDifference();
   }
@@ -128,7 +130,7 @@ void QmitkErodeTool3DGUI::OnShowAdvancedControls( bool on )
 
 void QmitkErodeTool3DGUI::OnNewLabel()
 {
-  if (m_ErodeTool3D.IsNotNull())
+  if (m_ErodeTool3D)
   {
     QmitkNewSegmentationDialog dialog(this);
 //    dialog->SetSuggestionList( m_OrganColors );

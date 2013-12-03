@@ -56,6 +56,7 @@ class Segmentation_EXPORT ErodeTool3D : public AutoSegmentationTool
     void Run();
 
     void SetRadius(int value);
+    int GetRadius();
 
   protected:
 

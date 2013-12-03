@@ -55,6 +55,7 @@ class Segmentation_EXPORT MedianTool3D : public AutoSegmentationTool
     void Run();
 
     void SetRadius(int);
+    int GetRadius();
 
   protected:
 

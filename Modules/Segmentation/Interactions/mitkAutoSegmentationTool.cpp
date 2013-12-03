@@ -76,26 +76,33 @@ void mitk::AutoSegmentationTool::AcceptPreview()
 
   m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
 
+  CurrentlyBusy.Send(true);
+
   try
   {
     AccessFixedDimensionByItk_1( workingImage, InternalAcceptPreview, 3, m_PreviewImage );
   }
   catch( itk::ExceptionObject & e )
   {
+    CurrentlyBusy.Send(false);
     MITK_ERROR << "Exception caught: " << e.GetDescription();
     m_ToolManager->ActivateTool(-1);
     return;
   }
   catch (...)
   {
+    CurrentlyBusy.Send(false);
     MITK_ERROR << "Unkown exception caught!";
     m_ToolManager->ActivateTool(-1);
     return;
   }
 
+  CurrentlyBusy.Send(false);
+
   workingImage->Modified();
 
   m_PreviewNode->SetData(NULL);
+  m_PreviewImage = NULL;
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -179,6 +186,7 @@ void mitk::AutoSegmentationTool::Activated()
   m_PreviewNode->SetProperty("layer", IntProperty::New(100) );
   m_PreviewNode->SetProperty("binary", BoolProperty::New(true) );
   m_PreviewNode->SetProperty("outline binary", BoolProperty::New(true) );
+  m_PreviewNode->SetProperty("outline binary shadow", BoolProperty::New(true) );
   m_PreviewNode->SetProperty("helper object", BoolProperty::New(true) );
   m_PreviewNode->SetOpacity(1.0);
   m_PreviewNode->SetColor(0.0, 1.0, 0.0);

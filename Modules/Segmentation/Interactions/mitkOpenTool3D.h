@@ -56,6 +56,7 @@ class Segmentation_EXPORT OpenTool3D : public AutoSegmentationTool
     void Run();
 
     void SetRadius(int);
+    int GetRadius();
 
   protected:
 

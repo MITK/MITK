@@ -19,7 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
-#include "mitkCloseTool3D.h"
+
+namespace mitk {
+  class CloseTool3D;
+}
 
 #include "ui_QmitkCloseTool3DGUIControls.h"
 
@@ -39,13 +42,6 @@ class SegmentationUI_EXPORT QmitkCloseTool3DGUI : public QmitkToolGUI
 
     mitkClassMacro(QmitkCloseTool3DGUI, QmitkToolGUI);
     itkNewMacro(QmitkCloseTool3DGUI);
-
-  signals:
-
-    /// \brief Emitted when button "Run" is pressed
-    void Run();
-
-  public slots:
 
   protected slots:
 
@@ -67,7 +63,7 @@ class SegmentationUI_EXPORT QmitkCloseTool3DGUI : public QmitkToolGUI
 
     Ui::QmitkCloseTool3DGUIControls m_Controls;
 
-    mitk::CloseTool3D::Pointer m_CloseTool3D;
+    mitk::CloseTool3D* m_CloseTool3D;
 };
 
 #endif

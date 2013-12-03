@@ -16,12 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkOpenTool3DGUI.h"
 
-#include "QmitkNewSegmentationDialog.h"
+#include <mitkOpenTool3D.h>
+#include <QmitkNewSegmentationDialog.h>
 #include <QApplication.h>
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkOpenTool3DGUI, "")
 
-QmitkOpenTool3DGUI::QmitkOpenTool3DGUI() : QmitkToolGUI()
+QmitkOpenTool3DGUI::QmitkOpenTool3DGUI() : QmitkToolGUI(), m_OpenTool3D(NULL)
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
@@ -40,7 +41,7 @@ QmitkOpenTool3DGUI::QmitkOpenTool3DGUI() : QmitkToolGUI()
 
 QmitkOpenTool3DGUI::~QmitkOpenTool3DGUI()
 {
-  if (m_OpenTool3D.IsNotNull())
+  if (m_OpenTool3D)
   {
     m_OpenTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkOpenTool3DGUI, bool>( this, &QmitkOpenTool3DGUI::BusyStateChanged );
   }
@@ -48,22 +49,23 @@ QmitkOpenTool3DGUI::~QmitkOpenTool3DGUI()
 
 void QmitkOpenTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
-  if (m_OpenTool3D.IsNotNull())
+  if (m_OpenTool3D)
   {
     m_OpenTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkOpenTool3DGUI, bool>( this, &QmitkOpenTool3DGUI::BusyStateChanged );
   }
 
   m_OpenTool3D = dynamic_cast<mitk::OpenTool3D*>( tool );
 
-  if (m_OpenTool3D.IsNotNull())
+  if (m_OpenTool3D)
   {
+    m_Controls.m_sbKernelSize->setValue( m_OpenTool3D->GetRadius() );
     m_OpenTool3D->CurrentlyBusy += mitk::MessageDelegate1<QmitkOpenTool3DGUI, bool>( this, &QmitkOpenTool3DGUI::BusyStateChanged );
   }
 }
 
 void QmitkOpenTool3DGUI::OnRun()
 {
-  if (m_OpenTool3D.IsNotNull())
+  if (m_OpenTool3D)
   {
     m_OpenTool3D->SetRadius(m_Controls.m_sbKernelSize->value());
     m_OpenTool3D->Run();
@@ -72,7 +74,7 @@ void QmitkOpenTool3DGUI::OnRun()
 
 void QmitkOpenTool3DGUI::OnCancel()
 {
-  if (m_OpenTool3D.IsNotNull())
+  if (m_OpenTool3D)
   {
     m_OpenTool3D->Cancel();
   }
@@ -80,7 +82,7 @@ void QmitkOpenTool3DGUI::OnCancel()
 
 void QmitkOpenTool3DGUI::OnKernelSizeChanged(int value)
 {
-  if (m_OpenTool3D.IsNotNull())
+  if (m_OpenTool3D)
   {
     m_OpenTool3D->SetRadius(value);
   }
@@ -88,7 +90,7 @@ void QmitkOpenTool3DGUI::OnKernelSizeChanged(int value)
 
 void QmitkOpenTool3DGUI::OnAcceptPreview()
 {
-  if (m_OpenTool3D.IsNotNull())
+  if (m_OpenTool3D)
   {
     m_OpenTool3D->AcceptPreview();
   }
@@ -96,7 +98,7 @@ void QmitkOpenTool3DGUI::OnAcceptPreview()
 
 void QmitkOpenTool3DGUI::OnCalculateDifference()
 {
-  if (m_OpenTool3D.IsNotNull())
+  if (m_OpenTool3D)
   {
     m_OpenTool3D->CalculateDifference();
   }
@@ -104,7 +106,7 @@ void QmitkOpenTool3DGUI::OnCalculateDifference()
 
 void QmitkOpenTool3DGUI::OnNewLabel()
 {
-  if (m_OpenTool3D.IsNotNull())
+  if (m_OpenTool3D)
   {
     QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this );
 //    dialog->SetSuggestionList( m_OrganColors );

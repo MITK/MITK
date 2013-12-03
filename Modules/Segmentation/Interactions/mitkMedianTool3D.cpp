@@ -74,6 +74,11 @@ void mitk::MedianTool3D::SetRadius(int value)
   m_Radius = value;
 }
 
+int mitk::MedianTool3D::GetRadius()
+{
+  return m_Radius;
+}
+
 void mitk::MedianTool3D::Run()
 {
 //  this->InitializeUndoController();
@@ -140,9 +145,9 @@ void mitk::MedianTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* in
   image2label->SetInput(thresholdFilter->GetOutput());
 
   typename AutoCropType::SizeType border;
-  border[0] = 3;
-  border[1] = 3;
-  border[2] = 3;
+  border[0] = m_Radius+1;
+  border[1] = m_Radius+1;
+  border[2] = m_Radius+1;
 
   typename AutoCropType::Pointer autoCropFilter = AutoCropType::New();
   autoCropFilter->SetInput( image2label->GetOutput() );
@@ -152,6 +157,12 @@ void mitk::MedianTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* in
   typename LabelMap2ImageType::Pointer label2image = LabelMap2ImageType::New();
   label2image->SetInput( autoCropFilter->GetOutput() );
 
+  thresholdFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+  autoCropFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+  m_ProgressCommand->AddStepsToDo(100);
+  label2image->Update();
+  m_ProgressCommand->Reset();
+
   typename ImageType::SizeType radius;
   radius.Fill(m_Radius);
 
@@ -160,20 +171,12 @@ void mitk::MedianTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* in
   medianFilter->SetForegroundValue( 1 );
   medianFilter->SetRadius( radius );
 
-  if (m_ProgressCommand.IsNotNull())
-  {
-    thresholdFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    autoCropFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    medianFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    m_ProgressCommand->AddStepsToDo(100);
-  }
+  medianFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+  m_ProgressCommand->AddStepsToDo(100);
 
   medianFilter->Update();
 
-  if (m_ProgressCommand.IsNotNull())
-  {
-    m_ProgressCommand->Reset();
-  }
+  m_ProgressCommand->Reset();
 
   typename ImageType::Pointer result = medianFilter->GetOutput();
   result->DisconnectPipeline();

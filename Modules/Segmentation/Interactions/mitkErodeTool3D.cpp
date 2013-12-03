@@ -77,6 +77,11 @@ void mitk::ErodeTool3D::SetRadius(int value)
   m_Radius = value;
 }
 
+int mitk::ErodeTool3D::GetRadius()
+{
+  return m_Radius;
+}
+
 void mitk::ErodeTool3D::Run()
 {
 //  this->InitializeUndoController();
@@ -142,9 +147,9 @@ void mitk::ErodeTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* inp
   image2label->SetInput(thresholdFilter->GetOutput());
 
   typename AutoCropType::SizeType border;
-  border[0] = 3;
-  border[1] = 3;
-  border[2] = 3;
+  border[0] = m_Radius+1;
+  border[1] = m_Radius+1;
+  border[2] = m_Radius+1;
 
   typename AutoCropType::Pointer autoCropFilter = AutoCropType::New();
   autoCropFilter->SetInput( image2label->GetOutput() );
@@ -153,6 +158,14 @@ void mitk::ErodeTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* inp
 
   typename LabelMap2ImageType::Pointer label2image = LabelMap2ImageType::New();
   label2image->SetInput( autoCropFilter->GetOutput() );
+
+  thresholdFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+  autoCropFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+  m_ProgressCommand->AddStepsToDo(100);
+
+  label2image->Update();
+
+  m_ProgressCommand->Reset();
 
   BallType ball;
   ball.SetRadius(m_Radius);
@@ -163,20 +176,12 @@ void mitk::ErodeTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* inp
   erodeFilter->SetInput(label2image->GetOutput());
   erodeFilter->SetErodeValue(1);
 
-  if (m_ProgressCommand.IsNotNull())
-  {
-    thresholdFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    autoCropFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    erodeFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    m_ProgressCommand->AddStepsToDo(200);
-  }
+  erodeFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+  m_ProgressCommand->AddStepsToDo(100);
 
   erodeFilter->Update();
 
-  if (m_ProgressCommand.IsNotNull())
-  {
-    m_ProgressCommand->Reset();
-  }
+  m_ProgressCommand->Reset();
 
   typename ImageType::Pointer result = erodeFilter->GetOutput();
   result->DisconnectPipeline();
@@ -187,7 +192,6 @@ void mitk::ErodeTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* inp
 
   typename ImageType::RegionType cropRegion;
   cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();
-
   const typename ImageType::SizeType& cropSize = cropRegion.GetSize();
   const typename ImageType::IndexType& cropIndex = cropRegion.GetIndex();
 

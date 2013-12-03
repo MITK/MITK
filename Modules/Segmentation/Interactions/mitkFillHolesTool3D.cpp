@@ -42,7 +42,7 @@ namespace mitk {
 }
 
 
-mitk::FillHolesTool3D::FillHolesTool3D()
+mitk::FillHolesTool3D::FillHolesTool3D() : m_ConsiderAllLabels(false)
 {
   m_ProgressCommand = mitk::ToolCommand::New();
 }
@@ -69,6 +69,11 @@ const char* mitk::FillHolesTool3D::GetName() const
   return "FillHolesTool3D";
 }
 
+void mitk::FillHolesTool3D::SetConsiderAllLabels(bool value)
+{
+  m_ConsiderAllLabels = value;
+}
+
 void mitk::FillHolesTool3D::Run()
 {
 //  this->InitializeUndoController();
@@ -86,7 +91,7 @@ void mitk::FillHolesTool3D::Run()
 
   m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
   m_PreviewNode->SetProperty("outline binary", BoolProperty::New(false) );
-  m_PreviewNode->SetOpacity(0.6);
+  m_PreviewNode->SetOpacity(0.3);
 
   try
   {
@@ -126,8 +131,17 @@ void mitk::FillHolesTool3D::InternalProcessing( itk::Image< TPixel, VDimension>*
 
   typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
   thresholdFilter->SetInput(input);
-  thresholdFilter->SetLowerThreshold(m_OverwritePixelValue);
-  thresholdFilter->SetUpperThreshold(m_OverwritePixelValue);
+  if (m_ConsiderAllLabels)
+  {
+    int numberOfLabels = workingImage->GetNumberOfLabels();
+    thresholdFilter->SetLowerThreshold(1);
+    thresholdFilter->SetUpperThreshold(numberOfLabels-1);
+  }
+  else
+  {
+    thresholdFilter->SetLowerThreshold(m_OverwritePixelValue);
+    thresholdFilter->SetUpperThreshold(m_OverwritePixelValue);
+  }
   thresholdFilter->SetOutsideValue(0);
   thresholdFilter->SetInsideValue(1);
 
@@ -147,24 +161,23 @@ void mitk::FillHolesTool3D::InternalProcessing( itk::Image< TPixel, VDimension>*
   typename LabelMap2ImageType::Pointer label2image = LabelMap2ImageType::New();
   label2image->SetInput( autoCropFilter->GetOutput() );
 
+  thresholdFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+  autoCropFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+  m_ProgressCommand->AddStepsToDo(100);
+  label2image->Update();
+  m_ProgressCommand->Reset();
+
+  typename ImageType::RegionType cropRegion;
+  cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();
+
   typename FillHolesFilterType::Pointer fillHolesFilter = FillHolesFilterType::New();
   fillHolesFilter->SetInput(label2image->GetOutput());
   fillHolesFilter->SetForegroundValue(1);
 
-  if (m_ProgressCommand.IsNotNull())
-  {
-    thresholdFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    autoCropFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    fillHolesFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    m_ProgressCommand->AddStepsToDo(200);
-  }
-
+  fillHolesFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+  m_ProgressCommand->AddStepsToDo(100);
   fillHolesFilter->Update();
-
-  if (m_ProgressCommand.IsNotNull())
-  {
-    m_ProgressCommand->Reset();
-  }
+  m_ProgressCommand->Reset();
 
   typename ImageType::Pointer result = fillHolesFilter->GetOutput();
   result->DisconnectPipeline();
@@ -172,9 +185,6 @@ void mitk::FillHolesTool3D::InternalProcessing( itk::Image< TPixel, VDimension>*
   // fix intersections with other labels
   typedef itk::ImageRegionConstIterator< ImageType > InputIteratorType;
   typedef itk::ImageRegionIterator< ImageType >      ResultIteratorType;
-
-  typename ImageType::RegionType cropRegion;
-  cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();
 
   typename InputIteratorType  inputIter( input, cropRegion );
   typename ResultIteratorType resultIter( result, result->GetLargestPossibleRegion() );

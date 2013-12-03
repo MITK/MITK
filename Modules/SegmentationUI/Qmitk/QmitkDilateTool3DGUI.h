@@ -19,8 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
-#include "mitkDilateTool3D.h"
 #include "ui_QmitkDilateTool3DGUIControls.h"
+
+
+namespace mitk {
+  class DilateTool3D;
+}
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -47,7 +51,6 @@ class SegmentationUI_EXPORT QmitkDilateTool3DGUI : public QmitkToolGUI
     void OnAcceptPreview();
     void OnCalculateDifference();
     void OnNewLabel();
-    void OnKernelSizeChanged(int);
     void OnShowInformation(bool);
     void OnShowAdvancedControls(bool);
 
@@ -59,7 +62,7 @@ class SegmentationUI_EXPORT QmitkDilateTool3DGUI : public QmitkToolGUI
 
     Ui::QmitkDilateTool3DGUIControls m_Controls;
 
-    mitk::DilateTool3D::Pointer m_DilateTool3D;
+    mitk::DilateTool3D* m_DilateTool3D;
 };
 
 #endif

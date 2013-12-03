@@ -19,9 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
-#include "mitkFillHolesTool3D.h"
 
 #include "ui_QmitkFillHolesTool3DGUIControls.h"
+
+namespace mitk {
+  class FillHolesTool3D;
+}
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -58,7 +61,7 @@ class SegmentationUI_EXPORT QmitkFillHolesTool3DGUI : public QmitkToolGUI
 
     Ui::QmitkFillHolesTool3DGUIControls m_Controls;
 
-    mitk::FillHolesTool3D::Pointer m_FillHolesTool3D;
+    mitk::FillHolesTool3D* m_FillHolesTool3D;
 };
 
 #endif

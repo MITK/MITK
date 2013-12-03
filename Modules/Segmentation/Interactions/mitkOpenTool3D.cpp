@@ -79,6 +79,11 @@ void mitk::OpenTool3D::SetRadius(int value)
   m_Radius = value;
 }
 
+int mitk::OpenTool3D::GetRadius()
+{
+  return m_Radius;
+}
+
 void mitk::OpenTool3D::Run()
 {
 //  this->InitializeUndoController();
@@ -145,9 +150,9 @@ void mitk::OpenTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
   image2label->SetInput(thresholdFilter->GetOutput());
 
   typename AutoCropType::SizeType border;
-  border[0] = 3;
-  border[1] = 3;
-  border[2] = 3;
+  border[0] = m_Radius+1;
+  border[1] = m_Radius+1;
+  border[2] = m_Radius+1;
 
   typename AutoCropType::Pointer autoCropFilter = AutoCropType::New();
   autoCropFilter->SetInput( image2label->GetOutput() );
@@ -156,6 +161,11 @@ void mitk::OpenTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
 
   typename LabelMap2ImageType::Pointer label2image = LabelMap2ImageType::New();
   label2image->SetInput( autoCropFilter->GetOutput() );
+
+  label2image->Update();
+
+  typename ImageType::RegionType cropRegion;
+  cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();
 
   BallType ball;
   ball.SetRadius(m_Radius);
@@ -167,30 +177,41 @@ void mitk::OpenTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
   openingFilter->SetForegroundValue(1);
   openingFilter->SetBackgroundValue(0);
 
-  if (m_ProgressCommand.IsNotNull())
-  {
-    thresholdFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    autoCropFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    openingFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    m_ProgressCommand->AddStepsToDo(200);
-  }
+  openingFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+  int steps = cropRegion.GetSize()[0] * cropRegion.GetSize()[1] * cropRegion.GetSize()[2] / 5000;
+  m_ProgressCommand->AddStepsToDo(steps);
 
   openingFilter->Update();
 
-  if (m_ProgressCommand.IsNotNull())
-  {
-    m_ProgressCommand->Reset();
-  }
+  m_ProgressCommand->Reset();
 
   typename ImageType::Pointer result = openingFilter->GetOutput();
   result->DisconnectPipeline();
 
+  // fix intersections with other labels
+  typedef itk::ImageRegionConstIterator< ImageType > InputIteratorType;
+  typedef itk::ImageRegionIterator< ImageType >      ResultIteratorType;
+
+  typename InputIteratorType  inputIter( input, cropRegion );
+  typename ResultIteratorType resultIter( result, result->GetLargestPossibleRegion() );
+
+  inputIter.GoToBegin();
+  resultIter.GoToBegin();
+
+  while ( !resultIter.IsAtEnd() )
+  {
+    int inputValue = static_cast<int>( inputIter.Get() );
+
+    if ( (inputValue != m_OverwritePixelValue) && workingImage->GetLabelLocked( inputValue ) )
+      resultIter.Set(0);
+
+    ++inputIter;
+    ++resultIter;
+  }
+
   m_PreviewImage = mitk::Image::New();
   m_PreviewImage->InitializeByItk(result.GetPointer());
   m_PreviewImage->SetChannel(result->GetBufferPointer());
-
-  typename ImageType::RegionType cropRegion;
-  cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();
 
   const typename ImageType::SizeType& cropSize = cropRegion.GetSize();
   const typename ImageType::IndexType& cropIndex = cropRegion.GetIndex();

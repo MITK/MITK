@@ -54,6 +54,8 @@ class Segmentation_EXPORT FillHolesTool3D : public AutoSegmentationTool
 
     void Run();
 
+    void SetConsiderAllLabels(bool);
+
   protected:
 
     FillHolesTool3D();
@@ -61,6 +63,8 @@ class Segmentation_EXPORT FillHolesTool3D : public AutoSegmentationTool
 
     template < typename TPixel, unsigned int VDimension >
     void InternalProcessing( itk::Image< TPixel, VDimension>* input );
+
+    bool m_ConsiderAllLabels;
 };
 
 } // namespace

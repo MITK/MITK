@@ -19,8 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
-#include "mitkErodeTool3D.h"
 #include "ui_QmitkErodeTool3DGUIControls.h"
+
+namespace mitk {
+  class ErodeTool3D;
+}
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -59,7 +62,7 @@ class SegmentationUI_EXPORT QmitkErodeTool3DGUI : public QmitkToolGUI
 
     Ui::QmitkErodeTool3DGUIControls m_Controls;
 
-    mitk::ErodeTool3D::Pointer m_ErodeTool3D;
+    mitk::ErodeTool3D* m_ErodeTool3D;
 };
 
 #endif

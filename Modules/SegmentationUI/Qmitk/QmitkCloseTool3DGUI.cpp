@@ -16,12 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkCloseTool3DGUI.h"
 
-#include "QmitkNewSegmentationDialog.h"
+#include <mitkCloseTool3D.h>
+#include <QmitkNewSegmentationDialog.h>
 #include <QApplication.h>
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkCloseTool3DGUI, "")
 
-QmitkCloseTool3DGUI::QmitkCloseTool3DGUI() : QmitkToolGUI()
+QmitkCloseTool3DGUI::QmitkCloseTool3DGUI() : QmitkToolGUI(), m_CloseTool3D(NULL)
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
@@ -40,7 +41,7 @@ QmitkCloseTool3DGUI::QmitkCloseTool3DGUI() : QmitkToolGUI()
 
 QmitkCloseTool3DGUI::~QmitkCloseTool3DGUI()
 {
-  if (m_CloseTool3D.IsNotNull())
+  if (m_CloseTool3D)
   {
     m_CloseTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkCloseTool3DGUI, bool>( this, &QmitkCloseTool3DGUI::BusyStateChanged );
   }
@@ -48,22 +49,23 @@ QmitkCloseTool3DGUI::~QmitkCloseTool3DGUI()
 
 void QmitkCloseTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
-  if (m_CloseTool3D.IsNotNull())
+  if (m_CloseTool3D)
   {
     m_CloseTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkCloseTool3DGUI, bool>( this, &QmitkCloseTool3DGUI::BusyStateChanged );
   }
 
   m_CloseTool3D = dynamic_cast<mitk::CloseTool3D*>( tool );
 
-  if (m_CloseTool3D.IsNotNull())
+  if (m_CloseTool3D)
   {
+    m_Controls.m_sbKernelSize->setValue( m_CloseTool3D->GetRadius() );
     m_CloseTool3D->CurrentlyBusy += mitk::MessageDelegate1<QmitkCloseTool3DGUI, bool>( this, &QmitkCloseTool3DGUI::BusyStateChanged );
   }
 }
 
 void QmitkCloseTool3DGUI::OnRun()
 {
-  if (m_CloseTool3D.IsNotNull())
+  if (m_CloseTool3D)
   {
     m_CloseTool3D->SetRadius(m_Controls.m_sbKernelSize->value());
     m_CloseTool3D->Run();
@@ -72,7 +74,7 @@ void QmitkCloseTool3DGUI::OnRun()
 
 void QmitkCloseTool3DGUI::OnCancel()
 {
-  if (m_CloseTool3D.IsNotNull())
+  if (m_CloseTool3D)
   {
     m_CloseTool3D->Cancel();
   }
@@ -80,7 +82,7 @@ void QmitkCloseTool3DGUI::OnCancel()
 
 void QmitkCloseTool3DGUI::OnKernelSizeChanged(int value)
 {
-  if (m_CloseTool3D.IsNotNull())
+  if (m_CloseTool3D)
   {
     m_CloseTool3D->SetRadius(value);
   }
@@ -88,7 +90,7 @@ void QmitkCloseTool3DGUI::OnKernelSizeChanged(int value)
 
 void QmitkCloseTool3DGUI::OnAcceptPreview()
 {
-  if (m_CloseTool3D.IsNotNull())
+  if (m_CloseTool3D)
   {
     m_CloseTool3D->AcceptPreview();
   }
@@ -96,7 +98,7 @@ void QmitkCloseTool3DGUI::OnAcceptPreview()
 
 void QmitkCloseTool3DGUI::OnCalculateDifference()
 {
-  if (m_CloseTool3D.IsNotNull())
+  if (m_CloseTool3D)
   {
     m_CloseTool3D->CalculateDifference();
   }
@@ -128,7 +130,7 @@ void QmitkCloseTool3DGUI::OnShowAdvancedControls( bool on )
 
 void QmitkCloseTool3DGUI::OnNewLabel()
 {
-  if (m_CloseTool3D.IsNotNull())
+  if (m_CloseTool3D)
   {
     QmitkNewSegmentationDialog dialog(this);
 //    dialog->SetSuggestionList( m_OrganColors );

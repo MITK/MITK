@@ -19,7 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
-#include "mitkOpenTool3D.h"
+
+namespace mitk {
+  class OpenTool3D;
+}
 
 #include "ui_QmitkOpenTool3DGUIControls.h"
 
@@ -60,7 +63,7 @@ class SegmentationUI_EXPORT QmitkOpenTool3DGUI : public QmitkToolGUI
 
     Ui::QmitkOpenTool3DGUIControls m_Controls;
 
-    mitk::OpenTool3D::Pointer m_OpenTool3D;
+    mitk::OpenTool3D* m_OpenTool3D;
 };
 
 #endif

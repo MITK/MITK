@@ -16,11 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkFillHolesTool3DGUI.h"
 
+#include <mitkFillHolesTool3D.h>
 #include <QApplication.h>
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkFillHolesTool3DGUI, "")
 
-QmitkFillHolesTool3DGUI::QmitkFillHolesTool3DGUI() : QmitkToolGUI()
+QmitkFillHolesTool3DGUI::QmitkFillHolesTool3DGUI() : QmitkToolGUI(), m_FillHolesTool3D(NULL)
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
@@ -37,7 +38,7 @@ QmitkFillHolesTool3DGUI::QmitkFillHolesTool3DGUI() : QmitkToolGUI()
 
 QmitkFillHolesTool3DGUI::~QmitkFillHolesTool3DGUI()
 {
-  if (m_FillHolesTool3D.IsNotNull())
+  if (m_FillHolesTool3D)
   {
     m_FillHolesTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkFillHolesTool3DGUI, bool>( this, &QmitkFillHolesTool3DGUI::BusyStateChanged );
   }
@@ -45,14 +46,14 @@ QmitkFillHolesTool3DGUI::~QmitkFillHolesTool3DGUI()
 
 void QmitkFillHolesTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
-  if (m_FillHolesTool3D.IsNotNull())
+  if (m_FillHolesTool3D)
   {
     m_FillHolesTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkFillHolesTool3DGUI, bool>( this, &QmitkFillHolesTool3DGUI::BusyStateChanged );
   }
 
   m_FillHolesTool3D = dynamic_cast<mitk::FillHolesTool3D*>( tool );
 
-  if (m_FillHolesTool3D.IsNotNull())
+  if (m_FillHolesTool3D)
   {
     m_FillHolesTool3D->CurrentlyBusy += mitk::MessageDelegate1<QmitkFillHolesTool3DGUI, bool>( this, &QmitkFillHolesTool3DGUI::BusyStateChanged );
   }
@@ -60,15 +61,16 @@ void QmitkFillHolesTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 
 void QmitkFillHolesTool3DGUI::OnRun()
 {
-  if (m_FillHolesTool3D.IsNotNull())
+  if (m_FillHolesTool3D)
   {
+    m_FillHolesTool3D->SetConsiderAllLabels(m_Controls.m_rbConsiderAllLabels->isChecked());
     m_FillHolesTool3D->Run();
   }
 }
 
 void QmitkFillHolesTool3DGUI::OnCancel()
 {
-  if (m_FillHolesTool3D.IsNotNull())
+  if (m_FillHolesTool3D)
   {
     m_FillHolesTool3D->Cancel();
   }
@@ -76,7 +78,7 @@ void QmitkFillHolesTool3DGUI::OnCancel()
 
 void QmitkFillHolesTool3DGUI::OnAcceptPreview()
 {
-  if (m_FillHolesTool3D.IsNotNull())
+  if (m_FillHolesTool3D)
   {
     m_FillHolesTool3D->AcceptPreview();
   }
@@ -84,7 +86,7 @@ void QmitkFillHolesTool3DGUI::OnAcceptPreview()
 
 void QmitkFillHolesTool3DGUI::OnCalculateDifference()
 {
-  if (m_FillHolesTool3D.IsNotNull())
+  if (m_FillHolesTool3D)
   {
     m_FillHolesTool3D->CalculateDifference();
   }

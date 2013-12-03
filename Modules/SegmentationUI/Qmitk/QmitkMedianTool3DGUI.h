@@ -19,7 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
-#include "mitkMedianTool3D.h"
+
+namespace mitk {
+  class MedianTool3D;
+}
 
 #include "ui_QmitkMedianTool3DGUIControls.h"
 
@@ -61,7 +64,7 @@ class SegmentationUI_EXPORT QmitkMedianTool3DGUI : public QmitkToolGUI
 
     Ui::QmitkMedianTool3DGUIControls m_Controls;
 
-    mitk::MedianTool3D::Pointer m_MedianTool3D;
+    mitk::MedianTool3D* m_MedianTool3D;
 };
 
 #endif

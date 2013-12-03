@@ -16,12 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkMedianTool3DGUI.h"
 
+#include <mitkMedianTool3D.h>
 #include <QmitkNewSegmentationDialog.h>
 #include <QApplication.h>
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkMedianTool3DGUI, "")
 
-QmitkMedianTool3DGUI::QmitkMedianTool3DGUI() : QmitkToolGUI()
+QmitkMedianTool3DGUI::QmitkMedianTool3DGUI() : QmitkToolGUI(), m_MedianTool3D(NULL)
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
@@ -41,7 +42,7 @@ QmitkMedianTool3DGUI::QmitkMedianTool3DGUI() : QmitkToolGUI()
 
 QmitkMedianTool3DGUI::~QmitkMedianTool3DGUI()
 {
-  if (m_MedianTool3D.IsNotNull())
+  if (m_MedianTool3D)
   {
     m_MedianTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkMedianTool3DGUI, bool>( this, &QmitkMedianTool3DGUI::BusyStateChanged );
   }
@@ -49,22 +50,23 @@ QmitkMedianTool3DGUI::~QmitkMedianTool3DGUI()
 
 void QmitkMedianTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
-  if (m_MedianTool3D.IsNotNull())
+  if (m_MedianTool3D)
   {
     m_MedianTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkMedianTool3DGUI, bool>( this, &QmitkMedianTool3DGUI::BusyStateChanged );
   }
 
   m_MedianTool3D = dynamic_cast<mitk::MedianTool3D*>( tool );
 
-  if (m_MedianTool3D.IsNotNull())
+  if (m_MedianTool3D)
   {
+    m_Controls.m_sbKernelSize->setValue( m_MedianTool3D->GetRadius() );
     m_MedianTool3D->CurrentlyBusy += mitk::MessageDelegate1<QmitkMedianTool3DGUI, bool>( this, &QmitkMedianTool3DGUI::BusyStateChanged );
   }
 }
 
 void QmitkMedianTool3DGUI::OnRun()
 {
-  if (m_MedianTool3D.IsNotNull())
+  if (m_MedianTool3D)
   {
     m_MedianTool3D->SetRadius(m_Controls.m_sbKernelSize->value());
     m_MedianTool3D->Run();
@@ -73,7 +75,7 @@ void QmitkMedianTool3DGUI::OnRun()
 
 void QmitkMedianTool3DGUI::OnCancel()
 {
-  if (m_MedianTool3D.IsNotNull())
+  if (m_MedianTool3D)
   {
     m_MedianTool3D->Cancel();
   }
@@ -81,7 +83,7 @@ void QmitkMedianTool3DGUI::OnCancel()
 
 void QmitkMedianTool3DGUI::OnAcceptPreview()
 {
-  if (m_MedianTool3D.IsNotNull())
+  if (m_MedianTool3D)
   {
     m_MedianTool3D->AcceptPreview();
   }
@@ -89,7 +91,7 @@ void QmitkMedianTool3DGUI::OnAcceptPreview()
 
 void QmitkMedianTool3DGUI::OnCalculateDifference()
 {
-  if (m_MedianTool3D.IsNotNull())
+  if (m_MedianTool3D)
   {
     m_MedianTool3D->CalculateDifference();
   }
@@ -97,7 +99,7 @@ void QmitkMedianTool3DGUI::OnCalculateDifference()
 
 void QmitkMedianTool3DGUI::OnCalculateUnion()
 {
-  if (m_MedianTool3D.IsNotNull())
+  if (m_MedianTool3D)
   {
     m_MedianTool3D->CalculateUnion();
   }
@@ -105,7 +107,7 @@ void QmitkMedianTool3DGUI::OnCalculateUnion()
 
 void QmitkMedianTool3DGUI::OnKernelSizeChanged(int value)
 {
-  if (m_MedianTool3D.IsNotNull())
+  if (m_MedianTool3D)
   {
     m_MedianTool3D->SetRadius(value);
   }
@@ -137,7 +139,7 @@ void QmitkMedianTool3DGUI::OnShowAdvancedControls( bool on )
 
 void QmitkMedianTool3DGUI::OnNewLabel()
 {
-  if (m_MedianTool3D.IsNotNull())
+  if (m_MedianTool3D)
   {
     QmitkNewSegmentationDialog dialog(this);
 //    dialog->SetSuggestionList( m_OrganColors );

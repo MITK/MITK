@@ -43,10 +43,9 @@ namespace mitk {
 }
 
 
-mitk::DilateTool3D::DilateTool3D()
+mitk::DilateTool3D::DilateTool3D() : m_Radius(3)
 {
   m_ProgressCommand = mitk::ToolCommand::New();
-  m_Radius = 1;
 }
 
 mitk::DilateTool3D::~DilateTool3D()
@@ -73,6 +72,11 @@ const char* mitk::DilateTool3D::GetName() const
 void mitk::DilateTool3D::SetRadius(int value)
 {
   m_Radius = value;
+}
+
+int mitk::DilateTool3D::GetRadius()
+{
+  return m_Radius;
 }
 
 void mitk::DilateTool3D::Run()
@@ -140,9 +144,9 @@ void mitk::DilateTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* in
   image2label->SetInput(thresholdFilter->GetOutput());
 
   typename AutoCropType::SizeType border;
-  border[0] = 3;
-  border[1] = 3;
-  border[2] = 3;
+  border[0] = m_Radius+1;
+  border[1] = m_Radius+1;
+  border[2] = m_Radius+1;
 
   typename AutoCropType::Pointer autoCropFilter = AutoCropType::New();
   autoCropFilter->SetInput( image2label->GetOutput() );
@@ -151,6 +155,16 @@ void mitk::DilateTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* in
 
   typename LabelMap2ImageType::Pointer label2image = LabelMap2ImageType::New();
   label2image->SetInput( autoCropFilter->GetOutput() );
+
+
+  thresholdFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+  autoCropFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+  m_ProgressCommand->AddStepsToDo(200);
+  label2image->Update();
+  m_ProgressCommand->Reset();
+
+  typename ImageType::RegionType cropRegion;
+  cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();
 
   BallType ball;
   ball.SetRadius(m_Radius);
@@ -161,20 +175,10 @@ void mitk::DilateTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* in
   dilateFilter->SetInput(label2image->GetOutput());
   dilateFilter->SetDilateValue(1);
 
-  if (m_ProgressCommand.IsNotNull())
-  {
-    thresholdFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    autoCropFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    dilateFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-    m_ProgressCommand->AddStepsToDo(200);
-  }
-
+  dilateFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+  m_ProgressCommand->AddStepsToDo(200);
   dilateFilter->Update();
-
-  if (m_ProgressCommand.IsNotNull())
-  {
-    m_ProgressCommand->Reset();
-  }
+  m_ProgressCommand->Reset();
 
   typename ImageType::Pointer result = dilateFilter->GetOutput();
   result->DisconnectPipeline();
@@ -182,9 +186,6 @@ void mitk::DilateTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* in
   // fix intersections with other labels
   typedef itk::ImageRegionConstIterator< ImageType > InputIteratorType;
   typedef itk::ImageRegionIterator< ImageType >      ResultIteratorType;
-
-  typename ImageType::RegionType cropRegion;
-  cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();
 
   typename InputIteratorType  inputIter( input, cropRegion );
   typename ResultIteratorType resultIter( result, result->GetLargestPossibleRegion() );

@@ -56,6 +56,7 @@ class Segmentation_EXPORT DilateTool3D : public AutoSegmentationTool
     void Run();
 
     void SetRadius(int);
+    int GetRadius();
 
   protected:
 

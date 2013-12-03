@@ -33,149 +33,91 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;WARNING: this plugin is highly experimental!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QFrame" name="frame_3">
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="lineWidth">
-         <number>0</number>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_6">
-         <property name="margin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QPushButton" name="LocalStorageButton">
-           <property name="toolTip">
-            <string>Local storage you can find your dicom data here.</string>
-           </property>
-           <property name="text">
-            <string>Local Storage</string>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="checkable">
-            <bool>false</bool>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="CDButton">
-           <property name="toolTip">
-            <string>Imports dicom data to your local storage from CD.</string>
-           </property>
-           <property name="text">
-            <string>Import CD</string>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="FolderButton">
-           <property name="toolTip">
-            <string>Imports dicom data to your local storage from a folder.</string>
-           </property>
-           <property name="text">
-            <string>Import Folder</string>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="QueryRetrieveButton">
-           <property name="toolTip">
-            <string>Query dicom data from a PACS and retrieve it to your system.</string>
-           </property>
-           <property name="text">
-            <string>Query Retrieve</string>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_5">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QStackedWidget" name="stackedWidget">
+       <widget class="QTabWidget" name="tabWidget">
         <property name="enabled">
          <bool>true</bool>
         </property>
-        <property name="currentIndex">
-         <number>0</number>
+        <property name="styleSheet">
+         <string notr="true"/>
         </property>
-        <widget class="QWidget" name="page">
+        <property name="tabPosition">
+         <enum>QTabWidget::North</enum>
+        </property>
+        <property name="tabShape">
+         <enum>QTabWidget::Rounded</enum>
+        </property>
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <widget class="QWidget" name="tabWidgetPage1">
+         <attribute name="icon">
+          <iconset resource="../../resources/dicom.qrc">
+           <normaloff>:/org.mitk.gui.qt.dicom/drive-harddisk_32.png</normaloff>:/org.mitk.gui.qt.dicom/drive-harddisk_32.png</iconset>
+         </attribute>
+         <attribute name="title">
+          <string>Local Storage</string>
+         </attribute>
+         <attribute name="toolTip">
+          <string>Manage your local dicom imports</string>
+         </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
            <widget class="QmitkDicomLocalStorageWidget" name="internalDataWidget" native="true"/>
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="importWidgetPage">
+        <widget class="QWidget" name="tabWidgetPage2">
+         <attribute name="icon">
+          <iconset resource="../../resources/dicom.qrc">
+           <normaloff>:/org.mitk.gui.qt.dicom/import_32.png</normaloff>
+           <selectedon>:/org.mitk.gui.qt.dicom/import_32.png</selectedon>:/org.mitk.gui.qt.dicom/import_32.png</iconset>
+         </attribute>
+         <attribute name="title">
+          <string>Import</string>
+         </attribute>
+         <attribute name="toolTip">
+          <string>Import dicom data from any hard drive</string>
+         </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_9">
           <item>
            <widget class="QmitkDicomExternalDataWidget" name="externalDataWidget" native="true"/>
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="queryRetrieveWidgetPage">
+        <widget class="QWidget" name="tabWidgetPage3">
+         <attribute name="icon">
+          <iconset resource="../../resources/dicom.qrc">
+           <normaloff>:/org.mitk.gui.qt.dicom/network-workgroup_32.png</normaloff>:/org.mitk.gui.qt.dicom/network-workgroup_32.png</iconset>
+         </attribute>
+         <attribute name="title">
+          <string>Query Retrieve</string>
+         </attribute>
+         <attribute name="toolTip">
+          <string>Query and retrieve dicom data from server</string>
+         </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_12">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 0, 0);</string>
+            </property>
+            <property name="text">
+             <string>Warning: This is currently an experimental feature!</string>
+            </property>
+           </widget>
+          </item>
           <item>
            <widget class="ctkDICOMQueryRetrieveWidget" name="m_ctkDICOMQueryRetrieveWidget" native="true"/>
           </item>
@@ -266,7 +208,9 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../resources/dicom.qrc"/>
+ </resources>
  <connections/>
  <slots>
   <slot>OnChangePage(int)</slot>

@@ -22,16 +22,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // include ctk
 #include <ctkDICOMDatabase.h>
-#include <ctkDICOMModel.h>
 #include <ctkDICOMIndexer.h>
 #include <ctkFileDialog.h>
 
 //include QT
-#include <QWidget>
+#include <QHash>
 #include <QString>
 #include <QStringList>
-#include <QHash>
 #include <QVariant>
+#include <QWidget>
+
+class QProgressDialog;
+class QLabel;
 
 /**
 * \brief QmitkDicomLocalStorageWidget is a QWidget providing functionality for dicom storage and import.
@@ -86,12 +88,6 @@ signals:
     */
     void SignalDicomToDataManager(QHash<QString,QVariant>);
 
-    /// \brief emitted when import progress changes.
-    void SignalProgress(int);
-
-    /// \brief emitted when anoter file is processed.
-    void SignalProcessingFile(QString);
-
     /// \brief emitted if cancel button is pressed.
     void SignalCancelImport();
 
@@ -114,15 +110,20 @@ public slots:
     /// @brief   Called when adding a list of dicom files. Starts a thread adding the dicom files.
     void OnStartDicomImport(const QStringList& dicomData);
 
-    /// @brief   Called when search parameters change.
-    void OnSearchParameterChanged();
+    /// @brief Called when the selection in the series table has changed
+    void OnSeriesSelectionChanged(const QStringList&);
 
 protected:
 
     void SetDatabase(QString databaseFile);
 
+    /// \brief SetupProgressDialog Sets up progress dialog.
+    void SetupProgressDialog(QWidget* parent);
+
+    QProgressDialog* m_ProgressDialog;
+    QLabel* m_ProgressDialogLabel;
+
     ctkDICOMDatabase* m_LocalDatabase;
-    ctkDICOMModel* m_LocalModel;
     ctkDICOMIndexer* m_LocalIndexer;
     Ui::QmitkDicomLocalStorageWidgetControls* m_Controls;
 };

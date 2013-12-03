@@ -17,31 +17,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkDicomEditor_h
 #define QmitkDicomEditor_h
 
+// Blueberry
+#include <berryIPartListener.h>
 #include <berryISelectionListener.h>
 #include <berryQtEditorPart.h>
-#include <berryIPartListener.h>
 
-#include "ui_QmitkDicomEditorControls.h"
+// MITK
+#include "DicomEventHandler.h"
+#include "QmitkDicomDataEventPublisher.h"
 #include "QmitkDicomDirectoryListener.h"
 #include "QmitkStoreSCPLauncher.h"
 #include "QmitkStoreSCPLauncherBuilder.h"
-#include "DicomEventHandler.h"
-#include "QmitkDicomDataEventPublisher.h"
+#include "ui_QmitkDicomEditorControls.h"
+#include <org_mitk_gui_qt_dicom_Export.h>
 
+// Qt
 #include <QObject>
-#include <QTextEdit>
-#include <QModelIndex>
 #include <QString>
-#include <QMap>
-#include <QVariant>
 #include <QStringList>
 #include <QThread>
-#include <QProcess>
-#include <QStringList>
-#include <QLabel>
-#include <QProgressDialog>
-#include <ctkFileDialog.h>
-#include <org_mitk_gui_qt_dicom_Export.h>
+#include <QVariant>
 
 /**
 * \brief QmitkDicomEditor is an editor providing functionality for dicom storage and import and query retrieve functionality.
@@ -91,29 +86,14 @@ signals:
 
 protected slots:
 
-    /// \brief Called when import process changes.
-    void OnImportProgress(int progress);
-
     /// \brief Called when import is finished.
     void OnDicomImportFinished();
 
     /// \brief Called when Query Retrieve or Import Folder was clicked.
-    void OnQueryRetrieve();
-
-    /// \brief Called when LocalStorageButton was clicked.
-    void OnLocalStorage();
-
-    /// \brief Called when FolderCDButton was clicked.
-    void OnFolderCDImport();
-
-    /// \brief Called when ok on import dialog is clicked was clicked.
-    void OnFileSelected(QString);
+    void OnTabChanged(int);
 
     /// \brief Called when view button is clicked. Sends out an event for adding the current selected file to the mitkDataStorage.
     void OnViewButtonAddToDataManager(QHash<QString, QVariant> eventProperties);
-
-    /// \brief Called when cd or folder or query retrieve button is clicked or SignalChangePage is emitted.
-    void OnChangePage(int);
 
     /// \brief Called when status of dicom storage provider changes.
     void OnStoreSCPStatusChanged(const QString& status);
@@ -141,11 +121,6 @@ protected:
     /// \brief StartDicomDirectoryListener starts dicom directory listener.
     void StartDicomDirectoryListener();
 
-    /// \brief SetupProgressDialog Sets up progress dialog.
-    void SetupProgressDialog(QWidget* parent);
-
-    /// \brief SetupImportDialog Sets up import dialog.
-    void SetupImportDialog();
 
    /**
     * \brief CreateQtPartControl(QWidget *parent) sets the view objects from ui_QmitkDicomeditorControls.h.
@@ -160,8 +135,6 @@ protected:
     Events::Types GetPartEventTypes() const;
 
     ctkFileDialog* m_ImportDialog;
-    QProgressDialog* m_ProgressDialog;
-    QLabel* m_ProgressDialogLabel;
     Ui::QmitkDicomEditorControls m_Controls;
     QThread m_Thread;
     QmitkDicomDirectoryListener* m_DicomDirectoryListener;
@@ -172,7 +145,6 @@ protected:
     QString m_PluginDirectory;
     QString m_TempDirectory;
     QString m_DatabaseDirectory;
-
 };
 
 #endif // QmitkDicomEditor_h

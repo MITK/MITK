@@ -5,8 +5,11 @@ SET(CPP_FILES
   mitkKinect2Controller.cpp
   mitkKinect2Activator.cpp
 )
+SET(H_FILES
+  stdafx.h
+)
 set(RESOURCE_FILES
-  #CalibrationFiles/Kinect_IR_camera.xml
+  #CalibrationFiles/Default_Parameters.xml
   #CalibrationFiles/Kinect_RGB_camera.xml
 )
 

@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkKinect2Controller.h"
+#include <Kinect.h>
+#include "stdafx.h"
 
 namespace mitk
 {
@@ -29,7 +31,9 @@ public:
   //  xn::DepthGenerator m_DepthGenerator; ///< Depth generator to access depth image of kinect
   //  xn::ImageGenerator m_ImageGenerator; ///< Image generator to access RGB image of kinect
   //  xn::IRGenerator m_IRGenerator; ///< IR generator to access IR image of kinect
-
+  // Depth reader
+  IDepthFrameReader* m_pDepthFrameReader;
+  IKinectSensor* m_pKinectSensor;
 
   bool m_ConnectionCheck; ///< check if camera is connected or not
 
@@ -40,10 +44,7 @@ public:
 };
 
 Kinect2Controller::Kinect2ControllerPrivate::Kinect2ControllerPrivate():
-  //  m_Context(NULL),
-  //  m_DepthGenerator(NULL),
-  //  m_ImageGenerator(NULL),
-  //  m_IRGenerator(NULL),
+  m_pKinectSensor(NULL),
   m_ConnectionCheck(false),
   m_UseIR(false),
   m_CaptureWidth(640),
@@ -78,86 +79,120 @@ Kinect2Controller::~Kinect2Controller()
 
 bool Kinect2Controller::OpenCameraConnection()
 {
-  //    if (!d->m_ConnectionCheck)
-  //    {
-  //      // Initialize the OpenNI status
-  //      d->m_ConnectionCheck = d->ErrorText(d->m_Context.Init());
-  //      if (!d->m_ConnectionCheck) return false;
-  //      // Create a depth generator and set its resolution
-  //      XnMapOutputMode DepthMode;
-  //      d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.Create(d->m_Context));
-  //      if (!d->m_ConnectionCheck) return false;
-  //      d->m_DepthGenerator.GetMapOutputMode(DepthMode);
-  //      DepthMode.nXRes = xn::Resolution((XnResolution)XN_RES_VGA).GetXResolution();
-  //      DepthMode.nYRes = xn::Resolution((XnResolution)XN_RES_VGA).GetYResolution();
-  //      d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.SetMapOutputMode(DepthMode));
-  //      if (!d->m_ConnectionCheck) return false;
+  HRESULT hr;
+  if (!d->m_ConnectionCheck)
+  {
+    hr = GetDefaultKinectSensor(&d->m_pKinectSensor);
+    MITK_INFO << "innen drin:" << hr;
 
-  //      if (d->m_UseIR)
-  //      {
-  //        // Create the IR generator and set its resolution
-  //        d->m_ConnectionCheck = d->ErrorText(d->m_IRGenerator.Create(d->m_Context));
-  //        if (!d->m_ConnectionCheck) return false;
-  //        XnMapOutputMode IRMode;
-  //        d->m_IRGenerator.GetMapOutputMode(IRMode);
-  //        IRMode.nXRes = XN_VGA_X_RES;
-  //        IRMode.nYRes = XN_VGA_Y_RES;
-  //        IRMode.nFPS = 30;
-  //        d->m_ConnectionCheck = d->ErrorText(d->m_IRGenerator.SetMapOutputMode(IRMode));
-  //        if (!d->m_ConnectionCheck) return false;
-  //      }
-  //      else
-  //      {
-  //        // Create an image generator and set its resolution
-  //        XnMapOutputMode ImageMode;
-  //        d->m_ConnectionCheck = d->ErrorText(d->m_ImageGenerator.Create(d->m_Context));
-  //        if (!d->m_ConnectionCheck) return false;
-  //        d->m_ImageGenerator.GetMapOutputMode(ImageMode);
-  //        ImageMode.nXRes = xn::Resolution((XnResolution)XN_RES_VGA).GetXResolution();
-  //        ImageMode.nYRes = xn::Resolution((XnResolution)XN_RES_VGA).GetYResolution();
-  //        d->m_ConnectionCheck = d->ErrorText(d->m_ImageGenerator.SetMapOutputMode(ImageMode));
-  //        if (!d->m_ConnectionCheck) return false;
-  //      }
+    if (FAILED(hr))
+    {
+      d->m_ConnectionCheck = false;
+    }
 
-  //      // Camera registration
-  //      if ( d->m_DepthGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
-  //      {
-  //        if (d->m_UseIR)
-  //        {
-  //          d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_IRGenerator));
-  //          //if (!d->m_ConnectionCheck) return false;
-  //        }
-  //        else
-  //        {
-  //          d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_ImageGenerator));
-  //          //if (!d->m_ConnectionCheck) return false;
-  //        }
-  //      }
-  //      else
-  //      {
-  //        std::cout << "Alternative view point not supported by the depth generator..." << std::endl;
-  //      }
-  //      if (d->m_UseIR)
-  //      {
-  //        if ( d->m_IRGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
-  //        {
-  //          d->m_ConnectionCheck = d->ErrorText(d->m_IRGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_DepthGenerator));
-  //          //if (!d->m_ConnectionCheck) return false;
-  //        }
-  //        else
-  //        {
-  //          std::cout << "Alternative view point not supported by the depth generator..." << std::endl;
-  //        }
-  //      }
+    if (d->m_pKinectSensor)
+    {
+      // Initialize the Kinect and get the depth reader
+      IDepthFrameSource* pDepthFrameSource = NULL;
 
-  //      // Start data generation
-  //      d->m_ConnectionCheck = d->ErrorText(d->m_Context.StartGeneratingAll());
-  //      if (!d->m_ConnectionCheck) return false;
+      hr = d->m_pKinectSensor->Open();
 
-  ////      // Update the connected flag
-  ////      d->m_ConnectionCheck = true;
-  //    }
-  //    return d->m_ConnectionCheck;
+      if (SUCCEEDED(hr))
+      {
+        hr = d->m_pKinectSensor->get_DepthFrameSource(&pDepthFrameSource);
+      }
+
+      if (SUCCEEDED(hr))
+      {
+        hr = pDepthFrameSource->OpenReader(&d->m_pDepthFrameReader);
+      }
+
+      SafeRelease(pDepthFrameSource);
+    }
+
+    if (!d->m_pKinectSensor || FAILED(hr))
+    {
+      d->m_ConnectionCheck = false;
+      MITK_INFO << "No Kinect 2 ready!";
+    }
+
+    //      // Initialize the OpenNI status
+    //      d->m_ConnectionCheck = d->ErrorText(d->m_Context.Init());
+    //      // Create a depth generator and set its resolution
+    //      XnMapOutputMode DepthMode;
+    //      d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.Create(d->m_Context));
+    //      if (!d->m_ConnectionCheck) return false;
+    //      d->m_DepthGenerator.GetMapOutputMode(DepthMode);
+    //      DepthMode.nXRes = xn::Resolution((XnResolution)XN_RES_VGA).GetXResolution();
+    //      DepthMode.nYRes = xn::Resolution((XnResolution)XN_RES_VGA).GetYResolution();
+    //      d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.SetMapOutputMode(DepthMode));
+    //      if (!d->m_ConnectionCheck) return false;
+
+    //      if (d->m_UseIR)
+    //      {
+    //        // Create the IR generator and set its resolution
+    //        d->m_ConnectionCheck = d->ErrorText(d->m_IRGenerator.Create(d->m_Context));
+    //        if (!d->m_ConnectionCheck) return false;
+    //        XnMapOutputMode IRMode;
+    //        d->m_IRGenerator.GetMapOutputMode(IRMode);
+    //        IRMode.nXRes = XN_VGA_X_RES;
+    //        IRMode.nYRes = XN_VGA_Y_RES;
+    //        IRMode.nFPS = 30;
+    //        d->m_ConnectionCheck = d->ErrorText(d->m_IRGenerator.SetMapOutputMode(IRMode));
+    //        if (!d->m_ConnectionCheck) return false;
+    //      }
+    //      else
+    //      {
+    //        // Create an image generator and set its resolution
+    //        XnMapOutputMode ImageMode;
+    //        d->m_ConnectionCheck = d->ErrorText(d->m_ImageGenerator.Create(d->m_Context));
+    //        if (!d->m_ConnectionCheck) return false;
+    //        d->m_ImageGenerator.GetMapOutputMode(ImageMode);
+    //        ImageMode.nXRes = xn::Resolution((XnResolution)XN_RES_VGA).GetXResolution();
+    //        ImageMode.nYRes = xn::Resolution((XnResolution)XN_RES_VGA).GetYResolution();
+    //        d->m_ConnectionCheck = d->ErrorText(d->m_ImageGenerator.SetMapOutputMode(ImageMode));
+    //        if (!d->m_ConnectionCheck) return false;
+    //      }
+
+    //      // Camera registration
+    //      if ( d->m_DepthGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
+    //      {
+    //        if (d->m_UseIR)
+    //        {
+    //          d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_IRGenerator));
+    //          //if (!d->m_ConnectionCheck) return false;
+    //        }
+    //        else
+    //        {
+    //          d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_ImageGenerator));
+    //          //if (!d->m_ConnectionCheck) return false;
+    //        }
+    //      }
+    //      else
+    //      {
+    //        std::cout << "Alternative view point not supported by the depth generator..." << std::endl;
+    //      }
+    //      if (d->m_UseIR)
+    //      {
+    //        if ( d->m_IRGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
+    //        {
+    //          d->m_ConnectionCheck = d->ErrorText(d->m_IRGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_DepthGenerator));
+    //          //if (!d->m_ConnectionCheck) return false;
+    //        }
+    //        else
+    //        {
+    //          std::cout << "Alternative view point not supported by the depth generator..." << std::endl;
+    //        }
+    //      }
+
+    //      // Start data generation
+    //      d->m_ConnectionCheck = d->ErrorText(d->m_Context.StartGeneratingAll());
+    //      if (!d->m_ConnectionCheck) return false;
+
+    ////      // Update the connected flag
+    d->m_ConnectionCheck = true;
+  }
+  return d->m_ConnectionCheck;
 }
 
 bool Kinect2Controller::CloseCameraConnection()
@@ -175,6 +210,69 @@ bool Kinect2Controller::UpdateCamera()
   //    d->m_CaptureWidth = DepthMD.XRes();
   //    d->m_CaptureHeight = DepthMD.YRes();
   //    return updateSuccessful;
+      if (!d->m_pDepthFrameReader)
+    {
+        return false;
+    }
+
+    IDepthFrame* pDepthFrame = NULL;
+
+    HRESULT hr = d->m_pDepthFrameReader->AcquireLatestFrame(&pDepthFrame);
+
+    if (SUCCEEDED(hr))
+    {
+        INT64 nTime = 0;
+        IFrameDescription* pFrameDescription = NULL;
+        int nWidth = 0;
+        int nHeight = 0;
+        USHORT nDepthMinReliableDistance = 0;
+        USHORT nDepthMaxReliableDistance = 0;
+        UINT nBufferSize = 0;
+        UINT16 *pBuffer = NULL;
+
+        hr = pDepthFrame->get_RelativeTime(&nTime);
+
+        if (SUCCEEDED(hr))
+        {
+            hr = pDepthFrame->get_FrameDescription(&pFrameDescription);
+        }
+
+        if (SUCCEEDED(hr))
+        {
+            hr = pFrameDescription->get_Width(&nWidth);
+        }
+
+        if (SUCCEEDED(hr))
+        {
+            hr = pFrameDescription->get_Height(&nHeight);
+        }
+
+        if (SUCCEEDED(hr))
+        {
+            hr = pDepthFrame->get_DepthMinReliableDistance(&nDepthMinReliableDistance);
+        }
+
+        if (SUCCEEDED(hr))
+        {
+            hr = pDepthFrame->get_DepthMaxReliableDistance(&nDepthMaxReliableDistance);
+        }
+
+        if (SUCCEEDED(hr))
+        {
+            hr = pDepthFrame->AccessUnderlyingBuffer(&nBufferSize, &pBuffer);
+        }
+
+        if (SUCCEEDED(hr))
+        {
+            //ProcessDepth(nTime, pBuffer, nWidth, nHeight, nDepthMinReliableDistance, nDepthMaxReliableDistance);
+        }
+
+        SafeRelease(pFrameDescription);
+    }
+
+    SafeRelease(pDepthFrame);
+
+
   return true;
 }
 

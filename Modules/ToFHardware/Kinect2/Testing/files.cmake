@@ -1,2 +1,3 @@
-set(MODULE_TESTSs
+set(MODULE_TESTS
+  mitkKinect2ControllerTest.cpp
 )

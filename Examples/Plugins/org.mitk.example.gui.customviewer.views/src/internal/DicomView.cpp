@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 #include <berryIWorkbenchPage.h>
 
+#include "QDockWidget"
+
 const std::string DicomView::VIEW_ID = "org.mitk.customviewer.views.dicomview";
 
 DicomView::DicomView()

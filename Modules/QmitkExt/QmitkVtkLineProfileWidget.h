@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \brief Widget for displaying intensity profiles of images along a given
  * path
  */
-class QmitkExt_EXPORT QmitkVtkLineProfileWidget : public QDialog
+class DEPRECATED() QmitkExt_EXPORT QmitkVtkLineProfileWidget : public QDialog
 {
   Q_OBJECT
 

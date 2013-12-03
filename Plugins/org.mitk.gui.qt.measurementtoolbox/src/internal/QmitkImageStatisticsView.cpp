@@ -76,7 +76,6 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 
     m_Controls->m_ErrorMessageLabel->hide();
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-    m_Controls->m_LineProfileWidget->SetPathModeToPlanarFigure();
   }
 }
 

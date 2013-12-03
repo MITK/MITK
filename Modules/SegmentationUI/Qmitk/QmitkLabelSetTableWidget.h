@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "SegmentationUIExports.h"
 
-#include "mitkLabelSet.h"
+//#include "mitkLabelSet.h"
 #include "mitkLabelSetImage.h"
 #include "mitkColorSequenceRainbow.h"
 

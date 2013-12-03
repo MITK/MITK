@@ -48,7 +48,6 @@ m_ColorSequenceRainbow(mitk::ColorSequenceRainbow::New())
   m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   assert(m_ToolManager);
 
-  // react whenever the set of selected segmentation changes
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkLabelSetTableWidget>( this, &QmitkLabelSetTableWidget::OnToolManagerWorkingDataModified );
 
   this->Initialize();
@@ -69,6 +68,9 @@ QmitkLabelSetTableWidget::~QmitkLabelSetTableWidget()
 
     m_LabelSetImage->ModifyLabelEvent.RemoveListener( mitk::MessageDelegate1<QmitkLabelSetTableWidget
       , int>( this, &QmitkLabelSetTableWidget::LabelModified ) );
+
+    m_LabelSetImage->ActiveLabelEvent.RemoveListener( mitk::MessageDelegate1<QmitkLabelSetTableWidget
+      , int>( this, &QmitkLabelSetTableWidget::ActiveLabelChanged ) );
 
     m_LabelSetImage->AllLabelsModifiedEvent.RemoveListener( mitk::MessageDelegate<QmitkLabelSetTableWidget>(
         this, &QmitkLabelSetTableWidget::AllLabelsModified ) );

@@ -83,6 +83,13 @@ namespace mitk
     */
     DataObjectPointerArraySizeType GetInputIndex(std::string navDataName);
 
+  /**
+  *\brief Connects the input of this filter to the outputs of the given NavigationDataSource
+  *
+  * E.g. calling Filter2->ConnectTo(Filter1) will result in a Pipeline where NavigationData flows from Filter1 to Filter2.
+  */
+  virtual void ConnectTo(mitk::NavigationDataSource::Pointer UpstreamFilter);
+
   protected:
     NavigationDataToNavigationDataFilter();
     virtual ~NavigationDataToNavigationDataFilter();

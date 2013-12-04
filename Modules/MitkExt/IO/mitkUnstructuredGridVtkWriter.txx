@@ -89,13 +89,13 @@ void UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
         filename <<  m_FileName.c_str() << "_T" << t << GetDefaultExtension();
       }
       geometry->TransferItkToVtkTransform();
-      transformPointSet->SetInput(input->GetVtkUnstructuredGrid(t));
+      transformPointSet->SetInputData(input->GetVtkUnstructuredGrid(t));
       transformPointSet->SetTransform(geometry->GetVtkTransform());
       transformPointSet->UpdateWholeExtent();
       unstructuredGrid = static_cast<vtkUnstructuredGrid*>(transformPointSet->GetOutput());
 
       unstructuredGridWriter->SetFileName(filename.str().c_str());
-      unstructuredGridWriter->SetInput(unstructuredGrid);
+      unstructuredGridWriter->SetInputData(unstructuredGrid);
 
       ExecuteWrite( unstructuredGridWriter );
     }
@@ -104,13 +104,13 @@ void UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
   {
     geometry = input->GetGeometry();
     geometry->TransferItkToVtkTransform();
-    transformPointSet->SetInput(input->GetVtkUnstructuredGrid());
+    transformPointSet->SetInputData(input->GetVtkUnstructuredGrid());
     transformPointSet->SetTransform(geometry->GetVtkTransform());
     transformPointSet->UpdateWholeExtent();
     unstructuredGrid = static_cast<vtkUnstructuredGrid*>(transformPointSet->GetOutput());
 
     unstructuredGridWriter->SetFileName(m_FileName.c_str());
-    unstructuredGridWriter->SetInput(unstructuredGrid);
+    unstructuredGridWriter->SetInputData(unstructuredGrid);
 
     ExecuteWrite( unstructuredGridWriter );
   }

@@ -67,7 +67,7 @@ void mitk::PointLocator::SetPoints( vtkPointSet* pointSet )
   m_IndexToPointIdContainer.resize( size );
   for( vtkIdType i = 0; (unsigned)i < size; ++i )
   {
-    vtkFloatingPointType* currentPoint = points->GetPoint( i );
+    double* currentPoint = points->GetPoint( i );
     (m_ANNDataPoints[i])[0] = currentPoint[0];
     (m_ANNDataPoints[i])[1] = currentPoint[1];
     (m_ANNDataPoints[i])[2] = currentPoint[2];
@@ -161,7 +161,7 @@ void mitk::PointLocator::SetPoints( ITKPointSet* pointSet )
 
 
 
-mitk::PointLocator::IdType mitk::PointLocator::FindClosestPoint( const vtkFloatingPointType point[3] )
+mitk::PointLocator::IdType mitk::PointLocator::FindClosestPoint( const double point[3] )
 {
   m_ANNQueryPoint[0] = point[0];
   m_ANNQueryPoint[1] = point[1];
@@ -171,7 +171,7 @@ mitk::PointLocator::IdType mitk::PointLocator::FindClosestPoint( const vtkFloati
 
 
 
-mitk::PointLocator::IdType mitk::PointLocator::FindClosestPoint( vtkFloatingPointType x, vtkFloatingPointType y, vtkFloatingPointType z )
+mitk::PointLocator::IdType mitk::PointLocator::FindClosestPoint( double x, double y, double z )
 {
   m_ANNQueryPoint[0] = x;
   m_ANNQueryPoint[1] = y;

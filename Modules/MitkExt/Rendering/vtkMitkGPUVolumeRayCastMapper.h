@@ -53,7 +53,7 @@ class MitkExt_EXPORT vtkMitkGPUVolumeRayCastMapper : public vtkVolumeMapper
 {
 public:
   static vtkMitkGPUVolumeRayCastMapper *New();
-  vtkTypeRevisionMacro(vtkMitkGPUVolumeRayCastMapper,vtkVolumeMapper);
+  vtkTypeMacro(vtkMitkGPUVolumeRayCastMapper,vtkVolumeMapper);
   void PrintSelf( ostream& os, vtkIndent indent );
 
   // Description:

@@ -567,7 +567,7 @@ void mitk::FiberBundleX::GenerateFiberIds()
         return;
 
     vtkSmartPointer<vtkIdFilter> idFiberFilter = vtkSmartPointer<vtkIdFilter>::New();
-    idFiberFilter->SetInput(m_FiberPolyData);
+    idFiberFilter->SetInputData(m_FiberPolyData);
     idFiberFilter->CellIdsOn();
     //  idFiberFilter->PointIdsOn(); // point id's are not needed
     idFiberFilter->SetIdsArrayName(FIBER_ID_ARRAY);
@@ -911,16 +911,17 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
         /* get all points/fibers cutting the plane */
         MITK_DEBUG << "start clipping";
         vtkSmartPointer<vtkClipPolyData> clipper = vtkSmartPointer<vtkClipPolyData>::New();
-        clipper->SetInput(m_FiberIdDataSet);
+        clipper->SetInputData(m_FiberIdDataSet);
         clipper->SetClipFunction(plane);
         clipper->GenerateClipScalarsOn();
         clipper->GenerateClippedOutputOn();
+        clipper->Update();
         vtkSmartPointer<vtkPolyData> clipperout = clipper->GetClippedOutput();
         MITK_DEBUG << "end clipping";
 
         MITK_DEBUG << "init and update clipperoutput";
-        clipperout->GetPointData()->Initialize();
-        clipperout->Update();
+//        clipperout->GetPointData()->Initialize();
+//        clipperout->Update(); //VTK6_TODO
         MITK_DEBUG << "init and update clipperoutput completed";
 
         MITK_DEBUG << "STEP 1: find all points which have distance 0 to the given plane";
@@ -1087,7 +1088,7 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
 void mitk::FiberBundleX::UpdateFiberGeometry()
 {
     vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
-    cleaner->SetInput(m_FiberPolyData);
+    cleaner->SetInputData(m_FiberPolyData);
     cleaner->PointMergingOff();
     cleaner->Update();
     m_FiberPolyData = cleaner->GetOutput();

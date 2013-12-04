@@ -46,7 +46,7 @@ public:
     mitkClassMacro( VectorImageMapper2D, GLMapper );
 
     itkNewMacro( Self );
-    typedef vtkFloatingPointType vtkScalarType;
+    typedef double vtkScalarType;
 
     /**
      * @returns the image held by the associated with the mapper or the image
@@ -68,7 +68,7 @@ public:
      */
     itkGetConstObjectMacro( Image, mitk::Image );
 
-    virtual void PaintCells( vtkPolyData* contour, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform* vtktransform, BaseRenderer* renderer, vtkScalarsToColors *lut, mitk::Color color, float lwidth, vtkFloatingPointType *spacing );
+    virtual void PaintCells( vtkPolyData* contour, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform* vtktransform, BaseRenderer* renderer, vtkScalarsToColors *lut, mitk::Color color, float lwidth, double *spacing );
 
 protected:
 

@@ -38,7 +38,7 @@ mitk::LabeledImageLookupTable::LabeledImageLookupTable()
 
   // initialize the remaining 255 colors with random values and
   // an alpha value of 1.0
-  vtkFloatingPointType r, g, b;
+  double r, g, b;
 
   //
   // Initialize the random number generator with an arbitrary seed.
@@ -81,7 +81,7 @@ mitk::LabeledImageLookupTable::~LabeledImageLookupTable()
  * @param b The blue component of the rgba color value. Values sould be given in the range [0,1]
  * @param a The alpha component of the rgba color value. Values sould be given in the range [0,1]. Default is 1.
  */
-void mitk::LabeledImageLookupTable::SetColorForLabel ( const mitk::LabeledImageLookupTable::LabelType& label, const vtkFloatingPointType& r, const vtkFloatingPointType& g, const vtkFloatingPointType& b, const vtkFloatingPointType a )
+void mitk::LabeledImageLookupTable::SetColorForLabel ( const mitk::LabeledImageLookupTable::LabelType& label, const double& r, const double& g, const double& b, const double a )
 {
   if ( m_LookupTable == NULL )
   {
@@ -99,7 +99,7 @@ void mitk::LabeledImageLookupTable::SetColorForLabel ( const mitk::LabeledImageL
  * @returns an rgba array containing the color information for the given label
  *          Color components are expressed as [0,1] double values.
  */
-vtkFloatingPointType* mitk::LabeledImageLookupTable::GetColorForLabel ( const mitk::LabeledImageLookupTable::LabelType& label )
+double* mitk::LabeledImageLookupTable::GetColorForLabel ( const mitk::LabeledImageLookupTable::LabelType& label )
 {
   if ( m_LookupTable == NULL )
   {
@@ -114,7 +114,7 @@ vtkFloatingPointType* mitk::LabeledImageLookupTable::GetColorForLabel ( const mi
  * Generates a random rgb color value. Values for rgb are in the range
  * [0,1]
  */
-void mitk::LabeledImageLookupTable::GenerateRandomColor ( vtkFloatingPointType& r, vtkFloatingPointType& g, vtkFloatingPointType& b )
+void mitk::LabeledImageLookupTable::GenerateRandomColor ( double& r, double& g, double& b )
 {
   r = GenerateRandomNumber();
   g = GenerateRandomNumber();
@@ -126,9 +126,9 @@ void mitk::LabeledImageLookupTable::GenerateRandomColor ( vtkFloatingPointType& 
  * Generates a radnom number drawn from a uniform
  * distribution in the range [0,1].
  */
-vtkFloatingPointType mitk::LabeledImageLookupTable::GenerateRandomNumber()
+double mitk::LabeledImageLookupTable::GenerateRandomNumber()
 {
-  return ( ( ( vtkFloatingPointType ) ( std::rand( ) ) ) / ( ( vtkFloatingPointType ) ( RAND_MAX ) ) );
+  return ( ( ( double ) ( std::rand( ) ) ) / ( ( double ) ( RAND_MAX ) ) );
 }
 
 itk::LightObject::Pointer mitk::LabeledImageLookupTable::InternalClone() const

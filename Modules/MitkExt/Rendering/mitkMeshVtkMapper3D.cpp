@@ -124,7 +124,7 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* rendere
     int j;
 
     float floatRgba[4] = {1.0f,1.0f,1.0f,1.0f};
-    vtkFloatingPointType doubleRgba[4]={1.0f,1.0f,1.0f,1.0f};
+    double doubleRgba[4]={1.0f,1.0f,1.0f,1.0f};
     mitk::Color tmpColor;
 
     // check for color prop and use it for rendering if it exists
@@ -158,12 +158,12 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* rendere
         sphere->SetRadius(pointSize);
         sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
 
-        m_Spheres->AddInput(sphere->GetOutput());
+        m_Spheres->AddInputConnection(sphere->GetOutputPort());
         sphere->Delete();
       }
 
       // setup mapper, actor and add to assembly
-      m_SpheresMapper->SetInput(m_Spheres->GetOutput());
+      m_SpheresMapper->SetInputConnection(m_Spheres->GetOutputPort());
       m_SpheresActor->GetProperty()->SetColor(doubleRgba);
       m_PropAssembly->AddPart(m_SpheresActor);
     }
@@ -180,7 +180,7 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* rendere
       if(m_Contour->GetNumberOfCells()>0)
       {
         // setup mapper, actor and add to assembly
-        m_ContourMapper->SetInput(m_Contour);
+        m_ContourMapper->SetInputData(m_Contour);
         bool wireframe=true;
         GetDataNode()->GetVisibility(wireframe, NULL, "wireframe");
         if(wireframe)

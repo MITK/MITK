@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkPolyDataMapper.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkUnstructuredGridMapper, "$Revision$");
 vtkStandardNewMacro(vtkUnstructuredGridMapper);
 
 //----------------------------------------------------------------------------
@@ -59,12 +58,12 @@ void vtkUnstructuredGridMapper::SetInput(vtkUnstructuredGrid *input)
 {
   if(input)
     {
-    this->SetInputConnection(0, input->GetProducerPort());
+    this->SetInput(input);
     }
   else
     {
     // Setting a NULL input removes the connection.
-    this->SetInputConnection(0, 0);
+    this->SetInput(0);
     }
 }
 
@@ -121,7 +120,7 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
     {
     vtkGeometryFilter *gf = vtkGeometryFilter::New();
     vtkPolyDataMapper *pm = vtkPolyDataMapper::New();
-    pm->SetInput(gf->GetOutput());
+    pm->SetInputConnection(gf->GetOutputPort());
 
     this->GeometryExtractor = gf;
     this->PolyDataMapper = pm;
@@ -146,8 +145,8 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
     this->GeometryExtractor->ExtentClippingOff();
   }
 
-  this->GeometryExtractor->SetInput(this->GetInput());
-  this->PolyDataMapper->SetInput(this->GeometryExtractor->GetOutput());
+  this->GeometryExtractor->SetInputData(this->GetInput());
+  this->PolyDataMapper->SetInputConnection(this->GeometryExtractor->GetOutputPort());
 
   // update ourselves in case something has changed
   this->PolyDataMapper->SetLookupTable(this->GetLookupTable());

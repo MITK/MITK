@@ -192,7 +192,7 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset( )
     emit SignalUpdateCanvas();
 
     /*
-    vtkFloatingPointType* dp = tf->GetScalarOpacityFunction()->GetDataPointer();
+    double* dp = tf->GetScalarOpacityFunction()->GetDataPointer();
     for (int i = 0; i < tf->GetScalarOpacityFunction()->GetSize(); i++)
     {
       MITK_INFO << "x: " << dp[i * 2] << " y: " << dp[i * 2 + 1];

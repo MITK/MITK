@@ -104,8 +104,8 @@ if( (NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_
   AND (${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.10.1 ))
   set(CPP_FILES
     ${CPP_FILES}
-    QmitkVtkHistogramWidget.cpp
-    QmitkVtkLineProfileWidget.cpp
+    #QmitkVtkHistogramWidget.cpp
+    #QmitkVtkLineProfileWidget.cpp //VTK6_TODO
   )
 endif()
 
@@ -191,8 +191,8 @@ if( (NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_
   AND (${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.10.1 ))
   set(MOC_H_FILES
     ${MOC_H_FILES}
-    QmitkVtkHistogramWidget.h
-    QmitkVtkLineProfileWidget.h
+    #QmitkVtkHistogramWidget.h
+    #QmitkVtkLineProfileWidget.h //VTK6_TODO
   )
 else()
   message("QmitkVtkHistogramWidget and QmitkVtkLineProfileWidget won't be build. Use Vtk version 5.10.0 if you need this classes.")

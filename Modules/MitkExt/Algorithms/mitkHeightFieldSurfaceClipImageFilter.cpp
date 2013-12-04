@@ -196,7 +196,7 @@ namespace mitk
 
     // Get bounds of clipping data
     clippingPolyData->ComputeBounds();
-    vtkFloatingPointType *bounds = clippingPolyData->GetBounds();
+    double *bounds = clippingPolyData->GetBounds();
 
     double xWidth = bounds[1] - bounds[0];
     double yWidth = bounds[3] - bounds[2];
@@ -221,7 +221,7 @@ namespace mitk
     {
       for ( unsigned int x = 0; x < m_HeightFieldResolutionX; ++x )
       {
-        vtkFloatingPointType p0[3], p1[3], surfacePoint[3], pcoords[3];
+        double p0[3], p1[3], surfacePoint[3], pcoords[3];
         p0[0] = bounds[0] + xWidth * x / (double) m_HeightFieldResolutionX;
         p0[1] = bounds[2] + yWidth * y / (double) m_HeightFieldResolutionY;
         p0[2] = -m_MaxHeight;

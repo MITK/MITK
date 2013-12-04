@@ -84,12 +84,12 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
 
   if ( m_GenerateNormals )
   {
-    ls->m_VtkPolyDataNormals->SetInput( polydata );
-    ls->m_VtkPolyDataMapper->SetInput( ls->m_VtkPolyDataNormals->GetOutput() );
+    ls->m_VtkPolyDataNormals->SetInputData( polydata );
+    ls->m_VtkPolyDataMapper->SetInputConnection( ls->m_VtkPolyDataNormals->GetOutputPort() );
   }
   else
   {
-    ls->m_VtkPolyDataMapper->SetInput( polydata );
+    ls->m_VtkPolyDataMapper->SetInputData( polydata );
   }
 
   //
@@ -320,12 +320,13 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
             sliceselector->SetTimeNr(0);
             sliceselector->SetInput(miktTexture);
             sliceselector->Update();
-            vtkTxture->SetInput(sliceselector->GetOutput()->GetVtkImageData());
+            vtkTxture->SetInputData(sliceselector->GetOutput()->GetVtkImageData());
         }
         else //or just use the 2D image
         {
-            vtkTxture->SetInput(miktTexture->GetVtkImageData());
+            vtkTxture->SetInputData(miktTexture->GetVtkImageData());
         }
+        vtkTxture->Update();
         //pass the texture to the actor
         ls->m_Actor->SetTexture(vtkTxture);
         if(ls->m_VtkPolyDataMapper->GetInput()->GetPointData()->GetTCoords() == NULL)

@@ -45,44 +45,44 @@ public:
     m_Histogram = histogram;
   }
 
-  vtkFloatingPointType GetMin()
+  double GetMin()
   {
     return m_Min;
   }
 
-  void SetMin(vtkFloatingPointType min)
+  void SetMin(double min)
   {
     this->m_Min = min;
     SetLower(min);
   }
 
-  vtkFloatingPointType GetMax()
+  double GetMax()
   {
     return m_Max;
   }
 
-  void SetMax(vtkFloatingPointType max)
+  void SetMax(double max)
   {
     this->m_Max = max;
     SetUpper(max);
   }
 
-  vtkFloatingPointType GetLower()
+  double GetLower()
   {
     return m_Lower;
   }
 
-  void SetLower(vtkFloatingPointType lower)
+  void SetLower(double lower)
   {
     this->m_Lower = lower;
   }
 
-  vtkFloatingPointType GetUpper()
+  double GetUpper()
   {
     return m_Upper;
   }
 
-  void SetUpper(vtkFloatingPointType upper)
+  void SetUpper(double upper)
   {
     this->m_Upper = upper;
   }
@@ -99,18 +99,18 @@ public:
   void PaintHistogram(QPainter &p);
 
   virtual int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32) = 0;
-  virtual void AddFunctionPoint(vtkFloatingPointType x,vtkFloatingPointType val) = 0;
-  virtual void RemoveFunctionPoint(vtkFloatingPointType x) = 0;
-  virtual void MoveFunctionPoint(int index, std::pair<vtkFloatingPointType,vtkFloatingPointType> pos) = 0;
-  virtual vtkFloatingPointType GetFunctionX(int index) = 0;
+  virtual void AddFunctionPoint(double x,double val) = 0;
+  virtual void RemoveFunctionPoint(double x) = 0;
+  virtual void MoveFunctionPoint(int index, std::pair<double,double> pos) = 0;
+  virtual double GetFunctionX(int index) = 0;
   virtual float GetFunctionY(int index) = 0;
   virtual int GetFunctionSize() = 0;
   int m_GrabbedHandle;
 
   double m_Lower, m_Upper, m_Min, m_Max;
 
-  std::pair<int,int> FunctionToCanvas(std::pair<vtkFloatingPointType,vtkFloatingPointType>);
-  std::pair<vtkFloatingPointType,vtkFloatingPointType> CanvasToFunction(std::pair<int,int>);
+  std::pair<int,int> FunctionToCanvas(std::pair<double,double>);
+  std::pair<double,double> CanvasToFunction(std::pair<int,int>);
 
 
   mitk::SimpleHistogram *m_Histogram;
@@ -119,7 +119,7 @@ public:
 
   void SetImmediateUpdate(bool state);
 
-  static std::pair<vtkFloatingPointType,vtkFloatingPointType> ValidateCoord( std::pair<vtkFloatingPointType,vtkFloatingPointType> x )
+  static std::pair<double,double> ValidateCoord( std::pair<double,double> x )
   {
     if( x.first < -2048 ) x.first = -2048;
     if( x.first >  2048 ) x.first =  2048;

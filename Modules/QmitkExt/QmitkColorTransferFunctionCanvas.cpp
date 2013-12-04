@@ -50,7 +50,7 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
   {
     for (int x = contentsRect.x(); x < contentsRect.x() + contentsRect.width(); x++)
     {
-      vtkFloatingPointType xVal = m_Min + ((float) x) / contentsRect.width() * (m_Max
+      double xVal = m_Min + ((float) x) / contentsRect.width() * (m_Max
           - m_Min);
       QColor col((int) (m_ColorTransferFunction->GetRedValue(xVal) * 255),
           (int) (m_ColorTransferFunction->GetGreenValue(xVal) * 255),
@@ -129,7 +129,7 @@ int QmitkColorTransferFunctionCanvas::GetNearHandle(int x, int /*y*/,
   for (int i = 0; i < this->GetFunctionSize(); i++)
   {
     std::pair<int,int> point = this->FunctionToCanvas(std::make_pair(
-        GetFunctionX(i), (vtkFloatingPointType) 0.0));
+        GetFunctionX(i), (double) 0.0));
     if ((unsigned int) ((point.first - x) * (point.first - x))
         < maxSquaredDistance)
     {
@@ -141,7 +141,7 @@ int QmitkColorTransferFunctionCanvas::GetNearHandle(int x, int /*y*/,
 
 void QmitkColorTransferFunctionCanvas::DoubleClickOnHandle(int handle)
 {
-  vtkFloatingPointType xVal = GetFunctionX(handle);
+  double xVal = GetFunctionX(handle);
   QColor col((int) (m_ColorTransferFunction->GetRedValue(xVal) * 255),
       (int) (m_ColorTransferFunction->GetGreenValue(xVal) * 255),
       (int) (m_ColorTransferFunction->GetBlueValue(xVal) * 255));
@@ -156,9 +156,9 @@ void QmitkColorTransferFunctionCanvas::DoubleClickOnHandle(int handle)
 }
 
 void QmitkColorTransferFunctionCanvas::MoveFunctionPoint(int index,
-    std::pair<vtkFloatingPointType,vtkFloatingPointType> pos)
+    std::pair<double,double> pos)
 {
-  vtkFloatingPointType color[3];
+  double color[3];
   m_ColorTransferFunction->GetColor(GetFunctionX(index), color);
   RemoveFunctionPoint( GetFunctionX(index));
   m_ColorTransferFunction->AddRGBPoint(pos.first, color[0], color[1], color[2]);

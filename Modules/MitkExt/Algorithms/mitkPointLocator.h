@@ -90,7 +90,7 @@ public:
    * @returns the id of the nearest neighbour of the given point. The id corresponds to the id
    * which is given in the original point set.
    */
-  IdType FindClosestPoint( const vtkFloatingPointType point[3] );
+  IdType FindClosestPoint( const double point[3] );
 
   /**
    * Finds the nearest neighbour in the point set previously defined by SetPoints().
@@ -103,7 +103,7 @@ public:
    * @returns the id of the nearest neighbour of the given point. The id corresponds to the id
    * which is given in the original point set.
    */
-  IdType FindClosestPoint( vtkFloatingPointType x, vtkFloatingPointType y, vtkFloatingPointType z );
+  IdType FindClosestPoint( double x, double y, double z );
 
   /**
    * Finds the nearest neighbour in the point set previously defined by SetPoints().

@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class DiffusionCore_EXPORT vtkOdfSource : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkOdfSource,vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkOdfSource,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   typedef itk::OrientationDistributionFunction<float, QBALL_ODFSIZE> OdfType;

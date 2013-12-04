@@ -109,7 +109,7 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
     mitk::Contour::PointsContainerPointer contourPoints = input->GetPoints();
     mitk::Contour::PointsContainerIterator pointsIt = contourPoints->Begin();
 
-    vtkFloatingPointType vtkpoint[3];
+    double vtkpoint[3];
 
     int i;
     float pointSize = 2;
@@ -140,7 +140,7 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
         sphere->SetRadius(pointSize);
         sphere->SetCenter(vtkpoint);
 
-        m_VtkPointList->AddInput(sphere->GetOutput());
+        m_VtkPointList->AddInputConnection(sphere->GetOutputPort());
         sphere->Update();
       }
     }
@@ -153,23 +153,22 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
 
     m_Contour->SetPoints(points);
     m_Contour->SetLines(lines);
-    m_Contour->Update();
 
-    m_TubeFilter->SetInput(m_Contour);
+    m_TubeFilter->SetInputData(m_Contour);
     m_TubeFilter->SetRadius(pointSize / 2.0f);
     m_TubeFilter->SetNumberOfSides(8);
     m_TubeFilter->Update();
 
     if ( showPoints )
     {
-      m_VtkPointList->AddInput(m_TubeFilter->GetOutput());
-      m_VtkPolyDataMapper->SetInput(m_VtkPointList->GetOutput());
+      m_VtkPointList->AddInputConnection(m_TubeFilter->GetOutputPort());
+      m_VtkPolyDataMapper->SetInputConnection(m_VtkPointList->GetOutputPort());
     }
     else
     {
-      m_VtkPolyDataMapper->SetInput(m_TubeFilter->GetOutput());
+      m_VtkPolyDataMapper->SetInputConnection(m_TubeFilter->GetOutputPort());
     }
-    vtkFloatingPointType rgba[4]={0.0f,1.0f,0.0f,0.6f};
+    double rgba[4]={0.0f,1.0f,0.0f,0.6f};
     m_Actor->GetProperty()->SetColor(rgba);
     m_Actor->SetMapper(m_VtkPolyDataMapper);
   }

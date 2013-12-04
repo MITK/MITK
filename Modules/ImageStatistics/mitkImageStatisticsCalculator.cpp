@@ -1448,10 +1448,8 @@ ImageStatisticsCalculator
       voxelPosition[dimension] = indexPoint[dimension];
     }
 
-    // TODO DM: regard all dimensions, including z! (former code used only x/y)
-    // TODO DM: generalize: not x, y, z but a for loop over dimension
-    // TODO DM: this could be done by calling a recursive method, handing over the "remaining number of dimensions to iterate"
-
+    // TODO think about 2D case
+    // TODO this could be done by calling a recursive method, handing over the "remaining number of dimensions to iterate"
     maskValue = 0.0;
     Vector3D subVoxelOffset; subVoxelOffset.Fill(0.0);
     // iterate sub-voxels by iterating all possible offsets
@@ -1467,10 +1465,9 @@ ImageStatisticsCalculator
             subVoxelOffset[2] < +0.5;
             subVoxelOffset[2] += subVoxelSize)
         {
-          subVoxelPosition = voxelPosition + subVoxelOffset; // TODO DM: this COULD be integrated into the for-loops if neccessary (add voxelPosition to initializer and end condition)
-          //if ( subVoxelPosition.EuclideanDistanceTo( convolutionMaskCenter ) < radiusInMM ) // TODO DM: this is too much matrix operations, we calculate ourselves, check if this time is relevant
-          //   maskValue += valueOfOneSubVoxel;
-         distanceSquared = (subVoxelPosition[0]-convolutionMaskCenter[0]) / spacing[0] * (subVoxelPosition[0]-convolutionMaskCenter[0]) / spacing[0]
+          subVoxelPosition = voxelPosition + subVoxelOffset; // this COULD be integrated into the for-loops if neccessary (add voxelPosition to initializer and end condition)
+         distanceSquared =
+              (subVoxelPosition[0]-convolutionMaskCenter[0]) / spacing[0] * (subVoxelPosition[0]-convolutionMaskCenter[0]) / spacing[0]
             + (subVoxelPosition[1]-convolutionMaskCenter[1]) / spacing[1] * (subVoxelPosition[1]-convolutionMaskCenter[1]) / spacing[1]
             + (subVoxelPosition[2]-convolutionMaskCenter[2]) / spacing[2] * (subVoxelPosition[2]-convolutionMaskCenter[2]) / spacing[2];
 

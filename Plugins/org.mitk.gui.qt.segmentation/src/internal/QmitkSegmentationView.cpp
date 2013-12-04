@@ -1036,10 +1036,10 @@ void QmitkSegmentationView::RenderingManagerReinitialized()
    * For further information see Bug 16063
    */
    mitk::DataNode* workingNode = m_Controls->segImageSelector->GetSelectedNode();
-   if (workingNode)
+   const mitk::Geometry3D* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
+   if (workingNode && worldGeo)
    {
       const mitk::Geometry3D* workingNodeGeo = workingNode->GetData()->GetGeometry();
-      const mitk::Geometry3D* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
       if (mitk::Equal(workingNodeGeo->GetBoundingBox(), worldGeo->GetBoundingBox(), mitk::eps, true))
       {
          this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), workingNode);

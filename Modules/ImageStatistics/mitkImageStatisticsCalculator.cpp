@@ -111,8 +111,8 @@ ImageStatisticsCalculator::Statistics::Statistics()
   m_Mean(0.0),
   Sigma(0.0),
   m_RMS(0.0),
-  m_MaxIndex(1,-1),      //TODO: Dimension anpassen
-  m_MinIndex(1,-1),      //TODO: Dimension anpassen
+  m_MaxIndex(0),
+  m_MinIndex(0),
   m_HotspotN(0),
   m_HotspotMin(0.0),
   m_HotspotMax(0.0),
@@ -120,9 +120,9 @@ ImageStatisticsCalculator::Statistics::Statistics()
   m_HotspotMean(0.0),
   m_HotspotSigma(0.0),
   m_HotspotRMS(0.0),
-  m_HotspotIndex(1,-1),    //TODO: Dimension anpassen
-  m_HotspotMaxIndex(1,-1), //TODO: Dimension anpassen
-  m_HotspotMinIndex(1,-1)  //TODO: Dimension anpassen
+  m_HotspotIndex(0),
+  m_HotspotMaxIndex(0),
+  m_HotspotMinIndex(0)
 {
 }
 
@@ -859,7 +859,6 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   HistogramContainer* histogramContainer )
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
-  typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
   typedef typename ImageType::IndexType IndexType;
 
   typedef itk::Statistics::ScalarImageToHistogramGenerator< ImageType >
@@ -921,8 +920,8 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
 
   for (unsigned int i=0; i<statistics.GetMaxIndex().size(); i++)
   {
-      tmpMaxIndex[i] = minMaxFilter->GetIndexOfMaximum()[i];
-      tmpMinIndex[i] = minMaxFilter->GetIndexOfMinimum()[i];
+    tmpMaxIndex[i] = minMaxFilter->GetIndexOfMaximum()[i];
+    tmpMinIndex[i] = minMaxFilter->GetIndexOfMinimum()[i];
   }
 
   statistics.SetMinIndex(tmpMaxIndex);
@@ -931,29 +930,8 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   if( IsHotspotCalculated() )
   {
     typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
-    typename MaskImageType::Pointer maskImageITK = MaskImageType::New();
-
-    maskImageITK->SetRegions ( image->GetLargestPossibleRegion() );
-    maskImageITK->Allocate();
-    typedef itk::ImageRegionIteratorWithIndex< MaskImageType > MaskImageIteratorType;
-
-    MaskImageIteratorType maskIt(maskImageITK, image->GetLargestPossibleRegion());
-
-    for(maskIt.GoToBegin();!maskIt.IsAtEnd(); ++maskIt)
-      maskIt.Set(1);
-
-    Image::Pointer maskImageMITK = ImportItkImage( maskImageITK );
-
-    ImageStatisticsCalculator::Pointer hotspotCalculator = ImageStatisticsCalculator::New();
-    hotspotCalculator->SetImage( this->m_Image );
-    hotspotCalculator->SetMaskingModeToImage();
-    hotspotCalculator->SetImageMask( maskImageMITK );
-    hotspotCalculator->SetCalculateHotspot( true );
-    hotspotCalculator->SetHotspotRadiusInMM( GetHotspotRadiusInMM() );
-    hotspotCalculator->ComputeStatistics(0); // TODO: timestep
-
-    Statistics hotspotStatistics = hotspotCalculator->GetStatistics();
-    ImageExtrema hotspotExtrema = CalculateExtremaWorld(image, maskImageITK.GetPointer());
+    typename MaskImageType::Pointer nullMask;
+    Statistics hotspotStatistics = this->CalculateHotspotStatistics(image, nullMask.GetPointer(), m_HotspotRadiusInMM);
 
     statistics.SetHotspotN(hotspotStatistics.GetHotspotN());
     statistics.SetHotspotMax (hotspotStatistics.GetHotspotMax());
@@ -965,7 +943,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
       + statistics.GetHotspotSigma() * statistics.GetHotspotSigma() ));
     statistics.SetHotspotMaxIndex(hotspotStatistics.GetHotspotMaxIndex());
     statistics.SetHotspotMinIndex(hotspotStatistics.GetHotspotMinIndex());
-    statistics.SetHotspotIndex(hotspotExtrema.MaxIndex);
+    statistics.SetHotspotIndex(hotspotStatistics.GetHotspotIndex());
   }
 
   statisticsContainer->push_back( statistics );
@@ -978,8 +956,6 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   histogramGenerator->SetHistogramMin( statistics.GetMin() );
   histogramGenerator->SetHistogramMax( statistics.GetMax() );
   histogramGenerator->Compute();
-
-  // TODO DM: add hotspot search here!
 
   histogramContainer->push_back( histogramGenerator->GetOutput() );
 }
@@ -1304,7 +1280,6 @@ ImageStatisticsCalculator::ImageExtrema ImageStatisticsCalculator::CalculateExtr
   typedef itk::ImageRegionConstIteratorWithIndex<MaskImageType> MaskImageIteratorType;
   typedef itk::ImageRegionConstIteratorWithIndex<ImageType> InputImageIndexIteratorType;
 
-  MaskImageIteratorType maskIt(maskImage, inputImage->GetLargestPossibleRegion());
   InputImageIndexIteratorType imageIndexIt(inputImage, inputImage->GetLargestPossibleRegion());
 
   float maxValue = itk::NumericTraits<float>::min();
@@ -1313,18 +1288,41 @@ ImageStatisticsCalculator::ImageExtrema ImageStatisticsCalculator::CalculateExtr
   typename ImageType::IndexType maxIndex;
   typename ImageType::IndexType minIndex;
 
-  typename ImageType::IndexType imageIndex;
-  typename ImageType::PointType worldPosition;
-  typename ImageType::IndexType maskIndex;
-
-  for(imageIndexIt.GoToBegin(); !imageIndexIt.IsAtEnd(); ++imageIndexIt)
+  if (maskImage != NULL)
   {
-    imageIndex = imageIndexIt.GetIndex();
-    inputImage->TransformIndexToPhysicalPoint(imageIndex, worldPosition);
-    maskImage->TransformPhysicalPointToIndex(worldPosition, maskIndex);
+    MaskImageIteratorType maskIt(maskImage, inputImage->GetLargestPossibleRegion());
+    typename ImageType::IndexType imageIndex;
+    typename ImageType::PointType worldPosition;
+    typename ImageType::IndexType maskIndex;
+    for(imageIndexIt.GoToBegin(); !imageIndexIt.IsAtEnd(); ++imageIndexIt)
+    {
+      imageIndex = imageIndexIt.GetIndex();
+      inputImage->TransformIndexToPhysicalPoint(imageIndex, worldPosition);
+      maskImage->TransformPhysicalPointToIndex(worldPosition, maskIndex);
 
-    maskIt.SetIndex( maskIndex );
-    if(maskIt.Get() > 0)
+      maskIt.SetIndex( maskIndex );
+      if(maskIt.Get() > 0)
+      {
+        double value = imageIndexIt.Get();
+
+        //Calculate minimum, maximum and corresponding index-values
+        if( value > maxValue )
+        {
+          maxIndex = imageIndexIt.GetIndex();
+          maxValue = value;
+        }
+
+        if(value < minValue )
+        {
+          minIndex = imageIndexIt.GetIndex();
+          minValue = value;
+        }
+      }
+    }
+  }
+  else
+  {
+    for(imageIndexIt.GoToBegin(); !imageIndexIt.IsAtEnd(); ++imageIndexIt)
     {
       double value = imageIndexIt.Get();
 
@@ -1342,6 +1340,7 @@ ImageStatisticsCalculator::ImageExtrema ImageStatisticsCalculator::CalculateExtr
       }
     }
   }
+
 
   ImageExtrema minMax;
 
@@ -1586,7 +1585,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   }
 
   typedef typename ConvolutionImageType::SizeType SizeType;
-  SizeType maskSize = this->CalculateConvolutionKernelSize<VImageDimension>(spacing, m_HotspotRadiusInMM);
+  SizeType maskSize = this->CalculateConvolutionKernelSize<VImageDimension>(spacing, radiusInMM);
 
   typedef typename ConvolutionImageType::IndexType IndexType;
   IndexType maskIndex; maskIndex.Fill(0);
@@ -1631,12 +1630,11 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   inputImage->TransformIndexToPhysicalPoint(maskCenterIndex,maskCenter);
   //MITK_INFO << "Mask center in input image: " << maskCenter;
 
-  this->FillHotspotMaskPixels(hotspotMaskITK.GetPointer(), maskCenter, m_HotspotRadiusInMM);
+  this->FillHotspotMaskPixels(hotspotMaskITK.GetPointer(), maskCenter, radiusInMM);
 
   Image::Pointer hotspotMaskMITK = ImportItkImage( hotspotMaskITK );
 
-  Point3D maskCenterPosition = hotspotMaskMITK->GetGeometry()->GetCenter();
-  //MITK_INFO << "Mask center: " << maskCenterPosition;
+  MITK_DEBUG << "Mask center: " << hotspotMaskMITK->GetGeometry()->GetCenter();
 
   // use second instance of ImageStatisticsCalculator to calculate hotspot statistics
 

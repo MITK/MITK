@@ -1590,7 +1590,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   typedef typename ConvolutionImageType::IndexType IndexType;
   IndexType maskIndex; maskIndex.Fill(0);
-  //MITK_INFO << "Hotspot statistics mask started with size ["<<maskSize[0]<<"x"<<maskSize[1]<<"x"<<maskSize[2]<<"] at ["<<maskIndex[0]<<","<<maskIndex[1]<<","<<maskIndex[2]<<"]";
+  MITK_DEBUG << "Hotspot statistics mask started with size ["<<maskSize[0]<<"x"<<maskSize[1]<<"x"<<maskSize[2]<<"] at ["<<maskIndex[0]<<","<<maskIndex[1]<<","<<maskIndex[2]<<"]";
   for (unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
   {
     maskIndex[dimension] = pi.MaxIndex[dimension] - (maskSize[dimension]-1)/2; // maskSize is always odd (size of 5 --> shift -2 required
@@ -1599,15 +1599,13 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
       maskIndex[dimension] = 0;
     }
 
-    /* TODO
-    if (maskIndex[dimension] + maskSize[dimension] > inputImage->GetBufferedRegion().GetSize()[dimension] )
+    if (maskIndex[dimension] + maskSize[dimension] > inputImage->GetRequestedRegion().GetSize()[dimension] )
     {
-      maskSize[dimension] = inputImage->GetBufferedRegionLargestPossibleRegion().GetSize()[dimension] - maskIndex[dimension];
+      maskSize[dimension] = inputImage->GetRequestedRegion().GetSize()[dimension] - maskIndex[dimension];
     }
-    */
   }
 
-  //MITK_INFO << "Hotspot statistics mask corrected as region of size ["<<maskSize[0]<<"x"<<maskSize[1]<<"x"<<maskSize[2]<<"] at ["<<maskIndex[0]<<","<<maskIndex[1]<<","<<maskIndex[2]<<"]";
+  MITK_DEBUG << "Hotspot statistics mask corrected as region of size ["<<maskSize[0]<<"x"<<maskSize[1]<<"x"<<maskSize[2]<<"] at ["<<maskIndex[0]<<","<<maskIndex[1]<<","<<maskIndex[2]<<"]";
 
   typename ConvolutionImageType::Pointer hotspotMaskITK = ConvolutionImageType::New();
   // copy origin and spacing of maskImage

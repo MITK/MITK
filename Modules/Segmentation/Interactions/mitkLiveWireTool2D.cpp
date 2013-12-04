@@ -285,6 +285,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_ContourModelNode = mitk::DataNode::New();
   m_ContourModelNode->SetData( m_Contour );
   m_ContourModelNode->SetName("working contour node");
+  m_ContourModelNode->SetProperty( "helper object", mitk::BoolProperty::New(true));
   m_ContourModelNode->AddProperty( "contour.color", ColorProperty::New(1, 1, 0), NULL, true );
   m_ContourModelNode->AddProperty( "contour.points.color", ColorProperty::New(1.0, 0.0, 0.1), NULL, true );
   m_ContourModelNode->AddProperty( "contour.controlpoints.show", BoolProperty::New(true), NULL, true );

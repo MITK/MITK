@@ -1030,6 +1030,8 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
 
 void QmitkSegmentationView::RenderingManagerReinitialized()
 {
+   if ( ! m_MultiWidget ) { return; }
+
    /*
    * Here we check whether the geometry of the selected segmentation image if aligned with the worldgeometry
    * At the moment it is not supported to use a geometry different from the selected image for reslicing.

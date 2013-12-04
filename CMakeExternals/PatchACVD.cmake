@@ -2,11 +2,19 @@
 
 file(WRITE "ACVDConfig.cmake.in"
 "set(ACVD_INCLUDE_DIRS \"@VTKSURFACE_INCLUDE_DIR@;@VTKDISCRETEREMESHING_INCLUDE_DIR@;@VTKVOLUMEPROCESSING_INCLUDE_DIR@\")
-set(ACVD_LIBRARY_DIRS \"@VTKSURFACE_BINARY_DIR@/bin\")
+set(ACVD_LIBRARY_DIRS \"@PROJECT_BINARY_DIR@/bin\")
 set(ACVD_LIBRARIES vtkSurface vtkDiscreteRemeshing vtkVolumeProcessing)
 add_definitions(-DDOmultithread)")
 
 file(APPEND "CMakeLists.txt" "CONFIGURE_FILE(ACVDConfig.cmake.in ACVDConfig.cmake @ONLY)")
+
+# Add vtkVersionMacros.h header file
+
+set(path "Common/vtkCurvatureMeasure.h")
+file(STRINGS ${path} contents NEWLINE_CONSUME)
+string(REPLACE "w.h\"" "w.h\"\n#include <vtkVersionMacros.h>" contents ${contents})
+set(CONTENTS ${contents})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
 # Replace VTK_COMMON_EXPORT by VTK_EXPORT in class declarations
 
@@ -38,10 +46,18 @@ string(REPLACE "int N" "vtkIdType N" contents ${contents})
 set(CONTENTS ${contents})
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
+# Replace VTK 5 module names by VTK 6 module names
 # Link to POSIX thread library
 
 set(path "DiscreteRemeshing/CMakeLists.txt")
 file(STRINGS ${path} contents NEWLINE_CONSUME)
+string(REPLACE "vtkCommon" "vtkCommonCore" contents ${contents})
+string(REPLACE "vtkFiltering" "vtkFiltersCore" contents ${contents})
+string(REPLACE "vtkImaging" "vtkImagingCore" contents ${contents})
+string(REPLACE "vtkIO" "vtkIOCore" contents ${contents})
+string(REPLACE "vtkRendering" "vtkRenderingCore" contents ${contents})
+string(REPLACE "vtkHybrid" "vtkFiltersHybrid vtkImagingHybrid" contents ${contents})
+string(REPLACE "vtkGraphics" "" contents ${contents})
 string(REPLACE "TARGET_LINK_LIBRARIES(v" "IF(UNIX AND NOT APPLE)\n  LIST(APPEND LIB_ADDED pthread)\nENDIF(UNIX AND NOT APPLE)\n\nTARGET_LINK_LIBRARIES(v" contents ${contents})
 set(CONTENTS ${contents})
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)

@@ -283,6 +283,11 @@ void mitk::ToolManager::SetWorkingData(DataVectorType data)
     m_WorkingData = data;
     // TODO tell active tool?
 
+    // Quick workaround for bug #16598
+    if (m_WorkingData.empty())
+      this->ActivateTool(-1);
+    // workaround end
+
     // attach new observers
     m_WorkingDataObserverTags.clear();
     for ( DataVectorType::iterator dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter )

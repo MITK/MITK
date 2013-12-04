@@ -1189,7 +1189,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   MITK_INFO <<"Mask has pixels? " << maskNonEmpty;
   if ( maskNonEmpty )
   {
-    Statistics statistics;
+    Statistics statistics; // restore previous code
     std::list< int >::iterator it;
     for ( it = relevantLabels.begin(), i = 0;
           it != relevantLabels.end();
@@ -1271,7 +1271,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       //  1. regard mask
       //  2. calculate a hotspot (and its statistics) per mask label/value
       //  3. use LabelStatisticsImageFilter where possible
-      Statistics hotspotStatistics = CalculateHotspotStatistics (adaptedImage.GetPointer(), adaptedMaskImage.GetPointer(), GetHotspotRadiusInMM());
+      Statistics hotspotStatistics = CalculateHotspotStatistics (adaptedImage.GetPointer(), adaptedMaskImage.GetPointer(), GetHotspotRadiusInMM()); // TODO: input label = *it
       statistics.SetHotspotMax( hotspotStatistics.GetHotspotMax() );
       statistics.SetHotspotMin( hotspotStatistics.GetHotspotMin() );
       statistics.SetHotspotMean( hotspotStatistics.GetHotspotMean() );
@@ -1636,7 +1636,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
   inputImage->TransformIndexToPhysicalPoint(maskCenterIndex,maskCenter);
   //MITK_INFO << "Mask center in input image: " << maskCenter;
 
-  FillHotspotMaskPixels(hotspotMaskITK.GetPointer(), maskCenter, m_HotspotRadiusInMM);
+  this->FillHotspotMaskPixels(hotspotMaskITK.GetPointer(), maskCenter, m_HotspotRadiusInMM);
 
   Image::Pointer hotspotMaskMITK = ImportItkImage( hotspotMaskITK );
 
@@ -1645,12 +1645,14 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   // use second instance of ImageStatisticsCalculator to calculate hotspot statistics
 
+  Image::Pointer hotspotInputMITK = ImportItkImage( inputImage );
+
   ImageStatisticsCalculator::Pointer calculator = ImageStatisticsCalculator::New();
-  calculator->SetImage( this->m_Image );
+  calculator->SetImage( hotspotInputMITK );
   calculator->SetMaskingModeToImage();
   calculator->SetImageMask( hotspotMaskMITK );
   calculator->SetCalculateHotspot( false );
-  calculator->ComputeStatistics(0); // TODO: timestep
+  calculator->ComputeStatistics(0); // timestep 0, because inputImage already IS the image of timestep N (from perspective of ImageStatisticsCalculator caller)
 
   Statistics hotspotMaskStatistics = calculator->GetStatistics(0);
 

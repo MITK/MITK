@@ -111,7 +111,7 @@ void mitk::TrackingDeviceSource::CreateOutputs(){
   //if outputs are set then delete them
   if (this->GetNumberOfOutputs() > 0)
   {
-    for (unsigned int numOP = this->GetNumberOfOutputs() -1; numOP >= 0; numOP--)
+    for (int numOP = this->GetNumberOfOutputs() -1; numOP >= 0; numOP--)
       this->RemoveOutput(this->GetOutput(numOP));
     this->Modified();
   }

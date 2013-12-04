@@ -22,12 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTTimeStamp.h"
 #include "mitkIGTException.h"
 
-
 mitk::TrackingDeviceSource::TrackingDeviceSource()
-: mitk::NavigationDataSource(), m_TrackingDevice(NULL)
+  : mitk::NavigationDataSource(), m_TrackingDevice(NULL)
 {
 }
-
 
 mitk::TrackingDeviceSource::~TrackingDeviceSource()
 {
@@ -44,7 +42,6 @@ mitk::TrackingDeviceSource::~TrackingDeviceSource()
     m_TrackingDevice = NULL;
   }
 }
-
 
 void mitk::TrackingDeviceSource::GenerateData()
 {
@@ -97,7 +94,6 @@ void mitk::TrackingDeviceSource::GenerateData()
   }
 }
 
-
 void mitk::TrackingDeviceSource::SetTrackingDevice( mitk::TrackingDevice* td )
 {
   MITK_DEBUG << "Setting TrackingDevice to " << td;
@@ -115,7 +111,7 @@ void mitk::TrackingDeviceSource::CreateOutputs(){
   //if outputs are set then delete them
   if (this->GetNumberOfOutputs() > 0)
   {
-    for (unsigned int numOP = this->GetNumberOfOutputs(); numOP>0; numOP--)
+    for (unsigned int numOP = this->GetNumberOfOutputs() -1; numOP >= 0; numOP--)
       this->RemoveOutput(this->GetOutput(numOP));
     this->Modified();
   }
@@ -128,7 +124,7 @@ void mitk::TrackingDeviceSource::CreateOutputs(){
   unsigned int numberOfOutputs = this->GetNumberOfIndexedOutputs();
   MITK_DEBUG << "Number of tools at start of method CreateOutputs(): " << m_TrackingDevice->GetToolCount();
   MITK_DEBUG << "Number of outputs at start of method CreateOutputs(): " << numberOfOutputs;
-  for (unsigned int idx = 0; idx < numberOfOutputs; ++idx)
+  for (unsigned int idx = 0; idx < m_TrackingDevice->GetToolCount(); ++idx)
   {
     if (this->GetOutput(idx) == NULL)
     {
@@ -148,16 +144,15 @@ void mitk::TrackingDeviceSource::Connect()
     return;
   try {m_TrackingDevice->OpenConnection();}
   catch (mitk::IGTException &e)
-    {
+  {
     throw std::runtime_error(std::string("mitk::TrackingDeviceSource: Could not open connection to tracking device. Error: ") + e.GetDescription());
-    }
+  }
 
   /* NDI Aurora needs a connection to discover tools that are connected to it.
-     Therefore we need to create outputs for these tools now */
+  Therefore we need to create outputs for these tools now */
   //if (m_TrackingDevice->GetType() == mitk::NDIAurora)
-    //this->CreateOutputs();
+  //this->CreateOutputs();
 }
-
 
 void mitk::TrackingDeviceSource::StartTracking()
 {
@@ -169,7 +164,6 @@ void mitk::TrackingDeviceSource::StartTracking()
     throw std::runtime_error("mitk::TrackingDeviceSource: Could not start tracking");
 }
 
-
 void mitk::TrackingDeviceSource::Disconnect()
 {
   if (m_TrackingDevice.IsNull())
@@ -178,7 +172,6 @@ void mitk::TrackingDeviceSource::Disconnect()
     throw std::runtime_error("mitk::TrackingDeviceSource: Could not close connection to tracking device");
 }
 
-
 void mitk::TrackingDeviceSource::StopTracking()
 {
   if (m_TrackingDevice.IsNull())
@@ -186,7 +179,6 @@ void mitk::TrackingDeviceSource::StopTracking()
   if (m_TrackingDevice->StopTracking() == false)
     throw std::runtime_error("mitk::TrackingDeviceSource: Could not stop tracking");
 }
-
 
 void mitk::TrackingDeviceSource::UpdateOutputInformation()
 {
@@ -197,14 +189,12 @@ void mitk::TrackingDeviceSource::UpdateOutputInformation()
   Superclass::UpdateOutputInformation();
 }
 
-
 //unsigned int mitk::TrackingDeviceSource::GetToolCount()
 //{
 //  if (m_TrackingDevice)
 //    return m_TrackingDevice->GetToolCount();
 //  return 0;
 //}
-
 
 bool mitk::TrackingDeviceSource::IsConnected()
 {
@@ -213,7 +203,6 @@ bool mitk::TrackingDeviceSource::IsConnected()
 
   return (m_TrackingDevice->GetState() == mitk::TrackingDevice::Ready) || (m_TrackingDevice->GetState() == mitk::TrackingDevice::Tracking);
 }
-
 
 bool mitk::TrackingDeviceSource::IsTracking()
 {

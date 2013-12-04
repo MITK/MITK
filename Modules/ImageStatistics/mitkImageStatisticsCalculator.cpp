@@ -109,7 +109,7 @@ ImageStatisticsCalculator::Statistics::Statistics()
   m_Max(0.0),
   m_Median(0.0),
   m_Mean(0.0),
-  m_Sigma(0.0),
+  Sigma(0.0),
   m_RMS(0.0),
   m_MaxIndex(1,-1),      //TODO: Dimension anpassen
   m_MinIndex(1,-1),      //TODO: Dimension anpassen
@@ -138,7 +138,7 @@ ImageStatisticsCalculator::Statistics::~Statistics()
 //  m_Max = 0.0;
 //  m_Median = 0.0;
 //  m_Mean = 0.0;
-//  m_Sigma = 0.0;
+//  Sigma = 0.0;
 //  m_RMS = 0.0;
 //  m_MaxIndex = 0;
 //  m_MinIndex = 0;
@@ -1827,7 +1827,6 @@ double ImageStatisticsCalculator::Statistics::GetMin() const { return m_Min; }
 double ImageStatisticsCalculator::Statistics::GetMax() const { return m_Max; }
 double ImageStatisticsCalculator::Statistics::GetMedian() const { return m_Median; }
 double ImageStatisticsCalculator::Statistics::GetVariance() const { return m_Variance; }
-double ImageStatisticsCalculator::Statistics::GetSigma() const { return m_Sigma; }
 double ImageStatisticsCalculator::Statistics::GetRMS() const { return m_RMS; }
 vnl_vector<int> ImageStatisticsCalculator::Statistics::GetMaxIndex() const { return m_MaxIndex; }
 vnl_vector<int> ImageStatisticsCalculator::Statistics::GetMinIndex() const { return m_MinIndex; }
@@ -1840,7 +1839,6 @@ void ImageStatisticsCalculator::Statistics::SetMin(double min) {  m_Min = min; }
 void ImageStatisticsCalculator::Statistics::SetMax(double max) {  m_Max = max; }
 void ImageStatisticsCalculator::Statistics::SetMedian(double median) {  m_Median = median; }
 void ImageStatisticsCalculator::Statistics::SetVariance(double variance) {  m_Variance = variance; }
-void ImageStatisticsCalculator::Statistics::SetSigma(double sigma) {  m_Sigma = sigma; }
 void ImageStatisticsCalculator::Statistics::SetRMS(double rms) {  m_RMS = rms; }
 void ImageStatisticsCalculator::Statistics::SetMaxIndex(vnl_vector<int> maxIndex) { m_MaxIndex = maxIndex; }
 void ImageStatisticsCalculator::Statistics::SetMinIndex(vnl_vector<int> minIndex) { m_MinIndex = minIndex; }

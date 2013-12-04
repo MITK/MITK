@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkPlanarFigure.h"
 
-// TODO DM: why the ifndef?
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
 #endif
@@ -30,6 +29,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 
 #include "ImageStatisticsExports.h"
+
+// just a helper to unclutter our code
+// to be replaced with references to m_Member (when deprecated public members in Statistics are removed)
+#define mitkSetGetConstMacro(name, type) \
+  virtual type Get##name() const \
+  { \
+    return this->name; \
+  } \
+  \
+  virtual void Set##name(const type _arg) \
+  { \
+    if ( this->name != _arg ) \
+    { \
+      this->name = _arg; \
+    } \
+  }
 
 namespace mitk
 {
@@ -52,7 +67,7 @@ namespace mitk
  * image, the information doesn't need to be recalculated.
  *
  * The class also has the possibility to calculate the location and separate
- * statistics for a region called “hotspot”. The hotspot is a sphere of
+ * statistics for a region called "hotspot". The hotspot is a sphere of
  * user-defined size and its location is chosen in a way that the average
  * pixel value within the sphere is maximized.
  *
@@ -70,11 +85,11 @@ namespace mitk
  *
  * \subsection HotspotStatistics_description Hotspot Definition
  *
- * The “hotspot” of an image is motivated from PET readings. It is defined
+ * The "hotspot" of an image is motivated from PET readings. It is defined
  * as a spherical region of fixed size which maximizes the average pixel value
  * within the region.  The following image illustrates the concept: the
  * colored areas are different image intensities and the hotspot is located
- * in the “hottest” region of the image.
+ * in the "hottest" region of the image.
  *
  * [image with pixelvalue scale]
  *
@@ -145,6 +160,17 @@ public:
 
   /**
     TODO DM: document
+
+    keep public members, mark them deprecated
+
+    add getter/setter, they are the new preferrd variant
+
+    add operator=() and copy constructor
+
+    check variance (not used here, but maybe elsewhere)
+
+
+
   */
   class ImageStatistics_EXPORT Statistics
   {
@@ -154,6 +180,7 @@ public:
     virtual ~Statistics();
 
     //void Reset()
+    mitkSetGetConstMacro(Sigma, double)
 
     unsigned int GetN() const;
     double GetMin() const;
@@ -161,7 +188,6 @@ public:
     double GetMean() const;
     double GetMedian() const;
     double GetVariance() const;
-    double GetSigma() const;
     double GetRMS() const;
     vnl_vector<int> GetMaxIndex() const;
     vnl_vector<int> GetMinIndex() const;
@@ -173,7 +199,6 @@ public:
     void SetMean(double mean);
     void SetMedian(double median);
     void SetVariance(double variance);
-    void SetSigma(double sigma);
     void SetRMS(double rms);
     void SetMaxIndex(vnl_vector<int> maxIndex);
     void SetMinIndex(vnl_vector<int> minIndex);
@@ -188,7 +213,14 @@ public:
     double GetHotspotRMS() const;
     vnl_vector<int> GetHotspotMaxIndex() const;
     vnl_vector<int> GetHotspotMinIndex() const;
-    vnl_vector<int> GetHotspotIndex() const;
+
+    vnl_vector<int> GetHotspotIndex() const;  // position
+    // c'tor: m_HotspotStatistics = NULL
+    // hotspot calculation:
+    //   delete m_HotspotStatistics
+    //   m_HotspotStatistics = new Statistics()
+    // destructor: delete m_HotspotStatistics (delete 0 IST ok)
+    const Statistics& GetHotspotStatistics() const { /* return *m_HotspotStatistics */};  // real statistics
 
     void SetHotspotLabel(unsigned int label);
     void SetHotspotN(unsigned int n);
@@ -203,6 +235,14 @@ public:
     void SetHotspotMinIndex(vnl_vector<int> hotspotMinIndex);
     void SetHotspotIndex(vnl_vector<int> hotspotIndex);
 
+  public:
+
+    // this section is all deprecated. Get/Set methods should be used
+
+    /// standard deviation of values (== square root of variance)
+    /// \deprecated Public member Sigma is deprecated. Use GetSigma/SetSigma instead
+    DEPRECATED(double Sigma);
+
   private:
 
     int m_Label;
@@ -212,7 +252,6 @@ public:
     double m_Mean;                      //< mean value
     double m_Median;                    //< median value
     double m_Variance;
-    double m_Sigma;                     //< standard deviation of values (== square root of variance)
     double m_RMS;                       //< root mean square
 
     vnl_vector< int > m_MinIndex;       //< index of minimum value

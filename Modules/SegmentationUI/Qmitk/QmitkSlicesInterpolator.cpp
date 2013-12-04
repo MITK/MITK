@@ -868,7 +868,6 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
   m_3DInterpolationEnabled = on;
 
   this->CheckSupportedImageDimension();
-
   try
   {
     if ( m_DataStorage.IsNotNull() && m_ToolManager && m_3DInterpolationEnabled)
@@ -880,8 +879,7 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
         bool isInterpolationResult(false);
         workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
 
-        if ((workingNode->IsSelected() &&
-             workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")))) &&
+        if ((workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")))) &&
             !isInterpolationResult && m_3DInterpolationEnabled)
         {
           int ret = QMessageBox::Yes;

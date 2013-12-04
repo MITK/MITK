@@ -107,8 +107,7 @@ TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
 }
 
 template <class TInputScalarType, class TOutputScalarType>
-void
-TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
+void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
 ::ThreadedGenerateData (const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId )
 {
   typedef ImageRegionIterator<OutputImageType>      IteratorOutputType;
@@ -145,15 +144,22 @@ TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
     out.SetSize(m_GradientList->Size());
     out.Fill(0);
 
+    unsigned int b0index = 0;
+
     if( b0 > 0)
     {
-      for( unsigned int i=0; i<m_GradientList->Size()-1; i++)
+      for( unsigned int i=0; i<m_GradientList->Size(); i++)
       {
-
-        GradientType g = m_GradientList->at(i+1);
+        GradientType g = m_GradientList->at(i);
 
         // normalize vector so the following computations work
         const double twonorm = g.two_norm();
+        if( twonorm < vnl_math::eps )
+        {
+          b0index = i;
+          continue;
+        }
+
         GradientType gn = g.normalize();
 
         InputPixelType S;
@@ -175,13 +181,13 @@ TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
           // estimate the bvalue from the base value and the norm of the gradient
           //   - because of this estimation the vector have to be normalized beforehand
           //     otherwise the modelled signal is wrong ( i.e. not scaled properly )
-          const double bval = m_BValue * twonorm;
-          out[i+1] = static_cast<OutputScalarType>( 1.0 * b0 * exp ( -1.0 * bval * res ) );
+          const double bval = m_BValue * twonorm * twonorm;
+          out[i] = static_cast<OutputScalarType>( 1.0 * b0 * exp ( -1.0 * bval * res ) );
         }
       }
     }
 
-    out[0] = b0;
+    out[b0index] = b0;
 
     itOut.Set(out);
 

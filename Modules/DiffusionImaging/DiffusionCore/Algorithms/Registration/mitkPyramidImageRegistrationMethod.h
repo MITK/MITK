@@ -59,6 +59,8 @@ public:
   /** Smart pointer support */
   itkNewMacro(Self)
 
+  typedef itk::OptimizerParameters<double> ParametersType;
+
   /** Typedef for the transformation matrix, corresponds to the InternalMatrixType from ITK transforms */
   typedef vnl_matrix_fixed< double, 3, 3> TransformMatrixType;
 
@@ -162,6 +164,28 @@ public:
     }
   }
 
+  ParametersType GetLastRegistrationParameters()
+  {
+    if( m_EstimatedParameters == NULL )
+    {
+      mitkThrow() << "No parameters were estimated yet, call Update() first.";
+    }
+
+    unsigned int dim = 12;
+    if( !m_UseAffineTransform )
+      dim = 6;
+
+    ParametersType params(dim);
+
+    params.SetData( m_EstimatedParameters );
+    return params;
+  }
+
+  void SetInitialParameters( ParametersType& params )
+  {
+    m_InitialParameters = params;
+  }
+
   /**
    * @brief Control the interpolator used for resampling.
    *
@@ -210,6 +234,8 @@ protected:
 
   double* m_EstimatedParameters;
 
+  ParametersType m_InitialParameters;
+
   /** Control the verbosity of the regsitistration output */
   bool m_Verbose;
 
@@ -235,9 +261,13 @@ protected:
 
     typename BaseMetricType::Pointer metric;
 
+    unsigned int glob_max_threads = itk::MultiThreader::GetGlobalMaximumNumberOfThreads();
+    itk::MultiThreader::SetGlobalMaximumNumberOfThreads(1);
+
     if( m_CrossModalityRegistration )
     {
       metric = MMIMetricType::New();
+      //metric->SetNumberOfThreads( 6 );
     }
     else
     {
@@ -267,6 +297,10 @@ protected:
       initialParams[0] = initialParams[4] = initialParams[8] = 1;
     }
 
+    if( m_InitialParameters.Size() == paramDim )
+    {
+      initialParams = m_InitialParameters;
+    }
 
     typename FixedImageType::Pointer referenceImage = itkImage1;
     typename MovingImageType::Pointer movingImage = itkImage2;
@@ -285,6 +319,7 @@ protected:
     if( min_value / max_schedule_val < 12 )
     {
       max_schedule_val /= 2;
+      max_pyramid_lvl--;
       optmaxstep *= 0.25f;
       optminstep *= 0.1f;
     }
@@ -348,7 +383,12 @@ protected:
     typename PyramidOptControlCommand<RegistrationType>::Pointer pyramid_observer =
         PyramidOptControlCommand<RegistrationType>::New();
 
-    registration->AddObserver( itk::IterationEvent(), pyramid_observer );
+
+    unsigned int pyramid_tag = 0;
+    if(m_Verbose)
+    {
+        pyramid_tag = registration->AddObserver( itk::IterationEvent(), pyramid_observer );
+    }
 
     try
     {
@@ -356,6 +396,7 @@ protected:
     }
     catch (itk::ExceptionObject &e)
     {
+      registration->Print( std::cout );
       MITK_ERROR << "[Registration Update] Caught ITK exception: ";
       mitkThrow() << "Registration failed with exception: " << e.what();
     }
@@ -373,12 +414,20 @@ protected:
       m_EstimatedParameters[i] = finalParameters[i];
     }
 
+    MITK_INFO("Params") << optimizer->GetValue() << " :: " << finalParameters;
+
     // remove optimizer tag if used
     if( vopt_tag )
     {
       optimizer->RemoveObserver( vopt_tag );
     }
 
+    if( pyramid_tag )
+    {
+      registration->RemoveObserver( pyramid_tag );
+    }
+
+    itk::MultiThreader::SetGlobalMaximumNumberOfThreads( glob_max_threads );
 
   }
 
@@ -432,6 +481,8 @@ protected:
     resampler->SetInterpolator( linear_interpolator );
     if( m_UseWindowedSincInterpolator )
       resampler->SetInterpolator( sinc_interpolator );
+
+    //resampler->SetNumberOfThreads(1);
 
     resampler->SetInput( itkImage );
     resampler->SetTransform( base_transform );

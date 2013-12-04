@@ -30,31 +30,23 @@ typedef mitk::DiffusionImage< DiffusionPixelType >  DiffusionImageType;
  *
  * @param argv : Input and Output image full path
  */
-int mitkDWHeadMotionCorrectionTest( int argc, char* argv[] )
+int mitkConvertDWITypeTest( int argc, char* argv[] )
 {
-  MITK_TEST_BEGIN("mitkDWHeadMotionCorrectionTest");
+  MITK_TEST_BEGIN("mitkConvertDWITypeTest");
 
   MITK_TEST_CONDITION_REQUIRED( argc > 2, "Specify input and output.");
 
   RegisterDiffusionCoreObjectFactory();
 
-  itk::MultiThreader::SetGlobalMaximumNumberOfThreads(1);
-
   mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage( argv[1] );
   DiffusionImageType* dwimage =
       static_cast<DiffusionImageType*>( inputImage.GetPointer() );
 
-  mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>::Pointer corrfilter =
-      mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>::New();
-
-  corrfilter->SetInput( dwimage );
-  corrfilter->SetAverageUnweighted(false);
-  corrfilter->Update();
 
   mitk::NrrdDiffusionImageWriter< DiffusionPixelType >::Pointer dwiwriter =
       mitk::NrrdDiffusionImageWriter< DiffusionPixelType >::New();
 
-  dwiwriter->SetInput( corrfilter->GetOutput() );
+  dwiwriter->SetInput( dwimage );
   dwiwriter->SetFileName( argv[2] );
 
   try

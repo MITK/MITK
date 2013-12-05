@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>358</width>
-    <height>945</height>
+    <width>288</width>
+    <height>328</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,12 +20,6 @@
    <string notr="true"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing">
-    <number>2</number>
-   </property>
-   <property name="margin">
-    <number>2</number>
-   </property>
    <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
@@ -38,29 +32,6 @@
       <property name="margin">
        <number>2</number>
       </property>
-      <item>
-       <widget class="QToolButton" name="m_btNewSegmentation">
-        <property name="toolTip">
-         <string>Create a new segmentation session</string>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/SegmentationUI.qrc">
-          <normaloff>:/Qmitk/NewSegmentationSession_48x48.png</normaloff>:/Qmitk/NewSegmentationSession_48x48.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="autoRaise">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QToolButton" name="m_btLoadSegmentation">
         <property name="toolTip">
@@ -75,31 +46,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="autoRaise">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="m_btImportLabeledImage">
-        <property name="toolTip">
-         <string>Import a labeled image from disk</string>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/SegmentationUI.qrc">
-          <normaloff>:/Qmitk/ImportLabeledImage_48x48.png</normaloff>:/Qmitk/ImportLabeledImage_48x48.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
+          <width>28</width>
+          <height>28</height>
          </size>
         </property>
         <property name="autoRaise">
@@ -121,31 +69,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="autoRaise">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="m_btImportSegmentation">
-        <property name="toolTip">
-         <string>Import labels from another segmentation session</string>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/SegmentationUI.qrc">
-          <normaloff>:/Qmitk/ImportLabelSet_48x48.png</normaloff>:/Qmitk/ImportLabelSet_48x48.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
+          <width>28</width>
+          <height>28</height>
          </size>
         </property>
         <property name="autoRaise">
@@ -167,8 +92,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>32</width>
-          <height>32</height>
+          <width>28</width>
+          <height>28</height>
          </size>
         </property>
         <property name="autoRaise">
@@ -195,7 +120,7 @@
    <item>
     <widget class="QmitkLabelSetTableWidget" name="m_LabelSetTableWidget">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -203,52 +128,23 @@
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
      </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
+    <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
       <string/>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
       <property name="spacing">
        <number>2</number>
       </property>
       <property name="margin">
        <number>2</number>
       </property>
-      <item>
-       <widget class="QToolButton" name="m_btNewLabel">
-        <property name="toolTip">
-         <string>Add a new label to the current segmentation session</string>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/SegmentationUI.qrc">
-          <normaloff>:/Qmitk/NewLabel_48x48.png</normaloff>:/Qmitk/NewLabel_48x48.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="shortcut">
-         <string>N</string>
-        </property>
-        <property name="autoRaise">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QToolButton" name="m_btSegmentationInteractor">
         <property name="toolTip">
@@ -263,8 +159,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>32</width>
-          <height>32</height>
+          <width>28</width>
+          <height>28</height>
          </size>
         </property>
         <property name="checkable">
@@ -290,8 +186,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>32</width>
-          <height>32</height>
+          <width>28</width>
+          <height>28</height>
          </size>
         </property>
         <property name="checkable">
@@ -316,8 +212,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>32</width>
-          <height>32</height>
+          <width>28</width>
+          <height>28</height>
          </size>
         </property>
         <property name="autoRaise">
@@ -339,8 +235,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>32</width>
-          <height>32</height>
+          <width>28</width>
+          <height>28</height>
          </size>
         </property>
         <property name="autoRaise">
@@ -362,8 +258,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>32</width>
-          <height>32</height>
+          <width>28</width>
+          <height>28</height>
          </size>
         </property>
         <property name="autoRaise">
@@ -411,8 +307,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>32</width>
-          <height>32</height>
+          <width>28</width>
+          <height>28</height>
          </size>
         </property>
         <property name="autoRaise">
@@ -421,13 +317,13 @@
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer_2">
+       <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>5</width>
+          <width>57</width>
           <height>20</height>
          </size>
         </property>
@@ -438,22 +334,6 @@
    </item>
    <item>
     <widget class="ctkSearchBox" name="m_LabelSearchBox"/>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Minimum</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>5</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

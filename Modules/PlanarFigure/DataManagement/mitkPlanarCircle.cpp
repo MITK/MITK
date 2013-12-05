@@ -163,3 +163,13 @@ void mitk::PlanarCircle::PrintSelf( std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf( os, indent );
 }
+
+bool mitk::PlanarCircle::SetCurrentControlPoint( const Point2D& point )
+{
+  if ( m_SelectedControlPoint < 0 )
+  {
+    m_SelectedControlPoint = 1;
+  }
+
+  return this->SetControlPoint( m_SelectedControlPoint, point, false);
+}

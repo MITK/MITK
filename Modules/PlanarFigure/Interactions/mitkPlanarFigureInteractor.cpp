@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigureInteractor.h"
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarPolygon.h"
+#include "mitkPlanarCircle.h"
 
 #include "mitkInteractionPositionEvent.h"
 #include "mitkInternalEvent.h"

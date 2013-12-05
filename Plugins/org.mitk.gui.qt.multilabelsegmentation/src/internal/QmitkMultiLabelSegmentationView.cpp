@@ -29,14 +29,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegTool2D.h"
 #include "mitkPlanePositionManager.h"
 #include "mitkPluginActivator.h"
+#include "mitkInteractionEventObserver.h"
 
 // Qmitk
 #include "QmitkMultiLabelSegmentationOrganNamesHandling.cpp"
 #include "QmitkRenderWindow.h"
+#include "QmitkNewSegmentationDialog.h"
 
 // us
-#include "usModuleResource.h"
-#include "usModuleResourceStream.h"
+// us
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usModuleResourceStream.h>
 
 // Qt
 #include <QMessageBox>
@@ -91,8 +97,11 @@ m_MouseCursorSet(false)
 
 QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
 {
-  m_Controls.m_ManualToolSelectionBox2D->setEnabled(false);
-  m_Controls.m_ManualToolSelectionBox3D->setEnabled(false);
+//  m_Controls.m_ManualToolSelectionBox2D->setEnabled(false);
+//  m_Controls.m_ManualToolSelectionBox3D->setEnabled(false);
+
+  //m_ServiceRegistration.Unregister();
+
   m_ToolManager->ActivateTool(-1);
 /*
   m_Controls.m_SliceBasedInterpolator->EnableInterpolation(false);
@@ -104,6 +113,18 @@ QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
 */
   m_ToolManager->SetReferenceData(NULL);
   m_ToolManager->SetWorkingData(NULL);
+}
+
+void QmitkMultiLabelSegmentationView::InitializeListeners()
+{
+  if (m_Interactor.IsNull())
+  {
+    us::ModuleContext* moduleContext = us::GetModuleContext();
+    m_Interactor = mitk::SegmentationInteractor::New();
+    m_Interactor->LoadStateMachine( "SegmentationInteraction.xml", moduleContext->GetModule());
+    m_Interactor->SetEventConfig ( "SegmentationConfig.xml", moduleContext->GetModule());
+    us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>( m_Interactor.GetPointer(), us::ServiceProperties() );
+  }
 }
 
 void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
@@ -132,6 +153,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_LabelSetWidget->SetDataStorage( *(this->GetDataStorage()) );
   m_Controls.m_LabelSetWidget->SetOrganColors(this->GetDefaultOrganColorString());
   m_Controls.m_LabelSetWidget->SetLastFileOpenPath(this->GetLastFileOpenPath());
+  m_Controls.m_LabelSetWidget->hide();
 
   m_Controls.m_cbSurfaceNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.m_cbSurfaceNodeSelector->SetPredicate( m_SurfacePredicate );
@@ -152,14 +174,14 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
   m_Controls.m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer3D );
   //specify tools to be added to 3D Tool area
-//  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("'Two Thresholds' Otsu FastMarching3D RegionGrowing Watershed");
-  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold FastMarching3D MedianTool3D DilateTool3D ErodeTool3D OpenTool3D CloseTool3D FillHolesTool3D KeepNConnectedRegionsTool3D");
+//  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("'Two Thresholds' FastMarching3D Otsu FastMarching3D RegionGrowing Watershed");
+  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold MedianTool3D DilateTool3D ErodeTool3D OpenTool3D CloseTool3D FillHolesTool3D KeepNRegionsTool3D");
   m_Controls.m_ManualToolSelectionBox3D->SetLayoutColumns(2);
   m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );
 
   //Hide 3D selection box, show 2D selection box
-  m_Controls.m_ManualToolSelectionBox3D->hide();
-  m_Controls.m_ManualToolSelectionBox2D->show();
+//  m_Controls.m_ManualToolSelectionBox3D->hide();
+//  m_Controls.m_ManualToolSelectionBox2D->show();
 
   connect( m_Controls.m_cbReferenceNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
        this, SLOT( OnReferenceSelectionChanged( const mitk::DataNode* ) ) );
@@ -169,8 +191,8 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 
   //connect( m_Controls.m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
 
-  connect( m_Controls.tabWidgetSegmentationTools, SIGNAL(currentChanged(int)), this, SLOT(OnTabWidgetChanged(int)));
-
+//  connect( m_Controls.tabWidgetSegmentationTools, SIGNAL(currentChanged(int)), this, SLOT(OnTabWidgetChanged(int)));
+  connect(m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT( OnNewLabel()) );
   connect(m_Controls.m_pbSurfaceStamp, SIGNAL(clicked()), this, SLOT(OnSurfaceStamp()));
   connect(m_Controls.m_pbMaskStamp, SIGNAL(clicked()), this, SLOT(OnMaskStamp()));
   connect(m_Controls.m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
@@ -188,6 +210,9 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
     m_Controls.m_SurfaceBasedInterpolator->Initialize(this->GetDataStorage());
 //    m_Controls.m_LabelSetWidget->SetRenderWindowPart(this->m_IRenderWindowPart);
   }
+
+//  this->InitializeListeners();
+
 }
 
 void QmitkMultiLabelSegmentationView::SetFocus ()
@@ -241,6 +266,70 @@ int QmitkMultiLabelSegmentationView::ComputePreferredSize(bool width, int /*avai
   {
     return preferredResult;
   }
+}
+
+void QmitkMultiLabelSegmentationView::OnNewLabel()
+{
+  mitk::DataNode* referenceNode = m_Controls.m_cbReferenceNodeSelector->GetSelectedNode();
+
+  if (!referenceNode)
+  {
+    QMessageBox::information( m_Parent, "New Label", "Please load and select a patient image before starting some action.");
+    return;
+  }
+
+  m_ToolManager->ActivateTool(-1);
+
+  mitk::Image* referenceImage = dynamic_cast<mitk::Image*>( referenceNode->GetData() );
+  assert(referenceImage);
+
+  QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( m_Parent );
+  dialog->SetSuggestionList( this->GetDefaultOrganColorString() );
+  dialog->setWindowTitle("New Label");
+
+  int dialogReturnValue = dialog->exec();
+
+  if ( dialogReturnValue == QDialog::Rejected ) return;
+
+  mitk::LabelSetImage::Pointer workingImage;
+  mitk::DataNode::Pointer workingNode = m_ToolManager->GetWorkingData(0);
+
+  if (workingNode.IsNull())
+  {
+    QString name = QString::fromStdString(referenceNode->GetName());
+    name.append("-labels");
+
+    this->WaitCursorOn();
+
+    try
+    {
+      workingImage = mitk::LabelSetImage::New();
+      workingImage->Initialize(referenceImage);
+    }
+    catch ( mitk::Exception& e )
+    {
+      this->WaitCursorOff();
+      MITK_ERROR << "Exception caught: " << e.GetDescription();
+      QMessageBox::information(m_Parent, "New Label", "Could not create a new segmentation session.\n");
+      return;
+    }
+
+    this->WaitCursorOff();
+
+    workingNode = mitk::DataNode::New();
+    workingNode->SetData(workingImage);
+    workingNode->SetName(name.toStdString());
+    workingImage->SetName(name.toStdString());
+  }
+
+  workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  workingImage->AddLabel(dialog->GetSegmentationName().toStdString(), dialog->GetColor());
+
+  if (workingImage->GetNumberOfLabels() > 2)
+    m_Controls.m_LabelSetWidget->show();
+
+  if (!this->GetDataStorage()->Exists(workingNode))
+    this->GetDataStorage()->Add(workingNode, referenceNode);
 }
 
 void QmitkMultiLabelSegmentationView::NodeAdded(const mitk::DataNode* node)
@@ -306,6 +395,7 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
   {
     m_ToolManager->SetReferenceData(NULL);
     m_Controls.m_LabelSetWidget->setEnabled(false);
+    m_Controls.m_pbNewLabel->setEnabled(false);
     return;
   }
 
@@ -324,6 +414,7 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
 
   m_ToolManager->SetReferenceData(m_ReferenceNode);
   m_Controls.m_LabelSetWidget->setEnabled(true);
+  m_Controls.m_pbNewLabel->setEnabled(true);
 
   m_ReferenceNode->SetVisibility(true);
 
@@ -349,8 +440,8 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
     m_ToolManager->SetWorkingData(NULL);
     m_Controls.m_SliceBasedInterpolator->setEnabled(false);
     m_Controls.m_SurfaceBasedInterpolator->setEnabled(false);
-    m_Controls.m_gbSurfaceStamp->setEnabled(false);
-    m_Controls.m_gbMaskStamp->setEnabled(false);
+//    m_Controls.m_gbSurfaceStamp->setEnabled(false);
+//    m_Controls.m_gbMaskStamp->setEnabled(false);
     return;
   }
 /*
@@ -386,28 +477,10 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
   // and enable GUI controls
   m_Controls.m_SliceBasedInterpolator->setEnabled(true);
   m_Controls.m_SurfaceBasedInterpolator->setEnabled(true);
-  m_Controls.m_gbSurfaceStamp->setEnabled(true);
-  m_Controls.m_gbMaskStamp->setEnabled(true);
+//  m_Controls.m_gbSurfaceStamp->setEnabled(true);
+//  m_Controls.m_gbMaskStamp->setEnabled(true);
 
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
-}
-
-void QmitkMultiLabelSegmentationView::OnTabWidgetChanged(int id)
-{
-  //always disable tools on tab changed
-  m_ToolManager->ActivateTool(-1);
-
-  if (id == 0)
-  {
-    //Hide 3D selection box, show 2D selection box
-    m_Controls.m_ManualToolSelectionBox3D->hide();
-    m_Controls.m_ManualToolSelectionBox2D->show();
-  }
-  else
-  {
-    m_Controls.m_ManualToolSelectionBox2D->hide();
-    m_Controls.m_ManualToolSelectionBox3D->show();
-  }
 }
 
 void QmitkMultiLabelSegmentationView::OnManualTool2DSelected(int id)

@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
+#include "mitkSegmentationInteractor.h"
 
 #include "ui_QmitkMultiLabelSegmentationControls.h"
 
@@ -59,7 +60,7 @@ protected slots:
 
   void OnManualTool2DSelected(int id);
 
-  void OnTabWidgetChanged(int);
+  void OnNewLabel();
 
   // reaction to button "Surface Stamp"
   void OnSurfaceStamp();
@@ -81,6 +82,7 @@ protected:
 
   void SetMouseCursor(const us::ModuleResource, int hotspotX, int hotspotY );
 
+  void InitializeListeners();
   /**
   * Reimplemented from QmitkAbstractView
   */
@@ -120,6 +122,16 @@ protected:
   mitk::NodePredicateAnd::Pointer m_MaskPredicate;
 
   bool m_MouseCursorSet;
+
+
+  mitk::SegmentationInteractor::Pointer m_Interactor;
+
+  /**
+    * Reference to the service registration of the observer,
+    * it is needed to unregister the observer on unload.
+  */
+ // us::ServiceRegistration<mitk::InteractionEventObserver> m_ServiceRegistration;
+
 };
 
 #endif // QmitkMultiLabelSegmentationView_h

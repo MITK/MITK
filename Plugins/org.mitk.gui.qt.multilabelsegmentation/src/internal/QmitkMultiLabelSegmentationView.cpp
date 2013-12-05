@@ -128,7 +128,7 @@ void QmitkMultiLabelSegmentationView::InitializeListeners()
     us::ModuleContext* moduleContext = us::GetModuleContext();
     m_Interactor = mitk::SegmentationInteractor::New();
     m_Interactor->LoadStateMachine( "SegmentationInteraction.xml", moduleContext->GetModule());
-    m_Interactor->SetEventConfig ( "SegmentationConfig.xml", moduleContext->GetModule());
+    m_Interactor->SetEventConfig ( "ConfigSegmentation.xml", moduleContext->GetModule());
     us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>( m_Interactor.GetPointer(), us::ServiceProperties() );
   }
 }
@@ -192,6 +192,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
        this, SLOT( OnSegmentationSelectionChanged( const mitk::DataNode* ) ) );
 
   connect( m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT( OnNewLabel()) );
+  connect( m_Controls.m_pbNewSegmentationSession, SIGNAL(clicked()), this, SLOT( OnNewSegmentation()) );
   connect( m_Controls.m_pbSaveSegmentation, SIGNAL(clicked()), this, SLOT( OnSaveSegmentation()) );
   connect( m_Controls.m_pbLoadSegmentation, SIGNAL(clicked()), this, SLOT( OnLoadSegmentation()) );
   connect( m_Controls.m_pbDeleteSegmentation, SIGNAL(clicked()), this, SLOT( OnDeleteSegmentation()) );
@@ -372,6 +373,61 @@ void QmitkMultiLabelSegmentationView::OnDeleteSegmentation()
   this->GetDataStorage()->Remove(workingNode);
 }
 
+void QmitkMultiLabelSegmentationView::OnNewSegmentation()
+{
+  mitk::DataNode* referenceNode = m_Controls.m_cbReferenceNodeSelector->GetSelectedNode();
+
+  if (!referenceNode)
+  {
+    QMessageBox::information( m_Parent, "New Segmentation Session", "Please load and select a patient image before starting some action.");
+    return;
+  }
+
+  m_ToolManager->ActivateTool(-1);
+
+  mitk::Image* referenceImage = dynamic_cast<mitk::Image*>( referenceNode->GetData() );
+  assert(referenceImage);
+
+  QString newName = QString::fromStdString(referenceNode->GetName());
+  newName.append("-labels");
+
+  bool ok = false;
+  newName = QInputDialog::getText(m_Parent, "New Segmentation Session", "New name:", QLineEdit::Normal, newName, &ok);
+
+  if(!ok) return;
+
+  this->WaitCursorOn();
+
+  mitk::LabelSetImage::Pointer workingImage = mitk::LabelSetImage::New();
+
+  try
+  {
+    workingImage->Initialize(referenceImage);
+  }
+  catch ( mitk::Exception& e )
+  {
+    this->WaitCursorOff();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(m_Parent, "New Segmentation Session", "Could not create a new segmentation session.\n");
+    return;
+  }
+
+  mitk::DataNode::Pointer workingNode = mitk::DataNode::New();
+  workingNode->SetData(workingImage);
+  workingNode->SetName(newName.toStdString());
+  workingImage->SetName(newName.toStdString());
+  mitk::Color color;
+  color.SetRed(1.0);
+  color.SetGreen(0.0);
+  color.SetBlue(0.0);
+  workingImage->AddLabel("new-label", color);
+
+  this->WaitCursorOff();
+
+  if (!this->GetDataStorage()->Exists(workingNode))
+    this->GetDataStorage()->Add(workingNode, referenceNode);
+}
+
 void QmitkMultiLabelSegmentationView::OnNewLabel()
 {
   mitk::DataNode* referenceNode = m_Controls.m_cbReferenceNodeSelector->GetSelectedNode();
@@ -395,38 +451,10 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
 
   if ( dialogReturnValue == QDialog::Rejected ) return;
 
-  mitk::LabelSetImage::Pointer workingImage;
-  mitk::DataNode::Pointer workingNode = m_ToolManager->GetWorkingData(0);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  assert(workingNode);
 
-  if (workingNode.IsNull())
-  {
-    QString name = QString::fromStdString(referenceNode->GetName());
-    name.append("-labels");
-
-    this->WaitCursorOn();
-
-    try
-    {
-      workingImage = mitk::LabelSetImage::New();
-      workingImage->Initialize(referenceImage);
-    }
-    catch ( mitk::Exception& e )
-    {
-      this->WaitCursorOff();
-      MITK_ERROR << "Exception caught: " << e.GetDescription();
-      QMessageBox::information(m_Parent, "New Label", "Could not create a new segmentation session.\n");
-      return;
-    }
-
-    workingNode = mitk::DataNode::New();
-    workingNode->SetData(workingImage);
-    workingNode->SetName(name.toStdString());
-    workingImage->SetName(name.toStdString());
-
-    this->WaitCursorOff();
-  }
-
-  workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
   workingImage->AddLabel(dialog->GetSegmentationName().toStdString(), dialog->GetColor());
 
   if (workingImage->GetNumberOfLabels() > 2)
@@ -505,6 +533,7 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
   {
     m_ToolManager->SetReferenceData(NULL);
     m_Controls.m_LabelSetWidget->setEnabled(false);
+    m_Controls.m_pbNewSegmentationSession->setEnabled(false);
     m_Controls.m_pbNewLabel->setEnabled(false);
     m_Controls.m_pbSaveSegmentation->setEnabled(false);
     m_Controls.m_pbLoadSegmentation->setEnabled(false);
@@ -528,6 +557,7 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
   m_ToolManager->SetReferenceData(m_ReferenceNode);
   m_Controls.m_LabelSetWidget->setEnabled(true);
   m_Controls.m_pbNewLabel->setEnabled(true);
+  m_Controls.m_pbNewSegmentationSession->setEnabled(true);
   m_Controls.m_pbSaveSegmentation->setEnabled(true);
   m_Controls.m_pbLoadSegmentation->setEnabled(true);
   m_Controls.m_pbDeleteSegmentation->setEnabled(true);

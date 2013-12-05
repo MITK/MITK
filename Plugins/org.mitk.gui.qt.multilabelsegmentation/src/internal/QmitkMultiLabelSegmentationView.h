@@ -68,6 +68,8 @@ protected slots:
 
   void OnNewLabel();
 
+  void OnNewSegmentation();
+
   // reaction to button "Surface Stamp"
   void OnSurfaceStamp();
 

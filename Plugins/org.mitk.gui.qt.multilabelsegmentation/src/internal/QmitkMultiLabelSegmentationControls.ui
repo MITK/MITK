@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>203</width>
+    <width>244</width>
     <height>592</height>
    </rect>
   </property>
@@ -130,16 +130,16 @@
        <number>2</number>
       </property>
       <item>
-       <widget class="QToolButton" name="m_pbNewLabel">
+       <widget class="QToolButton" name="m_pbNewSegmentationSession">
         <property name="toolTip">
-         <string>Add a new label to the current segmentation session</string>
+         <string>Create a new segmentation session</string>
         </property>
         <property name="text">
          <string>...</string>
         </property>
         <property name="icon">
          <iconset resource="../../resources/multilabelsegmentation.qrc">
-          <normaloff>:/multilabelsegmentation/NewLabel_48x48.png</normaloff>:/multilabelsegmentation/NewLabel_48x48.png</iconset>
+          <normaloff>:/multilabelsegmentation/NewSegmentationSession_48x48.png</normaloff>:/multilabelsegmentation/NewSegmentationSession_48x48.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -237,6 +237,32 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QToolButton" name="m_pbNewLabel">
+        <property name="toolTip">
+         <string>Add a new label to the current segmentation session</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../resources/multilabelsegmentation.qrc">
+          <normaloff>:/multilabelsegmentation/NewLabel_48x48.png</normaloff>:/multilabelsegmentation/NewLabel_48x48.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>N</string>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -278,7 +304,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>185</width>
+        <width>226</width>
         <height>247</height>
        </rect>
       </property>

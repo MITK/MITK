@@ -82,6 +82,7 @@ set(CPP_FILES
   Interactions/mitkToolCommand.cpp
   Interactions/mitkWatershedTool.cpp
   Interactions/mitkKeepNConnectedRegionsTool3D.cpp
+  Interactions/mitkSegmentationInteractor.cpp
   IO/mitkNrrdLabelSetImageIOFactory.cpp
   IO/mitkNrrdLabelSetImageWriterFactory.cpp
   IO/mitkNrrdLabelSetImageReader.cpp

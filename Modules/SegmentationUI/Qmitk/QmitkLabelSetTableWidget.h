@@ -124,6 +124,8 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
 
     void createSurfaces(int);
 
+    void importSegmentation();
+
   protected:
 
     /// \brief Seaches for a given label and returns a valid index or -1 if the label was not found.
@@ -134,23 +136,6 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
 
     /// \brief Set the LabelSetImage the widget should listen to.
     void SetActiveLabelSetImage(mitk::LabelSetImage* image);
-
-  protected slots:
-
-    /// \brief Slot for signal when the user selects another item.
-    void OnItemClicked(QTableWidgetItem *item);
-
-    void OnItemDoubleClicked(QTableWidgetItem *item);
-
-    void OnLockedButtonClicked();
-
-    void OnVisibleButtonClicked();
-
-    void OnColorButtonClicked();
-
-    void NodeTableViewContextMenuRequested( const QPoint & index );
-
-  public slots:
 
   protected:
 
@@ -185,6 +170,19 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     QWidgetAction* m_OpacityAction;
 
   protected slots:
+
+    /// \brief Slot for signal when the user selects another item.
+    void OnItemClicked(QTableWidgetItem *item);
+
+    void OnItemDoubleClicked(QTableWidgetItem *item);
+
+    void OnLockedButtonClicked();
+
+    void OnVisibleButtonClicked();
+
+    void OnColorButtonClicked();
+
+    void NodeTableViewContextMenuRequested( const QPoint & index );
 
     void OnRandomColor(bool);
 
@@ -233,6 +231,8 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     void OnRemoveAllLabels(bool);
 
     void OpacityChanged(int);
+
+    void OnImportSegmentationSession(bool);
 
 }; // mitk namespace
 

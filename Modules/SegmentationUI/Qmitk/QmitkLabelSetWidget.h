@@ -95,7 +95,7 @@ private slots:
   void OnActiveLabelChanged(int);
 
   // reaction to the button "New Label"
-  void OnNewLabel();
+//  void OnNewLabel();
 
   // reaction to the button "Add Layer"
   void OnAddLayer();
@@ -116,23 +116,11 @@ private slots:
 
   void OnLockExteriorToggled(bool);
 
-  // reaction to the button "New Segmentation"
-  void OnNewSegmentation();
-
-  // reaction to the button "Delete Segmentation"
-  void OnDeleteSegmentation();
-
-  // reaction to the button "Load Segmentation"
-  void OnLoadSegmentation();
-
   // reaction to the button "Import Segmentation"
   void OnImportSegmentation();
 
   // reaction to the button "Import Labeled Image"
   void OnImportLabeledImage();
-
-  // reaction to the button "Save Segmentation"
-  void OnSaveSegmentation();
 
 private:
 

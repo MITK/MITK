@@ -9,14 +9,8 @@
     <file>Accept_48x48.png</file>
     <file>Cancel_48x48.png</file>
     <file>Run_48x48.png</file>
-    <file>LoadSegmentationSession_48x48.png</file>
-    <file>SaveSegmentationSession_48x48.png</file>
-    <file>NewSegmentationSession_48x48.png</file>
     <file>ImportLabelSet_48x48.png</file>
     <file>ImportLabeledImage_48x48.png</file>
-    <file>NewLabel_48x48.png</file>
-    <file>NewSegmentationSession_48x48.png</file>
-    <file>DeleteSegmentationSession_48x48.png</file>
     <file>DeleteLayer_48x48.png</file>
     <file>PreviousLayer_48x48.png</file>
     <file>NextLayer_48x48.png</file>

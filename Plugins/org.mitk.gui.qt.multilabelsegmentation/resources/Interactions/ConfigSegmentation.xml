@@ -1,0 +1,54 @@
+<!--
+* - Segmentation : An interaction specially suited for segmenting
+*   - middle mouse button : panning
+*   - right mouse button  : zooming
+*   - wheel               : scrolling
+*   - up arrow key        : next upper slice
+*   - down arrow key      : next lower slice
+-->
+<config>
+  <!-- Zoom sensitivity -->
+  <param name="zoomFactor" value="5"/>
+  <!-- Zoom either by moving mouse leftright or updown -->
+  <param name="zoomDirection" value="updown"/>
+  <!-- react to an event, even tough is was already processed by a DataInteractor-->
+  <param name="alwaysReact" value="false"/>
+  <!-- Moving -->
+  <event_variant class="MousePressEvent" name="StartMove">
+    <attribute name="EventButton" value="MiddleMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndMoving">
+    <attribute name="EventButton" value="MiddleMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="Moving">
+    <attribute name="ButtonState" value="MiddleMouseButton"/>
+  </event_variant>
+  <!-- Zooming -->
+  <event_variant class="MousePressEvent" name="StartZoom">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </event_variant>
+   <event_variant class="MouseMoveEvent" name="Zooming">
+    <attribute name="ButtonState" value="RightMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndZooming">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </event_variant>
+  <!-- Scrolling through planes -->
+  <event_variant class="MouseWheelEvent" name="PlaneUP">
+    <attribute name="ScrollDirection" value="up"/>
+  </event_variant>
+  <event_variant class="MouseWheelEvent" name="PlaneDown">
+    <attribute name="ScrollDirection" value="down"/>
+  </event_variant>
+  <event_variant class="InteractionKeyEvent" name="PlaneUP">
+    <attribute name="Key" value="ArrowUp"/>
+  </event_variant>
+  <event_variant class="InteractionKeyEvent" name="PlaneDown">
+    <attribute name="Key" value="ArrowDown"/>
+  </event_variant>
+  <!-- Label selection -->
+  <event_variant class="MousePressEvent" name="SelectLabel">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
+  </event_variant>
+</config>

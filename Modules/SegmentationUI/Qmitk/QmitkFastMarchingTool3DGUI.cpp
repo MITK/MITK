@@ -74,7 +74,6 @@ m_TimeIsConnected(false)
   m_slSigma->setPageStep(0.1);
   m_slSigma->setSingleStep(0.01);
   m_slSigma->setValue(1.0);
-  m_slSigma->setDecimals(2);
   m_slSigma->setTracking(false);
   m_slSigma->setToolTip("The \"sigma\" parameter in the Gradient Magnitude filter.");
   connect( m_slSigma, SIGNAL(valueChanged(double)), this, SLOT(OnSigmaChanged(double)));
@@ -101,7 +100,6 @@ m_TimeIsConnected(false)
   m_slAlpha->setPageStep(0.1);
   m_slAlpha->setSingleStep(0.01);
   m_slAlpha->setValue(-0.5);
-  m_slAlpha->setDecimals(2);
   m_slAlpha->setTracking(false);
   m_slAlpha->setToolTip("The \"alpha\" parameter in the Sigmoid mapping filter.");
   connect( m_slAlpha, SIGNAL(valueChanged(double)), this, SLOT(OnAlphaChanged(double)));
@@ -128,7 +126,6 @@ m_TimeIsConnected(false)
   m_slBeta->setPageStep(0.1);
   m_slBeta->setSingleStep(0.01);
   m_slBeta->setValue(3.0);
-  m_slBeta->setDecimals(2);
   m_slBeta->setTracking(false);
   m_slBeta->setToolTip("The \"beta\" parameter in the Sigmoid mapping filter.");
   connect( m_slBeta, SIGNAL(valueChanged(double)), this, SLOT(OnBetaChanged(double)));
@@ -155,7 +152,6 @@ m_TimeIsConnected(false)
   m_slStoppingValue->setPageStep(10);
   m_slStoppingValue->setSingleStep(1);
   m_slStoppingValue->setValue(2000);
-  m_slStoppingValue->setDecimals(0);
   m_slStoppingValue->setTracking(false);
   m_slStoppingValue->setToolTip("The \"stopping value\" parameter in the fast marching 3D algorithm");
   connect( m_slStoppingValue, SIGNAL(valueChanged(double)), this, SLOT(OnStoppingValueChanged(double)));
@@ -181,7 +177,6 @@ m_TimeIsConnected(false)
   m_slwThreshold->setMaximum(500);
   m_slwThreshold->setMinimumValue(-100);
   m_slwThreshold->setMaximumValue(2000);
-  m_slwThreshold->setDecimals(0);
   m_slwThreshold->setTracking(false);
   m_slwThreshold->setToolTip("The lower and upper thresholds for the final thresholding");
   connect( m_slwThreshold, SIGNAL(valuesChanged(double, double)), this, SLOT(OnThresholdChanged(double, double)));
@@ -198,6 +193,12 @@ m_TimeIsConnected(false)
   connect( m_btConfirm, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()) );
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
+
+  m_slSigma->setDecimals(2);
+  m_slAlpha->setDecimals(2);
+  m_slBeta->setDecimals(2);
+  m_slStoppingValue->setDecimals(0);
+  m_slwThreshold->setDecimals(0);
 }
 
 QmitkFastMarchingTool3DGUI::~QmitkFastMarchingTool3DGUI()

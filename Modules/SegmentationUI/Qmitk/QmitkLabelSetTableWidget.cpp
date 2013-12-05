@@ -630,6 +630,11 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
     createCroppedMaskAction->setEnabled(true);
     QObject::connect( createCroppedMaskAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateCroppedMask(bool) ) );
 
+    QAction* importAction = new QAction(QIcon(":/QmitkExt/renamelabel.png"), "Import...", this );
+    importAction->setEnabled(true);
+    QObject::connect( importAction, SIGNAL( triggered(bool) ), this, SLOT( OnImportSegmentationSession(bool) ) );
+    menu->addAction(importAction);
+
     menu->addAction(createCroppedMaskAction);
 
     m_OpacitySlider = new QSlider;
@@ -834,6 +839,11 @@ void QmitkLabelSetTableWidget::OnCreateMask(bool value)
 void QmitkLabelSetTableWidget::OnCreateCroppedMask(bool value)
 {
   emit createCroppedMask( this->currentRow() );
+}
+
+void QmitkLabelSetTableWidget::OnImportSegmentationSession(bool value)
+{
+  emit importSegmentation();
 }
 
 void QmitkLabelSetTableWidget::OnCreateMasks(bool value)

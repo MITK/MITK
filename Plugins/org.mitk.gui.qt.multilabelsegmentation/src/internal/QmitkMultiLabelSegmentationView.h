@@ -60,6 +60,12 @@ protected slots:
 
   void OnManualTool2DSelected(int id);
 
+  void OnLoadSegmentation();
+
+  void OnSaveSegmentation();
+
+  void OnDeleteSegmentation();
+
   void OnNewLabel();
 
   // reaction to button "Surface Stamp"

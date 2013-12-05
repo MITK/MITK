@@ -61,10 +61,10 @@ mitk::DICOMNullFileReader
        ++o, ++inputIter)
   {
     DICOMImageBlockDescriptor block;
-    StringList outputFiles;
-    outputFiles.push_back( *inputIter );
+    DICOMImageFrameList outputFrames;
+    outputFrames.push_back( DICOMImageFrameInfo::New(*inputIter) );
 
-    block.SetFilenames( outputFiles );
+    block.SetImageFrameList( outputFrames );
 
     this->SetOutput( o, block );
   }

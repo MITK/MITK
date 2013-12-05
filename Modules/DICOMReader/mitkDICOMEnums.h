@@ -17,10 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkDICOMEnums_h
 #define mitkDICOMEnums_h
 
+#include "mitkDICOMImageFrameInfo.h"
+
 namespace mitk
 {
   typedef std::vector<std::string> StringList;
   typedef std::vector<bool> BoolList;
+
+  typedef std::vector<DICOMImageFrameInfo::Pointer> DICOMImageFrameList;
 
   typedef enum
   {

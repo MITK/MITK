@@ -36,8 +36,8 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
     DICOMImageBlockDescriptor(const DICOMImageBlockDescriptor& other);
     DICOMImageBlockDescriptor& operator=(const DICOMImageBlockDescriptor& other);
 
-    void SetFilenames(StringList filenames);
-    const StringList& GetFilenames() const;
+    void SetImageFrameList(const DICOMImageFrameList& framelist);
+    const DICOMImageFrameList& GetImageFrameList() const;
 
     void SetMitkImage(Image::Pointer image);
     Image::Pointer GetMitkImage() const;
@@ -54,7 +54,7 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
 
   private:
 
-    StringList m_Filenames;
+    DICOMImageFrameList m_ImageFrameList;
     Image::Pointer m_MitkImage;
     BoolList m_SliceIsLoaded;
     bool m_PixelsInterpolated;

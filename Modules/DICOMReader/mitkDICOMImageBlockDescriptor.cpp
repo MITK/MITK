@@ -30,7 +30,7 @@ mitk::DICOMImageBlockDescriptor
 
 mitk::DICOMImageBlockDescriptor
 ::DICOMImageBlockDescriptor(const DICOMImageBlockDescriptor& other)
-:m_Filenames( other.m_Filenames )
+:m_ImageFrameList( other.m_ImageFrameList )
 ,m_MitkImage( other.m_MitkImage )
 ,m_SliceIsLoaded( other.m_SliceIsLoaded )
 ,m_PixelsInterpolated( other.m_PixelsInterpolated )
@@ -48,7 +48,7 @@ mitk::DICOMImageBlockDescriptor
 {
   if (this != &other)
   {
-    m_Filenames = other.m_Filenames;
+    m_ImageFrameList = other.m_ImageFrameList;
     m_MitkImage = other.m_MitkImage;
     m_SliceIsLoaded = other.m_SliceIsLoaded;
     m_PixelsInterpolated = other.m_PixelsInterpolated;
@@ -64,18 +64,18 @@ mitk::DICOMImageBlockDescriptor
 
 void
 mitk::DICOMImageBlockDescriptor
-::SetFilenames(StringList filenames)
+::SetImageFrameList(const DICOMImageFrameList& framelist)
 {
-  m_Filenames = filenames;
-  m_SliceIsLoaded.resize(filenames.size());
-  m_SliceIsLoaded.assign(filenames.size(), false);
+  m_ImageFrameList = framelist;
+  m_SliceIsLoaded.resize(framelist.size());
+  m_SliceIsLoaded.assign(framelist.size(), false);
 }
 
-const mitk::StringList&
+const mitk::DICOMImageFrameList&
 mitk::DICOMImageBlockDescriptor
-::GetFilenames() const
+::GetImageFrameList() const
 {
-  return m_Filenames;
+  return m_ImageFrameList;
 }
 
 void

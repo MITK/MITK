@@ -239,9 +239,7 @@ void QmitkLabelSetTableWidget::LabelRemoved( )
   if (!m_BlockEvents)
   {
     m_BlockEvents = true;
-
     this->Reset();
-
     m_BlockEvents = false;
   }
 }
@@ -255,7 +253,9 @@ void QmitkLabelSetTableWidget::AllLabelsModified( )
 
 void QmitkLabelSetTableWidget::ActiveLabelChanged(int index)
 {
-    QTableWidgetItem* nameItem = this->item(index,NAME_COL);
+  if (!m_BlockEvents)
+  {
+    QTableWidgetItem* nameItem = this->item(index, NAME_COL);
     if (!nameItem) return;
     this->clearSelection();
     this->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -263,6 +263,7 @@ void QmitkLabelSetTableWidget::ActiveLabelChanged(int index)
     this->scrollToItem(nameItem);
     this->setSelectionMode(QAbstractItemView::ExtendedSelection);
     emit activeLabelChanged(index);
+  }
 }
 
 void QmitkLabelSetTableWidget::LabelModified( int index )
@@ -396,8 +397,10 @@ void QmitkLabelSetTableWidget::OnItemClicked(QTableWidgetItem *item)
   int row = item->row();
   if (row >= 0 && row < this->rowCount())
   {
+    m_BlockEvents = true;
     m_LabelSetImage->SetActiveLabel(row);
     emit activeLabelChanged(row);
+    m_BlockEvents = false;
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -488,14 +491,24 @@ void QmitkLabelSetTableWidget::InsertItem()
   this->setCellWidget(row, 1, pbLocked);
   this->setCellWidget(row, 2, pbColor);
   this->setCellWidget(row, 3, pbVisible);
+  this->selectRow(row);
+  m_LabelSetImage->SetActiveLabel(row);
+  emit activeLabelChanged(row);
 
+  if (row == 0)
+  {
+    this->hideRow(row); // hide exterior label
+    return;
+  }
+
+  /*
   if (m_AutoSelectNewLabels)
   {
     this->selectRow(row);
     m_LabelSetImage->SetActiveLabel(row);
     emit activeLabelChanged(row);
   }
-
+  */
   emit labelListModified(m_LabelStringList);
 }
 

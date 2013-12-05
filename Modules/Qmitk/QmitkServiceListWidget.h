@@ -231,6 +231,12 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     bool RemoveServiceFromList(const us::ServiceReferenceU& serviceRef);
 
     /**
+     * \brief Changes list entry of given service to match the changed service properties.
+     * \return true if successful, false if service was not found
+     */
+    bool ChangeServiceOnList(const us::ServiceReferenceU& serviceRef);
+
+    /**
     * \brief Returns the serviceReference corresponding to the given ListEntry or an invalid one if none was found (will evaluate to false in bool expressions).
     */
     us::ServiceReferenceU GetServiceForListItem(QListWidgetItem* item);
@@ -240,8 +246,11 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     */
     std::vector<us::ServiceReferenceU> GetAllRegisteredServices();
 
-
-
+    /**
+     * \brief Gets string from the naming property of the service.
+     * \return caption string for given us::ServiceReferenceU
+     */
+    QString CreateCaptionForService(const us::ServiceReferenceU& serviceRef);
 };
 
 #endif // _QmitkServiceListWidget_H_INCLUDED

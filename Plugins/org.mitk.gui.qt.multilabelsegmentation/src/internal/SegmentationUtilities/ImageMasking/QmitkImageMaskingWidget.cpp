@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkExceptionMacro.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkMaskImageFilter.h>
+#include <mitkPadImageFilter.h>
 #include <mitkProgressBar.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkSurfaceToImageFilter.h>
@@ -96,7 +97,7 @@ void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::D
       this->EnableButtons(false);
       return;
     }
-
+    /*
     else if( node.IsNotNull() && selection )
     {
       mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*> ( dataSelectionWidget->GetSelection(0)->GetData() );
@@ -115,6 +116,7 @@ void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::D
       dataSelectionWidget->SetHelpText(HelpText);
       return;
     }
+    */
   }
 
   dataSelectionWidget->SetHelpText("");
@@ -174,6 +176,23 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
 
     mitk::Image::Pointer maskImage = dynamic_cast<mitk::Image*> ( maskingNode->GetData() );
 
+    if( referenceImage->GetLargestPossibleRegion().GetSize() != maskImage->GetLargestPossibleRegion().GetSize() )
+    {
+      mitk::PadImageFilter::Pointer padImageFilter = mitk::PadImageFilter::New();
+      padImageFilter->SetInput(0, maskImage);
+      padImageFilter->SetInput(1, referenceImage);
+      padImageFilter->SetPadConstant(0);
+      padImageFilter->SetBinaryFilter(false);
+      padImageFilter->SetLowerThreshold(0);
+      padImageFilter->SetUpperThreshold(1);
+
+      MITK_INFO << "Padding mask ...";
+
+      padImageFilter->Update();
+
+      maskImage = padImageFilter->GetOutput();
+    }
+
     if(maskImage.IsNull() )
     {
       MITK_ERROR << "Selection does not contain a binary image";
@@ -182,11 +201,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
       return;
     }
 
-    if( referenceImage->GetLargestPossibleRegion().GetSize() == maskImage->GetLargestPossibleRegion().GetSize() )
-    {
-      resultImage = this->MaskImage( referenceImage, maskImage );
-    }
-
+    resultImage = this->MaskImage( referenceImage, maskImage );
   }
 
   //Do Surface-Masking

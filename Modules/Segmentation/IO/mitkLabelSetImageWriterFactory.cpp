@@ -14,37 +14,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkNrrdLabelSetImageWriterFactory.h"
+#include "mitkLabelSetImageWriterFactory.h"
 
 #include "itkCreateObjectFunction.h"
 #include "itkVersion.h"
 
-#include <mitkNrrdLabelSetImageWriter.h>
+#include <mitkLabelSetImageWriter.h>
 
 namespace mitk
 {
 
-NrrdLabelSetImageWriterFactory::NrrdLabelSetImageWriterFactory()
+LabelSetImageWriterFactory::LabelSetImageWriterFactory()
 {
   this->RegisterOverride("IOWriter",
-                         "NrrdLabelSetImageWriter",
+                         "LabelSetImageWriter",
                          "Nrrd LabelSet Image Writer",
                          1,
-                         itk::CreateObjectFunction< mitk::NrrdLabelSetImageWriter >::New());
+                         itk::CreateObjectFunction< mitk::LabelSetImageWriter >::New());
 }
 
-NrrdLabelSetImageWriterFactory::~NrrdLabelSetImageWriterFactory()
+LabelSetImageWriterFactory::~LabelSetImageWriterFactory()
 {
 }
 
-const char* NrrdLabelSetImageWriterFactory::GetITKSourceVersion() const
+const char* LabelSetImageWriterFactory::GetITKSourceVersion() const
 {
   return ITK_SOURCE_VERSION;
 }
 
-const char* NrrdLabelSetImageWriterFactory::GetDescription() const
+const char* LabelSetImageWriterFactory::GetDescription() const
 {
-  return "NrrdLabelSetImageWriterFactory";
+  return "LabelSetImageWriterFactory";
 }
 
 } // end namespace mitk

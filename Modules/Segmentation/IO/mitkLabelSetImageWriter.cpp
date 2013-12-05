@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkNrrdLabelSetImageWriter__cpp
-#define __mitkNrrdLabelSetImageWriter__cpp
+#ifndef __mitkLabelSetImageWriter__cpp
+#define __mitkLabelSetImageWriter__cpp
 
-#include "mitkNrrdLabelSetImageWriter.h"
+#include "mitkLabelSetImageWriter.h"
 #include "itkMetaDataDictionary.h"
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
@@ -27,22 +27,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <fstream>
 
-mitk::NrrdLabelSetImageWriter::NrrdLabelSetImageWriter()
+mitk::LabelSetImageWriter::LabelSetImageWriter()
   : m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
 {
   this->SetNumberOfRequiredInputs( 1 );
 }
 
-mitk::NrrdLabelSetImageWriter::~NrrdLabelSetImageWriter()
+mitk::LabelSetImageWriter::~LabelSetImageWriter()
 {}
 
-void mitk::NrrdLabelSetImageWriter::GenerateData()
+void mitk::LabelSetImageWriter::GenerateData()
 {
   m_Success = false;
   InputType* input = this->GetInput();
   if (input == NULL)
   {
-    MITK_WARN << "Input to NrrdLabelSetImageWriter is NULL.";
+    MITK_WARN << "Input to LabelSetImageWriter is NULL.";
     return;
   }
   if ( m_FileName == "" )
@@ -147,12 +147,12 @@ void mitk::NrrdLabelSetImageWriter::GenerateData()
   m_Success = true;
 }
 
-void mitk::NrrdLabelSetImageWriter::SetInput( InputType* diffVolumes )
+void mitk::LabelSetImageWriter::SetInput( InputType* diffVolumes )
 {
   this->ProcessObject::SetNthInput( 0, diffVolumes );
 }
 
-mitk::LabelSetImage* mitk::NrrdLabelSetImageWriter::GetInput()
+mitk::LabelSetImage* mitk::LabelSetImageWriter::GetInput()
 {
   if ( this->GetNumberOfInputs() < 1 )
   {
@@ -164,11 +164,11 @@ mitk::LabelSetImage* mitk::NrrdLabelSetImageWriter::GetInput()
   }
 }
 
-std::vector<std::string> mitk::NrrdLabelSetImageWriter::GetPossibleFileExtensions()
+std::vector<std::string> mitk::LabelSetImageWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
   possibleFileExtensions.push_back(".lset");
   return possibleFileExtensions;
 }
 
-#endif //__mitkNrrdLabelSetImageWriter__cpp
+#endif //__mitkLabelSetImageWriter__cpp

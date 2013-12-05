@@ -83,10 +83,10 @@ set(CPP_FILES
   Interactions/mitkWatershedTool.cpp
   Interactions/mitkKeepNConnectedRegionsTool3D.cpp
   Interactions/mitkSegmentationInteractor.cpp
-  IO/mitkNrrdLabelSetImageIOFactory.cpp
-  IO/mitkNrrdLabelSetImageWriterFactory.cpp
-  IO/mitkNrrdLabelSetImageReader.cpp
-  IO/mitkNrrdLabelSetImageWriter.cpp
+  IO/mitkLabelSetImageIOFactory.cpp
+  IO/mitkLabelSetImageWriterFactory.cpp
+  IO/mitkLabelSetImageReader.cpp
+  IO/mitkLabelSetImageWriter.cpp
   IO/mitkLabelSetImageSource.cpp
   Rendering/mitkContourMapper2D.cpp
   #Rendering/mitkContourModelGLMapper2D.cpp

@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkNrrdLabelSetImageReader_cpp
-#define __mitkNrrdLabelSetImageReader_cpp
+#ifndef __mitkLabelSetImageReader_cpp
+#define __mitkLabelSetImageReader_cpp
 
-#include "mitkNrrdLabelSetImageReader.h"
+#include "mitkLabelSetImageReader.h"
 
 #include "mitkLabelSetImage.h"
 
@@ -33,18 +33,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-NrrdLabelSetImageReader::NrrdLabelSetImageReader() :
+LabelSetImageReader::LabelSetImageReader() :
 m_FileName(""),
 m_FilePrefix(""),
 m_FilePattern("")
 {
 }
 
-NrrdLabelSetImageReader::~NrrdLabelSetImageReader()
+LabelSetImageReader::~LabelSetImageReader()
 {
 }
 
-void NrrdLabelSetImageReader::GenerateData()
+void LabelSetImageReader::GenerateData()
 {
   if ( m_FileName == "")
     mitkThrow() << "The filename to be read is empty!";
@@ -196,41 +196,41 @@ void NrrdLabelSetImageReader::GenerateData()
   }
 }
 
-void NrrdLabelSetImageReader::GenerateOutputInformation()
+void LabelSetImageReader::GenerateOutputInformation()
 {
 }
 
-const char* NrrdLabelSetImageReader::GetFileName() const
+const char* LabelSetImageReader::GetFileName() const
 {
   return m_FileName.c_str();
 }
 
-void NrrdLabelSetImageReader::SetFileName(const char* aFileName)
+void LabelSetImageReader::SetFileName(const char* aFileName)
 {
   m_FileName = aFileName;
 }
 
-const char* NrrdLabelSetImageReader::GetFilePrefix() const
+const char* LabelSetImageReader::GetFilePrefix() const
 {
   return m_FilePrefix.c_str();
 }
 
-void NrrdLabelSetImageReader::SetFilePrefix(const char* aFilePrefix)
+void LabelSetImageReader::SetFilePrefix(const char* aFilePrefix)
 {
   m_FilePrefix = aFilePrefix;
 }
 
-const char* NrrdLabelSetImageReader::GetFilePattern() const
+const char* LabelSetImageReader::GetFilePattern() const
 {
   return m_FilePattern.c_str();
 }
 
-void NrrdLabelSetImageReader::SetFilePattern(const char* aFilePattern)
+void LabelSetImageReader::SetFilePattern(const char* aFilePattern)
 {
   m_FilePattern = aFilePattern;
 }
 
-bool NrrdLabelSetImageReader::CanReadFile(const std::string filename,
+bool LabelSetImageReader::CanReadFile(const std::string filename,
                                           const std::string /*filePrefix*/, const std::string /*filePattern*/)
 {
   // First check the extension

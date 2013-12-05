@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkNrrdLabelSetImageWriter_h
-#define __mitkNrrdLabelSetImageWriter_h
+#ifndef __mitkLabelSetImageWriter_h
+#define __mitkLabelSetImageWriter_h
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
@@ -30,11 +30,11 @@ namespace mitk
  * Writes a labelset image to a file
  * @ingroup Process
  */
-class Segmentation_EXPORT NrrdLabelSetImageWriter : public mitk::FileWriterWithInformation
+class Segmentation_EXPORT LabelSetImageWriter : public mitk::FileWriterWithInformation
 {
 public:
 
-    mitkClassMacro( NrrdLabelSetImageWriter, mitk::FileWriterWithInformation );
+    mitkClassMacro( LabelSetImageWriter, mitk::FileWriterWithInformation );
 
     mitkWriterMacro;
 
@@ -118,9 +118,9 @@ public:
 
 protected:
 
-    NrrdLabelSetImageWriter();
+    LabelSetImageWriter();
 
-    virtual ~NrrdLabelSetImageWriter();
+    virtual ~LabelSetImageWriter();
 
     virtual void GenerateData();
 
@@ -136,4 +136,4 @@ protected:
 
 } // end of namespace mitk
 
-#endif // __mitkNrrdLabelSetImageWriter_h
+#endif // __mitkLabelSetImageWriter_h

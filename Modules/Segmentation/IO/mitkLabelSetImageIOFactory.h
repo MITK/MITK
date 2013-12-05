@@ -13,28 +13,28 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __MITK_NRRD_LABELSET_IMAGE_IO_FACTORY_H_HEADER__
-#define __MITK_NRRD_LABELSET_IMAGE_IO_FACTORY_H_HEADER__
+#ifndef __mitkLabelSetImageIOFactory_h
+#define __mitkLabelSetImageIOFactory_h
 
 #ifdef _MSC_VER
 #pragma warning ( disable : 4786 )
 #endif
 
+#include "SegmentationExports.h"
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
-#include "SegmentationExports.h"
 
 namespace mitk
 {
 //##Documentation
-//## @brief Create instances of NrrdLabelSetImageReader objects using an object factory.
+//## @brief Create instances of LabelSetImageReader objects using an object factory.
 //##
 //## @ingroup IO
-class Segmentation_EXPORT NrrdLabelSetImageIOFactory : public itk::ObjectFactoryBase
+class Segmentation_EXPORT LabelSetImageIOFactory : public itk::ObjectFactoryBase
 {
 public:
   /** Standard class typedefs. */
-  typedef NrrdLabelSetImageIOFactory   Self;
+  typedef LabelSetImageIOFactory   Self;
   typedef itk::ObjectFactoryBase  Superclass;
   typedef itk::SmartPointer<Self>  Pointer;
   typedef itk::SmartPointer<const Self>  ConstPointer;
@@ -45,32 +45,31 @@ public:
 
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
-  static NrrdLabelSetImageIOFactory* FactoryNew() { return new NrrdLabelSetImageIOFactory;}
+  static LabelSetImageIOFactory* FactoryNew() { return new LabelSetImageIOFactory;}
   /** Run-time type information (and related methods). */
-  itkTypeMacro(NrrdLabelSetImageIOFactory, ObjectFactoryBase);
+  itkTypeMacro(LabelSetImageIOFactory, ObjectFactoryBase);
 
-  /** Register one factory of this type  */
-  static void RegisterOneFactory(void)
+  /**
+   * Register one factory of this type
+   * \deprecatedSince{2013_09}
+   */
+  DEPRECATED(static void RegisterOneFactory(void))
   {
-    static bool IsRegistered = false;
-    if ( !IsRegistered )
-    {
-      NrrdLabelSetImageIOFactory::Pointer fac = NrrdLabelSetImageIOFactory::New();
-      ObjectFactoryBase::RegisterFactory( fac );
-      IsRegistered = true;
-    }
+    LabelSetImageIOFactory::Pointer LabelSetImageIOFactory = LabelSetImageIOFactory::New();
+    ObjectFactoryBase::RegisterFactory(LabelSetImageIOFactory);
   }
 
 protected:
-  NrrdLabelSetImageIOFactory();
-  ~NrrdLabelSetImageIOFactory();
+  LabelSetImageIOFactory();
+  ~LabelSetImageIOFactory();
 
 private:
-  NrrdLabelSetImageIOFactory(const Self&); //purposely not implemented
+  LabelSetImageIOFactory(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
 };
 
+
 } // end namespace mitk
 
-#endif  // __MITK_NRRD_LABELSET_IMAGE_IO_FACTORY_H_HEADER__
+#endif

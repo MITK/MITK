@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLabelSetImage.h>
 #include <mitkToolManagerProvider.h>
 #include <mitkLabelSetImageToSurfaceThreadedFilter.h>
-#include <mitkNrrdLabelSetImageReader.h>
-#include <mitkNrrdLabelSetImageWriter.h>
 #include <mitkRenderingManager.h>
 #include <mitkStatusBar.h>
 #include <mitkIOUtil.h>
@@ -653,6 +651,7 @@ void QmitkLabelSetWidget::OnImportLabeledImage()
 
 void QmitkLabelSetWidget::OnImportSegmentation()
 {
+/*
   m_ToolManager->ActivateTool(-1);
 
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
@@ -682,7 +681,7 @@ void QmitkLabelSetWidget::OnImportSegmentation()
     MITK_ERROR << "Exception caught: " << e.GetDescription();
     QMessageBox::information(this, "Import Segmentation", "Could not import the selected segmentation session.\n See error log for details.\n");
   }
-
+*/
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

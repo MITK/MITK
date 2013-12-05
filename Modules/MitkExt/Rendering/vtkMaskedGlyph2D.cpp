@@ -70,7 +70,7 @@ int vtkMaskedGlyph2D::RequestData(vtkInformation* info, vtkInformationVector** i
     this->Superclass::SetInputData(this->MaskPoints->GetInput());
     }
 
-  this->Superclass::RequestData(info, inInfoVec, outInfoVec);
+  return this->Superclass::RequestData(info, inInfoVec, outInfoVec);
 }
 
 void vtkMaskedGlyph2D::PrintSelf(ostream& os, vtkIndent indent)

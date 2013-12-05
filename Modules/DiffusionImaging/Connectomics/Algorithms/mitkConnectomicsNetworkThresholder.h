@@ -54,10 +54,32 @@ namespace mitk
     typedef boost::property_map< NetworkType, boost::vertex_index_t>::type VertexIndexMapType;
     typedef boost::iterator_property_map< std::vector< double >::iterator, VertexIndexMapType > VertexIteratorPropertyMapType;
 
+    /** \brief Possible schemes for thresholding the network
+    *
+    * \li \c RandomRemovalOfWeakest: Randomly remove one of the weakest edges until a given density is reached
+    * \li \c LargestLowerThanDensity: Remove all edges of the lowest weight, repeat until below the specified density
+    * \li \c ThresholdBased: Remove all edges with a weight of threshold and lower. This will not take density information into account.
+    */
+    enum ThresholdingSchemes
+    {
+      RandomRemovalOfWeakest,
+      LargestLowerThanDensity,
+      ThresholdBased
+    };
+
     // Set/Get Macros
     itkSetObjectMacro( Network, mitk::ConnectomicsNetwork );
+    itkSetMacro( ThresholdingScheme, ThresholdingSchemes );
+    itkSetMacro( TargetThreshold, double );
+    itkSetMacro( TargetDensity, double );
 
-    void Update();
+    itkGetObjectMacro( Network, mitk::ConnectomicsNetwork );
+    itkGetMacro( ThresholdingScheme, ThresholdingSchemes );
+    itkGetMacro( TargetThreshold, double );
+    itkGetMacro( TargetDensity, double );
+
+    /** \brief Apply thresholding scheme and get resulting network */
+    mitk::ConnectomicsNetwork::Pointer GetThresholdedNetwork();
 
   protected:
 
@@ -65,11 +87,20 @@ namespace mitk
     ConnectomicsNetworkThresholder();
     ~ConnectomicsNetworkThresholder();
 
+    mitk::ConnectomicsNetwork::Pointer ThresholdByRandomRemoval( mitk::ConnectomicsNetwork::Pointer input, double targetDensity );
+    mitk::ConnectomicsNetwork::Pointer ThresholdBelowDensity( mitk::ConnectomicsNetwork::Pointer input, double targetDensity );
+    mitk::ConnectomicsNetwork::Pointer Threshold( mitk::ConnectomicsNetwork::Pointer input, double targetThreshold );
 
     /////////////////////// Variables ////////////////////////
 
     // The connectomics network, which is used for statistics calculation
     mitk::ConnectomicsNetwork::Pointer m_Network;
+
+    // The thresholding scheme to be used
+    ThresholdingSchemes m_ThresholdingScheme;
+
+    double m_TargetThreshold;
+    double m_TargetDensity;
 
   };
 

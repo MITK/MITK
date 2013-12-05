@@ -117,7 +117,7 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::Thresho
     }
   }
 
-  input->UpdateIDs();
+  result->UpdateIDs();
 
-  return input;
+  return result;
 }

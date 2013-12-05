@@ -89,5 +89,35 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::Thresho
 
 mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::Threshold( mitk::ConnectomicsNetwork::Pointer input, double targetThreshold )
 {
+  mitk::ConnectomicsNetwork::Pointer result( input );
+
+  NetworkType* boostGraph = result->GetBoostGraph();
+
+  EdgeIteratorType iterator, end;
+
+  // set to true if iterators are invalidated by deleting an edge
+  bool edgeHasBeenRemoved( true );
+
+  // if no edge has been removed in the last loop, we are done
+  while( edgeHasBeenRemoved )
+  {
+    edgeHasBeenRemoved = false;
+    // sets iterator to start and end to end
+    boost::tie(iterator, end) = boost::edges( *boostGraph );
+
+    for ( ; iterator != end && !edgeHasBeenRemoved; ++iterator)
+    {
+      // If the edge is below the target threshold it is deleted
+      if( (*boostGraph)[ *iterator ].weight < targetThreshold )
+      {
+        edgeHasBeenRemoved = true;
+        // this invalidates all iterators
+        boost::remove_edge( *iterator, *boostGraph );
+      }
+    }
+  }
+
+  input->UpdateIDs();
+
   return input;
 }

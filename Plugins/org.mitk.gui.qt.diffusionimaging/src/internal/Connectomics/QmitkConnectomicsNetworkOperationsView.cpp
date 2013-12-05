@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsSimulatedAnnealingPermutationModularity.h"
 #include "mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h"
 #include <itkConnectomicsNetworkToConnectivityMatrixImageFilter.h>
+#include <mitkConnectomicsNetworkThresholder.h>
 
 // Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"
@@ -440,7 +441,11 @@ void QmitkConnectomicsNetworkOperationsView::OnPrunePushButtonClicked()
       if( node.IsNotNull() && network )
       {
         // Edge pruning will also do node pruning
-        network->PruneEdgesBelowWeight( this->m_Controls->pruneEdgeWeightSpinBox->value() );
+        mitk::ConnectomicsNetworkThresholder::Pointer thresholder;
+        thresholder->SetNetwork( network );
+        thresholder->SetThresholdingScheme( mitk::ConnectomicsNetworkThresholder::ThresholdBased );
+        thresholder->SetTargetThreshold( this->m_Controls->pruneEdgeWeightSpinBox->value() );
+        node->SetData( thresholder->GetThresholdedNetwork()  );
       }
     }
   }

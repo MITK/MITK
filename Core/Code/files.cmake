@@ -393,7 +393,6 @@ Interactions/PointSet.xml
 Interactions/Legacy/StateMachine.xml
 Interactions/Legacy/DisplayConfigMITKTools.xml
 Interactions/PointSetConfig.xml
-Interactions/DisplayConfigSegmentation.xml
 
 Shaders/mitkShaderLighting.xml
 

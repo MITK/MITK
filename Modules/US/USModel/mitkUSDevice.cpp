@@ -54,6 +54,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   m_ImageMutex(itk::FastMutexLock::New()),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
+  m_ThreadID(-1),
   m_UnregisteringStarted(false)
 {
   // Initialize Members
@@ -82,6 +83,7 @@ mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
   m_ImageMutex(itk::FastMutexLock::New()),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
+  m_ThreadID(-1),
   m_UnregisteringStarted(false)
 {
   m_Metadata = metadata;
@@ -103,6 +105,11 @@ mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
 
 mitk::USDevice::~USDevice()
 {
+  if (m_ThreadID >= 0)
+  {
+    m_MultiThreader->TerminateThread(m_ThreadID);
+  }
+
   // make sure that the us device is not registered at the micro service
   // anymore after it is destructed
   this->UnregisterOnService();

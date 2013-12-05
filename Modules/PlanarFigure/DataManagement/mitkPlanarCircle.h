@@ -94,6 +94,9 @@ public:
       m_MinMaxRadiusContraintsActive = active;
   }
 
+  virtual bool SetCurrentControlPoint( const Point2D& point );
+
+
 protected:
   PlanarCircle();
   virtual ~PlanarCircle();

@@ -258,7 +258,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   // initialize points with a random start value
 
   // current point in point set
-  itk::Point<float> point = pointsIter->Value();
+  itk::Point<ScalarType> point = pointsIter->Value();
 
   mitk::Point3D p = point;              // currently visited point
   mitk::Point3D lastP = point;          // last visited point (predecessor in point set of "point")
@@ -279,6 +279,8 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
   mitk::PlaneGeometry::ConstPointer planeGeometry = renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry();
 
+  vtkLinearTransform* dataNodeTransform = input->GetGeometry()->GetVtkTransform();
+
   int count = 0;
 
   for (pointsIter=itkPointSet->GetPoints()->Begin();
@@ -294,6 +296,14 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
     // get current point in point set
     point = pointsIter->Value();
+
+    // transform point
+    {
+      float vtkp[3];
+      itk2vtk(point, vtkp);
+      dataNodeTransform->TransformPoint(vtkp, vtkp);
+      vtk2itk(vtkp,point);
+    }
 
     p[0] = point[0];
     p[1] = point[1];

@@ -73,9 +73,9 @@ void mitkDICOMLocaleTestWithReferenceImage(std::string filename)
 
   // note importance of minor differences in spacings:
   // DICOM has order y-spacing, x-spacing, while in MITK we assume x-spacing, y-spacing (both meant for 0 and 1 index in array)
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[0], 0.3141592), "correct x spacing? found "
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[0], 0.3141592, 0.000001), "correct x spacing? found "
                                << image->GetGeometry()->GetSpacing()[0]);
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[1], 0.3411592), "correct y spacing? found "
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[1], 0.3411592, 0.000001), "correct y spacing? found "
                                << image->GetGeometry()->GetSpacing()[1]);
 }
 

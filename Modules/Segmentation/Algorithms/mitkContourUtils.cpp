@@ -59,7 +59,7 @@ mitk::ContourModel::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image* s
 
   const Geometry3D* sliceGeometry = slice->GetGeometry();
 
-  int numberOfTimesteps = contourIn3D->GetTimeSlicedGeometry()->GetTimeSteps();
+  int numberOfTimesteps = contourIn3D->GetTimeGeometry()->CountTimeSteps();
 
   for(int currentTimestep = 0; currentTimestep < numberOfTimesteps; currentTimestep++)
   {
@@ -111,11 +111,10 @@ mitk::ContourModel::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(co
   ContourModel::Pointer worldContour = ContourModel::New();
   worldContour->Initialize(*contourIn2D);
 
-  int numberOfTimesteps = contourIn2D->GetTimeSlicedGeometry()->GetTimeSteps();
+  int numberOfTimesteps = contourIn2D->GetTimeGeometry()->CountTimeSteps();
 
   for(int currentTimestep = 0; currentTimestep < numberOfTimesteps; currentTimestep++)
   {
-
   ContourModel::VertexIterator iter = contourIn2D->Begin(currentTimestep);
   ContourModel::VertexIterator end = contourIn2D->End(currentTimestep);
 
@@ -236,4 +235,3 @@ void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDi
     ++inputIterator;
   }
 }
-

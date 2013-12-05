@@ -86,6 +86,15 @@ void vtkUnstructuredGridMapper::ReleaseGraphicsResources( vtkWindow *renWin )
 }
 
 //----------------------------------------------------------------------------
+void vtkUnstructuredGridMapper::ReleaseGraphicsResources( mitk::BaseRenderer * renderer )
+{
+  if (this->PolyDataMapper)
+    {
+    this->PolyDataMapper->ReleaseGraphicsResources( renderer->GetVtkRenderer()->GetRenderWindow());
+    }
+}
+
+//----------------------------------------------------------------------------
 // Receives from Actor -> maps data to primitives
 //
 void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)

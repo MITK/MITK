@@ -25,12 +25,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkTransferFunctionCanvas::QmitkTransferFunctionCanvas(QWidget * parent,
     Qt::WindowFlags f) :
-  QWidget(parent, f), m_GrabbedHandle(-1), m_Lower(0.0f), m_Upper(1.0f), m_Min(
-      0.0f), m_Max(1.0f)
+  QWidget(parent, f),
+  m_GrabbedHandle(-1),
+  m_Lower(0.0),
+  m_Upper(1.0),
+  m_Min(0.0),
+  m_Max(1.0),
+  m_Histogram(0),
+  m_ImmediateUpdate(false),
+  m_Range(0.0f),
+  m_LineEditAvailable(false),
+  m_XEdit(0),
+  m_YEdit(0)
 {
   setEnabled(false);
   setFocusPolicy(Qt::ClickFocus);
-  m_LineEditAvailable = false;
 }
 
 void QmitkTransferFunctionCanvas::paintEvent(QPaintEvent* ev)

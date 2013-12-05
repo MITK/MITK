@@ -90,7 +90,9 @@ namespace mitk {
     PlanarFigureComposite();
     virtual ~PlanarFigureComposite();
 
+    PlanarFigureComposite(const Self& other);
 
+    mitkCloneMacro(Self);
 
     // ///MUST HAVE IMPLEMENTATION//////
     /** \brief Generates the poly-line representation of the planar figure. */

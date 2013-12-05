@@ -140,7 +140,11 @@ macro(MACRO_CREATE_CTK_PLUGIN)
   include_directories(${Poco_INCLUDE_DIRS})
   include_directories(${BlueBerry_BINARY_DIR})
 
-  target_link_libraries(${PLUGIN_TARGET} ${Poco_LIBRARIES})
+  # Only add the following Poco libraries due to possible name clashes
+  # in PocoPDF with libpng when also linking QtGui.
+  foreach(lib Foundation Util XML)
+    target_link_libraries(${PLUGIN_TARGET} ${Poco_${lib}_LIBRARY})
+  endforeach()
 
   # Set compiler flags
   get_target_property(_plugin_compile_flags ${PLUGIN_TARGET} COMPILE_FLAGS)

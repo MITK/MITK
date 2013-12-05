@@ -95,6 +95,7 @@ set(CPP_FILES
  QmitkModulesDialog.cpp
 
  QmitkHistogramJSWidget.cpp
+ QmitkWebPage.cpp
 
  QmitkLineEdit.cpp
 )
@@ -180,6 +181,7 @@ set(MOC_H_FILES
  QmitkPlotWidget.h
 
  QmitkHistogramJSWidget.h
+ QmitkWebPage.h
 
  QmitkLineEdit.h
 )

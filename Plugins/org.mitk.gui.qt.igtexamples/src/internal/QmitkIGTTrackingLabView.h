@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 
 #include "ui_QmitkIGTTrackingLabViewControls.h"
 
@@ -32,7 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTrackingDeviceSource.h>
 #include <mitkSurface.h>
 #include <mitkCameraVisualization.h>
-#include <mitkTransform.h>
 
 #include <QToolBox>
 #include <QCheckBox>
@@ -42,13 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSpinBox>
 #include <QTimer>
 
-class QmitkNDIConfigurationWidget;
-class QmitkFiducialRegistrationWidget;
-class QmitkUpdateTimerWidget;
-class QmitkToolSelectionWidget;
-class QmitkToolTrackingStatusWidget;
-
-
 /*!
   \brief QmitkIGTTrackingLabView
 
@@ -57,7 +49,7 @@ class QmitkToolTrackingStatusWidget;
   \sa QmitkFunctionality
   \ingroup ${plugin_target}_internal
 */
-class QmitkIGTTrackingLabView : public QmitkFunctionality
+class QmitkIGTTrackingLabView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -78,6 +70,8 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     virtual ~QmitkIGTTrackingLabView();
 
     virtual void CreateQtPartControl(QWidget *parent);
+
+    virtual void SetFocus();
 
   protected slots:
 
@@ -103,10 +97,6 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     \brief This method initializes the registration for the FiducialRegistrationWidget.
     */
     void InitializeRegistration();
-    /**
-    \brief This method reacts on tool surface changes.
-    */
-    void ChangeToolRepresentation( int toolID , mitk::Surface::Pointer surface );
     /**
     \brief This method starts the PointSet recording.
     */
@@ -153,24 +143,10 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     */
     void SetupIGTPipeline();
     /**
-    \brief This method initializes all needed filters.
-    */
-    void InitializeFilters();
-    /**
     \brief This method destroys the filter pipeline.
     */
     void DestroyIGTPipeline();
 
-
-    /**
-    \brief This method creates a DataNode for fiducial PointSets.
-    */
-    mitk::DataNode::Pointer CreateRegistrationFiducialsNode( const std::string& label, const mitk::Color& color);
-
-    /**
-    \brief This method returns a PointSet with three vritual points transformed from the position and orientation of the given NavigationData. This method is needed to calculate the source points for permanent registration from one tool's position.
-    */
-    mitk::PointSet::Pointer GetVirtualPointSetFromPosition(mitk::NavigationData::Pointer navigationData);
 
 
     mitk::TrackingDeviceSource::Pointer m_Source; ///< source that connects to the tracking device
@@ -179,7 +155,6 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer; ///< visualization filter
     mitk::CameraVisualization::Pointer m_VirtualView; ///< filter to update the vtk camera according to the reference navigation data
 
-    mitk::Vector3D  m_DirectionOfProjectionVector;///< vector for direction of projection of instruments
 
     bool CheckRegistrationInitialization();///< Checks if everything is initialized for registration. Gives error messages and returns false if not.
 
@@ -193,7 +168,7 @@ private:
 
   mitk::PointSet::Pointer m_PSRecordingPointSet;
 
-  QmitkNDIConfigurationWidget* m_NDIConfigWidget;  // tracking device configuration widget
+
   QmitkFiducialRegistrationWidget* m_RegistrationWidget; // landmark registration widget
 
   std::string m_RegistrationTrackingFiducialsName;
@@ -207,25 +182,19 @@ private:
   mitk::DataNode::Pointer m_ImageFiducialsDataNode;
   mitk::DataNode::Pointer m_TrackerFiducialsDataNode;
 
-  QmitkToolSelectionWidget* m_PermanentRegistrationToolSelectionWidget;
-  QmitkToolSelectionWidget* m_VirtualViewToolSelectionWidget;
-
-  mitk::NavigationData::PositionType m_TargetPosition;
-  mitk::NavigationData::OrientationType m_PermanentRegistrationInitialOrientation;
-
   mitk::PointSet::Pointer m_PermanentRegistrationSourcePoints;
 
   mitk::NavigationData::Pointer m_InstrumentNavigationData;
   mitk::NavigationData::Pointer m_ObjectmarkerNavigationData;
   mitk::NavigationData::Pointer m_PointSetRecordingNavigationData;
 
-  mitk::Transform::Pointer m_T_MarkerRel;
-  mitk::Transform::Pointer m_T_ObjectReg;
+  mitk::NavigationData::Pointer m_T_MarkerRel;
+  mitk::NavigationData::Pointer m_T_ObjectReg;
   mitk::AffineTransform3D::Pointer m_T_ImageReg;
   mitk::AffineTransform3D::Pointer m_T_ImageGeo;
-  mitk::Transform::Pointer m_ObjectmarkerNavigationDataLastUpdate;
+  mitk::NavigationData::Pointer m_ObjectmarkerNavigationDataLastUpdate;
 
-  bool IsTransformDifferenceHigh(mitk::Transform::Pointer transformA, mitk::Transform::Pointer transformB);
+  bool IsTransformDifferenceHigh(mitk::NavigationData::Pointer transformA, mitk::NavigationData::Pointer transformB);
 
   /**
     \brief This method performs GlobalReinit() for the rendering widgets.

@@ -178,7 +178,8 @@ void TestGoToSnapshotException()
   bool exceptionThrown2=false;
   try
   {
-    myTestPlayer2->GoToSnapshot(1000);
+    unsigned int invalidSnapshot = 1000;
+    myTestPlayer2->GoToSnapshot(invalidSnapshot);
   }
   catch(mitk::IGTException)
   {

@@ -14,9 +14,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+// Qmitk includes
 #include "QmitkRigidRegistrationView.h"
-
 #include "QmitkStdMultiWidget.h"
+
+// MITK includes
+#include "mitkDataNodeObject.h"
+#include <mitkImageCast.h>
+#include "mitkManualSegmentationToSurfaceFilter.h"
+#include <mitkSegmentationSink.h>
+#include <mitkImageStatisticsHolder.h>
+#include "mitkNodePredicateDataType.h"
+#include "mitkNodePredicateAnd.h"
+#include "mitkNodePredicateProperty.h"
+
+// QT includes
 #include "qinputdialog.h"
 #include "qmessagebox.h"
 #include "qcursor.h"
@@ -25,22 +37,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "qslider.h"
 #include "qtooltip.h"
 
+// VTK includes
 #include <vtkTransform.h>
 
-#include "mitkDataNodeObject.h"
-#include <mitkImageCast.h>
-
-#include "berryIWorkbenchWindow.h"
-#include "berryISelectionService.h"
-
-#include "mitkManualSegmentationToSurfaceFilter.h"
-#include <mitkSegmentationSink.h>
-
-#include <mitkImageStatisticsHolder.h>
-
-
+// ITK includes
 #include <itkBinaryThresholdImageFilter.h>
 
+// BlueBerry includes
+#include "berryIWorkbenchWindow.h"
+#include "berryISelectionService.h"
 
 const std::string QmitkRigidRegistrationView::VIEW_ID = "org.mitk.views.rigidregistration";
 
@@ -57,8 +62,6 @@ struct SelListenerRigidRegistration : ISelectionListener
 
   void DoSelectionChanged(ISelection::ConstPointer selection)
   {
-//    if (!m_View->IsVisible())
-//      return;
     // save current selection in member variable
     m_View->m_CurrentSelection = selection.Cast<const IStructuredSelection>();
 
@@ -74,6 +77,7 @@ struct SelListenerRigidRegistration : ISelectionListener
           m_View->m_Controls.m_FixedLabel->hide();
           m_View->m_Controls.TextLabelMoving->hide();
           m_View->m_Controls.m_MovingLabel->hide();
+          m_View->m_Controls.m_UseMaskingCB->hide();
           m_View->m_Controls.m_OpacityLabel->setEnabled(false);
           m_View->m_Controls.m_OpacitySlider->setEnabled(false);
           m_View->m_Controls.label->setEnabled(false);
@@ -111,7 +115,7 @@ struct SelListenerRigidRegistration : ISelectionListener
               }
               else
               {
-                m_View->SetImagesVisible(selection);
+                // m_View->SetImagesVisible(selection);
                 m_View->FixedSelected(fixedNode);
                 m_View->MovingSelected(node);
                 m_View->m_Controls.m_StatusLabel->hide();
@@ -119,6 +123,7 @@ struct SelListenerRigidRegistration : ISelectionListener
                 m_View->m_Controls.m_FixedLabel->show();
                 m_View->m_Controls.TextLabelMoving->show();
                 m_View->m_Controls.m_MovingLabel->show();
+                m_View->m_Controls.m_UseMaskingCB->show();
                 m_View->m_Controls.m_OpacityLabel->setEnabled(true);
                 m_View->m_Controls.m_OpacitySlider->setEnabled(true);
                 m_View->m_Controls.label->setEnabled(true);
@@ -147,7 +152,7 @@ struct SelListenerRigidRegistration : ISelectionListener
     if (part)
     {
       QString partname(part->GetPartName().c_str());
-      if(partname.compare("Datamanager")==0)
+      if(partname.compare("Data Manager")==0)
       {
         // apply selection
         DoSelectionChanged(selection);
@@ -160,7 +165,7 @@ struct SelListenerRigidRegistration : ISelectionListener
 
 QmitkRigidRegistrationView::QmitkRigidRegistrationView(QObject * /*parent*/, const char * /*name*/)
 : QmitkFunctionality(), m_MultiWidget(NULL), m_MovingNode(NULL), m_MovingMaskNode(NULL), m_FixedNode(NULL), m_FixedMaskNode(NULL),
-  m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_Deactivated(false),m_FixedDimension(0), m_MovingDimension(0)
+m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_Deactivated(false),m_FixedDimension(0), m_MovingDimension(0)
 {
   m_TranslateSliderPos[0] = 0;
   m_TranslateSliderPos[1] = 0;
@@ -193,6 +198,9 @@ QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
       s->RemovePostSelectionListener(m_SelListener);
     m_SelListener = NULL;
   }
+
+  this->GetDataStorage()->RemoveNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkRigidRegistrationView,
+    const mitk::DataNode*> ( this, &QmitkRigidRegistrationView::DataNodeHasBeenRemoved ));
 }
 
 void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
@@ -204,8 +212,9 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_FixedLabel->hide();
   m_Controls.TextLabelMoving->hide();
   m_Controls.m_MovingLabel->hide();
-  m_Controls.m_UseFixedImageMask->hide();
-  m_Controls.m_UseMovingImageMask->hide();
+  //m_Controls.m_UseFixedImageMask->hide();
+  //m_Controls.m_UseMovingImageMask->hide();
+  m_Controls.m_UseMaskingCB->hide();
   m_Controls.m_OpacityLabel->setEnabled(false);
   m_Controls.m_OpacitySlider->setEnabled(false);
   m_Controls.label->setEnabled(false);
@@ -222,6 +231,20 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   }
   m_Controls.m_ManualFrame->setEnabled(false);
   m_Parent->setEnabled(false);
+
+  mitk::NodePredicateAnd::Pointer andPred =                       // we want binary images in the selectors
+    mitk::NodePredicateAnd::New(mitk::NodePredicateDataType::New("Image"),
+    mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true)));
+
+  m_Controls.m_FixedImageCB->SetPredicate(andPred);
+  m_Controls.m_FixedImageCB->SetDataStorage(this->GetDataStorage());
+  m_Controls.m_FixedImageCB->hide();
+  m_Controls.m_FixedMaskLB->hide();
+
+  m_Controls.m_MovingImageCB->SetPredicate(andPred);
+  m_Controls.m_MovingImageCB->SetDataStorage(this->GetDataStorage());
+  m_Controls.m_MovingImageCB->hide();
+  m_Controls.m_MovingMaskLB->hide();
 
   this->CreateConnections();
   this->CheckCalculateEnabled();
@@ -246,8 +269,8 @@ void QmitkRigidRegistrationView::CreateConnections()
   connect((QObject*)(m_Controls.m_SwitchImages),SIGNAL(clicked()),this,SLOT(SwitchImages()));
   connect(m_Controls.m_ShowRedGreenValues, SIGNAL(toggled(bool)), this, SLOT(ShowRedGreen(bool)));
   connect(m_Controls.m_ShowContour, SIGNAL(toggled(bool)), this, SLOT(EnableContour(bool)));
-  connect(m_Controls.m_UseFixedImageMask, SIGNAL(toggled(bool)), this, SLOT(UseFixedMaskImageChecked(bool)));
-  connect(m_Controls.m_UseMovingImageMask, SIGNAL(toggled(bool)), this, SLOT(UseMovingMaskImageChecked(bool)));
+  //connect(m_Controls.m_UseFixedImageMask, SIGNAL(toggled(bool)), this, SLOT(UseFixedMaskImageChecked(bool)));
+  //connect(m_Controls.m_UseMovingImageMask, SIGNAL(toggled(bool)), this, SLOT(UseMovingMaskImageChecked(bool)));
   connect(m_Controls.m_RigidTransform, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(int)));
   connect(m_Controls.m_OpacitySlider, SIGNAL(valueChanged(int)), this, SLOT(OpacityUpdate(int)));
   connect(m_Controls.m_ContourSlider, SIGNAL(sliderReleased()), this, SLOT(ShowContour()));
@@ -273,6 +296,9 @@ void QmitkRigidRegistrationView::CreateConnections()
   connect(m_Controls.qmitkRigidRegistrationSelector1,SIGNAL(OptimizerChanged(double)),this,SLOT(SetOptimizerValue( double )));
   connect(m_Controls.qmitkRigidRegistrationSelector1,SIGNAL(TransformChanged()),this,SLOT(CheckCalculateEnabled()));
   connect(m_Controls.qmitkRigidRegistrationSelector1,SIGNAL(AddNewTransformationToUndoList()),this,SLOT(AddNewTransformationToUndoList()));
+  connect(m_Controls.m_UseMaskingCB, SIGNAL(stateChanged(int)),this,SLOT(OnUseMaskingChanged(int)));
+  connect(m_Controls.m_FixedImageCB, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),this,SLOT(OnFixedMaskImageChanged(const mitk::DataNode*)));
+  connect(m_Controls.m_MovingImageCB, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),this,SLOT(OnMovingMaskImageChanged(const mitk::DataNode*)));
 }
 
 void QmitkRigidRegistrationView::Activated()
@@ -295,22 +321,21 @@ void QmitkRigidRegistrationView::Activated()
   this->CheckCalculateEnabled();
   /*
   m_Deactivated = false;
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    QmitkFunctionality::Activated();
-    if (m_SelListener.IsNull())
-    {
-      m_SelListener = berry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
-      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/ *"org.mitk.views.datamanager",* / m_SelListener);
-      berry::ISelection::ConstPointer sel(
-        this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-      m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-      m_SelListener.Cast<SelListenerRigidRegistration>()->DoSelectionChanged(sel);
-    }
-    this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
-    this->ShowRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
-    this->ClearTransformationLists();
-    this->CheckCalculateEnabled();*/
-
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  QmitkFunctionality::Activated();
+  if (m_SelListener.IsNull())
+  {
+  m_SelListener = berry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/ *"org.mitk.views.datamanager",* / m_SelListener);
+  berry::ISelection::ConstPointer sel(
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+  m_CurrentSelection = sel.Cast<const IStructuredSelection>();
+  m_SelListener.Cast<SelListenerRigidRegistration>()->DoSelectionChanged(sel);
+  }
+  this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
+  this->ShowRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
+  this->ClearTransformationLists();
+  this->CheckCalculateEnabled();*/
 }
 
 void QmitkRigidRegistrationView::Visible()
@@ -321,12 +346,12 @@ void QmitkRigidRegistrationView::Visible()
   QmitkFunctionality::Activated();
   if (m_SelListener.IsNull())
   {
-    m_SelListener = berry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener("org.mitk.views.datamanager", m_SelListener);
-    berry::ISelection::ConstPointer sel(
-      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-    m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-    m_SelListener.Cast<SelListenerRigidRegistration>()->DoSelectionChanged(sel);
+  m_SelListener = berry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener("org.mitk.views.datamanager", m_SelListener);
+  berry::ISelection::ConstPointer sel(
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+  m_CurrentSelection = sel.Cast<const IStructuredSelection>();
+  m_SelListener.Cast<SelListenerRigidRegistration>()->DoSelectionChanged(sel);
   }
   this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
   this->ShowRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
@@ -349,17 +374,16 @@ void QmitkRigidRegistrationView::Deactivated()
   m_SelListener = NULL;
   /*
   m_Deactivated = true;
-    this->SetImageColor(false);
-    m_FixedNode = NULL;
-    m_MovingNode = NULL;
-    this->ClearTransformationLists();
-    berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-    if(s)
-      s->RemovePostSelectionListener(m_SelListener);
-    m_SelListener = NULL;
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    QmitkFunctionality::Deactivated();*/
-
+  this->SetImageColor(false);
+  m_FixedNode = NULL;
+  m_MovingNode = NULL;
+  this->ClearTransformationLists();
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if(s)
+  s->RemovePostSelectionListener(m_SelListener);
+  m_SelListener = NULL;
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  QmitkFunctionality::Deactivated();*/
 }
 
 void QmitkRigidRegistrationView::Hidden()
@@ -371,7 +395,7 @@ void QmitkRigidRegistrationView::Hidden()
   this->ClearTransformationLists();
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
-    s->RemovePostSelectionListener(m_SelListener);
+  s->RemovePostSelectionListener(m_SelListener);
   m_SelListener = NULL;
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   //QmitkFunctionality::Deactivated();*/
@@ -432,26 +456,8 @@ void QmitkRigidRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImag
       m_Controls.qmitkRigidRegistrationSelector1->SetFixedNode(m_FixedNode);
     }
 
-    bool hasMask = false;
-    mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_FixedNode);
-    unsigned long size;
-    size = children->Size();
-    for (unsigned long i = 0; i < size; ++i)
-    {
-      mitk::BoolProperty::Pointer isMaskProp = dynamic_cast<mitk::BoolProperty*>(children->GetElement(i)->GetProperty("binary"));
-      if(isMaskProp.IsNotNull() && isMaskProp->GetValue() == true)
-      {
-        m_FixedMaskNode = children->GetElement(i);
-        hasMask = true;
-        this->CheckForMaskImages();
-        break;
-      }
-    }
-    if (!hasMask)
-    {
-      this->CheckForMaskImages();
-      m_FixedMaskNode = NULL;
-    }
+    // what's about masking?
+    m_Controls.m_UseMaskingCB->show();
 
     // Modify slider range
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
@@ -463,7 +469,6 @@ void QmitkRigidRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImag
     int avg = (min+max) / 2;
     m_Controls.m_ContourSlider->setSliderPosition(avg);
     m_Controls.m_ThresholdLabel->setText(QString::number(avg));
-
   }
   else
   {
@@ -505,32 +510,14 @@ void QmitkRigidRegistrationView::MovingSelected(mitk::DataNode::Pointer movingIm
     m_MovingNode->GetFloatProperty("opacity", m_OriginalOpacity);
     this->OpacityUpdate(m_Opacity);
 
-    bool hasMask = false;
-    mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
-    m_Controls.qmitkRigidRegistrationSelector1->SetMovingNodeChildren(children);
-    unsigned long size;
-    size = children->Size();
-    for (unsigned long i = 0; i < size; ++i)
-    {
-      mitk::BoolProperty::Pointer isMaskProp = dynamic_cast<mitk::BoolProperty*>(children->GetElement(i)->GetProperty("binary"));
-      if(isMaskProp.IsNotNull() && isMaskProp->GetValue() == true)
-      {
-        m_MovingMaskNode = children->GetElement(i);
-        hasMask = true;
-        this->CheckForMaskImages();
-        break;
-      }
-    }
-    if (!hasMask)
-    {
-      m_MovingMaskNode = NULL;
-      this->CheckForMaskImages();
-    }
+    // what's about masking?
+    m_Controls.m_UseMaskingCB->show();
   }
   else
   {
     m_Controls.m_MovingLabel->hide();
     m_Controls.TextLabelMoving->hide();
+    m_Controls.m_UseMaskingCB->hide();
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   this->MovingImageChanged();
@@ -547,14 +534,25 @@ bool QmitkRigidRegistrationView::CheckCalculate()
 void QmitkRigidRegistrationView::AddNewTransformationToUndoList()
 {
   mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
-  m_UndoGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingData->GetGeometry(0)->Clone().GetPointer()));
-  unsigned long size;
-  mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
-  size = children->Size();
-  std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> childGeometries;
-  for (unsigned long i = 0; i < size; ++i)
+  m_UndoGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingData->GetGeometry()->Clone().GetPointer()));
+
+  GeometryMapType childGeometries = GeometryMapType();
+  if(m_MovingMaskNode.IsNotNull())
   {
-    childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(children->GetElement(i), children->GetElement(i)->GetData()->GetGeometry()));
+    childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(m_MovingMaskNode,
+      static_cast<mitk::Geometry3D *>(m_MovingMaskNode->GetData()->GetGeometry()->Clone().GetPointer())));
+  }
+
+  mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
+  if(children.IsNotNull() && children->Size() != 0)
+  {
+    unsigned long size;
+    size = children->Size();
+    for (unsigned long i = 0; i < size; ++i)
+    {
+      childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(children->GetElement(i),
+        static_cast<mitk::Geometry3D *>(children->GetElement(i)->GetData()->GetGeometry()->Clone().GetPointer())));
+    }
   }
   m_UndoChildGeometryList.push_back(childGeometries);
   m_RedoGeometryList.clear();
@@ -569,36 +567,63 @@ void QmitkRigidRegistrationView::UndoTransformation()
   {
     mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
     m_RedoGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingData->GetGeometry(0)->Clone().GetPointer()));
-    unsigned long size;
+
+    unsigned long size = 0;
+    GeometryMapType childGeometries = GeometryMapType();
+    if(m_MovingMaskNode.IsNotNull())
+    {
+      ++size;
+    }
+
     mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
-    size = children->Size();
-    std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> childGeometries;
+    size += children->Size();
+
     for (unsigned long i = 0; i < size; ++i)
     {
-      childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(children->GetElement(i), children->GetElement(i)->GetData()->GetGeometry()));
+      if(i==0)
+      {
+        childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(m_MovingMaskNode,
+          static_cast<mitk::Geometry3D *>(m_MovingMaskNode->GetData()->GetGeometry()->Clone().GetPointer())));
+      }
+      else
+      {
+        childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(children->GetElement(i),
+          static_cast<mitk::Geometry3D *>(children->GetElement(i)->GetData()->GetGeometry()->Clone().GetPointer())));
+      }
     }
+
     m_RedoChildGeometryList.push_back(childGeometries);
 
     movingData->SetGeometry(m_UndoGeometryList.back());
     m_UndoGeometryList.pop_back();
-    std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> oldChildGeometries;
+    GeometryMapType oldChildGeometries;
     oldChildGeometries = m_UndoChildGeometryList.back();
     m_UndoChildGeometryList.pop_back();
-    std::map<mitk::DataNode::Pointer, mitk::Geometry3D*>::iterator iter;
+
+    GeometryMapType::iterator iter;
     for (unsigned long j = 0; j < size; ++j)
     {
-      iter = oldChildGeometries.find(children->GetElement(j));
-      children->GetElement(j)->GetData()->SetGeometry((*iter).second);
+      if(j == 0)    // we have put the geometry for the moving mask at position one
+      {
+        iter = oldChildGeometries.find(m_MovingMaskNode);
+        mitk::Geometry3D* geo = static_cast<mitk::Geometry3D*>((*iter).second);
+        m_MovingMaskNode->GetData()->SetGeometry(geo);
+        m_MovingMaskNode->GetData()->GetTimeGeometry()->Update();
+      }
+      else
+      {
+        iter = oldChildGeometries.find(children->GetElement(j));
+        children->GetElement(j)->GetData()->SetGeometry((*iter).second);
+      }
     }
 
     //\FIXME when geometry is substituted the matrix referenced by the actor created by the mapper
     //is still pointing to the old one. Workaround: delete mapper
-    m_MovingNode->SetMapper(1, NULL);
-    mitk::RenderingManager::GetInstance()->RequestUpdate(m_MultiWidget->mitkWidget4->GetRenderWindow());
 
-    movingData->GetTimeSlicedGeometry()->UpdateInformation();
-    this->SetRedoEnabled(true);
+    //m_MovingNode->SetMapper(1, NULL);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+    this->SetRedoEnabled(true);
   }
   if(!m_UndoGeometryList.empty())
   {
@@ -617,37 +642,58 @@ void QmitkRigidRegistrationView::RedoTransformation()
   {
     mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
     m_UndoGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingData->GetGeometry(0)->Clone().GetPointer()));
-    unsigned long size;
+
+    unsigned long size = 0;
+    GeometryMapType childGeometries = GeometryMapType();
+    if(m_MovingMaskNode.IsNotNull())
+    {
+      ++size;
+    }
+
     mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
-    size = children->Size();
-    std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> childGeometries;
+    size += children->Size();
+
     for (unsigned long i = 0; i < size; ++i)
     {
-      childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(children->GetElement(i), children->GetElement(i)->GetData()->GetGeometry()));
+      if(i == 0)
+      {
+        childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(m_MovingMaskNode,
+          static_cast<mitk::Geometry3D *>(m_MovingMaskNode->GetData()->GetGeometry()->Clone().GetPointer())));
+      }
+      else
+      {
+        childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(children->GetElement(i),
+          static_cast<mitk::Geometry3D *>(children->GetElement(i)->GetData()->GetGeometry()->Clone().GetPointer())));
+      }
     }
+
     m_UndoChildGeometryList.push_back(childGeometries);
 
     movingData->SetGeometry(m_RedoGeometryList.back());
     m_RedoGeometryList.pop_back();
 
-    std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> oldChildGeometries;
+    GeometryMapType oldChildGeometries;
     oldChildGeometries = m_RedoChildGeometryList.back();
     m_RedoChildGeometryList.pop_back();
-    std::map<mitk::DataNode::Pointer, mitk::Geometry3D*>::iterator iter;
+    GeometryMapType::iterator iter;
     for (unsigned long j = 0; j < size; ++j)
     {
-      iter = oldChildGeometries.find(children->GetElement(j));
-      children->GetElement(j)->GetData()->SetGeometry((*iter).second);
+      if(j == 0)
+      {
+        iter = oldChildGeometries.find(m_MovingMaskNode);
+        m_MovingMaskNode->GetData()->SetGeometry((*iter).second);
+      }
+      else
+      {
+        iter = oldChildGeometries.find(children->GetElement(j));
+        children->GetElement(j)->GetData()->SetGeometry((*iter).second);
+      }
     }
 
-    //\FIXME when geometry is substituted the matrix referenced by the actor created by the mapper
-    //is still pointing to the old one. Workaround: delete mapper
-    m_MovingNode->SetMapper(1, NULL);
-    mitk::RenderingManager::GetInstance()->RequestUpdate(m_MultiWidget->mitkWidget4->GetRenderWindow());
-
-    movingData->GetTimeSlicedGeometry()->UpdateInformation();
-    this->SetUndoEnabled(true);
+    movingData->GetTimeGeometry()->Update();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+    this->SetUndoEnabled(true);
   }
   if(!m_RedoGeometryList.empty())
   {
@@ -678,7 +724,6 @@ void QmitkRigidRegistrationView::EnableContour(bool show)
   m_ContourHelperNode->SetProperty("visible", mitk::BoolProperty::New(show));
 
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-
 }
 
 void QmitkRigidRegistrationView::ShowContour()
@@ -746,7 +791,6 @@ void QmitkRigidRegistrationView::ShowContour()
     m_ContourHelperNode->SetProperty("color", mitk::ColorProperty::New(1.0, 0.0, 0.0));
     m_ContourHelperNode->SetBoolProperty("helper object", true);
     this->GetDataStorage()->Add(m_ContourHelperNode);
-
   }
   else
   {
@@ -755,8 +799,6 @@ void QmitkRigidRegistrationView::ShowContour()
 
 
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-
-
 }
 
 
@@ -811,7 +853,6 @@ void QmitkRigidRegistrationView::Translate(int* translateVector)
 {
   if (m_MovingNode.IsNotNull())
   {
-
     mitk::Vector3D translateVec;
 
     translateVec[0] = translateVector[0] - m_TranslateSliderPos[0];
@@ -946,7 +987,6 @@ void QmitkRigidRegistrationView::Scale(int* scaleVector)
 {
   if (m_MovingNode.IsNotNull())
   {
-
     mitk::Vector3D scaleVec;
 
     scaleVec[0] = scaleVector[0] - m_ScaleSliderPos[0];
@@ -1249,7 +1289,7 @@ void QmitkRigidRegistrationView::Calculate()
 {
   m_Controls.qmitkRigidRegistrationSelector1->SetFixedNode(m_FixedNode);
   m_Controls.qmitkRigidRegistrationSelector1->SetMovingNode(m_MovingNode);
-  if (m_FixedMaskNode.IsNotNull() && m_Controls.m_UseFixedImageMask->isChecked())
+  if (m_FixedMaskNode.IsNotNull() && m_Controls.m_UseMaskingCB->isChecked())
   {
     m_Controls.qmitkRigidRegistrationSelector1->SetFixedMaskNode(m_FixedMaskNode);
   }
@@ -1257,7 +1297,7 @@ void QmitkRigidRegistrationView::Calculate()
   {
     m_Controls.qmitkRigidRegistrationSelector1->SetFixedMaskNode(NULL);
   }
-  if (m_MovingMaskNode.IsNotNull() && m_Controls.m_UseMovingImageMask->isChecked())
+  if (m_MovingMaskNode.IsNotNull() && m_Controls.m_UseMaskingCB->isChecked())
   {
     m_Controls.qmitkRigidRegistrationSelector1->SetMovingMaskNode(m_MovingMaskNode);
   }
@@ -1334,50 +1374,6 @@ void QmitkRigidRegistrationView::SetImagesVisible(berry::ISelection::ConstPointe
   }
 }
 
-void QmitkRigidRegistrationView::CheckForMaskImages()
-{
-  if (m_FixedMaskNode.IsNotNull())
-  {
-    m_Controls.m_UseFixedImageMask->show();
-  }
-  else
-  {
-    m_Controls.m_UseFixedImageMask->hide();
-  }
-  if (m_MovingMaskNode.IsNotNull())
-  {
-    m_Controls.m_UseMovingImageMask->show();
-  }
-  else
-  {
-    m_Controls.m_UseMovingImageMask->hide();
-  }
-}
-
-void QmitkRigidRegistrationView::UseFixedMaskImageChecked(bool checked)
-{
-  if (checked)
-  {
-    m_FixedMaskNode->SetVisibility(true);
-  }
-  else
-  {
-    m_FixedMaskNode->SetVisibility(false);
-  }
-}
-
-void QmitkRigidRegistrationView::UseMovingMaskImageChecked(bool checked)
-{
-  if (checked)
-  {
-    m_MovingMaskNode->SetVisibility(true);
-  }
-  else
-  {
-    m_MovingMaskNode->SetVisibility(false);
-  }
-}
-
 void QmitkRigidRegistrationView::TabChanged(int index)
 {
   if (index == 0)
@@ -1399,11 +1395,62 @@ void QmitkRigidRegistrationView::SwitchImages()
 
   if(m_ContourHelperNode.IsNotNull())
   {
-
     // Update the contour
     ShowContour();
-
-
   }
 
+  if(m_Controls.m_UseMaskingCB->isChecked())
+  {
+    mitk::DataNode::Pointer tempMovingMask = NULL;
+    mitk::DataNode::Pointer tempFixedMask = NULL;
+
+    if(m_FixedMaskNode.IsNotNull()) // it is initialized
+    {
+      tempFixedMask = m_Controls.m_FixedImageCB->GetSelectedNode();
+    }
+
+    if(m_MovingMaskNode.IsNotNull())  // it is initialized
+    {
+      tempMovingMask = m_Controls.m_MovingImageCB->GetSelectedNode();
+    }
+    m_Controls.m_FixedImageCB->SetSelectedNode(tempMovingMask);
+    m_Controls.m_MovingImageCB->SetSelectedNode(tempFixedMask);
+  }
+}
+
+void QmitkRigidRegistrationView::OnUseMaskingChanged( int state )
+{
+  if(state == Qt::Checked)
+  {
+    m_Controls.m_FixedImageCB->show();
+    m_Controls.m_MovingImageCB->show();
+    m_Controls.m_MovingMaskLB->show();
+    m_Controls.m_FixedMaskLB->show();
+  }
+  else
+  {
+    m_Controls.m_FixedImageCB->hide();
+    m_Controls.m_MovingImageCB->hide();
+    m_Controls.m_MovingMaskLB->hide();
+    m_Controls.m_FixedMaskLB->hide();
+
+    m_FixedMaskNode = NULL;
+    m_MovingMaskNode = NULL;
+  }
+}
+
+void QmitkRigidRegistrationView::OnFixedMaskImageChanged( const mitk::DataNode* node )
+{
+  if(m_Controls.m_UseMaskingCB->isChecked())
+    m_FixedMaskNode = const_cast<mitk::DataNode*>(node);
+  else
+    m_FixedMaskNode = NULL;
+}
+
+void QmitkRigidRegistrationView::OnMovingMaskImageChanged( const mitk::DataNode* node )
+{
+  if(m_Controls.m_UseMaskingCB->isChecked())
+    m_MovingMaskNode = const_cast<mitk::DataNode*>(node);
+  else
+    m_MovingMaskNode = NULL;
 }

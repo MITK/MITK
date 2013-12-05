@@ -11,6 +11,7 @@ set(module_dirs
     MitkExt
     SceneSerialization
     GraphAlgorithms
+    ContourModel
     SurfaceInterpolation
     Segmentation
     PlanarFigureSegmentation
@@ -19,6 +20,7 @@ set(module_dirs
     SegmentationUI
     DiffusionImaging
     GPGPU
+    IGTBase
     IGT
     CameraCalibration
     IGTUI

@@ -90,8 +90,7 @@ set(H_FILES
   SignalModels/mitkStickModel.h
   SignalModels/mitkDiffusionNoiseModel.h
   SignalModels/mitkRicianNoiseModel.h
-  SignalModels/mitkKspaceArtifact.h
-#  SignalModels/mitkChisquareNoiseModel.h
+  SignalModels/mitkChiSquareNoiseModel.h
 )
 
 set(RESOURCE_FILES

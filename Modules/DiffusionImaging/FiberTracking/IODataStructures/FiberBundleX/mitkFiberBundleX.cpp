@@ -230,9 +230,8 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
     vtkSmartPointer<vtkPoints> vNewPoints = vtkSmartPointer<vtkPoints>::New();
 
     // iterate over current fibers
-    int numFibers = GetNumFibers();
-    boost::progress_display disp(numFibers);
-    for( int i=0; i<numFibers; i++ )
+    boost::progress_display disp(m_NumFibers);
+    for( int i=0; i<m_NumFibers; i++ )
     {
         ++disp;
         vtkCell* cell = m_FiberPolyData->GetCell(i);
@@ -250,21 +249,24 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
             int numPoints2 = cell2->GetNumberOfPoints();
             vtkPoints* points2 = cell2->GetPoints();
 
-            if (points2==NULL || numPoints2<=0)
+            if (points2==NULL)// || numPoints2<=0)
                 continue;
 
             // check endpoints
-            itk::Point<float, 3> point_start = GetItkPoint(points->GetPoint(0));
-            itk::Point<float, 3> point_end = GetItkPoint(points->GetPoint(numPoints-1));
-            itk::Point<float, 3> point2_start = GetItkPoint(points2->GetPoint(0));
-            itk::Point<float, 3> point2_end = GetItkPoint(points2->GetPoint(numPoints2-1));
-
-            if (point_start.SquaredEuclideanDistanceTo(point2_start)<=mitk::eps && point_end.SquaredEuclideanDistanceTo(point2_end)<=mitk::eps ||
-                    point_start.SquaredEuclideanDistanceTo(point2_end)<=mitk::eps && point_end.SquaredEuclideanDistanceTo(point2_start)<=mitk::eps)
+            if (numPoints2==numPoints)
             {
-                // further checking ???
-                if (numPoints2==numPoints)
+                itk::Point<float, 3> point_start = GetItkPoint(points->GetPoint(0));
+                itk::Point<float, 3> point_end = GetItkPoint(points->GetPoint(numPoints-1));
+                itk::Point<float, 3> point2_start = GetItkPoint(points2->GetPoint(0));
+                itk::Point<float, 3> point2_end = GetItkPoint(points2->GetPoint(numPoints2-1));
+
+                if (point_start.SquaredEuclideanDistanceTo(point2_start)<=mitk::eps && point_end.SquaredEuclideanDistanceTo(point2_end)<=mitk::eps ||
+                        point_start.SquaredEuclideanDistanceTo(point2_end)<=mitk::eps && point_end.SquaredEuclideanDistanceTo(point2_start)<=mitk::eps)
+                {
+                    // further checking ???
                     contained = true;
+                    break;
+                }
             }
         }
 
@@ -287,8 +289,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
     vNewPolyData->SetLines(vNewLines);
 
     // initialize fiber bundle
-    mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New(vNewPolyData);
-    return newFib;
+    return mitk::FiberBundleX::New(vNewPolyData);
 }
 
 itk::Point<float, 3> mitk::FiberBundleX::GetItkPoint(double point[3])
@@ -753,7 +754,9 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::RemoveFibersOutside(ItkUcharImgT
     vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
     newPolyData->SetPoints(vtkNewPoints);
     newPolyData->SetLines(vtkNewCells);
-    return mitk::FiberBundleX::New(newPolyData);
+    mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New(newPolyData);
+    newFib->ResampleFibers(minSpacing/2);
+    return newFib;
 }
 
 mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(mitk::PlanarFigure* pf)
@@ -1892,15 +1895,50 @@ void mitk::FiberBundleX::UpdateColorCoding()
 bool mitk::FiberBundleX::Equals(mitk::FiberBundleX* fib)
 {
     if (fib==NULL)
+    {
+        MITK_INFO << "Reference bundle is NULL!";
         return false;
+    }
 
-    mitk::FiberBundleX::Pointer tempFib = this->SubtractBundle(fib);
-    mitk::FiberBundleX::Pointer tempFib2 = fib->SubtractBundle(this);
+    if (m_NumFibers!=fib->GetNumFibers())
+    {
+        MITK_INFO << "Unequal number of fibers!";
+        MITK_INFO << m_NumFibers << " vs. " << fib->GetNumFibers();
+        return false;
+    }
 
-    if (tempFib.IsNull() && tempFib2.IsNull())
-        return true;
+    for (int i=0; i<m_NumFibers; i++)
+    {
+        vtkCell* cell = m_FiberPolyData->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
 
-    return false;
+        vtkCell* cell2 = fib->GetFiberPolyData()->GetCell(i);
+        int numPoints2 = cell2->GetNumberOfPoints();
+        vtkPoints* points2 = cell2->GetPoints();
+
+        if (numPoints2!=numPoints)
+        {
+            MITK_INFO << "Unequal number of points in fiber " << i << "!";
+            MITK_INFO << numPoints2 << " vs. " << numPoints;
+            return false;
+        }
+
+        for (int j=0; j<numPoints; j++)
+        {
+            double* p1 = points->GetPoint(j);
+            double* p2 = points2->GetPoint(j);
+            if (fabs(p1[0]-p2[0])>0.0001 || fabs(p1[1]-p2[1])>0.0001 || fabs(p1[2]-p2[2])>0.0001)
+            {
+                MITK_INFO << "Unequal points in fiber " << i << " at position " << j << "!";
+                MITK_INFO << "p1: " << p1[0] << ", " << p1[1] << ", " << p1[2];
+                MITK_INFO << "p2: " << p2[0] << ", " << p2[1] << ", " << p2[2];
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */

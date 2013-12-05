@@ -31,9 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /*!
 \brief QmitkImageStatisticsView is a bundle that allows statistics calculation from images. Three modes
-       are supported: 1. Statistics of one image, 2. Statistics of an image and a segmentation, 3. Statistics
-       of an image and a Planar Figure. The statistics calculation is realized in a seperate thread to keep the
-       gui accessable during calculation.
+are supported: 1. Statistics of one image, 2. Statistics of an image and a segmentation, 3. Statistics
+of an image and a Planar Figure. The statistics calculation is realized in a seperate thread to keep the
+gui accessable during calculation.
 
 \ingroup Plugins/org.mitk.gui.qt.measurementtoolbox
 */
@@ -75,25 +75,25 @@ public:
 
   static const std::string VIEW_ID;
 
-public slots:
+  public slots:
     /** \brief  Called when the statistics update is finished, sets the results to GUI.*/
     void OnThreadedStatisticsCalculationEnds();
 
-protected slots:
-  /** \brief  Saves the histogram to the clipboard */
-  void OnClipboardHistogramButtonClicked();
-  /** \brief  Saves the statistics to the clipboard */
-  void OnClipboardStatisticsButtonClicked();
-  /** \brief  Indicates if zeros should be excluded from statistics calculation */
-  void OnIgnoreZerosCheckboxClicked(  );
-  /** \brief Checks if update is possible and calls StatisticsUpdate() possible */
-  void RequestStatisticsUpdate();
-  /** \brief Jump to coordinates stored in the double clicked cell */
-  void JumpToCoordinates(int row, int col);
+    protected slots:
+      /** \brief  Saves the histogram to the clipboard */
+      void OnClipboardHistogramButtonClicked();
+      /** \brief  Saves the statistics to the clipboard */
+      void OnClipboardStatisticsButtonClicked();
+      /** \brief  Indicates if zeros should be excluded from statistics calculation */
+      void OnIgnoreZerosCheckboxClicked(  );
+      /** \brief Checks if update is possible and calls StatisticsUpdate() possible */
+      void RequestStatisticsUpdate();
+      /** \brief Jump to coordinates stored in the double clicked cell */
+      void JumpToCoordinates(int row, int col);
 
 signals:
-  /** \brief Method to set the data to the member and start the threaded statistics update */
-  void StatisticsUpdate();
+      /** \brief Method to set the data to the member and start the threaded statistics update */
+      void StatisticsUpdate();
 
 protected:
   /** \brief  Writes the calculated statistics to the GUI */
@@ -103,7 +103,7 @@ protected:
   void InvalidateStatisticsTableView();
 
   /** \brief Recalculate statistics for currently selected image and mask and
-   * update the GUI. */
+  * update the GUI. */
   void UpdateStatistics();
 
   /** \brief Listener for progress events to update progress bar. */

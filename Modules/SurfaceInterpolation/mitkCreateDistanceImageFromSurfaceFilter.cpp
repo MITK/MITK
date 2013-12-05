@@ -438,7 +438,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
 
     for (int i = 0; i < 6; i++)
     {
-      if( nIt2.GetPixel(relativeNbIdx[i]) == 10)
+      if( nIt2.GetPixel(relativeNbIdx[i]) == 10 || nIt2.GetPixel(relativeNbIdx[i]) < 0 && nIt2.GetPixel(relativeNbIdx[i]) != -10)
       {
           currentIndex = nIt2.GetIndex(relativeNbIdx[i]);
           nIt2.SetPixel(relativeNbIdx[i], -10);

@@ -39,7 +39,7 @@ void itk::ADCAverageFunctor::operator()(vnl_matrix<double> & newSignal, const vn
     // Root Mean Squares Error
     double error = 0;
     for(unsigned int j = 0 ; j < SignalMatrix.cols(); ++j)
-      error += std::pow( S0 * std::exp(-m_BValueList[j] * averageADC),2); // sum of squres
+      error += std::pow(SignalMatrix(i,j) - S0 * std::exp(-m_BValueList[j] * averageADC),2); // sum of squres
     error /= (double)SignalMatrix.cols(); // mean
     error = std::sqrt(error);
 

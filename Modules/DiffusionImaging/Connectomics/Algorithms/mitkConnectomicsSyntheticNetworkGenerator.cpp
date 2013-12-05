@@ -85,7 +85,7 @@ mitk::Geometry3D::Pointer mitk::ConnectomicsSyntheticNetworkGenerator::GenerateD
   geometry->SetOrigin(origin);
 
   // spacing = {1,1,1}
-  float spacing[3];
+  ScalarType spacing[3];
   spacing[0] = one;
   spacing[1] = one;
   spacing[2] = one;
@@ -237,9 +237,6 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCenterToSurfa
 
   // uniform weight of one
   int edgeWeight(1);
-
-  mitk::ConnectomicsNetwork::VertexDescriptorType source;
-  mitk::ConnectomicsNetwork::VertexDescriptorType target;
 
   //add vertices on sphere surface
   for( int loopID( 1 ); loopID < numberOfPoints; loopID++  )

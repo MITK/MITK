@@ -280,14 +280,14 @@ void mitk::ImageWriter::GenerateData()
         std::ostringstream filename;
         timeSelector->SetTimeNr(t);
         timeSelector->Update();
-        if(input->GetTimeSlicedGeometry()->IsValidTime(t))
+        if(input->GetTimeGeometry()->IsValidTimeStep(t))
         {
-          const mitk::TimeBounds& timebounds = input->GetTimeSlicedGeometry()->GetGeometry3D(t)->GetTimeBounds();
+          const mitk::TimeBounds& timebounds = input->GetTimeGeometry()->GetGeometryForTimeStep(t)->GetTimeBounds();
           filename <<  m_FileNameWithoutExtension << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
         }
         else
         {
-          itkWarningMacro(<<"Error on write: TimeSlicedGeometry invalid of image " << filename << ".");
+          itkWarningMacro(<<"Error on write: TimeGeometry invalid of image " << filename << ".");
           filename <<  m_FileNameWithoutExtension << "_T" << t << m_Extension;
         }
         if ( vti )
@@ -397,6 +397,8 @@ std::vector<std::string> mitk::ImageWriter::GetPossibleFileExtensions()
   possibleFileExtensions.push_back(".vtk");
   possibleFileExtensions.push_back(".vti");
   possibleFileExtensions.push_back(".hdr");
+  possibleFileExtensions.push_back(".img");
+  possibleFileExtensions.push_back(".img.gz");
   possibleFileExtensions.push_back(".png");
   possibleFileExtensions.push_back(".tif");
   possibleFileExtensions.push_back(".jpg");
@@ -432,9 +434,16 @@ const char* mitk::ImageWriter::GetDefaultFilename()
 
 const char* mitk::ImageWriter::GetFileDialogPattern()
 {
-  return "Image (*.bmp *.dcm *.DCM *.dicom *.DICOM *.gipl *.gipl.gz *.mha "
-      "*.nii *.nii.gz *.nrrd *.nhdr *.png *.PNG *.spr *.mhd *.vtk *.vti *.hdr *.png "
-      "*.tif *.jpg)";
+  return
+      "Nearly Raw Raster Data (*.nrrd);;"
+      "NIfTI format (*.nii *.nii.gz);;"
+      "VTK Image Data Files (*.vti);;"
+      "NRRD with detached header (*.nhdr);;"
+      "Analyze Format (*.hdr);;"
+      "MetaImage (*.mhd);;"
+      "Sets of 2D slices (*.png *.tiff *.jpg *.jpeg *.bmp);;"
+      "DICOM (*.dcm *.DCM *.dicom *.DICOM);;"
+      "UMDS GIPL Format Files (*.gipl *.gipl.gz)";
 }
 
 const char *mitk::ImageWriter::GetDefaultExtension()

@@ -10,7 +10,7 @@ set(US_IS_EMBEDDED OFF)
 set(US_NO_DOCUMENTATION ON)
 
 # Don't use an install component for SDK artifacts
-set(US_SDK_INSTALL_COMPONENT )
+set(US_SDK_INSTALL_COMPONENT "")
 
 if(BUILD_TESTING)
   set(US_BUILD_TESTING ON)

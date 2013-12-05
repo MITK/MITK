@@ -27,33 +27,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //usService
 #include "usServiceReference.h"
+#include <usServiceRegistration.h>
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
 
 mitk::OclFilter::OclFilter()
-  : m_ClFile(),
-    m_ClSource(NULL),
-    m_ClCompilerFlags(""),
+  : m_ClCompilerFlags(""),
     m_ClProgram(NULL),
     m_CommandQue(NULL),
     m_FilterID("mitkOclFilter"),
     m_Preambel(" "),
     m_Initialized(false)
 {
-  m_ClSourcePath = MITK_ROOT;
-  m_ClSourcePath += "Modules/OpenCL/ShaderSources";
 }
 
 mitk::OclFilter::OclFilter(const char* filename)
-  : m_ClFile(),
-    m_ClSource(NULL),
-    m_ClCompilerFlags(""),
+  : m_ClCompilerFlags(""),
     m_ClProgram(NULL),
     m_CommandQue(NULL),
     m_FilterID(filename),
     m_Preambel(" "),
     m_Initialized(false)
 {
-  m_ClSourcePath = MITK_ROOT;
-  m_ClSourcePath += "Modules/OpenCL/ShaderSources";
+  m_ClFiles.push_back(filename);
 }
 
 mitk::OclFilter::~OclFilter()
@@ -94,7 +93,7 @@ bool mitk::OclFilter::Initialize()
   cl_int clErr = 0;
   m_Initialized = CHECK_OCL_ERR(clErr);
 
-  if ((m_ClSource==NULL) && (m_ClFile.empty()))
+  if ( m_ClFiles.empty())
   {
     MITK_ERROR<<"No OpenCL Source FILE specified";
     return false;
@@ -116,51 +115,69 @@ bool mitk::OclFilter::Initialize()
   return m_Initialized;
 }
 
-void mitk::OclFilter::SetSourceFile(const char* filename)
+void mitk::OclFilter::LoadSourceFiles(CStringList &sourceCode, ClSizeList &sourceCodeSize)
 {
-  MITK_DEBUG("ocl.filter") << "Setting source [" <<  filename <<" ]";
+  for( CStringList::iterator it = m_ClFiles.begin(); it != m_ClFiles.end(); ++it )
+  {
+    MITK_DEBUG << "Load file :" << *it;
+    us::ModuleResource mdr = GetModule()->GetResource(*it);
 
-  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_ClSourcePath.c_str(), true);
-  // search for file
-  m_ClFile = mitk::StandardFileLocations::GetInstance()->FindFile(  filename);
+    if( !mdr.IsValid() )
+      MITK_WARN << "Could not load resource: " << mdr.GetName() << " is invalid!";
+
+    us:ModuleResourceStream rss(mdr);
+
+    // read resource file to a string
+    std::istreambuf_iterator<char> eos;
+    std::string source(std::istreambuf_iterator<char>(rss), eos);
+
+    // add preambel and build up string to compile
+    std::string src(m_Preambel);
+    src.append("\n");
+    src.append(source);
+
+    // allocate new char buffer
+    char* tmp = new char[src.size() + 1];
+    strcpy(tmp,src.c_str());
+
+    // add source to list
+    sourceCode.push_back((const char*)tmp);
+    sourceCodeSize.push_back(src.size());
+  }
 }
 
 void mitk::OclFilter::CompileSource()
 {
-  if (m_ClFile.empty() && m_ClSource == NULL)
+  // helper variable
+  int clErr = 0;
+  CStringList sourceCode;
+  ClSizeList sourceCodeSize;
+
+  if (m_ClFiles.empty())
   {
     MITK_ERROR("ocl.filter") << "No shader source file was set";
     return;
   }
-
-  // help variables
-  size_t szKernelLength;
-  int clErr = 0;
 
   //get a valid opencl context
   us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
   OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
 
   cl_context gpuContext = resources->GetContext();
-
   // load the program source from file
-  m_ClSource = oclLoadProgramSource( m_ClFile.c_str(), this->m_Preambel, &szKernelLength);
+  LoadSourceFiles(sourceCode, sourceCodeSize);
 
-  if (m_ClSource != NULL)
+  if ( !sourceCode.empty() )
   {
-    m_ClProgram = clCreateProgramWithSource(gpuContext, 1, (const char**)&m_ClSource, &szKernelLength, &clErr);
+    // create program from all files in the file list
+    m_ClProgram = clCreateProgramWithSource(gpuContext, sourceCode.size(), &sourceCode[0], &sourceCodeSize[0], &clErr);
     CHECK_OCL_ERR(clErr);
 
     // build the source code
     MITK_DEBUG << "Building Program Source";
     std::string compilerOptions = "";
-
     compilerOptions.append(m_ClCompilerFlags);
-    // activate the include compiler flag
-    compilerOptions.append(" -I");
-    // set the path of the current gpu source dir as opencl
-    // include folder
-    compilerOptions.append(m_ClSourcePath.c_str());
+
     MITK_DEBUG("ocl.filter") << "cl compiler flags: " << compilerOptions.c_str();
 
     clErr = clBuildProgram(m_ClProgram, 0, NULL, compilerOptions.c_str(), NULL, NULL);
@@ -177,6 +194,12 @@ void mitk::OclFilter::CompileSource()
 
     // store the succesfully build program into the program storage provided by the resource service
     resources->InsertProgram(m_ClProgram, m_FilterID, true);
+
+    // free the char buffers with the source code
+    for( CStringList::iterator it = sourceCode.begin(); it != sourceCode.end(); ++it )
+    {
+      delete[] *it;
+    }
   }
   else
   {
@@ -210,9 +233,9 @@ void mitk::OclFilter::SetSourcePreambel(const char* preambel)
   this->m_Preambel = preambel;
 }
 
-void mitk::OclFilter::SetSourcePath(const char* path)
+void mitk::OclFilter::AddSourceFile(const char* filename)
 {
-  m_ClSourcePath = path;
+  m_ClFiles.push_back(filename);
 }
 
 void mitk::OclFilter::SetCompilerFlags(const char* flags)

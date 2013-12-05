@@ -39,6 +39,13 @@ if (!connected)
   histogramData.SignalGraphChanged.connect(updateHistogram);
 }
 
+function disconnectSignals()
+{
+  histogramData.SignalDataChanged.disconnect(updateHistogram);
+  histogramData.SignalGraphChanged.disconnect(updateHistogram);
+  delete histogramData;
+}
+
 /*
  * Predefinition of scales.
  */

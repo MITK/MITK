@@ -17,8 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseDataTestImplementation.h"
 #include "mitkStringProperty.h"
 #include "mitkTestingMacros.h"
+#include <mitkTimeGeometry.h>
+#include <mitkProportionalTimeGeometry.h>
 #include "itkImage.h"
-
 
 int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
 {
@@ -33,6 +34,7 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION(baseDataImpl->IsInitialized(), "BaseDataTestImplementation is initialized");
   MITK_TEST_CONDITION(baseDataImpl->IsEmpty(), "BaseDataTestImplementation is initialized and empty");
 
+
   mitk::BaseDataTestImplementation::Pointer cloneBaseData = baseDataImpl->Clone();
   MITK_TEST_CONDITION_REQUIRED(cloneBaseData.IsNotNull(),"Testing instantiation of base data clone");
   MITK_TEST_CONDITION(cloneBaseData->IsInitialized(), "Clone of BaseDataTestImplementation is initialized");
@@ -40,18 +42,18 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
 
   MITK_INFO << "Testing setter and getter for geometries...";
 
-  //test method GetTimeSlicedGeometry()
-  MITK_TEST_CONDITION(baseDataImpl->GetTimeSlicedGeometry(), "Testing creation of TimeSlicedGeometry");
+  //test method GetTimeGeometry()
+  MITK_TEST_CONDITION(baseDataImpl->GetTimeGeometry(), "Testing creation of TimeGeometry");
 
-  mitk::TimeSlicedGeometry* geo = NULL;
-  baseDataImpl->SetGeometry(geo);
+  mitk::TimeGeometry* geo = NULL;
+  baseDataImpl->SetTimeGeometry(geo);
 
-  MITK_TEST_CONDITION(baseDataImpl->GetTimeSlicedGeometry() == NULL, "Reset Geometry");
+  MITK_TEST_CONDITION(baseDataImpl->GetTimeGeometry() == NULL, "Reset Geometry");
 
-  mitk::TimeSlicedGeometry::Pointer geo2 = mitk::TimeSlicedGeometry::New();
-  baseDataImpl->SetGeometry(geo2);
-  baseDataImpl->InitializeTimeSlicedGeometry(2);
-  MITK_TEST_CONDITION(baseDataImpl->GetTimeSlicedGeometry() == geo2, "Correct Reinit of TimeslicedGeometry");
+  mitk::ProportionalTimeGeometry::Pointer geo2 = mitk::ProportionalTimeGeometry::New();
+  baseDataImpl->SetTimeGeometry(geo2);
+  geo2->Initialize(2);
+  MITK_TEST_CONDITION(baseDataImpl->GetTimeGeometry() == geo2.GetPointer(), "Correct Reinit of TimeGeometry");
 
   //test method GetGeometry(int timeStep)
   MITK_TEST_CONDITION(baseDataImpl->GetGeometry(1) != NULL, "... and single Geometries");
@@ -62,17 +64,17 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
 
   //test method GetUpdatedGeometry(int timeStep);
   mitk::Geometry3D::Pointer geo3 = mitk::Geometry3D::New();
-  mitk::TimeSlicedGeometry::Pointer timeSlicedGeometry = baseDataImpl->GetTimeSlicedGeometry();
-  if (timeSlicedGeometry.IsNotNull() )
+  mitk::ProportionalTimeGeometry::Pointer timeGeometry = dynamic_cast<mitk::ProportionalTimeGeometry *>(baseDataImpl->GetTimeGeometry());
+  if (timeGeometry.IsNotNull() )
   {
-    timeSlicedGeometry->SetGeometry3D(geo3, 1);
+    timeGeometry->SetTimeStepGeometry(geo3,1);
   }
 
   MITK_TEST_CONDITION(baseDataImpl->GetUpdatedGeometry(1) == geo3, "Set Geometry for time step 1");
   MITK_TEST_CONDITION(baseDataImpl->GetMTime()!= 0, "Check if modified time is set");
   baseDataImpl->SetClonedGeometry(geo3, 1);
 
-  float x[3];
+  mitk::ScalarType x[3];
   x[0] = 2;
   x[1] = 4;
   x[2] = 6;
@@ -107,12 +109,12 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION(baseDataImpl->GetPropertyList()->GetBoolProperty("visibility", value) == true, "Check if base property is set correctly in the property list!");
 
   //test method UpdateOutputInformation()
-   baseDataImpl->UpdateOutputInformation();
-  MITK_TEST_CONDITION(baseDataImpl->GetUpdatedTimeSlicedGeometry() == geo2, "TimeSlicedGeometry update!");
+  baseDataImpl->UpdateOutputInformation();
+  MITK_TEST_CONDITION(baseDataImpl->GetUpdatedTimeGeometry() == geo2, "TimeGeometry update!");
   //Test method CopyInformation()
   mitk::BaseDataTestImplementation::Pointer newBaseData =  mitk::BaseDataTestImplementation::New();
   newBaseData->CopyInformation(baseDataImpl);
-  MITK_TEST_CONDITION_REQUIRED(  newBaseData->GetTimeSlicedGeometry()->GetTimeSteps() == 5, "Check copying of of Basedata Data Object!");
+  MITK_TEST_CONDITION_REQUIRED(  newBaseData->GetTimeGeometry()->CountTimeSteps() == 5, "Check copying of of Basedata Data Object!");
 
   MITK_TEST_END()
 }

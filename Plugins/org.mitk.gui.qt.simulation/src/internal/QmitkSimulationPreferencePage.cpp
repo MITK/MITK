@@ -44,7 +44,7 @@ void QmitkSimulationPreferencePage::CreateQtControl(QWidget* parent)
   headerLabels << "Name" << "License" << "Version" << "Path";
   m_Controls.pluginsTreeWidget->setHeaderLabels(headerLabels);
 
-  connect(m_Controls.pluginsTreeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(OnPluginTreeWidgetItemSelectionChanged()));
+  connect(m_Controls.pluginsTreeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(OnSelectedPluginChanged()));
   connect(m_Controls.addButton, SIGNAL(clicked()), this, SLOT(OnAddButtonClicked()));
   connect(m_Controls.removeButton, SIGNAL(clicked()), this, SLOT(OnRemoveButtonClicked()));
 
@@ -72,7 +72,7 @@ void QmitkSimulationPreferencePage::OnAddButtonClicked()
   filter += "(*.so)";
 #endif
 
-  std::string path = QFileDialog::getOpenFileName(m_Control, "Add SOFA Library", "", filter).toStdString();
+  std::string path = QFileDialog::getOpenFileName(m_Control, "Add SOFA Plugin", "", filter).toStdString();
 
   if (path.empty())
     return;
@@ -116,7 +116,7 @@ void QmitkSimulationPreferencePage::OnAddButtonClicked()
   }
 }
 
-void QmitkSimulationPreferencePage::OnPluginTreeWidgetItemSelectionChanged()
+void QmitkSimulationPreferencePage::OnSelectedPluginChanged()
 {
   QList<QTreeWidgetItem*> selectedItems = m_Controls.pluginsTreeWidget->selectedItems();
 
@@ -173,17 +173,17 @@ bool QmitkSimulationPreferencePage::PerformOk()
 {
   PluginManager& pluginManager = PluginManager::getInstance();
   PluginMap& pluginMap = pluginManager.getPluginMap();
-  std::string pluginPaths;
+  std::string plugins;
 
   for (PluginIterator it = pluginMap.begin(); it != pluginMap.end(); ++it)
   {
-    if (!pluginPaths.empty())
-      pluginPaths += ";";
+    if (!plugins.empty())
+      plugins += ";";
 
-    pluginPaths += it->first;
+    plugins += it->first;
   }
 
-  m_Preferences->PutByteArray("plugin paths", pluginPaths);
+  m_Preferences->PutByteArray("plugins", plugins);
   return true;
 }
 

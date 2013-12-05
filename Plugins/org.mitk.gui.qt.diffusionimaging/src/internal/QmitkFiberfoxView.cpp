@@ -54,7 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QMessageBox>
 #include "usModuleRegistry.h"
-#include <mitkSurface.h>
+#include <mitkChiSquareNoiseModel.h>
 #include <itksys/SystemTools.hxx>
 
 #define _USE_MATH_DEFINES
@@ -67,13 +67,17 @@ QmitkFiberfoxView::QmitkFiberfoxView()
     , m_Controls( 0 )
     , m_SelectedImage( NULL )
 {
-
+    m_ImageGenParameters.noiseModel = NULL;
+    m_ImageGenParameters.noiseModelShort = NULL;
 }
 
 // Destructor
 QmitkFiberfoxView::~QmitkFiberfoxView()
 {
-
+    if (m_ImageGenParameters.noiseModel!=NULL)
+        delete m_ImageGenParameters.noiseModel;
+    if (m_ImageGenParameters.noiseModelShort!=NULL)
+        delete m_ImageGenParameters.noiseModelShort;
 }
 
 void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
@@ -165,7 +169,6 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
 
 void QmitkFiberfoxView::UpdateImageParameters()
 {
-    m_ImageGenParameters.artifactList.clear();
     m_ImageGenParameters.nonFiberModelList.clear();
     m_ImageGenParameters.fiberModelList.clear();
     m_ImageGenParameters.signalModelString = "";
@@ -293,14 +296,81 @@ void QmitkFiberfoxView::UpdateImageParameters()
     // rician noise
     if (m_Controls->m_AddNoise->isChecked())
     {
+        if (m_ImageGenParameters.noiseModel!=NULL)
+            delete m_ImageGenParameters.noiseModel;
+        if (m_ImageGenParameters.noiseModelShort!=NULL)
+            delete m_ImageGenParameters.noiseModelShort;
+
         double noiseVariance = m_Controls->m_NoiseLevel->value();
-        m_ImageGenParameters.ricianNoiseModel.SetNoiseVariance(noiseVariance);
-        m_ImageGenParameters.artifactModelString += "_NOISE";
+        {
+            switch (m_Controls->m_NoiseDistributionBox->currentIndex())
+            {
+            case 0:
+            {
+                mitk::RicianNoiseModel<double>* rician = new mitk::RicianNoiseModel<double>();
+                rician->SetNoiseVariance(noiseVariance);
+                m_ImageGenParameters.noiseModel = rician;
+                m_ImageGenParameters.artifactModelString += "_RICIAN";
+                break;
+            }
+            case 1:
+            {
+                mitk::ChiSquareNoiseModel<double>* chiSquare = new mitk::ChiSquareNoiseModel<double>();
+                chiSquare->SetDOF(noiseVariance/2);
+                m_ImageGenParameters.noiseModel = chiSquare;
+                m_ImageGenParameters.artifactModelString += "_CHISQUARE";
+                break;
+            }
+            default:
+            {
+                mitk::RicianNoiseModel<double>* rician = new mitk::RicianNoiseModel<double>();
+                rician->SetNoiseVariance(noiseVariance);
+                m_ImageGenParameters.noiseModel = rician;
+                m_ImageGenParameters.artifactModelString += "_RICIAN";
+            }
+            }
+        }
+        {
+            switch (m_Controls->m_NoiseDistributionBox->currentIndex())
+            {
+            case 0:
+            {
+                mitk::RicianNoiseModel<short>* rician = new mitk::RicianNoiseModel<short>();
+                rician->SetNoiseVariance(noiseVariance);
+                m_ImageGenParameters.noiseModelShort = rician;
+                break;
+            }
+            case 1:
+            {
+                mitk::ChiSquareNoiseModel<short>* chiSquare = new mitk::ChiSquareNoiseModel<short>();
+                chiSquare->SetDOF(noiseVariance/2);
+                m_ImageGenParameters.noiseModelShort = chiSquare;
+                break;
+            }
+            default:
+            {
+                mitk::RicianNoiseModel<short>* rician = new mitk::RicianNoiseModel<short>();
+                rician->SetNoiseVariance(noiseVariance);
+                m_ImageGenParameters.noiseModelShort = rician;
+            }
+            }
+        }
         m_ImageGenParameters.artifactModelString += QString::number(noiseVariance);
         m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Noise-Variance", DoubleProperty::New(noiseVariance));
     }
     else
-        m_ImageGenParameters.ricianNoiseModel.SetNoiseVariance(0);
+    {
+        if (m_ImageGenParameters.noiseModel!=NULL)
+        {
+            delete m_ImageGenParameters.noiseModel;
+            m_ImageGenParameters.noiseModel = NULL;
+        }
+        if (m_ImageGenParameters.noiseModelShort!=NULL)
+        {
+            delete m_ImageGenParameters.noiseModelShort;
+            m_ImageGenParameters.noiseModelShort = NULL;
+        }
+    }
 
     // gibbs ringing
     m_ImageGenParameters.addGibbsRinging = m_Controls->m_AddGibbsRinging->isChecked();
@@ -609,6 +679,7 @@ void QmitkFiberfoxView::SaveParameters()
     parameters.put("fiberfox.image.outputvolumefractions", m_Controls->m_VolumeFractionsBox->isChecked());
 
     parameters.put("fiberfox.image.artifacts.addnoise", m_Controls->m_AddNoise->isChecked());
+    parameters.put("fiberfox.image.artifacts.noisedistribution", m_Controls->m_NoiseDistributionBox->currentIndex());
     parameters.put("fiberfox.image.artifacts.noisevariance", m_Controls->m_NoiseLevel->value());
     parameters.put("fiberfox.image.artifacts.addghost", m_Controls->m_AddGhosts->isChecked());
     parameters.put("fiberfox.image.artifacts.kspaceLineOffset", m_Controls->m_kOffsetBox->value());
@@ -749,6 +820,7 @@ void QmitkFiberfoxView::LoadParameters()
             m_Controls->m_VolumeFractionsBox->setChecked(v1.second.get<bool>("outputvolumefractions"));
 
             m_Controls->m_AddNoise->setChecked(v1.second.get<bool>("artifacts.addnoise"));
+            m_Controls->m_NoiseDistributionBox->setCurrentIndex(v1.second.get<int>("artifacts.noisedistribution"));
             m_Controls->m_NoiseLevel->setValue(v1.second.get<double>("artifacts.noisevariance"));
             m_Controls->m_AddGhosts->setChecked(v1.second.get<bool>("artifacts.addghost"));
             m_Controls->m_kOffsetBox->setValue(v1.second.get<double>("artifacts.kspaceLineOffset"));
@@ -1431,14 +1503,11 @@ void QmitkFiberfoxView::GenerateImage()
 
                 mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedImages.at(i)->GetData());
 
-                mitk::RicianNoiseModel<short> noiseModel;
-                noiseModel.SetNoiseVariance(m_ImageGenParameters.ricianNoiseModel.GetNoiseVariance());
-
                 itk::AddArtifactsToDwiImageFilter< short >::Pointer filter = itk::AddArtifactsToDwiImageFilter< short >::New();
                 filter->SetInput(diffImg->GetVectorImage());
                 filter->SettLine(m_ImageGenParameters.tLine);
                 filter->SetkOffset(m_ImageGenParameters.kspaceLineOffset);
-                filter->SetNoiseModel(&noiseModel);
+                filter->SetNoiseModel(m_ImageGenParameters.noiseModelShort);
                 filter->SetGradientList(m_ImageGenParameters.gradientDirections);
                 filter->SetTE(m_ImageGenParameters.tEcho);
                 filter->SetSimulateEddyCurrents(m_ImageGenParameters.doSimulateEddyCurrents);
@@ -1514,8 +1583,7 @@ void QmitkFiberfoxView::GenerateImage()
         tractsToDwiFilter->SetFiberBundle(fiberBundle);
         tractsToDwiFilter->SetFiberModels(m_ImageGenParameters.fiberModelList);
         tractsToDwiFilter->SetNonFiberModels(m_ImageGenParameters.nonFiberModelList);
-        tractsToDwiFilter->SetNoiseModel(&m_ImageGenParameters.ricianNoiseModel);
-        tractsToDwiFilter->SetKspaceArtifacts(m_ImageGenParameters.artifactList);
+        tractsToDwiFilter->SetNoiseModel(m_ImageGenParameters.noiseModel);
         tractsToDwiFilter->SetkOffset(m_ImageGenParameters.kspaceLineOffset);
         tractsToDwiFilter->SettLine(m_ImageGenParameters.tLine);
         tractsToDwiFilter->SettInhom(m_ImageGenParameters.tInhom);
@@ -1579,7 +1647,7 @@ void QmitkFiberfoxView::GenerateImage()
         if (basedata.IsNotNull())
         {
             mitk::RenderingManager::GetInstance()->InitializeViews(
-                        basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+                        basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         }
     }
@@ -1635,25 +1703,25 @@ void QmitkFiberfoxView::ApplyTransform()
                         double y = m_Controls->m_YrotBox->value()*M_PI/180;
                         double z = m_Controls->m_ZrotBox->value()*M_PI/180;
 
-                        itk::Matrix< float, 3, 3 > rotX; rotX.SetIdentity();
+                        itk::Matrix< double, 3, 3 > rotX; rotX.SetIdentity();
                         rotX[1][1] = cos(x);
                         rotX[2][2] = rotX[1][1];
                         rotX[1][2] = -sin(x);
                         rotX[2][1] = -rotX[1][2];
 
-                        itk::Matrix< float, 3, 3 > rotY; rotY.SetIdentity();
+                        itk::Matrix< double, 3, 3 > rotY; rotY.SetIdentity();
                         rotY[0][0] = cos(y);
                         rotY[2][2] = rotY[0][0];
                         rotY[0][2] = sin(y);
                         rotY[2][0] = -rotY[0][2];
 
-                        itk::Matrix< float, 3, 3 > rotZ; rotZ.SetIdentity();
+                        itk::Matrix< double, 3, 3 > rotZ; rotZ.SetIdentity();
                         rotZ[0][0] = cos(z);
                         rotZ[1][1] = rotZ[0][0];
                         rotZ[0][1] = -sin(z);
                         rotZ[1][0] = -rotZ[0][1];
 
-                        itk::Matrix< float, 3, 3 > rot = rotZ*rotY*rotX;
+                        itk::Matrix< double, 3, 3 > rot = rotZ*rotY*rotX;
 
                         // transform control point coordinate into geometry translation
                         geom->SetOrigin(pe->GetWorldControlPoint(0));
@@ -1694,22 +1762,22 @@ void QmitkFiberfoxView::ApplyTransform()
             double x = m_Controls->m_XrotBox->value()*M_PI/180;
             double y = m_Controls->m_YrotBox->value()*M_PI/180;
             double z = m_Controls->m_ZrotBox->value()*M_PI/180;
-            itk::Matrix< float, 3, 3 > rotX; rotX.SetIdentity();
+            itk::Matrix< double, 3, 3 > rotX; rotX.SetIdentity();
             rotX[1][1] = cos(x);
             rotX[2][2] = rotX[1][1];
             rotX[1][2] = -sin(x);
             rotX[2][1] = -rotX[1][2];
-            itk::Matrix< float, 3, 3 > rotY; rotY.SetIdentity();
+            itk::Matrix< double, 3, 3 > rotY; rotY.SetIdentity();
             rotY[0][0] = cos(y);
             rotY[2][2] = rotY[0][0];
             rotY[0][2] = sin(y);
             rotY[2][0] = -rotY[0][2];
-            itk::Matrix< float, 3, 3 > rotZ; rotZ.SetIdentity();
+            itk::Matrix< double, 3, 3 > rotZ; rotZ.SetIdentity();
             rotZ[0][0] = cos(z);
             rotZ[1][1] = rotZ[0][0];
             rotZ[0][1] = -sin(z);
             rotZ[1][0] = -rotZ[0][1];
-            itk::Matrix< float, 3, 3 > rot = rotZ*rotY*rotX;
+            itk::Matrix< double, 3, 3 > rot = rotZ*rotY*rotX;
 
             // transform control point coordinate into geometry translation
             geom->SetOrigin(pe->GetWorldControlPoint(0));
@@ -1845,7 +1913,7 @@ void QmitkFiberfoxView::UpdateGui()
         m_Controls->m_AlignOnGrid->setEnabled(true);
     }
 
-    if (m_SelectedImage.IsNotNull())
+    if (m_ImageGenParameters.maskImage.IsNotNull() || m_SelectedImage.IsNotNull())
     {
         m_Controls->m_GeometryMessage->setVisible(true);
         m_Controls->m_GeometryFrame->setEnabled(false);

@@ -558,7 +558,8 @@ void QmitkIGTPlayerWidget::OnSliderReleased()
 
   if(currentSliderValue > m_CurrentSequentialPointNumber) // at the moment only forward scrolling is possible
   {
-    m_SequentialPlayer->GoToSnapshot(currentSliderValue); // move player to selected snapshot
+    unsigned int snapshotNumber = currentSliderValue;
+    m_SequentialPlayer->GoToSnapshot(snapshotNumber); // move player to selected snapshot
     m_CurrentSequentialPointNumber = currentSliderValue;
     m_Controls->sampleLCDNumber->display(currentSliderValue); // update lcdnumber in widget
   }

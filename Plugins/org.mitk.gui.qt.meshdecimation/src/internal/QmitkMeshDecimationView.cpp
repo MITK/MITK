@@ -134,7 +134,7 @@ void QmitkMeshDecimationView::Decimate()
       vtkPolyData* newPolyData = 0;
       if( this->m_Controls->DecimationType->currentText() == "DecimatePro" )
       {
-        vtkSmartPointer<vtkDecimatePro> decimator = vtkDecimatePro::New();
+        vtkSmartPointer<vtkDecimatePro> decimator = vtkSmartPointer<vtkDecimatePro>::New();
         decimator->SetInput( polyData );
         decimator->SetTargetReduction( targetReduction );
         decimator->SetPreserveTopology( 1 );
@@ -143,7 +143,7 @@ void QmitkMeshDecimationView::Decimate()
       }
       else
       {
-        vtkSmartPointer<vtkQuadricDecimation> decimator = vtkQuadricDecimation::New();
+        vtkSmartPointer<vtkQuadricDecimation> decimator = vtkSmartPointer<vtkQuadricDecimation>::New();
         decimator->SetInput( polyData );
         decimator->SetTargetReduction( targetReduction );
         decimator->Update();

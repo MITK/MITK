@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <mitkImage.h>
 
+#include <fstream>
+
 namespace mitk {
 
 /**
@@ -71,8 +73,8 @@ public:
    * and opens the file using the output stream \c tmpStream and returns the name of
    * the newly create file.
    *
-   * The last six characters of \c templateName must be "XXXXXX" and these are replaced
-   * with a string that makes the filename unique.
+   * The \c templateName argument must contain six consective 'X' characters ("XXXXXX")
+   * and these are replaced with a string that makes the filename unique.
    *
    * The file is created with read and write permissions for owner only.
    *
@@ -87,10 +89,36 @@ public:
   static std::string CreateTemporaryFile(std::ofstream& tmpStream, const std::string& templateName = "XXXXXX", std::string path = std::string());
 
   /**
+   * Create and open a temporary file.
+   *
+   * This method generates a unique temporary filename from \c templateName, creates
+   * and opens the file using the output stream \c tmpStream and the specified open
+   * mode \c mode and returns the name of the newly create file. The open mode is always
+   * OR'd with \begin{code}std::ios_base::out | std::ios_base::trunc\end{code}.
+   *
+   * The \c templateName argument must contain six consective 'X' characters ("XXXXXX")
+   * and these are replaced with a string that makes the filename unique.
+   *
+   * The file is created with read and write permissions for owner only.
+   *
+   * @param tmpStream The output stream for writing to the temporary file.
+   * @param mode The open mode for the temporary file stream.
+   * @param templateName An optional template for the filename.
+   * @param path An optional path where the temporary file should be created. Defaults
+   *        to the default temp path as returned by GetTempPath().
+   * @return The filename of the created temporary file.
+   *
+   * @throw mitk::Exception if the temporary file could not be created.
+   */
+  static std::string CreateTemporaryFile(std::ofstream& tmpStream, std::ios_base::openmode mode,
+                                         const std::string& templateName = "XXXXXX",
+                                         std::string path = std::string());
+
+  /**
    * Create a temporary directory.
    *
    * This method generates a uniquely named temporary directory from \c templateName.
-   * The last six characters of \c templateName must be "XXXXXX" and these are replaced
+   * The last set of six consecutive 'X' characters in \c templateName is replaced
    * with a string that makes the directory name unique.
    *
    * The directory is created with read, write and executable permissions for owner only.

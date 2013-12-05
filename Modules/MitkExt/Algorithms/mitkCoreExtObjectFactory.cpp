@@ -52,21 +52,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::CoreExtObjectFactory::CoreExtObjectFactory()
-:CoreObjectFactoryBase()
+  : CoreObjectFactoryBase()
+  , m_ParRecFileIOFactory(ParRecFileIOFactory::New().GetPointer())
+  , m_ObjFileIOFactory(ObjFileIOFactory::New().GetPointer())
+  , m_VtkUnstructuredGridIOFactory(VtkUnstructuredGridIOFactory::New().GetPointer())
+  , m_StlVolumeTimeSeriesIOFactory(StlVolumeTimeSeriesIOFactory::New().GetPointer())
+  , m_VtkVolumeTimeSeriesIOFactory(VtkVolumeTimeSeriesIOFactory::New().GetPointer())
+  , m_UnstructuredGridVtkWriterFactory(UnstructuredGridVtkWriterFactory::New().GetPointer())
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
     MITK_DEBUG << "CoreExtObjectFactory c'tor" << std::endl;
-    RegisterIOFactories();
 
-    itk::ObjectFactoryBase::RegisterFactory( ParRecFileIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( ObjFileIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( VtkUnstructuredGridIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( StlVolumeTimeSeriesIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( VtkVolumeTimeSeriesIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( m_ParRecFileIOFactory );
+    itk::ObjectFactoryBase::RegisterFactory( m_ObjFileIOFactory );
+    itk::ObjectFactoryBase::RegisterFactory( m_VtkUnstructuredGridIOFactory );
+    itk::ObjectFactoryBase::RegisterFactory( m_StlVolumeTimeSeriesIOFactory );
+    itk::ObjectFactoryBase::RegisterFactory( m_VtkVolumeTimeSeriesIOFactory );
 
-    mitk::UnstructuredGridVtkWriterFactory::RegisterOneFactory();
+    itk::ObjectFactoryBase::RegisterFactory( m_UnstructuredGridVtkWriterFactory );
 
     m_FileWriters.push_back(mitk::UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::New().GetPointer());
     m_FileWriters.push_back(mitk::UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::New().GetPointer());
@@ -76,6 +81,17 @@ mitk::CoreExtObjectFactory::CoreExtObjectFactory()
 
     alreadyDone = true;
   }
+}
+
+mitk::CoreExtObjectFactory::~CoreExtObjectFactory()
+{
+  itk::ObjectFactoryBase::UnRegisterFactory( m_ParRecFileIOFactory );
+  itk::ObjectFactoryBase::UnRegisterFactory( m_ObjFileIOFactory );
+  itk::ObjectFactoryBase::UnRegisterFactory( m_VtkUnstructuredGridIOFactory );
+  itk::ObjectFactoryBase::UnRegisterFactory( m_StlVolumeTimeSeriesIOFactory );
+  itk::ObjectFactoryBase::UnRegisterFactory( m_VtkVolumeTimeSeriesIOFactory );
+
+  itk::ObjectFactoryBase::UnRegisterFactory( m_UnstructuredGridVtkWriterFactory );
 }
 
 mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)

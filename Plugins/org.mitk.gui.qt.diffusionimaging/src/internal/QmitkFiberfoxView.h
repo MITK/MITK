@@ -108,7 +108,6 @@ protected slots:
     void OnAddMotion(int value);
     void OnConstantRadius(int value);
 
-
 protected:
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
@@ -178,10 +177,10 @@ protected:
         bool                                doAddMotion;
         bool                                randomMotion;
 
-        mitk::RicianNoiseModel<double>       ricianNoiseModel;
+        mitk::DiffusionNoiseModel<double>* noiseModel;
+        mitk::DiffusionNoiseModel<short>* noiseModelShort;
         mitk::DiffusionSignalModel<double>::GradientListType  gradientDirections;
         itk::TractsToDWIImageFilter< short >::DiffusionModelList fiberModelList, nonFiberModelList;
-        itk::TractsToDWIImageFilter< short >::KspaceArtifactList artifactList;
         QString signalModelString, artifactModelString;
 
         ItkDoubleImgType::Pointer           frequencyMap;

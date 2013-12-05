@@ -31,8 +31,11 @@ namespace mitk{
 /**
   * \brief Creates a region of interest for tract-specific analysis of existing TBSS data
   *
-  * This class needs a 3D image (typically a mean FA skeleton as produced by the standard TBSS pipeline of FSL)
-  * and a user-defined point set defining the points through which the region of interest should pass.
+  * This class needs a 3D image, which is the mean FA skeleton as produced by the standard TBSS pipeline of FSL.
+  * How this dataset can be obtained can be found in the TBSS user manual: http://fsl.fmrib.ox.ac.uk/fsl/fsl4.0/tbss/index
+  * Furthermore, this class requires a user-defined point set defining the points through which the region of interest should pass.
+  * The output is a TBSS roi image, which is a binary images defining the roi and metadata containing indices
+  * that can be used for plotting graphs using the QmitkTbssRoiAnalysisWidget
   */
 
 
@@ -47,7 +50,7 @@ public:
 
 
   /** Image type definitions */
-  typedef itk::Image<char,3> CharImageType;
+  typedef itk::Image<unsigned char,3> CharImageType;
   typedef itk::Image<float,3> FloatImageType;
 
 
@@ -60,11 +63,7 @@ public:
 
 
 
-  /** \brief Sets the input image
-   *
-   * The region of interest is calculated on a 3D image. This is generally the mean FA skeleton as calculated
-   * in the standard TBSS pipeline (see http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/TBSS).
-   */
+  /** \brief Returns the TbssRoiImage **/
   mitk::TbssRoiImage::Pointer GetRoiImage()
   {
     return m_TbssRoi;
@@ -114,6 +113,8 @@ public:
     return m_PathDescription;
   }
 
+  itkGetMacro(CostSum, double)
+
 protected:
 
 
@@ -141,6 +142,8 @@ protected:
   /** \brief Path description in as string for display in GUI */
   std::string m_PathDescription;
 
+  /** \brief Total cost of the path */
+  double m_CostSum;
 
 
 private:

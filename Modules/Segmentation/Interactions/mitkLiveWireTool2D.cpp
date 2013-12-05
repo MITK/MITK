@@ -125,13 +125,17 @@ const char* mitk::LiveWireTool2D::GetName() const
 void mitk::LiveWireTool2D::Activated()
 {
   Superclass::Activated();
+
+  //enable interaction if there are any previously created contours
+  this->EnableContourLiveWireInteraction(true);
 }
 
 void mitk::LiveWireTool2D::Deactivated()
 {
-  this->ClearContours();
-
   Superclass::Deactivated();
+
+  //disable interaction with current contours
+  this->EnableContourLiveWireInteraction(false);
 }
 
 void mitk::LiveWireTool2D::ClearContours()
@@ -159,16 +163,32 @@ void mitk::LiveWireTool2D::ClearContours()
 
   this->m_EditingContours.clear();
 
-  std::vector< mitk::ContourModelLiveWireInteractor::Pointer >::iterator itLiveWireInteractors = this->m_LiveWireInteractors.begin();
-  while(itLiveWireInteractors != this->m_LiveWireInteractors.end() )
-  {
-      // remove interactors from globalInteraction instance
-      mitk::GlobalInteraction::GetInstance()->RemoveInteractor( *itLiveWireInteractors );
-      ++itLiveWireInteractors;
-  }
-
+  this->EnableContourLiveWireInteraction(false);
   this->m_LiveWireInteractors.clear();
 }
+
+
+void mitk::LiveWireTool2D::EnableContourLiveWireInteraction(bool on)
+{
+//for all currently created contours enable or disable interactor
+  std::vector< mitk::ContourModelLiveWireInteractor::Pointer >::iterator itLiveWireInteractors = this->m_LiveWireInteractors.begin();
+  std::vector< mitk::ContourModelLiveWireInteractor::Pointer >::iterator end = this->m_LiveWireInteractors.end();
+  while(itLiveWireInteractors != end )
+  {
+  if(on)
+  {
+    // add interactors to globalInteraction instance
+    mitk::GlobalInteraction::GetInstance()->AddInteractor( *itLiveWireInteractors );
+  }
+  else
+  {
+    // remove interactors from globalInteraction instance
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( *itLiveWireInteractors );
+  }
+    ++itLiveWireInteractors;
+  }
+}
+
 
 void mitk::LiveWireTool2D::ConfirmSegmentation()
 {
@@ -194,7 +214,7 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
       {
 
         // for each timestep of this contourModel
-        for( int currentTimestep = 0; currentTimestep < contourModel->GetTimeSlicedGeometry()->GetTimeSteps(); currentTimestep++)
+        for( TimeStepType currentTimestep = 0; currentTimestep < contourModel->GetTimeGeometry()->CountTimeSteps(); ++currentTimestep)
         {
 
           //get the segmentation image slice at current timestep
@@ -487,7 +507,7 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
 
 void mitk::LiveWireTool2D::FinishTool()
 {
-  unsigned int numberOfTimesteps = m_Contour->GetTimeSlicedGeometry()->GetTimeSteps();
+  TimeStepType numberOfTimesteps = m_Contour->GetTimeGeometry()->CountTimeSteps();
 
   //close contour in each timestep
   for( int i = 0; i <= numberOfTimesteps; i++)
@@ -573,7 +593,7 @@ bool mitk::LiveWireTool2D::OnLastSegmentDelete( Action* action, const StateEvent
       it++;
     }
 
-    newContour->SetIsClosed(m_Contour->IsClosed());
+    newContour->SetClosed(m_Contour->IsClosed());
 
     //set new contour visible
     m_ContourModelNode->SetData(newContour);

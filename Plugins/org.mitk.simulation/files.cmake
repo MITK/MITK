@@ -1,8 +1,12 @@
 set(SRC_CPP_FILES
+  mitkExportMitkVisitor.cpp
   mitkGetSimulationPreferences.cpp
+  mitkMeshMitkLoader.cpp
 )
 
 set(INTERNAL_CPP_FILES
+  mitkGetDataStorage.cpp
+  mitkGetSimulationDataNode.cpp
   org_mitk_simulation_Activator.cpp
 )
 
@@ -11,8 +15,7 @@ set(MOC_H_FILES
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/simulation.png
-  resources/simulationTemplate.png
+  resources/SOFAIcon.png
 )
 
 set(QRC_FILES

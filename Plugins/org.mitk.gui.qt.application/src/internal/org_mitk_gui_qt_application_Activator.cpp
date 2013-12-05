@@ -47,6 +47,8 @@ namespace mitk
   {
     Q_UNUSED(context)
 
+    this->m_PrefServiceTracker.reset();
+
     this->m_Context = 0;
     this->m_Instance = 0;
   }

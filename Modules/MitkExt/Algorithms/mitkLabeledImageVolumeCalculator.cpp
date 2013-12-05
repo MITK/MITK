@@ -77,9 +77,6 @@ void LabeledImageVolumeCalculator::Calculate()
 
   m_InputTimeSelector->SetInput( m_Image );
 
-  //const TimeSlicedGeometry *timeSlicedGeometry = m_Image->GetTimeSlicedGeometry();
-  //for( unsigned int t = 0; t < timeSlicedGeometry->GetTimeSteps(); ++t )
-  //{
   m_InputTimeSelector->SetTimeNr( 0 );
   m_InputTimeSelector->UpdateLargestPossibleRegion();
 

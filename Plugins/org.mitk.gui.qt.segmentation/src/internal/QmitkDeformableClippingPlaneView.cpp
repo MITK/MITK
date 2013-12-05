@@ -40,9 +40,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkDeformableClippingPlaneView::VIEW_ID = "org.mitk.views.deformableclippingplane";
 
 QmitkDeformableClippingPlaneView::QmitkDeformableClippingPlaneView()
-: QmitkFunctionality()
-, m_MultiWidget(NULL)
-, m_ToolManager(NULL)
+  : QmitkFunctionality()
+  , m_MultiWidget(NULL)
+  , m_ToolManager(NULL)
 {
   //Current fix for bug 10707. Waiting for a solution of bug 10834.
   itk::Object::Pointer o;
@@ -74,9 +74,12 @@ void QmitkDeformableClippingPlaneView::StdMultiWidgetNotAvailable()
 
 void QmitkDeformableClippingPlaneView::CreateConnections()
 {
-  m_ToolManager = m_Controls.interactionToolSelectionBox->GetToolManager();
-  m_ToolManager->SetDataStorage(*(this->GetDefaultDataStorage()));
+  m_ToolManager = mitk::ToolManager::New(this->GetDefaultDataStorage());
+  m_Controls.interactionToolSelectionBox->SetToolManager(*m_ToolManager);
   assert(m_ToolManager);
+
+
+
 
   mitk::NodePredicateProperty::Pointer clipPredicate = mitk::NodePredicateProperty::New("clippingPlane",mitk::BoolProperty::New(true));
   //set only clipping planes in the list of the selector

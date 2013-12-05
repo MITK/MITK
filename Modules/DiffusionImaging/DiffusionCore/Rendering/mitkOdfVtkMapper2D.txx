@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkMatrixConvert.h"
 #include "mitkGeometry3D.h"
+#include "mitkTimeGeometry.h"
 #include "mitkOdfNormalizationMethodProperty.h"
 #include "mitkOdfScaleByProperty.h"
 #include "mitkProperties.h"
@@ -632,8 +633,8 @@ bool mitk::OdfVtkMapper2D<T,N>
 ::IsVisibleOdfs(mitk::BaseRenderer* renderer)
 {
     mitk::Image::Pointer input  = const_cast<mitk::Image*>(this->GetInput());
-    const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
-    if(inputTimeGeometry==NULL || inputTimeGeometry->GetTimeSteps()==0 || !inputTimeGeometry->IsValidTime(this->GetTimestep()))
+    const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
+    if(inputTimeGeometry==NULL || inputTimeGeometry->CountTimeSteps()==0 || !inputTimeGeometry->IsValidTimeStep(this->GetTimestep()))
         return false;
 
     if(this->IsPlaneRotated(renderer))

@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkPlanarFigure.h"
 #include <itkPolyLineParametricPath.h>
+#include <QmitkWebPage.h>
 
 /**
 * \brief Widget which shows a histogram using JavaScript.
@@ -225,6 +226,7 @@ private:
   * Clears the QLists m_Measurement and m_Frequency
   */
   void ClearData();
+  QmitkJSWebPage* m_Page;
 
 private slots:
 

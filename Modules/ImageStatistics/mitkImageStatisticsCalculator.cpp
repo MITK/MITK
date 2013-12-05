@@ -646,13 +646,21 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 
 
       // Extract slice with given position and direction from image
-      ExtractImageFilter::Pointer imageExtractor = ExtractImageFilter::New();
-      imageExtractor->SetInput( timeSliceImage );
-      imageExtractor->SetSliceDimension( axis );
-      imageExtractor->SetSliceIndex( slice );
-      imageExtractor->Update();
-      m_InternalImage = imageExtractor->GetOutput();
+      unsigned int dimension = timeSliceImage->GetDimension();
 
+      if (dimension != 2)
+      {
+        ExtractImageFilter::Pointer imageExtractor = ExtractImageFilter::New();
+        imageExtractor->SetInput( timeSliceImage );
+        imageExtractor->SetSliceDimension( axis );
+        imageExtractor->SetSliceIndex( slice );
+        imageExtractor->Update();
+        m_InternalImage = imageExtractor->GetOutput();
+      }
+      else
+      {
+        m_InternalImage = timeSliceImage;
+      }
 
       // Compute mask from PlanarFigure
       AccessFixedDimensionByItk_1(
@@ -1184,6 +1192,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
   // Export from VTK back to ITK
   vtkSmartPointer<vtkImageExport> vtkExporter = vtkImageExport::New(); // TODO: this is WRONG, should be vtkSmartPointer<vtkImageExport>::New(), but bug # 14455
+  //vtkSmartPointer<vtkImageExport> vtkExporter = vtkSmartPointer<vtkImageExport>::New();
   vtkExporter->SetInputConnection( imageStencilFilter->GetOutputPort() );
   vtkExporter->Update();
 

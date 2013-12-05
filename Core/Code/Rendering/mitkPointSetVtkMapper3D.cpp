@@ -81,6 +81,15 @@ void mitk::PointSetVtkMapper3D::ReleaseGraphicsResources(vtkWindow *renWin)
   m_ContourActor->ReleaseGraphicsResources(renWin);
 }
 
+void mitk::PointSetVtkMapper3D::ReleaseGraphicsResources(mitk::BaseRenderer* renderer)
+{
+  m_PointsAssembly->ReleaseGraphicsResources(renderer->GetRenderWindow());
+
+  m_SelectedActor->ReleaseGraphicsResources(renderer->GetRenderWindow());
+  m_UnselectedActor->ReleaseGraphicsResources(renderer->GetRenderWindow());
+  m_ContourActor->ReleaseGraphicsResources(renderer->GetRenderWindow());
+
+}
 
 void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
 {

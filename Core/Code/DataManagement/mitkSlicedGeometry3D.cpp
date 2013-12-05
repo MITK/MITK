@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionConst.h"
 #include "mitkSliceNavigationController.h"
 
-const float PI = 3.14159265359;
+const mitk::ScalarType PI = 3.14159265359;
 
 mitk::SlicedGeometry3D::SlicedGeometry3D()
 : m_EvenlySpaced( true ),
@@ -64,7 +64,7 @@ mitk::SlicedGeometry3D::SlicedGeometry3D(const SlicedGeometry3D& other)
       }
       else
       {
-        Geometry2D* geometry2D = other.m_Geometry2Ds[0]->Clone();
+        Geometry2D* geometry2D = other.m_Geometry2Ds[s]->Clone();
         assert(geometry2D!=NULL);
         SetGeometry2D(geometry2D, s);
       }
@@ -474,7 +474,7 @@ double mitk::SlicedGeometry3D::CalculateSpacing( const mitk::Vector3D spacing, c
 mitk::Vector3D
 mitk::SlicedGeometry3D::AdjustNormal( const mitk::Vector3D &normal ) const
 {
-  Geometry3D::TransformType::Pointer inverse = Geometry3D::TransformType::New();
+  TransformType::Pointer inverse = TransformType::New();
   m_ReferenceGeometry->GetIndexToWorldTransform()->GetInverse( inverse );
 
   Vector3D transformedNormal = inverse->TransformVector( normal );
@@ -764,7 +764,11 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
               iter != m_Geometry2Ds.end();
               ++iter)
            {
-              (*iter)->ExecuteOperation(operation);
+              // Test for empty slices, which can happen if evenly spaced geometry
+              if ((*iter).IsNotNull())
+              {
+                (*iter)->ExecuteOperation(operation);
+              }
            }
 
           // rotate overall geometry
@@ -828,14 +832,14 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
       // Get Rotation axis und angle
       currentNormal.Normalize();
       newNormal.Normalize();
-      float rotationAngle = angle(currentNormal.GetVnlVector(),newNormal.GetVnlVector());
+      ScalarType rotationAngle = angle(currentNormal.GetVnlVector(),newNormal.GetVnlVector());
 
       rotationAngle *= 180.0 / vnl_math::pi; // from rad to deg
       Vector3D rotationAxis = itk::CrossProduct( currentNormal, newNormal );
       if (std::abs(rotationAngle-180) < mitk::eps )
       {
          // current Normal and desired normal are not linear independent!!(e.g 1,0,0 and -1,0,0).
-         // Rotation Axis should be ANY vector that is 90° to current Normal
+         // Rotation Axis should be ANY vector that is 90ï¿½ to current Normal
          mitk::Vector3D helpNormal;
          helpNormal = currentNormal;
          helpNormal[0] += 1;
@@ -883,7 +887,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
          mitk::Vector3D VecAxisCurr = geometry2D->GetAxisVector(0);
          VecAxisCurr.Normalize();
 
-         float rotationAngle = angle(VecAxisCurr.GetVnlVector(),vecAxixNew.GetVnlVector());
+         ScalarType rotationAngle = angle(VecAxisCurr.GetVnlVector(),vecAxixNew.GetVnlVector());
          rotationAngle = rotationAngle * 180 / PI; // Rad to Deg
 
          // we rotate around the normal of the plane, but we do not know, if we need to rotate clockwise
@@ -894,7 +898,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
          if (std::abs(rotationAngle-180) < mitk::eps )
          {
             // current axisVec and desired axisVec are not linear independent!!(e.g 1,0,0 and -1,0,0).
-            // Rotation Axis can be just plane Normal. (have to rotate by 180°)
+            // Rotation Axis can be just plane Normal. (have to rotate by 180ï¿½)
             rotationAxis = newNormal;
          }
 

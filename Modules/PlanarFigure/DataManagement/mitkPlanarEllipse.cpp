@@ -45,7 +45,7 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
         Point2D boundaryPoint1 = GetControlPoint( 1 );
         Point2D boundaryPoint2 = GetControlPoint( 2 );
         Point2D boundaryPoint3 = GetControlPoint( 3 );
-        vnl_vector<float> vec = (point.GetVnlVector() - centerPoint.GetVnlVector());
+        vnl_vector<ScalarType> vec = (point.GetVnlVector() - centerPoint.GetVnlVector());
 
         boundaryPoint1[0] += vec[0];
         boundaryPoint1[1] += vec[1];

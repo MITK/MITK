@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkPropertyTreeView_h
 #define QmitkPropertyTreeView_h
 
+#include <mitkDataNode.h>
+#include <mitkIRenderWindowPartListener.h>
 #include <QmitkAbstractView.h>
 #include <ui_QmitkPropertyTreeView.h>
 
@@ -30,7 +32,7 @@ namespace mitk
   class IPropertyDescriptions;
 }
 
-class QmitkPropertyTreeView : public QmitkAbstractView
+class QmitkPropertyTreeView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
@@ -44,6 +46,9 @@ public:
 
   void SetFocus();
 
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart*);
+
 protected:
   void CreateQtPartControl(QWidget* parent);
 
@@ -55,19 +60,25 @@ private:
 
 private slots:
   void OnCurrentRowChanged(const QModelIndex& current, const QModelIndex& previous);
+  void OnPropertyListChanged(int index);
+  void OnAddNewProperty();
   void OnFilterTextChanged(const QString& filter);
   void OnModelReset();
 
 private:
+  QWidget* m_Parent;
   unsigned long m_PropertyNameChangedTag;
   std::string m_SelectionClassName;
   mitk::IPropertyAliases* m_PropertyAliases;
   mitk::IPropertyDescriptions* m_PropertyDescriptions;
   bool m_ShowAliasesInDescription;
+  bool m_DeveloperMode;
   Ui::QmitkPropertyTreeView m_Controls;
   QmitkPropertyItemSortFilterProxyModel* m_ProxyModel;
   QmitkPropertyItemModel* m_Model;
   QmitkPropertyItemDelegate* m_Delegate;
+  mitk::DataNode::Pointer m_SelectedNode;
+  mitk::BaseRenderer* m_Renderer;
 };
 
 #endif

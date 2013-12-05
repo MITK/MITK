@@ -97,7 +97,7 @@ namespace mitk
       dimensions[ 2 ] = 0;
       dimensions[ 3 ] = 0;
 
-      float spacing[ MAXDIM ];
+      ScalarType spacing[ MAXDIM ];
       spacing[ 0 ] = 1.0f;
       spacing[ 1 ] = 1.0f;
       spacing[ 2 ] = 1.0f;
@@ -161,8 +161,8 @@ namespace mitk
       slicedGeometry->InitializeEvenlySpaced(planeGeometry, static_cast<OutputType*>(this->GetPrimaryOutput())->GetDimension(2));
       slicedGeometry->SetSpacing(spacing);
 
-      // re-initialize TimeSlicedGeometry
-      static_cast<OutputType*>(this->GetPrimaryOutput())->GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, static_cast<OutputType*>(this->GetPrimaryOutput())->GetDimension(3));
+      // re-initialize TimeGeometry
+      dynamic_cast<ProportionalTimeGeometry *>(static_cast<OutputType*>(this->GetPrimaryOutput())->GetTimeGeometry())->Initialize(slicedGeometry, static_cast<OutputType*>(this->GetOutput(0))->GetDimension(3));
 
       buffer = NULL;
       MITK_INFO << "number of image components: "<< static_cast<OutputType*>(this->GetPrimaryOutput())->GetPixelType().GetNumberOfComponents() << std::endl;

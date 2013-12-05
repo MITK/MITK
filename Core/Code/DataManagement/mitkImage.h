@@ -23,10 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseData.h"
 #include "mitkLevelWindow.h"
 #include "mitkPlaneGeometry.h"
+#include <mitkProportionalTimeGeometry.h>
 #include "mitkImageDataItem.h"
 #include "mitkImageDescriptor.h"
 #include "mitkImageAccessorBase.h"
 #include "mitkImageVtkAccessor.h"
+
+//DEPRECATED
+#include <mitkTimeSlicedGeometry.h>
 
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
@@ -234,8 +238,23 @@ public:
   //##Documentation
   //## initialize new (or re-initialize) image information by a Geometry3D
   //##
-  //## @param tDim override time dimension (@a n[3]) if @a geometry is a TimeSlicedGeometry (if >0)
-  virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels = 1, int tDim=-1);
+  //## @param tDim defines the number of time steps for which the Image should be initialized
+  virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels = 1, int tDim=1);
+
+  /**
+  * initialize new (or re-initialize) image information by a Geometry3D
+  *
+  * @param tDim defines the number of time steps for which the Image should be initialized
+  * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
+  */
+  DEPRECATED(virtual void Initialize(const mitk::PixelType& /*type*/, const mitk::TimeSlicedGeometry* /*geometry*/, unsigned int /*channels = 1*/, int /*tDim=1*/)){}
+
+  /**
+  * \brief Initialize new (or re-initialize) image information by a TimeGeometry
+  *
+  * \param tDim override time dimension if the value is bigger than 0 (Default -1)
+  */
+  virtual void Initialize(const mitk::PixelType& type, const mitk::TimeGeometry& geometry, unsigned int channels = 1, int tDim=-1 );
 
   //##Documentation
   //## initialize new (or re-initialize) image information by a Geometry2D and number of slices
@@ -243,9 +262,8 @@ public:
   //## Initializes the bounding box according to the width/height of the
   //## Geometry2D and @a sDim via SlicedGeometry3D::InitializeEvenlySpaced.
   //## The spacing is calculated from the Geometry2D.
-  //## @param tDim override time dimension (@a n[3]) if @a geometry is a TimeSlicedGeometry (if >0)
   //## \sa SlicedGeometry3D::InitializeEvenlySpaced
-  virtual void Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped = false, unsigned int channels = 1, int tDim=-1);
+  virtual void Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped = false, unsigned int channels = 1, int tDim=1);
 
   //##Documentation
   //## initialize new (or re-initialize) image information by another
@@ -409,8 +427,10 @@ public:
     slicedGeometry->InitializeEvenlySpaced(planeGeometry, m_Dimensions[2]);
     slicedGeometry->SetSpacing(spacing);
 
-    // re-initialize TimeSlicedGeometry
-    GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
+    // re-initialize TimeGeometry
+    ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+    timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
+    SetTimeGeometry(timeGeometry);
 
     // clean-up
     delete [] tmpDimensions;

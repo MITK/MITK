@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 typedef itk::VectorImage<float,3>     VectorImageType;
 typedef std::vector< itk::Index<3> > RoiType;
 
-typedef itk::Point<float,3>               PointType;
+typedef mitk::Point3D                     PointType;
 typedef std::vector< PointType>           TractType;
 typedef std::vector< TractType > TractContainerType;
 
@@ -37,8 +37,11 @@ class QwtPlotPicker;
 
 /**
  * \brief Plot widget for TBSS Data
- * This widget can plot regions of interest on TBSS projection data.
+ * This widget can plot regions of interest on TBSS projection data. The projection data is created by importing FSL TBSS subject data and
+ * completing it with patient data using the QmitkTractbasedSpatialStatisticsView.
+ * The region of interest is a vector of indices from which data for plotting should be obtained.
  */
+
 class DIFFUSIONIMAGING_EXPORT QmitkTbssRoiAnalysisWidget : public QmitkPlotWidget
 {
 
@@ -51,7 +54,7 @@ public:
   virtual ~QmitkTbssRoiAnalysisWidget();
 
 
-  /* \brief Set group information */
+  /* \brief Set group information as a vector of pairs of group name and number of group members */
   void SetGroups(std::vector< std::pair<std::string, int> > groups)
   {
     m_Groups = groups;

@@ -63,6 +63,13 @@ struct RenderingManagerInterface : public IRenderingManager
     return m_RM->InitializeViews( geometry, type, preserveRoughOrientationInWorldSpace);
   }
 
+  bool InitializeViews( const TimeGeometry *geometry,
+                        RenderingManager::RequestType type = RenderingManager::REQUEST_UPDATE_ALL,
+                        bool preserveRoughOrientationInWorldSpace = false )
+  {
+    return m_RM->InitializeViews( geometry, type, preserveRoughOrientationInWorldSpace);
+  }
+
   bool InitializeViews( RenderingManager::RequestType type )
   {
     return m_RM->InitializeViews(type);

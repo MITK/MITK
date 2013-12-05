@@ -513,3 +513,8 @@ void QmitkPropertyItemModel::SetPropertyList(mitk::PropertyList* propertyList, c
     this->SetNewPropertyList(propertyList);
   }
 }
+
+void QmitkPropertyItemModel::Update()
+{
+  this->SetNewPropertyList(m_PropertyList);
+}

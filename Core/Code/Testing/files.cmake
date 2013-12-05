@@ -49,7 +49,7 @@ set(MODULE_TESTS
   mitkSurfaceTest.cpp
   mitkSurfaceEqualTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp
-  mitkTimeSlicedGeometryTest.cpp
+  mitkTimeGeometryTest.cpp
   mitkTransitionTest.cpp
   mitkUndoControllerTest.cpp
   mitkVtkWidgetRenderingTest.cpp
@@ -77,6 +77,7 @@ set(MODULE_TESTS
   mitkPropertyDescriptionsTest.cpp
   mitkPropertyExtensionsTest.cpp
   mitkPropertyFiltersTest.cpp
+  mitkTinyXMLTest.cpp
 )
 
 # test with image filename as an extra command line parameter
@@ -125,6 +126,7 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DColorTest.cpp
     mitkImageVtkMapper2DSwivelTest.cpp
     mitkImageVtkMapper2DTransferFunctionTest.cpp
+    mitkImageVtkMapper2DLookupTableTest.cpp
     mitkIOUtilTest.cpp
     mitkSurfaceVtkMapper3DTest
     mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
@@ -135,6 +137,7 @@ set(MODULE_CUSTOM_TESTS
     mitkPointSetVtkMapper2DTest.cpp
     mitkPointSetVtkMapper2DImageTest.cpp
     mitkPointSetVtkMapper2DGlyphTypeTest.cpp
+    mitkPointSetVtkMapper2DTransformedPointsTest.cpp
     mitkLabelOverlay3DRendering2DTest.cpp
     mitkLabelOverlay3DRendering3DTest.cpp
     mitkTextOverlay2DRenderingTest.cpp
@@ -142,7 +145,13 @@ set(MODULE_CUSTOM_TESTS
     mitkTextOverlay3DRendering2DTest.cpp
     mitkTextOverlay3DRendering3DTest.cpp
     mitkTextOverlay3DColorRenderingTest.cpp
+    mitkVTKRenderWindowSizeTest.cpp
+    mitkMultiComponentImageDataComparisonFilterTest.cpp
 )
+
+if (${VTK_MAJOR_VERSION} VERSION_LESS 6) # test can be removed with VTK 6
+  set(MODULE_TESTS ${MODULE_TESTS} mitkVTKRenderWindowSizeTest.cpp)
+endif()
 
 set(MODULE_RESOURCE_FILES
   Interactions/AddAndRemovePoints.xml

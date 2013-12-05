@@ -114,9 +114,9 @@ void mitk::SurfaceGLMapper2D::SetDataNode( mitk::DataNode* node )
 
     Surface::Pointer input  = const_cast< Surface* >(dynamic_cast<const Surface*>( this->GetDataNode()->GetData() ));
     if(input.IsNull()) return;
-    const TimeSlicedGeometry::Pointer inputTimeGeometry = input->GetTimeSlicedGeometry();
-    if(( inputTimeGeometry.IsNull() ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) ) return;
-    for (unsigned int timestep=0; timestep<inputTimeGeometry->GetTimeSteps(); timestep++)
+    const TimeGeometry::Pointer inputTimeGeometry = input->GetTimeGeometry();
+    if(( inputTimeGeometry.IsNull() ) || ( inputTimeGeometry->CountTimeSteps() == 0 ) ) return;
+    for (unsigned int timestep=0; timestep<inputTimeGeometry->CountTimeSteps(); timestep++)
     {
       vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
       if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 )) continue;
@@ -153,10 +153,10 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     return;
 
   //
-  // get the TimeSlicedGeometry of the input object
+  // get the TimeGeometry of the input object
   //
-  const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
-  if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
+  const TimeGeometry* inputTimeGeometry = input->GetTimeGeometry();
+  if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->CountTimeSteps() == 0 ) )
     return;
 
   if (dynamic_cast<IntProperty *>(this->GetDataNode()->GetProperty("line width")) == NULL)
@@ -174,11 +174,11 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   int timestep=0;
 
   if( time > ScalarTypeNumericTraits::NonpositiveMin() )
-    timestep = inputTimeGeometry->MSToTimeStep( time );
+    timestep = inputTimeGeometry->TimePointToTimeStep( time );
 
  // int timestep = this->GetTimestep();
 
-  if( inputTimeGeometry->IsValidTime( timestep ) == false )
+  if( inputTimeGeometry->IsValidTimeStep( timestep ) == false )
     return;
 
   vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
@@ -244,7 +244,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       AbstractTransformGeometry::ConstPointer worldAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(renderer->GetCurrentWorldGeometry2D());
       if(worldAbstractGeometry.IsNotNull())
       {
-        AbstractTransformGeometry::ConstPointer surfaceAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(input->GetTimeSlicedGeometry()->GetGeometry3D(0));
+        AbstractTransformGeometry::ConstPointer surfaceAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(input->GetTimeGeometry()->GetGeometryForTimeStep(0).GetPointer());
         if(surfaceAbstractGeometry.IsNotNull()) //@todo substitude by operator== after implementation, see bug id 28
         {
           PaintCells(renderer, vtkpolydata, worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut);

@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
 #include <mitkResliceMethodProperty.h>
-#include <mitkTimeSlicedGeometry.h>
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkPixelType.h>
 //#include <mitkTransferFunction.h>
@@ -158,7 +157,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
 
   //set the transformation of the image to adapt reslice axis
-  localStorage->m_Reslicer->SetResliceTransformByGeometry( input->GetTimeSlicedGeometry()->GetGeometry3D( this->GetTimestep() ) );
+  localStorage->m_Reslicer->SetResliceTransformByGeometry( input->GetTimeGeometry()->GetGeometryForTimeStep( this->GetTimestep() ) );
 
 
   //is the geometry of the slice based on the input image or the worldgeometry?
@@ -251,7 +250,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     }
     normal.Normalize();
 
-    input->GetTimeSlicedGeometry()->GetGeometry3D( this->GetTimestep() )->WorldToIndex( normal, normInIndex );
+    input->GetTimeGeometry()->GetGeometryForTimeStep( this->GetTimestep() )->WorldToIndex( normal, normInIndex );
 
     dataZSpacing = 1.0 / normInIndex.GetNorm();
 
@@ -599,7 +598,10 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
   }
   else
   {
-    MITK_WARN << "Image Rendering.Mode was set to use a lookup table but there is no property 'LookupTable'. A default (rainbow) lookup table will be used.";
+    //"Image Rendering.Mode was set to use a lookup table but there is no property 'LookupTable'.
+    //A default (rainbow) lookup table will be used.
+    //Here have to do nothing. Warning for the user has been removed, due to unwanted console output
+    //in every interation of the rendering.
   }
   localStorage->m_LevelWindowFilter->SetLookupTable(usedLookupTable);
 }
@@ -639,10 +641,10 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   this->CalculateTimeStep( renderer );
 
   // Check if time step is valid
-  const TimeSlicedGeometry *dataTimeGeometry = data->GetTimeSlicedGeometry();
+  const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
   if ( ( dataTimeGeometry == NULL )
-       || ( dataTimeGeometry->GetTimeSteps() == 0 )
-       || ( !dataTimeGeometry->IsValidTime( this->GetTimestep() ) ) )
+    || ( dataTimeGeometry->CountTimeSteps() == 0 )
+    || ( !dataTimeGeometry->IsValidTimeStep( this->GetTimestep() ) ) )
   {
     return;
   }
@@ -772,11 +774,16 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
     node->AddProperty("layer", mitk::IntProperty::New(0), renderer, overwrite);
 
-    PixelType pixelType = image->GetPixelType();
-    std::size_t numComponents = pixelType.GetNumberOfComponents();
+    std::string className = image->GetNameOfClass();
 
-    if ((pixelType.GetPixelTypeAsString() == "vector" && numComponents > 1) || numComponents == 2 || numComponents > 4)
-      node->AddProperty("Image.Displayed Component", mitk::IntProperty::New(0), renderer, overwrite);
+    if (className != "TensorImage" && className != "QBallImage")
+    {
+      PixelType pixelType = image->GetPixelType();
+      size_t numComponents = pixelType.GetNumberOfComponents();
+
+      if ((pixelType.GetPixelTypeAsString() == "vector" && numComponents > 1) || numComponents == 2 || numComponents > 4)
+        node->AddProperty("Image.Displayed Component", mitk::IntProperty::New(0), renderer, overwrite);
+    }
   }
 
   if(image.IsNotNull() && image->IsInitialized())

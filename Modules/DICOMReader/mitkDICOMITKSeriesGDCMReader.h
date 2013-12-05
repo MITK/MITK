@@ -19,10 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMFileReader.h"
 
+#include "DICOMReaderExports.h"
+
 namespace mitk
 {
 
-class DICOMITKSeriesGDCMReader : public DICOMFileReader
+class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 {
   public:
 

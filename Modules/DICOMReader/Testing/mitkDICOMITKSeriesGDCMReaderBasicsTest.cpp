@@ -14,22 +14,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkDICOMNullFileReader.h"
+#include "mitkDICOMITKSeriesGDCMReader.h"
 #include "mitkDICOMFileReaderTestHelper.h"
 
 #include "mitkTestingMacros.h"
 
-int mitkDICOMFileReaderTest(int argc, char* argv[])
+int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
 {
-  MITK_TEST_BEGIN("mitkDICOMFileReaderTest");
+  MITK_TEST_BEGIN("mitkDICOMITKSeriesGDCMReaderBasicsTest");
 
-  mitk::DICOMNullFileReader::Pointer simpleReader = mitk::DICOMNullFileReader::New();
-  MITK_TEST_CONDITION_REQUIRED(simpleReader.IsNotNull(), "DICOMNullFileReader can be instantiated.");
+  mitk::DICOMITKSeriesGDCMReader::Pointer gdcmReader = mitk::DICOMITKSeriesGDCMReader::New();
+  MITK_TEST_CONDITION_REQUIRED(gdcmReader.IsNotNull(), "DICOMITKSeriesGDCMReaderBasics can be instantiated.");
 
   mitk::DICOMFileReaderTestHelper::SetTestInputFilenames( argc,argv );
 
-  mitk::DICOMFileReaderTestHelper::TestInputFilenames( simpleReader );
-  mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( simpleReader );
+  mitk::DICOMFileReaderTestHelper::TestInputFilenames( gdcmReader );
+  mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
 
   MITK_TEST_END();
 }

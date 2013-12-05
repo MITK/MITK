@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkClaronTrackingDevice.h"
 #include "mitkNDITrackingDevice.h"
+#include "mitkOptitrackTrackingDevice.h"
 
 #include "mitkNavigationToolStorageDeserializer.h"
 #include "mitkTrackingDeviceSourceConfigurator.h"

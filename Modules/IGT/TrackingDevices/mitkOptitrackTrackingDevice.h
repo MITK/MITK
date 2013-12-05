@@ -137,6 +137,24 @@ namespace mitk
     */
     unsigned int GetToolCount() const;
 
+/** @brief Sets the directory where the calibration file of the MicronTracker can be found. */
+    itkSetMacro(Exp,int);
+
+  /** @brief Gets the current calibration directory. */
+    itkGetMacro(Exp,int);
+
+/** @brief Sets the directory where the calibration file of the MicronTracker can be found. */
+    itkSetMacro(Led,int);
+
+  /** @brief Gets the current calibration directory. */
+    itkGetMacro(Led,int);
+
+/** @brief Sets the directory where the calibration file of the MicronTracker can be found. */
+    itkSetMacro(Thr,int);
+
+  /** @brief Gets the current calibration directory. */
+    itkGetMacro(Thr,int);
+
     /** @brief Sets the file where the calibration of the OptitrackTracker can be found. */
   void SetcalibrationPath(std::string calibrationPath);
 
@@ -218,6 +236,21 @@ namespace mitk
     * This variable is used to determine what will be the calibration file absolute path.
     */
     std::string m_calibrationPath;
+
+    /**
+    * \brief The Cameras Exposition
+    */
+    int m_Exp;
+
+    /**
+    * \brief The Cameras LED power
+    */
+    int m_Led;
+
+    /**
+    * \brief The Cameras Thr
+    */
+    int m_Thr;
 
     /**
     * \brief Described if the system was initialized at least once during execution. This is due

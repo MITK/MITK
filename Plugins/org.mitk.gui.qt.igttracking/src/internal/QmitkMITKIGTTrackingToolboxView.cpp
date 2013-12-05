@@ -358,6 +358,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
 void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
 {
   mitk::TrackingDeviceType Type = m_Controls->m_configurationWidget->GetTrackingDevice()->GetType();
+   //Type = m_Controls->m_configurationWidget->GetTrackingDevice()->GetData().Line;//->GetType();
 
   // Code to enable/disable device specific buttons
   if (Type == mitk::NDIAurora) //Aurora

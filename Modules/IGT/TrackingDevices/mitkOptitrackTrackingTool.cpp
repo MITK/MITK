@@ -31,8 +31,6 @@ mitk::OptitrackTrackingTool::OptitrackTrackingTool()
     m_ID(-1)
 {
   MITK_DEBUG << "Creating OptitrackTrackingTool Object";
-  this->m_calibrationPoints = new float[1];
-  m_pivotPoint = new float[1];
   this->m_FLE = 0.0;
 }
 
@@ -54,7 +52,6 @@ bool mitk::OptitrackTrackingTool::SetToolByFileName(std::string nameFile)
   MITK_DEBUG << "SetToolByFileName";
   MITK_INFO<<"Name of the file for configuration:  "<<nameFile;
   this->m_fileConfiguration = nameFile;
-  char* aux = new char[200];
   int resultFscan, resultUpdate, resultCreateTrackable, resultTrackableTranslatePivot;
 
   // Check the file path
@@ -78,8 +75,10 @@ bool mitk::OptitrackTrackingTool::SetToolByFileName(std::string nameFile)
 
   // Get the name
   this->m_ToolName = "";
+  char* aux = new char[200];
   resultFscan = fscanf(calib_file,"%s\n",aux);
   this->m_ToolName.append(aux);
+  delete aux;
   if ((resultFscan < 1) || this->m_ToolName.empty())
   {
     MITK_INFO << "No name found in the tool configuration file";
@@ -133,7 +132,7 @@ bool mitk::OptitrackTrackingTool::SetToolByFileName(std::string nameFile)
 
      this->m_calibrationPoints[i*3+0] = this->m_calibrationPoints[i*3+0]/1000;
      this->m_calibrationPoints[i*3+1] = this->m_calibrationPoints[i*3+1]/1000;
-     this->m_calibrationPoints[i*3+2] = this->m_calibrationPoints[i*3+2]/1000;
+     this->m_calibrationPoints[i*3+2] = -this->m_calibrationPoints[i*3+2]/1000;// Optitrack works with Left Handed System
 
   }
 
@@ -169,7 +168,7 @@ bool mitk::OptitrackTrackingTool::SetToolByFileName(std::string nameFile)
   // mm -> m
   this->m_pivotPoint[0] = this->m_pivotPoint[0]/1000;
   this->m_pivotPoint[1] = this->m_pivotPoint[1]/1000;
-  this->m_pivotPoint[2] = this->m_pivotPoint[2]/1000;
+  this->m_pivotPoint[2] = -this->m_pivotPoint[2]/1000;
 
   // get the ID for next tool in Optitrack System
   this->m_ID = this->get_IDnext();
@@ -273,6 +272,7 @@ bool mitk::OptitrackTrackingTool::DeleteTrackable()
     MITK_INFO << "Cannot Remove Trackable";
     MITK_INFO << GetOptitrackErrorMessage(resultRemoveTrackable);
     mitkThrowException(mitk::IGTException) << "Cannot Remove Trackable" << GetOptitrackErrorMessage(resultRemoveTrackable);
+    return false;
   }
   else
   {
@@ -465,12 +465,13 @@ void mitk::OptitrackTrackingTool::updateTool()
 
       this->m_Orientation.x() = data[3];
       this->m_Orientation.y() = data[4];
-      this->m_Orientation.z() = data[5];
+      this->m_Orientation.z() = -data[5];
       this->m_Orientation.r() = data[6];
 
       this->SetDataValid(true);
 
       MITK_DEBUG << this->m_Position[0] << "   " << this->m_Position[1] << "   " << this->m_Position[2];
+      MITK_DEBUG << data[3] << "   " << data[4] << "   " << data[5] << "   " << data[6];
 
     }
     else

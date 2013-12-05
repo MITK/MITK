@@ -36,9 +36,7 @@ mitk::OptitrackTrackingDevice::OptitrackTrackingDevice()
   this->m_ToolsMutex = itk::FastMutexLock::New();
 
   //Set the mitk device information
-  mitk::TrackingDeviceData currentDevice;
-  currentDevice.Model = "Optitrack";
-  SetData(currentDevice);
+  SetData(mitk::DeviceDataNPOptitrack);
 
   //Clear List of tools
   this->m_AllTools.clear();
@@ -100,23 +98,31 @@ bool mitk::OptitrackTrackingDevice::OpenConnection()
   // Not initialize the system twice.
   if(!m_initialized)
   {
-    m_initialized = true; // Set the initialized variable to true
     MITK_DEBUG << "Initialize Optitrack Tracking System";
 
-    if(  this->InitializeCameras() && // Initialize the Tracking System
-         this->LoadCalibration() )    // Load a Calibration File to the System
-    {
-      this->SetState(mitk::TrackingDevice::Ready); // Set state to Ready for Tracking
-      MITK_INFO << "Device initialization successfull. Device state is in ready state";
+  if( this->InitializeCameras() )
+  {
+    m_initialized = true; // Set the initialized variable to true
+    this->SetState(mitk::TrackingDevice::Ready);
+      if(this->m_calibrationPath.empty()){
+      MITK_INFO << "Numer of connected cameras = " << TT_CameraCount();
+      MITK_WARN << "Attention: No calibration File defined !!";
+      return m_initialized;
     }
     else
     {
-      this->SetState(mitk::TrackingDevice::Setup); // Set the State to Setup
-    MITK_INFO << "Device initialization failed. Device is still in setup state";
-      mitkThrowException(mitk::IGTException) << "Device initialization failed. Device is still in setup state";
+      this->LoadCalibration();
     }
   }
-
+  else
+  {
+    m_initialized = false; // Set the initialized variable to false
+    this->SetState(mitk::TrackingDevice::Setup); // Set the State to Setup
+    MITK_INFO << "Device initialization failed. Device is still in setup state";
+    mitkThrowException(mitk::IGTException) << "Device initialization failed. Device is still in setup state";
+  }
+  }
+  //this->LoadCalibration();
   return m_initialized;
 }
 
@@ -138,13 +144,11 @@ bool mitk::OptitrackTrackingDevice::InitializeCameras()
   else
   {
     MITK_DEBUG << GetOptitrackErrorMessage(result);
-    MITK_DEBUG << "Trying again...";
-  }
-
   // If not succeed after OPTITRACK_ATTEMPTS times launch exception
   MITK_INFO << "Optitrack Tracking System cannot be initialized \n" << GetOptitrackErrorMessage(result);
   mitkThrowException(mitk::IGTException) << "Optitrack Tracking System cannot be initialized \n" << GetOptitrackErrorMessage(result);
   return false;
+  }
 }
 
 //=======================================================
@@ -172,8 +176,8 @@ bool mitk::OptitrackTrackingDevice::LoadCalibration()
 
       if(resultLoadCalibration != NPRESULT_SUCCESS)
       {
-        mitkThrowException(mitk::IGTException) << mitk::GetOptitrackErrorMessage(resultLoadCalibration);
-        return false;
+        MITK_DEBUG << mitk::GetOptitrackErrorMessage(resultLoadCalibration);
+        MITK_DEBUG << "Trying again...";
       }
       else
       {
@@ -210,7 +214,7 @@ void mitk::OptitrackTrackingDevice::SetcalibrationPath(std::string calibrationPa
   if(calibrationPath.empty())
   {
     MITK_INFO << "Calibration Path is empty";
-    mitkThrowException(mitk::IGTException) << "Calibration Path is empty";
+    //mitkThrowException(mitk::IGTException) << "Calibration Path is empty";
     return;
   }
 
@@ -239,6 +243,8 @@ bool mitk::OptitrackTrackingDevice::CloseConnection()
 
     for( int i=OPTITRACK_ATTEMPTS; i>0; i--)
     {
+
+      TT_ClearTrackableList();
       resultShutdown = TT_Shutdown();
 
       if(resultShutdown == NPRESULT_SUCCESS)
@@ -508,13 +514,12 @@ bool mitk::OptitrackTrackingDevice::SetCameraParams(int exposure, int threshold 
       }
     }
 
-    //char* buffer = new char[20];
-
     // If no cameras are connected
     if(num_cams == 0)
     {
       MITK_DEBUG << "No cameras are connected to the device";
-            mitkThrowException(mitk::IGTException) << "No cameras are connected to the device";
+      return false;
+      mitkThrowException(mitk::IGTException) << "No cameras are connected to the device";
     }
 
     for(int cam = 0; cam < num_cams; cam++) // for all connected cameras
@@ -554,7 +559,7 @@ bool mitk::OptitrackTrackingDevice::SetCameraParams(int exposure, int threshold 
     mitkThrowException(mitk::IGTException) << "System is not Initialized -> System is not ready to perform the Camera Parameters Setting";
     return false;
   }
-  return false;
+  return true;
 }
 
 //=======================================================

@@ -35,8 +35,7 @@ namespace mitk
     static ctkPluginContext* getContext();
 
   private:
-
-    static ctkPluginContext* m_context;
+    static ctkPluginContext* m_Context;
   };
 }
 

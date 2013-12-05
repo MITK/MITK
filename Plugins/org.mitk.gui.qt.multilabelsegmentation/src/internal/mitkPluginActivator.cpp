@@ -26,11 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkMultiLabelSegmentationPreferencePage.h"
 #include "SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesView.h"
 
-using namespace mitk;
+#include <usModuleInitialization.h>
 
-ctkPluginContext* PluginActivator::m_context = NULL;
+ctkPluginContext* mitk::PluginActivator::m_Context = NULL;
 
-void PluginActivator::start(ctkPluginContext *context)
+void mitk::PluginActivator::start(ctkPluginContext *context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkThresholdAction, context)
@@ -43,17 +43,20 @@ void PluginActivator::start(ctkPluginContext *context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationUtilitiesView, context)
 
-  this->m_context = context;
+  m_Context = context;
 }
 
-void PluginActivator::stop(ctkPluginContext *)
+void mitk::PluginActivator::stop(ctkPluginContext* context)
 {
-  this->m_context = NULL;
+  Q_UNUSED(context)
+  m_Context = NULL;
 }
 
-ctkPluginContext*PluginActivator::getContext()
+ctkPluginContext* mitk::PluginActivator::getContext()
 {
-  return m_context;
+  return m_Context;
 }
 
 Q_EXPORT_PLUGIN2(org_mitk_gui_qt_multilabelsegmentation, mitk::PluginActivator)
+
+US_INITIALIZE_MODULE("Segmentation", "org_mitk_gui_qt_multilabelsegmentation")

@@ -32,8 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionEventObserver.h"
 
 //move to core file load/save
-#include "mitkNrrdLabelSetImageReader.h"
-#include "mitkNrrdLabelSetImageWriter.h"
+#include "mitkLabelSetImageReader.h"
+#include "mitkLabelSetImageWriter.h"
 
 // Qmitk
 #include "QmitkMultiLabelSegmentationOrganNamesHandling.cpp"
@@ -103,11 +103,6 @@ m_MouseCursorSet(false)
 
 QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
 {
-//  m_Controls.m_ManualToolSelectionBox2D->setEnabled(false);
-//  m_Controls.m_ManualToolSelectionBox3D->setEnabled(false);
-
-  //m_ServiceRegistration.Unregister();
-
   m_ToolManager->ActivateTool(-1);
 /*
   m_Controls.m_SliceBasedInterpolator->EnableInterpolation(false);
@@ -215,7 +210,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 //    m_Controls.m_LabelSetWidget->SetRenderWindowPart(this->m_IRenderWindowPart);
   }
 
-//  this->InitializeListeners();
+  this->InitializeListeners();
 
 }
 
@@ -286,7 +281,7 @@ void QmitkMultiLabelSegmentationView::OnLoadSegmentation()
   QString qfileName = QFileDialog::getOpenFileName(m_Parent, "Load Segmentation", this->GetLastFileOpenPath(), fileExtensions.c_str() );
   if (qfileName.isEmpty() ) return;
 
-  mitk::NrrdLabelSetImageReader::Pointer reader = mitk::NrrdLabelSetImageReader::New();
+  mitk::LabelSetImageReader::Pointer reader = mitk::LabelSetImageReader::New();
   reader->SetFileName(qfileName.toLatin1());
 
   try
@@ -342,7 +337,7 @@ void QmitkMultiLabelSegmentationView::OnSaveSegmentation()
   QString qfileName = QFileDialog::getSaveFileName(m_Parent, "Save Segmentation", this->GetLastFileOpenPath(), selected_suffix);
   if (qfileName.isEmpty()) return;
 
-  mitk::NrrdLabelSetImageWriter::Pointer writer = mitk::NrrdLabelSetImageWriter::New();
+  mitk::LabelSetImageWriter::Pointer writer = mitk::LabelSetImageWriter::New();
   writer->SetFileName(qfileName.toStdString());
   std::string newName = itksys::SystemTools::GetFilenameWithoutExtension(qfileName.toStdString());
   workingImage->SetName(newName);

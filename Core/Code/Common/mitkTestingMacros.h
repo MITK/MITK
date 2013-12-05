@@ -14,6 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef mitkTestingMacros_h
+#define mitkTestingMacros_h
+
 #include <exception>
 #include <string>
 #include <iostream>
@@ -137,3 +140,4 @@ namespace mitk {
   STATEMENT ; \
   MITK_TEST_FOR_EXCEPTION_END(EXCEPTIONCLASS)
 
+#endif

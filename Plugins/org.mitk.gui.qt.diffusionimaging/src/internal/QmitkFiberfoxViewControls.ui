@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>435</width>
-    <height>2111</height>
+    <height>2116</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1643,7 +1643,7 @@
           <item row="0" column="0">
            <widget class="QCheckBox" name="m_AddNoise">
             <property name="text">
-             <string>Add Rician Noise</string>
+             <string>Add Noise</string>
             </property>
             <property name="checked">
              <bool>false</bool>
@@ -1846,17 +1846,17 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item row="0" column="0">
+             <item row="1" column="0">
               <widget class="QLabel" name="m_NoiseLabel">
                <property name="text">
                 <string>Variance:</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
+             <item row="1" column="1">
               <widget class="QDoubleSpinBox" name="m_NoiseLevel">
                <property name="toolTip">
-                <string>Variance of Rician noise model.</string>
+                <string>Variance of selected noise distribution.</string>
                </property>
                <property name="decimals">
                 <number>4</number>
@@ -1873,6 +1873,30 @@
                <property name="value">
                 <double>50.000000000000000</double>
                </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_NoiseLabel_5">
+               <property name="text">
+                <string>Distribution:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="m_NoiseDistributionBox">
+               <property name="toolTip">
+                <string>Noise distribution</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Rician</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Chi-squared</string>
+                </property>
+               </item>
               </widget>
              </item>
             </layout>

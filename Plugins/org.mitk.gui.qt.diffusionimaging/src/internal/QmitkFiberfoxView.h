@@ -170,7 +170,6 @@ protected:
         double                              wrap;
         itk::Vector<double,3>               translation;
         itk::Vector<double,3>               rotation;
-
         bool                                doSimulateRelaxation;
         bool                                doSimulateEddyCurrents;
         bool                                doDisablePartialVolume;
@@ -182,10 +181,8 @@ protected:
         mitk::DiffusionSignalModel<double>::GradientListType  gradientDirections;
         itk::TractsToDWIImageFilter< short >::DiffusionModelList fiberModelList, nonFiberModelList;
         QString signalModelString, artifactModelString;
-
         ItkDoubleImgType::Pointer           frequencyMap;
         ItkUcharImgType::Pointer            maskImage;
-
         mitk::DataNode::Pointer             resultNode;
     };
 

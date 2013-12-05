@@ -245,6 +245,7 @@ void QmitkFiberfoxView::UpdateImageParameters()
     {
         m_ImageGenParameters.artifactModelString += "_GHOST";
         m_ImageGenParameters.kspaceLineOffset = m_Controls->m_kOffsetBox->value();
+        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Ghost", DoubleProperty::New(m_ImageGenParameters.kspaceLineOffset));
     }
     else
         m_ImageGenParameters.kspaceLineOffset = 0;
@@ -254,6 +255,7 @@ void QmitkFiberfoxView::UpdateImageParameters()
     {
         m_ImageGenParameters.artifactModelString += "_ALIASING";
         m_ImageGenParameters.wrap = (100-m_Controls->m_WrapBox->value())/100;
+        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Aliasing", DoubleProperty::New(m_Controls->m_WrapBox->value()));
     }
 
     // Motion
@@ -266,7 +268,16 @@ void QmitkFiberfoxView::UpdateImageParameters()
     m_ImageGenParameters.rotation[1] = m_Controls->m_MaxRotationBoxY->value();
     m_ImageGenParameters.rotation[2] = m_Controls->m_MaxRotationBoxZ->value();
     if ( m_Controls->m_AddMotion->isChecked() && m_SelectedBundles.size()>0 )
+    {
         m_ImageGenParameters.artifactModelString += "_MOTION";
+        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Motion.Random", BoolProperty::New(m_ImageGenParameters.randomMotion));
+        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Motion.Translation-x", DoubleProperty::New(m_ImageGenParameters.translation[0]));
+        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Motion.Translation-y", DoubleProperty::New(m_ImageGenParameters.translation[1]));
+        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Motion.Translation-z", DoubleProperty::New(m_ImageGenParameters.translation[2]));
+        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Motion.Rotation-x", DoubleProperty::New(m_ImageGenParameters.rotation[0]));
+        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Motion.Rotation-y", DoubleProperty::New(m_ImageGenParameters.rotation[1]));
+        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Motion.Rotation-z", DoubleProperty::New(m_ImageGenParameters.rotation[2]));
+    }
 
     // other imaging parameters
     m_ImageGenParameters.tLine = m_Controls->m_LineReadoutTimeBox->value();
@@ -283,6 +294,9 @@ void QmitkFiberfoxView::UpdateImageParameters()
         m_ImageGenParameters.spikes = m_Controls->m_SpikeNumBox->value();
         m_ImageGenParameters.spikeAmplitude = m_Controls->m_SpikeScaleBox->value();
         m_ImageGenParameters.artifactModelString += "_SPIKES";
+        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Spikes.Number", IntProperty::New(m_ImageGenParameters.spikes));
+        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Spikes.Amplitude", DoubleProperty::New(m_ImageGenParameters.spikeAmplitude));
+
     }
 
     // adjust echo time if needed
@@ -310,7 +324,8 @@ void QmitkFiberfoxView::UpdateImageParameters()
                 mitk::RicianNoiseModel<double>* rician = new mitk::RicianNoiseModel<double>();
                 rician->SetNoiseVariance(noiseVariance);
                 m_ImageGenParameters.noiseModel = rician;
-                m_ImageGenParameters.artifactModelString += "_RICIAN";
+                m_ImageGenParameters.artifactModelString += "_RICIAN-";
+                m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Rician"));
                 break;
             }
             case 1:
@@ -318,7 +333,8 @@ void QmitkFiberfoxView::UpdateImageParameters()
                 mitk::ChiSquareNoiseModel<double>* chiSquare = new mitk::ChiSquareNoiseModel<double>();
                 chiSquare->SetDOF(noiseVariance/2);
                 m_ImageGenParameters.noiseModel = chiSquare;
-                m_ImageGenParameters.artifactModelString += "_CHISQUARE";
+                m_ImageGenParameters.artifactModelString += "_CHISQUARED-";
+                m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Chi-squared"));
                 break;
             }
             default:
@@ -326,7 +342,8 @@ void QmitkFiberfoxView::UpdateImageParameters()
                 mitk::RicianNoiseModel<double>* rician = new mitk::RicianNoiseModel<double>();
                 rician->SetNoiseVariance(noiseVariance);
                 m_ImageGenParameters.noiseModel = rician;
-                m_ImageGenParameters.artifactModelString += "_RICIAN";
+                m_ImageGenParameters.artifactModelString += "_RICIAN-";
+                m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Rician"));
             }
             }
         }
@@ -375,7 +392,10 @@ void QmitkFiberfoxView::UpdateImageParameters()
     // gibbs ringing
     m_ImageGenParameters.addGibbsRinging = m_Controls->m_AddGibbsRinging->isChecked();
     if (m_Controls->m_AddGibbsRinging->isChecked())
+    {
+        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Ringing", BoolProperty::New(true));
         m_ImageGenParameters.artifactModelString += "_RINGING";
+    }
 
     // adjusting line readout time to the adapted image size needed for the DFT
     int y = m_ImageGenParameters.imageRegion.GetSize(1);
@@ -398,6 +418,7 @@ void QmitkFiberfoxView::UpdateImageParameters()
         {
             m_ImageGenParameters.frequencyMap = itkImg;
             m_ImageGenParameters.artifactModelString += "_DISTORTED";
+            m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Distortions", BoolProperty::New(true));
         }
     }
 
@@ -407,6 +428,7 @@ void QmitkFiberfoxView::UpdateImageParameters()
     {
         m_ImageGenParameters.eddyStrength = m_Controls->m_EddyGradientStrength->value();
         m_ImageGenParameters.artifactModelString += "_EDDY";
+        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Eddy-strength", DoubleProperty::New(m_ImageGenParameters.eddyStrength));
     }
 
     // signal models
@@ -416,6 +438,8 @@ void QmitkFiberfoxView::UpdateImageParameters()
     {
         m_ImageGenParameters.comp4Weight = m_Controls->m_Comp4FractionBox->value();
         m_ImageGenParameters.comp3Weight -= m_ImageGenParameters.comp4Weight;
+        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Compartment3.weight", DoubleProperty::New(m_ImageGenParameters.comp3Weight));
+        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Compartment4.weight", DoubleProperty::New(m_ImageGenParameters.comp4Weight));
     }
 
     // compartment 1
@@ -607,11 +631,13 @@ void QmitkFiberfoxView::UpdateImageParameters()
     m_ImageGenParameters.resultNode->AddProperty("Fiberfox.InterpolationShrink", IntProperty::New(m_ImageGenParameters.interpolationShrink));
     m_ImageGenParameters.resultNode->AddProperty("Fiberfox.SignalScale", IntProperty::New(m_ImageGenParameters.signalScale));
     m_ImageGenParameters.resultNode->AddProperty("Fiberfox.FiberRadius", IntProperty::New(m_ImageGenParameters.axonRadius));
-    m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Tinhom", IntProperty::New(m_ImageGenParameters.tInhom));
+    m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Tinhom", DoubleProperty::New(m_ImageGenParameters.tInhom));
+    m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Tline", DoubleProperty::New(m_ImageGenParameters.tLine));
+    m_ImageGenParameters.resultNode->AddProperty("Fiberfox.TE", DoubleProperty::New(m_ImageGenParameters.tEcho));
     m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Repetitions", IntProperty::New(m_ImageGenParameters.repetitions));
     m_ImageGenParameters.resultNode->AddProperty("Fiberfox.b-value", DoubleProperty::New(m_ImageGenParameters.b_value));
-    m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Model", StringProperty::New(m_ImageGenParameters.signalModelString.toStdString()));
-    m_ImageGenParameters.resultNode->AddProperty("Fiberfox.PureFiberVoxels", BoolProperty::New(m_ImageGenParameters.doDisablePartialVolume));
+    m_ImageGenParameters.resultNode->AddProperty("Fiberfox.NoPartialVolume", BoolProperty::New(m_ImageGenParameters.doDisablePartialVolume));
+    m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Relaxation", BoolProperty::New(m_ImageGenParameters.doSimulateRelaxation));
     m_ImageGenParameters.resultNode->AddProperty("binary", BoolProperty::New(false));
 }
 

@@ -115,7 +115,8 @@ bool mitk::ConnectomicsNetworkThresholder::CheckValidity()
 
 mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::ThresholdByRandomRemoval( mitk::ConnectomicsNetwork::Pointer input, double targetDensity )
 {
-  mitk::ConnectomicsNetwork::Pointer result( input );
+  mitk::ConnectomicsNetwork::Pointer result = mitk::ConnectomicsNetwork::New();
+  result->ImportNetwort( input );
 
   mitk::ConnectomicsStatisticsCalculator::Pointer calculator = mitk::ConnectomicsStatisticsCalculator::New();
 
@@ -178,7 +179,8 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::Thresho
 
 mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::ThresholdBelowDensity( mitk::ConnectomicsNetwork::Pointer input, double targetDensity )
 {
-  mitk::ConnectomicsNetwork::Pointer result( input );
+  mitk::ConnectomicsNetwork::Pointer result = mitk::ConnectomicsNetwork::New();
+  result->ImportNetwort( input );
 
   mitk::ConnectomicsStatisticsCalculator::Pointer calculator = mitk::ConnectomicsStatisticsCalculator::New();
 
@@ -200,7 +202,8 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::Thresho
 
 mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::Threshold( mitk::ConnectomicsNetwork::Pointer input, double targetThreshold )
 {
-  mitk::ConnectomicsNetwork::Pointer result( input );
+  mitk::ConnectomicsNetwork::Pointer result = mitk::ConnectomicsNetwork::New();
+  result->ImportNetwort( input );
 
   NetworkType* boostGraph = result->GetBoostGraph();
 

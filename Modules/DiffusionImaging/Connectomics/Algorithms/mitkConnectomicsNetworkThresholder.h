@@ -50,9 +50,8 @@ namespace mitk
     typedef boost::graph_traits<NetworkType>::adjacency_iterator AdjacencyIteratorType;
     typedef std::map<EdgeDescriptorType, int> EdgeIndexStdMapType;
     typedef boost::associative_property_map< EdgeIndexStdMapType > EdgeIndexMapType;
-    typedef boost::iterator_property_map< std::vector< double >::iterator, EdgeIndexMapType > EdgeIteratorPropertyMapType;
-    typedef boost::property_map< NetworkType, boost::vertex_index_t>::type VertexIndexMapType;
-    typedef boost::iterator_property_map< std::vector< double >::iterator, VertexIndexMapType > VertexIteratorPropertyMapType;
+    typedef std::map<VertexDescriptorType, int> VertexIndexStdMapType;
+    typedef boost::associative_property_map< VertexIndexStdMapType > VertexIndexMapType;
 
     /** \brief Possible schemes for thresholding the network
     *

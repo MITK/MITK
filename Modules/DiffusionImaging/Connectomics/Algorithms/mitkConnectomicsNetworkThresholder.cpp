@@ -164,7 +164,7 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::Thresho
     }
 
     // Which to delete
-    int deleteNumber( rng.lrand32( count ) );
+    int deleteNumber( rng.lrand32( count - 1 ) );
 
     boost::remove_edge( candidateVector.at( deleteNumber ), *boostGraph );
 

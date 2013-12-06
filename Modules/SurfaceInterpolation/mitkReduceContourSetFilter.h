@@ -45,7 +45,7 @@ namespace mitk {
 
   Additional if more than one input contour is provided this filter tries detect contours which occur just because
   of an intersection. These intersection contours are eliminated. In oder to ensure a correct elimination the min and max
-  spacing of the original image must be provided.
+  spacing of the reference image onto which the contours where traced, must be provided.
 
   The output is a mitk::Surface.
 
@@ -59,13 +59,13 @@ namespace mitk {
 
        enum Reduction_Type
         {
-            NTH_POINT, DOUGLAS_PEUCKER
+          NTH_POINT, DOUGLAS_PEUCKER
         };
 
         struct LineSegment
         {
-            unsigned int StartIndex;
-            unsigned int EndIndex;
+          unsigned int StartIndex;
+          unsigned int EndIndex;
         };
 
         mitkClassMacro(ReduceContourSetFilter,SurfaceToSurfaceFilter);

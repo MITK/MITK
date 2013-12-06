@@ -16,4 +16,5 @@
    <preset NAME="Pancreas" LEVEL="40" WINDOW="400" />
    <preset NAME="Tumor" LEVEL="35" WINDOW="60" />
    <preset NAME="Water" LEVEL="0" WINDOW="10" />
+   <preset NAME="Labeled Image" LEVEL="128" WINDOW="256" />
 </mitkLevelWindowPresets>

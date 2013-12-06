@@ -86,4 +86,3 @@ namespace mitk
 }// end namespace mitk
 
 #endif /* define MITKPROGRESSBAR_H */
-

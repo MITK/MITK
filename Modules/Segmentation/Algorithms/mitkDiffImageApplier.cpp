@@ -100,19 +100,13 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
         }
 
         // just send the diff to SegmentationInterpolationController
-        SegmentationInterpolationController* interpolator = SegmentationInterpolationController::InterpolatorForImage( m_Image );
+        mitk::SegmentationInterpolationController* interpolator = mitk::SegmentationInterpolationController::InterpolatorForImage(m_Image);
         if (interpolator)
         {
-          interpolator->BlockModified(true);
           interpolator->SetChangedSlice( m_SliceDifferenceImage, m_SliceDimension, m_SliceIndex, m_TimeStep );
         }
 
         m_Image->Modified();
-
-        if (interpolator)
-        {
-          interpolator->BlockModified(false);
-        }
 
         if ( m_Factor == -1 ) // return to normal values
         {
@@ -158,21 +152,15 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
           // multiply diff pixels by factor and then send this diff slice
           AccessFixedDimensionByItk( m_SliceDifferenceImage, ItkInvertPixelValues, 3 );
         }
-
+/*
         // just send the diff to SegmentationInterpolationController
-        SegmentationInterpolationController* interpolator = SegmentationInterpolationController::InterpolatorForImage( m_Image );
+        SegmentationInterpolationController* interpolator = SegmentationInterpolationController::InterpolatorForImage(m_Image);
         if (interpolator)
         {
-          interpolator->BlockModified(true);
-          interpolator->SetChangedVolume( m_SliceDifferenceImage, m_TimeStep );
+          interpolator->SetChangedImage( m_SliceDifferenceImage, m_TimeStep );
         }
-
+*/
         m_Image->Modified();
-
-        if (interpolator)
-        {
-          interpolator->BlockModified(false);
-        }
 
         if ( m_Factor == -1 ) // return to normal values
         {

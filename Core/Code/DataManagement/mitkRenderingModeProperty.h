@@ -106,11 +106,11 @@ public:
   //Never (!) change this without adaptation of mitkLevelWindowManagerTest::VerifyRenderingModes and mitkLevelWindowManagerTest::TestLevelWindowSliderVisibility !
   enum ImageRenderingMode
   {
-    LEVELWINDOW_COLOR = 0,
-    LOOKUPTABLE_LEVELWINDOW_COLOR = 1,
-    COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR = 2,
-    LOOKUPTABLE_COLOR = 3,
-    COLORTRANSFERFUNCTION_COLOR = 4
+//    LEVELWINDOW_COLOR = 0,
+    LOOKUPTABLE_LEVELWINDOW = 0,
+    COLORTRANSFERFUNCTION_LEVELWINDOW = 1,
+    LOOKUPTABLE = 2,
+    COLORTRANSFERFUNCTION = 3
   //  Default = LEVELWINDOW_COLOR;
   };
 

@@ -29,20 +29,29 @@ mitk::ContourModelSet::ContourModelSet() :
 mitk::ContourModelSet::ContourModelSet(const mitk::ContourModelSet &other) :
   m_Contours(other.m_Contours)
 {
-  this->InitializeTimeSlicedGeometry(1);
+  this->GetUpdatedTimeGeometry();
 }
-
-
 
 mitk::ContourModelSet::~ContourModelSet()
 {
   this->m_Contours.clear();
 }
 
+itk::LightObject::Pointer mitk::ContourModelSet::InternalClone() const
+{
+  itk::LightObject::Pointer parent = Superclass::InternalClone();
+  Self::Pointer rval = dynamic_cast<Self *> (parent.GetPointer());
+  if (rval.IsNull())
+  {
+    mitkThrow() << " Downcast to type " << this->GetNameOfClass() << " failed.";
+  }
+  rval->m_Contours= this->m_Contours;
+  return parent;
+}
 
 void mitk::ContourModelSet::InitializeEmpty()
 {
-  this->InitializeTimeSlicedGeometry(1);
+  this->GetUpdatedTimeGeometry();
   m_Contours.resize(0);
 }
 

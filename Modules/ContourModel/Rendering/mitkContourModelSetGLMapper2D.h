@@ -58,7 +58,7 @@ namespace mitk {
 
     virtual ~ContourModelSetGLMapper2D();
 
-    void DrawContour(mitk::ContourModel* contour, mitk::BaseRenderer* renderer);
+//    void DrawContour(mitk::ContourModel* contour, mitk::BaseRenderer* renderer);
 
   private:
 

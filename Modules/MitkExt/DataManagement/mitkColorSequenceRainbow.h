@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef MITKCOLORSEQUENCERAINBOW_H_URTESEINDEUTIGEKENNUNG_02
-#define MITKCOLORSEQUENCERAINBOW_H_URTESEINDEUTIGEKENNUNG_02
+#ifndef _mitkColorSequenceRainbow_H_
+#define _mitkColorSequenceRainbow_H_
 
 #include "mitkColorSequence.h"
 #include "MitkExtExports.h"
@@ -24,9 +24,11 @@ namespace mitk
 
 class MitkExt_EXPORT ColorSequenceRainbow : public ColorSequence
 {
+
 public:
-  ColorSequenceRainbow();
-  virtual ~ColorSequenceRainbow();
+
+  mitkClassMacro(ColorSequenceRainbow, ColorSequence);
+  itkNewMacro(Self);
 
   /*!
   \brief method to return another color
@@ -38,7 +40,13 @@ public:
   */
   virtual void GoToBegin();
 
+protected:
+
+  ColorSequenceRainbow();
+  virtual ~ColorSequenceRainbow();
+
 private:
+
   /*!
   \brief method that fills the pre-defnied colors
   */
@@ -62,6 +70,6 @@ private:
 
 }
 
-#endif
+#endif // _mitkColorSequenceRainbow_H_
 
 

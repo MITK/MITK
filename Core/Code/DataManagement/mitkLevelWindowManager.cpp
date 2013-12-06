@@ -136,8 +136,8 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk:
     if (levelWindowProperty.IsNull())
       continue;
 
-    int nonLvlWinMode1 = mitk::RenderingModeProperty::LOOKUPTABLE_COLOR;
-    int nonLvlWinMode2 = mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR;
+    int nonLvlWinMode1 = mitk::RenderingModeProperty::LOOKUPTABLE;
+    int nonLvlWinMode2 = mitk::RenderingModeProperty::COLORTRANSFERFUNCTION;
 
     mitk::RenderingModeProperty::Pointer mode = dynamic_cast<mitk::RenderingModeProperty*>(node->GetProperty( "Image Rendering.Mode" ));
 

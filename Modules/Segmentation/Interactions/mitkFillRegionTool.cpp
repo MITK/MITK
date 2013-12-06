@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFillRegionTool.xpm"
 
+#include "mitkToolManager.h"
+#include "mitkLabelSetImage.h"
+
 // us
 #include <usModule.h>
 #include <usModuleResource.h>
@@ -29,8 +32,9 @@ namespace mitk {
 }
 
 mitk::FillRegionTool::FillRegionTool()
-:SetRegionTool(1)
+:SetRegionTool()
 {
+  CONNECT_ACTION( 49014, OnInvertLogic );
 }
 
 mitk::FillRegionTool::~FillRegionTool()
@@ -61,3 +65,42 @@ const char* mitk::FillRegionTool::GetName() const
   return "Fill";
 }
 
+bool mitk::FillRegionTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
+{
+  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  assert (workingNode);
+
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  assert (workingImage);
+
+  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+  const mitk::Color& color = workingImage->GetActiveLabelColor();
+  this->SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
+
+  return Superclass::OnMousePressed(action, stateEvent);
+}
+
+bool mitk::FillRegionTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
+{
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+
+  m_LogicInverted = !m_LogicInverted;
+
+  if (m_LogicInverted)
+  {
+    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+    assert (workingNode);
+    LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+    assert (workingImage);
+    m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+    const mitk::Color& color = workingImage->GetActiveLabelColor();
+    FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
+  }
+  else
+  {
+    m_PaintingPixelValue = 0;
+    FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+  }
+
+  return true;
+}

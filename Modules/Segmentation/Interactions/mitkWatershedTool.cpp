@@ -111,7 +111,7 @@ void mitk::WatershedTool::DoIt()
     dataNode->SetProperty("binary", mitk::BoolProperty::New(false));
     dataNode->SetProperty("name", mitk::StringProperty::New("Watershed Result"));
     mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-    renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
+    renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW );
     dataNode->SetProperty("Image Rendering.Mode", renderingMode);
 
     // since we create a multi label image, define a vtk lookup table
@@ -199,8 +199,8 @@ void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* ori
   // start the whole pipeline
   cast->Update();
 
-  // reset the progress bar by setting progress
-  command->SetProgress(10);
+  // reset the progress bar
+  command->Reset();
 
   // since we obtain a new image from our pipeline, we have to make sure, that our mitk::Image::Pointer
   // is responsible for the memory management of the output image

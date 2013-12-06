@@ -803,6 +803,9 @@
       <transition NAME="send Koordinates release" NEXT_STATE_ID="1" EVENT_ID="505">
         <action ID="42" />
       </transition>
+      <transition NAME="SHIFT+press" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="91" />
+      </transition>
     </state>
   </stateMachine>
   <stateMachine NAME="PressMoveReleaseAndPointSetting">
@@ -907,6 +910,9 @@
         <action ID="49014" />
         <action ID="42" />
         <action ID="49014" />
+      </transition>
+      <transition NAME="SHIFT+press" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="91" />
       </transition>
     </state>
     <state NAME="inverted" ID="2">

@@ -54,7 +54,7 @@
   <event_variant class="MouseWheelEvent" name="PlaneDown">
     <attribute name="ScrollDirection" value="down"/>
   </event_variant>
-    <event_variant class="InteractionKeyEvent" name="PlaneUP">
+  <event_variant class="InteractionKeyEvent" name="PlaneUP">
     <attribute name="Key" value="ArrowUp"/>
   </event_variant>
   <event_variant class="InteractionKeyEvent" name="PlaneDown">

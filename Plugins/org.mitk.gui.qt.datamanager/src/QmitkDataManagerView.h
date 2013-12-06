@@ -92,6 +92,10 @@ public slots:
   ///
   void TextureInterpolationChanged();
   ///
+  /// Invoked when the CenterRotation action changed
+  ///
+  void CenterRotationChanged();
+  ///
   /// Invoked when the color action changed
   ///
   void TextureInterpolationToggled ( bool checked );
@@ -99,7 +103,17 @@ public slots:
   /// SurfaceRepresentationActionToggled
   ///
   void SurfaceRepresentationMenuAboutToShow ();
-  ///public
+
+  ///
+  /// \brief Agreggates available colormaps
+  ///
+  void ColormapMenuAboutToShow ();
+
+  ///
+  /// \brief changes the active colormap
+  ///
+  void ColormapActionToggled (bool);
+
   /// SurfaceRepresentationActionToggled
   ///
   void SurfaceRepresentationActionToggled ( bool checked );
@@ -111,6 +125,10 @@ public slots:
   /// \brief Invoked when an element should be saved.
   ///
   void SaveSelectedNodes( bool checked = false );
+  ///
+  /// \brief Invoked when an element should be renamed.
+  ///
+  void RenameSelectedNode( bool checked = false );
   ///
   /// \brief Invoked when an element should be removed.
   ///
@@ -153,9 +171,6 @@ public slots:
   /// and run IContextMenuAction
   ///
   void ContextMenuActionTriggered( bool );
-
-  /// Invoked when the median action is invoked
-  void OtsuFilter( bool checked = false );
 
   /// When rows are inserted auto expand them
   void NodeTreeViewRowsInserted ( const QModelIndex & parent, int start, int end );
@@ -223,8 +238,12 @@ protected:
   QPushButton* m_ColorButton;
   /// TextureInterpolation action
   QAction* m_TextureInterpolation;
+  // CenterRotation action
+  QAction* m_ActionCenterRotation;
   /// SurfaceRepresentation action
   QAction* m_SurfaceRepresentation;
+
+  QAction* m_ColormapAction;
 
   /// Maps "Show in" actions to editor ids
   QSignalMapper* m_ShowInMapper;

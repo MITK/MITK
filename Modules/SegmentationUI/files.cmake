@@ -15,7 +15,6 @@ Qmitk/QmitkOtsuTool3DGUI.cpp
 Qmitk/QmitkPaintbrushToolGUI.cpp
 Qmitk/QmitkPixelManipulationToolGUI.cpp
 Qmitk/QmitkRegionGrow3DToolGUI.cpp
-Qmitk/QmitkSlicesInterpolator.cpp
 Qmitk/QmitkToolGUI.cpp
 Qmitk/QmitkToolGUIArea.cpp
 Qmitk/QmitkToolReferenceDataSelectionBox.cpp
@@ -23,6 +22,18 @@ Qmitk/QmitkToolRoiDataSelectionBox.cpp
 Qmitk/QmitkToolSelectionBox.cpp
 Qmitk/QmitkToolWorkingDataSelectionBox.cpp
 Qmitk/QmitkWatershedToolGUI.cpp
+Qmitk/QmitkMedianTool3DGUI.cpp
+Qmitk/QmitkDilateTool3DGUI.cpp
+Qmitk/QmitkErodeTool3DGUI.cpp
+Qmitk/QmitkOpenTool3DGUI.cpp
+Qmitk/QmitkCloseTool3DGUI.cpp
+Qmitk/QmitkFillHolesTool3DGUI.cpp
+Qmitk/QmitkKeepNConnectedRegionsTool3DGUI.cpp
+Qmitk/QmitkSliceBasedInterpolator.cpp
+Qmitk/QmitkSurfaceBasedInterpolator.cpp
+Qmitk/QmitkLabelSetTableWidget.cpp
+Qmitk/QmitkLabelSetWidget.cpp
+Qmitk/QmitkSearchLabelDialog.cpp
 )
 
 set(MOC_H_FILES
@@ -42,7 +53,6 @@ Qmitk/QmitkOtsuTool3DGUI.h
 Qmitk/QmitkPaintbrushToolGUI.h
 Qmitk/QmitkPixelManipulationToolGUI.h
 Qmitk/QmitkRegionGrow3DToolGUI.h
-Qmitk/QmitkSlicesInterpolator.h
 Qmitk/QmitkToolGUI.h
 Qmitk/QmitkToolGUIArea.h
 Qmitk/QmitkToolReferenceDataSelectionBox.h
@@ -50,6 +60,18 @@ Qmitk/QmitkToolRoiDataSelectionBox.h
 Qmitk/QmitkToolSelectionBox.h
 Qmitk/QmitkToolWorkingDataSelectionBox.h
 Qmitk/QmitkWatershedToolGUI.h
+Qmitk/QmitkMedianTool3DGUI.h
+Qmitk/QmitkDilateTool3DGUI.h
+Qmitk/QmitkErodeTool3DGUI.h
+Qmitk/QmitkOpenTool3DGUI.h
+Qmitk/QmitkCloseTool3DGUI.h
+Qmitk/QmitkFillHolesTool3DGUI.h
+Qmitk/QmitkKeepNConnectedRegionsTool3DGUI.h
+Qmitk/QmitkSliceBasedInterpolator.h
+Qmitk/QmitkSurfaceBasedInterpolator.h
+Qmitk/QmitkLabelSetTableWidget.h
+Qmitk/QmitkLabelSetWidget.h
+Qmitk/QmitkSearchLabelDialog.h
 )
 
 set(UI_FILES
@@ -57,4 +79,20 @@ Qmitk/QmitkAdaptiveRegionGrowingToolGUIControls.ui
 Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
+Qmitk/QmitkSliceBasedInterpolatorControls.ui
+Qmitk/QmitkSurfaceBasedInterpolatorControls.ui
+Qmitk/QmitkLabelSetWidgetControls.ui
+Qmitk/QmitkDilateTool3DGUIControls.ui
+Qmitk/QmitkErodeTool3DGUIControls.ui
+Qmitk/QmitkMedianTool3DGUIControls.ui
+Qmitk/QmitkCloseTool3DGUIControls.ui
+Qmitk/QmitkOpenTool3DGUIControls.ui
+Qmitk/QmitkKeepNConnectedRegionsTool3DGUIControls.ui
+Qmitk/QmitkFillHolesTool3DGUIControls.ui
+Qmitk/QmitkSearchLabelDialogGUI.ui
+Qmitk/QmitkBinaryThresholdToolGUIControls.ui
+)
+
+set(QRC_FILES
+  resources/SegmentationUI.qrc
 )

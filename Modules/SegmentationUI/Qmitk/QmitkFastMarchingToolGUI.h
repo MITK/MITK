@@ -21,8 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationUIExports.h"
 #include "mitkFastMarchingTool.h"
 
-class ctkSliderWidget;
+class ctkSlider;
+class ctkDoubleSlider;
 class ctkRangeWidget;
+class ctkSliderWidget;
 class QPushButton;
 
 #include "QmitkStepperAdapter.h"
@@ -51,7 +53,7 @@ public:
     void OnBetaChanged(double);
     void OnSigmaChanged(double);
     void OnStoppingValueChanged(double);
-    void OnConfirmSegmentation();
+    void OnAcceptPreview();
     void Refetch();
     void SetStepper(mitk::Stepper *);
     void OnClearSeeds();
@@ -66,20 +68,19 @@ protected:
   void BusyStateChanged(bool);
 
   ctkRangeWidget*  m_slwThreshold;
-  ctkSliderWidget* m_slStoppingValue;
-  ctkSliderWidget* m_slSigma;
-  ctkSliderWidget* m_slAlpha;
-  ctkSliderWidget* m_slBeta;
+  //ctkSliderWidget* m_slStoppingValue;
+  ctkDoubleSlider* m_slSigma;
+  ctkDoubleSlider* m_slAlpha;
+  ctkDoubleSlider* m_slBeta;
 
-  QPushButton* m_btConfirm;
+  QPushButton* m_btAcceptPreview;
   QPushButton* m_btClearSeeds;
 
   mitk::FastMarchingTool::Pointer m_FastMarchingTool;
 
   bool m_TimeIsConnected;
+  bool m_SelfCall;
   mitk::Stepper::Pointer m_TimeStepper;
-
-  void OnFastMarchingToolReady();
 };
 
 #endif

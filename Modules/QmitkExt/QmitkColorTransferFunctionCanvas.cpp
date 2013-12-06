@@ -114,7 +114,7 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
       {
         if (m_LineEditAvailable)
         {
-          m_XEdit->setText(QString::number(GetFunctionX(m_GrabbedHandle)));
+          m_XEdit->setText(QString::number(GetFunctionX(m_GrabbedHandle), 'g', 4));
           //m_YEdit->setText(QString::number(GetFunctionY(m_GrabbedHandle)));
         }
       }

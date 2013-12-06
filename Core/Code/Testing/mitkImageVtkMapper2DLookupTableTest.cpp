@@ -52,7 +52,7 @@ int mitkImageVtkMapper2DLookupTableTest(int argc, char* argv[])
   myLookupTable->SetVtkLookupTable( lookupTable );
 
   //set the rendering mode to use the transfer function
-  renderingHelper.SetImageProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::LOOKUPTABLE_COLOR));
+  renderingHelper.SetImageProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::LOOKUPTABLE));
   //set the property for the image
   renderingHelper.SetImageProperty("LookupTable", mitk::LookupTableProperty::New(myLookupTable));
 

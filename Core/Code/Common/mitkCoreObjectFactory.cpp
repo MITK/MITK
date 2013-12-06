@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGeometry3D.h"
 #include "mitkGeometryData.h"
 #include "mitkImage.h"
-#include <mitkImageVtkMapper2D.h>
+#include "mitkImageVtkMapper2D.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkLookupTable.h"
 #include "mitkLookupTableProperty.h"
@@ -41,7 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSlicedGeometry3D.h"
 #include "mitkSmartPointerProperty.h"
 #include "mitkStringProperty.h"
-#include "mitkSurface.h"
 #include "mitkSurface.h"
 #include "mitkSurfaceGLMapper2D.h"
 #include "mitkSurfaceVtkMapper3D.h"
@@ -107,8 +106,8 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode* node)
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNotNull() && image->IsInitialized())
   {
-    mitk::ImageVtkMapper2D::SetDefaultProperties(node);
-    mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
+      mitk::ImageVtkMapper2D::SetDefaultProperties(node);
+      mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
   }
 
   mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
@@ -388,7 +387,6 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", "Diffusion Weighted Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.qbi", "Q-Ball Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hqbi", "Q-Ball Images"));
-
 }
 
 /**

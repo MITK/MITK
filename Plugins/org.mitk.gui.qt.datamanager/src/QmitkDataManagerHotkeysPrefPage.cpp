@@ -64,6 +64,8 @@ void QmitkDataManagerHotkeysPrefPage::CreateQtControl(QWidget* parent)
 
   m_HotkeyEditors["Show Node Information"] = new QmitkHotkeyLineEdit("Ctrl+, I");
 
+  m_HotkeyEditors["Rename selected node"] = new QmitkHotkeyLineEdit("F2");
+
   m_MainControl = new QWidget(parent);
 
   QGridLayout* layout = new QGridLayout;

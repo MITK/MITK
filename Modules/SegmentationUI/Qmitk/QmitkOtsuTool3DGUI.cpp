@@ -50,7 +50,6 @@ void QmitkOtsuTool3DGUI::OnItemSelectionChanged(QListWidgetItem* item)
   {
     m_SelectedItem = 0;
     m_Controls.m_selectionListWidget->clearSelection();
-    m_Controls.m_ConfSegButton->setEnabled( false );
     m_OtsuTool3DTool->ShowMultiLabelResultNode(true);
     return;
   }
@@ -79,6 +78,7 @@ void QmitkOtsuTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 
 void QmitkOtsuTool3DGUI::OnSegmentationRegionAccept()
 {
+  /*
   QmitkConfirmSegmentationDialog dialog;
   QString segName = QString::fromStdString(m_OtsuTool3DTool->GetCurrentSegmentationName());
 
@@ -100,7 +100,9 @@ void QmitkOtsuTool3DGUI::OnSegmentationRegionAccept()
   if (m_OtsuTool3DTool.IsNotNull() && m_Controls.m_selectionListWidget->currentItem() != NULL)
   {
     m_OtsuTool3DTool->ConfirmSegmentation();
+    m_OtsuTool3DTool->Deactivated();
   }
+  */
 }
 
 void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
@@ -143,8 +145,6 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
       item = new QListWidgetItem(itemName);
       m_Controls.m_selectionListWidget->addItem(item);
     }
-    //deactivate 'confirm segmentation'-button
-    m_Controls.m_ConfSegButton->setEnabled(false);
   }
 }
 

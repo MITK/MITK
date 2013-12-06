@@ -1698,13 +1698,13 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     stream<<"Position: <" << std::fixed <<crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", " << std::fixed << crosshairPos[2] << "> mm";
     stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
     mitk::ScalarType pixelValue = image->GetPixelValueByIndex(p, timestep);
-    if (fabs(pixelValue)>1000000 || fabs(pixelValue) < 0.01)
+    if ( (pixelValue != 0.0) && (fabs(pixelValue)>1000000 || fabs(pixelValue) < 0.01) )
     {
-      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<< std::scientific<< pixelValue <<"  ";
+      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixel value: "<< std::scientific<< pixelValue <<"  ";
     }
     else
     {
-      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<< pixelValue <<"  ";
+      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixel value: "<< pixelValue <<"  ";
     }
   }
   else

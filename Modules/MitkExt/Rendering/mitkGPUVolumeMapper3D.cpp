@@ -465,7 +465,7 @@ void mitk::GPUVolumeMapper3D::UpdateTransferFunctions( mitk::BaseRenderer * rend
   vtkPiecewiseFunction *opacityTransferFunction = m_DefaultOpacityTransferFunction;
   vtkPiecewiseFunction *gradientTransferFunction = m_DefaultGradientTransferFunction;
   vtkColorTransferFunction *colorTransferFunction = m_DefaultColorTransferFunction;
-
+/*
   bool isBinary = false;
 
   GetDataNode()->GetBoolProperty("binary", isBinary, renderer);
@@ -485,6 +485,7 @@ void mitk::GPUVolumeMapper3D::UpdateTransferFunctions( mitk::BaseRenderer * rend
   }
   else
   {
+*/
     mitk::TransferFunctionProperty *transferFunctionProp =
       dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataNode()->GetProperty("TransferFunction",renderer));
 
@@ -494,7 +495,7 @@ void mitk::GPUVolumeMapper3D::UpdateTransferFunctions( mitk::BaseRenderer * rend
       gradientTransferFunction = transferFunctionProp->GetValue()->GetGradientOpacityFunction();
       colorTransferFunction = transferFunctionProp->GetValue()->GetColorTransferFunction();
     }
-  }
+//  }
 
   if(ls->m_gpuInitialized)
   {
@@ -566,7 +567,7 @@ void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::B
   node->AddProperty( "volumerendering.gpu.usetexturecompression", mitk::BoolProperty ::New( false ), renderer, overwrite );
   node->AddProperty( "volumerendering.gpu.reducesliceartifacts" , mitk::BoolProperty ::New( false ), renderer, overwrite );
 
-  node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
+  //node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNotNull() && image->IsInitialized())

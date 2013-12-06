@@ -35,9 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   /**
-  \brief Filter to compute the normales for contours based on vtkPolygons
-
-
+  \brief Filter to compute the normals for contours based on vtkPolygons
 
     This filter takes a number of extracted contours and computes the normals for each
     contour edge point. The normals can be accessed by calling:
@@ -58,17 +56,25 @@ public:
   mitkClassMacro(ComputeContourSetNormalsFilter,SurfaceToSurfaceFilter);
   itkNewMacro(Self);
 
-  itkSetMacro(SegmentationBinaryImage, mitk::Image::Pointer);
+  /**
+    \brief Sets the working image and the current active label.
+  */
+  void SetWorkingImage(Image* image, int activeLabel);
 
-   /*
-      \brief Returns the computed normals as a surface
+  /**
+    \brief Returns the computed normals as a surface.
   */
   mitk::Surface::Pointer GetNormalsAsSurface();
 
   //Resets the filter, i.e. removes all inputs and outputs
   void Reset();
 
-  void SetMaxSpacing(double);
+  /**
+    \brief Sets the max spacing ...
+
+    \a Parameter spacing ...
+  */
+  void SetMaxSpacing(double spacing);
 
   /**
     \brief Set whether the mitkProgressBar should be used
@@ -92,8 +98,8 @@ protected:
 
 private:
 
-  //The segmentation out of which the contours were extracted. Can be used to determine the direction of the normals
-  mitk::Image::Pointer m_SegmentationBinaryImage;
+  mitk::Image* m_WorkingImage;
+  int m_ActiveLabel;
   double m_MaxSpacing;
 
   unsigned int m_NegativeNormalCounter;

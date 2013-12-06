@@ -147,4 +147,3 @@ namespace mitk
   }
 
 }//end namespace mitk
-

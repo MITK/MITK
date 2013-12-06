@@ -56,10 +56,9 @@ namespace mitk
   public:
 
     mitkClassMacro(ContourModel, BaseData);
-
     itkNewMacro(Self);
 
-    mitkCloneMacro(Self);
+   // mitkCloneMacro(Self);
 
 
     /*+++++++++++++++ typedefs +++++++++++++++++++++++++++++++*/
@@ -440,6 +439,11 @@ namespace mitk
     ContourModel();
     ContourModel(const mitk::ContourModel &other);
     virtual ~ContourModel();
+
+    /**
+    * \brief Makes a deep copy of the current object
+    */
+    virtual LightObject::Pointer InternalClone() const;
 
     //inherit from BaseData. called by Clear()
     virtual void ClearData();

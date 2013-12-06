@@ -87,6 +87,18 @@ void mitk::CameraController::SetViewToCaudal()
   this->SetStandardView(CAUDAL);
 }
 
+void mitk::CameraController::SetCameraFocalPoint(const mitk::Point3D& fpoint)
+{
+  if (m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard3D)
+  {
+    const mitk::VtkPropRenderer* glRenderer = dynamic_cast<const mitk::VtkPropRenderer*>(m_Renderer);
+    if (glRenderer == NULL)
+      return;
+    vtkRenderer* vtkRenderer = glRenderer->GetVtkRenderer();
+    assert (vtkRenderer);
+    vtkRenderer->GetActiveCamera()->SetFocalPoint(fpoint[0], fpoint[1], fpoint[2]);
+  }
+}
 
 void mitk::CameraController::SetStandardView( mitk::CameraController::StandardView view )
 {

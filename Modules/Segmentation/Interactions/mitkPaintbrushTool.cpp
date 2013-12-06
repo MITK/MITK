@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOverwriteSliceImageFilter.h"
 #include "mitkBaseRenderer.h"
 #include "mitkImageDataItem.h"
+#include "mitkContourUtils.h"
 #include "ipSegmentation.h"
 
 #include "mitkLevelWindowProperty.h"
@@ -369,13 +370,14 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
     it++;
   }
 
-
+  /*
   if (leftMouseButtonPressed)
   {
-    FeedbackContourTool::FillContourInSlice( contour, timestep, m_WorkingSlice, m_PaintingPixelValue );
+    ContourUtils::FillContourInSlice( contour, timestep, m_WorkingSlice, m_PaintingPixelValue );
     m_WorkingNode->SetData(m_WorkingSlice);
     m_WorkingNode->Modified();
   }
+  */
 
   // visualize contour
   ContourModel::Pointer displayContour = ContourModel::New();
@@ -392,8 +394,8 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   //  displayContour->AddVertex( point );
   //}
 
-  displayContour = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
-  SetFeedbackContour( *displayContour );
+  //displayContour = ContourUtils::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
+  //SetFeedbackContour( *displayContour );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
 

@@ -70,6 +70,8 @@ public:
    virtual void SetViewToCranial();
    virtual void SetViewToCaudal();
    virtual void SetStandardView(StandardView view);
+   virtual void SetCameraFocalPoint(const mitk::Point3D& fpoint);
+
 
 protected:
     /**

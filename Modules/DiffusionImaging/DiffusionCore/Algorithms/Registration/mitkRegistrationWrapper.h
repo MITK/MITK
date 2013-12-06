@@ -22,7 +22,6 @@ namespace mitk
  *
  *  For DWI images a registerable B0 Image will automatically be extracted.
  *
- *  TBD Include Resampling, ++ with special resampling for Binary files
  */
 class DiffusionCore_EXPORT RegistrationWrapper : public itk::LightObject
 {
@@ -33,6 +32,19 @@ public:
   mitkClassMacro(RegistrationWrapper, itk::LightObject)
   itkNewMacro(Self)
 
+  /**
+   * @brief ApplyTransformationToImage Applies transformation from GetTransformation to provided image.
+   *
+   *  Transforms image according to previously calculated transformation. Can be applied to derived resources also (e.g. binary images).
+   *  Handles DWI Data and rotates the gradients according to the transformation.
+   *  Images are resampled to provided reference, if no reference it supplied a copy of the input image is used as reference.
+   *
+   * @param img - image on which the transformation is to be applied
+   * @param transformation - transformation returned from  GetTransformation
+   * @param offset - offset  transformation returned from  GetTransformation
+   * @param resampleReference - image to which is to be resampled
+   * @param binary
+   */
   void ApplyTransformationToImage(mitk::Image::Pointer& img, const RidgidTransformType& transformation, double *offset, mitk::Image::Pointer resampleReference = NULL , bool binary = false) const;
 
   /**
@@ -49,8 +61,8 @@ public:
    * @param fixedImage
    * @param movingImage
    * @param transformation
-   * @param offset -
-   * @param mask
+   * @param offset - stores offset that has been applied to match origin of both images
+   * @param mask - optional, provide a mask that is excluded from registration metric
    */
   void GetTransformation(mitk::Image::Pointer fixedImage , mitk::Image::Pointer movingImage, RidgidTransformType transformation, double* offset, mitk::Image::Pointer mask = NULL);
 

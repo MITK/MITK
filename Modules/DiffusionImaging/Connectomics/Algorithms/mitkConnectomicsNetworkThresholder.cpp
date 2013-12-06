@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkConnectomicsNetworkThresholder.h"
 #include <mitkConnectomicsStatisticsCalculator.h>
+#include "vnl/vnl_random.h"
 
 mitk::ConnectomicsNetworkThresholder::ConnectomicsNetworkThresholder()
   : m_Network( 0 )
@@ -121,12 +122,50 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::Thresho
   calculator->SetNetwork( result );
   calculator->Update();
 
+  //the random number generator
+  vnl_random rng( (unsigned int) rand() );
+
   bool notBelow( targetDensity < calculator->GetConnectionDensity() );
+
+  double minWeight( result->GetMaximumWeight() );
+  int count( 0 );
 
   while( notBelow )
   {
  //   result = Threshold( result, loop );
+    std::vector< EdgeDescriptorType > candidateVector;
 
+    // determine minimum weight and number of edges having that weight
+    NetworkType* boostGraph = result->GetBoostGraph();
+    EdgeIteratorType iterator, end;
+    // sets iterator to start end end to end
+    boost::tie(iterator, end) = boost::edges( *boostGraph );
+
+    for ( ; iterator != end; ++iterator)
+    {
+      double tempWeight;
+
+      // the value of an iterator is a descriptor
+      tempWeight = (*boostGraph)[ *iterator ].weight;
+
+      if( mitk::Equal( tempWeight, minWeight ) )
+      {
+        candidateVector.push_back( *iterator );
+        count++;
+      }
+      else if( tempWeight < minWeight )
+      {
+        candidateVector.clear();
+        candidateVector.push_back( *iterator );
+        minWeight < tempWeight;
+        count = 1;
+      }
+    }
+
+    // Which to delete
+    int deleteNumber( rng.lrand32( count ) );
+
+    boost::remove_edge( candidateVector.at( deleteNumber ), *boostGraph );
 
     calculator->SetNetwork( result );
     calculator->Update();

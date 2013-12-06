@@ -33,6 +33,12 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::GetThre
 {
   mitk::ConnectomicsNetwork::Pointer result;
 
+  if( ! CheckValidity() )
+  {
+    MITK_ERROR << "Aborting";
+    return m_Network;
+  }
+
   switch(m_ThresholdingScheme)
   {
   case RandomRemovalOfWeakest :
@@ -60,9 +66,75 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::GetThre
   return result;
 }
 
+bool mitk::ConnectomicsNetworkThresholder::CheckValidity()
+{
+  bool valid(true);
+
+  if( m_Network.IsNull() )
+  {
+    valid = false;
+    MITK_ERROR << "Network is NULL.";
+  }
+
+  switch(m_ThresholdingScheme)
+  {
+  case RandomRemovalOfWeakest :
+  case LargestLowerThanDensity :
+    {
+      if( m_TargetDensity < 0.0 )
+      {
+        valid = false;
+        MITK_ERROR << "Target density is negative.";
+      }
+      if( m_TargetDensity > 1.0 )
+      {
+        valid = false;
+        MITK_ERROR << "Target density is larger than 1.";
+      }
+      break;
+    }
+  case ThresholdBased :
+    {
+      if( m_TargetThreshold < 0 )
+      {
+        valid = false;
+        MITK_ERROR << "Target threshold is negative.";
+      }
+      break;
+    }
+  default :
+    {
+      valid = false;
+      MITK_ERROR << "Specified unknown Thresholding Scheme";
+    }
+  }
+
+  return valid;
+}
+
 mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::ThresholdByRandomRemoval( mitk::ConnectomicsNetwork::Pointer input, double targetDensity )
 {
-  return input;
+  mitk::ConnectomicsNetwork::Pointer result( input );
+
+  mitk::ConnectomicsStatisticsCalculator::Pointer calculator;
+
+  calculator->SetNetwork( result );
+  calculator->Update();
+
+  bool notBelow( targetDensity < calculator->GetConnectionDensity() );
+
+  while( notBelow )
+  {
+ //   result = Threshold( result, loop );
+
+
+    calculator->SetNetwork( result );
+    calculator->Update();
+    notBelow = targetDensity < calculator->GetConnectionDensity();
+  }
+
+  result->UpdateIDs();
+  return result;
 }
 
 mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::ThresholdBelowDensity( mitk::ConnectomicsNetwork::Pointer input, double targetDensity )

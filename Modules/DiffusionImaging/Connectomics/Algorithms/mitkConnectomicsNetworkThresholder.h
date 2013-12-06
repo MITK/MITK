@@ -90,6 +90,8 @@ namespace mitk
     mitk::ConnectomicsNetwork::Pointer ThresholdByRandomRemoval( mitk::ConnectomicsNetwork::Pointer input, double targetDensity );
     mitk::ConnectomicsNetwork::Pointer ThresholdBelowDensity( mitk::ConnectomicsNetwork::Pointer input, double targetDensity );
     mitk::ConnectomicsNetwork::Pointer Threshold( mitk::ConnectomicsNetwork::Pointer input, double targetThreshold );
+    // Returns false if parameter combination is invalid
+    bool CheckValidity();
 
     /////////////////////// Variables ////////////////////////
 

@@ -49,8 +49,8 @@ QmitkStreamlineTrackingView::QmitkStreamlineTrackingView()
     : QmitkFunctionality()
     , m_Controls( 0 )
     , m_MultiWidget( NULL )
-    , m_TensorImage( NULL )
     , m_SeedRoi( NULL )
+    , m_MaskImage( NULL )
 {
 }
 
@@ -133,8 +133,8 @@ void QmitkStreamlineTrackingView::StdMultiWidgetNotAvailable()
 
 void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
-    m_TensorImageNode = NULL;
-    m_TensorImage = NULL;
+    m_TensorImageNodes.clear();
+    m_TensorImages.clear();
     m_SeedRoi = NULL;
     m_MaskImage = NULL;
     m_Controls->m_TensorImageLabel->setText("<font color='red'>mandatory</font>");
@@ -149,9 +149,8 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
         {
             if( dynamic_cast<mitk::TensorImage*>(node->GetData()) )
             {
-                m_TensorImageNode = node;
-                m_TensorImage = dynamic_cast<mitk::TensorImage*>(node->GetData());
-                m_Controls->m_TensorImageLabel->setText(node->GetName().c_str());
+                m_TensorImageNodes.push_back(node);
+                m_TensorImages.push_back(dynamic_cast<mitk::TensorImage*>(node->GetData()));
             }
             else
             {
@@ -171,8 +170,12 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
         }
     }
 
-    if(m_TensorImageNode.IsNotNull())
+    if(!m_TensorImageNodes.empty())
     {
+        if (m_TensorImageNodes.size()>1)
+            m_Controls->m_TensorImageLabel->setText(m_TensorImageNodes.size()+" tensor images selected");
+        else
+            m_Controls->m_TensorImageLabel->setText(m_TensorImageNodes.at(0)->GetName().c_str());
         m_Controls->m_InputData->setTitle("Input Data");
         m_Controls->commandLinkButton->setEnabled(true);
     }
@@ -187,21 +190,25 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
 
 void QmitkStreamlineTrackingView::DoFiberTracking()
 {
-    if (m_TensorImage.IsNull())
+    if (m_TensorImages.empty())
         return;
 
     typedef itk::Image< itk::DiffusionTensor3D<float>, 3> TensorImageType;
     typedef mitk::ImageToItk<TensorImageType> CastType;
     typedef mitk::ImageToItk<ItkUCharImageType> CastType2;
 
-    CastType::Pointer caster = CastType::New();
-    caster->SetInput(m_TensorImage);
-    caster->Update();
-    TensorImageType::Pointer image = caster->GetOutput();
-
     typedef itk::StreamlineTrackingFilter< float > FilterType;
     FilterType::Pointer filter = FilterType::New();
-    filter->SetInput(image);
+
+    for (int i=0; i<(int)m_TensorImages.size(); i++)
+    {
+        CastType::Pointer caster = CastType::New();
+        caster->SetInput(m_TensorImages.at(i));
+        caster->Update();
+        filter->SetInput(i, caster->GetOutput());
+    }
+
+    filter->SetNumberOfThreads(1);
     filter->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelSlider->value());
     filter->SetFaThreshold((float)m_Controls->m_FaThresholdSlider->value()/100);
     filter->SetMinCurvatureRadius((float)m_Controls->m_AngularThresholdSlider->value()/10);
@@ -236,11 +243,11 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData(fib);
     QString name("FiberBundle_");
-    name += m_TensorImageNode->GetName().c_str();
+    name += m_TensorImageNodes.at(0)->GetName().c_str();
     name += "_Streamline";
     node->SetName(name.toStdString());
     node->SetVisibility(true);
-    GetDataStorage()->Add(node, m_TensorImageNode);
+    GetDataStorage()->Add(node, m_TensorImageNodes.at(0));
 }
 
 

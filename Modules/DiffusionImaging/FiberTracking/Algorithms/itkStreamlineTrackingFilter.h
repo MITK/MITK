@@ -88,8 +88,8 @@ namespace itk{
     void PrintSelf(std::ostream& os, Indent indent) const;
 
     void CalculateNewPosition(itk::ContinuousIndex<double, 3>& pos, vnl_vector_fixed<double,3>& dir, typename InputImageType::IndexType& index);
-    float FollowStreamline(itk::ContinuousIndex<double, 3> pos, int dirSign, vtkPoints* points, std::vector< vtkIdType >& ids);
-    bool IsValidPosition(itk::ContinuousIndex<double, 3>& pos, typename InputImageType::IndexType& index, vnl_vector_fixed< float, 8 >& interpWeights);
+    float FollowStreamline(itk::ContinuousIndex<double, 3> pos, int dirSign, vtkPoints* points, std::vector< vtkIdType >& ids, int imageIdx);
+    bool IsValidPosition(itk::ContinuousIndex<double, 3>& pos, typename InputImageType::IndexType& index, vnl_vector_fixed< float, 8 >& interpWeights, int imageIdx);
 
     double RoundToNearest(double num);
     void BeforeThreadedGenerateData();
@@ -102,11 +102,12 @@ namespace itk{
     vtkSmartPointer<vtkPoints> m_Points;
     vtkSmartPointer<vtkCellArray> m_Cells;
 
-    ItkFloatImgType::Pointer    m_EmaxImage;
+    std::vector< ItkFloatImgType::Pointer >    m_EmaxImage;
     ItkFloatImgType::Pointer    m_FaImage;
-    ItkPDImgType::Pointer       m_PdImage;
-    typename InputImageType::Pointer m_InputImage;
+    std::vector< ItkPDImgType::Pointer >       m_PdImage;
+    std::vector< typename InputImageType::Pointer > m_InputImage;
 
+    int m_NumberOfInputs;
     float m_FaThreshold;
     float m_MinCurvatureRadius;
     float m_StepSize;

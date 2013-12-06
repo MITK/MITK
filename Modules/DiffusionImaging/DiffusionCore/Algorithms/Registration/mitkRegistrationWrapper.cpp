@@ -72,7 +72,9 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
     RigidTransformType::ParametersType parameters(RigidTransformType::ParametersDimension);
 
     for (int i = 0; i<6;++i)
+    {
       parameters[i] = transformation[i];
+    }
 
     rtransform->SetParameters( parameters );
 
@@ -131,11 +133,13 @@ void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImag
   // align the offsets of the two images. this is done to avoid non-overlapping initialization
   Point3D origin = fixedImage->GetGeometry()->GetOrigin();
   Point3D originMoving = movingImage->GetGeometry()->GetOrigin();
+
   offset[0] = originMoving[0]-origin[0];
   offset[1] = originMoving[1]-origin[1];
   offset[2] = originMoving[2]-origin[2];
 
-  movingImage->GetGeometry()->SetOrigin(origin);
+  mitk::Image::Pointer tmpImage = movingImage->Clone();
+  tmpImage->GetGeometry()->SetOrigin(origin);
   // Start registration
   mitk::PyramidImageRegistrationMethod::Pointer registrationMethod = mitk::PyramidImageRegistrationMethod::New();
   registrationMethod->SetFixedImage( fixedImage );
@@ -153,7 +157,7 @@ void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImag
   registrationMethod->SetTransformToRigid();
   registrationMethod->SetCrossModalityOn();
 
-  registrationMethod->SetMovingImage(movingImage);
+  registrationMethod->SetMovingImage(tmpImage);
   registrationMethod->Update();
   registrationMethod->GetParameters(transformation); // first three: euler angles, last three translation
 }

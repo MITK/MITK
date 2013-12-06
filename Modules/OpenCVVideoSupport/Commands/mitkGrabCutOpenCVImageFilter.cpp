@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::GrabCutOpenCVImageFilter::GrabCutOpenCVImageFilter()
   : m_PointSetsChanged(false), m_InputImageChanged(false),
+    m_NewResultReady(false),
     m_ProcessEveryNumImage(1), m_CurrentProcessImageNum(0),
     m_ResultCount(0),
     m_ThreadId(-1),
@@ -43,6 +44,13 @@ mitk::GrabCutOpenCVImageFilter::~GrabCutOpenCVImageFilter()
 
 bool mitk::GrabCutOpenCVImageFilter::FilterImage( cv::Mat& image )
 {
+  if ( m_NewResultReady )
+  {
+    m_ResultMutex->Lock();
+    m_NewResultReady = false;
+    m_ResultMutex->Unlock();
+  }
+
   // update just every x images (as configured)
   ++m_CurrentProcessImageNum %= m_ProcessEveryNumImage;
   if (m_CurrentProcessImageNum != 0) { return true; }
@@ -52,32 +60,6 @@ bool mitk::GrabCutOpenCVImageFilter::FilterImage( cv::Mat& image )
   m_ImageMutex->Unlock();
 
   if ( ! m_ForegroundPoints.empty()) { m_WorkerBarrier->Broadcast(); }
-
-  /*// nothing to update if the point sets haven't changed
-  if ( ! m_PointSetsChanged ) { return true; }
-
-  if ( m_ForegroundPoints.empty() )
-  {
-    MITK_WARN("GrabCutOpenCVImageFilter")("AbstractOpenCVImageFilter")
-        << "Cannot filter image without foreground points set.";
-    return false;
-  }
-
-  this->UpdateMaskFromPointSets();
-
-  cv::Mat mask = m_GrabCutMask.clone();
-
-  cv::Mat bgdModel, fgdModel;
-  cv::grabCut(m_InputImage, mask, cv::Rect(), bgdModel, fgdModel, 1, cv::GC_INIT_WITH_MASK);
-
-  cv::compare(mask, cv::GC_PR_FGD, m_ResultMask, cv::CMP_EQ);
-
-  cv::Mat foregroundMat;
-  cv::compare(mask, cv::GC_FGD, foregroundMat, cv::CMP_EQ);
-
-  foregroundMat.copyTo(m_ResultMask, foregroundMat);
-
-  m_InputImageChanged = false;*/
 
   return true;
 }
@@ -103,86 +85,15 @@ void mitk::GrabCutOpenCVImageFilter::SetModelPoints(std::vector<itk::Index<2> > 
   m_PointSetsMutex->Unlock();
 }
 
+unsigned int mitk::GrabCutOpenCVImageFilter::GetResultCount()
+{
+  return m_ResultCount;
+}
+
 const cv::Mat& mitk::GrabCutOpenCVImageFilter::GetResultMask()
 {
-  //this->UpdateMaskFromPointSets();
-
   return m_ResultMask;
 }
-
-/*bool mitk::GrabCutOpenCVImageFilter::UpdateResultMask()
-{
-  // nothing to update if the point sets haven't changed
-  if ( ! m_PointSetsChanged ) { return true; }
-
-  if ( m_InputImage.empty() )
-  {
-    MITK_WARN("GrabCutOpenCVImageFilter")("AbstractOpenCVImageFilter")
-        << "Cannot update result mask without input image being set.";
-    return false;
-  }
-
-  if ( m_ForegroundPoints.empty() )
-  {
-    MITK_WARN("GrabCutOpenCVImageFilter")("AbstractOpenCVImageFilter")
-        << "Cannot filter image without foreground points set.";
-    return false;
-  }
-
-  this->UpdateMaskFromPointSets();
-
-  cv::Mat mask = m_GrabCutMask.clone();
-
-  cv::Mat bgdModel, fgdModel;
-  cv::grabCut(m_InputImage, mask, cv::Rect(), bgdModel, fgdModel, 1, cv::GC_INIT_WITH_MASK);
-
-  cv::compare(mask, cv::GC_PR_FGD, m_ResultMask, cv::CMP_EQ);
-
-  cv::Mat foregroundMat;
-  cv::compare(mask, cv::GC_FGD, foregroundMat, cv::CMP_EQ);
-
-  foregroundMat.copyTo(m_ResultMask, foregroundMat);
-
-  m_InputImageChanged = false;
-
-  return true;
-}*/
-
-/*void mitk::GrabCutOpenCVImageFilter::UpdateMaskFromPointSets()
-{
-  if ( m_PointSetsChanged )
-  {
-    m_PointSetsMutex->Lock();
-
-    m_GrabCutMask = cv::Mat(m_InputImage.size().height, m_InputImage.size().width, CV_8UC1, cv::GC_PR_BGD);
-
-    this->UpdateMaskWithPointSet(m_ForegroundPoints, cv::GC_FGD);
-    this->UpdateMaskWithPointSet(m_BackgroundPoints, cv::GC_BGD);
-
-    m_PointSetsChanged = false;
-
-    m_PointSetsMutex->Unlock();
-  }
-}
-
-void mitk::GrabCutOpenCVImageFilter::UpdateMaskWithPointSet(std::vector<itk::Index<2> > pointSet, int pixelValue)
-{
-  for (std::vector<itk::Index<2> >::iterator it = pointSet.begin();
-       it != pointSet.end(); ++it)
-  {
-    for ( int i = -2; i <= 2; ++i )
-    {
-      for ( int j = -2; j <= 2; ++j)
-      {
-        int x = it->GetElement(1) + i; int y = it->GetElement(0) + j;
-        if ( x >= 0 && y >= 0 && x < m_GrabCutMask.cols && y < m_GrabCutMask.rows)
-        {
-          m_GrabCutMask.at<unsigned char>(x, y) = pixelValue;
-        }
-      }
-    }
-  }
-}*/
 
 cv::Mat mitk::GrabCutOpenCVImageFilter::GetMaskFromPointSets()
 {
@@ -221,12 +132,12 @@ cv::Mat mitk::GrabCutOpenCVImageFilter::RunSegmentation(cv::Mat input, cv::Mat m
   cv::Mat bgdModel, fgdModel;
   cv::grabCut(input, mask, cv::Rect(), bgdModel, fgdModel, 1, cv::GC_INIT_WITH_MASK);
 
-  cv::compare(mask, cv::GC_PR_FGD, m_ResultMask, cv::CMP_EQ);
+  cv::Mat result;
+  cv::compare(mask, cv::GC_PR_FGD, result, cv::CMP_EQ);
 
   cv::Mat foregroundMat;
   cv::compare(mask, cv::GC_FGD, foregroundMat, cv::CMP_EQ);
 
-  cv::Mat result;
   foregroundMat.copyTo(result, foregroundMat);
   return result;
 }
@@ -252,6 +163,7 @@ ITK_THREAD_RETURN_TYPE mitk::GrabCutOpenCVImageFilter::SegmentationWorker(void* 
     cv::Mat result = thisObject->RunSegmentation(image, mask);
     thisObject->m_ResultMutex->Lock();
     thisObject->m_ResultMask = result;
+    thisObject->m_NewResultReady = true;
     thisObject->m_ResultCount++;
     thisObject->m_ResultMutex->Unlock();
   }

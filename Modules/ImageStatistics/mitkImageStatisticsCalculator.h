@@ -186,6 +186,7 @@ public:
     const Statistics& GetHotspotStatistics() const;  // real statistics
     Statistics& GetHotspotStatistics();  // real statistics
     bool HasHotspotStatistics() const;
+    void SetHasHotspotStatistics(bool); // set a flag. if set, return empty hotspotstatistics object
 
     void Reset();
 
@@ -374,10 +375,18 @@ protected:
 
   struct ImageExtrema
   {
+    bool Defined;
     double Max;
     double Min;
     vnl_vector<int> MaxIndex;
     vnl_vector<int> MinIndex;
+
+    ImageExtrema()
+    :Max(itk::NumericTraits<double>::Min())
+    ,Min(itk::NumericTraits<double>::Max())
+    ,Defined(false)
+    {
+    }
   };
 
 

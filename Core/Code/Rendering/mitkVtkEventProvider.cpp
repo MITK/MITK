@@ -32,7 +32,6 @@
 
 namespace mitk
 {
-  vtkCxxRevisionMacro(vtkEventProvider, "$Revision: 1.18 $");
   vtkStandardNewMacro(vtkEventProvider);
 }
 //----------------------------------------------------------------------------

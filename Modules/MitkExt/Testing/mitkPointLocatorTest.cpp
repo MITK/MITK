@@ -23,12 +23,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPointLocator.h>
 #include <cstdlib>
 
-vtkFloatingPointType GenerateRandomNumber( const vtkFloatingPointType& min = 0.0, const vtkFloatingPointType& max = 100.0 )
+double GenerateRandomNumber( const double& min = 0.0, const double& max = 100.0 )
 {
-  return ( ( ( vtkFloatingPointType ) ( std::rand( ) ) ) / ( ( vtkFloatingPointType ) ( RAND_MAX ) ) ) * ( max - min) + min;
+  return ( ( ( double ) ( std::rand( ) ) ) / ( ( double ) ( RAND_MAX ) ) ) * ( max - min) + min;
 }
 
-void GenerateRandomPoint( vtkFloatingPointType& x, vtkFloatingPointType& y, vtkFloatingPointType& z, const vtkFloatingPointType& min = 0.0, const vtkFloatingPointType& max = 100.0 )
+void GenerateRandomPoint( double& x, double& y, double& z, const double& min = 0.0, const double& max = 100.0 )
 {
     x = GenerateRandomNumber(min, max);
     y = GenerateRandomNumber(min, max);
@@ -94,7 +94,7 @@ int mitkPointLocatorTest(int /*argc*/, char* /*argv*/[])
   // generate N random points and calculate the closest
   // points with both the vtk and mitk pointlocator.
   // verify, that the point ids are the same.
-  vtkFloatingPointType p[3], x, y, z;
+  double p[3], x, y, z;
   mitk::PointSet::PointType pointType;
   for ( unsigned int i = 0 ; i < 100 ; ++i )
   {

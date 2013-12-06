@@ -111,7 +111,7 @@ static void writeVti(const char * filename, mitk::Image* image, int t=0)
 {
   vtkXMLImageDataWriter * vtkwriter = vtkXMLImageDataWriter::New();
   vtkwriter->SetFileName( filename );
-  vtkwriter->SetInput(image->GetVtkImageData(t));
+  vtkwriter->SetInputData(image->GetVtkImageData(t));
   vtkwriter->Write();
   vtkwriter->Delete();
 }

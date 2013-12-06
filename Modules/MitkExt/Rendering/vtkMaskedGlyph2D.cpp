@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkPolyData.h"
 
 vtkStandardNewMacro(vtkMaskedGlyph2D);
-vtkCxxRevisionMacro(vtkMaskedGlyph2D, "");
 
 vtkMaskedGlyph2D::vtkMaskedGlyph2D()
 {
@@ -42,8 +41,8 @@ vtkMaskedGlyph2D::~vtkMaskedGlyph2D()
 
 void vtkMaskedGlyph2D::SetInput(vtkDataSet *input)
 {
-  this->MaskPoints->SetInput(input);
-  this->Superclass::SetInput(this->MaskPoints->GetOutput());
+  this->MaskPoints->SetInputData(input);
+  this->Superclass::SetInputConnection(this->MaskPoints->GetOutputPort());
 }
 
 void vtkMaskedGlyph2D::SetRandomMode(int mode)
@@ -56,11 +55,11 @@ int vtkMaskedGlyph2D::GetRandomMode()
   return this->MaskPoints->GetRandomMode();
 }
 
-void vtkMaskedGlyph2D::Execute()
+int vtkMaskedGlyph2D::RequestData(vtkInformation* info, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec)
 {
   if (this->UseMaskPoints)
     {
-    this->Superclass::SetInput(this->MaskPoints->GetOutput());
+    this->Superclass::SetInputConnection(this->MaskPoints->GetOutputPort());
     vtkIdType numPts = this->MaskPoints->GetPolyDataInput(0)->GetNumberOfPoints();
     this->MaskPoints->SetMaximumNumberOfPoints(MaximumNumberOfPoints);
     this->MaskPoints->SetOnRatio(numPts / MaximumNumberOfPoints);
@@ -68,10 +67,10 @@ void vtkMaskedGlyph2D::Execute()
     }
   else
     {
-    this->Superclass::SetInput(this->MaskPoints->GetInput());
+    this->Superclass::SetInputData(this->MaskPoints->GetInput());
     }
 
-  this->Superclass::Execute();
+  return this->Superclass::RequestData(info, inInfoVec, outInfoVec);
 }
 
 void vtkMaskedGlyph2D::PrintSelf(ostream& os, vtkIndent indent)

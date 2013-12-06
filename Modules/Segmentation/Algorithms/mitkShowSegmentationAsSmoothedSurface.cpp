@@ -417,14 +417,14 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
     MITK_INFO << "Quadric mesh decimation...";
 
     vtkQuadricDecimation *quadricDecimation = vtkQuadricDecimation::New();
-    quadricDecimation->SetInput(m_Surface->GetVtkPolyData());
+    quadricDecimation->SetInputData(m_Surface->GetVtkPolyData());
     quadricDecimation->SetTargetReduction(decimation);
     quadricDecimation->AttributeErrorMetricOn();
     quadricDecimation->GlobalWarningDisplayOff();
     quadricDecimation->Update();
 
     vtkCleanPolyData* cleaner = vtkCleanPolyData::New();
-    cleaner->SetInput(quadricDecimation->GetOutput());
+    cleaner->SetInputConnection(quadricDecimation->GetOutputPort());
     cleaner->PieceInvariantOn();
     cleaner->ConvertLinesToPointsOn();
     cleaner->ConvertStripsToPolysOn();
@@ -439,7 +439,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   // Compute Normals
 
   vtkPolyDataNormals* computeNormals = vtkPolyDataNormals::New();
-  computeNormals->SetInput(m_Surface->GetVtkPolyData());
+  computeNormals->SetInputData(m_Surface->GetVtkPolyData());
   computeNormals->SetFeatureAngle(360.0f);
   computeNormals->FlipNormalsOff();
   computeNormals->Update();

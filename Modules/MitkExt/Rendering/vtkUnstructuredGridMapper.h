@@ -32,7 +32,7 @@ class MitkExt_EXPORT vtkUnstructuredGridMapper : public vtkMapper
 {
 public:
   static vtkUnstructuredGridMapper *New();
-  vtkTypeRevisionMacro(vtkUnstructuredGridMapper,vtkMapper);
+  vtkTypeMacro(vtkUnstructuredGridMapper,vtkMapper);
   void PrintSelf(ostream& os, vtkIndent indent);
   void Render(vtkRenderer *ren, vtkActor *act);
 

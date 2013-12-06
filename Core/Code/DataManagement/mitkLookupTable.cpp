@@ -74,7 +74,7 @@ void mitk::LookupTable::ChangeOpacityForAll( float opacity )
 
   int noValues = m_LookupTable->GetNumberOfTableValues ();
 
-  vtkFloatingPointType rgba[ 4 ];
+  double rgba[ 4 ];
 
   for ( int i = 0;i < noValues;i++ )
   {
@@ -95,7 +95,7 @@ void mitk::LookupTable::ChangeOpacity(int index, float opacity )
     return;
   }
 
-  vtkFloatingPointType rgba[ 4 ];
+  double rgba[ 4 ];
 
   m_LookupTable->GetTableValue ( index, rgba );
   rgba[ 3 ] = opacity;
@@ -234,9 +234,9 @@ void mitk::LookupTable::CreateColorTransferFunction(vtkColorTransferFunction*& c
   int i, num_of_values=m_LookupTable->GetNumberOfTableValues();
 
 
-  vtkFloatingPointType *cols;
-  vtkFloatingPointType *colsHead;
-  colsHead=cols=(vtkFloatingPointType *)malloc(sizeof(vtkFloatingPointType)*num_of_values*3);
+  double *cols;
+  double *colsHead;
+  colsHead=cols=(double *)malloc(sizeof(double)*num_of_values*3);
 
   for(i=0;i<num_of_values;++i)
   {
@@ -258,9 +258,9 @@ void mitk::LookupTable::CreateOpacityTransferFunction(vtkPiecewiseFunction*& opa
   mitk::LookupTable::RawLookupTableType *rgba = GetRawLookupTable();
   int i, num_of_values=m_LookupTable->GetNumberOfTableValues();
 
-  vtkFloatingPointType *alphas;
-  vtkFloatingPointType *alphasHead;
-  alphasHead=alphas=(vtkFloatingPointType*)malloc(sizeof(vtkFloatingPointType)*num_of_values);
+  double *alphas;
+  double *alphasHead;
+  alphasHead=alphas=(double*)malloc(sizeof(double)*num_of_values);
 
   rgba+=3;
   for(i=0;i<num_of_values;++i)
@@ -281,9 +281,9 @@ void mitk::LookupTable::CreateGradientTransferFunction(vtkPiecewiseFunction*& gr
   mitk::LookupTable::RawLookupTableType *rgba = GetRawLookupTable();
   int i, num_of_values=m_LookupTable->GetNumberOfTableValues();
 
-  vtkFloatingPointType *alphas;
-  vtkFloatingPointType *alphasHead;
-  alphasHead=alphas=(vtkFloatingPointType*)malloc(sizeof(vtkFloatingPointType)*num_of_values);
+  double *alphas;
+  double *alphasHead;
+  alphasHead=alphas=(double*)malloc(sizeof(double)*num_of_values);
 
   rgba+=3;
   for(i=0;i<num_of_values;++i)

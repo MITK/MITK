@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkContour.h>
 #include <vtkConfigure.h>
 #include <mitkPlaneGeometry.h>
+#include <vtkVersionMacros.h>
 
 class vtkLinearExtrusionFilter;
 class vtkPlanes;

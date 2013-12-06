@@ -34,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
 
 
-#include "vtkVolumeRenderingFactory.h"
 #include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
@@ -53,7 +52,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkGPUInfoList.h"
 #include "vtkGPUInfo.h"
 
-vtkCxxRevisionMacro(vtkMitkGPUVolumeRayCastMapper, "$Revision: 1.7 $");
 vtkInstantiatorNewMacro(vtkMitkGPUVolumeRayCastMapper);
 vtkCxxSetObjectMacro(vtkMitkGPUVolumeRayCastMapper, MaskInput, vtkImageData);
 vtkCxxSetObjectMacro(vtkMitkGPUVolumeRayCastMapper, TransformedInput, vtkImageData);
@@ -118,15 +116,6 @@ vtkMitkGPUVolumeRayCastMapper::~vtkMitkGPUVolumeRayCastMapper()
   this->SetMaskInput(NULL);
   this->SetTransformedInput(NULL);
   this->LastInput = NULL;
-}
-
-// ----------------------------------------------------------------------------
-vtkMitkGPUVolumeRayCastMapper *vtkMitkGPUVolumeRayCastMapper::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret =
-    vtkVolumeRenderingFactory::CreateInstance("vtkMitkGPUVolumeRayCastMapper");
-  return static_cast<vtkMitkGPUVolumeRayCastMapper*>(ret);
 }
 
 // ----------------------------------------------------------------------------
@@ -327,9 +316,9 @@ int vtkMitkGPUVolumeRayCastMapper::ValidateRender(vtkRenderer *ren,
   if ( goodSoFar )
     {
     // Here is where we update the input
-    this->TransformedInput->UpdateInformation();
-    this->TransformedInput->SetUpdateExtentToWholeExtent();
-    this->TransformedInput->Update();
+//    this->TransformedInput->UpdateInformation(); //VTK6_TODO
+//    this->TransformedInput->SetUpdateExtentToWholeExtent();
+//    this->TransformedInput->Update();
 
     // Now make sure we can find scalars
     scalars=this->GetScalars(this->TransformedInput,this->ScalarMode,
@@ -457,9 +446,7 @@ void vtkMitkGPUVolumeRayCastMapper::CreateCanonicalView(
 
   vtkImageData *bigImage = vtkImageData::New();
   bigImage->SetDimensions(size[0], size[1], 1);
-  bigImage->SetScalarTypeToUnsignedChar();
-  bigImage->SetNumberOfScalarComponents(3);
-  bigImage->AllocateScalars();
+  bigImage->AllocateScalars(VTK_UNSIGNED_CHAR,3);
 
   this->CanonicalViewImageData = bigImage;
 
@@ -542,7 +529,7 @@ void vtkMitkGPUVolumeRayCastMapper::CreateCanonicalView(
 
   // Shrink to image to the desired size
   vtkImageResample *resample = vtkImageResample::New();
-  resample->SetInput( bigImage );
+  resample->SetInputData( bigImage );
   resample->SetAxisMagnificationFactor(0,scale[0]);
   resample->SetAxisMagnificationFactor(1,scale[1]);
   resample->SetAxisMagnificationFactor(2,1);

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class vtkScalarsToColors;
 #include <vtkImageData.h>
-#include <vtkImageToImageFilter.h>
+#include <vtkThreadedImageAlgorithm.h>
 
 #include <MitkExports.h>
 /** Documentation
@@ -34,12 +34,12 @@ class vtkScalarsToColors;
 *
 * \ingroup Renderer
 */
-class MITK_CORE_EXPORT vtkMitkLevelWindowFilter : public vtkImageToImageFilter
+class MITK_CORE_EXPORT vtkMitkLevelWindowFilter : public vtkThreadedImageAlgorithm
 {
 
 
 public:
-  vtkTypeMacro(vtkMitkLevelWindowFilter,vtkImageToImageFilter);
+  vtkTypeMacro(vtkMitkLevelWindowFilter,vtkThreadedImageAlgorithm);
 
   static vtkMitkLevelWindowFilter *New();
 
@@ -58,13 +58,15 @@ public:
   inline double GetMaxOpacity() const;
 
   /** \brief Set clipping bounds for the opaque part of the resliced 2d image */
-  void SetClippingBounds(vtkFloatingPointType*);
+  void SetClippingBounds(double*);
+
+protected:
 
   /** Default constructor. */
   vtkMitkLevelWindowFilter();
   /** Default deconstructor. */
   ~vtkMitkLevelWindowFilter();
-protected:
+
   /** \brief Method for threaded execution of the filter.
    * \param *inData: The input.
    * \param *outData: The output of the filter.
@@ -74,10 +76,10 @@ protected:
    */
   void ThreadedExecute(vtkImageData *inData, vtkImageData *outData,int extent[6], int id);
 
-  /** Standard VTK filter method to apply the filter. See VTK documentation.*/
-  void ExecuteInformation();
-  /** Standard VTK filter method to apply the filter. See VTK documentation. Not used at the moment.*/
-  void ExecuteInformation(vtkImageData *vtkNotUsed(inData), vtkImageData *vtkNotUsed(outData));
+//  /** Standard VTK filter method to apply the filter. See VTK documentation.*/
+  int RequestInformation(vtkInformation* request,vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+//  /** Standard VTK filter method to apply the filter. See VTK documentation. Not used at the moment.*/
+//  void ExecuteInformation(vtkImageData *vtkNotUsed(inData), vtkImageData *vtkNotUsed(outData));
 
 private:
   /** m_LookupTable contains the lookup table for the RGB level window.*/
@@ -87,6 +89,6 @@ private:
   /** m_MaxOpacity contains the upper bound for the alpha level window.*/
   double m_MaxOpacity;
 
-  vtkFloatingPointType m_ClippingBounds[4];
+  double m_ClippingBounds[4];
 };
 #endif

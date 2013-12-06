@@ -42,12 +42,12 @@ public:
     update();
   }
 
-  void AddFunctionPoint(vtkFloatingPointType x,vtkFloatingPointType /*val*/)
+  void AddFunctionPoint(double x,double /*val*/)
   {
     m_ColorTransferFunction->AddRGBPoint(x,m_ColorTransferFunction->GetRedValue(x),m_ColorTransferFunction->GetGreenValue(x),m_ColorTransferFunction->GetBlueValue(x));
   }
 
-  void RemoveFunctionPoint(vtkFloatingPointType x)
+  void RemoveFunctionPoint(double x)
   {
     int old_size = GetFunctionSize();
     m_ColorTransferFunction->RemovePoint(x);
@@ -58,7 +58,7 @@ public:
     }
   }
 
-  vtkFloatingPointType GetFunctionX(int index)
+  double GetFunctionX(int index)
   {
     return m_ColorTransferFunction->GetDataPointer()[index*4];
   }
@@ -69,7 +69,7 @@ public:
   }
 
   void DoubleClickOnHandle(int handle);
-  void MoveFunctionPoint(int index, std::pair<vtkFloatingPointType,vtkFloatingPointType> pos);
+  void MoveFunctionPoint(int index, std::pair<double,double> pos);
 
   void AddRGB(double x, double r, double g, double b);
 

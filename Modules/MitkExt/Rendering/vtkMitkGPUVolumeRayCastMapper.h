@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkVolumeMapper.h"
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
+#include "vtkVersionMacros.h"
 
 // Only with VTK 5.6 or above
 #if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
@@ -52,8 +53,7 @@ class vtkRenderWindow;
 class MitkExt_EXPORT vtkMitkGPUVolumeRayCastMapper : public vtkVolumeMapper
 {
 public:
-  static vtkMitkGPUVolumeRayCastMapper *New();
-  vtkTypeRevisionMacro(vtkMitkGPUVolumeRayCastMapper,vtkVolumeMapper);
+  vtkTypeMacro(vtkMitkGPUVolumeRayCastMapper,vtkVolumeMapper);
   void PrintSelf( ostream& os, vtkIndent indent );
 
   // Description:

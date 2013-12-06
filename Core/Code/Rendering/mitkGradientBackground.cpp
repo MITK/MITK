@@ -76,7 +76,7 @@ mitk::GradientBackground::GradientBackground()
   m_Lut->SetTableValue( m_Lut->GetIndex(0), 1, 1, 1 );
   m_Lut->SetTableValue( m_Lut->GetIndex(1), 0, 0, 0 );
 
-  m_Mapper->SetInput( m_Plane );
+  m_Mapper->SetInputData( m_Plane );
   m_Mapper->SetLookupTable( m_Lut );
 
   //m_Mapper->ImmediateModeRenderingOn();

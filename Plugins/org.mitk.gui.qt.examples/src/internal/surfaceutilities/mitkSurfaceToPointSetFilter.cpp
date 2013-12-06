@@ -54,7 +54,7 @@ void mitk::SurfaceToPointSetFilter::GenerateData()
   cleaner->ConvertPolysToLinesOff();
   cleaner->ConvertStripsToPolysOff();
   cleaner->PointMergingOn();
-  cleaner->SetInput(points);
+  cleaner->SetInputData(points);
   cleaner->Update();
 
   vtkPolyData* mergedPoints = cleaner->GetOutput();

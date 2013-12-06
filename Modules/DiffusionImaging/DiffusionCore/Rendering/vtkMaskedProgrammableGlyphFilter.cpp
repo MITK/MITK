@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkPolyData.h"
 
 vtkStandardNewMacro(vtkMaskedProgrammableGlyphFilter);
-vtkCxxRevisionMacro(vtkMaskedProgrammableGlyphFilter, "");
 
 vtkMaskedProgrammableGlyphFilter::vtkMaskedProgrammableGlyphFilter()
 {
@@ -42,8 +41,8 @@ vtkMaskedProgrammableGlyphFilter::~vtkMaskedProgrammableGlyphFilter()
 
 void vtkMaskedProgrammableGlyphFilter::SetInput(vtkDataSet *input)
 {
-  this->MaskPoints->SetInput(input);
-  this->Superclass::SetInput(this->MaskPoints->GetOutput());
+  this->MaskPoints->SetInputData(input);
+  this->Superclass::SetInputData(this->MaskPoints->GetOutput());
 }
 
 void vtkMaskedProgrammableGlyphFilter::SetRandomMode(int mode)
@@ -56,25 +55,6 @@ int vtkMaskedProgrammableGlyphFilter::GetRandomMode()
   return this->MaskPoints->GetRandomMode();
 }
 
-void vtkMaskedProgrammableGlyphFilter::Execute()
-{
-  if (this->UseMaskPoints)
-    {
-    this->Superclass::SetInput(this->MaskPoints->GetOutput());
-    vtkIdType numPts = this->MaskPoints->GetPolyDataInput(0)->GetNumberOfPoints();
-    this->MaskPoints->SetMaximumNumberOfPoints(MaximumNumberOfPoints);
-    double onRatio = MaximumNumberOfPoints != 0.0 ? numPts / MaximumNumberOfPoints : 1.0;
-    this->MaskPoints->SetOnRatio(onRatio);
-    this->MaskPoints->Update();
-    }
-  else
-    {
-      this->Superclass::SetInput(this->MaskPoints->GetInput());
-    }
-
-  this->Superclass::Execute();
-}
-
 int vtkMaskedProgrammableGlyphFilter::RequestData(
   vtkInformation *request,
   vtkInformationVector **inputVector,
@@ -82,15 +62,15 @@ int vtkMaskedProgrammableGlyphFilter::RequestData(
 {
   if (this->UseMaskPoints)
   {
-    this->Superclass::SetInput(this->MaskPoints->GetOutput());
     vtkIdType numPts = this->MaskPoints->GetPolyDataInput(0)->GetNumberOfPoints();
     this->MaskPoints->SetMaximumNumberOfPoints(MaximumNumberOfPoints);
     this->MaskPoints->SetOnRatio(numPts / MaximumNumberOfPoints);
+    this->Superclass::SetInputConnection(this->MaskPoints->GetOutputPort());
     this->MaskPoints->Update();
   }
   else
   {
-    this->Superclass::SetInput(this->MaskPoints->GetInput());
+    this->Superclass::SetInputData(this->MaskPoints->GetInput());
   }
 
   return this->Superclass::RequestData(

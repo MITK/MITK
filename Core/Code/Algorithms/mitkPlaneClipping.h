@@ -26,10 +26,10 @@ namespace mitk {
 namespace PlaneClipping {
 
 /** \brief Internal helper method for intersection testing used only in CalculateClippedPlaneBounds() */
-static bool LineIntersectZero( vtkPoints *points, int p1, int p2, vtkFloatingPointType *bounds )
+static bool LineIntersectZero( vtkPoints *points, int p1, int p2, double *bounds )
 {
-  vtkFloatingPointType point1[3];
-  vtkFloatingPointType point2[3];
+  double point1[3];
+  double point2[3];
   points->GetPoint( p1, point1 );
   points->GetPoint( p2, point2 );
 
@@ -52,7 +52,7 @@ static bool LineIntersectZero( vtkPoints *points, int p1, int p2, vtkFloatingPoi
 /** \brief Calculate the bounding box of the resliced image. This is necessary for
     arbitrarily rotated planes in an image volume. A rotated plane (e.g. in swivel mode)
     will have a new bounding box, which needs to be calculated. */
-static bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
+static bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, const PlaneGeometry *planeGeometry, double *bounds )
 {
   // Clip the plane with the bounding geometry. To do so, the corner points
   // of the bounding box are transformed by the inverse transformation

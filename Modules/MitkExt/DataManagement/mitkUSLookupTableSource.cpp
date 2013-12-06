@@ -75,7 +75,7 @@ vtkLookupTable* mitk::USLookupTableSource::BuildDSRDopplerLookupTable()
             vtkLookupTable->SetTableRange(0,255);
 
             int LookupTablesize = 256;
-            vtkFloatingPointType rgba[ 4 ];
+            double rgba[ 4 ];
 
             vtkLookupTable->SetNumberOfColors( LookupTablesize );
             for ( int i = 0; i < LookupTablesize; i++ )
@@ -106,7 +106,7 @@ vtkLookupTable* mitk::USLookupTableSource::BuildDSRDopplerLookupTable()
             int factor = 1;
             int i, n;
 
-            vtkFloatingPointType rgba[ 4 ];
+            double rgba[ 4 ];
 
             //int xDim = lutSize;
             //int yDim = 3;
@@ -227,7 +227,7 @@ vtkLookupTable* mitk::USLookupTableSource::BuildStrainRateLookupTable()
 
         //   xDim = size;
         //   yDim = 3;
-        vtkFloatingPointType rgba[ 4 ];
+        double rgba[ 4 ];
 
         float quartal = lutSize / 8.0f;
 

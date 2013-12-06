@@ -165,7 +165,7 @@ mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::ConstPointer surface, u
 
   vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
 
-  normals->SetInput(remesher->GetOutput());
+  normals->SetInputData(remesher->GetOutput());
   normals->AutoOrientNormalsOn();
   normals->ComputeCellNormalsOff();
   normals->ComputePointNormalsOn();

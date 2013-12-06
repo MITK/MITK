@@ -107,7 +107,7 @@ inline int vtkResliceRound(double x)
 mitkVtkImageOverwrite::mitkVtkImageOverwrite()
 {
   m_Overwrite_Mode = false;
-  this->GetOutput()->SetScalarTypeToUnsignedInt();
+  this->GetOutput()->AllocateScalars(VTK_UNSIGNED_INT,1); //VTK6_TODO where should the image be allocated?
 }
 
 //----------------------------------------------------------------------------

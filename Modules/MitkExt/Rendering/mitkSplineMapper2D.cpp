@@ -109,11 +109,11 @@ void mitk::SplineMapper2D::Paint ( mitk::BaseRenderer * renderer )
 
   mitk::Point3D currentPoint3D;
   mitk::Point2D currentPoint2D;
-  vtkFloatingPointType currentPoint3DVtk[3];
+  double currentPoint3DVtk[3];
 
   vlines->InitTraversal();
   int numberOfLines = vlines->GetNumberOfCells();
-  vtkFloatingPointType currentPointDistance;
+  double currentPointDistance;
   for ( int i = 0;i < numberOfLines; ++i )
   {
     bool previousPointOnPlane = false;

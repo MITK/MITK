@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkGlyph2D.h>
 #include <vtkGlyphSource2D.h>
 #include <vtkPolyData.h>
-#include <vtkPolyDataSource.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
@@ -111,7 +110,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     return ;
   }
 
-  vtkFloatingPointType vp[ 3 ], vp_slice[ 3 ], vnormal[ 3 ];
+  double vp[ 3 ], vp_slice[ 3 ], vnormal[ 3 ];
   vnl2vtk( point.Get_vnl_vector(), vp );
   vnl2vtk( normal.Get_vnl_vector(), vnormal );
   //std::cout << "Origin: " << vp[0] <<" "<< vp[1] <<" "<< vp[2] << std::endl;
@@ -188,7 +187,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
         (dims[2] == 1 && vnormal[2] != 0) ))
   {
     m_Cutter->SetCutFunction( m_Plane );
-    m_Cutter->SetInput( vtkImage );
+    m_Cutter->SetInputData( vtkImage );
     m_Cutter->GenerateCutScalarsOff();//!
     m_Cutter->Update();
     cuttedPlane = m_Cutter->GetOutput();
@@ -255,8 +254,8 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     vectorMagnitudes->SetNumberOfComponents(1);
     vectorMagnitudes->SetNumberOfValues(numPoints);
     vectorMagnitudes->SetNumberOfTuples(numPoints);
-    vtkFloatingPointType inVector[ 3 ], outVector[3], wnormal[3]; //, tmpVector[ 3 ], outVector[ 3 ];
-    vtkFloatingPointType k = 0.0;
+    double inVector[ 3 ], outVector[3], wnormal[3]; //, tmpVector[ 3 ], outVector[ 3 ];
+    double k = 0.0;
     vnl2vtk( normal.Get_vnl_vector(), wnormal );
     vtkMath::Normalize( wnormal );
     bool normalizeVecs;
@@ -317,8 +316,8 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     }
 
     vtkMaskedGlyph3D* glyphGenerator = vtkMaskedGlyph3D::New();
-    glyphGenerator->SetSource( glyphSource->GetOutput() );
-    glyphGenerator->SetInputConnection(cuttedPlane->GetProducerPort());
+    glyphGenerator->SetSourceData(glyphSource->GetOutput() );
+    glyphGenerator->SetInput(cuttedPlane);
     glyphGenerator->SetInputArrayToProcess (1, 0,0, vtkDataObject::FIELD_ASSOCIATION_POINTS , "vector");
     glyphGenerator->SetVectorModeToUseVector();
     glyphGenerator->OrientOn();
@@ -384,7 +383,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
 
 
 
-void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform* vtktransform, mitk::BaseRenderer*  /*renderer*/, vtkScalarsToColors *lut, mitk::Color color, float lwidth, vtkFloatingPointType *spacing )
+void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform* vtktransform, mitk::BaseRenderer*  /*renderer*/, vtkScalarsToColors *lut, mitk::Color color, float lwidth, double *spacing )
 {
 
   vtkPoints * points = glyphs->GetPoints();
@@ -399,7 +398,7 @@ void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2
   vtkIdList* idList;
   vtkCell* cell;
 
-  vtkFloatingPointType offset[3];
+  double offset[3];
   for (unsigned int i = 0; i < 3; ++i)
   {
     offset[i] = 0;
@@ -408,7 +407,7 @@ void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2
   vtkIdType numCells = glyphs->GetNumberOfCells();
   for ( vtkIdType cellId = 0; cellId < numCells; ++cellId )
   {
-    vtkFloatingPointType vp[ 3 ];
+    double vp[ 3 ];
 
     cell = glyphs->GetCell( cellId );
     idList = cell->GetPointIds();
@@ -418,7 +417,7 @@ void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2
     if(numPoints == 1)
     {
       //take transformation via vtktransform into account
-      vtkFloatingPointType pos[ 3 ],vp_raster[3];
+      double pos[ 3 ],vp_raster[3];
       points->GetPoint( idList->GetId( 0 ), vp );
       vp_raster[0] = vtkMath::Round(vp[0]/spacing[0])*spacing[0];
       vp_raster[1] = vtkMath::Round(vp[1]/spacing[1])*spacing[1];
@@ -441,7 +440,7 @@ void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2
         vp[1] = vp[1] + offset[1];
         vp[2] = vp[2] + offset[2];
 
-        vtkFloatingPointType tmp[ 3 ];
+        double tmp[ 3 ];
         vtktransform->TransformPoint( vp,tmp );
 
         vtk2itk( vp, p );
@@ -455,7 +454,7 @@ void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2
         if ( lut != NULL )
         {
           // color each point according to point data
-          vtkFloatingPointType * color;
+          double * color;
 
           if ( vpointscalars != NULL )
           {

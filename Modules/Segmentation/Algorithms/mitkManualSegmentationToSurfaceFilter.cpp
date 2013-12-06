@@ -63,7 +63,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     if(m_MedianFilter3D)
     {
       vtkImageMedian3D *median = vtkImageMedian3D::New();
-      median->SetInput(vtkimage); //RC++ (VTK < 5.0)
+      median->SetInputData(vtkimage); //RC++ (VTK < 5.0)
       median->SetKernelSize(m_MedianKernelSizeX,m_MedianKernelSizeY,m_MedianKernelSizeZ);//Std: 3x3x3
       median->ReleaseDataFlagOn();
       median->UpdateInformation();
@@ -78,7 +78,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     if(m_Interpolation)
     {
       vtkImageResample * imageresample = vtkImageResample::New();
-      imageresample->SetInput(vtkimage);
+      imageresample->SetInputData(vtkimage);
 
       //Set Spacing Manual to 1mm in each direction (Original spacing is lost during image processing)
       imageresample->SetAxisOutputSpacing(0, m_InterpolationX);
@@ -95,7 +95,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     if(m_UseGaussianImageSmooth)//gauss
     {
       vtkImageThreshold* vtkimagethreshold = vtkImageThreshold::New();
-      vtkimagethreshold->SetInput(vtkimage);
+      vtkimagethreshold->SetInputData(vtkimage);
       vtkimagethreshold->SetInValue( 100 );
       vtkimagethreshold->SetOutValue( 0 );
       vtkimagethreshold->ThresholdByUpper( this->m_Threshold );
@@ -105,7 +105,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       vtkimagethreshold->ReleaseDataFlagOn();
 
       vtkImageGaussianSmooth *gaussian = vtkImageGaussianSmooth::New();
-      gaussian->SetInput(vtkimagethreshold->GetOutput());
+      gaussian->SetInputConnection(vtkimagethreshold->GetOutputPort());
       gaussian->SetDimensionality(3);
       gaussian->SetRadiusFactor(0.49);
       gaussian->SetStandardDeviation( m_GaussianStandardDeviation );

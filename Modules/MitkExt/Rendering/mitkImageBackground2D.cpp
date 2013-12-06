@@ -129,7 +129,7 @@ void mitk::ImageBackground2D::Enable()
 
   char * c = 0;
   Update(c);
-  m_Actor->SetInput(m_VtkImageImport->GetOutput());
+  m_Actor->SetInputData(m_VtkImageImport->GetOutput());
 
   m_ImageRenderer->AddActor2D(m_Actor);
   m_ImageRenderer->ResetCamera();

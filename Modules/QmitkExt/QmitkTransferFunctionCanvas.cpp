@@ -48,19 +48,19 @@ void QmitkTransferFunctionCanvas::paintEvent(QPaintEvent* ev)
 }
 
 std::pair<int,int> QmitkTransferFunctionCanvas::FunctionToCanvas(
-    std::pair<vtkFloatingPointType,vtkFloatingPointType> functionPoint)
+    std::pair<double,double> functionPoint)
 {
   //std::cout<<"F2C.first: "<<(int)((functionPoint.first - m_Lower) /  (m_Upper - m_Lower) * width())<<" F2C.second: "<<(int)(height() * (1 - functionPoint.second))<<std::endl;
   return std::make_pair((int) ((functionPoint.first - m_Lower) / (m_Upper
       - m_Lower) * contentsRect().width()) + contentsRect().x(), (int) (contentsRect().height() * (1 - functionPoint.second)) + contentsRect().y());
 }
 
-std::pair<vtkFloatingPointType,vtkFloatingPointType> QmitkTransferFunctionCanvas::CanvasToFunction(
+std::pair<double,double> QmitkTransferFunctionCanvas::CanvasToFunction(
     std::pair<int,int> canvasPoint)
 {
-  //std::cout<<"C2F.first: "<<(canvasPoint.first * (m_Upper - m_Lower) / width() + m_Lower)<<" C2F.second: "<<(1.0 - (vtkFloatingPointType)canvasPoint.second / height())<<std::endl;
+  //std::cout<<"C2F.first: "<<(canvasPoint.first * (m_Upper - m_Lower) / width() + m_Lower)<<" C2F.second: "<<(1.0 - (double)canvasPoint.second / height())<<std::endl;
   return std::make_pair((canvasPoint.first - contentsRect().x()) * (m_Upper - m_Lower) / contentsRect().width()
-      + m_Lower, 1.0 - (vtkFloatingPointType) (canvasPoint.second - contentsRect().y()) / contentsRect().height());
+      + m_Lower, 1.0 - (double) (canvasPoint.second - contentsRect().y()) / contentsRect().height());
 }
 
 void QmitkTransferFunctionCanvas::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
@@ -118,7 +118,7 @@ void QmitkTransferFunctionCanvas::mouseMoveEvent(QMouseEvent* mouseEvent)
 {
   if (m_GrabbedHandle != -1)
   {
-    std::pair<vtkFloatingPointType,vtkFloatingPointType>
+    std::pair<double,double>
         newPos = this->CanvasToFunction(std::make_pair(mouseEvent->x(),
             mouseEvent->y()));
 

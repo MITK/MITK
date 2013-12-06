@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMITKSeriesGDCMReader.h"
 #include "mitkDICOMFileReaderTestHelper.h"
+#include "mitkDICOMFilenameSorter.h"
+#include "mitkDICOMTagBasedSorter.h"
 
 #include "mitkTestingMacros.h"
 
@@ -24,12 +26,38 @@ int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
   MITK_TEST_BEGIN("mitkDICOMITKSeriesGDCMReaderBasicsTest");
 
   mitk::DICOMITKSeriesGDCMReader::Pointer gdcmReader = mitk::DICOMITKSeriesGDCMReader::New();
-  MITK_TEST_CONDITION_REQUIRED(gdcmReader.IsNotNull(), "DICOMITKSeriesGDCMReaderBasics can be instantiated.");
+  MITK_TEST_CONDITION_REQUIRED(gdcmReader.IsNotNull(), "DICOMITKSeriesGDCMReader can be instantiated.");
 
   mitk::DICOMFileReaderTestHelper::SetTestInputFilenames( argc,argv );
 
+  // check the Set/GetInput function
   mitk::DICOMFileReaderTestHelper::TestInputFilenames( gdcmReader );
+
+  // check that output is a good reproduction of input (no duplicates, no new elements)
   mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
+
+
+  // repeat test with filename based sorter in-between
+  mitk::DICOMFilenameSorter::Pointer filenameSorter = mitk::DICOMFilenameSorter::New();
+  gdcmReader->AddSortingElement( filenameSorter );
+  mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
+
+  // repeat test with some more realistic sorting
+  gdcmReader = mitk::DICOMITKSeriesGDCMReader::New(); // this also tests destruction
+  mitk::DICOMTagBasedSorter::Pointer tagSorter = mitk::DICOMTagBasedSorter::New();
+
+  tagSorter->AddDistinguishingTag( std::make_pair(0x0028, 0x0010) ); // Number of Rows
+  tagSorter->AddDistinguishingTag( std::make_pair(0x0028, 0x0011) ); // Number of Columns
+  tagSorter->AddDistinguishingTag( std::make_pair(0x0028, 0x0030) ); // Pixel Spacing
+  tagSorter->AddDistinguishingTag( std::make_pair(0x0018, 0x1164) ); // Imager Pixel Spacing
+  tagSorter->AddDistinguishingTag( std::make_pair(0x0020, 0x0037) ); // Image Orientation (Patient) // TODO add tolerance parameter (l. 1572 of original code)
+  tagSorter->AddDistinguishingTag( std::make_pair(0x0020, 0x000e) ); // Series Instance UID
+  tagSorter->AddDistinguishingTag( std::make_pair(0x0018, 0x0050) ); // Slice Thickness
+  tagSorter->AddDistinguishingTag( std::make_pair(0x0028, 0x0008) ); // Number of Frames
+  gdcmReader->AddSortingElement( tagSorter );
+  mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
+
+  gdcmReader->PrintOutputs(std::cout);
 
   MITK_TEST_END();
 }

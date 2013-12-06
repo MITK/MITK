@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkDICOMITKSeriesGDCMReader_h
 
 #include "mitkDICOMFileReader.h"
+#include "mitkDICOMDatasetSorter.h"
+
+#include "mitkDICOMGDCMImageFrameInfo.h"
 
 #include "DICOMReaderExports.h"
 
@@ -39,6 +42,8 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 
     virtual bool CanHandleFile(const std::string& filename);
 
+    virtual void AddSortingElement(DICOMDatasetSorter* sorter);
+
   protected:
 
     DICOMITKSeriesGDCMReader();
@@ -47,13 +52,20 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other);
     DICOMITKSeriesGDCMReader& operator=(const DICOMITKSeriesGDCMReader& other);
 
+    DICOMDatasetList ToDICOMDatasetList(DICOMGDCMImageFrameList& input);
+    DICOMGDCMImageFrameList FromDICOMDatasetList(DICOMDatasetList& input);
+    DICOMImageFrameList ToDICOMImageFrameList(DICOMGDCMImageFrameList& input);
+
   private:
 
     bool m_FixTiltByShearing;
     bool m_Group3DplusT;
 
-    typedef std::list<DICOMImageFrameList> SortingBlockList;
+    typedef std::list<DICOMGDCMImageFrameList> SortingBlockList;
     SortingBlockList m_SortingResultInProgress;
+
+    typedef std::list<DICOMDatasetSorter::Pointer> SorterList;
+    SorterList m_Sorter;
 };
 
 }

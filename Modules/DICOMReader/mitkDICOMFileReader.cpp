@@ -97,6 +97,40 @@ mitk::DICOMFileReader
   }
 }
 
+void
+mitk::DICOMFileReader
+::PrintOutputs(std::ostream& os, bool filenameDetails)
+{
+  os << "---- Outputs of DICOMFilereader " << (void*)this << "----"<< std::endl;
+
+  for (unsigned int o = 0; o < m_Outputs.size(); ++o)
+  {
+    os << "-- Output " << o << std::endl;
+    const DICOMImageBlockDescriptor& block = m_Outputs[o];
+    const DICOMImageFrameList& frames = block.GetImageFrameList();
+    os << "  Number of frames: " << frames.size() << std::endl;
+    os << "  Pixels interpolated: " << (block.GetPixelsInterpolated() ? "true" : "false") << std::endl;
+    os << "  Pixel spacing interpretation: " << (int)block.GetPixelSpacingInterpretation() << std::endl;
+    os << "  MITK image: " << (void*)block.GetMitkImage().GetPointer() << std::endl;
+    if (filenameDetails)
+    {
+      for (DICOMImageFrameList::const_iterator frameIter = frames.begin();
+          frameIter != frames.end();
+          ++frameIter)
+      {
+        os << "    " << (*frameIter)->Filename;
+        if ((*frameIter)->FrameNo > 0)
+        {
+          os << ", " << (*frameIter)->FrameNo;
+        }
+        os << std::endl;
+      }
+    }
+  }
+  os << "---- End of output list ----" << std::endl;
+}
+
+
 const mitk::DICOMImageBlockDescriptor&
 mitk::DICOMFileReader
 ::GetOutput(unsigned int index) const

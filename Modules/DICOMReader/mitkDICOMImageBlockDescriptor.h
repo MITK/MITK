@@ -17,11 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkDICOMImageBlockDescriptor_h
 #define mitkDICOMImageBlockDescriptor_h
 
-#include "mitkImage.h"
-
 #include "mitkDICOMEnums.h"
+#include "mitkDICOMImageFrameInfo.h"
 
-#include "DICOMReaderExports.h"
+#include "mitkImage.h"
 
 namespace mitk
 {

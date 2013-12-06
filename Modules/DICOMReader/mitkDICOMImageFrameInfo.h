@@ -39,12 +39,10 @@ namespace mitk
 
     protected:
 
-      DICOMImageFrameInfo(const std::string& filename = "", unsigned int frameNo = 0)
-      :Filename(filename)
-      ,FrameNo(frameNo)
-      {
-      }
+      DICOMImageFrameInfo(const std::string& filename = "", unsigned int frameNo = 0);
   };
+
+  typedef std::vector<DICOMImageFrameInfo::Pointer> DICOMImageFrameList;
 }
 
 #endif

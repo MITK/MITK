@@ -16,6 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMITKSeriesGDCMReader.h"
 
+#include <itkTimeProbesCollectorBase.h>
+
+#include <gdcmScanner.h>
+
 mitk::DICOMITKSeriesGDCMReader
 ::DICOMITKSeriesGDCMReader()
 :DICOMFileReader()
@@ -48,78 +52,173 @@ mitk::DICOMITKSeriesGDCMReader
   return *this;
 }
 
+mitk::DICOMGDCMImageFrameList
+mitk::DICOMITKSeriesGDCMReader
+::FromDICOMDatasetList(DICOMDatasetList& input)
+{
+  DICOMGDCMImageFrameList output;
+  output.reserve(input.size());
+
+  for(DICOMDatasetList::iterator inputIter = input.begin();
+      inputIter != input.end();
+      ++inputIter)
+  {
+    DICOMGDCMImageFrameInfo* gfi = dynamic_cast<DICOMGDCMImageFrameInfo*>(*inputIter);
+    assert(gfi);
+    output.push_back(gfi);
+  }
+
+  return output;
+}
+
+mitk::DICOMDatasetList
+mitk::DICOMITKSeriesGDCMReader
+::ToDICOMDatasetList(DICOMGDCMImageFrameList& input)
+{
+  DICOMDatasetList output;
+  output.reserve(input.size());
+
+  for(DICOMGDCMImageFrameList::iterator inputIter = input.begin();
+      inputIter != input.end();
+      ++inputIter)
+  {
+    DICOMDatasetAccess* da = inputIter->GetPointer();
+    assert(da);
+    output.push_back(da);
+  }
+
+  return output;
+}
+
+mitk::DICOMImageFrameList
+mitk::DICOMITKSeriesGDCMReader
+::ToDICOMImageFrameList(DICOMGDCMImageFrameList& input)
+{
+  DICOMImageFrameList output;
+  output.reserve(input.size());
+
+  for(DICOMGDCMImageFrameList::iterator inputIter = input.begin();
+      inputIter != input.end();
+      ++inputIter)
+  {
+    DICOMImageFrameInfo::Pointer fi = (*inputIter)->GetFrameInfo();
+    assert(fi.IsNotNull());
+    output.push_back(fi);
+  }
+
+  return output;
+}
 
 void
 mitk::DICOMITKSeriesGDCMReader
 ::AnalyzeInputFiles()
 {
+  itk::TimeProbesCollectorBase timer;
+
+  timer.Start("Reset");
   this->ClearOutputs();
+  timer.Stop("Reset");
 
   // prepare initial sorting (== list of input files)
-
   StringList inputFilenames = this->GetInputFiles();
-  DICOMImageFrameList initialFramelist;
+
+  // scan files for sorting-relevant tags
+
+  // TODO provide tagToValueMappings to items in initialFramelist  / m_SortingResultInProgress
+  timer.Start("Setup scanning");
+  gdcm::Scanner gdcmScanner;
+  for(SorterList::iterator sorterIter = m_Sorter.begin();
+      sorterIter != m_Sorter.end();
+      ++sorterIter)
+  {
+    assert(sorterIter->IsNotNull());
+
+    DICOMTagList tags = (*sorterIter)->GetTagsOfInterest();
+    for(DICOMTagList::const_iterator tagIter = tags.begin();
+        tagIter != tags.end();
+        ++tagIter)
+    {
+      MITK_DEBUG << "Sorting uses tag " << tagIter->first << "," << tagIter->second;
+      gdcmScanner.AddTag( gdcm::Tag(tagIter->first, tagIter->second) );
+    }
+  }
+  timer.Stop("Setup scanning");
+
+  timer.Start("Tag scanning");
+  gdcmScanner.Scan( inputFilenames );
+  timer.Stop("Tag scanning");
+
+  timer.Start("Setup sorting");
+  DICOMGDCMImageFrameList initialFramelist;
   for (StringList::const_iterator inputIter = inputFilenames.begin();
        inputIter != inputFilenames.end();
        ++inputIter)
   {
     // TODO check DICOMness and non-multi-framedness
-    initialFramelist.push_back( DICOMImageFrameInfo::New(*inputIter, 0) );
+    initialFramelist.push_back( DICOMGDCMImageFrameInfo::New( DICOMImageFrameInfo::New(*inputIter, 0), gdcmScanner.GetMapping(inputIter->c_str()) ) );
   }
+  m_SortingResultInProgress.clear();
   m_SortingResultInProgress.push_back( initialFramelist );
+  timer.Stop("Setup sorting");
 
-  /*
-     PSEUDO CODE
+  // sort and split blocks as configured
 
-     // scan files for sorting-relevant tags
+  timer.Start("Sorting frames");
+  SortingBlockList nextStepSorting; // we should not modify our input list while processing it
+  unsigned int sorterIndex = 0;
+  for(SorterList::iterator sorterIter = m_Sorter.begin();
+      sorterIter != m_Sorter.end();
+      ++sorterIndex, ++sorterIter)
+  {
+    std::stringstream ss; ss << "Sorting step " << sorterIndex;
+    timer.Start( ss.str().c_str() );
+    nextStepSorting.clear();
+    DICOMDatasetSorter::Pointer& sorter = *sorterIter;
 
-     gdcm::Scanner gdcmScanner;
+    for(SortingBlockList::iterator blockIter = m_SortingResultInProgress.begin();
+        blockIter != m_SortingResultInProgress.end();
+        ++blockIter)
+    {
+      DICOMGDCMImageFrameList& gdcmInfoFrameList = *blockIter;
+      DICOMDatasetList datasetList = ToDICOMDatasetList( gdcmInfoFrameList );
 
-     foreach(DICOMDataSetSorter sorter, m_Sorter)
-     {
-       TagList tags = sorter->GetTagsOfInterest();
-       foreach(Tag, tags)
-       {
-         gdcmScanner.AddTag( tag );
-       }
-     }
+      sorter->SetInput(datasetList);
+      sorter->Sort();
+      unsigned int numberOfResultingBlocks = sorter->GetNumberOfOutputs();
+      for (unsigned int b = 0; b < numberOfResultingBlocks; ++b)
+      {
+        DICOMDatasetList blockResult = sorter->GetOutput(b);
+        DICOMGDCMImageFrameList sortedGdcmInfoFrameList = FromDICOMDatasetList(blockResult);
+        nextStepSorting.push_back( sortedGdcmInfoFrameList );
+      }
+    }
 
-     // sort and split blocks as configured
-
-     DICOMImageFrameInfo nextStepSorting; // we should not modify our input list while processing it
-     foreach(DICOMDataSetSorter sorter, m_Sorter)
-     {
-       nextStepSorting.clear();
-
-       foreach(DICOMImageFrameList framelist, m_SortingResultInProgress)
-       {
-         sorter->SetInput(framelist);
-         sorter->Sort();
-         unsigned int numberOfResultingBlocks = sorter->GetNumberOfOutputs();
-         for (unsigned int b = 0; b < numberOfResultingBlocks; ++b)
-         {
-           DICOMImageFrameList blockResult = sorter->GetOutput(b);
-           nextStepSorting.push_back( blockResult );
-         }
-       }
-
-       m_SortingResultInProgress = nextStepSorting;
-     }
-
-  */
+    m_SortingResultInProgress = nextStepSorting;
+    timer.Stop( ss.str().c_str() );
+  }
+  timer.Stop("Sorting frames");
 
   // provide final result as output
 
+  timer.Start("Output");
   this->SetNumberOfOutputs( m_SortingResultInProgress.size() );
   unsigned int o = 0;
   for (SortingBlockList::iterator blockIter = m_SortingResultInProgress.begin();
        blockIter != m_SortingResultInProgress.end();
        ++o, ++blockIter)
   {
+    DICOMGDCMImageFrameList& gdcmFrameInfoList = *blockIter;
+    DICOMImageFrameList frameList = ToDICOMImageFrameList( gdcmFrameInfoList );
+
     DICOMImageBlockDescriptor block;
-    block.SetImageFrameList( *blockIter );
+    block.SetImageFrameList( frameList );
     this->SetOutput( o, block );
   }
+  timer.Stop("Output");
+
+  std::cout << "---------------------------------------------------------------" << std::endl;
+  timer.Report( std::cout );
+  std::cout << "---------------------------------------------------------------" << std::endl;
 }
 
 // void AllocateOutputImages();
@@ -137,4 +236,12 @@ mitk::DICOMITKSeriesGDCMReader
 ::CanHandleFile(const std::string& itkNotUsed(filename))
 {
   return true; // can handle all
+}
+
+void
+mitk::DICOMITKSeriesGDCMReader
+::AddSortingElement(DICOMDatasetSorter* sorter)
+{
+  assert(sorter);
+  m_Sorter.push_back( sorter );
 }

@@ -17,14 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkDICOMEnums_h
 #define mitkDICOMEnums_h
 
-#include "mitkDICOMImageFrameInfo.h"
+#include <string>
+#include <vector>
+#include <utility>
 
 namespace mitk
 {
+  typedef std::pair<unsigned int, unsigned int> DICOMTag;
   typedef std::vector<std::string> StringList;
+  typedef std::vector<DICOMTag> DICOMTagList;
   typedef std::vector<bool> BoolList;
-
-  typedef std::vector<DICOMImageFrameInfo::Pointer> DICOMImageFrameList;
 
   typedef enum
   {
@@ -32,7 +34,6 @@ namespace mitk
     SpacingAtDetector, /// distances are mm at detector surface
     SpacingUnknown     /// NO spacing information is present, we use (1,1) as default
   } PixelSpacingInterpretation;
-
 }
 
 #endif

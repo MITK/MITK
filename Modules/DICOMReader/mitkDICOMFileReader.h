@@ -52,6 +52,8 @@ class DICOMReader_EXPORT DICOMFileReader : public itk::LightObject
 
     virtual bool CanHandleFile(const std::string& filename) = 0;
 
+    void PrintOutputs(std::ostream& os, bool filenameDetails = false);
+
   protected:
 
     DICOMFileReader();

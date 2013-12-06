@@ -97,17 +97,19 @@ static void TestOutputsContainInputs(DICOMFileReader* reader)
         }
         else
         {
-          MITK_TEST_CONDITION(false, "File '" << (*iter)->Filename << "' appears in TWO outputs. Readers are expected to use each frame only once." )
+          reader->PrintOutputs(std::cout);
+          MITK_TEST_CONDITION_REQUIRED(false, "File '" << (*iter)->Filename << "' appears in TWO outputs. Readers are expected to use each frame only once." )
         }
       }
       else
       {
-        MITK_TEST_CONDITION(false, "File '" << (*iter)->Filename << "' appears in output, but it was never part of the input list." )
+        reader->PrintOutputs(std::cout);
+        MITK_TEST_CONDITION_REQUIRED(false, "File '" << (*iter)->Filename << "' appears in output, but it was never part of the input list." )
       }
     }
   }
 
-  MITK_TEST_CONDITION( allSortedInputsFiles.size() == inputFiles.size(), "Output list size equals input list size" )
+  MITK_TEST_CONDITION( allSortedInputsFiles.size() == inputFiles.size(), "Output list size (" << allSortedInputsFiles.size() << ") equals input list size (" << inputFiles.size() << ")" )
 
   try
   {

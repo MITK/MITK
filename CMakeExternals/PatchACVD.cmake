@@ -38,6 +38,14 @@ string(REPLACE "ss" "ss VTK_EXPORT" contents ${contents})
 set(CONTENTS ${contents})
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
+# Change required CMake version
+
+set(path "CMakeLists.txt")
+file(STRINGS ${path} contents NEWLINE_CONSUME)
+string(REPLACE "2.8.7" "2.8.5" contents ${contents})
+set(CONTENTS ${contents})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
 # Replace int by vtkIdType, which are types of different size (x64)
 
 set(path "DiscreteRemeshing/vtkVerticesProcessing.h")

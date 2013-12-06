@@ -108,6 +108,7 @@ void QmitkDicomLocalStorageWidget::OnDeleteButtonClicked()
   {
     m_LocalDatabase->removePatient(uid);
   }
+  m_Controls->ctkDicomBrowser->updateTableViews();
 }
 
 void QmitkDicomLocalStorageWidget::OnViewButtonClicked()

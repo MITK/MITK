@@ -93,7 +93,7 @@ ImageStatisticsCalculator::ImageStatisticsCalculator()
   histogramSize.Fill( 256 );
   m_EmptyHistogram->Initialize( histogramSize );
 
- // m_EmptyStatistics.Reset();
+  m_EmptyStatistics.Reset();
 
 }
 
@@ -102,58 +102,130 @@ ImageStatisticsCalculator::~ImageStatisticsCalculator()
 }
 
 
-ImageStatisticsCalculator::Statistics::Statistics()
-: m_Label(0),
-  m_N(0),
-  m_Min(0.0),
-  m_Max(0.0),
-  m_Median(0.0),
-  m_Mean(0.0),
+ImageStatisticsCalculator::Statistics::Statistics(bool withHotspotStatistics)
+: Label(0),
+  N(0),
+  Min(0.0),
+  Max(0.0),
+  Median(0.0),
+  Mean(0.0),
   Sigma(0.0),
-  m_RMS(0.0),
-  m_MaxIndex(0),
-  m_MinIndex(0),
-  m_HotspotN(0),
-  m_HotspotMin(0.0),
-  m_HotspotMax(0.0),
-  m_HotspotMedian(0.0),
-  m_HotspotMean(0.0),
-  m_HotspotSigma(0.0),
-  m_HotspotRMS(0.0),
-  m_HotspotIndex(0),
-  m_HotspotMaxIndex(0),
-  m_HotspotMinIndex(0)
+  RMS(0.0),
+  MaxIndex(0),
+  MinIndex(0),
+  HotspotIndex(0),
+  m_HotspotStatistics(withHotspotStatistics ? new Statistics(false) : NULL)
 {
 }
+
+ImageStatisticsCalculator::Statistics::Statistics(const Statistics& other)
+: Label(other.Label),
+  N(other.N),
+  Min(other.Min),
+  Max(other.Max),
+  Median(other.Median),
+  Mean(other.Mean),
+  Sigma(other.Sigma),
+  RMS(other.RMS),
+  MaxIndex(other.MaxIndex),
+  MinIndex(other.MinIndex),
+  HotspotIndex(other.HotspotIndex),
+  m_HotspotStatistics(NULL)
+{
+  if (other.m_HotspotStatistics)
+  {
+    this->m_HotspotStatistics = new Statistics(false);
+    *this->m_HotspotStatistics = *other.m_HotspotStatistics;
+  }
+}
+
+bool ImageStatisticsCalculator::Statistics::HasHotspotStatistics() const
+{
+  return m_HotspotStatistics != NULL;
+}
+
 
 ImageStatisticsCalculator::Statistics::~Statistics()
 {
+  delete m_HotspotStatistics;
 }
 
-//ImageStatisticsCalculator::Statistics::Reset()
-//{
-//  m_Label = 0;
-//  m_N = 0;
-//  m_Min = 0.0;
-//  m_Max = 0.0;
-//  m_Median = 0.0;
-//  m_Mean = 0.0;
-//  Sigma = 0.0;
-//  m_RMS = 0.0;
-//  m_MaxIndex = 0;
-//  m_MinIndex = 0;
-//  m_Label = 0;
-//  m_HotspotN = 0;
-//  m_HotspotMin = 0.0;
-//  m_HotspotMax = 0.0;
-//  m_HotspotMedian = 0.0;
-//  m_HotspotMean = 0.0;
-//  m_HotspotSigma = 0.0;
-//  m_HotspotRMS = 0.0;
-//  m_HotspotIndex = 0;
-//  m_HotspotMaxIndex = 0;
-//  m_HotspotMinIndex = 0;
-//}
+void ImageStatisticsCalculator::Statistics::Reset()
+{
+  Label = 0;
+  N = 0;
+  Min = 0.0;
+  Max = 0.0;
+  Median = 0.0;
+  Mean = 0.0;
+  Sigma = 0.0;
+  RMS = 0.0;
+  MaxIndex = 0;
+  MinIndex = 0;
+  HotspotIndex = 0;
+  if (m_HotspotStatistics != NULL)
+  {
+    m_HotspotStatistics->Reset();
+  }
+ }
+
+const ImageStatisticsCalculator::Statistics&
+ImageStatisticsCalculator::Statistics::GetHotspotStatistics() const
+{
+  if (m_HotspotStatistics)
+  {
+    return *m_HotspotStatistics;
+  }
+  else
+  {
+    return Statistics();
+  }
+}
+
+ImageStatisticsCalculator::Statistics&
+ImageStatisticsCalculator::Statistics::GetHotspotStatistics()
+{
+  if (m_HotspotStatistics)
+  {
+    return *m_HotspotStatistics;
+  }
+  else
+  {
+    return Statistics();
+  }
+}
+
+ImageStatisticsCalculator::Statistics&
+ImageStatisticsCalculator::Statistics::operator=(ImageStatisticsCalculator::Statistics const& other)
+{
+  if (this == &other)
+    return *this;
+
+  this->Label = other.Label;
+  this->N = other.N;
+  this->Min = other.Min;
+  this->Max = other.Max;
+  this->Mean = other.Mean;
+  this->Median = other.Median;
+  this->Variance = other.Variance;
+  this->Sigma = other.Sigma;
+  this->RMS = other.RMS;
+  this->MinIndex = other.MinIndex;
+  this->MaxIndex = other.MaxIndex;
+  this->HotspotIndex = other.HotspotIndex;
+
+  delete this->m_HotspotStatistics;
+  this->m_HotspotStatistics = NULL;
+
+  if (other.m_HotspotStatistics)
+  {
+    this->m_HotspotStatistics = new Statistics(false);
+    *this->m_HotspotStatistics = *other.m_HotspotStatistics;
+  }
+
+  return *this;
+
+}
 
 void ImageStatisticsCalculator::SetImage( const mitk::Image *image )
 {
@@ -595,7 +667,6 @@ ImageStatisticsCalculator::GetStatistics( unsigned int timeStep, unsigned int la
   }
 }
 
-
 const ImageStatisticsCalculator::StatisticsContainer &
 ImageStatisticsCalculator::GetStatisticsVector( unsigned int timeStep ) const
 {
@@ -902,7 +973,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   minMaxFilter->RemoveObserver( observerTag2 );
   this->InvokeEvent( itk::EndEvent() );
 
-  Statistics statistics; //statistics.Reset();
+  Statistics statistics; statistics.Reset();
   statistics.SetLabel(1);
   statistics.SetN(image->GetBufferedRegion().GetNumberOfPixels());
   statistics.SetMin(statisticsFilter->GetMinimum());
@@ -932,18 +1003,16 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
     typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
     typename MaskImageType::Pointer nullMask;
     Statistics hotspotStatistics = this->CalculateHotspotStatistics(image, nullMask.GetPointer(), m_HotspotRadiusInMM);
-
-    statistics.SetHotspotN(hotspotStatistics.GetHotspotN());
-    statistics.SetHotspotMax (hotspotStatistics.GetHotspotMax());
-    statistics.SetHotspotMin(hotspotStatistics.GetHotspotMin());
-    statistics.SetHotspotMean(hotspotStatistics.GetHotspotMean());
-    statistics.SetHotspotMedian(0.0);
-    statistics.SetHotspotSigma (hotspotStatistics.GetHotspotSigma());
-    statistics.SetHotspotRMS (sqrt (statistics.GetHotspotMean() * statistics.GetHotspotMean()
-      + statistics.GetHotspotSigma() * statistics.GetHotspotSigma() ));
-    statistics.SetHotspotMaxIndex(hotspotStatistics.GetHotspotMaxIndex());
-    statistics.SetHotspotMinIndex(hotspotStatistics.GetHotspotMinIndex());
-    statistics.SetHotspotIndex(hotspotStatistics.GetHotspotIndex());
+    statistics.GetHotspotStatistics() = hotspotStatistics;
+    if(statistics.GetHotspotStatistics().HasHotspotStatistics() )
+    {
+      MITK_DEBUG << "Hotspot statistics available";
+      statistics.SetHotspotIndex(hotspotStatistics.GetHotspotIndex());
+    }
+    else
+    {
+      MITK_ERROR << "No hotspot statistics available!";
+    }
   }
 
   statisticsContainer->push_back( statistics );
@@ -1162,15 +1231,14 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     }
   }
 
-  MITK_INFO <<"Mask has pixels? " << maskNonEmpty;
   if ( maskNonEmpty )
   {
-    Statistics statistics; // restore previous code
     std::list< int >::iterator it;
     for ( it = relevantLabels.begin(), i = 0;
-          it != relevantLabels.end();
-          ++it, ++i )
+      it != relevantLabels.end();
+      ++it, ++i )
     {
+      Statistics statistics; // restore previous code
       histogramContainer->push_back( HistogramType::ConstPointer( labelStatisticsFilter->GetHistogram( (*it) ) ) );
 
       statistics.SetLabel (*it);
@@ -1200,74 +1268,64 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       this->InvokeEvent( itk::EndEvent() );
 
 
-        typename MinMaxFilterType::IndexType tempMaxIndex = minMaxFilter->GetIndexOfMaximum();
-        typename MinMaxFilterType::IndexType tempMinIndex = minMaxFilter->GetIndexOfMinimum();
+      typename MinMaxFilterType::IndexType tempMaxIndex = minMaxFilter->GetIndexOfMaximum();
+      typename MinMaxFilterType::IndexType tempMinIndex = minMaxFilter->GetIndexOfMinimum();
 
-// FIX BUG 14644
-        //If a PlanarFigure is used for segmentation the
-        //adaptedImage is a single slice (2D). Adding the
-        // 3. dimension.
+      // FIX BUG 14644
+      //If a PlanarFigure is used for segmentation the
+      //adaptedImage is a single slice (2D). Adding the
+      // 3. dimension.
 
-        vnl_vector<int> maxIndex;
-        vnl_vector<int> minIndex;
-        maxIndex.set_size(m_Image->GetDimension());
-        minIndex.set_size(m_Image->GetDimension());
+      vnl_vector<int> maxIndex;
+      vnl_vector<int> minIndex;
+      maxIndex.set_size(m_Image->GetDimension());
+      minIndex.set_size(m_Image->GetDimension());
 
-        if (m_MaskingMode == MASKING_MODE_PLANARFIGURE && m_Image->GetDimension()==3)
+      if (m_MaskingMode == MASKING_MODE_PLANARFIGURE && m_Image->GetDimension()==3)
+      {
+        maxIndex[m_PlanarFigureCoordinate0] = tempMaxIndex[0];
+        maxIndex[m_PlanarFigureCoordinate1] = tempMaxIndex[1];
+        maxIndex[m_PlanarFigureAxis] = m_PlanarFigureSlice;
+
+        minIndex[m_PlanarFigureCoordinate0] = tempMinIndex[0] ;
+        minIndex[m_PlanarFigureCoordinate1] = tempMinIndex[1];
+        minIndex[m_PlanarFigureAxis] = m_PlanarFigureSlice;
+      } else
+      {
+        for (unsigned int i = 0; i<maxIndex.size(); i++)
         {
-            maxIndex[m_PlanarFigureCoordinate0] = tempMaxIndex[0];
-            maxIndex[m_PlanarFigureCoordinate1] = tempMaxIndex[1];
-            maxIndex[m_PlanarFigureAxis] = m_PlanarFigureSlice;
-
-            minIndex[m_PlanarFigureCoordinate0] = tempMinIndex[0] ;
-            minIndex[m_PlanarFigureCoordinate1] = tempMinIndex[1];
-            minIndex[m_PlanarFigureAxis] = m_PlanarFigureSlice;
-        } else
-        {
-          for (unsigned int i = 0; i<maxIndex.size(); i++)
-          {
-            maxIndex[i] = tempMaxIndex[i];
-            minIndex[i] = tempMinIndex[i];
-          }
+          maxIndex[i] = tempMaxIndex[i];
+          minIndex[i] = tempMinIndex[i];
         }
-
-        statistics.SetMaxIndex(maxIndex);
-        statistics.SetMinIndex(minIndex);
-     }
-
-
-// FIX END
-
-    // TODO DM: what about different label values? ImageStatisticsCalculator usually calculates statistics sets for EACH label in the given mask
-    // TODO DM: it would be more consistent if we calculate hotspot statistics for EACH label, not only for the "unequal 0" label (after all other TODOs)
-    /*****************************************************Calculate Hotspot Statistics**********************************************/
-    if(IsHotspotCalculated())
-    {
-      // TODO DM: CalculateHotspotStatistics should
-      //  1. regard mask
-      //  2. calculate a hotspot (and its statistics) per mask label/value
-      //  3. use LabelStatisticsImageFilter where possible
-      Statistics hotspotStatistics = CalculateHotspotStatistics (adaptedImage.GetPointer(), adaptedMaskImage.GetPointer(), GetHotspotRadiusInMM()); // TODO: input label = *it
-      statistics.SetHotspotMax( hotspotStatistics.GetHotspotMax() );
-      statistics.SetHotspotMin( hotspotStatistics.GetHotspotMin() );
-      statistics.SetHotspotMean( hotspotStatistics.GetHotspotMean() );
-      statistics.SetHotspotMaxIndex( hotspotStatistics.GetHotspotMaxIndex() );
-      statistics.SetHotspotMinIndex( hotspotStatistics.GetHotspotMinIndex() );
-      statistics.SetHotspotIndex( hotspotStatistics.GetHotspotIndex() );
-      statistics.SetHotspotMedian( hotspotStatistics.GetHotspotMedian() );
-      statistics.SetHotspotN( hotspotStatistics.GetHotspotN() );
-      statistics.SetHotspotRMS( hotspotStatistics.GetHotspotRMS() );
+      }
+    // FIX END
+      statistics.SetMaxIndex(maxIndex);
+      statistics.SetMinIndex(minIndex);
+      /*****************************************************Calculate Hotspot Statistics**********************************************/
+      if(IsHotspotCalculated())
+      {
+        Statistics hotspotStatistics = CalculateHotspotStatistics(adaptedImage.GetPointer(), adaptedMaskImage.GetPointer(), GetHotspotRadiusInMM()); // TODO: input label = *it
+        statistics.GetHotspotStatistics() = hotspotStatistics;
+        if(statistics.GetHotspotStatistics().HasHotspotStatistics())
+        {
+          MITK_DEBUG << "Hotspot statistics available";
+          statistics.SetHotspotIndex( hotspotStatistics.GetHotspotIndex() );
+        }
+        else
+        {
+          MITK_ERROR << "No hotspot statistics available!";
+        }
+      }
+      statisticsContainer->push_back( statistics );
     }
-    statisticsContainer->push_back( statistics );
   }
   else
   {
     histogramContainer->push_back( HistogramType::ConstPointer( m_EmptyHistogram ) );
-    statisticsContainer->push_back( Statistics() ); // TODO DM: this is uninitialized! (refactor into real class!)
+    statisticsContainer->push_back( Statistics() );
   }
 }
 
-// TODO DM: needs to be modified to calculate a specific or multiple(!) labels
 template <typename TPixel, unsigned int VImageDimension  >
 ImageStatisticsCalculator::ImageExtrema ImageStatisticsCalculator::CalculateExtremaWorld(
   const itk::Image<TPixel, VImageDimension> *inputImage,
@@ -1513,7 +1571,7 @@ ImageStatisticsCalculator::InternalUpdateConvolutionImage( itk::Image<TPixel, VI
   convolutionFilter->SetInput(inputImage);
   convolutionFilter->SetKernelImage(convolutionKernel);
   convolutionFilter->SetNormalize(true);
-  //MITK_INFO << "Update Convolution image for hotspot search";
+  MITK_DEBUG << "Update Convolution image for hotspot search";
   convolutionFilter->UpdateLargestPossibleRegion(); // TODO check if we could benefit from restricting this for a region
 
   typename ConvolutionImageType::Pointer convolutionImage = convolutionFilter->GetOutput();
@@ -1534,7 +1592,7 @@ ImageStatisticsCalculator
   typedef itk::Image< TPixel, VImageDimension > MaskImageType;
   typedef itk::ImageRegionIteratorWithIndex<MaskImageType> MaskImageIteratorType;
 
-  MaskImageIteratorType maskIt(maskImage, maskImage->GetLargestPossibleRegion()); // TODO DM: we should use the same regions here
+  MaskImageIteratorType maskIt(maskImage, maskImage->GetLargestPossibleRegion());
 
   typename MaskImageType::IndexType maskIndex;
   typename MaskImageType::PointType worldPosition;
@@ -1544,7 +1602,7 @@ ImageStatisticsCalculator
     maskIndex = maskIt.GetIndex();
     maskImage->TransformIndexToPhysicalPoint(maskIndex, worldPosition);
 
-    maskIt.Set( worldPosition.EuclideanDistanceTo(sphereCenter) <= sphereRadiusInMM ? 1 : 0 );
+    maskIt.Set( worldPosition.EuclideanDistanceTo(sphereCenter) <= sphereRadiusInMM ? 3 : 0 );
   }
 }
 
@@ -1554,8 +1612,6 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
     itk::Image<unsigned short, VImageDimension>* maskImage,
     double radiusInMM)
 {
-  //MITK_INFO << "CalculateHotspotStatistics()";
-
   // get convolution image (updated in InternalUpdateConvolutionImage())
   typedef itk::Image< TPixel, VImageDimension > ConvolutionImageType;
   typedef itk::Image< float, VImageDimension > KernelImageType;
@@ -1569,15 +1625,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   // find maximum in convolution image, given the current mask (this might change over time, while we assume the input fixed (TODO wrong assumption))
   ImageExtrema pi = CalculateExtremaWorld(convolutionImage.GetPointer(), maskImage);
- /* MITK_INFO <<"Initial search for hotspot: "
-  "\n  Index: " << pi.MaxIndex[0] << "," << pi.MaxIndex[1] << "," << pi.MaxIndex[2] <<
-    "\n  Value(hotspot): " << pi.Max<<
-  "\n  Index(min): " << pi.MinIndex[0] << "," << pi.MinIndex[1] << "," << pi.MinIndex[2] <<
-    "\n  Value(min): " << pi.Min;*/
 
-  // create mask corresponding to hotspot region
-  // mask is defined on the inputImage grid and is
-  // dimensioned as the hotspot convolution kernel (the sphere)
   double spacing[VImageDimension];
   for (unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
   {
@@ -1589,7 +1637,7 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   typedef typename ConvolutionImageType::IndexType IndexType;
   IndexType maskIndex; maskIndex.Fill(0);
-  MITK_DEBUG << "Hotspot statistics mask started with size ["<<maskSize[0]<<"x"<<maskSize[1]<<"x"<<maskSize[2]<<"] at ["<<maskIndex[0]<<","<<maskIndex[1]<<","<<maskIndex[2]<<"]";
+
   for (unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
   {
     maskIndex[dimension] = pi.MaxIndex[dimension] - (maskSize[dimension]-1)/2; // maskSize is always odd (size of 5 --> shift -2 required
@@ -1621,55 +1669,30 @@ ImageStatisticsCalculator::Statistics ImageStatisticsCalculator::CalculateHotspo
 
   typename ConvolutionImageType::PointType maskOrigin;
   inputImage->TransformIndexToPhysicalPoint(maskIndex,maskOrigin);
-  //MITK_INFO << "Mask origin at: " << maskOrigin;
+  MITK_DEBUG << "Mask origin at: " << maskOrigin;
   hotspotMaskITK->SetOrigin(maskOrigin);
 
   IndexType maskCenterIndex;
   for (unsigned int d =0; d< VImageDimension;++d) maskCenterIndex[d]=pi.MaxIndex[d];
   typename ConvolutionImageType::PointType maskCenter;
   inputImage->TransformIndexToPhysicalPoint(maskCenterIndex,maskCenter);
-  //MITK_INFO << "Mask center in input image: " << maskCenter;
+  MITK_DEBUG << "Mask center in input image: " << maskCenter;
 
   this->FillHotspotMaskPixels(hotspotMaskITK.GetPointer(), maskCenter, radiusInMM);
 
   Image::Pointer hotspotMaskMITK = ImportItkImage( hotspotMaskITK );
 
-  MITK_DEBUG << "Mask center: " << hotspotMaskMITK->GetGeometry()->GetCenter();
-
-  // use second instance of ImageStatisticsCalculator to calculate hotspot statistics
-
   Image::Pointer hotspotInputMITK = ImportItkImage( inputImage );
-
+  // use second instance of ImageStatisticsCalculator to calculate hotspot statistics
   ImageStatisticsCalculator::Pointer calculator = ImageStatisticsCalculator::New();
   calculator->SetImage( hotspotInputMITK );
   calculator->SetMaskingModeToImage();
   calculator->SetImageMask( hotspotMaskMITK );
   calculator->SetCalculateHotspot( false );
   calculator->ComputeStatistics(0); // timestep 0, because inputImage already IS the image of timestep N (from perspective of ImageStatisticsCalculator caller)
-
-  Statistics hotspotMaskStatistics = calculator->GetStatistics(0);
-
-  Statistics hotspotStatistics;
-  hotspotStatistics.SetHotspotMin(hotspotMaskStatistics.GetMin());
-  hotspotStatistics.SetHotspotMinIndex(hotspotMaskStatistics.GetMinIndex());
-  hotspotStatistics.SetHotspotMax(hotspotMaskStatistics.GetMax());
-  hotspotStatistics.SetHotspotMaxIndex(hotspotMaskStatistics.GetMaxIndex());
-  hotspotStatistics.SetHotspotMean(hotspotMaskStatistics.GetMean());
-  hotspotStatistics.SetHotspotMedian(hotspotMaskStatistics.GetMedian());
+  Statistics hotspotStatistics = calculator->GetStatistics(0);
   hotspotStatistics.SetHotspotIndex(pi.MaxIndex);
-  hotspotStatistics.SetHotspotSigma(hotspotMaskStatistics.GetSigma());
-  hotspotStatistics.SetHotspotRMS(sqrt( hotspotMaskStatistics.GetMean() * hotspotMaskStatistics.GetMean()
-    + hotspotMaskStatistics.GetSigma() * hotspotMaskStatistics.GetSigma() ));
-  hotspotStatistics.SetHotspotN(hotspotMaskStatistics.GetN());
-
-  /*MITK_INFO << "----- Hotspot search results:"
-               "\n  Index: " << hotspotStatistics.HotspotIndex[0] << "," << hotspotStatistics.HotspotIndex[1] << "," << hotspotStatistics.HotspotIndex[2] <<
-               "\n  Value: " << hotspotStatistics.HotspotMean <<
-               "\n  Max Index: " << hotspotStatistics.HotspotMaxIndex[0] << "," << hotspotStatistics.HotspotMaxIndex[1] << "," << hotspotStatistics.HotspotMaxIndex[2] <<
-               "\n  Max Value: " << hotspotStatistics.HotspotMax <<
-               "\n  Min Index: " << hotspotStatistics.HotspotMinIndex[0] << "," << hotspotStatistics.HotspotMinIndex[1] << "," << hotspotStatistics.HotspotMinIndex[2] <<
-               "\n  Min Value: " << hotspotStatistics.HotspotMin;*/
-
+  hotspotStatistics.SetMean(pi.Max);
   return hotspotStatistics;
 }
 
@@ -1817,54 +1840,5 @@ void ImageStatisticsCalculator::MaskedStatisticsProgressUpdate()
 {
   this->InvokeEvent( itk::ProgressEvent() );
 }
-
-// Get-functions statistics
-unsigned int ImageStatisticsCalculator::Statistics::GetN() const { return m_N; }
-double ImageStatisticsCalculator::Statistics::GetMean() const { return m_Mean; }
-double ImageStatisticsCalculator::Statistics::GetMin() const { return m_Min; }
-double ImageStatisticsCalculator::Statistics::GetMax() const { return m_Max; }
-double ImageStatisticsCalculator::Statistics::GetMedian() const { return m_Median; }
-double ImageStatisticsCalculator::Statistics::GetVariance() const { return m_Variance; }
-double ImageStatisticsCalculator::Statistics::GetRMS() const { return m_RMS; }
-vnl_vector<int> ImageStatisticsCalculator::Statistics::GetMaxIndex() const { return m_MaxIndex; }
-vnl_vector<int> ImageStatisticsCalculator::Statistics::GetMinIndex() const { return m_MinIndex; }
-
-// Set-fucntions statistics
-void ImageStatisticsCalculator::Statistics::SetLabel(unsigned int label) { m_Label = label; }
-void ImageStatisticsCalculator::Statistics::SetN(unsigned int n) {  m_N = n; }
-void ImageStatisticsCalculator::Statistics::SetMean(double mean) {  m_Mean = mean; }
-void ImageStatisticsCalculator::Statistics::SetMin(double min) {  m_Min = min; }
-void ImageStatisticsCalculator::Statistics::SetMax(double max) {  m_Max = max; }
-void ImageStatisticsCalculator::Statistics::SetMedian(double median) {  m_Median = median; }
-void ImageStatisticsCalculator::Statistics::SetVariance(double variance) {  m_Variance = variance; }
-void ImageStatisticsCalculator::Statistics::SetRMS(double rms) {  m_RMS = rms; }
-void ImageStatisticsCalculator::Statistics::SetMaxIndex(vnl_vector<int> maxIndex) { m_MaxIndex = maxIndex; }
-void ImageStatisticsCalculator::Statistics::SetMinIndex(vnl_vector<int> minIndex) { m_MinIndex = minIndex; }
-
-// Get-fucntions hotspot-statistics
-unsigned int ImageStatisticsCalculator::Statistics::GetHotspotN() const { return m_HotspotN; }
-double ImageStatisticsCalculator::Statistics::GetHotspotMean() const { return m_HotspotMean; }
-double ImageStatisticsCalculator::Statistics::GetHotspotMin() const { return m_HotspotMin; }
-double ImageStatisticsCalculator::Statistics::GetHotspotMax() const { return m_HotspotMax; }
-double ImageStatisticsCalculator::Statistics::GetHotspotMedian() const { return m_HotspotMedian; }
-double ImageStatisticsCalculator::Statistics::GetHotspotVariance() const { return m_HotspotVariance; }
-double ImageStatisticsCalculator::Statistics::GetHotspotSigma() const { return m_HotspotSigma; }
-double ImageStatisticsCalculator::Statistics::GetHotspotRMS() const { return m_HotspotRMS; }
-vnl_vector<int> ImageStatisticsCalculator::Statistics::GetHotspotMaxIndex() const { return m_HotspotMaxIndex; }
-vnl_vector<int> ImageStatisticsCalculator::Statistics::GetHotspotMinIndex() const { return m_HotspotMinIndex; }
-vnl_vector<int> ImageStatisticsCalculator::Statistics::GetHotspotIndex() const {return m_HotspotIndex;}
-
-// Set-functions hotspot-statistics
-void ImageStatisticsCalculator::Statistics::SetHotspotN(unsigned int n) {  m_HotspotN = n; }
-void ImageStatisticsCalculator::Statistics::SetHotspotMean(double mean) {  m_HotspotMean = mean; }
-void ImageStatisticsCalculator::Statistics::SetHotspotMin(double min) {  m_HotspotMin = min; }
-void ImageStatisticsCalculator::Statistics::SetHotspotMax(double max) {  m_HotspotMax = max; }
-void ImageStatisticsCalculator::Statistics::SetHotspotMedian(double median) {  m_HotspotMedian = median; }
-void ImageStatisticsCalculator::Statistics::SetHotspotVariance(double variance) {  m_HotspotVariance = variance; }
-void ImageStatisticsCalculator::Statistics::SetHotspotSigma(double sigma) {  m_HotspotSigma = sigma; }
-void ImageStatisticsCalculator::Statistics::SetHotspotRMS(double rms) {  m_HotspotRMS = rms; }
-void ImageStatisticsCalculator::Statistics::SetHotspotMaxIndex(vnl_vector<int> maxIndex) { m_HotspotMaxIndex = maxIndex; }
-void ImageStatisticsCalculator::Statistics::SetHotspotMinIndex(vnl_vector<int> minIndex) { m_HotspotMinIndex = minIndex; }
-void ImageStatisticsCalculator::Statistics::SetHotspotIndex(vnl_vector<int> index) { m_HotspotIndex = index; }
 
 }

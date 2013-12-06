@@ -176,99 +176,64 @@ public:
   {
   public:
 
-    Statistics();
+    Statistics(bool withHotspotStatistics = true);
+    Statistics(const Statistics& other);
+
     virtual ~Statistics();
 
-    //void Reset()
+    Statistics& operator=(Statistics const& stats);
+
+    const Statistics& GetHotspotStatistics() const;  // real statistics
+    Statistics& GetHotspotStatistics();  // real statistics
+    bool HasHotspotStatistics() const;
+
+    void Reset();
+
+    mitkSetGetConstMacro(Label, unsigned int)
+    mitkSetGetConstMacro(N, unsigned int)
+    mitkSetGetConstMacro(Min, double)
+    mitkSetGetConstMacro(Max, double)
+    mitkSetGetConstMacro(Mean, double)
+    mitkSetGetConstMacro(Median, double)
+    mitkSetGetConstMacro(Variance, double)
     mitkSetGetConstMacro(Sigma, double)
-
-    unsigned int GetN() const;
-    double GetMin() const;
-    double GetMax() const;
-    double GetMean() const;
-    double GetMedian() const;
-    double GetVariance() const;
-    double GetRMS() const;
-    vnl_vector<int> GetMaxIndex() const;
-    vnl_vector<int> GetMinIndex() const;
-
-    void SetLabel(unsigned int label);
-    void SetN(unsigned int n);
-    void SetMin(double min);
-    void SetMax(double max);
-    void SetMean(double mean);
-    void SetMedian(double median);
-    void SetVariance(double variance);
-    void SetRMS(double rms);
-    void SetMaxIndex(vnl_vector<int> maxIndex);
-    void SetMinIndex(vnl_vector<int> minIndex);
-
-    unsigned int GetHotspotN() const;
-    double GetHotspotMin() const;
-    double GetHotspotMax() const;
-    double GetHotspotMean() const;
-    double GetHotspotMedian() const;
-    double GetHotspotVariance() const;
-    double GetHotspotSigma() const;
-    double GetHotspotRMS() const;
-    vnl_vector<int> GetHotspotMaxIndex() const;
-    vnl_vector<int> GetHotspotMinIndex() const;
-
-    vnl_vector<int> GetHotspotIndex() const;  // position
-    // c'tor: m_HotspotStatistics = NULL
-    // hotspot calculation:
-    //   delete m_HotspotStatistics
-    //   m_HotspotStatistics = new Statistics()
-    // destructor: delete m_HotspotStatistics (delete 0 IST ok)
-    const Statistics& GetHotspotStatistics() const { /* return *m_HotspotStatistics */};  // real statistics
-
-    void SetHotspotLabel(unsigned int label);
-    void SetHotspotN(unsigned int n);
-    void SetHotspotMin(double min);
-    void SetHotspotMax(double max);
-    void SetHotspotMean(double mean);
-    void SetHotspotMedian(double median);
-    void SetHotspotVariance(double variance);
-    void SetHotspotSigma(double sigma);
-    void SetHotspotRMS(double rms);
-    void SetHotspotMaxIndex(vnl_vector<int> hotspotMaxIndex);
-    void SetHotspotMinIndex(vnl_vector<int> hotspotMinIndex);
-    void SetHotspotIndex(vnl_vector<int> hotspotIndex);
+    mitkSetGetConstMacro(RMS, double)
+    mitkSetGetConstMacro(MinIndex, vnl_vector<int>)
+    mitkSetGetConstMacro(MaxIndex, vnl_vector<int>)
+    mitkSetGetConstMacro(HotspotIndex, vnl_vector<int>)
 
   public:
 
     // this section is all deprecated. Get/Set methods should be used
 
-    /// standard deviation of values (== square root of variance)
-    /// \deprecated Public member Sigma is deprecated. Use GetSigma/SetSigma instead
+    // \deprecated Public member Label is deprecated. Use get-/set-functions instead
+    DEPRECATED(unsigned int Label);
+    // \deprecated Public member N is deprecated. Use get-/set-functions instead
+    DEPRECATED(unsigned int N);
+    // \deprecated Public member Min is deprecated. Use get-/set-functions instead
+    DEPRECATED(double Min);
+    // \deprecated Public member Max is deprecated. Use get-/set-functions instead
+    DEPRECATED(double Max);
+    // \deprecated Public member Mean is deprecated. Use get-/set-functions instead
+    DEPRECATED(double Mean);
+    // \deprecated Public member Median is deprecated. Use get-/set-functions instead
+    DEPRECATED(double Median);
+    // \deprecated Public member Variance is deprecated. Use get-/set-functions instead
+    DEPRECATED(double Variance);
+    // \deprecated Public member Sigma is deprecated. Use get-/set-functions instead
     DEPRECATED(double Sigma);
+    // \deprecated Public member RMS is deprecated. Use get-/set-functions instead
+    DEPRECATED(double RMS);
+    // \deprecated Public member MinIndex is deprecated. Use get-/set-functions instead
+    DEPRECATED(vnl_vector<int> MinIndex);
+    // \deprecated Public member MaxIndex is deprecated. Use get-/set-functions instead
+    DEPRECATED(vnl_vector<int> MaxIndex);
 
   private:
 
-    int m_Label;
-    unsigned int m_N;                   //< number of voxels
-    double m_Min;                       //< mimimum value
-    double m_Max;                       //< maximum value
-    double m_Mean;                      //< mean value
-    double m_Median;                    //< median value
-    double m_Variance;
-    double m_RMS;                       //< root mean square
+   Statistics* m_HotspotStatistics;
 
-    vnl_vector< int > m_MinIndex;       //< index of minimum value
-    vnl_vector< int > m_MaxIndex;       //< index of maximum value
-
-    unsigned int m_HotspotN;            //< number of voxels inside hotspot
-    double m_HotspotMin;                //< mimimum value inside hotspot
-    double m_HotspotMax;                //< maximum value inside hotspot
-    double m_HotspotMean;               //< mean value of hotspot
-    double m_HotspotMedian;             //< median value of hotspot
-    double m_HotspotVariance;
-    double m_HotspotSigma;              //< standard deviation of values inside hotspot
-    double m_HotspotRMS;                //< root mean square of hotspot
-
-    vnl_vector<int> m_HotspotMinIndex;  //< index of minimum value inside hotspot
-    vnl_vector<int> m_HotspotMaxIndex;  //< index of maximum value inside hotspot
-    vnl_vector<int> m_HotspotIndex;     //< index of hotspot origin
+    vnl_vector<int> HotspotIndex;     //< index of hotspot origin
   };
 
   typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
@@ -348,7 +313,6 @@ public:
    * \param label The label for which to retrieve the statistics in multi-label situations (ascending order).
    */
   const Statistics &GetStatistics( unsigned int timeStep = 0, unsigned int label = 0 ) const;
-
 
   /** \brief Retrieve statistics depending on the current masking mode (for all image labels). */
   const StatisticsContainer &GetStatisticsVector( unsigned int timeStep = 0 ) const;

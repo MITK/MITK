@@ -126,16 +126,83 @@
        </widget>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QLabel" name="targetDensityLabel">
+            <property name="text">
+             <string>Target Density</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="densityThresholdDoubleSpinBox">
+            <property name="maximum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.010000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QLabel" name="targetThresholdLabel">
+            <property name="text">
+             <string>Target Threshold</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="targetThresholdSpinBox"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
-         <widget class="QLabel" name="edgeWeightLabel">
+         <widget class="QCheckBox" name="thresholdBasedThresholdingCheckBox">
+          <property name="toolTip">
+           <string extracomment="Remove all edges below at and below weight"/>
+          </property>
           <property name="text">
-           <string>Prune edge weight below</string>
+           <string>Threshold weight</string>
           </property>
          </widget>
         </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QSpinBox" name="pruneEdgeWeightSpinBox"/>
+         <widget class="QCheckBox" name="largestDensityLowerThanCheckBox">
+          <property name="toolTip">
+           <string extracomment="Remove all edges of the weakest weight until below target density"/>
+          </property>
+          <property name="text">
+           <string>Threshold Below Density</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QCheckBox" name="RandomRemovalThresholdingCheckBox">
+          <property name="toolTip">
+           <string extracomment="Randomly remove one of the lowest weight edges until the target density is reached"/>
+          </property>
+          <property name="text">
+           <string>Random Removal Threshold</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

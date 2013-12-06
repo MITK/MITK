@@ -441,7 +441,7 @@ void QmitkConnectomicsNetworkOperationsView::OnPrunePushButtonClicked()
 
       if( node.IsNotNull() && network )
       {
-        mitk::ConnectomicsNetworkThresholder::Pointer thresholder;
+        mitk::ConnectomicsNetworkThresholder::Pointer thresholder = mitk::ConnectomicsNetworkThresholder::New();
         thresholder->SetNetwork( network );
         thresholder->SetTargetThreshold( this->m_Controls->targetThresholdSpinBox->value() );
         thresholder->SetTargetDensity( this->m_Controls->densityThresholdDoubleSpinBox->value() );

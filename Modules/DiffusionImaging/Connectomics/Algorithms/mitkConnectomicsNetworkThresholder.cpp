@@ -117,7 +117,7 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::Thresho
 {
   mitk::ConnectomicsNetwork::Pointer result( input );
 
-  mitk::ConnectomicsStatisticsCalculator::Pointer calculator;
+  mitk::ConnectomicsStatisticsCalculator::Pointer calculator = mitk::ConnectomicsStatisticsCalculator::New();
 
   calculator->SetNetwork( result );
   calculator->Update();
@@ -180,7 +180,7 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::Thresho
 {
   mitk::ConnectomicsNetwork::Pointer result( input );
 
-  mitk::ConnectomicsStatisticsCalculator::Pointer calculator;
+  mitk::ConnectomicsStatisticsCalculator::Pointer calculator = mitk::ConnectomicsStatisticsCalculator::New();
 
   calculator->SetNetwork( result );
   calculator->Update();
@@ -216,14 +216,26 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::Thresho
     // sets iterator to start and end to end
     boost::tie(iterator, end) = boost::edges( *boostGraph );
 
-    for ( ; iterator != end && !edgeHasBeenRemoved; ++iterator)
+    bool endReached( false );
+    while( !edgeHasBeenRemoved && !endReached )
     {
-      // If the edge is below the target threshold it is deleted
-      if( (*boostGraph)[ *iterator ].weight < targetThreshold )
+      if( iterator != end )
       {
-        edgeHasBeenRemoved = true;
-        // this invalidates all iterators
-        boost::remove_edge( *iterator, *boostGraph );
+        // If the edge is below the target threshold it is deleted
+        if( (*boostGraph)[ *iterator ].weight < targetThreshold )
+        {
+          edgeHasBeenRemoved = true;
+          // this invalidates all iterators
+          boost::remove_edge( *iterator, *boostGraph );
+        }
+        else
+        {
+          ++iterator;
+        }
+      }
+      else
+      {
+        endReached = true;
       }
     }
   }

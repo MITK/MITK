@@ -53,6 +53,7 @@ public:
   void SetModelPoints(ModelPointsList foregroundPoints);
   void SetModelPoints(ModelPointsList foregroundPoints, ModelPointsList backgroundPoints);
 
+  unsigned int GetResultCount();
   const cv::Mat& GetResultMask();
 
 protected:
@@ -65,6 +66,7 @@ protected:
 
   bool                         m_PointSetsChanged;
   bool                         m_InputImageChanged;
+  bool                         m_NewResultReady;
 
   ModelPointsList              m_ForegroundPoints;
   ModelPointsList              m_BackgroundPoints;

@@ -39,9 +39,9 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath)
   cv::Mat foregroundMask; cv::Mat foregroundPoints;
   cv::compare(maskImageGray, 200, foregroundMask, cv::CMP_GE);
   cv::findNonZero(foregroundMask, foregroundPoints);
-  //cv::Rect foregroundRect = cv::boundingRect(foregroundPoints);
+  cv::Rect foregroundRect = cv::boundingRect(foregroundPoints);
 
-  cv::Rect foregroundRect(0,0,image.cols,image.rows);
+  //cv::Rect foregroundRect(0,0,image.cols,image.rows);
 
   // extract foreground points from loaded mask image
   cv::compare(maskImageGray, 250, foregroundMask, cv::CMP_GE);
@@ -71,6 +71,7 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath)
   gettimeofday(&t1, NULL); // start timer
 
   MITK_TEST_CONDITION(grabCutFilter->FilterImage(croppedImage), "Filtering should return true for sucess.")
+  while (grabCutFilter->GetResultMask().empty());
 
   gettimeofday(&t2, NULL); // stop timer
 

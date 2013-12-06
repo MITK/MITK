@@ -34,12 +34,17 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath)
   cv::Mat maskImageGray;
   cv::cvtColor(maskImage, maskImageGray, CV_RGB2GRAY, 1);
 
+  cv::Mat foregroundMask; cv::Mat foregroundPoints;
+  cv::compare(maskImageGray, 200, foregroundMask, cv::CMP_GE);
+  cv::findNonZero(foregroundMask, foregroundPoints);
+  cv::Rect foregroundRect = cv::boundingRect(foregroundPoints);
+
+  //cv::Rect foregroundRect(0,0,image.cols,image.rows);
+
   // extract foreground points from loaded mask image
-  cv::Mat foregroundMask;
   cv::compare(maskImageGray, 250, foregroundMask, cv::CMP_GE);
 
-  cv::Mat foregroundPoints;
-  cv::findNonZero(foregroundMask, foregroundPoints);
+  cv::findNonZero(foregroundMask(foregroundRect), foregroundPoints);
 
   std::vector<itk::Index<2> > foregroundPointsVector;
   for ( size_t n = 0; n < foregroundPoints.total(); ++n)
@@ -52,14 +57,16 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath)
   mitk::GrabCutOpenCVImageFilter::Pointer grabCutFilter
       = mitk::GrabCutOpenCVImageFilter::New();
 
-  MITK_TEST_CONDITION(!grabCutFilter->FilterImage(image), "Filtering should return false as no foreground points are set.")
+  cv::Mat croppedImage = image(foregroundRect);
+  //imwrite("/home/wintersa/output-cropped.png", croppedImage);
+  MITK_TEST_CONDITION(!grabCutFilter->FilterImage(croppedImage), "Filtering should return false as no foreground points are set.")
 
   grabCutFilter->AddForegroundPoints(foregroundPointsVector);
 
   timeval t1, t2;
   gettimeofday(&t1, NULL); // start timer
 
-  MITK_TEST_CONDITION(grabCutFilter->FilterImage(image), "Filtering should return true for sucess.")
+  MITK_TEST_CONDITION(grabCutFilter->FilterImage(croppedImage), "Filtering should return true for sucess.")
 
   gettimeofday(&t2, NULL); // stop timer
 

@@ -71,10 +71,11 @@ namespace mitk
     {
       Kinect2Device::Pointer device = Kinect2Device::New();
 
-      device->SetBoolProperty("HasRGBImage", false);
+      device->SetBoolProperty("HasRGBImage", true);
       device->SetBoolProperty("HasAmplitudeImage", false);
       device->SetBoolProperty("HasIntensityImage", false);
       device->SetBoolProperty("KinectReconstructionMode", true);
+      device->SetBoolProperty("RGBImageHasDifferentResolution", true);
 
       return device.GetPointer();
     }

@@ -437,6 +437,50 @@ mitk::ConnectomicsNetwork::NetworkType* mitk::ConnectomicsNetwork::GetBoostGraph
   return &m_Network;
 }
 
+void mitk::ConnectomicsNetwork::SetBoostGraph( NetworkType* newGraph )
+{
+  this->clear();
+
+  m_Network = *newGraph;
+  this->SetIsModified( true );
+}
+
+void mitk::ConnectomicsNetwork::ImportNetwort( mitk::ConnectomicsNetwork::Pointer source )
+{
+  typedef std::vector< std::pair< std::pair< NetworkNode, NetworkNode >, NetworkEdge > > EdgeVectorType;
+  typedef std::vector< NetworkNode >  VertexVectorType;
+
+  this->clear();
+
+  this->SetGeometry( source->GetGeometry());
+  VertexVectorType vertexVector = source->GetVectorOfAllNodes();
+  EdgeVectorType edgeVector = source->GetVectorOfAllEdges();
+  std::map< int, VertexDescriptorType > idToVertexMap;
+
+  for( int loop(0); loop < vertexVector.size(); loop++ )
+  {
+    VertexDescriptorType newVertex = this->AddVertex( vertexVector[ loop ].id );
+    this->SetLabel( newVertex, vertexVector[ loop ].label );
+    this->SetCoordinates( newVertex, vertexVector[ loop ].coordinates );
+
+    if ( idToVertexMap.count( vertexVector[ loop ].id ) > 0 )
+    {
+      MITK_ERROR << "Aborting network import, duplicate vertex ID discovered.";
+      return;
+    }
+    idToVertexMap.insert( std::pair< int, VertexDescriptorType >( vertexVector[ loop ].id, newVertex) );
+  }
+
+  for( int loop(0); loop < edgeVector.size(); loop++ )
+  {
+    VertexDescriptorType source = idToVertexMap.find( edgeVector[ loop ].second.sourceId )->second;
+    VertexDescriptorType target = idToVertexMap.find( edgeVector[ loop ].second.targetId )->second;
+
+    this->AddEdge( source, target, edgeVector[ loop ].second.sourceId, edgeVector[ loop ].second.targetId, edgeVector[ loop ].second.weight);
+  }
+
+  this->SetIsModified( true );
+}
 
 bool mitk::ConnectomicsNetwork::GetIsModified() const
 {

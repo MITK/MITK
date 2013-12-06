@@ -179,6 +179,11 @@ namespace mitk {
     /** Access boost graph directly */
     NetworkType* GetBoostGraph();
 
+    /** Set the boost graph directly */
+    void SetBoostGraph( NetworkType* newGraph );
+
+    void ImportNetwort( mitk::ConnectomicsNetwork::Pointer source );
+
     /** Get the modified flag */
     bool GetIsModified() const;
 

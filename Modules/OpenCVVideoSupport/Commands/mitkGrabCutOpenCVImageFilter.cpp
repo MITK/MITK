@@ -27,7 +27,7 @@ mitk::GrabCutOpenCVImageFilter::GrabCutOpenCVImageFilter()
     m_NewResultReady(false),
     m_ProcessEveryNumImage(1), m_CurrentProcessImageNum(0),
     m_ResultCount(0),
-    m_ThreadId(-1),
+    m_ThreadId(-1), m_StopThread(false),
     m_MultiThreader(itk::MultiThreader::New()),
     m_WorkerBarrier(itk::ConditionVariable::New()),
     m_ImageMutex(itk::FastMutexLock::New()),
@@ -39,6 +39,8 @@ mitk::GrabCutOpenCVImageFilter::GrabCutOpenCVImageFilter()
 
 mitk::GrabCutOpenCVImageFilter::~GrabCutOpenCVImageFilter()
 {
+  m_StopThread = true;
+  m_WorkerBarrier->Broadcast();
   if ( m_ThreadId >= 0) { m_MultiThreader->TerminateThread(m_ThreadId); }
 }
 
@@ -90,9 +92,15 @@ unsigned int mitk::GrabCutOpenCVImageFilter::GetResultCount()
   return m_ResultCount;
 }
 
-const cv::Mat& mitk::GrabCutOpenCVImageFilter::GetResultMask()
+cv::Mat mitk::GrabCutOpenCVImageFilter::GetResultMask()
 {
-  return m_ResultMask;
+  cv::Mat result;
+
+  m_ResultMutex->Lock();
+  result = m_ResultMask.clone();
+  m_ResultMutex->Unlock();
+
+  return result;
 }
 
 cv::Mat mitk::GrabCutOpenCVImageFilter::GetMaskFromPointSets()
@@ -129,30 +137,36 @@ cv::Mat mitk::GrabCutOpenCVImageFilter::GetMaskFromPointSets()
 
 cv::Mat mitk::GrabCutOpenCVImageFilter::RunSegmentation(cv::Mat input, cv::Mat mask)
 {
+  // do the actual grab cut segmentation (initialized with the mask)
   cv::Mat bgdModel, fgdModel;
   cv::grabCut(input, mask, cv::Rect(), bgdModel, fgdModel, 1, cv::GC_INIT_WITH_MASK);
 
+  // set propably foreground pixels to white on result mask
   cv::Mat result;
   cv::compare(mask, cv::GC_PR_FGD, result, cv::CMP_EQ);
 
+  // set foreground pixels to white on result mask
   cv::Mat foregroundMat;
   cv::compare(mask, cv::GC_FGD, foregroundMat, cv::CMP_EQ);
-
   foregroundMat.copyTo(result, foregroundMat);
-  return result;
+
+  return result; // now the result mask can be returned
 }
 
 ITK_THREAD_RETURN_TYPE mitk::GrabCutOpenCVImageFilter::SegmentationWorker(void* pInfoStruct)
 {
-  /* extract this pointer from Thread Info structure */
+  // extract this pointer from thread info structure
   struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
   mitk::GrabCutOpenCVImageFilter* thisObject = static_cast<mitk::GrabCutOpenCVImageFilter*>(pInfo->UserData);
 
+  itk::SimpleMutexLock mutex;
+  mutex.Lock();
+
   while (true)
   {
-    itk::SimpleMutexLock* mutex = &(thisObject->m_WorkerMutex);
-    mutex->Lock();
-    thisObject->m_WorkerBarrier->Wait(mutex);
+    thisObject->m_WorkerBarrier->Wait(&mutex);
+
+    if (thisObject->m_StopThread) { break; }
 
     thisObject->m_ImageMutex->Lock();
     cv::Mat image = thisObject->m_InputImage.clone();
@@ -167,6 +181,8 @@ ITK_THREAD_RETURN_TYPE mitk::GrabCutOpenCVImageFilter::SegmentationWorker(void* 
     thisObject->m_ResultCount++;
     thisObject->m_ResultMutex->Unlock();
   }
+
+  mutex.Unlock();
 
   return ITK_THREAD_RETURN_VALUE;
 }

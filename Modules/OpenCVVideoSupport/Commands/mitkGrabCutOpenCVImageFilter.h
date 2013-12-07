@@ -54,13 +54,9 @@ public:
   void SetModelPoints(ModelPointsList foregroundPoints, ModelPointsList backgroundPoints);
 
   unsigned int GetResultCount();
-  const cv::Mat& GetResultMask();
+  cv::Mat GetResultMask();
 
 protected:
-  bool UpdateResultMask();
-  void UpdateMaskFromPointSets();
-  void UpdateMaskWithPointSet(std::vector<itk::Index<2> > pointSet, int pixelValue);
-
   cv::Mat GetMaskFromPointSets();
   cv::Mat RunSegmentation(cv::Mat input, cv::Mat mask);
 
@@ -84,10 +80,10 @@ private:
   static ITK_THREAD_RETURN_TYPE SegmentationWorker(void* pInfoStruct);
 
   int                                       m_ThreadId;
+  bool                                      m_StopThread;
 
   itk::SmartPointer<itk::MultiThreader>     m_MultiThreader;
   itk::SmartPointer<itk::ConditionVariable> m_WorkerBarrier;
-  itk::SimpleMutexLock                      m_WorkerMutex;
   itk::SmartPointer<itk::FastMutexLock>     m_ImageMutex;
   itk::SmartPointer<itk::FastMutexLock>     m_ResultMutex;
   itk::SmartPointer<itk::FastMutexLock>     m_PointSetsMutex;

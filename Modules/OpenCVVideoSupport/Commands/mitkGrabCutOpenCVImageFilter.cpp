@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::GrabCutOpenCVImageFilter::GrabCutOpenCVImageFilter()
   : m_PointSetsChanged(false), m_InputImageChanged(false),
     m_NewResultReady(false),
+    m_ModelPointsDilationSize(0),
+    m_UseOnlyRegionAroundModelPoints(false),
     m_ProcessEveryNumImage(1), m_CurrentProcessImageNum(0),
     m_ResultCount(0),
     m_ThreadId(-1), m_StopThread(false),
@@ -66,7 +68,7 @@ bool mitk::GrabCutOpenCVImageFilter::FilterImage( cv::Mat& image )
   return true;
 }
 
-void mitk::GrabCutOpenCVImageFilter::SetModelPoints(std::vector<itk::Index<2> > foregroundPoints)
+void mitk::GrabCutOpenCVImageFilter::SetModelPoints(ModelPointsList foregroundPoints)
 {
   m_PointSetsMutex->Lock();
 
@@ -76,7 +78,7 @@ void mitk::GrabCutOpenCVImageFilter::SetModelPoints(std::vector<itk::Index<2> > 
   m_PointSetsMutex->Unlock();
 }
 
-void mitk::GrabCutOpenCVImageFilter::SetModelPoints(std::vector<itk::Index<2> > foregroundPoints, std::vector<itk::Index<2> > backgroundPoints)
+void mitk::GrabCutOpenCVImageFilter::SetModelPoints(ModelPointsList foregroundPoints, ModelPointsList backgroundPoints)
 {
   m_PointSetsMutex->Lock();
 
@@ -85,6 +87,17 @@ void mitk::GrabCutOpenCVImageFilter::SetModelPoints(std::vector<itk::Index<2> > 
   m_PointSetsChanged = true;
 
   m_PointSetsMutex->Unlock();
+}
+
+void mitk::GrabCutOpenCVImageFilter::SetUseOnlyRegionAroundModelPoints(unsigned int additionalWidth)
+{
+  m_UseOnlyRegionAroundModelPoints = true;
+  m_AdditionalWidth = additionalWidth;
+}
+
+void mitk::GrabCutOpenCVImageFilter::SetUseFullImage()
+{
+  m_UseOnlyRegionAroundModelPoints = false;
 }
 
 unsigned int mitk::GrabCutOpenCVImageFilter::GetResultCount()
@@ -118,9 +131,9 @@ cv::Mat mitk::GrabCutOpenCVImageFilter::GetMaskFromPointSets()
     for (ModelPointsList::iterator it = pointsLists[n].begin();
          it != pointsLists[n].end(); ++it)
     {
-      for ( int i = -2; i <= 2; ++i )
+      for ( int i = -m_ModelPointsDilationSize; i <= m_ModelPointsDilationSize; ++i )
       {
-        for ( int j = -2; j <= 2; ++j)
+        for ( int j = -m_ModelPointsDilationSize; j <= m_ModelPointsDilationSize; ++j)
         {
           int x = it->GetElement(1) + i; int y = it->GetElement(0) + j;
           if ( x >= 0 && y >= 0 && x < mask.cols && y < mask.rows)
@@ -133,6 +146,37 @@ cv::Mat mitk::GrabCutOpenCVImageFilter::GetMaskFromPointSets()
   }
 
   return mask;
+}
+
+cv::Rect mitk::GrabCutOpenCVImageFilter::GetBoundingRectFromMask(cv::Mat mask)
+{
+  cv::Mat nonPropablyBackgroundMask, modelPoints;
+  cv::compare(mask, cv::GC_PR_BGD, nonPropablyBackgroundMask, cv::CMP_NE);
+  cv::findNonZero(nonPropablyBackgroundMask, modelPoints);
+  cv::Rect boundingRect = cv::boundingRect(modelPoints);
+
+  boundingRect.x = boundingRect.x > m_AdditionalWidth ? boundingRect.x - m_AdditionalWidth : 0;
+  boundingRect.y = boundingRect.y > m_AdditionalWidth ? boundingRect.y - m_AdditionalWidth : 0;
+
+  if ( boundingRect.x + boundingRect.width + m_AdditionalWidth < mask.size().width )
+  {
+    boundingRect.width += m_AdditionalWidth;
+  }
+  else
+  {
+    boundingRect.width = mask.size().width - boundingRect.x - 1;
+  }
+
+  if ( boundingRect.y + boundingRect.height + m_AdditionalWidth < mask.size().height )
+  {
+    boundingRect.height += m_AdditionalWidth;
+  }
+  else
+  {
+    boundingRect.height = mask.size().height - boundingRect.y - 1;
+  }
+
+  return boundingRect;
 }
 
 cv::Mat mitk::GrabCutOpenCVImageFilter::RunSegmentation(cv::Mat input, cv::Mat mask)
@@ -164,6 +208,8 @@ ITK_THREAD_RETURN_TYPE mitk::GrabCutOpenCVImageFilter::SegmentationWorker(void* 
 
   while (true)
   {
+    if (thisObject->m_StopThread) { break; }
+
     thisObject->m_WorkerBarrier->Wait(&mutex);
 
     if (thisObject->m_StopThread) { break; }
@@ -174,7 +220,18 @@ ITK_THREAD_RETURN_TYPE mitk::GrabCutOpenCVImageFilter::SegmentationWorker(void* 
 
     cv::Mat mask = thisObject->GetMaskFromPointSets();
 
-    cv::Mat result = thisObject->RunSegmentation(image, mask);
+    cv::Mat result;
+    if (thisObject->m_UseOnlyRegionAroundModelPoints)
+    {
+      result = cv::Mat(mask.rows, mask.cols, mask.type(), 0.0);
+      cv::Rect boundingBox = thisObject->GetBoundingRectFromMask(mask);
+      thisObject->RunSegmentation(image(boundingBox), mask(boundingBox)).copyTo(result(boundingBox));
+    }
+    else
+    {
+      result = thisObject->RunSegmentation(image, mask);
+    }
+
     thisObject->m_ResultMutex->Lock();
     thisObject->m_ResultMask = result;
     thisObject->m_NewResultReady = true;

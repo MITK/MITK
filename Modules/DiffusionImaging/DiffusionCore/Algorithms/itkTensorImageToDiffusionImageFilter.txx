@@ -144,8 +144,7 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
     out.SetSize(m_GradientList->Size());
     out.Fill(0);
 
-    unsigned int b0index = 0;
-
+    std::vector<unsigned int> b0_indices;
     if( b0 > 0)
     {
       for( unsigned int i=0; i<m_GradientList->Size(); i++)
@@ -156,7 +155,7 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
         const double twonorm = g.two_norm();
         if( twonorm < vnl_math::eps )
         {
-          b0index = i;
+          b0_indices.push_back(i);
           continue;
         }
 
@@ -187,7 +186,12 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
       }
     }
 
-    out[b0index] = b0;
+    unsigned int idx;
+    foreach( idx, b0_indices )
+    {
+      out[b0_indices.at(idx)] = b0;
+    }
+
 
     itOut.Set(out);
 

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkDICOMTagBasedSorter_h
 
 #include "mitkDICOMDatasetSorter.h"
+#include "mitkDICOMSortCriterion.h"
 
 namespace mitk
 {
@@ -33,13 +34,23 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
     itkNewMacro( DICOMTagBasedSorter )
 
     void AddDistinguishingTag( const DICOMTag& );
-    void AddSortCriterion( const DICOMTag& );
+    void SetSortCriterion( DICOMSortCriterion::ConstPointer criterion );
 
     virtual DICOMTagList GetTagsOfInterest();
 
     virtual void Sort();
 
   protected:
+
+    struct ParameterizedDatasetSort
+    {
+      ParameterizedDatasetSort(DICOMSortCriterion::ConstPointer);
+      bool operator() (const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right);
+      bool StringCompare(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right);
+      bool NumericCompare(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right);
+      DICOMSortCriterion::ConstPointer m_SortCriterion;
+    };
+
 
     DICOMTagBasedSorter();
     virtual ~DICOMTagBasedSorter();
@@ -49,11 +60,12 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
 
     std::string BuildGroupID( DICOMDatasetAccess* dataset );
 
-    void SplitGroups();
-    void SortGroups();
+    typedef std::map<std::string, DICOMDatasetList> GroupIDToListType;
+    GroupIDToListType SplitInputGroups();
+    GroupIDToListType& SortGroups(GroupIDToListType& groups);
 
     DICOMTagList m_DistinguishingTags;
-    DICOMTagList m_SortCriteria;
+    DICOMSortCriterion::ConstPointer m_SortCriterion;
 };
 
 }

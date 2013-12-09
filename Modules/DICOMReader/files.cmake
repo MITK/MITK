@@ -8,6 +8,8 @@ set(H_FILES
   mitkDICOMFilenameSorter.h
   mitkDICOMEnums.h
   mitkDICOMTagBasedSorter.h
+  mitkDICOMSortCriterion.h
+  mitkDICOMSortByTag.h
 )
 
 set(CPP_FILES
@@ -19,4 +21,6 @@ set(CPP_FILES
   mitkDICOMTagBasedSorter.cpp
   mitkDICOMGDCMImageFrameInfo.cpp
   mitkDICOMImageFrameInfo.cpp
+  mitkDICOMSortCriterion.cpp
+  mitkDICOMSortByTag.cpp
 )

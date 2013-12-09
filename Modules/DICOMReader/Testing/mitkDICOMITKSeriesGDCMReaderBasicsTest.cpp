@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMFileReaderTestHelper.h"
 #include "mitkDICOMFilenameSorter.h"
 #include "mitkDICOMTagBasedSorter.h"
+#include "mitkDICOMSortByTag.h"
 
 #include "mitkTestingMacros.h"
 
@@ -46,6 +47,7 @@ int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
   gdcmReader = mitk::DICOMITKSeriesGDCMReader::New(); // this also tests destruction
   mitk::DICOMTagBasedSorter::Pointer tagSorter = mitk::DICOMTagBasedSorter::New();
 
+  // all the things that split by tag in DicomSeriesReader
   tagSorter->AddDistinguishingTag( std::make_pair(0x0028, 0x0010) ); // Number of Rows
   tagSorter->AddDistinguishingTag( std::make_pair(0x0028, 0x0011) ); // Number of Columns
   tagSorter->AddDistinguishingTag( std::make_pair(0x0028, 0x0030) ); // Pixel Spacing
@@ -54,10 +56,23 @@ int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
   tagSorter->AddDistinguishingTag( std::make_pair(0x0020, 0x000e) ); // Series Instance UID
   tagSorter->AddDistinguishingTag( std::make_pair(0x0018, 0x0050) ); // Slice Thickness
   tagSorter->AddDistinguishingTag( std::make_pair(0x0028, 0x0008) ); // Number of Frames
+
+  // a sorter...
+  // TODO ugly syntax, improve..
+  mitk::DICOMSortCriterion::Pointer sorting =
+    mitk::DICOMSortByTag::New( std::make_pair(0x0020, 0x0013), // instance number
+      mitk::DICOMSortByTag::New( std::make_pair(0x0020, 0x0012), // aqcuisition number
+        mitk::DICOMSortByTag::New( std::make_pair(0x0008, 0x0032), // aqcuisition time
+          mitk::DICOMSortByTag::New( std::make_pair(0x0018, 0x1060) // trigger time
+          ).GetPointer()
+        ).GetPointer()
+      ).GetPointer()
+    ).GetPointer();
+
   gdcmReader->AddSortingElement( tagSorter );
   mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
 
-  gdcmReader->PrintOutputs(std::cout);
+  gdcmReader->PrintOutputs(std::cout, true);
 
   MITK_TEST_END();
 }

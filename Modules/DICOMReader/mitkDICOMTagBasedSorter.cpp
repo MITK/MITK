@@ -50,9 +50,9 @@ mitk::DICOMTagBasedSorter
 ::GetTagsOfInterest()
 {
   DICOMTagList allTags = m_DistinguishingTags;
-  allTags.insert( allTags.end(), m_SortCriteria.begin(), m_SortCriteria.end() ); // append
 
-  // TODO sort, unique
+  DICOMTagList sortingRelevantTags = m_SortCriterion->GetAllTagsOfInterest();
+  allTags.insert( allTags.end(), sortingRelevantTags.begin(), sortingRelevantTags.end() ); // append
 
   return allTags;
 }
@@ -66,9 +66,9 @@ mitk::DICOMTagBasedSorter
 
 void
 mitk::DICOMTagBasedSorter
-::AddSortCriterion( const DICOMTag& tag )
+::SetSortCriterion( DICOMSortCriterion::ConstPointer criterion )
 {
-  m_SortCriteria.push_back(tag);
+  m_SortCriterion = criterion;
 }
 
 void
@@ -76,12 +76,19 @@ mitk::DICOMTagBasedSorter
 ::Sort()
 {
   // 1. split
-  this->SplitGroups();
-
   // 2. sort each group
-  this->SortGroups();
+  GroupIDToListType groups = this->SplitInputGroups();
+  GroupIDToListType& sortedGroups = this->SortGroups( groups );
 
-  //std::sort( output.begin(), output.end(), FilenameSort() );
+  // 3. define output
+  this->SetNumberOfOutputs(sortedGroups.size());
+  unsigned int outputIndex(0);
+  for (GroupIDToListType::iterator groupIter = sortedGroups.begin();
+       groupIter != sortedGroups.end();
+       ++outputIndex, ++groupIter)
+  {
+    this->SetOutput(outputIndex, groupIter->second);
+  }
 }
 
 std::string
@@ -103,13 +110,12 @@ mitk::DICOMTagBasedSorter
   return groupID.str();
 }
 
-void
+mitk::DICOMTagBasedSorter::GroupIDToListType
 mitk::DICOMTagBasedSorter
-::SplitGroups()
+::SplitInputGroups()
 {
   DICOMDatasetList input = GetInput(); // copy
 
-  typedef std::map<std::string, DICOMDatasetList> GroupIDToListType;
   GroupIDToListType listForGroupID;
 
   for (DICOMDatasetList::iterator dsIter = input.begin();
@@ -124,24 +130,46 @@ mitk::DICOMTagBasedSorter
     listForGroupID[groupID].push_back(dataset);
   }
 
-  this->SetNumberOfOutputs(listForGroupID.size());
-  unsigned int outputIndex(0);
-  for (GroupIDToListType::iterator groupIter = listForGroupID.begin();
-       groupIter != listForGroupID.end();
-       ++outputIndex, ++groupIter)
-  {
-    this->SetOutput(outputIndex, groupIter->second);
-  }
+  return listForGroupID;
 }
 
-void
+mitk::DICOMTagBasedSorter::GroupIDToListType&
 mitk::DICOMTagBasedSorter
-::SortGroups()
+::SortGroups(GroupIDToListType& groups)
 {
-  // for each output
-  //   sort by all configured tags, use secondary tags when equal or empty
-  //   make configurable:
-  //    - sorting order (ascending, descending)
-  //    - sort numerically
-  //    - ... ?
+  if (m_SortCriterion.IsNotNull())
+  {
+    // for each output
+    //   sort by all configured tags, use secondary tags when equal or empty
+    //   make configurable:
+    //    - sorting order (ascending, descending)
+    //    - sort numerically
+    //    - ... ?
+    for (GroupIDToListType::iterator gIter = groups.begin();
+         gIter != groups.end();
+         ++gIter)
+    {
+      DICOMDatasetList& dsList = gIter->second;
+      std::sort( dsList.begin(), dsList.end(), ParameterizedDatasetSort( m_SortCriterion ) );
+    }
+  }
+
+  return groups;
+}
+
+mitk::DICOMTagBasedSorter::ParameterizedDatasetSort
+::ParameterizedDatasetSort(DICOMSortCriterion::ConstPointer criterion)
+:m_SortCriterion(criterion)
+{
+}
+
+bool
+mitk::DICOMTagBasedSorter::ParameterizedDatasetSort
+::operator() (const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right)
+{
+  assert(left);
+  assert(right);
+  assert(m_SortCriterion.IsNotNull());
+
+  return m_SortCriterion->IsLeftBeforeRight(left, right);
 }

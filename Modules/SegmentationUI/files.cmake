@@ -29,6 +29,7 @@ Qmitk/QmitkOpenTool3DGUI.cpp
 Qmitk/QmitkCloseTool3DGUI.cpp
 Qmitk/QmitkFillHolesTool3DGUI.cpp
 Qmitk/QmitkKeepNConnectedRegionsTool3DGUI.cpp
+Qmitk/QmitkSplitConnectedRegionsTool3DGUI.cpp
 Qmitk/QmitkSliceBasedInterpolator.cpp
 Qmitk/QmitkSurfaceBasedInterpolator.cpp
 Qmitk/QmitkLabelSetTableWidget.cpp
@@ -67,6 +68,7 @@ Qmitk/QmitkOpenTool3DGUI.h
 Qmitk/QmitkCloseTool3DGUI.h
 Qmitk/QmitkFillHolesTool3DGUI.h
 Qmitk/QmitkKeepNConnectedRegionsTool3DGUI.h
+Qmitk/QmitkSplitConnectedRegionsTool3DGUI.h
 Qmitk/QmitkSliceBasedInterpolator.h
 Qmitk/QmitkSurfaceBasedInterpolator.h
 Qmitk/QmitkLabelSetTableWidget.h
@@ -88,6 +90,7 @@ Qmitk/QmitkMedianTool3DGUIControls.ui
 Qmitk/QmitkCloseTool3DGUIControls.ui
 Qmitk/QmitkOpenTool3DGUIControls.ui
 Qmitk/QmitkKeepNConnectedRegionsTool3DGUIControls.ui
+Qmitk/QmitkSplitConnectedRegionsTool3DGUIControls.ui
 Qmitk/QmitkFillHolesTool3DGUIControls.ui
 Qmitk/QmitkSearchLabelDialogGUI.ui
 Qmitk/QmitkBinaryThresholdToolGUIControls.ui

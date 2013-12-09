@@ -70,6 +70,7 @@ namespace itk{
     itkGetMacro( FiberPolyData, FiberPolyDataType )
     itkSetMacro( SeedImage, ItkUcharImgType::Pointer)
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)
+    itkSetMacro( FaImage, ItkFloatImgType::Pointer)
     itkSetMacro( SeedsPerVoxel, int)
     itkSetMacro( FaThreshold, float)
     itkSetMacro( StepSize, float)

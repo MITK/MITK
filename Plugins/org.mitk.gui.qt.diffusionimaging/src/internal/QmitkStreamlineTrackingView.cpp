@@ -31,6 +31,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkFiberBundleX.h>
 #include <mitkImageCast.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDimension.h>
 
 // VTK
 #include <vtkPolyData.h>
@@ -67,6 +72,16 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
         // create GUI widgets from the Qt Designer's .ui file
         m_Controls = new Ui::QmitkStreamlineTrackingViewControls;
         m_Controls->setupUi( parent );
+        m_Controls->m_FaImageBox->SetDataStorage(this->GetDataStorage());
+
+        mitk::TNodePredicateDataType<mitk::Image>::Pointer isImagePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
+
+        mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+        mitk::NodePredicateNot::Pointer isNotBinaryPredicate = mitk::NodePredicateNot::New( isBinaryPredicate );
+        mitk::NodePredicateAnd::Pointer isNotABinaryImagePredicate = mitk::NodePredicateAnd::New( isImagePredicate, isNotBinaryPredicate );
+        mitk::NodePredicateDimension::Pointer dimensionPredicate = mitk::NodePredicateDimension::New(3);
+
+        m_Controls->m_FaImageBox->SetPredicate( mitk::NodePredicateAnd::New(isNotABinaryImagePredicate, dimensionPredicate) );
 
         connect( m_Controls->commandLinkButton, SIGNAL(clicked()), this, SLOT(DoFiberTracking()) );
         connect( m_Controls->m_SeedsPerVoxelSlider, SIGNAL(valueChanged(int)), this, SLOT(OnSeedsPerVoxelChanged(int)) );
@@ -208,7 +223,15 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         filter->SetInput(i, caster->GetOutput());
     }
 
-    filter->SetNumberOfThreads(1);
+    if (m_Controls->m_UseFaImage->isChecked())
+    {
+        mitk::ImageToItk<ItkFloatImageType>::Pointer floatCast = mitk::ImageToItk<ItkFloatImageType>::New();
+        floatCast->SetInput(dynamic_cast<mitk::Image*>(m_Controls->m_FaImageBox->GetSelectedNode()->GetData()));
+        floatCast->Update();
+        filter->SetFaImage(floatCast->GetOutput());
+    }
+
+    //filter->SetNumberOfThreads(1);
     filter->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelSlider->value());
     filter->SetFaThreshold((float)m_Controls->m_FaThresholdSlider->value()/100);
     filter->SetMinCurvatureRadius((float)m_Controls->m_AngularThresholdSlider->value()/10);

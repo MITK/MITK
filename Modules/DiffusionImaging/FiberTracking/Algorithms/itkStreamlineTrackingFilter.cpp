@@ -129,13 +129,18 @@ TPDPixelType>
         m_MaskImage->FillBuffer(1);
     }
 
-    m_FaImage = ItkFloatImgType::New();
-    m_FaImage->SetSpacing( inputImage->GetSpacing() );
-    m_FaImage->SetOrigin( inputImage->GetOrigin() );
-    m_FaImage->SetDirection( inputImage->GetDirection() );
-    m_FaImage->SetRegions( inputImage->GetLargestPossibleRegion() );
-    m_FaImage->Allocate();
-    m_FaImage->FillBuffer(0.0);
+    bool useUserFaImage = true;
+    if (m_FaImage.IsNull())
+    {
+        m_FaImage = ItkFloatImgType::New();
+        m_FaImage->SetSpacing( inputImage->GetSpacing() );
+        m_FaImage->SetOrigin( inputImage->GetOrigin() );
+        m_FaImage->SetDirection( inputImage->GetDirection() );
+        m_FaImage->SetRegions( inputImage->GetLargestPossibleRegion() );
+        m_FaImage->Allocate();
+        m_FaImage->FillBuffer(0.0);
+        useUserFaImage = false;
+    }
 
     m_NumberOfInputs = 0;
     for (unsigned int i=0; i<this->GetNumberOfIndexedInputs(); i++)
@@ -188,10 +193,12 @@ TPDPixelType>
                     dir[2] = eigenvectors(2, 2);
                     dir.normalize();
                     m_PdImage.at(i)->SetPixel(index, dir);
-                    m_FaImage->SetPixel(index, m_FaImage->GetPixel(index)+tensor.GetFractionalAnisotropy());
+                    if (!useUserFaImage)
+                        m_FaImage->SetPixel(index, m_FaImage->GetPixel(index)+tensor.GetFractionalAnisotropy());
                     m_EmaxImage.at(i)->SetPixel(index, 2/eigenvalues[2]);
                 }
-                m_FaImage->SetPixel(index, m_FaImage->GetPixel(index)/m_NumberOfInputs);
+                if (!useUserFaImage)
+                    m_FaImage->SetPixel(index, m_FaImage->GetPixel(index)/m_NumberOfInputs);
             }
 
     if (m_Interpolate)
@@ -549,52 +556,154 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
         }
         else // use trilinear interpolation (weights calculated in IsValidPosition())
         {
-            double minAngle = 0;
-            for (int img=0; img<m_NumberOfInputs; img++)
+            typename InputImageType::PixelType tensor;
+
+            typename InputImageType::IndexType tmpIdx = index;
+            typename InputImageType::PixelType tmpTensor;
+
+            if (m_NumberOfInputs>1)
             {
-                typename InputImageType::PixelType tensor = m_InputImage.at(img)->GetPixel(index) * interpWeights[0];
-                typename InputImageType::IndexType tmpIdx = index; tmpIdx[0]++;
-                tensor +=  m_InputImage.at(img)->GetPixel(tmpIdx) * interpWeights[1];
+                double minAngle = 0;
+                for (int img=0; img<m_NumberOfInputs; img++)
+                {
+                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    if (fabs(angle)>minAngle)
+                    {
+                        minAngle = angle;
+                        tmpTensor = m_InputImage.at(img)->GetPixel(tmpIdx);
+                    }
+                }
+                tensor = tmpTensor * interpWeights[0];
+
+                minAngle = 0;
+                tmpIdx = index; tmpIdx[0]++;
+                for (int img=0; img<m_NumberOfInputs; img++)
+                {
+                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    if (fabs(angle)>minAngle)
+                    {
+                        minAngle = angle;
+                        tmpTensor = m_InputImage.at(img)->GetPixel(tmpIdx);
+                    }
+                }
+                tensor += tmpTensor * interpWeights[1];
+
+                minAngle = 0;
                 tmpIdx = index; tmpIdx[1]++;
-                tensor +=  m_InputImage.at(img)->GetPixel(tmpIdx) * interpWeights[2];
+                for (int img=0; img<m_NumberOfInputs; img++)
+                {
+                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    if (fabs(angle)>minAngle)
+                    {
+                        minAngle = angle;
+                        tmpTensor = m_InputImage.at(img)->GetPixel(tmpIdx);
+                    }
+                }
+                tensor += tmpTensor * interpWeights[2];
+
+                minAngle = 0;
                 tmpIdx = index; tmpIdx[2]++;
-                tensor +=  m_InputImage.at(img)->GetPixel(tmpIdx) * interpWeights[3];
+                for (int img=0; img<m_NumberOfInputs; img++)
+                {
+                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    if (fabs(angle)>minAngle)
+                    {
+                        minAngle = angle;
+                        tmpTensor = m_InputImage.at(img)->GetPixel(tmpIdx);
+                    }
+                }
+                tensor += tmpTensor * interpWeights[3];
+
+                minAngle = 0;
                 tmpIdx = index; tmpIdx[0]++; tmpIdx[1]++;
-                tensor +=  m_InputImage.at(img)->GetPixel(tmpIdx) * interpWeights[4];
+                for (int img=0; img<m_NumberOfInputs; img++)
+                {
+                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    if (fabs(angle)>minAngle)
+                    {
+                        minAngle = angle;
+                        tmpTensor = m_InputImage.at(img)->GetPixel(tmpIdx);
+                    }
+                }
+                tensor += tmpTensor * interpWeights[4];
+
+                minAngle = 0;
                 tmpIdx = index; tmpIdx[1]++; tmpIdx[2]++;
-                tensor +=  m_InputImage.at(img)->GetPixel(tmpIdx) * interpWeights[5];
+                for (int img=0; img<m_NumberOfInputs; img++)
+                {
+                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    if (fabs(angle)>minAngle)
+                    {
+                        minAngle = angle;
+                        tmpTensor = m_InputImage.at(img)->GetPixel(tmpIdx);
+                    }
+                }
+                tensor += tmpTensor * interpWeights[5];
+
+                minAngle = 0;
                 tmpIdx = index; tmpIdx[2]++; tmpIdx[0]++;
-                tensor +=  m_InputImage.at(img)->GetPixel(tmpIdx) * interpWeights[6];
+                for (int img=0; img<m_NumberOfInputs; img++)
+                {
+                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    if (fabs(angle)>minAngle)
+                    {
+                        minAngle = angle;
+                        tmpTensor = m_InputImage.at(img)->GetPixel(tmpIdx);
+                    }
+                }
+                tensor += tmpTensor * interpWeights[6];
+
+                minAngle = 0;
                 tmpIdx = index; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
-                tensor +=  m_InputImage.at(img)->GetPixel(tmpIdx) * interpWeights[7];
-
-                tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
-                vnl_vector_fixed<double,3> newDir;
-                newDir[0] = eigenvectors(2, 0);
-                newDir[1] = eigenvectors(2, 1);
-                newDir[2] = eigenvectors(2, 2);
-                if (newDir.magnitude()<mitk::eps)
-                    continue;
-                newDir.normalize();
-
-                float scale = 2/eigenvalues[2];
-                newDir[0] = m_F*newDir[0] + (1-m_F)*( (1-m_G)*dirOld[0] + scale*m_G*(tensor[0]*dirOld[0] + tensor[1]*dirOld[1] + tensor[2]*dirOld[2]));
-                newDir[1] = m_F*newDir[1] + (1-m_F)*( (1-m_G)*dirOld[1] + scale*m_G*(tensor[1]*dirOld[0] + tensor[3]*dirOld[1] + tensor[4]*dirOld[2]));
-                newDir[2] = m_F*newDir[2] + (1-m_F)*( (1-m_G)*dirOld[2] + scale*m_G*(tensor[2]*dirOld[0] + tensor[4]*dirOld[1] + tensor[5]*dirOld[2]));
-                newDir.normalize();
-
-                float angle = dot_product(dirOld, newDir);
-                if (angle<0)
+                for (int img=0; img<m_NumberOfInputs; img++)
                 {
-                    newDir *= -1;
-                    angle *= -1;
+                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    if (fabs(angle)>minAngle)
+                    {
+                        minAngle = angle;
+                        tmpTensor = m_InputImage.at(img)->GetPixel(tmpIdx);
+                    }
                 }
+                tensor += tmpTensor * interpWeights[7];
+            }
+            else
+            {
+                tensor = m_InputImage.at(0)->GetPixel(index) * interpWeights[0];
+                typename InputImageType::IndexType tmpIdx = index; tmpIdx[0]++;
+                tensor +=  m_InputImage.at(0)->GetPixel(tmpIdx) * interpWeights[1];
+                tmpIdx = index; tmpIdx[1]++;
+                tensor +=  m_InputImage.at(0)->GetPixel(tmpIdx) * interpWeights[2];
+                tmpIdx = index; tmpIdx[2]++;
+                tensor +=  m_InputImage.at(0)->GetPixel(tmpIdx) * interpWeights[3];
+                tmpIdx = index; tmpIdx[0]++; tmpIdx[1]++;
+                tensor +=  m_InputImage.at(0)->GetPixel(tmpIdx) * interpWeights[4];
+                tmpIdx = index; tmpIdx[1]++; tmpIdx[2]++;
+                tensor +=  m_InputImage.at(0)->GetPixel(tmpIdx) * interpWeights[5];
+                tmpIdx = index; tmpIdx[2]++; tmpIdx[0]++;
+                tensor +=  m_InputImage.at(0)->GetPixel(tmpIdx) * interpWeights[6];
+                tmpIdx = index; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
+                tensor +=  m_InputImage.at(0)->GetPixel(tmpIdx) * interpWeights[7];
+            }
 
-                if (angle>minAngle)
-                {
-                    minAngle = angle;
-                    dir = newDir;
-                }
+            tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
+            dir[0] = eigenvectors(2, 0);
+            dir[1] = eigenvectors(2, 1);
+            dir[2] = eigenvectors(2, 2);
+            if (dir.magnitude()<mitk::eps)
+                continue;
+            dir.normalize();
+
+            float scale = 2/eigenvalues[2];
+            dir[0] = m_F*dir[0] + (1-m_F)*( (1-m_G)*dirOld[0] + scale*m_G*(tensor[0]*dirOld[0] + tensor[1]*dirOld[1] + tensor[2]*dirOld[2]));
+            dir[1] = m_F*dir[1] + (1-m_F)*( (1-m_G)*dirOld[1] + scale*m_G*(tensor[1]*dirOld[0] + tensor[3]*dirOld[1] + tensor[4]*dirOld[2]));
+            dir[2] = m_F*dir[2] + (1-m_F)*( (1-m_G)*dirOld[2] + scale*m_G*(tensor[2]*dirOld[0] + tensor[4]*dirOld[1] + tensor[5]*dirOld[2]));
+            dir.normalize();
+
+            float angle = dot_product(dirOld, dir);
+            if (angle<0)
+            {
+                dir *= -1;
+                angle *= -1;
             }
 
             vnl_vector_fixed<double,3> v3 = dir+dirOld; v3 *= m_StepSize;
@@ -604,10 +713,7 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
             float r = a*b*c/std::sqrt((a+b+c)*(a+b-c)*(b+c-a)*(a-b+c)); // radius of triangle via Heron's formula (area of triangle)
 
             if (r<m_MinCurvatureRadius)
-            {
-                MITK_INFO << "OUT";
                 return tractLength;
-            }
 
             dirOld = dir;
             indexOld = index;

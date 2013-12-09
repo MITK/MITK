@@ -44,10 +44,9 @@ namespace mitk {
 }
 
 
-mitk::ErodeTool3D::ErodeTool3D()
+mitk::ErodeTool3D::ErodeTool3D() : m_Radius(3)
 {
   m_ProgressCommand = mitk::ToolCommand::New();
-  m_Radius = 1;
 }
 
 mitk::ErodeTool3D::~ErodeTool3D()
@@ -103,19 +102,27 @@ void mitk::ErodeTool3D::Run()
   {
     AccessByItk(workingImage, InternalProcessing);
   }
-  catch( itk::ExceptionObject& e )
+  catch( itk::ExceptionObject & e )
   {
-   MITK_ERROR << "Exception caught: " << e.GetDescription();
-   m_ProgressCommand->Reset();
-   CurrentlyBusy.Send(false);
-   return;
+    CurrentlyBusy.Send(false);
+    m_ProgressCommand->Reset();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    m_ToolManager->ActivateTool(-1);
+    return;
+  }
+  catch (...)
+  {
+    CurrentlyBusy.Send(false);
+    m_ProgressCommand->Reset();
+    MITK_ERROR << "Unkown exception caught!";
+    m_ToolManager->ActivateTool(-1);
+    return;
   }
 
   CurrentlyBusy.Send(false);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
-
 
 template < typename TPixel, unsigned int VDimension >
 void mitk::ErodeTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* input )

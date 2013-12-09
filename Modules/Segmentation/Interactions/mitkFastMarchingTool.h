@@ -54,6 +54,8 @@ namespace mitk
 */
 class Segmentation_EXPORT FastMarchingTool : public SegTool2D
 {
+    mitkNewMessageMacro(Ready);
+
   public:
 
     mitkClassMacro(FastMarchingTool, SegTool2D);

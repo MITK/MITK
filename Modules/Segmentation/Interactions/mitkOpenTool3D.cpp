@@ -105,12 +105,21 @@ void mitk::OpenTool3D::Run()
   {
     AccessByItk(workingImage, ITKProcessing);
   }
-  catch( itk::ExceptionObject& e )
+  catch( itk::ExceptionObject & e )
   {
-   MITK_ERROR << "Exception caught: " << e.GetDescription();
-   m_ProgressCommand->Reset();
-   CurrentlyBusy.Send(false);
-   return;
+    CurrentlyBusy.Send(false);
+    m_ProgressCommand->Reset();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    m_ToolManager->ActivateTool(-1);
+    return;
+  }
+  catch (...)
+  {
+    CurrentlyBusy.Send(false);
+    m_ProgressCommand->Reset();
+    MITK_ERROR << "Unkown exception caught!";
+    m_ToolManager->ActivateTool(-1);
+    return;
   }
 
   CurrentlyBusy.Send(false);

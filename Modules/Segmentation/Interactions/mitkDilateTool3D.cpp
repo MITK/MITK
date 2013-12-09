@@ -100,12 +100,21 @@ void mitk::DilateTool3D::Run()
   {
     AccessByItk(workingImage, InternalProcessing);
   }
-  catch( itk::ExceptionObject& e )
+  catch( itk::ExceptionObject & e )
   {
-   MITK_ERROR << "Exception caught: " << e.GetDescription();
-   m_ProgressCommand->Reset();
-   CurrentlyBusy.Send(false);
-   return;
+    CurrentlyBusy.Send(false);
+    m_ProgressCommand->Reset();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    m_ToolManager->ActivateTool(-1);
+    return;
+  }
+  catch (...)
+  {
+    CurrentlyBusy.Send(false);
+    m_ProgressCommand->Reset();
+    MITK_ERROR << "Unkown exception caught!";
+    m_ToolManager->ActivateTool(-1);
+    return;
   }
 
   CurrentlyBusy.Send(false);
@@ -155,7 +164,6 @@ void mitk::DilateTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* in
 
   typename LabelMap2ImageType::Pointer label2image = LabelMap2ImageType::New();
   label2image->SetInput( autoCropFilter->GetOutput() );
-
 
   thresholdFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
   autoCropFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );

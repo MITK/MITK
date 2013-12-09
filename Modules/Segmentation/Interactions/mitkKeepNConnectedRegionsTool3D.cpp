@@ -81,7 +81,7 @@ void mitk::KeepNConnectedRegionsTool3D::Run()
 {
    //  this->InitializeUndoController();
 
-   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
@@ -98,12 +98,21 @@ void mitk::KeepNConnectedRegionsTool3D::Run()
   {
     AccessByItk(workingImage, InternalProcessing);
   }
-  catch( itk::ExceptionObject& e )
+  catch( itk::ExceptionObject & e )
   {
-   MITK_ERROR << "Exception caught: " << e.GetDescription();
-   m_ProgressCommand->Reset();
-   CurrentlyBusy.Send(false);
-   return;
+    CurrentlyBusy.Send(false);
+    m_ProgressCommand->Reset();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    m_ToolManager->ActivateTool(-1);
+    return;
+  }
+  catch (...)
+  {
+    CurrentlyBusy.Send(false);
+    m_ProgressCommand->Reset();
+    MITK_ERROR << "Unkown exception caught!";
+    m_ToolManager->ActivateTool(-1);
+    return;
   }
 
   CurrentlyBusy.Send(false);

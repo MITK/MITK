@@ -57,6 +57,8 @@ class Segmentation_EXPORT FastMarchingTool3D : public SegTool3D
 {
   public:
 
+    mitkNewMessageMacro(Ready);
+
     mitkClassMacro(FastMarchingTool3D, SegTool3D)
     itkNewMacro(FastMarchingTool3D)
 
@@ -148,6 +150,9 @@ class Segmentation_EXPORT FastMarchingTool3D : public SegTool3D
 
     mitk::DataNode::Pointer m_SeedsAsPointSetNode;//used to visualize the seed points
     mitk::PointSet::Pointer m_SeedsAsPointSet;
+
+    unsigned int m_PointSetAddObserverTag;
+    unsigned int m_PointSetRemoveObserverTag;
 
     ThresholdingFilterType::Pointer m_ThresholdFilter;
   //  SmoothingFilterType::Pointer m_SmoothFilter;

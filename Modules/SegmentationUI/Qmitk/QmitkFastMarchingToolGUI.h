@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFastMarchingTool.h"
 
 class ctkSlider;
-class ctkDoubleSlider;
+class ctkSliderWidget;
 class ctkRangeWidget;
 class ctkSliderWidget;
 class QPushButton;
@@ -69,9 +69,9 @@ protected:
 
   ctkRangeWidget*  m_slwThreshold;
   //ctkSliderWidget* m_slStoppingValue;
-  ctkDoubleSlider* m_slSigma;
-  ctkDoubleSlider* m_slAlpha;
-  ctkDoubleSlider* m_slBeta;
+  ctkSliderWidget* m_slSigma;
+  ctkSliderWidget* m_slAlpha;
+  ctkSliderWidget* m_slBeta;
 
   QPushButton* m_btAcceptPreview;
   QPushButton* m_btClearSeeds;

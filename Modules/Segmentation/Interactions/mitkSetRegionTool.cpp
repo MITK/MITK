@@ -219,8 +219,8 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   {
     // copy point from float* to mitk::ContourModel
     ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
-    contourInImageIndexCoordinates->Expand(timeStep + 1);
-    contourInImageIndexCoordinates->SetClosed(true, timeStep);
+//    contourInImageIndexCoordinates->Expand(timeStep + 1);
+//    contourInImageIndexCoordinates->SetClosed(true, timeStep);
     Point3D newPoint;
 
     for (int index = 0; index < numberOfContourPoints; ++index)

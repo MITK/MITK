@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkNewSegmentationDialog.h"
 
 #include <qlabel.h>
-#include <ctkDoubleSlider.h>
+#include <ctkSliderWidget.h>
 #include <ctkRangeWidget.h>
 #include <ctkSliderWidget.h>
 //#include <ctkSpinbox.h>
@@ -68,9 +68,9 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI()
    widgetLayout->addItem(hlayout);
   }
 
-  m_slSigma = new ctkDoubleSlider(this);
+  m_slSigma = new ctkSliderWidget(this);
   m_slSigma->setTracking(false);
-  m_slSigma->setOrientation(Qt::Horizontal);
+//  m_slSigma->setOrientation(Qt::Horizontal);
   m_slSigma->setPageStep(0.1);
 //  m_slSigma->setTickInterval(0.01);
   m_slSigma->setSingleStep(0.01);
@@ -97,10 +97,10 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI()
    widgetLayout->addItem(hlayout);
   }
 
-  m_slAlpha = new ctkDoubleSlider(this);
+  m_slAlpha = new ctkSliderWidget(this);
 //  m_slAlpha->setDecimals(2);
   m_slAlpha->setTracking(false);
-  m_slAlpha->setOrientation(Qt::Horizontal);
+//  m_slAlpha->setOrientation(Qt::Horizontal);
   m_slAlpha->setMinimum(-10);
   m_slAlpha->setMaximum(0);
   m_slAlpha->setPageStep(0.1);
@@ -126,10 +126,10 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI()
    widgetLayout->addLayout(hlayout);
   }
 
-  m_slBeta = new ctkDoubleSlider(this);
+  m_slBeta = new ctkSliderWidget(this);
 //  m_slBeta->setDecimals(2);
   m_slBeta->setTracking(false);
-  m_slBeta->setOrientation(Qt::Horizontal);
+//  m_slBeta->setOrientation(Qt::Horizontal);
   m_slBeta->setMinimum(0);
   m_slBeta->setMaximum(100);
   m_slBeta->setPageStep(0.1);
@@ -309,8 +309,8 @@ void QmitkFastMarchingToolGUI::OnAcceptPreview()
 {
   if (m_FastMarchingTool.IsNotNull() && (!m_SelfCall))
   {
-    m_btConfirm->setEnabled(false);
-    m_FastMarchingTool->ConfirmSegmentation();
+    m_btAcceptPreview->setEnabled(false);
+    m_FastMarchingTool->AcceptPreview();
   }
 }
 

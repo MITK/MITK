@@ -260,9 +260,6 @@ void mitk::FastMarchingTool3D::Deactivated()
   m_SeedsAsPointSet->RemoveObserver(m_PointSetRemoveObserverTag);
 }
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
 void mitk::FastMarchingTool3D::ConfirmSegmentation()
 {
   // combine preview image with current working segmentation
@@ -329,8 +326,6 @@ bool mitk::FastMarchingTool3D::OnAddPoint(Action* action, const StateEvent* stat
   this->Update();
 
   m_ReadyMessage.Send();
-
-}
 
   return true;
 }

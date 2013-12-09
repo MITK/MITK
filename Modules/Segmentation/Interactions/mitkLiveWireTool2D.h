@@ -109,6 +109,9 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     //the corresponding datanode
     mitk::DataNode::Pointer m_LiveWireContourNode;
 
+    mitk::ContourModel::Pointer m_EditingContour;
+    mitk::DataNode::Pointer m_EditingContourNode;
+
     //the current reference image
     mitk::Image::Pointer m_WorkingSlice;
 

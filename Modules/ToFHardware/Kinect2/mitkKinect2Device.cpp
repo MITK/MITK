@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "mitkKinect2Device.h"
 #include "mitkRealTimeClock.h"
+#include <mitkImageToOpenCVImageFilter.h>
 
 #include "itkMultiThreader.h"
 #include <itksys/SystemTools.hxx>
@@ -128,7 +129,7 @@ namespace mitk
       // get the first image
       this->m_Controller->UpdateCamera();
       this->m_ImageMutex->Lock();
-      //this->m_Controller->GetAllData(this->m_DistanceDataBuffer[this->m_FreePos],this->m_AmplitudeDataBuffer[this->m_FreePos],this->m_RGBDataBuffer[this->m_FreePos]);
+      this->m_Controller->GetAllData(this->m_DistanceDataBuffer[this->m_FreePos],this->m_AmplitudeDataBuffer[this->m_FreePos],this->m_RGBDataBuffer[this->m_FreePos]);
       this->m_FreePos = (this->m_FreePos+1) % this->m_BufferSize;
       this->m_CurrentPos = (this->m_CurrentPos+1) % this->m_BufferSize;
       this->m_ImageSequence++;
@@ -173,6 +174,7 @@ namespace mitk
   {
     if (m_Controller)
     {
+      MITK_INFO << "Kinect2Device::UpdateCamera()";
       m_Controller->UpdateCamera();
     }
   }
@@ -211,19 +213,11 @@ namespace mitk
   //      // call modified to indicate that cameraDevice was modified
   //      toFCameraDevice->Modified();
 
-  //      /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  //      TODO Buffer Handling currently only works for buffer size 1
-  //      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-  //      //toFCameraDevice->m_ImageSequence++;
   //      toFCameraDevice->m_FreePos = (toFCameraDevice->m_FreePos+1) % toFCameraDevice->m_BufferSize;
   //      toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
   //      toFCameraDevice->m_ImageSequence++;
   //      if (toFCameraDevice->m_FreePos == toFCameraDevice->m_CurrentPos)
   //      {
-  //        // buffer overflow
-  //        //MITK_INFO << "Buffer overflow!! ";
-  //        //toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
-  //        //toFCameraDevice->m_ImageSequence++;
   //        overflow = true;
   //      }
   //      if (toFCameraDevice->m_ImageSequence % n == 0)
@@ -232,18 +226,13 @@ namespace mitk
   //      }
   //      if (overflow)
   //      {
-  //        //itksys::SystemTools::Delay(10);
   //        overflow = false;
   //      }
-  //      /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  //      END TODO Buffer Handling currently only works for buffer size 1
-  //      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
   //      // print current framerate
   //      if (printStatus)
   //      {
   //        t2 = realTimeClock->GetCurrentStamp() - t1;
-  //        //MITK_INFO << "t2: " << t2 <<" Time (s) for 1 image: " << (t2/1000) / n << " Framerate (fps): " << n / (t2/1000) << " Sequence: " << toFCameraDevice->m_ImageSequence;
   //        MITK_INFO << " Framerate (fps): " << n / (t2/1000) << " Sequence: " << toFCameraDevice->m_ImageSequence;
   //        t1 = realTimeClock->GetCurrentStamp();
   //        printStatus = false;
@@ -255,38 +244,38 @@ namespace mitk
 
   void Kinect2Device::GetAmplitudes(float* amplitudeArray, int& imageSequence)
   {
-    m_ImageMutex->Lock();
-    if (m_CameraActive)
-    {
-      for (int i=0; i<this->m_PixelNumber; i++)
-      {
-        amplitudeArray[i] = this->m_AmplitudeDataBuffer[this->m_CurrentPos][i];
-      }
-      imageSequence = this->m_ImageSequence;
-    }
-    else
-    {
-      MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
-    }
-    m_ImageMutex->Unlock();
+    //m_ImageMutex->Lock();
+    //if (m_CameraActive)
+    //{
+    //  for (int i=0; i<this->m_PixelNumber; i++)
+    //  {
+    //    amplitudeArray[i] = this->m_AmplitudeDataBuffer[this->m_CurrentPos][i];
+    //  }
+    //  imageSequence = this->m_ImageSequence;
+    //}
+    //else
+    //{
+    //  MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
+    //}
+    //m_ImageMutex->Unlock();
   }
 
   void Kinect2Device::GetIntensities(float* intensityArray, int& imageSequence)
   {
-    m_ImageMutex->Lock();
-    if (m_CameraActive)
-    {
-      for (int i=0; i<this->m_PixelNumber; i++)
-      {
-        intensityArray[i] = this->m_IntensityDataBuffer[this->m_CurrentPos][i];
-      }
-      imageSequence = this->m_ImageSequence;
-    }
-    else
-    {
-      MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
-    }
-    m_ImageMutex->Unlock();
+    //m_ImageMutex->Lock();
+    //if (m_CameraActive)
+    //{
+    //  for (int i=0; i<this->m_PixelNumber; i++)
+    //  {
+    //    intensityArray[i] = this->m_IntensityDataBuffer[this->m_CurrentPos][i];
+    //  }
+    //  imageSequence = this->m_ImageSequence;
+    //}
+    //else
+    //{
+    //  MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
+    //}
+    //m_ImageMutex->Unlock();
   }
 
   void Kinect2Device::GetDistances(float* distanceArray, int& imageSequence)
@@ -312,11 +301,11 @@ namespace mitk
   {
     if (m_CameraActive)
     {
-      // 1) copy the image buffer
-      // 2) convert the distance values from m to mm
-      // 3) Flip around y- axis (vertical axis)
+      //// 1) copy the image buffer
+      //// 2) convert the distance values from m to mm
+      //// 3) Flip around y- axis (vertical axis)
 
-      // check for empty buffer
+      //// check for empty buffer
       //if (this->m_ImageSequence < 0)
       //{
       //  // buffer empty
@@ -330,39 +319,58 @@ namespace mitk
       //{
       //  capturedImageSequence = this->m_ImageSequence;
       //  pos = this->m_CurrentPos;
-      //  //MITK_INFO << "Required image not found! Required: " << requiredImageSequence << " delivered/current: " << this->m_ImageSequence;
       //}
       //else if (requiredImageSequence <= this->m_ImageSequence - this->m_BufferSize)
       //{
       //  capturedImageSequence = (this->m_ImageSequence - this->m_BufferSize) + 1;
       //  pos = (this->m_CurrentPos + 1) % this->m_BufferSize;
-      //  //MITK_INFO << "Out of buffer! Required: " << requiredImageSequence << " delivered: " << capturedImageSequence << " current: " << this->m_ImageSequence;
       //}
       //else // (requiredImageSequence > this->m_ImageSequence - this->m_BufferSize) && (requiredImageSequence <= this->m_ImageSequence)
-
       //{
       //  capturedImageSequence = requiredImageSequence;
       //  pos = (this->m_CurrentPos + (10-(this->m_ImageSequence - requiredImageSequence))) % this->m_BufferSize;
       //}
-      m_Controller->UpdateCamera();
-      m_Controller->GetDistances(distanceArray);
-      m_Controller->GetRgb(rgbDataArray);
-      //// write image data to float arrays
+      ////// write image data to float arrays
       //for (int i=0; i<this->m_PixelNumber; i++)
       //{
       //  distanceArray[i] = this->m_DistanceDataBuffer[pos][i];
-      //  amplitudeArray[i] = this->m_AmplitudeDataBuffer[pos][i];
-      //  intensityArray[i] = this->m_IntensityDataBuffer[pos][i];
+      //  //amplitudeArray[i] = this->m_AmplitudeDataBuffer[pos][i];
+      //  //intensityArray[i] = this->m_IntensityDataBuffer[pos][i];
       //  rgbDataArray[i*3] = this->m_RGBDataBuffer[pos][i*3];
       //  rgbDataArray[i*3+1] = this->m_RGBDataBuffer[pos][i*3+1];
       //  rgbDataArray[i*3+2] = this->m_RGBDataBuffer[pos][i*3+2];
       //}
+      m_Controller->UpdateCamera();
+      m_Controller->GetAllData(distanceArray, amplitudeArray, rgbDataArray);
+      this->Modified();
     }
     else
     {
       MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
     }
   }
+
+    void Kinect2Device::ShowDebugImage(float* distances)
+  {
+    unsigned int* dim = new unsigned int[2];
+    dim[0] = 512;
+    dim[1] = 424;
+    mitk::Image::Pointer image = mitk::Image::New();
+    image->Initialize(mitk::PixelType(mitk::MakeScalarPixelType<float>()), 2, dim);
+    image->SetSlice(distances);
+
+    mitk::ImageToOpenCVImageFilter::Pointer filter = mitk::ImageToOpenCVImageFilter::New();
+    filter->SetImage(image);
+    cv::Mat cvImage = cv::Mat(filter->GetOpenCVImage(), true);
+    double minVal, maxVal;
+    cv::minMaxLoc(cvImage, &minVal, &maxVal);
+    cv::Mat uCCImage;
+    cvImage.convertTo(uCCImage, CV_8U, 255.0/(maxVal - minVal), -minVal);
+    cv::namedWindow("test", CV_WINDOW_AUTOSIZE);
+    cv::imshow("test", uCCImage);
+    cv::waitKey(10000000);
+  }
+
 
   Kinect2Controller::Pointer Kinect2Device::GetController()
   {
@@ -386,16 +394,6 @@ namespace mitk
       m_Controller->SetUseIR(ir);
     }
   }
-
-  //int Kinect2Device::GetCaptureWidth()
-  //{
-  //  return this->m_DepthCaptureWidth;
-  //}
-
-  //int Kinect2Device::GetCaptureHeight()
-  //{
-  //  return this->m_DepthCaptureHeight;
-  //}
 
   int Kinect2Device::GetRGBCaptureWidth()
   {

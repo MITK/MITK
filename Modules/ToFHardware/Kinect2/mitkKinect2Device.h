@@ -123,6 +123,8 @@ namespace mitk
     */
     int GetRGBCaptureHeight();
 
+     void ShowDebugImage(float* distances);
+
   protected:
 
     Kinect2Device();
@@ -132,7 +134,7 @@ namespace mitk
     /*!
     \brief Thread method continuously acquiring images from the ToF hardware
     */
-    //static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
+    static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
     /*!
     \brief moves the position pointer m_CurrentPos to the next position in the buffer if that's not the next free position to prevent reading from an empty buffer
     */

@@ -511,6 +511,10 @@ void QmitkToFUtilView::OnUpdateCamera()
   else
   {
     // update pipeline
+    this->m_ToFImageGrabber->GetCameraDevice()->UpdateCamera();
+    this->m_ToFImageGrabber->Modified();
+    this->m_ToFImageGrabber->Update();
+    this->m_MitkDistanceImage = m_ToFImageGrabber->GetOutput(0);
     this->m_MitkDistanceImage->Update();
   }
 

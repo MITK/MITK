@@ -44,6 +44,7 @@ namespace mitk
   int GetDepthCaptureHeight() const;
 
   bool GetUseIR() const;
+  void ShowDebugImage(float* distances);
 
     void SetUseIR(bool useIR);
 

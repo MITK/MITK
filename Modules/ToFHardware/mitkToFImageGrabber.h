@@ -43,6 +43,7 @@ namespace mitk
 
     itkNewMacro( Self );
 
+    void ShowDebugImage(float* distances);
     /*!
     \brief Establish a connection to the ToF camera
     */

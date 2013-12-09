@@ -17,6 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Kinect.h>
 #include "stdafx.h"
 #include <stdio.h>
+#include <mitkImage.h>
+#include <mitkPixelType.h>
+#include <mitkImageToOpenCVImageFilter.h>
 
 namespace mitk
 {
@@ -64,7 +67,6 @@ namespace mitk
     m_RGBCaptureHeight(1080),
     m_Distances(NULL),
     m_Colors(NULL),
-    //m_BufferSize(1920*1080*sizeof(unsigned char)*4)
     m_BufferSize(1920*1080*3)
   {
     // create heap storage for color pixel data in RGBX format
@@ -170,6 +172,7 @@ namespace mitk
 
   bool Kinect2Controller::UpdateCamera()
   {
+    MITK_INFO << "UpdateCamera";
     if (!d->m_pDepthFrameReader)
     {
       MITK_ERROR << "UpdateCamera: No DepthFrameReader";
@@ -186,6 +189,7 @@ namespace mitk
 
     if (SUCCEEDED(hr))
     {
+      MITK_INFO << "AcquireLatestFrame";
       INT64 nTime = 0;
       IFrameDescription* pFrameDescription = NULL;
       int nWidth = 0;
@@ -226,12 +230,17 @@ namespace mitk
 
       if (SUCCEEDED(hr))
       {
+              MITK_INFO << "AccessUnderlyingBuffer";
         for(int i = 0; i < d->m_DepthCaptureHeight*d->m_DepthCaptureWidth; ++i)
         {
           float depth = static_cast<float>(*pBuffer);
           d->m_Distances[i] = depth;
+          //if( i % 100 == 0 )
+          //  MITK_INFO << "i " << i << " d " <<d->m_Distances[i];
           ++pBuffer;
         }
+        //ShowDebugImage(d->m_Distances);
+
       }
       else
       {
@@ -282,15 +291,14 @@ namespace mitk
             hr = d->m_pColorFrame->CopyConvertedFrameDataToArray(nBufferSize, reinterpret_cast<BYTE*>(pBuffer), ColorImageFormat_Bgra);
             for(int i = 0; i < d->m_BufferSize; i+=3)
             {
+
               d->m_Colors[i+0] = pBuffer->rgbRed;
               d->m_Colors[i+1] = pBuffer->rgbGreen;
               d->m_Colors[i+2] = pBuffer->rgbBlue;
-              //d->m_Colors[i+3] = pBuffer->rgbReserved;
               ++pBuffer;
             }
           }
         }
-
         SafeRelease(pColorFrameDescription);
       }
       else
@@ -311,6 +319,28 @@ namespace mitk
     return true;
   }
 
+  void Kinect2Controller::ShowDebugImage(float* distances)
+  {
+    unsigned int* dim = new unsigned int[2];
+    dim[0] = 512;
+    dim[1] = 424;
+    mitk::Image::Pointer image = mitk::Image::New();
+    image->Initialize(mitk::PixelType(mitk::MakeScalarPixelType<float>()), 2, dim);
+    image->SetSlice(distances);
+
+    mitk::ImageToOpenCVImageFilter::Pointer filter = mitk::ImageToOpenCVImageFilter::New();
+    filter->SetImage(image);
+    cv::Mat cvImage = cv::Mat(filter->GetOpenCVImage(), true);
+    double minVal, maxVal;
+    cv::minMaxLoc(cvImage, &minVal, &maxVal);
+    cv::Mat uCCImage;
+    cvImage.convertTo(uCCImage, CV_8U, 255.0/(maxVal - minVal), -minVal);
+    cv::namedWindow("test", CV_WINDOW_AUTOSIZE);
+    cv::imshow("test", uCCImage);
+    cv::waitKey(10000000);
+  }
+
+
   void Kinect2Controller::GetDistances(float* distances)
   {
     memcpy(distances, d->m_Distances, sizeof(float)*512*424);
@@ -323,7 +353,8 @@ namespace mitk
 
   void Kinect2Controller::GetAllData(float* distances, float* amplitudes, unsigned char* rgb)
   {
-    //this->GetDistances(distances);
+    this->GetDistances(distances);
+    this->GetRgb(rgb);
   }
 
   void Kinect2Controller::GetAmplitudes( float* amplitudes )

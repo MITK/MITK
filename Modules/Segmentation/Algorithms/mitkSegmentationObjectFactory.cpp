@@ -35,7 +35,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLabelSetImageIOFactory.h"
 
 mitk::SegmentationObjectFactory::SegmentationObjectFactory()
-:CoreObjectFactoryBase()
+  : CoreObjectFactoryBase()
+  , m_LabelSetImageIOFactory(mitk::LabelSetImageIOFactory::New().GetPointer())
+  , m_LabelSetImageWriterFactory(mitk::LabelSetImageWriterFactory::New().GetPointer())
 {
   static bool alreadyDone = false;
   if (!alreadyDone)

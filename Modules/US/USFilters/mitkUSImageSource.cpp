@@ -17,14 +17,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSImageSource.h"
 
 mitk::USImageSource::USImageSource()
-  : m_OpenCVToMitkFilter(mitk::OpenCVToMitkImageFilter::New()),
-  m_MitkToOpenCVFilter(0)
+: m_OpenCVToMitkFilter(mitk::OpenCVToMitkImageFilter::New()),
+  m_MitkToOpenCVFilter(0),
+  m_ImageFilter(mitk::BasicCombinationOpenCVImageFilter::New())
 {
   m_OpenCVToMitkFilter->SetCopyBuffer(false);
 }
 
 mitk::USImageSource::~USImageSource()
 {
+}
+
+void mitk::USImageSource::PushFilter(AbstractOpenCVImageFilter::Pointer filter)
+{
+  m_ImageFilter->PushFilter(filter);
+}
+
+bool mitk::USImageSource::RemoveFilter(AbstractOpenCVImageFilter::Pointer filter)
+{
+  return m_ImageFilter->RemoveFilter(filter);
 }
 
 mitk::Image::Pointer mitk::USImageSource::GetNextImage()

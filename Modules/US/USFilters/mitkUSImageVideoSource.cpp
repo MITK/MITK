@@ -34,10 +34,8 @@ mitk::USImageVideoSource::USImageVideoSource()
   m_ResolutionOverrideHeight(0),
   m_ResolutionOverride(false),
   m_GrayscaleFilter(mitk::ConvertGrayscaleOpenCVImageFilter::New()),
-  m_CropFilter(mitk::CropOpenCVImageFilter::New()),
-  m_CombinationFilter(mitk::BasicCombinationOpenCVImageFilter::New())
+  m_CropFilter(mitk::CropOpenCVImageFilter::New())
 {
-  SetImageFilter(m_CombinationFilter.GetPointer());
 }
 
 mitk::USImageVideoSource::~USImageVideoSource()
@@ -81,11 +79,11 @@ void mitk::USImageVideoSource::SetCameraInput(int deviceID)
 void mitk::USImageVideoSource::SetColorOutput(bool isColor){
   if ( ! isColor && ! m_IsGreyscale )
   {
-    m_CombinationFilter->PushFilter(m_GrayscaleFilter.GetPointer());
+    this->PushFilter(m_GrayscaleFilter.GetPointer());
   }
   else if ( isColor && m_IsGreyscale )
   {
-    m_CombinationFilter->RemoveFilter(m_GrayscaleFilter.GetPointer());
+    this->RemoveFilter(m_GrayscaleFilter.GetPointer());
   }
 
   m_IsGreyscale = !isColor;
@@ -116,7 +114,7 @@ void mitk::USImageVideoSource::SetRegionOfInterest(int topLeftX, int topLeftY, i
 
   if (! m_IsCropped && ! m_CropFilter->GetIsCropRegionEmpty())
   {
-    m_CombinationFilter->PushFilter(m_CropFilter.GetPointer());
+    this->PushFilter(m_CropFilter.GetPointer());
     m_IsCropped = true;
   }
 }
@@ -172,7 +170,7 @@ mitk::USImageVideoSource::USImageRoi  mitk::USImageVideoSource::GetRegionOfInter
 
 void mitk::USImageVideoSource::RemoveRegionOfInterest()
 {
-  m_CombinationFilter->RemoveFilter(m_CropFilter.GetPointer());
+  this->RemoveFilter(m_CropFilter.GetPointer());
   m_IsCropped = false;
 }
 

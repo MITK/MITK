@@ -181,6 +181,9 @@ namespace mitk {
     */
     virtual bool GetIsFreezed();
 
+    void PushFilter(AbstractOpenCVImageFilter::Pointer filter);
+    bool RemoveFilter(AbstractOpenCVImageFilter::Pointer filter);
+
     /**
     * \brief Given property is updated in the device micro service.
     * This method is mainly for being used by the control interface

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <MitkUSExports.h>
 #include <mitkCommon.h>
-#include "mitkAbstractOpenCVImageFilter.h"
+#include "mitkBasicCombinationOpenCVImageFilter.h"
 #include "mitkOpenCVToMitkImageFilter.h"
 #include "mitkImageToOpenCVImageFilter.h"
 
@@ -46,7 +46,9 @@ namespace mitk {
     mitkClassMacro(USImageSource, itk::Object);
 
     itkGetMacro(ImageFilter, mitk::AbstractOpenCVImageFilter::Pointer);
-    itkSetMacro(ImageFilter, mitk::AbstractOpenCVImageFilter::Pointer);
+
+    void PushFilter(AbstractOpenCVImageFilter::Pointer filter);
+    bool RemoveFilter(AbstractOpenCVImageFilter::Pointer filter);
 
     /**
     * \brief Retrieves the next frame. This will typically be the next frame
@@ -77,10 +79,6 @@ namespace mitk {
     virtual void GetNextRawImage( mitk::Image::Pointer& ) = 0;
 
     /**
-    * \brief Filter is executed during mitk::USImageVideoSource::GetNextImage().
-    */
-    AbstractOpenCVImageFilter::Pointer m_ImageFilter;
-    /**
     * \brief Used to convert from OpenCV Images to MITK Images.
     */
     mitk::OpenCVToMitkImageFilter::Pointer m_OpenCVToMitkFilter;
@@ -88,6 +86,12 @@ namespace mitk {
     * \brief Used to convert from MITK Images to OpenCV Images.
     */
     mitk::ImageToOpenCVImageFilter::Pointer m_MitkToOpenCVFilter;
+
+  private:
+        /**
+    * \brief Filter is executed during mitk::USImageVideoSource::GetNextImage().
+    */
+    BasicCombinationOpenCVImageFilter::Pointer m_ImageFilter;
   };
 } // namespace mitk
 #endif /* MITKUSImageSource_H_HEADER_INCLUDED_ */

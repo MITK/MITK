@@ -322,6 +322,30 @@ bool mitk::USDevice::GetIsFreezed()
   return m_IsFreezed;
 }
 
+void mitk::USDevice::PushFilter(AbstractOpenCVImageFilter::Pointer filter)
+{
+  mitk::USImageSource::Pointer imageSource = this->GetUSImageSource();
+  if ( imageSource.IsNull() )
+  {
+    MITK_ERROR << "ImageSource must not be null when pushing a filter.";
+    mitkThrow() << "ImageSource must not be null when pushing a filter.";
+  }
+
+  imageSource->PushFilter(filter);
+}
+
+bool mitk::USDevice::RemoveFilter(AbstractOpenCVImageFilter::Pointer filter)
+{
+  mitk::USImageSource::Pointer imageSource = this->GetUSImageSource();
+  if ( imageSource.IsNull() )
+  {
+    MITK_ERROR << "ImageSource must not be null when pushing a filter.";
+    mitkThrow() << "ImageSource must not be null when removing a filter.";
+  }
+
+  return imageSource->RemoveFilter(filter);
+}
+
 void mitk::USDevice::UpdateServiceProperty(std::string key, std::string value)
 {
   m_ServiceProperties[ key ] = value;
@@ -430,7 +454,8 @@ void mitk::USDevice::GenerateData()
 
   mitk::Image::Pointer output = this->GetOutput();
 
-  if ( ! output->IsInitialized() )
+  if ( ! output->IsInitialized()
+    || output->GetDimension(0) != m_Image->GetDimension(0) || output->GetDimension(1) != m_Image->GetDimension(1) )
   {
     output->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
   }

@@ -213,7 +213,6 @@ namespace mitk {
 
     ConvertGrayscaleOpenCVImageFilter::Pointer  m_GrayscaleFilter;
     CropOpenCVImageFilter::Pointer              m_CropFilter;
-    BasicCombinationOpenCVImageFilter::Pointer  m_CombinationFilter;
   };
 } // namespace mitk
 #endif /* MITKUSImageVideoSource_H_HEADER_INCLUDED_ */

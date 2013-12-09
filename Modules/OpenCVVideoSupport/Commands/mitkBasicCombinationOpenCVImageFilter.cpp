@@ -19,12 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "cv.h"
 
 namespace mitk {
-
 bool BasicCombinationOpenCVImageFilter::FilterImage( cv::Mat& image )
 {
   // go through the list of all filters
   for ( std::vector<AbstractOpenCVImageFilter::Pointer>::iterator it
-        = m_FilterList.begin(); it != m_FilterList.end(); it++ )
+        = m_FilterList.begin(); it != m_FilterList.end(); ++it )
   {
     // apply current filter and return false if the filter returned false
     if (! (*it)->FilterImage(image) ) { return false; }
@@ -59,4 +58,8 @@ bool BasicCombinationOpenCVImageFilter::RemoveFilter( AbstractOpenCVImageFilter:
   return false;
 }
 
+bool BasicCombinationOpenCVImageFilter::GetIsEmpty()
+{
+  return m_FilterList.empty();
+}
 } // namespace mitk

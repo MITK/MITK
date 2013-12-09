@@ -23,10 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObjectFactory.h"
 
 namespace mitk {
-
 class MITK_OPENCVVIDEOSUPPORT_EXPORT BasicCombinationOpenCVImageFilter : public AbstractOpenCVImageFilter
 {
-
 public:
   mitkClassMacro(BasicCombinationOpenCVImageFilter, AbstractOpenCVImageFilter);
   itkNewMacro(Self);
@@ -53,13 +51,14 @@ public:
     */
   bool RemoveFilter( AbstractOpenCVImageFilter::Pointer filter );
 
+  bool GetIsEmpty();
+
 protected:
   /**
     * \brief All filters applied to the given image during call of mitk::mitkBasicCombinationOpenCVImageFilter::FilterImage().
     */
   std::vector<AbstractOpenCVImageFilter::Pointer> m_FilterList;
 };
-
 } // namespace mitk
 
 #endif // mitkBasicCombinationOpenCVImageFilter_h

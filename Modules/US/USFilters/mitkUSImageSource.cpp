@@ -42,22 +42,25 @@ mitk::Image::Pointer mitk::USImageSource::GetNextImage()
 {
   mitk::Image::Pointer result;
 
-  if ( m_ImageFilter.IsNotNull() )
+  if ( m_ImageFilter.IsNotNull() && ! m_ImageFilter->GetIsEmpty() )
   {
     cv::Mat image;
     this->GetNextRawImage(image);
 
-    // execute filter if a filter is specified
-    if ( m_ImageFilter.IsNotNull() ) { m_ImageFilter->FilterImage(image); }
+    //if ( ! image.empty() )
+    //{
+      // execute filter if a filter is specified
+      if ( m_ImageFilter.IsNotNull() ) { m_ImageFilter->FilterImage(image); }
 
-    // convert to MITK image
-    IplImage ipl_img = image;
+      // convert to MITK image
+      IplImage ipl_img = image;
 
-    this->m_OpenCVToMitkFilter->SetOpenCVImage(&ipl_img);
-    this->m_OpenCVToMitkFilter->Update();
+      this->m_OpenCVToMitkFilter->SetOpenCVImage(&ipl_img);
+      this->m_OpenCVToMitkFilter->Update();
 
-    // OpenCVToMitkImageFilter returns a standard mitk::image.
-    result = this->m_OpenCVToMitkFilter->GetOutput();
+      // OpenCVToMitkImageFilter returns a standard mitk::image.
+      result = this->m_OpenCVToMitkFilter->GetOutput();
+    //}
 
     // clean up
     image.release();
@@ -68,7 +71,7 @@ mitk::Image::Pointer mitk::USImageSource::GetNextImage()
     this->GetNextRawImage(result);
   }
 
-  if ( result )
+  if ( result.IsNotNull() )
   {
     // Everything as expected, return result
     return result;

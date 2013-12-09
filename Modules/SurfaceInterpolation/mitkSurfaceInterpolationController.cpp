@@ -91,7 +91,7 @@ void mitk::SurfaceInterpolationController::AddNewContour(mitk::ContourModel::Poi
 
   for (unsigned int i=0; i < m_MapOfContourLists[m_ActiveLabel].size(); i++)
   {
-      itk::Matrix<ScalarType> diffM = transform->GetMatrix()-m_MapOfContourLists[m_SelectedSegmentation].at(i).position->GetTransform()->GetMatrix();
+      itk::Matrix<ScalarType> diffM = transform->GetMatrix()-m_MapOfContourLists[m_ActiveLabel].at(i).second->GetTransform()->GetMatrix();
       bool isSameMatrix(true);
       for (unsigned int j = 0; j < 3; j++)
       {
@@ -135,7 +135,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
 
   m_InterpolateSurfaceFilter->Reset();
 
-  // update the filter and get teh resulting distance-image
+  // update the filter and get the resulting distance-image
   m_InterpolateSurfaceFilter->Update();
   Image::Pointer distanceImage = m_InterpolateSurfaceFilter->GetOutput();
 
@@ -186,17 +186,6 @@ void mitk::SurfaceInterpolationController::Interpolate()
   polyDataAppender->Update();
   m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());
 
-
-  m_InterpolateSurfaceFilter->Update();
-
-  Image::Pointer distanceImage = m_InterpolateSurfaceFilter->GetOutput();
-
-  // create a surface from the distance-image
-  mitk::ImageToSurfaceFilter::Pointer imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
-  imageToSurfaceFilter->SetInput( distanceImage );
-  imageToSurfaceFilter->SetThreshold( 0 );
-  imageToSurfaceFilter->Update();
-  m_InterpolationResult = imageToSurfaceFilter->GetOutput();
   m_InterpolationResult->DisconnectPipeline();
 }
 

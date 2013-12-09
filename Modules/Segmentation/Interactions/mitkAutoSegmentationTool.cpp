@@ -205,6 +205,8 @@ void mitk::AutoSegmentationTool::Deactivated()
 
 void mitk::AutoSegmentationTool::CreateNewLabel(const std::string& name, const mitk::Color& color)
 {
+  if ( m_PreviewImage.IsNull() ) return;
+
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   assert(workingNode);
 

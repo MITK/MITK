@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPropertyFilters.h>
 #include <mitkIOUtil.h>
 
+#include <usModuleInitialization.h>
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 #include <usModuleSettings.h>
@@ -205,3 +206,8 @@ void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
 
 US_EXPORT_MODULE_ACTIVATOR(Mitk, MitkCoreActivator)
 
+// Call CppMicroservices initialization code at the end of the file.
+// This especially ensures that VTK object factories have already
+// been registered (VTK initialization code is injected by implicitly
+// include VTK header files at the top of this file).
+US_INITIALIZE_MODULE("Mitk", "Mitk")

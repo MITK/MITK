@@ -65,8 +65,6 @@ m_WorkingNode(NULL),
 m_ToolManager(NULL),
 m_MouseCursorSet(false)
 {
-//  RegisterSegmentationObjectFactory();
-
   m_SegmentationPredicate = mitk::NodePredicateAnd::New();
   m_SegmentationPredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
   m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
@@ -105,6 +103,7 @@ QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
 {
   m_ToolManager->ActivateTool(-1);
 /*
+  todo: check this
   m_Controls.m_SliceBasedInterpolator->EnableInterpolation(false);
   ctkPluginContext* context = mitk::PluginActivator::getContext();
   ctkServiceReference ppmRef = context->getServiceReference<mitk::PlanePositionManagerService>();
@@ -120,11 +119,31 @@ void QmitkMultiLabelSegmentationView::InitializeListeners()
 {
   if (m_Interactor.IsNull())
   {
+    /*
     us::ModuleContext* moduleContext = us::GetModuleContext();
     m_Interactor = mitk::SegmentationInteractor::New();
     m_Interactor->LoadStateMachine( "SegmentationInteraction.xml", moduleContext->GetModule());
     m_Interactor->SetEventConfig ( "ConfigSegmentation.xml", moduleContext->GetModule());
     us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>( m_Interactor.GetPointer(), us::ServiceProperties() );
+    */
+    us::Module* module = us::GetModuleContext()->GetModule();
+    std::vector<us::ModuleResource> resources = module->FindResources("/", "*", true);
+    MITK_INFO << "number of resources found: " << resources.size();
+    for (std::vector<us::ModuleResource>::iterator iter = resources.begin(); iter != resources.end(); ++iter)
+    {
+      MITK_INFO << iter->GetResourcePath();
+    }
+
+    m_Interactor = mitk::SegmentationInteractor::New();
+    if (!m_Interactor->LoadStateMachine("SegmentationInteraction.xml", module))
+    {
+      MITK_WARN << "Error loading state machine";
+    }
+
+    if (!m_Interactor->SetEventConfig ("ConfigSegmentation.xml", module))
+    {
+      MITK_WARN << "Error loading state machine configuration";
+    }
   }
 }
 
@@ -210,7 +229,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 //    m_Controls.m_LabelSetWidget->SetRenderWindowPart(this->m_IRenderWindowPart);
   }
 
-  this->InitializeListeners();
+//  this->InitializeListeners();
 
 }
 

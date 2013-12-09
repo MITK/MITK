@@ -98,8 +98,8 @@ protected:
 
   virtual void GenerateData();
 
-  template < typename TPixel, unsigned int VImageDimension >
-  void InternalComputeMask(itk::Image<TPixel, VImageDimension>* itkImage);
+  template <typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>
+  void InternalComputeMask( itk::Image<TPixel1, VDimension1>* referenceImage, const itk::Image<TPixel2, VDimension2>* maskImage );
 
   mitk::Image::Pointer m_Mask;
   mitk::ImageTimeSelector::Pointer m_InputTimeSelector;

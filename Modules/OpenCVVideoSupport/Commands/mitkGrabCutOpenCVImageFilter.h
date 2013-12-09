@@ -53,16 +53,27 @@ public:
   void SetModelPoints(ModelPointsList foregroundPoints);
   void SetModelPoints(ModelPointsList foregroundPoints, ModelPointsList backgroundPoints);
 
+  void SetModelPointsDilationSize(unsigned int modelPointsDilationSize);
+
+  void SetUseOnlyRegionAroundModelPoints(unsigned int additionalWidth);
+  void SetUseFullImage();
+
   unsigned int GetResultCount();
   cv::Mat GetResultMask();
 
 protected:
   cv::Mat GetMaskFromPointSets();
+  cv::Rect GetBoundingRectFromMask(cv::Mat mask);
   cv::Mat RunSegmentation(cv::Mat input, cv::Mat mask);
 
   bool                         m_PointSetsChanged;
   bool                         m_InputImageChanged;
   bool                         m_NewResultReady;
+
+  unsigned int                 m_ModelPointsDilationSize;
+
+  bool                         m_UseOnlyRegionAroundModelPoints;
+  unsigned int                 m_AdditionalWidth;
 
   ModelPointsList              m_ForegroundPoints;
   ModelPointsList              m_BackgroundPoints;

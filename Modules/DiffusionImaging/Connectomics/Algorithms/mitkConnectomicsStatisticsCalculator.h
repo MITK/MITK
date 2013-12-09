@@ -112,6 +112,7 @@ namespace mitk
     itkGetMacro( NormalizedLaplacianNumberOf0s, unsigned int );
     itkGetMacro( NormalizedLaplacianLowerSlope, double );
     itkGetMacro( NormalizedLaplacianUpperSlope, double );
+    itkGetMacro( SmallWorldness, double );
 
     void Update();
 
@@ -152,6 +153,14 @@ namespace mitk
     void CalculateLaplacianMetrics();
 
     void CalculateNormalizedLaplacianMetrics();
+
+    /**
+     * \brief Calculate the small worldness of the network.
+     *
+     * This will compare the clustering coefficient and mean path length of the network
+     * to an Erdos-Reny network of the same number of nodes and edges.
+     */
+    void CalculateSmallWorldness();
 
     /////////////////////// Variables ////////////////////////
 
@@ -215,6 +224,7 @@ namespace mitk
     unsigned int m_NormalizedLaplacianNumberOf0s;
     double m_NormalizedLaplacianLowerSlope;
     double m_NormalizedLaplacianUpperSlope;
+    double m_SmallWorldness;
   };
 
 }// end namespace mitk

@@ -21,10 +21,13 @@
 
 #include "usUtils_p.h"
 
+#include "usLog_p.h"
 #include "usModuleInfo.h"
 #include "usModuleSettings.h"
 
 #include <cstdio>
+#include <cctype>
+#include <algorithm>
 
 #ifdef US_PLATFORM_POSIX
   #include <errno.h>
@@ -45,7 +48,6 @@
 //-------------------------------------------------------------------
 
 namespace {
-
 #if !defined(US_PLATFORM_LINUX)
 std::string library_suffix()
 {
@@ -88,7 +90,6 @@ bool load_impl(const std::string&) { return false; }
   #endif
 
 #endif
-
 }
 
 US_BEGIN_NAMESPACE
@@ -105,7 +106,16 @@ void AutoLoadModulesFromPath(const std::string& absoluteBasePath, const std::str
     std::size_t indexOfLastSeparator = absoluteBasePath.find_last_of(DIR_SEP);
     if (indexOfLastSeparator != -1)
     {
-      if (absoluteBasePath.substr(indexOfLastSeparator+1) == CMAKE_INTDIR)
+      std::string intermediateDir = absoluteBasePath.substr(indexOfLastSeparator+1);
+      bool equalSubDir = intermediateDir.size() == std::strlen(CMAKE_INTDIR);
+      for (std::size_t i = 0; equalSubDir && i < intermediateDir.size(); ++i)
+      {
+        if (std::tolower(intermediateDir[i]) != std::tolower(CMAKE_INTDIR[i]))
+        {
+          equalSubDir = false;
+        }
+      }
+      if (equalSubDir)
       {
         loadPath = absoluteBasePath.substr(0, indexOfLastSeparator+1) + subDir + DIR_SEP + CMAKE_INTDIR;
         dir = opendir(loadPath.c_str());

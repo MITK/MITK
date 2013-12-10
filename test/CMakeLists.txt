@@ -26,6 +26,7 @@ set(_tests
   usModuleTest
   usModuleResourceTest
   usServiceFactoryTest
+  usServiceHooksTest
   usServiceRegistryPerformanceTest
   usServiceRegistryTest
   usServiceTemplateTest
@@ -35,7 +36,12 @@ set(_tests
 )
 
 if(US_BUILD_SHARED_LIBS)
-  list(APPEND _tests usServiceListenerTest usModuleManifestTest usSharedLibraryTest)
+  list(APPEND _tests
+       usModuleHooksTest
+       usModuleManifestTest
+       usServiceListenerTest
+       usSharedLibraryTest
+      )
   if(US_ENABLE_AUTOLOADING_SUPPORT)
     list(APPEND _tests usModuleAutoLoadTest)
   endif()

@@ -23,8 +23,17 @@
 #include "mitkStateMachineState.h"
 
 mitk::EventStateMachine::EventStateMachine() :
-    m_StateMachineContainer(NULL), m_CurrentState(NULL)
+  m_StateMachineContainer(NULL), m_CurrentState(NULL), m_UndoController(NULL)
 {
+  if (!m_UndoController)
+  {
+    m_UndoController = new UndoController(UndoController::VERBOSE_LIMITEDLINEARUNDO);//switch to LLU or add LLU
+
+    /**
+    * here the Undo mechanism is enabled / disabled for all interactors.
+    **/
+    m_UndoEnabled = true;
+  }
 }
 
 bool mitk::EventStateMachine::LoadStateMachine(const std::string& filename, const us::Module* module)
@@ -115,6 +124,9 @@ void mitk::EventStateMachine::AddConditionFunction(const std::string& condition,
 
 bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dataNode)
 {
+  if (!m_IsActive)
+    return false;
+
   if (!FilterEvents(event, dataNode))
   {
     return false;

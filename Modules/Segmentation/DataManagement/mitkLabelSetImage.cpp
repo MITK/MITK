@@ -603,6 +603,12 @@ int mitk::LabelSetImage::GetActiveLabelIndex(int layer) const
   return m_LabelSetContainer[layer]->GetActiveLabel()->GetIndex();
 }
 
+const char* mitk::LabelSetImage::GetActiveLabelName(int layer) const
+{
+  if (layer < 0) layer = m_ActiveLayer;
+  return m_LabelSetContainer[layer]->GetActiveLabel()->GetName();
+}
+
 const mitk::Color& mitk::LabelSetImage::GetActiveLabelColor(int layer) const
 {
   if (layer < 0) layer = m_ActiveLayer;

@@ -243,6 +243,10 @@ public:
     * \brief  */
   const mitk::Color& GetActiveLabelColor(int layer = -1) const;
 
+  /**
+    * \brief  */
+  const char* GetActiveLabelName(int layer = -1) const;
+
    /**
     * \brief  */
   double GetActiveLabelOpacity(int layer = -1) const;

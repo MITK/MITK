@@ -206,6 +206,8 @@ void mitk::LabelSet::RemoveLabels(int begin, int count)
 
 void mitk::LabelSet::AddLabel(const mitk::Label& label )
 {
+  if (m_LabelContainer.size() > 255) return;
+
   mitk::Label::Pointer newLabel = mitk::Label::New();
   newLabel->SetColor( label.GetColor() );
   newLabel->SetExterior( label.GetExterior() );
@@ -231,6 +233,8 @@ void mitk::LabelSet::AddLabel(const mitk::Label& label )
 
 void mitk::LabelSet::AddLabel(const std::string& name, const mitk::Color& color )
 {
+  if (m_LabelContainer.size() > 255) return;
+
   mitk::Label::Pointer newLabel = mitk::Label::New();
   newLabel->SetName(name);
   newLabel->SetColor(color);

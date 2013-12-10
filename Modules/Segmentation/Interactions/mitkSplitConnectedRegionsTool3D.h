@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLabelSetImage.h"
 #include "mitkToolCommand.h"
 #include "mitkStateEvent.h"
+#include "mitkColorSequenceRainbow.h"
 
 #include "itkImage.h"
 
@@ -67,11 +68,13 @@ class Segmentation_EXPORT SplitConnectedRegionsTool3D : public AutoSegmentationT
 
     int m_NumberOfConnectedRegionsToKeep;
 
-    template < typename TPixel, unsigned int VDimension >
-    void InternalProcessing( itk::Image< TPixel, VDimension>* input );
+    mitk::ColorSequenceRainbow::Pointer m_ColorSequenceRainbow;
 
     template < typename TPixel, unsigned int VDimension >
-    void InternalAcceptPreview( itk::Image< TPixel, VDimension>* input );
+    void InternalProcessing( itk::Image<TPixel, VDimension>* input );
+
+    template < typename ImageType >
+    void InternalAcceptPreview( ImageType* targetImage, const mitk::Image* sourceImage );
 };
 
 } // namespace

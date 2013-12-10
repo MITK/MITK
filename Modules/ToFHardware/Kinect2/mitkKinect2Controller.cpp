@@ -23,11 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 template<class Interface>
 inline void SafeRelease(Interface *& pInterfaceToRelease)
 {
-    if (pInterfaceToRelease != NULL)
-    {
-        pInterfaceToRelease->Release();
-        pInterfaceToRelease = NULL;
-    }
+  if (pInterfaceToRelease != NULL)
+  {
+    pInterfaceToRelease->Release();
+    pInterfaceToRelease = NULL;
+  }
 }
 
 namespace mitk
@@ -41,10 +41,15 @@ namespace mitk
     bool ErrorText(unsigned int error);
     // Depth reader
     IKinectSensor* m_pKinectSensor;
-    IDepthFrameReader* m_pDepthFrameReader;
-    IColorFrameReader* m_pColorFrameReader;
+    IMultiSourceFrameReader*m_pMultiSourceFrameReader;
+    //IDepthFrameReader* m_pDepthFrameReader;
+    //IColorFrameReader* m_pColorFrameReader;
     IDepthFrame* m_pDepthFrame;
     IColorFrame* m_pColorFrame;
+    ICoordinateMapper* m_pCoordinateMapper;
+    //ColorSpacePoint*        m_pColorCoordinates;
+
+
     RGBQUAD* m_pColorRGBX;
 
     bool m_ConnectionCheck; ///< check if camera is connected or not
@@ -63,10 +68,12 @@ namespace mitk
 
   Kinect2Controller::Kinect2ControllerPrivate::Kinect2ControllerPrivate():
     m_pKinectSensor(NULL),
-    m_pDepthFrameReader(NULL),
-    m_pColorFrameReader(NULL),
+    //m_pDepthFrameReader(NULL),
+    //m_pColorFrameReader(NULL),
+    m_pMultiSourceFrameReader(NULL),
     m_pDepthFrame(NULL),
     m_pColorFrame(NULL),
+    m_pCoordinateMapper(NULL),
     m_pColorRGBX(NULL),
     m_ConnectionCheck(false),
     m_UseIR(false),
@@ -118,34 +125,19 @@ namespace mitk
 
       if (d->m_pKinectSensor)
       {
-        // Initialize the Kinect and get the depth and color reader
-        IDepthFrameSource* pDepthFrameSource = NULL;
-        IColorFrameSource* pColorFrameSource = NULL;
+        if (SUCCEEDED(hr))
+        {
+          hr = d->m_pKinectSensor->get_CoordinateMapper(&d->m_pCoordinateMapper);
+        }
 
         hr = d->m_pKinectSensor->Open();
 
         if (SUCCEEDED(hr))
         {
-          hr = d->m_pKinectSensor->get_DepthFrameSource(&pDepthFrameSource);
+          hr = d->m_pKinectSensor->OpenMultiSourceFrameReader(
+            FrameSourceTypes::FrameSourceTypes_Depth | FrameSourceTypes::FrameSourceTypes_Color | FrameSourceTypes::FrameSourceTypes_Infrared,
+            &d->m_pMultiSourceFrameReader);
         }
-
-        if (SUCCEEDED(hr))
-        {
-          hr = pDepthFrameSource->OpenReader(&d->m_pDepthFrameReader);
-        }
-
-        if (SUCCEEDED(hr))
-        {
-          hr = d->m_pKinectSensor->get_ColorFrameSource(&pColorFrameSource);
-        }
-
-        if (SUCCEEDED(hr))
-        {
-          hr = pColorFrameSource->OpenReader(&d->m_pColorFrameReader);
-        }
-
-        SafeRelease(pColorFrameSource);
-        SafeRelease(pDepthFrameSource);
       }
 
       if (!d->m_pKinectSensor || FAILED(hr))
@@ -155,7 +147,7 @@ namespace mitk
       }
       d->m_ConnectionCheck = true;
     }
-    if((d->m_ConnectionCheck) && (d->m_pDepthFrameReader) && (d->m_pColorFrameReader))
+    if((d->m_ConnectionCheck) && (d->m_pMultiSourceFrameReader))
     {
       MITK_INFO << "Kinect 2 succesfully connected";
     }
@@ -166,7 +158,7 @@ namespace mitk
   {
     // done with depth frame reader
     MITK_INFO << "CloseConnection";
-    SafeRelease(d->m_pDepthFrameReader);
+    SafeRelease(d->m_pMultiSourceFrameReader);
 
     // close the Kinect Sensor
     if(d->m_pKinectSensor)
@@ -182,145 +174,115 @@ namespace mitk
   bool Kinect2Controller::UpdateCamera()
   {
     MITK_INFO << "UpdateCamera";
-    if (!d->m_pDepthFrameReader)
+    if (!d->m_pMultiSourceFrameReader)
     {
-      MITK_ERROR << "UpdateCamera: No DepthFrameReader";
+      MITK_ERROR << "MultiSourceFrameReader not initialized!";
       return false;
     }
-    if (!d->m_pColorFrameReader)
-    {
-      MITK_ERROR << "UpdateCamera: No ColorFrameReader";
-      return false;
-    }
-    d->m_pDepthFrame = NULL;
 
-    HRESULT hr = d->m_pDepthFrameReader->AcquireLatestFrame(&d->m_pDepthFrame);
+    IMultiSourceFrame* pMultiSourceFrame = NULL;
+    IDepthFrame* pDepthFrame = NULL;
+    IColorFrame* pColorFrame = NULL;
+
+    HRESULT hr = d->m_pMultiSourceFrameReader->AcquireLatestFrame(&pMultiSourceFrame);
 
     if (SUCCEEDED(hr))
     {
-      MITK_INFO << "AcquireLatestFrame";
-      INT64 nTime = 0;
-      IFrameDescription* pFrameDescription = NULL;
-      int nWidth = 0;
-      int nHeight = 0;
-      USHORT nDepthMinReliableDistance = 0;
-      USHORT nDepthMaxReliableDistance = 0;
-      UINT nBufferSize = 0;
-      UINT16 *pBuffer = NULL;
+      IDepthFrameReference* pDepthFrameReference = NULL;
 
-      hr = d->m_pDepthFrame->get_RelativeTime(&nTime);
+      hr = pMultiSourceFrame->get_DepthFrameReference(&pDepthFrameReference);
+      if (SUCCEEDED(hr))
+      {
+        hr = pDepthFrameReference->AcquireFrame(&pDepthFrame);
+      }
+
+      SafeRelease(pDepthFrameReference);
+    }
+
+    if (SUCCEEDED(hr))
+    {
+      IColorFrameReference* pColorFrameReference = NULL;
+
+      hr = pMultiSourceFrame->get_ColorFrameReference(&pColorFrameReference);
+      if (SUCCEEDED(hr))
+      {
+        hr = pColorFrameReference->AcquireFrame(&pColorFrame);
+      }
+
+      SafeRelease(pColorFrameReference);
+    }
+
+    if (SUCCEEDED(hr))
+    {
+      UINT nDepthBufferSize = 0;
+      UINT16 *pDepthBuffer = NULL;
+
+      ColorImageFormat imageFormat = ColorImageFormat_None;
+      UINT nColorBufferSize = 0;
+      RGBQUAD *pColorBuffer = NULL;
 
       if (SUCCEEDED(hr))
       {
-        hr = d->m_pDepthFrame->get_FrameDescription(&pFrameDescription);
+        hr = pDepthFrame->AccessUnderlyingBuffer(&nDepthBufferSize, &pDepthBuffer);
       }
-
-      if (SUCCEEDED(hr))
-      {
-        hr = pFrameDescription->get_Width(&nWidth);
-      }
-
-      if (SUCCEEDED(hr))
-      {
-        hr = pFrameDescription->get_Height(&nHeight);
-      }
-
-      if (SUCCEEDED(hr))
-      {
-        hr = d->m_pDepthFrame->get_DepthMinReliableDistance(&nDepthMinReliableDistance);
-      }
-
-      if (SUCCEEDED(hr))
-      {
-        hr = d->m_pDepthFrame->get_DepthMaxReliableDistance(&nDepthMaxReliableDistance);
-      }
-
-      hr = d->m_pDepthFrame->AccessUnderlyingBuffer(&nBufferSize, &pBuffer);
-
       if (SUCCEEDED(hr))
       {
         MITK_INFO << "AccessUnderlyingBuffer";
         for(int i = 0; i < d->m_DepthCaptureHeight*d->m_DepthCaptureWidth; ++i)
         {
-          float depth = static_cast<float>(*pBuffer);
+          float depth = static_cast<float>(*pDepthBuffer);
           d->m_Distances[i] = depth;
-          ++pBuffer;
+          ++pDepthBuffer;
         }
       }
       else
       {
         MITK_ERROR << "AccessUnderlyingBuffer";
       }
-      SafeRelease(pFrameDescription);
 
-      //color
-      hr = d->m_pColorFrameReader->AcquireLatestFrame(&d->m_pColorFrame);
+      // get color frame data
       if (SUCCEEDED(hr))
       {
-        INT64 nTime = 0;
-        IFrameDescription* pColorFrameDescription = NULL;
-        int nColorWidth = 0;
-        int nColorHeight = 0;
-        ColorImageFormat imageFormat = ColorImageFormat_None;
-        UINT nBufferSize = 0;
-        RGBQUAD *pBuffer = NULL;
-
-        hr = d->m_pColorFrame->get_RelativeTime(&nTime);
-
-        if (SUCCEEDED(hr))
-        {
-          hr = d->m_pColorFrame->get_FrameDescription(&pColorFrameDescription);
-        }
-
-        if (SUCCEEDED(hr))
-        {
-          hr = pColorFrameDescription->get_Width(&nColorWidth);
-        }
-
-        if (SUCCEEDED(hr))
-        {
-          hr = pColorFrameDescription->get_Height(&nColorHeight);
-        }
-
-        if (SUCCEEDED(hr))
-        {
-          hr = d->m_pColorFrame->get_RawColorImageFormat(&imageFormat);
-          if (imageFormat == ColorImageFormat_Bgra)
-          {
-            MITK_INFO << "Format ist ColorImageFormat_Bgra";
-          }
-          if (d->m_pColorRGBX)
-          {
-            pBuffer = d->m_pColorRGBX;
-            nBufferSize = d->m_RGBCaptureWidth * d->m_RGBCaptureHeight * sizeof(RGBQUAD);
-            hr = d->m_pColorFrame->CopyConvertedFrameDataToArray(nBufferSize, reinterpret_cast<BYTE*>(pBuffer), ColorImageFormat_Bgra);
-            for(int i = 0; i < d->m_BufferSize; i+=3)
-            {
-
-              d->m_Colors[i+0] = pBuffer->rgbRed;
-              d->m_Colors[i+1] = pBuffer->rgbGreen;
-              d->m_Colors[i+2] = pBuffer->rgbBlue;
-              ++pBuffer;
-            }
-          }
-        }
-        SafeRelease(pColorFrameDescription);
+        hr = pColorFrame->get_RawColorImageFormat(&imageFormat);
       }
-      else
+
+      if (SUCCEEDED(hr))
       {
-        MITK_ERROR << "UpdateCamera() alles andere";
-        return false;
+        if (imageFormat == ColorImageFormat_Bgra)
+        {
+          hr = pColorFrame->AccessRawUnderlyingBuffer(&nColorBufferSize, reinterpret_cast<BYTE**>(&pColorBuffer));
+        }
+        else if (d->m_pColorRGBX)
+        {
+          pColorBuffer = d->m_pColorRGBX;
+          nColorBufferSize = d->m_RGBCaptureWidth * d->m_RGBCaptureHeight * sizeof(RGBQUAD);
+          hr = pColorFrame->CopyConvertedFrameDataToArray(nColorBufferSize, reinterpret_cast<BYTE*>(pColorBuffer), ColorImageFormat_Bgra);
+        }
+        else
+        {
+          hr = E_FAIL;
+        }
+        if (SUCCEEDED(hr))
+        {
+          for(int i = 0; i < d->m_BufferSize; i+=3)
+          {
+            //convert from BGR to RGB
+            d->m_Colors[i+0] = pColorBuffer->rgbRed;
+            d->m_Colors[i+1] = pColorBuffer->rgbGreen;
+            d->m_Colors[i+2] = pColorBuffer->rgbBlue;
+            ++pColorBuffer;
+          }
+        }
       }
     }
     else
     {
-      MITK_ERROR << "UpdateCamera() AcquireLatestFrame - Is the 'KinectService' App running in the background? Did you connect the device properly?";
+      MITK_ERROR << "UpdateCamera() AcquireFrame - Is the 'KinectService' App running in the background? Did you connect the device properly?";
       return false;
     }
-
-    SafeRelease(d->m_pDepthFrame);
-    SafeRelease(d->m_pColorFrame);
-
+    SafeRelease(pDepthFrame);
+    SafeRelease(pColorFrame);
+    SafeRelease(pMultiSourceFrame);
     return true;
   }
 

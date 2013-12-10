@@ -32,8 +32,7 @@ public:
   QmitkModuleTableModelPrivate(QmitkModuleTableModel* q, us::ModuleContext* mc)
     : q(q), context(mc)
   {
-    std::vector<us::Module*> m;
-    context->GetModules(m);
+    std::vector<us::Module*> m = context->GetModules();
     for (std::vector<us::Module*>::const_iterator it = m.begin();
          it != m.end(); ++it)
     {

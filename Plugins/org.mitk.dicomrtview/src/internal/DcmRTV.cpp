@@ -89,10 +89,14 @@ void DcmRTV::OnPrescribedDoseChanged(double value)
 
 void DcmRTV::LoadIsoLines()
 {
+//  MITK_INFO << "\a";
   bool result;
   if(m_selectedNode->GetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),result) && result)
   {
     m_selectedNode->SetProperty("shader",mitk::ShaderProperty::New("mitkIsoLineShader"));
+//    m_selectedNode->SetProperty("shader.mitkIsoLineShader.HoleSize", mitk::FloatProperty::New(90.0f));
+//    m_selectedNode->SetProperty("shader.mitkIsoLineShader.CustomISO", mitk::FloatProperty::New(m_Controls.freeBox->value()));
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   else
   {
@@ -120,6 +124,7 @@ void DcmRTV::OnFreeIsoValueChanged(int value)
 {
   if(m_selectedNode.IsNotNull())
   {
+    m_selectedNode->SetProperty("shader.mitkIsoLineShader.CustomISO", mitk::FloatProperty::New(m_Controls.freeBox->value()));
     (*m_freeIsoValues)[0]->SetDoseValue(value/100.0);
     mitk::IsoDoseLevelVectorProperty::Pointer levelVecProp = mitk::IsoDoseLevelVectorProperty::New(m_freeIsoValues);
     m_selectedNode->SetProperty(mitk::rt::Constants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(),levelVecProp);

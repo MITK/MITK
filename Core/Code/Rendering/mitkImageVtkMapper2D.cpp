@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkMitkThickSlicesFilter.h"
 #include "vtkMitkLevelWindowFilter.h"
 #include "vtkNeverTranslucentTexture.h"
+#include "vtkMitkShaderTexture.h"
 
 #include <mitkIShaderRepository.h>
 
@@ -521,6 +522,8 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
 void mitk::ImageVtkMapper2D::ApplyShader( mitk::BaseRenderer* renderer)
 {
   LocalStorage *localStorage = this->GetLocalStorage( renderer );
+
+  localStorage->m_Texture = vtkSmartPointer<vtkMitkShaderTexture>::New().GetPointer();
 
   CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
   itk::TimeStamp timestamp;

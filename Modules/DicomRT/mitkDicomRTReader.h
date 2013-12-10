@@ -56,6 +56,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkGDCMSeriesFileNames.h>
 #include <mitkDicomSeriesReader.h>
 #include <DataStructures/mitkRTConstants.h>
+
+#include <mitkCoreServices.h>
+#include <mitkIShaderRepository.h>
 //######################################################
 
 #include "dcmtk/dcmrt/drtstrct.h"

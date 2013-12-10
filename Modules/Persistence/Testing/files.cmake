@@ -1,0 +1,2 @@
+set(MODULE_TESTS
+)

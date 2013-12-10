@@ -505,16 +505,14 @@ void QmitkToFUtilView::OnUpdateCamera()
       this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction());
     }
     //update pipeline
+    this->m_ToFImageGrabber->Modified();
     this->m_Surface->Update();
   }
   //##### End code for surface #####
   else
   {
     // update pipeline
-    this->m_ToFImageGrabber->GetCameraDevice()->UpdateCamera();
     this->m_ToFImageGrabber->Modified();
-    this->m_ToFImageGrabber->Update();
-    this->m_MitkDistanceImage = m_ToFImageGrabber->GetOutput(0);
     this->m_MitkDistanceImage->Update();
   }
 

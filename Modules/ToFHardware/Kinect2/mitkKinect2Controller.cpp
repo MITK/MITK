@@ -17,9 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Kinect.h>
 #include "stdafx.h"
 #include <stdio.h>
-#include <mitkImage.h>
-#include <mitkPixelType.h>
-#include <mitkImageToOpenCVImageFilter.h>
+#include <mitkToFDebugHelper.h>
 
 namespace mitk
 {
@@ -142,7 +140,7 @@ namespace mitk
       if (!d->m_pKinectSensor || FAILED(hr))
       {
         d->m_ConnectionCheck = false;
-        MITK_INFO << "No Kinect 2 ready!";
+        MITK_WARN << "No Kinect 2 ready!";
       }
       d->m_ConnectionCheck = true;
     }
@@ -230,21 +228,17 @@ namespace mitk
 
       if (SUCCEEDED(hr))
       {
-              MITK_INFO << "AccessUnderlyingBuffer";
+        MITK_INFO << "AccessUnderlyingBuffer";
         for(int i = 0; i < d->m_DepthCaptureHeight*d->m_DepthCaptureWidth; ++i)
         {
           float depth = static_cast<float>(*pBuffer);
           d->m_Distances[i] = depth;
-          //if( i % 100 == 0 )
-          //  MITK_INFO << "i " << i << " d " <<d->m_Distances[i];
           ++pBuffer;
         }
-        //ShowDebugImage(d->m_Distances);
-
       }
       else
       {
-        MITK_ERROR << "AccessUnderlyingBuffer Error";
+        MITK_ERROR << "AccessUnderlyingBuffer";
       }
       SafeRelease(pFrameDescription);
 
@@ -303,13 +297,13 @@ namespace mitk
       }
       else
       {
-        MITK_ERROR << "UpdateCamera alles andere Error";
+        MITK_ERROR << "UpdateCamera() alles andere";
         return false;
       }
     }
     else
     {
-      MITK_ERROR << "UpdateCamera AcquireLatestFrame Error";
+      MITK_ERROR << "UpdateCamera() AcquireLatestFrame";
       return false;
     }
 
@@ -318,28 +312,6 @@ namespace mitk
 
     return true;
   }
-
-  void Kinect2Controller::ShowDebugImage(float* distances)
-  {
-    unsigned int* dim = new unsigned int[2];
-    dim[0] = 512;
-    dim[1] = 424;
-    mitk::Image::Pointer image = mitk::Image::New();
-    image->Initialize(mitk::PixelType(mitk::MakeScalarPixelType<float>()), 2, dim);
-    image->SetSlice(distances);
-
-    mitk::ImageToOpenCVImageFilter::Pointer filter = mitk::ImageToOpenCVImageFilter::New();
-    filter->SetImage(image);
-    cv::Mat cvImage = cv::Mat(filter->GetOpenCVImage(), true);
-    double minVal, maxVal;
-    cv::minMaxLoc(cvImage, &minVal, &maxVal);
-    cv::Mat uCCImage;
-    cvImage.convertTo(uCCImage, CV_8U, 255.0/(maxVal - minVal), -minVal);
-    cv::namedWindow("test", CV_WINDOW_AUTOSIZE);
-    cv::imshow("test", uCCImage);
-    cv::waitKey(10000000);
-  }
-
 
   void Kinect2Controller::GetDistances(float* distances)
   {

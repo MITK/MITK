@@ -9,8 +9,8 @@ SET(H_FILES
   stdafx.h
 )
 set(RESOURCE_FILES
-  #CalibrationFiles/Default_Parameters.xml
-  #CalibrationFiles/Kinect_RGB_camera.xml
+  #Todo: Replace me one we have actual calibration files
+  CalibrationFiles/Kinect_RGB_camera.xml
 )
 
 ENDIF(MITK_USE_TOF_KINECT2)

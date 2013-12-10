@@ -38,13 +38,12 @@ namespace mitk
     mitkClassMacro( Kinect2Controller , itk::Object );
 
     itkNewMacro( Self );
-  int GetRGBCaptureWidth() const;
-  int GetRGBCaptureHeight() const;
-  int GetDepthCaptureWidth() const;
-  int GetDepthCaptureHeight() const;
+    int GetRGBCaptureWidth() const;
+    int GetRGBCaptureHeight() const;
+    int GetDepthCaptureWidth() const;
+    int GetDepthCaptureHeight() const;
 
-  bool GetUseIR() const;
-  void ShowDebugImage(float* distances);
+    bool GetUseIR() const;
 
     void SetUseIR(bool useIR);
 

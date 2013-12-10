@@ -80,11 +80,11 @@ namespace mitk
       return device.GetPointer();
     }
 
-    //us::ModuleResource GetIntrinsicsResource()
-    //{
-    //  us::Module* module = us::GetModuleContext()->GetModule();
-    //  return module->GetResource("CalibrationFiles/Default_Parameters.xml");
-    //}
+    us::ModuleResource GetIntrinsicsResource()
+    {
+      us::Module* module = us::GetModuleContext()->GetModule();
+      return module->GetResource("CalibrationFiles/Kinect_RGB_camera.xml");
+    }
   };
 }
 #endif

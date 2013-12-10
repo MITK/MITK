@@ -123,8 +123,6 @@ namespace mitk
     */
     int GetRGBCaptureHeight();
 
-     void ShowDebugImage(float* distances);
-
   protected:
 
     Kinect2Device();

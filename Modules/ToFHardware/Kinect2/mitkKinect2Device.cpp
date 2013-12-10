@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "mitkKinect2Device.h"
 #include "mitkRealTimeClock.h"
-#include <mitkImageToOpenCVImageFilter.h>
 
 #include "itkMultiThreader.h"
 #include <itksys/SystemTools.hxx>
@@ -349,28 +348,6 @@ namespace mitk
       MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
     }
   }
-
-    void Kinect2Device::ShowDebugImage(float* distances)
-  {
-    unsigned int* dim = new unsigned int[2];
-    dim[0] = 512;
-    dim[1] = 424;
-    mitk::Image::Pointer image = mitk::Image::New();
-    image->Initialize(mitk::PixelType(mitk::MakeScalarPixelType<float>()), 2, dim);
-    image->SetSlice(distances);
-
-    mitk::ImageToOpenCVImageFilter::Pointer filter = mitk::ImageToOpenCVImageFilter::New();
-    filter->SetImage(image);
-    cv::Mat cvImage = cv::Mat(filter->GetOpenCVImage(), true);
-    double minVal, maxVal;
-    cv::minMaxLoc(cvImage, &minVal, &maxVal);
-    cv::Mat uCCImage;
-    cvImage.convertTo(uCCImage, CV_8U, 255.0/(maxVal - minVal), -minVal);
-    cv::namedWindow("test", CV_WINDOW_AUTOSIZE);
-    cv::imshow("test", uCCImage);
-    cv::waitKey(10000000);
-  }
-
 
   Kinect2Controller::Pointer Kinect2Device::GetController()
   {

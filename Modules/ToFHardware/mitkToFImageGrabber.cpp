@@ -14,10 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkToFImageGrabber.h"
-//#include "mitkToFCameraPMDCamCubeDevice.h"
-
-#include <mitkImageToOpenCVImageFilter.h>
-
 #include "itkCommand.h"
 
 
@@ -69,7 +65,6 @@ namespace mitk
       requiredImageSequence, this->m_ImageSequence, this->m_RgbDataArray );
 
     mitk::Image::Pointer distanceImage = this->GetOutput();
-    //if (!distanceImage->IsInitialized())
     if (!m_DistanceImageInitialized)
     {
       distanceImage->ReleaseData();
@@ -77,7 +72,6 @@ namespace mitk
       m_DistanceImageInitialized = true;
     }
     mitk::Image::Pointer amplitudeImage = this->GetOutput(1);
-    //if (!amplitudeImage->IsInitialized())
     if (!m_AmplitudeImageInitialized)
     {
       amplitudeImage->ReleaseData();
@@ -85,7 +79,6 @@ namespace mitk
       m_AmplitudeImageInitialized = true;
     }
     mitk::Image::Pointer intensityImage = this->GetOutput(2);
-    //if (!intensityImage->IsInitialized())
     if (!m_IntensityImageInitialized)
     {
       intensityImage->ReleaseData();
@@ -98,7 +91,6 @@ namespace mitk
     rgbDimension[1] = this->GetRGBImageHeight();
     rgbDimension[2] = 1 ;
     mitk::Image::Pointer rgbImage = this->GetOutput(3);
-    //if (!rgbImage->IsInitialized())
     if (!m_RGBImageInitialized)
     {
       rgbImage->ReleaseData();
@@ -109,9 +101,7 @@ namespace mitk
     capturedImageSequence = this->m_ImageSequence;
     if (m_DistanceArray)
     {
-      MITK_INFO << "m_DistanceArray";
       distanceImage->SetSlice(this->m_DistanceArray, 0, 0, 0);
-      //ShowDebugImage(this->m_DistanceArray);
     }
     if (m_AmplitudeArray)
     {
@@ -125,27 +115,6 @@ namespace mitk
     {
       rgbImage->SetSlice(this->m_RgbDataArray, 0, 0, 0);
     }
-  }
-
-  void ToFImageGrabber::ShowDebugImage(float* distances)
-  {
-    unsigned int* dim = new unsigned int[2];
-    dim[0] = 512;
-    dim[1] = 424;
-    mitk::Image::Pointer image = mitk::Image::New();
-    image->Initialize(mitk::PixelType(mitk::MakeScalarPixelType<float>()), 2, dim);
-    image->SetSlice(distances);
-
-    mitk::ImageToOpenCVImageFilter::Pointer filter = mitk::ImageToOpenCVImageFilter::New();
-    filter->SetImage(image);
-    cv::Mat cvImage = cv::Mat(filter->GetOpenCVImage(), true);
-    double minVal, maxVal;
-    cv::minMaxLoc(cvImage, &minVal, &maxVal);
-    cv::Mat uCCImage;
-    cvImage.convertTo(uCCImage, CV_8U, 255.0/(maxVal - minVal), -minVal);
-    cv::namedWindow("test", CV_WINDOW_AUTOSIZE);
-    cv::imshow("test", uCCImage);
-    cv::waitKey(10000000);
   }
 
   bool ToFImageGrabber::ConnectCamera()

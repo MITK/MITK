@@ -23,4 +23,5 @@ set(CPP_FILES
   mitkDICOMImageFrameInfo.cpp
   mitkDICOMSortCriterion.cpp
   mitkDICOMSortByTag.cpp
+  mitkITKDICOMSeriesReaderHelper.cpp
 )

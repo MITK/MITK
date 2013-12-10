@@ -108,17 +108,17 @@ mitk::DICOMSortByTag
   double leftDouble = strtod(leftInput, &leftEnd);
   double rightDouble = strtod(rightInput, &rightEnd);
 
-  if (leftEnd == leftInput || rightEnd == rightInput)
+  if (leftEnd == leftInput || rightEnd == rightInput) // no numerical conversion..
   {
-    return this->StringCompare(left,right, tag);
+    return this->StringCompare(left,right, tag); // fallback to string compare
   }
   else
   {
-    if (leftDouble != rightDouble)
+    if (leftDouble != rightDouble) // can we decide?
     {
       return leftDouble < rightDouble;
     }
-    else
+    else // ask secondary criterion
     {
       if (m_SecondaryCriterion.IsNotNull())
       {

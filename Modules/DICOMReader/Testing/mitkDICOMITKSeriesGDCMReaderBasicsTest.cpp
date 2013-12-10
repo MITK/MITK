@@ -59,20 +59,26 @@ int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
 
   // a sorter...
   // TODO ugly syntax, improve..
-  mitk::DICOMSortCriterion::Pointer sorting =
+  mitk::DICOMSortCriterion::ConstPointer sorting =
     mitk::DICOMSortByTag::New( std::make_pair(0x0020, 0x0013), // instance number
       mitk::DICOMSortByTag::New( std::make_pair(0x0020, 0x0012), // aqcuisition number
         mitk::DICOMSortByTag::New( std::make_pair(0x0008, 0x0032), // aqcuisition time
-          mitk::DICOMSortByTag::New( std::make_pair(0x0018, 0x1060) // trigger time
+          mitk::DICOMSortByTag::New( std::make_pair(0x0018, 0x1060), // trigger time
+            mitk::DICOMSortByTag::New( std::make_pair(0x0008, 0x0018) // SOP instance UID (last resort, not really meaningful but decides clearly)
+            ).GetPointer()
           ).GetPointer()
         ).GetPointer()
       ).GetPointer()
     ).GetPointer();
+  tagSorter->SetSortCriterion( sorting );
 
   gdcmReader->AddSortingElement( tagSorter );
   mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
 
   gdcmReader->PrintOutputs(std::cout, true);
+
+  // really load images
+  mitk::DICOMFileReaderTestHelper::TestMitkImagesAreLoaded( gdcmReader );
 
   MITK_TEST_END();
 }

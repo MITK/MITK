@@ -77,7 +77,7 @@ static void TestOutputsContainInputs(DICOMFileReader* reader)
   unsigned int numberOfOutputs = reader->GetNumberOfOutputs();
   for (unsigned int o = 0; o < numberOfOutputs; ++o)
   {
-    DICOMImageBlockDescriptor block = reader->GetOutput(o);
+    const DICOMImageBlockDescriptor block = reader->GetOutput(o);
 
     const DICOMImageFrameList& outputFiles = block.GetImageFrameList();
     for(DICOMImageFrameList::const_iterator iter = outputFiles.begin();
@@ -113,7 +113,7 @@ static void TestOutputsContainInputs(DICOMFileReader* reader)
 
   try
   {
-    DICOMImageBlockDescriptor block = reader->GetOutput( inputFiles.size() );
+    const DICOMImageBlockDescriptor block = reader->GetOutput( inputFiles.size() );
     MITK_TEST_CONDITION(false, "Invalid indices for GetOutput() should throw exception")
   }
   catch( std::invalid_argument& )
@@ -121,6 +121,30 @@ static void TestOutputsContainInputs(DICOMFileReader* reader)
     MITK_TEST_CONDITION(true, "Invalid indices for GetOutput() should throw exception")
   }
 }
+
+static void TestMitkImagesAreLoaded(DICOMFileReader* reader)
+{
+  StringList inputFiles = GetInputFilenames();
+  reader->SetInputFiles( inputFiles );
+
+  reader->AnalyzeInputFiles();
+  reader->LoadImages();
+
+  unsigned int numberOfOutputs = reader->GetNumberOfOutputs();
+  for (unsigned int o = 0; o < numberOfOutputs; ++o)
+  {
+    const DICOMImageBlockDescriptor block = reader->GetOutput(o);
+
+    const DICOMImageFrameList& outputFiles = block.GetImageFrameList();
+    mitk::Image::Pointer mitkImage = block.GetMitkImage();
+
+    MITK_INFO << "-------------------------------------------";
+    MITK_INFO << "Output " << o << " at " << (void*) mitkImage.GetPointer();
+    MITK_INFO << "  Number of files: " << outputFiles.size();
+    MITK_INFO << "  Dimensions: " << mitkImage->GetDimension(0) << " " << mitkImage->GetDimension(1) << " " << mitkImage->GetDimension(2);
+  }
+}
+
 
 }; // end test class
 

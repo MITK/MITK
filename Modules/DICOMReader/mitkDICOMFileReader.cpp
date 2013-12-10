@@ -146,3 +146,18 @@ mitk::DICOMFileReader
     throw std::invalid_argument( ss.str() );
   }
 }
+mitk::DICOMImageBlockDescriptor&
+mitk::DICOMFileReader
+::InternalGetOutput(unsigned int index)
+{
+  if (index < m_Outputs.size())
+  {
+    return m_Outputs[index];
+  }
+  else
+  {
+    std::stringstream ss;
+    ss << "Index " << index << " out of range (" << m_Outputs.size() << " indices reserved)";
+    throw std::invalid_argument( ss.str() );
+  }
+}

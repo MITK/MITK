@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkDICOMITKSeriesGDCMReader.h"
+#include "mitkITKDICOMSeriesReaderHelper.h"
 
 #include <itkTimeProbesCollectorBase.h>
 
@@ -113,6 +114,7 @@ void
 mitk::DICOMITKSeriesGDCMReader
 ::AnalyzeInputFiles()
 {
+  // TODO at this point, make sure we have a sorting element at the end that splits geometrically separate blocks
   itk::TimeProbesCollectorBase timer;
 
   timer.Start("Reset");
@@ -227,9 +229,32 @@ bool
 mitk::DICOMITKSeriesGDCMReader
 ::LoadImages()
 {
-  // does nothing
+  mitk::ITKDICOMSeriesReaderHelper helper;
+
+  unsigned int numberOfOutputs = this->GetNumberOfOutputs();
+  for (unsigned int o = 0; o < numberOfOutputs; ++o)
+  {
+    DICOMImageBlockDescriptor& block = this->InternalGetOutput(o);
+    const DICOMImageFrameList& frames = block.GetImageFrameList();
+
+    bool correctTilt = false; // TODO
+    bool tiltInfo = false; // TODO
+
+    ITKDICOMSeriesReaderHelper::StringContainer filenames;
+    for (DICOMImageFrameList::const_iterator frameIter = frames.begin();
+        frameIter != frames.end();
+        ++frameIter)
+    {
+      filenames.push_back( (*frameIter)->Filename );
+    }
+
+    mitk::Image::Pointer mitkImage = helper.Load( filenames, correctTilt, tiltInfo ); // TODO preloaded images, caching..?
+    block.SetMitkImage( mitkImage );
+  }
+
   return true;
 }
+
 
 bool
 mitk::DICOMITKSeriesGDCMReader

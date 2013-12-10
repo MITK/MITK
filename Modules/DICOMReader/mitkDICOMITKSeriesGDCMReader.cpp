@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMITKSeriesGDCMReader.h"
 #include "mitkITKDICOMSeriesReaderHelper.h"
+#include "mitkEquiDistantBlocksSorter.h"
 
 #include <itkTimeProbesCollectorBase.h>
 
@@ -115,6 +116,8 @@ mitk::DICOMITKSeriesGDCMReader
 ::AnalyzeInputFiles()
 {
   // TODO at this point, make sure we have a sorting element at the end that splits geometrically separate blocks
+  this->EnsureMandatorySortersArePresent();
+
   itk::TimeProbesCollectorBase timer;
 
   timer.Start("Reset");
@@ -269,4 +272,12 @@ mitk::DICOMITKSeriesGDCMReader
 {
   assert(sorter);
   m_Sorter.push_back( sorter );
+}
+
+void
+mitk::DICOMITKSeriesGDCMReader
+::EnsureMandatorySortersArePresent()
+{
+  mitk::EquiDistantBlocksSorter::Pointer distanceKeeper = mitk::EquiDistantBlocksSorter::New();
+  this->AddSortingElement( distanceKeeper );
 }

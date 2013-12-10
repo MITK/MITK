@@ -43,6 +43,7 @@ int main(int argc, char* argv[])
   tagSorter->AddDistinguishingTag( std::make_pair(0x0020, 0x000e) ); // Series Instance UID
   tagSorter->AddDistinguishingTag( std::make_pair(0x0018, 0x0050) ); // Slice Thickness
   tagSorter->AddDistinguishingTag( std::make_pair(0x0028, 0x0008) ); // Number of Frames
+  tagSorter->AddDistinguishingTag( std::make_pair(0x0020, 0x0052) ); // Frame of Reference UID
 
   // a sorter...
   // TODO ugly syntax, improve..
@@ -67,6 +68,7 @@ int main(int argc, char* argv[])
 
   MITK_INFO << "Analyzing " << inputFiles.size() << " file ...";
   gdcmReader->AnalyzeInputFiles();
+  gdcmReader->PrintOutputs(std::cout, true);
   MITK_INFO << "Loading " << inputFiles.size() << " file ...";
   gdcmReader->LoadImages();
 
@@ -81,6 +83,9 @@ int main(int argc, char* argv[])
     MITK_INFO << "-------------------------------------------";
     MITK_INFO << "Output " << o << " at " << (void*) mitkImage.GetPointer();
     MITK_INFO << "  Number of files: " << outputFiles.size();
-    MITK_INFO << "  Dimensions: " << mitkImage->GetDimension(0) << " " << mitkImage->GetDimension(1) << " " << mitkImage->GetDimension(2);
+    if (mitkImage.IsNotNull())
+    {
+      MITK_INFO << "  Dimensions: " << mitkImage->GetDimension(0) << " " << mitkImage->GetDimension(1) << " " << mitkImage->GetDimension(2);
+    }
   }
 }

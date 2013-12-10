@@ -57,6 +57,7 @@ int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
   tagSorter->AddDistinguishingTag( std::make_pair(0x0020, 0x000e) ); // Series Instance UID
   tagSorter->AddDistinguishingTag( std::make_pair(0x0018, 0x0050) ); // Slice Thickness
   tagSorter->AddDistinguishingTag( std::make_pair(0x0028, 0x0008) ); // Number of Frames
+  tagSorter->AddDistinguishingTag( std::make_pair(0x0020, 0x0052) ); // Frame of Reference UID
 
   // a sorter...
   // TODO ugly syntax, improve..

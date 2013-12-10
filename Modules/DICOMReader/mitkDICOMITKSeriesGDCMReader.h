@@ -56,6 +56,8 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     DICOMGDCMImageFrameList FromDICOMDatasetList(DICOMDatasetList& input);
     DICOMImageFrameList ToDICOMImageFrameList(DICOMGDCMImageFrameList& input);
 
+    void EnsureMandatorySortersArePresent();
+
   private:
 
     bool m_FixTiltByShearing;

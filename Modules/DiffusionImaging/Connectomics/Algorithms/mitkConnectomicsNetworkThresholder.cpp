@@ -158,7 +158,7 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::Thresho
       {
         candidateVector.clear();
         candidateVector.push_back( *iterator );
-        minWeight < tempWeight;
+        minWeight = tempWeight;
         count = 1;
       }
     }

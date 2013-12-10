@@ -69,23 +69,24 @@ static void CreateNetworkFromFibersAndParcellation(std::string fiberFilename, st
   connectomicsNetworkCreator->SetEndPointSearchRadius( 15 );
   connectomicsNetworkCreator->CreateNetworkFromFibersAndSegmentation();
 
-  // write
-  mitk::ConnectomicsNetwork::Pointer network = connectomicsNetworkCreator->GetNetwork();
-
-  MITK_INFO << "searching writer";
-  mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
-  for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
+  // write if not test mode
+  if( !testMode )
   {
-    if ( (*it)->CanWriteBaseDataType(network.GetPointer()) )
+    mitk::ConnectomicsNetwork::Pointer network = connectomicsNetworkCreator->GetNetwork();
+
+    MITK_INFO << "searching writer";
+    mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
+    for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
     {
-      MITK_INFO << "writing";
-      (*it)->SetFileName( outputFilename.c_str() );
-      (*it)->DoWrite( network.GetPointer() );
+      if ( (*it)->CanWriteBaseDataType(network.GetPointer()) )
+      {
+        MITK_INFO << "writing";
+        (*it)->SetFileName( outputFilename.c_str() );
+        (*it)->DoWrite( network.GetPointer() );
+      }
     }
   }
-
-  // Actual comparison if reference network was given
-  if( testMode )
+  else
   {
     // load network
     std::vector<mitk::BaseData::Pointer> referenceFile =
@@ -98,7 +99,9 @@ static void CreateNetworkFromFibersAndParcellation(std::string fiberFilename, st
     mitk::BaseData* referenceBaseData = referenceFile.at(0);
     mitk::ConnectomicsNetwork* referenceNetwork = dynamic_cast<mitk::ConnectomicsNetwork*>( referenceBaseData );
 
-    // TODO: implement equal method
+    mitk::ConnectomicsNetwork::Pointer network = connectomicsNetworkCreator->GetNetwork();
+
+    MITK_TEST_CONDITION_REQUIRED( mitk::Equal( network.GetPointer(), referenceNetwork, mitk::eps, true), "Comparing created and reference network.");
   }
 }
 

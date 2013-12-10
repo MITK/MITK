@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkConnectomicsNetwork.h"
+#include <mitkConnectomicsStatisticsCalculator.h>
 #include <boost/graph/clustering_coefficient.hpp>
 #include <boost/graph/betweenness_centrality.hpp>
 
@@ -708,4 +709,58 @@ bool mitk::ConnectomicsNetwork::CheckForLabel( std::string targetLabel ) const
   }
 
   return true;
+}
+
+bool mitk::Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNetwork* rightHandSide, mitk::ScalarType eps, bool verbose )
+{
+  bool noDifferenceFound = true;
+
+    if( rightHandSide == NULL )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] rightHandSide NULL.";
+    }
+    return false;
+  }
+
+  if( leftHandSide == NULL )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] leftHandSide NULL.";
+    }
+    return false;
+  }
+
+  mitk::ConnectomicsStatisticsCalculator::Pointer calculatorLeft = mitk::ConnectomicsStatisticsCalculator::New();
+    mitk::ConnectomicsStatisticsCalculator::Pointer calculatorRight = mitk::ConnectomicsStatisticsCalculator::New();
+
+    calculatorLeft->SetNetwork( leftHandSide );
+    calculatorRight->SetNetwork( rightHandSide );
+    calculatorLeft->Update();
+    calculatorRight->Update();
+
+    if( ! mitk::Equal( calculatorLeft->GetNumberOfVertices(), calculatorRight->GetNumberOfVertices(), eps ) )
+    {
+      if(verbose)
+        MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] Number of vertices not equal. " << calculatorLeft->GetNumberOfVertices() << " vs " << calculatorRight->GetNumberOfVertices();
+      noDifferenceFound = false;
+    }
+
+    if( ! mitk::Equal( calculatorLeft->GetNumberOfEdges(), calculatorRight->GetNumberOfEdges(), eps ) )
+    {
+      if(verbose)
+        MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] Number of edges not equal. " << calculatorLeft->GetNumberOfEdges() << " vs " << calculatorRight->GetNumberOfEdges();
+      noDifferenceFound = false;
+    }
+
+    if( ! mitk::Equal( calculatorLeft->GetSmallWorldness(), calculatorRight->GetSmallWorldness(), eps ) )
+    {
+      if(verbose)
+        MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] Small worldness not equal. " << calculatorLeft->GetSmallWorldness() << " vs " << calculatorRight->GetSmallWorldness();
+      noDifferenceFound = false;
+    }
+
+  return noDifferenceFound;
 }

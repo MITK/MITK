@@ -219,6 +219,17 @@ namespace mitk {
 
   };
 
+  /**
+  * \brief Returns true if the networks are considered equal.
+  *
+  * For now two networks are considered equal if they have the following properties are equal:
+  * - Number of nodes
+  * - Number of edges
+  * - Smallworldness
+  */
+
+  Connectomics_EXPORT bool Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNetwork* rightHandSide, mitk::ScalarType eps, bool verbose);
+
 } // namespace mitk
 
 #endif /*  _MITK_ConnectomicsNetwork_H */

@@ -38,8 +38,8 @@ namespace mitk
     this->m_ImageMutex = itk::FastMutexLock::New();
     this->m_CameraActiveMutex = itk::FastMutexLock::New();
 
-    this->m_RGBImageWidth  = this->m_CaptureWidth;
-    this->m_RGBImageHeight  = this->m_CaptureHeight;
+    this->m_RGBImageWidth = this->m_CaptureWidth;
+    this->m_RGBImageHeight = this->m_CaptureHeight;
     this->m_RGBPixelNumber = this->m_RGBImageWidth* this->m_RGBImageHeight;
   }
 

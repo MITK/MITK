@@ -52,14 +52,20 @@ namespace mitk
      */
     std::string GetFactoryName()
     {
-      return std::string("Kinect 2 Factory");
+      return std::string("Kinect V2 Factory");
     }
     /**
      * @brief GetDeviceNamePrefix Main part of a device name.
+     *
+     * The string for the kinect 2 is "Kinect V2" on purpose,
+     * to distinguish a "Kinect V2" device from a secondary
+     * connected "Kinect 2" (in case you have connected 2x
+     * "Kinect" and 1x Kinect V2). This case is rare, but
+     * we should be able to distinguish between cameras.
      */
     std::string GetDeviceNamePrefix()
     {
-      return std::string("Kinect 2");
+      return std::string("Kinect V2");
     }
 
   private:

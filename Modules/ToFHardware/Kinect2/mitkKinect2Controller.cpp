@@ -15,9 +15,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "mitkKinect2Controller.h"
 #include <Kinect.h>
-#include "stdafx.h"
-#include <stdio.h>
 #include <mitkToFDebugHelper.h>
+
+//Taken from official Microsoft SDK samples. Should never be public or part of the class,
+//because it is just for cleaning up.
+// Safe release for interfaces
+template<class Interface>
+inline void SafeRelease(Interface *& pInterfaceToRelease)
+{
+    if (pInterfaceToRelease != NULL)
+    {
+        pInterfaceToRelease->Release();
+        pInterfaceToRelease = NULL;
+    }
+}
 
 namespace mitk
 {
@@ -303,7 +314,7 @@ namespace mitk
     }
     else
     {
-      MITK_ERROR << "UpdateCamera() AcquireLatestFrame";
+      MITK_ERROR << "UpdateCamera() AcquireLatestFrame - Is the 'KinectService' App running in the background? Did you connect the device properly?";
       return false;
     }
 

@@ -53,8 +53,8 @@ int mitkPersistenceTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED( testClass.Save(), "testClass.Save()");
 
   PersistenceTestClass testClass2;
-  testClass.id = "testClass";
-  MITK_TEST_CONDITION_REQUIRED( testClass2.Load(), "testClass.Save()");
+  testClass2.id = "testClass";
+  MITK_TEST_CONDITION_REQUIRED( testClass2.Load(), "testClass.Load()");
 
 
   MITK_TEST_CONDITION_REQUIRED( testClass.param1 == testClass2.param1, "testClass.param1 == testClass2.param1" );

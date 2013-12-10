@@ -32,6 +32,7 @@ namespace mitk
         static const std::string DEFAULT_FILE_NAME;
         static const std::string PERSISTENCE_PROPERTY_NAME;
         static const std::string PERSISTENCE_PROPERTYLIST_NAME;
+        static const std::string ID_PROPERTY_NAME;
         static us::ModuleContext* GetModuleContext();
 
         PersistenceService();

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPropertyListReplacedObserver.h"
 #include "usServiceReference.h"
 #include "usModuleContext.h"
+#include "usGetModuleContext.h"
 //for microservices
 #include <usServiceInterface.h>
 
@@ -104,37 +105,28 @@ bool Save() { \
 
 #define PERSISTENCE_CREATE_SAVE(IdMemberName, ParamMemberName)\
     PERSISTENCE_CREATE_SAVE_START(IdMemberName)\
-        propList->Set( "ParamMemberName", ParamMemberName );\
+        propList->Set( #ParamMemberName, ParamMemberName );\
     PERSISTENCE_CREATE_SAVE_END
 
-#define PERSISTENCE_CREATE_SAVE2(IdMemberName, ParamMemberName, ParamMember2Name)\
+#define PERSISTENCE_CREATE_SAVE2(IdMemberName, ParamMemberName, Param2MemberName)\
     PERSISTENCE_CREATE_SAVE_START(IdMemberName)\
-        propList->Set( "ParamMemberName", ParamMemberName );\
-        propList->Set( "ParamMember2Name", ParamMember2Name );\
+        propList->Set( #ParamMemberName, ParamMemberName );\
+        propList->Set( #Param2MemberName, Param2MemberName );\
     PERSISTENCE_CREATE_SAVE_END
 
-#define PERSISTENCE_CREATE_SAVE3(IdMemberName, ParamMemberName, ParamMember2Name, ParamMember3Name)\
+#define PERSISTENCE_CREATE_SAVE3(IdMemberName, ParamMemberName, Param2MemberName, Param3MemberName)\
     PERSISTENCE_CREATE_SAVE_START(IdMemberName)\
-        propList->Set( "ParamMemberName", ParamMemberName );\
-        propList->Set( "ParamMember2Name", ParamMember2Name );\
-        propList->Set( "ParamMember3Name", ParamMember3Name );\
+        propList->Set( #ParamMemberName, ParamMemberName );\
+        propList->Set( #Param2MemberName, Param2MemberName );\
+        propList->Set( #Param3MemberName, Param3MemberName );\
     PERSISTENCE_CREATE_SAVE_END
 
-#define PERSISTENCE_CREATE_SAVE4(IdMemberName, ParamMemberName, ParamMember2Name, ParamMember3Name, ParamMember4Name)\
+#define PERSISTENCE_CREATE_SAVE4(IdMemberName, ParamMemberName, Param2MemberName, Param3MemberName, Param4MemberName)\
     PERSISTENCE_CREATE_SAVE_START(IdMemberName)\
-        propList->Set( "ParamMemberName", ParamMemberName );\
-        propList->Set( "ParamMember2Name", ParamMember2Name );\
-        propList->Set( "ParamMember3Name", ParamMember3Name );\
-        propList->Set( "ParamMember4Name", ParamMember4Name );\
-    PERSISTENCE_CREATE_SAVE_END
-
-#define PERSISTENCE_CREATE_SAVE5(IdMemberName, ParamMemberName, ParamMember2Name, ParamMember3Name, Param4Name, ParamMember5Name)\
-    PERSISTENCE_CREATE_SAVE_START(IdMemberName)\
-        propList->Set( "ParamMemberName", ParamMemberName );\
-        propList->Set( "ParamMember2Name", ParamMember2Name );\
-        propList->Set( "ParamMember3Name", ParamMember3Name );\
-        propList->Set( "ParamMember4Name", ParamMember4Name );\
-        propList->Set( "ParamMember5Name", ParamMember5Name );\
+        propList->Set( #ParamMemberName, ParamMemberName );\
+        propList->Set( #Param2MemberName, Param2MemberName );\
+        propList->Set( #Param3MemberName, Param3MemberName );\
+        propList->Set( #Param4MemberName, Param4MemberName );\
     PERSISTENCE_CREATE_SAVE_END
 
 /// MACROS FOR AUTOMATIC LOAD FUNCTION
@@ -142,7 +134,8 @@ bool Save() { \
 bool Load() {\
     PERSISTENCE_GET_SERVICE\
     bool noError = persistenceService != 0 && persistenceService->Load();\
-    if( noError ) {
+    if( noError ) {\
+        mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(IdMemberName);
 
 #define PERSISTENCE_CREATE_LOAD_END\
     }\
@@ -151,38 +144,34 @@ bool Load() {\
 
 #define PERSISTENCE_CREATE_LOAD(IdMemberName, ParamMemberName)\
     PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
-        mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(IdMemberName);\
-        noError = propList->Get( "ParamMemberName", ParamMemberName );\
+        noError = propList->Get( #ParamMemberName, ParamMemberName );\
     PERSISTENCE_CREATE_LOAD_END
 
 #define PERSISTENCE_CREATE_LOAD2(IdMemberName, ParamMemberName, Param2MemberName)\
     PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
-        mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(IdMemberName);\
-        noError = propList->Get( "ParamMemberName", ParamMemberName );\
+        noError = propList->Get( #ParamMemberName, ParamMemberName );\
         if(noError)\
-            noError = propList->Get( "Param2MemberName", Param2MemberName );\
+            noError = propList->Get( #Param2MemberName, Param2MemberName );\
     PERSISTENCE_CREATE_LOAD_END
 
 #define PERSISTENCE_CREATE_LOAD3(IdMemberName, ParamMemberName, Param2MemberName, Param3MemberName)\
     PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
-        mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(IdMemberName);\
-        noError = propList->Get( "ParamMemberName", ParamMemberName );\
+        noError = propList->Get( #ParamMemberName, ParamMemberName );\
         if(noError)\
-            noError = propList->Get( "Param2MemberName", Param2MemberName );\
+            noError = propList->Get( #Param2MemberName, Param2MemberName );\
         if(noError)\
-            noError = propList->Get( "Param3MemberName", Param3MemberName );\
+            noError = propList->Get( #Param3MemberName, Param3MemberName );\
     PERSISTENCE_CREATE_LOAD_END
 
 #define PERSISTENCE_CREATE_LOAD4(IdMemberName, ParamMemberName, Param2MemberName, Param3MemberName, Param4MemberName)\
     PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
-        mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(IdMemberName);\
-        noError = propList->Get( "ParamMemberName", ParamMemberName );\
+        noError = propList->Get( #ParamMemberName, ParamMemberName );\
         if(noError)\
-            noError = propList->Get( "Param2MemberName", Param2MemberName );\
+            noError = propList->Get( #Param2MemberName, Param2MemberName );\
         if(noError)\
-            noError = propList->Get( "Param3MemberName", Param3MemberName );\
+            noError = propList->Get( #Param3MemberName, Param3MemberName );\
         if(noError)\
-            noError = propList->Get( "Param4MemberName", Param4MemberName );\
+            noError = propList->Get( #Param4MemberName, Param4MemberName );\
     PERSISTENCE_CREATE_LOAD_END
 
 US_DECLARE_SERVICE_INTERFACE(mitk::IPersistenceService, "org.mitk.services.IPersistenceService")

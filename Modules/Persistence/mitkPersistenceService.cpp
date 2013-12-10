@@ -36,6 +36,8 @@ const std::string mitk::PersistenceService::PERSISTENCE_PROPERTY_NAME("Persisten
 
 const std::string mitk::PersistenceService::PERSISTENCE_PROPERTYLIST_NAME("PersistenceService");
 
+const std::string mitk::PersistenceService::ID_PROPERTY_NAME("Id");
+
 
 mitk::PersistenceService::PersistenceService()
   : m_AutoLoadAndSave( false ), m_SceneIO( SceneIO::New() )
@@ -98,7 +100,8 @@ void mitk::PersistenceService::ClonePropertyList( mitk::PropertyList* from, mitk
     std::map< std::string, BaseProperty::Pointer>::const_iterator propMapIt = propMap->begin();
     while( propMapIt != propMap->end() )
     {
-        to->SetProperty( (*propMapIt).first, (*propMapIt).second->Clone() );
+        mitk::BaseProperty::Pointer clonedProp = (*propMapIt).second->Clone();
+        to->SetProperty( (*propMapIt).first, clonedProp );
         ++propMapIt;
     }
 }
@@ -117,6 +120,7 @@ bool mitk::PersistenceService::Save(const std::string& fileName)
 
         newNode->SetBoolProperty( PERSISTENCE_PROPERTY_NAME.c_str(), true );
         newNode->SetName( (*it).first );
+        newNode->SetStringProperty(ID_PROPERTY_NAME.c_str(),(*it).first.c_str() );
 
         tempDs->Add(newNode);
         ++it;
@@ -127,15 +131,21 @@ bool mitk::PersistenceService::Save(const std::string& fileName)
 
     mitk::DataStorage::SetOfObjects::ConstPointer rs = tempDs->GetSubset(pred);
 
-    return m_SceneIO->SaveScene( rs, tempDs, fileName );
+    std::string theFile = fileName;
+    if(theFile.empty())
+        theFile = DEFAULT_FILE_NAME;
+    return m_SceneIO->SaveScene( rs, tempDs, theFile );
 }
 
 bool mitk::PersistenceService::Load(const std::string& fileName)
 {
     bool load = false;
 
-    DataStorage::Pointer ds = m_SceneIO->LoadScene( fileName );
-    load = m_SceneIO->GetFailedNodes() == 0 && m_SceneIO->GetFailedProperties() == 0;
+    std::string theFile = fileName;
+    if(theFile.empty())
+        theFile = DEFAULT_FILE_NAME;
+    DataStorage::Pointer ds = m_SceneIO->LoadScene( theFile );
+    load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) && (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
     if( !load )
     {
         MITK_DEBUG("mitk::PersistenceService") << "loading of scene files failed";
@@ -173,7 +183,7 @@ bool mitk::PersistenceService::Load(const std::string& fileName)
 
             this->ClonePropertyList(  node->GetPropertyList(), propList );
 
-            propList->SetStringProperty("Id", name.c_str());
+            propList->SetStringProperty(ID_PROPERTY_NAME.c_str(), name.c_str());
 
             if( existed )
             {

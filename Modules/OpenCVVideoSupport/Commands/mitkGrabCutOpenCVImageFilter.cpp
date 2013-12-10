@@ -89,6 +89,16 @@ void mitk::GrabCutOpenCVImageFilter::SetModelPoints(ModelPointsList foregroundPo
   m_PointSetsMutex->Unlock();
 }
 
+void mitk::GrabCutOpenCVImageFilter::SetModelPointsDilationSize(int modelPointsDilationSize)
+{
+  if ( modelPointsDilationSize < 0 )
+  {
+    MITK_ERROR << "Model points dilation size must not be smaller then zero.";
+    mitkThrow() << "Model points dilation size must not be smaller then zero.";
+  }
+  m_ModelPointsDilationSize = modelPointsDilationSize;
+}
+
 void mitk::GrabCutOpenCVImageFilter::SetUseOnlyRegionAroundModelPoints(unsigned int additionalWidth)
 {
   m_UseOnlyRegionAroundModelPoints = true;
@@ -153,6 +163,13 @@ cv::Rect mitk::GrabCutOpenCVImageFilter::GetBoundingRectFromMask(cv::Mat mask)
   cv::Mat nonPropablyBackgroundMask, modelPoints;
   cv::compare(mask, cv::GC_PR_BGD, nonPropablyBackgroundMask, cv::CMP_NE);
   cv::findNonZero(nonPropablyBackgroundMask, modelPoints);
+
+  if (modelPoints.empty())
+  {
+    MITK_WARN << "Cannot find any foreground points. Returning full image size as bounding rectangle.";
+    return cv::Rect(0, 0, mask.rows, mask.cols);
+  }
+
   cv::Rect boundingRect = cv::boundingRect(modelPoints);
 
   boundingRect.x = boundingRect.x > m_AdditionalWidth ? boundingRect.x - m_AdditionalWidth : 0;

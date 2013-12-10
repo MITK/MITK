@@ -37,6 +37,8 @@ class DataNode;
   * NOTE: The interaction mechanism is similar to that of vtkPlaneWidget
   *
   * \ingroup Interaction
+  * \deprecatedSince{2013_12} mitk::AffineInteractor is deprecated. Use mitk::AffineDataInteractor instead.
+
   */
 class MitkExt_EXPORT AffineInteractor3D : public Interactor
 {
@@ -71,8 +73,8 @@ protected:
     *
     * if no n is set, then the number of points is unlimited*
     */
-  AffineInteractor3D(const char *type,
-    DataNode *dataNode, int n = -1);
+  DEPRECATED(AffineInteractor3D(const char *type,
+    DataNode *dataNode, int n = -1));
 
   /**
     * \brief Default Destructor
@@ -108,6 +110,7 @@ private:
   Vector3D m_ObjectNormal;
 
 };
+
 
 }
 

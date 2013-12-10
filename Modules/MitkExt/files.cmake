@@ -97,6 +97,7 @@ set(CPP_FILES
   #Interactions/mitkDisplayCoordinateOperation.cpp
   #Interactions/mitkDisplayInteractor.cpp
   Interactions/mitkAffineInteractor3D.cpp
+  Interactions/mitkAffineDataInteractor3D.cpp
   Interactions/mitkDisplayPointSetInteractor.cpp
   #Interactions/mitkDisplayVectorInteractor.cpp
   Interactions/mitkInteractionDebug.cpp
@@ -105,6 +106,7 @@ set(CPP_FILES
   Interactions/mitkPointSelectorInteractor.cpp
   #Interactions/mitkPositionTracker.cpp
   Interactions/mitkSeedsInteractor.cpp
+  Interactions/mitkSurfaceDeformationDataInteractor3D.cpp
   Interactions/mitkSocketClient.cpp
   Interactions/mitkSurfaceDeformationInteractor3D.cpp
   Interactions/mitkSurfaceInteractor.cpp
@@ -138,5 +140,10 @@ if(WIN32 AND NOT MINGW)
   )
 endif(WIN32 AND NOT MINGW)
 
-
+set(RESOURCE_FILES
+Interactions/AffineInteraction3D.xml
+Interactions/AffineTranslationConfig.xml
+Interactions/AffineRotationConfig.xml
+Interactions/AffineDeformationConfig.xml
+)
 

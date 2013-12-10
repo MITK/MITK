@@ -282,3 +282,70 @@ void mitk::PropertyList::SetStringProperty( const char* propertyKey, const char*
 {
   SetProperty(propertyKey, mitk::StringProperty::New(stringValue));
 }
+
+void mitk::PropertyList::Set( const char* propertyKey, bool boolValue )
+{
+    this->SetBoolProperty( propertyKey, boolValue );
+}
+
+void mitk::PropertyList::Set( const char* propertyKey, int intValue )
+{
+    this->SetIntProperty(propertyKey, intValue);
+}
+
+void mitk::PropertyList::Set( const char* propertyKey, float floatValue )
+{
+    this->SetFloatProperty(propertyKey, floatValue);
+}
+
+void mitk::PropertyList::Set( const char* propertyKey, double doubleValue )
+{
+    this->SetDoubleProperty(propertyKey, doubleValue);
+}
+
+void mitk::PropertyList::Set( const char* propertyKey, const char* stringValue )
+{
+    this->SetStringProperty(propertyKey, stringValue);
+}
+
+bool mitk::PropertyList::Get( const char* propertyKey, bool& boolValue ) const
+{
+    return this->GetBoolProperty( propertyKey, boolValue );
+}
+
+bool mitk::PropertyList::Get( const char* propertyKey, int &intValue ) const
+{
+    return this->GetIntProperty(propertyKey, intValue);
+}
+
+bool mitk::PropertyList::Get( const char* propertyKey, float &floatValue ) const
+{
+    return this->GetFloatProperty( propertyKey, floatValue );
+}
+
+bool mitk::PropertyList::Get( const char* propertyKey, double &doubleValue ) const
+{
+    return this->GetDoubleProperty( propertyKey, doubleValue );
+}
+
+bool mitk::PropertyList::Get( const char* propertyKey, std::string& stringValue ) const
+{
+    return this->GetStringProperty( propertyKey, stringValue );
+}
+
+bool mitk::PropertyList::GetDoubleProperty( const char* propertyKey, double &doubleValue ) const
+{
+    DoubleProperty *gp = dynamic_cast<DoubleProperty*>( GetProperty(propertyKey) );
+    if ( gp != NULL )
+    {
+        doubleValue = gp->GetValue();
+        return true;
+    }
+    return false;
+
+}
+
+void mitk::PropertyList::SetDoubleProperty( const char* propertyKey, double doubleValue )
+{
+    SetProperty(propertyKey, mitk::DoubleProperty::New(doubleValue));
+}

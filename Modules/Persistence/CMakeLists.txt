@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE( Persistence
   INCLUDE_DIRS
-  DEPENDS Mitk
+  DEPENDS SceneSerialization
 )
 add_subdirectory(Testing)

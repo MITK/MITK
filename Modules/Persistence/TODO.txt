@@ -1,0 +1,8 @@
+1. sceneIO holt sich propertylists vom persistenceservice (NICHT umgekehrt)
+2. "erweiterte" propertylist, um komfortabel zugreifen zu können (klammer operator)-> sceneIO aufbohren
+3. ähnelt sehr dem configuration service (vll den nehmen)
+
+PLAN
+1. configuration service anschauen
+2. einfache implementierung des interfaces wie es ist
+3. sceneIO aufbohren (evtl erweiterte proplist)

@@ -1,2 +1,6 @@
 set(CPP_FILES
+mitkIPersistenceService.cpp
+mitkPersistenceService.cpp
+mitkPropertyListReplacedObserver.cpp
+mitkPersistenceActivator.cpp
 )

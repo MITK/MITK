@@ -42,6 +42,7 @@ set(module_dirs
     Simulation
     Remeshing
     Python
+    Persistence
 )
 
 set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

@@ -45,7 +45,7 @@ namespace mitk {
   public:
     mitkClassMacro(USImageSource, itk::Object);
 
-    itkGetMacro(ImageFilter, mitk::AbstractOpenCVImageFilter::Pointer);
+    itkGetMacro(ImageFilter, mitk::BasicCombinationOpenCVImageFilter::Pointer);
 
     void PushFilter(AbstractOpenCVImageFilter::Pointer filter);
     bool RemoveFilter(AbstractOpenCVImageFilter::Pointer filter);

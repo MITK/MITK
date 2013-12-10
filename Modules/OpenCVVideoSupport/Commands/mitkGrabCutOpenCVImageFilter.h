@@ -53,7 +53,7 @@ public:
   void SetModelPoints(ModelPointsList foregroundPoints);
   void SetModelPoints(ModelPointsList foregroundPoints, ModelPointsList backgroundPoints);
 
-  void SetModelPointsDilationSize(unsigned int modelPointsDilationSize);
+  void SetModelPointsDilationSize(int modelPointsDilationSize);
 
   void SetUseOnlyRegionAroundModelPoints(unsigned int additionalWidth);
   void SetUseFullImage();
@@ -70,7 +70,7 @@ protected:
   bool                         m_InputImageChanged;
   bool                         m_NewResultReady;
 
-  unsigned int                 m_ModelPointsDilationSize;
+  int                          m_ModelPointsDilationSize;
 
   bool                         m_UseOnlyRegionAroundModelPoints;
   unsigned int                 m_AdditionalWidth;

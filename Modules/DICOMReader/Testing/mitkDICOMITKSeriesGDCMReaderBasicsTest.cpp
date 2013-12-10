@@ -53,6 +53,7 @@ int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
   tagSorter->AddDistinguishingTag( std::make_pair(0x0028, 0x0030) ); // Pixel Spacing
   tagSorter->AddDistinguishingTag( std::make_pair(0x0018, 0x1164) ); // Imager Pixel Spacing
   tagSorter->AddDistinguishingTag( std::make_pair(0x0020, 0x0037) ); // Image Orientation (Patient) // TODO add tolerance parameter (l. 1572 of original code)
+  // TODO handle as real vectors! cluster with configurable errors!
   tagSorter->AddDistinguishingTag( std::make_pair(0x0020, 0x000e) ); // Series Instance UID
   tagSorter->AddDistinguishingTag( std::make_pair(0x0018, 0x0050) ); // Slice Thickness
   tagSorter->AddDistinguishingTag( std::make_pair(0x0028, 0x0008) ); // Number of Frames

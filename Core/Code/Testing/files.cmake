@@ -69,6 +69,7 @@ set(MODULE_TESTS
   mitkPropertyExtensionsTest.cpp
   mitkPropertyFiltersTest.cpp
   mitkTinyXMLTest.cpp
+  mitkRawImageFileReaderTest.cpp
 
   ################## DISABLED TESTS #################################################
   #mitkAbstractTransformGeometryTest.cpp #seems as tested class mitkExternAbstractTransformGeometry doesnt exist any more

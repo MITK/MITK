@@ -114,8 +114,8 @@ mitk::EquiDistantBlocksSorter
 ::GetTagsOfInterest()
 {
   DICOMTagList tags;
-  tags.push_back( std::make_pair(0x0020, 0x0032) ); // ImagePositionPatient
-  tags.push_back( std::make_pair(0x0020, 0x0037) ); // ImageOrientationPatient
+  tags.push_back( DICOMTag(0x0020, 0x0032) ); // ImagePositionPatient
+  tags.push_back( DICOMTag(0x0020, 0x0037) ); // ImageOrientationPatient
 
   return tags;
 }
@@ -239,9 +239,9 @@ mitk::EquiDistantBlocksSorter
   SliceGroupingAnalysisResult result;
 
   // we const_cast here, because I could not use a map.at(), which would make the code much more readable
-  const DICOMTag tagImagePositionPatient = std::make_pair(0x0020,0x0032); // Image Position (Patient)
-  const DICOMTag    tagImageOrientation = std::make_pair(0x0020, 0x0037); // Image Orientation
-  const DICOMTag          tagGantryTilt = std::make_pair(0x0018, 0x1120); // gantry tilt
+  const DICOMTag tagImagePositionPatient = DICOMTag(0x0020,0x0032); // Image Position (Patient)
+  const DICOMTag    tagImageOrientation = DICOMTag(0x0020, 0x0037); // Image Orientation
+  const DICOMTag          tagGantryTilt = DICOMTag(0x0018, 0x1120); // gantry tilt
 
   Vector3D fromFirstToSecondOrigin; fromFirstToSecondOrigin.Fill(0.0);
   bool fromFirstToSecondOriginInitialized(false);

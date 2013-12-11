@@ -14,26 +14,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkDICOMDatasetAccess_h
-#define mitkDICOMDatasetAccess_h
+#ifndef mitkTag_h
+#define mitkTag_h
 
-#include "mitkDICOMTag.h"
+#include <vector>
 
 #include "DICOMReaderExports.h"
 
 namespace mitk
 {
 
-class DICOMReader_EXPORT DICOMDatasetAccess
+class DICOMReader_EXPORT DICOMTag
 {
   public:
 
-    virtual std::string GetFilenameIfAvailable() const = 0;
-    virtual std::string GetTagValueAsString(const mitk::DICOMTag& tag) const = 0;
+    DICOMTag(unsigned int group, unsigned int element);
+    DICOMTag(const DICOMTag& other);
+    DICOMTag& operator=(const DICOMTag& other);
+
+    unsigned int GetGroup() const;
+    unsigned int GetElement() const;
+
+  protected:
+
+    unsigned int m_Group;
+    unsigned int m_Element;
 };
 
-
-typedef std::vector<DICOMDatasetAccess*> DICOMDatasetList;
+typedef std::vector<DICOMTag> DICOMTagList;
 
 }
 

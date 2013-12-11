@@ -23,9 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  typedef std::pair<unsigned int, unsigned int> DICOMTag;
   typedef std::vector<std::string> StringList;
-  typedef std::vector<DICOMTag> DICOMTagList;
   typedef std::vector<bool> BoolList;
 
   typedef enum

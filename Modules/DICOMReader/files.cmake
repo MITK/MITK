@@ -12,6 +12,7 @@ set(H_FILES
   mitkDICOMSortByTag.h
   mitkEquiDistantBlocksSorter.h
   mitkClassicDICOMSeriesReader.h
+  mitkDICOMTag.h
 )
 
 set(CPP_FILES
@@ -29,4 +30,5 @@ set(CPP_FILES
   mitkEquiDistantBlocksSorter.cpp
   mitkGantryTiltInformation.cpp
   mitkClassicDICOMSeriesReader.cpp
+  mitkDICOMTag.cpp
 )

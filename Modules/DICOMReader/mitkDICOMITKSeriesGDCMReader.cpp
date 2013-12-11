@@ -143,8 +143,8 @@ mitk::DICOMITKSeriesGDCMReader
         tagIter != tags.end();
         ++tagIter)
     {
-      MITK_DEBUG << "Sorting uses tag " << tagIter->first << "," << tagIter->second;
-      gdcmScanner.AddTag( gdcm::Tag(tagIter->first, tagIter->second) );
+      MITK_DEBUG << "Sorting uses tag " << tagIter->GetGroup() << "," << tagIter->GetElement();
+      gdcmScanner.AddTag( gdcm::Tag(tagIter->GetGroup(), tagIter->GetElement()) );
     }
   }
   timer.Stop("Setup scanning");

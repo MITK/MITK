@@ -103,7 +103,7 @@ mitk::DICOMTagBasedSorter
        tagIter != m_DistinguishingTags.end();
        ++tagIter)
   {
-    groupID << tagIter->first << tagIter->second; // make group/element part of the id to cover empty tags
+    groupID << tagIter->GetGroup() << tagIter->GetElement(); // make group/element part of the id to cover empty tags
     groupID << dataset->GetTagValueAsString(*tagIter);
   }
   // shorten ID?

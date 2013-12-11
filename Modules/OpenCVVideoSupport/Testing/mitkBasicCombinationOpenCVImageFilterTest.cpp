@@ -43,38 +43,38 @@ static void ConvertTestLoadedImage(std::string mitkImagePath)
   mitk::BasicCombinationOpenCVImageFilter::Pointer combinationFilter
       = mitk::BasicCombinationOpenCVImageFilter::New();
 
-  MITK_TEST_CONDITION_REQUIRED(combinationFilter->FilterImage(image), "Filtering with empty filter list is ok.");
-  MITK_TEST_CONDITION_REQUIRED(ImagesAreEqualInGray(image, compareImg), "Image must not be changed after filtering with empty filter list.");
+  MITK_TEST_CONDITION(combinationFilter->FilterImage(image), "Filtering with empty filter list is ok.");
+  MITK_TEST_CONDITION(ImagesAreEqualInGray(image, compareImg), "Image must not be changed after filtering with empty filter list.");
 
   mitk::ConvertGrayscaleOpenCVImageFilter::Pointer grayscaleFilter
       = mitk::ConvertGrayscaleOpenCVImageFilter::New();
 
   combinationFilter->PushFilter(grayscaleFilter.GetPointer());
-  MITK_TEST_CONDITION_REQUIRED(combinationFilter->FilterImage(image), "Filtering with grayscale filter should be ok.");
-  MITK_TEST_CONDITION_REQUIRED(image.channels() == 1, "Image must not have more than one channel after grayscale conversion.");
+  MITK_TEST_CONDITION(combinationFilter->FilterImage(image), "Filtering with grayscale filter should be ok.");
+  MITK_TEST_CONDITION(image.channels() == 1, "Image must not have more than one channel after grayscale conversion.");
 
   image.release();
   image = compareImg.clone();
 
   mitk::CropOpenCVImageFilter::Pointer cropFilter = mitk::CropOpenCVImageFilter::New();
   combinationFilter->PushFilter(cropFilter.GetPointer());
-  MITK_TEST_CONDITION_REQUIRED( ! combinationFilter->FilterImage(image), "Filter function must return false if an filter returns false.");
+  MITK_TEST_CONDITION( ! combinationFilter->FilterImage(image), "Filter function must return false if an filter returns false.");
 
-  MITK_TEST_CONDITION_REQUIRED(combinationFilter->PopFilter() == cropFilter, "Last added filter is equal to returned filter.");
-
-  image.release();
-  image = compareImg.clone();
-
-  MITK_TEST_CONDITION_REQUIRED(combinationFilter->FilterImage(image), "Filter function should return true again after removing incorrect filter.");
-
-  MITK_TEST_CONDITION_REQUIRED(combinationFilter->RemoveFilter(grayscaleFilter.GetPointer()), "Filter must be found.");
+  MITK_TEST_CONDITION(combinationFilter->PopFilter() == cropFilter, "Last added filter is equal to returned filter.");
 
   image.release();
   image = compareImg.clone();
 
-  MITK_TEST_CONDITION_REQUIRED(combinationFilter->FilterImage(image), "Filter function should still return true.");
+  MITK_TEST_CONDITION(combinationFilter->FilterImage(image), "Filter function should return true again after removing incorrect filter.");
 
-  MITK_TEST_CONDITION_REQUIRED(ImagesAreEqualInGray(image, compareImg), "Image must not be changed after all filters were removed.");
+  MITK_TEST_CONDITION(combinationFilter->RemoveFilter(grayscaleFilter.GetPointer()), "Filter must be found.");
+
+  image.release();
+  image = compareImg.clone();
+
+  MITK_TEST_CONDITION(combinationFilter->FilterImage(image), "Filter function should still return true.");
+
+  MITK_TEST_CONDITION(ImagesAreEqualInGray(image, compareImg), "Image must not be changed after all filters were removed.");
 }
 
 /**Documentation
@@ -84,8 +84,10 @@ int mitkBasicCombinationOpenCVImageFilterTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("BasicCombinationOpenCVImageFilter")
 
+  MITK_TEST_CONDITION_REQUIRED(argc == 2, "Two parameters are needed for this test.")
+
   ConvertTestLoadedImage(argv[1]);
-  // always end with this!
-  MITK_TEST_END();
+
+  MITK_TEST_END(); // always end with this!
 
 }

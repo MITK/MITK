@@ -15,4 +15,8 @@ IF(BUILD_TESTING AND MODULE_IS_ENABLED)
   "${MITK_DATA_DIR}/OpenCV-Data/BaseImage.png"
   "${MITK_DATA_DIR}/OpenCV-Data/GrayscaleImage.png"
   )
+
+  mitkAddCustomModuleTest("mitkBasicCombinationOpenCVImageFilterTest" "mitkBasicCombinationOpenCVImageFilterTest"
+  "${MITK_DATA_DIR}/OpenCV-Data/BaseImage.png"
+  )
 ENDIF(BUILD_TESTING AND MODULE_IS_ENABLED)

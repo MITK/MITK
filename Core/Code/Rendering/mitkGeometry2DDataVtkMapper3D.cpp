@@ -97,7 +97,6 @@ namespace mitk
     m_BackgroundMapper->SetInputData(emptyPolyData);
     m_BackgroundMapper->Update();
 
-    m_EdgeMapper->Update();
     m_EdgeActor->SetMapper( m_EdgeMapper );
 
     m_BackgroundActor->GetProperty()->SetAmbient( 0.5 );
@@ -119,8 +118,6 @@ namespace mitk
 
     m_Prop3DAssembly->AddPart( m_EdgeActor );
     m_Prop3DAssembly->AddPart( m_ImageAssembly );
-    m_FrontNormalsMapper->Update();
-    m_BackNormalsMapper->Update();
     m_FrontNormalsActor = vtkActor::New();
     m_FrontNormalsActor->SetMapper(m_FrontNormalsMapper);
     m_BackNormalsActor = vtkActor::New();

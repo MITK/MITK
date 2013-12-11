@@ -408,8 +408,6 @@ protected:
   */
   itk::TimeStamp m_DataReferenceChangedTime;
 
-  unsigned long m_PropertyListModifiedObserverTag;
-
 private:
 
   /** \brief copy constructor */

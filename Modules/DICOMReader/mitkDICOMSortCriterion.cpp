@@ -63,3 +63,17 @@ mitk::DICOMSortCriterion
 
   return allTags;
 }
+
+bool
+mitk::DICOMSortCriterion
+::NextLevelIsLeftBeforeRight(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right) const
+{
+  if (m_SecondaryCriterion.IsNotNull())
+  {
+    return m_SecondaryCriterion->IsLeftBeforeRight(left, right);
+  }
+  else
+  {
+    return (void*)left < (void*)right;
+  }
+}

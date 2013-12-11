@@ -79,14 +79,7 @@ mitk::DICOMSortByTag
   }
   else
   {
-    if (m_SecondaryCriterion.IsNotNull())
-    {
-      return m_SecondaryCriterion->IsLeftBeforeRight(left, right);
-    }
-    else
-    {
-      return leftString.compare(rightString) < 0; // TODO last resort needed
-    }
+    return this->NextLevelIsLeftBeforeRight(left, right);
   }
 }
 
@@ -120,14 +113,7 @@ mitk::DICOMSortByTag
     }
     else // ask secondary criterion
     {
-      if (m_SecondaryCriterion.IsNotNull())
-      {
-        return m_SecondaryCriterion->IsLeftBeforeRight(left, right);
-      }
-      else
-      {
-        return leftDouble < rightDouble; // TODO last resort
-      }
+      return this->NextLevelIsLeftBeforeRight(left, right);
     }
   }
 }

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMTagBasedSorter.h"
 #include "mitkDICOMSortByTag.h"
+#include "mitkSortByImagePositionPatient.h"
 
 
 mitk::ClassicDICOMSeriesReader
@@ -40,7 +41,7 @@ mitk::ClassicDICOMSeriesReader
   // a sorter...
   // TODO ugly syntax, improve..
   mitk::DICOMSortCriterion::ConstPointer sorting =
-    mitk::DICOMSortByTag::New( DICOMTag(0x0020, 0x0013), // instance number
+    mitk::SortByImagePositionPatient::New( // image position patient and image orientation
       mitk::DICOMSortByTag::New( DICOMTag(0x0020, 0x0012), // aqcuisition number
         mitk::DICOMSortByTag::New( DICOMTag(0x0008, 0x0032), // aqcuisition time
           mitk::DICOMSortByTag::New( DICOMTag(0x0018, 0x1060), // trigger time

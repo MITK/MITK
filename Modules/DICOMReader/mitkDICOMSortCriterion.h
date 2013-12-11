@@ -41,6 +41,8 @@ class DICOMReader_EXPORT DICOMSortCriterion : public itk::LightObject
     DICOMSortCriterion( DICOMSortCriterion::Pointer secondaryCriterion );
     virtual ~DICOMSortCriterion();
 
+    bool NextLevelIsLeftBeforeRight(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right) const;
+
     DICOMSortCriterion(const DICOMSortCriterion& other);
     DICOMSortCriterion& operator=(const DICOMSortCriterion& other);
 

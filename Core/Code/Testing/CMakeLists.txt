@@ -11,39 +11,78 @@ endif()
 MITK_CREATE_MODULE_TESTS(LABELS MITK-Core)
 # MITK_INSTALL_TARGETS(EXECUTABLES MitkTestDriver)
 
-mitkAddCustomModuleTest(mitkVolumeCalculatorTest_Png2D-bw mitkVolumeCalculatorTest ${MITK_DATA_DIR}/Png2D-bw.png ${MITK_DATA_DIR}/Pic2DplusT.nrrd)
+mitkAddCustomModuleTest(mitkVolumeCalculatorTest_Png2D-bw mitkVolumeCalculatorTest
+                        ${MITK_DATA_DIR}/Png2D-bw.png
+                        ${MITK_DATA_DIR}/Pic2DplusT.nrrd
+)
 
-mitkAddCustomModuleTest(mitkEventMapperTest_Test1And2 mitkEventMapperTest ${MITK_DATA_DIR}/TestStateMachine1.xml ${MITK_DATA_DIR}/TestStateMachine2.xml)
-mitkAddCustomModuleTest(mitkEventConfigTest_CreateObjectInDifferentWays mitkEventConfigTest ${MITK_SOURCE_DIR}/Core/Code/Testing/Resources/Interactions/StatemachineConfigTest.xml)
+mitkAddCustomModuleTest(mitkEventMapperTest_Test1And2 mitkEventMapperTest
+                        ${MITK_DATA_DIR}/TestStateMachine1.xml
+                        ${MITK_DATA_DIR}/TestStateMachine2.xml
+)
 
-#mitkAddCustomModuleTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest ${MITK_DATA_DIR}/Pic3D.pic.gz ${MITK_DATA_DIR}/BallBinary30x30x30.pic.gz)
-mitkAddCustomModuleTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest  ${MITK_DATA_DIR}/Pic3D.nrrd ${MITK_DATA_DIR}/BallBinary30x30x30.nrrd)
+mitkAddCustomModuleTest(mitkEventConfigTest_CreateObjectInDifferentWays mitkEventConfigTest
+                        ${MITK_SOURCE_DIR}/Core/Code/Testing/Resources/Interactions/StatemachineConfigTest.xml
+)
 
-mitkAddCustomModuleTest(mitkDataStorageTest_US4DCyl mitkDataStorageTest ${MITK_DATA_DIR}/US4DCyl.nrrd)
+mitkAddCustomModuleTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest
+                        ${MITK_DATA_DIR}/Pic3D.nrrd
+                        ${MITK_DATA_DIR}/BallBinary30x30x30.nrrd
+)
 
-mitkAddCustomModuleTest(mitkStateMachineFactoryTest_TestStateMachine1_2 mitkStateMachineFactoryTest ${MITK_DATA_DIR}/TestStateMachine1.xml ${MITK_DATA_DIR}/TestStateMachine2.xml)
+mitkAddCustomModuleTest(mitkDataStorageTest_US4DCyl mitkDataStorageTest
+                        ${MITK_DATA_DIR}/US4DCyl.nrrd
+)
 
-mitkAddCustomModuleTest(mitkDicomSeriesReaderTest_CTImage mitkDicomSeriesReaderTest ${MITK_DATA_DIR}/TinyCTAbdomen  ${MITK_DATA_DIR}/DICOMReader/Broken-Series)
+mitkAddCustomModuleTest(mitkStateMachineFactoryTest_TestStateMachine1_2 mitkStateMachineFactoryTest
+                        ${MITK_DATA_DIR}/TestStateMachine1.xml
+                        ${MITK_DATA_DIR}/TestStateMachine2.xml
+)
 
-mitkAddCustomModuleTest(mitkPointSetReaderTest mitkPointSetReaderTest ${MITK_DATA_DIR}/PointSetReaderTestData.mps)
+mitkAddCustomModuleTest(mitkDicomSeriesReaderTest_CTImage mitkDicomSeriesReaderTest
+                        ${MITK_DATA_DIR}/TinyCTAbdomen
+                        ${MITK_DATA_DIR}/DICOMReader/Broken-Series
+)
 
-mitkAddCustomModuleTest(mitkImageTest_4DImageData mitkImageTest ${MITK_DATA_DIR}/US4DCyl.nrrd)
-mitkAddCustomModuleTest(mitkImageTest_2D+tImageData mitkImageTest ${MITK_DATA_DIR}/Pic2DplusT.nrrd)
-mitkAddCustomModuleTest(mitkImageTest_3DImageData mitkImageTest ${MITK_DATA_DIR}/Pic3D.nrrd)
-mitkAddCustomModuleTest(mitkImageTest_brainImage mitkImageTest ${MITK_DATA_DIR}/brain.mhd)
-#mitkAddCustomModuleTest(mitkImageTest_color2DImage mitkImageTest ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg)
-mitkAddCustomModuleTest(mitkImageTest_3DImageData mitkImageGeneratorTest ${MITK_DATA_DIR}/Pic3D.nrrd)
+mitkAddCustomModuleTest(mitkPointSetReaderTest mitkPointSetReaderTest
+                        ${MITK_DATA_DIR}/PointSetReaderTestData.mps
+)
 
+mitkAddCustomModuleTest(mitkImageTest_4DImageData mitkImageTest
+                        ${MITK_DATA_DIR}/US4DCyl.nrrd
+)
+
+mitkAddCustomModuleTest(mitkImageTest_2D+tImageData mitkImageTest
+                        ${MITK_DATA_DIR}/Pic2DplusT.nrrd
+)
+
+mitkAddCustomModuleTest(mitkImageTest_3DImageData mitkImageTest
+                        ${MITK_DATA_DIR}/Pic3D.nrrd
+)
+
+mitkAddCustomModuleTest(mitkImageTest_brainImage mitkImageTest
+                        ${MITK_DATA_DIR}/brain.mhd
+)
+
+mitkAddCustomModuleTest(mitkImageTest_3DImageData mitkImageGeneratorTest
+                        ${MITK_DATA_DIR}/Pic3D.nrrd
+)
 
 mitkAddCustomModuleTest(mitkLevelWindowManagerTest mitkLevelWindowManagerTest
                         ${MITK_DATA_DIR}/Pic3D.nrrd
 )
+
 mitkAddCustomModuleTest(mitkMultiComponentImageDataComparisonFilterTest mitkMultiComponentImageDataComparisonFilterTest
                         ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg
 )
 
-mitkAddCustomModuleTest(mitkImageToItkTest mitkImageToItkTest ${MITK_DATA_DIR}/Pic3D.nrrd)
-mitkAddCustomModuleTest(mitkImageSliceSelectorTest mitkImageSliceSelectorTest ${MITK_DATA_DIR}/Pic2DplusT.nrrd)
+mitkAddCustomModuleTest(mitkImageToItkTest mitkImageToItkTest
+                        ${MITK_DATA_DIR}/Pic3D.nrrd
+)
+
+mitkAddCustomModuleTest(mitkImageSliceSelectorTest mitkImageSliceSelectorTest
+                        ${MITK_DATA_DIR}/Pic2DplusT.nrrd
+)
 
 
 if(MITK_ENABLE_RENDERING_TESTING) ### since the rendering test's do not run in ubuntu, yet, we build them only for other systems or if the user explicitly sets the variable MITK_ENABLE_RENDERING_TESTING
@@ -105,9 +144,7 @@ mitkAddCustomModuleTest(ResliceInterpolationIsCubic mitkImageVtkMapper2DResliceI
 )
 #End test reslice interpolation
 
-
 #Overlays
-
 mitkAddCustomModuleTest(mitkLabelOverlay3DRendering2DTest mitkLabelOverlay3DRendering2DTest #OverlayTest
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkLabelOverlay3DRendering2DTest.png #corresponding reference screenshot
 )
@@ -140,8 +177,7 @@ mitkAddCustomModuleTest(mitkTextOverlay3DColorRenderingTest_ball mitkTextOverlay
                         ${MITK_DATA_DIR}/ball.stl #input image to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkTextOverlay3DColorRenderingTest_ball.png #corresponding reference screenshot
 )
-
-##End of overlayTests
+#End of overlayTests
 
 # Testing of the rendering of binary images
 mitkAddCustomModuleTest(mitkImageVtkMapper2D_binaryTestImage640x480 mitkImageVtkMapper2DTest #test for standard Pic3D axial slice
@@ -166,11 +202,6 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw mitkIm
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Png2D-bw-TransferFunctionRGBImage640x480REF.png #corresponding reference screenshot
 )
 
-#mitkAddCustomModuleTest(mitkImageVtkMapper2DLookupTableTest_Png2D-bw mitkImageVtkMapper2DLookupTableTest
-#                        ${MITK_DATA_DIR}/Png2D-bw.png
-#                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Png2D-bw-LookupTableRGBImage640x480REF.png #corresponding reference screenshot
-#)
-
 mitkAddCustomModuleTest(mitkSurfaceGLMapper2DColorTest_RedBall mitkSurfaceGLMapper2DColorTest
                         ${MITK_DATA_DIR}/ball.stl
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/ballColorRed640x480REF.png #corresponding reference screenshot
@@ -186,12 +217,28 @@ mitkAddCustomModuleTest(mitkSurfaceGLMapper2DOpacityTest_BallOpacity mitkSurface
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/ballOpacity640x480REF.png #corresponding reference screenshot
 )
 
+############################## DISABLED TESTS
+
 #Removed due to high rendering error.
 #mitkAddCustomModuleTest(mitkSurfaceVtkMapper3DTexturedSphereTest_Football mitkSurfaceVtkMapper3DTexturedSphereTest
 #                        ${MITK_DATA_DIR}/RenderingTestData/texture.jpg #input texture
 #                        -V
 #                        ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/texturedSphere640x480REF.png corresponding reference screenshot
 #)
+
+#mitkAddCustomModuleTest(mitkImageVtkMapper2DLookupTableTest_Png2D-bw mitkImageVtkMapper2DLookupTableTest
+#                        ${MITK_DATA_DIR}/Png2D-bw.png
+#                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Png2D-bw-LookupTableRGBImage640x480REF.png #corresponding reference screenshot
+#)
+
+#mitkAddCustomModuleTest(mitkImageTest_color2DImage mitkImageTest
+#                        ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg
+#)
+
+#mitkAddCustomModuleTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest
+#                        ${MITK_DATA_DIR}/Pic3D.pic.gz ${MITK_DATA_DIR}/BallBinary30x30x30.pic.gz
+#)
+
 
 SET_PROPERTY(TEST mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw mitkImageVtkMapper2D_pic3dOpacity640x480 mitkSurfaceGLMapper2DOpacityTest_BallOpacity mitkSurfaceGLMapper2DColorTest_DasArmeSchwein mitkSurfaceGLMapper2DColorTest_RedBall mitkSurfaceVtkMapper3DTest_TextureProperty mitkPointSetVtkMapper2D_Pic3DPointSetForPic3D640x480 mitkPointSetVtkMapper2D_openMeAlone640x480 mitkPointSetVtkMapper2D_openMeAloneGlyphType640x480 mitkPointSetVtkMapper2D_openMeAloneTransformed640x480 #mitkSurfaceVtkMapper3DTexturedSphereTest_Football
 PROPERTY RUN_SERIAL TRUE)

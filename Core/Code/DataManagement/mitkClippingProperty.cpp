@@ -22,7 +22,7 @@ namespace mitk
 {
 
 ClippingProperty::ClippingProperty()
-: m_ClippingEnabled( false )
+    : m_ClippingEnabled( false ), m_Origin(0.0), m_Normal(0.0)
 {
 }
 

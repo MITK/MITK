@@ -29,6 +29,19 @@ mitk::PixelType::PixelType( const mitk::PixelType& other )
 {
 }
 
+mitk::PixelType& mitk::PixelType::operator=(const PixelType& other)
+{
+
+  m_ComponentType = other.m_ComponentType;
+  m_PixelType = other.m_PixelType;
+  m_ComponentTypeName = other.m_ComponentTypeName;
+  m_PixelTypeName = other.m_PixelTypeName;
+  m_NumberOfComponents = other.m_NumberOfComponents;
+  m_BytesPerComponent = other.m_BytesPerComponent;
+
+  return *this;
+}
+
 itk::ImageIOBase::IOPixelType mitk::PixelType::GetPixelType() const
 {
   return m_PixelType;

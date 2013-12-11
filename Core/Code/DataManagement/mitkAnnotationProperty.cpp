@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAnnotationProperty.h"
 
-mitk::AnnotationProperty::AnnotationProperty()
+mitk::AnnotationProperty::AnnotationProperty() : m_Position(0.0)
 {
 }
 

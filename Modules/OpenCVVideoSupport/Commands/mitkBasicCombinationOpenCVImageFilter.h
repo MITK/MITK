@@ -33,7 +33,7 @@ public:
     * \brief Apply list of filters to the given image.
     * \return false if one of the filter returns false. Be careful, that the image could already be changed when the function returned false.
     */
-  bool FilterImage( cv::Mat& image );
+  bool OnFilterImage( cv::Mat& image );
 
   /**
     * \brief Push an additional filter to the list of filter for applying to an image.

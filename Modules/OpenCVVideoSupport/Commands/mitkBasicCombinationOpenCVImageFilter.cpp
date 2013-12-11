@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "cv.h"
 
 namespace mitk {
-bool BasicCombinationOpenCVImageFilter::FilterImage( cv::Mat& image )
+bool BasicCombinationOpenCVImageFilter::OnFilterImage( cv::Mat& image )
 {
   // go through the list of all filters
   for ( std::vector<AbstractOpenCVImageFilter::Pointer>::iterator it

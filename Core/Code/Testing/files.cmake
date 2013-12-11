@@ -17,18 +17,18 @@ set(MODULE_TESTS
   mitkGlobalInteractionTest.cpp
   mitkImageEqualTest.cpp
   mitkImageDataItemTest.cpp
-  #mitkImageMapper2DTest.cpp
+  #mitkImageMapper2DTest.cpp #tested class mitkImageMapperGL2D doesn't exist any more
   mitkImageGeneratorTest.cpp
   mitkBaseDataTest.cpp
-  #mitkImageToItkTest.cpp
+  mitkImageToItkTest.cpp
   mitkImportItkImageTest.cpp
   mitkGrabItkImageMemoryTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
   mitkInteractorTest.cpp
-  #mitkITKThreadingTest.cpp
+  #mitkITKThreadingTest.cpp #test outdated because itk::Semaphore was removed from ITK
   mitkLevelWindowTest.cpp
   mitkMessageTest.cpp
-  #mitkPipelineSmartPointerCorrectnessTest.cpp
+  #mitkPipelineSmartPointerCorrectnessTest.cpp #file doesn't exist!
   mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
   mitkPointSetEqualTest.cpp
@@ -39,8 +39,8 @@ set(MODULE_TESTS
   mitkPointSetInteractorTest.cpp
   mitkPropertyTest.cpp
   mitkPropertyListTest.cpp
-  #mitkRegistrationBaseTest.cpp
-  #mitkSegmentationInterpolationTest.cpp
+  #mitkRegistrationBaseTest.cpp #tested class  mitkRegistrationBase doesn't exist any more
+  #mitkSegmentationInterpolationTest.cpp #file doesn't exist!
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkStateMachineTest.cpp
@@ -56,7 +56,7 @@ set(MODULE_TESTS
   mitkVerboseLimitedLinearUndoTest.cpp
   mitkWeakPointerTest.cpp
   mitkTransferFunctionTest.cpp
-  #mitkAbstractTransformGeometryTest.cpp
+  #mitkAbstractTransformGeometryTest.cpp #seems as tested class mitkExternAbstractTransformGeometry doesnt exist any more
   mitkStepperTest.cpp
   itkTotalVariationDenoisingImageFilterTest.cpp
   mitkRenderingManagerTest.cpp

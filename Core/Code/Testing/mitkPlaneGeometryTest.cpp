@@ -633,7 +633,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
     return EXIT_FAILURE;
   }
   std::cout << "Testing if cloned and original version are at the same place: ";
-  if(mitk::Equal(clonedplanegeometry2->IsOnPlane(planegeometry), true) ==false)
+  if(mitk::Equal(clonedplanegeometry2->IsOnPlane(planegeometry.GetPointer()), true) ==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -660,7 +660,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   clonedplanegeometry2->ExecuteOperation( planerot );
 
   std::cout << "Testing whether the flipped plane is still the original plane: ";
-  if( mitk::Equal( clonedplanegeometry2->IsOnPlane(planegeometry), true )==false )
+  if( mitk::Equal( clonedplanegeometry2->IsOnPlane(planegeometry.GetPointer()), true )==false )
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

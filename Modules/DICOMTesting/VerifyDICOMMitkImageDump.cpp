@@ -76,7 +76,7 @@ int main(int argc, char** argv)
   }
 
   mitk::TestDICOMLoading loader;
-  mitk::TestDICOMLoading::StringContainer files;
+  mitk::StringList files;
 
   // TODO load reference dumps
 

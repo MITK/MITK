@@ -57,9 +57,11 @@ void mitk::TestDICOMLoading::ResetUserLocale()
 
 
 
-mitk::TestDICOMLoading::ImageList mitk::TestDICOMLoading::LoadFiles( const StringContainer& files, Image::Pointer preLoadedVolume )
+mitk::TestDICOMLoading::ImageList
+mitk::TestDICOMLoading
+::LoadFiles( const StringList& files )
 {
-  for (StringContainer::const_iterator iter = files.begin();
+  for (StringList::const_iterator iter = files.begin();
        iter != files.end();
        ++iter)
   {
@@ -68,26 +70,16 @@ mitk::TestDICOMLoading::ImageList mitk::TestDICOMLoading::LoadFiles( const Strin
 
   ImageList result;
 
-  DicomSeriesReader::FileNamesGrouping seriesInFiles = DicomSeriesReader::GetSeries( files, true );
+  ClassicDICOMSeriesReader::Pointer reader = ClassicDICOMSeriesReader::New();
+  reader->SetInputFiles( files );
+  reader->AnalyzeInputFiles();
+  reader->LoadImages();
 
-  // TODO sort series UIDs, implementation of map iterator might differ on different platforms (or verify this is a standard topic??)
-  for (DicomSeriesReader::FileNamesGrouping::const_iterator seriesIter = seriesInFiles.begin();
-       seriesIter != seriesInFiles.end();
-       ++seriesIter)
+  unsigned int numberOfImages = reader->GetNumberOfOutputs();
+  for (unsigned imageIndex = 0; imageIndex < numberOfImages; ++imageIndex)
   {
-    StringContainer files = seriesIter->second.GetFilenames();
-
-    DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries( files, true, true, true, 0, preLoadedVolume ); // true, true, true ist just a copy of the default values
-
-    if (node.IsNotNull())
-    {
-      Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-
-      result.push_back( image );
-    }
-    else
-    {
-    }
+    const DICOMImageBlockDescriptor& block = reader->GetOutput(imageIndex);
+    result.push_back( block.GetMitkImage() );
   }
 
   return result;

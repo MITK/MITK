@@ -13,12 +13,13 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+
 #include "mitkTestDICOMLoading.h"
 
 int main(int argc, char** argv)
 {
   mitk::TestDICOMLoading loader;
-  mitk::TestDICOMLoading::StringContainer files;
+  mitk::StringList files;
 
   for (int arg = 1; arg < argc; ++arg) files.push_back( argv[arg] );
 

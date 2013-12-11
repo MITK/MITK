@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkTestDICOMLoading.h"
+
 #include "mitkTestingMacros.h"
 
 int mitkDICOMTestingSanityTest(int argc, char** const argv)
@@ -23,15 +24,7 @@ int mitkDICOMTestingSanityTest(int argc, char** const argv)
   MITK_TEST_BEGIN("DICOMTestingSanity")
 
   mitk::TestDICOMLoading loader;
-  mitk::TestDICOMLoading::StringContainer files;
-
-  // adapt expectations depending on configuration
-  std::string configuration = mitk::DicomSeriesReader::GetConfigurationString();
-  MITK_TEST_OUTPUT(<< "Configuration: " << configuration)
-  /*
-  MITK_TEST_CONDITION_REQUIRED( configuration.find( "GDCM_VERSION: 2." ) != std::string::npos,
-                                "Expect at least GDCM version 2" )
-  */
+  mitk::StringList files;
 
   // load files from commandline
   unsigned int numberOfExpectedImages = 0;
@@ -39,12 +32,11 @@ int mitkDICOMTestingSanityTest(int argc, char** const argv)
   for (int arg = 2; arg < argc; ++arg) files.push_back( argv[arg] );
 
   // verify all files are DICOM
-  for (mitk::TestDICOMLoading::StringContainer::const_iterator fileIter = files.begin();
+  for (mitk::StringList::const_iterator fileIter = files.begin();
        fileIter != files.end();
        ++fileIter)
   {
-    MITK_TEST_CONDITION_REQUIRED( mitk::DicomSeriesReader::IsDicom(*fileIter) , *fileIter << " is recognized as loadable DICOM object" )
-
+    MITK_TEST_CONDITION_REQUIRED( mitk::DICOMFileReader::IsDICOM(*fileIter) , *fileIter << " is recognized as loadable DICOM object" )
   }
 
   // compare with expected number of images from commandline

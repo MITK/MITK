@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkTestDICOMLoading_h
 #define mitkTestDICOMLoading_h
 
-#include "mitkDicomSeriesReader.h"
+#include "mitkClassicDICOMSeriesReader.h"
 
 #include "mitkDICOMTestingExports.h"
 
@@ -27,14 +27,12 @@ class mitkDICOMTesting_EXPORT TestDICOMLoading
 {
   public:
 
-    typedef DicomSeriesReader::StringContainer StringContainer;
-    typedef std::list<DataNode::Pointer> NodeList;
     typedef std::list<Image::Pointer> ImageList;
 
     TestDICOMLoading();
 
     ImageList
-    LoadFiles( const StringContainer& files, Image::Pointer preLoadedVolume = NULL );
+    LoadFiles( const StringList & files );
 
     /**
       \brief Dump relevant image information for later comparison.

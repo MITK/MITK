@@ -1,6 +1,5 @@
 
-MITK_CREATE_MODULE_TESTS(LABELS MITK-Core)
-
+MITK_CREATE_MODULE_TESTS(LABELS)
 
 include(mitkFunctionAddTestLabel)
 

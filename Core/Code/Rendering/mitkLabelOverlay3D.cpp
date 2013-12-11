@@ -119,7 +119,6 @@ void mitk::LabelOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
   }
 }
 
-
 vtkProp* mitk::LabelOverlay3D::GetVtkProp(BaseRenderer *renderer) const
 {
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
@@ -142,7 +141,15 @@ void mitk::LabelOverlay3D::SetPriorityVector(const std::vector<int>& PriorityVec
 void mitk::LabelOverlay3D::SetLabelCoordinates(mitk::PointSet::Pointer LabelCoordinates)
 {
   if(m_LabelCoordinates.IsNotNull())
+  {
     m_LabelCoordinates->RemoveObserver(m_PointSetModifiedObserverTag);
+    m_PointSetModifiedObserverTag = 0;
+    m_LabelCoordinates = NULL;
+  }
+  if(LabelCoordinates.IsNull())
+  {
+    return;
+  }
   m_LabelCoordinates = LabelCoordinates;
   itk::MemberCommand<mitk::LabelOverlay3D>::Pointer _PropertyListModifiedCommand =
       itk::MemberCommand<mitk::LabelOverlay3D>::New();

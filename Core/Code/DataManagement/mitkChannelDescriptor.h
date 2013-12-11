@@ -40,7 +40,7 @@ public:
 
     /** \brief Get the type of channel's elements */
     PixelType GetPixelType() const
-    { return *m_PixelType; }
+    { return m_PixelType; }
 
     /** \brief Get the size in bytes of the channel */
     size_t GetSize() const
@@ -75,7 +75,7 @@ protected:
     /** The type of each element of the channel
 
       \sa PixelType */
-    PixelType *m_PixelType;
+    PixelType m_PixelType;
 
     /** Size of the channel in bytes */
     size_t m_Size;

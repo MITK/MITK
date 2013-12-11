@@ -34,6 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "btnDown.xpm"
 
 
+#include <mitkDataInteractor.h>
+
+
 
 QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation):
   QWidget(parent), m_PointListView(NULL),  m_MultiWidget(NULL),  m_PointSetNode(NULL), m_Orientation(0),  m_MovePointUpBtn(NULL),
@@ -204,6 +207,9 @@ void QmitkPointListWidget::SetPointSet(mitk::PointSet* newPs)
 
 void QmitkPointListWidget::SetPointSetNode(mitk::DataNode *newNode)
 {
+  if (m_DataInteractor.IsNotNull())
+{    m_DataInteractor->SetDataNode(newNode);
+ MITK_INFO << "Updated node"; }
   ObserveNewNode(newNode);
   dynamic_cast<QmitkPointListModel*>(this->m_PointListView->model())->SetPointSetNode(newNode);
 }
@@ -344,11 +350,19 @@ void QmitkPointListWidget::OnBtnAddPoint(bool checked)
     {
       m_Interactor = dynamic_cast<mitk::PointSetInteractor*>(m_PointSetNode->GetInteractor());
 
-      if (m_Interactor.IsNull())//if not present, instanciate one
-        m_Interactor = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode);
+//      if (m_Interactor.IsNull())//if not present, instanciate one
+//        m_Interactor = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode);
 
+      if (m_DataInteractor.IsNull())
+
+      {m_DataInteractor = mitk::PointSetDataInteractor::New();
+      m_DataInteractor->LoadStateMachine("PointSet.xml");
+      m_DataInteractor->SetEventConfig("globalConfig.xml");
+      m_DataInteractor->AddEventConfig("PointSetConfig.xml");
+      m_DataInteractor->SetDataNode(m_PointSetNode);
+      }
       //add it to global interaction to activate it
-      mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
+      //mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
     }
     else if ( m_Interactor )
     {
@@ -396,6 +410,12 @@ void QmitkPointListWidget::EnableEditButton( bool enabled )
 
 void QmitkPointListWidget::ObserveNewNode( mitk::DataNode* node )
 {
+
+  if (m_DataInteractor.IsNotNull())
+  {
+    m_DataInteractor->SetDataNode(node);
+  }
+
   // remove old observer
   if ( m_PointSetNode )
   {

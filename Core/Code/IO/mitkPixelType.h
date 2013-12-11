@@ -60,6 +60,7 @@ public:
   typedef itk::ImageIOBase::IOComponentType ItkIOComponentType;
 
   PixelType(const mitk::PixelType & aPixelType);
+  PixelType& operator=(const PixelType& other);
 
   itk::ImageIOBase::IOPixelType GetPixelType() const;
 
@@ -142,19 +143,17 @@ private:
   // default constructor is disabled on purpose
   PixelType(void);
 
-  // assignment operator declared private on purpose
-  PixelType& operator=(const PixelType& other);
 
   /** \brief the \a type_info of the scalar (!) component type. Each element
     may contain m_NumberOfComponents (more than one) of these scalars.
   */
-  const int m_ComponentType;
+  int m_ComponentType;
 
-  const ItkIOPixelType m_PixelType;
+  ItkIOPixelType m_PixelType;
 
-  const std::string m_ComponentTypeName;
+  std::string m_ComponentTypeName;
 
-  const std::string m_PixelTypeName;
+  std::string m_PixelTypeName;
 
   std::size_t m_NumberOfComponents;
 

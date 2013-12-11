@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkColorProperty.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkPointSet.h"
+#include "mitkLabelOverlay3D.h"
+#include "mitkOverlayManager.h"
 
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
@@ -66,6 +68,10 @@ mitk::PointSetVtkMapper3D::PointSetVtkMapper3D()
   m_SelectedActor = vtkSmartPointer<vtkActor>::New();
   m_UnselectedActor = vtkSmartPointer<vtkActor>::New();
   m_ContourActor = vtkSmartPointer<vtkActor>::New();
+
+  m_OverlayManager = mitk::OverlayManager::New();
+  m_LabelOverlay = mitk::LabelOverlay3D::New();
+  m_OverlayManager->AddOverlay(m_LabelOverlay.GetPointer());
 }
 
 mitk::PointSetVtkMapper3D::~PointSetVtkMapper3D()
@@ -161,13 +167,14 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
   const char * pointLabel=NULL;
   if(showLabel)
   {
+    m_LabelOverlay->SetVisibility(true);
     if(dynamic_cast<mitk::StringProperty *>(this->GetDataNode()->GetPropertyList()->GetProperty("label")) != NULL)
       pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataNode()->GetPropertyList()->GetProperty("label"))->GetValue();
     else
       showLabel = false;
   }
 
-
+  std::vector<std::string> labelVector;
   //check if the list for the PointDataContainer is the same size as the PointsContainer. Is not, then the points were inserted manually and can not be visualized according to the PointData (selected/unselected)
   bool pointDataBroken = (itkPointSet->GetPointData()->Size() != itkPointSet->GetPoints()->Size());
   //now add an object for each point in data
@@ -294,6 +301,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
       // Define the text for the label
       vtkSmartPointer<vtkVectorText> label = vtkSmartPointer<vtkVectorText>::New();
       label->SetText(l.c_str());
+      labelVector.push_back(l);
 
       //# Set up a transform to move the label to a new position.
       vtkSmartPointer<vtkTransform> aLabelTransform = vtkSmartPointer<vtkTransform>::New();
@@ -324,6 +332,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
       pointDataIter++;
   } // end FOR
 
+  m_LabelOverlay->SetLabelVector(labelVector);
 
   //now according to number of elements added to selected or unselected, build up the rendering pipeline
   if (m_NumberOfSelectedAdded > 0)
@@ -351,6 +360,11 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
   }
 }
 
+mitk::OverlayManager *mitk::PointSetVtkMapper3D::GetOverlayManager() const
+{
+  return m_OverlayManager.GetPointer();
+}
+
 
 void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
@@ -361,8 +375,11 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     m_UnselectedActor->VisibilityOff();
     m_SelectedActor->VisibilityOff();
     m_ContourActor->VisibilityOff();
+    m_LabelOverlay->SetVisibility(false);
     return;
   }
+
+  m_LabelOverlay->SetLabelCoordinates(dynamic_cast<PointSet*>(GetDataNode()->GetData()));
 
   // create new vtk render objects (e.g. sphere for a point)
 
@@ -636,6 +653,8 @@ void mitk::PointSetVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk:
   node->AddProperty( "contoursize", mitk::FloatProperty::New(0.5), renderer, overwrite );
   node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );
   node->AddProperty( "updateDataOnRender", mitk::BoolProperty::New(true), renderer, overwrite );
+  node->AddProperty( "show label", mitk::BoolProperty::New(true), renderer, overwrite );
+  node->AddProperty( "label", mitk::StringProperty::New("Hallo"), renderer, overwrite );
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 

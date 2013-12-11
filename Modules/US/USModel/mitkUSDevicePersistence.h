@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKUSDevicePersistence_H_HEADER_INCLUDED_
 
 // MITK
-#include "MitkUSUIExports.h"
 #include <mitkCommon.h>
 #include <mitkUSVideoDevice.h>
 
@@ -27,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactory.h>
 
 // QT
- #include <QSettings>
+#include <QSettings>
 
 
 namespace mitk {
@@ -36,7 +35,7 @@ namespace mitk {
     * TODO
     */
 
-   class MitkUSUI_EXPORT USDevicePersistence : public itk::Object
+   class USDevicePersistence : public itk::Object
     {
     public:
       mitkClassMacro(USDevicePersistence, itk::Object);
@@ -44,7 +43,7 @@ namespace mitk {
 
       void StoreCurrentDevices();
 
-      void RestoreLastDevices();
+      std::vector<mitk::USDevice::Pointer> RestoreLastDevices();
 
     protected:
 

@@ -55,6 +55,9 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
     /* @brief Disconnects all devices immediately. */
     virtual void DisconnectAllDevices();
 
+  signals:
+    void NewDeviceButtonClicked();
+
   public slots:
 
   protected slots:
@@ -68,6 +71,9 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
     \brief Called, when the button "Disconnect Device" was clicked.
     */
     void OnClickedDisconnectDevice();
+
+    void OnClickedRemoveDevice();
+    void OnClickedNewDevice();
 
     /*
     \brief Called, when the selection in the devicelist changes.

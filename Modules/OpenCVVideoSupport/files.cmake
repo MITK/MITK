@@ -6,6 +6,7 @@ set(CPP_FILES
     mitkOpenCVToMitkImageFilter.cpp
     mitkImageToOpenCVImageFilter.cpp
     Commands/mitkAbstractOpenCVImageFilter.cpp
+    Commands/mitkBasicCombinationOpenCVImageFilter.cpp
     Commands/mitkConvertGrayscaleOpenCVImageFilter.cpp
     Commands/mitkCropOpenCVImageFilter.cpp
 )

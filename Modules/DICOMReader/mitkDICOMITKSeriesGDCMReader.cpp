@@ -147,6 +147,11 @@ mitk::DICOMITKSeriesGDCMReader
       gdcmScanner.AddTag( gdcm::Tag(tagIter->GetGroup(), tagIter->GetElement()) );
     }
   }
+
+  // Add some of our own interest
+  gdcmScanner.AddTag( gdcm::Tag(0x0018,0x1164) );
+  gdcmScanner.AddTag( gdcm::Tag(0x0028,0x0030) );
+
   timer.Stop("Setup scanning");
 
   timer.Start("Tag scanning");
@@ -217,6 +222,16 @@ mitk::DICOMITKSeriesGDCMReader
 
     DICOMImageBlockDescriptor block;
     block.SetImageFrameList( frameList );
+
+    if (!gdcmFrameInfoList.empty())
+    {
+      // assume
+      static const DICOMTag tagPixelSpacing(0x0028,0x0030);
+      static const DICOMTag tagImagerPixelSpacing(0x0018,0x1164);
+      std::string pixelSpacingString = (gdcmFrameInfoList.front())->GetTagValueAsString( tagPixelSpacing );
+      std::string imagerPixelSpacingString = gdcmFrameInfoList.front()->GetTagValueAsString( tagImagerPixelSpacing );
+      block.SetPixelSpacingInformation(pixelSpacingString, imagerPixelSpacingString);
+    }
     this->SetOutput( o, block );
   }
   timer.Stop("Output");
@@ -252,6 +267,20 @@ mitk::DICOMITKSeriesGDCMReader
     }
 
     mitk::Image::Pointer mitkImage = helper.Load( filenames, correctTilt, tiltInfo ); // TODO preloaded images, caching..?
+
+    Vector3D imageSpacing = mitkImage->GetGeometry()->GetSpacing();
+
+    ScalarType desiredSpacingX = imageSpacing[0];
+    ScalarType desiredSpacingY = imageSpacing[1];
+    block.GetDesiredMITKImagePixelSpacing( desiredSpacingX, desiredSpacingY ); // prefer pixel spacing over imager pixel spacing
+
+    MITK_DEBUG << "Loaded image with spacing " << imageSpacing[0] << ", " << imageSpacing[1];
+    MITK_DEBUG << "Found correct spacing info " << desiredSpacingX << ", " << desiredSpacingY;
+
+    imageSpacing[0] = desiredSpacingX;
+    imageSpacing[1] = desiredSpacingY;
+    mitkImage->GetGeometry()->SetSpacing( imageSpacing );
+
     block.SetMitkImage( mitkImage );
   }
 
@@ -278,6 +307,7 @@ void
 mitk::DICOMITKSeriesGDCMReader
 ::EnsureMandatorySortersArePresent()
 {
+  // TODO: cols, rows, etc. are also not optional
   mitk::EquiDistantBlocksSorter::Pointer distanceKeeper = mitk::EquiDistantBlocksSorter::New();
   this->AddSortingElement( distanceKeeper );
 }

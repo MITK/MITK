@@ -51,6 +51,10 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
     void SetPixelSpacingInterpretation( PixelSpacingInterpretation interpretation );
     PixelSpacingInterpretation GetPixelSpacingInterpretation() const;
 
+    void SetPixelSpacingInformation(const std::string& pixelSpacing, const std::string& imagerPixelSpacing);
+    void GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const;
+    bool DICOMStringToSpacing(const std::string& s, float& spacingX, float& spacingY) const;
+
   private:
 
     DICOMImageFrameList m_ImageFrameList;
@@ -58,6 +62,9 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
     BoolList m_SliceIsLoaded;
     bool m_PixelsInterpolated;
     PixelSpacingInterpretation m_PixelSpacingInterpretation;
+
+    std::string m_PixelSpacing;
+    std::string m_ImagerPixelSpacing;
 };
 
 }

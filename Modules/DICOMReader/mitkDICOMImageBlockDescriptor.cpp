@@ -20,6 +20,8 @@ mitk::DICOMImageBlockDescriptor
 ::DICOMImageBlockDescriptor()
 :m_PixelsInterpolated(false)
 ,m_PixelSpacingInterpretation()
+,m_PixelSpacing("")
+,m_ImagerPixelSpacing("")
 {
 }
 
@@ -35,6 +37,8 @@ mitk::DICOMImageBlockDescriptor
 ,m_SliceIsLoaded( other.m_SliceIsLoaded )
 ,m_PixelsInterpolated( other.m_PixelsInterpolated )
 ,m_PixelSpacingInterpretation( other.m_PixelSpacingInterpretation )
+,m_PixelSpacing( other.m_PixelSpacing )
+,m_ImagerPixelSpacing( other.m_ImagerPixelSpacing )
 {
   if (m_MitkImage)
   {
@@ -53,6 +57,8 @@ mitk::DICOMImageBlockDescriptor
     m_SliceIsLoaded = other.m_SliceIsLoaded;
     m_PixelsInterpolated = other.m_PixelsInterpolated;
     m_PixelSpacingInterpretation = other.m_PixelSpacingInterpretation;
+    m_PixelSpacing = other.m_PixelSpacing;
+    m_ImagerPixelSpacing = other.m_ImagerPixelSpacing;
 
     if (m_MitkImage)
     {
@@ -176,4 +182,55 @@ mitk::DICOMImageBlockDescriptor
 ::GetPixelSpacingInterpretation() const
 {
   return m_PixelSpacingInterpretation;
+}
+
+void
+mitk::DICOMImageBlockDescriptor
+::SetPixelSpacingInformation(const std::string& pixelSpacing, const std::string& imagerPixelSpacing)
+{
+  m_PixelSpacing = pixelSpacing;
+  m_ImagerPixelSpacing = imagerPixelSpacing;
+}
+
+void
+mitk::DICOMImageBlockDescriptor
+::GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const
+{
+  // preference for "in patient" pixel spacing
+  if ( !DICOMStringToSpacing( m_PixelSpacing, spacingX, spacingY ) )
+  {
+    // fallback to "on detector" spacing
+    if ( !DICOMStringToSpacing( m_ImagerPixelSpacing, spacingX, spacingY ) )
+    {
+      // last resort: invent something
+      spacingX = spacingY = 1.0;
+    }
+  }
+}
+
+bool
+mitk::DICOMImageBlockDescriptor
+::DICOMStringToSpacing(const std::string& s, float& spacingX, float& spacingY) const
+{
+  bool successful = false;
+
+  MITK_INFO << "Convert '"<<s<<"' to spacings";
+
+  std::istringstream spacingReader(s);
+  std::string spacing;
+  if ( std::getline( spacingReader, spacing, '\\' ) )
+  {
+    spacingY = atof( spacing.c_str() );
+    MITK_INFO  << "A part '"<<spacing<<"'" <<spacingY;
+
+    if ( std::getline( spacingReader, spacing, '\\' ) )
+    {
+    MITK_INFO  << "A part '"<<spacing<<"'" <<spacingX;
+      spacingX = atof( spacing.c_str() );
+
+      successful = true;
+    }
+  }
+
+  return successful;
 }

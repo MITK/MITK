@@ -215,6 +215,10 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
     * @brief ShortCut for the above method
     */
     void Set( const char* propertyKey, const char* stringValue);
+    /**
+    * @brief ShortCut for the above method
+    */
+    void Set( const char* propertyKey, const std::string& stringValue);
 
     /**
      * @brief Get the timestamp of the last change of the map or the last change of one of

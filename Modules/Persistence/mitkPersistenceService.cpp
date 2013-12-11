@@ -21,16 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "usModuleContext.h"
 #include "usGetModuleContext.h"
-#include <Poco\Path.h>
+#include "Poco\File.h"
 
-std::string mitk::PersistenceService::CreateDefaultFileName()
-{
-    std::string homeDir = Poco::Path::home();
-    std::string file = homeDir + "PersistenceService.mitk";
-    return file;
-}
-
-const std::string mitk::PersistenceService::DEFAULT_FILE_NAME(CreateDefaultFileName());
 
 const std::string mitk::PersistenceService::PERSISTENCE_PROPERTY_NAME("PersistenceNode");
 
@@ -47,7 +39,7 @@ mitk::PersistenceService::PersistenceService()
     }
 
     MITK_DEBUG("mitk::PersistenceService") << "loading PersistenceService personal persitent data";
-    this->Load( DEFAULT_FILE_NAME );
+    this->Load( IPersistenceService::GetDefaultPersistenceFile() );
     std::string id = PERSISTENCE_PROPERTYLIST_NAME;
     mitk::PropertyList::Pointer propList = this->GetPropertyList( id );
     propList->GetBoolProperty("m_AutoLoadAndSave", m_AutoLoadAndSave);
@@ -62,6 +54,8 @@ mitk::PersistenceService::PersistenceService()
 mitk::PersistenceService::~PersistenceService()
 {
   MITK_DEBUG("mitk::PersistenceService") << "destructing PersistenceService";
+  if(m_AutoLoadAndSave)
+      this->Save();
 }
 
 mitk::PropertyList::Pointer mitk::PersistenceService::GetPropertyList( std::string& id, bool* existed )
@@ -106,23 +100,51 @@ void mitk::PersistenceService::ClonePropertyList( mitk::PropertyList* from, mitk
     }
 }
 
-bool mitk::PersistenceService::Save(const std::string& fileName)
+bool mitk::PersistenceService::Save(const std::string& fileName, bool appendChanges)
 {
     bool save = false;
-    mitk::StandaloneDataStorage::Pointer tempDs = mitk::StandaloneDataStorage::New();
+    std::string theFile = fileName;
+    if(theFile.empty())
+        theFile = IPersistenceService::GetDefaultPersistenceFile();
+
+    mitk::DataStorage::Pointer tempDs;
+    if(appendChanges)
+    {
+        if( !Poco::File(theFile).exists() )
+            return false;
+        DataStorage::Pointer ds = m_SceneIO->LoadScene( theFile );
+        bool load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) && (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
+        if( !load )
+            return false;
+
+        tempDs = ds;
+    }
+    else
+        tempDs = mitk::StandaloneDataStorage::New();
 
     std::map<std::string, mitk::PropertyList::Pointer>::iterator it = m_PropertyLists.begin();
     while( it != m_PropertyLists.end() )
     {
-        mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+        mitk::DataNode::Pointer node;
+        const std::string& name = (*it).first;
+        if( appendChanges )
+        {
+            mitk::NodePredicateProperty::Pointer namePred =
+                mitk::NodePredicateProperty::New("name", mitk::StringProperty::New(name));
+            node = tempDs->GetNode(namePred);
+        }
+        if(node.IsNull())
+        {
+            node = mitk::DataNode::New();
+            tempDs->Add(node);
+        }
 
-        this->ClonePropertyList( (*it).second, newNode->GetPropertyList() );
+        this->ClonePropertyList( (*it).second, node->GetPropertyList() );
 
-        newNode->SetBoolProperty( PERSISTENCE_PROPERTY_NAME.c_str(), true );
-        newNode->SetName( (*it).first );
-        newNode->SetStringProperty(ID_PROPERTY_NAME.c_str(),(*it).first.c_str() );
+        node->SetBoolProperty( PERSISTENCE_PROPERTY_NAME.c_str(), true );
+        node->SetName( name );
+        node->SetStringProperty(ID_PROPERTY_NAME.c_str(),name.c_str() );
 
-        tempDs->Add(newNode);
         ++it;
     }
 
@@ -131,9 +153,6 @@ bool mitk::PersistenceService::Save(const std::string& fileName)
 
     mitk::DataStorage::SetOfObjects::ConstPointer rs = tempDs->GetSubset(pred);
 
-    std::string theFile = fileName;
-    if(theFile.empty())
-        theFile = DEFAULT_FILE_NAME;
     return m_SceneIO->SaveScene( rs, tempDs, theFile );
 }
 
@@ -143,7 +162,9 @@ bool mitk::PersistenceService::Load(const std::string& fileName)
 
     std::string theFile = fileName;
     if(theFile.empty())
-        theFile = DEFAULT_FILE_NAME;
+        theFile = IPersistenceService::GetDefaultPersistenceFile();
+    if( !Poco::File(theFile).exists() )
+        return false;
     DataStorage::Pointer ds = m_SceneIO->LoadScene( theFile );
     load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) && (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
     if( !load )

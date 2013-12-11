@@ -308,6 +308,12 @@ void mitk::PropertyList::Set( const char* propertyKey, const char* stringValue )
     this->SetStringProperty(propertyKey, stringValue);
 }
 
+void mitk::PropertyList::Set( const char* propertyKey, const std::string& stringValue )
+{
+    this->SetStringProperty(propertyKey, stringValue.c_str());
+
+}
+
 bool mitk::PropertyList::Get( const char* propertyKey, bool& boolValue ) const
 {
     return this->GetBoolProperty( propertyKey, boolValue );

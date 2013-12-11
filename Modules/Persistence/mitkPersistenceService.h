@@ -28,8 +28,6 @@ namespace mitk
     class Persistence_EXPORT PersistenceService: public itk::LightObject, public mitk::IPersistenceService
     {
     public:
-        static std::string CreateDefaultFileName();
-        static const std::string DEFAULT_FILE_NAME;
         static const std::string PERSISTENCE_PROPERTY_NAME;
         static const std::string PERSISTENCE_PROPERTYLIST_NAME;
         static const std::string ID_PROPERTY_NAME;
@@ -41,7 +39,7 @@ namespace mitk
 
         mitk::PropertyList::Pointer GetPropertyList( std::string& id, bool* existed=0 );
 
-        bool Save(const std::string& fileName="");
+        bool Save(const std::string& fileName="", bool appendChanges=false);
 
         bool Load(const std::string& fileName="");
 

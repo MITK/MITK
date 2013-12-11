@@ -42,6 +42,18 @@ namespace mitk
     {
     public:
         ///
+        /// Set a default directory for storage
+        ///
+        static std::string CreateDefaultFileName();
+        ///
+        /// Get the default directory for storage
+        ///
+        static void SetDefaultPersistenceFile(const std::string& defaultPersistenceFile);
+        ///
+        /// Set a default directory for storage
+        ///
+        static std::string GetDefaultPersistenceFile();
+        ///
         /// If PropertyList with the given id exists, returns it. Otherwise creates a new one and returns it.
         /// If id is empty a UUID will be created and set on the variable
         /// If existed was passed, it is true if the PropertyList with that id existed, false otherwise
@@ -50,9 +62,10 @@ namespace mitk
         virtual mitk::PropertyList::Pointer GetPropertyList( std::string& id, bool* existed=0 ) = 0;
         ///
         /// Save the current PropertyLists to fileName. If fileName is empty, a special file in the users home directory will be used.
+        /// if appendchanges is true, the file will not replaced but first loaded, then overwritten and then replaced
         /// \return false if an error occured (cannot write to file), true otherwise
         ///
-        virtual bool Save(const std::string& fileName="") = 0;
+        virtual bool Save(const std::string& fileName="", bool appendChanges=false) = 0;
         ///
         /// Load PropertyLists from fileName. If fileName is empty, a special file in the users home directory will be used.
         /// *ATTENTION*: If there are PropertyLists with the same id contained in the file, existing PropertyLists will be overwritten!
@@ -77,6 +90,8 @@ namespace mitk
         /// nothing to do here
         ///
         virtual ~IPersistenceService();
+    private:
+        static std::string m_DefaultPersistenceFile;
     };
 }
 
@@ -90,7 +105,7 @@ namespace mitk
     mitk::IPersistenceService* persistenceService = dynamic_cast<mitk::IPersistenceService*> ( context->GetService<mitk::IPersistenceService>(persistenceServiceRef) );
 
 #define PERSISTENCE_CREATE_SAVE_START(IdMemberName)\
-bool Save() { \
+bool Save(const std::string& fileName="") { \
     PERSISTENCE_GET_SERVICE\
     bool noError = persistenceService != 0;\
     mitk::PropertyList::Pointer propList;\
@@ -99,79 +114,72 @@ bool Save() { \
 
 #define PERSISTENCE_CREATE_SAVE_END\
     }\
-    noError = persistenceService->Save();\
+    noError = persistenceService->Save(fileName);\
     return noError;\
 }
 
-#define PERSISTENCE_CREATE_SAVE(IdMemberName, ParamMemberName)\
+#define PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
+void SetId( const std::string& ____id ) { IdMemberName = ____id; };\
+std::string GetId() { return IdMemberName; };\
+bool Load(const std::string& fileName="") {\
+    PERSISTENCE_GET_SERVICE\
+    bool noError = persistenceService != 0 && persistenceService->Load(fileName);\
+    if( noError ) {\
+    mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(IdMemberName);
+
+#define PERSISTENCE_CREATE_LOAD_END\
+    }\
+    return noError;\
+}
+
+#define PERSISTENCE_CREATE(IdMemberName, ParamMemberName)\
     PERSISTENCE_CREATE_SAVE_START(IdMemberName)\
         propList->Set( #ParamMemberName, ParamMemberName );\
-    PERSISTENCE_CREATE_SAVE_END
+    PERSISTENCE_CREATE_SAVE_END\
+    PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
+        noError = propList->Get( #ParamMemberName, ParamMemberName );\
+    PERSISTENCE_CREATE_LOAD_END
 
-#define PERSISTENCE_CREATE_SAVE2(IdMemberName, ParamMemberName, Param2MemberName)\
+#define PERSISTENCE_CREATE2(IdMemberName, ParamMemberName, Param2MemberName)\
     PERSISTENCE_CREATE_SAVE_START(IdMemberName)\
         propList->Set( #ParamMemberName, ParamMemberName );\
         propList->Set( #Param2MemberName, Param2MemberName );\
-    PERSISTENCE_CREATE_SAVE_END
+    PERSISTENCE_CREATE_SAVE_END\
+    PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
+        noError = propList->Get( #ParamMemberName, ParamMemberName );\
+        if(noError)\
+        noError = propList->Get( #Param2MemberName, Param2MemberName );\
+    PERSISTENCE_CREATE_LOAD_END
 
-#define PERSISTENCE_CREATE_SAVE3(IdMemberName, ParamMemberName, Param2MemberName, Param3MemberName)\
+#define PERSISTENCE_CREATE3(IdMemberName, ParamMemberName, Param2MemberName, Param3MemberName)\
     PERSISTENCE_CREATE_SAVE_START(IdMemberName)\
         propList->Set( #ParamMemberName, ParamMemberName );\
         propList->Set( #Param2MemberName, Param2MemberName );\
         propList->Set( #Param3MemberName, Param3MemberName );\
-    PERSISTENCE_CREATE_SAVE_END
+    PERSISTENCE_CREATE_SAVE_END\
+    PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
+        noError = propList->Get( #ParamMemberName, ParamMemberName );\
+        if(noError)\
+        noError = propList->Get( #Param2MemberName, Param2MemberName );\
+        if(noError)\
+        noError = propList->Get( #Param3MemberName, Param3MemberName );\
+    PERSISTENCE_CREATE_LOAD_END
 
-#define PERSISTENCE_CREATE_SAVE4(IdMemberName, ParamMemberName, Param2MemberName, Param3MemberName, Param4MemberName)\
+#define PERSISTENCE_CREATE4(IdMemberName, ParamMemberName, Param2MemberName, Param3MemberName, Param4MemberName)\
     PERSISTENCE_CREATE_SAVE_START(IdMemberName)\
         propList->Set( #ParamMemberName, ParamMemberName );\
         propList->Set( #Param2MemberName, Param2MemberName );\
         propList->Set( #Param3MemberName, Param3MemberName );\
         propList->Set( #Param4MemberName, Param4MemberName );\
-    PERSISTENCE_CREATE_SAVE_END
-
-/// MACROS FOR AUTOMATIC LOAD FUNCTION
-#define PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
-bool Load() {\
-    PERSISTENCE_GET_SERVICE\
-    bool noError = persistenceService != 0 && persistenceService->Load();\
-    if( noError ) {\
-        mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(IdMemberName);
-
-#define PERSISTENCE_CREATE_LOAD_END\
-    }\
-        return noError;\
-}
-
-#define PERSISTENCE_CREATE_LOAD(IdMemberName, ParamMemberName)\
-    PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
-        noError = propList->Get( #ParamMemberName, ParamMemberName );\
-    PERSISTENCE_CREATE_LOAD_END
-
-#define PERSISTENCE_CREATE_LOAD2(IdMemberName, ParamMemberName, Param2MemberName)\
+    PERSISTENCE_CREATE_SAVE_END\
     PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
         noError = propList->Get( #ParamMemberName, ParamMemberName );\
         if(noError)\
-            noError = propList->Get( #Param2MemberName, Param2MemberName );\
-    PERSISTENCE_CREATE_LOAD_END
-
-#define PERSISTENCE_CREATE_LOAD3(IdMemberName, ParamMemberName, Param2MemberName, Param3MemberName)\
-    PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
-        noError = propList->Get( #ParamMemberName, ParamMemberName );\
+        noError = propList->Get( #Param2MemberName, Param2MemberName );\
         if(noError)\
-            noError = propList->Get( #Param2MemberName, Param2MemberName );\
+        noError = propList->Get( #Param3MemberName, Param3MemberName );\
         if(noError)\
-            noError = propList->Get( #Param3MemberName, Param3MemberName );\
-    PERSISTENCE_CREATE_LOAD_END
-
-#define PERSISTENCE_CREATE_LOAD4(IdMemberName, ParamMemberName, Param2MemberName, Param3MemberName, Param4MemberName)\
-    PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
-        noError = propList->Get( #ParamMemberName, ParamMemberName );\
-        if(noError)\
-            noError = propList->Get( #Param2MemberName, Param2MemberName );\
-        if(noError)\
-            noError = propList->Get( #Param3MemberName, Param3MemberName );\
-        if(noError)\
-            noError = propList->Get( #Param4MemberName, Param4MemberName );\
+        noError = propList->Get( #Param4MemberName, Param4MemberName );\
     PERSISTENCE_CREATE_LOAD_END
 
 US_DECLARE_SERVICE_INTERFACE(mitk::IPersistenceService, "org.mitk.services.IPersistenceService")

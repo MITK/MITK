@@ -73,6 +73,7 @@ public:
 
 protected slots:
 
+    void SetOutputPath();
     void LoadParameters();
     void SaveParameters();
 
@@ -214,4 +215,5 @@ protected:
     mitk::DotModel<double> m_DotModel2;
 
     QString m_ParameterFile;
+    QString m_OutputPath;
 };

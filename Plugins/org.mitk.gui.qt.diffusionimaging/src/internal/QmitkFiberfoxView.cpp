@@ -56,6 +56,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usModuleRegistry.h"
 #include <mitkChiSquareNoiseModel.h>
 #include <itksys/SystemTools.hxx>
+#include <mitkNrrdDiffusionImageWriter.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -66,6 +67,7 @@ QmitkFiberfoxView::QmitkFiberfoxView()
     : QmitkAbstractView()
     , m_Controls( 0 )
     , m_SelectedImage( NULL )
+    , m_OutputPath("")
 {
     m_ImageGenParameters.noiseModel = NULL;
     m_ImageGenParameters.noiseModelShort = NULL;
@@ -164,6 +166,8 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
 
         connect((QObject*) m_Controls->m_SaveParametersButton, SIGNAL(clicked()), (QObject*) this, SLOT(SaveParameters()));
         connect((QObject*) m_Controls->m_LoadParametersButton, SIGNAL(clicked()), (QObject*) this, SLOT(LoadParameters()));
+        connect((QObject*) m_Controls->m_OutputPathButton, SIGNAL(clicked()), (QObject*) this, SLOT(SetOutputPath()));
+
     }
 }
 
@@ -1514,7 +1518,6 @@ void QmitkFiberfoxView::GenerateFibers()
 
 void QmitkFiberfoxView::GenerateImage()
 {
-    UpdateImageParameters();
     if (m_SelectedBundles.empty())
     {
         if (m_SelectedDWI.IsNotNull()) // add artifacts to existing diffusion weighted image
@@ -1590,8 +1593,9 @@ void QmitkFiberfoxView::GenerateImage()
         return;
     }
 
-    for (int i=0; i<m_SelectedBundles.size(); i++)
+    for (unsigned int i=0; i<m_SelectedBundles.size(); i++)
     {
+        UpdateImageParameters();
         mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundles.at(i)->GetData());
         if (fiberBundle->GetNumFibers()<=0)
             continue;
@@ -1652,6 +1656,14 @@ void QmitkFiberfoxView::GenerateImage()
         GetDataStorage()->Add(m_ImageGenParameters.resultNode, m_SelectedBundles.at(i));
 
         m_ImageGenParameters.resultNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New(tractsToDwiFilter->GetLevelWindow()) );
+
+        if (!m_OutputPath.isEmpty())
+        {
+            mitk::NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
+            writer->SetFileName(m_OutputPath.toStdString()+m_ImageGenParameters.resultNode->GetName()+".dwi");
+            writer->SetInput(image);
+            writer->Update();
+        }
 
         if (m_Controls->m_VolumeFractionsBox->isChecked())
         {
@@ -2166,4 +2178,20 @@ void QmitkFiberfoxView::PlanarFigureSelected( itk::Object* object, const itk::Ev
 void QmitkFiberfoxView::SetFocus()
 {
     m_Controls->m_CircleButton->setFocus();
+}
+
+
+void QmitkFiberfoxView::SetOutputPath()
+{
+    // SELECT FOLDER DIALOG
+
+    m_OutputPath = QFileDialog::getExistingDirectory(NULL, "Save images to...", m_OutputPath);
+
+    if (m_OutputPath.isEmpty())
+        m_Controls->m_SavePathEdit->setText("-");
+    else
+    {
+        m_OutputPath += "/";
+        m_Controls->m_SavePathEdit->setText(m_OutputPath);
+    }
 }

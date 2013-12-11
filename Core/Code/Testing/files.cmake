@@ -1,4 +1,3 @@
-
 # tests with no extra command line parameter
 set(MODULE_TESTS
   mitkAccessByItkTest.cpp
@@ -17,17 +16,14 @@ set(MODULE_TESTS
   mitkGlobalInteractionTest.cpp
   mitkImageEqualTest.cpp
   mitkImageDataItemTest.cpp
-  #mitkImageMapper2DTest.cpp #tested class mitkImageMapperGL2D doesn't exist any more
   mitkImageGeneratorTest.cpp
   mitkBaseDataTest.cpp
   mitkImportItkImageTest.cpp
   mitkGrabItkImageMemoryTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
   mitkInteractorTest.cpp
-  #mitkITKThreadingTest.cpp #test outdated because itk::Semaphore was removed from ITK
   mitkLevelWindowTest.cpp
   mitkMessageTest.cpp
-  #mitkPipelineSmartPointerCorrectnessTest.cpp #file doesn't exist!
   mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
   mitkPointSetEqualTest.cpp
@@ -38,12 +34,9 @@ set(MODULE_TESTS
   mitkPointSetInteractorTest.cpp
   mitkPropertyTest.cpp
   mitkPropertyListTest.cpp
-  #mitkRegistrationBaseTest.cpp #tested class  mitkRegistrationBase doesn't exist any more
-  #mitkSegmentationInterpolationTest.cpp #file doesn't exist!
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkStateMachineTest.cpp
-  ##mitkStateMachineContainerTest.cpp ## rewrite test, indirect since no longer exported Bug 14529
   mitkStateTest.cpp
   mitkSurfaceTest.cpp
   mitkSurfaceEqualTest.cpp
@@ -55,7 +48,6 @@ set(MODULE_TESTS
   mitkVerboseLimitedLinearUndoTest.cpp
   mitkWeakPointerTest.cpp
   mitkTransferFunctionTest.cpp
-  #mitkAbstractTransformGeometryTest.cpp #seems as tested class mitkExternAbstractTransformGeometry doesnt exist any more
   mitkStepperTest.cpp
   itkTotalVariationDenoisingImageFilterTest.cpp
   mitkRenderingManagerTest.cpp
@@ -77,6 +69,15 @@ set(MODULE_TESTS
   mitkPropertyExtensionsTest.cpp
   mitkPropertyFiltersTest.cpp
   mitkTinyXMLTest.cpp
+
+  ################## DISABLED TESTS #################################################
+  #mitkImageMapper2DTest.cpp #tested class mitkImageMapperGL2D doesn't exist any more
+  #mitkAbstractTransformGeometryTest.cpp #seems as tested class mitkExternAbstractTransformGeometry doesnt exist any more
+  #mitkStateMachineContainerTest.cpp #rewrite test, indirect since no longer exported Bug 14529
+  #mitkRegistrationBaseTest.cpp #tested class  mitkRegistrationBase doesn't exist any more
+  #mitkSegmentationInterpolationTest.cpp #file doesn't exist!
+  #mitkPipelineSmartPointerCorrectnessTest.cpp #file doesn't exist!
+  #mitkITKThreadingTest.cpp #test outdated because itk::Semaphore was removed from ITK
 )
 
 # test with image filename as an extra command line parameter

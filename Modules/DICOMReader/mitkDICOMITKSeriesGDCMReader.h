@@ -24,6 +24,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "DICOMReaderExports.h"
 
+// TODO ensure "C" locale!!
+// TODO tag inventing / defaults (origin, spacing, position)...
+// TODO tilt
+// TODO 3D+t
+
 namespace mitk
 {
 

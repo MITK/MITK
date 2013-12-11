@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMFileReader.h"
 
+#include <itkGDCMImageIO.h>
+
 mitk::DICOMFileReader
 ::DICOMFileReader()
 :itk::LightObject()
@@ -160,4 +162,12 @@ mitk::DICOMFileReader
     ss << "Index " << index << " out of range (" << m_Outputs.size() << " indices reserved)";
     throw std::invalid_argument( ss.str() );
   }
+}
+
+bool
+mitk::DICOMFileReader
+::IsDICOM(const std::string& filename)
+{
+  itk::GDCMImageIO::Pointer io = itk::GDCMImageIO::New();
+  return io->CanReadFile( filename.c_str() );
 }

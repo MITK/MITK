@@ -71,7 +71,6 @@ set(MODULE_TESTS
   mitkTinyXMLTest.cpp
 
   ################## DISABLED TESTS #################################################
-  #mitkImageMapper2DTest.cpp #tested class mitkImageMapperGL2D doesn't exist any more
   #mitkAbstractTransformGeometryTest.cpp #seems as tested class mitkExternAbstractTransformGeometry doesnt exist any more
   #mitkStateMachineContainerTest.cpp #rewrite test, indirect since no longer exported Bug 14529
   #mitkRegistrationBaseTest.cpp #tested class  mitkRegistrationBase doesn't exist any more

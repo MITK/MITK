@@ -150,7 +150,6 @@ bool mitk::PointSetDataInteractor::IsClosedContour(StateMachineAction*, Interact
       positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
       return true;
     }
-
   }
   return false;
 }
@@ -227,7 +226,6 @@ bool mitk::PointSetDataInteractor::UnSelectPoint(StateMachineAction*, Interactio
     if (index == -1 || index != m_SelectedPointIndex)
     {
       m_SelectedPointIndex = -1;
-      GetDataNode()->SetProperty("contourcolor", ColorProperty::New(1.0, 0.0, 1.0));
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       return true;
     }
@@ -253,9 +251,6 @@ void mitk::PointSetDataInteractor::DataNodeChanged()
 {
   if (GetDataNode().IsNotNull())
   {
-    // find proper place for this command!
-    // maybe when DN is created ?
-    GetDataNode()->SetBoolProperty("show contour", true);
     PointSet* points = dynamic_cast<PointSet*>(GetDataNode()->GetData());
     if (points == NULL)
     {
@@ -310,7 +305,6 @@ void mitk::PointSetDataInteractor::SetAccuracy(float accuracy)
 
 int mitk::PointSetDataInteractor::GetPointIndexByPosition(Point3D position, int time)
 {
-
   // iterate over point set and check if it contains a point close enough to the pointer to be selected
   PointSet* points = dynamic_cast<PointSet*>(GetDataNode()->GetData());
   int index = -1;
@@ -323,9 +317,9 @@ int mitk::PointSetDataInteractor::GetPointIndexByPosition(Point3D position, int 
   float minDistance = m_SelectionAccuracy;
   for (PointSet::PointsIterator it = pointsContainer->Begin(); it != pointsContainer->End(); it++)
   {
-    float distance = sqrt(position.SquaredEuclideanDistanceTo(points->GetPoint(it->Index(), time)));  // TODO: support time!
+    float distance = sqrt(position.SquaredEuclideanDistanceTo(points->GetPoint(it->Index(), time)));
     if (distance < minDistance) // if several points fall within the margin, choose the one with minimal distance to position
-    { // TODO: does this make sense, which unit is it?
+    {
       index = it->Index();
     }
   }

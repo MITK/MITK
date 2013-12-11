@@ -106,8 +106,6 @@ set(MODULE_TESTSURFACES
 )
 
 set(MODULE_CUSTOM_TESTS
-    #mitkLabeledImageToSurfaceFilterTest.cpp
-    #mitkExternalToolsTest.cpp
     mitkDataStorageTest.cpp
     mitkDataNodeTest.cpp
     mitkDicomSeriesReaderTest.cpp

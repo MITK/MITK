@@ -15,11 +15,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSImageSource.h"
+#include "mitkProperties.h"
+
+const char* mitk::USImageSource::IMAGE_PROPERTY_IDENTIFIER = "id_nummer";
 
 mitk::USImageSource::USImageSource()
 : m_OpenCVToMitkFilter(mitk::OpenCVToMitkImageFilter::New()),
   m_MitkToOpenCVFilter(0),
-  m_ImageFilter(mitk::BasicCombinationOpenCVImageFilter::New())
+  m_ImageFilter(mitk::BasicCombinationOpenCVImageFilter::New()),
+  m_CurrentImageId(0)
 {
   m_OpenCVToMitkFilter->SetCopyBuffer(false);
 }
@@ -50,7 +54,7 @@ mitk::Image::Pointer mitk::USImageSource::GetNextImage()
     //if ( ! image.empty() )
     //{
       // execute filter if a filter is specified
-      if ( m_ImageFilter.IsNotNull() ) { m_ImageFilter->FilterImage(image); }
+      if ( m_ImageFilter.IsNotNull() ) { m_ImageFilter->FilterImage(image, m_CurrentImageId); }
 
       // convert to MITK image
       IplImage ipl_img = image;
@@ -73,6 +77,9 @@ mitk::Image::Pointer mitk::USImageSource::GetNextImage()
 
   if ( result.IsNotNull() )
   {
+    result->SetProperty(IMAGE_PROPERTY_IDENTIFIER, mitk::IntProperty::New(m_CurrentImageId));
+    m_CurrentImageId++;
+
     // Everything as expected, return result
     return result;
   }

@@ -43,6 +43,8 @@ namespace mitk {
   class MitkUS_EXPORT USImageSource : public itk::Object
   {
   public:
+    static const char* IMAGE_PROPERTY_IDENTIFIER;
+
     mitkClassMacro(USImageSource, itk::Object);
 
     itkGetMacro(ImageFilter, mitk::BasicCombinationOpenCVImageFilter::Pointer);
@@ -92,6 +94,8 @@ namespace mitk {
     * \brief Filter is executed during mitk::USImageVideoSource::GetNextImage().
     */
     BasicCombinationOpenCVImageFilter::Pointer m_ImageFilter;
+
+    int                                        m_CurrentImageId;
   };
 } // namespace mitk
 #endif /* MITKUSImageSource_H_HEADER_INCLUDED_ */

@@ -70,8 +70,8 @@ if(NOT DEFINED ITK_DIR)
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
      PREFIX ${proj}-cmake
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.3.2.tar.gz
-     URL_MD5 f25bb1561887be621d3954689f3944a6
+     GIT_REPOSITORY http://itk.org/ITK.git
+     GIT_TAG v4.5rc03
      INSTALL_COMMAND ""
      PATCH_COMMAND ${ITK_PATCH_COMMAND}
      CMAKE_GENERATOR ${gen}

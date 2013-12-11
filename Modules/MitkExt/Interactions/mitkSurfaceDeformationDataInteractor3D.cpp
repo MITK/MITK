@@ -159,7 +159,7 @@ bool mitk::SurfaceDeformationDataInteractor3D::InitDeformation(StateMachineActio
   // Store current picked point
   m_InitialPickedPoint = positionEvent->GetPositionInWorld();
 
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode->GetData());
+  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
   // Make deep copy of vtkPolyData interacted on
   m_OriginalPolyData->DeepCopy(m_Surface->GetVtkPolyData(timeStep));
@@ -183,7 +183,7 @@ bool mitk::SurfaceDeformationDataInteractor3D::DeformObject (StateMachineAction*
   mitk::Point3D origin; origin.Fill( 0.0 );
   mitk::Vector3D interactionMoveIndex;
 
-  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode->GetData());
+  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
   mitk::Geometry3D::Pointer geometry = this->GetDataNode()->GetData()->GetGeometry(timeStep);
   geometry->WorldToIndex(interactionMove, interactionMoveIndex);
@@ -202,7 +202,7 @@ bool mitk::SurfaceDeformationDataInteractor3D::DeformObject (StateMachineAction*
       for ( unsigned int i = 0; i < deformedPoints->GetNumberOfPoints(); ++i )
       {
         // Get original point
-        vtkFloatingPointType *originalPoint = originalPoints->GetPoint( i );
+        double *originalPoint = originalPoints->GetPoint( i );
         mitk::Vector3D v0;
         v0[0] = originalPoint[0];
         v0[1] = originalPoint[1];

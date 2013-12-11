@@ -252,7 +252,7 @@ bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, Interactio
   }
   if ( camera )
   {
-    vtkFloatingPointType vpn[3];
+    double vpn[3];
     camera->GetViewPlaneNormal( vpn );
 
     Vector3D viewPlaneNormal;
@@ -295,10 +295,10 @@ bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, Interactio
     Geometry3D::Pointer newGeometry = static_cast< Geometry3D * >(
       m_OriginalGeometry->Clone().GetPointer() );
     newGeometry->ExecuteOperation( &op );
-    mitk::TimeSlicedGeometry::Pointer timeSlicedGeometry = this->GetDataNode()->GetData()->GetTimeSlicedGeometry();
-    if (timeSlicedGeometry.IsNotNull())
+    mitk::TimeGeometry::Pointer timeGeometry = this->GetDataNode()->GetData()->GetTimeGeometry();
+    if (timeGeometry.IsNotNull())
     {
-      timeSlicedGeometry->SetGeometry3D( newGeometry, timeStep );
+      timeGeometry->SetTimeStepGeometry( newGeometry, timeStep );
     }
 
     //TODO: Only 3D reinit

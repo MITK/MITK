@@ -39,6 +39,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sstream>
 
 #include "itksys/SystemTools.hxx"
+#include "mitkIPersistenceService.h"
+#include <usGetModuleContext.h>
+
+bool mitk::SceneIO::m_SavePersistentDataWithScene(false);
+bool mitk::SceneIO::m_LoadPersistentDataWithScene(false);
 
 mitk::SceneIO::SceneIO()
 :m_WorkingDirectory(""),
@@ -171,15 +176,43 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
     MITK_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
   }
 
+  if( m_LoadPersistentDataWithScene )
+  {
+      us::ModuleContext* context = us::GetModuleContext();
+      us::ServiceReference<mitk::IPersistenceService> persistenceServiceRef
+          = context->GetServiceReference<mitk::IPersistenceService>();\
+          mitk::IPersistenceService* persistenceService
+          = dynamic_cast<mitk::IPersistenceService*> ( context->GetService<mitk::IPersistenceService>(persistenceServiceRef) );
+      persistenceService->RestorePropertyListsFromPersistentDataNodes(storage);
+  }
+
   // return new data storage, even if empty or uncomplete (return as much as possible but notify calling method)
   return storage;
 
 }
 
-bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNodes, const DataStorage* storage,
+void mitk::SceneIO::RemoveNodes( DataStorage::SetOfObjects::ConstPointer nodesToRemove, DataStorage* storage, DataStorage::SetOfObjects::Pointer sceneNodes )
+{
+    if(nodesToRemove.IsNull())
+        return;
+    DataStorage::SetOfObjects::const_iterator it = nodesToRemove->begin();
+    while( it != nodesToRemove->end() )
+    {
+        mitk::DataNode* node = *it;
+        DataStorage::SetOfObjects::iterator it2 = std::find( sceneNodes->begin(), sceneNodes->end(), node );
+        if( it2 != sceneNodes->end() )
+            sceneNodes->erase(it2);
+
+        storage->Remove(node);
+
+        ++it;
+    }
+}
+
+bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNodes2, DataStorage* storage,
                                            const std::string& filename)
 {
-  if (!sceneNodes)
+  if (!sceneNodes2)
   {
     MITK_ERROR << "No set of nodes given. Not possible to save scene.";
     return false;
@@ -194,6 +227,36 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
   {
     MITK_ERROR << "No filename given. Not possible to save scene.";
     return false;
+  }
+
+  // muellerm, 11.12.13: added logic for importing persistent nodes from the PersistenceService
+  DataStorage::SetOfObjects::Pointer sceneNodes = DataStorage::SetOfObjects::New();
+  DataStorage::SetOfObjects::const_iterator itSceneNodes2 = sceneNodes2->begin();
+  while( itSceneNodes2 != sceneNodes2->end() )
+  {
+      mitk::DataNode* node = *itSceneNodes2;
+      sceneNodes->push_back(node);
+      ++itSceneNodes2;
+  }
+
+  DataStorage::SetOfObjects::Pointer persistentNodes;
+  if( m_SavePersistentDataWithScene )
+  {
+      us::ModuleContext* context = us::GetModuleContext();
+      us::ServiceReference<mitk::IPersistenceService> persistenceServiceRef
+          = context->GetServiceReference<mitk::IPersistenceService>();\
+          mitk::IPersistenceService* persistenceService
+          = dynamic_cast<mitk::IPersistenceService*> ( context->GetService<mitk::IPersistenceService>(persistenceServiceRef) );
+
+      DataStorage::SetOfObjects::Pointer persistentNodes = persistenceService->GetDataNodes();
+      DataStorage::SetOfObjects::iterator it = persistentNodes->begin();
+      while( it != persistentNodes->end() )
+      {
+          mitk::DataNode* node = *it;
+          sceneNodes->push_back(node);
+          storage->Add(node);
+          ++it;
+      }
   }
 
   try
@@ -232,6 +295,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
       if (m_WorkingDirectory.empty())
       {
         MITK_ERROR << "Could not create temporary directory. Cannot create scene files.";
+        this->RemoveNodes( persistentNodes.GetPointer(), storage, sceneNodes );
         return false;
       }
 
@@ -378,6 +442,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
     if ( !document.SaveFile( m_WorkingDirectory + Poco::Path::separator() + "index.xml" ) )
     {
       MITK_ERROR << "Could not write scene to " << m_WorkingDirectory << Poco::Path::separator() << "index.xml" << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+      this->RemoveNodes( persistentNodes.GetPointer(), storage, sceneNodes );
       return false;
     }
     else
@@ -411,20 +476,24 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         catch(...)
         {
           MITK_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
+          this->RemoveNodes( persistentNodes.GetPointer(), storage, sceneNodes );
           return false; // ok?
         }
       }
       catch(std::exception& e)
       {
         MITK_ERROR << "Could not create ZIP file from " << m_WorkingDirectory << "\nReason: " << e.what();
+        this->RemoveNodes( persistentNodes.GetPointer(), storage, sceneNodes );
         return false;
       }
+      this->RemoveNodes( persistentNodes.GetPointer(), storage, sceneNodes );
       return true;
     }
   }
   catch(std::exception& e)
   {
     MITK_ERROR << "Caught exception during saving temporary files to disk. Error description: '" << e.what() << "'";
+    this->RemoveNodes( persistentNodes.GetPointer(), storage, sceneNodes );
     return false;
   }
 }
@@ -530,4 +599,15 @@ void mitk::SceneIO::OnUnzipError(const void*  /*pSender*/, std::pair<const Poco:
 void mitk::SceneIO::OnUnzipOk(const void*  /*pSender*/, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path>& /*info*/)
 {
   // MITK_INFO << "Unzipped ok: " << info.second.toString();
+}
+
+void mitk::SceneIO::SetSavePersistentDataWithScene( bool savePersistentDataWithScene )
+{
+
+    m_SavePersistentDataWithScene = savePersistentDataWithScene;
+}
+
+void mitk::SceneIO::SetLoadPersistentDataWithScene( bool loadPersistentDataWithScene )
+{
+    m_LoadPersistentDataWithScene = loadPersistentDataWithScene;
 }

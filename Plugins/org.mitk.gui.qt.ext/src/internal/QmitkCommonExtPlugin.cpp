@@ -37,6 +37,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QProcess>
 #include <QMainWindow>
 #include <QtPlugin>
+#include <berryIPreferencesService.h>
+#include "berryPlatform.h"
+#include <QMessageBox>
 
 ctkPluginContext* QmitkCommonExtPlugin::_context = 0;
 

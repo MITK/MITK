@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usGetModuleContext.h"
 //for microservices
 #include <usServiceInterface.h>
+#include "mitkDataStorage.h"
 
 namespace mitk
 {
@@ -38,7 +39,7 @@ namespace mitk
     /// the user will be asked whether to save/load the propertlists in/from the current ".mitk" file that is selected
     /// by the user.
     ///
-    class Persistence_EXPORT IPersistenceService
+    class MITK_CORE_EXPORT IPersistenceService
     {
     public:
         ///
@@ -60,6 +61,21 @@ namespace mitk
         /// \return a valid PropertyList with a StringProperty "Id" containing the passed id
         ///
         virtual mitk::PropertyList::Pointer GetPropertyList( std::string& id, bool* existed=0 ) = 0;
+        ///
+        /// \return The name of the Bool Property that specifies whether a DataNode is a Node carrying Persistence PropertyLists
+        ///
+        virtual std::string GetPersistenceNodePropertyName() const = 0;
+        ///
+        /// Creates a vector of DataNodes that contain all PropertyLists. Additionally, the DataNodes
+        /// will have the property name set to the PropertyList's id and a BoolProperty equal to GetPersistenceNodePropertyName() set to true
+        /// \return vector of DataNodes with the described attributes
+        ///
+        virtual DataStorage::SetOfObjects::Pointer GetDataNodes() const = 0;
+        ///
+        /// Searches storage for persistent DataNodes, extracts and inserts the appended property lists to this service
+        /// \return true if at least one node was found from which a PropertyList could be restored
+        ///
+        virtual bool RestorePropertyListsFromPersistentDataNodes(DataStorage* storage) = 0;
         ///
         /// Save the current PropertyLists to fileName. If fileName is empty, a special file in the users home directory will be used.
         /// if appendchanges is true, the file will not replaced but first loaded, then overwritten and then replaced

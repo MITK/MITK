@@ -86,7 +86,7 @@ mitk::PropertyList::Pointer mitk::PersistenceService::GetPropertyList( std::stri
     return propList;
 }
 
-void mitk::PersistenceService::ClonePropertyList( mitk::PropertyList* from, mitk::PropertyList* to )
+void mitk::PersistenceService::ClonePropertyList( mitk::PropertyList* from, mitk::PropertyList* to ) const
 {
     to->Clear();
 
@@ -122,28 +122,12 @@ bool mitk::PersistenceService::Save(const std::string& fileName, bool appendChan
     else
         tempDs = mitk::StandaloneDataStorage::New();
 
-    std::map<std::string, mitk::PropertyList::Pointer>::iterator it = m_PropertyLists.begin();
-    while( it != m_PropertyLists.end() )
+    DataStorage::SetOfObjects::Pointer nodes = this->GetDataNodes();
+    DataStorage::SetOfObjects::iterator it = nodes->begin();
+    while( it != nodes->end() )
     {
-        mitk::DataNode::Pointer node;
-        const std::string& name = (*it).first;
-        if( appendChanges )
-        {
-            mitk::NodePredicateProperty::Pointer namePred =
-                mitk::NodePredicateProperty::New("name", mitk::StringProperty::New(name));
-            node = tempDs->GetNode(namePred);
-        }
-        if(node.IsNull())
-        {
-            node = mitk::DataNode::New();
-            tempDs->Add(node);
-        }
-
-        this->ClonePropertyList( (*it).second, node->GetPropertyList() );
-
-        node->SetBoolProperty( PERSISTENCE_PROPERTY_NAME.c_str(), true );
-        node->SetName( name );
-        node->SetStringProperty(ID_PROPERTY_NAME.c_str(),name.c_str() );
+        mitk::DataNode::Pointer node = *it;
+        tempDs->Add(node);
 
         ++it;
     }
@@ -173,7 +157,66 @@ bool mitk::PersistenceService::Load(const std::string& fileName)
         return load;
     }
 
-    DataStorage::SetOfObjects::ConstPointer allNodes = ds->GetAll();
+    this->RestorePropertyListsFromPersistentDataNodes(ds);
+
+    return load;
+}
+
+void mitk::PersistenceService::SetAutoLoadAndSave(bool autoLoadAndSave)
+{
+    m_AutoLoadAndSave = autoLoadAndSave;
+    std::string id = PERSISTENCE_PROPERTYLIST_NAME;
+    mitk::PropertyList::Pointer propList = this->GetPropertyList( id );
+    propList->Set("m_AutoLoadAndSave", m_AutoLoadAndSave);
+    this->Save();
+}
+
+void mitk::PersistenceService::AddPropertyListReplacedObserver(PropertyListReplacedObserver* observer)
+{
+    m_PropertyListReplacedObserver.insert( observer );
+}
+
+void mitk::PersistenceService::RemovePropertyListReplacedObserver(PropertyListReplacedObserver* observer)
+{
+    m_PropertyListReplacedObserver.erase( observer );
+}
+
+us::ModuleContext* mitk::PersistenceService::GetModuleContext()
+{
+    return us::GetModuleContext();
+}
+
+std::string mitk::PersistenceService::GetPersistenceNodePropertyName() const
+{
+    return PERSISTENCE_PROPERTY_NAME;
+}
+mitk::DataStorage::SetOfObjects::Pointer mitk::PersistenceService::GetDataNodes() const
+{
+    DataStorage::SetOfObjects::Pointer set = DataStorage::SetOfObjects::New();
+
+    std::map<std::string, mitk::PropertyList::Pointer>::const_iterator it = m_PropertyLists.begin();
+    while( it != m_PropertyLists.end() )
+    {
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        const std::string& name = (*it).first;
+
+        this->ClonePropertyList( (*it).second, node->GetPropertyList() );
+
+        node->SetBoolProperty( PERSISTENCE_PROPERTY_NAME.c_str(), true );
+        node->SetName( name );
+        node->SetStringProperty(ID_PROPERTY_NAME.c_str(), name.c_str() );
+
+        set->push_back( node );
+        ++it;
+    }
+
+    return set;
+}
+
+bool mitk::PersistenceService::RestorePropertyListsFromPersistentDataNodes( DataStorage* storage )
+{
+    bool oneFound = false;
+    DataStorage::SetOfObjects::ConstPointer allNodes = storage->GetAll();
     for ( mitk::DataStorage::SetOfObjects::const_iterator sourceIter = allNodes->begin();
         sourceIter != allNodes->end();
         ++sourceIter )
@@ -184,6 +227,7 @@ bool mitk::PersistenceService::Load(const std::string& fileName)
 
         if( isPersistenceNode )
         {
+            oneFound = true;
             MITK_DEBUG("mitk::PersistenceService") << "isPersistenceNode was true";
             std::string name = node->GetName();
             bool existed = false;
@@ -219,29 +263,5 @@ bool mitk::PersistenceService::Load(const std::string& fileName)
         } // if( isPersistenceNode )
     } // for ( mitk::DataStorage::SetOfObjects::const_iterator sourceIter = allNodes->begin(); ...
 
-    return load;
-}
-
-void mitk::PersistenceService::SetAutoLoadAndSave(bool autoLoadAndSave)
-{
-    m_AutoLoadAndSave = autoLoadAndSave;
-    std::string id = PERSISTENCE_PROPERTYLIST_NAME;
-    mitk::PropertyList::Pointer propList = this->GetPropertyList( id );
-    propList->Set("m_AutoLoadAndSave", m_AutoLoadAndSave);
-    this->Save();
-}
-
-void mitk::PersistenceService::AddPropertyListReplacedObserver(PropertyListReplacedObserver* observer)
-{
-    m_PropertyListReplacedObserver.insert( observer );
-}
-
-void mitk::PersistenceService::RemovePropertyListReplacedObserver(PropertyListReplacedObserver* observer)
-{
-    m_PropertyListReplacedObserver.erase( observer );
-}
-
-us::ModuleContext* mitk::PersistenceService::GetModuleContext()
-{
-    return us::GetModuleContext();
+    return oneFound;
 }

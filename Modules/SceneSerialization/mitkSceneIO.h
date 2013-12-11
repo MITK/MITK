@@ -42,6 +42,16 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
     typedef DataStorage::SetOfObjects                                FailedBaseDataListType;
 
     /**
+     * \brief If set and true, SceneIO will query the PersistenceService for Data and insert it into the datastorage temporarily to save them.
+     *
+    */
+    static void SetSavePersistentDataWithScene(bool savePersistentDataWithScene);
+    /**
+     * \brief If set and true, SceneIO will query the PersistenceService and insert the PropertyList of "PersistenceNodes" into the scene
+     *
+    */
+    static void SetLoadPersistentDataWithScene(bool savePersistentDataWithScene);
+    /**
      * \brief Load a scene of objects from file
      * \return DataStorage with all scene objects and their relations. If loading failed, query GetFailedNodes() and GetFailedProperties() for more detail.
      *
@@ -68,7 +78,7 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
      * \param filename full filename of the scene file
      * \param predicate defining which items of the datastorage to use and which not
      */
-    virtual bool SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNodes, const DataStorage* storage,
+    virtual bool SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNodes, DataStorage* storage,
                             const std::string& filename);
 
     /**
@@ -104,12 +114,14 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
 
     void OnUnzipError(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>& info);
     void OnUnzipOk(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path>& info);
-
+    void RemoveNodes( DataStorage::SetOfObjects::ConstPointer nodesToRemove, DataStorage* storage, DataStorage::SetOfObjects::Pointer sceneNodes );
     FailedBaseDataListType::Pointer m_FailedNodes;
     PropertyList::Pointer           m_FailedProperties;
 
     std::string  m_WorkingDirectory;
     unsigned int m_UnzipErrors;
+    static bool m_SavePersistentDataWithScene;
+    static bool m_LoadPersistentDataWithScene;
 };
 
 }

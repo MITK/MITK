@@ -32,6 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
 #include <berryUIException.h>
+#include <QMessageBox.h>
+#include <mitkSceneIO.h>
 
 class QmitkFileOpenActionPrivate
 {
@@ -119,5 +121,52 @@ void QmitkFileOpenAction::Run()
     return;
 
   d->setLastFileOpenPath(fileNames.front());
+
+  // muellerm, 11.12.13: added logic for persistent data inclusion
+  bool sceneFileLoad = false;
+  for( int i=0; i<fileNames.size(); ++i)
+  {
+      QFileInfo fileInfo( fileNames.at(i) );
+      if( fileInfo.suffix() == "mitk" )
+      {
+          sceneFileLoad = true;
+          break;
+      }
+  }
+
+  if(sceneFileLoad)
+  {
+      berry::IPreferencesService::Pointer prefService
+          = berry::Platform::GetServiceRegistry()
+          .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+      berry::IPreferences::Pointer prefs = prefService->GetSystemPreferences()->Node("/General");
+      bool loadPersistentDataWithScene = prefs->GetBool("loadPersistentDataWithScene", false);
+      mitk::SceneIO::SetLoadPersistentDataWithScene(loadPersistentDataWithScene);
+      bool loadPersistentDataWithSceneUserAlreadyAsked = prefs->GetBool("loadPersistentDataWithSceneUserAlreadyAsked", false);
+
+      if( !loadPersistentDataWithSceneUserAlreadyAsked )
+      {
+          int answer = QMessageBox::question( NULL, "Load additional application data?", "<html>Load additional application data from Scene file?<br />" + QString("<strong>Help:</strong>&nbsp;Modules and plugins of the MITK Workbench can store data in an internal database. This database can be included into scene files while saving or restored while loading a scene file. This is useful if the modules you are using support this internal database and you want to save images along with application data (e.g. settings, parameters, etc.).")
+              + QString::fromStdString("<br />Your answer will be saved and you will not be asked again. You can change this behavior later in the General Preferences Page.</html>"),
+              QMessageBox::Yes,
+              QMessageBox::No );
+
+          if( answer == QMessageBox::No )
+          {
+              loadPersistentDataWithScene = false;
+          }
+          else
+          {
+              loadPersistentDataWithScene = true;
+
+          }
+          loadPersistentDataWithSceneUserAlreadyAsked = true;
+          prefs->PutBool("loadPersistentDataWithSceneUserAlreadyAsked", loadPersistentDataWithSceneUserAlreadyAsked);
+          prefs->PutBool("loadPersistentDataWithScene", loadPersistentDataWithScene);
+          prefs->Flush();
+      }
+      // muellerm, 11.12.13: end of changes
+  }
+
   mitk::WorkbenchUtil::LoadFiles(fileNames, d->m_Window.Lock(), d->GetOpenEditor());
 }

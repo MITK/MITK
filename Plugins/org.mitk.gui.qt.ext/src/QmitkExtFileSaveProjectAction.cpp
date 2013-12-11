@@ -33,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIDataStorageService.h>
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
+#include <berryIPreferencesService.h>
+#include "berryPlatform.h"
 
 
 QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow::Pointer window)
@@ -100,12 +102,45 @@ void QmitkExtFileSaveProjectAction::Run()
 
     mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 
+    // muellerm, 11.12.13: added logic for persistent data inclusion
+    berry::IPreferencesService::Pointer prefService
+        = berry::Platform::GetServiceRegistry()
+        .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+    berry::IPreferences::Pointer prefs = prefService->GetSystemPreferences()->Node("/General");
+    bool savePersistentDataWithScene = prefs->GetBool("savePersistentDataWithScene", false);
+    mitk::SceneIO::SetSavePersistentDataWithScene(savePersistentDataWithScene);
+    bool savePersistentDataWithSceneUserAlreadyAsked = prefs->GetBool("savePersistentDataWithSceneUserAlreadyAsked", false);
+
+    if( !savePersistentDataWithSceneUserAlreadyAsked )
+    {
+        int answer = QMessageBox::question( NULL, "Save additional application data?", "<html>Save additional application data in Scene file?<br />" + QString("<strong>Help:</strong>&nbsp;Modules and plugins of the MITK Workbench can store data in an internal database. This database can be included into scene files while saving or restored while loading a scene file. This is useful if the modules you are using support this internal database and you want to save images along with application data (e.g. settings, parameters, etc.).")
+            + QString::fromStdString("<br />Your answer will be saved and you will not be asked again. You can change this behavior later in the General Preferences Page.</html>"),
+            QMessageBox::Yes,
+            QMessageBox::No );
+
+        if( answer == QMessageBox::No )
+        {
+            savePersistentDataWithScene = false;
+        }
+        else
+        {
+            savePersistentDataWithScene = true;
+
+        }
+        savePersistentDataWithSceneUserAlreadyAsked = true;
+        prefs->PutBool("savePersistentDataWithSceneUserAlreadyAsked", savePersistentDataWithSceneUserAlreadyAsked);
+        prefs->PutBool("savePersistentDataWithScene", savePersistentDataWithScene);
+        prefs->Flush();
+    }
+    // muellerm, 11.12.13: end of changes
+
     mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
 
     /* Build list of nodes that should be saved */
     mitk::NodePredicateNot::Pointer isNotHelperObject =
         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
     mitk::DataStorage::SetOfObjects::ConstPointer nodesToBeSaved = storage->GetSubset(isNotHelperObject);
+
     if ( !sceneIO->SaveScene( nodesToBeSaved, storage, fileName.toStdString() ) )
     {
       QMessageBox::information(NULL,

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPropertyListReplacedObserver_h
 
 // mitk
-#include "PersistenceExports.h"
+#include <MitkExports.h>
 #include "mitkPropertyList.h"
 #include <string>
 
@@ -27,7 +27,7 @@ namespace mitk
     /// a PropertyListReplacedObserver gets informed as soon as a PropertyList with a given id was replaced during a Load() process
     /// \see IPersistenceService::AddPropertyListReplacedObserver()
     ///
-    class Persistence_EXPORT PropertyListReplacedObserver
+    class MITK_CORE_EXPORT PropertyListReplacedObserver
     {
     public:
         ///

@@ -15,8 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkIPersistenceService.h"
-#include "Poco\Path.h"
-
 
 std::string mitk::IPersistenceService::m_DefaultPersistenceFile(CreateDefaultFileName());
 
@@ -37,7 +35,6 @@ std::string mitk::IPersistenceService::GetDefaultPersistenceFile()
 
 std::string mitk::IPersistenceService::CreateDefaultFileName()
 {
-    std::string homeDir = Poco::Path::home();
-    std::string file = /*homeDir +*/ "PersistentData.mitk";
+    std::string file = "PersistentData.mitk";
     return file;
 }

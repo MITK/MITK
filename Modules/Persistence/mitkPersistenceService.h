@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPersistenceService_h
 
 #include "mitkIPersistenceService.h"
+#include "PersistenceExports.h"
 #include <itkLightObject.h>
 #include "mitkSceneIO.h"
 
@@ -39,6 +40,10 @@ namespace mitk
 
         mitk::PropertyList::Pointer GetPropertyList( std::string& id, bool* existed=0 );
 
+        std::string GetPersistenceNodePropertyName() const;
+
+        DataStorage::SetOfObjects::Pointer GetDataNodes() const;
+
         bool Save(const std::string& fileName="", bool appendChanges=false);
 
         bool Load(const std::string& fileName="");
@@ -48,8 +53,10 @@ namespace mitk
         void AddPropertyListReplacedObserver( PropertyListReplacedObserver* observer );
 
         void RemovePropertyListReplacedObserver( PropertyListReplacedObserver* observer );
+
+        bool RestorePropertyListsFromPersistentDataNodes(DataStorage* storage);
     private:
-        void ClonePropertyList( mitk::PropertyList* from, mitk::PropertyList* to );
+        void ClonePropertyList( mitk::PropertyList* from, mitk::PropertyList* to ) const;
         std::map<std::string, mitk::PropertyList::Pointer> m_PropertyLists;
         bool m_AutoLoadAndSave;
         std::set<PropertyListReplacedObserver*> m_PropertyListReplacedObserver;

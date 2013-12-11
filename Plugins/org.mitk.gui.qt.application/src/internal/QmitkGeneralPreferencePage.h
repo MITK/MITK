@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferences.h>
 
 class QWidget;
+class QCheckBox;
 
 class QmitkGeneralPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -67,7 +68,10 @@ public:
 
 protected:
 
-  QWidget* m_MainControl;
+    QWidget* m_MainControl;
+    QCheckBox* m_SavePersistentDataWithSceneCheckBox;
+    QCheckBox* m_LoadPersistentDataWithSceneCheckBox;
+    berry::IPreferences::Pointer prefs;
 
 };
 

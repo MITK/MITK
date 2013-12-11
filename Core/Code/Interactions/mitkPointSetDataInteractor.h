@@ -85,7 +85,7 @@ namespace mitk
      *  Every time a point is added it is also checked if the maximal number of points is reached,
      *  and if so an InternalEvent with the signal name "MaxNumberOfPoints" is triggered.
      */
-    virtual bool AddPoint(StateMachineAction*, InteractionEvent*);
+    virtual bool AddPoint(StateMachineAction*, InteractionEvent* event);
 
     /** Removes point that is selected */
     virtual bool RemovePoint(StateMachineAction*, InteractionEvent*);

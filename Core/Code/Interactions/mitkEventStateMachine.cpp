@@ -21,9 +21,10 @@
 #include "mitkStateMachineCondition.h"
 #include "mitkStateMachineTransition.h"
 #include "mitkStateMachineState.h"
+#include "mitkUndoController.h"
 
 mitk::EventStateMachine::EventStateMachine() :
-  m_StateMachineContainer(NULL), m_CurrentState(NULL), m_UndoController(NULL)
+  m_UndoController(NULL), m_StateMachineContainer(NULL),  m_CurrentState(NULL)
 {
   if (!m_UndoController)
   {

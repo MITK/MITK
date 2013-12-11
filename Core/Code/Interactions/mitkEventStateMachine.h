@@ -225,6 +225,11 @@ namespace mitk
     */
     StateMachineTransition* GetExecutableTransition( InteractionEvent* event );
 
+    // Determines if state machine reacts to events
+    bool m_IsActive;
+    // Undo/Redo
+    UndoController* m_UndoController;
+    bool m_UndoEnabled;
 
   private:
 
@@ -237,11 +242,6 @@ namespace mitk
     ConditionDelegatesMapType m_ConditionDelegatesMap;
     StateMachineStateType m_CurrentState;
 
-    // Determines if state machine reacts to events
-    bool m_IsActive;
-    // Undo/Redo
-    UndoController* m_UndoController;
-    bool m_UndoEnabled;
 
   };
 

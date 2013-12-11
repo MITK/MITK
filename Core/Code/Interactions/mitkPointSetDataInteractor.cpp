@@ -16,6 +16,8 @@
 
 #include "mitkPointSetDataInteractor.h"
 #include "mitkMouseMoveEvent.h"
+
+#include "mitkOperationEvent.h"
 #include <mitkPointOperation.h>
 #include "mitkInteractionConst.h" // TODO: refactor file
 #include "mitkRenderingManager.h"
@@ -23,6 +25,8 @@
 //
 #include "mitkDispatcher.h"
 #include "mitkBaseRenderer.h"
+
+#include "mitkUndoController.h"
 
 void mitk::PointSetDataInteractor::ConnectActionsAndFunctions()
 {
@@ -45,6 +49,13 @@ bool mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineActi
   int lastPosition = 0;
   PointSet::PointsContainer* pointsContainer = m_PointSet->GetPointSet(0)->GetPoints();
 
+
+  mitk::ScalarType timeInMS = 0.0;
+
+
+      //additionaly to m_TimeStep we need timeInMS to satisfy the execution of the operations
+      timeInMS = interactionEvent->GetSender()->GetTime();
+
   if (!pointsContainer->empty())
   {
     mitk::PointSet::PointsIterator it, end;
@@ -64,12 +75,24 @@ bool mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineActi
   {
     IsClosedContour(stateMachineAction, interactionEvent);
     // Get time step from BaseRenderer
-    int timeStep = positionEvent->GetSender()->GetTimeStep();
+    //int timeStep = positionEvent->GetSender()->GetTimeStep();
     mitk::Point3D point = positionEvent->GetPositionInWorld();
-    m_PointSet->InsertPoint(lastPosition, point, timeStep);
+    //m_PointSet->InsertPoint(lastPosition, point, timeStep);
+
+    PointOperation* doOp = new PointOperation(OpINSERT, timeInMS, point, lastPosition);
+    PointOperation* undoOp = new mitk::PointOperation(mitk::OpREMOVE,timeInMS, point, lastPosition);
+
+    OperationEvent *operationEvent = new OperationEvent(this->GetDataNode()->GetData(),doOp, undoOp, "Add point");
+
+    m_UndoController->SetOperationEvent(operationEvent);
+
+
+
+
+
     m_NumberOfPoints++;
-    GetDataNode()->SetData(m_PointSet);
-    GetDataNode()->Modified();
+    //GetDataNode()->SetData(m_PointSet);
+    //GetDataNode()->Modified();
     if (m_MaxNumberOfPoints != 0 && m_NumberOfPoints >= m_MaxNumberOfPoints)
     {
       InternalEvent::Pointer event = InternalEvent::New(NULL, this, "MaxNumberOfPoints");
@@ -117,14 +140,28 @@ mitk::PointSetDataInteractor::~PointSetDataInteractor()
 {
 }
 
-bool mitk::PointSetDataInteractor::RemovePoint(StateMachineAction*, InteractionEvent*)
+bool mitk::PointSetDataInteractor::RemovePoint(StateMachineAction*, InteractionEvent* event)
 {
+
+
+  mitk::ScalarType timeInMS = 0.0;
+
+
+      //additionaly to m_TimeStep we need timeInMS to satisfy the execution of the operations
+      timeInMS = event->GetSender()->GetTime();
+
 
   if (m_SelectedPointIndex != -1)
   {
     Point3D point;
-    PointOperation* doOp = new PointOperation(mitk::OpREMOVE, point, m_SelectedPointIndex);
-    GetDataNode()->GetData()->ExecuteOperation(doOp);
+    PointOperation* doOp = new PointOperation(mitk::OpREMOVE, timeInMS, point, m_SelectedPointIndex);
+    PointOperation* undoOp = new mitk::PointOperation(OpINSERT,timeInMS, point, m_SelectedPointIndex);
+
+    OperationEvent *operationEvent = new OperationEvent(this->GetDataNode()->GetData(),doOp, undoOp, "Remove point");
+
+    m_UndoController->SetOperationEvent(operationEvent);
+
+    // GetDataNode()->GetData()->ExecuteOperation(doOp);
     m_SelectedPointIndex = -1;
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     m_NumberOfPoints--;

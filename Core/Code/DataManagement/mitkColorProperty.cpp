@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkColorProperty.h"
 
 mitk::ColorProperty::ColorProperty()
-: m_Color()
+: m_Color(0.0f)
 {
 
 }

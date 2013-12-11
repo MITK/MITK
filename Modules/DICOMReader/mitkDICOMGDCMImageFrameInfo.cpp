@@ -53,7 +53,21 @@ mitk::DICOMGDCMImageFrameInfo
   }
   else
   {
-    return std::string("");
+    const DICOMTag tagImagePositionPatient = DICOMTag(0x0020,0x0032); // Image Position (Patient)
+    const DICOMTag    tagImageOrientation = DICOMTag(0x0020, 0x0037); // Image Orientation
+
+    if (tag == tagImagePositionPatient)
+    {
+      return std::string("0\\0\\0");
+    }
+    else if (tag == tagImageOrientation)
+    {
+      return std::string("1\\0\\0\\0\\1\\0");
+    }
+    else
+    {
+      return std::string("");
+    }
   }
 }
 

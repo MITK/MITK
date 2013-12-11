@@ -31,6 +31,7 @@ class DICOMReader_EXPORT DICOMTag
     DICOMTag(unsigned int group, unsigned int element);
     DICOMTag(const DICOMTag& other);
     DICOMTag& operator=(const DICOMTag& other);
+    bool operator==(const DICOMTag& other) const;
 
     unsigned int GetGroup() const;
     unsigned int GetElement() const;

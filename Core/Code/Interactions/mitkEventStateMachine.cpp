@@ -24,7 +24,7 @@
 #include "mitkUndoController.h"
 
 mitk::EventStateMachine::EventStateMachine() :
-  m_UndoController(NULL), m_StateMachineContainer(NULL),  m_CurrentState(NULL)
+  m_IsActive(true), m_UndoController(NULL), m_StateMachineContainer(NULL),  m_CurrentState(NULL)
 {
   if (!m_UndoController)
   {
@@ -164,7 +164,6 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dat
 
     return true;
   }
-
   return false;
 }
 

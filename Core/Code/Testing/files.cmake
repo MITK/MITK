@@ -20,7 +20,6 @@ set(MODULE_TESTS
   #mitkImageMapper2DTest.cpp #tested class mitkImageMapperGL2D doesn't exist any more
   mitkImageGeneratorTest.cpp
   mitkBaseDataTest.cpp
-  mitkImageToItkTest.cpp
   mitkImportItkImageTest.cpp
   mitkGrabItkImageMemoryTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
@@ -147,6 +146,7 @@ set(MODULE_CUSTOM_TESTS
     mitkTextOverlay3DColorRenderingTest.cpp
     mitkVTKRenderWindowSizeTest.cpp
     mitkMultiComponentImageDataComparisonFilterTest.cpp
+    mitkImageToItkTest.cpp
 )
 
 if (${VTK_MAJOR_VERSION} VERSION_LESS 6) # test can be removed with VTK 6

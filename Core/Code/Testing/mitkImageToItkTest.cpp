@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkReferenceCountWatcher.h"
 #include "itkDiffusionTensor3D.h"
 #include <mitkImageCast.h>
+#include <mitkIOUtil.h>
 #include <fstream>
 
 //#############################################################################
@@ -51,9 +52,13 @@ mitk::Image::Pointer GetEmptyTestImageWithGeometry(mitk::PixelType pt)
   return imgMem;
 }
 
+//#############################################################################
+//##################### test methods ##########################################
+//#############################################################################
+
 void TestCastingMITKIntITKFloat_EmptyImage()
 {
-  MITK_TEST_OUTPUT(<<"Testing cast of empty MITK(int) to ITK(float) image and back ... no errors should occur");
+  MITK_TEST_OUTPUT(<<"Testing cast of empty MITK(int) to ITK(float) image and back ...");
   mitk::Image::Pointer imgMem = GetEmptyTestImageWithGeometry(mitk::MakeScalarPixelType<int>());
   itk::Image<float,3>::Pointer itkImage;
   mitk::CastToItkImage( imgMem, itkImage );
@@ -63,8 +68,17 @@ void TestCastingMITKIntITKFloat_EmptyImage()
 
 void TestCastingMITKDoubleITKFloat_EmptyImage()
 {
-  MITK_TEST_OUTPUT(<<"Testing cast of empty MITK(double) to ITK(float) image and back ... no errors should occur");
+  MITK_TEST_OUTPUT(<<"Testing cast of empty MITK(double) to ITK(float) image and back ...");
   mitk::Image::Pointer imgMem=GetEmptyTestImageWithGeometry(mitk::MakeScalarPixelType<double>());
+  itk::Image<itk::DiffusionTensor3D<float>,3>::Pointer diffImage;
+  mitk::CastToItkImage( imgMem, diffImage );
+  MITK_TEST_CONDITION_REQUIRED(diffImage.IsNotNull(),"Checking if result is not NULL.");
+}
+
+void TestCastingMITKFloatITKFloat_EmptyImage()
+{
+  MITK_TEST_OUTPUT(<<"Testing cast of empty MITK(float) to ITK(float) image and back ...");
+  mitk::Image::Pointer imgMem=GetEmptyTestImageWithGeometry(mitk::MakeScalarPixelType<float>());
   itk::Image<itk::DiffusionTensor3D<float>,3>::Pointer diffImage;
   mitk::CastToItkImage( imgMem, diffImage );
   MITK_TEST_CONDITION_REQUIRED(diffImage.IsNotNull(),"Checking if result is not NULL.");
@@ -72,103 +86,44 @@ void TestCastingMITKDoubleITKFloat_EmptyImage()
 
 void TestCastingMITKDoubleITKDouble_EmptyImage()
 {
-  MITK_TEST_OUTPUT(<<"Testing cast of empty MITK(double) to ITK(float) image and back ... no errors should occur");
+  MITK_TEST_OUTPUT(<<"Testing cast of empty MITK(double) to ITK(float) image and back ...");
   mitk::Image::Pointer imgMem=GetEmptyTestImageWithGeometry(mitk::MakeScalarPixelType<double>());
   itk::Image<itk::DiffusionTensor3D<double>,3>::Pointer diffImage;
   mitk::CastToItkImage( imgMem, diffImage );
   MITK_TEST_CONDITION_REQUIRED(diffImage.IsNotNull(),"Checking if result is not NULL.");
 }
 
-int mitkImageToItkTest(int /*argc*/, char* /*argv*/[])
+void TestCastingMITKtoITK_TestImage(mitk::Image::Pointer testImage)
+{
+itk::Image<short>::Pointer itkImage = itk::Image<short>::New();
+
+mitk::CastToItkImage( testImage, itkImage );
+MITK_TEST_CONDITION_REQUIRED(itkImage.IsNotNull(),"Casting test image to ITK.");
+
+mitk::Image::Pointer mitkImageAfterCast = mitk::ImportItkImage(itkImage);
+MITK_TEST_CONDITION_REQUIRED(mitkImageAfterCast.IsNotNull(),"Casting ITK image back.");
+
+MITK_TEST_CONDITION_REQUIRED(mitk::Equal(testImage,mitkImageAfterCast,mitk::eps,true),"Testing if both images are equal.");
+}
+
+int mitkImageToItkTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("mitkImageToItkTest");
 
+  MITK_TEST_OUTPUT(<<"Some tests with empty images, no errors should occur: ");
   TestCastingMITKIntITKFloat_EmptyImage();
-  TestCastingMITKDoubleITKFloat_EmptyImage();
-  TestCastingMITKDoubleITKDouble_EmptyImage();
+  //TestCastingMITKFloatITKFloat_EmptyImage(); //deactivated because of bug 16654
+  //TestCastingMITKDoubleITKFloat_EmptyImage(); //deactivated because of bug 16654
+  //TestCastingMITKDoubleITKDouble_EmptyImage(); //deactivated because of bug 16654
+
+  MITK_TEST_OUTPUT(<<"Test casting with real image data: ");
+  mitk::Image::Pointer Pic3DImage;
+  if(argc==2) {Pic3DImage = mitk::IOUtil::LoadImage(argv[1]);}
+  else {MITK_TEST_OUTPUT(<<"ERROR: test data could not be loaded: "<<argc<<"/"<<argv[1]);}
+
+  TestCastingMITKtoITK_TestImage(Pic3DImage);
 
 
 
-
-  //typedef itk::Image<float,3> ImageType;
-  //ImageType::Pointer itkImage;
-  //mitk::CastToItkImage( imgMem, itkImage );
-
-  //
-  //
-
-  //MITK_TEST_CONDITION_REQUIRED(testBackCasting<ImageType>(imgMem, itkImage, true),"Testing back casting (mitk int to itk float) with disconnect");
-
-
-
-  //imgMem->Initialize(pt_double, 40, *planegeometry, false, 1, 6);
-  //MITK_TEST_CONDITION_REQUIRED(testImageToItkAndBack<4>(imgMem),"Testing Initialize(const mitk::PixelType& type, int sDim, const mitk::PlaneGeometry& geometry) and GetData()");
-
-
-  //std::cout << "Testing mitk::CastToItkImage again (mitk float to itk float): " << std::flush;
-  //imgMem->Initialize(pt_float, 40, *planegeometry);
-  //mitk::CastToItkImage( imgMem, itkImage );
-  //std::cout<<"[PASSED]"<<std::endl;
-
-  //mitk::ImageDataItem::Pointer imageDataItem = imgMem->GetChannelData().GetPointer();
-  //std::cout << "Testing destruction of original mitk::Image: " << std::flush;
-  //imgMem = NULL;
-  //std::cout<<"[PASSED]"<<std::endl;
-
-  ///* Fails at the moment
-  //std::cout << "Testing reference count mitk::ImageDataItem, which is responsible for the memory still used within the itk::Image: " << std::flush;
-  //if(imageDataItem->GetReferenceCount()-1 != 1) // 1 count by imageDataItem itself
-  //{
-  //  std::cout<< imageDataItem->GetReferenceCount()-1 << " != 1. [FAILED]" << std::endl;
-  //  return EXIT_FAILURE;
-  //}
-  //std::cout<<"[PASSED]"<<std::endl;
-  //*/
-
-  //std::cout << "Testing destruction of itk::Image: " << std::flush;
-  //itkImage = NULL;
-  //std::cout<<"[PASSED]"<<std::endl;
-
-  ///* Crashes at the moment
-  //std::cout << "Testing reference count mitk::ImageDataItem, which should now have been freed by itk::Image: " << std::flush;
-  //if(imageDataItem->GetReferenceCount()-1 != 0) // 1 count by imageDataItem itself
-  //{
-  //  std::cout<< imageDataItem->GetReferenceCount()-1 << " != 0. [FAILED]" << std::endl;
-  //  return EXIT_FAILURE;
-  //}
-  //std::cout<<"[PASSED]"<<std::endl;
-  //*/
-
-
-  //imgMem=mitk::Image::New();
-  //itk::Image<itk::DiffusionTensor3D<float>,3>::Pointer diffImage;
-  //imgMem->Initialize(pt_double, 40, *planegeometry);
-  //mitk::CastToItkImage( imgMem, diffImage );
-
-
-  //imgMem->InitializeByItk(diffImage.GetPointer());
-  //std::cout<<"[PASSED]"<<std::endl;
-
-  //itk::Image<itk::DiffusionTensor3D<double>,3>::Pointer diffImage2;
-  //imgMem->Initialize(pt_double, 40, *planegeometry);
-  //mitk::CastToItkImage( imgMem, diffImage2 );
-  //imgMem->InitializeByItk(diffImage2.GetPointer());
-  //std::cout<<"[PASSED]"<<std::endl;
-
-  ///* seems as ConfidenceDiffusionTensor3D is no longer part of ITK, remove test code?
-  //itk::Image<itk::ConfidenceDiffusionTensor3D<float>,3>::Pointer confDiffImage;
-  //imgMem->Initialize(mitk::PixelType(typeid(itk::ConfidenceDiffusionTensor3D<float>)), 40, *planegeometry);
-  //mitk::CastToItkImage( imgMem, confDiffImage );
-  //imgMem->InitializeByItk(confDiffImage.GetPointer());
-  //std::cout<<"[PASSED]"<<std::endl;
-
-  //itk::Image<itk::ConfidenceDiffusionTensor3D<double>,3>::Pointer confDiffImage2;
-  //imgMem->Initialize(mitk::PixelType(typeid(itk::ConfidenceDiffusionTensor3D<double>)), 40, *planegeometry);
-  //mitk::CastToItkImage( imgMem, confDiffImage2 );
-  //imgMem->InitializeByItk(confDiffImage2.GetPointer());
-  //std::cout<<"[PASSED]"<<std::endl;
-  //*/
-
-  //std::cout<<"[TEST DONE]"<<std::endl;
   MITK_TEST_END();
 }

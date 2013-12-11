@@ -42,6 +42,8 @@ mitkAddCustomModuleTest(mitkMultiComponentImageDataComparisonFilterTest mitkMult
                         ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg
 )
 
+mitkAddCustomModuleTest(mitkImageToItkTest mitkImageToItkTest ${MITK_DATA_DIR}/Pic3D.nrrd)
+
 
 if(MITK_ENABLE_RENDERING_TESTING) ### since the rendering test's do not run in ubuntu, yet, we build them only for other systems or if the user explicitly sets the variable MITK_ENABLE_RENDERING_TESTING
 mitkAddCustomModuleTest(mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2DTest

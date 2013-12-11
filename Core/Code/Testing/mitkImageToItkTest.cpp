@@ -79,31 +79,65 @@ void TestCastingMITKFloatITKFloat_EmptyImage()
 {
   MITK_TEST_OUTPUT(<<"Testing cast of empty MITK(float) to ITK(float) image and back ...");
   mitk::Image::Pointer imgMem=GetEmptyTestImageWithGeometry(mitk::MakeScalarPixelType<float>());
-  itk::Image<itk::DiffusionTensor3D<float>,3>::Pointer diffImage;
+  //itk::Image<itk::DiffusionTensor3D<float>,3>::Pointer diffImage;
+  itk::Image<float,3>::Pointer diffImage;
   mitk::CastToItkImage( imgMem, diffImage );
   MITK_TEST_CONDITION_REQUIRED(diffImage.IsNotNull(),"Checking if result is not NULL.");
 }
 
-void TestCastingMITKDoubleITKDouble_EmptyImage()
+
+void TestCastingMITKFloatTensorITKFloatTensor_EmptyImage()
 {
-  MITK_TEST_OUTPUT(<<"Testing cast of empty MITK(double) to ITK(float) image and back ...");
-  mitk::Image::Pointer imgMem=GetEmptyTestImageWithGeometry(mitk::MakeScalarPixelType<double>());
-  itk::Image<itk::DiffusionTensor3D<double>,3>::Pointer diffImage;
+  MITK_TEST_OUTPUT(<<"Testing cast of empty MITK(Tensor<float>) to ITK(Tensor<float>) image and back ...");
+  typedef itk::Image< itk::DiffusionTensor3D<float>, 3 > ItkTensorImageType;
+  mitk::Image::Pointer imgMem=GetEmptyTestImageWithGeometry( mitk::MakePixelType< ItkTensorImageType  >() );
+  itk::Image<itk::DiffusionTensor3D<float>,3>::Pointer diffImage;
+  //itk::Image<float,3>::Pointer diffImage;
   mitk::CastToItkImage( imgMem, diffImage );
   MITK_TEST_CONDITION_REQUIRED(diffImage.IsNotNull(),"Checking if result is not NULL.");
+}
+
+void TestCastingMITKDoubleITKTensorDouble_EmptyImage_ThrowsException()
+{
+  MITK_TEST_OUTPUT(<<"Testing whether cast of empty MITK(double) to ITK(Tensor<double, 3>) image throws an exception...");
+  mitk::Image::Pointer imgMem=GetEmptyTestImageWithGeometry(mitk::MakeScalarPixelType<double>());
+  itk::Image<itk::DiffusionTensor3D<double>,3>::Pointer diffImage;
+  MITK_TEST_FOR_EXCEPTION_BEGIN(std::exception)
+  mitk::CastToItkImage( imgMem, diffImage );
+  MITK_TEST_FOR_EXCEPTION_END(std::exception)
 }
 
 void TestCastingMITKtoITK_TestImage(mitk::Image::Pointer testImage)
 {
-itk::Image<short>::Pointer itkImage = itk::Image<short>::New();
+itk::Image<short, 3>::Pointer itkImage;
 
+try
+{
 mitk::CastToItkImage( testImage, itkImage );
+}
+catch( const std::exception &e)
+{
+  MITK_TEST_FAILED_MSG(<< e.what() )
+}
+
 MITK_TEST_CONDITION_REQUIRED(itkImage.IsNotNull(),"Casting test image to ITK.");
 
 mitk::Image::Pointer mitkImageAfterCast = mitk::ImportItkImage(itkImage);
 MITK_TEST_CONDITION_REQUIRED(mitkImageAfterCast.IsNotNull(),"Casting ITK image back.");
 
-MITK_TEST_CONDITION_REQUIRED(mitk::Equal(testImage,mitkImageAfterCast,mitk::eps,true),"Testing if both images are equal.");
+// we need to explicitely dereference the itkImage as it still holds an mitk::ImageWriteAccessor
+// and the Equal methods throws an exception in this case
+itkImage = 0;
+
+try
+{
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(testImage,mitkImageAfterCast,mitk::eps,true),"Testing if both images are equal.");
+}
+catch( const itk::ExceptionObject &e)
+{
+  MITK_TEST_FAILED_MSG(<< e.what() )
+}
+
 }
 
 int mitkImageToItkTest(int argc, char* argv[])
@@ -112,9 +146,9 @@ int mitkImageToItkTest(int argc, char* argv[])
 
   MITK_TEST_OUTPUT(<<"Some tests with empty images, no errors should occur: ");
   TestCastingMITKIntITKFloat_EmptyImage();
-  //TestCastingMITKFloatITKFloat_EmptyImage(); //deactivated because of bug 16654
-  //TestCastingMITKDoubleITKFloat_EmptyImage(); //deactivated because of bug 16654
-  //TestCastingMITKDoubleITKDouble_EmptyImage(); //deactivated because of bug 16654
+  TestCastingMITKFloatITKFloat_EmptyImage();
+  TestCastingMITKFloatTensorITKFloatTensor_EmptyImage();
+  TestCastingMITKDoubleITKTensorDouble_EmptyImage_ThrowsException();
 
   MITK_TEST_OUTPUT(<<"Test casting with real image data: ");
   mitk::Image::Pointer Pic3DImage;
@@ -122,8 +156,6 @@ int mitkImageToItkTest(int argc, char* argv[])
   else {MITK_TEST_OUTPUT(<<"ERROR: test data could not be loaded: "<<argc<<"/"<<argv[1]);}
 
   TestCastingMITKtoITK_TestImage(Pic3DImage);
-
-
 
   MITK_TEST_END();
 }

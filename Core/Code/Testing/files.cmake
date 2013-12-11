@@ -147,6 +147,7 @@ set(MODULE_CUSTOM_TESTS
     mitkVTKRenderWindowSizeTest.cpp
     mitkMultiComponentImageDataComparisonFilterTest.cpp
     mitkImageToItkTest.cpp
+    mitkImageSliceSelectorTest.cpp
 )
 
 if (${VTK_MAJOR_VERSION} VERSION_LESS 6) # test can be removed with VTK 6

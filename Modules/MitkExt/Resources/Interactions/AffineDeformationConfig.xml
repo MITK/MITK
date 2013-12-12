@@ -10,4 +10,6 @@
   <event_variant name="EndDeformation" class="MouseReleaseEvent">
       <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>
+  <event_variant name="ScaleRadius" class="MouseWheelEvent">
+  </event_variant>
 </config>

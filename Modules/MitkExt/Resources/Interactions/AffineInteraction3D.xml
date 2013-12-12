@@ -10,14 +10,24 @@
             <condition name="isOverObject" inverted="true" />
             <action name="deselectObject"/>
         </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="MovePointer" target="select">
+            <condition name="isOverObject"/>
+            <action name="selectObject"/>
+        </transition>
+        <transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="start">
+            <action name="deselectObject"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="ScaleRadius" target="select">
+            <action name="scaleRadius"/>
+        </transition>
         <transition event_class="InteractionPositionEvent" event_variant="InitTranslatation" target="translate">
             <action name="initTranslate"/>
         </transition>
         <transition event_class="InteractionPositionEvent" event_variant="InitRotation" target="rotate">
             <action name="initRotate"/>
         </transition>
-        <transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="start">
-            <action name="deselectObject"/>
+        <transition event_class="InteractionPositionEvent" event_variant="InitDeformation" target="deform">
+            <action name="initDeformation"/>
         </transition>
     </state>
     <state name="translate" >

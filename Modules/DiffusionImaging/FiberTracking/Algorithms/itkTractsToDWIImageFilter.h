@@ -27,8 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageSource.h>
 #include <itkVnlForwardFFTImageFilter.h>
 #include <itkVnlInverseFFTImageFilter.h>
+#include <itkTimeProbe.h>
 
 #include <cmath>
+#include <ctime>
 
 
 namespace itk
@@ -99,6 +101,7 @@ public:
     itkSetMacro( MaxRotation, VectorType )
     itkSetMacro( AddMotionArtifact, bool )
     itkSetMacro( RandomMotion, bool )
+    itkGetMacro( StatusText, std::string )
 
     // output
     std::vector< ItkDoubleImgType::Pointer > GetVolumeFractions(){ return m_VolumeFractions; }
@@ -113,6 +116,7 @@ protected:
     itk::Vector<double, 3> GetItkVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(Vector< float, 3 >& vector);
+    std::string GetTime();
 
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using FFT and add k-space artifacts. */
     DoubleDwiType::Pointer DoKspaceStuff(std::vector< DoubleDwiType::Pointer >& images);
@@ -156,6 +160,8 @@ protected:
     bool                                m_AddMotionArtifact;
     bool                                m_RandomMotion;
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
+    std::string                         m_StatusText;
+    time_t                              m_StartTime;
 };
 }
 

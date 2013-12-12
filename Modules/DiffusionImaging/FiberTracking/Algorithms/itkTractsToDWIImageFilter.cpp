@@ -134,13 +134,17 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                 transform[i][j] *= m_Spacing[j];
         }
 
-    std::vector< int > spikeVolume;
+    std::vector< unsigned int > spikeVolume;
     for (int i=0; i<m_Spikes; i++)
         spikeVolume.push_back(rand()%images.at(0)->GetVectorLength());
     std::sort (spikeVolume.begin(), spikeVolume.end());
     std::reverse (spikeVolume.begin(), spikeVolume.end());
 
-    boost::progress_display disp(images.at(0)->GetVectorLength()*images.at(0)->GetLargestPossibleRegion().GetSize(2));
+    m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
+    m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
+    unsigned long lastTick = 0;
+
+    boost::progress_display disp(2*images.at(0)->GetVectorLength()*images.at(0)->GetLargestPossibleRegion().GetSize(2));
     for (unsigned int g=0; g<images.at(0)->GetVectorLength(); g++)
     {
         std::vector< int > spikeSlice;
@@ -190,6 +194,9 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                 t2Vector.push_back(signalModel->GetT2());
             }
 
+            if (this->GetAbortGenerateData())
+                return NULL;
+
             // create k-sapce (inverse fourier transform slices)
             itk::Size<2> outSize; outSize.SetElement(0, m_ImageRegion.GetSize(0)); outSize.SetElement(1, m_ImageRegion.GetSize(1));
             itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
@@ -221,6 +228,12 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
             ComplexSliceType::Pointer fSlice;
             fSlice = idft->GetOutput();
 
+            ++disp;
+            unsigned long newTick = 50*disp.count()/disp.expected_count();
+            for (int tick = 0; tick<(newTick-lastTick); tick++)
+                m_StatusText += "*";
+            lastTick = newTick;
+
             // fourier transform slice
             SliceType::Pointer newSlice;
             itk::DftImageFilter< SliceType::PixelType >::Pointer dft = itk::DftImageFilter< SliceType::PixelType >::New();
@@ -240,14 +253,22 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                     newImage->SetPixel(index3D, pix3D);
                 }
             ++disp;
+            newTick = 50*disp.count()/disp.expected_count();
+            for (int tick = 0; tick<(newTick-lastTick); tick++)
+                m_StatusText += "*";
+            lastTick = newTick;
         }
     }
+    m_StatusText += "\n\n";
     return newImage;
 }
 
 template< class PixelType >
 void TractsToDWIImageFilter< PixelType >::GenerateData()
 {
+    m_StartTime = clock();
+    m_StatusText = "Starting simulation\n";
+
     // check input data
     if (m_FiberBundle.IsNull())
         itkExceptionMacro("Input fiber bundle is NULL!");
@@ -300,6 +321,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     double upsampling = 1;
     if (m_AddGibbsRinging)
     {
+        m_StatusText += "Gibbs ringing enabled\n";
         MITK_INFO << "Adding ringing artifacts.";
         upsampling = 2;
     }
@@ -391,6 +413,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     bool maskImageSet = true;
     if (m_TissueMask.IsNull())
     {
+        m_StatusText += "No tissue mask set\n";
         MITK_INFO << "No tissue mask set";
         m_TissueMask = ItkUcharImgType::New();
         m_TissueMask->SetSpacing( m_UpsampledSpacing );
@@ -404,7 +427,10 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         maskImageSet = false;
     }
     else
+    {
+        m_StatusText += "Using tissue mask\n";
         MITK_INFO << "Using tissue mask";
+    }
 
     m_ImageRegion = croppedRegion;
     x=m_ImageRegion.GetSize(0); y=m_ImageRegion.GetSize(1);
@@ -432,11 +458,24 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     double maxVolume = 0;
     double voxelVolume = m_UpsampledSpacing[0]*m_UpsampledSpacing[1]*m_UpsampledSpacing[2];
 
+    m_StatusText += "\nGenerating signal of " + boost::lexical_cast<std::string>(m_FiberModels.size()) + " fiber compartments\n";
     MITK_INFO << "Generating signal of " << m_FiberModels.size() << " fiber compartments";
     boost::progress_display disp(numFibers*m_FiberModels.at(0)->GetNumGradients());
 
     if (m_AddMotionArtifact)
     {
+        if (m_RandomMotion)
+        {
+            m_StatusText += "Adding random motion artifacts:\n";
+            m_StatusText += "Maximum rotation: +/-" + boost::lexical_cast<std::string>(m_MaxRotation) + "°\n";
+            m_StatusText += "Maximum translation: +/-" + boost::lexical_cast<std::string>(m_MaxTranslation) + "mm\n";
+        }
+        else
+        {
+            m_StatusText += "Adding linear motion artifacts:\n";
+            m_StatusText += "Maximum rotation: " + boost::lexical_cast<std::string>(m_MaxRotation) + "°\n";
+            m_StatusText += "Maximum translation: " + boost::lexical_cast<std::string>(m_MaxTranslation) + "mm\n";
+        }
         MITK_INFO << "Adding motion artifacts";
         MITK_INFO << "Maximum rotation: " << m_MaxRotation;
         MITK_INFO << "Maxmimum translation: " << m_MaxTranslation;
@@ -480,10 +519,14 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     upsampler->SetOutputSpacing(upsampledSpacing);
     upsampler->SetOutputOrigin(upsampledOrigin);
     itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType>::Pointer nn_interpolator
-      = itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType>::New();
+            = itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType>::New();
     upsampler->SetInterpolator(nn_interpolator);
     upsampler->Update();
     upsampledTissueMask = upsampler->GetOutput();
+
+    m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
+    m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
+    unsigned int lastTick = 0;
 
     for (int g=0; g<m_FiberModels.at(0)->GetNumGradients(); g++)
     {
@@ -511,6 +554,12 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
             for( int j=0; j<numPoints; j++)
             {
+                if (this->GetAbortGenerateData())
+                {
+                    m_StatusText += "\nSimulation aborted\n";
+                    return;
+                }
+
                 double* temp = points->GetPoint(j);
                 itk::Point<float, 3> vertex = GetItkPoint(temp);
                 itk::Vector<double> v = GetItkVector(temp);
@@ -615,6 +664,10 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                 }
             }
             ++disp;
+            unsigned long newTick = 50*disp.count()/disp.expected_count();
+            for (int tick = 0; tick<(newTick-lastTick); tick++)
+                m_StatusText += "*";
+            lastTick = newTick;
         }
 
         // generate non-fiber signal
@@ -670,11 +723,11 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                     {
                         DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
                         DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index);
-//                        if (dynamic_cast< mitk::AstroStickModel<double>* >(m_NonFiberModels.at(i)))
-//                        {
-//                            mitk::AstroStickModel<double>* model = dynamic_cast< mitk::AstroStickModel<double>* >(m_NonFiberModels.at(i));
-//                            model->SetSeed(8111984);
-//                        }
+                        //                        if (dynamic_cast< mitk::AstroStickModel<double>* >(m_NonFiberModels.at(i)))
+                        //                        {
+                        //                            mitk::AstroStickModel<double>* model = dynamic_cast< mitk::AstroStickModel<double>* >(m_NonFiberModels.at(i));
+                        //                            model->SetSeed(8111984);
+                        //                        }
                         pix[g] += m_NonFiberModels[i]->SimulateMeasurement(g)*other*m_NonFiberModels[i]->GetWeight();
                         doubleDwi->SetPixel(index, pix);
                         m_VolumeFractions.at(i+m_FiberModels.size())->SetPixel(index, other/voxelVolume*m_NonFiberModels[i]->GetWeight());
@@ -734,17 +787,25 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         }
     }
     logFile.close();
+    m_StatusText += "\n\n";
+    if (this->GetAbortGenerateData())
+    {
+        m_StatusText += "\nSimulation aborted\n";
+        return;
+    }
 
     // do k-space stuff
     DoubleDwiType::Pointer doubleOutImage;
     if (m_Spikes>0 || m_FrequencyMap.IsNotNull() || m_kOffset>0 || m_SimulateRelaxation || m_SimulateEddyCurrents || m_AddGibbsRinging || m_Wrap<1.0)
     {
+        m_StatusText += "Adjusting complex signal\n";
         MITK_INFO << "Adjusting complex signal";
         doubleOutImage = DoKspaceStuff(compartments);
         m_SignalScale = 1;
     }
     else
     {
+        m_StatusText += "Summing compartments\n";
         MITK_INFO << "Summing compartments";
         doubleOutImage = compartments.at(0);
 
@@ -757,16 +818,38 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             doubleOutImage = adder->GetOutput();
         }
     }
+    if (this->GetAbortGenerateData())
+    {
+        m_StatusText += "\nSimulation aborted\n";
+        return;
+    }
 
+    m_StatusText += "Finalizing image\n";
     MITK_INFO << "Finalizing image";
     unsigned int window = 0;
     unsigned int min = itk::NumericTraits<unsigned int>::max();
     ImageRegionIterator<OutputImageType> it4 (outImage, outImage->GetLargestPossibleRegion());
     DoubleDwiType::PixelType signal; signal.SetSize(m_FiberModels[0]->GetNumGradients());
-    boost::progress_display disp4(outImage->GetLargestPossibleRegion().GetNumberOfPixels());
+    boost::progress_display disp2(outImage->GetLargestPossibleRegion().GetNumberOfPixels());
+
+    m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
+    m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
+    lastTick = 0;
+
     while(!it4.IsAtEnd())
     {
-        ++disp4;
+        if (this->GetAbortGenerateData())
+        {
+            m_StatusText += "\nSimulation aborted\n";
+            return;
+        }
+
+        ++disp2;
+        unsigned long newTick = 50*disp2.count()/disp2.expected_count();
+        for (int tick = 0; tick<(newTick-lastTick); tick++)
+            m_StatusText += "*";
+        lastTick = newTick;
+
         typename OutputImageType::IndexType index = it4.GetIndex();
         signal = doubleOutImage->GetPixel(index)*m_SignalScale;
 
@@ -801,6 +884,10 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     unsigned int level = window/2 + min;
     m_LevelWindow.SetLevelWindow(level, window);
     this->SetNthOutput(0, outImage);
+
+    m_StatusText += "\n\n";
+    m_StatusText += "Finished simulation\n";
+    m_StatusText += "Simulation time: "+GetTime();
 }
 
 template< class PixelType >
@@ -841,6 +928,22 @@ vnl_vector_fixed<double, 3> TractsToDWIImageFilter< PixelType >::GetVnlVector(Ve
     vnlVector[1] = vector[1];
     vnlVector[2] = vector[2];
     return vnlVector;
+}
+
+template< class PixelType >
+std::string TractsToDWIImageFilter< PixelType >::GetTime()
+{
+    unsigned long total = (double)(clock() - m_StartTime)/CLOCKS_PER_SEC;
+    unsigned long hours = total/3600;
+    unsigned long minutes = (total%3600)/60;
+    unsigned long seconds = total%60;
+    std::string out = "";
+    out.append(boost::lexical_cast<std::string>(hours));
+    out.append(":");
+    out.append(boost::lexical_cast<std::string>(minutes));
+    out.append(":");
+    out.append(boost::lexical_cast<std::string>(seconds));
+    return out;
 }
 
 }

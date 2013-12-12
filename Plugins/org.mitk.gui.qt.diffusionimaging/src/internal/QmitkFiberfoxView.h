@@ -30,11 +30,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionSignalModel.h>
 #include <mitkRicianNoiseModel.h>
 #include <itkTractsToDWIImageFilter.h>
+#include <itkAddArtifactsToDwiImageFilter.h>
 #include <mitkTensorModel.h>
 #include <mitkBallModel.h>
 #include <mitkStickModel.h>
 #include <mitkAstroStickModel.h>
 #include <mitkDotModel.h>
+#include <QThread>
+#include <QObject>
+#include <QTimer>
+#include <QTime>
 
 /*!
 \brief View for fiber based diffusion software phantoms (Fiberfox).
@@ -46,6 +51,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Forward Qt class declarations
 
 using namespace std;
+
+class QmitkFiberfoxView;
+
+class QmitkFiberfoxWorker : public QObject
+{
+    Q_OBJECT
+
+public:
+
+    QmitkFiberfoxWorker(QmitkFiberfoxView* view);
+    int m_FilterType;
+
+public slots:
+
+    void run();
+
+private:
+
+    QmitkFiberfoxView*                  m_View;
+};
 
 class QmitkFiberfoxView : public QmitkAbstractView
 {
@@ -76,6 +101,11 @@ protected slots:
     void SetOutputPath();
     void LoadParameters();
     void SaveParameters();
+
+    void BeforeThread();
+    void AfterThread();
+    void KillThread();
+    void UpdateSimulationStatus();
 
     void OnDrawROI();           ///< adds new ROI, handles interactors etc.
     void OnAddBundle();         ///< adds new fiber bundle to datastorage
@@ -118,6 +148,8 @@ protected:
 
     Ui::QmitkFiberfoxViewControls* m_Controls;
 
+    void SimulateForExistingDwi(mitk::DataNode* imageNode);
+    void SimulateImageFromFibers(mitk::DataNode* fiberNode);
     void UpdateImageParameters();                   ///< update iamge generation paaremeter struct
     void UpdateGui();                               ///< enable/disbale buttons etc. according to current datamanager selection
     void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
@@ -185,9 +217,12 @@ protected:
         ItkDoubleImgType::Pointer           frequencyMap;
         ItkUcharImgType::Pointer            maskImage;
         mitk::DataNode::Pointer             resultNode;
+        mitk::DataNode::Pointer             parentNode;
+        QString                             outputPath;
     };
 
     ImageParameters                                     m_ImageGenParameters;
+    ImageParameters                                     m_ImageGenParametersBackup;
 
     std::map<mitk::DataNode*, QmitkPlanarFigureData>    m_DataNodeToPlanarFigureData;   ///< map each planar figure uniquely to a QmitkPlanarFigureData
     mitk::DataNode::Pointer                             m_SelectedFiducial;             ///< selected planar ellipse
@@ -216,4 +251,16 @@ protected:
 
     QString m_ParameterFile;
     QString m_OutputPath;
+
+    // GUI thread
+    QmitkFiberfoxWorker     m_Worker;   ///< runs filter
+    QThread                 m_Thread;   ///< worker thread
+    itk::TractsToDWIImageFilter< short >::Pointer           m_TractsToDwiFilter;
+    itk::AddArtifactsToDwiImageFilter< short >::Pointer     m_ArtifactsToDwiFilter;
+    bool                    m_ThreadIsRunning;
+    QTimer*                 m_SimulationTimer;
+    QTime                   m_SimulationTime;
+    QString                 m_SimulationStatusText;
+
+    friend class QmitkFiberfoxWorker;
 };

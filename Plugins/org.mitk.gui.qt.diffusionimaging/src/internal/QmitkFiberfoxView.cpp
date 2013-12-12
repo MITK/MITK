@@ -47,7 +47,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
-#include <itkAddArtifactsToDwiImageFilter.h>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/foreach.hpp>
@@ -61,6 +60,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+QmitkFiberfoxWorker::QmitkFiberfoxWorker(QmitkFiberfoxView* view)
+    : m_View(view)
+{
+
+}
+
+void QmitkFiberfoxWorker::run()
+{
+    try{
+        switch (m_FilterType)
+        {
+        case 0:
+            m_View->m_TractsToDwiFilter->Update();
+            break;
+        case 1:
+            m_View->m_ArtifactsToDwiFilter->Update();
+            break;
+        }
+    }
+    catch( ... )
+    {
+
+    }
+    m_View->m_Thread.quit();
+}
+
 const std::string QmitkFiberfoxView::VIEW_ID = "org.mitk.views.fiberfoxview";
 
 QmitkFiberfoxView::QmitkFiberfoxView()
@@ -68,9 +93,160 @@ QmitkFiberfoxView::QmitkFiberfoxView()
     , m_Controls( 0 )
     , m_SelectedImage( NULL )
     , m_OutputPath("")
+    , m_Worker(this)
+    , m_ThreadIsRunning(false)
 {
     m_ImageGenParameters.noiseModel = NULL;
     m_ImageGenParameters.noiseModelShort = NULL;
+
+    m_Worker.moveToThread(&m_Thread);
+    connect(&m_Thread, SIGNAL(started()), this, SLOT(BeforeThread()));
+    connect(&m_Thread, SIGNAL(started()), &m_Worker, SLOT(run()));
+    connect(&m_Thread, SIGNAL(finished()), this, SLOT(AfterThread()));
+    connect(&m_Thread, SIGNAL(terminated()), this, SLOT(AfterThread()));
+    m_SimulationTimer = new QTimer(this);
+}
+
+void QmitkFiberfoxView::KillThread()
+{
+    MITK_INFO << "Aborting DWI simulation.";
+    switch (m_Worker.m_FilterType)
+    {
+    case 0:
+        m_TractsToDwiFilter->SetAbortGenerateData(true);
+        break;
+    case 1:
+        m_ArtifactsToDwiFilter->SetAbortGenerateData(true);
+        break;
+    }
+}
+
+void QmitkFiberfoxView::BeforeThread()
+{
+    m_SimulationTime = QTime::currentTime();
+    m_SimulationTimer->start(100);
+    m_ImageGenParametersBackup = m_ImageGenParameters;
+    m_Controls->m_AbortSimulationButton->setVisible(true);
+    m_Controls->m_GenerateImageButton->setVisible(false);
+    m_Controls->m_SimulationStatusText->setVisible(true);
+    m_ThreadIsRunning = true;
+}
+
+void QmitkFiberfoxView::AfterThread()
+{
+    UpdateSimulationStatus();
+    m_SimulationTimer->stop();
+    m_Controls->m_AbortSimulationButton->setVisible(false);
+    m_Controls->m_GenerateImageButton->setVisible(true);
+    //m_Controls->m_SimulationStatusText->setVisible(false);
+    m_ThreadIsRunning = false;
+
+    switch (m_Worker.m_FilterType)
+    {
+    case 0:
+    {
+        if (m_TractsToDwiFilter->GetAbortGenerateData())
+        {
+            MITK_INFO << "Simulation aborted.";
+            return;
+        }
+
+        mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
+        image->SetVectorImage( m_TractsToDwiFilter->GetOutput() );
+        image->SetB_Value(m_ImageGenParametersBackup.b_value);
+        image->SetDirections(m_ImageGenParametersBackup.gradientDirections);
+        image->InitializeFromVectorImage();
+        m_ImageGenParametersBackup.resultNode->SetData( image );
+
+        m_ImageGenParametersBackup.resultNode->SetName(m_ImageGenParametersBackup.parentNode->GetName()
+                                                       +"_D"+QString::number(m_ImageGenParametersBackup.imageRegion.GetSize(0)).toStdString()
+                                                       +"-"+QString::number(m_ImageGenParametersBackup.imageRegion.GetSize(1)).toStdString()
+                                                       +"-"+QString::number(m_ImageGenParametersBackup.imageRegion.GetSize(2)).toStdString()
+                                                       +"_S"+QString::number(m_ImageGenParametersBackup.imageSpacing[0]).toStdString()
+                +"-"+QString::number(m_ImageGenParametersBackup.imageSpacing[1]).toStdString()
+                +"-"+QString::number(m_ImageGenParametersBackup.imageSpacing[2]).toStdString()
+                +"_b"+QString::number(m_ImageGenParametersBackup.b_value).toStdString()
+                +"_"+m_ImageGenParametersBackup.signalModelString.toStdString()
+                +m_ImageGenParametersBackup.artifactModelString.toStdString());
+
+        GetDataStorage()->Add(m_ImageGenParametersBackup.resultNode, m_ImageGenParametersBackup.parentNode);
+
+        m_ImageGenParametersBackup.resultNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New(m_TractsToDwiFilter->GetLevelWindow()) );
+
+        if (!m_ImageGenParametersBackup.outputPath.isEmpty())
+        {
+            mitk::NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
+            writer->SetFileName(m_ImageGenParametersBackup.outputPath.toStdString()+m_ImageGenParametersBackup.resultNode->GetName()+".dwi");
+            writer->SetInput(image);
+            writer->Update();
+        }
+
+        if (m_Controls->m_VolumeFractionsBox->isChecked())
+        {
+            std::vector< itk::TractsToDWIImageFilter< short >::ItkDoubleImgType::Pointer > volumeFractions = m_TractsToDwiFilter->GetVolumeFractions();
+            for (int k=0; k<volumeFractions.size(); k++)
+            {
+                mitk::Image::Pointer image = mitk::Image::New();
+                image->InitializeByItk(volumeFractions.at(k).GetPointer());
+                image->SetVolume(volumeFractions.at(k)->GetBufferPointer());
+
+                mitk::DataNode::Pointer node = mitk::DataNode::New();
+                node->SetData( image );
+                node->SetName(m_ImageGenParametersBackup.parentNode->GetName()+"_CompartmentVolume-"+QString::number(k).toStdString());
+                GetDataStorage()->Add(node, m_ImageGenParametersBackup.parentNode);
+            }
+        }
+        break;
+    }
+    case 1:
+    {
+        if (m_ArtifactsToDwiFilter->GetAbortGenerateData())
+        {
+            MITK_INFO << "Simulation aborted.";
+            return;
+        }
+
+        mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(m_ImageGenParametersBackup.parentNode->GetData());
+        mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
+        image->SetVectorImage( m_ArtifactsToDwiFilter->GetOutput() );
+        image->SetB_Value(diffImg->GetB_Value());
+        image->SetDirections(diffImg->GetDirections());
+        image->InitializeFromVectorImage();
+        m_ImageGenParametersBackup.resultNode->SetData( image );
+        m_ImageGenParametersBackup.resultNode->SetName(m_ImageGenParametersBackup.parentNode->GetName()+m_ImageGenParameters.artifactModelString.toStdString());
+        GetDataStorage()->Add(m_ImageGenParametersBackup.resultNode, m_ImageGenParametersBackup.parentNode);
+        break;
+    }
+    }
+
+    mitk::BaseData::Pointer basedata = m_ImageGenParametersBackup.resultNode->GetData();
+    if (basedata.IsNotNull())
+    {
+        mitk::RenderingManager::GetInstance()->InitializeViews(
+                    basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+}
+
+void QmitkFiberfoxView::UpdateSimulationStatus()
+{
+    QString statusText;
+    switch (m_Worker.m_FilterType)
+    {
+    case 0:
+        statusText = QString(m_TractsToDwiFilter->GetStatusText().c_str());
+        break;
+    case 1:
+        statusText = QString(m_ArtifactsToDwiFilter->GetStatusText().c_str());
+        break;
+    }
+
+    if (QString::compare(m_SimulationStatusText,statusText)!=0)
+    {
+        m_Controls->m_SimulationStatusText->clear();
+        statusText = "<pre>"+statusText+"</pre>";
+        m_Controls->m_SimulationStatusText->setText(statusText);
+    }
 }
 
 // Destructor
@@ -80,6 +256,7 @@ QmitkFiberfoxView::~QmitkFiberfoxView()
         delete m_ImageGenParameters.noiseModel;
     if (m_ImageGenParameters.noiseModelShort!=NULL)
         delete m_ImageGenParameters.noiseModelShort;
+    delete m_SimulationTimer;
 }
 
 void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
@@ -120,6 +297,9 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_MotionArtifactFrame->setVisible(false);
         m_ParameterFile = QDir::currentPath()+"/param.ffp";
 
+        m_Controls->m_AbortSimulationButton->setVisible(false);
+        m_Controls->m_SimulationStatusText->setVisible(false);
+
         m_Controls->m_FrequencyMapBox->SetDataStorage(this->GetDataStorage());
         mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
         mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
@@ -131,6 +311,8 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         mitk::NodePredicateAnd::Pointer finalPredicate = mitk::NodePredicateAnd::New(isMitkImage, noDiffusionImage);
         m_Controls->m_FrequencyMapBox->SetPredicate(finalPredicate);
 
+        connect( m_SimulationTimer, SIGNAL(timeout()), this, SLOT(UpdateSimulationStatus()) );
+        connect((QObject*) m_Controls->m_AbortSimulationButton, SIGNAL(clicked()), (QObject*) this, SLOT(KillThread()));
         connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
         connect((QObject*) m_Controls->m_CircleButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnDrawROI()));
@@ -183,6 +365,7 @@ void QmitkFiberfoxView::UpdateImageParameters()
     m_ImageGenParameters.spikes = 0;
     m_ImageGenParameters.spikeAmplitude = 1;
     m_ImageGenParameters.wrap = 1;
+    m_ImageGenParameters.outputPath = m_OutputPath;
 
     if (m_SelectedDWI.IsNotNull())  // use parameters of selected DWI
     {
@@ -1385,11 +1568,11 @@ void QmitkFiberfoxView::OnDrawROI()
     mitk::PlanarFigureInteractor::Pointer figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
     if(figureInteractor.IsNull())
     {
-      figureInteractor = mitk::PlanarFigureInteractor::New();
-      us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
-      figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
-      figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
-      figureInteractor->SetDataNode( node );
+        figureInteractor = mitk::PlanarFigureInteractor::New();
+        us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+        figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+        figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+        figureInteractor->SetDataNode( node );
     }
 
     UpdateGui();
@@ -1518,49 +1701,8 @@ void QmitkFiberfoxView::GenerateFibers()
 
 void QmitkFiberfoxView::GenerateImage()
 {
-    if (m_SelectedBundles.empty())
+    if (m_SelectedBundles.empty() && m_SelectedDWI.IsNull())
     {
-        if (m_SelectedDWI.IsNotNull()) // add artifacts to existing diffusion weighted image
-        {
-            for (unsigned int i=0; i<m_SelectedImages.size(); i++)
-            {
-                if (!dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedImages.at(i)->GetData()))
-                    continue;
-
-                m_SelectedDWI = m_SelectedImages.at(i);
-                UpdateImageParameters();
-
-                mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedImages.at(i)->GetData());
-
-                itk::AddArtifactsToDwiImageFilter< short >::Pointer filter = itk::AddArtifactsToDwiImageFilter< short >::New();
-                filter->SetInput(diffImg->GetVectorImage());
-                filter->SettLine(m_ImageGenParameters.tLine);
-                filter->SetkOffset(m_ImageGenParameters.kspaceLineOffset);
-                filter->SetNoiseModel(m_ImageGenParameters.noiseModelShort);
-                filter->SetGradientList(m_ImageGenParameters.gradientDirections);
-                filter->SetTE(m_ImageGenParameters.tEcho);
-                filter->SetSimulateEddyCurrents(m_ImageGenParameters.doSimulateEddyCurrents);
-                filter->SetEddyGradientStrength(m_ImageGenParameters.eddyStrength);
-                filter->SetAddGibbsRinging(m_ImageGenParameters.addGibbsRinging);
-                filter->SetFrequencyMap(m_ImageGenParameters.frequencyMap);
-                filter->SetSpikeAmplitude(m_ImageGenParameters.spikeAmplitude);
-                filter->SetSpikes(m_ImageGenParameters.spikes);
-                filter->SetWrap(m_ImageGenParameters.wrap);
-                filter->Update();
-
-                mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
-                image->SetVectorImage( filter->GetOutput() );
-                image->SetB_Value(diffImg->GetB_Value());
-                image->SetDirections(diffImg->GetDirections());
-                image->InitializeFromVectorImage();
-                m_ImageGenParameters.resultNode->SetData( image );
-                m_ImageGenParameters.resultNode->SetName(m_SelectedImages.at(i)->GetName()+m_ImageGenParameters.artifactModelString.toStdString());
-                GetDataStorage()->Add(m_ImageGenParameters.resultNode);
-            }
-            m_SelectedDWI = m_SelectedImages.front();
-            return;
-        }
-
         mitk::Image::Pointer image = mitk::ImageGenerator::GenerateGradientImage<unsigned int>(
                     m_Controls->m_SizeX->value(),
                     m_Controls->m_SizeY->value(),
@@ -1589,106 +1731,85 @@ void QmitkFiberfoxView::GenerateImage()
             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         }
         UpdateGui();
+    }
+    else if (!m_SelectedBundles.empty())
+        SimulateImageFromFibers(m_SelectedBundles.at(0));
+    else if (m_SelectedDWI.IsNotNull())
+        SimulateForExistingDwi(m_SelectedDWI);
+}
 
+void QmitkFiberfoxView::SimulateForExistingDwi(mitk::DataNode* imageNode)
+{
+    if (!dynamic_cast<mitk::DiffusionImage<short>*>(imageNode->GetData()))
         return;
-    }
 
-    for (unsigned int i=0; i<m_SelectedBundles.size(); i++)
-    {
-        UpdateImageParameters();
-        mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundles.at(i)->GetData());
-        if (fiberBundle->GetNumFibers()<=0)
-            continue;
+    MITK_INFO << "TEST";
+    UpdateImageParameters();
 
-        itk::TractsToDWIImageFilter< short >::Pointer tractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
+    mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(imageNode->GetData());
+    m_ArtifactsToDwiFilter = itk::AddArtifactsToDwiImageFilter< short >::New();
+    m_ArtifactsToDwiFilter->SetInput(diffImg->GetVectorImage());
+    m_ArtifactsToDwiFilter->SettLine(m_ImageGenParameters.tLine);
+    m_ArtifactsToDwiFilter->SetkOffset(m_ImageGenParameters.kspaceLineOffset);
+    m_ArtifactsToDwiFilter->SetNoiseModel(m_ImageGenParameters.noiseModelShort);
+    m_ArtifactsToDwiFilter->SetGradientList(m_ImageGenParameters.gradientDirections);
+    m_ArtifactsToDwiFilter->SetTE(m_ImageGenParameters.tEcho);
+    m_ArtifactsToDwiFilter->SetSimulateEddyCurrents(m_ImageGenParameters.doSimulateEddyCurrents);
+    m_ArtifactsToDwiFilter->SetEddyGradientStrength(m_ImageGenParameters.eddyStrength);
+    m_ArtifactsToDwiFilter->SetAddGibbsRinging(m_ImageGenParameters.addGibbsRinging);
+    m_ArtifactsToDwiFilter->SetFrequencyMap(m_ImageGenParameters.frequencyMap);
+    m_ArtifactsToDwiFilter->SetSpikeAmplitude(m_ImageGenParameters.spikeAmplitude);
+    m_ArtifactsToDwiFilter->SetSpikes(m_ImageGenParameters.spikes);
+    m_ArtifactsToDwiFilter->SetWrap(m_ImageGenParameters.wrap);
+    m_ImageGenParameters.parentNode = imageNode;
+    m_Worker.m_FilterType = 1;
+    m_Thread.start(QThread::LowestPriority);
+}
 
-        tractsToDwiFilter->SetSimulateEddyCurrents(m_ImageGenParameters.doSimulateEddyCurrents);
-        tractsToDwiFilter->SetEddyGradientStrength(m_ImageGenParameters.eddyStrength);
-        tractsToDwiFilter->SetAddGibbsRinging(m_ImageGenParameters.addGibbsRinging);
-        tractsToDwiFilter->SetSimulateRelaxation(m_ImageGenParameters.doSimulateRelaxation);
-        tractsToDwiFilter->SetImageRegion(m_ImageGenParameters.imageRegion);
-        tractsToDwiFilter->SetSpacing(m_ImageGenParameters.imageSpacing);
-        tractsToDwiFilter->SetOrigin(m_ImageGenParameters.imageOrigin);
-        tractsToDwiFilter->SetDirectionMatrix(m_ImageGenParameters.imageDirection);
-        tractsToDwiFilter->SetFiberBundle(fiberBundle);
-        tractsToDwiFilter->SetFiberModels(m_ImageGenParameters.fiberModelList);
-        tractsToDwiFilter->SetNonFiberModels(m_ImageGenParameters.nonFiberModelList);
-        tractsToDwiFilter->SetNoiseModel(m_ImageGenParameters.noiseModel);
-        tractsToDwiFilter->SetkOffset(m_ImageGenParameters.kspaceLineOffset);
-        tractsToDwiFilter->SettLine(m_ImageGenParameters.tLine);
-        tractsToDwiFilter->SettInhom(m_ImageGenParameters.tInhom);
-        tractsToDwiFilter->SetTE(m_ImageGenParameters.tEcho);
-        tractsToDwiFilter->SetNumberOfRepetitions(m_ImageGenParameters.repetitions);
-        tractsToDwiFilter->SetEnforcePureFiberVoxels(m_ImageGenParameters.doDisablePartialVolume);
-        tractsToDwiFilter->SetInterpolationShrink(m_ImageGenParameters.interpolationShrink);
-        tractsToDwiFilter->SetFiberRadius(m_ImageGenParameters.axonRadius);
-        tractsToDwiFilter->SetSignalScale(m_ImageGenParameters.signalScale);
-        if (m_ImageGenParameters.interpolationShrink>0)
-            tractsToDwiFilter->SetUseInterpolation(true);
-        tractsToDwiFilter->SetTissueMask(m_ImageGenParameters.maskImage);
-        tractsToDwiFilter->SetFrequencyMap(m_ImageGenParameters.frequencyMap);
-        tractsToDwiFilter->SetSpikeAmplitude(m_ImageGenParameters.spikeAmplitude);
-        tractsToDwiFilter->SetSpikes(m_ImageGenParameters.spikes);
-        tractsToDwiFilter->SetWrap(m_ImageGenParameters.wrap);
-        tractsToDwiFilter->SetAddMotionArtifact(m_ImageGenParameters.doAddMotion);
-        tractsToDwiFilter->SetMaxTranslation(m_ImageGenParameters.translation);
-        tractsToDwiFilter->SetMaxRotation(m_ImageGenParameters.rotation);
-        tractsToDwiFilter->SetRandomMotion(m_ImageGenParameters.randomMotion);
-        tractsToDwiFilter->Update();
+void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
+{
+    mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(fiberNode->GetData());
+    if (fiberBundle->GetNumFibers()<=0)
+        return;
 
-        mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
-        image->SetVectorImage( tractsToDwiFilter->GetOutput() );
-        image->SetB_Value(m_ImageGenParameters.b_value);
-        image->SetDirections(m_ImageGenParameters.gradientDirections);
-        image->InitializeFromVectorImage();
-        m_ImageGenParameters.resultNode->SetData( image );
-        m_ImageGenParameters.resultNode->SetName(m_SelectedBundles.at(i)->GetName()
-                                                 +"_D"+QString::number(m_ImageGenParameters.imageRegion.GetSize(0)).toStdString()
-                                                 +"-"+QString::number(m_ImageGenParameters.imageRegion.GetSize(1)).toStdString()
-                                                 +"-"+QString::number(m_ImageGenParameters.imageRegion.GetSize(2)).toStdString()
-                                                 +"_S"+QString::number(m_ImageGenParameters.imageSpacing[0]).toStdString()
-                                                 +"-"+QString::number(m_ImageGenParameters.imageSpacing[1]).toStdString()
-                                                 +"-"+QString::number(m_ImageGenParameters.imageSpacing[2]).toStdString()
-                                                 +"_b"+QString::number(m_ImageGenParameters.b_value).toStdString()
-                                                 +"_"+m_ImageGenParameters.signalModelString.toStdString()
-                                                 +m_ImageGenParameters.artifactModelString.toStdString());
+    UpdateImageParameters();
 
-        GetDataStorage()->Add(m_ImageGenParameters.resultNode, m_SelectedBundles.at(i));
-
-        m_ImageGenParameters.resultNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New(tractsToDwiFilter->GetLevelWindow()) );
-
-        if (!m_OutputPath.isEmpty())
-        {
-            mitk::NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
-            writer->SetFileName(m_OutputPath.toStdString()+m_ImageGenParameters.resultNode->GetName()+".dwi");
-            writer->SetInput(image);
-            writer->Update();
-        }
-
-        if (m_Controls->m_VolumeFractionsBox->isChecked())
-        {
-            std::vector< itk::TractsToDWIImageFilter< short >::ItkDoubleImgType::Pointer > volumeFractions = tractsToDwiFilter->GetVolumeFractions();
-            for (int k=0; k<volumeFractions.size(); k++)
-            {
-                mitk::Image::Pointer image = mitk::Image::New();
-                image->InitializeByItk(volumeFractions.at(k).GetPointer());
-                image->SetVolume(volumeFractions.at(k)->GetBufferPointer());
-
-                mitk::DataNode::Pointer node = mitk::DataNode::New();
-                node->SetData( image );
-                node->SetName(m_SelectedBundles.at(i)->GetName()+"_CompartmentVolume-"+QString::number(k).toStdString());
-                GetDataStorage()->Add(node, m_SelectedBundles.at(i));
-            }
-        }
-
-        mitk::BaseData::Pointer basedata = m_ImageGenParameters.resultNode->GetData();
-        if (basedata.IsNotNull())
-        {
-            mitk::RenderingManager::GetInstance()->InitializeViews(
-                        basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-        }
-    }
+    m_TractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
+    m_TractsToDwiFilter->SetSimulateEddyCurrents(m_ImageGenParameters.doSimulateEddyCurrents);
+    m_TractsToDwiFilter->SetEddyGradientStrength(m_ImageGenParameters.eddyStrength);
+    m_TractsToDwiFilter->SetAddGibbsRinging(m_ImageGenParameters.addGibbsRinging);
+    m_TractsToDwiFilter->SetSimulateRelaxation(m_ImageGenParameters.doSimulateRelaxation);
+    m_TractsToDwiFilter->SetImageRegion(m_ImageGenParameters.imageRegion);
+    m_TractsToDwiFilter->SetSpacing(m_ImageGenParameters.imageSpacing);
+    m_TractsToDwiFilter->SetOrigin(m_ImageGenParameters.imageOrigin);
+    m_TractsToDwiFilter->SetDirectionMatrix(m_ImageGenParameters.imageDirection);
+    m_TractsToDwiFilter->SetFiberBundle(fiberBundle);
+    m_TractsToDwiFilter->SetFiberModels(m_ImageGenParameters.fiberModelList);
+    m_TractsToDwiFilter->SetNonFiberModels(m_ImageGenParameters.nonFiberModelList);
+    m_TractsToDwiFilter->SetNoiseModel(m_ImageGenParameters.noiseModel);
+    m_TractsToDwiFilter->SetkOffset(m_ImageGenParameters.kspaceLineOffset);
+    m_TractsToDwiFilter->SettLine(m_ImageGenParameters.tLine);
+    m_TractsToDwiFilter->SettInhom(m_ImageGenParameters.tInhom);
+    m_TractsToDwiFilter->SetTE(m_ImageGenParameters.tEcho);
+    m_TractsToDwiFilter->SetNumberOfRepetitions(m_ImageGenParameters.repetitions);
+    m_TractsToDwiFilter->SetEnforcePureFiberVoxels(m_ImageGenParameters.doDisablePartialVolume);
+    m_TractsToDwiFilter->SetInterpolationShrink(m_ImageGenParameters.interpolationShrink);
+    m_TractsToDwiFilter->SetFiberRadius(m_ImageGenParameters.axonRadius);
+    m_TractsToDwiFilter->SetSignalScale(m_ImageGenParameters.signalScale);
+    if (m_ImageGenParameters.interpolationShrink>0)
+        m_TractsToDwiFilter->SetUseInterpolation(true);
+    m_TractsToDwiFilter->SetTissueMask(m_ImageGenParameters.maskImage);
+    m_TractsToDwiFilter->SetFrequencyMap(m_ImageGenParameters.frequencyMap);
+    m_TractsToDwiFilter->SetSpikeAmplitude(m_ImageGenParameters.spikeAmplitude);
+    m_TractsToDwiFilter->SetSpikes(m_ImageGenParameters.spikes);
+    m_TractsToDwiFilter->SetWrap(m_ImageGenParameters.wrap);
+    m_TractsToDwiFilter->SetAddMotionArtifact(m_ImageGenParameters.doAddMotion);
+    m_TractsToDwiFilter->SetMaxTranslation(m_ImageGenParameters.translation);
+    m_TractsToDwiFilter->SetMaxRotation(m_ImageGenParameters.rotation);
+    m_TractsToDwiFilter->SetRandomMotion(m_ImageGenParameters.randomMotion);
+    m_ImageGenParameters.parentNode = fiberNode;
+    m_Worker.m_FilterType = 0;
+    m_Thread.start(QThread::LowestPriority);
 }
 
 void QmitkFiberfoxView::ApplyTransform()
@@ -2117,11 +2238,11 @@ void QmitkFiberfoxView::NodeAdded( const mitk::DataNode* node )
         mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>( node );
         if(figureInteractor.IsNull())
         {
-          figureInteractor = mitk::PlanarFigureInteractor::New();
-          us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
-          figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
-          figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
-          figureInteractor->SetDataNode( nonConstNode );
+            figureInteractor = mitk::PlanarFigureInteractor::New();
+            us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+            figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+            figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+            figureInteractor->SetDataNode( nonConstNode );
         }
 
         MITK_DEBUG << "will now add observers for planarfigure";

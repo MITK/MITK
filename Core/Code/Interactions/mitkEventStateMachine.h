@@ -173,6 +173,12 @@ namespace mitk
     StateMachineState* GetCurrentState() const;
 
     /**
+     * @brief ResetToStartState Reset state machine to it initial starting state.
+     */
+
+    void ResetToStartState();
+
+    /**
      * Is called after loading a statemachine.
      * Overwrite this function in specific interactor implementations.
      * Connect actions and functions using the  CONNECT_FUNCTION macro within this function.

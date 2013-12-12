@@ -324,7 +324,7 @@ mitk::StateMachineTransition* mitk::EventStateMachine::GetExecutableTransition( 
 }
 
 
-void EventStateMachine::ResetToStartState()
+void mitk::EventStateMachine::ResetToStartState()
 {
   m_CurrentState = m_StateMachineContainer->GetStartState();
 }

@@ -4,11 +4,7 @@
              <action name="upd"/>
              <action name="addpoint"/>
         </transition>
-        <transition event_class="InternalEvent" event_variant="EnoughPoints" target="final">
-        </transition>
-                <transition event_class="InternalEvent" event_variant="ClosedContour" target="final">
-        </transition>
-        <transition event_class="MouseMoveEvent" event_variant="StdMouseMove" target="selected">
+        <transition event_class="MouseMoveEvent" event_variant="CheckSelected" target="selected">
             <condition name="isoverpoint"/>
             <action name="upd"/>
             <action name="selectpoint"/>
@@ -18,10 +14,7 @@
         </transition>
     </state>
     <state name="selected">
-        <transition event_class="InternalEvent" event_variant="EnoughPoints" target="final">
-            <action name="colourme"/>
-        </transition>
-        <transition event_class="MouseMoveEvent" event_variant="StdMouseMove" target="start">
+        <transition event_class="MouseMoveEvent" event_variant="CheckSelected" target="start">
             <condition name="isoverpoint" inverted="true"/>
             <action name="upd"/>
             <action name="unselectAll"/>
@@ -44,5 +37,4 @@
          <action name="finishMovement"/>
       </transition>
     </state>
-    <state name="final"/>
 </statemachine>

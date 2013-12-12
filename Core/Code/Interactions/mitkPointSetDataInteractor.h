@@ -72,6 +72,14 @@ namespace mitk
      */
     void SetAccuracy(float accuracy);
 
+
+    /**
+     * @brief SetMaxPoints Sets the maximal number of points for the pointset
+     * Default ist zero, which result in infinite number of allowed points
+     * @param maxNumber
+     */
+    void SetMaxPoints(unsigned int maxNumber = 0);
+
     /**
      * \brief Return index in PointSet of the point that is within given accuracy to the provided position.
      *
@@ -92,7 +100,7 @@ namespace mitk
     virtual bool AddPoint(StateMachineAction*, InteractionEvent* event);
 
     /** Removes point that is selected */
-    virtual bool RemovePoint(StateMachineAction*, InteractionEvent*);
+    virtual bool RemovePoint(StateMachineAction*, InteractionEvent*interactionEvent);
 
     /**
      * Checks if new point is close enough to an old one,
@@ -135,7 +143,7 @@ namespace mitk
      * @brief UpdatePointSet Updates the member variable that holds the point set, evaluating the time step of the sender.
      */
 
-    virtual bool UpdatePointSet(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+    virtual bool UpdatePointSet(StateMachineAction* stateMachineAction, InteractionEvent*);
 
     /**
      * Calls for inactivation of the DataInteractor
@@ -145,6 +153,7 @@ namespace mitk
     /** \brief to calculate a direction vector from last point and actual
      * point
      */
+
     Point3D m_LastPoint;
 
     /** \brief summ-vector for Movement */
@@ -159,8 +168,8 @@ namespace mitk
     float m_SelectionAccuracy; // accuracy that's needed to select a point
 
     // FUNCTIONS
-    void UnselectAll( unsigned int timeStep );
-    void SelectPoint( int position, unsigned int timeStep  );
+    void UnselectAll(unsigned int timeStep , ScalarType timeInMs);
+    void SelectPoint(int position, unsigned int timeStep  , ScalarType timeInMS);
   };
 
 }

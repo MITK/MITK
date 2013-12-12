@@ -1,12 +1,12 @@
 <statemachine>
     <state name="start" startstate="true">
         <transition event_class="InteractionPositionEvent" event_variant="AddPointClick" target="start">
-             <action name="upd"/>
+             <action name="update"/>
              <action name="addpoint"/>
         </transition>
         <transition event_class="MouseMoveEvent" event_variant="CheckSelected" target="selected">
             <condition name="isoverpoint"/>
-            <action name="upd"/>
+            <action name="update"/>
             <action name="selectpoint"/>
         </transition>
         <transition event_class="InteractionKeyEvent" event_variant="Abort" target="start">
@@ -16,21 +16,21 @@
     <state name="selected">
         <transition event_class="MouseMoveEvent" event_variant="CheckSelected" target="start">
             <condition name="isoverpoint" inverted="true"/>
-            <action name="upd"/>
+            <action name="update"/>
             <action name="unselectAll"/>
         </transition>
         <transition event_class="MousePressEvent" event_variant="DeletePoint" target="start">
-            <action name="upd"/>
+            <action name="update"/>
             <action name="removePoint"/>
         </transition>
         <transition event_class="MousePressEvent" event_variant="AddPointClick" target="MovementInitalized">
-            <action name="upd"/>
+            <action name="update"/>
             <action name="initMove"/>
         </transition>
     </state>
     <state name="MovementInitalized">
       <transition event_class="MouseMoveEvent" event_variant="PointMove" target="MovementInitalized">
-          <action name="upd"/>
+          <action name="update"/>
           <action name="movePoint"/>
       </transition>
       <transition event_class="MouseReleaseEvent" event_variant="EndMovement" target="selected">

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkIGTUIExports.h"
 #include "ui_QmitkTrackingDeviceConfigurationWidgetControls.h"
 #include "mitkTrackingDevice.h"
+#include <mitkIPersistenceService.h>
 
 
 //itk headers
@@ -143,6 +144,9 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
       */
     mitk::TrackingDeviceType ScanPort(QString port);
 
+    void StoreUISettings();
+    void LoadUISettings();
+
 
   protected slots:
     /* @brief This method is called when the user changes the selection of the trackingdevice (m_trackingDeviceChooser).
@@ -185,5 +189,7 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     /* @brief Opens a file dialog. The users sets the calibration file which location is then stored in the member m_MTCalibrationFile.*/
     void SetMTCalibrationFileClicked();
 
+  private:
+    PERSISTENCE_GET_SERVICE_METHOD_MACRO
 };
 #endif

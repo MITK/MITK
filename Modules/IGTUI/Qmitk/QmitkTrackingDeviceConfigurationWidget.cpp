@@ -126,6 +126,7 @@ switch(style)
 
 QmitkTrackingDeviceConfigurationWidget::~QmitkTrackingDeviceConfigurationWidget()
 {
+StoreUISettings();
 }
 
 void QmitkTrackingDeviceConfigurationWidget::CreateQtPartControl(QWidget *parent)
@@ -168,6 +169,7 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
     //disable unused UI component
     m_Controls->m_polarisTrackingModeBox->setVisible(false); //don't delete this component, because it is used in the MBI part of MITK
   }
+  LoadUISettings();
 }
 
 void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
@@ -491,5 +493,31 @@ mitk::TrackingDeviceType QmitkTrackingDeviceConfigurationWidget::ScanPort(QStrin
   catch (mitk::IGTException)
   {}//do nothing: there is simply no device on this port
   return returnValue;
+}
+
+void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
+{
+std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
+mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+propList->Set("PolarisPortWin",m_Controls->m_portSpinBoxPolaris->value());
+propList->Set("AuroraPortWin",m_Controls->m_portSpinBoxAurora->value());
+propList->Set("MTCalibrationFile",m_MTCalibrationFile);
+propList->Set("SelectedDevice",m_Controls->m_trackingDeviceChooser->currentIndex());
+}
+
+void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
+{
+std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
+mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+int portPolarisWin,portAuroraWin,SelectedDevice;
+propList->Get("PolarisPortWin",portPolarisWin);
+propList->Get("AuroraPortWin",portAuroraWin);
+propList->Get("MTCalibrationFile",m_MTCalibrationFile);
+propList->Get("SelectedDevice",SelectedDevice);
+m_Controls->m_portSpinBoxPolaris->setValue(portPolarisWin);
+m_Controls->m_portSpinBoxAurora->setValue(portAuroraWin);
+m_Controls->m_TrackingSystemWidget->setCurrentIndex(SelectedDevice);
+m_Controls->m_trackingDeviceChooser->setCurrentIndex(SelectedDevice);
+m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(m_MTCalibrationFile.c_str()));
 }
 

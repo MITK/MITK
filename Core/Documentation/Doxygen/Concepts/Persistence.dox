@@ -8,11 +8,36 @@ In general, persistence referes to the capability of an application to permanent
 -# Extended features, which include persistence, are provided by the configuration service. \ref PersistenceConfigurationService
 
 \section PersistenceMITKService MITK Persistence Service
+For persistence of member variables and parameters, the interface mitk::IPersistenceService in the MITK core provides an API to store variables permanentely by means of mitk::PropertyList objects. These properties can be stored inside a MITK scene together with the data so that the user loads data and restores the application state at once. The current actual implementation of this interface can be found in the module Persistence. the class mitk::PersistenceService offers a rather simple way to store variables permanently.
 
+To enable MITK persistence inside your class, simply include the persistence interface and use PERSISTENCE_GET_SERVICE_METHOD_MACRO in the private part of your class, as shown in the next code snippet:
 
+\code
+#include <mitkIPersistenceService.h>
+//[...]
+private:
+  PERSISTENCE_GET_SERVICE_METHOD_MACRO
+\endcode
+
+You can then access a persistent property list by using a unique id, e.g. the name of your plugin. Variables can be added to this propertylist and will be available after restarting the application.
+\code
+mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList("org.mitk.myUniqueModule");
+//set a variable:
+propList->Set("deviceNumber", m_Controls->GrabbingDeviceNumber->value());
+//get a variable:
+int grabbingDeviceNumber = 0;
+propList->Get("deviceNumber", deviceNumber);
+\endcode
+
+When a MITK scene with stored property list is loaded within MITK the list will change automatically. However a class can be informed by the service object by when the list is changed by adding it as observer to the service object.
+\code
+this->GetPeristenceService()->AddPropertyListReplacedObserver(this);
+\endcode
+
+An example implementation for the use of the mitk::PersistenceService can be found in the module OpenCVVideoSupport (class QmitkOpenCVVideoControls) and in the corresponding unit test mitkPersistenceTest in the Persistence module.
 
 \section PersistenceQTSetting Qt Settings
-
+Within the UI dependet modules inside MITK, the Qt::settings class can also be used to store variables permanentely. The following code snippet shows an example:
 \code
 //in the header:
   #include <QSettings>
@@ -27,9 +52,10 @@ In general, persistence referes to the capability of an application to permanent
   //load settings:
   int intExample = m_MySettings.value("identifier").toInt();
 \endcode
-
-*/
+However, integration into a MITK scene file is not possible with Qt::settings.
 
 \section PersistenceBlueberry TODO
 
 \section PersistenceConfigurationService TODO
+
+*/

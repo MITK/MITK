@@ -84,6 +84,34 @@ static bool RevealBinaryTag(const gdcm::Tag tag, const gdcm::DataSet& dataset, s
   }
 }
 
+/**
+ * @brief The DiffusionImageHeaderInformation struct
+ */
+struct DiffusionImageDICOMHeaderInformation
+{
+  DiffusionImageDICOMHeaderInformation()
+    : b_value(0),
+      isotropic(false),
+      baseline(false)
+  {
+    g_vector.fill(0);
+  }
+
+  void Print()
+  {
+    MITK_INFO << " DiffusionImageHeaderInformation : \n"
+              << "    : b value   : " << b_value << "\n"
+              << "    : gradient  : " << g_vector << "\n"
+              << "    : isotropic : " << isotropic << "\n --- \n";
+  }
+
+  unsigned int b_value;
+  vnl_vector_fixed< double, 3> g_vector;
+  bool baseline;
+  bool isotropic;
+};
+
+
 } // end namespace mitk
 
 #endif // MITKDIFFUSIONHEADERFILEREADER_H

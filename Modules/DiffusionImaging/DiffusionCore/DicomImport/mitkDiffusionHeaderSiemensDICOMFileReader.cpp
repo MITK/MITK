@@ -62,28 +62,6 @@ struct Siemens_Header_Format
 
 static std::vector< Siemens_Header_Format > SiemensFormatsCollection;
 
-struct DiffusionImageHeaderInformation
-{
-  DiffusionImageHeaderInformation()
-    : b_value(0),
-      isotropic(false)
-  {
-    g_vector.fill(0);
-  }
-
-  void Print()
-  {
-    MITK_INFO << " DiffusionImageHeaderInformation : \n"
-              << "    : b value   : " << b_value << "\n"
-              << "    : gradient  : " << g_vector << "\n"
-              << "    : isotropic : " << isotropic << "\n --- \n";
-  }
-
-  unsigned int b_value;
-  vnl_vector_fixed< double, 3> g_vector;
-  bool isotropic;
-};
-
 static bool ParseInputString( std::string input, std::vector<double>& values, Siemens_Header_Format format_specs )
 {
 
@@ -109,7 +87,7 @@ static bool ParseInputString( std::string input, std::vector<double>& values, Si
 /**
  * @brief Extract b value from the siemens diffusion tag
  */
-static bool ExtractDiffusionTagInformation( std::string tag_value, DiffusionImageHeaderInformation& values)
+static bool ExtractDiffusionTagInformation( std::string tag_value, mitk::DiffusionImageDICOMHeaderInformation& values)
 {
   SiemensDiffusionHeaderType hformat = GetHeaderType( tag_value );
   Siemens_Header_Format specs = SiemensFormatsCollection.at( hformat );
@@ -175,6 +153,10 @@ static bool ExtractDiffusionTagInformation( std::string tag_value, DiffusionImag
     }
 
   }
+  else
+  {
+    values.baseline = true;
+  }
 
   return true;
 }
@@ -214,7 +196,7 @@ bool mitk::DiffusionHeaderSiemensDICOMFileReader
   std::string siemens_diffusionheader_str;
   if( RevealBinaryTag( t_sie_diffusion, dataset, siemens_diffusionheader_str ) )
   {
-    DiffusionImageHeaderInformation values;
+    DiffusionImageDICOMHeaderInformation values;
     ExtractDiffusionTagInformation( siemens_diffusionheader_str, values );
 
     values.Print();

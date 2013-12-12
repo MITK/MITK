@@ -192,6 +192,7 @@ set(CPP_FILES
   DataManagement/mitkProperties.cpp
   DataManagement/mitkPropertyList.cpp
   DataManagement/mitkRestorePlanePositionOperation.cpp
+  DataManagement/mitkApplyTransformMatrixOperation.cpp
   DataManagement/mitkRotationOperation.cpp
   DataManagement/mitkSlicedData.cpp
   DataManagement/mitkSlicedGeometry3D.cpp

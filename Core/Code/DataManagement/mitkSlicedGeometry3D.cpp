@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRotationOperation.h"
 #include "mitkPlaneOperation.h"
 #include "mitkRestorePlanePositionOperation.h"
+#include "mitkApplyTransformMatrixOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkSliceNavigationController.h"
 
@@ -1022,6 +1023,31 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
     }
     break;
 
+  case OpAPPLYTRANSFORMMATRIX:
+
+    // Clear all generated geometries and then transform only the first slice.
+    // The other slices will be re-generated on demand
+
+    // Save first slice
+    Geometry2D::Pointer geometry2D = m_Geometry2Ds[0];
+
+    ApplyTransformMatrixOperation *applyMatrixOp = dynamic_cast< ApplyTransformMatrixOperation* >( operation );
+
+    // Apply transformation to first plane
+    geometry2D->ExecuteOperation( applyMatrixOp );
+
+    // Generate a ApplyTransformMatrixOperation using the dataset center instead of
+    // the supplied rotation center. The supplied center is instead used to adjust the
+    // slice stack afterwards (see OpROTATE).
+    Point3D center = m_ReferenceGeometry->GetCenter();
+
+    // Clear the slice stack and adjust it according to the center of
+    // the dataset and the supplied rotation center (see documentation of
+    // ReinitializePlanes)
+    this->ReinitializePlanes( center, applyMatrixOp->GetReferencePoint() );
+
+    Geometry3D::ExecuteOperation( applyMatrixOp );
+    break;
   }
 
   this->Modified();

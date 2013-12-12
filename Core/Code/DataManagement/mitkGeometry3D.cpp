@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMatrixConvert.h"
 #include "mitkRotationOperation.h"
 #include "mitkRestorePlanePositionOperation.h"
+#include "mitkApplyTransformMatrixOperation.h"
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
 
@@ -369,7 +370,12 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
       vtktransform->SetMatrix(matrix);
       break;
   }
-
+  case OpAPPLYTRANSFORMMATRIX:
+  {
+    ApplyTransformMatrixOperation *applyMatrixOp = dynamic_cast< ApplyTransformMatrixOperation* >( operation );
+    vtktransform->SetMatrix(applyMatrixOp->GetMatrix());
+    break;
+  }
   default:
     vtktransform->Delete();
     return;

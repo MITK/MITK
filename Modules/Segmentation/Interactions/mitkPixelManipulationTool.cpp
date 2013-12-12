@@ -33,7 +33,6 @@ mitk::PixelManipulationTool::PixelManipulationTool() : Tool("dummy"),
 m_Value(0),
 m_FixedValue(false)
 {
-  this->SupportRoiOn();
 }
 
 mitk::PixelManipulationTool::~PixelManipulationTool()

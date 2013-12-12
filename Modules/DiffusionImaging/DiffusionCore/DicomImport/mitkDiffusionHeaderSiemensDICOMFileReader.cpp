@@ -65,7 +65,8 @@ static std::vector< Siemens_Header_Format > SiemensFormatsCollection;
 struct DiffusionImageHeaderInformation
 {
   DiffusionImageHeaderInformation()
-    : b_value(0)
+    : b_value(0),
+      isotropic(false)
   {
     g_vector.fill(0);
   }
@@ -73,12 +74,14 @@ struct DiffusionImageHeaderInformation
   void Print()
   {
     MITK_INFO << " DiffusionImageHeaderInformation : \n"
-              << "    : b value  : " << b_value << "\n"
-              << "    : gradient : " << g_vector << "\n --- \n";
+              << "    : b value   : " << b_value << "\n"
+              << "    : gradient  : " << g_vector << "\n"
+              << "    : isotropic : " << isotropic << "\n --- \n";
   }
 
   unsigned int b_value;
   vnl_vector_fixed< double, 3> g_vector;
+  bool isotropic;
 };
 
 static bool ParseInputString( std::string input, std::vector<double>& values, Siemens_Header_Format format_specs )
@@ -111,8 +114,8 @@ static bool ExtractDiffusionTagInformation( std::string tag_value, DiffusionImag
   SiemensDiffusionHeaderType hformat = GetHeaderType( tag_value );
   Siemens_Header_Format specs = SiemensFormatsCollection.at( hformat );
 
-  MITK_INFO << " Header format: " << hformat;
-  MITK_INFO << " :: Retrieving b value. ";
+  MITK_DEBUG << " Header format: " << hformat;
+  MITK_DEBUG << " :: Retrieving b value. ";
 
   std::string::size_type tag_position =
       tag_value.find( "B_value", 0 );
@@ -135,9 +138,16 @@ static bool ExtractDiffusionTagInformation( std::string tag_value, DiffusionImag
   if( values.b_value > 0 )
   {
     std::string::size_type tag_position = tag_value.find( "DiffusionGradientDirection", 0 );
+    // Possibly it is a IVIM dataset, i.e. the gradient direction is not relevant
+    // and possibly either not set or set to zero
     if( tag_position == std::string::npos )
     {
-      MITK_INFO << "No gradient direction information. ";
+      MITK_WARN << "No gradient direction information, but non-zero b-value. Possibly an IVIM dataset. " << "\n"
+                << "Setting gradient to (1,1,1).";
+
+      values.isotropic = true;
+      values.g_vector.fill(1);
+      return false;
     }
 
     value_array.clear();
@@ -154,6 +164,13 @@ static bool ExtractDiffusionTagInformation( std::string tag_value, DiffusionImag
       for( unsigned int i=0; i<value_array.size(); i++)
       {
         values.g_vector[i] = value_array.at(i);
+      }
+
+      // Test for isotropic data (i.e. IVIM)
+      if( values.g_vector.two_norm() < vnl_math::eps )
+      {
+        values.g_vector.fill(1);
+        values.isotropic = true;
       }
     }
 

@@ -18,9 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTextProperty.h>
 #include "vtkUnicodeString.h"
 #include <vtkImageMapper.h>
-#include <vtkFreeTypeStringToImage.h>
+#include <vtkTextRendererStringToImage.h>
 #include <vtkTextActor.h>
 #include <vtkImageMapper.h>
+#include <vtkTextRenderer.h>
 
 mitk::TextOverlay2D::TextOverlay2D()
 {
@@ -49,8 +50,8 @@ void mitk::TextOverlay2D::SetBoundsOnDisplay(mitk::BaseRenderer *renderer, const
 {
   vtkSmartPointer<vtkActor2D> actor = GetVtkActor2D(renderer);
   actor->SetDisplayPosition(bounds.Position[0],bounds.Position[1]);
-  actor->SetWidth(bounds.Size[0]);
-  actor->SetHeight(bounds.Size[1]);
+//  actor->SetWidth(bounds.Size[0]);
+//  actor->SetHeight(bounds.Size[1]);
 }
 
 mitk::TextOverlay2D::LocalStorage::~LocalStorage()
@@ -72,7 +73,7 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
 
   if(ls->IsGenerateDataRequired(renderer,this))
   {
-    vtkSmartPointer<vtkFreeTypeStringToImage> freetype = vtkSmartPointer<vtkFreeTypeStringToImage>::New();
+    vtkSmartPointer<vtkTextRendererStringToImage> freetype = vtkSmartPointer<vtkTextRendererStringToImage>::New();
     vtkSmartPointer<vtkTextProperty> prop = vtkSmartPointer<vtkTextProperty>::New();
     float color[3] = {1,1,1};
     float opacity = 1.0;
@@ -82,7 +83,12 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
     prop->SetFontSize(GetFontSize());
     prop->SetOpacity(opacity);
 
+    freetype->SetScaleToPowerOfTwo(false);
+
     freetype->RenderString(prop,vtkUnicodeString::from_utf8(GetText().c_str()),ls->m_textImage);
+//    vtkSmartPointer<vtkTextRenderer> fds = vtkTextRenderer::New();
+//    int bbox[4];
+//    fds->GetBoundingBox(prop,vtkUnicodeString::from_utf8(GetText().c_str()),bbox);
 
     ls->m_textImage->Modified();
 

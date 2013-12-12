@@ -39,7 +39,7 @@ namespace mitk {
   class BaseRenderer;
   class BaseData;
   class DataNode;
-
+  class OverlayManager;
 
   /** \brief Base class of all mappers, Vtk as well as OpenGL mappers
   *
@@ -190,8 +190,9 @@ namespace mitk {
     */
     virtual void ResetMapper( BaseRenderer* /*renderer*/ ) { }
 
-    mitk::DataNode * m_DataNode;
+    virtual OverlayManager* GetOverlayManager() const;
 
+    mitk::DataNode * m_DataNode;
 
   private:
 
@@ -206,7 +207,6 @@ namespace mitk {
 
     /** \brief assignment operator */
     Mapper &operator=(const Mapper &);
-
 
   public:
 

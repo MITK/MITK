@@ -44,6 +44,7 @@ public:
   itkNewMacro(OverlayManager);
 
   void AddOverlay(const Overlay::Pointer& overlay);
+  void AddOverlay(const Overlay::Pointer& overlay, BaseRenderer* renderer);
   void RemoveOverlay(const Overlay::Pointer& overlay);
 
   /** \brief Clears the manager of all Overlays.*/

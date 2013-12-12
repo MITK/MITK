@@ -33,6 +33,7 @@ class vtkPolyDataMapper;
 namespace mitk {
 
   class PointSet;
+  class LabelOverlay3D;
 
   /**
   * @brief Vtk-based mapper for PointSet
@@ -126,6 +127,7 @@ namespace mitk {
     virtual void ApplyAllProperties(mitk::BaseRenderer* renderer, vtkActor* actor);
     virtual void CreateContour();
     virtual void CreateVTKRenderObjects();
+    virtual mitk::OverlayManager* GetOverlayManager() const;
 
     vtkSmartPointer<vtkAppendPolyData> m_vtkSelectedPointList;
     vtkSmartPointer<vtkAppendPolyData> m_vtkUnselectedPointList;
@@ -138,6 +140,9 @@ namespace mitk {
     vtkSmartPointer<vtkActor> m_ContourActor;
 
     vtkSmartPointer<vtkPropAssembly> m_PointsAssembly;
+
+    itk::SmartPointer<LabelOverlay3D> m_LabelOverlay;
+    itk::SmartPointer<OverlayManager> m_OverlayManager;
 
     //help for contour between points
     vtkSmartPointer<vtkAppendPolyData> m_vtkTextList;

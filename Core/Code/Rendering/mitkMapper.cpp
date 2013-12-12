@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNode.h"
 #include "mitkBaseRenderer.h"
 #include "mitkProperties.h"
+#include "mitkOverlayManager.h"
 
 
 mitk::Mapper::Mapper()
@@ -104,6 +105,9 @@ void mitk::Mapper::CalculateTimeStep( mitk::BaseRenderer *renderer )
 
 void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
 {
+  if(GetOverlayManager())
+    GetOverlayManager()->AddBaseRenderer(renderer);
+
   const DataNode* node = GetDataNode();
 
   assert(node!=NULL);
@@ -129,6 +133,8 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
   }
 
   this->GenerateDataForRenderer(renderer);
+  if(GetOverlayManager())
+    GetOverlayManager()->UpdateOverlays(renderer);
 }
 
 
@@ -162,4 +168,10 @@ void mitk::Mapper::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer
   node->AddProperty( "visible", mitk::BoolProperty::New(true), renderer, overwrite );
   node->AddProperty( "layer", mitk::IntProperty::New(0), renderer, overwrite);
   node->AddProperty( "name", mitk::StringProperty::New("No Name!"), renderer, overwrite );
+}
+
+
+mitk::OverlayManager* mitk::Mapper::GetOverlayManager() const
+{
+  return NULL;
 }

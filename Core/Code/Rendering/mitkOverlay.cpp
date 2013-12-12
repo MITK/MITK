@@ -194,7 +194,7 @@ void mitk::Overlay::SetFontSize(int fontSize)
 
 int mitk::Overlay::GetFontSize() const
 {
-  int fontSize;
+  int fontSize = 1;
   GetPropertyList()->GetIntProperty("Overlay.FontSize", fontSize);
   return fontSize;
 }

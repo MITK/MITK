@@ -142,8 +142,6 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dat
     // all conditions are fulfilled so we can continue with the actions
     m_CurrentState = transition->GetNextState();
 
-    MITK_INFO << "New state" << m_CurrentState->GetName();
-
     // iterate over all actions in this transition and execute them
     ActionVectorType actions = transition->GetActions();
     for (ActionVectorType::iterator it = actions.begin(); it != actions.end(); ++it)

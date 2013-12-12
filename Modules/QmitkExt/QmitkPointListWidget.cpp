@@ -421,7 +421,7 @@ void QmitkPointListWidget::ObserveNewNode( mitk::DataNode* node )
       m_ToggleAddPoint->setChecked( false );
     }
 
-    m_PointSetNode->RemoveObserver(m_NodeObserverResultTag);
+    m_PointSetNode->RemoveObserver(m_NodeObserverTag);
     m_NodeObserverTag = 0;
   }
 

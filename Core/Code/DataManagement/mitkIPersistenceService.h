@@ -112,91 +112,161 @@ namespace mitk
 }
 
 /// MACROS FOR AUTOMATIC SAVE FUNCTION
-#define PERSISTENCE_GET_MODULE_CONTEXT\
-    us::ModuleContext* context = GetModuleContext();
+#define PERSISTENCE_GET_MODULE_CONTEXT_FUNCTION\
+    us::GetModuleContext()
 
-#define PERSISTENCE_GET_SERVICE\
-    PERSISTENCE_GET_MODULE_CONTEXT\
-    us::ServiceReference<mitk::IPersistenceService> persistenceServiceRef = context->GetServiceReference<mitk::IPersistenceService>();\
-    mitk::IPersistenceService* persistenceService = dynamic_cast<mitk::IPersistenceService*> ( context->GetService<mitk::IPersistenceService>(persistenceServiceRef) );
+#define PERSISTENCE_GET_SERVICE_MACRO\
+    mitk::IPersistenceService* persistenceService = 0;\
+    us::ModuleContext* context = PERSISTENCE_GET_MODULE_CONTEXT_FUNCTION;\
+    if( context )\
+    {\
+        us::ServiceReference<mitk::IPersistenceService> persistenceServiceRef = context->GetServiceReference<mitk::IPersistenceService>();\
+        if( persistenceServiceRef )\
+        {\
+            persistenceService\
+                = dynamic_cast<mitk::IPersistenceService*> ( context->GetService<mitk::IPersistenceService>(persistenceServiceRef) );\
+        }\
+    }
 
-#define PERSISTENCE_CREATE_SAVE_START(IdMemberName)\
-bool Save(const std::string& fileName="") { \
-    PERSISTENCE_GET_SERVICE\
-    bool noError = persistenceService != 0;\
-    mitk::PropertyList::Pointer propList;\
-    if( noError ) {\
-        propList = persistenceService->GetPropertyList(IdMemberName);
+#define PERSISTENCE_GET_SERVICE_METHOD_MACRO\
+    mitk::IPersistenceService* GetPeristenceService() const\
+    {\
+        static mitk::IPersistenceService* staticPersistenceService = 0;\
+        if( staticPersistenceService == 0 )\
+        {\
+            PERSISTENCE_GET_SERVICE_MACRO\
+            staticPersistenceService = persistenceService;\
+        }\
+        return staticPersistenceService;\
+    }
 
-#define PERSISTENCE_CREATE_SAVE_END\
+#define PERSISTENCE_MACRO_START_PART(ID_MEMBER_NAME)\
+public:\
+    bool Save(const std::string& fileName="")\
+    {\
+        mitk::IPersistenceService* persistenceService = this->GetPeristenceService();\
+        bool noError = persistenceService != 0;\
+        if( noError )\
+            this->ToPropertyList();\
+        if(noError)\
+            noError = persistenceService->Save(fileName);\
+        return noError;\
     }\
-    noError = persistenceService->Save(fileName);\
-    return noError;\
-}
-
-#define PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
-void SetId( const std::string& ____id ) { IdMemberName = ____id; };\
-std::string GetId() { return IdMemberName; };\
-bool Load(const std::string& fileName="") {\
-    PERSISTENCE_GET_SERVICE\
-    bool noError = persistenceService != 0 && persistenceService->Load(fileName);\
-    if( noError ) {\
-    mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(IdMemberName);
-
-#define PERSISTENCE_CREATE_LOAD_END\
+    bool Load(const std::string& fileName="")\
+    {\
+        mitk::IPersistenceService* persistenceService = this->GetPeristenceService();\
+        bool noError = persistenceService != 0 && persistenceService->Load(fileName);\
+        if( noError )\
+        {\
+            this->FromPropertyList();\
+        }\
+        return noError;\
     }\
-    return noError;\
-}
+    void ToPropertyList()\
+    {\
+        mitk::IPersistenceService* persistenceService = this->GetPeristenceService();\
+        this->InitializePropertyListReplacedObserver(persistenceService);\
+        if( !persistenceService )\
+            return;\
+        mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(ID_MEMBER_NAME);\
+        propList->Set(#ID_MEMBER_NAME, ID_MEMBER_NAME);
 
-#define PERSISTENCE_CREATE(IdMemberName, ParamMemberName)\
-    PERSISTENCE_CREATE_SAVE_START(IdMemberName)\
-        propList->Set( #ParamMemberName, ParamMemberName );\
-    PERSISTENCE_CREATE_SAVE_END\
-    PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
-        noError = propList->Get( #ParamMemberName, ParamMemberName );\
-    PERSISTENCE_CREATE_LOAD_END
+#define PERSISTENCE_MACRO_MIDDLE_PART(ID_MEMBER_NAME)\
+    }\
+    void FromPropertyList()\
+    {\
+        mitk::IPersistenceService* persistenceService = this->GetPeristenceService();\
+        this->InitializePropertyListReplacedObserver(persistenceService);\
+        if( !persistenceService )\
+            return;\
+        mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(ID_MEMBER_NAME);\
+        propList->Get(#ID_MEMBER_NAME, ID_MEMBER_NAME);
 
-#define PERSISTENCE_CREATE2(IdMemberName, ParamMemberName, Param2MemberName)\
-    PERSISTENCE_CREATE_SAVE_START(IdMemberName)\
-        propList->Set( #ParamMemberName, ParamMemberName );\
-        propList->Set( #Param2MemberName, Param2MemberName );\
-    PERSISTENCE_CREATE_SAVE_END\
-    PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
-        noError = propList->Get( #ParamMemberName, ParamMemberName );\
-        if(noError)\
-        noError = propList->Get( #Param2MemberName, Param2MemberName );\
-    PERSISTENCE_CREATE_LOAD_END
+#define PERSISTENCE_MACRO_END_PART(THE_CLASS_NAME, ID_MEMBER_NAME)\
+}\
+std::string GetId() const\
+{\
+    return ID_MEMBER_NAME;\
+}\
+private:\
+    PERSISTENCE_GET_SERVICE_METHOD_MACRO\
+    struct MyPropertyListReplacedObserver: public mitk::PropertyListReplacedObserver\
+    {\
+        MyPropertyListReplacedObserver()\
+        : m_##THE_CLASS_NAME(0), m_PersistenceService(0)\
+        {\
+        }\
+        ~MyPropertyListReplacedObserver()\
+        {\
+            if( m_PersistenceService )\
+                m_PersistenceService->RemovePropertyListReplacedObserver(this);\
+        }\
+        void AfterPropertyListReplaced( const std::string& id, mitk::PropertyList* propertyList )\
+        {\
+            if( m_##THE_CLASS_NAME && m_##THE_CLASS_NAME->GetId() == id )\
+                m_##THE_CLASS_NAME->FromPropertyList();\
+        }\
+        void Initialize( THE_CLASS_NAME##* _##THE_CLASS_NAME, mitk::IPersistenceService* persistenceService )\
+        {\
+            m_##THE_CLASS_NAME = _##THE_CLASS_NAME;\
+            m_PersistenceService = persistenceService;\
+            if( m_PersistenceService )\
+                m_PersistenceService->AddPropertyListReplacedObserver(this);\
+        }\
+    private:\
+        THE_CLASS_NAME##* m_##THE_CLASS_NAME;\
+        mitk::IPersistenceService* m_PersistenceService;\
+    };\
+    MyPropertyListReplacedObserver m_MyPropertyListReplacedObserver;\
+    void InitializePropertyListReplacedObserver(mitk::IPersistenceService* persistenceService)\
+    {\
+        static bool observerInitialized = false;\
+        if( observerInitialized == false && persistenceService )\
+        {\
+            m_MyPropertyListReplacedObserver.Initialize( this, persistenceService );\
+            observerInitialized = true;\
+        }\
+    }
 
-#define PERSISTENCE_CREATE3(IdMemberName, ParamMemberName, Param2MemberName, Param3MemberName)\
-    PERSISTENCE_CREATE_SAVE_START(IdMemberName)\
-        propList->Set( #ParamMemberName, ParamMemberName );\
-        propList->Set( #Param2MemberName, Param2MemberName );\
-        propList->Set( #Param3MemberName, Param3MemberName );\
-    PERSISTENCE_CREATE_SAVE_END\
-    PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
-        noError = propList->Get( #ParamMemberName, ParamMemberName );\
-        if(noError)\
-        noError = propList->Get( #Param2MemberName, Param2MemberName );\
-        if(noError)\
-        noError = propList->Get( #Param3MemberName, Param3MemberName );\
-    PERSISTENCE_CREATE_LOAD_END
+#define PERSISTENCE_CREATE(THE_CLASS_NAME, ID_MEMBER_NAME, PARAM_MEMBER_NAME)\
+    PERSISTENCE_MACRO_START_PART(ID_MEMBER_NAME)\
+        propList->Set( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    PERSISTENCE_MACRO_MIDDLE_PART(ID_MEMBER_NAME)\
+        propList->Get( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    PERSISTENCE_MACRO_END_PART(THE_CLASS_NAME, ID_MEMBER_NAME)
 
-#define PERSISTENCE_CREATE4(IdMemberName, ParamMemberName, Param2MemberName, Param3MemberName, Param4MemberName)\
-    PERSISTENCE_CREATE_SAVE_START(IdMemberName)\
-        propList->Set( #ParamMemberName, ParamMemberName );\
-        propList->Set( #Param2MemberName, Param2MemberName );\
-        propList->Set( #Param3MemberName, Param3MemberName );\
-        propList->Set( #Param4MemberName, Param4MemberName );\
-    PERSISTENCE_CREATE_SAVE_END\
-    PERSISTENCE_CREATE_LOAD_START(IdMemberName)\
-        noError = propList->Get( #ParamMemberName, ParamMemberName );\
-        if(noError)\
-        noError = propList->Get( #Param2MemberName, Param2MemberName );\
-        if(noError)\
-        noError = propList->Get( #Param3MemberName, Param3MemberName );\
-        if(noError)\
-        noError = propList->Get( #Param4MemberName, Param4MemberName );\
-    PERSISTENCE_CREATE_LOAD_END
+#define PERSISTENCE_CREATE2(THE_CLASS_NAME, ID_MEMBER_NAME, PARAM_MEMBER_NAME, PARAM2_MEMBER_NAME)\
+    PERSISTENCE_MACRO_START_PART(ID_MEMBER_NAME)\
+    propList->Set( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    propList->Set( #PARAM2_MEMBER_NAME, PARAM2_MEMBER_NAME );\
+    PERSISTENCE_MACRO_MIDDLE_PART(ID_MEMBER_NAME)\
+    propList->Get( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    propList->Get( #PARAM2_MEMBER_NAME, PARAM2_MEMBER_NAME );\
+    PERSISTENCE_MACRO_END_PART(THE_CLASS_NAME, ID_MEMBER_NAME)
+
+#define PERSISTENCE_CREATE3(THE_CLASS_NAME, ID_MEMBER_NAME, PARAM_MEMBER_NAME, PARAM2_MEMBER_NAME, PARAM3_MEMBER_NAME)\
+    PERSISTENCE_MACRO_START_PART(ID_MEMBER_NAME)\
+    propList->Set( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    propList->Set( #PARAM2_MEMBER_NAME, PARAM2_MEMBER_NAME );\
+    propList->Set( #PARAM3_MEMBER_NAME, PARAM3_MEMBER_NAME );\
+    PERSISTENCE_MACRO_MIDDLE_PART(ID_MEMBER_NAME)\
+    propList->Get( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    propList->Get( #PARAM2_MEMBER_NAME, PARAM2_MEMBER_NAME );\
+    propList->Get( #PARAM3_MEMBER_NAME, PARAM3_MEMBER_NAME );\
+    PERSISTENCE_MACRO_END_PART(THE_CLASS_NAME, ID_MEMBER_NAME)
+
+#define PERSISTENCE_CREATE4(THE_CLASS_NAME, ID_MEMBER_NAME, PARAM_MEMBER_NAME, PARAM2_MEMBER_NAME, PARAM3_MEMBER_NAME, PARAM4_MEMBER_NAME)\
+    PERSISTENCE_MACRO_START_PART(ID_MEMBER_NAME)\
+    propList->Set( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    propList->Set( #PARAM2_MEMBER_NAME, PARAM2_MEMBER_NAME );\
+    propList->Set( #PARAM3_MEMBER_NAME, PARAM3_MEMBER_NAME );\
+    propList->Set( #PARAM4_MEMBER_NAME, PARAM4_MEMBER_NAME );\
+    PERSISTENCE_MACRO_MIDDLE_PART(ID_MEMBER_NAME)\
+    propList->Get( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    propList->Get( #PARAM2_MEMBER_NAME, PARAM2_MEMBER_NAME );\
+    propList->Get( #PARAM3_MEMBER_NAME, PARAM3_MEMBER_NAME );\
+    propList->Get( #PARAM4_MEMBER_NAME, PARAM4_MEMBER_NAME );\
+    PERSISTENCE_MACRO_END_PART(THE_CLASS_NAME, ID_MEMBER_NAME)
 
 US_DECLARE_SERVICE_INTERFACE(mitk::IPersistenceService, "org.mitk.services.IPersistenceService")
 

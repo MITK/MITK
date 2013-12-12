@@ -21,8 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "usModuleContext.h"
 #include "usGetModuleContext.h"
-#include "Poco\File.h"
-
+#include <itksys/SystemTools.hxx>
 
 const std::string mitk::PersistenceService::PERSISTENCE_PROPERTY_NAME("PersistenceNode");
 
@@ -32,30 +31,18 @@ const std::string mitk::PersistenceService::ID_PROPERTY_NAME("Id");
 
 
 mitk::PersistenceService::PersistenceService()
-  : m_AutoLoadAndSave( false ), m_SceneIO( SceneIO::New() )
+  : m_AutoLoadAndSave( true ), m_SceneIO( SceneIO::New() )
 {
-    {
-        MITK_DEBUG("mitk::PersistenceService") << "constructing PersistenceService";
-    }
+}
 
-    MITK_DEBUG("mitk::PersistenceService") << "loading PersistenceService personal persitent data";
-    this->Load( IPersistenceService::GetDefaultPersistenceFile() );
-    std::string id = PERSISTENCE_PROPERTYLIST_NAME;
-    mitk::PropertyList::Pointer propList = this->GetPropertyList( id );
-    propList->GetBoolProperty("m_AutoLoadAndSave", m_AutoLoadAndSave);
-
-    if( m_AutoLoadAndSave == false )
-    {
-        MITK_DEBUG("mitk::PersistenceService") << "autoloading was not wished. clearing data we got so far.";
-        m_PropertyLists.clear();
-    }
+void mitk::PersistenceService::Clear()
+{
+    m_PropertyLists.clear();
 }
 
 mitk::PersistenceService::~PersistenceService()
 {
   MITK_DEBUG("mitk::PersistenceService") << "destructing PersistenceService";
-  if(m_AutoLoadAndSave)
-      this->Save();
 }
 
 mitk::PropertyList::Pointer mitk::PersistenceService::GetPropertyList( std::string& id, bool* existed )
@@ -110,8 +97,9 @@ bool mitk::PersistenceService::Save(const std::string& fileName, bool appendChan
     mitk::DataStorage::Pointer tempDs;
     if(appendChanges)
     {
-        if( !Poco::File(theFile).exists() )
+        if( !itksys::SystemTools::FileExists(theFile.c_str()) )
             return false;
+
         DataStorage::Pointer ds = m_SceneIO->LoadScene( theFile );
         bool load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) && (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
         if( !load )
@@ -122,22 +110,9 @@ bool mitk::PersistenceService::Save(const std::string& fileName, bool appendChan
     else
         tempDs = mitk::StandaloneDataStorage::New();
 
-    DataStorage::SetOfObjects::Pointer nodes = this->GetDataNodes();
-    DataStorage::SetOfObjects::iterator it = nodes->begin();
-    while( it != nodes->end() )
-    {
-        mitk::DataNode::Pointer node = *it;
-        tempDs->Add(node);
+    DataStorage::SetOfObjects::Pointer rs = DataStorage::SetOfObjects::New();
 
-        ++it;
-    }
-
-    mitk::NodePredicateProperty::Pointer pred =
-        mitk::NodePredicateProperty::New(PERSISTENCE_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(true));
-
-    mitk::DataStorage::SetOfObjects::ConstPointer rs = tempDs->GetSubset(pred);
-
-    return m_SceneIO->SaveScene( rs, tempDs, theFile );
+    return m_SceneIO->SaveScene( rs.GetPointer(), tempDs, theFile );
 }
 
 bool mitk::PersistenceService::Load(const std::string& fileName)
@@ -147,8 +122,10 @@ bool mitk::PersistenceService::Load(const std::string& fileName)
     std::string theFile = fileName;
     if(theFile.empty())
         theFile = IPersistenceService::GetDefaultPersistenceFile();
-    if( !Poco::File(theFile).exists() )
+
+    if( !itksys::SystemTools::FileExists(theFile.c_str()) )
         return false;
+
     DataStorage::Pointer ds = m_SceneIO->LoadScene( theFile );
     load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) && (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
     if( !load )
@@ -156,8 +133,6 @@ bool mitk::PersistenceService::Load(const std::string& fileName)
         MITK_DEBUG("mitk::PersistenceService") << "loading of scene files failed";
         return load;
     }
-
-    this->RestorePropertyListsFromPersistentDataNodes(ds);
 
     return load;
 }
@@ -264,4 +239,9 @@ bool mitk::PersistenceService::RestorePropertyListsFromPersistentDataNodes( Data
     } // for ( mitk::DataStorage::SetOfObjects::const_iterator sourceIter = allNodes->begin(); ...
 
     return oneFound;
+}
+
+bool mitk::PersistenceService::GetAutoLoadAndSave() const
+{
+    return m_AutoLoadAndSave;
 }

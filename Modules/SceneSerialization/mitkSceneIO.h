@@ -40,17 +40,6 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
     itkNewMacro(Self);
 
     typedef DataStorage::SetOfObjects                                FailedBaseDataListType;
-
-    /**
-     * \brief If set and true, SceneIO will query the PersistenceService for Data and insert it into the datastorage temporarily to save them.
-     *
-    */
-    static void SetSavePersistentDataWithScene(bool savePersistentDataWithScene);
-    /**
-     * \brief If set and true, SceneIO will query the PersistenceService and insert the PropertyList of "PersistenceNodes" into the scene
-     *
-    */
-    static void SetLoadPersistentDataWithScene(bool savePersistentDataWithScene);
     /**
      * \brief Load a scene of objects from file
      * \return DataStorage with all scene objects and their relations. If loading failed, query GetFailedNodes() and GetFailedProperties() for more detail.
@@ -120,8 +109,6 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
 
     std::string  m_WorkingDirectory;
     unsigned int m_UnzipErrors;
-    static bool m_SavePersistentDataWithScene;
-    static bool m_LoadPersistentDataWithScene;
 };
 
 }

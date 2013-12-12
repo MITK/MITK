@@ -42,9 +42,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIPersistenceService.h"
 #include <usGetModuleContext.h>
 
-bool mitk::SceneIO::m_SavePersistentDataWithScene(false);
-bool mitk::SceneIO::m_LoadPersistentDataWithScene(false);
-
 mitk::SceneIO::SceneIO()
 :m_WorkingDirectory(""),
  m_UnzipErrors(0)
@@ -176,15 +173,26 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
     MITK_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
   }
 
-  if( m_LoadPersistentDataWithScene )
+  // muellerm, 11.12.13: added PersistenceService usage (i.e. try to load PropertyLists that are meant for internal Data storage)
+  us::ModuleContext* context = us::GetModuleContext();
+  mitk::IPersistenceService* persistenceService = 0;
+  if( context )
   {
-      us::ModuleContext* context = us::GetModuleContext();
       us::ServiceReference<mitk::IPersistenceService> persistenceServiceRef
-          = context->GetServiceReference<mitk::IPersistenceService>();\
-          mitk::IPersistenceService* persistenceService
-          = dynamic_cast<mitk::IPersistenceService*> ( context->GetService<mitk::IPersistenceService>(persistenceServiceRef) );
-      persistenceService->RestorePropertyListsFromPersistentDataNodes(storage);
+          = context->GetServiceReference<mitk::IPersistenceService>();
+      if( persistenceServiceRef )
+      {
+          persistenceService
+              = dynamic_cast<mitk::IPersistenceService*> ( context->GetService<mitk::IPersistenceService>(persistenceServiceRef) );
+      }
   }
+  if( persistenceService )
+    persistenceService->RestorePropertyListsFromPersistentDataNodes(storage);
+  else
+  {
+      MITK_WARN << "Peristence Service not found. Unable to load persisted PropertyLists from the Scene file";
+  }
+  // muellerm, 11.12.13: end of changed code
 
   // return new data storage, even if empty or uncomplete (return as much as possible but notify calling method)
   return storage;
@@ -240,24 +248,41 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
   }
 
   DataStorage::SetOfObjects::Pointer persistentNodes;
-  if( m_SavePersistentDataWithScene )
+  us::ModuleContext* context = us::GetModuleContext();
+  mitk::IPersistenceService* persistenceService = 0;
+  if( context )
   {
-      us::ModuleContext* context = us::GetModuleContext();
       us::ServiceReference<mitk::IPersistenceService> persistenceServiceRef
-          = context->GetServiceReference<mitk::IPersistenceService>();\
-          mitk::IPersistenceService* persistenceService
+          = context->GetServiceReference<mitk::IPersistenceService>();
+      if( persistenceServiceRef )
+      {
+        persistenceService
           = dynamic_cast<mitk::IPersistenceService*> ( context->GetService<mitk::IPersistenceService>(persistenceServiceRef) );
-
+      }
+  }
+  if( persistenceService )
+  {
       DataStorage::SetOfObjects::Pointer persistentNodes = persistenceService->GetDataNodes();
       DataStorage::SetOfObjects::iterator it = persistentNodes->begin();
       while( it != persistentNodes->end() )
       {
           mitk::DataNode* node = *it;
-          sceneNodes->push_back(node);
-          storage->Add(node);
+          if( std::find( sceneNodes->begin(), sceneNodes->end(), node) == sceneNodes->end() )
+          {
+              sceneNodes->push_back(node);
+          }
+          if( !storage->Exists(node) )
+          {
+            storage->Add(node);
+          }
           ++it;
       }
   }
+  else
+  {
+      MITK_ERROR << "Peristence Service not found. Unable to load persisted PropertyLists from the Scene file";
+  }
+  // muellerm, 11.12.13: end of changed code
 
   try
   {
@@ -295,6 +320,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
       if (m_WorkingDirectory.empty())
       {
         MITK_ERROR << "Could not create temporary directory. Cannot create scene files.";
+        // muellerm, 11.12.13: removing PersistenceNodes from DataStorage that were propably added before for saving in scene (tidy up!)
         this->RemoveNodes( persistentNodes.GetPointer(), storage, sceneNodes );
         return false;
       }
@@ -441,7 +467,8 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
 
     if ( !document.SaveFile( m_WorkingDirectory + Poco::Path::separator() + "index.xml" ) )
     {
-      MITK_ERROR << "Could not write scene to " << m_WorkingDirectory << Poco::Path::separator() << "index.xml" << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+        MITK_ERROR << "Could not write scene to " << m_WorkingDirectory << Poco::Path::separator() << "index.xml" << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+        // muellerm, 11.12.13: removing PersistenceNodes from DataStorage that were propably added before for saving in scene (tidy up!)
       this->RemoveNodes( persistentNodes.GetPointer(), storage, sceneNodes );
       return false;
     }
@@ -475,24 +502,28 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         }
         catch(...)
         {
-          MITK_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
+            MITK_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
+            // muellerm, 11.12.13: removing PersistenceNodes from DataStorage that were propably added before for saving in scene (tidy up!)
           this->RemoveNodes( persistentNodes.GetPointer(), storage, sceneNodes );
           return false; // ok?
         }
       }
       catch(std::exception& e)
       {
-        MITK_ERROR << "Could not create ZIP file from " << m_WorkingDirectory << "\nReason: " << e.what();
+          MITK_ERROR << "Could not create ZIP file from " << m_WorkingDirectory << "\nReason: " << e.what();
+          // muellerm, 11.12.13: removing PersistenceNodes from DataStorage that were propably added before for saving in scene (tidy up!)
         this->RemoveNodes( persistentNodes.GetPointer(), storage, sceneNodes );
         return false;
       }
+      // muellerm, 11.12.13: removing PersistenceNodes from DataStorage that were propably added before for saving in scene (tidy up!)
       this->RemoveNodes( persistentNodes.GetPointer(), storage, sceneNodes );
       return true;
     }
   }
   catch(std::exception& e)
   {
-    MITK_ERROR << "Caught exception during saving temporary files to disk. Error description: '" << e.what() << "'";
+      MITK_ERROR << "Caught exception during saving temporary files to disk. Error description: '" << e.what() << "'";
+      // muellerm, 11.12.13: removing PersistenceNodes from DataStorage that were propably added before for saving in scene (tidy up!)
     this->RemoveNodes( persistentNodes.GetPointer(), storage, sceneNodes );
     return false;
   }
@@ -599,15 +630,4 @@ void mitk::SceneIO::OnUnzipError(const void*  /*pSender*/, std::pair<const Poco:
 void mitk::SceneIO::OnUnzipOk(const void*  /*pSender*/, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path>& /*info*/)
 {
   // MITK_INFO << "Unzipped ok: " << info.second.toString();
-}
-
-void mitk::SceneIO::SetSavePersistentDataWithScene( bool savePersistentDataWithScene )
-{
-
-    m_SavePersistentDataWithScene = savePersistentDataWithScene;
-}
-
-void mitk::SceneIO::SetLoadPersistentDataWithScene( bool loadPersistentDataWithScene )
-{
-    m_LoadPersistentDataWithScene = loadPersistentDataWithScene;
 }

@@ -69,9 +69,6 @@ public:
 protected:
 
     QWidget* m_MainControl;
-    QCheckBox* m_SavePersistentDataWithSceneCheckBox;
-    QCheckBox* m_LoadPersistentDataWithSceneCheckBox;
-    berry::IPreferences::Pointer prefs;
 
 };
 

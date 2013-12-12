@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <cv.h>
 #include <ui_QmitkOpenCVVideoControls.h>
 #include <mitkOpenCVVideoSupportUIExports.h>
+#include <mitkIPersistenceService.h>
 
 class QmitkStdMultiWidget;
 class QmitkVideoBackground;
@@ -34,7 +35,7 @@ namespace mitk
 /// the use of an !initialized! QmitkVideoBackground. The QmitkVideoBackground should
 /// contain an OpenCVVideoSource is then owned by this widget (and deleted)
 ///
-class MITK_OPENCVVIDEOSUPPORTUI_EXPORT QmitkOpenCVVideoControls : public QWidget
+class MITK_OPENCVVIDEOSUPPORTUI_EXPORT QmitkOpenCVVideoControls : public QWidget,  public mitk::PropertyListReplacedObserver
 {
   Q_OBJECT
 
@@ -69,6 +70,12 @@ public:
   /// returns the current QmitkVideoBackground
   ///
   QmitkVideoBackground* GetVideoBackground() const;
+
+  ///
+  /// calls FromPropertyList
+  ///
+  void AfterPropertyListReplaced( const std::string& id, mitk::PropertyList* propertyList );
+
 signals:
   ///
   /// When playback is started this informs when a new frame was grabbed
@@ -95,6 +102,19 @@ protected:
   mitk::OpenCVVideoSource* m_VideoSource;
   Ui::QmitkOpenCVVideoControls* m_Controls;
   bool m_SliderCurrentlyMoved;
+
+private:
+    ///
+    /// muellerm: persitence service implementation
+    ///
+    PERSISTENCE_GET_SERVICE_METHOD_MACRO
+    ///
+    /// muellerm: a unique id for the prop list
+    ///
+    std::string m_Id;
+    void ToPropertyList();
+    void FromPropertyList();
+
 };
 
 #endif

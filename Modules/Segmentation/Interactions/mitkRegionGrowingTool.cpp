@@ -57,15 +57,17 @@ mitk::RegionGrowingTool::RegionGrowingTool()
  m_LastWorkingSeed(-1),
  m_FillFeedbackContour(true)
 {
-  // great magic numbers
-  CONNECT_ACTION( 80, OnMousePressed );
-  CONNECT_ACTION( 90, OnMouseMoved );
-  CONNECT_ACTION( 42, OnMouseReleased );
-
 }
 
 mitk::RegionGrowingTool::~RegionGrowingTool()
 {
+}
+
+void mitk::RegionGrowingTool::ConnectActionsAndFunctions()
+{
+  CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
+  CONNECT_FUNCTION( "Move", OnMouseMoved);
+  CONNECT_FUNCTION( "Release", OnMouseReleased);
 }
 
 const char** mitk::RegionGrowingTool::GetXPM() const
@@ -114,9 +116,10 @@ void mitk::RegionGrowingTool::Deactivated()
      3.2.2 Determine initial region growing parameters from the level window settings of the image
      3.2.3 Perform a region growing (which generates a new feedback contour)
  */
-bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
+bool mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   m_LastEventSender = positionEvent->GetSender();
@@ -125,7 +128,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
   //ToolLogger::SetVerboseness(3);
 
   MITK_DEBUG << "OnMousePressed" << std::endl;
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) > 0.0 )
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) > 0.0 )
   {
     MITK_DEBUG << "OnMousePressed: FeedbackContourTool says ok" << std::endl;
 
@@ -144,14 +147,14 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
         // 2. Determine if the user clicked inside or outside of the segmentation
           const Geometry3D* workingSliceGeometry = m_WorkingSlice->GetGeometry();
           Point3D mprojectedPointIn2D;
-          workingSliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), mprojectedPointIn2D);
+          workingSliceGeometry->WorldToIndex( positionEvent->GetPositionInWorld(), mprojectedPointIn2D);
           itk::Index<2> projectedPointInWorkingSlice2D;
           projectedPointInWorkingSlice2D[0] = static_cast<int>( mprojectedPointIn2D[0] - 0.5 );
           projectedPointInWorkingSlice2D[1] = static_cast<int>( mprojectedPointIn2D[1] - 0.5 );
 
           if ( workingSliceGeometry->IsIndexInside( projectedPointInWorkingSlice2D ) )
           {
-            MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetWorldPosition() << " (index coordinates " << projectedPointInWorkingSlice2D << ") IS in working slice" << std::endl;
+            MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPositionInWorld() << " (index coordinates " << projectedPointInWorkingSlice2D << ") IS in working slice" << std::endl;
 
             // Convert to ipMITKSegmentationTYPE (because getting pixels relys on that data type)
             itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
@@ -199,11 +202,11 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
               // 3.1. Switch depending on the pixel value
               if (inside)
               {
-                OnMousePressedInside(action, stateEvent, workingPicSlice, initialWorkingOffset);
+                OnMousePressedInside( NULL, interactionEvent, workingPicSlice, initialWorkingOffset);
               }
               else
               {
-                OnMousePressedOutside(action, stateEvent);
+                OnMousePressedOutside( NULL, interactionEvent);
               }
             }
           }
@@ -221,9 +224,10 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
    3.1.1 Call a ipSegmentation algorithm to create a nice cut
    3.1.2 Set the result of this algorithm as the feedback contour
 */
-bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ), const StateEvent* stateEvent, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset)
+bool mitk::RegionGrowingTool::OnMousePressedInside( StateMachineAction*, InteractionEvent* interactionEvent, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset)
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in OnMousePressed
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in OnMousePressed
   // 3.1.1. Create a skeletonization of the segmentation and try to find a nice cut
   // apply the skeletonization-and-cut algorithm
   // generate contour to remove
@@ -284,22 +288,23 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
    3.2.2 Determine initial region growing parameters from the level window settings of the image
    3.2.3 Perform a region growing (which generates a new feedback contour)
 */
-bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action ), const StateEvent* stateEvent)
+bool mitk::RegionGrowingTool::OnMousePressedOutside( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in OnMousePressed
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in OnMousePressed
   // 3.2 If we have a reference image, then perform an initial region growing, considering the reference image's level window
 
   // if click was outside the image, don't continue
   const Geometry3D* sliceGeometry = m_ReferenceSlice->GetGeometry();
   Point3D mprojectedPointIn2D;
-  sliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), mprojectedPointIn2D );
+  sliceGeometry->WorldToIndex( positionEvent->GetPositionInWorld(), mprojectedPointIn2D );
   itk::Index<2> projectedPointIn2D;
   projectedPointIn2D[0] = static_cast<int>( mprojectedPointIn2D[0] - 0.5 );
   projectedPointIn2D[1] = static_cast<int>( mprojectedPointIn2D[1] - 0.5 );
 
   if ( sliceGeometry->IsIndexInside( mprojectedPointIn2D ) )
   {
-    MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetWorldPosition() << " (index coordinates " << mprojectedPointIn2D << ") IS in reference slice" << std::endl;
+    MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPositionInWorld() << " (index coordinates " << mprojectedPointIn2D << ") IS in reference slice" << std::endl;
 
     // 3.2.1 Remember Y cursor position and initial seed point
     //m_ScreenYPositionAtStart = static_cast<int>(positionEvent->GetDisplayPosition()[1]);
@@ -350,13 +355,14 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
  1. Calculate the new thresholds from mouse position (relative to first position)
  2. Perform a new region growing and update the feedback contour
 */
-bool mitk::RegionGrowingTool::OnMouseMoved(Action* action, const StateEvent* stateEvent)
+bool mitk::RegionGrowingTool::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) > 0.0 )
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) > 0.0 )
   {
     if ( m_ReferenceSlice.IsNotNull() && m_OriginalPicSlice )
     {
-      const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+      mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+      //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
       if (positionEvent)
       {
         ApplicationCursor* cursor = ApplicationCursor::GetInstance();
@@ -383,14 +389,15 @@ bool mitk::RegionGrowingTool::OnMouseMoved(Action* action, const StateEvent* sta
 /**
  If the feedback contour should be filled, then it is done here. (Contour is NOT filled, when skeletonization is done but no nice cut was found)
 */
-bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* stateEvent)
+bool mitk::RegionGrowingTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) > 0.0 )
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) > 0.0 )
   {
     // 1. If we have a working slice, use the contour to fill a new piece on segmentation on it (or erase a piece that was selected by ipMITKSegmentationGetCutPoints)
     if ( m_WorkingSlice.IsNotNull() && m_OriginalPicSlice )
     {
-      const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+      mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+      //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
       if (positionEvent)
       {
         // remember parameters for next time

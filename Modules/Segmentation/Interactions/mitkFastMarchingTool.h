@@ -43,6 +43,9 @@ class ModuleResource;
 namespace mitk
 {
 
+  class StateMachineAction;
+  class InteractionEvent;
+
 /**
   \brief FastMarching semgentation tool.
 
@@ -118,7 +121,9 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     FastMarchingTool();
     virtual ~FastMarchingTool();
 
-    virtual float CanHandleEvent( StateEvent const *stateEvent) const;
+    void ConnectActionsAndFunctions();
+
+    //virtual float CanHandleEvent( StateEvent const *stateEvent) const;
 
     virtual void Activated();
     virtual void Deactivated();
@@ -127,10 +132,10 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     virtual void BuildITKPipeline();
 
     /// \brief Add point action of StateMachine pattern
-    virtual bool OnAddPoint (Action*, const StateEvent*);
+    virtual bool OnAddPoint ( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Delete action of StateMachine pattern
-    virtual bool OnDelete (Action*, const StateEvent*);
+    virtual bool OnDelete ( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Reset all relevant inputs of the itk pipeline.
     void Reset();
@@ -144,7 +149,7 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
 
     int m_CurrentTimeStep;
 
-    mitk::PositionEvent* m_PositionEvent;
+    mitk::InteractionPositionEvent::Pointer m_PositionEvent;
 
     float m_LowerThreshold; //used in Threshold filter
     float m_UpperThreshold; //used in Threshold filter

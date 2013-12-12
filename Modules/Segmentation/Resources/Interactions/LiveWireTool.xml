@@ -1,11 +1,9 @@
   <statemachine name="LiveWireTool">
-  
     <state name="Start" ID="1" startstate="true">
       <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="Active" >
         <action name="InitObject" ID="5" />
       </transition>
     </state>
-    
     <state name="Active" ID="2" >
       <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="Active" >
         <action name="AddPoint" ID="10" />

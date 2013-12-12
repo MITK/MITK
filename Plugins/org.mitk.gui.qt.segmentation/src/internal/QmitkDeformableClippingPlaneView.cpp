@@ -45,7 +45,7 @@ QmitkDeformableClippingPlaneView::QmitkDeformableClippingPlaneView()
   , m_ToolManager(NULL)
 {
   //Current fix for bug 10707. Waiting for a solution of bug 10834.
-  itk::Object::Pointer o;
+  itk::LightObject::Pointer o;
   o = mitk::ClippingPlaneRotationTool::New();
   o = mitk::ClippingPlaneDeformationTool::New();
   o = mitk::ClippingPlaneTranslationTool::New();

@@ -168,3 +168,23 @@ void mitk::PixelManipulationTool::AddImageToDataStorage(mitk::Image::Pointer ima
       m_ToolManager->GetDataStorage()->Add(node, m_OriginalImageNode);
   }
 }
+
+void mitk::PixelManipulationTool::SetValue( int value )
+{
+  m_Value = value;
+}
+
+int mitk::PixelManipulationTool::GetValue()
+{
+  return m_Value;
+}
+
+void mitk::PixelManipulationTool::SetFixedValue( int value )
+{
+  m_FixedValue = value;
+}
+
+int mitk::PixelManipulationTool::GetFixedValue()
+{
+  return m_FixedValue;
+}

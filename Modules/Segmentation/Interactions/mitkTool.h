@@ -154,6 +154,8 @@ namespace mitk
     */
     virtual const char* GetGroup() const;
 
+    virtual void InitializeStateMachine();
+
     /**
     * \brief Interface for GUI creation.
     *
@@ -186,6 +188,8 @@ namespace mitk
     friend class ToolManager;
 
     virtual void SetToolManager(ToolManager*);
+
+    void ConnectActionsAndFunctions();
 
     /**
     \brief Called when the tool gets activated (registered to mitk::GlobalInteraction).
@@ -237,6 +241,8 @@ namespace mitk
 
     // for working data
     NodePredicateAnd::Pointer m_IsSegmentationPredicate;
+
+    std::string m_InteractorType;
 
   };
 

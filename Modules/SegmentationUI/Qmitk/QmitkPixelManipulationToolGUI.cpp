@@ -86,7 +86,7 @@ void QmitkPixelManipulationToolGUI::SetFixedValueOff(bool flag)
   if (flag)
   {
     if (m_PixelManipulationTool.IsNotNull())
-      m_PixelManipulationTool->FixedValueOff();
+      m_PixelManipulationTool->SetFixedValue(false);
   }
 }
 
@@ -95,7 +95,7 @@ void QmitkPixelManipulationToolGUI::SetFixedValueOn(bool flag)
   if (flag)
   {
     if (m_PixelManipulationTool.IsNotNull())
-      m_PixelManipulationTool->FixedValueOn();
+      m_PixelManipulationTool->SetFixedValue(true);
   }
 }
 

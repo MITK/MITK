@@ -44,24 +44,28 @@ mitk::Tool::Tool(const char* type)
 , m_PredicateImageColorfulNotHelper( NodePredicateAnd::New(m_PredicateImageColorful, m_PredicateNotHelper) )
 , m_PredicateReference( NodePredicateAnd::New(m_PredicateImage3D, m_PredicateImageColorfulNotHelper) )
 , m_IsSegmentationPredicate(NodePredicateAnd::New(NodePredicateOr::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper))
+, m_InteractorType( type )
 {
-  std::string interactorFilename( type );
-  interactorFilename += ".xml";
-
-  try
-  {
-    LoadStateMachine( interactorFilename, us::GetModuleContext()->GetModule() );
-    SetEventConfig( "SegmentationToolsConfig.xml", us::GetModuleContext()->GetModule() );
-  }
-  catch ( const std::exception& e)
-  {
-    MITK_ERROR << "Could not load statemachine pattern " << interactorFilename;
-  }
 
 }
 
 mitk::Tool::~Tool()
 {
+}
+
+void mitk::Tool::InitializeStateMachine()
+{
+  m_InteractorType += ".xml";
+
+  try
+  {
+    LoadStateMachine( m_InteractorType, us::GetModuleContext()->GetModule() );
+    SetEventConfig( "SegmentationToolsConfig.xml", us::GetModuleContext()->GetModule() );
+  }
+  catch( const std::exception& e )
+  {
+    MITK_ERROR << "Could not load statemachine pattern " << m_InteractorType << " with exception: " << e.what();
+  }
 }
 
 void mitk::Tool::Notify( InteractionEvent* interactionEvent, bool isHandled )
@@ -73,6 +77,11 @@ void mitk::Tool::Notify( InteractionEvent* interactionEvent, bool isHandled )
     this->HandleEvent(interactionEvent, NULL);
   }
 }
+
+void mitk::Tool::ConnectActionsAndFunctions()
+{
+}
+
 
 bool mitk::Tool::FilterEvents(InteractionEvent* , DataNode* )
 {

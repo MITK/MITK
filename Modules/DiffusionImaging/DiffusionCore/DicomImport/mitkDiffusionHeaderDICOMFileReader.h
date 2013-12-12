@@ -22,9 +22,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkLightObject.h>
 #include "mitkDiffusionImage.h"
 
+#include "gdcmScanner.h"
+#include "gdcmReader.h"
+
 namespace mitk
 {
 
+/**
+ * @class DiffusionHeaderDICOMFileReader
+ *
+ * @brief Abstract class for all vendor specific diffusion file header reader
+ *
+ * To provide a diffusion header reader for a new vendor, reimplement the \sa ReadDiffusionHeader method.
+ */
 class DiffusionCore_EXPORT DiffusionHeaderDICOMFileReader
     : public itk::LightObject
 {
@@ -44,6 +54,35 @@ protected:
 
   virtual ~DiffusionHeaderDICOMFileReader();
 };
+
+/**
+ * @brief Retrieve the value of a gdcm tag to the given string
+ *
+ * @param tag the gdcm::Tag to be search for
+ * @param dataset a gdcm::DataSet to look into
+ * @param target a string to store the value of the given tag if found
+ * @param verbose make some output
+ *
+ * @return true if a string was found, false otherwise
+ */
+static bool RevealBinaryTag(const gdcm::Tag tag, const gdcm::DataSet& dataset, std::string& target, bool verbose = true)
+{
+  if( dataset.FindDataElement( tag ) )
+  {
+    if(verbose) MITK_INFO << "Found tag " << tag.PrintAsPipeSeparatedString();
+
+    const gdcm::DataElement& de = dataset.GetDataElement( tag );
+    target = std::string( de.GetByteValue()->GetPointer(),
+                          de.GetByteValue()->GetLength() );
+    return true;
+
+  }
+  else
+  {
+    if(verbose) MITK_INFO << "Could not find tag " << tag.PrintAsPipeSeparatedString();
+    return false;
+  }
+}
 
 } // end namespace mitk
 

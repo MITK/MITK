@@ -27,7 +27,7 @@ bool mitk::AbstractOpenCVImageFilter::FilterImage( cv::Mat& image, int id )
   if (id < INVALID_IMAGE_ID) { id = INVALID_IMAGE_ID; }
 
   m_CurrentImageId = id;
-  return this->FilterImage(image);
+  return this->OnFilterImage(image);
 }
 
 int mitk::AbstractOpenCVImageFilter::GetCurrentImageId()

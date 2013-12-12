@@ -117,7 +117,7 @@ mitk::DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vec
 }
 
 bool
-mitk::DICOMStringToSpacing(const std::string& s, float& spacingX, float& spacingY)
+mitk::DICOMStringToSpacing(const std::string& s, ScalarType& spacingX, ScalarType& spacingY)
 {
   bool successful = false;
 

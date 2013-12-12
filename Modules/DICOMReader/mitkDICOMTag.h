@@ -55,7 +55,7 @@ typedef std::vector<DICOMTag> DICOMTagList;
  */
 void DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up, bool& successful);
 
-bool DICOMStringToSpacing(const std::string& s, float& spacingX, float& spacingY);
+bool DICOMStringToSpacing(const std::string& s, ScalarType& spacingX, ScalarType& spacingY);
 
 
 /**

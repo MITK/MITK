@@ -71,6 +71,8 @@ mitk::GantryTiltInformation::GantryTiltInformation(
     MITK_DEBUG << "  Series seems to contain a tilted (or sheared) geometry";
     MITK_DEBUG << "  Distance of expected slice origin from actual slice origin: " << distance;
     MITK_DEBUG << "    ==> storing this shift for later analysis:";
+    MITK_DEBUG << "    v origin1: " << origin1;
+    MITK_DEBUG << "    v origin2: " << origin2;
     MITK_DEBUG << "    v right: " << right;
     MITK_DEBUG << "    v up: " << up;
     MITK_DEBUG << "    v normal: " << normal;
@@ -122,6 +124,19 @@ mitk::GantryTiltInformation::GantryTiltInformation(
   }
 }
 
+void
+mitk::GantryTiltInformation
+::Print(std::ostream& os) const
+{
+  os << "  calculated from slices " << m_NumberOfSlicesApart << " slices apart " << std::endl;
+  os << "  shift normal: " << m_ShiftNormal << std::endl;
+  os << "  shift normal assumed by ITK: " << m_ITKAssumedSliceSpacing << std::endl;
+  os << "  shift up: " << m_ShiftUp << std::endl;
+  os << "  shift right: " << m_ShiftRight << std::endl;
+
+  os << "  tilt angle (deg): " << atan( m_ShiftUp / m_ShiftNormal ) * 180.0 / 3.1415926535 << std::endl;
+}
+
 mitk::Point3D
 mitk::GantryTiltInformation::projectPointOnLine( Point3Dd p, Point3Dd lineOrigin, Vector3Dd lineDirection )
 {
@@ -141,9 +156,9 @@ mitk::GantryTiltInformation::projectPointOnLine( Point3Dd p, Point3Dd lineOrigin
 }
 
 double
-mitk::GantryTiltInformation::GetTiltCorrectedAdditionalSize() const
+mitk::GantryTiltInformation::GetTiltCorrectedAdditionalSize(unsigned int imageSizeZ) const
 {
-  return fabs(m_ShiftUp);
+  return fabs(m_ShiftUp /  static_cast<double>(m_NumberOfSlicesApart) * static_cast<double>(imageSizeZ-1)); // TODO care for SIZE of image
 }
 
 double

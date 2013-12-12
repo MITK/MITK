@@ -13,7 +13,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkEquiDistantBlocksSorter.h"
-#include "mitkGantryTiltInformation.h"
 
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
 ::SliceGroupingAnalysisResult()
@@ -65,9 +64,31 @@ mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
 
 void
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
-::FlagGantryTilt()
+::SetFirstFilenameOfBlock(const std::string& filename)
+{
+  m_FirstFilenameOfBlock = filename;
+}
+
+std::string
+mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
+::GetFirstFilenameOfBlock() const
+{
+  return m_FirstFilenameOfBlock;
+}
+
+void
+mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
+::FlagGantryTilt(const GantryTiltInformation& tiltInfo)
 {
   m_GantryTilt = true;
+  m_TiltInfo = tiltInfo;
+}
+
+const mitk::GantryTiltInformation&
+mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
+::GetTiltInfo() const
+{
+  return m_TiltInfo;
 }
 
 void
@@ -84,6 +105,14 @@ mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
 mitk::EquiDistantBlocksSorter
 ::EquiDistantBlocksSorter()
 :DICOMDatasetSorter()
+,m_AcceptTilt(false)
+{
+}
+
+mitk::EquiDistantBlocksSorter
+::EquiDistantBlocksSorter(const EquiDistantBlocksSorter& other )
+:DICOMDatasetSorter(other)
+,m_AcceptTilt(false)
 {
 }
 
@@ -92,11 +121,13 @@ mitk::EquiDistantBlocksSorter
 {
 }
 
+void
 mitk::EquiDistantBlocksSorter
-::EquiDistantBlocksSorter(const EquiDistantBlocksSorter& other )
-:DICOMDatasetSorter(other)
+::SetAcceptTilt(bool accept)
 {
+  m_AcceptTilt = accept;
 }
+
 
 mitk::EquiDistantBlocksSorter&
 mitk::EquiDistantBlocksSorter
@@ -116,6 +147,7 @@ mitk::EquiDistantBlocksSorter
   DICOMTagList tags;
   tags.push_back( DICOMTag(0x0020, 0x0032) ); // ImagePositionPatient
   tags.push_back( DICOMTag(0x0020, 0x0037) ); // ImageOrientationPatient
+  tags.push_back( DICOMTag(0x0018, 0x1120) ); // GantryTilt
 
   return tags;
 }
@@ -126,14 +158,14 @@ mitk::EquiDistantBlocksSorter
 {
   DICOMDatasetList remainingInput = GetInput(); // copy
 
-  bool acceptGantryTilt = false; // TODO
-
   typedef std::list<DICOMDatasetList> OutputListType;
   OutputListType outputs;
 
+  m_SliceGroupingResults.clear();
+
   while (!remainingInput.empty()) // repeat until all files are grouped somehow
   {
-    SliceGroupingAnalysisResult regularBlock = this->AnalyzeFileForITKImageSeriesReaderSpacingAssumption( remainingInput, acceptGantryTilt );
+    SliceGroupingAnalysisResult regularBlock = this->AnalyzeFileForITKImageSeriesReaderSpacingAssumption( remainingInput, m_AcceptTilt );
 
     DICOMDatasetList inBlock = regularBlock.GetBlockFilenames();
     DICOMDatasetList laterBlock = regularBlock.GetUnsortedFilenames();
@@ -144,6 +176,7 @@ mitk::EquiDistantBlocksSorter
       MITK_DEBUG << " OUT  " << (*diter)->GetFilenameIfAvailable();
 
     outputs.push_back( regularBlock.GetBlockFilenames() );
+    m_SliceGroupingResults.push_back( regularBlock );
     remainingInput = regularBlock.GetUnsortedFilenames();
   }
 
@@ -157,6 +190,29 @@ mitk::EquiDistantBlocksSorter
   {
     this->SetOutput(outputIndex, *oIter);
   }
+}
+
+const mitk::GantryTiltInformation
+mitk::EquiDistantBlocksSorter
+::GetTiltInformation(const std::string& filename, bool& hasTiltInfo)
+{
+  for (ResultsList::iterator ri = m_SliceGroupingResults.begin();
+       ri != m_SliceGroupingResults.end();
+       ++ri)
+  {
+    SliceGroupingAnalysisResult& result = *ri;
+
+    if (filename == result.GetFirstFilenameOfBlock())
+    {
+      hasTiltInfo = result.ContainsGantryTilt(); // this is a returning statement, don't remove
+      if (hasTiltInfo)
+      {
+        return result.GetTiltInfo();
+      }
+    }
+  }
+
+  return GantryTiltInformation(); // empty
 }
 
 std::string
@@ -280,14 +336,19 @@ mitk::EquiDistantBlocksSorter
 
           if ( groupImagesWithGantryTilt && tiltInfo.IsRegularGantryTilt() )
           {
-            bool todoIsDone(false); // TODO add GantryTilt reading
             // check if this is at least roughly the same angle as recorded in DICOM tags
-            if ( todoIsDone /*&& tagValueMappings[dsIter->c_str()].find(tagGantryTilt) != tagValueMappings[dsIter->c_str()].end() */)
+            double angle = 0.0;
+            std::string tiltStr = (*dsIter)->GetTagValueAsString( tagGantryTilt );
+            const char* convertInput = tiltStr.c_str();
+            char* convertEnd(NULL);
+            if (!tiltStr.empty())
             {
               // read value, compare to calculated angle
-              std::string tiltStr = (*dsIter)->GetTagValueAsString( tagGantryTilt );
-              double angle = atof(tiltStr.c_str());
+              angle = strtod(convertInput, &convertEnd); // TODO check errors!
+            }
 
+            if (convertEnd != convertInput)
+            {
               MITK_DEBUG << "Comparing recorded tilt angle " << angle << " against calculated value " << tiltInfo.GetTiltAngleInDegrees();
               // TODO we probably want the signs correct, too (that depends: this is just a rough check, nothing serious)
               if ( fabs(angle) - tiltInfo.GetTiltAngleInDegrees() > 0.25)
@@ -297,15 +358,21 @@ mitk::EquiDistantBlocksSorter
               }
               else  // tilt angle from header is less than 0.25 degrees different from what we calculated, assume this is fine
               {
-                result.FlagGantryTilt();
+                assert(!datasets.empty());
+
+                result.FlagGantryTilt(tiltInfo);
                 result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
+                result.SetFirstFilenameOfBlock( datasets.front()->GetFilenameIfAvailable() );
                 fileFitsIntoPattern = true;
               }
             }
             else // we cannot check the calculated tilt angle against the one from the dicom header (so we assume we are right)
             {
-              result.FlagGantryTilt();
+              assert(!datasets.empty());
+
+              result.FlagGantryTilt(tiltInfo);
               result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
+              result.SetFirstFilenameOfBlock( datasets.front()->GetFilenameIfAvailable() );
               fileFitsIntoPattern = true;
             }
           }

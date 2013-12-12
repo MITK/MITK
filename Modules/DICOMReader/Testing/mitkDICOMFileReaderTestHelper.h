@@ -138,10 +138,10 @@ static void TestMitkImagesAreLoaded(DICOMFileReader* reader)
     const DICOMImageFrameList& outputFiles = block.GetImageFrameList();
     mitk::Image::Pointer mitkImage = block.GetMitkImage();
 
-    MITK_INFO << "-------------------------------------------";
-    MITK_INFO << "Output " << o << " at " << (void*) mitkImage.GetPointer();
-    MITK_INFO << "  Number of files: " << outputFiles.size();
-    MITK_INFO << "  Dimensions: " << mitkImage->GetDimension(0) << " " << mitkImage->GetDimension(1) << " " << mitkImage->GetDimension(2);
+    MITK_DEBUG << "-------------------------------------------";
+    MITK_DEBUG << "Output " << o << " at " << (void*) mitkImage.GetPointer();
+    MITK_DEBUG << "  Number of files: " << outputFiles.size();
+    MITK_DEBUG << "  Dimensions: " << mitkImage->GetDimension(0) << " " << mitkImage->GetDimension(1) << " " << mitkImage->GetDimension(2);
   }
 }
 

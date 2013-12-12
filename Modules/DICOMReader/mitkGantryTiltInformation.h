@@ -46,6 +46,8 @@ class GantryTiltInformation
      */
     GantryTiltInformation();
 
+    void Print(std::ostream& os) const;
+
     /**
       \brief THE constructor, which does all the calculations.
 
@@ -101,7 +103,7 @@ class GantryTiltInformation
 
       Needed to resize an orthogonal image volume.
      */
-    double GetTiltCorrectedAdditionalSize() const;
+    double GetTiltCorrectedAdditionalSize(unsigned int imageSizeZ) const; // TODO: imageSizeZ is a bit of a loss of information: when loading, GantryTiltInformation *should* be initialized with the most distant slices
 
     /**
       \brief Calculated tilt angle in degrees.

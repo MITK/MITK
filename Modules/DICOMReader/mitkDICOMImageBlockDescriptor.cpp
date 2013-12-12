@@ -22,6 +22,7 @@ mitk::DICOMImageBlockDescriptor
 ,m_PixelSpacingInterpretation()
 ,m_PixelSpacing("")
 ,m_ImagerPixelSpacing("")
+,m_HasGantryTilt( false )
 {
 }
 
@@ -39,6 +40,8 @@ mitk::DICOMImageBlockDescriptor
 ,m_PixelSpacingInterpretation( other.m_PixelSpacingInterpretation )
 ,m_PixelSpacing( other.m_PixelSpacing )
 ,m_ImagerPixelSpacing( other.m_ImagerPixelSpacing )
+,m_HasGantryTilt( other.m_HasGantryTilt )
+,m_TiltInformation( other.m_TiltInformation )
 {
   if (m_MitkImage)
   {
@@ -59,6 +62,8 @@ mitk::DICOMImageBlockDescriptor
     m_PixelSpacingInterpretation = other.m_PixelSpacingInterpretation;
     m_PixelSpacing = other.m_PixelSpacing;
     m_ImagerPixelSpacing = other.m_ImagerPixelSpacing;
+    m_HasGantryTilt = other.m_HasGantryTilt;
+    m_TiltInformation = other.m_TiltInformation;
 
     if (m_MitkImage)
     {
@@ -66,6 +71,34 @@ mitk::DICOMImageBlockDescriptor
     }
   }
   return *this;
+}
+
+bool
+mitk::DICOMImageBlockDescriptor
+::HasGantryTilt() const
+{
+  return m_HasGantryTilt;
+}
+
+bool
+mitk::DICOMImageBlockDescriptor
+::SetHasGantryTilt(bool hasi)
+{
+  m_HasGantryTilt = hasi;
+}
+
+void
+mitk::DICOMImageBlockDescriptor
+::SetTiltInformation(const GantryTiltInformation& info)
+{
+  m_TiltInformation = info;
+}
+
+const mitk::GantryTiltInformation
+mitk::DICOMImageBlockDescriptor
+::GetTiltInformation() const
+{
+  return m_TiltInformation;
 }
 
 void

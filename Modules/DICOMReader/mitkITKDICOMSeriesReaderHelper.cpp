@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::Image::Pointer
 mitk::ITKDICOMSeriesReaderHelper
-::Load( const StringContainer& filenames, bool correctTilt, bool itkNotUsed(tiltInfo) )
+::Load( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo )
 {
   if( filenames.empty() )
   {
@@ -29,7 +29,6 @@ mitk::ITKDICOMSeriesReaderHelper
 
   DcmIoType::Pointer io = DcmIoType::New();
 
-  GantryTiltInformation tiltInfo; // TODO
   Image::Pointer preLoadedImageBlock; // TODO
 
   try

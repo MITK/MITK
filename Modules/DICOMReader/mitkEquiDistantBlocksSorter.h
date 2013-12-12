@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMDatasetSorter.h"
 #include "mitkDICOMSortCriterion.h"
+#include "mitkGantryTiltInformation.h"
 
 #include "mitkVector.h"
 
@@ -43,6 +44,9 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
 
     virtual void Sort();
 
+    void SetAcceptTilt(bool accept);
+    const GantryTiltInformation GetTiltInformation(const std::string& filename, bool& hasTiltInfo); // TODO ugly, but bool flag will be removed
+
   protected:
 
     /**
@@ -65,6 +69,9 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
          */
         DICOMDatasetList GetBlockFilenames();
 
+        void SetFirstFilenameOfBlock(const std::string& filename);
+        std::string GetFirstFilenameOfBlock() const;
+
         /**
           \brief Remaining files, which could not be grouped.
          */
@@ -74,6 +81,11 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
           \brief Wheter or not the grouped result contain a gantry tilt.
          */
         bool ContainsGantryTilt();
+
+        /**
+          \brief Detailed description of gantry tilt.
+        */
+        const GantryTiltInformation& GetTiltInfo() const;
 
         /**
           \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
@@ -90,7 +102,7 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
           \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
           \todo Could make sense to enhance this with an instance of GantryTiltInformation to store the whole result!
          */
-        void FlagGantryTilt();
+        void FlagGantryTilt(const GantryTiltInformation& tiltInfo);
 
         /**
           \brief Only meaningful for use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption.
@@ -102,7 +114,9 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
         DICOMDatasetList m_GroupedFiles;
         DICOMDatasetList m_UnsortedFiles;
 
-        bool m_GantryTilt;
+        bool m_GantryTilt; // TODO make the flag part of GantryTiltInformation!
+        GantryTiltInformation m_TiltInfo;
+        std::string m_FirstFilenameOfBlock;
     };
 
     /**
@@ -130,6 +144,11 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
 
     EquiDistantBlocksSorter(const EquiDistantBlocksSorter& other);
     EquiDistantBlocksSorter& operator=(const EquiDistantBlocksSorter& other);
+
+    bool m_AcceptTilt;
+
+    typedef std::vector<SliceGroupingAnalysisResult> ResultsList;
+    ResultsList m_SliceGroupingResults;
 };
 
 }

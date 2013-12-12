@@ -71,9 +71,10 @@ mitk::TestDICOMLoading
   ImageList result;
 
   ClassicDICOMSeriesReader::Pointer reader = ClassicDICOMSeriesReader::New();
+  reader->SetFixTiltByShearing(true);
   reader->SetInputFiles( files );
   reader->AnalyzeInputFiles();
-  reader->PrintOutputs(std::cout);
+  reader->PrintOutputs(std::cout,true);
   reader->LoadImages();
 
   unsigned int numberOfImages = reader->GetNumberOfOutputs();

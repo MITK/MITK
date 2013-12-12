@@ -21,11 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMDatasetSorter.h"
 
 #include "mitkDICOMGDCMImageFrameInfo.h"
+#include "mitkEquiDistantBlocksSorter.h"
 
 #include "DICOMReaderExports.h"
 
 // TODO ensure "C" locale!!
-// TODO tilt
 // TODO 3D+t
 
 namespace mitk
@@ -47,6 +47,8 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     virtual bool CanHandleFile(const std::string& filename);
 
     virtual void AddSortingElement(DICOMDatasetSorter* sorter);
+
+    void SetFixTiltByShearing(bool on);
 
   protected:
 
@@ -72,6 +74,8 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 
     typedef std::list<DICOMDatasetSorter::Pointer> SorterList;
     SorterList m_Sorter;
+
+    mitk::EquiDistantBlocksSorter::Pointer m_EquiDistantBlocksSorter;
 };
 
 }

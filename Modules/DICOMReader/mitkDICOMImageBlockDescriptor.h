@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImage.h"
 
+#include "mitkGantryTiltInformation.h"
+
 namespace mitk
 {
 
@@ -55,6 +57,12 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
     void SetPixelSpacingInformation(const std::string& pixelSpacing, const std::string& imagerPixelSpacing);
     void GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const;
 
+    bool HasGantryTilt() const;
+    bool SetHasGantryTilt(bool hasi);
+
+    void SetTiltInformation(const GantryTiltInformation& info);
+    const GantryTiltInformation GetTiltInformation() const;
+
   private:
 
     DICOMImageFrameList m_ImageFrameList;
@@ -65,6 +73,9 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
 
     std::string m_PixelSpacing;
     std::string m_ImagerPixelSpacing;
+
+    bool m_HasGantryTilt;
+    GantryTiltInformation m_TiltInformation;
 };
 
 }

@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMITKSeriesGDCMReader.h"
 #include "mitkITKDICOMSeriesReaderHelper.h"
-#include "mitkEquiDistantBlocksSorter.h"
+#include "mitkGantryTiltInformation.h"
 
 #include <itkTimeProbesCollectorBase.h>
 
@@ -52,6 +52,13 @@ mitk::DICOMITKSeriesGDCMReader
     DICOMFileReader::operator=(other);
   }
   return *this;
+}
+
+void
+mitk::DICOMITKSeriesGDCMReader
+::SetFixTiltByShearing(bool on)
+{
+  m_FixTiltByShearing = on;
 }
 
 mitk::DICOMGDCMImageFrameList
@@ -241,19 +248,24 @@ mitk::DICOMITKSeriesGDCMReader
   {
     DICOMGDCMImageFrameList& gdcmFrameInfoList = *blockIter;
     DICOMImageFrameList frameList = ToDICOMImageFrameList( gdcmFrameInfoList );
+    assert(!gdcmFrameInfoList.empty());
+    assert(!frameList.empty());
 
     DICOMImageBlockDescriptor block;
     block.SetImageFrameList( frameList );
 
-    if (!gdcmFrameInfoList.empty())
-    {
-      // assume
-      static const DICOMTag tagPixelSpacing(0x0028,0x0030);
-      static const DICOMTag tagImagerPixelSpacing(0x0018,0x1164);
-      std::string pixelSpacingString = (gdcmFrameInfoList.front())->GetTagValueAsString( tagPixelSpacing );
-      std::string imagerPixelSpacingString = gdcmFrameInfoList.front()->GetTagValueAsString( tagImagerPixelSpacing );
-      block.SetPixelSpacingInformation(pixelSpacingString, imagerPixelSpacingString);
-    }
+    bool hasTilt = false;
+    const GantryTiltInformation& tiltInfo = m_EquiDistantBlocksSorter->GetTiltInformation( (gdcmFrameInfoList.front())->GetFilenameIfAvailable(), hasTilt );
+    block.SetHasGantryTilt( hasTilt );
+    block.SetTiltInformation( tiltInfo );
+
+    // assume
+    static const DICOMTag tagPixelSpacing(0x0028,0x0030);
+    static const DICOMTag tagImagerPixelSpacing(0x0018,0x1164);
+    std::string pixelSpacingString = (gdcmFrameInfoList.front())->GetTagValueAsString( tagPixelSpacing );
+    std::string imagerPixelSpacingString = gdcmFrameInfoList.front()->GetTagValueAsString( tagImagerPixelSpacing );
+    block.SetPixelSpacingInformation(pixelSpacingString, imagerPixelSpacingString);
+
     this->SetOutput( o, block );
   }
   timer.Stop("Output");
@@ -276,9 +288,17 @@ mitk::DICOMITKSeriesGDCMReader
   {
     DICOMImageBlockDescriptor& block = this->InternalGetOutput(o);
     const DICOMImageFrameList& frames = block.GetImageFrameList();
-
-    bool correctTilt = false; // TODO
-    bool tiltInfo = false; // TODO
+    const GantryTiltInformation tiltInfo = block.GetTiltInformation();
+    bool hasTilt = block.HasGantryTilt();
+    if (hasTilt)
+    {
+      MITK_DEBUG << "When loading image " << o << ": got tilt info:";
+      tiltInfo.Print(std::cout);
+    }
+    else
+    {
+      MITK_DEBUG << "When loading image " << o << ": has NO info.";
+    }
 
     ITKDICOMSeriesReaderHelper::StringContainer filenames;
     for (DICOMImageFrameList::const_iterator frameIter = frames.begin();
@@ -288,7 +308,7 @@ mitk::DICOMITKSeriesGDCMReader
       filenames.push_back( (*frameIter)->Filename );
     }
 
-    mitk::Image::Pointer mitkImage = helper.Load( filenames, correctTilt, tiltInfo ); // TODO preloaded images, caching..?
+    mitk::Image::Pointer mitkImage = helper.Load( filenames, m_FixTiltByShearing && hasTilt, tiltInfo ); // TODO preloaded images, caching..?
 
     Vector3D imageSpacing = mitkImage->GetGeometry()->GetSpacing();
 
@@ -330,6 +350,12 @@ mitk::DICOMITKSeriesGDCMReader
 ::EnsureMandatorySortersArePresent()
 {
   // TODO: cols, rows, etc. are also not optional
-  mitk::EquiDistantBlocksSorter::Pointer distanceKeeper = mitk::EquiDistantBlocksSorter::New();
-  this->AddSortingElement( distanceKeeper );
+  if (m_EquiDistantBlocksSorter.IsNull())
+  {
+    m_EquiDistantBlocksSorter = mitk::EquiDistantBlocksSorter::New();
+  }
+  m_EquiDistantBlocksSorter->SetAcceptTilt( m_FixTiltByShearing );
+
+  // TODO CHECK
+  this->AddSortingElement( m_EquiDistantBlocksSorter );
 }

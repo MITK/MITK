@@ -42,11 +42,11 @@ mitk::ITKDICOMSeriesReaderHelper
   typename ReaderType::Pointer reader = ReaderType::New();
 
   reader->SetImageIO(io);
+  reader->ReverseOrderOff();
 
   if (preLoadedImageBlock.IsNull())
   {
     reader->SetFileNames(filenames);
-    reader->ReverseOrderOff();
     reader->Update();
     typename ImageType::Pointer readVolume = reader->GetOutput();
 
@@ -84,6 +84,7 @@ typename ImageType::Pointer
 mitk::ITKDICOMSeriesReaderHelper
 ::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo )
 {
+  tiltInfo.Print(std::cout);
   typedef itk::ResampleImageFilter<ImageType,ImageType> ResampleFilterType;
   typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
   resampler->SetInput( input );
@@ -166,8 +167,11 @@ mitk::ITKDICOMSeriesReaderHelper
 
   // in any case we need more size to accomodate shifted slices
   typename ImageType::SizeType largerSize = resampler->GetSize(); // now the resampler already holds the input image's size.
-  largerSize[1] += static_cast<typename ImageType::SizeType::SizeValueType>(tiltInfo.GetTiltCorrectedAdditionalSize() / input->GetSpacing()[1]+ 2.0);
+  double imageSizeZ = largerSize[2];
+  MITK_DEBUG <<"Calculate lager size = " << largerSize[1] << " + " << tiltInfo.GetTiltCorrectedAdditionalSize(imageSizeZ) << " / " << input->GetSpacing()[1] << "+ 2.0";
+  largerSize[1] += static_cast<typename ImageType::SizeType::SizeValueType>(tiltInfo.GetTiltCorrectedAdditionalSize(imageSizeZ) / input->GetSpacing()[1]+ 2.0);
   resampler->SetSize( largerSize );
+  MITK_DEBUG << "Fix Y size of image w/ spacing " << input->GetSpacing()[1] << " from " << input->GetLargestPossibleRegion().GetSize()[1] << " to " << largerSize[1];
 
   // in SOME cases this additional size is below/behind origin
   if ( tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates() > 0.0 )
@@ -183,9 +187,9 @@ mitk::ITKDICOMSeriesReaderHelper
     shiftedOrigin = input->GetOrigin();
 
     // add some pixels to make everything fit
-    shiftedOrigin[0] -= yDirection[0] * (tiltInfo.GetTiltCorrectedAdditionalSize() + 1.0 * input->GetSpacing()[1]);
-    shiftedOrigin[1] -= yDirection[1] * (tiltInfo.GetTiltCorrectedAdditionalSize() + 1.0 * input->GetSpacing()[1]);
-    shiftedOrigin[2] -= yDirection[2] * (tiltInfo.GetTiltCorrectedAdditionalSize() + 1.0 * input->GetSpacing()[1]);
+    shiftedOrigin[0] -= yDirection[0] * (tiltInfo.GetTiltCorrectedAdditionalSize(imageSizeZ) + 1.0 * input->GetSpacing()[1]);
+    shiftedOrigin[1] -= yDirection[1] * (tiltInfo.GetTiltCorrectedAdditionalSize(imageSizeZ) + 1.0 * input->GetSpacing()[1]);
+    shiftedOrigin[2] -= yDirection[2] * (tiltInfo.GetTiltCorrectedAdditionalSize(imageSizeZ) + 1.0 * input->GetSpacing()[1]);
 
     resampler->SetOutputOrigin( shiftedOrigin );
   }

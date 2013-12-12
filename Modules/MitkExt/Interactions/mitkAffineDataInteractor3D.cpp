@@ -16,19 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAffineDataInteractor3D.h"
 
-#include "mitkDispatcher.h"
-#include "mitkInteractionConst.h" // TODO: refactor file
+#include "mitkInteractionConst.h"
 #include "mitkInteractionPositionEvent.h"
-#include "mitkInternalEvent.h"
-#include "mitkMouseMoveEvent.h"
-#include "mitkRenderingManager.h"
 #include "mitkRotationOperation.h"
 #include "mitkSurface.h"
 
-#include <mitkPointOperation.h>
-
 #include <vtkCamera.h>
-#include <vtkDataArray.h>
 #include <vtkInteractorStyle.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
@@ -50,9 +43,7 @@ mitk::AffineDataInteractor3D::~AffineDataInteractor3D()
 
 void mitk::AffineDataInteractor3D::ConnectActionsAndFunctions()
 {
-  // **Conditions** that can be used in the state machine,
-  // to ensure that certain conditions are met, before
-  // actually executing an action
+  // **Conditions** that can be used in the state machine, to ensure that certain conditions are met, before actually executing an action
   CONNECT_CONDITION("isOverObject", CheckOverObject);
 
   // **Function** in the statmachine patterns also referred to as **Actions**
@@ -70,19 +61,14 @@ void mitk::AffineDataInteractor3D::DataNodeChanged()
 
 bool mitk::AffineDataInteractor3D::CheckOverObject(const InteractionEvent* interactionEvent)
 {
-  ////Is only a copy of the old AffineInteractor3D. Not sure if is still needed.
-  ////Re-enable VTK interactor (may have been disabled previously)
   const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
     return false;
 
-  m_CurrentPickedPoint = positionEvent->GetPositionInWorld();
-  m_CurrentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
-
-  if(interactionEvent->GetSender()->PickObject( m_CurrentPickedDisplayPoint, m_CurrentPickedPoint ) == this->GetDataNode().GetPointer())
-  {
+  Point3D currentPickedPoint;
+  if(interactionEvent->GetSender()->PickObject(positionEvent->GetPointerPositionOnScreen(), currentPickedPoint) == this->GetDataNode().GetPointer())
     return true;
-  }
+
   return false;
 }
 
@@ -93,13 +79,12 @@ bool mitk::AffineDataInteractor3D::SelectObject(StateMachineAction*, Interaction
   if (node.IsNull())
     return false;
 
-  node->SetColor( 1.0, 0.0, 0.0 );
-  //TODO: Only 3D reinit
-  RenderingManager::GetInstance()->RequestUpdateAll();
+  node->SetColor(1.0, 0.0, 0.0);
 
   // Colorize surface / wireframe dependend on distance from picked point
-  //TODO Check the return value
-  this->ColorizeSurface( interactionEvent->GetSender(), 0.0 );
+  this->ColorizeSurface(interactionEvent->GetSender(), 0.0);
+
+  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 
   return true;
 }
@@ -112,12 +97,11 @@ bool mitk::AffineDataInteractor3D::DeselectObject(StateMachineAction*, Interacti
     return false;
 
   node->SetColor( 1.0, 1.0, 1.0 );
-  //TODO: Only 3D reinit
-  RenderingManager::GetInstance()->RequestUpdateAll();
 
   // Colorize surface / wireframe as inactive
-  //TODO Check the return value
-  this->ColorizeSurface( interactionEvent->GetSender(), -1.0 );
+  this->ColorizeSurface(interactionEvent->GetSender(), -1.0);
+
+  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 
   return true;
 }
@@ -128,11 +112,8 @@ bool mitk::AffineDataInteractor3D::InitTranslate(StateMachineAction*, Interactio
   if(positionEvent == NULL)
     return false;
 
-  m_CurrentPickedPoint = positionEvent->GetPositionInWorld();
-  m_CurrentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
-
-  m_InitialPickedPoint = m_CurrentPickedPoint;
-  m_InitialPickedDisplayPoint = m_CurrentPickedDisplayPoint;
+  m_InitialPickedPoint = positionEvent->GetPositionInWorld();
+  m_InitialPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
 
   // Get the timestep to also support 3D+t
   int timeStep = 0;
@@ -141,7 +122,7 @@ bool mitk::AffineDataInteractor3D::InitTranslate(StateMachineAction*, Interactio
 
   // Make deep copy of current Geometry3D of the plane
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // make sure that the Geometry is up-to-date
-  m_OriginalGeometry = static_cast< Geometry3D * >(this->GetDataNode()->GetData()->GetGeometry( timeStep )->Clone().GetPointer() );
+  m_OriginalGeometry = static_cast<Geometry3D*>(this->GetDataNode()->GetData()->GetGeometry(timeStep)->Clone().GetPointer());
 
   return true;
 }
@@ -152,20 +133,16 @@ bool mitk::AffineDataInteractor3D::InitRotate(StateMachineAction*, InteractionEv
   if(positionEvent == NULL)
     return false;
 
-  m_CurrentPickedPoint = positionEvent->GetPositionInWorld();
-  m_CurrentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
-
-  m_InitialPickedPoint = m_CurrentPickedPoint;
-  m_InitialPickedDisplayPoint = m_CurrentPickedDisplayPoint;
+  m_InitialPickedPoint = positionEvent->GetPositionInWorld();
+  m_InitialPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
 
   // Get the timestep to also support 3D+t
-  int timeStep = 0;
-  if ((interactionEvent->GetSender()) != NULL)
-    timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
   // Make deep copy of current Geometry3D of the plane
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // make sure that the Geometry is up-to-date
-  m_OriginalGeometry = static_cast< Geometry3D * >(this->GetDataNode()->GetData()->GetGeometry( timeStep )->Clone().GetPointer() );
+  m_OriginalGeometry = static_cast<Geometry3D*>(this->GetDataNode()->GetData()->GetGeometry(timeStep)->Clone().GetPointer());
+
   return true;
 }
 
@@ -175,20 +152,17 @@ bool mitk::AffineDataInteractor3D::TranslateObject (StateMachineAction*, Interac
   if(positionEvent == NULL)
     return false;
 
-  m_CurrentPickedPoint = positionEvent->GetPositionInWorld();
-  m_CurrentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+  Point3D currentPickedPoint = positionEvent->GetPositionInWorld();
 
   Vector3D interactionMove;
-  interactionMove[0] = m_CurrentPickedPoint[0] - m_InitialPickedPoint[0];
-  interactionMove[1] = m_CurrentPickedPoint[1] - m_InitialPickedPoint[1];
-  interactionMove[2] = m_CurrentPickedPoint[2] - m_InitialPickedPoint[2];
+  interactionMove[0] = currentPickedPoint[0] - m_InitialPickedPoint[0];
+  interactionMove[1] = currentPickedPoint[1] - m_InitialPickedPoint[1];
+  interactionMove[2] = currentPickedPoint[2] - m_InitialPickedPoint[2];
 
   Point3D origin = m_OriginalGeometry->GetOrigin();
 
   // Get the timestep to also support 3D+t
-  int timeStep = 0;
-  if ((interactionEvent->GetSender()) != NULL)
-    timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
   // If data is an mitk::Surface, extract it
   Surface::Pointer surface = dynamic_cast< Surface* >(this->GetDataNode()->GetData());
@@ -201,7 +175,7 @@ bool mitk::AffineDataInteractor3D::TranslateObject (StateMachineAction*, Interac
     vtkPointData* pointData = polyData->GetPointData();
     if (pointData != NULL)
     {
-      vtkDataArray* normal = polyData->GetPointData()->GetVectors( "planeNormal" );
+      vtkDataArray* normal = polyData->GetPointData()->GetVectors("planeNormal");
       if (normal != NULL)
       {
         m_ObjectNormal[0] = normal->GetComponent( 0, 0 );
@@ -212,14 +186,11 @@ bool mitk::AffineDataInteractor3D::TranslateObject (StateMachineAction*, Interac
   }
 
   Vector3D transformedObjectNormal;
-  this->GetDataNode()->GetData()->GetGeometry( timeStep )->IndexToWorld(
-    m_ObjectNormal, transformedObjectNormal );
+  this->GetDataNode()->GetData()->GetGeometry( timeStep )->IndexToWorld(m_ObjectNormal, transformedObjectNormal);
 
-  this->GetDataNode()->GetData()->GetGeometry( timeStep )->SetOrigin(
-    origin + transformedObjectNormal * (interactionMove * transformedObjectNormal) );
+  this->GetDataNode()->GetData()->GetGeometry( timeStep )->SetOrigin(origin + transformedObjectNormal * (interactionMove * transformedObjectNormal));
 
-  //TODO: Only 3D reinit
-  RenderingManager::GetInstance()->RequestUpdateAll();
+  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 
   return true;
 }
@@ -230,22 +201,22 @@ bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, Interactio
   if(positionEvent == NULL)
     return false;
 
-  m_CurrentPickedPoint = positionEvent->GetPositionInWorld();
-  m_CurrentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+  Point2D currentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+  Point3D currentPickedPoint = positionEvent->GetPositionInWorld();
 
   vtkCamera* camera = NULL;
-  vtkRenderer *currentVtkRenderer = NULL;
+  vtkRenderer* currentVtkRenderer = NULL;
 
   if ((interactionEvent->GetSender()) != NULL)
   {
     vtkRenderWindow* renderWindow = interactionEvent->GetSender()->GetRenderWindow();
-    if ( renderWindow != NULL )
+    if (renderWindow != NULL)
     {
       vtkRenderWindowInteractor* renderWindowInteractor = renderWindow->GetInteractor();
       if ( renderWindowInteractor != NULL )
       {
         currentVtkRenderer = renderWindowInteractor->GetInteractorStyle()->GetCurrentRenderer();
-        if ( currentVtkRenderer != NULL )
+        if (currentVtkRenderer != NULL)
           camera = currentVtkRenderer->GetActiveCamera();
       }
     }
@@ -261,26 +232,24 @@ bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, Interactio
     viewPlaneNormal[2] = vpn[2];
 
     Vector3D interactionMove;
-    interactionMove[0] = m_CurrentPickedPoint[0] - m_InitialPickedPoint[0];
-    interactionMove[1] = m_CurrentPickedPoint[1] - m_InitialPickedPoint[1];
-    interactionMove[2] = m_CurrentPickedPoint[2] - m_InitialPickedPoint[2];
+    interactionMove[0] = currentPickedPoint[0] - m_InitialPickedPoint[0];
+    interactionMove[1] = currentPickedPoint[1] - m_InitialPickedPoint[1];
+    interactionMove[2] = currentPickedPoint[2] - m_InitialPickedPoint[2];
 
-    if (interactionMove[0]==0 && interactionMove[1]==0  && interactionMove[2]==0)
+    if (interactionMove[0] == 0 && interactionMove[1] == 0  && interactionMove[2] == 0)
       return true;
 
-    Vector3D rotationAxis = itk::CrossProduct( viewPlaneNormal, interactionMove );
+    Vector3D rotationAxis = itk::CrossProduct(viewPlaneNormal, interactionMove);
     rotationAxis.Normalize();
 
-    m_CurrentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
-
-    int *size = currentVtkRenderer->GetSize();
+    int* size = currentVtkRenderer->GetSize();
     double l2 =
-      (m_CurrentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) *
-      (m_CurrentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) +
-      (m_CurrentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]) *
-      (m_CurrentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]);
+      (currentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) *
+      (currentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) +
+      (currentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]) *
+      (currentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]);
 
-    double rotationAngle = 360.0 * sqrt(l2/(size[0]*size[0]+size[1]*size[1]));
+    double rotationAngle = 360.0 * sqrt(l2 / (size[0] * size[0] + size[1] * size[1]));
 
     // Use center of data bounding box as center of rotation
     Point3D rotationCenter = m_OriginalGeometry->GetCenter();
@@ -292,17 +261,13 @@ bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, Interactio
     // Reset current Geometry3D to original state (pre-interaction) and
     // apply rotation
     RotationOperation op( OpROTATE, rotationCenter, rotationAxis, rotationAngle );
-    Geometry3D::Pointer newGeometry = static_cast< Geometry3D * >(
-      m_OriginalGeometry->Clone().GetPointer() );
+    Geometry3D::Pointer newGeometry = static_cast<Geometry3D*>(m_OriginalGeometry->Clone().GetPointer());
     newGeometry->ExecuteOperation( &op );
     mitk::TimeGeometry::Pointer timeGeometry = this->GetDataNode()->GetData()->GetTimeGeometry();
     if (timeGeometry.IsNotNull())
-    {
-      timeGeometry->SetTimeStepGeometry( newGeometry, timeStep );
-    }
+      timeGeometry->SetTimeStepGeometry(newGeometry, timeStep);
 
-    //TODO: Only 3D reinit
-    RenderingManager::GetInstance()->RequestUpdateAll();
+    interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 
     return true;
   }
@@ -338,14 +303,14 @@ bool mitk::AffineDataInteractor3D::ColorizeSurface(BaseRenderer::Pointer rendere
     return false;
   }
 
-  vtkPointData *pointData = polyData->GetPointData();
+  vtkPointData* pointData = polyData->GetPointData();
   if (pointData == NULL)
   {
     MITK_ERROR << "AffineInteractor3D: No point data present!";
     return false;
   }
 
-  vtkDataArray *scalars = pointData->GetScalars();
+  vtkDataArray* scalars = pointData->GetScalars();
   if (scalars == NULL)
   {
     MITK_ERROR << "AffineInteractor3D: No scalars for point data present!";

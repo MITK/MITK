@@ -20,7 +20,7 @@
         <transition event_class="InteractionPositionEvent" event_variant="ScaleRadius" target="select">
             <action name="scaleRadius"/>
         </transition>
-        <transition event_class="InteractionPositionEvent" event_variant="InitTranslatation" target="translate">
+        <transition event_class="InteractionPositionEvent" event_variant="InitTranslation" target="translate">
             <action name="initTranslate"/>
         </transition>
         <transition event_class="InteractionPositionEvent" event_variant="InitRotation" target="rotate">

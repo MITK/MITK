@@ -84,11 +84,13 @@ namespace mitk
         virtual bool Save(const std::string& fileName="", bool appendChanges=false) = 0;
         ///
         /// Load PropertyLists from fileName. If fileName is empty, a special file in the users home directory will be used.
+        /// If enforeReload is false, the service will take care of modified time flags, i.e. it will not load a file
+        /// that was loaded before and did not change in the meantime or that was modified by the service itself
         /// *ATTENTION*: If there are PropertyLists with the same id contained in the file, existing PropertyLists will be overwritten!
         /// \see AddPropertyListReplacedObserver()
         /// \return false if an error occured (cannot load from file), true otherwise
         ///
-        virtual bool Load(const std::string& fileName="") = 0;
+        virtual bool Load(const std::string& fileName="", bool enforeReload=true) = 0;
         ///
         /// Using SetAutoLoadAndSave(true) will cause the service to load/save the property lists at application
         /// start/stop.

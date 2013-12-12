@@ -38,6 +38,7 @@ mitk::PersistenceService::PersistenceService()
 void mitk::PersistenceService::Clear()
 {
     m_PropertyLists.clear();
+    m_FileNamesToModifiedTimes.clear();
 }
 
 mitk::PersistenceService::~PersistenceService()
@@ -112,10 +113,16 @@ bool mitk::PersistenceService::Save(const std::string& fileName, bool appendChan
 
     DataStorage::SetOfObjects::Pointer rs = DataStorage::SetOfObjects::New();
 
-    return m_SceneIO->SaveScene( rs.GetPointer(), tempDs, theFile );
+    save = m_SceneIO->SaveScene( rs.GetPointer(), tempDs, theFile );
+    if( save )
+    {
+        long int currentModifiedTime = itksys::SystemTools::ModifiedTime( theFile.c_str() );
+        m_FileNamesToModifiedTimes[theFile] = currentModifiedTime;
+    }
+    return save;
 }
 
-bool mitk::PersistenceService::Load(const std::string& fileName)
+bool mitk::PersistenceService::Load(const std::string& fileName, bool enforceReload)
 {
     bool load = false;
 
@@ -125,6 +132,26 @@ bool mitk::PersistenceService::Load(const std::string& fileName)
 
     if( !itksys::SystemTools::FileExists(theFile.c_str()) )
         return false;
+
+    if( enforceReload == false )
+    {
+        bool loadTheFile = true;
+        std::map<std::string, long int>::iterator it = m_FileNamesToModifiedTimes.find( theFile );
+
+        long int currentModifiedTime = itksys::SystemTools::ModifiedTime( theFile.c_str() );
+        if( it != m_FileNamesToModifiedTimes.end() )
+        {
+            long int knownModifiedTime = (*it).second;
+            if( knownModifiedTime >= currentModifiedTime )
+            {
+                loadTheFile = false;
+            }
+        }
+        if( loadTheFile )
+            m_FileNamesToModifiedTimes[theFile] = currentModifiedTime;
+        else
+            return true;
+    }
 
     DataStorage::Pointer ds = m_SceneIO->LoadScene( theFile );
     load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) && (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());

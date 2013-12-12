@@ -45,7 +45,7 @@ namespace mitk
 
         bool Save(const std::string& fileName="", bool appendChanges=false);
 
-        bool Load(const std::string& fileName="");
+        bool Load(const std::string& fileName="", bool enforeReload=true);
 
         void SetAutoLoadAndSave(bool autoLoadAndSave);
 
@@ -64,6 +64,7 @@ namespace mitk
         bool m_AutoLoadAndSave;
         std::set<PropertyListReplacedObserver*> m_PropertyListReplacedObserver;
         SceneIO::Pointer m_SceneIO;
+        std::map<std::string, long int> m_FileNamesToModifiedTimes;
     };
 }
 #endif

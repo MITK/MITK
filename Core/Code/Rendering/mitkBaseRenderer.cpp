@@ -210,6 +210,11 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
 
 mitk::BaseRenderer::~BaseRenderer()
 {
+  if (m_OverlayManager.IsNotNull())
+  {
+    m_OverlayManager->RemoveBaseRenderer(this);
+  }
+
   if (m_VtkRenderer != NULL)
   {
     m_VtkRenderer->Delete();
@@ -238,10 +243,6 @@ mitk::BaseRenderer::~BaseRenderer()
     m_RenderWindow = NULL;
   }
 
-  if (m_OverlayManager.IsNotNull())
-  {
-    m_OverlayManager->RemoveBaseRenderer(this);
-  }
 }
 
 void mitk::BaseRenderer::RemoveAllLocalStorages()

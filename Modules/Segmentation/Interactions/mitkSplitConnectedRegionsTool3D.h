@@ -73,8 +73,8 @@ class Segmentation_EXPORT SplitConnectedRegionsTool3D : public AutoSegmentationT
     template < typename TPixel, unsigned int VDimension >
     void InternalProcessing( itk::Image<TPixel, VDimension>* input );
 
-    template < typename ImageType >
-    void InternalAcceptPreview( ImageType* targetImage, const mitk::Image* sourceImage );
+    template <typename ImageType1, typename ImageType2>
+    void InternalAcceptPreview( ImageType1* targetImage, const ImageType2* sourceImage );
 };
 
 } // namespace

@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkBinaryShapeKeepNObjectsImageFilter.h>
 #include <itkBinaryImageToShapeLabelMapFilter.h>
+#include <itkRelabelLabelMapFilter.h>
 
 // us
 #include <usModule.h>
@@ -93,11 +94,12 @@ void mitk::SplitConnectedRegionsTool3D::AcceptPreview()
 
   try
   {
-    AccessFixedDimensionByItk_1( workingImage, InternalAcceptPreview, 3, m_PreviewImage );
+    AccessTwoImagesFixedDimensionByItk( workingImage, m_PreviewImage, InternalAcceptPreview, 3);
   }
   catch( itk::ExceptionObject & e )
   {
     CurrentlyBusy.Send(false);
+    m_ProgressCommand->Reset();
     MITK_ERROR << "Exception caught: " << e.GetDescription();
     m_ToolManager->ActivateTool(-1);
     return;
@@ -105,12 +107,16 @@ void mitk::SplitConnectedRegionsTool3D::AcceptPreview()
   catch (...)
   {
     CurrentlyBusy.Send(false);
+    m_ProgressCommand->Reset();
     MITK_ERROR << "Unkown exception caught!";
     m_ToolManager->ActivateTool(-1);
     return;
   }
 
   workingImage->Modified();
+
+  m_PreviewImage = NULL;
+  m_PreviewNode->SetData(NULL);
 
   CurrentlyBusy.Send(false);
 
@@ -161,28 +167,30 @@ void mitk::SplitConnectedRegionsTool3D::Run()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-template < typename ImageType >
-void mitk::SplitConnectedRegionsTool3D::InternalAcceptPreview( ImageType* targetImage, const mitk::Image* sourceImage )
+template <typename ImageType1, typename ImageType2>
+void mitk::SplitConnectedRegionsTool3D::InternalAcceptPreview( ImageType1* targetImage, const ImageType2* sourceImage )
 {
-  typename ImageType::Pointer sourceImageITK;
-  CastToItkImage( sourceImage, sourceImageITK );
-
-  typedef itk::BinaryImageToShapeLabelMapFilter< ImageType > BinaryImageToShapeLabelMapFilterType;
-  typedef itk::LabelMapToLabelImageFilter< typename BinaryImageToShapeLabelMapFilterType::OutputImageType, ImageType > LabelMap2ImageType;
-  typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;
+  typedef itk::BinaryImageToShapeLabelMapFilter< ImageType2 > BinaryImageToShapeLabelMapFilterType;
+  typedef itk::RelabelLabelMapFilter< typename BinaryImageToShapeLabelMapFilterType::OutputImageType > RelabelFilterType;
+  typedef itk::LabelMapToLabelImageFilter< typename BinaryImageToShapeLabelMapFilterType::OutputImageType, ImageType2 > LabelMap2ImageType;
 
   typename BinaryImageToShapeLabelMapFilterType::Pointer binaryImageToShapeLabelMapFilter = BinaryImageToShapeLabelMapFilterType::New();
-  binaryImageToShapeLabelMapFilter->SetInput( sourceImageITK );
+  binaryImageToShapeLabelMapFilter->SetInput( sourceImage );
   binaryImageToShapeLabelMapFilter->SetOutputBackgroundValue(0);
   binaryImageToShapeLabelMapFilter->SetInputForegroundValue(1);
 
+  typename RelabelFilterType::Pointer relabelFilter = RelabelFilterType::New();
+  relabelFilter->SetInput( binaryImageToShapeLabelMapFilter->GetOutput() );
+  relabelFilter->SetInPlace(true);
+
   typename LabelMap2ImageType::Pointer label2image = LabelMap2ImageType::New();
-  label2image->SetInput( binaryImageToShapeLabelMapFilter->GetOutput() );
+  label2image->SetInput( relabelFilter->GetOutput() );
 
   if (m_ProgressCommand.IsNotNull())
   {
     m_ProgressCommand->AddStepsToDo(200);
     binaryImageToShapeLabelMapFilter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
+    relabelFilter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
   }
 
   label2image->Update();
@@ -192,7 +200,7 @@ void mitk::SplitConnectedRegionsTool3D::InternalAcceptPreview( ImageType* target
     m_ProgressCommand->Reset();
   }
 
-  typename ImageType::Pointer result = label2image->GetOutput();
+  typename ImageType2::Pointer result = label2image->GetOutput();
   result->DisconnectPipeline();
 
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
@@ -207,35 +215,32 @@ void mitk::SplitConnectedRegionsTool3D::InternalAcceptPreview( ImageType* target
 
   int maxLabel = workingImage->GetNumberOfLabels();
 
-  MITK_INFO << "numberOfObjects: " << numberOfObjects;
-  MITK_INFO << "maxLabel: " << maxLabel;
+  std::string originalName = workingImage->GetActiveLabelName();
 
   // Loop over all of the blobs
-  for (unsigned int i=0; 0<numberOfObjects; i++)
+  for (unsigned int i=0; i<numberOfObjects; i++)
   {
-    std::stringstream newname;
-    newname << name << "-subpart-" << i;
-
     mitk::Color color = m_ColorSequenceRainbow->GetNextColor();
-    workingImage->AddLabel(newname.str().c_str(), color);
+    std::stringstream stream;
+    stream << originalName << "-sp-" << i;
+    std::string name = stream.str().c_str();
+    workingImage->AddLabel(name, color);
   }
 
-  MITK_INFO << "start iteraction";
+  typedef itk::ImageRegionIterator< ImageType1 >      TargetIteratorType;
+  typedef itk::ImageRegionConstIterator< ImageType2 > SourceIteratorType;
 
-  typedef itk::ImageRegionConstIterator< ImageType > SourceIteratorType;
-  typedef itk::ImageRegionIterator< ImageType >      TargetIteratorType;
-
-  typename ImageType::IndexType cropIndex;
+  typename ImageType1::IndexType cropIndex;
   cropIndex[0] = m_RequestedRegion.GetIndex(0);
   cropIndex[1] = m_RequestedRegion.GetIndex(1);
   cropIndex[2] = m_RequestedRegion.GetIndex(2);
 
-  typename ImageType::SizeType cropSize;
+  typename ImageType1::SizeType cropSize;
   cropSize[0] = m_RequestedRegion.GetSize(0);
   cropSize[1] = m_RequestedRegion.GetSize(1);
   cropSize[2] = m_RequestedRegion.GetSize(2);
 
-  typename ImageType::RegionType cropRegion(cropIndex,cropSize);
+  typename ImageType1::RegionType cropRegion(cropIndex,cropSize);
 
   SourceIteratorType sourceIter( result, result->GetLargestPossibleRegion() );
   TargetIteratorType targetIter( targetImage, cropRegion );
@@ -250,7 +255,6 @@ void mitk::SplitConnectedRegionsTool3D::InternalAcceptPreview( ImageType* target
 
     if (sourceValue)
     {
-      MITK_INFO << "maxLabel + sourceValue - 1" << maxLabel + sourceValue - 1;
       targetIter.Set( maxLabel + sourceValue - 1);
     }
 

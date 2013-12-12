@@ -28,18 +28,6 @@ mitk::VtkOverlay3D::~VtkOverlay3D()
 {
 }
 
-
-mitk::Overlay::Bounds mitk::VtkOverlay3D::GetBoundsOnDisplay(mitk::BaseRenderer*) const
-{
-  mitk::Overlay::Bounds bounds;
-  bounds.Position[0] = bounds.Position[1] = bounds.Size[0] = bounds.Size[1] = 0;
-  return bounds;
-}
-
-void mitk::VtkOverlay3D::SetBoundsOnDisplay(mitk::BaseRenderer*, const mitk::Overlay::Bounds&)
-{
-}
-
 void mitk::VtkOverlay3D::SetPosition3D(const Point3D& position3D, mitk::BaseRenderer *renderer)
 {
   mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);

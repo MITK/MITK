@@ -1356,7 +1356,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
     StringContainer filesStillToAnalyze = groupIter->second.GetFilenames();
     std::string groupUID = groupIter->first;
     unsigned int subgroup(0);
-    MITK_DEBUG << "Analyze group " << groupUID;
+    MITK_DEBUG << "Analyze group " << groupUID << " of " << groupIter->second.GetFilenames().size() << " files";
 
     while (!filesStillToAnalyze.empty()) // repeat until all files are grouped somehow
     {

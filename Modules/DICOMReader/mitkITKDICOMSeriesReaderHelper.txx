@@ -42,11 +42,11 @@ mitk::ITKDICOMSeriesReaderHelper
   typename ReaderType::Pointer reader = ReaderType::New();
 
   reader->SetImageIO(io);
-  reader->ReverseOrderOff();
 
   if (preLoadedImageBlock.IsNull())
   {
     reader->SetFileNames(filenames);
+    reader->ReverseOrderOff();
     reader->Update();
     typename ImageType::Pointer readVolume = reader->GetOutput();
 

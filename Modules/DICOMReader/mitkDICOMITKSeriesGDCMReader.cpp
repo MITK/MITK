@@ -185,19 +185,41 @@ mitk::DICOMITKSeriesGDCMReader
     nextStepSorting.clear();
     DICOMDatasetSorter::Pointer& sorter = *sorterIter;
 
+    MITK_DEBUG << "================================================================================";
+    MITK_DEBUG << "DICOMIKTSeriesGDCMReader: " << ss.str() << ": " << m_SortingResultInProgress.size() << " groups input";
+    unsigned int groupIndex = 0;
+
     for(SortingBlockList::iterator blockIter = m_SortingResultInProgress.begin();
         blockIter != m_SortingResultInProgress.end();
-        ++blockIter)
+        ++groupIndex, ++blockIter)
     {
       DICOMGDCMImageFrameList& gdcmInfoFrameList = *blockIter;
       DICOMDatasetList datasetList = ToDICOMDatasetList( gdcmInfoFrameList );
 
+      MITK_DEBUG << "--------------------------------------------------------------------------------";
+      MITK_DEBUG << "DICOMIKTSeriesGDCMReader: " << ss.str() << ", dataset group " << groupIndex << " (" << datasetList.size() << " datasets): ";
+      for (DICOMDatasetList::iterator oi = datasetList.begin();
+           oi != datasetList.end();
+           ++oi)
+      {
+        MITK_DEBUG << "  INPUT     : " << (*oi)->GetFilenameIfAvailable();
+      }
+
       sorter->SetInput(datasetList);
       sorter->Sort();
       unsigned int numberOfResultingBlocks = sorter->GetNumberOfOutputs();
+
       for (unsigned int b = 0; b < numberOfResultingBlocks; ++b)
       {
         DICOMDatasetList blockResult = sorter->GetOutput(b);
+
+        for (DICOMDatasetList::iterator oi = blockResult.begin();
+             oi != blockResult.end();
+             ++oi)
+        {
+          MITK_DEBUG << "  OUTPUT(" << b << ") :" << (*oi)->GetFilenameIfAvailable();
+        }
+
         DICOMGDCMImageFrameList sortedGdcmInfoFrameList = FromDICOMDatasetList(blockResult);
         nextStepSorting.push_back( sortedGdcmInfoFrameList );
       }

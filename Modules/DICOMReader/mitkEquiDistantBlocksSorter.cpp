@@ -135,6 +135,14 @@ mitk::EquiDistantBlocksSorter
   {
     SliceGroupingAnalysisResult regularBlock = this->AnalyzeFileForITKImageSeriesReaderSpacingAssumption( remainingInput, acceptGantryTilt );
 
+    DICOMDatasetList inBlock = regularBlock.GetBlockFilenames();
+    DICOMDatasetList laterBlock = regularBlock.GetUnsortedFilenames();
+    MITK_DEBUG << "Result: sorted 3D group with " << inBlock.size() << " files";
+    for (DICOMDatasetList::const_iterator diter = inBlock.begin(); diter != inBlock.end(); ++diter)
+      MITK_DEBUG << "  IN  " << (*diter)->GetFilenameIfAvailable();
+    for (DICOMDatasetList::const_iterator diter = laterBlock.begin(); diter != laterBlock.end(); ++diter)
+      MITK_DEBUG << " OUT  " << (*diter)->GetFilenameIfAvailable();
+
     outputs.push_back( regularBlock.GetBlockFilenames() );
     remainingInput = regularBlock.GetUnsortedFilenames();
   }
@@ -255,31 +263,30 @@ mitk::EquiDistantBlocksSorter
   bool lastOriginInitialized(false);
 
   MITK_DEBUG << "--------------------------------------------------------------------------------";
-  MITK_DEBUG << "Analyzing files for z-spacing assumption of ITK's ImageSeriesReader (group tilted: " << groupImagesWithGantryTilt << ")";
+  MITK_DEBUG << "Analyzing " << datasets.size() << " files for z-spacing assumption of ITK's ImageSeriesReader (group tilted: " << groupImagesWithGantryTilt << ")";
   unsigned int fileIndex(0);
-  for (DICOMDatasetList::const_iterator fileIter = datasets.begin();
-       fileIter != datasets.end();
-       ++fileIter, ++fileIndex)
+  for (DICOMDatasetList::const_iterator dsIter = datasets.begin();
+       dsIter != datasets.end();
+       ++dsIter, ++fileIndex)
   {
     bool fileFitsIntoPattern(false);
     std::string thisOriginString;
     // Read tag value into point3D. PLEASE replace this by appropriate GDCM code if you figure out how to do that
-    thisOriginString = (*fileIter)->GetTagValueAsString( tagImagePositionPatient );
+    thisOriginString = (*dsIter)->GetTagValueAsString( tagImagePositionPatient );
 
     if (thisOriginString.empty())
     {
       // don't let such files be in a common group. Everything without position information will be loaded as a single slice:
       // with standard DICOM files this can happen to: CR, DX, SC
-      MITK_DEBUG << "    ==> Sort away " << *fileIter << " for later analysis (no position information)"; // we already have one occupying this position
+      MITK_DEBUG << "    ==> Sort away " << *dsIter << " for later analysis (no position information)"; // we already have one occupying this position
 
       if ( result.GetBlockFilenames().empty() ) // nothing WITH position information yet
       {
         // ==> this is a group of its own, stop processing, come back later
-        result.AddFileToSortedBlock( *fileIter ); // TODO
+        result.AddFileToSortedBlock( *dsIter );
 
-        // TODO change to DICOMDatasetList!
         DICOMDatasetList remainingFiles;
-        remainingFiles.insert( remainingFiles.end(), fileIter+1, datasets.end() );
+        remainingFiles.insert( remainingFiles.end(), dsIter+1, datasets.end() );
         result.AddFilesToUnsortedBlock( remainingFiles );
 
         fileFitsIntoPattern = false;
@@ -288,7 +295,7 @@ mitk::EquiDistantBlocksSorter
       else
       {
         // ==> this does not match, consider later
-        result.AddFileToUnsortedBlock( *fileIter ); // sort away for further analysis
+        result.AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
         fileFitsIntoPattern = false;
         continue; // next file
       }
@@ -297,14 +304,14 @@ mitk::EquiDistantBlocksSorter
     bool ignoredConversionError(-42); // hard to get here, no graceful way to react
     thisOrigin = DICOMStringToPoint3D( thisOriginString, ignoredConversionError );
 
-    MITK_DEBUG << "  " << fileIndex << " " << *fileIter
+    MITK_DEBUG << "  " << fileIndex << " " << (*dsIter)->GetFilenameIfAvailable()
                        << " at "
                        /* << thisOriginString */ << "(" << thisOrigin[0] << "," << thisOrigin[1] << "," << thisOrigin[2] << ")";
 
     if ( lastOriginInitialized && (thisOrigin == lastOrigin) )
     {
-      MITK_DEBUG << "    ==> Sort away " << *fileIter << " for separate time step"; // we already have one occupying this position
-      result.AddFileToUnsortedBlock( *fileIter ); // sort away for further analysis
+      MITK_DEBUG << "    ==> Sort away " << *dsIter << " for separate time step"; // we already have one occupying this position
+      result.AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
       fileFitsIntoPattern = false;
     }
     else
@@ -325,7 +332,7 @@ mitk::EquiDistantBlocksSorter
 
         Vector3D right; right.Fill(0.0);
         Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
-        std::string orientationValue = (*fileIter)->GetTagValueAsString( tagImageOrientation );
+        std::string orientationValue = (*dsIter)->GetTagValueAsString( tagImageOrientation );
         DICOMStringToOrientationVectors( orientationValue, right, up, ignoredConversionError );
 
         GantryTiltInformation tiltInfo( lastDifferentOrigin, thisOrigin, right, up, 1 );
@@ -336,7 +343,7 @@ mitk::EquiDistantBlocksSorter
 
           // at this point we have TWO slices analyzed! if they are the only two files, we still split, because there is no third to verify our tilting assumption.
           // later with a third being available, we must check if the initial tilting vector is still valid. if yes, continue.
-          // if NO, we need to split the already sorted part (result.first) and the currently analyzed file (*fileIter)
+          // if NO, we need to split the already sorted part (result.first) and the currently analyzed file (*dsIter)
 
           // tell apart gantry tilt from overall skewedness
           // sort out irregularly sheared slices, that IS NOT tilting
@@ -345,42 +352,42 @@ mitk::EquiDistantBlocksSorter
           {
             bool todoIsDone(false); // TODO add GantryTilt reading
             // check if this is at least roughly the same angle as recorded in DICOM tags
-            if ( todoIsDone /*&& tagValueMappings[fileIter->c_str()].find(tagGantryTilt) != tagValueMappings[fileIter->c_str()].end() */)
+            if ( todoIsDone /*&& tagValueMappings[dsIter->c_str()].find(tagGantryTilt) != tagValueMappings[dsIter->c_str()].end() */)
             {
               // read value, compare to calculated angle
-              std::string tiltStr = (*fileIter)->GetTagValueAsString( tagGantryTilt );
+              std::string tiltStr = (*dsIter)->GetTagValueAsString( tagGantryTilt );
               double angle = atof(tiltStr.c_str());
 
               MITK_DEBUG << "Comparing recorded tilt angle " << angle << " against calculated value " << tiltInfo.GetTiltAngleInDegrees();
               // TODO we probably want the signs correct, too (that depends: this is just a rough check, nothing serious)
               if ( fabs(angle) - tiltInfo.GetTiltAngleInDegrees() > 0.25)
               {
-                result.AddFileToUnsortedBlock( *fileIter ); // sort away for further analysis
+                result.AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
                 fileFitsIntoPattern = false;
               }
               else  // tilt angle from header is less than 0.25 degrees different from what we calculated, assume this is fine
               {
                 result.FlagGantryTilt();
-                result.AddFileToSortedBlock( *fileIter ); // this file is good for current block
+                result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
                 fileFitsIntoPattern = true;
               }
             }
             else // we cannot check the calculated tilt angle against the one from the dicom header (so we assume we are right)
             {
               result.FlagGantryTilt();
-              result.AddFileToSortedBlock( *fileIter ); // this file is good for current block
+              result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
               fileFitsIntoPattern = true;
             }
           }
           else // caller does not want tilt compensation OR shearing is more complicated than tilt
           {
-            result.AddFileToUnsortedBlock( *fileIter ); // sort away for further analysis
+            result.AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
             fileFitsIntoPattern = false;
           }
         }
         else // not sheared
         {
-          result.AddFileToSortedBlock( *fileIter ); // this file is good for current block
+          result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
           fileFitsIntoPattern = true;
         }
       }
@@ -403,25 +410,25 @@ mitk::EquiDistantBlocksSorter
                                             << thisOrigin[0] << ","
                                             << thisOrigin[1] << ","
                                             << thisOrigin[2] << ")";
-          MITK_DEBUG  << "    ==> Sort away " << *fileIter << " for later analysis";
+          MITK_DEBUG  << "    ==> Sort away " << *dsIter << " for later analysis";
 
           // At this point we know we deviated from the expectation of ITK's ImageSeriesReader
           // We split the input file list at this point, i.e. all files up to this one (excluding it)
           // are returned as group 1, the remaining files (including the faulty one) are group 2
 
           /* Optimistic approach: check if any of the remaining slices fits in */
-          result.AddFileToUnsortedBlock( *fileIter ); // sort away for further analysis
+          result.AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
           fileFitsIntoPattern = false;
         }
         else
         {
-          result.AddFileToSortedBlock( *fileIter ); // this file is good for current block
+          result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
           fileFitsIntoPattern = true;
         }
       }
       else // this should be the very first slice
       {
-        result.AddFileToSortedBlock( *fileIter ); // this file is good for current block
+        result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
         fileFitsIntoPattern = true;
       }
     }

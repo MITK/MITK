@@ -9,6 +9,10 @@ set(CPP_FILES
   DicomImport/mitkSiemensDicomDiffusionImageHeaderReader.cpp
   DicomImport/mitkSiemensMosaicDicomDiffusionImageHeaderReader.cpp
 
+  DicomImport/mitkDiffusionDICOMFileReader.cpp
+  DicomImport/mitkDiffusionHeaderDICOMFileReader.cpp
+  DicomImport/mitkDiffusionHeaderSiemensDICOMFileReader.cpp
+
   # DataStructures
   IODataStructures/mitkDiffusionCoreObjectFactory.cpp
 

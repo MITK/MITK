@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkOpenGL.h"
 #include "vtkUnsignedShortArray.h"
 #include "vtkgl.h" // vtkgl namespace
+#include "GL/glext.h"
 
 #include <math.h>
 
@@ -370,7 +371,9 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
 //      }
 //    }
 
-    internalFormat = GL_LUMINANCE16;
+    internalFormat = GL_LUMINANCE32F_ARB;
+    format = GL_LUMINANCE;
+//    internalFormat = GL_RGBA32F;
 
     //std::cout << "uploading texture\n";
 
@@ -383,7 +386,7 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
 
       glTexImage2D( GL_TEXTURE_2D, 0 , internalFormat,
                    xsize, ysize, 0, format,
-                   GL_UNSIGNED_SHORT,
+                   GL_FLOAT,
                    static_cast<const GLvoid *>(resultData) );
 
       this->Format16BIT = true;
@@ -392,7 +395,7 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
     {
       glTexImage2D( GL_TEXTURE_2D, 0 , internalFormat,
                    xsize, ysize, 0, format,
-                   GL_UNSIGNED_BYTE,
+                   GL_FLOAT,
                    static_cast<const GLvoid *>(resultData) );
 
       this->Format16BIT = false;

@@ -56,6 +56,8 @@ protected:
   mitk::DataStorage::Pointer                  m_DataStorage;
   mitk::DataNode::Pointer                     m_BaseNode;
 
+  std::string                                 m_StateMachineFileName;
+
 private:
   Ui::QmitkUSZoneManagementWidget* ui;
 

@@ -15,6 +15,7 @@
 QmitkUSZoneManagementWidget::QmitkUSZoneManagementWidget(QWidget *parent) :
     QWidget(parent), m_ZonesDataModel(new QmitkUSZonesDataModel(this)),
     m_Interactor(mitk::USZonesInteractor::New()),
+    m_StateMachineFileName("USZoneInteractions.xml"),
     ui(new Ui::QmitkUSZoneManagementWidget), m_CurMaxNumOfZones(0)
 {
   ui->setupUi(this);
@@ -31,7 +32,7 @@ QmitkUSZoneManagementWidget::QmitkUSZoneManagementWidget(QWidget *parent) :
            this, SLOT(OnDataChanged(const QModelIndex&, const QModelIndex&)));
 
   // load state machine and event config for data interactor
-  m_Interactor->LoadStateMachine("USZoneInteractions.xml", us::ModuleRegistry::GetModule("MitkUSNavigation"));
+  m_Interactor->LoadStateMachine(m_StateMachineFileName, us::ModuleRegistry::GetModule("MitkUSNavigation"));
   m_Interactor->SetEventConfig("globalConfig.xml");
 }
 
@@ -44,6 +45,7 @@ QmitkUSZoneManagementWidget::~QmitkUSZoneManagementWidget()
 
 void QmitkUSZoneManagementWidget::SetStateMachineFilename(const std::string& filename)
 {
+  m_StateMachineFileName = filename;
   m_Interactor->LoadStateMachine(filename, us::ModuleRegistry::GetModule("MitkUSNavigation"));
 }
 
@@ -118,7 +120,7 @@ void QmitkUSZoneManagementWidget::OnStartAddingZone()
 
   // workaround for bug 16407
   m_Interactor = mitk::USZonesInteractor::New();
-  m_Interactor->LoadStateMachine("USZoneInteractions.xml", us::ModuleRegistry::GetModule("MitkUSNavigation"));
+  m_Interactor->LoadStateMachine(m_StateMachineFileName, us::ModuleRegistry::GetModule("MitkUSNavigation"));
   m_Interactor->SetEventConfig("globalConfig.xml");
 
   mitk::DataNode::Pointer dataNode = mitk::DataNode::New();

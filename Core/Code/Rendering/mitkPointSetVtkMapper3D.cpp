@@ -298,34 +298,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
         sprintf(buffer,"%d",j+1);
         l.append(buffer);
       }
-      // Define the text for the label
-      vtkSmartPointer<vtkVectorText> label = vtkSmartPointer<vtkVectorText>::New();
-      label->SetText(l.c_str());
       labelVector.push_back(l);
-
-      //# Set up a transform to move the label to a new position.
-      vtkSmartPointer<vtkTransform> aLabelTransform = vtkSmartPointer<vtkTransform>::New();
-      aLabelTransform->Identity();
-      itk::Point<float> point1 = pointsIter->Value();
-      aLabelTransform->Translate(point1[0]+2,point1[1]+2,point1[2]);
-      aLabelTransform->Scale(5.7,5.7,5.7);
-
-      //# Move the label to a new position.
-      vtkSmartPointer<vtkTransformPolyDataFilter> labelTransform = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-      labelTransform->SetTransform(aLabelTransform);
-      labelTransform->SetInputConnection(label->GetOutputPort());
-
-      //add it to the wright PointList
-      if (pointType)
-      {
-        m_vtkSelectedPointList->AddInputConnection(labelTransform->GetOutputPort());
-        ++m_NumberOfSelectedAdded;
-      }
-      else
-      {
-        m_vtkUnselectedPointList->AddInputConnection(labelTransform->GetOutputPort());
-        ++m_NumberOfUnselectedAdded;
-      }
     }
 
     if(pointDataIter != itkPointSet->GetPointData()->End())
@@ -653,8 +626,6 @@ void mitk::PointSetVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk:
   node->AddProperty( "contoursize", mitk::FloatProperty::New(0.5), renderer, overwrite );
   node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );
   node->AddProperty( "updateDataOnRender", mitk::BoolProperty::New(true), renderer, overwrite );
-  node->AddProperty( "show label", mitk::BoolProperty::New(true), renderer, overwrite );
-  node->AddProperty( "label", mitk::StringProperty::New("Hallo"), renderer, overwrite );
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 

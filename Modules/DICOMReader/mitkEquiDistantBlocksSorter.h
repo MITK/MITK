@@ -125,28 +125,6 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
     std::string
     ConstCharStarToString(const char* s);
 
-    /**
-      \brief Convert DICOM string describing a point to Point3D.
-
-      DICOM tags like ImagePositionPatient contain a position as float numbers separated by backslashes:
-      \verbatim
-      42.7131\13.77\0.7
-      \endverbatim
-     */
-    Point3D
-    DICOMStringToPoint3D(const std::string& s, bool& successful);
-
-    /**
-      \brief Convert DICOM string describing a point two Vector3D.
-
-      DICOM tags like ImageOrientationPatient contain two vectors as float numbers separated by backslashes:
-      \verbatim
-      42.7131\13.77\0.7\137.76\0.3
-      \endverbatim
-     */
-    void
-    DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up, bool& successful);
-
     EquiDistantBlocksSorter();
     virtual ~EquiDistantBlocksSorter();
 

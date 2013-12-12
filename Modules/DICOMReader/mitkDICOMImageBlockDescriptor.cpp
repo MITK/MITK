@@ -208,29 +208,4 @@ mitk::DICOMImageBlockDescriptor
   }
 }
 
-bool
-mitk::DICOMImageBlockDescriptor
-::DICOMStringToSpacing(const std::string& s, float& spacingX, float& spacingY) const
-{
-  bool successful = false;
 
-  MITK_INFO << "Convert '"<<s<<"' to spacings";
-
-  std::istringstream spacingReader(s);
-  std::string spacing;
-  if ( std::getline( spacingReader, spacing, '\\' ) )
-  {
-    spacingY = atof( spacing.c_str() );
-    MITK_INFO  << "A part '"<<spacing<<"'" <<spacingY;
-
-    if ( std::getline( spacingReader, spacing, '\\' ) )
-    {
-    MITK_INFO  << "A part '"<<spacing<<"'" <<spacingX;
-      spacingX = atof( spacing.c_str() );
-
-      successful = true;
-    }
-  }
-
-  return successful;
-}

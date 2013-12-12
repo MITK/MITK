@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkSortByImagePositionPatient.h"
+#include "mitkDICOMTag.h"
 
 mitk::SortByImagePositionPatient
 ::SortByImagePositionPatient(DICOMSortCriterion::Pointer secondaryCriterion)
@@ -54,76 +55,6 @@ mitk::SortByImagePositionPatient
 
   return tags;
 }
-
-mitk::Point3D
-mitk::SortByImagePositionPatient
-::DICOMStringToPoint3D(const std::string& s, bool& successful) const
-{
-  Point3D p;
-  successful = true;
-
-  std::istringstream originReader(s);
-  std::string coordinate;
-  unsigned int dim(0);
-  while( std::getline( originReader, coordinate, '\\' ) && dim < 3)
-  {
-    p[dim++]= atof(coordinate.c_str());
-  }
-
-  if (dim && dim != 3)
-  {
-    successful = false;
-    MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0032). Found " << dim << " instead of 3 values.";
-  }
-  else if (dim == 0)
-  {
-    successful = false;
-    p.Fill(0.0); // assume default (0,0,0)
-  }
-
-  return p;
-}
-
-
-void
-mitk::SortByImagePositionPatient
-::DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up, bool& successful) const
-{
-  successful = true;
-
-  std::istringstream orientationReader(s);
-  std::string coordinate;
-  unsigned int dim(0);
-  while( std::getline( orientationReader, coordinate, '\\' ) && dim < 6 )
-  {
-    if (dim<3)
-    {
-      right[dim++] = atof(coordinate.c_str());
-    }
-    else
-    {
-      up[dim++ - 3] = atof(coordinate.c_str());
-    }
-  }
-
-  if (dim && dim != 6)
-  {
-    successful = false;
-    MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0037). Found " << dim << " instead of 6 values.";
-  }
-  else if (dim == 0)
-  {
-    // fill with defaults
-    right.Fill(0.0);
-    right[0] = 1.0;
-
-    up.Fill(0.0);
-    up[1] = 1.0;
-
-    successful = false;
-  }
-}
-
 
 bool
 mitk::SortByImagePositionPatient
@@ -174,6 +105,8 @@ mitk::SortByImagePositionPatient
 
   static double leftDistance = 0.0;
   static double rightDistance = 0.0;
+  leftDistance = 0.0;
+  rightDistance = 0.0;
 
   // this computes the distance from world origin (0,0,0) ALONG THE NORMAL of the image planes
   for (unsigned int dim = 0; dim < 3; ++dim)

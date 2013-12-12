@@ -17,6 +17,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <algorithm>
 
+mitk::DICOMTagBasedSorter::CutDecimalPlaces
+::CutDecimalPlaces(unsigned int precision)
+:m_Precision(precision)
+{
+}
+
+std::string
+mitk::DICOMTagBasedSorter::CutDecimalPlaces
+::operator()(const std::string& input) const
+{
+  // be a bit tolerant for tags such as image orientation orienatation, let only the first few digits matter (http://bugs.mitk.org/show_bug.cgi?id=12263)
+
+  bool conversionError(false);
+  Vector3D right; right.Fill(0.0);
+  Vector3D up; right.Fill(0.0);
+  DICOMStringToOrientationVectors( input, right, up, conversionError );
+
+  std::ostringstream ss;
+  ss.setf(std::ios::fixed, std::ios::floatfield);
+  ss.precision(m_Precision);
+  ss << right[0] << "\\"
+     << right[1] << "\\"
+     << right[2] << "\\"
+     << up[0] << "\\"
+     << up[1] << "\\"
+     << up[2];
+
+  return ss.str();
+}
+
 mitk::DICOMTagBasedSorter
 ::DICOMTagBasedSorter()
 :DICOMDatasetSorter()
@@ -26,6 +56,12 @@ mitk::DICOMTagBasedSorter
 mitk::DICOMTagBasedSorter
 ::~DICOMTagBasedSorter()
 {
+  for(TagValueProcessorMap::iterator ti = m_TagValueProcessor.begin();
+      ti != m_TagValueProcessor.end();
+      ++ti)
+  {
+    delete ti->second;
+  }
 }
 
 mitk::DICOMTagBasedSorter
@@ -59,9 +95,10 @@ mitk::DICOMTagBasedSorter
 
 void
 mitk::DICOMTagBasedSorter
-::AddDistinguishingTag( const DICOMTag& tag )
+::AddDistinguishingTag( const DICOMTag& tag, TagValueProcessor* tagValueProcessor )
 {
   m_DistinguishingTags.push_back(tag);
+  m_TagValueProcessor[tag] = tagValueProcessor;
 }
 
 void
@@ -104,7 +141,17 @@ mitk::DICOMTagBasedSorter
        ++tagIter)
   {
     groupID << tagIter->GetGroup() << tagIter->GetElement(); // make group/element part of the id to cover empty tags
-    groupID << dataset->GetTagValueAsString(*tagIter);
+    std::string rawTagValue = dataset->GetTagValueAsString(*tagIter);
+    std::string processedTagValue;
+    if ( m_TagValueProcessor[*tagIter] != NULL )
+    {
+      processedTagValue = (*m_TagValueProcessor[*tagIter])(rawTagValue);
+    }
+    else
+    {
+      processedTagValue = rawTagValue;
+    }
+    groupID << processedTagValue;
   }
   // shorten ID?
   return groupID.str();
@@ -130,6 +177,8 @@ mitk::DICOMTagBasedSorter
     listForGroupID[groupID].push_back(dataset);
   }
 
+  MITK_DEBUG << "After tag based splitting: " << listForGroupID.size() << " groups";
+
   return listForGroupID;
 }
 
@@ -145,12 +194,32 @@ mitk::DICOMTagBasedSorter
     //    - sorting order (ascending, descending)
     //    - sort numerically
     //    - ... ?
+    unsigned int groupIndex(0);
     for (GroupIDToListType::iterator gIter = groups.begin();
          gIter != groups.end();
-         ++gIter)
+         ++groupIndex, ++gIter)
     {
       DICOMDatasetList& dsList = gIter->second;
+      MITK_DEBUG << "   --------------------------------------------------------------------------------";
+      MITK_DEBUG << "   DICOMTagBasedSorter before sorting group : " << groupIndex;
+      for (DICOMDatasetList::iterator oi = dsList.begin();
+           oi != dsList.end();
+           ++oi)
+      {
+        MITK_DEBUG << "     INPUT     : " << (*oi)->GetFilenameIfAvailable();
+      }
+
       std::sort( dsList.begin(), dsList.end(), ParameterizedDatasetSort( m_SortCriterion ) );
+
+      MITK_DEBUG << "   --------------------------------------------------------------------------------";
+      MITK_DEBUG << "   DICOMTagBasedSorter after sorting group : " << groupIndex;
+      for (DICOMDatasetList::iterator oi = dsList.begin();
+           oi != dsList.end();
+           ++oi)
+      {
+        MITK_DEBUG << "     OUTPUT    : " << (*oi)->GetFilenameIfAvailable();
+      }
+      MITK_DEBUG << "   --------------------------------------------------------------------------------";
     }
   }
 

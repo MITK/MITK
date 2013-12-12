@@ -30,6 +30,8 @@ class DICOMReader_EXPORT DICOMDatasetAccess
 
     virtual std::string GetFilenameIfAvailable() const = 0;
     virtual std::string GetTagValueAsString(const mitk::DICOMTag& tag) const = 0;
+
+    virtual ~DICOMDatasetAccess() {};
 };
 
 

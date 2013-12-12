@@ -35,6 +35,8 @@ namespace mitk
       mitkNewMacro1Param( DICOMGDCMImageFrameInfo, DICOMImageFrameInfo::Pointer);
       mitkNewMacro2Param( DICOMGDCMImageFrameInfo, DICOMImageFrameInfo::Pointer, gdcm::Scanner::TagToValue const&);
 
+      virtual ~DICOMGDCMImageFrameInfo();
+
       virtual std::string GetTagValueAsString(const DICOMTag&) const;
 
       std::string GetFilenameIfAvailable() const;

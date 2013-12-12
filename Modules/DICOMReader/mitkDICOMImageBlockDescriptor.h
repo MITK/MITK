@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMEnums.h"
 #include "mitkDICOMImageFrameInfo.h"
+#include "mitkDICOMTag.h"
 
 #include "mitkImage.h"
 
@@ -53,7 +54,6 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
 
     void SetPixelSpacingInformation(const std::string& pixelSpacing, const std::string& imagerPixelSpacing);
     void GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const;
-    bool DICOMStringToSpacing(const std::string& s, float& spacingX, float& spacingY) const;
 
   private:
 

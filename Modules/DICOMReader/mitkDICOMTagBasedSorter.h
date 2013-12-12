@@ -30,10 +30,25 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
 {
   public:
 
+    class TagValueProcessor // TODO use smart pointers here
+    {
+      public:
+        virtual std::string operator()(const std::string&) const = 0;
+    };
+
+    class CutDecimalPlaces : public TagValueProcessor
+    {
+      public:
+        CutDecimalPlaces(unsigned int precision);
+        virtual std::string operator()(const std::string&) const;
+      private:
+        unsigned int m_Precision;
+    };
+
     mitkClassMacro( DICOMTagBasedSorter, DICOMDatasetSorter )
     itkNewMacro( DICOMTagBasedSorter )
 
-    void AddDistinguishingTag( const DICOMTag& );
+    void AddDistinguishingTag( const DICOMTag&, TagValueProcessor* tagValueProcessor = NULL );
     void SetSortCriterion( DICOMSortCriterion::ConstPointer criterion );
 
     virtual DICOMTagList GetTagsOfInterest();
@@ -65,6 +80,9 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
     GroupIDToListType& SortGroups(GroupIDToListType& groups);
 
     DICOMTagList m_DistinguishingTags;
+    typedef std::map<const DICOMTag, TagValueProcessor*>  TagValueProcessorMap;
+    TagValueProcessorMap m_TagValueProcessor;
+
     DICOMSortCriterion::ConstPointer m_SortCriterion;
 };
 

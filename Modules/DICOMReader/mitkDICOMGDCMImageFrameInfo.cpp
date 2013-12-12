@@ -40,6 +40,10 @@ mitk::DICOMGDCMImageFrameInfo
 {
 }
 
+mitk::DICOMGDCMImageFrameInfo::
+~DICOMGDCMImageFrameInfo()
+{
+}
 
 std::string
 mitk::DICOMGDCMImageFrameInfo

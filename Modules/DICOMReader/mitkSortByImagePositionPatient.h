@@ -42,9 +42,6 @@ class DICOMReader_EXPORT SortByImagePositionPatient : public DICOMSortCriterion
     SortByImagePositionPatient(const SortByImagePositionPatient& other);
     SortByImagePositionPatient& operator=(const SortByImagePositionPatient& other);
 
-    mitk::Point3D DICOMStringToPoint3D(const std::string& s, bool& successful) const;
-    void DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up, bool& successful) const;
-
   private:
 };
 

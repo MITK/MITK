@@ -39,9 +39,6 @@ public:
 
   Point3D GetOffsetVector(mitk::BaseRenderer* renderer = NULL) const;
 
-  Overlay::Bounds GetBoundsOnDisplay(BaseRenderer*) const;
-  void SetBoundsOnDisplay(BaseRenderer*, const Bounds&);
-
   mitkClassMacro(VtkOverlay3D, VtkOverlay);
 
 protected:

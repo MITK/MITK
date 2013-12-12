@@ -48,23 +48,29 @@ public:
   GrabCutOpenCVImageFilter();
   virtual ~GrabCutOpenCVImageFilter();
 
-  bool FilterImage( cv::Mat& image );
+  bool OnFilterImage( cv::Mat& image );
 
   void SetModelPoints(ModelPointsList foregroundPoints);
   void SetModelPoints(ModelPointsList foregroundPoints, ModelPointsList backgroundPoints);
+
+  void SetModelPoints(cv::Mat foregroundMask);
+  void SetModelPoints(cv::Mat foregroundMask, cv::Mat backgroundMask);
 
   void SetModelPointsDilationSize(int modelPointsDilationSize);
 
   void SetUseOnlyRegionAroundModelPoints(unsigned int additionalWidth);
   void SetUseFullImage();
 
-  unsigned int GetResultCount();
+  int GetResultImageId();
   cv::Mat GetResultMask();
+  std::vector<ModelPointsList> GetResultContours();
 
 protected:
   cv::Mat GetMaskFromPointSets();
   cv::Rect GetBoundingRectFromMask(cv::Mat mask);
   cv::Mat RunSegmentation(cv::Mat input, cv::Mat mask);
+
+  ModelPointsList ConvertMaskToModelPointsList(cv::Mat mask);
 
   bool                         m_PointSetsChanged;
   bool                         m_InputImageChanged;
@@ -85,7 +91,8 @@ protected:
   unsigned int                 m_ProcessEveryNumImage;
   unsigned int                 m_CurrentProcessImageNum;
 
-  unsigned int                 m_ResultCount;
+  int                          m_InputImageId;
+  int                          m_ResultImageId;
 
 private:
   static ITK_THREAD_RETURN_TYPE SegmentationWorker(void* pInfoStruct);

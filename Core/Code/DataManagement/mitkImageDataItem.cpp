@@ -50,7 +50,7 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, const mitk::Ima
     m_Dimensions[i] = desc->GetDimensions()[i];
   this->ComputeItemSize(m_Dimensions,dimension);
 
-  if(data != NULL)
+  if(data != NULL && data != m_Data)
   {
     memcpy(m_Data, data, m_Size);
     if(manageMemory)

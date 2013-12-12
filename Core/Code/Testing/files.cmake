@@ -70,6 +70,9 @@ set(MODULE_TESTS
   mitkPropertyFiltersTest.cpp
   mitkTinyXMLTest.cpp
   mitkRawImageFileReaderTest.cpp
+  mitkInteractionEventTest.cpp
+  mitkLookupTableTest.cpp
+  mitkSTLFileReaderTest.cpp
 
   ################## DISABLED TESTS #################################################
   #mitkAbstractTransformGeometryTest.cpp #seems as tested class mitkExternAbstractTransformGeometry doesnt exist any more
@@ -78,6 +81,9 @@ set(MODULE_TESTS
   #mitkSegmentationInterpolationTest.cpp #file doesn't exist!
   #mitkPipelineSmartPointerCorrectnessTest.cpp #file doesn't exist!
   #mitkITKThreadingTest.cpp #test outdated because itk::Semaphore was removed from ITK
+  #mitkAbstractTransformPlaneGeometryTest.cpp #mitkVtkAbstractTransformPlaneGeometry doesn't exist any more
+  #mitkTestUtilSharedLibrary.cpp #Linker problem with this test...
+  #mitkTextOverlay2DSymbolsRenderingTest.cpp #Implementation of the tested feature is not finished yet. Ask Christoph or see bug TODO for details.
 )
 
 # test with image filename as an extra command line parameter

@@ -46,6 +46,12 @@ mitk::PersistenceService::~PersistenceService()
   MITK_DEBUG("mitk::PersistenceService") << "destructing PersistenceService";
 }
 
+std::string mitk::PersistenceService::GetDefaultPersistenceFile() const
+{
+    std::string file = "PersistentData.mitk";
+    return file;
+}
+
 mitk::PropertyList::Pointer mitk::PersistenceService::GetPropertyList( std::string& id, bool* existed )
 {
     mitk::PropertyList::Pointer propList;
@@ -93,7 +99,7 @@ bool mitk::PersistenceService::Save(const std::string& fileName, bool appendChan
     bool save = false;
     std::string theFile = fileName;
     if(theFile.empty())
-        theFile = IPersistenceService::GetDefaultPersistenceFile();
+        theFile = PersistenceService::GetDefaultPersistenceFile();
 
     mitk::DataStorage::Pointer tempDs;
     if(appendChanges)
@@ -128,7 +134,7 @@ bool mitk::PersistenceService::Load(const std::string& fileName, bool enforceRel
 
     std::string theFile = fileName;
     if(theFile.empty())
-        theFile = IPersistenceService::GetDefaultPersistenceFile();
+        theFile = PersistenceService::GetDefaultPersistenceFile();
 
     if( !itksys::SystemTools::FileExists(theFile.c_str()) )
         return false;

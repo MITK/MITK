@@ -37,6 +37,8 @@ namespace mitk
 
         ~PersistenceService();
 
+        std::string GetDefaultPersistenceFile() const;
+
         mitk::PropertyList::Pointer GetPropertyList( std::string& id, bool* existed=0 );
 
         std::string GetPersistenceNodePropertyName() const;

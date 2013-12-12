@@ -43,24 +43,16 @@ namespace mitk
     {
     public:
         ///
-        /// Set a default directory for storage
-        ///
-        static std::string CreateDefaultFileName();
-        ///
-        /// Get the default directory for storage
-        ///
-        static void SetDefaultPersistenceFile(const std::string& defaultPersistenceFile);
-        ///
-        /// Set a default directory for storage
-        ///
-        static std::string GetDefaultPersistenceFile();
-        ///
         /// If PropertyList with the given id exists, returns it. Otherwise creates a new one and returns it.
         /// If id is empty a UUID will be created and set on the variable
         /// If existed was passed, it is true if the PropertyList with that id existed, false otherwise
         /// \return a valid PropertyList with a StringProperty "Id" containing the passed id
         ///
         virtual mitk::PropertyList::Pointer GetPropertyList( std::string& id, bool* existed=0 ) = 0;
+        ///
+        /// Get the default name of the PersistenceFile (the one that is loaded at startup)
+        ///
+        virtual std::string GetDefaultPersistenceFile() const = 0;
         ///
         /// \return The name of the Bool Property that specifies whether a DataNode is a Node carrying Persistence PropertyLists
         ///
@@ -97,6 +89,10 @@ namespace mitk
         ///
         virtual void SetAutoLoadAndSave(bool autoLoadAndSave) = 0;
         ///
+        /// \return whether AutoLoading is activated or not
+        ///
+        virtual bool GetAutoLoadAndSave() const = 0;
+        ///
         /// adds a observer which is informed if a propertyList gets replaced during a Load() procedure
         ///
         virtual void AddPropertyListReplacedObserver( PropertyListReplacedObserver* observer ) = 0;
@@ -108,8 +104,6 @@ namespace mitk
         /// nothing to do here
         ///
         virtual ~IPersistenceService();
-    private:
-        static std::string m_DefaultPersistenceFile;
     };
 }
 
@@ -268,6 +262,78 @@ private:\
     propList->Get( #PARAM2_MEMBER_NAME, PARAM2_MEMBER_NAME );\
     propList->Get( #PARAM3_MEMBER_NAME, PARAM3_MEMBER_NAME );\
     propList->Get( #PARAM4_MEMBER_NAME, PARAM4_MEMBER_NAME );\
+    PERSISTENCE_MACRO_END_PART(THE_CLASS_NAME, ID_MEMBER_NAME)
+
+#define PERSISTENCE_CREATE5(THE_CLASS_NAME, ID_MEMBER_NAME, PARAM_MEMBER_NAME, PARAM2_MEMBER_NAME, PARAM3_MEMBER_NAME, PARAM4_MEMBER_NAME, PARAM5_MEMBER_NAME)\
+    PERSISTENCE_MACRO_START_PART(ID_MEMBER_NAME)\
+    propList->Set( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    propList->Set( #PARAM2_MEMBER_NAME, PARAM2_MEMBER_NAME );\
+    propList->Set( #PARAM3_MEMBER_NAME, PARAM3_MEMBER_NAME );\
+    propList->Set( #PARAM4_MEMBER_NAME, PARAM4_MEMBER_NAME );\
+    propList->Set( #PARAM5_MEMBER_NAME, PARAM5_MEMBER_NAME );\
+    PERSISTENCE_MACRO_MIDDLE_PART(ID_MEMBER_NAME)\
+    propList->Get( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    propList->Get( #PARAM2_MEMBER_NAME, PARAM2_MEMBER_NAME );\
+    propList->Get( #PARAM3_MEMBER_NAME, PARAM3_MEMBER_NAME );\
+    propList->Get( #PARAM4_MEMBER_NAME, PARAM4_MEMBER_NAME );\
+    propList->Get( #PARAM5_MEMBER_NAME, PARAM5_MEMBER_NAME );\
+    PERSISTENCE_MACRO_END_PART(THE_CLASS_NAME, ID_MEMBER_NAME)
+
+#define PERSISTENCE_CREATE6(THE_CLASS_NAME, ID_MEMBER_NAME, PARAM_MEMBER_NAME, PARAM2_MEMBER_NAME, PARAM3_MEMBER_NAME, PARAM4_MEMBER_NAME, PARAM5_MEMBER_NAME, PARAM6_MEMBER_NAME)\
+    PERSISTENCE_MACRO_START_PART(ID_MEMBER_NAME)\
+    propList->Set( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    propList->Set( #PARAM2_MEMBER_NAME, PARAM2_MEMBER_NAME );\
+    propList->Set( #PARAM3_MEMBER_NAME, PARAM3_MEMBER_NAME );\
+    propList->Set( #PARAM4_MEMBER_NAME, PARAM4_MEMBER_NAME );\
+    propList->Set( #PARAM5_MEMBER_NAME, PARAM5_MEMBER_NAME );\
+    propList->Set( #PARAM6_MEMBER_NAME, PARAM6_MEMBER_NAME );\
+    PERSISTENCE_MACRO_MIDDLE_PART(ID_MEMBER_NAME)\
+    propList->Get( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    propList->Get( #PARAM2_MEMBER_NAME, PARAM2_MEMBER_NAME );\
+    propList->Get( #PARAM3_MEMBER_NAME, PARAM3_MEMBER_NAME );\
+    propList->Get( #PARAM4_MEMBER_NAME, PARAM4_MEMBER_NAME );\
+    propList->Get( #PARAM5_MEMBER_NAME, PARAM5_MEMBER_NAME );\
+    propList->Get( #PARAM6_MEMBER_NAME, PARAM6_MEMBER_NAME );\
+    PERSISTENCE_MACRO_END_PART(THE_CLASS_NAME, ID_MEMBER_NAME)
+
+#define PERSISTENCE_CREATE7(THE_CLASS_NAME, ID_MEMBER_NAME, PARAM_MEMBER_NAME, PARAM2_MEMBER_NAME, PARAM3_MEMBER_NAME, PARAM4_MEMBER_NAME, PARAM5_MEMBER_NAME, PARAM6_MEMBER_NAME, PARAM7_MEMBER_NAME)\
+    PERSISTENCE_MACRO_START_PART(ID_MEMBER_NAME)\
+    propList->Set( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    propList->Set( #PARAM2_MEMBER_NAME, PARAM2_MEMBER_NAME );\
+    propList->Set( #PARAM3_MEMBER_NAME, PARAM3_MEMBER_NAME );\
+    propList->Set( #PARAM4_MEMBER_NAME, PARAM4_MEMBER_NAME );\
+    propList->Set( #PARAM5_MEMBER_NAME, PARAM5_MEMBER_NAME );\
+    propList->Set( #PARAM6_MEMBER_NAME, PARAM6_MEMBER_NAME );\
+    propList->Set( #PARAM7_MEMBER_NAME, PARAM7_MEMBER_NAME );\
+    PERSISTENCE_MACRO_MIDDLE_PART(ID_MEMBER_NAME)\
+    propList->Get( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    propList->Get( #PARAM2_MEMBER_NAME, PARAM2_MEMBER_NAME );\
+    propList->Get( #PARAM3_MEMBER_NAME, PARAM3_MEMBER_NAME );\
+    propList->Get( #PARAM4_MEMBER_NAME, PARAM4_MEMBER_NAME );\
+    propList->Get( #PARAM5_MEMBER_NAME, PARAM5_MEMBER_NAME );\
+    propList->Get( #PARAM6_MEMBER_NAME, PARAM6_MEMBER_NAME );\
+    propList->Get( #PARAM7_MEMBER_NAME, PARAM7_MEMBER_NAME );\
+    PERSISTENCE_MACRO_END_PART(THE_CLASS_NAME, ID_MEMBER_NAME)
+
+#define PERSISTENCE_CREATE8(THE_CLASS_NAME, ID_MEMBER_NAME, PARAM_MEMBER_NAME, PARAM2_MEMBER_NAME, PARAM3_MEMBER_NAME, PARAM4_MEMBER_NAME, PARAM5_MEMBER_NAME, PARAM6_MEMBER_NAME, PARAM7_MEMBER_NAME, PARAM8_MEMBER_NAME)\
+    PERSISTENCE_MACRO_START_PART(ID_MEMBER_NAME)\
+    propList->Set( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    propList->Set( #PARAM2_MEMBER_NAME, PARAM2_MEMBER_NAME );\
+    propList->Set( #PARAM3_MEMBER_NAME, PARAM3_MEMBER_NAME );\
+    propList->Set( #PARAM4_MEMBER_NAME, PARAM4_MEMBER_NAME );\
+    propList->Set( #PARAM5_MEMBER_NAME, PARAM5_MEMBER_NAME );\
+    propList->Set( #PARAM6_MEMBER_NAME, PARAM6_MEMBER_NAME );\
+    propList->Set( #PARAM7_MEMBER_NAME, PARAM7_MEMBER_NAME );\
+    propList->Set( #PARAM8_MEMBER_NAME, PARAM8_MEMBER_NAME );\
+    PERSISTENCE_MACRO_MIDDLE_PART(ID_MEMBER_NAME)\
+    propList->Get( #PARAM_MEMBER_NAME, PARAM_MEMBER_NAME );\
+    propList->Get( #PARAM2_MEMBER_NAME, PARAM2_MEMBER_NAME );\
+    propList->Get( #PARAM3_MEMBER_NAME, PARAM3_MEMBER_NAME );\
+    propList->Get( #PARAM4_MEMBER_NAME, PARAM4_MEMBER_NAME );\
+    propList->Get( #PARAM5_MEMBER_NAME, PARAM5_MEMBER_NAME );\
+    propList->Get( #PARAM6_MEMBER_NAME, PARAM6_MEMBER_NAME );\
+    propList->Get( #PARAM7_MEMBER_NAME, PARAM7_MEMBER_NAME );\
+    propList->Get( #PARAM8_MEMBER_NAME, PARAM8_MEMBER_NAME );\
     PERSISTENCE_MACRO_END_PART(THE_CLASS_NAME, ID_MEMBER_NAME)
 
 US_DECLARE_SERVICE_INTERFACE(mitk::IPersistenceService, "org.mitk.services.IPersistenceService")

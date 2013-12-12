@@ -37,6 +37,6 @@ if(MITK_USE_ACVD)
 
     set(ACVD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
   else()
-    mitkMacroEmptyExternalProject(${proj} "${proj}_DEPENDENCIES}")
+    mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   endif()
 endif()

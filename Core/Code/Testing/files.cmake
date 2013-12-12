@@ -83,7 +83,7 @@ set(MODULE_TESTS
   #mitkITKThreadingTest.cpp #test outdated because itk::Semaphore was removed from ITK
   #mitkAbstractTransformPlaneGeometryTest.cpp #mitkVtkAbstractTransformPlaneGeometry doesn't exist any more
   #mitkTestUtilSharedLibrary.cpp #Linker problem with this test...
-  #mitkTextOverlay2DSymbolsRenderingTest.cpp #Implementation of the tested feature is not finished yet. Ask Christoph or see bug TODO for details.
+  #mitkTextOverlay2DSymbolsRenderingTest.cpp #Implementation of the tested feature is not finished yet. Ask Christoph or see bug 15104 for details.
 )
 
 # test with image filename as an extra command line parameter

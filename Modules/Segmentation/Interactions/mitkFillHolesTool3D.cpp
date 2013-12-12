@@ -66,7 +66,7 @@ us::ModuleResource mitk::FillHolesTool3D::GetIconResource() const
 
 const char* mitk::FillHolesTool3D::GetName() const
 {
-  return "FillHolesTool3D";
+  return "Fill Holes";
 }
 
 void mitk::FillHolesTool3D::SetConsiderAllLabels(bool value)
@@ -95,14 +95,23 @@ void mitk::FillHolesTool3D::Run()
 
   try
   {
-    AccessByItk(workingImage, InternalProcessing);
+    AccessByItk(workingImage, InternalRun);
   }
-  catch( itk::ExceptionObject& e )
+  catch( itk::ExceptionObject & e )
   {
-   MITK_ERROR << "Exception caught: " << e.GetDescription();
-   m_ProgressCommand->Reset();
-   CurrentlyBusy.Send(false);
-   return;
+    CurrentlyBusy.Send(false);
+    m_ProgressCommand->Reset();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    m_ToolManager->ActivateTool(-1);
+    return;
+  }
+  catch (...)
+  {
+    CurrentlyBusy.Send(false);
+    m_ProgressCommand->Reset();
+    MITK_ERROR << "Unkown exception caught!";
+    m_ToolManager->ActivateTool(-1);
+    return;
   }
 
   CurrentlyBusy.Send(false);
@@ -112,7 +121,7 @@ void mitk::FillHolesTool3D::Run()
 
 
 template < typename TPixel, unsigned int VDimension >
-void mitk::FillHolesTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* input )
+void mitk::FillHolesTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
   typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;

@@ -45,10 +45,9 @@ namespace mitk {
 }
 
 
-mitk::CloseTool3D::CloseTool3D()
+mitk::CloseTool3D::CloseTool3D() : m_Radius(1)
 {
   m_ProgressCommand = mitk::ToolCommand::New();
-  m_Radius = 1;
 }
 
 mitk::CloseTool3D::~CloseTool3D()
@@ -70,7 +69,7 @@ us::ModuleResource mitk::CloseTool3D::GetIconResource() const
 
 const char* mitk::CloseTool3D::GetName() const
 {
-  return "CloseTool3D";
+  return "Close";
 }
 
 void mitk::CloseTool3D::SetRadius(int value)
@@ -102,7 +101,7 @@ void mitk::CloseTool3D::Run()
 
   try
   {
-    AccessByItk(workingImage, InternalProcessing);
+    AccessByItk(workingImage, InternalRun);
   }
   catch( itk::ExceptionObject & e )
   {
@@ -129,7 +128,7 @@ void mitk::CloseTool3D::Run()
 
 
 template < typename TPixel, unsigned int VDimension >
-void mitk::CloseTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* input )
+void mitk::CloseTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
   typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;

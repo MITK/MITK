@@ -39,7 +39,7 @@ namespace mitk
 /**
   \brief Morphologic closing tool.
 
-  This tool smooths the active label by morphologic opening.
+  This tool smooths the active label by morphologic closing.
 */
 class Segmentation_EXPORT CloseTool3D : public AutoSegmentationTool
 {
@@ -53,9 +53,13 @@ class Segmentation_EXPORT CloseTool3D : public AutoSegmentationTool
     virtual const char* GetName() const;
     us::ModuleResource GetIconResource() const;
 
+    /// \brief Runs the tool.
     void Run();
 
+    /// \brief Sets the radius of the kernel used in the morphologic operation.
     void SetRadius(int);
+
+    /// \brief Gets the radius of the kernel used in the morphologic operation.
     int GetRadius();
 
   protected:
@@ -66,7 +70,7 @@ class Segmentation_EXPORT CloseTool3D : public AutoSegmentationTool
     int m_Radius;
 
     template < typename TPixel, unsigned int VDimension >
-    void InternalProcessing( itk::Image< TPixel, VDimension>* input );
+    void InternalRun( itk::Image< TPixel, VDimension>* input );
 };
 
 } // namespace

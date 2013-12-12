@@ -68,7 +68,7 @@ us::ModuleResource mitk::ErodeTool3D::GetIconResource() const
 
 const char* mitk::ErodeTool3D::GetName() const
 {
-  return "ErodeTool3D";
+  return "Erode";
 }
 
 void mitk::ErodeTool3D::SetRadius(int value)

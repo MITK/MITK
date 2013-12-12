@@ -57,8 +57,10 @@ class Segmentation_EXPORT SplitConnectedRegionsTool3D : public AutoSegmentationT
     /// \brief Replaces the active label with the preview image.
     virtual void AcceptPreview();
 
+    /// \brief Runs the tool.
     void Run();
 
+    /// \brief Sets the number of new labels to generate.
     void SetNumberOfConnectedRegionsToKeep(int);
 
   protected:
@@ -71,7 +73,7 @@ class Segmentation_EXPORT SplitConnectedRegionsTool3D : public AutoSegmentationT
     mitk::ColorSequenceRainbow::Pointer m_ColorSequenceRainbow;
 
     template < typename TPixel, unsigned int VDimension >
-    void InternalProcessing( itk::Image<TPixel, VDimension>* input );
+    void InternalRun( itk::Image<TPixel, VDimension>* input );
 
     template <typename ImageType1, typename ImageType2>
     void InternalAcceptPreview( ImageType1* targetImage, const ImageType2* sourceImage );

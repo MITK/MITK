@@ -46,10 +46,9 @@ namespace mitk {
 }
 
 
-mitk::OpenTool3D::OpenTool3D()
+mitk::OpenTool3D::OpenTool3D() : m_Radius(1)
 {
   m_ProgressCommand = mitk::ToolCommand::New();
-  m_Radius = 1;
 }
 
 mitk::OpenTool3D::~OpenTool3D()
@@ -71,7 +70,7 @@ us::ModuleResource mitk::OpenTool3D::GetIconResource() const
 
 const char* mitk::OpenTool3D::GetName() const
 {
-  return "OpenTool3D";
+  return "Open";
 }
 
 void mitk::OpenTool3D::SetRadius(int value)
@@ -103,7 +102,7 @@ void mitk::OpenTool3D::Run()
 
   try
   {
-    AccessByItk(workingImage, ITKProcessing);
+    AccessByItk(workingImage, InternalRun);
   }
   catch( itk::ExceptionObject & e )
   {
@@ -130,7 +129,7 @@ void mitk::OpenTool3D::Run()
 
 
 template < typename TPixel, unsigned int VDimension >
-void mitk::OpenTool3D::ITKProcessing( itk::Image< TPixel, VDimension>* input )
+void mitk::OpenTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
   typedef itk::LabelObject< TPixel, VDimension > LabelObjectType;

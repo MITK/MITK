@@ -69,7 +69,7 @@ us::ModuleResource mitk::KeepNConnectedRegionsTool3D::GetIconResource() const
 
 const char* mitk::KeepNConnectedRegionsTool3D::GetName() const
 {
-  return "KeepNRegionsTool3D";
+  return "Keep N Largest";
 }
 
 void mitk::KeepNConnectedRegionsTool3D::SetNumberOfConnectedRegionsToKeep(int value)

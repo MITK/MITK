@@ -36,9 +36,13 @@ namespace mitk
 {
 
 /**
-  \brief Segmentation hole filling tool
+  \brief A tool for filling holes in a label
 
-  This tool fills holes on the active label.
+  This tool fills holes on the active label. There are two types of holes.
+  One is a region belonging to the "exterior" that is completly surrounded
+  by the active label. The default behavior of this tool is to fill such
+  holes. The other type of holes is one that has some parts surrounded
+  by other labels. SetCondiderAllLabels(true) enables this mode.
 */
 class Segmentation_EXPORT FillHolesTool3D : public AutoSegmentationTool
 {
@@ -52,6 +56,7 @@ class Segmentation_EXPORT FillHolesTool3D : public AutoSegmentationTool
     virtual const char* GetName() const;
     us::ModuleResource GetIconResource() const;
 
+    /// \brief Runs the tool.
     void Run();
 
     void SetConsiderAllLabels(bool);
@@ -62,7 +67,7 @@ class Segmentation_EXPORT FillHolesTool3D : public AutoSegmentationTool
     virtual ~FillHolesTool3D();
 
     template < typename TPixel, unsigned int VDimension >
-    void InternalProcessing( itk::Image< TPixel, VDimension>* input );
+    void InternalRun( itk::Image< TPixel, VDimension>* input );
 
     bool m_ConsiderAllLabels;
 };

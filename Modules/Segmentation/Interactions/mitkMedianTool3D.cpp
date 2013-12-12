@@ -42,10 +42,9 @@ namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, MedianTool3D, "MedianTool3D tool");
 }
 
-mitk::MedianTool3D::MedianTool3D()
+mitk::MedianTool3D::MedianTool3D() : m_Radius(1)
 {
   m_ProgressCommand = mitk::ToolCommand::New();
-  m_Radius = 1;
 }
 
 mitk::MedianTool3D::~MedianTool3D()
@@ -66,7 +65,7 @@ us::ModuleResource mitk::MedianTool3D::GetIconResource() const
 
 const char* mitk::MedianTool3D::GetName() const
 {
-  return "MedianTool3D";
+  return "Median";
 }
 
 void mitk::MedianTool3D::SetRadius(int value)
@@ -98,7 +97,7 @@ void mitk::MedianTool3D::Run()
 
   try
   {
-    AccessByItk(workingImage, InternalProcessing);
+    AccessByItk(workingImage, InternalRun);
   }
   catch( itk::ExceptionObject & e )
   {
@@ -124,7 +123,7 @@ void mitk::MedianTool3D::Run()
 
 
 template < typename TPixel, unsigned int VDimension >
-void mitk::MedianTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* input )
+void mitk::MedianTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
 

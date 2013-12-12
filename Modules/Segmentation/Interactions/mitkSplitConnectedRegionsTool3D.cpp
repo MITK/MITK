@@ -72,7 +72,7 @@ us::ModuleResource mitk::SplitConnectedRegionsTool3D::GetIconResource() const
 
 const char* mitk::SplitConnectedRegionsTool3D::GetName() const
 {
-  return "Split Label";
+  return "Split";
 }
 
 void mitk::SplitConnectedRegionsTool3D::SetNumberOfConnectedRegionsToKeep(int value)
@@ -142,7 +142,7 @@ void mitk::SplitConnectedRegionsTool3D::Run()
 
   try
   {
-    AccessByItk(workingImage, InternalProcessing);
+    AccessByItk(workingImage, InternalRun);
   }
   catch( itk::ExceptionObject & e )
   {
@@ -265,7 +265,7 @@ void mitk::SplitConnectedRegionsTool3D::InternalAcceptPreview( ImageType1* targe
 }
 
 template < typename TPixel, unsigned int VDimension >
-void mitk::SplitConnectedRegionsTool3D::InternalProcessing( itk::Image<TPixel, VDimension>* input )
+void mitk::SplitConnectedRegionsTool3D::InternalRun( itk::Image<TPixel, VDimension>* input )
 {
   typedef itk::Image< TPixel, VDimension > ImageType;
   typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;

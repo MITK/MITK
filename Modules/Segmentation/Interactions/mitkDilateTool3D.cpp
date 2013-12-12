@@ -66,7 +66,7 @@ us::ModuleResource mitk::DilateTool3D::GetIconResource() const
 
 const char* mitk::DilateTool3D::GetName() const
 {
-  return "DilateTool3D";
+  return "Dilate";
 }
 
 void mitk::DilateTool3D::SetRadius(int value)

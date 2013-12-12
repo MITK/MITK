@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAutoSegmentationTool.h"
 #include "mitkLegacyAdaptors.h"
 #include "SegmentationExports.h"
-#include "mitkDataNode.h"
+//#include "mitkDataNode.h"
 #include "mitkLabelSetImage.h"
 #include "mitkStateEvent.h"
 
@@ -36,7 +36,7 @@ namespace mitk
 {
 
 /**
-  \brief Segmentation smoothing tool.
+  \brief A tool for smoothing a label by median filtering.
 
   This tool applies a median smoothing filter on the active label
 */
@@ -52,9 +52,13 @@ class Segmentation_EXPORT MedianTool3D : public AutoSegmentationTool
     virtual const char* GetName() const;
     us::ModuleResource GetIconResource() const;
 
+    /// \brief Runs the tool.
     void Run();
 
+    /// \brief Sets the radius of the kernel used in the morphologic operation.
     void SetRadius(int);
+
+    /// \brief Gets the radius of the kernel used in the morphologic operation.
     int GetRadius();
 
   protected:
@@ -65,7 +69,7 @@ class Segmentation_EXPORT MedianTool3D : public AutoSegmentationTool
     int m_Radius;
 
     template < typename TPixel, unsigned int VDimension >
-    void InternalProcessing( itk::Image< TPixel, VDimension>* input );
+    void InternalRun( itk::Image< TPixel, VDimension>* input );
 };
 
 } // namespace

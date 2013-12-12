@@ -17,14 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSurfaceDeformationDataInteractor3D_h_
 #define mitkSurfaceDeformationDataInteractor3D_h_
 
-//#include "itkObject.h"
-//#include "itkSmartPointer.h"
-//#include "itkObjectFactory.h"
-#include "mitkBaseRenderer.h"
-#include "mitkCommon.h"
 #include "mitkDataInteractor.h"
 #include "MitkExtExports.h"
-#include "mitkGeometry3D.h"
 #include "mitkSurface.h"
 
 namespace mitk
@@ -43,9 +37,6 @@ public:
   mitkClassMacro(SurfaceDeformationDataInteractor3D, DataInteractor);
   itkNewMacro(Self);
 
-  /** \brief Sets the amount of precision */
-  void SetPrecision( ScalarType precision );
-
 protected:
   SurfaceDeformationDataInteractor3D();
   virtual ~SurfaceDeformationDataInteractor3D();
@@ -62,11 +53,12 @@ protected:
   /**
     * Initializes the movement, stores starting position.
     */
-  virtual bool CheckOverObject (const InteractionEvent *);
+  virtual bool CheckOverObject (const InteractionEvent*);
   virtual bool SelectObject (StateMachineAction*, InteractionEvent*);
   virtual bool DeselectObject (StateMachineAction*, InteractionEvent*);
   virtual bool InitDeformation (StateMachineAction*, InteractionEvent*);
   virtual bool DeformObject (StateMachineAction*, InteractionEvent*);
+  virtual bool ScaleRadius (StateMachineAction*, InteractionEvent*);
 
   enum
   {
@@ -74,35 +66,17 @@ protected:
     COLORIZATION_CONSTANT
   };
 
-  bool ColorizeSurface(BaseRenderer::Pointer renderer, vtkPolyData* polyData, const Point3D &pickedPoint,
-                       int mode, double scalar = 0.0 );
+ private:
 
-private:
-
-  /** \brief to store the value of precision to pick a point */
-  ScalarType m_Precision;
+  bool ColorizeSurface(vtkPolyData* polyData, int timeStep, const Point3D& pickedPoint, int mode, double scalar = 0.0);
 
   Point3D m_InitialPickedPoint;
-  Point2D m_InitialPickedDisplayPoint;
-
-  Point3D m_CurrentPickedPoint;
-  Point2D m_CurrentPickedDisplayPoint;
-
   Point3D m_SurfaceColorizationCenter;
 
-  Geometry3D::Pointer m_Geometry;
-
   Surface* m_Surface;
-  vtkPolyData* m_PolyData;
-
-  DataNode* m_PickedSurfaceNode;
-  Surface * m_PickedSurface;
-
-  vtkPolyData* m_PickedPolyData;
-  vtkPolyData *m_OriginalPolyData;
+  vtkPolyData* m_OriginalPolyData;
 
   double m_GaussSigma;
-
   Vector3D m_ObjectNormal;
 };
 

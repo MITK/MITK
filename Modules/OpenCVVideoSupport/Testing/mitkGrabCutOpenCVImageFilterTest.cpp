@@ -70,14 +70,18 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, 
   // test filtering with image and model points set
   {
     grabCutFilter->SetModelPoints(foregroundPointsVector);
+    int resultCountBefore = grabCutFilter->GetResultImageId();
     MITK_TEST_CONDITION(grabCutFilter->FilterImage(image), "Filtering should return true for sucess.")
 
     cv::Mat resultMask;
     // wait up to ten seconds for the segmentation to finish
     for (unsigned int n = 0; n < 100; ++n)
     {
-      resultMask = grabCutFilter->GetResultMask();
-      if ( ! resultMask.empty()) { break; }
+      if ( ! resultCountBefore != grabCutFilter->GetResultImageId() )
+      {
+        resultMask = grabCutFilter->GetResultMask();
+        break;
+      }
       itksys::SystemTools::Delay(100);
     }
 
@@ -93,14 +97,14 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, 
   // (but with really big additional width so that whole image should be used againg)
   {
     grabCutFilter->SetUseOnlyRegionAroundModelPoints(image.cols);
-    unsigned int resultCountBefore = grabCutFilter->GetResultCount();
+    int resultCountBefore = grabCutFilter->GetResultImageId();
     grabCutFilter->FilterImage(image);
 
     cv::Mat resultMask;
     // wait up to ten seconds for the segmentation to finish
     for (unsigned int n = 0; n < 100; ++n)
     {
-      if (resultCountBefore != grabCutFilter->GetResultCount())
+      if (resultCountBefore != grabCutFilter->GetResultImageId())
       {
         resultMask = grabCutFilter->GetResultMask();
         break;
@@ -117,14 +121,14 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, 
   // test filtering with using only region around model points
   {
     grabCutFilter->SetUseOnlyRegionAroundModelPoints(0);
-    unsigned int resultCountBefore = grabCutFilter->GetResultCount();
+    int resultCountBefore = grabCutFilter->GetResultImageId();
     grabCutFilter->FilterImage(image);
 
     cv::Mat resultMask;
     // wait up to ten seconds for the segmentation to finish
     for (unsigned int n = 0; n < 100; ++n)
     {
-      if (resultCountBefore != grabCutFilter->GetResultCount())
+      if (resultCountBefore != grabCutFilter->GetResultImageId())
       {
         resultMask = grabCutFilter->GetResultMask();
         break;

@@ -28,7 +28,8 @@ mitk::GrabCutOpenCVImageFilter::GrabCutOpenCVImageFilter()
     m_ModelPointsDilationSize(0),
     m_UseOnlyRegionAroundModelPoints(false),
     m_ProcessEveryNumImage(1), m_CurrentProcessImageNum(0),
-    m_ResultCount(0),
+    m_InputImageId(AbstractOpenCVImageFilter::INVALID_IMAGE_ID),
+    m_ResultImageId(AbstractOpenCVImageFilter::INVALID_IMAGE_ID),
     m_ThreadId(-1), m_StopThread(false),
     m_MultiThreader(itk::MultiThreader::New()),
     m_WorkerBarrier(itk::ConditionVariable::New()),
@@ -46,7 +47,7 @@ mitk::GrabCutOpenCVImageFilter::~GrabCutOpenCVImageFilter()
   if ( m_ThreadId >= 0) { m_MultiThreader->TerminateThread(m_ThreadId); }
 }
 
-bool mitk::GrabCutOpenCVImageFilter::FilterImage( cv::Mat& image )
+bool mitk::GrabCutOpenCVImageFilter::OnFilterImage( cv::Mat& image )
 {
   if ( m_NewResultReady )
   {
@@ -61,6 +62,7 @@ bool mitk::GrabCutOpenCVImageFilter::FilterImage( cv::Mat& image )
 
   m_ImageMutex->Lock();
   m_InputImage = image.clone();
+  m_InputImageId = this->GetCurrentImageId();
   m_ImageMutex->Unlock();
 
   if ( ! m_ForegroundPoints.empty()) { m_WorkerBarrier->Broadcast(); }
@@ -89,6 +91,27 @@ void mitk::GrabCutOpenCVImageFilter::SetModelPoints(ModelPointsList foregroundPo
   m_PointSetsMutex->Unlock();
 }
 
+void mitk::GrabCutOpenCVImageFilter::SetModelPoints(cv::Mat foregroundMask)
+{
+  m_PointSetsMutex->Lock();
+
+  m_ForegroundPoints = this->ConvertMaskToModelPointsList(foregroundMask);
+  m_PointSetsChanged = true;
+
+  m_PointSetsMutex->Unlock();
+}
+
+void mitk::GrabCutOpenCVImageFilter::SetModelPoints(cv::Mat foregroundMask, cv::Mat backgroundMask)
+{
+  m_PointSetsMutex->Lock();
+
+  m_ForegroundPoints = this->ConvertMaskToModelPointsList(foregroundMask);
+  m_BackgroundPoints = this->ConvertMaskToModelPointsList(backgroundMask);
+  m_PointSetsChanged = true;
+
+  m_PointSetsMutex->Unlock();
+}
+
 void mitk::GrabCutOpenCVImageFilter::SetModelPointsDilationSize(int modelPointsDilationSize)
 {
   if ( modelPointsDilationSize < 0 )
@@ -110,9 +133,9 @@ void mitk::GrabCutOpenCVImageFilter::SetUseFullImage()
   m_UseOnlyRegionAroundModelPoints = false;
 }
 
-unsigned int mitk::GrabCutOpenCVImageFilter::GetResultCount()
+int mitk::GrabCutOpenCVImageFilter::GetResultImageId()
 {
-  return m_ResultCount;
+  return m_ResultImageId;
 }
 
 cv::Mat mitk::GrabCutOpenCVImageFilter::GetResultMask()
@@ -124,6 +147,34 @@ cv::Mat mitk::GrabCutOpenCVImageFilter::GetResultMask()
   m_ResultMutex->Unlock();
 
   return result;
+}
+
+std::vector<mitk::GrabCutOpenCVImageFilter::ModelPointsList> mitk::GrabCutOpenCVImageFilter::GetResultContours()
+{
+  std::vector<std::vector<cv::Point> > cvContours;
+  std::vector<cv::Vec4i> hierarchy;
+
+  cv::findContours(this->GetResultMask(), cvContours, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
+
+  std::vector<mitk::GrabCutOpenCVImageFilter::ModelPointsList> contourPoints;
+
+  for ( unsigned int i = 0; i < cvContours.size(); ++i )
+  {
+    mitk::GrabCutOpenCVImageFilter::ModelPointsList curContourPoints;
+
+    for ( std::vector<cv::Point>::iterator it = cvContours[i].begin();
+          it != cvContours[i].end(); ++it)
+    {
+      itk::Index<2> index;
+      index.SetElement(0, it->x);
+      index.SetElement(1, it->y);
+      curContourPoints.push_back(index);
+    }
+
+    contourPoints.push_back(curContourPoints);
+  }
+
+  return contourPoints;
 }
 
 cv::Mat mitk::GrabCutOpenCVImageFilter::GetMaskFromPointSets()
@@ -214,6 +265,24 @@ cv::Mat mitk::GrabCutOpenCVImageFilter::RunSegmentation(cv::Mat input, cv::Mat m
   return result; // now the result mask can be returned
 }
 
+mitk::GrabCutOpenCVImageFilter::ModelPointsList mitk::GrabCutOpenCVImageFilter::ConvertMaskToModelPointsList(cv::Mat mask)
+{
+  cv::Mat points;
+  cv::findNonZero(mask, points);
+
+  // push extracted points into a vector of itk indices
+  ModelPointsList pointsVector;
+  for ( size_t n = 0; n < points.total(); ++n)
+  {
+    itk::Index<2> index;
+    index.SetElement(0, points.at<cv::Point>(n).x);
+    index.SetElement(1, points.at<cv::Point>(n).y);
+    pointsVector.push_back(index);
+  }
+
+  return pointsVector;
+}
+
 ITK_THREAD_RETURN_TYPE mitk::GrabCutOpenCVImageFilter::SegmentationWorker(void* pInfoStruct)
 {
   // extract this pointer from thread info structure
@@ -233,6 +302,7 @@ ITK_THREAD_RETURN_TYPE mitk::GrabCutOpenCVImageFilter::SegmentationWorker(void* 
 
     thisObject->m_ImageMutex->Lock();
     cv::Mat image = thisObject->m_InputImage.clone();
+    int inputImageId = thisObject->m_InputImageId;
     thisObject->m_ImageMutex->Unlock();
 
     cv::Mat mask = thisObject->GetMaskFromPointSets();
@@ -252,7 +322,7 @@ ITK_THREAD_RETURN_TYPE mitk::GrabCutOpenCVImageFilter::SegmentationWorker(void* 
     thisObject->m_ResultMutex->Lock();
     thisObject->m_ResultMask = result;
     thisObject->m_NewResultReady = true;
-    thisObject->m_ResultCount++;
+    thisObject->m_ResultImageId = inputImageId;
     thisObject->m_ResultMutex->Unlock();
   }
 

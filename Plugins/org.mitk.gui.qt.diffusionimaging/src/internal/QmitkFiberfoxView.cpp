@@ -141,6 +141,7 @@ void QmitkFiberfoxView::AfterThread()
     //m_Controls->m_SimulationStatusText->setVisible(false);
     m_ThreadIsRunning = false;
 
+    mitk::DiffusionImage<short>::Pointer mitkImage = mitk::DiffusionImage<short>::New();
     switch (m_Worker.m_FilterType)
     {
     case 0:
@@ -151,12 +152,11 @@ void QmitkFiberfoxView::AfterThread()
             return;
         }
 
-        mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
-        image->SetVectorImage( m_TractsToDwiFilter->GetOutput() );
-        image->SetB_Value(m_ImageGenParametersBackup.b_value);
-        image->SetDirections(m_ImageGenParametersBackup.gradientDirections);
-        image->InitializeFromVectorImage();
-        m_ImageGenParametersBackup.resultNode->SetData( image );
+        mitkImage->SetVectorImage( m_TractsToDwiFilter->GetOutput() );
+        mitkImage->SetB_Value(m_ImageGenParametersBackup.b_value);
+        mitkImage->SetDirections(m_ImageGenParametersBackup.gradientDirections);
+        mitkImage->InitializeFromVectorImage();
+        m_ImageGenParametersBackup.resultNode->SetData( mitkImage );
 
         m_ImageGenParametersBackup.resultNode->SetName(m_ImageGenParametersBackup.parentNode->GetName()
                                                        +"_D"+QString::number(m_ImageGenParametersBackup.imageRegion.GetSize(0)).toStdString()
@@ -172,14 +172,6 @@ void QmitkFiberfoxView::AfterThread()
         GetDataStorage()->Add(m_ImageGenParametersBackup.resultNode, m_ImageGenParametersBackup.parentNode);
 
         m_ImageGenParametersBackup.resultNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New(m_TractsToDwiFilter->GetLevelWindow()) );
-
-        if (!m_ImageGenParametersBackup.outputPath.isEmpty())
-        {
-            mitk::NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
-            writer->SetFileName(m_ImageGenParametersBackup.outputPath.toStdString()+m_ImageGenParametersBackup.resultNode->GetName()+".dwi");
-            writer->SetInput(image);
-            writer->Update();
-        }
 
         if (m_Controls->m_VolumeFractionsBox->isChecked())
         {
@@ -207,12 +199,12 @@ void QmitkFiberfoxView::AfterThread()
         }
 
         mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(m_ImageGenParametersBackup.parentNode->GetData());
-        mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
-        image->SetVectorImage( m_ArtifactsToDwiFilter->GetOutput() );
-        image->SetB_Value(diffImg->GetB_Value());
-        image->SetDirections(diffImg->GetDirections());
-        image->InitializeFromVectorImage();
-        m_ImageGenParametersBackup.resultNode->SetData( image );
+        mitkImage = mitk::DiffusionImage<short>::New();
+        mitkImage->SetVectorImage( m_ArtifactsToDwiFilter->GetOutput() );
+        mitkImage->SetB_Value(diffImg->GetB_Value());
+        mitkImage->SetDirections(diffImg->GetDirections());
+        mitkImage->InitializeFromVectorImage();
+        m_ImageGenParametersBackup.resultNode->SetData( mitkImage );
         m_ImageGenParametersBackup.resultNode->SetName(m_ImageGenParametersBackup.parentNode->GetName()+m_ImageGenParameters.artifactModelString.toStdString());
         GetDataStorage()->Add(m_ImageGenParametersBackup.resultNode, m_ImageGenParametersBackup.parentNode);
         break;
@@ -225,6 +217,32 @@ void QmitkFiberfoxView::AfterThread()
         mitk::RenderingManager::GetInstance()->InitializeViews(
                     basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+
+    if (!m_ImageGenParametersBackup.outputPath.isEmpty())
+    {
+        try{
+            QString status("\nSaving output image to ");
+            status += m_ImageGenParametersBackup.outputPath;
+            status += m_ImageGenParametersBackup.resultNode->GetName().c_str();
+            status += ".dwi";
+            m_Controls->m_SimulationStatusText->append(status);
+            mitk::NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
+            writer->SetFileName(m_ImageGenParametersBackup.outputPath.toStdString()+m_ImageGenParametersBackup.resultNode->GetName()+".dwi");
+            writer->SetInput(mitkImage);
+            writer->Update();
+            m_Controls->m_SimulationStatusText->append("File saved successfully.");
+        }
+        catch (itk::ExceptionObject &e)
+        {
+            QString status("\nException during DWI writing: ");
+            status += e.GetDescription();
+            m_Controls->m_SimulationStatusText->append(status);
+        }
+        catch (...)
+        {
+            m_Controls->m_SimulationStatusText->append("\nUnknown exception during DWI writing!");
+        }
     }
 }
 

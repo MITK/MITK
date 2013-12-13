@@ -440,6 +440,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         m_ImageRegion.SetSize(1, y+1);
 
     // resample fiber bundle for sufficient voxel coverage
+    m_StatusText += "\n"+this->GetTime()+" > Resampling fibers ...\n";
     double segmentVolume = 0.0001;
     float minSpacing = 1;
     if(m_UpsampledSpacing[0]<m_UpsampledSpacing[1] && m_UpsampledSpacing[0]<m_UpsampledSpacing[2])
@@ -457,10 +458,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     double interpFact = 2*atan(-0.5*m_InterpolationShrink);
     double maxVolume = 0;
     double voxelVolume = m_UpsampledSpacing[0]*m_UpsampledSpacing[1]*m_UpsampledSpacing[2];
-
-    m_StatusText += "\nGenerating signal of " + boost::lexical_cast<std::string>(m_FiberModels.size()) + " fiber compartments\n";
-    MITK_INFO << "Generating signal of " << m_FiberModels.size() << " fiber compartments";
-    boost::progress_display disp(numFibers*m_FiberModels.at(0)->GetNumGradients());
 
     if (m_AddMotionArtifact)
     {
@@ -481,6 +478,10 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         MITK_INFO << "Maxmimum translation: " << m_MaxTranslation;
     }
     maxVolume = 0;
+
+    m_StatusText += "\n"+this->GetTime()+" > Generating signal of " + boost::lexical_cast<std::string>(m_FiberModels.size()) + " fiber compartments\n";
+    MITK_INFO << "Generating signal of " << m_FiberModels.size() << " fiber compartments";
+    boost::progress_display disp(numFibers*m_FiberModels.at(0)->GetNumGradients());
 
     ofstream logFile;
     logFile.open("fiberfox_motion.log");
@@ -556,7 +557,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             {
                 if (this->GetAbortGenerateData())
                 {
-                    m_StatusText += "\nSimulation aborted\n";
+                    m_StatusText += "\n"+this->GetTime()+" > Simulation aborted\n";
                     return;
                 }
 
@@ -570,7 +571,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                 else
                     dir = v-GetItkVector(points->GetPoint(j-1));
 
-                if (dir.GetSquaredNorm()<0.0001)
+                if (dir.GetSquaredNorm()<0.0001 || dir[0]!=dir[0] || dir[1]!=dir[1] || dir[2]!=dir[2])
                     continue;
 
                 itk::Index<3> idx;
@@ -590,6 +591,15 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                         m_FiberModels[k]->SetFiberDirection(dir);
                         DoubleDwiType::PixelType pix = doubleDwi->GetPixel(idx);
                         pix[g] += segmentVolume*m_FiberModels[k]->SimulateMeasurement(g);
+
+                        if (pix[g]!=pix[g])
+                        {
+                            std::cout << "pix[g] " << pix[g] << std::endl;
+                            std::cout << "dir " << dir << std::endl;
+                            std::cout << "segmentVolume " << segmentVolume << std::endl;
+                            std::cout << "m_FiberModels[k]->SimulateMeasurement(g) " << m_FiberModels[k]->SimulateMeasurement(g) << std::endl;
+                        }
+
                         doubleDwi->SetPixel(idx, pix );
 
                         double vol = intraAxonalVolume->GetPixel(idx) + segmentVolume;
@@ -790,7 +800,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     m_StatusText += "\n\n";
     if (this->GetAbortGenerateData())
     {
-        m_StatusText += "\nSimulation aborted\n";
+        m_StatusText += "\n"+this->GetTime()+" > Simulation aborted\n";
         return;
     }
 
@@ -798,14 +808,14 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     DoubleDwiType::Pointer doubleOutImage;
     if (m_Spikes>0 || m_FrequencyMap.IsNotNull() || m_kOffset>0 || m_SimulateRelaxation || m_SimulateEddyCurrents || m_AddGibbsRinging || m_Wrap<1.0)
     {
-        m_StatusText += "Adjusting complex signal\n";
+        m_StatusText += this->GetTime()+" > Adjusting complex signal\n";
         MITK_INFO << "Adjusting complex signal";
         doubleOutImage = DoKspaceStuff(compartments);
         m_SignalScale = 1;
     }
     else
     {
-        m_StatusText += "Summing compartments\n";
+        m_StatusText += this->GetTime()+" > Summing compartments\n";
         MITK_INFO << "Summing compartments";
         doubleOutImage = compartments.at(0);
 
@@ -820,11 +830,11 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     }
     if (this->GetAbortGenerateData())
     {
-        m_StatusText += "\nSimulation aborted\n";
+        m_StatusText += "\n"+this->GetTime()+" > Simulation aborted\n";
         return;
     }
 
-    m_StatusText += "Finalizing image\n";
+    m_StatusText += this->GetTime()+" > Finalizing image\n";
     MITK_INFO << "Finalizing image";
     unsigned int window = 0;
     unsigned int min = itk::NumericTraits<unsigned int>::max();
@@ -840,7 +850,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     {
         if (this->GetAbortGenerateData())
         {
-            m_StatusText += "\nSimulation aborted\n";
+            m_StatusText += "\n"+this->GetTime()+" > Simulation aborted\n";
             return;
         }
 

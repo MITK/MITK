@@ -76,6 +76,17 @@ namespace mitk
     return difference;
   }
 
+  /**
+   * @brief implements mulPoint = point * scalar for mitk::Point.
+   *
+   * @return scalar multiplication
+   * @param point
+   * @param scalar
+   *
+   * @attention Please make sure, that you really want to add mitk::Point s.
+   * @attention E.g., multiplying a points by a scalar does geometrically not make sense, which is why itk does
+   * @attention not provide an operator* for these types.
+   */
   template< typename TCoordRep, unsigned int NPointDimension>
   mitk::Point<TCoordRep, NPointDimension> operator*(mitk::Point<TCoordRep, NPointDimension>& point, TCoordRep scalar)
   {
@@ -89,6 +100,19 @@ namespace mitk
     return multipliedPoint;
   }
 
+  /**
+   * @brief implements divPoint = point / scalar for mitk::Point.
+   *
+   * @return scalar division
+   * @param point
+   * @param scalar
+   *
+   * @attention Make sure you do not divide by zero. Division by zero is not handled by this method
+   *
+   * @attention Please make sure, that you really want to add mitk::Point s.
+   * @attention E.g., dividing a point by a scalar does geometrically not make sense, which is why itk does
+   * @attention not provide an operator/ for these types.
+   */
   template< typename TCoordRep, unsigned int NPointDimension>
   mitk::Point<TCoordRep, NPointDimension> operator/(mitk::Point<TCoordRep, NPointDimension>& point, TCoordRep scalar)
   {

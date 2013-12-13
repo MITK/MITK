@@ -95,5 +95,6 @@ const mitk::Color & mitk::ColorProperty::GetValue() const
 itk::LightObject::Pointer mitk::ColorProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

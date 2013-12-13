@@ -55,5 +55,6 @@ std::string mitk::StringProperty::GetValueAsString() const
 itk::LightObject::Pointer mitk::StringProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

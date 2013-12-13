@@ -42,5 +42,6 @@ bool mitk::GroupTagProperty::Assign(const BaseProperty& /*property*/)
 itk::LightObject::Pointer mitk::GroupTagProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

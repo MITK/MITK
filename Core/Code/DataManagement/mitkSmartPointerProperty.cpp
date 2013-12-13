@@ -138,5 +138,6 @@ std::string mitk::SmartPointerProperty::GetValueAsString() const
 itk::LightObject::Pointer mitk::SmartPointerProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

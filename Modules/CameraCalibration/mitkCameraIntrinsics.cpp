@@ -506,5 +506,6 @@ void mitk::CameraIntrinsics::SetValid( bool valid )
 itk::LightObject::Pointer mitk::CameraIntrinsics::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

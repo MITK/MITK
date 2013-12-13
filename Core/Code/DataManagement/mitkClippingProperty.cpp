@@ -117,6 +117,7 @@ std::string ClippingProperty::GetValueAsString() const
 itk::LightObject::Pointer ClippingProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }
 

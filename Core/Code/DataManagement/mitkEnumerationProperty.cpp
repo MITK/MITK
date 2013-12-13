@@ -201,5 +201,6 @@ const mitk::EnumerationProperty::EnumStringsContainerType& mitk::EnumerationProp
 itk::LightObject::Pointer mitk::EnumerationProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

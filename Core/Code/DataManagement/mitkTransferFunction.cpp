@@ -326,6 +326,7 @@ void TransferFunction::PrintSelf(std::ostream &os, itk::Indent indent) const
 itk::LightObject::Pointer mitk::TransferFunction::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }
 

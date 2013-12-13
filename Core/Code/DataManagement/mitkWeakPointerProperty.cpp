@@ -76,5 +76,6 @@ void mitk::WeakPointerProperty::SetValue(const ValueType &value)
 itk::LightObject::Pointer mitk::WeakPointerProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

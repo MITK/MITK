@@ -195,7 +195,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer3D );
   //specify tools to be added to 3D Tool area
 //  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("'Two Thresholds' FastMarching3D Otsu FastMarching3D RegionGrowing Watershed");
-  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold MedianTool3D DilateTool3D ErodeTool3D OpenTool3D CloseTool3D FillHolesTool3D KeepNRegionsTool3D 'Split Label'");
+  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold Median Dilate Erode Open Close 'Fill Holes' 'Keep N Largest' 'Split'");
   m_Controls.m_ManualToolSelectionBox3D->SetLayoutColumns(2);
   m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );
 
@@ -457,6 +457,9 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
   mitk::Image* referenceImage = dynamic_cast<mitk::Image*>( referenceNode->GetData() );
   assert(referenceImage);
 
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  if (!workingNode) return;
+
   QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( m_Parent );
   dialog->SetSuggestionList( this->GetDefaultOrganColorString() );
   dialog->setWindowTitle("New Label");
@@ -464,9 +467,6 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
   int dialogReturnValue = dialog->exec();
 
   if ( dialogReturnValue == QDialog::Rejected ) return;
-
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
   workingImage->AddLabel(dialog->GetSegmentationName().toStdString(), dialog->GetColor());

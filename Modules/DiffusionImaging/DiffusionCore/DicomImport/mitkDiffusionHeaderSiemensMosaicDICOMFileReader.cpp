@@ -32,6 +32,42 @@ bool mitk::DiffusionHeaderSiemensMosaicDICOMFileReader
 
     this->ExtractSiemensDiffusionTagInformation( siemens_diffusionheader_str, header_values );
 
+    SiemensDiffusionHeaderType hformat = GetHeaderType( siemens_diffusionheader_str );
+    Siemens_Header_Format specs = this->m_SiemensFormatsCollection.at( hformat );
+
+
+    std::string::size_type tag_position = siemens_diffusionheader_str.find( "NumberOfImagesInMosaic", 0 );
+    if( tag_position != std::string::npos )
+    {
+      std::vector<double> value_array;
+      ParseInputString( siemens_diffusionheader_str.substr( tag_position, siemens_diffusionheader_str.size() - tag_position + 1 ),
+                        value_array,
+                        specs
+                        );
+
+      MITK_INFO << "Mosaic";
+      for( unsigned int i=0; i<value_array.size(); i++)
+      {
+        MITK_INFO << value_array.at(i);
+      }
+    }
+
+    tag_position = siemens_diffusionheader_str.find("SliceNormalVector", 0);
+    if( tag_position != std::string::npos )
+    {
+      std::vector<double> value_array;
+      ParseInputString( siemens_diffusionheader_str.substr( tag_position, siemens_diffusionheader_str.size() - tag_position + 1 ),
+                        value_array,
+                        specs
+                        );
+
+      MITK_INFO << "SliceNormal";
+      for( unsigned int i=0; i<value_array.size(); i++)
+      {
+        MITK_INFO << value_array.at(i);
+      }
+
+    }
 
   }
 

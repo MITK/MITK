@@ -123,7 +123,6 @@ void mitk::OpenTool3D::Run()
 
   CurrentlyBusy.Send(false);
 
-  workingImage->Modified();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -186,8 +185,7 @@ void mitk::OpenTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
   openingFilter->SetBackgroundValue(0);
 
   openingFilter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
-  int steps = cropRegion.GetSize()[0] * cropRegion.GetSize()[1] * cropRegion.GetSize()[2] / 5000;
-  m_ProgressCommand->AddStepsToDo(steps);
+  m_ProgressCommand->AddStepsToDo(200);
 
   openingFilter->Update();
 

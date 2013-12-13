@@ -94,6 +94,7 @@ Qmitk/QmitkSplitConnectedRegionsTool3DGUIControls.ui
 Qmitk/QmitkFillHolesTool3DGUIControls.ui
 Qmitk/QmitkSearchLabelDialogGUI.ui
 Qmitk/QmitkBinaryThresholdToolGUIControls.ui
+Qmitk/QmitkFastMarchingToolGUIControls.ui
 )
 
 set(QRC_FILES

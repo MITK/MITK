@@ -178,6 +178,8 @@ void mitk::AutoSegmentationTool::Cancel()
 
 void mitk::AutoSegmentationTool::Activated()
 {
+  Superclass::Activated();
+
   // feedback node and its visualization properties
   m_PreviewNode = mitk::DataNode::New();
   m_PreviewNode->SetName("preview");

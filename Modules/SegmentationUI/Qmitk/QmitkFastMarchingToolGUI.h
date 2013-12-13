@@ -19,16 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
-#include "mitkFastMarchingTool.h"
+#include "mitkStepper.h"
 
-class ctkSlider;
-class ctkSliderWidget;
-class ctkRangeWidget;
-class ctkSliderWidget;
-class QPushButton;
+namespace mitk {
+  class FastMarchingTool;
+}
 
-#include "QmitkStepperAdapter.h"
-
+#include "ui_QmitkFastMarchingToolGUIControls.h"
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
 \brief GUI for mitk::FastMarchingTool.
@@ -54,6 +51,7 @@ public:
     void OnSigmaChanged(double);
     void OnStoppingValueChanged(double);
     void OnAcceptPreview();
+    void OnCancel();
     void Refetch();
     void SetStepper(mitk::Stepper *);
     void OnClearSeeds();
@@ -67,16 +65,9 @@ protected:
 
   void BusyStateChanged(bool);
 
-  ctkRangeWidget*  m_slwThreshold;
-  //ctkSliderWidget* m_slStoppingValue;
-  ctkSliderWidget* m_slSigma;
-  ctkSliderWidget* m_slAlpha;
-  ctkSliderWidget* m_slBeta;
+  Ui::QmitkFastMarchingToolGUIControls m_Controls;
 
-  QPushButton* m_btAcceptPreview;
-  QPushButton* m_btClearSeeds;
-
-  mitk::FastMarchingTool::Pointer m_FastMarchingTool;
+  mitk::FastMarchingTool* m_FastMarchingTool;
 
   bool m_TimeIsConnected;
   bool m_SelfCall;

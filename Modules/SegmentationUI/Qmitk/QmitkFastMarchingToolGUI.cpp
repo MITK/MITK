@@ -16,206 +16,79 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkFastMarchingToolGUI.h"
 
-#include "QmitkNewSegmentationDialog.h"
-
-#include <qlabel.h>
-#include <ctkSliderWidget.h>
-#include <ctkRangeWidget.h>
-#include <ctkSliderWidget.h>
-//#include <ctkSpinbox.h>
-
-#include <qpushbutton.h>
-#include <qlayout.h>
-#include <QGroupBox>
-#include <QApplication>
 #include <QMessageBox>
 #include "mitkStepper.h"
 #include "mitkBaseRenderer.h"
 
+#include <QmitkNewSegmentationDialog.h>
+#include <QmitkStepperAdapter.h>
+#include <QApplication.h>
+#include "mitkFastMarchingTool.h"
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkFastMarchingToolGUI, "")
 
-QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI()
-:QmitkToolGUI(), m_TimeIsConnected(false), m_SelfCall(false)
+QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI() : QmitkToolGUI(), m_TimeIsConnected(false), m_SelfCall(false), m_FastMarchingTool(NULL)
 {
-  this->setContentsMargins( 0, 0, 0, 0 );
+  m_Controls.setupUi(this);
+  m_Controls.m_InformationWidget->hide();
+  m_Controls.m_AdvancedControlsWidget->hide();
 
-  // create the visible widgets
-  QVBoxLayout *widgetLayout = new QVBoxLayout(this);
-  widgetLayout->setContentsMargins(0, 0, 0, 0);
-
-  QFont fntHelp;
-  fntHelp.setBold(true);
-
-  QLabel *lblHelp = new QLabel(this);
-  lblHelp->setText("Press shift-click to add seeds repeatedly.");
-  lblHelp->setFont(fntHelp);
-
-  widgetLayout->addWidget(lblHelp);
-
-  // Sigma controls
-  {
-   QHBoxLayout *hlayout = new QHBoxLayout();
-   hlayout->setSpacing(2);
-
-   QLabel *lbl = new QLabel(this);
-   lbl->setText("Sigma: ");
-   hlayout->addWidget(lbl);
-
-   QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-   hlayout->addItem(sp2);
-
-   widgetLayout->addItem(hlayout);
-  }
-
-  m_slSigma = new ctkSliderWidget(this);
-  m_slSigma->setTracking(false);
-//  m_slSigma->setOrientation(Qt::Horizontal);
-  m_slSigma->setPageStep(0.1);
+  m_Controls.m_slSigma->setPageStep(0.1);
 //  m_slSigma->setTickInterval(0.01);
-  m_slSigma->setSingleStep(0.01);
-  m_slSigma->setMinimum(0.1);
-  m_slSigma->setMaximum(5.0);
-  m_slSigma->setValue(1.0);
-  m_slSigma->setTracking(false);
-  m_slSigma->setToolTip("The \"sigma\" parameter in the Gradient Magnitude filter.");
-  connect( m_slSigma, SIGNAL(valueChanged(double)), this, SLOT(OnSigmaChanged(double)));
-  widgetLayout->addWidget( m_slSigma );
+  m_Controls.m_slSigma->setSingleStep(0.01);
+  m_Controls.m_slSigma->setMinimum(0.1);
+  m_Controls.m_slSigma->setMaximum(5.0);
+  m_Controls.m_slSigma->setValue(1.0);
+  m_Controls.m_slSigma->setTracking(false);
+  m_Controls.m_slSigma->setToolTip("The \"sigma\" parameter in the Gradient Magnitude filter.");
+  connect( m_Controls.m_slSigma, SIGNAL(valueChanged(double)), this, SLOT(OnSigmaChanged(double)));
 
-  // Alpha controls
-  {
-   QHBoxLayout *hlayout = new QHBoxLayout();
-   hlayout->setSpacing(2);
+  m_Controls.m_slAlpha->setMinimum(-10);
+  m_Controls.m_slAlpha->setMaximum(0);
+  m_Controls.m_slAlpha->setPageStep(0.1);
+  m_Controls.m_slAlpha->setSingleStep(0.01);
+  m_Controls.m_slAlpha->setValue(-2.5);
+  m_Controls.m_slAlpha->setTracking(false);
+  m_Controls.m_slAlpha->setToolTip("The \"alpha\" parameter in the Sigmoid mapping filter.");
+  connect( m_Controls.m_slAlpha, SIGNAL(valueChanged(double)), this, SLOT(OnAlphaChanged(double)));
 
-   QLabel *lbl = new QLabel(this);
-   lbl->setText("Alpha: ");
-   hlayout->addWidget(lbl);
-
-   QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-   hlayout->addItem(sp2);
-
-   widgetLayout->addItem(hlayout);
-  }
-
-  m_slAlpha = new ctkSliderWidget(this);
-//  m_slAlpha->setDecimals(2);
-  m_slAlpha->setTracking(false);
-//  m_slAlpha->setOrientation(Qt::Horizontal);
-  m_slAlpha->setMinimum(-10);
-  m_slAlpha->setMaximum(0);
-  m_slAlpha->setPageStep(0.1);
-  m_slAlpha->setSingleStep(0.01);
-  m_slAlpha->setValue(-2.5);
-  m_slAlpha->setTracking(false);
-  m_slAlpha->setToolTip("The \"alpha\" parameter in the Sigmoid mapping filter.");
-  connect( m_slAlpha, SIGNAL(valueChanged(double)), this, SLOT(OnAlphaChanged(double)));
-  widgetLayout->addWidget( m_slAlpha );
-
-  // Beta controls
-  {
-   QHBoxLayout *hlayout = new QHBoxLayout();
-   hlayout->setSpacing(2);
-
-   QLabel *lbl = new QLabel(this);
-   lbl->setText("Beta: ");
-   hlayout->addWidget(lbl);
-
-   QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-   hlayout->addItem(sp2);
-
-   widgetLayout->addLayout(hlayout);
-  }
-
-  m_slBeta = new ctkSliderWidget(this);
-//  m_slBeta->setDecimals(2);
-  m_slBeta->setTracking(false);
+  m_Controls.m_slBeta->setTracking(false);
 //  m_slBeta->setOrientation(Qt::Horizontal);
-  m_slBeta->setMinimum(0);
-  m_slBeta->setMaximum(100);
-  m_slBeta->setPageStep(0.1);
-  m_slBeta->setSingleStep(0.01);
-  m_slBeta->setValue(3.5);
-  m_slBeta->setTracking(false);
-  m_slBeta->setToolTip("The \"beta\" parameter in the Sigmoid mapping filter.");
-  connect( m_slBeta, SIGNAL(valueChanged(double)), this, SLOT(OnBetaChanged(double)));
-  widgetLayout->addWidget( m_slBeta );
-/*
-  // stopping value controls
-  {
-   QHBoxLayout *hlayout = new QHBoxLayout();
-   hlayout->setSpacing(2);
+  m_Controls.m_slBeta->setMinimum(0);
+  m_Controls.m_slBeta->setMaximum(100);
+  m_Controls.m_slBeta->setPageStep(0.1);
+  m_Controls.m_slBeta->setSingleStep(0.01);
+  m_Controls.m_slBeta->setValue(3.5);
+  m_Controls.m_slBeta->setTracking(false);
+  m_Controls.m_slBeta->setToolTip("The \"beta\" parameter in the Sigmoid mapping filter.");
+  connect( m_Controls.m_slBeta, SIGNAL(valueChanged(double)), this, SLOT(OnBetaChanged(double)));
 
-   QLabel *lbl = new QLabel(this);
-   lbl->setText("Stopping value: ");
-   hlayout->addWidget(lbl);
+  m_Controls.m_slwThreshold->setMinimum(-100);
+  m_Controls.m_slwThreshold->setMaximum(5000);
+  m_Controls.m_slwThreshold->setTickInterval(1);
+  m_Controls.m_slwThreshold->setMinimumValue(-100);
+  m_Controls.m_slwThreshold->setMaximumValue(2000);
+  m_Controls.m_slwThreshold->setDecimals(0);
+  m_Controls.m_slwThreshold->setTracking(false);
+  m_Controls.m_slwThreshold->setToolTip("The lower and upper thresholds for the final thresholding");
+  connect( m_Controls.m_slwThreshold, SIGNAL(valuesChanged(double, double)), this, SLOT(OnThresholdChanged(double, double)));
 
-   QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-   hlayout->addItem(sp2);
+  m_Controls.m_pbClearSeeds->setToolTip("Clear current preview and start over again");
+  connect( m_Controls.m_pbClearSeeds, SIGNAL(clicked()), this, SLOT(OnClearSeeds()) );
 
-   widgetLayout->addLayout(hlayout);
-  }
-
-  m_slStoppingValue = new ctkSliderWidget(this);
-  m_slStoppingValue->setDecimals(0);
-  m_slStoppingValue->setMinimum(0);
-  m_slStoppingValue->setMaximum(10000);
-  m_slStoppingValue->setPageStep(10);
-  m_slStoppingValue->setSingleStep(1);
-  m_slStoppingValue->setValue(2000);
-  m_slStoppingValue->setTracking(false);
-  m_slStoppingValue->setToolTip("The \"stopping value\" parameter in the fast marching 3D algorithm");
-  connect( m_slStoppingValue, SIGNAL(valueChanged(double)), this, SLOT(OnStoppingValueChanged(double)));
-  widgetLayout->addWidget( m_slStoppingValue );
-*/
-  // threshold controls
-  {
-   QHBoxLayout *hlayout = new QHBoxLayout();
-   hlayout->setSpacing(2);
-
-   QLabel *lbl = new QLabel(this);
-   lbl->setText("Threshold: ");
-   hlayout->addWidget(lbl);
-
-   QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-   hlayout->addItem(sp2);
-
-   widgetLayout->addLayout(hlayout);
-  }
-
-  m_slwThreshold = new ctkRangeWidget(this);
-  m_slwThreshold->setMinimum(-100);
-  m_slwThreshold->setMaximum(5000);
-  m_slwThreshold->setTickInterval(1);
-  m_slwThreshold->setMinimumValue(-100);
-  m_slwThreshold->setMaximumValue(2000);
-  m_slwThreshold->setDecimals(0);
-  m_slwThreshold->setTracking(false);
-  m_slwThreshold->setToolTip("The lower and upper thresholds for the final thresholding");
-  connect( m_slwThreshold, SIGNAL(valuesChanged(double, double)), this, SLOT(OnThresholdChanged(double, double)));
-  widgetLayout->addWidget( m_slwThreshold );
-
-  m_btClearSeeds = new QPushButton("Clear");
-  m_btClearSeeds->setToolTip("Clear current preview and start over again");
-  widgetLayout->addWidget(m_btClearSeeds);
-  connect( m_btClearSeeds, SIGNAL(clicked()), this, SLOT(OnClearSeeds()) );
-
-  m_btAcceptPreview = new QPushButton("Accept");
-  m_btAcceptPreview->setToolTip("Incorporate current preview in your working session.");
-  widgetLayout->addWidget(m_btAcceptPreview);
-  connect( m_btAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
+  connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
+  connect( m_Controls.m_pbCancel, SIGNAL(clicked()), this, SLOT(OnCancel()) );
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 
-  this->setEnabled(false);
-
-  m_slAlpha->setDecimals(2);
-  m_slSigma->setDecimals(2);
-  m_slBeta->setDecimals(2);
+  m_Controls.m_slAlpha->setDecimals(2);
+  m_Controls.m_slSigma->setDecimals(2);
+  m_Controls.m_slBeta->setDecimals(2);
 }
 
 QmitkFastMarchingToolGUI::~QmitkFastMarchingToolGUI()
 {
-  if (m_FastMarchingTool.IsNotNull())
+  if (m_FastMarchingTool)
   {
     m_FastMarchingTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkFastMarchingToolGUI, bool>( this, &QmitkFastMarchingToolGUI::BusyStateChanged );
   }
@@ -223,14 +96,14 @@ QmitkFastMarchingToolGUI::~QmitkFastMarchingToolGUI()
 
 void QmitkFastMarchingToolGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
-  if (m_FastMarchingTool.IsNotNull())
+  if (m_FastMarchingTool)
   {
     m_FastMarchingTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkFastMarchingToolGUI, bool>( this, &QmitkFastMarchingToolGUI::BusyStateChanged );
   }
 
   m_FastMarchingTool = dynamic_cast<mitk::FastMarchingTool*>( tool );
 
-  if (m_FastMarchingTool.IsNotNull())
+  if (m_FastMarchingTool)
   {
     m_FastMarchingTool->CurrentlyBusy += mitk::MessageDelegate1<QmitkFastMarchingToolGUI, bool>( this, &QmitkFastMarchingToolGUI::BusyStateChanged );
 
@@ -248,18 +121,18 @@ void QmitkFastMarchingToolGUI::OnNewToolAssociated(mitk::Tool* tool)
 
 void QmitkFastMarchingToolGUI::Update()
 {
-  m_FastMarchingTool->SetLowerThreshold( this->m_slwThreshold->minimumValue());
-  m_FastMarchingTool->SetUpperThreshold( this->m_slwThreshold->maximumValue());
+  m_FastMarchingTool->SetLowerThreshold( m_Controls.m_slwThreshold->minimumValue());
+  m_FastMarchingTool->SetUpperThreshold( m_Controls.m_slwThreshold->maximumValue());
 //  m_FastMarchingTool->SetStoppingValue( this->m_slStoppingValue->value());
-  m_FastMarchingTool->SetSigma( this->m_slSigma->value());
-  m_FastMarchingTool->SetAlpha( this->m_slAlpha->value());
-  m_FastMarchingTool->SetBeta( this->m_slBeta->value());
-  m_FastMarchingTool->Update();
+  m_FastMarchingTool->SetSigma( m_Controls.m_slSigma->value());
+  m_FastMarchingTool->SetAlpha( m_Controls.m_slAlpha->value());
+  m_FastMarchingTool->SetBeta( m_Controls.m_slBeta->value());
+  m_FastMarchingTool->Run();
 }
 
 void QmitkFastMarchingToolGUI::OnThresholdChanged(double lower, double upper)
 {
-  if (m_FastMarchingTool.IsNotNull() && (!m_SelfCall))
+  if (m_FastMarchingTool && (!m_SelfCall))
   {
     m_FastMarchingTool->SetLowerThreshold( lower );
     m_FastMarchingTool->SetUpperThreshold( upper );
@@ -269,7 +142,7 @@ void QmitkFastMarchingToolGUI::OnThresholdChanged(double lower, double upper)
 
 void QmitkFastMarchingToolGUI::OnBetaChanged(double value)
 {
-  if (m_FastMarchingTool.IsNotNull() && (!m_SelfCall))
+  if (m_FastMarchingTool && (!m_SelfCall))
   {
     m_FastMarchingTool->SetBeta( value );
     this->Update();
@@ -278,7 +151,7 @@ void QmitkFastMarchingToolGUI::OnBetaChanged(double value)
 
 void QmitkFastMarchingToolGUI::OnSigmaChanged(double value)
 {
-  if (m_FastMarchingTool.IsNotNull() && (!m_SelfCall))
+  if (m_FastMarchingTool && (!m_SelfCall))
   {
     m_FastMarchingTool->SetSigma( value );
     this->Update();
@@ -287,7 +160,7 @@ void QmitkFastMarchingToolGUI::OnSigmaChanged(double value)
 
 void QmitkFastMarchingToolGUI::OnAlphaChanged(double value)
 {
-  if (m_FastMarchingTool.IsNotNull() && (!m_SelfCall))
+  if (m_FastMarchingTool && (!m_SelfCall))
   {
     m_FastMarchingTool->SetAlpha( value );
     this->Update();
@@ -307,10 +180,17 @@ void QmitkFastMarchingToolGUI::OnStoppingValueChanged(double value)
 
 void QmitkFastMarchingToolGUI::OnAcceptPreview()
 {
-  if (m_FastMarchingTool.IsNotNull() && (!m_SelfCall))
+  if (m_FastMarchingTool && (!m_SelfCall))
   {
-    m_btAcceptPreview->setEnabled(false);
     m_FastMarchingTool->AcceptPreview();
+  }
+}
+
+void QmitkFastMarchingToolGUI::OnCancel()
+{
+  if (m_FastMarchingTool && (!m_SelfCall))
+  {
+    m_FastMarchingTool->Cancel();
   }
 }
 

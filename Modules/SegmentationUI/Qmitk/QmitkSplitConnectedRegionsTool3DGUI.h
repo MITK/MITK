@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
+
+
 #include "mitkSplitConnectedRegionsTool3D.h"
 
 #include "ui_QmitkSplitConnectedRegionsTool3DGUIControls.h"
@@ -61,7 +63,7 @@ class SegmentationUI_EXPORT QmitkSplitConnectedRegionsTool3DGUI : public QmitkTo
 
     Ui::QmitkSplitConnectedRegionsTool3DGUIControls m_Controls;
 
-    mitk::SplitConnectedRegionsTool3D::Pointer m_SplitConnectedRegionsTool3D;
+    mitk::SplitConnectedRegionsTool3D* m_SplitConnectedRegionsTool3D;
 };
 
 #endif

@@ -45,10 +45,14 @@ namespace mitk
 /**
   \brief FastMarching semgentation tool.
 
-  The segmentation is done by setting one or more seed points on the image
-  and adapting the time range and threshold. The pipeline is:
-    Smoothing->GradientMagnitude->SigmoidFunction->FastMarching->Threshold
-  The resulting binary image is seen as a segmentation of an object.
+  The processing pipeline is triggered upon placing the first seed and updated every time
+  a new seed is added or a parameter is changed.
+  The pipeline is as follows:
+  Smoothing->GradientMagnitude->SigmoidFunction->FastMarching->Thresholding
+  As with most segmentation tools, a preview image is shown as a green contour, which the user
+  can accept or reject.
+  If the preview image is accepted, its contents will be transferred to the active label.
+
 
   For detailed documentation see ITK Software Guide section 9.3.1 Fast Marching Segmentation.
 */
@@ -82,6 +86,9 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
     virtual us::ModuleResource GetCursorIconResource() const;
     us::ModuleResource GetIconResource() const;
 
+    /// \brief Stops the running operation and disables the tool
+    void Cancel();
+
     /// \brief Set parameter used in Threshold filter.
     void SetUpperThreshold(double);
 
@@ -104,7 +111,7 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
     void AcceptPreview();
 
     /// \brief Updates the itk pipeline and shows the result of FastMarching.
-    void Update();
+    void Run();
 
     /// \brief Clear all seed points.
     void ClearSeeds();
@@ -135,7 +142,12 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
 
     int m_CurrentTimeStep;
 
+    template < typename ImageType >
+    void InternalRun( ImageType* input );
+
     mitk::PositionEvent* m_PositionEvent;
+
+    int m_OverwritePixelValue;
 
     float m_LowerThreshold; //used in Threshold filter
     float m_UpperThreshold; //used in Threshold filter
@@ -145,8 +157,8 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
     float m_Beta; //used in Sigmoid filter
 
     //used to visualize the preview segmentation
-    mitk::DataNode::Pointer             m_FeedbackNode;
-    mitk::LabelSetImage::Pointer        m_FeedbackImage;
+    DataNode::Pointer  m_PreviewNode;
+    Image::Pointer     m_PreviewImage;
 
     //seed points for FastMarching
     NodeContainer::Pointer m_SeedContainer;

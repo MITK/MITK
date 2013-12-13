@@ -40,7 +40,7 @@ QmitkSplitConnectedRegionsTool3DGUI::QmitkSplitConnectedRegionsTool3DGUI() : Qmi
 
 QmitkSplitConnectedRegionsTool3DGUI::~QmitkSplitConnectedRegionsTool3DGUI()
 {
-  if (m_SplitConnectedRegionsTool3D.IsNotNull())
+  if (m_SplitConnectedRegionsTool3D)
   {
     m_SplitConnectedRegionsTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkSplitConnectedRegionsTool3DGUI, bool>( this, &QmitkSplitConnectedRegionsTool3DGUI::BusyStateChanged );
   }
@@ -48,14 +48,14 @@ QmitkSplitConnectedRegionsTool3DGUI::~QmitkSplitConnectedRegionsTool3DGUI()
 
 void QmitkSplitConnectedRegionsTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
-  if (m_SplitConnectedRegionsTool3D.IsNotNull())
+  if (m_SplitConnectedRegionsTool3D)
   {
     m_SplitConnectedRegionsTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkSplitConnectedRegionsTool3DGUI, bool>( this, &QmitkSplitConnectedRegionsTool3DGUI::BusyStateChanged );
   }
 
   m_SplitConnectedRegionsTool3D = dynamic_cast<mitk::SplitConnectedRegionsTool3D*>( tool );
 
-  if (m_SplitConnectedRegionsTool3D.IsNotNull())
+  if (m_SplitConnectedRegionsTool3D)
   {
     m_SplitConnectedRegionsTool3D->CurrentlyBusy += mitk::MessageDelegate1<QmitkSplitConnectedRegionsTool3DGUI, bool>( this, &QmitkSplitConnectedRegionsTool3DGUI::BusyStateChanged );
   }
@@ -63,7 +63,7 @@ void QmitkSplitConnectedRegionsTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 
 void QmitkSplitConnectedRegionsTool3DGUI::OnRun()
 {
-  if (m_SplitConnectedRegionsTool3D.IsNotNull())
+  if (m_SplitConnectedRegionsTool3D)
   {
     m_SplitConnectedRegionsTool3D->SetNumberOfConnectedRegionsToKeep(m_Controls.m_sbConnectedRegionsToKeep->value());
     m_SplitConnectedRegionsTool3D->Run();
@@ -72,7 +72,7 @@ void QmitkSplitConnectedRegionsTool3DGUI::OnRun()
 
 void QmitkSplitConnectedRegionsTool3DGUI::OnCancel()
 {
-  if (m_SplitConnectedRegionsTool3D.IsNotNull())
+  if (m_SplitConnectedRegionsTool3D)
   {
     m_SplitConnectedRegionsTool3D->Cancel();
   }
@@ -80,7 +80,7 @@ void QmitkSplitConnectedRegionsTool3DGUI::OnCancel()
 
 void QmitkSplitConnectedRegionsTool3DGUI::OnNumberOfConnectedRegionsToKeepChanged(int value)
 {
-  if (m_SplitConnectedRegionsTool3D.IsNotNull())
+  if (m_SplitConnectedRegionsTool3D)
   {
     m_SplitConnectedRegionsTool3D->SetNumberOfConnectedRegionsToKeep(value);
   }
@@ -88,7 +88,7 @@ void QmitkSplitConnectedRegionsTool3DGUI::OnNumberOfConnectedRegionsToKeepChange
 
 void QmitkSplitConnectedRegionsTool3DGUI::OnAcceptPreview()
 {
-  if (m_SplitConnectedRegionsTool3D.IsNotNull())
+  if (m_SplitConnectedRegionsTool3D)
   {
     m_SplitConnectedRegionsTool3D->AcceptPreview();
   }
@@ -96,7 +96,7 @@ void QmitkSplitConnectedRegionsTool3DGUI::OnAcceptPreview()
 
 void QmitkSplitConnectedRegionsTool3DGUI::OnCalculateDifference()
 {
-  if (m_SplitConnectedRegionsTool3D.IsNotNull())
+  if (m_SplitConnectedRegionsTool3D)
   {
     m_SplitConnectedRegionsTool3D->CalculateDifference();
   }
@@ -104,7 +104,7 @@ void QmitkSplitConnectedRegionsTool3DGUI::OnCalculateDifference()
 
 void QmitkSplitConnectedRegionsTool3DGUI::OnCalculateUnion()
 {
-  if (m_SplitConnectedRegionsTool3D.IsNotNull())
+  if (m_SplitConnectedRegionsTool3D)
   {
     m_SplitConnectedRegionsTool3D->CalculateUnion();
   }
@@ -136,7 +136,7 @@ void QmitkSplitConnectedRegionsTool3DGUI::OnShowAdvancedControls( bool on )
 
 void QmitkSplitConnectedRegionsTool3DGUI::OnNewLabel()
 {
-  if (m_SplitConnectedRegionsTool3D.IsNotNull())
+  if (m_SplitConnectedRegionsTool3D)
   {
     QmitkNewSegmentationDialog dialog(this);
 //    dialog->SetSuggestionList( m_OrganColors );

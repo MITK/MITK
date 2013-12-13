@@ -13,17 +13,17 @@ set(H_FILES)
 set(CPP_FILES)
 
 # now create a new module only for testing purposes
-MITK_CREATE_MODULE( mitkDICOMTesting
-  DEPENDS Mitk # Mitk.so
+MITK_CREATE_MODULE( DICOMTesting
+  DEPENDS DICOMReader
 )
 
-MITK_CHECK_MODULE(_RESULT mitkDICOMTesting)
+MITK_CHECK_MODULE(_RESULT DICOMTesting)
 if(_RESULT)
-  message(STATUS "mitkDICOMTesting application won't be built. Missing: ${_RESULT}")
+  message(STATUS "DICOMTesting application won't be built. Missing: ${_RESULT}")
 else(_RESULT)
 
 # add helpful applications
-MITK_USE_MODULE( mitkDICOMTesting )
+MITK_USE_MODULE( DICOMTesting )
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${ALL_INCLUDE_DIRECTORIES})
 
 # dumps out image information

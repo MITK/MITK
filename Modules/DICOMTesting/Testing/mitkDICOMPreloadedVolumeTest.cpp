@@ -57,11 +57,7 @@ int mitkDICOMPreloadedVolumeTest(int argc, char** const argv)
   MITK_TEST_BEGIN("DICOMPreloadedVolume")
 
   mitk::TestDICOMLoading loader;
-  mitk::TestDICOMLoading::StringContainer files;
-
-  // adapt expectations depending on configuration
-  std::string configuration = mitk::DicomSeriesReader::GetConfigurationString();
-  MITK_TEST_OUTPUT(<< "Configuration: " << configuration)
+  mitk::StringList files;
 
   // load files from commandline
   for (int arg = 1; arg < argc; ++arg)
@@ -72,12 +68,11 @@ int mitkDICOMPreloadedVolumeTest(int argc, char** const argv)
 
 
   // verify all files are DICOM
-  for (mitk::TestDICOMLoading::StringContainer::const_iterator fileIter = files.begin();
+  for (mitk::StringList::const_iterator fileIter = files.begin();
        fileIter != files.end();
        ++fileIter)
   {
-    MITK_TEST_CONDITION_REQUIRED( mitk::DicomSeriesReader::IsDicom(*fileIter) , *fileIter << " is recognized as loadable DICOM object" )
-
+    MITK_TEST_CONDITION_REQUIRED( mitk::DICOMFileReader::IsDICOM(*fileIter) , *fileIter << " is recognized as loadable DICOM object" )
   }
 
   // load for a first time
@@ -91,6 +86,8 @@ int mitkDICOMPreloadedVolumeTest(int argc, char** const argv)
 
   // load for a second time, this time provide the image volume as a pointer
   // expectation is that the reader will provide the same properties to this image (without actually loading a new mitk::Image)
+
+  /* TODO
   mitk::TestDICOMLoading::ImageList reloadedImages = loader.LoadFiles(files, firstImage);
   MITK_TEST_OUTPUT(<< "Again loaded " << reloadedImages.size() << " images. Comparing to previously loaded version.")
   mitk::Image::Pointer reloadedImage = reloadedImages.front();
@@ -99,6 +96,9 @@ int mitkDICOMPreloadedVolumeTest(int argc, char** const argv)
 
   bool listsAreEqual = VerifyPropertyListsEquality(regeneratedProperties, originalProperties);
   MITK_TEST_CONDITION(listsAreEqual, "LoadDicomSeries generates a valid property list when provided a pre-loaded image");
+  */
+
+  MITK_TEST_CONDITION(false, "pre-loaded image volumes not yet implemented");
 
   MITK_TEST_END()
 }

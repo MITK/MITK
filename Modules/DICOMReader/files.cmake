@@ -1,0 +1,36 @@
+set(H_FILES
+  mitkDICOMFileReader.h
+  mitkDICOMImageFrameInfo.h
+  mitkDICOMImageBlockDescriptor.h
+  mitkDICOMGDCMImageFrameInfo.h
+  mitkDICOMITKSeriesGDCMReader.h
+  mitkDICOMDatasetSorter.h
+  mitkDICOMFilenameSorter.h
+  mitkDICOMEnums.h
+  mitkDICOMTagBasedSorter.h
+  mitkDICOMSortCriterion.h
+  mitkDICOMSortByTag.h
+  mitkEquiDistantBlocksSorter.h
+  mitkSortByImagePositionPatient.h
+  mitkClassicDICOMSeriesReader.h
+  mitkDICOMTag.h
+)
+
+set(CPP_FILES
+  mitkDICOMFileReader.cpp
+  mitkDICOMImageBlockDescriptor.cpp
+  mitkDICOMITKSeriesGDCMReader.cpp
+  mitkDICOMDatasetSorter.cpp
+  mitkDICOMFilenameSorter.cpp
+  mitkDICOMTagBasedSorter.cpp
+  mitkDICOMGDCMImageFrameInfo.cpp
+  mitkDICOMImageFrameInfo.cpp
+  mitkDICOMSortCriterion.cpp
+  mitkDICOMSortByTag.cpp
+  mitkITKDICOMSeriesReaderHelper.cpp
+  mitkEquiDistantBlocksSorter.cpp
+  mitkSortByImagePositionPatient.cpp
+  mitkGantryTiltInformation.cpp
+  mitkClassicDICOMSeriesReader.cpp
+  mitkDICOMTag.cpp
+)

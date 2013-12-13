@@ -55,7 +55,7 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
     PixelSpacingInterpretation GetPixelSpacingInterpretation() const;
 
     void SetPixelSpacingInformation(const std::string& pixelSpacing, const std::string& imagerPixelSpacing);
-    void GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const;
+    void GetDesiredMITKImagePixelSpacing( ScalarType& spacingX, ScalarType& spacingY) const;
 
     bool HasGantryTilt() const;
     bool SetHasGantryTilt(bool hasi);

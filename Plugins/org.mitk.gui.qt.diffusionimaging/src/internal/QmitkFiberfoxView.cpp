@@ -222,7 +222,7 @@ void QmitkFiberfoxView::AfterThread()
     if (!m_ImageGenParametersBackup.outputPath.isEmpty())
     {
         try{
-            QString status("\nSaving output image to ");
+            QString status("Saving output image to ");
             status += m_ImageGenParametersBackup.outputPath;
             status += m_ImageGenParametersBackup.resultNode->GetName().c_str();
             status += ".dwi";
@@ -235,13 +235,13 @@ void QmitkFiberfoxView::AfterThread()
         }
         catch (itk::ExceptionObject &e)
         {
-            QString status("\nException during DWI writing: ");
+            QString status("Exception during DWI writing: ");
             status += e.GetDescription();
             m_Controls->m_SimulationStatusText->append(status);
         }
         catch (...)
         {
-            m_Controls->m_SimulationStatusText->append("\nUnknown exception during DWI writing!");
+            m_Controls->m_SimulationStatusText->append("Unknown exception during DWI writing!");
         }
     }
 }

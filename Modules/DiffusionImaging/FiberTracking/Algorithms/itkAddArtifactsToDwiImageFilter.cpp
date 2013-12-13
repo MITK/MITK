@@ -171,7 +171,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
             for (int j=0; j<3; j++)
                     transform[i][j] *= inputImage->GetSpacing()[j];
 
-        MITK_INFO << "Adjusting complex signal";
+        MITK_INFO << this->GetTime()+" > Adjusting complex signal";
         MITK_INFO << "line readout time: " << m_tLine;
         MITK_INFO << "line offset: " << m_kOffset;
         if (m_FrequencyMap.IsNotNull())
@@ -211,7 +211,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
             {
                 if (this->GetAbortGenerateData())
                 {
-                    m_StatusText += "\nSimulation aborted\n";
+                    m_StatusText += "\n"+this->GetTime()+" > Simulation aborted\n";
                     return;
                 }
 
@@ -313,7 +313,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
 
     if (m_NoiseModel!=NULL)
     {
-        m_StatusText += "Adding noise\n";
+        m_StatusText += this->GetTime()+" > Adding noise\n";
         m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
         m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
         unsigned long lastTick = 0;
@@ -324,7 +324,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         {
             if (this->GetAbortGenerateData())
             {
-                m_StatusText += "\nSimulation aborted\n";
+                m_StatusText += "\n"+this->GetTime()+" > Simulation aborted\n";
                 return;
             }
 

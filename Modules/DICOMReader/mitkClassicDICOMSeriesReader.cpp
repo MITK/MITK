@@ -55,6 +55,8 @@ mitk::ClassicDICOMSeriesReader
 
   // define above sorting for this class
   this->AddSortingElement( tagSorter );
+
+  this->SetFixTiltByShearing(true);
 }
 
 mitk::ClassicDICOMSeriesReader

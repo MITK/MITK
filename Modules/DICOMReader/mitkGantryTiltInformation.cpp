@@ -1,3 +1,19 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
 #include "mitkGantryTiltInformation.h"
 
 #include "mitkLogMacros.h"
@@ -115,6 +131,7 @@ mitk::GantryTiltInformation::GantryTiltInformation(
     // How do we now this is assumed? See header documentation for ITK code references
     //double itkAssumedSliceSpacing = sqrt( m_ShiftUp * m_ShiftUp + m_ShiftNormal * m_ShiftNormal );
 
+    MITK_INFO <<  "    calculated from slices " << m_NumberOfSlicesApart << " slices apart";
     MITK_DEBUG << "    shift normal: " << m_ShiftNormal;
     MITK_DEBUG << "    shift normal assumed by ITK: " << m_ITKAssumedSliceSpacing;
     MITK_DEBUG << "    shift up: " << m_ShiftUp;
@@ -128,7 +145,7 @@ void
 mitk::GantryTiltInformation
 ::Print(std::ostream& os) const
 {
-  os << "  calculated from slices " << m_NumberOfSlicesApart << " slices apart " << std::endl;
+  os << "  calculated from slices " << m_NumberOfSlicesApart << " slices apart" << std::endl;
   os << "  shift normal: " << m_ShiftNormal << std::endl;
   os << "  shift normal assumed by ITK: " << m_ITKAssumedSliceSpacing << std::endl;
   os << "  shift up: " << m_ShiftUp << std::endl;

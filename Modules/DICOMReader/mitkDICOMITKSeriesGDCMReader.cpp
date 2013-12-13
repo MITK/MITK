@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::DICOMITKSeriesGDCMReader
 ::DICOMITKSeriesGDCMReader()
 :DICOMFileReader()
-,m_FixTiltByShearing(false)
+,m_FixTiltByShearing(true)
 ,m_Group3DplusT(false)
 {
 }

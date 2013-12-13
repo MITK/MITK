@@ -67,7 +67,7 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
         /**
           \brief Grouping result, all same origin-to-origin distance w/o gaps.
          */
-        DICOMDatasetList GetBlockFilenames();
+        DICOMDatasetList GetBlockFilenames(); // TODO rename --> ... Dataset ... instead of filename
 
         void SetFirstFilenameOfBlock(const std::string& filename);
         std::string GetFirstFilenameOfBlock() const;
@@ -90,7 +90,7 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
         /**
           \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
          */
-        void AddFileToSortedBlock(DICOMDatasetAccess* dataset); // TODO Dataset!
+        void AddFileToSortedBlock(DICOMDatasetAccess* dataset);
 
         /**
           \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.

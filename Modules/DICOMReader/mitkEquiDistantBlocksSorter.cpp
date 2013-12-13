@@ -98,6 +98,7 @@ mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
   assert( !m_GroupedFiles.empty() );
   m_UnsortedFiles.insert( m_UnsortedFiles.begin(), m_GroupedFiles.back() );
   m_GroupedFiles.pop_back();
+  m_GantryTilt = false;
 }
 
 // ------------------------ end helper class
@@ -450,6 +451,45 @@ mitk::EquiDistantBlocksSorter
     if ( result.GetBlockFilenames().size() == 2 )
     {
       result.UndoPrematureGrouping();
+    }
+  }
+
+  // update tilt info to get maximum precision
+  // earlier, tilt was only calculated from first and second slice.
+  // now that we know the whole range, we can re-calculate using the very first and last slice
+  if ( result.ContainsGantryTilt() && result.GetBlockFilenames().size() > 1 )
+  {
+    DICOMDatasetList datasets = result.GetBlockFilenames();
+    DICOMDatasetAccess* firstDataset = datasets.front();
+    DICOMDatasetAccess* lastDataset = datasets.back();
+    unsigned int numberOfSlicesApart = datasets.size() - 1;
+
+    Vector3D right; right.Fill(0.0);
+    Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
+    std::string orientationValue = firstDataset->GetTagValueAsString( tagImageOrientation );
+    bool orientationConversion(false);
+    DICOMStringToOrientationVectors( orientationValue, right, up, orientationConversion );
+
+    if (orientationConversion)
+    {
+
+      std::string firstOriginString = firstDataset->GetTagValueAsString( tagImagePositionPatient );
+      std::string lastOriginString = lastDataset->GetTagValueAsString( tagImagePositionPatient );
+
+      if (!firstOriginString.empty() && !lastOriginString.empty())
+      {
+        bool firstOriginConversion(false);
+        bool lastOriginConversion(false);
+
+        Point3D firstOrigin = DICOMStringToPoint3D( firstOriginString, firstOriginConversion );
+        Point3D lastOrigin = DICOMStringToPoint3D( lastOriginString, lastOriginConversion );
+
+        if (firstOriginConversion && lastOriginConversion)
+        {
+          GantryTiltInformation updatedTiltInfo( firstOrigin, lastOrigin, right, up, numberOfSlicesApart );
+          result.FlagGantryTilt(updatedTiltInfo);
+        }
+      }
     }
   }
 

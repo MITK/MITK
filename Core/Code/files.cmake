@@ -70,7 +70,6 @@ set(H_FILES
   DataManagement/mitkImageToItk.h
   DataManagement/mitkImageToItk.txx
   DataManagement/mitkTimeSlicedGeometry.h # Deprecated, empty for compatibilty reasons.
-  DataManagement/mitkIPersistenceService.cpp
   DataManagement/mitkPropertyListReplacedObserver.cpp
 
   Interactions/mitkEventMapperAddOn.h
@@ -289,6 +288,7 @@ set(CPP_FILES
   Interfaces/mitkIPropertyDescriptions.cpp
   Interfaces/mitkIPropertyExtensions.cpp
   Interfaces/mitkIPropertyFilters.cpp
+  Interfaces/mitkIPersistenceService.cpp
 
   IO/mitkBaseDataIOFactory.cpp
   IO/mitkCoreDataNodeReader.cpp

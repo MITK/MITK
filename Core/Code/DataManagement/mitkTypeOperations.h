@@ -76,6 +76,34 @@ namespace mitk
     return difference;
   }
 
+  template< typename TCoordRep, unsigned int NPointDimension>
+  mitk::Point<TCoordRep, NPointDimension> operator*(mitk::Point<TCoordRep, NPointDimension>& point, TCoordRep scalar)
+  {
+    mitk::Point<TCoordRep, NPointDimension> multipliedPoint;
+
+    for (typename mitk::Point<TCoordRep, NPointDimension>::SizeType var = 0; var < NPointDimension; ++var)
+    {
+      multipliedPoint[var] = point[var] * scalar;
+    }
+
+    return multipliedPoint;
+  }
+
+  template< typename TCoordRep, unsigned int NPointDimension>
+  mitk::Point<TCoordRep, NPointDimension> operator/(mitk::Point<TCoordRep, NPointDimension>& point, TCoordRep scalar)
+  {
+    mitk::Point<TCoordRep, NPointDimension> dividedPoint;
+
+    for (typename mitk::Point<TCoordRep, NPointDimension>::SizeType var = 0; var < NPointDimension; ++var)
+    {
+      dividedPoint[var] = point[var] / scalar;
+    }
+
+    return dividedPoint;
+  }
+
+
+
 }
 
 #endif /* MITKTYPEOPERATIONS_H_ */

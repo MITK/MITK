@@ -26,9 +26,9 @@ using namespace mitk;
 
 static ScalarType bValues[3] = {14.123456, 10.2, 5.123456789};
 static ScalarType cValues[3] = { 2.654321,  5.1, 2.543231111};
+static ScalarType scalar = 2.1234567891011;
 
 static Point3D a, b, c;
-
 
 static void Setup(void)
 {
@@ -68,6 +68,26 @@ static void Test_Substraction(void)
   TestForValuesHelper(a, 11.469135, 5.1, 2.580225678, "difference a = b - c correctly performed");
 }
 
+static void Test_ScalarMultiplication(void)
+{
+  Setup();
+
+  a = b * scalar;
+
+  TestForValuesHelper(a, 29.991, 21.659, 10.879, "scalar multiplication a = b * scalar correctly performed", 10E-3);
+
+}
+
+
+static void Test_ScalarDivision(void)
+{
+  Setup();
+
+  a = b / scalar;
+
+  TestForValuesHelper(a,  6.6512, 4.8035, 2.4128, "scalar division a = b / scalar correctly performed", 10E-4);
+
+}
 
 
 
@@ -78,6 +98,9 @@ int mitkTypeOperationTest(int /*argc*/ , char* /*argv*/[])
 
   Test_Addition();
   Test_Substraction();
+
+  Test_ScalarMultiplication();
+  Test_ScalarDivision();
 
   MITK_TEST_END()
 }

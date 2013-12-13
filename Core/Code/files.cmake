@@ -73,6 +73,7 @@ set(H_FILES
   DataManagement/mitkTypes.h
   DataManagement/mitkVector.h
   DataManagement/mitkPoint.h
+  DataManagement/mitkPoint.hxx
   DataManagement/mitkMatrix.h
   DataManagement/mitkTypeOperations.h
 

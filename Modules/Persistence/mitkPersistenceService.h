@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPersistenceService_h
 
 #include "mitkIPersistenceService.h"
+#include "mitkPropertyListsXmlFileReaderAndWriter.h"
 #include <itkLightObject.h>
 #include "mitkSceneIO.h"
 
@@ -40,6 +41,8 @@ namespace mitk
         std::string GetDefaultPersistenceFile() const;
 
         mitk::PropertyList::Pointer GetPropertyList( std::string& id, bool* existed=0 );
+
+        bool RemovePropertyList( std::string& id );
 
         std::string GetPersistenceNodePropertyName() const;
 
@@ -66,6 +69,7 @@ namespace mitk
         bool m_AutoLoadAndSave;
         std::set<PropertyListReplacedObserver*> m_PropertyListReplacedObserver;
         SceneIO::Pointer m_SceneIO;
+        PropertyListsXmlFileReaderAndWriter::Pointer m_PropertyListsXmlFileReaderAndWriter;
         std::map<std::string, long int> m_FileNamesToModifiedTimes;
     };
 }

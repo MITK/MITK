@@ -50,6 +50,11 @@ namespace mitk
         ///
         virtual mitk::PropertyList::Pointer GetPropertyList( std::string& id, bool* existed=0 ) = 0;
         ///
+        /// removes the PropertyList with the given id
+        /// \return true if PropertyList existed and could be removed, false otherwise
+        ///
+        virtual bool RemovePropertyList( std::string& id ) = 0;
+        ///
         /// Get the default name of the PersistenceFile (the one that is loaded at startup)
         ///
         virtual std::string GetDefaultPersistenceFile() const = 0;
@@ -138,20 +143,20 @@ namespace mitk
 
 #define PERSISTENCE_MACRO_START_PART(ID_MEMBER_NAME)\
 public:\
-    bool Save(const std::string& fileName="")\
+    bool Save(const std::string& fileName="", bool appendChanges=false)\
     {\
         mitk::IPersistenceService* persistenceService = this->GetPeristenceService();\
         bool noError = persistenceService != 0;\
         if( noError )\
             this->ToPropertyList();\
         if(noError)\
-            noError = persistenceService->Save(fileName);\
+            noError = persistenceService->Save(fileName, appendChanges);\
         return noError;\
     }\
-    bool Load(const std::string& fileName="")\
+    bool Load(const std::string& fileName="", bool enforeReload=true)\
     {\
         mitk::IPersistenceService* persistenceService = this->GetPeristenceService();\
-        bool noError = persistenceService != 0 && persistenceService->Load(fileName);\
+        bool noError = persistenceService != 0 && persistenceService->Load(fileName, enforeReload);\
         if( noError )\
         {\
             this->FromPropertyList();\
@@ -164,8 +169,7 @@ public:\
         this->InitializePropertyListReplacedObserver(persistenceService);\
         if( !persistenceService )\
             return;\
-        mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(ID_MEMBER_NAME);\
-        propList->Set(#ID_MEMBER_NAME, ID_MEMBER_NAME);
+        mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(ID_MEMBER_NAME);
 
 #define PERSISTENCE_MACRO_MIDDLE_PART(ID_MEMBER_NAME)\
     }\
@@ -175,8 +179,7 @@ public:\
         this->InitializePropertyListReplacedObserver(persistenceService);\
         if( !persistenceService )\
             return;\
-        mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(ID_MEMBER_NAME);\
-        propList->Get(#ID_MEMBER_NAME, ID_MEMBER_NAME);
+        mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(ID_MEMBER_NAME);
 
 #define PERSISTENCE_MACRO_END_PART(THE_CLASS_NAME, ID_MEMBER_NAME)\
 }\

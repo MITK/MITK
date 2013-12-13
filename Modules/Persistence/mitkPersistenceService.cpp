@@ -27,11 +27,11 @@ const std::string mitk::PersistenceService::PERSISTENCE_PROPERTY_NAME("Persisten
 
 const std::string mitk::PersistenceService::PERSISTENCE_PROPERTYLIST_NAME("PersistenceService");
 
-const std::string mitk::PersistenceService::ID_PROPERTY_NAME("Id");
+const std::string mitk::PersistenceService::ID_PROPERTY_NAME("id");
 
 
 mitk::PersistenceService::PersistenceService()
-  : m_AutoLoadAndSave( true ), m_SceneIO( SceneIO::New() )
+: m_AutoLoadAndSave( true ), m_SceneIO( SceneIO::New() ), m_PropertyListsXmlFileReaderAndWriter( PropertyListsXmlFileReaderAndWriter::New() )
 {
 }
 
@@ -101,25 +101,46 @@ bool mitk::PersistenceService::Save(const std::string& fileName, bool appendChan
     if(theFile.empty())
         theFile = PersistenceService::GetDefaultPersistenceFile();
 
+    bool xmlFile = false;
+    if( itksys::SystemTools::GetFilenameLastExtension(theFile.c_str()) == ".xml" )
+        xmlFile = true;
+
     mitk::DataStorage::Pointer tempDs;
-    if(appendChanges)
+    if(appendChanges && xmlFile == false)
     {
-        if( !itksys::SystemTools::FileExists(theFile.c_str()) )
-            return false;
+        if( itksys::SystemTools::FileExists(theFile.c_str()) )
+        {
 
-        DataStorage::Pointer ds = m_SceneIO->LoadScene( theFile );
-        bool load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) && (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
-        if( !load )
-            return false;
+            bool load = false;
+            DataStorage::Pointer ds = m_SceneIO->LoadScene( theFile );
+            load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) && (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
+            if( !load )
+                return false;
 
-        tempDs = ds;
+            tempDs = ds;
+
+        }
     }
     else
+    {
         tempDs = mitk::StandaloneDataStorage::New();
+        if( xmlFile && appendChanges && itksys::SystemTools::FileExists(theFile.c_str()) )
+        {
+            if( !m_PropertyListsXmlFileReaderAndWriter->ReadLists( theFile, m_PropertyLists ) )
+                return false;
+        }
+    }
 
     DataStorage::SetOfObjects::Pointer rs = DataStorage::SetOfObjects::New();
 
-    save = m_SceneIO->SaveScene( rs.GetPointer(), tempDs, theFile );
+    if( xmlFile )
+    {
+        save = m_PropertyListsXmlFileReaderAndWriter->WriteLists(theFile, m_PropertyLists);
+    }
+    else
+    {
+        save = m_SceneIO->SaveScene( rs.GetPointer(), tempDs, theFile );
+    }
     if( save )
     {
         long int currentModifiedTime = itksys::SystemTools::ModifiedTime( theFile.c_str() );
@@ -138,6 +159,10 @@ bool mitk::PersistenceService::Load(const std::string& fileName, bool enforceRel
 
     if( !itksys::SystemTools::FileExists(theFile.c_str()) )
         return false;
+
+    bool xmlFile = false;
+    if( itksys::SystemTools::GetFilenameLastExtension(theFile.c_str()) == ".xml" )
+        xmlFile = true;
 
     if( enforceReload == false )
     {
@@ -159,8 +184,15 @@ bool mitk::PersistenceService::Load(const std::string& fileName, bool enforceRel
             return true;
     }
 
-    DataStorage::Pointer ds = m_SceneIO->LoadScene( theFile );
-    load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) && (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
+    if( xmlFile )
+    {
+        load = m_PropertyListsXmlFileReaderAndWriter->ReadLists(theFile, m_PropertyLists);
+    }
+    else
+    {
+        DataStorage::Pointer ds = m_SceneIO->LoadScene( theFile );
+        load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) && (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
+    }
     if( !load )
     {
         MITK_DEBUG("mitk::PersistenceService") << "loading of scene files failed";
@@ -277,4 +309,15 @@ bool mitk::PersistenceService::RestorePropertyListsFromPersistentDataNodes( Data
 bool mitk::PersistenceService::GetAutoLoadAndSave() const
 {
     return m_AutoLoadAndSave;
+}
+
+bool mitk::PersistenceService::RemovePropertyList( std::string& id )
+{
+    std::map<std::string, mitk::PropertyList::Pointer>::iterator it = m_PropertyLists.find( id );
+    if( it != m_PropertyLists.end() )
+    {
+        m_PropertyLists.erase(it);
+        return true;
+    }
+    return false;
 }

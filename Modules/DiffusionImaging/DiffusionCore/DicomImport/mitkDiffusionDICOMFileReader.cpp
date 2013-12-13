@@ -16,10 +16,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDiffusionDICOMFileReader.h"
 
-#include "mitkDiffusionHeaderDICOMFileReader.h"
+#include "mitkDiffusionDICOMFileReaderHelper.h"
 
 #include "mitkDiffusionHeaderSiemensDICOMFileReader.h"
 #include "mitkDiffusionHeaderSiemensMosaicDICOMFileReader.h"
+
+static void PerformHeaderAnalysis( mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType headers )
+{
+  unsigned int images = headers.size();
+
+  unsigned int unweighted_images = 0;
+  unsigned int weighted_images = 0;
+
+  mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType::const_iterator c_iter = headers.begin();
+  while( c_iter != headers.end() )
+  {
+    const mitk::DiffusionImageDICOMHeaderInformation h = *c_iter;
+    if( h.baseline ) unweighted_images++;
+    if( h.b_value > 0 ) weighted_images++;
+
+    ++c_iter;
+  }
+
+  MITK_INFO << "  :: Analyzed volumes " << images  << "\n"
+            << "  :: \t"<< unweighted_images << " b = 0" << "\n"
+            << "  :: \t"<< weighted_images << " b > 0";
+}
 
 mitk::DiffusionDICOMFileReader::DiffusionDICOMFileReader()
 {
@@ -34,6 +56,31 @@ mitk::DiffusionDICOMFileReader::~DiffusionDICOMFileReader()
 bool mitk::DiffusionDICOMFileReader
 ::LoadImages()
 {
+  // prepare data reading
+  DiffusionDICOMFileReaderHelper helper;
+  DiffusionDICOMFileReaderHelper::VolumeFileNamesContainer filenames;
+
+  const size_t number_of_outputs = this->GetNumberOfOutputs();
+
+  for( size_t idx = 0; idx < number_of_outputs; idx++ )
+  {
+    DICOMImageFrameList flist = this->GetOutput(idx).GetImageFrameList();
+
+    std::vector< std::string > FileNamesPerVolume;
+
+    DICOMImageFrameList::const_iterator cIt = flist.begin();
+    while( cIt != flist.end() )
+    {
+      FileNamesPerVolume.push_back( (*cIt)->Filename );
+      ++cIt;
+    }
+
+    filenames.push_back( FileNamesPerVolume );
+  }
+
+  helper.LoadToVector<short, 3>( filenames );
+
+
 
 }
 
@@ -115,14 +162,17 @@ void mitk::DiffusionDICOMFileReader
   {
     DICOMImageFrameInfo::Pointer frame = this->GetOutput( idx ).GetImageFrameList().at(0);
     canread = header_reader->ReadDiffusionHeader(frame->Filename);
-
-    MITK_INFO << "Can read ()" << idx << " value: " << canread;
-
-    canread = false;
   }
 
+  // collect the information
+  m_RetrievedHeader = header_reader->GetHeaderInformation();
 
+  // TODO : Analyze outputs + header information, i.e. for the loading confidence
+  MITK_INFO << "----- Diffusion DICOM Analysis Report ---- ";
 
+  PerformHeaderAnalysis( m_RetrievedHeader );
+
+  MITK_INFO << "===========================================";
 
 }
 

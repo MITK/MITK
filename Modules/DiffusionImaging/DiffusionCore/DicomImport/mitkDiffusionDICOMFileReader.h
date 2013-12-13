@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "DiffusionCoreExports.h"
 
 #include "mitkDICOMITKSeriesGDCMReader.h"
+#include "mitkDiffusionHeaderDICOMFileReader.h"
 
 namespace mitk
 {
@@ -43,6 +44,8 @@ public:
 protected:
     DiffusionDICOMFileReader();
     virtual ~DiffusionDICOMFileReader();
+
+    mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType m_RetrievedHeader;
 };
 
 }

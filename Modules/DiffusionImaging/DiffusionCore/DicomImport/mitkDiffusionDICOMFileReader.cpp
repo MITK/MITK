@@ -17,7 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionDICOMFileReader.h"
 
 #include "mitkDiffusionHeaderDICOMFileReader.h"
+
 #include "mitkDiffusionHeaderSiemensDICOMFileReader.h"
+#include "mitkDiffusionHeaderSiemensMosaicDICOMFileReader.h"
 
 mitk::DiffusionDICOMFileReader::DiffusionDICOMFileReader()
 {
@@ -81,7 +83,7 @@ void mitk::DiffusionDICOMFileReader
   {
     if( image_type.find("MOSAIC") != std::string::npos )
     {
-      header_reader = 0;
+      header_reader = mitk::DiffusionHeaderSiemensMosaicDICOMFileReader::New();
     }
     else
     {

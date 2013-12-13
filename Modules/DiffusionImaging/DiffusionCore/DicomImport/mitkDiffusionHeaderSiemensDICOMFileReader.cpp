@@ -19,78 +19,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "gdcmScanner.h"
 #include "gdcmReader.h"
 
-enum SiemensDiffusionHeaderType {
-  SIEMENS_CSA1 = 0,
-  SIEMENS_CSA2
-};
-
-static SiemensDiffusionHeaderType GetHeaderType( std::string header )
-{
-  // The CSA2 format begins with the string ‘SV10’, the CSA1 format does not.
-  if( header.find("SV10") != std::string::npos )
-  {
-    return SIEMENS_CSA2;
-  }
-  else
-  {
-    return SIEMENS_CSA1;
-  }
-}
-
-struct Siemens_Header_Format
-{
-  Siemens_Header_Format( size_t nlen,
-                         size_t vm,
-                         size_t vr,
-                         size_t syngodt,
-                         size_t nitems )
-    : NameLength( nlen ),
-      VM( vm ),
-      VR( vr ),
-      Syngodt( syngodt ),
-      NumItems( nitems ),
-      Delimiter( "\0" )
-  {}
-  size_t NameLength;
-  std::string Delimiter;
-  size_t VM;
-  size_t VR;
-  size_t Syngodt;
-  size_t NumItems;
-};
-
-
-static std::vector< Siemens_Header_Format > SiemensFormatsCollection;
-
-static bool ParseInputString( std::string input, std::vector<double>& values, Siemens_Header_Format format_specs )
-{
-
-  int offset = 84;
-  int vm = *(input.c_str() + format_specs.NameLength );
-
-  for (int k = 0; k < vm; k++)
-  {
-    int itemLength = *(input.c_str() + offset + 4);
-
-    int strideSize = static_cast<int> (ceil(static_cast<double>(itemLength)/4) * 4);
-    std::string valueString = input.substr( offset+16, itemLength );
-
-    double value = atof( valueString.c_str() );
-    values.push_back( value );
-
-    offset += 16+strideSize;
-  }
-
-  return true;
-}
 
 /**
  * @brief Extract b value from the siemens diffusion tag
  */
-static bool ExtractDiffusionTagInformation( std::string tag_value, mitk::DiffusionImageDICOMHeaderInformation& values)
+bool mitk::DiffusionHeaderSiemensDICOMFileReader
+::ExtractSiemensDiffusionTagInformation( std::string tag_value, mitk::DiffusionImageDICOMHeaderInformation& values)
 {
   SiemensDiffusionHeaderType hformat = GetHeaderType( tag_value );
-  Siemens_Header_Format specs = SiemensFormatsCollection.at( hformat );
+  Siemens_Header_Format specs = this->m_SiemensFormatsCollection.at( hformat );
 
   MITK_DEBUG << " Header format: " << hformat;
   MITK_DEBUG << " :: Retrieving b value. ";
@@ -167,8 +104,8 @@ mitk::DiffusionHeaderSiemensDICOMFileReader
   Siemens_Header_Format Siemens_CSA1_Format( 64, sizeof(int32_t), 4, sizeof(int32_t), sizeof(int32_t)  );
   Siemens_Header_Format Siemens_CSA2_Format( 64, sizeof(int32_t), 4, sizeof(int32_t), sizeof(int32_t)  );
 
-  SiemensFormatsCollection.push_back( Siemens_CSA1_Format );
-  SiemensFormatsCollection.push_back( Siemens_CSA2_Format );
+  m_SiemensFormatsCollection.push_back( Siemens_CSA1_Format );
+  m_SiemensFormatsCollection.push_back( Siemens_CSA2_Format );
 }
 
 mitk::DiffusionHeaderSiemensDICOMFileReader
@@ -197,7 +134,7 @@ bool mitk::DiffusionHeaderSiemensDICOMFileReader
   if( RevealBinaryTag( t_sie_diffusion, dataset, siemens_diffusionheader_str ) )
   {
     DiffusionImageDICOMHeaderInformation values;
-    ExtractDiffusionTagInformation( siemens_diffusionheader_str, values );
+    this->ExtractSiemensDiffusionTagInformation( siemens_diffusionheader_str, values );
 
     values.Print();
   }

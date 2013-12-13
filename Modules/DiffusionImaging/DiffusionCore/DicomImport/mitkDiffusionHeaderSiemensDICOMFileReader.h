@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "DiffusionCoreExports.h"
 
 #include "mitkDiffusionHeaderDICOMFileReader.h"
+#include "mitkDiffusionHeaderSiemensDICOMFileHelper.h"
 
 namespace mitk
 {
@@ -38,6 +39,10 @@ protected:
   DiffusionHeaderSiemensDICOMFileReader();
 
   ~DiffusionHeaderSiemensDICOMFileReader();
+
+  bool ExtractSiemensDiffusionTagInformation( std::string tag_value, mitk::DiffusionImageDICOMHeaderInformation& values );
+
+  std::vector< Siemens_Header_Format > m_SiemensFormatsCollection;
 };
 
 }

@@ -12,6 +12,7 @@ set(CPP_FILES
   DicomImport/mitkDiffusionDICOMFileReader.cpp
   DicomImport/mitkDiffusionHeaderDICOMFileReader.cpp
   DicomImport/mitkDiffusionHeaderSiemensDICOMFileReader.cpp
+  DicomImport/mitkDiffusionHeaderSiemensMosaicDICOMFileReader.cpp
 
   # DataStructures
   IODataStructures/mitkDiffusionCoreObjectFactory.cpp

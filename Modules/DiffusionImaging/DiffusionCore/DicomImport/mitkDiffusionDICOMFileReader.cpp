@@ -78,9 +78,46 @@ bool mitk::DiffusionDICOMFileReader
     filenames.push_back( FileNamesPerVolume );
   }
 
-  helper.LoadToVector<short, 3>( filenames );
+  // TODO : only prototyping to test loading of diffusion images
+  // we need some solution for the different types
+  typedef mitk::DiffusionImage<short> DiffusionImageType;
+  DiffusionImageType::Pointer output_image = DiffusionImageType::New();
+
+  DiffusionImageType::GradientDirectionContainerType::Pointer directions =
+      DiffusionImageType::GradientDirectionContainerType::New();
 
 
+  double max_bvalue = 0;
+  for( size_t idx = 0; idx < number_of_outputs; idx++ )
+  {
+    DiffusionImageDICOMHeaderInformation header = this->m_RetrievedHeader.at(idx);
+
+    if( max_bvalue < header.b_value )
+      max_bvalue = header.b_value;
+  }
+
+  // normalize the retrieved gradient directions according to the set b-value (maximal one)
+  for( size_t idx = 0; idx < number_of_outputs; idx++ )
+  {
+    DiffusionImageDICOMHeaderInformation header = this->m_RetrievedHeader.at(idx);
+    DiffusionImageType::GradientDirectionType grad = header.g_vector;
+
+    grad.normalize();
+    grad *= sqrt( header.b_value / max_bvalue );
+
+    directions->push_back( header.g_vector );
+  }
+
+  // initialize the output image
+  output_image->SetDirections( directions );
+  output_image->SetB_Value( max_bvalue );
+  output_image->SetVectorImage( helper.LoadToVector<short, 3>( filenames ) );
+  output_image->InitializeFromVectorImage();
+  output_image->UpdateBValueMap();
+
+  DICOMImageBlockDescriptor& block = this->InternalGetOutput(0);
+
+  block.SetMitkImage( (mitk::Image::Pointer) output_image );
 
 }
 

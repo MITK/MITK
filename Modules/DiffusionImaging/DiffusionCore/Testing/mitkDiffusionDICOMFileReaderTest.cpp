@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMTagBasedSorter.h"
 #include "mitkDICOMSortByTag.h"
 
+#include "mitkNrrdDiffusionImageWriter.h"
+
 #include "mitkTestingMacros.h"
 
 using mitk::DICOMTag;
@@ -86,6 +88,23 @@ int mitkDiffusionDICOMFileReaderTest(int argc, char* argv[])
   //mitk::DICOMFileReaderTestHelper::TestMitkImagesAreLoaded( gdcmReader );
   gdcmReader->LoadImages();
 
+  mitk::Image::Pointer loaded_image = gdcmReader->GetOutput(0).GetMitkImage();
+
+  mitk::DiffusionImage<short>::Pointer d_img = static_cast<mitk::DiffusionImage<short>*>( loaded_image.GetPointer() );
+
+  mitk::NrrdDiffusionImageWriter<short>::Pointer writer =
+      mitk::NrrdDiffusionImageWriter<short>::New();
+  writer->SetFileName("/tmp/test.dwi");
+  writer->SetInput(d_img );
+
+  try
+  {
+    writer->Update();
+  }
+  catch( const itk::ExceptionObject& e)
+  {
+    MITK_TEST_FAILED_MSG( << "Writer failed : " << e.what() );
+  }
 
   MITK_TEST_END();
 }

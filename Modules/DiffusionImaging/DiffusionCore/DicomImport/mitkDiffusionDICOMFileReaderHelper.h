@@ -16,8 +16,6 @@ public:
 
   typedef std::vector< StringContainer > VolumeFileNamesContainer;
 
-
-
   template< typename PixelType, unsigned int VecImageDimension>
   typename itk::VectorImage< PixelType, VecImageDimension >::Pointer LoadToVector(
       const VolumeFileNamesContainer& filenames
@@ -39,6 +37,10 @@ public:
 
     typename VectorImageType::Pointer output_image = VectorImageType::New();
     output_image->SetNumberOfComponentsPerPixel( filenames.size() );
+    output_image->SetSpacing( probe_reader->GetOutput()->GetSpacing() );
+    output_image->SetOrigin( probe_reader->GetOutput()->GetOrigin() );
+    output_image->SetDirection( probe_reader->GetOutput()->GetDirection() );
+    output_image->SetLargestPossibleRegion( probe_reader->GetOutput()->GetLargestPossibleRegion() );
     output_image->SetBufferedRegion( requestedRegion );
     output_image->Allocate();
 

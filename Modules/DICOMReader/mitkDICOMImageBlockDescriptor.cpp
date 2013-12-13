@@ -227,7 +227,7 @@ mitk::DICOMImageBlockDescriptor
 
 void
 mitk::DICOMImageBlockDescriptor
-::GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const
+::GetDesiredMITKImagePixelSpacing( ScalarType& spacingX, ScalarType& spacingY) const
 {
   // preference for "in patient" pixel spacing
   if ( !DICOMStringToSpacing( m_PixelSpacing, spacingX, spacingY ) )

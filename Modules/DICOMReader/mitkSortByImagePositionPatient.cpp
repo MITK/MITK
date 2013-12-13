@@ -99,9 +99,9 @@ mitk::SortByImagePositionPatient
   }
 
   static Vector3D normal;
-  normal[0] = leftRight[1] * leftUp[5] - leftRight[2] * leftUp[4];
-  normal[1] = leftRight[2] * leftUp[3] - leftRight[0] * leftUp[5];
-  normal[2] = leftRight[0] * leftUp[4] - leftRight[1] * leftUp[3];
+  normal[0] = leftRight[1] * leftUp[2] - leftRight[2] * leftUp[1];
+  normal[1] = leftRight[2] * leftUp[0] - leftRight[0] * leftUp[2];
+  normal[2] = leftRight[0] * leftUp[1] - leftRight[1] * leftUp[0];
 
   static double leftDistance = 0.0;
   static double rightDistance = 0.0;

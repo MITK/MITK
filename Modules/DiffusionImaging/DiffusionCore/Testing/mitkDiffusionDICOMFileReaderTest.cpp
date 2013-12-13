@@ -84,6 +84,7 @@ int mitkDiffusionDICOMFileReaderTest(int argc, char* argv[])
 
   // really load images
   //mitk::DICOMFileReaderTestHelper::TestMitkImagesAreLoaded( gdcmReader );
+  gdcmReader->LoadImages();
 
 
   MITK_TEST_END();

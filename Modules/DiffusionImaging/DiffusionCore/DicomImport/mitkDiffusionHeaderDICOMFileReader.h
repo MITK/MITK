@@ -29,6 +29,35 @@ namespace mitk
 {
 
 /**
+ * @brief The DiffusionImageHeaderInformation struct
+ */
+struct DiffusionImageDICOMHeaderInformation
+{
+  DiffusionImageDICOMHeaderInformation()
+    : b_value(0),
+      baseline(false),
+      isotropic(false)
+  {
+    g_vector.fill(0);
+  }
+
+  void Print()
+  {
+    MITK_INFO << " DiffusionImageHeaderInformation : \n"
+              << "    : b value   : " << b_value << "\n"
+              << "    : gradient  : " << g_vector << "\n"
+              << "    : isotropic : " << isotropic << "\n --- \n";
+  }
+
+  unsigned int b_value;
+  vnl_vector_fixed< double, 3> g_vector;
+  bool baseline;
+  bool isotropic;
+};
+
+
+
+/**
  * @class DiffusionHeaderDICOMFileReader
  *
  * @brief Abstract class for all vendor specific diffusion file header reader
@@ -40,19 +69,25 @@ class DiffusionCore_EXPORT DiffusionHeaderDICOMFileReader
 {
 public:
 
+  typedef std::vector< DiffusionImageDICOMHeaderInformation > DICOMHeaderListType;
 
   mitkClassMacro( DiffusionHeaderDICOMFileReader, itk::LightObject )
+  itkSimpleNewMacro( Self )
 
   /**
    * @brief IsDiffusionHeader Parse the given dicom file and collect the special diffusion image information
    * @return
    */
-  virtual bool ReadDiffusionHeader( std::string ) = 0;
+  virtual bool ReadDiffusionHeader( std::string ){ return false; }
+
+  DICOMHeaderListType GetHeaderInformation();
 
 protected:
   DiffusionHeaderDICOMFileReader();
 
   virtual ~DiffusionHeaderDICOMFileReader();
+
+  DICOMHeaderListType m_HeaderInformationList;
 };
 
 /**
@@ -83,33 +118,6 @@ static bool RevealBinaryTag(const gdcm::Tag tag, const gdcm::DataSet& dataset, s
     return false;
   }
 }
-
-/**
- * @brief The DiffusionImageHeaderInformation struct
- */
-struct DiffusionImageDICOMHeaderInformation
-{
-  DiffusionImageDICOMHeaderInformation()
-    : b_value(0),
-      isotropic(false),
-      baseline(false)
-  {
-    g_vector.fill(0);
-  }
-
-  void Print()
-  {
-    MITK_INFO << " DiffusionImageHeaderInformation : \n"
-              << "    : b value   : " << b_value << "\n"
-              << "    : gradient  : " << g_vector << "\n"
-              << "    : isotropic : " << isotropic << "\n --- \n";
-  }
-
-  unsigned int b_value;
-  vnl_vector_fixed< double, 3> g_vector;
-  bool baseline;
-  bool isotropic;
-};
 
 
 } // end namespace mitk

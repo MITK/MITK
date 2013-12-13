@@ -45,10 +45,10 @@ bool mitk::DiffusionHeaderSiemensMosaicDICOMFileReader
                         specs
                         );
 
-      MITK_INFO << "Mosaic";
+      MITK_DEBUG << "Mosaic";
       for( unsigned int i=0; i<value_array.size(); i++)
       {
-        MITK_INFO << value_array.at(i);
+        MITK_DEBUG << value_array.at(i);
       }
     }
 
@@ -61,13 +61,15 @@ bool mitk::DiffusionHeaderSiemensMosaicDICOMFileReader
                         specs
                         );
 
-      MITK_INFO << "SliceNormal";
+      MITK_DEBUG << "SliceNormal";
       for( unsigned int i=0; i<value_array.size(); i++)
       {
-        MITK_INFO << value_array.at(i);
+        MITK_DEBUG << value_array.at(i);
       }
 
     }
+
+    m_HeaderInformationList.push_back( header_values );
 
   }
 

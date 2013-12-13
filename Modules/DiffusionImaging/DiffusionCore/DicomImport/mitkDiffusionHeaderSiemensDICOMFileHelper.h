@@ -28,12 +28,15 @@ struct Siemens_Header_Format
                          size_t syngodt,
                          size_t nitems )
     : NameLength( nlen ),
+      Delimiter( "\0" ),
       VM( vm ),
       VR( vr ),
       Syngodt( syngodt ),
-      NumItems( nitems ),
-      Delimiter( "\0" )
-  {}
+      NumItems( nitems )
+  {
+
+  }
+
   size_t NameLength;
   std::string Delimiter;
   size_t VM;

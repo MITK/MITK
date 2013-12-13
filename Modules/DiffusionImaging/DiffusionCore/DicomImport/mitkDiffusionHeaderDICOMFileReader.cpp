@@ -27,3 +27,15 @@ mitk::DiffusionHeaderDICOMFileReader
 {
 
 }
+
+mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType
+mitk::DiffusionHeaderDICOMFileReader
+::GetHeaderInformation()
+{
+  if( m_HeaderInformationList.size() < 1 )
+  {
+    MITK_WARN << "No information retrieved yet. Call AnalyzeInputFiles first!";
+  }
+
+  return m_HeaderInformationList;
+}

@@ -136,7 +136,7 @@ bool mitk::DiffusionHeaderSiemensDICOMFileReader
     DiffusionImageDICOMHeaderInformation values;
     this->ExtractSiemensDiffusionTagInformation( siemens_diffusionheader_str, values );
 
-    values.Print();
+    m_HeaderInformationList.push_back( values );
   }
 
 

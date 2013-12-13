@@ -23,10 +23,11 @@ mitk::ITKDICOMSeriesReaderHelper
 {
   if( filenames.empty() )
   {
-    MITK_DEBUG << "Calling LoadDicomSeries with empty filename string container. Probably invalid application logic."; // TODO
+    MITK_DEBUG << "Calling LoadDicomSeries with empty filename string container. Probably invalid application logic.";
     return NULL; // this is not actually an error but the result is very simple
   }
 
+  typedef itk::GDCMImageIO DcmIoType;
   DcmIoType::Pointer io = DcmIoType::New();
 
   Image::Pointer preLoadedImageBlock; // TODO

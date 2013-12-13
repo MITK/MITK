@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // TODO ensure "C" locale!!
 // TODO 3D+t
+// TODO providing tags as properties!
+// TODO preloaded volumes?? could be solved in a different way..
 
 namespace mitk
 {

@@ -29,7 +29,7 @@ mitk::ITKDICOMSeriesReaderHelper
     const StringContainer& filenames,
     bool correctTilt,
     const GantryTiltInformation& tiltInfo,
-    DcmIoType::Pointer& io,
+    itk::GDCMImageIO::Pointer& io,
     Image::Pointer preLoadedImageBlock )
 {
   /******** Normal Case, 3D (also for GDCM < 2 usable) ***************/
@@ -38,7 +38,7 @@ mitk::ITKDICOMSeriesReaderHelper
   typedef itk::Image<PixelType, 3> ImageType;
   typedef itk::ImageSeriesReader<ImageType> ReaderType;
 
-  io = DcmIoType::New();
+  io = itk::GDCMImageIO::New();
   typename ReaderType::Pointer reader = ReaderType::New();
 
   reader->SetImageIO(io);

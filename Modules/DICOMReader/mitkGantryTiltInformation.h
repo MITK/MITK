@@ -103,7 +103,7 @@ class GantryTiltInformation
 
       Needed to resize an orthogonal image volume.
      */
-    double GetTiltCorrectedAdditionalSize(unsigned int imageSizeZ) const; // TODO: imageSizeZ is a bit of a loss of information: when loading, GantryTiltInformation *should* be initialized with the most distant slices
+    double GetTiltCorrectedAdditionalSize(unsigned int imageSizeZ) const;
 
     /**
       \brief Calculated tilt angle in degrees.

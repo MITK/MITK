@@ -67,5 +67,6 @@ bool mitk::RenderingModeProperty::AddEnum( const std::string& name, const IdType
 itk::LightObject::Pointer mitk::RenderingModeProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

@@ -114,5 +114,6 @@ std::string mitk::AnnotationProperty::GetValueAsString() const
 itk::LightObject::Pointer mitk::AnnotationProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

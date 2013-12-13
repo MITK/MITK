@@ -305,5 +305,6 @@ void mitk::LookupTable::PrintSelf(std::ostream &os, itk::Indent indent) const
 itk::LightObject::Pointer mitk::LookupTable::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

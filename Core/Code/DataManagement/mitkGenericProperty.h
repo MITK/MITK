@@ -88,6 +88,7 @@ class MITK_EXPORT GenericProperty : public BaseProperty
     virtual itk::LightObject::Pointer InternalClone() const
     {
       itk::LightObject::Pointer result(new Self(*this));
+      result->UnRegister();
       return result;
     }
 
@@ -139,6 +140,7 @@ private:                                                      \
   mitk::PropertyName::PropertyName(Type x) : Superclass(x) {}                \
   itk::LightObject::Pointer mitk::PropertyName::InternalClone() const {      \
     itk::LightObject::Pointer result(new Self(*this));                       \
+    result->UnRegister();                                                    \
     return result;                                                           \
   }                                                                          \
 

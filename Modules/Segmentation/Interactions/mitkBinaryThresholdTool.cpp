@@ -87,33 +87,19 @@ const char* mitk::BinaryThresholdTool::GetName() const
 void mitk::BinaryThresholdTool::Activated()
 {
   m_ReferenceNode = m_ToolManager->GetReferenceData(0);
-  if (m_ReferenceNode.IsNull())
-  {
-    MITK_ERROR << "Could not retrieve the reference node.";
-    m_ToolManager->ActivateTool(-1);
-    return;
-  }
+  assert(m_ReferenceNode.IsNotNull());
+
   m_NodeForThresholding = m_ReferenceNode;
   m_CurrentTimeStep = 0; // todo: get the right time step e.g. from GUI
   this->SetupPreviewNodeFor( m_NodeForThresholding );
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::BinaryThresholdTool::Deactivated()
 {
   m_NodeForThresholding = NULL;
   m_ReferenceNode = NULL;
-  try
-  {
-    if (DataStorage* storage = m_ToolManager->GetDataStorage())
-    {
-      storage->Remove( m_PreviewNode );
-      RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-  }
-  catch(...)
-  {
-    // don't care
-  }
+  m_ToolManager->GetDataStorage()->Remove( m_PreviewNode );
   m_PreviewNode->SetData(NULL);
 //  mitk::UndoController::GetCurrentUndoModel()->Clear();
 //  mitk::UndoController::GetCurrentUndoModel()->ClearRedoList();

@@ -75,7 +75,7 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
     typedef itk::CurvatureAnisotropicDiffusionImageFilter< InternalImageType, InternalImageType >       SmoothingFilterType;
     typedef itk::GradientMagnitudeRecursiveGaussianImageFilter< InternalImageType, InternalImageType >  GradientFilterType;
     typedef itk::SigmoidImageFilter< InternalImageType, InternalImageType >                             SigmoidFilterType;
-    typedef itk::FastMarchingImageFilter< InternalImageType, InternalImageType >                        FastMarchingFilterType;
+    typedef itk::FastMarchingImageFilter< InternalImageType, InternalImageType >                          FastMarchingFilterType;
     typedef FastMarchingFilterType::NodeContainer                                                       NodeContainer;
     typedef FastMarchingFilterType::NodeType                                                            NodeType;
 
@@ -91,21 +91,27 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
 
     /// \brief Set parameter used in Threshold filter.
     void SetUpperThreshold(double);
+    double GetUpperThreshold();
 
     /// \brief Set parameter used in Threshold filter.
     void SetLowerThreshold(double);
+    double GetLowerThreshold();
 
     /// \brief Set parameter used in Fast Marching filter.
     void SetStoppingValue(double);
+    double GetStoppingValue();
 
     /// \brief Set parameter used in Gradient Magnitude filter.
     void SetSigma(double);
+    double GetSigma();
 
     /// \brief Set parameter used in Fast Marching filter.
     void SetAlpha(double);
+    double GetAlpha();
 
     /// \brief Set parameter used in Fast Marching filter.
     void SetBeta(double);
+    double GetBeta();
 
     /// \brief Adds the feedback image to the current working image.
     void AcceptPreview();

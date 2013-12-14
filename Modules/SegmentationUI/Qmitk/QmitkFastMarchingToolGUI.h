@@ -45,23 +45,23 @@ public:
 
     void OnNewToolAssociated(mitk::Tool*);
 
-    void OnThresholdChanged(double, double);
     void OnAlphaChanged(double);
     void OnBetaChanged(double);
     void OnSigmaChanged(double);
-    void OnStoppingValueChanged(double);
+    void OnStopValueChanged(double);
     void OnAcceptPreview();
     void OnCancel();
     void Refetch();
     void SetStepper(mitk::Stepper *);
     void OnClearSeeds();
+    void OnNewLabel();
+    void OnShowInformation(bool);
+    void OnShowAdvancedControls(bool);
 
 protected:
 
   QmitkFastMarchingToolGUI();
   virtual ~QmitkFastMarchingToolGUI();
-
-  void Update();
 
   void BusyStateChanged(bool);
 

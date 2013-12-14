@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>347</width>
-    <height>494</height>
+    <height>542</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -162,13 +162,13 @@
       <widget class="QLabel" name="label">
        <property name="minimumSize">
         <size>
-         <width>50</width>
+         <width>60</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>50</width>
+         <width>60</width>
          <height>16777215</height>
         </size>
        </property>
@@ -188,13 +188,13 @@
       <widget class="QLabel" name="label_2">
        <property name="minimumSize">
         <size>
-         <width>50</width>
+         <width>60</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>50</width>
+         <width>60</width>
          <height>16777215</height>
         </size>
        </property>
@@ -214,13 +214,13 @@
       <widget class="QLabel" name="label_3">
        <property name="minimumSize">
         <size>
-         <width>50</width>
+         <width>60</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>50</width>
+         <width>60</width>
          <height>16777215</height>
         </size>
        </property>
@@ -240,23 +240,23 @@
       <widget class="QLabel" name="label_4">
        <property name="minimumSize">
         <size>
-         <width>50</width>
+         <width>60</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>50</width>
+         <width>60</width>
          <height>16777215</height>
         </size>
        </property>
        <property name="text">
-        <string>Threshold: </string>
+        <string>Stop Value: </string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="ctkRangeWidget" name="m_slwThreshold" native="true"/>
+      <widget class="ctkSliderWidget" name="m_slStopValue" native="true"/>
      </item>
     </layout>
    </item>
@@ -283,7 +283,7 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;This tool segments the region under the clicked positions by running the &amp;quot;FastMarching&amp;quot; algorithm.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;This tool segments the region under the clicked positions (seeds) by means of the &amp;quot;FastMarching&amp;quot; algorithm.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Press &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; font-style:italic;&quot;&gt;shift-click&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; to add a new seed, &lt;/span&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;execute the tool and generate a preview image (green contour)&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;Press &amp;quot;Clear Seeds&amp;quot; to remove all seeds and start over again.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;Press &amp;quot;Accept&amp;quot; to replace the active label with the preview result.&lt;/span&gt;&lt;/p&gt;
@@ -395,12 +395,6 @@ p, li { white-space: pre-wrap; }
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
-  <customwidget>
-   <class>ctkRangeWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">ctkRangeWidget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>ctkSliderWidget</class>
    <extends>QWidget</extends>

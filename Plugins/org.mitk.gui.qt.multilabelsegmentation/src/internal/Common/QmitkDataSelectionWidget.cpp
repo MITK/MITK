@@ -123,6 +123,7 @@ unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(const QString &lab
 
   QmitkDataStorageComboBox* comboBox = new QmitkDataStorageComboBox(this->GetDataStorage(), predicate, m_Controls.dataSelectionWidget);
   connect(comboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnSelectionChanged(const mitk::DataNode *)));
+  comboBox->SetAutoSelectNewItems(true);
   m_Controls.gridLayout->addWidget(comboBox, row, 1);
 
   m_DataStorageComboBoxes.push_back(comboBox);

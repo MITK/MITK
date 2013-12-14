@@ -54,36 +54,47 @@ public:
 
 protected slots:
 
+  /// \brief reaction to the selection of a new patient (reference) image in the DataStorage combobox
   void OnReferenceSelectionChanged(const mitk::DataNode* node);
 
+  /// \brief reaction to the selection of a new Segmentation (working) image in the DataStorage combobox
   void OnSegmentationSelectionChanged(const mitk::DataNode *node);
 
+  /// \brief reaction to the selection of any 2D segmentation tool
   void OnManualTool2DSelected(int id);
 
+  /// \brief reaction to button "Load Segmentation"
   void OnLoadSegmentation();
 
+  /// \brief reaction to button "Save Segmentation"
   void OnSaveSegmentation();
 
+  /// \brief reaction to button "Delete Segmentation"
   void OnDeleteSegmentation();
 
+  /// \brief reaction to button "New Label"
   void OnNewLabel();
 
+  /// \brief reaction to button "New Segmentation"
   void OnNewSegmentation();
 
-  // reaction to button "Surface Stamp"
+  /// \brief reaction to button "Surface Stamp"
   void OnSurfaceStamp();
 
-  // reaction to button "Mask Stamp"
+  /// \brief reaction to button "Mask Stamp"
   void OnMaskStamp();
 
-  // reaction to signal "goToLabel" from labelset widget
+  /// \brief reaction to signal "goToLabel" from labelset widget
   void OnGoToLabel(const mitk::Point3D& pos);
 
 protected:
 
   void SetFocus();
 
+  void UpdateControls();
+
   void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart);
+
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart);
 
   void ResetMouseCursor();
@@ -91,14 +102,14 @@ protected:
   void SetMouseCursor(const us::ModuleResource, int hotspotX, int hotspotY );
 
   void InitializeListeners();
-  /**
-  * Reimplemented from QmitkAbstractView
-  */
+
+  /// \brief Checks if two images have the same size and geometry
+  bool CheckForSameGeometry(const mitk::Image *image1, const mitk::Image *image2) const;
+
+  /// \brief Reimplemented from QmitkAbstractView
   virtual void NodeAdded(const mitk::DataNode* node);
 
-  /**
-  * Reimplemented from QmitkAbstractView
-  */
+  /// \brief Reimplemented from QmitkAbstractView
   virtual void NodeRemoved(const mitk::DataNode* node);
 
   QString GetLastFileOpenPath();
@@ -130,7 +141,6 @@ protected:
   mitk::NodePredicateAnd::Pointer m_MaskPredicate;
 
   bool m_MouseCursorSet;
-
 
   mitk::SegmentationInteractor::Pointer m_Interactor;
 

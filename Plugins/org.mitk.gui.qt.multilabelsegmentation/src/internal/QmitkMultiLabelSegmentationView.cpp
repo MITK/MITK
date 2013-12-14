@@ -238,6 +238,30 @@ void QmitkMultiLabelSegmentationView::SetFocus ()
 
 }
 
+bool QmitkMultiLabelSegmentationView::CheckForSameGeometry(const mitk::Image *image1, const mitk::Image *image2) const
+{
+   bool isSameGeometry(true);
+
+   if (image1 && image2)
+   {
+      mitk::Geometry3D* geo1 = image1->GetGeometry();
+      mitk::Geometry3D* geo2 = image2->GetGeometry();
+
+      isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetOrigin(), geo2->GetOrigin());
+      isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(0), geo2->GetExtent(0));
+      isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(1), geo2->GetExtent(1));
+      isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(2), geo2->GetExtent(2));
+      isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetSpacing(), geo2->GetSpacing());
+      isSameGeometry = isSameGeometry && mitk::MatrixEqualElementWise(geo1->GetIndexToWorldTransform()->GetMatrix(), geo2->GetIndexToWorldTransform()->GetMatrix());
+
+      return isSameGeometry;
+   }
+   else
+   {
+      return false;
+   }
+}
+
 void QmitkMultiLabelSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
   if (m_IRenderWindowPart != renderWindowPart)
@@ -286,6 +310,31 @@ int QmitkMultiLabelSegmentationView::ComputePreferredSize(bool width, int /*avai
   }
 }
 
+void QmitkMultiLabelSegmentationView::UpdateControls()
+{
+  mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
+  m_Controls.m_LabelSetWidget->setEnabled(referenceNode!=NULL);
+  m_Controls.m_pbNewSegmentationSession->setEnabled(referenceNode!=NULL);
+  m_Controls.m_pbLoadSegmentation->setEnabled(referenceNode!=NULL);
+
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  m_Controls.m_LabelSetWidget->setEnabled(workingNode!=NULL);
+  m_Controls.m_pbNewLabel->setEnabled(workingNode!=NULL);
+  m_Controls.m_pbSaveSegmentation->setEnabled(workingNode!=NULL);
+  m_Controls.m_pbDeleteSegmentation->setEnabled(workingNode!=NULL);
+  m_Controls.m_SliceBasedInterpolator->setEnabled(workingNode!=NULL);
+  m_Controls.m_SurfaceBasedInterpolator->setEnabled(workingNode!=NULL);
+
+  if (workingNode!=NULL)
+  {
+    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+    if (workingImage->GetNumberOfLabels() > 2)
+      m_Controls.m_LabelSetWidget->show();
+    else
+      m_Controls.m_LabelSetWidget->hide();
+  }
+}
+
 void QmitkMultiLabelSegmentationView::OnLoadSegmentation()
 {
   m_ToolManager->ActivateTool(-1);
@@ -303,11 +352,11 @@ void QmitkMultiLabelSegmentationView::OnLoadSegmentation()
   mitk::LabelSetImageReader::Pointer reader = mitk::LabelSetImageReader::New();
   reader->SetFileName(qfileName.toLatin1());
 
+  this->WaitCursorOn();
+
   try
   {
-    this->WaitCursorOn();
     reader->Update();
-    this->WaitCursorOff();
   }
   catch ( mitk::Exception& e )
   {
@@ -317,6 +366,14 @@ void QmitkMultiLabelSegmentationView::OnLoadSegmentation()
   }
 
   mitk::LabelSetImage::Pointer newImage = reader->GetOutput();
+
+  if (!this->CheckForSameGeometry(referenceImage, newImage))
+  {
+    this->WaitCursorOff();
+    MITK_INFO << "Loaded segmentation session belongs to another reference image.";
+    QMessageBox::information(m_Parent, "Load Segmentation", "Loaded segmentation session belongs to another reference image.\n");
+    return;
+  }
 
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetData(newImage);
@@ -332,6 +389,8 @@ void QmitkMultiLabelSegmentationView::OnLoadSegmentation()
 
   this->UpdateControls();
   */
+  this->WaitCursorOff();
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -434,7 +493,7 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentation()
   color.SetRed(1.0);
   color.SetGreen(0.0);
   color.SetBlue(0.0);
-  workingImage->AddLabel("new-label", color);
+  workingImage->AddLabel("no_name", color);
 
   this->WaitCursorOff();
 
@@ -543,18 +602,6 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
 {
   m_ToolManager->ActivateTool(-1);
 
-  if (!node)
-  {
-    m_ToolManager->SetReferenceData(NULL);
-    m_Controls.m_LabelSetWidget->setEnabled(false);
-    m_Controls.m_pbNewSegmentationSession->setEnabled(false);
-    m_Controls.m_pbNewLabel->setEnabled(false);
-    m_Controls.m_pbSaveSegmentation->setEnabled(false);
-    m_Controls.m_pbLoadSegmentation->setEnabled(false);
-    m_Controls.m_pbDeleteSegmentation->setEnabled(false);
-    return;
-  }
-
   if (m_ReferenceNode.IsNotNull())
   {
     mitk::DataStorage::SetOfObjects::ConstPointer segNodes = this->GetDataStorage()->GetDerivations(m_ReferenceNode);
@@ -567,85 +614,60 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
   }
 
   m_ReferenceNode = const_cast<mitk::DataNode*>(node);
-
   m_ToolManager->SetReferenceData(m_ReferenceNode);
-  m_Controls.m_LabelSetWidget->setEnabled(true);
-  m_Controls.m_pbNewLabel->setEnabled(true);
-  m_Controls.m_pbNewSegmentationSession->setEnabled(true);
-  m_Controls.m_pbSaveSegmentation->setEnabled(true);
-  m_Controls.m_pbLoadSegmentation->setEnabled(true);
-  m_Controls.m_pbDeleteSegmentation->setEnabled(true);
 
-  m_ReferenceNode->SetVisibility(true);
-
-  mitk::DataStorage::SetOfObjects::ConstPointer segNodes = this->GetDataStorage()->GetDerivations(m_ReferenceNode);
-  for(mitk::DataStorage::SetOfObjects::const_iterator iter = segNodes->begin(); iter != segNodes->end(); ++iter)
+  if (m_ReferenceNode.IsNotNull())
   {
-    mitk::DataNode* _segNode = *iter;
-    if (_segNode)
+    m_ReferenceNode->SetVisibility(true);
+
+    mitk::DataStorage::SetOfObjects::ConstPointer segNodes = this->GetDataStorage()->GetDerivations(m_ReferenceNode);
+    for(mitk::DataStorage::SetOfObjects::const_iterator iter = segNodes->begin(); iter != segNodes->end(); ++iter)
     {
-      _segNode->SetVisibility(true);
+      mitk::DataNode* _segNode = *iter;
+      if (_segNode)
+      {
+        _segNode->SetVisibility(true);
+      }
     }
+
+    m_Controls.m_cbWorkingNodeSelector->Reset();
   }
 
-  m_Controls.m_cbWorkingNodeSelector->Reset();
+  this->UpdateControls();
 
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
 }
 
 void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk::DataNode *node)
 {
-  if (!node)
-  {
-    m_ToolManager->SetWorkingData(NULL);
-    m_Controls.m_SliceBasedInterpolator->setEnabled(false);
-    m_Controls.m_SurfaceBasedInterpolator->setEnabled(false);
-//    m_Controls.m_gbSurfaceStamp->setEnabled(false);
-//    m_Controls.m_gbMaskStamp->setEnabled(false);
-    return;
-  }
-/*
-  if (m_WorkingNode.IsNotNull())
-  {
-    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( m_WorkingNode->GetData() );
-    assert(workingImage);
-    workingImage->SetActiveLabel(0,true);
-  }
-*/
   m_WorkingNode = const_cast<mitk::DataNode*>(node);
-
   m_ToolManager->SetWorkingData(m_WorkingNode);
 
-  int layer(0);
-  m_ReferenceNode->GetIntProperty("layer", layer);
-  int othersLayer = layer+1;
-
-  mitk::DataStorage::SetOfObjects::ConstPointer otherNodes = this->GetDataStorage()->GetDerivations(m_ReferenceNode, m_SegmentationPredicate);
-  for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherNodes->begin(); iter != otherNodes->end(); ++iter)
+  if (m_WorkingNode.IsNotNull())
   {
-    mitk::DataNode* _otherNode = *iter;
-    if (_otherNode != m_WorkingNode)
+    int layer(0);
+    m_ReferenceNode->GetIntProperty("layer", layer);
+    int othersLayer = layer+1;
+
+    mitk::DataStorage::SetOfObjects::ConstPointer otherNodes = this->GetDataStorage()->GetDerivations(m_ReferenceNode, m_SegmentationPredicate);
+    for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherNodes->begin(); iter != otherNodes->end(); ++iter)
     {
-      _otherNode->SetIntProperty("layer", othersLayer);
-      othersLayer++;
+      mitk::DataNode* _otherNode = *iter;
+      if (_otherNode != m_WorkingNode)
+      {
+        _otherNode->SetIntProperty("layer", othersLayer);
+        othersLayer++;
+      }
     }
+
+    //finally, set the layer to the current working node
+    m_WorkingNode->SetIntProperty("layer", othersLayer);
   }
 
-  //finally, set the layer to the current working node
-  m_WorkingNode->SetIntProperty("layer", othersLayer);
+  this->UpdateControls();
 
-  // and enable GUI controls
-  m_Controls.m_SliceBasedInterpolator->setEnabled(true);
-  m_Controls.m_SurfaceBasedInterpolator->setEnabled(true);
 //  m_Controls.m_gbSurfaceStamp->setEnabled(true);
 //  m_Controls.m_gbMaskStamp->setEnabled(true);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
-
-  if (workingImage->GetNumberOfLabels() > 2)
-    m_Controls.m_LabelSetWidget->show();
-  else
-    m_Controls.m_LabelSetWidget->hide();
 
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
 }

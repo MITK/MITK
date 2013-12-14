@@ -42,6 +42,11 @@ bool mitk::USImageSource::RemoveFilter(AbstractOpenCVImageFilter::Pointer filter
   return m_ImageFilter->RemoveFilter(filter);
 }
 
+bool mitk::USImageSource::GetIsFilterInThePipeline(AbstractOpenCVImageFilter::Pointer filter)
+{
+  return m_ImageFilter->GetIsFilterOnTheList(filter);
+}
+
 mitk::Image::Pointer mitk::USImageSource::GetNextImage()
 {
   mitk::Image::Pointer result;

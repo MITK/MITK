@@ -60,6 +60,11 @@ bool BasicCombinationOpenCVImageFilter::RemoveFilter( AbstractOpenCVImageFilter:
   return false;
 }
 
+bool BasicCombinationOpenCVImageFilter::GetIsFilterOnTheList( AbstractOpenCVImageFilter::Pointer filter )
+{
+  return std::find(m_FilterList.begin(), m_FilterList.end(), filter) != m_FilterList.end();
+}
+
 bool BasicCombinationOpenCVImageFilter::GetIsEmpty()
 {
   return m_FilterList.empty();

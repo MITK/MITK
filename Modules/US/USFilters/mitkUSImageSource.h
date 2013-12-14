@@ -51,6 +51,7 @@ namespace mitk {
 
     void PushFilter(AbstractOpenCVImageFilter::Pointer filter);
     bool RemoveFilter(AbstractOpenCVImageFilter::Pointer filter);
+    bool GetIsFilterInThePipeline(AbstractOpenCVImageFilter::Pointer filter);
 
     /**
     * \brief Retrieves the next frame. This will typically be the next frame

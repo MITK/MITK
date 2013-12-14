@@ -182,6 +182,7 @@ namespace mitk {
     virtual bool GetIsFreezed();
 
     void PushFilter(AbstractOpenCVImageFilter::Pointer filter);
+    void PushFilterIfNotPushedBefore(AbstractOpenCVImageFilter::Pointer filter);
     bool RemoveFilter(AbstractOpenCVImageFilter::Pointer filter);
 
     /**

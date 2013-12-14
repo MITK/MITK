@@ -334,6 +334,21 @@ void mitk::USDevice::PushFilter(AbstractOpenCVImageFilter::Pointer filter)
   imageSource->PushFilter(filter);
 }
 
+void mitk::USDevice::PushFilterIfNotPushedBefore(AbstractOpenCVImageFilter::Pointer filter)
+{
+  mitk::USImageSource::Pointer imageSource = this->GetUSImageSource();
+  if ( imageSource.IsNull() )
+  {
+    MITK_ERROR << "ImageSource must not be null when pushing a filter.";
+    mitkThrow() << "ImageSource must not be null when pushing a filter.";
+  }
+
+  if ( ! imageSource->GetIsFilterInThePipeline(filter) )
+  {
+    imageSource->PushFilter(filter);
+  }
+}
+
 bool mitk::USDevice::RemoveFilter(AbstractOpenCVImageFilter::Pointer filter)
 {
   mitk::USImageSource::Pointer imageSource = this->GetUSImageSource();

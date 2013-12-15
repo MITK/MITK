@@ -66,7 +66,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     return m_Nodes.size();
   }
 
-  mitk::DataNode::Pointer mitk::NodeDisplacementFilter::GetNode (int i)
+  mitk::DataNode::Pointer mitk::NodeDisplacementFilter::GetNode (unsigned int i)
   {
     if (i < m_Nodes.size() )
     {
@@ -82,8 +82,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   void mitk::NodeDisplacementFilter::SelectInput(int i)
   {
-    if (i < 0) mitkThrow() << "Negative Input selected in NodeDisplacementFilter";
-    if (! (i < this->GetInputs().size())) mitkThrow() << "Selected input index is larger than actual number of inputs in NodeDisplacementFilter";
+    if (i < 0) { mitkThrow() << "Negative Input selected in NodeDisplacementFilter"; }
+    if (! (static_cast<unsigned int>(i) < this->GetInputs().size()))
+    {
+      mitkThrow() << "Selected input index is larger than actual number of inputs in NodeDisplacementFilter";
+    }
     m_SelectedInput = i;
   }
 
@@ -136,44 +139,11 @@ See LICENSE.txt or http://www.mitk.org for details.
     }
   }
 
-  void mitk::NodeDisplacementFilter::SetInput( const NavigationData* nd )
-  {
-    // Process object is not const-correct so the const_cast is required here
-    this->ProcessObject::SetNthInput(0, const_cast<NavigationData*>(nd));
-    this->CreateOutputsForAllInputs();
-  }
-
-
   void mitk::NodeDisplacementFilter::ResetNodes()
   {
     m_Nodes.clear();
     m_Offsets.clear();
   }
-
-  void mitk::NodeDisplacementFilter::SetInput( unsigned int idx, const NavigationData* nd )
-  {
-    // Process object is not const-correct so the const_cast is required here
-    this->ProcessObject::SetNthInput(idx, const_cast<NavigationData*>(nd));
-    this->CreateOutputsForAllInputs();
-  }
-
-  const mitk::NavigationData* mitk::NodeDisplacementFilter::GetInput( void )
-  {
-    if (this->GetNumberOfInputs() < 1)
-      return NULL;
-
-    return static_cast<const NavigationData*>(this->ProcessObject::GetInput(0));
-  }
-
-  const mitk::NavigationData* mitk::NodeDisplacementFilter::GetInput( unsigned int idx )
-  {
-    if (this->GetNumberOfInputs() < 1)
-      return NULL;
-
-    return static_cast<const NavigationData*>(this->ProcessObject::GetInput(idx));
-  }
-
-
 
 mitk::AffineTransform3D::Pointer mitk::NodeDisplacementFilter::NavigationDataToTransform(const mitk::NavigationData * nd)
 {
@@ -198,7 +168,7 @@ mitk::AffineTransform3D::Pointer mitk::NodeDisplacementFilter::NavigationDataToT
 
   /*set the offset by convert from itkPoint to itkVector and setting offset of transform*/
   mitk::Vector3D pos;
-  pos.Set_vnl_vector(nd->GetPosition().Get_vnl_vector());
+  pos.SetVnlVector(nd->GetPosition().GetVnlVector());
   affineTransform->SetOffset(pos);
 
   affineTransform->Modified();

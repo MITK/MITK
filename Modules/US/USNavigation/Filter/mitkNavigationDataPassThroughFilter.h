@@ -35,8 +35,6 @@ public:
   mitkClassMacro(NavigationDataPassThroughFilter, NavigationDataToNavigationDataFilter)
   itkNewMacro(Self)
 
-  virtual void SetInput( const NavigationData* nd);
-
 protected:
   NavigationDataPassThroughFilter();
   virtual ~NavigationDataPassThroughFilter();

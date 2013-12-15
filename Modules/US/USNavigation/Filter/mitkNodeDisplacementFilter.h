@@ -65,7 +65,7 @@ namespace mitk {
     /**
     * \brief Returns the nth node that was added to this filter.
     */
-    virtual mitk::DataNode::Pointer GetNode (int i = 0);
+    virtual mitk::DataNode::Pointer GetNode (unsigned int i = 0);
 
     /**
     * \brief Returns a vector containing all nodes that have been added to this filter.
@@ -89,26 +89,6 @@ namespace mitk {
     * \brief Removes all added Nodes from the Filter but leaves all other configuration intact.
     */
     virtual void ResetNodes();
-
-    /**Documentation
-    * \brief Set the input of this filter
-    */
-    virtual void SetInput( const NavigationData* nd);
-
-    /**Documentation
-    * \brief Set input with id idx of this filter
-    */
-    virtual void SetInput( unsigned int idx, const NavigationData* nd);
-
-    /**Documentation
-    * \brief Get the input of this filter
-    */
-    const NavigationData* GetInput(void);
-
-    /**Documentation
-    * \brief Get the input with id idx of this filter
-    */
-    const NavigationData* GetInput(unsigned int idx);
 
   protected:
     NodeDisplacementFilter();

@@ -24,13 +24,6 @@ mitk::NavigationDataPassThroughFilter::~NavigationDataPassThroughFilter()
 {
 }
 
-void mitk::NavigationDataPassThroughFilter::SetInput( const NavigationData* nd )
-{
-  mitk::NavigationDataToNavigationDataFilter::SetInput(nd);
-
-  this->CreateOutputsForAllInputs();
-}
-
 void mitk::NavigationDataPassThroughFilter::GenerateData()
 {
   // get each input and transfer the data

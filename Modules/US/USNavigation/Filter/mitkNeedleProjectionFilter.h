@@ -62,26 +62,6 @@ namespace mitk {
     itkSetMacro(TargetPlane, mitk::AffineTransform3D::Pointer);
     itkGetMacro(Projection,  mitk::PointSet::Pointer);
 
-    /**Documentation
-    * \brief Set the input of this filter
-    */
-    virtual void SetInput( const NavigationData* nd);
-
-    /**Documentation
-    * \brief Set input with id idx of this filter
-    */
-    virtual void SetInput( unsigned int idx, const NavigationData* nd);
-
-    /**Documentation
-    * \brief Get the input of this filter
-    */
-    const NavigationData* GetInput(void);
-
-    /**Documentation
-    * \brief Get the input with id idx of this filter
-    */
-    const NavigationData* GetInput(unsigned int idx);
-
   protected:
     NeedleProjectionFilter();
     virtual ~NeedleProjectionFilter();

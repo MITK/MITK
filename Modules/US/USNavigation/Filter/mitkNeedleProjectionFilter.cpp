@@ -19,12 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::NeedleProjectionFilter::NeedleProjectionFilter()
+  : m_Projection(mitk::PointSet::New()),
+    m_OriginalPoints(mitk::PointSet::New()),
+    m_SelectedInput(-1)
 {
-  m_SelectedInput = -1;
-
-  m_OriginalPoints = mitk::PointSet::New();
-  m_Projection = mitk::PointSet::New();
-
   // Tool Coordinates: First point - Tip of Needle, Second Point - 40 cm distance from needle
   for (int i = 0; i < 2; i++)
   {
@@ -45,7 +43,7 @@ mitk::NeedleProjectionFilter::~NeedleProjectionFilter()
 void mitk::NeedleProjectionFilter::SelectInput(int i)
 {
   if (i < 0) mitkThrow() << "Negative Input selected in NeedleProjectionFilter";
-  if (! (i < this->GetInputs().size())) mitkThrow() << "Selected input index is larger than actual number of inputs in NeedleProjectionFilter";
+  if (! (static_cast<unsigned int>(i) < this->GetInputs().size())) mitkThrow() << "Selected input index is larger than actual number of inputs in NeedleProjectionFilter";
   m_SelectedInput = i;
 }
 
@@ -123,38 +121,6 @@ void mitk::NeedleProjectionFilter::GenerateData()
 
 }
 
-void mitk::NeedleProjectionFilter::SetInput( const NavigationData* nd )
-{
-  // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(0, const_cast<NavigationData*>(nd));
-  this->CreateOutputsForAllInputs();
-}
-
-void mitk::NeedleProjectionFilter::SetInput( unsigned int idx, const NavigationData* nd )
-{
-  // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(idx, const_cast<NavigationData*>(nd));
-  this->CreateOutputsForAllInputs();
-}
-
-const mitk::NavigationData* mitk::NeedleProjectionFilter::GetInput( void )
-{
-  if (this->GetNumberOfInputs() < 1)
-    return NULL;
-
-  return static_cast<const NavigationData*>(this->ProcessObject::GetInput(0));
-}
-
-const mitk::NavigationData* mitk::NeedleProjectionFilter::GetInput( unsigned int idx )
-{
-  if (this->GetNumberOfInputs() < 1)
-    return NULL;
-
-  return static_cast<const NavigationData*>(this->ProcessObject::GetInput(idx));
-}
-
-
-
 mitk::AffineTransform3D::Pointer mitk::NeedleProjectionFilter::NavigationDataToTransform(const mitk::NavigationData * nd)
 {
   mitk::AffineTransform3D::Pointer affineTransform = mitk::AffineTransform3D::New();
@@ -178,7 +144,7 @@ mitk::AffineTransform3D::Pointer mitk::NeedleProjectionFilter::NavigationDataToT
 
   /*set the offset by convert from itkPoint to itkVector and setting offset of transform*/
   mitk::Vector3D pos;
-  pos.Set_vnl_vector(nd->GetPosition().Get_vnl_vector());
+  pos.SetVnlVector(nd->GetPosition().GetVnlVector());
   affineTransform->SetOffset(pos);
 
   affineTransform->Modified();

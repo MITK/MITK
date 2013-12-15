@@ -50,10 +50,10 @@ mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   : mitk::ImageSource(),
-  m_MultiThreader(itk::MultiThreader::New()),
-  m_ImageMutex(itk::FastMutexLock::New()),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
+  m_MultiThreader(itk::MultiThreader::New()),
+  m_ImageMutex(itk::FastMutexLock::New()),
   m_ThreadID(-1),
   m_UnregisteringStarted(false)
 {
@@ -70,7 +70,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   this->m_CropArea = empty;
 
   //set number of outputs
-  this->SetNumberOfOutputs(1);
+  this->SetNumberOfIndexedOutputs(1);
 
   //create a new output
   mitk::Image::Pointer newOutput = mitk::Image::New();
@@ -79,10 +79,10 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
 
 mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
   : mitk::ImageSource(),
-  m_MultiThreader(itk::MultiThreader::New()),
-  m_ImageMutex(itk::FastMutexLock::New()),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
+  m_MultiThreader(itk::MultiThreader::New()),
+  m_ImageMutex(itk::FastMutexLock::New()),
   m_ThreadID(-1),
   m_UnregisteringStarted(false)
 {
@@ -96,7 +96,7 @@ mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
   this->m_CropArea = empty;
 
   //set number of outputs
-  this->SetNumberOfOutputs(1);
+  this->SetNumberOfIndexedOutputs(1);
 
   //create a new output
   mitk::Image::Pointer newOutput = mitk::Image::New();

@@ -60,7 +60,7 @@ void mitk::USVideoDevice::Init()
   m_Source = mitk::USImageVideoSource::New();
   m_ControlInterfaceCustom = mitk::USVideoDeviceCustomControls::New(this);
   //this->SetNumberOfInputs(1);
-  this->SetNumberOfOutputs(1);
+  this->SetNumberOfIndexedOutputs(1);
 
   // mitk::USImage::Pointer output = mitk::USImage::New();
   // output->Initialize();

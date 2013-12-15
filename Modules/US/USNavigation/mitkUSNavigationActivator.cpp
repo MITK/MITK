@@ -72,13 +72,15 @@ void mitk::USNavigationActivator::OnServiceEvent(const us::ServiceEvent event)
       m_Devices.push_back(device.GetPointer());
       break;
     case us::ServiceEvent::UNREGISTERING:
+    {
       // unregistered device does not need to be hold any longer
       std::vector<mitk::USDevice::Pointer>::iterator it = find(m_Devices.begin(), m_Devices.end(), device.GetPointer());
       if (it != m_Devices.end()) { m_Devices.erase(it); }
       break;
-    /*default:
+    }
+    default:
       MITK_DEBUG("us::ModuleActivator")("USNavigationActivator")
           << "Received uninteresting service event: " << event.GetType();
-      break;*/
+      break;
   }
 }

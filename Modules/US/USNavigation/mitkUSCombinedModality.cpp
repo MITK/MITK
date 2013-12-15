@@ -29,7 +29,7 @@ mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, Navigat
   m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New()), m_DelayFilter(mitk::NavigationDataDelayFilter::New(0))
 {
   // build tracking filter pipeline
-  for (int i = 0; i < m_TrackingDevice->GetNumberOfOutputs(); i++)
+  for (unsigned int i = 0; i < m_TrackingDevice->GetNumberOfOutputs(); i++)
   {
     m_SmoothingFilter->SetInput(i, m_TrackingDevice->GetOutput(i));
     mitk::NavigationData::Pointer nd1 = m_TrackingDevice->GetOutput(i);

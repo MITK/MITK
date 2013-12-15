@@ -115,8 +115,11 @@ bool mitk::DiffusionDICOMFileReader
   output_image->InitializeFromVectorImage();
   output_image->UpdateBValueMap();
 
-  DICOMImageBlockDescriptor& block = this->InternalGetOutput(0);
+  // reduce the number of outputs to 1 as we will produce a single image
+  this->SetNumberOfOutputs(1);
 
+  // set the image to output
+  DICOMImageBlockDescriptor& block = this->InternalGetOutput(0);
   block.SetMitkImage( (mitk::Image::Pointer) output_image );
 
 }

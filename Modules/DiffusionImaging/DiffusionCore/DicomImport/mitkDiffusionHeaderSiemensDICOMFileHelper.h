@@ -48,6 +48,7 @@ struct Siemens_Header_Format
 static bool ParseInputString( std::string input, std::vector<double>& values, Siemens_Header_Format format_specs )
 {
 
+  // TODO : Compute offset based on the format_specs, where does the 84 come from???
   int offset = 84;
   int vm = *(input.c_str() + format_specs.NameLength );
 

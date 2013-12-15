@@ -127,8 +127,8 @@ bool mitk::DiffusionHeaderSiemensDICOMFileReader
   const gdcm::DataSet& dataset = gdcmReader.GetFile().GetDataSet();
 
   const gdcm::Tag t_sie_diffusion( 0x0029,0x1010 );
-  const gdcm::Tag t_sie_diffusion_vec( 0x0029,0x100e );
-  const gdcm::Tag t_sie_diffusion2( 0x0029,0x100c );
+  //const gdcm::Tag t_sie_diffusion_vec( 0x0029,0x100e );
+  //const gdcm::Tag t_sie_diffusion2( 0x0029,0x100c );
 
   std::string siemens_diffusionheader_str;
   if( RevealBinaryTag( t_sie_diffusion, dataset, siemens_diffusionheader_str ) )

@@ -5,5 +5,6 @@ set(MODULE_TESTS
 set(MODULE_CUSTOM_TESTS
   mitkPyramidImageRegistrationMethodTest.cpp
   mitkDWHeadMotionCorrectionTest.cpp
+  mitkDiffusionDICOMFileReaderTest.cpp
 )
 

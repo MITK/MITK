@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkPixelBufferObject.h"
 #include "vtkOpenGL.h"
 #include "vtkUnsignedShortArray.h"
+#include "vtkFloatArray.h"
 #include "vtkgl.h" // vtkgl namespace
 #include "GL/glext.h"
 
@@ -185,6 +186,8 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
     int size[3];
     vtkDataArray *scalars;
     unsigned char *dataPtr;
+//    float *floatPtr;
+    float *floatData=NULL;
     unsigned char *resultData=NULL;
     int xsize, ysize;
     GLuint tempIndex=0;
@@ -231,10 +234,39 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
       dataPtr = this->MapScalarsToColors (scalars);
       numChannels = 4;
       channelByteSize = 1;
+
+      floatData = new float[xsize*ysize];
+      int type = scalars->GetDataType();
+      cout << "##################################################################################################################" << endl;
+      cout << "DataType: " << type << endl;
+
+      floatData = static_cast<vtkFloatArray *>(scalars)->GetPointer(0);
     }
     else
     {
-      dataPtr = static_cast<vtkUnsignedCharArray *>(scalars)->GetPointer(0);
+//      dataPtr = static_cast<vtkUnsignedCharArray *>(scalars)->GetPointer(0);
+//      for(int i=0;i<10;i++)
+//      {
+//        cout << "UnsignedCharArray" << i << ": " << static_cast<unsigned short>(*(dataPtr+i)) << endl;
+
+//      }
+//      floatPtr = static_cast<vtkFloatArray *>(scalars)->GetPointer(0);
+//      vtkIdType scalarSize = scalars->GetSize();
+
+      floatData = new float[xsize*ysize];
+      int type = scalars->GetDataType();
+      cout << "##################################################################################################################" << endl;
+      cout << "DataType: " << type << endl;
+
+//      for(int i=0; i<scalarSize; i++)
+//      {
+//        *(floatData+i) = *(scalars+i);
+//      }
+
+//      for(int i=0;i<10;i++)
+//      {
+//        cout << "FloatArray" << i << ": " << *(floatPtr+i) << endl;
+//      }
       channelByteSize = 1;
     }
 
@@ -373,6 +405,7 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
 
     internalFormat = GL_LUMINANCE32F_ARB;
     format = GL_LUMINANCE;
+
 //    internalFormat = GL_RGBA32F;
 
     //std::cout << "uploading texture\n";
@@ -396,7 +429,7 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
       glTexImage2D( GL_TEXTURE_2D, 0 , internalFormat,
                    xsize, ysize, 0, format,
                    GL_FLOAT,
-                   static_cast<const GLvoid *>(resultData) );
+                   static_cast<const GLvoid *>(floatData) );
 
       this->Format16BIT = false;
     }

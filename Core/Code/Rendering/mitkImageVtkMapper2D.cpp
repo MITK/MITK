@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkMitkLevelWindowFilter.h"
 #include "vtkNeverTranslucentTexture.h"
 #include "vtkMitkShaderTexture.h"
+#include "vtkImageToImageFilter.h"
 
 #include <mitkIShaderRepository.h>
 
@@ -400,6 +401,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   localStorage->m_Texture->SetInterpolate(textureInterpolation);
 
   // connect the texture with the output of the levelwindow filter
+  //####################################################################################################################################################################################################################
   localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
 
   this->TransformActor( renderer );

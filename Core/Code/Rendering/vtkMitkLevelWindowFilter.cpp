@@ -468,7 +468,7 @@ void vtkMitkLevelWindowFilter::ExecuteInformation()
   output->CopyTypeSpecificInformation( input );
 
   // TODO make output RGBA
-  output->SetScalarTypeToUnsignedChar();
+//  output->SetScalarTypeToUnsignedChar();
   output->SetNumberOfScalarComponents(4);
 
   int extent[6];

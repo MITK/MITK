@@ -37,6 +37,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionImage.h"
 #include "mitkNrrdDiffusionImageWriter.h"
 
+#include "mitkDiffusionDICOMFileReader.h"
+#include "mitkDICOMTagBasedSorter.h"
+#include "mitkDICOMSortByTag.h"
+
 #include "gdcmDirectory.h"
 #include "gdcmScanner.h"
 #include "gdcmSorter.h"
@@ -51,7 +55,7 @@ const std::string QmitkDiffusionDicomImport::VIEW_ID = "org.mitk.views.diffusion
 
 QmitkDiffusionDicomImport::QmitkDiffusionDicomImport(QObject* /*parent*/, const char* /*name*/)
   : QmitkFunctionality(), m_Controls(NULL), m_MultiWidget(NULL),
-  m_OutputFolderName(""), m_OutputFolderNameSet(false)
+    m_OutputFolderName(""), m_OutputFolderNameSet(false)
 {
 }
 
@@ -91,7 +95,8 @@ void QmitkDiffusionDicomImport::CreateConnections()
   {
     connect( m_Controls->m_AddFoldersButton, SIGNAL(clicked()), this, SLOT(DicomLoadAddFolderNames()) );
     connect( m_Controls->m_DeleteFoldersButton, SIGNAL(clicked()), this, SLOT(DicomLoadDeleteFolderNames()) );
-    connect( m_Controls->m_DicomLoadStartLoadButton, SIGNAL(clicked()), this, SLOT(DicomLoadStartLoad()) );
+    //connect( m_Controls->m_DicomLoadStartLoadButton, SIGNAL(clicked()), this, SLOT(DicomLoadStartLoad()) );
+    connect( m_Controls->m_DicomLoadStartLoadButton, SIGNAL(clicked()), this, SLOT(NewDicomLoadStartLoad()) );
     connect( m_Controls->m_DicomLoadAverageDuplicatesCheckbox, SIGNAL(clicked()), this, SLOT(AverageClicked()) );
     connect( m_Controls->m_OutputSetButton, SIGNAL(clicked()), this, SLOT(OutputSet()) );
     connect( m_Controls->m_OutputClearButton, SIGNAL(clicked()), this, SLOT(OutputClear()) );
@@ -275,6 +280,153 @@ std::string QmitkDiffusionDicomImport::GetMemoryDescription( size_t processSize,
   return str.str();
 }
 
+void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
+{
+  itk::TimeProbesCollectorBase clock;
+  bool imageSuccessfullySaved = true;
+
+  try
+  {
+    const std::string& locale = "C";
+    const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+    if ( locale.compare(currLocale)!=0 )
+    {
+      try
+      {
+        MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
+        setlocale(LC_ALL, locale.c_str());
+      }
+      catch(...)
+      {
+        MITK_INFO << "Could not set locale " << locale;
+      }
+    }
+
+    int nrFolders = m_Controls->listWidget->count();
+
+    if(!nrFolders)
+    {
+      Error(QString("No input folders were selected. ABORTING."));
+      return;
+    }
+
+    Status(QString("GDCM %1 used for DICOM parsing and sorting!").arg(gdcm::Version::GetVersion()));
+
+    PrintMemoryUsage();
+    QString status;
+    mitk::DataNode::Pointer node;
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(2*nrFolders);
+
+    gdcm::Directory::FilenamesType complete_list;
+    while(m_Controls->listWidget->count())
+    {
+      // RETREIVE FOLDERNAME
+      QListWidgetItem * item  = m_Controls->listWidget->takeItem(0);
+      QString folderName = item->text();
+
+      gdcm::Directory d;
+      d.Load( folderName.toStdString().c_str(), true ); // recursive !
+      const gdcm::Directory::FilenamesType &l1 = d.GetFilenames();
+      const unsigned int ntotalfiles = l1.size();
+      Status(QString(" ... found %1 different files").arg(ntotalfiles));
+
+      for( unsigned int i=0; i< ntotalfiles; i++)
+      {
+        complete_list.push_back( l1.at(i) );
+      }
+
+    }
+
+    {
+      mitk::DiffusionDICOMFileReader::Pointer gdcmReader = mitk::DiffusionDICOMFileReader::New();
+      mitk::DICOMTagBasedSorter::Pointer tagSorter = mitk::DICOMTagBasedSorter::New();
+
+      // Use tags as in Qmitk
+      // all the things that split by tag in DicomSeriesReader
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0010) ); // Number of Rows
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0011) ); // Number of Columns
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0030) ); // Pixel Spacing
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0018, 0x1164) ); // Imager Pixel Spacing
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x0037) ); // Image Orientation (Patient) // TODO add tolerance parameter (l. 1572 of original code)
+      // TODO handle as real vectors! cluster with configurable errors!
+      //tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x000e) ); // Series Instance UID
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0018, 0x0050) ); // Slice Thickness
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0008) ); // Number of Frames
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x0052) ); // Frame of Reference UID
+
+      // gdcmReader->AddSortingElement( tagSorter );
+      //mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
+
+      mitk::DICOMSortCriterion::ConstPointer sorting =
+          mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0013), // instance number
+             mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0012), // aqcuisition number
+                mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0032), // aqcuisition time
+                   mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0018, 0x1060), // trigger time
+                      mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0018) // SOP instance UID (last resort, not really meaningful but decides clearly)
+                    ).GetPointer()
+                  ).GetPointer()
+                ).GetPointer()
+             ).GetPointer()
+          ).GetPointer();
+      tagSorter->SetSortCriterion( sorting );
+
+      gdcmReader->AddSortingElement( tagSorter );
+      gdcmReader->SetInputFiles( complete_list );
+      gdcmReader->AnalyzeInputFiles();
+
+      gdcmReader->LoadImages();
+
+      mitk::Image::Pointer loaded_image = gdcmReader->GetOutput(0).GetMitkImage();
+      mitk::DiffusionImage<short>::Pointer d_img = static_cast<mitk::DiffusionImage<short>*>( loaded_image.GetPointer() );
+
+      node=mitk::DataNode::New();
+      node->SetData( d_img );
+      GetDefaultDataStorage()->Add(node);
+      SetDwiNodeProperties(node, "ImportedData");
+      //Status(QString("Image %1 added to datastorage").arg(descr));
+
+    }
+
+    Status("Timing information");
+    clock.Report();
+
+    if(!m_OutputFolderNameSet && node.IsNotNull())
+    {
+      mitk::BaseData::Pointer basedata = node->GetData();
+      if (basedata.IsNotNull())
+      {
+        mitk::RenderingManager::GetInstance()->InitializeViews(
+              basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+      }
+    }
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+    try
+    {
+      MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
+      setlocale(LC_ALL, currLocale.c_str());
+    }
+    catch(...)
+    {
+      MITK_INFO << "Could not reset locale " << currLocale;
+    }
+  }
+  catch (itk::ExceptionObject &ex)
+  {
+    Error(QString("%1\n%2\n%3\n%4\n%5\n%6").arg(ex.GetNameOfClass()).arg(ex.GetFile()).arg(ex.GetLine()).arg(ex.GetLocation()).arg(ex.what()).arg(ex.GetDescription()));
+    return ;
+  }
+
+  if (!imageSuccessfullySaved)
+    QMessageBox::warning(NULL,"WARNING","One or more files could not be saved! The according files where moved to the datastorage.");
+  Status(QString("Finished import with memory:"));
+
+  PrintMemoryUsage();
+}
+
+
 void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 {
   itk::TimeProbesCollectorBase clock;
@@ -328,7 +480,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
     ofstream logfile;
     if(m_OutputFolderNameSet) logfile.open(folder.c_str());
-
+    /*
     while(m_Controls->listWidget->count())
     {
       // RETREIVE FOLDERNAME
@@ -670,6 +822,10 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         diffImage->SetB_Value(maxb);
         diffImage->InitializeFromVectorImage();
         diffImage->UpdateBValueMap();
+
+
+
+
         Status(QString("Diffusion Image initialized"));
         if(m_OutputFolderNameSet) logfile << "Diffusion Image initialized\n";
 
@@ -770,8 +926,73 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       logfile << "\n";
 
     }
-
+*/
     logfile.close();
+
+    while(m_Controls->listWidget->count())
+    {
+      // RETREIVE FOLDERNAME
+      QListWidgetItem * item  = m_Controls->listWidget->takeItem(0);
+      QString folderName = item->text();
+
+      if(m_OutputFolderNameSet) logfile << "Reading " << folderName.toStdString() << '\n';
+
+      gdcm::Directory d;
+      d.Load( folderName.toStdString().c_str(), true ); // recursive !
+      const gdcm::Directory::FilenamesType &l1 = d.GetFilenames();
+      const unsigned int ntotalfiles = l1.size();
+      Status(QString(" ... found %1 different files").arg(ntotalfiles));
+      if(m_OutputFolderNameSet)logfile << "...found " << ntotalfiles << " different files\n";
+
+
+      mitk::DiffusionDICOMFileReader::Pointer gdcmReader = mitk::DiffusionDICOMFileReader::New();
+      mitk::DICOMTagBasedSorter::Pointer tagSorter = mitk::DICOMTagBasedSorter::New();
+
+      // Use tags as in Qmitk
+      // all the things that split by tag in DicomSeriesReader
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0010) ); // Number of Rows
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0011) ); // Number of Columns
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0030) ); // Pixel Spacing
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0018, 0x1164) ); // Imager Pixel Spacing
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x0037) ); // Image Orientation (Patient) // TODO add tolerance parameter (l. 1572 of original code)
+      // TODO handle as real vectors! cluster with configurable errors!
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x000e) ); // Series Instance UID
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0018, 0x0050) ); // Slice Thickness
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0008) ); // Number of Frames
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x0052) ); // Frame of Reference UID
+
+      // gdcmReader->AddSortingElement( tagSorter );
+      //mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
+
+      mitk::DICOMSortCriterion::ConstPointer sorting =
+          mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0013), // instance number
+             mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0012), // aqcuisition number
+                mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0032), // aqcuisition time
+                   mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0018, 0x1060), // trigger time
+                      mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0018) // SOP instance UID (last resort, not really meaningful but decides clearly)
+                    ).GetPointer()
+                  ).GetPointer()
+                ).GetPointer()
+             ).GetPointer()
+          ).GetPointer();
+      tagSorter->SetSortCriterion( sorting );
+
+      gdcmReader->AddSortingElement( tagSorter );
+      gdcmReader->SetInputFiles( l1 );
+      gdcmReader->AnalyzeInputFiles();
+
+      gdcmReader->LoadImages();
+
+      mitk::Image::Pointer loaded_image = gdcmReader->GetOutput(0).GetMitkImage();
+      mitk::DiffusionImage<short>::Pointer d_img = static_cast<mitk::DiffusionImage<short>*>( loaded_image.GetPointer() );
+
+      node=mitk::DataNode::New();
+      node->SetData( d_img );
+      GetDefaultDataStorage()->Add(node);
+      SetDwiNodeProperties(node, "ImportedData");
+      //Status(QString("Image %1 added to datastorage").arg(descr));
+
+    }
 
     Status("Timing information");
     clock.Report();
@@ -782,7 +1003,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       if (basedata.IsNotNull())
       {
         mitk::RenderingManager::GetInstance()->InitializeViews(
-            basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+              basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
       }
     }
 

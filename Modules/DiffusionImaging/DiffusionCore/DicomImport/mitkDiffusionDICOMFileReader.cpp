@@ -199,7 +199,7 @@ void mitk::DiffusionDICOMFileReader
   }
 
   bool canread = false;
-  for( size_t idx; idx < number_of_outputs; idx++ )
+  for( size_t idx = 0; idx < number_of_outputs; idx++ )
   {
     DICOMImageFrameInfo::Pointer frame = this->GetOutput( idx ).GetImageFrameList().at(0);
     canread = header_reader->ReadDiffusionHeader(frame->Filename);

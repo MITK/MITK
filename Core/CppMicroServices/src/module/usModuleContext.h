@@ -130,8 +130,8 @@ public:
    * environment at the time of the call to this method. This list will
    * also contain modules which might already have been unloaded.
    *
-   * @param modules A std::vector of <code>Module</code> objects which
-   *                will hold one object per known module.
+   * @return A std::vector of <code>Module</code> objects which
+   *         will hold one object per known module.
    */
   std::vector<Module*> GetModules() const;
 
@@ -810,6 +810,19 @@ public:
     RemoveModuleListener(ModuleListenerMemberFunctor(receiver, callback),
                          static_cast<void*>(receiver));
   }
+
+  /**
+   * Get the absolute path for a file or directory in the persistent
+   * storage area provided for the module. The returned path
+   * might be empty if no storage path has been set previously.
+   * If the path is non-empty, it is safe to assume that the path is writable.
+   *
+   * @see ModuleSettings::SetStoragePath(const std::string&)
+   *
+   * @param filename A relative name to the file or directory to be accessed.
+   * @return The absolute path to the persistent storage area for the given file name.
+   */
+  std::string GetDataFile(const std::string& filename) const;
 
 
 private:

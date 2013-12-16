@@ -62,6 +62,9 @@ namespace itk
     typedef typename itk::Image<BaselinePixelType,3>  BaselineImageType;
     typedef typename BaselineImageType::RegionType    BaselineImageRegionType;
 
+    typedef itk::Image< short, 3>                     MaskImageType;
+    typedef MaskImageType::RegionType                  MaskImageRegionType;
+
     typedef TensorImageToDiffusionImageFilter Self;
     typedef ImageToImageFilter<InputImageType, OutputImageType> Superclass;
 
@@ -91,6 +94,11 @@ namespace itk
 
     void SetBValue( const double& bval)
     { m_BValue = bval; }
+
+    void SetMaskImage( MaskImageType::Pointer maskimage )
+    {
+      m_MaskImage = maskimage;
+    }
 
 
     /**
@@ -137,6 +145,8 @@ namespace itk
 
     OutputScalarType                     m_Min;
     OutputScalarType                     m_Max;
+
+    MaskImageType::Pointer               m_MaskImage;
 
   private:
 

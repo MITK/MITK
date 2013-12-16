@@ -110,6 +110,8 @@ template <class TInputScalarType, class TOutputScalarType>
 void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
 ::ThreadedGenerateData (const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId )
 {
+  std::cout << "Entering threaded generate data: " << threadId << std::endl;
+
   typedef ImageRegionIterator<OutputImageType>      IteratorOutputType;
   typedef ImageRegionConstIterator<InputImageType>  IteratorInputType;
   typedef ImageRegionConstIterator<BaselineImageType>  IteratorBaselineType;
@@ -122,11 +124,21 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
   IteratorInputType  itIn (this->GetInput(), outputRegionForThread);
   IteratorBaselineType itB0 (m_BaselineImage, outputRegionForThread);
 
+  typedef ImageRegionConstIterator< MaskImageType >   IteratorMaskImageType;
+  IteratorMaskImageType itMask( m_MaskImage, outputRegionForThread );
+/*
+  if( m_MaskImage.IsNotNull() )
+  {
+    itMask = IteratorMaskImageType;
+    itMask.GoToBegin();
+  }
+*/
   if( threadId==0 )
   {
     this->UpdateProgress (0.0);
   }
 
+  std::cout << "Thread computing.... ";
 
   while(!itIn.IsAtEnd())
   {
@@ -174,6 +186,14 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
             2 * T[1]*S[1] +     T[3]*S[3] +
             2 * T[2]*S[2] + 2 * T[4]*S[4] + T[5]*S[5];
 
+        short maskvalue = 1;
+        //std::cout << "R-" << std::endl;
+        if( m_MaskImage.IsNotNull() )
+        {
+          maskvalue = itMask.Get();
+          ++itMask;
+        }
+
         // check for corrupted tensor
         if (res>=0)
         {
@@ -181,13 +201,13 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
           //   - because of this estimation the vector have to be normalized beforehand
           //     otherwise the modelled signal is wrong ( i.e. not scaled properly )
           const double bval = m_BValue * twonorm * twonorm;
-          out[i] = static_cast<OutputScalarType>( 1.0 * b0 * exp ( -1.0 * bval * res ) );
+          out[i] = static_cast<OutputScalarType>( maskvalue * 1.0 * b0 * exp ( -1.0 * bval * res ) );
         }
+        //std::cout << "-E" << std::endl;
       }
     }
 
-    unsigned int idx;
-    foreach( idx, b0_indices )
+    for(unsigned int idx = 0; idx < b0_indices.size(); idx++ )
     {
       out[b0_indices.at(idx)] = b0;
     }

@@ -397,6 +397,13 @@ protected:
     catch (itk::ExceptionObject &e)
     {
       registration->Print( std::cout );
+      /*registration->Print( std::cout );
+      MITK_INFO << "========== reference ";
+      itkImage1->Print( std::cout );
+
+      MITK_INFO << "========== moving ";
+      itkImage2->Print( std::cout );*/
+
       MITK_ERROR << "[Registration Update] Caught ITK exception: ";
       mitkThrow() << "Registration failed with exception: " << e.what();
     }

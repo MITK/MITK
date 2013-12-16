@@ -39,16 +39,12 @@ namespace mitk
     ~Kinect2ControllerPrivate();
 
     bool ErrorText(unsigned int error);
-    // Depth reader
     IKinectSensor* m_pKinectSensor;
     IMultiSourceFrameReader*m_pMultiSourceFrameReader;
-    //IDepthFrameReader* m_pDepthFrameReader;
-    //IColorFrameReader* m_pColorFrameReader;
     IDepthFrame* m_pDepthFrame;
     IColorFrame* m_pColorFrame;
     ICoordinateMapper* m_pCoordinateMapper;
     //ColorSpacePoint*        m_pColorCoordinates;
-
 
     RGBQUAD* m_pColorRGBX;
 
@@ -68,8 +64,6 @@ namespace mitk
 
   Kinect2Controller::Kinect2ControllerPrivate::Kinect2ControllerPrivate():
     m_pKinectSensor(NULL),
-    //m_pDepthFrameReader(NULL),
-    //m_pColorFrameReader(NULL),
     m_pMultiSourceFrameReader(NULL),
     m_pDepthFrame(NULL),
     m_pColorFrame(NULL),

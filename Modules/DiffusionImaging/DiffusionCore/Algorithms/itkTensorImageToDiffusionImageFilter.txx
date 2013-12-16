@@ -110,8 +110,6 @@ template <class TInputScalarType, class TOutputScalarType>
 void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
 ::ThreadedGenerateData (const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId )
 {
-  std::cout << "Entering threaded generate data: " << threadId << std::endl;
-
   typedef ImageRegionIterator<OutputImageType>      IteratorOutputType;
   typedef ImageRegionConstIterator<InputImageType>  IteratorInputType;
   typedef ImageRegionConstIterator<BaselineImageType>  IteratorBaselineType;
@@ -125,20 +123,18 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
   IteratorBaselineType itB0 (m_BaselineImage, outputRegionForThread);
 
   typedef ImageRegionConstIterator< MaskImageType >   IteratorMaskImageType;
-  IteratorMaskImageType itMask( m_MaskImage, outputRegionForThread );
-/*
+  IteratorMaskImageType itMask;
+
   if( m_MaskImage.IsNotNull() )
   {
     itMask = IteratorMaskImageType;
     itMask.GoToBegin();
   }
-*/
+
   if( threadId==0 )
   {
     this->UpdateProgress (0.0);
   }
-
-  std::cout << "Thread computing.... ";
 
   while(!itIn.IsAtEnd())
   {
@@ -155,6 +151,13 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
     OutputPixelType out;
     out.SetSize(m_GradientList->Size());
     out.Fill(0);
+
+    short maskvalue = 1;
+    if( m_MaskImage.IsNotNull() )
+    {
+      maskvalue = itMask.Get();
+      ++itMask;
+    }
 
     std::vector<unsigned int> b0_indices;
     if( b0 > 0)
@@ -186,14 +189,6 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
             2 * T[1]*S[1] +     T[3]*S[3] +
             2 * T[2]*S[2] + 2 * T[4]*S[4] + T[5]*S[5];
 
-        short maskvalue = 1;
-        //std::cout << "R-" << std::endl;
-        if( m_MaskImage.IsNotNull() )
-        {
-          maskvalue = itMask.Get();
-          ++itMask;
-        }
-
         // check for corrupted tensor
         if (res>=0)
         {
@@ -203,7 +198,6 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
           const double bval = m_BValue * twonorm * twonorm;
           out[i] = static_cast<OutputScalarType>( maskvalue * 1.0 * b0 * exp ( -1.0 * bval * res ) );
         }
-        //std::cout << "-E" << std::endl;
       }
     }
 

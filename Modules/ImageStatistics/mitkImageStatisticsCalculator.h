@@ -48,7 +48,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
 /**
  * \brief Class for calculating statistics and histogram for an (optionally
  * masked) image.
@@ -71,62 +70,68 @@ namespace mitk
  * user-defined size and its location is chosen in a way that the average
  * pixel value within the sphere is maximized.
  *
+ * \warning Hotspot calculation does not work in case of 2D-images!
+ *
  * Note: currently time-resolved and multi-channel pictures are not properly
  * supported.
- */
-
-  /**
+ *
  * \section HotspotStatistics_caption Calculation of hotspot statistics
  *
  * Since calculation of hotspot location and statistics is not
  * straight-forward, the following paragraphs will describe it in more detail.
  *
- * <b>Note: Calculation of hotspot statistics is optional.</b>
+ * <b>Note: Calculation of hotspot statistics is optional and set to off by default.
+ * Multilabel-masks are supported.</b>
  *
  * \subsection HotspotStatistics_description Hotspot Definition
  *
- * The "hotspot" of an image is motivated from PET readings. It is defined
+ * The hotspot of an image is motivated from PET readings. It is defined
  * as a spherical region of fixed size which maximizes the average pixel value
  * within the region.  The following image illustrates the concept: the
  * colored areas are different image intensities and the hotspot is located
- * in the "hottest" region of the image.
+ * in the hottest region of the image.
  *
- * [image with pixelvalue scale]
+ * <b> Note:</b> Only hotspots are calculated for which the whole hotspot-sphere is
+ *     inside the image by default. This behaviour can be changed by setting
+ *     m_HotspotMustBeCompletelyInsideImage to false.
+ *
+ * \image html hotspotExample.JPG
  *
  * \subsection HotspotStatistics_calculation Hotspot Calculation
  *
  * Since only the size of the hotspot is known initially, we need to calculate
- * two aspects (both implemented in ComputeHotspotStatistics):
+ * two aspects (both implemented in CalculateHotspotStatistics() ):
  * - the hotspot location
- * - statistics of the pixels within the hotspot
+ * - statistics of the pixels within the hotspot.
+ *
  * Finding the hotspot location requires to calculate the average value at each
  * position. This is done by convolution of the image with a sperical kernel
  * image which reflects partial volumes (important in the case of low-resolution
  * PET images).
  *
  * Once the hotspot location is known, calculating the actual statistics is a
- * simple task which is implemented in ...TODO...
+ * simple task which is implemented in CalculateHotspotStatistics() using a second
+ * instance of the ImageStatisticsCalculator.
  *
- * \b Step 1: Finding the hotspot by image convolution
+ * <b>Step 1: Finding the hotspot by image convolution</b>
  *
  * As described above, we use image convolution with a rasterized sphere to
  * average the image at each position. To handle coarse resolutions, which would
  * normally force us to decide for partially contained voxels whether to count
  * them or not, we supersample the kernel image and use non-integer kernel values
- * (see TODO-MethodName), which reflect the volume part that is contained in the
+ * (see GenerateHotspotSearchConvolutionKernel()), which reflect the volume part that is contained in the
  * sphere. For example, if three subvoxels are inside the sphere, the corresponding
- *  kernel voxel gets a value of 0.75 (3 out of 4 subvoxels, see 2D example below).
+ * kernel voxel gets a value of 0.75 (3 out of 4 subvoxels, see 2D example below).
  *
- * [image with subsampled pixel]
+ * \image html supersampling.PNG
  *
- * Convolution itself is done by means of the itk::FFTConvolutionImageFilter.
+ * Convolution itself is done by means of the itkFFTConvolutionImageFilter.
  * To find the hotspot location, we simply iterate the averaged image and find a
- * maximum location (see CalculateExtrema()).
- * TODO? Discuss cases with multiple maxima!?
- * -> "In case of images with multiple maxima the method returns value and corresponding
- * index of the extrema that is found by the iterator first"
+ * maximum location (see CalculateExtremaWorld()). In case of images with multiple
+ * maxima the method returns value and corresponding index of the extrema that is
+ * found by the iterator first.
  *
- * \b Step 2: Computation of hotspot statistics
+ * <b>Step 2: Computation of hotspot statistics</b>
  *
  * Once the hotspot location is found, statistics for the region are calculated
  * by simply iterating the input image and regarding all pixel centers inside the
@@ -135,7 +140,7 @@ namespace mitk
  * \subsection HotspotStatistics_tests Tests
  *
  * To check the correctness of the hotspot calculation, a special class
- * (mitkImageStatisticsHotspotTest) has been created, which generates images with
+ * (\link mitkImageStatisticsHotspotTest \endlink) has been created, which generates images with
  * known hotspot location and statistics. A number of unit tests use this class
  * to first generate an image of known properites and then verify that
  * ImageStatisticsCalculator is able to reproduce the known statistics.
@@ -145,9 +150,7 @@ class ImageStatistics_EXPORT ImageStatisticsCalculator : public itk::Object
 {
 public:
 
-  /**
-    TODO DM: document
-  */
+  /** \brief Enum for possible masking modi. */
   enum
   {
     MASKING_MODE_NONE = 0,
@@ -158,20 +161,7 @@ public:
   typedef itk::Statistics::Histogram<double> HistogramType;
   typedef HistogramType::ConstIterator HistogramConstIteratorType;
 
-  /**
-    TODO DM: document
-
-    keep public members, mark them deprecated
-
-    add getter/setter, they are the new preferrd variant
-
-    add operator=() and copy constructor
-
-    check variance (not used here, but maybe elsewhere)
-
-
-
-  */
+  /** \brief Class for common statistics, includig hotspot properties. */
   class ImageStatistics_EXPORT Statistics
   {
   public:
@@ -186,9 +176,9 @@ public:
     const Statistics& GetHotspotStatistics() const;  // real statistics
     Statistics& GetHotspotStatistics();  // real statistics
     bool HasHotspotStatistics() const;
-    void SetHasHotspotStatistics(bool); // set a flag. if set, return empty hotspotstatistics object
+    void SetHasHotspotStatistics(bool hasHotspotStatistics); // set a flag. if set, return empty hotspotstatistics object
 
-    void Reset();
+    void Reset(unsigned int dimension = 2);
 
     mitkSetGetConstMacro(Label, unsigned int)
     mitkSetGetConstMacro(N, unsigned int)
@@ -234,7 +224,8 @@ public:
 
    Statistics* m_HotspotStatistics;
 
-    vnl_vector<int> HotspotIndex;     //< index of hotspot origin
+   bool m_HasHotspotStatistics;
+    vnl_vector<int> HotspotIndex;     //< index of hotspotsphere origin
   };
 
   typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
@@ -291,6 +282,12 @@ public:
 
   /** \brief Returns true whether the hotspot should be calculated, otherwise false */
   bool IsHotspotCalculated();
+
+  /** \brief Sets flag whether hotspot is completly inside the image.*/
+  void SetHotspotMustBeCompletlyInsideImage(bool hotspotIsCompletlyInsideImage);
+
+  /** \brief Returns true if hotspot has to be completly inside the image. */
+  bool GetHotspotMustBeCompletlyInsideImage() const;
 
   /** \brief Compute statistics (together with histogram) for the current
    * masking mode.
@@ -373,8 +370,9 @@ protected:
     const itk::Image< TPixel, VImageDimension > *image,
     itk::Image< unsigned short, VImageDimension > *maskImage );
 
-  struct ImageExtrema
+  class ImageExtrema
   {
+  public:
     bool Defined;
     double Max;
     double Min;
@@ -382,8 +380,8 @@ protected:
     vnl_vector<int> MinIndex;
 
     ImageExtrema()
-    :Max(itk::NumericTraits<double>::Min())
-    ,Min(itk::NumericTraits<double>::Max())
+    :Max(itk::NumericTraits<double>::min())
+    ,Min(itk::NumericTraits<double>::max())
     ,Defined(false)
     {
     }
@@ -392,22 +390,25 @@ protected:
 
   /** \brief Calculates minimum, maximum, mean value and their
   * corresponding indices in a given ROI. As input the function
-  * needs an image and a mask. It returns a ImageExtrema object. */
+  * needs an image and a mask. Returns an ImageExtrema object. */
   template <typename TPixel, unsigned int VImageDimension >
   ImageExtrema CalculateExtremaWorld(
     const itk::Image<TPixel, VImageDimension> *inputImage,
-    itk::Image<unsigned short, VImageDimension> *maskImage);
+    itk::Image<unsigned short, VImageDimension> *maskImage,
+    double neccessaryDistanceToImageBorderInMM,
+    unsigned int label);
 
 
-  /** \brief Calculates the hotspot statistics within a given
-  * ROI. As input the function needs an image, a mask which
-  * represents the ROI and a radius which defines the size of
-  * the sphere. The function returns a Statistics object. */
+  /** \brief Calculates the hotspot statistics depending on
+  * masking mode. Hotspot statistics are calculated for a
+  * hotspot which is completly located inside the image by default. */
   template < typename TPixel, unsigned int VImageDimension>
   Statistics CalculateHotspotStatistics(
     const itk::Image<TPixel, VImageDimension> *inputImage,
     itk::Image<unsigned short, VImageDimension> *maskImage,
-    double radiusInMM);
+    double radiusInMM,
+    bool& isHotspotDefined,
+    unsigned int label);
 
   /** Connection from ITK to VTK */
   template <typename ITK_Exporter, typename VTK_Importer>
@@ -456,19 +457,22 @@ protected:
 
   void MaskedStatisticsProgressUpdate();
 
+  /** \brief Returns size of convolution kernel depending on spacing and radius. */
   template <unsigned int VImageDimension>
   itk::Size<VImageDimension>
   CalculateConvolutionKernelSize(double spacing[VImageDimension], double radiusInMM);
 
+  /** \brief Generates image of kernel which is needed for convolution. */
   template <unsigned int VImageDimension>
   itk::SmartPointer< itk::Image<float, VImageDimension> >
   GenerateHotspotSearchConvolutionKernel(double spacing[VImageDimension], double radiusInMM);
 
-  /** Uses members m_HotspotRadiusInMM */
+  /** \brief Convolves image with spherical kernel image. Used for hotspot calculation.   */
   template <typename TPixel, unsigned int VImageDimension>
   void
   InternalUpdateConvolutionImage( itk::Image<TPixel, VImageDimension>* inputImage );
 
+  /** \brief Fills pixels of the spherical hotspot mask. */
   template < typename TPixel, unsigned int VImageDimension>
   void
   FillHotspotMaskPixels( itk::Image<TPixel, VImageDimension>* maskImage,
@@ -528,6 +532,7 @@ protected:
   double m_HotspotRadiusInMM;
   bool m_CalculateHotspot;
   bool m_HotspotRadiusInMMChanged;
+  bool m_HotspotMustBeCompletelyInsideImage;
 
 };
 

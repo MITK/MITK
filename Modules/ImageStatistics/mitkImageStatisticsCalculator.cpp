@@ -68,11 +68,8 @@ See LICENSE.txt or http://www.mitk.org for details.
   #include "vtkLassoStencilSource.h"
 #endif
 
-// TODO DM: sort includes, check if they are really needed
-
 namespace mitk
 {
-
 ImageStatisticsCalculator::ImageStatisticsCalculator()
 : m_MaskingMode( MASKING_MODE_NONE ),
   m_MaskingModeChanged( false ),
@@ -82,10 +79,11 @@ ImageStatisticsCalculator::ImageStatisticsCalculator()
   m_PlanarFigureAxis (0),
   m_PlanarFigureSlice (0),
   m_PlanarFigureCoordinate0 (0),
-  m_PlanarFigureCoordinate1 (0),          // TODO DM: check order of variable initialization
+  m_PlanarFigureCoordinate1 (0),
   m_HotspotRadiusInMM(6.2035049089940),   // radius of a 1cm3 sphere in mm
   m_CalculateHotspot(false),
-  m_HotspotRadiusInMMChanged(false)
+  m_HotspotRadiusInMMChanged(false),
+  m_HotspotMustBeCompletelyInsideImage(true)
 {
   m_EmptyHistogram = HistogramType::New();
   m_EmptyHistogram->SetMeasurementVectorSize(1);
@@ -144,13 +142,18 @@ bool ImageStatisticsCalculator::Statistics::HasHotspotStatistics() const
   return m_HotspotStatistics != NULL;
 }
 
+void ImageStatisticsCalculator::Statistics::SetHasHotspotStatistics(bool hasHotspotStatistics)
+{
+  m_HasHotspotStatistics = hasHotspotStatistics;
+}
+
 
 ImageStatisticsCalculator::Statistics::~Statistics()
 {
   delete m_HotspotStatistics;
 }
 
-void ImageStatisticsCalculator::Statistics::Reset()
+void ImageStatisticsCalculator::Statistics::Reset(unsigned int dimension)
 {
   Label = 0;
   N = 0;
@@ -160,9 +163,17 @@ void ImageStatisticsCalculator::Statistics::Reset()
   Mean = 0.0;
   Sigma = 0.0;
   RMS = 0.0;
-  MaxIndex = 0;
-  MinIndex = 0;
-  HotspotIndex = 0;
+
+  MaxIndex.set_size(dimension);
+  MinIndex.set_size(dimension);
+  HotspotIndex.set_size(dimension);
+
+  for(int i = 0; i < dimension; ++i)
+  {
+    MaxIndex[i] = 0;
+    MinIndex[i] = 0;
+    HotspotIndex[i] = 0;
+  }
   if (m_HotspotStatistics != NULL)
   {
     m_HotspotStatistics->Reset();
@@ -418,6 +429,16 @@ void ImageStatisticsCalculator::SetCalculateHotspot(bool on)
 bool ImageStatisticsCalculator::IsHotspotCalculated()
 {
   return m_CalculateHotspot;
+}
+
+void ImageStatisticsCalculator::SetHotspotMustBeCompletlyInsideImage(bool hotspotMustBeCompletelyInsideImage)
+{
+  m_HotspotMustBeCompletelyInsideImage = hotspotMustBeCompletelyInsideImage;
+}
+
+bool ImageStatisticsCalculator::GetHotspotMustBeCompletlyInsideImage() const
+{
+  return m_HotspotMustBeCompletelyInsideImage;
 }
 
 bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
@@ -873,7 +894,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
       (
         m_HotspotSearchConvolutionImage.IsNull()
         ||
-        m_Image->GetMTime() > this->GetMTime() // TODO check when m_InternalImage 'really' changes; depends on timeStep
+        m_Image->GetMTime() > this->GetMTime()
         ||
         m_HotspotRadiusInMMChanged == true
       )
@@ -989,6 +1010,9 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   vnl_vector<int> tmpMaxIndex;
   vnl_vector<int> tmpMinIndex;
 
+  tmpMaxIndex.set_size(image->GetImageDimension() );
+  tmpMinIndex.set_size(image->GetImageDimension() );
+
   for (unsigned int i=0; i<statistics.GetMaxIndex().size(); i++)
   {
     tmpMaxIndex[i] = minMaxFilter->GetIndexOfMaximum()[i];
@@ -998,12 +1022,12 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   statistics.SetMinIndex(tmpMaxIndex);
   statistics.SetMinIndex(tmpMinIndex);
 
-  if( IsHotspotCalculated() )
+  if( IsHotspotCalculated() && VImageDimension == 3 )
   {
     typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
     typename MaskImageType::Pointer nullMask;
-    bool isHotspotDefined(false)
-    Statistics hotspotStatistics = this->CalculateHotspotStatistics(image, nullMask.GetPointer(), m_HotspotRadiusInMM, isHotspotDefined);
+    bool isHotspotDefined(false);
+    Statistics hotspotStatistics = this->CalculateHotspotStatistics(image, nullMask.GetPointer(), m_HotspotRadiusInMM, isHotspotDefined, NULL);
     if (isHotspotDefined)
     {
       statistics.SetHasHotspotStatistics(true);
@@ -1312,9 +1336,11 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       statistics.SetMaxIndex(maxIndex);
       statistics.SetMinIndex(minIndex);
       /*****************************************************Calculate Hotspot Statistics**********************************************/
-      if(IsHotspotCalculated())
+
+      if(IsHotspotCalculated() && VImageDimension == 3)
       {
-        Statistics hotspotStatistics = CalculateHotspotStatistics(adaptedImage.GetPointer(), adaptedMaskImage.GetPointer(), GetHotspotRadiusInMM()); // TODO: input label = *it
+        bool isDefined(false);
+        Statistics hotspotStatistics = CalculateHotspotStatistics(adaptedImage.GetPointer(), adaptedMaskImage.GetPointer(),GetHotspotRadiusInMM(), isDefined, *it);
         statistics.GetHotspotStatistics() = hotspotStatistics;
         if(statistics.GetHotspotStatistics().HasHotspotStatistics())
         {
@@ -1341,32 +1367,38 @@ ImageStatisticsCalculator::ImageExtrema
 ImageStatisticsCalculator::CalculateExtremaWorld(
   const itk::Image<TPixel, VImageDimension> *inputImage,
   itk::Image<unsigned short, VImageDimension> *maskImage,
-  double neccessaryDistanceToImageBorderInMM)
+  double neccessaryDistanceToImageBorderInMM,
+  unsigned int label)
 {
-  // TODO iterate onlye the region of the mask (in the inputImage), which is usually smaller (not sure if this is possible)
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
 
   typedef itk::ImageRegionConstIteratorWithIndex<MaskImageType> MaskImageIteratorType;
   typedef itk::ImageRegionConstIteratorWithIndex<ImageType> InputImageIndexIteratorType;
 
-  /*
-     ImageType::RegionType allowedExtremaRegion = inputImage->GetLargestPossibleRegion();
+  ImageType::SpacingType spacing = inputImage->GetSpacing();
 
-     bool keepDistanceToImageBorders( neccessaryDistanceToImageBorderInMM > 0 );
-     if (keepDistanceToImageBorders)
-     {
-       foreach(dimension)
-       {
-         distanceInPixels[dim] = .... round( neccessaryDistanceToImageBorderInMM / spacing[dim] )
-         distanceInPixels[dim] = .... int( neccessaryDistanceToImageBorderInMM / spacing[dim] + 0.5)
-       }
+  ImageExtrema minMax;
+  minMax.Defined = false;
+  minMax.MaxIndex.set_size(VImageDimension);
+  minMax.MaxIndex.set_size(VImageDimension);
 
-       allowedExtremaRegion.ShrinkByRadius(distanceInPixels);  // check code: what happens if nothing is left?
-     }
-  */
+  ImageType::RegionType allowedExtremaRegion = inputImage->GetLargestPossibleRegion();
 
-  InputImageIndexIteratorType imageIndexIt(inputImage, inputImage->GetLargestPossibleRegion());
+  bool keepDistanceToImageBorders( neccessaryDistanceToImageBorderInMM > 0 );
+  if (keepDistanceToImageBorders)
+  {
+    long distanceInPixels[VImageDimension];
+    for(int dimension = 0; dimension < VImageDimension; ++dimension)
+    {
+      // We add 0.5 because voxels are center-based (?! oder spacing[dimension] / 2 ?!)
+      distanceInPixels[dimension] = int( neccessaryDistanceToImageBorderInMM / spacing[dimension] + 0.5);
+    }
+
+    allowedExtremaRegion.ShrinkByRadius(distanceInPixels);
+  }
+
+  InputImageIndexIteratorType imageIndexIt(inputImage, allowedExtremaRegion);
 
   float maxValue = itk::NumericTraits<float>::min();
   float minValue = itk::NumericTraits<float>::max();
@@ -1374,12 +1406,15 @@ ImageStatisticsCalculator::CalculateExtremaWorld(
   typename ImageType::IndexType maxIndex;
   typename ImageType::IndexType minIndex;
 
-  ImageExtrema minMax;
-  minMax.Defined = false;
+  for(int i = 0; i < VImageDimension; ++i)
+  {
+    maxIndex[i] = 0;
+    minIndex[i] = 0;
+  }
 
   if (maskImage != NULL)
   {
-    MaskImageIteratorType maskIt(maskImage, inputImage->GetLargestPossibleRegion());
+    MaskImageIteratorType maskIt(maskImage, allowedExtremaRegion);
     typename ImageType::IndexType imageIndex;
     typename ImageType::PointType worldPosition;
     typename ImageType::IndexType maskIndex;
@@ -1390,10 +1425,10 @@ ImageStatisticsCalculator::CalculateExtremaWorld(
       maskImage->TransformPhysicalPointToIndex(worldPosition, maskIndex);
 
       maskIt.SetIndex( maskIndex );
-      if(maskIt.Get() > 0)
+      if(maskIt.Get() == label)
       {
-        minMax.Defined = true;
         double value = imageIndexIt.Get();
+        minMax.Defined = true;
 
         //Calculate minimum, maximum and corresponding index-values
         if( value > maxValue )
@@ -1432,14 +1467,18 @@ ImageStatisticsCalculator::CalculateExtremaWorld(
     }
   }
 
-  minMax.MinIndex.set_size(inputImage->GetImageDimension());
-  minMax.MaxIndex.set_size(inputImage->GetImageDimension());
+  minMax.MaxIndex.set_size(VImageDimension);
+  minMax.MinIndex.set_size(VImageDimension);
 
   for(unsigned int i = 0; i < minMax.MaxIndex.size(); ++i)
+  {
     minMax.MaxIndex[i] = maxIndex[i];
+  }
 
   for(unsigned int i = 0; i < minMax.MinIndex.size(); ++i)
+  {
     minMax.MinIndex[i] = minIndex[i];
+  }
 
 
   minMax.Max = maxValue;
@@ -1535,8 +1574,6 @@ ImageStatisticsCalculator
       voxelPosition[dimension] = indexPoint[dimension];
     }
 
-    // TODO think about 2D case
-    // TODO this could be done by calling a recursive method, handing over the "remaining number of dimensions to iterate"
     maskValue = 0.0;
     Vector3D subVoxelOffset; subVoxelOffset.Fill(0.0);
     // iterate sub-voxels by iterating all possible offsets
@@ -1583,7 +1620,6 @@ ImageStatisticsCalculator::InternalUpdateConvolutionImage( itk::Image<TPixel, VI
   // update convolution kernel
   typedef itk::Image< float, VImageDimension > KernelImageType;
   typename KernelImageType::Pointer convolutionKernel = this->GenerateHotspotSearchConvolutionKernel<VImageDimension>(spacing, m_HotspotRadiusInMM);
-  // TODO: if GenerateHotspotSearchConvolutionKernel() consumes relevant time, we need an additional condition
 
   // update convolution image
   typedef itk::Image< TPixel, VImageDimension > InputImageType;
@@ -1602,10 +1638,10 @@ ImageStatisticsCalculator::InternalUpdateConvolutionImage( itk::Image<TPixel, VI
   convolutionFilter->SetKernelImage(convolutionKernel);
   convolutionFilter->SetNormalize(true);
   MITK_DEBUG << "Update Convolution image for hotspot search";
-  convolutionFilter->UpdateLargestPossibleRegion(); // TODO check if we could benefit from restricting this for a region
+  convolutionFilter->UpdateLargestPossibleRegion(); //
 
   typename ConvolutionImageType::Pointer convolutionImage = convolutionFilter->GetOutput();
-  convolutionImage->SetSpacing( inputImage->GetSpacing() ); // TODO: only workaround because convolution filter seems to ignore spacing of input image
+  convolutionImage->SetSpacing( inputImage->GetSpacing() ); // only workaround because convolution filter seems to ignore spacing of input image
 
   m_HotspotSearchConvolutionImage = convolutionImage.GetPointer();
 
@@ -1632,7 +1668,7 @@ ImageStatisticsCalculator
     maskIndex = maskIt.GetIndex();
     maskImage->TransformIndexToPhysicalPoint(maskIndex, worldPosition);
 
-    maskIt.Set( worldPosition.EuclideanDistanceTo(sphereCenter) <= sphereRadiusInMM ? 3 : 0 );
+    maskIt.Set( worldPosition.EuclideanDistanceTo(sphereCenter) <= sphereRadiusInMM ? 1 : 0 );
   }
 }
 
@@ -1642,7 +1678,8 @@ ImageStatisticsCalculator::CalculateHotspotStatistics(
     const itk::Image<TPixel, VImageDimension>* inputImage,
     itk::Image<unsigned short, VImageDimension>* maskImage,
     double radiusInMM,
-    bool& isHotspotDefined)
+    bool& isHotspotDefined,
+    unsigned int label)
 {
   // get convolution image (updated in InternalUpdateConvolutionImage())
   typedef itk::Image< TPixel, VImageDimension > ConvolutionImageType;
@@ -1655,16 +1692,17 @@ ImageStatisticsCalculator::CalculateHotspotStatistics(
     throw std::logic_error("Empty convolution image in CalculateHotspotStatistics()");
   }
 
-  // find maximum in convolution image, given the current mask (this might change over time, while we assume the input fixed (TODO wrong assumption))
-  // TODO add flag m_HotspotMustBeCompletelyInsideImage (default: true)
+  // find maximum in convolution image, given the current mask
   double requiredDistanceToBorder = m_HotspotMustBeCompletelyInsideImage ? m_HotspotRadiusInMM : -1.0;
-  ImageExtrema pi = CalculateExtremaWorld(convolutionImage.GetPointer(), maskImage, requiredDistanceToBorder);
-  // TODO handle case of NO hotspot
+  ImageExtrema pi = CalculateExtremaWorld(convolutionImage.GetPointer(), maskImage, requiredDistanceToBorder, label);
+
   isHotspotDefined = pi.Defined; // return value!
 
   if (!isHotspotDefined)
   {
-    ... return empty statistics object
+    m_EmptyStatistics.Reset(VImageDimension);
+    MITK_ERROR << "No origin of hotspot-sphere was calculated!";
+    return m_EmptyStatistics;
   }
   else
   {
@@ -1726,6 +1764,7 @@ ImageStatisticsCalculator::CalculateHotspotStatistics(
     Image::Pointer hotspotMaskMITK = ImportItkImage( hotspotMaskITK );
 
     Image::Pointer hotspotInputMITK = ImportItkImage( inputImage );
+
     // use second instance of ImageStatisticsCalculator to calculate hotspot statistics
     ImageStatisticsCalculator::Pointer calculator = ImageStatisticsCalculator::New();
     calculator->SetImage( hotspotInputMITK );

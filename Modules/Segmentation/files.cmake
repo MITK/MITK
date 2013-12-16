@@ -68,6 +68,7 @@ set(CPP_FILES
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
   Interactions/mitkWatershedTool.cpp
+  Interactions/mitkPickingTool.cpp
   #IO/mitkContourModelIOFactory.cpp
   #IO/mitkContourModelReader.cpp
   #IO/mitkContourModelWriter.cpp

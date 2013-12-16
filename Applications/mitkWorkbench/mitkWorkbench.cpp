@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QtSingleApplication>
 #include <QtGlobal>
 #include <QTime>
+#include <QDesktopServices>
+
+#include <usModuleSettings.h>
 
 #include <mitkCommon.h>
 #include <mitkException.h>
@@ -110,6 +113,20 @@ int main(int argc, char** argv)
   // In the latter case, a path to a temporary directory for
   // the new application's storage directory is returned.
   QString storageDir = handleNewAppInstance(&qSafeApp, argc, argv, "BlueBerry.newInstance");
+
+  if (storageDir.isEmpty())
+  {
+    // This is a new instance and no other instance is already running. We specify
+    // the storage directory here (this is the same code as in berryInternalPlatform.cpp
+    // so that we can re-use the location for the persistent data location of the
+    // the CppMicroServices library.
+
+    // Append a hash value of the absolute path of the executable to the data location.
+    // This allows to start the same application from different build or install trees.
+    storageDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation) + '_';
+    storageDir += QString::number(qHash(QCoreApplication::applicationDirPath())) + "/";
+  }
+  us::ModuleSettings::SetStoragePath((storageDir + "us/").toStdString());
 
   // These paths replace the .ini file and are tailored for installation
   // packages created with CPack. If a .ini file is presented, it will

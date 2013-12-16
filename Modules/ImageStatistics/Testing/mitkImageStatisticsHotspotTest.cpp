@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
  \section hotspotCalculationTestCases Testcases
 
- \brief Every testcase has a defined hotspot, maximum and minimum includig their corresponding index-values and mean value.
+ Every testcase has a defined hotspot, maximum and minimum includig their corresponding index-values and mean value.
  The XML-files to each testcase is located in \ImageStatistics\Testing\Data.
 
  The following cases describe situations of hotspot-calculation and their supposed results.
@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  - Defined location of maximum in image: bottom right corner
  - Segmenation is not available
 
- \image html Case1.jpg
+ \image html mitkimagestatisticshotspottestcase1.jpg
 
    Assumed results:
  - Hotspot is calcualted correctly in the left upper corner of the image
@@ -62,7 +62,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  - Defined location of maximum: inside hotspot
  - Another "hotter" region outside of the segmenation
 
- \image html Case2.jpg
+ \image html mitkimagestatisticshotspottestcase2.jpg
 
    Assumed results:
  - Defined hotspot is correctly calculated inside segmentation
@@ -79,7 +79,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  - Defined location of hotspot: inside segmentation
  - Defined location of maximum: outside of segmentation, but inside of hotspot
 
- \image html Case3.jpg
+ \image html mitkimagestatisticshotspottestcase3.jpg
 
    Assumed results:
  - Defined hotspot is correctly calculated inside segmentation
@@ -95,7 +95,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  - Defined location of maximum: Inside hotspot
  - Segmenation is not available
 
- \image html Case4.jpg
+ \image html mitkimagestatisticshotspottestcase4.jpg
 
    Assumed result:
  - Just the part of the hotspot, which is located in the image, is used for statistics-calculation
@@ -111,7 +111,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  - Defined location of maximum: Inside hotspot
  - Segmenation is not available
 
- \image html Case5.jpg
+ \image html mitkimagestatisticshotspottestcase5.jpg
 
    Assumed results:
  - Defined hotspot and statistics are not calculated, because hotspot is not completly inside image
@@ -125,7 +125,7 @@ See LICENSE.txt or http://www.mitk.org for details.
    Description:
  - Two defined regions of interest with defined statistics for each one.
 
- \image html Case6.jpg
+ \image html mitkimagestatisticshotspottestcase6.jpg
 
    Assumed results:
  - In every region of interest there are correctly calculated hotspot-statistics

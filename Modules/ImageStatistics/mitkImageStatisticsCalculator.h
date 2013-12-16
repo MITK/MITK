@@ -95,7 +95,7 @@ namespace mitk
  *     inside the image by default. This behaviour can be changed by setting
  *     m_HotspotMustBeCompletelyInsideImage to false.
  *
- * \image html hotspotExample.JPG
+ * \image html hotspotexample.JPG
  *
  * \subsection HotspotStatistics_calculation Hotspot Calculation
  *
@@ -123,7 +123,7 @@ namespace mitk
  * sphere. For example, if three subvoxels are inside the sphere, the corresponding
  * kernel voxel gets a value of 0.75 (3 out of 4 subvoxels, see 2D example below).
  *
- * \image html supersampling.PNG
+ * \image html convolutionkernelsupersampling.jpg
  *
  * Convolution itself is done by means of the itkFFTConvolutionImageFilter.
  * To find the hotspot location, we simply iterate the averaged image and find a
@@ -140,7 +140,7 @@ namespace mitk
  * \subsection HotspotStatistics_tests Tests
  *
  * To check the correctness of the hotspot calculation, a special class
- * (\link mitkImageStatisticsHotspotTest \endlink) has been created, which generates images with
+ * (\ref hotspottestdoc mitkImageStatisticsHotspotTest) has been created, which generates images with
  * known hotspot location and statistics. A number of unit tests use this class
  * to first generate an image of known properites and then verify that
  * ImageStatisticsCalculator is able to reproduce the known statistics.
@@ -343,7 +343,7 @@ protected:
 
 
   /** \brief If the passed vector matches any of the three principal axes
-   * of the passed geometry, the ínteger value corresponding to the axis
+   * of the passed geometry, the integer value corresponding to the axis
    * is set and true is returned. */
   bool GetPrincipalAxis( const Geometry3D *geometry, Vector3D vector,
     unsigned int &axis );

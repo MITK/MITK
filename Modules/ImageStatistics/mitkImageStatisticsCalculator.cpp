@@ -1391,7 +1391,8 @@ ImageStatisticsCalculator::CalculateExtremaWorld(
     long distanceInPixels[VImageDimension];
     for(int dimension = 0; dimension < VImageDimension; ++dimension)
     {
-      // We add 0.5 because voxels are center-based (?! oder spacing[dimension] / 2 ?!)
+      // We add 0.5 because voxels are center-based: for example with a radius of 2.2 and a spacing of 1 two indices are enough
+      // because 2.2 / 1 + 0.5 = 2.7 => 2. But with a radius of 2.7 we need 3 indices because 2.7 / 1 + 0.5 = 3.2 => 3
       distanceInPixels[dimension] = int( neccessaryDistanceToImageBorderInMM / spacing[dimension] + 0.5);
     }
 

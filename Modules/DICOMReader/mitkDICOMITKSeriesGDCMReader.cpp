@@ -331,7 +331,7 @@ mitk::DICOMITKSeriesGDCMReader
   mitk::ITKDICOMSeriesReaderHelper helper;
   mitk::Image::Pointer mitkImage = helper.Load( filenames, m_FixTiltByShearing && hasTilt, tiltInfo ); // TODO preloaded images, caching..?
 
-  block.SetMitkImage( this->FixupSpacing( mitkImage, block ) );
+  block.SetMitkImage( mitkImage );
 
   return true;
 }
@@ -384,25 +384,4 @@ mitk::DICOMITKSeriesGDCMReader
   m_EquiDistantBlocksSorter->SetAcceptTilt( m_FixTiltByShearing );
 
   this->AddSortingElement( m_EquiDistantBlocksSorter );
-}
-
-mitk::Image::Pointer
-mitk::DICOMITKSeriesGDCMReader
-::FixupSpacing(Image* mitkImage, const DICOMImageBlockDescriptor& block) const
-{
-  assert(mitkImage);
-  Vector3D imageSpacing = mitkImage->GetGeometry()->GetSpacing();
-
-  ScalarType desiredSpacingX = imageSpacing[0];
-  ScalarType desiredSpacingY = imageSpacing[1];
-  block.GetDesiredMITKImagePixelSpacing( desiredSpacingX, desiredSpacingY ); // prefer pixel spacing over imager pixel spacing
-
-  MITK_DEBUG << "Loaded image with spacing " << imageSpacing[0] << ", " << imageSpacing[1];
-  MITK_DEBUG << "Found correct spacing info " << desiredSpacingX << ", " << desiredSpacingY;
-
-  imageSpacing[0] = desiredSpacingX;
-  imageSpacing[1] = desiredSpacingY;
-  mitkImage->GetGeometry()->SetSpacing( imageSpacing );
-
-  return mitkImage;
 }

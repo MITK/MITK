@@ -113,7 +113,7 @@ mitk::DICOMImageBlockDescriptor
 {
   if (m_MitkImage != image)
   {
-    m_MitkImage = image;
+    m_MitkImage = this->FixupSpacing(image);
   }
 }
 
@@ -124,6 +124,28 @@ mitk::DICOMImageBlockDescriptor
   return m_MitkImage;
 }
 
+mitk::Image::Pointer
+mitk::DICOMImageBlockDescriptor
+::FixupSpacing(Image* mitkImage)
+{
+  if (mitkImage)
+  {
+    Vector3D imageSpacing = mitkImage->GetGeometry()->GetSpacing();
+
+    ScalarType desiredSpacingX = imageSpacing[0];
+    ScalarType desiredSpacingY = imageSpacing[1];
+    this->GetDesiredMITKImagePixelSpacing( desiredSpacingX, desiredSpacingY ); // prefer pixel spacing over imager pixel spacing
+
+    MITK_DEBUG << "Loaded image with spacing " << imageSpacing[0] << ", " << imageSpacing[1];
+    MITK_DEBUG << "Found correct spacing info " << desiredSpacingX << ", " << desiredSpacingY;
+
+    imageSpacing[0] = desiredSpacingX;
+    imageSpacing[1] = desiredSpacingY;
+    mitkImage->GetGeometry()->SetSpacing( imageSpacing );
+  }
+
+  return mitkImage;
+}
 void
 mitk::DICOMImageBlockDescriptor
 ::SetSliceIsLoaded(unsigned int index, bool isLoaded)

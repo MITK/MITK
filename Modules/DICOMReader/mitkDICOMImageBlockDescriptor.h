@@ -70,6 +70,8 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
 
   private:
 
+    mitk::Image::Pointer FixupSpacing(Image* mitkImage);
+
     DICOMImageFrameList m_ImageFrameList;
     Image::Pointer m_MitkImage;
     BoolList m_SliceIsLoaded;

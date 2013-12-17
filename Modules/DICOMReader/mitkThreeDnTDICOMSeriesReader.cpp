@@ -236,7 +236,7 @@ mitk::ThreeDnTDICOMSeriesReader
   mitk::ITKDICOMSeriesReaderHelper helper;
   mitk::Image::Pointer mitkImage = helper.Load3DnT( filenamesPerTimestep, m_FixTiltByShearing && hasTilt, tiltInfo ); // TODO preloaded images, caching..?
 
-  block.SetMitkImage( this->FixupSpacing( mitkImage, block ) ); // TODO FixupSpacing could be integrated with a check in SetMitkImage
+  block.SetMitkImage( mitkImage );
 
   return true;
 }

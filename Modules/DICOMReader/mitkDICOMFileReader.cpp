@@ -32,7 +32,7 @@ mitk::DICOMFileReader
 mitk::DICOMFileReader
 ::DICOMFileReader(const DICOMFileReader& other )
 :itk::LightObject()
-,m_Outputs( other.m_Outputs ) // TODO copy instead of reference!
+,m_Outputs( other.m_Outputs )
 {
 }
 
@@ -43,7 +43,7 @@ mitk::DICOMFileReader
   if (this != &other)
   {
     m_InputFilenames = other.m_InputFilenames;
-    m_Outputs = other.m_Outputs; // TODO copy instead of reference!
+    m_Outputs = other.m_Outputs;
   }
   return *this;
 }

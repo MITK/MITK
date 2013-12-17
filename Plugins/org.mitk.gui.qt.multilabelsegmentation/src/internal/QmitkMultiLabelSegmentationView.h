@@ -63,20 +63,11 @@ protected slots:
   /// \brief reaction to the selection of any 2D segmentation tool
   void OnManualTool2DSelected(int id);
 
-  /// \brief reaction to button "Load Segmentation"
-  void OnLoadSegmentation();
-
-  /// \brief reaction to button "Save Segmentation"
-  void OnSaveSegmentation();
-
-  /// \brief reaction to button "Delete Segmentation"
-  void OnDeleteSegmentation();
-
   /// \brief reaction to button "New Label"
   void OnNewLabel();
 
-  /// \brief reaction to button "New Segmentation"
-  void OnNewSegmentation();
+  /// \brief reaction to button "New Segmentation Session"
+  void OnNewSegmentationSession();
 
   /// \brief reaction to button "Surface Stamp"
   void OnSurfaceStamp();

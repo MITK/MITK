@@ -47,6 +47,8 @@ namespace mitk
 
     void SetUseIR(bool useIR);
 
+    bool InitializeMultiFrameReader();
+
     /*!
     \brief opens a connection to the Kinect camera.
     \throws mitkException In case of no connection, an exception is thrown!

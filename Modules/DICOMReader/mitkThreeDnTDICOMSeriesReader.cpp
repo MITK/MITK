@@ -198,6 +198,7 @@ bool
 mitk::ThreeDnTDICOMSeriesReader
 ::LoadMitkImageForOutput(unsigned int o)
 {
+  PushLocale();
   DICOMImageBlockDescriptor& block = this->InternalGetOutput(o);
   const DICOMImageFrameList& frames = block.GetImageFrameList();
   const GantryTiltInformation tiltInfo = block.GetTiltInformation();
@@ -237,6 +238,8 @@ mitk::ThreeDnTDICOMSeriesReader
   mitk::Image::Pointer mitkImage = helper.Load3DnT( filenamesPerTimestep, m_FixTiltByShearing && hasTilt, tiltInfo ); // TODO preloaded images, caching..?
 
   block.SetMitkImage( mitkImage );
+
+  PopLocale();
 
   return true;
 }

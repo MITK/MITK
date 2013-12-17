@@ -25,8 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "DICOMReaderExports.h"
 
+#include <stack>
+
 // TODO tests seem to pass if reader creates NO output at all!
-// TODO ensure "C" locale!!
 // TODO providing tags as properties!
 // TODO preloaded volumes?? could be solved in a different way..
 
@@ -53,6 +54,10 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     void SetFixTiltByShearing(bool on);
 
   protected:
+
+    std::string GetActiveLocale() const;
+    void PushLocale();
+    void PopLocale();
 
     DICOMITKSeriesGDCMReader();
     virtual ~DICOMITKSeriesGDCMReader();
@@ -95,6 +100,9 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     mitk::EquiDistantBlocksSorter::Pointer m_EquiDistantBlocksSorter;
 
   private:
+
+    std::stack<std::string> m_ReplacedCLocales;
+    std::stack<std::locale> m_ReplacedCinLocales;
 };
 
 }

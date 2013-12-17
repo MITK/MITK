@@ -50,7 +50,7 @@ mitk::DICOMITKSeriesGDCMReader
   {
     DICOMFileReader::operator=(other);
     this->m_FixTiltByShearing = other.m_FixTiltByShearing;
-    this->m_Sorter = other.m_Sorter; // ?? TODO should probably clone the list items. Semantics to be defined..
+    this->m_Sorter = other.m_Sorter; // TODO should clone the list items
     this->m_EquiDistantBlocksSorter = other.m_EquiDistantBlocksSorter->Clone();
   }
   return *this;
@@ -120,6 +120,53 @@ mitk::DICOMITKSeriesGDCMReader
   return output;
 }
 
+std::string
+mitk::DICOMITKSeriesGDCMReader
+::GetActiveLocale() const
+{
+  return setlocale(LC_NUMERIC, NULL);
+}
+
+void
+mitk::DICOMITKSeriesGDCMReader
+::PushLocale()
+{
+  std::string currentCLocale = setlocale(LC_NUMERIC, NULL);
+  m_ReplacedCLocales.push( currentCLocale );
+  setlocale(LC_NUMERIC, "C");
+
+  std::locale currentCinLocale( std::cin.getloc() );
+  m_ReplacedCinLocales.push( currentCinLocale );
+  std::locale l( "C" );
+  std::cin.imbue(l);
+}
+
+void
+mitk::DICOMITKSeriesGDCMReader
+::PopLocale()
+{
+  if (!m_ReplacedCLocales.empty())
+  {
+    setlocale(LC_NUMERIC, m_ReplacedCLocales.top().c_str());
+    m_ReplacedCLocales.pop();
+  }
+  else
+  {
+    MITK_WARN << "Mismatched PopLocale on DICOMITKSeriesGDCMReader.";
+  }
+
+  if (!m_ReplacedCinLocales.empty())
+  {
+    std::cin.imbue( m_ReplacedCinLocales.top() );
+    m_ReplacedCinLocales.pop();
+  }
+  else
+  {
+    MITK_WARN << "Mismatched PopLocale on DICOMITKSeriesGDCMReader.";
+  }
+
+}
+
 mitk::DICOMITKSeriesGDCMReader::SortingBlockList
 mitk::DICOMITKSeriesGDCMReader
 ::Condense3DBlocks(SortingBlockList& input)
@@ -170,7 +217,9 @@ mitk::DICOMITKSeriesGDCMReader
   timer.Stop("Setup scanning");
 
   timer.Start("Tag scanning");
+  PushLocale();
   gdcmScanner.Scan( inputFilenames );
+  PopLocale();
   timer.Stop("Tag scanning");
 
   timer.Start("Setup sorting");
@@ -306,6 +355,7 @@ bool
 mitk::DICOMITKSeriesGDCMReader
 ::LoadMitkImageForOutput(unsigned int o)
 {
+  PushLocale();
   DICOMImageBlockDescriptor& block = this->InternalGetOutput(o);
   const DICOMImageFrameList& frames = block.GetImageFrameList();
   const GantryTiltInformation tiltInfo = block.GetTiltInformation();
@@ -332,6 +382,7 @@ mitk::DICOMITKSeriesGDCMReader
   mitk::Image::Pointer mitkImage = helper.Load( filenames, m_FixTiltByShearing && hasTilt, tiltInfo ); // TODO preloaded images, caching..?
 
   block.SetMitkImage( mitkImage );
+  PopLocale();
 
   return true;
 }

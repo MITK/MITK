@@ -48,7 +48,7 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 
     virtual bool CanHandleFile(const std::string& filename);
 
-    virtual void AddSortingElement(DICOMDatasetSorter* sorter);
+    virtual void AddSortingElement(DICOMDatasetSorter* sorter, bool atFront = false);
 
     void SetFixTiltByShearing(bool on);
 

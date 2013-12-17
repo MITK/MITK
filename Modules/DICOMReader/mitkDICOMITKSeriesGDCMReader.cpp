@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMITKSeriesGDCMReader.h"
 #include "mitkITKDICOMSeriesReaderHelper.h"
 #include "mitkGantryTiltInformation.h"
+#include "mitkDICOMTagBasedSorter.h"
 
 #include <itkTimeProbesCollectorBase.h>
 
@@ -130,7 +131,7 @@ void
 mitk::DICOMITKSeriesGDCMReader
 ::AnalyzeInputFiles()
 {
-  // TODO at this point, make sure we have a sorting element at the end that splits geometrically separate blocks
+  // at this point, make sure we have a sorting element at the end that splits geometrically separate blocks
   this->EnsureMandatorySortersArePresent();
 
   itk::TimeProbesCollectorBase timer;
@@ -344,28 +345,47 @@ mitk::DICOMITKSeriesGDCMReader
 ::CanHandleFile(const std::string& itkNotUsed(filename))
 {
   return true; // can handle all
+  // peek into file, check DCM
+  // nice-to-have: check multi-framedness
 }
 
 void
 mitk::DICOMITKSeriesGDCMReader
-::AddSortingElement(DICOMDatasetSorter* sorter)
+::AddSortingElement(DICOMDatasetSorter* sorter, bool atFront)
 {
   assert(sorter);
-  m_Sorter.push_back( sorter );
+
+  if (atFront)
+  {
+    m_Sorter.push_front( sorter );
+  }
+  else
+  {
+    m_Sorter.push_back( sorter );
+  }
 }
 
 void
 mitk::DICOMITKSeriesGDCMReader
 ::EnsureMandatorySortersArePresent()
 {
-  // TODO: cols, rows, etc. are also not optional
+  // TODO do just once!
+  DICOMTagBasedSorter::Pointer splitter = DICOMTagBasedSorter::New();
+  splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0010) ); // Number of Rows
+  splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0011) ); // Number of Columns
+  splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0030) ); // Pixel Spacing
+  splitter->AddDistinguishingTag( DICOMTag(0x0018, 0x1164) ); // Imager Pixel Spacing
+  splitter->AddDistinguishingTag( DICOMTag(0x0020, 0x0037), new mitk::DICOMTagBasedSorter::CutDecimalPlaces(5) ); // Image Orientation (Patient) // TODO: configurable!
+  splitter->AddDistinguishingTag( DICOMTag(0x0018, 0x0050) ); // Slice Thickness
+  splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0008) ); // Number of Frames
+  this->AddSortingElement( splitter, true ); // true = at front
+
   if (m_EquiDistantBlocksSorter.IsNull())
   {
     m_EquiDistantBlocksSorter = mitk::EquiDistantBlocksSorter::New();
   }
   m_EquiDistantBlocksSorter->SetAcceptTilt( m_FixTiltByShearing );
 
-  // TODO CHECK
   this->AddSortingElement( m_EquiDistantBlocksSorter );
 }
 

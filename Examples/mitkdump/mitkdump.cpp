@@ -14,15 +14,13 @@
 
  ===================================================================*/
 
-#include "mitkDICOMITKSeriesGDCMReader.h"
-#include "mitkDICOMTagBasedSorter.h"
-#include "mitkDICOMSortByTag.h"
+#include "mitkClassicDICOMSeriesReader.h"
 
 using mitk::DICOMTag;
 
 int main(int argc, char* argv[])
 {
-  mitk::StringList inputFiles; // TODO
+  mitk::StringList inputFiles;
   for (int a = 1; a < argc; ++a)
   {
     inputFiles.push_back( std::string(argv[a]) );
@@ -30,48 +28,18 @@ int main(int argc, char* argv[])
 
   // ----------------- Configure reader -------------------
 
-  mitk::DICOMITKSeriesGDCMReader::Pointer gdcmReader =
-    mitk::DICOMITKSeriesGDCMReader::New();
-
-  mitk::DICOMTagBasedSorter::Pointer tagSorter =
-    mitk::DICOMTagBasedSorter::New();
-
-  // all the things that split by tag in DicomSeriesReader
-  tagSorter->AddDistinguishingTag( DICOMTag(0x0028, 0x0010) ); // Number of Rows
-  tagSorter->AddDistinguishingTag( DICOMTag(0x0028, 0x0011) ); // Number of Columns
-  tagSorter->AddDistinguishingTag( DICOMTag(0x0028, 0x0030) ); // Pixel Spacing
-  tagSorter->AddDistinguishingTag( DICOMTag(0x0018, 0x1164) ); // Imager Pixel Spacing
-  tagSorter->AddDistinguishingTag( DICOMTag(0x0020, 0x0037) ); // Image Orientation (Patient) // TODO add tolerance parameter (l. 1572 of original code)
-  tagSorter->AddDistinguishingTag( DICOMTag(0x0020, 0x000e) ); // Series Instance UID
-  tagSorter->AddDistinguishingTag( DICOMTag(0x0018, 0x0050) ); // Slice Thickness
-  tagSorter->AddDistinguishingTag( DICOMTag(0x0028, 0x0008) ); // Number of Frames
-  tagSorter->AddDistinguishingTag( DICOMTag(0x0020, 0x0052) ); // Frame of Reference UID
-
-  // a sorter...
-  // TODO ugly syntax, improve..
-  mitk::DICOMSortCriterion::ConstPointer sorting =
-    mitk::DICOMSortByTag::New( DICOMTag(0x0020, 0x0013), // instance number
-      mitk::DICOMSortByTag::New( DICOMTag(0x0020, 0x0012), // aqcuisition number
-        mitk::DICOMSortByTag::New( DICOMTag(0x0008, 0x0032), // aqcuisition time
-          mitk::DICOMSortByTag::New( DICOMTag(0x0018, 0x1060), // trigger time
-            mitk::DICOMSortByTag::New( DICOMTag(0x0008, 0x0018) // SOP instance UID (last resort, not really meaningful but decides clearly)
-            ).GetPointer()
-          ).GetPointer()
-        ).GetPointer()
-      ).GetPointer()
-    ).GetPointer();
-  tagSorter->SetSortCriterion( sorting );
-
-  gdcmReader->AddSortingElement( tagSorter );
+  // DOES fix tilt when detected
+  // DOES group 3D blocks into 3D+t if possible
+  mitk::ClassicDICOMSeriesReader::Pointer gdcmReader = mitk::ClassicDICOMSeriesReader::New();
 
   // ----------------- Load -------------------
 
   gdcmReader->SetInputFiles( inputFiles );
 
-  MITK_INFO << "Analyzing " << inputFiles.size() << " file ...";
+  MITK_INFO << "Analyzing " << inputFiles.size() << " files ...";
   gdcmReader->AnalyzeInputFiles();
-  gdcmReader->PrintOutputs(std::cout, true);
-  MITK_INFO << "Loading " << inputFiles.size() << " file ...";
+  //gdcmReader->PrintOutputs(std::cout, false);
+  MITK_INFO << "Loading " << inputFiles.size() << " files ...";
   gdcmReader->LoadImages();
 
   unsigned int numberOfOutputs = gdcmReader->GetNumberOfOutputs();

@@ -53,7 +53,7 @@ mitk::ITKDICOMSeriesReaderHelper
     // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
     if (correctTilt)
     {
-      readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
+      readVolume = FixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
     }
 
     image->InitializeByItk(readVolume.GetPointer());
@@ -122,7 +122,7 @@ mitk::ITKDICOMSeriesReaderHelper
     // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
     if (correctTilt)
     {
-      readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
+      readVolume = FixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
     }
 
     image->InitializeByItk(readVolume.GetPointer(), 1, numberOfTimeSteps);
@@ -141,7 +141,7 @@ mitk::ITKDICOMSeriesReaderHelper
 
       if (correctTilt)
       {
-        readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
+        readVolume = FixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
       }
 
       image->SetImportVolume(readVolume->GetBufferPointer(), currentTimeStep);
@@ -171,7 +171,7 @@ mitk::ITKDICOMSeriesReaderHelper
 template <typename ImageType>
 typename ImageType::Pointer
 mitk::ITKDICOMSeriesReaderHelper
-::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo )
+::FixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo )
 {
   tiltInfo.Print(std::cout);
   typedef itk::ResampleImageFilter<ImageType,ImageType> ResampleFilterType;

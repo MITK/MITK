@@ -39,8 +39,7 @@ class ITKDICOMSeriesReaderHelper
 
     template <typename ImageType>
     typename ImageType::Pointer
-    // TODO this is NOT inplace!
-    InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo );
+    FixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo );
 
     template <typename PixelType>
     Image::Pointer

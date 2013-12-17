@@ -56,8 +56,8 @@ mitk::Image::Pointer mitk::USImageSource::GetNextImage()
     cv::Mat image;
     this->GetNextRawImage(image);
 
-    //if ( ! image.empty() )
-    //{
+    if ( ! image.empty() )
+    {
       // execute filter if a filter is specified
       if ( m_ImageFilter.IsNotNull() ) { m_ImageFilter->FilterImage(image, m_CurrentImageId); }
 
@@ -69,7 +69,7 @@ mitk::Image::Pointer mitk::USImageSource::GetNextImage()
 
       // OpenCVToMitkImageFilter returns a standard mitk::image.
       result = this->m_OpenCVToMitkFilter->GetOutput();
-    //}
+    }
 
     // clean up
     image.release();
@@ -106,6 +106,12 @@ void mitk::USImageSource::GetNextRawImage( cv::Mat& image )
   // get mitk image through virtual method of the subclass
   mitk::Image::Pointer mitkImg;
   this->GetNextRawImage(mitkImg);
+
+  if ( mitkImg.IsNull() )
+  {
+    image = cv::Mat();
+    return;
+  }
 
   // convert mitk::Image to an OpenCV image
   m_MitkToOpenCVFilter->SetImage(mitkImg);

@@ -52,6 +52,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   : mitk::ImageSource(),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
+  m_SpawnAcquireThread(true),
   m_MultiThreader(itk::MultiThreader::New()),
   m_ImageMutex(itk::FastMutexLock::New()),
   m_ThreadID(-1),
@@ -81,6 +82,7 @@ mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
   : mitk::ImageSource(),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
+  m_SpawnAcquireThread(true),
   m_MultiThreader(itk::MultiThreader::New()),
   m_ImageMutex(itk::FastMutexLock::New()),
   m_ThreadID(-1),
@@ -260,7 +262,10 @@ bool mitk::USDevice::Activate()
     m_FreezeBarrier = itk::ConditionVariable::New();
 
     // spawn thread for aquire images if us device is active
-    this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->Acquire, this);
+    if (m_SpawnAcquireThread)
+    {
+      this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->Acquire, this);
+    }
 
     this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_ISACTIVE, true);
     this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_LABEL, this->GetServicePropertyLabel());

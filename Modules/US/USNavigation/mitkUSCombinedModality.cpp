@@ -41,6 +41,10 @@ mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, Navigat
   //create a new output (for the image data)
   mitk::Image::Pointer newOutput = mitk::Image::New();
   this->SetNthOutput(0,newOutput);
+
+  // Combined Modality should not spawn an own acquire thread, because
+  // image acquiring is done by the included us device
+  this->SetSpawnAcquireThread(false);
 }
 
 mitk::USCombinedModality::~USCombinedModality()
@@ -230,7 +234,8 @@ void mitk::USCombinedModality::OnFreeze(bool freeze)
 
 mitk::NavigationDataSource::Pointer mitk::USCombinedModality::GetNavigationDataSource()
 {
-  return m_DelayFilter.GetPointer();
+  //return m_DelayFilter.GetPointer();
+  return m_TrackingDevice.GetPointer();
 }
 
 bool mitk::USCombinedModality::GetIsCalibratedForCurrentStatus()

@@ -233,6 +233,8 @@ namespace mitk {
 
   protected:
     itkSetMacro(Image, mitk::Image::Pointer);
+    itkSetMacro(SpawnAcquireThread, bool);
+    itkGetMacro(SpawnAcquireThread, bool);
 
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
 
@@ -345,6 +347,8 @@ namespace mitk {
     std::string GetServicePropertyLabel();
 
   private:
+
+    bool m_SpawnAcquireThread;
 
     /**
     *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.

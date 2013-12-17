@@ -81,6 +81,7 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI() : QmitkToolGUI(), m_TimeIsC
   m_Controls.m_slAlpha->setDecimals(2);
   m_Controls.m_slSigma->setDecimals(2);
   m_Controls.m_slBeta->setDecimals(2);
+  m_Controls.m_slStopValue->setDecimals(0);
 }
 
 QmitkFastMarchingToolGUI::~QmitkFastMarchingToolGUI()

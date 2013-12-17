@@ -178,8 +178,6 @@ void mitk::FastMarchingTool3D::Activated()
   m_SeedsAsPointSetNode->SetVisibility(true);
   m_ToolManager->GetDataStorage()->Add( m_SeedsAsPointSetNode, m_ToolManager->GetWorkingData(0) );
 
-  m_ProgressCommand = mitk::ToolCommand::New();
-
   m_ReferenceImage = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
   if(m_ReferenceImage->GetTimeGeometry()->CountTimeSteps() > 1)
   {
@@ -266,7 +264,7 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
   int activeLayer = workingImage->GetActiveLayer();
   int activePixelValue = workingImage->GetActiveLabel(activeLayer)->GetIndex();
-/*
+  /*
   mitk::Image::Pointer diffImage = mitk::Image::New();
 
   PixelType pixelType(mitk::MakeScalarPixelType<DefaultSegmentationDataType>() );
@@ -281,8 +279,8 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
   AffineGeometryFrame3D::Pointer originalGeometryAGF = workingImage->GetTimeSlicedGeometry()->Clone();
   TimeSlicedGeometry::Pointer originalGeometry = dynamic_cast<TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
   diffImage->SetGeometry( originalGeometry );
-*/
-  this->PasteSegmentationOnWorkingImage( workingImage, m_FeedbackImage, activePixelValue, m_CurrentTimeStep );
+  */
+//  this->PasteSegmentationOnWorkingImage( workingImage, m_FeedbackImage, activePixelValue, m_CurrentTimeStep );
 
   this->ClearSeeds();
 

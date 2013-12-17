@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDilateTool3D.h"
 
+#include "mitkLabelSetImage.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkImageAccessByItk.h"
@@ -45,7 +46,6 @@ namespace mitk {
 
 mitk::DilateTool3D::DilateTool3D() : m_Radius(3)
 {
-  m_ProgressCommand = mitk::ToolCommand::New();
 }
 
 mitk::DilateTool3D::~DilateTool3D()

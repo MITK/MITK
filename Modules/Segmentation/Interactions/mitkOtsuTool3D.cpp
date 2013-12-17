@@ -98,7 +98,7 @@ us::ModuleResource mitk::OtsuTool3D::GetIconResource() const
   return resource;
 }
 
-void mitk::OtsuTool3D::RunSegmentation(int regions)
+void mitk::OtsuTool3D::Run(int regions)
 {
   //this->m_OtsuSegmentationDialog->setCursor(Qt::WaitCursor);
 
@@ -155,7 +155,7 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::OtsuTool3D::ConfirmSegmentation()
+void mitk::OtsuTool3D::AcceptPreview()
 {
 //  GetTargetSegmentationNode()->SetData(dynamic_cast<mitk::Image*>(m_BinaryPreviewNode->GetData()));
 }

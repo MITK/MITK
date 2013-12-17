@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToolManager.h"
 #include "mitkDataStorage.h"
 #include "mitkBaseRenderer.h"
+
 #include "mitkPlaneGeometry.h"
 #include "mitkPlanarCircle.h"
 #include "mitkImageCast.h"
@@ -59,6 +60,7 @@ m_ShowMarkerNodes (false),
 m_3DInterpolationEnabled(false),
 m_2DInterpolationEnabled(false)
 {
+  m_ProgressCommand = mitk::ToolCommand::New();
 }
 
 mitk::SegTool2D::~SegTool2D()
@@ -85,7 +87,6 @@ float mitk::SegTool2D::CanHandleEvent( StateEvent const *stateEvent) const
     return 1.0;
   }
 }
-
 
 bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const PlaneGeometry* plane, int& affectedDimension, int& affectedSlice )
 {
@@ -147,7 +148,6 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
   return true;
 }
 
-
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PositionEvent* positionEvent, const Image* image)
 {
   if (!positionEvent) return NULL;
@@ -160,7 +160,6 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 
   return this->GetAffectedImageSliceAs2DImage(planeGeometry, image, timeStep);
 }
-
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PlaneGeometry* planeGeometry, const Image* image, unsigned int timeStep)
 {
@@ -191,7 +190,6 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Plane
   return slice;
 }
 
-
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const PositionEvent* positionEvent)
 {
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
@@ -202,7 +200,6 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const PositionEven
 
   return GetAffectedImageSliceAs2DImage( positionEvent, workingImage );
 }
-
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEvent* positionEvent)
 {

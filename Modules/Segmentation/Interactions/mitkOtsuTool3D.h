@@ -38,8 +38,8 @@ namespace mitk{
       virtual void Activated();
       virtual void Deactivated();
 
-      void RunSegmentation( int regions);
-      void ConfirmSegmentation();
+      void Run( int regions);
+      void AcceptPreview();
       void UpdateBinaryPreview(int regionID);
       void UpdateVolumePreview(bool volumeRendering);
       void ShowMultiLabelResultNode(bool);

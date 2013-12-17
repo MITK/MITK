@@ -16,13 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCloseTool3D.h"
 
+#include "mitkLabelSetImage.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
-#include "mitkInteractionConst.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkToolManager.h"
 #include "mitkImageCast.h"
-#include "mitkImageTimeSelector.h"
 
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkBinaryBallStructuringElement.h>
@@ -47,7 +46,6 @@ namespace mitk {
 
 mitk::CloseTool3D::CloseTool3D() : m_Radius(1)
 {
-  m_ProgressCommand = mitk::ToolCommand::New();
 }
 
 mitk::CloseTool3D::~CloseTool3D()

@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkErodeTool3D.h"
 
+#include "mitkLabelSetImage.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkInteractionConst.h"
@@ -46,7 +47,6 @@ namespace mitk {
 
 mitk::ErodeTool3D::ErodeTool3D() : m_Radius(3)
 {
-  m_ProgressCommand = mitk::ToolCommand::New();
 }
 
 mitk::ErodeTool3D::~ErodeTool3D()

@@ -18,12 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSplitConnectedRegionsTool3D_h_Included
 
 #include "mitkAutoSegmentationTool.h"
-#include "mitkLegacyAdaptors.h"
 #include "SegmentationExports.h"
-#include "mitkDataNode.h"
-#include "mitkLabelSetImage.h"
-#include "mitkToolCommand.h"
-#include "mitkStateEvent.h"
+//#include "mitkStateEvent.h"
 #include "mitkColorSequenceRainbow.h"
 
 #include "itkImage.h"
@@ -57,7 +53,7 @@ class Segmentation_EXPORT SplitConnectedRegionsTool3D : public AutoSegmentationT
     /// \brief Replaces the active label with the preview image.
     virtual void AcceptPreview();
 
-    /// \brief Runs the tool.
+    /// \brief Executes the tool.
     void Run();
 
     /// \brief Sets the number of new labels to generate.

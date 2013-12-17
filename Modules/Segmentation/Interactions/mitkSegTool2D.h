@@ -21,14 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationExports.h"
 #include "mitkTool.h"
 #include "mitkImage.h"
-
 #include "mitkStateEvent.h"
 #include "mitkPositionEvent.h"
-
 #include "mitkPlanePositionManager.h"
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkInteractionConst.h"
-
+#include "mitkToolCommand.h"
 #include <mitkDiffSliceOperation.h>
 
 
@@ -140,6 +138,8 @@ class Segmentation_EXPORT SegTool2D : public Tool
     int   m_LastEventSlice;
     bool m_3DInterpolationEnabled;
     bool m_2DInterpolationEnabled;
+
+    ToolCommand::Pointer m_ProgressCommand;
 
   private:
     //The prefix of the contourmarkername. Suffix is a consecutive number

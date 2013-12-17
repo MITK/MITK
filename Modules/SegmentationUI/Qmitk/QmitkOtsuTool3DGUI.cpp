@@ -124,7 +124,7 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
         if (proceed != QMessageBox::Ok) return;
       }
       this->setCursor(Qt::WaitCursor);
-      m_OtsuTool3DTool->RunSegmentation( m_NumberOfRegions );
+      m_OtsuTool3DTool->Run( m_NumberOfRegions );
       this->setCursor(Qt::ArrowCursor);
     }
     catch( ... )

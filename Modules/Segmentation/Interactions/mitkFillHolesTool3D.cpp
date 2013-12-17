@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFillHolesTool3D.h"
 
+#include "mitkLabelSetImage.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkImageAccessByItk.h"
@@ -44,7 +45,6 @@ namespace mitk {
 
 mitk::FillHolesTool3D::FillHolesTool3D() : m_ConsiderAllLabels(false)
 {
-  m_ProgressCommand = mitk::ToolCommand::New();
 }
 
 mitk::FillHolesTool3D::~FillHolesTool3D()

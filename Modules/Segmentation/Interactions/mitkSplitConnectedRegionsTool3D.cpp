@@ -16,16 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSplitConnectedRegionsTool3D.h"
 
+#include "mitkLabelSetImage.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkInteractionConst.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkToolManager.h"
 #include "mitkImageCast.h"
-#include "mitkImageTimeSelector.h"
-
 #include <itkBinaryThresholdImageFilter.h>
-#include <itkConnectedComponentImageFilter.h>
 #include <itkCastImageFilter.h>
 #include <itkLabelObject.h>
 #include <itkLabelMap.h>
@@ -44,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, SplitConnectedRegionsTool3D, "SplitConnectedRegions3D tool");
+  MITK_TOOL_MACRO(Segmentation_EXPORT, SplitConnectedRegionsTool3D, "SplitConnectedRegionsTool3D");
 }
 
 mitk::SplitConnectedRegionsTool3D::SplitConnectedRegionsTool3D()

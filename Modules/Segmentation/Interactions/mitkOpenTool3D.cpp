@@ -48,7 +48,6 @@ namespace mitk {
 
 mitk::OpenTool3D::OpenTool3D() : m_Radius(1)
 {
-  m_ProgressCommand = mitk::ToolCommand::New();
 }
 
 mitk::OpenTool3D::~OpenTool3D()

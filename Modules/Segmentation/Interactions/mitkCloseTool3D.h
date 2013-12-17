@@ -18,12 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkCloseTool3D_h_Included
 
 #include "mitkAutoSegmentationTool.h"
-#include "mitkLegacyAdaptors.h"
 #include "SegmentationExports.h"
-#include "mitkDataNode.h"
-#include "mitkLabelSetImage.h"
-#include "mitkToolCommand.h"
-#include "mitkStateEvent.h"
 
 #include "itkImage.h"
 
@@ -53,7 +48,7 @@ class Segmentation_EXPORT CloseTool3D : public AutoSegmentationTool
     virtual const char* GetName() const;
     us::ModuleResource GetIconResource() const;
 
-    /// \brief Runs the tool.
+    /// \brief Executes the tool.
     void Run();
 
     /// \brief Sets the radius of the kernel used in the morphologic operation.

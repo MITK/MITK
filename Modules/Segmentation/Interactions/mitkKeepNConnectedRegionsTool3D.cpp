@@ -171,19 +171,13 @@ void mitk::KeepNConnectedRegionsTool3D::InternalProcessing( itk::Image< TPixel, 
   binaryShapeKeepNObjectsImageFilter->SetForegroundValue( 1 );
   binaryShapeKeepNObjectsImageFilter->ReleaseDataFlagOn();
 
-  if (m_ProgressCommand.IsNotNull())
-  {
-    m_ProgressCommand->AddStepsToDo(200);
-    thresholdFilter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
-    binaryShapeKeepNObjectsImageFilter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
-  }
+  m_ProgressCommand->AddStepsToDo(200);
+  thresholdFilter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
+  binaryShapeKeepNObjectsImageFilter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
 
   binaryShapeKeepNObjectsImageFilter->Update();
 
-  if (m_ProgressCommand.IsNotNull())
-  {
-    m_ProgressCommand->Reset();
-  }
+  m_ProgressCommand->Reset();
 
   typename ImageType::Pointer result = binaryShapeKeepNObjectsImageFilter->GetOutput();
   result->DisconnectPipeline();

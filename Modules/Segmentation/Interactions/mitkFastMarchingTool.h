@@ -116,7 +116,7 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
     /// \brief Adds the feedback image to the current working image.
     void AcceptPreview();
 
-    /// \brief Updates the itk pipeline and shows the result of FastMarching.
+    /// \brief Updates the tool and generates a new preview image
     void Run();
 
     /// \brief Clear all seed points.

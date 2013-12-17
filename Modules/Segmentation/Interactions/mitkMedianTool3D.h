@@ -18,11 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkMedianTool3D_h_Included
 
 #include "mitkAutoSegmentationTool.h"
-#include "mitkLegacyAdaptors.h"
 #include "SegmentationExports.h"
-//#include "mitkDataNode.h"
-#include "mitkLabelSetImage.h"
-#include "mitkStateEvent.h"
 
 #include "itkImage.h"
 

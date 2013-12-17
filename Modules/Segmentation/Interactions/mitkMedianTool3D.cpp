@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkMedianTool3D.h"
 
+#include "mitkLabelSetImage.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkImageAccessByItk.h"
@@ -44,7 +45,6 @@ namespace mitk {
 
 mitk::MedianTool3D::MedianTool3D() : m_Radius(1)
 {
-  m_ProgressCommand = mitk::ToolCommand::New();
 }
 
 mitk::MedianTool3D::~MedianTool3D()

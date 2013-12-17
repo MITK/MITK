@@ -18,12 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkDilateTool3D_h_Included
 
 #include "mitkAutoSegmentationTool.h"
-#include "mitkLegacyAdaptors.h"
 #include "SegmentationExports.h"
-#include "mitkDataNode.h"
-#include "mitkLabelSetImage.h"
-#include "mitkToolCommand.h"
-#include "mitkStateEvent.h"
 
 #include "itkImage.h"
 

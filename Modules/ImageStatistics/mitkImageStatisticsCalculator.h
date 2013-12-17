@@ -93,7 +93,7 @@ namespace mitk
  *
  * <b> Note:</b> Only hotspots are calculated for which the whole hotspot-sphere is
  *     inside the image by default. This behaviour can be changed by setting
- *     m_HotspotMustBeCompletelyInsideImage to false.
+ *     m_HotspotMustBeCompletelyInsideImage to false by calling SetHotspotMustBeCompletlyInsideImage().
  *
  * \image html hotspotexample.JPG
  *
@@ -140,7 +140,7 @@ namespace mitk
  * \subsection HotspotStatistics_tests Tests
  *
  * To check the correctness of the hotspot calculation, a special class
- * (\ref hotspottestdoc mitkImageStatisticsHotspotTest) has been created, which generates images with
+ * (\ref hotspottestdoc) has been created, which generates images with
  * known hotspot location and statistics. A number of unit tests use this class
  * to first generate an image of known properites and then verify that
  * ImageStatisticsCalculator is able to reproduce the known statistics.

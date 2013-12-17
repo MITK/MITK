@@ -1391,8 +1391,10 @@ ImageStatisticsCalculator::CalculateExtremaWorld(
     long distanceInPixels[VImageDimension];
     for(int dimension = 0; dimension < VImageDimension; ++dimension)
     {
-      // We add 0.5 because voxels are center-based: for example with a radius of 2.2 and a spacing of 1 two indices are enough
-      // because 2.2 / 1 + 0.5 = 2.7 => 2. But with a radius of 2.7 we need 3 indices because 2.7 / 1 + 0.5 = 3.2 => 3
+      // To confirm that the whole hotspot is inside the image we have to keep a specific distance to the image-borders, which is as long as
+      // the radius. To get the amount of indices we divide the radius by spacing and add 0.5 because voxels are center based:
+      // For example with a radius of 2.2 and a spacing of 1 two indices are enough because 2.2 / 1 + 0.5 = 2.7 => 2.
+      // But with a radius of 2.7 we need 3 indices because 2.7 / 1 + 0.5 = 3.2 => 3
       distanceInPixels[dimension] = int( neccessaryDistanceToImageBorderInMM / spacing[dimension] + 0.5);
     }
 

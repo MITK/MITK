@@ -32,6 +32,8 @@
 #include "itkNumericTraits.h"
 #include "itkImageRegionIteratorWithIndex.h"
 #include "itkImageFileWriter.h"
+#include <itkMapContainer.h>
+
 
 namespace itk
 {
@@ -169,6 +171,10 @@ public:
   /** Typedef to describe the Poiner type at the output image. */
   typedef typename TOutputImage::Pointer                      ImageType;
 
+  typedef  MapContainer<unsigned int, PointType>              MapContainerPoints;
+  typedef  MapContainer<unsigned int, VectorType>             MapContainerEdges;
+   typedef  MapContainer<unsigned int, double>                MapContainerRadius;
+
 
   /** Set/Get size of the output image */
   itkSetMacro(Size, SizeType);
@@ -218,11 +224,32 @@ public:
   virtual void SetRegionOfInterest(ItkVectorType, ItkVectorType);
   /** Optimize the mean value in the wanted sphere*/
   virtual void OptimizeMeanValue();
+  /** Write a .mps file to visualise the point in the sphere*/
+  virtual void WriteXMLToTest();
+  virtual void WriteXMLToTestTheCuboid();
+  virtual void WriteXMLToTestTheCuboidInsideTheSphere();
+  virtual void CalculateTheMidPointMeanValueInCuboid();
+  virtual void CalculateEdgesInSphere( PointType globalCoordinateMidpointCuboid, PointType globalCoordinateMidpointSphere, double cuboidRadius);
+  virtual double MultiGaussianFunctionValueAtCuboid(double xMin, double xMax, double yMin, double yMax, double zMin, double zMax);
+  virtual void InsertPoints( PointType globalCoordinateMidpointCuboid, double cuboidRadius);
+  virtual void GenerateCuboidSegmentationInSphere();
+  virtual double FunctionPhi(double value);
+
+  virtual void CalculateMidpoint();
+
+  virtual  unsigned int IntesectTheSphere( PointType globalCoordinateMidpointCuboid, PointType globalCoordinateMidpointSphere, double sideLength);
+  void SetNormalDistributionValues();
+
+  double Quadtrees( PointType globalCoordinateMidpointCuboid, PointType globalCoordinateMidpointSphere,  double sideLength, double meanValueTemp);
+
+
   /** Set the minimum possible pixel value. By default, it is
    * NumericTraits<TOutputImage::PixelType>::min(). */
   itkSetClampMacro( Min, OutputImagePixelType,
                     NumericTraits< OutputImagePixelType >::NonpositiveMin(),
                     NumericTraits< OutputImagePixelType >::max() );
+  /** Check if a index is inside the image*/
+  bool IsInImage(IndexType index);
 
   /** Get the minimum possible pixel value. */
   itkGetConstMacro(Min, OutputImagePixelType);
@@ -235,9 +262,6 @@ public:
 
   /** Get the maximum possible pixel value. */
   itkGetConstMacro(Max, OutputImagePixelType);
-
-
-
 
 protected:
   MultiGaussianImageSource();
@@ -276,6 +300,14 @@ private:
   typename TOutputImage::PixelType          m_Min;                   //minimum possible value
   typename TOutputImage::PixelType          m_Max;                   //maximum possible value
   PointType                                 m_GlobalCoordinate;      // physical coordiante of the sphere midpoint
+
+
+  MapContainerEdges                         m_Edges;
+  MapContainerPoints                        m_Midpoints, m_EdgePoints;
+  MapContainerRadius                        m_RadiusCuboid;
+
+  VectorType                                m_XCoordToTest, m_YCoordToTest, m_ZCoordToTest;
+  double                                    m_NormalDistValues [410];
   // The following variables are deprecated, and provided here just for
   // backward compatibility. It use is discouraged.
   mutable PointValueArrayType               m_OriginArray;

@@ -59,13 +59,10 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList
 mitk::ThreeDnTDICOMSeriesReader
 ::Condense3DBlocks(SortingBlockList& resultOf3DGrouping)
 {
-  MITK_INFO << "Attempt to group 3D+t blocks?";
   if (!m_Group3DandT)
   {
     return resultOf3DGrouping; // don't work if nobody asks us to
   }
-
-  MITK_INFO << "Attempt to group 3D+t blocks!";
 
   SortingBlockList remainingBlocks = resultOf3DGrouping;
 
@@ -166,7 +163,7 @@ mitk::ThreeDnTDICOMSeriesReader
 
     block.SetFlag("3D+t", true);
     block.SetIntProperty("timesteps", true3DnTBlocksTimeStepCount[o]);
-    MITK_INFO << "Found " << true3DnTBlocksTimeStepCount[o] << " timesteps";
+    MITK_DEBUG << "Found " << true3DnTBlocksTimeStepCount[o] << " timesteps";
 
     this->SetOutput( o, block );
   }
@@ -187,7 +184,6 @@ mitk::ThreeDnTDICOMSeriesReader
 
     if (block.GetFlag("3D+t", false))
     {
-      MITK_INFO << "!!!! ALERTA I need to work!";
       success &= this->LoadMitkImageForOutput(o);
     }
     else

@@ -131,7 +131,7 @@ mitk::GantryTiltInformation::GantryTiltInformation(
     // How do we now this is assumed? See header documentation for ITK code references
     //double itkAssumedSliceSpacing = sqrt( m_ShiftUp * m_ShiftUp + m_ShiftNormal * m_ShiftNormal );
 
-    MITK_INFO <<  "    calculated from slices " << m_NumberOfSlicesApart << " slices apart";
+    MITK_DEBUG << "    calculated from slices " << m_NumberOfSlicesApart << " slices apart";
     MITK_DEBUG << "    shift normal: " << m_ShiftNormal;
     MITK_DEBUG << "    shift normal assumed by ITK: " << m_ITKAssumedSliceSpacing;
     MITK_DEBUG << "    shift up: " << m_ShiftUp;

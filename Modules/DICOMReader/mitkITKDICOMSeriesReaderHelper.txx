@@ -80,12 +80,12 @@ mitk::ITKDICOMSeriesReaderHelper
 }
 
 #define MITK_DEBUG_OUTPUT_FILELIST(list)\
-  MITK_INFO << "-------------------------------------------"; \
+  MITK_DEBUG << "-------------------------------------------"; \
   for (StringContainer::const_iterator _iter = (list).begin(); _iter!=(list).end(); ++_iter) \
     { \
-      MITK_INFO <<" file '" << *_iter<< "'"; \
+      MITK_DEBUG <<" file '" << *_iter<< "'"; \
     } \
-  MITK_INFO << "-------------------------------------------";
+  MITK_DEBUG << "-------------------------------------------";
 
 template <typename PixelType>
 mitk::Image::Pointer
@@ -113,7 +113,7 @@ mitk::ITKDICOMSeriesReaderHelper
   if (preLoadedImageBlock.IsNull())
   {
     unsigned int currentTimeStep = 0;
-    MITK_INFO << "Start loading timestep " << currentTimeStep;
+    MITK_DEBUG << "Start loading timestep " << currentTimeStep;
     MITK_DEBUG_OUTPUT_FILELIST( filenamesForTimeSteps.front() )
     reader->SetFileNames(filenamesForTimeSteps.front());
     reader->Update();
@@ -125,32 +125,26 @@ mitk::ITKDICOMSeriesReaderHelper
       readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
     }
 
-    MITK_INFO << "1";
     image->InitializeByItk(readVolume.GetPointer(), 1, numberOfTimeSteps);
-    MITK_INFO << "2";
     image->SetImportVolume(readVolume->GetBufferPointer(), currentTimeStep++); // timestep 0
-    MITK_INFO << "3";
 
     // for other time-steps
     for (StringContainerList::const_iterator timestepsIter = ++(filenamesForTimeSteps.begin()); // start with SECOND entry
          timestepsIter != filenamesForTimeSteps.end();
          ++currentTimeStep, ++timestepsIter)
     {
-      MITK_INFO << "Start loading timestep " << currentTimeStep;
+      MITK_DEBUG << "Start loading timestep " << currentTimeStep;
       MITK_DEBUG_OUTPUT_FILELIST( *timestepsIter )
       reader->SetFileNames(*timestepsIter);
       reader->Update();
       readVolume = reader->GetOutput();
-    MITK_INFO << "1";
 
       if (correctTilt)
       {
         readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
       }
-    MITK_INFO << "2";
 
       image->SetImportVolume(readVolume->GetBufferPointer(), currentTimeStep);
-    MITK_INFO << "3";
     }
   }
   else

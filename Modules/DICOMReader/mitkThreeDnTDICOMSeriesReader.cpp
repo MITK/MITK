@@ -149,9 +149,8 @@ mitk::ThreeDnTDICOMSeriesReader
 
     // bad copy&paste code, should be handled in a better way
 
-    bool hasTilt = false;
-    const GantryTiltInformation& tiltInfo = m_EquiDistantBlocksSorter->GetTiltInformation( (gdcmFrameInfoList.front())->GetFilenameIfAvailable(), hasTilt );
-    block.SetHasGantryTilt( hasTilt );
+    const GantryTiltInformation& tiltInfo = m_EquiDistantBlocksSorter->GetTiltInformation( (gdcmFrameInfoList.front())->GetFilenameIfAvailable() );
+    block.SetHasGantryTilt( tiltInfo.IsRegularGantryTilt() );
     block.SetTiltInformation( tiltInfo );
 
     // assume
@@ -195,7 +194,7 @@ mitk::ThreeDnTDICOMSeriesReader
   return success;
 }
 
-// TODO why not handle 3D as a special case of 3D+t?? late insight.. .. because of ITK VImageDimension? .. could be a parameter
+// TODO why not handle 3D as a special case of 3D+t?? Late insight?.. .. because of ITK VImageDimension? .. could be a parameter
 bool
 mitk::ThreeDnTDICOMSeriesReader
 ::LoadMitkImageForOutput(unsigned int o)
@@ -240,5 +239,5 @@ mitk::ThreeDnTDICOMSeriesReader
 
   block.SetMitkImage( this->FixupSpacing( mitkImage, block ) ); // TODO FixupSpacing could be integrated with a check in SetMitkImage
 
-  return true; // TODO error handling? What about exceptions?
+  return true;
 }

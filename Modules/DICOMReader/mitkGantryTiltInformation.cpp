@@ -23,7 +23,7 @@ mitk::GantryTiltInformation::GantryTiltInformation()
 , m_ShiftRight(0.0)
 , m_ShiftNormal(0.0)
 , m_ITKAssumedSliceSpacing(0.0)
-, m_NumberOfSlicesApart(1)
+, m_NumberOfSlicesApart(0)
 {
 }
 
@@ -175,7 +175,7 @@ mitk::GantryTiltInformation::projectPointOnLine( Point3Dd p, Point3Dd lineOrigin
 double
 mitk::GantryTiltInformation::GetTiltCorrectedAdditionalSize(unsigned int imageSizeZ) const
 {
-  return fabs(m_ShiftUp /  static_cast<double>(m_NumberOfSlicesApart) * static_cast<double>(imageSizeZ-1)); // TODO care for SIZE of image
+  return fabs(m_ShiftUp /  static_cast<double>(m_NumberOfSlicesApart) * static_cast<double>(imageSizeZ-1));
 }
 
 double
@@ -201,7 +201,8 @@ mitk::GantryTiltInformation::GetRealZSpacing() const
 bool
 mitk::GantryTiltInformation::IsSheared() const
 {
-  return (   fabs(m_ShiftRight) > 0.001
+  return m_NumberOfSlicesApart &&
+         (   fabs(m_ShiftRight) > 0.001
           ||    fabs(m_ShiftUp) > 0.001);
 }
 
@@ -209,7 +210,8 @@ mitk::GantryTiltInformation::IsSheared() const
 bool
 mitk::GantryTiltInformation::IsRegularGantryTilt() const
 {
-  return (   fabs(m_ShiftRight) < 0.001
+  return m_NumberOfSlicesApart &&
+         (   fabs(m_ShiftRight) < 0.001
           &&    fabs(m_ShiftUp) > 0.001);
 }
 

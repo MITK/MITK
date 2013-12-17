@@ -28,6 +28,7 @@ namespace mitk
 {
 
 // TODO Philips3D!
+// TODO http://bugs.mitk.org/show_bug.cgi?id=11572 ?
 class DICOMReader_EXPORT DICOMFileReader : public itk::LightObject
 {
   public:

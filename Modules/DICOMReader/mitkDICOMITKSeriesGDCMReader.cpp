@@ -145,7 +145,6 @@ mitk::DICOMITKSeriesGDCMReader
 
   // scan files for sorting-relevant tags
 
-  // TODO provide tagToValueMappings to items in initialFramelist  / m_SortingResultInProgress
   timer.Start("Setup scanning");
   gdcm::Scanner gdcmScanner;
   for(SorterList::iterator sorterIter = m_Sorter.begin();
@@ -165,8 +164,8 @@ mitk::DICOMITKSeriesGDCMReader
   }
 
   // Add some of our own interest
-  gdcmScanner.AddTag( gdcm::Tag(0x0018,0x1164) ); // TODO what?
-  gdcmScanner.AddTag( gdcm::Tag(0x0028,0x0030) ); // TODO what?
+  gdcmScanner.AddTag( gdcm::Tag(0x0018,0x1164) ); // pixel spacing
+  gdcmScanner.AddTag( gdcm::Tag(0x0028,0x0030) ); // imager pixel spacing
 
   timer.Stop("Setup scanning");
 
@@ -180,7 +179,6 @@ mitk::DICOMITKSeriesGDCMReader
        inputIter != inputFilenames.end();
        ++inputIter)
   {
-    // TODO check DICOMness and non-multi-framedness
     initialFramelist.push_back( DICOMGDCMImageFrameInfo::New( DICOMImageFrameInfo::New(*inputIter, 0), gdcmScanner.GetMapping(inputIter->c_str()) ) );
   }
   m_SortingResultInProgress.clear();
@@ -267,9 +265,8 @@ mitk::DICOMITKSeriesGDCMReader
     DICOMImageBlockDescriptor block;
     block.SetImageFrameList( frameList );
 
-    bool hasTilt = false;
-    const GantryTiltInformation& tiltInfo = m_EquiDistantBlocksSorter->GetTiltInformation( (gdcmFrameInfoList.front())->GetFilenameIfAvailable(), hasTilt );
-    block.SetFlag("gantryTilt", hasTilt);
+    const GantryTiltInformation& tiltInfo = m_EquiDistantBlocksSorter->GetTiltInformation( (gdcmFrameInfoList.front())->GetFilenameIfAvailable() );
+    block.SetFlag("gantryTilt", tiltInfo.IsRegularGantryTilt());
     block.SetTiltInformation( tiltInfo );
 
     // assume
@@ -336,7 +333,7 @@ mitk::DICOMITKSeriesGDCMReader
 
   block.SetMitkImage( this->FixupSpacing( mitkImage, block ) );
 
-  return true; // TODO error handling? What about exceptions?
+  return true;
 }
 
 

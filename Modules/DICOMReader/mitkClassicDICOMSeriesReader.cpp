@@ -32,7 +32,6 @@ mitk::ClassicDICOMSeriesReader
   //tagSorter->AddDistinguishingTag( DICOMTag(0x0020, 0x0052) ); // Frame of Reference UID
 
   // a sorter...
-  // TODO ugly syntax, improve..
   mitk::DICOMSortCriterion::ConstPointer sorting =
     mitk::SortByImagePositionPatient::New( // image position patient and image orientation
       mitk::DICOMSortByTag::New( DICOMTag(0x0020, 0x0012), // aqcuisition number

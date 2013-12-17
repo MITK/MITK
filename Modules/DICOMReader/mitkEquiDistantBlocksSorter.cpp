@@ -16,20 +16,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
 ::SliceGroupingAnalysisResult()
-:m_GantryTilt(false)
 {
 }
 
 mitk::DICOMDatasetList
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
-::GetBlockFilenames()
+::GetBlockDatasets()
 {
   return m_GroupedFiles;
 }
 
 mitk::DICOMDatasetList
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
-::GetUnsortedFilenames()
+::GetUnsortedDatasets()
 {
   return m_UnsortedFiles;
 }
@@ -38,7 +37,7 @@ bool
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
 ::ContainsGantryTilt()
 {
-  return m_GantryTilt;
+  return m_TiltInfo.IsRegularGantryTilt();
 }
 
 void
@@ -80,7 +79,6 @@ void
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
 ::FlagGantryTilt(const GantryTiltInformation& tiltInfo)
 {
-  m_GantryTilt = true;
   m_TiltInfo = tiltInfo;
 }
 
@@ -98,7 +96,7 @@ mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
   assert( !m_GroupedFiles.empty() );
   m_UnsortedFiles.insert( m_UnsortedFiles.begin(), m_GroupedFiles.back() );
   m_GroupedFiles.pop_back();
-  m_GantryTilt = false;
+  m_TiltInfo = GantryTiltInformation();
 }
 
 // ------------------------ end helper class
@@ -168,17 +166,17 @@ mitk::EquiDistantBlocksSorter
   {
     SliceGroupingAnalysisResult regularBlock = this->AnalyzeFileForITKImageSeriesReaderSpacingAssumption( remainingInput, m_AcceptTilt );
 
-    DICOMDatasetList inBlock = regularBlock.GetBlockFilenames();
-    DICOMDatasetList laterBlock = regularBlock.GetUnsortedFilenames();
+    DICOMDatasetList inBlock = regularBlock.GetBlockDatasets();
+    DICOMDatasetList laterBlock = regularBlock.GetUnsortedDatasets();
     MITK_DEBUG << "Result: sorted 3D group with " << inBlock.size() << " files";
     for (DICOMDatasetList::const_iterator diter = inBlock.begin(); diter != inBlock.end(); ++diter)
       MITK_DEBUG << "  IN  " << (*diter)->GetFilenameIfAvailable();
     for (DICOMDatasetList::const_iterator diter = laterBlock.begin(); diter != laterBlock.end(); ++diter)
       MITK_DEBUG << " OUT  " << (*diter)->GetFilenameIfAvailable();
 
-    outputs.push_back( regularBlock.GetBlockFilenames() );
+    outputs.push_back( regularBlock.GetBlockDatasets() );
     m_SliceGroupingResults.push_back( regularBlock );
-    remainingInput = regularBlock.GetUnsortedFilenames();
+    remainingInput = regularBlock.GetUnsortedDatasets();
   }
 
   unsigned int numberOfOutputs = outputs.size();
@@ -195,7 +193,7 @@ mitk::EquiDistantBlocksSorter
 
 const mitk::GantryTiltInformation
 mitk::EquiDistantBlocksSorter
-::GetTiltInformation(const std::string& filename, bool& hasTiltInfo)
+::GetTiltInformation(const std::string& filename)
 {
   for (ResultsList::iterator ri = m_SliceGroupingResults.begin();
        ri != m_SliceGroupingResults.end();
@@ -205,14 +203,11 @@ mitk::EquiDistantBlocksSorter
 
     if (filename == result.GetFirstFilenameOfBlock())
     {
-      hasTiltInfo = result.ContainsGantryTilt(); // this is a returning statement, don't remove
-      if (hasTiltInfo)
-      {
-        return result.GetTiltInfo();
-      }
+      return result.GetTiltInfo();
     }
   }
 
+  MITK_WARN << "Request for tilt information on file '" << filename << "' could not be answered";
   return GantryTiltInformation(); // empty
 }
 
@@ -267,7 +262,7 @@ mitk::EquiDistantBlocksSorter
       // with standard DICOM files this can happen to: CR, DX, SC
       MITK_DEBUG << "    ==> Sort away " << *dsIter << " for later analysis (no position information)"; // we already have one occupying this position
 
-      if ( result.GetBlockFilenames().empty() ) // nothing WITH position information yet
+      if ( result.GetBlockDatasets().empty() ) // nothing WITH position information yet
       {
         // ==> this is a group of its own, stop processing, come back later
         result.AddFileToSortedBlock( *dsIter );
@@ -340,15 +335,8 @@ mitk::EquiDistantBlocksSorter
             // check if this is at least roughly the same angle as recorded in DICOM tags
             double angle = 0.0;
             std::string tiltStr = (*dsIter)->GetTagValueAsString( tagGantryTilt );
-            const char* convertInput = tiltStr.c_str();
-            char* convertEnd(NULL);
-            if (!tiltStr.empty())
-            {
-              // read value, compare to calculated angle
-              angle = strtod(convertInput, &convertEnd); // TODO check errors!
-            }
-
-            if (convertEnd != convertInput)
+            std::istringstream i(tiltStr);
+            if (i >> angle)
             {
               MITK_DEBUG << "Comparing recorded tilt angle " << angle << " against calculated value " << tiltInfo.GetTiltAngleInDegrees();
               // TODO we probably want the signs correct, too (that depends: this is just a rough check, nothing serious)
@@ -448,7 +436,7 @@ mitk::EquiDistantBlocksSorter
     // THEN we would want to also split the two previous files (simple) because
     // we don't have any reason to assume they belong together
 
-    if ( result.GetBlockFilenames().size() == 2 )
+    if ( result.GetBlockDatasets().size() == 2 )
     {
       result.UndoPrematureGrouping();
     }
@@ -457,9 +445,9 @@ mitk::EquiDistantBlocksSorter
   // update tilt info to get maximum precision
   // earlier, tilt was only calculated from first and second slice.
   // now that we know the whole range, we can re-calculate using the very first and last slice
-  if ( result.ContainsGantryTilt() && result.GetBlockFilenames().size() > 1 )
+  if ( result.ContainsGantryTilt() && result.GetBlockDatasets().size() > 1 )
   {
-    DICOMDatasetList datasets = result.GetBlockFilenames();
+    DICOMDatasetList datasets = result.GetBlockDatasets();
     DICOMDatasetAccess* firstDataset = datasets.front();
     DICOMDatasetAccess* lastDataset = datasets.back();
     unsigned int numberOfSlicesApart = datasets.size() - 1;

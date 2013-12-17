@@ -112,7 +112,8 @@ private slots:
   // reaction to the combobox change "Change Layer"
   void OnChangeLayer(int);
 
-  void OnSegmentationInteractorToggled(bool);
+  // reaction to the button "Deactive Active Tool"
+  void OnDeactivateActiveTool();
 
   void OnLockExteriorToggled(bool);
 

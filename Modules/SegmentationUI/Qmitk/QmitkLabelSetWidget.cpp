@@ -55,8 +55,8 @@ m_ToolManager(NULL)
 
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(activeLabelChanged(int)), this, SLOT(OnActiveLabelChanged(int)) );
 //  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(newLabel()), this, SLOT(OnNewLabel()) );
-  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(importSegmentation()), this, SLOT( OnImportSegmentation()) );
-  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(importLabeledImage()), this, SLOT( OnImportLabeledImage()) );
+  //connect( m_Controls.m_LabelSetTableWidget, SIGNAL(importSegmentation()), this, SLOT( OnImportSegmentation()) );
+  //connect( m_Controls.m_LabelSetTableWidget, SIGNAL(importLabeledImage()), this, SLOT( OnImportLabeledImage()) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(renameLabel(int, const mitk::Color&, const std::string&)), this, SLOT(OnRenameLabel(int, const mitk::Color&, const std::string&)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createSurface(int)), this, SLOT(OnCreateSurface(int)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(toggleOutline(bool)), this, SLOT(OnToggleOutline(bool)) );
@@ -69,19 +69,13 @@ m_ToolManager(NULL)
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(combineAndCreateMask( const QList<QTableWidgetSelectionRange>& )),
       this, SLOT(OnCombineAndCreateMask( const QList<QTableWidgetSelectionRange>&)) );
 
-  //connect( m_Controls.m_btNewSegmentation, SIGNAL(clicked()), this, SLOT( OnNewSegmentation()) );
-//  connect( m_Controls.m_btSaveSegmentation, SIGNAL(clicked()), this, SLOT( OnSaveSegmentation()) );
-//  connect( m_Controls.m_btLoadSegmentation, SIGNAL(clicked()), this, SLOT( OnLoadSegmentation()) );
-//  connect( m_Controls.m_btDeleteSegmentation, SIGNAL(clicked()), this, SLOT( OnDeleteSegmentation()) );
-
-  //connect( m_Controls.m_btNewLabel, SIGNAL(clicked()), this, SLOT( OnNewLabel()) );
   connect( m_Controls.m_btAddLayer, SIGNAL(clicked()), this, SLOT( OnAddLayer()) );
   connect( m_Controls.m_btDeleteLayer, SIGNAL(clicked()), this, SLOT( OnDeleteLayer()) );
   connect( m_Controls.m_btPreviousLayer, SIGNAL(clicked()), this, SLOT( OnPreviousLayer()) );
   connect( m_Controls.m_btNextLayer, SIGNAL(clicked()), this, SLOT( OnNextLayer()) );
 
   connect( m_Controls.m_btLockExterior, SIGNAL(toggled(bool)), this, SLOT( OnLockExteriorToggled(bool)) );
-  connect( m_Controls.m_btSegmentationInteractor, SIGNAL(toggled(bool)), this, SLOT( OnSegmentationInteractorToggled(bool)) );
+  connect( m_Controls.m_btSegmentationInteractor, SIGNAL(clicked()), this, SLOT( OnDeactivateActiveTool()) );
 
   connect( m_Controls.m_cbActiveLayer, SIGNAL(currentIndexChanged(int)), this, SLOT( OnChangeLayer(int)) );
 
@@ -386,7 +380,7 @@ void QmitkLabelSetWidget::OnAddLayer()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkLabelSetWidget::OnSegmentationInteractorToggled(bool checked)
+void QmitkLabelSetWidget::OnDeactivateActiveTool()
 {
   m_ToolManager->ActivateTool(-1);
 }

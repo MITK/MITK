@@ -150,7 +150,6 @@ mitk::ThreeDnTDICOMSeriesReader
     // bad copy&paste code, should be handled in a better way
 
     const GantryTiltInformation& tiltInfo = m_EquiDistantBlocksSorter->GetTiltInformation( (gdcmFrameInfoList.front())->GetFilenameIfAvailable() );
-    block.SetHasGantryTilt( tiltInfo.IsRegularGantryTilt() );
     block.SetTiltInformation( tiltInfo );
 
     // assume

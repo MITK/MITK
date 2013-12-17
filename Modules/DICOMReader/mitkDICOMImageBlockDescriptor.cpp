@@ -22,7 +22,6 @@ mitk::DICOMImageBlockDescriptor
 ,m_PixelSpacingInterpretation()
 ,m_PixelSpacing("")
 ,m_ImagerPixelSpacing("")
-,m_HasGantryTilt( false )
 ,m_PropertyList(PropertyList::New())
 {
 }
@@ -41,7 +40,6 @@ mitk::DICOMImageBlockDescriptor
 ,m_PixelSpacingInterpretation( other.m_PixelSpacingInterpretation )
 ,m_PixelSpacing( other.m_PixelSpacing )
 ,m_ImagerPixelSpacing( other.m_ImagerPixelSpacing )
-,m_HasGantryTilt( other.m_HasGantryTilt )
 ,m_TiltInformation( other.m_TiltInformation )
 ,m_PropertyList( other.m_PropertyList->Clone() )
 {
@@ -64,7 +62,6 @@ mitk::DICOMImageBlockDescriptor
     m_PixelSpacingInterpretation = other.m_PixelSpacingInterpretation;
     m_PixelSpacing = other.m_PixelSpacing;
     m_ImagerPixelSpacing = other.m_ImagerPixelSpacing;
-    m_HasGantryTilt = other.m_HasGantryTilt;
     m_TiltInformation = other.m_TiltInformation;
 
     if (other.m_PropertyList)
@@ -78,20 +75,6 @@ mitk::DICOMImageBlockDescriptor
     }
   }
   return *this;
-}
-
-bool
-mitk::DICOMImageBlockDescriptor
-::HasGantryTilt() const
-{
-  return m_HasGantryTilt;
-}
-
-void
-mitk::DICOMImageBlockDescriptor
-::SetHasGantryTilt(bool hasi)
-{
-  m_HasGantryTilt = hasi;
 }
 
 void

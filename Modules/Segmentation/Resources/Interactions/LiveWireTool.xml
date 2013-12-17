@@ -17,7 +17,7 @@
       <transition event_class="InteractionKeyEvent" event_variant="KeyDelete" target="Active" >
         <action name="DeletePoint" ID="120"/>
       </transition>
-      <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="Active" >
+      <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="Start" >
         <condition name="CheckContourClosed" />
         <action name="FinishContour" ID="44" />
       </transition>

@@ -26,7 +26,6 @@ mitk::DICOMITKSeriesGDCMReader
 ::DICOMITKSeriesGDCMReader()
 :DICOMFileReader()
 ,m_FixTiltByShearing(true)
-,m_Group3DplusT(false)
 {
 }
 
@@ -34,7 +33,6 @@ mitk::DICOMITKSeriesGDCMReader
 ::DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other )
 :DICOMFileReader(other)
 ,m_FixTiltByShearing(false)
-,m_Group3DplusT(false)
 {
 }
 
@@ -50,6 +48,9 @@ mitk::DICOMITKSeriesGDCMReader
   if (this != &other)
   {
     DICOMFileReader::operator=(other);
+    this->m_FixTiltByShearing = other.m_FixTiltByShearing;
+    this->m_Sorter = other.m_Sorter; // ?? TODO should probably clone the list items. Semantics to be defined..
+    this->m_EquiDistantBlocksSorter = other.m_EquiDistantBlocksSorter->Clone();
   }
   return *this;
 }
@@ -118,6 +119,13 @@ mitk::DICOMITKSeriesGDCMReader
   return output;
 }
 
+mitk::DICOMITKSeriesGDCMReader::SortingBlockList
+mitk::DICOMITKSeriesGDCMReader
+::Condense3DBlocks(SortingBlockList& input)
+{
+  return input; // to be implemented differently by sub-classes
+}
+
 void
 mitk::DICOMITKSeriesGDCMReader
 ::AnalyzeInputFiles()
@@ -156,8 +164,8 @@ mitk::DICOMITKSeriesGDCMReader
   }
 
   // Add some of our own interest
-  gdcmScanner.AddTag( gdcm::Tag(0x0018,0x1164) );
-  gdcmScanner.AddTag( gdcm::Tag(0x0028,0x0030) );
+  gdcmScanner.AddTag( gdcm::Tag(0x0018,0x1164) ); // TODO what?
+  gdcmScanner.AddTag( gdcm::Tag(0x0028,0x0030) ); // TODO what?
 
   timer.Stop("Setup scanning");
 
@@ -237,11 +245,15 @@ mitk::DICOMITKSeriesGDCMReader
   }
   timer.Stop("Sorting frames");
 
+  timer.Start("Condensing 3D blocks (3D+t or vector values)");
+  m_SortingResultInProgress = this->Condense3DBlocks( m_SortingResultInProgress );
+  timer.Stop("Condensing 3D blocks (3D+t or vector values)");
+
   // provide final result as output
 
   timer.Start("Output");
-  this->SetNumberOfOutputs( m_SortingResultInProgress.size() );
-  unsigned int o = 0;
+  unsigned int o = this->GetNumberOfOutputs();
+  this->SetNumberOfOutputs( o + m_SortingResultInProgress.size() ); // Condense3DBlocks may already have added outputs!
   for (SortingBlockList::iterator blockIter = m_SortingResultInProgress.begin();
        blockIter != m_SortingResultInProgress.end();
        ++o, ++blockIter)
@@ -256,7 +268,7 @@ mitk::DICOMITKSeriesGDCMReader
 
     bool hasTilt = false;
     const GantryTiltInformation& tiltInfo = m_EquiDistantBlocksSorter->GetTiltInformation( (gdcmFrameInfoList.front())->GetFilenameIfAvailable(), hasTilt );
-    block.SetHasGantryTilt( hasTilt );
+    block.SetFlag("gantryTilt", hasTilt);
     block.SetTiltInformation( tiltInfo );
 
     // assume
@@ -281,52 +293,49 @@ bool
 mitk::DICOMITKSeriesGDCMReader
 ::LoadImages()
 {
-  mitk::ITKDICOMSeriesReaderHelper helper;
+  bool success = true;
 
   unsigned int numberOfOutputs = this->GetNumberOfOutputs();
   for (unsigned int o = 0; o < numberOfOutputs; ++o)
   {
-    DICOMImageBlockDescriptor& block = this->InternalGetOutput(o);
-    const DICOMImageFrameList& frames = block.GetImageFrameList();
-    const GantryTiltInformation tiltInfo = block.GetTiltInformation();
-    bool hasTilt = block.HasGantryTilt();
-    if (hasTilt)
-    {
-      MITK_DEBUG << "When loading image " << o << ": got tilt info:";
-      tiltInfo.Print(std::cout);
-    }
-    else
-    {
-      MITK_DEBUG << "When loading image " << o << ": has NO info.";
-    }
-
-    ITKDICOMSeriesReaderHelper::StringContainer filenames;
-    for (DICOMImageFrameList::const_iterator frameIter = frames.begin();
-        frameIter != frames.end();
-        ++frameIter)
-    {
-      filenames.push_back( (*frameIter)->Filename );
-    }
-
-    mitk::Image::Pointer mitkImage = helper.Load( filenames, m_FixTiltByShearing && hasTilt, tiltInfo ); // TODO preloaded images, caching..?
-
-    Vector3D imageSpacing = mitkImage->GetGeometry()->GetSpacing();
-
-    ScalarType desiredSpacingX = imageSpacing[0];
-    ScalarType desiredSpacingY = imageSpacing[1];
-    block.GetDesiredMITKImagePixelSpacing( desiredSpacingX, desiredSpacingY ); // prefer pixel spacing over imager pixel spacing
-
-    MITK_DEBUG << "Loaded image with spacing " << imageSpacing[0] << ", " << imageSpacing[1];
-    MITK_DEBUG << "Found correct spacing info " << desiredSpacingX << ", " << desiredSpacingY;
-
-    imageSpacing[0] = desiredSpacingX;
-    imageSpacing[1] = desiredSpacingY;
-    mitkImage->GetGeometry()->SetSpacing( imageSpacing );
-
-    block.SetMitkImage( mitkImage );
+    success &= this->LoadMitkImageForOutput(o);
   }
 
-  return true;
+  return success;
+}
+
+bool
+mitk::DICOMITKSeriesGDCMReader
+::LoadMitkImageForOutput(unsigned int o)
+{
+  DICOMImageBlockDescriptor& block = this->InternalGetOutput(o);
+  const DICOMImageFrameList& frames = block.GetImageFrameList();
+  const GantryTiltInformation tiltInfo = block.GetTiltInformation();
+  bool hasTilt = block.GetFlag("gantryTilt", false);
+  if (hasTilt)
+  {
+    MITK_DEBUG << "When loading image " << o << ": got tilt info:";
+    tiltInfo.Print(std::cout);
+  }
+  else
+  {
+    MITK_DEBUG << "When loading image " << o << ": has NO info.";
+  }
+
+  ITKDICOMSeriesReaderHelper::StringContainer filenames;
+  for (DICOMImageFrameList::const_iterator frameIter = frames.begin();
+      frameIter != frames.end();
+      ++frameIter)
+  {
+    filenames.push_back( (*frameIter)->Filename );
+  }
+
+  mitk::ITKDICOMSeriesReaderHelper helper;
+  mitk::Image::Pointer mitkImage = helper.Load( filenames, m_FixTiltByShearing && hasTilt, tiltInfo ); // TODO preloaded images, caching..?
+
+  block.SetMitkImage( this->FixupSpacing( mitkImage, block ) );
+
+  return true; // TODO error handling? What about exceptions?
 }
 
 
@@ -358,4 +367,25 @@ mitk::DICOMITKSeriesGDCMReader
 
   // TODO CHECK
   this->AddSortingElement( m_EquiDistantBlocksSorter );
+}
+
+mitk::Image::Pointer
+mitk::DICOMITKSeriesGDCMReader
+::FixupSpacing(Image* mitkImage, const DICOMImageBlockDescriptor& block) const
+{
+  assert(mitkImage);
+  Vector3D imageSpacing = mitkImage->GetGeometry()->GetSpacing();
+
+  ScalarType desiredSpacingX = imageSpacing[0];
+  ScalarType desiredSpacingY = imageSpacing[1];
+  block.GetDesiredMITKImagePixelSpacing( desiredSpacingX, desiredSpacingY ); // prefer pixel spacing over imager pixel spacing
+
+  MITK_DEBUG << "Loaded image with spacing " << imageSpacing[0] << ", " << imageSpacing[1];
+  MITK_DEBUG << "Found correct spacing info " << desiredSpacingX << ", " << desiredSpacingY;
+
+  imageSpacing[0] = desiredSpacingX;
+  imageSpacing[1] = desiredSpacingY;
+  mitkImage->GetGeometry()->SetSpacing( imageSpacing );
+
+  return mitkImage;
 }

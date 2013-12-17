@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+// TODO Philips3D!
 class DICOMReader_EXPORT DICOMFileReader : public itk::LightObject
 {
   public:

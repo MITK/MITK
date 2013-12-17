@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMTag.h"
 
 #include "mitkImage.h"
+#include "mitkProperties.h"
 
 #include "mitkGantryTiltInformation.h"
 
@@ -41,6 +42,13 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
     void SetImageFrameList(const DICOMImageFrameList& framelist);
     const DICOMImageFrameList& GetImageFrameList() const;
 
+    void SetProperty(const std::string& key, BaseProperty* value);
+    BaseProperty* GetProperty(const std::string& key) const;
+    void SetFlag(const std::string& key, bool value);
+    bool GetFlag(const std::string& key, bool defaultValue) const;
+    void SetIntProperty(const std::string& key, int value);
+    int GetIntProperty(const std::string& key, int defaultValue) const;
+
     void SetMitkImage(Image::Pointer image);
     Image::Pointer GetMitkImage() const;
 
@@ -58,7 +66,7 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
     void GetDesiredMITKImagePixelSpacing( ScalarType& spacingX, ScalarType& spacingY) const;
 
     bool HasGantryTilt() const;
-    bool SetHasGantryTilt(bool hasi);
+    void SetHasGantryTilt(bool hasi);
 
     void SetTiltInformation(const GantryTiltInformation& info);
     const GantryTiltInformation GetTiltInformation() const;
@@ -76,6 +84,8 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
 
     bool m_HasGantryTilt;
     GantryTiltInformation m_TiltInformation;
+
+    PropertyList::Pointer m_PropertyList;
 };
 
 }

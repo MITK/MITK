@@ -23,6 +23,7 @@ mitk::DICOMImageBlockDescriptor
 ,m_PixelSpacing("")
 ,m_ImagerPixelSpacing("")
 ,m_HasGantryTilt( false )
+,m_PropertyList(PropertyList::New())
 {
 }
 
@@ -42,6 +43,7 @@ mitk::DICOMImageBlockDescriptor
 ,m_ImagerPixelSpacing( other.m_ImagerPixelSpacing )
 ,m_HasGantryTilt( other.m_HasGantryTilt )
 ,m_TiltInformation( other.m_TiltInformation )
+,m_PropertyList( other.m_PropertyList->Clone() )
 {
   if (m_MitkImage)
   {
@@ -65,9 +67,14 @@ mitk::DICOMImageBlockDescriptor
     m_HasGantryTilt = other.m_HasGantryTilt;
     m_TiltInformation = other.m_TiltInformation;
 
-    if (m_MitkImage)
+    if (other.m_PropertyList)
     {
-      m_MitkImage = m_MitkImage->Clone();
+      m_PropertyList = other.m_PropertyList->Clone();
+    }
+
+    if (other.m_MitkImage)
+    {
+      m_MitkImage = other.m_MitkImage->Clone();
     }
   }
   return *this;
@@ -80,7 +87,7 @@ mitk::DICOMImageBlockDescriptor
   return m_HasGantryTilt;
 }
 
-bool
+void
 mitk::DICOMImageBlockDescriptor
 ::SetHasGantryTilt(bool hasi)
 {
@@ -241,4 +248,60 @@ mitk::DICOMImageBlockDescriptor
   }
 }
 
+void
+mitk::DICOMImageBlockDescriptor
+::SetProperty(const std::string& key, BaseProperty* value)
+{
+  m_PropertyList->SetProperty(key, value);
+}
 
+mitk::BaseProperty*
+mitk::DICOMImageBlockDescriptor
+::GetProperty(const std::string& key) const
+{
+  return m_PropertyList->GetProperty(key);
+}
+
+void
+mitk::DICOMImageBlockDescriptor
+::SetFlag(const std::string& key, bool value)
+{
+  m_PropertyList->ReplaceProperty(key, BoolProperty::New(value));
+}
+
+bool
+mitk::DICOMImageBlockDescriptor
+::GetFlag(const std::string& key, bool defaultValue) const
+{
+  BoolProperty::ConstPointer boolProp = dynamic_cast<BoolProperty*>( this->GetProperty(key) );
+  if (boolProp.IsNotNull())
+  {
+    return boolProp->GetValue();
+  }
+  else
+  {
+    return defaultValue;
+  }
+}
+
+void
+mitk::DICOMImageBlockDescriptor
+::SetIntProperty(const std::string& key, int value)
+{
+  m_PropertyList->ReplaceProperty(key, IntProperty::New(value));
+}
+
+int
+mitk::DICOMImageBlockDescriptor
+::GetIntProperty(const std::string& key, int defaultValue) const
+{
+  IntProperty::ConstPointer intProp = dynamic_cast<IntProperty*>( this->GetProperty(key) );
+  if (intProp.IsNotNull())
+  {
+    return intProp->GetValue();
+  }
+  else
+  {
+    return defaultValue;
+  }
+}

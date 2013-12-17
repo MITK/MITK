@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkClassicDICOMSeriesReader_h
 #define mitkClassicDICOMSeriesReader_h
 
-#include "mitkDICOMITKSeriesGDCMReader.h"
+#include "mitkThreeDnTDICOMSeriesReader.h"
 
 #include "DICOMReaderExports.h"
 
@@ -27,7 +27,7 @@ namespace mitk
 /*
    \brief Sorting and grouping like mitk::DicomSeriesReader until 2013.
 */
-class DICOMReader_EXPORT ClassicDICOMSeriesReader : public DICOMITKSeriesGDCMReader
+class DICOMReader_EXPORT ClassicDICOMSeriesReader : public ThreeDnTDICOMSeriesReader
 {
   public:
 

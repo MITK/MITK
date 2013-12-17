@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ClassicDICOMSeriesReader
 ::ClassicDICOMSeriesReader()
-:DICOMITKSeriesGDCMReader()
+:ThreeDnTDICOMSeriesReader()
 {
   mitk::DICOMTagBasedSorter::Pointer tagSorter = mitk::DICOMTagBasedSorter::New();
 
@@ -57,11 +57,12 @@ mitk::ClassicDICOMSeriesReader
   this->AddSortingElement( tagSorter );
 
   this->SetFixTiltByShearing(true);
+  this->SetGroup3DandT(true);
 }
 
 mitk::ClassicDICOMSeriesReader
 ::ClassicDICOMSeriesReader(const ClassicDICOMSeriesReader& other )
-:DICOMITKSeriesGDCMReader(other)
+:ThreeDnTDICOMSeriesReader(other)
 {
 }
 
@@ -76,7 +77,7 @@ mitk::ClassicDICOMSeriesReader
 {
   if (this != &other)
   {
-    DICOMITKSeriesGDCMReader::operator=(other);
+    ThreeDnTDICOMSeriesReader::operator=(other);
   }
   return *this;
 }

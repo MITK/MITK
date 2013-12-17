@@ -79,6 +79,101 @@ mitk::ITKDICOMSeriesReaderHelper
   return image;
 }
 
+#define MITK_DEBUG_OUTPUT_FILELIST(list)\
+  MITK_INFO << "-------------------------------------------"; \
+  for (StringContainer::const_iterator _iter = (list).begin(); _iter!=(list).end(); ++_iter) \
+    { \
+      MITK_INFO <<" file '" << *_iter<< "'"; \
+    } \
+  MITK_INFO << "-------------------------------------------";
+
+template <typename PixelType>
+mitk::Image::Pointer
+mitk::ITKDICOMSeriesReaderHelper
+::LoadDICOMByITK3DnT(
+    const StringContainerList& filenamesForTimeSteps,
+    bool correctTilt,
+    const GantryTiltInformation& tiltInfo,
+    itk::GDCMImageIO::Pointer& io,
+    Image::Pointer preLoadedImageBlock )
+{
+  unsigned int numberOfTimeSteps = filenamesForTimeSteps.size();
+
+  mitk::Image::Pointer image = mitk::Image::New();
+
+  typedef itk::Image<PixelType, 4> ImageType;
+  typedef itk::ImageSeriesReader<ImageType> ReaderType;
+
+  io = itk::GDCMImageIO::New();
+  typename ReaderType::Pointer reader = ReaderType::New();
+
+  reader->SetImageIO(io);
+  reader->ReverseOrderOff();
+
+  if (preLoadedImageBlock.IsNull())
+  {
+    unsigned int currentTimeStep = 0;
+    MITK_INFO << "Start loading timestep " << currentTimeStep;
+    MITK_DEBUG_OUTPUT_FILELIST( filenamesForTimeSteps.front() )
+    reader->SetFileNames(filenamesForTimeSteps.front());
+    reader->Update();
+    typename ImageType::Pointer readVolume = reader->GetOutput();
+
+    // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
+    if (correctTilt)
+    {
+      readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
+    }
+
+    MITK_INFO << "1";
+    image->InitializeByItk(readVolume.GetPointer(), 1, numberOfTimeSteps);
+    MITK_INFO << "2";
+    image->SetImportVolume(readVolume->GetBufferPointer(), currentTimeStep++); // timestep 0
+    MITK_INFO << "3";
+
+    // for other time-steps
+    for (StringContainerList::const_iterator timestepsIter = ++(filenamesForTimeSteps.begin()); // start with SECOND entry
+         timestepsIter != filenamesForTimeSteps.end();
+         ++currentTimeStep, ++timestepsIter)
+    {
+      MITK_INFO << "Start loading timestep " << currentTimeStep;
+      MITK_DEBUG_OUTPUT_FILELIST( *timestepsIter )
+      reader->SetFileNames(*timestepsIter);
+      reader->Update();
+      readVolume = reader->GetOutput();
+    MITK_INFO << "1";
+
+      if (correctTilt)
+      {
+        readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
+      }
+    MITK_INFO << "2";
+
+      image->SetImportVolume(readVolume->GetBufferPointer(), currentTimeStep);
+    MITK_INFO << "3";
+    }
+  }
+  else
+  { // TODO check and fix
+    image = preLoadedImageBlock;
+    StringContainer fakeList;
+    fakeList.push_back( filenamesForTimeSteps.front().front() );
+    reader->SetFileNames( fakeList ); // we always need to load at least one file to get the MetaDataDictionary
+    reader->Update();
+  }
+
+  MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", "
+                                      << image->GetDimension(1) << ", "
+                                      << image->GetDimension(2) << "]";
+
+  MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", "
+                                    << image->GetGeometry()->GetSpacing()[1] << ", "
+                                    << image->GetGeometry()->GetSpacing()[2] << "]";
+
+  return image;
+}
+
+
 template <typename ImageType>
 typename ImageType::Pointer
 mitk::ITKDICOMSeriesReaderHelper

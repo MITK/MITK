@@ -185,6 +185,8 @@ mitk::DICOMITKSeriesGDCMReader
 
   timer.Start("Reset");
   this->ClearOutputs();
+  m_InputFrameList.clear();
+  m_GDCMScanner.ClearTags();
   timer.Stop("Reset");
 
   // prepare initial sorting (== list of input files)
@@ -193,7 +195,6 @@ mitk::DICOMITKSeriesGDCMReader
   // scan files for sorting-relevant tags
 
   timer.Start("Setup scanning");
-  gdcm::Scanner gdcmScanner;
   for(SorterList::iterator sorterIter = m_Sorter.begin();
       sorterIter != m_Sorter.end();
       ++sorterIter)
@@ -206,32 +207,35 @@ mitk::DICOMITKSeriesGDCMReader
         ++tagIter)
     {
       MITK_DEBUG << "Sorting uses tag " << tagIter->GetGroup() << "," << tagIter->GetElement();
-      gdcmScanner.AddTag( gdcm::Tag(tagIter->GetGroup(), tagIter->GetElement()) );
+      m_GDCMScanner.AddTag( gdcm::Tag(tagIter->GetGroup(), tagIter->GetElement()) );
     }
   }
 
   // Add some of our own interest
-  gdcmScanner.AddTag( gdcm::Tag(0x0018,0x1164) ); // pixel spacing
-  gdcmScanner.AddTag( gdcm::Tag(0x0028,0x0030) ); // imager pixel spacing
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0018,0x1164) ); // pixel spacing
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0028,0x0030) ); // imager pixel spacing
+
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x1041) ); // slice location
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x0013) ); // instance number
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0018) ); // sop instance number
 
   timer.Stop("Setup scanning");
 
   timer.Start("Tag scanning");
   PushLocale();
-  gdcmScanner.Scan( inputFilenames );
+  m_GDCMScanner.Scan( inputFilenames );
   PopLocale();
   timer.Stop("Tag scanning");
 
   timer.Start("Setup sorting");
-  DICOMGDCMImageFrameList initialFramelist;
   for (StringList::const_iterator inputIter = inputFilenames.begin();
        inputIter != inputFilenames.end();
        ++inputIter)
   {
-    initialFramelist.push_back( DICOMGDCMImageFrameInfo::New( DICOMImageFrameInfo::New(*inputIter, 0), gdcmScanner.GetMapping(inputIter->c_str()) ) );
+    m_InputFrameList.push_back( DICOMGDCMImageFrameInfo::New( DICOMImageFrameInfo::New(*inputIter, 0), m_GDCMScanner.GetMapping(inputIter->c_str()) ) );
   }
   m_SortingResultInProgress.clear();
-  m_SortingResultInProgress.push_back( initialFramelist );
+  m_SortingResultInProgress.push_back( m_InputFrameList );
   timer.Stop("Setup sorting");
 
   // sort and split blocks as configured
@@ -324,6 +328,8 @@ mitk::DICOMITKSeriesGDCMReader
     std::string pixelSpacingString = (gdcmFrameInfoList.front())->GetTagValueAsString( tagPixelSpacing );
     std::string imagerPixelSpacingString = gdcmFrameInfoList.front()->GetTagValueAsString( tagImagerPixelSpacing );
     block.SetPixelSpacingInformation(pixelSpacingString, imagerPixelSpacingString);
+
+    block.SetTagCache( this );
 
     this->SetOutput( o, block );
   }
@@ -435,4 +441,23 @@ mitk::DICOMITKSeriesGDCMReader
   m_EquiDistantBlocksSorter->SetAcceptTilt( m_FixTiltByShearing );
 
   this->AddSortingElement( m_EquiDistantBlocksSorter );
+}
+
+std::string
+mitk::DICOMITKSeriesGDCMReader
+::GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const
+{
+  for(DICOMGDCMImageFrameList::const_iterator frameIter = m_InputFrameList.begin();
+      frameIter != m_InputFrameList.end();
+      ++frameIter)
+  {
+    if ( (*frameIter)->GetFrameInfo().IsNotNull() &&
+         (*((*frameIter)->GetFrameInfo()) == *frame )
+       )
+    {
+      return (*frameIter)->GetTagValueAsString(tag);
+    }
+
+  }
+    return "soso";
 }

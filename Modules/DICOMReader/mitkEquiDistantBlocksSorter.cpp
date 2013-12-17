@@ -207,7 +207,6 @@ mitk::EquiDistantBlocksSorter
     }
   }
 
-  MITK_WARN << "Request for tilt information on file '" << filename << "' could not be answered";
   return GantryTiltInformation(); // empty
 }
 

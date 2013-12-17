@@ -14,21 +14,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkDICOMImageFrameInfo.h"
+#ifndef mitkDICOMTagCache_h
+#define mitkDICOMTagCache_h
 
-mitk::DICOMImageFrameInfo
-::DICOMImageFrameInfo(const std::string& filename, unsigned int frameNo)
-:Filename(filename)
-,FrameNo(frameNo)
+#include "itkObjectFactory.h"
+#include "mitkCommon.h"
+
+#include "DICOMReaderExports.h"
+
+namespace mitk
 {
+  class DICOMReader_EXPORT DICOMTagCache
+  {
+    public:
+
+      virtual std::string GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const = 0;
+  };
 }
 
-bool
-mitk::DICOMImageFrameInfo
-::operator==(const DICOMImageFrameInfo& other) const
-{
-  return
-     this->Filename == other.Filename
-  && this->FrameNo == other.FrameNo;
-
-}
+#endif

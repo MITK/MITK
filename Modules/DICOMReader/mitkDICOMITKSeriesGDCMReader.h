@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
+class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, protected DICOMTagCache
 {
   public:
 
@@ -54,6 +54,8 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     void SetFixTiltByShearing(bool on);
 
   protected:
+
+    virtual std::string GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const;
 
     std::string GetActiveLocale() const;
     void PushLocale();
@@ -103,6 +105,10 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 
     std::stack<std::string> m_ReplacedCLocales;
     std::stack<std::locale> m_ReplacedCinLocales;
+
+    DICOMGDCMImageFrameList m_InputFrameList;
+
+    gdcm::Scanner m_GDCMScanner;
 };
 
 }

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMEnums.h"
 #include "mitkDICOMImageFrameInfo.h"
 #include "mitkDICOMTag.h"
+#include "mitkDICOMTagCache.h"
 
 #include "mitkImage.h"
 #include "mitkProperties.h"
@@ -68,9 +69,12 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
     void SetTiltInformation(const GantryTiltInformation& info);
     const GantryTiltInformation GetTiltInformation() const;
 
+    void SetTagCache(DICOMTagCache* privateCache);
+
   private:
 
-    mitk::Image::Pointer FixupSpacing(Image* mitkImage);
+    Image::Pointer FixupSpacing(Image* mitkImage);
+    Image::Pointer DescribeImageWithProperties(Image* mitkImage);
 
     DICOMImageFrameList m_ImageFrameList;
     Image::Pointer m_MitkImage;
@@ -84,6 +88,8 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
     GantryTiltInformation m_TiltInformation;
 
     PropertyList::Pointer m_PropertyList;
+
+    const DICOMTagCache* m_TagCache;
 };
 
 }

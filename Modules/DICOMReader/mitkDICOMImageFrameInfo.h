@@ -37,6 +37,8 @@ namespace mitk
       mitkNewMacro1Param( DICOMImageFrameInfo, const std::string&);
       mitkNewMacro2Param( DICOMImageFrameInfo, const std::string&, unsigned int );
 
+      bool operator==(const DICOMImageFrameInfo& other) const;
+
     protected:
 
       DICOMImageFrameInfo(const std::string& filename = "", unsigned int frameNo = 0);

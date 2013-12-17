@@ -20,13 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkDataNode.h"
 #include "mitkCoreObjectFactory.h"
-/*
-#include "mitkContour.h"
-#include "mitkContourMapper2D.h"
-#include "mitkContourSetMapper2D.h"
-#include "mitkContourSetVtkMapper3D.h"
-#include "mitkContourVtkMapper3D.h"
-*/
 
 #include "mitkLabelSetImage.h"
 #include "mitkLabelSetImageVtkMapper2D.h"
@@ -42,8 +35,6 @@ mitk::SegmentationObjectFactory::SegmentationObjectFactory()
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    MITK_DEBUG << "SegmentationObjectFactory c'tor" << std::endl;
-
     itk::ObjectFactoryBase::RegisterFactory( m_LabelSetImageIOFactory );
     itk::ObjectFactoryBase::RegisterFactory( m_LabelSetImageWriterFactory );
 
@@ -121,8 +112,8 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::SegmentationObjectFactory::GetSa
 
 void mitk::SegmentationObjectFactory::CreateFileExtensionsMap()
 {
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation Files"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation File"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation files"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation files"));
 }
 
 const char* mitk::SegmentationObjectFactory::GetSaveFileExtensions()

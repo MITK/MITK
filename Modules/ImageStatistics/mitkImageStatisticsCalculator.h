@@ -283,7 +283,8 @@ public:
   /** \brief Returns true whether the hotspot should be calculated, otherwise false */
   bool IsHotspotCalculated();
 
-  /** \brief Sets flag whether hotspot is completly inside the image.*/
+  /** \brief Sets flag whether hotspot is completly inside the image. Please note that if set to false
+      it can be possible that statistics are calculated for which the whole hotspot is not inside the image! */
   void SetHotspotMustBeCompletlyInsideImage(bool hotspotIsCompletlyInsideImage);
 
   /** \brief Returns true if hotspot has to be completly inside the image. */

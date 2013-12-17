@@ -71,7 +71,7 @@ foreach(file ${SRC_CPP_FILES})
 endforeach(file ${SRC_CPP_FILES})
 
 usFunctionEmbedResources(CPP_FILES
-LIBRARY_NAME "org_mitk_gui_qt_multilabelsegmentation"
+LIBRARY_NAME "liborg_mitk_gui_qt_multilabelsegmentation"
 ROOT_DIR resources
 FILES Interactions/SegmentationInteraction.xml
       Interactions/ConfigSegmentation.xml

@@ -59,4 +59,4 @@ ctkPluginContext* mitk::PluginActivator::getContext()
 
 Q_EXPORT_PLUGIN2(org_mitk_gui_qt_multilabelsegmentation, mitk::PluginActivator)
 
-US_INITIALIZE_MODULE("MultiLabelSegmentation", "org_mitk_gui_qt_multilabelsegmentation")
+US_INITIALIZE_MODULE("MultiLabelSegmentation", "liborg_mitk_gui_qt_multilabelsegmentation")

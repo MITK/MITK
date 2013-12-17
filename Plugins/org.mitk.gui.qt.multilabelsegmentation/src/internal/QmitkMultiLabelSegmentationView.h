@@ -139,7 +139,7 @@ protected:
     * Reference to the service registration of the observer,
     * it is needed to unregister the observer on unload.
   */
- // us::ServiceRegistration<mitk::InteractionEventObserver> m_ServiceRegistration;
+  us::ServiceRegistration<mitk::InteractionEventObserver> m_ServiceRegistration;
 
 };
 

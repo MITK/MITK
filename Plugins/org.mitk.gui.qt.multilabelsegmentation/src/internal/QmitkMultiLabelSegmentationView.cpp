@@ -113,6 +113,8 @@ QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
 */
   m_ToolManager->SetReferenceData(NULL);
   m_ToolManager->SetWorkingData(NULL);
+
+  m_ServiceRegistration.Unregister();
 }
 
 void QmitkMultiLabelSegmentationView::InitializeListeners()
@@ -144,6 +146,12 @@ void QmitkMultiLabelSegmentationView::InitializeListeners()
     {
       MITK_WARN << "Error loading state machine configuration";
     }
+
+    // Register as listener via micro services
+    us::ServiceProperties props;
+    props["name"] = std::string("SegmentationInteraction");
+    m_ServiceRegistration = us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>(
+        m_Interactor.GetPointer(),props);
   }
 }
 

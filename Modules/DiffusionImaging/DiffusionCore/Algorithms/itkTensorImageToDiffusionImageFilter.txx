@@ -127,7 +127,7 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
 
   if( m_MaskImage.IsNotNull() )
   {
-    itMask = IteratorMaskImageType;
+    itMask = IteratorMaskImageType( m_MaskImage, outputRegionForThread);
     itMask.GoToBegin();
   }
 

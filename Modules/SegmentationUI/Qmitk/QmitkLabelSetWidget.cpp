@@ -54,7 +54,6 @@ m_ToolManager(NULL)
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerWorkingDataModified );
 
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(activeLabelChanged(int)), this, SLOT(OnActiveLabelChanged(int)) );
-//  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(newLabel()), this, SLOT(OnNewLabel()) );
   //connect( m_Controls.m_LabelSetTableWidget, SIGNAL(importSegmentation()), this, SLOT( OnImportSegmentation()) );
   //connect( m_Controls.m_LabelSetTableWidget, SIGNAL(importLabeledImage()), this, SLOT( OnImportLabeledImage()) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(renameLabel(int, const mitk::Color&, const std::string&)), this, SLOT(OnRenameLabel(int, const mitk::Color&, const std::string&)) );
@@ -97,20 +96,12 @@ m_ToolManager(NULL)
 
  // m_Controls.m_LabelSetTableWidget->setEnabled(false);
   m_Controls.m_LabelSearchBox->setEnabled(false);
-//  m_Controls.m_btNewLabel->setEnabled(false);
-//  m_Controls.m_btLoadSegmentation->setEnabled(false);
-//  m_Controls.m_btSaveSegmentation->setEnabled(false);
-//  m_Controls.m_btNewLabel->setEnabled(false);
   m_Controls.m_btLockExterior->setEnabled(false);
   m_Controls.m_btSegmentationInteractor->setEnabled(false);
   m_Controls.m_btAddLayer->setEnabled(false);
   m_Controls.m_btDeleteLayer->setEnabled(false);
   m_Controls.m_btPreviousLayer->setEnabled(false);
   m_Controls.m_btNextLayer->setEnabled(false);
-
-//  m_Controls.m_btDeleteSegmentation->setEnabled(false);
-//  m_Controls.m_btImportSegmentation->setEnabled(false);
-//  m_Controls.m_btImportLabeledImage->setEnabled(false);
 }
 
 QmitkLabelSetWidget::~QmitkLabelSetWidget()
@@ -356,7 +347,6 @@ void QmitkLabelSetWidget::OnAddLayer()
   {
     this->WaitCursorOn();
     workingImage->AddLayer();
-    workingImage->SetActiveLayer( workingImage->GetActiveLayer() - 1 );
     this->WaitCursorOff();
   }
   catch ( mitk::Exception& e )
@@ -367,15 +357,24 @@ void QmitkLabelSetWidget::OnAddLayer()
     return;
   }
 
-  m_Controls.m_LabelSetTableWidget->Reset();
-
   m_Controls.m_cbActiveLayer->clear();
   for (int lidx=0; lidx<workingImage->GetNumberOfLayers(); ++lidx)
   {
     m_Controls.m_cbActiveLayer->addItem(QString::number(lidx));
   }
 
-  this->UpdateControls();
+  this->OnChangeLayer(workingImage->GetNumberOfLayers()-1);
+
+  QmitkNewSegmentationDialog dialog(this);
+  dialog.setWindowTitle("New Label");
+  dialog.SetSuggestionList( m_OrganColors );
+  dialog.SetSegmentationName("no_name");
+
+  int dialogReturnValue = dialog.exec();
+
+  if ( dialogReturnValue == QDialog::Rejected ) return;
+
+  workingImage->AddLabel(dialog.GetSegmentationName().toStdString(), dialog.GetColor());
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

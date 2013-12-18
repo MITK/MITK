@@ -226,9 +226,7 @@ void QmitkLabelSetTableWidget::LabelAdded()
   if (!m_BlockEvents)
   {
     m_BlockEvents = true;
-
     this->InsertItem();
-
     m_BlockEvents = false;
   }
 }

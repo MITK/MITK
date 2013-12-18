@@ -13,13 +13,13 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __mitkKinect2Device_h
-#define __mitkKinect2Device_h
+#ifndef __mitkKinectV2Device_h
+#define __mitkKinectV2Device_h
 
-#include "mitkKinect2ModuleExports.h"
+#include "mitkKinectV2ModuleExports.h"
 #include "mitkCommon.h"
 #include "mitkToFCameraDevice.h"
-#include "mitkKinect2Controller.h"
+#include "mitkKinectV2Controller.h"
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"
@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   /**
-  * @brief Interface for all representations of Microsoft Kinect 2 devices.
+  * @brief Interface for all representations of Microsoft Kinect V2 devices.
   * Kinect2Device internally holds an instance of Kinect2Controller and starts a thread
   * that continuously grabs images from the controller. A buffer structure buffers the last acquired images
   * to provide the image data loss-less.
@@ -39,11 +39,11 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_KINECT2MODULE_EXPORT Kinect2Device : public ToFCameraDevice
+  class MITK_KINECTV2MODULE_EXPORT KinectV2Device : public ToFCameraDevice
   {
   public:
 
-    mitkClassMacro( Kinect2Device , ToFCameraDevice );
+    mitkClassMacro( KinectV2Device , ToFCameraDevice );
 
     itkNewMacro( Self );
 
@@ -108,7 +108,7 @@ namespace mitk
     /*!
     \brief returns the corresponding camera controller
     */
-    Kinect2Controller::Pointer GetController();
+    KinectV2Controller::Pointer GetController();
 
     /*!
     \brief set a BaseProperty
@@ -125,9 +125,9 @@ namespace mitk
 
   protected:
 
-    Kinect2Device();
+    KinectV2Device();
 
-    ~Kinect2Device();
+    ~KinectV2Device();
 
     /*!
     \brief Thread method continuously acquiring images from the ToF hardware
@@ -137,7 +137,7 @@ namespace mitk
     \brief moves the position pointer m_CurrentPos to the next position in the buffer if that's not the next free position to prevent reading from an empty buffer
     */
     void GetNextPos();
-    Kinect2Controller::Pointer m_Controller; ///< corresponding CameraController
+    KinectV2Controller::Pointer m_Controller; ///< corresponding CameraController
 
     float** m_DistanceDataBuffer; ///< buffer holding the last distance images
     float** m_AmplitudeDataBuffer; ///< buffer holding the last amplitude images

@@ -1,4 +1,4 @@
-IF(MITK_USE_TOF_KinectV2)
+IF(MITK_USE_TOF_KINECTV2)
 SET(CPP_FILES
   mitkKinectV2Device.cpp
   mitkKinectV2DeviceFactory.cpp
@@ -11,4 +11,4 @@ set(RESOURCE_FILES
   CalibrationFiles/KinectV2_RGB_camera.xml
 )
 
-ENDIF(MITK_USE_TOF_KinectV2)
+ENDIF(MITK_USE_TOF_KINECTV2)

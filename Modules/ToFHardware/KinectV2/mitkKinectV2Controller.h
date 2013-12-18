@@ -13,10 +13,10 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __mitkKinect2Controller_h
-#define __mitkKinect2Controller_h
+#ifndef __mitkKinectV2Controller_h
+#define __mitkKinectV2Controller_h
 
-#include "mitkKinect2ModuleExports.h"
+#include "mitkKinectV2ModuleExports.h"
 #include "mitkCommon.h"
 #include "mitkToFConfig.h"
 
@@ -31,11 +31,11 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_KINECT2MODULE_EXPORT Kinect2Controller : public itk::Object
+  class MITK_KINECTV2MODULE_EXPORT KinectV2Controller : public itk::Object
   {
   public:
 
-    mitkClassMacro( Kinect2Controller , itk::Object );
+    mitkClassMacro( KinectV2Controller , itk::Object );
 
     itkNewMacro( Self );
     int GetRGBCaptureWidth() const;
@@ -50,7 +50,7 @@ namespace mitk
     bool InitializeMultiFrameReader();
 
     /*!
-    \brief opens a connection to the Kinect camera.
+    \brief opens a connection to the Kinect V2 camera.
     \throws mitkException In case of no connection, an exception is thrown!
     */
     virtual bool OpenCameraConnection();
@@ -84,13 +84,13 @@ namespace mitk
 
   protected:
 
-    Kinect2Controller();
+    KinectV2Controller();
 
-    ~Kinect2Controller();
+    ~KinectV2Controller();
 
   private:
-    class Kinect2ControllerPrivate;
-    Kinect2ControllerPrivate *d;
+    class KinectV2ControllerPrivate;
+    KinectV2ControllerPrivate *d;
 
   };
 } //END mitk namespace

@@ -13,11 +13,11 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __mitkKinect2DeviceFactory_h
-#define __mitkKinect2DeviceFactory_h
+#ifndef __mitkKinectV2DeviceFactory_h
+#define __mitkKinectV2DeviceFactory_h
 
-#include "mitkKinect2ModuleExports.h"
-#include "mitkKinect2Device.h"
+#include "mitkKinectV2ModuleExports.h"
+#include "mitkKinectV2Device.h"
 #include "mitkAbstractToFDeviceFactory.h"
 #include <mitkCameraIntrinsics.h>
 #include <mitkCameraIntrinsicsProperty.h>
@@ -33,16 +33,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   /**
-  * \brief KinectDeviceFactory is an implementation of the factory pattern to generate Microsoft Kinect devices.
+  * \brief KinectDeviceFactory is an implementation of the factory pattern to generate Microsoft Kinect V2 devices.
   * KinectDeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
   * This offers users the oppertunity to generate new KinectDevices via a global instance of this factory.
   * @ingroup ToFHardware
   */
-  class MITK_KINECT2MODULE_EXPORT Kinect2DeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+  class MITK_KINECTV2MODULE_EXPORT KinectV2DeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
   public:
 
-    Kinect2DeviceFactory()
+    KinectV2DeviceFactory()
     {
     }
 
@@ -75,7 +75,7 @@ namespace mitk
     */
     ToFCameraDevice::Pointer CreateToFCameraDevice()
     {
-      Kinect2Device::Pointer device = Kinect2Device::New();
+      KinectV2Device::Pointer device = KinectV2Device::New();
 
       device->SetBoolProperty("HasRGBImage", true);
       device->SetBoolProperty("HasAmplitudeImage", false);

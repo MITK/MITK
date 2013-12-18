@@ -13,4 +13,4 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include "mitkKinect2DeviceFactory.h"
+#include "mitkKinectV2DeviceFactory.h"

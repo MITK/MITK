@@ -44,7 +44,6 @@ namespace mitk
     IDepthFrame* m_pDepthFrame;
     IColorFrame* m_pColorFrame;
     ICoordinateMapper* m_pCoordinateMapper;
-    //ColorSpacePoint*        m_pColorCoordinates;
 
     RGBQUAD* m_pColorRGBX;
 
@@ -59,7 +58,8 @@ namespace mitk
     int m_RGBCaptureHeight;
     float* m_Distances;
     unsigned char* m_Colors;
-    unsigned int m_BufferSize;
+    size_t m_RGBBufferSize;
+    size_t m_DepthBufferSize;
   };
 
   KinectV2Controller::KinectV2ControllerPrivate::KinectV2ControllerPrivate():
@@ -77,12 +77,13 @@ namespace mitk
     m_RGBCaptureHeight(1080),
     m_Distances(NULL),
     m_Colors(NULL),
-    m_BufferSize(1920*1080*3)
+    m_RGBBufferSize(1920*1080*3),
+    m_DepthBufferSize(sizeof(float)*512*424)
   {
     // create heap storage for color pixel data in RGBX format
     m_pColorRGBX = new RGBQUAD[m_RGBCaptureWidth * m_RGBCaptureHeight];
     m_Distances = new float[m_DepthCaptureWidth * m_DepthCaptureHeight];
-    m_Colors = new unsigned char[m_BufferSize];
+    m_Colors = new unsigned char[m_RGBBufferSize];
   }
 
   KinectV2Controller::KinectV2ControllerPrivate::~KinectV2ControllerPrivate()
@@ -270,7 +271,7 @@ namespace mitk
           }
           if (SUCCEEDED(hr))
           {
-            for(int i = 0; i < d->m_BufferSize; i+=3)
+            for(int i = 0; i < d->m_RGBBufferSize; i+=3)
             {
               //convert from BGR to RGB
               d->m_Colors[i+0] = pColorBuffer->rgbRed;
@@ -297,12 +298,12 @@ namespace mitk
 
   void KinectV2Controller::GetDistances(float* distances)
   {
-    memcpy(distances, d->m_Distances, sizeof(float)*512*424);
+    memcpy(distances, d->m_Distances, d->m_DepthBufferSize);
   }
 
   void KinectV2Controller::GetRgb(unsigned char* rgb)
   {
-    memcpy(rgb, d->m_Colors, d->m_BufferSize);
+    memcpy(rgb, d->m_Colors, d->m_RGBBufferSize);
   }
 
   void KinectV2Controller::GetAllData(float* distances, float* amplitudes, unsigned char* rgb)

@@ -23,14 +23,14 @@ namespace mitk
 {
 
   KinectV2Device::KinectV2Device():
-   m_DistanceDataBuffer(NULL),
-   m_AmplitudeDataBuffer(NULL),
-   m_IntensityDataBuffer(NULL),
-   m_RGBDataBuffer(NULL),
-   m_DepthCaptureWidth(512),
-   m_DepthCaptureHeight(424),
-   m_DepthBufferSize(sizeof(float)*512*424),
-   m_RGBBufferSize(3*1920*1080)
+    m_DistanceDataBuffer(NULL),
+    m_AmplitudeDataBuffer(NULL),
+    m_IntensityDataBuffer(NULL),
+    m_RGBDataBuffer(NULL),
+    m_DepthCaptureWidth(512),
+    m_DepthCaptureHeight(424),
+    m_DepthBufferSize(sizeof(float)*512*424),
+    m_RGBBufferSize(3*1920*1080)
   {
     m_Controller = mitk::KinectV2Controller::New();
   }
@@ -250,7 +250,7 @@ namespace mitk
 
   void KinectV2Device::GetAmplitudes(float* amplitudeArray, int& imageSequence)
   {
-        //TODO Implement me
+    //TODO Implement me
     //m_ImageMutex->Lock();
     //if (m_CameraActive)
     //{

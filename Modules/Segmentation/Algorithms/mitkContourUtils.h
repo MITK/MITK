@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationExports.h"
 #include "mitkContour.h"
 #include "mitkContourModel.h"
-#include "mitkLegacyAdaptors.h"
 
 #include <itkImage.h>
 

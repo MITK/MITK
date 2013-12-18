@@ -2,6 +2,10 @@ set(LIBPOSTFIX "Ext")
 
 # Modules must be listed according to their dependencies
 set(module_dirs
+    MitkDataTypesExt
+    MitkAlgorithmsExt
+    MitkMapperExt
+    MitkIOExt
     SceneSerializationBase
     PlanarFigure
     ImageExtraction

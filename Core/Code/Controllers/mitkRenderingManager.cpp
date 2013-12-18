@@ -351,7 +351,7 @@ RenderingManager
 
 bool
 RenderingManager
-::InitializeViews( const TimeGeometry * dataGeometry, RequestType type, bool preserveRoughOrientationInWorldSpace )
+::InitializeViews( const TimeGeometry * dataGeometry, RequestType type, bool /*preserveRoughOrientationInWorldSpace*/ )
 {
   MITK_DEBUG << "initializing views";
 

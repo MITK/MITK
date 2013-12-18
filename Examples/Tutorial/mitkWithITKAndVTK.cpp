@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiscreteGaussianImageFilter.h>
 #include <itksys/SystemTools.hxx>
 
-#include <mitkPicFileReader.h>
+#include <mitkIOUtil.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkImageCast.h>
 #include <mitkImageAccessByItk.h>
@@ -33,19 +33,19 @@ int main( int /*argc*/, char ** argv )
 {
   // MITK: Read a .pic.gz file, e.g. Core/Code/Testing/Data/Pic3D.pic.gz from
   // disk
-  mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
   const char * filename = argv[1];
+
+  mitk::Image::Pointer mitkImage;
   try
   {
-    reader->SetFileName(filename);
-    reader->Update();
+    mitkImage = mitk::IOUtil::LoadImage(filename);
   }
-  catch(...)
+  catch (const std::exception& e)
   {
-    fprintf( stderr, "Could not open file %s \n\n", filename );
+    MITK_WARN << "Could not open file " << filename;
     return EXIT_FAILURE;
   }
-  mitk::Image::Pointer mitkImage = reader->GetOutput();
+
 
   // ITK: Image smoothing
   // Create ITK image, cast from MITK image

@@ -191,6 +191,7 @@ set(CPP_FILES
   DataManagement/mitkPointSet.cpp
   DataManagement/mitkProperties.cpp
   DataManagement/mitkPropertyList.cpp
+  DataManagement/mitkPropertyObserver.cpp
   DataManagement/mitkRestorePlanePositionOperation.cpp
   DataManagement/mitkRotationOperation.cpp
   DataManagement/mitkSlicedData.cpp

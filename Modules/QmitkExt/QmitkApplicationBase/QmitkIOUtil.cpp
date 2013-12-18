@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //ITK
 #include <itksys/SystemTools.hxx>
-#include <Poco/Path.h>
 
 void mitk::QmitkIOUtil::SaveBaseDataWithDialog(mitk::BaseData* data, std::string fileName, QWidget* parent)
 {

@@ -66,8 +66,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSetWriterFactory.h"
 #include "mitkSurfaceVtkWriterFactory.h"
 
-mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::m_FileWriters;
-
 void mitk::CoreObjectFactory::RegisterExtraFactory(CoreObjectFactoryBase* factory) {
   MITK_DEBUG << "CoreObjectFactory: registering extra factory of type " << factory->GetNameOfClass();
   m_ExtraFactories.insert(CoreObjectFactoryBase::Pointer(factory));

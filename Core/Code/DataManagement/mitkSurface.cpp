@@ -39,7 +39,7 @@ static void Delete(vtkPolyData* polyData)
     polyData->Delete();
 }
 
-static void Update(vtkPolyData* polyData)
+static void Update(vtkPolyData* /*polyData*/)
 {
 //  if (polyData != NULL)
 //    polyData->Update(); //VTK6_TODO vtk pipeline

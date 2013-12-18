@@ -100,7 +100,7 @@ namespace mitk
     bool m_ConnectionCheck; ///< flag showing whether the camera is connected (true) or not (false)
 
     std::string m_InputFileName;
-    std::string m_Extension;
+    //std::string m_Extension;
 
     ToFImageType m_ToFImageType; ///< type of the ToF image to be played: 3D Volume (ToFImageType3D), temporal 2D image stack (ToFImageType2DPlusT)
 
@@ -133,9 +133,9 @@ namespace mitk
 
     //void OpenPicFileToData(FILE** outfile, const char *outfileName);
     void AccessData(int frame, Image::Pointer image, float* &data);
-    bool CheckCurrentFileType();
-    void OpenNrrdImageFile( const std::string outfileName, Image::Pointer &image);
-    void OpenPicImageFile( const std::string outfileName, Image::Pointer &image);
+    //bool CheckCurrentFileType();
+    //void OpenNrrdImageFile( const std::string outfileName, Image::Pointer &image);
+    //void OpenPicImageFile( const std::string outfileName, Image::Pointer &image);
     void CleanUp();
   };
 } //END mitk namespace

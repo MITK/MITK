@@ -4,7 +4,6 @@ if(MISSING)
 else(MISSING)
 
   MITK_USE_MODULE(QmitkExt)
-  MITK_USE_MODULE(MitkExt)
 
   include_directories(${ALL_INCLUDE_DIRECTORIES})
 

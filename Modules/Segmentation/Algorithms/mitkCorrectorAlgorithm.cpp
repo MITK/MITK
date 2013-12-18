@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkImageDataItem.h"
 #include "mitkContourUtils.h"
+#include "mitkLegacyAdaptors.h"
 
 mitk::CorrectorAlgorithm::CorrectorAlgorithm()
 :ImageToImageFilter()

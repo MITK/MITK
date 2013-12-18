@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSceneIO.h"
 #include "mitkProgressBar.h"
 
-#include <mitkCoreExtObjectFactory.h>
 #include <mitkDataStorageEditorInput.h>
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>

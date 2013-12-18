@@ -39,6 +39,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
                              # automatic loading of this module
       ADDITIONAL_LIBS        # list of addidtional libraries linked to this module
       GENERATED_CPP          # not used (?)
+      DEPRECATED_SINCE       # marks this modules as deprecated
      )
 
   set(_macro_options
@@ -65,6 +66,12 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
       # Add a dependency to the "Mitk" module
       #list(APPEND MODULE_DEPENDS Mitk)
     endif()
+  endif()
+
+  if(MODULE_DEPRECATED_SINCE)
+    set(MODULE_IS_DEPRECATED 1)
+  else()
+    set(MODULE_IS_DEPRECATED 0)
   endif()
 
   if(NOT MODULE_SUBPROJECTS)

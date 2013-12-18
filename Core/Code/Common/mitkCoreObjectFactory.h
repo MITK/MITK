@@ -54,7 +54,6 @@ class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
     typedef std::set<mitk::CoreObjectFactoryBase::Pointer> ExtraFactoriesContainer;
 
     ExtraFactoriesContainer m_ExtraFactories;
-    static FileWriterList m_FileWriters;
     std::string m_FileExtensions;
     MultimapType m_FileExtensionsMap;
     std::string m_SaveFileExtensions;

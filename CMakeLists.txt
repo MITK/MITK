@@ -487,6 +487,7 @@ if(NOT MSVC_VERSION)
     -Wcast-align
     -Wwrite-strings
     -Wno-error=gnu
+    -Wno-error=unknown-pragmas
     -Woverloaded-virtual
     -Wstrict-null-sentinel
     #-Wold-style-cast

@@ -15,24 +15,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkTestingMacros.h>
-#include <mitkKinect2Controller.h>
+#include <mitkKinectV2Controller.h>
 #include <mitkImage.h>
 #include <mitkIOUtil.h>
 #include <mitkPixelType.h>
 
 /**Documentation
-*  test for the class "Kinect2Controller".
+*  test for the class "KinectV2Controller".
 */
-int mitkKinect2ControllerTest(int /* argc */, char* /*argv*/[])
+int mitkKinectV2ControllerTest(int /* argc */, char* /*argv*/[])
 {
 
-  MITK_TEST_BEGIN("Kinect2ControllerTest");
+  MITK_TEST_BEGIN("KinectV2ControllerTest");
   try
   {
     int counter = 0;
 
 
-    mitk::Kinect2Controller::Pointer kinectController = mitk::Kinect2Controller::New();
+    mitk::KinectV2Controller::Pointer kinectController = mitk::KinectV2Controller::New();
     MITK_INFO << "connected: " << kinectController->OpenCameraConnection();
     MITK_INFO << "CloseCameraConnection: " << kinectController->CloseCameraConnection();
     MITK_INFO << "connected: " << kinectController->OpenCameraConnection();

@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __mitkKinect2Activator_h
-#define __mitkKinect2Activator_h
+#ifndef __mitkKinectV2Activator_h
+#define __mitkKinectV2Activator_h
 
 // Microservices
 #include <usServiceRegistration.h>
@@ -24,37 +24,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIToFDeviceFactory.h"
 
 #include "mitkToFConfig.h"
-#include "mitkKinect2DeviceFactory.h"
+#include "mitkKinectV2DeviceFactory.h"
 
 #include "mitkAbstractToFDeviceFactory.h"
 
 /*
-  * This is the module activator for the "mitkKinect2Module" module. It registers services
+  * This is the module activator for the "mitkKinectV2Module" module. It registers services
   * like the IToFDeviceFactory.
   */
 
 namespace mitk
 {
-class Kinect2Activator : public us::ModuleActivator {
+class KinectV2Activator : public us::ModuleActivator {
 public:
 
     void Load(us::ModuleContext* context)
     {
         //Implementing KinectDeviceFactory
-        Kinect2DeviceFactory* kinect2Factory = new Kinect2DeviceFactory();
-        us::ServiceProperties kinect2FactoryProps;
-        kinect2FactoryProps["ToFFactoryName"] =kinect2Factory->GetFactoryName();
-        context->RegisterService<IToFDeviceFactory>(kinect2Factory, kinect2FactoryProps);
-        kinect2Factory->ConnectToFDevice();
+        KinectV2DeviceFactory* KinectV2Factory = new KinectV2DeviceFactory();
+        us::ServiceProperties KinectV2FactoryProps;
+        KinectV2FactoryProps["ToFFactoryName"] =KinectV2Factory->GetFactoryName();
+        context->RegisterService<IToFDeviceFactory>(KinectV2Factory, KinectV2FactoryProps);
+        KinectV2Factory->ConnectToFDevice();
 
-        m_Factories.push_back( kinect2Factory );
+        m_Factories.push_back( KinectV2Factory );
     }
 
     void Unload(us::ModuleContext* )
     {
     }
 
-    ~Kinect2Activator()
+    ~KinectV2Activator()
     {
         if(m_Factories.size() > 0)
         {
@@ -71,5 +71,5 @@ private:
 
 };
 }
-US_EXPORT_MODULE_ACTIVATOR(mitkKinect2Module, mitk::Kinect2Activator)
+US_EXPORT_MODULE_ACTIVATOR(mitkKinectV2Module, mitk::KinectV2Activator)
 #endif

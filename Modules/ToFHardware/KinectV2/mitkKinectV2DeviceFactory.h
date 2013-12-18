@@ -89,7 +89,7 @@ namespace mitk
     us::ModuleResource GetIntrinsicsResource()
     {
       us::Module* module = us::GetModuleContext()->GetModule();
-      return module->GetResource("CalibrationFiles/Kinect_RGB_camera.xml");
+      return module->GetResource("CalibrationFiles/KinectV2_IR_camera.xml");
     }
   };
 }

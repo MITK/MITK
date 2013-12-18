@@ -13,7 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include "mitkKinect2Device.h"
+#include "mitkKinectV2Device.h"
 #include "mitkRealTimeClock.h"
 
 #include "itkMultiThreader.h"
@@ -23,12 +23,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  Kinect2Device::Kinect2Device()
+  KinectV2Device::KinectV2Device()
   {
-    m_Controller = mitk::Kinect2Controller::New();
+    m_Controller = mitk::KinectV2Controller::New();
   }
 
-  Kinect2Device::~Kinect2Device()
+  KinectV2Device::~KinectV2Device()
   {
   }
 
@@ -37,7 +37,7 @@ namespace mitk
     return "Microsoft Kinect 2 Device ";
   }
 
-  bool Kinect2Device::OnConnectCamera()
+  bool KinectV2Device::OnConnectCamera()
   {
     bool ok = false;
     if (m_Controller)
@@ -88,7 +88,7 @@ namespace mitk
     return ok;
   }
 
-  bool Kinect2Device::DisconnectCamera()
+  bool KinectV2Device::DisconnectCamera()
   {
     bool ok = false;
     if (m_Controller)
@@ -121,7 +121,7 @@ namespace mitk
     return ok;
   }
 
-  void Kinect2Device::StartCamera()
+  void KinectV2Device::StartCamera()
   {
     if (m_CameraConnected)
     {
@@ -147,7 +147,7 @@ namespace mitk
     }
   }
 
-  void Kinect2Device::StopCamera()
+  void KinectV2Device::StopCamera()
   {
     m_CameraActiveMutex->Lock();
     m_CameraActive = false;
@@ -161,7 +161,7 @@ namespace mitk
     itksys::SystemTools::Delay(10);
   }
 
-  bool Kinect2Device::IsCameraActive()
+  bool KinectV2Device::IsCameraActive()
   {
     m_CameraActiveMutex->Lock();
     bool ok = m_CameraActive;
@@ -169,16 +169,16 @@ namespace mitk
     return ok;
   }
 
-  void Kinect2Device::UpdateCamera()
+  void KinectV2Device::UpdateCamera()
   {
     if (m_Controller)
     {
-      MITK_INFO << "Kinect2Device::UpdateCamera()";
+      MITK_INFO << "KinectV2Device::UpdateCamera()";
       m_Controller->UpdateCamera();
     }
   }
 
-  //ITK_THREAD_RETURN_TYPE Kinect2Device::Acquire(void* pInfoStruct)
+  //ITK_THREAD_RETURN_TYPE KinectV2Device::Acquire(void* pInfoStruct)
   //{
   //  /* extract this pointer from Thread Info structure */
   //  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
@@ -190,7 +190,7 @@ namespace mitk
   //  {
   //    return ITK_THREAD_RETURN_VALUE;
   //  }
-  //  Kinect2Device* toFCameraDevice = (Kinect2Device*)pInfo->UserData;
+  //  KinectV2Device* toFCameraDevice = (KinectV2Device*)pInfo->UserData;
   //  if (toFCameraDevice!=NULL)
   //  {
   //    mitk::RealTimeClock::Pointer realTimeClock;
@@ -241,7 +241,7 @@ namespace mitk
   //  return ITK_THREAD_RETURN_VALUE;
   //}
 
-  void Kinect2Device::GetAmplitudes(float* amplitudeArray, int& imageSequence)
+  void KinectV2Device::GetAmplitudes(float* amplitudeArray, int& imageSequence)
   {
     //m_ImageMutex->Lock();
     //if (m_CameraActive)
@@ -259,7 +259,7 @@ namespace mitk
     //m_ImageMutex->Unlock();
   }
 
-  void Kinect2Device::GetIntensities(float* intensityArray, int& imageSequence)
+  void KinectV2Device::GetIntensities(float* intensityArray, int& imageSequence)
   {
     //m_ImageMutex->Lock();
     //if (m_CameraActive)
@@ -277,7 +277,7 @@ namespace mitk
     //m_ImageMutex->Unlock();
   }
 
-  void Kinect2Device::GetDistances(float* distanceArray, int& imageSequence)
+  void KinectV2Device::GetDistances(float* distanceArray, int& imageSequence)
   {
     m_ImageMutex->Lock();
     if (m_CameraActive)
@@ -295,7 +295,7 @@ namespace mitk
     m_ImageMutex->Unlock();
   }
 
-  void Kinect2Device::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
+  void KinectV2Device::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
     int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray)
   {
     if (m_CameraActive)
@@ -349,12 +349,12 @@ namespace mitk
     }
   }
 
-  Kinect2Controller::Pointer Kinect2Device::GetController()
+  KinectV2Controller::Pointer KinectV2Device::GetController()
   {
     return this->m_Controller;
   }
 
-  void Kinect2Device::SetProperty( const char *propertyKey, BaseProperty* propertyValue )
+  void KinectV2Device::SetProperty( const char *propertyKey, BaseProperty* propertyValue )
   {
     ToFCameraDevice::SetProperty(propertyKey,propertyValue);
     this->m_PropertyList->SetProperty(propertyKey, propertyValue);
@@ -372,12 +372,12 @@ namespace mitk
     }
   }
 
-  int Kinect2Device::GetRGBCaptureWidth()
+  int KinectV2Device::GetRGBCaptureWidth()
   {
     return this->m_RGBImageWidth;
   }
 
-  int Kinect2Device::GetRGBCaptureHeight()
+  int KinectV2Device::GetRGBCaptureHeight()
   {
     return this->m_RGBImageHeight;
   }

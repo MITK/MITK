@@ -13,7 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include "mitkKinect2Controller.h"
+#include "mitkKinectV2Controller.h"
 #include <Kinect.h>
 #include <mitkToFDebugHelper.h>
 
@@ -32,11 +32,11 @@ inline void SafeRelease(Interface *& pInterfaceToRelease)
 
 namespace mitk
 {
-  class Kinect2Controller::Kinect2ControllerPrivate
+  class KinectV2Controller::KinectV2ControllerPrivate
   {
   public:
-    Kinect2ControllerPrivate();
-    ~Kinect2ControllerPrivate();
+    KinectV2ControllerPrivate();
+    ~KinectV2ControllerPrivate();
 
     bool ErrorText(unsigned int error);
     IKinectSensor* m_pKinectSensor;
@@ -62,7 +62,7 @@ namespace mitk
     unsigned int m_BufferSize;
   };
 
-  Kinect2Controller::Kinect2ControllerPrivate::Kinect2ControllerPrivate():
+  KinectV2Controller::KinectV2ControllerPrivate::KinectV2ControllerPrivate():
     m_pKinectSensor(NULL),
     m_pMultiSourceFrameReader(NULL),
     m_pDepthFrame(NULL),
@@ -85,27 +85,27 @@ namespace mitk
     m_Colors = new unsigned char[m_BufferSize];
   }
 
-  Kinect2Controller::Kinect2ControllerPrivate::~Kinect2ControllerPrivate()
+  KinectV2Controller::KinectV2ControllerPrivate::~KinectV2ControllerPrivate()
   {
-    MITK_INFO << "~Kinect2ControllerPrivate";
+    MITK_INFO << "~KinectV2ControllerPrivate";
   }
 
-  bool Kinect2Controller::Kinect2ControllerPrivate::ErrorText(unsigned int error)
+  bool KinectV2Controller::KinectV2ControllerPrivate::ErrorText(unsigned int error)
   {
     return true;
   }
 
-  Kinect2Controller::Kinect2Controller(): d(new Kinect2ControllerPrivate)
+  KinectV2Controller::KinectV2Controller(): d(new KinectV2ControllerPrivate)
   {
   }
 
-  Kinect2Controller::~Kinect2Controller()
+  KinectV2Controller::~KinectV2Controller()
   {
-    MITK_INFO << "~Kinect2Controller";
+    MITK_INFO << "~KinectV2Controller";
     delete d;
   }
 
-  bool Kinect2Controller::OpenCameraConnection()
+  bool KinectV2Controller::OpenCameraConnection()
   {
     if (!d->m_ConnectionCheck)
     {
@@ -141,7 +141,7 @@ namespace mitk
     return d->m_ConnectionCheck;
   }
 
-  bool Kinect2Controller::InitializeMultiFrameReader()
+  bool KinectV2Controller::InitializeMultiFrameReader()
   {
     //check if it is already initialized
     if((d->m_ConnectionCheck) && (d->m_pMultiSourceFrameReader))
@@ -163,7 +163,7 @@ namespace mitk
   }
 
 
-  bool Kinect2Controller::CloseCameraConnection()
+  bool KinectV2Controller::CloseCameraConnection()
   {
     // done with depth frame reader
     MITK_INFO << "CloseConnection";
@@ -180,7 +180,7 @@ namespace mitk
     return true;
   }
 
-  bool Kinect2Controller::UpdateCamera()
+  bool KinectV2Controller::UpdateCamera()
   {
     MITK_INFO << "UpdateCamera";
     if(InitializeMultiFrameReader())
@@ -295,55 +295,55 @@ namespace mitk
     return false;
   }
 
-  void Kinect2Controller::GetDistances(float* distances)
+  void KinectV2Controller::GetDistances(float* distances)
   {
     memcpy(distances, d->m_Distances, sizeof(float)*512*424);
   }
 
-  void Kinect2Controller::GetRgb(unsigned char* rgb)
+  void KinectV2Controller::GetRgb(unsigned char* rgb)
   {
     memcpy(rgb, d->m_Colors, d->m_BufferSize);
   }
 
-  void Kinect2Controller::GetAllData(float* distances, float* amplitudes, unsigned char* rgb)
+  void KinectV2Controller::GetAllData(float* distances, float* amplitudes, unsigned char* rgb)
   {
     this->GetDistances(distances);
     this->GetRgb(rgb);
   }
 
-  void Kinect2Controller::GetAmplitudes( float* amplitudes )
+  void KinectV2Controller::GetAmplitudes( float* amplitudes )
   {
   }
 
-  void Kinect2Controller::GetIntensities( float* intensities )
+  void KinectV2Controller::GetIntensities( float* intensities )
   {
   }
 
-  int Kinect2Controller::GetRGBCaptureWidth() const
+  int KinectV2Controller::GetRGBCaptureWidth() const
   {
     return d->m_RGBCaptureWidth;
   }
 
-  int Kinect2Controller::GetRGBCaptureHeight() const
+  int KinectV2Controller::GetRGBCaptureHeight() const
   {
     return d->m_RGBCaptureHeight;
   }
 
-  int Kinect2Controller::GetDepthCaptureWidth() const
+  int KinectV2Controller::GetDepthCaptureWidth() const
   {
     return d->m_DepthCaptureWidth;
   }
 
-  int Kinect2Controller::GetDepthCaptureHeight() const
+  int KinectV2Controller::GetDepthCaptureHeight() const
   {
     return d->m_DepthCaptureHeight;
   }
 
-  bool Kinect2Controller::GetUseIR() const
+  bool KinectV2Controller::GetUseIR() const
   {
     return d->m_UseIR;
   }
-  void Kinect2Controller::SetUseIR(bool useIR)
+  void KinectV2Controller::SetUseIR(bool useIR)
   {
     if (d->m_UseIR!=useIR)
     {

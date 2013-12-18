@@ -15,7 +15,7 @@ set(H_FILES
   mitkClassicDICOMSeriesReader.h
   mitkThreeDnTDICOMSeriesReader.h
   mitkDICOMTag.h
-  mitkDICOMITKSeriesGDCMReaderConfigurator.h
+  mitkDICOMReaderConfigurator.h
 )
 
 set(CPP_FILES
@@ -37,5 +37,5 @@ set(CPP_FILES
   mitkThreeDnTDICOMSeriesReader.cpp
   mitkDICOMTag.cpp
   mitkDICOMEnums.cpp
-  mitkDICOMITKSeriesGDCMReaderConfigurator.cpp
+  mitkDICOMReaderConfigurator.cpp
 )

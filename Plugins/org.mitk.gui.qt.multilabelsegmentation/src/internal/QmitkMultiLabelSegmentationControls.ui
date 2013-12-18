@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>244</width>
-    <height>592</height>
+    <width>194</width>
+    <height>732</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -36,7 +36,7 @@
   <property name="windowTitle">
    <string>QmitkSegmentation</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="sizePolicy">
@@ -214,35 +214,24 @@
     </widget>
    </item>
    <item>
-    <widget class="QToolBox" name="toolBox">
+    <widget class="QTabWidget" name="tabWidget">
      <property name="styleSheet">
-      <string notr="true">::tab
-{
-  background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 palette(light), stop:1 palette(midlight));
-}
-
-::tab:selected
-{
-  background: palette(highlight);
-  color: palette(highlighted-text);
-}</string>
+      <string notr="true">QTabWidget::tab-bar { alignment: middle; }</string>
      </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="page_3">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>226</width>
-        <height>247</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>2D Segmentation Tools</string>
+     <property name="usesScrollButtons">
+      <bool>true</bool>
+     </property>
+     <property name="documentMode">
+      <bool>false</bool>
+     </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>2D Tools</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QmitkToolGUIArea" name="m_ManualToolGUIContainer2D" native="true">
          <property name="sizePolicy">
@@ -280,9 +269,6 @@
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::MinimumExpanding</enum>
-         </property>
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
@@ -293,19 +279,11 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>100</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>3D Segmentation Tools</string>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>3D Tools</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QmitkToolGUIArea" name="m_ManualToolGUIContainer3D" native="true">
          <property name="sizePolicy">
@@ -353,13 +331,32 @@
        </item>
       </layout>
      </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QToolBox" name="toolBox">
+     <property name="styleSheet">
+      <string notr="true">::tab
+{
+  background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 palette(light), stop:1 palette(midlight));
+}
+
+::tab:selected
+{
+  background: palette(highlight);
+  color: palette(highlighted-text);
+}</string>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
      <widget class="QWidget" name="page_4">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>83</width>
-        <height>130</height>
+        <width>176</width>
+        <height>177</height>
        </rect>
       </property>
       <attribute name="label">
@@ -545,6 +542,7 @@
   <zorder>toolBox</zorder>
   <zorder>groupBox</zorder>
   <zorder>groupBox_2</zorder>
+  <zorder>tabWidget</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

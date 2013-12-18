@@ -95,7 +95,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
       message(SEND_ERROR "The module target \"${MODULE_AUTOLOAD_WITH}\" specified as the auto-loading module for \"${MODULE_NAME}\" does not exist")
     endif()
     # create a meta-target if it does not already exist
-    set(_module_autoload_meta_target "${MODULE_AUTOLOAD_WITH}-universe")
+    set(_module_autoload_meta_target "${MODULE_AUTOLOAD_WITH}-autoload")
     if(NOT TARGET ${_module_autoload_meta_target})
       add_custom_target(${_module_autoload_meta_target})
     endif()
@@ -419,11 +419,6 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
 
             # add the auto-load module name as a property
             set_property(TARGET ${MODULE_AUTOLOAD_WITH} APPEND PROPERTY MITK_AUTOLOAD_TARGETS ${MODULE_PROVIDES})
-          else()
-            # Add meta dependencies (e.g. on auto-load modules from depending modules)
-            if(ALL_META_DEPENDENCIES)
-              add_dependencies(${MODULE_PROVIDES} ${ALL_META_DEPENDENCIES})
-            endif()
           endif()
         endif()
 

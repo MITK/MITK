@@ -56,15 +56,7 @@ void vtkUnstructuredGridMapper::SetBoundingObject(mitk::BoundingObject* bo)
 //----------------------------------------------------------------------------
 void vtkUnstructuredGridMapper::SetInput(vtkUnstructuredGrid *input)
 {
-  if(input)
-    {
-    this->SetInput(input);
-    }
-  else
-    {
-    // Setting a NULL input removes the connection.
-    this->SetInput(0);
-    }
+  this->SetInputDataObject(input);
 }
 
 //----------------------------------------------------------------------------

@@ -373,10 +373,10 @@ protected:
   void AddLayerProcessing( ImageType* input);
 
   template < typename ImageType >
-  void LayerContainerToImageProcessing( ImageType* input, int layer);
+  void LayerContainerToImageProcessing( ImageType* source, int layer);
 
   template < typename ImageType >
-  void ImageToLayerContainerProcessing( ImageType* input, int layer);
+  void ImageToLayerContainerProcessing( ImageType* source, int layer);
 
   template < typename ImageType >
   void CalculateCenterOfMassProcessing( ImageType* input, int index, int layer);

@@ -271,7 +271,7 @@ void mitk::LabelSetImage::AddLayer()
     newImage->Initialize(this);
 
     LabelSetImageType::Pointer itkImage;
-    mitk::CastToItkImage(this, itkImage);
+    mitk::CastToItkImage(newImage, itkImage);
     itkImage->FillBuffer(0);
 
     m_LayerContainer.push_back(newImage);
@@ -284,6 +284,7 @@ void mitk::LabelSetImage::AddLayer()
     ls->SetLayer(m_ActiveLayer);
     m_LabelSetContainer.push_back(ls);
 
+    // important to release the itk image
     itkImage = NULL;
     AccessByItk_1(this, LayerContainerToImageProcessing, m_ActiveLayer);
   }
@@ -1137,7 +1138,7 @@ void mitk::LabelSetImage::ConcatenateProcessing(ImageType* itkTarget, mitk::Labe
 }
 
 template < typename ImageType >
-void mitk::LabelSetImage::LayerContainerToImageProcessing( ImageType* input, int layer)
+void mitk::LabelSetImage::LayerContainerToImageProcessing( ImageType* source, int layer)
 {
   typename ImageType::Pointer itkSource;
   mitk::CastToItkImage(m_LayerContainer[m_ActiveLayer], itkSource);
@@ -1147,7 +1148,7 @@ void mitk::LabelSetImage::LayerContainerToImageProcessing( ImageType* input, int
   SourceIteratorType sourceIter( itkSource, itkSource->GetLargestPossibleRegion() );
   sourceIter.GoToBegin();
 
-  TargetIteratorType targetIter( input, input->GetLargestPossibleRegion() );
+  TargetIteratorType targetIter( source, source->GetLargestPossibleRegion() );
   targetIter.GoToBegin();
 
   while(!sourceIter.IsAtEnd())
@@ -1159,15 +1160,15 @@ void mitk::LabelSetImage::LayerContainerToImageProcessing( ImageType* input, int
 }
 
 template < typename ImageType >
-void mitk::LabelSetImage::ImageToLayerContainerProcessing( ImageType* input, int layer)
+void mitk::LabelSetImage::ImageToLayerContainerProcessing( ImageType* source, int layer)
 {
   typename ImageType::Pointer itkTarget;
-  mitk::CastToItkImage(m_LayerContainer[m_ActiveLayer],itkTarget);
+  mitk::CastToItkImage(m_LayerContainer[m_ActiveLayer], itkTarget);
 
   typedef itk::ImageRegionConstIterator< ImageType >   SourceIteratorType;
   typedef itk::ImageRegionIterator< ImageType >        TargetIteratorType;
 
-  SourceIteratorType sourceIter( input, input->GetLargestPossibleRegion() );
+  SourceIteratorType sourceIter( source, source->GetLargestPossibleRegion() );
   sourceIter.GoToBegin();
 
   TargetIteratorType targetIter( itkTarget, itkTarget->GetLargestPossibleRegion() );

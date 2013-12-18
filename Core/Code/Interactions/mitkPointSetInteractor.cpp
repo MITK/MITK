@@ -447,26 +447,11 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           if ( !m_UndoEnabled )
             delete doOp;
 
-          /*now select the point "position-1",
-          and if it is the first in list,
-          then contine at the last in list*/
-
-
           //only then a select of a point is possible!
           if (pointSet->GetSize( m_TimeStep ) > 0)
           {
-            if (position>0)//not the first in list
-            {
-              this->SelectPoint( position-1, m_TimeStep, timeInMS );
-            }
-            //it was the first point in list, that was removed, so select
-            //the last in list
-            else
-            {
-              position = pointSet->GetSize( m_TimeStep ) - 1; //last in list
-              this->SelectPoint( position, m_TimeStep, timeInMS );
-            }//else
-          }//if
+            this->SelectPoint(pointSet->Begin(m_TimeStep)->Index(), m_TimeStep, timeInMS);
+          }
 
           ok = true;
         }

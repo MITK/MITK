@@ -9,7 +9,9 @@ if(@MODULE_NAME@_IS_ENABLED)
   set(@MODULE_NAME@_DEPENDS "@MODULE_DEPENDS@")
   set(@MODULE_NAME@_PACKAGE_DEPENDS "@MODULE_PACKAGE_DEPENDS@")
   set(@MODULE_NAME@_LIBRARY_DIRS "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@")
-  if(@MODULE_NAME@_IS_DEPRECATED)
+  if(@MODULE_NAME@_IS_DEPRECATED AND NOT MODULE_IS_DEPRECATED)
+    # Only print the message if the dependent module
+    # is not deprecated itself.
     message(WARNING "Module @MODULE_NAME@ is deprecated since ${@MODULE_NAME@_DEPRECATED_SINCE}")
   endif()
 endif(@MODULE_NAME@_IS_ENABLED)

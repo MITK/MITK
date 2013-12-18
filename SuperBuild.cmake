@@ -209,6 +209,8 @@ set(mitk_cmake_boolean_args
   MITK_USE_SOFA
   MITK_USE_Python
   MITK_USE_OpenCL
+
+  MITK_ENABLE_PIC_READER
   )
 
 #-----------------------------------------------------------------------------

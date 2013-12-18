@@ -48,6 +48,10 @@ set(module_dirs
     Python
 )
 
+if(MITK_ENABLE_PIC_READER)
+  list(APPEND module_dirs IpPicSupportIO)
+endif()
+
 set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)
 
 foreach(module_dir ${module_dirs})

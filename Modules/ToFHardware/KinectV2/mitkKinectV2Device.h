@@ -147,6 +147,9 @@ namespace mitk
     int m_DepthCaptureWidth;
     int m_DepthCaptureHeight;
 
+    size_t m_DepthBufferSize;
+    size_t m_RGBBufferSize;
+
   private:
 
   };

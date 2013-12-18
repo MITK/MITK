@@ -320,17 +320,20 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
   mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
   if (!referenceNode)
   {
-    m_Controls.m_LabelSetWidget->setEnabled(false);
     m_Controls.m_pbNewSegmentationSession->setEnabled(false);
+    m_Controls.m_LabelSetWidget->setEnabled(false);
     m_Controls.m_pbNewLabel->setEnabled(false);
     m_Controls.m_SliceBasedInterpolator->setEnabled(false);
     m_Controls.m_SurfaceBasedInterpolator->setEnabled(false);
     return;
   }
 
+  m_Controls.m_pbNewSegmentationSession->setEnabled(true);
+
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   if (!workingNode)
   {
+    m_Controls.m_LabelSetWidget->setEnabled(false);
     m_Controls.m_pbNewLabel->setEnabled(false);
     m_Controls.m_SliceBasedInterpolator->setEnabled(false);
     m_Controls.m_SurfaceBasedInterpolator->setEnabled(false);
@@ -338,7 +341,6 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
   }
 
   m_Controls.m_LabelSetWidget->setEnabled(true);
-  m_Controls.m_pbNewSegmentationSession->setEnabled(true);
   m_Controls.m_pbNewLabel->setEnabled(true);
   m_Controls.m_SliceBasedInterpolator->setEnabled(true);
   m_Controls.m_SurfaceBasedInterpolator->setEnabled(true);
@@ -409,21 +411,13 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
 
 void QmitkMultiLabelSegmentationView::OnNewLabel()
 {
-  mitk::DataNode* referenceNode = m_Controls.m_cbReferenceNodeSelector->GetSelectedNode();
-
-  if (!referenceNode)
-  {
-    QMessageBox::information( m_Parent, "New Label", "Please load and select a patient image before starting some action.");
-    return;
-  }
-
   m_ToolManager->ActivateTool(-1);
 
-  mitk::Image* referenceImage = dynamic_cast<mitk::Image*>( referenceNode->GetData() );
-  assert(referenceImage);
-
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  if (!workingNode) return;
+  assert(workingNode);
+
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  assert(workingImage);
 
   QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( m_Parent );
   dialog->SetSuggestionList( this->GetDefaultOrganColorString() );
@@ -433,7 +427,6 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
 
   if ( dialogReturnValue == QDialog::Rejected ) return;
 
-  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
   workingImage->AddLabel(dialog->GetSegmentationName().toStdString(), dialog->GetColor());
 
   if (workingImage->GetNumberOfLabels() > 2)
@@ -512,14 +505,17 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
 
   m_ToolManager->SetWorkingData(m_WorkingNode);
 
-  mitk::DataStorage::SetOfObjects::ConstPointer segNodes = this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
-  for(mitk::DataStorage::SetOfObjects::const_iterator iter = segNodes->begin(); iter != segNodes->end(); ++iter)
+  if (m_WorkingNode.IsNotNull())
   {
-     mitk::DataNode* _segNode = *iter;
-     _segNode->SetVisibility(false);
-  }
+    mitk::DataStorage::SetOfObjects::ConstPointer segNodes = this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
+    for(mitk::DataStorage::SetOfObjects::const_iterator iter = segNodes->begin(); iter != segNodes->end(); ++iter)
+    {
+       mitk::DataNode* _segNode = *iter;
+       _segNode->SetVisibility(false);
+    }
 
-  m_WorkingNode->SetVisibility(true);
+    m_WorkingNode->SetVisibility(true);
+  }
 
   this->UpdateControls();
 

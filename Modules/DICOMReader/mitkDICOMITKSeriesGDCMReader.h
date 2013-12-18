@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stack>
 
 // TODO tests seem to pass if reader creates NO output at all!
-// TODO providing tags as properties!
 // TODO preloaded volumes?? could be solved in a different way..
 
 namespace mitk
@@ -81,6 +80,7 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
 
     Image::Pointer FixupSpacing(Image* mitkImage, const DICOMImageBlockDescriptor& block) const;
 
+    ReaderImplementationLevel GetReaderImplementationLevel(const std::string uid) const;
   private:
 
   protected:

@@ -173,7 +173,6 @@ typename ImageType::Pointer
 mitk::ITKDICOMSeriesReaderHelper
 ::FixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo )
 {
-  tiltInfo.Print(std::cout);
   typedef itk::ResampleImageFilter<ImageType,ImageType> ResampleFilterType;
   typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
   resampler->SetInput( input );

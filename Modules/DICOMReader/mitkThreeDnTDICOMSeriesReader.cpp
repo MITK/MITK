@@ -145,6 +145,7 @@ mitk::ThreeDnTDICOMSeriesReader
     assert(!frameList.empty());
 
     DICOMImageBlockDescriptor block;
+    block.SetTagCache( this ); // important: this must be before SetImageFrameList(), because SetImageFrameList will trigger reading of lots of interesting tags!
     block.SetImageFrameList( frameList );
 
     // bad copy&paste code, should be handled in a better way
@@ -206,7 +207,7 @@ mitk::ThreeDnTDICOMSeriesReader
   if (hasTilt)
   {
     MITK_DEBUG << "When loading image " << o << ": got tilt info:";
-    tiltInfo.Print(std::cout);
+    //tiltInfo.Print(std::cout);
   }
   else
   {

@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTimeProbesCollectorBase.h>
 
 #include <gdcmScanner.h>
+#include <gdcmUIDs.h>
 
 mitk::DICOMITKSeriesGDCMReader
 ::DICOMITKSeriesGDCMReader()
@@ -212,12 +213,20 @@ mitk::DICOMITKSeriesGDCMReader
   }
 
   // Add some of our own interest
+  // TODO all tags that are needed in DICOMImageBlockDescriptor should be added by DICOMFileReader (this code location here should query all superclasses for tags)
   m_GDCMScanner.AddTag( gdcm::Tag(0x0018,0x1164) ); // pixel spacing
   m_GDCMScanner.AddTag( gdcm::Tag(0x0028,0x0030) ); // imager pixel spacing
 
   m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x1041) ); // slice location
   m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x0013) ); // instance number
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0018) ); // sop instance number
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0016) ); // sop class UID
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0018) ); // sop instance UID
+
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0060) ); // modality
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x0012) ); // acquisition number
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0018,0x0024) ); // sequence name
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x0037) ); // image orientation
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x0032) ); // ipp
 
   timer.Stop("Setup scanning");
 
@@ -253,7 +262,7 @@ mitk::DICOMITKSeriesGDCMReader
     DICOMDatasetSorter::Pointer& sorter = *sorterIter;
 
     MITK_DEBUG << "================================================================================";
-    MITK_DEBUG << "DICOMIKTSeriesGDCMReader: " << ss.str() << ": " << m_SortingResultInProgress.size() << " groups input";
+    MITK_DEBUG << "DICOMITKSeriesGDCMReader: " << ss.str() << ": " << m_SortingResultInProgress.size() << " groups input";
     unsigned int groupIndex = 0;
 
     for(SortingBlockList::iterator blockIter = m_SortingResultInProgress.begin();
@@ -264,7 +273,7 @@ mitk::DICOMITKSeriesGDCMReader
       DICOMDatasetList datasetList = ToDICOMDatasetList( gdcmInfoFrameList );
 
       MITK_DEBUG << "--------------------------------------------------------------------------------";
-      MITK_DEBUG << "DICOMIKTSeriesGDCMReader: " << ss.str() << ", dataset group " << groupIndex << " (" << datasetList.size() << " datasets): ";
+      MITK_DEBUG << "DICOMITKSeriesGDCMReader: " << ss.str() << ", dataset group " << groupIndex << " (" << datasetList.size() << " datasets): ";
       for (DICOMDatasetList::iterator oi = datasetList.begin();
            oi != datasetList.end();
            ++oi)
@@ -316,28 +325,69 @@ mitk::DICOMITKSeriesGDCMReader
     assert(!frameList.empty());
 
     DICOMImageBlockDescriptor block;
+    block.SetTagCache( this ); // important: this must be before SetImageFrameList(), because SetImageFrameList will trigger reading of lots of interesting tags!
     block.SetImageFrameList( frameList );
 
     const GantryTiltInformation& tiltInfo = m_EquiDistantBlocksSorter->GetTiltInformation( (gdcmFrameInfoList.front())->GetFilenameIfAvailable() );
     block.SetFlag("gantryTilt", tiltInfo.IsRegularGantryTilt());
     block.SetTiltInformation( tiltInfo );
 
-    // assume
     static const DICOMTag tagPixelSpacing(0x0028,0x0030);
     static const DICOMTag tagImagerPixelSpacing(0x0018,0x1164);
     std::string pixelSpacingString = (gdcmFrameInfoList.front())->GetTagValueAsString( tagPixelSpacing );
     std::string imagerPixelSpacingString = gdcmFrameInfoList.front()->GetTagValueAsString( tagImagerPixelSpacing );
     block.SetPixelSpacingInformation(pixelSpacingString, imagerPixelSpacingString);
 
-    block.SetTagCache( this );
+    static const DICOMTag tagSOPClassUID(0x0008,0x0016);
+    std::string sopClassUID = (gdcmFrameInfoList.front())->GetTagValueAsString( tagSOPClassUID );
+    block.SetSOPClassUID(sopClassUID);
+
+    block.SetReaderImplementationLevel( this->GetReaderImplementationLevel(sopClassUID) );
 
     this->SetOutput( o, block );
   }
   timer.Stop("Output");
 
+#ifdef MBILOG_ENABLE_DEBUG
   std::cout << "---------------------------------------------------------------" << std::endl;
   timer.Report( std::cout );
   std::cout << "---------------------------------------------------------------" << std::endl;
+#endif
+}
+
+mitk::ReaderImplementationLevel
+mitk::DICOMITKSeriesGDCMReader
+::GetReaderImplementationLevel(const std::string uid) const
+{
+  if (uid.empty())
+  {
+    return SOPClassUnknown;
+  }
+
+  gdcm::UIDs uidKnowledge;
+  uidKnowledge.SetFromUID( uid.c_str() );
+
+  gdcm::UIDs::TSType gdcmType = uidKnowledge;
+
+  switch (gdcmType)
+  {
+    case gdcm::UIDs::CTImageStorage:
+    case gdcm::UIDs::MRImageStorage:
+    case gdcm::UIDs::PositronEmissionTomographyImageStorage:
+    case gdcm::UIDs::ComputedRadiographyImageStorage:
+    case gdcm::UIDs::DigitalXRayImageStorageForPresentation:
+    case gdcm::UIDs::DigitalXRayImageStorageForProcessing:
+      return SOPClassSupported;
+
+    case gdcm::UIDs::NuclearMedicineImageStorage:
+      return SOPClassPartlySupported;
+
+    case gdcm::UIDs::SecondaryCaptureImageStorage:
+      return SOPClassImplemented;
+
+    default:
+      return SOPClassUnsupported;
+  }
 }
 
 // void AllocateOutputImages();
@@ -369,7 +419,7 @@ mitk::DICOMITKSeriesGDCMReader
   if (hasTilt)
   {
     MITK_DEBUG << "When loading image " << o << ": got tilt info:";
-    tiltInfo.Print(std::cout);
+    //tiltInfo.Print(std::cout);
   }
   else
   {
@@ -459,5 +509,6 @@ mitk::DICOMITKSeriesGDCMReader
     }
 
   }
-    return "soso";
+
+  return "";
 }

@@ -13,6 +13,7 @@ set(H_FILES
   mitkEquiDistantBlocksSorter.h
   mitkSortByImagePositionPatient.h
   mitkClassicDICOMSeriesReader.h
+  mitkThreeDnTDICOMSeriesReader.h
   mitkDICOMTag.h
 )
 
@@ -32,5 +33,7 @@ set(CPP_FILES
   mitkSortByImagePositionPatient.cpp
   mitkGantryTiltInformation.cpp
   mitkClassicDICOMSeriesReader.cpp
+  mitkThreeDnTDICOMSeriesReader.cpp
   mitkDICOMTag.cpp
+  mitkDICOMEnums.cpp
 )

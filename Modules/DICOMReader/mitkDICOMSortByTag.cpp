@@ -93,19 +93,13 @@ mitk::DICOMSortByTag
   std::string leftString = left->GetTagValueAsString(tag);
   std::string rightString = right->GetTagValueAsString(tag);
 
-  const char* leftInput(leftString.c_str());
-  const char* rightInput(rightString.c_str());
-  char* leftEnd(NULL);
-  char* rightEnd(NULL);
+  std::istringstream lefti(leftString);
+  std::istringstream righti(rightString);
 
-  double leftDouble = strtod(leftInput, &leftEnd);
-  double rightDouble = strtod(rightInput, &rightEnd);
+  double leftDouble(0);
+  double rightDouble(0);
 
-  if (leftEnd == leftInput || rightEnd == rightInput) // no numerical conversion..
-  {
-    return this->StringCompare(left,right, tag); // fallback to string compare
-  }
-  else
+  if ( (lefti >> leftDouble) && (righti >> rightDouble) )
   {
     if (leftDouble != rightDouble) // can we decide?
     {
@@ -115,5 +109,9 @@ mitk::DICOMSortByTag
     {
       return this->NextLevelIsLeftBeforeRight(left, right);
     }
+  }
+  else // no numerical conversion..
+  {
+    return this->StringCompare(left,right, tag); // fallback to string compare
   }
 }

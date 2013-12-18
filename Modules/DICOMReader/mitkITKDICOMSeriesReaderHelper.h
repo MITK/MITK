@@ -30,13 +30,16 @@ class ITKDICOMSeriesReaderHelper
   public:
 
     typedef std::vector<std::string> StringContainer;
+    typedef std::list<StringContainer> StringContainerList;
 
     Image::Pointer Load( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo );
+    Image::Pointer Load3DnT( const StringContainerList& filenamesLists, bool correctTilt, const GantryTiltInformation& tiltInfo );
+
+  private:
 
     template <typename ImageType>
     typename ImageType::Pointer
-    // TODO this is NOT inplace!
-    InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo );
+    FixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo );
 
     template <typename PixelType>
     Image::Pointer
@@ -45,6 +48,15 @@ class ITKDICOMSeriesReaderHelper
                     const GantryTiltInformation& tiltInfo,
                     itk::GDCMImageIO::Pointer& io,
                     Image::Pointer preLoadedImageBlock );
+
+    template <typename PixelType>
+    Image::Pointer
+    LoadDICOMByITK3DnT( const StringContainerList& filenames,
+                        bool correctTilt,
+                        const GantryTiltInformation& tiltInfo,
+                        itk::GDCMImageIO::Pointer& io,
+                        Image::Pointer preLoadedImageBlock );
+
 
 };
 

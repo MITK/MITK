@@ -53,7 +53,14 @@ mitk::DICOMGDCMImageFrameInfo
 
   if (mappedValue != m_TagForValue.end())
   {
-    return mappedValue->second;
+    if (mappedValue->second != NULL)
+    {
+      return std::string(mappedValue->second);
+    }
+    else
+    {
+      return std::string("");
+    }
   }
   else
   {
@@ -85,7 +92,7 @@ mitk::DICOMGDCMImageFrameInfo
   }
   else
   {
-    return "";
+    return std::string("");
   }
 }
 

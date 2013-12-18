@@ -30,7 +30,7 @@ mitk::DICOMDatasetSorter
 mitk::DICOMDatasetSorter
 ::DICOMDatasetSorter(const DICOMDatasetSorter& other )
 :itk::LightObject()
-,m_Outputs( other.m_Outputs ) // TODO copy instead of reference!
+,m_Outputs( other.m_Outputs )
 {
 }
 
@@ -41,7 +41,7 @@ mitk::DICOMDatasetSorter
   if (this != &other)
   {
     m_Input = other.m_Input;
-    m_Outputs = other.m_Outputs; // TODO copy instead of reference!
+    m_Outputs = other.m_Outputs;
   }
   return *this;
 }

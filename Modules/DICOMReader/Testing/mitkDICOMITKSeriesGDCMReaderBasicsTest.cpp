@@ -62,7 +62,6 @@ int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
   tagSorter->AddDistinguishingTag( DICOMTag(0x0020, 0x0052) ); // Frame of Reference UID
 
   // a sorter...
-  // TODO ugly syntax, improve..
   mitk::DICOMSortCriterion::ConstPointer sorting =
     mitk::DICOMSortByTag::New( DICOMTag(0x0020, 0x0013), // instance number
       mitk::DICOMSortByTag::New( DICOMTag(0x0020, 0x0012), // aqcuisition number

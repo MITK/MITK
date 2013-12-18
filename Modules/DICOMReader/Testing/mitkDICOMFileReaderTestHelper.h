@@ -61,8 +61,6 @@ static void TestInputFilenames(DICOMFileReader* reader)
   const StringList& inputFilesReturned = reader->GetInputFiles();
   MITK_TEST_CONDITION( inputFilesReturned.size() == inputFiles.size(), "Input file list is received")
   MITK_TEST_CONDITION( reader->GetNumberOfOutputs() == 0, "No outputs without analysis")
-
-  // TODO: check that strings are actually contained
 }
 
 static void TestOutputsContainInputs(DICOMFileReader* reader)

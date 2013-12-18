@@ -45,7 +45,7 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
     virtual void Sort();
 
     void SetAcceptTilt(bool accept);
-    const GantryTiltInformation GetTiltInformation(const std::string& filename, bool& hasTiltInfo); // TODO ugly, but bool flag will be removed
+    const GantryTiltInformation GetTiltInformation(const std::string& filename);
 
   protected:
 
@@ -67,7 +67,7 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
         /**
           \brief Grouping result, all same origin-to-origin distance w/o gaps.
          */
-        DICOMDatasetList GetBlockFilenames(); // TODO rename --> ... Dataset ... instead of filename
+        DICOMDatasetList GetBlockDatasets();
 
         void SetFirstFilenameOfBlock(const std::string& filename);
         std::string GetFirstFilenameOfBlock() const;
@@ -75,7 +75,7 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
         /**
           \brief Remaining files, which could not be grouped.
          */
-        DICOMDatasetList GetUnsortedFilenames();
+        DICOMDatasetList GetUnsortedDatasets();
 
         /**
           \brief Wheter or not the grouped result contain a gantry tilt.
@@ -114,7 +114,6 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
         DICOMDatasetList m_GroupedFiles;
         DICOMDatasetList m_UnsortedFiles;
 
-        bool m_GantryTilt; // TODO make the flag part of GantryTiltInformation!
         GantryTiltInformation m_TiltInfo;
         std::string m_FirstFilenameOfBlock;
     };

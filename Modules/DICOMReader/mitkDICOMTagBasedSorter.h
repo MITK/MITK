@@ -30,7 +30,7 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
 {
   public:
 
-    class TagValueProcessor // TODO use smart pointers here
+    class TagValueProcessor
     {
       public:
         virtual std::string operator()(const std::string&) const = 0;

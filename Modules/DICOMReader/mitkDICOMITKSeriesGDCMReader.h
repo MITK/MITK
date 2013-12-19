@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <stack>
 
+// TODO should reject multi-frame
 // TODO tests seem to pass if reader creates NO output at all!
 // TODO preloaded volumes?? could be solved in a different way..
 

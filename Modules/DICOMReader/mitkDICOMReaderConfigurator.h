@@ -45,9 +45,13 @@ class DICOMReader_EXPORT DICOMReaderConfigurator : public itk::LightObject
     DICOMFileReader::Pointer CreateFromTiXmlDocument(TiXmlDocument& doc);
     DICOMTag tagFromXMLElement(TiXmlElement*);
     std::string requiredStringAttribute(TiXmlElement* xmlElement, const std::string& key);
+    unsigned int hexStringToUInt(const std::string& s);
 
     ThreeDnTDICOMSeriesReader::Pointer ConfigureThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, TiXmlElement*);
     DICOMITKSeriesGDCMReader::Pointer ConfigureDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, TiXmlElement*);
+
+    DICOMSortCriterion::Pointer CreateDICOMSortByTag(TiXmlElement* xmlElement, DICOMSortCriterion::Pointer secondaryCriterion);
+    DICOMSortCriterion::Pointer CreateSortByImagePositionPatient(TiXmlElement* xmlElement, DICOMSortCriterion::Pointer secondaryCriterion);
  };
 
 } // namespace

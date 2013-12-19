@@ -36,6 +36,8 @@ class DICOMReader_EXPORT DICOMFilenameSorter : public DICOMDatasetSorter
 
     virtual void Sort();
 
+    virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const;
+
   protected:
 
     struct FilenameSort

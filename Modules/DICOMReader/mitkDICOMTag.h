@@ -37,7 +37,12 @@ class DICOMReader_EXPORT DICOMTag
     unsigned int GetGroup() const;
     unsigned int GetElement() const;
 
+    std::string GetName() const;
+    void Print(std::ostream& os) const;
+
   protected:
+
+    std::string toHexString(unsigned int i) const;
 
     unsigned int m_Group;
     unsigned int m_Element;

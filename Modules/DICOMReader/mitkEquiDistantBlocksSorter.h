@@ -47,6 +47,8 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
     void SetAcceptTilt(bool accept);
     const GantryTiltInformation GetTiltInformation(const std::string& filename);
 
+    virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const;
+
   protected:
 
     /**

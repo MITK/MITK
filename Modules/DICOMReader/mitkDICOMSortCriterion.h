@@ -36,6 +36,10 @@ class DICOMReader_EXPORT DICOMSortCriterion : public itk::LightObject
 
     virtual bool IsLeftBeforeRight(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right) const = 0;
 
+    DICOMSortCriterion::ConstPointer GetSecondaryCriterion() const;
+
+    virtual void Print(std::ostream& os) const = 0;
+
   protected:
 
     DICOMSortCriterion( DICOMSortCriterion::Pointer secondaryCriterion );

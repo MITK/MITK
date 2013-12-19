@@ -29,6 +29,7 @@ mitk::DICOMITKSeriesGDCMReader
 :DICOMFileReader()
 ,m_FixTiltByShearing(true)
 {
+  this->EnsureMandatorySortersArePresent();
 }
 
 mitk::DICOMITKSeriesGDCMReader
@@ -36,6 +37,7 @@ mitk::DICOMITKSeriesGDCMReader
 :DICOMFileReader(other)
 ,m_FixTiltByShearing(false)
 {
+  this->EnsureMandatorySortersArePresent();
 }
 
 mitk::DICOMITKSeriesGDCMReader
@@ -66,12 +68,12 @@ mitk::DICOMITKSeriesGDCMReader
 
 mitk::DICOMGDCMImageFrameList
 mitk::DICOMITKSeriesGDCMReader
-::FromDICOMDatasetList(DICOMDatasetList& input)
+::FromDICOMDatasetList(const DICOMDatasetList& input)
 {
   DICOMGDCMImageFrameList output;
   output.reserve(input.size());
 
-  for(DICOMDatasetList::iterator inputIter = input.begin();
+  for(DICOMDatasetList::const_iterator inputIter = input.begin();
       inputIter != input.end();
       ++inputIter)
   {
@@ -85,12 +87,12 @@ mitk::DICOMITKSeriesGDCMReader
 
 mitk::DICOMDatasetList
 mitk::DICOMITKSeriesGDCMReader
-::ToDICOMDatasetList(DICOMGDCMImageFrameList& input)
+::ToDICOMDatasetList(const DICOMGDCMImageFrameList& input)
 {
   DICOMDatasetList output;
   output.reserve(input.size());
 
-  for(DICOMGDCMImageFrameList::iterator inputIter = input.begin();
+  for(DICOMGDCMImageFrameList::const_iterator inputIter = input.begin();
       inputIter != input.end();
       ++inputIter)
   {
@@ -104,12 +106,12 @@ mitk::DICOMITKSeriesGDCMReader
 
 mitk::DICOMImageFrameList
 mitk::DICOMITKSeriesGDCMReader
-::ToDICOMImageFrameList(DICOMGDCMImageFrameList& input)
+::ToDICOMImageFrameList(const DICOMGDCMImageFrameList& input)
 {
   DICOMImageFrameList output;
   output.reserve(input.size());
 
-  for(DICOMGDCMImageFrameList::iterator inputIter = input.begin();
+  for(DICOMGDCMImageFrameList::const_iterator inputIter = input.begin();
       inputIter != input.end();
       ++inputIter)
   {
@@ -120,6 +122,24 @@ mitk::DICOMITKSeriesGDCMReader
 
   return output;
 }
+
+void
+mitk::DICOMITKSeriesGDCMReader
+::InternalPrintConfiguration(std::ostream& os) const
+{
+  unsigned int sortIndex(1);
+  for(SorterList::const_iterator sorterIter = m_Sorter.begin();
+      sorterIter != m_Sorter.end();
+      ++sortIndex, ++sorterIter)
+  {
+    os << "Sorting step " << sortIndex << ":" << std::endl;
+    (*sorterIter)->PrintConfiguration(os, "  ");
+  }
+
+  os << "Sorting step " << sortIndex << ":" << std::endl;
+  m_EquiDistantBlocksSorter->PrintConfiguration(os, "  ");
+}
+
 
 std::string
 mitk::DICOMITKSeriesGDCMReader
@@ -179,9 +199,6 @@ void
 mitk::DICOMITKSeriesGDCMReader
 ::AnalyzeInputFiles()
 {
-  // at this point, make sure we have a sorting element at the end that splits geometrically separate blocks
-  this->EnsureMandatorySortersArePresent();
-
   itk::TimeProbesCollectorBase timer;
 
   timer.Start("Reset");
@@ -250,60 +267,17 @@ mitk::DICOMITKSeriesGDCMReader
   // sort and split blocks as configured
 
   timer.Start("Sorting frames");
-  SortingBlockList nextStepSorting; // we should not modify our input list while processing it
   unsigned int sorterIndex = 0;
   for(SorterList::iterator sorterIter = m_Sorter.begin();
       sorterIter != m_Sorter.end();
       ++sorterIndex, ++sorterIter)
   {
-    std::stringstream ss; ss << "Sorting step " << sorterIndex;
-    timer.Start( ss.str().c_str() );
-    nextStepSorting.clear();
-    DICOMDatasetSorter::Pointer& sorter = *sorterIter;
-
-    MITK_DEBUG << "================================================================================";
-    MITK_DEBUG << "DICOMITKSeriesGDCMReader: " << ss.str() << ": " << m_SortingResultInProgress.size() << " groups input";
-    unsigned int groupIndex = 0;
-
-    for(SortingBlockList::iterator blockIter = m_SortingResultInProgress.begin();
-        blockIter != m_SortingResultInProgress.end();
-        ++groupIndex, ++blockIter)
-    {
-      DICOMGDCMImageFrameList& gdcmInfoFrameList = *blockIter;
-      DICOMDatasetList datasetList = ToDICOMDatasetList( gdcmInfoFrameList );
-
-      MITK_DEBUG << "--------------------------------------------------------------------------------";
-      MITK_DEBUG << "DICOMITKSeriesGDCMReader: " << ss.str() << ", dataset group " << groupIndex << " (" << datasetList.size() << " datasets): ";
-      for (DICOMDatasetList::iterator oi = datasetList.begin();
-           oi != datasetList.end();
-           ++oi)
-      {
-        MITK_DEBUG << "  INPUT     : " << (*oi)->GetFilenameIfAvailable();
-      }
-
-      sorter->SetInput(datasetList);
-      sorter->Sort();
-      unsigned int numberOfResultingBlocks = sorter->GetNumberOfOutputs();
-
-      for (unsigned int b = 0; b < numberOfResultingBlocks; ++b)
-      {
-        DICOMDatasetList blockResult = sorter->GetOutput(b);
-
-        for (DICOMDatasetList::iterator oi = blockResult.begin();
-             oi != blockResult.end();
-             ++oi)
-        {
-          MITK_DEBUG << "  OUTPUT(" << b << ") :" << (*oi)->GetFilenameIfAvailable();
-        }
-
-        DICOMGDCMImageFrameList sortedGdcmInfoFrameList = FromDICOMDatasetList(blockResult);
-        nextStepSorting.push_back( sortedGdcmInfoFrameList );
-      }
-    }
-
-    m_SortingResultInProgress = nextStepSorting;
-    timer.Stop( ss.str().c_str() );
+    m_SortingResultInProgress = this->InternalExecuteSortingStep(sorterIndex, *sorterIter, m_SortingResultInProgress, &timer);
   }
+
+  // a last extra-sorting step: ensure equidistant slices
+  m_SortingResultInProgress = this->InternalExecuteSortingStep(sorterIndex, m_EquiDistantBlocksSorter.GetPointer(), m_SortingResultInProgress, &timer);
+
   timer.Stop("Sorting frames");
 
   timer.Start("Condensing 3D blocks (3D+t or vector values)");
@@ -353,6 +327,64 @@ mitk::DICOMITKSeriesGDCMReader
   timer.Report( std::cout );
   std::cout << "---------------------------------------------------------------" << std::endl;
 #endif
+}
+
+mitk::DICOMITKSeriesGDCMReader::SortingBlockList
+mitk::DICOMITKSeriesGDCMReader
+::InternalExecuteSortingStep(
+    unsigned int sortingStepIndex,
+    DICOMDatasetSorter::Pointer sorter,
+    const SortingBlockList& input,
+    itk::TimeProbesCollectorBase* timer)
+{
+  SortingBlockList nextStepSorting; // we should not modify our input list while processing it
+  std::stringstream ss; ss << "Sorting step " << sortingStepIndex;
+  timer->Start( ss.str().c_str() );
+  nextStepSorting.clear();
+
+  MITK_DEBUG << "================================================================================";
+  MITK_DEBUG << "DICOMITKSeriesGDCMReader: " << ss.str() << ": " << input.size() << " groups input";
+  unsigned int groupIndex = 0;
+
+  for(SortingBlockList::const_iterator blockIter = input.begin();
+      blockIter != input.end();
+      ++groupIndex, ++blockIter)
+  {
+    const DICOMGDCMImageFrameList& gdcmInfoFrameList = *blockIter;
+    DICOMDatasetList datasetList = ToDICOMDatasetList( gdcmInfoFrameList );
+
+    MITK_DEBUG << "--------------------------------------------------------------------------------";
+    MITK_DEBUG << "DICOMITKSeriesGDCMReader: " << ss.str() << ", dataset group " << groupIndex << " (" << datasetList.size() << " datasets): ";
+    for (DICOMDatasetList::iterator oi = datasetList.begin();
+        oi != datasetList.end();
+        ++oi)
+    {
+      MITK_DEBUG << "  INPUT     : " << (*oi)->GetFilenameIfAvailable();
+    }
+
+    sorter->SetInput(datasetList);
+    sorter->Sort();
+    unsigned int numberOfResultingBlocks = sorter->GetNumberOfOutputs();
+
+    for (unsigned int b = 0; b < numberOfResultingBlocks; ++b)
+    {
+      DICOMDatasetList blockResult = sorter->GetOutput(b);
+
+      for (DICOMDatasetList::iterator oi = blockResult.begin();
+          oi != blockResult.end();
+          ++oi)
+      {
+        MITK_DEBUG << "  OUTPUT(" << b << ") :" << (*oi)->GetFilenameIfAvailable();
+      }
+
+      DICOMGDCMImageFrameList sortedGdcmInfoFrameList = FromDICOMDatasetList(blockResult);
+      nextStepSorting.push_back( sortedGdcmInfoFrameList );
+    }
+  }
+
+  timer->Stop( ss.str().c_str() );
+
+  return nextStepSorting;
 }
 
 mitk::ReaderImplementationLevel
@@ -473,7 +505,7 @@ void
 mitk::DICOMITKSeriesGDCMReader
 ::EnsureMandatorySortersArePresent()
 {
-  // TODO do just once!
+  // TODO do just once! Do it in c'tor and handle this step extra!
   DICOMTagBasedSorter::Pointer splitter = DICOMTagBasedSorter::New();
   splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0010) ); // Number of Rows
   splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0011) ); // Number of Columns
@@ -489,8 +521,6 @@ mitk::DICOMITKSeriesGDCMReader
     m_EquiDistantBlocksSorter = mitk::EquiDistantBlocksSorter::New();
   }
   m_EquiDistantBlocksSorter->SetAcceptTilt( m_FixTiltByShearing );
-
-  this->AddSortingElement( m_EquiDistantBlocksSorter );
 }
 
 std::string

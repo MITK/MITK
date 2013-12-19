@@ -33,6 +33,8 @@ class DICOMReader_EXPORT DICOMSortByTag : public DICOMSortCriterion
     virtual DICOMTagList GetTagsOfInterest() const;
     virtual bool IsLeftBeforeRight(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right) const;
 
+    virtual void Print(std::ostream& os) const;
+
   protected:
 
     DICOMSortByTag( const DICOMTag& tag, DICOMSortCriterion::Pointer secondaryCriterion = NULL );

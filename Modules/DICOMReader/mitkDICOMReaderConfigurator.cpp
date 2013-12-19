@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMTagBasedSorter.h"
 
+#include "mitkDICOMSortByTag.h"
+#include "mitkSortByImagePositionPatient.h"
+
 mitk::DICOMReaderConfigurator
 ::DICOMReaderConfigurator()
 {
@@ -96,45 +99,11 @@ mitk::DICOMReaderConfigurator
       return NULL;
     }
   }
-
-  /*
-  mitk::DICOMTagBasedSorter::Pointer tagSorter = mitk::DICOMTagBasedSorter::New();
-
-  TiXmlHandle hroot (0);
-    hroot = TiXmlHandle (doc.FirstChildElement());
-
-    MITK_INFO<< "Loading dicom reader configuration... "<<hroot.Element()->Value();
-
-    if (hroot.FirstChild("DistinguishingTags").Element() == NULL)
-      return tagSorter;
-
-    TiXmlElement* distTag = hroot.FirstChild("DistinguishingTags").FirstChild().Element();
-
-
-    for( ;distTag; distTag=distTag->NextSiblingElement())
-    {
-      tagSorter->AddDistinguishingTag(this->getTagFromXMLElement(distTag));
-    }
-
-    // Sorting tags are loaded in reverse order
-    if (hroot.FirstChild("SortingTags").Element() == NULL)
-      return tagSorter;
-
-    TiXmlNode* sortTag = hroot.FirstChild("SortingTags").ToNode()->LastChild();
-
-    mitk::DICOMSortCriterion::Pointer sortingCrit;
-    for( ;sortTag; sortTag=sortTag->PreviousSibling())
-    {
-      if (sortingCrit.IsNull())
-        sortingCrit  = mitk::DICOMSortByTag::New(this->getTagFromXMLElement(sortTag->ToElement())).GetPointer();
-      else
-        sortingCrit = mitk::DICOMSortByTag::New(this->getTagFromXMLElement(sortTag->ToElement()), sortingCrit).GetPointer();
-    }
-    tagSorter->SetSortCriterion(sortingCrit.GetPointer());
-
-    return tagSorter;
-  */
-  return mitk::ClassicDICOMSeriesReader::New().GetPointer();
+  else
+  {
+    MITK_ERROR << "Great confusion: no root element in XML document. Expecting a DICOMFileReader tag at top-level.";
+    return NULL;
+  }
 }
 
 #define boolStringTrue(s) \
@@ -150,24 +119,21 @@ mitk::DICOMReaderConfigurator
   // use all the base class configuration
   if (this->ConfigureDICOMITKSeriesGDCMReader( reader.GetPointer(), element ).IsNull())
   {
-
-    // add the "group3DnT" flag
-    bool group3DnT(true);
-    const char* group3DnTC = element->Attribute("group3DnT");
-    if (group3DnTC)
-    {
-      std::string group3DnTS(group3DnTC);
-      group3DnT = boolStringTrue(group3DnTS);
-    }
-
-    reader->SetGroup3DandT( group3DnT );
-
-    return reader;
-  }
-  else
-  {
     return NULL;
   }
+
+  // add the "group3DnT" flag
+  bool group3DnT(true);
+  const char* group3DnTC = element->Attribute("group3DnT");
+  if (group3DnTC)
+  {
+    std::string group3DnTS(group3DnTC);
+    group3DnT = boolStringTrue(group3DnTS);
+  }
+
+  reader->SetGroup3DandT( group3DnT );
+
+  return reader;
 }
 
 mitk::DICOMITKSeriesGDCMReader::Pointer
@@ -190,7 +156,7 @@ mitk::DICOMReaderConfigurator
 
   // "distinguishing tags"
   mitk::DICOMTagBasedSorter::Pointer tagSorter = mitk::DICOMTagBasedSorter::New();
-  TiXmlElement* dElement = element->FirstChildElement("DistinguishingTags");
+  TiXmlElement* dElement = element->FirstChildElement("Distinguishing");
   if (dElement)
   {
     for ( TiXmlElement* tChild = dElement->FirstChildElement();
@@ -209,7 +175,59 @@ mitk::DICOMReaderConfigurator
     }
   }
 
-  // "sorting"
+  // "sorting tags"
+  TiXmlElement* sElement = element->FirstChildElement("Sorting");
+  if (dElement)
+  {
+    DICOMSortCriterion::Pointer previousCriterion;
+    DICOMSortCriterion::Pointer currentCriterion;
+
+    for ( TiXmlNode* tChildNode = sElement->LastChild();
+        tChildNode != NULL;
+        tChildNode = tChildNode->PreviousSibling() )
+    {
+      TiXmlElement* tChild = tChildNode->ToElement();
+      if (!tChild) continue;
+
+      if (!strcmp(tChild->Value(), "Tag"))
+      {
+        try
+        {
+          currentCriterion = this->CreateDICOMSortByTag(tChild, previousCriterion);
+        }
+        catch(...)
+        {
+          std::stringstream ss;
+          ss << "Could not parse <Tag> element at (input line " << tChild->Row() << ", col. " << tChild->Column() << ")!";
+          MITK_ERROR << ss.str();
+          return NULL;
+        }
+      }
+      else
+      if (!strcmp(tChild->Value(), "ImagePositionPatient"))
+      {
+        try
+        {
+          currentCriterion = this->CreateSortByImagePositionPatient(tChild, previousCriterion);
+        }
+        catch(...)
+        {
+          std::stringstream ss;
+          ss << "Could not parse <ImagePositionPatient> element at (input line " << tChild->Row() << ", col. " << tChild->Column() << ")!";
+          MITK_ERROR << ss.str();
+          return NULL;
+        }
+      }
+      else
+      {
+        MITK_ERROR << "File contain unknown tag <" << tChild->Value()  << "> tag as child to <Sorting>! Cannot interpret...";
+      }
+
+      previousCriterion = currentCriterion;
+    }
+
+    tagSorter->SetSortCriterion( currentCriterion.GetPointer() ); // TODO get ConstPointer declarations right here
+  }
 
   reader->AddSortingElement( tagSorter );
 
@@ -238,6 +256,17 @@ mitk::DICOMReaderConfigurator
   }
 }
 
+unsigned int
+mitk::DICOMReaderConfigurator
+::hexStringToUInt(const std::string& s)
+{
+  std::stringstream converter(s);
+  unsigned int ui;
+  converter >> std::hex >> ui;
+  MITK_DEBUG << "Converted string '" << s << "' to unsigned int " << ui;
+  return ui;
+}
+
 mitk::DICOMTag
 mitk::DICOMReaderConfigurator
 ::tagFromXMLElement(TiXmlElement* xmlElement)
@@ -257,9 +286,34 @@ mitk::DICOMReaderConfigurator
   std::string groupS = requiredStringAttribute(xmlElement, "group");
   std::string elementS = requiredStringAttribute(xmlElement, "element");
 
-  // convert string to int (assuming string is in hex format with leading "0x" like "0x0020")
-  unsigned int group(0);
-  unsigned int element(0);
+  try
+  {
+    // convert string to int (assuming string is in hex format with leading "0x" like "0x0020")
+    unsigned int group = hexStringToUInt(groupS);
+    unsigned int element = hexStringToUInt(elementS);
+    return DICOMTag(group, element);
+  }
+  catch(...)
+  {
+    std::stringstream ss;
+    ss << "Expected group and element values in <Tag group=\"..\" element=\"..\"> to be hexadecimal with leading 0x, e.g. '0x0020'"
+          "(input line " << xmlElement->Row() << ", col. " << xmlElement->Column() << ")!";
+    MITK_ERROR << ss.str();
+    throw std::invalid_argument( ss.str() );
+  }
+}
 
-  return DICOMTag(group, element);
+mitk::DICOMSortCriterion::Pointer
+mitk::DICOMReaderConfigurator
+::CreateDICOMSortByTag(TiXmlElement* xmlElement, DICOMSortCriterion::Pointer secondaryCriterion)
+{
+  mitk::DICOMTag tag = tagFromXMLElement(xmlElement);
+  return DICOMSortByTag::New(tag, secondaryCriterion).GetPointer();
+}
+
+mitk::DICOMSortCriterion::Pointer
+mitk::DICOMReaderConfigurator
+::CreateSortByImagePositionPatient(TiXmlElement*, DICOMSortCriterion::Pointer secondaryCriterion)
+{
+  return SortByImagePositionPatient::New(secondaryCriterion).GetPointer();
 }

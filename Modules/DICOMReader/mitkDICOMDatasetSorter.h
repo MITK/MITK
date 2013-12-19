@@ -42,6 +42,8 @@ class DICOMReader_EXPORT DICOMDatasetSorter : public itk::LightObject
     const DICOMDatasetList& GetOutput(unsigned int index) const;
     DICOMDatasetList& GetOutput(unsigned int index);
 
+    virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const = 0;
+
   protected:
 
     DICOMDatasetSorter();

@@ -55,6 +55,8 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
 
     virtual void Sort();
 
+    virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const;
+
   protected:
 
     struct ParameterizedDatasetSort

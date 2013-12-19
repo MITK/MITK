@@ -81,6 +81,31 @@ mitk::DICOMTagBasedSorter
   return *this;
 }
 
+void
+mitk::DICOMTagBasedSorter
+::PrintConfiguration(std::ostream& os, const std::string& indent) const
+{
+  os << indent << "Tag based sorting:" << std::endl;
+  for (DICOMTagList::const_iterator tagIter = m_DistinguishingTags.begin();
+       tagIter != m_DistinguishingTags.end();
+       ++tagIter)
+  {
+    os << indent << "  Split on ";
+    tagIter->Print(os);
+    os << std::endl;
+  }
+
+  DICOMSortCriterion::ConstPointer crit = m_SortCriterion.GetPointer();
+  while (crit.IsNotNull())
+  {
+    os << indent << "   Sort by ";
+    crit->Print(os);
+    os << std::endl;
+    crit = crit->GetSecondaryCriterion();
+  }
+}
+
+
 mitk::DICOMTagList
 mitk::DICOMTagBasedSorter
 ::GetTagsOfInterest()

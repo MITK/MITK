@@ -122,6 +122,14 @@ mitk::EquiDistantBlocksSorter
 
 void
 mitk::EquiDistantBlocksSorter
+::PrintConfiguration(std::ostream& os, const std::string& indent) const
+{
+  os << indent << "Sort into blocks of equidistant, well-aligned slices " << (m_AcceptTilt ? "(accepting a gantry tilt)" : "") << std::endl;
+}
+
+
+void
+mitk::EquiDistantBlocksSorter
 ::SetAcceptTilt(bool accept)
 {
   m_AcceptTilt = accept;

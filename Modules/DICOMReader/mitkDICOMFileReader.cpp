@@ -101,9 +101,19 @@ mitk::DICOMFileReader
 
 void
 mitk::DICOMFileReader
-::PrintOutputs(std::ostream& os, bool filenameDetails)
+::PrintConfiguration(std::ostream& os) const
 {
-  os << "---- Outputs of DICOMFilereader " << (void*)this << "----"<< std::endl;
+  os << "---- Configuration of " << this->GetNameOfClass() <<" " << (void*)this << " ----"<< std::endl;
+  this->InternalPrintConfiguration(os);
+  os << "---- End of configuration ----" << std::endl;
+}
+
+
+void
+mitk::DICOMFileReader
+::PrintOutputs(std::ostream& os, bool filenameDetails) const
+{
+  os << "---- Outputs of DICOMFilereader " << (void*)this << " ----"<< std::endl;
 
   for (unsigned int o = 0; o < m_Outputs.size(); ++o)
   {

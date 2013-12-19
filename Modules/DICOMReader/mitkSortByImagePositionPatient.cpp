@@ -45,6 +45,13 @@ mitk::SortByImagePositionPatient
   return *this;
 }
 
+void
+mitk::SortByImagePositionPatient
+::Print(std::ostream& os) const
+{
+  os << "(0020,0032) Image Position (Patient) along normal of (0020,0037) Image Orientation (Patient)";
+}
+
 mitk::DICOMTagList
 mitk::SortByImagePositionPatient
 ::GetTagsOfInterest() const

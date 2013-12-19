@@ -53,6 +53,13 @@ mitk::DICOMFilenameSorter
   return DICOMTagList();
 }
 
+void
+mitk::DICOMFilenameSorter
+::PrintConfiguration(std::ostream& os, const std::string& indent) const
+{
+  os << indent << "Sort alphabetically based on filenames" << std::endl;
+}
+
 bool
 mitk::DICOMFilenameSorter::FilenameSort
 ::operator() (const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right)

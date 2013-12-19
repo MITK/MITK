@@ -46,6 +46,13 @@ mitk::DICOMSortCriterion
   return *this;
 }
 
+mitk::DICOMSortCriterion::ConstPointer
+mitk::DICOMSortCriterion
+::GetSecondaryCriterion() const
+{
+  return m_SecondaryCriterion.GetPointer();
+}
+
 mitk::DICOMTagList
 mitk::DICOMSortCriterion
 ::GetAllTagsOfInterest() const

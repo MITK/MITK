@@ -30,6 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 // TODO tests seem to pass if reader creates NO output at all!
 // TODO preloaded volumes?? could be solved in a different way..
 
+namespace itk
+{
+  class TimeProbesCollectorBase;
+}
+
 namespace mitk
 {
 
@@ -54,6 +59,8 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
 
   protected:
 
+    virtual void InternalPrintConfiguration(std::ostream& os) const;
+
     virtual std::string GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const;
 
     std::string GetActiveLocale() const;
@@ -66,13 +73,19 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
     DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other);
     DICOMITKSeriesGDCMReader& operator=(const DICOMITKSeriesGDCMReader& other);
 
-    DICOMDatasetList ToDICOMDatasetList(DICOMGDCMImageFrameList& input);
-    DICOMGDCMImageFrameList FromDICOMDatasetList(DICOMDatasetList& input);
-    DICOMImageFrameList ToDICOMImageFrameList(DICOMGDCMImageFrameList& input);
+    DICOMDatasetList ToDICOMDatasetList(const DICOMGDCMImageFrameList& input);
+    DICOMGDCMImageFrameList FromDICOMDatasetList(const DICOMDatasetList& input);
+    DICOMImageFrameList ToDICOMImageFrameList(const DICOMGDCMImageFrameList& input);
 
     typedef std::list<DICOMGDCMImageFrameList> SortingBlockList;
     /// \return REMAINING blocks
     virtual SortingBlockList Condense3DBlocks(SortingBlockList& resultOf3DGrouping);
+
+    SortingBlockList InternalExecuteSortingStep(
+        unsigned int sortingStepIndex,
+        DICOMDatasetSorter::Pointer sorter,
+        const SortingBlockList& input,
+        itk::TimeProbesCollectorBase* timer);
 
     void EnsureMandatorySortersArePresent();
 

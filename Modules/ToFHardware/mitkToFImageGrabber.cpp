@@ -52,7 +52,6 @@ namespace mitk
 
   void ToFImageGrabber::GenerateData()
   {
-    MITK_INFO << "ToFImageGrabber::GenerateData()";
     int requiredImageSequence = 0;
     int capturedImageSequence = 0;
     unsigned int dimensions[3];

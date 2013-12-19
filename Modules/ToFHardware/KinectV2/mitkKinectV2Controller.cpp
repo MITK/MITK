@@ -183,7 +183,6 @@ namespace mitk
 
   bool KinectV2Controller::UpdateCamera()
   {
-    MITK_INFO << "UpdateCamera";
     if(InitializeMultiFrameReader())
     {
 
@@ -234,7 +233,6 @@ namespace mitk
         }
         if (SUCCEEDED(hr))
         {
-          MITK_INFO << "AccessUnderlyingBuffer";
           for(int i = 0; i < d->m_DepthCaptureHeight*d->m_DepthCaptureWidth; ++i)
           {
             float depth = static_cast<float>(*pDepthBuffer);
@@ -284,12 +282,14 @@ namespace mitk
       }
       else
       {
-        MITK_ERROR << "UpdateCamera() AcquireFrame - Is the 'KinectService' App running in the background? Did you connect the device properly?";
+        MITK_ERROR << hr;
+        //MITK_ERROR << "UpdateCamera() AcquireFrame - Is the 'KinectService' App running in the background? Did you connect the device properly?";
         return false;
       }
       SafeRelease(pDepthFrame);
       SafeRelease(pColorFrame);
       SafeRelease(pMultiSourceFrame);
+      MITK_INFO << "SUCCESS";
       return true;
     }
     MITK_ERROR << "Unable to initialize MultiFrameReader";

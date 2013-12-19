@@ -150,7 +150,7 @@ namespace mitk
     }
     else
     {
-      MITK_INFO<<"Camera not connected";
+      MITK_WARN << "Camera not connected";
     }
   }
 
@@ -180,7 +180,6 @@ namespace mitk
   {
     if (m_Controller)
     {
-      MITK_INFO << "KinectV2Device::UpdateCamera()";
       m_Controller->UpdateCamera();
     }
   }
@@ -317,7 +316,7 @@ namespace mitk
       if (this->m_ImageSequence < 0)
       {
         // buffer empty
-        MITK_INFO << "Buffer empty!! ";
+        MITK_WARN << "Buffer empty!! ";
         capturedImageSequence = this->m_ImageSequence;
         return;
       }

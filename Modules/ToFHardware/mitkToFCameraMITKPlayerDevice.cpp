@@ -44,9 +44,14 @@ namespace mitk
     {
       this->m_CaptureWidth = m_Controller->GetCaptureWidth();
       this->m_CaptureHeight = m_Controller->GetCaptureHeight();
-      this->m_RGBImageWidth = m_Controller->GetCaptureWidth();
-      this->m_RGBImageHeight = m_Controller->GetCaptureHeight();
-      this->m_PixelNumber = this->m_CaptureWidth * this->m_CaptureHeight;
+      this->m_RGBImageWidth = m_Controller->GetRGBCaptureWidth();
+      this->m_RGBImageHeight = m_Controller->GetRGBCaptureHeight();
+      this->m_PixelNumber = m_Controller->GetPixelNumber();
+      this->m_RGBPixelNumber = m_Controller->GetRGBPixelNumber();
+
+      if(m_RGBPixelNumber != m_PixelNumber)
+        this->SetBoolProperty("RGBImageHasDifferentResolution", true);
+
 
       AllocatePixelArrays();
       AllocateDataBuffers();
@@ -234,7 +239,7 @@ namespace mitk
       TODO Buffer handling???
     !!!!!!!!!!!!!!!!!!!!!!!!*/
     // write intensity image data to unsigned char array
-    for (int i=0; i<this->m_PixelNumber*3; i++)
+    for (int i=0; i<this->m_RGBPixelNumber*3; i++)
     {
       rgbArray[i] = this->m_RGBDataBuffer[this->m_CurrentPos][i];
     }
@@ -281,23 +286,28 @@ namespace mitk
     if(this->m_DistanceDataBuffer&&this->m_AmplitudeDataBuffer&&this->m_IntensityDataBuffer&&this->m_RGBDataBuffer)
     {
       // write image data to float arrays
-      for (int i=0; i<this->m_PixelNumber; i++)
-      {
-        distanceArray[i] = this->m_DistanceDataBuffer[pos][i];
-        amplitudeArray[i] = this->m_AmplitudeDataBuffer[pos][i];
-        intensityArray[i] = this->m_IntensityDataBuffer[pos][i];
-        if (rgbDataArray)
-        {
-          rgbDataArray[i] = this->m_RGBDataBuffer[pos][i];
-        }
-      }
-      if (rgbDataArray)
-      {
-        for (int j=this->m_PixelNumber; j<this->m_PixelNumber*3; j++)
-        {
-          rgbDataArray[j] = this->m_RGBDataBuffer[pos][j];
-        }
-      }
+      memcpy(distanceArray, this->m_DistanceDataBuffer[pos], this->m_PixelNumber * sizeof(float));
+      memcpy(amplitudeArray, this->m_AmplitudeDataBuffer[pos], this->m_PixelNumber * sizeof(float));
+      memcpy(intensityArray, this->m_IntensityDataBuffer[pos], this->m_PixelNumber * sizeof(float));
+      memcpy(rgbDataArray, this->m_RGBDataBuffer[pos], this->m_RGBPixelNumber * 3 * sizeof(unsigned char));
+
+      //for (int i=0; i<this->m_PixelNumber; i++)
+      //{
+      //  distanceArray[i] = this->m_DistanceDataBuffer[pos][i];
+      //  amplitudeArray[i] = this->m_AmplitudeDataBuffer[pos][i];
+      //  intensityArray[i] = this->m_IntensityDataBuffer[pos][i];
+      //  if (rgbDataArray)
+      //  {
+      //    rgbDataArray[i] = this->m_RGBDataBuffer[pos][i];
+      //  }
+      //}
+      //if (rgbDataArray)
+      //{
+      //  for (int j=this->m_PixelNumber; j<this->m_RGBPixelNumber; j++)
+      //  {
+      //    rgbDataArray[j] = this->m_RGBDataBuffer[pos][j];
+      //  }
+      //}
     }
     m_ImageMutex->Unlock();
   }
@@ -396,7 +406,7 @@ namespace mitk
     this->m_RGBDataBuffer = new unsigned char*[this->m_MaxBufferSize];
     for(int i=0; i<this->m_MaxBufferSize; i++)
     {
-      this->m_RGBDataBuffer[i] = new unsigned char[this->m_PixelNumber*3];
+      this->m_RGBDataBuffer[i] = new unsigned char[this->m_RGBPixelNumber*3];
     }
   }
 }

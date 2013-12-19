@@ -820,17 +820,7 @@ void QmitkDataManagerView::GlobalReinit( bool )
   // no render window available
   if (renderWindow == NULL) return;
 
-  // get all nodes that have not set "includeInBoundingBox" to false
-  mitk::NodePredicateNot::Pointer pred
-    = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
-    , mitk::BoolProperty::New(false)));
-
-  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
-  // calculate bounding geometry of these nodes
-  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
-
-  // initialize the views to the bounding geometry
-  renderWindow->GetRenderingManager()->InitializeViews(bounds);
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 }
 
 void QmitkDataManagerView::OtsuFilter( bool )

@@ -402,7 +402,8 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   // connect the texture with the output of the levelwindow filter
   //####################################################################################################################################################################################################################
-  localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
+  localStorage->m_Texture->SetInput(localStorage->m_ReslicedImage);
+  //localStorage->m_LevelWindowFilter->GetOutputPort());
 
   this->TransformActor( renderer );
 

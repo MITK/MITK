@@ -186,7 +186,7 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
     int size[3];
     vtkDataArray *scalars;
     unsigned char *dataPtr;
-//    float *floatPtr;
+    float *floatPtr;
     float *floatData=NULL;
     unsigned char *resultData=NULL;
     int xsize, ysize;
@@ -229,18 +229,28 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
       channelByteSize = 2;
 //      this->Interpolate = 0;
     }
+    else if (scalars->GetDataType() == VTK_FLOAT)
+    {
+      floatData = new float[xsize*ysize];
+      floatPtr = reinterpret_cast<float *>(static_cast<vtkFloatArray *>(scalars)->GetPointer(0));
+      floatData = floatPtr;
+
+      int type = scalars->GetDataType();
+      cout << "##################################################################################################################" << endl;
+      cout << "DataType: " << type << endl;
+    }
     else if (this->MapColorScalarsThroughLookupTable || scalars->GetDataType() != VTK_UNSIGNED_CHAR )
     {
       dataPtr = this->MapScalarsToColors (scalars);
       numChannels = 4;
       channelByteSize = 1;
 
-      floatData = new float[xsize*ysize];
-      int type = scalars->GetDataType();
-      cout << "##################################################################################################################" << endl;
-      cout << "DataType: " << type << endl;
-
-      floatData = static_cast<vtkFloatArray *>(scalars)->GetPointer(0);
+//      vtkIdType scalarSize = scalars->GetSize();
+//      for(int i=0; i<scalarSize; i++)
+//      {
+//        *(floatData+i) = *static_cast<vtkFloatArray *>((scalars+i))->GetPointer(0);
+//      }
+//      floatData = static_cast<vtkFloatArray *>(scalars)->GetPointer(0);
     }
     else
     {
@@ -253,7 +263,7 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
 //      floatPtr = static_cast<vtkFloatArray *>(scalars)->GetPointer(0);
 //      vtkIdType scalarSize = scalars->GetSize();
 
-      floatData = new float[xsize*ysize];
+//      floatData = new float[xsize*ysize];
       int type = scalars->GetDataType();
       cout << "##################################################################################################################" << endl;
       cout << "DataType: " << type << endl;

@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkConnectomicsNetwork.h"
+#include <mitkConnectomicsStatisticsCalculator.h>
 #include <boost/graph/clustering_coefficient.hpp>
 #include <boost/graph/betweenness_centrality.hpp>
 
@@ -437,6 +438,50 @@ mitk::ConnectomicsNetwork::NetworkType* mitk::ConnectomicsNetwork::GetBoostGraph
   return &m_Network;
 }
 
+void mitk::ConnectomicsNetwork::SetBoostGraph( NetworkType* newGraph )
+{
+  this->clear();
+
+  m_Network = *newGraph;
+  this->SetIsModified( true );
+}
+
+void mitk::ConnectomicsNetwork::ImportNetwort( mitk::ConnectomicsNetwork::Pointer source )
+{
+  typedef std::vector< std::pair< std::pair< NetworkNode, NetworkNode >, NetworkEdge > > EdgeVectorType;
+  typedef std::vector< NetworkNode >  VertexVectorType;
+
+  this->clear();
+
+  this->SetGeometry( source->GetGeometry());
+  VertexVectorType vertexVector = source->GetVectorOfAllNodes();
+  EdgeVectorType edgeVector = source->GetVectorOfAllEdges();
+  std::map< int, VertexDescriptorType > idToVertexMap;
+
+  for( int loop(0); loop < vertexVector.size(); loop++ )
+  {
+    VertexDescriptorType newVertex = this->AddVertex( vertexVector[ loop ].id );
+    this->SetLabel( newVertex, vertexVector[ loop ].label );
+    this->SetCoordinates( newVertex, vertexVector[ loop ].coordinates );
+
+    if ( idToVertexMap.count( vertexVector[ loop ].id ) > 0 )
+    {
+      MITK_ERROR << "Aborting network import, duplicate vertex ID discovered.";
+      return;
+    }
+    idToVertexMap.insert( std::pair< int, VertexDescriptorType >( vertexVector[ loop ].id, newVertex) );
+  }
+
+  for( int loop(0); loop < edgeVector.size(); loop++ )
+  {
+    VertexDescriptorType source = idToVertexMap.find( edgeVector[ loop ].second.sourceId )->second;
+    VertexDescriptorType target = idToVertexMap.find( edgeVector[ loop ].second.targetId )->second;
+
+    this->AddEdge( source, target, edgeVector[ loop ].second.sourceId, edgeVector[ loop ].second.targetId, edgeVector[ loop ].second.weight);
+  }
+
+  this->SetIsModified( true );
+}
 
 bool mitk::ConnectomicsNetwork::GetIsModified() const
 {
@@ -565,37 +610,6 @@ void mitk::ConnectomicsNetwork::UpdateIDs()
   this->SetIsModified( true );
 }
 
-void mitk::ConnectomicsNetwork::PruneEdgesBelowWeight( int targetWeight )
-{
-  boost::graph_traits<NetworkType>::edge_iterator iterator, end;
-
-  // set to true if iterators are invalidated by deleting a vertex
-  bool edgeHasBeenRemoved( true );
-
-  // if no vertex has been removed in the last loop, we are done
-  while( edgeHasBeenRemoved )
-  {
-    edgeHasBeenRemoved = false;
-    // sets iterator to start and end to end
-    boost::tie(iterator, end) = boost::edges( m_Network );
-
-    for ( ; iterator != end && !edgeHasBeenRemoved; ++iterator)
-    {
-      // If the node has no adjacent edges it should be deleted
-      if( m_Network[ *iterator ].weight < targetWeight )
-      {
-        edgeHasBeenRemoved = true;
-        // this invalidates all iterators
-        boost::remove_edge( *iterator, m_Network );
-      }
-    }
-  }
-
-  // this will remove any nodes which, after deleting edges are now
-  // unconnected, also this calls UpdateIDs()
-  PruneUnconnectedSingleNodes();
-}
-
 std::vector< double > mitk::ConnectomicsNetwork::GetNodeBetweennessVector() const
 {
   std::vector< double > betweennessVector;
@@ -695,4 +709,58 @@ bool mitk::ConnectomicsNetwork::CheckForLabel( std::string targetLabel ) const
   }
 
   return true;
+}
+
+bool mitk::Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNetwork* rightHandSide, mitk::ScalarType eps, bool verbose )
+{
+  bool noDifferenceFound = true;
+
+    if( rightHandSide == NULL )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] rightHandSide NULL.";
+    }
+    return false;
+  }
+
+  if( leftHandSide == NULL )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] leftHandSide NULL.";
+    }
+    return false;
+  }
+
+  mitk::ConnectomicsStatisticsCalculator::Pointer calculatorLeft = mitk::ConnectomicsStatisticsCalculator::New();
+    mitk::ConnectomicsStatisticsCalculator::Pointer calculatorRight = mitk::ConnectomicsStatisticsCalculator::New();
+
+    calculatorLeft->SetNetwork( leftHandSide );
+    calculatorRight->SetNetwork( rightHandSide );
+    calculatorLeft->Update();
+    calculatorRight->Update();
+
+    if( ! mitk::Equal( calculatorLeft->GetNumberOfVertices(), calculatorRight->GetNumberOfVertices(), eps ) )
+    {
+      if(verbose)
+        MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] Number of vertices not equal. " << calculatorLeft->GetNumberOfVertices() << " vs " << calculatorRight->GetNumberOfVertices();
+      noDifferenceFound = false;
+    }
+
+    if( ! mitk::Equal( calculatorLeft->GetNumberOfEdges(), calculatorRight->GetNumberOfEdges(), eps ) )
+    {
+      if(verbose)
+        MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] Number of edges not equal. " << calculatorLeft->GetNumberOfEdges() << " vs " << calculatorRight->GetNumberOfEdges();
+      noDifferenceFound = false;
+    }
+
+    if( ! mitk::Equal( calculatorLeft->GetSmallWorldness(), calculatorRight->GetSmallWorldness(), eps ) )
+    {
+      if(verbose)
+        MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] Small worldness not equal. " << calculatorLeft->GetSmallWorldness() << " vs " << calculatorRight->GetSmallWorldness();
+      noDifferenceFound = false;
+    }
+
+  return noDifferenceFound;
 }

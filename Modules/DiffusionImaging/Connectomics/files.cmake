@@ -34,7 +34,6 @@ set(CPP_FILES
   Algorithms/mitkConnectomicsBetweennessHistogram.cpp
   Algorithms/mitkConnectomicsHistogramCache.cpp
   Algorithms/mitkConnectomicsSyntheticNetworkGenerator.cpp
-  #Algorithms/itkConnectomicsNetworkToConnectivityMatrixImageFilter.cpp
   Algorithms/mitkConnectomicsSimulatedAnnealingPermutationBase.cpp
   Algorithms/mitkConnectomicsSimulatedAnnealingPermutationModularity.cpp
   Algorithms/mitkConnectomicsSimulatedAnnealingManager.cpp
@@ -42,6 +41,7 @@ set(CPP_FILES
   Algorithms/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.cpp
   Algorithms/mitkConnectomicsStatisticsCalculator.cpp
   Algorithms/mitkConnectomicsNetworkConverter.cpp
+  Algorithms/mitkConnectomicsNetworkThresholder.cpp
 )
 
 set(H_FILES

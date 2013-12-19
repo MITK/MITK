@@ -110,6 +110,7 @@ mitk::ConnectomicsStatisticsCalculator::ConnectomicsStatisticsCalculator()
   , m_NormalizedLaplacianNumberOf0s( 0 )
   , m_NormalizedLaplacianLowerSlope( 0.0 )
   , m_NormalizedLaplacianUpperSlope( 0.0 )
+  , m_SmallWorldness( 0.0 )
 {
 }
 
@@ -135,6 +136,7 @@ void mitk::ConnectomicsStatisticsCalculator::Update()
   CalculateSpectralMetrics();
   CalculateLaplacianMetrics();
   CalculateNormalizedLaplacianMetrics();
+  CalculateSmallWorldness();
 }
 
 void mitk::ConnectomicsStatisticsCalculator::CalculateNumberOfVertices()
@@ -167,7 +169,7 @@ void mitk::ConnectomicsStatisticsCalculator::CalculateNumberOfConnectedComponent
 
 void mitk::ConnectomicsStatisticsCalculator::CalculateAverageComponentSize()
 {
-  m_AverageComponentSize = (double) m_NumberOfConnectedComponents / (double) m_NumberOfVertices ;
+  m_AverageComponentSize = (double) m_NumberOfVertices / (double) m_NumberOfConnectedComponents ;
 }
 
 void mitk::ConnectomicsStatisticsCalculator::CalculateLargestComponentSize()
@@ -720,4 +722,18 @@ void  mitk::ConnectomicsStatisticsCalculator::CalculateNormalizedLaplacianMetric
 
   b2 = (D2*F2 - C2*E2)/(F2*N2 - C2*C2);
   m_NormalizedLaplacianUpperSlope = (E2 - b2*C2)/F2;
+}
+
+void mitk::ConnectomicsStatisticsCalculator::CalculateSmallWorldness()
+{
+  double k( this->GetAverageDegree() );
+  double N( this->GetNumberOfVertices() );
+  // The clustering coefficient of an Erdos-Reny network is equivalent to
+  // the likelihood two random nodes are connected
+  double gamma = this->GetAverageClusteringCoefficientsC() / ( k / N );
+  //The mean path length of an Erdos-Reny network is approximately
+  // ln( #vertices ) / ln( average degree )
+  double lambda = this->GetAveragePathLength() / ( std::log( N ) / std::log( k ) );
+
+  m_SmallWorldness = gamma / lambda;
 }

@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // ####### MITK includes #######
 
 #include <mitkConnectomicsConstantsManager.h>
+#include <mitkConnectomicsStatisticsCalculator.h>
 
 // Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"
@@ -84,13 +85,7 @@ void QmitkConnectomicsStatisticsView::WipeDisplay()
   m_Controls->inputImageOneNameLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
   m_Controls->inputImageOneNameLabel->setVisible( false );
   m_Controls->inputImageOneLabel->setVisible( false );
-  m_Controls->numberOfVerticesLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
-  m_Controls->numberOfEdgesLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
-  m_Controls->numberOfSelfLoopsLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
-  m_Controls->averageDegreeLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
-  m_Controls->connectionDensityLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
-  m_Controls->efficiencyLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
-  m_Controls->globalClusteringLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
+  m_Controls->networkStatisticsPlainTextEdit->clear();
   m_Controls->betweennessNetworkHistogramCanvas->SetHistogram(   NULL );
   m_Controls->degreeNetworkHistogramCanvas->SetHistogram(       NULL );
   m_Controls->shortestPathNetworkHistogramCanvas->SetHistogram( NULL );
@@ -148,19 +143,37 @@ void QmitkConnectomicsStatisticsView::OnSelectionChanged( std::vector<mitk::Data
         m_Controls->inputImageOneNameLabel->setVisible( true );
         m_Controls->inputImageOneLabel->setVisible( true );
 
-        int noVertices = network->GetNumberOfVertices();
-        int noEdges = network->GetNumberOfEdges();
-        int noSelfLoops = network->GetNumberOfSelfLoops();
-        double averageDegree = network->GetAverageDegree();
-        double connectionDensity = network->GetConnectionDensity();
-        double globalClustering = network->GetGlobalClusteringCoefficient();
+        {
+          std::stringstream statisticsStream;
 
-        m_Controls->numberOfVerticesLabel->setText( QString::number( noVertices ) );
-        m_Controls->numberOfEdgesLabel->setText( QString::number( noEdges ) );
-        m_Controls->numberOfSelfLoopsLabel->setText( QString::number( noSelfLoops ) );
-        m_Controls->averageDegreeLabel->setText( QString::number( averageDegree ) );
-        m_Controls->connectionDensityLabel->setText( QString::number( connectionDensity ) );
-        m_Controls->globalClusteringLabel->setText( QString::number( globalClustering ) );
+          mitk::ConnectomicsStatisticsCalculator::Pointer calculator = mitk::ConnectomicsStatisticsCalculator::New();
+
+          calculator->SetNetwork( network );
+          calculator->Update();
+
+          statisticsStream << "# Vertices: " << calculator->GetNumberOfVertices() << "\n";
+          statisticsStream << "# Edges: " << calculator->GetNumberOfEdges() << "\n";
+          statisticsStream << "Average Degree: " << calculator->GetAverageDegree() << "\n";
+          statisticsStream << "Density: " << calculator->GetConnectionDensity() << "\n";
+          statisticsStream << "Small Worldness: " << calculator->GetSmallWorldness() << "\n";
+          statisticsStream << "Average Path Length: " << calculator->GetAveragePathLength() << "\n";
+          statisticsStream << "Efficiency: " << (1 / calculator->GetAveragePathLength() ) << "\n";
+          statisticsStream << "# Connected Components: " << calculator->GetNumberOfConnectedComponents() << "\n";
+          statisticsStream << "Average Component Size: " << calculator->GetAverageComponentSize() << "\n";
+          statisticsStream << "Largest Component Size: " << calculator->GetLargestComponentSize() << "\n";
+          statisticsStream << "Average Clustering Coefficient: " << calculator->GetAverageClusteringCoefficientsC() << "\n";
+          statisticsStream << "Average Vertex Betweenness Centrality: " << calculator->GetAverageVertexBetweennessCentrality() << "\n";
+          statisticsStream << "Average Edge Betweenness Centrality: " << calculator->GetAverageEdgeBetweennessCentrality() << "\n";
+          statisticsStream << "# Isolated Points: " << calculator->GetNumberOfIsolatedPoints() << "\n";
+          statisticsStream << "# End Points: " << calculator->GetNumberOfEndPoints() << "\n";
+          statisticsStream << "Diameter: " << calculator->GetDiameter() << "\n";
+          statisticsStream << "Radius: " << calculator->GetRadius() << "\n";
+          statisticsStream << "Average Eccentricity: " << calculator->GetAverageEccentricity() << "\n";
+          statisticsStream << "# Central Points: " << calculator->GetNumberOfCentralPoints() << "\n";
+
+          QString statisticsString( statisticsStream.str().c_str() );
+          m_Controls->networkStatisticsPlainTextEdit->setPlainText( statisticsString );
+        }
 
         mitk::ConnectomicsNetwork::Pointer connectomicsNetwork( network );
         mitk::ConnectomicsHistogramsContainer *histogramContainer = histogramCache[ connectomicsNetwork ];
@@ -172,10 +185,6 @@ void QmitkConnectomicsStatisticsView::OnSelectionChanged( std::vector<mitk::Data
           m_Controls->betweennessNetworkHistogramCanvas->DrawProfiles();
           m_Controls->degreeNetworkHistogramCanvas->DrawProfiles();
           m_Controls->shortestPathNetworkHistogramCanvas->DrawProfiles();
-
-          double efficiency = histogramContainer->GetShortestPathHistogram()->GetEfficiency();
-
-          m_Controls->efficiencyLabel->setText( QString::number( efficiency ) );
         }
       }
     } // end network section

@@ -180,6 +180,14 @@ public:
    * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
   virtual bool InitializeView( vtkRenderWindow *renderWindow );
 
+  /**
+   * @brief Initializes the renderwindows by the aggregated geometry of
+   *        all objects that are held in the data storage.
+   * This is basically a global reinit
+   * @param The data storage from which the bounding object can be retrieved
+   */
+  virtual void InitializeViewsByBoundingObjects(const DataStorage * );
+
   /** Gets the (global) SliceNavigationController responsible for
    * time-slicing. */
   const SliceNavigationController *GetTimeNavigationController() const;

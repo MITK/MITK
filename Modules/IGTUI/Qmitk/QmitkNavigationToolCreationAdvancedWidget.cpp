@@ -112,10 +112,7 @@ void QmitkNavigationToolCreationAdvancedWidget::ReInitialize()
     }
 
    // reinit the views with the new nodes
-   mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
-   mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetSubset(pred);
-   mitk::TimeGeometry::Pointer bounds = m_DataStorage->ComputeBoundingGeometry3D(rs, "visible");
-   mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
 }
 
 void QmitkNavigationToolCreationAdvancedWidget::RetrieveAndInitializeDataForTooltipManipulation()

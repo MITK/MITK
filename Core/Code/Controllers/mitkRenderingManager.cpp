@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManagerFactory.h"
 #include "mitkBaseRenderer.h"
 #include "mitkGlobalInteraction.h"
+#include "mitkNodePredicateNot.h"
+#include "mitkNodePredicateProperty.h"
 
 #include <vtkRenderWindow.h>
 
@@ -335,7 +337,23 @@ RenderingManager
 
 }
 
+void RenderingManager::InitializeViewsByBoundingObjects( const DataStorage *ds)
+{
+  if (!ds)
+    return;
 
+  // get all nodes that have not set "includeInBoundingBox" to false
+  mitk::NodePredicateNot::Pointer pred
+    = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
+    , mitk::BoolProperty::New(false)));
+
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = ds->GetSubset(pred);
+  // calculate bounding geometry of these nodes
+  mitk::TimeGeometry::Pointer bounds = ds->ComputeBoundingGeometry3D(rs, "visible");
+
+  // initialize the views to the bounding geometry
+  this->InitializeViews(bounds);
+}
 
 //TODO_GOETZ
 // Remove old function, so only this one is working.

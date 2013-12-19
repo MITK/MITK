@@ -259,7 +259,7 @@ namespace mitk {
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
     //## @param renderer see @a boolPropertyKey
     //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-    mitk::TimeGeometry::Pointer ComputeBoundingGeometry3D( const SetOfObjects* input, const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
+    mitk::TimeGeometry::Pointer ComputeBoundingGeometry3D( const SetOfObjects* input, const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL) const;
 
     //##Documentation
     //## @brief Compute the axis-parallel bounding geometry of the data tree
@@ -270,7 +270,7 @@ namespace mitk {
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
     //## @param renderer see @a boolPropertyKey
     //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-    mitk::TimeGeometry::Pointer ComputeBoundingGeometry3D( const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
+    mitk::TimeGeometry::Pointer ComputeBoundingGeometry3D( const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL) const;
 
     //##Documentation
     //## @brief Compute the axis-parallel bounding geometry of all visible parts of the

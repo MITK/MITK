@@ -16,6 +16,7 @@ set(H_FILES
   mitkThreeDnTDICOMSeriesReader.h
   mitkDICOMTag.h
   mitkDICOMReaderConfigurator.h
+  mitkDICOMFileReaderSelector.h
 )
 
 set(CPP_FILES
@@ -38,4 +39,12 @@ set(CPP_FILES
   mitkDICOMTag.cpp
   mitkDICOMEnums.cpp
   mitkDICOMReaderConfigurator.cpp
+  mitkDICOMFileReaderSelector.cpp
+)
+
+set(RESOURCE_FILES
+  configurations/3D/acquisitionnumberfirst.xml
+  configurations/3D/classicreader.xml
+
+  configurations/3DnT/classicreader.xml
 )

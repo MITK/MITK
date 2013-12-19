@@ -132,6 +132,8 @@ class MitkAlgorithmsExt_EXPORT SimpleHistogramCache
         mitk::WeakPointer<BaseData> baseData;
         itk::TimeStamp m_LastUpdateTime;
 
+        virtual ~Element();
+
         virtual void ComputeFromBaseData(BaseData* baseData) = 0;
         virtual SimpleHistogram* GetHistogram() = 0;
     };

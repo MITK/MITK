@@ -245,4 +245,8 @@ SimpleHistogram* SimpleHistogramCache::operator[](BaseData::Pointer sp_BaseData)
   return elementToUpdate->GetHistogram();
 }
 
+SimpleHistogramCache::Element::~Element()
+{
+}
+
 }

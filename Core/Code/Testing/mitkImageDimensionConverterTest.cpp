@@ -18,16 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkImageDataItem.h>
 #include <mitkImageCast.h>
-#include "mitkItkImageFileReader.h"
 #include <mitkTestingMacros.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkConvert2Dto3DImageFilter.h>
 #include <mitkRotationOperation.h>
 #include <mitkInteractionConst.h>
-#include <mitkImageWriter.h>
 #include <mitkPlaneOperation.h>
+#include <mitkFileWriterRegistry.h>
+#include <mitkFileReaderRegistry.h>
 #include "mitkTestingConfig.h"
-#include "mitkItkImageFileReader.h"
 
 // itk includes
 #include <itkImage.h>
@@ -50,8 +49,6 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
   float error = 0;
   bool matrixIsEqual = true;
   std::stringstream sstream;
-  mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
-  mitk::ItkImageFileReader::Pointer imageReader = mitk::ItkImageFileReader::New();
   mitk::Convert2Dto3DImageFilter::Pointer convertFilter = mitk::Convert2Dto3DImageFilter::New();
 
   ///////////////////////////////////////
@@ -108,16 +105,10 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
   // mitkImage2D is now a 2D image with 3D Geometry information.
   // Save it without conversion and load it again. It should have an identitiy matrix
   sstream.clear();
-  sstream << MITK_TEST_OUTPUT_DIR << "" << "/rotatedImage2D";
-  imageWriter->SetInput(mitkImage2D);
-  imageWriter->SetFileName(sstream.str().c_str());
-  imageWriter->SetExtension(".nrrd");
-  imageWriter->Write();
-  sstream << ".nrrd";
+  sstream << MITK_TEST_OUTPUT_DIR << "" << "/rotatedImage2D.nrrd";
+  mitk::FileWriterRegistry::Write(mitkImage2D, sstream.str());
 
-  imageReader->SetFileName(sstream.str().c_str());
-  imageReader->Update();
-  mitk::Image::Pointer imageLoaded2D = imageReader->GetOutput();
+  mitk::Image::Pointer imageLoaded2D = mitk::FileReaderRegistry::Read<mitk::Image>(sstream.str());
 
   // check if image can be loaded
   MITK_TEST_CONDITION_REQUIRED( imageLoaded2D.IsNotNull() , "Loading saved 2D Image");
@@ -228,15 +219,9 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
      // So far it seems good! now try to save and load the file
 
      std::stringstream sstream2;
-     sstream2 << MITK_TEST_OUTPUT_DIR << "" << "/rotatedImage";
-     imageWriter->SetInput(mitkImage3D);
-     imageWriter->SetFileName(sstream2.str().c_str());
-     imageWriter->SetExtension(".nrrd");
-     imageWriter->Write();
-     sstream2 << ".nrrd";
-     imageReader->SetFileName(sstream2.str().c_str());
-     imageReader->Update();
-     mitk::Image::Pointer imageLoaded = imageReader->GetOutput();
+     sstream2 << MITK_TEST_OUTPUT_DIR << "" << "/rotatedImage.nrrd";
+     mitk::FileWriterRegistry::Write(mitkImage3D, sstream2.str());
+     mitk::Image::Pointer imageLoaded = mitk::FileReaderRegistry::Read<mitk::Image>(sstream2.str());
 
      // check if image can be loaded
      MITK_TEST_CONDITION_REQUIRED( imageLoaded.IsNotNull() , "Loading saved Image");

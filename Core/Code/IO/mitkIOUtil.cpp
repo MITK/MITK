@@ -16,10 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkIOUtil.h"
-#include "mitkDataNodeFactory.h"
-#include "mitkImageWriter.h"
-#include "mitkPointSetWriter.h"
-#include "mitkSurfaceVtkWriter.h"
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -28,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProgressBar.h>
 #include <mitkExceptionMacro.h>
 #include <mitkCoreObjectFactory.h>
+#include <mitkFileReaderRegistry.h>
+#include <mitkFileWriterRegistry.h>
 
 //ITK
 #include <itksys/SystemTools.hxx>
@@ -474,33 +472,31 @@ DataStorage::Pointer IOUtil::LoadFiles(const std::vector<std::string>& fileNames
 
 DataNode::Pointer IOUtil::LoadDataNode(const std::string path)
 {
-    mitk::DataNodeFactory::Pointer reader = mitk::DataNodeFactory::New();
-    try
+  try
+  {
+    mitk::FileReaderRegistry readerRegistry;
+    std::vector<BaseData::Pointer> baseDataList = readerRegistry.Read(path);
+
+    BaseData::Pointer baseData;
+    if (!baseDataList.empty()) baseData = baseDataList.front();
+
+    if(baseData.IsNull())
     {
-        reader->SetFileName( path );
-        reader->Update();
-
-        if((reader->GetNumberOfOutputs()<1))
-        {
-            MITK_ERROR << "Could not find data '" << path << "'";
-            mitkThrow() << "An exception occured during loading the file " << path << ". Exception says could not find data.";
-        }
-
-        mitk::DataNode::Pointer node = reader->GetOutput();
-
-        if(node.IsNull())
-        {
-            MITK_ERROR << "Could not find path: '" << path << "'" << " datanode is NULL" ;
-            mitkThrow() << "An exception occured during loading the file " << path << ". Exception says datanode is NULL.";
-        }
-
-        return reader->GetOutput( 0 );
-     }
-    catch ( itk::ExceptionObject & e )
-    {
-        MITK_ERROR << "Exception occured during load data of '" << path << "': Exception: " << e.what();
-        mitkThrow() << "An exception occured during loading the file " << path << ". Exception says: " << e.what();
+      MITK_ERROR << "Could not find data '" << path << "'";
+      mitkThrow() << "An exception occured during loading the file " << path << ". Exception says could not find data.";
     }
+
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(baseData);
+    SetDefaultDataNodeProperties(node, path);
+
+    return node;
+  }
+  catch (const std::exception& e)
+  {
+    MITK_ERROR << "Exception occured during load data of '" << path << "': Exception: " << e.what();
+    mitkThrow() << "An exception occured during loading the file " << path << ". Exception says: " << e.what();
+  }
 }
 
 Image::Pointer IOUtil::LoadImage(const std::string path)
@@ -541,6 +537,8 @@ PointSet::Pointer IOUtil::LoadPointSet(const std::string path)
 
 bool IOUtil::SaveImage(mitk::Image::Pointer image, const std::string path)
 {
+  return SaveBaseData(image, path);
+  /*
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutExtension( path );
     std::string extension = itksys::SystemTools::GetFilenameExtension( path );
@@ -580,10 +578,13 @@ bool IOUtil::SaveImage(mitk::Image::Pointer image, const std::string path)
         mitkThrow() << "An exception occured during writing the file " << finalFileName << ". Exception says " << e.what();
     }
     return true;
+    */
 }
 
 bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string path)
 {
+  return SaveBaseData(surface, path);
+  /*
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( path );
     std::string extension = itksys::SystemTools::GetFilenameLastExtension( path );
@@ -650,10 +651,13 @@ bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string path)
         mitkThrow() << "An exception occured during writing the file " << finalFileName << ". Exception says " << e.what();
     }
     return true;
+    */
 }
 
 bool IOUtil::SavePointSet(PointSet::Pointer pointset, const std::string path)
 {
+  return SaveBaseData(pointset, path);
+  /*
     mitk::PointSetWriter::Pointer pointSetWriter = mitk::PointSetWriter::New();
 
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
@@ -691,61 +695,58 @@ bool IOUtil::SavePointSet(PointSet::Pointer pointset, const std::string path)
         mitkThrow() << "An exception occured during writing the file " << finalFileName << ". Exception says " << e.what();
     }
     return true;
+    */
 }
 
 bool IOUtil::SaveBaseData( mitk::BaseData* data, const std::string& path )
 {
   if (data == NULL || path.empty()) return false;
 
-  std::string dir = itksys::SystemTools::GetFilenamePath( path );
-  std::string baseFilename = itksys::SystemTools::GetFilenameWithoutExtension( path );
-  std::string extension = itksys::SystemTools::GetFilenameExtension( path );
-  if (dir == "")
-    dir = ".";
-  std::string fileNameWithoutExtension = dir + "/" + baseFilename;
-
-  mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
-
-  for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
+  try
   {
-    if ( (*it)->CanWriteBaseDataType(data) )
-    {
-      // Ensure a valid filename
-      if(baseFilename=="")
-      {
-        baseFilename = (*it)->GetDefaultFilename();
-      }
-      // Check if an extension exists already and if not, append the default extension
-      if (extension=="" )
-      {
-        extension=(*it)->GetDefaultExtension();
-      }
-      else
-      {
-        if (!(*it)->IsExtensionValid(extension))
-        {
-          MITK_WARN << extension << " extension is unknown";
-          continue;
-        }
-      }
+    mitk::FileWriterRegistry::Write(data, path);
+  }
+  catch(const std::exception& e)
+  {
+    MITK_ERROR << " Writing a " << data->GetNameOfClass() << " to " << path << " failed: "
+               << e.what();
+    throw e;
+  }
 
-      std::string finalFileName = fileNameWithoutExtension + extension;
-      try
-      {
-        (*it)->SetFileName( finalFileName.c_str() );
-        (*it)->DoWrite( data );
-        return true;
-      }
-      catch( const std::exception& e )
-      {
-        MITK_ERROR << " during attempt to write '" << finalFileName << "' Exception says:";
-        MITK_ERROR << e.what();
-        mitkThrow() << "An exception occured during writing the file " << finalFileName << ". Exception says " << e.what();
-      }
+  return true;
+}
+
+void IOUtil::SetDefaultDataNodeProperties(DataNode* node, const std::string& filePath)
+{
+  // path
+  mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New( itksys::SystemTools::GetFilenamePath(filePath) );
+  node->SetProperty(StringProperty::PATH, pathProp);
+
+  // name already defined?
+  mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name"));
+  if(nameProp.IsNull() || (strcmp(nameProp->GetValue(),"No Name!")==0))
+  {
+    // name already defined in BaseData
+    mitk::StringProperty::Pointer baseDataNameProp = dynamic_cast<mitk::StringProperty*>(node->GetData()->GetProperty("name").GetPointer() );
+    if(baseDataNameProp.IsNull() || (strcmp(baseDataNameProp->GetValue(),"No Name!")==0))
+    {
+      // name neither defined in node, nor in BaseData -> name = filename
+      nameProp = mitk::StringProperty::New( itksys::SystemTools::GetFilenameWithoutExtension(filePath));
+      node->SetProperty("name", nameProp);
+    }
+    else
+    {
+      // name defined in BaseData!
+      nameProp = mitk::StringProperty::New(baseDataNameProp->GetValue());
+      node->SetProperty("name", nameProp);
     }
   }
 
-  return false;
+  // visibility
+  if(!node->GetProperty("visible"))
+  {
+    node->SetVisibility(true);
+  }
 }
 
 }

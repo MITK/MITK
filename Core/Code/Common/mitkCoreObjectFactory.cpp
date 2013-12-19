@@ -52,25 +52,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 
-//#include "mitkPicFileIOFactory.h"
-#include "mitkPointSetIOFactory.h"
-#include "mitkItkImageFileIOFactory.h"
-#include "mitkSTLFileIOFactory.h"
-#include "mitkVtkSurfaceIOFactory.h"
-#include "mitkVtkImageIOFactory.h"
-#include "mitkVtiFileIOFactory.h"
-//#include "mitkPicVolumeTimeSeriesIOFactory.h"
+// Legacy Support:
+#include <mitkCoreServices.h>
+#include <mitkFileReaderRegistry.h>
+#include <mitkFileWriterRegistry.h>
+#include <mitkIMimeTypeProvider.h>
+#include <mitkLegacyFileReaderService.h>
+#include <mitkLegacyFileWriterService.h>
 
-#include "mitkImageWriterFactory.h"
-#include "mitkImageWriter.h"
-#include "mitkPointSetWriterFactory.h"
-#include "mitkSurfaceVtkWriterFactory.h"
-
-mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::m_FileWriters;
 
 void mitk::CoreObjectFactory::RegisterExtraFactory(CoreObjectFactoryBase* factory) {
   MITK_DEBUG << "CoreObjectFactory: registering extra factory of type " << factory->GetNameOfClass();
   m_ExtraFactories.insert(CoreObjectFactoryBase::Pointer(factory));
+  // Register Legacy Reader and Writer
+  this->RegisterLegacyReaders(factory);
+  this->RegisterLegacyWriters(factory);
 }
 
 void mitk::CoreObjectFactory::UnRegisterExtraFactory(CoreObjectFactoryBase *factory)
@@ -90,12 +86,25 @@ mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
   static mitk::CoreObjectFactory::Pointer instance;
   if (instance.IsNull())
   {
-     instance = mitk::CoreObjectFactory::New();
+    instance = mitk::CoreObjectFactory::New();
   }
   return instance;
 }
 
-#include <mitkDataNodeFactory.h>
+mitk::CoreObjectFactory::~CoreObjectFactory()
+{
+  for (std::list< mitk::LegacyFileReaderService* >::iterator it = m_LegacyReaders.begin();
+       it != m_LegacyReaders.end(); ++it)
+  {
+    delete *it;
+  }
+
+  for (std::list< mitk::LegacyFileWriterService* >::iterator it = m_LegacyWriters.begin();
+       it != m_LegacyWriters.end(); ++it)
+  {
+    delete *it;
+  }
+}
 
 void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
@@ -130,52 +139,17 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 }
 
 mitk::CoreObjectFactory::CoreObjectFactory()
-  : m_PointSetIOFactory(PointSetIOFactory::New().GetPointer())
-  , m_STLFileIOFactory(STLFileIOFactory::New().GetPointer())
-  , m_VtkSurfaceIOFactory(VtkSurfaceIOFactory::New().GetPointer())
-  , m_VtkImageIOFactory(VtkImageIOFactory::New().GetPointer())
-  , m_VtiFileIOFactory(VtiFileIOFactory::New().GetPointer())
-  , m_ItkImageFileIOFactory(ItkImageFileIOFactory::New().GetPointer())
-  , m_SurfaceVtkWriterFactory(SurfaceVtkWriterFactory::New().GetPointer())
-  , m_PointSetWriterFactory(PointSetWriterFactory::New().GetPointer())
-  , m_ImageWriterFactory(ImageWriterFactory::New().GetPointer())
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    MITK_DEBUG << "CoreObjectFactory c'tor" << std::endl;
-
-    itk::ObjectFactoryBase::RegisterFactory( m_PointSetIOFactory );
-    itk::ObjectFactoryBase::RegisterFactory( m_STLFileIOFactory );
-    itk::ObjectFactoryBase::RegisterFactory( m_VtkSurfaceIOFactory );
-    itk::ObjectFactoryBase::RegisterFactory( m_VtkImageIOFactory );
-    itk::ObjectFactoryBase::RegisterFactory( m_VtiFileIOFactory );
-    itk::ObjectFactoryBase::RegisterFactory( m_ItkImageFileIOFactory );
-
-    itk::ObjectFactoryBase::RegisterFactory( m_SurfaceVtkWriterFactory );
-    itk::ObjectFactoryBase::RegisterFactory( m_PointSetWriterFactory );
-    itk::ObjectFactoryBase::RegisterFactory( m_ImageWriterFactory );
-
-    m_FileWriters.push_back(mitk::ImageWriter::New().GetPointer());
-
     CreateFileExtensionsMap();
+
+    RegisterLegacyReaders(this);
+    RegisterLegacyWriters(this);
 
     alreadyDone = true;
   }
-}
-
-mitk::CoreObjectFactory::~CoreObjectFactory()
-{
-  itk::ObjectFactoryBase::UnRegisterFactory( m_PointSetIOFactory );
-  itk::ObjectFactoryBase::UnRegisterFactory( m_STLFileIOFactory );
-  itk::ObjectFactoryBase::UnRegisterFactory( m_VtkSurfaceIOFactory );
-  itk::ObjectFactoryBase::UnRegisterFactory( m_VtkImageIOFactory );
-  itk::ObjectFactoryBase::UnRegisterFactory( m_VtiFileIOFactory );
-  itk::ObjectFactoryBase::UnRegisterFactory( m_ItkImageFileIOFactory );
-
-  itk::ObjectFactoryBase::UnRegisterFactory( m_SurfaceVtkWriterFactory );
-  itk::ObjectFactoryBase::UnRegisterFactory( m_PointSetWriterFactory );
-  itk::ObjectFactoryBase::UnRegisterFactory( m_ImageWriterFactory );
 }
 
 mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)
@@ -248,27 +222,6 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
   return newMapper;
 }
 
-/*
-// @deprecated
-//
-#define EXTERNAL_FILE_EXTENSIONS \
-    "All known formats(*.dcm *.DCM *.dc3 *.DC3 *.gdcm *.ima *.mhd *.mps *.nii *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.hdr *.nrrd *.nhdr );;" \
-    "DICOM files(*.dcm *.DCM *.dc3 *.DC3 *.gdcm);;" \
-    "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
-    "NRRD Vector Images (*.nrrd *.nhdr);;" \
-    "Point sets (*.mps);;" \
-    "Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.ima *.tiff);;" \
-    "Surface files (*.stl *.vtk *.vtp *.obj);;" \
-    "NIfTI format (*.nii)"
-
-#define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.vtk *.vti *.hdr *.png *.tiff *.jpg *.hdr *.bmp *.dcm *.gipl *.nii *.nrrd *.nhdr *.spr *.lsm *.dwi *.hdwi *.qbi *.hqbi)"
-*/
-
-/**
- * @brief This method gets the supported (open) file extensions as string. This string is can then used by the QT QFileDialog widget.
- * @return The c-string that contains the file extensions
- *
- */
 const char* mitk::CoreObjectFactory::GetFileExtensions()
 {
   MultimapType aMap;
@@ -281,14 +234,6 @@ const char* mitk::CoreObjectFactory::GetFileExtensions()
   return m_FileExtensions.c_str();
 }
 
-/**
- * @brief Merge the input map into the fileExtensionsMap. Duplicate entries are removed
- * @param fileExtensionsMap the existing map, it contains value pairs like ("*.dcm", "DICOM files"),("*.dc3", "DICOM files").
- *                          This map is extented/merged with the values from the input map.
- * @param inputMap the input map, it contains value pairs like ("*.dcm", "DICOM files"),("*.dc3", "DICOM files") returned by
- *                 the extra factories.
- *
- */
 void mitk::CoreObjectFactory::MergeFileExtensions(MultimapType& fileExtensionsMap, MultimapType inputMap)
 {
   bool duplicateFound = false;
@@ -315,18 +260,11 @@ void mitk::CoreObjectFactory::MergeFileExtensions(MultimapType& fileExtensionsMa
   }
 }
 
-/**
- * @brief get the defined (open) file extension map
- * @return the defined (open) file extension map
- */
 mitk::CoreObjectFactoryBase::MultimapType mitk::CoreObjectFactory::GetFileExtensionsMap()
 {
   return m_FileExtensionsMap;
 }
 
-/**
- * @brief initialize the file extension entries for open and save
- */
 void mitk::CoreObjectFactory::CreateFileExtensionsMap()
 {
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.dcm", "DICOM files"));
@@ -391,11 +329,6 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
 
 }
 
-/**
- * @brief This method gets the supported (save) file extensions as string. This string is can then used by the QT QFileDialog widget.
- * @return The c-string that contains the (save) file extensions
- *
- */
 const char* mitk::CoreObjectFactory::GetSaveFileExtensions() {
   MultimapType aMap;
   for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ )
@@ -406,12 +339,8 @@ const char* mitk::CoreObjectFactory::GetSaveFileExtensions() {
   }
   this->CreateFileExtensions(m_SaveFileExtensionsMap, m_SaveFileExtensions);
   return m_SaveFileExtensions.c_str();
-};
+}
 
-/**
- * @brief get the defined (save) file extension map
- * @return the defined (save) file extension map
- */
 mitk::CoreObjectFactoryBase::MultimapType mitk::CoreObjectFactory::GetSaveFileExtensionsMap()
 {
   return m_SaveFileExtensionsMap;
@@ -435,15 +364,101 @@ mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters(
     //add them to the sorted set
     fileWritersSet.insert(list2.begin(), list2.end());
   }
-
   //write back to allWriters to return a list
   allWriters.clear();
   allWriters.insert(allWriters.end(), fileWritersSet.begin(), fileWritersSet.end());
-
   return allWriters;
 }
 
-void mitk::CoreObjectFactory::MapEvent(const mitk::Event*, const int) {
-
+void mitk::CoreObjectFactory::MapEvent(const mitk::Event*, const int)
+{
 }
 
+std::string mitk::CoreObjectFactory::GetDescriptionForExtension(const std::string& extension)
+{
+  std::multimap<std::string, std::string> fileExtensionMap = GetSaveFileExtensionsMap();
+  for(std::multimap<std::string, std::string>::iterator it = fileExtensionMap.begin(); it != fileExtensionMap.end(); it++)
+    if (it->first == extension) return it->second;
+  return ""; // If no matching extension was found, return emtpy string
+}
+
+void mitk::CoreObjectFactory::RegisterLegacyReaders(mitk::CoreObjectFactoryBase* factory)
+{
+  // We are not really interested in the string, just call the method since
+  // many readers initialize the map the first time when this method is called
+  factory->GetFileExtensions();
+
+  CoreServicePointer<IMimeTypeProvider> mimeTypeProvider(CoreServices::GetMimeTypeProvider());
+
+  std::multimap<std::string, std::string> fileExtensionMap = factory->GetFileExtensionsMap();
+  for(std::multimap<std::string, std::string>::iterator it = fileExtensionMap.begin(); it != fileExtensionMap.end(); it++)
+  {
+    std::string extension = it->first;
+    // remove "*."
+    extension = extension.erase(0,2);
+    std::string mimeType;
+    std::vector<std::string> mimeTypes = mimeTypeProvider->GetMimeTypesForExtension(extension);
+    for(std::vector<std::string>::iterator mimeType = mimeTypes.begin();
+        mimeType != mimeTypes.end(); ++mimeType)
+    {
+      try
+      {
+        mitk::LegacyFileReaderService* lfrs = new mitk::LegacyFileReaderService(*mimeType, extension, it->second);
+        m_LegacyReaders.push_back(lfrs);
+      }
+      catch (const std::exception& e)
+      {
+        MITK_WARN << e.what();
+      }
+    }
+  }
+}
+
+void mitk::CoreObjectFactory::RegisterLegacyWriters(mitk::CoreObjectFactoryBase* factory)
+{
+  // Get all external Writers
+  mitk::CoreObjectFactory::FileWriterList writers = factory->GetFileWriters();
+
+  // We are not really interested in the string, just call the method since
+  // many writers initialize the map the first time when this method is called
+  factory->GetSaveFileExtensions();
+
+  MultimapType fileExtensionMap = factory->GetSaveFileExtensionsMap();
+
+  for(mitk::CoreObjectFactory::FileWriterList::iterator it = writers.begin(); it != writers.end(); it++)
+  {
+    std::vector<std::string> extensions = (*it)->GetPossibleFileExtensions();
+    for(std::vector<std::string>::iterator ext = extensions.begin(); ext != extensions.end(); ext++)
+    {
+      if (ext->empty()) continue;
+
+      std::string extension = *ext;
+      std::string extensionWithStar = extension;
+      if (extension.find_first_of('*') == 0)
+      {
+        // remove "*."
+        extension = extension.substr(0, extension.size()-2);
+      }
+      else
+      {
+        extensionWithStar.insert(extensionWithStar.begin(), '*');
+      }
+
+      std::string description;
+      for(MultimapType::iterator fileExtensionIter = fileExtensionMap.begin();
+          fileExtensionIter != fileExtensionMap.end(); fileExtensionIter++)
+      {
+        if (fileExtensionIter->first == extensionWithStar)
+        {
+          description = fileExtensionIter->second;
+          break;
+        }
+      }
+
+      //extension = extension.erase(0,1);
+      std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+      mitk::LegacyFileWriterService* lfws = new mitk::LegacyFileWriterService(*it, "LegacyDataType", extension, description);
+      m_LegacyWriters.push_back(lfws);
+    }
+  }
+}

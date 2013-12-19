@@ -36,6 +36,7 @@ if(MINGW)
   set_target_properties(Mitk PROPERTIES LINK_FLAGS "${_mitkCore_MINGW_linkflags} -Wl,--export-all-symbols")
 endif(MINGW)
 
+
 if(MSVC_IDE OR MSVC_VERSION OR MINGW)
   target_link_libraries(Mitk psapi.lib)
 endif(MSVC_IDE OR MSVC_VERSION OR MINGW)

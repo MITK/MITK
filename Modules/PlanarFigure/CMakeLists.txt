@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE( PlanarFigure
   INCLUDE_DIRS Algorithms DataManagement Interactions IO Rendering
-  DEPENDS Mitk SceneSerializationBase
+  DEPENDS Mitk LegacyIO SceneSerializationBase
 )
 
 IF( BUILD_TESTING )

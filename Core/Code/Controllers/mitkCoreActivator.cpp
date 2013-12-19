@@ -14,17 +14,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+// Rendering
 #include "mitkRenderingManager.h"
 #include "mitkPlanePositionManager.h"
-#include <mitkCoreDataNodeReader.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkShaderRepository.h>
 #include <mitkPropertyAliases.h>
 #include <mitkPropertyDescriptions.h>
 #include <mitkPropertyExtensions.h>
 #include <mitkPropertyFilters.h>
-#include <mitkIOUtil.h>
 
+// File IO
+#include <mitkIOUtil.h>
+#include <mitkIFileReader.h>
+#include <mitkIFileWriter.h>
+#include <mitkMimeTypeProvider.h>
+#include <mitkPointSetReaderService.h>
+
+// Microservices
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 #include <usModuleSettings.h>
@@ -32,6 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModule.h>
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
+#include <usSharedLibrary.h>
+
 
 void HandleMicroServicesMessages(us::MsgType type, const char* msg)
 {
@@ -81,9 +90,9 @@ void AddMitkAutoLoadPaths(const std::string& programPath)
 }
 
 /*
- * This is the module activator for the "Mitk" module. It registers core services
- * like ...
- */
+* This is the module activator for the "Mitk" module. It registers core services
+* like ...
+*/
 class MitkCoreActivator : public us::ModuleActivator
 {
 public:
@@ -110,9 +119,6 @@ public:
     m_PlanePositionManager.reset(new mitk::PlanePositionManagerService);
     context->RegisterService<mitk::PlanePositionManagerService>(m_PlanePositionManager.get());
 
-    m_CoreDataNodeReader.reset(new mitk::CoreDataNodeReader);
-    context->RegisterService<mitk::IDataNodeReader>(m_CoreDataNodeReader.get());
-
     m_ShaderRepository.reset(new mitk::ShaderRepository);
     context->RegisterService<mitk::IShaderRepository>(m_ShaderRepository.get());
 
@@ -128,7 +134,22 @@ public:
     m_PropertyFilters.reset(new mitk::PropertyFilters);
     context->RegisterService<mitk::IPropertyFilters>(m_PropertyFilters.get());
 
+    m_MimeTypeProvider.reset(new mitk::MimeTypeProvider);
+    m_MimeTypeProvider->Start();
+    m_MimeTypeProviderReg = context->RegisterService<mitk::IMimeTypeProvider>(m_MimeTypeProvider.get());
+
     context->AddModuleListener(this, &MitkCoreActivator::HandleModuleEvent);
+
+    // Explicitly load the LegacyIO module
+    us::SharedLibrary legacyIOLib(programPath, "LegacyIO");
+    legacyIOLib.Load();
+
+    // Add Reader / Writer Services
+
+    mitk::IFileReader* reader;
+//    mitk::IFileWriter* writer;
+    reader = new mitk::PointSetReaderService();
+    m_FileReaders.push_back(reader);
 
     /*
     There IS an option to exchange ALL vtkTexture instances against vtkNeverTranslucentTextureFactory.
@@ -146,6 +167,13 @@ public:
     // will always be 0 for the Mitk library. It makes no sense
     // to use it at this stage anyway, since all libraries which
     // know about the module system have already been unloaded.
+
+    // we need to close the internal service tracker of the
+    // MimeTypeProvider class here. Otherwise it
+    // would hold on to the ModuleContext longer than it is
+    // actually valid.
+    m_MimeTypeProviderReg.Unregister();
+    m_MimeTypeProvider->Stop();
   }
 
 private:
@@ -156,12 +184,18 @@ private:
 
   //mitk::RenderingManager::Pointer m_RenderingManager;
   std::auto_ptr<mitk::PlanePositionManagerService> m_PlanePositionManager;
-  std::auto_ptr<mitk::CoreDataNodeReader> m_CoreDataNodeReader;
   std::auto_ptr<mitk::ShaderRepository> m_ShaderRepository;
   std::auto_ptr<mitk::PropertyAliases> m_PropertyAliases;
   std::auto_ptr<mitk::PropertyDescriptions> m_PropertyDescriptions;
   std::auto_ptr<mitk::PropertyExtensions> m_PropertyExtensions;
   std::auto_ptr<mitk::PropertyFilters> m_PropertyFilters;
+  std::auto_ptr<mitk::MimeTypeProvider> m_MimeTypeProvider;
+
+  // File IO
+  std::vector<mitk::IFileReader*> m_FileReaders;
+  std::vector<mitk::IFileReader*> m_FileWriters;
+
+  us::ServiceRegistration<mitk::IMimeTypeProvider> m_MimeTypeProviderReg;
 };
 
 void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
@@ -170,9 +204,9 @@ void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
   {
     // search and load shader files
     std::vector<us::ModuleResource> shaderResoruces =
-        moduleEvent.GetModule()->FindResources("Shaders", "*.xml", true);
+      moduleEvent.GetModule()->FindResources("Shaders", "*.xml", true);
     for (std::vector<us::ModuleResource>::iterator i = shaderResoruces.begin();
-         i != shaderResoruces.end(); ++i)
+      i != shaderResoruces.end(); ++i)
     {
       if (*i)
       {
@@ -188,20 +222,17 @@ void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
   else if (moduleEvent.GetType() == us::ModuleEvent::UNLOADED)
   {
     std::map<long, std::vector<int> >::iterator shaderIdsIter =
-        moduleIdToShaderIds.find(moduleEvent.GetModule()->GetModuleId());
+      moduleIdToShaderIds.find(moduleEvent.GetModule()->GetModuleId());
     if (shaderIdsIter != moduleIdToShaderIds.end())
     {
       for (std::vector<int>::iterator idIter = shaderIdsIter->second.begin();
-           idIter != shaderIdsIter->second.end(); ++idIter)
+        idIter != shaderIdsIter->second.end(); ++idIter)
       {
         m_ShaderRepository->UnloadShader(*idIter);
       }
       moduleIdToShaderIds.erase(shaderIdsIter);
     }
   }
-
-
 }
 
 US_EXPORT_MODULE_ACTIVATOR(Mitk, MitkCoreActivator)
-

@@ -1,7 +1,5 @@
 set(CPP_FILES
 
- QmitkApplicationBase/QmitkIOUtil.cpp
-
  #QmitkModels/QmitkDataStorageListModel.cpp
  #QmitkModels/QmitkPropertiesTableModel.cpp
  #QmitkModels/QmitkDataStorageTreeModel.cpp

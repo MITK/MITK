@@ -1,0 +1,4 @@
+
+MITK_CREATE_MODULE( LegacyIO
+  DEPENDS Mitk
+)

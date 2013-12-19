@@ -18,12 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkImageDataItem.h>
 #include <mitkImageCast.h>
-#include "mitkItkImageFileReader.h"
 #include <mitkTestingMacros.h>
 #include <mitkImageStatisticsHolder.h>
 #include "mitkImageGenerator.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkException.h"
+#include "mitkFileReaderRegistry.h"
 
 #include "mitkImageSliceSelector.h"
 
@@ -41,23 +41,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 bool ImageVtkDataReferenceCheck(const char* fname) {
 
   const std::string filename = std::string(fname);
-  mitk::ItkImageFileReader::Pointer imageReader = mitk::ItkImageFileReader::New();
+
   try
   {
-    imageReader->SetFileName(filename);
-    imageReader->Update();
-  }
-  catch(...) {
-    MITK_TEST_FAILED_MSG(<< "Could not read file for testing: " << filename);
-    return false;
-  }
+    mitk::Image::Pointer image = mitk::FileReaderRegistry::Read<mitk::Image>(filename);
+    MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "Non-NULL image")
 
-  {
-    mitk::Image::Pointer image = imageReader->GetOutput();
     vtkImageData* vtk = image->GetVtkImageData();
 
     if(vtk == NULL)
       return false;
+  }
+  catch(...)
+  {
+    MITK_TEST_FAILED_MSG(<< "Could not read file for testing: " << filename);
+    return false;
   }
 
   return true;
@@ -358,18 +356,16 @@ int mitkImageTest(int argc, char* argv[])
 
   MITK_TEST_CONDITION_REQUIRED(argc == 2, "Check if test image is accessible!");
   const std::string filename = std::string(argv[1]);
-  mitk::ItkImageFileReader::Pointer imageReader = mitk::ItkImageFileReader::New();
+  mitk::Image::Pointer image;
   try
   {
-    imageReader->SetFileName(filename);
-    imageReader->Update();
+    mitk::Image::Pointer image = mitk::FileReaderRegistry::Read<mitk::Image>(filename);
+    MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "Non-NULL image")
   }
   catch(...) {
     MITK_TEST_FAILED_MSG(<< "Could not read file for testing: " << filename);
     return 0;
   }
-
-  mitk::Image::Pointer image = imageReader->GetOutput();
 
   // generate a random point in world coordinates
   mitk::Point3D xMax, yMax, zMax, xMaxIndex, yMaxIndex, zMaxIndex;

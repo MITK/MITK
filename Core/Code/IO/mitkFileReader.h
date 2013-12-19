@@ -25,6 +25,7 @@ namespace mitk {
 //##Documentation
 //## @brief Interface class of readers that read from files
 //## @ingroup Process
+//## @deprecatedSince{2013_09} Use mitk::IFileReader instead.
 class MITK_CORE_EXPORT FileReader
 {
   public:
@@ -73,7 +74,7 @@ class MITK_CORE_EXPORT FileReader
     /**
     @brief Specifies, whether the file reader also can
     read a file from a memory buffer */
-    virtual bool CanReadFromMemory(  );
+    virtual bool CanReadFromMemory(  ); // TODO Eliminieren, stattdessen abstrakte Klasse welche nach unten StrStream bereitstellt
 
     /**
     @brief Set/Get functions to advise the file reader to

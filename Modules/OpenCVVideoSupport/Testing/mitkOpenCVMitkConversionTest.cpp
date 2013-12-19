@@ -63,7 +63,9 @@ void ConvertIplImageForthAndBack(mitk::Image::Pointer inputForCVMat, std::string
 void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string imageFileName);
 
 
+
 // Begin the test for mitkImage to OpenCV image conversion and back.
+
 int mitkOpenCVMitkConversionTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("ImageToOpenCVImageFilter")
@@ -88,7 +90,6 @@ int mitkOpenCVMitkConversionTest(int argc, char* argv[])
 
   MITK_INFO << "generating test OpenCV image (RGB)";
   cv::Mat testRGBImage = cv::Mat::zeros( testImageSize, CV_8UC3 );
-
   // generate some test intensity values
   testRGBImage.at<cv::Vec3b>(pos1)= color1;
   testRGBImage.at<cv::Vec3b>(pos2)= color2;
@@ -109,6 +110,7 @@ int mitkOpenCVMitkConversionTest(int argc, char* argv[])
   AccessFixedTypeByItk(mitkImage.GetPointer(), ComparePixels,
     (itk::RGBPixel<unsigned char>), // rgb image
     (2) );
+
 
   // convert it back to OpenCV image
   MITK_INFO << "converting mitk image to OpenCV image and comparing scalar rgb values";
@@ -132,7 +134,6 @@ int mitkOpenCVMitkConversionTest(int argc, char* argv[])
   {
     ReadImageDataAndConvertForthAndBack(argv[i]);
   }
-
   MITK_TEST_END();
 }
 

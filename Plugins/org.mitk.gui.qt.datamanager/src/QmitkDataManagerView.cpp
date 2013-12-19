@@ -633,7 +633,7 @@ void QmitkDataManagerView::SaveSelectedNodes( bool )
         QString error;
         try
         {
-           mitk::QmitkIOUtil::SaveBaseDataWithDialog( data.GetPointer(), node->GetName().c_str(), m_Parent );
+           QmitkIOUtil::SaveBaseDataWithDialog( data.GetPointer(), node->GetName().c_str(), m_Parent );
         }
         catch(std::exception& e)
         {

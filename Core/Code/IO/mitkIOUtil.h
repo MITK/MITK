@@ -229,6 +229,10 @@ public:
   static const std::string DEFAULTSURFACEEXTENSION;
   static const std::string DEFAULTPOINTSETEXTENSION;
 
+private:
+
+  static void SetDefaultDataNodeProperties(mitk::DataNode* node, const std::string& filePath = std::string());
+
 };
 
 }

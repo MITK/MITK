@@ -25,51 +25,119 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 class Event;
+class LegacyFileReaderService;
+class LegacyFileWriterService;
+class LegacyImageWriterService;
 
 class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
 {
-  public:
-    mitkClassMacro(CoreObjectFactory,CoreObjectFactoryBase);
-    itkFactorylessNewMacro(CoreObjectFactory);
-    virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
-    virtual void SetDefaultProperties(mitk::DataNode* node);
-    virtual const char* GetFileExtensions();
-    virtual MultimapType GetFileExtensionsMap();
-    virtual const char* GetSaveFileExtensions();
-    virtual MultimapType GetSaveFileExtensionsMap();
-    virtual FileWriterList GetFileWriters();
-    virtual void MapEvent(const mitk::Event* event, const int eventID);
-    virtual void RegisterExtraFactory(CoreObjectFactoryBase* factory);
-    virtual void UnRegisterExtraFactory(CoreObjectFactoryBase* factory);
-    static Pointer GetInstance();
+public:
 
-    ~CoreObjectFactory();
+  mitkClassMacro(CoreObjectFactory,CoreObjectFactoryBase)
+  itkFactorylessNewMacro(CoreObjectFactory)
 
-  protected:
+  virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
+  virtual void SetDefaultProperties(mitk::DataNode* node);
 
-    CoreObjectFactory();
-    void MergeFileExtensions(MultimapType& fileExtensionsMap, MultimapType inputMap);
-    void CreateFileExtensionsMap();
-    void CreateSaveFileExtensions();
-    typedef std::set<mitk::CoreObjectFactoryBase::Pointer> ExtraFactoriesContainer;
+  virtual void MapEvent(const mitk::Event* event, const int eventID);
 
-    ExtraFactoriesContainer m_ExtraFactories;
-    static FileWriterList m_FileWriters;
-    std::string m_FileExtensions;
-    MultimapType m_FileExtensionsMap;
-    std::string m_SaveFileExtensions;
-    MultimapType m_SaveFileExtensionsMap;
+  virtual void RegisterExtraFactory(CoreObjectFactoryBase* factory);
+  virtual void UnRegisterExtraFactory(CoreObjectFactoryBase* factory);
 
-    itk::ObjectFactoryBase::Pointer m_PointSetIOFactory;
-    itk::ObjectFactoryBase::Pointer m_STLFileIOFactory;
-    itk::ObjectFactoryBase::Pointer m_VtkSurfaceIOFactory;
-    itk::ObjectFactoryBase::Pointer m_VtkImageIOFactory;
-    itk::ObjectFactoryBase::Pointer m_VtiFileIOFactory;
-    itk::ObjectFactoryBase::Pointer m_ItkImageFileIOFactory;
+  static Pointer GetInstance();
 
-    itk::ObjectFactoryBase::Pointer m_SurfaceVtkWriterFactory;
-    itk::ObjectFactoryBase::Pointer m_PointSetWriterFactory;
-    itk::ObjectFactoryBase::Pointer m_ImageWriterFactory;
+  ~CoreObjectFactory();
+
+  /**
+   * @brief This method gets the supported (open) file extensions as string.
+   *
+   * This string can then used by the Qt QFileDialog widget.
+   *
+   * @return The c-string that contains the file extensions
+   * @deprecatedSince{2013_09} See mitk::FileReaderRegistry and QmitkIOUtil
+   */
+  DEPRECATED(virtual const char* GetFileExtensions());
+
+  /**
+   * @brief get the defined (open) file extension map
+   *
+   * @return the defined (open) file extension map
+   * @deprecatedSince{2013_09} See mitk::FileReaderRegistry and QmitkIOUtil
+   */
+  DEPRECATED(virtual MultimapType GetFileExtensionsMap());
+
+  /**
+   * @brief This method gets the supported (save) file extensions as string.
+   *
+   * This string can then used by the Qt QFileDialog widget.
+   *
+   * @return The c-string that contains the (save) file extensions
+   * @deprecatedSince{2013_09} See mitk::FileWriterRegistry and QmitkIOUtil
+   */
+  DEPRECATED(virtual const char* GetSaveFileExtensions());
+
+  /**
+   * @brief get the defined (save) file extension map
+   *
+   * @return the defined (save) file extension map
+   * @deprecatedSince{2013_09} See mitk::FileWriterRegistry and QmitkIOUtil
+   */
+  virtual MultimapType GetSaveFileExtensionsMap();
+
+  /**
+   * @deprecatedSince{2013_09} See mitk::FileWriterRegistry
+   */
+  DEPRECATED(virtual FileWriterList GetFileWriters());
+
+  /**
+   * @deprecatedSince{2013_09} See mitk::FileWriterRegistry and QmitkIOUtil
+   */
+  DEPRECATED(std::string GetDescriptionForExtension(const std::string& extension));
+
+protected:
+
+  CoreObjectFactory();
+
+  /**
+   * @brief Merge the input map into the fileExtensionsMap. Duplicate entries are removed
+   *
+   * @param fileExtensionsMap the existing map, it contains value pairs like
+   *        ("*.dcm", "DICOM files"),("*.dc3", "DICOM files").
+   *        This map is extented/merged with the values from the input map.
+   * @param inputMap the input map, it contains value pairs like ("*.dcm",
+   *        "DICOM files"),("*.dc3", "DICOM files") returned by the extra factories.
+   * @deprecatedSince{2013_09}
+   */
+  void MergeFileExtensions(MultimapType& fileExtensionsMap, MultimapType inputMap);
+
+  /**
+   * @brief initialize the file extension entries for open and save
+   * @deprecatedSince{2013_09}
+   */
+  void CreateFileExtensionsMap();
+
+  /**
+   * @deprecatedSince{2013_09}
+   */
+  DEPRECATED(void CreateSaveFileExtensions());
+
+  typedef std::set<mitk::CoreObjectFactoryBase::Pointer> ExtraFactoriesContainer;
+
+  ExtraFactoriesContainer m_ExtraFactories;
+  FileWriterList m_FileWriters;
+  std::string m_FileExtensions;
+  MultimapType m_FileExtensionsMap;
+  std::string m_SaveFileExtensions;
+  MultimapType m_SaveFileExtensionsMap;
+
+private:
+
+  void RegisterLegacyReaders(mitk::CoreObjectFactoryBase* factory);
+  void RegisterLegacyWriters(mitk::CoreObjectFactoryBase* factory);
+
+  std::list< mitk::LegacyFileReaderService* > m_LegacyReaders;
+  std::list< mitk::LegacyFileWriterService* > m_LegacyWriters;
+
 };
 
 } // namespace mitk

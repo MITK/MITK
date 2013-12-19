@@ -71,9 +71,9 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     QmitkServiceListWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
     virtual ~QmitkServiceListWidget();
 
-    /** \brief This method is part of the widget an needs not to be called separately. */
+    /** \brief This method is part of the widget and needs not to be called separately. */
     virtual void CreateQtPartControl(QWidget *parent);
-    /** \brief This method is part of the widget an needs not to be called separately. (Creation of the connections of main and control widget.)*/
+    /** \brief This method is part of the widget and needs not to be called separately. (Creation of the connections of main and control widget.)*/
     virtual void CreateConnections();
 
     /**

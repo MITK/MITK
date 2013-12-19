@@ -49,6 +49,12 @@ mitk::GrabCutOpenCVImageFilter::~GrabCutOpenCVImageFilter()
 
 bool mitk::GrabCutOpenCVImageFilter::OnFilterImage( cv::Mat& image )
 {
+  if ( image.empty() )
+  {
+    MITK_WARN << "Filtering empty image?";
+    return false;
+  }
+
   if ( m_NewResultReady )
   {
     m_ResultMutex->Lock();
@@ -61,6 +67,14 @@ bool mitk::GrabCutOpenCVImageFilter::OnFilterImage( cv::Mat& image )
   if (m_CurrentProcessImageNum != 0) { return true; }
 
   m_ImageMutex->Lock();
+
+  // make sure that the image is an rgb image
+  if (image.type() != CV_8UC3)
+  {
+    cv::Mat test = image.clone();
+    cv::cvtColor(test, image, CV_GRAY2RGB);
+  }
+
   m_InputImage = image.clone();
   m_InputImageId = this->GetCurrentImageId();
   m_ImageMutex->Unlock();
@@ -153,10 +167,12 @@ std::vector<mitk::GrabCutOpenCVImageFilter::ModelPointsList> mitk::GrabCutOpenCV
 {
   std::vector<std::vector<cv::Point> > cvContours;
   std::vector<cv::Vec4i> hierarchy;
-
-  cv::findContours(this->GetResultMask(), cvContours, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
-
   std::vector<mitk::GrabCutOpenCVImageFilter::ModelPointsList> contourPoints;
+
+  cv::Mat resultMask = this->GetResultMask();
+  if (resultMask.empty()) { return contourPoints; }
+
+  cv::findContours(resultMask, cvContours, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
 
   for ( unsigned int i = 0; i < cvContours.size(); ++i )
   {

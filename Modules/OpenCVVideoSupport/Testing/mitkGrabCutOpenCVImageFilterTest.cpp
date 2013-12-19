@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <highgui.h>
 #include <cv.h>
 
-#include <sys/time.h>
-
 #include "mitkOpenCVToMitkImageFilter.h"
 
 static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, std::string resultMaskPath)

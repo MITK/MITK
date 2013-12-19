@@ -107,7 +107,7 @@ void mitk::USImageSource::GetNextRawImage( cv::Mat& image )
   mitk::Image::Pointer mitkImg;
   this->GetNextRawImage(mitkImg);
 
-  if ( mitkImg.IsNull() )
+  if ( mitkImg.IsNull() || ! mitkImg->IsInitialized() )
   {
     image = cv::Mat();
     return;
@@ -115,9 +115,5 @@ void mitk::USImageSource::GetNextRawImage( cv::Mat& image )
 
   // convert mitk::Image to an OpenCV image
   m_MitkToOpenCVFilter->SetImage(mitkImg);
-  IplImage* iplImage = m_MitkToOpenCVFilter->GetOpenCVImage();
-  image = iplImage;
-
-  // make sure that IplImage is released
-  cvReleaseImage(&iplImage);
+  image = m_MitkToOpenCVFilter->GetOpenCVMat();
 }

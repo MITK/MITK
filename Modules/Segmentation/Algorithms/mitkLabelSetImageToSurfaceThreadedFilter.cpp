@@ -62,6 +62,16 @@ bool LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateFunction()
 //    MITK_WARN << "None observer provided.";
   }
 */
+  bool useSmoothing(false);
+  try
+  {
+    this->GetParameter("Smooth", useSmoothing);
+  }
+  catch(std::invalid_argument&)
+  {
+    MITK_WARN << "\"Smooth\" parameter was not set: will use the default value (" << useSmoothing << ").";
+  }
+
   try
   {
     this->GetParameter("RequestedLabel", m_RequestedLabel);
@@ -76,6 +86,7 @@ bool LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateFunction()
 //  filter->SetObserver(obsv);
   filter->SetGenerateAllLabels( false );
   filter->SetRequestedLabel( m_RequestedLabel );
+  filter->SetUseSmoothing(useSmoothing);
 
   try
   {

@@ -18,13 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkLabelSetImageToSurfaceFilter_H_
 
 #include <mitkSurfaceSource.h>
-#include "MitkExtExports.h"
-#include "mitkTool.h"
+#include "SegmentationExports.h"
+#include "mitkLabelSetImage.h"
 #include "mitkSurface.h"
 
 #include <vtkMatrix4x4.h>
 
-#include "itkImage.h"
+#include <itkImage.h>
 
 #include <map>
 
@@ -32,10 +32,9 @@ namespace mitk
 {
 
 /**
- * Calculates surfaces for labeled images.
- * If you want to calculate a surface representation only for one
- * specific label, you may call GenerateAllLabelsOff() and set the
- * desired label by SetLabel(label).
+ * Generates surface meshes from a labelset image.
+ * If you want to calculate a surface representation for all available labels,
+ * you may call GenerateAllLabelsOn().
  */
 class Segmentation_EXPORT LabelSetImageToSurfaceFilter : public SurfaceSource
 {
@@ -45,7 +44,7 @@ public:
 
   itkNewMacro( Self );
 
-  typedef mitk::Tool::DefaultSegmentationDataType LabelType;
+  typedef LabelSetImage::PixelType LabelType;
 
   typedef std::map<LabelType, unsigned long> LabelMapType;
 
@@ -90,22 +89,26 @@ public:
   itkGetMacro( RequestedLabel, int );
 
   /**
-   * Set the label of the background. No surface will be generated for this label!
+   * Sets the label value of the background. No surface will be generated for this label.
    * @param _arg the label of the background, by default 0
    */
   itkSetMacro( BackgroundLabel, int );
 
-    /**
-   * Set whether to use image smoothing before surface extraction
+  /**
+   * Gets the label value of the background. No surface will be generated for this label.
+   * @param _arg the label of the background, by default 0
    */
+  itkGetMacro( BackgroundLabel, int );
 
+  /**
+   * Sets whether to provide a smoothed surface
+   */
   itkSetMacro( UseSmoothing, int );
 
   /**
-   * Returns the label of the background. No surface will be generated for this label!
-   * @returns the label of the background, by default 0
+   * Sets the Sigma used in the gaussian smoothing
    */
-  itkGetMacro( BackgroundLabel, int );
+  itkSetMacro( Sigma, float );
 
 protected:
 
@@ -127,11 +130,10 @@ protected:
     out[2] = z;
    }
 
-  template < typename TPixel, unsigned int VImageDimension >
-  void ITKProcessing( itk::Image<TPixel, VImageDimension>* input, mitk::Surface* surface );
+  mitk::Image::Pointer m_ResultImage;
 
   template < typename TPixel, unsigned int VImageDimension >
-  void GetAvailableLabelsInternal( itk::Image<TPixel, VImageDimension>* input, LabelMapType& availableLabels );
+  void InternalProcessing( itk::Image<TPixel, VImageDimension>* input, mitk::Surface* surface );
 
   bool m_GenerateAllLabels;
 
@@ -140,6 +142,8 @@ protected:
   int m_BackgroundLabel;
 
   int m_UseSmoothing;
+
+  float m_Sigma;
 
   LabelMapType m_AvailableLabels;
 
@@ -150,9 +154,6 @@ protected:
   virtual void GenerateData();
 
   virtual void GenerateOutputInformation();
-
-  int m_LowerThreshold;
-  int m_UpperThreshold;
 
 //  mitk::ProcessObserver::Pointer m_Observer;
 

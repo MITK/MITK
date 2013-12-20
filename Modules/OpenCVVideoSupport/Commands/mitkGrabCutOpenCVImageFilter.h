@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKGRABCUTOPENCVIMAGEFILTER_H
 
 #include "mitkAbstractOpenCVImageFilter.h"
+#include "mitkVector.h"
 
 //itk headers
 #include "itkObjectFactory.h"
@@ -64,6 +65,7 @@ public:
   int GetResultImageId();
   cv::Mat GetResultMask();
   std::vector<ModelPointsList> GetResultContours();
+  ModelPointsList GetResultContourWithPixel(itk::Index<2> pixelIndex);
 
 protected:
   cv::Mat GetMaskFromPointSets();

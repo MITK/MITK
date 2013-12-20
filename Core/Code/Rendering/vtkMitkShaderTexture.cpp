@@ -181,28 +181,21 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
       input->GetMTime() > this->LoadTime.GetMTime() ||
       (this->GetLookupTable() && this->GetLookupTable()->GetMTime () > this->LoadTime.GetMTime()) )
   {
-    int numChannels;
-    int channelByteSize;
     int size[3];
     vtkDataArray *scalars;
-    unsigned char *dataPtr;
     float *floatPtr;
     float *floatData=NULL;
-    unsigned char *resultData=NULL;
     int xsize, ysize;
     GLuint tempIndex=0;
 
-    // Get the scalars the user choose to color with.
     scalars = this->GetInputArrayToProcess(0, input);
 
-    // make sure scalars are non null
     if (!scalars)
     {
       vtkErrorMacro(<< "No scalar values found for texture input!");
       return;
     }
 
-    // get some info
     input->GetDimensions(size);
 
     if (input->GetNumberOfCells() == scalars->GetNumberOfTuples())
@@ -217,41 +210,12 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
       }
     }
 
-    numChannels = scalars->GetNumberOfComponents();
-
-    this->Interpolate = 1;
-
-    // make sure using unsigned char data of color scalars type
-    if (scalars->GetDataType() == VTK_UNSIGNED_SHORT)
-    {
-//      std::cout << " ushort mode " << std::endl;
-      dataPtr = reinterpret_cast<unsigned char *>(static_cast<vtkUnsignedShortArray *>(scalars)->GetPointer(0));
-      channelByteSize = 2;
-//      this->Interpolate = 0;
-    }
-    else if (scalars->GetDataType() == VTK_FLOAT)
-    {
-      floatData = new float[xsize*ysize];
-      floatPtr = reinterpret_cast<float *>(static_cast<vtkFloatArray *>(scalars)->GetPointer(0));
-      floatData = floatPtr;
-    }
-    else if (this->MapColorScalarsThroughLookupTable || scalars->GetDataType() != VTK_UNSIGNED_CHAR )
-    {
-      dataPtr = this->MapScalarsToColors (scalars);
-      numChannels = 4;
-      channelByteSize = 1;
-    }
-    else
-    {
-      channelByteSize = 1;
-    }
-
-    // we only support 2d texture maps right now
-    // so one of the three sizes must be 1, but it
-    // could be any of them, so lets find it
+    // we only support 2d texture maps right now so one of the three sizes must be 1,
+    // but it could be any of them, so lets find it
     if (size[0] == 1)
     {
-      xsize = size[1]; ysize = size[2];
+      xsize = size[1];
+      ysize = size[2];
     }
     else
     {
@@ -271,6 +235,16 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
       }
     }
 
+//    numChannels = scalars->GetNumberOfComponents();
+
+    this->Interpolate = 1;
+
+    if (scalars->GetDataType() == VTK_FLOAT)
+    {
+      floatData = new float[xsize*ysize];
+      floatPtr = reinterpret_cast<float *>(static_cast<vtkFloatArray *>(scalars)->GetPointer(0));
+      floatData = floatPtr;
+    }
 
     // -- decide whether the texture needs to be resampled --
 
@@ -281,30 +255,6 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
     if(resampleNeeded)
     {
       vtkDebugMacro( "Texture too big for gl, maximum is " << maxDimGL);
-    }
-
-    if(resampleNeeded)
-    {
-      vtkDebugMacro(<< "Resampling texture to power of two for OpenGL");
-
-      switch (channelByteSize)
-      {
-        case 1:
-          resultData = this->ResampleToPowerOfTwo<unsigned char>(xsize, ysize, dataPtr, numChannels);
-          break;
-
-        case 2:
-          resultData = reinterpret_cast<unsigned char *>(this->ResampleToPowerOfTwo<unsigned short>(xsize, ysize, reinterpret_cast<unsigned short *>(dataPtr), numChannels));
-          break;
-
-        default:
-          vtkErrorMacro("resampling of component types with more than 2 bytes are not supported");
-      }
-    }
-
-    if ( resultData == NULL )
-    {
-      resultData = dataPtr;
     }
 
     // free any old display lists (from the old context)
@@ -347,45 +297,25 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
         glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
                         vtkgl::CLAMP_TO_EDGE );
     }
-    int internalFormat = numChannels;
-    switch (numChannels)
-    {
-      case 1: format = GL_LUMINANCE; break;
-      case 2: format = GL_LUMINANCE_ALPHA; break;
-      case 3: format = GL_RGB; break;
-      case 4: format = GL_RGBA; break;
-    }
 
-    internalFormat = GL_LUMINANCE32F_ARB;
+    int internalFormat = GL_LUMINANCE32F_ARB;
     format = GL_LUMINANCE;
 
-    // blocking call
-    if (channelByteSize == 2)
-    {
-      glTexImage2D( GL_TEXTURE_2D, 0 , internalFormat,
-                   xsize, ysize, 0, format,
-                   GL_FLOAT,
-                   static_cast<const GLvoid *>(resultData) );
+    glTexImage2D( GL_TEXTURE_2D, 0 , internalFormat,
+                  xsize, ysize, 0, format,
+                  GL_FLOAT,
+                  static_cast<const GLvoid *>(floatData) );
 
-      this->Format16BIT = true;
-    }
-    else
-    {
-      glTexImage2D( GL_TEXTURE_2D, 0 , internalFormat,
-                   xsize, ysize, 0, format,
-                   GL_FLOAT,
-                   static_cast<const GLvoid *>(floatData) );
+    this->Format16BIT = false;
 
-      this->Format16BIT = false;
-    }
 
     // modify the load time to the current time
     this->LoadTime.Modified();
 
     // free memory
-    if (resultData != dataPtr)
+    if (floatData != floatPtr)
     {
-      delete [] resultData;
+      delete [] floatData;
     }
   }
 

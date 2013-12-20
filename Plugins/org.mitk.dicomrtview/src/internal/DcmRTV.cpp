@@ -89,13 +89,11 @@ void DcmRTV::OnPrescribedDoseChanged(double value)
 
 void DcmRTV::LoadIsoLines()
 {
-//  MITK_INFO << "\a";
   bool result;
   if(m_selectedNode->GetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),result) && result)
   {
     m_selectedNode->SetProperty("shader",mitk::ShaderProperty::New("mitkIsoLineShader"));
-//    m_selectedNode->SetProperty("shader.mitkIsoLineShader.HoleSize", mitk::FloatProperty::New(90.0f));
-//    m_selectedNode->SetProperty("shader.mitkIsoLineShader.CustomISO", mitk::FloatProperty::New(m_Controls.freeBox->value()));
+    m_selectedNode->SetProperty("shader.mitkIsoLineShader.CustomISO", mitk::FloatProperty::New(20));
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   else

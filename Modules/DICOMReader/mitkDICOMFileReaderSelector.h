@@ -22,6 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+/**
+  \brief Simple best-reader selection.
+
+  \ingroup DICOMReaderModule
+*/
 class DICOMReader_EXPORT DICOMFileReaderSelector : public itk::LightObject
 {
   public:

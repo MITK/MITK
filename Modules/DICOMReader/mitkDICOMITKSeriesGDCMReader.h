@@ -39,6 +39,15 @@ namespace itk
 namespace mitk
 {
 
+/**
+  \brief Flexible reader based on itk::ImageSeriesReader and GDCM, for single-slice modalities like CT, MR, PET, CR, etc.
+
+  - most complex class of this module
+  - configurable regarding sorting of slices
+  - configuration can be done via mitk::DICOMReaderConfigurator
+
+  \ingroup DICOMReaderModule
+*/
 class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, protected DICOMTagCache
 {
   public:

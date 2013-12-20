@@ -190,7 +190,17 @@ namespace mitk
       IDepthFrame* pDepthFrame = NULL;
       IColorFrame* pColorFrame = NULL;
 
-      HRESULT hr = d->m_pMultiSourceFrameReader->AcquireLatestFrame(&pMultiSourceFrame);
+      HRESULT hr = -1;
+
+      static DWORD lastTime = 0;
+
+      DWORD currentTime = GetTickCount();
+
+      if( unsigned int(currentTime - lastTime) > 33 )
+      {
+        hr = d->m_pMultiSourceFrameReader->AcquireLatestFrame(&pMultiSourceFrame);
+        lastTime = currentTime;
+      }
 
       if (SUCCEEDED(hr))
       {
@@ -280,7 +290,8 @@ namespace mitk
           }
         }
       }
-      else
+
+      if( hr != -1 && !SUCCEEDED(hr) )
       {
         MITK_ERROR << hr;
         //MITK_ERROR << "UpdateCamera() AcquireFrame - Is the 'KinectService' App running in the background? Did you connect the device properly?";
@@ -289,7 +300,6 @@ namespace mitk
       SafeRelease(pDepthFrame);
       SafeRelease(pColorFrame);
       SafeRelease(pMultiSourceFrame);
-      MITK_INFO << "SUCCESS";
       return true;
     }
     MITK_ERROR << "Unable to initialize MultiFrameReader";

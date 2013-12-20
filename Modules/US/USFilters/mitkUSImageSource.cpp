@@ -62,17 +62,12 @@ mitk::Image::Pointer mitk::USImageSource::GetNextImage()
       if ( m_ImageFilter.IsNotNull() ) { m_ImageFilter->FilterImage(image, m_CurrentImageId); }
 
       // convert to MITK image
-      IplImage ipl_img = image;
-
-      this->m_OpenCVToMitkFilter->SetOpenCVImage(&ipl_img);
+      this->m_OpenCVToMitkFilter->SetOpenCVMat(image);
       this->m_OpenCVToMitkFilter->Update();
 
       // OpenCVToMitkImageFilter returns a standard mitk::image.
       result = this->m_OpenCVToMitkFilter->GetOutput();
     }
-
-    // clean up
-    image.release();
   }
   else
   {

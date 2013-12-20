@@ -1,3 +1,7 @@
+if(TARGET itksys)
+  set(ITK_TARGETS_IMPORTED 1)
+endif()
+
 find_package(ITK REQUIRED)
 #
 # for some reason this does not work on windows, probably an ITK bug

@@ -80,7 +80,7 @@ void SimpleImageHistogram::ComputeFromBaseData( BaseData* src )
 
     do
     {
-      int value;
+      int value = 0;
 
       switch(typInt)
       {

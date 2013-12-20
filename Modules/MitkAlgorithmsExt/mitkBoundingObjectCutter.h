@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BOUNDINGOBJECTCUTTER_H_HEADER_INCLUDED_C10B22CD
 
 #include "mitkCommon.h"
-#include "MitkDataTypesExtExports.h"
+#include "MitkAlgorithmsExtExports.h"
 #include "mitkImageToImageFilter.h"
 #include "mitkBoundingObject.h"
 #include "mitkImageTimeSelector.h"
@@ -37,7 +37,7 @@ namespace mitk {
 //## Pixel on the outside of the BoundingObject will have a pixelvalue of m_OutsideValue
 //## \todo What Image resolution/spacing should be used, if no input image is given?
 //## @ingroup Process
-class MitkDataTypesExt_EXPORT BoundingObjectCutter : public ImageToImageFilter
+class MitkAlgorithmsExt_EXPORT BoundingObjectCutter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(BoundingObjectCutter, ImageToImageFilter);

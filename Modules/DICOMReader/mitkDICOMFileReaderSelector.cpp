@@ -179,5 +179,7 @@ mitk::DICOMFileReaderSelector
 
   MITK_INFO << "Decided for reader #" << bestReaderIndex;
 
+  MITK_INFO << m_PossibleConfigurations[bestReaderIndex];
+
   return bestReader;
 }

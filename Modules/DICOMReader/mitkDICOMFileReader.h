@@ -54,6 +54,11 @@ class DICOMReader_EXPORT DICOMFileReader : public itk::LightObject
 
     virtual bool CanHandleFile(const std::string& filename) = 0;
 
+    void SetConfigurationLabel(const std::string&);
+    std::string GetConfigurationLabel();
+    void SetConfigurationDescription(const std::string&);
+    std::string GetConfigurationDescription();
+
     void PrintConfiguration(std::ostream& os) const;
     void PrintOutputs(std::ostream& os, bool filenameDetails = false) const;
 
@@ -78,6 +83,9 @@ class DICOMReader_EXPORT DICOMFileReader : public itk::LightObject
 
     StringList m_InputFilenames;
     std::vector< DICOMImageBlockDescriptor > m_Outputs;
+
+    std::string m_ConfigLabel;
+    std::string m_ConfigDescription;
 };
 
 }

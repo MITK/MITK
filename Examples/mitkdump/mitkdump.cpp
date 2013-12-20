@@ -38,6 +38,7 @@ int main(int argc, char* argv[])
   }
 
   MITK_INFO << "---- Best reader configuration -----------------";
+  MITK_DEBUG << "Found best reader with configuration '" << reader->GetConfigurationLabel() << "'";
   reader->PrintConfiguration( std::cout );
   MITK_INFO << "-------------------------------------------";
 

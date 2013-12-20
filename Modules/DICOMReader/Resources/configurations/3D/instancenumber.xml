@@ -1,5 +1,7 @@
 <?xml version="1.0" standalone=no>
 <DICOMFileReader
+  label="Instance Number"
+  description="Sort by Instance Number"
   class="DICOMITKSeriesGDCMReader"
   fixTiltByShearing="true">
 <Distinguishing>

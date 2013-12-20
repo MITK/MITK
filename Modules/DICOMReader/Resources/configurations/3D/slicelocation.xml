@@ -1,5 +1,7 @@
 <?xml version="1.0" standalone=no>
 <DICOMFileReader
+  label="Slice Location"
+  description="Sort by Slice Location"
   class="DICOMITKSeriesGDCMReader"
   fixTiltByShearing="true">
 <Distinguishing>

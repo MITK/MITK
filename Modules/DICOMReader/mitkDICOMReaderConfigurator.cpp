@@ -142,6 +142,20 @@ mitk::DICOMReaderConfigurator
 {
   assert(element);
 
+  const char* configLabelC = element->Attribute("label");
+  if (configLabelC)
+  {
+    std::string configLabel(configLabelC);
+    reader->SetConfigurationLabel(configLabel);
+  }
+
+  const char* configDescriptionC = element->Attribute("label");
+  if (configDescriptionC)
+  {
+    std::string configDescription(configDescriptionC);
+    reader->SetConfigurationDescription(configDescriptionC);
+  }
+
   // "fixTiltByShearing" flag
   bool fixTiltByShearing(false);
   const char* fixTiltByShearingC = element->Attribute("fixTiltByShearing");

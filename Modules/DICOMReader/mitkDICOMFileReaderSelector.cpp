@@ -147,15 +147,15 @@ mitk::DICOMFileReaderSelector
     {
       (*rIter)->AnalyzeInputFiles();
       workingCandidates.push_back( *rIter );
-      MITK_INFO << "Reader " << readerIndex << " suggests " << (*rIter)->GetNumberOfOutputs() << " 3D blocks";
+      MITK_INFO << "Reader " << readerIndex << " (" << (*rIter)->GetConfigurationLabel() << ") suggests " << (*rIter)->GetNumberOfOutputs() << " 3D blocks";
     }
     catch (std::exception& e)
     {
-      MITK_ERROR << "Reader " << readerIndex << " threw exception during file analysis, ignoring this reader. Exception: " << e.what();
+      MITK_ERROR << "Reader " << readerIndex << " (" << (*rIter)->GetConfigurationLabel() << ") threw exception during file analysis, ignoring this reader. Exception: " << e.what();
     }
     catch (...)
     {
-      MITK_ERROR << "Reader " << readerIndex << " threw unknown exception during file analysis, ignoring this reader.";
+      MITK_ERROR << "Reader " << readerIndex << " (" << (*rIter)->GetConfigurationLabel() << ") threw unknown exception during file analysis, ignoring this reader.";
     }
   }
 
@@ -177,9 +177,8 @@ mitk::DICOMFileReaderSelector
     }
   }
 
-  MITK_INFO << "Decided for reader #" << bestReaderIndex;
-
-  MITK_INFO << m_PossibleConfigurations[bestReaderIndex];
+  MITK_DEBUG << "Decided for reader #" << bestReaderIndex << " (" << bestReader->GetConfigurationLabel() << ")";
+  MITK_DEBUG << m_PossibleConfigurations[bestReaderIndex];
 
   return bestReader;
 }

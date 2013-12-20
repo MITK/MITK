@@ -1,5 +1,7 @@
 <?xml version="1.0" standalone=no>
 <DICOMFileReader
+  label="Image Time"
+  description="Sort by Content Time"
   class="DICOMITKSeriesGDCMReader"
   fixTiltByShearing="true">
 <Distinguishing>

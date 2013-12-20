@@ -193,6 +193,33 @@ std::vector<mitk::GrabCutOpenCVImageFilter::ModelPointsList> mitk::GrabCutOpenCV
   return contourPoints;
 }
 
+mitk::GrabCutOpenCVImageFilter::ModelPointsList mitk::GrabCutOpenCVImageFilter::GetResultContourWithPixel(itk::Index<2> pixelIndex)
+{
+  cv::Mat mask = this->GetResultMask();
+
+  cv::floodFill(mask, cv::Point(pixelIndex.GetElement(0), pixelIndex.GetElement(1)), 5);
+
+  cv::Mat foregroundMask;
+  cv::compare(mask, 5, foregroundMask, cv::CMP_EQ);
+
+  std::vector<std::vector<cv::Point> > cvContours;
+  std::vector<cv::Vec4i> hierarchy;
+  cv::findContours(foregroundMask, cvContours, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
+
+  ModelPointsList contourPoints;
+
+  for ( std::vector<cv::Point>::iterator it = cvContours[0].begin();
+        it != cvContours[0].end(); ++it)
+  {
+    itk::Index<2> index;
+    index.SetElement(0, it->x);
+    index.SetElement(1, it->y);
+    contourPoints.push_back(index);
+  }
+
+  return contourPoints;
+}
+
 cv::Mat mitk::GrabCutOpenCVImageFilter::GetMaskFromPointSets()
 {
   cv::Mat mask(m_InputImage.size().height, m_InputImage.size().width, CV_8UC1, cv::GC_PR_BGD);

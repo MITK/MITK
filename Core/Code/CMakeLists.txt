@@ -21,7 +21,7 @@ MITK_CREATE_MODULE( Mitk
   INTERNAL_INCLUDE_DIRS
     ${OPENGL_INCLUDE_DIR}
   DEPENDS mbilog CppMicroServices
-  PACKAGE_DEPENDS tinyxml ITK GDCM VTK OpenGL CppUnit
+  PACKAGE_DEPENDS tinyxml ITK GDCM VTK OpenGL
   EXPORT_DEFINE MITK_CORE_EXPORT
   WARNINGS_AS_ERRORS
   # Do not automatically create CppMicroServices initialization code.

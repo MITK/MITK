@@ -74,15 +74,11 @@ void QmitkMultiLabelSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   QFormLayout* surfaceLayout = new QFormLayout;
   surfaceLayout->setSpacing(8);
 
-  m_SmoothingCheckBox = new QCheckBox("Use image spacing as smoothing value hint", m_MainControl);
-  surfaceLayout->addRow(m_SmoothingCheckBox);
-  connect(m_SmoothingCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSmoothingCheckboxChecked(int)));
-
   m_SmoothingSpinBox = new QDoubleSpinBox(m_MainControl);
   m_SmoothingSpinBox->setMinimum(0.0);
   m_SmoothingSpinBox->setSingleStep(0.5);
-  m_SmoothingSpinBox->setValue(1.0);
-  m_SmoothingSpinBox->setToolTip("The Smoothing value is used as variance for a gaussian blur.");
+  m_SmoothingSpinBox->setValue(0.1);
+  m_SmoothingSpinBox->setToolTip("The Smoothing value is used as Sigma for a gaussian blur.");
   surfaceLayout->addRow("Smoothing value (mm)", m_SmoothingSpinBox);
 
   m_DecimationSpinBox = new QDoubleSpinBox(m_MainControl);
@@ -92,14 +88,6 @@ void QmitkMultiLabelSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   m_DecimationSpinBox->setValue(0.5);
   m_DecimationSpinBox->setToolTip("Valid range is [0, 1). High values increase decimation, especially when very close to 1. A value of 0 disables decimation.");
   surfaceLayout->addRow("Decimation rate", m_DecimationSpinBox);
-
-  m_ClosingSpinBox = new QDoubleSpinBox(m_MainControl);
-  m_ClosingSpinBox->setMinimum(0.0);
-  m_ClosingSpinBox->setMaximum(1.0);
-  m_ClosingSpinBox->setSingleStep(0.1);
-  m_ClosingSpinBox->setValue(0.0);
-  m_ClosingSpinBox->setToolTip("Valid range is [0, 1]. Higher values increase closing. A value of 0 disables closing.");
-  surfaceLayout->addRow("Closing Ratio", m_ClosingSpinBox);
 
   m_SelectionModeCheckBox = new QCheckBox("Enable auto-selection mode", m_MainControl);
   m_SelectionModeCheckBox->setToolTip("If checked the segmentation plugin ensures that only one segmentation and the according greyvalue image are visible at one time.");
@@ -121,10 +109,8 @@ bool QmitkMultiLabelSegmentationPreferencePage::PerformOk()
 {
   m_SegmentationPreferencesNode->PutBool("draw outline", m_RadioOutline->isChecked());
   m_SegmentationPreferencesNode->PutBool("volume rendering", m_VolumeRenderingCheckBox->isChecked());
-  m_SegmentationPreferencesNode->PutBool("smoothing hint", m_SmoothingCheckBox->isChecked());
   m_SegmentationPreferencesNode->PutDouble("smoothing value", m_SmoothingSpinBox->value());
   m_SegmentationPreferencesNode->PutDouble("decimation rate", m_DecimationSpinBox->value());
-  m_SegmentationPreferencesNode->PutDouble("closing ratio", m_ClosingSpinBox->value());
   m_SegmentationPreferencesNode->PutBool("auto selection", m_SelectionModeCheckBox->isChecked());
   return true;
 }
@@ -150,20 +136,17 @@ void QmitkMultiLabelSegmentationPreferencePage::Update()
 
   if (m_SegmentationPreferencesNode->GetBool("smoothing hint", true))
   {
-    m_SmoothingCheckBox->setChecked(true);
     m_SmoothingSpinBox->setDisabled(true);
   }
   else
   {
-      m_SmoothingCheckBox->setChecked(false);
-      m_SmoothingSpinBox->setEnabled(true);
+    m_SmoothingSpinBox->setEnabled(true);
   }
 
   m_SelectionModeCheckBox->setChecked( m_SegmentationPreferencesNode->GetBool("auto selection", true) );
 
-  m_SmoothingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("smoothing value", 1.0));
+  m_SmoothingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("smoothing value", 0.1));
   m_DecimationSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("decimation rate", 0.5));
-  m_ClosingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("closing ratio", 0.0));
 }
 
 void QmitkMultiLabelSegmentationPreferencePage::OnVolumeRenderingCheckboxChecked(int state)

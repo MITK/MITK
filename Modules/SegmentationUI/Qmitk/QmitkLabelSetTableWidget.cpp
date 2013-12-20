@@ -534,11 +534,6 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
     QObject::connect( eraseLabelsAction, SIGNAL( triggered(bool) ), this, SLOT( OnEraseLabels(bool) ) );
     menu->addAction(eraseLabelsAction);
 
-    QAction* createSurfacesAction = new QAction(QIcon(":/QmitkExt/createsurface.png"), "Create a surface for each selected label", this );
-    createSurfacesAction->setEnabled(true);
-    QObject::connect( createSurfacesAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateSurfaces(bool) ) );
-    menu->addAction(createSurfacesAction);
-
     QAction* combineAndCreateSurfaceAction = new QAction(QIcon(":/QmitkExt/createsurface.png"), "Combine and create a surface", this );
     combineAndCreateSurfaceAction->setEnabled(true);
     QObject::connect( combineAndCreateSurfaceAction, SIGNAL( triggered(bool) ), this, SLOT( OnCombineAndCreateSurface(bool) ) );
@@ -614,7 +609,15 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
 
     QAction* createSurfaceAction = new QAction(QIcon(":/QmitkExt/createsurface.png"), "Create surface", this );
     createSurfaceAction->setEnabled(true);
-    QObject::connect( createSurfaceAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateSurface(bool) ) );
+    createSurfaceAction->setMenu(new QMenu());
+
+    QAction* tmp1 = createSurfaceAction->menu()->addAction(QString("Detailed"));
+    QAction* tmp2 = createSurfaceAction->menu()->addAction(QString("Smoothed"));
+
+    QObject::connect( tmp1, SIGNAL( triggered(bool) ), this, SLOT( OnCreateDetailedSurface(bool) ) );
+    QObject::connect( tmp2, SIGNAL( triggered(bool) ), this, SLOT( OnCreateSmoothedSurface(bool) ) );
+
+    QObject::connect( createSurfaceAction->menu(), SIGNAL(aboutToShow()), this, SLOT( OnCreateSurfaceMenuAboutToShow() ) );
 
     menu->addAction(createSurfaceAction);
 
@@ -814,14 +817,14 @@ void QmitkLabelSetTableWidget::OnNewLabel(bool value)
   emit newLabel();
 }
 
-void QmitkLabelSetTableWidget::OnCreateSurface(bool value)
+void QmitkLabelSetTableWidget::OnCreateSmoothedSurface(bool value)
 {
-  emit createSurface( this->currentRow() );
+  emit createSurface( this->currentRow(), true );
 }
 
-void QmitkLabelSetTableWidget::OnCreateSurfaces(bool value)
+void QmitkLabelSetTableWidget::OnCreateDetailedSurface(bool value)
 {
-  //emit createSurfaces( this->selectedRanges() );
+  emit createSurface( this->currentRow(), false );
 }
 
 void QmitkLabelSetTableWidget::OnCombineAndCreateSurface(bool value)

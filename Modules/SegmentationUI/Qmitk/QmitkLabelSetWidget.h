@@ -74,7 +74,7 @@ private slots:
   void OnRenameLabel(int index, const mitk::Color& color, const std::string& name);
 
   // reaction to the signal "createSurface" from QmitkLabelSetTableWidget
-  void OnCreateSurface(int);
+  void OnCreateSurface(int index, bool smooth);
 
   // reaction to the signal "toggleOutline" from QmitkLabelSetTableWidget
   void OnToggleOutline(bool);

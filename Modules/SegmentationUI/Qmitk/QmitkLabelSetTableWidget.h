@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "SegmentationUIExports.h"
 
-//#include "mitkLabelSet.h"
 #include "mitkLabelSetImage.h"
 #include "mitkColorSequenceRainbow.h"
 
@@ -103,8 +102,8 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     /// \brief Send a signal when it was requested to rename a label.
     void renameLabel(int index, const mitk::Color& color, const std::string& name);
 
-    /// \brief Send a signal when it was requested to create a surface out of a label.
-    void createSurface(int);
+    /// \brief Send a signal when it was requested to create a surface out of the selected label.
+    void createSurface(int, bool);
 
     void toggleOutline(bool);
 
@@ -114,15 +113,11 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     /// \brief Send a signal when it was requested to create a mask out of a selection (range) of labels.
     void combineAndCreateMask( const QList<QTableWidgetSelectionRange>& ranges );
 
-    /// \brief Send a signal when it was requested to create a mask out of a label.
+    /// \brief Send a signal when it was requested to create a mask out of the selected label.
     void createMask(int);
 
-    /// \brief Send a signal when it was requested to create a cropped mask out of a label.
+    /// \brief Send a signal when it was requested to create a cropped mask out of the selected label.
     void createCroppedMask(int);
-
-    void createMasks(int);
-
-    void createSurfaces(int);
 
     void importSegmentation();
 
@@ -188,9 +183,9 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
 
     void OnRemoveLabel(bool);
 
-    void OnCreateSurface(bool);
+    void OnCreateSmoothedSurface(bool);
 
-    void OnCreateSurfaces(bool);
+    void OnCreateDetailedSurface(bool);
 
     void OnCreateMask(bool);
 

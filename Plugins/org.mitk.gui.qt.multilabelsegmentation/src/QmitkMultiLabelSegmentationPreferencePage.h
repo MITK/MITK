@@ -69,10 +69,8 @@ protected:
   QRadioButton* m_RadioOutline;
   QRadioButton* m_RadioOverlay;
   QCheckBox* m_VolumeRenderingCheckBox;
-  QCheckBox* m_SmoothingCheckBox;
   QDoubleSpinBox* m_SmoothingSpinBox;
   QDoubleSpinBox* m_DecimationSpinBox;
-  QDoubleSpinBox* m_ClosingSpinBox;
   QCheckBox* m_SelectionModeCheckBox;
 
   bool m_Initializing;

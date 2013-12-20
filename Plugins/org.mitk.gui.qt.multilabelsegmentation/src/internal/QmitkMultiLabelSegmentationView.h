@@ -66,6 +66,9 @@ protected slots:
   /// \brief reaction to button "New Label"
   void OnNewLabel();
 
+  /// \brief reaction to button "Show Label Table"
+  void OnShowLabelTable(bool value);
+
   /// \brief reaction to button "New Segmentation Session"
   void OnNewSegmentationSession();
 
@@ -77,6 +80,10 @@ protected slots:
 
   /// \brief reaction to signal "goToLabel" from labelset widget
   void OnGoToLabel(const mitk::Point3D& pos);
+
+  void OnMaskStampShowInformation(bool);
+
+  void OnSurfaceStampShowInformation(bool);
 
 protected:
 
@@ -113,10 +120,10 @@ protected:
   void UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color colorname);
   void AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b);
 
-  // the Qt parent of our GUI (NOT of this object)
+  /// \brief the Qt parent of our GUI (NOT of this object)
   QWidget* m_Parent;
 
-  // our GUI
+  /// \brief Qt GUI file
   Ui::QmitkMultiLabelSegmentationControls m_Controls;
 
   mitk::IRenderWindowPart* m_IRenderWindowPart;

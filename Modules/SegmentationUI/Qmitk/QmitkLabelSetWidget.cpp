@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk
 #include <mitkLabelSetImage.h>
 #include <mitkToolManagerProvider.h>
+#include <mitkShowSegmentationAsSurface.h>
 #include <mitkLabelSetImageToSurfaceThreadedFilter.h>
 #include <mitkRenderingManager.h>
 #include <mitkStatusBar.h>
@@ -41,7 +42,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QDateTime>
 
+// itk
 #include <itksys/SystemTools.hxx>
+
+// todo:
+// berry
+//#include <berryIPreferencesService.h>
 
 QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent) : QWidget(parent),
 m_ToolManager(NULL)
@@ -57,7 +63,7 @@ m_ToolManager(NULL)
   //connect( m_Controls.m_LabelSetTableWidget, SIGNAL(importSegmentation()), this, SLOT( OnImportSegmentation()) );
   //connect( m_Controls.m_LabelSetTableWidget, SIGNAL(importLabeledImage()), this, SLOT( OnImportLabeledImage()) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(renameLabel(int, const mitk::Color&, const std::string&)), this, SLOT(OnRenameLabel(int, const mitk::Color&, const std::string&)) );
-  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createSurface(int)), this, SLOT(OnCreateSurface(int)) );
+  connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createSurface(int, bool)), this, SLOT(OnCreateSurface(int, bool)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(toggleOutline(bool)), this, SLOT(OnToggleOutline(bool)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SIGNAL(goToLabel(const mitk::Point3D&)) );
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(combineAndCreateSurface( const QList<QTableWidgetSelectionRange>& )),
@@ -553,44 +559,53 @@ void QmitkLabelSetWidget::OnToggleOutline(bool value)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkLabelSetWidget::OnCreateSurface(int index)
+void QmitkLabelSetWidget::OnCreateSurface(int index, bool smooth)
 {
   m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
+  mitk::DataNode::Pointer workingNode = m_ToolManager->GetWorkingData(0);
+  assert(workingNode.IsNotNull());
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
   assert(workingImage);
 
-  mitk::LabelSetImageToSurfaceThreadedFilter::Pointer filter =
-     mitk::LabelSetImageToSurfaceThreadedFilter::New();
+  mitk::LabelSetImageToSurfaceThreadedFilter::Pointer surfaceFilter = mitk::LabelSetImageToSurfaceThreadedFilter::New();
 
   itk::SimpleMemberCommand<QmitkLabelSetWidget>::Pointer successCommand = itk::SimpleMemberCommand<QmitkLabelSetWidget>::New();
   successCommand->SetCallbackFunction(this, &QmitkLabelSetWidget::OnThreadedCalculationDone);
-  filter->AddObserver(mitk::ResultAvailable(), successCommand);
+  surfaceFilter->AddObserver(mitk::ResultAvailable(), successCommand);
 
   itk::SimpleMemberCommand<QmitkLabelSetWidget>::Pointer errorCommand = itk::SimpleMemberCommand<QmitkLabelSetWidget>::New();
   errorCommand->SetCallbackFunction(this, &QmitkLabelSetWidget::OnThreadedCalculationDone);
-  filter->AddObserver(mitk::ProcessingError(), errorCommand);
+  surfaceFilter->AddObserver(mitk::ProcessingError(), errorCommand);
 
+  // todo: get smoothing and decimation parameters from preferences
+  /*
+  berry::IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferences::Pointer segPref = prefService->GetSystemPreferences()->Node("/org.mitk.views.multilabelsegmentation");
+
+  mitk::ScalarType smoothing = segPref->GetDouble("smoothing value", 0.1);
+  mitk::ScalarType decimation = segPref->GetDouble("decimation rate", 0.5);
+  */
   mitk::DataNode::Pointer groupNode = workingNode;
-  filter->SetPointerParameter("Group node", groupNode);
-  filter->SetPointerParameter("Input", workingImage);
-  filter->SetParameter("RequestedLabel", index);
-  filter->SetDataStorage( *m_DataStorage );
+  surfaceFilter->SetPointerParameter("Group node", groupNode);
+  surfaceFilter->SetPointerParameter("Input", workingImage);
+  surfaceFilter->SetParameter("RequestedLabel", index);
+  surfaceFilter->SetParameter("Smooth", smooth);
+  surfaceFilter->SetDataStorage( *m_DataStorage );
 
   mitk::StatusBar::GetInstance()->DisplayText("Surface creation is running in background...");
 
   try
   {
-    filter->StartAlgorithm();
+    surfaceFilter->StartAlgorithm();
   }
   catch ( mitk::Exception & e )
   {
     MITK_ERROR << "Exception caught: " << e.GetDescription();
     QMessageBox::information(this, "Create Surface", "Could not create a surface mesh out of the selected label. See error log for details.\n");
   }
+
 }
 
 void QmitkLabelSetWidget::OnImportLabeledImage()

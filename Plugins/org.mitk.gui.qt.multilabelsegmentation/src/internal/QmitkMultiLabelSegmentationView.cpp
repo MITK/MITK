@@ -215,9 +215,16 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 
   connect( m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT( OnNewLabel()) );
   connect( m_Controls.m_pbNewSegmentationSession, SIGNAL(clicked()), this, SLOT( OnNewSegmentationSession()) );
+  connect( m_Controls.m_pbShowLabelTable, SIGNAL(toggled(bool)), this, SLOT( OnShowLabelTable(bool)) );
 
   connect(m_Controls.m_pbSurfaceStamp, SIGNAL(clicked()), this, SLOT(OnSurfaceStamp()));
+  connect( m_Controls.m_cbSurfaceStampShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnSurfaceStampShowInformation(bool)) );
+  m_Controls.m_SurfaceStampInformationWidget->hide();
+
   connect(m_Controls.m_pbMaskStamp, SIGNAL(clicked()), this, SLOT(OnMaskStamp()));
+  connect( m_Controls.m_cbMaskStampShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnMaskStampShowInformation(bool)) );
+  m_Controls.m_MaskStampInformationWidget->hide();
+
   connect(m_Controls.m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
 
   this->OnReferenceSelectionChanged( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode() );
@@ -348,10 +355,7 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
   assert(workingImage);
 
-  if (workingImage->GetNumberOfLabels() > 2)
-    m_Controls.m_LabelSetWidget->show();
-  else
-    m_Controls.m_LabelSetWidget->hide();
+  m_Controls.m_pbShowLabelTable->setChecked(workingImage->GetNumberOfLabels() > 2);
 }
 
 void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
@@ -429,8 +433,15 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
 
   workingImage->AddLabel(dialog->GetSegmentationName().toStdString(), dialog->GetColor());
 
-  if (workingImage->GetNumberOfLabels() > 2)
-      m_Controls.m_LabelSetWidget->show();
+  m_Controls.m_pbShowLabelTable->setChecked(workingImage->GetNumberOfLabels() > 2);
+}
+
+void QmitkMultiLabelSegmentationView::OnShowLabelTable(bool value)
+{
+  if (value)
+    m_Controls.m_LabelSetWidget->show();
+  else
+    m_Controls.m_LabelSetWidget->hide();
 }
 
 void QmitkMultiLabelSegmentationView::NodeAdded(const mitk::DataNode* node)
@@ -683,4 +694,20 @@ void QmitkMultiLabelSegmentationView::SetLastFileOpenPath(const QString& path)
 {
   this->GetPreferences()->Put("LastFileOpenPath", path.toStdString());
   this->GetPreferences()->Flush();
+}
+
+void QmitkMultiLabelSegmentationView::OnMaskStampShowInformation( bool on )
+{
+  if (on)
+    m_Controls.m_MaskStampInformationWidget->show();
+  else
+    m_Controls.m_MaskStampInformationWidget->hide();
+}
+
+void QmitkMultiLabelSegmentationView::OnSurfaceStampShowInformation( bool on )
+{
+  if (on)
+    m_Controls.m_SurfaceStampInformationWidget->show();
+  else
+    m_Controls.m_SurfaceStampInformationWidget->hide();
 }

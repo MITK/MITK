@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKPLANELANDMARKPROJECTOR_H_HEADER_INCLUDED_C1C68A2C
 
 #include "mitkLandmarkProjector.h"
-#include "MitkExtExports.h"
+#include "MitkAlgorithmsExtExports.h"
 #include "mitkPointSet.h"
 
 namespace mitk {
@@ -28,7 +28,7 @@ namespace mitk {
 //## @brief Thin-plate-spline-based landmark-based curved geometry
 //##
 //## @ingroup Geometry
-class MitkExt_EXPORT PlaneLandmarkProjector : public LandmarkProjector
+class MitkAlgorithmsExt_EXPORT PlaneLandmarkProjector : public LandmarkProjector
 {
 public:
   mitkClassMacro(PlaneLandmarkProjector, LandmarkProjector);

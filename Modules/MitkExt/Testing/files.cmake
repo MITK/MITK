@@ -12,7 +12,6 @@ set(MODULE_SURFACE_TESTS
   mitkSurfaceToImageFilterTest.cpp #only runs on surfaces
 )
 set(MODULE_CUSTOM_TESTS
-  mitkLabeledImageToSurfaceFilterTest.cpp
   mitkImageToSurfaceFilterTest.cpp
 )
 set(MODULE_TESTIMAGES

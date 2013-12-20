@@ -256,4 +256,3 @@ bool mitk::PointLocator::FindClosestPointAndDistance( mitk::PointSet::PointType 
   *dist = m_ANNDistances[0];
   return true;
 }
-

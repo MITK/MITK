@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_POINT_LOCATOR__H__
 
 #include <itkObject.h>
-#include "MitkExtExports.h"
+#include "MitkAlgorithmsExtExports.h"
 
 #include "mitkPointSet.h"
 
@@ -42,7 +42,7 @@ namespace mitk
  * NOTE: At least 1 point must be contained in the point set.
  */
 
-class MitkExt_EXPORT PointLocator : public itk::Object
+class MitkAlgorithmsExt_EXPORT PointLocator : public itk::Object
 {
 public:
 

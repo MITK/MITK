@@ -18,6 +18,7 @@ set(CPP_FILES
   mitkLabeledImageLookupTable.cpp
   mitkLabeledImageVolumeCalculator.cpp
   mitkLineOperation.cpp
+  mitkLookupTableSource.cpp
   mitkMesh.cpp
   mitkMultiStepper.cpp
   mitkOrganTypeProperty.cpp

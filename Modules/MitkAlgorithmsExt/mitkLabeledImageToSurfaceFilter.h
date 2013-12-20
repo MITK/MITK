@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitk_labeled_image_to_surface_filter__h_
 
 #include <mitkImageToSurfaceFilter.h>
-#include "MitkExtExports.h"
+#include "MitkAlgorithmsExtExports.h"
 #include <vtkImageData.h>
 #include <map>
 
@@ -36,7 +36,7 @@ namespace mitk
  * specific label, you may call GenerateAllLabelsOff() and set the
  * desired label by SetLabel(label).
  */
-class MitkExt_EXPORT LabeledImageToSurfaceFilter : public ImageToSurfaceFilter
+class MitkAlgorithmsExt_EXPORT LabeledImageToSurfaceFilter : public ImageToSurfaceFilter
 {
 public:
 
@@ -169,6 +169,3 @@ private:
 } // end of namespace mitk
 
 #endif
-
-
-

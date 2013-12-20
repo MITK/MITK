@@ -360,5 +360,3 @@ mitk::ScalarType mitk::LabeledImageToSurfaceFilter::GetVolumeForLabel( const mit
     return 0.0;
   }
 }
-
-

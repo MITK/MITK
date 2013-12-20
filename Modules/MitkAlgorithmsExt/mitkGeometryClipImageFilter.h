@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKGEOMETRYCLIPIMAGEFILTER_H_HEADER_INCLUDED_C1F48A22
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "MitkAlgorithmsExtExports.h"
 #include "mitkImageToImageFilter.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkGeometryData.h"
@@ -42,7 +42,7 @@ namespace mitk {
 //##       front/back side of curved planes
 //##
 //## @ingroup Process
-class MitkExt_EXPORT GeometryClipImageFilter : public ImageToImageFilter
+class MitkAlgorithmsExt_EXPORT GeometryClipImageFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(GeometryClipImageFilter, ImageToImageFilter);
@@ -178,5 +178,3 @@ public:
 } // namespace mitk
 
 #endif /* MITKGEOMETRYCLIPIMAGEFILTER_H_HEADER_INCLUDED_C1F48A22 */
-
-

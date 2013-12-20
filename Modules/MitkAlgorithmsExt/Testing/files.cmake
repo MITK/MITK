@@ -4,3 +4,6 @@ set(MODULE_TESTS
   mitkSimpleHistogramTest.cpp
 )
 
+set(MODULE_CUSTOM_TESTS
+  mitkLabeledImageToSurfaceFilterTest.cpp
+)

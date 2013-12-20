@@ -2,17 +2,13 @@ set(CPP_FILES
   Algorithms/vtkPointSetSlicer.cxx
   Algorithms/mitkAngleCorrectByPointFilter.cpp
   Algorithms/mitkCylindricToCartesianFilter.cpp
-  Algorithms/mitkGeometryClipImageFilter.cpp
   Algorithms/mitkGeometryDataSource.cpp
   Algorithms/mitkImageToLookupTableFilter.cpp
   Algorithms/mitkInterpolateLinesFilter.cpp
-  Algorithms/mitkLabeledImageToSurfaceFilter.cpp
-  Algorithms/mitkLookupTableSource.cpp
   Algorithms/mitkMeshSource.cpp
   Algorithms/mitkPlaneCutFilter.cpp
   Algorithms/mitkPlaneFit.cpp
   Algorithms/mitkPlanesPerpendicularToLinesFilter.cpp
-  Algorithms/mitkPointLocator.cpp
   Algorithms/mitkPointSetToCurvedGeometryFilter.cpp
   Algorithms/mitkPointSetToGeometryDataFilter.cpp
   Algorithms/mitkPointSetIndexToWorldTransformFilter.cpp
@@ -30,7 +26,6 @@ set(CPP_FILES
   DataManagement/mitkFrameOfReferenceUIDManager.cpp
   DataManagement/mitkItkBaseDataAdapter.cpp
   DataManagement/mitkObjectSet.cpp
-  DataManagement/mitkPlaneLandmarkProjector.cpp
   DataManagement/mitkPropertyManager.cpp
   DataManagement/mitkSeedsImage.cpp
   DataManagement/mitkSeedsImageLookupTableSource.cpp

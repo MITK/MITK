@@ -1,5 +1,6 @@
 MITK_CREATE_MODULE(MitkAlgorithmsExt
                    DEPENDS MitkDataTypesExt
+                   PACKAGE_DEPENDS ANN
                    WARNINGS_AS_ERRORS
                   )
 

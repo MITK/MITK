@@ -196,6 +196,15 @@ std::vector<mitk::GrabCutOpenCVImageFilter::ModelPointsList> mitk::GrabCutOpenCV
 mitk::GrabCutOpenCVImageFilter::ModelPointsList mitk::GrabCutOpenCVImageFilter::GetResultContourWithPixel(itk::Index<2> pixelIndex)
 {
   cv::Mat mask = this->GetResultMask();
+  if (mask.empty()) { return mitk::GrabCutOpenCVImageFilter::ModelPointsList(); }
+
+  if (pixelIndex.GetElement(0) < 0 || pixelIndex.GetElement(0) >= mask.size().height
+    || pixelIndex.GetElement(1) < 0 || pixelIndex.GetElement(1) >= mask.size().width)
+  {
+    MITK_WARN << "Given pixel index ("<< pixelIndex.GetElement(0) << ", " << pixelIndex.GetElement(1)
+      << ") is outside the image (" << mask.size().height << ", " << mask.size().width << ").";
+    return mitk::GrabCutOpenCVImageFilter::ModelPointsList();
+  }
 
   cv::floodFill(mask, cv::Point(pixelIndex.GetElement(0), pixelIndex.GetElement(1)), 5);
 

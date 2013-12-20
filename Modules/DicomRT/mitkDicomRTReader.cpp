@@ -535,16 +535,15 @@ namespace mitk
     mitkTransFuncProp->SetValue(mitkTransFunc);
 
     mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-    renderingMode->SetValue(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR);
+    renderingMode->SetValue(mitk::RenderingModeProperty::ISODOSESHADER_COLOR);
 
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetName("DicomRT Dosis");
     node->SetProperty("shader.mitkIsoLineShader.Gridscale", mitk::FloatProperty::New(gridscale));
     node->SetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),true);
-//    node->SetProperty("Image Rendering.Mode", renderingMode);
+    node->SetProperty("Image Rendering.Mode", renderingMode);
 //    node->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
     node->SetProperty("opacity", mitk::FloatProperty::New(0.3));
-//    node->SetProperty("texture interpolation", mitk::BoolProperty::New( true ) );
     node->SetData(image);
 
     return node;

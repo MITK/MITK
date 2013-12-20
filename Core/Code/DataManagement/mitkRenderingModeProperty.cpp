@@ -57,6 +57,7 @@ void mitk::RenderingModeProperty::AddRenderingModes()
   AddEnum( "ColorTransferFunction_LevelWindow_Color", COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR );
   AddEnum( "LookupTable_Color", LOOKUPTABLE_COLOR );
   AddEnum( "ColorTransferFunction_Color", COLORTRANSFERFUNCTION_COLOR );
+  AddEnum( "IsoDoseShader_Color", ISODOSESHADER_COLOR );
 }
 
 bool mitk::RenderingModeProperty::AddEnum( const std::string& name, const IdType& id )

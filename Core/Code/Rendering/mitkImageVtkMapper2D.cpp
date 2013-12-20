@@ -601,6 +601,12 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
       MITK_DEBUG << "'Image Rendering.Mode' = ColorTransferFunction_Color";
       this->ApplyColorTransferFunction( renderer );
       break;
+    case mitk::RenderingModeProperty::ISODOSESHADER_COLOR:
+      MITK_DEBUG << "'Image Rendering.Mode' = IsoDoseShader_Color";
+      localStorage->m_LevelWindowFilter->SetLookupTable(localStorage->m_DefaultLookupTable);
+      this->ApplyLevelWindow( renderer );
+      this->ApplyShader( renderer );
+      break;
     default:
       MITK_ERROR << "No valid 'Image Rendering.Mode' set";
       break;
@@ -608,12 +614,6 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
   }
   //we apply color for all images (including binaries).
   this->ApplyColor( renderer );
-
-  bool doseProperty;
-  if(this->GetDataNode()->GetBoolProperty("dose",doseProperty) && doseProperty)
-  {
-    this->ApplyShader( renderer );
-  }
 }
 
 void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )

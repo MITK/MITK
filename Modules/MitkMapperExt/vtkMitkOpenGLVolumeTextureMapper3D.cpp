@@ -2180,7 +2180,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupProgramLocalsForShadingFP(
                                      2.0, -1.0, 0.0, 0.0 );
 }
 
-int  vtkMitkOpenGLVolumeTextureMapper3D::IsRenderSupported(  vtkRenderer *renderer, vtkVolumeProperty */*property*/ )
+int  vtkMitkOpenGLVolumeTextureMapper3D::IsRenderSupported(  vtkRenderer *renderer, vtkVolumeProperty* /*property*/ )
 {
   //GPU_INFO << "IsRenderSupported";
 

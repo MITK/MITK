@@ -243,6 +243,15 @@ void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string im
   {
     MITK_WARN << "Unhandled number of components used to test equality, please enhance test!";
   }
+
+  // change OpenCV image to test if the filter gets updated
+  cv::Mat changedcvmatTestImage = cvmatTestImage.clone();
+  changedcvmatTestImage.at<char>(0,0) = cvmatTestImage.at<char>(0,0) != 0 ? 0 : 1;
+
+  toMitkConverter->SetOpenCVMat(changedcvmatTestImage);
+  toMitkConverter->Update();
+
+  MITK_TEST_NOT_EQUAL(toMitkConverter->GetOutput(), inputForCVMat, "Converted image must not be the same as before.");
 }
 
 void ConvertIplImageForthAndBack(mitk::Image::Pointer inputForIpl, std::string imageFileName)

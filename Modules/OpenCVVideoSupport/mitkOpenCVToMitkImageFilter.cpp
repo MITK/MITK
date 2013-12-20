@@ -153,6 +153,7 @@ namespace mitk{
   {
     m_OpenCVMat = image;
     m_OpenCVImage = NULL;
+    this->Modified();
   }
 
 

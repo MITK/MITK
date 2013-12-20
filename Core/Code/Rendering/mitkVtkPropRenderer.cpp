@@ -753,7 +753,7 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
 }
 
 
-void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow */*renWin*/)
+void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow* /*renWin*/)
 {
   if( m_DataStorage.IsNull() )
     return;

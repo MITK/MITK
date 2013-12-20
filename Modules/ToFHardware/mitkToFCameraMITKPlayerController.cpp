@@ -161,10 +161,47 @@ namespace mitk
     {
       try
       {
-        m_DistanceImage = mitk::IOUtil::LoadImage(this->m_DistanceImageFileName);
-        m_AmplitudeImage = mitk::IOUtil::LoadImage(this->m_AmplitudeImageFileName);
-        m_IntensityImage = mitk::IOUtil::LoadImage(this->m_IntensityImageFileName);
-        m_RGBImage = mitk::IOUtil::LoadImage(this->m_RGBImageFileName);
+        if (this->m_DistanceImageFileName.empty() &&
+            this->m_AmplitudeImageFileName.empty() &&
+            this->m_IntensityImageFileName.empty() &&
+            this->m_RGBImageFileName.empty())
+        {
+          throw std::logic_error("No image data file names set");
+        }
+
+        if (!this->m_DistanceImageFileName.empty())
+        {
+          m_DistanceImage = mitk::IOUtil::LoadImage(this->m_DistanceImageFileName);
+        }
+        else
+        {
+          MITK_ERROR << "ToF distance image data file empty";
+        }
+        if (!this->m_AmplitudeImageFileName.empty())
+        {
+          m_AmplitudeImage = mitk::IOUtil::LoadImage(this->m_AmplitudeImageFileName);
+        }
+        else
+        {
+          MITK_ERROR << "ToF amplitude image data file empty";
+        }
+        if (!this->m_IntensityImageFileName.empty())
+        {
+          m_IntensityImage = mitk::IOUtil::LoadImage(this->m_IntensityImageFileName);
+        }
+        else
+        {
+          MITK_ERROR << "ToF amplitude image data file empty";
+        }
+        if (!this->m_RGBImageFileName.empty())
+        {
+          m_RGBImage = mitk::IOUtil::LoadImage(this->m_RGBImageFileName);
+        }
+        else
+        {
+          MITK_ERROR << "ToF RGB image data file empty";
+        }
+
         /*
         // Check for file type, only .nrrd and .pic files are supported!
         if( this->CheckCurrentFileType())

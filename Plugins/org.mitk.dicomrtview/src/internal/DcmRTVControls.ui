@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>244</width>
-    <height>303</height>
+    <height>329</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -152,13 +152,13 @@
      <item>
       <widget class="QSlider" name="freeSlider">
        <property name="maximum">
-        <number>200</number>
+        <number>50</number>
        </property>
        <property name="value">
-        <number>48</number>
+        <number>20</number>
        </property>
        <property name="sliderPosition">
-        <number>48</number>
+        <number>20</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -168,10 +168,10 @@
      <item>
       <widget class="QSpinBox" name="freeBox">
        <property name="maximum">
-        <number>200</number>
+        <number>50</number>
        </property>
        <property name="value">
-        <number>50</number>
+        <number>20</number>
        </property>
       </widget>
      </item>

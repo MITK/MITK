@@ -234,53 +234,17 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
       floatData = new float[xsize*ysize];
       floatPtr = reinterpret_cast<float *>(static_cast<vtkFloatArray *>(scalars)->GetPointer(0));
       floatData = floatPtr;
-
-      int type = scalars->GetDataType();
-      cout << "##################################################################################################################" << endl;
-      cout << "DataType: " << type << endl;
     }
     else if (this->MapColorScalarsThroughLookupTable || scalars->GetDataType() != VTK_UNSIGNED_CHAR )
     {
       dataPtr = this->MapScalarsToColors (scalars);
       numChannels = 4;
       channelByteSize = 1;
-
-//      vtkIdType scalarSize = scalars->GetSize();
-//      for(int i=0; i<scalarSize; i++)
-//      {
-//        *(floatData+i) = *static_cast<vtkFloatArray *>((scalars+i))->GetPointer(0);
-//      }
-//      floatData = static_cast<vtkFloatArray *>(scalars)->GetPointer(0);
     }
     else
     {
-//      dataPtr = static_cast<vtkUnsignedCharArray *>(scalars)->GetPointer(0);
-//      for(int i=0;i<10;i++)
-//      {
-//        cout << "UnsignedCharArray" << i << ": " << static_cast<unsigned short>(*(dataPtr+i)) << endl;
-
-//      }
-//      floatPtr = static_cast<vtkFloatArray *>(scalars)->GetPointer(0);
-//      vtkIdType scalarSize = scalars->GetSize();
-
-//      floatData = new float[xsize*ysize];
-      int type = scalars->GetDataType();
-      cout << "##################################################################################################################" << endl;
-      cout << "DataType: " << type << endl;
-
-//      for(int i=0; i<scalarSize; i++)
-//      {
-//        *(floatData+i) = *(scalars+i);
-//      }
-
-//      for(int i=0;i<10;i++)
-//      {
-//        cout << "FloatArray" << i << ": " << *(floatPtr+i) << endl;
-//      }
       channelByteSize = 1;
     }
-
-//    std::cout << "uploading texture width=" << size[0] << " height=" << size[1] << " channels=" << numChannels << " channelSize=" << channelByteSize << std::endl;
 
     // we only support 2d texture maps right now
     // so one of the three sizes must be 1, but it
@@ -391,42 +355,13 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
       case 3: format = GL_RGB; break;
       case 4: format = GL_RGBA; break;
     }
-    // if we are using OpenGL 1.1, you can force 32 or16 bit textures
-
-//    if (channelByteSize == 2)
-//    {
-//      switch (numChannels)
-//      {
-//        case 1: internalFormat = GL_LUMINANCE16; break;
-//        default:
-//          vtkErrorMacro(<< "only 16-bit luminance format supported");
-//      }
-//    }
-//    else
-//    {
-//      switch (numChannels)
-//      {
-//        case 1: internalFormat = GL_LUMINANCE8; break;
-//        case 2: internalFormat = GL_LUMINANCE8_ALPHA8; break;
-//        case 3: internalFormat = GL_RGB8; break;
-//        case 4: internalFormat = GL_RGBA8; break;
-//      }
-//    }
 
     internalFormat = GL_LUMINANCE32F_ARB;
     format = GL_LUMINANCE;
 
-//    internalFormat = GL_RGBA32F;
-
-    //std::cout << "uploading texture\n";
-
     // blocking call
     if (channelByteSize == 2)
     {
-      //MES_INFO << "uploading 16bit data";
-      //const unsigned short * t = reinterpret_cast<unsigned short *>(resultData);
-      //MES_INFO << t[xsize/2 + xsize * (ysize/2) ];
-
       glTexImage2D( GL_TEXTURE_2D, 0 , internalFormat,
                    xsize, ysize, 0, format,
                    GL_FLOAT,

@@ -14,7 +14,7 @@ MITK_CREATE_MODULE(MitkIGT
   SUBPROJECTS MITK-IGT
   INCLUDE_DIRS Algorithms Common DataManagement ExceptionHandling IO Rendering TrackingDevices
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
-  DEPENDS Mitk SceneSerialization MitkIGTBase
+  DEPENDS Mitk ImageStatistics SceneSerialization MitkIGTBase
   PACKAGE_DEPENDS tinyxml
   ADDITIONAL_LIBS "${ADDITIONAL_LIBS}"
 )

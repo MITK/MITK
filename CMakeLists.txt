@@ -163,17 +163,20 @@ option(MITK_USE_Poco "Use the Poco library" ON)
 option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
 option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
-if(MITK_USE_Python)
-  FIND_PACKAGE(PythonLibs REQUIRED)
-  FIND_PACKAGE(PythonInterp REQUIRED)
-endif()
+
+option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
 
 mark_as_advanced(MITK_BUILD_ALL_APPS
                  MITK_USE_GLEW
                  MITK_USE_CTK
                  MITK_USE_DCMTK
+                 MITK_ENABLE_PIC_READER
                 )
 
+if(MITK_USE_Python)
+  FIND_PACKAGE(PythonLibs REQUIRED)
+  FIND_PACKAGE(PythonInterp REQUIRED)
+endif()
 
 if(MITK_USE_Boost)
   option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
@@ -487,6 +490,7 @@ if(NOT MSVC_VERSION)
     -Wcast-align
     -Wwrite-strings
     -Wno-error=gnu
+    -Wno-error=unknown-pragmas
     -Woverloaded-virtual
     -Wstrict-null-sentinel
     #-Wold-style-cast

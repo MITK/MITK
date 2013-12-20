@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk includes
 #include "mitkItkImageFileReader.h"
-#include "mitkPicFileReader.h"
+#include "mitkIOUtil.h"
 #include <mitkIpPic.h>
 #include "mitkImageReadAccessor.h"
 
@@ -32,7 +32,7 @@ namespace mitk
     m_CaptureHeight(0),
     m_ConnectionCheck(false),
     m_InputFileName(""),
-    m_Extension(""),
+    // m_Extension(""),
     m_ToFImageType(ToFImageType3D),
     m_DistanceImage(0),
     m_AmplitudeImage(0),
@@ -94,7 +94,7 @@ namespace mitk
     delete[] this->m_RGBArray;
     this->m_RGBArray = NULL;
   }
-
+/*
  bool ToFCameraMITKPlayerController::CheckCurrentFileType()
   {
     if(!this->m_DistanceImageFileName.empty())
@@ -153,6 +153,7 @@ namespace mitk
     }
     return false;
   }
+  */
 
   bool ToFCameraMITKPlayerController::OpenCameraConnection()
   {
@@ -160,6 +161,48 @@ namespace mitk
     {
       try
       {
+        if (this->m_DistanceImageFileName.empty() &&
+            this->m_AmplitudeImageFileName.empty() &&
+            this->m_IntensityImageFileName.empty() &&
+            this->m_RGBImageFileName.empty())
+        {
+          throw std::logic_error("No image data file names set");
+        }
+
+        if (!this->m_DistanceImageFileName.empty())
+        {
+          m_DistanceImage = mitk::IOUtil::LoadImage(this->m_DistanceImageFileName);
+        }
+        else
+        {
+          MITK_ERROR << "ToF distance image data file empty";
+        }
+        if (!this->m_AmplitudeImageFileName.empty())
+        {
+          m_AmplitudeImage = mitk::IOUtil::LoadImage(this->m_AmplitudeImageFileName);
+        }
+        else
+        {
+          MITK_ERROR << "ToF amplitude image data file empty";
+        }
+        if (!this->m_IntensityImageFileName.empty())
+        {
+          m_IntensityImage = mitk::IOUtil::LoadImage(this->m_IntensityImageFileName);
+        }
+        else
+        {
+          MITK_ERROR << "ToF amplitude image data file empty";
+        }
+        if (!this->m_RGBImageFileName.empty())
+        {
+          m_RGBImage = mitk::IOUtil::LoadImage(this->m_RGBImageFileName);
+        }
+        else
+        {
+          MITK_ERROR << "ToF RGB image data file empty";
+        }
+
+        /*
         // Check for file type, only .nrrd and .pic files are supported!
         if( this->CheckCurrentFileType())
         {
@@ -182,6 +225,7 @@ namespace mitk
         {
           throw std::logic_error("Please check image type, currently only .nrrd files are supported (.pic files are deprecated!)");
         }
+        */
 
         // check if the opened files contained data
         if(m_DistanceImage.IsNull())
@@ -271,7 +315,7 @@ namespace mitk
     else
       return this->m_ConnectionCheck;
   }
-
+/*
   void ToFCameraMITKPlayerController::OpenNrrdImageFile( const std::string outfileName, Image::Pointer &image)
   {
     if(!outfileName.empty())
@@ -312,7 +356,7 @@ namespace mitk
       MITK_ERROR << "Error opening ToF data file 2" << outfileName;
     }
   }
-
+*/
   bool ToFCameraMITKPlayerController::CloseCameraConnection()
   {
     if (this->m_ConnectionCheck)

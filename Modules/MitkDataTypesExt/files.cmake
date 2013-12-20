@@ -1,0 +1,39 @@
+set(CPP_FILES
+  mitkAffineDataInteractor3D.cpp
+  mitkApplyDiffImageOperation.cpp
+  mitkBoundingObject.cpp
+  mitkBoundingObjectGroup.cpp
+  mitkCellOperation.cpp
+  mitkColorSequence.cpp
+  mitkColorSequenceCycleH.cpp
+  mitkColorSequenceRainbow.cpp
+  mitkCompressedImageContainer.cpp
+  mitkCone.cpp
+  mitkCuboid.cpp
+  mitkCylinder.cpp
+  mitkDataStorageSelection.cpp
+  mitkEllipsoid.cpp
+  mitkGridRepresentationProperty.cpp
+  mitkGridVolumeMapperProperty.cpp
+  mitkLabeledImageLookupTable.cpp
+  mitkLabeledImageVolumeCalculator.cpp
+  mitkLineOperation.cpp
+  mitkLookupTableSource.cpp
+  mitkMesh.cpp
+  mitkMultiStepper.cpp
+  mitkOrganTypeProperty.cpp
+  mitkPlane.cpp
+  mitkSurfaceDeformationDataInteractor3D.cpp
+  mitkUnstructuredGrid.cpp
+  mitkUnstructuredGridSource.cpp
+  mitkVideoSource.cpp
+
+  Internal/mitkColorConversions.cpp
+)
+
+set(RESOURCE_FILES
+  Interactions/AffineInteraction3D.xml
+  Interactions/AffineTranslationConfig.xml
+  Interactions/AffineRotationConfig.xml
+  Interactions/AffineDeformationConfig.xml
+)

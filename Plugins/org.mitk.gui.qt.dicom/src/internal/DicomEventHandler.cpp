@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLogMacros.h>
 #include <mitkDicomSeriesReader.h>
 #include <mitkDataNode.h>
-#include <QmitkBaseFunctionalityComponent.h>
 #include <mitkIDataStorageService.h>
 #include <service/event/ctkEventAdmin.h>
 #include <ctkServiceReference.h>

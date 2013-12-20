@@ -2,22 +2,15 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
 
   MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES;MODULE_DEPENDENCIES;SUBPROJECTS" "TEST_PLUGIN;NO_INSTALL" ${ARGN})
 
-  set(MODULE_QT4_MODULES ${PLUGIN_QT4_MODULES})
-  if (MITK_USE_Qt4 AND MODULE_QT4_MODULES)
+  if (MITK_USE_Qt4 AND PLUGIN_QT4_MODULES)
     list(APPEND _PLUGIN_MODULE_DEPENDENCIES Qt4)
   endif()
-  set(MODULE_QT5_MODULES ${PLUGIN_QT5_MODULES})
-  if (MITK_USE_Qt5 AND MODULE_QT5_MODULES)
+  if (MITK_USE_Qt5 AND PLUGIN_QT5_MODULES)
     list(APPEND _PLUGIN_MODULE_DEPENDENCIES Qt5)
   endif()
 
   MITK_CHECK_MODULE(_MODULE_CHECK_RESULT Mitk ${_PLUGIN_MODULE_DEPENDENCIES})
   if(NOT _MODULE_CHECK_RESULT)
-
-    MITK_USE_MODULE(Mitk ${_PLUGIN_MODULE_DEPENDENCIES})
-
-    link_directories(${ALL_LIBRARY_DIRS})
-    include_directories(${ALL_INCLUDE_DIRECTORIES})
 
     if(_PLUGIN_TEST_PLUGIN)
       set(is_test_plugin "TEST_PLUGIN")
@@ -32,13 +25,27 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
       set(plugin_no_install)
     endif()
 
+    # This is a workaround until GDCM provides a proper GDCMExports.cmake
+    # file where the imported GDCM targets provide their absolute path.
+    list(FIND PACKAGE_DEPENDS ITK _has_itk_dep)
+    if(_has_itk_dep GREATER -1)
+      include(${MITK_MODULES_PACKAGE_DEPENDS_DIR}/MITK_ITK_Config.cmake)
+      if(GDCM_LIBRARY_DIRS)
+        link_directories(${GDCM_LIBRARY_DIRS})
+      endif()
+    endif()
+
     MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE ${_PLUGIN_EXPORT_DIRECTIVE}
                             EXPORTED_INCLUDE_SUFFIXES ${_PLUGIN_EXPORTED_INCLUDE_SUFFIXES}
                             DOXYGEN_TAGFILES ${_PLUGIN_DOXYGEN_TAGFILES}
                             MOC_OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED
                             ${is_test_plugin} ${plugin_no_install})
 
-    target_link_libraries(${PLUGIN_TARGET} ${ALL_LIBRARIES})
+    mitk_use_modules(TARGET ${PLUGIN_TARGET}
+      MODULES Mitk ${_PLUGIN_MODULE_DEPENDENCIES}
+      QT4_MODULES ${PLUGIN_QT4_MODULES}
+      QT5_MODULES ${PLUGIN_QT5_MODULES}
+     )
 
     if(ALL_META_DEPENDENCIES)
       add_dependencies(${PLUGIN_TARGET} ${ALL_META_DEPENDENCIES})

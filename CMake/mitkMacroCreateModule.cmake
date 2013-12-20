@@ -388,6 +388,17 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
         endif()
 
         if(NOT MODULE_HEADERS_ONLY)
+
+          # This is a workaround until GDCM provides a proper GDCMExports.cmake
+          # file where the imported GDCM targets provide their absolute path.
+          list(FIND PACKAGE_DEPENDS ITK _has_itk_dep)
+          if(_has_itk_dep GREATER -1)
+            include(${MITK_MODULES_PACKAGE_DEPENDS_DIR}/MITK_ITK_Config.cmake)
+            if(GDCM_LIBRARY_DIRS)
+              link_directories(${GDCM_LIBRARY_DIRS})
+            endif()
+          endif()
+
           add_library(${MODULE_PROVIDES} ${_STATIC}
                       ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
                       ${DOX_FILES} ${UI_FILES} ${QRC_FILES})

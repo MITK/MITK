@@ -1,4 +1,6 @@
 macro(MITK_USE_MODULE)
+  message(WARNING "The MITK_USE_MODULE macro is deprecated, use the mitk_use_modules macro instead.")
+
   set(DEPENDS "")
   set(DEPENDS_BEFORE "not initialized")
   # check for each parameter if it is a package (3rd party)

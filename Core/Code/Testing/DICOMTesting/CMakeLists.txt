@@ -23,16 +23,15 @@ if(_RESULT)
 else(_RESULT)
 
 # add helpful applications
-MITK_USE_MODULE( mitkDICOMTesting )
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${ALL_INCLUDE_DIRECTORIES})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 # dumps out image information
 add_executable(DumpDICOMMitkImage DumpDICOMMitkImage.cpp)
-target_link_libraries(DumpDICOMMitkImage ${ALL_LIBRARIES})
+mitk_use_modules(TARGET DumpDICOMMitkImage MODULES mitkDICOMTesting)
 
 # compares dumped out image information against reference dump
 add_executable(VerifyDICOMMitkImageDump VerifyDICOMMitkImageDump.cpp)
-target_link_libraries(VerifyDICOMMitkImageDump ${ALL_LIBRARIES})
+mitk_use_modules(TARGET VerifyDICOMMitkImageDump MODULES mitkDICOMTesting)
 
 add_subdirectory(Testing)
 endif()

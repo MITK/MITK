@@ -59,7 +59,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
   if (MODULE_QT_MODULE)
     message(WARNING "QT_MODULE keyword is deprecated (in module ${MODULE_NAME}). Please replace QT_MODULE by the more specific QT4_MODULES / QT5_MODULES!")
     if (NOT MODULE_QT4_MODULES)
-      set(MODULE_QT4_MODULES Qt4Gui)
+      set(MODULE_QT4_MODULES QtGui)
     endif()
   endif()
 

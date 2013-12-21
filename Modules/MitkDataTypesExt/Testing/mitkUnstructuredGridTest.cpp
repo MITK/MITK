@@ -48,16 +48,10 @@ int mitkUnstructuredGridTest(int /* argc */, char* /*argv*/[])
   // specify a region and set it to the test object
   mitk::UnstructuredGrid::RegionType* ugRegion = new mitk::UnstructuredGrid::RegionType;
   mitk::UnstructuredGrid::RegionType::SizeType size;
-  size[0] = 100;
-  size[1] = 100;
-  size[2] = 100;
-  size[3] = 100;
-  size[4] = 100;
+  size.Fill(100);
 
   mitk::UnstructuredGrid::RegionType::IndexType index;
-  index[0] = 0;
-  index[1] = 0;
-  index[2] = 0;
+  index.Fill(0);
 
   ugRegion->SetSize(size);
   ugRegion->SetIndex(index);

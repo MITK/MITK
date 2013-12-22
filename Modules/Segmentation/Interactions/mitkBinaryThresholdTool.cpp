@@ -19,17 +19,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBinaryThresholdTool.xpm"
 
 #include "mitkToolManager.h"
-#include "mitkCoreObjectFactory.h"
 #include "mitkLevelWindowProperty.h"
-#include "mitkColorProperty.h"
 #include "mitkProperties.h"
 #include "mitkDataStorage.h"
 #include "mitkRenderingManager.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkImageTimeSelector.h"
-#include "mitkPadImageFilter.h"
 #include "mitkLabelSetImage.h"
+#include "mitkSliceNavigationController.h"
 
 // us
 #include "usModule.h"
@@ -50,16 +48,7 @@ m_SensibleMaximumThresholdValue(+100),
 m_CurrentThresholdValue(0.0),
 m_IsFloatImage(false)
 {
-  m_PreviewNode = DataNode::New();
-  mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties( m_PreviewNode );
 
-  m_PreviewNode->SetProperty( "color", ColorProperty::New(0.0, 1.0, 0.0) );
-  m_PreviewNode->SetProperty( "texture interpolation", BoolProperty::New(false) );
-  m_PreviewNode->SetProperty( "layer", IntProperty::New( 100 ) );
-  m_PreviewNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(100, 1) ) );
-  m_PreviewNode->SetProperty( "name", StringProperty::New("BinaryThresholdTool preview") );
-  m_PreviewNode->SetProperty( "opacity", FloatProperty::New(0.3) );
-  m_PreviewNode->SetProperty( "helper object", BoolProperty::New(true) );
 }
 
 mitk::BinaryThresholdTool::~BinaryThresholdTool()
@@ -86,21 +75,37 @@ const char* mitk::BinaryThresholdTool::GetName() const
 
 void mitk::BinaryThresholdTool::Activated()
 {
+  m_PreviewNode = DataNode::New();
+  m_PreviewNode->SetName("preview");
+  m_PreviewNode->SetOpacity(0.3);
+  m_PreviewNode->SetColor(0.0, 1.0, 0.0);
+  m_PreviewNode->SetProperty( "texture interpolation", BoolProperty::New(false) );
+  m_PreviewNode->SetProperty( "layer", IntProperty::New( 100 ) );
+  m_PreviewNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(100, 1) ) );
+  m_PreviewNode->SetProperty( "helper object", BoolProperty::New(true) );
+  m_PreviewNode->SetProperty( "binary", BoolProperty::New(false) );
+
+  m_ToolManager->GetDataStorage()->Add( m_PreviewNode, m_ToolManager->GetWorkingData(0) );
+
   m_ReferenceNode = m_ToolManager->GetReferenceData(0);
   assert(m_ReferenceNode.IsNotNull());
 
   m_NodeForThresholding = m_ReferenceNode;
-  m_CurrentTimeStep = 0; // todo: get the right time step e.g. from GUI
+
+  CurrentlyBusy.Send(true);
+
   this->SetupPreviewNodeFor( m_NodeForThresholding );
+
+  CurrentlyBusy.Send(false);
+
   RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::BinaryThresholdTool::Deactivated()
 {
+  SegTool3D::Deactivated();
   m_NodeForThresholding = NULL;
   m_ReferenceNode = NULL;
-  m_ToolManager->GetDataStorage()->Remove( m_PreviewNode );
-  m_PreviewNode->SetData(NULL);
 //  mitk::UndoController::GetCurrentUndoModel()->Clear();
 //  mitk::UndoController::GetCurrentUndoModel()->ClearRedoList();
 }
@@ -113,6 +118,21 @@ void mitk::BinaryThresholdTool::SetThresholdValue(double value)
     m_PreviewNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(m_CurrentThresholdValue, 0.001) ) );
     RenderingManager::GetInstance()->RequestUpdateAll();
   }
+}
+
+void mitk::BinaryThresholdTool::CreateNewLabel(const std::string& name, const mitk::Color& color)
+{
+  if ( m_PreviewNode.IsNull() ) return;
+
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  assert(workingNode);
+
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  assert(workingImage);
+
+  workingImage->AddLabel(name,color);
+
+  this->AcceptPreview();
 }
 
 void mitk::BinaryThresholdTool::AcceptPreview()
@@ -138,11 +158,11 @@ void mitk::BinaryThresholdTool::AcceptPreview()
 
     if (workingImageTimeStep->GetDimension() == 2)
     {
-      AccessTwoImagesFixedDimensionByItk( workingImageTimeStep, referenceImage, ITKThresholding, 2 );
+      AccessTwoImagesFixedDimensionByItk( workingImageTimeStep, referenceImage, InternalAcceptPreview, 2 );
     }
     else
     {
-      AccessTwoImagesFixedDimensionByItk( workingImageTimeStep, referenceImage, ITKThresholding, 3 );
+      AccessTwoImagesFixedDimensionByItk( workingImageTimeStep, referenceImage, InternalAcceptPreview, 3 );
     }
 
     workingImageTimeStep->Modified();
@@ -165,22 +185,17 @@ void mitk::BinaryThresholdTool::AcceptPreview()
   m_ToolManager->ActivateTool(-1);
 }
 
-void mitk::BinaryThresholdTool::CancelThresholding()
-{
-  m_ToolManager->ActivateTool(-1);
-}
-
 void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataNode* nodeForThresholding )
 {
   if (!nodeForThresholding) return;
 
-  unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+  m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
   Image::Pointer imageForThresholding = dynamic_cast<Image*>( nodeForThresholding->GetData() );
-  Image::Pointer imageForThresholdingTimeStep = this->Get3DImage(imageForThresholding, timestep);
+  Image::Pointer imageForThresholdingTimeStep = this->Get3DImage(imageForThresholding, m_CurrentTimeStep);
 
   Image::Pointer originalImage = dynamic_cast<Image*> (m_ReferenceNode->GetData());
-  Image::Pointer originalImageTimeStep = this->Get3DImage(originalImage, timestep);
+  Image::Pointer originalImageTimeStep = this->Get3DImage(originalImage, m_CurrentTimeStep);
   if (originalImageTimeStep.IsNotNull() && imageForThresholding.IsNotNull())
   {
     // initialize a new node with the same image as our reference image
@@ -207,7 +222,7 @@ void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataNode* nodeForThresholdi
          m_IsFloatImage = false;
 
      m_SensibleMinimumThresholdValue = static_cast<double>( originalImageTimeStep->GetScalarValueMin() );
-     m_SensibleMaximumThresholdValue = static_cast<double>( originalImageTimeStep->GetScalarValueMax() );
+     m_SensibleMaximumThresholdValue = static_cast<double>( originalImageTimeStep->GetScalarValueMaxNoRecompute() );
     }
 
     LevelWindowProperty::Pointer lwp = dynamic_cast<LevelWindowProperty*>( m_PreviewNode->GetProperty( "levelwindow" ));
@@ -226,7 +241,7 @@ void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataNode* nodeForThresholdi
 }
 
 template <typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>
-void mitk::BinaryThresholdTool::ITKThresholding( itk::Image<TPixel1, VDimension1>* targetImage,
+void mitk::BinaryThresholdTool::InternalAcceptPreview( itk::Image<TPixel1, VDimension1>* targetImage,
                                                  const itk::Image<TPixel2, VDimension2>* sourceImage )
 {
   typedef typename itk::Image< TPixel1, VDimension1> TargetImageType;

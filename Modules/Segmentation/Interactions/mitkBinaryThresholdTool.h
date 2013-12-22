@@ -17,10 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkBinaryThresholdTool_h_Included
 #define mitkBinaryThresholdTool_h_Included
 
-#include "mitkCommon.h"
 #include "SegmentationExports.h"
 #include "mitkAutoSegmentationTool.h"
-#include "mitkDataNode.h"
 
 #include <itkImage.h>
 
@@ -63,8 +61,8 @@ namespace mitk
     /// \brief Adds the preview image to the current working image.
     virtual void AcceptPreview();
 
-    virtual void CancelThresholding();
-
+    /// \brief Creates a new label out of the the current preview image.
+    virtual void CreateNewLabel(const std::string& name, const mitk::Color& color);
 
   protected:
 
@@ -74,9 +72,8 @@ namespace mitk
     void SetupPreviewNodeFor( DataNode* nodeForThresholding );
 
     template <typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>
-    void ITKThresholding( itk::Image<TPixel1, VDimension1>* targetImage, const itk::Image<TPixel2, VDimension2>* sourceImage );
+    void InternalAcceptPreview( itk::Image<TPixel1, VDimension1>* targetImage, const itk::Image<TPixel2, VDimension2>* sourceImage );
 
-    DataNode::Pointer m_PreviewNode;
     DataNode::Pointer m_ReferenceNode;
     DataNode::Pointer m_NodeForThresholding;
 

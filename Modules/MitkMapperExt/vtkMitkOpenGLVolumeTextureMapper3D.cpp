@@ -1140,8 +1140,8 @@ class RGBACompute
   int fullY;
   int fullZ;
   int fullXY;
-  int currentChunkStart;
-  int currentChunkEnd;
+  //int currentChunkStart;
+  //int currentChunkEnd;
 
   int offZ;
 

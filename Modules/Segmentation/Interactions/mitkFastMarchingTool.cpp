@@ -282,9 +282,9 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
   if( (!m_Initialized) || (m_LastEventSender != m_PositionEvent->GetSender()) || (m_LastEventSlice != m_PositionEvent->GetSender()->GetSlice()) )
   {
     m_SmoothFilter = SmoothingFilterType::New();
-    m_SmoothFilter->SetTimeStep(0.025);
+    m_SmoothFilter->SetTimeStep(0.014);
     m_SmoothFilter->SetNumberOfIterations(3);
-    m_SmoothFilter->SetConductanceParameter(9.0);
+    m_SmoothFilter->SetConductanceParameter(6.0);
 
     m_GradientMagnitudeFilter = GradientFilterType::New();
     m_GradientMagnitudeFilter->SetSigma(m_Sigma);

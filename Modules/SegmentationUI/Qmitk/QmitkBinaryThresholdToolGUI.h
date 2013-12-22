@@ -56,15 +56,13 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
     /// \brief Emitted when tool is Canceled
     void thresholdCanceled();
 
-  public slots:
-
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);
 //    void OnRun();
     void OnCancel();
     void OnAcceptPreview();
-    void OnCalculateDifference();
+    void OnInvertPreview();
     void OnNewLabel();
     void OnShowInformation(bool);
     void OnShowAdvancedControls(bool);

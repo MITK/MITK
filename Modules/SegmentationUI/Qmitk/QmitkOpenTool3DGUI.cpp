@@ -31,7 +31,7 @@ QmitkOpenTool3DGUI::QmitkOpenTool3DGUI() : QmitkToolGUI(), m_OpenTool3D(NULL)
   connect( m_Controls.m_pbRun, SIGNAL(clicked()), this, SLOT(OnRun()) );
   connect( m_Controls.m_pbCancel, SIGNAL(clicked()), this, SLOT(OnCancel()) );
   connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
-  connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
+  connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnInvertPreview()) );
   connect( m_Controls.m_sbKernelSize, SIGNAL(valueChanged(int)), this, SLOT(OnKernelSizeChanged(int)) );
   connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
   connect( m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
@@ -96,11 +96,11 @@ void QmitkOpenTool3DGUI::OnAcceptPreview()
   }
 }
 
-void QmitkOpenTool3DGUI::OnCalculateDifference()
+void QmitkOpenTool3DGUI::OnInvertPreview()
 {
   if (m_OpenTool3D)
   {
-    m_OpenTool3D->CalculateDifference();
+    m_OpenTool3D->InvertPreview();
   }
 }
 

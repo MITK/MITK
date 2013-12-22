@@ -49,7 +49,7 @@ class SegmentationUI_EXPORT QmitkDilateTool3DGUI : public QmitkToolGUI
     void OnRun();
     void OnCancel();
     void OnAcceptPreview();
-    void OnCalculateDifference();
+    void OnInvertPreview();
     void OnNewLabel();
     void OnShowInformation(bool);
     void OnShowAdvancedControls(bool);

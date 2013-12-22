@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkToolManager.h"
-#include "mitkImageCast.h"
+//#include "mitkImageCast.h"
 
 // itk
 #include <itkBinaryThresholdImageFilter.h>

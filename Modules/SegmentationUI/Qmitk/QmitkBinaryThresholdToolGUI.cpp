@@ -40,7 +40,7 @@ QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
 //  connect( m_Controls.m_pbRun, SIGNAL(clicked()), this, SLOT(OnRun()) );
   connect( m_Controls.m_pbCancel, SIGNAL(clicked()), this, SLOT(OnCancel()) );
   connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
-  connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
+  connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnInvertPreview()) );
   connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
   connect( m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
   connect( m_Controls.m_cbShowAdvancedControls, SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedControls(bool)) );
@@ -118,11 +118,11 @@ void QmitkBinaryThresholdToolGUI::OnAcceptPreview()
   }
 }
 
-void QmitkBinaryThresholdToolGUI::OnCalculateDifference()
+void QmitkBinaryThresholdToolGUI::OnInvertPreview()
 {
   if (m_BinaryThresholdTool.IsNotNull())
   {
-    m_BinaryThresholdTool->CalculateDifference();
+    m_BinaryThresholdTool->InvertPreview();
   }
 }
 

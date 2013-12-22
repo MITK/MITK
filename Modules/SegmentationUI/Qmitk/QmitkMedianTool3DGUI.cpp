@@ -31,7 +31,7 @@ QmitkMedianTool3DGUI::QmitkMedianTool3DGUI() : QmitkToolGUI(), m_MedianTool3D(NU
   connect( m_Controls.m_pbRun, SIGNAL(clicked()), this, SLOT(OnRun()) );
   connect( m_Controls.m_pbCancel, SIGNAL(clicked()), this, SLOT(OnCancel()) );
   connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
-  connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
+  connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnInvertPreview()) );
   connect( m_Controls.m_pbUnion, SIGNAL(clicked()), this, SLOT(OnCalculateUnion()) );
   connect( m_Controls.m_sbKernelSize, SIGNAL(valueChanged(int)), this, SLOT(OnKernelSizeChanged(int)) );
   connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
@@ -89,11 +89,11 @@ void QmitkMedianTool3DGUI::OnAcceptPreview()
   }
 }
 
-void QmitkMedianTool3DGUI::OnCalculateDifference()
+void QmitkMedianTool3DGUI::OnInvertPreview()
 {
   if (m_MedianTool3D)
   {
-    m_MedianTool3D->CalculateDifference();
+    m_MedianTool3D->InvertPreview();
   }
 }
 

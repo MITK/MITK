@@ -48,7 +48,7 @@ class SegmentationUI_EXPORT QmitkKeepNConnectedRegionsTool3DGUI : public QmitkTo
     void OnNewLabel();
     void OnNumberOfConnectedRegionsToKeepChanged(int);
     void OnAcceptPreview();
-    void OnCalculateDifference();
+    void OnInvertPreview();
     void OnCalculateUnion();
     void OnShowInformation(bool);
     void OnShowAdvancedControls(bool);

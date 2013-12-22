@@ -50,7 +50,7 @@ class SegmentationUI_EXPORT QmitkMedianTool3DGUI : public QmitkToolGUI
     void OnCancel();
     void OnNewLabel();
     void OnAcceptPreview();
-    void OnCalculateDifference();
+    void OnInvertPreview();
     void OnCalculateUnion();
     void OnShowInformation(bool);
     void OnShowAdvancedControls(bool);

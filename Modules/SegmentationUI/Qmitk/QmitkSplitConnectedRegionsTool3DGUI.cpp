@@ -30,7 +30,7 @@ QmitkSplitConnectedRegionsTool3DGUI::QmitkSplitConnectedRegionsTool3DGUI() : Qmi
   connect( m_Controls.m_pbRun, SIGNAL(clicked()), this, SLOT(OnRun()) );
   connect( m_Controls.m_pbCancel, SIGNAL(clicked()), this, SLOT(OnCancel()) );
   connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
-  connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
+  connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnInvertPreview()) );
   connect( m_Controls.m_sbConnectedRegionsToKeep, SIGNAL(valueChanged(int)), this, SLOT(OnNumberOfConnectedRegionsToKeepChanged(int)) );
   connect( m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
   connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
@@ -94,11 +94,11 @@ void QmitkSplitConnectedRegionsTool3DGUI::OnAcceptPreview()
   }
 }
 
-void QmitkSplitConnectedRegionsTool3DGUI::OnCalculateDifference()
+void QmitkSplitConnectedRegionsTool3DGUI::OnInvertPreview()
 {
   if (m_SplitConnectedRegionsTool3D)
   {
-    m_SplitConnectedRegionsTool3D->CalculateDifference();
+    m_SplitConnectedRegionsTool3D->InvertPreview();
   }
 }
 

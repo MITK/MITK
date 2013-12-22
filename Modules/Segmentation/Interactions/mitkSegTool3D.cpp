@@ -130,7 +130,7 @@ void mitk::SegTool3D::AcceptPreview()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::SegTool3D::CalculateDifference()
+void mitk::SegTool3D::InvertPreview()
 {
   if ( m_PreviewImage.IsNull() ) return;
 
@@ -142,7 +142,7 @@ void mitk::SegTool3D::CalculateDifference()
 
   try
   {
-    AccessFixedDimensionByItk( workingImage, InternalDifference, 3 );
+    AccessFixedDimensionByItk( workingImage, InternalInvertPreview, 3 );
   }
   catch( itk::ExceptionObject & e )
   {
@@ -216,7 +216,7 @@ void mitk::SegTool3D::Activated()
   m_PreviewNode->SetOpacity(1.0);
   m_PreviewNode->SetColor(0.0, 1.0, 0.0);
 
-  m_ToolManager->GetDataStorage()->Add( m_PreviewNode, m_ToolManager->GetWorkingData(0) );
+  m_ToolManager->GetDataStorage()->Add(m_PreviewNode, m_ToolManager->GetWorkingData(0));
 }
 
 void mitk::SegTool3D::Deactivated()
@@ -289,7 +289,7 @@ void mitk::SegTool3D::InternalAcceptPreview( ImageType* targetImage, const mitk:
 }
 
 template<typename ImageType>
-void mitk::SegTool3D::InternalDifference( ImageType* input )
+void mitk::SegTool3D::InternalInvertPreview( ImageType* input )
 {
   typedef itk::Image<unsigned char, 3> BinaryImageType;
   BinaryImageType::Pointer previewItk;

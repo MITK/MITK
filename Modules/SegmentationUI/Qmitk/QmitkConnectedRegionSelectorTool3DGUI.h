@@ -48,7 +48,7 @@ class SegmentationUI_EXPORT QmitkConnectedRegionSelectorTool3DGUI : public Qmitk
     void OnNewToolAssociated(mitk::Tool*);
     void OnCancel();
     void OnAcceptPreview();
-    void OnCalculateDifference();
+    void OnInvertPreview();
     void OnNewLabel();
     void OnShowInformation(bool);
     void OnShowAdvancedControls(bool);

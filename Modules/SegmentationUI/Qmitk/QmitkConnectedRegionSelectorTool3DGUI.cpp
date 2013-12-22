@@ -30,7 +30,7 @@ QmitkConnectedRegionSelectorTool3DGUI::QmitkConnectedRegionSelectorTool3DGUI() :
 
   connect( m_Controls.m_pbCancel, SIGNAL(clicked()), this, SLOT(OnCancel()) );
   connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
-  connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnCalculateDifference()) );
+  connect( m_Controls.m_pbDifference, SIGNAL(clicked()), this, SLOT(OnInvertPreview()) );
   connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
   connect( m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
   connect( m_Controls.m_cbShowAdvancedControls, SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedControls(bool)) );
@@ -76,11 +76,11 @@ void QmitkConnectedRegionSelectorTool3DGUI::OnAcceptPreview()
   }
 }
 
-void QmitkConnectedRegionSelectorTool3DGUI::OnCalculateDifference()
+void QmitkConnectedRegionSelectorTool3DGUI::OnInvertPreview()
 {
   if (m_ConnectedRegionSelectorTool3D)
   {
-    m_ConnectedRegionSelectorTool3D->CalculateDifference();
+    m_ConnectedRegionSelectorTool3D->InvertPreview();
   }
 }
 

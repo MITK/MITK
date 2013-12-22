@@ -39,14 +39,14 @@ class Segmentation_EXPORT SegTool3D : public Tool
 
     mitkClassMacro(SegTool3D, Tool);
 
-    /// \brief Stops the running operation and disables the tool
+    /// \brief Stops the running operation and disables the tool.
     void Cancel();
 
     /// \brief Replaces the active label with the preview image.
     virtual void AcceptPreview();
 
     /// \brief Replaces the preview image by the difference between the active label and the current preview image.
-    virtual void CalculateDifference();
+    virtual void InvertPreview();
 
     /// \brief Replaces the preview image by the union between the active label and the current preview image.
     virtual void CalculateUnion();
@@ -117,7 +117,7 @@ class Segmentation_EXPORT SegTool3D : public Tool
     void InternalAcceptPreview( ImageType* targetImage, const mitk::Image* sourceImage );
 
     template<typename ImageType>
-    void InternalDifference( ImageType* input );
+    void InternalInvertPreview( ImageType* input );
 
     template<typename ImageType>
     void InternalUnion( ImageType* input );

@@ -617,8 +617,6 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
     QObject::connect( tmp1, SIGNAL( triggered(bool) ), this, SLOT( OnCreateDetailedSurface(bool) ) );
     QObject::connect( tmp2, SIGNAL( triggered(bool) ), this, SLOT( OnCreateSmoothedSurface(bool) ) );
 
-    QObject::connect( createSurfaceAction->menu(), SIGNAL(aboutToShow()), this, SLOT( OnCreateSurfaceMenuAboutToShow() ) );
-
     menu->addAction(createSurfaceAction);
 
     QAction* createMaskAction = new QAction(QIcon(":/QmitkExt/createmask.png"), "Create mask", this );

@@ -78,7 +78,7 @@ class SegmentationUI_EXPORT QmitkSliceBasedInterpolator : public QWidget
     void Initialize(const QList<mitk::SliceNavigationController*> &controllers, mitk::DataStorage* storage);
 
     /**
-      Removal of observers.
+      \brief Removal of observers.
     */
     void Uninitialize();
 
@@ -104,16 +104,17 @@ class SegmentationUI_EXPORT QmitkSliceBasedInterpolator : public QWidget
   protected slots:
 
     /**
-      Reaction to groupbox checked
+      \brief Reaction to groupbox checked
     */
     void OnActivateWidget(bool);
 
     /**
-      Reaction to button clicks.
+      \brief Reaction to "Accept Current Slice" button click.
     */
     void OnAcceptInterpolationClicked();
 
     /*
+      \brief Reaction to "Accept All Slices" button click.
       Opens popup to ask about which orientation should be interpolated
     */
     void OnAcceptAllInterpolationsClicked();
@@ -122,6 +123,8 @@ class SegmentationUI_EXPORT QmitkSliceBasedInterpolator : public QWidget
      * Will trigger interpolation for all slices in given orientation (called from popup menu of OnAcceptAllInterpolationsClicked)
     */
     void OnAcceptAllPopupActivated(QAction* action);
+
+    void OnShowInformation(bool);
 
   protected:
 

@@ -45,10 +45,12 @@ m_Initialized(false),
 m_Activated(false)
 {
   m_Controls.setupUi(this);
+  m_Controls.m_InformationWidget->hide();
 
   connect(m_Controls.m_gbControls, SIGNAL(toggled(bool)), this, SLOT(OnActivateWidget(bool)));
   connect(m_Controls.m_btAccept, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
   connect(m_Controls.m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
+  connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
 
   itk::ReceptorMemberCommand<QmitkSurfaceBasedInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSurfaceBasedInterpolator>::New();
   command->SetCallbackFunction( this, &QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationInfoChanged );
@@ -132,6 +134,14 @@ QmitkSurfaceBasedInterpolator::~QmitkSurfaceBasedInterpolator()
   m_SurfaceInterpolator->RemoveObserver( m_SurfaceInterpolationInfoChangedObserverTag );
 
   delete m_Timer;
+}
+
+void QmitkSurfaceBasedInterpolator::OnShowInformation(bool on)
+{
+  if (on)
+    m_Controls.m_InformationWidget->show();
+  else
+    m_Controls.m_InformationWidget->hide();
 }
 
 void QmitkSurfaceBasedInterpolator::ShowInterpolationResult(bool status)

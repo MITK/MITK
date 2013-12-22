@@ -55,10 +55,12 @@ m_LastSNC(0),
 m_LastSliceIndex(0)
 {
   m_Controls.setupUi(this);
+  m_Controls.m_InformationWidget->hide();
 
   connect(m_Controls.m_gbControls, SIGNAL(toggled(bool)), this, SLOT(OnActivateWidget(bool)));
-  connect(m_Controls.m_btApply, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
+  connect(m_Controls.m_btApplyForCurrentSlice, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
   connect(m_Controls.m_btApplyForAllSlices, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()));
+  connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
 
   itk::ReceptorMemberCommand<QmitkSliceBasedInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSliceBasedInterpolator>::New();
   command->SetCallbackFunction( this, &QmitkSliceBasedInterpolator::OnSliceInterpolationInfoChanged );
@@ -557,6 +559,14 @@ void QmitkSliceBasedInterpolator::OnAcceptAllInterpolationsClicked()
   connect( &orientationPopup, SIGNAL(triggered(QAction*)), this, SLOT(OnAcceptAllPopupActivated(QAction*)) );
 
   orientationPopup.exec( QCursor::pos() );
+}
+
+void QmitkSliceBasedInterpolator::OnShowInformation(bool on)
+{
+  if (on)
+    m_Controls.m_InformationWidget->show();
+  else
+    m_Controls.m_InformationWidget->hide();
 }
 
 void QmitkSliceBasedInterpolator::OnAcceptAllPopupActivated(QAction* action)

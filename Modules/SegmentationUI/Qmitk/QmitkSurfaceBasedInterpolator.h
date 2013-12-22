@@ -101,6 +101,8 @@ class SegmentationUI_EXPORT QmitkSurfaceBasedInterpolator : public QWidget
 
     void ChangeSurfaceColor();
 
+    void OnShowInformation(bool);
+
 private:
 
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;

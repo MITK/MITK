@@ -28,24 +28,33 @@ namespace mitk
   /**
   * \brief ToFCameraMESASR4000DeviceFactory is an implementation of the factory pattern to generate MESASR4000Devices.
   * ToFCameraMESASR4000DeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
-  * This offers users the oppertunity to generate new Raw Player Devices via a global instance of this factory.
+  * This offers users the oppertunity to generate new MESA SR4000 Devices via a global instance of this factory.
   * @ingroup ToFHardware
   */
-
   class MITK_MESASR4000MODULE_EXPORT ToFCameraMESASR4000DeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
   public:
+    /**
+     * @brief ToFCameraMESASR4000DeviceFactory Default contructor.
+     * This factory internally counts all MESA SR4000 devices starting at 1.
+     */
     ToFCameraMESASR4000DeviceFactory()
     {
       this->m_DeviceNumber = 1;
     }
     /*!
-    \brief Defining the Factorie´s Name, here for the MESASR4000DeviceFactory
-    */
+     \brief Get the name of the factory, here for the ToFPMDCamCube.
+     */
     std::string GetFactoryName()
     {
       return std::string("MESA SR4000 Factory");
     }
+
+    /**
+    * @brief GetCurrentDeviceName Get the name of the current MESA SR4000.
+    * First device is named "MESA SR4000", second "MESA SR4000 2" and so on.
+    * @return Human readable name as string.
+    */
     std::string GetCurrentDeviceName()
     {
       std::stringstream name;
@@ -63,8 +72,9 @@ namespace mitk
 
   private:
     /*!
-    \brief Create an instance of a ToFCameraMESASR4000Device.
-    */
+     \brief Create an instance of a ToFCameraMESASR4000Device.
+     Sets default properties for a MESA SR4000.
+     */
     ToFCameraDevice::Pointer CreateToFCameraDevice()
     {
       ToFCameraMESASR4000Device::Pointer device = ToFCameraMESASR4000Device::New();
@@ -83,6 +93,10 @@ namespace mitk
 
       return device.GetPointer();
     }
+
+    /**
+      * @brief m_DeviceNumber Member for counting of devices.
+      */
     int m_DeviceNumber;
   };
 }

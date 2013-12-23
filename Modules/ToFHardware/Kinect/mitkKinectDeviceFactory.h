@@ -42,18 +42,26 @@ namespace mitk
 
   public:
 
+    /**
+     * @brief KinectDeviceFactory Default contructor.
+     * This factory internally counts all kinect devices starting at 1.
+     */
     KinectDeviceFactory()
     {
       this->m_DeviceNumber = 1;
     }
     /*!
-    \brief Defining the Factorie´s Name, here for the Kinect.
+    \brief Get the name of the factory, here for the Kinect.
     */
     std::string GetFactoryName()
     {
       return std::string("Kinect Factory");
     }
-    //Interating the Device name on calling the Factory
+    /**
+     * @brief GetCurrentDeviceName Get the name of the current kinect.
+     * First device is named "Kinect", second "Kinect 2" and so on.
+     * @return Human readable name as string.
+     */
     std::string GetCurrentDeviceName()
     {
       std::stringstream name;
@@ -73,6 +81,7 @@ namespace mitk
 
     /*!
     \brief Create an instance of a KinectDevice.
+    This method sets default properties for the kinect device.
     */
     ToFCameraDevice::Pointer CreateToFCameraDevice()
     {
@@ -86,13 +95,22 @@ namespace mitk
       return device.GetPointer();
     }
 
+    /**
+     * @brief GetIntrinsicsResource Get the resource of the
+     * default camera intrinsics for a kinect. If you want to
+     * use your own camera intrinsics, just overwrit the
+     * CameraIntrinsicsProperty of your device.
+     * @return A resource path to the camera .xml file.
+     */
     us::ModuleResource GetIntrinsicsResource()
     {
       us::Module* module = us::GetModuleContext()->GetModule();
       return module->GetResource("CalibrationFiles/Kinect_RGB_camera.xml");
     }
 
-    //Member variable as variable for our DeviceNumber
+    /**
+     * @brief m_DeviceNumber Member for counting of devices.
+     */
     int m_DeviceNumber;
   };
 }

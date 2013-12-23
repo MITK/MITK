@@ -35,7 +35,6 @@ mitk::ToFCameraDevice::Pointer mitk::AbstractToFDeviceFactory::ConnectToFDevice(
 
   us::ModuleContext* context = us::GetModuleContext();
   us::ServiceProperties deviceProps;
-//-------------Take a look at this part to change the name given to a device
   deviceProps["ToFDeviceName"] = GetCurrentDeviceName();
   m_DeviceRegistrations.insert(std::make_pair(device.GetPointer(), context->RegisterService(device.GetPointer(),deviceProps)));
   return device;

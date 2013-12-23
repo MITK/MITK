@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  /**
+/**
   * \brief ToFPMDCamBoardDeviceFactory is an implementation of the factory pattern to generate Cam Cube Devices.
   * ToFPMDCamCubeDeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
   * This offers users the oppertunity to generate new Cam Cube Devices via a global instance of this factory.
@@ -43,55 +43,72 @@ namespace mitk
 class MITK_PMDMODULE_EXPORT ToFCameraPMDCamCubeDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
+  /**
+   * @brief ToFCameraPMDCamCubeDeviceFactory Default contructor.
+   * This factory internally counts all Cam Cube devices starting at 1.
+   */
   ToFCameraPMDCamCubeDeviceFactory()
   {
     this->m_DeviceNumber=1;
   }
-   /*!
-   \brief Defining the Factorie´s Name, here for the ToFPMDCamCube.
+  /*!
+   \brief Get the name of the factory, here for the ToFPMDCamCube.
    */
-   std::string GetFactoryName()
-   {
-       return std::string("PMD Camcube 2.0/3.0 Factory ");
-   }
-
-   std::string GetCurrentDeviceName()
-   {
-     std::stringstream name;
-     if(m_DeviceNumber>1)
-     {
-       name << "PMD CamCube 2.0/3.0 "<< m_DeviceNumber;
-     }
-     else
-     {
-       name << "PMD CamCube 2.0/3.0 ";
-     }
-     m_DeviceNumber++;
-     return name.str();
-   }
+  std::string GetFactoryName()
+  {
+    return std::string("PMD Camcube 2.0/3.0 Factory ");
+  }
+  /**
+  * @brief GetCurrentDeviceName Get the name of the current Cam Cube.
+  * First device is named "PMD CamCube 2.0/3.0", second "PMD CamCube 2.0/3.0 2" and so on.
+  * @return Human readable name as string.
+  */
+  std::string GetCurrentDeviceName()
+  {
+    std::stringstream name;
+    if(m_DeviceNumber>1)
+    {
+      name << "PMD CamCube 2.0/3.0 "<< m_DeviceNumber;
+    }
+    else
+    {
+      name << "PMD CamCube 2.0/3.0 ";
+    }
+    m_DeviceNumber++;
+    return name.str();
+  }
 
 private:
-     /*!
+  /*!
    \brief Create an instance of a ToFPMDCamCubeDevice.
+   Sets default properties for a Cam Cube.
    */
-   ToFCameraDevice::Pointer CreateToFCameraDevice()
-   {
-     ToFCameraPMDCamCubeDevice::Pointer device = ToFCameraPMDCamCubeDevice::New();
+  ToFCameraDevice::Pointer CreateToFCameraDevice()
+  {
+    ToFCameraPMDCamCubeDevice::Pointer device = ToFCameraPMDCamCubeDevice::New();
 
-      device->SetBoolProperty("HasRGBImage", false);
-      device->SetBoolProperty("HasAmplitudeImage", true);
-      device->SetBoolProperty("HasIntensityImage", true);
+    device->SetBoolProperty("HasRGBImage", false);
+    device->SetBoolProperty("HasAmplitudeImage", true);
+    device->SetBoolProperty("HasIntensityImage", true);
 
-     return device.GetPointer();
-   }
+    return device.GetPointer();
+  }
 
-   us::ModuleResource GetIntrinsicsResource()
-   {
-     us::Module* module = us::GetModuleContext()->GetModule();
-     return module->GetResource("CalibrationFiles/PMDCamCube3_camera.xml");
-   }
+  /**
+    * @brief GetIntrinsicsResource Get the resource path to a default
+    * camera intrinsics .xml file.
+    * @return Path to the intrinsics .xml file.
+    */
+  us::ModuleResource GetIntrinsicsResource()
+  {
+    us::Module* module = us::GetModuleContext()->GetModule();
+    return module->GetResource("CalibrationFiles/PMDCamCube3_camera.xml");
+  }
 
-   int m_DeviceNumber;
+  /**
+  * @brief m_DeviceNumber Member for counting of devices.
+  */
+  int m_DeviceNumber;
 };
 }
 #endif

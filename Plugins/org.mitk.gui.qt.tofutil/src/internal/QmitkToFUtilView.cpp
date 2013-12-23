@@ -611,14 +611,6 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   }
   if (m_AmplitudeImageNode.IsNotNull())
   {
-    if ((m_SelectedCamera.contains("Kinect"))&&(m_ToFImageGrabber->GetBoolProperty("RGB")))
-    {
-      this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
-    }
-    else
-    {
-      this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    }
     this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
     this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetRenderWindow() ) );
     this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
@@ -626,32 +618,18 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   }
   if (m_IntensityImageNode.IsNotNull())
   {
-    if (m_SelectedCamera.contains("Kinect"))
-    {
-      this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
-    }
-    else
-    {
       this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
       this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
       this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
       this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
       this->m_IntensityImageNode->SetProperty("Image Rendering.Mode", renderingModePropertyForTransferFunction);
-    }
   }
   if ((m_RGBImageNode.IsNotNull()))
   {
-    if ((m_SelectedCamera.contains("Kinect"))&&(m_ToFImageGrabber->GetBoolProperty("IR")))
-    {
-      this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
-    }
-    else
-    {
       this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
       this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
       this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
       this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
-    }
   }
   // initialize images
   if (m_MitkDistanceImage.IsNotNull())

@@ -41,15 +41,10 @@ namespace mitk
     bool ErrorText(unsigned int error);
     IKinectSensor* m_pKinectSensor;
     IMultiSourceFrameReader*m_pMultiSourceFrameReader;
-    IDepthFrame* m_pDepthFrame;
-    IColorFrame* m_pColorFrame;
     ICoordinateMapper* m_pCoordinateMapper;
-
     RGBQUAD* m_pColorRGBX;
 
     bool m_ConnectionCheck; ///< check if camera is connected or not
-
-    bool m_UseIR; ///< flag indicating whether IR image is used or not
 
     int m_DepthCaptureWidth;
     int m_DepthCaptureHeight;
@@ -57,6 +52,7 @@ namespace mitk
     int m_RGBCaptureWidth;
     int m_RGBCaptureHeight;
     float* m_Distances;
+    float* m_Amplitudes;
     unsigned char* m_Colors;
     size_t m_RGBBufferSize;
     size_t m_DepthBufferSize;
@@ -65,17 +61,15 @@ namespace mitk
   KinectV2Controller::KinectV2ControllerPrivate::KinectV2ControllerPrivate():
     m_pKinectSensor(NULL),
     m_pMultiSourceFrameReader(NULL),
-    m_pDepthFrame(NULL),
-    m_pColorFrame(NULL),
     m_pCoordinateMapper(NULL),
     m_pColorRGBX(NULL),
     m_ConnectionCheck(false),
-    m_UseIR(false),
     m_DepthCaptureWidth(512),
     m_DepthCaptureHeight(424),
     m_RGBCaptureWidth(1920),
     m_RGBCaptureHeight(1080),
     m_Distances(NULL),
+    m_Amplitudes(NULL),
     m_Colors(NULL),
     m_RGBBufferSize(1920*1080*3),
     m_DepthBufferSize(sizeof(float)*512*424)
@@ -83,6 +77,7 @@ namespace mitk
     // create heap storage for color pixel data in RGBX format
     m_pColorRGBX = new RGBQUAD[m_RGBCaptureWidth * m_RGBCaptureHeight];
     m_Distances = new float[m_DepthCaptureWidth * m_DepthCaptureHeight];
+    m_Amplitudes = new float[m_DepthCaptureWidth * m_DepthCaptureHeight];
     m_Colors = new unsigned char[m_RGBBufferSize];
   }
 
@@ -189,6 +184,7 @@ namespace mitk
       IMultiSourceFrame* pMultiSourceFrame = NULL;
       IDepthFrame* pDepthFrame = NULL;
       IColorFrame* pColorFrame = NULL;
+      IInfraredFrame* pInfraRedFrame = NULL;
 
       HRESULT hr = -1;
 
@@ -196,6 +192,7 @@ namespace mitk
 
       DWORD currentTime = GetTickCount();
 
+      //Check if we do not request data faster than 30 FPS. Kinect V2 can only deliver 30 FPS.
       if( unsigned int(currentTime - lastTime) > 33 )
       {
         hr = d->m_pMultiSourceFrameReader->AcquireLatestFrame(&pMultiSourceFrame);
@@ -230,8 +227,22 @@ namespace mitk
 
       if (SUCCEEDED(hr))
       {
+        IInfraredFrameReference* pInfraredFrameReference = NULL;
+
+        hr = pMultiSourceFrame->get_InfraredFrameReference(&pInfraredFrameReference);
+        if (SUCCEEDED(hr))
+        {
+          hr = pInfraredFrameReference->AcquireFrame(&pInfraRedFrame);
+        }
+
+        SafeRelease(pInfraredFrameReference);
+      }
+
+      if (SUCCEEDED(hr))
+      {
         UINT nDepthBufferSize = 0;
         UINT16 *pDepthBuffer = NULL;
+        UINT16 *pIntraRedBuffer = NULL;
 
         ColorImageFormat imageFormat = ColorImageFormat_None;
         UINT nColorBufferSize = 0;
@@ -243,11 +254,16 @@ namespace mitk
         }
         if (SUCCEEDED(hr))
         {
+          hr = pInfraRedFrame->AccessUnderlyingBuffer(&nDepthBufferSize, &pIntraRedBuffer);
+        }
+        if (SUCCEEDED(hr))
+        {
           for(int i = 0; i < d->m_DepthCaptureHeight*d->m_DepthCaptureWidth; ++i)
           {
-            float depth = static_cast<float>(*pDepthBuffer);
-            d->m_Distances[i] = depth;
+            d->m_Distances[i] = static_cast<float>(*pDepthBuffer);
+            d->m_Amplitudes[i] = static_cast<float>(*pIntraRedBuffer);
             ++pDepthBuffer;
+            ++pIntraRedBuffer;
           }
         }
         else
@@ -293,12 +309,13 @@ namespace mitk
 
       SafeRelease(pDepthFrame);
       SafeRelease(pColorFrame);
+      SafeRelease(pInfraRedFrame);
       SafeRelease(pMultiSourceFrame);
 
       if( hr != -1 && !SUCCEEDED(hr) )
       {
-        MITK_ERROR << hr;
-        //MITK_ERROR << "UpdateCamera() AcquireFrame - Is the 'KinectService' App running in the background? Did you connect the device properly?";
+        //The thread gets here, if the data is requested faster than the device can deliver it.
+        //This may happen from time to time.
         return false;
       }
 
@@ -322,14 +339,12 @@ namespace mitk
   {
     this->GetDistances(distances);
     this->GetRgb(rgb);
+    this->GetAmplitudes(amplitudes);
   }
 
   void KinectV2Controller::GetAmplitudes( float* amplitudes )
   {
-  }
-
-  void KinectV2Controller::GetIntensities( float* intensities )
-  {
+    memcpy( amplitudes, d->m_Amplitudes, d->m_DepthBufferSize);
   }
 
   int KinectV2Controller::GetRGBCaptureWidth() const
@@ -350,18 +365,5 @@ namespace mitk
   int KinectV2Controller::GetDepthCaptureHeight() const
   {
     return d->m_DepthCaptureHeight;
-  }
-
-  bool KinectV2Controller::GetUseIR() const
-  {
-    return d->m_UseIR;
-  }
-  void KinectV2Controller::SetUseIR(bool useIR)
-  {
-    if (d->m_UseIR!=useIR)
-    {
-      d->m_UseIR = useIR;
-      this->Modified();
-    }
   }
 }

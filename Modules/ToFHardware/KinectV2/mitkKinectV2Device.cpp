@@ -25,10 +25,7 @@ namespace mitk
   KinectV2Device::KinectV2Device():
     m_DistanceDataBuffer(NULL),
     m_AmplitudeDataBuffer(NULL),
-    m_IntensityDataBuffer(NULL),
     m_RGBDataBuffer(NULL),
-    m_DepthCaptureWidth(512),
-    m_DepthCaptureHeight(424),
     m_DepthBufferSize(sizeof(float)*512*424),
     m_RGBBufferSize(3*1920*1080)
   {
@@ -61,8 +58,6 @@ namespace mitk
         this->m_RGBPixelNumber = this->m_RGBImageWidth * this->m_RGBImageHeight;
 
         // allocate buffer
-        this->m_IntensityArray = new float[this->m_PixelNumber];
-        for(int i=0; i<this->m_PixelNumber; i++) {this->m_IntensityArray[i]=0.0;}
         this->m_DistanceArray = new float[this->m_PixelNumber];
         for(int i=0; i<this->m_PixelNumber; i++) {this->m_DistanceArray[i]=0.0;}
         this->m_AmplitudeArray = new float[this->m_PixelNumber];
@@ -77,11 +72,6 @@ namespace mitk
         for(int i=0; i<this->m_MaxBufferSize; i++)
         {
           this->m_AmplitudeDataBuffer[i] = new float[this->m_PixelNumber];
-        }
-        this->m_IntensityDataBuffer = new float*[this->m_MaxBufferSize];
-        for(int i=0; i<this->m_MaxBufferSize; i++)
-        {
-          this->m_IntensityDataBuffer[i] = new float[this->m_PixelNumber];
         }
         this->m_RGBDataBuffer = new unsigned char*[this->m_MaxBufferSize];
         for (int i=0; i<this->m_MaxBufferSize; i++)
@@ -105,7 +95,6 @@ namespace mitk
       // clean-up only if camera was connected
       if (m_CameraConnected)
       {
-        delete [] m_IntensityArray;
         delete [] m_DistanceArray;
         delete [] m_AmplitudeArray;
 
@@ -113,17 +102,14 @@ namespace mitk
         {
           delete[] this->m_DistanceDataBuffer[i];
           delete[] this->m_AmplitudeDataBuffer[i];
-          delete[] this->m_IntensityDataBuffer[i];
           delete[] this->m_RGBDataBuffer[i];
         }
         delete[] this->m_DistanceDataBuffer;
         delete[] this->m_AmplitudeDataBuffer;
-        delete[] this->m_IntensityDataBuffer;
         delete[] this->m_RGBDataBuffer;
 
         m_CameraConnected = false;
       }
-
     }
     return ok;
   }
@@ -249,40 +235,21 @@ namespace mitk
 
   void KinectV2Device::GetAmplitudes(float* amplitudeArray, int& imageSequence)
   {
-    //TODO Implement me
-    //m_ImageMutex->Lock();
-    //if (m_CameraActive)
-    //{
-    //  for (int i=0; i<this->m_PixelNumber; i++)
-    //  {
-    //    amplitudeArray[i] = this->m_AmplitudeDataBuffer[this->m_CurrentPos][i];
-    //  }
-    //  imageSequence = this->m_ImageSequence;
-    //}
-    //else
-    //{
-    //  MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
-    //}
-    //m_ImageMutex->Unlock();
+    m_ImageMutex->Lock();
+    if (m_CameraActive)
+    {
+      memcpy(amplitudeArray, this->m_AmplitudeDataBuffer[this->m_CurrentPos], this->m_DepthBufferSize);
+      imageSequence = this->m_ImageSequence;
+    }
+    else
+    {
+      MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
+    }
+    m_ImageMutex->Unlock();
   }
 
-  void KinectV2Device::GetIntensities(float* intensityArray, int& imageSequence)
+  void KinectV2Device::GetIntensities(float*, int&)
   {
-    //TODO Implement me
-    //m_ImageMutex->Lock();
-    //if (m_CameraActive)
-    //{
-    //  for (int i=0; i<this->m_PixelNumber; i++)
-    //  {
-    //    intensityArray[i] = this->m_IntensityDataBuffer[this->m_CurrentPos][i];
-    //  }
-    //  imageSequence = this->m_ImageSequence;
-    //}
-    //else
-    //{
-    //  MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
-    //}
-    //m_ImageMutex->Unlock();
   }
 
   void KinectV2Device::GetDistances(float* distanceArray, int& imageSequence)
@@ -290,10 +257,7 @@ namespace mitk
     m_ImageMutex->Lock();
     if (m_CameraActive)
     {
-      for (int i=0; i<this->m_PixelNumber; i++)
-      {
-        distanceArray[i] = this->m_DistanceDataBuffer[this->m_CurrentPos][i]; // * 1000
-      }
+      memcpy(distanceArray, this->m_DistanceDataBuffer[this->m_CurrentPos], this->m_DepthBufferSize);
       imageSequence = this->m_ImageSequence;
     }
     else
@@ -308,10 +272,6 @@ namespace mitk
   {
     if (m_CameraActive)
     {
-      // 1) copy the image buffer
-      // 2) convert the distance values from m to mm
-      // 3) Flip around y- axis (vertical axis)
-
       // check for empty buffer
       if (this->m_ImageSequence < 0)
       {
@@ -337,10 +297,9 @@ namespace mitk
         capturedImageSequence = requiredImageSequence;
         pos = (this->m_CurrentPos + (10-(this->m_ImageSequence - requiredImageSequence))) % this->m_BufferSize;
       }
-      //// write image data to float arrays
+      //// write image data to arrays
       memcpy(distanceArray, this->m_DistanceDataBuffer[pos], this->m_DepthBufferSize);
       memcpy(amplitudeArray, this->m_AmplitudeDataBuffer[pos], this->m_DepthBufferSize);
-      memcpy(intensityArray, this->m_IntensityDataBuffer[pos], this->m_DepthBufferSize);
       memcpy(rgbDataArray, this->m_RGBDataBuffer[pos], this->m_RGBBufferSize);
 
       this->Modified();
@@ -354,24 +313,6 @@ namespace mitk
   KinectV2Controller::Pointer KinectV2Device::GetController()
   {
     return this->m_Controller;
-  }
-
-  void KinectV2Device::SetProperty( const char *propertyKey, BaseProperty* propertyValue )
-  {
-    ToFCameraDevice::SetProperty(propertyKey,propertyValue);
-    this->m_PropertyList->SetProperty(propertyKey, propertyValue);
-    if (strcmp(propertyKey, "RGB") == 0)
-    {
-      bool rgb = false;
-      GetBoolProperty(propertyKey, rgb);
-      m_Controller->SetUseIR(!rgb);
-    }
-    else if (strcmp(propertyKey, "IR") == 0)
-    {
-      bool ir = false;
-      GetBoolProperty(propertyKey, ir);
-      m_Controller->SetUseIR(ir);
-    }
   }
 
   int KinectV2Device::GetRGBCaptureWidth()

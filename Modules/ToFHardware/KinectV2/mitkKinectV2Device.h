@@ -16,15 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkKinectV2Device_h
 #define __mitkKinectV2Device_h
 
+#include <mitkCommon.h>
 #include "mitkKinectV2ModuleExports.h"
-#include "mitkCommon.h"
 #include "mitkToFCameraDevice.h"
 #include "mitkKinectV2Controller.h"
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
-#include "itkMultiThreader.h"
-#include "itkFastMutexLock.h"
+#include <itkObject.h>
+#include <itkObjectFactory.h>
+#include <itkMultiThreader.h>
+#include <itkFastMutexLock.h>
 
 
 namespace mitk
@@ -44,7 +44,6 @@ namespace mitk
   public:
 
     mitkClassMacro( KinectV2Device , ToFCameraDevice );
-
     itkNewMacro( Self );
 
     /*!
@@ -83,9 +82,9 @@ namespace mitk
     */
     virtual void GetAmplitudes(float* amplitudeArray, int& imageSequence);
     /*!
-    \brief gets the intensity data from the ToF camera as a greyscale image. Caution! The user is responsible for allocating and deleting the images.
-    \param intensityArray contains the returned intensities data as an array.
-    \param imageSequence the actually captured image sequence number
+    \brief Does nothing for Kinect V2 as there is no intensity data provided by the device.
+    *
+    * The method is an empty implementation, because the interface (ToFCameraDevice) requires it.
     */
     virtual void GetIntensities(float* intensityArray, int& imageSequence);
     /*!
@@ -96,12 +95,12 @@ namespace mitk
     virtual void GetDistances(float* distanceArray, int& imageSequence);
     /*!
     \brief gets the 3 images (distance, amplitude, intensity) from the ToF camera. Caution! The user is responsible for allocating and deleting the images.
-    \param distanceArray contains the returned distance data as an array.
-    \param amplitudeArray contains the returned amplitude data as an array.
-    \param intensityArray contains the returned intensity data as an array.
-    \param sourceDataArray contains the complete source data from the camera device.
-    \param requiredImageSequence the required image sequence number
-    \param capturedImageSequence the actually captured image sequence number
+    \param distanceArray Contains the distance data as an array.
+    \param amplitudeArray Contains the infrared image.
+    \param intensityArray Does nothing for Kinect V2.
+    \param sourceDataArray Does nothing for Kinect V2.
+    \param requiredImageSequence The required image sequence number.
+    \param capturedImageSequence Does nothing for Kinect V2.
     */
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
       int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL);
@@ -110,10 +109,6 @@ namespace mitk
     */
     KinectV2Controller::Pointer GetController();
 
-    /*!
-    \brief set a BaseProperty
-    */
-    virtual void SetProperty( const char *propertyKey, BaseProperty* propertyValue );
     /*!
     \brief returns the width of the RGB image
     */
@@ -133,25 +128,15 @@ namespace mitk
     \brief Thread method continuously acquiring images from the ToF hardware
     */
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
-    /*!
-    \brief moves the position pointer m_CurrentPos to the next position in the buffer if that's not the next free position to prevent reading from an empty buffer
-    */
-    void GetNextPos();
+
     KinectV2Controller::Pointer m_Controller; ///< corresponding CameraController
 
     float** m_DistanceDataBuffer; ///< buffer holding the last distance images
     float** m_AmplitudeDataBuffer; ///< buffer holding the last amplitude images
-    float** m_IntensityDataBuffer; ///< buffer holding the last intensity images
     unsigned char** m_RGBDataBuffer; ///< buffer holding the last RGB image
 
-    int m_DepthCaptureWidth;
-    int m_DepthCaptureHeight;
-
-    size_t m_DepthBufferSize;
-    size_t m_RGBBufferSize;
-
-  private:
-
+    size_t m_DepthBufferSize; ///< Size of depth buffer (i.e. memory size of depth and infrared image)
+    size_t m_RGBBufferSize; ///< Size of RGB buffer (i.e. memory size of RGB image)
   };
 } //END mitk namespace
 #endif

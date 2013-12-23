@@ -17,17 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkKinectV2Controller_h
 
 #include "mitkKinectV2ModuleExports.h"
-#include "mitkCommon.h"
+#include <mitkCommon.h>
 #include "mitkToFConfig.h"
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
+#include <itkObject.h>
+#include <itkObjectFactory.h>
 
 namespace mitk
 {
   /**
-  * @brief Interface to the Kinect 2 camera
-  *
+  * @brief Interface to the Kinect 2 camera. Currently, the Microsoft SDK is used.
   *
   * @ingroup ToFHardware
   */
@@ -43,10 +42,11 @@ namespace mitk
     int GetDepthCaptureWidth() const;
     int GetDepthCaptureHeight() const;
 
-    bool GetUseIR() const;
-
-    void SetUseIR(bool useIR);
-
+    /**
+    \brief Setup MultiFrameReader of Kinect V2.
+    * This reader can acquire different types of data. Here it is used
+    * to acquire depth, RGB and infrared images.
+    */
     bool InitializeMultiFrameReader();
 
     /*!

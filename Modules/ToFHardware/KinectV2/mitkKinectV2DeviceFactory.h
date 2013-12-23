@@ -78,7 +78,7 @@ namespace mitk
       KinectV2Device::Pointer device = KinectV2Device::New();
 
       device->SetBoolProperty("HasRGBImage", true);
-      device->SetBoolProperty("HasAmplitudeImage", false);
+      device->SetBoolProperty("HasAmplitudeImage", true);
       device->SetBoolProperty("HasIntensityImage", false);
       device->SetBoolProperty("KinectReconstructionMode", true);
       device->SetBoolProperty("RGBImageHasDifferentResolution", true);

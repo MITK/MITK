@@ -106,17 +106,27 @@ void mitk::ToFImageDownsamplingFilter::ItkImageResampling( itk::Image<TPixel,VIm
 
   //establish spacing for new downsampled image ( resulting image)
   const typename ItkImageType::SpacingType& inputSpacing = itkImage->GetSpacing();
-  typename ItkImageType::SpacingType spacing;
+  typename ItkImageType::SpacingType outputSpacing;
 
-  spacing[0] = inputSpacing[0] * ( inputSize[0]/ m_ResampledX );
-  spacing[1] = inputSpacing[1] * ( inputSize[1]/ m_ResampledY );
-  spacing[2] = inputSpacing[2] * ( inputSize[2]/ m_ResampledZ );
+  outputSpacing[0] = inputSpacing[0] * ( inputSize[0]/ m_ResampledX );
+  outputSpacing[1] = inputSpacing[1] * ( inputSize[1]/ m_ResampledY );
+  outputSpacing[2] = inputSpacing[2] * ( inputSize[2]/ m_ResampledZ );
+
+  mitk::Vector3D mitkspacing;
+  mitkspacing[0] = outputSpacing[0];
+  mitkspacing[1] = outputSpacing[1];
+  mitkspacing[2] = outputSpacing[2];
+
+  mitk::Point3D mitkorig;
+  mitkorig[0] = itkImage->GetOrigin()[0];
+  mitkorig[1] = itkImage->GetOrigin()[1];
+  mitkorig[2] = 0.0;
 
   // set filter parameters and update
   transform->SetIdentity();
   resampler->SetTransform(transform);
   resampler->SetInterpolator(interpolator);
-  resampler->SetOutputSpacing(spacing);
+  resampler->SetOutputSpacing(outputSpacing);
   resampler->SetOutputOrigin(itkImage->GetOrigin());
   resampler->SetSize(size);
   resampler->SetInput(itkImage);
@@ -124,6 +134,8 @@ void mitk::ToFImageDownsamplingFilter::ItkImageResampling( itk::Image<TPixel,VIm
 
   // Create mitk container for resulting image
   mitk::Image::Pointer resultImage = ImageToImageFilter::GetOutput();
+  resultImage->SetSpacing(mitkspacing);
+  resultImage->SetOrigin(mitkorig);
 
   // Cast itk image to mitk image
   mitk::CastToMitkImage(resampler->GetOutput(), resultImage);

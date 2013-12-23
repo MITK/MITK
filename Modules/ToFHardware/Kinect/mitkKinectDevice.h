@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   /**
-  * @brief Interface for all representations of MESA ToF devices.
+  * @brief Interface for all representations of Kinect devices.
   * KinectDevice internally holds an instance of KinectController and starts a thread
   * that continuously grabs images from the controller. A buffer structure buffers the last acquired images
   * to provide the image data loss-less.
@@ -98,21 +98,10 @@ namespace mitk
     \brief gets the 3 images (distance, amplitude, intensity) from the ToF camera. Caution! The user is responsible for allocating and deleting the images.
     \param distanceArray contains the returned distance data as an array.
     \param amplitudeArray contains the returned amplitude data as an array.
-    \param intensityArray contains the returned intensity data as an array.
-    \param sourceDataArray contains the complete source data from the camera device.
-    \param requiredImageSequence the required image sequence number
-    \param capturedImageSequence the actually captured image sequence number
+    \param capturedImageSequence the actually captured image sequence number.
     */
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
-      int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL);
-    //    TODO: Buffer size currently set to 1. Once Buffer handling is working correctly, method may be reactivated
-    //    /* // * TODO: Reenable doxygen comment when uncommenting, disabled to fix doxygen warning see bug 12882
-    //    \brief pure virtual method resetting the buffer using the specified bufferSize. Has to be implemented by sub-classes
-    //    \param bufferSize buffer size the buffer should be reset to
-    //    */
-    //    virtual void ResetBuffer(int bufferSize) = 0;
-    //TODO add/correct documentation for requiredImageSequence and capturedImageSequence in the GetAllImages, GetDistances, GetIntensities and GetAmplitudes methods.
-
+                              int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL);
     /*!
     \brief returns the corresponding camera controller
     */
@@ -148,10 +137,8 @@ namespace mitk
     KinectController::Pointer m_Controller; ///< corresponding CameraController
 
     float** m_DistanceDataBuffer; ///< buffer holding the last distance images
-    float** m_AmplitudeDataBuffer; ///< buffer holding the last amplitude images
-    float** m_IntensityDataBuffer; ///< buffer holding the last intensity images
+    float** m_AmplitudeDataBuffer; ///< buffer holding the last infra-red (IR) images
     unsigned char** m_RGBDataBuffer; ///< buffer holding the last RGB image
-    int m_KinectDeviceNumber;
 
   private:
 

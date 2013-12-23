@@ -291,15 +291,17 @@ namespace mitk
         }
       }
 
+      SafeRelease(pDepthFrame);
+      SafeRelease(pColorFrame);
+      SafeRelease(pMultiSourceFrame);
+
       if( hr != -1 && !SUCCEEDED(hr) )
       {
         MITK_ERROR << hr;
         //MITK_ERROR << "UpdateCamera() AcquireFrame - Is the 'KinectService' App running in the background? Did you connect the device properly?";
         return false;
       }
-      SafeRelease(pDepthFrame);
-      SafeRelease(pColorFrame);
-      SafeRelease(pMultiSourceFrame);
+
       return true;
     }
     MITK_ERROR << "Unable to initialize MultiFrameReader";

@@ -186,6 +186,18 @@ ITK_THREAD_RETURN_TYPE KinectDevice::Acquire(void* pInfoStruct)
     bool printStatus = false;
     while (toFCameraDevice->IsCameraActive())
     {
+      //check if to provide IR or RGB image
+      if(toFCameraDevice->GetController()->GetUseIR())
+      {
+        toFCameraDevice->SetBoolProperty("HasAmplitudeImage", true);
+        toFCameraDevice->SetBoolProperty("HasRGBImage", false);
+      }
+      else
+      {
+        toFCameraDevice->SetBoolProperty("HasAmplitudeImage", false);
+        toFCameraDevice->SetBoolProperty("HasRGBImage", true);
+      }
+
       // update the ToF camera
       toFCameraDevice->UpdateCamera();
       // get the image data from the camera and write it at the next free position in the buffer
@@ -239,7 +251,7 @@ void KinectDevice::GetAmplitudes(float* amplitudeArray, int& imageSequence)
   m_ImageMutex->Unlock();
 }
 
-void KinectDevice::GetIntensities(float *intensityArray, int &imageSequence)
+void KinectDevice::GetIntensities(float *, int &)
 {
 }
 
@@ -258,8 +270,8 @@ void KinectDevice::GetDistances(float* distanceArray, int& imageSequence)
   m_ImageMutex->Unlock();
 }
 
-void KinectDevice::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
-                          int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray)
+void KinectDevice::GetAllImages(float* distanceArray, float* amplitudeArray, float*, char*,
+                                int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray)
 {
   if (m_CameraActive)
   {
@@ -271,14 +283,33 @@ void KinectDevice::GetAllImages(float* distanceArray, float* amplitudeArray, flo
       capturedImageSequence = this->m_ImageSequence;
       return;
     }
-    memcpy( distanceArray, this->m_DistanceDataBuffer[this->m_CurrentPos], m_PixelNumber*sizeof(float));
+
+    // determine position of image in buffer
+    int pos = 0;
+    if ((requiredImageSequence < 0) || (requiredImageSequence > this->m_ImageSequence))
+    {
+      capturedImageSequence = this->m_ImageSequence;
+      pos = this->m_CurrentPos;
+    }
+    else if (requiredImageSequence <= this->m_ImageSequence - this->m_BufferSize)
+    {
+      capturedImageSequence = (this->m_ImageSequence - this->m_BufferSize) + 1;
+      pos = (this->m_CurrentPos + 1) % this->m_BufferSize;
+    }
+    else // (requiredImageSequence > this->m_ImageSequence - this->m_BufferSize) && (requiredImageSequence <= this->m_ImageSequence)
+    {
+      capturedImageSequence = requiredImageSequence;
+      pos = (this->m_CurrentPos + (10-(this->m_ImageSequence - requiredImageSequence))) % this->m_BufferSize;
+    }
+
+    memcpy( distanceArray, this->m_DistanceDataBuffer[pos], m_PixelNumber*sizeof(float));
     if(m_Controller->GetUseIR())
     {
-      memcpy( amplitudeArray, this->m_AmplitudeDataBuffer[this->m_CurrentPos], m_PixelNumber*sizeof(float));
+      memcpy( amplitudeArray, this->m_AmplitudeDataBuffer[pos], m_PixelNumber*sizeof(float));
     }
     else
     {
-      memcpy( rgbDataArray, this->m_RGBDataBuffer[this->m_CurrentPos], m_RGBPixelNumber*3*sizeof(unsigned char));
+      memcpy( rgbDataArray, this->m_RGBDataBuffer[pos], m_RGBPixelNumber*3*sizeof(unsigned char));
     }
   }
   else

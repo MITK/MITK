@@ -51,6 +51,11 @@ void mitk::AbstractToFDeviceFactory::DisconnectToFDevice(const ToFCameraDevice::
   m_Devices.erase(std::remove(m_Devices.begin(), m_Devices.end(), device), m_Devices.end());
 }
 
+size_t mitk::AbstractToFDeviceFactory::GetNumberOfDevices()
+{
+  return m_Devices.size();
+}
+
 mitk::CameraIntrinsics::Pointer mitk::AbstractToFDeviceFactory::GetCameraIntrinsics()
 {
   us::ModuleResource resource = GetIntrinsicsResource();

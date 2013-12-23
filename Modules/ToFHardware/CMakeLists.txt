@@ -19,6 +19,7 @@ MITK_CREATE_MODULE(mitkToFHardware
 
 add_subdirectory(Testing)
 add_subdirectory(Kinect)
+add_subdirectory(KinectV2)
 add_subdirectory(PMD)
 add_subdirectory(MesaSR4000)
 

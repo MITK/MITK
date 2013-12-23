@@ -13,11 +13,11 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __mitkKinectDeviceFactory_h
-#define __mitkKinectDeviceFactory_h
+#ifndef __mitkKinectV2DeviceFactory_h
+#define __mitkKinectV2DeviceFactory_h
 
-#include "mitkKinectModuleExports.h"
-#include "mitkKinectDevice.h"
+#include "mitkKinectV2ModuleExports.h"
+#include "mitkKinectV2Device.h"
 #include "mitkAbstractToFDeviceFactory.h"
 #include <mitkCameraIntrinsics.h>
 #include <mitkCameraIntrinsicsProperty.h>
@@ -33,36 +33,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   /**
-  * \brief KinectDeviceFactory is an implementation of the factory pattern to generate Microsoft Kinect devices.
+  * \brief KinectDeviceFactory is an implementation of the factory pattern to generate Microsoft Kinect V2 devices.
   * KinectDeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
   * This offers users the oppertunity to generate new KinectDevices via a global instance of this factory.
   * @ingroup ToFHardware
   */
-  class MITK_KINECTMODULE_EXPORT KinectDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+  class MITK_KINECTV2MODULE_EXPORT KinectV2DeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
   public:
 
-    /**
-     * @brief KinectDeviceFactory Default contructor.
-     * This factory internally counts all kinect devices starting at 1.
-     */
-    KinectDeviceFactory()
+    KinectV2DeviceFactory()
     {
-    }
-    /*!
-    \brief Get the name of the factory, here for the Kinect.
-    */
-    std::string GetFactoryName()
-    {
-      return std::string("Kinect Factory");
     }
 
     /**
+     * @brief GetFactoryName Get the name of the factory.
+     * @return Name as human readable string.
+     */
+    std::string GetFactoryName()
+    {
+      return std::string("Kinect V2 Factory");
+    }
+    /**
      * @brief GetDeviceNamePrefix Main part of a device name.
+     *
+     * The string for the kinect 2 is "Kinect V2" on purpose,
+     * to distinguish a "Kinect V2" device from a secondary
+     * connected "Kinect 2" (in case you have connected 2x
+     * "Kinect" and 1x Kinect V2). This case is rare, but
+     * we should be able to distinguish between cameras.
      */
     std::string GetDeviceNamePrefix()
     {
-      return std::string("Kinect");
+      return std::string("Kinect V2");
     }
 
   private:
@@ -72,27 +75,21 @@ namespace mitk
     */
     ToFCameraDevice::Pointer CreateToFCameraDevice()
     {
-      KinectDevice::Pointer device = KinectDevice::New();
+      KinectV2Device::Pointer device = KinectV2Device::New();
 
       device->SetBoolProperty("HasRGBImage", true);
-      device->SetBoolProperty("HasAmplitudeImage", false);
+      device->SetBoolProperty("HasAmplitudeImage", true);
       device->SetBoolProperty("HasIntensityImage", false);
       device->SetBoolProperty("KinectReconstructionMode", true);
+      device->SetBoolProperty("RGBImageHasDifferentResolution", true);
 
       return device.GetPointer();
     }
 
-    /**
-     * @brief GetIntrinsicsResource Get the resource of the
-     * default camera intrinsics for a kinect. If you want to
-     * use your own camera intrinsics, just overwrit the
-     * CameraIntrinsicsProperty of your device.
-     * @return A resource path to the camera .xml file.
-     */
     us::ModuleResource GetIntrinsicsResource()
     {
       us::Module* module = us::GetModuleContext()->GetModule();
-      return module->GetResource("CalibrationFiles/Kinect_RGB_camera.xml");
+      return module->GetResource("CalibrationFiles/KinectV2_IR_camera.xml");
     }
   };
 }

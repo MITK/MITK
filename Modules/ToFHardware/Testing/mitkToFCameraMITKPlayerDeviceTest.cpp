@@ -15,119 +15,131 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkTestingMacros.h>
-#include <mitkToFCameraMITKPlayerDevice.h>
-#include <mitkImageDataItem.h>
-#include <mitkPicFileReader.h>
+#include <mitkTestFixture.h>
+#include <mitkIOUtil.h>
+#include "mitkToFCameraMITKPlayerDevice.h"
+#include "mitkIToFDeviceFactory.h"
 
-#include <mitkToFConfig.h>
-#include <itksys/SystemTools.hxx>
+//MicroServices
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
+#include <usServiceReference.h>
 
-
-bool CompareFloatArrays(float* array1, float* array2, unsigned int numberOfElements)
+class mitkToFCameraMITKPlayerDeviceTestSuite : public mitk::TestFixture
 {
-  bool arraysEqual = true;
-  for (unsigned int i=0; i<numberOfElements; i++)
+
+  CPPUNIT_TEST_SUITE(mitkToFCameraMITKPlayerDeviceTestSuite);
+  MITK_TEST(DeviceNotConnected_NotActive);
+  MITK_TEST(ConnectCamera_ValidData_ReturnsTrue);
+  MITK_TEST(GetDistances_ValidData_ImagesEqual);
+  MITK_TEST(StartCamera_ValidData_DeviceIsConnected);
+  MITK_TEST(DisconnectCamera_ValidData_ReturnsTrue);
+  CPPUNIT_TEST_SUITE_END();
+
+private:
+
+  mitk::ToFCameraMITKPlayerDevice* m_PlayerDevice;
+  std::string m_PathToDepthData;
+  float* m_DistanceArray;
+
+public:
+
+  void setUp()
   {
-    if (i==0)
-      //MITK_INFO<<array1[i]<<", "<<array2[i];
-      if (!mitk::Equal(array1[i],array2[i]))
-      {
-        arraysEqual = false;
-      }
+    us::ModuleContext* context = us::GetModuleContext();
+
+    //Filter all registered devices for an ToFCameraMITKPlayerDevice via device name
+    std::string filter = "(ToFDeviceName=MITK Player)";
+    us::ServiceReference<mitk::ToFCameraDevice> serviceRefDevice = context->GetServiceReferences<mitk::ToFCameraDevice>(filter).front();
+    //Get the actual device
+    m_PlayerDevice = dynamic_cast<mitk::ToFCameraMITKPlayerDevice*>( context->GetService<mitk::ToFCameraDevice>(serviceRefDevice) );
+
+    //during the tests here, we use one special test data set located in MITK-Data
+    m_PathToDepthData = GetTestDataFilePath("ToF-Data/Kinect_Lego_Phantom_DistanceImage.nrrd");
+    m_PlayerDevice->SetProperty("DistanceImageFileName",mitk::StringProperty::New(m_PathToDepthData));
+
+    //initialize an array with the test data size
+    unsigned int numberOfPixels = 640*480;
+    m_DistanceArray = new float[numberOfPixels];
   }
-  return arraysEqual;
-}
 
-bool CheckValidFrame(float* array, mitk::Image::Pointer image, unsigned int numberOfElements)
-{
-  bool validFrame = false;
-  int numberOfSlices = image->GetDimension(2);
-  for (int i=0; i<numberOfSlices; i++)
+  void tearDown()
   {
-    float* dataArray = (float*)image->GetSliceData(i,0,0)->GetData();
-    if (CompareFloatArrays(dataArray,array,numberOfElements))
+    //Wait some time to avoid threading issues.
+    itksys::SystemTools::Delay(10);
+    //Clean up
+    if(m_PlayerDevice->IsCameraActive())
+      m_PlayerDevice->StopCamera();
+    if(m_PlayerDevice->IsCameraConnected())
+      m_PlayerDevice->DisconnectCamera();
+
+    delete[] m_DistanceArray;
+  }
+
+  void DeviceNotConnected_NotActive()
+  {
+    CPPUNIT_ASSERT_MESSAGE("The device (player) should not be active before starting.", m_PlayerDevice->IsCameraActive()==false);
+  }
+
+  void ConnectCamera_ValidData_ReturnsTrue()
+  {
+    CPPUNIT_ASSERT_MESSAGE("ConnectCamera() should return true in case of success.", m_PlayerDevice->ConnectCamera()==true);
+  }
+
+  void StartCamera_ValidData_DeviceIsConnected()
+  {
+    m_PlayerDevice->ConnectCamera();
+    m_PlayerDevice->StartCamera();
+    CPPUNIT_ASSERT_MESSAGE("After starting the device, the device should be active.", m_PlayerDevice->IsCameraActive()==true);
+  }
+
+  void GetDistances_ValidData_ImagesEqual()
+  {
+    try
     {
-      validFrame = true;
+      m_PlayerDevice->ConnectCamera();
+      m_PlayerDevice->StartCamera();
+      unsigned int dimension[2];
+      dimension[0] = m_PlayerDevice->GetCaptureWidth();
+      dimension[1] = m_PlayerDevice->GetCaptureHeight();
+      int imageSequence = 0;
+
+      //fill the array with the device output
+      m_PlayerDevice->GetDistances(m_DistanceArray,imageSequence);
+
+      //initialize an image and fill it with the array
+      mitk::Image::Pointer resultDepthImage = mitk::Image::New();
+      resultDepthImage->Initialize(mitk::PixelType(mitk::MakeScalarPixelType<float>()), 2, dimension,1);
+      resultDepthImage->SetSlice(m_DistanceArray);
+
+      mitk::Image::Pointer expectedDepthImage = mitk::IOUtil::LoadImage(m_PathToDepthData);
+
+      MITK_ASSERT_EQUAL( expectedDepthImage, resultDepthImage,
+        "Image from the player should be the same as loaded from the harddisk, because we just load one slice.");
+    }
+    catch(std::exception  &e)
+    {
+      MITK_ERROR << "Unknown exception occured: " << e.what();
     }
   }
-  return validFrame;
-}
 
-/**Documentation
-*  test for the class "ToFCameraMITKPlayerDevice".
-*/
-int mitkToFCameraMITKPlayerDeviceTest(int /* argc */, char* /*argv*/[])
-{
-  MITK_TEST_BEGIN("ToFCameraMITKPlayerDevice");
-
-  std::string dirName = MITK_TOF_DATA_DIR;
-  mitk::ToFCameraMITKPlayerDevice::Pointer tofCameraMITKPlayerDevice = mitk::ToFCameraMITKPlayerDevice::New();
-  std::string distanceFileName = dirName + "/PMDCamCube2_MF0_IT0_20Images_DistanceImage.pic";
-  tofCameraMITKPlayerDevice->SetProperty("DistanceImageFileName",mitk::StringProperty::New(distanceFileName));
-  std::string amplitudeFileName = dirName + "/PMDCamCube2_MF0_IT0_20Images_AmplitudeImage.pic";
-  tofCameraMITKPlayerDevice->SetProperty("AmplitudeImageFileName",mitk::StringProperty::New(amplitudeFileName));
-  std::string intensityFileName = dirName + "/PMDCamCube2_MF0_IT0_20Images_IntensityImage.pic";
-  tofCameraMITKPlayerDevice->SetProperty("IntensityImageFileName",mitk::StringProperty::New(intensityFileName));
-
-  MITK_TEST_CONDITION_REQUIRED(tofCameraMITKPlayerDevice->IsCameraActive()==false,"Test IsCameraActive() before start camera");
-  MITK_TEST_OUTPUT(<< "Start device");
-  MITK_TEST_CONDITION_REQUIRED(tofCameraMITKPlayerDevice->ConnectCamera(),"Test ConnectCamera()");
-  tofCameraMITKPlayerDevice->StartCamera();
-  MITK_TEST_CONDITION_REQUIRED(tofCameraMITKPlayerDevice->IsCameraActive()==true,"Test IsCameraActive() after start camera");
-
-  unsigned int captureWidth = tofCameraMITKPlayerDevice->GetCaptureWidth();
-  unsigned int captureHeight = tofCameraMITKPlayerDevice->GetCaptureHeight();
-  unsigned int numberOfPixels = captureWidth*captureHeight;
-  float* distances = new float[numberOfPixels];
-  float* amplitudes = new float[numberOfPixels];
-  float* intensities = new float[numberOfPixels];
-  unsigned char* rgbDataArray = new unsigned char[numberOfPixels*3];
-  char* sourceDataArray = new char[numberOfPixels];
-  float* expectedDistances = NULL;
-  float* expectedAmplitudes = NULL;
-  float* expectedIntensities = NULL;
-  int requiredImageSequence = 0;
-  int imageSequence = 0;
-
-
-  mitk::PicFileReader::Pointer distanceFileReader = mitk::PicFileReader::New();
-  distanceFileReader->SetFileName(distanceFileName);
-  distanceFileReader->Update();
-  mitk::Image::Pointer distanceImage = distanceFileReader->GetOutput();
-  mitk::PicFileReader::Pointer amplitudeFileReader = mitk::PicFileReader::New();
-  amplitudeFileReader->SetFileName(amplitudeFileName);
-  amplitudeFileReader->Update();
-  mitk::Image::Pointer amplitudeImage = amplitudeFileReader->GetOutput();
-  mitk::PicFileReader::Pointer intensityFileReader = mitk::PicFileReader::New();
-  intensityFileReader->SetFileName(intensityFileName);
-  intensityFileReader->Update();
-  mitk::Image::Pointer intensityImage = intensityFileReader->GetOutput();
-  unsigned int numberOfFrames = distanceImage->GetDimension(2);
-  for (int i=0; i<numberOfFrames; i++)
+  void DisconnectCamera_ValidData_ReturnsTrue()
   {
-    tofCameraMITKPlayerDevice->GetDistances(distances,imageSequence);
-    MITK_TEST_CONDITION_REQUIRED(CheckValidFrame(distances,distanceImage,numberOfPixels),"Check frame from GetDistances()");
-    tofCameraMITKPlayerDevice->GetAmplitudes(amplitudes,imageSequence);
-    MITK_TEST_CONDITION_REQUIRED(CheckValidFrame(amplitudes,amplitudeImage,numberOfPixels),"Check frame from GetAmplitudes()");
-    tofCameraMITKPlayerDevice->GetIntensities(intensities,imageSequence);
-    MITK_TEST_CONDITION_REQUIRED(CheckValidFrame(intensities,intensityImage,numberOfPixels),"Check frame from GetIntensities()");
-    MITK_TEST_OUTPUT(<< "GetAllImages() with rgbDataArray");
-    tofCameraMITKPlayerDevice->GetAllImages(distances,amplitudes,intensities,sourceDataArray,requiredImageSequence,imageSequence,rgbDataArray);
-    MITK_TEST_CONDITION_REQUIRED(CheckValidFrame(distances,distanceImage,numberOfPixels),"Check distance frame from GetAllImages()");
-    MITK_TEST_CONDITION_REQUIRED(CheckValidFrame(amplitudes,amplitudeImage,numberOfPixels),"Check amplitude frame from GetAllImages()");
-    MITK_TEST_CONDITION_REQUIRED(CheckValidFrame(intensities,intensityImage,numberOfPixels),"Check intensity frame from GetAllImages()");    //expectedDistances = (float*)distanceImage->GetSliceData(i,0,0)->GetData();
-    MITK_TEST_OUTPUT(<< "GetAllImages() without rgbDataArray");
-    tofCameraMITKPlayerDevice->GetAllImages(distances,amplitudes,intensities,sourceDataArray,requiredImageSequence,imageSequence);
+    try
+    {
+      int imageSequence = 0;
+      m_PlayerDevice->ConnectCamera();
+      m_PlayerDevice->StartCamera();
+      m_PlayerDevice->GetDistances(m_DistanceArray,imageSequence);
+      m_PlayerDevice->StopCamera();
+      CPPUNIT_ASSERT_MESSAGE("After stopping the device, the device should be inactive.", m_PlayerDevice->IsCameraActive()==false);
+      CPPUNIT_ASSERT_MESSAGE("DisconnectCamera() should return true in case of success.", m_PlayerDevice->DisconnectCamera()==true);
+    }
+    catch(std::exception  &e)
+    {
+      MITK_ERROR << "Unknown exception occured: " << e.what();
+    }
   }
-  itksys::SystemTools::Delay(1000);
-  tofCameraMITKPlayerDevice->StopCamera();
-  MITK_TEST_CONDITION_REQUIRED(tofCameraMITKPlayerDevice->IsCameraActive()==false,"Test IsCameraActive() after stop camera");
-  MITK_TEST_CONDITION_REQUIRED(tofCameraMITKPlayerDevice->DisconnectCamera(),"Test DisconnectCamera()");
-  delete [] distances;
-  delete [] intensities;
-  delete [] amplitudes;
-  delete [] rgbDataArray;
-  delete [] sourceDataArray;
-  MITK_TEST_END();
+};
 
-}
+MITK_TEST_SUITE_REGISTRATION(mitkToFCameraMITKPlayerDevice)

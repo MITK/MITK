@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-/**
+  /**
   * \brief ToFPMDCamBoardDeviceFactory is an implementation of the factory pattern to generate Cam Cube Devices.
   * ToFPMDCamCubeDeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
   * This offers users the oppertunity to generate new Cam Cube Devices via a global instance of this factory.
@@ -49,50 +49,39 @@ public:
    */
   ToFCameraPMDCamCubeDeviceFactory()
   {
-    this->m_DeviceNumber=1;
-  }
-  /*!
-   \brief Get the name of the factory, here for the ToFPMDCamCube.
-   */
-  std::string GetFactoryName()
-  {
-    return std::string("PMD Camcube 2.0/3.0 Factory ");
   }
   /**
   * @brief GetCurrentDeviceName Get the name of the current Cam Cube.
   * First device is named "PMD CamCube 2.0/3.0", second "PMD CamCube 2.0/3.0 2" and so on.
   * @return Human readable name as string.
   */
-  std::string GetCurrentDeviceName()
-  {
-    std::stringstream name;
-    if(m_DeviceNumber>1)
-    {
-      name << "PMD CamCube 2.0/3.0 "<< m_DeviceNumber;
-    }
-    else
-    {
-      name << "PMD CamCube 2.0/3.0 ";
-    }
-    m_DeviceNumber++;
-    return name.str();
-  }
+   std::string GetFactoryName()
+   {
+     return std::string("PMD Camcube 2.0/3.0 Factory ");
+   }
+
+   /**
+    * @brief GetDeviceNamePrefix Main part of the device name.
+    */
+   std::string GetDeviceNamePrefix()
+   {
+     return std::string("PMD CamCube 2.0/3.0");
+   }
 
 private:
   /*!
    \brief Create an instance of a ToFPMDCamCubeDevice.
-   Sets default properties for a Cam Cube.
    */
-  ToFCameraDevice::Pointer CreateToFCameraDevice()
-  {
-    ToFCameraPMDCamCubeDevice::Pointer device = ToFCameraPMDCamCubeDevice::New();
+   ToFCameraDevice::Pointer CreateToFCameraDevice()
+   {
+     ToFCameraPMDCamCubeDevice::Pointer device = ToFCameraPMDCamCubeDevice::New();
 
-    device->SetBoolProperty("HasRGBImage", false);
-    device->SetBoolProperty("HasAmplitudeImage", true);
-    device->SetBoolProperty("HasIntensityImage", true);
+      device->SetBoolProperty("HasRGBImage", false);
+      device->SetBoolProperty("HasAmplitudeImage", true);
+      device->SetBoolProperty("HasIntensityImage", true);
 
-    return device.GetPointer();
-  }
+     return device.GetPointer();
+   }
 
   /**
     * @brief GetIntrinsicsResource Get the resource path to a default

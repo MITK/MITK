@@ -27,12 +27,15 @@ namespace mitk
 
   ToFCameraMITKPlayerController::ToFCameraMITKPlayerController() :
     m_PixelNumber(0),
+    m_RGBPixelNumber(0),
     m_NumberOfBytes(0),
+    m_NumberOfRGBBytes(0),
     m_CaptureWidth(0),
     m_CaptureHeight(0),
+    m_RGBCaptureWidth(0),
+    m_RGBCaptureHeight(0),
     m_ConnectionCheck(false),
     m_InputFileName(""),
-    // m_Extension(""),
     m_ToFImageType(ToFImageType3D),
     m_DistanceImage(0),
     m_AmplitudeImage(0),
@@ -94,66 +97,6 @@ namespace mitk
     delete[] this->m_RGBArray;
     this->m_RGBArray = NULL;
   }
-/*
- bool ToFCameraMITKPlayerController::CheckCurrentFileType()
-  {
-    if(!this->m_DistanceImageFileName.empty())
-    {
-      if(ItkImageFileReader::CanReadFile(m_DistanceImageFileName,"",".nrrd"))
-      {
-        m_Extension = ".nrrd";
-        return true;
-      }
-      else if (PicFileReader::CanReadFile(m_DistanceImageFileName,"",".pic"))
-      {
-        m_Extension = ".pic";
-        return true;
-      }
-    }
-
-    if(!this->m_AmplitudeImageFileName.empty())
-    {
-      if(ItkImageFileReader::CanReadFile(m_AmplitudeImageFileName,"",".nrrd"))
-      {
-        m_Extension = ".nrrd";
-        return true;
-      }
-      else if (PicFileReader::CanReadFile(m_AmplitudeImageFileName,"",".pic"))
-      {
-        m_Extension = ".pic";
-        return true;
-      }
-    }
-
-    if(!this->m_IntensityImageFileName.empty())
-    {
-      if(ItkImageFileReader::CanReadFile(m_IntensityImageFileName,"",".nrrd"))
-      {
-        m_Extension = ".nrrd";
-        return true;
-      }
-      else if (PicFileReader::CanReadFile(m_IntensityImageFileName,"",".pic"))
-      {
-        m_Extension = ".pic";
-        return true;
-      }
-    }
-    if(!this->m_RGBImageFileName.empty())
-    {
-      if(ItkImageFileReader::CanReadFile(m_RGBImageFileName,"",".nrrd"))
-      {
-        m_Extension = ".nrrd";
-        return true;
-      }
-      else if (PicFileReader::CanReadFile(m_RGBImageFileName,"",".pic"))
-      {
-        m_Extension = ".pic";
-        return true;
-      }
-    }
-    return false;
-  }
-  */
 
   bool ToFCameraMITKPlayerController::OpenCameraConnection()
   {
@@ -201,31 +144,6 @@ namespace mitk
         {
           MITK_ERROR << "ToF RGB image data file empty";
         }
-
-        /*
-        // Check for file type, only .nrrd and .pic files are supported!
-        if( this->CheckCurrentFileType())
-        {
-          if(m_Extension == ".nrrd")
-          {
-            this->OpenNrrdImageFile(this->m_DistanceImageFileName, m_DistanceImage);
-            this->OpenNrrdImageFile(this->m_AmplitudeImageFileName, m_AmplitudeImage);
-            this->OpenNrrdImageFile(this->m_IntensityImageFileName, m_IntensityImage);
-            this->OpenNrrdImageFile(this->m_RGBImageFileName, m_RGBImage);
-          }
-          else if(m_Extension == ".pic")
-          {
-            this->OpenPicImageFile(this->m_DistanceImageFileName, m_DistanceImage);
-            this->OpenPicImageFile(this->m_AmplitudeImageFileName, m_AmplitudeImage);
-            this->OpenPicImageFile(this->m_IntensityImageFileName, m_IntensityImage);
-            this->OpenPicImageFile(this->m_RGBImageFileName, m_RGBImage);
-          }
-        }
-        else
-        {
-          throw std::logic_error("Please check image type, currently only .nrrd files are supported (.pic files are deprecated!)");
-        }
-        */
 
         // check if the opened files contained data
         if(m_DistanceImage.IsNull())
@@ -281,6 +199,14 @@ namespace mitk
         this->m_PixelNumber = this->m_CaptureWidth*this->m_CaptureHeight;
         this->m_NumberOfBytes = this->m_PixelNumber * sizeof(float);
 
+        if(m_RGBImage)
+        {
+          m_RGBCaptureWidth = m_RGBImage->GetDimension(0);
+          m_RGBCaptureHeight = m_RGBImage->GetDimension(1);
+          m_RGBPixelNumber = m_RGBCaptureWidth * m_RGBCaptureHeight;
+          m_NumberOfRGBBytes = m_RGBPixelNumber * 3;
+        }
+
         if (this->m_ToFImageType == ToFImageType2DPlusT)
         {
           this->m_NumOfFrames = infoImage->GetDimension(3);
@@ -297,8 +223,8 @@ namespace mitk
         for(int i=0; i<this->m_PixelNumber; i++) {this->m_AmplitudeArray[i]=0.0;}
         this->m_IntensityArray = new float[this->m_PixelNumber];
         for(int i=0; i<this->m_PixelNumber; i++) {this->m_IntensityArray[i]=0.0;}
-        this->m_RGBArray = new unsigned char[this->m_PixelNumber*3];
-        for(int i=0; i<this->m_PixelNumber*3; i++) {this->m_RGBArray[i]=0.0;}
+        this->m_RGBArray = new unsigned char[m_NumberOfRGBBytes];
+        for(int i=0; i<m_NumberOfRGBBytes; i++) {this->m_RGBArray[i]=0.0;}
 
         MITK_INFO << "NumOfFrames: " << this->m_NumOfFrames;
 
@@ -315,48 +241,7 @@ namespace mitk
     else
       return this->m_ConnectionCheck;
   }
-/*
-  void ToFCameraMITKPlayerController::OpenNrrdImageFile( const std::string outfileName, Image::Pointer &image)
-  {
-    if(!outfileName.empty())
-    {
-      if(image.IsNotNull())
-      {
-        image->ReleaseData();
-        image = NULL;
-      }
-      ItkImageFileReader::Pointer nrrdReader = ItkImageFileReader::New();
-      nrrdReader->SetFileName(outfileName);
-      nrrdReader->Update();
-      image = nrrdReader->GetOutput()->Clone();
-    }
-    else
-    {
-      MITK_ERROR << "Error opening ToF data file " << outfileName;
-    }
 
-  }
-
-  void ToFCameraMITKPlayerController::OpenPicImageFile( const std::string outfileName, Image::Pointer &image)
-  {
-    if(!outfileName.empty())
-    {
-      if(image.IsNotNull())
-      {
-        image->ReleaseData();
-        image = NULL;
-      }
-      PicFileReader::Pointer picReader = PicFileReader::New();
-      picReader->SetFileName(outfileName);
-      picReader->Update();
-      image = picReader->GetOutput()->Clone();
-    }
-    else
-    {
-      MITK_ERROR << "Error opening ToF data file 2" << outfileName;
-    }
-  }
-*/
   bool ToFCameraMITKPlayerController::CloseCameraConnection()
   {
     if (this->m_ConnectionCheck)
@@ -393,12 +278,12 @@ namespace mitk
       if(!this->m_ToFImageType)
       {
         ImageReadAccessor rgbAcc(m_RGBImage, m_RGBImage->GetSliceData(m_CurrentFrame));
-        memcpy(m_RGBArray, rgbAcc.GetData(), m_PixelNumber * sizeof(unsigned char)*3 );
+        memcpy(m_RGBArray, rgbAcc.GetData(), m_NumberOfRGBBytes );
       }
       else if(this->m_ToFImageType)
       {
         ImageReadAccessor rgbAcc(m_RGBImage, m_RGBImage->GetVolumeData(m_CurrentFrame));
-        memcpy(m_RGBArray, rgbAcc.GetData(), m_PixelNumber * sizeof(unsigned char)*3);
+        memcpy(m_RGBArray, rgbAcc.GetData(), m_NumberOfRGBBytes);
       }
     }
     itksys::SystemTools::Delay(50);
@@ -435,7 +320,7 @@ namespace mitk
 
   void ToFCameraMITKPlayerController::GetRgb(unsigned char* rgbArray)
   {
-    memcpy(rgbArray, this->m_RGBArray, m_PixelNumber * sizeof(unsigned char)*3);
+    memcpy(rgbArray, this->m_RGBArray, m_NumberOfRGBBytes);
   }
 
   void ToFCameraMITKPlayerController::SetInputFileName(std::string inputFileName)

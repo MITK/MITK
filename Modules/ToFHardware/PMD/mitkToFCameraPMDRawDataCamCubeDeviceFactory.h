@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-/**
+  /**
   * \brief ToFPMDRawPlayerDeviceFactory is an implementation of the factory pattern to generate Raw Player Devices.
   * ToFPMDRawPlayerDeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
   * This offers users the oppertunity to generate new Raw Player Devices via a global instance of this factory.
@@ -44,73 +44,45 @@ class MITK_PMDMODULE_EXPORT ToFCameraPMDRawDataCamCubeDeviceFactory : public itk
 
 public:
 
-  /**
-   * @brief ToFCameraPMDRawDataCamCubeDeviceFactory Default contructor.
-   * This factory internally counts all raw data Cam Cube devices starting at 1.
-   */
   ToFCameraPMDRawDataCamCubeDeviceFactory()
   {
-    this->m_DeviceNumber = 1;
   }
   /*!
    \brief Get the name of the factory, here for the ToFPMDRawDataCamCube.
    */
-  std::string GetFactoryName()
-  {
-    return std::string("PMD RAW Data Camcube Factory ");
-  }
+   std::string GetFactoryName()
+   {
+       return std::string("PMD RAW Data Camcube Factory ");
+   }
 
-  /**
-    * @brief GetCurrentDeviceName Get the name of the current raw data Cam Cube.
-    * First device is named "PMD Raw Data CamCube 2.0/3.0", second "PMD Raw Data CamCube 2.0/3.0 2" and so on.
-    * @return Human readable name as string.
+   /**
+    * @brief GetDeviceNamePrefix Main part of the device name.
     */
-  std::string GetCurrentDeviceName()
-  {
-    std::stringstream name;
-    if(m_DeviceNumber>1)
-    {
-      name << "PMD Raw Data CamCube 2.0/3.0 "<< m_DeviceNumber;
-    }
-    else
-    {
-      name << "PMD Raw Data CamCube 2.0/3.0";
-    }
-    m_DeviceNumber++;
-    return name.str();
-  }
+   std::string GetDeviceNamePrefix()
+   {
+       return std::string("PMD Raw Data CamCube 2.0/3.0");
+   }
 
 private:
-  /*!
-     \brief Create an instance of a ToFCameraPMDRawDataCamCubeDevice.
-     Sets default properties for a PMD raw data Cam Cube.
-     */
-  ToFCameraDevice::Pointer CreateToFCameraDevice()
-  {
-    ToFCameraPMDRawDataCamCubeDevice::Pointer device = ToFCameraPMDRawDataCamCubeDevice::New();
-
-    device->SetBoolProperty("HasRGBImage", false);
-    device->SetBoolProperty("HasAmplitudeImage", true);
-    device->SetBoolProperty("HasIntensityImage", true);
-
-    return device.GetPointer();
-  }
-
-  /**
-   * @brief GetIntrinsicsResource Get the resource path to a default
-   * camera intrinsics .xml file.
-   * @return Path to the intrinsics .xml file.
+     /*!
+   \brief Create an instance of a ToFPMDRawDataDevice.
    */
-  us::ModuleResource GetIntrinsicsResource()
-  {
-    us::Module* module = us::GetModuleContext()->GetModule();
-    return module->GetResource("CalibrationFiles/PMDCamCube3_camera.xml");
-  }
+   ToFCameraDevice::Pointer CreateToFCameraDevice()
+   {
+     ToFCameraPMDRawDataCamCubeDevice::Pointer device = ToFCameraPMDRawDataCamCubeDevice::New();
 
-  /**
-    * @brief m_DeviceNumber Member for counting of devices.
-    */
-  int m_DeviceNumber;
+      device->SetBoolProperty("HasRGBImage", false);
+      device->SetBoolProperty("HasAmplitudeImage", true);
+      device->SetBoolProperty("HasIntensityImage", true);
+
+     return device.GetPointer();
+   }
+
+   us::ModuleResource GetIntrinsicsResource()
+   {
+     us::Module* module = us::GetModuleContext()->GetModule();
+     return module->GetResource("CalibrationFiles/PMDCamCube3_camera.xml");
+   }
 };
 }
 #endif

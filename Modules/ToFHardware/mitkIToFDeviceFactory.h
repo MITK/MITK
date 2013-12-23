@@ -47,12 +47,15 @@ namespace mitk
      */
     virtual std::string GetCurrentDeviceName() = 0;
 
+    virtual std::string GetDeviceNamePrefix() = 0;
+
     /**
      * @brief CreateToFCameraDevice Create a new device of the respective
      * factory. E.g. a "KinectFactory" creates a KinectDevice.
      * @return A ToFCameraDevice.
      */
     virtual ToFCameraDevice::Pointer CreateToFCameraDevice() = 0;
+
   };
 }
 

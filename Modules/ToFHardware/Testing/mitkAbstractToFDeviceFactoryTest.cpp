@@ -15,48 +15,62 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkTestingMacros.h>
-#include <mitkAbstractToFDeviceFactory.h>
+#include <mitkTestFixture.h>
+#include "mitkAbstractToFDeviceFactory.h"
 
-
-struct DummyFactory : public mitk::AbstractToFDeviceFactory {
-
-  virtual std::string GetFactoryName(){return "dummy";}
-
-  virtual std::string GetCurrentDeviceName(){return "dummy";}
-
-  virtual mitk::ToFCameraDevice::Pointer CreateToFCameraDevice() {return NULL;}
-
-  // Public wrapper to test intrinsics
-  mitk::CameraIntrinsics::Pointer GetIntrinsics()
-  {
-    return GetCameraIntrinsics();
-  }
-
-}; // End of internal dummy reader
-
-
-/**Documentation
- *  test for the class "ToFImageWriter".
- */
-int mitkAbstractToFDeviceFactoryTest(int  argc , char* argv[])
+class mitkAbstractToFDeviceFactoryTestSuite : public mitk::TestFixture
 {
-  MITK_TEST_BEGIN("ToFImageWriter");
 
-  MITK_TEST_CONDITION_REQUIRED(argc > 0, "Testing if enough arguments are set.");
-    std::string calibrationFilePath(argv[2]);
+  CPPUNIT_TEST_SUITE(mitkAbstractToFDeviceFactoryTestSuite);
+  MITK_TEST(GetIntrinsics_DefaultFactory_ExpectedDefaultCalibrationParamters);
+  CPPUNIT_TEST_SUITE_END();
 
-  //testing initialization of object
-  DummyFactory factory;
-  mitk::CameraIntrinsics::Pointer result = factory.GetIntrinsics();
-  mitk::CameraIntrinsics::Pointer expected = mitk::CameraIntrinsics::New();
-  expected->FromXMLFile(calibrationFilePath);
+private:
 
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(result->GetFocalLengthX(), expected->GetFocalLengthX())  , "Testing correctness of CamerIntrinsics: FocalLengthX");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(result->GetFocalLengthY(), expected->GetFocalLengthY())  , "Testing correctness of CamerIntrinsics: FocalLengthY");
+  /**
+   * @brief The DummyFactory struct inherits from AbstractToFDeviceFactory
+   * and overwrites all neccessary methods. Unfortunately, only GetCameraIntrinsics
+   * can be testet without actually offering a device. The rest of the methods
+   * is tested in the ToFCameraMITKPlayerDeviceTest and the
+   * ToFCameraMITKPlayerDeviceFactoryTest
+   */
+  struct DummyFactory : public mitk::AbstractToFDeviceFactory {
 
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(result->GetPrincipalPointX(), expected->GetPrincipalPointX())  , "Testing correctness of CamerIntrinsics: PrincipalPointX");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(result->GetPrincipalPointY(), expected->GetPrincipalPointY())  , "Testing correctness of CamerIntrinsics: PrincipalPointY");
+    virtual std::string GetFactoryName(){return "dummy factory";}
 
+    virtual std::string GetDeviceNamePrefix(){return "dummy device";}
 
-  MITK_TEST_END();
-}
+    virtual std::string GetCurrentDeviceName(){return "dummy device";}
+
+    virtual mitk::ToFCameraDevice::Pointer CreateToFCameraDevice() {return NULL;}
+
+    /**
+     * @brief GetIntrinsics Public wrapper to test intrinsics
+     * @return Default camera intrinsic parameters.
+     */
+    mitk::CameraIntrinsics::Pointer GetIntrinsics()
+    {
+      return GetCameraIntrinsics();
+    }
+  };// End of internal dummy factory
+
+public:
+
+  void GetIntrinsics_DefaultFactory_ExpectedDefaultCalibrationParamters()
+  {
+    DummyFactory dummyFactory;
+    mitk::CameraIntrinsics::Pointer result = dummyFactory.GetIntrinsics();
+    mitk::CameraIntrinsics::Pointer expected = mitk::CameraIntrinsics::New();
+    //Load default calibration parameters from MITK-Data
+    expected->FromXMLFile(GetTestDataFilePath("ToF-Data/CalibrationFiles/Default_Parameters.xml"));
+
+    //There is not Equal for mitk::CameraIntrinsics, thus we compare some paramters.
+    CPPUNIT_ASSERT(mitk::Equal(result->GetFocalLengthX(), expected->GetFocalLengthX()));
+    CPPUNIT_ASSERT(mitk::Equal(result->GetFocalLengthY(), expected->GetFocalLengthY()));
+
+    CPPUNIT_ASSERT(mitk::Equal(result->GetPrincipalPointX(), expected->GetPrincipalPointX()));
+    CPPUNIT_ASSERT(mitk::Equal(result->GetPrincipalPointY(), expected->GetPrincipalPointY()));
+  }
+};
+
+MITK_TEST_SUITE_REGISTRATION(mitkAbstractToFDeviceFactory)

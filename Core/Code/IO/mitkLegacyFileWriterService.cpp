@@ -35,7 +35,12 @@ mitk::LegacyFileWriterService::LegacyFileWriterService(mitk::FileWriterWithInfor
 
 mitk::LegacyFileWriterService::~LegacyFileWriterService()
 {
-  m_ServiceRegistration.Unregister();
+  try
+  {
+    m_ServiceRegistration.Unregister();
+  }
+  catch (const std::exception&)
+  {}
 }
 
 ////////////////////// Writing /////////////////////////

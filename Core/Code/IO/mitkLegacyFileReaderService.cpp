@@ -40,7 +40,12 @@ mitk::LegacyFileReaderService::LegacyFileReaderService(const std::string& mimeTy
 
 mitk::LegacyFileReaderService::~LegacyFileReaderService()
 {
-  if (m_ServiceReg) m_ServiceReg.Unregister();
+  try
+  {
+    m_ServiceReg.Unregister();
+  }
+  catch (const std::exception&)
+  {}
 }
 
 ////////////////////// Reading /////////////////////////

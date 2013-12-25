@@ -480,7 +480,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     ls->m_VtkContourPolyData->SetPoints(ls->m_ContourPoints);
     ls->m_VtkContourPolyData->SetLines(ls->m_ContourLines);
 
-    ls->m_VtkContourPolyDataMapper->SetInput(ls->m_VtkContourPolyData);
+    ls->m_VtkContourPolyDataMapper->SetInputData(ls->m_VtkContourPolyData);
     ls->m_ContourActor->SetMapper(ls->m_VtkContourPolyDataMapper);
     ls->m_ContourActor->GetProperty()->SetLineWidth(m_LineWidth);
 
@@ -526,11 +526,11 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
   // apply transform of current plane to glyphs
   ls->m_UnselectedGlyph3D->SetSourceConnection(transformFilterU->GetOutputPort());
-  ls->m_UnselectedGlyph3D->SetInput(ls->m_VtkUnselectedPointListPolyData);
+  ls->m_UnselectedGlyph3D->SetInputData(ls->m_VtkUnselectedPointListPolyData);
   ls->m_UnselectedGlyph3D->SetScaleModeToScaleByVector();
   ls->m_UnselectedGlyph3D->SetVectorModeToUseVector();
 
-  ls->m_VtkUnselectedPolyDataMapper->SetInput(ls->m_UnselectedGlyph3D->GetOutput());
+  ls->m_VtkUnselectedPolyDataMapper->SetInputConnection(ls->m_UnselectedGlyph3D->GetOutputPort());
   ls->m_UnselectedActor->SetMapper(ls->m_VtkUnselectedPolyDataMapper);
   ls->m_UnselectedActor->GetProperty()->SetLineWidth(m_PointLineWidth);
 
@@ -552,11 +552,11 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
   // apply transform of current plane to glyphs
   ls->m_SelectedGlyph3D->SetSourceConnection(transformFilterS->GetOutputPort());
-  ls->m_SelectedGlyph3D->SetInput(ls->m_VtkSelectedPointListPolyData);
+  ls->m_SelectedGlyph3D->SetInputData(ls->m_VtkSelectedPointListPolyData);
   ls->m_SelectedGlyph3D->SetScaleModeToScaleByVector();
   ls->m_SelectedGlyph3D->SetVectorModeToUseVector();
 
-  ls->m_VtkSelectedPolyDataMapper->SetInput(ls->m_SelectedGlyph3D->GetOutput());
+  ls->m_VtkSelectedPolyDataMapper->SetInputConnection(ls->m_SelectedGlyph3D->GetOutputPort());
   ls->m_SelectedActor->SetMapper(ls->m_VtkSelectedPolyDataMapper);
   ls->m_SelectedActor->GetProperty()->SetLineWidth(m_PointLineWidth);
 
@@ -611,8 +611,8 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   //due to different params in VTK (double/float) we have to convert
 
   float unselectedColor[4];
-  vtkFloatingPointType selectedColor[4]={1.0f,0.0f,0.0f,1.0f};    //red
-  vtkFloatingPointType contourColor[4]={1.0f,0.0f,0.0f,1.0f};     //red
+  double selectedColor[4]={1.0f,0.0f,0.0f,1.0f};    //red
+  double contourColor[4]={1.0f,0.0f,0.0f,1.0f};     //red
 
   float opacity = 1.0;
 

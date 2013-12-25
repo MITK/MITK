@@ -72,9 +72,9 @@ public:
 
 private:
 
-  virtual ServiceReferenceT AddingService(const ServiceReferenceT& reference);
-  virtual void ModifiedService(const ServiceReferenceT& reference, ServiceReferenceT service);
-  virtual void RemovedService(const ServiceReferenceT& reference, ServiceReferenceT service);
+  virtual ServiceReferenceType AddingService(const ServiceReferenceType& reference);
+  virtual void ModifiedService(const ServiceReferenceType& reference, ServiceReferenceType service);
+  virtual void RemovedService(const ServiceReferenceType& reference, ServiceReferenceType service);
 
   us::ServiceTracker<IMimeType, MimeTypeTrackerTypeTraits>* m_Tracker;
 

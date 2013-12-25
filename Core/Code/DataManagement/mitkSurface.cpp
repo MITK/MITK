@@ -39,10 +39,10 @@ static void Delete(vtkPolyData* polyData)
     polyData->Delete();
 }
 
-static void Update(vtkPolyData* polyData)
+static void Update(vtkPolyData* /*polyData*/)
 {
-  if (polyData != NULL)
-    polyData->Update();
+//  if (polyData != NULL)
+//    polyData->Update(); //VTK6_TODO vtk pipeline
 }
 
 mitk::Surface::Surface()
@@ -200,11 +200,11 @@ void mitk::Surface::CalculateBoundingBox()
   for (unsigned int i = 0; i < m_PolyDatas.size(); ++i)
   {
     vtkPolyData* polyData = m_PolyDatas[i];
-    vtkFloatingPointType bounds[6] = {0};
+    double bounds[6] = {0};
 
     if (polyData != NULL && polyData->GetNumberOfPoints() > 0)
     {
-      polyData->Update();
+//      polyData->Update(); //VTK6_TODO vtk pipeline
       polyData->ComputeBounds();
       polyData->GetBounds(bounds);
     }

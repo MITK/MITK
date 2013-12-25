@@ -39,6 +39,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
                              # automatic loading of this module
       ADDITIONAL_LIBS        # list of addidtional libraries linked to this module
       GENERATED_CPP          # not used (?)
+      DEPRECATED_SINCE       # marks this modules as deprecated
      )
 
   set(_macro_options
@@ -67,6 +68,12 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
     endif()
   endif()
 
+  if(MODULE_DEPRECATED_SINCE)
+    set(MODULE_IS_DEPRECATED 1)
+  else()
+    set(MODULE_IS_DEPRECATED 0)
+  endif()
+
   if(NOT MODULE_SUBPROJECTS)
     if(MITK_DEFAULT_SUBPROJECTS)
       set(MODULE_SUBPROJECTS ${MITK_DEFAULT_SUBPROJECTS})
@@ -88,7 +95,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
       message(SEND_ERROR "The module target \"${MODULE_AUTOLOAD_WITH}\" specified as the auto-loading module for \"${MODULE_NAME}\" does not exist")
     endif()
     # create a meta-target if it does not already exist
-    set(_module_autoload_meta_target "${MODULE_AUTOLOAD_WITH}-universe")
+    set(_module_autoload_meta_target "${MODULE_AUTOLOAD_WITH}-autoload")
     if(NOT TARGET ${_module_autoload_meta_target})
       add_custom_target(${_module_autoload_meta_target})
     endif()
@@ -247,15 +254,17 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           set(_STATIC )
         endif(MODULE_FORCE_STATIC)
 
-        if(NOT MODULE_NO_INIT AND NOT MODULE_HEADERS_ONLY)
+        if(NOT MODULE_HEADERS_ONLY)
           set(MODULE_LIBNAME ${MODULE_PROVIDES})
 
-          usFunctionGenerateModuleInit(CPP_FILES
-                                       NAME ${MODULE_NAME}
-                                       LIBRARY_NAME ${MODULE_LIBNAME}
-                                       DEPENDS ${MODULE_DEPENDS} ${MODULE_DEPENDS_INTERNAL} ${MODULE_PACKAGE_DEPENDS}
-                                       #VERSION ${MODULE_VERSION}
-                                      )
+          if(NOT MODULE_NO_INIT)
+            usFunctionGenerateModuleInit(CPP_FILES
+                                         NAME ${MODULE_NAME}
+                                         LIBRARY_NAME ${MODULE_LIBNAME}
+                                         DEPENDS ${MODULE_DEPENDS} ${MODULE_DEPENDS_INTERNAL} ${MODULE_PACKAGE_DEPENDS}
+                                         #VERSION ${MODULE_VERSION}
+                                        )
+          endif()
 
           if(RESOURCE_FILES)
             set(res_dir Resources)
@@ -410,11 +419,6 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
 
             # add the auto-load module name as a property
             set_property(TARGET ${MODULE_AUTOLOAD_WITH} APPEND PROPERTY MITK_AUTOLOAD_TARGETS ${MODULE_PROVIDES})
-          else()
-            # Add meta dependencies (e.g. on auto-load modules from depending modules)
-            if(ALL_META_DEPENDENCIES)
-              add_dependencies(${MODULE_PROVIDES} ${ALL_META_DEPENDENCIES})
-            endif()
           endif()
         endif()
 
@@ -425,5 +429,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
   if(NOT MODULE_IS_ENABLED)
     _MITK_CREATE_MODULE_CONF()
   endif(NOT MODULE_IS_ENABLED)
+
+  unset(MODULE_IS_DEPRECATED)
 
 endmacro(MITK_CREATE_MODULE)

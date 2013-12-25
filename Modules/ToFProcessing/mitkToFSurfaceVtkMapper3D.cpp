@@ -92,12 +92,12 @@ void mitk::ToFSurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
 
   if ( m_GenerateNormals )
   {
-    ls->m_VtkPolyDataNormals->SetInput( polydata );
-    ls->m_VtkPolyDataMapper->SetInput( ls->m_VtkPolyDataNormals->GetOutput() );
+    ls->m_VtkPolyDataNormals->SetInputData( polydata );
+    ls->m_VtkPolyDataMapper->SetInputConnection( ls->m_VtkPolyDataNormals->GetOutputPort() );
   }
   else
   {
-    ls->m_VtkPolyDataMapper->SetInput( polydata );
+    ls->m_VtkPolyDataMapper->SetInputData( polydata );
   }
 
   //
@@ -489,7 +489,7 @@ void mitk::ToFSurfaceVtkMapper3D::SetImmediateModeRenderingOn(int  /*on*/)
 void mitk::ToFSurfaceVtkMapper3D::SetTexture(vtkImageData *img)
 {
     this->m_Texture = vtkSmartPointer<vtkTexture>::New();
-    this->m_Texture->SetInput(img);
+    this->m_Texture->SetInputData(img);
     //    MITK_INFO << "Neuer Code";
 }
 

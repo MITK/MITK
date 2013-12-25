@@ -7,7 +7,6 @@ set(_srcs
   util/jsoncpp.cpp
   util/usLDAPProp.cpp
   util/usSharedLibrary.cpp
-  util/usThreads.cpp
   util/usUncompressResourceData.c
   util/usUncompressResourceData.cpp
   util/usUtils.cpp
@@ -16,8 +15,12 @@ set(_srcs
   service/usLDAPFilter.cpp
   service/usServiceException.cpp
   service/usServiceEvent.cpp
+  service/usServiceEventListenerHook.cpp
+  service/usServiceFindHook.cpp
+  service/usServiceHooks.cpp
   service/usServiceListenerEntry.cpp
   service/usServiceListenerEntry_p.h
+  service/usServiceListenerHook.cpp
   service/usServiceListeners.cpp
   service/usServiceListeners_p.h
   service/usServiceObjects.cpp
@@ -30,11 +33,15 @@ set(_srcs
   service/usServiceRegistry.cpp
   service/usServiceRegistry_p.h
 
+  module/usCoreModuleActivator.cpp
   module/usCoreModuleContext_p.h
   module/usCoreModuleContext.cpp
   module/usModuleContext.cpp
   module/usModule.cpp
   module/usModuleEvent.cpp
+  module/usModuleEventHook.cpp
+  module/usModuleFindHook.cpp
+  module/usModuleHooks.cpp
   module/usModuleInfo.cpp
   module/usModuleManifest.cpp
   module/usModulePrivate.cpp
@@ -51,14 +58,19 @@ set(_srcs
 set(_private_headers
   util/usAtomicInt_p.h
   util/usFunctor_p.h
+  util/usListenerFunctors_p.h
+  util/usLog_p.h
   util/usStaticInit_p.h
   util/usThreads_p.h
   util/usUtils_p.h
+  util/usWaitCondition_p.h
 
   util/dirent_win32_p.h
   util/stdint_p.h
   util/stdint_vc_p.h
 
+  service/usServiceHooks_p.h
+  service/usServiceListenerHook_p.h
   service/usServicePropertiesImpl_p.h
   service/usServiceTracker.tpp
   service/usServiceTrackerPrivate.h
@@ -69,6 +81,7 @@ set(_private_headers
 
   module/usModuleAbstractTracked_p.h
   module/usModuleAbstractTracked.tpp
+  module/usModuleHooks_p.h
   module/usModuleResourceBuffer_p.h
   module/usModuleResourceTree_p.h
   module/usModuleUtils_p.h
@@ -79,14 +92,19 @@ set(_public_headers
   util/usLDAPProp.h
   util/usSharedData.h
   util/usSharedLibrary.h
+  util/usShrinkableMap.h
+  util/usShrinkableVector.h
   util/usUncompressResourceData.h
 
   service/usLDAPFilter.h
   service/usPrototypeServiceFactory.h
   service/usServiceEvent.h
+  service/usServiceEventListenerHook.h
   service/usServiceException.h
   service/usServiceFactory.h
+  service/usServiceFindHook.h
   service/usServiceInterface.h
+  service/usServiceListenerHook.h
   service/usServiceObjects.h
   service/usServiceProperties.h
   service/usServiceReference.h
@@ -101,6 +119,8 @@ set(_public_headers
   module/usModuleActivator.h
   module/usModuleContext.h
   module/usModuleEvent.h
+  module/usModuleEventHook.h
+  module/usModuleFindHook.h
   module/usModuleImport.h
   module/usModuleInfo.h
   module/usModuleInitialization.h

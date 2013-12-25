@@ -109,8 +109,8 @@ void mitk::SurfaceGLMapper2D::SetDataNode( mitk::DataNode* node )
   if (!useCellData)
   {
     // search min/max point scalars over all time steps
-    vtkFloatingPointType dataRange[2] = {0,0};
-    vtkFloatingPointType range[2];
+    double dataRange[2] = {0,0};
+    double range[2];
 
     Surface::Pointer input  = const_cast< Surface* >(dynamic_cast<const Surface*>( this->GetDataNode()->GetData() ));
     if(input.IsNull()) return;
@@ -202,8 +202,8 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     Vector3D normal;
 
     //Check if Lookup-Table is already given, else use standard one.
-    vtkFloatingPointType* scalarLimits = m_LUT->GetTableRange();
-    vtkFloatingPointType scalarsMin = scalarLimits[0], scalarsMax = scalarLimits[1];
+    double* scalarLimits = m_LUT->GetTableRange();
+    double scalarsMin = scalarLimits[0], scalarsMax = scalarLimits[1];
 
     vtkLookupTable *lut;// = vtkLookupTable::New();
 
@@ -264,7 +264,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
         return;
     }
 
-    vtkFloatingPointType vp[3], vnormal[3];
+    double vp[3], vnormal[3];
 
     vnl2vtk(point.GetVnlVector(), vp);
     vnl2vtk(normal.GetVnlVector(), vnormal);
@@ -281,14 +281,14 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     m_Plane->SetNormal(vnormal);
 
     //set data into cutter
-    m_Cutter->SetInput(vtkpolydata);
+    m_Cutter->SetInputData(vtkpolydata);
     m_Cutter->Update();
     //    m_Cutter->GenerateCutScalarsOff();
     //    m_Cutter->SetSortByToSortByCell();
 
     if (m_DrawNormals)
     {
-      m_Stripper->SetInput( m_Cutter->GetOutput() );
+      m_Stripper->SetInputData( m_Cutter->GetOutput() );
       // calculate the cut
       m_Stripper->Update();
       PaintCells(renderer, m_Stripper->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut, vtkpolydata);
@@ -359,7 +359,7 @@ void mitk::SurfaceGLMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyDa
   {
     vtkIdType *cell(NULL);
     vtkIdType cellSize(0);
-    vtkFloatingPointType vp[3];
+    double vp[3];
 
     vlines->GetNextCell(cellSize, cell);
 
@@ -390,7 +390,7 @@ void mitk::SurfaceGLMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyDa
       //convert point (until now mm and in world coordinates) to display coordinates (units )
       displayGeometry->WorldToDisplay(p2d, p2d);
 
-      vtkFloatingPointType color[3];
+      double color[3];
       if (useCellData && vcellscalars != NULL )
       {
         // color each cell according to cell data

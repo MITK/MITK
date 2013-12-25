@@ -36,7 +36,7 @@ class MITK_CORE_EXPORT vtkEventProvider : public vtkInteractorObserver
 {
   public:
     static vtkEventProvider *New();
-    vtkTypeRevisionMacro(vtkEventProvider,vtkInteractorObserver);
+    vtkTypeMacro(vtkEventProvider,vtkInteractorObserver);
 
     // Satisfy the superclass API. Enable/disable listening for events.
     virtual void SetEnabled(int);

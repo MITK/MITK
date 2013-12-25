@@ -60,7 +60,7 @@ mitk::LabelOverlay3D::LocalStorage::LocalStorage()
   m_Points->GetPointData()->AddArray(m_Labels);
 
   m_PointSetToLabelHierarchyFilter = vtkSmartPointer<vtkPointSetToLabelHierarchy>::New();
-  m_PointSetToLabelHierarchyFilter->SetInput(m_Points);
+  m_PointSetToLabelHierarchyFilter->SetInputData(m_Points);
   m_PointSetToLabelHierarchyFilter->SetLabelArrayName("labels");
   m_PointSetToLabelHierarchyFilter->SetPriorityArrayName("sizes");
   m_PointSetToLabelHierarchyFilter->Update();

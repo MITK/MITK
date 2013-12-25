@@ -177,61 +177,61 @@ void mitk::ImageDataItem::ConstructVtkImageData(ImagePointer iP) const
     return;
   }
 
-  inData->SetNumberOfScalarComponents(m_PixelType->GetNumberOfComponents());
+  int datatype;
 
 /*  if ( ( m_PixelType.GetType() == mitkIpPicInt || m_PixelType.GetType() == mitkIpPicUInt ) && m_PixelType.GetBitsPerComponent() == 1 )
   {
-    inData->SetScalarType( VTK_BIT );
+    datatype = VTK_BIT );
     scalars = vtkBitArray::New();
   }
   else*/ if ( m_PixelType->GetComponentType() == itk::ImageIOBase::CHAR )
   {
-    inData->SetScalarType( VTK_CHAR );
+    datatype = VTK_CHAR;
     scalars = vtkCharArray::New();
   }
   else if (   m_PixelType->GetComponentType() == itk::ImageIOBase::UCHAR)
   {
-    inData->SetScalarType( VTK_UNSIGNED_CHAR );
+    datatype = VTK_UNSIGNED_CHAR;
     scalars = vtkUnsignedCharArray::New();
   }
   else if (  m_PixelType->GetComponentType() == itk::ImageIOBase::SHORT )
   {
-    inData->SetScalarType( VTK_SHORT );
+    datatype = VTK_SHORT;
     scalars = vtkShortArray::New();
   }
   else if (   m_PixelType->GetComponentType() == itk::ImageIOBase::USHORT )
   {
-    inData->SetScalarType( VTK_UNSIGNED_SHORT );
+    datatype = VTK_UNSIGNED_SHORT;
     scalars = vtkUnsignedShortArray::New();
   }
   else if (  m_PixelType->GetComponentType() == itk::ImageIOBase::INT )
   {
-    inData->SetScalarType( VTK_INT );
+    datatype = VTK_INT;
     scalars = vtkIntArray::New();
   }
   else if (   m_PixelType->GetComponentType() == itk::ImageIOBase::UINT )
   {
-    inData->SetScalarType( VTK_UNSIGNED_INT );
+    datatype = VTK_UNSIGNED_INT;
     scalars = vtkUnsignedIntArray::New();
   }
   else if ( m_PixelType->GetComponentType() == itk::ImageIOBase::LONG )
   {
-    inData->SetScalarType( VTK_LONG );
+    datatype = VTK_LONG;
     scalars = vtkLongArray::New();
   }
   else if (  m_PixelType->GetComponentType() == itk::ImageIOBase::ULONG )
   {
-    inData->SetScalarType( VTK_UNSIGNED_LONG );
+    datatype = VTK_UNSIGNED_LONG;
     scalars = vtkUnsignedLongArray::New();
   }
   else if (  m_PixelType->GetComponentType() == itk::ImageIOBase::FLOAT  )
   {
-    inData->SetScalarType( VTK_FLOAT );
+    datatype = VTK_FLOAT;
     scalars = vtkFloatArray::New();
   }
   else if (  m_PixelType->GetComponentType() == itk::ImageIOBase::DOUBLE  )
   {
-    inData->SetScalarType( VTK_DOUBLE );
+    datatype = VTK_DOUBLE;
     scalars = vtkDoubleArray::New();
   }
   else
@@ -239,6 +239,8 @@ void mitk::ImageDataItem::ConstructVtkImageData(ImagePointer iP) const
     inData->Delete();
     return;
   }
+
+  inData->AllocateScalars(datatype,m_PixelType->GetNumberOfComponents());
 
   m_VtkImageData = inData;
 

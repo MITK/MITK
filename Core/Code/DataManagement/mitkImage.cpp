@@ -960,7 +960,7 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
 
   // access origin of vtkImage
   Point3D origin;
-  vtkFloatingPointType vtkorigin[3];
+  double vtkorigin[3];
   vtkimagedata->GetOrigin(vtkorigin);
   FillVector3D(origin, vtkorigin[0], 0.0, 0.0);
   if(m_Dimension>=2)

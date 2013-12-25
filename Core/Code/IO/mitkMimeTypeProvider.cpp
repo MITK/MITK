@@ -167,7 +167,7 @@ std::vector<std::string> MimeTypeProvider::GetCategories() const
   return result;
 }
 
-us::ServiceReference<IMimeType> MimeTypeProvider::AddingService(const ServiceReferenceT& reference)
+us::ServiceReference<IMimeType> MimeTypeProvider::AddingService(const ServiceReferenceType& reference)
 {
   us::Any id = reference.GetProperty(IMimeType::PROP_ID());
   if (!id.Empty() && id.Type() == typeid(std::string))
@@ -175,14 +175,14 @@ us::ServiceReference<IMimeType> MimeTypeProvider::AddingService(const ServiceRef
     m_MimeTypeToRefs[us::ref_any_cast<std::string>(id)].insert(reference);
     return reference;
   }
-  return ServiceReferenceT();
+  return ServiceReferenceType();
 }
 
-void MimeTypeProvider::ModifiedService(const ServiceReferenceT& /*reference*/, ServiceReferenceT /*service*/)
+void MimeTypeProvider::ModifiedService(const ServiceReferenceType& /*reference*/, ServiceReferenceType /*service*/)
 {
 }
 
-void MimeTypeProvider::RemovedService(const ServiceReferenceT& /*reference*/, ServiceReferenceT service)
+void MimeTypeProvider::RemovedService(const ServiceReferenceType& /*reference*/, ServiceReferenceType service)
 {
   std::string id = us::ref_any_cast<std::string>(service.GetProperty(IMimeType::PROP_ID()));
   std::set<us::ServiceReferenceU>& refs = m_MimeTypeToRefs[id];

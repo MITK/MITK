@@ -364,9 +364,11 @@ mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters(
     //add them to the sorted set
     fileWritersSet.insert(list2.begin(), list2.end());
   }
+
   //write back to allWriters to return a list
   allWriters.clear();
   allWriters.insert(allWriters.end(), fileWritersSet.begin(), fileWritersSet.end());
+
   return allWriters;
 }
 

@@ -266,14 +266,14 @@ void mitk::ExtractSliceFilter::GenerateData(){
     unitSpacingImageFilter->ReleaseDataFlagOn();
 
     unitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
-    unitSpacingImageFilter->SetInput( input->GetVtkImageData(m_TimeStep) );
+    unitSpacingImageFilter->SetInputData( input->GetVtkImageData(m_TimeStep) );
 
-    m_Reslicer->SetInput(unitSpacingImageFilter->GetOutput() );
+    m_Reslicer->SetInputConnection(unitSpacingImageFilter->GetOutputPort() );
   }
   else
   {
     //if no tranform is set the image can be used directly
-    m_Reslicer->SetInput(input->GetVtkImageData(m_TimeStep));
+    m_Reslicer->SetInputData(input->GetVtkImageData(m_TimeStep));
   }
 
 
@@ -329,7 +329,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
   xMax = static_cast< int >( extent[0]);
   yMax = static_cast< int >( extent[1]);
 
-  vtkFloatingPointType sliceBounds[6];
+  double sliceBounds[6];
   if (m_WorldGeometry->GetReferenceGeometry())
   {
     for ( int i = 0; i < 6; ++i )
@@ -467,7 +467,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 }
 
 
-bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(vtkFloatingPointType bounds[6]){
+bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(double bounds[6]){
 
   if(!m_WorldGeometry || !this->GetInput())
     return false;
@@ -478,7 +478,7 @@ bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(vtkFloatingPointType bounds
 
 
 bool mitk::ExtractSliceFilter::GetClippedPlaneBounds( const Geometry3D *boundingGeometry,
-                                                     const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
+                                                     const PlaneGeometry *planeGeometry, double *bounds )
 {
   bool b =  mitk::PlaneClipping::CalculateClippedPlaneBounds(boundingGeometry, planeGeometry, bounds);
 

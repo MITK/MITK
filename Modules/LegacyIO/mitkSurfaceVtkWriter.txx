@@ -103,12 +103,12 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
       m_VtkWriter->SetFileName(m_FileName.c_str());
 
     geometry->TransferItkToVtkTransform();
-    transformPolyData->SetInput(input->GetVtkPolyData(t));
+    transformPolyData->SetInputData(input->GetVtkPolyData(t));
     transformPolyData->SetTransform(geometry->GetVtkTransform());
     transformPolyData->UpdateWholeExtent();
     polyData = transformPolyData->GetOutput();
 
-    m_VtkWriter->SetInput(polyData);
+    m_VtkWriter->SetInputData(polyData);
 
     ExecuteWrite( m_VtkWriter );
   }

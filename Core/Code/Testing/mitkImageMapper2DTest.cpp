@@ -26,8 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTransferFunctionProperty.h>
 #include <mitkTransferFunction.h>
 
-#include <mitkNativeRenderWindowInteractor.h>
-
 #include "mitkReferenceCountWatcher.h"
 
 #include <fstream>

@@ -21,17 +21,18 @@
 
 
 #include <usConfig.h>
-#include "usCoreModuleContext_p.h"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4355)
-#endif
+US_MSVC_DISABLE_WARNING(4355)
+
+#include "usCoreModuleContext_p.h"
 
 US_BEGIN_NAMESPACE
 
 CoreModuleContext::CoreModuleContext()
-  : services(this)
+  : listeners(this)
+  , services(this)
+  , serviceHooks(this)
+  , moduleHooks(this)
 {
 }
 
@@ -39,8 +40,14 @@ CoreModuleContext::~CoreModuleContext()
 {
 }
 
-US_END_NAMESPACE
+void CoreModuleContext::Init()
+{
+  serviceHooks.Open();
+}
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+void CoreModuleContext::Uninit()
+{
+  serviceHooks.Close();
+}
+
+US_END_NAMESPACE

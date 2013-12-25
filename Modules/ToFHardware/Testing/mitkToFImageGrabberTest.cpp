@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFImageGrabber.h>
 
 #include <mitkImageDataItem.h>
-#include <mitkPicFileReader.h>
+#include <mitkIOUtil.h>
 #include <mitkToFCameraMITKPlayerDevice.h>
 #include <mitkToFConfig.h>
 #include "mitkImageReadAccessor.h"
@@ -79,7 +79,6 @@ int mitkToFImageGrabberTest(int /* argc */, char* /*argv*/[])
   tofImageGrabber->SetProperty("IntensityImageFileName",mitk::StringProperty::New(intensityFileName));
 
   // Load images with PicFileReader for comparison
-  mitk::PicFileReader::Pointer picFileReader = mitk::PicFileReader::New();
   mitk::Image::Pointer expectedResultImage = NULL;
 
   MITK_TEST_OUTPUT(<<"Test ToFImageGrabber using ToFCameraMITKPlayerDevice");
@@ -88,9 +87,7 @@ int mitkToFImageGrabberTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_OUTPUT(<<"Call StartCamera()");
   tofImageGrabber->StartCamera();
   MITK_TEST_CONDITION_REQUIRED(tofImageGrabber->IsCameraActive(),"IsCameraActive() after StartCamera()");
-  picFileReader->SetFileName(distanceFileName);
-  picFileReader->Update();
-  expectedResultImage = picFileReader->GetOutput();
+  expectedResultImage = mitk::IOUtil::LoadImage(distanceFileName);
   int captureWidth = expectedResultImage->GetDimension(0);
   int captureHeight = expectedResultImage->GetDimension(1);
   MITK_TEST_CONDITION_REQUIRED(tofImageGrabber->GetCaptureWidth()==captureWidth,"Test GetCaptureWidth()");
@@ -99,12 +96,10 @@ int mitkToFImageGrabberTest(int /* argc */, char* /*argv*/[])
   tofImageGrabber->Update();
   mitk::Image::Pointer distanceImage = tofImageGrabber->GetOutput();
   MITK_TEST_CONDITION_REQUIRED(CompareImages(expectedResultImage,distanceImage),"Test GetOutput()");
-  picFileReader->SetFileName(amplitudeFileName);
-  picFileReader->Update();
+  expectedResultImage = mitk::IOUtil::LoadImage(amplitudeFileName);
   mitk::Image::Pointer amplitudeImage = tofImageGrabber->GetOutput(1);
   MITK_TEST_CONDITION_REQUIRED(CompareImages(expectedResultImage,amplitudeImage),"Test GetOutput(1)");
-  picFileReader->SetFileName(intensityFileName);
-  picFileReader->Update();
+  expectedResultImage = mitk::IOUtil::LoadImage(intensityFileName);
   mitk::Image::Pointer intensityImage = tofImageGrabber->GetOutput(2);
   MITK_TEST_CONDITION_REQUIRED(CompareImages(expectedResultImage,intensityImage),"Test GetOutput(2)");
   MITK_TEST_OUTPUT(<<"Call StopCamera()");

@@ -47,32 +47,33 @@ mitk::ImageToSurfaceFilter::~ImageToSurfaceFilter()
 void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface * surface, const ScalarType threshold)
 {
   vtkImageChangeInformation *indexCoordinatesImageFilter = vtkImageChangeInformation::New();
-  indexCoordinatesImageFilter->SetInput(vtkimage);
+  indexCoordinatesImageFilter->SetInputData(vtkimage);
   indexCoordinatesImageFilter->SetOutputOrigin(0.0,0.0,0.0);
 
   //MarchingCube -->create Surface
-  vtkMarchingCubes *skinExtractor = vtkMarchingCubes::New();
+  vtkSmartPointer<vtkMarchingCubes> skinExtractor = vtkSmartPointer<vtkMarchingCubes>::New();
   skinExtractor->ComputeScalarsOff();
-  skinExtractor->SetInput(indexCoordinatesImageFilter->GetOutput());//RC++
+  skinExtractor->SetInputConnection(indexCoordinatesImageFilter->GetOutputPort());//RC++
   indexCoordinatesImageFilter->Delete();
   skinExtractor->SetValue(0, threshold);
 
   vtkPolyData *polydata;
+  skinExtractor->Update();
   polydata = skinExtractor->GetOutput();
   polydata->Register(NULL);//RC++
-  skinExtractor->Delete();
 
   if (m_Smooth)
   {
     vtkSmoothPolyDataFilter *smoother = vtkSmoothPolyDataFilter::New();
     //read poly1 (poly1 can be the original polygon, or the decimated polygon)
-    smoother->SetInput(polydata);//RC++
+    smoother->SetInputConnection(skinExtractor->GetOutputPort());//RC++
     smoother->SetNumberOfIterations( m_SmoothIteration );
     smoother->SetRelaxationFactor( m_SmoothRelaxation );
     smoother->SetFeatureAngle( 60 );
     smoother->FeatureEdgeSmoothingOff();
     smoother->BoundarySmoothingOff();
     smoother->SetConvergence( 0 );
+    smoother->Update();
 
     polydata->Delete();//RC--
     polydata = smoother->GetOutput();
@@ -92,9 +93,10 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     decimate->BoundaryVertexDeletionOff();
     decimate->SetDegree(10); //std-value is 25!
 
-    decimate->SetInput(polydata);//RC++
+    decimate->SetInputData(polydata);//RC++
     decimate->SetTargetReduction(m_TargetReduction);
     decimate->SetMaximumError(0.002);
+    decimate->Update();
 
     polydata->Delete();//RC--
     polydata = decimate->GetOutput();
@@ -106,17 +108,15 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     vtkQuadricDecimation* decimate = vtkQuadricDecimation::New();
     decimate->SetTargetReduction(m_TargetReduction);
 
-    decimate->SetInput(polydata);
+    decimate->SetInputData(polydata);
+    decimate->Update();
     polydata->Delete();
     polydata = decimate->GetOutput();
     polydata->Register(NULL);
     decimate->Delete();
   }
 
-  polydata->Update();
   ProgressBar::GetInstance()->Progress();
-
-  polydata->SetSource(NULL);
 
   if(polydata->GetNumberOfPoints() > 0)
   {
@@ -133,7 +133,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
         matrix[i][j]/=spacing[j];
 
     unsigned int n = points->GetNumberOfPoints();
-    vtkFloatingPointType point[3];
+    double point[3];
 
     for (i = 0; i < n; i++)
     {
@@ -147,10 +147,10 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
 
   // determine point_data normals for the poly data points.
   vtkSmartPointer<vtkPolyDataNormals> normalsGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
-  normalsGenerator->SetInput( polydata );
+  normalsGenerator->SetInputData( polydata );
 
   vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-  cleanPolyDataFilter->SetInput(normalsGenerator->GetOutput());
+  cleanPolyDataFilter->SetInputConnection(normalsGenerator->GetOutputPort());
   cleanPolyDataFilter->PieceInvariantOff();
   cleanPolyDataFilter->ConvertLinesToPointsOff();
   cleanPolyDataFilter->ConvertPolysToLinesOff();

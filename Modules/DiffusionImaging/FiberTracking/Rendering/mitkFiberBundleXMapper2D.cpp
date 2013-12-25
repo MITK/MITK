@@ -202,7 +202,7 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
     }
     int lineWidth = 1;
     node->GetIntProperty("LineWidth",lineWidth);
-    localStorage->m_PointMapper->SetInput(fbx->GetFiberPolyData());
+    localStorage->m_PointMapper->SetInputData(fbx->GetFiberPolyData());
     localStorage->m_PointActor->SetMapper(localStorage->m_PointMapper);
     localStorage->m_PointActor->GetProperty()->ShadingOn();
     localStorage->m_PointActor->GetProperty()->SetLineWidth(lineWidth);

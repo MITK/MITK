@@ -610,7 +610,7 @@ bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string path)
             if( polys->GetNumberOfStrips() > 0 )
             {
                 vtkSmartPointer<vtkTriangleFilter> triangleFilter = vtkSmartPointer<vtkTriangleFilter>::New();
-                triangleFilter->SetInput(polys);
+                triangleFilter->SetInputData(polys);
                 triangleFilter->Update();
                 polys = triangleFilter->GetOutput();
                 polys->Register(NULL);

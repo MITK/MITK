@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTextProperty.h>
 #include "vtkUnicodeString.h"
 #include <vtkImageMapper.h>
-#include "vtkQtStringToImage.h"
 #include <vtkFreeTypeStringToImage.h>
 #include <vtkTextActor.h>
 #include <vtkImageMapper.h>
@@ -63,7 +62,7 @@ mitk::TextOverlay2D::LocalStorage::LocalStorage()
   m_textActor = vtkSmartPointer<vtkActor2D>::New();
   m_textImage = vtkSmartPointer<vtkImageData>::New();
   m_imageMapper = vtkSmartPointer<vtkImageMapper>::New();
-  m_imageMapper->SetInputConnection(m_textImage->GetProducerPort());
+  m_imageMapper->SetInputData(m_textImage);
   m_textActor->SetMapper(m_imageMapper);
 }
 

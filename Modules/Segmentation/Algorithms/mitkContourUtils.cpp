@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkInstantiateAccessFunctions.h"
+#include "mitkLegacyAdaptors.h"
 #include "ipSegmentation.h"
 
 #define InstantiateAccessFunction_ItkCopyFilledContourToSlice(pixelType, dim) \

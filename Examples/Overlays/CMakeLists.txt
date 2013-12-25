@@ -1,8 +1,7 @@
 project(OverlayExample)
 
 find_package(MITK REQUIRED)
-  MITK_USE_MODULE(QmitkExt)
-  MITK_USE_MODULE(MitkExt)
+MITK_USE_MODULE(Qmitk)
 
 include_directories(${ALL_INCLUDE_DIRECTORIES})
 

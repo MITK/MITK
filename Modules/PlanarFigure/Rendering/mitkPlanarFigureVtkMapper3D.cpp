@@ -170,7 +170,7 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* render
     polyData->SetLines(cells);
 
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInput(polyData);
+    mapper->SetInputData(polyData);
 
     localStorage->m_Actor->SetMapper(mapper);
   }

@@ -15,7 +15,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkThickPlane, "$Revision: 1.41 $");
 vtkStandardNewMacro(vtkThickPlane);
 
 // Construct plane passing through origin and normal to z-axis.

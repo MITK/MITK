@@ -32,13 +32,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-static itk::SimpleFastMutexLock s_ContextToServicesMapMutex;
-static std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> > s_ContextToServicesMap;
+itk::SimpleFastMutexLock& s_ContextToServicesMapMutex()
+{
+  static itk::SimpleFastMutexLock mutex;
+  return mutex;
+}
+
+std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> >& s_ContextToServicesMap()
+{
+  static std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> > serviceMap;
+  return serviceMap;
+}
 
 template<class S>
 static S* GetCoreService(us::ModuleContext* context)
 {
-  itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex);
+  itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex());
   S* coreService = NULL;
   us::ServiceReference<S> serviceRef = context->GetServiceReference<S>();
   if (serviceRef)
@@ -47,7 +56,7 @@ static S* GetCoreService(us::ModuleContext* context)
   }
 
   assert(coreService && "Asserting non-NULL MITK core service");
-  s_ContextToServicesMap[context].insert(std::make_pair(coreService,serviceRef));
+  s_ContextToServicesMap()[context].insert(std::make_pair(coreService,serviceRef));
 
   return coreService;
 }
@@ -86,9 +95,9 @@ bool CoreServices::Unget(us::ModuleContext* context, const std::string& /*interf
 {
   bool success = false;
 
-  itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex);
-  std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> >::iterator iter = s_ContextToServicesMap.find(context);
-  if (iter != s_ContextToServicesMap.end())
+  itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex());
+  std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> >::iterator iter = s_ContextToServicesMap().find(context);
+  if (iter != s_ContextToServicesMap().end())
   {
     std::map<void*,us::ServiceReferenceU>::iterator iter2 = iter->second.find(service);
     if (iter2 != iter->second.end())

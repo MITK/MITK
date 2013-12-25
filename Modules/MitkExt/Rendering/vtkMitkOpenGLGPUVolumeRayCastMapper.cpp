@@ -237,7 +237,6 @@ const int vtkMitkOpenGLGPUVolumeRayCastMapperNumberOfTextureObjects=vtkMitkOpenG
 const int vtkMitkOpenGLGPUVolumeRayCastMapperOpacityTableSize=1024; //power of two
 
 #ifndef VTK_IMPLEMENT_MESA_CXX
-vtkCxxRevisionMacro(vtkMitkOpenGLGPUVolumeRayCastMapper, "$Revision: 1.9 $");
 vtkStandardNewMacro(vtkMitkOpenGLGPUVolumeRayCastMapper);
 #endif
 

@@ -35,15 +35,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkMapper.h>
 #include <mitkVtkMapper.h>
 #include <mitkGLMapper.h>
-#include <mitkMeshMapper2D.h>
-#include <mitkUnstructuredGridMapper2D.h>
 #include <mitkLineMapper2D.h>
-#include <mitkSplineMapper2D.h>
 
-#include <mitkMeshVtkMapper3D.h>
-#include <mitkUnstructuredGridVtkMapper3D.h>
 #include <mitkLineVtkMapper3D.h>
-#include <mitkSplineVtkMapper3D.h>
 
 //Interactors
 #include <mitkConnectPointsInteractor.h>
@@ -113,34 +107,9 @@ static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
   dataNode->SetMapper(0,mapper);
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(0), "Testing if a NULL pointer was set correctly" )
 
-  mapper = mitk::MeshMapper2D::New();
-  dataNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a MeshMapper2D was set correctly" )
-  MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
-
-  mapper = mitk::UnstructuredGridMapper2D::New();
-  dataNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a UnstructuredGridMapper2D was set correctly" )
-  MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
-
   mapper = mitk::LineMapper2D::New();
   dataNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a LineMapper2D was set correctly" )
-  MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
-
-  mapper = mitk::SplineMapper2D::New();
-  dataNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a SplineMapper2D was set correctly" )
-  MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
-
-  mapper = mitk::MeshVtkMapper3D::New();
-  dataNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a MeshVtkMapper3D was set correctly" )
-  MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
-
-  mapper = mitk::UnstructuredGridVtkMapper3D::New();
-  dataNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a UnstructuredGridVtkMapper3D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   //linker error
@@ -148,12 +117,8 @@ static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
   //dataNode->SetMapper(1,mapper);
   //MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a LineVtkMapper3D was set correctly" )
   //MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
-
-  mapper = mitk::SplineVtkMapper3D::New();
-  dataNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a SplineVtkMapper3D was set correctly" )
-  MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 }
+
 static void TestInteractorSetting(mitk::DataNode::Pointer dataNode)
 {
 

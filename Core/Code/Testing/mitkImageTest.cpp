@@ -318,8 +318,7 @@ int mitkImageTest(int argc, char* argv[])
   mitk::vtk2itk(vtkorigin, vtkoriginAsMitkPoint);
   double vtkspacing[] =  {1.367, 1.367, 2};
   vtkimage->SetSpacing(vtkspacing);
-  vtkimage->SetScalarType( VTK_SHORT );
-  vtkimage->AllocateScalars();
+  vtkimage->AllocateScalars(VTK_SHORT,1);
   std::cout<<"[PASSED]"<<std::endl;
 
   MITK_TEST_OUTPUT(<< " Testing mitk::Image::Initialize(vtkImageData*, ...)");

@@ -31,7 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkMimeTypeProvider.h>
 #include <mitkPointSetReaderService.h>
 
-// Microservices
+// Micro Services
+#include <usModuleInitialization.h>
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 #include <usModuleSettings.h>
@@ -90,9 +91,9 @@ void AddMitkAutoLoadPaths(const std::string& programPath)
 }
 
 /*
-* This is the module activator for the "Mitk" module. It registers core services
-* like ...
-*/
+ * This is the module activator for the "Mitk" module. It registers core services
+ * like ...
+ */
 class MitkCoreActivator : public us::ModuleActivator
 {
 public:
@@ -204,9 +205,9 @@ void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
   {
     // search and load shader files
     std::vector<us::ModuleResource> shaderResoruces =
-      moduleEvent.GetModule()->FindResources("Shaders", "*.xml", true);
+        moduleEvent.GetModule()->FindResources("Shaders", "*.xml", true);
     for (std::vector<us::ModuleResource>::iterator i = shaderResoruces.begin();
-      i != shaderResoruces.end(); ++i)
+         i != shaderResoruces.end(); ++i)
     {
       if (*i)
       {
@@ -222,11 +223,11 @@ void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
   else if (moduleEvent.GetType() == us::ModuleEvent::UNLOADED)
   {
     std::map<long, std::vector<int> >::iterator shaderIdsIter =
-      moduleIdToShaderIds.find(moduleEvent.GetModule()->GetModuleId());
+        moduleIdToShaderIds.find(moduleEvent.GetModule()->GetModuleId());
     if (shaderIdsIter != moduleIdToShaderIds.end())
     {
       for (std::vector<int>::iterator idIter = shaderIdsIter->second.begin();
-        idIter != shaderIdsIter->second.end(); ++idIter)
+           idIter != shaderIdsIter->second.end(); ++idIter)
       {
         m_ShaderRepository->UnloadShader(*idIter);
       }
@@ -236,3 +237,9 @@ void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
 }
 
 US_EXPORT_MODULE_ACTIVATOR(Mitk, MitkCoreActivator)
+
+// Call CppMicroservices initialization code at the end of the file.
+// This especially ensures that VTK object factories have already
+// been registered (VTK initialization code is injected by implicitly
+// include VTK header files at the top of this file).
+US_INITIALIZE_MODULE("Mitk", "Mitk")

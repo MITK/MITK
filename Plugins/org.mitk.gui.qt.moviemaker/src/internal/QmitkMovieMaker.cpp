@@ -727,7 +727,7 @@ void QmitkMovieMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int magnifi
   magnifier->SetInput(renderer);
   magnifier->SetMagnification(magnificationFactor);
   //magnifier->Update();
-  fileWriter->SetInput(magnifier->GetOutput());
+  fileWriter->SetInputConnection(magnifier->GetOutputPort());
   fileWriter->SetFileName(fileName.toLatin1());
 
   // vtkRenderLargeImage has problems with different layers, therefore we have to

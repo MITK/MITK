@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkConfigure.h>
 #include <vtkConfigure.h>
 #include <QPushButton>
+#include <vtkVersionMacros.h>
 
 QmitkAboutDialog::QmitkAboutDialog(QWidget* parent, Qt::WindowFlags f)
   : QDialog(parent, f)

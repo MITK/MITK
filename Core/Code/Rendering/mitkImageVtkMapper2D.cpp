@@ -69,7 +69,7 @@ mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
 }
 
 //set the two points defining the textured plane according to the dimension and spacing
-void mitk::ImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6])
+void mitk::ImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer, double planeBounds[6])
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
@@ -144,7 +144,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     // the latest image is used there if the plane is out of the geometry
     // see bug-13275
     localStorage->m_ReslicedImage = NULL;
-    localStorage->m_Mapper->SetInput( localStorage->m_EmptyPolyData );
+    localStorage->m_Mapper->SetInputData( localStorage->m_EmptyPolyData );
     return;
   }
 
@@ -261,7 +261,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     // executed even though the input geometry information did not change; this
     // is necessary when the input /em data, but not the /em geometry changes.
     localStorage->m_TSFilter->SetThickSliceMode( thickSlicesMode-1 );
-    localStorage->m_TSFilter->SetInput( localStorage->m_Reslicer->GetVtkOutput() );
+    localStorage->m_TSFilter->SetInputData( localStorage->m_Reslicer->GetVtkOutput() );
 
     //vtkFilter=>mitkFilter=>vtkFilter update mechanism will fail without calling manually
     localStorage->m_Reslicer->Modified();
@@ -288,7 +288,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   // Bounds information for reslicing (only reuqired if reference geometry
   // is present)
   //this used for generating a vtkPLaneSource with the right size
-  vtkFloatingPointType sliceBounds[6];
+  double sliceBounds[6];
   for ( int i = 0; i < 6; ++i )
   {
     sliceBounds[i] = 0.0;
@@ -300,7 +300,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   // calculate minimum bounding rect of IMAGE in texture
   {
-    vtkFloatingPointType textureClippingBounds[6];
+    double textureClippingBounds[6];
     for ( int i = 0; i < 6; ++i )
     {
       textureClippingBounds[i] = 0.0;
@@ -377,14 +377,14 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   if (datanode->GetIntProperty("Image.Displayed Component", displayedComponent, renderer) && numberOfComponents > 1)
   {
     localStorage->m_VectorComponentExtractor->SetComponents(displayedComponent);
-    localStorage->m_VectorComponentExtractor->SetInput(localStorage->m_ReslicedImage);
+    localStorage->m_VectorComponentExtractor->SetInputData(localStorage->m_ReslicedImage);
 
     localStorage->m_LevelWindowFilter->SetInputConnection(localStorage->m_VectorComponentExtractor->GetOutputPort(0));
   }
   else
   {
     //connect the input with the levelwindow filter
-    localStorage->m_LevelWindowFilter->SetInput(localStorage->m_ReslicedImage);
+    localStorage->m_LevelWindowFilter->SetInputData(localStorage->m_ReslicedImage);
   }
 
   // check for texture interpolation property
@@ -404,7 +404,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   if(binary && binaryOutline) //connect the mapper with the polyData which contains the lines
   {
     //We need the contour for the binary outline property as actor
-    localStorage->m_Mapper->SetInput(localStorage->m_OutlinePolyData);
+    localStorage->m_Mapper->SetInputData(localStorage->m_OutlinePolyData);
     localStorage->m_Actor->SetTexture(NULL); //no texture for contours
 
     bool binaryOutlineShadow( false );

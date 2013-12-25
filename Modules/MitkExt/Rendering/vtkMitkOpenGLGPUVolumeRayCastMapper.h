@@ -71,7 +71,7 @@ class MitkExt_EXPORT vtkMitkOpenGLGPUVolumeRayCastMapper : public vtkMitkGPUVolu
 {
 public:
   static vtkMitkOpenGLGPUVolumeRayCastMapper *New();
-  vtkTypeRevisionMacro(vtkMitkOpenGLGPUVolumeRayCastMapper,vtkMitkGPUVolumeRayCastMapper);
+  vtkTypeMacro(vtkMitkOpenGLGPUVolumeRayCastMapper,vtkMitkGPUVolumeRayCastMapper);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

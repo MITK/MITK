@@ -48,10 +48,13 @@ set(H_FILES
   Algorithms/mitkConvert2Dto3DImageFilter.h
   Algorithms/mitkPlaneClipping.h
 
+  Common/mitkCommon.h
   Common/mitkExceptionMacro.h
   Common/mitkServiceBaseObject.h
-  Common/mitkTestingMacros.h
+  Common/mitkTestCaller.h
+  Common/mitkTestFixture.h
   Common/mitkTesting.h
+  Common/mitkTestingMacros.h
 
   DataManagement/mitkProportionalTimeGeometry.h
   DataManagement/mitkTimeGeometry.h
@@ -192,6 +195,7 @@ set(CPP_FILES
   DataManagement/mitkPointSet.cpp
   DataManagement/mitkProperties.cpp
   DataManagement/mitkPropertyList.cpp
+  DataManagement/mitkPropertyObserver.cpp
   DataManagement/mitkRestorePlanePositionOperation.cpp
   DataManagement/mitkRotationOperation.cpp
   DataManagement/mitkSlicedData.cpp

@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //Basedata Test
 #include <mitkContour.h>
 #include <mitkContourSet.h>
-#include <mitkItkBaseDataAdapter.h>
 
 //Mapper Test
 #include <mitkMapper.h>
@@ -40,7 +39,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkContourVtkMapper3D.h>
 
 //Interactors
-#include <mitkConnectPointsInteractor.h>
 #include <mitkContourInteractor.h>
 #include <mitkExtrudedContourInteractor.h>
 

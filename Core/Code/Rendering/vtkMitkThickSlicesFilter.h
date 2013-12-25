@@ -33,7 +33,7 @@ class MITK_CORE_EXPORT vtkMitkThickSlicesFilter : public vtkThreadedImageAlgorit
 {
 public:
   static vtkMitkThickSlicesFilter *New();
-  vtkTypeRevisionMacro(vtkMitkThickSlicesFilter,vtkThreadedImageAlgorithm);
+  vtkTypeMacro(vtkMitkThickSlicesFilter,vtkThreadedImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

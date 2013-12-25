@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <math.h>
 #include <vtksys/ios/sstream>
 
-vtkCxxRevisionMacro(vtkMitkThickSlicesFilter, "$Revision: 1.00 $");
 vtkStandardNewMacro(vtkMitkThickSlicesFilter);
 
 //----------------------------------------------------------------------------

@@ -47,11 +47,12 @@ void Step7::StartRegionGrowing()
     m_ResultNode->SetProperty("volumerendering", mitk::BoolProperty::New(false));
 
     vtkMarchingCubes* surfaceCreator = vtkMarchingCubes::New();
-    surfaceCreator->SetInput(m_ResultImage->GetVtkImageData());
+    surfaceCreator->SetInputData(m_ResultImage->GetVtkImageData());
     surfaceCreator->SetValue(0, 1);
+    surfaceCreator->Update();
 
     mitk::Surface::Pointer surface = mitk::Surface::New();
-    surface->SetVtkPolyData(surfaceCreator->GetOutput());
+    surface->SetVtkPolyData(surfaceCreator->GetOutput()); //VTK6_TODO
 
     mitk::DataNode::Pointer surfaceNode = mitk::DataNode::New();
     surfaceNode->SetData(surface);

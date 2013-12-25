@@ -61,7 +61,7 @@ void mitk::TrackingVolumeGenerator::GenerateData()
     bounds[1] = bounds[3] = bounds[5] =  400.0;  // virtual tracking device, but it can be changed. In that case,
     // the tracking volume polydata has to be updated manually
     cubeSource->SetBounds(bounds);
-    cubeSource->GetOutput()->Update();
+    cubeSource->Update();
 
     output->SetVtkPolyData(cubeSource->GetOutput()); //set the vtkCubeSource as polyData of the surface
     return;

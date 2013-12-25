@@ -102,7 +102,7 @@ bool mitk::ContourInteractor::ExecuteAction(mitk::Action* action, mitk::StateEve
     sender->GetVtkRenderer()->SetDisplayPoint(p.GetDataPointer());
 
     sender->GetVtkRenderer()->DisplayToWorld();
-    vtkFloatingPointType *vtkwp = sender->GetVtkRenderer()->GetWorldPoint();
+    double *vtkwp = sender->GetVtkRenderer()->GetWorldPoint();
     vtk2itk(vtkwp, eventPoint);
   }
   else

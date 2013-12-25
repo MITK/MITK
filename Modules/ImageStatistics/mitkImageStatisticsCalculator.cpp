@@ -1185,7 +1185,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   // Apply the generated image stencil to the input image
   vtkSmartPointer<vtkImageStencil> imageStencilFilter = vtkSmartPointer<vtkImageStencil>::New();
   imageStencilFilter->SetInputConnection( vtkImporter->GetOutputPort() );
-  imageStencilFilter->SetStencil( lassoStencil->GetOutput() );
+  imageStencilFilter->SetStencilConnection(lassoStencil->GetOutputPort());
   imageStencilFilter->ReverseStencilOff();
   imageStencilFilter->SetBackgroundValue( 0 );
   imageStencilFilter->Update();

@@ -70,7 +70,7 @@ void mitk::ContourModelMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *re
 
   this->ApplyContourProperties(renderer);
 
-  localStorage->m_Mapper->SetInput(localStorage->m_OutlinePolyData);
+  localStorage->m_Mapper->SetInputData(localStorage->m_OutlinePolyData);
 
 }
 
@@ -227,7 +227,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
             sphere->SetRadius(1.2);
             sphere->SetCenter(coordinates[0], coordinates[1], coordinates[2]);
             sphere->Update();
-            appendPoly->AddInput(sphere->GetOutput());
+            appendPoly->AddInputConnection(sphere->GetOutputPort());
           }
         }
 
@@ -252,7 +252,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
           sphere->SetRadius(1.2);
           sphere->SetCenter(coordinates[0], coordinates[1], coordinates[2]);
           sphere->Update();
-          appendPoly->AddInput(sphere->GetOutput());
+          appendPoly->AddInputConnection(sphere->GetOutputPort());
         }
       }
 
@@ -292,7 +292,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
 
         //needed because currently there is no outher solution if the contour is within the plane
         vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
-        tubeFilter->SetInput(polyDataIn3D);
+        tubeFilter->SetInputData(polyDataIn3D);
         tubeFilter->SetRadius(0.05);
 
 
@@ -320,7 +320,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
 
     }//end if (it != end)
 
-    appendPoly->AddInput(resultingPolyData);
+    appendPoly->AddInputData(resultingPolyData);
     appendPoly->Update();
 
     //return contour with control points

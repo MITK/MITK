@@ -404,7 +404,7 @@ bool AffineInteractor3D
       {
         if ( camera )
         {
-          vtkFloatingPointType vpn[3];
+          double vpn[3];
           camera->GetViewPlaneNormal( vpn );
 
           Vector3D viewPlaneNormal;

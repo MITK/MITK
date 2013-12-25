@@ -176,7 +176,7 @@ private:
   *
   * Similar to the textured plane of an image
   * (cf. void mitkImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer,
-  * vtkFloatingPointType planeBounds[6])), the mitkDisplayGeometry defines a view plane (or
+  * double planeBounds[6])), the mitkDisplayGeometry defines a view plane (or
   * projection plane). This plane is used to set the camera parameters. The view plane
   * center (VC) is important for camera positioning (cf. the image above).
   *

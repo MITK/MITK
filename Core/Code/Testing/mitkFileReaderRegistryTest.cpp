@@ -30,8 +30,8 @@ public:
   {
   }
 
-  DummyReader(const std::string& extension, int priority)
-    : mitk::AbstractFileReader("application/dummy", extension, "This is a dummy description")
+  DummyReader(const std::string& mimeType, const std::string& extension, int priority)
+    : mitk::AbstractFileReader(mimeType, extension, "This is a dummy description")
   {
     this->SetPriority(priority);
     m_ServiceReg = this->RegisterService();
@@ -69,8 +69,8 @@ public:
   {
   }
 
-  DummyReader2(const std::string& extension, int priority)
-    : mitk::AbstractFileReader("application/dummy", extension, "This is a second dummy description")
+  DummyReader2(const std::string& mimeType, const std::string& extension, int priority)
+    : mitk::AbstractFileReader(mimeType, extension, "This is a second dummy description")
   {
     this->SetPriority(priority);
     m_ServiceReg = this->RegisterService();
@@ -109,8 +109,8 @@ int mitkFileReaderRegistryTest(int /*argc*/ , char* /*argv*/[])
   // mitk::FileReaderRegistry::Pointer frm = mitk::FileReaderRegistry::New();
   // MITK_TEST_CONDITION_REQUIRED(argc == 2,"Testing FileReaderRegistry instantiation");
 
-  DummyReader testDR("test",1);
-  DummyReader otherDR("other",1);
+  DummyReader testDR("application/dummy", "test",1);
+  DummyReader otherDR("application/dummy2", "other",1);
 
   MITK_TEST_CONDITION_REQUIRED(!testDR.CanRead("/this/is/a/folder/file.tes"),"Negative test of default CanRead() implementation");
 
@@ -123,9 +123,9 @@ int mitkFileReaderRegistryTest(int /*argc*/ , char* /*argv*/[])
 
   MITK_TEST_CONDITION_REQUIRED(returned && &static_cast<mitk::IFileReader&>(otherDR) != returned,"Testing correct retrieval of FileReader 2/2");
 
-  DummyReader mediocreTestDR("test", 20);
-  DummyReader prettyFlyTestDR("test", 50);
-  DummyReader2 awesomeTestDR("test", 100);
+  DummyReader mediocreTestDR("application/dummy", "test", 20);
+  DummyReader prettyFlyTestDR("application/dummy", "test", 50);
+  DummyReader2 awesomeTestDR("application/dummy", "test", 100);
 
   returned = readerRegistry->GetReader("test");
   MITK_TEST_CONDITION_REQUIRED(dynamic_cast<DummyReader2*>(returned), "Testing correct priorized retrieval of FileReader: Best reader");

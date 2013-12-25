@@ -46,13 +46,16 @@ std::vector< mitk::BaseData::Pointer > mitk::FileReaderRegistry::Read(const std:
 {
   // Find extension
   std::string extension = itksys::SystemTools::GetFilenameExtension(path);
-  extension = extension.substr(1, extension.size()-1);
+  if (!extension.empty())
+  {
+    extension = extension.substr(1, extension.size()-1);
+  }
 
   // Get best Reader
   FileReaderRegistry readerRegistry;
   mitk::IFileReader* reader = readerRegistry.GetReader(extension, context);
   // Throw exception if no compatible reader was found
-  if (reader == NULL) mitkThrow() << "Tried to directly read a file of type '" + extension + "' via FileReaderRegistry, but no reader supporting this filetype was found.";
+  if (reader == NULL) mitkThrow() << "Tried to directly read a file with extension '" + extension + "' via FileReaderRegistry, but no reader supporting this file type was found.";
   return reader->Read(path);
 }
 
@@ -67,7 +70,10 @@ std::vector< mitk::BaseData::Pointer > mitk::FileReaderRegistry::ReadAll(
     try
     {
       std::string extension = itksys::SystemTools::GetFilenameExtension(*iterator);
-      extension = extension.substr(1, extension.size()-1);
+      if (!extension.empty())
+      {
+        extension = extension.substr(1, extension.size()-1);
+      }
       mitk::IFileReader* reader = readerRegistry.GetReader(extension, context);
       // Throw exception if no compatible reader was found
       if (reader == NULL) throw;
@@ -220,17 +226,14 @@ std::vector< us::ServiceReference<mitk::IFileReader> > mitk::FileReaderRegistry:
 
   // filter for mime type
   std::string filter;
-  if (!extension.empty())
+  mitk::IMimeTypeProvider* mimeTypeProvider = mitk::CoreServices::GetMimeTypeProvider(context);
+  std::vector<std::string> mimeTypes = mimeTypeProvider->GetMimeTypesForExtension(extension);
+  if (mimeTypes.empty())
   {
-    mitk::IMimeTypeProvider* mimeTypeProvider = mitk::CoreServices::GetMimeTypeProvider(context);
-    std::vector<std::string> mimeTypes = mimeTypeProvider->GetMimeTypesForExtension(extension);
-    if (mimeTypes.empty())
-    {
-      MITK_WARN << "No mime-type information for extension " << extension << " available.";
-      return result;
-    }
-    filter = us::LDAPProp(mitk::IFileReader::PROP_MIMETYPE()) == mimeTypes.front();
+    MITK_WARN << "No mime-type information for extension " << extension << " available.";
+    return result;
   }
+  filter = us::LDAPProp(mitk::IFileReader::PROP_MIMETYPE()) == mimeTypes.front();
   result = context->GetServiceReferences<IFileReader>(filter);
   std::sort(result.begin(), result.end());
   std::reverse(result.begin(), result.end());

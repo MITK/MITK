@@ -62,7 +62,10 @@ std::vector<std::string> MimeTypeProvider::GetMimeTypesForFile(const std::string
 {
   // For now, just use the file extension to look-up the registered mime-types.
   std::string extension = itksys::SystemTools::GetFilenameExtension(filePath);
-  extension = extension.substr(1, extension.size()-1);
+  if (!extension.empty())
+  {
+    extension = extension.substr(1, extension.size()-1);
+  }
   return this->GetMimeTypesForExtension(extension);
 }
 

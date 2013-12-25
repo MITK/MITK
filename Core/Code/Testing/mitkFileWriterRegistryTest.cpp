@@ -139,8 +139,8 @@ private:
 
 void TestStreamMethods()
 {
-  DummyWriter dummyWriter(DummyBaseData::GetStaticNameOfClass(), ".stream", 100);
-  DummyWriter2 dummyWriter2(DummyBaseData::GetStaticNameOfClass(), ".file", 50);
+  DummyWriter dummyWriter(DummyBaseData::GetStaticNameOfClass(), "stream", 100);
+  DummyWriter2 dummyWriter2(DummyBaseData::GetStaticNameOfClass(), "file", 50);
   mitk::FileWriterRegistry writerRegistry;
 
   // Test DummyWriter, which always uses a ostream for writing, even
@@ -173,12 +173,7 @@ void TestStreamMethods()
   std::string content2;
   {
     std::ofstream tmpStream;
-    std::string tmpFileName = mitk::IOUtil::CreateTemporaryFile(tmpStream);
-    tmpStream.close();
-    std::remove(tmpFileName.c_str());
-
-    // This is a work-around to get a temporary file name ending with ".file"
-    tmpFileName += ".file";
+    std::string tmpFileName = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.file");
     writerRegistry.Write(&dummyData, tmpFileName);
 
     std::ifstream tmpInput(tmpFileName.c_str());
@@ -195,7 +190,7 @@ void TestStreamMethods()
 int mitkFileWriterRegistryTest(int argc , char* argv[])
 {
   // always start with this!
-  MITK_TEST_BEGIN("FileWriterRegistry");
+  //MITK_TEST_BEGIN("FileWriterRegistry");
 
   TestStreamMethods();
 
@@ -303,5 +298,6 @@ int mitkFileWriterRegistryTest(int argc , char* argv[])
   delete writerRegistry;
 
   //// always end with this!
-  MITK_TEST_END()
+  //MITK_TEST_END()
+  return 0;
 }

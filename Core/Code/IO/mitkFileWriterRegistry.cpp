@@ -48,7 +48,10 @@ void mitk::FileWriterRegistry::Write(const mitk::BaseData* data, const std::stri
 {
   // Find extension
   std::string extension = itksys::SystemTools::GetFilenameExtension(path);
-  extension = extension.substr(1, extension.size()-1);
+  if (!extension.empty())
+  {
+    extension = extension.substr(1, extension.size()-1);
+  }
 
   // Get best Writer
   FileWriterRegistry writerRegistry;
@@ -58,7 +61,7 @@ void mitk::FileWriterRegistry::Write(const mitk::BaseData* data, const std::stri
   {
     mitkThrow() << "Tried to directly write a file of type '" << data->GetNameOfClass()
                 << "' and extension '" << extension
-                << "' via FileWriterRegistry, but no writer supporting this filetype was found.";
+                << "' via FileWriterRegistry, but no writer supporting this file type was found.";
   }
   writer->Write(data, path);
 }

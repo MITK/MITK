@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE(MitkIOExt
                    DEPENDS MitkDataTypesExt MitkMapperExt LegacyIO
-                   #WARNINGS_AS_ERRORS
+                   WARNINGS_AS_ERRORS
                    AUTOLOAD_WITH Mitk
                   )
 

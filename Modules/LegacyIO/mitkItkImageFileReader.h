@@ -26,8 +26,8 @@ namespace mitk {
 //##Documentation
 //## @brief Reader to read file formats supported by itk
 //## @ingroup IO
-//## @deprecatedSince{2013_09} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-class DEPRECATED() LegacyIO_EXPORT ItkImageFileReader : public ImageSource, public FileReader
+//## @deprecatedSince{2014_03} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+class LegacyIO_EXPORT ItkImageFileReader : public ImageSource, public FileReader
 {
 public:
     mitkClassMacro(ItkImageFileReader, FileReader);

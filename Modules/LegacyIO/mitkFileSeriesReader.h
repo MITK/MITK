@@ -32,9 +32,9 @@ namespace mitk
  * a given prefix and pattern.
  * Subclasses may use this function to load a series of files.
  *
- * @deprecatedSince{2013_09}
+ * @deprecatedSince{2014_03}
  */
-class DEPRECATED() LegacyIO_EXPORT FileSeriesReader : public FileReader
+class LegacyIO_EXPORT FileSeriesReader : public FileReader
 {
 public:
     mitkClassMacro( FileSeriesReader, FileReader );

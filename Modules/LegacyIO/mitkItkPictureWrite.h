@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * @param itkImage an image with single-component pixel type
  *
- * @deprecatedSince{2013_09} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+ * @deprecatedSince{2014_03} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
 template < typename TPixel, unsigned int VImageDimension >
 DEPRECATED( void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName) );

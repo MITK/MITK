@@ -31,7 +31,7 @@ namespace mitk
 //## @brief Create instances of VtkImageReader objects using an object factory.
 //##
 //## @ingroup IO
-//## @deprecatedSince{2013_09} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+//## @deprecatedSince{2014_03} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
 class DEPRECATED() LegacyIO_EXPORT VtkImageIOFactory : public itk::ObjectFactoryBase
 {
 public:

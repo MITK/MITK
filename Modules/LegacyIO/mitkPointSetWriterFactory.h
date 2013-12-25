@@ -26,7 +26,7 @@ namespace mitk
 {
 
 /**
- * @deprecatedSince{2013_09} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+ * @deprecatedSince{2014_03} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
 class DEPRECATED() LegacyIO_EXPORT PointSetWriterFactory : public itk::ObjectFactoryBase
 {

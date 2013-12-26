@@ -110,10 +110,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
-  DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
   assert(workingImage);
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
@@ -366,9 +363,6 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
 {
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) > 0.0 )
   {
-    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-    if (!workingNode) return false;
-
     // 1. If we have a working slice, use the contour to fill a new piece on segmentation on it (or erase a piece that was selected by ipMITKSegmentationGetCutPoints)
     if ( m_WorkingSlice.IsNotNull() && m_OriginalPicSlice )
     {
@@ -416,10 +410,7 @@ bool mitk::RegionGrowingTool::OnChangeActiveLabel (Action* action, const StateEv
 {
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert (workingNode);
-
-  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
   assert (workingImage);
 
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());

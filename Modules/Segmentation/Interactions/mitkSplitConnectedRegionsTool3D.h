@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAutoSegmentationTool.h"
 #include "SegmentationExports.h"
-//#include "mitkStateEvent.h"
 #include "mitkColorSequenceRainbow.h"
 
 #include "itkImage.h"

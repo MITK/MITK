@@ -58,10 +58,7 @@ bool mitk::ContourTool::OnChangeActiveLabel (Action* action, const StateEvent* s
 
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
   assert(workingImage);
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
@@ -130,10 +127,7 @@ bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* state
 
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert(workingNode);
-
-  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
   assert(workingImage);
 
   const PlaneGeometry* planeGeometry = dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() );

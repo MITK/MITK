@@ -97,8 +97,6 @@ class Segmentation_EXPORT SegTool3D : public Tool
 
     void InitializeUndoController();
 
-    mitk::SlicedData::RegionType m_RequestedRegion;
-
     int m_CurrentTimeStep;
     int m_OverwritePixelValue;
 
@@ -107,11 +105,11 @@ class Segmentation_EXPORT SegTool3D : public Tool
 
     ToolCommand::Pointer m_ProgressCommand;
 
-    mitk::Geometry3D::Pointer m_ReferenceGeometry;
-
     BaseRenderer*  m_LastEventSender;
 
     mitk::Point3D m_LastClickedPosition;
+
+    mitk::SlicedData::RegionType m_RequestedRegion;
 
     template<typename ImageType>
     void InternalAcceptPreview( ImageType* targetImage, const mitk::Image* sourceImage );

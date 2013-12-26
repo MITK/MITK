@@ -96,6 +96,7 @@ Qmitk/QmitkSplitConnectedRegionsTool3DGUIControls.ui
 Qmitk/QmitkFillHolesTool3DGUIControls.ui
 Qmitk/QmitkSearchLabelDialogGUI.ui
 Qmitk/QmitkBinaryThresholdToolGUIControls.ui
+Qmitk/QmitkBinaryThresholdULToolGUIControls.ui
 Qmitk/QmitkFastMarchingToolGUIControls.ui
 Qmitk/QmitkConnectedRegionSelectorTool3DGUIControls.ui
 )

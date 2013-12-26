@@ -207,6 +207,10 @@ namespace mitk
 
     ToolManager* m_ToolManager;
 
+    DataNode* m_ReferenceNode;
+
+    DataNode* m_WorkingNode;
+
     bool m_SupportRoi;
 
   private:

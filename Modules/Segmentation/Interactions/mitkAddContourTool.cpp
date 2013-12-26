@@ -41,10 +41,7 @@ mitk::AddContourTool::~AddContourTool()
 
 bool mitk::AddContourTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
 {
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert (workingNode);
-
-  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
   assert (workingImage);
 
   m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
@@ -89,9 +86,7 @@ bool mitk::AddContourTool::OnInvertLogic(Action* action, const StateEvent* state
   }
   else
   {
-    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-    assert (workingNode);
-    LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+    LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
     assert (workingImage);
     m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
     const mitk::Color& color = workingImage->GetActiveLabelColor();

@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkSplitConnectedRegionsTool3DGUI, "")
 
-QmitkSplitConnectedRegionsTool3DGUI::QmitkSplitConnectedRegionsTool3DGUI() : QmitkToolGUI()
+QmitkSplitConnectedRegionsTool3DGUI::QmitkSplitConnectedRegionsTool3DGUI() : QmitkToolGUI(), m_SplitConnectedRegionsTool3D(NULL)
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();

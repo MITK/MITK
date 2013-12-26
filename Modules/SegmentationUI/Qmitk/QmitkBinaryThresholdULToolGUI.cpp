@@ -15,48 +15,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkBinaryThresholdULToolGUI.h"
-#include "QmitkConfirmSegmentationDialog.h"
-
-#include <qlabel.h>
-#include <qslider.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
+#include "QmitkNewSegmentationDialog.h"
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkBinaryThresholdULToolGUI, "")
 
 QmitkBinaryThresholdULToolGUI::QmitkBinaryThresholdULToolGUI()
-:QmitkToolGUI()
+:QmitkToolGUI(), m_BinaryThresholdULTool(NULL)
 {
-  // create the visible widgets
-  QBoxLayout* mainLayout = new QVBoxLayout(this);
+  m_Controls.setupUi(this);
+  m_Controls.m_InformationWidget->hide();
+  m_Controls.m_AdvancedControlsWidget->hide();
 
-  QLabel* label = new QLabel( "Threshold :", this );
-  QFont f = label->font();
-  f.setBold(false);
-  label->setFont( f );
-  mainLayout->addWidget(label);
+  m_Controls.m_DoubleThresholdSlider->setTracking(false);
 
-  QBoxLayout* layout = new QHBoxLayout();
-
-  m_DoubleThresholdSlider = new ctkRangeWidget();
-  connect(m_DoubleThresholdSlider, SIGNAL(valuesChanged(double,double)), this, SLOT(OnThresholdsChanged(double,double)));
-  layout->addWidget(m_DoubleThresholdSlider);
-  mainLayout->addLayout(layout);
-
-  QPushButton* okButton = new QPushButton("Confirm Segmentation", this);
-  connect( okButton, SIGNAL(clicked()), this, SLOT(OnAcceptThresholdPreview()));
-  okButton->setFont( f );
-  mainLayout->addWidget( okButton );
-
+  connect(m_Controls.m_DoubleThresholdSlider, SIGNAL(valuesChanged(double,double)), this, SLOT(OnThresholdsChanged(double, double)));
+  connect( m_Controls.m_pbCancel, SIGNAL(clicked()), this, SLOT(OnCancel()) );
+  connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
+  connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
+  connect( m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
+  connect( m_Controls.m_cbShowAdvancedControls, SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedControls(bool)) );
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
 
 QmitkBinaryThresholdULToolGUI::~QmitkBinaryThresholdULToolGUI()
 {
-  // !!!
-  if (m_BinaryThresholdULTool.IsNotNull())
+  if (m_BinaryThresholdULTool)
   {
-    m_BinaryThresholdULTool->IntervalBordersChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged );
+    m_BinaryThresholdULTool->IntervalBordersChanged -= mitk::MessageDelegate3<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType, bool>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged );
     m_BinaryThresholdULTool->ThresholdingValuesChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged );
     m_BinaryThresholdULTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkBinaryThresholdULToolGUI, bool>( this, &QmitkBinaryThresholdULToolGUI::BusyStateChanged );
   }
@@ -65,63 +50,106 @@ QmitkBinaryThresholdULToolGUI::~QmitkBinaryThresholdULToolGUI()
 
 void QmitkBinaryThresholdULToolGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
-  if (m_BinaryThresholdULTool.IsNotNull())
+  if (m_BinaryThresholdULTool)
   {
-    m_BinaryThresholdULTool->IntervalBordersChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged );
+    m_BinaryThresholdULTool->IntervalBordersChanged -= mitk::MessageDelegate3<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType, bool>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged );
     m_BinaryThresholdULTool->ThresholdingValuesChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged );
     m_BinaryThresholdULTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkBinaryThresholdULToolGUI, bool>( this, &QmitkBinaryThresholdULToolGUI::BusyStateChanged );
   }
 
   m_BinaryThresholdULTool = dynamic_cast<mitk::BinaryThresholdULTool*>( tool );
 
-  if (m_BinaryThresholdULTool.IsNotNull())
+  if (m_BinaryThresholdULTool)
   {
-    m_BinaryThresholdULTool->IntervalBordersChanged += mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged );
+    m_BinaryThresholdULTool->IntervalBordersChanged += mitk::MessageDelegate3<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType, bool>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged );
     m_BinaryThresholdULTool->ThresholdingValuesChanged += mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged );
     m_BinaryThresholdULTool->CurrentlyBusy += mitk::MessageDelegate1<QmitkBinaryThresholdULToolGUI, bool>( this, &QmitkBinaryThresholdULToolGUI::BusyStateChanged );
   }
 }
 
-void QmitkBinaryThresholdULToolGUI::OnAcceptThresholdPreview()
+void QmitkBinaryThresholdULToolGUI::OnCancel()
 {
-  /*
-  QmitkConfirmSegmentationDialog dialog;
-  QString segName = QString::fromStdString(m_BinaryThresholdULTool->GetCurrentSegmentationName());
-
-  dialog.SetSegmentationName(segName);
-  int result = dialog.exec();
-
-  switch(result)
+  if (m_BinaryThresholdULTool)
   {
-  case QmitkConfirmSegmentationDialog::CREATE_NEW_SEGMENTATION:
-    m_BinaryThresholdULTool->SetOverwriteExistingSegmentation(false);
-    break;
-  case QmitkConfirmSegmentationDialog::OVERWRITE_SEGMENTATION:
-    m_BinaryThresholdULTool->SetOverwriteExistingSegmentation(true);
-    break;
-  case QmitkConfirmSegmentationDialog::CANCEL_SEGMENTATION:
-    return;
+    m_BinaryThresholdULTool->Cancel();
   }
-
-  if (m_BinaryThresholdULTool.IsNotNull())
-  {
-    m_BinaryThresholdULTool->AcceptCurrentThresholdValue();
-  }
-  */
 }
 
-void QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged(mitk::ScalarType lower, mitk::ScalarType upper)
+void QmitkBinaryThresholdULToolGUI::OnAcceptPreview()
 {
-  m_DoubleThresholdSlider->setMinimum(lower);
-  m_DoubleThresholdSlider->setMaximum(upper);
+  if (m_BinaryThresholdULTool)
+  {
+    m_BinaryThresholdULTool->AcceptPreview();
+  }
+}
+
+void QmitkBinaryThresholdULToolGUI::OnInvertPreview()
+{
+  if (m_BinaryThresholdULTool)
+  {
+    m_BinaryThresholdULTool->InvertPreview();
+  }
+}
+
+void QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged(mitk::ScalarType lower, mitk::ScalarType upper, bool isFloat)
+{
+  m_Controls.m_DoubleThresholdSlider->setMinimum(lower);
+  m_Controls.m_DoubleThresholdSlider->setMaximum(upper);
+  if (isFloat)
+    m_Controls.m_DoubleThresholdSlider->setDecimals(2);
+  else
+    m_Controls.m_DoubleThresholdSlider->setDecimals(0);
 }
 
 void QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType upper)
 {
-  m_DoubleThresholdSlider->setValues(lower, upper);
+  m_Controls.m_DoubleThresholdSlider->setValues(lower, upper);
 }
 
 void QmitkBinaryThresholdULToolGUI::OnThresholdsChanged(double min, double max)
 {
-  m_BinaryThresholdULTool->SetThresholdValues(min, max);
+  if (m_BinaryThresholdULTool)
+  {
+    m_BinaryThresholdULTool->SetThresholdValues(min, max);
+    m_BinaryThresholdULTool->Run();
+  }
+}
+
+void QmitkBinaryThresholdULToolGUI::OnShowAdvancedControls( bool on )
+{
+  if (on)
+    m_Controls.m_AdvancedControlsWidget->show();
+  else
+    m_Controls.m_AdvancedControlsWidget->hide();
+}
+
+void QmitkBinaryThresholdULToolGUI::OnNewLabel()
+{
+  if (m_BinaryThresholdULTool)
+  {
+    QmitkNewSegmentationDialog dialog(this);
+//    dialog->SetSuggestionList( m_OrganColors );
+    dialog.setWindowTitle("New Label");
+    int dialogReturnValue = dialog.exec();
+    if ( dialogReturnValue == QDialog::Rejected ) return;
+    mitk::Color color = dialog.GetColor();
+    std::string name = dialog.GetSegmentationName().toStdString();
+    m_BinaryThresholdULTool->CreateNewLabel(name, color);
+  }
+}
+
+void QmitkBinaryThresholdULToolGUI::BusyStateChanged(bool value)
+{
+  if (value)
+    QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
+  else
+    QApplication::restoreOverrideCursor();
+}
+
+void QmitkBinaryThresholdULToolGUI::OnShowInformation( bool on )
+{
+  if (on)
+    m_Controls.m_InformationWidget->show();
+  else
+    m_Controls.m_InformationWidget->hide();
 }

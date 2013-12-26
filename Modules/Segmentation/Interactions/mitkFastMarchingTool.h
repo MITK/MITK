@@ -86,6 +86,9 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
     virtual us::ModuleResource GetCursorIconResource() const;
     us::ModuleResource GetIconResource() const;
 
+    /// \brief Creates a new label out of the the current preview image.
+    virtual void CreateNewLabel(const std::string& name, const mitk::Color& color);
+
     /// \brief Stops the running operation and disables the tool
     void Cancel();
 

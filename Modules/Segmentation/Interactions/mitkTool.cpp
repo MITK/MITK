@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTool.h"
+#include "mitkToolManager.h"
 #include "mitkDataNodeFactory.h"
 #include "mitkProperties.h"
 #include "mitkImageWriteAccessor.h"
@@ -68,6 +69,8 @@ void mitk::Tool::SetToolManager(ToolManager* manager)
 
 void mitk::Tool::Activated()
 {
+  m_WorkingNode = m_ToolManager->GetWorkingData(0);
+  assert(m_WorkingNode);
 }
 
 void mitk::Tool::Deactivated()

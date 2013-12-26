@@ -42,8 +42,8 @@ namespace mitk
   {
   public:
 
-    Message3<double,double, bool> IntervalBordersChanged;
-    Message1<double>              ThresholdingValueChanged;
+    Message3<mitk::ScalarType, mitk::ScalarType, bool> IntervalBordersChanged;
+    Message1<mitk::ScalarType>              ThresholdingValueChanged;
 
     mitkClassMacro(BinaryThresholdTool, AutoSegmentationTool);
     itkNewMacro(BinaryThresholdTool);
@@ -56,7 +56,7 @@ namespace mitk
     virtual void Deactivated();
 
     /// \brief Sets the current threshold value from GUI.
-    virtual void SetThresholdValue(double value);
+    virtual void SetThresholdValue(mitk::ScalarType value);
 
     /// \brief Adds the preview image to the current working image.
     virtual void AcceptPreview();
@@ -69,17 +69,14 @@ namespace mitk
     BinaryThresholdTool(); // purposely hidden
     virtual ~BinaryThresholdTool();
 
-    void SetupPreviewNodeFor( DataNode* nodeForThresholding );
-
     template <typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>
     void InternalAcceptPreview( itk::Image<TPixel1, VDimension1>* targetImage, const itk::Image<TPixel2, VDimension2>* sourceImage );
 
-    DataNode::Pointer m_ReferenceNode;
     DataNode::Pointer m_NodeForThresholding;
 
-    double m_SensibleMinimumThresholdValue;
-    double m_SensibleMaximumThresholdValue;
-    double m_CurrentThresholdValue;
+    mitk::ScalarType m_SensibleMinimumThresholdValue;
+    mitk::ScalarType m_SensibleMaximumThresholdValue;
+    mitk::ScalarType m_CurrentThresholdValue;
     bool m_IsFloatImage;
 
   };

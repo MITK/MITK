@@ -20,8 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
 #include "mitkBinaryThresholdULTool.h"
-#include "ctkRangeWidget.h"
 
+#include "ui_QmitkBinaryThresholdULToolGUIControls.h"
+
+namespace mitk {
+  class BinaryThresholdULTool;
+}
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -40,18 +44,18 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdULToolGUI : public QmitkToolGUI
     mitkClassMacro(QmitkBinaryThresholdULToolGUI, QmitkToolGUI);
     itkNewMacro(QmitkBinaryThresholdULToolGUI);
 
-    void OnThresholdingIntervalBordersChanged(mitk::ScalarType lower, mitk::ScalarType upper);
+    void OnThresholdingIntervalBordersChanged(mitk::ScalarType lower, mitk::ScalarType upper, bool isFloat);
     void OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType upper);
-
-  signals:
-
-  public slots:
 
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);
-
-    void OnAcceptThresholdPreview();
+    void OnCancel();
+    void OnAcceptPreview();
+    void OnInvertPreview();
+    void OnNewLabel();
+    void OnShowInformation(bool);
+    void OnShowAdvancedControls(bool);
 
     void OnThresholdsChanged(double min, double max);
 
@@ -59,9 +63,11 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdULToolGUI : public QmitkToolGUI
     QmitkBinaryThresholdULToolGUI();
     virtual ~QmitkBinaryThresholdULToolGUI();
 
-    ctkRangeWidget* m_DoubleThresholdSlider;
+    Ui::QmitkBinaryThresholdULToolGUIControls m_Controls;
 
-    mitk::BinaryThresholdULTool::Pointer m_BinaryThresholdULTool;
+    void BusyStateChanged(bool value);
+
+    mitk::BinaryThresholdULTool* m_BinaryThresholdULTool;
 };
 
 #endif

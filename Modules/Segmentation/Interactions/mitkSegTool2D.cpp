@@ -192,10 +192,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Plane
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const PositionEvent* positionEvent)
 {
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert(workingNode);
-
-  Image* workingImage = dynamic_cast<Image*>(workingNode->GetData());
+  Image* workingImage = dynamic_cast<Image*>(m_WorkingNode->GetData());
   assert(workingImage);
 
   return GetAffectedImageSliceAs2DImage( positionEvent, workingImage );
@@ -219,10 +216,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
   if( !planeGeometry ) return;
 
-  DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
   assert(workingImage);
 
   unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( workingImage );
@@ -282,10 +276,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
 {
   if(!planeGeometry || !slice) return;
 
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert(workingNode);
-
-  Image* workingImage = dynamic_cast<Image*>(workingNode->GetData());
+  Image* workingImage = dynamic_cast<Image*>(m_WorkingNode->GetData());
   assert(workingImage);
 
   //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
@@ -370,7 +361,6 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
   contourMarker->SetGeometry2D( const_cast<Geometry2D*>(plane));
 
   std::stringstream markerStream;
-  mitk::DataNode* workingNode (m_ToolManager->GetWorkingData(0));
 
   markerStream << m_Contourmarkername ;
   markerStream << " ";
@@ -393,13 +383,13 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
   {
     if ( id ==  size )
     {
-      m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
+      m_ToolManager->GetDataStorage()->Add(rotatedContourNode, m_WorkingNode);
     }
     else
     {
       mitk::NodePredicateProperty::Pointer isMarker = mitk::NodePredicateProperty::New("isContourMarker", mitk::BoolProperty::New(true));
 
-      mitk::DataStorage::SetOfObjects::ConstPointer markers = m_ToolManager->GetDataStorage()->GetDerivations(workingNode,isMarker);
+      mitk::DataStorage::SetOfObjects::ConstPointer markers = m_ToolManager->GetDataStorage()->GetDerivations(m_WorkingNode,isMarker);
 
       for ( mitk::DataStorage::SetOfObjects::const_iterator iter = markers->begin();
         iter != markers->end();
@@ -413,20 +403,20 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
           return id;
         }
       }
-      m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
+      m_ToolManager->GetDataStorage()->Add(rotatedContourNode, m_WorkingNode);
     }
   }
   return id;
 }
 
-void mitk::SegTool2D::PasteSegmentationOnWorkingImage( Image* targetSlice, Image* sourceSlice, int paintingPixelValue, int timestep )
+void mitk::SegTool2D::WritePreviewOnWorkingImage( Image* targetSlice, Image* sourceSlice, int paintingPixelValue, int timestep )
 {
-  if ((!targetSlice)|| (!sourceSlice)) return;
-  AccessFixedDimensionByItk_2( targetSlice, ItkPasteSegmentationOnWorkingImage, 2, sourceSlice, paintingPixelValue );
+  if ((!targetSlice) || (!sourceSlice)) return;
+  AccessFixedDimensionByItk_2( targetSlice, InternalProcessing, 2, sourceSlice, paintingPixelValue );
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::SegTool2D::ItkPasteSegmentationOnWorkingImage( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, int overwritevalue )
+void mitk::SegTool2D::InternalProcessing( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, int overwritevalue )
 {
   typedef itk::Image<TPixel,VImageDimension> SliceType;
 
@@ -443,10 +433,7 @@ void mitk::SegTool2D::ItkPasteSegmentationOnWorkingImage( itk::Image<TPixel,VIma
   outputIterator.GoToBegin();
   inputIterator.GoToBegin();
 
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert (workingNode);
-
-  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
   assert (workingImage);
 
   int activePixelValue = workingImage->GetActiveLabelIndex();

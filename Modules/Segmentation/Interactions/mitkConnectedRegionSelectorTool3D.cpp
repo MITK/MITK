@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLabelSetImage.h"
 #include "mitkImageAccessByItk.h"
 
-#include <itkRegionOfInterestImageFilter.h>
+// itk
 #include <itkConnectedThresholdImageFilter.h>
 
 // us
@@ -48,29 +48,14 @@ mitk::ConnectedRegionSelectorTool3D::~ConnectedRegionSelectorTool3D()
 
 void mitk::ConnectedRegionSelectorTool3D::Deactivated()
 {
-  m_ToolManager->GetDataStorage()->Remove( m_PreviewNode );
-  m_PreviewNode = NULL;
-  m_PreviewImage = NULL;
+  Superclass::Deactivated();
   m_LastEventSender = NULL;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::ConnectedRegionSelectorTool3D::Activated()
 {
-  // feedback node and its visualization properties
-  m_PreviewNode = mitk::DataNode::New();
-  m_PreviewNode->SetName("preview");
-
-  m_PreviewNode->SetProperty("texture interpolation", BoolProperty::New(false) );
-  m_PreviewNode->SetProperty("layer", IntProperty::New(100) );
-  m_PreviewNode->SetProperty("binary", BoolProperty::New(true) );
-  m_PreviewNode->SetProperty("outline binary", BoolProperty::New(true) );
-  m_PreviewNode->SetProperty("outline binary shadow", BoolProperty::New(true) );
-  m_PreviewNode->SetProperty("helper object", BoolProperty::New(true) );
-  m_PreviewNode->SetOpacity(1.0);
-  m_PreviewNode->SetColor(0.0, 1.0, 0.0);
-
-  m_ToolManager->GetDataStorage()->Add( m_PreviewNode, m_ToolManager->GetWorkingData(0) );
+  Superclass::Activated();
 
   m_LastSeedIndex.Fill(0);
 }
@@ -105,10 +90,7 @@ void mitk::ConnectedRegionSelectorTool3D::InternalAddRegion( itk::Image<TPixel, 
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::ConnectedThresholdImageFilter< ImageType, ImageType > FilterType;
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   typename FilterType::Pointer filter = FilterType::New();
@@ -129,14 +111,9 @@ void mitk::ConnectedRegionSelectorTool3D::InternalAddRegion( itk::Image<TPixel, 
 
   ImageType::Pointer result = filter->GetOutput();
   result->DisconnectPipeline();
-/*
+
    m_PreviewImage = mitk::Image::New();
    mitk::CastToMitkImage(result, m_PreviewImage);
-   m_PreviewNode->SetData(m_PreviewImage);
-*/
-  m_PreviewImage = mitk::Image::New();
-  m_PreviewImage->InitializeByItk(result.GetPointer());
-  m_PreviewImage->SetChannel(result->GetBufferPointer());
 
   typename ImageType::RegionType cropRegion;
   cropRegion = result->GetLargestPossibleRegion();
@@ -178,15 +155,11 @@ bool mitk::ConnectedRegionSelectorTool3D::AddRegion (Action* action, const State
 
   m_LastClickedPosition = positionEvent->GetWorldPosition();
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
-  m_ReferenceGeometry = workingImage->GetGeometry();
   // convert world coordinates to index coordinate on the reference image
-  m_ReferenceGeometry->WorldToIndex( m_LastClickedPosition, m_LastSeedIndex);
+  workingImage->GetGeometry()->WorldToIndex(m_LastClickedPosition, m_LastSeedIndex);
 
   m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
 

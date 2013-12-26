@@ -78,14 +78,10 @@ void mitk::FillHolesTool3D::Run()
 {
 //  this->InitializeUndoController();
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
-  // todo: use it later
-  unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+  m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
   CurrentlyBusy.Send(true);
 
@@ -132,10 +128,7 @@ void mitk::FillHolesTool3D::InternalRun( itk::Image< TPixel, VDimension>* input 
   typedef itk::LabelMapToLabelImageFilter< LabelMapType, ImageType > LabelMap2ImageType;
   typedef itk::BinaryFillholeImageFilter< ImageType > FillHolesFilterType;
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
@@ -213,10 +206,8 @@ void mitk::FillHolesTool3D::InternalRun( itk::Image< TPixel, VDimension>* input 
   }
 
   m_PreviewImage = mitk::Image::New();
-  m_PreviewImage->InitializeByItk(result.GetPointer());
-  m_PreviewImage->SetChannel(result->GetBufferPointer());
+  mitk::CastToMitkImage(result.GetPointer(), m_PreviewImage);
 
-  const typename ImageType::SizeType& cropSize = cropRegion.GetSize();
   const typename ImageType::IndexType& cropIndex = cropRegion.GetIndex();
 
   mitk::SlicedGeometry3D* slicedGeometry = m_PreviewImage->GetSlicedGeometry();
@@ -226,14 +217,4 @@ void mitk::FillHolesTool3D::InternalRun( itk::Image< TPixel, VDimension>* input 
   slicedGeometry->SetOrigin(origin);
 
   m_PreviewNode->SetData(m_PreviewImage);
-
-  m_RequestedRegion = workingImage->GetLargestPossibleRegion();
-
-  m_RequestedRegion.SetIndex(0,cropIndex[0]);
-  m_RequestedRegion.SetIndex(1,cropIndex[1]);
-  m_RequestedRegion.SetIndex(2,cropIndex[2]);
-
-  m_RequestedRegion.SetSize(0,cropSize[0]);
-  m_RequestedRegion.SetSize(1,cropSize[1]);
-  m_RequestedRegion.SetSize(2,cropSize[2]);
 }

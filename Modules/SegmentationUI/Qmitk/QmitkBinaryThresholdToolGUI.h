@@ -23,18 +23,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkBinaryThresholdToolGUIControls.h"
 
+namespace mitk {
+  class BinaryThresholdTool;
+}
+
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::BinaryThresholdTool.
 
   This GUI shows a slider to change the tool's threshold ...
-
-  There is only a slider for INT values in QT. So, if the working image has a float/double pixeltype, we need to convert
-  the original float intensity into a respective int value for the slider. The slider range is then between 0 and 99.
-
-  If the pixeltype is INT, then we do not need any conversion.
-
-  Last contributor: $Author$
 */
 class SegmentationUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
 {
@@ -48,18 +45,9 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
     void OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat);
     void OnThresholdingValueChanged(double current);
 
-  signals:
-
-    /// \brief Emitted when threshold is Accepted
-    void thresholdAccepted();
-
-    /// \brief Emitted when tool is Canceled
-    void thresholdCanceled();
-
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);
-//    void OnRun();
     void OnCancel();
     void OnAcceptPreview();
     void OnInvertPreview();
@@ -67,38 +55,24 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
     void OnShowInformation(bool);
     void OnShowAdvancedControls(bool);
 
-    /// \brief Called when Spinner value has changed. Consider: Spinner contains DOUBLE values
-    void OnSpinnerValueChanged();
-
-    /// \brief Called when Slider value has changed. Consider: Slider contains INT values
-    void OnSliderValueChanged(int value);
+    /// \brief Called when the Slider value has changed.
+    void OnThresholdSliderValueChanged(double value);
 
   protected:
     QmitkBinaryThresholdToolGUI();
     virtual ~QmitkBinaryThresholdToolGUI();
 
+    /// \brief changes the cursor icon
     void BusyStateChanged(bool);
-
-    /// \brief When Slider (int value) has changed, we need to convert it to a respective double value for the spinner
-    double SliderIntToDouble(int val);
-
-    /// \brief When Spinner (double value) has changed, we need to convert it to a respective int value for the slider
-    int DoubleToSliderInt(double val);
 
     /// \brief is image float or int?
     bool m_isFloat;
 
-    double m_RangeMin;
-    double m_RangeMax;
-    double m_Range;
-
-    /// \brief helper bool values to find out, which of the GUI elements has been touched by the user.
-    bool m_ChangingSlider;
-    bool m_ChangingSpinner;
-
+    /// \brief the GUI controls
     Ui::QmitkBinaryThresholdToolGUIControls m_Controls;
 
-    mitk::BinaryThresholdTool::Pointer m_BinaryThresholdTool;
+    /// \brief the tool this GUI is made for
+    mitk::BinaryThresholdTool* m_BinaryThresholdTool;
 };
 
 #endif

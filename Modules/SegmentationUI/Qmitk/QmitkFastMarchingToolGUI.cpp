@@ -33,7 +33,6 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI() : QmitkToolGUI(), m_TimeIsC
   m_Controls.m_AdvancedControlsWidget->hide();
 
   m_Controls.m_slSigma->setPageStep(0.1);
-//  m_slSigma->setTickInterval(0.01);
   m_Controls.m_slSigma->setSingleStep(0.01);
   m_Controls.m_slSigma->setMinimum(0.1);
   m_Controls.m_slSigma->setMaximum(5.0);
@@ -50,7 +49,6 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI() : QmitkToolGUI(), m_TimeIsC
   connect( m_Controls.m_slAlpha, SIGNAL(valueChanged(double)), this, SLOT(OnAlphaChanged(double)));
 
   m_Controls.m_slBeta->setTracking(false);
-//  m_slBeta->setOrientation(Qt::Horizontal);
   m_Controls.m_slBeta->setMinimum(0);
   m_Controls.m_slBeta->setMaximum(30);
   m_Controls.m_slBeta->setPageStep(0.1);
@@ -225,6 +223,6 @@ void QmitkFastMarchingToolGUI::OnNewLabel()
     if ( dialogReturnValue == QDialog::Rejected ) return;
     mitk::Color color = dialog.GetColor();
     std::string name = dialog.GetSegmentationName().toStdString();
-//    m_FastMarchingTool->CreateNewLabel(name, color);
+    m_FastMarchingTool->CreateNewLabel(name, color);
   }
 }

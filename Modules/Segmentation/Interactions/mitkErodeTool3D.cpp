@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLabelSetImage.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
-#include "mitkInteractionConst.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkToolManager.h"
 #include "mitkImageCast.h"
@@ -85,10 +84,7 @@ void mitk::ErodeTool3D::Run()
 {
 //  this->InitializeUndoController();
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
@@ -100,7 +96,7 @@ void mitk::ErodeTool3D::Run()
 
   try
   {
-    AccessByItk(workingImage, InternalProcessing);
+    AccessByItk(workingImage, InternalRun);
   }
   catch( itk::ExceptionObject & e )
   {
@@ -125,7 +121,7 @@ void mitk::ErodeTool3D::Run()
 }
 
 template < typename TPixel, unsigned int VDimension >
-void mitk::ErodeTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* input )
+void mitk::ErodeTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
   typedef itk::LabelObject< TPixel, VDimension > LabelObjectType;
@@ -137,10 +133,7 @@ void mitk::ErodeTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* inp
   typedef itk::BinaryErodeImageFilter<ImageType, ImageType, BallType> ErodeFilterType;
   typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
@@ -194,8 +187,7 @@ void mitk::ErodeTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* inp
   result->DisconnectPipeline();
 
   m_PreviewImage = mitk::Image::New();
-  m_PreviewImage->InitializeByItk(result.GetPointer());
-  m_PreviewImage->SetChannel(result->GetBufferPointer());
+  mitk::CastToMitkImage(result.GetPointer(), m_PreviewImage);
 
   typename ImageType::RegionType cropRegion;
   cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();

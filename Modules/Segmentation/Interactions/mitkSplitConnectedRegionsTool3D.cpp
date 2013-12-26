@@ -215,7 +215,7 @@ void mitk::SplitConnectedRegionsTool3D::InternalAcceptPreview( ImageType1* targe
 
   std::string originalName = workingImage->GetActiveLabelName();
 
-  // Loop over all of the blobs
+  // Loop over all blobs
   for (unsigned int i=0; i<numberOfObjects; i++)
   {
     mitk::Color color = m_ColorSequenceRainbow->GetNextColor();
@@ -330,8 +330,7 @@ void mitk::SplitConnectedRegionsTool3D::InternalRun( itk::Image<TPixel, VDimensi
   result->DisconnectPipeline();
 
   m_PreviewImage = mitk::Image::New();
-  m_PreviewImage->InitializeByItk(result.GetPointer());
-  m_PreviewImage->SetChannel(result->GetBufferPointer());
+  mitk::CastToMitkImage(result.GetPointer(), m_PreviewImage);
 
   typename ImageType::RegionType cropRegion;
   cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();

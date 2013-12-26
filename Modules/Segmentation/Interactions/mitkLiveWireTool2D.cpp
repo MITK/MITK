@@ -118,7 +118,7 @@ float mitk::LiveWireTool2D::CanHandleEvent( StateEvent const *stateEvent) const
       return 0.0; // we don't want anything but 2D
     }
 
-    if (!m_ToolManager->GetWorkingData(0)->GetData()->GetGeometry()->IsInside(positionEvent->GetWorldPosition()))
+    if (!m_WorkingNode->GetData()->GetGeometry()->IsInside(positionEvent->GetWorldPosition()))
     {
       return 0.0;
     }
@@ -167,10 +167,7 @@ void mitk::LiveWireTool2D::Deactivated()
 {
   this->FinishTool();
 
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert (workingNode);
-
-  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
   assert (workingImage);
 
   int activeLabel = workingImage->GetActiveLabelIndex();

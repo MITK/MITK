@@ -138,10 +138,7 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
 
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  if (!workingNode) return false;
-
-  Image* image = dynamic_cast<Image*>(workingNode->GetData());
+  Image* image = dynamic_cast<Image*>(m_WorkingNode->GetData());
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
   if ( !image || !planeGeometry ) return false;
 

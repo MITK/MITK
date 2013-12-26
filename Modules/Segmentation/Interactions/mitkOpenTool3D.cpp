@@ -18,17 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
-#include "mitkInteractionConst.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkToolManager.h"
 #include "mitkImageCast.h"
-#include "mitkImageTimeSelector.h"
+#include "mitkLabelSetImage.h"
 
+// itk
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryMorphologicalOpeningImageFilter.h>
-
-#include <itkMedianImageFilter.h>
 #include <itkLabelObject.h>
 #include <itkLabelMap.h>
 #include <itkLabelImageToLabelMapFilter.h>
@@ -86,16 +84,12 @@ void mitk::OpenTool3D::Run()
 {
 //  this->InitializeUndoController();
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
 
-  // todo: use it later
-  //unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+  m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
   CurrentlyBusy.Send(true);
 
@@ -139,10 +133,7 @@ void mitk::OpenTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
   typedef itk::BinaryMorphologicalOpeningImageFilter<ImageType, ImageType, BallType> OpeningFilterType;
   typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
@@ -215,8 +206,7 @@ void mitk::OpenTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
   }
 
   m_PreviewImage = mitk::Image::New();
-  m_PreviewImage->InitializeByItk(result.GetPointer());
-  m_PreviewImage->SetChannel(result->GetBufferPointer());
+  mitk::CastToMitkImage(result.GetPointer(), m_PreviewImage);
 
   const typename ImageType::SizeType& cropSize = cropRegion.GetSize();
   const typename ImageType::IndexType& cropIndex = cropRegion.GetIndex();

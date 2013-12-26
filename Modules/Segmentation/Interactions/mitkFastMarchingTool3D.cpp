@@ -167,7 +167,7 @@ void mitk::FastMarchingTool3D::Activated()
   m_FeedbackNode->SetProperty( "layer", IntProperty::New( 100 ) );
   m_FeedbackNode->SetProperty( "helper object", BoolProperty::New(true) );
 
-  m_ToolManager->GetDataStorage()->Add( m_FeedbackNode, m_ToolManager->GetWorkingData(0) );
+  m_ToolManager->GetDataStorage()->Add( m_FeedbackNode, m_WorkingNode );
 
   m_SeedsAsPointSet = mitk::PointSet::New();
   m_SeedsAsPointSetNode = mitk::DataNode::New();
@@ -176,7 +176,7 @@ void mitk::FastMarchingTool3D::Activated()
   m_SeedsAsPointSetNode->SetBoolProperty("helper object", true);
   m_SeedsAsPointSetNode->SetColor(0.0, 1.0, 0.0);
   m_SeedsAsPointSetNode->SetVisibility(true);
-  m_ToolManager->GetDataStorage()->Add( m_SeedsAsPointSetNode, m_ToolManager->GetWorkingData(0) );
+  m_ToolManager->GetDataStorage()->Add( m_SeedsAsPointSetNode, m_WorkingNode );
 
   m_ReferenceImage = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
   if(m_ReferenceImage->GetTimeGeometry()->CountTimeSteps() > 1)
@@ -261,7 +261,7 @@ void mitk::FastMarchingTool3D::Deactivated()
 void mitk::FastMarchingTool3D::ConfirmSegmentation()
 {
   // combine preview image with current working segmentation
-  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
   int activeLayer = workingImage->GetActiveLayer();
   int activePixelValue = workingImage->GetActiveLabel(activeLayer)->GetIndex();
   /*
@@ -280,7 +280,7 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
   TimeSlicedGeometry::Pointer originalGeometry = dynamic_cast<TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
   diffImage->SetGeometry( originalGeometry );
   */
-//  this->PasteSegmentationOnWorkingImage( workingImage, m_FeedbackImage, activePixelValue, m_CurrentTimeStep );
+//  this->WritePreviewOnWorkingImage( workingImage, m_FeedbackImage, activePixelValue, m_CurrentTimeStep );
 
   this->ClearSeeds();
 
@@ -379,7 +379,7 @@ void mitk::FastMarchingTool3D::Update()
 
     m_FeedbackImage->SetGeometry( m_ReferenceImage->GetGeometry(0)->Clone().GetPointer() );
 
-    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
+    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
     assert(workingImage);
 
     const mitk::Color& color = workingImage->GetActiveLabelColor();

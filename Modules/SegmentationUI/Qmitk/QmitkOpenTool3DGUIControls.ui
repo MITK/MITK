@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>325</width>
-    <height>505</height>
+    <height>646</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,6 +29,21 @@
    <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>3D Open</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>

@@ -438,12 +438,8 @@ bool mitk::PaintbrushTool::OnInvertLogic(Action* itkNotUsed(action), const State
 void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *event)
 {
     const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (event->GetSender()->GetCurrentWorldGeometry2D() ) );
-    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
 
-    if (!workingNode)
-        return;
-
-    Image::Pointer image = dynamic_cast<Image*>(workingNode->GetData());
+    Image::Pointer image = dynamic_cast<Image*>(m_WorkingNode->GetData());
 
     if ( !image || !planeGeometry )
         return;
@@ -452,7 +448,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *ev
     {
         m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
         m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
-        m_WorkingNode->ReplaceProperty( "color", workingNode->GetProperty("color") );
+        m_WorkingNode->ReplaceProperty( "color", m_WorkingNode->GetProperty("color") );
         m_WorkingNode->SetData(m_WorkingSlice);
     }
     else
@@ -485,7 +481,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *ev
     {
 
         m_WorkingNode->SetProperty( "outline binary", mitk::BoolProperty::New(true) );
-        m_WorkingNode->SetProperty( "color", workingNode->GetProperty("color") );
+        m_WorkingNode->SetProperty( "color", m_WorkingNode->GetProperty("color") );
         m_WorkingNode->SetProperty( "name", mitk::StringProperty::New("Paintbrush_Node") );
         m_WorkingNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
         m_WorkingNode->SetProperty( "opacity", mitk::FloatProperty::New(0.8) );

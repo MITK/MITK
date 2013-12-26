@@ -85,9 +85,7 @@ bool mitk::EraseRegionTool::OnInvertLogic(Action* action, const StateEvent* stat
 
   if (m_LogicInverted)
   {
-    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-    assert(workingNode);
-    LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+    LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
     assert(workingImage);
     m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
     const mitk::Color& color = workingImage->GetActiveLabelColor();

@@ -114,7 +114,13 @@ QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
   m_ToolManager->SetReferenceData(NULL);
   m_ToolManager->SetWorkingData(NULL);
 
-  m_ServiceRegistration.Unregister();
+  try
+  {
+    m_ServiceRegistration.Unregister();
+  }
+  catch (const std::exception&)
+  {}
+
 }
 
 void QmitkMultiLabelSegmentationView::InitializeListeners()
@@ -192,7 +198,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   // all part of open source MITK
   m_Controls.m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
   m_Controls.m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer2D );
-  //m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' 'FastMarching2D'");
+  //m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Correction Paint Wipe 'Live Wire'");
   m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Fill Erase 'Region Growing' FastMarching2D");
   m_Controls.m_ManualToolSelectionBox2D->SetLayoutColumns(2);
   m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );
@@ -202,8 +208,8 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
   m_Controls.m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer3D );
   //specify tools to be added to 3D Tool area
-//  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("'Two Thresholds' FastMarching3D Otsu RegionGrowing Watershed");
-  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold Median Dilate Erode Open Close 'Fill Holes' 'Keep N Largest' 'Split' 'Region Selector'");
+//  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("FastMarching3D Otsu RegionGrowing Watershed");
+  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'Two Thresholds' Median Dilate Erode Open Close 'Fill Holes' 'Keep N Largest' 'Split' 'Region Selector'");
   m_Controls.m_ManualToolSelectionBox3D->SetLayoutColumns(2);
   m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );
 
@@ -543,7 +549,8 @@ void QmitkMultiLabelSegmentationView::OnManualTool2DSelected(int id)
     mitk::StatusBar::GetInstance()->DisplayText(text.c_str());
 
     us::ModuleResource resource = m_ToolManager->GetToolById(id)->GetCursorIconResource();
-    this->SetMouseCursor(resource, 0, 0);
+    if (resource.IsValid())
+      this->SetMouseCursor(resource, 0, 0);
   }
   else
   {

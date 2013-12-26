@@ -90,17 +90,13 @@ void mitk::SegTool3D::AcceptPreview()
 {
   if ( m_PreviewImage.IsNull() ) return;
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
 
   CurrentlyBusy.Send(true);
 
-  MITK_INFO << "AcceptPreview entered";
   try
   {
     AccessFixedDimensionByItk_1( workingImage, InternalAcceptPreview, 3, m_PreviewImage );
@@ -125,7 +121,9 @@ void mitk::SegTool3D::AcceptPreview()
   workingImage->Modified();
 
   m_PreviewNode->SetData(NULL);
-  m_PreviewImage = NULL;
+//  m_PreviewImage = NULL;
+
+//  m_ToolManager->ActivateTool(-1);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -134,10 +132,7 @@ void mitk::SegTool3D::InvertPreview()
 {
   if ( m_PreviewImage.IsNull() ) return;
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   try
@@ -152,7 +147,7 @@ void mitk::SegTool3D::InvertPreview()
   }
   catch (...)
   {
-    MITK_ERROR << "Unkown exception caught!";
+    MITK_ERROR << "Unknown exception caught!";
     m_ToolManager->ActivateTool(-1);
     return;
   }
@@ -166,10 +161,7 @@ void mitk::SegTool3D::CalculateUnion()
 {
   if ( m_PreviewImage.IsNull() ) return;
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   try
@@ -205,7 +197,7 @@ void mitk::SegTool3D::Activated()
 
   // feedback node and its visualization properties
   m_PreviewNode = mitk::DataNode::New();
-  m_PreviewNode->SetName("preview");
+  m_PreviewNode->SetName("3D tool preview");
 
   m_PreviewNode->SetProperty("texture interpolation", BoolProperty::New(false) );
   m_PreviewNode->SetProperty("layer", IntProperty::New(100) );
@@ -216,7 +208,7 @@ void mitk::SegTool3D::Activated()
   m_PreviewNode->SetOpacity(1.0);
   m_PreviewNode->SetColor(0.0, 1.0, 0.0);
 
-  m_ToolManager->GetDataStorage()->Add(m_PreviewNode, m_ToolManager->GetWorkingData(0));
+  m_ToolManager->GetDataStorage()->Add(m_PreviewNode, m_WorkingNode);
 }
 
 void mitk::SegTool3D::Deactivated()
@@ -232,13 +224,10 @@ void mitk::SegTool3D::CreateNewLabel(const std::string& name, const mitk::Color&
 {
   if ( m_PreviewImage.IsNull() ) return;
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
   assert(workingImage);
 
-  workingImage->AddLabel(name,color);
+  workingImage->AddLabel(name, color);
 
   this->AcceptPreview();
 }
@@ -262,7 +251,7 @@ void mitk::SegTool3D::InternalAcceptPreview( ImageType* targetImage, const mitk:
   cropSize[1] = m_RequestedRegion.GetSize(1);
   cropSize[2] = m_RequestedRegion.GetSize(2);
 
-  typename ImageType::RegionType cropRegion(cropIndex,cropSize);
+  typename ImageType::RegionType cropRegion(cropIndex, cropSize);
 
   SourceIteratorType sourceIter( sourceImageITK, sourceImageITK->GetLargestPossibleRegion() );
   TargetIteratorType targetIter( targetImage, cropRegion );
@@ -291,7 +280,7 @@ void mitk::SegTool3D::InternalAcceptPreview( ImageType* targetImage, const mitk:
 template<typename ImageType>
 void mitk::SegTool3D::InternalInvertPreview( ImageType* input )
 {
-  typedef itk::Image<unsigned char, 3> BinaryImageType;
+  typedef itk::Image<LabelSetImage::PixelType, 3> BinaryImageType;
   BinaryImageType::Pointer previewItk;
   CastToItkImage( m_PreviewImage, previewItk );
 
@@ -308,7 +297,7 @@ void mitk::SegTool3D::InternalInvertPreview( ImageType* input )
   cropSize[1] = m_RequestedRegion.GetSize(1);
   cropSize[2] = m_RequestedRegion.GetSize(2);
 
-  typename ImageType::RegionType cropRegion(cropIndex,cropSize);
+  typename ImageType::RegionType cropRegion(cropIndex, cropSize);
 
   SourceIteratorType sourceIter( input, cropRegion );
   TargetIteratorType targetIter( previewItk, previewItk->GetLargestPossibleRegion() );
@@ -334,7 +323,7 @@ void mitk::SegTool3D::InternalInvertPreview( ImageType* input )
 template<typename ImageType>
 void mitk::SegTool3D::InternalUnion( ImageType* input )
 {
-  typedef itk::Image<unsigned char, 3> BinaryImageType;
+  typedef itk::Image<LabelSetImage::PixelType, 3> BinaryImageType;
   BinaryImageType::Pointer previewItk;
   CastToItkImage( m_PreviewImage, previewItk );
 
@@ -389,20 +378,17 @@ void mitk::SegTool3D::InitializeUndoController()
   mitk::UndoController::GetCurrentUndoModel()->Clear();
   mitk::UndoController::GetCurrentUndoModel()->ClearRedoList();
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( m_WorkingNode->GetData() );
   assert(workingImage);
 
   mitk::LabelSetImage::Pointer diffImage = mitk::LabelSetImage::New(workingImage);
   diffImage->SetVolume(workingImage->GetData());
 
-  opExchangeNodes* undoOp = new opExchangeNodes(OP_EXCHANGE, workingNode,
-  workingNode->GetData(), diffImage);
+  opExchangeNodes* undoOp = new opExchangeNodes(OP_EXCHANGE, m_WorkingNode,
+  m_WorkingNode->GetData(), diffImage);
 
-  opExchangeNodes* doOp  = new opExchangeNodes(OP_EXCHANGE, workingNode,
-      diffImage, workingNode->GetData());
+  opExchangeNodes* doOp  = new opExchangeNodes(OP_EXCHANGE, m_WorkingNode,
+      diffImage, m_WorkingNode->GetData());
 
   // TODO: MITK doesn't recognize that a new event happens in the next line,
   //       because nothing happens in the render window.

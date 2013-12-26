@@ -83,10 +83,7 @@ void mitk::DilateTool3D::Run()
 {
 //  this->InitializeUndoController();
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   // todo: use it later
@@ -136,10 +133,7 @@ void mitk::DilateTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* in
   typedef itk::BinaryDilateImageFilter<ImageType, ImageType, BallType> DilateFilterType;
   typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
@@ -213,8 +207,7 @@ void mitk::DilateTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* in
   }
 
   m_PreviewImage = mitk::Image::New();
-  m_PreviewImage->InitializeByItk(result.GetPointer());
-  m_PreviewImage->SetChannel(result->GetBufferPointer());
+  mitk::CastToMitkImage(result.GetPointer(), m_PreviewImage);
 
   const typename ImageType::SizeType& cropSize = cropRegion.GetSize();
   const typename ImageType::IndexType& cropIndex = cropRegion.GetIndex();

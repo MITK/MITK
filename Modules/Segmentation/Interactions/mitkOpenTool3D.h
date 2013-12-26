@@ -18,12 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkOpenTool3D_h_Included
 
 #include "mitkAutoSegmentationTool.h"
-#include "mitkLegacyAdaptors.h"
 #include "SegmentationExports.h"
-#include "mitkDataNode.h"
-#include "mitkLabelSetImage.h"
-#include "mitkToolCommand.h"
-#include "mitkStateEvent.h"
 
 #include "itkImage.h"
 
@@ -66,8 +61,6 @@ class Segmentation_EXPORT OpenTool3D : public AutoSegmentationTool
 
     OpenTool3D();
     virtual ~OpenTool3D();
-
-    mitk::ToolCommand::Pointer m_ProgressCommand;
 
     template < typename TPixel, unsigned int VDimension >
     void InternalRun( itk::Image< TPixel, VDimension>* input );

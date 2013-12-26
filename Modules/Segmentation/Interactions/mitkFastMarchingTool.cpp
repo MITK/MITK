@@ -200,9 +200,11 @@ double mitk::FastMarchingTool::GetStoppingValue()
 
 void mitk::FastMarchingTool::Activated()
 {
+  Superclass::Activated();
+
   // feedback node and its visualization properties
   m_PreviewNode = mitk::DataNode::New();
-  m_PreviewNode->SetName("preview");
+  m_PreviewNode->SetName("tool preview");
 
   m_PreviewNode->SetProperty("texture interpolation", BoolProperty::New(false) );
   m_PreviewNode->SetProperty("layer", IntProperty::New(100) );
@@ -213,7 +215,7 @@ void mitk::FastMarchingTool::Activated()
   m_PreviewNode->SetOpacity(1.0);
   m_PreviewNode->SetColor(0.0, 1.0, 0.0);
 
-  m_ToolManager->GetDataStorage()->Add( m_PreviewNode, m_ToolManager->GetWorkingData(0) );
+  m_ToolManager->GetDataStorage()->Add( m_PreviewNode, m_WorkingNode );
 
   m_SeedsAsPointSet = mitk::PointSet::New();
   m_SeedsAsPointSetNode = mitk::DataNode::New();
@@ -224,11 +226,13 @@ void mitk::FastMarchingTool::Activated()
   m_SeedsAsPointSetNode->SetColor(1.0, 1.0, 0.0);
   m_SeedsAsPointSetNode->SetVisibility(true);
 
-  m_ToolManager->GetDataStorage()->Add( m_SeedsAsPointSetNode, m_ToolManager->GetWorkingData(0) );
+  m_ToolManager->GetDataStorage()->Add( m_SeedsAsPointSetNode, m_WorkingNode );
 }
 
 void mitk::FastMarchingTool::Deactivated()
 {
+  Superclass::Deactivated();
+
   m_ToolManager->GetDataStorage()->Remove( m_PreviewNode );
   m_ToolManager->GetDataStorage()->Remove( m_SeedsAsPointSetNode );
   this->ClearSeeds();
@@ -241,20 +245,31 @@ void mitk::FastMarchingTool::Deactivated()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+void mitk::FastMarchingTool::CreateNewLabel(const std::string& name, const mitk::Color& color)
+{
+  if ( m_PreviewImage.IsNull() ) return;
+
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+  assert(workingImage);
+
+  workingImage->AddLabel(name,color);
+
+  this->AcceptPreview();
+}
+
 void mitk::FastMarchingTool::AcceptPreview()
 {
   mitk::Image::Pointer workingImageSlice = SegTool2D::GetAffectedWorkingSlice( m_PositionEvent );
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
 
-  // paste the binary segmentation to the current working slice
-  mitk::SegTool2D::PasteSegmentationOnWorkingImage( workingImageSlice, m_PreviewImage, m_OverwritePixelValue, m_CurrentTimeStep );
+  CurrentlyBusy.Send(true);
+
+  // paste the preview image to the current working slice
+  mitk::SegTool2D::WritePreviewOnWorkingImage( workingImageSlice, m_PreviewImage, m_OverwritePixelValue, m_CurrentTimeStep );
 
   // paste current working slice back to the working image
   mitk::SegTool2D::WriteBackSegmentationResult(m_PositionEvent, workingImageSlice);
@@ -265,6 +280,8 @@ void mitk::FastMarchingTool::AcceptPreview()
 
   m_PreviewNode->SetData(NULL);
   m_PreviewImage = NULL;
+
+  CurrentlyBusy.Send(false);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -308,6 +325,9 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
     m_SeedContainer->Initialize();
     m_FastMarchingFilter->SetTrialPoints( m_SeedContainer );
 
+    m_SeedsAsPointSet = mitk::PointSet::New(); // m_SeedsAsPointSet->Clear() does not work
+    m_SeedsAsPointSetNode->SetData(m_SeedsAsPointSet);
+
     InternalImageType::Pointer referenceImageSliceAsITK = InternalImageType::New();
     m_ReferenceImageSlice = SegTool2D::GetAffectedReferenceSlice( m_PositionEvent );
     CastToItkImage(m_ReferenceImageSlice, referenceImageSliceAsITK);
@@ -317,8 +337,6 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
     m_SigmoidFilter->SetInput( m_GradientMagnitudeFilter->GetOutput() );
     m_FastMarchingFilter->SetInput( m_SigmoidFilter->GetOutput() );
     m_ThresholdFilter->SetInput( m_FastMarchingFilter->GetOutput() );
-
-//    this->ClearSeeds();
 
     m_Initialized = true;
   }
@@ -402,10 +420,7 @@ void mitk::FastMarchingTool::Run()
   // update FastMarching pipeline and show result
   if (m_Initialized && m_NeedUpdate && m_SeedContainer->Size())
   {
-    mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-    assert(workingNode);
-
-    mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+    mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
     assert(workingImage);
 
     // todo: use it later
@@ -454,10 +469,7 @@ void mitk::FastMarchingTool::InternalRun( ImageType* input )
   OutputImageType::Pointer result = m_ThresholdFilter->GetOutput();
   result->DisconnectPipeline();
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   // fix intersections with other labels

@@ -81,10 +81,7 @@ void mitk::KeepNConnectedRegionsTool3D::Run()
 {
    //  this->InitializeUndoController();
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
@@ -133,10 +130,7 @@ void mitk::KeepNConnectedRegionsTool3D::InternalProcessing( itk::Image< TPixel, 
   typedef itk::LabelMapToLabelImageFilter< LabelMapType, ImageType > LabelMap2ImageType;
   typedef itk::BinaryShapeKeepNObjectsImageFilter< ImageType > BinaryShapeKeepNObjectsImageFilterType;
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
@@ -199,7 +193,7 @@ void mitk::KeepNConnectedRegionsTool3D::InternalProcessing( itk::Image< TPixel, 
   slicedGeometry->SetOrigin(origin);
 
   m_PreviewNode->SetData(m_PreviewImage);
-
+/*
   m_RequestedRegion = workingImage->GetLargestPossibleRegion();
 
   m_RequestedRegion.SetIndex(0,cropIndex[0]);
@@ -209,4 +203,5 @@ void mitk::KeepNConnectedRegionsTool3D::InternalProcessing( itk::Image< TPixel, 
   m_RequestedRegion.SetSize(0,cropSize[0]);
   m_RequestedRegion.SetSize(1,cropSize[1]);
   m_RequestedRegion.SetSize(2,cropSize[2]);
+*/
 }

@@ -219,7 +219,6 @@ if(MITK_USE_QT)
     set(MITK_USE_Qt5 FALSE)
   endif(DESIRED_QT_VERSION MATCHES 4)
   if(DESIRED_QT_VERSION MATCHES 5)
-    find_package(Qt5Core REQUIRED) # at least Core required
     set(MITK_USE_Qt4 FALSE)
     set(MITK_USE_Qt5 TRUE)
   endif(DESIRED_QT_VERSION MATCHES 5)

@@ -1,12 +1,9 @@
 project(MbiLogExample)
 
 find_package(MITK REQUIRED)
-MITK_USE_MODULE(Mitk)
-
-include_directories(${ALL_INCLUDE_DIRECTORIES})
 
 add_executable(MitkLogExample MitkLogExample.cpp)
-target_link_libraries(MitkLogExample ${ALL_LIBRARIES})
+mitk_use_modules(TARGET MitkLogExample MODULES Mitk)
 
 # subproject support
 set_property(TARGET MitkLogExample PROPERTY LABELS ${MITK_DEFAULT_SUBPROJECTS})

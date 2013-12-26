@@ -8,15 +8,10 @@ if(result)
   message(SEND_ERROR "MITK module(s) \"${result}\" not available from the MITK build at ${MITK_DIR}")
 endif()
 
-# Set-up the build system to use the Mitk module
-MITK_USE_MODULE(Mitk)
-include_directories(${ALL_INCLUDE_DIRECTORIES})
-link_directories(${ALL_LIBRARY_DIRS})
-
 usFunctionGenerateExecutableInit(init_src_file IDENTIFIER ${PROJECT_NAME})
 
 add_executable(${PROJECT_NAME} QtFreeRender.cpp ${init_src_file})
-target_link_libraries(${PROJECT_NAME} ${ALL_LIBRARIES} )
+mitk_use_modules(TARGET ${PROJECT_NAME} MODULES Mitk)
 
 # subproject support
 set_property(TARGET ${PROJECT_NAME} PROPERTY LABELS ${MITK_DEFAULT_SUBPROJECTS})

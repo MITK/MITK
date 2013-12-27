@@ -91,14 +91,7 @@ namespace mitk
     */
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
                               int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL);
-//    TODO: Buffer size currently set to 1. Once Buffer handling is working correctly, method may be reactivated
-//    /* // * TODO: Reenable doxygen comment when uncommenting, disabled to fix doxygen warning see bug 12882
-//    \brief pure virtual method resetting the buffer using the specified bufferSize. Has to be implemented by sub-classes
-//    \param bufferSize buffer size the buffer should be reset to
-//    */
-//    virtual void ResetBuffer(int bufferSize) = 0;
-    //TODO add/correct documentation for requiredImageSequence and capturedImageSequence in the GetAllImages, GetDistances, GetIntensities and GetAmplitudes methods.
-    /*!
+   /*!
     \brief Set file name where the data is recorded
     \param inputFileName name of input file which should be played
     */

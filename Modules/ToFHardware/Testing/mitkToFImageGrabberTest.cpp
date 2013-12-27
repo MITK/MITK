@@ -15,100 +15,142 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkTestingMacros.h>
-#include <mitkToFImageGrabber.h>
-
-#include <mitkImageDataItem.h>
+#include <mitkTestingConfig.h>
+#include <mitkTestFixture.h>
 #include <mitkIOUtil.h>
+
+#include <mitkToFImageGrabber.h>
 #include <mitkToFCameraMITKPlayerDevice.h>
 #include <mitkToFConfig.h>
-#include "mitkImageReadAccessor.h"
 
-static bool CompareImages(mitk::Image::Pointer image1, mitk::Image::Pointer image2)
-{
-  //check if epsilon is exceeded
-  unsigned int sliceDimension = image1->GetDimension(0)*image1->GetDimension(1);
-  bool picturesEqual = true;
 
-  mitk::ImageReadAccessor image1Acc(image1, image1->GetSliceData(0,0,0));
-  mitk::ImageReadAccessor image2Acc(image2, image2->GetSliceData(0,0,0));
+#include <mitkImageSliceSelector.h>
 
-  float* floatArray1 = (float*)image1Acc.GetData();
-  float* floatArray2 = (float*)image2Acc.GetData();
-
-  for(unsigned int i = 0; i < sliceDimension; i++)
-  {
-    if(!(mitk::Equal(floatArray1[i], floatArray2[i])))
-    {
-      picturesEqual = false;
-    }
-  }
-  return picturesEqual;
-}
-
-/**Documentation
- *  test for the class "ToFImageGrabber".
+/**
+ * @brief The mitkToFImageGrabberTestSuite class is a test-suite for mitkToFImageGrabber.
+ *
+ * Test data is retrieved from MITK-Data.
  */
-int mitkToFImageGrabberTest(int /* argc */, char* /*argv*/[])
+class mitkToFImageGrabberTestSuite : public mitk::TestFixture
 {
-  MITK_TEST_BEGIN("ToFImageGrabber");
 
-  std::string dirName = MITK_TOF_DATA_DIR;
-  mitk::ToFImageGrabber::Pointer tofImageGrabber = mitk::ToFImageGrabber::New();
-  mitk::ToFCameraMITKPlayerDevice::Pointer tofCameraMITKPlayerDevice = mitk::ToFCameraMITKPlayerDevice::New();
-  tofImageGrabber->SetCameraDevice(tofCameraMITKPlayerDevice);
-  MITK_TEST_CONDITION_REQUIRED(tofCameraMITKPlayerDevice==tofImageGrabber->GetCameraDevice(),"Test Set/GetCameraDevice()");
-  int modulationFrequency = 20;
-  tofImageGrabber->SetModulationFrequency(modulationFrequency);
-  MITK_TEST_CONDITION_REQUIRED(modulationFrequency==tofImageGrabber->GetModulationFrequency(),"Test Set/GetModulationFrequency()");
-  int integrationTime = 500;
-  tofImageGrabber->SetIntegrationTime(integrationTime);
-  MITK_TEST_CONDITION_REQUIRED(integrationTime==tofImageGrabber->GetIntegrationTime(),"Test Set/GetIntegrationTime()");
-  MITK_TEST_OUTPUT(<<"Test methods with invalid file name");
-  MITK_TEST_FOR_EXCEPTION(std::logic_error, tofImageGrabber->ConnectCamera());
-  MITK_TEST_OUTPUT(<<"Call StartCamera()");
-  tofImageGrabber->StartCamera();
-  MITK_TEST_OUTPUT(<<"Call StopCamera()");
-  tofImageGrabber->StopCamera();
-  MITK_TEST_CONDITION_REQUIRED(!tofImageGrabber->DisconnectCamera(),"Test DisconnectCamera() with no file name set");
+  CPPUNIT_TEST_SUITE(mitkToFImageGrabberTestSuite);
+  MITK_TEST(GetterAndSetterTests);
+  MITK_TEST(ConnectCamera_InvalidFileName_ThrowsException);
+  MITK_TEST(ConnectCamera_ValidFileName_ReturnsTrue);
+  MITK_TEST(IsCameraActive_DifferentStates_ReturnsCorrectResult);
+  MITK_TEST(Update_ValidData_ImagesAreEqual);
+  CPPUNIT_TEST_SUITE_END();
 
-  std::string distanceFileName = dirName + "/PMDCamCube2_MF0_IT0_1Images_DistanceImage.pic";
-  tofImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(distanceFileName));
-  std::string amplitudeFileName = dirName + "/PMDCamCube2_MF0_IT0_1Images_AmplitudeImage.pic";
-  tofImageGrabber->SetProperty("AmplitudeImageFileName",mitk::StringProperty::New(amplitudeFileName));
-  std::string intensityFileName = dirName + "/PMDCamCube2_MF0_IT0_1Images_IntensityImage.pic";
-  tofImageGrabber->SetProperty("IntensityImageFileName",mitk::StringProperty::New(intensityFileName));
+private:
 
-  // Load images with PicFileReader for comparison
-  mitk::Image::Pointer expectedResultImage = NULL;
+  std::string m_DepthImagePath;
+  std::string m_ColorImagePath;
 
-  MITK_TEST_OUTPUT(<<"Test ToFImageGrabber using ToFCameraMITKPlayerDevice");
-  MITK_TEST_CONDITION_REQUIRED(tofImageGrabber->ConnectCamera(),"Test ConnectCamera()");
-  MITK_TEST_CONDITION_REQUIRED(!tofImageGrabber->IsCameraActive(),"IsCameraActive() before StartCamera()");
-  MITK_TEST_OUTPUT(<<"Call StartCamera()");
-  tofImageGrabber->StartCamera();
-  MITK_TEST_CONDITION_REQUIRED(tofImageGrabber->IsCameraActive(),"IsCameraActive() after StartCamera()");
-  expectedResultImage = mitk::IOUtil::LoadImage(distanceFileName);
-  int captureWidth = expectedResultImage->GetDimension(0);
-  int captureHeight = expectedResultImage->GetDimension(1);
-  MITK_TEST_CONDITION_REQUIRED(tofImageGrabber->GetCaptureWidth()==captureWidth,"Test GetCaptureWidth()");
-  MITK_TEST_CONDITION_REQUIRED(tofImageGrabber->GetCaptureHeight()==captureHeight,"Test GetCaptureHeight()");
-  MITK_TEST_OUTPUT(<<"Call Update()");
-  tofImageGrabber->Update();
-  mitk::Image::Pointer distanceImage = tofImageGrabber->GetOutput();
-  MITK_TEST_CONDITION_REQUIRED(CompareImages(expectedResultImage,distanceImage),"Test GetOutput()");
-  expectedResultImage = mitk::IOUtil::LoadImage(amplitudeFileName);
-  mitk::Image::Pointer amplitudeImage = tofImageGrabber->GetOutput(1);
-  MITK_TEST_CONDITION_REQUIRED(CompareImages(expectedResultImage,amplitudeImage),"Test GetOutput(1)");
-  expectedResultImage = mitk::IOUtil::LoadImage(intensityFileName);
-  mitk::Image::Pointer intensityImage = tofImageGrabber->GetOutput(2);
-  MITK_TEST_CONDITION_REQUIRED(CompareImages(expectedResultImage,intensityImage),"Test GetOutput(2)");
-  MITK_TEST_OUTPUT(<<"Call StopCamera()");
-  tofImageGrabber->StopCamera();
-  MITK_TEST_CONDITION_REQUIRED(!tofImageGrabber->IsCameraActive(),"IsCameraActive() after StopCamera()");
-  MITK_TEST_CONDITION_REQUIRED(tofImageGrabber->DisconnectCamera(),"Test DisconnectCamera()");
-  MITK_TEST_CONDITION_REQUIRED(!tofImageGrabber->IsCameraActive(),"IsCameraActive() after DisconnectCamera()");
+  mitk::ToFImageGrabber::Pointer m_ToFImageGrabber;
 
-  MITK_TEST_END();;
-}
+public:
+
+  void setUp()
+  {
+    std::string dirName = MITK_TOF_DATA_DIR;
+
+    std::string depthImagePath = dirName + "/" + "Kinect_Lego_Phantom_DistanceImage.nrrd";
+    std::string colorImagePath = dirName + "/" + "Kinect_Lego_Phantom_RGBImage.nrrd";
+
+    m_DepthImagePath = GetTestDataFilePath(depthImagePath);
+    m_ColorImagePath = GetTestDataFilePath(colorImagePath);
+
+    m_ToFImageGrabber = mitk::ToFImageGrabber::New();
+
+    //The Grabber always needs a device
+    mitk::ToFCameraMITKPlayerDevice::Pointer tofCameraMITKPlayerDevice = mitk::ToFCameraMITKPlayerDevice::New();
+    m_ToFImageGrabber->SetCameraDevice(tofCameraMITKPlayerDevice);
+  }
+
+  void tearDown()
+  {
+    if(m_ToFImageGrabber->IsCameraActive())
+    {
+      m_ToFImageGrabber->StopCamera();
+      m_ToFImageGrabber->DisconnectCamera();
+    }
+    m_ToFImageGrabber = NULL;
+    MITK_INFO << "NED";
+  }
+
+  /**
+   * @brief GetterAndSetterTests Testing getters and setters of mitkToFImageGrabber, because
+   * they internally contain logic.
+   */
+  void GetterAndSetterTests()
+  {
+    int modulationFrequency = 20;
+    m_ToFImageGrabber->SetModulationFrequency(modulationFrequency);
+    CPPUNIT_ASSERT(modulationFrequency==m_ToFImageGrabber->GetModulationFrequency());
+
+    int integrationTime = 500;
+    m_ToFImageGrabber->SetIntegrationTime(integrationTime);
+    CPPUNIT_ASSERT(integrationTime==m_ToFImageGrabber->GetIntegrationTime());
+  }
+
+  void ConnectCamera_InvalidFileName_ThrowsException()
+  {
+    MITK_TEST_FOR_EXCEPTION(std::logic_error, m_ToFImageGrabber->ConnectCamera());
+    m_ToFImageGrabber->StartCamera();
+    m_ToFImageGrabber->StopCamera();
+    CPPUNIT_ASSERT_MESSAGE("Test DisconnectCamera() with no file name set", !m_ToFImageGrabber->DisconnectCamera());
+  }
+
+  void ConnectCamera_ValidFileName_ReturnsTrue()
+  {
+    m_ToFImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(m_DepthImagePath));
+    m_ToFImageGrabber->SetProperty("RGBImageFileName",mitk::StringProperty::New(m_ColorImagePath));
 
 
+    CPPUNIT_ASSERT(m_ToFImageGrabber->ConnectCamera() == true);
+  }
+
+  void Update_ValidData_ImagesAreEqual()
+  {
+    m_ToFImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(m_DepthImagePath));
+
+    m_ToFImageGrabber->ConnectCamera();
+    m_ToFImageGrabber->StartCamera();
+    mitk::Image::Pointer expectedResultImage = mitk::IOUtil::LoadImage(m_DepthImagePath);
+
+    m_ToFImageGrabber->Update();
+
+    //Select 2D slice to make it comparable in diminsion
+    mitk::ImageSliceSelector::Pointer selector = mitk::ImageSliceSelector::New();
+    selector->SetSliceNr(0);
+    selector->SetTimeNr(0);
+    selector->SetInput( m_ToFImageGrabber->GetOutput(0) );
+    selector->Update();
+    mitk::Image::Pointer distanceImage = selector->GetOutput(0);
+
+    MITK_ASSERT_EQUAL( expectedResultImage, distanceImage, "Test data is 2D. Results should be equal.");
+  }
+
+  void IsCameraActive_DifferentStates_ReturnsCorrectResult()
+  {
+    m_ToFImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(m_DepthImagePath));
+    m_ToFImageGrabber->SetProperty("RGBImageFileName",mitk::StringProperty::New(m_ColorImagePath));
+
+    m_ToFImageGrabber->ConnectCamera();
+    CPPUNIT_ASSERT(m_ToFImageGrabber->IsCameraActive() == false);
+    m_ToFImageGrabber->StartCamera();
+    CPPUNIT_ASSERT(m_ToFImageGrabber->IsCameraActive() == true);
+    m_ToFImageGrabber->StopCamera();
+    CPPUNIT_ASSERT(m_ToFImageGrabber->IsCameraActive() == false);
+    m_ToFImageGrabber->StartCamera();
+    CPPUNIT_ASSERT(m_ToFImageGrabber->IsCameraActive() == true);
+    m_ToFImageGrabber->StopCamera();
+    CPPUNIT_ASSERT(m_ToFImageGrabber->IsCameraActive() == false);
+
+    m_ToFImageGrabber->DisconnectCamera();
+    CPPUNIT_ASSERT(m_ToFImageGrabber->IsCameraActive() == false);
+  }
+};
+
+MITK_TEST_SUITE_REGISTRATION(mitkToFImageGrabber)

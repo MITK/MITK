@@ -17,11 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFCameraMITKPlayerController.h"
 #include "mitkRealTimeClock.h"
 
-#include "itkMultiThreader.h"
+#include <iostream>
+#include <itkMultiThreader.h>
 #include <itksys/SystemTools.hxx>
-
-
-
 
 namespace mitk
 {
@@ -279,18 +277,42 @@ namespace mitk
     }
     else if (strcmp(propertyKey, "AmplitudeImageFileName") == 0)
     {
-      this->m_PropertyList->SetBoolProperty("HasAmplitudeImage", true);
-      myController->SetAmplitudeImageFileName(strValue);
+      std::ifstream amplitudeImage(strValue.c_str());
+      if(amplitudeImage)
+      {
+        this->m_PropertyList->SetBoolProperty("HasAmplitudeImage", true);
+        myController->SetAmplitudeImageFileName(strValue);
+      }
+      else
+      {
+        MITK_WARN << "File " << strValue << " does not exist!";
+      }
     }
     else if (strcmp(propertyKey, "IntensityImageFileName") == 0)
     {
-      this->m_PropertyList->SetBoolProperty("HasIntensityImage", true);
-      myController->SetIntensityImageFileName(strValue);
+      std::ifstream intensityImage(strValue.c_str());
+      if(intensityImage)
+      {
+        this->m_PropertyList->SetBoolProperty("HasIntensityImage", true);
+        myController->SetIntensityImageFileName(strValue);
+      }
+      else
+      {
+        MITK_WARN << "File " << strValue << " does not exist!";
+      }
     }
     else if (strcmp(propertyKey, "RGBImageFileName") == 0)
     {
-      this->m_PropertyList->SetBoolProperty("HasRGBImage", true);
-      myController->SetRGBImageFileName(strValue);
+      std::ifstream intensityImage(strValue.c_str());
+      if(intensityImage)
+      {
+        this->m_PropertyList->SetBoolProperty("HasRGBImage", true);
+        myController->SetRGBImageFileName(strValue);
+      }
+      else
+      {
+        MITK_WARN << "File " << strValue << " does not exist!";
+      }
     }
   }
 

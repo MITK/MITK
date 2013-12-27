@@ -76,7 +76,6 @@ public:
       m_ToFImageGrabber->DisconnectCamera();
     }
     m_ToFImageGrabber = NULL;
-    MITK_INFO << "NED";
   }
 
   /**
@@ -113,23 +112,30 @@ public:
 
   void Update_ValidData_ImagesAreEqual()
   {
-    m_ToFImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(m_DepthImagePath));
+    try
+    {
+      m_ToFImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(m_DepthImagePath));
 
-    m_ToFImageGrabber->ConnectCamera();
-    m_ToFImageGrabber->StartCamera();
-    mitk::Image::Pointer expectedResultImage = mitk::IOUtil::LoadImage(m_DepthImagePath);
+      m_ToFImageGrabber->ConnectCamera();
+      m_ToFImageGrabber->StartCamera();
+      mitk::Image::Pointer expectedResultImage = mitk::IOUtil::LoadImage(m_DepthImagePath);
 
-    m_ToFImageGrabber->Update();
+      m_ToFImageGrabber->Update();
 
-    //Select 2D slice to make it comparable in diminsion
-    mitk::ImageSliceSelector::Pointer selector = mitk::ImageSliceSelector::New();
-    selector->SetSliceNr(0);
-    selector->SetTimeNr(0);
-    selector->SetInput( m_ToFImageGrabber->GetOutput(0) );
-    selector->Update();
-    mitk::Image::Pointer distanceImage = selector->GetOutput(0);
+      //Select 2D slice to make it comparable in diminsion
+      mitk::ImageSliceSelector::Pointer selector = mitk::ImageSliceSelector::New();
+      selector->SetSliceNr(0);
+      selector->SetTimeNr(0);
+      selector->SetInput( m_ToFImageGrabber->GetOutput(0) );
+      selector->Update();
+      mitk::Image::Pointer distanceImage = selector->GetOutput(0);
 
-    MITK_ASSERT_EQUAL( expectedResultImage, distanceImage, "Test data is 2D. Results should be equal.");
+      MITK_ASSERT_EQUAL( expectedResultImage, distanceImage, "Test data is 2D. Results should be equal.");
+    }
+    catch(std::exception &e)
+    {
+      MITK_ERROR << e.what();
+    }
   }
 
   void IsCameraActive_DifferentStates_ReturnsCorrectResult()

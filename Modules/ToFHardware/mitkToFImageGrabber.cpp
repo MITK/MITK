@@ -84,51 +84,28 @@ void ToFImageGrabber::GenerateData()
     distanceImage->Initialize(FloatType, 3, dimensions, 1);
     m_DistanceImageInitialized = true;
   }
-
-  if (m_DistanceArray)
+  mitk::Image::Pointer amplitudeImage = this->GetOutput(1);
+  if (!m_AmplitudeImageInitialized)
   {
-    distanceImage->SetSlice(this->m_DistanceArray, 0, 0, 0);
+    amplitudeImage->ReleaseData();
+    amplitudeImage->Initialize(FloatType, 3, dimensions, 1);
+    m_AmplitudeImageInitialized = true;
+  }
+  mitk::Image::Pointer intensityImage = this->GetOutput(2);
+  if (!m_IntensityImageInitialized)
+  {
+    intensityImage->ReleaseData();
+    intensityImage->Initialize(FloatType, 3, dimensions, 1);
+    m_IntensityImageInitialized = true;
   }
 
-  bool ImageTypeSupported = false;
-  m_ToFCameraDevice->GetBoolProperty("HasAmplitudeImage", ImageTypeSupported);
-  if( ImageTypeSupported )
-  {
-    mitk::Image::Pointer amplitudeImage = this->GetOutput(1);
-    if (!m_AmplitudeImageInitialized)
-    {
-      amplitudeImage->ReleaseData();
-      amplitudeImage->Initialize(FloatType, 3, dimensions, 1);
-      m_AmplitudeImageInitialized = true;
-    }
-    if (m_AmplitudeArray)
-    {
-      amplitudeImage->SetSlice(this->m_AmplitudeArray, 0, 0, 0);
-    }
-  }
-
-  m_ToFCameraDevice->GetBoolProperty("HasIntensityImage", ImageTypeSupported);
-  if( ImageTypeSupported )
-  {
-    mitk::Image::Pointer intensityImage = this->GetOutput(2);
-    if (!m_IntensityImageInitialized)
-    {
-      intensityImage->ReleaseData();
-      intensityImage->Initialize(FloatType, 3, dimensions, 1);
-      m_IntensityImageInitialized = true;
-    }
-    if (m_IntensityArray)
-    {
-      intensityImage->SetSlice(this->m_IntensityArray, 0, 0, 0);
-    }
-  }
-
-  m_ToFCameraDevice->GetBoolProperty("HasRGBImage", ImageTypeSupported);
-  if( ImageTypeSupported )
+  bool hasRGBImage = false;
+  m_ToFCameraDevice->GetBoolProperty("HasRGBImage", hasRGBImage);
+  if( hasRGBImage )
   {
     unsigned int rgbDimension[3];
-    rgbDimension[0] = this->GetRGBImageWidth();
-    rgbDimension[1] = this->GetRGBImageHeight();
+    rgbDimension[0] = this->m_ToFCameraDevice->GetRGBCaptureWidth();
+    rgbDimension[1] = this->m_ToFCameraDevice->GetRGBCaptureHeight();
     rgbDimension[2] = 1 ;
     mitk::Image::Pointer rgbImage = this->GetOutput(3);
     if (!m_RGBImageInitialized)
@@ -141,6 +118,19 @@ void ToFImageGrabber::GenerateData()
     {
       rgbImage->SetSlice(this->m_RgbDataArray, 0, 0, 0);
     }
+  }
+
+  if (m_DistanceArray)
+  {
+    distanceImage->SetSlice(this->m_DistanceArray, 0, 0, 0);
+  }
+  if (m_AmplitudeArray)
+  {
+    amplitudeImage->SetSlice(this->m_AmplitudeArray, 0, 0, 0);
+  }
+  if (m_IntensityArray)
+  {
+    intensityImage->SetSlice(this->m_IntensityArray, 0, 0, 0);
   }
 }
 

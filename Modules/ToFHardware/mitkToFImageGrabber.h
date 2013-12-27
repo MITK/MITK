@@ -153,6 +153,7 @@ namespace mitk
 
     BaseProperty* GetProperty( const char *propertyKey);
 
+
   protected:
 
     ///
@@ -173,9 +174,9 @@ namespace mitk
     int m_CaptureWidth; ///< Width of the captured ToF image
     int m_CaptureHeight; ///< Height of the captured ToF image
     int m_PixelNumber; ///< Number of pixels in the image
-    int m_RGBImageWidth;
-    int m_RGBImageHeight;
-    int m_RGBPixelNumber;
+    int m_RGBImageWidth; ///< Width of the captured RGB image
+    int m_RGBImageHeight; ///< Height of the captured RGB image
+    int m_RGBPixelNumber; ///< Number of pixels in the RGB image
     int m_ImageSequence; ///< counter for currently acquired images
     int m_SourceDataSize; ///< size of the source data in bytes
     float* m_IntensityArray; ///< member holding the current intensity array
@@ -197,6 +198,7 @@ namespace mitk
     0: distance image
     1: amplitude image
     2: intensity image
+    3: RGB image
     */
     void GenerateData();
 

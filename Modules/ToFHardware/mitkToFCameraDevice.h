@@ -217,9 +217,9 @@ namespace mitk
     int m_CaptureWidth; ///< width of the range image (x dimension)
     int m_CaptureHeight; ///< height of the range image (y dimension)
     int m_PixelNumber; ///< number of pixels in the range image (m_CaptureWidth*m_CaptureHeight)
-    int m_RGBImageWidth;
-    int m_RGBImageHeight;
-    int m_RGBPixelNumber;
+    int m_RGBImageWidth; ///< width of the RGB image (x dimension)
+    int m_RGBImageHeight; ///< height of the RGB image (y dimension)
+    int m_RGBPixelNumber; ///< number of pixels in the range image (m_RGBImageWidth*m_RGBImageHeight)
     int m_SourceDataSize; ///< size of the PMD source data
     itk::MultiThreader::Pointer m_MultiThreader; ///< itk::MultiThreader used for thread handling
     itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the range camera

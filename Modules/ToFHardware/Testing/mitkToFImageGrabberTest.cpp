@@ -39,13 +39,19 @@ class mitkToFImageGrabberTestSuite : public mitk::TestFixture
   MITK_TEST(ConnectCamera_InvalidFileName_ThrowsException);
   MITK_TEST(ConnectCamera_ValidFileName_ReturnsTrue);
   MITK_TEST(IsCameraActive_DifferentStates_ReturnsCorrectResult);
-  MITK_TEST(Update_ValidData_ImagesAreEqual);
+  MITK_TEST(Update_2DData_ImagesAreEqual);
+  MITK_TEST(Update_CamCubeData_PropertiesAreTrue);
+
   CPPUNIT_TEST_SUITE_END();
 
 private:
 
-  std::string m_DepthImagePath;
-  std::string m_ColorImagePath;
+  std::string m_KinectDepthImagePath;
+  std::string m_KinectColorImagePath;
+
+  std::string m_CamCubeDepthImagePath;
+  std::string m_CamCubeIntensityImagePath;
+  std::string m_CamCubeAmplitudeImagePath;
 
   mitk::ToFImageGrabber::Pointer m_ToFImageGrabber;
 
@@ -57,9 +63,15 @@ public:
 
     std::string depthImagePath = dirName + "/" + "Kinect_Lego_Phantom_DistanceImage.nrrd";
     std::string colorImagePath = dirName + "/" + "Kinect_Lego_Phantom_RGBImage.nrrd";
+    std::string distanceImageP = dirName + "/" + "PMDCamCube2_MF0_IT0_1Images_DistanceImage.pic";
+    std::string amplitudeImage = dirName + "/" + "PMDCamCube2_MF0_IT0_1Images_AmplitudeImage.pic";
+    std::string intensityImage = dirName + "/" + "PMDCamCube2_MF0_IT0_1Images_IntensityImage.pic";
 
-    m_DepthImagePath = GetTestDataFilePath(depthImagePath);
-    m_ColorImagePath = GetTestDataFilePath(colorImagePath);
+    m_KinectDepthImagePath = GetTestDataFilePath(depthImagePath);
+    m_KinectColorImagePath = GetTestDataFilePath(colorImagePath);
+    m_CamCubeDepthImagePath = GetTestDataFilePath(distanceImageP);
+    m_CamCubeIntensityImagePath = GetTestDataFilePath(amplitudeImage);
+    m_CamCubeAmplitudeImagePath = GetTestDataFilePath(intensityImage);
 
     m_ToFImageGrabber = mitk::ToFImageGrabber::New();
 
@@ -103,22 +115,22 @@ public:
 
   void ConnectCamera_ValidFileName_ReturnsTrue()
   {
-    m_ToFImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(m_DepthImagePath));
-    m_ToFImageGrabber->SetProperty("RGBImageFileName",mitk::StringProperty::New(m_ColorImagePath));
+    m_ToFImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(m_KinectDepthImagePath));
+    m_ToFImageGrabber->SetProperty("RGBImageFileName",mitk::StringProperty::New(m_KinectColorImagePath));
 
 
     CPPUNIT_ASSERT(m_ToFImageGrabber->ConnectCamera() == true);
   }
 
-  void Update_ValidData_ImagesAreEqual()
+  void Update_2DData_ImagesAreEqual()
   {
     try
     {
-      m_ToFImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(m_DepthImagePath));
+      m_ToFImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(m_KinectDepthImagePath));
 
       m_ToFImageGrabber->ConnectCamera();
       m_ToFImageGrabber->StartCamera();
-      mitk::Image::Pointer expectedResultImage = mitk::IOUtil::LoadImage(m_DepthImagePath);
+      mitk::Image::Pointer expectedResultImage = mitk::IOUtil::LoadImage(m_KinectDepthImagePath);
 
       m_ToFImageGrabber->Update();
 
@@ -140,8 +152,8 @@ public:
 
   void IsCameraActive_DifferentStates_ReturnsCorrectResult()
   {
-    m_ToFImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(m_DepthImagePath));
-    m_ToFImageGrabber->SetProperty("RGBImageFileName",mitk::StringProperty::New(m_ColorImagePath));
+    m_ToFImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(m_KinectDepthImagePath));
+    m_ToFImageGrabber->SetProperty("RGBImageFileName",mitk::StringProperty::New(m_KinectColorImagePath));
 
     m_ToFImageGrabber->ConnectCamera();
     CPPUNIT_ASSERT(m_ToFImageGrabber->IsCameraActive() == false);
@@ -156,6 +168,22 @@ public:
 
     m_ToFImageGrabber->DisconnectCamera();
     CPPUNIT_ASSERT(m_ToFImageGrabber->IsCameraActive() == false);
+  }
+
+  void Update_CamCubeData_PropertiesAreTrue()
+  {
+    m_ToFImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(m_CamCubeDepthImagePath));
+    m_ToFImageGrabber->SetProperty("AmplitudeImageFileName",mitk::StringProperty::New(m_CamCubeAmplitudeImagePath));
+    m_ToFImageGrabber->SetProperty("IntensityImageFileName",mitk::StringProperty::New(m_CamCubeIntensityImagePath));
+
+    m_ToFImageGrabber->ConnectCamera();
+    m_ToFImageGrabber->StartCamera();
+    m_ToFImageGrabber->Update();
+
+    CPPUNIT_ASSERT( m_ToFImageGrabber->GetBoolProperty("HasAmplitudeImage") == true);
+    CPPUNIT_ASSERT( m_ToFImageGrabber->GetBoolProperty("HasIntensityImage") == true);
+    CPPUNIT_ASSERT( m_ToFImageGrabber->GetOutput(1) != NULL );
+    CPPUNIT_ASSERT( m_ToFImageGrabber->GetOutput(2) != NULL );
   }
 };
 

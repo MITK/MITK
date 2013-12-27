@@ -126,7 +126,7 @@ namespace mitk
         }
         else
         {
-          MITK_ERROR << "ToF amplitude image data file empty";
+          MITK_WARN << "ToF amplitude image data file empty";
         }
         if (!this->m_IntensityImageFileName.empty())
         {
@@ -134,7 +134,7 @@ namespace mitk
         }
         else
         {
-          MITK_ERROR << "ToF amplitude image data file empty";
+          MITK_WARN << "ToF intensity image data file empty";
         }
         if (!this->m_RGBImageFileName.empty())
         {
@@ -142,7 +142,7 @@ namespace mitk
         }
         else
         {
-          MITK_ERROR << "ToF RGB image data file empty";
+          MITK_WARN << "ToF RGB image data file empty";
         }
 
         // check if the opened files contained data

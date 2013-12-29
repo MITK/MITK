@@ -25,12 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // us
 #include <usModuleResource.h>
+#include <usGetModuleContext.h>
 
 #include <itkObjectFactory.h>
 
-mitk::Tool::Tool(const char* type)
-: StateMachine(type),
-  m_SupportRoi(false)
+mitk::Tool::Tool(const char* type) : m_InteractorType( type )
 {
   m_PredicateWorking = mitk::NodePredicateAnd::New();
   m_PredicateWorking->AddPredicate(NodePredicateDimension::New(3, 1));
@@ -57,6 +56,43 @@ mitk::Tool::~Tool()
 {
 }
 
+void mitk::Tool::InitializeStateMachine()
+{
+  m_InteractorType += ".xml";
+
+  try
+  {
+    LoadStateMachine( m_InteractorType, us::GetModuleContext()->GetModule() );
+    SetEventConfig( "SegmentationToolsConfig.xml", us::GetModuleContext()->GetModule() );
+  }
+  catch( const std::exception& e )
+  {
+    MITK_ERROR << "Could not load statemachine pattern " << m_InteractorType << " with exception: " << e.what();
+  }
+}
+
+void mitk::Tool::Notify( InteractionEvent* interactionEvent, bool isHandled )
+{
+  // to use the state machine pattern,
+  // the event is passed to the state machine interface to be handled
+  if ( !isHandled )
+  {
+    this->HandleEvent(interactionEvent, NULL);
+  }
+}
+
+void mitk::Tool::ConnectActionsAndFunctions()
+{
+}
+
+
+bool mitk::Tool::FilterEvents(InteractionEvent* , DataNode* )
+{
+  return true;
+}
+
+
+
 const char* mitk::Tool::GetGroup() const
 {
   return "default";
@@ -75,7 +111,8 @@ void mitk::Tool::Activated()
 
 void mitk::Tool::Deactivated()
 {
-  StateMachine::ResetStatemachineToStartState(); // forget about the past
+  // ToDo: reactivate this feature!
+  //StateMachine::ResetStatemachineToStartState(); // forget about the past
 }
 
 itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkitPrefix, const std::string& toolkitPostfix)

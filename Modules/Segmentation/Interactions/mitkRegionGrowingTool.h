@@ -74,48 +74,18 @@ class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
     RegionGrowingTool(); // purposely hidden
     virtual ~RegionGrowingTool();
 
-    /**
-      1 Determine which slice is clicked into
-      2 Determine if the user clicked inside or outside of the segmentation
-      3 Depending on the pixel value under the mouse click position, two different things happen: (separated out into OnMousePressedInside and OnMousePressedOutside)
-       3.1 Create a skeletonization of the segmentation and try to find a nice cut
-         3.1.1 Call a ipSegmentation algorithm to create a nice cut
-         3.1.2 Set the result of this algorithm as the feedback contour
-       3.2 Initialize region growing
-         3.2.1 Determine memory offset inside the original image
-         3.2.2 Determine initial region growing parameters from the level window settings of the image
-         3.2.3 Perform a region growing (which generates a new feedback contour)
-    */
-    virtual bool OnMousePressed (Action*, const StateEvent*);
-    /**
-      3.1 Create a skeletonization of the segmentation and try to find a nice cut
-      3.1.1 Call a ipSegmentation algorithm to create a nice cut
-      3.1.2 Set the result of this algorithm as the feedback contour
-    */
-    virtual bool OnMousePressedInside (Action*, const StateEvent*, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset);
-    /**
-     3.2 Initialize region growing
-       3.2.1 Determine memory offset inside the original image
-       3.2.2 Determine initial region growing parameters from the level window settings of the image
-       3.2.3 Perform a region growing (which generates a new feedback contour)
-    */
-    virtual bool OnMousePressedOutside (Action*, const StateEvent*);
-    /**
-     If in region growing mode (m_ReferenceSlice != NULL), then
-     1. Calculate the new thresholds from mouse position (relative to first position)
-     2. Perform a new region growing and update the feedback contour
-    */
-    virtual bool OnMouseMoved   (Action*, const StateEvent*);
-    /**
-     If the feedback contour should be filled, then it is done here. (Contour is NOT filled, when skeletonization is done but no nice cut was found)
-    */
-    virtual bool OnMouseReleased(Action*, const StateEvent*);
-    virtual bool OnChangeActiveLabel(Action*, const StateEvent*);
-    /**
-      Uses ipSegmentation algorithms to do the actual region growing. The result (binary image) is first smoothed by a 5x5 circle mask, then
-      its contour is extracted and converted to MITK coordinates.
-    */
-    mitkIpPicDescriptor* PerformRegionGrowingAndUpdateContour(int timestep);
+    void ConnectActionsAndFunctions();
+
+    virtual void Activated();
+    virtual void Deactivated();
+
+    virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual bool OnMousePressedInside ( StateMachineAction*, InteractionEvent* interactionEvent, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset);
+    virtual bool OnMousePressedOutside ( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual bool OnMouseMoved   ( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent );
+//virtual bool OnChangeActiveLabel(Action*, const StateEvent*);
+    mitkIpPicDescriptor* PerformRegionGrowingAndUpdateContour(int timestep=0);
 
     Image::Pointer m_ReferenceSlice;
     Image::Pointer m_WorkingSlice;

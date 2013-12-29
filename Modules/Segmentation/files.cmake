@@ -137,4 +137,11 @@ set(RESOURCE_FILES
   SplitConnectedRegionsTool3D_48x48.png
   ConnectedRegionSelectorTool3D_48x48.png
   ConnectedRegionSelectorTool3D_Cursor_32x32.png
+  Interactions/dummy.xml
+  Interactions/LiveWireTool.xml
+  Interactions/PressMoveRelease.xml
+  Interactions/PressMoveReleaseAndPointSetting.xml
+  Interactions/PressMoveReleaseWithCTRLInversion.xml
+  Interactions/PressMoveReleaseWithCTRLInversionAllMouseMoves.xml
+  Interactions/SegmentationToolsConfig.xml
 )

@@ -42,6 +42,9 @@ class ModuleResource;
 namespace mitk
 {
 
+  class StateMachineAction;
+  class InteractionEvent;
+
 /**
   \brief FastMarching semgentation tool.
 
@@ -130,16 +133,18 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
     FastMarchingTool();
     virtual ~FastMarchingTool();
 
-    virtual float CanHandleEvent( StateEvent const *stateEvent) const;
+    void ConnectActionsAndFunctions();
+
+    //virtual float CanHandleEvent( StateEvent const *stateEvent) const;
 
     virtual void Activated();
     virtual void Deactivated();
 
     /// \brief Add point action of StateMachine pattern
-    bool OnAddPoint (Action*, const StateEvent*);
+    virtual bool OnAddPoint ( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Delete action of StateMachine pattern
-    bool OnDelete (Action*, const StateEvent*);
+    virtual bool OnDelete ( StateMachineAction*, InteractionEvent* interactionEvent );
 
     mitk::ToolCommand::Pointer m_ProgressCommand;
 
@@ -154,7 +159,7 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
     template < typename ImageType >
     void InternalRun( ImageType* input );
 
-    mitk::PositionEvent* m_PositionEvent;
+    mitk::InteractionPositionEvent::Pointer m_PositionEvent;
 
     int m_OverwritePixelValue;
 

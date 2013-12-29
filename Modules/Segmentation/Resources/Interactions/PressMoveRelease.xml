@@ -1,0 +1,16 @@
+<statemachine name="PressMoveRelease">
+
+  <state name="neutral" ID="1" startstate="true">
+
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" name="press" target="neutral" >
+      <action name="PrimaryButtonPressed" ID="80" />
+    </transition>
+    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonMoved" name="move w/ left PrimaryButton" target="neutral" EVENT_ID="530">
+      <action name="Move" ID="90" />
+    </transition>
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="neutral" EVENT_ID="505">
+      <action name="Release" ID="42" />
+    </transition>
+  </state>
+
+</statemachine>

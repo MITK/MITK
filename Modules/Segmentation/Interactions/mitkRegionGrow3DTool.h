@@ -24,6 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImage.h"
 
 namespace mitk{
+
+  class StateMachineAction;
+  class InteractionEvent;
+
   class Segmentation_EXPORT RegionGrow3DTool : public Tool
   {
   public:
@@ -60,7 +64,7 @@ namespace mitk{
     template < typename TPixel, unsigned int VImageDimension >
     void StartRegionGrowing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry, mitk::PointSet::PointType seedPoint );
 
-    bool OnMouseReleased(Action*, const StateEvent*);
+    bool OnMouseReleased( StateMachineAction*, InteractionEvent*  );
 
 
     int m_SeedpointValue;

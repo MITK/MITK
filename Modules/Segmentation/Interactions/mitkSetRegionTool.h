@@ -25,7 +25,8 @@ namespace mitk
 {
 
 class Image;
-
+class StateMachineAction;
+class InteractionEvent;
 /**
   \brief Fills or erases a 2D region
 
@@ -54,16 +55,13 @@ class Segmentation_EXPORT SetRegionTool : public FeedbackContourTool
     SetRegionTool(); // purposely hidden
     virtual ~SetRegionTool();
 
+    void ConnectActionsAndFunctions();
+
     virtual void Activated();
     virtual void Deactivated();
 
-    virtual bool OnMousePressed (Action*, const StateEvent*);
-    virtual bool OnMouseReleased(Action*, const StateEvent*);
-  //  virtual bool OnInvertLogic  (Action*, const StateEvent*);
-    /**
-     Set the label under clicked position as the active one.
-    */
-    virtual bool OnChangeActiveLabel(Action*, const StateEvent*);
+    virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* );
+    virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* );
 
     int m_PaintingPixelValue;
 

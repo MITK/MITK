@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTool.h"
 #include "mitkImage.h"
 #include "mitkStateEvent.h"
-#include "mitkPositionEvent.h"
+#include "mitkInteractionPositionEvent.h"
 #include "mitkPlanePositionManager.h"
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkInteractionConst.h"
@@ -93,13 +93,13 @@ class Segmentation_EXPORT SegTool2D : public Tool
     * \brief Calculates how good the data, this statemachine handles, is hit by the event.
     *
     */
-    virtual float CanHandleEvent( StateEvent const *stateEvent) const;
+    virtual float CanHandleEvent( InteractionEvent const *stateEvent) const;
 
     /**
       \brief Extract the slice of an image that the user just scribbles on.
       \return NULL if SegTool2D is either unable to determine which slice was affected, or if there was some problem getting the image data at that position.
     */
-    Image::Pointer GetAffectedImageSliceAs2DImage(const PositionEvent*, const Image* image);
+    Image::Pointer GetAffectedImageSliceAs2DImage(const InteractionPositionEvent*, const Image* image);
 
     /**
       \brief Extract the slice of an image cut by given plane.
@@ -112,18 +112,18 @@ class Segmentation_EXPORT SegTool2D : public Tool
       \return NULL if SegTool2D is either unable to determine which slice was affected, or if there was some problem getting the image data at that position,
                    or just no working image is selected.
     */
-    Image::Pointer GetAffectedWorkingSlice(const PositionEvent*);
+    Image::Pointer GetAffectedWorkingSlice(const InteractionPositionEvent*);
 
     /**
       \brief Extract the slice of the currently selected reference image that the user just scribbles on.
       \return NULL if SegTool2D is either unable to determine which slice was affected, or if there was some problem getting the image data at that position,
                    or just no reference image is selected.
     */
-    Image::Pointer GetAffectedReferenceSlice(const PositionEvent*);
+    Image::Pointer GetAffectedReferenceSlice(const InteractionPositionEvent*);
 
     void WritePreviewOnWorkingImage( Image* targetSlice, Image* sourceSlice, int paintingPixelValue, int timestep );
 
-    void WriteBackSegmentationResult (const PositionEvent*, Image*);
+    void WriteBackSegmentationResult (const InteractionPositionEvent*, Image*);
 
     void WriteBackSegmentationResult (const PlaneGeometry* planeGeometry, Image*, unsigned int timeStep);
 
@@ -132,10 +132,10 @@ class Segmentation_EXPORT SegTool2D : public Tool
              By selecting this node the slicestack will be reoriented according to the PlanarFigure's Geometry
     */
 
-    unsigned int AddContourmarker ( const PositionEvent* );
+    unsigned int AddContourmarker ( const InteractionPositionEvent* );
 
     BaseRenderer*  m_LastEventSender;
-    int   m_LastEventSlice;
+    int  m_LastEventSlice;
     bool m_3DInterpolationEnabled;
     bool m_2DInterpolationEnabled;
 

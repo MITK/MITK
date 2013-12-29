@@ -25,6 +25,8 @@ namespace mitk
 {
 
 class Image;
+class StateMachineAction;
+class InteractionEvent;
 
 /**
   \brief Simple contour filling tool.
@@ -62,24 +64,16 @@ class Segmentation_EXPORT ContourTool : public FeedbackContourTool
     virtual void Deactivated();
 
     /**
-    Just show the contour, insert the first point.
-    */
-    virtual bool OnMousePressed (Action*, const StateEvent*);
-
-    /**
-     Insert the point to the feedback contour.
-    */
-    virtual bool OnMouseMoved   (Action*, const StateEvent*);
-
-    /**
-     Close the contour, project it to the image slice and fill it in 2D.
-    */
-    virtual bool OnMouseReleased(Action*, const StateEvent*);
-
-    /**
      Set the label under clicked position as the active one.
     */
-    virtual bool OnChangeActiveLabel(Action*, const StateEvent*);
+   // virtual bool OnChangeActiveLabel(StateMachineAction*, InteractionEvent* interactionEvent );
+
+    virtual bool OnMousePressed( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual bool OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent );
+//    virtual bool OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent );
+
+    void ConnectActionsAndFunctions();
 
     int m_PaintingPixelValue;
 

@@ -67,26 +67,32 @@ mitk::SegTool2D::~SegTool2D()
 {
 }
 
-float mitk::SegTool2D::CanHandleEvent( StateEvent const *stateEvent) const
+float mitk::SegTool2D::CanHandleEvent( InteractionEvent const *stateEvent) const
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>( stateEvent );
   if (!positionEvent) return 0.0;
 
-  if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D ) return 0.0; // we don't want anything but 2D
+  if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D )
+    return 0.0; // we don't want anything but 2D
 
-  //This are the mouse event that are used by the statemachine patterns for zooming and panning. This must be possible although a tool is activ
-  if (stateEvent->GetId() == EIDRIGHTMOUSEBTN || stateEvent->GetId() == EIDMIDDLEMOUSEBTN || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDCTRL ||
-    stateEvent->GetId() == EIDMIDDLEMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDMOUSEMOVE ||
-    stateEvent->GetId() == EIDMIDDLEMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNRELEASE )
-  {
-    //Since the usual segmentation tools currently do not need right click interaction but the mitkDisplayVectorInteractor
-    return 0.0;
-  }
-  else
-  {
-    return 1.0;
-  }
+  return 1.0;
+
+//   //This are the mouse event that are used by the statemachine patterns for zooming and panning. This must be possible although a tool is activ
+//   if (stateEvent->GetId() == EIDRIGHTMOUSEBTN || stateEvent->GetId() == EIDMIDDLEMOUSEBTN || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDCTRL ||
+//     stateEvent->GetId() == EIDMIDDLEMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDMOUSEMOVE ||
+//     stateEvent->GetId() == EIDMIDDLEMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNRELEASE )
+//   {
+//     //Since the usual segmentation tools currently do not need right click interaction but the mitkDisplayVectorInteractor
+//     return 0.0;
+//   }
+//   else
+//   {
+//     return 1.0;
+//   }
+
 }
+
+
 
 bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const PlaneGeometry* plane, int& affectedDimension, int& affectedSlice )
 {
@@ -148,7 +154,7 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
   return true;
 }
 
-mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PositionEvent* positionEvent, const Image* image)
+mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const InteractionPositionEvent* positionEvent, const Image* image)
 {
   if (!positionEvent) return NULL;
 
@@ -190,7 +196,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Plane
   return slice;
 }
 
-mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const PositionEvent* positionEvent)
+mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const InteractionPositionEvent* positionEvent)
 {
   Image* workingImage = dynamic_cast<Image*>(m_WorkingNode->GetData());
   assert(workingImage);
@@ -198,7 +204,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const PositionEven
   return GetAffectedImageSliceAs2DImage( positionEvent, workingImage );
 }
 
-mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEvent* positionEvent)
+mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const InteractionPositionEvent* positionEvent)
 {
   DataNode* referenceNode( m_ToolManager->GetReferenceData(0) );
   assert(referenceNode);
@@ -209,7 +215,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEv
   return GetAffectedImageSliceAs2DImage( positionEvent, referenceImage );
 }
 
-void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* positionEvent, Image* slice)
+void mitk::SegTool2D::WriteBackSegmentationResult (const InteractionPositionEvent* positionEvent, Image* slice)
 {
   if ((!positionEvent) || (!slice)) return;
 
@@ -340,7 +346,7 @@ void mitk::SegTool2D::SetEnable2DInterpolation(bool enabled)
   m_2DInterpolationEnabled = enabled;
 }
 
-unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
+unsigned int mitk::SegTool2D::AddContourmarker ( const InteractionPositionEvent* positionEvent )
 {
   const mitk::Geometry2D* plane = dynamic_cast<const Geometry2D*> (dynamic_cast< const mitk::SlicedGeometry3D*>(
     positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D())->GetGeometry2D(0));

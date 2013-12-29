@@ -43,7 +43,6 @@ m_CurrentLowerThresholdValue(1),
 m_CurrentUpperThresholdValue(100),
 m_IsFloatImage(false)
 {
-
 }
 
 mitk::BinaryThresholdULTool::~BinaryThresholdULTool()

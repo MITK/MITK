@@ -56,15 +56,18 @@ mitk::RegionGrowingTool::RegionGrowingTool()
  m_LastWorkingSeed(-1),
  m_FillFeedbackContour(true)
 {
-  // great magic numbers
-  CONNECT_ACTION( 80, OnMousePressed );
-  CONNECT_ACTION( 90, OnMouseMoved );
-  CONNECT_ACTION( 42, OnMouseReleased );
-  CONNECT_ACTION( 91, OnChangeActiveLabel );
 }
 
 mitk::RegionGrowingTool::~RegionGrowingTool()
 {
+}
+
+void mitk::RegionGrowingTool::ConnectActionsAndFunctions()
+{
+  CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
+  CONNECT_FUNCTION( "Move", OnMouseMoved);
+  CONNECT_FUNCTION( "Release", OnMouseReleased);
+  CONNECT_FUNCTION( "ShiftPrimaryButtonPressed", OnChangeActiveLabel );
 }
 
 const char** mitk::RegionGrowingTool::GetXPM() const
@@ -92,11 +95,10 @@ const char* mitk::RegionGrowingTool::GetName() const
 }
 
 
-bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
+bool mitk::RegionGrowingTool::OnMousePressed (StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
 
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   ContourModel* feedbackContour = FeedbackContourTool::GetFeedbackContour();
@@ -196,11 +198,11 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
       // 3.1. Switch depending on the pixel value
       if (inside)
       {
-        OnMousePressedInside(action, stateEvent, workingPicSlice, initialWorkingOffset);
+        OnMousePressedInside(NULL, interactionEvent, workingPicSlice, initialWorkingOffset);
       }
       else
       {
-        OnMousePressedOutside(action, stateEvent);
+        OnMousePressedOutside(NULL, interactionEvent);
       }
 */
     }
@@ -209,10 +211,9 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
   return true;
 }
 
-
-bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ), const StateEvent* stateEvent, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset)
+bool mitk::RegionGrowingTool::OnMousePressedInside(StateMachineAction*, InteractionEvent* interactionEvent, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset)
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in OnMousePressed
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
@@ -273,9 +274,10 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
   return true;
 }
 
-bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action ), const StateEvent* stateEvent)
+bool mitk::RegionGrowingTool::OnMousePressedOutside( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in OnMousePressed
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in OnMousePressed
   // 3.2 If we have a reference image, then perform an initial region growing, considering the reference image's level window
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
@@ -283,7 +285,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
   // if click was outside the image, don't continue
   const Geometry3D* sliceGeometry = m_ReferenceSlice->GetGeometry();
   Point3D mprojectedPointIn2D;
-  sliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), mprojectedPointIn2D );
+  sliceGeometry->WorldToIndex( positionEvent->GetPositionInWorld(), mprojectedPointIn2D );
   itk::Index<2> projectedPointIn2D;
   projectedPointIn2D[0] = static_cast<int>( mprojectedPointIn2D[0] - 0.5 );
   projectedPointIn2D[1] = static_cast<int>( mprojectedPointIn2D[1] - 0.5 );
@@ -330,12 +332,11 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
   return false;
 }
 
-
-bool mitk::RegionGrowingTool::OnMouseMoved(Action* action, const StateEvent* stateEvent)
+bool mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction* action, InteractionEvent* interactionEvent )
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
 
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return false;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
@@ -359,14 +360,15 @@ bool mitk::RegionGrowingTool::OnMouseMoved(Action* action, const StateEvent* sta
   return true;
 }
 
-bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* stateEvent)
+bool mitk::RegionGrowingTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) > 0.0 )
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) > 0.0 )
   {
     // 1. If we have a working slice, use the contour to fill a new piece on segmentation on it (or erase a piece that was selected by ipMITKSegmentationGetCutPoints)
     if ( m_WorkingSlice.IsNotNull() && m_OriginalPicSlice )
     {
-      const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+      mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+      //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
       if (positionEvent)
       {
         int timestep = positionEvent->GetSender()->GetTimeStep();

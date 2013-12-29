@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCommand.h>
 #include "mitkSegTool2D.h"
 
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
 
 mitk::ToolManager::ToolManager(DataStorage* storage)
 :m_ActiveTool(NULL),
@@ -45,7 +47,8 @@ mitk::ToolManager::~ToolManager()
   if (m_ActiveTool)
   {
     m_ActiveTool->Deactivated();
-    GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
+    m_ActiveToolRegistration.Unregister();
+    //GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
 
     m_ActiveTool = NULL;
     m_ActiveToolID = -1; // no tool active
@@ -75,6 +78,7 @@ void mitk::ToolManager::InitializeTools()
     {
       if ( Tool* tool = dynamic_cast<Tool*>( iter->GetPointer() ) )
       {
+        tool->InitializeStateMachine();
         tool->SetToolManager(this); // important to call right after instantiation
         tool->ErrorMessage += MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnToolErrorMessage );
         tool->GeneralMessage += MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnGeneralToolMessage );
@@ -160,7 +164,8 @@ bool mitk::ToolManager::ActivateTool(int id)
     if (m_ActiveTool)
     {
       m_ActiveTool->Deactivated();
-      GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
+      //GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
+      m_ActiveToolRegistration.Unregister();
     }
 
     m_ActiveTool = GetToolById( nextTool );
@@ -173,7 +178,8 @@ bool mitk::ToolManager::ActivateTool(int id)
       if (m_RegisteredClients > 0)
       {
         m_ActiveTool->Activated();
-        GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
+        //GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
+        m_ActiveToolRegistration = us::GetModuleContext()->RegisterService<InteractionEventObserver>( m_ActiveTool, us::ServiceProperties() );
         //If a tool is activated set event notification policy to one
         if (dynamic_cast<mitk::SegTool2D*>(m_ActiveTool))
           GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_ONE);
@@ -493,7 +499,8 @@ void mitk::ToolManager::RegisterClient()
     if ( m_ActiveTool )
     {
       m_ActiveTool->Activated();
-      GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
+      //GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
+      m_ActiveToolRegistration = us::GetModuleContext()->RegisterService<InteractionEventObserver>( m_ActiveTool, us::ServiceProperties() );
     }
   }
   ++m_RegisteredClients;
@@ -509,7 +516,8 @@ void mitk::ToolManager::UnregisterClient()
     if ( m_ActiveTool )
     {
       m_ActiveTool->Deactivated();
-      GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
+      //GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
+      m_ActiveToolRegistration.Unregister();
     }
   }
 }

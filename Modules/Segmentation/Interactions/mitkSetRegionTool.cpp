@@ -31,15 +31,17 @@ mitk::SetRegionTool::SetRegionTool()
  m_FillContour(false),
  m_StatusFillWholeSlice(false)
 {
-  // great magic numbers
-  CONNECT_ACTION( 80, OnMousePressed );
-  //CONNECT_ACTION( 90, OnMouseMoved );
-  CONNECT_ACTION( 42, OnMouseReleased );
-  CONNECT_ACTION( 91, OnChangeActiveLabel );
 }
 
 mitk::SetRegionTool::~SetRegionTool()
 {
+}
+
+void mitk::SetRegionTool::ConnectActionsAndFunctions()
+{
+  CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
+  CONNECT_FUNCTION( "Release", OnMouseReleased);
+  CONNECT_FUNCTION( "InvertLogic", OnInvertLogic);
 }
 
 void mitk::SetRegionTool::Activated()
@@ -52,7 +54,7 @@ void mitk::SetRegionTool::Deactivated()
   Superclass::Deactivated();
 }
 
-bool mitk::SetRegionTool::OnChangeActiveLabel (Action* action, const StateEvent* stateEvent)
+bool mitk::SetRegionTool::OnChangeActiveLabel (StateMachineAction*, InteractionEvent* interactionEvent)
 {
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
@@ -76,9 +78,10 @@ bool mitk::SetRegionTool::OnChangeActiveLabel (Action* action, const StateEvent*
   return true;
 }
 
-bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
+bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
@@ -86,7 +89,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
 
   // 1. Get the working image
   Image::Pointer workingSlice = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
@@ -95,7 +98,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   // if click was outside the image, don't continue
   const Geometry3D* sliceGeometry = workingSlice->GetGeometry();
   itk::Index<2> projectedPointIn2D;
-  sliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), projectedPointIn2D );
+  sliceGeometry->WorldToIndex( positionEvent->GetPositionInWorld(), projectedPointIn2D );
   if ( !sliceGeometry->IsIndexInside( projectedPointIn2D ) )
   {
     MITK_ERROR << "point apparently not inside segmentation slice" << std::endl;
@@ -275,13 +278,14 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   return true;
 }
 
-bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stateEvent)
+bool mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice
   // of the toolmanager's working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
 
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();

@@ -541,6 +541,9 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
 
 void QmitkMultiLabelSegmentationView::OnManualTool2DSelected(int id)
 {
+  this->ResetMouseCursor();
+  mitk::StatusBar::GetInstance()->DisplayText("");
+
   if (id >= 0)
   {
     std::string text = "Active Tool: \"";
@@ -551,11 +554,6 @@ void QmitkMultiLabelSegmentationView::OnManualTool2DSelected(int id)
     us::ModuleResource resource = m_ToolManager->GetToolById(id)->GetCursorIconResource();
     if (resource.IsValid())
       this->SetMouseCursor(resource, 0, 0);
-  }
-  else
-  {
-    this->ResetMouseCursor();
-    mitk::StatusBar::GetInstance()->DisplayText("");
   }
 }
 

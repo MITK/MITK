@@ -44,7 +44,7 @@ namespace mitk {
 }
 
 
-mitk::DilateTool3D::DilateTool3D() : m_Radius(3)
+mitk::DilateTool3D::DilateTool3D() : SegTool3D("dummy"), m_Radius(3)
 {
 }
 
@@ -86,8 +86,7 @@ void mitk::DilateTool3D::Run()
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
-  // todo: use it later
-  unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+  m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
   m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
 
@@ -219,6 +218,7 @@ void mitk::DilateTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* in
   slicedGeometry->SetOrigin(origin);
 
   m_PreviewNode->SetData(m_PreviewImage);
+  m_PreviewNode->SetVisibility(true);
 
   m_RequestedRegion = workingImage->GetLargestPossibleRegion();
 

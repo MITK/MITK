@@ -43,7 +43,7 @@ namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, MedianTool3D, "MedianTool3D tool");
 }
 
-mitk::MedianTool3D::MedianTool3D() : m_Radius(1)
+mitk::MedianTool3D::MedianTool3D() : SegTool3D("dummy"), m_Radius(1)
 {
 }
 
@@ -219,6 +219,7 @@ void mitk::MedianTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
   slicedGeometry->SetOrigin(origin);
 
   m_PreviewNode->SetData(m_PreviewImage);
+  m_PreviewNode->SetVisibility(true);
 
   m_RequestedRegion = workingImage->GetLargestPossibleRegion();
 

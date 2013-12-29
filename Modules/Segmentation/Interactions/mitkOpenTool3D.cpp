@@ -44,7 +44,7 @@ namespace mitk {
 }
 
 
-mitk::OpenTool3D::OpenTool3D() : m_Radius(1)
+mitk::OpenTool3D::OpenTool3D() : SegTool3D("dummy"), m_Radius(1)
 {
 }
 
@@ -218,6 +218,7 @@ void mitk::OpenTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
   slicedGeometry->SetOrigin(origin);
 
   m_PreviewNode->SetData(m_PreviewImage);
+  m_PreviewNode->SetVisibility(true);
 
   m_RequestedRegion = workingImage->GetLargestPossibleRegion();
 

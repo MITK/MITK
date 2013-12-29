@@ -120,10 +120,10 @@ void mitk::SegTool3D::AcceptPreview()
 
   workingImage->Modified();
 
-  m_PreviewNode->SetData(NULL);
+  m_PreviewNode->SetVisibility(false);
 //  m_PreviewImage = NULL;
 
-//  m_ToolManager->ActivateTool(-1);
+//  this->Deactivated();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

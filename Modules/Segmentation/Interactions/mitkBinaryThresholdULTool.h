@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkBinaryThresholdULTool_h_Included
 
 #include "SegmentationExports.h"
-#include "mitkAutoSegmentationTool.h"
+#include "mitkSegTool3D.h"
 
 #include <itkImage.h>
 
@@ -38,14 +38,14 @@ namespace mitk
 
   Last contributor: $Author$
   */
-  class Segmentation_EXPORT BinaryThresholdULTool : public AutoSegmentationTool
+  class Segmentation_EXPORT BinaryThresholdULTool : public SegTool3D
   {
   public:
 
     Message3<mitk::ScalarType, mitk::ScalarType, bool> IntervalBordersChanged;
     Message2<mitk::ScalarType, mitk::ScalarType>  ThresholdingValuesChanged;
 
-    mitkClassMacro(BinaryThresholdULTool, AutoSegmentationTool);
+    mitkClassMacro(BinaryThresholdULTool, SegTool3D);
     itkNewMacro(BinaryThresholdULTool);
 
     virtual const char** GetXPM() const;
@@ -66,8 +66,8 @@ namespace mitk
     template < typename TPixel, unsigned int VDimension >
     void InternalRun( itk::Image<TPixel, VDimension>* source );
 
-    template <typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>
-    void InternalAcceptPreview( itk::Image<TPixel1, VDimension1>* targetImage, const itk::Image<TPixel2, VDimension2>* sourceImage );
+//    template <typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>
+//    void InternalAcceptPreview( itk::Image<TPixel1, VDimension1>* targetImage, const itk::Image<TPixel2, VDimension2>* sourceImage );
 
     mitk::ScalarType m_SensibleMinimumThresholdValue;
     mitk::ScalarType m_SensibleMaximumThresholdValue;

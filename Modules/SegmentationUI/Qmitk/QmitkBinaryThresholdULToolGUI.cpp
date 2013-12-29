@@ -19,8 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkBinaryThresholdULToolGUI, "")
 
-QmitkBinaryThresholdULToolGUI::QmitkBinaryThresholdULToolGUI()
-:QmitkToolGUI(), m_BinaryThresholdULTool(NULL)
+QmitkBinaryThresholdULToolGUI::QmitkBinaryThresholdULToolGUI() : QmitkToolGUI(), m_BinaryThresholdULTool(NULL), m_SelfCall(false)
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
@@ -80,6 +79,7 @@ void QmitkBinaryThresholdULToolGUI::OnAcceptPreview()
   if (m_BinaryThresholdULTool)
   {
     m_BinaryThresholdULTool->AcceptPreview();
+//    m_BinaryThresholdULTool->Cancel();
   }
 }
 
@@ -93,22 +93,26 @@ void QmitkBinaryThresholdULToolGUI::OnInvertPreview()
 
 void QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged(mitk::ScalarType lower, mitk::ScalarType upper, bool isFloat)
 {
+  m_SelfCall = true;
   m_Controls.m_DoubleThresholdSlider->setMinimum(lower);
   m_Controls.m_DoubleThresholdSlider->setMaximum(upper);
   if (isFloat)
     m_Controls.m_DoubleThresholdSlider->setDecimals(2);
   else
     m_Controls.m_DoubleThresholdSlider->setDecimals(0);
+  m_SelfCall = false;
 }
 
 void QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType upper)
 {
+  m_SelfCall = true;
   m_Controls.m_DoubleThresholdSlider->setValues(lower, upper);
+  m_SelfCall = false;
 }
 
 void QmitkBinaryThresholdULToolGUI::OnThresholdsChanged(double min, double max)
 {
-  if (m_BinaryThresholdULTool)
+  if (m_BinaryThresholdULTool && !m_SelfCall)
   {
     m_BinaryThresholdULTool->SetThresholdValues(min, max);
     m_BinaryThresholdULTool->Run();

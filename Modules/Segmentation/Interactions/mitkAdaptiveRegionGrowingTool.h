@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
-#include "mitkAutoSegmentationTool.h"
+#include "mitkSegTool3D.h"
 #include "mitkDataStorage.h"
 #include "mitkPointSetInteractor.h"
 #include "mitkPointSet.h"
@@ -40,11 +40,11 @@ namespace mitk
   \sa QmitkInteractiveSegmentation
 
   */
-  class Segmentation_EXPORT AdaptiveRegionGrowingTool : public AutoSegmentationTool
+  class Segmentation_EXPORT AdaptiveRegionGrowingTool : public SegTool3D
   {
   public:
 
-    mitkClassMacro(AdaptiveRegionGrowingTool, AutoSegmentationTool);
+    mitkClassMacro(AdaptiveRegionGrowingTool, SegTool3D);
     itkNewMacro(AdaptiveRegionGrowingTool);
 
     virtual const char** GetXPM() const;

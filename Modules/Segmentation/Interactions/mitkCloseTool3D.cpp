@@ -44,7 +44,7 @@ namespace mitk {
 }
 
 
-mitk::CloseTool3D::CloseTool3D() : m_Radius(1)
+mitk::CloseTool3D::CloseTool3D() : SegTool3D("dummy"), m_Radius(1)
 {
 }
 
@@ -218,6 +218,7 @@ void mitk::CloseTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
   slicedGeometry->SetOrigin(origin);
 
   m_PreviewNode->SetData(m_PreviewImage);
+  m_PreviewNode->SetVisibility(true);
 
   m_RequestedRegion = workingImage->GetLargestPossibleRegion();
 

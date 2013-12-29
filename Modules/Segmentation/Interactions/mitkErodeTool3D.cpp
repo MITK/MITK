@@ -44,7 +44,7 @@ namespace mitk {
 }
 
 
-mitk::ErodeTool3D::ErodeTool3D() : m_Radius(3)
+mitk::ErodeTool3D::ErodeTool3D() : SegTool3D("dummy"), m_Radius(3)
 {
 }
 
@@ -89,8 +89,7 @@ void mitk::ErodeTool3D::Run()
 
   m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
 
-  // todo: use it later
-  unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+  m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
   CurrentlyBusy.Send(true);
 
@@ -201,6 +200,7 @@ void mitk::ErodeTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
   slicedGeometry->SetOrigin(origin);
 
   m_PreviewNode->SetData(m_PreviewImage);
+  m_PreviewNode->SetVisibility(true);
 
   m_RequestedRegion = workingImage->GetLargestPossibleRegion();
 

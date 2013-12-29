@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkKeepNConnectedRegionsTool3D.h"
 
+#include "mitkLabelSetImage.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkInteractionConst.h"
@@ -45,8 +46,8 @@ namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, KeepNConnectedRegionsTool3D, "KeepNConnectedRegions3D tool");
 }
 
-mitk::KeepNConnectedRegionsTool3D::KeepNConnectedRegionsTool3D()
-: m_NumberOfConnectedRegionsToKeep(1)
+mitk::KeepNConnectedRegionsTool3D::KeepNConnectedRegionsTool3D() : SegTool3D("dummy"),
+m_NumberOfConnectedRegionsToKeep(1)
 {
 }
 
@@ -86,8 +87,7 @@ void mitk::KeepNConnectedRegionsTool3D::Run()
 
   m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
 
-  // todo: use it later
-  //unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+  m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
   CurrentlyBusy.Send(true);
 
@@ -177,8 +177,7 @@ void mitk::KeepNConnectedRegionsTool3D::InternalProcessing( itk::Image< TPixel, 
   result->DisconnectPipeline();
 
   m_PreviewImage = mitk::Image::New();
-  m_PreviewImage->InitializeByItk(result.GetPointer());
-  m_PreviewImage->SetChannel(result->GetBufferPointer());
+  mitk::CastToMitkImage(result.GetPointer(), m_PreviewImage);
 
   typename ImageType::RegionType cropRegion;
   cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();
@@ -193,7 +192,8 @@ void mitk::KeepNConnectedRegionsTool3D::InternalProcessing( itk::Image< TPixel, 
   slicedGeometry->SetOrigin(origin);
 
   m_PreviewNode->SetData(m_PreviewImage);
-/*
+  m_PreviewNode->SetVisibility(true);
+
   m_RequestedRegion = workingImage->GetLargestPossibleRegion();
 
   m_RequestedRegion.SetIndex(0,cropIndex[0]);
@@ -203,5 +203,4 @@ void mitk::KeepNConnectedRegionsTool3D::InternalProcessing( itk::Image< TPixel, 
   m_RequestedRegion.SetSize(0,cropSize[0]);
   m_RequestedRegion.SetSize(1,cropSize[1]);
   m_RequestedRegion.SetSize(2,cropSize[2]);
-*/
 }

@@ -288,14 +288,15 @@ bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction*, Intera
   assert(toolManager);
 
   DataNode* workingNode( toolManager->GetWorkingData(0) );
-  assert(workingNode);
+  if (workingNode)
+  {
+    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+    assert(workingImage);
 
-  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-  assert(workingImage);
-
-  int timestep = positionEvent->GetSender()->GetTimeStep();
-  int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetPositionInWorld(), timestep );
-  workingImage->SetActiveLabel(pixelValue);
+    int timestep = positionEvent->GetSender()->GetTimeStep();
+    int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetPositionInWorld(), timestep );
+    if (pixelValue) workingImage->SetActiveLabel(pixelValue);
+  }
 
   sender->GetRenderingManager()->RequestUpdateAll();
   return true;

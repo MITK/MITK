@@ -17,13 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkKeepNConnectedRegionsTool3D_h_Included
 #define mitkKeepNConnectedRegionsTool3D_h_Included
 
-#include "mitkAutoSegmentationTool.h"
-#include "mitkLegacyAdaptors.h"
+#include "mitkSegTool3D.h"
 #include "SegmentationExports.h"
-#include "mitkDataNode.h"
-#include "mitkLabelSetImage.h"
-#include "mitkToolCommand.h"
-#include "mitkStateEvent.h"
 
 #include "itkImage.h"
 
@@ -41,11 +36,11 @@ namespace mitk
 
   This tool keeps the N largest connected regions in the active label.
 */
-class Segmentation_EXPORT KeepNConnectedRegionsTool3D : public AutoSegmentationTool
+class Segmentation_EXPORT KeepNConnectedRegionsTool3D : public SegTool3D
 {
   public:
 
-    mitkClassMacro(KeepNConnectedRegionsTool3D, AutoSegmentationTool)
+    mitkClassMacro(KeepNConnectedRegionsTool3D, SegTool3D)
     itkNewMacro(KeepNConnectedRegionsTool3D)
 
     /* icon stuff */

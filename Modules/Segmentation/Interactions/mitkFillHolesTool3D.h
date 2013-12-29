@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkFillHolesTool3D_h_Included
 #define mitkFillHolesTool3D_h_Included
 
-#include "mitkAutoSegmentationTool.h"
+#include "mitkSegTool3D.h"
 #include "SegmentationExports.h"
 
 #include "itkImage.h"
@@ -40,11 +40,11 @@ namespace mitk
   holes. The other type of holes is one that has some parts surrounded
   by other labels. SetCondiderAllLabels(true) enables this mode.
 */
-class Segmentation_EXPORT FillHolesTool3D : public AutoSegmentationTool
+class Segmentation_EXPORT FillHolesTool3D : public SegTool3D
 {
   public:
 
-    mitkClassMacro(FillHolesTool3D, AutoSegmentationTool)
+    mitkClassMacro(FillHolesTool3D, SegTool3D)
     itkNewMacro(FillHolesTool3D)
 
     /* icon stuff */

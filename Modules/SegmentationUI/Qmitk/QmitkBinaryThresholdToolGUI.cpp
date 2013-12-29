@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkBinaryThresholdToolGUI, "")
 
-QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI() : QmitkToolGUI(), m_BinaryThresholdTool(NULL)
+QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI() : QmitkToolGUI(), m_BinaryThresholdTool(NULL), m_SelfCall(false)
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
@@ -43,8 +43,8 @@ QmitkBinaryThresholdToolGUI::~QmitkBinaryThresholdToolGUI()
 {
   if (m_BinaryThresholdTool)
   {
-    m_BinaryThresholdTool->IntervalBordersChanged -= mitk::MessageDelegate3<QmitkBinaryThresholdToolGUI, double, double, bool>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
-    m_BinaryThresholdTool->ThresholdingValueChanged -= mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, double>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
+    m_BinaryThresholdTool->IntervalBordersChanged -= mitk::MessageDelegate3<QmitkBinaryThresholdToolGUI, mitk::ScalarType, mitk::ScalarType, bool>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
+    m_BinaryThresholdTool->ThresholdingValueChanged -= mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, mitk::ScalarType>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
     m_BinaryThresholdTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, bool>( this, &QmitkBinaryThresholdToolGUI::BusyStateChanged );
   }
 }
@@ -53,8 +53,8 @@ void QmitkBinaryThresholdToolGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
   if (m_BinaryThresholdTool)
   {
-    m_BinaryThresholdTool->IntervalBordersChanged -= mitk::MessageDelegate3<QmitkBinaryThresholdToolGUI, double, double, bool>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
-    m_BinaryThresholdTool->ThresholdingValueChanged -= mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, double>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
+    m_BinaryThresholdTool->IntervalBordersChanged -= mitk::MessageDelegate3<QmitkBinaryThresholdToolGUI, mitk::ScalarType, mitk::ScalarType, bool>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
+    m_BinaryThresholdTool->ThresholdingValueChanged -= mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, mitk::ScalarType>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
     m_BinaryThresholdTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, bool>( this, &QmitkBinaryThresholdToolGUI::BusyStateChanged );
   }
 
@@ -62,15 +62,15 @@ void QmitkBinaryThresholdToolGUI::OnNewToolAssociated(mitk::Tool* tool)
 
   if (m_BinaryThresholdTool)
   {
-    m_BinaryThresholdTool->IntervalBordersChanged += mitk::MessageDelegate3<QmitkBinaryThresholdToolGUI, double, double, bool>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
-    m_BinaryThresholdTool->ThresholdingValueChanged += mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, double>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
+    m_BinaryThresholdTool->IntervalBordersChanged += mitk::MessageDelegate3<QmitkBinaryThresholdToolGUI, mitk::ScalarType, mitk::ScalarType, bool>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
+    m_BinaryThresholdTool->ThresholdingValueChanged += mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, mitk::ScalarType>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
     m_BinaryThresholdTool->CurrentlyBusy += mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, bool>( this, &QmitkBinaryThresholdToolGUI::BusyStateChanged );
   }
 }
 
 void QmitkBinaryThresholdToolGUI::OnThresholdSliderValueChanged(double value)
 {
-  if (m_BinaryThresholdTool)
+  if (m_BinaryThresholdTool && !m_SelfCall)
   {
     m_BinaryThresholdTool->SetThresholdValue(value);
   }
@@ -89,6 +89,7 @@ void QmitkBinaryThresholdToolGUI::OnAcceptPreview()
   if (m_BinaryThresholdTool)
   {
     m_BinaryThresholdTool->AcceptPreview();
+//    m_BinaryThresholdTool->Cancel();
   }
 }
 
@@ -100,18 +101,22 @@ void QmitkBinaryThresholdToolGUI::OnInvertPreview()
   }
 }
 
-void QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat)
+void QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged(mitk::ScalarType lower, mitk::ScalarType upper, bool isFloat)
 {
+  m_SelfCall = true;
   m_Controls.m_swThreshold->setRange(lower, upper);
   if (isFloat)
     m_Controls.m_swThreshold->setDecimals(2);
   else
     m_Controls.m_swThreshold->setDecimals(0);
+  m_SelfCall = false;
 }
 
-void QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged(double current)
+void QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged(mitk::ScalarType value)
 {
-  m_Controls.m_swThreshold->setValue(current);
+  m_SelfCall = true;
+  m_Controls.m_swThreshold->setValue(value);
+  m_SelfCall = false;
 }
 
 void QmitkBinaryThresholdToolGUI::BusyStateChanged(bool value)

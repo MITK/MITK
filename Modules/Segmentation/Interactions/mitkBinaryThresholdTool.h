@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkBinaryThresholdTool_h_Included
 
 #include "SegmentationExports.h"
-#include "mitkAutoSegmentationTool.h"
+#include "mitkSegTool3D.h"
 
 #include <itkImage.h>
 
@@ -38,14 +38,14 @@ namespace mitk
 
   Last contributor: $Author$
   */
-  class Segmentation_EXPORT BinaryThresholdTool : public AutoSegmentationTool
+  class Segmentation_EXPORT BinaryThresholdTool : public SegTool3D
   {
   public:
 
     Message3<mitk::ScalarType, mitk::ScalarType, bool> IntervalBordersChanged;
-    Message1<mitk::ScalarType>              ThresholdingValueChanged;
+    Message1<mitk::ScalarType>                         ThresholdingValueChanged;
 
-    mitkClassMacro(BinaryThresholdTool, AutoSegmentationTool);
+    mitkClassMacro(BinaryThresholdTool, SegTool3D);
     itkNewMacro(BinaryThresholdTool);
 
     virtual const char** GetXPM() const;

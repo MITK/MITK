@@ -15,16 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkBinaryThresholdULTool.h"
-//#include "mitkBinaryThresholdULTool.xpm"
 
 #include "mitkToolManager.h"
 #include "mitkLabelSetImage.h"
-#include "mitkColorProperty.h"
-#include "mitkProperties.h"
 #include "mitkRenderingManager.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
-#include "mitkLevelWindowProperty.h"
 
 // itk
 #include <itkImageRegionIterator.h>
@@ -40,7 +36,7 @@ namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, BinaryThresholdULTool, "BinaryThresholdULTool tool");
 }
 
-mitk::BinaryThresholdULTool::BinaryThresholdULTool() :
+mitk::BinaryThresholdULTool::BinaryThresholdULTool() : SegTool3D("dummy"),
 m_SensibleMinimumThresholdValue(-100),
 m_SensibleMaximumThresholdValue(+100),
 m_CurrentLowerThresholdValue(1),
@@ -75,20 +71,25 @@ void mitk::BinaryThresholdULTool::Activated()
 {
   Superclass::Activated();
 
-  if (m_ReferenceNode != m_ToolManager->GetReferenceData(0))
+  m_PreviewNode->SetProperty("outline binary", BoolProperty::New(false) );
+  m_PreviewNode->SetOpacity(0.6);
+
+  bool referenceHasChanged(m_ReferenceNode != m_ToolManager->GetReferenceData(0));
+
+  m_ReferenceNode = m_ToolManager->GetReferenceData(0);
+  assert(m_ReferenceNode);
+
+  Image* referenceImage = dynamic_cast<Image*> (m_ReferenceNode->GetData());
+  assert(referenceImage);
+
+  if ((referenceImage->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR)
+    && (referenceImage->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT))
+      m_IsFloatImage = true;
+  else
+      m_IsFloatImage = false;
+
+  if (referenceHasChanged)
   {
-    m_ReferenceNode = m_ToolManager->GetReferenceData(0);
-    assert(m_ReferenceNode);
-
-    Image* referenceImage = dynamic_cast<Image*> (m_ReferenceNode->GetData());
-    assert(referenceImage);
-
-    if ((referenceImage->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR)
-      && (referenceImage->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT))
-        m_IsFloatImage = true;
-    else
-        m_IsFloatImage = false;
-
     CurrentlyBusy.Send(true);
 
     m_SensibleMinimumThresholdValue = static_cast<mitk::ScalarType>( referenceImage->GetScalarValueMin() );
@@ -102,8 +103,7 @@ void mitk::BinaryThresholdULTool::Activated()
   IntervalBordersChanged.Send(m_SensibleMinimumThresholdValue, m_SensibleMaximumThresholdValue, m_IsFloatImage);
   ThresholdingValuesChanged.Send(m_CurrentLowerThresholdValue, m_CurrentUpperThresholdValue);
 
-  m_PreviewNode->SetProperty("binary", BoolProperty::New(false) );
-  m_PreviewNode->SetOpacity(0.6);
+  this->Run();
 }
 
 void mitk::BinaryThresholdULTool::SetThresholdValues(mitk::ScalarType lower, mitk::ScalarType upper)
@@ -147,43 +147,6 @@ void mitk::BinaryThresholdULTool::Run()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-template <typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>
-void mitk::BinaryThresholdULTool::InternalAcceptPreview( itk::Image<TPixel1, VDimension1>* targetImage,
-                                                   const itk::Image<TPixel2, VDimension2>* sourceImage )
-{
-  typedef typename itk::Image< TPixel1, VDimension1> TargetImageType;
-  typedef typename itk::Image< TPixel2, VDimension2> SourceImageType;
-
-  typedef itk::ImageRegionConstIterator< SourceImageType > SourceIteratorType;
-  typedef typename itk::ImageRegionIterator< TargetImageType > TargetIteratorType;
-
-  SourceIteratorType sourceIterator( sourceImage, sourceImage->GetLargestPossibleRegion() );
-  TargetIteratorType targetIterator( targetImage, targetImage->GetLargestPossibleRegion() );
-
-  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
-  assert(workingImage);
-
-  int activePixelValue = workingImage->GetActiveLabelIndex();
-
-  sourceIterator.GoToBegin();
-  targetIterator.GoToBegin();
-
-  while (!targetIterator.IsAtEnd())
-  {
-    int targetValue = static_cast<int>( targetIterator.Get() );
-    int sourceValue = static_cast<int>( sourceIterator.Get() );
-    if ( sourceValue )
-    {
-      if (!workingImage->GetLabelLocked(targetValue))
-      {
-        targetIterator.Set(activePixelValue);
-      }
-    }
-    ++sourceIterator;
-    ++targetIterator;
-  }
-}
-
 template <typename TPixel, unsigned int VDimension>
 void mitk::BinaryThresholdULTool::InternalRun( itk::Image<TPixel, VDimension>* input)
 {
@@ -202,32 +165,12 @@ void mitk::BinaryThresholdULTool::InternalRun( itk::Image<TPixel, VDimension>* i
 
   typename SegmentationType::Pointer result = thresholdFilter->GetOutput();
   result->DisconnectPipeline();
-/*
-  // fix intersections with other labels
-  typedef itk::ImageRegionConstIterator< SourceImageType > InputIteratorType;
-  typedef itk::ImageRegionIterator< SourceImageType >      ResultIteratorType;
-
-  typename InputIteratorType  inputIter( referenceImage, referenceImage->GetLargestPossibleRegion() );
-  typename ResultIteratorType resultIter( result, result->GetLargestPossibleRegion() );
-
-  inputIter.GoToBegin();
-  resultIter.GoToBegin();
-
-  while ( !resultIter.IsAtEnd() )
-  {
-    int inputValue = static_cast<int>( inputIter.Get() );
-
-    if ( (inputValue != m_OverwritePixelValue) && workingImage->GetLabelLocked( inputValue ) )
-      resultIter.Set(0);
-
-    ++inputIter;
-    ++resultIter;
-  }
-*/
 
   m_PreviewImage = mitk::Image::New();
   mitk::CastToMitkImage(result, m_PreviewImage);
-  m_PreviewNode->SetData(m_PreviewImage);
 
-//  m_RequestedRegion = m_PreviewImage->GetLargestPossibleRegion();
+  m_PreviewNode->SetData(m_PreviewImage);
+  m_PreviewNode->SetVisibility(true);
+
+  m_RequestedRegion = m_PreviewImage->GetLargestPossibleRegion();
 }

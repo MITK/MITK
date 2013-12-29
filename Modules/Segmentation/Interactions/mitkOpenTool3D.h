@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkOpenTool3D_h_Included
 #define mitkOpenTool3D_h_Included
 
-#include "mitkAutoSegmentationTool.h"
+#include "mitkSegTool3D.h"
 #include "SegmentationExports.h"
 
 #include "itkImage.h"
@@ -36,11 +36,11 @@ namespace mitk
 
   The segmentation smooths the active label by morphologic opening.
 */
-class Segmentation_EXPORT OpenTool3D : public AutoSegmentationTool
+class Segmentation_EXPORT OpenTool3D : public SegTool3D
 {
   public:
 
-    mitkClassMacro(OpenTool3D, AutoSegmentationTool)
+    mitkClassMacro(OpenTool3D, SegTool3D)
     itkNewMacro(OpenTool3D)
 
     /* icon stuff */

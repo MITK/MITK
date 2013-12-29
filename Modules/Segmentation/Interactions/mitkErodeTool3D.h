@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkErodeTool3D_h_Included
 #define mitkErodeTool3D_h_Included
 
-#include "mitkAutoSegmentationTool.h"
+#include "mitkSegTool3D.h"
 #include "SegmentationExports.h"
 
 #include "itkImage.h"
@@ -36,11 +36,11 @@ namespace mitk
 
   This tool applies morphologic eroding on the active label.
 */
-class Segmentation_EXPORT ErodeTool3D : public AutoSegmentationTool
+class Segmentation_EXPORT ErodeTool3D : public SegTool3D
 {
   public:
 
-    mitkClassMacro(ErodeTool3D, AutoSegmentationTool)
+    mitkClassMacro(ErodeTool3D, SegTool3D)
     itkNewMacro(ErodeTool3D)
 
     /* icon stuff */

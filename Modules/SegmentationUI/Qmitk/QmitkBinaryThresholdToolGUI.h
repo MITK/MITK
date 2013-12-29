@@ -42,8 +42,8 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
     mitkClassMacro(QmitkBinaryThresholdToolGUI, QmitkToolGUI);
     itkNewMacro(QmitkBinaryThresholdToolGUI);
 
-    void OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat);
-    void OnThresholdingValueChanged(double current);
+    void OnThresholdingIntervalBordersChanged(mitk::ScalarType lower, mitk::ScalarType upper, bool isFloat);
+    void OnThresholdingValueChanged(mitk::ScalarType value);
 
   protected slots:
 
@@ -67,6 +67,9 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
 
     /// \brief is image float or int?
     bool m_isFloat;
+
+    /// \brief variable used to avoid calling ourselves
+    bool m_SelfCall;
 
     /// \brief the GUI controls
     Ui::QmitkBinaryThresholdToolGUIControls m_Controls;

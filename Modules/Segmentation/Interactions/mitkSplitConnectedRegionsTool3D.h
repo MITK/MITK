@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSplitConnectedRegionsTool3D_h_Included
 #define mitkSplitConnectedRegionsTool3D_h_Included
 
-#include "mitkAutoSegmentationTool.h"
+#include "mitkSegTool3D.h"
 #include "SegmentationExports.h"
 #include "mitkColorSequenceRainbow.h"
 
@@ -37,11 +37,11 @@ namespace mitk
 
   This tool splits the active label into N connected regions and generates a new label for each one.
 */
-class Segmentation_EXPORT SplitConnectedRegionsTool3D : public AutoSegmentationTool
+class Segmentation_EXPORT SplitConnectedRegionsTool3D : public SegTool3D
 {
   public:
 
-    mitkClassMacro(SplitConnectedRegionsTool3D, AutoSegmentationTool)
+    mitkClassMacro(SplitConnectedRegionsTool3D, SegTool3D)
     itkNewMacro(SplitConnectedRegionsTool3D)
 
     /* icon stuff */

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
-#include "mitkAutoSegmentationTool.h"
+#include "mitkSegTool3D.h"
 
 namespace us {
 class ModuleResource;
@@ -42,11 +42,11 @@ class Image;
 
   $Darth Vader$
 */
-class Segmentation_EXPORT WatershedTool : public AutoSegmentationTool
+class Segmentation_EXPORT WatershedTool : public SegTool3D
 {
   public:
 
-    mitkClassMacro(WatershedTool, AutoSegmentationTool);
+    mitkClassMacro(WatershedTool, SegTool3D);
     itkNewMacro(WatershedTool);
 
     void SetThreshold(double t) {

@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkToolManager.h"
 #include "mitkImageCast.h"
+
+// itk
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkCastImageFilter.h>
 #include <itkLabelObject.h>
@@ -30,7 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkLabelImageToLabelMapFilter.h>
 #include <itkAutoCropLabelMapFilter.h>
 #include <itkLabelMapToLabelImageFilter.h>
-
 #include <itkBinaryShapeKeepNObjectsImageFilter.h>
 #include <itkBinaryImageToShapeLabelMapFilter.h>
 #include <itkRelabelLabelMapFilter.h>
@@ -45,8 +46,9 @@ namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, SplitConnectedRegionsTool3D, "SplitConnectedRegionsTool3D");
 }
 
-mitk::SplitConnectedRegionsTool3D::SplitConnectedRegionsTool3D()
-: m_NumberOfConnectedRegionsToKeep(1), m_ColorSequenceRainbow(mitk::ColorSequenceRainbow::New())
+mitk::SplitConnectedRegionsTool3D::SplitConnectedRegionsTool3D() : SegTool3D("dummy"),
+m_NumberOfConnectedRegionsToKeep(1),
+m_ColorSequenceRainbow(mitk::ColorSequenceRainbow::New())
 {
   m_ColorSequenceRainbow->GoToBegin();
 }
@@ -113,8 +115,7 @@ void mitk::SplitConnectedRegionsTool3D::AcceptPreview()
 
   workingImage->Modified();
 
-  m_PreviewImage = NULL;
-  m_PreviewNode->SetData(NULL);
+  m_PreviewNode->SetVisibility(true);
 
   CurrentlyBusy.Send(false);
 
@@ -133,8 +134,7 @@ void mitk::SplitConnectedRegionsTool3D::Run()
 
   m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
 
-  // todo: use it later
-  //unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+  m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
   CurrentlyBusy.Send(true);
 

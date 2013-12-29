@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkToolManager.h"
-//#include "mitkImageCast.h"
 
 // itk
 #include <itkBinaryThresholdImageFilter.h>
@@ -43,7 +42,7 @@ namespace mitk {
 }
 
 
-mitk::FillHolesTool3D::FillHolesTool3D() : m_ConsiderAllLabels(false)
+mitk::FillHolesTool3D::FillHolesTool3D() : SegTool3D("dummy"), m_ConsiderAllLabels(false)
 {
 }
 
@@ -208,6 +207,7 @@ void mitk::FillHolesTool3D::InternalRun( itk::Image< TPixel, VDimension>* input 
   m_PreviewImage = mitk::Image::New();
   mitk::CastToMitkImage(result.GetPointer(), m_PreviewImage);
 
+  const typename ImageType::SizeType& cropSize = cropRegion.GetSize();
   const typename ImageType::IndexType& cropIndex = cropRegion.GetIndex();
 
   mitk::SlicedGeometry3D* slicedGeometry = m_PreviewImage->GetSlicedGeometry();
@@ -217,4 +217,15 @@ void mitk::FillHolesTool3D::InternalRun( itk::Image< TPixel, VDimension>* input 
   slicedGeometry->SetOrigin(origin);
 
   m_PreviewNode->SetData(m_PreviewImage);
+  m_PreviewNode->SetVisibility(true);
+
+  m_RequestedRegion = workingImage->GetLargestPossibleRegion();
+
+  m_RequestedRegion.SetIndex(0,cropIndex[0]);
+  m_RequestedRegion.SetIndex(1,cropIndex[1]);
+  m_RequestedRegion.SetIndex(2,cropIndex[2]);
+
+  m_RequestedRegion.SetSize(0,cropSize[0]);
+  m_RequestedRegion.SetSize(1,cropSize[1]);
+  m_RequestedRegion.SetSize(2,cropSize[2]);
 }

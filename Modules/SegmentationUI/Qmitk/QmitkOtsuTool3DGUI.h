@@ -20,17 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
 #include "mitkOtsuTool3D.h"
-#include <QListWidget>
-#include <QPushButton>
-#include "ui_QmitkOtsuToolWidgetControls.h"
+#include "ui_QmitkOtsuTool3DGUIControls.h"
 
-class QSpinBox;
-class QLabel;
+//class QListWidgetItem;
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI for mitk::.
-  \sa mitk::
+  \brief GUI for mitk::OtsuTool3D
 
   This GUI shows ...
 
@@ -52,22 +48,20 @@ class SegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
     void OnNewToolAssociated(mitk::Tool*);
 
-    void OnSpinboxValueAccept();
+    void OnRun();
 
-    void OnSegmentationRegionAccept();
+//    void OnAcceptPreview();
 
     void OnItemSelectionChanged(QListWidgetItem *item);
-
-    void OnVolumePreviewChecked(int);
 
   protected:
 
     QmitkOtsuTool3DGUI();
     virtual ~QmitkOtsuTool3DGUI();
 
-    mitk::OtsuTool3D::Pointer m_OtsuTool3DTool;
+    mitk::OtsuTool3D::Pointer m_OtsuTool3D;
 
-    Ui_QmitkOtsuToolWidgetControls m_Controls;
+    Ui_QmitkOtsuTool3DGUIControls m_Controls;
 
     int m_NumberOfRegions;
 

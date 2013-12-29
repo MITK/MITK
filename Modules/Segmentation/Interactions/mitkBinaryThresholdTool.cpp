@@ -42,8 +42,8 @@ namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, BinaryThresholdTool, "Thresholding tool");
 }
 
-mitk::BinaryThresholdTool::BinaryThresholdTool()
-:m_SensibleMinimumThresholdValue(-100),
+mitk::BinaryThresholdTool::BinaryThresholdTool() : SegTool3D("dummy"),
+m_SensibleMinimumThresholdValue(-100),
 m_SensibleMaximumThresholdValue(+100),
 m_CurrentThresholdValue(0.0),
 m_IsFloatImage(false)
@@ -105,8 +105,8 @@ void mitk::BinaryThresholdTool::Activated()
   {
     CurrentlyBusy.Send(true);
 
-    m_SensibleMinimumThresholdValue = static_cast<double>( originalImageTimeStep->GetScalarValueMin() );
-    m_SensibleMaximumThresholdValue = static_cast<double>( originalImageTimeStep->GetScalarValueMaxNoRecompute() );
+    m_SensibleMinimumThresholdValue = static_cast<mitk::ScalarType>( originalImageTimeStep->GetScalarValueMin() );
+    m_SensibleMaximumThresholdValue = static_cast<mitk::ScalarType>( originalImageTimeStep->GetScalarValueMaxNoRecompute() );
     m_CurrentThresholdValue = (m_SensibleMaximumThresholdValue + m_SensibleMinimumThresholdValue)/2;
 
     CurrentlyBusy.Send(false);
@@ -136,6 +136,7 @@ void mitk::BinaryThresholdTool::SetThresholdValue(double value)
   {
     m_CurrentThresholdValue = value;
     m_PreviewNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(m_CurrentThresholdValue, 0.001) ) );
+    m_PreviewNode->SetVisibility(true);
     RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -159,6 +160,8 @@ void mitk::BinaryThresholdTool::AcceptPreview()
 
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>( m_WorkingNode->GetData() );
   assert(workingImage);
+
+  m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
 
   CurrentlyBusy.Send(true);
 
@@ -193,8 +196,9 @@ void mitk::BinaryThresholdTool::AcceptPreview()
 
   CurrentlyBusy.Send(false);
 
+  m_PreviewNode->SetVisibility(false);
+
   RenderingManager::GetInstance()->RequestUpdateAll();
-  m_ToolManager->ActivateTool(-1);
 }
 
 template <typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>

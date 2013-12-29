@@ -42,7 +42,6 @@ set(CPP_FILES
   Interactions/mitkAdaptiveRegionGrowingTool.cpp
   Interactions/mitkAddContourTool.cpp
   Interactions/mitkAutoCropTool.cpp
-  Interactions/mitkAutoSegmentationTool.cpp
   Interactions/mitkBinaryThresholdTool.cpp
   Interactions/mitkBinaryThresholdULTool.cpp
   Interactions/mitkCalculateGrayValueStatisticsTool.cpp

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkLabelSetImage.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkSliceNavigationController.h"
 
 // itk
 #include <itkConnectedThresholdImageFilter.h>
@@ -99,7 +100,6 @@ void mitk::ConnectedRegionSelectorTool3D::InternalAddRegion( itk::Image<TPixel, 
   filter->SetLower( m_OverwritePixelValue );
   filter->SetUpper( m_OverwritePixelValue );
   filter->SetConnectivity(FilterType::FaceConnectivity);
-  filter->ClearSeeds();
   filter->AddSeed( m_LastSeedIndex );
 
   m_ProgressCommand->AddStepsToDo(200);
@@ -112,8 +112,8 @@ void mitk::ConnectedRegionSelectorTool3D::InternalAddRegion( itk::Image<TPixel, 
   ImageType::Pointer result = filter->GetOutput();
   result->DisconnectPipeline();
 
-   m_PreviewImage = mitk::Image::New();
-   mitk::CastToMitkImage(result, m_PreviewImage);
+  m_PreviewImage = mitk::Image::New();
+  mitk::CastToMitkImage(result, m_PreviewImage);
 
   typename ImageType::RegionType cropRegion;
   cropRegion = result->GetLargestPossibleRegion();
@@ -128,6 +128,7 @@ void mitk::ConnectedRegionSelectorTool3D::InternalAddRegion( itk::Image<TPixel, 
   slicedGeometry->SetOrigin(origin);
 
   m_PreviewNode->SetData(m_PreviewImage);
+  m_PreviewNode->SetVisibility(true);
 
   m_RequestedRegion = workingImage->GetLargestPossibleRegion();
 
@@ -161,10 +162,16 @@ bool mitk::ConnectedRegionSelectorTool3D::AddRegion (Action* action, const State
   // convert world coordinates to index coordinate on the reference image
   workingImage->GetGeometry()->WorldToIndex(m_LastClickedPosition, m_LastSeedIndex);
 
+  m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+
   m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
 
-  // todo: use it later
-//  unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+  int clickedPixelValue = static_cast<int>( workingImage->GetPixelValueByIndex(m_LastSeedIndex, m_CurrentTimeStep) );
+
+  if (clickedPixelValue != m_OverwritePixelValue)
+  {
+    return false;
+  }
 
   CurrentlyBusy.Send(true);
 

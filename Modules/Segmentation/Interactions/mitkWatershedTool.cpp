@@ -48,9 +48,9 @@ namespace mitk {
 }
 
 
-mitk::WatershedTool::WatershedTool() :
-  m_Level(0.),
-  m_Threshold(0.)
+mitk::WatershedTool::WatershedTool() : SegTool3D("dummy"),
+m_Level(0.),
+m_Threshold(0.)
 {
 }
 

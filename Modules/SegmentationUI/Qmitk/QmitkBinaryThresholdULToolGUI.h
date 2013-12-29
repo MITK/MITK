@@ -60,12 +60,15 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdULToolGUI : public QmitkToolGUI
     void OnThresholdsChanged(double min, double max);
 
   protected:
+
     QmitkBinaryThresholdULToolGUI();
     virtual ~QmitkBinaryThresholdULToolGUI();
 
     Ui::QmitkBinaryThresholdULToolGUIControls m_Controls;
 
     void BusyStateChanged(bool value);
+
+    bool m_SelfCall;
 
     mitk::BinaryThresholdULTool* m_BinaryThresholdULTool;
 };

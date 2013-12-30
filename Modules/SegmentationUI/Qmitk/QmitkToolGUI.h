@@ -21,7 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationUIExports.h"
 
 #include "mitkCommon.h"
-#include "mitkTool.h"
+#include "itkObjectFactory.h"
+
+namespace mitk {
+  class Tool;
+}
+
 
 /**
   \brief Base class for GUIs belonging to mitk::Tool classes.
@@ -59,7 +64,7 @@ class SegmentationUI_EXPORT QmitkToolGUI : public QWidget, public itk::Object
 
   protected:
 
-    mitk::Tool::Pointer m_Tool;
+    //mitk::Tool::Pointer m_Tool;
 
     virtual void BusyStateChanged(bool) {};
 };

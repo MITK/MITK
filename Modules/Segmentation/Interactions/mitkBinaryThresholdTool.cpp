@@ -161,14 +161,13 @@ void mitk::BinaryThresholdTool::AcceptPreview()
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>( m_WorkingNode->GetData() );
   assert(workingImage);
 
-  m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
+  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
 
   CurrentlyBusy.Send(true);
 
   try
   {
 //    this->InitializeUndoController();
-    // perform the actual thresholding
     Image::Pointer workingImageTimeStep = this->Get3DImage(workingImage, m_CurrentTimeStep);
 
     if (workingImageTimeStep->GetDimension() == 2)
@@ -186,7 +185,7 @@ void mitk::BinaryThresholdTool::AcceptPreview()
   catch (itk::ExceptionObject& e)
   {
     MITK_ERROR << "Exception caught: " << e.GetDescription();
-    Tool::ErrorMessage("Could not create segmentation.");
+    Tool::ErrorMessage("Could not create segmentation. See error log for details.");
   }
   catch (...)
   {

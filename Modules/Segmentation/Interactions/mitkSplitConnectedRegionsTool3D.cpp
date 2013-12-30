@@ -132,7 +132,7 @@ void mitk::SplitConnectedRegionsTool3D::Run()
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
   assert(workingImage);
 
-  m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
+  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
 
   m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
@@ -283,8 +283,8 @@ void mitk::SplitConnectedRegionsTool3D::InternalRun( itk::Image<TPixel, VDimensi
 
   typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
   thresholdFilter->SetInput( input );
-  thresholdFilter->SetLowerThreshold(m_OverwritePixelValue);
-  thresholdFilter->SetUpperThreshold(m_OverwritePixelValue);
+  thresholdFilter->SetLowerThreshold(m_PaintingPixelValue);
+  thresholdFilter->SetUpperThreshold(m_PaintingPixelValue);
   thresholdFilter->SetOutsideValue(0);
   thresholdFilter->SetInsideValue(1);
 

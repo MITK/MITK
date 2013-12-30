@@ -233,15 +233,17 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const InteractionPositionEven
     int clickedSliceIndex(-1);
     mitk::SegTool2D::DetermineAffectedImageSlice( workingImage, planeGeometry, clickedSliceDimension, clickedSliceIndex );
     mitk::SegmentationInterpolationController* interpolator = mitk::SegmentationInterpolationController::InterpolatorForImage(workingImage);
-    assert(interpolator);
-    try
+    if(interpolator)
     {
-      interpolator->SetChangedSlice( slice, clickedSliceDimension, clickedSliceIndex, timeStep );
-    }
-    catch ( itk::ExceptionObject& e )
-    {
-      mitkThrow() << e.GetDescription();
-      return;
+      try
+      {
+        interpolator->SetChangedSlice( slice, clickedSliceDimension, clickedSliceIndex, timeStep );
+      }
+      catch ( itk::ExceptionObject& e )
+      {
+        mitkThrow() << e.GetDescription();
+        return;
+      }
     }
   }
 

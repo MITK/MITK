@@ -88,7 +88,7 @@ void mitk::DilateTool3D::Run()
 
   m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
-  m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
+  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
 
   CurrentlyBusy.Send(true);
 
@@ -137,8 +137,8 @@ void mitk::DilateTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* in
 
   typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
   thresholdFilter->SetInput(input);
-  thresholdFilter->SetLowerThreshold(m_OverwritePixelValue);
-  thresholdFilter->SetUpperThreshold(m_OverwritePixelValue);
+  thresholdFilter->SetLowerThreshold(m_PaintingPixelValue);
+  thresholdFilter->SetUpperThreshold(m_PaintingPixelValue);
   thresholdFilter->SetOutsideValue(0);
   thresholdFilter->SetInsideValue(1);
 
@@ -198,7 +198,7 @@ void mitk::DilateTool3D::InternalProcessing( itk::Image< TPixel, VDimension>* in
   {
     int inputValue = static_cast<int>( inputIter.Get() );
 
-    if ( (inputValue != m_OverwritePixelValue) && workingImage->GetLabelLocked( inputValue ) )
+    if ( (inputValue != m_PaintingPixelValue) && workingImage->GetLabelLocked( inputValue ) )
       resultIter.Set(0);
 
     ++inputIter;

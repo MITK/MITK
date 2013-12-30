@@ -43,6 +43,9 @@ class ModuleResource;
 namespace mitk
 {
 
+  class StateMachineAction;
+  class InteractionEvent;
+
 /**
   \brief FastMarching semgentation tool.
 
@@ -76,11 +79,12 @@ class Segmentation_EXPORT FastMarchingTool3D : public SegTool3D
     typedef FastMarchingFilterType::NodeContainer                                                       NodeContainer;
     typedef FastMarchingFilterType::NodeType                                                            NodeType;
 
-
     /* icon stuff */
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
     us::ModuleResource GetIconResource() const;
+
+    void ConnectActionsAndFunctions();
 
     /// \brief Set parameter used in Threshold filter.
     void SetUpperThreshold(double);
@@ -117,16 +121,14 @@ class Segmentation_EXPORT FastMarchingTool3D : public SegTool3D
     FastMarchingTool3D();
     virtual ~FastMarchingTool3D();
 
-    virtual float CanHandleEvent( StateEvent const *stateEvent) const;
-
     virtual void Activated();
     virtual void Deactivated();
 
     /// \brief Add point action of StateMachine pattern
-    bool OnAddPoint (Action*, const StateEvent*);
+    bool OnAddPoint (StateMachineAction*, InteractionEvent* interactionEvent);
 
     /// \brief Delete action of StateMachine pattern
-    bool OnDelete (Action*, const StateEvent*);
+    bool OnDelete (StateMachineAction*, InteractionEvent* interactionEvent);
 
     mitk::ToolCommand::Pointer m_ProgressCommand;
 

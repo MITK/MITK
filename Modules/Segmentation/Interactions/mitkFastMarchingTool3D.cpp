@@ -20,14 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkInteractionConst.h"
 #include "mitkGlobalInteraction.h"
-//#include "mitkApplyDiffImageOperation.h"
-//#include "mitkOperationEvent.h"
-//#include "mitkDiffImageApplier.h"
 #include "mitkUndoController.h"
 #include "mitkPositionEvent.h"
 #include "mitkToolManager.h"
 #include "mitkImageCast.h"
 #include "mitkImageTimeSelector.h"
+#include "mitkStateMachineAction.h"
+#include "mitkInteractionEvent.h"
+#include "mitkInteractionPositionEvent.h"
 
 // us
 #include <usModule.h>
@@ -50,26 +50,17 @@ m_Sigma(1.0),
 m_Alpha(-0.5),
 m_Beta(3.0)
 {
-  CONNECT_ACTION( AcADDPOINTRMB, OnAddPoint );
-  CONNECT_ACTION( AcADDPOINT, OnAddPoint );
-  CONNECT_ACTION( AcREMOVEPOINT, OnDelete );
 }
 
 mitk::FastMarchingTool3D::~FastMarchingTool3D()
 {
 }
 
-float mitk::FastMarchingTool3D::CanHandleEvent( StateEvent const *stateEvent) const
+void mitk::FastMarchingTool3D::ConnectActionsAndFunctions()
 {
-  float returnValue = Superclass::CanHandleEvent(stateEvent);
-
-  //we can handle delete
-  if(stateEvent->GetId() == 12 )
-  {
-    returnValue = 1.0;
-  }
-
-  return returnValue;
+  CONNECT_FUNCTION( "ShiftSecondaryButtonPressed", OnAddPoint);
+  CONNECT_FUNCTION( "ShiftPrimaryButtonPressed", OnAddPoint);
+  CONNECT_FUNCTION( "DeletePoint", OnDelete);
 }
 
 const char** mitk::FastMarchingTool3D::GetXPM() const
@@ -294,16 +285,17 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
   m_ToolManager->ActivateTool(-1);
 }
 
-bool mitk::FastMarchingTool3D::OnAddPoint(Action* action, const StateEvent* stateEvent)
+bool mitk::FastMarchingTool3D::OnAddPoint(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  if (!positionEvent) return false;
 
-  m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), positionEvent->GetWorldPosition());
+  m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), positionEvent->GetPositionInWorld());
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   mitk::Point3D clickInIndex;
-  m_ReferenceImage->GetGeometry()->WorldToIndex(positionEvent->GetWorldPosition(), clickInIndex);
+  m_ReferenceImage->GetGeometry()->WorldToIndex(positionEvent->GetPositionInWorld(), clickInIndex);
 
   itk::Index<3> seedPosition;
   seedPosition[0] = clickInIndex[0];
@@ -317,7 +309,7 @@ bool mitk::FastMarchingTool3D::OnAddPoint(Action* action, const StateEvent* stat
   this->m_SeedContainer->InsertElement(this->m_SeedContainer->Size(), node);
   m_FastMarchingFilter->Modified();
 
-  m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), positionEvent->GetWorldPosition());
+  m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), positionEvent->GetPositionInWorld());
 
   m_NeedUpdate = true;
 
@@ -328,7 +320,7 @@ bool mitk::FastMarchingTool3D::OnAddPoint(Action* action, const StateEvent* stat
   return true;
 }
 
-bool mitk::FastMarchingTool3D::OnDelete(Action* action, const StateEvent* stateEvent)
+bool mitk::FastMarchingTool3D::OnDelete(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   // delete last seed point
   if(!(this->m_SeedContainer->empty()))

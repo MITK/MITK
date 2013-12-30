@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkStateMachineAction.h"
 #include "mitkInteractionEvent.h"
+#include "mitkPositionEvent.h"
 
 mitk::ContourTool::ContourTool()
 :FeedbackContourTool("PressMoveReleaseWithCTRLInversion"),
@@ -45,8 +46,7 @@ void mitk::ContourTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
   CONNECT_FUNCTION( "Move", OnMouseMoved);
   CONNECT_FUNCTION( "Release", OnMouseReleased);
-  CONNECT_FUNCTION( "InvertLogic", OnInvertLogic);
-  //CONNECT_ACTION( 91, OnChangeActiveLabel );
+  CONNECT_FUNCTION( "ShiftPrimaryButtonPressed", OnChangeActiveLabel );
 }
 
 void mitk::ContourTool::Activated()
@@ -60,18 +60,18 @@ void mitk::ContourTool::Deactivated()
   Superclass::Deactivated();
 }
 
-bool mitk::ContourTool::OnChangeActiveLabel (Action* action, const StateEvent* stateEvent)
+bool mitk::ContourTool::OnChangeActiveLabel (StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
 
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  if (!positionEvent) return false;
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
   assert(workingImage);
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
-  int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition(), timestep );
+  int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetPositionInWorld(), timestep );
   if (pixelValue!=0)
     workingImage->SetActiveLabel(pixelValue);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -85,7 +85,7 @@ bool mitk::ContourTool::OnMousePressed (StateMachineAction*, InteractionEvent* i
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(interactionEvent->GetEvent());
   if (!positionEvent) return false;
 
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
@@ -98,7 +98,8 @@ bool mitk::ContourTool::OnMousePressed (StateMachineAction*, InteractionEvent* i
   feedbackContour->Expand(timestep+1);
 
   feedbackContour->Close(timestep);
-  feedbackContour->AddVertex( positionEvent->GetWorldPosition(), timestep );
+  Point3D pointIn3D = positionEvent->GetPositionInWorld();
+  feedbackContour->AddVertex( pointIn3D, timestep );
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
@@ -118,7 +119,8 @@ bool mitk::ContourTool::OnMouseMoved( StateMachineAction*, InteractionEvent* int
 
   ContourModel* feedbackContour = mitk::FeedbackContourTool::GetFeedbackContour();
   assert( feedbackContour );
-  feedbackContour->AddVertex( positionEvent->GetWorldPosition(), timestep );
+  mitk::Point3D pointInWorld = positionEvent->GetPositionInWorld();
+  feedbackContour->AddVertex( pointInWorld, timestep );
 
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 

@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFillRegionTool.h"
 
-#include "mitkFillRegionTool.xpm"
-
 #include "mitkToolManager.h"
 #include "mitkLabelSetImage.h"
 
@@ -34,16 +32,21 @@ namespace mitk {
 mitk::FillRegionTool::FillRegionTool()
 :SetRegionTool()
 {
-  CONNECT_ACTION( 49014, OnInvertLogic );
 }
 
 mitk::FillRegionTool::~FillRegionTool()
 {
 }
 
+void mitk::FillRegionTool::ConnectActionsAndFunctions()
+{
+  Superclass::ConnectActionsAndFunctions();
+  CONNECT_FUNCTION( "InvertLogic", OnInvertLogic );
+}
+
 const char** mitk::FillRegionTool::GetXPM() const
 {
-  return mitkFillRegionTool_xpm;
+  return NULL;
 }
 
 us::ModuleResource mitk::FillRegionTool::GetIconResource() const
@@ -65,7 +68,7 @@ const char* mitk::FillRegionTool::GetName() const
   return "Fill";
 }
 
-bool mitk::FillRegionTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
+bool mitk::FillRegionTool::OnMousePressed (StateMachineAction*, InteractionEvent* interactionEvent)
 {
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
   assert (workingImage);
@@ -74,12 +77,12 @@ bool mitk::FillRegionTool::OnMousePressed (Action* action, const StateEvent* sta
   const mitk::Color& color = workingImage->GetActiveLabelColor();
   this->SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
 
-  return Superclass::OnMousePressed(action, stateEvent);
+  return Superclass::OnMousePressed(NULL, interactionEvent);
 }
 
-bool mitk::FillRegionTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
+bool mitk::FillRegionTool::OnInvertLogic(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
 
   m_LogicInverted = !m_LogicInverted;
 

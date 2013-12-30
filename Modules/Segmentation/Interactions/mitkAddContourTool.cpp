@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLabelSetImage.h"
 #include "mitkAddContourTool.xpm"
 
+#include "mitkStateMachineAction.h"
+#include "mitkInteractionEvent.h"
+
 // us
 #include <usModule.h>
 #include <usModuleResource.h>
@@ -32,14 +35,20 @@ namespace mitk {
 mitk::AddContourTool::AddContourTool()
 :ContourTool()
 {
-  CONNECT_ACTION( 49014, OnInvertLogic );
+
 }
 
 mitk::AddContourTool::~AddContourTool()
 {
 }
 
-bool mitk::AddContourTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
+void mitk::AddContourTool::ConnectActionsAndFunctions()
+{
+  Superclass::ConnectActionsAndFunctions();
+  CONNECT_FUNCTION( "InvertLogic", OnInvertLogic );
+}
+
+bool mitk::AddContourTool::OnMousePressed (StateMachineAction*, InteractionEvent* interactionEvent)
 {
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
   assert (workingImage);
@@ -48,7 +57,7 @@ bool mitk::AddContourTool::OnMousePressed (Action* action, const StateEvent* sta
   const mitk::Color& color = workingImage->GetActiveLabelColor();
   this->SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
 
-  return Superclass::OnMousePressed(action, stateEvent);
+  return Superclass::OnMousePressed(NULL, interactionEvent);
 }
 
 const char** mitk::AddContourTool::GetXPM() const
@@ -75,9 +84,9 @@ const char* mitk::AddContourTool::GetName() const
   return "Add";
 }
 
-bool mitk::AddContourTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
+bool mitk::AddContourTool::OnInvertLogic(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
   m_LogicInverted = !m_LogicInverted;
   if (m_LogicInverted)
   {

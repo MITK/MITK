@@ -54,8 +54,10 @@ class Segmentation_EXPORT EraseRegionTool : public SetRegionTool
     us::ModuleResource GetIconResource() const;
 
     virtual const char* GetName() const;
-    virtual bool OnMousePressed (Action*, const StateEvent*);
-    virtual bool OnInvertLogic  (Action*, const StateEvent*);
+
+    virtual void ConnectActionsAndFunctions();
+    virtual bool OnMousePressed (StateMachineAction*, InteractionEvent* interactionEvent);
+    virtual bool OnInvertLogic  (StateMachineAction*, InteractionEvent* interactionEvent);
 
   protected:
 

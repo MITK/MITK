@@ -17,10 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFastMarchingTool.h"
 
 #include "mitkToolManager.h"
+#include "mitkLabelSetImage.h"
 #include "mitkRenderingManager.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkBaseRenderer.h"
+#include "mitkStateMachineAction.h"
+#include "mitkInteractionEvent.h"
 
 // us
 #include <usModule.h>
@@ -41,7 +44,6 @@ m_StoppingValue(2000),
 m_Sigma(1.2),
 m_Alpha(-1.9),
 m_Beta(2.8),
-m_PositionEvent(0),
 m_Initialized(false)
 {
 }
@@ -250,20 +252,18 @@ void mitk::FastMarchingTool::CreateNewLabel(const std::string& name, const mitk:
 
 void mitk::FastMarchingTool::AcceptPreview()
 {
-  mitk::Image::Pointer workingImageSlice = SegTool2D::GetAffectedWorkingSlice( m_PositionEvent );
-
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
-  m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
+  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
 
   CurrentlyBusy.Send(true);
 
   // paste the preview image to the current working slice
-  mitk::SegTool2D::WritePreviewOnWorkingImage( workingImageSlice, m_PreviewImage, m_OverwritePixelValue, m_CurrentTimeStep );
+  mitk::SegTool2D::WritePreviewOnWorkingImage( m_WorkingImageSlice, m_PreviewImage, m_PaintingPixelValue, m_CurrentTimeStep );
 
   // paste current working slice back to the working image
-  mitk::SegTool2D::WriteBackSegmentationResult(m_PositionEvent, workingImageSlice);
+  mitk::SegTool2D::WriteBackSegmentationResult(m_PositionEvent, m_WorkingImageSlice);
 
   this->ClearSeeds();
 
@@ -279,19 +279,17 @@ void mitk::FastMarchingTool::AcceptPreview()
 
 bool mitk::FastMarchingTool::OnAddPoint( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  // Add a new seed point for FastMarching algorithm
+  // add a new seed point
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  //const PositionEvent* p = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if ( positionEvent == NULL ) return false;
+  if (!positionEvent) return false;
 
-  if ( m_PositionEvent.IsNotNull() )
-      m_PositionEvent = NULL;
+  m_WorkingImageSlice = SegTool2D::GetAffectedWorkingSlice( positionEvent );
 
   m_PositionEvent = InteractionPositionEvent::New( positionEvent->GetSender(),
                                                    positionEvent->GetPointerPositionOnScreen() );
 
   //if the pipeline is not initialized or click was on another render window or slice then reset pipeline and preview image
-  if( (!m_Initialized) || (m_LastEventSender != m_PositionEvent->GetSender()) || (m_LastEventSlice != m_PositionEvent->GetSender()->GetSlice()) )
+  if( (!m_Initialized) || (m_LastEventSender != positionEvent->GetSender()) || (m_LastEventSlice != positionEvent->GetSender()->GetSlice()) )
   {
     m_SmoothFilter = SmoothingFilterType::New();
     m_SmoothFilter->SetTimeStep(0.014);
@@ -324,7 +322,7 @@ bool mitk::FastMarchingTool::OnAddPoint( StateMachineAction*, InteractionEvent* 
     m_SeedsAsPointSetNode->SetData(m_SeedsAsPointSet);
 
     InternalImageType::Pointer referenceImageSliceAsITK = InternalImageType::New();
-    m_ReferenceImageSlice = SegTool2D::GetAffectedReferenceSlice( m_PositionEvent );
+    m_ReferenceImageSlice = SegTool2D::GetAffectedReferenceSlice( positionEvent );
     CastToItkImage(m_ReferenceImageSlice, referenceImageSliceAsITK);
     m_SmoothFilter->SetInput( referenceImageSliceAsITK );
 
@@ -336,15 +334,15 @@ bool mitk::FastMarchingTool::OnAddPoint( StateMachineAction*, InteractionEvent* 
     m_Initialized = true;
   }
 
-  m_LastEventSender = m_PositionEvent->GetSender();
+  m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
-  mitk::Point3D clickInIndex;
+  itk::Index<3> lastSeedIndex;
 
-  m_ReferenceImageSlice->GetGeometry()->WorldToIndex(m_PositionEvent->GetPositionInWorld(), clickInIndex);
+  m_ReferenceImageSlice->GetGeometry()->WorldToIndex(positionEvent->GetPositionInWorld(), lastSeedIndex);
   itk::Index<2> seedPosition;
-  seedPosition[0] = clickInIndex[0];
-  seedPosition[1] = clickInIndex[1];
+  seedPosition[0] = lastSeedIndex[0];
+  seedPosition[1] = lastSeedIndex[1];
 
   NodeType node;
   const double seedValue = 0.0;
@@ -353,7 +351,7 @@ bool mitk::FastMarchingTool::OnAddPoint( StateMachineAction*, InteractionEvent* 
   m_SeedContainer->InsertElement(m_SeedContainer->Size(), node);
   m_FastMarchingFilter->Modified();
 
-  m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize()-1, m_PositionEvent->GetPositionInWorld());
+  m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize()-1, positionEvent->GetPositionInWorld());
 
   m_NeedUpdate = true;
 
@@ -369,21 +367,12 @@ bool mitk::FastMarchingTool::OnDelete(StateMachineAction*, InteractionEvent* int
   // delete last seed point
   if( m_SeedContainer->empty() ) return false;
 
-  // get the timestep to support 3D+t
-  const mitk::Event *theEvent = stateEvent->GetEvent();
-  mitk::ScalarType timeInMS = 0.0;
-
-  //check if the current timestep has to be changed
-  if ( theEvent && theEvent->GetSender())
-  {
-    //additionaly to m_TimeStep we need timeInMS to satisfy the execution of the operations
-    timeInMS = theEvent->GetSender()->GetTime();
-  }
+  mitk::ScalarType timeInMS = interactionEvent->GetSender()->GetTime();
 
   //search the point in the list
   int position = m_SeedsAsPointSet->GetSize() - 1;
 
-  PointSet::PointType pt = m_SeedsAsPointSet->GetPoint(position, m_TimeStep);
+  PointSet::PointType pt = m_SeedsAsPointSet->GetPoint(position, m_CurrentTimeStep);
 
   PointOperation* doOp = new mitk::PointOperation(OpREMOVE, timeInMS, pt, position);
   //execute the Operation
@@ -481,7 +470,7 @@ void mitk::FastMarchingTool::InternalRun( ImageType* input )
   {
     int inputValue = static_cast<int>( inputIter.Get() );
 
-    if ( (inputValue != m_OverwritePixelValue) && workingImage->GetLabelLocked( inputValue ) )
+    if ( (inputValue != m_PaintingPixelValue) && workingImage->GetLabelLocked( inputValue ) )
       resultIter.Set(0);
 
     ++inputIter;

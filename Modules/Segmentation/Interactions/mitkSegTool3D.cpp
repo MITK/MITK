@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLabelSetImage.h"
 #include "mitkPositionEvent.h"
 
-mitk::SegTool3D::SegTool3D(const char* type) : Tool(type), m_CurrentTimeStep(0), m_OverwritePixelValue(0)
+mitk::SegTool3D::SegTool3D(const char* type) : Tool(type)
 {
   m_ProgressCommand = mitk::ToolCommand::New();
 }
@@ -37,7 +37,7 @@ const char* mitk::SegTool3D::GetGroup() const
 {
   return "SegTool3D";
 }
-
+/*
 float mitk::SegTool3D::CanHandleEvent( StateEvent const *stateEvent) const
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
@@ -58,7 +58,7 @@ float mitk::SegTool3D::CanHandleEvent( StateEvent const *stateEvent) const
     return 1.0;
   }
 }
-
+*/
 //to be moved to mitkInteractionConst.h by StateMachineEditor
 const mitk::OperationType mitk::SegTool3D::OP_EXCHANGE = 717;
 
@@ -93,7 +93,7 @@ void mitk::SegTool3D::AcceptPreview()
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
-  m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
+  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
 
   CurrentlyBusy.Send(true);
 
@@ -264,10 +264,10 @@ void mitk::SegTool3D::InternalAcceptPreview( ImageType* targetImage, const mitk:
     int targetValue = static_cast< int >( targetIter.Get() );
     int sourceValue = static_cast< int >( sourceIter.Get() );
 
-    if ( (targetValue == m_OverwritePixelValue) || sourceValue )
+    if ( (targetValue == m_PaintingPixelValue) || sourceValue )
     {
       if (sourceValue)
-        targetIter.Set( m_OverwritePixelValue );
+        targetIter.Set( m_PaintingPixelValue );
       else
         targetIter.Set( 0 );
     }
@@ -310,7 +310,7 @@ void mitk::SegTool3D::InternalInvertPreview( ImageType* input )
     int targetValue = static_cast< int >( targetIter.Get() );
     int sourceValue = static_cast< int >( sourceIter.Get() );
 
-    if ( (targetValue && (sourceValue != m_OverwritePixelValue)) || ((sourceValue==m_OverwritePixelValue) && !targetValue) )
+    if ( (targetValue && (sourceValue != m_PaintingPixelValue)) || ((sourceValue==m_PaintingPixelValue) && !targetValue) )
       targetIter.Set(1);
     else
       targetIter.Set(0);
@@ -375,6 +375,7 @@ mitk::Image::Pointer mitk::SegTool3D::Get3DImage(mitk::Image::Pointer image, uns
 
 void mitk::SegTool3D::InitializeUndoController()
 {
+/*
   mitk::UndoController::GetCurrentUndoModel()->Clear();
   mitk::UndoController::GetCurrentUndoModel()->ClearRedoList();
 
@@ -399,4 +400,5 @@ void mitk::SegTool3D::InitializeUndoController()
      new mitk::OperationEvent(this, doOp, undoOp, msg) ); // tell the undo controller about the action
 
   ExecuteOperation(doOp);
+*/
 }

@@ -25,9 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourUtils.h"
 #include "mitkLabelSetImage.h"
 
-#include "ipSegmentation.h"
+#include "mitkStateMachineAction.h"
+#include "mitkInteractionEvent.h"
+#include "mitkPositionEvent.h"
 
-#include "mitkRegionGrowingTool.xpm"
+#include "ipSegmentation.h"
 
 // us
 #include <usModule.h>
@@ -72,7 +74,7 @@ void mitk::RegionGrowingTool::ConnectActionsAndFunctions()
 
 const char** mitk::RegionGrowingTool::GetXPM() const
 {
-  return mitkRegionGrowingTool_xpm;
+  return NULL;
 }
 
 us::ModuleResource mitk::RegionGrowingTool::GetIconResource() const
@@ -129,7 +131,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (StateMachineAction*, InteractionEv
   if (!workingSliceGeometry) return false;
 
   Point3D mprojectedPointIn2D;
-  workingSliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), mprojectedPointIn2D);
+  workingSliceGeometry->WorldToIndex( positionEvent->GetPositionInWorld(), mprojectedPointIn2D);
   itk::Index<2> projectedPointInWorkingSlice2D;
   projectedPointInWorkingSlice2D[0] = static_cast<int>( mprojectedPointIn2D[0] - 0.5 );
   projectedPointInWorkingSlice2D[1] = static_cast<int>( mprojectedPointIn2D[1] - 0.5 );
@@ -169,7 +171,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (StateMachineAction*, InteractionEv
       FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
       m_OriginalPicSlice = mitkIpPicNew();
       CastToIpPicDescriptor(m_ReferenceSlice, m_OriginalPicSlice);
-      OnMousePressedOutside(action, stateEvent);
+      this->OnMousePressedOutside(NULL, interactionEvent);
 //todo: fix click inside
 /*
       bool inside = static_cast<ipMITKSegmentationTYPE*>(workingPicSlice->data)[initialWorkingOffset] == workingImage->GetActiveLabelIndex();
@@ -408,19 +410,19 @@ bool mitk::RegionGrowingTool::OnMouseReleased( StateMachineAction*, InteractionE
   return true;
 }
 
-bool mitk::RegionGrowingTool::OnChangeActiveLabel (Action* action, const StateEvent* stateEvent)
+bool mitk::RegionGrowingTool::OnChangeActiveLabel ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
 
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
   assert (workingImage);
 
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return false;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
-  int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition(), timestep );
+  int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetPositionInWorld(), timestep );
   workingImage->SetActiveLabel(pixelValue);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

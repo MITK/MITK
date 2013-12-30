@@ -169,7 +169,7 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
   Image* workingImage = dynamic_cast<Image*>(workingNode->GetData());
   assert ( workingImage );
 
-  ContourUtils::Pointer contourUtils = mitk::ContourUtils::New();
+ // ContourUtils::Pointer contourUtils = mitk::ContourUtils::New();
 
   // for all contours in list (currently created by tool)
   std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> >::iterator itWorkingContours = this->m_WorkingContours.begin();
@@ -191,8 +191,9 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
           //get the segmentation image slice at current timestep
           mitk::Image::Pointer workingSlice = this->GetAffectedImageSliceAs2DImage(itWorkingContours->second, workingImage, currentTimestep);
 
-          mitk::ContourModel::Pointer projectedContour = contourUtils->ProjectContourTo2DSlice(workingSlice, contourModel, true, false);
-          contourUtils->FillContourInSlice(projectedContour, workingSlice, 1.0);
+          ContourModel::Pointer projectedContour = ContourModel::New();
+          const mitk::Geometry3D* sliceGeometry = workingSlice->GetGeometry();
+          ContourUtils::ProjectContourTo2DSlice( sliceGeometry, contourModel, projectedContour );
 
           //write back to image volume
           this->WriteBackSegmentationResult(itWorkingContours->second, workingSlice, currentTimestep);

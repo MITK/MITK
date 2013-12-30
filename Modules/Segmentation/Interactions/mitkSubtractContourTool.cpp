@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLookupTableProperty.h"
 #include "mitkSubtractContourTool.xpm"
 
+#include "mitkStateMachineAction.h"
+#include "mitkInteractionEvent.h"
+
 // us
 #include <usModule.h>
 #include <usModuleResource.h>
@@ -33,19 +36,24 @@ namespace mitk {
 mitk::SubtractContourTool::SubtractContourTool()
 :ContourTool()
 {
-  CONNECT_ACTION( 49014, OnInvertLogic );
 }
 
 mitk::SubtractContourTool::~SubtractContourTool()
 {
 }
 
-bool mitk::SubtractContourTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
+void mitk::SubtractContourTool::ConnectActionsAndFunctions()
+{
+  Superclass::ConnectActionsAndFunctions();
+  CONNECT_FUNCTION( "InvertLogic", OnInvertLogic );
+}
+
+bool mitk::SubtractContourTool::OnMousePressed (StateMachineAction*, InteractionEvent* interactionEvent)
 {
   m_PaintingPixelValue = 0;
   FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
 
-  return Superclass::OnMousePressed(action, stateEvent);
+  return Superclass::OnMousePressed(NULL, interactionEvent);
 }
 
 const char** mitk::SubtractContourTool::GetXPM() const
@@ -76,9 +84,9 @@ const char* mitk::SubtractContourTool::GetName() const
   Called when the CTRL key is pressed. Will change the painting pixel value from 0 to the active label
   and viceversa.
 */
-bool mitk::SubtractContourTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
+bool mitk::SubtractContourTool::OnInvertLogic(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
 
   m_LogicInverted = !m_LogicInverted;
 

@@ -59,8 +59,11 @@ class Segmentation_EXPORT SubtractContourTool : public ContourTool
     us::ModuleResource GetIconResource() const;
 
     virtual const char* GetName() const;
-    virtual bool OnMousePressed (Action*, const StateEvent*);
-    virtual bool OnInvertLogic  (Action*, const StateEvent*);
+
+    virtual void ConnectActionsAndFunctions();
+
+    virtual bool OnMousePressed (StateMachineAction*, InteractionEvent* interactionEvent);
+    virtual bool OnInvertLogic  (StateMachineAction*, InteractionEvent* interactionEvent);
 
   protected:
 

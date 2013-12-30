@@ -19,11 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTool.h"
 
-#include "mitkCommon.h"
+//#include "mitkCommon.h"
 #include "SegmentationExports.h"
-#include "mitkStateEvent.h"
-#include "mitkPositionEvent.h"
-#include "mitkInteractionConst.h"
+//#include "mitkStateEvent.h"
+//#include "mitkPositionEvent.h"
+//#include "mitkInteractionConst.h"
 #include "mitkToolCommand.h"
 
 namespace mitk
@@ -78,7 +78,7 @@ class Segmentation_EXPORT SegTool3D : public Tool
     /**
     * \brief Calculates how good the data, this statemachine handles, is hit by the event.
     */
-    virtual float CanHandleEvent( StateEvent const *stateEvent) const;
+   // virtual float CanHandleEvent( StateEvent const *stateEvent) const;
 
     /// \brief Retrieves the name of the group this tool belongs to.
     virtual const char* GetGroup() const;
@@ -97,10 +97,7 @@ class Segmentation_EXPORT SegTool3D : public Tool
 
     void InitializeUndoController();
 
-    int m_CurrentTimeStep;
-    int m_OverwritePixelValue;
-
-    DataNode::Pointer  m_PreviewNode; //holds the result as a preview image
+    DataNode::Pointer  m_PreviewNode;
     Image::Pointer     m_PreviewImage;
 
     ToolCommand::Pointer m_ProgressCommand;

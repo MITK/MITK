@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLabelSetImage.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkSliceNavigationController.h"
+#include "mitkStateMachineAction.h"
+#include "mitkInteractionEvent.h"
+#include "mitkInteractionPositionEvent.h"
 
 // itk
 #include <itkConnectedThresholdImageFilter.h>
@@ -38,13 +41,17 @@ namespace mitk {
 
 mitk::ConnectedRegionSelectorTool3D::ConnectedRegionSelectorTool3D() : SegTool3D("PressMoveReleaseAndPointSetting")
 {
-  CONNECT_ACTION( AcADDPOINTRMB, AddRegion );
-  CONNECT_ACTION( AcADDPOINT, AddRegion );
-//  CONNECT_ACTION( AcREMOVEPOINT, OnDelete );
 }
 
 mitk::ConnectedRegionSelectorTool3D::~ConnectedRegionSelectorTool3D()
 {
+}
+
+void mitk::ConnectedRegionSelectorTool3D::ConnectActionsAndFunctions()
+{
+  CONNECT_FUNCTION( "ShiftSecondaryButtonPressed", AddRegion );
+  CONNECT_FUNCTION( "ShiftPrimaryButtonPressed", AddRegion );
+//  CONNECT_ACTION( AcREMOVEPOINT, OnDelete );
 }
 
 void mitk::ConnectedRegionSelectorTool3D::Deactivated()
@@ -97,8 +104,8 @@ void mitk::ConnectedRegionSelectorTool3D::InternalAddRegion( itk::Image<TPixel, 
   typename FilterType::Pointer filter = FilterType::New();
 
   filter->SetInput( input );
-  filter->SetLower( m_OverwritePixelValue );
-  filter->SetUpper( m_OverwritePixelValue );
+  filter->SetLower( m_PaintingPixelValue );
+  filter->SetUpper( m_PaintingPixelValue );
   filter->SetConnectivity(FilterType::FaceConnectivity);
   filter->AddSeed( m_LastSeedIndex );
 
@@ -141,37 +148,26 @@ void mitk::ConnectedRegionSelectorTool3D::InternalAddRegion( itk::Image<TPixel, 
   m_RequestedRegion.SetSize(2,cropSize[2]);
 }
 
-bool mitk::ConnectedRegionSelectorTool3D::AddRegion (Action* action, const StateEvent* stateEvent)
+bool mitk::ConnectedRegionSelectorTool3D::AddRegion( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if (!stateEvent)
-  {
-    return false;
-  }
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  if (!positionEvent) return false;
 
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent)
-  {
-    return false;
-  }
-
-  m_LastClickedPosition = positionEvent->GetWorldPosition();
+  m_LastClickedPosition = positionEvent->GetPositionInWorld();
 
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
-  // convert world coordinates to index coordinate on the reference image
+  // convert world to index coordinates with respect to the working image
   workingImage->GetGeometry()->WorldToIndex(m_LastClickedPosition, m_LastSeedIndex);
 
   m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
-  m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
+  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
 
   int clickedPixelValue = static_cast<int>( workingImage->GetPixelValueByIndex(m_LastSeedIndex, m_CurrentTimeStep) );
 
-  if (clickedPixelValue != m_OverwritePixelValue)
-  {
-    return false;
-  }
+  if (clickedPixelValue != m_PaintingPixelValue) return false;
 
   CurrentlyBusy.Send(true);
 

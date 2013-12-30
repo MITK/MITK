@@ -18,17 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkFastMarchingTool_h_Included
 
 #include "mitkSegTool2D.h"
-#include "mitkLegacyAdaptors.h"
 #include "SegmentationExports.h"
-#include "mitkDataNode.h"
 #include "mitkPointSet.h"
 #include "mitkToolCommand.h"
-#include "mitkStateEvent.h"
-#include "mitkLabelSetImage.h"
 
 #include "itkImage.h"
 
-//itk filter
+//itk
 #include "itkFastMarchingImageFilter.h"
 #include "itkBinaryThresholdImageFilter.h"
 #include "itkGradientMagnitudeRecursiveGaussianImageFilter.h"
@@ -149,6 +145,7 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
     mitk::ToolCommand::Pointer m_ProgressCommand;
 
     Image::Pointer m_ReferenceImageSlice;
+    Image::Pointer m_WorkingImageSlice;
 
     bool m_NeedUpdate;
 
@@ -160,8 +157,6 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
     void InternalRun( ImageType* input );
 
     mitk::InteractionPositionEvent::Pointer m_PositionEvent;
-
-    int m_OverwritePixelValue;
 
     float m_LowerThreshold; //used in Threshold filter
     float m_UpperThreshold; //used in Threshold filter

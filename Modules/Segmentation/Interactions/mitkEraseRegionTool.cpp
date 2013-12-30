@@ -16,10 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkEraseRegionTool.h"
 
-#include "mitkEraseRegionTool.xpm"
-
 #include "mitkToolManager.h"
 #include "mitkLabelSetImage.h"
+#include "mitkStateMachineAction.h"
+#include "mitkInteractionEvent.h"
 
 // us
 #include <usModule.h>
@@ -34,16 +34,21 @@ namespace mitk {
 mitk::EraseRegionTool::EraseRegionTool()
 :SetRegionTool()
 {
-  CONNECT_ACTION( 49014, OnInvertLogic );
 }
 
 mitk::EraseRegionTool::~EraseRegionTool()
 {
 }
 
+void mitk::EraseRegionTool::ConnectActionsAndFunctions()
+{
+  Superclass::ConnectActionsAndFunctions();
+  CONNECT_FUNCTION( "InvertLogic", OnInvertLogic );
+}
+
 const char** mitk::EraseRegionTool::GetXPM() const
 {
-  return mitkEraseRegionTool_xpm;
+  return NULL; //mitkEraseRegionTool_xpm;
 }
 
 us::ModuleResource mitk::EraseRegionTool::GetIconResource() const
@@ -65,21 +70,21 @@ const char* mitk::EraseRegionTool::GetName() const
   return "Erase";
 }
 
-bool mitk::EraseRegionTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
+bool mitk::EraseRegionTool::OnMousePressed (StateMachineAction*, InteractionEvent* interactionEvent)
 {
   m_PaintingPixelValue = 0;
   FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
 
-  return Superclass::OnMousePressed(action, stateEvent);
+  return Superclass::OnMousePressed(NULL, interactionEvent);
 }
 
 /**
   Called when the CTRL key is pressed. Will change the painting pixel value from 0 to the active label
   and viceversa.
 */
-bool mitk::EraseRegionTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
+bool mitk::EraseRegionTool::OnInvertLogic(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
 
   m_LogicInverted = !m_LogicInverted;
 

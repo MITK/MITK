@@ -65,10 +65,7 @@ void mitk::OtsuTool3D::AcceptPreview(int region)
 {
   if ( (m_PreviewImages.size() == 0) || (region<0) || (region > m_PreviewImages.size()-1) ) return;
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   CurrentlyBusy.Send(true);
@@ -120,13 +117,10 @@ void mitk::OtsuTool3D::Run()
 {
    //  this->InitializeUndoController();
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
-  m_OverwritePixelValue = workingImage->GetActiveLabelIndex();
+  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
 
   m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
@@ -200,10 +194,7 @@ void mitk::OtsuTool3D::InternalAcceptPreview( ImageType1* targetImage, const Ima
   typename ImageType2::Pointer result = label2image->GetOutput();
   result->DisconnectPipeline();
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   std::string name = workingImage->GetActiveLabelName();
@@ -274,16 +265,13 @@ void mitk::OtsuTool3D::InternalRun( itk::Image<TPixel, VDimension>* input )
   typedef itk::LabelMapToLabelImageFilter< LabelMapType, ImageType > LabelMap2ImageType;
   typedef itk::BinaryShapeKeepNObjectsImageFilter< ImageType > BinaryShapeKeepNObjectsImageFilterType;
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
   typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
   thresholdFilter->SetInput( input );
-  thresholdFilter->SetLowerThreshold(m_OverwritePixelValue);
-  thresholdFilter->SetUpperThreshold(m_OverwritePixelValue);
+  thresholdFilter->SetLowerThreshold(m_PaintingPixelValue);
+  thresholdFilter->SetUpperThreshold(m_PaintingPixelValue);
   thresholdFilter->SetOutsideValue(0);
   thresholdFilter->SetInsideValue(1);
 

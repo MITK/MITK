@@ -24,6 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLegacyAdaptors.h"
 #include "mitkContourUtils.h"
 
+#include "mitkStateMachineAction.h"
+#include "mitkInteractionEvent.h"
+#include "mitkPositionEvent.h"
+
 #include "ipSegmentation.h"
 
 mitk::SetRegionTool::SetRegionTool()
@@ -41,7 +45,7 @@ void mitk::SetRegionTool::ConnectActionsAndFunctions()
 {
   CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
   CONNECT_FUNCTION( "Release", OnMouseReleased);
-  CONNECT_FUNCTION( "InvertLogic", OnInvertLogic);
+//  CONNECT_FUNCTION( "InvertLogic", OnInvertLogic);
 }
 
 void mitk::SetRegionTool::Activated()
@@ -54,9 +58,9 @@ void mitk::SetRegionTool::Deactivated()
   Superclass::Deactivated();
 }
 
-bool mitk::SetRegionTool::OnChangeActiveLabel (StateMachineAction*, InteractionEvent* interactionEvent)
+bool mitk::SetRegionTool::OnChangeActiveLabel (mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   assert(workingNode);
@@ -64,12 +68,12 @@ bool mitk::SetRegionTool::OnChangeActiveLabel (StateMachineAction*, InteractionE
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
   assert(workingImage);
 
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return false;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
-  int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition(), timestep );
+  int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetPositionInWorld(), timestep );
 
   workingImage->SetActiveLabel(pixelValue);
 
@@ -280,6 +284,8 @@ bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
 
 bool mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 ) return false;
+
   // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice
   // of the toolmanager's working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
@@ -295,12 +301,7 @@ bool mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent
 
   if (!m_FillContour && !m_StatusFillWholeSlice) return true;
 
-  if ( SegTool2D::CanHandleEvent(stateEvent) < 1.0 ) return false;
-
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  if (!workingNode) return false;
-
-  LabelSetImage* image = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  Image* image = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
   if ( !image || !planeGeometry ) return false;
 

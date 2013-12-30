@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
-#include "mitkStepper.h"
 
 namespace mitk {
   class FastMarchingTool;
@@ -51,8 +50,6 @@ public:
     void OnStopValueChanged(double);
     void OnAcceptPreview();
     void OnCancel();
-    void Refetch();
-    void SetStepper(mitk::Stepper *);
     void OnClearSeeds();
     void OnNewLabel();
     void OnShowInformation(bool);
@@ -69,9 +66,7 @@ protected:
 
   mitk::FastMarchingTool* m_FastMarchingTool;
 
-  bool m_TimeIsConnected;
   bool m_SelfCall;
-  mitk::Stepper::Pointer m_TimeStepper;
 };
 
 #endif

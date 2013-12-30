@@ -60,6 +60,9 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
 
     virtual const char* GetName() const;
 
+    /// \brief Convert all current contour objects to binary segmentation image.
+    void ConfirmSegmentation();
+
   protected:
 
     LiveWireTool2D();
@@ -70,57 +73,75 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     virtual void Activated();
     virtual void Deactivated();
 
-    /// \brief Initialize tool
-    virtual bool OnInitLiveWire ( StateMachineAction*, InteractionEvent* interactionEvent );
+     /// \brief Memory release from all used contours
+     virtual void ClearContours();
 
-    /// \brief Add a control point and finish current segment
-    virtual bool OnAddPoint   ( StateMachineAction*, InteractionEvent* interactionEvent );
+     /// \brief Initialize tool
+     virtual bool OnInitLiveWire ( StateMachineAction*, InteractionEvent* interactionEvent );
 
-    /// \brief Actual LiveWire computation
-    virtual bool OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent );
+     /// \brief Add a control point and finish current segment
+     virtual bool OnAddPoint   ( StateMachineAction*, InteractionEvent* interactionEvent );
 
-    /// \brief Check double click on first control point to finish the LiveWire tool
-    virtual bool OnCheckPoint( const InteractionEvent* interactionEvent );
+     /// \brief Actual LiveWire computation
+     virtual bool OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent );
 
-    /// \brief Finish LiveWire tool
-    virtual bool OnFinish( StateMachineAction*, InteractionEvent* interactionEvent );
+     /// \brief Check double click on first control point to finish the LiveWire tool
+     virtual bool OnCheckPoint( const InteractionEvent* interactionEvent );
 
-    /// \brief Close the contour
-    virtual bool OnLastSegmentDelete( StateMachineAction*, InteractionEvent* interactionEvent );
+     /// \brief Finish LiveWire tool
+     virtual bool OnFinish( StateMachineAction*, InteractionEvent* interactionEvent );
 
-    /// \brief Don't use dynamic cost map for LiveWire calculation
-    virtual bool OnMouseMoveNoDynamicCosts( StateMachineAction*, InteractionEvent* interactionEvent );
+     /// \brief Close the contour
+     virtual bool OnLastSegmentDelete( StateMachineAction*, InteractionEvent* interactionEvent );
+
+     /// \brief Don't use dynamic cost map for LiveWire calculation
+     virtual bool OnMouseMoveNoDynamicCosts( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Finish contour interaction.
     void FinishTool();
 
+     /** \brief Enable interaction with contours.
+     * Contours that are created by the tool can be edited using LiveWire functionality.
+     * Points can thus be inserted, moved or deleted.
+     * \param on true to have interaction enabled.
+    */
+     void EnableContourLiveWireInteraction(bool on);
 
-    //the contour already set by the user
-    mitk::ContourModel::Pointer m_Contour;
-    //the corresponding datanode
-    mitk::DataNode::Pointer m_ContourModelNode;
+     //the contour already set by the user
+     mitk::ContourModel::Pointer m_Contour;
 
-    //the current LiveWire computed contour
-    mitk::ContourModel::Pointer m_LiveWireContour;
-    //the corresponding datanode
-    mitk::DataNode::Pointer m_LiveWireContourNode;
+     //the corresponding datanode
+     mitk::DataNode::Pointer m_ContourModelNode;
 
-    mitk::ContourModel::Pointer m_EditingContour;
-    mitk::DataNode::Pointer m_EditingContourNode;
+     //the current LiveWire computed contour
+     mitk::ContourModel::Pointer m_LiveWireContour;
 
-    //the current reference image
-    mitk::Image::Pointer m_WorkingSlice;
+     //the corresponding datanode
+     mitk::DataNode::Pointer m_LiveWireContourNode;
 
-    mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
+     // the contour for the editing portion
+     mitk::ContourModel::Pointer m_EditingContour;
 
-    bool m_CreateAndUseDynamicCosts;
+     //the corresponding datanode
+     mitk::DataNode::Pointer m_EditingContourNode;
 
-    int m_TimeStep;
+     // the corresponding contour interactor
+     mitk::ContourModelLiveWireInteractor::Pointer m_ContourInteractor;
 
-    std::vector< std::pair<mitk::DataNode*, mitk::PlaneGeometry::Pointer> > m_Contours;
+     //the current reference image
+     mitk::Image::Pointer m_WorkingSlice;
 
-    template<typename TPixel, unsigned int VImageDimension>
-    void FindHighestGradientMagnitudeByITK(itk::Image<TPixel, VImageDimension>* inputImage, itk::Index<3> &index, itk::Index<3> &returnIndex);
+     // the filter for live wire calculation
+     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
+
+     bool m_CreateAndUseDynamicCosts;
+
+     std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> > m_WorkingContours;
+     std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> > m_EditingContours;
+     std::vector< mitk::ContourModelLiveWireInteractor::Pointer > m_LiveWireInteractors;
+
+     template<typename TPixel, unsigned int VImageDimension>
+     void FindHighestGradientMagnitudeByITK(itk::Image<TPixel, VImageDimension>* inputImage, itk::Index<3> &index, itk::Index<3> &returnIndex);
 };
 
 } // namespace

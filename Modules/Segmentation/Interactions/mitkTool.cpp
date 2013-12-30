@@ -29,9 +29,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkObjectFactory.h>
 
-mitk::Tool::Tool(const char* type) : m_InteractorType( type )
+mitk::Tool::Tool(const char* type) :
+m_InteractorType( type ),
+m_PaintingPixelValue(0),
+m_CurrentTimeStep(0),
+m_PredicateWorking(mitk::NodePredicateAnd::New()),
+m_PredicateReference(mitk::NodePredicateAnd::New())
 {
-  m_PredicateWorking = mitk::NodePredicateAnd::New();
   m_PredicateWorking->AddPredicate(NodePredicateDimension::New(3, 1));
   m_PredicateWorking->AddPredicate(mitk::NodePredicateDataType::New("LabelSetImage"));
   m_PredicateWorking->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
@@ -46,7 +50,6 @@ mitk::Tool::Tool(const char* type) : m_InteractorType( type )
   validImages->AddPredicate(isDti);
   validImages->AddPredicate(isQbi);
 
-  m_PredicateReference = mitk::NodePredicateAnd::New();
   m_PredicateReference->AddPredicate(validImages);
   m_PredicateReference->AddPredicate(mitk::NodePredicateNot::New(m_PredicateWorking));
   m_PredicateReference->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));

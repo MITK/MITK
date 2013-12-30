@@ -38,6 +38,8 @@ public:
    virtual us::ModuleResource GetCursorIconResource() const;
    us::ModuleResource GetIconResource() const;
 
+   virtual void ConnectActionsAndFunctions();
+
    /// \brief Updates the tool and generates a new preview image
    void Run();
 
@@ -49,7 +51,7 @@ public:
    void Deactivated();
    void Activated();
 
-   bool AddRegion (Action*, const StateEvent*);
+   bool AddRegion (StateMachineAction*, InteractionEvent* interactionEvent);
 
    template <typename TPixel, unsigned int VImageDimension>
    void InternalAddRegion( itk::Image<TPixel, VImageDimension>* input );

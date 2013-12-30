@@ -16,17 +16,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkFastMarchingToolGUI.h"
 
-#include <QMessageBox>
 #include "mitkBaseRenderer.h"
 #include "mitkFastMarchingTool.h"
 
 #include <QmitkNewSegmentationDialog.h>
-#include <QmitkStepperAdapter.h>
 #include <QApplication.h>
+#include <QMessageBox>
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkFastMarchingToolGUI, "")
 
-QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI() : QmitkToolGUI(), m_TimeIsConnected(false), m_SelfCall(false), m_FastMarchingTool(NULL)
+QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI() : QmitkToolGUI(), m_SelfCall(false), m_FastMarchingTool(NULL)
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
@@ -103,20 +102,15 @@ void QmitkFastMarchingToolGUI::OnNewToolAssociated(mitk::Tool* tool)
   {
     m_FastMarchingTool->CurrentlyBusy += mitk::MessageDelegate1<QmitkFastMarchingToolGUI, bool>( this, &QmitkFastMarchingToolGUI::BusyStateChanged );
     m_SelfCall = true;
+    m_Controls.m_slAlpha->setDecimals(2);
+    m_Controls.m_slSigma->setDecimals(2);
+    m_Controls.m_slBeta->setDecimals(2);
+    m_Controls.m_slStopValue->setDecimals(0);
     m_Controls.m_slSigma->setValue( m_FastMarchingTool->GetSigma() );
     m_Controls.m_slAlpha->setValue( m_FastMarchingTool->GetAlpha() );
     m_Controls.m_slBeta->setValue( m_FastMarchingTool->GetBeta() );
     m_Controls.m_slStopValue->setValue( m_FastMarchingTool->GetStoppingValue() );
     m_SelfCall = false;
-    //listen to timestep change events
-    mitk::BaseRenderer::Pointer renderer;
-    renderer = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") );
-    if (renderer.IsNotNull() && !m_TimeIsConnected)
-    {
-        new QmitkStepperAdapter(this, renderer->GetSliceNavigationController()->GetTime(), "stepper");
-      //  connect(m_TimeStepper, SIGNAL(Refetch()), this, SLOT(Refetch()));
-        m_TimeIsConnected = true;
-    }
   }
 }
 
@@ -172,17 +166,6 @@ void QmitkFastMarchingToolGUI::OnCancel()
   }
 }
 
-void QmitkFastMarchingToolGUI::SetStepper(mitk::Stepper *stepper)
-{
-  this->m_TimeStepper = stepper;
-}
-
-void QmitkFastMarchingToolGUI::Refetch()
-{
-  //event from image navigator recieved - timestep has changed
-//    m_FastMarchingTool->SetCurrentTimeStep(m_TimeStepper->GetPos());
-}
-
 void QmitkFastMarchingToolGUI::OnClearSeeds()
 {
   m_FastMarchingTool->ClearSeeds();
@@ -191,22 +174,22 @@ void QmitkFastMarchingToolGUI::OnClearSeeds()
 void QmitkFastMarchingToolGUI::BusyStateChanged(bool value)
 {
   if (value)
-      QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
+    QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
   else
-      QApplication::restoreOverrideCursor();
+    QApplication::restoreOverrideCursor();
 }
 
-void QmitkFastMarchingToolGUI::OnShowInformation( bool on )
+void QmitkFastMarchingToolGUI::OnShowInformation( bool value )
 {
-  if (on)
+  if (value)
     m_Controls.m_InformationWidget->show();
   else
     m_Controls.m_InformationWidget->hide();
 }
 
-void QmitkFastMarchingToolGUI::OnShowAdvancedControls( bool on )
+void QmitkFastMarchingToolGUI::OnShowAdvancedControls( bool value )
 {
-  if (on)
+  if (value)
     m_Controls.m_AdvancedControlsWidget->show();
   else
     m_Controls.m_AdvancedControlsWidget->hide();

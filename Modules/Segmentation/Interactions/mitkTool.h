@@ -212,6 +212,8 @@ namespace mitk
     virtual void Notify( InteractionEvent* interactionEvent,bool isHandled );
     DataNode* m_ReferenceNode;
     DataNode* m_WorkingNode;
+    int m_PaintingPixelValue;
+    int m_CurrentTimeStep;
     bool FilterEvents(InteractionEvent* , DataNode* );
 
     ToolManager* m_ToolManager;

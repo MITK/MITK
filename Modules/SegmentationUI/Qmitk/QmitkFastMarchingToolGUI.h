@@ -38,7 +38,10 @@ public:
   mitkClassMacro(QmitkFastMarchingToolGUI, QmitkToolGUI);
   itkNewMacro(QmitkFastMarchingToolGUI);
 
-  void OnThresholdChanged(int current);
+  void OnSigmaValueSet(mitk::ScalarType value);
+  void OnAlphaValueSet(mitk::ScalarType value);
+  void OnBetaValueSet(mitk::ScalarType value);
+  void OnStopValueSet(mitk::ScalarType value);
 
   protected slots:
 

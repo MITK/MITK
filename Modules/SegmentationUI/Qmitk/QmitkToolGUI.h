@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationUIExports.h"
 
 #include "mitkCommon.h"
+#include "mitkVector.h"
+
 #include "itkObjectFactory.h"
 
 namespace mitk {

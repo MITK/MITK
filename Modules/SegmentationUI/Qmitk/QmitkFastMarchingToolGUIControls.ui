@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>333</width>
-    <height>542</height>
+    <height>645</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -193,9 +193,22 @@
       </widget>
      </item>
      <item>
-      <widget class="ctkSliderWidget" name="m_slSigma" native="true"/>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="ctkSliderWidget" name="m_slSigma" native="true"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -219,9 +232,22 @@
       </widget>
      </item>
      <item>
-      <widget class="ctkSliderWidget" name="m_slAlpha" native="true"/>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="ctkSliderWidget" name="m_slAlpha" native="true"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -245,9 +271,22 @@
       </widget>
      </item>
      <item>
-      <widget class="ctkSliderWidget" name="m_slBeta" native="true"/>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="ctkSliderWidget" name="m_slBeta" native="true"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -271,9 +310,22 @@
       </widget>
      </item>
      <item>
-      <widget class="ctkSliderWidget" name="m_slStopValue" native="true"/>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="ctkSliderWidget" name="m_slStopValue" native="true"/>
    </item>
    <item>
     <widget class="QCheckBox" name="m_cbShowInformation">

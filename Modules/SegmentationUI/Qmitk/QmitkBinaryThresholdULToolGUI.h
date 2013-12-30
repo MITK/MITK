@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
-#include "mitkBinaryThresholdULTool.h"
 
 #include "ui_QmitkBinaryThresholdULToolGUIControls.h"
 
@@ -44,8 +43,8 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdULToolGUI : public QmitkToolGUI
     mitkClassMacro(QmitkBinaryThresholdULToolGUI, QmitkToolGUI);
     itkNewMacro(QmitkBinaryThresholdULToolGUI);
 
-    void OnThresholdingIntervalBordersChanged(mitk::ScalarType lower, mitk::ScalarType upper, bool isFloat);
-    void OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType upper);
+    void OnThresholdingIntervalBordersSet(mitk::ScalarType lower, mitk::ScalarType upper, bool isFloat);
+    void OnThresholdingValuesSet(mitk::ScalarType lower, mitk::ScalarType upper);
 
   protected slots:
 

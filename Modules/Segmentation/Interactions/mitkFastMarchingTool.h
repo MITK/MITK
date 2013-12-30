@@ -57,12 +57,16 @@ namespace mitk
 */
 class Segmentation_EXPORT FastMarchingTool : public SegTool2D
 {
-    mitkNewMessageMacro(Ready);
 
   public:
 
     mitkClassMacro(FastMarchingTool, SegTool2D);
     itkNewMacro(FastMarchingTool);
+
+    Message1<mitk::ScalarType> SigmaValueChanged;
+    Message1<mitk::ScalarType> AlphaValueChanged;
+    Message1<mitk::ScalarType> BetaValueChanged;
+    Message1<mitk::ScalarType> StopValueChanged;
 
     /* typedefs for itk pipeline */
     typedef float                                     InternalPixelType;
@@ -151,19 +155,17 @@ class Segmentation_EXPORT FastMarchingTool : public SegTool2D
 
     bool m_Initialized;
 
-    int m_CurrentTimeStep;
-
     template < typename ImageType >
     void InternalRun( ImageType* input );
 
     mitk::InteractionPositionEvent::Pointer m_PositionEvent;
 
-    float m_LowerThreshold; //used in Threshold filter
-    float m_UpperThreshold; //used in Threshold filter
-    float m_StoppingValue; //used in Fast Marching filter
-    float m_Sigma; //used in GradientMagnitude filter
-    float m_Alpha; //used in Sigmoid filter
-    float m_Beta; //used in Sigmoid filter
+    mitk::ScalarType m_LowerThreshold; //used in Threshold filter
+    mitk::ScalarType m_UpperThreshold; //used in Threshold filter
+    mitk::ScalarType m_StoppingValue; //used in Fast Marching filter
+    mitk::ScalarType m_Sigma; //used in GradientMagnitude filter
+    mitk::ScalarType m_Alpha; //used in Sigmoid filter
+    mitk::ScalarType m_Beta; //used in Sigmoid filter
 
     //used to visualize the preview segmentation
     DataNode::Pointer  m_PreviewNode;

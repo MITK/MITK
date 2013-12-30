@@ -31,29 +31,32 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI() : QmitkToolGUI(), m_SelfCal
   m_Controls.m_InformationWidget->hide();
   m_Controls.m_AdvancedControlsWidget->hide();
 
+  m_Controls.m_slSigma->setDecimals(2);
   m_Controls.m_slSigma->setPageStep(0.1);
   m_Controls.m_slSigma->setSingleStep(0.01);
   m_Controls.m_slSigma->setMinimum(0.1);
   m_Controls.m_slSigma->setMaximum(5.0);
   m_Controls.m_slSigma->setTracking(false);
-  m_Controls.m_slSigma->setToolTip("The \"sigma\" parameter in the Gradient Magnitude filter.");
+  m_Controls.m_slSigma->setToolTip("The \"Sigma\" parameter in the Gradient Magnitude filter.");
   connect( m_Controls.m_slSigma, SIGNAL(valueChanged(double)), this, SLOT(OnSigmaChanged(double)));
 
+  m_Controls.m_slAlpha->setDecimals(2);
   m_Controls.m_slAlpha->setMinimum(-10);
   m_Controls.m_slAlpha->setMaximum(0);
   m_Controls.m_slAlpha->setPageStep(0.1);
   m_Controls.m_slAlpha->setSingleStep(0.01);
   m_Controls.m_slAlpha->setTracking(false);
-  m_Controls.m_slAlpha->setToolTip("The \"alpha\" parameter in the Sigmoid mapping filter.");
+  m_Controls.m_slAlpha->setToolTip("The \"Alpha\" parameter in the Sigmoid mapping filter.");
   connect( m_Controls.m_slAlpha, SIGNAL(valueChanged(double)), this, SLOT(OnAlphaChanged(double)));
 
+  m_Controls.m_slBeta->setDecimals(2);
   m_Controls.m_slBeta->setTracking(false);
   m_Controls.m_slBeta->setMinimum(0);
   m_Controls.m_slBeta->setMaximum(30);
   m_Controls.m_slBeta->setPageStep(0.1);
   m_Controls.m_slBeta->setSingleStep(0.01);
   m_Controls.m_slBeta->setTracking(false);
-  m_Controls.m_slBeta->setToolTip("The \"beta\" parameter in the Sigmoid mapping filter.");
+  m_Controls.m_slBeta->setToolTip("The \"Beta\" parameter in the Sigmoid mapping filter.");
   connect( m_Controls.m_slBeta, SIGNAL(valueChanged(double)), this, SLOT(OnBetaChanged(double)));
 
   m_Controls.m_slStopValue->setTickInterval(1);
@@ -61,7 +64,7 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI() : QmitkToolGUI(), m_SelfCal
   m_Controls.m_slStopValue->setMaximum(3000);
   m_Controls.m_slStopValue->setDecimals(0);
   m_Controls.m_slStopValue->setTracking(false);
-  m_Controls.m_slStopValue->setToolTip("The \"stop value\" parameter in the FastMarching filter.");
+  m_Controls.m_slStopValue->setToolTip("The \"Stop Value\" parameter in the FastMarching filter.");
   connect( m_Controls.m_slStopValue, SIGNAL(valueChanged(double)), this, SLOT(OnStopValueChanged(double)));
 
   m_Controls.m_pbClearSeeds->setToolTip("Clear current preview and start over again");
@@ -74,11 +77,6 @@ QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI() : QmitkToolGUI(), m_SelfCal
   connect( m_Controls.m_cbShowAdvancedControls, SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedControls(bool)) );
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
-
-  m_Controls.m_slAlpha->setDecimals(2);
-  m_Controls.m_slSigma->setDecimals(2);
-  m_Controls.m_slBeta->setDecimals(2);
-  m_Controls.m_slStopValue->setDecimals(0);
 }
 
 QmitkFastMarchingToolGUI::~QmitkFastMarchingToolGUI()
@@ -86,6 +84,10 @@ QmitkFastMarchingToolGUI::~QmitkFastMarchingToolGUI()
   if (m_FastMarchingTool)
   {
     m_FastMarchingTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkFastMarchingToolGUI, bool>( this, &QmitkFastMarchingToolGUI::BusyStateChanged );
+    m_FastMarchingTool->SigmaValueChanged -= mitk::MessageDelegate1<QmitkFastMarchingToolGUI, mitk::ScalarType>( this, &QmitkFastMarchingToolGUI::OnSigmaValueSet );
+    m_FastMarchingTool->AlphaValueChanged -= mitk::MessageDelegate1<QmitkFastMarchingToolGUI, mitk::ScalarType>( this, &QmitkFastMarchingToolGUI::OnAlphaValueSet );
+    m_FastMarchingTool->BetaValueChanged -= mitk::MessageDelegate1<QmitkFastMarchingToolGUI, mitk::ScalarType>( this, &QmitkFastMarchingToolGUI::OnBetaValueSet );
+    m_FastMarchingTool->StopValueChanged -= mitk::MessageDelegate1<QmitkFastMarchingToolGUI, mitk::ScalarType>( this, &QmitkFastMarchingToolGUI::OnStopValueSet );
   }
 }
 
@@ -94,6 +96,10 @@ void QmitkFastMarchingToolGUI::OnNewToolAssociated(mitk::Tool* tool)
   if (m_FastMarchingTool)
   {
     m_FastMarchingTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkFastMarchingToolGUI, bool>( this, &QmitkFastMarchingToolGUI::BusyStateChanged );
+    m_FastMarchingTool->SigmaValueChanged -= mitk::MessageDelegate1<QmitkFastMarchingToolGUI, mitk::ScalarType>( this, &QmitkFastMarchingToolGUI::OnSigmaValueSet );
+    m_FastMarchingTool->AlphaValueChanged -= mitk::MessageDelegate1<QmitkFastMarchingToolGUI, mitk::ScalarType>( this, &QmitkFastMarchingToolGUI::OnAlphaValueSet );
+    m_FastMarchingTool->BetaValueChanged -= mitk::MessageDelegate1<QmitkFastMarchingToolGUI, mitk::ScalarType>( this, &QmitkFastMarchingToolGUI::OnBetaValueSet );
+    m_FastMarchingTool->StopValueChanged -= mitk::MessageDelegate1<QmitkFastMarchingToolGUI, mitk::ScalarType>( this, &QmitkFastMarchingToolGUI::OnStopValueSet );
   }
 
   m_FastMarchingTool = dynamic_cast<mitk::FastMarchingTool*>( tool );
@@ -101,17 +107,43 @@ void QmitkFastMarchingToolGUI::OnNewToolAssociated(mitk::Tool* tool)
   if (m_FastMarchingTool)
   {
     m_FastMarchingTool->CurrentlyBusy += mitk::MessageDelegate1<QmitkFastMarchingToolGUI, bool>( this, &QmitkFastMarchingToolGUI::BusyStateChanged );
-    m_SelfCall = true;
-    m_Controls.m_slAlpha->setDecimals(2);
-    m_Controls.m_slSigma->setDecimals(2);
-    m_Controls.m_slBeta->setDecimals(2);
-    m_Controls.m_slStopValue->setDecimals(0);
-    m_Controls.m_slSigma->setValue( m_FastMarchingTool->GetSigma() );
-    m_Controls.m_slAlpha->setValue( m_FastMarchingTool->GetAlpha() );
-    m_Controls.m_slBeta->setValue( m_FastMarchingTool->GetBeta() );
-    m_Controls.m_slStopValue->setValue( m_FastMarchingTool->GetStoppingValue() );
-    m_SelfCall = false;
+    m_FastMarchingTool->SigmaValueChanged += mitk::MessageDelegate1<QmitkFastMarchingToolGUI, mitk::ScalarType>( this, &QmitkFastMarchingToolGUI::OnSigmaValueSet );
+    m_FastMarchingTool->AlphaValueChanged += mitk::MessageDelegate1<QmitkFastMarchingToolGUI, mitk::ScalarType>( this, &QmitkFastMarchingToolGUI::OnAlphaValueSet );
+    m_FastMarchingTool->BetaValueChanged += mitk::MessageDelegate1<QmitkFastMarchingToolGUI, mitk::ScalarType>( this, &QmitkFastMarchingToolGUI::OnBetaValueSet );
+    m_FastMarchingTool->StopValueChanged += mitk::MessageDelegate1<QmitkFastMarchingToolGUI, mitk::ScalarType>( this, &QmitkFastMarchingToolGUI::OnStopValueSet );
   }
+}
+
+void QmitkFastMarchingToolGUI::OnSigmaValueSet(mitk::ScalarType value)
+{
+    m_SelfCall = true;
+    m_Controls.m_slSigma->setDecimals(2);
+    m_Controls.m_slSigma->setValue( value );
+    m_SelfCall = false;
+}
+
+void QmitkFastMarchingToolGUI::OnAlphaValueSet(mitk::ScalarType value)
+{
+    m_SelfCall = true;
+    m_Controls.m_slAlpha->setValue( value );
+    m_Controls.m_slAlpha->setDecimals(2);
+    m_SelfCall = false;
+}
+
+void QmitkFastMarchingToolGUI::OnBetaValueSet(mitk::ScalarType value)
+{
+    m_SelfCall = true;
+    m_Controls.m_slBeta->setValue( value );
+    m_Controls.m_slBeta->setDecimals(2);
+    m_SelfCall = false;
+}
+
+void QmitkFastMarchingToolGUI::OnStopValueSet(mitk::ScalarType value)
+{
+    m_SelfCall = true;
+    m_Controls.m_slStopValue->setValue( value );
+    m_Controls.m_slStopValue->setDecimals(0);
+    m_SelfCall = false;
 }
 
 void QmitkFastMarchingToolGUI::OnStopValueChanged(double value)
@@ -152,7 +184,7 @@ void QmitkFastMarchingToolGUI::OnAlphaChanged(double value)
 
 void QmitkFastMarchingToolGUI::OnAcceptPreview()
 {
-  if (m_FastMarchingTool && (!m_SelfCall))
+  if (m_FastMarchingTool)
   {
     m_FastMarchingTool->AcceptPreview();
   }
@@ -160,7 +192,7 @@ void QmitkFastMarchingToolGUI::OnAcceptPreview()
 
 void QmitkFastMarchingToolGUI::OnCancel()
 {
-  if (m_FastMarchingTool && (!m_SelfCall))
+  if (m_FastMarchingTool)
   {
     m_FastMarchingTool->Cancel();
   }

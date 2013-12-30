@@ -37,7 +37,6 @@ namespace mitk {
 
 mitk::FastMarchingTool::FastMarchingTool() : SegTool2D("PressMoveReleaseAndPointSetting"),
 m_NeedUpdate(true),
-m_CurrentTimeStep(0),
 m_LowerThreshold(-100),
 m_UpperThreshold(2000),
 m_StoppingValue(2000),
@@ -220,6 +219,11 @@ void mitk::FastMarchingTool::Activated()
   m_SeedsAsPointSetNode->SetVisibility(true);
 
   m_ToolManager->GetDataStorage()->Add( m_SeedsAsPointSetNode, m_WorkingNode );
+
+  SigmaValueChanged.Send(m_Sigma);
+  AlphaValueChanged.Send(m_Alpha);
+  BetaValueChanged.Send(m_Beta);
+  StopValueChanged.Send(m_StoppingValue);
 }
 
 void mitk::FastMarchingTool::Deactivated()
@@ -279,7 +283,6 @@ void mitk::FastMarchingTool::AcceptPreview()
 
 bool mitk::FastMarchingTool::OnAddPoint( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  // add a new seed point
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return false;
 
@@ -357,8 +360,6 @@ bool mitk::FastMarchingTool::OnAddPoint( StateMachineAction*, InteractionEvent* 
 
   this->Run();
 
-  m_ReadyMessage.Send();
-
   return true;
 }
 
@@ -407,8 +408,7 @@ void mitk::FastMarchingTool::Run()
     mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
     assert(workingImage);
 
-    // todo: use it later
-    //unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+    m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
     CurrentlyBusy.Send(true);
 

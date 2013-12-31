@@ -75,11 +75,6 @@ class Segmentation_EXPORT SegTool3D : public Tool
     SegTool3D(const char*); // purposely hidden
     virtual ~SegTool3D();
 
-    /**
-    * \brief Calculates how good the data, this statemachine handles, is hit by the event.
-    */
-   // virtual float CanHandleEvent( StateEvent const *stateEvent) const;
-
     /// \brief Retrieves the name of the group this tool belongs to.
     virtual const char* GetGroup() const;
 

@@ -22,6 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOtsuTool3D.h"
 #include "ui_QmitkOtsuTool3DGUIControls.h"
 
+namespace mitk {
+  class OtsuTool3D;
+}
+
 //class QListWidgetItem;
 
 /**
@@ -40,17 +44,17 @@ class SegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
     mitkClassMacro(QmitkOtsuTool3DGUI, QmitkToolGUI);
     itkNewMacro(QmitkOtsuTool3DGUI);
 
-  signals:
-
-  public slots:
-
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);
 
     void OnRun();
 
-//    void OnAcceptPreview();
+    void OnCancel();
+
+    void OnAcceptPreview();
+
+    void OnShowInformation(bool);
 
     void OnItemSelectionChanged(QListWidgetItem *item);
 
@@ -59,7 +63,9 @@ class SegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
     QmitkOtsuTool3DGUI();
     virtual ~QmitkOtsuTool3DGUI();
 
-    mitk::OtsuTool3D::Pointer m_OtsuTool3D;
+    void BusyStateChanged(bool);
+
+    mitk::OtsuTool3D* m_OtsuTool3D;
 
     Ui_QmitkOtsuTool3DGUIControls m_Controls;
 

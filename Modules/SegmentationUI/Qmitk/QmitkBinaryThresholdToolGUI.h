@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
-#include "mitkBinaryThresholdTool.h"
 
 #include "ui_QmitkBinaryThresholdToolGUIControls.h"
 

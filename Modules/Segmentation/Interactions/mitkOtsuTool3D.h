@@ -39,14 +39,24 @@ namespace mitk{
       virtual const char* GetName() const;
       us::ModuleResource GetIconResource() const;
 
-      /// \brief Replaces the active label with the preview image.
-      virtual void AcceptPreview(int region);
+      /// \brief Adds actions related to multi label preview image and node
+      virtual void Activated();
+
+      /// \brief Adds actions related to multi label preview image and node
+      virtual void Deactivated();
+
+      /// \brief Adds a new label with the contents of the current preview image.
+      //void AcceptPreview(int region);
+
+      /// \brief Updates the preview image with the current region selection.
+      void UpdatePreview(int region);
 
       /// \brief Executes the tool.
       void Run();
 
-      /// \brief Sets the number of new labels to generate.
+      /// \brief Sets\Gets the number of regions to extract.
       void SetNumberOfRegions(int);
+      int GetNumberOfRegions();
 
     protected:
       OtsuTool3D();
@@ -54,8 +64,13 @@ namespace mitk{
 
       int m_NumberOfRegions;
 
-      std::map< int, mitk::Image::Pointer > m_PreviewImages;
-      std::map< int, mitk::DataNode::Pointer > m_PreviewNodes;
+      int m_SelectedRegion;
+
+      //std::map< int, mitk::Image::Pointer > m_PreviewImages;
+      //std::map< int, mitk::DataNode::Pointer > m_PreviewNodes;
+
+      mitk::DataNode::Pointer m_MultiLabelNode;
+      mitk::Image::Pointer m_MultiLabelImage;
       mitk::ColorSequenceRainbow::Pointer m_ColorSequenceRainbow;
 
       template < typename TPixel, unsigned int VDimension >
@@ -63,6 +78,9 @@ namespace mitk{
 
       template <typename ImageType1, typename ImageType2>
       void InternalAcceptPreview( ImageType1* targetImage, const ImageType2* sourceImage );
+
+      template <typename ImageType>
+      void InternalUpdatePreview( const ImageType* input, int region);
 
   };
 

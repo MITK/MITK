@@ -14,9 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// MITK
 #include "mitkOtsuTool3D.h"
 
+// mitk
 #include "mitkLabelSetImage.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
@@ -24,18 +24,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkToolManager.h"
 #include "mitkImageCast.h"
-#include <itkBinaryThresholdImageFilter.h>
-#include <itkCastImageFilter.h>
-#include <itkLabelObject.h>
-#include <itkLabelMap.h>
-#include <itkLabelImageToLabelMapFilter.h>
-#include <itkAutoCropLabelMapFilter.h>
-#include <itkLabelMapToLabelImageFilter.h>
+#include "mitkColormapProperty.h"
+#include "mitkRenderingModeProperty.h"
+#include "mitkLevelWindowProperty.h"
 
-#include <itkBinaryShapeKeepNObjectsImageFilter.h>
+// itk
+#include <itkOtsuMultipleThresholdsImageFilter.h>
 #include <itkBinaryImageToShapeLabelMapFilter.h>
 #include <itkRelabelLabelMapFilter.h>
-#include <itkOtsuMultipleThresholdsImageFilter.h>
+#include <itkLabelMapToLabelImageFilter.h>
+#include <itkBinaryThresholdImageFilter.h>
 
 // us
 #include <usModule.h>
@@ -47,7 +45,7 @@ namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, OtsuTool3D, "Otsu Segmentation");
 }
 
-mitk::OtsuTool3D::OtsuTool3D() : SegTool3D("dummy")
+mitk::OtsuTool3D::OtsuTool3D() : SegTool3D("dummy"), m_NumberOfRegions(3), m_SelectedRegion(0)
 {
 }
 
@@ -58,12 +56,18 @@ mitk::OtsuTool3D::~OtsuTool3D()
 
 void mitk::OtsuTool3D::SetNumberOfRegions(int value)
 {
-  m_NumberOfRegions = value;
+  if (value>1 && value<5)
+    m_NumberOfRegions = value;
 }
 
+int mitk::OtsuTool3D::GetNumberOfRegions()
+{
+  return m_NumberOfRegions;
+}
+/*
 void mitk::OtsuTool3D::AcceptPreview(int region)
 {
-  if ( (m_PreviewImages.size() == 0) || (region<0) || (region > m_PreviewImages.size()-1) ) return;
+  m_SelectedRegion = region;
 
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
@@ -93,8 +97,49 @@ void mitk::OtsuTool3D::AcceptPreview(int region)
 
   workingImage->Modified();
 
-  m_PreviewImages.erase(region);
-  m_PreviewNodes.erase(region);
+  CurrentlyBusy.Send(false);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+*/
+void mitk::OtsuTool3D::UpdatePreview(int region)
+{
+/*
+  if (region<0)
+  {
+    m_PreviewNode->SetVisibility(false);
+    return;
+  }
+*/
+  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
+  assert(workingImage);
+
+  CurrentlyBusy.Send(true);
+
+  try
+  {
+    AccessByItk_1( m_MultiLabelImage, InternalUpdatePreview, region);
+  }
+  catch( itk::ExceptionObject & e )
+  {
+    CurrentlyBusy.Send(false);
+    m_ProgressCommand->Reset();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    m_ToolManager->ActivateTool(-1);
+    return;
+  }
+  catch (...)
+  {
+    CurrentlyBusy.Send(false);
+    m_ProgressCommand->Reset();
+    MITK_ERROR << "Unkown exception caught!";
+    m_ToolManager->ActivateTool(-1);
+    return;
+  }
+
+  m_PreviewNode->SetVisibility(true);
+
+  workingImage->Modified();
 
   CurrentlyBusy.Send(false);
 
@@ -113,9 +158,53 @@ us::ModuleResource mitk::OtsuTool3D::GetIconResource() const
   return resource;
 }
 
+void mitk::OtsuTool3D::Activated()
+{
+  Superclass::Activated();
+
+  // feedback node and its visualization properties
+  m_MultiLabelNode = mitk::DataNode::New();
+  m_MultiLabelNode->SetName( "multilabel preview" );
+  m_MultiLabelNode->SetOpacity(0.7);
+  m_MultiLabelNode->SetColor(1.0, 1.0, 1.0);
+  m_MultiLabelNode->SetProperty( "Image Rendering.Mode", RenderingModeProperty::New( RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW) );
+  m_MultiLabelNode->SetProperty( "colormap", ColormapProperty::New(ColormapProperty::CM_MULTILABEL) );
+  m_MultiLabelNode->SetProperty( "texture interpolation", BoolProperty::New(false) );
+  m_MultiLabelNode->SetProperty( "layer", IntProperty::New(100) );
+  m_MultiLabelNode->SetProperty( "binary", BoolProperty::New(false) );
+  m_MultiLabelNode->SetProperty( "helper object", BoolProperty::New(true) );
+
+  mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
+  mitk::LevelWindow levelwindow;
+  levelwindow.SetLevelWindow(127.5, 255);
+  levelwindow.SetRangeMinMax(0, 255);
+  levWinProp->SetLevelWindow(levelwindow);
+  m_MultiLabelNode->SetProperty( "levelwindow", levWinProp );
+
+  m_ToolManager->GetDataStorage()->Add(m_MultiLabelNode, m_WorkingNode);
+
+  m_PreviewNode->SetProperty("outline binary", BoolProperty::New(false) );
+  m_PreviewNode->SetOpacity(0.6);
+  m_PreviewNode->SetColor(1.0, 0.0, 0.0);
+}
+
+void mitk::OtsuTool3D::Deactivated()
+{
+  Superclass::Deactivated();
+
+  m_ToolManager->GetDataStorage()->Remove( m_MultiLabelNode );
+  m_MultiLabelNode = NULL;
+  m_MultiLabelImage = NULL;
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 void mitk::OtsuTool3D::Run()
 {
-   //  this->InitializeUndoController();
+  m_ReferenceNode = m_ToolManager->GetReferenceData(0);
+  assert(m_ReferenceNode);
+
+  mitk::Image* referenceImage = dynamic_cast< mitk::Image* >( m_ReferenceNode->GetData() );
+  assert(referenceImage);
 
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
@@ -124,11 +213,12 @@ void mitk::OtsuTool3D::Run()
 
   m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
+  //  this->InitializeUndoController();
   CurrentlyBusy.Send(true);
 
   try
   {
-    AccessByItk(workingImage, InternalRun);
+    AccessByItk(referenceImage, InternalRun);
   }
   catch( itk::ExceptionObject & e )
   {
@@ -149,7 +239,6 @@ void mitk::OtsuTool3D::Run()
 
   CurrentlyBusy.Send(false);
 
-  workingImage->Modified();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -158,188 +247,74 @@ const char* mitk::OtsuTool3D::GetName() const
   return "Otsu";
 }
 
-template <typename ImageType1, typename ImageType2>
-void mitk::OtsuTool3D::InternalAcceptPreview( ImageType1* targetImage, const ImageType2* sourceImage )
+template <typename ImageType>
+void mitk::OtsuTool3D::InternalUpdatePreview(const ImageType* input, int region)
 {
-  typedef itk::BinaryImageToShapeLabelMapFilter< ImageType2 > BinaryImageToShapeLabelMapFilterType;
-  typedef itk::RelabelLabelMapFilter< typename BinaryImageToShapeLabelMapFilterType::OutputImageType > RelabelFilterType;
-  typedef itk::LabelMapToLabelImageFilter< typename BinaryImageToShapeLabelMapFilterType::OutputImageType, ImageType2 > LabelMap2ImageType;
-
-  typename BinaryImageToShapeLabelMapFilterType::Pointer binaryImageToShapeLabelMapFilter = BinaryImageToShapeLabelMapFilterType::New();
-  binaryImageToShapeLabelMapFilter->SetInput( sourceImage );
-  binaryImageToShapeLabelMapFilter->SetOutputBackgroundValue(0);
-  binaryImageToShapeLabelMapFilter->SetInputForegroundValue(1);
-
-  typename RelabelFilterType::Pointer relabelFilter = RelabelFilterType::New();
-  relabelFilter->SetInput( binaryImageToShapeLabelMapFilter->GetOutput() );
-  relabelFilter->SetInPlace(true);
-
-  typename LabelMap2ImageType::Pointer label2image = LabelMap2ImageType::New();
-  label2image->SetInput( relabelFilter->GetOutput() );
-
-  if (m_ProgressCommand.IsNotNull())
-  {
-    m_ProgressCommand->AddStepsToDo(200);
-    binaryImageToShapeLabelMapFilter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
-    relabelFilter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
-  }
-
-  label2image->Update();
-
-  if (m_ProgressCommand.IsNotNull())
-  {
-    m_ProgressCommand->Reset();
-  }
-
-  typename ImageType2::Pointer result = label2image->GetOutput();
-  result->DisconnectPipeline();
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
-  assert(workingImage);
-
-  std::string name = workingImage->GetActiveLabelName();
-
-  int numberOfObjects = binaryImageToShapeLabelMapFilter->GetOutput()->GetNumberOfLabelObjects();
-
-  int maxLabel = workingImage->GetNumberOfLabels();
-
-  std::string originalName = workingImage->GetActiveLabelName();
-
-  // Loop over all blobs
-  for (unsigned int i=0; i<numberOfObjects; i++)
-  {
-    mitk::Color color = m_ColorSequenceRainbow->GetNextColor();
-    std::stringstream stream;
-    stream << originalName << "-sp-" << i;
-    std::string name = stream.str().c_str();
-    workingImage->AddLabel(name, color);
-  }
-
-  typedef itk::ImageRegionIterator< ImageType1 >      TargetIteratorType;
-  typedef itk::ImageRegionConstIterator< ImageType2 > SourceIteratorType;
-
-  typename ImageType1::IndexType cropIndex;
-  cropIndex[0] = m_RequestedRegion.GetIndex(0);
-  cropIndex[1] = m_RequestedRegion.GetIndex(1);
-  cropIndex[2] = m_RequestedRegion.GetIndex(2);
-
-  typename ImageType1::SizeType cropSize;
-  cropSize[0] = m_RequestedRegion.GetSize(0);
-  cropSize[1] = m_RequestedRegion.GetSize(1);
-  cropSize[2] = m_RequestedRegion.GetSize(2);
-
-  typename ImageType1::RegionType cropRegion(cropIndex,cropSize);
-
-  SourceIteratorType sourceIter( result, result->GetLargestPossibleRegion() );
-  TargetIteratorType targetIter( targetImage, cropRegion );
-
-  sourceIter.GoToBegin();
-  targetIter.GoToBegin();
-
-  while ( !targetIter.IsAtEnd() )
-  {
-    int targetValue = static_cast< int >( targetIter.Get() );
-    int sourceValue = static_cast< int >( sourceIter.Get() );
-
-    if (sourceValue)
-    {
-      targetIter.Set( maxLabel + sourceValue - 1);
-    }
-
-    ++sourceIter;
-    ++targetIter;
-  }
-
-}
-
-template < typename TPixel, unsigned int VDimension >
-void mitk::OtsuTool3D::InternalRun( itk::Image<TPixel, VDimension>* input )
-{
-  typedef itk::Image< TPixel, VDimension > ImageType;
   typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;
-  typedef itk::LabelObject< TPixel, VDimension > LabelObjectType;
-  typedef itk::LabelMap< LabelObjectType > LabelMapType;
-  typedef itk::ShapeLabelObject< TPixel, VDimension > ShapeLabelObjectType;
-  typedef itk::LabelImageToLabelMapFilter< ImageType, LabelMapType > Image2LabelMapType;
-  typedef itk::AutoCropLabelMapFilter< LabelMapType > AutoCropType;
-  typedef itk::LabelMapToLabelImageFilter< LabelMapType, ImageType > LabelMap2ImageType;
-  typedef itk::BinaryShapeKeepNObjectsImageFilter< ImageType > BinaryShapeKeepNObjectsImageFilterType;
-
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
-  assert(workingImage);
 
   typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
-  thresholdFilter->SetInput( input );
-  thresholdFilter->SetLowerThreshold(m_PaintingPixelValue);
-  thresholdFilter->SetUpperThreshold(m_PaintingPixelValue);
+  thresholdFilter->SetInput(input);
+  thresholdFilter->SetLowerThreshold(region);
+  thresholdFilter->SetUpperThreshold(region);
   thresholdFilter->SetOutsideValue(0);
   thresholdFilter->SetInsideValue(1);
-
-  typename Image2LabelMapType::Pointer image2label = Image2LabelMapType::New();
-  image2label->SetInput(thresholdFilter->GetOutput());
-
-  typename AutoCropType::SizeType border;
-  border[0] = 3;
-  border[1] = 3;
-  border[2] = 3;
-
-  typename AutoCropType::Pointer autoCropFilter = AutoCropType::New();
-  autoCropFilter->SetInput( image2label->GetOutput() );
-  autoCropFilter->SetCropBorder(border);
-  autoCropFilter->InPlaceOn();
-
-  typename LabelMap2ImageType::Pointer label2image = LabelMap2ImageType::New();
-  label2image->SetInput( autoCropFilter->GetOutput() );
-
-  typename BinaryShapeKeepNObjectsImageFilterType::Pointer binaryShapeKeepNObjectsImageFilter = BinaryShapeKeepNObjectsImageFilterType::New();
-  binaryShapeKeepNObjectsImageFilter->SetInput( label2image->GetOutput() );
-  binaryShapeKeepNObjectsImageFilter->SetBackgroundValue( 0 );
-  binaryShapeKeepNObjectsImageFilter->SetNumberOfObjects( m_NumberOfRegions );
-  binaryShapeKeepNObjectsImageFilter->SetAttribute( ShapeLabelObjectType::PHYSICAL_SIZE);
-  binaryShapeKeepNObjectsImageFilter->SetForegroundValue( 1 );
-//  binaryShapeKeepNObjectsImageFilter->ReleaseDataFlagOn();
 
   if (m_ProgressCommand.IsNotNull())
   {
     m_ProgressCommand->AddStepsToDo(200);
     thresholdFilter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
-    binaryShapeKeepNObjectsImageFilter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
   }
 
-  binaryShapeKeepNObjectsImageFilter->Update();
+  thresholdFilter->Update();
 
   if (m_ProgressCommand.IsNotNull())
   {
     m_ProgressCommand->Reset();
   }
 
-  typename ImageType::Pointer result = binaryShapeKeepNObjectsImageFilter->GetOutput();
+  typename ImageType::Pointer result = thresholdFilter->GetOutput();
   result->DisconnectPipeline();
 
   m_PreviewImage = mitk::Image::New();
   mitk::CastToMitkImage(result.GetPointer(), m_PreviewImage);
 
-  typename ImageType::RegionType cropRegion;
-  cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();
-
-  const typename ImageType::SizeType& cropSize = cropRegion.GetSize();
-  const typename ImageType::IndexType& cropIndex = cropRegion.GetIndex();
-
-  mitk::SlicedGeometry3D* slicedGeometry = m_PreviewImage->GetSlicedGeometry();
-  mitk::Point3D origin;
-  vtk2itk(cropIndex, origin);
-  workingImage->GetSlicedGeometry()->IndexToWorld(origin, origin);
-  slicedGeometry->SetOrigin(origin);
-
   m_PreviewNode->SetData(m_PreviewImage);
 
-  m_RequestedRegion = workingImage->GetLargestPossibleRegion();
+  m_RequestedRegion = m_PreviewImage->GetLargestPossibleRegion();
+}
 
-  m_RequestedRegion.SetIndex(0,cropIndex[0]);
-  m_RequestedRegion.SetIndex(1,cropIndex[1]);
-  m_RequestedRegion.SetIndex(2,cropIndex[2]);
+template < typename TPixel, unsigned int VDimension >
+void mitk::OtsuTool3D::InternalRun( itk::Image<TPixel, VDimension>* input )
+{
+  typedef itk::Image< TPixel, VDimension > InputImageType;
+  typedef itk::Image< LabelSetImage::PixelType, VDimension > OutputImageType;
+  typedef itk::OtsuMultipleThresholdsImageFilter< InputImageType, OutputImageType > OtsuFilterType;
 
-  m_RequestedRegion.SetSize(0,cropSize[0]);
-  m_RequestedRegion.SetSize(1,cropSize[1]);
-  m_RequestedRegion.SetSize(2,cropSize[2]);
+  typename OtsuFilterType::Pointer otsuFilter = OtsuFilterType::New();
+  otsuFilter->SetInput( input );
+  otsuFilter->SetNumberOfThresholds( m_NumberOfRegions - 1);
+//  otsuFilter->ReleaseDataFlagOn();
+
+  if (m_ProgressCommand.IsNotNull())
+  {
+    m_ProgressCommand->AddStepsToDo(200);
+    otsuFilter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
+  }
+
+  otsuFilter->Update();
+
+  if (m_ProgressCommand.IsNotNull())
+  {
+    m_ProgressCommand->Reset();
+  }
+
+  typename OutputImageType::Pointer result = otsuFilter->GetOutput();
+  result->DisconnectPipeline();
+
+  m_MultiLabelImage = mitk::Image::New();
+  mitk::CastToMitkImage(result.GetPointer(), m_MultiLabelImage);
+
+  m_MultiLabelNode->SetData(m_MultiLabelImage);
+
+  m_RequestedRegion = m_MultiLabelImage->GetLargestPossibleRegion();
 }

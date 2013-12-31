@@ -41,8 +41,7 @@ m_ActiveLayer(0)
   m_LabelSetContainer.push_back(ls);
 }
 
-mitk::LabelSetImage::LabelSetImage(mitk::LabelSetImage* other) : mitk::Image(),
-m_ActiveLayer(0)
+mitk::LabelSetImage::LabelSetImage(mitk::LabelSetImage* other) : mitk::Image(), m_ActiveLayer(0)
 {
   this->Initialize(other);
   int numberOfLayers = other->GetNumberOfLayers();

@@ -12,6 +12,7 @@ Qmitk/QmitkFastMarchingToolGUI.cpp
 Qmitk/QmitkLiveWireTool2DGUI.cpp
 Qmitk/QmitkNewSegmentationDialog.cpp
 Qmitk/QmitkOtsuTool3DGUI.cpp
+Qmitk/QmitkTriangleThresholdingTool3DGUI.cpp
 Qmitk/QmitkPaintbrushToolGUI.cpp
 Qmitk/QmitkPixelManipulationToolGUI.cpp
 Qmitk/QmitkRegionGrow3DToolGUI.cpp
@@ -52,6 +53,7 @@ Qmitk/QmitkFastMarchingToolGUI.h
 Qmitk/QmitkLiveWireTool2DGUI.h
 Qmitk/QmitkNewSegmentationDialog.h
 Qmitk/QmitkOtsuTool3DGUI.h
+Qmitk/QmitkTriangleThresholdingTool3DGUI.h
 Qmitk/QmitkPaintbrushToolGUI.h
 Qmitk/QmitkPixelManipulationToolGUI.h
 Qmitk/QmitkRegionGrow3DToolGUI.h
@@ -82,6 +84,7 @@ set(UI_FILES
 Qmitk/QmitkAdaptiveRegionGrowingToolGUIControls.ui
 Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
+Qmitk/QmitkTriangleThresholdingTool3DGUIControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
 Qmitk/QmitkSliceBasedInterpolatorControls.ui
 Qmitk/QmitkSurfaceBasedInterpolatorControls.ui

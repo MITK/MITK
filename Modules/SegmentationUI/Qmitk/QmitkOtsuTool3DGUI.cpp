@@ -16,9 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkOtsuTool3DGUI.h"
 
-#include <QmitkNewSegmentationDialog.h>
-#include <QApplication.h>
+#include "mitkOtsuTool3D.h"
 
+#include <QmitkNewSegmentationDialog.h>
+
+#include <QApplication.h>
 #include <QMessageBox>
 
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkOtsuTool3DGUI, "")
@@ -27,6 +29,7 @@ QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI() : QmitkToolGUI(), m_NumberOfRegions(0),
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
+
 
   m_Controls.m_SelectionListWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 

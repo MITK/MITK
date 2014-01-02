@@ -303,7 +303,20 @@ p, li { white-space: pre-wrap; }
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QToolButton" name="m_pbDifference">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QToolButton" name="m_pbInvertPreview">
           <property name="enabled">
            <bool>true</bool>
           </property>
@@ -313,11 +326,17 @@ p, li { white-space: pre-wrap; }
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="minimumSize">
+           <size>
+            <width>85</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="toolTip">
            <string>Replace active label with the difference from the preview result</string>
           </property>
           <property name="text">
-           <string>Invert</string>
+           <string>Invert Preview</string>
           </property>
           <property name="icon">
            <iconset resource="../resources/SegmentationUI.qrc">
@@ -353,6 +372,12 @@ p, li { white-space: pre-wrap; }
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>85</width>
+            <height>0</height>
+           </size>
           </property>
           <property name="toolTip">
            <string>Replace active label with the difference from the preview result</string>

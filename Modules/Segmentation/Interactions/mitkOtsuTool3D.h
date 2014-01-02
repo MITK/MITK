@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSegTool3D.h"
 #include "SegmentationExports.h"
-#include "mitkColorSequenceRainbow.h"
 
 #include "itkImage.h"
 
@@ -45,9 +44,6 @@ namespace mitk{
       /// \brief Adds actions related to multi label preview image and node
       virtual void Deactivated();
 
-      /// \brief Adds a new label with the contents of the current preview image.
-      //void AcceptPreview(int region);
-
       /// \brief Updates the preview image with the current region selection.
       void UpdatePreview(int region);
 
@@ -66,12 +62,8 @@ namespace mitk{
 
       int m_SelectedRegion;
 
-      //std::map< int, mitk::Image::Pointer > m_PreviewImages;
-      //std::map< int, mitk::DataNode::Pointer > m_PreviewNodes;
-
       mitk::DataNode::Pointer m_MultiLabelNode;
       mitk::Image::Pointer m_MultiLabelImage;
-      mitk::ColorSequenceRainbow::Pointer m_ColorSequenceRainbow;
 
       template < typename TPixel, unsigned int VDimension >
       void InternalRun( itk::Image<TPixel, VDimension>* input );

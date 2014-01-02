@@ -64,53 +64,9 @@ int mitk::OtsuTool3D::GetNumberOfRegions()
 {
   return m_NumberOfRegions;
 }
-/*
-void mitk::OtsuTool3D::AcceptPreview(int region)
-{
-  m_SelectedRegion = region;
 
-  mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
-  assert(workingImage);
-
-  CurrentlyBusy.Send(true);
-
-  try
-  {
-    AccessTwoImagesFixedDimensionByItk( workingImage, m_PreviewImage, InternalAcceptPreview, 3);
-  }
-  catch( itk::ExceptionObject & e )
-  {
-    CurrentlyBusy.Send(false);
-    m_ProgressCommand->Reset();
-    MITK_ERROR << "Exception caught: " << e.GetDescription();
-    m_ToolManager->ActivateTool(-1);
-    return;
-  }
-  catch (...)
-  {
-    CurrentlyBusy.Send(false);
-    m_ProgressCommand->Reset();
-    MITK_ERROR << "Unkown exception caught!";
-    m_ToolManager->ActivateTool(-1);
-    return;
-  }
-
-  workingImage->Modified();
-
-  CurrentlyBusy.Send(false);
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-*/
 void mitk::OtsuTool3D::UpdatePreview(int region)
 {
-/*
-  if (region<0)
-  {
-    m_PreviewNode->SetVisibility(false);
-    return;
-  }
-*/
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 

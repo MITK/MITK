@@ -14,34 +14,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkOtsuTool3DGUI_h_Included
-#define QmitkOtsuTool3DGUI_h_Included
+#ifndef QmitkTriangleThresholdingTool3DGUI_h_Included
+#define QmitkTriangleThresholdingTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
-#include "ui_QmitkOtsuTool3DGUIControls.h"
+#include "ui_QmitkTriangleThresholdingTool3DGUIControls.h"
 
 namespace mitk {
-  class OtsuTool3D;
+  class TriangleThresholdingTool3D;
 }
 
 //class QListWidgetItem;
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI for mitk::OtsuTool3D
+  \brief GUI for mitk::TriangleThresholdingTool3D
 
   This GUI shows ...
 
   Last contributor: $Author$
 */
-class SegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
+class SegmentationUI_EXPORT QmitkTriangleThresholdingTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
   public:
-    mitkClassMacro(QmitkOtsuTool3DGUI, QmitkToolGUI);
-    itkNewMacro(QmitkOtsuTool3DGUI);
+    mitkClassMacro(QmitkTriangleThresholdingTool3DGUI, QmitkToolGUI);
+    itkNewMacro(QmitkTriangleThresholdingTool3DGUI);
 
   protected slots:
 
@@ -53,24 +53,22 @@ class SegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
     void OnAcceptPreview();
 
+    void OnInvertPreview();
+
     void OnShowInformation(bool);
 
-    void OnItemSelectionChanged(QListWidgetItem *item);
+    void OnShowAdvancedControls(bool);
 
   protected:
 
-    QmitkOtsuTool3DGUI();
-    virtual ~QmitkOtsuTool3DGUI();
+    QmitkTriangleThresholdingTool3DGUI();
+    virtual ~QmitkTriangleThresholdingTool3DGUI();
 
     void BusyStateChanged(bool);
 
-    mitk::OtsuTool3D* m_OtsuTool3D;
+    mitk::TriangleThresholdingTool3D* m_TriangleThresholdingTool3D;
 
-    Ui_QmitkOtsuTool3DGUIControls m_Controls;
-
-    int m_NumberOfRegions;
-
-    QListWidgetItem* m_SelectedItem;
+    Ui_QmitkTriangleThresholdingTool3DGUIControls m_Controls;
 };
 
 #endif

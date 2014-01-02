@@ -35,7 +35,6 @@ class FastMutexLock;
 }
 
 namespace mitk {
-
 class PointSet;
 
 class MITK_OPENCVVIDEOSUPPORT_EXPORT GrabCutOpenCVImageFilter : public AbstractOpenCVImageFilter
@@ -61,6 +60,7 @@ public:
 
   void SetUseOnlyRegionAroundModelPoints(unsigned int additionalWidth);
   void SetUseFullImage();
+  cv::Rect GetRegionAroundModelPoints();
 
   int GetResultImageId();
   cv::Mat GetResultMask();
@@ -82,6 +82,7 @@ protected:
 
   bool                         m_UseOnlyRegionAroundModelPoints;
   unsigned int                 m_AdditionalWidth;
+  cv::Rect                     m_BoundingBox;
 
   ModelPointsList              m_ForegroundPoints;
   ModelPointsList              m_BackgroundPoints;
@@ -108,7 +109,6 @@ private:
   itk::SmartPointer<itk::FastMutexLock>     m_ResultMutex;
   itk::SmartPointer<itk::FastMutexLock>     m_PointSetsMutex;
 };
-
 } // namespace mitk
 
 #endif // MITKGRABCUTOPENCVIMAGEFILTER_H

@@ -11,5 +11,4 @@ SET(CPP_FILES
 SET(RESOURCE_FILES
   Interactions/USZoneInteractions.xml
   Interactions/USZoneInteractionsHold.xml
-  Interactions/USGrabCutMaskInteractions.xml
 )

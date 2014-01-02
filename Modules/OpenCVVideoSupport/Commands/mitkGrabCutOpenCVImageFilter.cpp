@@ -22,6 +22,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkFastMutexLock.h"
 #include "itkConditionVariable.h"
 
+#include <highgui.h>
+
+// This is a magic number defined in "grabcut.cpp" of OpenCV.
+// GrabCut function crashes if less than this number of model
+// points are given. There must be at least as much model points
+// as components of the Gaussian Mixture Model.
+#define GMM_COMPONENTS_COUNT 5
+
 mitk::GrabCutOpenCVImageFilter::GrabCutOpenCVImageFilter()
   : m_PointSetsChanged(false), m_InputImageChanged(false),
     m_NewResultReady(false),
@@ -66,8 +74,6 @@ bool mitk::GrabCutOpenCVImageFilter::OnFilterImage( cv::Mat& image )
   ++m_CurrentProcessImageNum %= m_ProcessEveryNumImage;
   if (m_CurrentProcessImageNum != 0) { return true; }
 
-  m_ImageMutex->Lock();
-
   // make sure that the image is an rgb image
   if (image.type() != CV_8UC3)
   {
@@ -75,6 +81,7 @@ bool mitk::GrabCutOpenCVImageFilter::OnFilterImage( cv::Mat& image )
     cv::cvtColor(test, image, CV_GRAY2RGB);
   }
 
+  m_ImageMutex->Lock();
   m_InputImage = image.clone();
   m_InputImageId = this->GetCurrentImageId();
   m_ImageMutex->Unlock();
@@ -145,6 +152,11 @@ void mitk::GrabCutOpenCVImageFilter::SetUseOnlyRegionAroundModelPoints(unsigned 
 void mitk::GrabCutOpenCVImageFilter::SetUseFullImage()
 {
   m_UseOnlyRegionAroundModelPoints = false;
+}
+
+cv::Rect mitk::GrabCutOpenCVImageFilter::GetRegionAroundModelPoints()
+{
+  return m_BoundingBox;
 }
 
 int mitk::GrabCutOpenCVImageFilter::GetResultImageId()
@@ -278,29 +290,43 @@ cv::Rect mitk::GrabCutOpenCVImageFilter::GetBoundingRectFromMask(cv::Mat mask)
   boundingRect.x = boundingRect.x > m_AdditionalWidth ? boundingRect.x - m_AdditionalWidth : 0;
   boundingRect.y = boundingRect.y > m_AdditionalWidth ? boundingRect.y - m_AdditionalWidth : 0;
 
-  if ( boundingRect.x + boundingRect.width + m_AdditionalWidth < mask.size().width )
+  if ( boundingRect.x + boundingRect.width + 2 * m_AdditionalWidth < mask.size().width )
   {
-    boundingRect.width += m_AdditionalWidth;
+    boundingRect.width += 2 * m_AdditionalWidth;
   }
   else
   {
     boundingRect.width = mask.size().width - boundingRect.x - 1;
   }
 
-  if ( boundingRect.y + boundingRect.height + m_AdditionalWidth < mask.size().height )
+  if ( boundingRect.y + boundingRect.height + 2 * m_AdditionalWidth < mask.size().height )
   {
-    boundingRect.height += m_AdditionalWidth;
+    boundingRect.height += 2 * m_AdditionalWidth;
   }
   else
   {
     boundingRect.height = mask.size().height - boundingRect.y - 1;
   }
 
+  assert(boundingRect.x + boundingRect.width < mask.size().width);
+  assert(boundingRect.y + boundingRect.height < mask.size().height);
+
   return boundingRect;
 }
 
 cv::Mat mitk::GrabCutOpenCVImageFilter::RunSegmentation(cv::Mat input, cv::Mat mask)
 {
+  // test if foreground and background models are large enough for GrabCut
+  cv::Mat compareFgResult, compareBgResult;
+  cv::compare(mask, cv::GC_FGD, compareFgResult, cv::CMP_EQ);
+  cv::compare(mask, cv::GC_PR_BGD, compareBgResult, cv::CMP_EQ);
+  if ( cv::countNonZero(compareFgResult) < GMM_COMPONENTS_COUNT
+    || cv::countNonZero(compareBgResult) < GMM_COMPONENTS_COUNT)
+  {
+    // return result mask with no pixels set to foreground
+    return cv::Mat::zeros(mask.size(), mask.type());
+  }
+
   // do the actual grab cut segmentation (initialized with the mask)
   cv::Mat bgdModel, fgdModel;
   cv::grabCut(input, mask, cv::Rect(), bgdModel, fgdModel, 1, cv::GC_INIT_WITH_MASK);
@@ -363,8 +389,14 @@ ITK_THREAD_RETURN_TYPE mitk::GrabCutOpenCVImageFilter::SegmentationWorker(void* 
     if (thisObject->m_UseOnlyRegionAroundModelPoints)
     {
       result = cv::Mat(mask.rows, mask.cols, mask.type(), 0.0);
-      cv::Rect boundingBox = thisObject->GetBoundingRectFromMask(mask);
-      thisObject->RunSegmentation(image(boundingBox), mask(boundingBox)).copyTo(result(boundingBox));
+      thisObject->m_BoundingBox = thisObject->GetBoundingRectFromMask(mask);
+
+      MITK_DEBUG("GrabCutOpenCVImageFilter") << "Image Size: " << image.cols << ", " << image.rows;
+      MITK_DEBUG("GrabCutOpenCVImageFilter") << "Bounding Box: x " << thisObject->m_BoundingBox.x << ", y "
+        << thisObject->m_BoundingBox.y << ", width " << thisObject->m_BoundingBox.width
+        << ", height " << thisObject->m_BoundingBox.height;
+
+      thisObject->RunSegmentation(image(thisObject->m_BoundingBox), mask(thisObject->m_BoundingBox)).copyTo(result(thisObject->m_BoundingBox));
     }
     else
     {

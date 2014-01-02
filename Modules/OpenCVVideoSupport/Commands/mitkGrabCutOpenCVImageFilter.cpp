@@ -93,6 +93,9 @@ bool mitk::GrabCutOpenCVImageFilter::OnFilterImage( cv::Mat& image )
 
 void mitk::GrabCutOpenCVImageFilter::SetModelPoints(ModelPointsList foregroundPoints)
 {
+  MITK_DEBUG("GrabCutOpenCVImageFilter") << "Setting " << foregroundPoints.size()
+                                        << " foreground points.";
+
   m_PointSetsMutex->Lock();
 
   m_ForegroundPoints = foregroundPoints;
@@ -103,6 +106,10 @@ void mitk::GrabCutOpenCVImageFilter::SetModelPoints(ModelPointsList foregroundPo
 
 void mitk::GrabCutOpenCVImageFilter::SetModelPoints(ModelPointsList foregroundPoints, ModelPointsList backgroundPoints)
 {
+  MITK_DEBUG("GrabCutOpenCVImageFilter") << "Setting " << foregroundPoints.size()
+                                        << " foreground and " << backgroundPoints.size()
+                                        << " background points.";
+
   m_PointSetsMutex->Lock();
 
   m_BackgroundPoints = backgroundPoints;
@@ -248,6 +255,10 @@ cv::Mat mitk::GrabCutOpenCVImageFilter::GetMaskFromPointSets()
   m_PointSetsMutex->Lock();
   ModelPointsList pointsLists[2] = {ModelPointsList(m_ForegroundPoints), ModelPointsList(m_BackgroundPoints)};
   m_PointSetsMutex->Unlock();
+
+  MITK_DEBUG("GrabCutOpenCVImageFilter") << "Creating mask from " << pointsLists[0].size()
+                                        << " foreground and " << pointsLists[1].size()
+                                        << " background points.";
 
   unsigned int pixelValues[2] = {cv::GC_FGD, cv::GC_BGD};
 

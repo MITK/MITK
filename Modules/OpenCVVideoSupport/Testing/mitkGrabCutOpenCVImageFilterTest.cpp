@@ -65,6 +65,30 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, 
     MITK_TEST_CONDITION(resultMask.empty(), "Result mask must be empty when no foreground points are set.")
   }
 
+  // test filtering with very little model points set
+  {
+    std::vector<itk::Index<2> > littleForegroundPointsSet(foregroundPointsVector.begin(), foregroundPointsVector.begin()+3);
+    grabCutFilter->SetModelPoints(littleForegroundPointsSet);
+    int resultCountBefore = grabCutFilter->GetResultImageId();
+    grabCutFilter->FilterImage(image);
+
+    cv::Mat resultMask;
+    // wait up to ten seconds for the segmentation to finish
+    for (unsigned int n = 0; n < 100; ++n)
+    {
+      if ( resultCountBefore != grabCutFilter->GetResultImageId() )
+      {
+        resultMask = grabCutFilter->GetResultMask();
+        break;
+      }
+      itksys::SystemTools::Delay(100);
+    }
+
+    MITK_TEST_CONDITION(resultMask.empty(),
+                        "Result mask must not be empty when little ("
+                        << littleForegroundPointsSet.size() <<") foreground points are set.");
+  }
+
   // test filtering with image and model points set
   {
     grabCutFilter->SetModelPoints(foregroundPointsVector);
@@ -75,7 +99,7 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, 
     // wait up to ten seconds for the segmentation to finish
     for (unsigned int n = 0; n < 100; ++n)
     {
-      if ( ! resultCountBefore != grabCutFilter->GetResultImageId() )
+      if ( resultCountBefore != grabCutFilter->GetResultImageId() )
       {
         resultMask = grabCutFilter->GetResultMask();
         break;

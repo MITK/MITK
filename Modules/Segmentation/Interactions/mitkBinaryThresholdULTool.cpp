@@ -153,7 +153,7 @@ void mitk::BinaryThresholdULTool::InternalRun( itk::Image<TPixel, VDimension>* i
   typedef itk::Image< LabelSetImage::PixelType, VDimension> SegmentationType;
   typedef itk::BinaryThresholdImageFilter <ImageType, SegmentationType>  BinaryThresholdImageFilterType;
 
-  BinaryThresholdImageFilterType::Pointer thresholdFilter = BinaryThresholdImageFilterType::New();
+  typename BinaryThresholdImageFilterType::Pointer thresholdFilter = BinaryThresholdImageFilterType::New();
   thresholdFilter->SetInput(input);
   thresholdFilter->SetLowerThreshold(m_CurrentLowerThresholdValue);
   thresholdFilter->SetUpperThreshold(m_CurrentUpperThresholdValue);

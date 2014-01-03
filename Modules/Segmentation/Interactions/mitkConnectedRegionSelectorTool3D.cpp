@@ -116,7 +116,7 @@ void mitk::ConnectedRegionSelectorTool3D::InternalAddRegion( itk::Image<TPixel, 
 
   m_ProgressCommand->Reset();
 
-  ImageType::Pointer result = filter->GetOutput();
+  typename ImageType::Pointer result = filter->GetOutput();
   result->DisconnectPipeline();
 
   m_PreviewImage = mitk::Image::New();

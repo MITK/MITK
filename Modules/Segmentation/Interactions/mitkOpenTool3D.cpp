@@ -188,8 +188,8 @@ void mitk::OpenTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
   typedef itk::ImageRegionConstIterator< ImageType > InputIteratorType;
   typedef itk::ImageRegionIterator< ImageType >      ResultIteratorType;
 
-  typename InputIteratorType  inputIter( input, cropRegion );
-  typename ResultIteratorType resultIter( result, result->GetLargestPossibleRegion() );
+  InputIteratorType  inputIter( input, cropRegion );
+  ResultIteratorType resultIter( result, result->GetLargestPossibleRegion() );
 
   inputIter.GoToBegin();
   resultIter.GoToBegin();

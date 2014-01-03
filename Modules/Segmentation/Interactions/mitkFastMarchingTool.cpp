@@ -460,8 +460,8 @@ void mitk::FastMarchingTool::InternalRun( ImageType* input )
   typedef itk::ImageRegionConstIterator< ImageType >    InputIteratorType;
   typedef itk::ImageRegionIterator< OutputImageType >   ResultIteratorType;
 
-  typename InputIteratorType  inputIter( input, input->GetLargestPossibleRegion() );
-  typename ResultIteratorType resultIter( result, result->GetLargestPossibleRegion() );
+  InputIteratorType  inputIter( input, input->GetLargestPossibleRegion() );
+  ResultIteratorType resultIter( result, result->GetLargestPossibleRegion() );
 
   inputIter.GoToBegin();
   resultIter.GoToBegin();

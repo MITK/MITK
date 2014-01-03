@@ -40,10 +40,12 @@ void QmitkUSCombinedModalityCreationWidget::OnCreation()
       return;
   }
 
+  QString vendor = ui->vendorLineEdit->text();
   QString name = ui->nameLineEdit->text();
   if (name.isEmpty()) { name = "Combined Modality"; }
 
-  mitk::USCombinedModality::Pointer combinedModality = mitk::USCombinedModality::New(usDevice, trackingDevice, "", name.toStdString());
+  mitk::USCombinedModality::Pointer combinedModality = mitk::USCombinedModality::New(
+    usDevice, trackingDevice, vendor.toStdString(), name.toStdString());
   combinedModality->Initialize(); // register as micro service
 
   emit SignalCreated();

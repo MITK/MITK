@@ -105,7 +105,7 @@ void mitk::TriangleThresholdingTool3D::InternalRun( itk::Image<TPixel, VDimensio
   typedef itk::Image< LabelSetImage::PixelType, VDimension> SegmentationType;
   typedef itk::TriangleThresholdImageFilter <ImageType, SegmentationType>  TriangleThresholdImageFilterType;
 
-  TriangleThresholdImageFilterType::Pointer thresholdFilter = TriangleThresholdImageFilterType::New();
+  typename TriangleThresholdImageFilterType::Pointer thresholdFilter = TriangleThresholdImageFilterType::New();
   thresholdFilter->SetInput(input);
   thresholdFilter->SetInsideValue(1);
   thresholdFilter->SetOutsideValue(0);

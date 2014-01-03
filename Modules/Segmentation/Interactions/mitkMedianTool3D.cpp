@@ -189,8 +189,8 @@ void mitk::MedianTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
   typename ImageType::RegionType cropRegion;
   cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();
 
-  typename InputIteratorType  inputIter( input, cropRegion );
-  typename ResultIteratorType resultIter( result, result->GetLargestPossibleRegion() );
+  InputIteratorType  inputIter( input, cropRegion );
+  ResultIteratorType resultIter( result, result->GetLargestPossibleRegion() );
 
   inputIter.GoToBegin();
   resultIter.GoToBegin();

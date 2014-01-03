@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSegTool3D.h"
 #include "SegmentationExports.h"
-#include "mitkColorSequenceRainbow.h"
 
 #include "itkImage.h"
 

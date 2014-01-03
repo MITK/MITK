@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkFastMutexLock.h"
 #include "itkConditionVariable.h"
 
-#include <highgui.h>
-
 // This is a magic number defined in "grabcut.cpp" of OpenCV.
 // GrabCut function crashes if less than this number of model
 // points are given. There must be at least as much model points
@@ -32,11 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define GMM_COMPONENTS_COUNT 5
 
 mitk::GrabCutOpenCVImageFilter::GrabCutOpenCVImageFilter()
-  : m_PointSetsChanged(false), m_InputImageChanged(false),
-    m_NewResultReady(false),
-    m_ModelPointsDilationSize(0),
+  : m_ModelPointsDilationSize(0),
     m_UseOnlyRegionAroundModelPoints(false),
-    m_ProcessEveryNumImage(1), m_CurrentProcessImageNum(0),
+    m_CurrentProcessImageNum(0),
     m_InputImageId(AbstractOpenCVImageFilter::INVALID_IMAGE_ID),
     m_ResultImageId(AbstractOpenCVImageFilter::INVALID_IMAGE_ID),
     m_ThreadId(-1), m_StopThread(false),
@@ -51,6 +47,7 @@ mitk::GrabCutOpenCVImageFilter::GrabCutOpenCVImageFilter()
 
 mitk::GrabCutOpenCVImageFilter::~GrabCutOpenCVImageFilter()
 {
+  // terminate worker thread on destruction
   m_StopThread = true;
   m_WorkerBarrier->Broadcast();
   if ( m_ThreadId >= 0) { m_MultiThreader->TerminateThread(m_ThreadId); }
@@ -63,17 +60,6 @@ bool mitk::GrabCutOpenCVImageFilter::OnFilterImage( cv::Mat& image )
     MITK_WARN << "Filtering empty image?";
     return false;
   }
-
-  if ( m_NewResultReady )
-  {
-    m_ResultMutex->Lock();
-    m_NewResultReady = false;
-    m_ResultMutex->Unlock();
-  }
-
-  // update just every x images (as configured)
-  ++m_CurrentProcessImageNum %= m_ProcessEveryNumImage;
-  if (m_CurrentProcessImageNum != 0) { return true; }
 
   // make sure that the image is an rgb image as needed
   // by the GrabCut algorithm
@@ -99,25 +85,16 @@ bool mitk::GrabCutOpenCVImageFilter::OnFilterImage( cv::Mat& image )
 
 void mitk::GrabCutOpenCVImageFilter::SetModelPoints(ModelPointsList foregroundPoints)
 {
-  MITK_DEBUG("GrabCutOpenCVImageFilter")
-          << "Setting " << foregroundPoints.size() << " foreground points.";
-
   m_PointSetsMutex->Lock();
   m_ForegroundPoints = foregroundPoints;
-  m_PointSetsChanged = true;
   m_PointSetsMutex->Unlock();
 }
 
 void mitk::GrabCutOpenCVImageFilter::SetModelPoints(ModelPointsList foregroundPoints, ModelPointsList backgroundPoints)
 {
-  MITK_DEBUG("GrabCutOpenCVImageFilter")
-          << "Setting " << foregroundPoints.size() << " foreground and "
-          << backgroundPoints.size() << " background points.";
-
   m_PointSetsMutex->Lock();
   m_BackgroundPoints = backgroundPoints;
   m_ForegroundPoints = foregroundPoints;
-  m_PointSetsChanged = true;
   m_PointSetsMutex->Unlock();
 }
 
@@ -125,7 +102,6 @@ void mitk::GrabCutOpenCVImageFilter::SetModelPoints(cv::Mat foregroundMask)
 {
   m_PointSetsMutex->Lock();
   m_ForegroundPoints = this->ConvertMaskToModelPointsList(foregroundMask);
-  m_PointSetsChanged = true;
   m_PointSetsMutex->Unlock();
 }
 
@@ -134,7 +110,6 @@ void mitk::GrabCutOpenCVImageFilter::SetModelPoints(cv::Mat foregroundMask, cv::
   m_PointSetsMutex->Lock();
   m_ForegroundPoints = this->ConvertMaskToModelPointsList(foregroundMask);
   m_BackgroundPoints = this->ConvertMaskToModelPointsList(backgroundMask);
-  m_PointSetsChanged = true;
   m_PointSetsMutex->Unlock();
 }
 
@@ -142,7 +117,8 @@ void mitk::GrabCutOpenCVImageFilter::SetModelPointsDilationSize(int modelPointsD
 {
   if ( modelPointsDilationSize < 0 )
   {
-    MITK_ERROR << "Model points dilation size must not be smaller then zero.";
+    MITK_ERROR("AbstractOpenCVImageFilter")("GrabCutOpenCVImageFilter")
+            << "Model points dilation size must not be smaller then zero.";
     mitkThrow() << "Model points dilation size must not be smaller then zero.";
   }
 
@@ -192,6 +168,7 @@ std::vector<mitk::GrabCutOpenCVImageFilter::ModelPointsList> mitk::GrabCutOpenCV
 
   cv::findContours(resultMask, cvContours, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
 
+  // convert cvContours to vector of ModelPointsLists
   for ( unsigned int i = 0; i < cvContours.size(); ++i )
   {
     mitk::GrabCutOpenCVImageFilter::ModelPointsList curContourPoints;
@@ -216,25 +193,32 @@ mitk::GrabCutOpenCVImageFilter::ModelPointsList mitk::GrabCutOpenCVImageFilter::
   cv::Mat mask = this->GetResultMask();
   if (mask.empty()) { return mitk::GrabCutOpenCVImageFilter::ModelPointsList(); }
 
+  // return empty model point list if given pixel is outside the image borders
   if (pixelIndex.GetElement(0) < 0 || pixelIndex.GetElement(0) >= mask.size().height
     || pixelIndex.GetElement(1) < 0 || pixelIndex.GetElement(1) >= mask.size().width)
   {
-    MITK_WARN << "Given pixel index ("<< pixelIndex.GetElement(0) << ", " << pixelIndex.GetElement(1)
-      << ") is outside the image (" << mask.size().height << ", " << mask.size().width << ").";
+    MITK_WARN("AbstractOpenCVImageFilter")("GrabCutOpenCVImageFilter")
+        << "Given pixel index ("<< pixelIndex.GetElement(0) << ", " << pixelIndex.GetElement(1)
+        << ") is outside the image (" << mask.size().height << ", " << mask.size().width << ").";
+
     return mitk::GrabCutOpenCVImageFilter::ModelPointsList();
   }
 
+  // create a mask where the segmentation around the given pixel index is
+  // set (done by flood filling the result mask using the pixel as seed)
   cv::floodFill(mask, cv::Point(pixelIndex.GetElement(0), pixelIndex.GetElement(1)), 5);
 
   cv::Mat foregroundMask;
   cv::compare(mask, 5, foregroundMask, cv::CMP_EQ);
 
+  // find the contour on the flood filled image (there can be only one now)
   std::vector<std::vector<cv::Point> > cvContours;
   std::vector<cv::Vec4i> hierarchy;
   cv::findContours(foregroundMask, cvContours, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
 
   ModelPointsList contourPoints;
 
+  // convert cvContours to ModelPointsList
   for ( std::vector<cv::Point>::iterator it = cvContours[0].begin();
         it != cvContours[0].end(); ++it)
   {
@@ -249,16 +233,15 @@ mitk::GrabCutOpenCVImageFilter::ModelPointsList mitk::GrabCutOpenCVImageFilter::
 
 cv::Mat mitk::GrabCutOpenCVImageFilter::GetMaskFromPointSets()
 {
+  // initialize mask with values of propably background
   cv::Mat mask(m_InputImage.size().height, m_InputImage.size().width, CV_8UC1, cv::GC_PR_BGD);
 
+  // get foreground and background points (guarded by mutex)
   m_PointSetsMutex->Lock();
   ModelPointsList pointsLists[2] = {ModelPointsList(m_ForegroundPoints), ModelPointsList(m_BackgroundPoints)};
   m_PointSetsMutex->Unlock();
 
-  MITK_DEBUG("GrabCutOpenCVImageFilter") << "Creating mask from " << pointsLists[0].size()
-                                        << " foreground and " << pointsLists[1].size()
-                                        << " background points.";
-
+  // define values for foreground and background pixels
   unsigned int pixelValues[2] = {cv::GC_FGD, cv::GC_BGD};
 
   for (unsigned int n = 0; n < 2; ++n)
@@ -266,6 +249,8 @@ cv::Mat mitk::GrabCutOpenCVImageFilter::GetMaskFromPointSets()
     for (ModelPointsList::iterator it = pointsLists[n].begin();
          it != pointsLists[n].end(); ++it)
     {
+      // set pixels around current pixel to the same value (size of this
+      // area is specified by ModelPointsDilationSize)
       for ( int i = -m_ModelPointsDilationSize; i <= m_ModelPointsDilationSize; ++i )
       {
         for ( int j = -m_ModelPointsDilationSize; j <= m_ModelPointsDilationSize; ++j)
@@ -291,16 +276,22 @@ cv::Rect mitk::GrabCutOpenCVImageFilter::GetBoundingRectFromMask(cv::Mat mask)
 
   if (modelPoints.empty())
   {
-    MITK_WARN << "Cannot find any foreground points. Returning full image size as bounding rectangle.";
+    MITK_WARN("AbstractOpenCVImageFilter")("GrabCutOpenCVImageFilter")
+        << "Cannot find any foreground points. Returning full image size as bounding rectangle.";
     return cv::Rect(0, 0, mask.rows, mask.cols);
   }
 
+  // calculate bounding rect around the model points
   cv::Rect boundingRect = cv::boundingRect(modelPoints);
 
-  boundingRect.x = boundingRect.x > m_AdditionalWidth ? boundingRect.x - m_AdditionalWidth : 0;
-  boundingRect.y = boundingRect.y > m_AdditionalWidth ? boundingRect.y - m_AdditionalWidth : 0;
+  // substract additional width to x and y value (and make sure that they aren't outside the image then)
+  boundingRect.x = static_cast<unsigned int>(boundingRect.x) > m_AdditionalWidth ? boundingRect.x - m_AdditionalWidth : 0;
+  boundingRect.y = static_cast<unsigned int>(boundingRect.y) > m_AdditionalWidth ? boundingRect.y - m_AdditionalWidth : 0;
 
-  if ( boundingRect.x + boundingRect.width + 2 * m_AdditionalWidth < mask.size().width )
+  // add additional width to width of bounding rect (twice as x value was moved before)
+  // and make sure that the bounding rect will stay inside the image borders)
+  if ( static_cast<unsigned int>(boundingRect.x + boundingRect.width)
+       + 2 * m_AdditionalWidth < static_cast<unsigned int>(mask.size().width) )
   {
     boundingRect.width += 2 * m_AdditionalWidth;
   }
@@ -309,7 +300,10 @@ cv::Rect mitk::GrabCutOpenCVImageFilter::GetBoundingRectFromMask(cv::Mat mask)
     boundingRect.width = mask.size().width - boundingRect.x - 1;
   }
 
-  if ( boundingRect.y + boundingRect.height + 2 * m_AdditionalWidth < mask.size().height )
+  // add additional width to height of bounding rect (twice as y value was moved before)
+  // and make sure that the bounding rect will stay inside the image borders)
+  if ( static_cast<unsigned int>(boundingRect.y + boundingRect.height)
+       + 2 * m_AdditionalWidth < static_cast<unsigned int>(mask.size().height) )
   {
     boundingRect.height += 2 * m_AdditionalWidth;
   }
@@ -400,12 +394,6 @@ ITK_THREAD_RETURN_TYPE mitk::GrabCutOpenCVImageFilter::SegmentationWorker(void* 
     {
       result = cv::Mat(mask.rows, mask.cols, mask.type(), 0.0);
       thisObject->m_BoundingBox = thisObject->GetBoundingRectFromMask(mask);
-
-      MITK_DEBUG("GrabCutOpenCVImageFilter") << "Image Size: " << image.cols << ", " << image.rows;
-      MITK_DEBUG("GrabCutOpenCVImageFilter") << "Bounding Box: x " << thisObject->m_BoundingBox.x << ", y "
-        << thisObject->m_BoundingBox.y << ", width " << thisObject->m_BoundingBox.width
-        << ", height " << thisObject->m_BoundingBox.height;
-
       thisObject->RunSegmentation(image(thisObject->m_BoundingBox), mask(thisObject->m_BoundingBox)).copyTo(result(thisObject->m_BoundingBox));
     }
     else
@@ -413,9 +401,9 @@ ITK_THREAD_RETURN_TYPE mitk::GrabCutOpenCVImageFilter::SegmentationWorker(void* 
       result = thisObject->RunSegmentation(image, mask);
     }
 
+    // save result to member attribute
     thisObject->m_ResultMutex->Lock();
     thisObject->m_ResultMask = result;
-    thisObject->m_NewResultReady = true;
     thisObject->m_ResultImageId = inputImageId;
     thisObject->m_ResultMutex->Unlock();
   }

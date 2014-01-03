@@ -234,10 +234,6 @@ protected:
    */
   ModelPointsList ConvertMaskToModelPointsList(cv::Mat mask);
 
-  bool                         m_PointSetsChanged;
-  bool                         m_InputImageChanged;
-  bool                         m_NewResultReady;
-
   int                          m_ModelPointsDilationSize;
 
   bool                         m_UseOnlyRegionAroundModelPoints;
@@ -251,7 +247,6 @@ protected:
   cv::Mat                      m_GrabCutMask;
   cv::Mat                      m_ResultMask;
 
-  unsigned int                 m_ProcessEveryNumImage;
   unsigned int                 m_CurrentProcessImageNum;
 
   /** \brief id of the image currently set as m_InputImage */

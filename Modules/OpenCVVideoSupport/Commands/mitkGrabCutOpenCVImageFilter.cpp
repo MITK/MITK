@@ -14,10 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+// mitk headers
 #include "mitkGrabCutOpenCVImageFilter.h"
-
 #include "mitkPointSet.h"
 
+// itk headers
 #include "itkMultiThreader.h"
 #include "itkFastMutexLock.h"
 #include "itkConditionVariable.h"
@@ -74,18 +75,23 @@ bool mitk::GrabCutOpenCVImageFilter::OnFilterImage( cv::Mat& image )
   ++m_CurrentProcessImageNum %= m_ProcessEveryNumImage;
   if (m_CurrentProcessImageNum != 0) { return true; }
 
-  // make sure that the image is an rgb image
+  // make sure that the image is an rgb image as needed
+  // by the GrabCut algorithm
   if (image.type() != CV_8UC3)
   {
-    cv::Mat test = image.clone();
-    cv::cvtColor(test, image, CV_GRAY2RGB);
+    cv::Mat tmp = image.clone();
+    cv::cvtColor(tmp, image, CV_GRAY2RGB);
   }
 
+  // set image as the current input image, guarded by
+  // a mutex as the worker thread reads this imagr
   m_ImageMutex->Lock();
   m_InputImage = image.clone();
   m_InputImageId = this->GetCurrentImageId();
   m_ImageMutex->Unlock();
 
+  // wake up the worker thread if there was an image set
+  // and foreground model points are available
   if ( ! m_ForegroundPoints.empty()) { m_WorkerBarrier->Broadcast(); }
 
   return true;
@@ -93,50 +99,42 @@ bool mitk::GrabCutOpenCVImageFilter::OnFilterImage( cv::Mat& image )
 
 void mitk::GrabCutOpenCVImageFilter::SetModelPoints(ModelPointsList foregroundPoints)
 {
-  MITK_DEBUG("GrabCutOpenCVImageFilter") << "Setting " << foregroundPoints.size()
-                                        << " foreground points.";
+  MITK_DEBUG("GrabCutOpenCVImageFilter")
+          << "Setting " << foregroundPoints.size() << " foreground points.";
 
   m_PointSetsMutex->Lock();
-
   m_ForegroundPoints = foregroundPoints;
   m_PointSetsChanged = true;
-
   m_PointSetsMutex->Unlock();
 }
 
 void mitk::GrabCutOpenCVImageFilter::SetModelPoints(ModelPointsList foregroundPoints, ModelPointsList backgroundPoints)
 {
-  MITK_DEBUG("GrabCutOpenCVImageFilter") << "Setting " << foregroundPoints.size()
-                                        << " foreground and " << backgroundPoints.size()
-                                        << " background points.";
+  MITK_DEBUG("GrabCutOpenCVImageFilter")
+          << "Setting " << foregroundPoints.size() << " foreground and "
+          << backgroundPoints.size() << " background points.";
 
   m_PointSetsMutex->Lock();
-
   m_BackgroundPoints = backgroundPoints;
   m_ForegroundPoints = foregroundPoints;
   m_PointSetsChanged = true;
-
   m_PointSetsMutex->Unlock();
 }
 
 void mitk::GrabCutOpenCVImageFilter::SetModelPoints(cv::Mat foregroundMask)
 {
   m_PointSetsMutex->Lock();
-
   m_ForegroundPoints = this->ConvertMaskToModelPointsList(foregroundMask);
   m_PointSetsChanged = true;
-
   m_PointSetsMutex->Unlock();
 }
 
 void mitk::GrabCutOpenCVImageFilter::SetModelPoints(cv::Mat foregroundMask, cv::Mat backgroundMask)
 {
   m_PointSetsMutex->Lock();
-
   m_ForegroundPoints = this->ConvertMaskToModelPointsList(foregroundMask);
   m_BackgroundPoints = this->ConvertMaskToModelPointsList(backgroundMask);
   m_PointSetsChanged = true;
-
   m_PointSetsMutex->Unlock();
 }
 
@@ -147,6 +145,7 @@ void mitk::GrabCutOpenCVImageFilter::SetModelPointsDilationSize(int modelPointsD
     MITK_ERROR << "Model points dilation size must not be smaller then zero.";
     mitkThrow() << "Model points dilation size must not be smaller then zero.";
   }
+
   m_ModelPointsDilationSize = modelPointsDilationSize;
 }
 

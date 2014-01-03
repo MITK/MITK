@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataSmoothingFilter.h"
 
 mitk::NavigationDataSmoothingFilter::NavigationDataSmoothingFilter()
-: mitk::NavigationDataToNavigationDataFilter()
+  : mitk::NavigationDataToNavigationDataFilter(),
+    m_NumerOfValues(5)
 {
-m_NumerOfValues = 5;
 }
 
 mitk::NavigationDataSmoothingFilter::~NavigationDataSmoothingFilter()
@@ -28,20 +28,26 @@ mitk::NavigationDataSmoothingFilter::~NavigationDataSmoothingFilter()
 
 void mitk::NavigationDataSmoothingFilter::GenerateData()
 {
-  if (GetNumberOfInputs()==0) return;
+  DataObjectPointerArraySizeType numberOfInputs = this->GetNumberOfInputs();
+
+  if ( numberOfInputs == 0 ) return;
 
   this->CreateOutputsForAllInputs();
 
   //initialize list if nessesary
-  if (m_LastValuesList.empty() || (m_LastValuesList.size() != this->GetNumberOfInputs()))
-    {InitializeLastValuesList();}
+  if ( m_LastValuesList.size() != numberOfInputs )
+  {
+    this->InitializeLastValuesList();
+  }
 
   //add current value to list
-  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
-    {AddValue(i,this->GetInput(i)->GetPosition());}
+  for ( unsigned int i = 0; i < numberOfInputs; ++i )
+  {
+    this->AddValue(i,this->GetInput(i)->GetPosition());
+  }
 
   //generate output
-  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
+  for (unsigned int i = 0; i < numberOfInputs; ++i)
   {
     const mitk::NavigationData* nd = this->GetInput(i);
     assert(nd);
@@ -59,38 +65,43 @@ void mitk::NavigationDataSmoothingFilter::GenerateData()
 
 void mitk::NavigationDataSmoothingFilter::InitializeLastValuesList()
 {
-    m_LastValuesList = std::map< int, std::map< int , mitk::Point3D> >();
-    for (int i = 0; i < this->GetNumberOfOutputs();i++)
-      {
-      std::map<int,mitk::Point3D> currentList;
-      for (int j = 0; j < m_NumerOfValues; j++)
-        {
-        mitk::Point3D emptyPoint;
-        emptyPoint.Fill(0);
-        currentList.insert(std::pair<int, mitk::Point3D>(j, emptyPoint));
-        }
-      m_LastValuesList.insert(std::pair<int, std::map<int,mitk::Point3D> > (i,currentList));
-      }
+  m_LastValuesList = std::map< int, std::map< int , mitk::Point3D> >();
+
+  for ( int i = 0; i < this->GetNumberOfOutputs(); ++i )
+  {
+    std::map<int,mitk::Point3D> currentList;
+    for ( int j = 0; j < m_NumerOfValues; ++j )
+    {
+      mitk::Point3D emptyPoint;
+      emptyPoint.Fill(0);
+      currentList.insert(std::pair<int, mitk::Point3D>(j, emptyPoint));
+    }
+    m_LastValuesList.insert(std::pair<int, std::map<int,mitk::Point3D> > (i,currentList));
+  }
 }
 
 void mitk::NavigationDataSmoothingFilter::AddValue(int outputID, mitk::Point3D value)
+{
+  for (int i = 1; i < m_NumerOfValues; ++i)
   {
-  for (int i=1; i<(m_NumerOfValues-1); i++) {m_LastValuesList[outputID][i-1] = m_LastValuesList[outputID][i];}
-  m_LastValuesList[outputID][m_NumerOfValues-1] = value;
+    m_LastValuesList[outputID][i-1] = m_LastValuesList[outputID][i];
   }
 
+  m_LastValuesList[outputID][m_NumerOfValues-1] = value;
+}
+
 mitk::Point3D mitk::NavigationDataSmoothingFilter::GetMean(int outputID)
-  {
+{
   mitk::Point3D mean;
   mean.Fill(0);
-  for (int i=1; i<m_NumerOfValues; i++)
-    {
+  for (int i=0; i<m_NumerOfValues; i++)
+  {
     mean[0] += m_LastValuesList[outputID][i][0];
     mean[1] += m_LastValuesList[outputID][i][1];
     mean[2] += m_LastValuesList[outputID][i][2];
-    }
+  }
   mean[0] /= m_NumerOfValues;
   mean[1] /= m_NumerOfValues;
   mean[2] /= m_NumerOfValues;
   return mean;
-  }
+}

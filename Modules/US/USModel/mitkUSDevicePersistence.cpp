@@ -22,10 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 
-//QT
-#include <QMessageBox>
-
-
 mitk::USDevicePersistence::USDevicePersistence() : m_devices("MITK US","Device Settings")
 {
 }
@@ -58,8 +54,10 @@ void mitk::USDevicePersistence::StoreCurrentDevices()
   MITK_INFO << "Successfully saved " << numberOfSavedDevices << " US devices.";
 }
 
-void mitk::USDevicePersistence::RestoreLastDevices()
+std::vector<mitk::USDevice::Pointer> mitk::USDevicePersistence::RestoreLastDevices()
 {
+  std::vector<mitk::USDevice::Pointer> devices;
+
   int numberOfSavedDevices = m_devices.value("numberOfSavedDevices").toInt();
 
   for(int i=0; i<numberOfSavedDevices; i++)
@@ -68,36 +66,45 @@ void mitk::USDevicePersistence::RestoreLastDevices()
     try
     {
       QString currentString = m_devices.value("device"+QString::number(i)).toString();
-      mitk::USVideoDevice::Pointer currentDevice = StringToUSVideoDevice(currentString);
-      currentDevice->Connect();
+      mitk::USDevice::Pointer currentDevice = dynamic_cast<mitk::USDevice*>(StringToUSVideoDevice(currentString).GetPointer());
+      //currentDevice->Initialize();
+      devices.push_back(currentDevice.GetPointer());
     }
     catch (...)
     {
       MITK_ERROR << "Error occured while loading a USVideoDevice from persistence. Device assumed corrupt, will be deleted.";
-      QMessageBox::warning(NULL, "Could not load device" ,"A stored ultrasound device is corrupted and could not be loaded. The device will be deleted.");
+      //QMessageBox::warning(NULL, "Could not load device" ,"A stored ultrasound device is corrupted and could not be loaded. The device will be deleted.");
     }
   }
 
   MITK_INFO << "Restoring " << numberOfSavedDevices << " US devices.";
+
+  return devices;
 }
 
 QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Pointer d)
 {
-
   QString manufacturer = d->GetDeviceManufacturer().c_str();
   QString model = d->GetDeviceModel().c_str();
   QString comment = d->GetDeviceComment().c_str();
   int source = d->GetDeviceID();
   std::string file = d->GetFilePath();
   if (file == "") file = "none";
-  int greyscale = d->GetSource()->GetIsGreyscale();
-  int resOverride = d->GetSource()->GetResolutionOverride();
-  int resWidth = d->GetSource()->GetResolutionOverrideWidth();
-  int resHight = d->GetSource()->GetResolutionOverrideHeight();
-  int cropRight = d->GetCropArea().cropRight;
-  int cropLeft = d->GetCropArea().cropLeft;
-  int cropBottom = d->GetCropArea().cropBottom;
-  int cropTop = d->GetCropArea().cropTop;
+
+  mitk::USImageVideoSource::Pointer imageSource = dynamic_cast<mitk::USImageVideoSource*>(d->GetUSImageSource().GetPointer());
+  if ( ! imageSource )
+  {
+    MITK_ERROR << "There is no USImageVideoSource at the current device.";
+    mitkThrow() << "There is no USImageVideoSource at the current device.";
+  }
+
+  int greyscale = imageSource->GetIsGreyscale();
+  int resOverride = imageSource->GetResolutionOverride();
+  int resWidth = imageSource->GetResolutionOverrideWidth();
+  int resHight = imageSource->GetResolutionOverrideHeight();
+
+  mitk::USImageVideoSource::USImageRoi roi = imageSource->GetRegionOfInterest();
+
   char seperator = '|';
 
   QString returnValue = manufacturer + seperator
@@ -109,10 +116,10 @@ QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Po
                        + QString::number(resOverride) + seperator
                        + QString::number(resWidth) + seperator
                        + QString::number(resHight) + seperator
-                       + QString::number(cropRight) + seperator
-                       + QString::number(cropLeft) + seperator
-                       + QString::number(cropBottom) + seperator
-                       + QString::number(cropTop)
+                       + QString::number(roi.topLeftX) + seperator
+                       + QString::number(roi.topLeftY) + seperator
+                       + QString::number(roi.bottomRightX) + seperator
+                       + QString::number(roi.bottomRightY)
                        ;
 
   MITK_INFO << "Output String: " << returnValue.toStdString();
@@ -141,11 +148,11 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
   bool resOverride = (QString(data.at(6).c_str())).toInt();
   int resWidth = (QString(data.at(7).c_str())).toInt();
   int resHight = (QString(data.at(8).c_str())).toInt();
-  mitk::USDevice::USImageCropArea cropArea;
-  cropArea.cropRight = (QString(data.at(9).c_str())).toInt();
-  cropArea.cropLeft = (QString(data.at(10).c_str())).toInt();
-  cropArea.cropBottom = (QString(data.at(11).c_str())).toInt();
-  cropArea.cropTop = (QString(data.at(12).c_str())).toInt();
+  mitk::USImageVideoSource::USImageRoi cropArea;
+  cropArea.topLeftX = (QString(data.at(9).c_str())).toInt();
+  cropArea.topLeftY = (QString(data.at(10).c_str())).toInt();
+  cropArea.bottomRightX = (QString(data.at(11).c_str())).toInt();
+  cropArea.bottomRightY = (QString(data.at(12).c_str())).toInt();
 
   // Assemble Metadata
   mitk::USImageMetadata::Pointer metadata = mitk::USImageMetadata::New();
@@ -166,18 +173,26 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
     returnValue = mitk::USVideoDevice::New(file, metadata);
   }
 
+  mitk::USImageVideoSource::Pointer imageSource =
+    dynamic_cast<mitk::USImageVideoSource*>(returnValue->GetUSImageSource().GetPointer());
+  if ( ! imageSource )
+  {
+    MITK_ERROR << "There is no USImageVideoSource at the current device.";
+    mitkThrow() << "There is no USImageVideoSource at the current device.";
+  }
+
   // Set Video Options
-  returnValue->GetSource()->SetColorOutput(!greyscale);
+  imageSource->SetColorOutput(!greyscale);
 
   // If Resolution override is activated, apply it
   if (resOverride)
     {
-    returnValue->GetSource()->OverrideResolution(resWidth, resHight);
-    returnValue->GetSource()->SetResolutionOverride(true);
+    imageSource->OverrideResolution(resWidth, resHight);
+    imageSource->SetResolutionOverride(true);
     }
 
   // Set Crop Area
-  returnValue->SetCropArea(cropArea);
+  imageSource->SetRegionOfInterest(cropArea);
 
   return returnValue;
 }

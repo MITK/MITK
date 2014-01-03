@@ -15,7 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSVideoDevice.h"
-#include "mitkImageReadAccessor.h"
+#include "mitkUSVideoDeviceCustomControls.h"
+
+const std::string mitk::USVideoDevice::DeviceClassIdentifier = "org.mitk.modules.us.USVideoDevice";
 
 mitk::USVideoDevice::USVideoDevice(int videoDeviceNumber, std::string manufacturer, std::string model) : mitk::USDevice(manufacturer, model)
 {
@@ -49,32 +51,35 @@ mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, mitk::USImageMetad
 
 mitk::USVideoDevice::~USVideoDevice()
 {
-  if (m_ThreadID >= 0)
-  {
-    m_MultiThreader->TerminateThread(m_ThreadID);
-  }
+  //m_Source->UnRegister();
+  m_Source = 0;
 }
 
 void mitk::USVideoDevice::Init()
 {
-  m_ThreadID = -1; // initialize with invalid id
-
   m_Source = mitk::USImageVideoSource::New();
+  m_ControlInterfaceCustom = mitk::USVideoDeviceCustomControls::New(this);
   //this->SetNumberOfInputs(1);
   this->SetNumberOfOutputs(1);
 
   // mitk::USImage::Pointer output = mitk::USImage::New();
   // output->Initialize();
   this->SetNthOutput(0, this->MakeOutput(0));
-
-  this->m_MultiThreader = itk::MultiThreader::New();
-  this->m_ImageMutex = itk::FastMutexLock::New();
-  this->m_CameraActiveMutex= itk::FastMutexLock::New();
-  m_IsActive = false;
 }
 
 std::string mitk::USVideoDevice::GetDeviceClass(){
-  return "org.mitk.modules.us.USVideoDevice";
+  return mitk::USVideoDevice::DeviceClassIdentifier;
+}
+
+mitk::USAbstractControlInterface::Pointer mitk::USVideoDevice::GetControlInterfaceCustom()
+{
+  return m_ControlInterfaceCustom.GetPointer();
+}
+
+bool mitk::USVideoDevice::OnInitialization()
+{
+  // nothing to do at initialization of video device
+  return true;
 }
 
 bool mitk::USVideoDevice::OnConnection()
@@ -84,13 +89,13 @@ bool mitk::USVideoDevice::OnConnection()
   } else {
      m_Source->SetCameraInput(m_DeviceID);
   }
-  SetSourceCropArea();
+  //SetSourceCropArea();
   return true;
 }
 
 bool mitk::USVideoDevice::OnDisconnection()
 {
-  if (m_IsActive) this->Deactivate();
+  if (m_DeviceState == State_Activated) this->Deactivate();
   return true;
 }
 
@@ -104,92 +109,38 @@ bool mitk::USVideoDevice::OnActivation()
   }
 
   MITK_INFO << "Activated UsVideoDevice!";
-  this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->Acquire, this);
   return true;
 }
 
-void mitk::USVideoDevice::OnDeactivation()
+bool mitk::USVideoDevice::OnDeactivation()
 {
-   // happens automatically when m_Active is set to false
+  // happens automatically when m_Active is set to false
+  return true;
 }
 
 void mitk::USVideoDevice::GenerateData()
 {
-  m_ImageMutex->Lock();
-
-  if ( m_Image.IsNull() || ! m_Image->IsInitialized() ) { m_ImageMutex->Unlock(); return; }
-
-  mitk::USImage::Pointer result = this->GetOutput();
-
-  if ( ! result->IsInitialized() )
-  {
-    result->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
-  }
-
-  mitk::ImageReadAccessor inputReadAccessor(m_Image.GetPointer(), m_Image->GetSliceData(0,0,0));
-  result->SetSlice(inputReadAccessor.GetData());
-
-  m_ImageMutex->Unlock();
+  mitk::USImage::Pointer result;
+  result = m_Image;
 
   // Set Metadata
   result->SetMetadata(this->m_Metadata);
-  //Apply Transformation
+  // Apply Transformation
   this->ApplyCalibration(result);
   // Set Output
   this->SetNthOutput(0, result);
 }
 
-void mitk::USVideoDevice::GrabImage()
+void mitk::USVideoDevice::UnregisterOnService()
 {
-  mitk::USImage::Pointer image = m_Source->GetNextImage();
+  if (m_DeviceState == State_Activated) { this->Deactivate(); }
+  if (m_DeviceState == State_Connected) { this->Disconnect(); }
 
-  this->m_ImageMutex->Lock();
-  m_Image = image;
-  this->m_ImageMutex->Unlock();
-
-  //this->SetNthOutput(0, m_Image);
-  //this->Modified();
+  mitk::USDevice::UnregisterOnService();
 }
 
-void mitk::USVideoDevice::SetSourceCropArea()
+mitk::USImageSource::Pointer mitk::USVideoDevice::GetUSImageSource()
 {
-if (this->m_Source.IsNotNull())
-  {
-    if((m_CropArea.cropBottom==0)&&
-       (m_CropArea.cropTop==0)&&
-       (m_CropArea.cropLeft==0)&&
-       (m_CropArea.cropRight==0))
-      {this->m_Source->RemoveRegionOfInterest();}
-    else
-      {
-      int right = m_Source->GetImageWidth() - m_CropArea.cropRight;
-      int bottom = m_Source->GetImageHeight() - m_CropArea.cropBottom;
-      this->m_Source->SetRegionOfInterest(m_CropArea.cropLeft,
-                                          m_CropArea.cropTop,
-                                          right,
-                                          bottom);
-      }
-  }
-else
-  {MITK_WARN << "Cannot set crop are, source is not initialized!";}
-}
-
-void mitk::USVideoDevice::SetCropArea(mitk::USDevice::USImageCropArea newArea)
-{
-m_CropArea = newArea;
-MITK_INFO << "Set Crop Area L:" << m_CropArea.cropLeft << " R:" << m_CropArea.cropRight << " T:" << m_CropArea.cropTop << " B:" << m_CropArea.cropBottom;
-if (m_IsConnected) SetSourceCropArea();
-}
-
-ITK_THREAD_RETURN_TYPE mitk::USVideoDevice::Acquire(void* pInfoStruct)
-{
-  /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  mitk::USVideoDevice * device = (mitk::USVideoDevice *) pInfo->UserData;
-  while (device->GetIsActive())
-  {
-    device->GrabImage();
-  }
-  return ITK_THREAD_RETURN_VALUE;
+  return m_Source.GetPointer();
 }
 

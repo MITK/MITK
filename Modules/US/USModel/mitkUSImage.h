@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-    /**Documentation
+    /**DocumentationZ
     * \brief This specialization of mitk::Image only appends necessary Metadata to an MITK image. Otherwise it can safely be treated like it's mother class.
     *  To generate an USImage from a standard mitkImage, call the appropriate constructor USImage(image::Pointer)
     * \ingroup US

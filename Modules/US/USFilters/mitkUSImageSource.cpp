@@ -41,7 +41,7 @@ mitk::USImage::Pointer mitk::USImageSource::GetNextImage()
     if ( m_ImageFilter.IsNotNull() ) { m_ImageFilter->FilterImage(image); }
 
     // convert to MITK image
-    IplImage ipl_img = image;
+    IplImage ipl_img = image.clone();
 
     this->m_OpenCVToMitkFilter->SetOpenCVImage(&ipl_img);
     this->m_OpenCVToMitkFilter->Update();

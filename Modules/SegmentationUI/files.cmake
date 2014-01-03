@@ -83,7 +83,6 @@ Qmitk/QmitkSearchLabelDialog.h
 set(UI_FILES
 Qmitk/QmitkAdaptiveRegionGrowingToolGUIControls.ui
 Qmitk/QmitkConfirmSegmentationDialog.ui
-Qmitk/QmitkOtsuToolWidgetControls.ui
 Qmitk/QmitkTriangleThresholdingTool3DGUIControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
 Qmitk/QmitkSliceBasedInterpolatorControls.ui

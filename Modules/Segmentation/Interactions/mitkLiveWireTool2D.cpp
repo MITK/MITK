@@ -286,7 +286,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEven
   m_LiveWireFilter->SetInput(m_WorkingSlice);
 
   //map click to pixel coordinates
-  mitk::Point3D click = const_cast<mitk::Point3D &>( positionEvent->GetPositionInWorld() );
+  mitk::Point3D click = positionEvent->GetPositionInWorld();
   itk::Index<3> idx;
   m_WorkingSlice->GetGeometry()->WorldToIndex(click, idx);
 
@@ -351,7 +351,7 @@ bool mitk::LiveWireTool2D::OnAddPoint ( StateMachineAction*, InteractionEvent* i
   m_LiveWireContour->Clear(timestep);
 
   //set new start point
-  m_LiveWireFilter->SetStartPoint(const_cast<mitk::Point3D &>(positionEvent->GetPositionInWorld()));
+  m_LiveWireFilter->SetStartPoint(positionEvent->GetPositionInWorld());
 
   if( m_CreateAndUseDynamicCosts )
   {
@@ -379,7 +379,7 @@ bool mitk::LiveWireTool2D::OnMouseMoved( StateMachineAction*, InteractionEvent* 
   // actual LiveWire computation
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
-  m_LiveWireFilter->SetEndPoint(const_cast<mitk::Point3D &>(positionEvent->GetPositionInWorld()));
+  m_LiveWireFilter->SetEndPoint(positionEvent->GetPositionInWorld());
 
   m_LiveWireFilter->SetTimeStep( timestep );
   m_LiveWireFilter->Update();

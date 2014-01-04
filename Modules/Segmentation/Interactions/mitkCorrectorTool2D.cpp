@@ -102,7 +102,8 @@ bool mitk::CorrectorTool2D::OnMousePressed ( StateMachineAction*, InteractionEve
   contour->Clear();
   contour->Expand(timestep + 1);
   contour->SetClosed(false, timestep);
-  contour->AddVertex( static_cast<mitk::Point3D>(positionEvent->GetPositionInWorld()), timestep );
+  mitk::Point3D point = positionEvent->GetPositionInWorld();
+  contour->AddVertex( point, timestep );
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
 
@@ -120,7 +121,8 @@ bool mitk::CorrectorTool2D::OnMouseMoved( StateMachineAction*, InteractionEvent*
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
   ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
-  contour->AddVertex( static_cast<mitk::Point3D>(positionEvent->GetPositionInWorld()), timestep );
+  mitk::Point3D point = positionEvent->GetPositionInWorld();
+  contour->AddVertex( point, timestep );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );

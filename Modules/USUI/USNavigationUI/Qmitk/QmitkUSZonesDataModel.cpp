@@ -165,7 +165,7 @@ QVariant QmitkUSZonesDataModel::headerData ( int section, Qt::Orientation orient
 
 Qt::ItemFlags QmitkUSZonesDataModel::flags ( const QModelIndex& index ) const
 {
-  if (index.column() == 1) { return Qt::ItemIsSelectable | Qt::ItemIsEnabled; }
+  if (index.column() == 1 || index.column() == 2) { return Qt::ItemIsSelectable | Qt::ItemIsEnabled; }
 
   return Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled;
 }
@@ -227,7 +227,7 @@ QVariant QmitkUSZonesDataModel::data ( const QModelIndex& index, int role ) cons
         else if (qColor == Qt::red) { return QVariant("Red"); }
         else if (qColor == Qt::blue) { return QVariant("Blue"); }
         else if (qColor == Qt::yellow) { return QVariant("Yellow"); }
-        else { return QVariant(QVariant::Invalid); }
+        else { return QVariant(qColor.name()); }
       }
       else { return QVariant(QVariant::Invalid); }
     }

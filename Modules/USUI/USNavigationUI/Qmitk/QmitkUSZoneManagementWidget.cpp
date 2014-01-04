@@ -2,7 +2,7 @@
 #include "ui_QmitkUSZoneManagementWidget.h"
 
 #include "QmitkUSZonesDataModel.h"
-#include "QmitkUSZoneManagementComboBoxDelegate.h"
+#include "QmitkUSZoneManagementColorDialogDelegate.h"
 
 #include "mitkUSZonesInteractor.h"
 #include "usModuleRegistry.h"
@@ -21,7 +21,7 @@ QmitkUSZoneManagementWidget::QmitkUSZoneManagementWidget(QWidget *parent) :
   ui->setupUi(this);
 
   ui->CurrentZonesTable->setModel(m_ZonesDataModel);
-  ui->CurrentZonesTable->setItemDelegateForColumn(2, new QmitkUSZoneManagementComboBoxDelegate(this));
+  ui->CurrentZonesTable->setItemDelegateForColumn(2, new QmitkUSZoneManagementColorDialogDelegate(this));
 
   connect (ui->CurrentZonesTable->selectionModel(), SIGNAL(selectionChanged(const QItemSelection& , const QItemSelection&)),
            this, SLOT(OnSelectionChanged(const QItemSelection&, const QItemSelection&)));

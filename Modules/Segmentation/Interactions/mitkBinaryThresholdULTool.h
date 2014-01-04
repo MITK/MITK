@@ -66,9 +66,6 @@ namespace mitk
     template < typename TPixel, unsigned int VDimension >
     void InternalRun( itk::Image<TPixel, VDimension>* source );
 
-//    template <typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>
-//    void InternalAcceptPreview( itk::Image<TPixel1, VDimension1>* targetImage, const itk::Image<TPixel2, VDimension2>* sourceImage );
-
     mitk::ScalarType m_SensibleMinimumThresholdValue;
     mitk::ScalarType m_SensibleMaximumThresholdValue;
     mitk::ScalarType m_CurrentLowerThresholdValue;

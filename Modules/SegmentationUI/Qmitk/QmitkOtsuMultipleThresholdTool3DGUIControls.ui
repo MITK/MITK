@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkOtsuTool3DGUIControls</class>
- <widget class="QWidget" name="QmitkOtsuTool3DGUIControls">
+ <class>QmitkOtsuMultipleThresholdTool3DGUIControls</class>
+ <widget class="QWidget" name="QmitkOtsuMultipleThresholdTool3DGUIControls">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>QmitkSplitConnectedRegionsTool3DGUIContols</string>
+   <string>GUI Controls</string>
   </property>
   <property name="toolTip">
    <string/>
@@ -37,7 +37,7 @@
       </font>
      </property>
      <property name="text">
-      <string>3D Otsu Multiple Thresholder</string>
+      <string>3D Otsu Multiple Threshold</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

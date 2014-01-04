@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef mitkOtsuTool3D_H
-#define mitkOtsuTool3D_H
+#ifndef mitkOtsuMultipleThresholdTool3D_H
+#define mitkOtsuMultipleThresholdTool3D_H
 
 #include "mitkSegTool3D.h"
 #include "SegmentationExports.h"
@@ -26,12 +26,12 @@ class ModuleResource;
 }
 
 namespace mitk{
-  class Segmentation_EXPORT OtsuTool3D : public SegTool3D
+  class Segmentation_EXPORT OtsuMultipleThresholdTool3D : public SegTool3D
   {
     public:
 
-      mitkClassMacro(OtsuTool3D, SegTool3D);
-      itkNewMacro(OtsuTool3D);
+      mitkClassMacro(OtsuMultipleThresholdTool3D, SegTool3D);
+      itkNewMacro(OtsuMultipleThresholdTool3D);
 
       /* icon stuff */
       virtual const char** GetXPM() const;
@@ -55,12 +55,10 @@ namespace mitk{
       int GetNumberOfRegions();
 
     protected:
-      OtsuTool3D();
-      virtual ~OtsuTool3D();
+      OtsuMultipleThresholdTool3D();
+      virtual ~OtsuMultipleThresholdTool3D();
 
       int m_NumberOfRegions;
-
-      int m_SelectedRegion;
 
       mitk::DataNode::Pointer m_MultiLabelNode;
       mitk::Image::Pointer m_MultiLabelImage;
@@ -78,4 +76,4 @@ namespace mitk{
 
 }//namespace
 
-#endif //mitkOtsuTool3D_H
+#endif //mitkOtsuMultipleThresholdTool3D_H

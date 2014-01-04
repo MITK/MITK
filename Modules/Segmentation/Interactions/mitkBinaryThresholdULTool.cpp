@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 
 // itk
-#include <itkImageRegionIterator.h>
 #include <itkBinaryThresholdImageFilter.h>
 
 // us

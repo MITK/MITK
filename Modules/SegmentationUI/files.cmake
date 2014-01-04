@@ -11,8 +11,8 @@ Qmitk/QmitkFastMarchingTool3DGUI.cpp
 Qmitk/QmitkFastMarchingToolGUI.cpp
 Qmitk/QmitkLiveWireTool2DGUI.cpp
 Qmitk/QmitkNewSegmentationDialog.cpp
-Qmitk/QmitkOtsuTool3DGUI.cpp
-Qmitk/QmitkTriangleThresholdingTool3DGUI.cpp
+Qmitk/QmitkOtsuMultipleThresholdTool3DGUI.cpp
+Qmitk/QmitkAutoThresholdTool3DGUI.cpp
 Qmitk/QmitkPaintbrushToolGUI.cpp
 Qmitk/QmitkPixelManipulationToolGUI.cpp
 Qmitk/QmitkRegionGrow3DToolGUI.cpp
@@ -52,8 +52,8 @@ Qmitk/QmitkFastMarchingTool3DGUI.h
 Qmitk/QmitkFastMarchingToolGUI.h
 Qmitk/QmitkLiveWireTool2DGUI.h
 Qmitk/QmitkNewSegmentationDialog.h
-Qmitk/QmitkOtsuTool3DGUI.h
-Qmitk/QmitkTriangleThresholdingTool3DGUI.h
+Qmitk/QmitkOtsuMultipleThresholdTool3DGUI.h
+Qmitk/QmitkAutoThresholdTool3DGUI.h
 Qmitk/QmitkPaintbrushToolGUI.h
 Qmitk/QmitkPixelManipulationToolGUI.h
 Qmitk/QmitkRegionGrow3DToolGUI.h
@@ -83,7 +83,7 @@ Qmitk/QmitkSearchLabelDialog.h
 set(UI_FILES
 Qmitk/QmitkAdaptiveRegionGrowingToolGUIControls.ui
 Qmitk/QmitkConfirmSegmentationDialog.ui
-Qmitk/QmitkTriangleThresholdingTool3DGUIControls.ui
+Qmitk/QmitkAutoThresholdTool3DGUIControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
 Qmitk/QmitkSliceBasedInterpolatorControls.ui
 Qmitk/QmitkSurfaceBasedInterpolatorControls.ui
@@ -95,7 +95,7 @@ Qmitk/QmitkCloseTool3DGUIControls.ui
 Qmitk/QmitkOpenTool3DGUIControls.ui
 Qmitk/QmitkKeepNConnectedRegionsTool3DGUIControls.ui
 Qmitk/QmitkSplitConnectedRegionsTool3DGUIControls.ui
-Qmitk/QmitkOtsuTool3DGUIControls.ui
+Qmitk/QmitkOtsuMultipleThresholdTool3DGUIControls.ui
 Qmitk/QmitkFillHolesTool3DGUIControls.ui
 Qmitk/QmitkSearchLabelDialogGUI.ui
 Qmitk/QmitkBinaryThresholdToolGUIControls.ui

@@ -67,8 +67,8 @@ set(CPP_FILES
   Interactions/mitkFeedbackContourTool.cpp
   Interactions/mitkFillRegionTool.cpp
   Interactions/mitkLiveWireTool2D.cpp
-  Interactions/mitkOtsuTool3D.cpp
-  Interactions/mitkTriangleThresholdingTool3D.cpp
+  Interactions/mitkOtsuMultipleThresholdTool3D.cpp
+  Interactions/mitkAutoThresholdTool3D.cpp
   Interactions/mitkPaintbrushTool.cpp
   Interactions/mitkPixelManipulationTool.cpp
   Interactions/mitkRegionGrow3DTool.cpp
@@ -122,7 +122,7 @@ set(RESOURCE_FILES
   RegionGrowing_Cursor_32x32.png
   Subtract_48x48.png
   Subtract_Cursor_32x32.png
-  TriangleThreshold_48x48.png
+  AutoThreshold_48x48.png
   Threshold_48x48.png
   TwoThresholds_48x48.png
   Watershed_48x48.png

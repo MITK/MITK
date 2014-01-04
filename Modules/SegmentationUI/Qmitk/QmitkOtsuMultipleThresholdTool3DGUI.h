@@ -14,34 +14,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkTriangleThresholdingTool3DGUI_h_Included
-#define QmitkTriangleThresholdingTool3DGUI_h_Included
+#ifndef QmitkOtsuMultipleThresholdTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
-#include "ui_QmitkTriangleThresholdingTool3DGUIControls.h"
+#include "ui_QmitkOtsuMultipleThresholdTool3DGUIControls.h"
 
 namespace mitk {
-  class TriangleThresholdingTool3D;
+  class OtsuMultipleThresholdTool3D;
 }
 
 //class QListWidgetItem;
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI for mitk::TriangleThresholdingTool3D
+  \brief GUI for mitk::OtsuTool3D
 
   This GUI shows ...
 
   Last contributor: $Author$
 */
-class SegmentationUI_EXPORT QmitkTriangleThresholdingTool3DGUI : public QmitkToolGUI
+class SegmentationUI_EXPORT QmitkOtsuMultipleThresholdTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
   public:
-    mitkClassMacro(QmitkTriangleThresholdingTool3DGUI, QmitkToolGUI);
-    itkNewMacro(QmitkTriangleThresholdingTool3DGUI);
+    mitkClassMacro(QmitkOtsuMultipleThresholdTool3DGUI, QmitkToolGUI);
+    itkNewMacro(QmitkOtsuMultipleThresholdTool3DGUI);
 
   protected slots:
 
@@ -53,22 +52,24 @@ class SegmentationUI_EXPORT QmitkTriangleThresholdingTool3DGUI : public QmitkToo
 
     void OnAcceptPreview();
 
-    void OnInvertPreview();
-
     void OnShowInformation(bool);
 
-    void OnShowAdvancedControls(bool);
+    void OnItemSelectionChanged(QListWidgetItem *item);
 
   protected:
 
-    QmitkTriangleThresholdingTool3DGUI();
-    virtual ~QmitkTriangleThresholdingTool3DGUI();
+    QmitkOtsuMultipleThresholdTool3DGUI();
+    virtual ~QmitkOtsuMultipleThresholdTool3DGUI();
 
     void BusyStateChanged(bool);
 
-    mitk::TriangleThresholdingTool3D* m_TriangleThresholdingTool3D;
+    mitk::OtsuMultipleThresholdTool3D* m_OtsuMultipleThresholdTool3D;
 
-    Ui_QmitkTriangleThresholdingTool3DGUIControls m_Controls;
+    Ui_QmitkOtsuMultipleThresholdTool3DGUIControls m_Controls;
+
+    int m_NumberOfRegions;
+
+    QListWidgetItem* m_SelectedItem;
 };
 
 #endif

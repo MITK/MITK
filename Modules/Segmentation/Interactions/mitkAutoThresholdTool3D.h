@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef mitkTriangleThresholdingTool3D_H
-#define mitkTriangleThresholdingTool3D_H
+#ifndef mitkAutoThresholdTool3D_H
+#define mitkAutoThresholdTool3D_H
 
 #include "mitkSegTool3D.h"
 #include "SegmentationExports.h"
@@ -26,24 +26,45 @@ class ModuleResource;
 }
 
 namespace mitk{
-  class Segmentation_EXPORT TriangleThresholdingTool3D : public SegTool3D
+  class Segmentation_EXPORT AutoThresholdTool3D : public SegTool3D
   {
     public:
 
-      mitkClassMacro(TriangleThresholdingTool3D, SegTool3D);
-      itkNewMacro(TriangleThresholdingTool3D);
+      mitkClassMacro(AutoThresholdTool3D, SegTool3D);
+      itkNewMacro(AutoThresholdTool3D);
 
       /* icon stuff */
       virtual const char** GetXPM() const;
       virtual const char* GetName() const;
       us::ModuleResource GetIconResource() const;
 
+      enum AutoThresholdType
+      {
+        AT_HUANG,
+        AT_INTERMODES,
+        AT_ISODATA,
+        AT_LI,
+        AT_MAXENTROPY,
+        AT_MINERROR,
+        AT_MOMENTS,
+        AT_OTSU,
+        AT_RENYIENTROPY,
+        AT_SHANBHAG,
+        AT_TRIANGLE,
+        AT_YEN
+      };
+
       /// \brief Executes the tool.
       void Run();
 
+      /// \brief Sets the thresholding algorithm to use.
+      void SetMethod(AutoThresholdType value);
+
     protected:
-      TriangleThresholdingTool3D();
-      virtual ~TriangleThresholdingTool3D();
+      AutoThresholdTool3D();
+      virtual ~AutoThresholdTool3D();
+
+      AutoThresholdType m_ActiveMethod;
 
       template < typename TPixel, unsigned int VDimension >
       void InternalRun( itk::Image<TPixel, VDimension>* input );
@@ -52,4 +73,4 @@ namespace mitk{
 
 }//namespace
 
-#endif //mitkTriangleThresholdingTool3D_H
+#endif //mitkAutoThresholdTool3D_H

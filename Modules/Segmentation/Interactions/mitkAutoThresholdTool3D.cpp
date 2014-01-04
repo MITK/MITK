@@ -144,102 +144,54 @@ void mitk::AutoThresholdTool3D::InternalRun( itk::Image<TPixel, VDimension>* inp
   {
   case AT_HUANG:
     filter = HuangThresholdImageFilterType::New();
-    filter->SetInput(input);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
-    filter->Update();
-    result = filter->GetOutput();
     break;
   case AT_INTERMODES:
     filter = IntermodesThresholdImageFilterType::New();
-    filter->SetInput(input);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
-    filter->Update();
-    result = filter->GetOutput();
     break;
   case AT_ISODATA:
     filter = IsoDataThresholdImageFilterType::New();
-    filter->SetInput(input);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
-    filter->Update();
-    result = filter->GetOutput();
     break;
   case AT_LI:
     filter = LiThresholdImageFilterType::New();
-    filter->SetInput(input);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
-    filter->Update();
-    result = filter->GetOutput();
     break;
   case AT_MAXENTROPY:
     filter = MaximumEntropyThresholdImageFilterType::New();
-    filter->SetInput(input);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
-    filter->Update();
-    result = filter->GetOutput();
     break;
   case AT_MINERROR:
     filter = KittlerIllingworthThresholdImageFilterType::New();
-    filter->SetInput(input);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
-    filter->Update();
-    result = filter->GetOutput();
     break;
   case AT_MOMENTS:
     filter = MomentsThresholdImageFilterType::New();
-    filter->SetInput(input);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
-    filter->Update();
-    result = filter->GetOutput();
     break;
   case AT_OTSU:
     filter = OtsuThresholdImageFilterType::New();
-    filter->SetInput(input);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
-    filter->Update();
-    result = filter->GetOutput();
     break;
   case AT_RENYIENTROPY:
     filter = RenyiEntropyThresholdImageFilterType::New();
-    filter->SetInput(input);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
-    filter->Update();
-    result = filter->GetOutput();
     break;
   case AT_SHANBHAG:
     filter = ShanbhagThresholdImageFilterType::New();
-    filter->SetInput(input);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
-    filter->Update();
-    result = filter->GetOutput();
     break;
   case AT_TRIANGLE:
     filter = TriangleThresholdImageFilterType::New();
-    filter->SetInput(input);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
-    filter->Update();
-    result = filter->GetOutput();
     break;
   case AT_YEN:
     filter = YenThresholdImageFilterType::New();
-    filter->SetInput(input);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
-    filter->Update();
-    result = filter->GetOutput();
     break;
   }
 
+  filter->SetInput(input);
+  filter->SetInsideValue(1);
+  filter->SetOutsideValue(0);
+
+  filter->AddObserver( itk::AnyEvent(), m_ProgressCommand );
+  m_ProgressCommand->AddStepsToDo(100);
+
+  filter->Update();
+
+  m_ProgressCommand->Reset();
+
+  result = filter->GetOutput();
   result->DisconnectPipeline();
 
   m_PreviewImage = mitk::Image::New();

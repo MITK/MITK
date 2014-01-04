@@ -19,11 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTool.h"
 
-//#include "mitkCommon.h"
 #include "SegmentationExports.h"
-//#include "mitkStateEvent.h"
-//#include "mitkPositionEvent.h"
-//#include "mitkInteractionConst.h"
 #include "mitkToolCommand.h"
 
 namespace mitk
@@ -49,7 +45,7 @@ class Segmentation_EXPORT SegTool3D : public Tool
     virtual void InvertPreview();
 
     /// \brief Replaces the preview image by the union between the active label and the current preview image.
-    virtual void CalculateUnion();
+    virtual void AddPreview();
 
     /// \brief Creates a new label out of the the current preview image.
     virtual void CreateNewLabel(const std::string& name, const mitk::Color& color);
@@ -110,7 +106,7 @@ class Segmentation_EXPORT SegTool3D : public Tool
     void InternalInvertPreview( ImageType* input );
 
     template<typename ImageType>
-    void InternalUnion( ImageType* input );
+    void InternalAddPreview( ImageType* input );
 
  };
 

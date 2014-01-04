@@ -106,7 +106,7 @@ void QmitkKeepNConnectedRegionsTool3DGUI::OnCalculateUnion()
 {
   if (m_KeepNConnectedRegionsTool3D.IsNotNull())
   {
-    m_KeepNConnectedRegionsTool3D->CalculateUnion();
+    m_KeepNConnectedRegionsTool3D->AddPreview();
   }
 }
 

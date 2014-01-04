@@ -37,28 +37,7 @@ const char* mitk::SegTool3D::GetGroup() const
 {
   return "SegTool3D";
 }
-/*
-float mitk::SegTool3D::CanHandleEvent( StateEvent const *stateEvent) const
-{
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return 0.0;
 
-  if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D ) return 0.0; // we don't want anything but 2D
-
-  //This are the mouse event that are used by the statemachine patterns for zooming and panning. This must be possible although a tool is activ
-  if (stateEvent->GetId() == EIDRIGHTMOUSEBTN || stateEvent->GetId() == EIDMIDDLEMOUSEBTN || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDCTRL ||
-    stateEvent->GetId() == EIDMIDDLEMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDMOUSEMOVE ||
-    stateEvent->GetId() == EIDMIDDLEMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNRELEASE )
-  {
-    //Since the usual segmentation tools currently do not need right click interaction but the mitkDisplayVectorInteractor
-    return 0.0;
-  }
-  else
-  {
-    return 1.0;
-  }
-}
-*/
 //to be moved to mitkInteractionConst.h by StateMachineEditor
 const mitk::OperationType mitk::SegTool3D::OP_EXCHANGE = 717;
 
@@ -123,8 +102,6 @@ void mitk::SegTool3D::AcceptPreview()
   m_PreviewNode->SetVisibility(false);
 //  m_PreviewImage = NULL;
 
-//  this->Deactivated();
-
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -157,7 +134,7 @@ void mitk::SegTool3D::InvertPreview()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::SegTool3D::CalculateUnion()
+void mitk::SegTool3D::AddPreview()
 {
   if ( m_PreviewImage.IsNull() ) return;
 
@@ -166,7 +143,7 @@ void mitk::SegTool3D::CalculateUnion()
 
   try
   {
-    AccessFixedDimensionByItk( workingImage, InternalUnion, 3 );
+    AccessFixedDimensionByItk( workingImage, InternalAddPreview, 3 );
   }
   catch( itk::ExceptionObject & e )
   {
@@ -321,7 +298,7 @@ void mitk::SegTool3D::InternalInvertPreview( ImageType* input )
 }
 
 template<typename ImageType>
-void mitk::SegTool3D::InternalUnion( ImageType* input )
+void mitk::SegTool3D::InternalAddPreview( ImageType* input )
 {
   typedef itk::Image<LabelSetImage::PixelType, 3> BinaryImageType;
   BinaryImageType::Pointer previewItk;

@@ -101,7 +101,7 @@ void QmitkMedianTool3DGUI::OnCalculateUnion()
 {
   if (m_MedianTool3D)
   {
-    m_MedianTool3D->CalculateUnion();
+    m_MedianTool3D->AddPreview();
   }
 }
 

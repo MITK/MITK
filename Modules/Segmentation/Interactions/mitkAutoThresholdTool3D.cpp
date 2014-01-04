@@ -136,7 +136,7 @@ void mitk::AutoThresholdTool3D::InternalRun( itk::Image<TPixel, VDimension>* inp
   typedef itk::TriangleThresholdImageFilter <ImageType, SegmentationType>  TriangleThresholdImageFilterType;
   typedef itk::YenThresholdImageFilter <ImageType, SegmentationType>  YenThresholdImageFilterType;
 
-  itk::HistogramThresholdImageFilter<ImageType, SegmentationType>::Pointer filter;
+  typename itk::HistogramThresholdImageFilter<ImageType, SegmentationType>::Pointer filter;
 
   typename SegmentationType::Pointer result;
 

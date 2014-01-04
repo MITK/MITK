@@ -70,15 +70,7 @@ void mitk::USActivator::OnServiceEvent(const us::ServiceEvent event)
     return;
   }
 
-  // just USVideoDevice objects need processing in this method
   us::ServiceReference<mitk::USDevice> service = event.GetServiceReference();
-  if ( service.GetProperty(mitk::USDevice::US_PROPKEY_CLASS).ToString() != "org.mitk.modules.us.USVideoDevice" )
-  {
-    MITK_INFO("us::ModuleActivator")("USActivator")
-        << "Device is no USVideoDevice.";
-    return;
-  }
-
   mitk::USDevice::Pointer device = m_Context->GetService(us::ServiceReference<mitk::USDevice>(service));
 
   switch (event.GetType())

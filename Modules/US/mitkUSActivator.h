@@ -30,7 +30,7 @@ namespace mitk
   * Loads mitk::USVideoDevice objects from hard disk on module load and write
   * them to hard disk on module unload.
   *
-  * Pointers to mitk::USVideoDevice objects are held to make sure that they
+  * Pointers to mitk::USDevice objects are held to make sure that they
   * will not be deleted while the module is loaded. A service event listener is
   * registered, so that pointers to devices which are registered into micro
   * service from a plugin for example can be held here, too.
@@ -53,7 +53,7 @@ public:
 
 protected:
   /**
-    *\brief Listens to ServiceRegistry changes and updates the list of mitk::USVideoDevice object accordingly.
+    *\brief Listens to ServiceRegistry changes and updates the list of mitk::USDevice object accordingly.
     */
   void OnServiceEvent(const us::ServiceEvent event);
 

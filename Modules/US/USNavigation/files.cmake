@@ -1,5 +1,4 @@
 SET(CPP_FILES
-  mitkUSNavigationActivator.cpp
   mitkUSCombinedModality.cpp
   mitkUSZonesInteractor.cpp
 

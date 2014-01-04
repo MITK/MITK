@@ -30,6 +30,16 @@ namespace itk {
 namespace mitk {
   class NavigationDataSource;
 
+  /**
+   * \brief Combination of USDevice and NavigationDataSource.
+   * This class can be used as any USDevice subclass. Additionally tracking data be
+   * retrieved from the NavigationDataSource returned by GetTrackingDevice().
+   *
+   * A calibration of the ultrasound image stream to the navigation datas can be set
+   * for the currently active zoom level (of the ultrasound device) by SetCalibration().
+   * The ultrasound images are transformed according to this calibration in the
+   * GenerateData() method.
+   */
   class MitkUSNavigation_EXPORT USCombinedModality : public USDevice
   {
   public:

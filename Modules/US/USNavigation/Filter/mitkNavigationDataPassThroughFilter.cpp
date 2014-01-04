@@ -28,15 +28,16 @@ void mitk::NavigationDataPassThroughFilter::GenerateData()
 {
   // get each input and transfer the data
   DataObjectPointerArray inputs = this->GetInputs(); //get all inputs
-  for (unsigned int index = 0; index < inputs.size(); index++)
+  for ( unsigned int index = 0; index < inputs.size(); ++index )
   {
-    //get the needed variables
+    // get the needed variables (input and output)
     const mitk::NavigationData* nd = this->GetInput(index);
     mitk::NavigationData* output = this->GetOutput(index);
 
-    if (! nd || ! output)
+    if ( ! nd || ! output )
     {
-      MITK_ERROR << "Input and output must not be null.";
+      MITK_ERROR("NavigationDataToNavigationDataFilter")("NavigationDataPassThroughFilter")
+          << "Input and output must not be null.";
       mitkThrow() << "Input and output must not be null.";
     }
 

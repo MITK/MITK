@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "vtkSphereSource.h"
 
+const char* mitk::USZonesInteractor::DATANODE_PROPERTY_SIZE = "zone.size";
+const char* mitk::USZonesInteractor::DATANODE_PROPERTY_CREATED = "zone.created";
+
 void mitk::USZonesInteractor::UpdateSurface(mitk::DataNode::Pointer dataNode)
 {
   if ( ! dataNode->GetData())
@@ -34,7 +37,7 @@ void mitk::USZonesInteractor::UpdateSurface(mitk::DataNode::Pointer dataNode)
   mitk::Point3D origin = dataNode->GetData()->GetGeometry()->GetOrigin();
 
   mitk::ScalarType radius;
-  if ( ! dataNode->GetFloatProperty("zone.size", radius) )
+  if ( ! dataNode->GetFloatProperty(DATANODE_PROPERTY_SIZE, radius) )
   {
     MITK_WARN("USZonesInteractor")("DataInteractor")
         << "Cannut update surface for node as no radius is specified in the node properties.";
@@ -43,6 +46,7 @@ void mitk::USZonesInteractor::UpdateSurface(mitk::DataNode::Pointer dataNode)
 
   mitk::Surface::Pointer zone = mitk::Surface::New();
 
+  // create a vtk sphere with given radius
   vtkSphereSource *vtkData = vtkSphereSource::New();
   vtkData->SetRadius( radius );
   vtkData->SetCenter(0,0,0);
@@ -50,8 +54,9 @@ void mitk::USZonesInteractor::UpdateSurface(mitk::DataNode::Pointer dataNode)
   zone->SetVtkPolyData(vtkData->GetOutput());
   vtkData->Delete();
 
+  // set vtk sphere and origin to data node (origin must be set
+  // again, because of the new sphere set as data)
   dataNode->SetData(zone);
-
   dataNode->GetData()->GetGeometry()->SetOrigin(origin);
 
   // update the RenderWindow to show the changed surface
@@ -89,9 +94,7 @@ bool mitk::USZonesInteractor::AddCenter(mitk::StateMachineAction* , mitk::Intera
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == NULL) { return false; }
 
-  this->GetDataNode()->SetBoolProperty("zone.created", false);
-
-  this->GetDataNode()->SetData(mitk::Surface::New());
+  this->GetDataNode()->SetBoolProperty(DATANODE_PROPERTY_CREATED, false);
 
   // set origin of the data node to the mouse click position
   this->GetDataNode()->GetData()->GetGeometry()->SetOrigin(positionEvent->GetPositionInWorld());
@@ -111,23 +114,16 @@ bool mitk::USZonesInteractor::ChangeRadius(mitk::StateMachineAction* , mitk::Int
   mitk::Point3D mousePosition = positionEvent->GetPositionInWorld();
 
   mitk::ScalarType radius = mousePosition.EuclideanDistanceTo(curNode->GetData()->GetGeometry()->GetOrigin());
-  //MITK_INFO << "Radius: " << radius;
-  curNode->SetFloatProperty("zone.size", radius);
+  curNode->SetFloatProperty(DATANODE_PROPERTY_SIZE, radius);
 
   mitk::USZonesInteractor::UpdateSurface(curNode);
-  /*mitk::Point3D origin = curNode->GetData()->GetGeometry()->GetOrigin();
-  curNode->SetData(this->MakeSphere(radius));
-  this->GetDataNode()->GetData()->GetGeometry()->SetOrigin(origin);*/
-
-  // update the RenderWindow to show the changed surface
-  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return true;
 }
 
 bool mitk::USZonesInteractor::EndCreation(mitk::StateMachineAction* , mitk::InteractionEvent* /*interactionEvent*/)
 {
-  this->GetDataNode()->SetBoolProperty("zone.created", true);
+  this->GetDataNode()->SetBoolProperty(DATANODE_PROPERTY_CREATED, true);
   return true;
 }
 

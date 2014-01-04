@@ -39,6 +39,11 @@ protected:
   NavigationDataPassThroughFilter();
   virtual ~NavigationDataPassThroughFilter();
 
+  /**
+   * \brief Passes navigation data from all inputs to all outputs.
+   * If a subclass wants to implement its own version of the GenerateData()
+   * method it should call this method inside its implementation.
+   */
   virtual void GenerateData();
 };
 

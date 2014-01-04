@@ -272,8 +272,6 @@ void mitk::USCombinedModality::GenerateData()
       output->GetGeometry()->SetIndexToWorldTransform(calibrationIterator->second);
     }
   }
-
-  // TODO: do processing here
 }
 
 std::string mitk::USCombinedModality::SerializeCalibration()

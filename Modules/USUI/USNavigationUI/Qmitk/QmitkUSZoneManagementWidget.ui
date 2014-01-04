@@ -15,20 +15,6 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="ZonesTitleLabel">
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Current Zones:</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QTableView" name="CurrentZonesTable">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -51,7 +37,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="ZoneSizeSliderLayout">
      <item>
       <widget class="QLabel" name="ZoneSizeLabel">
        <property name="enabled">

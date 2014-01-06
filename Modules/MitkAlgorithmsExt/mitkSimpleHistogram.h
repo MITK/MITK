@@ -126,7 +126,7 @@ class MitkAlgorithmsExt_EXPORT SimpleHistogramCache
 
     static const unsigned int maxCacheSize = 64;
 
-    class Element
+    class MitkAlgorithmsExt_EXPORT Element
     {
       public:
         mitk::WeakPointer<BaseData> baseData;

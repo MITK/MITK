@@ -95,11 +95,17 @@ int main(int  /*argc*/, char*  /*argv*/[])
   mitk::FillVector3D(offset, 10.0, 100.0, 1.0); //initialize the offset
   displacer->SetOffset(offset); //now set the offset in the NavigationDataDisplacementFilter object
 
-  //now every output of the source object is connected to the displacer object
-  for (unsigned int i = 0; i < source->GetNumberOfOutputs(); i++)
-  {
-    displacer->SetInput(i, source->GetOutput(i));  //here we connect to the displacement filter
-  }
+  //Connect the two filters. You can use the ConnectTo method to automatically connect all outputs from one filter
+  // to inputs from another filter.
+  displacer->ConnectTo(source.GetPointer());
+
+  // Alternatively, you can manually connect inputs and outputs.
+  // The code below shows what the ConnectTo Methods does internally:
+  //
+  //for (unsigned int i = 0; i < source->GetNumberOfOutputs(); i++)
+  //{
+  //  displacer->SetInput(i, source->GetOutput(i));  //here we connect to the displacement filter
+  //}
 
 
   //*************************************************************************

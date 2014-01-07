@@ -83,6 +83,14 @@ namespace mitk
     */
     DataObjectPointerArraySizeType GetInputIndex(std::string navDataName);
 
+  /**
+  *\brief Connects the input of this filter to the outputs of the given NavigationDataSource
+  *
+  * This method does not support smartpointer. use FilterX.GetPointer() to retrieve a dumbpointer.
+  * E.g. calling Filter2->ConnectTo(Filter1) will result in a Pipeline where NavigationData flows from Filter1 to Filter2.
+  */
+  virtual void ConnectTo(mitk::NavigationDataSource * UpstreamFilter);
+
   protected:
     NavigationDataToNavigationDataFilter();
     virtual ~NavigationDataToNavigationDataFilter();

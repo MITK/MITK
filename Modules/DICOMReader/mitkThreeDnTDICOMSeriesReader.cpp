@@ -158,7 +158,7 @@ mitk::ThreeDnTDICOMSeriesReader
     static const DICOMTag tagImagerPixelSpacing(0x0018,0x1164);
     std::string pixelSpacingString = (gdcmFrameInfoList.front())->GetTagValueAsString( tagPixelSpacing );
     std::string imagerPixelSpacingString = gdcmFrameInfoList.front()->GetTagValueAsString( tagImagerPixelSpacing );
-    block.SetPixelSpacingInformation(pixelSpacingString, imagerPixelSpacingString);
+    block.SetPixelSpacingTagValues(pixelSpacingString, imagerPixelSpacingString);
 
     block.SetFlag("3D+t", true);
     block.SetIntProperty("timesteps", true3DnTBlocksTimeStepCount[o]);

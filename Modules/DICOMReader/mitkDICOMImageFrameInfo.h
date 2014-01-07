@@ -24,11 +24,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /**
+    \ingroup DICOMReaderModule
+    \brief Describes a frame within a DICOM file.
+
+    This is a minimal data structure to describe a single frame
+    (think of DICOM multi-frame classes) within a DICOM file.
+    To be used by DICOMFileReader%s and as part of DICOMImageBlockDescriptor.
+  */
   class DICOMReader_EXPORT DICOMImageFrameInfo : public itk::LightObject
   {
     public:
 
+      /// absolute filename
       std::string Filename;
+      /// frame number, starting with 0
       unsigned int FrameNo;
 
       mitkClassMacro( DICOMImageFrameInfo, itk::LightObject )

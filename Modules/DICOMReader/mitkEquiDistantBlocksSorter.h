@@ -29,9 +29,24 @@ namespace mitk
 {
 
 /**
-  \brief Split inputs into blocks of equidant slices.
+ \ingroup DICOMReaderModule
+ \brief Split inputs into blocks of equidistant slices (for use in DICOMITKSeriesGDCMReader).
 
-  This kind of splitting is used as a check before loading a DICOM series with ITK ImageSeriesReader.
+ Since inter-slice distance is not recorded in DICOM tags, we must ensure that blocks are made up of
+ slices that have equal distances between neighboring slices. This is especially necessary because itk::ImageSeriesReader
+ is later used for the actual loading, and this class expects (and does nocht verify) equal inter-slice distance (see \ref DICOMITKSeriesGDCMReader_ForcedConfiguration).
+
+ To achieve such grouping, the inter-slice distance is calculated from the first two different slice positions of a block.
+ Following slices are added to a block as long as they can be added by adding the calculated inter-slice distance to the
+ last slice of the block. Slices that do not fit into the expected distance pattern, are set aside for further analysis.
+ This grouping is done until each file has been assigned to a group.
+
+ Slices that share a position in space are also sorted into separate blocks during this step.
+ So the result of this step is a set of blocks that contain only slices with equal z spacing
+ and uniqe slices at each position.
+
+ Detailed implementation in AnalyzeFileForITKImageSeriesReaderSpacingAssumption().
+
 */
 class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
 {
@@ -42,8 +57,16 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
 
     virtual DICOMTagList GetTagsOfInterest();
 
+    /**
+      \brief Delegates work to AnalyzeFileForITKImageSeriesReaderSpacingAssumption().
+      AnalyzeFileForITKImageSeriesReaderSpacingAssumption() is called until it does not
+      create multiple blocks anymore.
+    */
     virtual void Sort();
 
+    /**
+      \brief Whether or not to accept images from a tilted acquisition in a single output group.
+    */
     void SetAcceptTilt(bool accept);
     const GantryTiltInformation GetTiltInformation(const std::string& filename);
 
@@ -52,9 +75,9 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
   protected:
 
     /**
-      \brief Return type of DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption.
+      \brief Return type of AnalyzeFileForITKImageSeriesReaderSpacingAssumption().
 
-      Class contains the grouping result of method DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption,
+      Class contains the grouping result of method AnalyzeFileForITKImageSeriesReaderSpacingAssumption(),
       which takes as input a number of images, which are all equally oriented and spatially sorted along their normal direction.
 
       The result contains of two blocks: a first one is the grouping result, all of those images can be loaded

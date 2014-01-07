@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+/**
+  \ingroup DICOMReaderModule
+*/
   class DICOMReader_EXPORT DICOMTagCache
   {
     public:

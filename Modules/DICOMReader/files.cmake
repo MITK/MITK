@@ -5,7 +5,6 @@ set(H_FILES
   mitkDICOMGDCMImageFrameInfo.h
   mitkDICOMITKSeriesGDCMReader.h
   mitkDICOMDatasetSorter.h
-  mitkDICOMFilenameSorter.h
   mitkDICOMEnums.h
   mitkDICOMTagBasedSorter.h
   mitkDICOMSortCriterion.h
@@ -24,7 +23,6 @@ set(CPP_FILES
   mitkDICOMImageBlockDescriptor.cpp
   mitkDICOMITKSeriesGDCMReader.cpp
   mitkDICOMDatasetSorter.cpp
-  mitkDICOMFilenameSorter.cpp
   mitkDICOMTagBasedSorter.cpp
   mitkDICOMGDCMImageFrameInfo.cpp
   mitkDICOMImageFrameInfo.cpp

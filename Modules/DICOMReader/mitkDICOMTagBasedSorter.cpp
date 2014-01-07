@@ -27,6 +27,7 @@ std::string
 mitk::DICOMTagBasedSorter::CutDecimalPlaces
 ::operator()(const std::string& input) const
 {
+  // TODO make this work with all kind of numbers and lists of numbers!!
   // be a bit tolerant for tags such as image orientation orienatation, let only the first few digits matter (http://bugs.mitk.org/show_bug.cgi?id=12263)
 
   bool conversionError(false);

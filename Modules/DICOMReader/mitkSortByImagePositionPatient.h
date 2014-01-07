@@ -24,6 +24,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+/**
+  \ingroup DICOMReaderModule
+  \brief Sort by distance of image origin along image normal (for use in DICOMTagBasedSorter).
+
+  To compare two datasets, their distance to the world origin is calculated.
+  This distance is calculated along the image normals because we do not know
+  the image orientation in advance, to any of the three coordinates could be identical for all datasets.
+
+  \note This class assumes that the datasets have identical orientations!
+*/
 class DICOMReader_EXPORT SortByImagePositionPatient : public DICOMSortCriterion
 {
   public:

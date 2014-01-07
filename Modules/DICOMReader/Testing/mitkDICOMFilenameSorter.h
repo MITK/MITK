@@ -23,9 +23,10 @@ namespace mitk
 {
 
 /**
+  \ingroup DICOMReaderModule
   \brief sort files based on filename (last resort).
 */
-class DICOMReader_EXPORT DICOMFilenameSorter : public DICOMDatasetSorter
+class DICOMFilenameSorter : public DICOMDatasetSorter
 {
   public:
 

@@ -24,8 +24,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-/*
-   \brief Extends sorting/grouping to ThreeD+t image blocks.
+/**
+   \ingroup DICOMReader
+   \brief Extends DICOMITKSeriesGDCMReader by sorting/grouping into 3D+t image blocks.
+
+   This class reuses the DICOMITKSeriesGDCMReader class and adds the option of
+   grouping 3D blocks at the same spatial position into a single block, which
+   is loaded as a 3D+t mitk::Image (compare to \ref DICOMITKSeriesGDCMReader_Condensing).
+
+   To group two output blocks into a single 3D+t block, this class tests a number
+   of requirements that the two blocks must fulfill:
+    - the <b>origin of the first slice</b> must be identical
+    - the <b>origin of the last slice</b> must be identical
+    - the <b>number of slices</b> must be identical
+
+   The output blocks described by DICOMImageBlockDescriptor will contains the following properties:
+    - \b "3D+t": true if the image is 3D+t
+    - \b "timesteps": number of timesteps of an image (only defined if "3D+t" is true)
 */
 class DICOMReader_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGDCMReader
 {
@@ -35,9 +50,11 @@ class DICOMReader_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGDCMRe
     mitkCloneMacro( ThreeDnTDICOMSeriesReader );
     itkNewMacro( ThreeDnTDICOMSeriesReader );
 
+    /// \brief Control whether 3D+t grouping shall actually be attempted.
     void SetGroup3DandT(bool on);
 
     // void AllocateOutputImages();
+    /// \brief Load via multiple calls to itk::ImageSeriesReader.
     virtual bool LoadImages();
 
 
@@ -49,6 +66,11 @@ class DICOMReader_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGDCMRe
     ThreeDnTDICOMSeriesReader(const ThreeDnTDICOMSeriesReader& other);
     ThreeDnTDICOMSeriesReader& operator=(const ThreeDnTDICOMSeriesReader& other);
 
+    /**
+      \brief Analyze the groups produced by DICOMITKSeriesGDCMReader for 3D+t properties.
+      This method tests whether some blocks are at the same spatial position and groups
+      them into single blocks.
+    */
     virtual SortingBlockList Condense3DBlocks(SortingBlockList&);
 
     bool LoadMitkImageForOutput(unsigned int o);

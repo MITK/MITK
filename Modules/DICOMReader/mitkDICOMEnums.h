@@ -27,19 +27,21 @@ namespace mitk
   typedef std::vector<bool> BoolList;
 
   /**
-   \brief How the mitk::Image spacing should be interpreted.
+   \ingroup DICOMReaderModule
+   \brief How the mitk::Image spacing should be interpreted (see mitk::DICOMFileReader).
 
    Compare DICOM PS 3.3 10.7 (Basic Pixel Spacing Calibration Macro).
  */
  typedef enum
   {
-    SpacingInPatient,  /// distances are mm within a patient
-    SpacingAtDetector, /// distances are mm at detector surface
-    SpacingUnknown     /// NO spacing information is present, we use (1,1) as default
+    SpacingInPatient,  ///< distances are mm within a patient
+    SpacingAtDetector, ///< distances are mm at detector surface
+    SpacingUnknown     ///< NO spacing information is present, we use (1,1) as default
   } PixelSpacingInterpretation;
 
   /**
-    \brief Describes how well the reader is tested for a certain file type.
+   \ingroup DICOMReaderModule
+    \brief Describes how well the reader is tested for a certain file type (see mitk::DICOMFileReader).
 
     Applications should not rely on the outcome for images which are reported
     Implemented or Unsupported.
@@ -49,15 +51,17 @@ namespace mitk
   */
   typedef enum
   {
-    SOPClassSupported,       /// loader code and tests are established
-    SOPClassPartlySupported, /// loader code and tests are establised for specific parts of a SOP Class
-    SOPClassImplemented,     /// loader code is implemented but not accompanied by tests
-    SOPClassUnsupported,     /// loader code is not known to work with this SOP Class
-    SOPClassUnknown,         /// loader did not yet inspect any images, unknown fitness
+    SOPClassSupported,       ///< loader code and tests are established
+    SOPClassPartlySupported, ///< loader code and tests are establised for specific parts of a SOP Class
+    SOPClassImplemented,     ///< loader code is implemented but not accompanied by tests
+    SOPClassUnsupported,     ///< loader code is not known to work with this SOP Class
+    SOPClassUnknown,         ///< loader did not yet inspect any images, unknown fitness
   } ReaderImplementationLevel;
 
 
+  /// Convert mitk::PixelSpacingInterpretation to a human readable string.
   std::string PixelSpacingInterpretationToString(const PixelSpacingInterpretation& value);
+  /// Convert mitk::ReaderImplementationLevel to a human readable string.
   std::string ReaderImplementationLevelToString( const ReaderImplementationLevel& enumValue );
 }
 

@@ -310,7 +310,7 @@ mitk::DICOMITKSeriesGDCMReader
     static const DICOMTag tagImagerPixelSpacing(0x0018,0x1164);
     std::string pixelSpacingString = (gdcmFrameInfoList.front())->GetTagValueAsString( tagPixelSpacing );
     std::string imagerPixelSpacingString = gdcmFrameInfoList.front()->GetTagValueAsString( tagImagerPixelSpacing );
-    block.SetPixelSpacingInformation(pixelSpacingString, imagerPixelSpacingString);
+    block.SetPixelSpacingTagValues(pixelSpacingString, imagerPixelSpacingString);
 
     static const DICOMTag tagSOPClassUID(0x0008,0x0016);
     std::string sopClassUID = (gdcmFrameInfoList.front())->GetTagValueAsString( tagSOPClassUID );
@@ -389,15 +389,15 @@ mitk::DICOMITKSeriesGDCMReader
 
 mitk::ReaderImplementationLevel
 mitk::DICOMITKSeriesGDCMReader
-::GetReaderImplementationLevel(const std::string uid) const
+::GetReaderImplementationLevel(const std::string sopClassUID) const
 {
-  if (uid.empty())
+  if (sopClassUID.empty())
   {
     return SOPClassUnknown;
   }
 
   gdcm::UIDs uidKnowledge;
-  uidKnowledge.SetFromUID( uid.c_str() );
+  uidKnowledge.SetFromUID( sopClassUID.c_str() );
 
   gdcm::UIDs::TSType gdcmType = uidKnowledge;
 
@@ -481,8 +481,8 @@ mitk::DICOMITKSeriesGDCMReader
 ::CanHandleFile(const std::string& itkNotUsed(filename))
 {
   return true; // can handle all
-  // peek into file, check DCM
-  // nice-to-have: check multi-framedness
+  // TODO peek into file, check DCM
+  // TODO nice-to-have: check multi-framedness
 }
 
 void
@@ -527,6 +527,7 @@ std::string
 mitk::DICOMITKSeriesGDCMReader
 ::GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const
 {
+  // TODO inefficient. if (m_InputFrameList.contains(frame)) return frame->GetTagValueAsString(tag);
   for(DICOMGDCMImageFrameList::const_iterator frameIter = m_InputFrameList.begin();
       frameIter != m_InputFrameList.end();
       ++frameIter)

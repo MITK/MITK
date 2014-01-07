@@ -29,7 +29,20 @@ namespace itk {
 
 namespace mitk {
   class NavigationDataSource;
+  class USControlInterfaceBMode;
+  class USControlInterfaceProbes;
+  class USControlInterfaceDoppler;
 
+  /**
+   * \brief Combination of USDevice and NavigationDataSource.
+   * This class can be used as any USDevice subclass. Additionally tracking data be
+   * retrieved from the NavigationDataSource returned by GetTrackingDevice().
+   *
+   * A calibration of the ultrasound image stream to the navigation datas can be set
+   * for the currently active zoom level (of the ultrasound device) by SetCalibration().
+   * The ultrasound images are transformed according to this calibration in the
+   * GenerateData() method.
+   */
   class MitkUSNavigation_EXPORT USCombinedModality : public USDevice
   {
   public:
@@ -39,7 +52,6 @@ namespace mitk {
     mitkNewMacro4Param(USCombinedModality, USDevice::Pointer, NavigationDataSource::Pointer, std::string, std::string);
 
     itkGetMacro(UltrasoundDevice, itk::SmartPointer<USDevice>);
-    //itkGetMacro(TrackingDevice, itk::SmartPointer<NavigationDataSource>);
 
     itkSetMacro(UltrasoundDevice, itk::SmartPointer<USDevice>);
     itkSetMacro(TrackingDevice, itk::SmartPointer<NavigationDataSource>);
@@ -71,17 +83,17 @@ namespace mitk {
     /**
     * \brief Wrapper for returning B mode control interface of the UltrasoundDevice.
     */
-    virtual USControlInterfaceBMode::Pointer GetControlInterfaceBMode();
+    virtual itk::SmartPointer<USControlInterfaceBMode> GetControlInterfaceBMode();
 
     /**
     * \brief Wrapper for returning probes control interface of the UltrasoundDevice.
     */
-    virtual USControlInterfaceProbes::Pointer GetControlInterfaceProbes();
+    virtual itk::SmartPointer<USControlInterfaceProbes> GetControlInterfaceProbes();
 
     /**
     * \brief Wrapper for returning doppler control interface of the UltrasoundDevice.
     */
-    virtual USControlInterfaceDoppler::Pointer GetControlInterfaceDoppler();
+    virtual itk::SmartPointer<USControlInterfaceDoppler> GetControlInterfaceDoppler();
 
     virtual mitk::NavigationDataSource::Pointer GetNavigationDataSource();
 
@@ -160,8 +172,8 @@ namespace mitk {
     itk::SmartPointer<NavigationDataSource>             m_TrackingDevice;
     std::map<std::string, AffineTransform3D::Pointer>   m_Calibrations;
 
-    mitk::NavigationDataSmoothingFilter::Pointer m_SmoothingFilter;
-    mitk::NavigationDataDelayFilter::Pointer m_DelayFilter;
+    mitk::NavigationDataSmoothingFilter::Pointer        m_SmoothingFilter;
+    mitk::NavigationDataDelayFilter::Pointer            m_DelayFilter;
 
   private:
     /**

@@ -24,8 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateSource.h"
 #include "mitkUSZonesInteractor.h"
 
-const char* QmitkUSZonesDataModel::DataNodePropertySize = "zone.size";
-
 QmitkUSZonesDataModel::QmitkUSZonesDataModel(QObject *parent) :
   QAbstractTableModel(parent),
   m_ListenerAddNode(this, &QmitkUSZonesDataModel::AddNode),
@@ -69,7 +67,7 @@ void QmitkUSZonesDataModel::AddNode(const mitk::DataNode* node)
 
   // do not add nodes, which aren't fully created yet
   bool boolValue;
-  if ( ! (node->GetBoolProperty("zone.created", boolValue) && boolValue) )
+  if ( ! (node->GetBoolProperty(mitk::USZonesInteractor::DATANODE_PROPERTY_CREATED, boolValue) && boolValue) )
   {
     return;
   }
@@ -121,7 +119,7 @@ void QmitkUSZonesDataModel::ChangeNode(const mitk::DataNode* node)
   {
     // if node was not added yet, but it's creation is finished -> add it now
     bool boolValue;
-    if ( node->GetBoolProperty("zone.created", boolValue) && boolValue )
+    if ( node->GetBoolProperty(mitk::USZonesInteractor::DATANODE_PROPERTY_CREATED, boolValue) && boolValue )
     {
       this->AddNode(node);
     }
@@ -209,8 +207,14 @@ QVariant QmitkUSZonesDataModel::data ( const QModelIndex& index, int role ) cons
     case 1:
     {
       float floatValue;
-      if ( curNode->GetFloatProperty(DataNodePropertySize, floatValue) ) { return static_cast<int>(floatValue); }
-      else { return QVariant(QVariant::Invalid); }
+      if ( curNode->GetFloatProperty(mitk::USZonesInteractor::DATANODE_PROPERTY_SIZE, floatValue) )
+      {
+          return static_cast<int>(floatValue);
+      }
+      else
+      {
+          return QVariant(QVariant::Invalid);
+      }
     }
     case 2:
     {
@@ -256,11 +260,11 @@ bool QmitkUSZonesDataModel::setData ( const QModelIndex & index, const QVariant 
     }
     case 1:
     {
-      curNode->SetFloatProperty(DataNodePropertySize, value.toFloat());
+      curNode->SetFloatProperty(mitk::USZonesInteractor::DATANODE_PROPERTY_SIZE, value.toFloat());
 
       if (curNode->GetData() != 0)
       {
-        curNode->SetFloatProperty("zone.size", value.toFloat());
+        curNode->SetFloatProperty(mitk::USZonesInteractor::DATANODE_PROPERTY_SIZE, value.toFloat());
         mitk::USZonesInteractor::UpdateSurface(curNode);
       }
 

@@ -26,10 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkUSExports.h>
 #include "mitkUSImageSource.h"
 
-#include "mitkUSControlInterfaceProbes.h"
-#include "mitkUSControlInterfaceBMode.h"
-#include "mitkUSControlInterfaceDoppler.h"
-
 // MITK
 #include <mitkCommon.h>
 #include <mitkImageSource.h>
@@ -43,7 +39,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceRegistration.h>
 #include <usServiceProperties.h>
 
+namespace itk {
+template<class T> class SmartPointer;
+}
+
 namespace mitk {
+
+class USAbstractControlInterface;
+class USControlInterfaceBMode;
+class USControlInterfaceProbes;
+class USControlInterfaceDoppler;
+
   /**
   * \brief A device holds information about it's model, make and the connected probes. It is the
   * common super class for all devices and acts as an image source for mitkUSImages. It is the base class
@@ -99,7 +105,7 @@ namespace mitk {
     *
     * \return null pointer
     */
-    virtual USAbstractControlInterface::Pointer   GetControlInterfaceCustom();
+    virtual itk::SmartPointer<USAbstractControlInterface>   GetControlInterfaceCustom();
 
     /**
     * \brief Default getter for the b mode control interface.
@@ -108,7 +114,7 @@ namespace mitk {
     *
     * \return null pointer
     */
-    virtual USControlInterfaceBMode::Pointer      GetControlInterfaceBMode();
+    virtual itk::SmartPointer<USControlInterfaceBMode>      GetControlInterfaceBMode();
 
     /**
     * \brief Default getter for the probes control interface.
@@ -117,7 +123,7 @@ namespace mitk {
     *
     * \return null pointer
     */
-    virtual USControlInterfaceProbes::Pointer     GetControlInterfaceProbes();
+    virtual itk::SmartPointer<USControlInterfaceProbes>     GetControlInterfaceProbes();
 
     /**
     * \brief Default getter for the doppler control interface.
@@ -126,7 +132,7 @@ namespace mitk {
     *
     * \return null pointer
     */
-    virtual USControlInterfaceDoppler::Pointer    GetControlInterfaceDoppler();
+    virtual itk::SmartPointer<USControlInterfaceDoppler>    GetControlInterfaceDoppler();
 
     /**
     * \brief Changes device state to mitk::USDevice::State_Initialized.

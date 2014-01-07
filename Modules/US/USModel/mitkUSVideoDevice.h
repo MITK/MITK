@@ -29,6 +29,8 @@ namespace itk {
 
 namespace mitk {
   class USVideoDeviceCustomControls;
+  class USAbstractControlInterface;
+
   /**
   * \brief A mitk::USVideoDevice is the common class for video only devices.
   * They capture video input either from a file or from a device and
@@ -62,7 +64,7 @@ namespace mitk {
     *
     * \return custom control interface of the video device
     */
-    virtual USAbstractControlInterface::Pointer GetControlInterfaceCustom();
+    virtual itk::SmartPointer<USAbstractControlInterface> GetControlInterfaceCustom();
 
     /**
     * \brief Remove this device from the micro service.

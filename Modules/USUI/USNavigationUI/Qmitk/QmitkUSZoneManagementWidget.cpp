@@ -2,13 +2,13 @@
 #include "ui_QmitkUSZoneManagementWidget.h"
 
 #include "QmitkUSZonesDataModel.h"
-#include "QmitkUSZoneManagementSpinBoxDelegate.h"
 #include "QmitkUSZoneManagementComboBoxDelegate.h"
 
 #include "mitkUSZonesInteractor.h"
 #include "usModuleRegistry.h"
 #include "usModule.h"
 #include "mitkGlobalInteraction.h"
+#include "mitkSurface.h"
 
 #include <QLatin1Char>
 
@@ -21,7 +21,6 @@ QmitkUSZoneManagementWidget::QmitkUSZoneManagementWidget(QWidget *parent) :
   ui->setupUi(this);
 
   ui->CurrentZonesTable->setModel(m_ZonesDataModel);
-  ui->CurrentZonesTable->setItemDelegateForColumn(1, new QmitkUSZoneManagementSpinBoxDelegate(this));
   ui->CurrentZonesTable->setItemDelegateForColumn(2, new QmitkUSZoneManagementComboBoxDelegate(this));
 
   connect (ui->CurrentZonesTable->selectionModel(), SIGNAL(selectionChanged(const QItemSelection& , const QItemSelection&)),
@@ -67,6 +66,23 @@ void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer data
   }
 
   baseNode->SetData(mitk::Surface::New());
+
+  m_ZonesDataModel->SetDataStorage(dataStorage, baseNode);
+
+  m_BaseNode = baseNode;
+  m_DataStorage = dataStorage;
+}
+
+void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::DataNode::Pointer baseNode)
+{
+  if ( dataStorage.IsNull() || baseNode.IsNull() )
+  {
+    MITK_ERROR("QWidget")("QmitkUSZoneManagementWidget")
+        << "DataStorage and BaseNode must not be null.";
+    mitkThrow() << "DataStorage and BaseNode must not be null.";
+  }
+
+  if ( ! baseNode->GetData() ) { baseNode->SetData(mitk::Surface::New()); }
 
   m_ZonesDataModel->SetDataStorage(dataStorage, baseNode);
 
@@ -183,7 +199,7 @@ void QmitkUSZoneManagementWidget::OnRowInsertion( const QModelIndex & /*parent*/
   emit ZoneAdded();
 }
 
-void QmitkUSZoneManagementWidget::OnDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
+void QmitkUSZoneManagementWidget::OnDataChanged(const QModelIndex& topLeft, const QModelIndex& /*bottomRight*/)
 {
   QItemSelectionModel* selection = ui->CurrentZonesTable->selectionModel();
   if ( ! selection->hasSelection() || selection->selectedRows().size() < 1 ) { return; }

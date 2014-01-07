@@ -16,7 +16,7 @@ QmitkUSCombinedModalityCreationWidget::QmitkUSCombinedModalityCreationWidget(QWi
   connect( ui->trackingDevicesServiceList, SIGNAL( ServiceSelectionChanged(us::ServiceReferenceU) ), this, SLOT(OnSelectedUltrasoundOrTrackingDevice()) );
 
   connect( ui->createButton, SIGNAL(clicked()), this, SLOT(OnCreation()) );
-  connect( ui->cancelButton, SIGNAL(clicked()), this, SLOT(OnAbortion()) );
+  connect( ui->cancelButton, SIGNAL(clicked()), this, SIGNAL(SignalAborted()) );
 }
 
 QmitkUSCombinedModalityCreationWidget::~QmitkUSCombinedModalityCreationWidget()
@@ -29,7 +29,7 @@ void QmitkUSCombinedModalityCreationWidget::OnCreation()
   mitk::USDevice::Pointer usDevice = ui->usDevicesServiceList->GetSelectedService<mitk::USDevice>();
   if (usDevice.IsNull())
   {
-      MITK_WARN << "No US Device selected for creation of Combined Modality.";
+      MITK_WARN << "No Ultrasound Device selected for creation of Combined Modality.";
       return;
   }
 
@@ -50,11 +50,6 @@ void QmitkUSCombinedModalityCreationWidget::OnCreation()
 
   emit SignalCreated();
   emit SignalCreated(combinedModality);
-}
-
-void QmitkUSCombinedModalityCreationWidget::OnAbortion()
-{
-  emit SignalAborted();
 }
 
 void QmitkUSCombinedModalityCreationWidget::OnSelectedUltrasoundOrTrackingDevice()

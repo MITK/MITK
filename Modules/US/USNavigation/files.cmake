@@ -1,7 +1,7 @@
 SET(CPP_FILES
-  mitkUSNavigationActivator.cpp
   mitkUSCombinedModality.cpp
   mitkUSZonesInteractor.cpp
+  mitkUSPointMarkInteractor.cpp
 
   Filter/mitkNavigationDataPassThroughFilter.cpp
   Filter/mitkNeedleProjectionFilter.cpp
@@ -11,4 +11,5 @@ SET(CPP_FILES
 SET(RESOURCE_FILES
   Interactions/USZoneInteractions.xml
   Interactions/USZoneInteractionsHold.xml
+  Interactions/USPointMarkInteractions.xml
 )

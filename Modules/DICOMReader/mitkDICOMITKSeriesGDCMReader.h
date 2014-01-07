@@ -53,6 +53,8 @@ namespace mitk
    - \ref DICOMITKSeriesGDCMReader_GantryTilt
    - \ref DICOMITKSeriesGDCMReader_Testing
    - \ref DICOMITKSeriesGDCMReader_Internals
+     - \ref DICOMITKSeriesGDCMReader_RelatedClasses
+     - \ref DICOMITKSeriesGDCMReader_TiltInternals
      - \ref DICOMITKSeriesGDCMReader_Condensing
 
 
@@ -133,27 +135,7 @@ namespace mitk
 
    As such gemetries do not "work" in conjunction with mitk::Image, DICOMITKSeriesGDCMReader is able to perform a correction for such series.
    Whether or not such correction should be attempted is controlled by SetFixTiltByShearing(), the default being correction.
-
-   The correction algorithm fixes two errors introduced by ITK's ImageSeriesReader:
-    - the plane shift that is ignored by ITK's reader is recreated by applying a shearing transformation using itk::ResampleFilter.
-    - the spacing is corrected (it is calculated by ITK's reader from the distance between two origins, which is NOT the slice distance in this special case)
-
-   Both errors are introduced in
-   itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
-
-   For the correction, we examine two consecutive slices of a series, both described as a pair (origin/orientation):
-    - we calculate if the first origin is on a line along the normal of the second slice
-      - if this is not the case, the geometry will not fit a normal mitk::Image/mitk::Geometry3D
-      - we then project the second origin into the first slice's coordinate system to quantify the shift
-      - both is done in class GantryTiltInformation with quite some comments.
-
-   The geometry of image stacks with tilted geometries is illustrated below:
-    - green: the DICOM images as described by their tags: origin as a point with the line indicating the orientation
-    - red: the output of ITK ImageSeriesReader: wrong, larger spacing, no tilt
-    - blue: how much a shear must correct
-
-    \image html tilt-correction.jpg
-
+   For details, see "Internals" below.
   \section DICOMITKSeriesGDCMReader_Testing Testing
 
   A number of tests is implemented in module DICOMTesting, which is documented at \ref DICOMTesting.
@@ -168,6 +150,34 @@ namespace mitk
 
   The intermediate result of all the sorting efforts is held in m_SortingResultInProgress,
   which is modified through InternalExecuteSortingStep().
+
+  \subsection DICOMITKSeriesGDCMReader_RelatedClasses Overview of related classes
+
+  The following diagram gives an overview of the related classes:
+
+  \image html implementeditkseriesgdcmreader.jpg
+
+  \subsection DICOMITKSeriesGDCMReader_TiltInternals Details about the tilt correction
+
+  The gantry tilt "correction" algorithm fixes two errors introduced by ITK's ImageSeriesReader:
+    - the plane shift that is ignored by ITK's reader is recreated by applying a shearing transformation using itk::ResampleFilter.
+    - the spacing is corrected (it is calculated by ITK's reader from the distance between two origins, which is NOT the slice distance in this special case)
+
+  Both errors are introduced in
+  itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
+
+  For the correction, we examine two consecutive slices of a series, both described as a pair (origin/orientation):
+    - we calculate if the first origin is on a line along the normal of the second slice
+      - if this is not the case, the geometry will not fit a normal mitk::Image/mitk::Geometry3D
+      - we then project the second origin into the first slice's coordinate system to quantify the shift
+      - both is done in class GantryTiltInformation with quite some comments.
+
+  The geometry of image stacks with tilted geometries is illustrated below:
+    - green: the DICOM images as described by their tags: origin as a point with the line indicating the orientation
+    - red: the output of ITK ImageSeriesReader: wrong, larger spacing, no tilt
+    - blue: how much a shear must correct
+
+  \image html tilt-correction.jpg
 
   \subsection DICOMITKSeriesGDCMReader_Condensing Sub-classes can condense multiple blocks into a single larger block
 

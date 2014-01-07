@@ -19,6 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataSource.h"
 #include "mitkImageReadAccessor.h"
 
+// US Control Interfaces
+#include "mitkUSControlInterfaceProbes.h"
+#include "mitkUSControlInterfaceBMode.h"
+#include "mitkUSControlInterfaceDoppler.h"
+
 //TempIncludes
 #include <tinyxml.h>
 

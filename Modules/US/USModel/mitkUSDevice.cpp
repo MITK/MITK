@@ -17,7 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSDevice.h"
 #include "mitkImageReadAccessor.h"
 
-//Microservices
+// US Control Interfaces
+#include "mitkUSControlInterfaceProbes.h"
+#include "mitkUSControlInterfaceBMode.h"
+#include "mitkUSControlInterfaceDoppler.h"
+
+// Microservices
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usServiceProperties.h>

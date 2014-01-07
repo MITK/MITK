@@ -50,6 +50,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
       GCC_DEFAULT_VISIBILITY # do not use gcc visibility flags - all symbols will be exported
       NO_INIT                # do not create CppMicroServices initialization code
       WARNINGS_AS_ERRORS     # treat all compiler warnings as errors
+      EXECUTABLE             # create an executable; do not use directly, use mitk_create_executable() instead
      )
 
   MACRO_PARSE_ARGUMENTS(MODULE "${_macro_params}" "${_macro_options}" ${ARGN})
@@ -202,7 +203,9 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
         # Add the module specific include dirs
         include_directories(${MODULE_INCLUDE_DIRS} ${MODULE_INTERNAL_INCLUDE_DIRS})
 
-        _MITK_CREATE_MODULE_CONF()
+        if(NOT MODULE_EXECUTABLE)
+          _MITK_CREATE_MODULE_CONF()
+        endif()
         if(NOT MODULE_EXPORT_DEFINE)
           set(MODULE_EXPORT_DEFINE ${MODULE_NAME}_EXPORT)
         endif(NOT MODULE_EXPORT_DEFINE)
@@ -215,7 +218,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
         endif(MITK_GENERATE_MODULE_DOT)
 
         # ok, now create the module itself
-        include(files.cmake)
+        include(${CMAKE_CURRENT_SOURCE_DIR}/files.cmake)
 
         set(module_c_flags )
         set(module_c_flags_debug )
@@ -305,12 +308,16 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           find_package(CppMicroServices QUIET NO_MODULE REQUIRED)
           set(MODULE_LIBNAME ${MODULE_PROVIDES})
 
-          usFunctionGenerateModuleInit(CPP_FILES
-                                       NAME ${MODULE_NAME}
-                                       LIBRARY_NAME ${MODULE_LIBNAME}
-                                       DEPENDS ${MODULE_DEPENDS} ${MODULE_DEPENDS_INTERNAL} ${MODULE_PACKAGE_DEPENDS}
-                                       #VERSION ${MODULE_VERSION}
-                                      )
+          if(MODULE_EXECUTABLE)
+            usFunctionGenerateExecutableInit(CPP_FILES
+                                             IDENTIFIER ${MODULE_NAME}
+                                            )
+          else()
+            usFunctionGenerateModuleInit(CPP_FILES
+                                         NAME ${MODULE_NAME}
+                                         LIBRARY_NAME ${MODULE_LIBNAME}
+                                        )
+          endif()
 
           if(RESOURCE_FILES)
             set(res_dir Resources)
@@ -399,9 +406,15 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
             endif()
           endif()
 
-          add_library(${MODULE_PROVIDES} ${_STATIC}
-                      ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
-                      ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+          if(MODULE_EXECUTABLE)
+            add_executable(${MODULE_PROVIDES}
+                           ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
+                           ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+          else()
+            add_library(${MODULE_PROVIDES} ${_STATIC}
+                        ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
+                        ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+          endif()
 
           if(MODULE_TARGET_DEPENDS)
             add_dependencies(${MODULE_PROVIDES} ${MODULE_TARGET_DEPENDS})
@@ -496,12 +509,12 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           endif()
         endif()
 
-      endif(MODULE_IS_ENABLED)
-    endif(_MISSING_DEP)
-  endif(NOT MODULE_IS_EXCLUDED AND NOT (MODULE_QT_MODULE AND NOT MITK_USE_QT))
+      endif()
+    endif()
+  endif()
 
-  if(NOT MODULE_IS_ENABLED)
+  if(NOT MODULE_IS_ENABLED AND NOT MODULE_EXECUTABLE)
     _MITK_CREATE_MODULE_CONF()
-  endif(NOT MODULE_IS_ENABLED)
+  endif()
 
 endmacro(MITK_CREATE_MODULE)

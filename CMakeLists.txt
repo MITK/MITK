@@ -92,8 +92,10 @@ endforeach()
 # Update CMake module path
 #------------------------------------------------------------------------------
 
+set(MITK_CMAKE_DIR ${MITK_SOURCE_DIR}/CMake)
+
 set(CMAKE_MODULE_PATH
-  ${MITK_SOURCE_DIR}/CMake
+  ${MITK_CMAKE_DIR}
   ${CMAKE_MODULE_PATH}
   )
 
@@ -377,6 +379,7 @@ include(mitkFunctionCompileSnippets)
 include(mitkFunctionUseModules)
 include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
+include(mitkMacroCreateExecutable)
 include(mitkMacroCheckModule)
 include(mitkMacroCreateModuleTests)
 include(mitkFunctionAddCustomModuleTest)
@@ -708,8 +711,6 @@ endforeach()
 # Add subdirectories
 #-----------------------------------------------------------------------------
 
-link_directories(${MITK_LINK_DIRECTORIES})
-
 add_subdirectory(Core)
 
 add_subdirectory(Modules)
@@ -886,11 +887,6 @@ include(mitkInstallRules)
 #-----------------------------------------------------------------------------
 # Last configuration steps
 #-----------------------------------------------------------------------------
-
-# This is for installation support of external projects depending on
-# MITK plugins and modules. The export file should not be used for linking to MITK
-# libraries without using LINK_DIRECTORIES, since the exports are incomplete
-# yet (depending libraries are not exported).
 
 set(MITK_EXPORTS_FILE "${MITK_BINARY_DIR}/MitkExports.cmake")
 file(REMOVE ${MITK_EXPORTS_FILE})

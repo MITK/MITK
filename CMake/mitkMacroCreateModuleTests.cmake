@@ -23,6 +23,13 @@ macro(MITK_CREATE_MODULE_TESTS)
       QT4_WRAP_CPP(MODULE_TEST_GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
     endif(DEFINED MOC_H_FILES)
 
+    # This is a workaround until GDCM provides a proper GDCMExports.cmake
+    # file where the imported GDCM targets provide their absolute path.
+    include(${MITK_MODULES_PACKAGE_DEPENDS_DIR}/MITK_ITK_Config.cmake)
+    if(GDCM_LIBRARY_DIRS)
+      link_directories(${GDCM_LIBRARY_DIRS})
+    endif()
+
     if (MODULE_TEST_EXTRA_DEPENDS)
       MITK_USE_MODULE("${MODULE_TEST_EXTRA_DEPENDS}")
       include_directories(${ALL_INCLUDE_DIRECTORIES})

@@ -20,6 +20,20 @@
 #!     [WARNINGS_AS_ERRORS]
 #! \endcode
 #!
+#! A modules source files are specified in a separate CMake file usually
+#! called files.cmake, located in the module root directory. The
+#! mitk_create_module() macro evaluates the following CMake variables
+#! from the files.cmake file:
+#!
+#! - CPP_FILES A list of .cpp files
+#! - H_FILES A list of .h files without a corresponding .cpp file
+#! - TXX_FILES A list of .txx files
+#! - RESOURCE_FILES A list of files (resources) which are embedded into the module
+#! - MOC_H_FILES A list of Qt header files which should be processed by the MOC
+#! - UI_FILES A list of .ui Qt UI files
+#! - QRC_FILES A list of .qrc Qt resource files
+#! - DOX_FILES A list of .dox Doxygen files
+#!
 #! \param MODULE_NAME_IN The name for the new module
 #! \param HEADERS_ONLY specify this if the modules just contains header files.
 ##################################################################
@@ -38,6 +52,8 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
       AUTOLOAD_WITH          # a module target name identifying the module which will trigger the
                              # automatic loading of this module
       ADDITIONAL_LIBS        # list of addidtional libraries linked to this module
+      FILES_CMAKE            # file name of a CMake file setting source list variables
+                             # (defaults to files.cmake)
       GENERATED_CPP          # not used (?)
       QT4_MODULES            # the module depends on a given list of Qt 4 modules
       QT5_MODULES            # the module depends on a given list of Qt 5 modules
@@ -56,6 +72,13 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
   MACRO_PARSE_ARGUMENTS(MODULE "${_macro_params}" "${_macro_options}" ${ARGN})
 
   set(MODULE_NAME ${MODULE_NAME_IN})
+
+  if(NOT MODULE_FILES_CMAKE)
+    set(MODULE_FILES_CMAKE files.cmake)
+  endif()
+  if(NOT IS_ABSOLUTE ${MODULE_FILES_CMAKE})
+    set(MODULE_FILES_CMAKE ${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_FILES_CMAKE})
+  endif()
 
   if (MODULE_QT_MODULE)
     message(WARNING "QT_MODULE keyword is deprecated (in module ${MODULE_NAME}). Please replace QT_MODULE by the more specific QT4_MODULES / QT5_MODULES!")
@@ -174,6 +197,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
         set(QRC_FILES )
 
         # clear other variables
+        set(Q${KITNAME}_GENERATED_CPP )
         set(Q${KITNAME}_GENERATED_MOC_CPP )
         set(Q${KITNAME}_GENERATED_QRC_CPP )
         set(Q${KITNAME}_GENERATED_UI_CPP )
@@ -218,7 +242,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
         endif(MITK_GENERATE_MODULE_DOT)
 
         # ok, now create the module itself
-        include(${CMAKE_CURRENT_SOURCE_DIR}/files.cmake)
+        include(${MODULE_FILES_CMAKE})
 
         set(module_c_flags )
         set(module_c_flags_debug )

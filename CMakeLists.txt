@@ -540,14 +540,14 @@ if(NOT MSVC_VERSION)
   endforeach()
 endif()
 
+mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" MITK_SHARED_LINKER_FLAGS)
+mitkFunctionCheckCompilerFlags("-Wl,--as-needed" MITK_SHARED_LINKER_FLAGS)
+
+if(MITK_USE_C++0x)
+  mitkFunctionCheckCompilerFlags("-std=c++0x" MITK_CXX_FLAGS)
+endif()
+
 if(CMAKE_COMPILER_IS_GNUCXX)
-
-  mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" MITK_SHARED_LINKER_FLAGS)
-  mitkFunctionCheckCompilerFlags("-Wl,--as-needed" MITK_SHARED_LINKER_FLAGS)
-
-  if(MITK_USE_C++0x)
-    mitkFunctionCheckCompilerFlags("-std=c++0x" MITK_CXX_FLAGS)
-  endif()
 
   mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
   # With older version of gcc supporting the flag -fstack-protector-all, an extra dependency to libssp.so

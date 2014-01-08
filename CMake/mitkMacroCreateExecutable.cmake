@@ -66,6 +66,11 @@ macro(mitk_create_executable EXECUTABLE_NAME)
                      ${_EXEC_OPTIONS}
                     )
 
+  # Add meta dependencies (e.g. on auto-load modules from depending modules)
+  if(ALL_META_DEPENDENCIES)
+    add_dependencies(${EXEC_NAME} ${ALL_META_DEPENDENCIES})
+  endif()
+
   # Create batch files for Windows platforms
   if(WIN32)
     set(_batch_file_in "${CMAKE_CURRENT_SOURCE_DIR}/${EXEC_NAME}.bat.in")

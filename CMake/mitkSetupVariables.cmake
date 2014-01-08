@@ -157,7 +157,6 @@ set(VTK_FOR_MITK_LIBRARIES
     vtkRenderingVolume
     vtkRenderingVolumeAMR
     vtkRenderingVolumeOpenGL
-    vtkGUISupportQtOpenGL
     vtksqlite
     vtksys
     vtkTestingRendering
@@ -167,14 +166,20 @@ set(VTK_FOR_MITK_LIBRARIES
     vtkViewsGeovis
     vtkViewsInfovis
     vtkzlib
-    vtkGUISupportQt
-    vtkGUISupportQtWebkit
     ${VTK_JPEG_LIBRARIES}
     ${VTK_PNG_LIBRARIES}
     ${VTK_ZLIB_LIBRARIES}
     ${VTK_EXPAT_LIBRARIES}
     ${VTK_FREETYPE_LIBRARIES}
    )
+  if(MITK_USE_Qt4)
+    list(APPEND VTK_FOR_MITK_LIBRARIES
+      vtkGUISupportQt
+      vtkGUISupportQtOpenGL
+      vtkGUISupportQtWebkit
+    )
+  endif()
+
 # TODO: maybe solve this with lib depends mechanism of CMake
 set(UTIL_FOR_MITK_LIBRARIES mbilog)
 set(LIBRARIES_FOR_MITK_CORE

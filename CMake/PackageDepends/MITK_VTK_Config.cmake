@@ -112,7 +112,6 @@ else()
     vtkRenderingVolume
     vtkRenderingVolumeAMR
     vtkRenderingVolumeOpenGL
-    vtkGUISupportQtOpenGL
     vtksqlite
     vtksys
     vtkTestingRendering
@@ -122,12 +121,17 @@ else()
     vtkViewsGeovis
     vtkViewsInfovis
     vtkzlib
-    vtkGUISupportQt
-    vtkGUISupportQtWebkit
     ${VTK_JPEG_LIBRARIES}
     ${VTK_PNG_LIBRARIES}
     ${VTK_ZLIB_LIBRARIES}
     ${VTK_EXPAT_LIBRARIES}
     ${VTK_FREETYPE_LIBRARIES}
     )
+  if(MITK_USE_Qt4)
+    list(APPEND ALL_LIBRARIES
+      vtkGUISupportQt
+      vtkGUISupportQtOpenGL
+      vtkGUISupportQtWebkit
+    )
+  endif()
 endif()

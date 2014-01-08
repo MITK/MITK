@@ -55,6 +55,7 @@ if(NOT DEFINED VTK_DIR)
           -DVTK_USE_QVTK_QTOPENGL:BOOL=OFF
           -DVTK_USE_QT:BOOL=ON
           -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+          -DVTK_Group_Qt:BOOL=ON
        )
      endif()
   endif()
@@ -73,8 +74,6 @@ if(NOT DEFINED VTK_DIR)
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}
-        -DVTK_GROUP_QT:BOOL=ON
-        -DVTK_Group_Qt:BOOL=ON
         -DVTK_WRAP_TCL:BOOL=OFF
         -DVTK_WRAP_PYTHON:BOOL=OFF
         -DVTK_WRAP_JAVA:BOOL=OFF

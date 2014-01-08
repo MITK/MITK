@@ -29,34 +29,70 @@ namespace mitk
 
 // TODO Philips3D!
 // TODO http://bugs.mitk.org/show_bug.cgi?id=11572 ?
+
+/**
+  \ingroup DICOMReaderModule
+  \brief Interface for DICOM readers that produce mitk::Images.
+
+  As described in \ref DICOMReaderModule, this class structures
+  the reader's part in the process of analyzing a set of DICOM files
+  and selecting the most appropriate reader.
+
+  The overall loading process is as follows:
+   - <b>Define input files</b>: a list of absolute filenames
+   - <b>Analyze the potential output</b>: see what can be made of the input files, describe with DICOMImageBlockDescriptor%s
+   - <b>Load pixel data</b>: an application will usually analyze files using multiple readers and only load with a single reader
+
+  Sub-classes are required to implement a number of methods that
+  reflect above structure. See mitk::DICOMITKSeriesGDCMReader for
+  an example.
+
+  To help applications in describing different readers to the user, each reader
+  brings a number of methods that describe its configuration/specifics by
+  means of a short label and a (longer) description.
+*/
 class DICOMReader_EXPORT DICOMFileReader : public itk::LightObject
 {
   public:
 
-    enum LoadingConfidence
-    {
-      NoSupport = 0,
-      FullSupport = 1,
-      PartialSupport = 2,
-    };
+    mitkClassMacro( DICOMFileReader, itk::LightObject );
 
-    mitkClassMacro( DICOMFileReader, itk::LightObject )
-
-    void SetInputFiles(StringList filenames);
-    const StringList& GetInputFiles() const;
-
-    virtual void AnalyzeInputFiles() = 0;
-    unsigned int GetNumberOfOutputs() const;
-    const DICOMImageBlockDescriptor& GetOutput(unsigned int index) const;
-
-    // void AllocateOutputImages();
-    virtual bool LoadImages() = 0;
-
+    /// Test whether a file is DICOM at all
+    static bool IsDICOM(const std::string& filename);
+    /// Indicate whether this reader can handle given file
     virtual bool CanHandleFile(const std::string& filename) = 0;
 
-    void PrintOutputs(std::ostream& os, bool filenameDetails = false);
+    /// This input files
+    void SetInputFiles(StringList filenames);
+    /// This input files
+    const StringList& GetInputFiles() const;
 
-    static bool IsDICOM(const std::string& filename);
+    /// Analyze input files
+    virtual void AnalyzeInputFiles() = 0;
+
+    /// Number of outputs, only meaningful after calling AnalyzeInputFiles()
+    unsigned int GetNumberOfOutputs() const;
+    /// Individual outputs, only meaningful after calling AnalyzeInputFiles(). \throws std::invalid_argument
+    const DICOMImageBlockDescriptor& GetOutput(unsigned int index) const;
+
+    // void AllocateOutputImages(); TODO for later implementation of slice-by-slice loading
+
+    /// Load the mitk::Image%s in our outputs, the DICOMImageBlockDescriptor. To be called only after AnalyzeInputFiles(). Take care of potential exceptions!
+    virtual bool LoadImages() = 0;
+
+    /// Short label/name to describe this reader
+    void SetConfigurationLabel(const std::string&);
+    /// Short label/name to describe this reader
+    std::string GetConfigurationLabel();
+    /// One-sentence description of the reader's loading "strategy"
+    void SetConfigurationDescription(const std::string&);
+    /// One-sentence description of the reader's loading "strategy"
+    std::string GetConfigurationDescription();
+
+    /// Print configuration description to given stream, for human reader
+    void PrintConfiguration(std::ostream& os) const;
+    /// Print output description to given stream, for human reader
+    void PrintOutputs(std::ostream& os, bool filenameDetails = false) const;
 
   protected:
 
@@ -70,12 +106,19 @@ class DICOMReader_EXPORT DICOMFileReader : public itk::LightObject
     void SetNumberOfOutputs(unsigned int numberOfOutputs);
     void SetOutput(unsigned int index, const DICOMImageBlockDescriptor& output);
 
+    /// non-const access to the DICOMImageBlockDescriptor
     DICOMImageBlockDescriptor& InternalGetOutput(unsigned int index);
+
+    /// Configuration description for human reader, to be implemented by sub-classes
+    virtual void InternalPrintConfiguration(std::ostream& os) const = 0;
 
   private:
 
     StringList m_InputFilenames;
     std::vector< DICOMImageBlockDescriptor > m_Outputs;
+
+    std::string m_ConfigLabel;
+    std::string m_ConfigDescription;
 };
 
 }

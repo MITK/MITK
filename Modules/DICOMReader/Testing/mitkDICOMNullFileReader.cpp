@@ -44,6 +44,13 @@ mitk::DICOMNullFileReader
   return *this;
 }
 
+void
+mitk::DICOMNullFileReader
+::InternalPrintConfiguration(std::ostream& os) const
+{
+  os << "Nothing to configure" << std::endl;
+}
+
 
 void
 mitk::DICOMNullFileReader

@@ -8,4 +8,5 @@ set(MODULE_CUSTOM_TESTS
 
 set(TEST_CPP_FILES
   mitkDICOMNullFileReader.cpp
+  mitkDICOMFilenameSorter.cpp
 )

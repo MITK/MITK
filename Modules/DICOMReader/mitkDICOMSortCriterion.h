@@ -25,16 +25,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+/**
+  \ingroup DICOMReaderModule
+  \brief A tag based sorting criterion for use in DICOMTagBasedSorter.
+
+  This class is used within std::sort (see DICOMTagBasedSorter::Sort())
+  and has to answer a simple question by implementing IsLeftBeforeRight().
+  Each time IsLeftBeforeRight() is called, the method should return whether
+  the left dataset should be sorted before the right dataset.
+
+  Because there are identical tags values quite oftenly, a DICOMSortCriterion
+  will always hold a secondary DICOMSortCriterion. In cases of equal tag
+  values, the decision is refered to the secondary criterion.
+*/
 class DICOMReader_EXPORT DICOMSortCriterion : public itk::LightObject
 {
   public:
 
     mitkClassMacro( DICOMSortCriterion, itk::LightObject );
 
+    /// \brief Tags used for comparison (includes seconary criteria).
     DICOMTagList GetAllTagsOfInterest() const;
+    /// \brief Tags used for comparison.
     virtual DICOMTagList GetTagsOfInterest() const = 0;
 
+    /// \brief Answer the sorting question.
     virtual bool IsLeftBeforeRight(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right) const = 0;
+
+    /// \brief The fallback criterion.
+    DICOMSortCriterion::ConstPointer GetSecondaryCriterion() const;
+
+    /// brief describe this class in given stream.
+    virtual void Print(std::ostream& os) const = 0;
 
   protected:
 

@@ -33,6 +33,8 @@ mitk::DICOMFileReader
 ::DICOMFileReader(const DICOMFileReader& other )
 :itk::LightObject()
 ,m_Outputs( other.m_Outputs )
+,m_ConfigLabel( other.m_ConfigLabel )
+,m_ConfigDescription( other.m_ConfigDescription )
 {
 }
 
@@ -44,8 +46,38 @@ mitk::DICOMFileReader
   {
     m_InputFilenames = other.m_InputFilenames;
     m_Outputs = other.m_Outputs;
+    m_ConfigLabel = other.m_ConfigLabel;
+    m_ConfigDescription = other.m_ConfigDescription;
   }
   return *this;
+}
+
+void
+mitk::DICOMFileReader
+::SetConfigurationLabel(const std::string& label)
+{
+  m_ConfigLabel = label;
+}
+
+std::string
+mitk::DICOMFileReader
+::GetConfigurationLabel()
+{
+  return m_ConfigLabel;
+}
+
+void
+mitk::DICOMFileReader
+::SetConfigurationDescription(const std::string& desc)
+{
+  m_ConfigDescription = desc;
+}
+
+std::string
+mitk::DICOMFileReader
+::GetConfigurationDescription()
+{
+  return m_ConfigDescription;
 }
 
 void
@@ -101,9 +133,19 @@ mitk::DICOMFileReader
 
 void
 mitk::DICOMFileReader
-::PrintOutputs(std::ostream& os, bool filenameDetails)
+::PrintConfiguration(std::ostream& os) const
 {
-  os << "---- Outputs of DICOMFilereader " << (void*)this << "----"<< std::endl;
+  os << "---- Configuration of " << this->GetNameOfClass() <<" " << (void*)this << " ----"<< std::endl;
+  this->InternalPrintConfiguration(os);
+  os << "---- End of configuration ----" << std::endl;
+}
+
+
+void
+mitk::DICOMFileReader
+::PrintOutputs(std::ostream& os, bool filenameDetails) const
+{
+  os << "---- Outputs of DICOMFilereader " << (void*)this << " ----"<< std::endl;
 
   for (unsigned int o = 0; o < m_Outputs.size(); ++o)
   {

@@ -19,6 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMTag.h"
 
+#include <gdcmGlobal.h>
+#include <gdcmDicts.h>
+
+#include "mitkLogMacros.h"
+
 mitk::DICOMTag
 ::DICOMTag(unsigned int group, unsigned int element)
 :m_Group(group)
@@ -74,10 +79,46 @@ bool
 mitk::DICOMTag
 ::operator<(const DICOMTag& other) const
 {
+  // TODO check this comparison!
   return this->m_Group * 0x3000 + this->m_Element <
          other.m_Group * 0x3000 + other.m_Element;
 }
 
+std::string
+mitk::DICOMTag
+::GetName() const
+{
+  gdcm::Tag t(m_Group, m_Element);
+
+  const gdcm::Global& g = gdcm::Global::GetInstance(); // sum of all knowledge !
+  const gdcm::Dicts& dicts = g.GetDicts();
+  const gdcm::Dict& pub = dicts.GetPublicDict(); // Part 6
+
+  const gdcm::DictEntry& entry = pub.GetDictEntry(t);
+  std::string name = entry.GetName();
+  if (name.empty())
+  {
+    name = "Unknown Tag";
+  }
+
+  return name;
+}
+
+std::string
+mitk::DICOMTag
+::toHexString(unsigned int i) const
+{
+  std::stringstream ss;
+  ss << std::setfill ('0') << std::setw(4) << std::hex << i;
+  return ss.str();
+}
+
+void
+mitk::DICOMTag
+::Print(std::ostream& os) const
+{
+  os << "(" << toHexString(m_Group) << "," << toHexString(m_Element) << ") " << this->GetName();
+}
 
 void
 mitk::DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up, bool& successful)

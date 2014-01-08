@@ -23,9 +23,10 @@ namespace mitk
 {
 
 /**
+  \ingroup DICOMReaderModule
   \brief sort files based on filename (last resort).
 */
-class DICOMReader_EXPORT DICOMFilenameSorter : public DICOMDatasetSorter
+class DICOMFilenameSorter : public DICOMDatasetSorter
 {
   public:
 
@@ -35,6 +36,8 @@ class DICOMReader_EXPORT DICOMFilenameSorter : public DICOMDatasetSorter
     virtual DICOMTagList GetTagsOfInterest();
 
     virtual void Sort();
+
+    virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const;
 
   protected:
 

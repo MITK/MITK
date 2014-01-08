@@ -45,6 +45,8 @@ class DICOMNullFileReader : public DICOMFileReader
     DICOMNullFileReader(const DICOMNullFileReader& other);
     DICOMNullFileReader& operator=(const DICOMNullFileReader& other);
 
+    void InternalPrintConfiguration(std::ostream& os) const;
+
   private:
 };
 

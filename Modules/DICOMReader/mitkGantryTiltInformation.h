@@ -23,6 +23,7 @@ namespace mitk
 {
 
 /**
+  \ingroup DICOMReaderModule
   \brief Gantry tilt analysis result.
 
   Takes geometry information for two slices of a DICOM series and
@@ -32,6 +33,9 @@ namespace mitk
 
   Most calculations are done in the constructor, results can then
   be read via the remaining methods.
+
+  This class is a helper to DICOMITKSeriesGDCMReader and can
+  not be used outside of \ref DICOMReaderModule
  */
 class GantryTiltInformation
 {
@@ -110,7 +114,7 @@ class GantryTiltInformation
      */
     double GetTiltAngleInDegrees() const;
 
-  protected:
+  private:
 
     /**
       \brief Projection of point p onto line through lineOrigin in direction of lineDirection.

@@ -203,7 +203,7 @@ mitk::DICOMImageBlockDescriptor
 
 void
 mitk::DICOMImageBlockDescriptor
-::SetPixelSpacingInformation(const std::string& pixelSpacing, const std::string& imagerPixelSpacing)
+::SetPixelSpacingTagValues(const std::string& pixelSpacing, const std::string& imagerPixelSpacing)
 {
   m_PixelSpacing = pixelSpacing;
   m_ImagerPixelSpacing = imagerPixelSpacing;
@@ -361,7 +361,7 @@ mitk::DICOMImageBlockDescriptor
       StringProperty::New( m_SOPClassUID ) );
 
   mitkImage->SetProperty("dicomseriesreader.SOPClass",
-      StringProperty::New( this->GetSOPClassUIDAsString() ));
+      StringProperty::New( this->GetSOPClassUIDAsName() ));
 
   mitkImage->SetProperty("dicomseriesreader.PixelSpacingInterpretationString",
       StringProperty::New( PixelSpacingInterpretationToString( this->GetPixelSpacingInterpretation() )) );
@@ -414,7 +414,7 @@ mitk::DICOMImageBlockDescriptor
 
 std::string
 mitk::DICOMImageBlockDescriptor
-::GetSOPClassUIDAsString() const
+::GetSOPClassUIDAsName() const
 {
   gdcm::UIDs uidKnowledge;
   uidKnowledge.SetFromUID( m_SOPClassUID.c_str() );
@@ -471,7 +471,7 @@ mitk::DICOMImageBlockDescriptor
 ::Print(std::ostream& os, bool filenameDetails) const
 {
   os << "  Number of Frames: '" << m_ImageFrameList.size() << "'" << std::endl;
-  os << "  SOP class: '" << this->GetSOPClassUIDAsString() << "'" << std::endl;
+  os << "  SOP class: '" << this->GetSOPClassUIDAsName() << "'" << std::endl;
 
   printProperty("Modality", modality);
   printProperty("Sequence Name", sequenceName);

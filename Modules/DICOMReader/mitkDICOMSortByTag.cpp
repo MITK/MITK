@@ -47,6 +47,14 @@ mitk::DICOMSortByTag
   return *this;
 }
 
+void
+mitk::DICOMSortByTag
+::Print(std::ostream& os) const
+{
+  m_Tag.Print(os);
+}
+
+
 mitk::DICOMTagList
 mitk::DICOMSortByTag
 ::GetTagsOfInterest() const

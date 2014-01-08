@@ -24,6 +24,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+/**
+  \ingroup DICOMReaderModule
+  \brief Representation of a DICOM tag.
+
+  This class is just meant to combine group and element
+  numbers for better readability and make handling tags
+  more easy by offering comparison methods.
+*/
 class DICOMReader_EXPORT DICOMTag
 {
   public:
@@ -37,7 +45,15 @@ class DICOMReader_EXPORT DICOMTag
     unsigned int GetGroup() const;
     unsigned int GetElement() const;
 
-  protected:
+    /// Return the name of this tag (e.g. "SeriesDescription" instead of "(0008,103e)")
+    std::string GetName() const;
+
+    /// add "(group-id,element-id) name" to given stream
+    void Print(std::ostream& os) const;
+
+  private:
+
+    std::string toHexString(unsigned int i) const;
 
     unsigned int m_Group;
     unsigned int m_Element;

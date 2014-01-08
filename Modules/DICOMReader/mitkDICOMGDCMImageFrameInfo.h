@@ -24,6 +24,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /**
+    \ingroup DICOMReaderModule
+    \brief The dataset access implementation for DICOMITKSeriesGDCMReader, based on GDCM.
+
+    This class combines a DICOMImageFrameInfo object with the scanning results
+    from gdcm::Scanner. The scanning results will be used to implement the tag
+    access methods of DICOMDatasetAccess.
+  */
   class DICOMReader_EXPORT DICOMGDCMImageFrameInfo : public itk::LightObject, public DICOMDatasetAccess
   {
     public:
@@ -41,7 +49,9 @@ namespace mitk
 
       std::string GetFilenameIfAvailable() const;
 
+      /// The frame that this objects refers to
       DICOMImageFrameInfo::Pointer GetFrameInfo() const;
+      /// The frame that this objects refers to
       void SetFrameInfo(DICOMImageFrameInfo::Pointer frameinfo);
 
     protected:

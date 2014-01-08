@@ -14,7 +14,7 @@
 
  ===================================================================*/
 
-#include "mitkClassicDICOMSeriesReader.h"
+#include "mitkDICOMFileReaderSelector.h"
 
 using mitk::DICOMTag;
 
@@ -27,25 +27,38 @@ int main(int argc, char* argv[])
   }
 
   // ----------------- Configure reader -------------------
+  mitk::DICOMFileReaderSelector::Pointer configSelector = mitk::DICOMFileReaderSelector::New();
+  configSelector->LoadBuiltIn3DConfigs(); // a set of compiled in ressources with standard configurations that work well
+  configSelector->SetInputFiles( inputFiles );
+  mitk::DICOMFileReader::Pointer reader = configSelector->GetFirstReaderWithMinimumNumberOfOutputImages();
+  if (reader.IsNull())
+  {
+    MITK_ERROR << "Could not configure any DICOM reader.. Exiting...";
+    return EXIT_FAILURE;
+  }
 
-  // DOES fix tilt when detected
-  // DOES group 3D blocks into 3D+t if possible
-  mitk::ClassicDICOMSeriesReader::Pointer gdcmReader = mitk::ClassicDICOMSeriesReader::New();
+  MITK_INFO << "---- Best reader configuration -----------------";
+  MITK_DEBUG << "Found best reader with configuration '" << reader->GetConfigurationLabel() << "'";
+  reader->PrintConfiguration( std::cout );
+  MITK_INFO << "-------------------------------------------";
 
   // ----------------- Load -------------------
 
-  gdcmReader->SetInputFiles( inputFiles );
+  reader->SetInputFiles( inputFiles );
 
   MITK_INFO << "Analyzing " << inputFiles.size() << " files ...";
-  gdcmReader->AnalyzeInputFiles();
-  //gdcmReader->PrintOutputs(std::cout, false);
-  MITK_INFO << "Loading " << inputFiles.size() << " files ...";
-  gdcmReader->LoadImages();
+  reader->AnalyzeInputFiles();
+  reader->PrintOutputs(std::cout, false);
 
-  unsigned int numberOfOutputs = gdcmReader->GetNumberOfOutputs();
+  return EXIT_SUCCESS;
+
+  MITK_INFO << "Loading " << inputFiles.size() << " files ...";
+  reader->LoadImages();
+
+  unsigned int numberOfOutputs = reader->GetNumberOfOutputs();
   for (unsigned int o = 0; o < numberOfOutputs; ++o)
   {
-    const mitk::DICOMImageBlockDescriptor block = gdcmReader->GetOutput(o);
+    const mitk::DICOMImageBlockDescriptor block = reader->GetOutput(o);
 
     const mitk::DICOMImageFrameList& outputFiles = block.GetImageFrameList();
     mitk::Image::Pointer mitkImage = block.GetMitkImage();
@@ -58,4 +71,6 @@ int main(int argc, char* argv[])
       MITK_INFO << "  Dimensions: " << mitkImage->GetDimension(0) << " " << mitkImage->GetDimension(1) << " " << mitkImage->GetDimension(2);
     }
   }
+
+  return EXIT_SUCCESS;
 }

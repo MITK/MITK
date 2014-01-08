@@ -27,6 +27,7 @@ std::string
 mitk::DICOMTagBasedSorter::CutDecimalPlaces
 ::operator()(const std::string& input) const
 {
+  // TODO make this work with all kind of numbers and lists of numbers!!
   // be a bit tolerant for tags such as image orientation orienatation, let only the first few digits matter (http://bugs.mitk.org/show_bug.cgi?id=12263)
 
   bool conversionError(false);
@@ -80,6 +81,31 @@ mitk::DICOMTagBasedSorter
   }
   return *this;
 }
+
+void
+mitk::DICOMTagBasedSorter
+::PrintConfiguration(std::ostream& os, const std::string& indent) const
+{
+  os << indent << "Tag based sorting:" << std::endl;
+  for (DICOMTagList::const_iterator tagIter = m_DistinguishingTags.begin();
+       tagIter != m_DistinguishingTags.end();
+       ++tagIter)
+  {
+    os << indent << "  Split on ";
+    tagIter->Print(os);
+    os << std::endl;
+  }
+
+  DICOMSortCriterion::ConstPointer crit = m_SortCriterion.GetPointer();
+  while (crit.IsNotNull())
+  {
+    os << indent << "   Sort by ";
+    crit->Print(os);
+    os << std::endl;
+    crit = crit->GetSecondaryCriterion();
+  }
+}
+
 
 mitk::DICOMTagList
 mitk::DICOMTagBasedSorter

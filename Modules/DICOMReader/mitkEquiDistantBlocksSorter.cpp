@@ -12,6 +12,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+//#define MBILOG_ENABLE_DEBUG
+
 #include "mitkEquiDistantBlocksSorter.h"
 
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
@@ -119,6 +121,14 @@ mitk::EquiDistantBlocksSorter
 ::~EquiDistantBlocksSorter()
 {
 }
+
+void
+mitk::EquiDistantBlocksSorter
+::PrintConfiguration(std::ostream& os, const std::string& indent) const
+{
+  os << indent << "Sort into blocks of equidistant, well-aligned slices " << (m_AcceptTilt ? "(accepting a gantry tilt)" : "") << std::endl;
+}
+
 
 void
 mitk::EquiDistantBlocksSorter
@@ -246,6 +256,7 @@ mitk::EquiDistantBlocksSorter
   MITK_DEBUG << "--------------------------------------------------------------------------------";
   MITK_DEBUG << "Analyzing " << datasets.size() << " files for z-spacing assumption of ITK's ImageSeriesReader (group tilted: " << groupImagesWithGantryTilt << ")";
   unsigned int fileIndex(0);
+  double toleratedOriginError(0.005); // default: max. 1/10mm error when measurement crosses 20 slices in z direction (too strict? we don't know better)
   for (DICOMDatasetList::const_iterator dsIter = datasets.begin();
        dsIter != datasets.end();
        ++dsIter, ++fileIndex)
@@ -301,6 +312,12 @@ mitk::EquiDistantBlocksSorter
       {
         fromFirstToSecondOrigin = thisOrigin - lastDifferentOrigin;
         fromFirstToSecondOriginInitialized = true;
+
+        MITK_DEBUG << "Distance of two slices: " << fromFirstToSecondOrigin.GetNorm() << "mm";
+        toleratedOriginError =
+          fromFirstToSecondOrigin.GetNorm() * 0.3; // a third of the slice distance
+                                                  //  (less than half, which would mean that a slice is displayed where another slice should actually be)
+        MITK_DEBUG << "Accepting errors in actual versus expected origin up to " << toleratedOriginError << "mm";
 
         // Here we calculate if this slice and the previous one are well aligned,
         // i.e. we test if the previous origin is on a line through the current
@@ -382,13 +399,12 @@ mitk::EquiDistantBlocksSorter
 
         Vector3D originError = assumedOrigin - thisOrigin;
         double norm = originError.GetNorm();
-        double toleratedError(0.005); // max. 1/10mm error when measurement crosses 20 slices in z direction
 
-        if (norm > toleratedError)
+        if (norm > toleratedOriginError)
         {
           MITK_DEBUG << "  File does not fit into the inter-slice distance pattern (diff = "
                                << norm << ", allowed "
-                               << toleratedError << ").";
+                               << toleratedOriginError << ").";
           MITK_DEBUG << "  Expected position (" << assumedOrigin[0] << ","
                                             << assumedOrigin[1] << ","
                                             << assumedOrigin[2] << "), got position ("

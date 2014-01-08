@@ -5,7 +5,6 @@ set(H_FILES
   mitkDICOMGDCMImageFrameInfo.h
   mitkDICOMITKSeriesGDCMReader.h
   mitkDICOMDatasetSorter.h
-  mitkDICOMFilenameSorter.h
   mitkDICOMEnums.h
   mitkDICOMTagBasedSorter.h
   mitkDICOMSortCriterion.h
@@ -15,6 +14,8 @@ set(H_FILES
   mitkClassicDICOMSeriesReader.h
   mitkThreeDnTDICOMSeriesReader.h
   mitkDICOMTag.h
+  mitkDICOMReaderConfigurator.h
+  mitkDICOMFileReaderSelector.h
 )
 
 set(CPP_FILES
@@ -22,7 +23,6 @@ set(CPP_FILES
   mitkDICOMImageBlockDescriptor.cpp
   mitkDICOMITKSeriesGDCMReader.cpp
   mitkDICOMDatasetSorter.cpp
-  mitkDICOMFilenameSorter.cpp
   mitkDICOMTagBasedSorter.cpp
   mitkDICOMGDCMImageFrameInfo.cpp
   mitkDICOMImageFrameInfo.cpp
@@ -36,4 +36,16 @@ set(CPP_FILES
   mitkThreeDnTDICOMSeriesReader.cpp
   mitkDICOMTag.cpp
   mitkDICOMEnums.cpp
+  mitkDICOMReaderConfigurator.cpp
+  mitkDICOMFileReaderSelector.cpp
+)
+
+set(RESOURCE_FILES
+  configurations/3D/classicreader.xml
+  configurations/3D/descriptionbasedgrouping.xml
+  configurations/3D/instancenumber.xml
+  configurations/3D/slicelocation.xml
+  configurations/3D/imagetime.xml
+
+  configurations/3DnT/classicreader.xml
 )

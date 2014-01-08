@@ -149,7 +149,7 @@ mitk::DICOMReaderConfigurator
     reader->SetConfigurationLabel(configLabel);
   }
 
-  const char* configDescriptionC = element->Attribute("label");
+  const char* configDescriptionC = element->Attribute("description");
   if (configDescriptionC)
   {
     std::string configDescription(configDescriptionC);

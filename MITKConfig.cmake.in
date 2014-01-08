@@ -127,9 +127,11 @@ set(MITK_USE_SOFA @MITK_USE_SOFA@)
 set(MITK_USE_Python @MITK_USE_Python@)
 
 if(MITK_USE_Qt4)
-  find_package(Qt4 REQUIRED)
+  set(MITK_QT4_MINIMUM_VERSION @MITK_QT4_MINIMUM_VERSION@)
+  find_package(Qt4 ${MITK_QT4_MINIMUM_VERSION} REQUIRED)
 elseif(MITK_USE_Qt5)
-  find_package(Qt5Core REQUIRED)
+  set(MITK_QT5_MINIMUM_VERSION @MITK_QT5_MINIMUM_VERSION@)
+  find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
 endif()
 
 # MITK ToF use variables

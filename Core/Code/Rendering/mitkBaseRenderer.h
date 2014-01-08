@@ -19,7 +19,7 @@
 
 #include "mitkDataStorage.h"
 #include "mitkGeometry2D.h"
-#include "mitkTimeSlicedGeometry.h"
+#include "mitkTimeGeometry.h"
 #include "mitkDisplayGeometry.h"
 #include "mitkGeometry2DData.h"
 #include "mitkCameraController.h"
@@ -41,6 +41,9 @@
 
 #include <map>
 #include <set>
+
+// DEPRECATED
+#include <mitkTimeSlicedGeometry.h>
 
 namespace mitk
 {
@@ -164,22 +167,33 @@ namespace mitk
     //##
     //## Depending of the type of the passed Geometry3D more or less information can be extracted:
     //## \li if it is a Geometry2D (which is a sub-class of Geometry3D), m_CurrentWorldGeometry2D is
-    //## also set to point to it. m_TimeSlicedWorldGeometry is set to NULL.
-    //## \li if it is a TimeSlicedGeometry, m_TimeSlicedWorldGeometry is also set to point to it.
-    //## If m_TimeSlicedWorldGeometry contains instances of SlicedGeometry3D, m_CurrentWorldGeometry2D is set to
+    //## also set to point to it. m_WorldTimeGeometry is set to NULL.
+    //## \li if it is a TimeGeometry, m_WorldTimeGeometry is also set to point to it.
+    //## If m_WorldTimeGeometry contains instances of SlicedGeometry3D, m_CurrentWorldGeometry2D is set to
     //## one of geometries stored in the SlicedGeometry3D according to the value of m_Slice;  otherwise
     //## a PlaneGeometry describing the top of the bounding-box of the Geometry3D is set as the
     //## m_CurrentWorldGeometry2D.
     //## \li otherwise a PlaneGeometry describing the top of the bounding-box of the Geometry3D
-    //## is set as the m_CurrentWorldGeometry2D. m_TimeSlicedWorldGeometry is set to NULL.
+    //## is set as the m_CurrentWorldGeometry2D. m_WorldTimeGeometry is set to NULL.
     //## @todo add calculation of PlaneGeometry describing the top of the bounding-box of the Geometry3D
     //## when the passed Geometry3D is not sliced.
     //## \sa m_WorldGeometry
-    //## \sa m_TimeSlicedWorldGeometry
+    //## \sa m_WorldTimeGeometry
     //## \sa m_CurrentWorldGeometry2D
-    virtual void SetWorldGeometry(Geometry3D* geometry);
+    virtual void SetWorldGeometry3D(Geometry3D* geometry);
+    virtual void SetWorldTimeGeometry(mitk::TimeGeometry* geometry);
+
+
+    /**
+    * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
+    */
+    DEPRECATED(void SetWorldGeometry3D(TimeSlicedGeometry* geometry));
+
 
     itkGetConstObjectMacro(WorldGeometry, Geometry3D)
+    itkGetObjectMacro(WorldGeometry, Geometry3D)
+    itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry)
+    itkGetObjectMacro(WorldTimeGeometry, TimeGeometry)
 
     //##Documentation
     //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering
@@ -214,7 +228,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Set/Get m_Slice which defines together with m_TimeStep the 2D geometry
-    //## stored in m_TimeSlicedWorldGeometry used as m_CurrentWorldGeometry2D
+    //## stored in m_WorldTimeGeometry used as m_CurrentWorldGeometry2D
     //##
     //## \sa m_Slice
     virtual void SetSlice(unsigned int slice);
@@ -233,7 +247,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Set/Get m_TimeStep which defines together with m_Slice the 2D geometry
-    //## stored in m_TimeSlicedWorldGeometry used as m_CurrentWorldGeometry2D
+    //## stored in m_WorldTimeGeometry used as m_CurrentWorldGeometry2D
     //##
     //## \sa m_TimeStep
     virtual void SetTimeStep(unsigned int timeStep);
@@ -509,13 +523,13 @@ namespace mitk
     itk::SmartPointer<OverlayManager> m_OverlayManager;
 
     //##Documentation
-    //## m_TimeSlicedWorldGeometry is set by SetWorldGeometry if the passed Geometry3D is a
-    //## TimeSlicedGeometry (or a sub-class of it). If it contains instances of SlicedGeometry3D,
+    //## m_WorldTimeGeometry is set by SetWorldGeometry if the passed Geometry3D is a
+    //## TimeGeometry (or a sub-class of it). If it contains instances of SlicedGeometry3D,
     //## m_Slice and m_TimeStep (set via SetSlice and SetTimeStep, respectively) define
-    //## which 2D geometry stored in m_TimeSlicedWorldGeometry (if available)
+    //## which 2D geometry stored in m_WorldTimeGeometry (if available)
     //## is used as m_CurrentWorldGeometry2D.
     //## \sa m_CurrentWorldGeometry2D
-    TimeSlicedGeometry::Pointer m_TimeSlicedWorldGeometry;
+    TimeGeometry::Pointer m_WorldTimeGeometry;
 
     //##Documentation
     //## Pointer to the current 3D-worldgeometry.
@@ -539,14 +553,14 @@ namespace mitk
     DisplayGeometry::Pointer m_DisplayGeometry;
 
     //##Documentation
-    //## Defines together with m_Slice which 2D geometry stored in m_TimeSlicedWorldGeometry
-    //## is used as m_CurrentWorldGeometry2D: m_TimeSlicedWorldGeometry->GetGeometry2D(m_Slice, m_TimeStep).
-    //## \sa m_TimeSlicedWorldGeometry
+    //## Defines together with m_Slice which 2D geometry stored in m_WorldTimeGeometry
+    //## is used as m_CurrentWorldGeometry2D: m_WorldTimeGeometry->GetGeometry2D(m_Slice, m_TimeStep).
+    //## \sa m_WorldTimeGeometry
     unsigned int m_Slice;
     //##Documentation
-    //## Defines together with m_TimeStep which 2D geometry stored in m_TimeSlicedWorldGeometry
-    //## is used as m_CurrentWorldGeometry2D: m_TimeSlicedWorldGeometry->GetGeometry2D(m_Slice, m_TimeStep).
-    //## \sa m_TimeSlicedWorldGeometry
+    //## Defines together with m_TimeStep which 2D geometry stored in m_WorldTimeGeometry
+    //## is used as m_CurrentWorldGeometry2D: m_WorldTimeGeometry->GetGeometry2D(m_Slice, m_TimeStep).
+    //## \sa m_WorldTimeGeometry
     unsigned int m_TimeStep;
 
     //##Documentation

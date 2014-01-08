@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourModelIOFactory.h"
 #include "mitkIOAdapter.h"
 #include "mitkContourModelReader.h"
+#include "mitkContourModelSetReader.h"
 
 #include "itkVersion.h"
 
@@ -30,6 +31,12 @@ namespace mitk
       "mitk ContourModel IO",
       1,
       itk::CreateObjectFunction<IOAdapter<ContourModelReader> >::New());
+
+    this->RegisterOverride("mitkIOAdapter",
+      "mitkContourModelSetReader",
+      "mitk ContourModelSet IO",
+      1,
+      itk::CreateObjectFunction<IOAdapter<ContourModelSetReader> >::New());
   }
 
   ContourModelIOFactory::~ContourModelIOFactory()

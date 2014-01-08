@@ -267,22 +267,8 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     typedef itk::TensorImageToDiffusionImageFilter<
             TTensorPixelType, DiffusionPixelType > FilterType;
 
-    FilterType::GradientListType gradientList;
     mitk::DiffusionImage<DiffusionPixelType>::GradientDirectionContainerType* gradients
             = diffImage->GetDirections();
-
-    // Copy gradients vectors from gradients to gradientList
-    for(int i=0; i<gradients->Size(); i++)
-    {
-        mitk::DiffusionImage<DiffusionPixelType>::GradientDirectionType vec = gradients->at(i);
-        itk::Vector<double,3> grad;
-
-        grad[0] = vec[0];
-        grad[1] = vec[1];
-        grad[2] = vec[2];
-
-        gradientList.push_back(grad);
-    }
 
     // Find the min and the max values from a baseline image
     mitk::ImageStatisticsHolder *stats = diffImage->GetStatistics();
@@ -291,7 +277,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput( tensorImage );
     filter->SetBValue(diffImage->GetB_Value());
-    filter->SetGradientList(gradientList);
+    filter->SetGradientList(gradients);
     filter->SetMin(stats->GetScalarValueMin());
     filter->SetMax(stats->GetScalarValueMax());
     filter->Update();
@@ -301,7 +287,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     mitk::DiffusionImage<DiffusionPixelType>::Pointer image = mitk::DiffusionImage<DiffusionPixelType>::New();
     image->SetVectorImage( filter->GetOutput() );
     image->SetB_Value(diffImage->GetB_Value());
-    image->SetDirections(gradientList);
+    image->SetDirections(gradients);
     image->InitializeFromVectorImage();
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( image );
@@ -894,22 +880,21 @@ void QmitkTensorReconstructionView::OnSelectionChanged( std::vector<mitk::DataNo
 }
 
 template<int ndirs>
-std::vector<itk::Vector<double,3> > QmitkTensorReconstructionView::MakeGradientList()
+QmitkTensorReconstructionView::GradientListType::Pointer QmitkTensorReconstructionView::MakeGradientList()
 {
-    std::vector<itk::Vector<double,3> > retval;
+  QmitkTensorReconstructionView::GradientListType::Pointer retval = GradientListType::New();
     vnl_matrix_fixed<double, 3, ndirs>* U =
             itk::PointShell<ndirs, vnl_matrix_fixed<double, 3, ndirs> >::DistributePointShell();
 
     for(int i=0; i<ndirs;i++)
     {
-        itk::Vector<double,3> v;
+        GradientType v;
         v[0] = U->get(0,i); v[1] = U->get(1,i); v[2] = U->get(2,i);
-        retval.push_back(v);
+        retval->push_back(v);
     }
     // Add 0 vector for B0
-    itk::Vector<double,3> v;
-    v.Fill(0.0);
-    retval.push_back(v);
+    GradientType v(0.0);
+    retval->push_back(v);
 
     return retval;
 }
@@ -952,7 +937,7 @@ void QmitkTensorReconstructionView::DoTensorsToDWI(mitk::DataStorage::SetOfObjec
             typedef itk::TensorImageToDiffusionImageFilter<
                     TTensorPixelType, DiffusionPixelType > FilterType;
 
-            FilterType::GradientListType gradientList;
+            FilterType::GradientListType::Pointer gradientList;
 
             switch(m_Controls->m_TensorsToDWINumDirsSelect->currentIndex())
             {

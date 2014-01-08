@@ -122,11 +122,10 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
     // world geometry rectangle
     Point2D lineFrom, lineTo;
 
-    typedef Geometry3D::TransformType TransformType;
-    const TransformType *transform = dynamic_cast< const TransformType * >(
+    const Geometry3D::TransformType *transform = dynamic_cast< const Geometry3D::TransformType * >(
       referenceGeometry->GetIndexToWorldTransform() );
 
-    TransformType::Pointer inverseTransform = TransformType::New();
+    Geometry3D::TransformType::Pointer inverseTransform = Geometry3D::TransformType::New();
     transform->GetInverse( inverseTransform );
 
     Line3D crossLine, otherCrossLine;

@@ -16,28 +16,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataToPointSetFilter.h"
 #include "mitkNavigationDataPlayer.h"
-#include <mitkStandardFileLocations.h>
+#include <mitkIGTConfig.h>
 #include <mitkTestingMacros.h>
 
 #include <iostream>
 
-#include <itksys/SystemTools.hxx>
-
 /**
- *  Simple example for a test for the (non-existent) class "NavigationDataToPointSetFilter".
- *
- *  argc and argv are the command line parameters which were passed to
- *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
- *  tests, argv is either empty for the simple tests or contains the filename
- *  of a test image for the image tests (see CMakeLists.txt).
- */
-class mitkNavigationDataToPointSetFilterTestClass {
+*  Simple example for a test for the (non-existent) class "NavigationDataToPointSetFilter".
+*
+*  argc and argv are the command line parameters which were passed to
+*  the ADD_TEST command in the CMakeLists.txt file. For the automatic
+*  tests, argv is either empty for the simple tests or contains the filename
+*  of a test image for the image tests (see CMakeLists.txt).
+*/
 
-public:
+mitk::NavigationDataToPointSetFilter::Pointer m_NavigationDataToPointSetFilter;
 
-static void TestMode3D(mitk::NavigationDataToPointSetFilter::Pointer myNavigationDataToPointSetFilter)
+static void Setup()
 {
-  myNavigationDataToPointSetFilter->SetOperationMode(mitk::NavigationDataToPointSetFilter::Mode3D);
+  m_NavigationDataToPointSetFilter = mitk::NavigationDataToPointSetFilter::New();
+}
+
+static void TestMode3D()
+{
+  Setup();
+  m_NavigationDataToPointSetFilter->SetOperationMode(mitk::NavigationDataToPointSetFilter::Mode3D);
 
   //Build up test data
   mitk::NavigationData::Pointer nd0 = mitk::NavigationData::New();
@@ -73,16 +76,16 @@ static void TestMode3D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   nd3->SetPosition(point3);
   nd3->SetDataValid(true);
 
-  myNavigationDataToPointSetFilter->SetInput(0, nd0);
-  myNavigationDataToPointSetFilter->SetInput(1, nd1);
-  myNavigationDataToPointSetFilter->SetInput(2, nd2);
-  myNavigationDataToPointSetFilter->SetInput(3, nd3);
+  m_NavigationDataToPointSetFilter->SetInput(0, nd0);
+  m_NavigationDataToPointSetFilter->SetInput(1, nd1);
+  m_NavigationDataToPointSetFilter->SetInput(2, nd2);
+  m_NavigationDataToPointSetFilter->SetInput(3, nd3);
 
   //Process
-  mitk::PointSet::Pointer pointSet0 = myNavigationDataToPointSetFilter->GetOutput();
-  mitk::PointSet::Pointer pointSet1 = myNavigationDataToPointSetFilter->GetOutput(1);
-  mitk::PointSet::Pointer pointSet2 = myNavigationDataToPointSetFilter->GetOutput(2);
-  mitk::PointSet::Pointer pointSet3 = myNavigationDataToPointSetFilter->GetOutput(3);
+  mitk::PointSet::Pointer pointSet0 = m_NavigationDataToPointSetFilter->GetOutput();
+  mitk::PointSet::Pointer pointSet1 = m_NavigationDataToPointSetFilter->GetOutput(1);
+  mitk::PointSet::Pointer pointSet2 = m_NavigationDataToPointSetFilter->GetOutput(2);
+  mitk::PointSet::Pointer pointSet3 = m_NavigationDataToPointSetFilter->GetOutput(3);
 
   pointSet0->Update();
 
@@ -91,20 +94,13 @@ static void TestMode3D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   MITK_TEST_CONDITION(mitk::Equal(pointSet1->GetPoint(0), point1), "Pointset 1 correct?");
   MITK_TEST_CONDITION(mitk::Equal(pointSet2->GetPoint(0), point2), "Pointset 2 correct?");
   MITK_TEST_CONDITION(mitk::Equal(pointSet3->GetPoint(0), point3), "Pointset 3 correct?");
-
-    //pointSet0->GetPoint(0)[0] == 1.0  && pointSet0->GetPoint(0)[1] == 2.0  && pointSet0->GetPoint(0)[2] == 3.0 &&
-    //                  pointSet1->GetPoint(0)[0] == 4.0  && pointSet1->GetPoint(0)[1] == 5.0  && pointSet1->GetPoint(0)[2] == 6.0 &&
-    //                  pointSet2->GetPoint(0)[0] == 7.0  && pointSet2->GetPoint(0)[1] == 8.0  && pointSet2->GetPoint(0)[2] == 9.0 &&
-    //                  pointSet3->GetPoint(0)[0] == 10.0 && pointSet3->GetPoint(0)[1] == 11.0 && pointSet3->GetPoint(0)[2] == 12.0
-    //, "Testing the conversion of navigation data object to PointSets in Mode 3D" );
-
 }
 
-
-static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigationDataToPointSetFilter)
+static void TestMode4D()
 {
-  myNavigationDataToPointSetFilter->SetOperationMode(mitk::NavigationDataToPointSetFilter::Mode4D);
-  myNavigationDataToPointSetFilter->SetRingBufferSize(2);
+  Setup();
+  m_NavigationDataToPointSetFilter->SetOperationMode(mitk::NavigationDataToPointSetFilter::Mode4D);
+  m_NavigationDataToPointSetFilter->SetRingBufferSize(2);
 
   //Build up test data
   mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
@@ -134,20 +130,20 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   point[2] = 12.0;
   nd4->SetPosition(point);
 
-  myNavigationDataToPointSetFilter->SetInput(0, nd);
-  myNavigationDataToPointSetFilter->SetInput(1, nd2);
+  m_NavigationDataToPointSetFilter->SetInput(0, nd);
+  m_NavigationDataToPointSetFilter->SetInput(1, nd2);
 
-  mitk::PointSet::Pointer pointSet = myNavigationDataToPointSetFilter->GetOutput();
+  mitk::PointSet::Pointer pointSet = m_NavigationDataToPointSetFilter->GetOutput();
   pointSet->Update();
 
   MITK_TEST_CONDITION( pointSet->GetPoint(0,0)[0] == 1.0 && pointSet->GetPoint(0,0)[1] == 2.0 && pointSet->GetPoint(0,0)[2] == 3.0 &&
     pointSet->GetPoint(1,0)[0] == 4.0 && pointSet->GetPoint(1,0)[1] == 5.0 && pointSet->GetPoint(1,0)[2] == 6.0
     , "Testing the conversion of navigation data object to one point set in Mode 4D in first timestep" );
 
-  myNavigationDataToPointSetFilter->SetInput(0, nd3);
-  myNavigationDataToPointSetFilter->SetInput(1, nd4);
-  myNavigationDataToPointSetFilter->Update();
-  pointSet = myNavigationDataToPointSetFilter->GetOutput();
+  m_NavigationDataToPointSetFilter->SetInput(0, nd3);
+  m_NavigationDataToPointSetFilter->SetInput(1, nd4);
+  m_NavigationDataToPointSetFilter->Update();
+  pointSet = m_NavigationDataToPointSetFilter->GetOutput();
 
   MITK_TEST_CONDITION( pointSet->GetPoint(0,0)[0] == 1.0 && pointSet->GetPoint(0,0)[1] == 2.0 && pointSet->GetPoint(0,0)[2] == 3.0 &&
     pointSet->GetPoint(1,0)[0] == 4.0 && pointSet->GetPoint(1,0)[1] == 5.0 && pointSet->GetPoint(1,0)[2] == 6.0 &&
@@ -155,12 +151,9 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
     pointSet->GetPoint(1,1)[0] == 10.0 && pointSet->GetPoint(1,1)[1] == 11.0 && pointSet->GetPoint(1,1)[2] == 12.0
     , "Testing the conversion of navigation data object to one point set in Mode 4D in second timestep" );
 
-  myNavigationDataToPointSetFilter->SetInput(0, nd3);
-  //nd3->Modified(); //necessary because the generate data is only called when input has changed...
-  myNavigationDataToPointSetFilter->SetInput(1, nd4);
-  //nd4->Modified();
-  //myNavigationDataToPointSetFilter->Update();
-  pointSet = myNavigationDataToPointSetFilter->GetOutput();
+  m_NavigationDataToPointSetFilter->SetInput(0, nd3);
+  m_NavigationDataToPointSetFilter->SetInput(1, nd4);
+  pointSet = m_NavigationDataToPointSetFilter->GetOutput();
   pointSet->Update();
 
   MITK_TEST_CONDITION( pointSet->GetPoint(0,0)[0] == 7.0 && pointSet->GetPoint(0,0)[1] == 8.0 && pointSet->GetPoint(0,0)[2] == 9.0 &&
@@ -170,30 +163,32 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
     , "Testing the correct ring buffer behavior" );
 }
 
-static void TestMode3DMean(mitk::NavigationDataToPointSetFilter::Pointer myNavigationDataToPointSetFilter)
+static void TestMode3DMean()
 {
-  myNavigationDataToPointSetFilter->SetOperationMode(mitk::NavigationDataToPointSetFilter::Mode3DMean);
+  Setup();
+  m_NavigationDataToPointSetFilter->SetOperationMode(mitk::NavigationDataToPointSetFilter::Mode3DMean);
   int numberForMean = 5;
-  myNavigationDataToPointSetFilter->SetNumberForMean(numberForMean);
+  m_NavigationDataToPointSetFilter->SetNumberForMean(numberForMean);
 
-  MITK_TEST_CONDITION(mitk::Equal(myNavigationDataToPointSetFilter->GetNumberForMean(), numberForMean), "Testing get/set for numberForMean");
+  MITK_TEST_CONDITION(mitk::Equal(m_NavigationDataToPointSetFilter->GetNumberForMean(), numberForMean), "Testing get/set for numberForMean");
 
   mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
 
-  std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData_2Tools.xml", "Modules/IGT/Testing/Data");
+  std::string file(MITK_IGT_DATA_DIR);
+  file.append("/NavigationDataTestData_2Tools.xml");
 
   player->SetFileName( file );
   player->StartPlaying();
 
-  for (int i = 0; i< player->GetNumberOfOutputs(); i++)
+  for (unsigned int i = 0; i< player->GetNumberOfOutputs(); i++)
   {
-    myNavigationDataToPointSetFilter->SetInput(i, player->GetOutput(i));
+    m_NavigationDataToPointSetFilter->SetInput(i, player->GetOutput(i));
   }
 
-  mitk::PointSet::Pointer pointSet0 = myNavigationDataToPointSetFilter->GetOutput();
-  mitk::PointSet::Pointer pointSet1 = myNavigationDataToPointSetFilter->GetOutput(1);
+  mitk::PointSet::Pointer pointSet0 = m_NavigationDataToPointSetFilter->GetOutput();
+  mitk::PointSet::Pointer pointSet1 = m_NavigationDataToPointSetFilter->GetOutput(1);
 
-  myNavigationDataToPointSetFilter->Update();
+  m_NavigationDataToPointSetFilter->Update();
 
   player->StopPlaying();
 
@@ -202,26 +197,18 @@ static void TestMode3DMean(mitk::NavigationDataToPointSetFilter::Pointer myNavig
 
   MITK_TEST_CONDITION(pointSet1->GetPoint(0)[0]==30.0 && pointSet1->GetPoint(0)[1]==20.0 && pointSet1->GetPoint(0)[2]==50.0,
     "Testing the average of second input");
-
 }
-};
 
-
-int mitkNavigationDataToPointSetFilterTest(int /* argc */, char* /*argv*/[])
+static void NavigationDataToPointSetFilterContructor_DefaultCall_IsNotEmpty()
 {
-  // always start with this!
-  MITK_TEST_BEGIN("NavigationDataToPointSetFilter");
+  Setup();
+  MITK_TEST_CONDITION_REQUIRED(m_NavigationDataToPointSetFilter.IsNotNull(),"Testing instantiation");
+  //I think this test is meaningless, because it will never ever fail. I keep it for know just to be save.
+}
 
-  // let's create an object of our class
-  mitk::NavigationDataToPointSetFilter::Pointer myNavigationDataToPointSetFilter = mitk::NavigationDataToPointSetFilter::New();
-
-  // first test: did this work?
-  // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
-  // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(myNavigationDataToPointSetFilter.IsNotNull(),"Testing instantiation");
-
-  // write your own tests here and use the macros from mitkTestingMacros.h !!!
-  // do not write to std::cout and do not return from this function yourself!
+static void NavigationDataToPointSetFilterSetInput_SimplePoint_EqualsGroundTruth()
+{
+  Setup();
 
   mitk::NavigationData::Pointer nd_in = mitk::NavigationData::New();
   const mitk::NavigationData* nd_out = mitk::NavigationData::New();
@@ -232,18 +219,22 @@ int mitkNavigationDataToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   point[2] = 3.0;
   nd_in->SetPosition(point);
 
-  myNavigationDataToPointSetFilter->SetInput(nd_in);
-  nd_out = myNavigationDataToPointSetFilter->GetInput();
+  m_NavigationDataToPointSetFilter->SetInput(nd_in);
+  nd_out = m_NavigationDataToPointSetFilter->GetInput();
 
   MITK_TEST_CONDITION( nd_out->GetPosition() == nd_in->GetPosition(),
     "Testing get/set input" );
+}
 
-  myNavigationDataToPointSetFilter = mitk::NavigationDataToPointSetFilter::New();
-  mitkNavigationDataToPointSetFilterTestClass::TestMode3D(myNavigationDataToPointSetFilter);
-  myNavigationDataToPointSetFilter = mitk::NavigationDataToPointSetFilter::New();
-  mitkNavigationDataToPointSetFilterTestClass::TestMode4D(myNavigationDataToPointSetFilter);
-  myNavigationDataToPointSetFilter = mitk::NavigationDataToPointSetFilter::New();
-  mitkNavigationDataToPointSetFilterTestClass::TestMode3DMean(myNavigationDataToPointSetFilter);
-  // always end with this!
+int mitkNavigationDataToPointSetFilterTest(int /* argc */, char* /*argv*/[])
+{
+  MITK_TEST_BEGIN("NavigationDataToPointSetFilter");
+
+  NavigationDataToPointSetFilterContructor_DefaultCall_IsNotEmpty();
+  NavigationDataToPointSetFilterSetInput_SimplePoint_EqualsGroundTruth();
+  TestMode3D();
+  TestMode4D();
+  TestMode3DMean();
+
   MITK_TEST_END();
 }

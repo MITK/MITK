@@ -15,20 +15,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "org_mitk_gui_qt_simulation_Activator.h"
-#include "QmitkCreateSimulationAction.h"
 #include "QmitkSimulationPreferencePage.h"
 #include "QmitkSimulationView.h"
 #include <QtPlugin>
 
+ctkPluginContext* mitk::org_mitk_gui_qt_simulation_Activator::Context = NULL;
+
+ctkPluginContext* mitk::org_mitk_gui_qt_simulation_Activator::GetContext()
+{
+  return Context;
+}
+
 void mitk::org_mitk_gui_qt_simulation_Activator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkCreateSimulationAction, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSimulationPreferencePage, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSimulationView, context);
+  Context = context;
 }
 
 void mitk::org_mitk_gui_qt_simulation_Activator::stop(ctkPluginContext*)
 {
+  Context = NULL;
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_gui_qt_simulation, mitk::org_mitk_gui_qt_simulation_Activator)
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_simulation, mitk::org_mitk_gui_qt_simulation_Activator);

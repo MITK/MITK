@@ -103,12 +103,12 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_AdvancedSignalOptionsFrame->setVisible(false);
         m_Controls->m_AdvancedFiberOptionsFrame->setVisible(false);
         m_Controls->m_VarianceBox->setVisible(false);
-        m_Controls->m_GibbsRingingFrame->setVisible(false);
         m_Controls->m_NoiseFrame->setVisible(false);
         m_Controls->m_GhostFrame->setVisible(false);
         m_Controls->m_DistortionsFrame->setVisible(false);
         m_Controls->m_EddyFrame->setVisible(false);
         m_Controls->m_SpikeFrame->setVisible(false);
+        m_Controls->m_AliasingFrame->setVisible(false);
 
         m_Controls->m_FrequencyMapBox->SetDataStorage(this->GetDataStorage());
         mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -139,6 +139,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_AddDistortions, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddDistortions(int)));
         connect((QObject*) m_Controls->m_AddEddy, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddEddy(int)));
         connect((QObject*) m_Controls->m_AddSpikes, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddSpikes(int)));
+        connect((QObject*) m_Controls->m_AddAliasing, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddAliasing(int)));
 
         connect((QObject*) m_Controls->m_ConstantRadiusBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnConstantRadius(int)));
         connect((QObject*) m_Controls->m_CopyBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(CopyBundles()));
@@ -171,6 +172,7 @@ void QmitkFiberfoxView::UpdateImageParameters()
     m_ImageGenParameters.gradientDirections.clear();
     m_ImageGenParameters.spikes = 0;
     m_ImageGenParameters.spikeAmplitude = 1;
+    m_ImageGenParameters.wrap = 1;
 
     if (m_SelectedDWI.IsNotNull())  // use parameters of selected DWI
     {
@@ -241,6 +243,13 @@ void QmitkFiberfoxView::UpdateImageParameters()
     else
         m_ImageGenParameters.kspaceLineOffset = 0;
 
+    // Aliasing
+    if (m_Controls->m_AddAliasing->isChecked())
+    {
+        m_ImageGenParameters.artifactModelString += "_ALIASING";
+        m_ImageGenParameters.wrap = 1/m_Controls->m_WrapBox->value();
+    }
+
     m_ImageGenParameters.tLine = m_Controls->m_LineReadoutTimeBox->value();
     m_ImageGenParameters.tInhom = m_Controls->m_T2starBox->value();
     m_ImageGenParameters.tEcho = m_Controls->m_TEbox->value();
@@ -285,13 +294,9 @@ void QmitkFiberfoxView::UpdateImageParameters()
         m_ImageGenParameters.ricianNoiseModel.SetNoiseVariance(0);
 
     // gibbs ringing
-    m_ImageGenParameters.upsampling = 1;
+    m_ImageGenParameters.addGibbsRinging = m_Controls->m_AddGibbsRinging->isChecked();
     if (m_Controls->m_AddGibbsRinging->isChecked())
-    {
         m_ImageGenParameters.artifactModelString += "_RINGING";
-        m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Ringing-Upsampling", DoubleProperty::New(m_Controls->m_ImageUpsamplingBox->value()));
-        m_ImageGenParameters.upsampling = m_Controls->m_ImageUpsamplingBox->value();
-    }
 
     // adjusting line readout time to the adapted image size needed for the DFT
     int y = m_ImageGenParameters.imageRegion.GetSize(1);
@@ -600,10 +605,11 @@ void QmitkFiberfoxView::SaveParameters()
     parameters.put("fiberfox.image.artifacts.addeddy", m_Controls->m_AddEddy->isChecked());
     parameters.put("fiberfox.image.artifacts.eddyStrength", m_Controls->m_EddyGradientStrength->value());
     parameters.put("fiberfox.image.artifacts.addringing", m_Controls->m_AddGibbsRinging->isChecked());
-    parameters.put("fiberfox.image.artifacts.ringingupsampling", m_Controls->m_ImageUpsamplingBox->value());
     parameters.put("fiberfox.image.artifacts.addspikes", m_Controls->m_AddSpikes->isChecked());
     parameters.put("fiberfox.image.artifacts.spikesnum", m_Controls->m_SpikeNumBox->value());
     parameters.put("fiberfox.image.artifacts.spikesscale", m_Controls->m_SpikeScaleBox->value());
+    parameters.put("fiberfox.image.artifacts.addaliasing", m_Controls->m_AddAliasing->isChecked());
+    parameters.put("fiberfox.image.artifacts.aliasingfactor", m_Controls->m_WrapBox->value());
 
     parameters.put("fiberfox.image.compartment1.index", m_Controls->m_Compartment1Box->currentIndex());
     parameters.put("fiberfox.image.compartment2.index", m_Controls->m_Compartment2Box->currentIndex());
@@ -725,6 +731,8 @@ void QmitkFiberfoxView::LoadParameters()
             m_Controls->m_NoiseLevel->setValue(v1.second.get<double>("artifacts.noisevariance"));
             m_Controls->m_AddGhosts->setChecked(v1.second.get<bool>("artifacts.addghost"));
             m_Controls->m_kOffsetBox->setValue(v1.second.get<double>("artifacts.kspaceLineOffset"));
+            m_Controls->m_AddAliasing->setChecked(v1.second.get<bool>("artifacts.addaliasing"));
+            m_Controls->m_WrapBox->setValue(v1.second.get<double>("artifacts.aliasingfactor"));
             m_Controls->m_AddDistortions->setChecked(v1.second.get<bool>("artifacts.distortions"));
 
             m_Controls->m_AddSpikes->setChecked(v1.second.get<bool>("artifacts.addspikes"));
@@ -733,7 +741,6 @@ void QmitkFiberfoxView::LoadParameters()
             m_Controls->m_AddEddy->setChecked(v1.second.get<bool>("artifacts.addeddy"));
             m_Controls->m_EddyGradientStrength->setValue(v1.second.get<double>("artifacts.eddyStrength"));
             m_Controls->m_AddGibbsRinging->setChecked(v1.second.get<bool>("artifacts.addringing"));
-            m_Controls->m_ImageUpsamplingBox->setValue(v1.second.get<double>("artifacts.ringingupsampling"));
 
             m_Controls->m_Compartment1Box->setCurrentIndex(v1.second.get<int>("compartment1.index"));
             m_Controls->m_Compartment2Box->setCurrentIndex(v1.second.get<int>("compartment2.index"));
@@ -893,6 +900,14 @@ void QmitkFiberfoxView::OnConstantRadius(int value)
         GenerateFibers();
 }
 
+void QmitkFiberfoxView::OnAddAliasing(int value)
+{
+    if (value>0)
+        m_Controls->m_AliasingFrame->setVisible(true);
+    else
+        m_Controls->m_AliasingFrame->setVisible(false);
+}
+
 void QmitkFiberfoxView::OnAddSpikes(int value)
 {
     if (value>0)
@@ -931,14 +946,6 @@ void QmitkFiberfoxView::OnAddNoise(int value)
         m_Controls->m_NoiseFrame->setVisible(true);
     else
         m_Controls->m_NoiseFrame->setVisible(false);
-}
-
-void QmitkFiberfoxView::OnAddGibbsRinging(int value)
-{
-    if (value>0)
-        m_Controls->m_GibbsRingingFrame->setVisible(true);
-    else
-        m_Controls->m_GibbsRingingFrame->setVisible(false);
 }
 
 void QmitkFiberfoxView::OnDistributionChanged(int value)
@@ -1362,7 +1369,7 @@ void QmitkFiberfoxView::GenerateFibers()
     filter->Update();
     vector< mitk::FiberBundleX::Pointer > fiberBundles = filter->GetFiberBundles();
 
-    for (int i=0; i<fiberBundles.size(); i++)
+    for (unsigned int i=0; i<fiberBundles.size(); i++)
     {
         m_SelectedBundles.at(i)->SetData( fiberBundles.at(i) );
         if (fiberBundles.at(i)->GetNumFibers()>50000)
@@ -1379,7 +1386,7 @@ void QmitkFiberfoxView::GenerateImage()
     {
         if (m_SelectedDWI.IsNotNull()) // add artifacts to existing diffusion weighted image
         {
-            for (int i=0; i<m_SelectedImages.size(); i++)
+            for (unsigned int i=0; i<m_SelectedImages.size(); i++)
             {
                 if (!dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedImages.at(i)->GetData()))
                     continue;
@@ -1401,10 +1408,11 @@ void QmitkFiberfoxView::GenerateImage()
                 filter->SetTE(m_ImageGenParameters.tEcho);
                 filter->SetSimulateEddyCurrents(m_ImageGenParameters.doSimulateEddyCurrents);
                 filter->SetEddyGradientStrength(m_ImageGenParameters.eddyStrength);
-                filter->SetUpsampling(m_ImageGenParameters.upsampling);
+                filter->SetAddGibbsRinging(m_ImageGenParameters.addGibbsRinging);
                 filter->SetFrequencyMap(m_ImageGenParameters.frequencyMap);
                 filter->SetSpikeAmplitude(m_ImageGenParameters.spikeAmplitude);
                 filter->SetSpikes(m_ImageGenParameters.spikes);
+                filter->SetWrap(m_ImageGenParameters.wrap);
                 filter->Update();
 
                 mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
@@ -1444,7 +1452,7 @@ void QmitkFiberfoxView::GenerateImage()
         mitk::BaseData::Pointer basedata = node->GetData();
         if (basedata.IsNotNull())
         {
-            mitk::RenderingManager::GetInstance()->InitializeViews( basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+            mitk::RenderingManager::GetInstance()->InitializeViews( basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         }
         UpdateGui();
@@ -1462,7 +1470,7 @@ void QmitkFiberfoxView::GenerateImage()
 
         tractsToDwiFilter->SetSimulateEddyCurrents(m_ImageGenParameters.doSimulateEddyCurrents);
         tractsToDwiFilter->SetEddyGradientStrength(m_ImageGenParameters.eddyStrength);
-        tractsToDwiFilter->SetUpsampling(m_ImageGenParameters.upsampling);
+        tractsToDwiFilter->SetAddGibbsRinging(m_ImageGenParameters.addGibbsRinging);
         tractsToDwiFilter->SetSimulateRelaxation(m_ImageGenParameters.doSimulateRelaxation);
         tractsToDwiFilter->SetImageRegion(m_ImageGenParameters.imageRegion);
         tractsToDwiFilter->SetSpacing(m_ImageGenParameters.imageSpacing);
@@ -1488,6 +1496,7 @@ void QmitkFiberfoxView::GenerateImage()
         tractsToDwiFilter->SetFrequencyMap(m_ImageGenParameters.frequencyMap);
         tractsToDwiFilter->SetSpikeAmplitude(m_ImageGenParameters.spikeAmplitude);
         tractsToDwiFilter->SetSpikes(m_ImageGenParameters.spikes);
+        tractsToDwiFilter->SetWrap(m_ImageGenParameters.wrap);
         tractsToDwiFilter->Update();
 
         mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
@@ -1531,7 +1540,7 @@ void QmitkFiberfoxView::GenerateImage()
         if (basedata.IsNotNull())
         {
             mitk::RenderingManager::GetInstance()->InitializeViews(
-                        basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+                        basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         }
     }
@@ -1587,25 +1596,25 @@ void QmitkFiberfoxView::ApplyTransform()
                         double y = m_Controls->m_YrotBox->value()*M_PI/180;
                         double z = m_Controls->m_ZrotBox->value()*M_PI/180;
 
-                        itk::Matrix< float, 3, 3 > rotX; rotX.SetIdentity();
+                        itk::Matrix< double, 3, 3 > rotX; rotX.SetIdentity();
                         rotX[1][1] = cos(x);
                         rotX[2][2] = rotX[1][1];
                         rotX[1][2] = -sin(x);
                         rotX[2][1] = -rotX[1][2];
 
-                        itk::Matrix< float, 3, 3 > rotY; rotY.SetIdentity();
+                        itk::Matrix< double, 3, 3 > rotY; rotY.SetIdentity();
                         rotY[0][0] = cos(y);
                         rotY[2][2] = rotY[0][0];
                         rotY[0][2] = sin(y);
                         rotY[2][0] = -rotY[0][2];
 
-                        itk::Matrix< float, 3, 3 > rotZ; rotZ.SetIdentity();
+                        itk::Matrix< double, 3, 3 > rotZ; rotZ.SetIdentity();
                         rotZ[0][0] = cos(z);
                         rotZ[1][1] = rotZ[0][0];
                         rotZ[0][1] = -sin(z);
                         rotZ[1][0] = -rotZ[0][1];
 
-                        itk::Matrix< float, 3, 3 > rot = rotZ*rotY*rotX;
+                        itk::Matrix< double, 3, 3 > rot = rotZ*rotY*rotX;
 
                         // transform control point coordinate into geometry translation
                         geom->SetOrigin(pe->GetWorldControlPoint(0));
@@ -1646,22 +1655,22 @@ void QmitkFiberfoxView::ApplyTransform()
             double x = m_Controls->m_XrotBox->value()*M_PI/180;
             double y = m_Controls->m_YrotBox->value()*M_PI/180;
             double z = m_Controls->m_ZrotBox->value()*M_PI/180;
-            itk::Matrix< float, 3, 3 > rotX; rotX.SetIdentity();
+            itk::Matrix< double, 3, 3 > rotX; rotX.SetIdentity();
             rotX[1][1] = cos(x);
             rotX[2][2] = rotX[1][1];
             rotX[1][2] = -sin(x);
             rotX[2][1] = -rotX[1][2];
-            itk::Matrix< float, 3, 3 > rotY; rotY.SetIdentity();
+            itk::Matrix< double, 3, 3 > rotY; rotY.SetIdentity();
             rotY[0][0] = cos(y);
             rotY[2][2] = rotY[0][0];
             rotY[0][2] = sin(y);
             rotY[2][0] = -rotY[0][2];
-            itk::Matrix< float, 3, 3 > rotZ; rotZ.SetIdentity();
+            itk::Matrix< double, 3, 3 > rotZ; rotZ.SetIdentity();
             rotZ[0][0] = cos(z);
             rotZ[1][1] = rotZ[0][0];
             rotZ[0][1] = -sin(z);
             rotZ[1][0] = -rotZ[0][1];
-            itk::Matrix< float, 3, 3 > rot = rotZ*rotY*rotX;
+            itk::Matrix< double, 3, 3 > rot = rotZ*rotY*rotX;
 
             // transform control point coordinate into geometry translation
             geom->SetOrigin(pe->GetWorldControlPoint(0));

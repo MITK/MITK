@@ -88,11 +88,11 @@ namespace mitk
 
 //    Point3D m_InitialPickedPoint;
 //    Point2D m_InitialPickedDisplayPoint;
-//    vtkFloatingPointType m_InitialPickedPointWorld[4];
+//    double m_InitialPickedPointWorld[4];
 
     Point3D m_CurrentPickedPoint;
     Point2D m_CurrentPickedDisplayPoint;
-    vtkFloatingPointType m_CurrentPickedPointWorld[4];
+    double m_CurrentPickedPointWorld[4];
 
   };
 }

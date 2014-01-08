@@ -91,9 +91,6 @@ void mitk::Geometry3D::Initialize()
   float b[6] = {0,1,0,1,0,1};
   SetFloatBounds(b);
 
-  m_IndexToObjectTransform = TransformType::New();
-  m_ObjectToNodeTransform = TransformType::New();
-
   if(m_IndexToWorldTransform.IsNull())
     m_IndexToWorldTransform = TransformType::New();
   else
@@ -145,7 +142,7 @@ void mitk::Geometry3D::SetFloatBounds(const float bounds[6])
   const float *input = bounds;
   int i=0;
   for(mitk::BoundingBox::BoundsArrayType::Iterator it = b.Begin(); i < 6 ;++i) *it++ = (mitk::ScalarType)*input++;
-  SetBoundsArray(b, m_BoundingBox);
+  SetBounds(b);
 }
 
 void mitk::Geometry3D::SetFloatBounds(const double bounds[6])
@@ -154,12 +151,31 @@ void mitk::Geometry3D::SetFloatBounds(const double bounds[6])
   const double *input = bounds;
   int i=0;
   for(mitk::BoundingBox::BoundsArrayType::Iterator it = b.Begin(); i < 6 ;++i) *it++ = (mitk::ScalarType)*input++;
-  SetBoundsArray(b, m_BoundingBox);
+  SetBounds(b);
 }
 
 void mitk::Geometry3D::SetParametricBounds(const BoundingBox::BoundsArrayType& bounds)
 {
-  SetBoundsArray(bounds, m_ParametricBoundingBox);
+  m_ParametricBoundingBox = BoundingBoxType::New();
+
+  BoundingBoxType::PointsContainer::Pointer pointscontainer =
+           BoundingBoxType::PointsContainer::New();
+  BoundingBoxType::PointType p;
+  BoundingBoxType::PointIdentifier pointid;
+
+  for(pointid=0; pointid<2;++pointid)
+    {
+    unsigned int i;
+    for(i=0; i<NDimensions; ++i)
+      {
+      p[i] = bounds[2*i+pointid];
+      }
+    pointscontainer->InsertElement(pointid, p);
+    }
+
+  m_ParametricBoundingBox->SetPoints(pointscontainer);
+  m_ParametricBoundingBox->ComputeBoundingBox();
+  this->Modified();
 }
 
 void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const
@@ -200,7 +216,7 @@ void mitk::Geometry3D::SetIndexToWorldTransform(mitk::AffineTransform3D* transfo
 {
   if(m_IndexToWorldTransform.GetPointer() != transform)
   {
-    Superclass::SetIndexToWorldTransform(transform);
+    m_IndexToWorldTransform = transform;
     CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
     vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
     TransferItkToVtkTransform();
@@ -540,7 +556,7 @@ void mitk::Geometry3D::SetIdentity()
   TransferItkToVtkTransform();
 }
 
-void mitk::Geometry3D::Compose( const mitk::AffineGeometryFrame3D::TransformType * other, bool pre )
+void mitk::Geometry3D::Compose( const mitk::Geometry3D::TransformType * other, bool pre )
 {
   m_IndexToWorldTransform->Compose(other, pre);
   CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
@@ -551,7 +567,7 @@ void mitk::Geometry3D::Compose( const mitk::AffineGeometryFrame3D::TransformType
 
 void mitk::Geometry3D::Compose( const vtkMatrix4x4 * vtkmatrix, bool pre )
 {
-  mitk::AffineGeometryFrame3D::TransformType::Pointer itkTransform = mitk::AffineGeometryFrame3D::TransformType::New();
+  mitk::Geometry3D::TransformType::Pointer itkTransform = mitk::Geometry3D::TransformType::New();
   TransferVtkMatrixToItkTransform(vtkmatrix, itkTransform.GetPointer());
   Compose(itkTransform, pre);
 }
@@ -906,4 +922,46 @@ bool mitk::Equal(const Geometry3D::TransformType *leftHandSide, const Geometry3D
     return false;
   }
   return true;
+}
+
+/** Initialize the geometry */
+void
+mitk::Geometry3D::InitializeGeometry(Geometry3D* newGeometry) const
+{
+  newGeometry->SetBounds(m_BoundingBox->GetBounds());
+  // we have to create a new transform!!
+
+  if(m_IndexToWorldTransform)
+  {
+    TransformType::Pointer indexToWorldTransform = TransformType::New();
+    indexToWorldTransform->SetCenter( m_IndexToWorldTransform->GetCenter() );
+    indexToWorldTransform->SetMatrix( m_IndexToWorldTransform->GetMatrix() );
+    indexToWorldTransform->SetOffset( m_IndexToWorldTransform->GetOffset() );
+    newGeometry->SetIndexToWorldTransform(indexToWorldTransform);
+  }
+}
+
+/** Set the bounds */
+void mitk::Geometry3D::SetBounds(const BoundsArrayType& bounds)
+{
+  m_BoundingBox = BoundingBoxType::New();
+
+  BoundingBoxType::PointsContainer::Pointer pointscontainer =
+           BoundingBoxType::PointsContainer::New();
+  BoundingBoxType::PointType p;
+  BoundingBoxType::PointIdentifier pointid;
+
+  for(pointid=0; pointid<2;++pointid)
+    {
+    unsigned int i;
+    for(i=0; i<NDimensions; ++i)
+      {
+      p[i] = bounds[2*i+pointid];
+      }
+    pointscontainer->InsertElement(pointid, p);
+    }
+
+  m_BoundingBox->SetPoints(pointscontainer);
+  m_BoundingBox->ComputeBoundingBox();
+  this->Modified();
 }

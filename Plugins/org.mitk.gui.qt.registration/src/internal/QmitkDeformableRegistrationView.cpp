@@ -153,7 +153,7 @@ struct SelListenerDeformableRegistration : ISelectionListener
     if (part)
     {
       QString partname(part->GetPartName().c_str());
-      if(partname.compare("Datamanager")==0)
+      if(partname.compare("Data Manager")==0)
       {
         // apply selection
         DoSelectionChanged(selection);

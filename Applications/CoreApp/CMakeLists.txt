@@ -32,6 +32,3 @@ FunctionCreateBlueBerryApplication(
 
 # subproject support
 add_dependencies(MITK-CoreUI CoreApp)
-if(MITK_ENABLE_GUI_TESTING)
-  add_dependencies(MITK-CoreUI solstice)
-endif()

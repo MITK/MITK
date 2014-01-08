@@ -58,10 +58,10 @@ void mitk::ContourModelMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
   this->ApplyContourProperties(renderer);
 
   //tube filter the polyData
-  localStorage->m_TubeFilter->SetInput(localStorage->m_OutlinePolyData);
+  localStorage->m_TubeFilter->SetInputData(localStorage->m_OutlinePolyData);
 
   float lineWidth(1.0);
-  if (this->GetDataNode()->GetFloatProperty( "3D contour width", lineWidth, renderer ))
+  if (this->GetDataNode()->GetFloatProperty( "contour.3D.width", lineWidth, renderer ))
   {
     localStorage->m_TubeFilter->SetRadius(lineWidth);
   }else
@@ -71,7 +71,7 @@ void mitk::ContourModelMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
   localStorage->m_TubeFilter->CappingOn();
   localStorage->m_TubeFilter->SetNumberOfSides(10);
   localStorage->m_TubeFilter->Update();
-  localStorage->m_Mapper->SetInput(localStorage->m_TubeFilter->GetOutput());
+  localStorage->m_Mapper->SetInputConnection(localStorage->m_TubeFilter->GetOutputPort());
 
 }
 
@@ -94,14 +94,14 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer* renderer)
 
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
   // Check if time step is valid
-  const TimeSlicedGeometry *dataTimeGeometry = data->GetTimeSlicedGeometry();
+  const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
   if ( ( dataTimeGeometry == NULL )
-    || ( dataTimeGeometry->GetTimeSteps() == 0 )
-    || ( !dataTimeGeometry->IsValidTime( renderer->GetTimeStep() ) )
+    || ( dataTimeGeometry->CountTimeSteps() == 0 )
+    || ( !dataTimeGeometry->IsValidTimeStep( renderer->GetTimeStep() ) )
     || ( this->GetTimestep() == -1 ) )
   {
     //clear the rendered polydata
-    localStorage->m_Mapper->SetInput(vtkSmartPointer<vtkPolyData>::New());
+    localStorage->m_Mapper->SetInputData(vtkSmartPointer<vtkPolyData>::New());
     return;
   }
 
@@ -202,7 +202,7 @@ void mitk::ContourModelMapper3D::ApplyContourProperties(mitk::BaseRenderer* rend
 
 
   mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-        ("color", renderer));
+        ("contour.color", renderer));
   if(colorprop)
   {
     //set the color of the contour
@@ -237,7 +237,7 @@ mitk::ContourModelMapper3D::LocalStorage::LocalStorage()
 void mitk::ContourModelMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
-  node->AddProperty( "3D contour width", mitk::FloatProperty::New( 0.5 ), renderer, overwrite );
+  node->AddProperty( "contour.3D.width", mitk::FloatProperty::New( 0.5 ), renderer, overwrite );
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

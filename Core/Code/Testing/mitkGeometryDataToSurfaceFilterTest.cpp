@@ -76,7 +76,7 @@ int testSurfaceBoundingBoxConsistency(mitk::Surface* surface, bool expectIdentit
     std::cout<<"[PASSED]"<<std::endl;
   }
 
-  vtkFloatingPointType bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  double bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
   vtkPolyData* polys = surface->GetVtkPolyData();
   polys->ComputeBounds();

@@ -14,47 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// Blueberry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
-#include <berryUIException.h>
-#include <berryIWorkbenchPage.h>
-#include <berryIPreferencesService.h>
-#include <berryIPartListener.h>
-#include <mitkGlobalInteraction.h>
-#include <mitkDataStorageEditorInput.h>
-#include "berryFileEditorInput.h"
-
 // Qmitk
 #include "QmitkDicomEditor.h"
 #include "mitkPluginActivator.h"
-#include <mitkDicomSeriesReader.h>
-
-//#include "mitkProgressBar.h"
-
-// Qt
-#include <QCheckBox>
-#include <QMessageBox>
-#include <QWidget>
-
-#include <QtSql>
-#include <QSqlDatabase>
-#include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QGridLayout>
-#include <QtGui/QHeaderView>
-#include <QtGui/QPushButton>
-#include <QtGui/QTextEdit>
-#include <QtGui/QWidget>
-
-//CTK
-#include <ctkDICOMModel.h>
-#include <ctkDICOMAppWidget.h>
-#include <ctkDICOMQueryWidget.h>
-#include <ctkFileDialog.h>
-#include <ctkDICOMQueryRetrieveWidget.h>
 
 
 const std::string QmitkDicomEditor::EDITOR_ID = "org.mitk.editors.dicomeditor";
@@ -77,16 +39,11 @@ QmitkDicomEditor::~QmitkDicomEditor()
     delete m_StoreSCPLauncher;
     delete m_Handler;
     delete m_Publisher;
-    delete m_ImportDialog;
 }
 
 void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
 {
     m_Controls.setupUi( parent );
-    m_Controls.LocalStorageButton->setIcon(QIcon(":/org.mitk.gui.qt.dicom/drive-harddisk_32.png"));
-    m_Controls.FolderButton->setIcon(QIcon(":/org.mitk.gui.qt.dicom/folder_32.png"));
-    m_Controls.CDButton->setIcon(QIcon(":/org.mitk.gui.qt.dicom/media-optical_32.png"));
-    m_Controls.QueryRetrieveButton->setIcon(QIcon(":/org.mitk.gui.qt.dicom/network-workgroup_32.png"));
     m_Controls.StoreSCPStatusLabel->setTextFormat(Qt::RichText);
     m_Controls.StoreSCPStatusLabel->setText("<img src=':/org.mitk.gui.qt.dicom/network-offline_16.png'>");
 
@@ -98,68 +55,21 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     CreateTemporaryDirectory();
     StartDicomDirectoryListener();
 
-    SetupImportDialog();
-    SetupProgressDialog(parent);
-
     m_Controls.m_ctkDICOMQueryRetrieveWidget->useProgressDialog(false);
 
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalStartDicomImport(const QStringList&)),m_Controls.internalDataWidget,SLOT(OnStartDicomImport(const QStringList&)));
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalDicomToDataManager(QHash<QString,QVariant>)),this,SLOT(OnViewButtonAddToDataManager(QHash<QString,QVariant>)));
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalChangePage(int)), this, SLOT(OnChangePage(int)));
+    connect(m_Controls.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(OnTabChanged(int)));
 
-    connect(m_Controls.internalDataWidget,SIGNAL(SignalFinishedImport()),this,SLOT(OnDicomImportFinished()));
-    connect(m_Controls.internalDataWidget,SIGNAL(SignalDicomToDataManager(QHash<QString,QVariant>)),this,SLOT(OnViewButtonAddToDataManager(QHash<QString,QVariant>)));
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalStartDicomImport(const QStringList&)),
+            m_Controls.internalDataWidget,SLOT(OnStartDicomImport(const QStringList&)));
 
-    connect(m_Controls.CDButton, SIGNAL(clicked()), this, SLOT(OnFolderCDImport()));
-    connect(m_Controls.FolderButton, SIGNAL(clicked()), this, SLOT(OnFolderCDImport()));
-    connect(m_Controls.QueryRetrieveButton, SIGNAL(clicked()), this, SLOT(OnQueryRetrieve()));
-    connect(m_Controls.LocalStorageButton, SIGNAL(clicked()), this, SLOT(OnLocalStorage()));
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalDicomToDataManager(const QHash<QString,QVariant>&)),
+            this,SLOT(OnViewButtonAddToDataManager(const QHash<QString,QVariant>&)));
+
+    connect(m_Controls.internalDataWidget,SIGNAL(SignalFinishedImport()),this, SLOT(OnDicomImportFinished()));
+    connect(m_Controls.internalDataWidget,SIGNAL(SignalDicomToDataManager(const QHash<QString,QVariant>&)),
+            this,SLOT(OnViewButtonAddToDataManager(const QHash<QString,QVariant>&)));
 }
 
-void QmitkDicomEditor::SetupProgressDialog(QWidget* parent)
-{
-    m_ProgressDialog = new QProgressDialog("DICOM Import", "Cancel", 0, 100, parent,Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-    m_ProgressDialogLabel = new QLabel(tr("Initialization..."));
-    m_ProgressDialog->setLabel(m_ProgressDialogLabel);
-#ifdef Q_WS_MAC
-    // BUG: avoid deadlock of dialogs on mac
-    m_ProgressDialog->setWindowModality(Qt::NonModal);
-#else
-    m_ProgressDialog->setWindowModality(Qt::ApplicationModal);
-#endif
-
-    connect(m_ProgressDialog, SIGNAL(canceled()), m_Controls.internalDataWidget, SIGNAL(SignalCancelImport()));
-    connect(m_Controls.internalDataWidget, SIGNAL(SignalProcessingFile(QString)),m_ProgressDialogLabel, SLOT(setText(QString)));
-    connect(m_Controls.internalDataWidget, SIGNAL(SignalProgress(int)),m_ProgressDialog, SLOT(setValue(int)));
-    connect(m_Controls.internalDataWidget, SIGNAL(SignalProgress(int)),this, SLOT(OnImportProgress(int)));
-    connect(m_Controls.internalDataWidget, SIGNAL(SignalFinishedImport()),this, SLOT(OnDicomImportFinished()));
-
-    connect(m_ProgressDialog, SIGNAL(canceled()), m_Controls.externalDataWidget, SIGNAL(SignalCancelImport()));
-    connect(m_Controls.externalDataWidget, SIGNAL(SignalProcessingFile(QString)),m_ProgressDialogLabel, SLOT(setText(QString)));
-    connect(m_Controls.externalDataWidget, SIGNAL(SignalProgress(int)),m_ProgressDialog, SLOT(setValue(int)));
-    connect(m_Controls.externalDataWidget, SIGNAL(SignalProgress(int)),this, SLOT(OnImportProgress(int)));
-    connect(m_Controls.externalDataWidget, SIGNAL(SignalFinishedImport()),this, SLOT(OnDicomImportFinished()));
-
-}
-
-void QmitkDicomEditor::SetupImportDialog()
-{
-        //Initialize import widget
-        m_ImportDialog = new ctkFileDialog();
-        QCheckBox* importCheckbox = new QCheckBox("Copy on import", m_ImportDialog);
-        m_ImportDialog->setBottomWidget(importCheckbox);
-        m_ImportDialog->setFileMode(QFileDialog::Directory);
-        m_ImportDialog->setLabelText(QFileDialog::Accept,"Import");
-        m_ImportDialog->setWindowTitle("Import DICOM files from directory ...");
-        m_ImportDialog->setWindowModality(Qt::ApplicationModal);
-        connect(m_ImportDialog, SIGNAL(fileSelected(QString)),this,SLOT(OnFileSelected(QString)));
-}
-
-void QmitkDicomEditor::OnImportProgress(int progress)
-{
-  Q_UNUSED(progress);
-  QApplication::processEvents();
-}
 
 void QmitkDicomEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input)
 {
@@ -176,9 +86,10 @@ berry::IPartListener::Events::Types QmitkDicomEditor::GetPartEventTypes() const
     return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
 }
 
-void QmitkDicomEditor::OnQueryRetrieve()
+void QmitkDicomEditor::OnTabChanged(int page)
 {
-    OnChangePage(2);
+  if (page == 2)//Query/Retrieve is selected
+  {
     QString storagePort = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StoragePort"].toString();
     QString storageAET = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StorageAETitle"].toString();
      if(!((m_Builder.GetAETitle()->compare(storageAET,Qt::CaseSensitive)==0)&&
@@ -187,58 +98,12 @@ void QmitkDicomEditor::OnQueryRetrieve()
          StopStoreSCP();
          StartStoreSCP();
      }
-}
-
-void QmitkDicomEditor::OnFileSelected(QString directory)
-{
-    if (QDir(directory).exists())
-    {
-        QCheckBox* copyOnImport = qobject_cast<QCheckBox*>(m_ImportDialog->bottomWidget());
-
-        if (copyOnImport->isChecked())
-        {
-            connect(this,SIGNAL(SignalStartDicomImport(const QString&)),m_Controls.internalDataWidget,SLOT(OnStartDicomImport(const QString&)));
-            disconnect(this,SIGNAL(SignalStartDicomImport(const QString&)),m_Controls.externalDataWidget,SLOT(OnStartDicomImport(const QString&)));
-            OnChangePage(0);
-        }
-        else
-        {
-            disconnect(this,SIGNAL(SignalStartDicomImport(const QString&)),m_Controls.internalDataWidget,SLOT(OnStartDicomImport(const QString&)));
-            connect(this,SIGNAL(SignalStartDicomImport(const QString&)),m_Controls.externalDataWidget,SLOT(OnStartDicomImport(const QString&)));
-            OnChangePage(1);
-        }
-
-        m_ProgressDialog->setMinimumDuration(0);
-        m_ProgressDialog->setValue(0);
-        m_ProgressDialog->show();
-        emit SignalStartDicomImport(directory);
-    }
-}
-
-void QmitkDicomEditor::OnFolderCDImport()
-{
-    m_ImportDialog->show();
-    m_ImportDialog->raise();
-}
-
-void QmitkDicomEditor::OnLocalStorage()
-{
-    OnChangePage(0);
-}
-
-void QmitkDicomEditor::OnChangePage(int page)
-{
-    try{
-        m_Controls.stackedWidget->setCurrentIndex(page);
-    }catch(std::exception e){
-        MITK_ERROR <<"error: "<< e.what();
-        return;
-    }
+  }
 }
 
 void QmitkDicomEditor::OnDicomImportFinished()
 {
-  m_ProgressDialog->close();
+  m_Controls.tabWidget->setCurrentIndex(0);
 }
 
 void QmitkDicomEditor::StartDicomDirectoryListener()
@@ -264,11 +129,11 @@ void QmitkDicomEditor::TestHandler()
 void QmitkDicomEditor::OnViewButtonAddToDataManager(QHash<QString, QVariant> eventProperties)
 {
     ctkDictionary properties;
-    properties["PatientName"] = eventProperties["PatientName"];
-    properties["StudyUID"] = eventProperties["StudyUID"];
-    properties["StudyName"] = eventProperties["StudyName"];
-    properties["SeriesUID"] = eventProperties["SeriesUID"];
-    properties["SeriesName"] = eventProperties["SeriesName"];
+//    properties["PatientName"] = eventProperties["PatientName"];
+//    properties["StudyUID"] = eventProperties["StudyUID"];
+//    properties["StudyName"] = eventProperties["StudyName"];
+//    properties["SeriesUID"] = eventProperties["SeriesUID"];
+//    properties["SeriesName"] = eventProperties["SeriesName"];
     properties["FilesForSeries"] = eventProperties["FilesForSeries"];
 
     m_Publisher->PublishSignals(mitk::PluginActivator::getContext());
@@ -284,7 +149,6 @@ void QmitkDicomEditor::StartStoreSCP()
     m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&m_Builder);
     connect(m_StoreSCPLauncher, SIGNAL(SignalStatusOfStoreSCP(const QString&)), this, SLOT(OnStoreSCPStatusChanged(const QString&)));
     connect(m_StoreSCPLauncher ,SIGNAL(SignalStartImport(const QStringList&)),m_Controls.internalDataWidget,SLOT(OnStartDicomImport(const QStringList&)));
-    connect(m_StoreSCPLauncher ,SIGNAL(SignalStoreSCPError(const QString&)),m_Controls.internalDataWidget,SLOT(SignalCancelImport()));
     connect(m_StoreSCPLauncher ,SIGNAL(SignalStoreSCPError(const QString&)),m_DicomDirectoryListener,SLOT(OnDicomNetworkError(const QString&)),Qt::DirectConnection);
     connect(m_StoreSCPLauncher ,SIGNAL(SignalStoreSCPError(const QString&)),this,SLOT(OnDicomNetworkError(const QString&)),Qt::DirectConnection);
     m_StoreSCPLauncher->StartStoreSCP();

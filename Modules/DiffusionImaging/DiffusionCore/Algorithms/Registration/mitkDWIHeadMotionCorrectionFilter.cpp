@@ -188,8 +188,11 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   //   - (3.2) Register all timesteps in the splitted image onto the first reference
   //
   unsigned int maxImageIdx = splittedImage->GetTimeSteps();
-  mitk::TimeSlicedGeometry* tsg = splittedImage->GetTimeSlicedGeometry();
-  tsg->ExpandToNumberOfTimeSteps( maxImageIdx+1 );
+  mitk::TimeGeometry* tsg = splittedImage->GetTimeGeometry();
+  mitk::ProportionalTimeGeometry* ptg = dynamic_cast<ProportionalTimeGeometry*>(tsg);
+  ptg->Expand(maxImageIdx+1);
+  ptg->SetTimeStepGeometry( ptg->GetGeometryForTimeStep(0), maxImageIdx );
+
 
   mitk::Image::Pointer registeredWeighted = mitk::Image::New();
   registeredWeighted->Initialize( splittedImage->GetPixelType(0), *tsg );

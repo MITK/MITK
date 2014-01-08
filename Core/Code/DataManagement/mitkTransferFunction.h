@@ -37,17 +37,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 /**
- * \brief Wrapper class for VTK scalar opacity, gradient opacity, and color
- * transfer functions.
+ * @brief The TransferFunction class A wrapper class for VTK scalar opacity,
+ * gradient opacity, and color transfer functions.
+ * @ingroup DataManagement
  *
  * Holds a copy of each of the three standard VTK transfer functions (scalar
  * opacity, gradient opacity, color) and provides an interface for manipulating
  * their control points. Each original function can be retrieved by a Get()
  * method.
  *
- * NOTE: Currently, transfer function initialization based on histograms or
+ * @note Currently, transfer function initialization based on histograms or
  * computed-tomography-presets is also provided by this class, but will likely
  * be separated into a specific initializer class.
+ *
+ * @note If you want to use this as a property for an mitk::Image, make sure
+ * to use the mitk::TransferFunctionProperty and set the mitk::RenderingModeProperty
+ * to a mode which supports transfer functions (e.g. COLORTRANSFERFUNCTION_COLOR).
+ * Make sure to check the documentation of the mitk::RenderingModeProperty. For a
+ * code example how to use the mitk::TransferFunction check the
+ * mitkImageVtkMapper2DTransferFunctionTest.cpp in Core\Code\Testing.
  */
 class MITK_CORE_EXPORT TransferFunction : public itk::Object
 {

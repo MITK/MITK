@@ -202,7 +202,6 @@ void QmitkConnectomicsDataView::OnSelectionChanged( std::vector<mitk::DataNode*>
         m_Controls->inputImageOneNameLabel->setText(node->GetName().c_str());
         m_Controls->inputImageOneNameLabel->setVisible( true );
         m_Controls->inputImageOneLabel->setVisible( true );
-
       }
     } // end network section
 
@@ -288,7 +287,6 @@ void QmitkConnectomicsDataView::OnSyntheticNetworkCreationPushButtonClicked()
     break;
   default:
     break;
-
   }
 
   if( numberOfNodes > 5000 )
@@ -335,7 +333,7 @@ void QmitkConnectomicsDataView::OnSyntheticNetworkCreationPushButtonClicked()
   }
 
   mitk::RenderingManager::GetInstance()->InitializeViews(
-    networkNode->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+    networkNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return;

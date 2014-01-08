@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkBoundingBox.h>
 #include <itkQuaternionRigidTransform.h>
 #include <itkAffineGeometryFrame.h>
+#include "itkScalableAffineTransform.h"
+#include "itkBoundingBox.h"
 
 class vtkLinearTransform;
 class vtkMatrixToLinearTransform;
@@ -45,7 +47,8 @@ typedef itk::BoundingBox<unsigned long, 3, ScalarType>   BoundingBox;
 typedef itk::FixedArray<ScalarType,2>  TimeBounds;
 typedef itk::FixedArray<ScalarType, 3> FixedArrayType;
 
-typedef itk::AffineGeometryFrame<ScalarType, 3> AffineGeometryFrame3D;
+typedef itk::AffineGeometryFrame<ScalarType, 3>        AffineGeometryFrame3D;
+
 
 //##Documentation
 //## @brief Describes the geometry of a data object
@@ -93,16 +96,21 @@ typedef itk::AffineGeometryFrame<ScalarType, 3> AffineGeometryFrame3D;
 //##
 //## Rule: everything is in mm (ms) if not stated otherwise.
 //## @ingroup Geometry
-class MITK_CORE_EXPORT Geometry3D : public AffineGeometryFrame3D, public OperationActor
+class MITK_CORE_EXPORT Geometry3D : public itk::Object, public OperationActor
 {
 public:
-  mitkClassMacro(Geometry3D, AffineGeometryFrame3D);
+  mitkClassMacro(Geometry3D, itk::Object);
 
   typedef itk::QuaternionRigidTransform< ScalarType > QuaternionTransformType;
   typedef QuaternionTransformType::VnlQuaternionType VnlQuaternionType;
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
+
+typedef itk::ScalableAffineTransform<ScalarType, 3>    TransformType;
+typedef itk::BoundingBox<unsigned long, 3, ScalarType> BoundingBoxType;
+typedef BoundingBoxType::BoundsArrayType               BoundsArrayType;
+typedef BoundingBoxType::Pointer                       BoundingBoxPointer;
 
   // a bit of a misuse, but we want only doxygen to see the following:
 #ifdef DOXYGEN_SKIP
@@ -131,13 +139,13 @@ public:
     assert(m_BoundingBox.IsNotNull());
     return m_BoundingBox->GetBounds();
   }
+#endif
   //##Documentation
   //## \brief Set the bounding box (in index/unit coordinates)
   //##
   //## Only possible via the BoundsArray to make clear that a
   //## copy of the bounding-box is stored, not a reference to it.
-virtual void SetBounds(const BoundsArrayType& bounds);
-#endif
+  virtual void SetBounds(const BoundsArrayType& bounds);
   //##Documentation
   //## @brief Set the bounding box (in index/unit coordinates) via a float array
   virtual void SetFloatBounds(const float bounds[6]);
@@ -284,7 +292,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //## then other is post-composed with self; that is the resulting
   //## transformation consists of first applying self to the source,
   //## followed by other.
-  virtual void Compose( const AffineGeometryFrame3D::TransformType * other, bool pre = 0 );
+  virtual void Compose( const Geometry3D::TransformType * other, bool pre = 0 );
 
   //##Documentation
   //## @brief Compose new IndexToWorldTransform with a given vtkMatrix4x4.
@@ -549,7 +557,8 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //## See AbstractTransformGeometry for an example usage of this.
   mitk::ScalarType GetParametricExtent(int direction) const
   {
-    assert(direction>=0 && direction<3);
+    if (direction < 0 || direction>=3)
+      mitkThrow() << "Invalid direction. Must be between either 0, 1 or 2. ";
     assert(m_ParametricBoundingBox.IsNotNull());
 
     BoundingBoxType::BoundsArrayType bounds = m_ParametricBoundingBox->GetBounds();
@@ -596,11 +605,38 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //##@brief executes affine operations (translate, rotate, scale)
   virtual void ExecuteOperation(Operation* operation);
 
+
+
+  /** Set/Get the IndexToWorldTransform */
+  itkGetConstObjectMacro(IndexToWorldTransform, AffineTransform3D);
+  itkGetObjectMacro(IndexToWorldTransform, AffineTransform3D);
+  /** Get the bounding box */
+  itkGetConstObjectMacro(BoundingBox, BoundingBoxType);
+
+  const BoundsArrayType GetBounds() const
+    {
+    assert(m_BoundingBox.IsNotNull());
+    return m_BoundingBox->GetBounds();
+    }
+
+  /** Get the extent of the bounding box */
+  ScalarType GetExtent(unsigned int direction) const
+    {
+    assert(m_BoundingBox.IsNotNull());
+    if (direction>=NDimensions)
+      mitkThrow() << "Direction is too big. This geometry is for 3D Data";
+    BoundsArrayType bounds = m_BoundingBox->GetBounds();
+    return bounds[direction*2+1]-bounds[direction*2];
+    }
 protected:
   Geometry3D();
   Geometry3D(const Geometry3D& other);
 
+
+  virtual void InitializeGeometry(Self * newGeometry) const;
+
   static const std::string GetTransformAsString( TransformType* transformType );
+  static const unsigned int NDimensions = 3;
 
   virtual ~Geometry3D();
 
@@ -633,6 +669,9 @@ protected:
   vtkMatrix4x4* m_VtkMatrix;
 
   bool m_ImageGeometry;
+
+  AffineTransform3D::Pointer m_IndexToWorldTransform;
+  mutable BoundingBoxPointer m_BoundingBox;
 
   //##Documentation
   //## @brief Spacing of the data. Only significant if the geometry describes

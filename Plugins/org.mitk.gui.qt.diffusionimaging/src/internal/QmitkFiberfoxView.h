@@ -99,12 +99,12 @@ protected slots:
     void OnBiasChanged(double value);
     void OnVarianceChanged(double value);
     void OnDistributionChanged(int value);
-    void OnAddGibbsRinging(int value);
     void OnAddNoise(int value);
     void OnAddGhosts(int value);
     void OnAddDistortions(int value);
     void OnAddEddy(int value);
     void OnAddSpikes(int value);
+    void OnAddAliasing(int value);
     void OnConstantRadius(int value);
 
 protected:
@@ -160,12 +160,13 @@ protected:
         double                              axonRadius;
         unsigned int                        interpolationShrink;
         double                              kspaceLineOffset;
-        double                              upsampling;
+        bool                                addGibbsRinging;
         double                              eddyStrength;
         double                              comp3Weight;
         double                              comp4Weight;
         int                                 spikes;
         double                              spikeAmplitude;
+        double                              wrap;
 
         bool                                doSimulateRelaxation;
         bool                                doSimulateEddyCurrents;

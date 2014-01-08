@@ -109,14 +109,14 @@ void mitk::SurfaceGLMapper2D::SetDataNode( mitk::DataNode* node )
   if (!useCellData)
   {
     // search min/max point scalars over all time steps
-    vtkFloatingPointType dataRange[2] = {0,0};
-    vtkFloatingPointType range[2];
+    double dataRange[2] = {0,0};
+    double range[2];
 
     Surface::Pointer input  = const_cast< Surface* >(dynamic_cast<const Surface*>( this->GetDataNode()->GetData() ));
     if(input.IsNull()) return;
-    const TimeSlicedGeometry::Pointer inputTimeGeometry = input->GetTimeSlicedGeometry();
-    if(( inputTimeGeometry.IsNull() ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) ) return;
-    for (unsigned int timestep=0; timestep<inputTimeGeometry->GetTimeSteps(); timestep++)
+    const TimeGeometry::Pointer inputTimeGeometry = input->GetTimeGeometry();
+    if(( inputTimeGeometry.IsNull() ) || ( inputTimeGeometry->CountTimeSteps() == 0 ) ) return;
+    for (unsigned int timestep=0; timestep<inputTimeGeometry->CountTimeSteps(); timestep++)
     {
       vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
       if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 )) continue;
@@ -153,10 +153,10 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     return;
 
   //
-  // get the TimeSlicedGeometry of the input object
+  // get the TimeGeometry of the input object
   //
-  const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
-  if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
+  const TimeGeometry* inputTimeGeometry = input->GetTimeGeometry();
+  if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->CountTimeSteps() == 0 ) )
     return;
 
   if (dynamic_cast<IntProperty *>(this->GetDataNode()->GetProperty("line width")) == NULL)
@@ -174,11 +174,11 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   int timestep=0;
 
   if( time > ScalarTypeNumericTraits::NonpositiveMin() )
-    timestep = inputTimeGeometry->MSToTimeStep( time );
+    timestep = inputTimeGeometry->TimePointToTimeStep( time );
 
  // int timestep = this->GetTimestep();
 
-  if( inputTimeGeometry->IsValidTime( timestep ) == false )
+  if( inputTimeGeometry->IsValidTimeStep( timestep ) == false )
     return;
 
   vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
@@ -202,8 +202,8 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     Vector3D normal;
 
     //Check if Lookup-Table is already given, else use standard one.
-    vtkFloatingPointType* scalarLimits = m_LUT->GetTableRange();
-    vtkFloatingPointType scalarsMin = scalarLimits[0], scalarsMax = scalarLimits[1];
+    double* scalarLimits = m_LUT->GetTableRange();
+    double scalarsMin = scalarLimits[0], scalarsMax = scalarLimits[1];
 
     vtkLookupTable *lut;// = vtkLookupTable::New();
 
@@ -244,7 +244,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       AbstractTransformGeometry::ConstPointer worldAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(renderer->GetCurrentWorldGeometry2D());
       if(worldAbstractGeometry.IsNotNull())
       {
-        AbstractTransformGeometry::ConstPointer surfaceAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(input->GetTimeSlicedGeometry()->GetGeometry3D(0));
+        AbstractTransformGeometry::ConstPointer surfaceAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(input->GetTimeGeometry()->GetGeometryForTimeStep(0).GetPointer());
         if(surfaceAbstractGeometry.IsNotNull()) //@todo substitude by operator== after implementation, see bug id 28
         {
           PaintCells(renderer, vtkpolydata, worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut);
@@ -264,7 +264,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
         return;
     }
 
-    vtkFloatingPointType vp[3], vnormal[3];
+    double vp[3], vnormal[3];
 
     vnl2vtk(point.GetVnlVector(), vp);
     vnl2vtk(normal.GetVnlVector(), vnormal);
@@ -281,14 +281,14 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     m_Plane->SetNormal(vnormal);
 
     //set data into cutter
-    m_Cutter->SetInput(vtkpolydata);
+    m_Cutter->SetInputData(vtkpolydata);
     m_Cutter->Update();
     //    m_Cutter->GenerateCutScalarsOff();
     //    m_Cutter->SetSortByToSortByCell();
 
     if (m_DrawNormals)
     {
-      m_Stripper->SetInput( m_Cutter->GetOutput() );
+      m_Stripper->SetInputData( m_Cutter->GetOutput() );
       // calculate the cut
       m_Stripper->Update();
       PaintCells(renderer, m_Stripper->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut, vtkpolydata);
@@ -359,7 +359,7 @@ void mitk::SurfaceGLMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyDa
   {
     vtkIdType *cell(NULL);
     vtkIdType cellSize(0);
-    vtkFloatingPointType vp[3];
+    double vp[3];
 
     vlines->GetNextCell(cellSize, cell);
 
@@ -390,7 +390,7 @@ void mitk::SurfaceGLMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyDa
       //convert point (until now mm and in world coordinates) to display coordinates (units )
       displayGeometry->WorldToDisplay(p2d, p2d);
 
-      vtkFloatingPointType color[3];
+      double color[3];
       if (useCellData && vcellscalars != NULL )
       {
         // color each cell according to cell data

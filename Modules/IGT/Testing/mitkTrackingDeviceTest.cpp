@@ -53,9 +53,6 @@ int mitkTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   TrackingDeviceTestClass::Pointer trackingDeviceTestClass = TrackingDeviceTestClass::New();
   MITK_TEST_CONDITION(trackingDeviceTestClass.IsNotNull(),"Test instatiation");
 
-  // Test method GetErrorMessage()
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetErrorMessage()==std::string(""),"Error message should be empty");
-
   // Test method GetState()
   MITK_TEST_CONDITION(trackingDeviceTestClass->GetState()==mitk::TrackingDevice::Setup,"Mode should be initialized to SETUP");
 

@@ -84,12 +84,6 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Obje
         IplImage* m_OpenCVImage;
 };
 
-template<typename TPixel, unsigned int VImageDimension>
-void mitk::ImageToOpenCVImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* image )
-{
-    m_OpenCVImage = itk::OpenCVImageBridge::ITKImageToIplImage (image);
-}
-
 } // namespace
 
 #endif // mitkImageToOpenCVImageFilter_h

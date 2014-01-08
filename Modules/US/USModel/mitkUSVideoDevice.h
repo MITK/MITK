@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKUSVideoDevice_H_HEADER_INCLUDED_
 #define MITKUSVideoDevice_H_HEADER_INCLUDED_
 
@@ -25,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSImageVideoSource.h"
 
 namespace mitk {
-
     /**Documentation
     * \brief A VideoDevice is the common class for video only devices. They capture Video Input either from
     *  a file or from a device, and transform the output into an mitkUSImage with attached Metadata.
@@ -66,8 +64,6 @@ namespace mitk {
     protected:
 
       static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
-
-
 
       /**
       * \brief Creates a new device that will deliver USImages taken from a video device.
@@ -114,7 +110,6 @@ namespace mitk {
       */
       virtual bool OnActivation();
 
-
       /**
       * \brief Is called during the deactivation process. After a call to this method the device should still be connected, but not producing images anymore.
       */
@@ -148,7 +143,7 @@ namespace mitk {
       itk::FastMutexLock::Pointer m_CameraActiveMutex; ///< mutex for the cameraActive flag
       int m_ThreadID; ///< ID of the started thread
       mitk::USImage::Pointer m_Image;
-
+      mitk::USImage::Pointer m_OutputImage;
     };
 } // namespace mitk
 #endif

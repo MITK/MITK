@@ -64,7 +64,7 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
         return;
 
     FBXLocalStorage3D *localStorage = m_LSH.GetLocalStorage(renderer);
-    localStorage->m_FiberMapper->SetInput(FiberData);
+    localStorage->m_FiberMapper->SetInputData(FiberData);
 
     if ( FiberData->GetPointData()->GetNumberOfArrays() > 0 )
         localStorage->m_FiberMapper->SelectColorArray( FBX->GetCurrentColorCoding() );

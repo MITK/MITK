@@ -349,7 +349,7 @@ int main(int argc, char* argv[])
   Fit();
 
   // Initialize the RenderWindows
-  mitk::TimeSlicedGeometry::Pointer geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
+  mitk::TimeGeometry::Pointer geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
   m_DataStorage->Print(std::cout);

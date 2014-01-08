@@ -71,6 +71,7 @@ endif()
 
 set(external_projects
   tinyxml
+  GLUT
   ANN
   CppUnit
   GLEW
@@ -113,6 +114,10 @@ endif()
 
 if(MITK_USE_BLUEBERRY)
   set(MITK_USE_CppUnit 1)
+endif()
+
+if(MITK_USE_SOFA)
+  set(MITK_USE_GLUT 1)
 endif()
 
 # A list of "nice" external projects, playing well together with CMake
@@ -243,6 +248,8 @@ set(mitk_cmake_boolean_args
   MITK_USE_SOFA
   MITK_USE_Python
   MITK_USE_OpenCL
+
+  MITK_ENABLE_PIC_READER
   )
 
 #-----------------------------------------------------------------------------
@@ -277,6 +284,7 @@ ExternalProject_Add(${proj}
     # Optionnal dependencies
     ${ACVD_DEPENDS}
     ${CppUnit_DEPENDS}
+    ${GLUT_DEPENDS}
     ${GLEW_DEPENDS}
     ${Boost_DEPENDS}
     ${CTK_DEPENDS}
@@ -384,6 +392,7 @@ ExternalProject_Add(${proj}
     -DCTK_DIR:PATH=${CTK_DIR}
     -DDCMTK_DIR:PATH=${DCMTK_DIR}
     -Dtinyxml_DIR:PATH=${tinyxml_DIR}
+    -DGLUT_DIR:PATH=${GLUT_DIR}
     -DGLEW_DIR:PATH=${GLEW_DIR}
     -DANN_DIR:PATH=${ANN_DIR}
     -DCppUnit_DIR:PATH=${CppUnit_DIR}

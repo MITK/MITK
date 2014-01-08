@@ -2,7 +2,7 @@ OPTION(BUILD_DiffusionMiniApps "Build commandline tools for diffusion" OFF)
 
 IF(BUILD_DiffusionMiniApps)
 
-  # include necessary modules here MitkExt QmitkExt
+  # include necessary modules here
   MITK_CHECK_MODULE(_RESULT DiffusionCore FiberTracking )
   IF(_RESULT)
     MESSAGE("Warning: DiffusionMiniApps is missing ${_RESULT}")
@@ -38,6 +38,8 @@ IF(BUILD_DiffusionMiniApps)
     FiberDirectionExtraction.cpp
     PeakExtraction.cpp
     PeaksAngularError.cpp
+    MultishellMethods.cpp
+    FiberFoxProcessing.cpp
   )
 
   # create an executable foreach tool (only one at the moment)

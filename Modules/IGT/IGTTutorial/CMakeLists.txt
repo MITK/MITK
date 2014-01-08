@@ -1,2 +1,0 @@
-add_executable(IGTTutorialStep1 IGTTutorialStep1.cpp)
-mitk_use_modules(TARGET IGTTutorialStep1 MODULES MitkIGT)

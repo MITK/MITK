@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVtkPropRenderer.h>
 #include <vtkMitkRenderProp.h>
 #include <mitkVtkLayerController.h>
-#include <mitkNativeRenderWindowInteractor.h>  // Needs MitkExt!
 
 #include <itksys/SystemTools.hxx>
 

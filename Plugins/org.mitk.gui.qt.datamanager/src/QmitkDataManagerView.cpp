@@ -24,11 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIDataStorageReference.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkCoreObjectFactory.h"
-#include "mitkPACSPlugin.h"
 #include "mitkDataNodeFactory.h"
 #include "mitkColorProperty.h"
 #include "mitkCommon.h"
-#include "mitkDelegateManager.h"
 #include "mitkNodePredicateData.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
@@ -663,10 +661,10 @@ void QmitkDataManagerView::ReinitSelectedNodes( bool )
   {
     mitk::BaseData::Pointer basedata = node->GetData();
     if ( basedata.IsNotNull() &&
-         basedata->GetTimeSlicedGeometry()->IsValid() )
+      basedata->GetTimeGeometry()->IsValid() )
     {
       renderWindow->GetRenderingManager()->InitializeViews(
-            basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+          basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
       renderWindow->GetRenderingManager()->RequestUpdateAll();
     }
   }
@@ -792,7 +790,7 @@ void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataNode* pare
         this->GetDataStorage()->Add(node, parentNode);
         mitk::BaseData::Pointer basedata = node->GetData();
         mitk::RenderingManager::GetInstance()->InitializeViews(
-          basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+          basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
         //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }
@@ -827,7 +825,7 @@ void QmitkDataManagerView::GlobalReinit( bool )
 
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
   // calculate bounding geometry of these nodes
-  mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
+  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
 
   // initialize the views to the bounding geometry
   renderWindow->GetRenderingManager()->InitializeViews(bounds);

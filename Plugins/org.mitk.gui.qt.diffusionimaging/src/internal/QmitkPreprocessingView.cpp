@@ -394,7 +394,7 @@ void QmitkPreprocessingView::UpdateBValueTableWidget(int i)
       m_Controls->m_B_ValueMap_TableWidget->setItem(i,1,new QTableWidgetItem(QString::number(it->second.size())));
 
       // Reduce Gradients GUI adaption
-      if(it->first != 0 && roundedBValueMap.size() > 1){
+      if(roundedBValueMap.size() > 1){
         checkBox = new QCheckBox(QString::number(it->first) + " with " + QString::number(it->second.size()) + " directions");
         checkBox->setEnabled(true);
         checkBox->setChecked(true);

@@ -91,6 +91,7 @@ void mitk::ContourModelToSurfaceFilter::GenerateData()
     */
     vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New(); //the points to draw
     vtkSmartPointer<vtkCellArray> polygons = vtkSmartPointer<vtkCellArray>::New();
+    vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
 
     //iterate over all control points
     mitk::ContourModel::VertexIterator current = inputContour->IteratorBegin(currentTimeStep);
@@ -109,8 +110,28 @@ void mitk::ContourModelToSurfaceFilter::GenerateData()
 
       polygon->GetPointIds()->SetId(j,id);
 
+      //create connections between the points
+      //no previous point for first point available (ingnore id=0)
+      if(id>0)
+      {
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(id - 1);
+        lines->InsertCellPoint(id);
+      }
+
       current++;
       j++;
+    }
+
+    /*
+    * If the contour is closed an additional line has to be created between the first point
+    * and the last point
+    */
+    if(inputContour->IsClosed(currentTimeStep))
+    {
+      lines->InsertNextCell(2);
+      lines->InsertCellPoint(0);
+      lines->InsertCellPoint( (inputContour->GetNumberOfVertices() - 1) );
     }
 
     polygons->InsertNextCell(polygon);
@@ -121,6 +142,7 @@ void mitk::ContourModelToSurfaceFilter::GenerateData()
     // Add the points to the dataset
     polyData->SetPoints(points);
     polyData->SetPolys(polygons);
+    polyData->SetLines(lines);
     polyData->BuildLinks();
 
     surface->SetVtkPolyData(polyData, currentTimeStep);

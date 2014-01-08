@@ -227,6 +227,7 @@ void mitk::FastMarchingTool3D::Deactivated()
   }
   mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SeedPointInteractor);
   m_ToolManager->GetDataStorage()->Remove(m_SeedsAsPointSetNode);
+  m_SeedsAsPointSetNode = NULL;
   m_SeedsAsPointSet->RemoveObserver(m_PointSetAddObserverTag);
   m_SeedsAsPointSet->RemoveObserver(m_PointSetRemoveObserverTag);
 }
@@ -234,7 +235,7 @@ void mitk::FastMarchingTool3D::Deactivated()
 void mitk::FastMarchingTool3D::Initialize()
 {
   m_ReferenceImage = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
-  if(m_ReferenceImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
+  if(m_ReferenceImage->GetTimeGeometry()->CountTimeSteps() > 1)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
     timeSelector->SetInput( m_ReferenceImage );
@@ -256,7 +257,7 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
     OutputImageType::Pointer segmentationImageInITK = OutputImageType::New();
 
     mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(GetTargetSegmentationNode()->GetData());
-    if(workingImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
+    if(workingImage->GetTimeGeometry()->CountTimeSteps() > 1)
     {
       mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
       timeSelector->SetInput( workingImage );
@@ -284,6 +285,7 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  m_ToolManager->ActivateTool(-1);
 }
 
 
@@ -310,9 +312,10 @@ void mitk::FastMarchingTool3D::OnAddPoint()
 
   m_NeedUpdate = true;
 
+  this->Update();
+
   m_ReadyMessage.Send();
 
-  this->Update();
 }
 
 

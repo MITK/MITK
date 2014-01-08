@@ -29,8 +29,12 @@ FunctionCreateBlueBerryApplication(
   LINK_LIBRARIES ${ALL_LIBRARIES}
   ${_app_options}
 )
-
 mitk_use_modules(TARGET mitkWorkbench MODULES qtsingleapplication Mitk)
+
+# Add meta dependencies (e.g. on auto-load modules from depending modules)
+if(ALL_META_DEPENDENCIES)
+  add_dependencies(mitkWorkbench ${ALL_META_DEPENDENCIES})
+endif()
 
 #Setting application icon for mac os x systems
 set_target_properties(mitkWorkbench PROPERTIES MACOSX_BUNDLE_ICON_FILE "icon.icns")

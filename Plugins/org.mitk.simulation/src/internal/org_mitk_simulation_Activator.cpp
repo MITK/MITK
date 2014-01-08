@@ -16,96 +16,92 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "org_mitk_simulation_Activator.h"
 #include <mitkGetSimulationPreferences.h>
-#include <mitkNodePredicateDataType.h>
 #include <mitkIPropertyFilters.h>
+#include <mitkMeshMitkLoader.h>
+#include <mitkNodePredicateDataType.h>
 #include <mitkPropertyFilter.h>
 #include <mitkSimulationObjectFactory.h>
 #include <QmitkNodeDescriptorManager.h>
 #include <QtPlugin>
+#include <sofa/core/ObjectFactory.h>
 #include <sofa/helper/system/PluginManager.h>
 
-template <class T>
-T* GetPropertyService(ctkPluginContext* context)
+static void RegisterSofaClasses()
 {
-  if (context == NULL)
-    return NULL;
-
-  ctkServiceReference serviceRef = context->getServiceReference<T>();
-
-  return serviceRef
-    ? context->getService<T>(serviceRef)
-    : NULL;
+  int MeshMitkLoaderClass = sofa::core::RegisterObject("").add<mitk::MeshMitkLoader>();
 }
 
-static void InitSOFAPlugins()
+static void LoadSofaPlugins()
 {
   berry::IPreferences::Pointer preferences = mitk::GetSimulationPreferences();
 
   if (preferences.IsNull())
     return;
 
-  QString pluginPaths = preferences->GetByteArray("plugin paths", "").c_str();
+  QString plugins = preferences->GetByteArray("plugins", "").c_str();
 
-  if (pluginPaths.isEmpty())
+  if (plugins.isEmpty())
     return;
 
-  QStringList pluginPathList = pluginPaths.split(';', QString::SkipEmptyParts);
-  QStringListIterator it(pluginPathList);
+  QStringList pluginList = plugins.split(';', QString::SkipEmptyParts);
+  QStringListIterator it(pluginList);
 
   typedef sofa::helper::system::PluginManager PluginManager;
   PluginManager& pluginManager = PluginManager::getInstance();
 
   while (it.hasNext())
   {
-    std::string path = it.next().toStdString();
+    std::string plugin = it.next().toStdString();
     std::ostringstream errlog;
 
-    pluginManager.loadPlugin(path, &errlog);
+    pluginManager.loadPlugin(plugin, &errlog);
 
     if (errlog.str().empty())
-      pluginManager.getPluginMap()[path].initExternalModule();
+      pluginManager.getPluginMap()[plugin].initExternalModule();
   }
 }
 
-static void SetPropertyFilters(ctkPluginContext* context)
+static void AddPropertyFilters()
 {
-  mitk::IPropertyFilters* propertyFilters = GetPropertyService<mitk::IPropertyFilters>(context);
+  mitk::IPropertyFilters* filters = mitk::org_mitk_simulation_Activator::GetService<mitk::IPropertyFilters>();
 
-  if (propertyFilters == NULL)
+  if (filters == NULL)
     return;
 
-  mitk::PropertyFilter simulationFilter;
+  mitk::PropertyFilter filter;
 
-  simulationFilter.AddEntry("layer", mitk::PropertyFilter::Blacklist);
-  simulationFilter.AddEntry("name", mitk::PropertyFilter::Blacklist);
-  simulationFilter.AddEntry("path", mitk::PropertyFilter::Blacklist);
-  simulationFilter.AddEntry("selected", mitk::PropertyFilter::Blacklist);
-  simulationFilter.AddEntry("visible", mitk::PropertyFilter::Blacklist);
+  filter.AddEntry("layer", mitk::PropertyFilter::Blacklist);
+  filter.AddEntry("name", mitk::PropertyFilter::Blacklist);
+  filter.AddEntry("path", mitk::PropertyFilter::Blacklist);
+  filter.AddEntry("selected", mitk::PropertyFilter::Blacklist);
+  filter.AddEntry("visible", mitk::PropertyFilter::Blacklist);
 
-  propertyFilters->AddFilter(simulationFilter, "Simulation");
-  propertyFilters->AddFilter(simulationFilter, "SimulationTemplate");
+  filters->AddFilter(filter, "Simulation");
 }
+
+ctkPluginContext* mitk::org_mitk_simulation_Activator::Context = NULL;
 
 void mitk::org_mitk_simulation_Activator::start(ctkPluginContext* context)
 {
+  Context = context;
+
   RegisterSimulationObjectFactory();
-  InitSOFAPlugins();
-  SetPropertyFilters(context);
+  RegisterSofaClasses();
+  LoadSofaPlugins();
+  AddPropertyFilters();
 
   QmitkNodeDescriptorManager* nodeDescriptorManager = QmitkNodeDescriptorManager::GetInstance();
 
   if (nodeDescriptorManager != NULL)
   {
-    mitk::NodePredicateDataType::Pointer isSimulation = mitk::NodePredicateDataType::New("Simulation");
-    nodeDescriptorManager->AddDescriptor(new QmitkNodeDescriptor("Simulation", ":/Simulation/simulation.png", isSimulation, nodeDescriptorManager));
-
-    mitk::NodePredicateDataType::Pointer isSimulationTemplate = mitk::NodePredicateDataType::New("SimulationTemplate");
-    nodeDescriptorManager->AddDescriptor(new QmitkNodeDescriptor("SimulationTemplate", ":/Simulation/simulationTemplate.png", isSimulationTemplate, nodeDescriptorManager));
+    mitk::NodePredicateDataType::Pointer simulationPredicate = mitk::NodePredicateDataType::New("Simulation");
+    nodeDescriptorManager->AddDescriptor(new QmitkNodeDescriptor("Simulation", ":/Simulation/SOFAIcon.png", simulationPredicate, nodeDescriptorManager));
   }
 }
 
 void mitk::org_mitk_simulation_Activator::stop(ctkPluginContext*)
 {
+  Context = NULL;
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_simulation, mitk::org_mitk_simulation_Activator)
+Q_EXPORT_PLUGIN2(org_mitk_simulation, mitk::org_mitk_simulation_Activator);

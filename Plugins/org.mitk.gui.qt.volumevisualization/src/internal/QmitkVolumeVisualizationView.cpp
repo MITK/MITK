@@ -35,7 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkColorTransferFunctionCanvas.h"
 
 #include "mitkBaseRenderer.h"
-#include "mitkGPUVolumeMapper3D.h"
 
 #include "mitkVtkVolumeRenderingProperty.h"
 

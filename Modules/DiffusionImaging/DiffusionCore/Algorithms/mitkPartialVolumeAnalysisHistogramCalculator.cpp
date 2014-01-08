@@ -1094,14 +1094,14 @@ namespace mitk
 
     // Extrude the generated contour polygon
     vtkLinearExtrusionFilter *extrudeFilter = vtkLinearExtrusionFilter::New();
-    extrudeFilter->SetInput( polyline );
+    extrudeFilter->SetInputData( polyline );
     extrudeFilter->SetScaleFactor( 1 );
     extrudeFilter->SetExtrusionTypeToNormalExtrusion();
     extrudeFilter->SetVector( 0.0, 0.0, 1.0 );
 
     // Make a stencil from the extruded polygon
     vtkPolyDataToImageStencil *polyDataToImageStencil = vtkPolyDataToImageStencil::New();
-    polyDataToImageStencil->SetInput( extrudeFilter->GetOutput() );
+    polyDataToImageStencil->SetInputConnection( extrudeFilter->GetOutputPort() );
 
 
 
@@ -1119,8 +1119,8 @@ namespace mitk
 
     // Apply the generated image stencil to the input image
     vtkImageStencil *imageStencilFilter = vtkImageStencil::New();
-    imageStencilFilter->SetInput( vtkImporter->GetOutput() );
-    imageStencilFilter->SetStencil( polyDataToImageStencil->GetOutput() );
+    imageStencilFilter->SetInputData( vtkImporter->GetOutput() );
+    imageStencilFilter->SetStencilConnection(polyDataToImageStencil->GetOutputPort() );
     imageStencilFilter->ReverseStencilOff();
     imageStencilFilter->SetBackgroundValue( 0 );
     imageStencilFilter->Update();
@@ -1128,7 +1128,7 @@ namespace mitk
 
     // Export from VTK back to ITK
     vtkImageExport *vtkExporter = vtkImageExport::New();
-    vtkExporter->SetInput( imageStencilFilter->GetOutput() );
+    vtkExporter->SetInputData( imageStencilFilter->GetOutput() );
     vtkExporter->Update();
 
     typename ImageImportType::Pointer itkImporter = ImageImportType::New();

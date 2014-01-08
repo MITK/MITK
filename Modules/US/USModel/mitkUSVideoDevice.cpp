@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSVideoDevice.h"
-
+#include "mitkImageReadAccessor.h"
 
 mitk::USVideoDevice::USVideoDevice(int videoDeviceNumber, std::string manufacturer, std::string model) : mitk::USDevice(manufacturer, model)
 {
@@ -49,11 +49,16 @@ mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, mitk::USImageMetad
 
 mitk::USVideoDevice::~USVideoDevice()
 {
-
+  if (m_ThreadID >= 0)
+  {
+    m_MultiThreader->TerminateThread(m_ThreadID);
+  }
 }
 
 void mitk::USVideoDevice::Init()
 {
+  m_ThreadID = -1; // initialize with invalid id
+
   m_Source = mitk::USImageVideoSource::New();
   //this->SetNumberOfInputs(1);
   this->SetNumberOfOutputs(1);
@@ -72,7 +77,6 @@ std::string mitk::USVideoDevice::GetDeviceClass(){
   return "org.mitk.modules.us.USVideoDevice";
 }
 
-
 bool mitk::USVideoDevice::OnConnection()
 {
   if (m_SourceIsFile){
@@ -90,7 +94,6 @@ bool mitk::USVideoDevice::OnDisconnection()
   return true;
 }
 
-
 bool mitk::USVideoDevice::OnActivation()
 {
   // make sure that video device is ready before aquiring images
@@ -105,7 +108,6 @@ bool mitk::USVideoDevice::OnActivation()
   return true;
 }
 
-
 void mitk::USVideoDevice::OnDeactivation()
 {
    // happens automatically when m_Active is set to false
@@ -113,8 +115,21 @@ void mitk::USVideoDevice::OnDeactivation()
 
 void mitk::USVideoDevice::GenerateData()
 {
-  mitk::USImage::Pointer result;
-  result = m_Image;
+  m_ImageMutex->Lock();
+
+  if ( m_Image.IsNull() || ! m_Image->IsInitialized() ) { m_ImageMutex->Unlock(); return; }
+
+  mitk::USImage::Pointer result = this->GetOutput();
+
+  if ( ! result->IsInitialized() )
+  {
+    result->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
+  }
+
+  mitk::ImageReadAccessor inputReadAccessor(m_Image.GetPointer(), m_Image->GetSliceData(0,0,0));
+  result->SetSlice(inputReadAccessor.GetData());
+
+  m_ImageMutex->Unlock();
 
   // Set Metadata
   result->SetMetadata(this->m_Metadata);
@@ -126,7 +141,12 @@ void mitk::USVideoDevice::GenerateData()
 
 void mitk::USVideoDevice::GrabImage()
 {
-  m_Image = m_Source->GetNextImage();
+  mitk::USImage::Pointer image = m_Source->GetNextImage();
+
+  this->m_ImageMutex->Lock();
+  m_Image = image;
+  this->m_ImageMutex->Unlock();
+
   //this->SetNthOutput(0, m_Image);
   //this->Modified();
 }
@@ -149,11 +169,9 @@ if (this->m_Source.IsNotNull())
                                           right,
                                           bottom);
       }
-
   }
 else
   {MITK_WARN << "Cannot set crop are, source is not initialized!";}
-
 }
 
 void mitk::USVideoDevice::SetCropArea(mitk::USDevice::USImageCropArea newArea)

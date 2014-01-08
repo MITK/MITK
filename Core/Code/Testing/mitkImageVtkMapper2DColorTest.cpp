@@ -36,6 +36,9 @@ int mitkImageVtkMapper2DColorTest(int argc, char* argv[])
   //for now this test renders in sagittal view direction
   renderingHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
 
+  //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
+  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
+
   //####################
   //Use this to generate a reference screenshot or save the file.
   //(Only in your local version of the test!)
@@ -45,8 +48,6 @@ int mitkImageVtkMapper2DColorTest(int argc, char* argv[])
   }
   //####################
 
-  //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
-  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
 
   MITK_TEST_END();
 }

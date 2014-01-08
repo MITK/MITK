@@ -35,7 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkStandardFileLocations.h"
 
-//#include <mitkInteractionDebugger.h>
 #include "mitkConfig.h"
 #include "mitkCoreObjectFactory.h"
 

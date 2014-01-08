@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSimulationIOFactory_h
 #define mitkSimulationIOFactory_h
 
-#include <itkObjectFactoryBase.h>
 #include <mitkCommon.h>
+#include <itkObjectFactoryBase.h>
 #include <SimulationExports.h>
 
 namespace mitk
@@ -35,10 +35,7 @@ namespace mitk
   private:
     SimulationIOFactory();
     ~SimulationIOFactory();
-
-    SimulationIOFactory(const Self&);
-    Self& operator=(const Self&);
   };
-};
+}
 
 #endif

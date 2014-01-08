@@ -23,12 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 #include "mitkExtractSliceFilter.h"
 
+
 QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
   QWebView(parent)
 {
   // set histogram type to barchart in first instance
   m_UseLineGraph = false;
-
+  m_Page = new QmitkJSWebPage(this);
+  setPage(m_Page);
   // set html from source
   connect(page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(AddJSObject()));
   QUrl myUrl = QUrl("qrc:/qmitk/Histogram.html");
@@ -39,11 +41,11 @@ QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
   page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
 
   m_ParametricPath = ParametricPathType::New();
+
 }
 
 QmitkHistogramJSWidget::~QmitkHistogramJSWidget()
 {
-
 }
 
 // adds an Object of Type QmitkHistogramJSWidget to the JavaScript, using QtWebkitBridge
@@ -52,11 +54,13 @@ void QmitkHistogramJSWidget::AddJSObject()
   page()->mainFrame()->addToJavaScriptWindowObject(QString("histogramData"), this);
 }
 
-
 // reloads WebView, everytime its size has been changed, so the size of the Histogram fits to the size of the widget
 void QmitkHistogramJSWidget::resizeEvent(QResizeEvent* resizeEvent)
 {
   QWebView::resizeEvent(resizeEvent);
+
+  // workaround for Qt Bug: https://bugs.webkit.org/show_bug.cgi?id=75984
+  page()->mainFrame()->evaluateJavaScript("disconnectSignals()");
   this->reload();
 }
 
@@ -125,14 +129,20 @@ bool QmitkHistogramJSWidget::GetUseLineGraph()
 
 void QmitkHistogramJSWidget::OnBarRadioButtonSelected()
 {
-  m_UseLineGraph = false;
-  this->SignalGraphChanged();
+  if (m_UseLineGraph)
+  {
+    m_UseLineGraph = false;
+    this->SignalGraphChanged();
+  }
 }
 
 void QmitkHistogramJSWidget::OnLineRadioButtonSelected()
 {
-  m_UseLineGraph = true;
-  this->SignalGraphChanged();
+  if (!m_UseLineGraph)
+  {
+    m_UseLineGraph = true;
+    this->SignalGraphChanged();
+  }
 }
 
 void QmitkHistogramJSWidget::SetImage(mitk::Image* image)

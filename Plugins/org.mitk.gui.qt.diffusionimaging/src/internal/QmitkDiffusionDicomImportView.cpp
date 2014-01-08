@@ -649,7 +649,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           // since some protocols provide a gradient direction of (0,0,0) in their dicom files when isotropic diffusion is assumed,
           // the nrrd compatible way of storing b-values is not possible, so in this case we overwrite
           // the gradient direction to (1,1,1)
-          if (b_vals[i] == 0.0 && vect[0] == 0.0 && vect[1] == 0.0 && vect[2] ==0.0)
+          if (b_vals[i] > 0 && vect[0] == 0.0 && vect[1] == 0.0 && vect[2] ==0.0)
           {
             vect.fill(1.0);
           }
@@ -782,7 +782,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       if (basedata.IsNotNull())
       {
         mitk::RenderingManager::GetInstance()->InitializeViews(
-            basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+            basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
       }
     }
 

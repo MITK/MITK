@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolWriter.h>
 #include <mitkNavigationToolReader.h>
 #include <mitkSTLFileReader.h>
+#include <mitkIGTException.h>
 
 #include "QmitkCustomVariants.h"
 
@@ -99,7 +100,18 @@ void QmitkNDIConfigurationWidget::OnConnect()
   this->CreateTracker();
 
   this->SetupTracker();
-  bool okay = m_Tracker->OpenConnection();
+  bool okay = false;
+  try
+    {
+    okay = m_Tracker->OpenConnection();
+    }
+  catch(mitk::IGTException &e)
+    {
+    QMessageBox::warning(NULL, "Error", QString("Connection failed, error message: ") + e.GetDescription());
+    m_Tracker->CloseConnection();
+    this->m_Tracker = NULL;
+
+    }
   if (okay)
   {
     // show/hide options according to connected device
@@ -124,7 +136,7 @@ void QmitkNDIConfigurationWidget::OnConnect()
   }
   else
   {
-    QMessageBox::warning(NULL, "Error", QString("Connection failed. Tracking device error message is '%1'").arg(m_Tracker->GetErrorMessage()));
+    QMessageBox::warning(NULL, "Error", QString("Connection failed due to an unknown reason!"));
     m_Tracker->CloseConnection();
     this->m_Tracker = NULL;
   }

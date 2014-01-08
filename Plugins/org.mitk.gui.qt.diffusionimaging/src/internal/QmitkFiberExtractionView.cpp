@@ -535,14 +535,14 @@ void QmitkFiberExtractionView::InternalCalculateMaskFromPlanarFigure( itk::Image
 
     // Extrude the generated contour polygon
     vtkLinearExtrusionFilter *extrudeFilter = vtkLinearExtrusionFilter::New();
-    extrudeFilter->SetInput( polyline );
+    extrudeFilter->SetInputData( polyline );
     extrudeFilter->SetScaleFactor( 1 );
     extrudeFilter->SetExtrusionTypeToNormalExtrusion();
     extrudeFilter->SetVector( 0.0, 0.0, 1.0 );
 
     // Make a stencil from the extruded polygon
     vtkPolyDataToImageStencil *polyDataToImageStencil = vtkPolyDataToImageStencil::New();
-    polyDataToImageStencil->SetInput( extrudeFilter->GetOutput() );
+    polyDataToImageStencil->SetInputConnection( extrudeFilter->GetOutputPort() );
 
 
 
@@ -561,7 +561,7 @@ void QmitkFiberExtractionView::InternalCalculateMaskFromPlanarFigure( itk::Image
     // Apply the generated image stencil to the input image
     vtkImageStencil *imageStencilFilter = vtkImageStencil::New();
     imageStencilFilter->SetInputConnection( vtkImporter->GetOutputPort() );
-    imageStencilFilter->SetStencil( polyDataToImageStencil->GetOutput() );
+    imageStencilFilter->SetStencilConnection(polyDataToImageStencil->GetOutputPort() );
     imageStencilFilter->ReverseStencilOff();
     imageStencilFilter->SetBackgroundValue( 0 );
     imageStencilFilter->Update();

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkPlanarFigure.h>
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
 
@@ -261,7 +262,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
           if (basedata.IsNotNull())
           {
             mitk::RenderingManager::GetInstance()->InitializeViews(
-              basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+              basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
 
             numberOfNodesDropped++;
           }
@@ -629,6 +630,11 @@ bool QmitkDataStorageTreeModel::setData( const QModelIndex &index, const QVarian
   if(role == Qt::EditRole && !value.toString().isEmpty())
   {
     dataNode->SetStringProperty("name", value.toString().toStdString().c_str());
+
+    mitk::PlanarFigure* planarFigure = dynamic_cast<mitk::PlanarFigure*>(dataNode->GetData());
+
+    if (planarFigure != NULL)
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   else if(role == Qt::CheckStateRole)
   {

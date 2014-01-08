@@ -6,25 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>321</width>
-    <height>272</height>
+    <width>358</width>
+    <height>371</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QLabel" name="widget_title_label">
-     <property name="text">
-      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; text-decoration: underline;&quot;&gt;New Navigation Tool&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-   </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -77,8 +66,8 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>303</width>
-        <height>83</height>
+        <width>336</width>
+        <height>178</height>
        </rect>
       </property>
       <attribute name="label">
@@ -127,7 +116,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="QLineEdit" name="m_CalibrationFileName">
            <property name="text">
-            <string>&lt;not given&gt;</string>
+            <string>none</string>
            </property>
           </widget>
          </item>
@@ -166,8 +155,8 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>307</width>
-        <height>72</height>
+        <width>336</width>
+        <height>178</height>
        </rect>
       </property>
       <attribute name="label">
@@ -177,7 +166,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QRadioButton" name="m_Surface_Use_Sphere">
          <property name="text">
-          <string>Use Simple Sphere</string>
+          <string>Use Simple Cone</string>
          </property>
          <property name="checked">
           <bool>true</bool>
@@ -240,12 +229,20 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="page_3">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>336</width>
+        <height>178</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Advanced</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
           <widget class="QLabel" name="label_7">
            <property name="minimumSize">
@@ -298,7 +295,7 @@ p, li { white-space: pre-wrap; }
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
           <widget class="QLabel" name="label_4">
            <property name="minimumSize">
@@ -322,7 +319,7 @@ p, li { white-space: pre-wrap; }
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
           <widget class="QLabel" name="label_5">
            <property name="minimumSize">
@@ -346,6 +343,40 @@ p, li { white-space: pre-wrap; }
         </layout>
        </item>
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Tooltip:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="m_ShowAdvancedOptionsPB">
+           <property name="text">
+            <string>Edit Tooltip</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -353,7 +384,7 @@ p, li { white-space: pre-wrap; }
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>7</height>
+           <height>40</height>
           </size>
          </property>
         </spacer>
@@ -407,6 +438,7 @@ p, li { white-space: pre-wrap; }
    <class>QmitkDataStorageComboBox</class>
    <extends>QComboBox</extends>
    <header>QmitkDataStorageComboBox.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

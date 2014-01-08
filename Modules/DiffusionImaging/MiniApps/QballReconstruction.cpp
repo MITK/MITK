@@ -164,6 +164,25 @@ int QballReconstruction(int argc, char* argv[])
             coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
             break;
         }
+        case 12:
+        {
+            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,12,QBALL_ODFSIZE> FilterType;
+            FilterType::Pointer filter = FilterType::New();
+            filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
+            filter->SetBValue(dwi->GetB_Value());
+            filter->SetThreshold( threshold );
+            filter->SetLambda(lambda);
+            if (normalization==0)
+                filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
+            else
+                filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
+            filter->Update();
+            image->InitializeByItk( filter->GetOutput() );
+            image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+            coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
+            coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
+            break;
+        }
         default:
         {
             MITK_INFO << "Supplied SH order not supported. Using default order of 4.";

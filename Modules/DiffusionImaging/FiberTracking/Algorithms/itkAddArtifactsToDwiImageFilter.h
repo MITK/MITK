@@ -63,9 +63,10 @@ namespace itk{
     itkSetMacro( EddyGradientStrength, double )
     void SetGradientList(mitk::DiffusionSignalModel<double>::GradientListType list) { m_GradientList=list; }
     itkSetMacro( TE, double )
-    itkSetMacro( Upsampling, double )
+    itkSetMacro( AddGibbsRinging, bool )
     itkSetMacro( Spikes, int )
     itkSetMacro( SpikeAmplitude, double )
+    itkSetMacro( Wrap, double )
 
   protected:
     AddArtifactsToDwiImageFilter();
@@ -83,9 +84,10 @@ namespace itk{
     double                              m_EddyGradientStrength;
     mitk::DiffusionSignalModel<double>::GradientListType m_GradientList;
     double                              m_TE;
-    double                              m_Upsampling;           ///< causes ringing artifacts
+    bool                                m_AddGibbsRinging;           ///< causes ringing artifacts
     int                                 m_Spikes;
     double                              m_SpikeAmplitude;
+    double                              m_Wrap;
 
   private:
 

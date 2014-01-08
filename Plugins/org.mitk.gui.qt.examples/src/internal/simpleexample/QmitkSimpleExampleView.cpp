@@ -118,7 +118,7 @@ void QmitkSimpleExampleView::initNavigators()
   mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
   /* calculate bounding geometry of these nodes */
-  mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
+  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
   /* initialize the views to the bounding geometry */
   m_NavigatorsInitialized = mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
   //m_NavigatorsInitialized = mitk::RenderingManager::GetInstance()->InitializeViews(GetDefaultDataStorage());
@@ -279,7 +279,7 @@ void QmitkSimpleExampleView::TakeScreenshot(vtkRenderer* renderer, unsigned int 
   magnifier->SetInput(renderer);
   magnifier->SetMagnification(magnificationFactor);
   //magnifier->Update();
-  fileWriter->SetInput(magnifier->GetOutput());
+  fileWriter->SetInputConnection(magnifier->GetOutputPort());
   fileWriter->SetFileName(fileName.toLatin1());
 
   // vtkRenderLargeImage has problems with different layers, therefore we have to

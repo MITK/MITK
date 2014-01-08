@@ -216,7 +216,7 @@ int mitkNavigationDataReferenceTransformFilterTest(int /* argc */, char* /*argv*
 
   bool thirdPointCorrect = thirdPoint0Same && thirdPoint1Same && thirdPoint2Same;
 
-  //MITK_TEST_CONDITION_REQUIRED(firstPointCorrect && secondPointCorrect && thirdPointCorrect, "Testing if point generation is correct");
+  MITK_TEST_CONDITION_REQUIRED(firstPointCorrect && secondPointCorrect && thirdPointCorrect, "Testing if point generation is correct");
 
 
   // deleting helper objects

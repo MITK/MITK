@@ -45,8 +45,8 @@ public:
     return m_ThinPlateSplineTransform;
   }
 
-  virtual void SetSigma(float sigma);
-  virtual float GetSigma() const;
+  virtual void SetSigma(double sigma);
+  virtual double GetSigma() const;
 
   virtual bool IsValid() const;
 

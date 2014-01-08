@@ -240,7 +240,7 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
       // 3.1.2 copy point from float* to mitk::Contour
       ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
       contourInImageIndexCoordinates->Expand(timestep + 1);
-      contourInImageIndexCoordinates->SetIsClosed(true, timestep);
+      contourInImageIndexCoordinates->SetClosed(true, timestep);
       Point3D newPoint;
       for (int index = 0; index < cutContour.deleteSize; ++index)
       {
@@ -527,7 +527,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
     // copy point from float* to mitk::Contour
     ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
     contourInImageIndexCoordinates->Expand(timestep + 1);
-    contourInImageIndexCoordinates->SetIsClosed(true, timestep);
+    contourInImageIndexCoordinates->SetClosed(true, timestep);
     Point3D newPoint;
     for (int index = 0; index < numberOfContourPoints; ++index)
     {

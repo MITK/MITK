@@ -283,9 +283,11 @@ public:
   {
     PlanarFigureList::iterator it1, it2;
 
+    int i = 0;
     for ( it1 = planarFigures1.begin(); it1 != planarFigures1.end(); ++it1 )
     {
       bool planarFigureFound = false;
+      int j = 0;
       for ( it2 = planarFigures2.begin(); it2 != planarFigures2.end(); ++it2 )
       {
         // Compare PlanarFigures (returns false if different types)
@@ -293,12 +295,14 @@ public:
         {
           planarFigureFound = true;
         }
+        ++j;
       }
 
       // Test if (at least) on PlanarFigure of the first type was found in the second list
       MITK_TEST_CONDITION_REQUIRED(
           planarFigureFound,
-          "Testing if " << (*it1)->GetNameOfClass() << " has a counterpart" );
+          "Testing if " << (*it1)->GetNameOfClass() << " has a counterpart " << i );
+      ++i;
     }
   }
 
@@ -308,6 +312,11 @@ public:
     if ( strcmp( figure1->GetNameOfClass(), figure2->GetNameOfClass() ) != 0 )
     {
       return false;
+    }
+
+    if( strcmp( figure1->GetNameOfClass(), "PlanarCross" ) == 0 )
+    {
+      std::cout << "Planar Cross Found" << std::endl;
     }
 
     // Test for equal number of control points
@@ -363,7 +372,7 @@ public:
     const mitk::PlaneGeometry* planeGeometry2 = dynamic_cast<const mitk::PlaneGeometry*>(figure2->GetGeometry2D());
 
     // Test Geometry transform parameters
-    typedef mitk::AffineGeometryFrame3D::TransformType TransformType;
+    typedef mitk::Geometry3D::TransformType TransformType;
     const TransformType* affineGeometry1 = planeGeometry1->GetIndexToWorldTransform();
     const TransformType::ParametersType& parameters1 = affineGeometry1->GetParameters();
     const TransformType::ParametersType& parameters2 = planeGeometry2->GetIndexToWorldTransform()->GetParameters();

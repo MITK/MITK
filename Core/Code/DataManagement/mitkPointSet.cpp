@@ -72,7 +72,7 @@ void mitk::PointSet::InitializeEmpty()
   m_PointSetSeries[0]->SetPointData( pointData );
   m_CalculateBoundingBox = false;
 
-  Superclass::InitializeTimeSlicedGeometry(1);
+  Superclass::InitializeTimeGeometry(1);
   m_Initialized = true;
 }
 
@@ -179,7 +179,7 @@ mitk::PointSet::PointsConstIterator mitk::PointSet::End(int t) const
   return PointsConstIterator();
 }
 
-int mitk::PointSet::SearchPoint( Point3D point, float distance, int t  ) const
+int mitk::PointSet::SearchPoint( Point3D point, ScalarType distance, int t  ) const
 {
   if ( t >= (int)m_PointSetSeries.size() )
   {
@@ -418,7 +418,7 @@ void mitk::PointSet::SetSelectInfo( int position, bool selected, int t )
   if ( this->IndexExists( position, t ) )
   {
     // timeStep to ms
-    ScalarType timeInMS = this->GetTimeSlicedGeometry()->TimeStepToMS( t );
+    TimePointType timeInMS = this->GetTimeGeometry()->TimeStepToTimePoint( t );
 
     // point
     Point3D point = this->GetPoint( position, t );
@@ -502,8 +502,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
 
   if ( pointOp )
   {
-    timeStep = this->GetTimeSlicedGeometry()
-      ->MSToTimeStep( pointOp->GetTimeInMS() );
+    timeStep = this->GetTimeGeometry()->TimePointToTimeStep( pointOp->GetTimeInMS() );
   }
 
   if ( timeStep < 0 )
@@ -696,10 +695,10 @@ void mitk::PointSet::UpdateOutputInformation()
   // first make sure, that the associated time sliced geometry has
   // the same number of geometry 3d's as PointSets are present
   //
-  mitk::TimeSlicedGeometry* timeGeometry = GetTimeSlicedGeometry();
-  if ( timeGeometry->GetTimeSteps() != m_PointSetSeries.size() )
+  TimeGeometry* timeGeometry = GetTimeGeometry();
+  if ( timeGeometry->CountTimeSteps() != m_PointSetSeries.size() )
   {
-    itkExceptionMacro(<<"timeGeometry->GetTimeSteps() != m_PointSetSeries.size() -- use Initialize(timeSteps) with correct number of timeSteps!");
+    itkExceptionMacro(<<"timeGeometry->CountTimeSteps() != m_PointSetSeries.size() -- use Initialize(timeSteps) with correct number of timeSteps!");
   }
 
   // This is needed to detect zero objects
@@ -739,7 +738,7 @@ void mitk::PointSet::UpdateOutputInformation()
     }
     m_CalculateBoundingBox = false;
   }
-  this->GetTimeSlicedGeometry()->UpdateInformation();
+  this->GetTimeGeometry()->Update();
 }
 
 void mitk::PointSet::SetRequestedRegionToLargestPossibleRegion()

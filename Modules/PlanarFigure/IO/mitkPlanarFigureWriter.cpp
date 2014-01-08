@@ -142,7 +142,7 @@ void mitk::PlanarFigureWriter::GenerateData()
     if (planeGeo != NULL)
     {
       // Write parameters of IndexToWorldTransform of the PlaneGeometry
-      typedef mitk::AffineGeometryFrame3D::TransformType TransformType;
+      typedef mitk::Geometry3D::TransformType TransformType;
       const TransformType* affineGeometry = planeGeo->GetIndexToWorldTransform();
       const TransformType::ParametersType& parameters = affineGeometry->GetParameters();
       TiXmlElement* vElement = new TiXmlElement( "transformParam" );

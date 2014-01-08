@@ -127,7 +127,7 @@ namespace itk {
         {
           typename TensorType::EigenValuesArrayType evs;
           tensor.ComputeEigenValues(evs);
-          outputIt.Set((evs[0]+evs[0]+evs[0])/3.0);
+          outputIt.Set((evs[0]+evs[1]+evs[2])/3.0);
           break;
         }
       }

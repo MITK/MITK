@@ -30,26 +30,41 @@ macro(MITK_CREATE_MODULE_TESTS)
       link_directories(${GDCM_LIBRARY_DIRS})
     endif()
 
-    if (MODULE_TEST_EXTRA_DEPENDS)
-      MITK_USE_MODULE("${MODULE_TEST_EXTRA_DEPENDS}")
-      include_directories(${ALL_INCLUDE_DIRECTORIES})
-    endif()
+    set(TESTDRIVER ${MODULE_NAME}TestDriver)
+    set(MODULE_TEST_EXTRA_DRIVER_INIT "${MODULE_TEST_EXTRA_DRIVER_INIT}")
 
-    set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "mitk::LoggingBackend::Register(); ${MODULE_TEST_EXTRA_DRIVER_INIT};")
+    # Write a header file containing include directives and custom code
+    # for the test driver.
+    set(_extra_include_content )
+    list(APPEND MODULE_TEST_EXTRA_DRIVER_INCLUDE "mitkLog.h")
+    list(REMOVE_DUPLICATES MODULE_TEST_EXTRA_DRIVER_INCLUDE)
+    foreach(_include ${MODULE_TEST_EXTRA_DRIVER_INCLUDE})
+      set(_extra_include_content "${_extra_include_content}
+#include <${_include}>")
+    endforeach()
+    set(_extra_include_content "${_extra_include_content}
+#include <vector>
+std::vector<std::string> globalCmdLineArgs;")
+    set(_extra_include_file ${CMAKE_CURRENT_BINARY_DIR}/${TESTDRIVER}_extras.h)
+    file(WRITE ${_extra_include_file} "${_extra_include_content}")
+
+    set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "
+for (int avIndex = 1; avIndex < ac; ++avIndex) globalCmdLineArgs.push_back(av[avIndex]);
+mitk::LoggingBackend::Register();
+${MODULE_TEST_EXTRA_DRIVER_INIT};"
+)
     set(CMAKE_TESTDRIVER_AFTER_TESTMAIN "mitk::LoggingBackend::Unregister();")
-    if(NOT MODULE_TEST_EXTRA_DRIVER_INCLUDE)
-      # this is necessary to make the LoggingBackend calls available if nothing else is included
-      set(MODULE_TEST_EXTRA_DRIVER_INCLUDE "mitkLog.h")
-    endif(NOT MODULE_TEST_EXTRA_DRIVER_INCLUDE)
 
     create_test_sourcelist(MODULETEST_SOURCE ${MODULE_NAME}TestDriver.cpp
       ${MODULE_TESTS} ${MODULE_IMAGE_TESTS} ${MODULE_SURFACE_TESTS} ${MODULE_CUSTOM_TESTS}
-      EXTRA_INCLUDE ${MODULE_TEST_EXTRA_DRIVER_INCLUDE}
+      EXTRA_INCLUDE ${_extra_include_file}
     )
 
-    set(TESTDRIVER ${MODULE_NAME}TestDriver)
     add_executable(${TESTDRIVER} ${MODULETEST_SOURCE} ${MODULE_TEST_GENERATED_MOC_CPP} ${TEST_CPP_FILES})
-    target_link_libraries(${TESTDRIVER} ${MODULE_PROVIDES} ${ALL_LIBRARIES})
+    mitk_use_modules(TARGET ${TESTDRIVER}
+                     MODULES ${MODULE_PROVIDES} ${MODULE_TEXT_EXTRA_DEPENDS}
+                     PACKAGES CppUnit
+                    )
 
     if(MODULE_SUBPROJECTS)
       foreach(subproject ${MODULE_SUBPROJECTS})

@@ -404,7 +404,7 @@ bool AffineInteractor3D
       {
         if ( camera )
         {
-          vtkFloatingPointType vpn[3];
+          double vpn[3];
           camera->GetViewPlaneNormal( vpn );
 
           Vector3D viewPlaneNormal;
@@ -434,11 +434,7 @@ bool AffineInteractor3D
           Geometry3D::Pointer newGeometry = static_cast< Geometry3D * >(
             m_OriginalGeometry->Clone().GetPointer() );
           newGeometry->ExecuteOperation( &op );
-          mitk::TimeSlicedGeometry::Pointer timeSlicedGeometry = data->GetTimeSlicedGeometry();
-          if (timeSlicedGeometry.IsNotNull())
-          {
-            timeSlicedGeometry->SetGeometry3D( newGeometry, timeStep );
-          }
+          data->SetClonedGeometry(newGeometry, timeStep);
         }
       }
 

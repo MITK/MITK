@@ -427,7 +427,7 @@ public:
 
       void SetHasMultipleTimePoints(bool);
 
-      void GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const;
+      void GetDesiredMITKImagePixelSpacing(ScalarType& spacingX, ScalarType& spacingY) const;
 
       StringContainer m_Filenames;
       std::string m_ImageBlockUID;
@@ -749,7 +749,7 @@ protected:
   */
   static
   bool
-  DICOMStringToSpacing(const std::string& s, float& spacingX, float& spacingY);
+  DICOMStringToSpacing(const std::string& s, ScalarType& spacingX, ScalarType& spacingY);
 
   /**
     \brief Convert DICOM string describing a point to Point3D.
@@ -871,7 +871,6 @@ protected:
   /**
    \brief Performs actual loading of a series and creates an image having the specified pixel type.
   */
-  template <typename PixelType>
   static
   void
   LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback, Image::Pointer preLoadedImageBlock);
@@ -884,7 +883,36 @@ protected:
   template <typename PixelType>
   static
   Image::Pointer
-  LoadDICOMByITK( const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command = NULL, Image::Pointer preLoadedImageBlock = NULL);
+  LoadDICOMByITK( const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+
+  static
+  Image::Pointer MultiplexLoadDICOMByITK(const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+
+  static
+  Image::Pointer MultiplexLoadDICOMByITKScalar(const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+
+  static
+  Image::Pointer MultiplexLoadDICOMByITKRGBPixel(const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+
+
+  template <typename PixelType>
+  static
+  Image::Pointer
+  LoadDICOMByITK4D( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+
+  static
+  Image::Pointer
+  MultiplexLoadDICOMByITK4D( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+
+  static
+  Image::Pointer
+  MultiplexLoadDICOMByITK4DScalar( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+
+  static
+  Image::Pointer
+  MultiplexLoadDICOMByITK4DRGBPixel( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+
+
 
   /**
     \brief Sort files into time step blocks of a 3D+t image.

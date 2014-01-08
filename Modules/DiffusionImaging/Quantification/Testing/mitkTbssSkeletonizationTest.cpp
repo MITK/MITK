@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkDistanceMapFilter.h>
 #include <itkProjectionFilter.h>
+#include <itkTestingComparisonImageFilter.h>
 
 /**Documentation
  *  test for the class "itkSkeletonizationFilter".
@@ -55,32 +56,16 @@ int mitkTbssSkeletonizationTest(int argc , char* argv[])
   FloatImageType::Pointer controlSkeleton = reader->GetOutput();
 
 
-  // Check dimensions
-  FloatImageType::SizeType size = skeleton->GetLargestPossibleRegion().GetSize();
-  FloatImageType::SizeType controlSize = controlSkeleton->GetLargestPossibleRegion().GetSize();
+  // Convert itk images to mitk images and use the mitk::Equal method to compare the result with the reference skeleton.
+
+  mitk::Image::Pointer mitkSkeleton = mitk::Image::New();
+  mitkSkeleton->InitializeByItk(skeleton.GetPointer());
+
+  mitk::Image::Pointer mitkRefSkeleton = mitk::Image::New();
+  mitkRefSkeleton->InitializeByItk(controlSkeleton.GetPointer());
 
 
-  MITK_TEST_CONDITION(size == controlSize, "Size of skeleton and control skeleton are the same");
-
-
-  // Loop trough both images and check if all values are the same
-  bool same = true;
-  for(int x=0; x<size[0]; x++)
-  {
-    for(int y=0; y<size[1]; y++)
-    {
-      for(int z=0; z<size[2]; z++)
-      {
-        itk::Index<3> ix = {x,y,z};
-        if(skeleton->GetPixel(ix) != controlSkeleton->GetPixel(ix))
-        {
-          same = false;
-        }
-      }
-    }
-  }
-
-  MITK_TEST_CONDITION(same, "Check correctness of the skeleton");
+  MITK_TEST_CONDITION(mitk::Equal(mitkSkeleton, mitkRefSkeleton, 0.001, true), "Check correctness of the skeleton");
 
 
   // Test the projection filter
@@ -165,35 +150,17 @@ int mitkTbssSkeletonizationTest(int argc , char* argv[])
   Float4DImageType::SizeType pSize = projected->GetLargestPossibleRegion().GetSize();
   Float4DImageType::SizeType pControlSize = controlProjection->GetLargestPossibleRegion().GetSize();
 
+  typedef itk::Testing::ComparisonImageFilter<Float4DImageType, Float4DImageType> ComparisonFilterType;
+  ComparisonFilterType::Pointer comparisonFilter = ComparisonFilterType::New();
+  comparisonFilter->SetTestInput(projected);
+  comparisonFilter->SetValidInput(controlProjection);
+  comparisonFilter->Update();
+  float diff = comparisonFilter->GetTotalDifference();
 
 
   MITK_TEST_CONDITION(pSize == pControlSize, "Size of projection image and control projection image are the same");
 
-
-  // Check all pixel values of the projection
-  same = true;
-
-  for(int x=0; x<pSize[0]; x++)
-  {
-    for(int y=0; y<pSize[1]; y++)
-    {
-      for(int z=0; z<pSize[2]; z++)
-      {
-
-        for(int t=0; t<pSize[3]; t++)
-        {
-          itk::Index<4> ix = {x,y,z,t};
-          if(projected->GetPixel(ix) != controlProjection->GetPixel(ix))
-          {
-            same = false;
-          }
-        }
-      }
-    }
-  }
-
-
-  MITK_TEST_CONDITION(same, "Check correctness of the projections");
+  MITK_TEST_CONDITION(diff < 0.001, "Check correctness of the projections");
 
 
   MITK_TEST_END();

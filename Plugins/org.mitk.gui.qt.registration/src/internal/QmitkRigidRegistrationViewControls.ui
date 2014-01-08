@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>417</width>
-    <height>932</height>
+    <width>482</width>
+    <height>973</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -68,90 +68,104 @@
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_7">
-             <item>
-              <layout class="QFormLayout" name="formLayout">
-               <property name="fieldGrowthPolicy">
-                <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+            <layout class="QGridLayout" name="gridLayout">
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_FixedLabel">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                </font>
                </property>
-               <item row="0" column="0">
-                <widget class="QLabel" name="m_FixedLabel">
-                 <property name="font">
-                  <font>
-                   <pointsize>8</pointsize>
-                  </font>
-                 </property>
+               <property name="text">
+                <string>Fixed Image:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLabel" name="TextLabelFixed">
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="2">
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <item>
+                <widget class="QLabel" name="m_FixedMaskLB">
                  <property name="text">
-                  <string>Fixed Image:</string>
+                  <string>Fixed Image Mask:</string>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="1">
-                <widget class="QLabel" name="TextLabelFixed">
-                 <property name="font">
-                  <font>
-                   <pointsize>10</pointsize>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="wordWrap">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="m_MovingLabel">
-                 <property name="font">
-                  <font>
-                   <pointsize>8</pointsize>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>Moving Image :</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QLabel" name="TextLabelMoving">
-                 <property name="font">
-                  <font>
-                   <pointsize>10</pointsize>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="wordWrap">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0" colspan="2">
-                <widget class="QPushButton" name="m_SwitchImages">
-                 <property name="text">
-                  <string>Switch fixed and moving image</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QCheckBox" name="m_UseFixedImageMask">
-                 <property name="text">
-                  <string>Use Fixed Image Mask</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QCheckBox" name="m_UseMovingImageMask">
-                 <property name="text">
-                  <string>Use Moving Image Mask</string>
-                 </property>
-                </widget>
+               <item>
+                <widget class="QmitkDataStorageComboBox" name="m_FixedImageCB"/>
                </item>
               </layout>
              </item>
-             <item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="m_MovingLabel">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Moving Image:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLabel" name="TextLabelMoving">
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0" colspan="2">
+              <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <item>
+                <widget class="QLabel" name="m_MovingMaskLB">
+                 <property name="text">
+                  <string>Moving Image Mask:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QmitkDataStorageComboBox" name="m_MovingImageCB"/>
+               </item>
+              </layout>
+             </item>
+             <item row="4" column="0">
+              <widget class="QPushButton" name="m_SwitchImages">
+               <property name="text">
+                <string>Switch fixed and moving image</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QCheckBox" name="m_UseMaskingCB">
+               <property name="text">
+                <string>Use Image Masking</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0" colspan="2">
               <widget class="QLabel" name="m_StatusLabel">
                <property name="palette">
                 <palette>
@@ -257,7 +271,7 @@
                </property>
               </widget>
              </item>
-             <item>
+             <item row="7" column="0" colspan="2">
               <layout class="QHBoxLayout" name="_3">
                <item>
                 <widget class="QLabel" name="label">
@@ -304,10 +318,10 @@
                </item>
               </layout>
              </item>
-             <item>
+             <item row="8" column="0" colspan="2">
               <widget class="QmitkSliderNavigatorWidget" name="timeSlider" native="true"/>
              </item>
-             <item>
+             <item row="9" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout">
                <item>
                 <widget class="QCheckBox" name="m_ShowContour">
@@ -335,7 +349,7 @@
                </item>
               </layout>
              </item>
-             <item>
+             <item row="10" column="0">
               <widget class="QCheckBox" name="m_ShowRedGreenValues">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -348,7 +362,7 @@
                </property>
               </widget>
              </item>
-             <item>
+             <item row="11" column="0">
               <layout class="QVBoxLayout" name="verticalLayout_3">
                <item>
                 <widget class="QPushButton" name="m_LoadRigidRegistrationParameter">
@@ -1017,6 +1031,11 @@
    <extends>QWidget</extends>
    <header location="global">QmitkSliderNavigatorWidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header>QmitkDataStorageComboBox.h</header>
   </customwidget>
  </customwidgets>
  <includes>

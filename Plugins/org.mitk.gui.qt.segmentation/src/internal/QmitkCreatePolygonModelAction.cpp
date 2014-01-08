@@ -112,9 +112,9 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
       IPreferences::Pointer segPref = prefService->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
 
       bool smoothingHint = segPref->GetBool("smoothing hint", true);
-      float smoothing = (float)segPref->GetDouble("smoothing value", 1.0);
-      float decimation = (float)segPref->GetDouble("decimation rate", 0.5);
-      float closing = (float)segPref->GetDouble("closing ratio", 0.0);
+      ScalarType smoothing = segPref->GetDouble("smoothing value", 1.0);
+      ScalarType decimation = segPref->GetDouble("decimation rate", 0.5);
+      ScalarType closing = segPref->GetDouble("closing ratio", 0.0);
 
       if (smoothingHint)
       {

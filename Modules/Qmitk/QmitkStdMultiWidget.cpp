@@ -2185,7 +2185,7 @@ void QmitkStdMultiWidget::ResetCrosshair()
     mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetSubset(pred);
     mitk::DataStorage::SetOfObjects::ConstPointer rs2 = m_DataStorage->GetSubset(pred2);
     // calculate bounding geometry of these nodes
-    mitk::TimeSlicedGeometry::Pointer bounds = m_DataStorage->ComputeBoundingGeometry3D(rs, "visible");
+    mitk::TimeGeometry::Pointer bounds = m_DataStorage->ComputeBoundingGeometry3D(rs, "visible");
 
     m_RenderingManager->InitializeViews(bounds);
     //m_RenderingManager->InitializeViews( m_DataStorage->ComputeVisibleBoundingGeometry3D() );

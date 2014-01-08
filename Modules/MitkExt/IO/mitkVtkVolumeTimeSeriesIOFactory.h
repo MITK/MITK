@@ -49,8 +49,11 @@ public:
   /** Run-time type information (and related methods). */
   itkTypeMacro(VtkVolumeTimeSeriesIOFactory, ObjectFactoryBase);
 
-  /** Register one factory of this type  */
-  static void RegisterOneFactory(void)
+  /**
+   * Register one factory of this type
+   * \deprecatedSince{2013_09}
+   */
+  DEPRECATED(static void RegisterOneFactory(void))
   {
     VtkVolumeTimeSeriesIOFactory::Pointer VtkVolumeTimeSeriesIOFactory = VtkVolumeTimeSeriesIOFactory::New();
     ObjectFactoryBase::RegisterFactory(VtkVolumeTimeSeriesIOFactory);

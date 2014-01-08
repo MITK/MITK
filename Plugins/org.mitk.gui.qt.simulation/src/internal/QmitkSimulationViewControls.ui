@@ -16,7 +16,7 @@
   <property name="windowTitle">
    <string>Simulation</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QGroupBox" name="sceneGroupBox">
      <property name="enabled">
@@ -27,7 +27,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0" colspan="3">
-       <widget class="QmitkDataStorageComboBox" name="simulationComboBox">
+       <widget class="QmitkDataStorageComboBox" name="sceneComboBox">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -117,7 +117,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="recordingGroupBox">
+    <widget class="QGroupBox" name="surfaceRecordingGroupBox">
      <property name="title">
       <string>Surface Recording</string>
      </property>

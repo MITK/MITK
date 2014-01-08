@@ -36,11 +36,17 @@ namespace mitk
     /** Method for class instantiation. */
     itkFactorylessNewMacro(Self);
 
-    /** Register one factory of this type  */
-    static void RegisterOneFactory(void);
+    /**
+     * Register one factory of this type
+     * \deprecatedSince{2013_09}
+     */
+    DEPRECATED(static void RegisterOneFactory(void));
 
-    /** UnRegister one factory of this type  */
-    static void UnRegisterOneFactory(void);
+    /**
+     * UnRegister one factory of this type
+     * \deprecatedSince{2013_09}
+     */
+    DEPRECATED(static void UnRegisterOneFactory(void));
 
 
   protected:

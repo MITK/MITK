@@ -17,16 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "Step6.h"
 #include "QmitkRegisterClasses.h"
 
-#include "mitkCoreExtObjectFactory.h"
-
 #include "mitkDataStorage.h"
 
 #include <QApplication>
 #include <itksys/SystemTools.hxx>
 int main(int argc, char* argv[])
 {
-  RegisterCoreExtObjectFactory();
-
   QApplication qtapplication( argc, argv );
 
   if(argc<2)

@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef DOXYGEN_SKIP
 
 namespace mitk {
-typedef float ScalarType;
+typedef double ScalarType;
 
 typedef itk::Matrix<ScalarType, 3, 3> Matrix3D;
 typedef itk::Matrix<ScalarType,4,4> Matrix4D;
@@ -82,10 +82,11 @@ template <> class VectorTraits<VnlVector> {
     typedef ScalarType ValueType;
 };
 
-template<> class VectorTraits<double[4]> {
+template<> class VectorTraits<float[4]> {
   public:
-    typedef double ValueType;
+    typedef float ValueType;
 };
+
 template<> class VectorTraits< itk::Index<5> > {
   public:
     typedef itk::Index<5>::IndexValueType ValueType;
@@ -124,9 +125,9 @@ template<> class VectorTraits< unsigned int *> {
     typedef unsigned int ValueType;
 };
 
-template<> class VectorTraits< ScalarType[4] > {
+template<> class VectorTraits< double[4] > {
   public:
-    typedef ScalarType ValueType;
+    typedef double ValueType;
 };
 
 template<> class VectorTraits< itk::Vector<float,3> > {
@@ -144,6 +145,7 @@ template<> class VectorTraits< itk::Point<float,4> > {
     typedef float ValueType;
 };
 
+
 template<> class VectorTraits< itk::Vector<double,3> > {
   public:
     typedef double ValueType;
@@ -151,6 +153,11 @@ template<> class VectorTraits< itk::Vector<double,3> > {
 
 template<> class VectorTraits< itk::Point<double,3> > {
   public:
+    typedef double ValueType;
+};
+
+template<> class VectorTraits< itk::Point<double,4> > {
+public:
     typedef double ValueType;
 };
 
@@ -388,7 +395,7 @@ inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2
   return true;
 }
 
-inline bool Equal(double scalar1, double scalar2, ScalarType eps=mitk::eps)
+inline bool Equal(ScalarType scalar1, ScalarType scalar2, ScalarType eps=mitk::eps)
 {
   bool isEqual( fabs(scalar1-scalar2) < eps );
   return isEqual;

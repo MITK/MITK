@@ -330,90 +330,61 @@ RenderingManager
       // Immediately repaint this window (implementation platform specific)
       // If the size is 0, it crashes
       this->ForceImmediateUpdate(it->first);
-
-  //    int *size = it->first->GetSize();
-  //    if ( 0 != size[0] && 0 != size[1] )
-  //    {
-  //      //prepare the camera before rendering
-  //      //Note: this is a very important step which should be called before the VTK render!
-  //      //If you modify the camera anywhere else or after the render call, the scene cannot be seen.
-  //      mitk::VtkPropRenderer *vPR =
-  //          dynamic_cast<mitk::VtkPropRenderer*>(mitk::BaseRenderer::GetInstance( it->first ));
-      //      if(vPR)
-      //         vPR->PrepareRender();
-      //      // Execute rendering
-      //      it->first->Render();
-      //    }
-
-      //    it->second = RENDERING_INACTIVE;
     }
   }
 
-  //m_UpdatePending = false;
 }
 
 
-//bool RenderingManager::InitializeViews( const mitk::DataStorage * storage, const DataNode* node = NULL, RequestType type, bool preserveRoughOrientationInWorldSpace )
-//{
-//  mitk::Geometry3D::Pointer geometry;
-//  if ( storage != NULL )
-//  {
-//    geometry = storage->ComputeVisibleBoundingGeometry3D(node, "visible", NULL, "includeInBoundingBox" );
-//
-//    if ( geometry.IsNotNull() )
-//    {
-//      // let's see if we have data with a limited live-span ...
-//      mitk::TimeBounds timebounds = geometry->GetTimeBounds();
-//      if ( timebounds[1] < mitk::ScalarTypeNumericTraits::max() )
-//      {
-//        mitk::ScalarType duration = timebounds[1]-timebounds[0];
-//
-//        mitk::TimeSlicedGeometry::Pointer timegeometry =
-//          mitk::TimeSlicedGeometry::New();
-//        timegeometry->InitializeEvenlyTimed(
-//          geometry, (unsigned int) duration );
-//        timegeometry->SetTimeBounds( timebounds );
-//
-//        timebounds[1] = timebounds[0] + 1.0;
-//        geometry->SetTimeBounds( timebounds );
-//
-//        geometry = timegeometry;
-//      }
-//    }
-//  }
-//
-//  // Use geometry for initialization
-//  return this->InitializeViews( geometry.GetPointer(), type );
-//}
+
+//TODO_GOETZ
+// Remove old function, so only this one is working.
+bool
+RenderingManager
+::InitializeViews( const Geometry3D * dataGeometry, RequestType type, bool preserveRoughOrientationInWorldSpace )
+{
+  ProportionalTimeGeometry::Pointer propTimeGeometry = ProportionalTimeGeometry::New();
+  propTimeGeometry->Initialize(dynamic_cast<Geometry3D *>(dataGeometry->Clone().GetPointer()), 1);
+  return InitializeViews(propTimeGeometry,type, preserveRoughOrientationInWorldSpace);
+}
 
 
 bool
 RenderingManager
-::InitializeViews( const Geometry3D * dataGeometry, RequestType type, bool preserveRoughOrientationInWorldSpace )
+::InitializeViews( const TimeGeometry * dataGeometry, RequestType type, bool /*preserveRoughOrientationInWorldSpace*/ )
 {
   MITK_DEBUG << "initializing views";
 
   bool boundingBoxInitialized = false;
 
-  Geometry3D::ConstPointer geometry = dataGeometry;
+  TimeGeometry::ConstPointer timeGeometry = dataGeometry;
+  TimeGeometry::Pointer modifiedGeometry = NULL;
+  if (dataGeometry!=NULL)
+  {
+    modifiedGeometry = dataGeometry->Clone();
+  }
 
+
+  // //TODO_GOETZ previously this code section has been disabled by
+  // a later asignment to geometry (e.g. timeGeometry)
+  // This has been fixed during Geometry-1-Plattform Project
+  // Propably this code is not working anymore, test!!
+  /*
   if (dataGeometry && preserveRoughOrientationInWorldSpace)
   {
-
     // clone the input geometry
-    Geometry3D::Pointer modifiedGeometry = dynamic_cast<Geometry3D*>( dataGeometry->Clone().GetPointer() );
     assert(modifiedGeometry.IsNotNull());
 
     // construct an affine transform from it
-    AffineGeometryFrame3D::TransformType::Pointer transform = AffineGeometryFrame3D::TransformType::New();
-    assert( modifiedGeometry->GetIndexToWorldTransform() );
-    transform->SetMatrix( modifiedGeometry->GetIndexToWorldTransform()->GetMatrix() );
-    transform->SetOffset( modifiedGeometry->GetIndexToWorldTransform()->GetOffset() );
+    Geometry3D::TransformType::Pointer transform = Geometry3D::TransformType::New();
+    assert( modifiedGeometry->GetGeometryForTimeStep(0)->GetIndexToWorldTransform() );
+    transform->SetMatrix( modifiedGeometry->GetGeometryForTimeStep(0)->GetIndexToWorldTransform()->GetMatrix() );
+    transform->SetOffset( modifiedGeometry->GetGeometryForTimeStep(0)->GetIndexToWorldTransform()->GetOffset() );
 
     // get transform matrix
-    AffineGeometryFrame3D::TransformType::MatrixType::InternalMatrixType& oldMatrix =
-      const_cast< AffineGeometryFrame3D::TransformType::MatrixType::InternalMatrixType& > ( transform->GetMatrix().GetVnlMatrix() );
-    AffineGeometryFrame3D::TransformType::MatrixType::InternalMatrixType newMatrix(oldMatrix);
+    Geometry3D::TransformType::MatrixType::InternalMatrixType& oldMatrix =
+      const_cast< Geometry3D::TransformType::MatrixType::InternalMatrixType& > ( transform->GetMatrix().GetVnlMatrix() );
+    Geometry3D::TransformType::MatrixType::InternalMatrixType newMatrix(oldMatrix);
 
     // get offset and bound
     Vector3D offset = modifiedGeometry->GetIndexToWorldTransform()->GetOffset();
@@ -435,7 +406,7 @@ RenderingManager
       unsigned int matchingRow = 0;
 
       // maximum value in the column
-      float max = std::numeric_limits<float>::min();
+      ScalarType max = std::numeric_limits<ScalarType>::min();
 
       // sign of the maximum value (-1 or 1)
       int sign = 1;
@@ -482,44 +453,44 @@ RenderingManager
     modifiedGeometry->SetBounds(newBounds);
 
     // set new offset and direction matrix
-    AffineGeometryFrame3D::TransformType::MatrixType newMatrixITK( newMatrix );
+    Geometry3D::TransformType::MatrixType newMatrixITK( newMatrix );
     transform->SetMatrix( newMatrixITK );
     transform->SetOffset( offset );
     modifiedGeometry->SetIndexToWorldTransform( transform );
     geometry = modifiedGeometry;
 
-  }
+  }*/
 
   int warningLevel = vtkObject::GetGlobalWarningDisplay();
   vtkObject::GlobalWarningDisplayOff();
 
-  if ( (geometry.IsNotNull() ) && (const_cast< mitk::BoundingBox * >(
-    geometry->GetBoundingBox())->GetDiagonalLength2() > mitk::eps) )
+  if ( (timeGeometry.IsNotNull() ) && (const_cast< mitk::BoundingBox * >(
+    timeGeometry->GetBoundingBoxInWorld())->GetDiagonalLength2() > mitk::eps) )
   {
     boundingBoxInitialized = true;
   }
 
-  if (geometry.IsNotNull() )
+  if (timeGeometry.IsNotNull() )
   {// make sure bounding box has an extent bigger than zero in any direction
     // clone the input geometry
-    Geometry3D::Pointer modifiedGeometry = dynamic_cast<Geometry3D*>( dataGeometry->Clone().GetPointer() );
+    //Old Geometry3D::Pointer modifiedGeometry = dynamic_cast<Geometry3D*>( dataGeometry->Clone().GetPointer() );
     assert(modifiedGeometry.IsNotNull());
-    Geometry3D::BoundsArrayType newBounds = modifiedGeometry->GetBounds();
-    for( unsigned int dimension = 0; ( 2 * dimension ) < newBounds.Size() ; dimension++ )
+    for (TimeStepType step = 0; step < modifiedGeometry->CountTimeSteps(); ++step)
     {
-      //check for equality but for an epsilon
-      if( Equal( newBounds[ 2 * dimension ], newBounds[ 2 * dimension + 1 ] ) )
+      Geometry3D::BoundsArrayType newBounds = modifiedGeometry->GetGeometryForTimeStep(step)->GetBounds();
+      for( unsigned int dimension = 0; ( 2 * dimension ) < newBounds.Size() ; dimension++ )
       {
-        newBounds[ 2 * dimension + 1 ] += 1;
+        //check for equality but for an epsilon
+        if( Equal( newBounds[ 2 * dimension ], newBounds[ 2 * dimension + 1 ] ) )
+        {
+          newBounds[ 2 * dimension + 1 ] += 1;
+        }
       }
+      modifiedGeometry->GetGeometryForTimeStep(step)->SetBounds(newBounds);
     }
-
-    // set the newly calculated bounds array
-    modifiedGeometry->SetBounds(newBounds);
-
-    geometry = modifiedGeometry;
   }
 
+  timeGeometry = modifiedGeometry;
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
@@ -534,14 +505,14 @@ RenderingManager
       || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)))
       )
     {
-      this->InternalViewInitialization( baseRenderer, geometry,
+      this->InternalViewInitialization( baseRenderer, timeGeometry,
         boundingBoxInitialized, id );
     }
   }
 
   if ( boundingBoxInitialized )
   {
-    m_TimeNavigationController->SetInputWorldGeometry( geometry );
+    m_TimeNavigationController->SetInputWorldTimeGeometry( timeGeometry );
   }
   m_TimeNavigationController->Update();
 
@@ -589,41 +560,14 @@ RenderingManager
   return true;
 }
 
-//bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const DataStorage* ds, const DataNode node = NULL,  bool initializeGlobalTimeSNC )
-//{
-//  mitk::Geometry3D::Pointer geometry;
-//  if ( ds != NULL )
-//  {
-//    geometry = ds->ComputeVisibleBoundingGeometry3D(node, NULL, "includeInBoundingBox" );
-//
-//    if ( geometry.IsNotNull() )
-//    {
-//      // let's see if we have data with a limited live-span ...
-//      mitk::TimeBounds timebounds = geometry->GetTimeBounds();
-//      if ( timebounds[1] < mitk::ScalarTypeNumericTraits::max() )
-//      {
-//        mitk::ScalarType duration = timebounds[1]-timebounds[0];
-//
-//        mitk::TimeSlicedGeometry::Pointer timegeometry =
-//          mitk::TimeSlicedGeometry::New();
-//        timegeometry->InitializeEvenlyTimed(
-//          geometry, (unsigned int) duration );
-//        timegeometry->SetTimeBounds( timebounds );
-//
-//        timebounds[1] = timebounds[0] + 1.0;
-//        geometry->SetTimeBounds( timebounds );
-//
-//        geometry = timegeometry;
-//      }
-//    }
-//  }
-//
-//  // Use geometry for initialization
-//  return this->InitializeView( renderWindow,
-//    geometry.GetPointer(), initializeGlobalTimeSNC );
-//}
-
 bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const Geometry3D * geometry, bool initializeGlobalTimeSNC )
+{
+  ProportionalTimeGeometry::Pointer propTimeGeometry = ProportionalTimeGeometry::New();
+  propTimeGeometry->Initialize(dynamic_cast<Geometry3D *>(geometry->Clone().GetPointer()), 1);
+  return InitializeView(renderWindow, propTimeGeometry, initializeGlobalTimeSNC );
+}
+
+bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const TimeGeometry * geometry, bool initializeGlobalTimeSNC )
 {
   bool boundingBoxInitialized = false;
 
@@ -631,7 +575,7 @@ bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const Geo
   vtkObject::GlobalWarningDisplayOff();
 
   if ( (geometry != NULL ) && (const_cast< mitk::BoundingBox * >(
-   geometry->GetBoundingBox())->GetDiagonalLength2() > mitk::eps) )
+   geometry->GetBoundingBoxInWorld())->GetDiagonalLength2() > mitk::eps) )
   {
    boundingBoxInitialized = true;
   }
@@ -646,7 +590,7 @@ bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const Geo
 
   if ( boundingBoxInitialized && initializeGlobalTimeSNC )
   {
-    m_TimeNavigationController->SetInputWorldGeometry( geometry );
+    m_TimeNavigationController->SetInputWorldTimeGeometry( geometry );
   }
   m_TimeNavigationController->Update();
 
@@ -677,8 +621,7 @@ bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow )
   return true;
 }
 
-
-void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRenderer, const mitk::Geometry3D *geometry, bool boundingBoxInitialized, int mapperID )
+void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRenderer, const mitk::TimeGeometry *geometry, bool boundingBoxInitialized, int mapperID )
 {
   mitk::SliceNavigationController *nc = baseRenderer->GetSliceNavigationController();
 
@@ -688,7 +631,7 @@ void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRender
   if ( boundingBoxInitialized )
   {
     // Set geometry for NC
-    nc->SetInputWorldGeometry( geometry );
+    nc->SetInputWorldTimeGeometry( geometry );
     nc->Update();
 
     if ( mapperID == 1 )

@@ -69,11 +69,32 @@ void mitk::ContourElement::AddVertexAtFront(VertexType &vertex)
 
 void mitk::ContourElement::InsertVertexAtIndex(mitk::Point3D &vertex, bool isControlPoint, int index)
 {
-  if(index > 0 && this->GetSize() > index)
+  if(index >= 0 && this->GetSize() > index)
   {
     VertexIterator _where = this->m_Vertices->begin();
     _where += index;
     this->m_Vertices->insert(_where, new VertexType(vertex, isControlPoint));
+  }
+}
+
+
+
+void mitk::ContourElement::SetVertexAt(int pointId, const Point3D &point)
+{
+  if(pointId >= 0 && this->GetSize() > pointId)
+  {
+    this->m_Vertices->at(pointId)->Coordinates = point;
+  }
+}
+
+
+
+void mitk::ContourElement::SetVertexAt(int pointId, const VertexType* vertex)
+{
+  if(pointId >= 0 && this->GetSize() > pointId)
+  {
+    this->m_Vertices->at(pointId)->Coordinates = vertex->Coordinates;
+    this->m_Vertices->at(pointId)->IsControlPoint = vertex->IsControlPoint;
   }
 }
 
@@ -296,7 +317,7 @@ void mitk::ContourElement::Open()
 
 
 
-void mitk::ContourElement::SetIsClosed( bool isClosed)
+void mitk::ContourElement::SetClosed( bool isClosed)
 {
   isClosed ? this->Close() : this->Open();
 }
@@ -357,7 +378,7 @@ void mitk::ContourElement::Concatenate(mitk::ContourElement* other, bool check)
   }
 }
 
-bool mitk::ContourElement::RemoveVertex(mitk::ContourElement::VertexType* vertex)
+bool mitk::ContourElement::RemoveVertex(const VertexType *vertex)
 {
   VertexIterator it = this->m_Vertices->begin();
 
@@ -376,6 +397,31 @@ bool mitk::ContourElement::RemoveVertex(mitk::ContourElement::VertexType* vertex
   }
 
   return false;
+}
+
+
+
+int mitk::ContourElement::GetIndex(const VertexType *vertex)
+{
+  VertexIterator it = this->m_Vertices->begin();
+
+  VertexIterator end = this->m_Vertices->end();
+
+  int index = 0;
+
+  //search for vertex
+  while(it != end)
+  {
+    if((*it) == vertex)
+    {
+      return index;
+    }
+
+    it++;
+    ++index;
+  }
+
+  return -1;//not found
 }
 
 

@@ -26,8 +26,8 @@ int mitkToFProcessingCommonTest(int /* argc */, char* /*argv*/[])
 
   unsigned int i = 10;
   unsigned int j = 50;
-  mitk::ScalarType distance = 1000;
-  mitk::ScalarType focalLength = 10;
+  float distance = 1000;
+  float focalLength = 10;
   mitk::Point2D focalLength_XY;
   focalLength_XY[0] = 200;
   focalLength_XY[1] = 200;

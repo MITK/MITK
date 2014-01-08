@@ -36,7 +36,7 @@ public:
   // Construct plane passing through origin and normal to z-axis.
   static vtkThickPlane *New();
 
-  vtkTypeRevisionMacro(vtkThickPlane,vtkImplicitFunction);
+  vtkTypeMacro(vtkThickPlane,vtkImplicitFunction);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description

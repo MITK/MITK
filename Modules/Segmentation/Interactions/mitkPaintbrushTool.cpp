@@ -58,6 +58,7 @@ void mitk::PaintbrushTool::Activated()
   Superclass::Activated();
   FeedbackContourTool::SetFeedbackContourVisible(true);
   SizeChanged.Send(m_Size);
+  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<mitk::PaintbrushTool>( this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified );
 }
 
 void mitk::PaintbrushTool::Deactivated()
@@ -68,6 +69,7 @@ void mitk::PaintbrushTool::Deactivated()
   Superclass::Deactivated();
   m_WorkingSlice = NULL;
   m_CurrentPlane = NULL;
+  m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<mitk::PaintbrushTool>( this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified );
 }
 
 void mitk::PaintbrushTool::SetSize(int value)
@@ -283,7 +285,7 @@ bool mitk::PaintbrushTool::OnMousePressed (Action* action, const StateEvent* sta
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
-  m_MasterContour->SetIsClosed(true);
+  m_MasterContour->SetClosed(true);
 
   return this->OnMouseMoved(action, stateEvent);
 }
@@ -352,7 +354,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
 
   ContourModel::Pointer contour = ContourModel::New();
   contour->Expand(timestep + 1);
-  contour->SetIsClosed(true, timestep);
+  contour->SetClosed(true, timestep);
 
   ContourModel::VertexIterator it = m_MasterContour->Begin();
   ContourModel::VertexIterator end = m_MasterContour->End();
@@ -444,7 +446,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *ev
     if ( !image || !planeGeometry )
         return;
 
-    if(m_CurrentPlane.IsNull())
+    if(m_CurrentPlane.IsNull() || m_WorkingSlice.IsNull())
     {
         m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
         m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
@@ -490,4 +492,11 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *ev
 
         m_ToolManager->GetDataStorage()->Add(m_WorkingNode);
     }
+}
+
+void mitk::PaintbrushTool::OnToolManagerWorkingDataModified()
+{
+  //Here we simply set the current working slice to null. The next time the mouse is moved
+  //within a renderwindow a new slice will be extracted from the new working data
+  m_WorkingSlice = 0;
 }

@@ -34,8 +34,6 @@
 
 US_BEGIN_NAMESPACE
 
-typedef ServiceRegistrationBasePrivate::MutexLocker MutexLocker;
-
 ServiceRegistrationBase::ServiceRegistrationBase()
   : d(0)
 {
@@ -99,12 +97,13 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 {
   if (!d) throw std::logic_error("ServiceRegistrationBase object invalid");
 
-  MutexLocker lock(d->eventLock);
+  MutexLock lock(d->eventLock);
 
+  ServiceEvent modifiedEndMatchEvent(ServiceEvent::MODIFIED_ENDMATCH, d->reference);
   ServiceListeners::ServiceListenerEntries before;
   // TBD, optimize the locking of services
   {
-    //MutexLocker lock2(d->module->coreCtx->globalFwLock);
+    //MutexLock lock2(d->module->coreCtx->globalFwLock);
 
     if (d->available)
     {
@@ -114,14 +113,14 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 
       std::vector<std::string> classes;
       {
-        MutexLocker lock3(d->propsLock);
+        MutexLock lock3(d->propsLock);
 
         {
           const Any& any = d->properties.Value(ServiceConstants::SERVICE_RANKING());
           if (any.Type() == typeid(int)) old_rank = any_cast<int>(any);
         }
 
-        d->module->coreCtx->listeners.GetMatchingServiceListeners(d->reference, before, false);
+        d->module->coreCtx->listeners.GetMatchingServiceListeners(modifiedEndMatchEvent, before, false);
         classes = ref_any_cast<std::vector<std::string> >(d->properties.Value(ServiceConstants::OBJECTCLASS()));
         long int sid = any_cast<long int>(d->properties.Value(ServiceConstants::SERVICE_ID()));
         d->properties = ServiceRegistry::CreateServiceProperties(props, classes, false, false, sid);
@@ -142,14 +141,15 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
       throw std::logic_error("Service is unregistered");
     }
   }
+  ServiceEvent modifiedEvent(ServiceEvent::MODIFIED, d->reference);
   ServiceListeners::ServiceListenerEntries matchingListeners;
-  d->module->coreCtx->listeners.GetMatchingServiceListeners(d->reference, matchingListeners);
+  d->module->coreCtx->listeners.GetMatchingServiceListeners(modifiedEvent, matchingListeners);
   d->module->coreCtx->listeners.ServiceChanged(matchingListeners,
-                                               ServiceEvent(ServiceEvent::MODIFIED, d->reference),
+                                               modifiedEvent,
                                                before);
 
   d->module->coreCtx->listeners.ServiceChanged(before,
-                                               ServiceEvent(ServiceEvent::MODIFIED_ENDMATCH, d->reference));
+                                               modifiedEndMatchEvent);
 }
 
 void ServiceRegistrationBase::Unregister()
@@ -158,7 +158,7 @@ void ServiceRegistrationBase::Unregister()
 
   if (d->unregistering) return; // Silently ignore redundant unregistration.
   {
-    MutexLocker lock(d->eventLock);
+    MutexLock lock(d->eventLock);
     if (d->unregistering) return;
     d->unregistering = true;
 
@@ -178,16 +178,17 @@ void ServiceRegistrationBase::Unregister()
   if (d->module)
   {
     ServiceListeners::ServiceListenerEntries listeners;
-    d->module->coreCtx->listeners.GetMatchingServiceListeners(d->reference, listeners);
-     d->module->coreCtx->listeners.ServiceChanged(
-         listeners,
-         ServiceEvent(ServiceEvent::UNREGISTERING, d->reference));
+    ServiceEvent unregisteringEvent(ServiceEvent::UNREGISTERING, d->reference);
+    d->module->coreCtx->listeners.GetMatchingServiceListeners(unregisteringEvent, listeners);
+    d->module->coreCtx->listeners.ServiceChanged(
+          listeners,
+          unregisteringEvent);
   }
 
   {
-    MutexLocker lock(d->eventLock);
+    MutexLock lock(d->eventLock);
     {
-      MutexLocker lock2(d->propsLock);
+      MutexLock lock2(d->propsLock);
       d->available = false;
       InterfaceMap::const_iterator factoryIter = d->service.find("org.cppmicroservices.factory");
       if (d->module && factoryIter != d->service.end())

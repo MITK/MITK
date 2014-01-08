@@ -122,7 +122,7 @@ void FiberBundleXReader::GenerateOutputInformation()
                 geometry->SetOrigin(origin);
 
                 // read spacing
-                float spacing[3];
+          ScalarType spacing[3];
                 pElem->Attribute("spacing_x", &temp);
                 spacing[0] = temp;
                 pElem->Attribute("spacing_y", &temp);
@@ -178,7 +178,7 @@ void FiberBundleXReader::GenerateOutputInformation()
 
                     for( pElem2; pElem2; pElem2=pElem2->NextSiblingElement())
                     {
-                        itk::Point<float> point;
+              Point3D point;
                         pElem2->Attribute("pos_x", &temp);
                         point[0] = temp;
                         pElem2->Attribute("pos_y", &temp);
@@ -197,7 +197,7 @@ void FiberBundleXReader::GenerateOutputInformation()
                 fiberPolyData->SetLines(cellArray);
 
                 vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
-                cleaner->SetInput(fiberPolyData);
+                cleaner->SetInputData(fiberPolyData);
                 cleaner->Update();
                 fiberPolyData = cleaner->GetOutput();
 

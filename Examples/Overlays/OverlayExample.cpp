@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
   renderWindow.GetRenderer()->SetDataStorage(dataStorage);
 
   // Initialize the RenderWindow
-  mitk::TimeSlicedGeometry::Pointer geo = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
+  mitk::TimeGeometry::Pointer geo = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews( geo );
   //mitk::RenderingManager::GetInstance()->InitializeViews();
 

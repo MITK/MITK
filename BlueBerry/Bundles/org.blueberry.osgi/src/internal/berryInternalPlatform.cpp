@@ -195,7 +195,24 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   if (!provisioningFile.empty())
   {
     BERRY_INFO(m_ConsoleLog) << "Using provisioning file: " << provisioningFile;
-    ProvisioningInfo provInfo(QString::fromStdString(provisioningFile));
+
+    // FIXME: This is a quick-fix for Bug 16224 - Umlaut and other special characters in install/binary path
+    // Assumption : linux provides utf8, windows provides ascii encoded argv lists
+#ifdef Q_OS_WIN
+    ProvisioningInfo provInfo(QString::fromStdString(provisioningFile.c_str()));
+#else
+    ProvisioningInfo provInfo(QString::fromUtf8(provisioningFile.c_str()));
+#endif
+
+    // it can still happen, that the encoding is not compatible with the fromUtf8 function ( i.e. when manipulating the LANG variable
+    // in such case, the QStringList in provInfo is empty which we can easily check for
+    if( provInfo.getPluginDirs().empty() )
+    {
+      BERRY_ERROR << "Cannot search for provisioning file, the retrieved directory list is empty.\n" <<
+                     "This can occur if there are some special (non-ascii) characters in the install path.";
+      throw berry::PlatformException("No provisioning file specified. Terminating...");
+    }
+
     foreach(QString pluginPath, provInfo.getPluginDirs())
     {
       ctkPluginFrameworkLauncher::addSearchPath(pluginPath);

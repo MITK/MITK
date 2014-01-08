@@ -205,7 +205,7 @@ void QmitkTractbasedSpatialStatisticsView::InitPointsets()
     m_P1->SetData( m_PointSetNode );
     m_P1->SetProperty( "name", mitk::StringProperty::New( "PointSet" ) );
     m_P1->SetProperty( "opacity", mitk::FloatProperty::New( 1 ) );
-    m_P1->SetProperty( "helper object", mitk::BoolProperty::New(false) ); // CHANGE if wanted
+    m_P1->SetProperty( "helper object", mitk::BoolProperty::New(true) ); // CHANGE if wanted
     m_P1->SetProperty( "pointsize", mitk::FloatProperty::New( 0.1 ) );
     m_P1->SetColor( 1.0, 0.0, 0.0 );
     this->GetDefaultDataStorage()->Add(m_P1);
@@ -1045,6 +1045,8 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
   mitk::TractAnalyzer analyzer;
   analyzer.SetInputImage(image);
   analyzer.SetThreshold(threshold);
+
+  m_PointSetNode = this->m_Controls->m_PointWidget->GetPointSet();
 
   // Set Pointset to analyzer
   analyzer.SetPointSet(m_PointSetNode);

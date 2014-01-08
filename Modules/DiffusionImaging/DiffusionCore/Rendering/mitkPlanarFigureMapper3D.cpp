@@ -79,7 +79,7 @@ void mitk::PlanarFigureMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
         m_polygonPolyData->SetPoints(m_points);
         m_polygonPolyData->SetPolys(m_polygonsCell);
 
-        m_VtkPolygonDataMapperGL->SetInput(m_polygonPolyData);
+        m_VtkPolygonDataMapperGL->SetInputData(m_polygonPolyData);
         m_PolygonActor->SetMapper(m_VtkPolygonDataMapperGL);
         m_PolygonAssembly->AddPart(m_PolygonActor);
 

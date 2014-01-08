@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkGetPropertyService.h"
+#include "QmitkAddNewPropertyDialog.h"
 #include "QmitkPropertiesPreferencePage.h"
 #include "QmitkPropertyItemDelegate.h"
 #include "QmitkPropertyItemModel.h"
@@ -23,18 +24,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIBerryPreferences.h>
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>
+#include <QmitkRenderWindow.h>
 #include <QPainter>
 
 const std::string QmitkPropertyTreeView::VIEW_ID = "org.mitk.views.properties";
 
 QmitkPropertyTreeView::QmitkPropertyTreeView()
-  : m_PropertyNameChangedTag(0),
+  : m_Parent(NULL),
+    m_PropertyNameChangedTag(0),
     m_PropertyAliases(NULL),
     m_PropertyDescriptions(NULL),
     m_ShowAliasesInDescription(true),
+    m_DeveloperMode(false),
     m_ProxyModel(NULL),
     m_Model(NULL),
-    m_Delegate(NULL)
+    m_Delegate(NULL),
+    m_Renderer(NULL)
 {
 }
 
@@ -44,11 +49,32 @@ QmitkPropertyTreeView::~QmitkPropertyTreeView()
 
 void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 {
+  m_Parent = parent;
+
   m_Controls.setupUi(parent);
 
-  m_Controls.filter->SetDefaultText("Filter");
+  m_Controls.propertyListComboBox->addItem("independent");
+
+  mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
+
+  if (renderWindowPart != NULL)
+  {
+    QHash<QString, QmitkRenderWindow*> renderWindows = renderWindowPart->GetQmitkRenderWindows();
+
+    Q_FOREACH(QString renderWindow, renderWindows.keys())
+    {
+      m_Controls.propertyListComboBox->addItem(renderWindow);
+    }
+  }
+
+  m_Controls.newButton->setEnabled(false);
+
+  m_Controls.filterLineEdit->SetDefaultText("Filter");
 
   m_Controls.description->hide();
+  m_Controls.propertyListLabel->hide();
+  m_Controls.propertyListComboBox->hide();
+  m_Controls.newButton->hide();
 
   m_ProxyModel = new QmitkPropertyItemSortFilterProxyModel(m_Controls.treeView);
   m_Model = new QmitkPropertyItemModel(m_ProxyModel);
@@ -62,13 +88,15 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.treeView->setItemDelegateForColumn(1, m_Delegate);
   m_Controls.treeView->setModel(m_ProxyModel);
-  m_Controls.treeView->setColumnWidth(0, 180);
+  m_Controls.treeView->setColumnWidth(0, 160);
   m_Controls.treeView->sortByColumn(0, Qt::AscendingOrder);
   m_Controls.treeView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_Controls.treeView->setSelectionMode(QAbstractItemView::SingleSelection);
   m_Controls.treeView->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::DoubleClicked);
 
-  connect(m_Controls.filter, SIGNAL(textChanged(const QString&)), this, SLOT(OnFilterTextChanged(const QString&)));
+  connect(m_Controls.filterLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(OnFilterTextChanged(const QString&)));
+  connect(m_Controls.propertyListComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnPropertyListChanged(int)));
+  connect(m_Controls.newButton, SIGNAL(clicked()), this, SLOT(OnAddNewProperty()));
   connect(m_Controls.treeView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(OnCurrentRowChanged(const QModelIndex&, const QModelIndex&)));
   connect(m_Model, SIGNAL(modelReset()), this, SLOT(OnModelReset()));
 }
@@ -192,10 +220,12 @@ void QmitkPropertyTreeView::OnPreferencesChanged(const berry::IBerryPreferences*
   bool showAliases = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES, true);
   bool showDescriptions = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_DESCRIPTIONS, true);
   bool showAliasesInDescription = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES_IN_DESCRIPTION, true);
+  bool developerMode = preferences->GetBool(QmitkPropertiesPreferencePage::DEVELOPER_MODE, false);
 
   bool updateAliases = showAliases != (m_PropertyAliases != NULL);
   bool updateDescriptions = showDescriptions != (m_PropertyDescriptions != NULL);
   bool updateAliasesInDescription = showAliasesInDescription != m_ShowAliasesInDescription;
+  bool updateDeveloperMode = developerMode != m_DeveloperMode;
 
   if (updateAliases)
     m_PropertyAliases = showAliases
@@ -216,6 +246,18 @@ void QmitkPropertyTreeView::OnPreferencesChanged(const berry::IBerryPreferences*
 
     if (!selection.isEmpty())
       this->OnCurrentRowChanged(selection[0], selection[0]);
+  }
+
+  if (updateDeveloperMode)
+  {
+    m_DeveloperMode = developerMode;
+
+    if (!developerMode)
+      m_Controls.propertyListComboBox->setCurrentIndex(0);
+
+    m_Controls.propertyListLabel->setVisible(developerMode);
+    m_Controls.propertyListComboBox->setVisible(developerMode);
+    m_Controls.newButton->setVisible(developerMode);
   }
 
   m_Model->OnPreferencesChanged(preferences);
@@ -254,22 +296,28 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
 
   if (nodes.empty() || nodes.front().IsNull())
   {
+    m_SelectedNode = NULL;
+
     this->SetPartName("Properties");
     m_Model->SetPropertyList(NULL);
     m_Delegate->SetPropertyList(NULL);
+
+    m_Controls.newButton->setEnabled(false);
   }
   else
   {
-    QString selectionClassName = nodes.front()->GetData() != NULL
-      ? nodes.front()->GetData()->GetNameOfClass()
+    m_SelectedNode = nodes.front();
+
+    QString selectionClassName = m_SelectedNode->GetData() != NULL
+      ? m_SelectedNode->GetData()->GetNameOfClass()
       : "";
 
     m_SelectionClassName = selectionClassName.toStdString();
-    m_Model->SetPropertyList(nodes.front()->GetPropertyList(), selectionClassName);
-    m_Delegate->SetPropertyList(nodes.front()->GetPropertyList());
+    m_Model->SetPropertyList(m_SelectedNode->GetPropertyList(m_Renderer), selectionClassName);
+    m_Delegate->SetPropertyList(m_SelectedNode->GetPropertyList(m_Renderer));
     OnPropertyNameChanged(itk::ModifiedEvent());
 
-    mitk::BaseProperty* nameProperty = nodes.front()->GetProperty("name");
+    mitk::BaseProperty* nameProperty = m_SelectedNode->GetProperty("name");
 
     if (nameProperty != NULL)
     {
@@ -277,6 +325,8 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
       command->SetCallbackFunction(this, &QmitkPropertyTreeView::OnPropertyNameChanged);
       m_PropertyNameChangedTag = nameProperty->AddObserver(itk::ModifiedEvent(), command);
     }
+
+    m_Controls.newButton->setEnabled(true);
   }
 
   if (!m_ProxyModel->filterRegExp().isEmpty())
@@ -285,5 +335,56 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
 
 void QmitkPropertyTreeView::SetFocus()
 {
-  m_Controls.filter->setFocus();
+  m_Controls.filterLineEdit->setFocus();
+}
+
+void QmitkPropertyTreeView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  if (m_Controls.propertyListComboBox->count() == 1)
+  {
+    QHash<QString, QmitkRenderWindow*> renderWindows = this->GetRenderWindowPart()->GetQmitkRenderWindows();
+
+    Q_FOREACH(QString renderWindow, renderWindows.keys())
+    {
+      m_Controls.propertyListComboBox->addItem(renderWindow);
+    }
+  }
+}
+
+void QmitkPropertyTreeView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
+{
+  if (m_Controls.propertyListComboBox->count() > 1)
+  {
+    m_Controls.propertyListComboBox->clear();
+    m_Controls.propertyListComboBox->addItem("independent");
+  }
+}
+
+void QmitkPropertyTreeView::OnPropertyListChanged(int index)
+{
+  if (index == -1)
+    return;
+
+  QString renderer = m_Controls.propertyListComboBox->itemText(index);
+
+  m_Renderer = renderer != "independent"
+    ? this->GetRenderWindowPart()->GetQmitkRenderWindow(renderer)->GetRenderer()
+    : NULL;
+
+  QList<mitk::DataNode::Pointer> nodes;
+
+  if (m_SelectedNode.IsNotNull())
+    nodes << m_SelectedNode;
+
+  berry::IWorkbenchPart::Pointer workbenchPart;
+
+  this->OnSelectionChanged(workbenchPart, nodes);
+}
+
+void QmitkPropertyTreeView::OnAddNewProperty()
+{
+  QmitkAddNewPropertyDialog dialog(m_SelectedNode, m_Renderer, m_Parent);
+
+  if (dialog.exec() == QDialog::Accepted)
+    this->m_Model->Update();
 }

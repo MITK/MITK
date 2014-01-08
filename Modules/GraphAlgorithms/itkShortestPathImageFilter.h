@@ -112,6 +112,10 @@ namespace itk
       itkSetMacro (FullNeighborsMode, bool);
       itkGetMacro (FullNeighborsMode, bool);
 
+
+      // \brief Set Graph_fullNeighbors. false = no diagonal neighbors, in 2D this means N4 Neigborhood. true = would be N8 in 2D
+      itkSetMacro (Graph_fullNeighbors,bool)
+
       // \brief (default=true), Produce output image, which shows the shortest path. But you can also get the shortest Path directly as vector with the function GetVectorPath
       itkSetMacro (MakeOutputImage, bool);
       itkGetMacro (MakeOutputImage, bool);

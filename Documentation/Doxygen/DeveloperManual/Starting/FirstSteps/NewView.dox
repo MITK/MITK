@@ -1,0 +1,50 @@
+/**
+\page NewViewPage Adding a new view to a MITK Plugin
+
+A plugin can bundle several views. If you want to extend an existing plugin, for example created as in \ref NewPluginPage, by an additional view, you only need to adapt a few files.
+This guide will give you a quick overview of what to do. We assume you are adding the view "Useful Functions View" and use default file names and locations (relative to your plugin folder root).
+
+\section NewViewPageFilesToAdd Files to add
+
+For a basic view you will have to add the following files (assuming you do not share any icons or other resources):
+
+<ul>
+ <li> src/internal/%QmitkUsefulFunctionsView.h
+ <li> src/internal/%QmitkUsefulFunctionsView.cpp <br>
+  remember to set an id for your view
+  \code
+  const std::string QmitkUsefulFunctionsView::VIEW_ID = "org.mitk.views.usefulfunctions";
+  \endcode
+ <li> src/internal/%QmitkUsefulFunctionsViewControls.ui
+ <li> resources/%UsefulFunctionsViewIcon.png
+ <li> documentation/%UserManual/%QmitkUsefulFunctionsViewUserManual.dox <br>
+ Use your view id as page id to be found using the F1 help
+ \code
+ \page org_mitk_views_usefulfunctions The Useful Functions View
+ \endcode
+</ul>
+
+\section NewViewPageFilesChanged Files to change
+
+The following files need to be adapted:
+
+<ul>
+ <li> files.cmake
+ <ul>
+  <li> Add "src/internal/QmitkUsefulFunctionsView.cpp" to <b>set(INTERNAL_CPP_FILES )</b>
+  <li> Add "src/internal/QmitkUsefulFunctionsViewControls.ui" to <b>set(UI_FILES )</b>
+  <li> Add "src/internal/QmitkUsefulFunctionsView.h" to <b>set(MOC_H_FILES )</b>
+  <li> Add "resources/UsefulFunctionsViewIcon.png" to <b>set(CACHED_RESOURCE_FILES )</b>
+ </ul>
+ <li> plugin.xml <br>
+  Add an extension point for your new view
+  \code
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.usefulfunctions"
+          name="Useful Functions"
+          class="QmitkUsefulFunctionsView"
+          icon="resources/UsefulFunctionsViewIcon.png" />
+  </extension>
+  \endcode
+</ul>
+*/

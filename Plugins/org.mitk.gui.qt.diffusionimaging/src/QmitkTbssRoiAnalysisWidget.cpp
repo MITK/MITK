@@ -90,8 +90,8 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
       int startId = 0;
       int endId = 0;
 
-      float minDistStart = std::numeric_limits<float>::max();
-      float minDistEnd = std::numeric_limits<float>::max();
+      mitk::ScalarType minDistStart = std::numeric_limits<mitk::ScalarType>::max();
+      mitk::ScalarType minDistEnd = std::numeric_limits<mitk::ScalarType>::max();
 
 
 
@@ -99,15 +99,15 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
       {
 
 
-        double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+        mitk::ScalarType *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
 
         mitk::Point3D point;
         point[0] = p[0];
         point[1] = p[1];
         point[2] = p[2];
 
-        float distanceToStart = point.EuclideanDistanceTo(startCenter);
-        float distanceToEnd = point.EuclideanDistanceTo(endCenter);
+        mitk::ScalarType distanceToStart = point.EuclideanDistanceTo(startCenter);
+        mitk::ScalarType distanceToEnd = point.EuclideanDistanceTo(endCenter);
 
         if(distanceToStart < minDistStart)
         {
@@ -136,7 +136,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
       {
 
         // Calculate the intersection of the ROI with the startRoi and decide if the startId is part of the roi or must be cut of
-        double *p = fiberPolyData->GetPoint( pointsInCell[ startId ] );
+        mitk::ScalarType *p = fiberPolyData->GetPoint( pointsInCell[ startId ] );
         mitk::Vector3D p0;
         p0[0] = p[0];      p0[1] = p[1];      p0[2] = p[2];
 
@@ -171,7 +171,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
         }
 
 
-        double d = ( (onPlane-p0)*normal) / ( (p0-p1) * normal );
+        mitk::ScalarType d = ( (onPlane-p0)*normal) / ( (p0-p1) * normal );
         mitk::Vector3D newPoint = (p0-p1);
 
         point[0] = d*newPoint[0] + p0[0];
@@ -185,7 +185,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
           /* StartId and startId+1 lie on the same side of the plane
              so startId is also part of the ROI*/
 
-          double *start = fiberPolyData->GetPoint( pointsInCell[startId] );
+          mitk::ScalarType *start = fiberPolyData->GetPoint( pointsInCell[startId] );
           point[0] = start[0]; point[1] = start[1]; point[2] = start[2];
           singleTract.push_back(point);
         }
@@ -195,7 +195,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
         for( int pointInCellID( startId+1 ); pointInCellID < endId ; pointInCellID++)
         {
           // push back point
-          double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+          mitk::ScalarType *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
           point[0] = p[0]; point[1] = p[1]; point[2] = p[2];
           singleTract.push_back( point );
 
@@ -256,7 +256,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
       else{
 
         // Calculate the intersection of the ROI with the startRoi and decide if the startId is part of the roi or must be cut of
-        double *p = fiberPolyData->GetPoint( pointsInCell[ startId ] );
+        mitk::ScalarType *p = fiberPolyData->GetPoint( pointsInCell[ startId ] );
         mitk::Vector3D p0;
         p0[0] = p[0];      p0[1] = p[1];      p0[2] = p[2];
 
@@ -289,7 +289,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
         }
 
 
-        double d = ( (onPlane-p0)*normal) / ( (p0-p1) * normal );
+        mitk::ScalarType d = ( (onPlane-p0)*normal) / ( (p0-p1) * normal );
         mitk::Vector3D newPoint = (p0-p1);
 
 
@@ -305,7 +305,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
           /* StartId and startId+1 lie on the same side of the plane
              so startId is also part of the ROI*/
 
-          double *start = fiberPolyData->GetPoint( pointsInCell[startId] );
+          mitk::ScalarType *start = fiberPolyData->GetPoint( pointsInCell[startId] );
           point[0] = start[0]; point[1] = start[1]; point[2] = start[2];
           singleTract.push_back(point);
         }
@@ -315,7 +315,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
         for( int pointInCellID( startId-1 ); pointInCellID > endId ; pointInCellID--)
         {
           // push back point
-          double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+          mitk::ScalarType *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
           point[0] = p[0]; point[1] = p[1]; point[2] = p[2];
           singleTract.push_back( point );
 
@@ -430,7 +430,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::ParameterizeTracts(TractContainer
     TractType tract = *it;
 
     // Calculate the total length
-    float totalLength = 0;
+    mitk::ScalarType totalLength = 0;
 
     if(tract.size() < 2)
       continue;
@@ -439,22 +439,22 @@ TractContainerType QmitkTbssRoiAnalysisWidget::ParameterizeTracts(TractContainer
     for(int i = 1; i<tract.size(); i++)
     {
       PointType p1 = tract.at(i);
-      float length = p0.EuclideanDistanceTo(p1);
+      mitk::ScalarType length = p0.EuclideanDistanceTo(p1);
       totalLength += length;
       p0 = p1;
     }
 
-    float stepSize = totalLength / number;
+    mitk::ScalarType stepSize = totalLength / number;
 
 
 
     p0 = tract.at(0);
     PointType p1 = tract.at(1);
     int tractCounter = 2;
-    float distance = p0.EuclideanDistanceTo(p1);
-    float locationBetween = 0;
+    mitk::ScalarType distance = p0.EuclideanDistanceTo(p1);
+    mitk::ScalarType locationBetween = 0;
 
-    for(float position = 0;
+    for(mitk::ScalarType position = 0;
         position <= totalLength+0.001 && resampledTract.size() <= (number+1);
         position+=stepSize)
     {
@@ -502,9 +502,9 @@ mitk::Point3D QmitkTbssRoiAnalysisWidget::GetPositionInWorld(int index)
 {
 
 
-  float xSum = 0.0;
-  float ySum = 0.0;
-  float zSum = 0.0;
+  mitk::ScalarType xSum = 0.0;
+  mitk::ScalarType ySum = 0.0;
+  mitk::ScalarType zSum = 0.0;
   for(TractContainerType::iterator it = m_CurrentTracts.begin();
       it!=m_CurrentTracts.end(); ++it)
   {
@@ -517,9 +517,9 @@ mitk::Point3D QmitkTbssRoiAnalysisWidget::GetPositionInWorld(int index)
 
   int number = m_CurrentTracts.size();
 
-  float xPos = xSum / number;
-  float yPos = ySum / number;
-  float zPos = zSum / number;
+  mitk::ScalarType xPos = xSum / number;
+  mitk::ScalarType yPos = ySum / number;
+  mitk::ScalarType zPos = zSum / number;
 
 
   mitk::Point3D pos;
@@ -531,17 +531,17 @@ mitk::Point3D QmitkTbssRoiAnalysisWidget::GetPositionInWorld(int index)
 }
 
 
-std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupProfiles()
+std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::CalculateGroupProfiles()
 {
   MITK_INFO << "make profiles!";
-  std::vector< std::vector<double> > profiles;
+  std::vector< std::vector<mitk::ScalarType> > profiles;
 
 
   int size = m_Projections->GetVectorLength();
   for(int s=0; s<size; s++)
   {
     // Iterate trough the roi
-    std::vector<double> profile;
+    std::vector<mitk::ScalarType> profile;
     RoiType::iterator it;
     it = m_Roi.begin();
     while(it != m_Roi.end())
@@ -563,7 +563,7 @@ std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupPro
   // the same length, but this should normally be the case if the input
   // data were corrected with the TBSS Module.
 
-  std::vector< std::vector<double> > groupProfiles;
+  std::vector< std::vector<mitk::ScalarType> > groupProfiles;
 
   std::vector< std::pair<std::string, int> >::iterator it;
   it = m_Groups.begin();
@@ -576,7 +576,7 @@ std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupPro
     int size = p.second;
 
     //initialize a vector of the right length with zeroes
-    std::vector<double> averageProfile;
+    std::vector<mitk::ScalarType> averageProfile;
     for(int i=0; i<profiles.at(0).size(); i++)
     {
       averageProfile.push_back(0.0);
@@ -610,21 +610,21 @@ std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupPro
 
 void QmitkTbssRoiAnalysisWidget::DrawProfiles()
 {
-  std::vector <std::vector<double> > groupProfiles = CalculateGroupProfiles();
+  std::vector <std::vector<mitk::ScalarType> > groupProfiles = CalculateGroupProfiles();
   Plot(groupProfiles);
 }
 
-void QmitkTbssRoiAnalysisWidget::Plot(std::vector <std::vector<double> > groupProfiles)
+void QmitkTbssRoiAnalysisWidget::Plot(std::vector <std::vector<mitk::ScalarType> > groupProfiles)
 {
     this->Clear();
     m_Vals.clear();
-    std::vector<double> v1;
+    std::vector<mitk::ScalarType> v1;
 
 
-    std::vector<double> xAxis;
+    std::vector<mitk::ScalarType> xAxis;
     for(int i=0; i<groupProfiles.at(0).size(); ++i)
     {
-      xAxis.push_back((double)i);
+      xAxis.push_back((mitk::ScalarType)i);
     }
 
 
@@ -689,7 +689,7 @@ void QmitkTbssRoiAnalysisWidget::Plot(std::vector <std::vector<double> > groupPr
 }
 
 
-std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupProfilesFibers(mitk::TbssImage::Pointer tbssImage,
+std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::CalculateGroupProfilesFibers(mitk::TbssImage::Pointer tbssImage,
                                                                                             mitk::FiberBundleX *fib,
                                                                                             mitk::PlanarFigure* startRoi,
                                                                                             mitk::PlanarFigure* endRoi,
@@ -706,7 +706,7 @@ std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupPro
 
     // For every group we have m fibers * n subjects of profiles to fill
 
-    std::vector< std::vector<double> > profiles;
+    std::vector< std::vector<mitk::ScalarType> > profiles;
 
     // calculate individual profiles by going through all n subjects
     int size = m_Projections->GetVectorLength();
@@ -718,7 +718,7 @@ std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupPro
       for(int t=0; t<nTracts; t++)
       {
         // Iterate trough the tract
-        std::vector<double> profile;
+        std::vector<mitk::ScalarType> profile;
         TractType::iterator it = resampledTracts[t].begin();
         while(it != resampledTracts[t].end())
         {
@@ -751,7 +751,7 @@ std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupPro
     int c = 0; //the current profile number
 
     // Calculate the group averages
-    std::vector< std::vector<double> > groupProfiles;
+    std::vector< std::vector<mitk::ScalarType> > groupProfiles;
 
     while(it != m_Groups.end() && profiles.size() > 0)
     {
@@ -759,7 +759,7 @@ std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupPro
       int size = p.second;
 
       //initialize a vector of the right length with zeroes
-      std::vector<double> averageProfile;
+      std::vector<mitk::ScalarType> averageProfile;
       for(int i=0; i<profiles.at(0).size(); i++)
       {
         averageProfile.push_back(0.0);
@@ -802,7 +802,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiber4D(mitk::TbssImage::Pointer tbssImage,
   m_CurrentStartRoi = startRoi;
   m_CurrentEndRoi = endRoi;
   m_CurrentTbssImage = tbssImage;
-  std::vector <std::vector<double> > groupProfiles = CalculateGroupProfilesFibers(tbssImage, fib, startRoi, endRoi, number);
+  std::vector <std::vector<mitk::ScalarType> > groupProfiles = CalculateGroupProfilesFibers(tbssImage, fib, startRoi, endRoi, number);
   Plot(groupProfiles);
 
 }
@@ -818,7 +818,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
   std::vector<TractType>::iterator it = tracts.begin();
 
 
-  std::vector< std::vector <double > > profiles;
+  std::vector< std::vector <mitk::ScalarType > > profiles;
 
   it = tracts.begin();
   while(it != tracts.end())
@@ -827,14 +827,14 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
     TractType tract = *it;
     TractType::iterator tractIt = tract.begin();
 
-    std::vector<double> profile;
+    std::vector<mitk::ScalarType> profile;
 
     while(tractIt != tract.end())
     {
       PointType p = *tractIt;
 
       // Get value from image
-      profile.push_back( (double)img->GetPixelValueByWorldCoordinate(p) );
+      profile.push_back( (mitk::ScalarType)img->GetPixelValueByWorldCoordinate(p) );
 
       ++tractIt;
     }
@@ -857,27 +857,27 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
 
 
   // initialize average profile
-  std::vector<double> averageProfile;
-  std::vector<double> profile = profiles.at(0); // can do this because we checked the size of profiles before
+  std::vector<mitk::ScalarType> averageProfile;
+  std::vector<mitk::ScalarType> profile = profiles.at(0); // can do this because we checked the size of profiles before
   for(int i=0; i<profile.size(); ++i)
   {
     averageProfile.push_back(0.0);
   }
 
 
-  std::vector< std::vector<double> >::iterator profit = profiles.begin();
+  std::vector< std::vector<mitk::ScalarType> >::iterator profit = profiles.begin();
 
   int id=0;
   while(profit != profiles.end())
   {
-    std::vector<double> profile = *profit;
+    std::vector<mitk::ScalarType> profile = *profit;
 
 
 
-    std::vector<double> xAxis;
+    std::vector<mitk::ScalarType> xAxis;
     for(int i=0; i<profile.size(); ++i)
     {
-      xAxis.push_back((double)i);
+      xAxis.push_back((mitk::ScalarType)i);
       averageProfile.at(i) += profile.at(i) / profiles.size();
     }
 
@@ -898,10 +898,10 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
   {
 
     // Draw the average profile
-    std::vector<double> xAxis;
+    std::vector<mitk::ScalarType> xAxis;
     for(int i=0; i<averageProfile.size(); ++i)
     {
-      xAxis.push_back((double)i);
+      xAxis.push_back((mitk::ScalarType)i);
     }
 
     int curveId = this->InsertCurve( "" );

@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImage.h"
 #include "mitkSTLFileReader.h"
-#include "mitkTimeSlicedGeometry.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkSurface.h"
 #include "mitkTestingMacros.h"

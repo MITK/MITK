@@ -25,8 +25,6 @@
 #include <usServiceInterface.h>
 #include <usServiceReferenceBase.h>
 
-//US_MSVC_PUSH_DISABLE_WARNING(4396)
-
 US_BEGIN_NAMESPACE
 
 /**
@@ -66,7 +64,7 @@ class ServiceReference : public ServiceReferenceBase {
 
 public:
 
-  typedef S ServiceT;
+  typedef S ServiceType;
 
   /**
    * Creates an invalid ServiceReference object. You can use
@@ -140,7 +138,5 @@ public:
 typedef ServiceReference<void> ServiceReferenceU;
 
 US_END_NAMESPACE
-
-//US_MSVC_POP_WARNING
 
 #endif // USSERVICEREFERENCE_H

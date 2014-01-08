@@ -210,6 +210,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     filter->SetG((float)m_Controls->m_gSlider->value()/100);
     filter->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
     filter->SetMinTractLength(m_Controls->m_MinTractLengthSlider->value());
+    filter->SetResampleFibers(m_Controls->m_ResampleFibersBox->isChecked());
 
     if (m_SeedRoi.IsNotNull())
     {

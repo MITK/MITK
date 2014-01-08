@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkItkImageFileReader.h"
 #include "mitkConfig.h"
 #include "mitkException.h"
+#include <mitkProportionalTimeGeometry.h>
 
 #include <itkImageFileReader.h>
 #include <itksys/SystemTools.hxx>
@@ -96,7 +97,7 @@ void mitk::ItkImageFileReader::GenerateData()
   dimensions[ 2 ] = 0;
   dimensions[ 3 ] = 0;
 
-  float spacing[ MAXDIM ];
+  ScalarType spacing[ MAXDIM ];
   spacing[ 0 ] = 1.0f;
   spacing[ 1 ] = 1.0f;
   spacing[ 2 ] = 1.0f;
@@ -152,8 +153,13 @@ void mitk::ItkImageFileReader::GenerateData()
   slicedGeometry->InitializeEvenlySpaced(planeGeometry, image->GetDimension(2));
   slicedGeometry->SetSpacing(spacing);
 
-  // re-initialize TimeSlicedGeometry
-  image->GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, image->GetDimension(3));
+  MITK_INFO << slicedGeometry->GetCornerPoint(false,false,false);
+  MITK_INFO << slicedGeometry->GetCornerPoint(true,true,true);
+
+  // re-initialize TimeGeometry
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(slicedGeometry, image->GetDimension(3));
+  image->SetTimeGeometry(timeGeometry);
 
   buffer = NULL;
   MITK_INFO << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;

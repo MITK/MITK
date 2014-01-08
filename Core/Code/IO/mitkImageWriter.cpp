@@ -111,7 +111,7 @@ static void writeVti(const char * filename, mitk::Image* image, int t=0)
 {
   vtkXMLImageDataWriter * vtkwriter = vtkXMLImageDataWriter::New();
   vtkwriter->SetFileName( filename );
-  vtkwriter->SetInput(image->GetVtkImageData(t));
+  vtkwriter->SetInputData(image->GetVtkImageData(t));
   vtkwriter->Write();
   vtkwriter->Delete();
 }
@@ -280,14 +280,14 @@ void mitk::ImageWriter::GenerateData()
         std::ostringstream filename;
         timeSelector->SetTimeNr(t);
         timeSelector->Update();
-        if(input->GetTimeSlicedGeometry()->IsValidTime(t))
+        if(input->GetTimeGeometry()->IsValidTimeStep(t))
         {
-          const mitk::TimeBounds& timebounds = input->GetTimeSlicedGeometry()->GetGeometry3D(t)->GetTimeBounds();
+          const mitk::TimeBounds& timebounds = input->GetTimeGeometry()->GetGeometryForTimeStep(t)->GetTimeBounds();
           filename <<  m_FileNameWithoutExtension << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
         }
         else
         {
-          itkWarningMacro(<<"Error on write: TimeSlicedGeometry invalid of image " << filename << ".");
+          itkWarningMacro(<<"Error on write: TimeGeometry invalid of image " << filename << ".");
           filename <<  m_FileNameWithoutExtension << "_T" << t << m_Extension;
         }
         if ( vti )

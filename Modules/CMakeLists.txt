@@ -2,6 +2,10 @@ set(LIBPOSTFIX "Ext")
 
 # Modules must be listed according to their dependencies
 set(module_dirs
+    MitkDataTypesExt
+    MitkAlgorithmsExt
+    MitkMapperExt
+    MitkIOExt
     Qt4Qt5TestModule
     SceneSerializationBase
     PlanarFigure
@@ -23,6 +27,7 @@ set(module_dirs
     SegmentationUI
     DiffusionImaging
     GPGPU
+    IGTBase
     IGT
     CameraCalibration
     IGTUI
@@ -45,6 +50,10 @@ set(module_dirs
     Remeshing
     Python
 )
+
+if(MITK_ENABLE_PIC_READER)
+  list(APPEND module_dirs IpPicSupportIO)
+endif()
 
 set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)
 

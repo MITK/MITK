@@ -37,7 +37,8 @@ void mitk::ImageChannelSelector::GenerateOutputInformation()
 
   // initialize geometry
   output->SetPropertyList(input->GetPropertyList()->Clone());
-  output->SetGeometry(dynamic_cast<Geometry3D*>(input->GetTimeSlicedGeometry()->Clone().GetPointer()));
+  mitk::TimeGeometry::Pointer clonGeometry = input->GetTimeGeometry()->Clone();
+  output->SetTimeGeometry(clonGeometry.GetPointer());
 }
 
 void mitk::ImageChannelSelector::GenerateData()

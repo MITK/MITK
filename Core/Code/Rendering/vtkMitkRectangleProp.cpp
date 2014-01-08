@@ -46,7 +46,7 @@ int vtkMitkRectangleProp::RenderOverlay(vtkViewport* /*viewport*/)
 
   //size and position
   int * i = m_RenderWindow->GetSize();
-  GLfloat bbox[8] = {0.f , 0.f, (float)i[0], 0.f, (float)i[0], (float)i[1], 0.f, (float)i[1]};
+  GLdouble bbox[8] = {0.f , 0.f, (double)i[0], 0.f, (double)i[0], (double)i[1], 0.f, (double)i[1]};
 
   //render rectangle
   glLineWidth(5.0f);
@@ -54,7 +54,7 @@ int vtkMitkRectangleProp::RenderOverlay(vtkViewport* /*viewport*/)
   for (int j = 0; j < 4; j++)
   {
     glColor3f(m_Color[0],m_Color[1],m_Color[2]);
-    glVertex2fv(&bbox[2*j]);
+    glVertex2dv(&bbox[2*j]);
   }
   glEnd();
   glLineWidth(1.0f);

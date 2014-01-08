@@ -19,7 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 itk::LightObject::Pointer mitk::DisplayGeometry::InternalClone() const
 {
-  itkExceptionMacro(<<"calling mitk::DisplayGeometry::Clone does not make much sense.");
+//  itkExceptionMacro(<<"calling mitk::DisplayGeometry::Clone does not make much sense.");
+  DisplayGeometry* returnValue = const_cast<DisplayGeometry *>(this);
+  return returnValue;
 }
 
 bool mitk::DisplayGeometry::IsValid() const

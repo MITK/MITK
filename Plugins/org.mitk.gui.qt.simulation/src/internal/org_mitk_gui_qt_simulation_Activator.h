@@ -24,11 +24,16 @@ namespace mitk
   class org_mitk_gui_qt_simulation_Activator : public QObject, public ctkPluginActivator
   {
     Q_OBJECT
-    Q_INTERFACES(ctkPluginActivator)
+    Q_INTERFACES(ctkPluginActivator);
 
   public:
+    static ctkPluginContext* GetContext();
+
     void start(ctkPluginContext* context);
-    void stop(ctkPluginContext* context);
+    void stop(ctkPluginContext*);
+
+  private:
+    static ctkPluginContext* Context;
   };
 }
 

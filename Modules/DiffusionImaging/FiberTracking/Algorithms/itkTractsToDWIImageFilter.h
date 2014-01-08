@@ -94,9 +94,10 @@ public:
     itkSetMacro( SimulateEddyCurrents, bool )
     itkSetMacro( SimulateRelaxation, bool )
     itkSetMacro( EddyGradientStrength, double )
-    itkSetMacro( Upsampling, double )
+    itkSetMacro( AddGibbsRinging, bool )
     itkSetMacro( Spikes, int )
     itkSetMacro( SpikeAmplitude, double )
+    itkSetMacro( Wrap, double )
 
     // output
     std::vector< ItkDoubleImgType::Pointer > GetVolumeFractions(){ return m_VolumeFractions; }
@@ -118,7 +119,7 @@ protected:
 //    /** Rearrange FFT output to shift low frequencies to the iamge center (correct itk). */
 //    TractsToDWIImageFilter::ComplexSliceType::Pointer RearrangeSlice(ComplexSliceType::Pointer slice);
 
-    itk::Vector<double,3>              m_Spacing;              ///< output image spacing
+    itk::Vector<double,3>               m_Spacing;              ///< output image spacing
     itk::Vector<double,3>               m_UpsampledSpacing;
     itk::Point<double,3>                m_Origin;               ///< output image origin
     MatrixType                          m_DirectionMatrix;      ///< output image rotation
@@ -137,7 +138,7 @@ protected:
     NoiseModelType*                     m_NoiseModel;           ///< generates the noise added to the image values
     bool                                m_CircleDummy;
     unsigned int                        m_VolumeAccuracy;
-    double                              m_Upsampling;           ///< causes ringing artifacts
+    bool                                m_AddGibbsRinging;      ///< causes ringing artifacts
     unsigned int                        m_NumberOfRepetitions;
     bool                                m_EnforcePureFiberVoxels;
     double                              m_InterpolationShrink;
@@ -151,6 +152,7 @@ protected:
     double                              m_EddyGradientStrength;
     int                                 m_Spikes;
     double                              m_SpikeAmplitude;
+    double                              m_Wrap;
 };
 }
 

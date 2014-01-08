@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkMatrixConvert.h"
 #include "mitkGeometry3D.h"
+#include "mitkTimeGeometry.h"
 #include "mitkOdfNormalizationMethodProperty.h"
 #include "mitkOdfScaleByProperty.h"
 #include "mitkProperties.h"
@@ -99,9 +100,9 @@ mitk::OdfVtkMapper2D<T,N>::LocalStorage::LocalStorage()
     m_OdfsPlanes.push_back(vtkAppendPolyData::New());
     m_OdfsPlanes.push_back(vtkAppendPolyData::New());
 
-    m_OdfsPlanes[0]->AddInput(vtkPolyData::New());
-    m_OdfsPlanes[1]->AddInput(vtkPolyData::New());
-    m_OdfsPlanes[2]->AddInput(vtkPolyData::New());
+    m_OdfsPlanes[0]->AddInputData(vtkPolyData::New());
+    m_OdfsPlanes[1]->AddInputData(vtkPolyData::New());
+    m_OdfsPlanes[2]->AddInputData(vtkPolyData::New());
 
     m_OdfsActors.push_back(vtkActor::New());
     m_OdfsActors.push_back(vtkActor::New());
@@ -293,7 +294,7 @@ typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry mitk::OdfVtkMapper2D<T,N>
 
     // set up the cutter orientation according to the current geometry of
     // the renderers plane
-    vtkFloatingPointType vp[ 3 ], vnormal[ 3 ];
+    double vp[ 3 ], vnormal[ 3 ];
     Point3D point = worldPlaneGeometry->GetOrigin();
     Vector3D normal = worldPlaneGeometry->GetNormal(); normal.Normalize();
     vnl2vtk( point.Get_vnl_vector(), vp );
@@ -467,7 +468,7 @@ void  mitk::OdfVtkMapper2D<T,N>
           (dims[2] == 1 && dispGeo.vnormal[2] != 0) ))
     {
         m_Cutters[index]->SetCutFunction( m_Planes[index] );
-        m_Cutters[index]->SetInput( m_VtkImage );
+        m_Cutters[index]->SetInputData( m_VtkImage );
         m_Cutters[index]->Update();
         cuttedPlane = m_Cutters[index]->GetOutput();
     }
@@ -518,7 +519,7 @@ void  mitk::OdfVtkMapper2D<T,N>
         polydata = vtkPolyData::New();
         polydata->SetPoints( tmppoints );
         delaunay = vtkDelaunay2D::New();
-        delaunay->SetInput( polydata );
+        delaunay->SetInputData( polydata );
         delaunay->Update();
         vtkCellArray* polys = delaunay->GetOutput()->GetPolys();
         cuttedPlane->SetPolys(polys);
@@ -551,7 +552,7 @@ void  mitk::OdfVtkMapper2D<T,N>
         m_ThickPlanes1[index]->SetPose( dispGeo.vnormal, dispGeo.vp );
         m_ThickPlanes1[index]->SetThickness(dispGeo.d2);
         m_Clippers1[index]->SetClipFunction( m_ThickPlanes1[index] );
-        m_Clippers1[index]->SetInput( cuttedPlane );
+        m_Clippers1[index]->SetInputData( cuttedPlane );
         m_Clippers1[index]->SetInsideOut(1);
         m_Clippers1[index]->Update();
 
@@ -571,7 +572,7 @@ void  mitk::OdfVtkMapper2D<T,N>
         m_ThickPlanes2[index]->SetPose( dispGeo.vnormal, dispGeo.vp );
         m_ThickPlanes2[index]->SetThickness(dispGeo.d1);
         m_Clippers2[index]->SetClipFunction( m_ThickPlanes2[index] );
-        m_Clippers2[index]->SetInput( m_Clippers1[index]->GetOutput() );
+        m_Clippers2[index]->SetInputData( m_Clippers1[index]->GetOutput() );
         m_Clippers2[index]->SetInsideOut(1);
         m_Clippers2[index]->Update();
 
@@ -599,7 +600,7 @@ void  mitk::OdfVtkMapper2D<T,N>
             glyphGenerator->SetMaximumNumberOfPoints(std::min(m_ShowMaxNumber,(int)cuttedPlane->GetNumberOfPoints()));
             glyphGenerator->SetRandomMode(0);
             glyphGenerator->SetUseMaskPoints(1);
-            glyphGenerator->SetSource( trans->GetOutput() );
+            glyphGenerator->SetSourceData(trans->GetOutput() );
             glyphGenerator->SetInput(cuttedPlane);
             glyphGenerator->SetColorModeToColorBySource();
             glyphGenerator->SetInputArrayToProcess(0,0,0, vtkDataObject::FIELD_ASSOCIATION_POINTS , "vector");
@@ -615,7 +616,7 @@ void  mitk::OdfVtkMapper2D<T,N>
                 std::cout << err << std::endl;
             }
 
-            localStorage->m_OdfsPlanes[index]->AddInput(glyphGenerator->GetOutput());
+            localStorage->m_OdfsPlanes[index]->AddInputConnection(glyphGenerator->GetOutputPort());
 
             localStorage->m_OdfsPlanes[index]->Update();
         }
@@ -623,7 +624,7 @@ void  mitk::OdfVtkMapper2D<T,N>
     localStorage->m_PropAssemblies[index]->VisibilityOn();
     if(localStorage->m_PropAssemblies[index]->GetParts()->IsItemPresent(localStorage->m_OdfsActors[index]))
         localStorage->m_PropAssemblies[index]->RemovePart(localStorage->m_OdfsActors[index]);
-    localStorage->m_OdfsMappers[index]->SetInput(localStorage->m_OdfsPlanes[index]->GetOutput());
+    localStorage->m_OdfsMappers[index]->SetInputData(localStorage->m_OdfsPlanes[index]->GetOutput());
     localStorage->m_PropAssemblies[index]->AddPart(localStorage->m_OdfsActors[index]);
 }
 
@@ -632,8 +633,8 @@ bool mitk::OdfVtkMapper2D<T,N>
 ::IsVisibleOdfs(mitk::BaseRenderer* renderer)
 {
     mitk::Image::Pointer input  = const_cast<mitk::Image*>(this->GetInput());
-    const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
-    if(inputTimeGeometry==NULL || inputTimeGeometry->GetTimeSteps()==0 || !inputTimeGeometry->IsValidTime(this->GetTimestep()))
+    const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
+    if(inputTimeGeometry==NULL || inputTimeGeometry->CountTimeSteps()==0 || !inputTimeGeometry->IsValidTimeStep(this->GetTimestep()))
         return false;
 
     if(this->IsPlaneRotated(renderer))
@@ -837,7 +838,7 @@ bool mitk::OdfVtkMapper2D<T,N>
     PlaneGeometry::ConstPointer worldPlaneGeometry =
             dynamic_cast<const PlaneGeometry*>( worldGeometry.GetPointer() );
 
-    vtkFloatingPointType vnormal[ 3 ];
+    double vnormal[ 3 ];
     Vector3D normal = worldPlaneGeometry->GetNormal(); normal.Normalize();
     vnl2vtk( normal.Get_vnl_vector(), vnormal );
 

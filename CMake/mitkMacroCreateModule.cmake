@@ -57,6 +57,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
       GENERATED_CPP          # not used (?)
       QT4_MODULES            # the module depends on a given list of Qt 4 modules
       QT5_MODULES            # the module depends on a given list of Qt 5 modules
+      DEPRECATED_SINCE       # marks this modules as deprecated
      )
 
   set(_macro_options
@@ -113,6 +114,12 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
     endif()
   endif()
 
+  if(MODULE_DEPRECATED_SINCE)
+    set(MODULE_IS_DEPRECATED 1)
+  else()
+    set(MODULE_IS_DEPRECATED 0)
+  endif()
+
   if(NOT MODULE_SUBPROJECTS)
     if(MITK_DEFAULT_SUBPROJECTS)
       set(MODULE_SUBPROJECTS ${MITK_DEFAULT_SUBPROJECTS})
@@ -134,7 +141,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
       message(SEND_ERROR "The module target \"${MODULE_AUTOLOAD_WITH}\" specified as the auto-loading module for \"${MODULE_NAME}\" does not exist")
     endif()
     # create a meta-target if it does not already exist
-    set(_module_autoload_meta_target "${MODULE_AUTOLOAD_WITH}-universe")
+    set(_module_autoload_meta_target "${MODULE_AUTOLOAD_WITH}-autoload")
     if(NOT TARGET ${_module_autoload_meta_target})
       add_custom_target(${_module_autoload_meta_target})
     endif()
@@ -169,7 +176,6 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           set(MODULE_IS_ENABLED 0)
         endif()
       endforeach()
-
       if (MODULE_QT_MODULE) # disable module if it 1. needs Qt 2. has only one of QT4_MODULES/QT5_MODULES set and 3. DESIRED_QT_VERSION does not match the module
         if (MITK_USE_Qt4)
           if (NOT MODULE_QT4_MODULES)
@@ -328,19 +334,21 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           set(_STATIC )
         endif(MODULE_FORCE_STATIC)
 
-        if(NOT MODULE_NO_INIT AND NOT MODULE_HEADERS_ONLY)
-          find_package(CppMicroServices QUIET NO_MODULE REQUIRED)
+        if(NOT MODULE_HEADERS_ONLY)
           set(MODULE_LIBNAME ${MODULE_PROVIDES})
 
-          if(MODULE_EXECUTABLE)
-            usFunctionGenerateExecutableInit(CPP_FILES
-                                             IDENTIFIER ${MODULE_NAME}
-                                            )
-          else()
-            usFunctionGenerateModuleInit(CPP_FILES
-                                         NAME ${MODULE_NAME}
-                                         LIBRARY_NAME ${MODULE_LIBNAME}
-                                        )
+          if(NOT MODULE_NO_INIT)
+            find_package(CppMicroServices QUIET NO_MODULE REQUIRED)
+            if(MODULE_EXECUTABLE)
+              usFunctionGenerateExecutableInit(CPP_FILES
+                                               IDENTIFIER ${MODULE_NAME}
+                                              )
+            else()
+              usFunctionGenerateModuleInit(CPP_FILES
+                                           NAME ${MODULE_NAME}
+                                           LIBRARY_NAME ${MODULE_LIBNAME}
+                                          )
+            endif()
           endif()
 
           if(RESOURCE_FILES)
@@ -393,6 +401,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           if(MOC_H_FILES)
             qt5_wrap_cpp(Q${KITNAME}_GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
           endif(MOC_H_FILES)
+
           if(QRC_FILES)
             qt5_add_resources(Q${KITNAME}_GENERATED_QRC_CPP ${QRC_FILES})
           endif(QRC_FILES)
@@ -525,11 +534,6 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
 
             # add the auto-load module name as a property
             set_property(TARGET ${MODULE_AUTOLOAD_WITH} APPEND PROPERTY MITK_AUTOLOAD_TARGETS ${MODULE_PROVIDES})
-          else()
-            # Add meta dependencies (e.g. on auto-load modules from depending modules)
-            if(ALL_META_DEPENDENCIES)
-              add_dependencies(${MODULE_PROVIDES} ${ALL_META_DEPENDENCIES})
-            endif()
           endif()
         endif()
 
@@ -540,5 +544,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
   if(NOT MODULE_IS_ENABLED AND NOT MODULE_EXECUTABLE)
     _MITK_CREATE_MODULE_CONF()
   endif()
+
+  unset(MODULE_IS_DEPRECATED)
 
 endmacro(MITK_CREATE_MODULE)

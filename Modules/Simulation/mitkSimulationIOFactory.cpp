@@ -16,15 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSimulationIOFactory.h"
 #include "mitkSimulationReader.h"
-#include <itkVersion.h>
 #include <mitkIOAdapter.h>
+#include <itkVersion.h>
 
 mitk::SimulationIOFactory::SimulationIOFactory()
 {
   this->RegisterOverride(
     "mitkIOAdapter",
     "mitkSimulationReader",
-    "Simulation IO",
+    "Simulation IO Factory",
     true,
     itk::CreateObjectFunction<IOAdapter<SimulationReader> >::New());
 }
@@ -35,7 +35,7 @@ mitk::SimulationIOFactory::~SimulationIOFactory()
 
 const char* mitk::SimulationIOFactory::GetDescription() const
 {
-  return "mitk::SimulationIOFactory";
+  return "Simulation IO Factory";
 }
 
 const char* mitk::SimulationIOFactory::GetITKSourceVersion() const

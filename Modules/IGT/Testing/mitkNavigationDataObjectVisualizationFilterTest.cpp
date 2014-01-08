@@ -300,6 +300,16 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   mitk::AffineTransform3D::MatrixType::InternalMatrixType uM2 = updatedAffineTransform2->GetMatrix().GetVnlMatrix();
   MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(uM2,updatedOri2.rotation_matrix_transpose().transpose()), "Testing updated orientation 2");
 
+  // Test that the second RepresentationObject is updated properly even when
+  // the first RepresentationObject is invalid
+  nd2->Modified();
+  myFilter->SetRepresentationObject(0, NULL);
+  mitkToolData2->GetGeometry()->SetIdentity();
+  myFilter->Update();
+  MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(mitkToolData2->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix(),
+                                                   updatedOri2.rotation_matrix_transpose().transpose()),
+                      "Test that the second repr object is updated correctly when the first repr object is invalid");
+
   // always end with this!
   MITK_TEST_END();
 }

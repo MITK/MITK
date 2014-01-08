@@ -17,13 +17,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkOpenCVToMitkImageFilter_h
 #define mitkOpenCVToMitkImageFilter_h
 
+// mitk includes
+#include "mitkOpenCVVideoSupportExports.h"
 #include <mitkCommon.h>
 #include <mitkImageSource.h>
+
+// itk includes
 #include <itkMacro.h>
 #include <itkImage.h>
-#include <cv.h>
 
-#include "mitkOpenCVVideoSupportExports.h"
+// OpenCV includes
+#include <cv.h>
 
 namespace mitk
 {
@@ -44,7 +48,7 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSourc
     /// WARNING: copyBuffer is deprecated, data will always be copied
     ///
     template <typename TPixel, unsigned int VImageDimension>
-    static mitk::Image::Pointer ConvertIplToMitkImage( const IplImage * input, bool copyBuffer=true );
+    static Image::Pointer ConvertIplToMitkImage( const IplImage * input, bool copyBuffer=true );
 
     mitkClassMacro(OpenCVToMitkImageFilter, ImageSource);
     itkNewMacro(OpenCVToMitkImageFilter);
@@ -74,11 +78,11 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSourc
     virtual void GenerateData();
 
 protected:
-    mitk::Image::Pointer m_Image;
+    Image::Pointer m_Image;
     const IplImage* m_OpenCVImage;
     cv::Mat m_OpenCVMat;
 };
 
-} // namespace
+} // namespace mitk
 
 #endif // mitkOpenCVToMitkImageFilter_h

@@ -80,7 +80,7 @@ float mitk::PointSetInteractor::CanHandleEvent(StateEvent const* stateEvent) con
   mitk::BaseRenderer* sender = stateEvent->GetEvent()->GetSender();
   if (sender != NULL)
   {
-    unsigned int timeStep = sender->GetTimeStep(m_DataNode->GetData());
+    int timeStep = sender->GetTimeStep(m_DataNode->GetData());
     //if the event can be understood and if there is a transition waiting for that event
     mitk::State const* state = this->GetCurrentState(timeStep);
     if (state!= NULL)
@@ -92,7 +92,7 @@ float mitk::PointSetInteractor::CanHandleEvent(StateEvent const* stateEvent) con
       //if we have one point or more, then check if the have been picked
       if ( (pointSet->GetSize( timeStep ) > 0)
         && (pointSet->SearchPoint(
-        disPosEvent->GetWorldPosition(), m_Precision, timeStep) > -1) )
+        disPosEvent->GetWorldPosition(), (ScalarType) m_Precision, timeStep) > -1) )
       {returnValue = 1.0;}
     }
   }

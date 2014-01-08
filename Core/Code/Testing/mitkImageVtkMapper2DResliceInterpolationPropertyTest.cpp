@@ -63,23 +63,18 @@ int mitkImageVtkMapper2DResliceInterpolationPropertyTest(int argc, char* argv[])
   //rotate the image arround its own center
   renderingHelper.ReorientSlices(centerPoint, rotationVector);
 
-
-  //use this to generate a reference screenshot or save the file:
-  bool generateReferenceScreenshot = false;
-  if(generateReferenceScreenshot)
-  {
-    renderingHelper.Render();
-    renderingHelper.SaveReferenceScreenShot("C:\\Users\\schroedt\\Pictures\\RenderingTestData\\Pic3dRefLinear.png");
-  }
-
   //threshold for CompareRenderWindowAgainstReference
   double threshold = 0.35;//difference between interpolation modes is very small
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
   MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv, threshold) == true, "CompareRenderWindowAgainstReference test result positive?" );
 
-
-
+  //use this to generate a reference screenshot or save the file:
+  if(false)
+  {
+    renderingHelper.Render();
+    renderingHelper.SaveReferenceScreenShot("C:\\Users\\schroedt\\Pictures\\RenderingTestData\\Pic3dRefLinear.png");
+  }
 
   MITK_TEST_END();
 }

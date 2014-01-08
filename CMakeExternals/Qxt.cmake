@@ -2,6 +2,8 @@
 # Qxt
 #-----------------------------------------------------------------------------
 
+if(MITK_USE_Qxt)
+
 # Sanity checks
 if(DEFINED Qxt_DIR AND NOT EXISTS ${Qxt_DIR})
   message(FATAL_ERROR "Qxt_DIR variable is defined but corresponds to non-existing directory")
@@ -35,5 +37,7 @@ if(NOT DEFINED ${proj}_DIR)
 else()
 
   mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
+
+endif()
 
 endif()

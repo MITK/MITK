@@ -242,7 +242,7 @@ void mitk::PlanarFigureReader::GenerateData()
         // Extract and set plane transform parameters
         DoubleList transformList = this->GetDoubleAttributeListFromXMLNode( geoElement->FirstChildElement( "transformParam" ), "param", 12 );
 
-        typedef mitk::AffineGeometryFrame3D::TransformType TransformType;
+        typedef mitk::Geometry3D::TransformType TransformType;
         TransformType::ParametersType parameters;
         parameters.SetSize( 12 );
 
@@ -255,7 +255,7 @@ void mitk::PlanarFigureReader::GenerateData()
           parameters.SetElement( i, *it );
         }
 
-        typedef mitk::AffineGeometryFrame3D::TransformType TransformType;
+        typedef mitk::Geometry3D::TransformType TransformType;
         TransformType::Pointer affineGeometry = TransformType::New();
         affineGeometry->SetParameters( parameters );
         planeGeo->SetIndexToWorldTransform( affineGeometry );
@@ -301,9 +301,9 @@ void mitk::PlanarFigureReader::GenerateData()
         mitk::Point2D::ValueType y = 0.0;
         if (vertElement->QueryIntAttribute("id", &id) == TIXML_WRONG_TYPE)
           return; // TODO: can we do a better error handling?
-        if (vertElement->QueryFloatAttribute("x", &x) == TIXML_WRONG_TYPE)
+        if (vertElement->QueryDoubleAttribute("x", &x) == TIXML_WRONG_TYPE)
           return; // TODO: can we do a better error handling?
-        if (vertElement->QueryFloatAttribute("y", &y) == TIXML_WRONG_TYPE)
+        if (vertElement->QueryDoubleAttribute("y", &y) == TIXML_WRONG_TYPE)
           return; // TODO: can we do a better error handling?
         Point2D p;
         p.SetElement(0, x);
@@ -334,13 +334,13 @@ mitk::Point3D mitk::PlanarFigureReader::GetPointFromXMLNode(TiXmlElement* e)
     throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
   mitk::Point3D point;
   mitk::ScalarType p(-1.0);
-  if (e->QueryFloatAttribute("x", &p) == TIXML_WRONG_TYPE)
+  if (e->QueryDoubleAttribute("x", &p) == TIXML_WRONG_TYPE)
     throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
   point.SetElement(0, p);
-  if (e->QueryFloatAttribute("y", &p) == TIXML_WRONG_TYPE)
+  if (e->QueryDoubleAttribute("y", &p) == TIXML_WRONG_TYPE)
     throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
   point.SetElement(1, p);
-  if (e->QueryFloatAttribute("z", &p) == TIXML_WRONG_TYPE)
+  if (e->QueryDoubleAttribute("z", &p) == TIXML_WRONG_TYPE)
     throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
   point.SetElement(2, p);
   return point;
@@ -353,13 +353,13 @@ mitk::Vector3D mitk::PlanarFigureReader::GetVectorFromXMLNode(TiXmlElement* e)
     throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
   mitk::Vector3D vector;
   mitk::ScalarType p(-1.0);
-  if (e->QueryFloatAttribute("x", &p) == TIXML_WRONG_TYPE)
+  if (e->QueryDoubleAttribute("x", &p) == TIXML_WRONG_TYPE)
     throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
   vector.SetElement(0, p);
-  if (e->QueryFloatAttribute("y", &p) == TIXML_WRONG_TYPE)
+  if (e->QueryDoubleAttribute("y", &p) == TIXML_WRONG_TYPE)
     throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
   vector.SetElement(1, p);
-  if (e->QueryFloatAttribute("z", &p) == TIXML_WRONG_TYPE)
+  if (e->QueryDoubleAttribute("z", &p) == TIXML_WRONG_TYPE)
     throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
   vector.SetElement(2, p);
   return vector;
@@ -379,7 +379,7 @@ mitk::PlanarFigureReader::GetDoubleAttributeListFromXMLNode(TiXmlElement* e, con
     std::stringstream attributeName;
     attributeName << attributeNameBase << i;
 
-    if (e->QueryFloatAttribute( attributeName.str().c_str(), &p ) == TIXML_WRONG_TYPE)
+    if (e->QueryDoubleAttribute( attributeName.str().c_str(), &p ) == TIXML_WRONG_TYPE)
       throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
     list.push_back( p );
   }

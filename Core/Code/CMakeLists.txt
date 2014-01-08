@@ -24,6 +24,16 @@ MITK_CREATE_MODULE( Mitk
   PACKAGE_DEPENDS tinyxml ITK VTK OpenGL
   EXPORT_DEFINE MITK_CORE_EXPORT
   WARNINGS_AS_ERRORS
+  # Do not automatically create CppMicroServices initialization code.
+  # Because the VTK 6 "auto-init" functionality injects file-local static
+  # initialization code in every cpp file which includes a VTK header,
+  # static initialization order becomes an issue again. For the Mitk
+  # core library, we need to ensure that the VTK static initialization stuff
+  # happens before the CppMicroServices initialization, since the latter
+  # might already use VTK code which needs to access VTK object factories.
+  # Hence, CppMicroServices initialization code is placed manually within
+  # the mitkCoreActivator.cpp file.
+  NO_INIT
 )
 
 # this is needed for libraries which link to Mitk and need

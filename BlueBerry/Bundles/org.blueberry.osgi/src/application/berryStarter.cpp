@@ -50,8 +50,20 @@ int Starter::Run(int& argc, char** argv,
   int returnCode = 0;
 
   // startup the internal platform
-  platform->Initialize(argc, argv, config);
+  try
+  {
+    platform->Initialize(argc, argv, config);
+  }
+  // the Initialize call can throw exceptions so catch them properly
+  catch( const berry::PlatformException &e)
+  {
+    BERRY_ERROR << "Caught exception while initializing the Platform : " << e.what();
+    BERRY_FATAL << "Platform initialization failed. Aborting... \n";
+    return 1;
+  }
+
   platform->Launch();
+
 
   bool consoleLog = platform->ConsoleLog();
 

@@ -33,7 +33,10 @@ namespace mitk {
     virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap();
     virtual const char* GetSaveFileExtensions();
     virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap();
-    void RegisterIOFactories();
+
+    /** \deprecatedSince{2013_09} */
+    DEPRECATED(void RegisterIOFactories());
+
   protected:
     ContourObjectFactory();
     ~ContourObjectFactory();
@@ -43,6 +46,7 @@ namespace mitk {
 
   private:
     itk::ObjectFactoryBase::Pointer m_ContourModelIOFactory;
+    itk::ObjectFactoryBase::Pointer m_ContourModelWriterFactory;
   };
 
 }

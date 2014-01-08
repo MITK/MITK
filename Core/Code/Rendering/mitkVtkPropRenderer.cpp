@@ -145,12 +145,12 @@ bool mitk::VtkPropRenderer::SetWorldGeometryToDataStorageBounds()
     return false;
 
   //initialize world geometry
-  mitk::TimeSlicedGeometry::Pointer geometry = m_DataStorage->ComputeVisibleBoundingGeometry3D( NULL, "includeInBoundingBox" );
+  mitk::TimeGeometry::Pointer geometry = m_DataStorage->ComputeVisibleBoundingGeometry3D( NULL, "includeInBoundingBox" );
 
   if ( geometry.IsNull() )
     return false;
 
-  this->SetWorldGeometry(geometry);
+  this->SetWorldTimeGeometry(geometry);
   //this->GetDisplayGeometry()->SetSizeInDisplayUnits( this->m_TextRenderer->GetRenderWindow()->GetSize()[0], this->m_TextRenderer->GetRenderWindow()->GetSize()[1] );
   this->GetDisplayGeometry()->Fit();
   this->GetVtkRenderer()->ResetCamera();
@@ -753,7 +753,7 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
 }
 
 
-void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
+void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow* /*renWin*/)
 {
   if( m_DataStorage.IsNull() )
     return;
@@ -772,7 +772,7 @@ void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
         VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>( mapper );
 
        if(vtkmapper)
-         vtkmapper->ReleaseGraphicsResources(renWin);
+         vtkmapper->ReleaseGraphicsResources(this);
       }
    }
 }

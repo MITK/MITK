@@ -48,13 +48,6 @@ class classname ## Factory : public ::itk::ObjectFactoryBase \
        \
     /* Run-time type information (and related methods). */ \
     itkTypeMacro(classname ## Factory, itkObjectFactoryBase); \
- \
-    /* Register one factory of this type  */ \
-    static void RegisterOneFactory() \
-    { \
-      classname ## Factory::Pointer factory = classname ## Factory::New(); \
-      itk::ObjectFactoryBase::RegisterFactory(factory); \
-    } \
      \
   protected: \
  \

@@ -48,11 +48,16 @@ set(H_FILES
   Algorithms/mitkConvert2Dto3DImageFilter.h
   Algorithms/mitkPlaneClipping.h
 
+  Common/mitkCommon.h
   Common/mitkExceptionMacro.h
   Common/mitkServiceBaseObject.h
-  Common/mitkTestingMacros.h
+  Common/mitkTestCaller.h
+  Common/mitkTestFixture.h
   Common/mitkTesting.h
+  Common/mitkTestingMacros.h
 
+  DataManagement/mitkProportionalTimeGeometry.h
+  DataManagement/mitkTimeGeometry.h
   DataManagement/mitkImageAccessByItk.h
   DataManagement/mitkImageCast.h
   DataManagement/mitkImagePixelAccessor.h
@@ -64,6 +69,7 @@ set(H_FILES
   DataManagement/mitkITKImageImport.txx
   DataManagement/mitkImageToItk.h
   DataManagement/mitkImageToItk.txx
+  DataManagement/mitkTimeSlicedGeometry.h # Deprecated, empty for compatibilty reasons.
 
   Interactions/mitkEventMapperAddOn.h
 
@@ -76,7 +82,8 @@ set(H_FILES
 
 set(CPP_FILES
   Algorithms/mitkBaseDataSource.cpp
-  Algorithms/mitkCompareImageFilter.cpp
+  Algorithms/mitkCompareImageDataFilter.cpp
+  Algorithms/mitkMultiComponentImageDataComparisonFilter.cpp
   Algorithms/mitkDataNodeSource.cpp
   Algorithms/mitkGeometry2DDataToSurfaceFilter.cpp
   Algorithms/mitkHistogramGenerator.cpp
@@ -121,7 +128,8 @@ set(CPP_FILES
   Controllers/mitkVerboseLimitedLinearUndo.cpp
   Controllers/mitkVtkInteractorCameraController.cpp
   Controllers/mitkVtkLayerController.cpp
-
+  DataManagement/mitkProportionalTimeGeometry.cpp
+  DataManagement/mitkTimeGeometry.cpp
   DataManagement/mitkAbstractTransformGeometry.cpp
   DataManagement/mitkAnnotationProperty.cpp
   DataManagement/mitkApplicationCursor.cpp
@@ -183,6 +191,7 @@ set(CPP_FILES
   DataManagement/mitkPointSet.cpp
   DataManagement/mitkProperties.cpp
   DataManagement/mitkPropertyList.cpp
+  DataManagement/mitkPropertyObserver.cpp
   DataManagement/mitkRestorePlanePositionOperation.cpp
   DataManagement/mitkRotationOperation.cpp
   DataManagement/mitkSlicedData.cpp
@@ -194,11 +203,11 @@ set(CPP_FILES
   DataManagement/mitkSurface.cpp
   DataManagement/mitkSurfaceOperation.cpp
   DataManagement/mitkThinPlateSplineCurvedGeometry.cpp
-  DataManagement/mitkTimeSlicedGeometry.cpp
   DataManagement/mitkTransferFunction.cpp
   DataManagement/mitkTransferFunctionProperty.cpp
   DataManagement/mitkTransferFunctionInitializer.cpp
   DataManagement/mitkVector.cpp
+
   DataManagement/mitkVtkInterpolationProperty.cpp
   DataManagement/mitkVtkRepresentationProperty.cpp
   DataManagement/mitkVtkResliceInterpolationProperty.cpp
@@ -283,6 +292,14 @@ set(CPP_FILES
   IO/mitkBaseDataIOFactory.cpp
   IO/mitkCoreDataNodeReader.cpp
   IO/mitkDicomSeriesReader.cpp
+  IO/mitkDicomSR_LoadDICOMScalar.cpp
+  IO/mitkDicomSR_LoadDICOMScalar4D.cpp
+  IO/mitkDicomSR_LoadDICOMRGBPixel.cpp
+  IO/mitkDicomSR_LoadDICOMRGBPixel4D.cpp
+  IO/mitkDicomSR_ImageBlockDescriptor.cpp
+  IO/mitkDicomSR_GantryTiltInformation.cpp
+  IO/mitkDicomSR_SliceGroupingResult.cpp
+
   IO/mitkFileReader.cpp
   IO/mitkFileSeriesReader.cpp
   IO/mitkFileWriter.cpp

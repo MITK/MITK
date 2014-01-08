@@ -1,7 +1,7 @@
 if( MITK_USE_Python )
 
   MITK_CREATE_MODULE(mitkPython
-    DEPENDS MitkExt
+    DEPENDS Mitk
     EXPORT_DEFINE MITK_PYTHON_EXPORT
     PACKAGE_DEPENDS Qt4 CTK PythonLibs
     QT_MODULE

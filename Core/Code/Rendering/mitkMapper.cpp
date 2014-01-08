@@ -117,12 +117,12 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
   this->CalculateTimeStep( renderer );
 
   // Check if time step is valid
-  const TimeSlicedGeometry *dataTimeGeometry = data->GetTimeSlicedGeometry();
+  const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
   if ( ( dataTimeGeometry == NULL )
-    || ( dataTimeGeometry->GetTimeSteps() == 0 )
-    || ( !dataTimeGeometry->IsValidTime( m_TimeStep ) ) )
+    || ( dataTimeGeometry->CountTimeSteps() == 0 )
+    || ( !dataTimeGeometry->IsValidTimeStep( m_TimeStep ) ) )
   {
-    // TimeSlicedGeometry or time step is not valid for this data:
+    // TimeGeometry or time step is not valid for this data:
     // reset mapper so that nothing is displayed
     this->ResetMapper( renderer );
     return;

@@ -103,9 +103,9 @@ namespace mitk
     virtual void GenerateOutputInformation();
 
     bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
-      const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
+      const PlaneGeometry *planeGeometry, double *bounds );
     bool LineIntersectZero( vtkPoints *points, int p1, int p2,
-      vtkFloatingPointType *bounds );
+      double *bounds );
 
     const Geometry2D*  m_WorldGeometry;
     vtkImageReslice *  m_Reslicer;

@@ -43,7 +43,28 @@ void mitk::ImageTimeSelector::GenerateOutputInformation()
   }
 
   // initialize geometry
-  output->SetGeometry(dynamic_cast<Geometry3D*>(input->GetSlicedGeometry(m_TimeNr)->Clone().GetPointer()));
+  mitk::SlicedGeometry3D::Pointer sliced_geo = input->GetSlicedGeometry(m_TimeNr);
+  if( sliced_geo.IsNull()  )
+  {
+     mitkThrow() << "Failed to retrieve SlicedGeometry from input at timestep " << m_TimeNr;
+  }
+
+  mitk::SlicedGeometry3D::Pointer sliced_geo_clone = sliced_geo->Clone();
+  if( sliced_geo_clone.IsNull()  )
+  {
+     mitkThrow() << "Failed to clone the retrieved sliced geometry.";
+  }
+
+  mitk::Geometry3D::Pointer geom_3d =  dynamic_cast<Geometry3D*>(sliced_geo_clone.GetPointer());
+  if( geom_3d.IsNotNull() )
+  {
+    output->SetGeometry(geom_3d.GetPointer() );
+  }
+  else
+  {
+    mitkThrow() << "Failed to cast the retrieved SlicedGeometry to a Geometry3D object.";
+  }
+
   output->SetPropertyList(input->GetPropertyList()->Clone());
 }
 

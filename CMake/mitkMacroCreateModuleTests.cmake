@@ -23,11 +23,18 @@ macro(MITK_CREATE_MODULE_TESTS)
       QT4_WRAP_CPP(MODULE_TEST_GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
     endif(DEFINED MOC_H_FILES)
 
-    # This is a workaround until GDCM provides a proper GDCMExports.cmake
-    # file where the imported GDCM targets provide their absolute path.
-    include(${MITK_MODULES_PACKAGE_DEPENDS_DIR}/MITK_ITK_Config.cmake)
-    if(GDCM_LIBRARY_DIRS)
-      link_directories(${GDCM_LIBRARY_DIRS})
+    # The PACKAGE_DEPENDS variable is filled in the MITK_CHECK_MODULE() macro
+    foreach(package ${PACKAGE_DEPENDS})
+      foreach(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
+        if(EXISTS "${dir}/MITK_${package}_Config.cmake")
+          include("${dir}/MITK_${package}_Config.cmake")
+          break()
+        endif()
+      endforeach()
+    endforeach()
+    if(ALL_LIBRARY_DIRS)
+      list(REMOVE_DUPLICATES ALL_LIBRARY_DIRS)
+      link_directories(${ALL_LIBRARY_DIRS})
     endif()
 
     set(TESTDRIVER ${MODULE_NAME}TestDriver)
@@ -62,7 +69,7 @@ ${MODULE_TEST_EXTRA_DRIVER_INIT};"
 
     add_executable(${TESTDRIVER} ${MODULETEST_SOURCE} ${MODULE_TEST_GENERATED_MOC_CPP} ${TEST_CPP_FILES})
     mitk_use_modules(TARGET ${TESTDRIVER}
-                     MODULES ${MODULE_PROVIDES} ${MODULE_TEXT_EXTRA_DEPENDS}
+                     MODULES ${MODULE_PROVIDES} ${MODULE_TEST_EXTRA_DEPENDS}
                      PACKAGES CppUnit
                     )
 

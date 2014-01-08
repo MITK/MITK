@@ -22,7 +22,7 @@ set(_SOURCES
 )
 
 find_package(Qt4 REQUIRED)
-set(QT_USE_QTNETWORKING 1)
+set(QT_USE_QTNETWORK 1)
 include(${QT_USE_FILE})
 
 qt4_wrap_cpp(_SOURCES ${_MOC_HEADERS})
@@ -33,6 +33,6 @@ target_link_libraries(qtsingleapplication ${QT_LIBRARIES})
 
 MITK_CREATE_MODULE_CONF(qtsingleapplication
   INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
-  QT4_MODULES QtNetworking)
+  QT4_MODULES QtNetwork)
 
 endif(MITK_USE_Qt4) # only if MITK is built with Qt 4

@@ -429,14 +429,24 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
 
         if(NOT MODULE_HEADERS_ONLY)
 
-          # This is a workaround until GDCM provides a proper GDCMExports.cmake
-          # file where the imported GDCM targets provide their absolute path.
-          list(FIND PACKAGE_DEPENDS ITK _has_itk_dep)
-          if(_has_itk_dep GREATER -1)
-            include(${MITK_MODULES_PACKAGE_DEPENDS_DIR}/MITK_ITK_Config.cmake)
-            if(GDCM_LIBRARY_DIRS)
-              link_directories(${GDCM_LIBRARY_DIRS})
-            endif()
+          # We have to include the MITK_<package>_Config.cmake files here because
+          # some external packages do not provide exported targets with an
+          # absolute path to link to. So we need to add link directories *before*
+          # add_library() or add_executable() is called. So far, this is needed only
+          # for GDCM and ACVD.
+
+          # The PACKAGE_DEPENDS variable is filled in the MITK_CHECK_MODULE() macro
+          foreach(package ${PACKAGE_DEPENDS})
+            foreach(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
+              if(EXISTS "${dir}/MITK_${package}_Config.cmake")
+                include("${dir}/MITK_${package}_Config.cmake")
+                break()
+              endif()
+            endforeach()
+          endforeach()
+          if(ALL_LIBRARY_DIRS)
+            list(REMOVE_DUPLICATES ALL_LIBRARY_DIRS)
+            link_directories(${ALL_LIBRARY_DIRS})
           endif()
 
           if(MODULE_EXECUTABLE)

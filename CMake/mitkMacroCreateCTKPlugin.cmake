@@ -25,14 +25,18 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
       set(plugin_no_install)
     endif()
 
-    # This is a workaround until GDCM provides a proper GDCMExports.cmake
-    # file where the imported GDCM targets provide their absolute path.
-    list(FIND PACKAGE_DEPENDS ITK _has_itk_dep)
-    if(_has_itk_dep GREATER -1)
-      include(${MITK_MODULES_PACKAGE_DEPENDS_DIR}/MITK_ITK_Config.cmake)
-      if(GDCM_LIBRARY_DIRS)
-        link_directories(${GDCM_LIBRARY_DIRS})
-      endif()
+    # The PACKAGE_DEPENDS variable is filled in the MITK_CHECK_MODULE() macro
+    foreach(package ${PACKAGE_DEPENDS})
+      foreach(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
+        if(EXISTS "${dir}/MITK_${package}_Config.cmake")
+          include("${dir}/MITK_${package}_Config.cmake")
+          break()
+        endif()
+      endforeach()
+    endforeach()
+    if(ALL_LIBRARY_DIRS)
+      list(REMOVE_DUPLICATES ALL_LIBRARY_DIRS)
+      link_directories(${ALL_LIBRARY_DIRS})
     endif()
 
     MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE ${_PLUGIN_EXPORT_DIRECTIVE}

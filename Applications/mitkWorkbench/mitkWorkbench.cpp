@@ -54,7 +54,7 @@ public:
     catch (mitk::Exception& e)
     {
       msg = QString("MITK Exception:\n\n")
-            + QString("Desciption: ")
+            + QString("Description: ")
             + QString(e.GetDescription()) + QString("\n\n")
             + QString("Filename: ") + QString(e.GetFile()) + QString("\n\n")
             + QString("Line: ") + QString::number(e.GetLine());

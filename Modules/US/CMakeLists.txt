@@ -2,7 +2,6 @@ MITK_CREATE_MODULE(MitkUS
   SUBPROJECTS
   INCLUDE_DIRS USControlInterfaces USFilters USModel USService
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
-  QT_MODULE
   DEPENDS Mitk mitkOpenCVVideoSupport Qmitk QmitkExt
 )
 

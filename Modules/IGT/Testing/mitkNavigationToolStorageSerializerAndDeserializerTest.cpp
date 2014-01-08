@@ -417,7 +417,7 @@ static void TestDeserializerForExceptions()
   try
   {
     std::string filename(MITK_IGT_DATA_DIR);
-    filename.append("/Empty.zip");
+    filename.append("/Empty2.zip");
     mitk::NavigationToolStorage::Pointer readStorage = testDeseralizer2->Deserialize(filename);
   }
   catch(mitk::IGTException)
@@ -441,7 +441,7 @@ int mitkNavigationToolStorageSerializerAndDeserializerTest(int /* argc */, char*
     TestReadComplexToolStorage();
     TestReadNotExistingStorage();
     TestReadStorageWithUnknownFiletype();
-    //TestReadZipFileWithNoToolstorage(); deactivated because of bug 16566
+    TestReadZipFileWithNoToolstorage();
     TestWriteStorageToInvalidFile();
     TestWriteEmptyToolStorage();
     TestSerializerForExceptions();

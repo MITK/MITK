@@ -35,7 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSet.h"
 #include "mitkPointSetVtkMapper2D.h"
 #include "mitkPointSetVtkMapper3D.h"
-#include "mitkPolyDataGLMapper2D.h"
 #include "mitkProperties.h"
 #include "mitkPropertyList.h"
 #include "mitkSlicedGeometry3D.h"

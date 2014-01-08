@@ -444,20 +444,26 @@ mitk::DICOMImageBlockDescriptor
 { \
   std::string first = this->GetPropertyAsString( #property_name "First"); \
   std::string last = this->GetPropertyAsString( #property_name "Last"); \
-  if (first == last) \
+  if (!first.empty() || !last.empty()) \
   { \
-    os << "  " label ": '" << first << "'" << std::endl; \
-  } \
-  else \
-  { \
-    os << "  " label ": '" << first << "' - '" << last << "'" << std::endl; \
+    if (first == last) \
+    { \
+      os << "  " label ": '" << first << "'" << std::endl; \
+    } \
+    else \
+    { \
+      os << "  " label ": '" << first << "' - '" << last << "'" << std::endl; \
+    } \
   } \
 }
 
 #define printProperty(label, property_name) \
 { \
   std::string first = this->GetPropertyAsString( #property_name ); \
-  os << "  " label ": '" << first << "'" << std::endl; \
+  if (!first.empty()) \
+  { \
+    os << "  " label ": '" << first << "'" << std::endl; \
+  } \
 }
 
 #define printBool(label, commands) \
@@ -473,6 +479,8 @@ mitk::DICOMImageBlockDescriptor
   os << "  Number of Frames: '" << m_ImageFrameList.size() << "'" << std::endl;
   os << "  SOP class: '" << this->GetSOPClassUIDAsName() << "'" << std::endl;
 
+  printProperty("Series Number", seriesNumber);
+  printProperty("Series Description", seriesDescription);
   printProperty("Modality", modality);
   printProperty("Sequence Name", sequenceName);
 
@@ -484,16 +492,17 @@ mitk::DICOMImageBlockDescriptor
 
   os << "  Pixel spacing interpretation: '" << PixelSpacingInterpretationToString(this->GetPixelSpacingInterpretation()) << "'" << std::endl;
   printBool("Gantry Tilt", this->GetFlag("gantryTilt",false))
-  printBool("3D+t", this->GetFlag("3D+t",false))
+  //printBool("3D+t", this->GetFlag("3D+t",false))
 
-  os << "  MITK image loaded: '" << (this->GetMitkImage().IsNotNull() ? "yes" : "no") << "'" << std::endl;
+  //os << "  MITK image loaded: '" << (this->GetMitkImage().IsNotNull() ? "yes" : "no") << "'" << std::endl;
   if (filenameDetails)
   {
+    os << "  Files in this image block:" << std::endl;
     for (DICOMImageFrameList::const_iterator frameIter = m_ImageFrameList.begin();
         frameIter != m_ImageFrameList.end();
         ++frameIter)
     {
-      os << "  File " << (*frameIter)->Filename;
+      os << "    " << (*frameIter)->Filename;
       if ((*frameIter)->FrameNo > 0)
       {
         os << ", " << (*frameIter)->FrameNo;
@@ -530,6 +539,8 @@ mitk::DICOMImageBlockDescriptor
     DICOMImageFrameInfo::Pointer lastFrame = m_ImageFrameList.back();;
 
     // see macros above
+    storeTagValueToProperty(seriesNumber,0x0020,0x0011)
+    storeTagValueToProperty(seriesDescription,0x0008,0x103e)
     storeTagValueToProperty(modality,0x0008,0x0060)
     storeTagValueToProperty(sequenceName,0x0018,0x0024)
     storeTagValueToProperty(orientation,0x0020,0x0037)

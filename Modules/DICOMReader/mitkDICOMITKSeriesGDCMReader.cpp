@@ -239,6 +239,8 @@ mitk::DICOMITKSeriesGDCMReader
   m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0016) ); // sop class UID
   m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0018) ); // sop instance UID
 
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x0011) ); // series number
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x103e) ); // series description
   m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0060) ); // modality
   m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x0012) ); // acquisition number
   m_GDCMScanner.AddTag( gdcm::Tag(0x0018,0x0024) ); // sequence name

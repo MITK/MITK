@@ -33,16 +33,14 @@ void mitk::PointSetDataInteractor::ConnectActionsAndFunctions()
   // Condition which is evaluated before transition is taken
   // following actions in the statemachine are only executed if it returns TRUE
   CONNECT_CONDITION("isoverpoint", CheckSelection);
-
   CONNECT_FUNCTION("addpoint", AddPoint);
   CONNECT_FUNCTION("selectpoint", SelectPoint);
-  CONNECT_FUNCTION("GetSender()->GetTime()ct", UnSelectPointAtPosition);
+  CONNECT_FUNCTION("unselect", UnSelectPointAtPosition);
   CONNECT_FUNCTION("unselectAll", UnSelectAll);
   CONNECT_FUNCTION("initMove", InitMove);
   CONNECT_FUNCTION("movePoint", MovePoint);
   CONNECT_FUNCTION("finishMovement", FinishMove);
   CONNECT_FUNCTION("removePoint", RemovePoint);
-
   CONNECT_FUNCTION("update", UpdatePointSet)
 }
 

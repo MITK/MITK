@@ -366,6 +366,7 @@ void QmitkPointListWidget::OnBtnAddPoint(bool checked)
     }
     else
     {
+      m_PointSetNode->SetDataInteractor(NULL);
       m_DataInteractor=NULL;
     }
     emit EditPointSets(checked);

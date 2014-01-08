@@ -13,10 +13,11 @@
   </event_variant>
   <event_variant class="MousePressEvent" name="DeletePoint">
     <attribute name="EventButton" value="LeftMouseButton"/>
-    <attribute name="Modifiers" value="shift"/>
+    <attribute name="Modifiers" value="alt"/>
   </event_variant>
   <event_variant class="MousePressEvent" name="AddPointClick">
     <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
   </event_variant>
   <event_variant class="MouseMoveEvent" name="CheckSelected"/>
   <event_variant class="MouseReleaseEvent" name="EndMovement">

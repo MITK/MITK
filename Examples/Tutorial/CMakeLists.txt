@@ -6,6 +6,9 @@ foreach(stepNo RANGE 1 8)
     )
 endforeach()
 
+add_dependencies(Step7 Step6)
+add_dependencies(Step8 Step7)
+
 # adding additional example for mitk itk and vtk interaction
 mitk_create_executable(mitkWithITKAndVTK
   DEPENDS Mitk IpPicSupport

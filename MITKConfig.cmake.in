@@ -129,7 +129,7 @@ set(MITK_USE_Python @MITK_USE_Python@)
 if(MITK_USE_Qt4)
   find_package(Qt4 REQUIRED)
 elseif(MITK_USE_Qt5)
-  find_package(Qt5 COMPONENTS Core)
+  find_package(Qt5Core REQUIRED)
 endif()
 
 # MITK ToF use variables

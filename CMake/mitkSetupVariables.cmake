@@ -203,7 +203,7 @@ set(MITK_LINK_DIRECTORIES
 if(MITK_USE_QT)
 
   if(DESIRED_QT_VERSION MATCHES 4)
-    find_package(Qt4 REQUIRED)
+    find_package(Qt4 ${MITK_QT4_MINIMUM_VERSION} REQUIRED)
 
     set(QMITK_INCLUDE_DIRS
         ${MITK_INCLUDE_DIRS}
@@ -214,7 +214,7 @@ if(MITK_USE_QT)
     set(QMITK_LIBRARIES Qmitk ${MITK_LIBRARIES})
     set(QMITK_LINK_DIRECTORIES ${MITK_LINK_DIRECTORIES})
   elseif(DESIRED_QT_VERSION MATCHES 5)
-    find_package(Qt5Core REQUIRED) # at least Core required
+    find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED) # at least Core required
 
     set(QMITK_INCLUDE_DIRS
         ${MITK_INCLUDE_DIRS}

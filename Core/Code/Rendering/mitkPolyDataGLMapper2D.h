@@ -38,6 +38,7 @@ class BaseRenderer;
  * OpenGL-based mapper to display a 2D cut through a poly data. The result is
  * normally a line. This class can be added to any data object, which is
  * rendered in 3D via a vtkPolyData.
+ * \deprecated This class is deprecated since January 2014. See bug 2337 for details.
  */
 class MITK_CORE_EXPORT PolyDataGLMapper2D : public GLMapper
 {

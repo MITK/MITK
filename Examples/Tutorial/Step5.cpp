@@ -23,9 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkStandaloneDataStorage.h"
 
-#include "mitkGlobalInteraction.h"
+//#include "mitkGlobalInteraction.h"
 #include "mitkPointSet.h"
-#include "mitkPointSetInteractor.h"
+#include "mitkPointSetDataInteractor.h"
 
 #include <itksys/SystemTools.hxx>
 #include <QApplication>
@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //## As in Step4, load one or more data sets (many image,
 //## surface and other formats) and create 3 views on the data.
 //## Additionally, we want to interactively add points. A node containing
-//## a PointSet as data is added to the data tree and a PointSetInteractor
+//## a PointSet as data is added to the data tree and a PointSetDataInteractor
 //## is associated with the node, which handles the interaction. The
 //## @em interaction @em pattern is defined in a state-machine, stored in an
 //## external XML file. Thus, we need to load a state-machine
@@ -99,32 +99,6 @@ int main(int argc, char* argv[])
     }
   }
 
-  // *******************************************************
-  // ****************** START OF NEW PART ******************
-  // *******************************************************
-
-  //*************************************************************************
-  // Part VI: For allowing to interactively add points ...
-  //*************************************************************************
-
-  // Create PointSet and a node for it
-  mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
-  mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
-  pointSetNode->SetData(pointSet);
-
-  // Add the node to the tree
-  ds->Add(pointSetNode);
-
-  // Create PointSetInteractor, associate to pointSetNode and add as
-  // interactor to GlobalInteraction
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(
-    mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode)
-  );
-
-  // *******************************************************
-  // ******************* END OF NEW PART *******************
-  // *******************************************************
-
   //*************************************************************************
   // Part V: Create windows and pass the tree to it
   //*************************************************************************
@@ -145,6 +119,7 @@ int main(int argc, char* argv[])
   layout.addWidget(&renderWindow);
 
   // Tell the renderwindow which (part of) the tree to render
+
   renderWindow.GetRenderer()->SetDataStorage(ds);
 
   // Use it as a 3D view
@@ -185,6 +160,36 @@ int main(int argc, char* argv[])
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the tree!
   ds->Add(view3.GetRenderer()->GetCurrentWorldGeometry2DNode());
+
+  // *******************************************************
+  // ****************** START OF NEW PART ******************
+  // *******************************************************
+
+  //*************************************************************************
+  // Part VI: For allowing to interactively add points ...
+  //*************************************************************************
+
+  // Create PointSet and a node for it
+  mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+  mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
+  pointSetNode->SetData(pointSet);
+
+  // Add the node to the tree
+  ds->Add(pointSetNode);
+
+  // Create PointSetInteractor, associate to pointSetNode and add as
+  // interactor to GlobalInteraction
+  mitk::PointSetDataInteractor::Pointer interactor = mitk::PointSetDataInteractor::New();
+  interactor->LoadStateMachine("PointSet.xml");
+  interactor->SetEventConfig("PointSetConfig.xml");
+
+  interactor->SetDataNode(pointSetNode);
+
+  // *******************************************************
+  // ******************* END OF NEW PART *******************
+  // *******************************************************
+
+
 
   //*************************************************************************
   //Part VII: Qt-specific initialization

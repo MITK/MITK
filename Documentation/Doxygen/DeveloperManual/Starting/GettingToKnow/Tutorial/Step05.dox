@@ -1,34 +1,34 @@
  /**
- 
+
  \page Step05Page MITK Tutorial - Step 5: Interactively add points
- 
+
  In addition to Step 4 where 3 views were created on the data, we now want to interactively add points.
 
- A node containing a PointSet as data is added to the data tree and a PointSetInteractor is associated with the node, which handles the interaction. 
+ A node containing a PointSet as data is added to the data tree and a PointSetDataInteractor is associated with the node, which handles the interaction.
  The @em interaction @em pattern is defined in a state-machine, stored in an external XML file. Thus, we need to load a state-machine.
 
  The interaction patterns defines the @em events, on which the interactor reacts (e.g., which mouse buttons are used to set a point), the @em transition to the next state (e.g., the initial
- may be "empty point set") and associated @a actions (e.g., add a point at the position where the mouse-click occured).  
+ may be "empty point set") and associated @a actions (e.g., add a point at the position where the mouse-click occured).
  More information about interaction in MITK can be found \ref InteractionPage "here".
- 
- In order to add a point the shift key has to be pressed simultaneously to highlight the point with the mouse.
- 
- \li \ref Step5.cpp "Step5.cpp"\n 
- Contains the code for this step.
- 
- \image html step5_result.png 
 
- 
+ In order to add a point the shift key has to be pressed simultaneously to highlight the point with the mouse.
+
+ \li \ref Step5.cpp "Step5.cpp"\n
+ Contains the code for this step.
+
+ \image html step5_result.png
+
+
 
  \dontinclude Step5.cpp
 
- 
+
  A PointSet and a node for it have to be created to be able to interactively adding points:
- 
+
  \skipline mitk::PointSet
  \until "pointsetinteractor"
- 
+
  \ref Step04Page "[Previous step]" \ref Step06Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
- 
+
   */
-  
+

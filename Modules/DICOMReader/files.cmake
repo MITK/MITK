@@ -42,7 +42,7 @@ set(CPP_FILES
 
 set(RESOURCE_FILES
   configurations/3D/classicreader.xml
-  configurations/3D/descriptionbasedgrouping.xml
+  configurations/3D/imageposition.xml
   configurations/3D/instancenumber.xml
   configurations/3D/slicelocation.xml
   configurations/3D/imagetime.xml

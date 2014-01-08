@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMFileReader.h"
 
+#include <usModuleResource.h>
+
 namespace mitk
 {
 
@@ -76,6 +78,8 @@ class DICOMReader_EXPORT DICOMFileReaderSelector : public itk::LightObject
     virtual ~DICOMFileReaderSelector();
 
     void AddConfigsFromResources(const std::string& path);
+    void AddConfigFromResource(const std::string& resourcename);
+    void AddConfigFromResource(ModuleResource& resource);
 
   private:
 

@@ -67,9 +67,46 @@ mitk::DICOMFileReaderSelector
 
 void
 mitk::DICOMFileReaderSelector
+::AddConfigFromResource(ModuleResource& resource)
+{
+  if (resource.IsValid())
+  {
+    ModuleResourceStream stream(resource);
+
+    // read all into string s
+    std::string s;
+
+    stream.seekg(0, std::ios::end);
+    s.reserve(stream.tellg());
+    stream.seekg(0, std::ios::beg);
+
+    s.assign((std::istreambuf_iterator<char>(stream)),
+              std::istreambuf_iterator<char>());
+
+    //MITK_INFO << "------------ One resource with content\n" << s << "\n------- end -------";
+    this->AddConfig(s);
+  }
+}
+
+void
+mitk::DICOMFileReaderSelector
+::AddConfigFromResource(const std::string& resourcename)
+{
+  ModuleResource r = GetModuleContext()->GetModule()->GetResource(resourcename);
+  this->AddConfigFromResource(r);
+}
+
+
+void
+mitk::DICOMFileReaderSelector
 ::LoadBuiltIn3DConfigs()
 {
-  this->AddConfigsFromResources("configurations/3D");
+  //this->AddConfigsFromResources("configurations/3D");
+  // in this order of preference...
+  this->AddConfigFromResource("configurations/3D/instancenumber.xml");
+  this->AddConfigFromResource("configurations/3D/imageposition.xml");
+  this->AddConfigFromResource("configurations/3D/slicelocation.xml");
+  this->AddConfigFromResource("configurations/3D/imagetime.xml");
 }
 
 void
@@ -148,6 +185,11 @@ mitk::DICOMFileReaderSelector
       (*rIter)->AnalyzeInputFiles();
       workingCandidates.push_back( *rIter );
       MITK_INFO << "Reader " << readerIndex << " (" << (*rIter)->GetConfigurationLabel() << ") suggests " << (*rIter)->GetNumberOfOutputs() << " 3D blocks";
+      if ((*rIter)->GetNumberOfOutputs() == 1)
+      {
+        MITK_DEBUG << "Early out with reader #" << readerIndex << " (" << (*rIter)->GetConfigurationLabel() << "), less than 1 block is not possible";
+        return *rIter;
+      }
     }
     catch (std::exception& e)
     {

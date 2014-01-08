@@ -42,7 +42,7 @@ mitk::ITKDICOMSeriesReaderHelper
   typename ReaderType::Pointer reader = ReaderType::New();
 
   reader->SetImageIO(io);
-  reader->ReverseOrderOff();
+  reader->ReverseOrderOff(); // TODO check this..
 
   if (preLoadedImageBlock.IsNull())
   {

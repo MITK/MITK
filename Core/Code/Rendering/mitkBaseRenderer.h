@@ -26,7 +26,6 @@
 #include "mitkDisplayPositionEvent.h"
 #include "mitkWheelEvent.h"
 
-
 //#include "mitkMapper.h"
 
 #include "mitkSliceNavigationController.h"
@@ -47,7 +46,6 @@
 
 namespace mitk
 {
-
   class NavigationController;
   class SliceNavigationController;
   class CameraRotationController;
@@ -183,12 +181,10 @@ namespace mitk
     virtual void SetWorldGeometry3D(Geometry3D* geometry);
     virtual void SetWorldTimeGeometry(mitk::TimeGeometry* geometry);
 
-
     /**
     * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
     */
     DEPRECATED(void SetWorldGeometry3D(TimeSlicedGeometry* geometry));
-
 
     itkGetConstObjectMacro(WorldGeometry, Geometry3D)
     itkGetObjectMacro(WorldGeometry, Geometry3D)
@@ -353,7 +349,6 @@ namespace mitk
     itkGetMacro(MapperID, MapperSlotId)
     itkGetConstMacro(MapperID, MapperSlotId)
 
-
     //##Documentation
     //## @brief Set the MapperSlotId to use.
     itkSetMacro(MapperID, MapperSlotId)
@@ -365,12 +360,6 @@ namespace mitk
     //## @brief Tell the renderer that it is focused. The caller is responsible for focus management,
     //## not the renderer itself.
     itkSetMacro(Focused, bool)
-
-    //##Documentation
-    //## @brief Sets whether depth peeling is enabled or not
-    void SetDepthPeelingEnabled(bool enabled);  //##Documentation
-    //## @brief Sets maximal number of peels
-    void SetMaxNumberOfPeels(int maxNumber);
 
     itkGetMacro(Size, int*)
 
@@ -509,7 +498,6 @@ namespace mitk
     //## which are stored in the OverlayManager
     void UpdateOverlays();
 
-
   private:
     //##Documentation
     //## Pointer to the worldgeometry, describing the maximal area to be rendered
@@ -615,10 +603,6 @@ namespace mitk
 
     bool m_EmptyWorldGeometry;
 
-    bool m_DepthPeelingEnabled;
-
-    int m_MaxNumberOfPeels;
-
     typedef std::set<Mapper *> LODEnabledMappersType;
 
     /** Number of mappers which are visible and have level-of-detail
@@ -636,9 +620,7 @@ namespace mitk
     void RemoveAllLocalStorages();
     void RegisterLocalStorageHandler(mitk::BaseLocalStorageHandler *lsh);
     void UnregisterLocalStorageHandler(mitk::BaseLocalStorageHandler *lsh);
-
   };
-
 } // namespace mitk
 
 #endif /* BASERENDERER_H_HEADER_INCLUDED_C1CCA0F4 */

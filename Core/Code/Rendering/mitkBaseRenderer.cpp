@@ -114,7 +114,7 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
         NULL), m_Slice(0), m_TimeStep(), m_CurrentWorldGeometry2DUpdateTime(), m_DisplayGeometryUpdateTime(), m_TimeStepUpdateTime(), m_WorldGeometryData(
         NULL), m_DisplayGeometryData(NULL), m_CurrentWorldGeometry2DData(NULL), m_WorldGeometryNode(NULL), m_DisplayGeometryNode(NULL), m_CurrentWorldGeometry2DNode(
         NULL), m_DisplayGeometryTransformTime(0), m_CurrentWorldGeometry2DTransformTime(0), m_Name(name), /*m_Bounds(),*/m_EmptyWorldGeometry(
-        true), m_DepthPeelingEnabled(true), m_MaxNumberOfPeels(100), m_NumberOfVisibleLODEnabledMappers(0)
+        true), m_NumberOfVisibleLODEnabledMappers(0)
 {
   m_Bounds[0] = 0;
   m_Bounds[1] = 0;
@@ -242,7 +242,6 @@ mitk::BaseRenderer::~BaseRenderer()
     m_RenderWindow->Delete();
     m_RenderWindow = NULL;
   }
-
 }
 
 void mitk::BaseRenderer::RemoveAllLocalStorages()
@@ -337,12 +336,6 @@ void mitk::BaseRenderer::InitRenderer(vtkRenderWindow* renderwindow)
   {
     m_CameraController->SetRenderer(this);
   }
-
-  //BUG (#1551) added settings for depth peeling
-  m_RenderWindow->SetAlphaBitPlanes(1);
-  m_VtkRenderer->SetUseDepthPeeling(m_DepthPeelingEnabled);
-  m_VtkRenderer->SetMaximumNumberOfPeels(m_MaxNumberOfPeels);
-  m_VtkRenderer->SetOcclusionRatio(0.1);
 }
 
 void mitk::BaseRenderer::InitSize(int w, int h)
@@ -874,16 +867,4 @@ void mitk::BaseRenderer::PrintSelf(std::ostream& os, itk::Indent indent) const
 
   os << indent << " DisplayGeometryTransformTime: " << m_DisplayGeometryTransformTime << std::endl;
   Superclass::PrintSelf(os, indent);
-}
-
-void mitk::BaseRenderer::SetDepthPeelingEnabled(bool enabled)
-{
-  m_DepthPeelingEnabled = enabled;
-  m_VtkRenderer->SetUseDepthPeeling(enabled);
-}
-
-void mitk::BaseRenderer::SetMaxNumberOfPeels(int maxNumber)
-{
-  m_MaxNumberOfPeels = maxNumber;
-  m_VtkRenderer->SetMaximumNumberOfPeels(maxNumber);
 }

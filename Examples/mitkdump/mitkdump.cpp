@@ -144,7 +144,10 @@ int main(int argc, char* argv[])
 
   // output best reader result
   MITK_INFO << "---- Best reader configuration '" << reader->GetConfigurationLabel() << "'";
-  reader->PrintOutputs(std::cout, fileDetails);
+  if (fileDetails)
+  {
+    reader->PrintOutputs(std::cout, fileDetails);
+  }
 
   // construct the name of a log file
   std::string datestring = buildDateString();;

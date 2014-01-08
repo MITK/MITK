@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITKSTDMULTIWIDGETEDITORPREFERENCEPAGE_H_
 #define QMITKSTDMULTIWIDGETEDITORPREFERENCEPAGE_H_
 
@@ -25,6 +24,7 @@ class QWidget;
 class QCheckBox;
 class QPushButton;
 class QWidgetAction;
+class QComboBox;
 
 struct QmitkStdMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -66,6 +66,8 @@ public slots:
 
   void ResetColors();
 
+  void ChangeRenderingMode(int i);
+
 protected:
   QWidget* m_MainControl;
   QCheckBox* m_EnableFlexibleZooming;
@@ -73,6 +75,10 @@ protected:
   QCheckBox* m_UseGradientBackground;
   QCheckBox* m_ChangeBackgroundColors;
   QCheckBox* m_PACSLikeMouseMode;
+  QComboBox* m_RenderingMode;
+
+  std::string m_CurrentRenderingMode;
+
   QPushButton* m_ColorButton1;
   QPushButton* m_ColorButton2;
   std::string m_FirstColor;

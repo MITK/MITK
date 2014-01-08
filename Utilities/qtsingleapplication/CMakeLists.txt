@@ -1,5 +1,5 @@
 
-if(MITK_USE_QT) # only if MITK is built with Qt
+if(MITK_USE_Qt4) # only if MITK is built with Qt 4
 
 project(QtSingleApplication)
 
@@ -9,7 +9,7 @@ set(_MOC_HEADERS
   qtsinglecoreapplication.h
 )
 
-set(_HEADERS 
+set(_HEADERS
   qthandlenewappinstance.h
   qtlockedfile.h
 )
@@ -22,7 +22,7 @@ set(_SOURCES
 )
 
 find_package(Qt4 REQUIRED)
-set(QT_USE_QTNETWORKING 1)
+set(QT_USE_QTNETWORK 1)
 include(${QT_USE_FILE})
 
 qt4_wrap_cpp(_SOURCES ${_MOC_HEADERS})
@@ -31,7 +31,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(qtsingleapplication STATIC ${_SOURCES})
 target_link_libraries(qtsingleapplication ${QT_LIBRARIES})
 
-MITK_CREATE_MODULE_CONF(qtsingleapplication)
+MITK_CREATE_MODULE_CONF(qtsingleapplication
+  INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
+  QT4_MODULES QtNetwork)
 
-endif(MITK_USE_QT) # only if MITK is built with Qt
-
+endif(MITK_USE_Qt4) # only if MITK is built with Qt 4

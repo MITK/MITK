@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::RenderWindowBase::RenderWindowBase( )
+: m_RenderProp(NULL)
+, m_InResize(false)
 {
 }
 

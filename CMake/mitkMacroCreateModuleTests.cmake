@@ -15,12 +15,29 @@ macro(MITK_CREATE_MODULE_TESTS)
     include(files.cmake)
     include_directories(.)
 
+    if(MODULE_TEST_EXTRA_DEPENDS)
+      message(WARNING "The keyword EXTRA_DEPENDS is deprecated. Use a separate call to mitk_use_modules instead.")
+    endif()
+
     if(DEFINED MOC_H_FILES)
       QT4_WRAP_CPP(MODULE_TEST_GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
     endif(DEFINED MOC_H_FILES)
 
-    MITK_USE_MODULE(CppUnit ${MODULE_TEST_EXTRA_DEPENDS})
-    include_directories(${ALL_INCLUDE_DIRECTORIES})
+    # The PACKAGE_DEPENDS variable is filled in the MITK_CHECK_MODULE() macro
+    foreach(package ${PACKAGE_DEPENDS})
+      if(NOT ${package} MATCHES "^Qt[45].*$")
+        foreach(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
+          if(EXISTS "${dir}/MITK_${package}_Config.cmake")
+            include("${dir}/MITK_${package}_Config.cmake")
+            break()
+          endif()
+        endforeach()
+      endif()
+    endforeach()
+    if(ALL_LIBRARY_DIRS)
+      list(REMOVE_DUPLICATES ALL_LIBRARY_DIRS)
+      link_directories(${ALL_LIBRARY_DIRS})
+    endif()
 
     set(TESTDRIVER ${MODULE_NAME}TestDriver)
     set(MODULE_TEST_EXTRA_DRIVER_INIT "${MODULE_TEST_EXTRA_DRIVER_INIT}")
@@ -53,7 +70,10 @@ ${MODULE_TEST_EXTRA_DRIVER_INIT};"
     )
 
     add_executable(${TESTDRIVER} ${MODULETEST_SOURCE} ${MODULE_TEST_GENERATED_MOC_CPP} ${TEST_CPP_FILES})
-    target_link_libraries(${TESTDRIVER} ${MODULE_PROVIDES} ${ALL_LIBRARIES})
+    mitk_use_modules(TARGET ${TESTDRIVER}
+                     MODULES ${MODULE_PROVIDES} ${MODULE_TEST_EXTRA_DEPENDS}
+                     PACKAGES CppUnit
+                    )
 
     if(MODULE_SUBPROJECTS)
       foreach(subproject ${MODULE_SUBPROJECTS})

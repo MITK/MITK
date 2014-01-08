@@ -1,3 +1,7 @@
+if(TARGET itksys)
+  set(ITK_TARGETS_IMPORTED 1)
+endif()
+
 find_package(ITK REQUIRED)
 #
 # for some reason this does not work on windows, probably an ITK bug
@@ -18,4 +22,4 @@ list(APPEND ALL_INCLUDE_DIRECTORIES ${ITK_INCLUDE_DIRS})
 find_package(GDCM PATHS ${ITK_GDCM_DIR} REQUIRED)
 list(APPEND ALL_INCLUDE_DIRECTORIES ${GDCM_INCLUDE_DIRS})
 list(APPEND ALL_LIBRARIES ${GDCM_LIBRARIES})
-include(${GDCM_USE_FILE})
+list(APPEND ALL_LIBRARY_DIRS ${GDCM_LIBRARY_DIRS})

@@ -1,9 +1,8 @@
 MITK_CREATE_MODULE( Qmitk
                DEPENDS Mitk PlanarFigure
-               PACKAGE_DEPENDS QT QVTK
+               QT4_MODULES QtCore QtGui
                SUBPROJECTS MITK-CoreUI
                EXPORT_DEFINE QMITK_EXPORT
-               QT_MODULE
 )
 
 add_subdirectory(Testing)

@@ -6,6 +6,7 @@ set(module_dirs
     MitkAlgorithmsExt
     MitkMapperExt
     MitkIOExt
+    Qt4Qt5TestModule
     SceneSerializationBase
     PlanarFigure
     ImageExtraction
@@ -19,6 +20,8 @@ set(module_dirs
     SurfaceInterpolation
     Segmentation
     PlanarFigureSegmentation
+    OpenViewCore
+    QmlMitk
     Qmitk
     QmitkExt
     SegmentationUI

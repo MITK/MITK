@@ -12,8 +12,10 @@ include(mitkFunctionCreateWindowsBatchScript)
 include(mitkFunctionInstallProvisioningFiles)
 include(mitkFunctionInstallAutoLoadModules)
 include(mitkFunctionGetLibrarySearchPaths)
+include(mitkFunctionUseModules)
 include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
+include(mitkMacroCreateExecutable)
 include(mitkMacroCheckModule)
 include(mitkMacroCreateModuleTests)
 include(mitkFunctionAddCustomModuleTest)
@@ -51,6 +53,7 @@ set(MITK_VERSION_PLUGIN_SYSTEM 2) # dropped legacy BlueBerry plug-in CMake suppo
 # MITK specific variables
 set(MITK_SOURCE_DIR "@MITK_SOURCE_DIR@")
 set(MITK_BINARY_DIR "@MITK_BINARY_DIR@")
+set(MITK_CMAKE_DIR "@MITK_CMAKE_DIR@")
 set(UTILITIES_DIR "@UTILITIES_DIR@")
 set(REGISTER_QFUNCTIONALITY_CPP_IN "@REGISTER_QFUNCTIONALITY_CPP_IN@")
 set(MITK_MODULES_PACKAGE_DEPENDS_DIR "@MITK_MODULES_PACKAGE_DEPENDS_DIR@")
@@ -110,6 +113,9 @@ set(MITK_PMD_SDK_DIR @MITK_PMD_SDK_DIR@)
 
 # MITK use variables
 set(MITK_USE_QT @MITK_USE_QT@)
+set(MITK_USE_Qt4 @MITK_USE_Qt4@)
+set(MITK_USE_Qt5 @MITK_USE_Qt5@)
+set(MITK_DESIRED_QT_VERSION @DESIRED_QT_VERSION@)
 set(MITK_USE_BLUEBERRY @MITK_USE_BLUEBERRY@)
 set(MITK_USE_SYSTEM_Boost @MITK_USE_SYSTEM_Boost@)
 set(MITK_USE_Boost @MITK_USE_Boost@)
@@ -119,6 +125,12 @@ set(MITK_USE_DCMTK @MITK_USE_DCMTK@)
 set(MITK_USE_OpenCV @MITK_USE_OpenCV@)
 set(MITK_USE_SOFA @MITK_USE_SOFA@)
 set(MITK_USE_Python @MITK_USE_Python@)
+
+if(MITK_USE_Qt4)
+  find_package(Qt4 REQUIRED)
+elseif(MITK_USE_Qt5)
+  find_package(Qt5Core REQUIRED)
+endif()
 
 # MITK ToF use variables
 

@@ -1,7 +1,36 @@
 function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
 
-  set(_dir_candidates ${MITK_VTK_LIBRARY_DIRS} ${MITK_ITK_LIBRARY_DIRS} ${QT_LIBRARY_DIR}
-                      ${QT_LIBRARY_DIR}/../bin ${MITK_BINARY_DIR}/bin ${MITK_BINARY_DIR}/bin/plugins)
+  set(_dir_candidates ${MITK_VTK_LIBRARY_DIRS} ${MITK_ITK_LIBRARY_DIRS}
+                      ${MITK_BINARY_DIR}/bin ${MITK_BINARY_DIR}/bin/plugins)
+
+  # Determine the Qt4/5 library installation prefix
+  set(_qmake_location )
+  if(MITK_USE_Qt4)
+    set(_qmake_location ${QT_QMAKE_EXECUTABLE})
+  elseif(MITK_USE_Qt5 AND TARGET ${Qt5Core_QMAKE_EXECUTABLE})
+    get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
+                 PROPERTY IMPORT_LOCATION)
+  endif()
+  if(_qmake_location)
+    if(NOT _qt_install_libs)
+      if(WIN32)
+        execute_process(COMMAND ${_qmake_location} -query QT_INSTALL_BINS
+                        OUTPUT_VARIABLE _qt_install_libs
+                        OUTPUT_STRIP_TRAILING_WHITESPACE)
+      else()
+        execute_process(COMMAND ${_qmake_location} -query QT_INSTALL_LIBS
+                        OUTPUT_VARIABLE _qt_install_libs
+                        OUTPUT_STRIP_TRAILING_WHITESPACE)
+      endif()
+      file(TO_CMAKE_PATH "${_qt_install_libs}" _qt_install_libs)
+      set(_qt_install_libs ${_qt_install_libs} CACHE INTERNAL "Qt library installation prefix" FORCE)
+    endif()
+    if(_qt_install_libs)
+      list(APPEND _dir_candidates ${_qt_install_libs})
+    endif()
+  elseif(MITK_USE_QT)
+    message(WARNING "The qmake executable could not be found.")
+  endif()
 
   get_property(_additional_paths GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
   if(_additional_paths)

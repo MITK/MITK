@@ -20,6 +20,20 @@
 #!     [WARNINGS_AS_ERRORS]
 #! \endcode
 #!
+#! A modules source files are specified in a separate CMake file usually
+#! called files.cmake, located in the module root directory. The
+#! mitk_create_module() macro evaluates the following CMake variables
+#! from the files.cmake file:
+#!
+#! - CPP_FILES A list of .cpp files
+#! - H_FILES A list of .h files without a corresponding .cpp file
+#! - TXX_FILES A list of .txx files
+#! - RESOURCE_FILES A list of files (resources) which are embedded into the module
+#! - MOC_H_FILES A list of Qt header files which should be processed by the MOC
+#! - UI_FILES A list of .ui Qt UI files
+#! - QRC_FILES A list of .qrc Qt resource files
+#! - DOX_FILES A list of .dox Doxygen files
+#!
 #! \param MODULE_NAME_IN The name for the new module
 #! \param HEADERS_ONLY specify this if the modules just contains header files.
 ##################################################################
@@ -38,22 +52,54 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
       AUTOLOAD_WITH          # a module target name identifying the module which will trigger the
                              # automatic loading of this module
       ADDITIONAL_LIBS        # list of addidtional libraries linked to this module
+      FILES_CMAKE            # file name of a CMake file setting source list variables
+                             # (defaults to files.cmake)
       GENERATED_CPP          # not used (?)
+      QT4_MODULES            # the module depends on a given list of Qt 4 modules
+      QT5_MODULES            # the module depends on a given list of Qt 5 modules
       DEPRECATED_SINCE       # marks this modules as deprecated
      )
 
   set(_macro_options
-      QT_MODULE              # the module makes use of Qt features and needs moc and ui generated files
+      QT_MODULE              # the module makes use of Qt4 features and needs moc and ui generated files
       FORCE_STATIC           # force building this module as a static library
       HEADERS_ONLY           # this module is a headers-only library
       GCC_DEFAULT_VISIBILITY # do not use gcc visibility flags - all symbols will be exported
       NO_INIT                # do not create CppMicroServices initialization code
       WARNINGS_AS_ERRORS     # treat all compiler warnings as errors
+      EXECUTABLE             # create an executable; do not use directly, use mitk_create_executable() instead
      )
 
   MACRO_PARSE_ARGUMENTS(MODULE "${_macro_params}" "${_macro_options}" ${ARGN})
 
   set(MODULE_NAME ${MODULE_NAME_IN})
+
+  if(NOT MODULE_FILES_CMAKE)
+    set(MODULE_FILES_CMAKE files.cmake)
+  endif()
+  if(NOT IS_ABSOLUTE ${MODULE_FILES_CMAKE})
+    set(MODULE_FILES_CMAKE ${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_FILES_CMAKE})
+  endif()
+
+  if (MODULE_QT_MODULE)
+    message(WARNING "QT_MODULE keyword is deprecated (in module ${MODULE_NAME}). Please replace QT_MODULE by the more specific QT4_MODULES / QT5_MODULES!")
+    if (NOT MODULE_QT4_MODULES)
+      set(MODULE_QT4_MODULES QtGui)
+    endif()
+  endif()
+
+  if (MODULE_QT4_MODULES)
+    set (MODULE_QT_MODULE TRUE) # defines that we want to process UIC_FILES, QRC_FILES etc. from files.cmake
+    if (MITK_USE_Qt4)
+      list(APPEND MODULE_PACKAGE_DEPENDS Qt4) # QT4_MODULES will create package dependencies to Qt4 modules and define a list of Qt 4 components
+    endif()
+  endif()
+  if (MODULE_QT5_MODULES)
+    set (MODULE_QT_MODULE TRUE)
+    if (MITK_USE_Qt5)
+      list(APPEND MODULE_PACKAGE_DEPENDS ${MODULE_QT5_MODULES}) # QT5_MODULES is just an alias for PACKAGE_DEPENDS
+    endif()
+  endif()
 
   if(MODULE_HEADERS_ONLY)
     set(MODULE_PROVIDES )
@@ -112,7 +158,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
   endif()
   if(NOT MODULE_IS_EXCLUDED AND NOT (MODULE_QT_MODULE AND NOT MITK_USE_QT))
     # first of all we check for the dependencies
-    MITK_CHECK_MODULE(_MISSING_DEP ${MODULE_DEPENDS})
+    MITK_CHECK_MODULE(_MISSING_DEP ${MODULE_DEPENDS} ${MODULE_PACKAGE_DEPENDS})
     if(_MISSING_DEP)
       message("Module ${MODULE_NAME} won't be built, missing dependency: ${_MISSING_DEP}")
       set(MODULE_IS_ENABLED 0)
@@ -122,10 +168,29 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
       # MITK_CHECK_MODULE ...
       foreach(_package ${MODULE_PACKAGE_DEPENDS})
         if((DEFINED MITK_USE_${_package}) AND NOT (MITK_USE_${_package}))
-          message("Module ${MODULE_NAME} won't be built. Turn on MITK_USE_${_package} if you want to use it.")
+          if (${_package} MATCHES "Qt[45]")
+            message("Module ${MODULE_NAME} won't be built because we lack ${_package}. Check CMake switches MITK_USE_QT and DESIRED_QT_VERSION.")
+          else()
+            message("Module ${MODULE_NAME} won't be built. Turn on MITK_USE_${_package} if you want to use it.")
+          endif()
           set(MODULE_IS_ENABLED 0)
         endif()
       endforeach()
+
+      if (MODULE_QT_MODULE) # disable module if it 1. needs Qt 2. has only one of QT4_MODULES/QT5_MODULES set and 3. DESIRED_QT_VERSION does not match the module
+        if (MITK_USE_Qt4)
+          if (NOT MODULE_QT4_MODULES)
+            set (MODULE_IS_ENABLED 0)
+          endif()
+        endif()
+
+        if (MITK_USE_Qt5)
+          if (NOT MODULE_QT5_MODULES)
+            set (MODULE_IS_ENABLED 0)
+          endif()
+        endif()
+      endif()
+
       if(MODULE_IS_ENABLED)
 
         # clear variables defined in files.cmake
@@ -139,12 +204,39 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
         set(QRC_FILES )
 
         # clear other variables
+        set(Q${KITNAME}_GENERATED_CPP )
         set(Q${KITNAME}_GENERATED_MOC_CPP )
         set(Q${KITNAME}_GENERATED_QRC_CPP )
         set(Q${KITNAME}_GENERATED_UI_CPP )
-        set(Q${KITNAME}_GENERATED_CPP )
 
-        _MITK_CREATE_MODULE_CONF()
+        # Convert relative include dirs to absolute dirs
+        set(_include_dirs . ${MODULE_INCLUDE_DIRS})
+        set(MODULE_INCLUDE_DIRS)
+        foreach(dir ${_include_dirs})
+          get_filename_component(_abs_dir ${dir} ABSOLUTE)
+          list(APPEND MODULE_INCLUDE_DIRS ${_abs_dir})
+        endforeach()
+        list(APPEND MODULE_INCLUDE_DIRS ${MITK_BINARY_DIR} ${MODULES_CONF_DIRS})
+
+        # Convert relative internal include dirs to absolute dirs
+        set(_include_dirs ${MODULE_INTERNAL_INCLUDE_DIRS})
+        set(MODULE_INTERNAL_INCLUDE_DIRS)
+        foreach(dir ${_include_dirs})
+          get_filename_component(_abs_dir ${dir} ABSOLUTE)
+          list(APPEND MODULE_INTERNAL_INCLUDE_DIRS ${_abs_dir})
+        endforeach()
+
+        # Qt generates headers in the binary tree
+        if(MODULE_QT4_MODULES OR MODULE_QT5_MODULES)
+          list(APPEND MODULE_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR})
+        endif()
+
+        # Add the module specific include dirs
+        include_directories(${MODULE_INCLUDE_DIRS} ${MODULE_INTERNAL_INCLUDE_DIRS})
+
+        if(NOT MODULE_EXECUTABLE)
+          _MITK_CREATE_MODULE_CONF()
+        endif()
         if(NOT MODULE_EXPORT_DEFINE)
           set(MODULE_EXPORT_DEFINE ${MODULE_NAME}_EXPORT)
         endif(NOT MODULE_EXPORT_DEFINE)
@@ -156,19 +248,8 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           endforeach(dep)
         endif(MITK_GENERATE_MODULE_DOT)
 
-        set(DEPENDS "${MODULE_DEPENDS}")
-        if(NOT MODULE_NO_INIT)
-          # Add a CppMicroServices dependency implicitly, since it is
-          # needed for the generated "module initialization" code.
-          set(DEPENDS "CppMicroServices;${DEPENDS}")
-        endif()
-        set(DEPENDS_BEFORE "not initialized")
-        set(PACKAGE_DEPENDS "${MODULE_PACKAGE_DEPENDS}")
-        MITK_USE_MODULE(${DEPENDS})
-
         # ok, now create the module itself
-        include_directories(. ${ALL_INCLUDE_DIRECTORIES})
-        include(files.cmake)
+        include(${MODULE_FILES_CMAKE})
 
         set(module_c_flags )
         set(module_c_flags_debug )
@@ -258,12 +339,17 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           set(MODULE_LIBNAME ${MODULE_PROVIDES})
 
           if(NOT MODULE_NO_INIT)
-            usFunctionGenerateModuleInit(CPP_FILES
-                                         NAME ${MODULE_NAME}
-                                         LIBRARY_NAME ${MODULE_LIBNAME}
-                                         DEPENDS ${MODULE_DEPENDS} ${MODULE_DEPENDS_INTERNAL} ${MODULE_PACKAGE_DEPENDS}
-                                         #VERSION ${MODULE_VERSION}
-                                        )
+            find_package(CppMicroServices QUIET NO_MODULE REQUIRED)
+            if(MODULE_EXECUTABLE)
+              usFunctionGenerateExecutableInit(CPP_FILES
+                                               IDENTIFIER ${MODULE_NAME}
+                                              )
+            else()
+              usFunctionGenerateModuleInit(CPP_FILES
+                                           NAME ${MODULE_NAME}
+                                           LIBRARY_NAME ${MODULE_LIBNAME}
+                                          )
+            endif()
           endif()
 
           if(RESOURCE_FILES)
@@ -295,21 +381,33 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
 
         endif()
 
-        if(MODULE_QT_MODULE)
+        # Qt 4 case
+        if(MITK_USE_Qt4)
           if(UI_FILES)
-            QT4_WRAP_UI(Q${KITNAME}_GENERATED_UI_CPP ${UI_FILES})
-          endif(UI_FILES)
-
+            qt4_wrap_ui(Q${KITNAME}_GENERATED_UI_CPP ${UI_FILES})
+          endif()
           if(MOC_H_FILES)
-            QT4_WRAP_CPP(Q${KITNAME}_GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-          endif(MOC_H_FILES)
-
+            qt4_wrap_cpp(Q${KITNAME}_GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+          endif()
           if(QRC_FILES)
-            QT4_ADD_RESOURCES(Q${KITNAME}_GENERATED_QRC_CPP ${QRC_FILES})
-          endif(QRC_FILES)
-
-          set(Q${KITNAME}_GENERATED_CPP ${Q${KITNAME}_GENERATED_CPP} ${Q${KITNAME}_GENERATED_UI_CPP} ${Q${KITNAME}_GENERATED_MOC_CPP} ${Q${KITNAME}_GENERATED_QRC_CPP})
+            qt4_add_resources(Q${KITNAME}_GENERATED_QRC_CPP ${QRC_FILES})
+          endif()
         endif()
+
+        # all the same for Qt 5
+        if(MITK_USE_Qt5)
+          if(UI_FILES)
+            qt5_wrap_ui(Q${KITNAME}_GENERATED_UI_CPP ${UI_FILES})
+          endif()
+          if(MOC_H_FILES)
+            qt5_wrap_cpp(Q${KITNAME}_GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+          endif()
+          if(QRC_FILES)
+            qt5_add_resources(Q${KITNAME}_GENERATED_QRC_CPP ${QRC_FILES})
+          endif()
+        endif()
+
+        set(Q${KITNAME}_GENERATED_CPP ${Q${KITNAME}_GENERATED_CPP} ${Q${KITNAME}_GENERATED_UI_CPP} ${Q${KITNAME}_GENERATED_MOC_CPP} ${Q${KITNAME}_GENERATED_QRC_CPP})
 
         ORGANIZE_SOURCES(SOURCE ${CPP_FILES}
                          HEADER ${H_FILES}
@@ -330,14 +428,38 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
         endif()
 
         if(NOT MODULE_HEADERS_ONLY)
-          if(ALL_LIBRARY_DIRS)
-            # LINK_DIRECTORIES applies only to targets which are added after the call to LINK_DIRECTORIES
-            link_directories(${ALL_LIBRARY_DIRS})
-          endif(ALL_LIBRARY_DIRS)
 
-          add_library(${MODULE_PROVIDES} ${_STATIC}
-                      ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
-                      ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+          # We have to include the MITK_<package>_Config.cmake files here because
+          # some external packages do not provide exported targets with an
+          # absolute path to link to. So we need to add link directories *before*
+          # add_library() or add_executable() is called. So far, this is needed only
+          # for GDCM and ACVD.
+
+          # The PACKAGE_DEPENDS variable is filled in the MITK_CHECK_MODULE() macro
+          foreach(package ${PACKAGE_DEPENDS})
+            if(NOT ${package} MATCHES "^Qt[45].*$")
+              foreach(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
+                if(EXISTS "${dir}/MITK_${package}_Config.cmake")
+                  include("${dir}/MITK_${package}_Config.cmake")
+                  break()
+                endif()
+              endforeach()
+            endif()
+          endforeach()
+          if(ALL_LIBRARY_DIRS)
+            list(REMOVE_DUPLICATES ALL_LIBRARY_DIRS)
+            link_directories(${ALL_LIBRARY_DIRS})
+          endif()
+
+          if(MODULE_EXECUTABLE)
+            add_executable(${MODULE_PROVIDES}
+                           ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
+                           ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+          else()
+            add_library(${MODULE_PROVIDES} ${_STATIC}
+                        ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
+                        ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+          endif()
 
           if(MODULE_TARGET_DEPENDS)
             add_dependencies(${MODULE_PROVIDES} ${MODULE_TARGET_DEPENDS})
@@ -350,13 +472,18 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
             endforeach()
           endif()
 
-          if(ALL_LIBRARIES)
-            target_link_libraries(${MODULE_PROVIDES} ${ALL_LIBRARIES})
-          endif(ALL_LIBRARIES)
-
-          if(MODULE_QT_MODULE AND QT_LIBRARIES)
-            target_link_libraries(${MODULE_PROVIDES} ${QT_LIBRARIES})
+          set(DEPENDS "${MODULE_DEPENDS}")
+          if(NOT MODULE_NO_INIT)
+            # Add a CppMicroServices dependency implicitly, since it is
+            # needed for the generated "module initialization" code.
+            set(DEPENDS "CppMicroServices;${DEPENDS}")
           endif()
+          mitk_use_modules(TARGET ${MODULE_PROVIDES}
+                           MODULES ${DEPENDS}
+                           PACKAGES ${MODULE_PACKAGE_DEPENDS}
+                           QT4_MODULES ${MODULE_QT4_MODULES}
+                           QT5_MODULES ${MODULE_QT5_MODULES}
+                          )
 
           if(MINGW)
             target_link_libraries(${MODULE_PROVIDES} ssp) # add stack smash protection lib
@@ -422,13 +549,13 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           endif()
         endif()
 
-      endif(MODULE_IS_ENABLED)
-    endif(_MISSING_DEP)
-  endif(NOT MODULE_IS_EXCLUDED AND NOT (MODULE_QT_MODULE AND NOT MITK_USE_QT))
+      endif()
+    endif()
+  endif()
 
-  if(NOT MODULE_IS_ENABLED)
+  if(NOT MODULE_IS_ENABLED AND NOT MODULE_EXECUTABLE)
     _MITK_CREATE_MODULE_CONF()
-  endif(NOT MODULE_IS_ENABLED)
+  endif()
 
   unset(MODULE_IS_DEPRECATED)
 

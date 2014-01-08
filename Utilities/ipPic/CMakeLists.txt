@@ -4,17 +4,17 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_definitions(-DMITK_IPPIC_COMPILE)
 
 set(IPPIC_FILES
-  ipPicInfo.c ipPicType.c                           
+  ipPicInfo.c ipPicType.c
   ipPicAddT.c ipPicQueryT.c ipPicDelT.c ipPicGetT.c
-  ipPicOldGet.c ipPicOldGetH.c ipPicOldGetS.c       
-  ipPicGet.c ipPicGetH.c ipPicGetS.c                
-  ipPicPut.c ipPicPutS.c                            
-  ipPicGetMem.c ipPicPutMem.c                       
-  ipPicCopyS.c ipPicCopyH.c                         
-  ipPicNew.c ipPicClear.c ipPicFree.c ipPicClone.c  
-  ipEndian.c ipFRead.c ipFWrite.c                   
-  ipError.c                                         
-  ipPicSize.c ipPicElements.c                       
+  ipPicOldGet.c ipPicOldGetH.c ipPicOldGetS.c
+  ipPicGet.c ipPicGetH.c ipPicGetS.c
+  ipPicPut.c ipPicPutS.c
+  ipPicGetMem.c ipPicPutMem.c
+  ipPicCopyS.c ipPicCopyH.c
+  ipPicNew.c ipPicClear.c ipPicFree.c ipPicClone.c
+  ipEndian.c ipFRead.c ipFWrite.c
+  ipError.c
+  ipPicSize.c ipPicElements.c
   ipPicTSVSize.c ipPicTSVElements.c
   )
 
@@ -28,4 +28,6 @@ endif(USE_ITKZLIB)
 MITK_CREATE_MODULE_CONF(mitkIpPic
   INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
+
+set_property(GLOBAL APPEND PROPERTY MITK_MODULE_TARGETS mitkIpPic)
 

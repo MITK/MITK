@@ -55,6 +55,13 @@ struct DiffusionImageDICOMHeaderInformation
   bool isotropic;
 };
 
+struct DiffusionImageMosaicDICOMHeaderInformation
+    : public DiffusionImageDICOMHeaderInformation
+{
+  unsigned long n_images;
+  bool slicenormalup;
+};
+
 
 
 /**

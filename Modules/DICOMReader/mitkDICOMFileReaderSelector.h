@@ -89,7 +89,7 @@ class DICOMReader_EXPORT DICOMFileReaderSelector : public itk::LightObject
 
     void AddConfigsFromResources(const std::string& path);
     void AddConfigFromResource(const std::string& resourcename);
-    void AddConfigFromResource(ModuleResource& resource);
+    void AddConfigFromResource(us::ModuleResource& resource);
 
   private:
 

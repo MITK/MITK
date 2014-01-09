@@ -76,7 +76,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             MITK_INFO << "Standard Q-ball reconstruction " << argv[4];
             mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::LoadDataNode(argv[4])->GetData());
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
-            typename FilterType::Pointer filter = FilterType::New();
+            FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
             filter->SetBValue(dwi->GetB_Value());
             filter->SetLambda(0.006);
@@ -92,7 +92,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             MITK_INFO << "CSA Q-ball reconstruction " << argv[5];
             mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::LoadDataNode(argv[5])->GetData());
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
-            typename FilterType::Pointer filter = FilterType::New();
+            FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
             filter->SetBValue(dwi->GetB_Value());
             filter->SetLambda(0.006);
@@ -108,7 +108,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             MITK_INFO << "ADC profile reconstruction " << argv[6];
             mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::LoadDataNode(argv[6])->GetData());
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
-            typename FilterType::Pointer filter = FilterType::New();
+            FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
             filter->SetBValue(dwi->GetB_Value());
             filter->SetLambda(0.006);
@@ -124,7 +124,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             MITK_INFO << "Raw signal modeling " << argv[7];
             mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::LoadDataNode(argv[7])->GetData());
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
-            typename FilterType::Pointer filter = FilterType::New();
+            FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
             filter->SetBValue(dwi->GetB_Value());
             filter->SetLambda(0.006);

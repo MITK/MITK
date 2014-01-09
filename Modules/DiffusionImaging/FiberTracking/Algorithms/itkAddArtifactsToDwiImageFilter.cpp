@@ -94,6 +94,9 @@ template< class TPixelType >
 void AddArtifactsToDwiImageFilter< TPixelType >
 ::GenerateData()
 {
+    m_StartTime = clock();
+    m_StatusText = "Starting simulation\n";
+
     typename DiffusionImageType::Pointer inputImage  = static_cast< DiffusionImageType * >( this->ProcessObject::GetInput(0) );
     itk::ImageRegion<3> inputRegion = inputImage->GetLargestPossibleRegion();
 
@@ -168,7 +171,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
             for (int j=0; j<3; j++)
                     transform[i][j] *= inputImage->GetSpacing()[j];
 
-        MITK_INFO << "Adjusting complex signal";
+        MITK_INFO << this->GetTime()+" > Adjusting complex signal";
         MITK_INFO << "line readout time: " << m_tLine;
         MITK_INFO << "line offset: " << m_kOffset;
         if (m_FrequencyMap.IsNotNull())
@@ -189,6 +192,9 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         std::sort (spikeVolume.begin(), spikeVolume.end());
         std::reverse (spikeVolume.begin(), spikeVolume.end());
 
+        m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
+        m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
+        unsigned long lastTick = 0;
         boost::progress_display disp(inputImage->GetVectorLength()*inputRegion.GetSize(2));
         for (unsigned int g=0; g<inputImage->GetVectorLength(); g++)
         {
@@ -203,6 +209,12 @@ void AddArtifactsToDwiImageFilter< TPixelType >
 
             for (unsigned int z=0; z<inputRegion.GetSize(2); z++)
             {
+                if (this->GetAbortGenerateData())
+                {
+                    m_StatusText += "\n"+this->GetTime()+" > Simulation aborted\n";
+                    return;
+                }
+
                 std::vector< SliceType::Pointer > compartmentSlices;
                 // extract slice from channel g
                 for (unsigned int y=0; y<sliceRegion.GetSize(1); y++)
@@ -290,17 +302,37 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                     }
 
                 ++disp;
+                unsigned long newTick = 50*disp.count()/disp.expected_count();
+                for (unsigned int tick = 0; tick<(newTick-lastTick); tick++)
+                    m_StatusText += "*";
+                lastTick = newTick;
             }
         }
+        m_StatusText += "\n\n";
     }
 
     if (m_NoiseModel!=NULL)
     {
+        m_StatusText += this->GetTime()+" > Adding noise\n";
+        m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
+        m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
+        unsigned long lastTick = 0;
+
         ImageRegionIterator<DiffusionImageType> it1 (outputImage, outputImage->GetLargestPossibleRegion());
-        boost::progress_display disp2(outputImage->GetLargestPossibleRegion().GetNumberOfPixels());
+        boost::progress_display disp(outputImage->GetLargestPossibleRegion().GetNumberOfPixels());
         while(!it1.IsAtEnd())
         {
-            ++disp2;
+            if (this->GetAbortGenerateData())
+            {
+                m_StatusText += "\n"+this->GetTime()+" > Simulation aborted\n";
+                return;
+            }
+
+            ++disp;
+            unsigned long newTick = 50*disp.count()/disp.expected_count();
+            for (unsigned int tick = 0; tick<(newTick-lastTick); tick++)
+                m_StatusText += "*";
+            lastTick = newTick;
 
             typename DiffusionImageType::PixelType signal = it1.Get();
             m_NoiseModel->AddNoise(signal);
@@ -308,9 +340,28 @@ void AddArtifactsToDwiImageFilter< TPixelType >
 
             ++it1;
         }
+        m_StatusText += "\n\n";
     }
 
     this->SetNthOutput(0, outputImage);
+    m_StatusText += "Finished simulation\n";
+    m_StatusText += "Simulation time: "+GetTime();
+}
+
+template< class TPixelType >
+std::string AddArtifactsToDwiImageFilter< TPixelType >::GetTime()
+{
+    unsigned long total = (double)(clock() - m_StartTime)/CLOCKS_PER_SEC;
+    unsigned long hours = total/3600;
+    unsigned long minutes = (total%3600)/60;
+    unsigned long seconds = total%60;
+    std::string out = "";
+    out.append(boost::lexical_cast<std::string>(hours));
+    out.append(":");
+    out.append(boost::lexical_cast<std::string>(minutes));
+    out.append(":");
+    out.append(boost::lexical_cast<std::string>(seconds));
+    return out;
 }
 
 }

@@ -60,6 +60,8 @@ mitkAddCustomModuleTest(mitkImageTest_3DImageData mitkImageTest
                         ${MITK_DATA_DIR}/Pic3D.nrrd
 )
 
+mitkAddCustomModuleTest(mitkImageEqualTest mitkImageEqualTest)
+
 mitkAddCustomModuleTest(mitkImageTest_brainImage mitkImageTest
                         ${MITK_DATA_DIR}/brain.mhd
 )

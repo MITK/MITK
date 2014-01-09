@@ -31,18 +31,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <fstream>
+#include <itksys/SystemTools.hxx>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-int TractometerAngularErrorTool(int argc, char* argv[])
+int LocalDirectionalFiberPlausibility(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", ctkCommandLineParser::String, "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
     parser.addArgument("reference", "r", ctkCommandLineParser::StringList, "reference direction images", us::Any(), false);
     parser.addArgument("out", "o", ctkCommandLineParser::String, "output root", us::Any(), false);
-    parser.addArgument("mask", "m", ctkCommandLineParser::String, "mask image");
+    parser.addArgument("mask", "m", ctkCommandLineParser::StringList, "mask images");
     parser.addArgument("athresh", "a", ctkCommandLineParser::Float, "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
     parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "output optional and intermediate calculation results");
     parser.addArgument("ignore", "n", ctkCommandLineParser::Bool, "don't increase error for missing or too many directions");
@@ -52,12 +53,11 @@ int TractometerAngularErrorTool(int argc, char* argv[])
         return EXIT_FAILURE;
 
     ctkCommandLineParser::StringContainerType referenceImages = us::any_cast<ctkCommandLineParser::StringContainerType>(parsedArgs["reference"]);
+    ctkCommandLineParser::StringContainerType maskImages;
+    if (parsedArgs.count("mask"))
+        maskImages = us::any_cast<ctkCommandLineParser::StringContainerType>(parsedArgs["mask"]);
 
     string fibFile = us::any_cast<string>(parsedArgs["input"]);
-
-    string maskImage("");
-    if (parsedArgs.count("mask"))
-        maskImage = us::any_cast<string>(parsedArgs["mask"]);
 
     float angularThreshold = 25;
     if (parsedArgs.count("athresh"))
@@ -103,26 +103,16 @@ int TractometerAngularErrorTool(int argc, char* argv[])
             catch(...){ MITK_INFO << "could not load: " << referenceImages.at(i); }
         }
 
-        // load/create mask image
         ItkUcharImgType::Pointer itkMaskImage = ItkUcharImgType::New();
-        if (maskImage.compare("")==0)
-        {
-            ItkDirectionImage3DType::Pointer dirImg = referenceImageContainer->GetElement(0);
-            itkMaskImage->SetSpacing( dirImg->GetSpacing() );
-            itkMaskImage->SetOrigin( dirImg->GetOrigin() );
-            itkMaskImage->SetDirection( dirImg->GetDirection() );
-            itkMaskImage->SetLargestPossibleRegion( dirImg->GetLargestPossibleRegion() );
-            itkMaskImage->SetBufferedRegion( dirImg->GetLargestPossibleRegion() );
-            itkMaskImage->SetRequestedRegion( dirImg->GetLargestPossibleRegion() );
-            itkMaskImage->Allocate();
-            itkMaskImage->FillBuffer(1);
-        }
-        else
-        {
-            mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(maskImage)->GetData());
-            mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, itkMaskImage);
-        }
-
+        ItkDirectionImage3DType::Pointer dirImg = referenceImageContainer->GetElement(0);
+        itkMaskImage->SetSpacing( dirImg->GetSpacing() );
+        itkMaskImage->SetOrigin( dirImg->GetOrigin() );
+        itkMaskImage->SetDirection( dirImg->GetDirection() );
+        itkMaskImage->SetLargestPossibleRegion( dirImg->GetLargestPossibleRegion() );
+        itkMaskImage->SetBufferedRegion( dirImg->GetLargestPossibleRegion() );
+        itkMaskImage->SetRequestedRegion( dirImg->GetLargestPossibleRegion() );
+        itkMaskImage->Allocate();
+        itkMaskImage->FillBuffer(1);
 
         // extract directions from fiber bundle
         itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
@@ -183,62 +173,111 @@ int TractometerAngularErrorTool(int argc, char* argv[])
             }
         }
 
-        // evaluate directions
-        EvaluationFilterType::Pointer evaluationFilter = EvaluationFilterType::New();
-        evaluationFilter->SetImageSet(directionImageContainer);
-        evaluationFilter->SetReferenceImageSet(referenceImageContainer);
-        evaluationFilter->SetMaskImage(itkMaskImage);
-        evaluationFilter->SetIgnoreMissingDirections(ignore);
-        evaluationFilter->Update();
-
-        if (verbose)
-        {
-            EvaluationFilterType::OutputImageType::Pointer angularErrorImage = evaluationFilter->GetOutput(0);
-            typedef itk::ImageFileWriter< EvaluationFilterType::OutputImageType > WriterType;
-            WriterType::Pointer writer = WriterType::New();
-
-            string outfilename = outRoot;
-            outfilename.append("_ERROR_IMAGE.nrrd");
-
-            MITK_INFO << "writing " << outfilename;
-            writer->SetFileName(outfilename.c_str());
-            writer->SetInput(angularErrorImage);
-            writer->Update();
-        }
-
         string logFile = outRoot;
         logFile.append("_ANGULAR_ERROR.csv");
-
         ofstream file;
         file.open (logFile.c_str());
 
-        string sens = "Mean:";
-        sens.append(",");
-        sens.append(boost::lexical_cast<string>(evaluationFilter->GetMeanAngularError()));
-        sens.append(";\n");
+        if (maskImages.size()>0)
+        {
+            for (int i=0; i<maskImages.size(); i++)
+            {
+                mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(maskImages.at(i))->GetData());
+                mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, itkMaskImage);
 
-        sens.append("Median:");
-        sens.append(",");
-        sens.append(boost::lexical_cast<string>(evaluationFilter->GetMedianAngularError()));
-        sens.append(";\n");
+                // evaluate directions
+                EvaluationFilterType::Pointer evaluationFilter = EvaluationFilterType::New();
+                evaluationFilter->SetImageSet(directionImageContainer);
+                evaluationFilter->SetReferenceImageSet(referenceImageContainer);
+                evaluationFilter->SetMaskImage(itkMaskImage);
+                evaluationFilter->SetIgnoreMissingDirections(ignore);
+                evaluationFilter->Update();
 
-        sens.append("Maximum:");
-        sens.append(",");
-        sens.append(boost::lexical_cast<string>(evaluationFilter->GetMaxAngularError()));
-        sens.append(";\n");
+                if (verbose)
+                {
+                    EvaluationFilterType::OutputImageType::Pointer angularErrorImage = evaluationFilter->GetOutput(0);
+                    typedef itk::ImageFileWriter< EvaluationFilterType::OutputImageType > WriterType;
+                    WriterType::Pointer writer = WriterType::New();
 
-        sens.append("Minimum:");
-        sens.append(",");
-        sens.append(boost::lexical_cast<string>(evaluationFilter->GetMinAngularError()));
-        sens.append(";\n");
+                    string outfilename = outRoot;
+                    outfilename.append("_ERROR_IMAGE.nrrd");
 
-        sens.append("STDEV:");
-        sens.append(",");
-        sens.append(boost::lexical_cast<string>(std::sqrt(evaluationFilter->GetVarAngularError())));
-        sens.append(";\n");
+                    MITK_INFO << "writing " << outfilename;
+                    writer->SetFileName(outfilename.c_str());
+                    writer->SetInput(angularErrorImage);
+                    writer->Update();
+                }
 
-        file << sens;
+                string sens = itksys::SystemTools::GetFilenameWithoutExtension(itksys::SystemTools::GetFilenameName(fibFile));
+                sens.append(",");
 
+                sens.append(itksys::SystemTools::GetFilenameWithoutExtension(itksys::SystemTools::GetFilenameName(maskImages.at(i))));
+                sens.append(",");
+
+                sens.append(boost::lexical_cast<string>(evaluationFilter->GetMeanAngularError()));
+                sens.append(",");
+
+                sens.append(boost::lexical_cast<string>(evaluationFilter->GetMedianAngularError()));
+                sens.append(",");
+
+                sens.append(boost::lexical_cast<string>(evaluationFilter->GetMaxAngularError()));
+                sens.append(",");
+
+                sens.append(boost::lexical_cast<string>(evaluationFilter->GetMinAngularError()));
+                sens.append(",");
+
+                sens.append(boost::lexical_cast<string>(std::sqrt(evaluationFilter->GetVarAngularError())));
+                sens.append(";\n");
+                file << sens;
+            }
+        }
+        else
+        {
+            // evaluate directions
+            EvaluationFilterType::Pointer evaluationFilter = EvaluationFilterType::New();
+            evaluationFilter->SetImageSet(directionImageContainer);
+            evaluationFilter->SetReferenceImageSet(referenceImageContainer);
+            evaluationFilter->SetMaskImage(itkMaskImage);
+            evaluationFilter->SetIgnoreMissingDirections(ignore);
+            evaluationFilter->Update();
+
+            if (verbose)
+            {
+                EvaluationFilterType::OutputImageType::Pointer angularErrorImage = evaluationFilter->GetOutput(0);
+                typedef itk::ImageFileWriter< EvaluationFilterType::OutputImageType > WriterType;
+                WriterType::Pointer writer = WriterType::New();
+
+                string outfilename = outRoot;
+                outfilename.append("_ERROR_IMAGE.nrrd");
+
+                MITK_INFO << "writing " << outfilename;
+                writer->SetFileName(outfilename.c_str());
+                writer->SetInput(angularErrorImage);
+                writer->Update();
+            }
+
+            string sens = itksys::SystemTools::GetFilenameWithoutExtension(itksys::SystemTools::GetFilenameName(fibFile));
+            sens.append(",");
+
+            sens.append("FULL");
+            sens.append(",");
+
+            sens.append(boost::lexical_cast<string>(evaluationFilter->GetMeanAngularError()));
+            sens.append(",");
+
+            sens.append(boost::lexical_cast<string>(evaluationFilter->GetMedianAngularError()));
+            sens.append(",");
+
+            sens.append(boost::lexical_cast<string>(evaluationFilter->GetMaxAngularError()));
+            sens.append(",");
+
+            sens.append(boost::lexical_cast<string>(evaluationFilter->GetMinAngularError()));
+            sens.append(",");
+
+            sens.append(boost::lexical_cast<string>(std::sqrt(evaluationFilter->GetVarAngularError())));
+            sens.append(";\n");
+            file << sens;
+        }
         file.close();
 
         MITK_INFO << "DONE";
@@ -260,4 +299,4 @@ int TractometerAngularErrorTool(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(TractometerAngularErrorTool);
+RegisterDiffusionMiniApp(LocalDirectionalFiberPlausibility);

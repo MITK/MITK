@@ -30,9 +30,10 @@ int StreamlineTracking(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input tensor image (.dti)", us::Any(), false);
-    parser.addArgument("seed", "si", ctkCommandLineParser::String, "binary seed image");
-    parser.addArgument("mask", "mi", ctkCommandLineParser::String, "binary mask image");
+    parser.addArgument("input", "i", ctkCommandLineParser::StringList, "input tensor image (.dti)", us::Any(), false);
+    parser.addArgument("seed", "si", ctkCommandLineParser::String, "binary seed image", us::Any(), true);
+    parser.addArgument("mask", "mi", ctkCommandLineParser::String, "binary mask image", us::Any(), true);
+    parser.addArgument("faImage", "fai", ctkCommandLineParser::String, "FA image", us::Any(), true);
     parser.addArgument("minFA", "fa", ctkCommandLineParser::Float, "minimum fractional anisotropy threshold", 0.15, true);
     parser.addArgument("minCurv", "c", ctkCommandLineParser::Float, "minimum curvature radius in mm (default = 0.5*minimum-spacing)");
     parser.addArgument("stepSize", "s", ctkCommandLineParser::Float, "stepsize in mm (default = 0.1*minimum-spacing)");
@@ -48,7 +49,8 @@ int StreamlineTracking(int argc, char* argv[])
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
-    string dtiFileName = us::any_cast<string>(parsedArgs["input"]);
+    ctkCommandLineParser::StringContainerType inputImages = us::any_cast<ctkCommandLineParser::StringContainerType>(parsedArgs["input"]);
+    string dtiFileName;
     string outFileName = us::any_cast<string>(parsedArgs["outFile"]);
 
     float minFA = 0.15;
@@ -86,15 +88,23 @@ int StreamlineTracking(int argc, char* argv[])
         RegisterDiffusionCoreObjectFactory();
         RegisterFiberTrackingObjectFactory();
 
-        // load input image
-        const std::string s1="", s2="";
-        std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( dtiFileName, s1, s2, false );
+        typedef itk::StreamlineTrackingFilter< float > FilterType;
+        FilterType::Pointer filter = FilterType::New();
 
-        MITK_INFO << "Loading tensor image ...";
+        MITK_INFO << "Loading tensor images ...";
         typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
-        mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(infile.at(0).GetPointer());
-        ItkTensorImage::Pointer itk_dti = ItkTensorImage::New();
-        mitk::CastToItkImage<ItkTensorImage>(mitkTensorImage, itk_dti);
+        dtiFileName = inputImages.at(0);
+        for (int i=0; i<inputImages.size(); i++)
+        {
+            try
+            {
+                mitk::TensorImage::Pointer img = dynamic_cast<mitk::TensorImage*>(mitk::IOUtil::LoadDataNode(inputImages.at(i))->GetData());
+                ItkTensorImage::Pointer itk_dti = ItkTensorImage::New();
+                mitk::CastToItkImage<ItkTensorImage>(img, itk_dti);
+                filter->SetInput(i, itk_dti);
+            }
+            catch(...){ MITK_INFO << "could not load: " << inputImages.at(i); }
+        }
 
         MITK_INFO << "Loading seed image ...";
         typedef itk::Image< unsigned char, 3 >    ItkUCharImageType;
@@ -108,9 +118,6 @@ int StreamlineTracking(int argc, char* argv[])
             mitkMaskImage = mitk::IOUtil::LoadImage(us::any_cast<string>(parsedArgs["mask"]));
 
         // instantiate tracker
-        typedef itk::StreamlineTrackingFilter< float > FilterType;
-        FilterType::Pointer filter = FilterType::New();
-        filter->SetInput(itk_dti);
         filter->SetSeedsPerVoxel(numSeeds);
         filter->SetFaThreshold(minFA);
         filter->SetMinCurvatureRadius(minCurv);

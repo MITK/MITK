@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundleX.h>
 #include <mitkDiffusionSignalModel.h>
 #include <mitkDiffusionNoiseModel.h>
-#include <mitkKspaceArtifact.h>
 
 // ITK
 #include <itkImage.h>
@@ -28,8 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageSource.h>
 #include <itkVnlForwardFFTImageFilter.h>
 #include <itkVnlInverseFFTImageFilter.h>
+#include <itkTimeProbe.h>
 
 #include <cmath>
+#include <ctime>
 
 
 namespace itk
@@ -55,7 +56,6 @@ public:
     typedef itk::Image<unsigned char, 3>                    ItkUcharImgType;
     typedef mitk::FiberBundleX::Pointer                     FiberBundleType;
     typedef itk::VectorImage< double, 3 >                   DoubleDwiType;
-    typedef std::vector< mitk::KspaceArtifact<double>* >    KspaceArtifactList;
     typedef std::vector< mitk::DiffusionSignalModel<double>* >    DiffusionModelList;
     typedef itk::Matrix<double, 3, 3>                       MatrixType;
     typedef mitk::DiffusionNoiseModel<double>               NoiseModelType;
@@ -83,7 +83,6 @@ public:
     void SetNoiseModel(NoiseModelType* noiseModel){ m_NoiseModel = noiseModel; }            ///< generates the noise added to the image values
     void SetFiberModels(DiffusionModelList modelList){ m_FiberModels = modelList; }         ///< generate signal of fiber compartments
     void SetNonFiberModels(DiffusionModelList modelList){ m_NonFiberModels = modelList; }   ///< generate signal of non-fiber compartments
-    void SetKspaceArtifacts(KspaceArtifactList artifactList){ m_KspaceArtifacts = artifactList; }
     mitk::LevelWindow GetLevelWindow(){ return m_LevelWindow; }
     itkSetMacro( FrequencyMap, ItkDoubleImgType::Pointer )
     itkSetMacro( kOffset, double )
@@ -98,6 +97,11 @@ public:
     itkSetMacro( Spikes, int )
     itkSetMacro( SpikeAmplitude, double )
     itkSetMacro( Wrap, double )
+    itkSetMacro( MaxTranslation, VectorType )
+    itkSetMacro( MaxRotation, VectorType )
+    itkSetMacro( AddMotionArtifact, bool )
+    itkSetMacro( RandomMotion, bool )
+    itkGetMacro( StatusText, std::string )
 
     // output
     std::vector< ItkDoubleImgType::Pointer > GetVolumeFractions(){ return m_VolumeFractions; }
@@ -112,16 +116,15 @@ protected:
     itk::Vector<double, 3> GetItkVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(Vector< float, 3 >& vector);
+    std::string GetTime();
 
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using FFT and add k-space artifacts. */
     DoubleDwiType::Pointer DoKspaceStuff(std::vector< DoubleDwiType::Pointer >& images);
 
-//    /** Rearrange FFT output to shift low frequencies to the iamge center (correct itk). */
-//    TractsToDWIImageFilter::ComplexSliceType::Pointer RearrangeSlice(ComplexSliceType::Pointer slice);
-
     itk::Vector<double,3>               m_Spacing;              ///< output image spacing
     itk::Vector<double,3>               m_UpsampledSpacing;
     itk::Point<double,3>                m_Origin;               ///< output image origin
+    itk::Point<double,3>                m_UpsampledOrigin;
     MatrixType                          m_DirectionMatrix;      ///< output image rotation
     ImageRegion<3>                      m_ImageRegion;          ///< output image size
     ImageRegion<3>                      m_UpsampledImageRegion;
@@ -134,7 +137,6 @@ protected:
     FiberBundleType                     m_FiberBundle;          ///< input fiber bundle
     DiffusionModelList                  m_FiberModels;          ///< generate signal of fiber compartments
     DiffusionModelList                  m_NonFiberModels;       ///< generate signal of non-fiber compartments
-    KspaceArtifactList                  m_KspaceArtifacts;
     NoiseModelType*                     m_NoiseModel;           ///< generates the noise added to the image values
     bool                                m_CircleDummy;
     unsigned int                        m_VolumeAccuracy;
@@ -153,6 +155,13 @@ protected:
     int                                 m_Spikes;
     double                              m_SpikeAmplitude;
     double                              m_Wrap;
+    VectorType                          m_MaxTranslation;
+    VectorType                          m_MaxRotation;
+    bool                                m_AddMotionArtifact;
+    bool                                m_RandomMotion;
+    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
+    std::string                         m_StatusText;
+    time_t                              m_StartTime;
 };
 }
 

@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTensorImage.h>
 
 #include <mitkDiffusionCoreObjectFactory.h>
-#include <mitkCoreExtObjectFactory.h>
 #include <mitkCoreObjectFactory.h>
 #include "ctkCommandLineParser.h"
 #include <mitkFiberBundleXWriter.h>
@@ -57,7 +56,7 @@ mitk::Image::Pointer LoadData(std::string filename)
 
 
 template<int shOrder>
-int Start(int argc, char* argv[])
+int StartPeakExtraction(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
@@ -364,15 +363,15 @@ int PeakExtraction(int argc, char* argv[])
     switch (shOrder)
     {
     case 4:
-        return Start<4>(argc, argv);
+        return StartPeakExtraction<4>(argc, argv);
     case 6:
-        return Start<6>(argc, argv);
+        return StartPeakExtraction<6>(argc, argv);
     case 8:
-        return Start<8>(argc, argv);
+        return StartPeakExtraction<8>(argc, argv);
     case 10:
-        return Start<10>(argc, argv);
+        return StartPeakExtraction<10>(argc, argv);
     case 12:
-        return Start<12>(argc, argv);
+        return StartPeakExtraction<12>(argc, argv);
     }
     return EXIT_FAILURE;
 }

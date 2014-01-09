@@ -213,6 +213,9 @@ void QmitkOdfMaximaExtractionView::ConvertShCoeffs()
 
     switch (shOrder)
     {
+    case 2:
+        TemplatedConvertShCoeffs<2>(mitkImg);
+        break;
     case 4:
         TemplatedConvertShCoeffs<4>(mitkImg);
         break;

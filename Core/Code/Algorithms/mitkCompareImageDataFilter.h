@@ -98,6 +98,8 @@ public:
     return m_CompareDetails;
   }
 
+  void SetTolerance(double eps){ m_Tolerance=eps; }
+
 protected:
   CompareImageDataFilter();
   virtual ~CompareImageDataFilter() {}
@@ -114,6 +116,7 @@ protected:
   bool m_CompareResult;
 
   CompareFilterResults m_CompareDetails;
+  double m_Tolerance;
 };
 } // end namespace mitk
 

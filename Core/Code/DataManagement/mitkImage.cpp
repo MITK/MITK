@@ -1367,6 +1367,7 @@ bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSi
     mitk::CompareImageDataFilter::Pointer compareFilter = mitk::CompareImageDataFilter::New();
     compareFilter->SetInput(0, rightHandSide);
     compareFilter->SetInput(1, leftHandSide);
+    compareFilter->SetTolerance(eps);
     compareFilter->Update();
 
     if(( !compareFilter->GetResult() ) )
@@ -1375,8 +1376,8 @@ bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSi
       if(verbose)
       {
         MITK_INFO << "[(Image)] Pixel values differ: ";
+        compareFilter->GetCompareResults().PrintSelf();
       }
-      compareFilter->GetCompareResults().PrintSelf();
     }
   }
   return returnValue;

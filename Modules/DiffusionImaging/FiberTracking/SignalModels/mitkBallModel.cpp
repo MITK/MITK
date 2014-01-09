@@ -31,6 +31,25 @@ BallModel< ScalarType >::~BallModel()
 }
 
 template< class ScalarType >
+ScalarType BallModel< ScalarType >::SimulateMeasurement(int dir)
+{
+    ScalarType signal = 0;
+
+    if (dir>=this->m_GradientList.size())
+        return signal;
+
+    GradientType g = this->m_GradientList[dir];
+    ScalarType bVal = g.GetNorm(); bVal *= bVal;
+
+    if (bVal>0.0001)
+        signal = exp( -m_BValue * bVal * m_Diffusivity );
+    else
+        signal = 1;
+
+    return signal;
+}
+
+template< class ScalarType >
 typename BallModel< ScalarType >::PixelType BallModel< ScalarType >::SimulateMeasurement()
 {
     PixelType signal;

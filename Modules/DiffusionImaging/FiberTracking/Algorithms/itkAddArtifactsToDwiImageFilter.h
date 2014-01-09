@@ -67,12 +67,14 @@ namespace itk{
     itkSetMacro( Spikes, int )
     itkSetMacro( SpikeAmplitude, double )
     itkSetMacro( Wrap, double )
+    itkGetMacro( StatusText, std::string )
 
   protected:
     AddArtifactsToDwiImageFilter();
     ~AddArtifactsToDwiImageFilter() {}
 
     typename ComplexSliceType::Pointer RearrangeSlice(typename ComplexSliceType::Pointer slice);
+    std::string GetTime();
 
     void GenerateData();
 
@@ -88,6 +90,8 @@ namespace itk{
     int                                 m_Spikes;
     double                              m_SpikeAmplitude;
     double                              m_Wrap;
+    std::string                         m_StatusText;
+    time_t                              m_StartTime;
 
   private:
 

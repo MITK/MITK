@@ -25,10 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 //includes storing fiberdata
-#include <vtkSmartPointer.h> //may be replaced by class precompile argument
-#include <vtkPolyData.h> // may be replaced by class
-#include <vtkPoints.h> // my be replaced by class
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
+#include <vtkPoints.h>
 #include <vtkDataSet.h>
+#include <vtkTransform.h>
 
 //#include <QStringList>
 
@@ -81,6 +82,9 @@ public:
     void RotateAroundAxis(double x, double y, double z);
     void TranslateFibers(double x, double y, double z);
     void ScaleFibers(double x, double y, double z);
+    void TransformFibers(double rx, double ry, double rz, double tx, double ty, double tz);
+    itk::Point<float, 3> TransformPoint(vnl_vector_fixed< double, 3 > point, double rx, double ry, double rz, double tx, double ty, double tz);
+    itk::Matrix< double, 3, 3 > TransformMatrix(itk::Matrix< double, 3, 3 > m, double rx, double ry, double rz);
 
     // add/subtract fibers
     FiberBundleX::Pointer AddBundle(FiberBundleX* fib);

@@ -142,7 +142,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
         m_FiberBundle = m_FiberBundle->GetDeepCopy();
 
     // resample fiber bundle for sufficient voxel coverage
-    m_FiberBundle->ResampleFibers(minSpacing/10);
+    m_FiberBundle->ResampleFibers(minSpacing/3);
 
     // iterate over all fibers
     vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
@@ -535,11 +535,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
             center[2] = index[2];
             itk::Point<float> worldCenter;
             m_MaskImage->TransformContinuousIndexToPhysicalPoint( center, worldCenter );
-
-            // workaround *********************************************
-            //DirectionType dir = m_MaskImage->GetDirection()*directions.at(i);
             DirectionType dir = directions.at(i);
-            // workaround *********************************************
 
             // set direction image pixel
             ItkDirectionImageType::Pointer directionImage = m_DirectionImageContainer->GetElement(i);

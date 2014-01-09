@@ -496,7 +496,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         gdcm::Scanner::ValuesType::const_iterator it;
 
         const gdcm::Scanner::ValuesType &values3 = s.GetValues(t3);
-        const gdcm::Scanner::ValuesType &values4 = s.GetValues(t4);;
+        const gdcm::Scanner::ValuesType &values4 = s.GetValues(t4);
         unsigned int nAcquis = values3.size();
 
         if(nAcquis > 1) // More than one element must have this tag (Not != )
@@ -510,13 +510,16 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           subsorter.SetSortFunction( SortBySeqName );
           it = values4.begin();
         }
+
         // Hotfix for Bug 14758, better fix by selecting always availible tags.
-        else
+        if( nAcquis == 0 || values4.size() == 0)
         {
-          Error("Sorting tags (0x0020,0x0012) and (0x0018,0x0024) missing, ABORTING");
-          if(m_OutputFolderNameSet) logfile << "Sorting tags (0x0020,0x0012) and (0x0018,0x0024) missing, ABORTING\n";
+          std::string err_msg = "Sorting tag (0x0020,0x0012) [Acquisition ID] or (0x0018,0x0024) [Sequence Name] missing, ABORTING";
+          Error(err_msg);
+          if(m_OutputFolderNameSet) logfile << err_msg << "\n";
           continue;
         }
+
         nTotalAcquis += nAcquis;
         subsorter.Sort( sub );
 

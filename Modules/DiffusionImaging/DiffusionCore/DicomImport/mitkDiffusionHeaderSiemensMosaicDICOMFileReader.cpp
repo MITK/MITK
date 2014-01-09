@@ -28,14 +28,16 @@ bool mitk::DiffusionHeaderSiemensMosaicDICOMFileReader
   std::string siemens_diffusionheader_str;
   if( RevealBinaryTag( t_sie_diffusion, dataset, siemens_diffusionheader_str ) )
   {
-    mitk::DiffusionImageDICOMHeaderInformation header_values;
+    mitk::DiffusionImageMosaicDICOMHeaderInformation header_values;
 
     this->ExtractSiemensDiffusionTagInformation( siemens_diffusionheader_str, header_values );
+
+    //MITK_INFO << siemens_diffusionheader_str;
 
     SiemensDiffusionHeaderType hformat = GetHeaderType( siemens_diffusionheader_str );
     Siemens_Header_Format specs = this->m_SiemensFormatsCollection.at( hformat );
 
-
+    double n_images = 0;
     std::string::size_type tag_position = siemens_diffusionheader_str.find( "NumberOfImagesInMosaic", 0 );
     if( tag_position != std::string::npos )
     {
@@ -45,11 +47,7 @@ bool mitk::DiffusionHeaderSiemensMosaicDICOMFileReader
                         specs
                         );
 
-      MITK_DEBUG << "Mosaic";
-      for( unsigned int i=0; i<value_array.size(); i++)
-      {
-        MITK_DEBUG << value_array.at(i);
-      }
+      header_values.n_images = value_array[0];
     }
 
     tag_position = siemens_diffusionheader_str.find("SliceNormalVector", 0);
@@ -65,6 +63,11 @@ bool mitk::DiffusionHeaderSiemensMosaicDICOMFileReader
       for( unsigned int i=0; i<value_array.size(); i++)
       {
         MITK_DEBUG << value_array.at(i);
+      }
+
+      if( value_array.size() > 2 )
+      {
+        header_values.slicenormalup = (value_array[2] > 0);
       }
 
     }

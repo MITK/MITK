@@ -22,22 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPiecewiseFunction.h>
 #include <mitkColormapProperty.h>
 
-#include "Spectrum.h"
-#include "VRMusclesBones.h"
-#include "VRRedVessels.h"
-#include "VRBones.h"
-#include "Stern.h"
-#include "BlackBody.h"
-#include "HotGreen.h"
-#include "HotMetal.h"
 #include "HotIron.h"
-#include "GrayRainbow.h"
-#include "Cardiac.h"
 #include "PETColor.h"
-#include "Flow.h"
-#include "LONI.h"
-#include "LONI2.h"
-#include "Asymmetry.h"
+#include "PET20.h"
 
 mitk::LookupTable::LookupTable():
 m_Window(0.0),
@@ -70,65 +57,14 @@ void mitk::LookupTable::SetActiveColormap(int index)
     case (mitk::ColormapProperty::CM_BWINVERSE):
         this->BuildInverseGrayScaleLookupTable();
         break;
-    case (mitk::ColormapProperty::CM_REDBLACKALPHA):
-        this->BuildRedBlackAlphaLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_GREENBLACKALPHA):
-        this->BuildGreenBlackAlphaLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_BLUEBLACKALPHA):
-        this->BuildBlueBlackAlphaLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_VRMUSCLESBONES):
-        this->BuildVRMusclesBonesLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_VRREDVESSELS):
-        this->BuildVRRedVesselsLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_STERN):
-        this->BuildSternLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_HOTGREEN):
-        this->BuildHotGreenLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_VRBONES):
-        this->BuildVRBonesLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_CARDIAC):
-        this->BuildCardiacLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_GRAYRAINBOW):
-        this->BuildGrayRainbowLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_RAINBOW):
-        this->BuildRainbowLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_HOTMETAL):
-        this->BuildHotMetalLookupTable();
-        break;
     case (mitk::ColormapProperty::CM_HOTIRON):
         this->BuildHotIronLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_SPECTRUM):
-        this->BuildSpectrumLookupTable();
         break;
     case (mitk::ColormapProperty::CM_PETCOLOR):
         this->BuildPETColorLookupTable();
         break;
-    case (mitk::ColormapProperty::CM_FLOW):
-        this->BuildFlowLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_LONI):
-        this->BuildLONILookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_LONI2):
-        this->BuildLONI2LookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_ASYMMETRY):
-        this->BuildAsymmetryLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_PVALUE):
-        this->BuildPValueLookupTable();
+    case (mitk::ColormapProperty::CM_PET20):
+        this->BuildPET20LookupTable();
         break;
     case (mitk::ColormapProperty::CM_MULTILABEL):
         this->BuildMultiLabelLookupTable();
@@ -446,176 +382,6 @@ void mitk::LookupTable::BuildInverseGrayScaleLookupTable()
   this->Modified();
 }
 
-void mitk::LookupTable::BuildCardiacLookupTable()
-{
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(256);
-  lut->Build();
-
-  for( int i=0; i<256; i++)
-  {
-    lut->SetTableValue(i, (double)Cardiac[i]/255.0, (double)Cardiac[256+i]/255.0, (double)Cardiac[256*2+i]/255.0, /*(double)(i)/255.0*/ log (1.0+(double)(i)/255.0*9.0)/log (10.0) );
-  }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-void mitk::LookupTable::BuildHotGreenLookupTable()
-{
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(256);
-  lut->Build();
-
-  for( int i=0; i<256; i++)
-  {
-    lut->SetTableValue(i, (double)HotGreen[i]/255.0, (double)HotGreen[256+i]/255.0, (double)HotGreen[256*2+i]/255.0, /*(double)(i)/255.0*/ log (1.0+(double)(i)/255.0*9.0)/log (10.0) );
-  }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-void mitk::LookupTable::BuildRedBlackAlphaLookupTable()
-{
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(256);
-  lut->Build();
-
-  lut->SetTableValue(0,0,0,0,0);
-
-  for( int i=1; i<256; i++)
-  {
-    lut->SetTableValue(i, i/255.0, 0.0, 0.0, (i/255.0*68.0 + 187)/255.0);
-  }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-void mitk::LookupTable::BuildGreenBlackAlphaLookupTable()
-{
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(256);
-  lut->Build();
-
-  lut->SetTableValue(0,0,0,0,0);
-
-  for( int i=1; i<256; i++)
-  {
-    lut->SetTableValue(i, 0.0, i/255.0, 0.0, (i/255.0*68.0 + 187)/255.0);
-  }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-void mitk::LookupTable::BuildBlueBlackAlphaLookupTable()
-{
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(256);
-  lut->Build();
-
-  lut->SetTableValue(0,0,0,0,0);
-
-  for( int i=1; i<256; i++)
-  {
-    lut->SetTableValue(i, 0.0, 0.0, i/255.0, (i/255.0*68.0 + 187)/255.0);
-  }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-void mitk::LookupTable::BuildVRMusclesBonesLookupTable()
-{
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(256);
-  lut->Build();
-
-  for( int i=0; i<256; i++)
-  {
-    lut->SetTableValue(i, (double)VRMusclesBones[i]/255.0, (double)VRMusclesBones[256+i]/255.0, (double)VRMusclesBones[256*2+i]/255.0, /*(double)(i)/255.0*/ log (1.0+(double)(i)/255.0*9.0)/log (10.0) );
-  }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-void mitk::LookupTable::BuildSternLookupTable()
-{
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(256);
-  lut->Build();
-
-  for( int i=0; i<256; i++)
-  {
-    lut->SetTableValue(i, (double)Stern[i]/255.0, (double)Stern[256+i]/255.0, (double)Stern[256*2+i]/255.0, /*(double)(i)/255.0*/ log (1.0+(double)(i)/255.0*9.0)/log (10.0) );
-  }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-void mitk::LookupTable::BuildVRRedVesselsLookupTable()
-{
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(256);
-  lut->Build();
-
-  for( int i=0; i<256; i++)
-  {
-    lut->SetTableValue(i, (double)VRRedVessels[i]/255.0, (double)VRRedVessels[256+i]/255.0, (double)VRRedVessels[256*2+i]/255.0, /*(double)(i)/255.0*/ log (1.0+(double)(i)/255.0*9.0)/log (10.0) );
-  }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-void mitk::LookupTable::BuildGrayRainbowLookupTable()
-{
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(256);
-  lut->Build();
-
-  for( int i=0; i<256; i++)
-  {
-    lut->SetTableValue(i, (double)GrayRainbow[i]/255.0, (double)GrayRainbow[256+i]/255.0, (double)GrayRainbow[256*2+i]/255.0, /*(double)(i)/255.0*/ log (1.0+(double)(i)/255.0*9.0)/log (10.0) );
-  }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-
-void mitk::LookupTable::BuildRainbowLookupTable()
-{
-  // add a default rainbow lookup table for color mapping
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(256);
-  lut->SetHueRange(0.6667, 0.0);
-  lut->SetTableRange(0.0, 20.0);
-  lut->Build();
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-void mitk::LookupTable::BuildSpectrumLookupTable()
-{
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(256);
-  lut->Build();
-
-  for( int i=0; i<256; i++)
-  {
-      lut->SetTableValue(i, (double)Spectrum[i]/255.0, (double)Spectrum[256+i]/255.0, (double)Spectrum[256*2+i]/255.0, (double)(i)/255.0 );
-  }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
 void mitk::LookupTable::BuildHotIronLookupTable()
 {
   vtkLookupTable* lut = vtkLookupTable::New();
@@ -624,43 +390,7 @@ void mitk::LookupTable::BuildHotIronLookupTable()
 
   for( int i=0; i<256; i++)
   {
-    lut->SetTableValue(i, (double)HotIron[i][0]/255.0, (double)HotIron[i][1]/255.0, (double)HotIron[i][2]/255.0, /*(double)(i)/255.0*/ log (1.0+(double)(i)/255.0*9.0)/log (10.0) );
-  }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-void mitk::LookupTable::BuildVRBonesLookupTable()
-{
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(256);
-  lut->Build();
-
-  for( int i=0; i<256; i++)
-  {
-    lut->SetTableValue(i, (double)VRBones[i]/255.0, (double)VRBones[256+i]/255.0, (double)VRBones[256*2+i]/255.0, /*(double)(i)/255.0*/ log (1.0+(double)(i)/255.0*9.0)/log (10.0) );
-  }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-void mitk::LookupTable::BuildHotMetalLookupTable()
-{
-//convert RGB to HSV
-  double saturation = 0.0;
-
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(256);
-  lut->SetTableRange ( (m_Level - m_Window/2.0), (m_Level + m_Window/2.0) );
-  lut->SetSaturationRange (saturation, saturation);
-  lut->SetAlphaRange (m_Opacity, m_Opacity);
-  lut->Build();
-
-  for( int i=0; i<256; i++)
-  {
-    lut->SetTableValue(i, (double)HotMetal[i]/255.0, (double)HotMetal[256+i]/255.0, (double)HotMetal[256*2+i]/255.0, 1.0);
+    lut->SetTableValue(i, (double)HotIron[i][0]/255.0, (double)HotIron[i][1]/255.0, (double)HotIron[i][2]/255.0, 1.0);
   }
 
   m_LookupTable = lut;
@@ -683,7 +413,7 @@ void mitk::LookupTable::BuildPETColorLookupTable()
   this->Modified();
 }
 
-void mitk::LookupTable::BuildFlowLookupTable()
+void mitk::LookupTable::BuildPET20LookupTable()
 {
   vtkLookupTable* lut = vtkLookupTable::New();
   lut->SetNumberOfTableValues(256);
@@ -692,71 +422,8 @@ void mitk::LookupTable::BuildFlowLookupTable()
 
   for( int i=0; i<256; i++)
   {
-      lut->SetTableValue(i, (double)Flow[i]/255.0, (double)Flow[256+i]/255.0, (double)Flow[256*2+i]/255.0, 1.0);
+      lut->SetTableValue(i, (double)PET20[i][0]/255.0, (double)PET20[i][1]/255.0, (double)PET20[i][2]/255.0, 1.0);
   }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-void mitk::LookupTable::BuildLONILookupTable()
-{
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(203);
-  lut->SetTableRange ( (m_Level - m_Window/2.0), (m_Level + m_Window/2.0) );
-  lut->Build();
-
-  for( int i=0; i<203; i++)
-  {
-    lut->SetTableValue(i, (double)LONI[i][0], (double)LONI[i][1], (double)LONI[i][2], 1.0);
-  }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-void mitk::LookupTable::BuildLONI2LookupTable()
-{
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(120);
-  lut->SetTableRange ( (m_Level - m_Window/2.0), (m_Level + m_Window/2.0) );
-  lut->Build();
-
-  for( int i=0; i<120; i++)
-  {
-    lut->SetTableValue(i, (double)LONI2[i][0], (double)LONI2[i][1], (double)LONI2[i][2], 1.0);
-  }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-void mitk::LookupTable::BuildAsymmetryLookupTable()
-{
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetNumberOfTableValues(256);
-  lut->SetTableRange ( (m_Level - m_Window/2.0), (m_Level + m_Window/2.0) );
-  lut->Build();
-
-  for( int i=0; i<256; i++)
-  {
-    lut->SetTableValue(i, (double)AsymmetryLUT[i][0], (double)AsymmetryLUT[i][1], (double)AsymmetryLUT[i][2], 1.0);
-  }
-
-  m_LookupTable = lut;
-  this->Modified();
-}
-
-void mitk::LookupTable::BuildPValueLookupTable()
-{
-  vtkLookupTable* lut = vtkLookupTable::New();
-  lut->SetTableRange ( (m_Level - m_Window/2.0), (m_Level + m_Window/2.0) );
-//  lut->SetTableRange (0, 1);
-  lut->SetSaturationRange (1.0, 1.5);
-  lut->SetHueRange (0.666, 0.8333);
-  //lut->SetHueRange (0.666, 0.0);
-  lut->SetValueRange (0.5, 1.0);
-  lut->Build();
 
   m_LookupTable = lut;
   this->Modified();

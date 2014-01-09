@@ -64,26 +64,9 @@ void mitk::ColormapProperty::AddEnumerationTypes()
 
   AddEnum( "Grayscale", newId++ );
   AddEnum( "Inverse Grayscale", newId++ );
-  AddEnum( "Red - Black - Alpha", newId++ );
-  AddEnum( "Green - Black- Alpha", newId++ );
-  AddEnum( "Blue - Black - Alpha", newId++ );
-  AddEnum( "Muscles - Bones", newId++ );
-  AddEnum( "Red Vessels", newId++ );
-  AddEnum( "Stern", newId++ );
-  AddEnum( "Hot Green", newId++ );
-  AddEnum( "Bones", newId++ );
-  AddEnum( "Cardiac", newId++ );
-  AddEnum( "Gray Rainbow", newId++ );
-  AddEnum( "Rainbow", newId++ );
-  AddEnum( "Hot Metal", newId++ );
   AddEnum( "Hot Iron", newId++ );
-  AddEnum( "Spectrum", newId++ );
   AddEnum( "PET Color", newId++ );
-  AddEnum( "Flow", newId++ );
-  AddEnum( "Loni", newId++ );
-  AddEnum( "Loni2", newId++ );
-  AddEnum( "Asymmetry", newId++ );
-  AddEnum( "p-value", newId++ );
+  AddEnum( "PET 20", newId++ );
   AddEnum( "Multi-Label", newId++ );
   AddEnum( "Legacy-Binary", newId++ );
 }

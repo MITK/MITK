@@ -143,26 +143,9 @@ protected:
     virtual void BuildGrayScaleLookupTable();
     virtual void BuildLegacyBinaryLookupTable();
     virtual void BuildInverseGrayScaleLookupTable();
-    virtual void BuildRedBlackAlphaLookupTable();
-    virtual void BuildGreenBlackAlphaLookupTable();
-    virtual void BuildBlueBlackAlphaLookupTable();
-    virtual void BuildVRMusclesBonesLookupTable();
-    virtual void BuildVRRedVesselsLookupTable();
-    virtual void BuildSternLookupTable();
-    virtual void BuildHotGreenLookupTable();
-    virtual void BuildVRBonesLookupTable();
-    virtual void BuildCardiacLookupTable();
-    virtual void BuildGrayRainbowLookupTable();
-    virtual void BuildRainbowLookupTable();
-    virtual void BuildHotMetalLookupTable();
     virtual void BuildHotIronLookupTable();
-    virtual void BuildSpectrumLookupTable();
     virtual void BuildPETColorLookupTable();
-    virtual void BuildFlowLookupTable();
-    virtual void BuildLONILookupTable();
-    virtual void BuildLONI2LookupTable();
-    virtual void BuildAsymmetryLookupTable();
-    virtual void BuildPValueLookupTable();
+    virtual void BuildPET20LookupTable();
     virtual void BuildMultiLabelLookupTable();
 
     vtkSmartPointer<vtkLookupTable> m_LookupTable;

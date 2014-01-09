@@ -109,10 +109,29 @@ bool mitk::DiffusionDICOMFileReader
     directions->push_back( header.g_vector );
   }
 
+  bool is_mosaic_file = false;
+  // FIXME : criterion for testing MOSAIC
+ /* {
+    is_mosaic_file = true;
+  }*/
+
   // initialize the output image
   output_image->SetDirections( directions );
   output_image->SetB_Value( max_bvalue );
-  output_image->SetVectorImage( helper.LoadToVector<short, 3>( filenames ) );
+  if( is_mosaic_file )
+  {
+
+    mitk::MosaicDescriptor mdesc;
+    // FIXME : will come from the header information
+    mdesc.nimages = 50;
+
+    output_image->SetVectorImage( helper.LoadMosaicToVector<short, 3>( filenames, mdesc ) );
+
+  }
+  else
+  {
+    output_image->SetVectorImage( helper.LoadToVector<short, 3>( filenames ) );
+  }
   output_image->InitializeFromVectorImage();
   output_image->UpdateBValueMap();
 

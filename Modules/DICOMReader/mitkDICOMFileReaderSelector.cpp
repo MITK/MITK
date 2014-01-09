@@ -46,16 +46,16 @@ void
 mitk::DICOMFileReaderSelector
 ::AddConfigsFromResources(const std::string& path)
 {
-  std::vector<ModuleResource> configs = GetModuleContext()->GetModule()->FindResources(path, "*.xml", false);
+  std::vector<us::ModuleResource> configs = us::GetModuleContext()->GetModule()->FindResources(path, "*.xml", false);
 
-  for (std::vector<ModuleResource>::iterator iter = configs.begin();
+  for (std::vector<us::ModuleResource>::iterator iter = configs.begin();
        iter != configs.end();
        ++iter)
   {
-    ModuleResource& resource = *iter;
+    us::ModuleResource& resource = *iter;
     if (resource.IsValid())
     {
-      ModuleResourceStream stream(resource);
+      us::ModuleResourceStream stream(resource);
 
       // read all into string s
       std::string s;
@@ -74,11 +74,11 @@ mitk::DICOMFileReaderSelector
 
 void
 mitk::DICOMFileReaderSelector
-::AddConfigFromResource(ModuleResource& resource)
+::AddConfigFromResource(us::ModuleResource& resource)
 {
   if (resource.IsValid())
   {
-    ModuleResourceStream stream(resource);
+    us::ModuleResourceStream stream(resource);
 
     // read all into string s
     std::string s;
@@ -98,7 +98,7 @@ void
 mitk::DICOMFileReaderSelector
 ::AddConfigFromResource(const std::string& resourcename)
 {
-  ModuleResource r = GetModuleContext()->GetModule()->GetResource(resourcename);
+  us::ModuleResource r = us::GetModuleContext()->GetModule()->GetResource(resourcename);
   this->AddConfigFromResource(r);
 }
 

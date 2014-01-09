@@ -65,7 +65,7 @@ int mitkPeakExtractionTest(int argc, char* argv[])
 
         typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
         typedef itk::FiniteDiffOdfMaximaExtractionFilter< float, 4, 20242 > MaximaExtractionFilterType;
-        typename MaximaExtractionFilterType::Pointer filter = MaximaExtractionFilterType::New();
+        MaximaExtractionFilterType::Pointer filter = MaximaExtractionFilterType::New();
 
         MITK_INFO << "Casting mask image ...";
         ItkUcharImgType::Pointer itkMask = ItkUcharImgType::New();
@@ -73,8 +73,8 @@ int mitkPeakExtractionTest(int argc, char* argv[])
         filter->SetMaskImage(itkMask);
 
         MITK_INFO << "Casting SH image ...";
-        typedef mitk::ImageToItk< typename MaximaExtractionFilterType::CoefficientImageType > CasterType;
-        typename CasterType::Pointer caster = CasterType::New();
+        typedef mitk::ImageToItk< MaximaExtractionFilterType::CoefficientImageType > CasterType;
+        CasterType::Pointer caster = CasterType::New();
         caster->SetInput(image);
         caster->Update();
         filter->SetInput(caster->GetOutput());

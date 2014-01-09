@@ -70,15 +70,15 @@ void gen_random(char *s, const int len)
 
 std::string gen_random(const int len)
 {
-  if (len < 1)
+  if (len > 0 && len < 100)
   {
-    return std::string("");
+    char retval[100];
+    gen_random(retval, len);
+    return std::string(retval);
   }
   else
   {
-    char retval[len];
-    gen_random(retval, len);
-    return std::string(retval);
+    return std::string("");
   }
 }
 

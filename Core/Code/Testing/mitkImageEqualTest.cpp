@@ -100,6 +100,15 @@ static void Equal_DifferentPixelValues_ReturnsFalse()
   MITK_TEST_NOT_EQUAL( m_Image, m_AnotherImage, "We compare two random images. Result should be false.");
 }
 
+static void Equal_EpsilonDifference_ReturnsTrue()
+{
+  m_Image = mitk::ImageGenerator::GenerateRandomImage<double>(10, 10);
+  m_AnotherImage = m_Image->Clone();
+
+  MITK_TEST_CONDITION_REQUIRED(!mitk::Equal(m_Image, m_AnotherImage, 0, false), "Epsilon = 0.0 --> double images should not be regarded as equal");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_Image, m_AnotherImage, 0.001, false), "Epsilon = 0.001 --> double images should be regarded as equal");
+}
+
 /**
  * @brief mitkImageAreEqualTest A test class for Equal methods in mitk::Image.
  */
@@ -114,6 +123,7 @@ int mitkImageEqualTest(int /*argc*/, char* /*argv*/[])
   Equal_DifferentDimensions_ReturnsFalse();
   Equal_DifferentDimensionalities_ReturnsFalse();
   Equal_DifferentPixelValues_ReturnsFalse();
+  Equal_EpsilonDifference_ReturnsTrue();
 
   MITK_TEST_END();
 }

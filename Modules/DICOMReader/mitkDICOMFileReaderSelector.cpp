@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMFileReaderSelector.h"
 #include "mitkDICOMReaderConfigurator.h"
 
-#include "mitkModuleContext.h"
+#include <usModuleContext.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleResource.h>
@@ -38,16 +38,16 @@ void
 mitk::DICOMFileReaderSelector
 ::AddConfigsFromResources(const std::string& path)
 {
-  std::vector<ModuleResource> configs = GetModuleContext()->GetModule()->FindResources(path, "*.xml", false);
+  std::vector<us::ModuleResource> configs = us::GetModuleContext()->GetModule()->FindResources(path, "*.xml", false);
 
-  for (std::vector<ModuleResource>::iterator iter = configs.begin();
+  for (std::vector<us::ModuleResource>::iterator iter = configs.begin();
        iter != configs.end();
        ++iter)
   {
-    ModuleResource& resource = *iter;
+    us::ModuleResource& resource = *iter;
     if (resource.IsValid())
     {
-      ModuleResourceStream stream(resource);
+      us::ModuleResourceStream stream(resource);
 
       // read all into string s
       std::string s;

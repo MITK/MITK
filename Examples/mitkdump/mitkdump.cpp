@@ -70,9 +70,16 @@ void gen_random(char *s, const int len)
 
 std::string gen_random(const int len)
 {
-  char retval[len];
-  gen_random(retval, len);
-  return std::string(retval);
+  if (len < 1)
+  {
+    return std::string("");
+  }
+  else
+  {
+    char retval[len];
+    gen_random(retval, len);
+    return std::string(retval);
+  }
 }
 
 std::string removeUnsafeChars(const std::string& str)

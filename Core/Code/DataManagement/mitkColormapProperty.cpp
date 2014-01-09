@@ -78,7 +78,7 @@ void mitk::ColormapProperty::AddEnumerationTypes()
   AddEnum( "Hot Metal", newId++ );
   AddEnum( "Hot Iron", newId++ );
   AddEnum( "Spectrum", newId++ );
-  AddEnum( "GE Color", newId++ );
+  AddEnum( "PET Color", newId++ );
   AddEnum( "Flow", newId++ );
   AddEnum( "Loni", newId++ );
   AddEnum( "Loni2", newId++ );

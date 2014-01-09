@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "HotIron.h"
 #include "GrayRainbow.h"
 #include "Cardiac.h"
-#include "GEColor.h"
+#include "PETColor.h"
 #include "Flow.h"
 #include "LONI.h"
 #include "LONI2.h"
@@ -112,8 +112,8 @@ void mitk::LookupTable::SetActiveColormap(int index)
     case (mitk::ColormapProperty::CM_SPECTRUM):
         this->BuildSpectrumLookupTable();
         break;
-    case (mitk::ColormapProperty::CM_GECOLOR):
-        this->BuildGEColorLookupTable();
+    case (mitk::ColormapProperty::CM_PETCOLOR):
+        this->BuildPETColorLookupTable();
         break;
     case (mitk::ColormapProperty::CM_FLOW):
         this->BuildFlowLookupTable();
@@ -624,7 +624,7 @@ void mitk::LookupTable::BuildHotIronLookupTable()
 
   for( int i=0; i<256; i++)
   {
-    lut->SetTableValue(i, (double)HotIron[i]/255.0, (double)HotIron[256+i]/255.0, (double)HotIron[256*2+i]/255.0, /*(double)(i)/255.0*/ log (1.0+(double)(i)/255.0*9.0)/log (10.0) );
+    lut->SetTableValue(i, (double)HotIron[i][0]/255.0, (double)HotIron[i][1]/255.0, (double)HotIron[i][2]/255.0, /*(double)(i)/255.0*/ log (1.0+(double)(i)/255.0*9.0)/log (10.0) );
   }
 
   m_LookupTable = lut;
@@ -667,7 +667,7 @@ void mitk::LookupTable::BuildHotMetalLookupTable()
   this->Modified();
 }
 
-void mitk::LookupTable::BuildGEColorLookupTable()
+void mitk::LookupTable::BuildPETColorLookupTable()
 {
   vtkLookupTable* lut = vtkLookupTable::New();
   lut->SetNumberOfTableValues(256);
@@ -676,7 +676,7 @@ void mitk::LookupTable::BuildGEColorLookupTable()
 
   for( int i=0; i<256; i++)
   {
-      lut->SetTableValue(i, (double)GEColor[i]/255.0, (double)GEColor[256+i]/255.0, (double)GEColor[256*2+i]/255.0, 1.0);
+      lut->SetTableValue(i, (double)PETColor[i][0]/255.0, (double)PETColor[i][1]/255.0, (double)PETColor[i][2]/255.0, 1.0);
   }
 
   m_LookupTable = lut;

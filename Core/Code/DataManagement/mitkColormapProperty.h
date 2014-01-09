@@ -61,7 +61,7 @@ class MITK_CORE_EXPORT ColormapProperty : public EnumerationProperty
         CM_HOTMETAL,
         CM_HOTIRON,
         CM_SPECTRUM,
-        CM_GECOLOR,
+        CM_PETCOLOR,
         CM_FLOW,
         CM_LONI,
         CM_LONI2,

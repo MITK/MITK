@@ -157,7 +157,7 @@ protected:
     virtual void BuildHotMetalLookupTable();
     virtual void BuildHotIronLookupTable();
     virtual void BuildSpectrumLookupTable();
-    virtual void BuildGEColorLookupTable();
+    virtual void BuildPETColorLookupTable();
     virtual void BuildFlowLookupTable();
     virtual void BuildLONILookupTable();
     virtual void BuildLONI2LookupTable();

@@ -40,6 +40,8 @@ public:
 
   virtual ~FunctorImpl() {}
 
+  virtual void* target() const = 0;
+
 private:
 
   virtual bool IsEqual(const FunctorImpl& o) const = 0;
@@ -57,6 +59,13 @@ public:
 
   void operator()(Arg a)
   { m_Fun(a); }
+
+  void* target() const
+  {
+    void* result = NULL;
+    std::memcpy(&result, &m_Fun, sizeof(void*));
+    return result;
+  }
 
 private:
 
@@ -80,6 +89,13 @@ public:
 
   void operator()(Arg a)
   { ((*m_pObj).*m_pMemFn)(a); }
+
+  void* target() const
+  {
+    void* result = NULL;
+    std::memcpy(&result, &m_pMemFn, sizeof(void*));
+    return result;
+  }
 
 private:
 
@@ -130,7 +146,7 @@ public:
 
   void* target() const
   {
-    return reinterpret_cast<void*>(m_Impl);
+    return m_Impl->target();
   }
 
 private:

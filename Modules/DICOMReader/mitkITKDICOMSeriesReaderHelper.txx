@@ -42,7 +42,11 @@ mitk::ITKDICOMSeriesReaderHelper
   typename ReaderType::Pointer reader = ReaderType::New();
 
   reader->SetImageIO(io);
-  reader->ReverseOrderOff(); // TODO check this..
+  reader->ReverseOrderOff(); // at this point we require an order of input images so that
+                             // the direction between the origin of the first and the last slice
+                             // is the same direction as the image normals! Otherwise we might
+                             // see images upside down. Unclear whether this is a bug in MITK,
+                             // see NormalDirectionConsistencySorter.
 
   if (preLoadedImageBlock.IsNull())
   {
@@ -108,7 +112,12 @@ mitk::ITKDICOMSeriesReaderHelper
   typename ReaderType::Pointer reader = ReaderType::New();
 
   reader->SetImageIO(io);
-  reader->ReverseOrderOff();
+  reader->ReverseOrderOff(); // at this point we require an order of input images so that
+                             // the direction between the origin of the first and the last slice
+                             // is the same direction as the image normals! Otherwise we might
+                             // see images upside down. Unclear whether this is a bug in MITK,
+                             // see NormalDirectionConsistencySorter.
+
 
   if (preLoadedImageBlock.IsNull())
   {

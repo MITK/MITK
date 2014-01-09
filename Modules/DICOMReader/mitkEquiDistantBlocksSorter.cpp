@@ -145,6 +145,7 @@ mitk::EquiDistantBlocksSorter
   if (this != &other)
   {
     DICOMDatasetSorter::operator=(other);
+    m_AcceptTilt = other.m_AcceptTilt;
   }
   return *this;
 }

@@ -36,6 +36,9 @@ mitk::DICOMITKSeriesGDCMReader
 ::DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other )
 :DICOMFileReader(other)
 ,m_FixTiltByShearing(false)
+,m_Sorter( other.m_Sorter ) // TODO should clone the list items
+,m_EquiDistantBlocksSorter( other.m_EquiDistantBlocksSorter->Clone() )
+,m_NormalDirectionConsistencySorter( other.m_NormalDirectionConsistencySorter->Clone() )
 {
   this->EnsureMandatorySortersArePresent();
 }
@@ -55,6 +58,7 @@ mitk::DICOMITKSeriesGDCMReader
     this->m_FixTiltByShearing = other.m_FixTiltByShearing;
     this->m_Sorter = other.m_Sorter; // TODO should clone the list items
     this->m_EquiDistantBlocksSorter = other.m_EquiDistantBlocksSorter->Clone();
+    this->m_NormalDirectionConsistencySorter = other.m_NormalDirectionConsistencySorter->Clone();
   }
   return *this;
 }
@@ -278,7 +282,8 @@ mitk::DICOMITKSeriesGDCMReader
   }
 
   // a last extra-sorting step: ensure equidistant slices
-  m_SortingResultInProgress = this->InternalExecuteSortingStep(sorterIndex, m_EquiDistantBlocksSorter.GetPointer(), m_SortingResultInProgress, &timer);
+  m_SortingResultInProgress = this->InternalExecuteSortingStep(sorterIndex++, m_EquiDistantBlocksSorter.GetPointer(), m_SortingResultInProgress, &timer);
+  m_SortingResultInProgress = this->InternalExecuteSortingStep(sorterIndex, m_NormalDirectionConsistencySorter.GetPointer(), m_SortingResultInProgress, &timer);
 
   timer.Stop("Sorting frames");
 
@@ -523,6 +528,11 @@ mitk::DICOMITKSeriesGDCMReader
     m_EquiDistantBlocksSorter = mitk::EquiDistantBlocksSorter::New();
   }
   m_EquiDistantBlocksSorter->SetAcceptTilt( m_FixTiltByShearing );
+
+  if (m_NormalDirectionConsistencySorter.IsNull())
+  {
+    m_NormalDirectionConsistencySorter = mitk::NormalDirectionConsistencySorter::New();
+  }
 }
 
 std::string

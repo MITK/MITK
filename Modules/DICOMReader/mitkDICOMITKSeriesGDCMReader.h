@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMGDCMImageFrameInfo.h"
 #include "mitkEquiDistantBlocksSorter.h"
+#include "mitkNormalDirectionConsistencySorter.h"
+
+#include "mitkITKDICOMSeriesReaderHelper.h"
 
 #include "DICOMReaderExports.h"
 
@@ -88,11 +91,14 @@ namespace mitk
      - (0020,0037) %Image Orientation (Patient)
      - (0018,0050) Slice Thickness
      - (0028,0008) Number of Frames
-    2. As a \b last step, there will always be an instance of EquiDistantBlocksSorter,
-       which ensures that there is an equal distance between all the frames of an Image.
-       This is required to achieve correct geometrical positions in the mitk::Image,
-       i.e. it is essential to be able to make measurements in images.
-       - whether or not the distance is required to be orthogonal to the image planes is configured by SetFixTiltByShearing().
+    2. As are two forced \b last steps:
+      1. There will always be an instance of EquiDistantBlocksSorter,
+         which ensures that there is an equal distance between all the frames of an Image.
+         This is required to achieve correct geometrical positions in the mitk::Image,
+         i.e. it is essential to be able to make measurements in images.
+         - whether or not the distance is required to be orthogonal to the image planes is configured by SetFixTiltByShearing().
+      2. There is always an instance of NormalDirectionConsistencySorter,
+         which makes the order of images go along the image normals (see NormalDirectionConsistencySorter)
 
   \section DICOMITKSeriesGDCMReader_UserConfiguration User Configuration
 
@@ -304,6 +310,7 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
 
     // NOT nice, made available to ThreeDnTDICOMSeriesReader due to lack of time
     mitk::EquiDistantBlocksSorter::Pointer m_EquiDistantBlocksSorter;
+    mitk::NormalDirectionConsistencySorter::Pointer m_NormalDirectionConsistencySorter;
 
   private:
 

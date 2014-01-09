@@ -42,6 +42,47 @@ AstroStickModel< ScalarType >::~AstroStickModel()
 }
 
 template< class ScalarType >
+void AstroStickModel< ScalarType >::SetSeed(int s)
+{
+    m_RandGen->SetSeed(s);
+}
+
+template< class ScalarType >
+ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(int dir)
+{
+    ScalarType signal = 0;
+
+    if (dir>=this->m_GradientList.size())
+        return signal;
+
+    ScalarType b = -m_BValue*m_Diffusivity;
+
+    if (m_RandomizeSticks)
+        m_NumSticks = 30 + m_RandGen->GetIntegerVariate()%31;
+
+    GradientType g = this->m_GradientList[dir];
+    ScalarType bVal = g.GetNorm(); bVal *= bVal;
+
+    if (bVal>0.0001)
+    {
+        for (int j=0; j<m_NumSticks; j++)
+        {
+            ScalarType dot = 0;
+            if(m_RandomizeSticks)
+                dot = GetRandomDirection()*g;
+            else
+                dot = m_Sticks[j]*g;
+            signal += exp( b*bVal*dot*dot );
+        }
+        signal /= m_NumSticks;
+    }
+    else
+        signal = 1;
+
+    return signal;
+}
+
+template< class ScalarType >
 typename AstroStickModel< ScalarType >::GradientType AstroStickModel< ScalarType >::GetRandomDirection()
 {
     GradientType vec;

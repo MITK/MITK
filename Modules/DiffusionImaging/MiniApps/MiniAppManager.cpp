@@ -28,7 +28,10 @@ MiniAppManager* MiniAppManager::GetInstance()
 // the app will be run
 int MiniAppManager::RunMiniApp(int argc, char* argv[])
 {
-    itk::MultiThreader::SetGlobalDefaultNumberOfThreads(itk::MultiThreader::GetGlobalMaximumNumberOfThreads());
+    int threadNum = itk::MultiThreader::GetGlobalMaximumNumberOfThreads();
+    if (threadNum>12)
+        threadNum = 12;
+    itk::MultiThreader::SetGlobalDefaultNumberOfThreads(threadNum);
     try
     {
         std::string nameOfMiniApp;

@@ -70,7 +70,6 @@ struct ImageParameters {
   mitk::RicianNoiseModel<double>       ricianNoiseModel;
   mitk::DiffusionSignalModel<double>::GradientListType  gradientDirections;
   itk::TractsToDWIImageFilter< short >::DiffusionModelList fiberModelList, nonFiberModelList;
-  itk::TractsToDWIImageFilter< short >::KspaceArtifactList artifactList;
   std::string signalModelString, artifactModelString;
 
   itk::Image<double, 3>::Pointer           frequencyMap;
@@ -108,7 +107,6 @@ void LoadParameters(const std::string & filename,
   boost::property_tree::ptree parameters;
   boost::property_tree::xml_parser::read_xml(filename, parameters);
 
-  m_ImageGenParameters.artifactList.clear();
   m_ImageGenParameters.nonFiberModelList.clear();
   m_ImageGenParameters.fiberModelList.clear();
   m_ImageGenParameters.signalModelString = "";
@@ -512,7 +510,6 @@ int FiberFoxProcessing(int argc, char* argv[])
     tractsToDwiFilter->SetFiberModels(m_ImageGenParameters.fiberModelList);
     tractsToDwiFilter->SetNonFiberModels(m_ImageGenParameters.nonFiberModelList);
     tractsToDwiFilter->SetNoiseModel(&m_ImageGenParameters.ricianNoiseModel);
-    tractsToDwiFilter->SetKspaceArtifacts(m_ImageGenParameters.artifactList);
     tractsToDwiFilter->SetkOffset(m_ImageGenParameters.kspaceLineOffset);
     tractsToDwiFilter->SettLine(m_ImageGenParameters.tLine);
     tractsToDwiFilter->SettInhom(m_ImageGenParameters.tInhom);

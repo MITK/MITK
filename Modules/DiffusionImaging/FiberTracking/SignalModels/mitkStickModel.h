@@ -39,6 +39,7 @@ public:
 
     /** Actual signal generation **/
     PixelType SimulateMeasurement();
+    ScalarType SimulateMeasurement(int dir);
 
     void SetBvalue(ScalarType bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
     void SetDiffusivity(ScalarType diffusivity) { m_Diffusivity = diffusivity; } ///< Scalar diffusion constant

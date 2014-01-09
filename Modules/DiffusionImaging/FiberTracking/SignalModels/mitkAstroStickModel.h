@@ -42,6 +42,9 @@ public:
 
     /** Actual signal generation **/
     PixelType SimulateMeasurement();
+    ScalarType SimulateMeasurement(int dir);
+
+    void SetSeed(int s);    ///< set seed for random generator that creates the stick orientations
 
     void SetRandomizeSticks(bool randomize=true){ m_RandomizeSticks=randomize; }
     void SetBvalue(ScalarType bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal

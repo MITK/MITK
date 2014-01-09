@@ -158,6 +158,7 @@ protected:
   itkUCharImageType::Pointer            m_PlanarFigureImage;
   float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations
   mitk::DataNode::Pointer               m_MaskImageNode;
+  mitk::DataNode::Pointer               m_LastAddedPf;
 
   void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);
   void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );

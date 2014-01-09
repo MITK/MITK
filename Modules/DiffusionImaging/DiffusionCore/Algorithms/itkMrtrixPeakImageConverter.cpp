@@ -166,10 +166,10 @@ void MrtrixPeakImageConverter< PixelType >
                     typename ItkDirectionImageType::IndexType index2;
                     index2[0] = a; index2[1] = b; index2[2] = c;
 
-//                    // workaround *********************************************
-//                    dirVec = m_InputImage->GetDirection()*dirVec;
-//                    dirVec.normalize();
-//                    // workaround *********************************************
+                    // workaround *********************************************
+                    dirVec = m_InputImage->GetDirection()*dirVec;
+                    dirVec.normalize();
+                    // workaround *********************************************
 
                     Vector< PixelType, 3 > pixel;
                     pixel.SetElement(0, dirVec[0]);

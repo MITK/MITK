@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTestingComparisonImageFilter.h>
 
 mitk::CompareImageDataFilter::CompareImageDataFilter()
+    : m_Tolerance(0.0)
 {
   this->SetNumberOfRequiredInputs(2);
 
@@ -68,6 +69,7 @@ void mitk::CompareImageDataFilter::GenerateData()
     mcComparator->SetTestImage(input1);
     mcComparator->SetValidImage(input2);
     mcComparator->SetCompareFilterResult( &m_CompareDetails);
+    mcComparator->SetTolerance(m_Tolerance);
     mcComparator->Update();
 
     m_CompareResult = mcComparator->GetResult();
@@ -106,6 +108,7 @@ void mitk::CompareImageDataFilter::EstimateValueDifference(itk::Image< TPixel, V
   typename CompareFilterType::Pointer compare_filter = CompareFilterType::New();
   compare_filter->SetTestInput( itkImage1 );
   compare_filter->SetValidInput( itk_reference );
+  compare_filter->SetDifferenceThreshold( m_Tolerance );
 
   try
   {

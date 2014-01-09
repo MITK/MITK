@@ -33,27 +33,33 @@ IF(BUILD_DiffusionMiniApps)
     GibbsTracking.cpp
     StreamlineTracking.cpp
     FiberProcessing.cpp
-    TractometerAngularErrorTool.cpp
-    TractogramAngularError.cpp
+    LocalDirectionalFiberPlausibility.cpp
+    #TractogramAngularError.cpp
     FiberDirectionExtraction.cpp
     PeakExtraction.cpp
     PeaksAngularError.cpp
     MultishellMethods.cpp
     FiberFoxProcessing.cpp
+    ExportShImage.cpp
   )
 
-  # create an executable foreach tool (only one at the moment)
-  FOREACH(tool ${DIFFUSIONMINIAPPS})
-    ADD_EXECUTABLE(
-    ${tool}
-    ${tool}.cpp
-    ${DIFFUSIONCORE_ADDITIONAL_FILES}
-    )
+  # deprecated
+#  FOREACH(tool ${DIFFUSIONMINIAPPS})
+#    ADD_EXECUTABLE(
+#    ${tool}
+#    ${tool}.cpp
+#    ${DIFFUSIONCORE_ADDITIONAL_FILES}
+#    )
 
-    TARGET_LINK_LIBRARIES(
-      ${tool}
-      ${ALL_LIBRARIES} )
-  ENDFOREACH(tool)
+#    TARGET_LINK_LIBRARIES(
+#      ${tool}
+#      ${ALL_LIBRARIES} )
+#  ENDFOREACH(tool)
+
+  mitk_create_executable(mitkDiffusionMiniApps
+  DEPENDS DiffusionCore FiberTracking
+  )
+
   ENDIF()
 
   MITK_INSTALL_TARGETS(EXECUTABLES mitkDiffusionMiniApps )

@@ -36,9 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 
 // MISC
-#include <fstream>
-#include <QFile>
-#include <tinyxml.h>
 #include <math.h>
 
 namespace itk{

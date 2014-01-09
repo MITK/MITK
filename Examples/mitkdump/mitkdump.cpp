@@ -116,6 +116,7 @@ std::string extractDirString(const std::string& dirString)
 int main(int argc, char* argv[])
 {
   bool fileDetails(false);
+  bool loadimage(false);
   int firstFileIndex = 1;
 
   // see if we got the '-v' flag to output file details
@@ -124,6 +125,14 @@ int main(int argc, char* argv[])
     fileDetails = true;
     ++firstFileIndex;
   }
+
+  // see if we got the '-l' flag
+  if (argc > 1 && std::string(argv[firstFileIndex]) == "-l")
+  {
+    loadimage = true;
+    ++firstFileIndex;
+  }
+
 
   // analyze files from argv
   mitk::StringList inputFiles;
@@ -160,6 +169,48 @@ int main(int argc, char* argv[])
   fs.open(logfilename.c_str());
   reader->PrintOutputs( fs, true); // always verbose in log file
   fs.close();
+
+  if (loadimage)
+  {
+    MITK_INFO << "Loading...";
+    reader->LoadImages();
+    mitk::Image::Pointer image = reader->GetOutput(0).GetMitkImage();
+    MITK_INFO << "---- Output image:";
+    mitk::Geometry3D::Pointer geo3D = image->GetGeometry();
+    if (geo3D.IsNotNull())
+    {
+      mitk::SlicedGeometry3D::Pointer sg = dynamic_cast<mitk::SlicedGeometry3D*>(geo3D.GetPointer());
+      if (sg.IsNotNull())
+      {
+        unsigned int nos = sg->GetSlices();
+        mitk::Geometry2D::Pointer first = sg->GetGeometry2D(0);
+        mitk::Geometry2D::Pointer last = sg->GetGeometry2D(nos-1);
+
+        mitk::Point3D firstOrigin = first->GetOrigin();
+        mitk::Point3D lastOrigin = last->GetOrigin();
+        MITK_INFO << "Geometry says: First slice at " << firstOrigin << ", last slice at " << lastOrigin;
+
+        mitk::StringLookupTableProperty::Pointer sliceLocations =
+          dynamic_cast<mitk::StringLookupTableProperty*>( image->GetProperty("dicom.image.0020.1041").GetPointer() );
+        if (sliceLocations.IsNotNull())
+        {
+          std::string firstSliceLocation = sliceLocations->GetValue().GetTableValue(0);
+          std::string lastSliceLocation = sliceLocations->GetValue().GetTableValue(nos-1);
+          MITK_INFO << "Image properties says: first slice location at " << firstSliceLocation << ", last slice location at " << lastSliceLocation;
+        }
+
+        mitk::StringLookupTableProperty::Pointer instanceNumbers =
+          dynamic_cast<mitk::StringLookupTableProperty*>( image->GetProperty("dicom.image.0020.0013").GetPointer() );
+        if (instanceNumbers.IsNotNull())
+        {
+          std::string firstInstanceNumber = instanceNumbers->GetValue().GetTableValue(0);
+          std::string lastInstanceNumber = instanceNumbers->GetValue().GetTableValue(nos-1);
+          MITK_INFO << "Image properties says: first instance number at " << firstInstanceNumber << ", last instance number at " << lastInstanceNumber;
+        }
+      }
+    }
+    MITK_INFO << "---- End of output";
+  }
 
   // if we got so far, everything is fine
   return EXIT_SUCCESS;

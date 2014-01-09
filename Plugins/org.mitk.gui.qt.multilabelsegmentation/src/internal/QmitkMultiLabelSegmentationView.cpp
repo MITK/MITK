@@ -416,7 +416,7 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
   this->WaitCursorOff();
 
   if (!this->GetDataStorage()->Exists(workingNode))
-    this->GetDataStorage()->Add(workingNode);
+    this->GetDataStorage()->Add(workingNode, referenceNode);
 }
 
 void QmitkMultiLabelSegmentationView::OnNewLabel()

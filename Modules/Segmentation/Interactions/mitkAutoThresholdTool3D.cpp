@@ -163,9 +163,11 @@ void mitk::AutoThresholdTool3D::InternalRun( itk::Image<TPixel, VDimension>* inp
   case AT_MOMENTS:
     filter = MomentsThresholdImageFilterType::New();
     break;
+/*
   case AT_OTSU:
     filter = OtsuThresholdImageFilterType::New();
     break;
+*/
   case AT_RENYIENTROPY:
     filter = RenyiEntropyThresholdImageFilterType::New();
     break;

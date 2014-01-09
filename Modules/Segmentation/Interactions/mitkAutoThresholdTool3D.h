@@ -47,7 +47,7 @@ namespace mitk{
         AT_MAXENTROPY,
         AT_MINERROR,
         AT_MOMENTS,
-        AT_OTSU,
+//        AT_OTSU,
         AT_RENYIENTROPY,
         AT_SHANBHAG,
         AT_TRIANGLE,

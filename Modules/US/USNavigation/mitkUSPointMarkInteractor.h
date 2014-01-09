@@ -33,6 +33,9 @@ public:
   mitkClassMacro(USPointMarkInteractor, DataInteractor)
   itkNewMacro(Self)
 
+  typedef Message1<const DataNode*> PointMarkInteractorEvent;
+  PointMarkInteractorEvent CoordinatesChangedEvent;
+
 protected:
   static void UpdateSurface(itk::SmartPointer<mitk::DataNode>);
 

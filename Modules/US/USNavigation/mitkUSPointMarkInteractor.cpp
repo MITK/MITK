@@ -102,5 +102,7 @@ bool mitk::USPointMarkInteractor::AddPoint(mitk::StateMachineAction* , mitk::Int
   /*circle->SetControlPoint(0, positionEvent->GetPositionInWorld());
   circle->SetControlPoint(1, positionEvent->GetPositionInWorld());*/
 
+  CoordinatesChangedEvent.Send(this->GetDataNode());
+
   return true;
 }

@@ -113,10 +113,13 @@ void TestFilterString()
   MyServiceOne serviceOne;
   MyServiceTwo serviceTwo;
 
-  context->RegisterService<MyInterfaceOne>(&serviceOne);
-  context->RegisterService<MyInterfaceTwo>(&serviceTwo);
+  ServiceRegistration<MyInterfaceOne> reg1 = context->RegisterService<MyInterfaceOne>(&serviceOne);
+  ServiceRegistration<MyInterfaceTwo> reg2 = context->RegisterService<MyInterfaceTwo>(&serviceTwo);
 
   US_TEST_CONDITION(tracker.GetServiceReferences().size() == 1, "tracking count")
+
+  reg1.Unregister();
+  reg2.Unregister();
 }
 
 void TestServiceTracker()

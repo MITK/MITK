@@ -30,8 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <queue>
 
-#include "mitkModuleResource.h"
-#include "mitkModuleResourceStream.h"
+#include "usModuleResource.h"
+#include "usModuleResourceStream.h"
 
 QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage* storage)
 :QWidget(parent),
@@ -529,7 +529,7 @@ void QmitkToolSelectionBox::RecreateButtons()
       button->setFont( currentFont );
     }
 
-    mitk::ModuleResource iconResource = tool->GetIconResource();
+    us::ModuleResource iconResource = tool->GetIconResource();
 
     if (!iconResource.IsValid())
     {
@@ -537,7 +537,7 @@ void QmitkToolSelectionBox::RecreateButtons()
     }
     else
     {
-      mitk::ModuleResourceStream resourceStream(iconResource, std::ios::binary);
+      us::ModuleResourceStream resourceStream(iconResource, std::ios::binary);
       resourceStream.seekg(0, std::ios::end);
       std::ios::pos_type length = resourceStream.tellg();
       resourceStream.seekg(0, std::ios::beg);

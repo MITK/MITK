@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStringList>
 #include <QMessageBox>
 
-#include <usServiceReference.h>
-#include <mitkGetModuleContext.h>
 #include <mitkIToFDeviceFactory.h>
 #include <mitkToFDeviceFactoryManager.h>
 #include <mitkToFCameraDevice.h>
@@ -32,15 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAbstractToFDeviceFactory.h>
 
 #include <QmitkServiceListWidget.h>
-
-
-
-//Microservices
-#include <usGetModuleContext.h>
-#include <usModule.h>
-#include "mitkModuleContext.h"
-#include <usServiceInterface.h>
-#include <usServiceRegistration.h>
 
 
 const std::string QmitkToFDeviceGeneration::VIEW_ID = "org.mitk.views.tofgeneration";

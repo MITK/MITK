@@ -775,7 +775,7 @@ if(MITK_USE_BLUEBERRY)
   endif()
 
   if(MITK_BUILD_EXAMPLES)
-      include("${CMAKE_CURRENT_SOURCE_DIR}/Examples/Plugins/PluginList.cmake")
+    include("${CMAKE_CURRENT_SOURCE_DIR}/Examples/Plugins/PluginList.cmake")
     set(mitk_example_plugins_fullpath )
     foreach(mitk_example_plugin ${MITK_EXAMPLE_PLUGINS})
       list(APPEND mitk_example_plugins_fullpath Examples/Plugins/${mitk_example_plugin})

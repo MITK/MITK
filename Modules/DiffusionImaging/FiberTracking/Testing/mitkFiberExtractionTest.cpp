@@ -30,7 +30,8 @@ int mitkFiberExtractionTest(int argc, char* argv[])
 {
     MITK_TEST_BEGIN("mitkFiberExtractionTest");
 
-    MITK_TEST_CONDITION_REQUIRED(argc==13,"check for input data")
+    MITK_INFO << "argc: " << argc;
+    MITK_TEST_CONDITION_REQUIRED(argc==12,"check for input data")
 
             try{
         RegisterFiberTrackingObjectFactory();
@@ -55,6 +56,8 @@ int mitkFiberExtractionTest(int argc, char* argv[])
 
         // test subtraction and addition
         mitk::FiberBundleX::Pointer notExtractedFibs = groundTruthFibs->SubtractBundle(extractedFibs);
+
+        MITK_INFO << argv[11];
         testFibs = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(argv[11])->GetData());
         MITK_TEST_CONDITION_REQUIRED(notExtractedFibs->Equals(testFibs),"check bundle subtraction")
 

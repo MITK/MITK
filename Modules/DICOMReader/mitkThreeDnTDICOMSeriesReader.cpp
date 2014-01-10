@@ -204,6 +204,12 @@ mitk::ThreeDnTDICOMSeriesReader
   bool hasTilt = block.GetFlag("gantryTilt", false);
 
   int numberOfTimesteps = block.GetIntProperty("timesteps", 1);
+
+  if (numberOfTimesteps == 1)
+  {
+    return DICOMITKSeriesGDCMReader::LoadMitkImageForImageBlockDescriptor(block);
+  }
+
   int numberOfFramesPerTimestep = frames.size() / numberOfTimesteps;
   assert( int(double((double)frames.size() / (double)numberOfTimesteps ))
        == numberOfFramesPerTimestep ); // this should hold

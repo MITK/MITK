@@ -34,6 +34,13 @@ mitk::DICOMFileReaderSelector
 {
 }
 
+std::list<mitk::DICOMFileReader::Pointer>
+mitk::DICOMFileReaderSelector
+::GetAllConfiguredReaders() const
+{
+  return m_Readers;
+}
+
 void
 mitk::DICOMFileReaderSelector
 ::AddConfigsFromResources(const std::string& path)

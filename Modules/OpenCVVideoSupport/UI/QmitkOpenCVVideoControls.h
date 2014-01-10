@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ui_QmitkOpenCVVideoControls.h>
 #include <mitkOpenCVVideoSupportUIExports.h>
 
-class QmitkStdMultiWidget;
+class QmitkRenderWindow;
 class QmitkVideoBackground;
 namespace mitk
 {
@@ -42,7 +42,7 @@ public:
   ///
   /// Construct the widget with the given render window and the given preset values
   ///
-  QmitkOpenCVVideoControls(QmitkVideoBackground* _VideoBackground, QmitkStdMultiWidget* _MultiWidget
+  QmitkOpenCVVideoControls(QmitkVideoBackground* _VideoBackground, QmitkRenderWindow* _RenderWindow
     , QWidget * parent = 0, Qt::WindowFlags f = 0);
 
   ///
@@ -51,14 +51,14 @@ public:
   virtual ~QmitkOpenCVVideoControls();
 
   ///
-  /// sets the multiwidget for this video player
+  /// sets the render window for this video player
   ///
-  void SetStdMultiWidget(QmitkStdMultiWidget* _MultiWidget);
+  void SetRenderWindow(QmitkRenderWindow* _RenderWindow);
 
   ///
-  /// returns the current multiwidget
+  /// returns the current render window
   ///
-  QmitkStdMultiWidget* GetStdMultiWidget() const;
+  QmitkRenderWindow* GetRenderWindow() const;
 
   ///
   /// sets the qmitkvideobackground for this
@@ -91,7 +91,7 @@ protected slots:
   void NewFrameAvailable(mitk::VideoSource* videoSource);
 protected:
   QmitkVideoBackground* m_VideoBackground;
-  QmitkStdMultiWidget* m_MultiWidget;
+  QmitkRenderWindow* m_RenderWindow;
   mitk::OpenCVVideoSource* m_VideoSource;
   Ui::QmitkOpenCVVideoControls* m_Controls;
   bool m_SliderCurrentlyMoved;

@@ -112,7 +112,7 @@ function(FunctionCreateProvisioningFile)
     if(TARGET ${plugin})
       # The entry already is a valid target (either imported or declared in the current project)
       set(_plugin_target ${plugin})
-    else()
+    elseif(${plugin} MATCHES "^[- :/A-Za-z0-9._]+:(ON|OFF)$")
       # Check if the entry if of the form "Some/Dir/org.my.plugin:OPTION"
       ctkFunctionExtractOptionNameAndValue(${plugin} plugin_name_with_dirs plugin_value)
       string(REPLACE "/" ";" _tokens ${plugin_name_with_dirs})

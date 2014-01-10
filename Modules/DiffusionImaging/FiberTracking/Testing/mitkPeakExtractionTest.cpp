@@ -92,6 +92,7 @@ int mitkPeakExtractionTest(int argc, char* argv[])
         std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( referenceFileName, s1, s2, false );
         mitk::FiberBundleX::Pointer fib2 = dynamic_cast<mitk::FiberBundleX*>(infile.at(0).GetPointer());
 
+        // TODO: reduce epsilon. strange issues with differing values between windows and linux.
         MITK_TEST_CONDITION_REQUIRED(fib1->Equals(fib2), "Check if tractograms are equal.");
     }
     catch (itk::ExceptionObject e)

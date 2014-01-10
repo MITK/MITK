@@ -32,7 +32,10 @@ namespace mitk
 {
 
   /**
-  \brief
+  \brief Extracts a single region from a segmentation image and creates a new image with same geometry of the input image.
+
+  The region is extracted in 3D space. This is done by performing region growing within the desired region.
+  Use shift click to add the seed point.
 
   \ingroup ToolManagerEtAl
   \sa mitk::Tool
@@ -66,10 +69,17 @@ namespace mitk
     PickingTool(); // purposely hidden
     virtual ~PickingTool();
 
+    //Callback for point add event of PointSet
     void OnPointAdded();
+
+    //Observer id
     long m_PointSetAddObserverTag;
 
-  private:
+    //itk regrowing
+    template < typename TPixel, unsigned int VImageDimension >
+    void StartRegionGrowing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry, mitk::PointSet::PointType seedPoint );
+
+    //seed point
     PointSet::Pointer m_PointSet;
     PointSetInteractor::Pointer m_SeedPointInteractor;
     DataNode::Pointer m_PointSetNode;

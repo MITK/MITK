@@ -31,7 +31,7 @@ int mitkFiberExtractionTest(int argc, char* argv[])
     MITK_TEST_BEGIN("mitkFiberExtractionTest");
 
     MITK_INFO << "argc: " << argc;
-    MITK_TEST_CONDITION_REQUIRED(argc==12,"check for input data")
+    MITK_TEST_CONDITION_REQUIRED(argc==13,"check for input data")
 
             try{
         RegisterFiberTrackingObjectFactory();
@@ -61,8 +61,8 @@ int mitkFiberExtractionTest(int argc, char* argv[])
         testFibs = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(argv[11])->GetData());
         MITK_TEST_CONDITION_REQUIRED(notExtractedFibs->Equals(testFibs),"check bundle subtraction")
 
-        testFibs = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(argv[12])->GetData());
         mitk::FiberBundleX::Pointer joinded = extractedFibs->AddBundle(notExtractedFibs);
+        testFibs = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(argv[12])->GetData());
         MITK_TEST_CONDITION_REQUIRED(joinded->Equals(testFibs),"check bundle addition")
 
         // test binary image based extraction

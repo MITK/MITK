@@ -19,7 +19,8 @@ Important
 [ ] Complete MITK properties of images: level/window and color type (MONOCHROME1/2)
 [ ] Check input images fo DICOMness and non-multi-frameness
 [ ] Use CanReadFile() in selection!
-[ ] Check TODO in mitkDICOMTag.cpp
+[x] Check TODO in mitkDICOMTag.cpp
+    - operator< for DICOMTag has been re-implemented in a readable and safer way.
 [ ] Configurable precision for tag value comparisons
 [x] Images are upside-down in some cases
     - error was hidden assumption somewhere: filenames for ImageSeriesReader need

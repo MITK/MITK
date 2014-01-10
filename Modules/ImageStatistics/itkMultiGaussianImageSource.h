@@ -172,7 +172,6 @@ public:
   typedef typename TOutputImage::Pointer                      ImageType;
 
   typedef  MapContainer<unsigned int, PointType>              MapContainerPoints;
-  typedef  MapContainer<unsigned int, VectorType>             MapContainerEdges;
    typedef  MapContainer<unsigned int, double>                MapContainerRadius;
 
 
@@ -225,22 +224,22 @@ public:
   /** Optimize the mean value in the wanted sphere*/
   virtual void OptimizeMeanValue();
   /** Write a .mps file to visualise the point in the sphere*/
-  virtual void WriteXMLToTest();
-  virtual void WriteXMLToTestTheCuboid();
+  // virtual void WriteXMLToTest();
+  // virtual void WriteXMLToTestTheCuboid();
   virtual void WriteXMLToTestTheCuboidInsideTheSphere();
-  virtual void CalculateTheMidPointMeanValueInCuboid();
-  virtual void CalculateEdgesInSphere( PointType globalCoordinateMidpointCuboid, PointType globalCoordinateMidpointSphere, double cuboidRadius);
+  virtual void CalculateTheMidPointMeanValueWithOctree();
+  virtual void CalculateEdgesInSphere( PointType globalCoordinateMidpointCuboid, PointType globalCoordinateMidpointSphere, double cuboidRadius, int level);
   virtual double MultiGaussianFunctionValueAtCuboid(double xMin, double xMax, double yMin, double yMax, double zMin, double zMax);
   virtual void InsertPoints( PointType globalCoordinateMidpointCuboid, double cuboidRadius);
-  virtual void GenerateCuboidSegmentationInSphere();
+  virtual void GenerateCuboidSegmentationInSphere( PointType globalCoordinateMidpointSphere );
   virtual double FunctionPhi(double value);
 
-  virtual void CalculateMidpoint();
+  //virtual void CalculateMidpoint();
 
-  virtual  unsigned int IntesectTheSphere( PointType globalCoordinateMidpointCuboid, PointType globalCoordinateMidpointSphere, double sideLength);
+  virtual  unsigned int IntersectTheSphere( PointType globalCoordinateMidpointCuboid, PointType globalCoordinateMidpointSphere, double sideLength);
   void SetNormalDistributionValues();
 
-  double Quadtrees( PointType globalCoordinateMidpointCuboid, PointType globalCoordinateMidpointSphere,  double sideLength, double meanValueTemp);
+  //double Quadtrees( PointType globalCoordinateMidpointCuboid, PointType globalCoordinateMidpointSphere,  double sideLength, double meanValueTemp);
 
 
   /** Set the minimum possible pixel value. By default, it is
@@ -300,14 +299,14 @@ private:
   typename TOutputImage::PixelType          m_Min;                   //minimum possible value
   typename TOutputImage::PixelType          m_Max;                   //maximum possible value
   PointType                                 m_GlobalCoordinate;      // physical coordiante of the sphere midpoint
+  bool                                      m_dispVol;
 
-
-  MapContainerEdges                         m_Edges;
-  MapContainerPoints                        m_Midpoints, m_EdgePoints;
+  MapContainerPoints                        m_Midpoints;
   MapContainerRadius                        m_RadiusCuboid;
-
+  double                                    m_Volume;
   VectorType                                m_XCoordToTest, m_YCoordToTest, m_ZCoordToTest;
   double                                    m_NormalDistValues [410];
+  double                                    m_meanValueTemp;
   // The following variables are deprecated, and provided here just for
   // backward compatibility. It use is discouraged.
   mutable PointValueArrayType               m_OriginArray;

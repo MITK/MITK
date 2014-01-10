@@ -10,7 +10,7 @@ MITK_CREATE_MODULE( MitkExt
                INCLUDE_DIRS Algorithms Controllers DataManagement Interactions IO Rendering
                DEPENDS MitkDataTypesExt ImageExtraction IpPicSupport
                PACKAGE_DEPENDS ANN
-               DEPRECATED_SINCE 2013.12
+               DEPRECATED_SINCE 2014.03
 )
 
 if(BUILD_TESTING)

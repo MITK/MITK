@@ -73,7 +73,7 @@ class DICOMReader_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGDCMRe
     */
     virtual SortingBlockList Condense3DBlocks(SortingBlockList&);
 
-    bool LoadMitkImageForOutput(unsigned int o);
+    bool LoadMitkImageForImageBlockDescriptor(DICOMImageBlockDescriptor& block) const;
 
     bool m_Group3DandT;
 };

@@ -154,7 +154,7 @@ mitk::DICOMITKSeriesGDCMReader
 
 void
 mitk::DICOMITKSeriesGDCMReader
-::PushLocale()
+::PushLocale() const
 {
   std::string currentCLocale = setlocale(LC_NUMERIC, NULL);
   m_ReplacedCLocales.push( currentCLocale );
@@ -168,7 +168,7 @@ mitk::DICOMITKSeriesGDCMReader
 
 void
 mitk::DICOMITKSeriesGDCMReader
-::PopLocale()
+::PopLocale() const
 {
   if (!m_ReplacedCLocales.empty())
   {
@@ -454,22 +454,12 @@ mitk::DICOMITKSeriesGDCMReader
 
 bool
 mitk::DICOMITKSeriesGDCMReader
-::LoadMitkImageForOutput(unsigned int o)
+::LoadMitkImageForImageBlockDescriptor(DICOMImageBlockDescriptor& block) const
 {
   PushLocale();
-  DICOMImageBlockDescriptor& block = this->InternalGetOutput(o);
   const DICOMImageFrameList& frames = block.GetImageFrameList();
   const GantryTiltInformation tiltInfo = block.GetTiltInformation();
   bool hasTilt = block.GetFlag("gantryTilt", false);
-  if (hasTilt)
-  {
-    MITK_DEBUG << "When loading image " << o << ": got tilt info:";
-    //tiltInfo.Print(std::cout);
-  }
-  else
-  {
-    MITK_DEBUG << "When loading image " << o << ": has NO info.";
-  }
 
   ITKDICOMSeriesReaderHelper::StringContainer filenames;
   for (DICOMImageFrameList::const_iterator frameIter = frames.begin();
@@ -480,12 +470,30 @@ mitk::DICOMITKSeriesGDCMReader
   }
 
   mitk::ITKDICOMSeriesReaderHelper helper;
-  mitk::Image::Pointer mitkImage = helper.Load( filenames, m_FixTiltByShearing && hasTilt, tiltInfo ); // TODO preloaded images, caching..?
+  bool success(true);
+  try
+  {
+    mitk::Image::Pointer mitkImage = helper.Load( filenames, m_FixTiltByShearing && hasTilt, tiltInfo ); // TODO preloaded images, caching..?
+    block.SetMitkImage( mitkImage );
+  }
+  catch (std::exception& e)
+  {
+    success = false;
+    MITK_ERROR << "Exception during image loading: " << e.what();
+  }
 
-  block.SetMitkImage( mitkImage );
   PopLocale();
 
-  return true;
+  return success;
+}
+
+
+bool
+mitk::DICOMITKSeriesGDCMReader
+::LoadMitkImageForOutput(unsigned int o)
+{
+  DICOMImageBlockDescriptor& block = this->InternalGetOutput(o);
+  return this->LoadMitkImageForImageBlockDescriptor(block);
 }
 
 

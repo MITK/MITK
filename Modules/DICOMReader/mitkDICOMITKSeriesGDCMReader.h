@@ -244,12 +244,12 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
       \brief Remember current locale on stack, activate "C" locale.
       "C" locale is required for correct parsing of numbers by itk::ImageSeriesReader
     */
-    void PushLocale();
+    void PushLocale() const;
     /**
       \brief Activate last remembered locale from locale stack
       "C" locale is required for correct parsing of numbers by itk::ImageSeriesReader
     */
-    void PopLocale();
+    void PopLocale() const;
 
     DICOMITKSeriesGDCMReader();
     virtual ~DICOMITKSeriesGDCMReader();
@@ -284,6 +284,8 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
     /// \brief Loads the mitk::Image by means of an itk::ImageSeriesReader
     virtual bool LoadMitkImageForOutput(unsigned int o);
 
+    virtual bool LoadMitkImageForImageBlockDescriptor(DICOMImageBlockDescriptor& block) const;
+
     /**
       \brief Shear the loaded mitk::Image to "correct" a spatial error introduced by itk::ImageSeriesReader
       See \ref DICOMITKSeriesGDCMReader_GantryTilt for details.
@@ -314,8 +316,8 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
 
   private:
 
-    std::stack<std::string> m_ReplacedCLocales;
-    std::stack<std::locale> m_ReplacedCinLocales;
+    mutable std::stack<std::string> m_ReplacedCLocales;
+    mutable std::stack<std::locale> m_ReplacedCinLocales;
 
     DICOMGDCMImageFrameList m_InputFrameList;
 

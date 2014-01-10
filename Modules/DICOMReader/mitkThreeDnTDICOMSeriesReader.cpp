@@ -194,25 +194,14 @@ mitk::ThreeDnTDICOMSeriesReader
   return success;
 }
 
-// TODO why not handle 3D as a special case of 3D+t?? Late insight?.. .. because of ITK VImageDimension? .. could be a parameter
 bool
 mitk::ThreeDnTDICOMSeriesReader
-::LoadMitkImageForOutput(unsigned int o)
+::LoadMitkImageForImageBlockDescriptor(DICOMImageBlockDescriptor& block) const
 {
   PushLocale();
-  DICOMImageBlockDescriptor& block = this->InternalGetOutput(o);
   const DICOMImageFrameList& frames = block.GetImageFrameList();
   const GantryTiltInformation tiltInfo = block.GetTiltInformation();
   bool hasTilt = block.GetFlag("gantryTilt", false);
-  if (hasTilt)
-  {
-    MITK_DEBUG << "When loading image " << o << ": got tilt info:";
-    //tiltInfo.Print(std::cout);
-  }
-  else
-  {
-    MITK_DEBUG << "When loading image " << o << ": has NO info.";
-  }
 
   int numberOfTimesteps = block.GetIntProperty("timesteps", 1);
   int numberOfFramesPerTimestep = frames.size() / numberOfTimesteps;

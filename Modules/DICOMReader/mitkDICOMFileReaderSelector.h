@@ -47,6 +47,8 @@ class DICOMReader_EXPORT DICOMFileReaderSelector : public itk::LightObject
 {
   public:
 
+    typedef std::list<DICOMFileReader::Pointer> ReaderList;
+
     mitkClassMacro( DICOMFileReaderSelector, itk::LightObject )
     itkNewMacro( DICOMFileReaderSelector )
 
@@ -63,6 +65,11 @@ class DICOMReader_EXPORT DICOMFileReaderSelector : public itk::LightObject
     /// \brief Load 3D+t image creating configurations from the MITK module system (see \ref mitk::Module::FindResources).
     /// For a default set of configurations, look into the directory Resources of the DICOMReader module.
     void LoadBuiltIn3DnTConfigs();
+
+    /// \brief Return all the DICOMFileReader%s that are currently used for selection by this class.
+    /// The readers returned by this method depend on what config files have been added earlier
+    /// (or which of the built-in readers have been loaded)
+    ReaderList GetAllConfiguredReaders() const;
 
     /// Input files
     void SetInputFiles(StringList filenames);
@@ -85,7 +92,6 @@ class DICOMReader_EXPORT DICOMFileReaderSelector : public itk::LightObject
 
     StringList m_PossibleConfigurations;
     StringList m_InputFilenames;
-    typedef std::list<DICOMFileReader::Pointer> ReaderList;
     ReaderList m_Readers;
 
  };

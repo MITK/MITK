@@ -107,7 +107,8 @@ mitk::DICOMSortByTag
   double leftDouble(0);
   double rightDouble(0);
 
-  if ( (lefti >> leftDouble) && (righti >> rightDouble) )
+  if (    (lefti >> leftDouble) && (righti >> rightDouble)
+       && lefti.eof() && righti.eof() )
   {
     if (leftDouble != rightDouble) // can we decide?
     {

@@ -19,13 +19,13 @@ macro(MACRO_ORGANIZE_SOURCES)
 
   MACRO_PARSE_ARGUMENTS(_ORG "HEADER;SOURCE;TXX;DOC;MOC;GEN_QRC;GEN_UI;META;UI;QRC" "" ${ARGN})
 
-  set(CORRESPONDING__H_FILES "" )
-  set(GLOBBED__H_FILES "" )
+  set(CORRESPONDING__H_FILES "")
+  set(GLOBBED__H_FILES "")
 
-  if(_ORG_HEADER)
+  if(_ORG_SOURCE)
     foreach(_file ${_ORG_SOURCE})
       string(REGEX REPLACE "(.*)\\.(txx|cpp|c|cxx)$" "\\1.h" H_FILE ${_file})
-      if(EXISTS ${H_FILE})
+      if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE}")
         list(APPEND CORRESPONDING__H_FILES "${H_FILE}")
       endif()
     endforeach()
@@ -46,8 +46,7 @@ macro(MACRO_ORGANIZE_SOURCES)
   source_group("== Template Files ==" FILES ${_ORG_TXX})
 
   #_MACRO_APPEND_TO_LIST(_ORG_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/")
-  source_group("== Header Files ==" FILES ${_ORG_HEADER} ${_ORG_HEADER} ${CORRESPONDING__H_FILES} ${GLOBBED__H_FILES})
-
+  source_group("== Header Files ==" FILES ${_ORG_HEADER} ${CORRESPONDING__H_FILES} ${GLOBBED__H_FILES})
 
   #_MACRO_APPEND_TO_LIST(_ORG_UI "${CMAKE_CURRENT_SOURCE_DIR}/")
   source_group("QT UI Files" FILES ${_ORG_UI})

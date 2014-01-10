@@ -16,7 +16,7 @@ Important
       - need to verify that the whole string (except whitespace at the begin/end) was converted
         Solution: GetTagValue as String does a right-trim plus we check after conversion! Works.
 [x] Implement Configurator::GetBuiltIn3DReaders() (don't ignore "classic reader")
-[ ] Complete MITK properties of images: level/window and color type (MONOCHROME1/2)
+[x] Complete MITK properties of images: level/window and color type (MONOCHROME1/2)
 [ ] Check input images fo DICOMness and non-multi-frameness
 [ ] Use CanReadFile() in selection!
 [x] Check TODO in mitkDICOMTag.cpp

@@ -138,7 +138,7 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
 
     Image::Pointer FixupSpacing(Image* mitkImage);
     Image::Pointer DescribeImageWithProperties(Image* mitkImage);
-    void UpdateImageDescribingProperties();
+    void UpdateImageDescribingProperties() const;
 
     DICOMImageFrameList m_ImageFrameList;
     Image::Pointer m_MitkImage;
@@ -156,6 +156,8 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
     PropertyList::Pointer m_PropertyList;
 
     const DICOMTagCache* m_TagCache;
+
+    mutable bool m_PropertiesOutOfDate;
 };
 
 }

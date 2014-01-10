@@ -26,6 +26,7 @@ mitk::DICOMImageBlockDescriptor
 ,m_SOPClassUID("")
 ,m_PropertyList(PropertyList::New())
 ,m_TagCache(NULL)
+,m_PropertiesOutOfDate(true)
 {
 }
 
@@ -46,6 +47,7 @@ mitk::DICOMImageBlockDescriptor
 ,m_TiltInformation( other.m_TiltInformation )
 ,m_PropertyList( other.m_PropertyList->Clone() )
 ,m_TagCache( other.m_TagCache )
+,m_PropertiesOutOfDate( other.m_PropertiesOutOfDate )
 {
   if (m_MitkImage)
   {
@@ -79,6 +81,7 @@ mitk::DICOMImageBlockDescriptor
     }
 
     m_TagCache = other.m_TagCache;
+    m_PropertiesOutOfDate = other.m_PropertiesOutOfDate;
   }
   return *this;
 }
@@ -105,7 +108,7 @@ mitk::DICOMImageBlockDescriptor
   m_SliceIsLoaded.resize(framelist.size());
   m_SliceIsLoaded.assign(framelist.size(), false);
 
-  this->UpdateImageDescribingProperties();
+  m_PropertiesOutOfDate = true;
 }
 
 const mitk::DICOMImageFrameList&
@@ -276,6 +279,7 @@ mitk::BaseProperty*
 mitk::DICOMImageBlockDescriptor
 ::GetProperty(const std::string& key) const
 {
+  this->UpdateImageDescribingProperties();
   return m_PropertyList->GetProperty(key);
 }
 
@@ -283,6 +287,7 @@ std::string
 mitk::DICOMImageBlockDescriptor
 ::GetPropertyAsString(const std::string& key) const
 {
+  this->UpdateImageDescribingProperties();
   mitk::BaseProperty::Pointer property = m_PropertyList->GetProperty(key);
   if (property.IsNotNull())
   {
@@ -305,6 +310,7 @@ bool
 mitk::DICOMImageBlockDescriptor
 ::GetFlag(const std::string& key, bool defaultValue) const
 {
+  this->UpdateImageDescribingProperties();
   BoolProperty::ConstPointer boolProp = dynamic_cast<BoolProperty*>( this->GetProperty(key) );
   if (boolProp.IsNotNull())
   {
@@ -327,6 +333,7 @@ int
 mitk::DICOMImageBlockDescriptor
 ::GetIntProperty(const std::string& key, int defaultValue) const
 {
+  this->UpdateImageDescribingProperties();
   IntProperty::ConstPointer intProp = dynamic_cast<IntProperty*>( this->GetProperty(key) );
   if (intProp.IsNotNull())
   {
@@ -516,7 +523,7 @@ mitk::DICOMImageBlockDescriptor
 { \
   const DICOMTag t(tag_g, tag_e); \
   std::string tagValue = m_TagCache->GetTagValue( firstFrame, t ); \
-  this->SetProperty(#tag_name, StringProperty::New( tagValue ) ); \
+  const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty(#tag_name, StringProperty::New( tagValue ) ); \
 }
 
 #define storeTagValueRangeToProperty(tag_name, tag_g, tag_e) \
@@ -524,15 +531,17 @@ mitk::DICOMImageBlockDescriptor
   const DICOMTag t(tag_g, tag_e); \
   std::string tagValueFirst = m_TagCache->GetTagValue( firstFrame, t ); \
   std::string tagValueLast = m_TagCache->GetTagValue( lastFrame, t ); \
-  this->SetProperty(#tag_name "First", StringProperty::New( tagValueFirst ) ); \
-  this->SetProperty(#tag_name "Last", StringProperty::New( tagValueLast ) ); \
+  const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty(#tag_name "First", StringProperty::New( tagValueFirst ) ); \
+  const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty(#tag_name "Last", StringProperty::New( tagValueLast ) ); \
 }
 
 
 void
 mitk::DICOMImageBlockDescriptor
-::UpdateImageDescribingProperties()
+::UpdateImageDescribingProperties() const
 {
+  if (!m_PropertiesOutOfDate) return;
+
   if (m_TagCache && !m_ImageFrameList.empty())
   {
     DICOMImageFrameInfo::Pointer firstFrame = m_ImageFrameList.front();;
@@ -584,9 +593,11 @@ mitk::DICOMImageBlockDescriptor
                  << "' SOP instance UID '" << sopInstanceUID << "'";
 
       // add property or properties with proper names
-      this->SetProperty( "sliceLocationForSlices", StringLookupTableProperty::New( sliceLocationForSlices ) );
-      this->SetProperty( "instanceNumberForSlices",    StringLookupTableProperty::New( instanceNumberForSlices ) );
-      this->SetProperty( "SOPInstanceUIDForSlices", StringLookupTableProperty::New( SOPInstanceUIDForSlices ) );
+      const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty( "sliceLocationForSlices", StringLookupTableProperty::New( sliceLocationForSlices ) );
+      const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty( "instanceNumberForSlices",    StringLookupTableProperty::New( instanceNumberForSlices ) );
+      const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty( "SOPInstanceUIDForSlices", StringLookupTableProperty::New( SOPInstanceUIDForSlices ) );
     }
+
+    m_PropertiesOutOfDate = false;
   }
 }

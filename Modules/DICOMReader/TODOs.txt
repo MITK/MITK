@@ -1,12 +1,22 @@
+Important
 
+[ ] ONLY load a pre-sorted list
 [ ] Either NRRD cache option or slice-by-slice loading
-[ ] Performance of mitkdump / DICOMReaderSelector (TagCache?)
-[?] Sorting by "Image Time" seems undeterministic (clarkson test data)
-    - seems deterministic on Linux, needs test on Windows
-[ ] Fallback to filename instead of instance UID?
+[x] Performance of mitkdump / DICOMReaderSelector (TagCache?)
+    - the note in GDCM..Reader::GetTagValue() is correct.
+      This piece of code is taking lots of time.
+      Approx. half of the time is tag scanning, the other
+      half is construction of block describing properties,
+      which accesses GetTagValue.
+[x]   - maybe we can evaluate these properties in a lazy way
+        (only when asked for).
+        Solution: Yes, this helps, implemented.
+[x] Sorting by "Image Time" seems undeterministic (clarkson test data)
+[x] - Numeric conversion of "1.2.3.4" yields 1.2 on Windows, seems to fail on Linux(?)
+      - need to verify that the whole string (except whitespace at the begin/end) was converted
+        Solution: GetTagValue as String does a right-trim plus we check after conversion! Works.
 [ ] Implement Configurator::GetBuiltIn3DReaders() (don't ignore "classic reader")
 [ ] Complete MITK properties of images: level/window and color type (MONOCHROME1/2)
-[ ] Multi-Frame images (DCMTK)
 [ ] Check input images fo DICOMness and non-multi-frameness
 [ ] Use CanReadFile() in selection!
 [ ] Check TODO in mitkDICOMTag.cpp
@@ -15,4 +25,12 @@
     - error was hidden assumption somewhere: filenames for ImageSeriesReader need
       to be in an order that goes along the image normals, not in the opposite
       direction
+
+Questionable
+
+[ ] Fallback to filename instead of instance UID?
+
+Nice-to-have
+
+[ ] Multi-Frame images (DCMTK)
 [ ] ...

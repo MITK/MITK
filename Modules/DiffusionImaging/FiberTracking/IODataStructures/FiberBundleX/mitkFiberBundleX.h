@@ -121,7 +121,7 @@ public:
     mitk::FiberBundleX::Pointer GetDeepCopy();
 
     // compare fiber bundles
-    bool Equals(FiberBundleX* fib);
+    bool Equals(FiberBundleX* fib, double eps=0.0001);
 
 protected:
 

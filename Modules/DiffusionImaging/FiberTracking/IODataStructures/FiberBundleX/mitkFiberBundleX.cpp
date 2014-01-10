@@ -1893,7 +1893,7 @@ void mitk::FiberBundleX::UpdateColorCoding()
 }
 
 // reapply selected colorcoding in case polydata structure has changed
-bool mitk::FiberBundleX::Equals(mitk::FiberBundleX* fib)
+bool mitk::FiberBundleX::Equals(mitk::FiberBundleX* fib, double eps)
 {
     if (fib==NULL)
     {
@@ -1929,7 +1929,7 @@ bool mitk::FiberBundleX::Equals(mitk::FiberBundleX* fib)
         {
             double* p1 = points->GetPoint(j);
             double* p2 = points2->GetPoint(j);
-            if (fabs(p1[0]-p2[0])>0.0001 || fabs(p1[1]-p2[1])>0.0001 || fabs(p1[2]-p2[2])>0.0001)
+            if (fabs(p1[0]-p2[0])>eps || fabs(p1[1]-p2[1])>eps || fabs(p1[2]-p2[2])>eps)
             {
                 MITK_INFO << "Unequal points in fiber " << i << " at position " << j << "!";
                 MITK_INFO << "p1: " << p1[0] << ", " << p1[1] << ", " << p1[2];

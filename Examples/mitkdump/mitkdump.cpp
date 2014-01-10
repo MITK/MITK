@@ -148,6 +148,12 @@ int main(int argc, char* argv[])
     inputFiles.push_back( std::string(argv[a]) );
   }
 
+  if (inputFiles.empty())
+  {
+    MITK_INFO << "0 input files given, exiting...";
+    return EXIT_SUCCESS;
+  }
+
   mitk::DICOMFileReaderSelector::Pointer configSelector = mitk::DICOMFileReaderSelector::New();
   configSelector->LoadBuiltIn3DConfigs(); // a set of compiled in ressources with standard configurations that work well
   configSelector->SetInputFiles( inputFiles );
@@ -159,7 +165,7 @@ int main(int argc, char* argv[])
   }
 
   // output best reader result
-  MITK_INFO << "---- Best reader configuration '" << reader->GetConfigurationLabel() << "'";
+  MITK_INFO << "---- Best reader configuration '" << reader->GetConfigurationLabel() << "' with " << reader->GetNumberOfOutputs() << " outputs";
   if (fileDetails)
   {
     reader->PrintOutputs(std::cout, fileDetails);
@@ -174,6 +180,7 @@ int main(int argc, char* argv[])
   // write output to file for later analysis
   std::ofstream fs;
   fs.open(logfilename.c_str());
+  fs << "---- " << dirString << ": Best reader configuration '" << reader->GetConfigurationLabel() << "' with " << reader->GetNumberOfOutputs() << " outputs" << std::endl;
   reader->PrintOutputs( fs, true); // always verbose in log file
   fs.close();
 

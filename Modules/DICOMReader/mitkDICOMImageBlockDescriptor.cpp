@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMImageBlockDescriptor.h"
 #include "mitkStringProperty.h"
+#include "mitkLevelWindowProperty.h"
 #include <gdcmUIDs.h>
 
 mitk::DICOMImageBlockDescriptor
@@ -345,10 +346,34 @@ mitk::DICOMImageBlockDescriptor
   }
 }
 
+double
+mitk::DICOMImageBlockDescriptor
+::stringtodouble(const std::string& str) const
+{
+  double d;
+  std::string trimmedstring(str);
+  trimmedstring = trimmedstring.erase(trimmedstring.find_last_not_of(" \n\r\t")+1);
+
+  std::istringstream converter(trimmedstring);
+  if ( !trimmedstring.empty() && (converter >> d) && converter.eof() )
+  {
+    return d;
+  }
+  else
+  {
+    throw std::invalid_argument("Argument is not a convertable number");
+  }
+}
+
 mitk::Image::Pointer
 mitk::DICOMImageBlockDescriptor
 ::DescribeImageWithProperties(Image* mitkImage)
 {
+  // TODO: this is a collection of properties that have been provided by the
+  // legacy DicomSeriesReader.
+  // We should at some point clean up this collection and name them in a more
+  // consistent way!
+
   if (!mitkImage) return mitkImage;
 
   // first part: add some tags that describe individual slices
@@ -385,6 +410,26 @@ mitk::DICOMImageBlockDescriptor
 
   mitkImage->SetProperty("dicomseriesreader.3D+t",
       BoolProperty::New( this->GetFlag("3D+t",false) ));
+
+  // level window
+  std::string windowCenter = this->GetPropertyAsString("windowCenter");
+  std::string windowWidth  = this->GetPropertyAsString("windowWidth");
+  try
+  {
+    double level = stringtodouble( windowCenter );
+    double window = stringtodouble( windowWidth );
+    mitkImage->SetProperty("levelwindow", LevelWindowProperty::New( LevelWindow(level,window) ) );
+  }
+  catch (...)
+  {
+    // nothing, no levelwindow to be predicted...
+  }
+
+  mitkImage->SetProperty("dicom.pixel.PhotometricInterpretation", this->GetProperty("photometricInterpretation") );
+  mitkImage->SetProperty("dicom.image.imagetype", this->GetProperty("imagetype") );
+
+  mitkImage->SetProperty("dicom.study.StudyDescription", this->GetProperty("studyDescription") );
+  mitkImage->SetProperty("dicom.series.SeriesDescription", this->GetProperty("seriesDescription") );
 
   // third part: get something from ImageIO. BUT this needs to be created elsewhere. or not at all!
 
@@ -487,6 +532,7 @@ mitk::DICOMImageBlockDescriptor
   os << "  SOP class: '" << this->GetSOPClassUIDAsName() << "'" << std::endl;
 
   printProperty("Series Number", seriesNumber);
+  printProperty("Study Description", studyDescription);
   printProperty("Series Description", seriesDescription);
   printProperty("Modality", modality);
   printProperty("Sequence Name", sequenceName);
@@ -544,11 +590,12 @@ mitk::DICOMImageBlockDescriptor
 
   if (m_TagCache && !m_ImageFrameList.empty())
   {
-    DICOMImageFrameInfo::Pointer firstFrame = m_ImageFrameList.front();;
-    DICOMImageFrameInfo::Pointer lastFrame = m_ImageFrameList.back();;
+    DICOMImageFrameInfo::Pointer firstFrame = m_ImageFrameList.front();
+    DICOMImageFrameInfo::Pointer lastFrame = m_ImageFrameList.back();
 
     // see macros above
     storeTagValueToProperty(seriesNumber,0x0020,0x0011)
+    storeTagValueToProperty(studyDescription,0x0008,0x1030)
     storeTagValueToProperty(seriesDescription,0x0008,0x103e)
     storeTagValueToProperty(modality,0x0008,0x0060)
     storeTagValueToProperty(sequenceName,0x0018,0x0024)
@@ -558,6 +605,11 @@ mitk::DICOMImageBlockDescriptor
     storeTagValueRangeToProperty(acquisitionNumber,0x0020,0x0012)
     storeTagValueRangeToProperty(instanceNumber,0x0020,0x0013)
     storeTagValueRangeToProperty(imagePositionPatient,0x0020,0x0032)
+
+    storeTagValueToProperty(windowCenter,0x0028,0x1050)
+    storeTagValueToProperty(windowWidth,0x0028,0x1051)
+    storeTagValueToProperty(imageType,0x0008,0x0008)
+    storeTagValueToProperty(photometricInterpretation,0x0028,0x0004)
 
     // some per-image attributes
     // frames are just numbered starting from 0. timestep 1 (the second time-step) has frames starting at (number-of-frames-per-timestep)

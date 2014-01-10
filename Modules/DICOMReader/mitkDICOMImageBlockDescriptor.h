@@ -140,6 +140,8 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
     Image::Pointer DescribeImageWithProperties(Image* mitkImage);
     void UpdateImageDescribingProperties() const;
 
+    double stringtodouble(const std::string& str) const;
+
     DICOMImageFrameList m_ImageFrameList;
     Image::Pointer m_MitkImage;
     BoolList m_SliceIsLoaded;

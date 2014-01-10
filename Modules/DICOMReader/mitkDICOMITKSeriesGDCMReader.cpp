@@ -238,12 +238,18 @@ mitk::DICOMITKSeriesGDCMReader
   m_GDCMScanner.AddTag( gdcm::Tag(0x0018,0x1164) ); // pixel spacing
   m_GDCMScanner.AddTag( gdcm::Tag(0x0028,0x0030) ); // imager pixel spacing
 
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0028,0x1050) ); // window center
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0028,0x1051) ); // window width
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0008) ); // image type
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0028,0x0004) ); // photometric interpretation
+
   m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x1041) ); // slice location
   m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x0013) ); // instance number
   m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0016) ); // sop class UID
   m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0018) ); // sop instance UID
 
   m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x0011) ); // series number
+  m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x1030) ); // study description
   m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x103e) ); // series description
   m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0060) ); // modality
   m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x0012) ); // acquisition number

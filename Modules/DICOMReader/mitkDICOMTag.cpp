@@ -79,9 +79,13 @@ bool
 mitk::DICOMTag
 ::operator<(const DICOMTag& other) const
 {
-  // TODO check this comparison!
-  return this->m_Group * 0x3000 + this->m_Element <
-         other.m_Group * 0x3000 + other.m_Element;
+  return
+    ( this->m_Group < other.m_Group )
+    ||
+    ( ( this->m_Group == other.m_Group )
+      &&
+      ( this->m_Element < other.m_Element )
+    );
 }
 
 std::string

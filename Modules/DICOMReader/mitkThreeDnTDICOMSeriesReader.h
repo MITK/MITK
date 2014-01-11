@@ -49,6 +49,7 @@ class DICOMReader_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGDCMRe
     mitkClassMacro( ThreeDnTDICOMSeriesReader, DICOMITKSeriesGDCMReader );
     mitkCloneMacro( ThreeDnTDICOMSeriesReader );
     itkNewMacro( ThreeDnTDICOMSeriesReader );
+    mitkNewMacro1Param( ThreeDnTDICOMSeriesReader, unsigned int );
 
     /// \brief Control whether 3D+t grouping shall actually be attempted.
     void SetGroup3DandT(bool on);
@@ -60,7 +61,7 @@ class DICOMReader_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGDCMRe
 
   protected:
 
-    ThreeDnTDICOMSeriesReader();
+    ThreeDnTDICOMSeriesReader(unsigned int decimalPlacesForOrientation = 5);
     virtual ~ThreeDnTDICOMSeriesReader();
 
     ThreeDnTDICOMSeriesReader(const ThreeDnTDICOMSeriesReader& other);

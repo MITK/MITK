@@ -27,11 +27,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <gdcmUIDs.h>
 
 mitk::DICOMITKSeriesGDCMReader
-::DICOMITKSeriesGDCMReader()
+::DICOMITKSeriesGDCMReader(unsigned int decimalPlacesForOrientation)
 :DICOMFileReader()
 ,m_FixTiltByShearing(true)
 {
-  this->EnsureMandatorySortersArePresent();
+  this->EnsureMandatorySortersArePresent(decimalPlacesForOrientation);
 }
 
 mitk::DICOMITKSeriesGDCMReader
@@ -44,7 +44,6 @@ mitk::DICOMITKSeriesGDCMReader
 ,m_EquiDistantBlocksSorter( other.m_EquiDistantBlocksSorter->Clone() )
 ,m_NormalDirectionConsistencySorter( other.m_NormalDirectionConsistencySorter->Clone() )
 {
-  this->EnsureMandatorySortersArePresent();
 }
 
 mitk::DICOMITKSeriesGDCMReader
@@ -540,14 +539,14 @@ mitk::DICOMITKSeriesGDCMReader
 
 void
 mitk::DICOMITKSeriesGDCMReader
-::EnsureMandatorySortersArePresent()
+::EnsureMandatorySortersArePresent(unsigned int decimalPlacesForOrientation)
 {
   DICOMTagBasedSorter::Pointer splitter = DICOMTagBasedSorter::New();
   splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0010) ); // Number of Rows
   splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0011) ); // Number of Columns
   splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0030) ); // Pixel Spacing
   splitter->AddDistinguishingTag( DICOMTag(0x0018, 0x1164) ); // Imager Pixel Spacing
-  splitter->AddDistinguishingTag( DICOMTag(0x0020, 0x0037), new mitk::DICOMTagBasedSorter::CutDecimalPlaces(5) ); // Image Orientation (Patient) // TODO: configurable!
+  splitter->AddDistinguishingTag( DICOMTag(0x0020, 0x0037), new mitk::DICOMTagBasedSorter::CutDecimalPlaces(decimalPlacesForOrientation) ); // Image Orientation (Patient)
   splitter->AddDistinguishingTag( DICOMTag(0x0018, 0x0050) ); // Slice Thickness
   splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0008) ); // Number of Frames
   this->AddSortingElement( splitter, true ); // true = at front

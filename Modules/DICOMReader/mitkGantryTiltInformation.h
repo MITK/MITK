@@ -74,6 +74,18 @@ class GantryTiltInformation
         const Vector3D& up, unsigned int numberOfSlicesApart);
 
     /**
+      \brief Factory method to create GantryTiltInformation from tag values (strings).
+
+      Parameters as the regular c'tor.
+    */
+    static
+    GantryTiltInformation
+    MakeFromTagValues( const std::string& origin1String,
+        const std::string& origin2String,
+        const std::string orientationString,
+        unsigned int numberOfSlicesApart);
+
+    /**
       \brief Whether the slices were sheared.
 
       True if any of the shifts along right or up vector are non-zero.

@@ -139,18 +139,25 @@ mitk::ThreeDnTDICOMSeriesReader
        blockIter != true3DnTBlocks.end();
        ++o, ++blockIter)
   {
+    // bad copy&paste code from DICOMITKSeriesGDCMReader, should be handled in a better way
     DICOMGDCMImageFrameList& gdcmFrameInfoList = *blockIter;
-    DICOMImageFrameList frameList = ToDICOMImageFrameList( gdcmFrameInfoList );
     assert(!gdcmFrameInfoList.empty());
+
+    // reverse frames if necessary
+    // update tilt information from absolute last sorting
+    DICOMDatasetList datasetList = ToDICOMDatasetList( gdcmFrameInfoList );
+    m_NormalDirectionConsistencySorter->SetInput( datasetList );
+    m_NormalDirectionConsistencySorter->Sort();
+    DICOMGDCMImageFrameList sortedGdcmInfoFrameList = FromDICOMDatasetList( m_NormalDirectionConsistencySorter->GetOutput(0) );
+    const GantryTiltInformation& tiltInfo = m_NormalDirectionConsistencySorter->GetTiltInformation();
+
+    // set frame list for current block
+    DICOMImageFrameList frameList = ToDICOMImageFrameList( sortedGdcmInfoFrameList );
     assert(!frameList.empty());
 
     DICOMImageBlockDescriptor block;
     block.SetTagCache( this ); // important: this must be before SetImageFrameList(), because SetImageFrameList will trigger reading of lots of interesting tags!
     block.SetImageFrameList( frameList );
-
-    // bad copy&paste code, should be handled in a better way
-
-    const GantryTiltInformation& tiltInfo = m_EquiDistantBlocksSorter->GetTiltInformation( (gdcmFrameInfoList.front())->GetFilenameIfAvailable() );
     block.SetTiltInformation( tiltInfo );
 
     // assume
@@ -201,7 +208,7 @@ mitk::ThreeDnTDICOMSeriesReader
   PushLocale();
   const DICOMImageFrameList& frames = block.GetImageFrameList();
   const GantryTiltInformation tiltInfo = block.GetTiltInformation();
-  bool hasTilt = block.GetFlag("gantryTilt", false);
+  bool hasTilt = tiltInfo.IsRegularGantryTilt();
 
   int numberOfTimesteps = block.GetIntProperty("timesteps", 1);
 

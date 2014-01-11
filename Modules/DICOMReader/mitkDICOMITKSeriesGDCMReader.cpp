@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+//#define MBILOG_ENABLE_DEBUG
+
 #include "mitkDICOMITKSeriesGDCMReader.h"
 #include "mitkITKDICOMSeriesReaderHelper.h"
 #include "mitkGantryTiltInformation.h"
@@ -289,7 +291,6 @@ mitk::DICOMITKSeriesGDCMReader
 
   // a last extra-sorting step: ensure equidistant slices
   m_SortingResultInProgress = this->InternalExecuteSortingStep(sorterIndex++, m_EquiDistantBlocksSorter.GetPointer(), m_SortingResultInProgress, &timer);
-  m_SortingResultInProgress = this->InternalExecuteSortingStep(sorterIndex, m_NormalDirectionConsistencySorter.GetPointer(), m_SortingResultInProgress, &timer);
 
   timer.Stop("Sorting frames");
 
@@ -307,16 +308,23 @@ mitk::DICOMITKSeriesGDCMReader
        ++o, ++blockIter)
   {
     DICOMGDCMImageFrameList& gdcmFrameInfoList = *blockIter;
-    DICOMImageFrameList frameList = ToDICOMImageFrameList( gdcmFrameInfoList );
     assert(!gdcmFrameInfoList.empty());
+
+    // reverse frames if necessary
+    // update tilt information from absolute last sorting
+    DICOMDatasetList datasetList = ToDICOMDatasetList( gdcmFrameInfoList );
+    m_NormalDirectionConsistencySorter->SetInput( datasetList );
+    m_NormalDirectionConsistencySorter->Sort();
+    DICOMGDCMImageFrameList sortedGdcmInfoFrameList = FromDICOMDatasetList( m_NormalDirectionConsistencySorter->GetOutput(0) );
+    const GantryTiltInformation& tiltInfo = m_NormalDirectionConsistencySorter->GetTiltInformation();
+
+    // set frame list for current block
+    DICOMImageFrameList frameList = ToDICOMImageFrameList( sortedGdcmInfoFrameList );
     assert(!frameList.empty());
 
     DICOMImageBlockDescriptor block;
     block.SetTagCache( this ); // important: this must be before SetImageFrameList(), because SetImageFrameList will trigger reading of lots of interesting tags!
     block.SetImageFrameList( frameList );
-
-    const GantryTiltInformation& tiltInfo = m_EquiDistantBlocksSorter->GetTiltInformation( (gdcmFrameInfoList.front())->GetFilenameIfAvailable() );
-    block.SetFlag("gantryTilt", tiltInfo.IsRegularGantryTilt());
     block.SetTiltInformation( tiltInfo );
 
     static const DICOMTag tagPixelSpacing(0x0028,0x0030);
@@ -351,7 +359,9 @@ mitk::DICOMITKSeriesGDCMReader
     itk::TimeProbesCollectorBase* timer)
 {
   SortingBlockList nextStepSorting; // we should not modify our input list while processing it
-  std::stringstream ss; ss << "Sorting step " << sortingStepIndex;
+  std::stringstream ss; ss << "Sorting step " << sortingStepIndex << " '";
+  sorter->PrintConfiguration(ss);
+  ss << "'";
   timer->Start( ss.str().c_str() );
   nextStepSorting.clear();
 
@@ -459,7 +469,7 @@ mitk::DICOMITKSeriesGDCMReader
   PushLocale();
   const DICOMImageFrameList& frames = block.GetImageFrameList();
   const GantryTiltInformation tiltInfo = block.GetTiltInformation();
-  bool hasTilt = block.GetFlag("gantryTilt", false);
+  bool hasTilt = tiltInfo.IsRegularGantryTilt();
 
   ITKDICOMSeriesReaderHelper::StringContainer filenames;
   for (DICOMImageFrameList::const_iterator frameIter = frames.begin();

@@ -1,6 +1,12 @@
 Important
 
-[ ] ONLY load a pre-sorted list
+[...] ONLY load a pre-sorted list
+    - Should work now by:
+      - get the list of images, consturct FrameInfo list (order must be known from prior sorting)
+      - prepare a tagcache object that provides tag information (from some kind of database)
+      - create DICOMImageBlockDescriptor with frame list and tag cache
+      - Call SetFixTiltByShearing() and TiltInfo object as appropriate... (the second part should not be necessary..)
+      - call DICOMITKSeriesGDCMReader::LoadMitkImageForImageBlockDescriptor(block)
 [ ] Either NRRD cache option or slice-by-slice loading
 [x] Performance of mitkdump / DICOMReaderSelector (TagCache?)
     - the note in GDCM..Reader::GetTagValue() is correct.
@@ -11,6 +17,12 @@ Important
 [x]   - maybe we can evaluate these properties in a lazy way
         (only when asked for).
         Solution: Yes, this helps, implemented.
+[x] Gantry tilt broken during implementation
+    - Was a wrong implementation of NormalDirectionConsistencySorter
+[ ] Accepted image origin error during EquiDistantBlocksSorter
+    must be configurable. To support legacy behavior of the reader,
+    the tolerance must be fixable to a constant value. For newer
+    readers, it should be adapted to the actual slice distance.
 [x] Sorting by "Image Time" seems undeterministic (clarkson test data)
 [x] - Numeric conversion of "1.2.3.4" yields 1.2 on Windows, seems to fail on Linux(?)
       - need to verify that the whole string (except whitespace at the begin/end) was converted

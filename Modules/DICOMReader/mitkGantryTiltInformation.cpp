@@ -14,7 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+//#define MBILOG_ENABLE_DEBUG
+
 #include "mitkGantryTiltInformation.h"
+
+#include "mitkDICOMTag.h"
 
 #include "mitkLogMacros.h"
 
@@ -141,6 +145,43 @@ mitk::GantryTiltInformation::GantryTiltInformation(
   }
 }
 
+mitk::GantryTiltInformation
+mitk::GantryTiltInformation
+::MakeFromTagValues(
+    const std::string& origin1String,
+    const std::string& origin2String,
+    const std::string orientationString,
+    unsigned int numberOfSlicesApart)
+{
+  Vector3D right; right.Fill(0.0);
+  Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
+  bool orientationConversion(false);
+  DICOMStringToOrientationVectors( orientationString, right, up, orientationConversion );
+
+  if (orientationConversion
+      && !origin1String.empty() && !origin2String.empty()
+    )
+  {
+    bool firstOriginConversion(false);
+    bool lastOriginConversion(false);
+
+    Point3D firstOrigin = DICOMStringToPoint3D( origin1String, firstOriginConversion );
+    Point3D lastOrigin = DICOMStringToPoint3D( origin2String, lastOriginConversion );
+
+    if (firstOriginConversion && lastOriginConversion)
+    {
+      return GantryTiltInformation( firstOrigin, lastOrigin, right, up, numberOfSlicesApart );
+    }
+  }
+
+  std::stringstream ss;
+  ss << "Invalid tag values when constructing tilt information from origin1 '" << origin1String
+     << "', origin2 '" << origin2String
+     << "', and orientation '" << orientationString << "'";
+
+  throw std::invalid_argument(ss.str());
+}
+
 void
 mitk::GantryTiltInformation
 ::Print(std::ostream& os) const
@@ -214,6 +255,4 @@ mitk::GantryTiltInformation::IsRegularGantryTilt() const
          (   fabs(m_ShiftRight) < 0.001
           &&    fabs(m_ShiftUp) > 0.001);
 }
-
-
 

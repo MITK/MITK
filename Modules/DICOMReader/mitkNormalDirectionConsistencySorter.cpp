@@ -39,7 +39,7 @@ void
 mitk::NormalDirectionConsistencySorter
 ::PrintConfiguration(std::ostream& os, const std::string& indent) const
 {
-  os << indent << "NormalDirectionConsistencySorter TODO" << std::endl;
+  os << indent << "NormalDirectionConsistencySorter" << std::endl;
 }
 
 
@@ -115,19 +115,51 @@ mitk::NormalDirectionConsistencySorter
     directionOfSlices = lastOrigin - firstOrigin;
     directionOfSlices.Normalize();
 
+    static double projection = 0.0;
+    projection = 0.0;
+    projection = normal * directionOfSlices;
+
     MITK_DEBUG << "Making sense of \norientation '" << imageOrientationString
-      << "'\nfirst position '" << imagePositionPatientFirst
-      << "'\nlast position '" << imagePositionPatientLast << "'";
+               << "'\nfirst position '" << imagePositionPatientFirst
+               << "'\nlast position '" << imagePositionPatientLast << "'";
     MITK_DEBUG << "Normal: " << normal;
     MITK_DEBUG << "Direction of slices: " << directionOfSlices;
+    MITK_DEBUG << "Projection of direction onto slice normal: " << projection;
 
-    if ( (directionOfSlices - normal).GetNorm() > 0.5 )
+    if ( projection < 0.0 )
     {
       MITK_DEBUG << "Need to reverse filenames";
       std::reverse( datasets.begin(), datasets.end() );
+
+      m_TiltInfo = GantryTiltInformation::MakeFromTagValues(
+          imagePositionPatientLast,
+          imagePositionPatientFirst,
+          imageOrientationString,
+          datasets.size() - 1
+          );
     }
+    else
+    {
+      m_TiltInfo = GantryTiltInformation::MakeFromTagValues(
+          imagePositionPatientFirst,
+          imagePositionPatientLast,
+          imageOrientationString,
+          datasets.size() - 1
+          );
+    }
+  }
+  else // just ONE dataset, do not forget to reset tilt information
+  {
+    m_TiltInfo = GantryTiltInformation(); // empty info
   }
 
   this->SetNumberOfOutputs(1);
   this->SetOutput(0, datasets);
+}
+
+mitk::GantryTiltInformation
+mitk::NormalDirectionConsistencySorter
+::GetTiltInformation() const
+{
+  return m_TiltInfo;
 }

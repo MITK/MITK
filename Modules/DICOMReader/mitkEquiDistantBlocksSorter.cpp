@@ -79,6 +79,21 @@ mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
 
 void
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
+::SetLastFilenameOfBlock(const std::string& filename)
+{
+  m_LastFilenameOfBlock = filename;
+}
+
+std::string
+mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
+::GetLastFilenameOfBlock() const
+{
+  return m_LastFilenameOfBlock;
+}
+
+
+void
+mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
 ::FlagGantryTilt(const GantryTiltInformation& tiltInfo)
 {
   m_TiltInfo = tiltInfo;
@@ -202,25 +217,6 @@ mitk::EquiDistantBlocksSorter
   }
 }
 
-const mitk::GantryTiltInformation
-mitk::EquiDistantBlocksSorter
-::GetTiltInformation(const std::string& filename)
-{
-  for (ResultsList::iterator ri = m_SliceGroupingResults.begin();
-       ri != m_SliceGroupingResults.end();
-       ++ri)
-  {
-    SliceGroupingAnalysisResult& result = *ri;
-
-    if (filename == result.GetFirstFilenameOfBlock())
-    {
-      return result.GetTiltInfo();
-    }
-  }
-
-  return GantryTiltInformation(); // empty
-}
-
 std::string
 mitk::EquiDistantBlocksSorter
 ::ConstCharStarToString(const char* s)
@@ -314,10 +310,19 @@ mitk::EquiDistantBlocksSorter
         fromFirstToSecondOrigin = thisOrigin - lastDifferentOrigin;
         fromFirstToSecondOriginInitialized = true;
 
-        MITK_DEBUG << "Distance of two slices: " << fromFirstToSecondOrigin.GetNorm() << "mm";
-        toleratedOriginError =
-          fromFirstToSecondOrigin.GetNorm() * 0.3; // a third of the slice distance
-                                                  //  (less than half, which would mean that a slice is displayed where another slice should actually be)
+        // classic mode without tolerance!
+        bool adaptiveErrorTolerance = false; // TODO make an option
+        if (adaptiveErrorTolerance)
+        {
+          MITK_DEBUG << "Distance of two slices: " << fromFirstToSecondOrigin.GetNorm() << "mm";
+          toleratedOriginError =
+            fromFirstToSecondOrigin.GetNorm() * 0.3; // a third of the slice distance
+          //  (less than half, which would mean that a slice is displayed where another slice should actually be)
+        }
+        else
+        {
+          toleratedOriginError = 0.005;
+        }
         MITK_DEBUG << "Accepting errors in actual versus expected origin up to " << toleratedOriginError << "mm";
 
         // Here we calculate if this slice and the previous one are well aligned,
@@ -336,7 +341,7 @@ mitk::EquiDistantBlocksSorter
 
         GantryTiltInformation tiltInfo( lastDifferentOrigin, thisOrigin, right, up, 1 );
 
-        if ( tiltInfo.IsSheared() ) // mitk::eps is too small; 1/1000 of a mm should be enough to detect tilt
+        if ( tiltInfo.IsSheared() )
         {
           /* optimistic approach, accepting gantry tilt: save file for later, check all further files */
 
@@ -369,6 +374,7 @@ mitk::EquiDistantBlocksSorter
                 result.FlagGantryTilt(tiltInfo);
                 result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
                 result.SetFirstFilenameOfBlock( datasets.front()->GetFilenameIfAvailable() );
+                result.SetLastFilenameOfBlock( datasets.back()->GetFilenameIfAvailable() );
                 fileFitsIntoPattern = true;
               }
             }
@@ -379,6 +385,7 @@ mitk::EquiDistantBlocksSorter
               result.FlagGantryTilt(tiltInfo);
               result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
               result.SetFirstFilenameOfBlock( datasets.front()->GetFilenameIfAvailable() );
+              result.SetLastFilenameOfBlock( datasets.back()->GetFilenameIfAvailable() );
               fileFitsIntoPattern = true;
             }
           }
@@ -463,37 +470,22 @@ mitk::EquiDistantBlocksSorter
   // now that we know the whole range, we can re-calculate using the very first and last slice
   if ( result.ContainsGantryTilt() && result.GetBlockDatasets().size() > 1 )
   {
-    DICOMDatasetList datasets = result.GetBlockDatasets();
-    DICOMDatasetAccess* firstDataset = datasets.front();
-    DICOMDatasetAccess* lastDataset = datasets.back();
-    unsigned int numberOfSlicesApart = datasets.size() - 1;
-
-    Vector3D right; right.Fill(0.0);
-    Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
-    std::string orientationValue = firstDataset->GetTagValueAsString( tagImageOrientation );
-    bool orientationConversion(false);
-    DICOMStringToOrientationVectors( orientationValue, right, up, orientationConversion );
-
-    if (orientationConversion)
+    try
     {
+      DICOMDatasetList datasets = result.GetBlockDatasets();
+      DICOMDatasetAccess* firstDataset = datasets.front();
+      DICOMDatasetAccess* lastDataset = datasets.back();
+      unsigned int numberOfSlicesApart = datasets.size() - 1;
 
+      std::string orientationString = firstDataset->GetTagValueAsString( tagImageOrientation );
       std::string firstOriginString = firstDataset->GetTagValueAsString( tagImagePositionPatient );
       std::string lastOriginString = lastDataset->GetTagValueAsString( tagImagePositionPatient );
 
-      if (!firstOriginString.empty() && !lastOriginString.empty())
-      {
-        bool firstOriginConversion(false);
-        bool lastOriginConversion(false);
-
-        Point3D firstOrigin = DICOMStringToPoint3D( firstOriginString, firstOriginConversion );
-        Point3D lastOrigin = DICOMStringToPoint3D( lastOriginString, lastOriginConversion );
-
-        if (firstOriginConversion && lastOriginConversion)
-        {
-          GantryTiltInformation updatedTiltInfo( firstOrigin, lastOrigin, right, up, numberOfSlicesApart );
-          result.FlagGantryTilt(updatedTiltInfo);
-        }
-      }
+      result.FlagGantryTilt( GantryTiltInformation::MakeFromTagValues( firstOriginString, lastOriginString, orientationString, numberOfSlicesApart ));
+    }
+    catch (...)
+    {
+      // just do not flag anything, we are ok
     }
   }
 

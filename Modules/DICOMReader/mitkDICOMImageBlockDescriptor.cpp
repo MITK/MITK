@@ -406,7 +406,7 @@ mitk::DICOMImageBlockDescriptor
       GenericProperty<ReaderImplementationLevel>::New( m_ReaderImplementationLevel ));
 
   mitkImage->SetProperty("dicomseriesreader.GantyTiltCorrected",
-      BoolProperty::New( this->GetFlag("gantryTilt",false) ));
+      BoolProperty::New( this->GetTiltInformation().IsRegularGantryTilt() ));
 
   mitkImage->SetProperty("dicomseriesreader.3D+t",
       BoolProperty::New( this->GetFlag("3D+t",false) ));
@@ -544,7 +544,7 @@ mitk::DICOMImageBlockDescriptor
   printProperty("Image Orientation", orientation);
 
   os << "  Pixel spacing interpretation: '" << PixelSpacingInterpretationToString(this->GetPixelSpacingInterpretation()) << "'" << std::endl;
-  printBool("Gantry Tilt", this->GetFlag("gantryTilt",false))
+  printBool("Gantry Tilt", this->GetTiltInformation().IsRegularGantryTilt())
   //printBool("3D+t", this->GetFlag("3D+t",false))
 
   //os << "  MITK image loaded: '" << (this->GetMitkImage().IsNotNull() ? "yes" : "no") << "'" << std::endl;

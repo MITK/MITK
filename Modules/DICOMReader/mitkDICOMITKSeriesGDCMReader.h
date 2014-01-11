@@ -76,9 +76,6 @@ namespace mitk
        2. let the sorter sort (and split)
        3. integrate the sorter's output groups with our own output groups
 
-  The output blocks described by DICOMImageBlockDescriptor will contains the following properties (compare DICOMImageBlockDescriptor):
-    - \b "gantryTilt": true if the image is has a gantry tilt that will be corrected during loading
-
   \section DICOMITKSeriesGDCMReader_ForcedConfiguration Forced Configuration
 
   In all cases, the reader will add two DICOMDatasetSorter objects that are required to load
@@ -308,10 +305,11 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
     typedef std::list<DICOMDatasetSorter::Pointer> SorterList;
     SorterList m_Sorter;
 
+    mitk::EquiDistantBlocksSorter::Pointer m_EquiDistantBlocksSorter;
+
   protected:
 
     // NOT nice, made available to ThreeDnTDICOMSeriesReader due to lack of time
-    mitk::EquiDistantBlocksSorter::Pointer m_EquiDistantBlocksSorter;
     mitk::NormalDirectionConsistencySorter::Pointer m_NormalDirectionConsistencySorter;
 
   private:

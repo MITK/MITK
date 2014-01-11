@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkNormalDirectionConsistencySorter_h
 
 #include "mitkDICOMDatasetSorter.h"
+#include "mitkGantryTiltInformation.h"
 
 namespace mitk
 {
@@ -30,6 +31,9 @@ namespace mitk
  we need to make sure that the order of inputs for the ImageSeriesReader is along the
  normal of the images. I.e. The direction of the normal needs to be the same direction
  as the vector from the first to the last image origin.
+
+ Since this class is used as a last sorting step before loading, it will also
+ calculate (and return) an updated GantryTiltInformation object.
 
  \note This class might be a workaround for another bug in MITK, but until this issue
        is completely understood, the workaround fixes the problem of images that
@@ -47,6 +51,9 @@ class DICOMReader_EXPORT NormalDirectionConsistencySorter : public DICOMDatasetS
     /// See class description.
     virtual void Sort();
 
+    /// See class description and DICOMITKSeriesGDCMReader.
+    GantryTiltInformation GetTiltInformation() const;
+
     virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const;
 
   protected:
@@ -56,6 +63,8 @@ class DICOMReader_EXPORT NormalDirectionConsistencySorter : public DICOMDatasetS
 
     NormalDirectionConsistencySorter(const NormalDirectionConsistencySorter& other);
     NormalDirectionConsistencySorter& operator=(const NormalDirectionConsistencySorter& other);
+
+    GantryTiltInformation m_TiltInfo;
 };
 
 }

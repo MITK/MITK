@@ -68,7 +68,6 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
       \brief Whether or not to accept images from a tilted acquisition in a single output group.
     */
     void SetAcceptTilt(bool accept);
-    const GantryTiltInformation GetTiltInformation(const std::string& filename);
 
     virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const;
 
@@ -96,6 +95,8 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
 
         void SetFirstFilenameOfBlock(const std::string& filename);
         std::string GetFirstFilenameOfBlock() const;
+        void SetLastFilenameOfBlock(const std::string& filename);
+        std::string GetLastFilenameOfBlock() const;
 
         /**
           \brief Remaining files, which could not be grouped.
@@ -141,6 +142,7 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
 
         GantryTiltInformation m_TiltInfo;
         std::string m_FirstFilenameOfBlock;
+        std::string m_LastFilenameOfBlock;
     };
 
     /**

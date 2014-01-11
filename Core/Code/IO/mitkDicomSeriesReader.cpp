@@ -1124,6 +1124,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
               MITK_DEBUG << "Comparing recorded tilt angle " << angle << " against calculated value " << tiltInfo.GetTiltAngleInDegrees();
               // TODO we probably want the signs correct, too (that depends: this is just a rough check, nothing serious)
+              // TODO TODO TODO when angle -27 and tiltangle 63, this will never trigger the if-clause... useless check in this case! old bug..?!
               if ( fabs(angle) - tiltInfo.GetTiltAngleInDegrees() > 0.25)
               {
                 result.AddFileToUnsortedBlock( *fileIter ); // sort away for further analysis

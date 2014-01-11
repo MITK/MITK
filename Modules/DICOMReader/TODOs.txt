@@ -29,9 +29,10 @@ Important
         Solution: GetTagValue as String does a right-trim plus we check after conversion! Works.
 [x] Implement Configurator::GetBuiltIn3DReaders() (don't ignore "classic reader")
 [x] Complete MITK properties of images: level/window and color type (MONOCHROME1/2)
-[ ] Check input images fo DICOMness and non-multi-frameness
-[ ] Use CanReadFile() in selection!
-[x] Check TODO in mitkDICOMTag.cpp
+[x] Check input images fo DICOMness and non-multi-frameness
+[x] Use CanHandleFile() in selection!
+    - implicitly now, the reader checks itself and produces no output if it cannot handle the files
+[x] Check ToDo in mitkDICOMTag.cpp
     - operator< for DICOMTag has been re-implemented in a readable and safer way.
 [ ] Configurable precision for tag value comparisons
 [x] Images are upside-down in some cases
@@ -47,3 +48,6 @@ Nice-to-have
 
 [ ] Multi-Frame images (DCMTK)
 [ ] ...
+[ ] Add the tags used by DICOMImageBlockDescriptor dynamically instead of hard-coded
+    (look for ToDo around m_GDCMScanner.AddTag() in mitkDICOMITKSeriesGDCMReader.cpp)
+[ ] Let DICOMImageBlockDescriptor describe attributes common and different for all blocks of a series

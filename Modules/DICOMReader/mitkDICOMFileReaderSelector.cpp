@@ -218,7 +218,9 @@ mitk::DICOMFileReaderSelector
        rIter != workingCandidates.end();
        ++readerIndex, ++rIter)
   {
-    if ( (*rIter)->GetNumberOfOutputs() < minimumNumberOfOutputs )
+    unsigned int thisReadersNumberOfOutputs = (*rIter)->GetNumberOfOutputs();
+    if (   thisReadersNumberOfOutputs > 0  // we don't count readers that don't actually produce output
+        && thisReadersNumberOfOutputs < minimumNumberOfOutputs )
     {
       minimumNumberOfOutputs = (*rIter)->GetNumberOfOutputs();
       bestReader = *rIter;

@@ -20,6 +20,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define switch3DCase(IOType, T) \
   case IOType: return LoadDICOMByITK< T >(filenames, correctTilt, tiltInfo, io, preLoadedImageBlock);
 
+bool
+mitk::ITKDICOMSeriesReaderHelper
+::CanHandleFile(const std::string& filename)
+{
+  MITK_DEBUG << "ITKDICOMSeriesReaderHelper::CanHandleFile " << filename;
+  static itk::GDCMImageIO::Pointer tester = itk::GDCMImageIO::New();
+  if ( tester->CanReadFile(filename.c_str()) )
+  {
+    tester->SetFileName( filename.c_str() );
+    tester->ReadImageInformation();
+
+    std::string numberOfFrames;
+    if (tester->GetValueFromTag("0028|0008", numberOfFrames))
+    {
+      MITK_DEBUG << "Number of Frames for " << filename << ": " << numberOfFrames;
+      // cannot handle multi-frame
+      return false;
+    }
+    else
+    {
+      MITK_DEBUG << "No Number of Frames tag for " << filename;
+      // friendly old single-frame file
+      return true;
+    }
+  }
+
+  MITK_DEBUG << "GDCMImageIO found: No DICOM in " << filename;
+  // does not seem to be DICOM
+  return false;
+}
+
 mitk::Image::Pointer
 mitk::ITKDICOMSeriesReaderHelper
 ::Load( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo )

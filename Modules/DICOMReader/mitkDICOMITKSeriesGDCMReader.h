@@ -30,8 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <stack>
 
-// TODO should reject multi-frame
-// TODO tests seem to pass if reader creates NO output at all!
 // TODO preloaded volumes?? could be solved in a different way..
 
 namespace itk
@@ -289,9 +287,6 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
         const SortingBlockList& input,
         itk::TimeProbesCollectorBase* timer);
 
-    /// \brief Creates the required sorting steps described in \ref DICOMITKSeriesGDCMReader_ForcedConfiguration
-    void EnsureMandatorySortersArePresent();
-
     /// \brief Loads the mitk::Image by means of an itk::ImageSeriesReader
     virtual bool LoadMitkImageForOutput(unsigned int o);
 
@@ -306,6 +301,9 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
     /// \brief Describe this reader's confidence for given SOP class UID
     ReaderImplementationLevel GetReaderImplementationLevel(const std::string sopClassUID) const;
   private:
+
+    /// \brief Creates the required sorting steps described in \ref DICOMITKSeriesGDCMReader_ForcedConfiguration
+    void EnsureMandatorySortersArePresent();
 
   protected:
 

@@ -78,8 +78,6 @@ int main(int argc, char** argv)
   mitk::TestDICOMLoading loader;
   mitk::StringList files;
 
-  // TODO load reference dumps
-
   // load from argv[1]
   // separate at "-- Image n"
   // store in an array of dumps
@@ -116,6 +114,13 @@ int main(int argc, char** argv)
       return EXIT_FAILURE;
     }
   }
+
+  if (images.size() < expectedDumps.size())
+  {
+    MITK_ERROR << "Loader produced only " << images.size() << " mitk::Images, while test expected " << expectedDumps.size() << " images";
+    return EXIT_FAILURE;
+  }
+
 
   return EXIT_SUCCESS;
 }

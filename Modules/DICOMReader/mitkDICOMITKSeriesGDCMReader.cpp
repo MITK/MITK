@@ -216,8 +216,24 @@ mitk::DICOMITKSeriesGDCMReader
   // prepare initial sorting (== list of input files)
   StringList inputFilenames = this->GetInputFiles();
 
-  // scan files for sorting-relevant tags
+  timer.Start("Check appropriateness of input files");
+  if ( inputFilenames.empty()
+       ||
+       !this->CanHandleFile( inputFilenames.front() ) // first
+       ||
+       !this->CanHandleFile( inputFilenames.back() ) // last
+       ||
+       !this->CanHandleFile( inputFilenames[ inputFilenames.size() / 2] ) // roughly central file
+     )
+  {
+    // TODO a read-as-many-as-possible fallback could be implemented here
+    MITK_DEBUG << "Reader unable to process files..";
+    return;
+  }
 
+  timer.Stop("Check appropriateness of input files");
+
+  // scan files for sorting-relevant tags
   timer.Start("Setup scanning");
   for(SorterList::iterator sorterIter = m_Sorter.begin();
       sorterIter != m_Sorter.end();
@@ -509,11 +525,9 @@ mitk::DICOMITKSeriesGDCMReader
 
 bool
 mitk::DICOMITKSeriesGDCMReader
-::CanHandleFile(const std::string& itkNotUsed(filename))
+::CanHandleFile(const std::string& filename)
 {
-  return true; // can handle all
-  // TODO peek into file, check DCM
-  // TODO nice-to-have: check multi-framedness
+  return ITKDICOMSeriesReaderHelper::CanHandleFile(filename);
 }
 
 void
@@ -536,7 +550,6 @@ void
 mitk::DICOMITKSeriesGDCMReader
 ::EnsureMandatorySortersArePresent()
 {
-  // TODO do just once! Do it in c'tor and handle this step extra!
   DICOMTagBasedSorter::Pointer splitter = DICOMTagBasedSorter::New();
   splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0010) ); // Number of Rows
   splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0011) ); // Number of Columns

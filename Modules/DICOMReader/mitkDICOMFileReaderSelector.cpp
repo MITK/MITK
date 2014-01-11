@@ -66,7 +66,6 @@ mitk::DICOMFileReaderSelector
       s.assign((std::istreambuf_iterator<char>(stream)),
                 std::istreambuf_iterator<char>());
 
-      //MITK_INFO << "------------ One resource with content\n" << s << "\n------- end -------";
       this->AddConfig(s);
     }
   }
@@ -90,7 +89,6 @@ mitk::DICOMFileReaderSelector
     s.assign((std::istreambuf_iterator<char>(stream)),
               std::istreambuf_iterator<char>());
 
-    //MITK_INFO << "------------ One resource with content\n" << s << "\n------- end -------";
     this->AddConfig(s);
   }
 }
@@ -112,6 +110,7 @@ mitk::DICOMFileReaderSelector
   // in this order of preference...
   this->AddConfigFromResource("configurations/3D/instancenumber.xml");
   this->AddConfigFromResource("configurations/3D/imageposition.xml");
+  this->AddConfigFromResource("configurations/3D/imageposition_byacquisition.xml");
   this->AddConfigFromResource("configurations/3D/slicelocation.xml");
   this->AddConfigFromResource("configurations/3D/imagetime.xml");
 }

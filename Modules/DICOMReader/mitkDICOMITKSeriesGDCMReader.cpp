@@ -36,7 +36,9 @@ mitk::DICOMITKSeriesGDCMReader
 
 mitk::DICOMITKSeriesGDCMReader
 ::DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other )
-:DICOMFileReader(other)
+:itk::Object()
+,DICOMFileReader(other)
+,DICOMTagCache(other)
 ,m_FixTiltByShearing(false)
 ,m_Sorter( other.m_Sorter ) // TODO should clone the list items
 ,m_EquiDistantBlocksSorter( other.m_EquiDistantBlocksSorter->Clone() )
@@ -343,17 +345,7 @@ mitk::DICOMITKSeriesGDCMReader
     block.SetImageFrameList( frameList );
     block.SetTiltInformation( tiltInfo );
 
-    static const DICOMTag tagPixelSpacing(0x0028,0x0030);
-    static const DICOMTag tagImagerPixelSpacing(0x0018,0x1164);
-    std::string pixelSpacingString = (gdcmFrameInfoList.front())->GetTagValueAsString( tagPixelSpacing );
-    std::string imagerPixelSpacingString = gdcmFrameInfoList.front()->GetTagValueAsString( tagImagerPixelSpacing );
-    block.SetPixelSpacingTagValues(pixelSpacingString, imagerPixelSpacingString);
-
-    static const DICOMTag tagSOPClassUID(0x0008,0x0016);
-    std::string sopClassUID = (gdcmFrameInfoList.front())->GetTagValueAsString( tagSOPClassUID );
-    block.SetSOPClassUID(sopClassUID);
-
-    block.SetReaderImplementationLevel( this->GetReaderImplementationLevel(sopClassUID) );
+    block.SetReaderImplementationLevel( this->GetReaderImplementationLevel( block.GetSOPClassUID() ) );
 
     this->SetOutput( o, block );
   }
@@ -499,7 +491,7 @@ mitk::DICOMITKSeriesGDCMReader
   bool success(true);
   try
   {
-    mitk::Image::Pointer mitkImage = helper.Load( filenames, m_FixTiltByShearing && hasTilt, tiltInfo ); // TODO preloaded images, caching..?
+    mitk::Image::Pointer mitkImage = helper.Load( filenames, m_FixTiltByShearing && hasTilt, tiltInfo );
     block.SetMitkImage( mitkImage );
   }
   catch (std::exception& e)

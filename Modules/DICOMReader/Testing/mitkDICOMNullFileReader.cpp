@@ -29,7 +29,8 @@ mitk::DICOMNullFileReader
 
 mitk::DICOMNullFileReader
 ::DICOMNullFileReader(const DICOMNullFileReader& other )
-:DICOMFileReader(other)
+:itk::Object()
+,DICOMFileReader(other)
 {
 }
 

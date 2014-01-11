@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImage.h"
 #include "mitkProperties.h"
+#include "mitkWeakPointer.h"
 
 #include "mitkGantryTiltInformation.h"
 
@@ -106,9 +107,6 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
 
   public:
 
-    /// Takes the raw value of the DICOM tags (0028,0030) Pixel Spacing and (0018,1164) Imager Pixel Spacing
-    void SetPixelSpacingTagValues(const std::string& pixelSpacing, const std::string& imagerPixelSpacing);
-
     /// Describe how the mitk::Image's pixel spacing should be interpreted
     PixelSpacingInterpretation GetPixelSpacingInterpretation() const;
 
@@ -134,6 +132,10 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
 
   private:
 
+    // read values from tag cache
+    std::string GetPixelSpacing() const;
+    std::string GetImagerPixelSpacing() const;
+
     Image::Pointer FixupSpacing(Image* mitkImage);
     Image::Pointer DescribeImageWithProperties(Image* mitkImage);
     void UpdateImageDescribingProperties() const;
@@ -143,19 +145,13 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
     DICOMImageFrameList m_ImageFrameList;
     Image::Pointer m_MitkImage;
     BoolList m_SliceIsLoaded;
-    PixelSpacingInterpretation m_PixelSpacingInterpretation;
     ReaderImplementationLevel m_ReaderImplementationLevel;
-
-    std::string m_PixelSpacing;
-    std::string m_ImagerPixelSpacing;
-
-    std::string m_SOPClassUID;
 
     GantryTiltInformation m_TiltInformation;
 
     PropertyList::Pointer m_PropertyList;
 
-    const DICOMTagCache* m_TagCache;
+    mitk::WeakPointer<DICOMTagCache> m_TagCache;
 
     mutable bool m_PropertiesOutOfDate;
 };

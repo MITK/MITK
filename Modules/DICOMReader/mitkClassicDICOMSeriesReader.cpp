@@ -55,7 +55,8 @@ mitk::ClassicDICOMSeriesReader
 
 mitk::ClassicDICOMSeriesReader
 ::ClassicDICOMSeriesReader(const ClassicDICOMSeriesReader& other )
-:ThreeDnTDICOMSeriesReader(other)
+:itk::Object()
+,ThreeDnTDICOMSeriesReader(other)
 {
 }
 

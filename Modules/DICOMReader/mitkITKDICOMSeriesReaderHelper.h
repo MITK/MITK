@@ -48,16 +48,14 @@ class ITKDICOMSeriesReaderHelper
     LoadDICOMByITK( const StringContainer& filenames,
                     bool correctTilt,
                     const GantryTiltInformation& tiltInfo,
-                    itk::GDCMImageIO::Pointer& io,
-                    Image::Pointer preLoadedImageBlock );
+                    itk::GDCMImageIO::Pointer& io);
 
     template <typename PixelType>
     Image::Pointer
     LoadDICOMByITK3DnT( const StringContainerList& filenames,
                         bool correctTilt,
                         const GantryTiltInformation& tiltInfo,
-                        itk::GDCMImageIO::Pointer& io,
-                        Image::Pointer preLoadedImageBlock );
+                        itk::GDCMImageIO::Pointer& io);
 
 
 };

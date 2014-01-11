@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::DICOMFileReader
 ::DICOMFileReader()
-:itk::LightObject()
+:itk::Object()
 {
 }
 
@@ -31,7 +31,7 @@ mitk::DICOMFileReader
 
 mitk::DICOMFileReader
 ::DICOMFileReader(const DICOMFileReader& other )
-:itk::LightObject()
+:itk::Object()
 ,m_Outputs( other.m_Outputs )
 ,m_ConfigLabel( other.m_ConfigLabel )
 ,m_ConfigDescription( other.m_ConfigDescription )

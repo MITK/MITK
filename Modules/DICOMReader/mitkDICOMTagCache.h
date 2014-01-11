@@ -20,18 +20,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
 
+#include "mitkDICOMTag.h"
+
 #include "DICOMReaderExports.h"
 
 namespace mitk
 {
-/**
-  \ingroup DICOMReaderModule
-*/
-  class DICOMReader_EXPORT DICOMTagCache
+
+  class DICOMImageFrameInfo;
+
+  /**
+    \ingroup DICOMReaderModule
+    \brief ...
+  */
+  class DICOMReader_EXPORT DICOMTagCache : virtual public itk::Object
   {
     public:
 
+      mitkClassMacro( DICOMTagCache, itk::Object );
+
       virtual std::string GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const = 0;
+
+      protected:
+
+      DICOMTagCache();
+      DICOMTagCache(const DICOMTagCache&);
+      virtual ~DICOMTagCache();
   };
 }
 

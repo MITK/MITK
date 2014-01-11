@@ -35,6 +35,8 @@ class ITKDICOMSeriesReaderHelper
     Image::Pointer Load( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo );
     Image::Pointer Load3DnT( const StringContainerList& filenamesLists, bool correctTilt, const GantryTiltInformation& tiltInfo );
 
+    static bool CanHandleFile(const std::string& filename);
+
   private:
 
     template <typename ImageType>

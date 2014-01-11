@@ -70,8 +70,8 @@ mitk::ThreeDnTDICOMSeriesReader
   SortingBlockList true3DnTBlocks;
   std::vector<unsigned int> true3DnTBlocksTimeStepCount;
 
-  // TODO we should provide this tag as needed via a function
-  // (however, we currently know that the superclass will use this tag)
+  // we should describe our need for this tag as needed via a function
+  // (however, we currently know that the superclass will always need this tag)
   const DICOMTag tagImagePositionPatient(0x0020, 0x0032);
 
   while (!remainingBlocks.empty())

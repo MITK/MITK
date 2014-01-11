@@ -255,7 +255,7 @@ mitk::DICOMReaderConfigurator
       previousCriterion = currentCriterion;
     }
 
-    tagSorter->SetSortCriterion( currentCriterion.GetPointer() ); // TODO get ConstPointer declarations right here
+    tagSorter->SetSortCriterion( currentCriterion.GetPointer() );
   }
 
   reader->AddSortingElement( tagSorter );

@@ -487,8 +487,7 @@ void
 mitk::DICOMImageBlockDescriptor
 ::SetTagCache(DICOMTagCache* privateCache)
 {
-  // TODO this must only be used during loading and never afterwards
-  // TODO better: somehow make possible to have smartpointers here
+  // this must only be used during loading and never afterwards
   m_TagCache = privateCache;
 }
 

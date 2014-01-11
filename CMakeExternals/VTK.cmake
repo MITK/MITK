@@ -55,6 +55,10 @@ if(NOT DEFINED VTK_DIR)
           -DVTK_USE_QVTK_QTOPENGL:BOOL=OFF
           -DVTK_USE_QT:BOOL=ON
           -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+          -DModule_vtkGUISupportQt:BOOL=ON
+          -DModule_vtkGUISupportQtWebkit:BOOL=ON
+          -DModule_vtkGUISupportQtSQL:BOOL=ON
+          -DModule_vtkRenderingQt:BOOL=ON
           -DVTK_Group_Qt:BOOL=ON
        )
      endif()
@@ -81,10 +85,6 @@ if(NOT DEFINED VTK_DIR)
         -DVTK_USE_SYSTEM_FREETYPE:BOOL=${VTK_USE_SYSTEM_FREETYPE}
         -DVTK_LEGACY_REMOVE:BOOL=ON
         -DModule_vtkTestingRendering:BOOL=ON
-        -DModule_vtkGUISupportQt:BOOL=ON
-        -DModule_vtkGUISupportQtWebkit:BOOL=ON
-        -DModule_vtkGUISupportQtSQL:BOOL=ON
-        -DModule_vtkRenderingQt:BOOL=ON
         -DVTK_MAKE_INSTANTIATORS:BOOL=ON
         ${additional_cmake_args}
      DEPENDS ${proj_DEPENDENCIES}

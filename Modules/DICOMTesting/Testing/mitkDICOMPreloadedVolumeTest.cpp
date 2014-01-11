@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestDICOMLoading.h"
 #include "mitkTestingMacros.h"
 
+#include "mitkDICOMTagCache.h"
+
 bool CheckAllPropertiesAreInOtherList(const mitk::PropertyList* list, const mitk::PropertyList* otherList)
 {
   MITK_TEST_CONDITION_REQUIRED(list && otherList, "Comparison is passed two non-empty property lists")
@@ -52,6 +54,7 @@ bool VerifyPropertyListsEquality(const mitk::PropertyList* testList, const mitk:
   return allTestPropsInReference && allReferencePropsInTest;
 }
 
+// !!! we expect that this tests get a list of files that load as ONE SINGLE mitk::Image!
 int mitkDICOMPreloadedVolumeTest(int argc, char** const argv)
 {
   MITK_TEST_BEGIN("DICOMPreloadedVolume")
@@ -87,18 +90,26 @@ int mitkDICOMPreloadedVolumeTest(int argc, char** const argv)
   // load for a second time, this time provide the image volume as a pointer
   // expectation is that the reader will provide the same properties to this image (without actually loading a new mitk::Image)
 
-  /* TODO
-  mitk::TestDICOMLoading::ImageList reloadedImages = loader.LoadFiles(files, firstImage);
-  MITK_TEST_OUTPUT(<< "Again loaded " << reloadedImages.size() << " images. Comparing to previously loaded version.")
-  mitk::Image::Pointer reloadedImage = reloadedImages.front();
+  // !!! we expect that this tests get a list of files that load as ONE SINGLE mitk::Image!
+  MITK_TEST_CONDITION_REQUIRED( images.size() == 1, "Not more than 1 images loaded." );
+  // otherwise, we would need to determine the correct set of files here
+  MITK_TEST_OUTPUT(<< "Generating properties via reader. Comparing new properties to previously loaded version.")
+  mitk::Image::Pointer reloadedImage = loader.DecorateVerifyCachedImage(files, firstImage);
+  MITK_TEST_CONDITION_REQUIRED(reloadedImage.IsNotNull(), "Reader was able to property-decorate image.");
 
   mitk::PropertyList::Pointer regeneratedProperties = reloadedImage->GetPropertyList(); // get the version of the second load attempt
 
   bool listsAreEqual = VerifyPropertyListsEquality(regeneratedProperties, originalProperties);
-  MITK_TEST_CONDITION(listsAreEqual, "LoadDicomSeries generates a valid property list when provided a pre-loaded image");
-  */
+  MITK_TEST_CONDITION(listsAreEqual, "DICOM file reader generates a valid property list when provided a pre-loaded image");
 
-  MITK_TEST_CONDITION(false, "pre-loaded image volumes not yet implemented");
+
+  // test again, this time provide a tag cache.
+  // expectation is, that an empty tag cache will lead to NO image
+  mitk::DICOMTagCache::Pointer tagCache; // empty
+  MITK_TEST_OUTPUT(<< "Generating properties via reader. Comparing new properties to previously loaded version.")
+  firstImage->SetPropertyList( mitk::PropertyList::New() ); // clear image properties
+  reloadedImage = loader.DecorateVerifyCachedImage(files, tagCache, firstImage);
+  MITK_TEST_CONDITION_REQUIRED(reloadedImage.IsNull(), "Reader was able to detect missing tag-cache.");
 
   MITK_TEST_END()
 }

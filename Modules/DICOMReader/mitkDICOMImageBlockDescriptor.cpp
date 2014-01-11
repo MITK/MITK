@@ -22,9 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::DICOMImageBlockDescriptor
 ::DICOMImageBlockDescriptor()
 :m_ReaderImplementationLevel(SOPClassUnknown)
-,m_PixelSpacing("")
-,m_ImagerPixelSpacing("")
-,m_SOPClassUID("")
 ,m_PropertyList(PropertyList::New())
 ,m_TagCache(NULL)
 ,m_PropertiesOutOfDate(true)
@@ -42,9 +39,6 @@ mitk::DICOMImageBlockDescriptor
 ,m_MitkImage( other.m_MitkImage )
 ,m_SliceIsLoaded( other.m_SliceIsLoaded )
 ,m_ReaderImplementationLevel( other.m_ReaderImplementationLevel )
-,m_PixelSpacing( other.m_PixelSpacing )
-,m_ImagerPixelSpacing( other.m_ImagerPixelSpacing )
-,m_SOPClassUID( other.m_SOPClassUID )
 ,m_TiltInformation( other.m_TiltInformation )
 ,m_PropertyList( other.m_PropertyList->Clone() )
 ,m_TagCache( other.m_TagCache )
@@ -66,9 +60,6 @@ mitk::DICOMImageBlockDescriptor
     m_MitkImage = other.m_MitkImage;
     m_SliceIsLoaded = other.m_SliceIsLoaded;
     m_ReaderImplementationLevel = other.m_ReaderImplementationLevel;
-    m_PixelSpacing = other.m_PixelSpacing;
-    m_ImagerPixelSpacing = other.m_ImagerPixelSpacing;
-    m_SOPClassUID = other.m_SOPClassUID;
     m_TiltInformation = other.m_TiltInformation;
 
     if (other.m_PropertyList)
@@ -125,6 +116,25 @@ mitk::DICOMImageBlockDescriptor
 {
   if (m_MitkImage != image)
   {
+    if (m_TagCache.IsNull())
+    {
+      MITK_ERROR << "Unable to describe MITK image with properties without a tag-cache object!";
+      m_MitkImage = NULL;
+      return;
+    }
+
+    if (m_ImageFrameList.empty())
+    {
+      MITK_ERROR << "Unable to describe MITK image with properties without a frame list!";
+      m_MitkImage = NULL;
+      return;
+    }
+
+    // Should verify that the image matches m_ImageFrameList and m_TagCache
+    // however, this is hard to do without re-analyzing all
+    // TODO we should at least make sure that the number of frames is identical (plus rows/columns, orientation)
+    //      without gantry tilt correction, we can also check image origin
+
     m_MitkImage = this->DescribeImageWithProperties( this->FixupSpacing(image) );
   }
 }
@@ -205,14 +215,6 @@ mitk::DICOMImageBlockDescriptor
   return allLoaded;
 }
 
-void
-mitk::DICOMImageBlockDescriptor
-::SetPixelSpacingTagValues(const std::string& pixelSpacing, const std::string& imagerPixelSpacing)
-{
-  m_PixelSpacing = pixelSpacing;
-  m_ImagerPixelSpacing = imagerPixelSpacing;
-}
-
 /*
    PS defined      IPS defined     PS==IPS
         0               0                     --> UNKNOWN spacing, loader will invent
@@ -225,9 +227,18 @@ mitk::PixelSpacingInterpretation
 mitk::DICOMImageBlockDescriptor
 ::GetPixelSpacingInterpretation() const
 {
-  if (m_PixelSpacing.empty())
+  if ( m_ImageFrameList.empty() || m_TagCache.IsNull() )
   {
-    if (m_ImagerPixelSpacing.empty())
+    MITK_ERROR << "Invalid call to GetPixelSpacingInterpretation. Need to have initialized tag-cache!";
+    return SpacingUnknown;
+  }
+
+  std::string pixelSpacing = this->GetPixelSpacing();
+  std::string imagerPixelSpacing = this->GetImagerPixelSpacing();
+
+  if (pixelSpacing.empty())
+  {
+    if (imagerPixelSpacing.empty())
     {
       return SpacingUnknown;
     }
@@ -238,11 +249,11 @@ mitk::DICOMImageBlockDescriptor
   }
   else // Pixel Spacing defined
   {
-    if (m_ImagerPixelSpacing.empty())
+    if (imagerPixelSpacing.empty())
     {
       return SpacingInPatient;
     }
-    else if (m_PixelSpacing != m_ImagerPixelSpacing)
+    else if (pixelSpacing != imagerPixelSpacing)
     {
       return SpacingInPatient;
     }
@@ -253,15 +264,45 @@ mitk::DICOMImageBlockDescriptor
   }
 }
 
+std::string
+mitk::DICOMImageBlockDescriptor
+::GetPixelSpacing() const
+{
+  if ( m_ImageFrameList.empty() || m_TagCache.IsNull() )
+  {
+    MITK_ERROR << "Invalid call to GetPixelSpacing. Need to have initialized tag-cache!";
+    return std::string("");
+  }
+
+  static const DICOMTag tagPixelSpacing(0x0028,0x0030);
+  return m_TagCache->GetTagValue( m_ImageFrameList.front(), tagPixelSpacing );
+}
+
+std::string
+mitk::DICOMImageBlockDescriptor
+::GetImagerPixelSpacing() const
+{
+  if ( m_ImageFrameList.empty() || m_TagCache.IsNull() )
+  {
+    MITK_ERROR << "Invalid call to GetImagerPixelSpacing. Need to have initialized tag-cache!";
+    return std::string("");
+  }
+
+  static const DICOMTag tagImagerPixelSpacing(0x0018,0x1164);
+  return m_TagCache->GetTagValue( m_ImageFrameList.front(), tagImagerPixelSpacing );
+}
+
 void
 mitk::DICOMImageBlockDescriptor
 ::GetDesiredMITKImagePixelSpacing( ScalarType& spacingX, ScalarType& spacingY) const
 {
+  std::string pixelSpacing = this->GetPixelSpacing();
   // preference for "in patient" pixel spacing
-  if ( !DICOMStringToSpacing( m_PixelSpacing, spacingX, spacingY ) )
+  if ( !DICOMStringToSpacing( pixelSpacing, spacingX, spacingY ) )
   {
+    std::string imagerPixelSpacing = this->GetImagerPixelSpacing();
     // fallback to "on detector" spacing
-    if ( !DICOMStringToSpacing( m_ImagerPixelSpacing, spacingX, spacingY ) )
+    if ( !DICOMStringToSpacing( imagerPixelSpacing, spacingX, spacingY ) )
     {
       // last resort: invent something
       spacingX = spacingY = 1.0;
@@ -390,7 +431,7 @@ mitk::DICOMImageBlockDescriptor
 
   // second part: add properties that describe the whole image block
   mitkImage->SetProperty("dicomseriesreader.SOPClassUID",
-      StringProperty::New( m_SOPClassUID ) );
+      StringProperty::New( this->GetSOPClassUID() ) );
 
   mitkImage->SetProperty("dicomseriesreader.SOPClass",
       StringProperty::New( this->GetSOPClassUIDAsName() ));
@@ -450,34 +491,44 @@ mitk::DICOMImageBlockDescriptor
   return m_ReaderImplementationLevel;
 }
 
-void
-mitk::DICOMImageBlockDescriptor
-::SetSOPClassUID(const std::string& uid)
-{
-  m_SOPClassUID = uid;
-}
-
 std::string
 mitk::DICOMImageBlockDescriptor
 ::GetSOPClassUID() const
 {
-  return m_SOPClassUID;
+  if ( !m_ImageFrameList.empty()  && m_TagCache.IsNotNull() )
+  {
+    static const DICOMTag tagSOPClassUID(0x0008,0x0016);
+    return m_TagCache->GetTagValue( m_ImageFrameList.front(), tagSOPClassUID );
+  }
+  else
+  {
+    MITK_ERROR << "Invalid call to DICOMImageBlockDescriptor::GetSOPClassUID(). Need to have initialized tag-cache!";
+    return std::string("");
+  }
 }
 
 std::string
 mitk::DICOMImageBlockDescriptor
 ::GetSOPClassUIDAsName() const
 {
-  gdcm::UIDs uidKnowledge;
-  uidKnowledge.SetFromUID( m_SOPClassUID.c_str() );
-
-  const char* name = uidKnowledge.GetName();
-  if (name)
+  if ( !m_ImageFrameList.empty()  && m_TagCache.IsNotNull() )
   {
-    return std::string(name);
+    gdcm::UIDs uidKnowledge;
+    uidKnowledge.SetFromUID( this->GetSOPClassUID().c_str() );
+
+    const char* name = uidKnowledge.GetName();
+    if (name)
+    {
+      return std::string(name);
+    }
+    else
+    {
+      return std::string("");
+    }
   }
   else
   {
+    MITK_ERROR << "Invalid call to DICOMImageBlockDescriptor::GetSOPClassUIDAsName(). Need to have initialized tag-cache!";
     return std::string("");
   }
 }
@@ -587,8 +638,14 @@ mitk::DICOMImageBlockDescriptor
 {
   if (!m_PropertiesOutOfDate) return;
 
-  if (m_TagCache && !m_ImageFrameList.empty())
+  if (!m_ImageFrameList.empty())
   {
+    if (m_TagCache.IsNull())
+    {
+      MITK_ERROR << "Invalid call to DICOMImageBlockDescriptor::UpdateImageDescribingProperties(). Need to have initialized tag-cache!";
+      return;
+    }
+
     DICOMImageFrameInfo::Pointer firstFrame = m_ImageFrameList.front();
     DICOMImageFrameInfo::Pointer lastFrame = m_ImageFrameList.back();
 

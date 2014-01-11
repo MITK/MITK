@@ -30,8 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <stack>
 
-// TODO preloaded volumes?? could be solved in a different way..
-
 namespace itk
 {
   class TimeProbesCollectorBase;

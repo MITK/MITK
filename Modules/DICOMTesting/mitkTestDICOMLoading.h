@@ -34,6 +34,12 @@ class mitkDICOMTesting_EXPORT TestDICOMLoading
     ImageList
     LoadFiles( const StringList & files );
 
+    Image::Pointer
+    DecorateVerifyCachedImage( const StringList& files, mitk::Image::Pointer cachedImage );
+
+    Image::Pointer
+    DecorateVerifyCachedImage( const StringList& files, DICOMTagCache*, mitk::Image::Pointer cachedImage );
+
     /**
       \brief Dump relevant image information for later comparison.
       \sa CompareImageInformationDumps
@@ -53,6 +59,9 @@ class mitkDICOMTesting_EXPORT TestDICOMLoading
   private:
 
     typedef std::map<std::string,std::string> KeyValueMap;
+
+    ClassicDICOMSeriesReader::Pointer
+    BuildDICOMReader();
 
     void SetDefaultLocale();
 

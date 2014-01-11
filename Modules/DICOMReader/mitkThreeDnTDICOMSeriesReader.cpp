@@ -26,7 +26,8 @@ mitk::ThreeDnTDICOMSeriesReader
 
 mitk::ThreeDnTDICOMSeriesReader
 ::ThreeDnTDICOMSeriesReader(const ThreeDnTDICOMSeriesReader& other )
-:DICOMITKSeriesGDCMReader(other)
+:itk::Object()
+,DICOMITKSeriesGDCMReader(other)
 ,m_Group3DandT(true)
 {
 }
@@ -160,13 +161,6 @@ mitk::ThreeDnTDICOMSeriesReader
     block.SetImageFrameList( frameList );
     block.SetTiltInformation( tiltInfo );
 
-    // assume
-    static const DICOMTag tagPixelSpacing(0x0028,0x0030);
-    static const DICOMTag tagImagerPixelSpacing(0x0018,0x1164);
-    std::string pixelSpacingString = (gdcmFrameInfoList.front())->GetTagValueAsString( tagPixelSpacing );
-    std::string imagerPixelSpacingString = gdcmFrameInfoList.front()->GetTagValueAsString( tagImagerPixelSpacing );
-    block.SetPixelSpacingTagValues(pixelSpacingString, imagerPixelSpacingString);
-
     block.SetFlag("3D+t", true);
     block.SetIntProperty("timesteps", true3DnTBlocksTimeStepCount[o]);
     MITK_DEBUG << "Found " << true3DnTBlocksTimeStepCount[o] << " timesteps";
@@ -238,7 +232,7 @@ mitk::ThreeDnTDICOMSeriesReader
   }
 
   mitk::ITKDICOMSeriesReaderHelper helper;
-  mitk::Image::Pointer mitkImage = helper.Load3DnT( filenamesPerTimestep, m_FixTiltByShearing && hasTilt, tiltInfo ); // TODO preloaded images, caching..?
+  mitk::Image::Pointer mitkImage = helper.Load3DnT( filenamesPerTimestep, m_FixTiltByShearing && hasTilt, tiltInfo );
 
   block.SetMitkImage( mitkImage );
 

@@ -51,11 +51,11 @@ namespace mitk
   brings a number of methods that describe its configuration/specifics by
   means of a short label and a (longer) description.
 */
-class DICOMReader_EXPORT DICOMFileReader : public itk::LightObject
+class DICOMReader_EXPORT DICOMFileReader : virtual public itk::Object
 {
   public:
 
-    mitkClassMacro( DICOMFileReader, itk::LightObject );
+    mitkClassMacro( DICOMFileReader, itk::Object );
 
     /// Test whether a file is DICOM at all
     static bool IsDICOM(const std::string& filename);

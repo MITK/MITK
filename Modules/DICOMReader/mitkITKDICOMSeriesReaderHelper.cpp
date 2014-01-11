@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkITKDICOMSeriesReaderHelper.txx"
 
 #define switch3DCase(IOType, T) \
-  case IOType: return LoadDICOMByITK< T >(filenames, correctTilt, tiltInfo, io, preLoadedImageBlock);
+  case IOType: return LoadDICOMByITK< T >(filenames, correctTilt, tiltInfo, io);
 
 bool
 mitk::ITKDICOMSeriesReaderHelper
@@ -63,8 +63,6 @@ mitk::ITKDICOMSeriesReaderHelper
 
   typedef itk::GDCMImageIO DcmIoType;
   DcmIoType::Pointer io = DcmIoType::New();
-
-  Image::Pointer preLoadedImageBlock; // TODO
 
   try
   {
@@ -131,7 +129,7 @@ mitk::ITKDICOMSeriesReaderHelper
 }
 
 #define switch3DnTCase(IOType, T) \
-  case IOType: return LoadDICOMByITK3DnT< T >(filenamesLists, correctTilt, tiltInfo, io, preLoadedImageBlock);
+  case IOType: return LoadDICOMByITK3DnT< T >(filenamesLists, correctTilt, tiltInfo, io);
 
 mitk::Image::Pointer
 mitk::ITKDICOMSeriesReaderHelper
@@ -145,8 +143,6 @@ mitk::ITKDICOMSeriesReaderHelper
 
   typedef itk::GDCMImageIO DcmIoType;
   DcmIoType::Pointer io = DcmIoType::New();
-
-  Image::Pointer preLoadedImageBlock; // TODO
 
   try
   {

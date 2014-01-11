@@ -1,13 +1,14 @@
 Important
 
-[...] ONLY load a pre-sorted list
+[x] ONLY load a pre-sorted list
     - Should work now by:
-      - get the list of images, consturct FrameInfo list (order must be known from prior sorting)
-      - prepare a tagcache object that provides tag information (from some kind of database)
+      - get the list of images, construct FrameInfo list (order must be known from prior sorting)
+      - prepare a tagcache object that provides tag information (from some kind of database, or run AnalyzeInputFiles() on file reader)
       - create DICOMImageBlockDescriptor with frame list and tag cache
-      - Call SetFixTiltByShearing() and TiltInfo object as appropriate... (the second part should not be necessary..)
+      - Call SetFixTiltByShearing() and TiltInfo object as appropriate...
       - call DICOMITKSeriesGDCMReader::LoadMitkImageForImageBlockDescriptor(block)
-[ ] Either NRRD cache option or slice-by-slice loading
+[x] Option to just provide properties to a pre-loaded mitk::Image
+    - see TestDICOMLoading::DecorateVerifyCachedImage()
 [x] Performance of mitkdump / DICOMReaderSelector (TagCache?)
     - the note in GDCM..Reader::GetTagValue() is correct.
       This piece of code is taking lots of time.
@@ -51,3 +52,4 @@ Nice-to-have
 [ ] Add the tags used by DICOMImageBlockDescriptor dynamically instead of hard-coded
     (look for ToDo around m_GDCMScanner.AddTag() in mitkDICOMITKSeriesGDCMReader.cpp)
 [ ] Let DICOMImageBlockDescriptor describe attributes common and different for all blocks of a series
+[ ] Let DICOMImageBlockDescriptor check image properties when mitk::Image is set (pre-loaded case)

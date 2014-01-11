@@ -70,8 +70,7 @@ mitk::TestDICOMLoading
 
   ImageList result;
 
-  ClassicDICOMSeriesReader::Pointer reader = ClassicDICOMSeriesReader::New();
-  reader->SetFixTiltByShearing(true);
+  ClassicDICOMSeriesReader::Pointer reader = this->BuildDICOMReader();
   reader->SetInputFiles( files );
   reader->AnalyzeInputFiles();
   reader->PrintOutputs(std::cout,true);
@@ -85,6 +84,60 @@ mitk::TestDICOMLoading
   }
 
   return result;
+}
+
+mitk::ClassicDICOMSeriesReader::Pointer
+mitk::TestDICOMLoading
+::BuildDICOMReader()
+{
+  ClassicDICOMSeriesReader::Pointer reader = ClassicDICOMSeriesReader::New();
+  reader->SetFixTiltByShearing(true);
+  return reader;
+}
+
+mitk::Image::Pointer
+mitk::TestDICOMLoading
+::DecorateVerifyCachedImage( const StringList& files, mitk::DICOMTagCache* tagCache, mitk::Image::Pointer cachedImage )
+{
+  DICOMImageBlockDescriptor block;
+
+  DICOMImageFrameList framelist;
+  for (StringList::const_iterator iter = files.begin();
+       iter != files.end();
+       ++iter)
+  {
+    framelist.push_back( DICOMImageFrameInfo::New(*iter) );
+  }
+
+  block.SetImageFrameList( framelist );
+
+  block.SetTagCache( tagCache );
+  block.SetMitkImage( cachedImage ); // this should/will create a propertylist describing the image slices
+  return block.GetMitkImage();
+}
+
+
+mitk::Image::Pointer
+mitk::TestDICOMLoading
+::DecorateVerifyCachedImage( const StringList& files, mitk::Image::Pointer cachedImage )
+{
+  ClassicDICOMSeriesReader::Pointer reader = this->BuildDICOMReader();
+  reader->SetInputFiles( files );
+  reader->AnalyzeInputFiles(); // This just creates a "tag cache and a nice DICOMImageBlockDescriptor.
+                               // Both of these could also be produced in a different way. The only
+                               // important thing is, that the DICOMImageBlockDescriptor knows a
+                               // tag-cache object when PropertyDecorateCachedMitkImageForImageBlockDescriptor
+                               // is called.
+
+  if  ( reader->GetNumberOfOutputs() != 1 )
+  {
+    MITK_ERROR << "Reader produce " << reader->GetNumberOfOutputs() << " images instead of 1 expected..";
+    return NULL;
+  }
+
+  DICOMImageBlockDescriptor block = reader->GetOutput(0); // creates a block copy
+  block.SetMitkImage( cachedImage ); // this should/will create a propertylist describing the image slices
+  return block.GetMitkImage();
 }
 
 std::string

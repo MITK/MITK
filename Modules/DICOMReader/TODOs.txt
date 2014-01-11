@@ -19,7 +19,7 @@ Important
         Solution: Yes, this helps, implemented.
 [x] Gantry tilt broken during implementation
     - Was a wrong implementation of NormalDirectionConsistencySorter
-[ ] Accepted image origin error during EquiDistantBlocksSorter
+[x] Accepted image origin error during EquiDistantBlocksSorter
     must be configurable. To support legacy behavior of the reader,
     the tolerance must be fixable to a constant value. For newer
     readers, it should be adapted to the actual slice distance.

@@ -3,7 +3,8 @@
   label="2013 default"
   description="Legacy sorting of 2013"
   class="DICOMITKSeriesGDCMReader"
-  fixTiltByShearing="true">
+  fixTiltByShearing="true"
+  toleratedOriginError="0.005">
 <Distinguishing>
  <Tag name="SeriesInstanceUID" group="0020" element="000e"/>
 </Distinguishing>

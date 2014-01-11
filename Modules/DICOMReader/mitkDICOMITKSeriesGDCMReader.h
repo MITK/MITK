@@ -94,6 +94,9 @@ namespace mitk
          This is required to achieve correct geometrical positions in the mitk::Image,
          i.e. it is essential to be able to make measurements in images.
          - whether or not the distance is required to be orthogonal to the image planes is configured by SetFixTiltByShearing().
+         - during this check, we need to tolerate some minor errors in documented vs. calculated image origins.
+           The amount of tolerance can be adjusted by SetToleratedOriginOffset() and SetToleratedOriginOffsetToAdaptive().
+           Please see EquiDistantBlocksSorter for more details. The default should be good for most cases.
       2. There is always an instance of NormalDirectionConsistencySorter,
          which makes the order of images go along the image normals (see NormalDirectionConsistencySorter)
 
@@ -227,6 +230,17 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
       \brief Controls whether to "fix" tilted acquisitions by shearing the output (see \ref DICOMITKSeriesGDCMReader_GantryTilt).
     */
     void SetFixTiltByShearing(bool on);
+
+    /**
+      \brief See \ref DICOMITKSeriesGDCMReader_ForcedConfiguration.
+    */
+    void SetToleratedOriginOffsetToAdaptive(double fractionOfInterSliceDistanct = 0.3);
+
+    /**
+      \brief See \ref DICOMITKSeriesGDCMReader_ForcedConfiguration.
+    */
+    void SetToleratedOriginOffset(double millimeters = 0.005);
+
 
   protected:
 

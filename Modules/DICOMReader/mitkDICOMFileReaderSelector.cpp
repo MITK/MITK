@@ -108,6 +108,7 @@ mitk::DICOMFileReaderSelector
 {
   //this->AddConfigsFromResources("configurations/3D");
   // in this order of preference...
+  //this->AddConfigFromResource("configurations/3D/classicreader.xml");
   this->AddConfigFromResource("configurations/3D/instancenumber.xml");
   this->AddConfigFromResource("configurations/3D/imageposition.xml");
   this->AddConfigFromResource("configurations/3D/imageposition_byacquisition.xml");

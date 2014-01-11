@@ -122,13 +122,15 @@ mitk::EquiDistantBlocksSorter
 ::EquiDistantBlocksSorter()
 :DICOMDatasetSorter()
 ,m_AcceptTilt(false)
+,m_ToleratedOriginOffset(-1.0) // convention: negative values mean "adaptive"
 {
 }
 
 mitk::EquiDistantBlocksSorter
 ::EquiDistantBlocksSorter(const EquiDistantBlocksSorter& other )
 :DICOMDatasetSorter(other)
-,m_AcceptTilt(false)
+,m_AcceptTilt(other.m_AcceptTilt)
+,m_ToleratedOriginOffset(other.m_ToleratedOriginOffset)
 {
 }
 
@@ -141,7 +143,20 @@ void
 mitk::EquiDistantBlocksSorter
 ::PrintConfiguration(std::ostream& os, const std::string& indent) const
 {
-  os << indent << "Sort into blocks of equidistant, well-aligned slices " << (m_AcceptTilt ? "(accepting a gantry tilt)" : "") << std::endl;
+  std::stringstream ts;
+  if (m_ToleratedOriginOffset < 0.0)
+  {
+    ts << "adaptive";
+  }
+  else
+  {
+    ts << m_ToleratedOriginOffset << "mm";
+  }
+
+  os << indent << "Sort into blocks of equidistant, well-aligned (tolerance "
+     << ts.str() << ") slices "
+     << (m_AcceptTilt ? "(accepting a gantry tilt)" : "")
+     << std::endl;
 }
 
 
@@ -161,6 +176,7 @@ mitk::EquiDistantBlocksSorter
   {
     DICOMDatasetSorter::operator=(other);
     m_AcceptTilt = other.m_AcceptTilt;
+    m_ToleratedOriginOffset = other.m_ToleratedOriginOffset;
   }
   return *this;
 }
@@ -217,6 +233,34 @@ mitk::EquiDistantBlocksSorter
   }
 }
 
+void
+mitk::EquiDistantBlocksSorter
+::SetToleratedOriginOffsetToAdaptive(double fractionOfInterSliceDistance)
+{
+  m_ToleratedOriginOffset = -fractionOfInterSliceDistance; // convention: negative values mean "adaptive"
+  if (m_ToleratedOriginOffset > 0.0)
+  {
+    MITK_WARN << "Call SetToleratedOriginOffsetToAdaptive() only with positive numbers between 0.0 and 1.0, read documentation!";
+  }
+
+  if (m_ToleratedOriginOffset < -0.5)
+  {
+    MITK_WARN << "EquiDistantBlocksSorter is now accepting large errors, take care of measurements, they could appear at unprecise locations!";
+  }
+}
+
+void
+mitk::EquiDistantBlocksSorter
+::SetToleratedOriginOffset(double millimeters)
+{
+  m_ToleratedOriginOffset = millimeters;
+  if (m_ToleratedOriginOffset < 0.0)
+  {
+    MITK_WARN << "Call SetToleratedOriginOffsetToAdaptive() instead of passing negative numbers to SetToleratedOriginOffsetToAdaptive()!";
+  }
+}
+
+
 std::string
 mitk::EquiDistantBlocksSorter
 ::ConstCharStarToString(const char* s)
@@ -253,6 +297,7 @@ mitk::EquiDistantBlocksSorter
   MITK_DEBUG << "--------------------------------------------------------------------------------";
   MITK_DEBUG << "Analyzing " << datasets.size() << " files for z-spacing assumption of ITK's ImageSeriesReader (group tilted: " << groupImagesWithGantryTilt << ")";
   unsigned int fileIndex(0);
+  bool adaptiveErrorTolerance = m_ToleratedOriginOffset < 0.0; // convention: negative values: adaptive/percentage of slice distance ; positive: absolute in millimeters
   double toleratedOriginError(0.005); // default: max. 1/10mm error when measurement crosses 20 slices in z direction (too strict? we don't know better)
   for (DICOMDatasetList::const_iterator dsIter = datasets.begin();
        dsIter != datasets.end();
@@ -311,7 +356,6 @@ mitk::EquiDistantBlocksSorter
         fromFirstToSecondOriginInitialized = true;
 
         // classic mode without tolerance!
-        bool adaptiveErrorTolerance = false; // TODO make an option
         if (adaptiveErrorTolerance)
         {
           MITK_DEBUG << "Distance of two slices: " << fromFirstToSecondOrigin.GetNorm() << "mm";
@@ -321,7 +365,7 @@ mitk::EquiDistantBlocksSorter
         }
         else
         {
-          toleratedOriginError = 0.005;
+          toleratedOriginError = m_ToleratedOriginOffset;
         }
         MITK_DEBUG << "Accepting errors in actual versus expected origin up to " << toleratedOriginError << "mm";
 

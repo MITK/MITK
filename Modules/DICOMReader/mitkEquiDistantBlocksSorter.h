@@ -45,6 +45,14 @@ namespace mitk
  So the result of this step is a set of blocks that contain only slices with equal z spacing
  and uniqe slices at each position.
 
+ During sorting, the origins (documented in tag image position patient) are compared
+ against expected origins (from former origin plus moving direction). As there will
+ be minor differences in numbers (from both calculations and unprecise tag values),
+ we must be a bit tolerant here. The default behavior is to expect that an origin is
+ not further away from the expected position than 30% of the inter-slice distance.
+ To support a legacy behavior of a former loader (DicomSeriesReader), this default can
+ be restricted to a constant number of millimeters by calling SetToleratedOriginOffset(mm).
+
  Detailed implementation in AnalyzeFileForITKImageSeriesReaderSpacingAssumption().
 
 */
@@ -68,6 +76,18 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
       \brief Whether or not to accept images from a tilted acquisition in a single output group.
     */
     void SetAcceptTilt(bool accept);
+
+    /**
+      \brief See class description and SetToleratedOriginOffset().
+    */
+    void SetToleratedOriginOffsetToAdaptive(double fractionOfInterSliceDistanct = 0.3);
+    /**
+      \brief See class description and SetToleratedOriginOffsetToAdaptive().
+
+      Default value of 0.005 is calculated so that we get a maximum of 1/10mm
+      error when having a measurement crosses 20 slices in z direction (too strict? we don't know better..).
+    */
+    void SetToleratedOriginOffset(double millimeters = 0.005);
 
     virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const;
 
@@ -175,6 +195,8 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
 
     typedef std::vector<SliceGroupingAnalysisResult> ResultsList;
     ResultsList m_SliceGroupingResults;
+
+    double m_ToleratedOriginOffset;
 };
 
 }

@@ -167,6 +167,21 @@ mitk::DICOMReaderConfigurator
 
   reader->SetFixTiltByShearing( fixTiltByShearing );
 
+  // "toleratedOriginError" attribute (double)
+  double toleratedOriginError(-0.3);
+  if (element->QueryDoubleAttribute("toleratedOriginError", &toleratedOriginError) == TIXML_SUCCESS) // attribute present and a double value
+  {
+    if (toleratedOriginError >= 0.0)
+    {
+      reader->SetToleratedOriginOffset( toleratedOriginError );
+    }
+    else
+    {
+      reader->SetToleratedOriginOffsetToAdaptive( -1.0 * toleratedOriginError );
+    }
+  }
+
+
 
   // "distinguishing tags"
   mitk::DICOMTagBasedSorter::Pointer tagSorter = mitk::DICOMTagBasedSorter::New();

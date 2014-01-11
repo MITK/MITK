@@ -66,7 +66,6 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
         CutDecimalPlaces(unsigned int precision);
         virtual std::string operator()(const std::string&) const;
       private:
-        std::vector<std::string>& split(const std::string &s, char delim, std::vector<std::string> &elems) const;
         unsigned int m_Precision;
     };
 

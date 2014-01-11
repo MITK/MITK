@@ -23,39 +23,27 @@ mitk::DICOMTagBasedSorter::CutDecimalPlaces
 {
 }
 
-std::vector<std::string>&
-mitk::DICOMTagBasedSorter::CutDecimalPlaces
-::split(const std::string &s, char delim, std::vector<std::string> &elems) const
-{
-  std::stringstream ss(s);
-  std::string item;
-  while (std::getline(ss, item, delim))
-  {
-    elems.push_back(item);
-  }
-  return elems;
-}
-
 std::string
 mitk::DICOMTagBasedSorter::CutDecimalPlaces
 ::operator()(const std::string& input) const
 {
   // be a bit tolerant for tags such as image orientation orienatation, let only the first few digits matter (http://bugs.mitk.org/show_bug.cgi?id=12263)
   // iterate all fields, convert each to a number, cut this number as configured, then return a concatenated string with all cut-off numbers
-  typedef std::vector<std::string> StringV;
-  StringV numbers;
-  split(input, '\\', numbers);
-
-  std::ostringstream resultString;
+  static std::ostringstream resultString;
+  resultString.str(std::string());
+  resultString.clear();
   resultString.setf(std::ios::fixed, std::ios::floatfield);
   resultString.precision(m_Precision);
 
-  static unsigned int idx(1); idx = 1;
-  for (StringV::const_iterator iter = numbers.begin();
-       iter != numbers.end();
-       ++idx, ++iter)
+  static std::stringstream ss(input);
+  ss.str(input);
+  ss.clear();
+  static std::string item;
+  while (std::getline(ss, item, '\\'))
   {
-    std::istringstream converter(*iter);
+    static std::istringstream converter(item);
+    converter.str(item);
+    converter.clear();
     static double number(0);
     if (converter >> number && converter.eof())
     {
@@ -65,10 +53,10 @@ mitk::DICOMTagBasedSorter::CutDecimalPlaces
     else
     {
       // did not convert to double
-      resultString << *iter; // just paste the unmodified string
+      resultString << item; // just paste the unmodified string
     }
 
-    if (idx < numbers.size())
+    if (!ss.eof())
     {
       resultString << "\\";
     }

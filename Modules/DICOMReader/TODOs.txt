@@ -35,7 +35,7 @@ Important
     - implicitly now, the reader checks itself and produces no output if it cannot handle the files
 [x] Check ToDo in mitkDICOMTag.cpp
     - operator< for DICOMTag has been re-implemented in a readable and safer way.
-[ ] Configurable precision for tag value comparisons
+[x] Configurable precision for tag value comparisons
 [x] Images are upside-down in some cases
     - error was hidden assumption somewhere: filenames for ImageSeriesReader need
       to be in an order that goes along the image normals, not in the opposite

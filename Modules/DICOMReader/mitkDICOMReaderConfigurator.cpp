@@ -82,15 +82,31 @@ mitk::DICOMReaderConfigurator
     }
 
     std::string classname(classnameC);
+
+    double decimalPlacesForOrientation(5);
+    bool useDecimalPlacesForOrientation(false);
+    useDecimalPlacesForOrientation =
+      rootElement->QueryDoubleAttribute("decimalPlacesForOrientation", &decimalPlacesForOrientation) == TIXML_SUCCESS; // attribute present and a double value
+
     if (classname == "ThreeDnTDICOMSeriesReader")
     {
-      mitk::ThreeDnTDICOMSeriesReader::Pointer reader = mitk::ThreeDnTDICOMSeriesReader::New();
+      mitk::ThreeDnTDICOMSeriesReader::Pointer reader;
+      if (useDecimalPlacesForOrientation)
+        reader = mitk::ThreeDnTDICOMSeriesReader::New(decimalPlacesForOrientation);
+      else
+        reader = mitk::ThreeDnTDICOMSeriesReader::New();
+
       return ConfigureThreeDnTDICOMSeriesReader(reader, rootElement).GetPointer();
     }
     else
     if (classname == "DICOMITKSeriesGDCMReader")
     {
-      mitk::DICOMITKSeriesGDCMReader::Pointer reader = mitk::DICOMITKSeriesGDCMReader::New();
+      mitk::DICOMITKSeriesGDCMReader::Pointer reader;
+      if (useDecimalPlacesForOrientation)
+        reader = mitk::DICOMITKSeriesGDCMReader::New(decimalPlacesForOrientation);
+      else
+        reader = mitk::DICOMITKSeriesGDCMReader::New();
+
       return ConfigureDICOMITKSeriesGDCMReader(reader, rootElement).GetPointer();
     }
     else
@@ -196,6 +212,7 @@ mitk::DICOMReaderConfigurator
       {
         mitk::DICOMTag tag = tagFromXMLElement(tChild);
         tagSorter->AddDistinguishingTag( tag );
+
       }
       catch(...)
       {

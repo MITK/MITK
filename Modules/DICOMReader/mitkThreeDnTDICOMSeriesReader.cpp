@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkITKDICOMSeriesReaderHelper.h"
 
 mitk::ThreeDnTDICOMSeriesReader
-::ThreeDnTDICOMSeriesReader()
-:DICOMITKSeriesGDCMReader()
+::ThreeDnTDICOMSeriesReader(unsigned int decimalPlacesForOrientation)
+:DICOMITKSeriesGDCMReader(decimalPlacesForOrientation)
 ,m_Group3DandT(true)
 {
 }

@@ -201,6 +201,7 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
     mitkClassMacro( DICOMITKSeriesGDCMReader, DICOMFileReader );
     mitkCloneMacro( DICOMITKSeriesGDCMReader );
     itkNewMacro( DICOMITKSeriesGDCMReader );
+    mitkNewMacro1Param( DICOMITKSeriesGDCMReader, unsigned int );
 
     /**
       \brief Runs the sorting / splitting process described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy.
@@ -237,7 +238,6 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
     */
     void SetToleratedOriginOffset(double millimeters = 0.005);
 
-
   protected:
 
     virtual void InternalPrintConfiguration(std::ostream& os) const;
@@ -258,7 +258,7 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
     */
     void PopLocale() const;
 
-    DICOMITKSeriesGDCMReader();
+    DICOMITKSeriesGDCMReader(unsigned int decimalPlacesForOrientation = 5);
     virtual ~DICOMITKSeriesGDCMReader();
 
     DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other);
@@ -301,7 +301,7 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
   private:
 
     /// \brief Creates the required sorting steps described in \ref DICOMITKSeriesGDCMReader_ForcedConfiguration
-    void EnsureMandatorySortersArePresent();
+    void EnsureMandatorySortersArePresent(unsigned int decimalPlacesForOrientation);
 
   protected:
 

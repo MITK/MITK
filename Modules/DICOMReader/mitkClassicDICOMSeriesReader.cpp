@@ -49,6 +49,7 @@ mitk::ClassicDICOMSeriesReader
   this->AddSortingElement( tagSorter );
 
   this->SetFixTiltByShearing(true);
+  this->SetToleratedOriginOffset(0.005);
   this->SetGroup3DandT(true);
 }
 

@@ -559,6 +559,22 @@ mitk::DICOMITKSeriesGDCMReader
   }
 }
 
+void
+mitk::DICOMITKSeriesGDCMReader
+::SetToleratedOriginOffsetToAdaptive(double fractionOfInterSliceDistance)
+{
+  assert( m_EquiDistantBlocksSorter.IsNotNull() );
+  m_EquiDistantBlocksSorter->SetToleratedOriginOffsetToAdaptive(fractionOfInterSliceDistance);
+}
+
+void
+mitk::DICOMITKSeriesGDCMReader
+::SetToleratedOriginOffset(double millimeters)
+{
+  assert( m_EquiDistantBlocksSorter.IsNotNull() );
+  m_EquiDistantBlocksSorter->SetToleratedOriginOffset(millimeters);
+}
+
 std::string
 mitk::DICOMITKSeriesGDCMReader
 ::GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const

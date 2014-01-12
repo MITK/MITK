@@ -216,6 +216,15 @@ set(ep_common_args
   -DCMAKE_MODULE_LINKER_FLAGS:STRING=${CMAKE_MODULE_LINKER_FLAGS}
 )
 
+if(APPLE)
+  set(ep_common_args
+       -DCMAKE_OSX_ARCHITECTURES:PATH=${CMAKE_OSX_ARCHITECTURES}
+       -DCMAKE_OSX_DEPLOYMENT_TARGET:PATH=${CMAKE_OSX_DEPLOYMENT_TARGET}
+       -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT}
+       ${ep_common_args}
+      )
+endif()
+
 # Include external projects
 foreach(p ${external_projects})
   include(CMakeExternals/${p}.cmake)

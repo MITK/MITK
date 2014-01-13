@@ -353,7 +353,7 @@ static void TestInvalidStream()
   //case 6: empty stream, exception is thrown in setstream
   player = mitk::NavigationDataPlayer::New();
   bool InvalidStreamException6=false;
-  std::ifstream* myEmptyStream;
+  std::ifstream* myEmptyStream = NULL;
   try
   {
     myEmptyStream = new std::ifstream("");

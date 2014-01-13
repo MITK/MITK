@@ -15,24 +15,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "org_mitk_dicomrtview_Activator.h"
+#ifndef org_mitk_gui_qt_rt_dosevisualization_Activator_h
+#define org_mitk_gui_qt_rt_dosevisualization_Activator_h
 
-#include <QtPlugin>
-
-#include "DcmRTV.h"
+#include <ctkPluginActivator.h>
 
 namespace mitk {
 
-void org_mitk_dicomrtview_Activator::start(ctkPluginContext* context)
+class org_mitk_gui_qt_rt_dosevisualization_Activator :
+  public QObject, public ctkPluginActivator
 {
-  BERRY_REGISTER_EXTENSION_CLASS(DcmRTV, context)
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
+
+public:
+
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
+
+}; // org_mitk_gui_qt_rt_dosevisualization_Activator
+
 }
 
-void org_mitk_dicomrtview_Activator::stop(ctkPluginContext* context)
-{
-  Q_UNUSED(context)
-}
-
-}
-
-Q_EXPORT_PLUGIN2(org_mitk_dicomrtview, mitk::org_mitk_dicomrtview_Activator)
+#endif // org_mitk_gui_qt_rt_dosevisualization_Activator_h

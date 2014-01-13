@@ -49,6 +49,14 @@ namespace mitk
   }
 }
 
+mitk::IsoDoseLevelSet::IsoDoseLevelSet(const IsoDoseLevelSet & other)
+{
+  if (&other != this)
+  {
+    this->m_IsoLevels = other.m_IsoLevels;
+  }
+};
+
 const mitk::IsoDoseLevel& mitk::IsoDoseLevelSet::GetIsoDoseLevel(IsoLevelIndexType index) const
 {
   if (index < this->m_IsoLevels.size())

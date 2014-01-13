@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string mitk::rt::Constants::DOSE_PROPERTY_NAME = "dose";
 const std::string mitk::rt::Constants::PRESCRIBED_DOSE_PROPERTY_NAME = "dose.PrescribedDose";
+const std::string mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME = "dose.ReferenceDose";
 const std::string mitk::rt::Constants::DOSE_TYPE_PROPERTY_NAME = "dose.type";
 const std::string mitk::rt::Constants::DOSE_SUMMATION_TYPE_PROPERTY_NAME = "dose.summationType";
 const std::string mitk::rt::Constants::DOSE_FRACTION_COUNT_PROPERTY_NAME = "dose.fractionCount";

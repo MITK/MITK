@@ -15,26 +15,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef org_mitk_dicomrtview_Activator_h
-#define org_mitk_dicomrtview_Activator_h
+#ifndef __ISO_LEVELS_GENERATOR_H
+#define __ISO_LEVELS_GENERATOR_H
 
-#include <ctkPluginActivator.h>
+#include "mitkIsoDoseLevelCollections.h"
 
-namespace mitk {
+#include "RTUIExports.h"
 
-class org_mitk_dicomrtview_Activator :
-  public QObject, public ctkPluginActivator
+namespace mitk
 {
-  Q_OBJECT
-  Q_INTERFACES(ctkPluginActivator)
-
-public:
-
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
-
-}; // org_mitk_dicomrtview_Activator
-
+  namespace rt
+  {
+    IsoDoseLevelSet::Pointer RTUI_EXPORT GeneratIsoLevels_Virtuos();
+  }
 }
 
-#endif // org_mitk_dicomrtview_Activator_h
+#endif

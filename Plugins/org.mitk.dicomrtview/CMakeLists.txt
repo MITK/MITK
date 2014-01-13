@@ -1,7 +1,0 @@
-project(org_mitk_dicomrtview)
-
-MACRO_CREATE_MITK_CTK_PLUGIN(
-  EXPORT_DIRECTIVE DICOMRTVIEW_EXPORT
-  EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDENCIES QmitkExt mitkDicomRT Segmentation ImageExtraction
-)

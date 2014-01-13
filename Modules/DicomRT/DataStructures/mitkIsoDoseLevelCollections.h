@@ -62,7 +62,11 @@ private:
 
 protected:
   IsoDoseLevelSet() {};
+  IsoDoseLevelSet(const IsoDoseLevelSet & other);
+
   virtual ~IsoDoseLevelSet() {};
+
+  mitkCloneMacro(IsoDoseLevelSet);
 
 public:
   typedef size_type IsoLevelIndexType;
@@ -84,8 +88,8 @@ public:
     ConstIterator() {}
     ConstIterator(const VectorConstIterator & i): m_Iter(i) {}
     ConstIterator(const ConstIterator & r) { m_Iter = r.m_Iter; }
-    IsoDoseLevel & operator*()    { return *(m_Iter->GetPointer()); }
-    IsoDoseLevel * operator->()   { return m_Iter->GetPointer(); }
+    const IsoDoseLevel & operator*()    { return *(m_Iter->GetPointer()); }
+    const IsoDoseLevel * operator->()   { return m_Iter->GetPointer(); }
     ConstIterator & operator++()   {++m_Iter; return *this; }
     ConstIterator operator++(int) { ConstIterator temp(*this); ++m_Iter; return temp; }
     ConstIterator & operator--()   {--m_Iter; return *this; }

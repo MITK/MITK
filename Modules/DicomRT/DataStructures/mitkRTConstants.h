@@ -39,6 +39,12 @@ namespace mitk
       static const std::string PRESCRIBED_DOSE_PROPERTY_NAME;
 
       /**
+      * Name of the property that encodes the reference dose that should be used for relative dose vizualization/evaluation purpose.
+      * It is often the prescribed dose but may differ e.g. when to dose distributions sould be compared using the same reference.
+      */
+      static const std::string REFERENCE_DOSE_PROPERTY_NAME;
+
+      /**
       * Name of the property that encodes the optional string property holding the information from the tag (3004,0004) - Dose Type.
       * This contains useful information for medical doctors
       */

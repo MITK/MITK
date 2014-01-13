@@ -14,7 +14,6 @@ set(module_dirs
     ContourModel
     SurfaceInterpolation
     Segmentation
-    DicomRT
     PlanarFigureSegmentation
     Qmitk
     QmitkExt
@@ -42,6 +41,8 @@ set(module_dirs
     Simulation
     Remeshing
     Python
+    DicomRT
+    RTUI
 )
 
 set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

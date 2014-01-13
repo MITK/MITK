@@ -7,9 +7,9 @@ set(MITK_EXT_PLUGINS
   org.mitk.planarfigure:ON
   org.mitk.core.ext:OFF
   org.mitk.core.jobs:OFF
-  org.mitk.dicomrtview:ON
   org.mitk.diffusionimaging:OFF
   org.mitk.simulation:OFF
+  org.mitk.gui.qt.rt.dosevisualization:ON
   org.mitk.gui.qt.application:ON
   org.mitk.gui.qt.coreapplication:OFF
   org.mitk.gui.qt.ext:OFF

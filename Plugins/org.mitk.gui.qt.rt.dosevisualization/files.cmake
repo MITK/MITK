@@ -1,19 +1,25 @@
 set(SRC_CPP_FILES
-
 )
 
 set(INTERNAL_CPP_FILES
-  org_mitk_dicomrtview_Activator.cpp
-  DcmRTV.cpp
+  org_mitk_gui_qt_rt_dosevisualization_Activator.cpp
+  RTDoseVisualizer.cpp
+  RTUIPreferencePage.cpp
+  DoseVisualizationPreferencePage.cpp
+  mitkDoseVisPreferenceHelper.cpp
 )
 
 set(UI_FILES
-  src/internal/DcmRTVControls.ui
+  src/internal/RTDoseVisualizerControls.ui
+  src/internal/DoseVisualizationPreferencePageControls.ui
+  src/internal/RTUIPreferencePageControls.ui
 )
 
 set(MOC_H_FILES
-  src/internal/org_mitk_dicomrtview_Activator.h
-  src/internal/DcmRTV.h
+  src/internal/org_mitk_gui_qt_rt_dosevisualization_Activator.h
+  src/internal/RTDoseVisualizer.h
+  src/internal/RTUIPreferencePage.h
+  src/internal/DoseVisualizationPreferencePage.h
 )
 
 # list of resource files which can be used by the plug-in
@@ -21,7 +27,7 @@ set(MOC_H_FILES
 # for example the icon used in the menu and tabs for the
 # plug-in views in the workbench
 set(CACHED_RESOURCE_FILES
-  resources/icon.xpm
+  resources/iso.png
   plugin.xml
 )
 

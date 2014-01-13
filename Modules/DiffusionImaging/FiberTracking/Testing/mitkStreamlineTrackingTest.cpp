@@ -84,6 +84,7 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
         filter->SetG(tendg);
         filter->SetInterpolate(interpolate);
         filter->SetMinTractLength(minLength);
+        filter->SetNumberOfThreads(1);
 
         if (mitkSeedImage.IsNotNull())
         {

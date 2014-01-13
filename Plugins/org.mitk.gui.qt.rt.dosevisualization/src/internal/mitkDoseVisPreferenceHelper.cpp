@@ -32,9 +32,8 @@ void mitk::rt::StorePresetsMap(const PresetMapType& presetMap)
   berry::IPreferences::Pointer doseVisNode = prefService->GetSystemPreferences()->Node(mitk::rt::UIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
   berry::IPreferences::Pointer presetsNode = doseVisNode->Node(mitk::rt::UIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID);
 
-  /**@TODO Wie kann man korrekt resetten? l�st immer eine pointer verletztung aus wenn die preferences nach "ok" final gespeichert werden sollen, da presetsNode dann ung�ltig ist.*/
-  //presetsNode->Delete();
-  //doseVisNode->Flush();
+  presetsNode->RemoveNode();
+  doseVisNode->Flush();
 
   //new empty preset node
   presetsNode = doseVisNode->Node(mitk::rt::UIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID);

@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+//#define MBILOG_ENABLE_DEBUG
+
 #include "mitkITKDICOMSeriesReaderHelper.h"
 #include "mitkITKDICOMSeriesReaderHelper.txx"
 
@@ -34,9 +36,21 @@ mitk::ITKDICOMSeriesReaderHelper
     std::string numberOfFrames;
     if (tester->GetValueFromTag("0028|0008", numberOfFrames))
     {
-      MITK_DEBUG << "Number of Frames for " << filename << ": " << numberOfFrames;
-      // cannot handle multi-frame
-      return false;
+      std::istringstream converter(numberOfFrames);
+      int i;
+      if (converter >> i)
+      {
+        MITK_DEBUG << "Number of Frames for " << filename << ": " << numberOfFrames;
+        if (i >1)
+        {
+          // cannot handle multi-frame
+          return false;
+        }
+        else
+        {
+          return true; // not sure..
+        }
+      }
     }
     else
     {

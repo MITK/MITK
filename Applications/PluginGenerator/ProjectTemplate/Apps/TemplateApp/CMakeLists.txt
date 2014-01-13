@@ -19,4 +19,4 @@ FunctionCreateBlueBerryApplication(
   EXCLUDE_PLUGINS ${_exclude_plugins}
   ${_app_options}
 )
-
+mitk_use_modules(TARGET ${MY_APP_NAME} QT4_MODULES QtGui)

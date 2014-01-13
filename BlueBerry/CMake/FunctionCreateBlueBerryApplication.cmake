@@ -68,15 +68,9 @@ find_package(Poco REQUIRED)
 # Set up include and link dirs for the executable
 # -----------------------------------------------------------------------
 
-include(${QT_USE_FILE})
-
 include_directories(
   ${org_blueberry_osgi_INCLUDE_DIRS}
-  ${Poco_INCLUDE_DIRS}
-  ${mbilog_INCLUDE_DIRS}
 )
-
-link_directories(${MITK_LINK_DIRECTORIES})
 
 # -----------------------------------------------------------------------
 # Add executable icon (Windows)
@@ -97,18 +91,32 @@ if(WIN32)
   set(_app_compile_flags "${_app_compile_flags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
 endif()
 
+# Work-around for linking GDCM libraries, until GDCM provides proper
+# target exports.
+foreach(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
+  if(EXISTS "${dir}/MITK_ITK_Config.cmake")
+    include("${dir}/MITK_ITK_Config.cmake")
+    break()
+  endif()
+endforeach()
+if(ALL_LIBRARY_DIRS)
+  list(REMOVE_DUPLICATES ALL_LIBRARY_DIRS)
+  link_directories(${ALL_LIBRARY_DIRS})
+endif()
+
 if(_APP_SHOW_CONSOLE)
   add_executable(${_APP_NAME} MACOSX_BUNDLE ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 else()
   add_executable(${_APP_NAME} MACOSX_BUNDLE WIN32 ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 endif()
+mitk_use_modules(TARGET ${_APP_NAME} MODULES mbilog PACKAGES Poco QT4_MODULES QtCore)
 
 set_target_properties(${_APP_NAME} PROPERTIES
                       COMPILE_FLAGS "${_app_compile_flags}")
 
 target_link_libraries(${_APP_NAME} org_blueberry_osgi ${_APP_LINK_LIBRARIES})
 if(WIN32)
-  target_link_libraries(${_APP_NAME} ${QT_QTCORE_LIBRARY} ${QT_QTMAIN_LIBRARY})
+  target_link_libraries(${_APP_NAME} ${QT_QTMAIN_LIBRARY})
 endif()
 
 # -----------------------------------------------------------------------

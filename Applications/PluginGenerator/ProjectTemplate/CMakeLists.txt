@@ -279,7 +279,6 @@ endif()
 
 if(MITK_USE_QT)
   set(QT_QMAKE_EXECUTABLE ${MITK_QMAKE_EXECUTABLE})
-  add_definitions(-DQWT_DLL)
 endif()
 
 #-----------------------------------------------------------------------------

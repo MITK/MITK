@@ -505,8 +505,6 @@ set(MITK_CXX_FLAGS_RELEASE )
 set(MITK_EXE_LINKER_FLAGS )
 set(MITK_SHARED_LINKER_FLAGS )
 
-include(mitkSetupC++0xVariables)
-
 if(WIN32)
   set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -D_WIN32_WINNT=0x0501 -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
   set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} /wd4231") # warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
@@ -542,10 +540,6 @@ endif()
 
 mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" MITK_SHARED_LINKER_FLAGS)
 mitkFunctionCheckCompilerFlags("-Wl,--as-needed" MITK_SHARED_LINKER_FLAGS)
-
-if(MITK_USE_C++0x)
-  mitkFunctionCheckCompilerFlags("-std=c++0x" MITK_CXX_FLAGS)
-endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 

@@ -133,11 +133,10 @@ void NrrdTensorImageReader
                 {
                     MITK_INFO << "Trying to load dti as 4D nifti ...";
                     typedef itk::Image<float,4> ImageType;
-                    itk::NiftiImageIO::Pointer io = itk::NiftiImageIO::New();
                     typedef itk::ImageFileReader<ImageType> FileReaderType;
                     FileReaderType::Pointer reader = FileReaderType::New();
                     reader->SetImageIO(io);
-                    reader->SetFileName(this->m_FileName);
+                    reader->SetFileName(fname3);
                     reader->Update();
                     ImageType::Pointer img = reader->GetOutput();
 
@@ -319,8 +318,6 @@ void NrrdTensorImageReader
                     ImageType::Pointer img = reader->GetOutput();
 
                     itk::Size<4> size = img->GetLargestPossibleRegion().GetSize();
-
-                    MITK_INFO << size;
 
                     while (!ot.IsAtEnd())
                     {

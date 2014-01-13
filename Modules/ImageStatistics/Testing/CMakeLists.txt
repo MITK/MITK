@@ -1,3 +1,4 @@
-MITK_CREATE_MODULE_TESTS(EXTRA_DEPENDS DICOMReader)
+# Deactivated temporarily
+#MITK_CREATE_MODULE_TESTS(EXTRA_DEPENDS DICOMReader)
 
-mitkAddCustomModuleTest(mitkImageStatisticsHotspotTest_Case1 mitkImageStatisticsHotspotTest ${CMAKE_CURRENT_SOURCE_DIR}/Data/Hotspot_Case1.xml)
+#mitkAddCustomModuleTest(mitkImageStatisticsHotspotTest_Case1 mitkImageStatisticsHotspotTest ${CMAKE_CURRENT_SOURCE_DIR}/Data/Hotspot_Case1.xml)

@@ -2,9 +2,20 @@
 <plugin>
 
   <extension point="org.blueberry.ui.editors">
-    <editor id="org.mitk.editors.xnatprojects"
-      name="XNAT Projects"
-      class="XNATProjects"
+    <editor id="org.mitk.editors.qmitkxnateditor"
+      name="XNAT Editor"
+      class="QmitkXnatEditor"
+      icon="resources/icon.xpm"/>
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.qmitkxnattreebrowserview"
+      name="XNAT Tree Browser"
+      class="QmitkXnatTreeBrowserView"
+      icon="resources/icon.xpm"/>
+    <view id="org.mitk.views.qmitkxnatsimplesearchview"
+      name="XNAT Simple Search"
+      class="QmitkXnatSimpleSearchView"
       icon="resources/icon.xpm"/>
   </extension>
 

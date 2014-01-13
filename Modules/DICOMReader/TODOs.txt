@@ -1,5 +1,10 @@
 Important
 
+[ ] Make sure that ..Selector does tag scanning only once
+[ ] Check Gantry Tilt TODO/Bug in old reader
+[ ] - and in new reader, how do we WANT to handle this?
+[x] Keep OLD DICOMTesting module, in order to test code until it is removed
+    - restored this module as DCMTesting module
 [x] ONLY load a pre-sorted list
     - Should work now by:
       - get the list of images, construct FrameInfo list (order must be known from prior sorting)

@@ -366,6 +366,7 @@ namespace itk
     //    // 1 / ((xMax - xMin) * (yMax - yMin) * (zMax - zMin) * pow(2.0 * itk::Math::pi, 1.5 ));// (m_SigmaX[n] * m_SigmaY[n] * m_SigmaZ[n] ) / ((xMax - xMin) * (yMax - yMin) * (zMax - zMin)); //* pow(2.0 * itk::Math::pi, 1.5 ));
     //  mean = mean + factor * value; //  * m_Altitude[n] ???? TODO
     //}
+    //TODO
 
     return mean;
   }
@@ -433,9 +434,6 @@ namespace itk
     MapContainerPoints::ElementIdentifier id = m_Midpoints.Size();
     m_Midpoints.InsertElement(id, globalCoordinateMidpointCuboid);
     m_RadiusCuboid.InsertElement(id, cuboidRadius);
-
-    // std::cout << "midpoint:    " << globalCoordinateMidpointCuboid << "   radius:   " << cuboidRadius << "     id: " << id << std::endl;
-
   }
 
   //----------------------------------------------------------------------------------------------------------------------
@@ -476,6 +474,7 @@ namespace itk
           }
         }
       }
+      // last step of recursion -> on the boundary
       else
       {
         // Calculate the integral and take the half of it (because we are on the boundary)
@@ -485,21 +484,101 @@ namespace itk
         yMax = globalCoordinateMidpointCuboid[1] + cuboidRadius;
         zMin = globalCoordinateMidpointCuboid[2] - cuboidRadius;
         zMax = globalCoordinateMidpointCuboid[2] + cuboidRadius;
+
+
+        // yz Plane
+        bool yzPlaneAtOriginCrossXSection      = xMin <= m_Origin[0] && xMax >= m_Origin[0];
+        bool yzPlaneAtImageBorderCrossXSection = xMin <= m_Size[0]   && xMax >= m_Size[0];
+        bool yzPlaneNotCrossYSection           = xMin >= m_Origin[0] && xMax <= m_Size[0];
+        // xz Plane
+        bool xzPlaneAtOriginCrossYSection      = yMin <= m_Origin[1] && yMax >= m_Origin[1];
+        bool xzPlaneAtImageBorderCrossYSection = yMin <= m_Size[1]   && yMax >= m_Size[1];
+        bool xzPlaneNotCrossYSection           = yMin >= m_Origin[1] && yMax <= m_Size[1];
+        // xy Plane
+        bool xyPlaneAtOriginCrossZSection      = zMin <= m_Origin[2] && zMax >= m_Origin[2];
+        bool xyPlaneAtImageBorderCrossZSection = zMin <= m_Size[2]   && zMax >= m_Size[2];
+        bool xyPlaneNotCrossZSection           = zMin >= m_Origin[2] && zMax <= m_Size[2];
+
         //check if the boundary of the integral is inside the image
-        if( xMax <= m_Size[0] && xMin >= m_Origin[0] &&  yMax <= m_Size[1] && yMin >= m_Origin[1] && zMax <= m_Size[2] && zMin >= m_Origin[2] )
+        // if( xMax <= m_Size[0] && xMin >= m_Origin[0] &&  yMax <= m_Size[1] && yMin >= m_Origin[1] && zMax <= m_Size[2] && zMin >= m_Origin[2] )
+        if( yzPlaneNotCrossYSection && xzPlaneNotCrossYSection && xyPlaneNotCrossZSection)
         {
 
-          double temp = this->MultiGaussianFunctionValueAtCuboid( xMin, xMax, yMin, yMax, zMin, zMax ) * 0.5;
-          if(temp > 10000000)
-          {
-            std::cout << "temp: " << temp << std::endl;
-          }
-
-
-
+          //double temp = this->MultiGaussianFunctionValueAtCuboid( xMin, xMax, yMin, yMax, zMin, zMax ) * 0.5;
           m_meanValueTemp  = m_meanValueTemp + this->MultiGaussianFunctionValueAtCuboid( xMin, xMax, yMin, yMax, zMin, zMax ) * 0.5;
           m_Volume = m_Volume + pow( 2.0 * cuboidRadius, 3.0) / 2.0;
         }
+        /*      // check if the boundary of the image intersect the cuboid and if yes change the limits of the cuboid
+        else if( // one cross
+          ( (yzPlaneAtOriginCrossXSection      && xzPlaneNotCrossYSection           && xyPlaneNotCrossZSection) ||
+          (yzPlaneAtImageBorderCrossXSection   && xzPlaneNotCrossYSection           && xyPlaneNotCrossZSection) ||
+
+          (yzPlaneNotCrossYSection             && xzPlaneAtOriginCrossYSection      && xyPlaneNotCrossZSection) ||
+          (yzPlaneNotCrossYSection             && xzPlaneAtImageBorderCrossYSection && xyPlaneNotCrossZSection) ||
+
+          (yzPlaneNotCrossYSection             && xzPlaneNotCrossYSection           && xyPlaneAtOriginCrossZSection) ||
+          (yzPlaneNotCrossYSection             && xzPlaneNotCrossYSection           && xyPlaneAtImageBorderCrossZSection) )
+          || // two crosses
+          ( (yzPlaneAtOriginCrossXSection      && xzPlaneAtOriginCrossYSection      && xyPlaneNotCrossZSection) ||
+          ( (yzPlaneAtOriginCrossXSection      && xzPlaneNotCrossYSection           && xyPlaneAtOriginCrossZSection) ||
+          (yzPlaneAtImageBorderCrossXSection   && xzPlaneAtImageBorderCrossYSection && xyPlaneNotCrossZSection) ||
+          (yzPlaneAtImageBorderCrossXSection   && xzPlaneNotCrossYSection           && xyPlaneAtImageBorderCrossZSection) ||
+
+          (yzPlaneNotCrossYSection             && xzPlaneAtOriginCrossYSection      && xyPlaneNotCrossZSection) ||
+          (yzPlaneNotCrossYSection             && xzPlaneAtOriginCrossYSection      && xyPlaneAtOriginCrossZSection) ||
+          (yzPlaneAtImageBorderCrossXSection   && xzPlaneAtImageBorderCrossYSection && xyPlaneNotCrossZSection) ||
+          (yzPlaneNotCrossYSection             && xzPlaneAtImageBorderCrossYSection && xyPlaneAtImageBorderCrossZSection) ||
+
+          (yzPlaneNotCrossYSection             && xzPlaneAtImageBorderCrossYSection && xyPlaneAtOriginCrossZSection) ||
+          (yzPlaneAtOriginCrossXSection        && xzPlaneNotCrossYSection           && xyPlaneAtOriginCrossZSection) ||
+          (yzPlaneNotCrossYSection             && xzPlaneAtImageBorderCrossYSection && xyPlaneAtImageBorderCrossZSection)) ||
+          (yzPlaneAtImageBorderCrossXSection    && xzPlaneNotCrossYSection          && xyPlaneAtImageBorderCrossZSection) )
+          )
+          /* if(
+          ( ( xMin <= m_Origin[0] && xMax >= m_Origin[0] && yMin <= m_Origin[1] && yMax >= m_Origin[1]  &&  zMax <= m_Size[2] && zMin >= m_Origin[2] ) ||
+          ( xMin <= m_Origin[0] && xMax >= m_Origin[0] && yMax <= m_Size[1] && yMin >= m_Origin[1]  &&  zMin <= m_Size[2] && zMax >= m_Size[2]) ||
+          (xMin <= m_Size[0] && xMax >= m_Size[0] && ( ( yMax <= m_Size[1] && yMin >= m_Origin[1] ) || ( zMax <= m_Size[2] && zMin >= m_Origin[2] ) ) ) ||
+          (yMin <= m_Origin[1] && yMax >= m_Origin[1] && ( ( xMax <= m_Size[0] && xMin >= m_Origin[0] ) || ( zMax <= m_Size[2] && zMin >= m_Origin[2] ) ) ) ||
+          (yMin <= m_Size[1] && yMax >= m_Size[1]  && ( ( xMax <= m_Size[0] && xMin >= m_Origin[0] ) || ( zMax <= m_Size[2] && zMin >= m_Origin[2] ) ) ) ||
+          (zMin <= m_Origin[2] && zMax >= m_Origin[2] && ( ( xMax <= m_Size[0] && xMin >= m_Origin[0] ) || ( yMax <= m_Size[1] && yMin >= m_Origin[1] ) ) ) ||
+          (zMin <= m_Size[2] && zMax >= m_Size[2] && ( (xMax <= m_Size[0] && xMin >= m_Origin[0] ) || ( yMax <= m_Size[1] && yMin >= m_Origin[1] ) ) ) )
+          || /* one axis crosses the cuboid
+          ( ( xMin <= m_Origin[0] && xMax >= m_Origin[0] &&  yMax <= m_Size[1] && yMin >= m_Origin[1] && zMax <= m_Size[2] && zMin >= m_Origin[2] ) ||
+          (xMin <= m_Size[0] && xMax >= m_Size[0] && yMax <= m_Size[1] && yMin >= m_Origin[1] && zMax <= m_Size[2] && zMin >= m_Origin[2] ) ||
+          (yMin <= m_Origin[1] && yMax >= m_Origin[1] && xMax <= m_Size[0] && xMin >= m_Origin[0] && zMax <= m_Size[2] && zMin >= m_Origin[2] ) ||
+          (yMin <= m_Size[1] && yMax >= m_Size[1]  && xMax <= m_Size[0] && xMin >= m_Origin[0] && zMax <= m_Size[2] && zMin >= m_Origin[2]  ) ||
+          (zMin <= m_Origin[2] && zMax >= m_Origin[2] &&  xMax <= m_Size[0] && xMin >= m_Origin[0] && yMax <= m_Size[1] && yMin >= m_Origin[1] ) ||
+          (zMin <= m_Size[2] && zMax >= m_Size[2] && xMax <= m_Size[0] && xMin >= m_Origin[0] && yMax <= m_Size[1] && yMin >= m_Origin[1] ) ) )
+        {
+          // x-Axis
+          if(xMin <= m_Origin[0] && xMax >= m_Origin[0])
+          {
+            xMin = m_Origin[0];
+          }else if(xMin <= m_Size[0] && xMax >= m_Size[0])
+          {
+            xMax = m_Size[0];
+          }
+          // y-Axis
+          if(yMin <= m_Origin[1] && yMax >= m_Origin[1])
+          {
+            yMin = m_Origin[1];
+          }else if(yMin <= m_Size[1] && yMax >= m_Size[1])
+          {
+            yMax = m_Size[1];
+          }
+          // z-Axis
+          if(zMin <= m_Origin[2] && zMax >= m_Origin[2])
+          {
+            zMin = m_Origin[2];
+          }else if(zMin <= m_Size[2] && zMax >= m_Size[2])
+          {
+            zMax = m_Size[2];
+          }
+          m_meanValueTemp  = m_meanValueTemp + this->MultiGaussianFunctionValueAtCuboid( xMin, xMax, yMin, yMax, zMin, zMax ) * 0.5;
+          // m_Volume = m_Volume + pow( 2.0 * cuboidRadius, 3.0) / 2.0;
+          m_Volume = m_Volume + (xMax - xMin) * (yMax - yMin) * (zMax - zMin) / 2.0;
+
+        } */
       }
     }
     else if(intersect == 2)
@@ -515,10 +594,79 @@ namespace itk
       yMax = globalCoordinateMidpointCuboid[1] + cuboidRadius;
       zMin = globalCoordinateMidpointCuboid[2] - cuboidRadius;
       zMax = globalCoordinateMidpointCuboid[2] + cuboidRadius;
-      if( xMax <= m_Size[0] && xMin >= m_Origin[0] &&  yMax <= m_Size[1] && yMin >= m_Origin[1] && zMax <= m_Size[2] && zMin >= m_Origin[2] )
+
+      // yz Plane
+      bool yzPlaneAtOriginCrossXSection      = xMin <= m_Origin[0] && xMax >= m_Origin[0];
+      bool yzPlaneAtImageBorderCrossXSection = xMin <= m_Size[0]   && xMax >= m_Size[0];
+      bool yzPlaneNotCrossYSection           = xMin >= m_Origin[0] && xMax <= m_Size[0];
+      // xz Plane
+      bool xzPlaneAtOriginCrossYSection      = yMin <= m_Origin[1] && yMax >= m_Origin[1];
+      bool xzPlaneAtImageBorderCrossYSection = yMin <= m_Size[1]   && yMax >= m_Size[1];
+      bool xzPlaneNotCrossYSection           = yMin >= m_Origin[1] && yMax <= m_Size[1];
+      // xy Plane
+      bool xyPlaneAtOriginCrossZSection      = zMin <= m_Origin[2] && zMax >= m_Origin[2];
+      bool xyPlaneAtImageBorderCrossZSection = zMin <= m_Size[2]   && zMax >= m_Size[2];
+      bool xyPlaneNotCrossZSection           = zMin >= m_Origin[2] && zMax <= m_Size[2];
+      if( yzPlaneNotCrossYSection && xzPlaneNotCrossYSection && xyPlaneNotCrossZSection)
       {
         m_meanValueTemp  = m_meanValueTemp +  this->MultiGaussianFunctionValueAtCuboid( xMin, xMax, yMin, yMax, zMin, zMax );
         m_Volume = m_Volume + pow( 2.0 * cuboidRadius, 3.0);
+      }
+      // check if the boundary of the image intersect the cuboid and if yes change the limits of the cuboid
+      // same as above
+       else if( // one cross
+        ( (yzPlaneAtOriginCrossXSection      && xzPlaneNotCrossYSection           && xyPlaneNotCrossZSection) ||
+        (yzPlaneAtImageBorderCrossXSection   && xzPlaneNotCrossYSection           && xyPlaneNotCrossZSection) ||
+
+        (yzPlaneNotCrossYSection             && xzPlaneAtOriginCrossYSection      && xyPlaneNotCrossZSection) ||
+        (yzPlaneNotCrossYSection             && xzPlaneAtImageBorderCrossYSection && xyPlaneNotCrossZSection) ||
+
+        (yzPlaneNotCrossYSection             && xzPlaneNotCrossYSection           && xyPlaneAtOriginCrossZSection) ||
+        (yzPlaneNotCrossYSection             && xzPlaneNotCrossYSection           && xyPlaneAtImageBorderCrossZSection) )
+        || // two crosses
+        ( (yzPlaneAtOriginCrossXSection      && xzPlaneAtOriginCrossYSection      && xyPlaneNotCrossZSection) ||
+        ( (yzPlaneAtOriginCrossXSection      && xzPlaneNotCrossYSection           && xyPlaneAtOriginCrossZSection) ||
+        (yzPlaneAtImageBorderCrossXSection   && xzPlaneAtImageBorderCrossYSection && xyPlaneNotCrossZSection) ||
+        (yzPlaneAtImageBorderCrossXSection   && xzPlaneNotCrossYSection           && xyPlaneAtImageBorderCrossZSection) ||
+
+        (yzPlaneNotCrossYSection             && xzPlaneAtOriginCrossYSection      && xyPlaneNotCrossZSection) ||
+        (yzPlaneNotCrossYSection             && xzPlaneAtOriginCrossYSection      && xyPlaneAtOriginCrossZSection) ||
+        (yzPlaneAtImageBorderCrossXSection   && xzPlaneAtImageBorderCrossYSection && xyPlaneNotCrossZSection) ||
+        (yzPlaneNotCrossYSection             && xzPlaneAtImageBorderCrossYSection && xyPlaneAtImageBorderCrossZSection) ||
+
+        (yzPlaneNotCrossYSection             && xzPlaneAtImageBorderCrossYSection && xyPlaneAtOriginCrossZSection) ||
+        (yzPlaneAtOriginCrossXSection        && xzPlaneNotCrossYSection           && xyPlaneAtOriginCrossZSection) ||
+        (yzPlaneNotCrossYSection             && xzPlaneAtImageBorderCrossYSection && xyPlaneAtImageBorderCrossZSection)) ||
+        (yzPlaneAtImageBorderCrossXSection   && xzPlaneNotCrossYSection           && xyPlaneAtImageBorderCrossZSection) )
+        )
+      {
+        // x-Axis
+        if(xMin <= m_Origin[0] && xMax >= m_Origin[0])
+        {
+          xMin = m_Origin[0];
+        }else if(xMin <= m_Size[0] && xMax >= m_Size[0])
+        {
+          xMax = m_Size[0];
+        }
+        // y-Axis
+        if(yMin <= m_Origin[1] && yMax >= m_Origin[1])
+        {
+          yMin = m_Origin[1];
+        }else if(yMin <= m_Size[1] && yMax >= m_Size[1])
+        {
+          yMax = m_Size[1];
+        }
+        // z-Axis
+        if(zMin <= m_Origin[2] && zMax >= m_Origin[2])
+        {
+          zMin = m_Origin[2];
+        }else if(zMin <= m_Size[2] && zMax >= m_Size[2])
+        {
+          zMax = m_Size[2];
+        }
+        m_meanValueTemp  = m_meanValueTemp + this->MultiGaussianFunctionValueAtCuboid( xMin, xMax, yMin, yMax, zMin, zMax );
+        m_Volume = m_Volume + (xMax - xMin) * (yMax - yMin) * (zMax - zMin) ;
+
       }
     }
   }
@@ -536,8 +684,6 @@ namespace itk
 
     double cuboidRadius;
     PointType globalCoordinateMidpointCuboid, newMidpoint;
-    //PointType globalCoordinateMidpointSphere;
-    IndexType index;
     OutputImageRegionType  regionOfInterest;
     IndexType indexR;
     indexR.SetElement( 0, m_RegionOfInterestMin[0] );
@@ -552,7 +698,7 @@ namespace itk
     typename TOutputImage::Pointer image = this->GetOutput(0);
     IteratorType regionOfInterestIterator(image, regionOfInterest);
     cuboidRadius = m_Radius / 2.0;
-    m_Volume = 0.0;
+    // m_Volume = 0.0;
     for(int i = -1; i < 2; i+=2)
     {
       for(int k = -1; k < 2; k+=2)
@@ -570,7 +716,7 @@ namespace itk
 
     if(m_dispVol)
     {
-      std::cout << "m_Volume:  " << m_Volume <<std::endl;
+      //  std::cout << "Index: " << globalCoordinateMidpointSphere << "    m_Volume:  " << m_Volume <<std::endl;
       m_dispVol = 1;//0;
       // std::cout << "Wrote .xml to visualise the midpoints." <<  std::endl;
       // WriteXMLToTestTheCuboidInsideTheSphere();
@@ -648,7 +794,7 @@ namespace itk
 
       meanValueTemp = m_meanValueTemp / m_Volume; //((4.0 / 3.0) * itk::Math::pi * m_Radius * m_Radius * m_Radius);
 
-     // std::cout << "index: " << index << "  meanValue: " << meanValueTemp << std::endl;
+       //std::cout <<  "  meanValue/ vol(Sphere): " << m_meanValueTemp / ((4.0 / 3.0) * itk::Math::pi * m_Radius * m_Radius * m_Radius) << std::endl;
       //   std::cout << "m_Volume: " << m_Volume << " ... " << (4.0 / 3.0) * itk::Math::pi * m_Radius * m_Radius * m_Radius << std::endl;
       if(meanValueTemp > m_MeanValue)
       {
@@ -840,7 +986,7 @@ namespace itk
 
   //----------------------------------------------------------------------------------------------------------------------
   /*
-  Check if a cuboid intersect the sphere boundary. Returns 0, if  the cuboid is inside the sphere; returns 1, if the  cuboid intersects the sphere boundary and 2, if the cuboid is out of the sphere.
+  Check if a cuboid intersect the sphere boundary. Returns 2, if  the cuboid is inside the sphere; returns 1, if the  cuboid intersects the sphere boundary and 0, if the cuboid is out of the sphere.
   */
   template< class TOutputImage >
   unsigned int

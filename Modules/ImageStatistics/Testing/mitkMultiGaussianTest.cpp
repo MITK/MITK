@@ -508,7 +508,7 @@ int mitkMultiGaussianTest(int argc, char* argv[])
       std::stringstream(attributeValue) >> value;
       ROIminSizeZ.push_back(value);
 
-      std::cout << "Read ROI with label nummber: " << label[i] << "with min and max values in the x-, y-, z-Achse: [" << ROIminSizeX[i] << ROImaxSizeX[i] <<"], [" << ROIminSizeY[i] << ROImaxSizeY[i] <<"], [" << ROIminSizeZ[i] << ROImaxSizeZ[i] <<"]\n" << std::endl;
+      std::cout << "Read ROI with label number: " << label[i] << " with min and max values in the x-, y-, z-Achse: [" << ROIminSizeX[i] << ROImaxSizeX[i] <<"], [" << ROIminSizeY[i] << ROImaxSizeY[i] <<"], [" << ROIminSizeZ[i] << ROImaxSizeZ[i] <<"]\n" << std::endl;
     }
 
     //write test image parameter
@@ -622,8 +622,8 @@ int mitkMultiGaussianTest(int argc, char* argv[])
       {
 
         // x axis region of interest------------------------------------------------------
-        maxSize = size[0] - static_cast<int>((radius)/spacing[0] + 0.9999);
-        minSize = 0.0 + static_cast<int>((radius)/spacing[0]+ 0.9999);
+        maxSize = size[0] - static_cast<int>((radius)/spacing[0] + 0.9999) + 1;
+        minSize = 0.0 + static_cast<int>((radius)/spacing[0]+ 0.9999) - 1;
         if( minSize >= maxSize )
         {
           std::cout << "The sphere is larger then the image in the x axis!" << std::endl;
@@ -635,8 +635,8 @@ int mitkMultiGaussianTest(int argc, char* argv[])
         regionOfInterestMin.SetElement( 0, ( ROIminSizeX[i] > minSize ) ? ROIminSizeX[i] : minSize );
 
         // y axis region of interest------------------------------------------------------
-        maxSize = size[1] - static_cast<int>((radius)/spacing[1] + 0.9999);
-        minSize = 0.0 + static_cast<int>((radius)/spacing[1]+ 0.9999);
+        maxSize = size[1] - static_cast<int>((radius)/spacing[1] + 0.9999) + 1;
+        minSize = 0.0 + static_cast<int>((radius)/spacing[1]+ 0.9999) - 1;
         if( minSize >= maxSize )
         {
           std::cout << "The sphere is larger then the image in the y axis!" << std::endl;
@@ -647,8 +647,8 @@ int mitkMultiGaussianTest(int argc, char* argv[])
         regionOfInterestMin.SetElement( 1, ( ROIminSizeY[i] > minSize ) ? ROIminSizeY[i] : minSize );
 
         // z axis region of interest------------------------------------------------------
-        maxSize = size[2] - static_cast<int>((radius)/spacing[1] + 0.9999);
-        minSize = 0.0 + static_cast<int>((radius)/spacing[1]+ 0.9999);
+        maxSize = size[2] - static_cast<int>((radius)/spacing[1] + 0.9999) + 1;
+        minSize = 0.0 + static_cast<int>((radius)/spacing[1]+ 0.9999) - 1;
         if( minSize >= maxSize )
         {
           std::cout << "The sphere is larger then the image in the z axis!" << std::endl;

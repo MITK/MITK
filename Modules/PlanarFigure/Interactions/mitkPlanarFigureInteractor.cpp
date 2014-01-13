@@ -75,7 +75,7 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
 }
 
 
-bool mitk::PlanarFigureInteractor::CheckFigurePlaced( const InteractionEvent* interactionEvent )
+bool mitk::PlanarFigureInteractor::CheckFigurePlaced( const InteractionEvent* /*interactionEvent*/ )
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
 
@@ -175,20 +175,20 @@ bool mitk::PlanarFigureInteractor::EndHovering( StateMachineAction*, Interaction
   return false;
 }
 
-bool mitk::PlanarFigureInteractor::CheckMinimalFigureFinished( const InteractionEvent* interactionEvent )
+bool mitk::PlanarFigureInteractor::CheckMinimalFigureFinished( const InteractionEvent* /*interactionEvent*/ )
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   return ( planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMinimumNumberOfControlPoints()  );
 }
 
-bool mitk::PlanarFigureInteractor::CheckFigureFinished( const InteractionEvent* interactionEvent )
+bool mitk::PlanarFigureInteractor::CheckFigureFinished( const InteractionEvent* /*interactionEvent*/ )
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   return ( planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMaximumNumberOfControlPoints() );
 }
 
 
-bool mitk::PlanarFigureInteractor::CheckFigureIsExtendable( const InteractionEvent* interactionEvent )
+bool mitk::PlanarFigureInteractor::CheckFigureIsExtendable( const InteractionEvent* /*interactionEvent*/ )
 {
   bool isExtendable = false;
   GetDataNode()->GetBoolProperty("planarfigure.isextendable", isExtendable);
@@ -196,7 +196,7 @@ bool mitk::PlanarFigureInteractor::CheckFigureIsExtendable( const InteractionEve
   return isExtendable;
 }
 
-bool mitk::PlanarFigureInteractor::DeselectPoint(StateMachineAction*, InteractionEvent* interactionEvent)
+bool mitk::PlanarFigureInteractor::DeselectPoint(StateMachineAction*, InteractionEvent* /*interactionEvent*/)
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(
     GetDataNode()->GetData() );
@@ -386,8 +386,6 @@ bool mitk::PlanarFigureInteractor::StartHovering( StateMachineAction*, Interacti
 
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
-  mitk::Geometry2D *planarFigureGeometry = dynamic_cast< Geometry2D * >( planarFigure->GetGeometry( 0 ) );
-  const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
 
   if ( !m_IsHovering )
   {
@@ -412,20 +410,10 @@ bool mitk::PlanarFigureInteractor::SetPreviewPointPosition( StateMachineAction*,
 
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
-  mitk::Geometry2D *planarFigureGeometry = dynamic_cast< Geometry2D * >( planarFigure->GetGeometry( 0 ) );
-  const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
 
   planarFigure->DeselectControlPoint();
 
   mitk::Point2D pointProjectedOntoLine;
-  int previousControlPoint = mitk::PlanarFigureInteractor::IsPositionOverFigure(
-    positionEvent,
-    planarFigure,
-    planarFigureGeometry,
-    projectionPlane,
-    renderer->GetDisplayGeometry(),
-    pointProjectedOntoLine
-    );
 
   bool selected(false);
   bool isExtendable(false);
@@ -445,7 +433,7 @@ bool mitk::PlanarFigureInteractor::SetPreviewPointPosition( StateMachineAction*,
   return true;
 }
 
-bool mitk::PlanarFigureInteractor::HideControlPoints( StateMachineAction*, InteractionEvent* interactionEvent )
+bool mitk::PlanarFigureInteractor::HideControlPoints( StateMachineAction*, InteractionEvent* /*interactionEvent*/ )
 {
   GetDataNode()->SetBoolProperty( "planarfigure.drawcontrolpoints", false );
   return true;
@@ -528,7 +516,7 @@ bool mitk::PlanarFigureInteractor::CheckControlPointHovering( const InteractionE
   }
 }
 
-bool mitk::PlanarFigureInteractor::CheckSelection( const InteractionEvent* interactionEvent )
+bool mitk::PlanarFigureInteractor::CheckSelection( const InteractionEvent* /*interactionEvent*/ )
 {
   bool selected = false;
   GetDataNode()->GetBoolProperty("selected", selected);
@@ -536,7 +524,7 @@ bool mitk::PlanarFigureInteractor::CheckSelection( const InteractionEvent* inter
   return selected;
 }
 
-bool mitk::PlanarFigureInteractor::SelectFigure( StateMachineAction*, InteractionEvent* interactionEvent )
+bool mitk::PlanarFigureInteractor::SelectFigure( StateMachineAction*, InteractionEvent* /*interactionEvent*/ )
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   planarFigure->InvokeEvent( SelectPlanarFigureEvent() );
@@ -617,7 +605,7 @@ bool mitk::PlanarFigureInteractor::RemoveSelectedPoint(StateMachineAction*, Inte
 }
 
 
-bool mitk::PlanarFigureInteractor::RequestContextMenu(StateMachineAction*, InteractionEvent* interactionEvent)
+bool mitk::PlanarFigureInteractor::RequestContextMenu(StateMachineAction*, InteractionEvent* /*interactionEvent*/)
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
 
@@ -636,7 +624,7 @@ bool mitk::PlanarFigureInteractor::RequestContextMenu(StateMachineAction*, Inter
 }
 
 
-bool mitk::PlanarFigureInteractor::CheckResetOnPointSelect( const InteractionEvent* interactionEvent )
+bool mitk::PlanarFigureInteractor::CheckResetOnPointSelect( const InteractionEvent* /*interactionEvent*/ )
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
 

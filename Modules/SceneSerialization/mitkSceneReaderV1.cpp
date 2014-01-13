@@ -213,7 +213,6 @@ void mitk::SceneReaderV1::GetLayerOrder(TiXmlDocument& document, const std::stri
   DataNodeVector::iterator nit = DataNodes.begin();
   for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL || nit != DataNodes.end(); element = element->NextSiblingElement("node"), ++nit )
   {
-    bool error(false);
     DataNode::Pointer node = *nit;
     DecorateNodeWithProperties(node, element, workingDirectory);
 

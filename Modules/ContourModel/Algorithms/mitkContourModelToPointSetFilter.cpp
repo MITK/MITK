@@ -42,9 +42,9 @@ void mitk::ContourModelToPointSetFilter::GenerateData()
   unsigned int pointId = 0;
 
 
-  unsigned int timestep = inputContour->GetTimeSteps();
+  std::size_t timestep = inputContour->GetTimeSteps();
 
-  for ( int i = 0; i < timestep; i++)
+  for ( std::size_t i = 0; i < timestep; i++)
   {
 
 

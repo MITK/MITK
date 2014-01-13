@@ -26,7 +26,9 @@ mitk::ContourElement::ContourElement()
 
 
 mitk::ContourElement::ContourElement(const mitk::ContourElement &other) :
-  m_Vertices(other.m_Vertices), m_IsClosed(other.m_IsClosed)
+  itk::LightObject(),
+  m_Vertices(other.m_Vertices),
+  m_IsClosed(other.m_IsClosed)
 {
 }
 
@@ -428,7 +430,7 @@ int mitk::ContourElement::GetIndex(const VertexType *vertex)
 
 bool mitk::ContourElement::RemoveVertexAt(int index)
 {
-  if( index >= 0 && index < this->m_Vertices->size() )
+  if( index >= 0 && static_cast<VertexListType::size_type>(index) < this->m_Vertices->size() )
   {
     this->m_Vertices->erase(this->m_Vertices->begin()+index);
     return true;

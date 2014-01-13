@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::NavigationDataPlayer::NavigationDataPlayer() : mitk::NavigationDataPlayerBase()
 {
-  m_NumberOfOutputs = 0;
   m_Pause = false;
   m_Playing = false;
   m_Stream = NULL;
@@ -196,7 +195,7 @@ void mitk::NavigationDataPlayer::InitPlayer()
   {
     //Generate the output only if there are changes to the amount of outputs
     //This happens when the player is stopped and start again with different file
-    if (this->GetNumberOfOutputs() != m_NumberOfOutputs) {SetNumberOfOutputs(m_NumberOfOutputs);}
+    if (this->GetNumberOfOutputs() != m_NumberOfOutputs) {SetNumberOfIndexedOutputs(m_NumberOfOutputs);}
     //initialize the player with first data
     GetFirstData();
     //set stream valid

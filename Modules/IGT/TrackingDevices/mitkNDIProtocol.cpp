@@ -1324,7 +1324,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
     signed int number = 0;
     //float localPos[3] = {0.0, 0.0, 0.0};
     MarkerPointType p;
-    float lineSeparation = 0.0;
+    //float lineSeparation = 0.0;
 
     /* parse number of markers from first 3 characters */
     std::stringstream converter;
@@ -1368,7 +1368,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
       converter >> number;                // extract the number as integer
       converter.clear();                  // converter must be cleared to be reused
       converter.str("");
-      lineSeparation = number / 100.0;    // the line separation value is send with an implied decimal point with 2 digits to the right
+      //lineSeparation = number / 100.0;    // the line separation value is send with an implied decimal point with 2 digits to the right
       /* read and parse 1 character out of volume value */
       receivevalue = m_TrackingDevice->Receive(&s, 1);   // read the port status value
       if(receivevalue != NDIOKAY)

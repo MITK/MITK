@@ -1,3 +1,4 @@
 MITK_CREATE_MODULE(ClippingTools
-DEPENDS Mitk Segmentation
+  DEPENDS Mitk Segmentation
+  WARNINGS_AS_ERRORS
 )

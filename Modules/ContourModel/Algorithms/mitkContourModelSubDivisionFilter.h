@@ -60,6 +60,8 @@ namespace mitk {
       this->m_InterpolationIterations = iterations;
     }
 
+    using Superclass::SetInput;
+
     virtual void SetInput( const InputType *input);
 
     virtual void SetInput( unsigned int idx, const InputType * input);

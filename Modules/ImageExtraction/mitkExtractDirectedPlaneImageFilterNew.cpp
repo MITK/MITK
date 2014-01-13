@@ -184,7 +184,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
     //Workaround end
 
     newSliceGeometryTest->SetOrigin(origin);
-    ScalarType bounds[6]={0, size[0], 0, size[1], 0, 1};
+    ScalarType bounds[6]={0, static_cast<ScalarType>(size[0]), 0, static_cast<ScalarType>(size[1]), 0, 1};
     newSliceGeometryTest->SetBounds(bounds);
     newSliceGeometryTest->SetSpacing(newPixelSpacing);
     newSliceGeometryTest->Modified();

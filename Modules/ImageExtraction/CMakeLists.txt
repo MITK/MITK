@@ -1,5 +1,6 @@
 MITK_CREATE_MODULE( ImageExtraction
-               DEPENDS MitkAlgorithmsExt
+  DEPENDS MitkAlgorithmsExt
+  WARNINGS_AS_ERRORS
 )
 
 if(BUILD_TESTING)

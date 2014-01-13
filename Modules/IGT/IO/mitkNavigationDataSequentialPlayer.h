@@ -115,7 +115,7 @@ namespace mitk
     TiXmlElement* m_CurrentElem;
     bool m_Repeat;
     unsigned int m_NumberOfSnapshots;
-    int m_LastGoTo;
+    unsigned int m_LastGoTo;
   };
 } // namespace mitk
 

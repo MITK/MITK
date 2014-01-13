@@ -23,7 +23,7 @@ mitk::ContourModelSetWriter::ContourModelSetWriter()
   : m_FileName(""), m_FilePrefix(""), m_FilePattern("")
 {
   this->SetNumberOfRequiredInputs( 1 );
-  this->SetNumberOfOutputs( 1 );
+  this->SetNumberOfIndexedOutputs( 1 );
   this->SetNthOutput( 0, mitk::ContourModel::New().GetPointer() );
   m_Success = false;
 }
@@ -56,7 +56,7 @@ void mitk::ContourModelSetWriter::GenerateData()
   //
   // for each contour object set input of writer
   //
-  for ( unsigned int i = 0 ; i < contourModelSet->GetSize(); ++i )
+  for ( int i = 0 ; i < contourModelSet->GetSize(); ++i )
   {
     mitk::ContourModel* contour = contourModelSet->GetContourModelAt(i);
     writer->SetInput( i, contour );
@@ -72,7 +72,7 @@ void mitk::ContourModelSetWriter::GenerateData()
 void mitk::ContourModelSetWriter::ResizeInputs( const unsigned int& num )
 {
   unsigned int prevNum = this->GetNumberOfInputs();
-  this->SetNumberOfInputs( num );
+  this->SetNumberOfIndexedInputs( num );
   for ( unsigned int i = prevNum; i < num; ++i )
   {
     this->SetNthInput( i, mitk::ContourModel::New().GetPointer() );

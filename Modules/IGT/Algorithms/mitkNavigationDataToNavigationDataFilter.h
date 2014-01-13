@@ -38,6 +38,8 @@ namespace mitk
   public:
     mitkClassMacro(NavigationDataToNavigationDataFilter, NavigationDataSource);
 
+    using Superclass::SetInput;
+
     /**
     * \brief Set the input of this filter
     *

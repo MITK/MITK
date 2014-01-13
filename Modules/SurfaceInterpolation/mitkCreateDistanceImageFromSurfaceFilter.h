@@ -95,6 +95,8 @@ namespace mitk {
     mitkClassMacro(CreateDistanceImageFromSurfaceFilter,ImageSource);
     itkNewMacro(Self);
 
+    using Superclass::SetInput;
+
     //Methods copied from mitkSurfaceToSurfaceFilter
     virtual void SetInput( const mitk::Surface* surface );
 

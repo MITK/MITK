@@ -558,11 +558,6 @@ void mitk::PlanarFigure::DeactivateFeature( unsigned int index )
   }
 }
 
-void mitk::PlanarFigure::InitializeTimeSlicedGeometry( unsigned int timeSteps )
-{
-  InitializeTimeGeometry(timeSteps);
-}
-
 void mitk::PlanarFigure::InitializeTimeGeometry( unsigned int timeSteps )
 {
   mitk::Geometry2D::Pointer geometry2D = mitk::Geometry2D::New();

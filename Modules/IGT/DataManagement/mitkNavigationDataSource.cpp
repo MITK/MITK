@@ -62,11 +62,14 @@ mitk::NavigationData* mitk::NavigationDataSource::GetOutput(DataObjectPointerArr
 
 mitk::NavigationData* mitk::NavigationDataSource::GetOutput(const std::string& navDataName)
 {
+  /*
   DataObjectPointerArray outputs = this->GetOutputs();
   for (DataObjectPointerArray::iterator it = outputs.begin(); it != outputs.end(); ++it)
     if (navDataName == (static_cast<NavigationData*>(it->GetPointer()))->GetName())
       return static_cast<NavigationData*>(it->GetPointer());
   return NULL;
+  */
+  return static_cast<NavigationData*>(this->ProcessObject::GetOutput(navDataName));
 }
 
 itk::ProcessObject::DataObjectPointerArraySizeType mitk::NavigationDataSource::GetOutputIndex( std::string navDataName )

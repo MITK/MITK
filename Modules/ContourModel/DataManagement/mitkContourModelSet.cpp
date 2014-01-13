@@ -27,9 +27,10 @@ mitk::ContourModelSet::ContourModelSet() :
 
 
 mitk::ContourModelSet::ContourModelSet(const mitk::ContourModelSet &other) :
+  mitk::BaseData(other),
   m_Contours(other.m_Contours)
 {
-  this->InitializeTimeSlicedGeometry(1);
+  this->InitializeTimeGeometry(1);
 }
 
 
@@ -42,7 +43,7 @@ mitk::ContourModelSet::~ContourModelSet()
 
 void mitk::ContourModelSet::InitializeEmpty()
 {
-  this->InitializeTimeSlicedGeometry(1);
+  this->InitializeTimeGeometry(1);
   m_Contours.resize(0);
 }
 
@@ -64,7 +65,7 @@ void mitk::ContourModelSet::AddContourModel(mitk::ContourModel::Pointer contourM
 
 mitk::ContourModel* mitk::ContourModelSet::GetContourModelAt(int index)
 {
-  if( index >= 0 && index < this->m_Contours.size() )
+  if( index >= 0 && static_cast<ContourModelListType::size_type>(index) < this->m_Contours.size() )
   {
     return this->m_Contours.at(index).GetPointer();
   }
@@ -74,7 +75,7 @@ mitk::ContourModel* mitk::ContourModelSet::GetContourModelAt(int index)
   }
 }
 
-bool mitk::ContourModelSet::IsEmpty()
+bool mitk::ContourModelSet::IsEmpty() const
 {
   return this->m_Contours.empty();
 }
@@ -111,7 +112,7 @@ bool mitk::ContourModelSet::RemoveContourModel(mitk::ContourModel* contourModel)
 
 bool mitk::ContourModelSet::RemoveContourModelAt(int index)
 {
-  if( index >= 0 && index < this->m_Contours.size() )
+  if( index >= 0 && static_cast<ContourModelListType::size_type>(index) < this->m_Contours.size() )
   {
     this->m_Contours.erase(this->m_Contours.begin()+index);
     m_UpdateBoundingBox = true;

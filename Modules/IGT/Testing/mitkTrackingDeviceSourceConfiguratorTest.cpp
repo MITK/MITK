@@ -128,11 +128,14 @@ static void TestValidClaronTrackingDevice()
   MITK_TEST_CONDITION_REQUIRED(testSource->GetTrackingDevice()->GetToolCount()==2,"testing tracking device");
 }
 
+/*
 static void TestNDIAuroraTrackingDevice()
 {
 
 }
+*/
 
+/*
 static void TestNDIPolarisTrackingDevice()
 {
   MITK_TEST_OUTPUT(<<"Testing simple NDI Polaris tracking device with 1 valid tool");
@@ -165,6 +168,7 @@ static void TestNDIPolarisTrackingDevice()
   MITK_TEST_CONDITION_REQUIRED(testSource->GetNumberOfOutputs()==1,"..testing number of outputs");
   MITK_TEST_CONDITION_REQUIRED(testSource->GetTrackingDevice()->GetToolCount()==1,"..testing tracking device");
 }
+*/
 
 static void TestAdditionalMethods()
 {

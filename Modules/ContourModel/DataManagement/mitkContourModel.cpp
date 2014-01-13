@@ -26,7 +26,9 @@ mitk::ContourModel::ContourModel() :
 
 
 mitk::ContourModel::ContourModel(const mitk::ContourModel &other) :
-m_ContourSeries(other.m_ContourSeries), m_lineInterpolation(other.m_lineInterpolation)
+  mitk::BaseData(other),
+  m_ContourSeries(other.m_ContourSeries),
+  m_lineInterpolation(other.m_lineInterpolation)
 {
   m_SelectedVertex = NULL;
 }
@@ -491,14 +493,14 @@ void mitk::ContourModel::Clear(int timestep)
 
 void mitk::ContourModel::Expand(unsigned int timeSteps )
 {
-  int oldSize = this->m_ContourSeries.size();
+  std::size_t oldSize = this->m_ContourSeries.size();
 
-  if( timeSteps > oldSize )
+  if( static_cast<std::size_t>(timeSteps) > oldSize )
   {
     Superclass::Expand(timeSteps);
 
     //insert contours for each new timestep
-    for( int i = oldSize; i < timeSteps; i++)
+    for( std::size_t i = oldSize; i < static_cast<std::size_t>(timeSteps); i++)
     {
       m_ContourSeries.push_back(mitk::ContourElement::New());
     }
@@ -545,7 +547,7 @@ mitk::Geometry3D* mitk::ContourModel::GetGeometry (int t)const
 }
 
 
-void mitk::ContourModel::SetRequestedRegion( const itk::DataObject *data)
+void mitk::ContourModel::SetRequestedRegion( const itk::DataObject* /*data*/)
 {
   //no support for regions
 }
@@ -592,10 +594,10 @@ void mitk::ContourModel::Initialize()
 
 void mitk::ContourModel::Initialize(mitk::ContourModel &other)
 {
-  unsigned int numberOfTimesteps = other.GetTimeGeometry()->CountTimeSteps();
+  mitk::TimeStepType numberOfTimesteps = other.GetTimeGeometry()->CountTimeSteps();
   this->InitializeTimeGeometry(numberOfTimesteps);
 
-  for(int currentTimestep = 0; currentTimestep < numberOfTimesteps; currentTimestep++)
+  for(mitk::TimeStepType currentTimestep = 0; currentTimestep < numberOfTimesteps; currentTimestep++)
   {
     this->m_ContourSeries.push_back(mitk::ContourElement::New());
     this->SetClosed(other.IsClosed(currentTimestep),currentTimestep);
@@ -701,7 +703,7 @@ void mitk::ContourModel::UpdateOutputInformation()
 }
 
 
-void mitk::ContourModel::ExecuteOperation(mitk::Operation* operation)
+void mitk::ContourModel::ExecuteOperation(mitk::Operation* /*operation*/)
 {
   //not supported yet
 }

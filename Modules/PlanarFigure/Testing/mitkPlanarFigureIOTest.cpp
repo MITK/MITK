@@ -231,42 +231,9 @@ public:
 
     for ( it1 = original.begin(); it1 != original.end(); ++it1 )
     {
-      mitk::PlanarFigure::Pointer copiedFigure;
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarAngle") == 0)
-      {
-        copiedFigure    = mitk::PlanarAngle::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarCircle") == 0)
-      {
-        copiedFigure    = mitk::PlanarCircle::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarLine") == 0)
-      {
-        copiedFigure    = mitk::PlanarLine::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarPolygon") == 0)
-      {
-        copiedFigure    = mitk::PlanarPolygon::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarSubdivisionPolygon") == 0)
-      {
-        copiedFigure    = mitk::PlanarSubdivisionPolygon::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarCross") == 0)
-      {
-        copiedFigure    = mitk::PlanarCross::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarRectangle") == 0)
-      {
-        copiedFigure    = mitk::PlanarRectangle::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarFourPointAngle") == 0)
-      {
-        copiedFigure    = mitk::PlanarFourPointAngle::New();
-      }
+      mitk::PlanarFigure::Pointer copiedFigure = (*it1)->Clone();
 
-      copiedFigure->DeepCopy((*it1));
-      copiedPlanarFigures.push_back(copiedFigure.GetPointer());
+      copiedPlanarFigures.push_back(copiedFigure);
     }
     return copiedPlanarFigures;
   }

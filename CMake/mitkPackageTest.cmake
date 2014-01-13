@@ -10,14 +10,14 @@ if(BUILD_TESTING)
 
       set_tests_properties( mitkPackageTest PROPERTIES
                           TIMEOUT 6000
-                          LABELS "MITK;MITK-Plugins")
+                          LABELS "MITK;MITK-Plugins;PACKAGE_TESTS")
     elseif(CMAKE_BUILD_TYPE)
       add_test( NAME mitkPackageTest
                 COMMAND ${CMAKE_COMMAND} --build ${MITK_BINARY_DIR} --config ${CMAKE_BUILD_TYPE} --target package)
 
       set_tests_properties( mitkPackageTest PROPERTIES
                           TIMEOUT 6000
-                          LABELS "MITK;MITK-Plugins"
+                          LABELS "MITK;MITK-Plugins;PACKAGE_TESTS"
                           RUN_SERIAL TRUE)
     endif()
 

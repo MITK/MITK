@@ -41,15 +41,11 @@ mitk::ITKDICOMSeriesReaderHelper
       if (converter >> i)
       {
         MITK_DEBUG << "Number of Frames for " << filename << ": " << numberOfFrames;
-        if (i >1)
-        {
-          // cannot handle multi-frame
-          return false;
-        }
-        else
-        {
-          return true; // not sure..
-        }
+        return (i <= 1); // cannot handle multi-frame
+      }
+      else
+      {
+        return true; // we assume single-frame
       }
     }
     else

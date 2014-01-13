@@ -59,6 +59,9 @@ class DICOMReader_EXPORT DICOMFileReaderSelector : public itk::LightObject
     /// Configs can only be reset by instantiating a new DICOMFileReaderSelector.
     void AddConfigFile(const std::string& filename);
 
+    /// \brief Add a whole pre-configured reader to the selection process.
+    void AddFileReaderCanditate(DICOMFileReader::Pointer reader);
+
     /// \brief Load 3D image creating configurations from the MITK module system (see \ref mitk::Module::FindResources).
     /// For a default set of configurations, look into the directory Resources of the DICOMReader module.
     void LoadBuiltIn3DConfigs();

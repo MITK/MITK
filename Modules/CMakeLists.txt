@@ -3,6 +3,8 @@ set(LIBPOSTFIX "Ext")
 # Modules must be listed according to their dependencies
 set(module_dirs
     SeedsImage
+    DICOMReader
+    DICOMTesting
     SceneSerializationBase
     PlanarFigure
     ImageExtraction

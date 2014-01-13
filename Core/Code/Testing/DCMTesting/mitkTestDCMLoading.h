@@ -13,32 +13,28 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef mitkTestDICOMLoading_h
-#define mitkTestDICOMLoading_h
+#ifndef mitkTestDCMLoading_h
+#define mitkTestDCMLoading_h
 
-#include "mitkClassicDICOMSeriesReader.h"
+#include "mitkDicomSeriesReader.h"
 
-#include "DICOMTestingExports.h"
+#include "mitkDCMTestingExports.h"
 
 namespace mitk
 {
 
-class DICOMTesting_EXPORT TestDICOMLoading
+class mitkDCMTesting_EXPORT TestDCMLoading
 {
   public:
 
+    typedef DicomSeriesReader::StringContainer StringContainer;
+    typedef std::list<DataNode::Pointer> NodeList;
     typedef std::list<Image::Pointer> ImageList;
 
-    TestDICOMLoading();
+    TestDCMLoading();
 
     ImageList
-    LoadFiles( const StringList & files );
-
-    Image::Pointer
-    DecorateVerifyCachedImage( const StringList& files, mitk::Image::Pointer cachedImage );
-
-    Image::Pointer
-    DecorateVerifyCachedImage( const StringList& files, DICOMTagCache*, mitk::Image::Pointer cachedImage );
+    LoadFiles( const StringContainer& files, Image::Pointer preLoadedVolume = NULL );
 
     /**
       \brief Dump relevant image information for later comparison.
@@ -59,9 +55,6 @@ class DICOMTesting_EXPORT TestDICOMLoading
   private:
 
     typedef std::map<std::string,std::string> KeyValueMap;
-
-    ClassicDICOMSeriesReader::Pointer
-    BuildDICOMReader();
 
     void SetDefaultLocale();
 
@@ -93,12 +86,14 @@ class DICOMTesting_EXPORT TestDICOMLoading
     std::string trim(const std::string& pString,
                      const std::string& pWhitespace = " \t");
 
+
+
     template<typename T>
     bool StringToNumber(const std::string& s, T& value)
     {
       std::stringstream stream(s);
       stream >> value;
-      return !stream.fail();
+      return (!stream.fail()) && (fabs(value) < std::numeric_limits<T>::max());
     }
 
     const char* m_PreviousCLocale;
@@ -109,4 +104,3 @@ class DICOMTesting_EXPORT TestDICOMLoading
 }
 
 #endif
-

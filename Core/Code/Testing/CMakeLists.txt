@@ -160,3 +160,5 @@ set_property(TEST mitkImageWriterTest_nrrdImage PROPERTY LABELS MITK-Core)
 set_property(TEST mitkImageWriterTest_2DPNGImage PROPERTY LABELS MITK-Core)
 set_property(TEST mitkImageWriterTest_rgbPNGImage PROPERTY LABELS MITK-Core)
 set_property(TEST mitkImageWriterTest_rgbaPNGImage PROPERTY LABELS MITK-Core)
+
+add_subdirectory(DCMTesting)

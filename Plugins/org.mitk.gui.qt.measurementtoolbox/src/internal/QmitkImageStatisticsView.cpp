@@ -42,6 +42,7 @@ QmitkImageStatisticsView::QmitkImageStatisticsView(QObject* /*parent*/, const ch
   m_ImageObserverTag( -1 ),
   m_ImageMaskObserverTag( -1 ),
   m_PlanarFigureObserverTag( -1 ),
+  m_TimeObserverTag( -1 ),
   m_CurrentStatisticsValid( false ),
   m_StatisticsUpdatePending( false ),
   m_DataNodeSelectionChanged ( false ),
@@ -91,6 +92,74 @@ void QmitkImageStatisticsView::CreateConnections()
     connect( (QObject*) this->m_Controls->m_StatisticsTable, SIGNAL(cellDoubleClicked(int,int)),this, SLOT( JumpToCoordinates(int,int)) );
     connect( (QObject*) (this->m_Controls->m_barRadioButton), SIGNAL(clicked()), (QObject*) (this->m_Controls->m_JSHistogram), SLOT(OnBarRadioButtonSelected()));
     connect( (QObject*) (this->m_Controls->m_lineRadioButton), SIGNAL(clicked()), (QObject*) (this->m_Controls->m_JSHistogram), SLOT(OnLineRadioButtonSelected()));
+  }
+
+  mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
+
+  if (renderWindow)
+  {
+    itk::ReceptorMemberCommand<QmitkImageStatisticsView>::Pointer cmdTimeEvent =
+	  itk::ReceptorMemberCommand<QmitkImageStatisticsView>::New();
+	cmdTimeEvent->SetCallbackFunction(this, &QmitkImageStatisticsView::OnTimeChanged);
+
+    // It is sufficient to add the observer to the axial render window since the GeometryTimeEvent
+    // is always triggered by all views.
+    m_TimeObserverTag = renderWindow->GetQmitkRenderWindow("axial")->
+      GetSliceNavigationController()->
+      AddObserver(mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), cmdTimeEvent);
+  }
+}
+
+void QmitkImageStatisticsView::PartClosed( berry::IWorkbenchPartReference::Pointer )
+{
+  // The slice navigation controller observer is removed here instead of in the destructor.
+  // If it was called in the destructor, the application would freeze because the view's
+  // destructor gets called after the render windows have been destructed.
+  if ( m_TimeObserverTag != NULL )
+  {
+    mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
+
+    if (renderWindow)
+    {
+      renderWindow->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->
+        RemoveObserver( m_TimeObserverTag );
+    }
+  }
+}
+
+void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject&)
+{
+  if (m_SelectedImage != NULL && !this->m_StatisticsUpdatePending)
+  {
+    while( this->m_CalculationThread->isRunning()) // wait until thread has finished
+	{
+      itksys::SystemTools::Delay(100);
+    }
+
+    if(this->m_SelectedImage != NULL)
+    {
+      this->m_SelectedImage->RemoveObserver( this->m_ImageObserverTag);
+      this->m_SelectedImage = NULL;
+    }
+
+    if(this->m_SelectedImageMask != NULL)
+    {
+      this->m_SelectedImageMask->RemoveObserver( this->m_ImageMaskObserverTag);
+      this->m_SelectedImageMask = NULL;
+    }
+
+    if(this->m_SelectedPlanarFigure != NULL)
+    {
+      this->m_SelectedPlanarFigure->RemoveObserver( this->m_PlanarFigureObserverTag);
+      this->m_SelectedPlanarFigure = NULL;
+	}
+
+    m_Controls->m_ErrorMessageLabel->setText("");
+    m_Controls->m_ErrorMessageLabel->hide();
+    this->InvalidateStatisticsTableView();
+    m_Controls->m_StatisticsWidgetStack->setCurrentIndex(0);
+
+    emit StatisticsUpdate();
   }
 }
 
@@ -434,6 +503,24 @@ void QmitkImageStatisticsView::UpdateStatistics()
     if(m_SelectedImage->GetDimension() <= 3 && timeStep > m_SelectedImage->GetDimension(3)-1)
     {
       timeStep = m_SelectedImage->GetDimension(3)-1;
+    }
+
+	// Add the used mask time step to the mask label so the user knows which mask time step was used
+    // if the image time step is bigger than the total number of mask time steps (see
+    // ImageStatisticsCalculator::ExtractImageAndMask)
+    if (m_SelectedImageMask != NULL)
+    {
+      unsigned int maskTimeStep = timeStep;
+	  
+      if (maskTimeStep >= m_SelectedImageMask->GetTimeSteps())
+      {
+        maskTimeStep = m_SelectedImageMask->GetTimeSteps() - 1;
+      }
+	  
+      m_Controls->m_SelectedMaskLabel->setText(m_Controls->m_SelectedMaskLabel->text() +
+                                               QString(" (t=") +
+                                               QString::number(maskTimeStep) +
+                                               QString(")"));
     }
 
     //// initialize thread and trigger it

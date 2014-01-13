@@ -49,7 +49,7 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
       \brief Processes tag values before they are compared.
       These classes could do some kind of normalization such as rounding, lower case formatting, etc.
     */
-    class TagValueProcessor
+    class DICOMReader_EXPORT TagValueProcessor
     {
       public:
         /// \brief Implements the "processing".
@@ -60,7 +60,7 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
       \brief Cuts a number after configured number of decimal places.
       An instance of this class can be used to avoid errors when comparing minimally different image orientations.
     */
-    class CutDecimalPlaces : public TagValueProcessor
+    class DICOMReader_EXPORT CutDecimalPlaces : public TagValueProcessor
     {
       public:
         CutDecimalPlaces(unsigned int precision);

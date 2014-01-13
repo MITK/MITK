@@ -100,6 +100,15 @@ mitk::DICOMFileReaderSelector
   this->AddConfigFromResource(r);
 }
 
+void
+mitk::DICOMFileReaderSelector
+::AddFileReaderCanditate(DICOMFileReader::Pointer reader)
+{
+  if (reader.IsNotNull())
+  {
+    m_Readers.push_back( reader );
+  }
+}
 
 void
 mitk::DICOMFileReaderSelector

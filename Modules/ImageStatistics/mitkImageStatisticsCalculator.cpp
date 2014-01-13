@@ -775,7 +775,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
 
   statistics.MinIndex.set_size(image->GetImageDimension());
   statistics.MaxIndex.set_size(image->GetImageDimension());
-  for (int i=0; i<statistics.MaxIndex.size(); i++)
+  for (unsigned int i=0; i<statistics.MaxIndex.size(); i++)
   {
       statistics.MaxIndex[i] = minMaxFilter->GetIndexOfMaximum()[i];
       statistics.MinIndex[i] = minMaxFilter->GetIndexOfMinimum()[i];
@@ -1057,7 +1057,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
             statistics.MinIndex[m_PlanarFigureAxis]=m_PlanarFigureSlice;
         } else
         {
-          for (int i = 0; i<statistics.MaxIndex.size(); i++)
+          for (unsigned int i = 0; i<statistics.MaxIndex.size(); i++)
           {
             statistics.MaxIndex[i] = tempMaxIndex[i];
             statistics.MinIndex[i] = tempMinIndex[i];

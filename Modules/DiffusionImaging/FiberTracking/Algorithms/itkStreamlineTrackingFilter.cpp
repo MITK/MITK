@@ -832,18 +832,19 @@ TPDPixelType>
     vtkSmartPointer<vtkCellArray> vNewLines = poly1->GetLines();
     vtkSmartPointer<vtkPoints> vNewPoints = poly1->GetPoints();
 
-    vtkSmartPointer<vtkCellArray> vLines = poly2->GetLines();
-    vLines->InitTraversal();
-    for( int i=0; i<vLines->GetNumberOfCells(); i++ )
+    for( int i=0; i<poly2->GetNumberOfLines(); i++ )
     {
-        vtkIdType   numPoints(0);
-        vtkIdType*  points(NULL);
-        vLines->GetNextCell ( numPoints, points );
+        vtkCell* cell = poly2->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
 
         vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-        for( int j=0; j<numPoints; j++)
+        for (int j=0; j<numPoints; j++)
         {
-            vtkIdType id = vNewPoints->InsertNextPoint(poly2->GetPoint(points[j]));
+            double p[3];
+            points->GetPoint(j, p);
+
+            vtkIdType id = vNewPoints->InsertNextPoint(p);
             container->GetPointIds()->InsertNextId(id);
         }
         vNewLines->InsertNextCell(container);

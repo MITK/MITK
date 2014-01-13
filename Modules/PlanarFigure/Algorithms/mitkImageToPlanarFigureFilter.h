@@ -41,6 +41,7 @@ public:
   typedef SlicedData::RegionType         InputImageRegionType;
 
   /** Set/Get the image input of this process object.  */
+  using Superclass::SetInput;
   virtual void SetInput( const InputImageType *image);
   virtual void SetInput( unsigned int, const InputImageType * image);
   const InputImageType * GetInput(void);

@@ -32,17 +32,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 static const float PLANAR_OFFSET = 0.5f;
 
 mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
+  : m_NodeModified(true)
+  , m_NodeModifiedObserverTag(0)
+  , m_NodeModifiedObserverAdded(false)
 {
-  m_NodeModifiedObserverTag = -1;
-  m_NodeModified = true;
   this->InitializeDefaultPlanarFigureProperties();
 }
 
 
 mitk::PlanarFigureMapper2D::~PlanarFigureMapper2D()
 {
-  if ( m_NodeModifiedObserverTag != -1
-    && GetDataNode() != NULL )
+  if ( m_NodeModifiedObserverAdded && GetDataNode() != NULL )
   {
     GetDataNode()->RemoveObserver( m_NodeModifiedObserverTag );
   }
@@ -433,13 +433,14 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
     return;
   }
 
-  // if we have not added an observer for ModifiedEvents on teh DataNode,
+  // if we have not added an observer for ModifiedEvents on the DataNode,
   // we add one now.
-  if ( m_NodeModifiedObserverTag == -1 )
+  if ( !m_NodeModifiedObserverAdded )
   {
     itk::SimpleMemberCommand<mitk::PlanarFigureMapper2D>::Pointer nodeModifiedCommand = itk::SimpleMemberCommand<mitk::PlanarFigureMapper2D>::New();
     nodeModifiedCommand->SetCallbackFunction(this, &mitk::PlanarFigureMapper2D::OnNodeModified);
     m_NodeModifiedObserverTag = node->AddObserver(itk::ModifiedEvent(), nodeModifiedCommand);
+    m_NodeModifiedObserverAdded = true;
   }
 
   // If the DataNode has not been modified since the last execution of

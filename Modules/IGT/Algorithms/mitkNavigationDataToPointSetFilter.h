@@ -80,6 +80,8 @@ namespace mitk {
     */
     virtual void GenerateData();
 
+    using Superclass::SetInput;
+
     /**
     * \brief Sets one input NavigationData
     */

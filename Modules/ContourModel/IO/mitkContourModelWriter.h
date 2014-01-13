@@ -149,6 +149,8 @@ public:
     */
     virtual std::string GetWritenMIMEType();
 
+    using Superclass::SetInput;
+
     /**
     * @brief Set the DataTreenode as Input. Important: The Writer always have a SetInput-Function.
     */

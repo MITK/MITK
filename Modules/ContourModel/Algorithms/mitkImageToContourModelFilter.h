@@ -44,6 +44,8 @@ namespace mitk {
     typedef mitk::Image InputType;
 
 
+    using Superclass::SetInput;
+
     virtual void SetInput( const InputType *input);
 
     virtual void SetInput( unsigned int idx, const InputType * input);

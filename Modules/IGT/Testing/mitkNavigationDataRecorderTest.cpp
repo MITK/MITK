@@ -162,6 +162,7 @@ static void TestRecordingOnHarddiscCSV()
   MITK_TEST_CONDITION(myFile.exists(),"Testing CSV recording on harddisc (does file exist?).");
 }
 
+/*
 static void TestLoadingRecordedXMLFile()
 {
   mitk::NavigationDataPlayer::Pointer myPlayer = mitk::NavigationDataPlayer::New();
@@ -181,6 +182,7 @@ static void TestLoadingRecordedXMLFile()
 
   MITK_TEST_CONDITION((thisData->GetPosition() == reference_pnt),"Testing load data from xml file.");
 }
+*/
 
 static void TestRecordingInvalidData()
 {

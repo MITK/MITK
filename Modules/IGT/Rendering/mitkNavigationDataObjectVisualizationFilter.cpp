@@ -147,7 +147,7 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
     {
       ///*set the offset by convert from itkPoint to itkVector and setting offset of transform*/
       mitk::Vector3D pos;
-      pos.Set_vnl_vector(nd->GetPosition().Get_vnl_vector());
+      pos.SetVnlVector(nd->GetPosition().GetVnlVector());
       affineTransform->SetOffset(pos);
     }
     affineTransform->Modified();

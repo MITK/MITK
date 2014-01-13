@@ -86,7 +86,7 @@ itk::ProcessObject::DataObjectPointerArraySizeType mitk::NavigationDataToNavigat
 
 void mitk::NavigationDataToNavigationDataFilter::ConnectTo(mitk::NavigationDataSource* UpstreamFilter)
 {
-  for (int i = 0; i < UpstreamFilter->GetNumberOfOutputs(); i++)
+  for (DataObjectPointerArraySizeType i = 0; i < UpstreamFilter->GetNumberOfOutputs(); i++)
   {
     this->SetInput(i, UpstreamFilter->GetOutput(i));
   }

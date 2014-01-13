@@ -66,7 +66,6 @@ mitk::ContourObjectFactory::~ContourObjectFactory()
 mitk::Mapper::Pointer mitk::ContourObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)
 {
   mitk::Mapper::Pointer newMapper=NULL;
-  mitk::BaseData *data = node->GetData();
 
   if ( id == mitk::BaseRenderer::Standard2D )
   {

@@ -328,13 +328,6 @@ protected:
 
   /** \brief Initializes the TimeGeometry describing the (time-resolved)
    * geometry of this figure. Note that each time step holds one Geometry2D.
-   *
-   * \deprecatedSince{2013_09} Please use InitializeTimeGeometry instead: For additional information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
-   */
-   DEPRECATED(virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 ));
-
-  /** \brief Initializes the TimeGeometry describing the (time-resolved)
-   * geometry of this figure. Note that each time step holds one Geometry2D.
    */
   virtual void InitializeTimeGeometry( unsigned int timeSteps = 1 );
 

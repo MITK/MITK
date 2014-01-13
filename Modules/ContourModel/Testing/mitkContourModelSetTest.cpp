@@ -63,7 +63,7 @@ static void TestEmptyContour()
 
 
 
-int mitkContourModelSetTest(int argc, char* argv[])
+int mitkContourModelSetTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("mitkContourModelSetTest")
 

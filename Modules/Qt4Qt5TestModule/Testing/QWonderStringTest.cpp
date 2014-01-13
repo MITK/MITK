@@ -11,7 +11,7 @@
   which is mean to demostrate how to implement a
   module for both Qt4 and Qt5
 */
-int QWonderStringTest(int argc, char* argv[])
+int QWonderStringTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_CONDITION( !QWonderString::penguinUID().isEmpty(), "Penguin registry working" )
 

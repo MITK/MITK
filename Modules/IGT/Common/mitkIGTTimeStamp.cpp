@@ -83,7 +83,7 @@ void mitk::IGTTimeStamp::Stop(itk::Object::Pointer device)
 
     if (m_DeviceMap.empty())
     {
-      m_ReferenceTime = NULL;
+      m_ReferenceTime = 0;
       m_Time = -1;
     }
   }

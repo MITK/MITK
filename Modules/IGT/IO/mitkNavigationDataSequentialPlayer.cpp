@@ -134,7 +134,7 @@ void mitk::NavigationDataSequentialPlayer::
 
   if(!m_Doc->LoadFile(m_FileName))
   {
-    this->SetNumberOfOutputs(0);
+    this->SetNumberOfIndexedOutputs(0);
     std::ostringstream s;
     s << "File " << _FileName << " could not be loaded";
     mitkThrowException(mitk::IGTIOException)<<s.str();

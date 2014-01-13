@@ -78,6 +78,8 @@ namespace mitk
     */
     itkGetStringMacro( FilePattern );
 
+    using Superclass::SetInput;
+
     /**
     * Sets the 0'th input object for the filter.
     * @param input the first input for the filter.

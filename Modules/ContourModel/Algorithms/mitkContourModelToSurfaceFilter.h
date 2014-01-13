@@ -47,6 +47,7 @@ namespace mitk {
     void GenerateOutputInformation();
 
     /** Set/Get the image input of this process object.  */
+    using Superclass::SetInput;
     virtual void SetInput( const InputType *input);
     virtual void SetInput( unsigned int idx, const InputType * input);
     const InputType * GetInput(void);

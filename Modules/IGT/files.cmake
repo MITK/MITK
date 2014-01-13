@@ -10,6 +10,7 @@ set(CPP_FILES
 
   Common/mitkIGTTimeStamp.cpp
   Common/mitkSerialCommunication.cpp
+  Common/mitkTrackingTypes.cpp
 
   DataManagement/mitkNavigationData.cpp
   DataManagement/mitkNavigationDataSource.cpp

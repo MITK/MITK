@@ -85,7 +85,7 @@ namespace mitk
 
     /** \brief Returns a bool whether the container is empty or not.
     */
-    bool IsEmpty();
+    bool IsEmpty() const;
 
     /** \brief Remove the given ContourModel from the container if exists.
     \param ContourModel - the ContourModel to be removed.

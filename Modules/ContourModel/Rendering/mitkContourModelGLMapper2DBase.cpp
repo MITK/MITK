@@ -51,7 +51,7 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* rendering
     assert(displayGeometry.IsNotNull());
 
     //apply color and opacity read from the PropertyList
-    ApplyProperties(renderer);
+    ApplyColorAndOpacityProperties(renderer);
 
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("contour.color", renderer));
     float opacity = 0.5;

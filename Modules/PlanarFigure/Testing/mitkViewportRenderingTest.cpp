@@ -71,7 +71,7 @@ int mitkViewportRenderingTest(int argc, char* argv[]) {
 
   //for now this test renders Sagittal
   //renderingHelper.SetViewDirection(mitk::SliceNavigationController::Axial);
-  renderingHelper.SetViewDirection(mitk::SliceNavigationController::Transversal);
+  renderingHelper.SetViewDirection(mitk::SliceNavigationController::Axial);
 
   typedef mitk::DataStorage::SetOfObjects ObjectsSet;
 

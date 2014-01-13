@@ -30,7 +30,7 @@ class MyNavigationDataSourceTest : public mitk::NavigationDataSource
     itkNewMacro(Self);
     void CreateOutput()
     {
-      this->SetNumberOfOutputs(1);
+      this->SetNumberOfIndexedOutputs(1);
       this->SetNthOutput(0, this->MakeOutput(0));
     };
   };

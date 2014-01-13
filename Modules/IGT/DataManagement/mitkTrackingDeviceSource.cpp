@@ -112,7 +112,7 @@ void mitk::TrackingDeviceSource::CreateOutputs(){
   if (this->GetNumberOfOutputs() > 0)
   {
     for (int numOP = this->GetNumberOfOutputs() -1; numOP >= 0; numOP--)
-      this->RemoveOutput(this->GetOutput(numOP));
+      this->RemoveOutput(numOP);
     this->Modified();
   }
 

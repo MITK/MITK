@@ -97,7 +97,7 @@ void mitk::InternalTrackingTool::GetPosition(mitk::Point3D& position) const
     // tracking device: Rotate the position of the tip into the tracking
     // device coordinate frame then add to the position of the tracking
     // sensor
-    vnl_vector<mitk::ScalarType> pos_vnl = m_Position.Get_vnl_vector() + m_Orientation.rotate( m_ToolTip.Get_vnl_vector() ) ;
+    vnl_vector<mitk::ScalarType> pos_vnl = m_Position.GetVnlVector() + m_Orientation.rotate( m_ToolTip.GetVnlVector() ) ;
 
     position[0] = pos_vnl[0];
     position[1] = pos_vnl[1];

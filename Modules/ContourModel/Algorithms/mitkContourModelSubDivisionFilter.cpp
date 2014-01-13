@@ -73,12 +73,12 @@ void mitk::ContourModelSubDivisionFilter::GenerateData()
 
   mitk::ContourModel::Pointer input =  const_cast<mitk::ContourModel*>(this->GetInput(0));
 
-  mitk::ContourModelSubDivisionFilter::OutputType::Pointer outputContour = this->GetOutput();
+  //mitk::ContourModelSubDivisionFilter::OutputType::Pointer outputContour = this->GetOutput();
 
   mitk::ContourModel::Pointer contour(input);
 
 
-  unsigned int timestep = input->GetTimeSteps();
+  int timestep = static_cast<int>(input->GetTimeSteps());
 
   for ( int currentTimestep = 0; currentTimestep < timestep; currentTimestep++)
   {

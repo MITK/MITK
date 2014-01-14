@@ -217,12 +217,15 @@ set(ep_common_args
 )
 
 if(APPLE)
+  set(MAC_OSX_ARCHITECTURE_ARGS
+        -DCMAKE_OSX_ARCHITECTURES:PATH=${CMAKE_OSX_ARCHITECTURES}
+        -DCMAKE_OSX_DEPLOYMENT_TARGET:PATH=${CMAKE_OSX_DEPLOYMENT_TARGET}
+        -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT}
+  )
   set(ep_common_args
-       -DCMAKE_OSX_ARCHITECTURES:PATH=${CMAKE_OSX_ARCHITECTURES}
-       -DCMAKE_OSX_DEPLOYMENT_TARGET:PATH=${CMAKE_OSX_DEPLOYMENT_TARGET}
-       -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT}
-       ${ep_common_args}
-      )
+        ${MAC_OSX_ARCHITECTURE_ARGS}
+        ${ep_common_args}
+  )
 endif()
 
 # Include external projects
@@ -419,6 +422,7 @@ ExternalProject_Add(${proj}
     -DQxt_DIR:PATH=${Qxt_DIR}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
+    ${MAC_OSX_ARCHITECTURE_ARGS}
 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
   BINARY_DIR ${CMAKE_BINARY_DIR}/MITK-build

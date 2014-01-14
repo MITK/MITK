@@ -23,9 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkProgressBar.h>
 
-
-#include <itkInvertIntensityImageFilter.h>
-
 QmitkDenoisingWorker::QmitkDenoisingWorker(QmitkDenoisingView *view)
   : m_View(view)
 {
@@ -64,6 +61,8 @@ QmitkDenoisingView::QmitkDenoisingView()
   , m_ThreadIsRunning(false)
   , m_NonLocalMeansFilter(NULL)
   , m_InputImage(NULL)
+  , m_LastProgressCount(0)
+  , m_MaxProgressCount(0)
 {
   m_DenoisingWorker.moveToThread(&m_DenoisingThread);
   connect(&m_DenoisingThread, SIGNAL(started()), this, SLOT(BeforeThread()));
@@ -146,6 +145,7 @@ void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes 
     }
   }
 
+  // Preparation of GUI to start denoising if a filter is selected
   if (m_ImageNode.IsNotNull() && m_BrainMaskNode.IsNotNull())
   {
     m_Controls->m_InputData->setTitle("Input Data");
@@ -160,54 +160,65 @@ void QmitkDenoisingView::StartDenoising()
 {
   if (m_ImageNode.IsNotNull() && m_BrainMaskNode.IsNotNull())
   {
+    m_LastProgressCount = 0;
     switch (m_SelectedFilter)
     {
-      case 0:
+      case NOFILTERSELECTED:
       {
         break;
       }
-      case 1:
+      case NLMR:
       {
         // initialize NLMr
         m_InputImage = dynamic_cast<DiffusionImageType*> (m_ImageNode->GetData());
-        m_ImageMask = MaskImageType::New();
-        mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_BrainMaskNode->GetData()), m_ImageMask);
+        m_ImageMask = dynamic_cast<mitk::Image*>(m_BrainMaskNode->GetData());
+        typename itk::Image<DiffusionPixelType, 3>::Pointer itkMask = itk::Image<DiffusionPixelType, 3>::New();
+        mitk::CastToItkImage(m_ImageMask, itkMask);
 
         m_NonLocalMeansFilter = NonLocalMeansDenoisingFilterType::New();
         m_NonLocalMeansFilter->SetNumberOfThreads(12);
         m_NonLocalMeansFilter->SetInputImage(m_InputImage->GetVectorImage());
-        m_NonLocalMeansFilter->SetInputMask(m_ImageMask);
+        m_NonLocalMeansFilter->SetInputMask(itkMask);
         m_NonLocalMeansFilter->SetUseJointInformation(false);
-        m_NonLocalMeansFilter->SetVRadius(m_Controls->m_SpinBoxParameter1->value());
-        m_NonLocalMeansFilter->SetNRadius(m_Controls->m_SpinBoxParameter2->value());
+        m_NonLocalMeansFilter->SetSearchRadius(m_Controls->m_SpinBoxParameter1->value());
+        m_NonLocalMeansFilter->SetComparisonRadius(m_Controls->m_SpinBoxParameter2->value());
+
+        // initialize the progressbar
+        m_MaxProgressCount = m_InputImage->GetDimension(0) * m_InputImage->GetDimension(1) * m_InputImage->GetDimension(2);
+        mitk::ProgressBar::GetInstance()->AddStepsToDo(m_MaxProgressCount);
+
+        // start denoising in detached thread
+        m_DenoisingThread.start(QThread::HighestPriority);
 
         break;
       }
-      case 2:
+      case NLMV:
       {
         // initialize NLMv
         m_InputImage = dynamic_cast<DiffusionImageType*> (m_ImageNode->GetData());
-        m_ImageMask = MaskImageType::New();
-        mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_BrainMaskNode->GetData()), m_ImageMask);
+        m_ImageMask = dynamic_cast<mitk::Image*>(m_BrainMaskNode->GetData());
+        typename itk::Image<DiffusionPixelType, 3>::Pointer itkMask = itk::Image<DiffusionPixelType, 3>::New();
+        mitk::CastToItkImage(m_ImageMask, itkMask);
 
         m_NonLocalMeansFilter = NonLocalMeansDenoisingFilterType::New();
         m_NonLocalMeansFilter->SetNumberOfThreads(12);
         m_NonLocalMeansFilter->SetInputImage(m_InputImage->GetVectorImage());
-        m_NonLocalMeansFilter->SetInputMask(m_ImageMask);
+        m_NonLocalMeansFilter->SetInputMask(itkMask);
         m_NonLocalMeansFilter->SetUseJointInformation(true);
-        m_NonLocalMeansFilter->SetVRadius(m_Controls->m_SpinBoxParameter1->value());
-        m_NonLocalMeansFilter->SetNRadius(m_Controls->m_SpinBoxParameter2->value());
+        m_NonLocalMeansFilter->SetSearchRadius(m_Controls->m_SpinBoxParameter1->value());
+        m_NonLocalMeansFilter->SetComparisonRadius(m_Controls->m_SpinBoxParameter2->value());
+        m_NonLocalMeansFilter->SetChannelRadius(m_Controls->m_SpinBoxParameter3->value());
+
+        // initialize the progressbar
+        m_MaxProgressCount = m_InputImage->GetDimension(0) * m_InputImage->GetDimension(1) * m_InputImage->GetDimension(2);
+        mitk::ProgressBar::GetInstance()->AddStepsToDo(m_MaxProgressCount);
+
+        // start denoising in detached thread
+        m_DenoisingThread.start(QThread::HighestPriority);
 
         break;
       }
     }
-    // initialize the progressbar
-    unsigned int maxVoxelCount = m_InputImage->GetDimension(0) * m_InputImage->GetDimension(1) * m_InputImage->GetDimension(2);
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(maxVoxelCount);
-    m_LastVoxelCount = 0;
-
-    // start denoising in detached thread
-    m_DenoisingThread.start(QThread::HighestPriority);
   }
 }
 
@@ -224,9 +235,9 @@ void QmitkDenoisingView::ResetParameterPanel()
   m_Controls->m_SpinBoxParameter1->setValue(1);
   m_Controls->m_SpinBoxParameter2->setEnabled(false);
   m_Controls->m_SpinBoxParameter2->setValue(1);
-  m_Controls->m_DoubleSpinBoxParameter3->setEnabled(false);
-  m_Controls->m_DoubleSpinBoxParameter3->setValue(1);
-  m_Controls->m_DoubleSpinBoxParameter3->hide();
+  m_Controls->m_SpinBoxParameter3->setEnabled(false);
+  m_Controls->m_SpinBoxParameter3->setValue(1);
+  m_Controls->m_SpinBoxParameter3->hide();
   m_Controls->m_ApplyButton->setEnabled(false);
 }
 
@@ -250,13 +261,13 @@ void QmitkDenoisingView::SelectFilter(int filter)
     {
       m_SelectedFilter = NLMR;
       m_Controls->m_LabelParameter_1->setEnabled(true);
-      m_Controls->m_LabelParameter_1->setText("Neigborhood V:");
+      m_Controls->m_LabelParameter_1->setText("Search Radius:");
       m_Controls->m_LabelParameter_2->setEnabled(true);
-      m_Controls->m_LabelParameter_2->setText("Neighborhood N:");
+      m_Controls->m_LabelParameter_2->setText("Comparision Radius:");
       m_Controls->m_SpinBoxParameter1->setEnabled(true);
-      m_Controls->m_SpinBoxParameter1->setValue(7);
+      m_Controls->m_SpinBoxParameter1->setValue(3);
       m_Controls->m_SpinBoxParameter2->setEnabled(true);
-      m_Controls->m_SpinBoxParameter2->setValue(3);
+      m_Controls->m_SpinBoxParameter2->setValue(1);
 
       break;
     }
@@ -264,13 +275,19 @@ void QmitkDenoisingView::SelectFilter(int filter)
     {
       m_SelectedFilter = NLMV;
       m_Controls->m_LabelParameter_1->setEnabled(true);
-      m_Controls->m_LabelParameter_1->setText("Neigborhood V:");
+      m_Controls->m_LabelParameter_1->setText("Search Radius:");
       m_Controls->m_LabelParameter_2->setEnabled(true);
-      m_Controls->m_LabelParameter_2->setText("Neighborhood N:");
+      m_Controls->m_LabelParameter_2->setText("Comparision Radius:");
+      m_Controls->m_LabelParameter_3->show();
+      m_Controls->m_LabelParameter_3->setEnabled(true);
+      m_Controls->m_LabelParameter_3->setText("Number of neighboring gradients:");
       m_Controls->m_SpinBoxParameter1->setEnabled(true);
-      m_Controls->m_SpinBoxParameter1->setValue(7);
+      m_Controls->m_SpinBoxParameter1->setValue(3);
       m_Controls->m_SpinBoxParameter2->setEnabled(true);
-      m_Controls->m_SpinBoxParameter2->setValue(3);
+      m_Controls->m_SpinBoxParameter2->setValue(1);
+      m_Controls->m_SpinBoxParameter3->show();
+      m_Controls->m_SpinBoxParameter3->setEnabled(true);
+      m_Controls->m_SpinBoxParameter3->setValue(3);
 
       break;
     }
@@ -285,11 +302,14 @@ void QmitkDenoisingView::SelectFilter(int filter)
 void QmitkDenoisingView::BeforeThread()
 {
   m_ThreadIsRunning = true;
-  m_DenoisingTimer->start(1000);
+  // initialize timer to update the progressbar at each timestep
+  m_DenoisingTimer->start(500);
   m_Controls->m_LabelParameter_1->setEnabled(false);
   m_Controls->m_LabelParameter_2->setEnabled(false);
+  m_Controls->m_LabelParameter_3->setEnabled(false);
   m_Controls->m_SpinBoxParameter1->setEnabled(false);
   m_Controls->m_SpinBoxParameter2->setEnabled(false);
+  m_Controls->m_SpinBoxParameter3->setEnabled(false);
   m_Controls->m_SelectFilterComboBox->setEnabled(false);
   m_Controls->m_ApplyButton->setEnabled(false);
 }
@@ -300,15 +320,15 @@ void QmitkDenoisingView::AfterThread()
   // stop timer to stop updates of progressbar
   m_DenoisingTimer->stop();
   // make sure progressbar is finished
-  mitk::ProgressBar::GetInstance()->Progress(m_InputImage->GetDimension(0) * m_InputImage->GetDimension(1) * m_InputImage->GetDimension(2));
+  mitk::ProgressBar::GetInstance()->Progress(m_MaxProgressCount);
   switch (m_SelectedFilter)
   {
-    case 0:
+    case NOFILTERSELECTED:
     {
       break;
     }
 
-    case 1:
+    case NLMR:
     {
       DiffusionImageType::Pointer image = DiffusionImageType::New();
       image->SetVectorImage(m_NonLocalMeansFilter->GetOutput());
@@ -319,12 +339,12 @@ void QmitkDenoisingView::AfterThread()
       imageNode->SetData( image );
       QString name = m_ImageNode->GetName().c_str();
 
-      imageNode->SetName((name+"_NLMr_V"+QString::number(m_Controls->m_SpinBoxParameter1->value())+"_N"+QString::number(m_Controls->m_SpinBoxParameter2->value())).toStdString().c_str());
+      imageNode->SetName((name+"_NLMr_"+QString::number(m_Controls->m_SpinBoxParameter1->value())+"-"+QString::number(m_Controls->m_SpinBoxParameter2->value())).toStdString().c_str());
       GetDefaultDataStorage()->Add(imageNode);
       break;
     }
 
-    case 2:
+    case NLMV:
     {
       DiffusionImageType::Pointer image = DiffusionImageType::New();
       image->SetVectorImage(m_NonLocalMeansFilter->GetOutput());
@@ -335,8 +355,11 @@ void QmitkDenoisingView::AfterThread()
       imageNode->SetData( image );
       QString name = m_ImageNode->GetName().c_str();
 
-      imageNode->SetName((name+"_NLMv_V"+QString::number(m_Controls->m_SpinBoxParameter1->value())+"_N"+QString::number(m_Controls->m_SpinBoxParameter2->value())).toStdString().c_str());
+      imageNode->SetName((name+"_NLMv_"+QString::number(m_Controls->m_SpinBoxParameter1->value())+"-"+QString::number(m_Controls->m_SpinBoxParameter2->value())+"-"+QString::number(m_Controls->m_SpinBoxParameter3->value())).toStdString().c_str());
       GetDefaultDataStorage()->Add(imageNode);
+
+      m_Controls->m_LabelParameter_3->setEnabled(true);
+      m_Controls->m_SpinBoxParameter3->setEnabled(true);
       break;
     }
   }
@@ -351,7 +374,21 @@ void QmitkDenoisingView::AfterThread()
 
 void QmitkDenoisingView::UpdateProgress()
 {
-  unsigned int currentVoxelCount = m_NonLocalMeansFilter->GetCurrentVoxelCount();
-  mitk::ProgressBar::GetInstance()->Progress(currentVoxelCount-m_LastVoxelCount);
-  m_LastVoxelCount = currentVoxelCount;
+  switch (m_SelectedFilter)
+  {
+    case NOFILTERSELECTED:
+    {
+      break;
+    }
+    case NLMR:
+    case NLMV:
+    {
+      unsigned int currentProgressCount = m_NonLocalMeansFilter->GetCurrentVoxelCount();
+      mitk::ProgressBar::GetInstance()->Progress(currentProgressCount-m_LastProgressCount);
+      m_LastProgressCount = currentProgressCount;
+      break;
+    }
+  }
+
+
 }

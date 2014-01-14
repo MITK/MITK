@@ -97,9 +97,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="m_DoubleSpinBoxParameter3"/>
-      </item>
       <item row="0" column="1">
        <widget class="QSpinBox" name="m_SpinBoxParameter1">
         <property name="minimum">
@@ -163,6 +160,9 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="2" column="1">
+       <widget class="QSpinBox" name="m_SpinBoxParameter3"/>
       </item>
      </layout>
     </widget>

@@ -23,8 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkDenoisingViewControls.h"
 
-#include <itkVectorImage.h>
-#include <itkImage.h>
+//#include <itkVectorImage.h>
+//#include <itkImage.h>
 #include <mitkDiffusionImage.h>
 #include <itkNonLocalMeansDenoisingFilter.h>
 #include <QThread>
@@ -68,14 +68,16 @@ public:
   QmitkDenoisingView();
   virtual ~QmitkDenoisingView();
 
+  /** Typedefs */
   typedef short DiffusionPixelType;
   typedef mitk::DiffusionImage< DiffusionPixelType > DiffusionImageType;
-  typedef itk::Image<short, 3> MaskImageType;
+  typedef mitk::Image MaskImageType;
   typedef itk::NonLocalMeansDenoisingFilter< DiffusionPixelType > NonLocalMeansDenoisingFilterType;
   virtual void CreateQtPartControl(QWidget *parent);
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
+  /// \brief Creation of the connections of the FilterComboBox
   virtual void Activated();
 
 protected slots:
@@ -84,7 +86,7 @@ protected slots:
   void SelectFilter(int filter);          ///< updates which filter is selected
   void BeforeThread();                    ///< starts timer & disables all buttons while denoising
   void AfterThread();                     ///< stops timer & creates a new datanode of the denoised image
-  void UpdateProgress();                  ///< updates the progressbar each second
+  void UpdateProgress();                  ///< updates the progressbar each timestep
 
 private:
 
@@ -102,7 +104,8 @@ private:
   DiffusionImageType::Pointer m_InputImage;
   MaskImageType::Pointer m_ImageMask;
   QTimer* m_DenoisingTimer;
-  unsigned int m_LastVoxelCount;
+  unsigned int m_LastProgressCount;
+  unsigned int m_MaxProgressCount;
 
   enum FilterType {
     NOFILTERSELECTED,

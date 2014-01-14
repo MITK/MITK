@@ -70,6 +70,8 @@ class DICOMReader_EXPORT DICOMDatasetSorter : public itk::LightObject
     /// \brief Print configuration details into stream.
     virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const = 0;
 
+    virtual bool operator==(const DICOMDatasetSorter& other) const = 0;
+
   protected:
 
     DICOMDatasetSorter();

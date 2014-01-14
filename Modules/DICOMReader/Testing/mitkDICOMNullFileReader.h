@@ -37,6 +37,8 @@ class DICOMNullFileReader : public DICOMFileReader
 
     virtual bool CanHandleFile(const std::string& filename);
 
+    bool operator==(const DICOMFileReader& other) const;
+
   protected:
 
     DICOMNullFileReader();

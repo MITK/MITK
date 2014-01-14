@@ -46,6 +46,8 @@ class DICOMReader_EXPORT DICOMSortByTag : public DICOMSortCriterion
     virtual bool IsLeftBeforeRight(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right) const;
 
     virtual void Print(std::ostream& os) const;
+    
+    virtual bool operator==(const DICOMSortCriterion& other) const;
 
   protected:
 

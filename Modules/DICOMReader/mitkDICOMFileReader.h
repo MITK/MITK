@@ -83,16 +83,18 @@ class DICOMReader_EXPORT DICOMFileReader : virtual public itk::Object
     /// Short label/name to describe this reader
     void SetConfigurationLabel(const std::string&);
     /// Short label/name to describe this reader
-    std::string GetConfigurationLabel();
+    std::string GetConfigurationLabel() const;
     /// One-sentence description of the reader's loading "strategy"
     void SetConfigurationDescription(const std::string&);
     /// One-sentence description of the reader's loading "strategy"
-    std::string GetConfigurationDescription();
+    std::string GetConfigurationDescription() const;
 
     /// Print configuration description to given stream, for human reader
     void PrintConfiguration(std::ostream& os) const;
     /// Print output description to given stream, for human reader
     void PrintOutputs(std::ostream& os, bool filenameDetails = false) const;
+    
+    virtual bool operator==(const DICOMFileReader& other) const = 0;
 
   protected:
 

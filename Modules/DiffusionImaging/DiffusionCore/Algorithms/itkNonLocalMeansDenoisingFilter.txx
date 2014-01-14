@@ -173,7 +173,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
       double sumj = 0;
       double wj = 0;
       short Z = 0;
-      double size = pow((m_ComparisonRadius*2+1), 3);
+      double size = pow((double)(m_ComparisonRadius*2+1), 3);
 
       for (int x = git.GetIndex().GetElement(0) - m_SearchRadius; x <= git.GetIndex().GetElement(0) + m_SearchRadius; ++x)
       {

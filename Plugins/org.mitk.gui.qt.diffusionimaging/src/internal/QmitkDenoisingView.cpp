@@ -172,7 +172,7 @@ void QmitkDenoisingView::StartDenoising()
         // initialize NLMr
         m_InputImage = dynamic_cast<DiffusionImageType*> (m_ImageNode->GetData());
         m_ImageMask = dynamic_cast<mitk::Image*>(m_BrainMaskNode->GetData());
-        typename itk::Image<DiffusionPixelType, 3>::Pointer itkMask = itk::Image<DiffusionPixelType, 3>::New();
+        itk::Image<DiffusionPixelType, 3>::Pointer itkMask = itk::Image<DiffusionPixelType, 3>::New();
         mitk::CastToItkImage(m_ImageMask, itkMask);
 
         m_NonLocalMeansFilter = NonLocalMeansDenoisingFilterType::New();
@@ -197,7 +197,7 @@ void QmitkDenoisingView::StartDenoising()
         // initialize NLMv
         m_InputImage = dynamic_cast<DiffusionImageType*> (m_ImageNode->GetData());
         m_ImageMask = dynamic_cast<mitk::Image*>(m_BrainMaskNode->GetData());
-        typename itk::Image<DiffusionPixelType, 3>::Pointer itkMask = itk::Image<DiffusionPixelType, 3>::New();
+        itk::Image<DiffusionPixelType, 3>::Pointer itkMask = itk::Image<DiffusionPixelType, 3>::New();
         mitk::CastToItkImage(m_ImageMask, itkMask);
 
         m_NonLocalMeansFilter = NonLocalMeansDenoisingFilterType::New();

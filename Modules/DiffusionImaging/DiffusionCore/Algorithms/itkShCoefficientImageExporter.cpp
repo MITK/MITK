@@ -41,7 +41,7 @@ void ShCoefficientImageExporter< PixelType, ShOrder >
     if (m_InputImage.IsNull())
         return;
 
-    Vector<float, 4> spacing4;
+    Vector<double, 4> spacing4;
     Point<float, 4> origin4;
     Matrix<double, 4, 4> direction4; direction4.SetIdentity();
     ImageRegion<4> imageRegion4;

@@ -432,7 +432,7 @@ double mitk::CreateDistanceImageFromSurfaceFilter::CalculateDistanceValue(PointT
   InterpolationWeights::iterator weightsIter;
 
   for ( centerIter=m_Centers.begin(), weightsIter=m_Weights.begin();
-    centerIter!=m_Centers.end(), weightsIter!=m_Weights.end();
+    centerIter!=m_Centers.end() && weightsIter!=m_Weights.end();
     centerIter++, weightsIter++ )
   {
     p1 = *centerIter;

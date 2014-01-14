@@ -61,7 +61,7 @@ mitk::DICOMFileReader
 
 std::string
 mitk::DICOMFileReader
-::GetConfigurationLabel()
+::GetConfigurationLabel() const
 {
   return m_ConfigLabel;
 }
@@ -75,7 +75,7 @@ mitk::DICOMFileReader
 
 std::string
 mitk::DICOMFileReader
-::GetConfigurationDescription()
+::GetConfigurationDescription() const
 {
   return m_ConfigDescription;
 }

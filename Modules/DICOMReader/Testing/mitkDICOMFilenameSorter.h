@@ -39,6 +39,8 @@ class DICOMFilenameSorter : public DICOMDatasetSorter
 
     virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const;
 
+    virtual bool operator==(const DICOMDatasetSorter& other) const;
+
   protected:
 
     struct FilenameSort

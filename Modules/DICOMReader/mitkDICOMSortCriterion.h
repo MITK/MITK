@@ -58,6 +58,8 @@ class DICOMReader_EXPORT DICOMSortCriterion : public itk::LightObject
     /// brief describe this class in given stream.
     virtual void Print(std::ostream& os) const = 0;
 
+    virtual bool operator==(const DICOMSortCriterion& other) const = 0;
+
   protected:
 
     DICOMSortCriterion( DICOMSortCriterion::Pointer secondaryCriterion );

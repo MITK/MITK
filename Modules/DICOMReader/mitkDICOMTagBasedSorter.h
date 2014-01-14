@@ -64,6 +64,7 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
     {
       public:
         CutDecimalPlaces(unsigned int precision);
+        unsigned int GetPrecision() const;
         virtual std::string operator()(const std::string&) const;
       private:
         unsigned int m_Precision;
@@ -76,11 +77,14 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
       \brief Datasets that differ in given tag's value will be sorted into separate outputs.
     */
     void AddDistinguishingTag( const DICOMTag&, TagValueProcessor* tagValueProcessor = NULL );
+    DICOMTagList GetDistinguishingTags() const;
+    const TagValueProcessor* GetTagValueProcessorForDistinguishingTag(const DICOMTag&) const;
 
     /**
       \brief Define the sorting criterion (which holds seconardy criteria)
     */
     void SetSortCriterion( DICOMSortCriterion::ConstPointer criterion );
+    DICOMSortCriterion::ConstPointer GetSortCriterion() const;
 
     /**
       \brief A list of all the tags needed for processing (facilitates scanning).
@@ -96,6 +100,8 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
       \brief Print configuration details into given stream.
     */
     virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const;
+    
+    virtual bool operator==(const DICOMDatasetSorter& other) const;
 
   protected:
 

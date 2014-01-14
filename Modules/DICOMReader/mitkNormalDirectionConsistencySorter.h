@@ -56,6 +56,8 @@ class DICOMReader_EXPORT NormalDirectionConsistencySorter : public DICOMDatasetS
 
     virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const;
 
+    virtual bool operator==(const DICOMDatasetSorter& other) const;
+
   protected:
 
     NormalDirectionConsistencySorter();

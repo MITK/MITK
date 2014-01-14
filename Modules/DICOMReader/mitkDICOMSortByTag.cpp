@@ -46,6 +46,26 @@ mitk::DICOMSortByTag
   }
   return *this;
 }
+    
+bool
+mitk::DICOMSortByTag
+::operator==(const DICOMSortCriterion& other) const
+{
+  if (const DICOMSortByTag* otherSelf = dynamic_cast<const DICOMSortByTag*>(&other))
+  {
+    if (!(this->m_Tag == otherSelf->m_Tag)) return false;
+
+    if (this->m_SecondaryCriterion.IsNull() && otherSelf->m_SecondaryCriterion.IsNull()) return true;
+
+    if (this->m_SecondaryCriterion.IsNull() || otherSelf->m_SecondaryCriterion.IsNull()) return false;
+
+    return *(this->m_SecondaryCriterion) == *(otherSelf->m_SecondaryCriterion);
+  }
+  else
+  {
+    return false;
+  }
+}
 
 void
 mitk::DICOMSortByTag

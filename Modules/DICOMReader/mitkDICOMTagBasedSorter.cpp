@@ -65,6 +65,13 @@ mitk::DICOMTagBasedSorter::CutDecimalPlaces
   return resultString.str();
 }
 
+unsigned int
+mitk::DICOMTagBasedSorter::CutDecimalPlaces
+::GetPrecision() const
+{
+  return m_Precision;
+}
+
 mitk::DICOMTagBasedSorter
 ::DICOMTagBasedSorter()
 :DICOMDatasetSorter()
@@ -97,6 +104,20 @@ mitk::DICOMTagBasedSorter
     DICOMDatasetSorter::operator=(other);
   }
   return *this;
+}
+
+bool
+mitk::DICOMTagBasedSorter
+::operator==(const DICOMDatasetSorter& other) const
+{
+  if (const DICOMTagBasedSorter* otherSelf = dynamic_cast<const DICOMTagBasedSorter*>(&other))
+  {
+    return true; // TODO
+  }
+  else
+  {
+    return false;
+  }
 }
 
 void
@@ -136,6 +157,28 @@ mitk::DICOMTagBasedSorter
   return allTags;
 }
 
+mitk::DICOMTagList
+mitk::DICOMTagBasedSorter
+::GetDistinguishingTags() const
+{
+  return m_DistinguishingTags;
+}
+
+const mitk::DICOMTagBasedSorter::TagValueProcessor*
+mitk::DICOMTagBasedSorter
+::GetTagValueProcessorForDistinguishingTag(const DICOMTag& tag) const
+{
+  TagValueProcessorMap::const_iterator loc = m_TagValueProcessor.find(tag);
+  if (loc != m_TagValueProcessor.end())
+  {
+    return loc->second;
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
 void
 mitk::DICOMTagBasedSorter
 ::AddDistinguishingTag( const DICOMTag& tag, TagValueProcessor* tagValueProcessor )
@@ -149,6 +192,13 @@ mitk::DICOMTagBasedSorter
 ::SetSortCriterion( DICOMSortCriterion::ConstPointer criterion )
 {
   m_SortCriterion = criterion;
+}
+
+mitk::DICOMSortCriterion::ConstPointer
+mitk::DICOMTagBasedSorter
+::GetSortCriterion() const
+{
+  return m_SortCriterion;
 }
 
 void

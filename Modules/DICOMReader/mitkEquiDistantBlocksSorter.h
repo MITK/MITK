@@ -89,7 +89,12 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
     */
     void SetToleratedOriginOffset(double millimeters = 0.005);
 
+    double GetToleratedOriginOffset() const;
+    bool IsToleratedOriginOffsetAbsolute() const;
+
     virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const;
+
+    virtual bool operator==(const DICOMDatasetSorter& other) const;
 
   protected:
 
@@ -197,6 +202,7 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
     ResultsList m_SliceGroupingResults;
 
     double m_ToleratedOriginOffset;
+    bool m_ToleratedOriginOffsetIsAbsolute;
 };
 
 }

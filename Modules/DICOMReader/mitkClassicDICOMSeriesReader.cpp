@@ -51,6 +51,9 @@ mitk::ClassicDICOMSeriesReader
   this->SetFixTiltByShearing(true);
   this->SetToleratedOriginOffset(0.005);
   this->SetGroup3DandT(true);
+  
+  this->SetConfigurationLabel("2013 sorting logic");
+  this->SetConfigurationDescription("Sort by Image Position, then Acquisition Number, Time, Trigger time, group by 3D+t, group tilted images");
 }
 
 mitk::ClassicDICOMSeriesReader
@@ -75,3 +78,19 @@ mitk::ClassicDICOMSeriesReader
   }
   return *this;
 }
+
+bool
+mitk::ClassicDICOMSeriesReader
+::operator==(const DICOMFileReader& other) const
+{
+  if (dynamic_cast<const Self*>(&other))
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+

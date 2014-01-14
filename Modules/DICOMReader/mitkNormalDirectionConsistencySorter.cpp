@@ -54,6 +54,14 @@ mitk::NormalDirectionConsistencySorter
   return *this;
 }
 
+bool
+mitk::NormalDirectionConsistencySorter
+::operator==(const DICOMDatasetSorter& other) const
+{
+  return dynamic_cast<const NormalDirectionConsistencySorter*>(&other) != NULL;
+}
+
+
 mitk::DICOMTagList
 mitk::NormalDirectionConsistencySorter
 ::GetTagsOfInterest()

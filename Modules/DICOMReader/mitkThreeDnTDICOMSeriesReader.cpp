@@ -49,11 +49,34 @@ mitk::ThreeDnTDICOMSeriesReader
   return *this;
 }
 
+bool
+mitk::ThreeDnTDICOMSeriesReader
+::operator==(const DICOMFileReader& other) const
+{
+  if (const Self* otherSelf = dynamic_cast<const Self*>(&other))
+  {
+    return
+       DICOMITKSeriesGDCMReader::operator==(other)
+    && this->m_Group3DandT == otherSelf->m_Group3DandT;
+  }
+  else
+  {
+    return false;
+  }
+}
+
 void
 mitk::ThreeDnTDICOMSeriesReader
 ::SetGroup3DandT(bool on)
 {
   m_Group3DandT = on;
+}
+
+bool
+mitk::ThreeDnTDICOMSeriesReader
+::GetGroup3DandT() const
+{
+  return m_Group3DandT;
 }
 
 mitk::DICOMITKSeriesGDCMReader::SortingBlockList

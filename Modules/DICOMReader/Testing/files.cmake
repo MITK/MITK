@@ -1,4 +1,5 @@
 set(MODULE_TESTS
+  mitkDICOMReaderConfiguratorTest.cpp
 )
 
 set(MODULE_CUSTOM_TESTS

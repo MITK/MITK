@@ -48,7 +48,7 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
     float tendg = 0;
     float minLength = 20;
     int numSeeds = 1;
-    bool interpolate = false;
+    bool interpolate = true;
 
     try
     {
@@ -104,6 +104,11 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
 
         vtkSmartPointer<vtkPolyData> fiberBundle = filter->GetFiberPolyData();
         mitk::FiberBundleX::Pointer fib1 = mitk::FiberBundleX::New(fiberBundle);
+
+        mitk::FiberBundleXWriter::Pointer writer = mitk::FiberBundleXWriter::New();
+        writer->SetFileName("testBundle.fib");
+        writer->SetInputFiberBundleX(fib1);
+        writer->Update();
 
         infile = mitk::BaseDataIO::LoadBaseDataFromFile( referenceFileName, s1, s2, false );
         mitk::FiberBundleX::Pointer fib2 = dynamic_cast<mitk::FiberBundleX*>(infile.at(0).GetPointer());

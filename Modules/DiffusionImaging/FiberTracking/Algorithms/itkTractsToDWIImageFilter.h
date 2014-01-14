@@ -102,6 +102,7 @@ public:
     itkSetMacro( AddMotionArtifact, bool )
     itkSetMacro( RandomMotion, bool )
     itkGetMacro( StatusText, std::string )
+    itkSetMacro( UseConstantRandSeed, bool )
 
     // output
     std::vector< ItkDoubleImgType::Pointer > GetVolumeFractions(){ return m_VolumeFractions; }
@@ -162,6 +163,7 @@ protected:
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
     std::string                         m_StatusText;
     time_t                              m_StartTime;
+    bool                                m_UseConstantRandSeed;
 };
 }
 

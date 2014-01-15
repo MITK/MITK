@@ -83,6 +83,7 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
     void OnShowAdvancedOptions(bool state);
     void OnProcessDialogCloseRequest();
     void OnRetrieveDataForManualTooltipManipulation();
+    void OnSurfaceUseOtherToggled(bool checked);
 
   protected:
 

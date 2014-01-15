@@ -156,7 +156,7 @@
         <x>0</x>
         <y>0</y>
         <width>340</width>
-        <height>94</height>
+        <height>205</height>
        </rect>
       </property>
       <attribute name="label">
@@ -216,6 +216,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="m_LoadSurface">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="maximumSize">
             <size>
              <width>40</width>

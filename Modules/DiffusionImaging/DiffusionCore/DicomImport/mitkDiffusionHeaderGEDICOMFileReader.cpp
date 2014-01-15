@@ -76,6 +76,7 @@ bool mitk::DiffusionHeaderGEDICOMFileReader
         header_info.g_vector.two_norm() < vnl_math::eps )
     {
       header_info.g_vector.fill(1);
+      header_info.g_vector.normalize();
       header_info.isotropic = true;
     }
 

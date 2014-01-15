@@ -69,6 +69,7 @@ TractsToDWIImageFilter< PixelType >::TractsToDWIImageFilter()
     , m_NoiseModel(NULL)
     , m_SpikeAmplitude(1)
     , m_AddMotionArtifact(false)
+    , m_UseConstantRandSeed(false)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -112,6 +113,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
         fMapSlice->SetBufferedRegion( region );
         fMapSlice->SetRequestedRegion( region );
         fMapSlice->Allocate();
+        fMapSlice->FillBuffer(0.0);
     }
 
     DoubleDwiType::Pointer newImage = DoubleDwiType::New();
@@ -136,7 +138,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
 
     std::vector< unsigned int > spikeVolume;
     for (int i=0; i<m_Spikes; i++)
-        spikeVolume.push_back(rand()%images.at(0)->GetVectorLength());
+        spikeVolume.push_back(m_RandGen->GetIntegerVariate()%images.at(0)->GetVectorLength());
     std::sort (spikeVolume.begin(), spikeVolume.end());
     std::reverse (spikeVolume.begin(), spikeVolume.end());
 
@@ -291,6 +293,11 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     if (baselineIndex<0)
         itkExceptionMacro("No baseline index found!");
 
+    if (m_UseConstantRandSeed)  // always generate the same random numbers?
+        m_RandGen->SetSeed(0);
+    else
+        m_RandGen->SetSeed();
+
     // initialize output dwi image
     ImageRegion<3> croppedRegion = m_ImageRegion; croppedRegion.SetSize(1, croppedRegion.GetSize(1)*m_Wrap);
     itk::Point<double,3> shiftedOrigin = m_Origin; shiftedOrigin[1] += (m_ImageRegion.GetSize(1)-croppedRegion.GetSize(1))*m_Spacing[1]/2;
@@ -312,10 +319,27 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     // ADJUST GEOMETRY FOR FURTHER PROCESSING
     // is input slize size a power of two?
     unsigned int x=m_ImageRegion.GetSize(0); unsigned int y=m_ImageRegion.GetSize(1);
-    if ( x%2 == 1 )
-        m_ImageRegion.SetSize(0, x+1);
-    if ( y%2 == 1 )
-        m_ImageRegion.SetSize(1, y+1);
+    ItkDoubleImgType::SizeType pad; pad[0]=x%2; pad[1]=y%2; pad[2]=0;
+    m_ImageRegion.SetSize(0, x+pad[0]);
+    m_ImageRegion.SetSize(1, y+pad[1]);
+    if (m_FrequencyMap.IsNotNull() && (pad[0]>0 || pad[1]>0))
+    {
+        itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::Pointer zeroPadder = itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::New();
+        zeroPadder->SetInput(m_FrequencyMap);
+        zeroPadder->SetConstant(0);
+        zeroPadder->SetPadUpperBound(pad);
+        zeroPadder->Update();
+        m_FrequencyMap = zeroPadder->GetOutput();
+    }
+    if (m_TissueMask.IsNotNull() && (pad[0]>0 || pad[1]>0))
+    {
+        itk::ConstantPadImageFilter<ItkUcharImgType, ItkUcharImgType>::Pointer zeroPadder = itk::ConstantPadImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
+        zeroPadder->SetInput(m_TissueMask);
+        zeroPadder->SetConstant(0);
+        zeroPadder->SetPadUpperBound(pad);
+        zeroPadder->Update();
+        m_TissueMask = zeroPadder->GetOutput();
+    }
 
     // apply in-plane upsampling
     double upsampling = 1;
@@ -394,7 +418,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             resampler->Update();
             m_TissueMask = resampler->GetOutput();
         }
-
         // resample frequency map
         if (m_FrequencyMap.IsNotNull())
         {

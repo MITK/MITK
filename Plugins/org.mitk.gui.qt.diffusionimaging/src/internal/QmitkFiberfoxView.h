@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QObject>
 #include <QTimer>
 #include <QTime>
+#include <mitkFiberfoxParameters.h>
 
 /*!
 \brief View for fiber based diffusion software phantoms (Fiberfox).
@@ -178,51 +179,8 @@ protected:
         unsigned int m_Flipped;
     };
 
-    /** structure storing the image generation parameters */
-    struct ImageParameters {
-        itk::ImageRegion<3>                 imageRegion;
-        itk::Vector<double,3>               imageSpacing;
-        itk::Point<double,3>                imageOrigin;
-        itk::Matrix<double, 3, 3>           imageDirection;
-        unsigned int                        numGradients;
-        double                              b_value;
-        unsigned int                        repetitions;
-        double                              signalScale;
-        double                              tEcho;
-        double                              tLine;
-        double                              tInhom;
-        double                              axonRadius;
-        unsigned int                        interpolationShrink;
-        double                              kspaceLineOffset;
-        bool                                addGibbsRinging;
-        double                              eddyStrength;
-        double                              comp3Weight;
-        double                              comp4Weight;
-        int                                 spikes;
-        double                              spikeAmplitude;
-        double                              wrap;
-        itk::Vector<double,3>               translation;
-        itk::Vector<double,3>               rotation;
-        bool                                doSimulateRelaxation;
-        bool                                doSimulateEddyCurrents;
-        bool                                doDisablePartialVolume;
-        bool                                doAddMotion;
-        bool                                randomMotion;
-
-        mitk::DiffusionNoiseModel<double>* noiseModel;
-        mitk::DiffusionNoiseModel<short>* noiseModelShort;
-        mitk::DiffusionSignalModel<double>::GradientListType  gradientDirections;
-        itk::TractsToDWIImageFilter< short >::DiffusionModelList fiberModelList, nonFiberModelList;
-        QString signalModelString, artifactModelString;
-        ItkDoubleImgType::Pointer           frequencyMap;
-        ItkUcharImgType::Pointer            maskImage;
-        mitk::DataNode::Pointer             resultNode;
-        mitk::DataNode::Pointer             parentNode;
-        QString                             outputPath;
-    };
-
-    ImageParameters                                     m_ImageGenParameters;
-    ImageParameters                                     m_ImageGenParametersBackup;
+    FiberfoxParameters                                  m_ImageGenParameters;
+    FiberfoxParameters                                  m_ImageGenParametersBackup;
 
     std::map<mitk::DataNode*, QmitkPlanarFigureData>    m_DataNodeToPlanarFigureData;   ///< map each planar figure uniquely to a QmitkPlanarFigureData
     mitk::DataNode::Pointer                             m_SelectedFiducial;             ///< selected planar ellipse
@@ -250,7 +208,7 @@ protected:
     mitk::DotModel<double> m_DotModel2;
 
     QString m_ParameterFile;
-    QString m_OutputPath;
+    string m_OutputPath;
 
     // GUI thread
     QmitkFiberfoxWorker     m_Worker;   ///< runs filter

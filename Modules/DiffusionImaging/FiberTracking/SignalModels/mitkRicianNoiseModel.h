@@ -42,6 +42,7 @@ public:
 
     void SetNoiseVariance(double var){ m_NoiseVariance = var; }
     double GetNoiseVariance(){ return m_NoiseVariance; }
+    void SetSeed(int seed);
 
 protected:
 

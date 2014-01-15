@@ -72,6 +72,9 @@ static std::string GetLastErrorStr()
 #include <io.h>
 #include <direct.h>
 
+#define S_RUSR S_IREAD
+#define S_IWUSR S_IWRITE
+
 #else
 
 #include <sys/time.h>

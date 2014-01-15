@@ -505,6 +505,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           # Add additional library search directories to a global property which
           # can be evaluated by other CMake macros, e.g. our install scripts.
           if(MODULE_ADDITIONAL_LIBS)
+            target_link_libraries(${MODULE_PROVIDES} ${MODULE_ADDITIONAL_LIBS})
             get_property(_mitk_additional_library_search_paths GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
             foreach(_lib_filepath ${MODULE_ADDITIONAL_LIBS})
               get_filename_component(_search_path "${_lib_filepath}" PATH)

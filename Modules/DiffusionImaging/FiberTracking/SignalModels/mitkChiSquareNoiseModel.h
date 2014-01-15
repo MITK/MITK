@@ -42,10 +42,11 @@ public:
 
     void SetDOF(double var){ m_Distribution = boost::random::chi_squared_distribution<double>(var); }
     double GetNoiseVariance(){ return m_Distribution.n(); }
+    void SetSeed(int seed);
 
 protected:
 
-    boost::random::mt19937 m_Randgen;
+    boost::random::mt19937 m_RandGen;
     boost::random::chi_squared_distribution<double> m_Distribution;
 };
 

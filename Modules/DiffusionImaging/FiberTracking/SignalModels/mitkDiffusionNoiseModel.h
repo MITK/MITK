@@ -43,6 +43,9 @@ public:
     /** Adds noise according to model to the input pixel. Has to be implemented in subclass. **/
     virtual void AddNoise(PixelType& pixel) = 0;
 
+    /** Seed random generator. Has to be implemented in subclass. **/
+    virtual void SetSeed(int seed) = 0;
+
 protected:
 
 };

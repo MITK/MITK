@@ -15,6 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include <vnl/vnl_cross.h>
 #include <vnl/vnl_quaternion.h>
+#include <mitkAstroStickModel.h>
+
+using namespace mitk;
 
 template< class ScalarType >
 AstroStickModel< ScalarType >::AstroStickModel()
@@ -26,7 +29,7 @@ AstroStickModel< ScalarType >::AstroStickModel()
     m_RandGen = ItkRandGenType::New();
 
     vnl_matrix_fixed<ScalarType,3,42>* sticks = itk::PointShell<42, vnl_matrix_fixed<ScalarType, 3, 42> >::DistributePointShell();
-    for (int i=0; i<m_NumSticks; i++)
+    for (unsigned int i=0; i<m_NumSticks; i++)
     {
         GradientType stick;
         stick[0] = sticks->get(0,i); stick[1] = sticks->get(1,i); stick[2] = sticks->get(2,i);

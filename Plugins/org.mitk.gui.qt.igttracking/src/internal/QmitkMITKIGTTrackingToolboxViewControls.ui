@@ -255,7 +255,7 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox_2">
+        <widget class="QGroupBox" name="m_TrackingControlsGroupBox">
          <property name="title">
           <string/>
          </property>

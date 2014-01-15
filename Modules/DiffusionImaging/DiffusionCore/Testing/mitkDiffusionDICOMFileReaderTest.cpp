@@ -32,7 +32,16 @@ int mitkDiffusionDICOMFileReaderTest(int argc, char* argv[])
   mitk::DiffusionDICOMFileReader::Pointer gdcmReader = mitk::DiffusionDICOMFileReader::New();
   MITK_TEST_CONDITION_REQUIRED(gdcmReader.IsNotNull(), "DICOMITKSeriesGDCMReader can be instantiated.");
 
-  mitk::DICOMFileReaderTestHelper::SetTestInputFilenames( argc,argv );
+  std::string output_filename = "/tmp/dicom_out.dwi";
+  if( argc > 3)
+  {
+    mitk::DICOMFileReaderTestHelper::SetTestInputFilenames( argc-1,argv );
+    output_filename = std::string( argv[argc-1] );
+  }
+  else
+  {
+    mitk::DICOMFileReaderTestHelper::SetTestInputFilenames( argc,argv );
+  }
 
   // check the Set/GetInput function
   mitk::DICOMFileReaderTestHelper::TestInputFilenames( gdcmReader );
@@ -94,7 +103,7 @@ int mitkDiffusionDICOMFileReaderTest(int argc, char* argv[])
 
   mitk::NrrdDiffusionImageWriter<short>::Pointer writer =
       mitk::NrrdDiffusionImageWriter<short>::New();
-  writer->SetFileName("/tmp/test.dwi");
+  writer->SetFileName( output_filename.c_str() );
   writer->SetInput(d_img );
 
   try

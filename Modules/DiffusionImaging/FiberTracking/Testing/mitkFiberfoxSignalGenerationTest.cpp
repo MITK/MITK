@@ -110,6 +110,7 @@ void StartSimulation(FiberfoxParameters parameters, FiberBundleX::Pointer fiberB
     }
     else
     {
+        MITK_INFO << "Saving test image to " << message;
         NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
         writer->SetFileName(message);
         writer->SetInput(testImage);
@@ -298,7 +299,7 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
         parameters.m_DoAddMotion = false;
         parameters.m_Spikes = 5;
         parameters.m_SpikeAmplitude = 1;
-        StartSimulation(parameters, fiberBundle, NULL, "spikes.dwi");
+        StartSimulation(parameters, fiberBundle, NULL, "/tmp/spikes.dwi");
 
         // Rician noise
         parameters.m_Spikes = 0;

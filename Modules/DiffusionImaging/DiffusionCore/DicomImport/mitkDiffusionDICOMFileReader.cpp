@@ -106,7 +106,7 @@ bool mitk::DiffusionDICOMFileReader
     grad.normalize();
     grad *= sqrt( header.b_value / max_bvalue );
 
-    directions->push_back( header.g_vector );
+    directions->push_back( grad );
   }
 
   bool is_mosaic_file = false;

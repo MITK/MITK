@@ -409,7 +409,6 @@ int mitk::SerialCommunication::ApplyConfigurationLin()
   case BaudRate230400:
     baudrate = B230400;
     break;
-  COMMENTED OUT FOR THE MOMENT, SEE BUG 15911 FOR DETAILS
   // the following baud rates do not work for apple
   #ifndef __APPLE__
   case BaudRate460800:
@@ -430,9 +429,9 @@ int mitk::SerialCommunication::ApplyConfigurationLin()
   case BaudRate1152000:
     baudrate = B1152000;
     break;
-  case BaudRate1228739:
-    baudrate = B1228739;
-    break;
+  //case BaudRate1228739:
+    //baudrate = B1228739;
+    //break;
   case BaudRate1500000:
     baudrate = B1500000;
     break;
@@ -452,7 +451,6 @@ int mitk::SerialCommunication::ApplyConfigurationLin()
     baudrate = B4000000;
     break;
   #endif
-  */
   default:
     MITK_WARN("mitk::SerialCommunication") << "Baud rate not recognized, using default of 9600 Baud.";
     baudrate = B9600;

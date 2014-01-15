@@ -82,7 +82,7 @@ namespace mitk
       BaudRate921600  = 921600,
       BaudRate1000000 = 1000000,
       BaudRate1152000 = 1152000,
-      BaudRate1228739 = 1228739, // Highest supported rate for NDI Polaris
+      // BaudRate1228739 = 1228739, // Highest supported rate for NDI Polaris According to handbook, unknown value to most compilers though
       BaudRate1500000 = 1500000,
       BaudRate2000000 = 2000000,
       BaudRate2500000 = 2500000,

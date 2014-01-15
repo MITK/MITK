@@ -75,6 +75,8 @@ void QmitkNavigationToolCreationWidget::CreateConnections()
     connect( (QObject*)(m_Controls->m_ShowAdvancedOptionsPB), SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedOptions(bool)) );
     connect( (QObject*)(m_AdvancedWidget), SIGNAL(DialogCloseRequested()), this, SLOT(OnProcessDialogCloseRequest()) );
     connect( (QObject*)(m_AdvancedWidget), SIGNAL(RetrieveDataForManualToolTipManipulation()), this, SLOT(OnRetrieveDataForManualTooltipManipulation()) );
+
+    connect( m_Controls->m_Surface_Use_Other, SIGNAL(toggled(bool)), this, SLOT(OnSurfaceUseOtherToggled(bool)));
   }
 }
 
@@ -292,4 +294,9 @@ void QmitkNavigationToolCreationWidget::OnRetrieveDataForManualTooltipManipulati
     m_AdvancedWidget->SetToolTipSurface(false,
       dynamic_cast<mitk::DataNode*>(m_Controls->m_SurfaceChooser->GetSelectedNode().GetPointer()));
   }
+}
+
+void QmitkNavigationToolCreationWidget::OnSurfaceUseOtherToggled(bool checked)
+{
+  m_Controls->m_LoadSurface->setEnabled(checked);
 }

@@ -23,8 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkStandaloneDataStorage.h"
 
-//#include "mitkGlobalInteraction.h"
 #include "mitkPointSet.h"
+// NEW INCLUDE
 #include "mitkPointSetDataInteractor.h"
 
 #include <itksys/SystemTools.hxx>

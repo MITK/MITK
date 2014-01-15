@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //POCO
 #include <Poco/Exception.h>
 #include <Poco/Path.h>
+#include <Poco/File.h>
 
 static void TestInstantiationSerializer()
 {
@@ -275,6 +276,7 @@ static void TestReadStorageWithUnknownFiletype()
   MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if exception is thrown if a wrong file type is given for deserialization.");
 }
 
+
 static void TestReadZipFileWithNoToolstorage()
 {
   mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
@@ -299,6 +301,7 @@ static void TestReadZipFileWithNoToolstorage()
   }
   MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if exception is thrown if a empty zip file is given for deserialization.");
 }
+
 
 static void TestWriteStorageToInvalidFile()
 {
@@ -357,7 +360,8 @@ static void TestWriteEmptyToolStorage()
     //create filename
     separator = Poco::Path::separator();
     optionDirectory = std::string( MITK_TEST_OUTPUT_DIR );
-    filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorage"+mitk::UIDGenerator::GetUID()+".storage";
+    mitk::UIDGenerator myGen = mitk::UIDGenerator();
+    filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorage"+myGen.GetUID()+".storage";
   }
   catch (std::exception& e) {
     MITK_ERROR << "File access Exception: " << e.what();

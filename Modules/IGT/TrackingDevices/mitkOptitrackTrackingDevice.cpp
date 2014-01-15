@@ -25,6 +25,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <NPTrackingTools.h>
 
 //=======================================================
+// Static method: IsDeviceInstalled
+//=======================================================
+bool mitk::OptitrackTrackingDevice::IsDeviceInstalled()
+{
+  return true;
+}
+
+//=======================================================
 // Constructor
 //=======================================================
 mitk::OptitrackTrackingDevice::OptitrackTrackingDevice()
@@ -608,6 +616,14 @@ bool mitk::OptitrackTrackingDevice::AddToolByDefinitionFile(std::string fileName
 //=======================================================
 
 #else
+
+//=======================================================
+// Static method: IsDeviceInstalled
+//=======================================================
+bool mitk::OptitrackTrackingDevice::IsDeviceInstalled()
+{
+  return false;
+}
 
 //=======================================================
 // Constructor

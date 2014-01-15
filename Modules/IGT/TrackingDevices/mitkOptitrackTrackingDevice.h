@@ -77,8 +77,12 @@ namespace mitk
 
   public:
     mitkClassMacro(OptitrackTrackingDevice, mitk::TrackingDevice);
-        itkNewMacro(Self);
+    itkNewMacro(Self);
 
+    /**
+    * @returns Returns true if the Optitrack tracker is installed on this build (means activated in CMAKE). False if not.
+    */
+    virtual bool IsDeviceInstalled();
 
     // Define the Type of Tracker as DefinitionOfTool (MITK)
     typedef mitk::TrackingDeviceType OptiTrackTrackingDeviceType;

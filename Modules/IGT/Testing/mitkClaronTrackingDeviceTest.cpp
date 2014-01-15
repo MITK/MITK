@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 static bool TestIsMicronTrackerInstalled()
 {
   mitk::ClaronTrackingDevice::Pointer myClaronTrackingDevice = mitk::ClaronTrackingDevice::New();
-  bool returnValue = myClaronTrackingDevice->IsMicronTrackerInstalled();
+  bool returnValue = myClaronTrackingDevice->IsDeviceInstalled();
   if (returnValue) {MITK_TEST_OUTPUT(<< "MicronTracker is installed on this system!")}
   else {MITK_TEST_OUTPUT(<< "MicronTracker is not installed on this system!")}
   return returnValue;
@@ -97,7 +97,7 @@ static void TestAllMethodsOnSystemsWithoutMicronTracker()
   myClaronTrackingDevice->AddTool("Tool3", toolFileName.c_str());
 
   //test IsMicronTrackerInstalled
-  MITK_TEST_CONDITION(!myClaronTrackingDevice->IsMicronTrackerInstalled(),"Testing method IsMicronTrackerInstalled().\n")
+  MITK_TEST_CONDITION(!myClaronTrackingDevice->IsDeviceInstalled(),"Testing method IsMicronTrackerInstalled().\n")
 
     //test getToolCount
     int toolCount = myClaronTrackingDevice->GetToolCount();

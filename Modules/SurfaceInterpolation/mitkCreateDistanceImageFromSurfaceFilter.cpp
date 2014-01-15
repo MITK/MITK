@@ -355,7 +355,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
   double prevPixelVal = 1;
 
   unsigned int _size[3] = { (unsigned int)(sizeOfRegion[0] - 1), (unsigned int)(sizeOfRegion[1] - 1), (unsigned int)(sizeOfRegion[2] - 1) };
-  double center [3] = {_size[0]/2, _size[1]/2, _size[2]/2};
+  double center [3] = {_size[0]/2.0, _size[1]/2.0, _size[2]/2.0};
   MITK_INFO<<"Size: ["<<_size[0]<<","<<_size[1]<<","<<_size[2]<<"] Center: ["<<center[0]<<","<<center[1]<<","<<center[2]<<"]";
 
 

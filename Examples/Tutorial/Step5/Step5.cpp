@@ -169,20 +169,31 @@ int main(int argc, char* argv[])
   // Part VI: For allowing to interactively add points ...
   //*************************************************************************
 
+
+  // ATTENTION: It is very important that the renderer already know their DataStorage,
+  // because registerig DataInteractors with the render windows is done automatically
+  // and only works if the BaseRenderer and the DataStorage know each other.
+
   // Create PointSet and a node for it
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
+  // Store the point set in the DataNode
   pointSetNode->SetData(pointSet);
 
   // Add the node to the tree
   ds->Add(pointSetNode);
 
-  // Create PointSetInteractor, associate to pointSetNode and add as
-  // interactor to GlobalInteraction
+  // Create PointSetDataInteractor
   mitk::PointSetDataInteractor::Pointer interactor = mitk::PointSetDataInteractor::New();
+  // Set the StateMachine pattern that describes the flow of the interactions
   interactor->LoadStateMachine("PointSet.xml");
+  // Set the configuration file, which describes the user interactions that trigger actions
+  // in this file SHIFT + LeftClick triggers add Point, but by modifying this file,
+  // it could as well be changes to any other user interaction.
   interactor->SetEventConfig("PointSetConfig.xml");
 
+  // Assign the pointSetNode to the interactor,
+  // alternatively one could also add the DataInteractor to the pointSetNode using the SetDataInteractor() method.
   interactor->SetDataNode(pointSetNode);
 
   // *******************************************************

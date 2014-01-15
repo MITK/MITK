@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageToDiffusionImageSource.h"
 
 #include "mitkDiffusionImageCorrectionFilter.h"
+#include <mitkImageWriteAccessor.h>
 
 #include <vector>
 
@@ -38,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 template< typename DiffusionPixelType>
 mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   ::DWIHeadMotionCorrectionFilter():
-m_CurrentStep(0),
+  m_CurrentStep(0),
   m_Steps(100),
   m_IsInValidState(true),
   m_AbortRegistration(false)
@@ -130,7 +131,8 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
       }
 
       // import volume to the inter-results
-      registeredB0Image->SetImportVolume( registrationMethod->GetResampledMovingImage()->GetData(),
+      mitk::ImageWriteAccessor imac(registrationMethod->GetResampledMovingImage());
+      registeredB0Image->SetImportVolume( imac.GetData(),
         i, 0, mitk::Image::ReferenceMemory );
 
     }
@@ -198,7 +200,8 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   registeredWeighted->Initialize( splittedImage->GetPixelType(0), *tsg );
 
   // insert the first unweighted reference as the first volume
-  registeredWeighted->SetImportVolume( b0referenceImage->GetData(),
+  mitk::ImageWriteAccessor imac(b0referenceImage);
+  registeredWeighted->SetImportVolume( imac.GetData(),
     0,0, mitk::Image::CopyMemory );
 
 
@@ -240,7 +243,8 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
     }
 
     // allow expansion
-    registeredWeighted->SetImportVolume( weightedRegistrationMethod->GetResampledMovingImage()->GetData(),
+    mitk::ImageWriteAccessor imac(weightedRegistrationMethod->GetResampledMovingImage());
+    registeredWeighted->SetImportVolume( imac.GetData(),
       i+1, 0, mitk::Image::CopyMemory);
 
     estimated_transforms.push_back( weightedRegistrationMethod->GetLastRotationMatrix() );

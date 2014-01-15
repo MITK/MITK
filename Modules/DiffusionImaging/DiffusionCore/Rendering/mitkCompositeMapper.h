@@ -92,15 +92,6 @@ namespace mitk {
       return m_OdfMapper->HasVtkProp(prop, renderer);
     }
 
-    /*
-    * \deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
-    */
-    DEPRECATED(void ReleaseGraphicsResources(vtkWindow* window))
-    {
-      m_ImgMapper->ReleaseGraphicsResources(window);
-      m_OdfMapper->ReleaseGraphicsResources(window);
-    }
-
     void ReleaseGraphicsResources(mitk::BaseRenderer* renderer)
     {
       m_ImgMapper->ReleaseGraphicsResources(renderer);

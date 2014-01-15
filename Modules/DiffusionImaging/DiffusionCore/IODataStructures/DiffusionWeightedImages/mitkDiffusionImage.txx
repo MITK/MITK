@@ -105,10 +105,10 @@ void mitk::DiffusionImage<TPixelType>
     CastToItkImage<ImgType>(this, img);
 
     itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
-    itw = itw.Begin();
+    itw.GoToBegin();
 
     itk::ImageRegionConstIterator<ImageType> itr (m_VectorImage, m_VectorImage->GetLargestPossibleRegion() );
-    itr = itr.Begin();
+    itr.GoToBegin();
 
     while(!itr.IsAtEnd())
     {

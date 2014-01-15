@@ -157,7 +157,7 @@ static int mkstemps_compat(char* tmpl, int suffixlen)
     v /= 62;
     XXXXXX[5] = validLetters[v % 62];
 
-    int fd = open (tmpl, O_RDWR | O_CREAT | O_EXCL, S_IREAD | S_IWRITE);
+    int fd = open (tmpl, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
     if (fd >= 0)
     {
       errno = savedErrno;

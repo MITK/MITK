@@ -72,7 +72,8 @@ static std::string GetLastErrorStr()
 #include <io.h>
 #include <direct.h>
 
-#define S_RUSR S_IREAD
+// make the posix flags point to the obsolte bsd types on windows
+#define S_IRUSR S_IREAD
 #define S_IWUSR S_IWRITE
 
 #else

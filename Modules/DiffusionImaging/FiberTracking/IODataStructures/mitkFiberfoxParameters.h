@@ -87,6 +87,8 @@ public:
     string m_ArtifactModelString;
     string m_OutputPath;
 
+    void PrintSelf();
+
 protected:
 
 };

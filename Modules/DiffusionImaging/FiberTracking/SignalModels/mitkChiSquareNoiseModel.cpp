@@ -22,7 +22,7 @@ using namespace mitk;
 template< class ScalarType >
 ChiSquareNoiseModel< ScalarType >::ChiSquareNoiseModel()
 {
-
+    m_RandGen.seed();
 }
 
 template< class ScalarType >
@@ -32,8 +32,17 @@ ChiSquareNoiseModel< ScalarType >::~ChiSquareNoiseModel()
 }
 
 template< class ScalarType >
+void ChiSquareNoiseModel< ScalarType >::SetSeed(int seed)
+{
+    if (seed>=0)
+        m_RandGen.seed(seed);
+    else
+        m_RandGen.seed();
+}
+
+template< class ScalarType >
 void ChiSquareNoiseModel< ScalarType >::AddNoise(PixelType& pixel)
 {
     for( unsigned int i=0; i<pixel.Size(); i++)
-        pixel[i] += (ScalarType)(m_Distribution(m_Randgen)-m_Distribution.n());
+        pixel[i] += (ScalarType)(m_Distribution(m_RandGen)-m_Distribution.n());
 }

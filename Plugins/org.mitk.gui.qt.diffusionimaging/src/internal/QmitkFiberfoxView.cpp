@@ -241,6 +241,9 @@ void QmitkFiberfoxView::AfterThread()
             m_Controls->m_SimulationStatusText->append("Unknown exception during DWI writing!");
         }
     }
+    m_ImageGenParameters.m_FrequencyMap = NULL;
+    m_ImageGenParametersBackup.m_FrequencyMap = NULL;
+    m_TractsToDwiFilter = NULL;
 }
 
 void QmitkFiberfoxView::UpdateSimulationStatus()

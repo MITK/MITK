@@ -113,6 +113,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
         fMapSlice->SetBufferedRegion( region );
         fMapSlice->SetRequestedRegion( region );
         fMapSlice->Allocate();
+        fMapSlice->FillBuffer(0.0);
     }
 
     DoubleDwiType::Pointer newImage = DoubleDwiType::New();
@@ -318,10 +319,27 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     // ADJUST GEOMETRY FOR FURTHER PROCESSING
     // is input slize size a power of two?
     unsigned int x=m_ImageRegion.GetSize(0); unsigned int y=m_ImageRegion.GetSize(1);
-    if ( x%2 == 1 )
-        m_ImageRegion.SetSize(0, x+1);
-    if ( y%2 == 1 )
-        m_ImageRegion.SetSize(1, y+1);
+    ItkDoubleImgType::SizeType pad; pad[0]=x%2; pad[1]=y%2; pad[2]=0;
+    m_ImageRegion.SetSize(0, x+pad[0]);
+    m_ImageRegion.SetSize(1, y+pad[1]);
+    if (m_FrequencyMap.IsNotNull() && (pad[0]>0 || pad[1]>0))
+    {
+        itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::Pointer zeroPadder = itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::New();
+        zeroPadder->SetInput(m_FrequencyMap);
+        zeroPadder->SetConstant(0);
+        zeroPadder->SetPadUpperBound(pad);
+        zeroPadder->Update();
+        m_FrequencyMap = zeroPadder->GetOutput();
+    }
+    if (m_TissueMask.IsNotNull() && (pad[0]>0 || pad[1]>0))
+    {
+        itk::ConstantPadImageFilter<ItkUcharImgType, ItkUcharImgType>::Pointer zeroPadder = itk::ConstantPadImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
+        zeroPadder->SetInput(m_TissueMask);
+        zeroPadder->SetConstant(0);
+        zeroPadder->SetPadUpperBound(pad);
+        zeroPadder->Update();
+        m_TissueMask = zeroPadder->GetOutput();
+    }
 
     // apply in-plane upsampling
     double upsampling = 1;
@@ -400,7 +418,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             resampler->Update();
             m_TissueMask = resampler->GetOutput();
         }
-
         // resample frequency map
         if (m_FrequencyMap.IsNotNull())
         {

@@ -31,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNrrdDiffusionImageWriter.h>
 #include <itkTestingComparisonImageFilter.h>
 #include <itkImageRegionConstIterator.h>
+#include <mitkRicianNoiseModel.h>
+#include <mitkChiSquareNoiseModel.h>
 
 /**Documentation
  *
@@ -121,7 +123,7 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
 
     MITK_TEST_BEGIN("mitkFiberfoxSignalGenerationTest");
 
-    MITK_TEST_CONDITION_REQUIRED(argc>=15,"check for input data");
+    MITK_TEST_CONDITION_REQUIRED(argc>=19,"check for input data");
 
     // input fiber bundle
     FiberBundleXReader::Pointer fibReader = FiberBundleXReader::New();
@@ -136,7 +138,6 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     mitk::DiffusionImage<short>::Pointer tensorBall = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[5])->GetData());
     mitk::DiffusionImage<short>::Pointer stickTensorBall = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[6])->GetData());
     mitk::DiffusionImage<short>::Pointer stickTensorBallAstrosticks = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[7])->GetData());
-
     mitk::DiffusionImage<short>::Pointer gibbsringing = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[8])->GetData());
     mitk::DiffusionImage<short>::Pointer ghost = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[9])->GetData());
     mitk::DiffusionImage<short>::Pointer aliasing = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[10])->GetData());
@@ -144,6 +145,13 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     mitk::DiffusionImage<short>::Pointer linearmotion = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[12])->GetData());
     mitk::DiffusionImage<short>::Pointer randommotion = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[13])->GetData());
     mitk::DiffusionImage<short>::Pointer spikes = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[14])->GetData());
+    mitk::DiffusionImage<short>::Pointer riciannoise = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[15])->GetData());
+    mitk::DiffusionImage<short>::Pointer chisquarenoise = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[16])->GetData());
+    mitk::DiffusionImage<short>::Pointer distortions = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[17])->GetData());
+    mitk::Image::Pointer mitkFMap = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[18])->GetData());
+    typedef itk::Image<double, 3> ItkDoubleImgType;
+    ItkDoubleImgType::Pointer fMap = ItkDoubleImgType::New();
+    mitk::CastToItkImage<ItkDoubleImgType>(mitkFMap, fMap);
 
     FiberfoxParameters parameters;
     parameters.m_DoSimulateRelaxation = true;
@@ -200,87 +208,113 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     dotModel.SetT2(80);
     dotModel.SetGradientList(parameters.m_GradientDirections);
 
+    // noise models
+    mitk::RicianNoiseModel<double>* ricianNoiseModel = new mitk::RicianNoiseModel<double>();
+    ricianNoiseModel->SetNoiseVariance(1000000);
+    ricianNoiseModel->SetSeed(0);
+
+    // Rician noise
+    mitk::ChiSquareNoiseModel<double>* chiSquareNoiseModel = new mitk::ChiSquareNoiseModel<double>();
+    chiSquareNoiseModel->SetDOF(500000);
+    chiSquareNoiseModel->SetSeed(0);
+
     try{
-        // TEST PAREMETER CONFIG 1
+        // Stick-Ball
         parameters.m_FiberModelList.push_back(&stickModel);
         parameters.m_NonFiberModelList.push_back(&ballModel);
-//        StartSimulation(parameters, fiberBundle, stickBall, argv[2]);
+        StartSimulation(parameters, fiberBundle, stickBall, argv[2]);
 
-        // TEST PAREMETER CONFIG 2
+        // Srick-Astrosticks
         parameters.m_NonFiberModelList.clear();
         parameters.m_NonFiberModelList.push_back(&astrosticksModel);
-//        StartSimulation(parameters, fiberBundle, stickAstrosticks, argv[3]);
+        StartSimulation(parameters, fiberBundle, stickAstrosticks, argv[3]);
 
-        // TEST PAREMETER CONFIG 3
+        // Stick-Dot
         parameters.m_NonFiberModelList.clear();
         parameters.m_NonFiberModelList.push_back(&dotModel);
-//        StartSimulation(parameters, fiberBundle, stickDot, argv[4]);
+        StartSimulation(parameters, fiberBundle, stickDot, argv[4]);
 
-        // TEST PAREMETER CONFIG 4
+        // Tensor-Ball
         parameters.m_FiberModelList.clear();
         parameters.m_FiberModelList.push_back(&tensorModel);
         parameters.m_NonFiberModelList.clear();
         parameters.m_NonFiberModelList.push_back(&ballModel);
-//        StartSimulation(parameters, fiberBundle, tensorBall, argv[5]);
+        StartSimulation(parameters, fiberBundle, tensorBall, argv[5]);
 
-        // TEST PAREMETER CONFIG 5
+        // Stick-Tensor-Ball
         parameters.m_FiberModelList.clear();
         parameters.m_FiberModelList.push_back(&stickModel);
         parameters.m_FiberModelList.push_back(&tensorModel);
         parameters.m_NonFiberModelList.clear();
         parameters.m_NonFiberModelList.push_back(&ballModel);
-//        StartSimulation(parameters, fiberBundle, stickTensorBall, argv[6]);
+        StartSimulation(parameters, fiberBundle, stickTensorBall, argv[6]);
 
-        // TEST PAREMETER CONFIG 6
+        // Stick-Tensor-Ball-Astrosticks
         parameters.m_NonFiberModelList.push_back(&astrosticksModel);
-//        StartSimulation(parameters, fiberBundle, stickTensorBallAstrosticks, argv[7]);
+        StartSimulation(parameters, fiberBundle, stickTensorBallAstrosticks, argv[7]);
 
-        // TEST PAREMETER CONFIG 7
+        // Gibbs ringing
         parameters.m_FiberModelList.clear();
         parameters.m_FiberModelList.push_back(&stickModel);
         parameters.m_NonFiberModelList.clear();
         parameters.m_NonFiberModelList.push_back(&ballModel);
         parameters.m_AddGibbsRinging = true;
-//        StartSimulation(parameters, fiberBundle, gibbsringing, argv[8]);
+        StartSimulation(parameters, fiberBundle, gibbsringing, argv[8]);
 
-        // TEST PAREMETER CONFIG 8
+        // Ghost
         parameters.m_AddGibbsRinging = false;
         parameters.m_KspaceLineOffset = 0.25;
-//        StartSimulation(parameters, fiberBundle, ghost, argv[9]);
+        StartSimulation(parameters, fiberBundle, ghost, argv[9]);
 
-        // TEST PAREMETER CONFIG 9
+        // Aliasing
         parameters.m_KspaceLineOffset = 0;
         parameters.m_Wrap = 0.4;
         parameters.m_SignalScale = 1000;
-//        StartSimulation(parameters, fiberBundle, aliasing, argv[10]);
+        StartSimulation(parameters, fiberBundle, aliasing, argv[10]);
 
-        // TEST PAREMETER CONFIG 10
+        // Eddy currents
         parameters.m_Wrap = 1;
         parameters.m_SignalScale = 10000;
         parameters.m_DoSimulateEddyCurrents = true;
         parameters.m_EddyStrength = 0.05;
-//        StartSimulation(parameters, fiberBundle, eddy, argv[11]);
+        StartSimulation(parameters, fiberBundle, eddy, argv[11]);
 
-        // TEST PAREMETER CONFIG 11
+        // Motion (linear)
         parameters.m_DoSimulateEddyCurrents = false;
         parameters.m_EddyStrength = 0.0;
         parameters.m_DoAddMotion = true;
         parameters.m_RandomMotion = false;
         parameters.m_Translation[1] = 10;
         parameters.m_Rotation[2] = 90;
-//        StartSimulation(parameters, fiberBundle, linearmotion, argv[12]);
+        StartSimulation(parameters, fiberBundle, linearmotion, argv[12]);
 
-        // TEST PAREMETER CONFIG 12
+        // Motion (random)
         parameters.m_RandomMotion = true;
         parameters.m_Translation[1] = 5;
         parameters.m_Rotation[2] = 45;
         StartSimulation(parameters, fiberBundle, randommotion, argv[13]);
 
-        // TEST PAREMETER CONFIG 13
+        // Spikes
         parameters.m_DoAddMotion = false;
         parameters.m_Spikes = 5;
         parameters.m_SpikeAmplitude = 1;
         StartSimulation(parameters, fiberBundle, spikes, argv[14]);
+
+        // Rician noise
+        parameters.m_Spikes = 0;
+        parameters.m_NoiseModel = ricianNoiseModel;
+        StartSimulation(parameters, fiberBundle, riciannoise, argv[15]);
+        delete parameters.m_NoiseModel;
+
+        // Chi-square noise
+        parameters.m_NoiseModel = chiSquareNoiseModel;
+        StartSimulation(parameters, fiberBundle, chisquarenoise, argv[16]);
+        delete parameters.m_NoiseModel;
+
+        // Distortions
+        parameters.m_NoiseModel = NULL;
+        parameters.m_FrequencyMap = fMap;
+        StartSimulation(parameters, fiberBundle, distortions, argv[17]);
     }
     catch (std::exception &e)
     {

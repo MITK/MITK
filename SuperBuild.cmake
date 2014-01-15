@@ -192,6 +192,18 @@ if(MSVC_VERSION)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
 endif()
 
+# With the current toolkits like VTK and ITK Mac OSX 10.9
+# does not compile with if stdlib=libc++is used
+# For more information see bug 16803 and 16776
+# This could probably be remove if ITK 4.5.1 and VTK 6.1 is integrated
+if (APPLE)
+  exec_program(sw_vers ARGS -productVersion OUTPUT_VARIABLE osx_version)
+  if (osx_version VERSION_EQUAL "10.9" OR osx_version VERSION_GREATER "10.9")
+    message("Detected OS X version is ${osx_version}...setting C++ library to libstdc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
+  endif()
+endif()
+
 set(ep_common_args
   -DBUILD_TESTING:BOOL=${ep_build_testing}
   -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}

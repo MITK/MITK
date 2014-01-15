@@ -261,7 +261,20 @@ int mitk::SerialCommunication::Send(const std::string& input, bool block)
 int mitk::SerialCommunication::ApplyConfiguration()
 {
 #ifdef WIN32 // Windows implementation
-  if (m_ComPortHandle == INVALID_HANDLE_VALUE)
+  return ApplyConfigurationWin();
+#else // Posix
+  return ApplyConfigurationLin();
+#endif
+}
+
+/**
+* The Code for Baud rates is highly platform specific and divided into separate subroutines for readability.
+*/
+
+#ifdef WIN32
+int mitk::SerialCommunication::ApplyConfigurationWin()
+{
+   if (m_ComPortHandle == INVALID_HANDLE_VALUE)
     return ERROR_VALUE;
 
   DCB controlSettings;
@@ -304,9 +317,23 @@ int mitk::SerialCommunication::ApplyConfiguration()
 
   PurgeComm(m_ComPortHandle, PURGE_TXCLEAR | PURGE_RXCLEAR);  // clear read and write buffers
   return OK;
+}
 
-#else // Posix
+#elif __APPLE__
+/**
+* \brief Applies the configuration for Mac
+*/
+int mitk::SerialCommunication::ApplyConfigurationMac()
+{
 
+}
+
+#else
+/**
+* \brief Applies the configuration for Linux
+*/
+int mitk::SerialCommunication::ApplyConfigurationLin()
+{
   if ( m_FileDescriptor == INVALID_HANDLE_VALUE )
     return ERROR_VALUE;
 
@@ -382,9 +409,9 @@ int mitk::SerialCommunication::ApplyConfiguration()
   case BaudRate230400:
     baudrate = B230400;
     break;
-  /* COMMENTED OUT FOR THE MOMENT, SEE BUG 15911 FOR DETAILS
-  //the following baud rates does not work for apple
-  #ifndef US_PLATFORM_APPLE
+  COMMENTED OUT FOR THE MOMENT, SEE BUG 15911 FOR DETAILS
+  // the following baud rates do not work for apple
+  #ifndef __APPLE__
   case BaudRate460800:
     baudrate = B460800;
     break;
@@ -403,9 +430,9 @@ int mitk::SerialCommunication::ApplyConfiguration()
   case BaudRate1152000:
     baudrate = B1152000;
     break;
-  //case BaudRate1228739:
-  //  baudrate = B1228739;
-  //  break;
+  case BaudRate1228739:
+    baudrate = B1228739;
+    break;
   case BaudRate1500000:
     baudrate = B1500000;
     break;
@@ -427,6 +454,7 @@ int mitk::SerialCommunication::ApplyConfiguration()
   #endif
   */
   default:
+    MITK_WARN("mitk::SerialCommunication") << "Baud rate not recognized, using default of 9600 Baud.";
     baudrate = B9600;
     break;
   }
@@ -440,8 +468,10 @@ int mitk::SerialCommunication::ApplyConfiguration()
     return OK;
   else
     return ERROR_VALUE;
-#endif
 }
+
+#endif
+
 
 void mitk::SerialCommunication::SendBreak(unsigned int ms)
 {

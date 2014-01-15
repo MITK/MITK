@@ -112,11 +112,11 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
         {
             MITK_INFO << "TEST FAILED. TRACTOGRAMS ARE NOT EQUAL!";
             mitk::FiberBundleXWriter::Pointer writer = mitk::FiberBundleXWriter::New();
-            writer->SetFileName("testBundle.fib");
+            writer->SetFileName("/tmp/testBundle.fib");
             writer->SetInputFiberBundleX(fib1);
             writer->Update();
 
-            writer->SetFileName("refBundle.fib");
+            writer->SetFileName("/tmp/refBundle.fib");
             writer->SetInputFiberBundleX(fib2);
             writer->Update();
         }

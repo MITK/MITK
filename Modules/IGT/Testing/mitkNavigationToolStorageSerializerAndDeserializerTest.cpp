@@ -357,7 +357,7 @@ static void TestWriteEmptyToolStorage()
     //create filename
     separator = Poco::Path::separator();
     optionDirectory = std::string( MITK_TEST_OUTPUT_DIR );
-    filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorage.storage";
+    filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorage"+mitk::UIDGenerator::GetUID()+".storage";
   }
   catch (std::exception& e) {
     MITK_ERROR << "File access Exception: " << e.what();
@@ -369,6 +369,11 @@ static void TestWriteEmptyToolStorage()
   //test serialization
   bool success = mySerializer->Serialize(filename,myStorage);
   MITK_TEST_CONDITION_REQUIRED(success,"Testing serialization of simple tool storage");
+
+  //clean up
+  Poco::File file = Poco::File(filename);
+  file.remove();
+
 }
 
 //new tests for exception throwing of NavigationToolStorageSerializer

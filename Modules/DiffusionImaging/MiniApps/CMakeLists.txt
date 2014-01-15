@@ -1,6 +1,6 @@
 OPTION(BUILD_DiffusionMiniApps "Build commandline tools for diffusion" OFF)
 
-IF(BUILD_DiffusionMiniApps)
+IF(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
 
   # include necessary modules here
   MITK_CHECK_MODULE(_RESULT DiffusionCore FiberTracking )

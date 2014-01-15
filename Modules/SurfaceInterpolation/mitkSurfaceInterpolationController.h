@@ -146,16 +146,9 @@ namespace mitk
     ComputeContourSetNormalsFilter::Pointer m_NormalsFilter;
     CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter;
 
-    double m_MinSpacing;
-    double m_MaxSpacing;
-
-    const Image* m_WorkingImage;
-
     Surface::Pointer m_Contours;
 
     vtkSmartPointer<vtkPolyData> m_PolyData;
-
-    unsigned int m_DistImageVolume;
 
     mitk::DataStorage::Pointer m_DataStorage;
 

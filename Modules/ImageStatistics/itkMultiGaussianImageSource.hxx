@@ -62,12 +62,12 @@ namespace itk
     m_Min = NumericTraits< OutputImagePixelType >::NonpositiveMin();
     m_Max = NumericTraits< OutputImagePixelType >::max();
   }
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   MultiGaussianImageSource< TOutputImage >
     ::~MultiGaussianImageSource()
   {}
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >
@@ -100,7 +100,7 @@ namespace itk
   {
     return this->m_Size.GetSize();
   }
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >
@@ -125,7 +125,7 @@ namespace itk
       }
     }
   }
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >
@@ -150,7 +150,7 @@ namespace itk
       }
     }
   }
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   const typename MultiGaussianImageSource< TOutputImage >::PointValueType *
     MultiGaussianImageSource< TOutputImage >
@@ -174,7 +174,7 @@ namespace itk
     }
     return this->m_SpacingArray;
   }
-
+  //-----------------------------------------------------------------------------------------------------------------------
   /**
   *
   */
@@ -218,7 +218,7 @@ namespace itk
     }
     os << m_Size[ii] << "]" << std::endl;
   }
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   unsigned int
     MultiGaussianImageSource< TOutputImage >
@@ -226,7 +226,7 @@ namespace itk
   {
     return this->m_NumberOfGaussians;
   }
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   const typename MultiGaussianImageSource< TOutputImage >::RadiusType
     MultiGaussianImageSource< TOutputImage >
@@ -234,7 +234,7 @@ namespace itk
   {
     return this->m_Radius;
   }
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >
@@ -242,7 +242,7 @@ namespace itk
   {
     this->m_Radius = radius;
   }
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   const int
     MultiGaussianImageSource< TOutputImage >
@@ -250,7 +250,7 @@ namespace itk
   {
     return this->m_RadiusStepNumber;
   }
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >
@@ -258,7 +258,7 @@ namespace itk
   {
     this->m_RadiusStepNumber = stepNumber;
   }
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >
@@ -267,7 +267,7 @@ namespace itk
     this->m_NumberOfGaussians = n;
   }
 
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >
@@ -277,7 +277,7 @@ namespace itk
     m_RegionOfInterestMin.operator=(roiMin);
   }
 
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   const typename MultiGaussianImageSource< TOutputImage >::OutputImagePixelType
     MultiGaussianImageSource< TOutputImage >
@@ -285,7 +285,7 @@ namespace itk
   {
     return m_MeanValue;
   }
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   const typename MultiGaussianImageSource< TOutputImage >::OutputImagePixelType
     MultiGaussianImageSource< TOutputImage >
@@ -293,7 +293,7 @@ namespace itk
   {
     return m_MaxValueInSphere;
   }
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   const typename MultiGaussianImageSource< TOutputImage >::IndexType
     MultiGaussianImageSource< TOutputImage >
@@ -301,7 +301,7 @@ namespace itk
   {
     return  m_MaxValueIndexInSphere;
   }
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   const typename MultiGaussianImageSource< TOutputImage >::OutputImagePixelType
     MultiGaussianImageSource< TOutputImage >
@@ -309,7 +309,7 @@ namespace itk
   {
     return m_MinValueInSphere;
   }
-
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   const typename MultiGaussianImageSource< TOutputImage >::IndexType
     MultiGaussianImageSource< TOutputImage >
@@ -317,7 +317,7 @@ namespace itk
   {
     return  m_MinValueIndexInSphere;
   }
-  //----------------------------------------------------------------------------
+  //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   const typename MultiGaussianImageSource< TOutputImage >::IndexType
     MultiGaussianImageSource< TOutputImage >
@@ -326,8 +326,8 @@ namespace itk
     return m_SphereMidpoint;
   }
 
-  //----------------------------------------------------------------------------------------------------------------------
-  /* Calculate and return value of the Integral of the gaussian in a cuboid region with the dimension 3: in the x-axis between xMin and xMax and in the y-axis between yMin and yMax and in the z-axis also between zMin and zMax;  */
+  //-----------------------------------------------------------------------------------------------------------------------
+  /* Calculate and return value of the integral of the gaussian in a cuboid region with the dimension 3: in the x-axis between xMin and xMax and in the y-axis between yMin and yMax and in the z-axis also between zMin and zMax.  */
 
   template< class TOutputImage >
   double
@@ -338,7 +338,10 @@ namespace itk
     double summand0, summand1, summand2, value, factor;
     for(unsigned int n = 0; n < m_NumberOfGaussians; ++n)
     {
-
+      //TODO
+      //summand0 = FunctionPhi((xMax - m_CenterX[n]  * m_Spacing[0]) / (m_SigmaX[n] * m_Spacing[0]) ) - FunctionPhi((xMin - m_CenterX[n]  * m_Spacing[0]) / (m_SigmaX[n] * m_Spacing[0]) );
+      //summand1 = FunctionPhi((yMax - m_CenterY[n] * m_Spacing[1]) / (m_SigmaY[n] * m_Spacing[1]) ) - FunctionPhi((yMin - m_CenterY[n] * m_Spacing[1]) / (m_SigmaY[n] * m_Spacing[1]) );
+      //summand2 = FunctionPhi((zMax - m_CenterZ[n] * m_Spacing[2]) / (m_SigmaZ[n] * m_Spacing[2]) ) - FunctionPhi((zMin - m_CenterZ[n] * m_Spacing[2]) / (m_SigmaZ[n] * m_Spacing[2]) );
       summand0 = FunctionPhi((xMax - m_CenterX[n]) / m_SigmaX[n] ) - FunctionPhi((xMin - m_CenterX[n]) / m_SigmaX[n] );
       summand1 = FunctionPhi((yMax - m_CenterY[n]) / m_SigmaY[n] ) - FunctionPhi((yMin - m_CenterY[n]) / m_SigmaY[n] );
       summand2 = FunctionPhi((zMax - m_CenterZ[n]) / m_SigmaZ[n] ) - FunctionPhi((zMin - m_CenterZ[n]) / m_SigmaZ[n] );
@@ -353,21 +356,6 @@ namespace itk
       // m_Volume = m_Volume + (xMax - xMin) * (yMax - yMin) * (zMax - zMin);
 
     }
-    //for(unsigned int n =0; n < m_NumberOfGaussians; ++n)
-    //{
-    //  summand0 = FunctionPhi( (xMax - m_CenterX[n]) / m_SigmaX[n] ) + FunctionPhi( (xMin - m_CenterX[n]) / m_SigmaX[n] );
-    //  summand1 = FunctionPhi( (yMax - m_CenterY[n]) / m_SigmaY[n] ) + FunctionPhi( (yMin - m_CenterY[n]) / m_SigmaY[n] );
-    //  summand2 = FunctionPhi( (zMax - m_CenterZ[n]) / m_SigmaZ[n] ) + FunctionPhi( (zMin - m_CenterZ[n]) / m_SigmaZ[n] );
-    //  value = summand0 * summand1 * summand2;
-    //  factor = pow(2.0 * itk::Math::pi, 1.5 ) /
-    //    ( ((xMax - m_CenterX[n]) / m_SigmaX[n] - (xMin - m_CenterX[n]) / m_SigmaX[n])
-    //    * ((yMax - m_CenterY[n]) / m_SigmaY[n] - (yMin - m_CenterY[n]) / m_SigmaY[n])
-    //    * ((zMax - m_CenterZ[n]) / m_SigmaZ[n] - (zMin - m_CenterZ[n]) / m_SigmaZ[n]));
-    //    // 1 / ((xMax - xMin) * (yMax - yMin) * (zMax - zMin) * pow(2.0 * itk::Math::pi, 1.5 ));// (m_SigmaX[n] * m_SigmaY[n] * m_SigmaZ[n] ) / ((xMax - xMin) * (yMax - yMin) * (zMax - zMin)); //* pow(2.0 * itk::Math::pi, 1.5 ));
-    //  mean = mean + factor * value; //  * m_Altitude[n] ???? TODO
-    //}
-    //TODO
-
     return mean;
   }
   //---------------------------------------------------------------------------------------------------------------------
@@ -382,8 +370,7 @@ namespace itk
   {
     double phiAtValue;
 
-    // TODO qubische interpolation
-    //linear interpolation
+    //linear interpolation between the values
     int indexValue = static_cast<int>( 100 * value);
     if( indexValue > 409 )
     {
@@ -438,9 +425,7 @@ namespace itk
 
   //----------------------------------------------------------------------------------------------------------------------
 
-  /*
-  recursive;
-  This method realise the octree method. It subdivide a cuboid in eight cuboids, when this cuboid crosses the boundary of sphere. If the cuboid is inside the sphere, we insert its midpoint in the m_Midpoints vector.
+  /* This recursive method realise the octree method. It subdivide a cuboid in eight cuboids, when this cuboid crosses the boundary of sphere. If the cuboid is inside the sphere, it calculates the integral and, if uncommented,  insert the midpoint of the cuboid in the m_Midpoints vector.
   */
   template< class TOutputImage >
   void
@@ -485,22 +470,15 @@ namespace itk
         zMin = globalCoordinateMidpointCuboid[2] - cuboidRadius;
         zMax = globalCoordinateMidpointCuboid[2] + cuboidRadius;
 
-
+        // size is in index coordinate -> multiply by the spacing -> global coordinate of the image boundary
         // yz Plane
-        bool yzPlaneAtOriginCrossXSection      = xMin <= m_Origin[0] && xMax >= m_Origin[0];
-        bool yzPlaneAtImageBorderCrossXSection = xMin <= m_Size[0]   && xMax >= m_Size[0];
-        bool yzPlaneNotCrossYSection           = xMin >= m_Origin[0] && xMax <= m_Size[0];
+        bool yzPlaneNotCrossYSection           = xMin >= m_Origin[0] && xMax <= m_Size[0] * m_Spacing[0];
         // xz Plane
-        bool xzPlaneAtOriginCrossYSection      = yMin <= m_Origin[1] && yMax >= m_Origin[1];
-        bool xzPlaneAtImageBorderCrossYSection = yMin <= m_Size[1]   && yMax >= m_Size[1];
-        bool xzPlaneNotCrossYSection           = yMin >= m_Origin[1] && yMax <= m_Size[1];
+        bool xzPlaneNotCrossYSection           = yMin >= m_Origin[1] && yMax <= m_Size[1] * m_Spacing[1];
         // xy Plane
-        bool xyPlaneAtOriginCrossZSection      = zMin <= m_Origin[2] && zMax >= m_Origin[2];
-        bool xyPlaneAtImageBorderCrossZSection = zMin <= m_Size[2]   && zMax >= m_Size[2];
-        bool xyPlaneNotCrossZSection           = zMin >= m_Origin[2] && zMax <= m_Size[2];
+        bool xyPlaneNotCrossZSection           = zMin >= m_Origin[2] && zMax <= m_Size[2] * m_Spacing[2];
 
         //check if the boundary of the integral is inside the image
-        // if( xMax <= m_Size[0] && xMin >= m_Origin[0] &&  yMax <= m_Size[1] && yMin >= m_Origin[1] && zMax <= m_Size[2] && zMin >= m_Origin[2] )
         if( yzPlaneNotCrossYSection && xzPlaneNotCrossYSection && xyPlaneNotCrossZSection)
         {
 
@@ -508,82 +486,12 @@ namespace itk
           m_meanValueTemp  = m_meanValueTemp + this->MultiGaussianFunctionValueAtCuboid( xMin, xMax, yMin, yMax, zMin, zMax ) * 0.5;
           m_Volume = m_Volume + pow( 2.0 * cuboidRadius, 3.0) / 2.0;
         }
-        /*      // check if the boundary of the image intersect the cuboid and if yes change the limits of the cuboid
-        else if( // one cross
-          ( (yzPlaneAtOriginCrossXSection      && xzPlaneNotCrossYSection           && xyPlaneNotCrossZSection) ||
-          (yzPlaneAtImageBorderCrossXSection   && xzPlaneNotCrossYSection           && xyPlaneNotCrossZSection) ||
-
-          (yzPlaneNotCrossYSection             && xzPlaneAtOriginCrossYSection      && xyPlaneNotCrossZSection) ||
-          (yzPlaneNotCrossYSection             && xzPlaneAtImageBorderCrossYSection && xyPlaneNotCrossZSection) ||
-
-          (yzPlaneNotCrossYSection             && xzPlaneNotCrossYSection           && xyPlaneAtOriginCrossZSection) ||
-          (yzPlaneNotCrossYSection             && xzPlaneNotCrossYSection           && xyPlaneAtImageBorderCrossZSection) )
-          || // two crosses
-          ( (yzPlaneAtOriginCrossXSection      && xzPlaneAtOriginCrossYSection      && xyPlaneNotCrossZSection) ||
-          ( (yzPlaneAtOriginCrossXSection      && xzPlaneNotCrossYSection           && xyPlaneAtOriginCrossZSection) ||
-          (yzPlaneAtImageBorderCrossXSection   && xzPlaneAtImageBorderCrossYSection && xyPlaneNotCrossZSection) ||
-          (yzPlaneAtImageBorderCrossXSection   && xzPlaneNotCrossYSection           && xyPlaneAtImageBorderCrossZSection) ||
-
-          (yzPlaneNotCrossYSection             && xzPlaneAtOriginCrossYSection      && xyPlaneNotCrossZSection) ||
-          (yzPlaneNotCrossYSection             && xzPlaneAtOriginCrossYSection      && xyPlaneAtOriginCrossZSection) ||
-          (yzPlaneAtImageBorderCrossXSection   && xzPlaneAtImageBorderCrossYSection && xyPlaneNotCrossZSection) ||
-          (yzPlaneNotCrossYSection             && xzPlaneAtImageBorderCrossYSection && xyPlaneAtImageBorderCrossZSection) ||
-
-          (yzPlaneNotCrossYSection             && xzPlaneAtImageBorderCrossYSection && xyPlaneAtOriginCrossZSection) ||
-          (yzPlaneAtOriginCrossXSection        && xzPlaneNotCrossYSection           && xyPlaneAtOriginCrossZSection) ||
-          (yzPlaneNotCrossYSection             && xzPlaneAtImageBorderCrossYSection && xyPlaneAtImageBorderCrossZSection)) ||
-          (yzPlaneAtImageBorderCrossXSection    && xzPlaneNotCrossYSection          && xyPlaneAtImageBorderCrossZSection) )
-          )
-          /* if(
-          ( ( xMin <= m_Origin[0] && xMax >= m_Origin[0] && yMin <= m_Origin[1] && yMax >= m_Origin[1]  &&  zMax <= m_Size[2] && zMin >= m_Origin[2] ) ||
-          ( xMin <= m_Origin[0] && xMax >= m_Origin[0] && yMax <= m_Size[1] && yMin >= m_Origin[1]  &&  zMin <= m_Size[2] && zMax >= m_Size[2]) ||
-          (xMin <= m_Size[0] && xMax >= m_Size[0] && ( ( yMax <= m_Size[1] && yMin >= m_Origin[1] ) || ( zMax <= m_Size[2] && zMin >= m_Origin[2] ) ) ) ||
-          (yMin <= m_Origin[1] && yMax >= m_Origin[1] && ( ( xMax <= m_Size[0] && xMin >= m_Origin[0] ) || ( zMax <= m_Size[2] && zMin >= m_Origin[2] ) ) ) ||
-          (yMin <= m_Size[1] && yMax >= m_Size[1]  && ( ( xMax <= m_Size[0] && xMin >= m_Origin[0] ) || ( zMax <= m_Size[2] && zMin >= m_Origin[2] ) ) ) ||
-          (zMin <= m_Origin[2] && zMax >= m_Origin[2] && ( ( xMax <= m_Size[0] && xMin >= m_Origin[0] ) || ( yMax <= m_Size[1] && yMin >= m_Origin[1] ) ) ) ||
-          (zMin <= m_Size[2] && zMax >= m_Size[2] && ( (xMax <= m_Size[0] && xMin >= m_Origin[0] ) || ( yMax <= m_Size[1] && yMin >= m_Origin[1] ) ) ) )
-          || /* one axis crosses the cuboid
-          ( ( xMin <= m_Origin[0] && xMax >= m_Origin[0] &&  yMax <= m_Size[1] && yMin >= m_Origin[1] && zMax <= m_Size[2] && zMin >= m_Origin[2] ) ||
-          (xMin <= m_Size[0] && xMax >= m_Size[0] && yMax <= m_Size[1] && yMin >= m_Origin[1] && zMax <= m_Size[2] && zMin >= m_Origin[2] ) ||
-          (yMin <= m_Origin[1] && yMax >= m_Origin[1] && xMax <= m_Size[0] && xMin >= m_Origin[0] && zMax <= m_Size[2] && zMin >= m_Origin[2] ) ||
-          (yMin <= m_Size[1] && yMax >= m_Size[1]  && xMax <= m_Size[0] && xMin >= m_Origin[0] && zMax <= m_Size[2] && zMin >= m_Origin[2]  ) ||
-          (zMin <= m_Origin[2] && zMax >= m_Origin[2] &&  xMax <= m_Size[0] && xMin >= m_Origin[0] && yMax <= m_Size[1] && yMin >= m_Origin[1] ) ||
-          (zMin <= m_Size[2] && zMax >= m_Size[2] && xMax <= m_Size[0] && xMin >= m_Origin[0] && yMax <= m_Size[1] && yMin >= m_Origin[1] ) ) )
-        {
-          // x-Axis
-          if(xMin <= m_Origin[0] && xMax >= m_Origin[0])
-          {
-            xMin = m_Origin[0];
-          }else if(xMin <= m_Size[0] && xMax >= m_Size[0])
-          {
-            xMax = m_Size[0];
-          }
-          // y-Axis
-          if(yMin <= m_Origin[1] && yMax >= m_Origin[1])
-          {
-            yMin = m_Origin[1];
-          }else if(yMin <= m_Size[1] && yMax >= m_Size[1])
-          {
-            yMax = m_Size[1];
-          }
-          // z-Axis
-          if(zMin <= m_Origin[2] && zMax >= m_Origin[2])
-          {
-            zMin = m_Origin[2];
-          }else if(zMin <= m_Size[2] && zMax >= m_Size[2])
-          {
-            zMax = m_Size[2];
-          }
-          m_meanValueTemp  = m_meanValueTemp + this->MultiGaussianFunctionValueAtCuboid( xMin, xMax, yMin, yMax, zMin, zMax ) * 0.5;
-          // m_Volume = m_Volume + pow( 2.0 * cuboidRadius, 3.0) / 2.0;
-          m_Volume = m_Volume + (xMax - xMin) * (yMax - yMin) * (zMax - zMin) / 2.0;
-
-        } */
       }
     }
     else if(intersect == 2)
     {
       // cuboid in the sphere
+
       // To insert the midpoint and the radius of the cuboid in a vector, so that we can visualise the midpoints, uncomment the next line and the line  WriteXMLToTestTheCuboidInsideTheSphere();
       // InsertPoints(globalCoordinateMidpointCuboid, cuboidRadius);
 
@@ -595,26 +503,28 @@ namespace itk
       zMin = globalCoordinateMidpointCuboid[2] - cuboidRadius;
       zMax = globalCoordinateMidpointCuboid[2] + cuboidRadius;
 
+      // size is in index coordinate -> multiply by the spacing -> global coordinate of the image boundary
       // yz Plane
       bool yzPlaneAtOriginCrossXSection      = xMin <= m_Origin[0] && xMax >= m_Origin[0];
-      bool yzPlaneAtImageBorderCrossXSection = xMin <= m_Size[0]   && xMax >= m_Size[0];
-      bool yzPlaneNotCrossYSection           = xMin >= m_Origin[0] && xMax <= m_Size[0];
+      bool yzPlaneAtImageBorderCrossXSection = xMin <= m_Size[0] * m_Spacing[0] && xMax >= m_Size[0] * m_Spacing[0];
+      bool yzPlaneNotCrossYSection           = xMin >= m_Origin[0] && xMax <= m_Size[0] * m_Spacing[0];
       // xz Plane
       bool xzPlaneAtOriginCrossYSection      = yMin <= m_Origin[1] && yMax >= m_Origin[1];
-      bool xzPlaneAtImageBorderCrossYSection = yMin <= m_Size[1]   && yMax >= m_Size[1];
-      bool xzPlaneNotCrossYSection           = yMin >= m_Origin[1] && yMax <= m_Size[1];
+      bool xzPlaneAtImageBorderCrossYSection = yMin <= m_Size[1] * m_Spacing[1]   && yMax >= m_Size[1] * m_Spacing[1];
+      bool xzPlaneNotCrossYSection           = yMin >= m_Origin[1] && yMax <= m_Size[1] * m_Spacing[1];
       // xy Plane
       bool xyPlaneAtOriginCrossZSection      = zMin <= m_Origin[2] && zMax >= m_Origin[2];
-      bool xyPlaneAtImageBorderCrossZSection = zMin <= m_Size[2]   && zMax >= m_Size[2];
-      bool xyPlaneNotCrossZSection           = zMin >= m_Origin[2] && zMax <= m_Size[2];
+      bool xyPlaneAtImageBorderCrossZSection = zMin <= m_Size[2] * m_Spacing[2]   && zMax >= m_Size[2] * m_Spacing[2];
+      bool xyPlaneNotCrossZSection           = zMin >= m_Origin[2] && zMax <= m_Size[2] * m_Spacing[2];
+
       if( yzPlaneNotCrossYSection && xzPlaneNotCrossYSection && xyPlaneNotCrossZSection)
       {
         m_meanValueTemp  = m_meanValueTemp +  this->MultiGaussianFunctionValueAtCuboid( xMin, xMax, yMin, yMax, zMin, zMax );
         m_Volume = m_Volume + pow( 2.0 * cuboidRadius, 3.0);
       }
-      // check if the boundary of the image intersect the cuboid and if yes change the limits of the cuboid
-      // same as above
-       else if( // one cross
+      // check if the boundary of the image intersect the cuboid and if yes, change the limits of the cuboid to be only inside the image;  therefor we cut the sphere and neglect the part of it outside the image
+
+      else if( // one plane crosses the cuboid
         ( (yzPlaneAtOriginCrossXSection      && xzPlaneNotCrossYSection           && xyPlaneNotCrossZSection) ||
         (yzPlaneAtImageBorderCrossXSection   && xzPlaneNotCrossYSection           && xyPlaneNotCrossZSection) ||
 
@@ -623,7 +533,7 @@ namespace itk
 
         (yzPlaneNotCrossYSection             && xzPlaneNotCrossYSection           && xyPlaneAtOriginCrossZSection) ||
         (yzPlaneNotCrossYSection             && xzPlaneNotCrossYSection           && xyPlaneAtImageBorderCrossZSection) )
-        || // two crosses
+        || // two plane cross the cuboid (on the image edges possible)
         ( (yzPlaneAtOriginCrossXSection      && xzPlaneAtOriginCrossYSection      && xyPlaneNotCrossZSection) ||
         ( (yzPlaneAtOriginCrossXSection      && xzPlaneNotCrossYSection           && xyPlaneAtOriginCrossZSection) ||
         (yzPlaneAtImageBorderCrossXSection   && xzPlaneAtImageBorderCrossYSection && xyPlaneNotCrossZSection) ||
@@ -644,25 +554,25 @@ namespace itk
         if(xMin <= m_Origin[0] && xMax >= m_Origin[0])
         {
           xMin = m_Origin[0];
-        }else if(xMin <= m_Size[0] && xMax >= m_Size[0])
+        }else if(xMin <= m_Size[0] * m_Spacing[0]  && xMax >= m_Size[0] * m_Spacing[0])
         {
-          xMax = m_Size[0];
+          xMax = m_Size[0] * m_Spacing[0];
         }
         // y-Axis
         if(yMin <= m_Origin[1] && yMax >= m_Origin[1])
         {
           yMin = m_Origin[1];
-        }else if(yMin <= m_Size[1] && yMax >= m_Size[1])
+        }else if(yMin <= m_Size[1] * m_Spacing[1] && yMax >= m_Size[1] * m_Spacing[1])
         {
-          yMax = m_Size[1];
+          yMax = m_Size[1] * m_Spacing[1];
         }
         // z-Axis
         if(zMin <= m_Origin[2] && zMax >= m_Origin[2])
         {
           zMin = m_Origin[2];
-        }else if(zMin <= m_Size[2] && zMax >= m_Size[2])
+        }else if(zMin <= m_Size[2] * m_Spacing[2] && zMax >= m_Size[2] * m_Spacing[2])
         {
-          zMax = m_Size[2];
+          zMax = m_Size[2] * m_Spacing[2];
         }
         m_meanValueTemp  = m_meanValueTemp + this->MultiGaussianFunctionValueAtCuboid( xMin, xMax, yMin, yMax, zMin, zMax );
         m_Volume = m_Volume + (xMax - xMin) * (yMax - yMin) * (zMax - zMin) ;
@@ -671,34 +581,15 @@ namespace itk
     }
   }
 
-
   //-----------------------------------------------------------------------------------------------------------------------
-  /*
-  For each voxel calculate the octree (start the recursion) and write this in a file, so that we can visualise it.
-  */
+  /* Start the octree recursion in eigth directions for the sphere with midpoint globalCoordinateMidpointSphere and, if uncommented, write this in a file, so that we can visualise it. */
   template< class TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >
     ::GenerateCuboidSegmentationInSphere(PointType globalCoordinateMidpointSphere)
   {
-
-    double cuboidRadius;
-    PointType globalCoordinateMidpointCuboid, newMidpoint;
-    OutputImageRegionType  regionOfInterest;
-    IndexType indexR;
-    indexR.SetElement( 0, m_RegionOfInterestMin[0] );
-    indexR.SetElement( 1, m_RegionOfInterestMin[1] );
-    indexR.SetElement( 2, m_RegionOfInterestMin[2] );
-    regionOfInterest.SetIndex(indexR);
-    SizeType sizeROI;
-    sizeROI.SetElement( 0, m_RegionOfInterestMax[0] - m_RegionOfInterestMin[0] );
-    sizeROI.SetElement( 1, m_RegionOfInterestMax[1] - m_RegionOfInterestMin[1] );
-    sizeROI.SetElement( 2, m_RegionOfInterestMax[2] - m_RegionOfInterestMin[2] );
-    regionOfInterest.SetSize(sizeROI);
-    typename TOutputImage::Pointer image = this->GetOutput(0);
-    IteratorType regionOfInterestIterator(image, regionOfInterest);
-    cuboidRadius = m_Radius / 2.0;
-    // m_Volume = 0.0;
+    double cuboidRadius = m_Radius * 0.5;
+    PointType newMidpoint;
     for(int i = -1; i < 2; i+=2)
     {
       for(int k = -1; k < 2; k+=2)
@@ -714,27 +605,25 @@ namespace itk
       }
     }
 
-    if(m_dispVol)
+    if(m_WriteMPS)
     {
-      //  std::cout << "Index: " << globalCoordinateMidpointSphere << "    m_Volume:  " << m_Volume <<std::endl;
-      m_dispVol = 1;//0;
+      m_WriteMPS = 0;
+      // uncomment to write an .mps file to visualise the midpoints
       // std::cout << "Wrote .xml to visualise the midpoints." <<  std::endl;
       // WriteXMLToTestTheCuboidInsideTheSphere();
     }
-
-
   }
 
-
   //----------------------------------------------------------------------------------------------------------------------
-
-  /*
-  Calculate the mean value and the midpoint with the octree discretised sphere.
-  */
+  /* This class allows by the method CalculateTheMidpointAndTheMeanValueWithOctree() to find a sphere with a specified radius that has a maximal mean value over all sphere with that radius with midpoint inside or at the boundary of the image. We approximaze the sphere with the octree recursiv method.
+  CalculateTheMidpointAndTheMeanValueWithOctree works as follows:
+  1. The for-loops traverse the region of interest and assume the current point to be the wanted sphere midpoint.
+  2. Calculate the mean value for that sphere.
+  3. Compare with the until-now-found-maximum and take the bigger one. */
   template< class TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >
-    ::CalculateTheMidPointMeanValueWithOctree()
+    ::CalculateTheMidpointAndTheMeanValueWithOctree()
   {
 
     m_MeanValue = 0.0;
@@ -745,7 +634,7 @@ namespace itk
     double radius;
     //double xMin, xMax, yMin, yMax, zMin, zMax;
 
-    m_dispVol = 1;
+    m_WriteMPS = 1;
     PointType globalCoordinateMidpointSphere;
     IndexType index;
     OutputImageRegionType  regionOfInterest;
@@ -764,38 +653,13 @@ namespace itk
 
     for(regionOfInterestIterator.GoToBegin(); !regionOfInterestIterator.IsAtEnd(); ++regionOfInterestIterator)
     {
-
       index = regionOfInterestIterator.GetIndex();
       image->TransformIndexToPhysicalPoint(index, globalCoordinateMidpointSphere);
       m_Volume = 0.0;
       m_meanValueTemp = 0.0;
       this->GenerateCuboidSegmentationInSphere(globalCoordinateMidpointSphere);
-
-      //for(unsigned int i = 0; i < cuboidNumber; ++i )
-      //{
-      //  midpoint = m_Midpoints.ElementAt(i);
-      //  radius = m_RadiusCuboid.ElementAt(i);
-      //  midpoint[0] = midpoint[0] + globalCoordinateMidpointSphere[0];
-      //  midpoint[1] = midpoint[1] + globalCoordinateMidpointSphere[1];
-      //  midpoint[2] = midpoint[2] + globalCoordinateMidpointSphere[2];
-      //  xMin = midpoint[0] - radius;
-      //  xMax = midpoint[0] + radius;
-      //  yMin = midpoint[1] - radius;
-      //  yMax = midpoint[1] + radius;
-      //  zMin = midpoint[2] - radius;
-      //  zMax = midpoint[2] + radius;
-      //  // std::cout << " 2 * radius: " << 2.0 * radius << " xMin: " << xMin << " xMax: " << xMax << " xMax - 2 * radius: " << xMax - 2.0 * radius<< std::endl;
-      //  //std::cout << " 2 * radius: " << 2.0 * radius << " yMin: " << yMin << " yMax: " << yMax << " yMax - 2 * radius: " << yMax - 2.0 * radius<< std::endl;
-      //  //std::cout << " 2 * radius: " << 2.0 * radius << " zMin: " << zMin << " zMax: " << zMax << " zMax - 2 * radius: " << zMax - 2.0 * radius<< std::endl;
-      //  ////  std::cout << "( 2 * radius) ^3: " << pow(2.0 * radius, 3.0) << "   Produkt: " << (xMax - xMin) * (yMax - yMin) * (zMax - zMin) << std::endl;
-      //  m_Volume = m_Volume + (xMax - xMin) * (yMax - yMin) * (zMax - zMin);
-      //  meanValueTemp  = meanValueTemp + MultiGaussianFunctionValueAtCuboid( xMin, xMax, yMin, yMax, zMin, zMax );
-      //}
-
-      meanValueTemp = m_meanValueTemp / m_Volume; //((4.0 / 3.0) * itk::Math::pi * m_Radius * m_Radius * m_Radius);
-
-       //std::cout <<  "  meanValue/ vol(Sphere): " << m_meanValueTemp / ((4.0 / 3.0) * itk::Math::pi * m_Radius * m_Radius * m_Radius) << std::endl;
-      //   std::cout << "m_Volume: " << m_Volume << " ... " << (4.0 / 3.0) * itk::Math::pi * m_Radius * m_Radius * m_Radius << std::endl;
+      meanValueTemp = m_meanValueTemp / m_Volume;
+      // std::cout << "index: " << index <<" meanvalue: " << meanValueTemp << std::endl;
       if(meanValueTemp > m_MeanValue)
       {
         m_GlobalCoordinate = globalCoordinateMidpointSphere;
@@ -804,185 +668,6 @@ namespace itk
       }
     }
   }
-
-  /*
-  ////-----------------------------------------------------------------------------------------------------------------------
-  //// TODO zu loeschen (ueberpruefen!)
-  //template< class TOutputImage >
-  //void
-  //  MultiGaussianImageSource< TOutputImage >
-  //  ::CalculateMidpoint()
-  //{
-  //  double valueMean  = 0;
-  //  m_MeanValue = 0.0;
-  //  double sideLength = m_Radius;
-  //  double cuboidRadius;
-  //  double sideLengthNew = m_Radius;
-  //  double meanValueTemp;
-  //  bool intersect;
-  //  PointType globalCoordinateMidpointCuboid;
-  //  PointType globalCoordinateMidpointSphere;
-  //  IndexType index;
-  //  OutputImageRegionType  regionOfInterest;
-  //  IndexType indexR;
-  //  indexR.SetElement(0, m_RegionOfInterestMin[0]);
-  //  indexR.SetElement(1, m_RegionOfInterestMin[1]);
-  //  indexR.SetElement(2, m_RegionOfInterestMin[2]);
-  //  regionOfInterest.SetIndex(indexR);
-  //  SizeType sizeROI;
-  //  sizeROI.SetElement(0, m_RegionOfInterestMax[0] - m_RegionOfInterestMin[0] +1);
-  //  sizeROI.SetElement(1, m_RegionOfInterestMax[1] - m_RegionOfInterestMin[1] +1);
-  //  sizeROI.SetElement(2, m_RegionOfInterestMax[2] - m_RegionOfInterestMin[2] +1);
-  //  regionOfInterest.SetSize(sizeROI);
-  //  typename TOutputImage::Pointer image = this->GetOutput(0);
-  //  IteratorType regionOfInterestIterator(image, regionOfInterest);
-  //  SetNormalDistributionValues();
-
-  //  for(regionOfInterestIterator.GoToBegin(); !regionOfInterestIterator.IsAtEnd(); ++regionOfInterestIterator)
-  //  {
-  //    cuboidRadius = sideLength / 2.0;
-  //    meanValueTemp = 0.0;
-  //    index = regionOfInterestIterator.GetIndex();
-  //    image->TransformIndexToPhysicalPoint(index, globalCoordinateMidpointSphere);
-
-  //    globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointSphere[0] - cuboidRadius;
-  //    globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointSphere[1] - cuboidRadius;
-  //    globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointSphere[2] - cuboidRadius;
-  //    meanValueTemp = meanValueTemp + Quadtrees(globalCoordinateMidpointCuboid, globalCoordinateMidpointSphere, cuboidRadius, meanValueTemp);
-
-  //    globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointSphere[0] + cuboidRadius;
-  //    globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointSphere[1] - cuboidRadius;
-  //    globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointSphere[2] - cuboidRadius;
-  //    meanValueTemp = meanValueTemp + Quadtrees(globalCoordinateMidpointCuboid, globalCoordinateMidpointSphere, cuboidRadius, meanValueTemp);
-
-  //    globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointSphere[0] + cuboidRadius;
-  //    globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointSphere[1] + cuboidRadius;
-  //    globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointSphere[2] - cuboidRadius;
-  //    meanValueTemp = meanValueTemp + Quadtrees(globalCoordinateMidpointCuboid, globalCoordinateMidpointSphere, cuboidRadius, meanValueTemp);
-
-  //    globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointSphere[0] + cuboidRadius;
-  //    globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointSphere[1] + cuboidRadius;
-  //    globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointSphere[2] + cuboidRadius;
-  //    meanValueTemp = meanValueTemp + Quadtrees(globalCoordinateMidpointCuboid, globalCoordinateMidpointSphere, cuboidRadius, meanValueTemp);
-
-  //    globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointSphere[0] + cuboidRadius;
-  //    globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointSphere[1] - cuboidRadius;
-  //    globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointSphere[2] + cuboidRadius;
-  //    meanValueTemp = meanValueTemp + Quadtrees(globalCoordinateMidpointCuboid, globalCoordinateMidpointSphere,
-  //      cuboidRadius, meanValueTemp);
-
-  //    globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointSphere[0] - cuboidRadius;
-  //    globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointSphere[1] + cuboidRadius;
-  //    globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointSphere[2] + cuboidRadius;
-  //    meanValueTemp = meanValueTemp + Quadtrees(globalCoordinateMidpointCuboid, globalCoordinateMidpointSphere, cuboidRadius, meanValueTemp);
-
-  //    globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointSphere[0] - cuboidRadius;
-  //    globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointSphere[1] + cuboidRadius;
-  //    globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointSphere[2] - cuboidRadius;
-  //    meanValueTemp = meanValueTemp + Quadtrees(globalCoordinateMidpointCuboid, globalCoordinateMidpointSphere, cuboidRadius, meanValueTemp);
-
-  //    globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointSphere[0] - cuboidRadius;
-  //    globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointSphere[1] - cuboidRadius;
-  //    globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointSphere[2] + cuboidRadius;
-  //    meanValueTemp = meanValueTemp + Quadtrees(globalCoordinateMidpointCuboid, globalCoordinateMidpointSphere,
-  //      cuboidRadius, meanValueTemp);
-
-
-
-  //    meanValueTemp = meanValueTemp / (m_Radius * itk::Math::pi * itk::Math::pi);
-  //    if(meanValueTemp > m_MeanValue)
-  //    {
-  //      m_GlobalCoordinate = globalCoordinateMidpointSphere;
-  //      m_MeanValue = meanValueTemp;
-  //      m_SphereMidpoint = index;
-  //    }
-
-
-  //    //to test only one step!!! TODO
-  //    regionOfInterestIterator.GoToReverseBegin();
-
-  //  }
-  //}
-  ////----------------------------------------------------------------------------------------------------------------------
-  //// TODO zu loeschen (ueberpruefen!)
-  //template< class TOutputImage >
-  //double
-  //  MultiGaussianImageSource< TOutputImage >
-  //  ::Quadtrees( PointType globalCoordinateMidpointCuboid, PointType globalCoordinateMidpointSphere,  double cuboidRadius, double meanValueTemp)
-  //{
-  //  double xMin, xMax, yMin, yMax, zMin, zMax;
-  //  double minDistance = m_Spacing[0] / 2.0;
-  //  unsigned int intersect;
-
-  //  while(cuboidRadius > minDistance)
-  //  {
-  //    intersect = IntersectTheSphere( globalCoordinateMidpointCuboid, globalCoordinateMidpointSphere, cuboidRadius);
-  //    if( intersect == 1 )
-  //    {
-  //      cuboidRadius = cuboidRadius / 2.0;
-  //      globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointCuboid[0] - cuboidRadius;
-  //      globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointCuboid[1] - cuboidRadius;
-  //      globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointCuboid[2] - cuboidRadius;
-  //      meanValueTemp = meanValueTemp +  Quadtrees(  globalCoordinateMidpointCuboid,  globalCoordinateMidpointSphere, cuboidRadius, meanValueTemp);
-
-  //      globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointCuboid[0] - cuboidRadius;
-  //      globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointCuboid[1] + cuboidRadius;
-  //      globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointCuboid[2] + cuboidRadius;
-  //      meanValueTemp = meanValueTemp +  Quadtrees(  globalCoordinateMidpointCuboid,  globalCoordinateMidpointSphere, cuboidRadius, meanValueTemp);
-
-  //      globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointCuboid[0] + cuboidRadius;
-  //      globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointCuboid[1] - cuboidRadius;
-  //      globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointCuboid[2] - cuboidRadius;
-  //      meanValueTemp = meanValueTemp +  Quadtrees(  globalCoordinateMidpointCuboid,  globalCoordinateMidpointSphere, cuboidRadius, meanValueTemp);
-
-  //      globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointCuboid[0] + cuboidRadius;
-  //      globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointCuboid[1] + cuboidRadius;
-  //      globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointCuboid[2] - cuboidRadius;
-  //      meanValueTemp = meanValueTemp +  Quadtrees(  globalCoordinateMidpointCuboid,  globalCoordinateMidpointSphere, cuboidRadius, meanValueTemp);
-
-  //      globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointCuboid[0] + cuboidRadius;
-  //      globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointCuboid[1] - cuboidRadius;
-  //      globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointCuboid[2] + cuboidRadius;
-  //      meanValueTemp = meanValueTemp +  Quadtrees(  globalCoordinateMidpointCuboid,  globalCoordinateMidpointSphere, cuboidRadius, meanValueTemp);
-
-  //      globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointCuboid[0] - cuboidRadius;
-  //      globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointCuboid[1] + cuboidRadius;
-  //      globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointCuboid[2] - cuboidRadius;
-  //      meanValueTemp = meanValueTemp +  Quadtrees(  globalCoordinateMidpointCuboid,  globalCoordinateMidpointSphere, cuboidRadius, meanValueTemp);
-
-  //      globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointCuboid[0] - cuboidRadius;
-  //      globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointCuboid[1] - cuboidRadius;
-  //      globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointCuboid[2] + cuboidRadius;
-  //      meanValueTemp = meanValueTemp +  Quadtrees(  globalCoordinateMidpointCuboid,  globalCoordinateMidpointSphere, cuboidRadius, meanValueTemp);
-
-  //      globalCoordinateMidpointCuboid[0] = globalCoordinateMidpointCuboid[0] + cuboidRadius;
-  //      globalCoordinateMidpointCuboid[1] = globalCoordinateMidpointCuboid[1] + cuboidRadius;
-  //      globalCoordinateMidpointCuboid[2] = globalCoordinateMidpointCuboid[2] + cuboidRadius;
-  //      meanValueTemp =  meanValueTemp + Quadtrees(  globalCoordinateMidpointCuboid,  globalCoordinateMidpointSphere, cuboidRadius, meanValueTemp);
-
-
-  //    }
-  //    else if( intersect == 2 )
-  //    {
-
-  //      xMin = globalCoordinateMidpointCuboid[0] - cuboidRadius;
-  //      xMax = globalCoordinateMidpointCuboid[0] + cuboidRadius;
-  //      yMin = globalCoordinateMidpointCuboid[1] - cuboidRadius;
-  //      yMax = globalCoordinateMidpointCuboid[1] + cuboidRadius;
-  //      zMin = globalCoordinateMidpointCuboid[2] - cuboidRadius;
-  //      zMax = globalCoordinateMidpointCuboid[2] + cuboidRadius;
-
-  //      meanValueTemp = meanValueTemp + MultiGaussianFunctionValueAtCuboid( xMin,  xMax,  yMin,  yMax,  zMin, zMax);
-  //      cuboidRadius = minDistance;
-  //    }
-  //    else if( intersect == 0 )
-  //    {
-  //      cuboidRadius = minDistance;
-  //    }
-  //  }
-  //  return meanValueTemp;
-  //}
-  */
 
   //----------------------------------------------------------------------------------------------------------------------
   /*
@@ -1025,7 +710,6 @@ namespace itk
   }
 
   //----------------------------------------------------------------------------------------------------------------------
-
   template< class TOutputImage >
   const double
     MultiGaussianImageSource< TOutputImage >
@@ -1034,10 +718,13 @@ namespace itk
     double summand0, summand1, summand2, power, value = 0.0;
     // the for-loop represent  the sum of the gaussian function
     for(unsigned int n =0; n < m_NumberOfGaussians; ++n)
-    {
-      summand0 = (x - m_CenterX[n]) / m_SigmaX[n];
-      summand1 = (y - m_CenterY[n]) / m_SigmaY[n];
-      summand2 = (z - m_CenterZ[n]) / m_SigmaZ[n];
+    { //TODO * spacing
+      //summand0 = ( x - m_CenterX[n] * m_Spacing[0] ) / ( m_SigmaX[n] * m_Spacing[0] );
+      //summand1 = ( y - m_CenterY[n] * m_Spacing[1] ) / ( m_SigmaY[n] * m_Spacing[1] );
+      //summand2 = ( z - m_CenterZ[n] * m_Spacing[2] ) / ( m_SigmaZ[n] * m_Spacing[2] );
+      summand0 = ( x - m_CenterX[n] ) / m_SigmaX[n];
+      summand1 = ( y - m_CenterY[n] ) / m_SigmaY[n];
+      summand2 = ( z - m_CenterZ[n] ) / m_SigmaZ[n];
 
       power = summand0 * summand0 + summand1 * summand1 + summand2 * summand2;
       value = value + m_Altitude[n] * pow(itk::Math::e, -0.5 * power); //* (1 / (pow(2.0 * itk::Math::pi, 1.5 ) * m_SigmaX[n] * m_SigmaY[n] * m_SigmaZ[n]) ) ;
@@ -1057,7 +744,6 @@ namespace itk
   }
 
   //----------------------------------------------------------------------------------------------------------------------
-
   template< class TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >
@@ -1065,17 +751,18 @@ namespace itk
   {
     for(unsigned int i = 0; i < x.size();  ++i)
     {
-      m_CenterX.push_back(x[i]);
-      m_CenterY.push_back(y[i]);
-      m_CenterZ.push_back(z[i]);
-      m_SigmaX.push_back(sx[i]);
-      m_SigmaY.push_back(sy[i]);
-      m_SigmaZ.push_back(sz[i]);
+      //  NOT ?? the x,y,z are given in index coordinates -> multiply by the spacing aand save the global coordinate
+      m_CenterX.push_back( x[i] );
+      m_CenterY.push_back( y[i] );
+      m_CenterZ.push_back( z[i] );
+      m_SigmaX.push_back( sx[i] );
+      m_SigmaY.push_back( sy[i] );
+      m_SigmaZ.push_back( sz[i] );
       m_Altitude.push_back(altitude[i]);
     }
   }
 
-  //----------------------------------------------------------------------------
+  //-----------------------------------------------------------------------------------------------------------------------
   template< typename TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >
@@ -1093,7 +780,7 @@ namespace itk
     output->SetOrigin(m_Origin);
   }
 
-  //----------------------------------------------------------------------------
+  //-----------------------------------------------------------------------------------------------------------------------
   template< typename TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >
@@ -1119,221 +806,9 @@ namespace itk
     }
   }
 
-  //----------------------------------------------------------------------------
-  /*
-  This class allows by the method CalculateMidpointAndMeanValue() to find a sphere with a specified radius that has a maximal mean value over all      sphere with that radius with midpoint inside or at the boundary of the image. The parameter RadiusStepNumber controls the accuracy of that           calculation (the higher the value the higher the exactness).
-  The algorithm works as follows:
-  1. the first three for-loops traverse the region of interest and assume the current point to be the wanted sphere midpoint
-  2. calculate the mean value for that sphere (use sphere coordinates):
-  2.1. traverse the radius of the sphere with step size Radius divided by RadiusStepNumber (the for-loop with index i)
-  2.2. define a variable dist, which gives a approximately distance between the points at the sphere surface
-  (here we take such a distance, that on the smallest sphere are located 8 points)
-  2.3. calculate the angles so that the points are equally spaced on the surface (for-loops with indexes j and k)
-  2.3. for all radius length add the values at the points on the sphere and divide by the number of points added
-  (the values at each point is calculate with the method MultiGaussianFunctionValueAtPoint())
-  3. Compare with the until-now-found-maximum and take the bigger one
+  //-----------------------------------------------------------------------------------------------------------------------
+  /*This method is used to write a .mps file, so that we can visualize the midpoints of the approximated sphere as a scatterplot (for example with MITK Workbench).
   */
-  template< typename TOutputImage >
-  void
-    MultiGaussianImageSource< TOutputImage >
-    ::CalculateMidpointAndMeanValue()
-  {
-    itkDebugMacro(<< "Generating a  image of scalars ");
-
-    double numberSummand = 0.0;
-    int fiStepNumber, psiStepNumber;
-    double x, y, z, temp, abst;
-    MultiGaussianImageSource< TOutputImage >::OutputImagePixelType value, meanValueTemp, valueAdd;
-    PointType globalCoordinate;
-    IndexType index;
-    double riStep, fijStep, psikStep, ri, fij, psik, rNew;
-    double dist = itk::Math::pi * m_Radius / static_cast< double >(2 * m_RadiusStepNumber);
-    m_MeanValue = 0.0;
-    riStep = m_Radius / static_cast< double >( m_RadiusStepNumber );
-    OutputImageRegionType  regionOfInterest;
-    IndexType indexR;
-    indexR.SetElement(0, m_RegionOfInterestMin[0]);
-    indexR.SetElement(1, m_RegionOfInterestMin[1]);
-    indexR.SetElement(2, m_RegionOfInterestMin[2]);
-    regionOfInterest.SetIndex(indexR);
-    SizeType sizeROI;
-    sizeROI.SetElement(0, m_RegionOfInterestMax[0] - m_RegionOfInterestMin[0] +1);
-    sizeROI.SetElement(1, m_RegionOfInterestMax[1] - m_RegionOfInterestMin[1] +1);
-    sizeROI.SetElement(2, m_RegionOfInterestMax[2] - m_RegionOfInterestMin[2] +1);
-    regionOfInterest.SetSize(sizeROI);
-    typename TOutputImage::Pointer image = this->GetOutput(0);
-    IteratorType regionOfInterestIterator(image, regionOfInterest);
-
-    for(regionOfInterestIterator.GoToBegin(); !regionOfInterestIterator.IsAtEnd(); ++regionOfInterestIterator)
-    {
-      numberSummand = 1.0;
-      value = regionOfInterestIterator.Get();
-      m_ValueAtMidpoint =  value;
-      index = regionOfInterestIterator.GetIndex();
-
-
-      image->TransformIndexToPhysicalPoint(index, globalCoordinate);
-      ri = riStep;
-
-      //for(unsigned int i = 0; i < m_RadiusStepNumber; ++i)
-      //{
-      //  angleStepNumberOverTwo = static_cast<int>( itk::Math::pi * ri / dist);
-      //  //fij = 0.0;
-      //  fijStep = itk::Math::pi / static_cast< double >( angleStepNumberOverTwo );
-      //  fij = fijStep;
-      //  std::cout << "i =         " << i << "    r = " << ri << "\n" << std::endl;
-      //  for(unsigned int j = 0; j < angleStepNumberOverTwo -1 ; ++j) // from 0 to pi    j<= angleStep...
-      //  {
-      //    z = ri * cos(fij);
-      //    psikStep = 2.0 * itk::Math::pi / (2.0 * static_cast< double >( angleStepNumberOverTwo ) );
-      //    psik =  -itk::Math::pi + psikStep;
-      //    temp =  ri * sin(fij);
-      //    std::cout << "    j =     " << j << "    fi = " << fij << "\n" << std::endl;
-      //    for(unsigned int k = 0; k < 2 * angleStepNumberOverTwo; ++k) // from -pi to pi
-      //    {
-      //      std::cout << "       k =  " << k << "    psi = " << psik << "\n" << std::endl;
-      //      x = temp * cos(psik);
-      //      y = temp * sin(psik);
-      //      numberSummand += 1.0;
-      //  //    std::cout << "x, y, z:    " << x <<"    " << y << "     " << z << "\n" <<std::endl;
-      //   //   std::cout << "psi, fi, r: "<< psik <<"    " << fij << "     " << ri << "\n" <<std::endl;
-      //      valueAdd = MultiGaussianFunctionValueAtPoint(x + globalCoordinate[0], y + globalCoordinate[1], z + globalCoordinate[2]);
-      //      value = value + valueAdd;
-      //      psik = psik + psikStep;
-      //      //double tempX = x + globalCoordinate[0];
-      //      //double tempY = y + globalCoordinate[1];
-      //      //double tempZ = z + globalCoordinate[2];
-      //      //if ( tempX < xMin ) xMin = tempX;
-      //      //if ( tempY < yMin ) yMin = tempY;
-      //      //if ( tempZ < zMin ) zMin = tempZ;
-      //      //if ( tempX > xMax ) xMax = tempX;
-      //      //if ( tempY > yMax ) yMax = tempY;
-      //      //if ( tempZ > zMax ) zMax = tempZ;
-      //
-      //    }
-      //    fij = fij  + fijStep;
-      //  }
-      //  ri = ri + riStep;
-      //}
-      // second implementation ... corrected!
-      //  for(unsigned int i = 0; i < m_RadiusStepNumber; ++i)
-      //{
-      //  angleStepNumberOverTwo = static_cast<int>( itk::Math::pi * ri / dist);
-      //  //fij = 0.0;
-      //  fijStep = itk::Math::pi / static_cast< double >( angleStepNumberOverTwo );
-      //  fij = fijStep;
-      //  //        std::cout << "i =         " << i << "    r = " << ri << "\n" << std::endl;
-      //  for(unsigned int j = 0; j < angleStepNumberOverTwo -1 ; ++j) // from 0 to pi    j<= angleStep...
-      //  {
-      //    z = ri * cos(fij);
-      //    /* double l = 2.0 * ri /  static_cast< double >( angleStepNumberOverTwo - 1);
-      //    double tempVar = (j + 1) * l;
-      //    abst =  (tempVar < ri ) ? tempVar : (2.0 * ri - tempVar);
-      //    double testVar = abst * (ri - abst);
-      //    rNew = std::sqrt(abst * (ri - abst)); */
-      //    if(fij < itk::Math::pi / 2.0)
-      //    {
-      //      rNew = sin(fij) * ri;
-      //    }
-      //    else
-      //    {
-      //      rNew = sin(itk::Math::pi - fij) * ri;
-      //    }
-      //    psiStepNumber = static_cast<int>( 2.0 * itk::Math::pi * rNew / dist);
-      //    psikStep = 2.0 * itk::Math::pi / psiStepNumber  ;
-      //    psik =  -itk::Math::pi + psikStep;
-      //    temp =  ri * sin(fij);
-      //    //         std::cout << "    j =     " << j << "    fi = " << fij << "\n" << std::endl;
-      //    for(unsigned int k = 0; k < psiStepNumber; ++k) // from -pi to pi
-      //    {
-      //      //           std::cout << "       k =  " << k << "    psi = " << psik << "\n" << std::endl;
-      //      x = temp * cos(psik);
-      //      y = temp * sin(psik);
-      //      numberSummand += 1.0;
-      //      valueAdd = MultiGaussianFunctionValueAtPoint(x + globalCoordinate[0], y + globalCoordinate[1], z + globalCoordinate[2]);
-      //      value = value + valueAdd;
-      //      psik = psik + psikStep;
-      //    }
-      //    fij = fij  + fijStep;
-      //  }
-      //  ri = ri + riStep;
-      //}
-
-
-      for(unsigned int i = 0; i < m_RadiusStepNumber; ++i)
-      {
-        fiStepNumber = static_cast<int>( (itk::Math::pi * ri / dist));
-        //fij = 0.0;
-        fijStep = itk::Math::pi / (static_cast< double >( fiStepNumber ) * 2.0);
-        fij = fijStep;
-        //       std::cout << "i =         " << i << "    r = " << ri << "\n" << std::endl;
-        for(unsigned int j = 0; j < fiStepNumber -2 ; ++j) // from 0 to pi/2    j<= angleStep...
-        {
-          z = ri * cos(fij);
-          if(fij < itk::Math::pi / 2.0)
-          {
-            rNew = sin(fij) * ri;
-          }
-          else
-          {
-            rNew = sin(itk::Math::pi - fij) * ri;
-          }
-
-          psiStepNumber = static_cast<int>(( 2.0 * itk::Math::pi * rNew / dist) / 4.0);
-          psikStep = itk::Math::pi / (static_cast< double >( psiStepNumber ) * 2.0);
-          psik = psikStep;
-          temp =  ri * sin(fij);
-          //  std::cout << "   j =      " << j << "    fi = " << fij << "\n" << std::endl;
-          if(psiStepNumber > 2){
-            for(unsigned int k = 0; k < psiStepNumber -2; ++k) // from 0 to pi/2
-            {
-              //   std::cout << "       k =  " << k << "    psi = " << psik << "\n" << std::endl;
-              x = temp * cos(psik);
-              y = temp * sin(psik);
-              numberSummand += 8.0;
-
-
-              valueAdd = MultiGaussianFunctionValueAtPoint(x + globalCoordinate[0], y + globalCoordinate[1], z + globalCoordinate[2]);
-              value = value + valueAdd;
-              valueAdd = MultiGaussianFunctionValueAtPoint( - x + globalCoordinate[0], y + globalCoordinate[1], z + globalCoordinate[2]);
-              value = value + valueAdd;
-              valueAdd = MultiGaussianFunctionValueAtPoint( - x + globalCoordinate[0], - y + globalCoordinate[1], - z + globalCoordinate[2]);
-              value = value + valueAdd;
-              valueAdd = MultiGaussianFunctionValueAtPoint(x + globalCoordinate[0], - y + globalCoordinate[1], z + globalCoordinate[2]);
-              value = value + valueAdd;
-              valueAdd = MultiGaussianFunctionValueAtPoint(x + globalCoordinate[0], - y + globalCoordinate[1], - z + globalCoordinate[2]);
-              value = value + valueAdd;
-              valueAdd = MultiGaussianFunctionValueAtPoint(x + globalCoordinate[0], y + globalCoordinate[1], - z + globalCoordinate[2]);
-              value = value + valueAdd;
-              valueAdd = MultiGaussianFunctionValueAtPoint(- x + globalCoordinate[0], y + globalCoordinate[1], - z + globalCoordinate[2]);
-              value = value + valueAdd;
-              valueAdd = MultiGaussianFunctionValueAtPoint(- x + globalCoordinate[0], - y + globalCoordinate[1], z + globalCoordinate[2]);
-              value = value + valueAdd;
-
-
-
-
-              psik = psik + psikStep;
-
-            }
-          }
-          fij = fij  + fijStep;
-        }
-        ri = ri + riStep;
-      }
-
-
-      meanValueTemp = value / numberSummand;
-      if(meanValueTemp > m_MeanValue)
-      {
-        m_GlobalCoordinate = globalCoordinate;
-        m_MeanValue = meanValueTemp;
-        m_SphereMidpoint = index;
-      }
-    }
-  }
-
-  //-------------------------------------------------------------------------------------------------------------------------
   template< typename TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >
@@ -1421,287 +896,7 @@ namespace itk
 
   }
 
-  //---------------------------------------------------------------------------------------------------------------------
-  /*
-  template< typename TOutputImage >
-  void
-  MultiGaussianImageSource< TOutputImage >
-  ::WriteXMLToTestTheCuboid()
-  {
-  // to create a point set
-
-
-  std::stringstream                                                    ss;
-  int fiStepNumber, psiStepNumber;
-  double x, y, z, temp;
-  MultiGaussianImageSource< TOutputImage >::OutputImagePixelType  meanValueTemp;
-  PointType globalCoordinate;
-  double riStep, fijStep, psikStep, ri, fij, psik, rNew;
-
-
-  int angleStepNumber = 4;
-  double dist = 2.0 * itk::Math::pi * m_Radius / static_cast< double >(angleStepNumber * m_RadiusStepNumber);
-  m_MeanValue = 0.0;
-  riStep = m_Radius / static_cast< double >( m_RadiusStepNumber);
-  int numberSummand = 1.0;
-
-  //write an  .mps test file
-  itk::DOMNodeXMLWriter::Pointer                                       xmlWriter;
-  typedef itk::DOMNode::Pointer                                        DOMNodeType;
-  DOMNodeType                                                          domXML, domPointSetFile, domFileVersion, domPointSet, domPoint, domId, domX, domY, domZ;
-
-  xmlWriter = itk::DOMNodeXMLWriter::New();
-  domXML =  itk::DOMNode::New();
-  domXML->SetName("?xml");
-  domPointSetFile =  itk::DOMNode::New();
-  domPointSetFile->SetName("point_set_file");
-  //domFileVersion =  itk::DOMNode::New();
-  //domFileVersion->SetName("file_version");
-  domPointSet =  itk::DOMNode::New();
-  domPointSet->SetName("point_set");
-
-  ss.str("");
-  ss << 1.0;
-  domXML->SetAttribute("version", ss.str());
-  domXML->AddChildAtBegin(domPointSetFile);
-  //domPointSetFile -> AddChildAtBegin(domFileVersion);
-  domPointSetFile -> AddChildAtBegin(domPointSet);
-
-
-  int cap = m_XCoordToTest.size();
-  for(unsigned int  iter = 0 ; iter < cap; ++iter)
-  {
-  numberSummand += 1.0;
-
-  domPoint =  itk::DOMNode::New();
-  domPoint->SetName("point");
-  domX =  itk::DOMNode::New();
-  domX->SetName("x");
-  domY =  itk::DOMNode::New();
-  domY->SetName("y");
-  domZ =  itk::DOMNode::New();
-  domZ->SetName("z");
-  domId =  itk::DOMNode::New();
-  domId->SetName("id");
-
-
-  ss.str("");
-  ss << numberSummand;
-  domId->AddTextChildAtBegin(ss.str());
-  domPoint -> AddChildAtEnd(domId);
-
-  double scaleFactor = 10.0;
-
-  ss.str("");
-  ss << m_XCoordToTest[iter] * scaleFactor;
-  domX->AddTextChildAtBegin(ss.str());
-  domPoint -> AddChildAtEnd(domX);
-  ss.str("");
-  ss << m_YCoordToTest[iter] * scaleFactor;
-  domY->AddTextChildAtBegin(ss.str());
-  domPoint -> AddChildAtEnd(domY);
-  ss.str("");
-  ss << m_ZCoordToTest[iter] * scaleFactor;
-  domZ->AddTextChildAtBegin(ss.str());
-  domPoint -> AddChildAtEnd(domZ);
-  domPointSet -> AddChildAtEnd(domPoint);
-
-
-
-  }
-
-
-  // .mps (Data)
-  ss.str("");
-  ss << "C:/temp/CuboidMidpointsSet.mps";
-  std::string name = ss.str();
-  char * fileNamePointer = (char*) name.c_str();
-  xmlWriter->SetFileName( fileNamePointer);
-  xmlWriter->SetInput( domXML );
-  xmlWriter->Update();
-
-
-  }
-  //------------------------------------------------------------------------------------------------------------------
-  template< typename TOutputImage >
-  void
-  MultiGaussianImageSource< TOutputImage >
-  ::WriteXMLToTest()
-  {
-  // to create a point set
-
-  double numberSummand = 0.0;
-  std::stringstream                                                    ss;
-  int fiStepNumber, psiStepNumber;
-  double x, y, z, temp;
-  MultiGaussianImageSource< TOutputImage >::OutputImagePixelType  meanValueTemp;
-  PointType globalCoordinate;
-  double riStep, fijStep, psikStep, ri, fij, psik, rNew;
-
-
-  int angleStepNumber = 4;
-  double dist = 2.0 * itk::Math::pi * m_Radius / static_cast< double >(angleStepNumber * m_RadiusStepNumber);
-  m_MeanValue = 0.0;
-  riStep = m_Radius / static_cast< double >( m_RadiusStepNumber);
-  numberSummand = 1.0;
-
-  //write an  .mps test file
-  itk::DOMNodeXMLWriter::Pointer                                       xmlWriter;
-  typedef itk::DOMNode::Pointer                                        DOMNodeType;
-  DOMNodeType                                                          domXML, domPointSetFile, domFileVersion, domPointSet, domPoint, domId, domX, domY, domZ;
-
-  xmlWriter = itk::DOMNodeXMLWriter::New();
-  domXML =  itk::DOMNode::New();
-  domXML->SetName("?xml");
-  domPointSetFile =  itk::DOMNode::New();
-  domPointSetFile->SetName("point_set_file");
-  //domFileVersion =  itk::DOMNode::New();
-  //domFileVersion->SetName("file_version");
-  domPointSet =  itk::DOMNode::New();
-  domPointSet->SetName("point_set");
-
-  ss.str("");
-  ss << 1.0;
-  domXML->SetAttribute("version", ss.str());
-  domXML->AddChildAtBegin(domPointSetFile);
-  //domPointSetFile -> AddChildAtBegin(domFileVersion);
-  domPointSetFile -> AddChildAtBegin(domPointSet);
-
-
-  typename TOutputImage::Pointer image = this->GetOutput(0);
-  image->TransformIndexToPhysicalPoint(m_SphereMidpoint, globalCoordinate);
-  ri = riStep;
-  for(unsigned int i = 0; i < m_RadiusStepNumber; ++i)
-  {
-  fiStepNumber = static_cast<int>( (itk::Math::pi * ri / dist) / 2.0);
-  //fij = 0.0;
-  fijStep = itk::Math::pi / (static_cast< double >( fiStepNumber ) * 2.0);
-  fij = fijStep;
-  //        std::cout << "i =         " << i << "    r = " << ri << "\n" << std::endl;
-  for(unsigned int j = 0; j < fiStepNumber - 2 ; ++j) // from 0 to pi/2    j<= angleStep...
-  {
-  z = ri * cos(fij);
-  if(fij < itk::Math::pi / 2.0)
-  {
-  rNew = sin(fij) * ri;
-  }
-  else
-  {
-  rNew = sin(itk::Math::pi - fij) * ri;
-  }
-
-  psiStepNumber = static_cast<int>(( 2.0 * itk::Math::pi * rNew / dist) / 4.0);
-  psikStep = itk::Math::pi / (static_cast< double >( psiStepNumber ) * 2.0);
-  psik = psikStep;
-  temp =  ri * sin(fij);
-
-  for(unsigned int k = 0; k < psiStepNumber - 2; ++k) // from 0 to pi/2
-  {
-  x = temp * cos(psik);
-  y = temp * sin(psik);
-  numberSummand += 1.0;
-
-  domPoint =  itk::DOMNode::New();
-  domPoint->SetName("point");
-  domX =  itk::DOMNode::New();
-  domX->SetName("x");
-  domY =  itk::DOMNode::New();
-  domY->SetName("y");
-  domZ =  itk::DOMNode::New();
-  domZ->SetName("z");
-  domId =  itk::DOMNode::New();
-  domId->SetName("id");
-
-
-  ss.str("");
-  ss << numberSummand;
-  domId->AddTextChildAtBegin(ss.str());
-  domPoint -> AddChildAtEnd(domId);
-
-  double scaleFactor = 40.0;
-
-  ss.str("");
-  ss << (x + globalCoordinate[0]) * scaleFactor;
-  domX->AddTextChildAtBegin(ss.str());
-  domPoint -> AddChildAtEnd(domX);
-  ss.str("");
-  ss << (y + globalCoordinate[1]) * scaleFactor;
-  domY->AddTextChildAtBegin(ss.str());
-  domPoint -> AddChildAtEnd(domY);
-  ss.str("");
-  ss << (z + globalCoordinate[2]) * scaleFactor;
-  domZ->AddTextChildAtBegin(ss.str());
-  domPoint -> AddChildAtEnd(domZ);
-  domPointSet -> AddChildAtEnd(domPoint);
-
-
-  psik = psik + psikStep;
-
-  }
-  fij = fij  + fijStep;
-  }
-  ri = ri + riStep;
-  }
-
-
-  // .mps (Data)
-  ss.str("");
-  ss << "C:/temp/SpherePointSet.mps";
-  std::string name = ss.str();
-  char * fileNamePointer = (char*) name.c_str();
-  xmlWriter->SetFileName( fileNamePointer);
-  xmlWriter->SetInput( domXML );
-  xmlWriter->Update();
-
-
-  }
-  */
-
-  //-------------------------------------------------------------------------------------------------------------------------------------------
-  template< typename TOutputImage >
-  void
-    MultiGaussianImageSource< TOutputImage >
-    ::OptimizeMeanValue()
-  {
-    int radiusStepNumberOptimized = m_RadiusStepNumber * 4;
-    int numberSummand = 1, angleStepNumberOverTwo;
-    double x, y, z, temp;
-    double riStep, fijStep, psikStep, ri, fij, psik;
-    double dist = itk::Math::pi * m_Radius / (2 * radiusStepNumberOptimized);
-    MultiGaussianImageSource< TOutputImage >::OutputImagePixelType valueAdd, value,
-      m_MeanValue = 0;
-    riStep = m_Radius / radiusStepNumberOptimized;
-    ri = riStep;
-    value =  m_ValueAtMidpoint;
-    for(unsigned int i = 0; i < radiusStepNumberOptimized; ++i)
-    {
-      angleStepNumberOverTwo = static_cast<int>( itk::Math::pi * ri / dist);
-      fij = 0.0;
-      fijStep = itk::Math::pi / angleStepNumberOverTwo;
-      for(unsigned int j = 0; j <= angleStepNumberOverTwo; ++j) // from 0 to pi
-      {
-        z = ri * cos(fij);
-        psikStep = 2.0 * itk::Math::pi / (2.0 * angleStepNumberOverTwo);
-        psik =  -itk::Math::pi + psikStep;
-        temp =  ri * sin(fij);
-        for(unsigned int k = 0; k < 2 * angleStepNumberOverTwo; ++k) // from -pi to pi
-        {
-          x = temp * cos(psik);
-          y = temp * sin(psik);
-          numberSummand++;
-          valueAdd = MultiGaussianFunctionValueAtPoint(x + m_GlobalCoordinate[0] , y + m_GlobalCoordinate[1], z + m_GlobalCoordinate[2]);
-          value = value + valueAdd;
-          psik = psik + psikStep;
-        }
-        fij = fij  + fijStep;
-      }
-      ri = ri + riStep;
-    }
-    m_MeanValue = value / numberSummand;
-  }
-
-
-  //-------------------------------------------------------------------------------------------------------------------------------------------
+  //-----------------------------------------------------------------------------------------------------------------------
   template< typename TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >
@@ -1769,8 +964,8 @@ namespace itk
       }
     }
   }
-  //--------------------------------------------------------------------------------------------------------------------------
 
+  //-----------------------------------------------------------------------------------------------------------------------
   template< typename TOutputImage >
   bool
     MultiGaussianImageSource< TOutputImage >
@@ -1784,10 +979,7 @@ namespace itk
     return isInImage;
   }
 
-
   //-----------------------------------------------------------------------------------------------------------------------
-
-
   template< typename TOutputImage >
   void
     MultiGaussianImageSource< TOutputImage >

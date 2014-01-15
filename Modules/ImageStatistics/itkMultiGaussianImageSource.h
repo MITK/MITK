@@ -52,22 +52,28 @@ gaussian bell curve takes its maximal value at the voxel with index [CenterX(i);
 3. Altitude - vector of the size of N determining the altitude: the i-th gaussian bell curve has a height of Altitude(i).
 This class allows by the method CalculateMidpointAndMeanValue() to find a sphere with a specified radius that has a maximal mean value over all sphere with that radius with midpoint inside or at the boundary of the image. Furthermore it can calculate the maximal und minimal pixel intensities and whose indices in the founded sphere.
 
-\section algorithm_description Algorithm description
 
-\subsection gaus_generation Generation of a multigauss image
+\section Multigaussian-image-source-generator Multigaussian image source generator
 
-A multigauss function consists of the sum of \f$N\f$ gauss function. The \f$i\f$-th \linebreak (\f$1 \leq i \leq N\f$) gaussian is described with the following seven parameters:
-  1. \f$x_0^{(i)}\f$ is the expectancy value in the \f$x\f$-Axis
-  2. \f$y_0^{(i)}\f$ is the expectancy value in the \f$y\f$-Axis
-  3. \f$z_0^{(i)}\f$ is the expectancy value in the \f$z\f$-Axis
-  4. \f$\sigma_x^{(i)}\f$ is the deviation in the \f$x\f$-Axis
-  5. \f$\sigma_y^{(i)}\f$ is the deviation in the \f$y\f$-Axis
-  6. \f$\sigma_z^{(i)}\f$ is the deviation in the \f$z\f$-Axis
-  7. \f$a^{(i)}\f$ is the  altitude of the gaussian.
+\subsection Abstract Abstract
+
+The class name is MultiGaussianImageSource and can be found in the directory MINT\Mint_Bin\CMakeExternals\Source\MITK\Modules\ImageStatistics. This class generates an image, which pixel intensities are the values of a multigauss function. The class allows calculating a spherical region of defined size which has a maximal mean value and returns the position and the mean value. Furthermore it can calculate the maximal und minimal pixel intensities and whose indices in the founded sphere.
+
+\subsection Generation-of-a-multigauss-image Generation of a multigauss image
+
+A multigauss function consists of the sum of \f$ N \f$ gauss function. The \f$ i \f$-th \linebreak (\f$0 \leq i \leq N \f$) gaussian is described with the following seven parameters:
+- \f$ x_0^{(i)} \f$ is the expectancy value in the \f$ x \f$-Axis
+- \f$ y_0^{(i)} \f$ is the expectancy value in the \f$ y \f$-Axis
+- \f$ z_0^{(i)} \f$ is the expectancy value in the \f$ z \f$-Axis
+- \f$ \sigma_x^{(i)} \f$ is the deviation in the \f$ x \f$-Axis
+- \f$ \sigma_y^{(i)} \f$ is the deviation in the \f$ y \f$-Axis
+- \f$ \sigma_z^{(i)} \f$ is the deviation in the \f$ z \f$-Axis
+- \f$ a^{(i)} \f$ is the  altitude of the gaussian.
 
 A gauss function has the following form:
 
-\f{eqnarray*}{
+\f{eqnarray}{
+\nonumber
 f^{(i)}(x,y,z) = a^{(i)}
 exp \left[ - \left(
 \frac{(x - x_0^{(i)})^2}{2 (\sigma_x^{(i)})^2} +
@@ -79,8 +85,8 @@ exp \left[ - \left(
 A multigauss function has then the form:
 
 \f{align*}{
-f_N(x,y,z) =& \sum_{i = 1}^{N}f^{(i)}(x,y,z)\\
-=&\sum_{i=1}^{N} a^{(i)}
+f_N(x,y,z) =& \sum_{i=0}^{N}f^{(i)}(x,y,z)\\
+=&\sum_{0}^{N} a^{(i)}
 exp \left[ - \left(
 \frac{(x - x_0^{(i)})^2}{2 (\sigma_x^{(i)})^2} +
 \frac{(y - y_0^{(i)})^2}{2 (\sigma_y^{(i)})^2} +
@@ -90,44 +96,115 @@ exp \left[ - \left(
 
 The multigauss function \f$f_N\f$ will be evaluated at each voxel coordinate to become the voxel intensity.
 
-\subsection calculating_statistics Algorithm for calculating statiscic in a sphere
+\subsection Algorithm-for-calculating-statistic-in-a-sphere Algorithm for calculating statistic in a sphere
 
 This section explains how we can find a sphere region which has a maximal mean value over all sphere regions with a fixed radius. Furthermore we want to calculate the maximal and minimal value in the wanted sphere.
 
-To calculate the mean value in a sphere we use the simple definition of a mean value of a function in a bounded discrete space: the sum of the values of the function divided by the number of the summand.
+To calculate the mean value in a sphere we integrate the gaussians over the whole sphere. The antiderivative is unknown as an explicit function, but we have a value table for the distribution function of the normal distribution \f$ \Phi(x) \f$ for \f$ x \f$ between \f$ -3.99 \f$ and \f$ 3.99 \f$ with step size \f$ 0.01 \f$. The only problem is that we cannot integrate over a spherical region, because we have an 3-dim integral and therefore are the integral limits dependent from each other and we cannot evaluate \f$ \Phi \f$. So we approximate the sphere with cuboids inside the sphere and prisms on the boundary of the sphere. We calculate these cuboids with the octree recursive method: We start by subdividing the wrapping box of the sphere in eight cuboids. Further we subdivide each cuboid in eight cuboids and check for each of them, whether it is inside or outside the sphere or whether it intersects the sphere surface. We save those of them, which are inside the sphere and continue to subdivide the cuboids that intersect the sphere until the recursion breaks. In the last step we take the half of the cuboids on the boundary and this are the prisms. Now we can calculate and sum the integrals over the cuboids and divide through the volume of the body to obtain the mean value.
 
-We discretize the spherical region of interest and use the spherical coordinate system to describe each point \linebreak [\f$x,y,z\f$] in this region:
-
-\f{eqnarray*}{
-x = r \sin(\phi) \cos(\psi)\hspace{20pt}
-y = r \sin(\phi) \sin(\psi)\hspace{20pt}
-z = r \cos(\phi),
-\f}
-
-where \f$r \in [0;R]\f$, \f$\phi \in [0; \pi]\f$, \f$ \psi \in [-\pi; \pi)\f$.
-We decided to have only one discretizing parameter T, which is equal to the number of steps we make to traverse the radius \f$R\f$ of the sphere. So the higher the value of T is, the more accurate the mean value is. The two angle \f$\psi\f$ and \f$\phi\f$ have an equal step size, which is calculate as follows: Define a constant distance (\f$dist\f$) between the points on the sphere with the smallest radius. In our class we set \f$dist\f$ such a value, that on the equator of the smallest sphere only four points lie. Then we calculate for each radius the angle step size in such a way, that the points on the equator of the particular sphere have always the same distance and this should  be approximately  the same as \f$dist\f$ ( exactly the same distance as \f$dist\f$ is not always possible, because the length of the equator is generally not a multiple of a natural number). With such a discretization we almost achieve  a uniformly distribution of the points in the "hot spot" region. So the following term equals the mean value in the sphere with midpoint [\f$x_l, y_l, z_l\f$] for a multigauss function:
+For each cuboid \f$ Q = [a_1, b_1]\times[a_2, b_2]\times[a_3, b_3] \f$ we apply  Fubini's theorem for integrable functions and become for the integral the following:
 
 \f{align*}{
-m_l = & \frac{1}{\kappa}
-\sum_{i = 1}^{T} \sum_{j = 0}^{\eta(i)} \sum_{k = 0}^{2\eta(i)} \sum_{i = 1}^{N} a^{(i)} exp \Big[ - \Big(
- \frac{(r_i \sin(\phi_j) \cos(\psi_k) - x_0^{(i)} + x_l)^2}{2 (\sigma_x^{(i)})^2} \\
-&+\frac{(r_i \sin(\phi_j) \sin(\psi_k) - y_0^{(i)} + y_l)^2}{2 (\sigma_y^{(i)})^2}
-+\frac{(r_i \cos(\phi_j)              - z_0^{(i)} + z_l)^2}{2 (\sigma_z^{(i)})^2}\Big)\Big]
+m_k =& \sum_{i=0}^{N} \int_{Q} f^{(i)}(x,y,z)dx\\
+=&\sum_{i=0}^{N} a^{(i)} \int_{Q}
+exp \left[ - \left(
+\frac{(x - x_0^{(i)})^2}{2 (\sigma_x^{(i)})^2} +
+\frac{(y - y_0^{(i)})^2}{2 (\sigma_y^{(i)})^2} +
+\frac{(z - z_0^{(i)})^2}{2 (\sigma_z^{(i)})^2}
+\right) \right] dx \\
+=& \sum_{i=0}^{N} a^{(i)} \int_{a_1}^{b_1} exp \left[ - \frac{(x - x_0^{(i)})^2}{2 (\sigma_x^{(i)})^2} \right] dx
+ \int_{a_2}^{b_2}exp \left[ -\frac{(y - y_0^{(i)})^2}{2 (\sigma_y^{(i)})^2} \right]dx
+ \int_{a_3}^{b_3}exp \left[ -\frac{(z - z_0^{(i)})^2}{2 (\sigma_z^{(i)})^2} \right]dx.
 \f}
 
-Here denotes \f$\kappa\f$ the number of summand; the radius of the \f$i\f$-th sphere equals its index multiplied by the radius step size and the angle \f$\phi_j\f$ equals its index multiplied by the angle step size (analogical \f$\psi_j\f$):
+So we calculate three one dimensional integrals:
 \f{align*}{
-r_i = i \frac{R}{T}, \hspace{20pt} \phi_j = j \frac{\pi}{\eta(i)}, \hspace{20pt} \psi_k = \pi + k \frac{\pi}{\eta(k)},
+\int_{a}^{b} & exp \left[ - \frac{(x - x_0^{(i)})^2}{2 (\sigma_x^{(i)})^2} \right] dx \\
+=&\int_{-\infty}^{b} exp \left[ - \frac{(x - x_0^{(i)})^2}{2 (\sigma_x^{(i)})^2} \right] dx - \int_{-\infty}^{a} exp \left[ - \frac{(x - x_0^{(i)})^2}{2 (\sigma_x^{(i)})^2} \right] dx \\
+=& \sigma_x^{(i)} \left[\int_{-\infty}^{(a - x_0^{(i)})/ \sigma_x^{(i)}} e^{-\frac{t^2}{2}} dt
+ - \int_{-\infty}^{(b - x_0^{(i)})/ \sigma_x^{(i)}} e^{-\frac{t^2}{2}}dt \right] \\
+=&\sigma_x^{(i)} \sqrt{(\pi)} \left[ \Phi \left( \frac{(a - x_0^{(i)})^2}{\sigma_x^{(i)}} \right) - \Phi \left ( \frac{(b - x_0^{(i)})^2}{\sigma_x^{(i)}} \right) \right].
 \f}
-where \f$\eta(i)\f$ is the number of angle steps: \f$\eta(i)= \left \lfloor \frac{\pi r_i}{dist} \right \rfloor\f$ and \f$dist\f$ the fixed distance between two points: \f$dist  = \frac{\pi R}{2T}\f$. We specify the volume of the "hot spot" to be \f$1\f$ cm\f$^3\f$. The radius of the sphere is there for:
+
+and become for the integral over \f$ Q \f$:
+
 \f{align*}{
-R = \left(\frac{3}{4\pi}\right)^{1/3}.
+m_k =& \sum_{i=0}^{N} \sigma_x^{(i)} \sigma_y^{(i)} \sigma_z^{(i)} \pi^{1.5}
+ \left[ \Phi \left( \frac{(a_1 - x_0^{(i)})^2}{\sigma_x^{(i)}} \right) - \Phi \left ( \frac{(b_1 - x_0^{(i)})^2}{\sigma_x^{(i)}} \right) \right]\times \\
+  &\left[ \Phi \left( \frac{(a_2 - y_0^{(i)})^2}{\sigma_y^{(i)}} \right) - \Phi \left ( \frac{(b_2 - y_0^{(i)})^2}{\sigma_y^{(i)}} \right) \right]\times
+   \left[ \Phi \left( \frac{(a_3 - z_0^{(i)})^2}{\sigma_z^{(i)}} \right) - \Phi \left ( \frac{(b_3 - z_0^{(i)})^2}{\sigma_z^{(i)}} \right) \right].
 \f}
-Now we know how to calculate the mean value in a sphere for given midpoint and radius of the wanted region. So we assume each voxel in the given image to be the sphere midpoint and we calculate the mean value as described  above. If the new mean value is greater then the "maximum-until-now", we take the new value to be the "maximum-until-now". Then we go to the next voxel and make the same calculation and so on. At the same time we save the coordinates  of the midpoint voxel.
+
+For the integral over the prism we take the half of the integral over the corresponding cuboid.
+
+Altogether we become for the mean value in the sphere:
+\f{align*}{
+\left( \sum_{Q_k \text{ Cuboid}} m_k + \sum_{P_l \text{ Prism}} 0.5 m_l \right )/Volume(B),
+\f}
+
+where Volume(B) is the volume of the body that approximate the sphere.
+
+Now we know how to calculate the mean value in a sphere for given midpoint and radius. So we assume each voxel in the given image to be the sphere midpoint and we calculate the mean value as described above. If the new mean value is greater than the "maximum-until-now", we take the new value to be the "maximum-until-now". Then we go to the next voxel and make the same calculation and so on. At the same time we save the coordinates  of the midpoint voxel.
 
 After we found the midpoint and the maximal mean value, we can calculate the maximum and the minimum in the sphere: we just traverse all the voxels in the region and take the maximum and minimum value and the respective coordinates.
 
-We can also optimize the calculation of the mean value in the founded sphere just by increasing the number of  radius steps and calculate this value one more time. We set the new step number to be four time greater then T.
+\subsection  Input-and-output Input and output
+
+An example for an input in the command-line is: mitkMultiGaussianTest C:/temp/outputFile C:/temp/inputFile.xml
+Here is outputFile the name of the gaussian image with extension .nrrd and at the same time the name of the output file with extension .xml, which is the same as the inputFile, only added the calculated mean value, max and min and the corresponding indexes in the statistic tag. Here we see an example for the input and output .xml File:
+
+--------------------- INPUT ---------------------------------------------------
+
+<testcase>
+
+  <testimage image-rows="20" image-columns="20" image-slices="20" numberOfGaussians="2" spacingX="1" spacingY="1" spacingZ="1" entireHotSpotInImage="1">
+
+    <gaussian centerIndexX="4" centerIndexY="16" centerIndexZ="10" deviationX="7" deviationY="7" deviationZ="7" altitude="200"/>
+
+    <gaussian centerIndexX="18" centerIndexY="2" centerIndexZ="10" deviationX="1" deviationY="1" deviationZ="1" altitude="210"/>
+
+  </testimage>
+
+  <segmentation numberOfLabels="1" hotspotRadiusInMM="6.2035">
+
+    <roi label="1" maximumSizeX="20" minimumSizeX="0" maximumSizeY="20" minimumSizeY="0" maximumSizeZ="20" minimumSizeZ="0"/>
+
+  </segmentation>
+
+</testcase>
+
+--------------------- OUTPUT  ---------------------------------------------------
+
+<testcase>
+
+  <testimage image-rows="20" image-columns="20" image-slices="20" numberOfGaussians="2" spacingX="1" spacingY="1" spacingZ="1" entireHotSpotInImage="1">
+
+    <gaussian centerIndexX="4" centerIndexY="16" centerIndexZ="10" deviationX="7" deviationY="7" deviationZ="7" altitude="200"/>
+
+    <gaussian centerIndexX="18" centerIndexY="2" centerIndexZ="10" deviationX="1" deviationY="1" deviationZ="1" altitude="210"/>
+
+  </testimage>
+
+  <segmentation numberOfLabels="1" hotspotRadiusInMM="6.2035">
+
+    <roi label="1" maximumSizeX="20" minimumSizeX="0" maximumSizeY="20" minimumSizeY="0" maximumSizeZ="20" minimumSizeZ="0"/>
+
+  </segmentation>
+
+  <statistic hotspotIndexX="6" hotspotIndexY="13" hotspotIndexZ="10" peak="141.544" mean="141.544" maximumIndexX="4" maximumIndexY="16" maximumIndexZ="10" maximum="200" minimumIndexX="9" minimumIndexY="8" minimumIndexZ="8"  minimum="77.4272"/>
+
+</testcase>
+
+\subsection  Parameter-for-the-input Parameter for the input
+
+In the tag \a testimage we describe the image that we generate. Image rows/columns/slices gives the number of rows/columns/slices of the image; \a numberOfGaussians is  the number of gauss functions (\f$ N \f$); spacing defines the extend of one voxel for each direction. The parameter \a entireHotSpotInImage determines whether the whole sphere is in the image included (\f$ = 1 \f$) or only the midpoint of the sphere is inside the image.
+
+NOTE: When the \a entireHotSpotInImage \f$ = 0 \f$ it is possible that we find the midpoint of the sphere on the border of the image. In this case we cut the approximation of the sphere, so that we become a body, which is completely inside the image, but not a "sphere" anymore. To that effect is the volume of the body decreased and that could lead to unexpected results.
+
+In the subtag \a gaussian we describe each gauss function as mentioned in the second section.
+
+In the tag \a segmentation we define the radius of the wanted sphere in mm (\a hotspotRadiusInMM ). We can also set the number of labels (\a numberOfLabels ) to be an positive number and this determines the number of regions of interest(ROI). In each ROI we find the sphere with the wanted properties and midpoint inside the ROI, but not necessarily the whole sphere. In the subtag \a roi we set label number and the index coordinates for the borders of the roi.
+
 */
 template< typename TOutputImage >
 class ITK_EXPORT MultiGaussianImageSource:public ImageSource< TOutputImage >
@@ -175,71 +252,68 @@ public:
    typedef  MapContainer<unsigned int, double>                MapContainerRadius;
 
 
-  /** Set/Get size of the output image */
+  /** Set/Get size of the output image. */
   itkSetMacro(Size, SizeType);
   virtual void SetSize(SizeValueArrayType sizeArray);
   virtual const SizeValueType * GetSize() const;
-  /** Set/Get spacing of the output image */
+  /** Set/Get spacing of the output image. */
   itkSetMacro(Spacing, SpacingType);
   virtual void SetSpacing(SpacingValueArrayType spacingArray);
   virtual const SpacingValueType * GetSpacing() const;
-  /** Set/Get origin of the output image */
+  /** Set/Get origin of the output image. */
   itkSetMacro(Origin, PointType);
   virtual void SetOrigin(PointValueArrayType originArray);
   virtual const PointValueType * GetOrigin() const;
-  /** Get the number of gaussian functions in the output image */
+  /** Get the number of gaussian functions in the output image. */
   virtual unsigned int GetNumberOfGaussians() const;
-  /** Set the number of gaussian function*/
+  /** Set the number of gaussian function. */
   virtual void SetNumberOfGausssians( unsigned int );
-  /** Set/Get the radius of the sphere */
+  /** Set/Get the radius of the sphere. */
   virtual const RadiusType GetRadius() const;
   virtual void  SetRadius( RadiusType  radius );
-  /** Set/Get the number of steps to traverse the radius of the sphere */
+  /** Set/Get the number of steps to traverse the radius of the sphere. */
   virtual const  int GetRadiusStepNumber() const;
-  /** Set the number of steps to traverse the radius */
+  /** Set the number of steps to traverse the radius. */
   virtual void  SetRadiusStepNumber( unsigned int stepNumber );
-  /** Get the maximal mean value in a sphere over all possible spheres with midpoint in the image */
+  /** Get the maximal mean value in a sphere over all possible spheres with midpoint in the image. */
   virtual const OutputImagePixelType GetMaxMeanValue() const;
-  /** Get the index of the midpoint of a sphere with the maximal mean value */
+  /** Get the index of the midpoint of a sphere with the maximal mean value.*/
   virtual const IndexType GetSphereMidpoint() const;
-  /** Calculates the value of the multigaussian function at a Point given by its coordinates [x;y;z] */
+  /** Calculates the value of the multigaussian function at a Point given by its coordinates [x, y, z]. */
   virtual const double MultiGaussianFunctionValueAtPoint(double , double, double);
   /** Adds a multigaussian defined by the parameter: CenterX, CenterY, CenterZ, SigmaX, SigmaY, SigmaZ, Altitude.
    All parameters should have the same size, which determinates the number of the gaussian added. */
   virtual void AddGaussian( VectorType, VectorType, VectorType, VectorType, VectorType, VectorType, VectorType);
-  /** Calculates and set the index of the midpoint of the sphere with the maximal mean value as well as the mean value*/
-  virtual void CalculateMidpointAndMeanValue();
-  /** Calculates and set the index an the value of maximulm and minimum in the wanted sphere*/
+  /** Calculates and set the index of the midpoint of the sphere with the maximal mean value as well as the mean value. */
+  virtual void CalculateTheMidpointAndTheMeanValueWithOctree();
+  /** Calculates and set the index an the value of maximulm and minimum in the wanted sphere. */
   virtual void CalculateMaxAndMinInSphere();
-  /** Get the index in the sphere with maximal value*/
+  /** Get the index in the sphere with maximal value. */
   virtual const IndexType GetMaxValueIndexInSphere() const;
-  /** Get the maximal value in the sphere*/
+  /** Get the maximal value in the sphere. */
   virtual const OutputImagePixelType GetMaxValueInSphere() const;
-  /** Get the index in the sphere with minimal value*/
+  /** Get the index in the sphere with minimal value. */
   virtual const IndexType GetMinValueIndexInSphere() const;
-  /** Get the minimal value in the sphere*/
+  /** Get the minimal value in the sphere. */
   virtual const OutputImagePixelType GetMinValueInSphere() const;
-  /** Set the region of interest */
+  /** Set the region of interest. */
   virtual void SetRegionOfInterest(ItkVectorType, ItkVectorType);
-  /** Optimize the mean value in the wanted sphere*/
-  virtual void OptimizeMeanValue();
-  /** Write a .mps file to visualise the point in the sphere*/
-  // virtual void WriteXMLToTest();
-  // virtual void WriteXMLToTestTheCuboid();
+  /** Write a .mps file to visualise the point in the sphere. */
   virtual void WriteXMLToTestTheCuboidInsideTheSphere();
-  virtual void CalculateTheMidPointMeanValueWithOctree();
+  /**This recursive method realise the octree method. It subdivide a cuboid in eight cuboids, when this cuboid crosses the boundary of sphere. If the cuboid is inside the sphere, it calculates the integral. */
   virtual void CalculateEdgesInSphere( PointType globalCoordinateMidpointCuboid, PointType globalCoordinateMidpointSphere, double cuboidRadius, int level);
+  /**Calculate and return value of the integral of the gaussian in a cuboid region with the dimension 3: in the x-axis between xMin and xMax and in the y-axis between yMin and yMax and in the z-axis also between zMin and zMax. */
   virtual double MultiGaussianFunctionValueAtCuboid(double xMin, double xMax, double yMin, double yMax, double zMin, double zMax);
+  /** Inseret the midpoints of cuboid in a vector m_Midpoints, so that we can visualise it. */
   virtual void InsertPoints( PointType globalCoordinateMidpointCuboid, double cuboidRadius);
+  /** Start the octree recursion in eigth directions for the sphere with midpoint globalCoordinateMidpointSphere. */
   virtual void GenerateCuboidSegmentationInSphere( PointType globalCoordinateMidpointSphere );
+  /** Get the  the values of the cumulative distribution function of the normal distribution. */
   virtual double FunctionPhi(double value);
-
-  //virtual void CalculateMidpoint();
-
+  /** Check if a cuboid with midpoint globalCoordinateMidpointCuboid and side length sideLength intersect the sphere with midpoint globalCoordinateMidpointSphere boundary. */
   virtual  unsigned int IntersectTheSphere( PointType globalCoordinateMidpointCuboid, PointType globalCoordinateMidpointSphere, double sideLength);
+  /** Set the tabel values of the distribution function of the normal distribution. */
   void SetNormalDistributionValues();
-
-  //double Quadtrees( PointType globalCoordinateMidpointCuboid, PointType globalCoordinateMidpointSphere,  double sideLength, double meanValueTemp);
 
 
   /** Set the minimum possible pixel value. By default, it is
@@ -285,7 +359,7 @@ private:
   RadiusType                                m_Radius;                //radius of the sphere
   unsigned int                              m_RadiusStepNumber;      //number of steps to traverse the sphere radius
   OutputImagePixelType                      m_MeanValue;             //mean value in the wanted sphere
-  OutputImagePixelType                      m_ValueAtMidpoint;        //value at the midpoint of the wanted sphere
+  OutputImagePixelType                      m_ValueAtMidpoint;       //value at the midpoint of the wanted sphere
   IndexType                                 m_SphereMidpoint;        //midpoint of the wanted sphere
   VectorType                                m_SigmaX;                //deviation in the x-axis
   VectorType                                m_SigmaY;                //deviation in the y-axis
@@ -294,19 +368,17 @@ private:
   VectorType                                m_CenterY;               //y-coordinate of the mean value of Gaussians
   VectorType                                m_CenterZ;               //z-coordinate of the mean value of Gaussians
   VectorType                                m_Altitude;              //amplitude
-  ItkVectorType                             m_RegionOfInterestMax;   // maximal values for the coordinates in the region of interest
-  ItkVectorType                             m_RegionOfInterestMin;   // minimal values for the coordinates in the region of interest
+  ItkVectorType                             m_RegionOfInterestMax;   //maximal values for the coordinates in the region of interest
+  ItkVectorType                             m_RegionOfInterestMin;   //minimal values for the coordinates in the region of interest
   typename TOutputImage::PixelType          m_Min;                   //minimum possible value
   typename TOutputImage::PixelType          m_Max;                   //maximum possible value
-  PointType                                 m_GlobalCoordinate;      // physical coordiante of the sphere midpoint
-  bool                                      m_dispVol;
-
-  MapContainerPoints                        m_Midpoints;
-  MapContainerRadius                        m_RadiusCuboid;
-  double                                    m_Volume;
-  VectorType                                m_XCoordToTest, m_YCoordToTest, m_ZCoordToTest;
-  double                                    m_NormalDistValues [410];
-  double                                    m_meanValueTemp;
+  PointType                                 m_GlobalCoordinate;      //physical coordiante of the sphere midpoint
+  bool                                      m_WriteMPS;              //1 = write a MPS File to visualise the cuboid midpoints of one approximation of the sphere
+  MapContainerPoints                        m_Midpoints;             //the midpoints of the cuboids
+  MapContainerRadius                        m_RadiusCuboid;          //the radius ( = 0.5 * side length) of the cuboids (in the same order as the midpoints in m_Midpoints)
+  double                                    m_Volume;                //the volume of the body, that approximize the sphere
+  double                                    m_NormalDistValues [410];//normal distribution values
+  double                                    m_meanValueTemp;         //= m_Volume * meanValue in each sphere
   // The following variables are deprecated, and provided here just for
   // backward compatibility. It use is discouraged.
   mutable PointValueArrayType               m_OriginArray;

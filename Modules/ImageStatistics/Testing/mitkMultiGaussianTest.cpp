@@ -32,8 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 //  <testimage image-rows="20" image-columns="20" image-slices="20" numberOfGaussians="1" spacingX="1" spacingY="1" spacingZ="1" entireHotSpotInImage="1">
 //    <gaussian centerIndexX="10" centerIndexY="10" centerIndexZ="10" deviationX="6" deviationY="6" deviationZ="6" altitude="200"/>
 //  </testimage>
-//<segmentation numberOfLabels="1" hotspotRadiusInMM="6.2035">
-//  <roi label="1" maximumSizeX="20" minimumSizeX="0" maximumSizeY="20" minimumSizeY="0" maximumSizeZ="20" minimumSizeZ="0"/>
+//<segmentation numberOfLabels="2" hotspotRadiusInMM="6.2035">
+//  <roi label="1" maximumSizeX="20" minimumSizeX="12" maximumSizeY="20" minimumSizeY="12" maximumSizeZ="20" minimumSizeZ="12"/>
+//  <roi label="2" maximumSizeX="10" minimumSizeX="0" maximumSizeY="10" minimumSizeY="0" maximumSizeZ="10" minimumSizeZ="0"/>
 // </segmentation>
 //</testcase>
 //
@@ -48,311 +49,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 // </segmentation>
 //  <statistic hotspotIndexX="50" hotspotIndexY="50" hotspotIndexZ="25" peak="291.067" mean="291.067" maximumIndexX="50" maximumIndexY="50" maximumIndexZ="25" maximum="367.469" minimumIndexX="55" minimumIndexY="53" minimumIndexZ="26" minimum="254.939"/>
 //</testcase>
-//
-//bin\Release\ImageStatisticsTestDriver.exe mitkMultiGaussianTest C:/temp/TestImage/image 1 12 12 10 1 1 5 20 200 "2.5" "2.5" 3
-//
-// bin\Release\ImageStatisticsTestDriver.exe mitkMultiGaussianTest C:/temp/HotSpotTestImage/ImageNeu30 5 30 30 15 1 5 15 20 200 1 1 2
+
+
+bool IsInOtherROI(int,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType);
+
 
 int mitkMultiGaussianTest(int argc, char* argv[])
 {
-  //if ( argc != 14 || argc != 3 )
-  //{
-  //  std::cerr << " 14 arguments expected: [outputFilename, numberOfImages, imageSizeX, imageSizeY, imageSizeZ, numberOfGaussians, minWidthOfGaussian, maxWidthOfGaussian, minAltitudeOfGaussian, maxAltitudeOfGaussian, spacingX, spacingY, spacingZ ] \n OR \n 3 argument expected : [outputFilename, input.xml] \n " << std::endl;
-  //  return EXIT_FAILURE;
-  //}
-  //// always start with this!
-  //MITK_TEST_BEGIN("mitkMultiGaussianTest");
-  //MITK_TEST_CONDITION_REQUIRED(argc == 14, "Test called with 14 parameters");
-
-  if( argc == 14)
-  {
-
-
-    const unsigned int                                                   Dimension = 3;
-    typedef double                                                       PixelType;
-    typedef itk::DOMNode::Pointer                                        DOMNodeType;
-    typedef  itk::Image<PixelType, Dimension>                            ImageType;
-    typedef itk::MultiGaussianImageSource< ImageType >                   MultiGaussianImageSource;
-    std::string                                                          outputFilename = argv[1], name;
-    int                                                                  numberOfImages;
-    double                                                               centerX, centerY, centerZ, sigmaX, sigmaY, sigmaZ, altitude;
-    unsigned int                                                         numberOfGaussians, minWidthOfGaussian, maxWidthOfGaussian, minAltitudeOfGaussian, maxAltitudeOfGaussian;
-    itk::MultiGaussianImageSource< ImageType >::VectorType               centerXVec, centerYVec, centerZVec, sigmaXVec, sigmaYVec, sigmaZVec, altitudeVec;
-    itk::MultiGaussianImageSource< ImageType >::ItkVectorType            regionOfInterestMax, regionOfInterestMin;
-    itk::MultiGaussianImageSource< ImageType >::IndexType                sphereMidpt, maxValueIndexInSphere, minValueIndexInSphere;
-    itk::MultiGaussianImageSource< ImageType >::ItkVectorType            X, Y, Z, Sig, Alt;
-    MultiGaussianImageSource::Pointer                                    gaussianGenerator;
-    itk::DOMNodeXMLWriter::Pointer                                       xmlWriter;
-    itk::MultiGaussianImageSource< ImageType >::SpacingValueArrayType    spacing;
-    DOMNodeType                                                          domTestCase, domTestImage, domGaussian, domStatistics, domROI;
-    ImageType::SizeValueType                                             size[3];
-    std::stringstream                                                    ss;
-    double                                                               radius = pow(itk::Math::one_over_pi * 0.75 , 1.0 / 3.0) * 10;
-    char *                                                               fileNamePointer;
-
-    if ( ! (std::istringstream(argv[2]) >> numberOfImages) ) numberOfImages = 0;
-    if ( ! (std::istringstream(argv[3]) >> size[0]) ) size[0] = 0;
-    if ( ! (std::istringstream(argv[4]) >> size[1]) ) size[1] = 0;
-    if ( ! (std::istringstream(argv[5]) >> size[2]) ) size[2] = 0;
-    if ( ! (std::istringstream(argv[6]) >> numberOfGaussians) ) numberOfGaussians = 0;
-    if ( ! (std::istringstream(argv[7]) >> minWidthOfGaussian) ) minWidthOfGaussian = (size[0] +  size[1] + size[2]) / 27;
-    if ( ! (std::istringstream(argv[8]) >> maxWidthOfGaussian) ) maxWidthOfGaussian = (size[0] +  size[1] + size[2]) / 9;
-    if ( ! (std::istringstream(argv[9]) >> minAltitudeOfGaussian) ) minAltitudeOfGaussian = 5;
-    if ( ! (std::istringstream(argv[10]) >> maxAltitudeOfGaussian) ) maxAltitudeOfGaussian = 200;
-    if ( ! (std::istringstream(argv[11]) >> spacing[0]) ) spacing[0] = 1;
-    if ( ! (std::istringstream(argv[12]) >> spacing[1]) ) spacing[1] = 1;
-    if ( ! (std::istringstream(argv[13]) >> spacing[2]) ) spacing[2] = 1;
-
-    // Set region of interest in pixels
-    regionOfInterestMax.SetElement(0, size[0] - static_cast<int>((radius)/spacing[0] + 0.9999) - 1);
-    regionOfInterestMax.SetElement(1, size[1] - static_cast<int>((radius)/spacing[1] + 0.9999) - 1);
-    regionOfInterestMax.SetElement(2, size[2] - static_cast<int>((radius)/spacing[2] + 0.9999) - 1);
-    regionOfInterestMin.SetElement(0, 0 + static_cast<int>((radius)/spacing[0]+ 0.9999));
-    regionOfInterestMin.SetElement(1, 0 + static_cast<int>((radius)/spacing[1]+ 0.9999));
-    regionOfInterestMin.SetElement(2, 0 + static_cast<int>((radius)/spacing[2]+ 0.9999));
-
-    srand (time(NULL));
-    int numberAddGaussian = numberOfGaussians;
-    unsigned int k = 0;
-    unsigned int count = 0;
-    while(k != numberOfImages && count < 500)
-      // for(unsigned  int k = 1; k <= numberOfImages; ++k)
-    {
-      ++count;
-      gaussianGenerator = MultiGaussianImageSource::New();
-      gaussianGenerator->SetSize( size );
-      gaussianGenerator->SetSpacing( spacing );
-      gaussianGenerator->SetRadiusStepNumber(8);
-      gaussianGenerator->SetRadius(radius);
-      gaussianGenerator->SetNumberOfGausssians(numberOfGaussians);
-      gaussianGenerator->SetRegionOfInterest(regionOfInterestMin, regionOfInterestMax);
-      // DOM Node Writer
-      xmlWriter = itk::DOMNodeXMLWriter::New();
-      domTestCase =  itk::DOMNode::New();
-      domTestCase->SetName("testcase");
-      domTestImage =  itk::DOMNode::New();
-      domTestImage->SetName("testimage");
-      ss.str("");
-      ss << size[0];
-      domTestImage->SetAttribute("image-rows", ss.str());
-      ss.str("");
-      ss << size[1];
-      domTestImage->SetAttribute("image-columns", ss.str());
-      ss.str("");
-      ss << size[2];
-      domTestImage->SetAttribute("image-slices", ss.str());
-      ss.str("");
-      ss << numberOfGaussians;
-      domTestImage->SetAttribute("numberOfGaussians", ss.str());
-      ss.str("");
-      ss << spacing[0];
-      domTestImage->SetAttribute("spacingX", ss.str());
-      ss.str("");
-      ss << spacing[1];
-      domTestImage->SetAttribute("spacingY", ss.str());
-      ss.str("");
-      ss << spacing[2];
-      domTestImage->SetAttribute("spacingZ", ss.str());
-      domTestCase->AddChildAtBegin(domTestImage);
-
-      for( unsigned int i = 0; i < numberAddGaussian; ++i)
-      {
-
-        domGaussian =  itk::DOMNode::New() ;
-        domGaussian->SetName("gaussian");
-        domTestImage->AddChildAtEnd(domGaussian);
-        // generate the midpoint and the daviation in mm
-        centerX = rand() % static_cast<int>(size[0] * spacing[0]);
-        ss.str("");
-        ss << centerX;
-        domGaussian->SetAttribute("centerIndexX", ss.str());
-
-        centerY = rand() % static_cast<int>(size[1] * spacing[1]);
-        ss.str("");
-        ss << centerY;
-        domGaussian->SetAttribute("centerIndexY", ss.str());
-
-        centerZ = rand() % static_cast<int>(size[2] * spacing[2]);
-        ss.str("");
-        ss << centerZ;
-        domGaussian->SetAttribute("centerIndexZ", ss.str());
-
-        sigmaX = minWidthOfGaussian + rand() % (maxWidthOfGaussian - minWidthOfGaussian);
-        ss.str("");
-        ss << sigmaX;
-        domGaussian->SetAttribute("deviationX", ss.str());
-
-        sigmaY = minWidthOfGaussian + rand() % (maxWidthOfGaussian - minWidthOfGaussian);
-        ss.str("");
-        ss << sigmaY;
-        domGaussian->SetAttribute("deviationY", ss.str());
-
-        sigmaZ = minWidthOfGaussian + rand() % (maxWidthOfGaussian - minWidthOfGaussian);
-        ss.str("");
-        ss << sigmaZ;
-        domGaussian->SetAttribute("deviationZ", ss.str());
-
-        altitude = minAltitudeOfGaussian + rand() % (maxAltitudeOfGaussian - minAltitudeOfGaussian);
-        ss.str("");
-        ss << altitude;
-        domGaussian->SetAttribute("altitude", ss.str());
-
-        centerXVec.push_back(centerX);
-        centerYVec.push_back(centerY);
-        centerZVec.push_back(centerZ);
-        sigmaXVec.push_back(sigmaX);
-        sigmaYVec.push_back(sigmaY);
-        sigmaZVec.push_back(sigmaZ);
-        altitudeVec.push_back(altitude);
-
-      }
-
-      gaussianGenerator->AddGaussian(centerXVec, centerYVec, centerZVec, sigmaXVec, sigmaYVec, sigmaZVec, altitudeVec);
-      centerXVec.clear();
-      centerYVec.clear();
-      centerZVec.clear();
-      sigmaXVec.clear();
-      sigmaYVec.clear();
-      sigmaZVec.clear();
-      altitudeVec.clear();
-      try {
-        gaussianGenerator->Update();
-        gaussianGenerator->CalculateMidpointAndMeanValue();
-      } catch (std::exception& e)
-      {
-        std::cout << "Error: " << e.what() << std::endl;
-      }
-
-      //region of interest
-      domROI = itk::DOMNode::New();
-      domROI->SetName("roi");
-      domTestCase->AddChildAtEnd(domROI);
-      ss.str("");
-      ss << radius;
-      domROI->SetAttribute("hotspotRadiusInMM", ss.str());
-      ss.str("");
-      ss << regionOfInterestMax[0];
-      domROI->SetAttribute("maximumSizeX", ss.str());
-      ss.str("");
-      ss << regionOfInterestMin[0];
-      domROI->SetAttribute("minimumSizeX", ss.str());
-      ss.str("");
-      ss << regionOfInterestMax[1];
-      domROI->SetAttribute("maximumSizeY", ss.str());
-      ss.str("");
-      ss << regionOfInterestMin[1];
-      domROI->SetAttribute("minimumSizeY", ss.str());
-      ss.str("");
-      ss << regionOfInterestMax[2];
-      domROI->SetAttribute("maximumSizeZ", ss.str());
-      ss.str("");
-      ss << regionOfInterestMin[2];
-      domROI->SetAttribute("minimumSizeZ", ss.str());
-
-      //peak and peak coordinate
-      domStatistics = itk::DOMNode::New();
-      domStatistics->SetName("statistic");
-      domTestCase->AddChildAtEnd(domStatistics);
-      sphereMidpt = gaussianGenerator->GetSphereMidpoint();
-      ss.str("");
-      ss << sphereMidpt[0];
-      domStatistics->SetAttribute("hotspotIndexX", ss.str());
-      ss.str("");
-      ss << sphereMidpt[1];
-      domStatistics->SetAttribute("hotspotIndexY", ss.str());
-      ss.str("");
-      ss << sphereMidpt[2];
-      domStatistics->SetAttribute("hotspotIndexZ", ss.str());
-      ss.str("");
-      ss << gaussianGenerator->GetMaxMeanValue();
-      domStatistics->SetAttribute("peak", ss.str());
-
-      //optimize the mean value in the sphere
-      //  gaussianGenerator->OptimizeMeanValue();
-      ss.str("");
-      ss << gaussianGenerator->GetMaxMeanValue();
-      domStatistics->SetAttribute("mean", ss.str());
-
-
-      //maximum and maximum coordinate
-      gaussianGenerator->CalculateMaxAndMinInSphere();
-      maxValueIndexInSphere = gaussianGenerator->GetMaxValueIndexInSphere();
-      ss.str("");
-      ss << maxValueIndexInSphere[0];
-      domStatistics->SetAttribute("maximumIndexX", ss.str());
-      ss.str("");
-      ss << maxValueIndexInSphere[1];
-      domStatistics->SetAttribute("maximumIndexY", ss.str());
-      ss.str("");
-      ss << maxValueIndexInSphere[2];
-      domStatistics->SetAttribute("maximumIndexZ", ss.str());
-      ss.str("");
-      ss << gaussianGenerator->GetMaxValueInSphere();
-      domStatistics->SetAttribute("maximum", ss.str());
-
-      //minimum and minimum coordinate
-      minValueIndexInSphere = gaussianGenerator->GetMinValueIndexInSphere();
-      ss.str("");
-      ss << minValueIndexInSphere[0];
-      domStatistics->SetAttribute("minimumIndexX", ss.str());
-      ss.str("");
-      ss << minValueIndexInSphere[1];
-      domStatistics->SetAttribute("minimumIndexY", ss.str());
-      ss.str("");
-      ss << minValueIndexInSphere[2];
-      domStatistics->SetAttribute("minimumIndexZ", ss.str());
-      ss.str("");
-      ss << gaussianGenerator->GetMinValueInSphere();
-      domStatistics->SetAttribute("minimum", ss.str());
-
-
-      // test if the midpoint of the sphere is not the same as the maximum's index and saves only such a case
-      if( sphereMidpt[0]!= maxValueIndexInSphere[0] && sphereMidpt[1]!= maxValueIndexInSphere[1] && sphereMidpt[2]!= maxValueIndexInSphere[2])
-      {
-        k++;
-        // .xml (Data)
-        ss.str("");
-        if(k < 10){
-          ss << outputFilename <<"00"<< k <<".xml";
-        }else if(k < 100){
-          ss << outputFilename <<"0"<< k <<".xml";
-        }else{   ss << outputFilename << k <<".xml";}
-        name = ss.str();
-        fileNamePointer = (char*) name.c_str();
-        xmlWriter->SetFileName( fileNamePointer);
-        xmlWriter->SetInput( domTestCase );
-        xmlWriter->Update();
-        ImageType::Pointer gaussianImage = gaussianGenerator->GetOutput();
-
-        //.nrrd (Image)
-        typedef  itk::ImageFileWriter< ImageType  > WriterType;
-        WriterType::Pointer writer = WriterType::New();
-        ss.str("");
-        if(k < 10)
-        {
-          ss << outputFilename <<"00"<< k <<".nrrd";
-        }else if(k < 100)
-        {
-          ss << outputFilename <<"0"<< k <<".nrrd";
-        }else
-        {
-          ss << outputFilename << k <<".nrrd";
-        }
-        name = ss.str();
-        fileNamePointer = (char*) name.c_str();
-        writer->SetFileName( fileNamePointer);
-        writer->SetInput( gaussianImage );
-        writer->Update();
-      }
-    }
-  }
-
-
-  //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // Read the parmaeter from a .xml File.
-  // In the inputFile.xml we find the characteristics of the Gaussian and the ROI's. Hier we can have more then one ROI -> we find the hot spot for each of the ROI's; we can set the entire HotSpot to be in the ROI or just its midpoint, but not necessary the whole HotSpot.
-  else
-  {
+  // In the inputFile.xml we find the characteristics of the Gaussian and the ROI's. Hier we can have more then one ROI -> we find the hot spot for each of the ROI's; we can set the entire HotSpot to be in the image or just its midpoint, but not necessary the whole HotSpot.
+
     const unsigned int                                                   Dimension = 3;
     typedef double    PixelType;
     typedef itk::DOMNode::Pointer                                        DOMNodeType;
@@ -365,7 +77,6 @@ int mitkMultiGaussianTest(int argc, char* argv[])
     itk::MultiGaussianImageSource< ImageType >::VectorType               centerXVec, centerYVec, centerZVec, sigmaXVec, sigmaYVec, sigmaZVec, altitudeVec,  ROImaxSizeX, ROIminSizeX, ROImaxSizeY, ROIminSizeY, ROImaxSizeZ, ROIminSizeZ, label;
     itk::MultiGaussianImageSource< ImageType >::ItkVectorType            regionOfInterestMax, regionOfInterestMin;
     itk::MultiGaussianImageSource< ImageType >::IndexType                sphereMidpt, maxValueIndexInSphere, minValueIndexInSphere;
-    itk::MultiGaussianImageSource< ImageType >::ItkVectorType            X, Y, Z, Sig, Alt;
     MultiGaussianImageSource::Pointer                                    gaussianGenerator;
     itk::DOMNodeXMLWriter::Pointer                                       xmlWriter;
     itk::MultiGaussianImageSource< ImageType >::SpacingValueArrayType    spacing;
@@ -390,7 +101,7 @@ int mitkMultiGaussianTest(int argc, char* argv[])
     NodeList testimages;
     domRoot->GetChildren("testimage", testimages);
     MITK_TEST_CONDITION_REQUIRED( testimages.size() == 1, "One test image defined" )
-      itk::DOMNode* testimage = testimages[0];
+    itk::DOMNode* testimage = testimages[0];
 
     attributeValue = testimage->GetAttribute("image-rows");
     std::stringstream(attributeValue) >> size[0];
@@ -420,34 +131,34 @@ int mitkMultiGaussianTest(int argc, char* argv[])
     for(int i = 0; i < numberOfGaussians ; ++i)
     {
       gaussian = gaussians[i];
-
+      //TODO
       attributeValue = gaussian->GetAttribute( "centerIndexX" );
       std::stringstream(attributeValue) >> value;
-      centerXVec.push_back(value);
+      centerXVec.push_back(value * spacing[0]);
 
       attributeValue = gaussian->GetAttribute( "centerIndexY" );
       std::stringstream(attributeValue) >> value;
-      centerYVec.push_back(value);
+      centerYVec.push_back(value * spacing[1]);
 
       attributeValue = gaussian->GetAttribute( "centerIndexZ" );
       std::stringstream(attributeValue) >> value;
-      centerZVec.push_back(value);
+      centerZVec.push_back(value * spacing[2]);
 
-      std::cout << "Read center of Gaussian (x,y,z): " << centerXVec[i] << ", " << centerYVec[i] << ", " << centerZVec[i] << "\n" << std::endl;
+      std::cout << "Read center of Gaussian (x,y,z) in mm: " << centerXVec[i] << ", " << centerYVec[i] << ", " << centerZVec[i] << "\n" << std::endl;
 
       attributeValue = gaussian->GetAttribute( "deviationX" );
       std::stringstream(attributeValue) >> value;
-      sigmaXVec.push_back(value);
+      sigmaXVec.push_back(value * spacing[0]);
 
       attributeValue = gaussian->GetAttribute( "deviationY" );
       std::stringstream(attributeValue) >> value;
-      sigmaYVec.push_back(value);
+      sigmaYVec.push_back(value * spacing[1]);
 
       attributeValue = gaussian->GetAttribute( "deviationZ" );
       std::stringstream(attributeValue) >> value;
-      sigmaZVec.push_back(value);
+      sigmaZVec.push_back(value * spacing[2]);
 
-      std::cout << "Read deviation of Gaussian (x,y,z): " << sigmaXVec[i] << ", " << sigmaYVec[i] << ", " << sigmaZVec[i] << "\n" << std::endl;
+      std::cout << "Read deviation of Gaussian (x,y,z) in mm: " << sigmaXVec[i] << ", " << sigmaYVec[i] << ", " << sigmaZVec[i] << "\n" << std::endl;
 
       attributeValue = gaussian->GetAttribute( "altitude" );
       std::stringstream(attributeValue) >> value;
@@ -455,22 +166,19 @@ int mitkMultiGaussianTest(int argc, char* argv[])
       std::cout << "Read altitude: " << altitudeVec[i] << "\n" << std::endl;
     }
 
-
-
     // read ROI's parameter
     NodeList segmentations;
     domRoot->GetChildren("segmentation", segmentations);
     MITK_TEST_CONDITION_REQUIRED( segmentations.size() == 1, "One ROI image defined" )
-      itk::DOMNode* segmentation = segmentations[0];
+    itk::DOMNode* segmentation = segmentations[0];
 
     attributeValue = segmentation->GetAttribute("numberOfLabels");
     std::stringstream(attributeValue) >> numberOfLabels;
     attributeValue = segmentation->GetAttribute("hotspotRadiusInMM");
     std::stringstream(attributeValue) >> hotSpotRadiusInMM;
 
-
-    std::cout << "Read number of labels: " << numberOfLabels << "\n" << std::endl;
-    std::cout << "Read radius in mm : " << hotSpotRadiusInMM << "\n" << std::endl;
+    std::cout << "Read number of labels: " << numberOfLabels << std::endl;
+    std::cout << "Read radius in mm : " << hotSpotRadiusInMM << std::endl;
 
     NodeList rois;
     segmentation->GetChildren("roi", rois);
@@ -508,11 +216,23 @@ int mitkMultiGaussianTest(int argc, char* argv[])
       std::stringstream(attributeValue) >> value;
       ROIminSizeZ.push_back(value);
 
-      std::cout << "Read ROI with label number: " << label[i] << " with min and max values in the x-, y-, z-Achse: [" << ROIminSizeX[i] << ROImaxSizeX[i] <<"], [" << ROIminSizeY[i] << ROImaxSizeY[i] <<"], [" << ROIminSizeZ[i] << ROImaxSizeZ[i] <<"]\n" << std::endl;
+      std::cout << "Read ROI with label number: " << label[i] << " with min and max values in the x-, y-, z-Achse: [" << ROIminSizeX[i] << " " << ROImaxSizeX[i] <<"], [" << ROIminSizeY[i] << " " << ROImaxSizeY[i] <<"], [" << ROIminSizeZ[i] << " " << ROImaxSizeZ[i] <<"]\n" << std::endl;
     }
 
-    //write test image parameter
+    // Check whether the ROI's are correct defined, i.e. whether the ROI's are disjoint
+    for(int i = 1; i < numberOfLabels ; ++i)
+    {
+      // check whether the edges of the i'th ROI is in another ROI included (when yes -> ERROR)
+      bool isInOtherROI = IsInOtherROI( i, ROIminSizeX, ROImaxSizeX, ROIminSizeY, ROImaxSizeY, ROIminSizeZ, ROImaxSizeZ );
+      if( isInOtherROI)
+      {
+        std::cout << "The ROI's in the different labels should be disjoint! Please define it correct. " << std::endl;
+        return 0;
+      }
+    }
 
+
+    //write test image parameter
     xmlWriter = itk::DOMNodeXMLWriter::New();
     domTestCase =  itk::DOMNode::New();
     domTestCase->SetName("testcase");
@@ -542,46 +262,43 @@ int mitkMultiGaussianTest(int argc, char* argv[])
     ss.str("");
     ss << entireHotSpotInImage;
     domTestImage->SetAttribute("entireHotSpotInImage", ss.str());
-
     domTestCase->AddChildAtBegin(domTestImage);
 
-    int numberAddGaussian = numberOfGaussians;
-
-    for( unsigned int i = 0; i < numberAddGaussian; ++i)
+    for( unsigned int i = 0; i < numberOfGaussians; ++i)
     {
 
       domGaussian =  itk::DOMNode::New() ;
       domGaussian->SetName("gaussian");
       domTestImage->AddChildAtEnd(domGaussian);
-      // generate the midpoint and the daviation in mm
-      centerX = centerXVec[i];
+      // write the midpoint and the daviation in pixel units
+      centerX = centerXVec[i] / spacing[0];
       ss.str("");
-      ss << centerX;
+      ss <<  centerX; // * spacing[0]; //static_cast<double>( static_cast<int>( centerX / spacing[0] + 0.9999 ) );
       domGaussian->SetAttribute("centerIndexX", ss.str());
 
-      centerY = centerYVec[i];
+      centerY = centerYVec[i] / spacing[1];
       ss.str("");
-      ss << centerY;
+      ss << centerY; // * spacing[1]; //static_cast<double>( static_cast<int>( centerY / spacing[1] + 0.9999 ) );
       domGaussian->SetAttribute("centerIndexY", ss.str());
 
-      centerZ = centerZVec[i];
+      centerZ = centerZVec[i] / spacing[2];
       ss.str("");
-      ss << centerZ;
+      ss << centerZ; //  * spacing[2]; //static_cast<double>( static_cast<int>( centerZ / spacing[2] + 0.9999 ) );
       domGaussian->SetAttribute("centerIndexZ", ss.str());
 
-      sigmaX = sigmaXVec[i];
+      sigmaX = sigmaXVec[i] / spacing[0];
       ss.str("");
-      ss << sigmaX;
+      ss << sigmaX; //  * spacing[0]; // static_cast<double>( static_cast<int>( sigmaX / spacing[0] + 0.9999 ) );
       domGaussian->SetAttribute("deviationX", ss.str());
 
-      sigmaY = sigmaYVec[i];
+      sigmaY = sigmaYVec[i] / spacing[1];
       ss.str("");
-      ss << sigmaY;
+      ss << sigmaY; // * spacing[1]; //static_cast<double>( static_cast<int>( sigmaY / spacing[1] + 0.9999 ) );
       domGaussian->SetAttribute("deviationY", ss.str());
 
-      sigmaZ = sigmaZVec[i];
+      sigmaZ = sigmaZVec[i] / spacing[2];
       ss.str("");
-      ss << sigmaZ;
+      ss << sigmaZ; // * spacing[2]; //static_cast<double>( static_cast<int>( sigmaZ / spacing[2] + 0.9999 ) );
       domGaussian->SetAttribute("deviationZ", ss.str());
 
       altitude = altitudeVec[i];
@@ -604,7 +321,6 @@ int mitkMultiGaussianTest(int argc, char* argv[])
     domSegmentation = itk::DOMNode::New();
     domSegmentation->SetName("segmentation");
     domTestCase->AddChildAtEnd(domSegmentation);
-
 
     ss.str("");
     ss << numberOfLabels;
@@ -647,8 +363,8 @@ int mitkMultiGaussianTest(int argc, char* argv[])
         regionOfInterestMin.SetElement( 1, ( ROIminSizeY[i] > minSize ) ? ROIminSizeY[i] : minSize );
 
         // z axis region of interest------------------------------------------------------
-        maxSize = size[2] - static_cast<int>((radius)/spacing[1] + 0.9999) + 1;
-        minSize = 0.0 + static_cast<int>((radius)/spacing[1]+ 0.9999) - 1;
+        maxSize = size[2] - static_cast<int>((radius)/spacing[2] + 0.9999) + 1;
+        minSize = 0.0 + static_cast<int>((radius)/spacing[2]+ 0.9999) - 1;
         if( minSize >= maxSize )
         {
           std::cout << "The sphere is larger then the image in the z axis!" << std::endl;
@@ -675,222 +391,91 @@ int mitkMultiGaussianTest(int argc, char* argv[])
       }
 
 
-        gaussianGenerator->SetRegionOfInterest(regionOfInterestMin, regionOfInterestMax);
-        gaussianGenerator->Update();
+      gaussianGenerator->SetRegionOfInterest(regionOfInterestMin, regionOfInterestMax);
+      gaussianGenerator->Update();
 
 
-        //write region of interest for the .xml file
-        domROI = itk::DOMNode::New();
-        domROI->SetName("roi");
-        domSegmentation->AddChildAtEnd(domROI);
+      //write region of interest for the .xml file
+      domROI = itk::DOMNode::New();
+      domROI->SetName("roi");
+      domSegmentation->AddChildAtEnd(domROI);
 
-        ss.str("");
-        ss << label[i];
-        domROI->SetAttribute("label", ss.str());
-        ss.str("");
-        ss << ROImaxSizeX[i];
-        domROI->SetAttribute("maximumSizeX", ss.str());
-        ss.str("");
-        ss << ROIminSizeX[i];
-        domROI->SetAttribute("minimumSizeX", ss.str());
-        ss.str("");
-        ss << ROImaxSizeY[i];
-        domROI->SetAttribute("maximumSizeY", ss.str());
-        ss.str("");
-        ss << ROIminSizeY[i];
-        domROI->SetAttribute("minimumSizeY", ss.str());
-        ss.str("");
-        ss << ROImaxSizeZ[i];
-        domROI->SetAttribute("maximumSizeZ", ss.str());
-        ss.str("");
-        ss << ROIminSizeZ[i];
-        domROI->SetAttribute("minimumSizeZ", ss.str());
-
-
-        // Calculate the mean value and the midpoint of the wanted sphere.
-        gaussianGenerator->CalculateTheMidPointMeanValueWithOctree();
-
-        //peak and peak coordinate
-        domStatistics = itk::DOMNode::New();
-        domStatistics->SetName("statistic");
-        domTestCase->AddChildAtEnd(domStatistics);
-        sphereMidpt = gaussianGenerator->GetSphereMidpoint();
-        ss.str("");
-        ss << sphereMidpt[0];
-        domStatistics->SetAttribute("hotspotIndexX", ss.str());
-        ss.str("");
-        ss << sphereMidpt[1];
-        domStatistics->SetAttribute("hotspotIndexY", ss.str());
-        ss.str("");
-        ss << sphereMidpt[2];
-        domStatistics->SetAttribute("hotspotIndexZ", ss.str());
-        ss.str("");
-        ss << gaussianGenerator->GetMaxMeanValue();
-        domStatistics->SetAttribute("peak", ss.str());
-
-        //optimize the mean value in the sphere
-        // gaussianGenerator->OptimizeMeanValue();
-        ss.str("");
-        ss << gaussianGenerator->GetMaxMeanValue();
-        domStatistics->SetAttribute("mean", ss.str());
+      ss.str("");
+      ss << label[i];
+      domROI->SetAttribute("label", ss.str());
+      ss.str("");
+      ss << ROImaxSizeX[i];
+      domROI->SetAttribute("maximumSizeX", ss.str());
+      ss.str("");
+      ss << ROIminSizeX[i];
+      domROI->SetAttribute("minimumSizeX", ss.str());
+      ss.str("");
+      ss << ROImaxSizeY[i];
+      domROI->SetAttribute("maximumSizeY", ss.str());
+      ss.str("");
+      ss << ROIminSizeY[i];
+      domROI->SetAttribute("minimumSizeY", ss.str());
+      ss.str("");
+      ss << ROImaxSizeZ[i];
+      domROI->SetAttribute("maximumSizeZ", ss.str());
+      ss.str("");
+      ss << ROIminSizeZ[i];
+      domROI->SetAttribute("minimumSizeZ", ss.str());
 
 
-        //maximum and maximum coordinate
-        gaussianGenerator->CalculateMaxAndMinInSphere();
-        maxValueIndexInSphere = gaussianGenerator->GetMaxValueIndexInSphere();
-        ss.str("");
-        ss << maxValueIndexInSphere[0];
-        domStatistics->SetAttribute("maximumIndexX", ss.str());
-        ss.str("");
-        ss << maxValueIndexInSphere[1];
-        domStatistics->SetAttribute("maximumIndexY", ss.str());
-        ss.str("");
-        ss << maxValueIndexInSphere[2];
-        domStatistics->SetAttribute("maximumIndexZ", ss.str());
-        ss.str("");
-        ss << gaussianGenerator->GetMaxValueInSphere();
-        domStatistics->SetAttribute("maximum", ss.str());
+      // Calculate the mean value and the midpoint of the wanted sphere.
+      gaussianGenerator->CalculateTheMidpointAndTheMeanValueWithOctree();
 
-        //minimum and minimum coordinate
-        minValueIndexInSphere = gaussianGenerator->GetMinValueIndexInSphere();
-        ss.str("");
-        ss << minValueIndexInSphere[0];
-        domStatistics->SetAttribute("minimumIndexX", ss.str());
-        ss.str("");
-        ss << minValueIndexInSphere[1];
-        domStatistics->SetAttribute("minimumIndexY", ss.str());
-        ss.str("");
-        ss << minValueIndexInSphere[2];
-        domStatistics->SetAttribute("minimumIndexZ", ss.str());
-        ss.str("");
-        ss << gaussianGenerator->GetMinValueInSphere();
-        domStatistics->SetAttribute("minimum", ss.str());
+      //peak and peak coordinate
+      domStatistics = itk::DOMNode::New();
+      domStatistics->SetName("statistic");
+      domTestCase->AddChildAtEnd(domStatistics);
+      sphereMidpt = gaussianGenerator->GetSphereMidpoint();
+      ss.str("");
+      ss << sphereMidpt[0];
+      domStatistics->SetAttribute("hotspotIndexX", ss.str());
+      ss.str("");
+      ss << sphereMidpt[1];
+      domStatistics->SetAttribute("hotspotIndexY", ss.str());
+      ss.str("");
+      ss << sphereMidpt[2];
+      domStatistics->SetAttribute("hotspotIndexZ", ss.str());
+      ss.str("");
+      ss << gaussianGenerator->GetMaxMeanValue();
+      domStatistics->SetAttribute("mean", ss.str());
 
 
+      //maximum and maximum coordinate
+      gaussianGenerator->CalculateMaxAndMinInSphere();
+      maxValueIndexInSphere = gaussianGenerator->GetMaxValueIndexInSphere();
+      ss.str("");
+      ss << maxValueIndexInSphere[0];
+      domStatistics->SetAttribute("maximumIndexX", ss.str());
+      ss.str("");
+      ss << maxValueIndexInSphere[1];
+      domStatistics->SetAttribute("maximumIndexY", ss.str());
+      ss.str("");
+      ss << maxValueIndexInSphere[2];
+      domStatistics->SetAttribute("maximumIndexZ", ss.str());
+      ss.str("");
+      ss << gaussianGenerator->GetMaxValueInSphere();
+      domStatistics->SetAttribute("maximum", ss.str());
+
+      //minimum and minimum coordinate
+      minValueIndexInSphere = gaussianGenerator->GetMinValueIndexInSphere();
+      ss.str("");
+      ss << minValueIndexInSphere[0];
+      domStatistics->SetAttribute("minimumIndexX", ss.str());
+      ss.str("");
+      ss << minValueIndexInSphere[1];
+      domStatistics->SetAttribute("minimumIndexY", ss.str());
+      ss.str("");
+      ss << minValueIndexInSphere[2];
+      domStatistics->SetAttribute("minimumIndexZ", ss.str());
+      ss.str("");
+      ss << gaussianGenerator->GetMinValueInSphere();
+      domStatistics->SetAttribute("minimum", ss.str());
     }
-
-
-    /*
-
-    //The midpoint of the HotSpot is in the image, but not necessary the whole HotSpot
-    else
-    {
-      // set the region of interest for each label i
-      for (unsigned int i = 0; i < numberOfLabels; ++i)
-      {
-        for (unsigned int k = 0 ; k < 3; ++k)
-        {
-
-          maxSize = ROImaxSizeX[i];
-          minSize = ROIminSizeX[i];
-          if(minSize > maxSize)
-          {
-            std::cout << "The sphere is larger then the region of interest! Set the roi to be the whole image " << std::endl;
-            maxSize = size[k];
-            minSize = 0.0;
-          }
-          // the maximum in the k-Axis
-          regionOfInterestMax.SetElement(k, (maxSize < size[k]) ? maxSize : size[k] - 1.0 );
-          // the minimum in the k-Axis
-          regionOfInterestMin.SetElement(k, (minSize > 0.0) ? minSize : 0.0 );
-        }
-
-
-        gaussianGenerator->SetRegionOfInterest(regionOfInterestMin, regionOfInterestMax);
-        gaussianGenerator->Update();
-        //TODO
-        // gaussianGenerator->GenerateCuboidSegmentationInSphere();
-        //gaussianGenerator->CalculateMidpointAndMeanValue();
-        gaussianGenerator->CalculateTheMidPointMeanValueInCuboid();
-
-        //region of interest
-        domROI = itk::DOMNode::New();
-        domROI->SetName("roi");
-        domSegmentation->AddChildAtEnd(domROI);
-
-        ss.str("");
-        ss << label[i];
-        domROI->SetAttribute("label", ss.str());
-        ss.str("");
-        ss << regionOfInterestMax[0];
-        domROI->SetAttribute("maximumSizeX", ss.str());
-        ss.str("");
-        ss << regionOfInterestMin[0];
-        domROI->SetAttribute("minimumSizeX", ss.str());
-        ss.str("");
-        ss << regionOfInterestMax[1];
-        domROI->SetAttribute("maximumSizeY", ss.str());
-        ss.str("");
-        ss << regionOfInterestMin[1];
-        domROI->SetAttribute("minimumSizeY", ss.str());
-        ss.str("");
-        ss << regionOfInterestMax[2];
-        domROI->SetAttribute("maximumSizeZ", ss.str());
-        ss.str("");
-        ss << regionOfInterestMin[2];
-        domROI->SetAttribute("minimumSizeZ", ss.str());
-
-        //peak and peak coordinate
-        domStatistics = itk::DOMNode::New();
-        domStatistics->SetName("statistic");
-        domTestCase->AddChildAtEnd(domStatistics);
-        sphereMidpt = gaussianGenerator->GetSphereMidpoint();
-        ss.str("");
-        ss << sphereMidpt[0];
-        domStatistics->SetAttribute("hotspotIndexX", ss.str());
-        ss.str("");
-        ss << sphereMidpt[1];
-        domStatistics->SetAttribute("hotspotIndexY", ss.str());
-        ss.str("");
-        ss << sphereMidpt[2];
-        domStatistics->SetAttribute("hotspotIndexZ", ss.str());
-        ss.str("");
-        ss << gaussianGenerator->GetMaxMeanValue();
-        domStatistics->SetAttribute("peak", ss.str());
-
-        //optimize the mean value in the sphere
-        // gaussianGenerator->OptimizeMeanValue();
-        ss.str("");
-        ss << gaussianGenerator->GetMaxMeanValue();
-        domStatistics->SetAttribute("mean", ss.str());
-
-
-        //maximum and maximum coordinate
-        gaussianGenerator->CalculateMaxAndMinInSphere();
-        maxValueIndexInSphere = gaussianGenerator->GetMaxValueIndexInSphere();
-        ss.str("");
-        ss << maxValueIndexInSphere[0];
-        domStatistics->SetAttribute("maximumIndexX", ss.str());
-        ss.str("");
-        ss << maxValueIndexInSphere[1];
-        domStatistics->SetAttribute("maximumIndexY", ss.str());
-        ss.str("");
-        ss << maxValueIndexInSphere[2];
-        domStatistics->SetAttribute("maximumIndexZ", ss.str());
-        ss.str("");
-        ss << gaussianGenerator->GetMaxValueInSphere();
-        domStatistics->SetAttribute("maximum", ss.str());
-
-        //minimum and minimum coordinate
-        minValueIndexInSphere = gaussianGenerator->GetMinValueIndexInSphere();
-        ss.str("");
-        ss << minValueIndexInSphere[0];
-        domStatistics->SetAttribute("minimumIndexX", ss.str());
-        ss.str("");
-        ss << minValueIndexInSphere[1];
-        domStatistics->SetAttribute("minimumIndexY", ss.str());
-        ss.str("");
-        ss << minValueIndexInSphere[2];
-        domStatistics->SetAttribute("minimumIndexZ", ss.str());
-        ss.str("");
-        ss << gaussianGenerator->GetMinValueInSphere();
-        domStatistics->SetAttribute("minimum", ss.str());
-
-      }*/
-
-
-
-
 
     // .xml (Data)
     ss.str("");
@@ -913,11 +498,50 @@ int mitkMultiGaussianTest(int argc, char* argv[])
     writer->SetInput( gaussianImage );
     writer->Update();
 
-    //  gaussianGenerator -> WriteXMLToTestTheCuboid();
+}
 
 
 
+// check whether the edges of the i'th ROI is in another ROI included
+bool IsInOtherROI(int i,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType ROIminSizeX,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType ROImaxSizeX,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType ROIminSizeY,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType ROImaxSizeY,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType ROIminSizeZ,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType ROImaxSizeZ  )
+{
+  bool error = 0;
+  std::vector<double> xBound, yBound, zBound;
+  xBound.push_back( ROIminSizeX[i] );
+  xBound.push_back( ROImaxSizeX[i] );
+  yBound.push_back( ROIminSizeY[i] );
+  yBound.push_back( ROImaxSizeY[i] );
+  zBound.push_back( ROIminSizeZ[i] );
+  zBound.push_back( ROImaxSizeZ[i] );
+  //for each ROI
+  for( unsigned int j = 0; j < i; ++j )
+  {
+    for( unsigned int x = 0; x < 2; ++x)
+    {
+      for( unsigned int y = 0; y < 2; ++y)
+      {
+        for( unsigned int z = 0; z < 2; ++z)
+        {
+          double edgeXCoord = xBound[x];
+          double edgeYCoord = yBound[y];
+          double edgeZCoord = zBound[z];
+          // check if the edge with coordinate [edgeXCoord; edgeYCoord; edgeZCoord] is inside the j'th ROI
+          if ( ROIminSizeX[j] < edgeXCoord && edgeXCoord < ROImaxSizeX[j] &&
+               ROIminSizeY[j] < edgeYCoord && edgeYCoord < ROImaxSizeY[j] &&
+               ROIminSizeZ[j] < edgeZCoord && edgeZCoord < ROImaxSizeZ[j])
+          {
+            error = 1;
+            return error;
+          }
+        }
+      }
+    }
   }
-  //  MITK_TEST_END()
-
+  return error;
 }

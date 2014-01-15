@@ -34,8 +34,11 @@ bool mitk::DiffusionHeaderGEDICOMFileReader
 
   // start with b-value
   success = RevealBinaryTag( ge_bvalue_tag, gdcmReader.GetFile().GetDataSet(), ge_tagvalue_string );
-  // b value stored in the first 2 bytes
-  const char* bval_string = ge_tagvalue_string.substr(0,2).c_str();
+  // b value stored in the first bytes
+  // typical example:  "1000\8\0\0" for bvalue=1000
+  //                   "40\8\0\0" for bvalue=40
+  // so we need to cut off the last 6 elements
+  const char* bval_string = ge_tagvalue_string.substr(0,ge_tagvalue_string.length()-6).c_str();
   header_info.b_value = static_cast<unsigned int>(strtod( bval_string, &pEnd ));
 
   // now retrieve the gradient direction

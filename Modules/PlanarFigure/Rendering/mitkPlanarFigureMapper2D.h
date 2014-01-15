@@ -275,7 +275,7 @@ private:
   float m_ShadowWidthFactor;
   float m_OutlineWidth;
   float m_HelperlineWidth;
-  float m_PointWidth;
+  //float m_PointWidth;
 
   PlanarFigureControlPointStyleProperty::Shape m_ControlPointShape;
 

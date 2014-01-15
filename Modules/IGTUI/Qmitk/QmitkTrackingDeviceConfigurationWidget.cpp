@@ -67,12 +67,12 @@ switch(style)
     m_Controls->dummyLayout->addWidget(m_Controls->m_outputTextPolaris);
     m_Controls->dummyLayout->addWidget(m_Controls->m_testConnectionPolaris);
     m_Controls->dummyLayout->addWidget(m_Controls->m_polarisTrackingModeBox);
-  m_Controls->dummyLayout->addWidget(m_Controls->m_testConnectionOptitrack);
-  m_Controls->dummyLayout->addWidget(m_Controls->m_outputTextOptitrack);
-  m_Controls->dummyLayout->addWidget(m_Controls->m_OptitrackExp);
-  m_Controls->dummyLayout->addWidget(m_Controls->m_OptitrackThr);
-  m_Controls->dummyLayout->addWidget(m_Controls->m_OptitrackLed);
-  m_Controls->dummyLayout->addWidget(m_Controls->Optitrack_label);
+    m_Controls->dummyLayout->addWidget(m_Controls->m_testConnectionOptitrack);
+    m_Controls->dummyLayout->addWidget(m_Controls->m_outputTextOptitrack);
+    m_Controls->dummyLayout->addWidget(m_Controls->m_OptitrackExp);
+    m_Controls->dummyLayout->addWidget(m_Controls->m_OptitrackThr);
+    m_Controls->dummyLayout->addWidget(m_Controls->m_OptitrackLed);
+    m_Controls->dummyLayout->addWidget(m_Controls->Optitrack_label);
     m_Controls->dummyLayout->addWidget(m_Controls->m_finishedLine);
     m_Controls->dummyLayout->addWidget(m_Controls->line);
     m_Controls->dummyLayout->addWidget(m_Controls->configuration_finished_label);
@@ -153,13 +153,13 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
     connect( (QObject*)(m_Controls->m_testConnectionPolaris), SIGNAL(clicked()), this, SLOT(TestConnection()) );
     connect( (QObject*)(m_Controls->m_testConnectionAurora), SIGNAL(clicked()), this, SLOT(TestConnection()) );
     connect( (QObject*)(m_Controls->m_testConnectionMicronTracker), SIGNAL(clicked()), this, SLOT(TestConnection()) );
-  connect( (QObject*)(m_Controls->m_testConnectionOptitrack), SIGNAL(clicked()), this, SLOT(TestConnection()) );
+    connect( (QObject*)(m_Controls->m_testConnectionOptitrack), SIGNAL(clicked()), this, SLOT(TestConnection()) );
     connect( (QObject*)(m_Controls->m_resetButton), SIGNAL(clicked()), this, SLOT(ResetByUser()) );
     connect( (QObject*)(m_Controls->m_finishedButton), SIGNAL(clicked()), this, SLOT(Finished()) );
     connect( (QObject*)(m_Controls->m_AutoScanPolaris), SIGNAL(clicked()), this, SLOT(AutoScanPorts()) );
     connect( (QObject*)(m_Controls->m_AutoScanAurora), SIGNAL(clicked()), this, SLOT(AutoScanPorts()) );
     connect( (QObject*)(m_Controls->m_SetMTCalibrationFile), SIGNAL(clicked()), this, SLOT(SetMTCalibrationFileClicked()) );
-  connect( (QObject*)(m_Controls->m_SetOptitrackCalibrationFile), SIGNAL(clicked()), this, SLOT(SetOptitrackCalibrationFileClicked()) );
+    connect( (QObject*)(m_Controls->m_SetOptitrackCalibrationFile), SIGNAL(clicked()), this, SLOT(SetOptitrackCalibrationFileClicked()) );
 
 
     //set a few UI components depending on Windows / Linux
@@ -203,7 +203,7 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
   else if (m_Controls->m_trackingDeviceChooser->currentIndex()==2) //ClaronTechnology MicronTracker 2
     {
     AddOutput("<br>Microntracker selected");
-    if (!mitk::ClaronTrackingDevice::New()->IsMicronTrackerInstalled())
+    if (!mitk::ClaronTrackingDevice::New()->IsDeviceInstalled())
       {
       AddOutput("<br>ERROR: not installed!");
       }
@@ -218,6 +218,10 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
   else if (m_Controls->m_trackingDeviceChooser->currentIndex()==3)
   {
     AddOutput("<br>Optitrack selected");
+    if (!mitk::OptitrackTrackingDevice::New()->IsDeviceInstalled())
+      {
+      AddOutput("<br>ERROR: not installed!");
+      }
   }
 
 emit TrackingDeviceSelectionChanged();
@@ -238,19 +242,26 @@ mitk::TrackingDevice::Pointer testTrackingDevice = ConstructTrackingDevice();
 
 try
   {
-  //test connection and start tracking, generate output
-  AddOutput("<br>testing connection <br>  ...");
-  testTrackingDevice->OpenConnection();
-  AddOutput("OK");
+  if (!testTrackingDevice->IsDeviceInstalled())
+     {
+     AddOutput("ERROR: Device is not installed!");
+     }
+  else
+    {
+    //test connection and start tracking, generate output
+    AddOutput("<br>testing connection <br>  ...");
+    testTrackingDevice->OpenConnection();
+    AddOutput("OK");
 
-  //try start/stop tracking
-  AddOutput("<br>testing tracking <br>  ...");
-  testTrackingDevice->StartTracking();
-  testTrackingDevice->StopTracking();
+    //try start/stop tracking
+    AddOutput("<br>testing tracking <br>  ...");
+    testTrackingDevice->StartTracking();
+    testTrackingDevice->StopTracking();
 
-  //try close connection
-  testTrackingDevice->CloseConnection();
-  AddOutput("OK");
+    //try close connection
+    testTrackingDevice->CloseConnection();
+    AddOutput("OK");
+    }
   }
 catch(mitk::IGTException &e)
   {
@@ -506,7 +517,8 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureN
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::GetTrackingDevice()
   {
   if (!m_AdvancedUserControl) m_TrackingDevice = ConstructTrackingDevice();
-  return this->m_TrackingDevice;
+  if (!m_TrackingDevice->IsDeviceInstalled()) return NULL;
+  else return this->m_TrackingDevice;
   }
 
 bool QmitkTrackingDeviceConfigurationWidget::GetTrackingDeviceConfigured()

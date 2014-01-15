@@ -54,7 +54,7 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     ~QmitkTrackingDeviceConfigurationWidget();
 
     /* @return Returns the current configurated tracking device. If the user didn't finished the
-     *         configuration process NULL is returned.
+     *         configuration process or if there is an error during configuration NULL is returned.
      */
     mitk::TrackingDevice::Pointer GetTrackingDevice();
 

@@ -331,9 +331,10 @@ static void TestInvalidStream()
     InvalidStreamException4=true;
     MITK_TEST_OUTPUT(<<"#4: Tested wrong file. Application should not crash.");
   }
-  */
+
 
   MITK_TEST_CONDITION_REQUIRED(InvalidStreamException4, "Testing Invalid Stream method if exception (wrong file) was thrown.");
+  */
 
   //case 5: null stream
   player = mitk::NavigationDataPlayer::New();

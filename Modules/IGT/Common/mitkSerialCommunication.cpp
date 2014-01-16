@@ -263,7 +263,7 @@ int mitk::SerialCommunication::ApplyConfiguration()
 #ifdef WIN32 // Windows implementation
   return ApplyConfigurationWin();
 #else // Posix
-  return ApplyConfigurationLin();
+  return ApplyConfigurationUnix();
 #endif
 }
 
@@ -319,20 +319,11 @@ int mitk::SerialCommunication::ApplyConfigurationWin()
   return OK;
 }
 
-#elif __APPLE__
-/**
-* \brief Applies the configuration for Mac
-*/
-int mitk::SerialCommunication::ApplyConfigurationMac()
-{
-
-}
-
 #else
 /**
 * \brief Applies the configuration for Linux
 */
-int mitk::SerialCommunication::ApplyConfigurationLin()
+int mitk::SerialCommunication::ApplyConfigurationUnix()
 {
   if ( m_FileDescriptor == INVALID_HANDLE_VALUE )
     return ERROR_VALUE;

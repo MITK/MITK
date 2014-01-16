@@ -310,17 +310,11 @@ namespace mitk
     */
     int ApplyConfigurationWin();
 
-    #elif __APPLE__
-    /**
-    * \brief Applies the configuration for Mac
-    */
-    int ApplyConfigurationMac();
-
     #else
     /**
     * \brief Applies the configuration for Linux
     */
-    int ApplyConfigurationLin();
+    int ApplyConfigurationUnix();
 
 
     #endif

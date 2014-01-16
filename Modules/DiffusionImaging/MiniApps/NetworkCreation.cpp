@@ -37,8 +37,8 @@ int NetworkCreation(int argc, char* argv[])
   parser.addArgument("parcellation", "p", ctkCommandLineParser::String, "parcellation image", us::Any(), false);
   parser.addArgument("outputNetwork", "o", ctkCommandLineParser::String, "where to save the ouput (.cnf)", us::Any(), false);
 
-  parser.addArgument("radius", "r", ctkCommandLineParser::Int, "Search radius in mm", 15, false);
-  parser.addArgument("centerOfMass", "com", ctkCommandLineParser::Bool, "Use center of mass for node positions", true, false);
+  parser.addArgument("radius", "r", ctkCommandLineParser::Int, "Search radius in mm", 15, true);
+  parser.addArgument("centerOfMass", "com", ctkCommandLineParser::Bool, "Use center of mass for node positions", true, true);
 
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

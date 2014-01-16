@@ -152,7 +152,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
         std::vector< int > spikeSlice;
         while (!spikeVolume.empty() && spikeVolume.back()==g)
         {
-            spikeSlice.push_back(rand()%images.at(0)->GetLargestPossibleRegion().GetSize(2));
+            spikeSlice.push_back(m_RandGen->GetIntegerVariate()%images.at(0)->GetLargestPossibleRegion().GetSize(2));
             spikeVolume.pop_back();
         }
         std::sort (spikeSlice.begin(), spikeSlice.end());
@@ -345,11 +345,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     // apply in-plane upsampling
     double upsampling = 1;
     if (m_AddGibbsRinging)
-    {
-        m_StatusText += "Gibbs ringing enabled\n";
-        MITK_INFO << "Adding ringing artifacts.";
         upsampling = 2;
-    }
     m_UpsampledSpacing = m_Spacing;
     m_UpsampledSpacing[0] /= upsampling;
     m_UpsampledSpacing[1] /= upsampling;
@@ -615,17 +611,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                         m_FiberModels[k]->SetFiberDirection(dir);
                         DoubleDwiType::PixelType pix = doubleDwi->GetPixel(idx);
                         pix[g] += segmentVolume*m_FiberModels[k]->SimulateMeasurement(g);
-
-                        if (pix[g]!=pix[g])
-                        {
-                            std::cout << "pix[g] " << pix[g] << std::endl;
-                            std::cout << "dir " << dir << std::endl;
-                            std::cout << "segmentVolume " << segmentVolume << std::endl;
-                            std::cout << "m_FiberModels[k]->SimulateMeasurement(g) " << m_FiberModels[k]->SimulateMeasurement(g) << std::endl;
-                        }
-
                         doubleDwi->SetPixel(idx, pix );
-
                         double vol = intraAxonalVolume->GetPixel(idx) + segmentVolume;
                         intraAxonalVolume->SetPixel(idx, vol );
 
@@ -833,7 +819,23 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     if (m_Spikes>0 || m_FrequencyMap.IsNotNull() || m_kOffset>0 || m_SimulateRelaxation || m_SimulateEddyCurrents || m_AddGibbsRinging || m_Wrap<1.0)
     {
         m_StatusText += this->GetTime()+" > Adjusting complex signal\n";
-        MITK_INFO << "Adjusting complex signal";
+        MITK_INFO << "Adjusting complex signal:";
+
+        if (m_SimulateRelaxation)
+            m_StatusText += " > Simulating signal relaxation\n";
+        if (m_FrequencyMap.IsNotNull())
+            m_StatusText += " > Simulating distortions\n";
+        if (m_AddGibbsRinging)
+            m_StatusText += " > Simulating ringing artifacts\n";
+        if (m_SimulateEddyCurrents)
+            m_StatusText += " > Simulating eddy currents\n";
+        if (m_Spikes>0)
+            m_StatusText += " > Simulating spikes\n";
+        if (m_Wrap<1.0)
+            m_StatusText += " > Simulating aliasing artifacts\n";
+        if (m_kOffset>0)
+            m_StatusText += " > Simulating ghosts\n";
+
         doubleOutImage = DoKspaceStuff(compartments);
         m_SignalScale = 1;
     }

@@ -1757,7 +1757,6 @@ void QmitkFiberfoxView::SimulateForExistingDwi(mitk::DataNode* imageNode)
     if (!dynamic_cast<mitk::DiffusionImage<short>*>(imageNode->GetData()))
         return;
 
-    MITK_INFO << "TEST";
     UpdateImageParameters();
 
     mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(imageNode->GetData());

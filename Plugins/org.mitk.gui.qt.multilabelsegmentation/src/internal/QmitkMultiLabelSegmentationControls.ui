@@ -377,7 +377,7 @@
 }</string>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_4">
       <property name="geometry">
@@ -385,7 +385,7 @@
         <x>0</x>
         <y>0</y>
         <width>236</width>
-        <height>252</height>
+        <height>306</height>
        </rect>
       </property>
       <attribute name="label">
@@ -435,7 +435,7 @@
         <x>0</x>
         <y>0</y>
         <width>236</width>
-        <height>252</height>
+        <height>306</height>
        </rect>
       </property>
       <attribute name="label">
@@ -473,82 +473,6 @@
           <size>
            <width>20</width>
            <height>175</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="page_6">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>236</width>
-        <height>252</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>Surface Stamp</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
-       <item>
-        <widget class="QmitkSurfaceStampWidget" name="m_SurfaceStampWidget" native="true">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>25</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="page_7">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>236</width>
-        <height>252</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>Mask Stamp</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_11">
-       <item>
-        <widget class="QmitkMaskStampWidget" name="m_MaskStampWidget" native="true">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>25</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
           </size>
          </property>
         </spacer>
@@ -597,18 +521,6 @@
    <class>QmitkSurfaceBasedInterpolator</class>
    <extends>QWidget</extends>
    <header location="global">QmitkSurfaceBasedInterpolator.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QmitkSurfaceStampWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">QmitkSurfaceStampWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QmitkMaskStampWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">QmitkMaskStampWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

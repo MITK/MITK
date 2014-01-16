@@ -181,8 +181,8 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_LabelSetWidget->SetLastFileOpenPath(this->GetLastFileOpenPath());
   m_Controls.m_LabelSetWidget->hide();
 
-  m_Controls.m_SurfaceStampWidget->SetDataStorage(*(this->GetDataStorage()) );
-  m_Controls.m_MaskStampWidget->SetDataStorage(*(this->GetDataStorage()) );
+//  m_Controls.m_SurfaceStampWidget->SetDataStorage(*(this->GetDataStorage()) );
+//  m_Controls.m_MaskStampWidget->SetDataStorage(*(this->GetDataStorage()) );
 
   // all part of open source MITK
   m_Controls.m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);

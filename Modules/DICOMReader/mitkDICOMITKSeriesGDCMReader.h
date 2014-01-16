@@ -222,7 +222,7 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
       \brief Add an element to the sorting procedure described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy.
     */
     virtual void AddSortingElement(DICOMDatasetSorter* sorter, bool atFront = false);
-    
+
     typedef const std::list<DICOMDatasetSorter::ConstPointer> ConstSorterList;
     ConstSorterList GetFreelyConfiguredSortingElements() const;
 
@@ -232,6 +232,12 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
     void SetFixTiltByShearing(bool on);
 
     bool GetFixTiltByShearing() const;
+
+    /**
+      \brief Controls whether groups of only two images are accepted when ensuring consecutive slices via EquiDistantBlocksSorter.
+    */
+    void SetAcceptTwoSlicesGroups(bool accept);
+    bool GetAcceptTwoSlicesGroups() const;
 
     /**
       \brief See \ref DICOMITKSeriesGDCMReader_ForcedConfiguration.
@@ -327,11 +333,11 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
     typedef std::list<DICOMDatasetSorter::Pointer> SorterList;
     SorterList m_Sorter;
 
-    mitk::EquiDistantBlocksSorter::Pointer m_EquiDistantBlocksSorter;
-
   protected:
 
-    // NOT nice, made available to ThreeDnTDICOMSeriesReader due to lack of time
+    // NOT nice, made available to ThreeDnTDICOMSeriesReader and ClassicDICOMSeriesReader due to lack of time
+    mitk::EquiDistantBlocksSorter::Pointer m_EquiDistantBlocksSorter;
+
     mitk::NormalDirectionConsistencySorter::Pointer m_NormalDirectionConsistencySorter;
 
   private:
@@ -342,7 +348,7 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
     DICOMGDCMImageFrameList m_InputFrameList;
 
     gdcm::Scanner m_GDCMScanner;
-  
+
     double m_DecimalPlacesForOrientation;
 };
 

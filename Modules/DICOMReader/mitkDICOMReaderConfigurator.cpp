@@ -201,6 +201,17 @@ mitk::DICOMReaderConfigurator
 
   reader->SetFixTiltByShearing( fixTiltByShearing );
 
+  // "acceptTwoSlicesGroups" flag
+  bool acceptTwoSlicesGroups(true);
+  const char* acceptTwoSlicesGroupsC = element->Attribute("acceptTwoSlicesGroups");
+  if (acceptTwoSlicesGroupsC)
+  {
+    std::string acceptTwoSlicesGroupsS(acceptTwoSlicesGroupsC);
+    acceptTwoSlicesGroups = boolStringTrue(acceptTwoSlicesGroupsS);
+  }
+
+  reader->SetAcceptTwoSlicesGroups( acceptTwoSlicesGroups );
+
   // "toleratedOriginError" attribute (double)
   bool toleratedOriginErrorIsAbsolute(false);
   const char* toleratedOriginErrorIsAbsoluteC = element->Attribute("toleratedOriginErrorIsAbsolute");
@@ -260,6 +271,17 @@ mitk::DICOMReaderConfigurator
 ::CreateDICOMTagBasedSorter(TiXmlElement* element) const
 {
   mitk::DICOMTagBasedSorter::Pointer tagSorter = mitk::DICOMTagBasedSorter::New();
+
+  // "strictSorting" parameter!
+  bool strictSorting(true);
+  const char* strictSortingC = element->Attribute("strictSorting");
+  if (strictSortingC)
+  {
+    std::string strictSortingS(strictSortingC);
+    strictSorting = boolStringTrue(strictSortingS);
+  }
+  tagSorter->SetStrictSorting(strictSorting);
+
   TiXmlElement* dElement = element->FirstChildElement("Distinguishing");
   if (dElement)
   {
@@ -484,6 +506,7 @@ mitk::DICOMReaderConfigurator
   assert(root);
 
   root->SetAttribute("fixTiltByShearing", toString(reader->GetFixTiltByShearing()));
+  root->SetAttribute("acceptTwoSlicesGroups", toString(reader->GetAcceptTwoSlicesGroups()));
   root->SetDoubleAttribute("toleratedOriginError", reader->GetToleratedOriginError());
   root->SetAttribute("toleratedOriginErrorIsAbsolute", toString(reader->IsToleratedOriginOffsetAbsolute()));
   root->SetDoubleAttribute("decimalPlacesForOrientation", reader->GetDecimalPlacesForOrientation());
@@ -518,6 +541,7 @@ mitk::DICOMReaderConfigurator
 
   TiXmlElement* sorterTag = new TiXmlElement("DICOMDatasetSorter");
   sorterTag->SetAttribute("class", sorter->GetNameOfClass());
+  sorterTag->SetAttribute("strictSorting", toString(sorter->GetStrictSorting()));
 
   TiXmlElement* distinguishingTagsElement = new TiXmlElement("Distinguishing");
   sorterTag->LinkEndChild(distinguishingTagsElement);

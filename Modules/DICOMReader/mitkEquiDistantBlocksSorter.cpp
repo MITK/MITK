@@ -124,6 +124,7 @@ mitk::EquiDistantBlocksSorter
 ,m_AcceptTilt(false)
 ,m_ToleratedOriginOffset(0.3)
 ,m_ToleratedOriginOffsetIsAbsolute(false)
+,m_AcceptTwoSlicesGroups(true)
 {
 }
 
@@ -133,6 +134,7 @@ mitk::EquiDistantBlocksSorter
 ,m_AcceptTilt(other.m_AcceptTilt)
 ,m_ToleratedOriginOffset(other.m_ToleratedOriginOffset)
 ,m_ToleratedOriginOffsetIsAbsolute(other.m_ToleratedOriginOffsetIsAbsolute)
+,m_AcceptTwoSlicesGroups(other.m_AcceptTwoSlicesGroups)
 {
 }
 
@@ -149,6 +151,7 @@ mitk::EquiDistantBlocksSorter
   {
     return this->m_AcceptTilt == otherSelf->m_AcceptTilt
         && this->m_ToleratedOriginOffsetIsAbsolute == otherSelf->m_ToleratedOriginOffsetIsAbsolute
+        && this->m_AcceptTwoSlicesGroups == otherSelf->m_AcceptTwoSlicesGroups
         && (fabs(this->m_ToleratedOriginOffset - otherSelf->m_ToleratedOriginOffset) < eps);
   }
   else
@@ -186,6 +189,28 @@ mitk::EquiDistantBlocksSorter
 }
 
 
+bool
+mitk::EquiDistantBlocksSorter
+::GetAcceptTilt() const
+{
+  return m_AcceptTilt;
+}
+
+void
+mitk::EquiDistantBlocksSorter
+::SetAcceptTwoSlicesGroups(bool accept)
+{
+  m_AcceptTwoSlicesGroups = accept;
+}
+
+bool
+mitk::EquiDistantBlocksSorter
+::GetAcceptTwoSlicesGroups() const
+{
+  return m_AcceptTwoSlicesGroups;
+}
+
+
 mitk::EquiDistantBlocksSorter&
 mitk::EquiDistantBlocksSorter
 ::operator=(const EquiDistantBlocksSorter& other)
@@ -196,6 +221,7 @@ mitk::EquiDistantBlocksSorter
     m_AcceptTilt = other.m_AcceptTilt;
     m_ToleratedOriginOffset = other.m_ToleratedOriginOffset;
     m_ToleratedOriginOffsetIsAbsolute = other.m_ToleratedOriginOffsetIsAbsolute;
+    m_AcceptTwoSlicesGroups = other.m_AcceptTwoSlicesGroups;
   }
   return *this;
 }
@@ -538,7 +564,8 @@ mitk::EquiDistantBlocksSorter
     // THEN we would want to also split the two previous files (simple) because
     // we don't have any reason to assume they belong together
 
-    if ( result.GetBlockDatasets().size() == 2 )
+    // Above behavior can be configured via m_AcceptTwoSlicesGroups, the default being "do accept"
+    if ( result.GetBlockDatasets().size() == 2 && !m_AcceptTwoSlicesGroups )
     {
       result.UndoPrematureGrouping();
     }

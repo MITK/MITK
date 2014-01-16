@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMTagBasedSorter.h"
 
 #include <algorithm>
+#include <iomanip>
 
 mitk::DICOMTagBasedSorter::CutDecimalPlaces
 ::CutDecimalPlaces(unsigned int precision)
@@ -75,6 +76,7 @@ mitk::DICOMTagBasedSorter::CutDecimalPlaces
 mitk::DICOMTagBasedSorter
 ::DICOMTagBasedSorter()
 :DICOMDatasetSorter()
+,m_StrictSorting(true)
 {
 }
 
@@ -92,6 +94,7 @@ mitk::DICOMTagBasedSorter
 mitk::DICOMTagBasedSorter
 ::DICOMTagBasedSorter(const DICOMTagBasedSorter& other )
 :DICOMDatasetSorter(other)
+,m_StrictSorting(other.m_StrictSorting)
 {
 }
 
@@ -102,6 +105,7 @@ mitk::DICOMTagBasedSorter
   if (this != &other)
   {
     DICOMDatasetSorter::operator=(other);
+    m_StrictSorting = other.m_StrictSorting;
   }
   return *this;
 }
@@ -112,6 +116,8 @@ mitk::DICOMTagBasedSorter
 {
   if (const DICOMTagBasedSorter* otherSelf = dynamic_cast<const DICOMTagBasedSorter*>(&other))
   {
+    if (this->m_StrictSorting != otherSelf->m_StrictSorting) return false;
+
     bool allTagsPresentAndEqual(true);
     if (this->m_DistinguishingTags.size() != otherSelf->m_DistinguishingTags.size())
       return false;
@@ -166,6 +172,19 @@ mitk::DICOMTagBasedSorter
   }
 }
 
+void
+mitk::DICOMTagBasedSorter
+::SetStrictSorting(bool strict)
+{
+  m_StrictSorting = strict;
+}
+
+bool
+mitk::DICOMTagBasedSorter
+::GetStrictSorting() const
+{
+  return m_StrictSorting;
+}
 
 mitk::DICOMTagList
 mitk::DICOMTagBasedSorter
@@ -303,6 +322,18 @@ mitk::DICOMTagBasedSorter
 {
   if (m_SortCriterion.IsNotNull())
   {
+    /*
+       Three steps here:
+        1. sort within each group
+           - this may result in orders such as 1 2 3 4 6 7 8 10 12 13 14
+        2. create new groups by enforcing consecutive order within each group
+           - resorts above example like 1 2 3 4  ;  6 7 8  ;  10  ;  12 13 14
+        3. sort all of the groups (not WITHIN each group) by their first frame
+           - if earlier "distinguish" steps created groups like 6 7 8  ;  1 2 3 4  ; 10,
+             then this step would sort them like 1 2 3 4  ;  6 7 8  ;  10
+    */
+
+    // Step 1: sort within the groups
     // for each output
     //   sort by all configured tags, use secondary tags when equal or empty
     //   make configurable:
@@ -336,6 +367,125 @@ mitk::DICOMTagBasedSorter
       }
       MITK_DEBUG << "   --------------------------------------------------------------------------------";
     }
+
+    GroupIDToListType consecutiveGroups;
+    if (m_StrictSorting)
+    {
+      // Step 2: create new groups by enforcing consecutive order within each group
+      unsigned int groupIndex(0);
+      for (GroupIDToListType::iterator gIter = groups.begin();
+           gIter != groups.end();
+           ++gIter)
+      {
+        std::stringstream groupKey;
+        groupKey << std::setfill('0') << std::setw(6) << groupIndex++;
+
+        DICOMDatasetList& dsList = gIter->second;
+        DICOMDatasetAccess* previousDS(NULL);
+        unsigned int dsIndex(0);
+        double constantDistance(0.0);
+        bool constantDistanceInitialized(false);
+        for (DICOMDatasetList::iterator dataset = dsList.begin();
+             dataset != dsList.end();
+             ++dsIndex, ++dataset)
+        {
+          if (dsIndex >0) // ignore the first dataset, we cannot check any distances yet..
+          {
+            // for the second and every following dataset:
+            // let the sorting criterion calculate a "distance"
+            // if the distance is not 1, split off a new group!
+            double currentDistance = m_SortCriterion->NumericDistance(previousDS, *dataset);
+            if (constantDistanceInitialized)
+            {
+              if (fabs(currentDistance - constantDistance) < constantDistance * 0.01) // ok, deviation of up to 1% of distance is tolerated
+              {
+                // nothing to do, just ok
+              }
+              else if (currentDistance < mitk::eps) // close enough to 0
+              {
+                // no numeric comparison possible?
+                // rare case(?), just accept
+              }
+              else
+              {
+                // split! this is done by simply creating a new group (key)
+                groupKey.str(std::string());
+                groupKey.clear();
+                groupKey << std::setfill('0') << std::setw(6) << groupIndex++;
+              }
+            }
+            else
+            {
+              // second slice: learn about the expected distance!
+
+              // heuristic: if distance is an integer, we check for a special case:
+              //            if the distance is integer and not 1/-1, then we assume
+              //            a missing slice right after the first slice
+              //            ==> split off slices
+              // in all other cases: second dataset at this position, no need to split already, we are still learning about the images
+              if ((currentDistance - (int)currentDistance == 0.0) && fabs(currentDistance) != 1.0)
+                // exact comparison. An integer should not be expressed as 1.000000000000000000000000001!
+              {
+                groupKey.str(std::string());
+                groupKey.clear();
+                groupKey << std::setfill('0') << std::setw(6) << groupIndex++;
+              }
+
+              constantDistance = currentDistance;
+              constantDistanceInitialized = true;
+            }
+          }
+          consecutiveGroups[groupKey.str()].push_back(*dataset);
+          previousDS = *dataset;
+        }
+      }
+    }
+    else
+    {
+      consecutiveGroups = groups;
+    }
+
+    // Step 3: sort all of the groups (not WITHIN each group) by their first frame
+    /*
+      build a list-1 of datasets with the first dataset one of each group
+      sort this list-1
+      build a new result list-2:
+       - iterate list-1, for each dataset
+         - find the group that contains this dataset
+         - add this group as the next element to list-2
+      return list-2 as the sorted output
+    */
+    DICOMDatasetList firstSlices;
+    for (GroupIDToListType::iterator gIter = consecutiveGroups.begin();
+         gIter != consecutiveGroups.end();
+         ++gIter)
+    {
+      assert(!gIter->second.empty());
+      firstSlices.push_back(gIter->second.front());
+    }
+
+    std::sort( firstSlices.begin(), firstSlices.end(), ParameterizedDatasetSort( m_SortCriterion ) );
+
+    GroupIDToListType sortedResultBlocks;
+    unsigned int groupKeyValue(0);
+    for (DICOMDatasetList::iterator firstSlice = firstSlices.begin();
+         firstSlice != firstSlices.end();
+         ++firstSlice)
+    {
+      for (GroupIDToListType::iterator gIter = consecutiveGroups.begin();
+           gIter != consecutiveGroups.end();
+           ++groupKeyValue, ++gIter)
+      {
+        if (gIter->second.front() == *firstSlice)
+        {
+          std::stringstream groupKey;
+          groupKey << std::setfill('0') << std::setw(6) << groupKeyValue; // try more than 999,999 groups and you are doomed (your application already is)
+          sortedResultBlocks[groupKey.str()] = gIter->second;
+        }
+      }
+    }
+
+    groups = sortedResultBlocks;
   }
 
   return groups;

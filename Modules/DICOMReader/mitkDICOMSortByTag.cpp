@@ -46,7 +46,7 @@ mitk::DICOMSortByTag
   }
   return *this;
 }
-    
+
 bool
 mitk::DICOMSortByTag
 ::operator==(const DICOMSortCriterion& other) const
@@ -143,4 +143,33 @@ mitk::DICOMSortByTag
   {
     return this->StringCompare(left,right, tag); // fallback to string compare
   }
+}
+
+double
+mitk::DICOMSortByTag
+::NumericDistance(const mitk::DICOMDatasetAccess* from, const mitk::DICOMDatasetAccess* to) const
+{
+  assert(from);
+  assert(to);
+
+  std::string fromString = from->GetTagValueAsString(m_Tag);
+  std::string toString = to->GetTagValueAsString(m_Tag);
+
+  std::istringstream fromi(fromString);
+  std::istringstream toi(toString);
+
+  double fromDouble(0);
+  double toDouble(0);
+
+  if (    (fromi >> fromDouble) && (toi >> toDouble)
+       && fromi.eof() && toi.eof() )
+  {
+    return toDouble - fromDouble;
+  }
+  else
+  {
+    return 0;
+  }
+
+  // TODO second-level compare?
 }

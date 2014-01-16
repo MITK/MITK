@@ -30,6 +30,7 @@ mitk::DICOMITKSeriesGDCMReader
 ::DICOMITKSeriesGDCMReader(unsigned int decimalPlacesForOrientation)
 :DICOMFileReader()
 ,m_FixTiltByShearing(true)
+,m_DecimalPlacesForOrientation(decimalPlacesForOrientation)
 {
   this->EnsureMandatorySortersArePresent(decimalPlacesForOrientation);
 }
@@ -43,6 +44,7 @@ mitk::DICOMITKSeriesGDCMReader
 ,m_Sorter( other.m_Sorter ) // TODO should clone the list items
 ,m_EquiDistantBlocksSorter( other.m_EquiDistantBlocksSorter->Clone() )
 ,m_NormalDirectionConsistencySorter( other.m_NormalDirectionConsistencySorter->Clone() )
+,m_DecimalPlacesForOrientation(other.m_DecimalPlacesForOrientation)
 {
 }
 
@@ -62,8 +64,45 @@ mitk::DICOMITKSeriesGDCMReader
     this->m_Sorter = other.m_Sorter; // TODO should clone the list items
     this->m_EquiDistantBlocksSorter = other.m_EquiDistantBlocksSorter->Clone();
     this->m_NormalDirectionConsistencySorter = other.m_NormalDirectionConsistencySorter->Clone();
+    this->m_DecimalPlacesForOrientation = other.m_DecimalPlacesForOrientation;
   }
   return *this;
+}
+
+bool
+mitk::DICOMITKSeriesGDCMReader
+::operator==(const DICOMFileReader& other) const
+{
+  if (const Self* otherSelf = dynamic_cast<const Self*>(&other))
+  {
+    if ( this->m_FixTiltByShearing == otherSelf->m_FixTiltByShearing
+      && *(this->m_EquiDistantBlocksSorter) == *(otherSelf->m_EquiDistantBlocksSorter)
+      && (fabs(this->m_DecimalPlacesForOrientation - otherSelf->m_DecimalPlacesForOrientation) < eps)
+       )
+    {
+      // test sorters for equality
+      if (this->m_Sorter.size() != otherSelf->m_Sorter.size()) return false;
+
+      SorterList::const_iterator mySorterIter = this->m_Sorter.begin();
+      SorterList::const_iterator oSorterIter = otherSelf->m_Sorter.begin();
+      for(; mySorterIter != this->m_Sorter.end() && oSorterIter != otherSelf->m_Sorter.end();
+          ++mySorterIter, ++oSorterIter)
+      {
+        if ( ! (**mySorterIter == **oSorterIter ) ) return false; // this sorter differs
+      }
+      
+      // nothing differs ==> all is equal
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  else
+  {
+    return false;
+  }
 }
 
 void
@@ -71,6 +110,13 @@ mitk::DICOMITKSeriesGDCMReader
 ::SetFixTiltByShearing(bool on)
 {
   m_FixTiltByShearing = on;
+}
+
+bool
+mitk::DICOMITKSeriesGDCMReader
+::GetFixTiltByShearing() const
+{
+  return m_FixTiltByShearing;
 }
 
 mitk::DICOMGDCMImageFrameList
@@ -537,6 +583,26 @@ mitk::DICOMITKSeriesGDCMReader
   }
 }
 
+mitk::DICOMITKSeriesGDCMReader::ConstSorterList
+mitk::DICOMITKSeriesGDCMReader
+::GetFreelyConfiguredSortingElements() const
+{
+  std::list<DICOMDatasetSorter::ConstPointer> result;
+
+  unsigned int sortIndex(0);
+  for(SorterList::const_iterator sorterIter = m_Sorter.begin();
+      sorterIter != m_Sorter.end();
+      ++sortIndex, ++sorterIter)
+  {
+    if (sortIndex > 0) // ignore first element (see EnsureMandatorySortersArePresent)
+    {
+      result.push_back( (*sorterIter).GetPointer() );
+    }
+  }
+
+  return result;
+}
+
 void
 mitk::DICOMITKSeriesGDCMReader
 ::EnsureMandatorySortersArePresent(unsigned int decimalPlacesForOrientation)
@@ -577,6 +643,29 @@ mitk::DICOMITKSeriesGDCMReader
 {
   assert( m_EquiDistantBlocksSorter.IsNotNull() );
   m_EquiDistantBlocksSorter->SetToleratedOriginOffset(millimeters);
+}
+
+double
+mitk::DICOMITKSeriesGDCMReader
+::GetToleratedOriginError() const
+{
+  assert( m_EquiDistantBlocksSorter.IsNotNull() );
+  return m_EquiDistantBlocksSorter->GetToleratedOriginOffset();
+}
+
+bool
+mitk::DICOMITKSeriesGDCMReader
+::IsToleratedOriginOffsetAbsolute() const
+{
+  assert( m_EquiDistantBlocksSorter.IsNotNull() );
+  return m_EquiDistantBlocksSorter->IsToleratedOriginOffsetAbsolute();
+}
+
+double
+mitk::DICOMITKSeriesGDCMReader
+::GetDecimalPlacesForOrientation() const
+{
+  return m_DecimalPlacesForOrientation;
 }
 
 std::string

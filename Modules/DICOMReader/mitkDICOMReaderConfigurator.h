@@ -17,7 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkDICOMReaderConfigurator_h
 #define mitkDICOMReaderConfigurator_h
 
-#include "mitkThreeDnTDICOMSeriesReader.h"
+#include "mitkClassicDICOMSeriesReader.h"
+#include "mitkDICOMTagBasedSorter.h"
 
 // to put into private implementation
 #include "tinyxml.h"
@@ -70,9 +71,25 @@ namespace mitk
   and afterwards the images within each group are sorted by means of DICOMSortCriterion, which
   most commonly mentions a tag.
 
-  Tag element and group are interpreted as the hexadecimal numbers
+  Tag element and group are interpreted as the exadecimal numbers
   found all around the DICOM standard. The numbers can be prepended by a "0x" if this is preferred
   by the programmer (but they are taken as hexadecimal in all cases).
+
+  \section DICOMReaderConfigurator_AboutTheFuture About the future evolution of this class
+
+  This first version is hard coded for the current state of the implementation.
+
+  If things should evolve in a way that needs us to splitt off readers for "old" versions,
+  time should be taken to refactor this class.
+
+  Basically, a serializer class should accompany each of the configurable classes. Such
+  serializer classes should be registered and discovered via micro-services (to support extensions).
+  A serializer should offer both methods to serialize a class and to desirialize it again.
+
+  A "version" attribute at the top-level tag should be used to distinguish versions.
+
+  Usually it should be enough to keep DE-serializers for all versions. Writers for the most
+  recent version should be enough.
 */
 class DICOMReader_EXPORT DICOMReaderConfigurator : public itk::LightObject
 {
@@ -81,8 +98,10 @@ class DICOMReader_EXPORT DICOMReaderConfigurator : public itk::LightObject
     mitkClassMacro( DICOMReaderConfigurator, itk::LightObject )
     itkNewMacro( DICOMReaderConfigurator )
 
-    DICOMFileReader::Pointer CreateFromConfigFile(const std::string& filename);
-    DICOMFileReader::Pointer CreateFromUTF8ConfigString(const std::string& xmlContents);
+    DICOMFileReader::Pointer CreateFromConfigFile(const std::string& filename) const;
+    DICOMFileReader::Pointer CreateFromUTF8ConfigString(const std::string& xmlContents) const;
+
+    std::string CreateConfigStringFromReader(DICOMFileReader::ConstPointer reader) const;
 
   protected:
 
@@ -91,16 +110,30 @@ class DICOMReader_EXPORT DICOMReaderConfigurator : public itk::LightObject
 
   private:
 
-    DICOMFileReader::Pointer CreateFromTiXmlDocument(TiXmlDocument& doc);
-    DICOMTag tagFromXMLElement(TiXmlElement*);
-    std::string requiredStringAttribute(TiXmlElement* xmlElement, const std::string& key);
-    unsigned int hexStringToUInt(const std::string& s);
+    DICOMFileReader::Pointer CreateFromTiXmlDocument(TiXmlDocument& doc) const;
+    DICOMTag tagFromXMLElement(TiXmlElement*) const;
+    std::string requiredStringAttribute(TiXmlElement* xmlElement, const std::string& key) const;
+    unsigned int hexStringToUInt(const std::string& s) const;
 
-    ThreeDnTDICOMSeriesReader::Pointer ConfigureThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, TiXmlElement*);
-    DICOMITKSeriesGDCMReader::Pointer ConfigureDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, TiXmlElement*);
+    ThreeDnTDICOMSeriesReader::Pointer ConfigureThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, TiXmlElement*) const;
+    DICOMITKSeriesGDCMReader::Pointer ConfigureDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, TiXmlElement*) const;
 
-    DICOMSortCriterion::Pointer CreateDICOMSortByTag(TiXmlElement* xmlElement, DICOMSortCriterion::Pointer secondaryCriterion);
-    DICOMSortCriterion::Pointer CreateSortByImagePositionPatient(TiXmlElement* xmlElement, DICOMSortCriterion::Pointer secondaryCriterion);
+    DICOMSortCriterion::Pointer CreateDICOMSortByTag(TiXmlElement* xmlElement, DICOMSortCriterion::Pointer secondaryCriterion) const;
+    DICOMSortCriterion::Pointer CreateSortByImagePositionPatient(TiXmlElement* xmlElement, DICOMSortCriterion::Pointer secondaryCriterion) const;
+
+    mitk::DICOMTagBasedSorter::Pointer CreateDICOMTagBasedSorter(TiXmlElement* element) const;
+
+    TiXmlElement* CreateConfigStringFromReader(const DICOMITKSeriesGDCMReader* reader) const;
+    TiXmlElement* CreateConfigStringFromReader(const ThreeDnTDICOMSeriesReader* reader) const;
+    TiXmlElement* CreateConfigStringFromReader(const ClassicDICOMSeriesReader* reader) const;
+
+    TiXmlElement* CreateConfigStringFromDICOMDatasetSorter(const DICOMTagBasedSorter* sorter) const;
+
+    TiXmlElement* CreateConfigStringFromDICOMTag(const DICOMTag& tag) const;
+
+    TiXmlElement* CreateDICOMFileReaderTag(const DICOMFileReader* reader) const;
+    const char* toString(bool) const;
+    std::string toHexString(unsigned int i) const;
  };
 
 } // namespace

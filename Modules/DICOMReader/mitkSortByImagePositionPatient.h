@@ -45,6 +45,8 @@ class DICOMReader_EXPORT SortByImagePositionPatient : public DICOMSortCriterion
     virtual bool IsLeftBeforeRight(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right) const;
 
     virtual void Print(std::ostream& os) const;
+    
+    virtual bool operator==(const DICOMSortCriterion& other) const;
 
   protected:
 

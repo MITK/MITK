@@ -53,11 +53,13 @@ class DICOMReader_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGDCMRe
 
     /// \brief Control whether 3D+t grouping shall actually be attempted.
     void SetGroup3DandT(bool on);
+    bool GetGroup3DandT() const;
 
     // void AllocateOutputImages();
     /// \brief Load via multiple calls to itk::ImageSeriesReader.
     virtual bool LoadImages();
 
+    virtual bool operator==(const DICOMFileReader& other) const;
 
   protected:
 

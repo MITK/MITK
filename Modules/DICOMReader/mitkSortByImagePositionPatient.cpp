@@ -44,6 +44,13 @@ mitk::SortByImagePositionPatient
   }
   return *this;
 }
+    
+bool
+mitk::SortByImagePositionPatient
+::operator==(const DICOMSortCriterion& other) const
+{
+  return dynamic_cast<const SortByImagePositionPatient*>(&other) != NULL; // same class
+}
 
 void
 mitk::SortByImagePositionPatient

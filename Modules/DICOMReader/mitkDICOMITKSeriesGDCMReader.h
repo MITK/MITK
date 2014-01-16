@@ -222,11 +222,16 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
       \brief Add an element to the sorting procedure described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy.
     */
     virtual void AddSortingElement(DICOMDatasetSorter* sorter, bool atFront = false);
+    
+    typedef const std::list<DICOMDatasetSorter::ConstPointer> ConstSorterList;
+    ConstSorterList GetFreelyConfiguredSortingElements() const;
 
     /**
       \brief Controls whether to "fix" tilted acquisitions by shearing the output (see \ref DICOMITKSeriesGDCMReader_GantryTilt).
     */
     void SetFixTiltByShearing(bool on);
+
+    bool GetFixTiltByShearing() const;
 
     /**
       \brief See \ref DICOMITKSeriesGDCMReader_ForcedConfiguration.
@@ -237,6 +242,13 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
       \brief See \ref DICOMITKSeriesGDCMReader_ForcedConfiguration.
     */
     void SetToleratedOriginOffset(double millimeters = 0.005);
+
+    double GetToleratedOriginError() const;
+    bool IsToleratedOriginOffsetAbsolute() const;
+
+    double GetDecimalPlacesForOrientation() const;
+
+    virtual bool operator==(const DICOMFileReader& other) const;
 
   protected:
 
@@ -330,6 +342,8 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
     DICOMGDCMImageFrameList m_InputFrameList;
 
     gdcm::Scanner m_GDCMScanner;
+  
+    double m_DecimalPlacesForOrientation;
 };
 
 }

@@ -34,6 +34,8 @@ Qmitk/QmitkSplitConnectedRegionsTool3DGUI.cpp
 Qmitk/QmitkConnectedRegionSelectorTool3DGUI.cpp
 Qmitk/QmitkSliceBasedInterpolator.cpp
 Qmitk/QmitkSurfaceBasedInterpolator.cpp
+Qmitk/QmitkSurfaceStampWidget.cpp
+Qmitk/QmitkMaskStampWidget.cpp
 Qmitk/QmitkLabelSetTableWidget.cpp
 Qmitk/QmitkLabelSetWidget.cpp
 Qmitk/QmitkSearchLabelDialog.cpp
@@ -75,6 +77,8 @@ Qmitk/QmitkSplitConnectedRegionsTool3DGUI.h
 Qmitk/QmitkConnectedRegionSelectorTool3DGUI.h
 Qmitk/QmitkSliceBasedInterpolator.h
 Qmitk/QmitkSurfaceBasedInterpolator.h
+Qmitk/QmitkSurfaceStampWidget.h
+Qmitk/QmitkMaskStampWidget.h
 Qmitk/QmitkLabelSetTableWidget.h
 Qmitk/QmitkLabelSetWidget.h
 Qmitk/QmitkSearchLabelDialog.h
@@ -102,6 +106,8 @@ Qmitk/QmitkBinaryThresholdToolGUIControls.ui
 Qmitk/QmitkBinaryThresholdULToolGUIControls.ui
 Qmitk/QmitkFastMarchingToolGUIControls.ui
 Qmitk/QmitkConnectedRegionSelectorTool3DGUIControls.ui
+Qmitk/QmitkSurfaceStampWidgetControls.ui
+Qmitk/QmitkMaskStampWidgetControls.ui
 )
 
 set(QRC_FILES

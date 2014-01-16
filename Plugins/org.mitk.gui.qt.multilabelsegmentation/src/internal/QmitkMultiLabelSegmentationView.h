@@ -72,18 +72,8 @@ protected slots:
   /// \brief reaction to button "New Segmentation Session"
   void OnNewSegmentationSession();
 
-  /// \brief reaction to button "Surface Stamp"
-  void OnSurfaceStamp();
-
-  /// \brief reaction to button "Mask Stamp"
-  void OnMaskStamp();
-
   /// \brief reaction to signal "goToLabel" from labelset widget
   void OnGoToLabel(const mitk::Point3D& pos);
-
-  void OnMaskStampShowInformation(bool);
-
-  void OnSurfaceStampShowInformation(bool);
 
 protected:
 
@@ -135,8 +125,6 @@ protected:
 
   mitk::NodePredicateAnd::Pointer m_ReferencePredicate;
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
-  mitk::NodePredicateAnd::Pointer m_SurfacePredicate;
-  mitk::NodePredicateAnd::Pointer m_MaskPredicate;
 
   bool m_MouseCursorSet;
 

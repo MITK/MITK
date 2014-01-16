@@ -1759,6 +1759,18 @@ void QmitkFiberfoxView::SimulateForExistingDwi(mitk::DataNode* imageNode)
 
     UpdateImageParameters();
 
+    if (m_ImageGenParameters.m_NoiseModel==NULL &&
+            m_ImageGenParameters.m_Spikes==0 &&
+            m_ImageGenParameters.m_FrequencyMap.IsNull() &&
+            m_ImageGenParameters.m_KspaceLineOffset<=0.000001 &&
+            !m_ImageGenParameters.m_AddGibbsRinging &&
+            !m_ImageGenParameters.m_DoSimulateEddyCurrents &&
+            m_ImageGenParameters.m_Wrap>0.999)
+    {
+        QMessageBox::information( NULL, "Simulation cancelled", "No valid artifact enabled! Motion artifacts and relaxation effects can NOT be added to an existing diffusion weighted image.");
+        return;
+    }
+
     mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(imageNode->GetData());
     m_ArtifactsToDwiFilter = itk::AddArtifactsToDwiImageFilter< short >::New();
     m_ArtifactsToDwiFilter->SetInput(diffImg->GetVectorImage());

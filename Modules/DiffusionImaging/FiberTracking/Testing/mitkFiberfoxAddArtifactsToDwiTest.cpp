@@ -44,15 +44,18 @@ class mitkFiberfoxAddArtifactsToDwiTestSuite : public mitk::TestFixture
     CPPUNIT_TEST_SUITE(mitkFiberfoxAddArtifactsToDwiTestSuite);
     MITK_TEST(Spikes);
     MITK_TEST(GibbsRinging);
+    MITK_TEST(Ghost);
+    MITK_TEST(Aliasing);
+    MITK_TEST(Eddy);
+    MITK_TEST(RicianNoise);
+    MITK_TEST(ChiSquareNoise);
+    MITK_TEST(Distortions);
     CPPUNIT_TEST_SUITE_END();
 
 private:
 
-    vector< string > m_Files;
     mitk::DiffusionImage<short>::Pointer m_InputDwi;
     FiberfoxParameters m_Parameters;
-    mitk::RicianNoiseModel<double>*  m_RicianNoiseModel;
-    mitk::ChiSquareNoiseModel<double>* m_ChiSquareNoiseModel;
 
 public:
 
@@ -61,13 +64,10 @@ public:
         RegisterDiffusionCoreObjectFactory();
 
         // reference files
-        m_Files.push_back( GetTestDataFilePath("DiffusionImaging/Fiberfox/StickBall_RELAX.dwi") );
-        m_Files.push_back( GetTestDataFilePath("DiffusionImaging/Fiberfox/spikes2.dwi") );
-        m_Files.push_back( GetTestDataFilePath("DiffusionImaging/Fiberfox/gibbsringing.dwi") );
-
-        m_InputDwi = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(m_Files.at(0))->GetData());
+        m_InputDwi = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(GetTestDataFilePath("DiffusionImaging/Fiberfox/StickBall_RELAX.dwi"))->GetData());
 
         // parameter setup
+        m_Parameters = FiberfoxParameters();
         m_Parameters.m_ImageRegion = m_InputDwi->GetVectorImage()->GetLargestPossibleRegion();
         m_Parameters.m_ImageSpacing = m_InputDwi->GetVectorImage()->GetSpacing();
         m_Parameters.m_ImageOrigin = m_InputDwi->GetVectorImage()->GetOrigin();
@@ -85,16 +85,6 @@ public:
             if (dirs->at(i).magnitude()>0.0001)
                 m_Parameters.m_NumGradients++;
         }
-
-        // noise models
-        m_RicianNoiseModel = new mitk::RicianNoiseModel<double>();
-        m_RicianNoiseModel->SetNoiseVariance(1000000);
-        m_RicianNoiseModel->SetSeed(0);
-
-        // Rician noise
-        m_ChiSquareNoiseModel = new mitk::ChiSquareNoiseModel<double>();
-        m_ChiSquareNoiseModel->SetDOF(500000);
-        m_ChiSquareNoiseModel->SetSeed(0);
     }
 
     bool CompareDwi(itk::VectorImage< short, 3 >* dwi1, itk::VectorImage< short, 3 >* dwi2)
@@ -139,7 +129,7 @@ public:
         artifactsToDwiFilter->SetSpikeAmplitude(m_Parameters.m_SpikeAmplitude);
         artifactsToDwiFilter->SetSpikes(m_Parameters.m_Spikes);
         artifactsToDwiFilter->SetWrap(m_Parameters.m_Wrap);
-        artifactsToDwiFilter->Update();
+        CPPUNIT_ASSERT_NO_THROW(artifactsToDwiFilter->Update());
 
         mitk::DiffusionImage<short>::Pointer testImage = mitk::DiffusionImage<short>::New();
         testImage->SetVectorImage( artifactsToDwiFilter->GetOutput() );
@@ -153,9 +143,8 @@ public:
         }
         else
         {
-            MITK_INFO << "Saving test image to " << testFileName;
             NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
-            writer->SetFileName(testFileName);
+            writer->SetFileName("/local/distortions2.dwi");
             writer->SetInput(testImage);
             writer->Update();
         }
@@ -165,50 +154,62 @@ public:
     {
         m_Parameters.m_Spikes = 5;
         m_Parameters.m_SpikeAmplitude = 1;
-        StartSimulation(m_Files.at(1));
-        m_Parameters.m_Spikes = 0;
+        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/spikes2.dwi") );
     }
 
     void GibbsRinging()
     {
-        // Gibbs ringing
         m_Parameters.m_AddGibbsRinging = true;
-        StartSimulation(m_Files.at(2));
-        m_Parameters.m_AddGibbsRinging = false;
+        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/gibbsringing2.dwi") );
+    }
 
-        //        // Ghost
-        //        parameters.m_AddGibbsRinging = false;
-        //        parameters.m_KspaceLineOffset = 0.25;
-        //        StartSimulation(parameters, fiberBundle, ghost, argv[9]);
+    void Ghost()
+    {
+        m_Parameters.m_KspaceLineOffset = 0.25;
+        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/ghost2.dwi") );
+    }
 
-        //        // Aliasing
-        //        parameters.m_KspaceLineOffset = 0;
-        //        parameters.m_Wrap = 0.4;
-        //        parameters.m_SignalScale = 1000;
-        //        StartSimulation(parameters, fiberBundle, aliasing, argv[10]);
+    void Aliasing()
+    {
+        m_Parameters.m_Wrap = 0.4;
+        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/aliasing2.dwi") );
+    }
 
-        //        // Eddy currents
-        //        parameters.m_Wrap = 1;
-        //        parameters.m_SignalScale = 10000;
-        //        parameters.m_DoSimulateEddyCurrents = true;
-        //        parameters.m_EddyStrength = 0.05;
-        //        StartSimulation(parameters, fiberBundle, eddy, argv[11]);
+    void Eddy()
+    {
+        m_Parameters.m_DoSimulateEddyCurrents = true;
+        m_Parameters.m_EddyStrength = 0.05;
+        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/eddy2.dwi") );
+    }
 
-        //        // Rician noise
-        //        parameters.m_Spikes = 0;
-        //        parameters.m_NoiseModel = ricianNoiseModel;
-        //        StartSimulation(parameters, fiberBundle, riciannoise, argv[15]);
-        //        delete parameters.m_NoiseModel;
+    void RicianNoise()
+    {
+        mitk::RicianNoiseModel<double>* ricianNoiseModel = new mitk::RicianNoiseModel<double>();
+        ricianNoiseModel->SetNoiseVariance(1000000);
+        ricianNoiseModel->SetSeed(0);
+        m_Parameters.m_NoiseModel = ricianNoiseModel;
+        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/riciannoise2.dwi") );
+        delete m_Parameters.m_NoiseModel;
+    }
 
-        //        // Chi-square noise
-        //        parameters.m_NoiseModel = chiSquareNoiseModel;
-        //        StartSimulation(parameters, fiberBundle, chisquarenoise, argv[16]);
-        //        delete parameters.m_NoiseModel;
+    void ChiSquareNoise()
+    {
+        mitk::ChiSquareNoiseModel<double>* chiSquareNoiseModel = new mitk::ChiSquareNoiseModel<double>();
+        chiSquareNoiseModel->SetDOF(500000);
+        chiSquareNoiseModel->SetSeed(0);
+        m_Parameters.m_NoiseModel = chiSquareNoiseModel;
+        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/chisquarenoise2.dwi") );
+        delete m_Parameters.m_NoiseModel;
+    }
 
-        //        // Distortions
-        //        parameters.m_NoiseModel = NULL;
-        //        parameters.m_FrequencyMap = fMap;
-        //        StartSimulation(parameters, fiberBundle, distortions, argv[17]);
+    void Distortions()
+    {
+        mitk::Image::Pointer mitkFMap = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode( GetTestDataFilePath("DiffusionImaging/Fiberfox/Fieldmap.nrrd") )->GetData());
+        typedef itk::Image<double, 3> ItkDoubleImgType;
+        ItkDoubleImgType::Pointer fMap = ItkDoubleImgType::New();
+        mitk::CastToItkImage<ItkDoubleImgType>(mitkFMap, fMap);
+        m_Parameters.m_FrequencyMap = fMap;
+        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/distortions2.dwi") );
     }
 };
 

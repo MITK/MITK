@@ -134,28 +134,27 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         outputImage->FillBuffer(temp);
 
         int tempY=croppedRegion.GetSize(1);
-        if ( tempY%2 == 1 )
-            tempY += 1;
+        tempY += tempY%2;
         croppedRegion.SetSize(1, tempY);
 
         MatrixType transform = inputImage->GetDirection();
         for (int i=0; i<3; i++)
             for (int j=0; j<3; j++)
-                    transform[i][j] *= inputImage->GetSpacing()[j];
+                transform[i][j] *= inputImage->GetSpacing()[j];
 
         m_StatusText += this->GetTime()+" > Adjusting complex signal\n";
         if (m_FrequencyMap.IsNotNull())
-            m_StatusText += this->GetTime()+" > Simulating distortions\n";
+            m_StatusText += "Simulating distortions\n";
         if (m_AddGibbsRinging)
-            m_StatusText += this->GetTime()+" > Simulating ringing artifacts\n";
+            m_StatusText += "Simulating ringing artifacts\n";
         if (m_SimulateEddyCurrents)
-            m_StatusText += this->GetTime()+" > Simulating eddy currents\n";
+            m_StatusText += "Simulating eddy currents\n";
         if (m_Spikes>0)
-            m_StatusText += this->GetTime()+" > Simulating spikes\n";
+            m_StatusText += "Simulating spikes\n";
         if (m_Wrap<1.0)
-            m_StatusText += this->GetTime()+" > Simulating aliasing artifacts\n";
+            m_StatusText += "Simulating aliasing artifacts\n";
         if (m_kOffset>0)
-            m_StatusText += this->GetTime()+" > Simulating ghosts\n";
+            m_StatusText += "Simulating ghosts\n";
 
         std::vector< int > spikeVolume;
         for (int i=0; i<m_Spikes; i++)
@@ -188,8 +187,8 @@ void AddArtifactsToDwiImageFilter< TPixelType >
 
                 std::vector< SliceType::Pointer > compartmentSlices;
                 // extract slice from channel g
-                for (unsigned int y=0; y<sliceRegion.GetSize(1); y++)
-                    for (unsigned int x=0; x<sliceRegion.GetSize(0); x++)
+                for (unsigned int y=0; y<inputRegion.GetSize(1); y++)
+                    for (unsigned int x=0; x<inputRegion.GetSize(0); x++)
                     {
                         typename SliceType::IndexType index2D;
                         index2D[0]=x; index2D[1]=y;
@@ -198,7 +197,6 @@ void AddArtifactsToDwiImageFilter< TPixelType >
 
                         SliceType::PixelType pix2D = (SliceType::PixelType)inputImage->GetPixel(index3D)[g];
                         slice->SetPixel(index2D, pix2D);
-
                         if (fMap.IsNotNull())
                             fMap->SetPixel(index2D, m_FrequencyMap->GetPixel(index3D));
                     }
@@ -213,6 +211,17 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                     resampler->Update();
                     typename SliceType::Pointer upslice = resampler->GetOutput();
                     compartmentSlices.push_back(upslice);
+
+                    if (fMap.IsNotNull())
+                    {
+                        itk::ResampleImageFilter<SliceType, SliceType>::Pointer resampler = itk::ResampleImageFilter<SliceType, SliceType>::New();
+                        resampler->SetInput(fMap);
+                        resampler->SetOutputParametersFromImage(fMap);
+                        resampler->SetSize(upsampledSliceRegion.GetSize());
+                        resampler->SetOutputSpacing(fMap->GetSpacing()/2);
+                        resampler->Update();
+                        fMap = resampler->GetOutput();
+                    }
                 }
                 else
                     compartmentSlices.push_back(slice);

@@ -64,4 +64,4 @@ IF(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
 
   MITK_INSTALL_TARGETS(EXECUTABLES mitkDiffusionMiniApps )
 
-ENDIF(BUILD_DiffusionMiniApps)
+ENDIF(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)

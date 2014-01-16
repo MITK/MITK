@@ -68,12 +68,12 @@ namespace itk{
     itkSetMacro( SpikeAmplitude, double )
     itkSetMacro( Wrap, double )
     itkGetMacro( StatusText, std::string )
+    itkSetMacro( UseConstantRandSeed, bool )
 
   protected:
     AddArtifactsToDwiImageFilter();
     ~AddArtifactsToDwiImageFilter() {}
 
-    typename ComplexSliceType::Pointer RearrangeSlice(typename ComplexSliceType::Pointer slice);
     std::string GetTime();
 
     void GenerateData();
@@ -92,6 +92,8 @@ namespace itk{
     double                              m_Wrap;
     std::string                         m_StatusText;
     time_t                              m_StartTime;
+    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
+    bool                                m_UseConstantRandSeed;
 
   private:
 

@@ -42,58 +42,30 @@ AddArtifactsToDwiImageFilter< TPixelType >
     , m_FrequencyMap(NULL)
     , m_kOffset(0)
     , m_tLine(1)
-    , m_EddyGradientStrength(0.001)
+    , m_EddyGradientStrength(0.0)
     , m_SimulateEddyCurrents(false)
     , m_TE(100)
     , m_AddGibbsRinging(false)
     , m_Spikes(0)
     , m_SpikeAmplitude(1)
     , m_Wrap(1.0)
+    , m_UseConstantRandSeed(false)
 {
     this->SetNumberOfRequiredInputs( 1 );
-}
 
-
-template< class TPixelType >
-AddArtifactsToDwiImageFilter< TPixelType >::ComplexSliceType::Pointer AddArtifactsToDwiImageFilter< TPixelType >::RearrangeSlice(ComplexSliceType::Pointer slice)
-{
-    ImageRegion<2> region = slice->GetLargestPossibleRegion();
-    typename ComplexSliceType::Pointer rearrangedSlice = ComplexSliceType::New();
-    rearrangedSlice->SetLargestPossibleRegion( region );
-    rearrangedSlice->SetBufferedRegion( region );
-    rearrangedSlice->SetRequestedRegion( region );
-    rearrangedSlice->Allocate();
-
-    int xHalf = region.GetSize(0)/2;
-    int yHalf = region.GetSize(1)/2;
-
-    for (int y=0; y<region.GetSize(1); y++)
-        for (int x=0; x<region.GetSize(0); x++)
-        {
-            typename SliceType::IndexType idx;
-            idx[0]=x; idx[1]=y;
-            vcl_complex< SliceType::PixelType > pix = slice->GetPixel(idx);
-
-            if( idx[0] <  xHalf )
-                idx[0] = idx[0] + xHalf;
-            else
-                idx[0] = idx[0] - xHalf;
-
-            if( idx[1] <  yHalf )
-                idx[1] = idx[1] + yHalf;
-            else
-                idx[1] = idx[1] - yHalf;
-
-            rearrangedSlice->SetPixel(idx, pix);
-        }
-
-    return rearrangedSlice;
+    m_RandGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+    m_RandGen->SetSeed();
 }
 
 template< class TPixelType >
 void AddArtifactsToDwiImageFilter< TPixelType >
 ::GenerateData()
 {
+    if (m_UseConstantRandSeed)  // always generate the same random numbers?
+        m_RandGen->SetSeed(0);
+    else
+        m_RandGen->SetSeed();
+
     m_StartTime = clock();
     m_StatusText = "Starting simulation\n";
 
@@ -171,24 +143,23 @@ void AddArtifactsToDwiImageFilter< TPixelType >
             for (int j=0; j<3; j++)
                     transform[i][j] *= inputImage->GetSpacing()[j];
 
-        MITK_INFO << this->GetTime()+" > Adjusting complex signal";
-        MITK_INFO << "line readout time: " << m_tLine;
-        MITK_INFO << "line offset: " << m_kOffset;
+        m_StatusText += this->GetTime()+" > Adjusting complex signal\n";
         if (m_FrequencyMap.IsNotNull())
-            MITK_INFO << "frequency map is set";
-        else
-            MITK_INFO << "no frequency map set";
+            m_StatusText += this->GetTime()+" > Simulating distortions\n";
         if (m_AddGibbsRinging)
-            MITK_INFO << "Gibbs ringing enabled";
-        else
-            MITK_INFO << "Gibbs ringing disabled";
-
+            m_StatusText += this->GetTime()+" > Simulating ringing artifacts\n";
         if (m_SimulateEddyCurrents)
-            MITK_INFO << "Simulating eddy currents";
+            m_StatusText += this->GetTime()+" > Simulating eddy currents\n";
+        if (m_Spikes>0)
+            m_StatusText += this->GetTime()+" > Simulating spikes\n";
+        if (m_Wrap<1.0)
+            m_StatusText += this->GetTime()+" > Simulating aliasing artifacts\n";
+        if (m_kOffset>0)
+            m_StatusText += this->GetTime()+" > Simulating ghosts\n";
 
         std::vector< int > spikeVolume;
         for (int i=0; i<m_Spikes; i++)
-            spikeVolume.push_back(rand()%inputImage->GetVectorLength());
+            spikeVolume.push_back(m_RandGen->GetIntegerVariate()%inputImage->GetVectorLength());
         std::sort (spikeVolume.begin(), spikeVolume.end());
         std::reverse (spikeVolume.begin(), spikeVolume.end());
 
@@ -201,7 +172,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
             std::vector< int > spikeSlice;
             while (!spikeVolume.empty() && spikeVolume.back()==g)
             {
-                spikeSlice.push_back(rand()%inputImage->GetLargestPossibleRegion().GetSize(2));
+                spikeSlice.push_back(m_RandGen->GetIntegerVariate()%inputImage->GetLargestPossibleRegion().GetSize(2));
                 spikeVolume.pop_back();
             }
             std::sort (spikeSlice.begin(), spikeSlice.end());
@@ -251,6 +222,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
 
                 itk::Size<2> outSize; outSize.SetElement(0, xMax); outSize.SetElement(1, croppedRegion.GetSize()[1]);
                 typename itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
+                idft->SetUseConstantRandSeed(m_UseConstantRandSeed);
                 idft->SetCompartmentImages(compartmentSlices);
                 idft->SetkOffset(m_kOffset);
                 idft->SettLine(m_tLine);

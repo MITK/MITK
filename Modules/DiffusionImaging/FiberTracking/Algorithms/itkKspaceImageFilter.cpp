@@ -46,14 +46,23 @@ KspaceImageFilter< TPixelType >
     , m_SignalScale(1)
     , m_Spikes(0)
     , m_SpikeAmplitude(1)
+    , m_UseConstantRandSeed(false)
 {
     m_DiffusionGradientDirection.Fill(0.0);
+
+    m_RandGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+    m_RandGen->SetSeed();
 }
 
 template< class TPixelType >
 void KspaceImageFilter< TPixelType >
 ::BeforeThreadedGenerateData()
 {
+    if (m_UseConstantRandSeed)  // always generate the same random numbers?
+        m_RandGen->SetSeed(0);
+    else
+        m_RandGen->SetSeed();
+
     typename OutputImageType::Pointer outputImage = OutputImageType::New();
     itk::ImageRegion<2> region; region.SetSize(0, m_OutSize[0]);  region.SetSize(1, m_OutSize[1]);
     outputImage->SetLargestPossibleRegion( region );
@@ -214,8 +223,8 @@ void KspaceImageFilter< TPixelType >
     for (int i=0; i<m_Spikes; i++)
     {
         itk::Index< 2 > spikeIdx;
-        spikeIdx[0] = rand()%(int)kxMax;
-        spikeIdx[1] = rand()%(int)kyMax;
+        spikeIdx[0] = m_RandGen->GetIntegerVariate()%(int)kxMax;
+        spikeIdx[1] = m_RandGen->GetIntegerVariate()%(int)kyMax;
         outputImage->SetPixel(spikeIdx, spike);
     }
 

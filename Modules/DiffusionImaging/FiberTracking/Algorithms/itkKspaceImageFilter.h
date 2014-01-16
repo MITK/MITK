@@ -26,6 +26,7 @@ This file is based heavily on a corresponding ITK filter.
 #include <itkImageSource.h>
 #include <vcl_complex.h>
 #include <vector>
+#include <itkMersenneTwisterRandomVariateGenerator.h>
 
 namespace itk{
 
@@ -71,6 +72,7 @@ namespace itk{
     itkSetMacro( OutSize, itk::Size<2> )
     itkSetMacro( Spikes, int )
     itkSetMacro( SpikeAmplitude, double )
+    itkSetMacro( UseConstantRandSeed, bool )
 
     void SetT2( std::vector< double > t2Vector ) { m_T2=t2Vector; }
     void SetCompartmentImages( std::vector< InputImagePointerType > cImgs ) { m_CompartmentImages=cImgs; }
@@ -108,6 +110,8 @@ namespace itk{
     itk::Size<2>                            m_OutSize;
     int                                     m_Spikes;
     double                                  m_SpikeAmplitude;
+    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
+    bool                                    m_UseConstantRandSeed;
 
   private:
 

@@ -204,6 +204,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
             itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
             idft->SetCompartmentImages(compartmentSlices);
             idft->SetT2(t2Vector);
+            idft->SetUseConstantRandSeed(m_UseConstantRandSeed);
             idft->SetkOffset(m_kOffset);
             idft->SettLine(m_tLine);
             idft->SetTE(m_TE);

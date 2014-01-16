@@ -299,7 +299,7 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
         parameters.m_DoAddMotion = false;
         parameters.m_Spikes = 5;
         parameters.m_SpikeAmplitude = 1;
-        StartSimulation(parameters, fiberBundle, NULL, "/tmp/spikes.dwi");
+        StartSimulation(parameters, fiberBundle, spikes, argv[14]);
 
         // Rician noise
         parameters.m_Spikes = 0;

@@ -1,6 +1,7 @@
 <?xml version="1.0" standalone=no>
 <DICOMFileReader
   class="ThreeDnTDICOMSeriesReader"
+  version="1"
   label="IPP 3D+t"
   description="Sort by Image Position (Patient), then group as 3D+t"
   group3DnT="true"

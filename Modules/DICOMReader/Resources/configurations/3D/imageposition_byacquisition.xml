@@ -1,9 +1,9 @@
 <?xml version="1.0" standalone=no>
 <DICOMFileReader
-  label="Image Position"
+  label="Image Position (A)"
   description="Sort by Image Position (Patient)"
   class="DICOMITKSeriesGDCMReader"
-  version="1.0"
+  version="1"
   fixTiltByShearing="true">
 <DICOMDatasetSorter class="DICOMTagBasedSorter">
   <Distinguishing>

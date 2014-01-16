@@ -121,9 +121,6 @@ const char* QmitkXnatEditor::GetClassNameA() const
 
 void QmitkXnatEditor::SetFocus()
 {
-  m_Controls.buttonGetAllProjects->setFocus();
-  m_Controls.buttonDownloadResource->setFocus();
-  m_Controls.buttonDownloadFile->setFocus();
 }
 
 void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
@@ -137,15 +134,14 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
   //m_Controls.scanTreeView->setModel(m_ScansModel);
   //m_Controls.resourceTreeView->setModel(m_ResourceModel);
   //m_Controls.fileTreeView->setModel(m_FileModel);
-  UpdateList();
+  //UpdateList();
 
   GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
 
-  connect( m_Controls.buttonHigherLevel, SIGNAL(clicked()), this, SLOT(OnHigherLevel()) );
+  //connect( m_Controls.buttonHigherLevel, SIGNAL(clicked()), this, SLOT(OnHigherLevel()) );
   connect( m_Controls.treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(OnObjectActivated(const QModelIndex&)) );
   //connect( m_Controls.buttonDownloadResource, SIGNAL(clicked()), this, SLOT(DownloadResource()) );
   //connect( m_Controls.buttonDownloadFile, SIGNAL(clicked()), this, SLOT(DownloadFile()) );
-
   /*
   connect( m_Controls.projectTreeView, SIGNAL(clicked(QModelIndex)), SLOT(ProjectSelected(QModelIndex)) );
   connect( m_Controls.subjectTreeView, SIGNAL(clicked(QModelIndex)), SLOT(SubjectSelected(QModelIndex)) );
@@ -153,6 +149,31 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.scanTreeView, SIGNAL(clicked(QModelIndex)), SLOT(ScanSelected(QModelIndex)) );
   connect( m_Controls.resourceTreeView, SIGNAL(clicked(QModelIndex)), SLOT(ResourceSelected(QModelIndex)) );
   */
+  connect( m_Controls.buttonDataModel, SIGNAL(clicked()), this, SLOT(OnDataModelButtonClicked()) );
+  connect( m_Controls.buttonProject, SIGNAL(clicked()), this, SLOT(OnProjectButtonClicked()) );
+  connect( m_Controls.buttonSubject, SIGNAL(clicked()), this, SLOT(OnSubjectButtonClicked()) );
+  connect( m_Controls.buttonExperiment, SIGNAL(clicked()), this, SLOT(OnExperimentButtonClicked()) );
+  connect( m_Controls.buttonKindOfData, SIGNAL(clicked()), this, SLOT(OnKindOfDataButtonClicked()) );
+  connect( m_Controls.buttonSession, SIGNAL(clicked()), this, SLOT(OnSessionButtonClicked()) );
+  connect( m_Controls.buttonResource, SIGNAL(clicked()), this, SLOT(OnResourceButtonClicked()) );
+  //QStandardItem item("...");
+  //ctkXnatObject* object = new ctkXnatObject(m_ListModel->getRootObject());
+  //if ( object != NULL )
+  //{
+  //  ctkXnatObject* inputObject = GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject();
+  //  inputObject->setId("...");
+  //  object->add( inputObject );
+  //}
+  for(int i = 0; i < m_Controls.breadcrumbHorizontalLayout->count()-1; i++)
+  {
+    QLayoutItem* child = m_Controls.breadcrumbHorizontalLayout->itemAt(i);
+    child->widget()->setVisible(false);
+  }
+  for(int i = 0; i < m_Controls.breadcrumbDescriptionLayout->count()-1; i++)
+  {
+    QLayoutItem* child = m_Controls.breadcrumbHorizontalLayout->itemAt(i);
+    child->widget()->setVisible(false);
+  }
 }
 
 void QmitkXnatEditor::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/, const QList<mitk::DataNode::Pointer>& nodes )
@@ -176,8 +197,73 @@ void QmitkXnatEditor::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sourc
 */
 void QmitkXnatEditor::UpdateList()
 {
-  m_ListModel->setRootObject( GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject() );
+  ctkXnatObject* inputObject = GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject();
+  if( inputObject == NULL )
+    return;
+  m_ListModel->setRootObject( inputObject );
   m_Controls.treeView->reset();
+
+  // recursive method to check parents of the inputObject
+  m_ParentCount = ParentChecker(inputObject);
+
+  for(int i = 0; i < m_Controls.breadcrumbHorizontalLayout->count()-1; i++)
+  {
+    QLayoutItem* child = m_Controls.breadcrumbHorizontalLayout->itemAt(i);
+    child->widget()->setVisible(false);
+  }
+  for(int i = 0; i < m_Controls.breadcrumbDescriptionLayout->count()-1; i++)
+  {
+    QLayoutItem* child = m_Controls.breadcrumbDescriptionLayout->itemAt(i);
+    child->widget()->setVisible(false);
+  }
+
+  ctkXnatObject* parent = NULL;
+  for(int i = m_ParentCount*2; i >= 0; i--)
+  {
+    m_Controls.breadcrumbDescriptionLayout->itemAt(i)->widget()->setVisible(true);
+    QLayoutItem* child = m_Controls.breadcrumbHorizontalLayout->itemAt(i);
+    child->widget()->setVisible(true);
+    if(i>0)
+    {
+      m_Controls.breadcrumbHorizontalLayout->itemAt(i-1)->widget()->setVisible(true);
+      m_Controls.breadcrumbDescriptionLayout->itemAt(i-1)->widget()->setVisible(true);
+    }
+    if(parent == NULL)
+    {
+      parent = inputObject;
+    }
+    QPushButton* breadcrumbButton = dynamic_cast<QPushButton*>(child->widget());
+    breadcrumbButton->setText(parent->id());
+    parent = parent->parent();
+    i--;
+  }
+  //for(int i = 0; i <= m_ParentCount*2; i++)
+  //{
+  //  QLayoutItem* child = m_Controls.breadcrumbHorizontalLayout->itemAt(i);
+  //  child->widget()->setVisible(true);
+  //while( inputObject->parent() != NULL )
+  //{
+  //  parent
+  //}
+  //m_Controls.buttonDataModel->setVisible(true);
+
+  //QList<ctkXnatObject*> children = m_ListModel->getRootObject()->children();
+  //bool goHigherDots = false;
+  //foreach(ctkXnatObject* child, children)
+  //{
+  //  if (child->id() == QString("..."))
+  //  {
+  //    goHigherDots = true;
+  //  }
+  //}
+  //if(!goHigherDots)
+  //{
+  //  ctkXnatObject* dummy = new ctkXnatProject();
+  //  dummy->setId("...");
+  //  m_ListModel->getRootObject()->add(dummy);
+  //}
+  //MITK_INFO << m_ListModel->children().count();
+  //m_ListModel->beginMoveRows(m_Controls.treeView->rootIndex(),
 }
 
 /**
@@ -335,7 +421,7 @@ void QmitkXnatEditor::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart
       selection.Cast<const berry::IStructuredSelection>())
   {
     berry::IStructuredSelection::ConstPointer currentSelection = selection.Cast<const berry::IStructuredSelection>();
-    // iterate over the selections (for the BlueBerry example this is always 1)
+    // iterates over the selection
     for (berry::IStructuredSelection::iterator itr = currentSelection->Begin();
          itr != currentSelection->End(); ++itr)
     {
@@ -355,7 +441,7 @@ void QmitkXnatEditor::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart
   }
 }
 
-void QmitkXnatEditor::OnHigherLevel()
+void QmitkXnatEditor::ToHigherLevel()
 {
   ctkXnatObject* parent = GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->parent();
   if( parent ==  NULL)
@@ -376,6 +462,7 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
   QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( child );
   berry::IEditorInput::Pointer editorInput( oPtr );
   SetInput(editorInput);
+
   //ctkXnatTreeModel* browserTreeModel =
   //  GetSite()->GetPage()->FindView("org.mitk.views.qmitkxnattreebrowserview").Cast<QmitkXnatTreeBrowserView>()->GetTreeModel();
   //QList<ctkXnatTreeItem *> itemList = browserTreeModel->findChildren<ctkXnatTreeItem *>();
@@ -397,9 +484,79 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
   //    browserTreeModel->canFetchMore(idx);
   //  }
   //}
-  //if ( !GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->isFetched() )
-  //{
-  //  GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
-  //}
+  if ( !this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->isFetched() )
+  {
+    this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
+  }
   UpdateList();
+}
+
+int QmitkXnatEditor::ParentChecker(ctkXnatObject* child)
+{
+  int sum;
+  if( child->parent() == NULL )
+  {
+    return 0;
+  }
+  else
+  {
+    sum = 1 + ParentChecker(child->parent());
+  }
+  return sum;
+}
+
+void QmitkXnatEditor::OnDataModelButtonClicked()
+{
+  for(int i = m_ParentCount; i > 0; i--)
+  {
+    ToHigherLevel();
+  }
+}
+
+void QmitkXnatEditor::OnProjectButtonClicked()
+{
+  for(int i = m_ParentCount-1; i > 0; i--)
+  {
+    ToHigherLevel();
+  }
+}
+
+void QmitkXnatEditor::OnSubjectButtonClicked()
+{
+  for(int i = m_ParentCount-2; i > 0; i--)
+  {
+    ToHigherLevel();
+  }
+}
+
+void QmitkXnatEditor::OnExperimentButtonClicked()
+{
+  for(int i = m_ParentCount-3; i > 0; i--)
+  {
+    ToHigherLevel();
+  }
+}
+
+void QmitkXnatEditor::OnKindOfDataButtonClicked()
+{
+  for(int i = m_ParentCount-4; i > 0; i--)
+  {
+    ToHigherLevel();
+  }
+}
+
+void QmitkXnatEditor::OnSessionButtonClicked()
+{
+  for(int i = m_ParentCount-5; i > 0; i--)
+  {
+    ToHigherLevel();
+  }
+}
+
+void QmitkXnatEditor::OnResourceButtonClicked()
+{
+  for(int i = m_ParentCount-6; i > 0; i--)
+  {
+    ToHigherLevel();
+  }
 }

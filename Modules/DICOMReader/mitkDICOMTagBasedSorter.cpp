@@ -112,7 +112,29 @@ mitk::DICOMTagBasedSorter
 {
   if (const DICOMTagBasedSorter* otherSelf = dynamic_cast<const DICOMTagBasedSorter*>(&other))
   {
-    return true; // TODO
+    bool allTagsPresentAndEqual(true);
+    if (this->m_DistinguishingTags.size() != otherSelf->m_DistinguishingTags.size())
+      return false;
+
+    for (DICOMTagList::const_iterator myTag = this->m_DistinguishingTags.begin();
+        myTag != this->m_DistinguishingTags.end();
+        ++myTag)
+    {
+      allTagsPresentAndEqual &= (std::find( otherSelf->m_DistinguishingTags.begin(), otherSelf->m_DistinguishingTags.end(), *myTag )
+                                 != otherSelf->m_DistinguishingTags.end()); // other contains this tags
+                                             // since size is equal, we don't need to check the inverse
+    }
+
+    if (!allTagsPresentAndEqual) return false;
+
+    if (this->m_SortCriterion.IsNotNull() && otherSelf->m_SortCriterion.IsNotNull())
+    {
+      return *(this->m_SortCriterion) == *(otherSelf->m_SortCriterion);
+    }
+    else
+    {
+      return this->m_SortCriterion.IsNull() && otherSelf->m_SortCriterion.IsNull();
+    }
   }
   else
   {

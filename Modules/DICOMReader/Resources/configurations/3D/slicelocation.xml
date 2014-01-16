@@ -3,6 +3,7 @@
   label="Slice Location"
   description="Sort by Slice Location"
   class="DICOMITKSeriesGDCMReader"
+  version="1"
   fixTiltByShearing="true">
 <DICOMDatasetSorter class="DICOMTagBasedSorter">
   <Distinguishing>

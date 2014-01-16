@@ -2,5 +2,6 @@
 <DICOMFileReader
   label="2013 default"
   description="Legacy sorting of 2013"
-  class="ClassicDICOMSeriesReader">
+  class="ClassicDICOMSeriesReader"
+  version="1">
 </DICOMFileReader>

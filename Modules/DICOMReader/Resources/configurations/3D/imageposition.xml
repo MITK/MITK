@@ -3,6 +3,7 @@
   label="Image Position"
   description="Sort by Image Position (Patient)"
   class="DICOMITKSeriesGDCMReader"
+  version="1"
   fixTiltByShearing="true">
 <DICOMDatasetSorter class="DICOMTagBasedSorter">
   <Distinguishing>

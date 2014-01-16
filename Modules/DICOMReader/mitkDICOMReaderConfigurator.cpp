@@ -77,6 +77,23 @@ mitk::DICOMReaderConfigurator
       return NULL;
     }
 
+    int version(1);
+    if ( rootElement->QueryIntAttribute("version", &version) == TIXML_SUCCESS)
+    {
+      if (version != 1)
+      {
+        MITK_WARN << "This reader is only capable of creating DICOMFileReaders of version 1. "
+                  << "Will not continue, because given configuration is meant for version " << version << ".";
+        return NULL;
+      }
+    }
+    else
+    {
+      MITK_ERROR << "File should name the version of the reader class in the version attribute: <DICOMFileReader class=\"" << classnameC << "\" version=\"...\">."
+                 << " Found nothing instead, assuming version 1!";
+      version = 1;
+    }
+
     std::string classname(classnameC);
 
     double decimalPlacesForOrientation(5);

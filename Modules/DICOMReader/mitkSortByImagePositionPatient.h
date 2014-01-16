@@ -44,8 +44,10 @@ class DICOMReader_EXPORT SortByImagePositionPatient : public DICOMSortCriterion
     virtual DICOMTagList GetTagsOfInterest() const;
     virtual bool IsLeftBeforeRight(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right) const;
 
+    virtual double NumericDistance(const mitk::DICOMDatasetAccess* from, const mitk::DICOMDatasetAccess* to) const;
+
     virtual void Print(std::ostream& os) const;
-    
+
     virtual bool operator==(const DICOMSortCriterion& other) const;
 
   protected:
@@ -55,6 +57,8 @@ class DICOMReader_EXPORT SortByImagePositionPatient : public DICOMSortCriterion
 
     SortByImagePositionPatient(const SortByImagePositionPatient& other);
     SortByImagePositionPatient& operator=(const SortByImagePositionPatient& other);
+
+    double InternalNumericDistance(const mitk::DICOMDatasetAccess* from, const mitk::DICOMDatasetAccess* to, bool& possible) const;
 
   private:
 };

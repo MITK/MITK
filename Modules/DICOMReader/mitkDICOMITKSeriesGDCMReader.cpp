@@ -90,7 +90,7 @@ mitk::DICOMITKSeriesGDCMReader
       {
         if ( ! (**mySorterIter == **oSorterIter ) ) return false; // this sorter differs
       }
-      
+
       // nothing differs ==> all is equal
       return true;
     }
@@ -118,6 +118,21 @@ mitk::DICOMITKSeriesGDCMReader
 {
   return m_FixTiltByShearing;
 }
+
+void
+mitk::DICOMITKSeriesGDCMReader
+::SetAcceptTwoSlicesGroups(bool accept)
+{
+  m_EquiDistantBlocksSorter->SetAcceptTwoSlicesGroups(accept);
+}
+
+bool
+mitk::DICOMITKSeriesGDCMReader
+::GetAcceptTwoSlicesGroups() const
+{
+  return m_EquiDistantBlocksSorter->GetAcceptTwoSlicesGroups();
+}
+
 
 mitk::DICOMGDCMImageFrameList
 mitk::DICOMITKSeriesGDCMReader

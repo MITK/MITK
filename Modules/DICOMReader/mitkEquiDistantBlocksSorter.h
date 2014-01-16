@@ -76,6 +76,7 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
       \brief Whether or not to accept images from a tilted acquisition in a single output group.
     */
     void SetAcceptTilt(bool accept);
+    bool GetAcceptTilt() const;
 
     /**
       \brief See class description and SetToleratedOriginOffset().
@@ -91,6 +92,9 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
 
     double GetToleratedOriginOffset() const;
     bool IsToleratedOriginOffsetAbsolute() const;
+
+    void SetAcceptTwoSlicesGroups(bool accept);
+    bool GetAcceptTwoSlicesGroups() const;
 
     virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const;
 
@@ -203,6 +207,8 @@ class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
 
     double m_ToleratedOriginOffset;
     bool m_ToleratedOriginOffsetIsAbsolute;
+
+    bool m_AcceptTwoSlicesGroups;
 };
 
 }

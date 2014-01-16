@@ -44,7 +44,7 @@ mitk::SortByImagePositionPatient
   }
   return *this;
 }
-    
+
 bool
 mitk::SortByImagePositionPatient
 ::operator==(const DICOMSortCriterion& other) const
@@ -73,6 +73,22 @@ mitk::SortByImagePositionPatient
 bool
 mitk::SortByImagePositionPatient
 ::IsLeftBeforeRight(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right) const
+{
+  bool possible(false);
+  double distance = InternalNumericDistance(left, right, possible); // returns 0.0 if not possible
+  if (possible)
+  {
+    return distance > 0.0;
+  }
+  else
+  {
+    return this->NextLevelIsLeftBeforeRight(left, right);
+  }
+}
+
+double
+mitk::SortByImagePositionPatient
+::InternalNumericDistance(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right, bool& possible) const
 {
   // sort by distance to world origin, assuming (almost) equal orientation
   static const DICOMTag tagImagePositionPatient = DICOMTag(0x0020,0x0032); // Image Position (Patient)
@@ -132,11 +148,23 @@ mitk::SortByImagePositionPatient
   // if we can sort by just comparing the distance, we do exactly that
   if ( fabs(leftDistance - rightDistance) >= mitk::eps)
   {
+    possible = true;
     // default: compare position
-    return leftDistance < rightDistance;
+    return rightDistance - leftDistance; // if (left < right> ==> diff > 0
   }
   else
   {
-    return this->NextLevelIsLeftBeforeRight(left, right);
+    possible = false;
+    return 0.0;
   }
+}
+
+
+double
+mitk::SortByImagePositionPatient
+::NumericDistance(const mitk::DICOMDatasetAccess* from, const mitk::DICOMDatasetAccess* to) const
+{
+  bool possible(false);
+  double retVal = InternalNumericDistance(from, to, possible); // returns 0.0 if not possible
+  return possible ? retVal : 0.0;
 }

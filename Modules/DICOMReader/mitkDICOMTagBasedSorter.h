@@ -92,6 +92,12 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
     virtual DICOMTagList GetTagsOfInterest();
 
     /**
+      \brief Whether or not groups should be checked for consecutive tag values.
+    */
+    void SetStrictSorting(bool strict);
+    bool GetStrictSorting() const;
+
+    /**
       \brief Actually sort as described in the Detailed Description.
     */
     virtual void Sort();
@@ -100,7 +106,7 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
       \brief Print configuration details into given stream.
     */
     virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const;
-    
+
     virtual bool operator==(const DICOMDatasetSorter& other) const;
 
   protected:
@@ -147,6 +153,8 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
     TagValueProcessorMap m_TagValueProcessor;
 
     DICOMSortCriterion::ConstPointer m_SortCriterion;
+
+    bool m_StrictSorting;
 };
 
 }

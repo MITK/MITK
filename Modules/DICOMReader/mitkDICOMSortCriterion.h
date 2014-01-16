@@ -52,6 +52,10 @@ class DICOMReader_EXPORT DICOMSortCriterion : public itk::LightObject
     /// \brief Answer the sorting question.
     virtual bool IsLeftBeforeRight(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right) const = 0;
 
+    /// \brief Calculate a distance between two datasets.
+    /// This ansers the question of consecutive datasets.
+    virtual double NumericDistance(const mitk::DICOMDatasetAccess* from, const mitk::DICOMDatasetAccess* to) const = 0;
+
     /// \brief The fallback criterion.
     DICOMSortCriterion::ConstPointer GetSecondaryCriterion() const;
 

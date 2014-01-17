@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <sstream>
 
+// ITK includes
+#include <itkImageFileWriter.h>
+
 // CTK includes
 #include "ctkCommandLineParser.h"
 
@@ -27,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseDataIOFactory.h>
 #include <mitkConnectomicsObjectFactory.h>
 #include <mitkConnectomicsStatisticsCalculator.h>
+#include <itkConnectomicsNetworkToConnectivityMatrixImageFilter.h>
 
 int NetworkStatistics(int argc, char* argv[])
 {
@@ -36,6 +40,9 @@ int NetworkStatistics(int argc, char* argv[])
   parser.addArgument("outputFile", "o", ctkCommandLineParser::String, "name of output file", us::Any(), false);
 
   parser.addArgument("noGlobalStatistics", "g", ctkCommandLineParser::Bool, "Do not calculate global statistics");
+  parser.addArgument("createConnectivityMatriximage", "I", ctkCommandLineParser::Bool, "Write connectivity matrix image");
+  parser.addArgument("binaryConnectivity", "b", ctkCommandLineParser::Bool, "Whether to create a binary connectivity matrix");
+  parser.addArgument("rescaleConnectivity", "r", ctkCommandLineParser::Bool, "Whether to rescale the connectivity matrix");
 
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -44,6 +51,10 @@ int NetworkStatistics(int argc, char* argv[])
 
   //default values
   bool noGlobalStatistics( false );
+  bool binaryConnectivity( false );
+  bool rescaleConnectivity( false );
+  bool createConnectivityMatriximage( false );
+
 
   // parse command line arguments
   std::string networkName = us::any_cast<std::string>(parsedArgs["inputNetwork"]);
@@ -53,6 +64,12 @@ int NetworkStatistics(int argc, char* argv[])
 
   if (parsedArgs.count("noGlobalStatistics"))
     noGlobalStatistics = us::any_cast<bool>(parsedArgs["noGlobalStatistics"]);
+  if (parsedArgs.count("binaryConnectivity"))
+    binaryConnectivity = us::any_cast<bool>(parsedArgs["binaryConnectivity"]);
+  if (parsedArgs.count("rescaleConnectivity"))
+    rescaleConnectivity = us::any_cast<bool>(parsedArgs["rescaleConnectivity"]);
+  if (parsedArgs.count("createConnectivityMatriximage"))
+    createConnectivityMatriximage = us::any_cast<bool>(parsedArgs["createConnectivityMatriximage"]);
 
   try
   {
@@ -192,6 +209,40 @@ int NetworkStatistics(int argc, char* argv[])
       outFile << headerStream.str() << dataStream.str();
       outFile.close();
     } // end global statistics
+
+    //create connectivity matrix png
+    if( createConnectivityMatriximage )
+    {
+      std::string connectivity_png_postfix = "_connectivity";
+      if( binaryConnectivity )
+      {
+        connectivity_png_postfix += "_binary";
+      }
+      else if( rescaleConnectivity )
+      {
+        connectivity_png_postfix += "_rescaled";
+      }
+      connectivity_png_postfix += ".png";
+
+      /* File format
+      * A png file depicting the binary connectivity matrix
+      */
+      itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::Pointer filter = itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::New();
+      filter->SetInputNetwork( network );
+      filter->SetBinaryConnectivity( binaryConnectivity );
+      filter->SetRescaleConnectivity( rescaleConnectivity );
+      filter->Update();
+
+      typedef itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::OutputImageType connectivityMatrixImageType;
+
+      itk::ImageFileWriter< connectivityMatrixImageType >::Pointer connectivityWriter = itk::ImageFileWriter< connectivityMatrixImageType >::New();
+
+      connectivityWriter->SetInput( filter->GetOutput() );
+      connectivityWriter->SetFileName( outName + connectivity_png_postfix);
+      connectivityWriter->Update();
+
+      MITK_INFO << "Connectivity matrix image written.";
+    } // end create connectivity matrix png
 
     return EXIT_SUCCESS;
   }

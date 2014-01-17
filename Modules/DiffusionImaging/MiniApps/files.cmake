@@ -18,4 +18,5 @@ set(CPP_FILES
     FiberFoxProcessing.cpp
     ExportShImage.cpp
     NetworkCreation.cpp
+    NetworkStatistics.cpp
 )

@@ -42,6 +42,7 @@ IF(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     FiberFoxProcessing.cpp
     ExportShImage.cpp
     NetworkCreation.cpp
+    NetworkStatistics.cpp
   )
 
   # deprecated

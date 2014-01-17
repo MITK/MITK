@@ -178,4 +178,11 @@
           icon="resources/diffusionregistration.png" />
   </extension>
 
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.denoisingview"
+          name="DWI Denoising"
+          class="QmitkDenoisingView"
+          icon="resources/diffusionregistration.png" />
+  </extension>
+
 </plugin>

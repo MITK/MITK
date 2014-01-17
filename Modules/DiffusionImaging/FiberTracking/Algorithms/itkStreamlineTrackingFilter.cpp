@@ -219,7 +219,7 @@ TPDPixelType>
     std::cout << "StreamlineTrackingFilter: stepsize: " << m_StepSize << " mm" << std::endl;
     std::cout << "StreamlineTrackingFilter: f: " << m_F << std::endl;
     std::cout << "StreamlineTrackingFilter: g: " << m_G << std::endl;
-    std::cout << "StreamlineTrackingFilter: starting streamline tracking" << std::endl;
+    std::cout << "StreamlineTrackingFilter: starting streamline tracking using " << this->GetNumberOfThreads() << " threads." << std::endl;
 }
 
 template< class TTensorPixelType, class TPDPixelType>

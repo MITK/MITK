@@ -72,6 +72,10 @@ static std::string GetLastErrorStr()
 #include <io.h>
 #include <direct.h>
 
+// make the posix flags point to the obsolte bsd types on windows
+#define S_IRUSR S_IREAD
+#define S_IWUSR S_IWRITE
+
 #else
 
 #include <sys/time.h>
@@ -157,7 +161,7 @@ static int mkstemps_compat(char* tmpl, int suffixlen)
     v /= 62;
     XXXXXX[5] = validLetters[v % 62];
 
-    int fd = open (tmpl, O_RDWR | O_CREAT | O_EXCL, S_IREAD | S_IWRITE);
+    int fd = open (tmpl, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
     if (fd >= 0)
     {
       errno = savedErrno;

@@ -225,6 +225,7 @@ void KspaceImageFilter< TPixelType >
         itk::Index< 2 > spikeIdx;
         spikeIdx[0] = m_RandGen->GetIntegerVariate()%(int)kxMax;
         spikeIdx[1] = m_RandGen->GetIntegerVariate()%(int)kyMax;
+        MITK_INFO << "Spike at (" << spikeIdx[0] << "," << spikeIdx[1] << ") - Amplitude: " << sqrt(spike.imag()*spike.imag()+spike.real()*spike.real());
         outputImage->SetPixel(spikeIdx, spike);
     }
 

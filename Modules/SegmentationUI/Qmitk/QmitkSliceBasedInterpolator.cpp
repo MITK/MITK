@@ -57,7 +57,7 @@ m_LastSliceIndex(0)
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
 
-  connect(m_Controls.m_gbControls, SIGNAL(toggled(bool)), this, SLOT(OnActivateWidget(bool)));
+  connect(m_Controls.m_btStart, SIGNAL(toggled(bool)), this, SLOT(OnActivateWidget(bool)));
   connect(m_Controls.m_btApplyForCurrentSlice, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
   connect(m_Controls.m_btApplyForAllSlices, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()));
   connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );

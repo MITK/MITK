@@ -301,7 +301,6 @@ static void TestReadZipFileWithNoToolstorage()
   }
   MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if exception is thrown if a empty zip file is given for deserialization.");
 }
-*/
 
 
 static void TestWriteStorageToInvalidFile()

@@ -172,6 +172,7 @@ set(CPP_FILES
   DataManagement/mitkLevelWindowPreset.cpp
   DataManagement/mitkLevelWindowProperty.cpp
   DataManagement/mitkLookupTable.cpp
+  DataManagement/mitkLookupTableProperty.cpp
   DataManagement/mitkLookupTables.cpp # specializations of GenericLookupTable
   DataManagement/mitkMemoryUtilities.cpp
   DataManagement/mitkModalityProperty.cpp
@@ -311,7 +312,6 @@ set(CPP_FILES
   IO/mitkImageGenerator.cpp
   IO/mitkItkLoggingAdapter.cpp
   IO/mitkIOUtil.cpp
-  IO/mitkLookupTableProperty.cpp
   IO/mitkOperation.cpp
 # IO/mitkPicFileIOFactory.cpp
 # IO/mitkPicFileReader.cpp

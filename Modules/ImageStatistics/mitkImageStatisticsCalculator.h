@@ -92,8 +92,14 @@ namespace mitk
  * in the hottest region of the image.
  *
  * <b> Note:</b> Only hotspots are calculated for which the whole hotspot-sphere is
- *     inside the image by default. This behaviour can be changed by setting
- *     m_HotspotMustBeCompletelyInsideImage to false by calling SetHotspotMustBeCompletlyInsideImage().
+ *     inside the image by default. This behaviour can be changed by
+ *     by calling SetHotspotMustBeCompletlyInsideImage().
+ * \warning Note that SetHotspotMustBeCompletlyInsideImage(false) may overrate
+ *          "hot" regions at image borders, because they have a stronger influence on the
+ *          mean value! Think clearly about this fact and make sure this is what you
+ *          want/need in your application, before calling
+ *          SetHotspotMustBeCompletlyInsideImage(false)!
+ *
  *
  * \image html hotspotexample.JPG
  *
@@ -284,8 +290,11 @@ public:
   bool IsHotspotCalculated();
 
   /** \brief Sets flag whether hotspot is completly inside the image. Please note that if set to false
-      it can be possible that statistics are calculated for which the whole hotspot is not inside the image! */
-  void SetHotspotMustBeCompletlyInsideImage(bool hotspotIsCompletlyInsideImage);
+      it can be possible that statistics are calculated for which the whole hotspot is not inside the image!
+
+      \warning regarding positions at the image centers may produce unexpected hotspot locations, please see \ref HotspotStatistics_description
+  */
+  void SetHotspotMustBeCompletlyInsideImage(bool hotspotIsCompletlyInsideImage, bool warn = true);
 
   /** \brief Returns true if hotspot has to be completly inside the image. */
   bool GetHotspotMustBeCompletlyInsideImage() const;

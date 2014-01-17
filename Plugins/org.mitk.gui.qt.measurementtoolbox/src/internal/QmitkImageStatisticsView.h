@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 #include "QmitkStepperAdapter.h"
 #include "QmitkImageStatisticsCalculationThread.h"
+#include <berryIPartListener.h>
 
 // mitk includes
 #include "mitkImageStatisticsCalculator.h"
@@ -37,7 +38,7 @@ gui accessable during calculation.
 
 \ingroup Plugins/org.mitk.gui.qt.measurementtoolbox
 */
-class QmitkImageStatisticsView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
+class QmitkImageStatisticsView : public QmitkAbstractView, public mitk::ILifecycleAwarePart, public berry::IPartListener
 {
   Q_OBJECT
 
@@ -135,6 +136,15 @@ protected:
 
   void NodeRemoved(const mitk::DataNode *node);
 
+  /** \brief Is called right before the view closes (before the destructor) */
+  virtual void PartClosed( berry::IWorkbenchPartReference::Pointer );
+  /** \brief Is called from the image navigator once the time step has changed */
+  void OnTimeChanged( const itk::EventObject& );
+  /** \brief Required for berry::IPartListener */
+  virtual const char* GetClassName() const { return "QmitkImageStatisticsView"; }
+  /** \brief Required for berry::IPartListener */
+  virtual Events::Types GetPartEventTypes() const { return Events::CLOSED; }
+
   // member variables
   Ui::QmitkImageStatisticsViewControls *m_Controls;
   QmitkImageStatisticsCalculationThread* m_CalculationThread;
@@ -152,6 +162,7 @@ protected:
   long m_ImageObserverTag;
   long m_ImageMaskObserverTag;
   long m_PlanarFigureObserverTag;
+  long m_TimeObserverTag;
 
   SelectedDataNodeVectorType m_SelectedDataNodes;
 

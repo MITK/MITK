@@ -41,6 +41,8 @@ IF(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     MultishellMethods.cpp
     FiberFoxProcessing.cpp
     ExportShImage.cpp
+    NetworkCreation.cpp
+    NetworkStatistics.cpp
   )
 
   # deprecated
@@ -57,7 +59,7 @@ IF(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
 #  ENDFOREACH(tool)
 
   mitk_create_executable(mitkDiffusionMiniApps
-  DEPENDS DiffusionCore FiberTracking
+  DEPENDS DiffusionCore FiberTracking Connectomics
   )
 
   ENDIF()

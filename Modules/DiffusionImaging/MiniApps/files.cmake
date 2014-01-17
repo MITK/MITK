@@ -17,4 +17,6 @@ set(CPP_FILES
     MultishellMethods.cpp
     FiberFoxProcessing.cpp
     ExportShImage.cpp
+    NetworkCreation.cpp
+    NetworkStatistics.cpp
 )

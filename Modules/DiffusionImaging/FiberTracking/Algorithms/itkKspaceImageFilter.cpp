@@ -98,6 +98,7 @@ void KspaceImageFilter< TPixelType >
     }
 
     this->SetNthOutput(0, outputImage);
+    m_Spike = vcl_complex<double>(0,0);
 }
 
 template< class TPixelType >
@@ -125,7 +126,6 @@ void KspaceImageFilter< TPixelType >
     int xRingingOffset = xMax-kxMax;
     int yRingingOffset = yMaxFov-kyMax;
 
-    vcl_complex<double> spike(0,0);
     while( !oit.IsAtEnd() )
     {
         itk::Index< 2 > kIdx;
@@ -211,23 +211,12 @@ void KspaceImageFilter< TPixelType >
         }
         s /= numPix;
 
-        if (m_Spikes>0 && sqrt(s.imag()*s.imag()+s.real()*s.real()) > sqrt(spike.imag()*spike.imag()+spike.real()*spike.real()) )
-            spike = s;
+        if (m_Spikes>0 && sqrt(s.imag()*s.imag()+s.real()*s.real()) > sqrt(m_Spike.imag()*m_Spike.imag()+m_Spike.real()*m_Spike.real()) )
+            m_Spike = s;
 
         //        m_TEMPIMAGE->SetPixel(kIdx, sqrt(s.real()*s.real()+s.imag()*s.imag()));
         outputImage->SetPixel(kIdx, s);
         ++oit;
-    }
-
-    spike *= m_SpikeAmplitude;
-    MITK_INFO << "Num spikes: " << m_Spikes;
-    for (int i=0; i<m_Spikes; i++)
-    {
-        itk::Index< 2 > spikeIdx;
-        spikeIdx[0] = m_RandGen->GetIntegerVariate()%(int)kxMax;
-        spikeIdx[1] = m_RandGen->GetIntegerVariate()%(int)kyMax;
-        MITK_INFO << "Spike at (" << spikeIdx[0] << "," << spikeIdx[1] << ") - Amplitude: " << sqrt(spike.imag()*spike.imag()+spike.real()*spike.real());
-        outputImage->SetPixel(spikeIdx, spike);
     }
 
     //    typedef itk::ImageFileWriter< InputImageType > WriterType;
@@ -241,7 +230,19 @@ template< class TPixelType >
 void KspaceImageFilter< TPixelType >
 ::AfterThreadedGenerateData()
 {
+    typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+    double kxMax = outputImage->GetLargestPossibleRegion().GetSize(0);  // k-space size in x-direction
+    double kyMax = outputImage->GetLargestPossibleRegion().GetSize(1);  // k-space size in y-direction
 
+    m_Spike *= m_SpikeAmplitude;
+    itk::Index< 2 > spikeIdx;
+    for (int i=0; i<m_Spikes; i++)
+    {
+        spikeIdx[0] = m_RandGen->GetIntegerVariate()%(int)kxMax;
+        spikeIdx[1] = m_RandGen->GetIntegerVariate()%(int)kyMax;
+        MITK_INFO << "Spike at (" << spikeIdx[0] << "," << spikeIdx[1] << ") - Amplitude: " << sqrt(m_Spike.imag()*m_Spike.imag()+m_Spike.real()*m_Spike.real());
+        outputImage->SetPixel(spikeIdx, m_Spike);
+    }
 }
 
 }

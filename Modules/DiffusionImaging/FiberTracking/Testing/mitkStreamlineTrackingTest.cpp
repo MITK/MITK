@@ -110,13 +110,13 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
         MITK_TEST_CONDITION_REQUIRED(fib2.IsNotNull(), "Check if reference tractogram is not null.");
         if (!fib1->Equals(fib2))
         {
-            MITK_INFO << "TEST FAILED. TRACTOGRAMS ARE NOT EQUAL!";
+            MITK_WARN << "TEST FAILED. TRACTOGRAMS ARE NOT EQUAL!";
             mitk::FiberBundleXWriter::Pointer writer = mitk::FiberBundleXWriter::New();
-            writer->SetFileName("/tmp/testBundle.fib");
+            writer->SetFileName("testBundle.fib");
             writer->SetInputFiberBundleX(fib1);
             writer->Update();
 
-            writer->SetFileName("/tmp/refBundle.fib");
+            writer->SetFileName("refBundle.fib");
             writer->SetInputFiberBundleX(fib2);
             writer->Update();
         }

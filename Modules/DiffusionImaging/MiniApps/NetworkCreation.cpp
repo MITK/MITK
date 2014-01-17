@@ -38,7 +38,7 @@ int NetworkCreation(int argc, char* argv[])
   parser.addArgument("outputNetwork", "o", ctkCommandLineParser::String, "where to save the ouput (.cnf)", us::Any(), false);
 
   parser.addArgument("radius", "r", ctkCommandLineParser::Int, "Search radius in mm", 15, true);
-  parser.addArgument("centerOfMass", "com", ctkCommandLineParser::Bool, "Use center of mass for node positions", true, true);
+  parser.addArgument("noCenterOfMass", "com", ctkCommandLineParser::Bool, "Do not use center of mass for node positions");
 
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -47,7 +47,7 @@ int NetworkCreation(int argc, char* argv[])
 
   //default values
   int searchRadius( 15 );
-  bool centerOfMass( true );
+  bool noCenterOfMass( false );
 
   // parse command line arguments
   std::string fiberFilename = us::any_cast<std::string>(parsedArgs["fiberImage"]);
@@ -58,8 +58,8 @@ int NetworkCreation(int argc, char* argv[])
     searchRadius = us::any_cast<int>(parsedArgs["radius"]);
 
 
-  if (parsedArgs.count("centerOfMass"))
-    centerOfMass = us::any_cast<bool>(parsedArgs["centerOfMass"]);
+  if (parsedArgs.count("noCenterOfMass"))
+    noCenterOfMass = us::any_cast<bool>(parsedArgs["noCenterOfMass"]);
 
   try
   {
@@ -100,7 +100,7 @@ int NetworkCreation(int argc, char* argv[])
     mitk::ConnectomicsNetworkCreator::Pointer connectomicsNetworkCreator = mitk::ConnectomicsNetworkCreator::New();
     connectomicsNetworkCreator->SetSegmentation( parcellationImage );
     connectomicsNetworkCreator->SetFiberBundle( fiberBundle );
-    if( centerOfMass )
+    if( !noCenterOfMass )
     {
       connectomicsNetworkCreator->CalculateCenterOfMass();
     }

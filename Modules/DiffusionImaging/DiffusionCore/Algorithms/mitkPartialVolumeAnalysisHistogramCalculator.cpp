@@ -1147,7 +1147,7 @@ namespace mitk
       if(itmask.Get() != 0)
       {
         typename ImageType::IndexType index = itmask.GetIndex();
-        for(int thick=0; thick<2*m_PlanarFigureThickness+1; thick++)
+        for(unsigned int thick=0; thick<2*m_PlanarFigureThickness+1; thick++)
         {
           index[axis] = thick;
           m_InternalImageMask3D->SetPixel(index, itmask.Get());

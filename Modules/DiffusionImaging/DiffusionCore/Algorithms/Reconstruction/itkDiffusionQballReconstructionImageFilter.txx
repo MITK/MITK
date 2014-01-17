@@ -308,7 +308,7 @@ namespace itk {
           }
         }
 
-        for (int i=0; i<odf.Size(); i++)
+        for (unsigned int i=0; i<odf.Size(); i++)
             if (odf.GetElement(i)!=odf.GetElement(i))
                 odf.Fill(0.0);
 
@@ -401,7 +401,7 @@ namespace itk {
 
         }
 
-        for (int i=0; i<odf.Size(); i++)
+        for (unsigned int i=0; i<odf.Size(); i++)
             if (odf.GetElement(i)!=odf.GetElement(i))
                 odf.Fill(0.0);
 

@@ -220,6 +220,7 @@ void KspaceImageFilter< TPixelType >
     }
 
     spike *= m_SpikeAmplitude;
+    MITK_INFO << "Num spikes: " << m_Spikes;
     for (int i=0; i<m_Spikes; i++)
     {
         itk::Index< 2 > spikeIdx;

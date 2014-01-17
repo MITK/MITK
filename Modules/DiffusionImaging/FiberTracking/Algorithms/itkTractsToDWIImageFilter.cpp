@@ -138,10 +138,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
 
     std::vector< unsigned int > spikeVolume;
     for (int i=0; i<m_Spikes; i++)
-    {
         spikeVolume.push_back(m_RandGen->GetIntegerVariate()%images.at(0)->GetVectorLength());
-        MITK_INFO << spikeVolume.back();
-    }
     std::sort (spikeVolume.begin(), spikeVolume.end());
     std::reverse (spikeVolume.begin(), spikeVolume.end());
 
@@ -227,8 +224,6 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                 numSpikes++;
                 spikeSlice.pop_back();
             }
-            if (numSpikes>0)
-                MITK_INFO << "Gradient " << g << ", Slice " << z << ", Num. peaks " << numSpikes;
             idft->SetSpikes(numSpikes);
             idft->SetSpikeAmplitude(m_SpikeAmplitude);
             idft->Update();

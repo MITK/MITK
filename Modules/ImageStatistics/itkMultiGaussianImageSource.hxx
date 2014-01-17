@@ -242,22 +242,7 @@ namespace itk
   {
     this->m_Radius = radius;
   }
-  //-----------------------------------------------------------------------------------------------------------------------
-  template< class TOutputImage >
-  const int
-    MultiGaussianImageSource< TOutputImage >
-    ::GetRadiusStepNumber() const
-  {
-    return this->m_RadiusStepNumber;
-  }
-  //-----------------------------------------------------------------------------------------------------------------------
-  template< class TOutputImage >
-  void
-    MultiGaussianImageSource< TOutputImage >
-    ::SetRadiusStepNumber( unsigned int stepNumber )
-  {
-    this->m_RadiusStepNumber = stepNumber;
-  }
+
   //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
   void
@@ -718,28 +703,14 @@ namespace itk
     double summand0, summand1, summand2, power, value = 0.0;
     // the for-loop represent  the sum of the gaussian function
     for(unsigned int n =0; n < m_NumberOfGaussians; ++n)
-    { //TODO * spacing
-      //summand0 = ( x - m_CenterX[n] * m_Spacing[0] ) / ( m_SigmaX[n] * m_Spacing[0] );
-      //summand1 = ( y - m_CenterY[n] * m_Spacing[1] ) / ( m_SigmaY[n] * m_Spacing[1] );
-      //summand2 = ( z - m_CenterZ[n] * m_Spacing[2] ) / ( m_SigmaZ[n] * m_Spacing[2] );
+    {
       summand0 = ( x - m_CenterX[n] ) / m_SigmaX[n];
       summand1 = ( y - m_CenterY[n] ) / m_SigmaY[n];
       summand2 = ( z - m_CenterZ[n] ) / m_SigmaZ[n];
 
       power = summand0 * summand0 + summand1 * summand1 + summand2 * summand2;
-      value = value + m_Altitude[n] * pow(itk::Math::e, -0.5 * power); //* (1 / (pow(2.0 * itk::Math::pi, 1.5 ) * m_SigmaX[n] * m_SigmaY[n] * m_SigmaZ[n]) ) ;
+      value = value + m_Altitude[n] * pow(itk::Math::e, -0.5 * power);
     }
-
-    /*for(unsigned int n =0; n < m_NumberOfGaussians; ++n)
-    {
-    summand0 = (x - m_CenterX[n]) / m_SigmaX[n];
-    summand1 = (y - m_CenterY[n]) / m_SigmaY[n];
-    summand2 = (z - m_CenterZ[n]) / m_SigmaZ[n];
-
-    power = summand0 * summand0 + summand1 * summand1 + summand2 * summand2;
-    value = value + m_Altitude[n] * pow(itk::Math::e, -0.5 * power);
-    }*/
-
     return value;
   }
 

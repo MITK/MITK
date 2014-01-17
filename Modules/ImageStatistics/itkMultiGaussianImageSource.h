@@ -41,16 +41,14 @@ namespace itk
 
 \brief Generate an 3-dimensional multigaussian image.
 
-This class defines an 3-dimensional Image, in which the value at one voxel equals the value of a multigaussian function evaluated at the
-voxel's coordinates. The multigaussian function is build as a sum of N gaussian function. This is defined by the following parameters:
+This class defines an 3-dimensional Image, in which the value at one voxel equals the value of a multigaussian function evaluated at the voxel's coordinates. The multigaussian function is build as a sum of N gaussian function. This is defined by the following parameters:
 
-1. CenterX, CenterY, CenterZ - vectors of the size of N determining the expectancy value at the x-, y- and the z-axis. That means: The i-th
-gaussian bell curve takes its maximal value at the voxel with index [CenterX(i); CenterY(i); Centerz(i)].
+1. CenterX, CenterY, CenterZ - vectors of the size of N determining the expectancy value at the x-, y- and the z-axis. That means: The i-th gaussian bell curve takes its maximal value at the voxel with index [CenterX(i); CenterY(i); Centerz(i)].
 
-2. SigmaX, SigmaY, SigmaZ - vectors of the size of N determining the deviation at the x-, y- and the z-axis. That means: The width of the i-the gaussian bell curve deviation in the x-axis is SigmaX(i), in the y-axis is SigmaY(i) and in the z-axis is SigmaZ(i).
+2. SigmaX, SigmaY, SigmaZ - vectors of the size of N determining the deviation at the x-, y- and the z-axis. That means: The width of the i-th gaussian bell curve is determined by the deviation in the x-axis, which is SigmaX(i), in the y-axis is SigmaY(i) and in the z-axis is SigmaZ(i).
 
 3. Altitude - vector of the size of N determining the altitude: the i-th gaussian bell curve has a height of Altitude(i).
-This class allows by the method CalculateMidpointAndMeanValue() to find a sphere with a specified radius that has a maximal mean value over all sphere with that radius with midpoint inside or at the boundary of the image. Furthermore it can calculate the maximal und minimal pixel intensities and whose indices in the founded sphere.
+This class allows by the method CalculateMidpointAndMeanValue() to find a sphere with a specified radius that has a maximal mean value over all sphere with that radius with midpoint inside or on the boundary of the image. Furthermore it can calculate the maximal und minimal pixel intensities and whose indices in the founded sphere.
 
 
 \section Multigaussian-image-source-generator Multigaussian image source generator
@@ -151,49 +149,36 @@ After we found the midpoint and the maximal mean value, we can calculate the max
 \subsection  Input-and-output Input and output
 
 An example for an input in the command-line is: mitkMultiGaussianTest C:/temp/outputFile C:/temp/inputFile.xml
-Here is outputFile the name of the gaussian image with extension .nrrd and at the same time the name of the output file with extension .xml, which is the same as the inputFile, only added the calculated mean value, max and min and the corresponding indexes in the statistic tag. Here we see an example for the input and output .xml File:
+Here is outputFile the name of the gaussian image with extension .nrrd and at the same time the name of the output file with extension .xml, which is the same as the inputFile, only added the calculated mean value, max and min and the corresponding indexes in the statistic tag. Here we see an example for the input and output .xml file:
 
 --------------------- INPUT ---------------------------------------------------
 
+\verbatim
 <testcase>
-
   <testimage image-rows="20" image-columns="20" image-slices="20" numberOfGaussians="2" spacingX="1" spacingY="1" spacingZ="1" entireHotSpotInImage="1">
-
     <gaussian centerIndexX="4" centerIndexY="16" centerIndexZ="10" deviationX="7" deviationY="7" deviationZ="7" altitude="200"/>
-
     <gaussian centerIndexX="18" centerIndexY="2" centerIndexZ="10" deviationX="1" deviationY="1" deviationZ="1" altitude="210"/>
-
   </testimage>
-
   <segmentation numberOfLabels="1" hotspotRadiusInMM="6.2035">
-
     <roi label="1" maximumSizeX="20" minimumSizeX="0" maximumSizeY="20" minimumSizeY="0" maximumSizeZ="20" minimumSizeZ="0"/>
-
   </segmentation>
-
 </testcase>
+\endverbatim
 
---------------------- OUTPUT  ---------------------------------------------------
+--------------------- OUTPUT  --------------------------------------------------
 
+\verbatim
 <testcase>
-
   <testimage image-rows="20" image-columns="20" image-slices="20" numberOfGaussians="2" spacingX="1" spacingY="1" spacingZ="1" entireHotSpotInImage="1">
-
     <gaussian centerIndexX="4" centerIndexY="16" centerIndexZ="10" deviationX="7" deviationY="7" deviationZ="7" altitude="200"/>
-
     <gaussian centerIndexX="18" centerIndexY="2" centerIndexZ="10" deviationX="1" deviationY="1" deviationZ="1" altitude="210"/>
-
   </testimage>
-
   <segmentation numberOfLabels="1" hotspotRadiusInMM="6.2035">
-
     <roi label="1" maximumSizeX="20" minimumSizeX="0" maximumSizeY="20" minimumSizeY="0" maximumSizeZ="20" minimumSizeZ="0"/>
-
   </segmentation>
-
   <statistic hotspotIndexX="6" hotspotIndexY="13" hotspotIndexZ="10" peak="141.544" mean="141.544" maximumIndexX="4" maximumIndexY="16" maximumIndexZ="10" maximum="200" minimumIndexX="9" minimumIndexY="8" minimumIndexZ="8"  minimum="77.4272"/>
-
 </testcase>
+\endverbatim
 
 \subsection  Parameter-for-the-input Parameter for the input
 
@@ -203,7 +188,7 @@ NOTE: When the \a entireHotSpotInImage \f$ = 0 \f$ it is possible that we find t
 
 In the subtag \a gaussian we describe each gauss function as mentioned in the second section.
 
-In the tag \a segmentation we define the radius of the wanted sphere in mm (\a hotspotRadiusInMM ). We can also set the number of labels (\a numberOfLabels ) to be an positive number and this determines the number of regions of interest(ROI). In each ROI we find the sphere with the wanted properties and midpoint inside the ROI, but not necessarily the whole sphere. In the subtag \a roi we set label number and the index coordinates for the borders of the roi.
+In the tag \a segmentation we define the radius of the wanted sphere in mm (\a hotspotRadiusInMM ). We can also set the number of labels (\a numberOfLabels ) to be an positive number and this determines the number of regions of interest (ROI). In each ROI we find the sphere with the wanted properties and midpoint inside the ROI, but not necessarily the whole sphere. In the subtag \a roi we set label number and the index coordinates for the borders of the roi.
 
 */
 template< typename TOutputImage >
@@ -260,7 +245,7 @@ public:
   itkSetMacro(Spacing, SpacingType);
   virtual void SetSpacing(SpacingValueArrayType spacingArray);
   virtual const SpacingValueType * GetSpacing() const;
-  /** Set/Get origin of the output image. */
+  /** Set/Get origin of the output image. This programm works proper only with origin [0.0, 0.0, 0.0] */
   itkSetMacro(Origin, PointType);
   virtual void SetOrigin(PointValueArrayType originArray);
   virtual const PointValueType * GetOrigin() const;
@@ -271,10 +256,6 @@ public:
   /** Set/Get the radius of the sphere. */
   virtual const RadiusType GetRadius() const;
   virtual void  SetRadius( RadiusType  radius );
-  /** Set/Get the number of steps to traverse the radius of the sphere. */
-  virtual const  int GetRadiusStepNumber() const;
-  /** Set the number of steps to traverse the radius. */
-  virtual void  SetRadiusStepNumber( unsigned int stepNumber );
   /** Get the maximal mean value in a sphere over all possible spheres with midpoint in the image. */
   virtual const OutputImagePixelType GetMaxMeanValue() const;
   /** Get the index of the midpoint of a sphere with the maximal mean value.*/

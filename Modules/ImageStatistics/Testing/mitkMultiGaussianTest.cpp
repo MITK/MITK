@@ -313,7 +313,6 @@ int mitkMultiGaussianTest(int argc, char* argv[])
     gaussianGenerator = MultiGaussianImageSource::New();
     gaussianGenerator->SetSize( size );
     gaussianGenerator->SetSpacing( spacing );
-    gaussianGenerator->SetRadiusStepNumber(8);
     gaussianGenerator->SetRadius(radius);
     gaussianGenerator->SetNumberOfGausssians(numberOfGaussians);
     gaussianGenerator->AddGaussian(centerXVec, centerYVec, centerZVec, sigmaXVec, sigmaYVec, sigmaZVec, altitudeVec);

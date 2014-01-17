@@ -71,14 +71,14 @@ namespace mitk
         vecImg->Allocate();
 
         itk::ImageRegionIterator<VecImgType> ot (vecImg, vecImg->GetLargestPossibleRegion() );
-        ot = ot.Begin();
+        ot.GoToBegin();
 
         itk::ImageRegionIterator<ImageType> it (img, img->GetLargestPossibleRegion() );
 
         typedef ImageType::PixelType  VarPixType;
         typedef VecImgType::PixelType FixPixType;
 
-        for (it = it.Begin(); !it.IsAtEnd(); ++it)
+        for (it.GoToBegin(); !it.IsAtEnd(); ++it)
         {
           VarPixType vec = it.Get();
           FixPixType fixVec(vec.GetDataPointer());

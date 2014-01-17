@@ -28,7 +28,18 @@ mitk::TensorImageSource::TensorImageSource()
   Superclass::SetNthOutput(0, output.GetPointer());
 }
 
-mitk::TensorImageSource::DataObjectPointer mitk::TensorImageSource::MakeOutput(DataObjectPointerArraySizeType /*idx*/ )
+itk::DataObject::Pointer mitk::TensorImageSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-  return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
+  return OutputImageType::New().GetPointer();
+}
+
+
+itk::DataObject::Pointer mitk::TensorImageSource::MakeOutput( const DataObjectIdentifierType & name )
+{
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
+    {
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    }
+  return static_cast<itk::DataObject *>(OutputImageType::New().GetPointer());
 }

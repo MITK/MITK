@@ -85,14 +85,14 @@ void mitk::NrrdQBallImageWriter::GenerateData()
     vecImg->Allocate();
 
     itk::ImageRegionIterator<VecImgType> ot (vecImg, vecImg->GetLargestPossibleRegion() );
-    ot = ot.Begin();
+    ot.GoToBegin();
 
     itk::ImageRegionIterator<ImageType> it (outimage, outimage->GetLargestPossibleRegion() );
 
     typedef ImageType::PixelType VecPixType;
     typedef VecImgType::PixelType VarVecType;
 
-    for (it = it.Begin(); !it.IsAtEnd(); ++it)
+    for (it.GoToBegin(); !it.IsAtEnd(); ++it)
     {
       VecPixType vec = it.Get();
       VarVecType varVec(vec.GetVnlVector().data_block(), QBALL_ODFSIZE);

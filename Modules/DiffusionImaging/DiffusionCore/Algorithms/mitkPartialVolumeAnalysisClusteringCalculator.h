@@ -140,12 +140,6 @@ namespace mitk
         return retval;
       }
 
-      void Print(int nr=10)
-      {
-        int sz = xVals.size();
-        int incr = (int)((1.0*sz)/(1.0*nr));
-      }
-
       VecType xVals;
       VecType hVals;
     };

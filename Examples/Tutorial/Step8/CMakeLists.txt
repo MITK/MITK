@@ -5,5 +5,5 @@ include_directories(
 
 mitk_create_executable(Step8
   DEPENDS QmitkExt
-  PACKAGE_DEPENDS ITK>ITKCurvatureFlow|ITKRegionGrowing
+  PACKAGE_DEPENDS ITK|ITKCurvatureFlow+ITKRegionGrowing
   )

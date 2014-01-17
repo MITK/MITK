@@ -15,7 +15,7 @@ MITK_CREATE_MODULE(MitkIGT
   INCLUDE_DIRS Algorithms Common DataManagement ExceptionHandling IO Rendering TrackingDevices
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
   DEPENDS Mitk ImageStatistics SceneSerialization MitkIGTBase
-  PACKAGE_DEPENDS ITK>ITKRegistrationCommon tinyxml
+  PACKAGE_DEPENDS ITK|ITKRegistrationCommon tinyxml
   ADDITIONAL_LIBS "${ADDITIONAL_LIBS}"
   WARNINGS_AS_ERRORS
 )

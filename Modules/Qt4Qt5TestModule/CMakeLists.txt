@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(Qt4Qt5TestModule
-               PACKAGE_DEPENDS Qt4>QtCore Qt5>Core
+               PACKAGE_DEPENDS Qt4|QtCore Qt5|Core
                SUBPROJECTS MITK-CoreUI
                WARNINGS_AS_ERRORS
 )

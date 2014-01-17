@@ -29,7 +29,7 @@ FunctionCreateBlueBerryApplication(
   PLUGINS ${_plugins}
   ${_app_options}
 )
-mitk_use_modules(TARGET CoreApp PACKAGES Qt4>QtGui)
+mitk_use_modules(TARGET CoreApp PACKAGES Qt4|QtGui)
 
 # subproject support
 add_dependencies(MITK-CoreUI CoreApp)

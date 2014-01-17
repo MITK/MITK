@@ -1,6 +1,6 @@
 if(MITK_USE_OpenCV)
 
-  set(dependencies ITK>ITKVideoBridgeOpenCV OpenCV)
+  set(dependencies ITK|ITKVideoBridgeOpenCV OpenCV)
   if(MITK_USE_videoInput)
     set(dependencies ${dependencies} videoInput)
   endif(MITK_USE_videoInput)

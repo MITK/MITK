@@ -2,14 +2,14 @@ function(_mitk_parse_package_args)
   set(packages ${ARGN})
   set(PACKAGE_NAMES )
   foreach(_package ${packages})
-    string(REPLACE ">" ";" _package_list ${_package})
+    string(REPLACE "|" ";" _package_list ${_package})
     if("${_package_list}" STREQUAL "${_package}")
       list(APPEND PACKAGE_NAMES ${_package})
     else()
       list(GET _package_list 0 _package_name)
       list(GET _package_list 1 _package_components)
       if(NOT _package_name OR NOT _package_components)
-        message(SEND_ERROR "PACKAGE argument syntax wrong. ${_package} is not of the form PACKAGE[>COMPONENT1[|COMPONENT2]...]")
+        message(SEND_ERROR "PACKAGE argument syntax wrong. ${_package} is not of the form PACKAGE[|COMPONENT1[+COMPONENT2]...]")
       endif()
       list(APPEND PACKAGE_NAMES ${_package_name})
     endif()
@@ -43,11 +43,11 @@ function(_mitk_parse_package_args)
   endif()
 
   foreach(_package ${packages})
-    string(REPLACE ">" ";" _package_list ${_package})
+    string(REPLACE "|" ";" _package_list ${_package})
     if(NOT "${_package_list}" STREQUAL "${_package}")
       list(GET _package_list 0 _package_name)
       list(GET _package_list 1 _package_components)
-      string(REPLACE "|" ";" _package_components_list "${_package_components}")
+      string(REPLACE "+" ";" _package_components_list "${_package_components}")
       list(APPEND ${_package_name}_REQUIRED_COMPONENTS ${_package_components_list})
    endif()
   endforeach()
@@ -68,7 +68,7 @@ endfunction()
 #!
 #! A package argument is of the form
 #!
-#!   PACKAGE[>COMPONENT1[|COMPONENT2]...]
+#!   PACKAGE[|COMPONENT1[+COMPONENT2]...]
 #!
 #! where PACKAGE is the package name (e.g. VTK) and components are
 #! the names of required package components or libraries.

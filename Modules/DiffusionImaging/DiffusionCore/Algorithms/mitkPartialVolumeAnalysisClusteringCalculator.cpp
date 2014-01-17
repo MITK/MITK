@@ -776,6 +776,7 @@ namespace mitk
     GeneratorType::HistogramType::ConstIterator iter = histogram->Begin();
     float maxFreq = 0;
     MeasurementVectorType maxValue;
+    maxValue.Fill(0);
     while ( iter != histogram->End() )
     {
       if(iter.GetFrequency() > maxFreq)

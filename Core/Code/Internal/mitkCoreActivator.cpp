@@ -28,8 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <mitkIFileReader.h>
 #include <mitkIFileWriter.h>
-#include <mitkMimeTypeProvider.h>
-#include <mitkPointSetReaderService.h>
+#include <Internal/mitkMimeTypeProvider.h>
+#include <Internal/mitkPointSetReaderService.h>
 
 // Micro Services
 #include <usModuleInitialization.h>

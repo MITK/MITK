@@ -14,7 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkLegacyFileReaderService.h>
+#include "mitkLegacyFileReaderService.h"
+
 #include <mitkDicomSeriesReader.h>
 #include <mitkProgressBar.h>
 #include <mitkIOAdapter.h>

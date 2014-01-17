@@ -57,8 +57,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFileReaderRegistry.h>
 #include <mitkFileWriterRegistry.h>
 #include <mitkIMimeTypeProvider.h>
-#include <mitkLegacyFileReaderService.h>
-#include <mitkLegacyFileWriterService.h>
+#include <Internal/mitkLegacyFileReaderService.h>
+#include <Internal/mitkLegacyFileWriterService.h>
 
 
 void mitk::CoreObjectFactory::RegisterExtraFactory(CoreObjectFactoryBase* factory) {

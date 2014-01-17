@@ -114,7 +114,6 @@ set(CPP_FILES
   Controllers/mitkCallbackFromGUIThread.cpp
   Controllers/mitkCameraController.cpp
   Controllers/mitkCameraRotationController.cpp
-  Controllers/mitkCoreActivator.cpp
   Controllers/mitkFocusManager.cpp
   Controllers/mitkLimitedLinearUndo.cpp
   Controllers/mitkOperationEvent.cpp
@@ -296,8 +295,6 @@ set(CPP_FILES
 
   IO/mitkAbstractFileReader.cpp
   IO/mitkAbstractFileWriter.cpp
-  IO/mitkLegacyFileReaderService.cpp
-  IO/mitkLegacyFileWriterService.cpp
   IO/mitkDicomSeriesReader.cpp
   IO/mitkDicomSR_LoadDICOMScalar.cpp
   IO/mitkDicomSR_LoadDICOMScalar4D.cpp
@@ -315,7 +312,6 @@ set(CPP_FILES
   IO/mitkItkLoggingAdapter.cpp
   IO/mitkIOUtil.cpp
   IO/mitkLookupTableProperty.cpp
-  IO/mitkMimeTypeProvider.cpp
   IO/mitkOperation.cpp
 # IO/mitkPicFileIOFactory.cpp
 # IO/mitkPicFileReader.cpp
@@ -324,8 +320,6 @@ set(CPP_FILES
 # IO/mitkPicVolumeTimeSeriesIOFactory.cpp
 # IO/mitkPicVolumeTimeSeriesReader.cpp
   IO/mitkPixelType.cpp
-  IO/mitkPointSetReaderService.cpp
-  IO/mitkPointSetWriterService.cpp
   IO/mitkSimpleMimeType.cpp
   IO/mitkStandardFileLocations.cpp
   IO/mitkVtkLoggingAdapter.cpp
@@ -377,6 +371,13 @@ set(CPP_FILES
   Common/mitkCoreObjectFactoryBase.cpp
   Common/mitkCoreObjectFactory.cpp
   Common/mitkCoreServices.cpp
+
+  Internal/mitkCoreActivator.cpp
+  Internal/mitkLegacyFileReaderService.cpp
+  Internal/mitkLegacyFileWriterService.cpp
+  Internal/mitkMimeTypeProvider.cpp
+  Internal/mitkPointSetReaderService.cpp
+  Internal/mitkPointSetWriterService.cpp
 )
 
 list(APPEND CPP_FILES ${CppMicroServices_SOURCES})

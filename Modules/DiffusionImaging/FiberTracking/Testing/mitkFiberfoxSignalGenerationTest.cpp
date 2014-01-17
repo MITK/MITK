@@ -104,7 +104,19 @@ void StartSimulation(FiberfoxParameters parameters, FiberBundleX::Pointer fiberB
 
     if (refImage.IsNotNull())
     {
-        MITK_TEST_CONDITION_REQUIRED(CompareDwi(testImage->GetVectorImage(), refImage->GetVectorImage()), message);
+        bool cond = CompareDwi(testImage->GetVectorImage(), refImage->GetVectorImage());
+        if (!cond)
+        {
+            NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
+            writer->SetFileName("/tmp/testImage.dwi");
+            writer->SetInput(testImage);
+            writer->Update();
+
+            writer->SetFileName("/tmp/refImage.dwi");
+            writer->SetInput(refImage);
+            writer->Update();
+        }
+        MITK_TEST_CONDITION_REQUIRED(cond, message);
     }
     else
     {

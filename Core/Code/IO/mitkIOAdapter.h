@@ -28,7 +28,7 @@ namespace mitk
 //## @brief IOAdapterBase class is an abstract adapter class for IO process objects.
 //##
 //## @ingroup IO
-//## @deprecatedSince{2013_09} Use mitk::IFileReader instead
+//## @deprecatedSince{2014_03} Use mitk::IFileReader instead
 class IOAdapterBase: public itk::Object
 {
 public:
@@ -56,7 +56,7 @@ private:
 //## Additional this interface defines the function CanReadFile().
 //## This interface allows the target (object) the access to the adaptee (IO process object).
 //## @ingroup IO
-//## @deprecatedSince{2013_09} Use mitk::IFileReader instead
+//## @deprecatedSince{2014_03} Use mitk::IFileReader instead
 template <class T>
 class IOAdapter : public IOAdapterBase
 {

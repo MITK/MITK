@@ -54,7 +54,7 @@ public:
    * This string can then used by the Qt QFileDialog widget.
    *
    * @return The c-string that contains the file extensions
-   * @deprecatedSince{2013_09} See mitk::FileReaderRegistry and QmitkIOUtil
+   * @deprecatedSince{2014_03} See mitk::FileReaderRegistry and QmitkIOUtil
    */
   DEPRECATED(virtual const char* GetFileExtensions());
 
@@ -62,7 +62,7 @@ public:
    * @brief get the defined (open) file extension map
    *
    * @return the defined (open) file extension map
-   * @deprecatedSince{2013_09} See mitk::FileReaderRegistry and QmitkIOUtil
+   * @deprecatedSince{2014_03} See mitk::FileReaderRegistry and QmitkIOUtil
    */
   DEPRECATED(virtual MultimapType GetFileExtensionsMap());
 
@@ -72,7 +72,7 @@ public:
    * This string can then used by the Qt QFileDialog widget.
    *
    * @return The c-string that contains the (save) file extensions
-   * @deprecatedSince{2013_09} See mitk::FileWriterRegistry and QmitkIOUtil
+   * @deprecatedSince{2014_03} See mitk::FileWriterRegistry and QmitkIOUtil
    */
   DEPRECATED(virtual const char* GetSaveFileExtensions());
 
@@ -80,17 +80,17 @@ public:
    * @brief get the defined (save) file extension map
    *
    * @return the defined (save) file extension map
-   * @deprecatedSince{2013_09} See mitk::FileWriterRegistry and QmitkIOUtil
+   * @deprecatedSince{2014_03} See mitk::FileWriterRegistry and QmitkIOUtil
    */
   virtual MultimapType GetSaveFileExtensionsMap();
 
   /**
-   * @deprecatedSince{2013_09} See mitk::FileWriterRegistry
+   * @deprecatedSince{2014_03} See mitk::FileWriterRegistry
    */
   DEPRECATED(virtual FileWriterList GetFileWriters());
 
   /**
-   * @deprecatedSince{2013_09} See mitk::FileWriterRegistry and QmitkIOUtil
+   * @deprecatedSince{2014_03} See mitk::FileWriterRegistry and QmitkIOUtil
    */
   DEPRECATED(std::string GetDescriptionForExtension(const std::string& extension));
 
@@ -106,18 +106,18 @@ protected:
    *        This map is extented/merged with the values from the input map.
    * @param inputMap the input map, it contains value pairs like ("*.dcm",
    *        "DICOM files"),("*.dc3", "DICOM files") returned by the extra factories.
-   * @deprecatedSince{2013_09}
+   * @deprecatedSince{2014_03}
    */
   void MergeFileExtensions(MultimapType& fileExtensionsMap, MultimapType inputMap);
 
   /**
    * @brief initialize the file extension entries for open and save
-   * @deprecatedSince{2013_09}
+   * @deprecatedSince{2014_03}
    */
   void CreateFileExtensionsMap();
 
   /**
-   * @deprecatedSince{2013_09}
+   * @deprecatedSince{2014_03}
    */
   DEPRECATED(void CreateSaveFileExtensions());
 

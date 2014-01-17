@@ -822,19 +822,19 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         MITK_INFO << "Adjusting complex signal:";
 
         if (m_SimulateRelaxation)
-            m_StatusText += " > Simulating signal relaxation\n";
+            m_StatusText += "Simulating signal relaxation\n";
         if (m_FrequencyMap.IsNotNull())
-            m_StatusText += " > Simulating distortions\n";
+            m_StatusText += "Simulating distortions\n";
         if (m_AddGibbsRinging)
-            m_StatusText += " > Simulating ringing artifacts\n";
+            m_StatusText += "Simulating ringing artifacts\n";
         if (m_SimulateEddyCurrents)
-            m_StatusText += " > Simulating eddy currents\n";
+            m_StatusText += "Simulating eddy currents\n";
         if (m_Spikes>0)
-            m_StatusText += " > Simulating spikes\n";
+            m_StatusText += "Simulating spikes\n";
         if (m_Wrap<1.0)
-            m_StatusText += " > Simulating aliasing artifacts\n";
+            m_StatusText += "Simulating aliasing artifacts\n";
         if (m_kOffset>0)
-            m_StatusText += " > Simulating ghosts\n";
+            m_StatusText += "Simulating ghosts\n";
 
         doubleOutImage = DoKspaceStuff(compartments);
         m_SignalScale = 1;
@@ -862,6 +862,10 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
     m_StatusText += this->GetTime()+" > Finalizing image\n";
     MITK_INFO << "Finalizing image";
+    if (m_SignalScale>1)
+        m_StatusText += " Scaling signal\n";
+    if (m_NoiseModel!=NULL)
+        m_StatusText += " Adding noise\n";
     unsigned int window = 0;
     unsigned int min = itk::NumericTraits<unsigned int>::max();
     ImageRegionIterator<OutputImageType> it4 (outImage, outImage->GetLargestPossibleRegion());

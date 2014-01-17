@@ -1382,7 +1382,7 @@
                 <double>0.000000000000000</double>
                </property>
                <property name="maximum">
-                <double>100000.000000000000000</double>
+                <double>999999999.000000000000000</double>
                </property>
                <property name="singleStep">
                 <double>0.001000000000000</double>
@@ -2651,7 +2651,7 @@
           <bool>true</bool>
          </property>
          <property name="toolTip">
-          <string>Start DWI generation from selected fiber bundle. If no fiber bundle is selected, a grayscale image containing a simple gradient is generated.</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start DWI generation from selected fiber bundle.&lt;/p&gt;&lt;p&gt;If no fiber bundle but an existing diffusion weighted image is selected, the enabled artifacts are added to this image.&lt;/p&gt;&lt;p&gt;If neither a fiber bundle nor a diffusion weighted image is selected, a grayscale image containing a simple gradient is generated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Start Simulation</string>

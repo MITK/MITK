@@ -35,10 +35,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkChiSquareNoiseModel.h>
 
 /**Documentation
- *
+ * Test the Fiberfox simulation functions (fiberBundle -> diffusion weighted image)
  */
-
-
 bool CompareDwi(itk::VectorImage< short, 3 >* dwi1, itk::VectorImage< short, 3 >* dwi2)
 {
     typedef itk::VectorImage< short, 3 > DwiImageType;

@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestFixture.h>
 
 /**Documentation
- *
+ * Test the Fiberfox simulation functions (diffusion weighted image -> diffusion weighted image)
  */
 class mitkFiberfoxAddArtifactsToDwiTestSuite : public mitk::TestFixture
 {

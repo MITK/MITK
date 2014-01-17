@@ -83,8 +83,8 @@ namespace mitk
     itkGetMacro( RatioOfIsolatedPoints, double );
     itkGetMacro( NumberOfEndPoints, unsigned int );
     itkGetMacro( RatioOfEndPoints, double );
-    itkGetMacro( VectorOfEccentrities, std::vector< int > );
-    itkGetMacro( VectorOfEccentrities90, std::vector< int > );
+    itkGetMacro( VectorOfEccentrities, std::vector< unsigned int > );
+    itkGetMacro( VectorOfEccentrities90, std::vector< unsigned int > );
     itkGetMacro( VectorOfAveragePathLengths, std::vector< double > );
     itkGetMacro( Diameter, unsigned int );
     itkGetMacro( Diameter90, unsigned int );
@@ -205,8 +205,8 @@ namespace mitk
     double m_RatioOfIsolatedPoints;
     unsigned int m_NumberOfEndPoints;
     double m_RatioOfEndPoints;
-    std::vector< int > m_VectorOfEccentrities;
-    std::vector< int > m_VectorOfEccentrities90;
+    std::vector< unsigned int > m_VectorOfEccentrities;
+    std::vector< unsigned int > m_VectorOfEccentrities90;
     std::vector< double > m_VectorOfAveragePathLengths;
     unsigned int m_Diameter;
     unsigned int m_Diameter90;

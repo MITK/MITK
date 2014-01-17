@@ -74,7 +74,6 @@ namespace mitk {
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer); //looks like deprecated.. should be replaced bz GetViewProp()
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
 
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer);
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
 
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);

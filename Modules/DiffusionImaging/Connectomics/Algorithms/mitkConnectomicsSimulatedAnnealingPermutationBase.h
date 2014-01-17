@@ -52,7 +52,7 @@ namespace mitk
     virtual void Initialize(){};
 
     // Do a permutation for a specific temperature
-    virtual void Permutate( double temperature ){};
+    virtual void Permutate( double /*temperature*/ ){};
 
     // Do clean up necessary after a permutation
     virtual void CleanUp(){};

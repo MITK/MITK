@@ -134,7 +134,7 @@ void mitk::ConnectomicsNetworkReader::GenerateOutputInformation()
         // walk through the vertices
         TiXmlElement* vertexElement = pElem->FirstChildElement();
 
-        for( vertexElement; vertexElement; vertexElement=vertexElement->NextSiblingElement())
+        for( ; vertexElement; vertexElement=vertexElement->NextSiblingElement())
         {
           std::vector< float > pos;
           std::string label;
@@ -168,7 +168,7 @@ void mitk::ConnectomicsNetworkReader::GenerateOutputInformation()
         // walk through the edges
         TiXmlElement* edgeElement = pElem->FirstChildElement();
 
-        for( edgeElement; edgeElement; edgeElement=edgeElement->NextSiblingElement())
+        for( ; edgeElement; edgeElement=edgeElement->NextSiblingElement())
         {
           int edgeID(0), edgeSourceID(0), edgeTargetID(0), edgeWeight(0);
 

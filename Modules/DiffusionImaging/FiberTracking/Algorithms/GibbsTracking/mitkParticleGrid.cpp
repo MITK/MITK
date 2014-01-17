@@ -42,7 +42,7 @@ ParticleGrid::ParticleGrid(ItkFloatImageType* image, float particleLength, int c
     m_ContainerCapacity = 100000;           // initial particle container capacity
     unsigned long  numCells = m_GridSize[0]*m_GridSize[1]*m_GridSize[2];   // number of grid cells
     unsigned long  gridSize = numCells*m_CellCapacity;
-    if ( itk::NumericTraits<int>::max()<gridSize )
+    if ( (unsigned long)itk::NumericTraits<int>::max()<gridSize )
         throw std::bad_alloc();
 
     m_Particles.resize(m_ContainerCapacity);        // allocate and initialize particles

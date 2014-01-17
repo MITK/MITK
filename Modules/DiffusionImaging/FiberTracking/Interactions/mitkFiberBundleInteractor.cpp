@@ -107,7 +107,6 @@ void mitk::FiberBundleInteractor::DeselectAllFibers()
 float mitk::FiberBundleInteractor::CanHandleEvent(StateEvent const* stateEvent) const
     //go through all points and check, if the given Point lies near a line
 {
-  float returnValue = 0;
 
   mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
   //checking if a keyevent can be handled:
@@ -131,12 +130,6 @@ float mitk::FiberBundleInteractor::CanHandleEvent(StateEvent const* stateEvent) 
     return 0;
   }
 
-  //if the event can be understood and if there is a transition waiting for that event
-  if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
-  {
-    returnValue = 0.5;//it can be understood
-  }
-
   //check on the right data-type
   mitk::FiberBundleX* bundle = dynamic_cast<mitk::FiberBundleX*>(m_DataNode->GetData());
   if (bundle == NULL)
@@ -157,34 +150,7 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
     return false;
 
   // Get Event and extract renderer
-  const Event *event = stateEvent->GetEvent();
-  BaseRenderer *renderer = NULL;
-  vtkRenderWindow *renderWindow = NULL;
   vtkRenderWindowInteractor *renderWindowInteractor = NULL;
-  vtkRenderer *currentVtkRenderer = NULL;
-  vtkCamera *camera = NULL;
-
-  if ( event != NULL )
-  {
-    renderer = event->GetSender();
-    if ( renderer != NULL )
-    {
-      renderWindow = renderer->GetRenderWindow();
-      if ( renderWindow != NULL )
-      {
-        renderWindowInteractor = renderWindow->GetInteractor();
-        if ( renderWindowInteractor != NULL )
-        {
-          currentVtkRenderer = renderWindowInteractor
-                               ->GetInteractorStyle()->GetCurrentRenderer();
-          if ( currentVtkRenderer != NULL )
-          {
-            camera = currentVtkRenderer->GetActiveCamera();
-          }
-        }
-      }
-    }
-  }
 
   /*Each case must watch the type of the event!*/
   switch (action->GetActionId())

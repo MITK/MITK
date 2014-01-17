@@ -19,8 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 using namespace mitk;
 
 MetropolisHastingsSampler::MetropolisHastingsSampler(ParticleGrid* grid, EnergyComputer* enComp, ItkRandGenType* randGen, float curvThres)
-    : m_AcceptedProposals(0)
-    , m_ExTemp(0.01)
+    : m_ExTemp(0.01)
     , m_BirthProb(0.25)
     , m_DeathProb(0.05)
     , m_ShiftProb(0.15)
@@ -29,6 +28,7 @@ MetropolisHastingsSampler::MetropolisHastingsSampler(ParticleGrid* grid, EnergyC
     , m_TractProb(0.5)
     , m_DelProb(0.1)
     , m_ChempotParticle(0.0)
+    , m_AcceptedProposals(0)
 {
     m_RandGen = randGen;
     m_ParticleGrid = grid;

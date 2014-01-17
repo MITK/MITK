@@ -161,8 +161,6 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
 
     //////////////////////Create Tubes/////////////////////////
 
-    double maxWeight = (double) this->GetInput()->GetMaximumWeight();
-
     for(unsigned int i = 0; i < vectorOfEdges.size(); i++)
     {
 
@@ -392,12 +390,6 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, Bas
     connectomicsRenderingEdgeRadiusParameter, renderer, overwrite );
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
-}
-
-void mitk::ConnectomicsNetworkMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
-{
-  //TODO: implement
-
 }
 
 void mitk::ConnectomicsNetworkMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *mapper)

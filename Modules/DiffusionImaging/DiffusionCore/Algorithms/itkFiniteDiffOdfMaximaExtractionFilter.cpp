@@ -47,14 +47,14 @@ static bool CompareVectors(const vnl_vector_fixed< double, 3 >& v1, const vnl_ve
 template< class PixelType, int ShOrder, int NrOdfDirections >
 FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
 ::FiniteDiffOdfMaximaExtractionFilter()
-    : m_Toolkit(FSL)
+    : m_NormalizationMethod(MAX_VEC_NORM)
     , m_MaxNumPeaks(2)
     , m_PeakThreshold(0.4)
+    , m_AbsolutePeakThreshold(0)
     , m_ClusteringThreshold(0.9)
     , m_AngularThreshold(0.7)
     , m_NumCoeffs((ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder)
-    , m_NormalizationMethod(MAX_VEC_NORM)
-    , m_AbsolutePeakThreshold(0)
+    , m_Toolkit(FSL)
 {
     this->SetNumberOfRequiredInputs(1);
 }
@@ -224,7 +224,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
     m_NumDirectionsImage->Allocate();
     m_NumDirectionsImage->FillBuffer(0);
 
-    this->SetNumberOfOutputs(m_MaxNumPeaks);
+    this->SetNumberOfIndexedOutputs(m_MaxNumPeaks);
 
     // calculate SH basis
     OdfType odf;

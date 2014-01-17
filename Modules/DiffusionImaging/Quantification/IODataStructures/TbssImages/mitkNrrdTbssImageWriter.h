@@ -78,6 +78,7 @@ public:
      * Sets the input object for the filter.
      * @param input the diffusion volumes to write to file.
      */
+    using ProcessObject::SetInput;
     void SetInput( InputType* input );
     /**itk::VectorImage<TPixelType, 3>
      * @returns the 0'th input object of the filter.

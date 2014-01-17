@@ -204,7 +204,7 @@ namespace mitk {
         double segmentCost = 0.0;
         std::vector< itk::Index<3> > path = pathFinder->GetVectorPath();
 
-        for(int i=0; i<path.size()-1; i++)
+        for(unsigned int i=0; i<path.size()-1; i++)
         {
             itk::Index<3> ix1 = path[i];
             itk::Index<3> ix2 = path[i+1];
@@ -219,6 +219,7 @@ namespace mitk {
 
 
       }
+      return std::vector< itk::Index<3> >();
   }
 
 

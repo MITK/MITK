@@ -52,11 +52,9 @@ public:
     const FiberBundleX* GetInput();
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer); //looks like depricated.. should be replaced bz GetViewProp()
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer);
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
     //=========================================================
-    virtual void GenerateData(mitk::BaseRenderer *renderer);
 
     class  FBXLocalStorage3D : public mitk::Mapper::BaseLocalStorage
     {
@@ -86,6 +84,7 @@ protected:
 
     FiberBundleXMapper3D();
     virtual ~FiberBundleXMapper3D();
+    void InternalGenerateData(mitk::BaseRenderer *renderer);
 
     void UpdateVtkObjects(); //??
 

@@ -33,15 +33,15 @@ namespace itk
   template <class TInputImageType, class TOutputImageType>
   ShortestPathImageFilter<TInputImageType, TOutputImageType>
     ::ShortestPathImageFilter() :
+    m_Nodes(0),
+    m_Graph_NumberOfNodes(0),
     m_FullNeighborsMode(false),
     m_MakeOutputImage(true),
     m_StoreVectorOrder(false),
     m_CalcAllDistances(false),
-    m_ActivateTimeOut(false),
     multipleEndPoints(false),
-    m_Initialized(false),
-    m_Nodes(0),
-    m_Graph_NumberOfNodes(0)
+    m_ActivateTimeOut(false),
+    m_Initialized(false)
   {
     m_endPoints.clear();
     m_endPointsClosed.clear();
@@ -505,10 +505,8 @@ namespace itk
     // init variables
     double durationAll = 0;
     bool timeout = false;
-    bool makeNewHeapNecessary = false;
     NodeNumType mainNodeListIndex = 0;
     DistanceType curNodeDistance = 0;
-    DistanceType curNodeDistAndEst = 0;
     NodeNumType numberOfNodesChecked = 0;
 
     // Create Multimap (tree structure for fast searching)
@@ -531,7 +529,6 @@ namespace itk
 
       // Get element with lowest score
       mainNodeListIndex = myMap.begin()->second->mainListIndex;
-      curNodeDistAndEst = myMap.begin()->second->distAndEst;
       curNodeDistance = myMap.begin()->second->distance;
       myMap.begin()->second->closed = true; // close it
 
@@ -611,8 +608,6 @@ namespace itk
 
             // 1st : find and delete old element
             bool found = false;
-            double lookFor = neighborNodes[i]->distAndEst;
-            unsigned int lookForId = neighborNodes[i]->mainListIndex;
             ret = myMap.equal_range(neighborNodes[i]->distAndEst);
 
             if ((ret.first == ret.second))

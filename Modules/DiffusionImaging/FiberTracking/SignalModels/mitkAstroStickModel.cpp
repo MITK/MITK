@@ -21,8 +21,8 @@ using namespace mitk;
 
 template< class ScalarType >
 AstroStickModel< ScalarType >::AstroStickModel()
-    : m_Diffusivity(0.001)
-    , m_BValue(1000)
+    : m_BValue(1000)
+    , m_Diffusivity(0.001)
     , m_NumSticks(42)
     , m_RandomizeSticks(false)
 {

@@ -68,7 +68,7 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
 
         // load reference directions
         ItkDirectionImageContainerType::Pointer referenceImageContainer = ItkDirectionImageContainerType::New();
-        for (int i=0; i<referenceImages.size(); i++)
+        for (unsigned int i=0; i<referenceImages.size(); i++)
         {
             try
             {

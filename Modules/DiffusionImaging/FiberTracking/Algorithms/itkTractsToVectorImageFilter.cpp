@@ -25,14 +25,14 @@ static bool CompareVectorLengths(const vnl_vector_fixed< double, 3 >& v1, const 
 template< class PixelType >
 TractsToVectorImageFilter< PixelType >::TractsToVectorImageFilter():
     m_AngularThreshold(0.7),
-    m_MaskImage(NULL),
-    m_NumDirectionsImage(NULL),
-    m_NormalizeVectors(false),
     m_Epsilon(0.999),
+    m_MaskImage(NULL),
+    m_NormalizeVectors(false),
     m_UseWorkingCopy(true),
-    m_MaxNumDirections(3),
     m_UseTrilinearInterpolation(false),
-    m_Thres(0.5)
+    m_MaxNumDirections(3),
+    m_Thres(0.5),
+    m_NumDirectionsImage(NULL)
 {
     this->SetNumberOfRequiredOutputs(1);
 }

@@ -15,6 +15,11 @@ GibbsEnergyComputer::GibbsEnergyComputer(ItkQBallImgType* qballImage, ItkFloatIm
   m_Image = qballImage;
 }
 
+GibbsEnergyComputer::~GibbsEnergyComputer()
+{
+
+}
+
 float GibbsEnergyComputer::EvaluateOdf(vnl_vector_fixed<float, 3>& pos, vnl_vector_fixed<float, 3> dir)
 {
     const int sampleSteps = 10;             // evaluate ODF at 2*sampleSteps+1 positions along dir

@@ -46,8 +46,8 @@ public:
 
 protected:
 
-    ScalarType   m_BValue;       ///< b-value used to generate the artificial signal
     ScalarType   m_Diffusivity;  ///< Scalar diffusion constant
+    ScalarType   m_BValue;       ///< b-value used to generate the artificial signal
 };
 
 }

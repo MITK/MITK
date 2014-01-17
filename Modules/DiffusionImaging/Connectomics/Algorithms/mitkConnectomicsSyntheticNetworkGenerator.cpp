@@ -210,12 +210,8 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCubeNetwork(
 void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCenterToSurfaceNetwork(
   mitk::ConnectomicsNetwork::Pointer network, int numberOfPoints, double radius )
 {
-  //the random number generators
-  unsigned int randomOne = (unsigned int) rand();
-  unsigned int randomTwo = (unsigned int) rand();
 
   vnl_random rng( (unsigned int) rand() );
-  vnl_random rng2( (unsigned int) rand() );
 
   mitk::ConnectomicsNetwork::VertexDescriptorType centerVertex;
   int vertexID(0);
@@ -277,12 +273,7 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticRandomNetwork
   // as the surface is proportional to the square of the radius the density stays the same
   double radius = 5 * std::sqrt( (float) numberOfPoints );
 
-  //the random number generators
-  unsigned int randomOne = (unsigned int) rand();
-  unsigned int randomTwo = (unsigned int) rand();
-
   vnl_random rng( (unsigned int) rand() );
-  vnl_random rng2( (unsigned int) rand() );
 
   // map for storing the conversion from indices to vertex descriptor
   std::map< int, mitk::ConnectomicsNetwork::VertexDescriptorType > idToVertexMap;

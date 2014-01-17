@@ -43,7 +43,7 @@ template<typename TPixelType>
 class DiffusionImageSource : public ImageSource
 {
 public:
-  mitkClassMacro(DiffusionImageSource, BaseProcess);
+  mitkClassMacro(DiffusionImageSource, BaseDataSource);
   itkNewMacro(Self);
 
   typedef DiffusionImage<TPixelType> OutputType;

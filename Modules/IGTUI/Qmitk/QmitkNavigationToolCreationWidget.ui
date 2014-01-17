@@ -66,8 +66,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>336</width>
-        <height>178</height>
+        <width>340</width>
+        <height>205</height>
        </rect>
       </property>
       <attribute name="label">
@@ -155,8 +155,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>336</width>
-        <height>178</height>
+        <width>340</width>
+        <height>94</height>
        </rect>
       </property>
       <attribute name="label">
@@ -174,19 +174,35 @@
         </widget>
        </item>
        <item>
+        <widget class="QRadioButton" name="m_Surface_Use_Other">
+         <property name="text">
+          <string>Use Surface:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QRadioButton" name="m_Surface_Use_Other">
-           <property name="text">
-            <string>Use Surface:</string>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
-          </widget>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>25</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
          <item>
           <widget class="QmitkDataStorageComboBox" name="m_SurfaceChooser">
            <property name="minimumSize">
             <size>
-             <width>150</width>
+             <width>200</width>
              <height>0</height>
             </size>
            </property>
@@ -211,6 +227,19 @@
            </property>
           </widget>
          </item>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
         </layout>
        </item>
        <item>
@@ -233,8 +262,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>336</width>
-        <height>178</height>
+        <width>340</width>
+        <height>129</height>
        </rect>
       </property>
       <attribute name="label">

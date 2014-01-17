@@ -96,7 +96,6 @@ mitk::Dispatcher::~Dispatcher()
 bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
 {
   InteractionEvent::Pointer p = event;
-
   bool eventIsHandled = false;
   /* Filter out and handle Internal Events separately */
   InternalEvent* internalEvent = dynamic_cast<InternalEvent*>(event);

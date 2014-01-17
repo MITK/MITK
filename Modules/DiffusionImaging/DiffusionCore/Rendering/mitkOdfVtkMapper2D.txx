@@ -297,8 +297,8 @@ typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry mitk::OdfVtkMapper2D<T,N>
     double vp[ 3 ], vnormal[ 3 ];
     Point3D point = worldPlaneGeometry->GetOrigin();
     Vector3D normal = worldPlaneGeometry->GetNormal(); normal.Normalize();
-    vnl2vtk( point.Get_vnl_vector(), vp );
-    vnl2vtk( normal.Get_vnl_vector(), vnormal );
+    vnl2vtk( point.GetVnlVector(), vp );
+    vnl2vtk( normal.GetVnlVector(), vnormal );
 
     mitk::DisplayGeometry::Pointer dispGeometry = renderer->GetDisplayGeometry();
     mitk::Vector2D size = dispGeometry->GetSizeInMM();
@@ -678,7 +678,6 @@ void  mitk::OdfVtkMapper2D<T,N>
     if ( this->GetVtkProp(renderer)->GetVisibility() )
     {
         // adapt cam pos
-        OdfDisplayGeometry dispGeo = MeasureDisplayedGeometry( renderer);
         this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
     }
 }
@@ -840,7 +839,7 @@ bool mitk::OdfVtkMapper2D<T,N>
 
     double vnormal[ 3 ];
     Vector3D normal = worldPlaneGeometry->GetNormal(); normal.Normalize();
-    vnl2vtk( normal.Get_vnl_vector(), vnormal );
+    vnl2vtk( normal.GetVnlVector(), vnormal );
 
     vtkLinearTransform * vtktransform =
             this->GetDataNode()->GetVtkTransform(this->GetTimestep());

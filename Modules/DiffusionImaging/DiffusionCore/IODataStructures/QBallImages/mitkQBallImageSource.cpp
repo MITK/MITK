@@ -28,7 +28,18 @@ mitk::QBallImageSource::QBallImageSource()
   Superclass::SetNthOutput(0, output.GetPointer());
 }
 
-mitk::QBallImageSource::DataObjectPointer mitk::QBallImageSource::MakeOutput( DataObjectPointerArraySizeType /*idx*/ )
+itk::DataObject::Pointer mitk::QBallImageSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-  return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
+  return OutputImageType::New().GetPointer();
+}
+
+
+itk::DataObject::Pointer mitk::QBallImageSource::MakeOutput( const DataObjectIdentifierType & name )
+{
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
+    {
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    }
+  return static_cast<itk::DataObject *>(OutputImageType::New().GetPointer());
 }

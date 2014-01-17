@@ -76,7 +76,8 @@ mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(mitk::Image::Pointer refImg, mi
 
   picDesc->type = CastToIpPicType( refImg->GetPixelType().GetComponentType() );
   picDesc->bpe = refImg->GetPixelType().GetBpe();
-  picDesc->data = refImg->GetData();
+  mitk::ImageWriteAccessor imAccess(refImg);
+  picDesc->data = imAccess.GetData();
 
   return picDesc;
 }

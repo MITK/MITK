@@ -183,7 +183,7 @@ void QmitkNavigationToolCreationWidget::OnCancel()
 
 void QmitkNavigationToolCreationWidget::OnLoadSurface()
 {
-  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), "/", "*.stl").toLatin1().data();
+  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), "/", tr("STL (*.stl)")).toLatin1().data();
   mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
   try
   {

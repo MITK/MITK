@@ -89,6 +89,17 @@ mitk::ProcessEventMode mitk::DataInteractor::GetMode() const
   return REGULAR;
 }
 
+void mitk::DataInteractor::NotifyStart()
+{
+  this->GetDataNode()->InvokeEvent(StartInteraction());
+}
+
+void mitk::DataInteractor::NotifyResultReady()
+{
+  this->GetDataNode()->InvokeEvent(ResultReady());
+}
+
+
 
 
 void mitk::DataInteractor::DataNodeChanged()

@@ -38,6 +38,7 @@ namespace mitk
   class InteractionEvent;
   class StateMachineState;
   class DataNode;
+  class UndoController;
 
   /**
    * \class TActionFunctor
@@ -135,6 +136,24 @@ namespace mitk
      */
     bool HandleEvent(InteractionEvent* event, DataNode* dataNode);
 
+    /**
+    * @brief Enables or disabled Undo.
+    **/
+    void EnableUndo(bool enable)
+    {
+      m_UndoEnabled = enable;
+    }
+
+
+    /**
+    * @brief Enables/disables the state machine. In un-enabled state it won't react to any events.
+    **/
+    void EnableInteraction(bool enable)
+    {
+      m_IsActive = enable;
+    }
+
+
   protected:
     EventStateMachine();
     virtual ~EventStateMachine();
@@ -152,6 +171,12 @@ namespace mitk
     void AddConditionFunction(const std::string& condition, const ConditionFunctionDelegate& delegate);
 
     StateMachineState* GetCurrentState() const;
+
+    /**
+     * @brief ResetToStartState Reset state machine to it initial starting state.
+     */
+
+    void ResetToStartState();
 
     /**
      * Is called after loading a statemachine.
@@ -206,6 +231,11 @@ namespace mitk
     */
     StateMachineTransition* GetExecutableTransition( InteractionEvent* event );
 
+    // Determines if state machine reacts to events
+    bool m_IsActive;
+    // Undo/Redo
+    UndoController* m_UndoController;
+    bool m_UndoEnabled;
 
   private:
 
@@ -217,6 +247,8 @@ namespace mitk
     ActionDelegatesMapType m_ActionDelegatesMap;
     ConditionDelegatesMapType m_ConditionDelegatesMap;
     StateMachineStateType m_CurrentState;
+
+
   };
 
 } /* namespace mitk */

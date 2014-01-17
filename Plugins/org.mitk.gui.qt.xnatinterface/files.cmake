@@ -8,6 +8,7 @@ set(INTERNAL_CPP_FILES
   QmitkXnatSimpleSearchView.cpp
   QmitkXnatTreeBrowserView.cpp
   QmitkXnatObjectEditorInput.cpp
+  QmitkXnatConnectionPreferencePage.cpp
 )
 
 set(UI_FILES
@@ -22,6 +23,7 @@ set(MOC_H_FILES
   src/internal/QmitkXnatSimpleSearchView.h
   src/internal/QmitkXnatTreeBrowserView.h
   src/internal/QmitkXnatObjectEditorInput.h
+  src/internal/QmitkXnatConnectionPreferencePage.h
 )
 
 # list of resource files which can be used by the plug-in

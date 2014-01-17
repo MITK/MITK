@@ -129,11 +129,6 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
   m_Controls.setupUi( parent );
 
   m_Controls.treeView->setModel(m_ListModel);
-  //m_Controls.subjectTreeView->setModel(m_SubjectsModel);
-  //m_Controls.experimentTreeView->setModel(m_ExperimentsModel);
-  //m_Controls.scanTreeView->setModel(m_ScansModel);
-  //m_Controls.resourceTreeView->setModel(m_ResourceModel);
-  //m_Controls.fileTreeView->setModel(m_FileModel);
   //UpdateList();
 
   GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
@@ -142,13 +137,6 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(OnObjectActivated(const QModelIndex&)) );
   //connect( m_Controls.buttonDownloadResource, SIGNAL(clicked()), this, SLOT(DownloadResource()) );
   //connect( m_Controls.buttonDownloadFile, SIGNAL(clicked()), this, SLOT(DownloadFile()) );
-  /*
-  connect( m_Controls.projectTreeView, SIGNAL(clicked(QModelIndex)), SLOT(ProjectSelected(QModelIndex)) );
-  connect( m_Controls.subjectTreeView, SIGNAL(clicked(QModelIndex)), SLOT(SubjectSelected(QModelIndex)) );
-  connect( m_Controls.experimentTreeView, SIGNAL(clicked(QModelIndex)), SLOT(ExperimentSelected(QModelIndex)) );
-  connect( m_Controls.scanTreeView, SIGNAL(clicked(QModelIndex)), SLOT(ScanSelected(QModelIndex)) );
-  connect( m_Controls.resourceTreeView, SIGNAL(clicked(QModelIndex)), SLOT(ResourceSelected(QModelIndex)) );
-  */
   connect( m_Controls.buttonDataModel, SIGNAL(clicked()), this, SLOT(OnDataModelButtonClicked()) );
   connect( m_Controls.buttonProject, SIGNAL(clicked()), this, SLOT(OnProjectButtonClicked()) );
   connect( m_Controls.buttonSubject, SIGNAL(clicked()), this, SLOT(OnSubjectButtonClicked()) );
@@ -156,14 +144,7 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.buttonKindOfData, SIGNAL(clicked()), this, SLOT(OnKindOfDataButtonClicked()) );
   connect( m_Controls.buttonSession, SIGNAL(clicked()), this, SLOT(OnSessionButtonClicked()) );
   connect( m_Controls.buttonResource, SIGNAL(clicked()), this, SLOT(OnResourceButtonClicked()) );
-  //QStandardItem item("...");
-  //ctkXnatObject* object = new ctkXnatObject(m_ListModel->getRootObject());
-  //if ( object != NULL )
-  //{
-  //  ctkXnatObject* inputObject = GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject();
-  //  inputObject->setId("...");
-  //  object->add( inputObject );
-  //}
+
   for(int i = 0; i < m_Controls.breadcrumbHorizontalLayout->count()-1; i++)
   {
     QLayoutItem* child = m_Controls.breadcrumbHorizontalLayout->itemAt(i);
@@ -178,18 +159,6 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
 
 void QmitkXnatEditor::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/, const QList<mitk::DataNode::Pointer>& nodes )
 {
-  // iterate all selected objects, adjust warning visibility
-  //foreach( mitk::DataNode::Pointer node, nodes )
-  //{
-  //  if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
-  //  {
-  //    m_Controls.labelWarning->setVisible( false );
-  //    m_Controls.buttonGetAllProjects->setEnabled( true );
-  //    return;
-  //  }
-  //}
-  //m_Controls.labelWarning->setVisible( true );
-  //m_Controls.buttonGetAllProjects->setEnabled( false );
 }
 
 /**
@@ -237,33 +206,6 @@ void QmitkXnatEditor::UpdateList()
     parent = parent->parent();
     i--;
   }
-  //for(int i = 0; i <= m_ParentCount*2; i++)
-  //{
-  //  QLayoutItem* child = m_Controls.breadcrumbHorizontalLayout->itemAt(i);
-  //  child->widget()->setVisible(true);
-  //while( inputObject->parent() != NULL )
-  //{
-  //  parent
-  //}
-  //m_Controls.buttonDataModel->setVisible(true);
-
-  //QList<ctkXnatObject*> children = m_ListModel->getRootObject()->children();
-  //bool goHigherDots = false;
-  //foreach(ctkXnatObject* child, children)
-  //{
-  //  if (child->id() == QString("..."))
-  //  {
-  //    goHigherDots = true;
-  //  }
-  //}
-  //if(!goHigherDots)
-  //{
-  //  ctkXnatObject* dummy = new ctkXnatProject();
-  //  dummy->setId("...");
-  //  m_ListModel->getRootObject()->add(dummy);
-  //}
-  //MITK_INFO << m_ListModel->children().count();
-  //m_ListModel->beginMoveRows(m_Controls.treeView->rootIndex(),
 }
 
 /**
@@ -459,31 +401,14 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
   if (!index.isValid()) return;
 
   ctkXnatObject* child = GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->children().takeAt(index.row());
+  if( child ==  NULL)
+  {
+    return;
+  }
   QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( child );
   berry::IEditorInput::Pointer editorInput( oPtr );
   SetInput(editorInput);
 
-  //ctkXnatTreeModel* browserTreeModel =
-  //  GetSite()->GetPage()->FindView("org.mitk.views.qmitkxnattreebrowserview").Cast<QmitkXnatTreeBrowserView>()->GetTreeModel();
-  //QList<ctkXnatTreeItem *> itemList = browserTreeModel->findChildren<ctkXnatTreeItem *>();
-  //std::string editorItemId = GetEditorInput()->GetName();
-  //foreach(ctkXnatTreeItem* item, itemList)
-  //{
-  //  if ( !item ) return;
-  //  if ( !editorItemId.compare(item->xnatObject()->id().toStdString()) && item->parent() != NULL)
-  //  {}
-  //}
-  //QModelIndexList indexes =
-  //  browserTreeModel->match(browserTreeModel->index(0, 0, QModelIndex()), Qt::DisplayRole, index.data(), 6, Qt::MatchRecursive);
-  //browserTreeModel->findChildren<ctkXnatTreeItem *>();
-  //foreach(QModelIndex idx, indexes)
-  //{
-  //  if (!idx.isValid()) return;
-  //  if ( idx.data(Qt::EditRole).value<ctkXnatObject*>()->id() == index.data(Qt::EditRole).value<ctkXnatObject*>()->id() )
-  //  {
-  //    browserTreeModel->canFetchMore(idx);
-  //  }
-  //}
   if ( !this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->isFetched() )
   {
     this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();

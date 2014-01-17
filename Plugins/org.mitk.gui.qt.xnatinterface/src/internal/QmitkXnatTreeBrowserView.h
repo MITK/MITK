@@ -78,7 +78,6 @@ private:
   friend class QmitkXnatEditor;
 
   ctkXnatTreeModel* GetTreeModel();
-  void CheckUserInput();
   void SetSelectionProvider();
 
   ctkXnatSession* m_Session;

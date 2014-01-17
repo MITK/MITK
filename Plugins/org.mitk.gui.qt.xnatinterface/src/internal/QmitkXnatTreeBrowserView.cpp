@@ -111,8 +111,6 @@ void QmitkXnatTreeBrowserView::StartBrowser()
   }
   else
   {
-    CheckUserInput();
-
     // fill profile
     m_Profile->setName(QString("localhost"));
     m_Profile->setServerUrl(m_Controls.inHostAddress->text());
@@ -185,49 +183,6 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
 void QmitkXnatTreeBrowserView::SetSelectionProvider()
 {
   GetSite()->SetSelectionProvider(m_SelectionProvider);
-}
-
-void QmitkXnatTreeBrowserView::CheckUserInput()
-{
-  // Validate user input
-  if ( m_Controls.inHostAddress->text().isEmpty() || m_Controls.inUser->text().isEmpty() || m_Controls.inPassword->text().isEmpty() ) {
-    if ( m_Controls.inHostAddress->text().isEmpty() )
-    {
-      MITK_INFO << "No host address!";
-      m_Controls.inHostAddress->setStyleSheet("QLineEdit{ background-color: rgb(255,0,0) }");
-    }
-
-    if ( m_Controls.inUser->text().isEmpty() ) {
-      MITK_INFO << "No user !";
-      m_Controls.inUser->setStyleSheet("QLineEdit{ background-color: rgb(255,0,0) }");
-    }
-
-    if ( m_Controls.inPassword->text().isEmpty() ) {
-      MITK_INFO << "No password!";
-      m_Controls.inPassword->setStyleSheet("QLineEdit{ background-color: rgb(255,0,0) }");
-    }
-  }
-  else
-  {
-    m_Controls.inHostAddress->setStyleSheet("QLineEdit{ background-color: rgb(255,255,255) }");
-    m_Controls.inUser->setStyleSheet("QLineEdit{ background-color: rgb(255,255,255) }");
-    m_Controls.inPassword->setStyleSheet("QLineEdit{ background-color: rgb(255,255,255) }");
-  }
-
-  // Regular Expression for uri
-  QRegExp uriregex("^(https?)://([a-zA-Z0-9\\.]+):([0-9]+)(/[^ /]+)*$");
-
-  // Validate address
-  if ( !uriregex.exactMatch(m_Controls.inHostAddress->text()) )
-  {
-    MITK_INFO << m_Controls.inHostAddress->text().toStdString();
-    MITK_INFO << "Host address not valid";
-    m_Controls.inHostAddress->setStyleSheet("QLineEdit{ background-color: rgb(255,0,0) }");
-  }
-  else
-  {
-    m_Controls.inHostAddress->setStyleSheet("QLineEdit{ background-color: rgb(255,255,255) }");
-  }
 }
 
 void QmitkXnatTreeBrowserView::DoFetchMore(const QModelIndex &index)

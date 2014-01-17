@@ -102,7 +102,7 @@ protected:
 private:
   //QMap::QMap<QString, ctkXnatLoginProfile*> m_Profiles;
   //bool DownloadExists(QString filename);
-  friend class QmitkXnatTreeBrowserView;
+  //friend class QmitkXnatTreeBrowserView;
   int ParentChecker(ctkXnatObject* child);
   int m_ParentCount;
   void ToHigherLevel();

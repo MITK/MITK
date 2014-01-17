@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkXnatEditor.h"
 #include "QmitkXnatSimpleSearchView.h"
 #include "QmitkXnatTreeBrowserView.h"
+#include "QmitkXnatConnectionPreferencePage.h"
 
 namespace mitk {
 
@@ -29,6 +30,7 @@ void org_mitk_gui_qt_xnatinterface_Activator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkXnatEditor, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkXnatSimpleSearchView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkXnatTreeBrowserView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkXnatConnectionPreferencePage, context)
 }
 
 void org_mitk_gui_qt_xnatinterface_Activator::stop(ctkPluginContext* context)

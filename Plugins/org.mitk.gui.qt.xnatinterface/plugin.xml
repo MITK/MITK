@@ -19,4 +19,14 @@
       icon="resources/icon.xpm"/>
   </extension>
 
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.gui.qt.application.XnatConnectionPreferencePage" name="Xnat Connection" class="QmitkXnatConnectionPreferencePage">
+      <keywordreference id="org.mitk.gui.qt.application.XnatConnectionPreferencePageKeywords"></keywordreference>
+    </page>
+  </extension>
+
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.gui.qt.application.XnatConnectionPreferencePageKeywords" label="xnat session connection login connect"></keyword>
+  </extension>
+
 </plugin>

@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE(MitkAlgorithmsExt
                    DEPENDS MitkDataTypesExt
-                   PACKAGE_DEPENDS ANN
+                   PACKAGE_DEPENDS ITK>ITKThresholding ANN
                    WARNINGS_AS_ERRORS
                   )
 

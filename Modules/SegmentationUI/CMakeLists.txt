@@ -2,5 +2,4 @@ MITK_CREATE_MODULE ( SegmentationUI
 INCLUDE_DIRS Qmitk
 DEPENDS Qmitk Segmentation QmitkExt
 PACKAGE_DEPENDS CTK
-QT4_MODULES QtCore QtGui
 )

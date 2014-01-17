@@ -94,8 +94,8 @@ endif()
 # Work-around for linking GDCM libraries, until GDCM provides proper
 # target exports.
 foreach(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
-  if(EXISTS "${dir}/MITK_ITK_Config.cmake")
-    include("${dir}/MITK_ITK_Config.cmake")
+  if(EXISTS "${dir}/MITK_GDCM_Config.cmake")
+    include("${dir}/MITK_GDCM_Config.cmake")
     break()
   endif()
 endforeach()
@@ -109,7 +109,7 @@ if(_APP_SHOW_CONSOLE)
 else()
   add_executable(${_APP_NAME} MACOSX_BUNDLE WIN32 ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 endif()
-mitk_use_modules(TARGET ${_APP_NAME} MODULES mbilog PACKAGES Poco QT4_MODULES QtCore)
+mitk_use_modules(TARGET ${_APP_NAME} MODULES mbilog PACKAGES Poco Qt4>QtCore)
 
 set_target_properties(${_APP_NAME} PROPERTIES
                       COMPILE_FLAGS "${_app_compile_flags}")

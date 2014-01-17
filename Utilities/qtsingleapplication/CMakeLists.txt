@@ -33,6 +33,6 @@ target_link_libraries(qtsingleapplication ${QT_LIBRARIES})
 
 MITK_CREATE_MODULE_CONF(qtsingleapplication
   INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
-  QT4_MODULES QtNetwork QtGui)
+  PACKAGE_DEPENDS Qt4>QtNetwork|QtGui)
 
 endif(MITK_USE_Qt4) # only if MITK is built with Qt 4

@@ -236,6 +236,9 @@ if(MITK_USE_QT)
     set(MITK_USE_Qt4 FALSE)
     set(MITK_USE_Qt5 TRUE)
   endif(DESIRED_QT_VERSION MATCHES 5)
+else()
+  set(MITK_USE_Qt4 FALSE)
+  set(MITK_USE_Qt5 FALSE)
 endif()
 
 if(MITK_USE_SOFA)
@@ -395,7 +398,8 @@ include(mitkFunctionGetLibrarySearchPaths)
 include(mitkFunctionCompileSnippets)
 include(mitkFunctionUseModules)
 include(mitkMacroCreateModuleConf)
-include(mitkMacroCreateModule)
+include(mitkFunctionCheckModuleDependencies)
+include(mitkFunctionCreateModule)
 include(mitkMacroCreateExecutable)
 include(mitkMacroCheckModule)
 include(mitkMacroCreateModuleTests)
@@ -408,15 +412,6 @@ include(mitkMacroInstallTargets)
 include(mitkMacroGenerateToolsLibrary)
 include(mitkMacroGetLinuxDistribution)
 include(mitkMacroGetPMDPlatformString)
-
-#-----------------------------------------------------------------------------
-# Prerequesites
-#-----------------------------------------------------------------------------
-
-find_package(ITK REQUIRED)
-find_package(VTK REQUIRED)
-
-find_package(GDCM PATHS ${ITK_GDCM_DIR} REQUIRED)
 
 #-----------------------------------------------------------------------------
 # Set MITK specific options and variables (NOT available during superbuild)
@@ -567,7 +562,7 @@ set(MITK_EXE_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})
 #-----------------------------------------------------------------------------
 
 set(MITK_MODULES_PACKAGE_DEPENDS_DIR ${MITK_SOURCE_DIR}/CMake/PackageDepends)
-set(MODULES_PACKAGE_DEPENDS_DIRS ${MITK_MODULES_PACKAGE_DEPENDS_DIR} ${MITK_MODULES_PACKAGE_DEPENDS_DIR}/Qt)
+set(MODULES_PACKAGE_DEPENDS_DIRS ${MITK_MODULES_PACKAGE_DEPENDS_DIR})
 
 #-----------------------------------------------------------------------------
 # Testing

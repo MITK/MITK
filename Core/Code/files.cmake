@@ -50,11 +50,6 @@ set(H_FILES
 
   Common/mitkCommon.h
   Common/mitkExceptionMacro.h
-  Common/mitkServiceBaseObject.h
-  Common/mitkTestCaller.h
-  Common/mitkTestFixture.h
-  Common/mitkTesting.h
-  Common/mitkTestingMacros.h
 
   DataManagement/mitkProportionalTimeGeometry.h
   DataManagement/mitkTimeGeometry.h
@@ -370,7 +365,6 @@ set(CPP_FILES
   Rendering/vtkMitkThickSlicesFilter.cpp
   Rendering/vtkMitkLevelWindowFilter.cpp
   Rendering/vtkNeverTranslucentTexture.cpp
-  Rendering/mitkRenderingTestHelper.cpp
 
   Rendering/mitkOverlay.cpp
   Rendering/mitkVtkOverlay.cpp
@@ -391,8 +385,6 @@ set(CPP_FILES
   Common/mitkCoreObjectFactory.cpp
   Common/mitkCoreServices.cpp
 )
-
-list(APPEND CPP_FILES ${CppMicroServices_SOURCES})
 
 set(RESOURCE_FILES
 Interactions/globalConfig.xml

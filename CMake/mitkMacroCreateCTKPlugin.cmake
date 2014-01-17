@@ -1,16 +1,17 @@
 macro(MACRO_CREATE_MITK_CTK_PLUGIN)
 
-  MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES;MODULE_DEPENDENCIES;SUBPROJECTS" "TEST_PLUGIN;NO_INSTALL" ${ARGN})
+  MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES;MODULE_DEPENDENCIES;MODULE_DEPENDS;PACKAGE_DEPENDS;SUBPROJECTS" "TEST_PLUGIN;NO_INSTALL" ${ARGN})
 
-  if (MITK_USE_Qt4 AND PLUGIN_QT4_MODULES)
-    list(APPEND _PLUGIN_MODULE_DEPENDENCIES Qt4)
-  endif()
-  if (MITK_USE_Qt5 AND PLUGIN_QT5_MODULES)
-    list(APPEND _PLUGIN_MODULE_DEPENDENCIES Qt5)
+  mitk_check_module_dependencies(MODULES Mitk ${_PLUGIN_MODULE_DEPENDENCIES} ${_PLUGIN_MODULE_DEPENDS}
+                                 PACKAGES ${_PLUGIN_PACKAGE_DEPENDS}
+                                 MISSING_DEPENDENCIES_VAR _missing_deps
+                                 PACKAGE_DEPENDENCIES_VAR _package_deps)
+
+  if(_PLUGIN_MODULE_DEPENDENCIES)
+    message(WARNING "The MODULE_DEPENDENCIES argument is deprecated since 2014.03. Please use MODULE_DEPENDS instead.")
   endif()
 
-  MITK_CHECK_MODULE(_MODULE_CHECK_RESULT Mitk ${_PLUGIN_MODULE_DEPENDENCIES})
-  if(NOT _MODULE_CHECK_RESULT)
+  if(NOT _missing_deps)
 
     if(_PLUGIN_TEST_PLUGIN)
       set(is_test_plugin "TEST_PLUGIN")
@@ -25,21 +26,7 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
       set(plugin_no_install)
     endif()
 
-    # The PACKAGE_DEPENDS variable is filled in the MITK_CHECK_MODULE() macro
-    foreach(package ${PACKAGE_DEPENDS})
-      if(NOT ${package} MATCHES "^Qt[45].*$")
-        foreach(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
-          if(EXISTS "${dir}/MITK_${package}_Config.cmake")
-            include("${dir}/MITK_${package}_Config.cmake")
-            break()
-          endif()
-        endforeach()
-      endif()
-    endforeach()
-    if(ALL_LIBRARY_DIRS)
-      list(REMOVE_DUPLICATES ALL_LIBRARY_DIRS)
-      link_directories(${ALL_LIBRARY_DIRS})
-    endif()
+    _link_directories_for_packages(${_package_deps})
 
     MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE ${_PLUGIN_EXPORT_DIRECTIVE}
                             EXPORTED_INCLUDE_SUFFIXES ${_PLUGIN_EXPORTED_INCLUDE_SUFFIXES}
@@ -48,9 +35,8 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
                             ${is_test_plugin} ${plugin_no_install})
 
     mitk_use_modules(TARGET ${PLUGIN_TARGET}
-      MODULES Mitk ${_PLUGIN_MODULE_DEPENDENCIES}
-      QT4_MODULES ${PLUGIN_QT4_MODULES}
-      QT5_MODULES ${PLUGIN_QT5_MODULES}
+      MODULES Mitk ${_PLUGIN_MODULE_DEPENDENCIES} ${_PLUGIN_MODULE_DEPENDS}
+      PACKAGES ${_PLUGIN_PACKAGE_DEPENDS}
      )
 
     if(ALL_META_DEPENDENCIES)
@@ -89,12 +75,12 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
 
     endif()
 
-  else(NOT _MODULE_CHECK_RESULT)
+  else()
     if(NOT MITK_BUILD_ALL_PLUGINS)
-      message(SEND_ERROR "${PROJECT_NAME} is missing requirements and won't be built. Missing: ${_MODULE_CHECK_RESULT}")
+      message(SEND_ERROR "${PROJECT_NAME} is missing requirements and won't be built. Missing: ${_missing_deps}")
     else()
-      message(STATUS "${PROJECT_NAME} is missing requirements and won't be built. Missing: ${_MODULE_CHECK_RESULT}")
+      message(STATUS "${PROJECT_NAME} is missing requirements and won't be built. Missing: ${_missing_deps}")
     endif()
-  endif(NOT _MODULE_CHECK_RESULT)
+  endif()
 endmacro()
 

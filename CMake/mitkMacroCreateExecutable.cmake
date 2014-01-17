@@ -30,8 +30,6 @@ macro(mitk_create_executable EXECUTABLE_NAME)
       ADDITIONAL_LIBS        # list of additional libraries linked to this executable
       FILES_CMAKE            # file name of a CMake file setting source list variables
                              # (defaults to files.cmake)
-      QT4_MODULES            # the executable depends on a given list of Qt 4 modules
-      QT5_MODULES            # the executable depends on a given list of Qt 5 modules
      )
 
   set(_macro_options
@@ -61,8 +59,6 @@ macro(mitk_create_executable EXECUTABLE_NAME)
                      TARGET_DEPENDS ${EXEC_TARGET_DEPENDS}
                      ADDITIONAL_LIBS ${EXEC_ADDITIONAL_LIBS}
                      FILES_CMAKE ${EXEC_FILES_CMAKE}
-                     QT4_MODULES ${EXEC_QT4_MODULES}
-                     QT5_MODULES ${EXEC_QT5_MODULES}
                      ${_EXEC_OPTIONS}
                     )
 

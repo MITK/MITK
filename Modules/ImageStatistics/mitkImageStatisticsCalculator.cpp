@@ -28,6 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkStatisticsImageFilter.h>
 #include <itkLabelStatisticsImageFilter.h>
 #include <itkMaskImageFilter.h>
+#include <itkImageFileWriter.h>
+#include <itkRescaleIntensityImageFilter.h>
+
 
 #include <itkCastImageFilter.h>
 #include <itkImageFileWriter.h>
@@ -44,20 +47,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageImport.h>
 #include <vtkImageExport.h>
 #include <vtkImageData.h>
-
-#include <itkImageFileWriter.h>
-#include <itkRescaleIntensityImageFilter.h>
+#include <vtkLassoStencilSource.h>
+#include <vtkMetaImageWriter.h>
 
 #include <list>
-
-#if ( ( VTK_MAJOR_VERSION <= 5 ) && ( VTK_MINOR_VERSION<=8)  )
-  #include "mitkvtkLassoStencilSource.h"
-#else
-  #include "vtkLassoStencilSource.h"
-#endif
-
-
-#include <vtkMetaImageWriter.h>
 
 #include <exception>
 

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
 
-#include <mitkTesting.h>
+#include <mitkVector.h>
 #include <iomanip>
 
 mitk::PointSet::PointSet()

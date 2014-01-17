@@ -17,11 +17,7 @@ MITK_CREATE_MODULE( mitkDICOMTesting
   DEPENDS Mitk # Mitk.so
 )
 
-MITK_CHECK_MODULE(_RESULT mitkDICOMTesting)
-if(_RESULT)
-  message(STATUS "mitkDICOMTesting application won't be built. Missing: ${_RESULT}")
-else(_RESULT)
-
+if(MODULE_IS_ENABLED)
 # add helpful applications
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 

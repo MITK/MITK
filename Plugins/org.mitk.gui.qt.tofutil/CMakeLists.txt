@@ -5,7 +5,7 @@ project(org_mitk_gui_qt_tofutil)
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE TOFUTIL_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDENCIES mitkToFHardware Qmitk QmitkExt mitkTOFUI
+  MODULE_DEPENDS mitkToFHardware Qmitk QmitkExt mitkTOFUI
 )
 
 

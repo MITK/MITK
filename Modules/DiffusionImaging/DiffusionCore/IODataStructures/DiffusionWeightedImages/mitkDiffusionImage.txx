@@ -399,7 +399,7 @@ void mitk::DiffusionImage<TPixelType>::SetDirections(const std::vector<itk::Vect
   m_OriginalDirections = GradientDirectionContainerType::New();
   for(unsigned int i=0; i<directions.size(); i++)
   {
-    m_OriginalDirections->InsertElement( i, directions[i].Get_vnl_vector() );
+    m_OriginalDirections->InsertElement( i, directions[i].GetVnlVector() );
   }
   this->ApplyMeasurementFrame();
 }

@@ -63,6 +63,8 @@ namespace mitk
     mitk::DataNode* GetWorkingData();
     mitk::DataStorage* GetDataStorage();
 
+    void ConfirmSegmentation();
+
 
   protected:
 
@@ -74,6 +76,8 @@ namespace mitk
 
     //Observer id
     long m_PointSetAddObserverTag;
+
+    mitk::DataNode::Pointer m_ResultNode;
 
     //itk regrowing
     template < typename TPixel, unsigned int VImageDimension >

@@ -55,6 +55,17 @@ mitk::PickingTool::PickingTool()
   itk::SimpleMemberCommand<PickingTool>::Pointer pointAddedCommand = itk::SimpleMemberCommand<PickingTool>::New();
   pointAddedCommand->SetCallbackFunction(this, &mitk::PickingTool::OnPointAdded);
   m_PointSetAddObserverTag = m_PointSet->AddObserver( mitk::PointSetAddEvent(), pointAddedCommand);
+
+  //create new node for picked region
+  m_ResultNode = mitk::DataNode::New();
+  // set some properties
+  m_ResultNode->SetProperty("name", mitk::StringProperty::New("result"));
+  m_ResultNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+  m_ResultNode->SetProperty("color", mitk::ColorProperty::New(0.0,1.0,0.0));
+  m_ResultNode->SetProperty("layer", mitk::IntProperty::New(1));
+  m_ResultNode->SetProperty("opacity", mitk::FloatProperty::New(0.7));
+
+
 }
 
 mitk::PickingTool::~PickingTool()
@@ -75,9 +86,10 @@ const char* mitk::PickingTool::GetName() const
 us::ModuleResource mitk::PickingTool::GetIconResource() const
 {
   us::Module* module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("RegionGrowing_48x48.png");
+  us::ModuleResource resource = module->GetResource("Pick_48x48.png");
   return resource;
 }
+
 
 void mitk::PickingTool::Activated()
 {
@@ -85,6 +97,9 @@ void mitk::PickingTool::Activated()
   if (!GetDataStorage()->Exists(m_PointSetNode))
     GetDataStorage()->Add(m_PointSetNode, GetWorkingData());
   mitk::GlobalInteraction::GetInstance()->AddInteractor(m_SeedPointInteractor);
+
+  // now add result to data tree
+  GetDataStorage()->Add( m_ResultNode, this->GetWorkingData() );
 }
 
 void mitk::PickingTool::Deactivated()
@@ -98,6 +113,7 @@ void mitk::PickingTool::Deactivated()
   //remove from data storage and disable interaction
   mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SeedPointInteractor);
   GetDataStorage()->Remove(m_PointSetNode);
+  GetDataStorage()->Remove( m_ResultNode);
 }
 
 mitk::DataNode* mitk::PickingTool::GetReferenceData(){
@@ -144,6 +160,7 @@ void mitk::PickingTool::OnPointAdded()
     {
       AccessByItk_2(orgImage, StartRegionGrowing, orgImage->GetGeometry(), seedPoint);
     }
+    this->m_PointSet->Clear();
   }
 }
 
@@ -182,24 +199,30 @@ void mitk::PickingTool::OnPointAdded()
       return;
     }
 
+    //Store result and preview
     mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput(),imageGeometry)->Clone();
 
-    //create new node for picked region
-    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-    newNode->SetData( resultImage );
-
-    // set some properties
-    newNode->SetProperty("name", mitk::StringProperty::New("result"));
-    newNode->SetProperty("helper object", mitk::BoolProperty::New(false));
-    newNode->SetProperty("color", mitk::ColorProperty::New(0.0,1.0,0.0));
-    newNode->SetProperty("layer", mitk::IntProperty::New(1));
-    newNode->SetProperty("opacity", mitk::FloatProperty::New(0.7));
-
-
-
-    // now add result to data tree
-    GetDataStorage()->Add( newNode );
+    m_ResultNode->SetData( resultImage );
 
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+
+
+  void mitk::PickingTool::ConfirmSegmentation()
+  {
+     //create a new node and store the image from the result node
+     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+     newNode->SetProperty("name", mitk::StringProperty::New("Picking_result"));
+     newNode->SetProperty("helper object", mitk::BoolProperty::New(false));
+     newNode->SetProperty("color", mitk::ColorProperty::New(1.0,0.0,0.0));
+     newNode->SetProperty("opacity", mitk::FloatProperty::New(1.0));
+     newNode->SetData(m_ResultNode->GetData());
+
+     GetDataStorage()->Add(newNode);
+
+     //reset result node
+     m_ResultNode->SetData(NULL);
+
+     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }

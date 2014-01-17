@@ -100,6 +100,7 @@ set(RESOURCE_FILES
   Otsu_48x48.png
   Paint_48x48.png
   Paint_Cursor_32x32.png
+  Pick_48x48.png
   RegionGrowing_48x48.png
   RegionGrowing_Cursor_32x32.png
   Subtract_48x48.png

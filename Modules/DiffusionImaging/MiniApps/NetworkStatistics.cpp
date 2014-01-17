@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // std includes
 #include <string>
 #include <sstream>
+#include <vector>
+#include <map>
 
 // ITK includes
 #include <itkImageFileWriter.h>
@@ -43,6 +45,7 @@ int NetworkStatistics(int argc, char* argv[])
   parser.addArgument("createConnectivityMatriximage", "I", ctkCommandLineParser::Bool, "Write connectivity matrix image");
   parser.addArgument("binaryConnectivity", "b", ctkCommandLineParser::Bool, "Whether to create a binary connectivity matrix");
   parser.addArgument("rescaleConnectivity", "r", ctkCommandLineParser::Bool, "Whether to rescale the connectivity matrix");
+  parser.addArgument("localStatistics", "L", ctkCommandLineParser::StringList, "Provide a list of node labels for local statistics", us::Any());
 
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -60,7 +63,12 @@ int NetworkStatistics(int argc, char* argv[])
   std::string networkName = us::any_cast<std::string>(parsedArgs["inputNetwork"]);
   std::string outName = us::any_cast<std::string>(parsedArgs["outputFile"]);
 
+  ctkCommandLineParser::StringContainerType localLabels;
 
+  if(parsedArgs.count("localStatistics"))
+  {
+    localLabels = us::any_cast<ctkCommandLineParser::StringContainerType>(parsedArgs["localStatistics"]);
+  }
 
   if (parsedArgs.count("noGlobalStatistics"))
     noGlobalStatistics = us::any_cast<bool>(parsedArgs["noGlobalStatistics"]);
@@ -100,12 +108,11 @@ int NetworkStatistics(int argc, char* argv[])
     statisticsCalculator->SetNetwork( network );
     statisticsCalculator->Update();
 
-    std::stringstream headerStream;
-
     // global statistics
     if( !noGlobalStatistics )
     {
       std::string globalOutName = outName + "_global.txt";
+      std::stringstream headerStream;
       headerStream  << "NumberOfVertices "
         << "NumberOfEdges "
         << "AverageDegree "
@@ -243,6 +250,70 @@ int NetworkStatistics(int argc, char* argv[])
 
       MITK_INFO << "Connectivity matrix image written.";
     } // end create connectivity matrix png
+
+    // calculate local averages
+    if( localLabels.size() > 0 )
+    {
+      std::string localOutName = outName + "_local.txt";
+
+      // Create LabelToIndex translation
+      std::map< std::string, int > labelToIdMap;
+      std::vector< mitk::ConnectomicsNetwork::NetworkNode > nodeVector = network->GetVectorOfAllNodes();
+      for(int loop(0); loop < nodeVector.size(); loop++)
+      {
+        labelToIdMap.insert( std::pair< std::string, int>(nodeVector.at(loop).label, nodeVector.at(loop).id) );
+      }
+
+      std::vector< int > degreeVector = network->GetDegreeOfNodes();
+      std::vector< double > ccVector = network->GetLocalClusteringCoefficients( );
+      std::vector< double > bcVector = network->GetNodeBetweennessVector( );
+
+      double sumDegree( 0 );
+      double sumCC( 0 );
+      double sumBC( 0 );
+      double count( 0 );
+
+      for( int loop(0); loop < localLabels.size(); loop++ )
+      {
+        if( network->CheckForLabel(localLabels.at( loop )) )
+        {
+          sumDegree = sumDegree + degreeVector.at( labelToIdMap.find( localLabels.at( loop ) )->second );
+          sumCC = sumCC + ccVector.at( labelToIdMap.find( localLabels.at( loop ) )->second );
+          sumBC = sumBC + bcVector.at( labelToIdMap.find( localLabels.at( loop ) )->second );
+          count = count + 1;
+        }
+        else
+        {
+          MITK_ERROR << "Illegal label. Label: \"" << localLabels.at( loop ) << "\" not found.";
+        }
+      }
+
+      std::stringstream headerStream;
+      headerStream  << "LocalAverageDegree "
+        << "LocalAverageCC "
+        << "LocalAverageBC "
+        << "NumberOfNodes"
+        << std::endl;
+
+      std::stringstream dataStream;
+      dataStream  << sumDegree / count << " "
+        << sumCC / count << " "
+        << sumBC / count << " "
+        << count
+        << std::endl;
+
+      ofstream outFile( localOutName.c_str(), ios::out );
+
+      if( ! outFile.is_open() )
+      {
+        std::string errorMessage = "Could not open " + localOutName + " for writing.";
+        MITK_ERROR << errorMessage;
+        return EXIT_FAILURE;
+      }
+
+      outFile << headerStream.str() << dataStream.str();
+      outFile.close();
+    }// end calculate local averages
 
     return EXIT_SUCCESS;
   }

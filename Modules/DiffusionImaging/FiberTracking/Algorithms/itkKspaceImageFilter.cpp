@@ -70,12 +70,6 @@ void KspaceImageFilter< TPixelType >
     outputImage->SetRequestedRegion( region );
     outputImage->Allocate();
 
-    m_TEMPIMAGE = InputImageType::New();
-    m_TEMPIMAGE->SetLargestPossibleRegion( region );
-    m_TEMPIMAGE->SetBufferedRegion( region );
-    m_TEMPIMAGE->SetRequestedRegion( region );
-    m_TEMPIMAGE->Allocate();
-
     m_SimulateDistortions = true;
     if (m_FrequencyMap.IsNull())
     {
@@ -214,16 +208,9 @@ void KspaceImageFilter< TPixelType >
         if (m_Spikes>0 && sqrt(s.imag()*s.imag()+s.real()*s.real()) > sqrt(m_Spike.imag()*m_Spike.imag()+m_Spike.real()*m_Spike.real()) )
             m_Spike = s;
 
-        //        m_TEMPIMAGE->SetPixel(kIdx, sqrt(s.real()*s.real()+s.imag()*s.imag()));
         outputImage->SetPixel(kIdx, s);
         ++oit;
     }
-
-    //    typedef itk::ImageFileWriter< InputImageType > WriterType;
-    //    typename WriterType::Pointer writer = WriterType::New();
-    //    writer->SetFileName("/local/kspace.nrrd");
-    //    writer->SetInput(m_TEMPIMAGE);
-    //    writer->Update();
 }
 
 template< class TPixelType >
@@ -240,7 +227,6 @@ void KspaceImageFilter< TPixelType >
     {
         spikeIdx[0] = m_RandGen->GetIntegerVariate()%(int)kxMax;
         spikeIdx[1] = m_RandGen->GetIntegerVariate()%(int)kyMax;
-        MITK_INFO << "Spike at (" << spikeIdx[0] << "," << spikeIdx[1] << ") - Amplitude: " << sqrt(m_Spike.imag()*m_Spike.imag()+m_Spike.real()*m_Spike.real());
         outputImage->SetPixel(spikeIdx, m_Spike);
     }
 }

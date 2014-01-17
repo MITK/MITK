@@ -121,6 +121,8 @@ int NetworkCreation(int argc, char* argv[])
         (*it)->DoWrite( network.GetPointer() );
       }
     }
+
+    return EXIT_SUCCESS;
   }
   catch (itk::ExceptionObject e)
   {

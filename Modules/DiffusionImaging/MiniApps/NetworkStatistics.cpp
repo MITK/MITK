@@ -192,6 +192,8 @@ int NetworkStatistics(int argc, char* argv[])
       outFile << headerStream.str() << dataStream.str();
       outFile.close();
     } // end global statistics
+
+    return EXIT_SUCCESS;
   }
   catch (itk::ExceptionObject e)
   {

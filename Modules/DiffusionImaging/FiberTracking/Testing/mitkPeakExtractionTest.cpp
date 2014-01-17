@@ -83,6 +83,7 @@ int mitkPeakExtractionTest(int argc, char* argv[])
         filter->SetAbsolutePeakThreshold(0.01);
         filter->SetAngularThreshold(25);
         filter->SetNormalizationMethod(MaximaExtractionFilterType::MAX_VEC_NORM);
+        filter->SetNumberOfThreads(1);
         MITK_INFO << "Starting extraction ...";
         filter->Update();
         mitk::FiberBundleX::Pointer fib1 = filter->GetOutputFiberBundle();

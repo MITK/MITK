@@ -101,6 +101,7 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
         fOdfFilter->SetNormalizeVectors(true);
         fOdfFilter->SetUseWorkingCopy(false);
+        fOdfFilter->SetNumberOfThreads(1);
         fOdfFilter->Update();
         ItkDirectionImageContainerType::Pointer directionImageContainer = fOdfFilter->GetDirectionImageContainer();
 

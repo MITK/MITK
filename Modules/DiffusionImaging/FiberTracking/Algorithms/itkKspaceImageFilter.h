@@ -28,6 +28,8 @@ This file is based heavily on a corresponding ITK filter.
 #include <vector>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 
+using namespace std;
+
 namespace itk{
 
 /**
@@ -98,8 +100,8 @@ namespace itk{
 
     double                                  m_Tinhom;
     double                                  m_TE;
-    std::vector< double >                   m_T2;
-    std::vector< InputImagePointerType >    m_CompartmentImages;
+    vector< double >                        m_T2;
+    vector< InputImagePointerType >         m_CompartmentImages;
     itk::Vector<double,3>                   m_DiffusionGradientDirection;
     double                                  m_Tau;                          ///< eddy current decay constant
     double                                  m_EddyGradientMagnitude;   ///< in T/m
@@ -112,6 +114,7 @@ namespace itk{
     double                                  m_SpikeAmplitude;
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
     bool                                    m_UseConstantRandSeed;
+    vcl_complex<double>                     m_Spike;
 
   private:
 

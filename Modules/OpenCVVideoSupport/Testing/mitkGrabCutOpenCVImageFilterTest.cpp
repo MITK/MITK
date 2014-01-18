@@ -57,6 +57,7 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, 
 
   mitk::GrabCutOpenCVImageFilter::Pointer grabCutFilter = mitk::GrabCutOpenCVImageFilter::New();
 
+  int currentImageId = 0;
 
   // test filtering with image set but no model points set
   {
@@ -69,14 +70,13 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, 
   {
     std::vector<itk::Index<2> > littleForegroundPointsSet(foregroundPointsVector.begin(), foregroundPointsVector.begin()+3);
     grabCutFilter->SetModelPoints(littleForegroundPointsSet);
-    int resultCountBefore = grabCutFilter->GetResultImageId();
-    grabCutFilter->FilterImage(image);
+    grabCutFilter->FilterImage(image, ++currentImageId);
 
     cv::Mat resultMask;
     // wait up to ten seconds for the segmentation to finish
     for (unsigned int n = 0; n < 100; ++n)
     {
-      if ( resultCountBefore != grabCutFilter->GetResultImageId() )
+      if ( grabCutFilter->GetResultImageId() == currentImageId )
       {
         resultMask = grabCutFilter->GetResultMask();
         break;
@@ -84,7 +84,7 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, 
       itksys::SystemTools::Delay(100);
     }
 
-    MITK_TEST_CONDITION(resultMask.empty(),
+    MITK_TEST_CONDITION(!resultMask.empty(),
                         "Result mask must not be empty when little ("
                         << littleForegroundPointsSet.size() <<") foreground points are set.");
   }
@@ -92,14 +92,13 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, 
   // test filtering with image and model points set
   {
     grabCutFilter->SetModelPoints(foregroundPointsVector);
-    int resultCountBefore = grabCutFilter->GetResultImageId();
-    MITK_TEST_CONDITION(grabCutFilter->FilterImage(image), "Filtering should return true for sucess.")
+    MITK_TEST_CONDITION(grabCutFilter->FilterImage(image, ++currentImageId), "Filtering should return true for sucess.")
 
     cv::Mat resultMask;
     // wait up to ten seconds for the segmentation to finish
     for (unsigned int n = 0; n < 100; ++n)
     {
-      if ( resultCountBefore != grabCutFilter->GetResultImageId() )
+      if ( grabCutFilter->GetResultImageId() == currentImageId )
       {
         resultMask = grabCutFilter->GetResultMask();
         break;
@@ -116,17 +115,16 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, 
 
 
   // test filtering with using only region around model points
-  // (but with really big additional width so that whole image should be used againg)
+  // (but with really big additional width so that whole image should be used again)
   {
     grabCutFilter->SetUseOnlyRegionAroundModelPoints(image.cols);
-    int resultCountBefore = grabCutFilter->GetResultImageId();
-    grabCutFilter->FilterImage(image);
+    grabCutFilter->FilterImage(image, ++currentImageId);
 
     cv::Mat resultMask;
     // wait up to ten seconds for the segmentation to finish
     for (unsigned int n = 0; n < 100; ++n)
     {
-      if (resultCountBefore != grabCutFilter->GetResultImageId())
+      if (grabCutFilter->GetResultImageId() == currentImageId)
       {
         resultMask = grabCutFilter->GetResultMask();
         break;
@@ -143,14 +141,13 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, 
   // test filtering with using only region around model points
   {
     grabCutFilter->SetUseOnlyRegionAroundModelPoints(0);
-    int resultCountBefore = grabCutFilter->GetResultImageId();
-    grabCutFilter->FilterImage(image);
+    grabCutFilter->FilterImage(image, ++currentImageId);
 
     cv::Mat resultMask;
     // wait up to ten seconds for the segmentation to finish
     for (unsigned int n = 0; n < 100; ++n)
     {
-      if (resultCountBefore != grabCutFilter->GetResultImageId())
+      if (grabCutFilter->GetResultImageId() == currentImageId)
       {
         resultMask = grabCutFilter->GetResultMask();
         break;
@@ -168,7 +165,7 @@ static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, 
     resultMaskImageGray(boundingRect).copyTo(compareMask(boundingRect));
 
     MITK_TEST_CONDITION( ! resultMask.empty() && cv::countNonZero(resultMask != compareMask) == 0,
-                         "Filtered image with really big region used should match reference image again.")
+                         "Filtered image with region just around the model points used should match reference image again.")
   }
 }
 

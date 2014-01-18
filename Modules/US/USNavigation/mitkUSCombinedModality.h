@@ -18,17 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKUSCombinedModality_H_HEADER_INCLUDED_
 
 #include <MitkUSNavigationExports.h>
-#include <mitkNavigationDataSmoothingFilter.h>
-#include <mitkNavigationDataDelayFilter.h>
-
 #include "mitkUSDevice.h"
+#include "mitkNavigationDataSource.h"
 
 namespace itk {
   template<class T> class SmartPointer;
 }
 
 namespace mitk {
-  class NavigationDataSource;
+  class NavigationDataSmoothingFilter;
+  class NavigationDataDelayFilter;
   class USControlInterfaceBMode;
   class USControlInterfaceProbes;
   class USControlInterfaceDoppler;
@@ -49,7 +48,7 @@ namespace mitk {
     static const std::string DeviceClassIdentifier;
 
     mitkClassMacro(USCombinedModality, USDevice);
-    mitkNewMacro4Param(USCombinedModality, USDevice::Pointer, NavigationDataSource::Pointer, std::string, std::string);
+    mitkNewMacro4Param(USCombinedModality, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, std::string, std::string);
 
     itkGetMacro(UltrasoundDevice, itk::SmartPointer<USDevice>);
 
@@ -95,7 +94,7 @@ namespace mitk {
     */
     virtual itk::SmartPointer<USControlInterfaceDoppler> GetControlInterfaceDoppler();
 
-    virtual mitk::NavigationDataSource::Pointer GetNavigationDataSource();
+    virtual itk::SmartPointer<mitk::NavigationDataSource> GetNavigationDataSource();
 
     /**
      * \return true if the device is calibrated for the currently selected probe with the current zoom level
@@ -127,7 +126,7 @@ namespace mitk {
     void DeserializeCalibration(const std::string &xmlString, bool clearPreviousCalibrations = true);
 
   protected:
-    USCombinedModality(USDevice::Pointer usDevice, NavigationDataSource::Pointer trackingDevice, std::string manufacturer = "", std::string model = "");
+    USCombinedModality(USDevice::Pointer usDevice, itk::SmartPointer<NavigationDataSource> trackingDevice, std::string manufacturer = "", std::string model = "");
     virtual ~USCombinedModality();
 
     /**
@@ -168,12 +167,12 @@ namespace mitk {
 
     std::string GetIdentifierForCurrentCalibration();
 
-    USDevice::Pointer                                   m_UltrasoundDevice;
-    itk::SmartPointer<NavigationDataSource>             m_TrackingDevice;
-    std::map<std::string, AffineTransform3D::Pointer>   m_Calibrations;
+    USDevice::Pointer                                      m_UltrasoundDevice;
+    itk::SmartPointer<NavigationDataSource>                m_TrackingDevice;
+    std::map<std::string, AffineTransform3D::Pointer>      m_Calibrations;
 
-    mitk::NavigationDataSmoothingFilter::Pointer        m_SmoothingFilter;
-    mitk::NavigationDataDelayFilter::Pointer            m_DelayFilter;
+    itk::SmartPointer<mitk::NavigationDataSmoothingFilter> m_SmoothingFilter;
+    itk::SmartPointer<mitk::NavigationDataDelayFilter>     m_DelayFilter;
 
   private:
     /**

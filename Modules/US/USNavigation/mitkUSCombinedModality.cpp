@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSDevice.h"
 #include "mitkNavigationDataSource.h"
 #include "mitkImageReadAccessor.h"
+#include <mitkNavigationDataSmoothingFilter.h>
+#include <mitkNavigationDataDelayFilter.h>
 
 // US Control Interfaces
 #include "mitkUSControlInterfaceProbes.h"

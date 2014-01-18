@@ -265,12 +265,20 @@
        <property name="text">
         <string>Add Video Device</string>
        </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/accept.png</normaloff>:/USUI/accept.png</iconset>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="m_BtnCancel">
        <property name="text">
         <string>Cancel</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/restart.png</normaloff>:/USUI/restart.png</iconset>
        </property>
       </widget>
      </item>
@@ -293,6 +301,8 @@
   <tabstop>m_ResolutionWidth</tabstop>
   <tabstop>m_ResolutionHeight</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/USUI.qrc"/>
+ </resources>
  <connections/>
 </ui>

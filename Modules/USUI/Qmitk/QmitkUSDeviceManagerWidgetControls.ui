@@ -19,10 +19,38 @@
   <property name="windowTitle">
    <string>QmitkUSDeviceManagerWidget</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0" colspan="3">
-    <layout class="QHBoxLayout" name="m_LayoutButtons">
-     <item>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QmitkServiceListWidget" name="m_ConnectedDevices" native="true"/>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QPushButton" name="m_BtnNewDevice">
+       <property name="text">
+        <string>New Video Device</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/plus.png</normaloff>:/USUI/plus.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="m_BtnRemove">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Remove</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/minus.png</normaloff>:/USUI/minus.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2">
       <widget class="QPushButton" name="m_BtnActivate">
        <property name="enabled">
         <bool>false</bool>
@@ -32,27 +60,7 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="m_BtnRemove">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Remove</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="m_BtnNewDevice">
-       <property name="text">
-        <string>New Video Device</string>
-       </property>
-      </widget>
-     </item>
     </layout>
-   </item>
-   <item row="0" column="0" colspan="3">
-    <widget class="QmitkServiceListWidget" name="m_ConnectedDevices" native="true"/>
    </item>
   </layout>
  </widget>
@@ -65,6 +73,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/USUI.qrc"/>
+ </resources>
  <connections/>
 </ui>

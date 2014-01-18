@@ -12,5 +12,6 @@
         <file>document-open.png</file>
         <file>document-save.png</file>
         <file>system-lock-screen.png</file>
+        <file>accept.png</file>
     </qresource>
 </RCC>

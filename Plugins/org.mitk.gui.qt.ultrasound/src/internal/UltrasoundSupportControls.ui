@@ -189,6 +189,10 @@
          <property name="text">
           <string>Freeze</string>
          </property>
+         <property name="icon">
+          <iconset resource="../../../../Modules/USUI/resources/USUI.qrc">
+           <normaloff>:/USUI/system-lock-screen.png</normaloff>:/USUI/system-lock-screen.png</iconset>
+         </property>
         </widget>
        </item>
        <item>
@@ -273,6 +277,8 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../../../Modules/USUI/resources/USUI.qrc"/>
+ </resources>
  <connections/>
 </ui>

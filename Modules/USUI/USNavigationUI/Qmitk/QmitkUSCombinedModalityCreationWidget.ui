@@ -130,7 +130,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="icon">
         <iconset resource="../../resources/USUI.qrc">
-         <normaloff>:/USUI/star.png</normaloff>:/USUI/star.png</iconset>
+         <normaloff>:/USUI/accept.png</normaloff>:/USUI/accept.png</iconset>
        </property>
       </widget>
      </item>

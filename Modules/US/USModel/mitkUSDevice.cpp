@@ -199,13 +199,13 @@ bool mitk::USDevice::Initialize()
 {
   if (! this->OnInitialization() ) { return false; }
 
+  m_DeviceState = State_Initialized;
+
   // Get Context and Module
   us::ModuleContext* context = us::GetModuleContext();
   us::ServiceProperties props = this->ConstructServiceProperties();
 
   m_ServiceRegistration = context->RegisterService(this, props);
-
-  m_DeviceState = State_Initialized;
 
   return true;
 }

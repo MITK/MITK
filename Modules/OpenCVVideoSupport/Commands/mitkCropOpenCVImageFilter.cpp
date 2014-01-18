@@ -26,7 +26,7 @@ CropOpenCVImageFilter::CropOpenCVImageFilter( )
 
 }
 
-bool CropOpenCVImageFilter::FilterImage( cv::Mat& image )
+bool CropOpenCVImageFilter::OnFilterImage( cv::Mat& image )
 {
   if (m_CropRegion.width == 0)
   {

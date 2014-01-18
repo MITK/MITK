@@ -41,7 +41,11 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT AbstractOpenCVImageFilter : public itk::Obj
 {
 
 public:
+  static int INVALID_IMAGE_ID;
+
   mitkClassMacro(AbstractOpenCVImageFilter, itk::Object);
+
+  virtual bool FilterImage( cv::Mat& image, int id = INVALID_IMAGE_ID );
 
   /**
     * \brief Pure virtual method for filtering an image.
@@ -49,7 +53,14 @@ public:
     * \param image OpenCV image which is supposed to be manipulated.
     * \return true if filtering was successfull, false otherwise
     */
-  virtual bool FilterImage( cv::Mat& image ) = 0;
+  virtual bool OnFilterImage( cv::Mat& image ) = 0;
+
+protected:
+  AbstractOpenCVImageFilter();
+
+  int GetCurrentImageId();
+
+  int m_CurrentImageId;
 };
 
 } // namespace mitk

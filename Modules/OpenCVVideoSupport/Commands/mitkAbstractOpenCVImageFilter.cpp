@@ -15,3 +15,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkAbstractOpenCVImageFilter.h"
+
+int mitk::AbstractOpenCVImageFilter::INVALID_IMAGE_ID = -1;
+
+mitk::AbstractOpenCVImageFilter::AbstractOpenCVImageFilter()
+{
+}
+
+bool mitk::AbstractOpenCVImageFilter::FilterImage( cv::Mat& image, int id )
+{
+  if (id < INVALID_IMAGE_ID) { id = INVALID_IMAGE_ID; }
+
+  m_CurrentImageId = id;
+  return this->FilterImage(image);
+}
+
+int mitk::AbstractOpenCVImageFilter::GetCurrentImageId()
+{
+  return m_CurrentImageId;
+}

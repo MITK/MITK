@@ -1,5 +1,6 @@
 SET(CPP_FILES
   mitkUSCombinedModality.cpp
+  mitkUSCombinedModalityPersistence.cpp
 
   Filter/mitkNavigationDataPassThroughFilter.cpp
   Filter/mitkNeedleProjectionFilter.cpp

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
 #include "mitkImageToSurfaceFilter.h"
+#include "mitkRestorePlanePositionOperation.h"
 #include "mitkContourModelToSurfaceFilter.h"
 #include "mitkInteractionConst.h"
 #include "mitkColorProperty.h"
@@ -91,11 +92,11 @@ void mitk::SurfaceInterpolationController::AddNewContour(mitk::ContourModel::Poi
 
   for (unsigned int i=0; i < m_MapOfContourLists[m_ActiveLabel].size(); i++)
   {
-      itk::Matrix<ScalarType> diffM = transform->GetMatrix()-m_MapOfContourLists[m_ActiveLabel].at(i).second->GetTransform()->GetMatrix();
-      bool isSameMatrix(true);
-      for (unsigned int j = 0; j < 3; j++)
-      {
-        if (fabs(diffM[j][0]) > 0.0001 && fabs(diffM[j][1]) > 0.0001 && fabs(diffM[j][2]) > 0.0001)
+    itk::Matrix<ScalarType> diffM = transform->GetMatrix()-m_MapOfContourLists[m_ActiveLabel].at(i).second->GetTransform()->GetMatrix();
+    bool isSameMatrix(true);
+    for (unsigned int j = 0; j < 3; j++)
+    {
+      if (fabs(diffM[j][0]) > 0.0001 && fabs(diffM[j][1]) > 0.0001 && fabs(diffM[j][2]) > 0.0001)
       {
         isSameMatrix = false;
         break;
@@ -135,27 +136,12 @@ void mitk::SurfaceInterpolationController::Interpolate()
 
   m_InterpolateSurfaceFilter->Reset();
 
-  // update the filter and get the resulting distance-image
-  m_InterpolateSurfaceFilter->Update();
-  Image::Pointer distanceImage = m_InterpolateSurfaceFilter->GetOutput();
-
-  // create a surface from the distance-image
-  mitk::ImageToSurfaceFilter::Pointer imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
-  imageToSurfaceFilter->SetInput( distanceImage );
-  imageToSurfaceFilter->SetThreshold( 0 );
-  imageToSurfaceFilter->SetSmooth(true);
-  imageToSurfaceFilter->SetSmoothIteration(20);
-  imageToSurfaceFilter->Update();
-  m_InterpolationResult = imageToSurfaceFilter->GetOutput();
-
-  itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
-  AccessFixedDimensionByItk_1( m_WorkingImage, GetImageBase, 3, itkImage );
-  m_InterpolateSurfaceFilter->SetReferenceImage( itkImage.GetPointer() );
+  m_InterpolateSurfaceFilter->SetReferenceImage( m_WorkingImage );
 
   //CreateDistanceImageFromSurfaceFilter::Pointer interpolateSurfaceFilter = CreateDistanceImageFromSurfaceFilter::New();
   vtkSmartPointer<vtkAppendPolyData> polyDataAppender = vtkSmartPointer<vtkAppendPolyData>::New();
 
-  for (unsigned int i = 0; i < m_MapOfContourLists[m_ActiveLabel].size(); i++)
+  for (unsigned int i=0; i < m_MapOfContourLists[m_ActiveLabel].size(); i++)
   {
     mitk::ContourModelToSurfaceFilter::Pointer converter = mitk::ContourModelToSurfaceFilter::New();
     converter->SetInput(m_MapOfContourLists[m_ActiveLabel].at(i).first);
@@ -185,6 +171,25 @@ void mitk::SurfaceInterpolationController::Interpolate()
 
   polyDataAppender->Update();
   m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());
+
+  // update the filter and get the resulting distance-image
+  m_InterpolateSurfaceFilter->Update();
+  Image::Pointer distanceImage = m_InterpolateSurfaceFilter->GetOutput();
+  if (distanceImage.IsNull())
+  {
+    //If no interpolation is possible reset the interpolation result
+    m_InterpolationResult = NULL;
+    return;
+  }
+
+  // create a surface from the distance-image
+  mitk::ImageToSurfaceFilter::Pointer imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
+  imageToSurfaceFilter->SetInput( distanceImage );
+  imageToSurfaceFilter->SetThreshold( 0 );
+  imageToSurfaceFilter->SetSmooth(true);
+  imageToSurfaceFilter->SetSmoothIteration(20);
+  imageToSurfaceFilter->Update();
+  m_InterpolationResult = imageToSurfaceFilter->GetOutput();
 
   m_InterpolationResult->DisconnectPipeline();
 }
@@ -236,12 +241,6 @@ double mitk::SurfaceInterpolationController::EstimatePortionOfNeededMemory()
   double totalMem = mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam();
   double percentage = sizeOfPoints/totalMem;
   return percentage;
-}
-
-template<typename TPixel, unsigned int VImageDimension>
-void mitk::SurfaceInterpolationController::GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& result)
-{
-  result->Graft(input);
 }
 
 void mitk::SurfaceInterpolationController::SetActiveLabel(int activeLabel)

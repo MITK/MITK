@@ -113,16 +113,11 @@ class PlanarFigureSegmentation_EXPORT PlanarFigureSegmentationController : publi
 
     void SetReferenceDirectionVector( mitk::Vector3D vector );
 
-
-
   protected:
 
     PlanarFigureSegmentationController();
 
     void InitializeFilters();
-
-    template<typename TPixel, unsigned int VImageDimension>
-    void GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& result);
 
     PlanarFigureListType m_PlanarFigureList;
     SurfaceListType m_SurfaceList;
@@ -147,8 +142,6 @@ class PlanarFigureSegmentation_EXPORT PlanarFigureSegmentationController : publi
     Image::Pointer m_SegmentationAsImage;
 
     mitk::Vector3D m_ReferenceDirectionVector;
-
-
 };
 
 } // namespace

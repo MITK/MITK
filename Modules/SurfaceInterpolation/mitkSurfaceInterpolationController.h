@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "SurfaceInterpolationExports.h"
-#include "mitkRestorePlanePositionOperation.h"
 #include "mitkSurface.h"
 #include "mitkContourModel.h"
 
@@ -31,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+
+ class RestorePlanePositionOperation;
 
  class SurfaceInterpolation_EXPORT SurfaceInterpolationController : public itk::Object
  {
@@ -105,9 +106,6 @@ namespace mitk
    SurfaceInterpolationController();
 
    ~SurfaceInterpolationController();
-
-   template<typename TPixel, unsigned int VImageDimension>
-   void GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& result);
 
    void Initialize();
 

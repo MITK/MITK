@@ -154,12 +154,6 @@ void mitk::PlanarFigureSegmentationController::RemovePlanarFigure( mitk::PlanarF
   m_SurfaceList.erase( surfaceIter );
 }
 
-template<typename TPixel, unsigned int VImageDimension>
-void mitk::PlanarFigureSegmentationController::GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& result)
-{
-  result = input;
-}
-
 mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationResult()
 {
   m_SegmentationAsImage = NULL;
@@ -172,9 +166,7 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
     return m_SegmentationAsImage;
   }
 
-  itk::ImageBase<3>::Pointer itkImage;
-  AccessFixedDimensionByItk_1( m_ReferenceImage.GetPointer(), GetImageBase, 3, itkImage );
-  m_DistanceImageCreator->SetReferenceImage( itkImage.GetPointer() );
+  m_DistanceImageCreator->SetReferenceImage(m_ReferenceImage);
 
   m_ReduceFilter->Update();
   m_NormalsFilter->Update();
@@ -187,7 +179,7 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
   m_DistanceImageCreator = NULL;
   m_NormalsFilter = NULL;
   m_ReduceFilter = NULL;
-  itkImage = NULL;
+  //itkImage = NULL;
 
   // If this bool flag is true, the distanceImage will be written to the
   // filesystem as nrrd-image and as surface-representation.
@@ -235,7 +227,6 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
 
   return m_SegmentationAsImage;
 }
-
 
 mitk::Surface::Pointer mitk::PlanarFigureSegmentationController::CreateSurfaceFromPlanarFigure( mitk::PlanarFigure::Pointer figure )
 {
@@ -303,5 +294,3 @@ void mitk::PlanarFigureSegmentationController::InitializeFilters()
   m_NormalsFilter = mitk::ComputeContourSetNormalsFilter::New();
   m_DistanceImageCreator = mitk::CreateDistanceImageFromSurfaceFilter::New();
 }
-
-

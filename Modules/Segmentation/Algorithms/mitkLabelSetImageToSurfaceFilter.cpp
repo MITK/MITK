@@ -20,9 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // itk
 #include <itkBinaryThresholdImageFilter.h>
-//#include <itkCastImageFilter.h>
 #include <itkAntiAliasBinaryImageFilter.h>
-//#include <itkImageRegionIterator.h>
 #include <itkLabelObject.h>
 #include <itkLabelMap.h>
 #include <itkLabelImageToLabelMapFilter.h>

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>254</width>
+    <width>242</width>
     <height>932</height>
    </rect>
   </property>
@@ -384,7 +384,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>236</width>
+        <width>224</width>
         <height>306</height>
        </rect>
       </property>
@@ -393,9 +393,9 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_8">
        <item>
-        <widget class="QmitkSliceBasedInterpolator" name="m_SliceBasedInterpolator" native="true">
+        <widget class="QmitkSliceBasedInterpolatorWidget" name="m_SliceBasedInterpolatorWidget" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -434,7 +434,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>236</width>
+        <width>224</width>
         <height>306</height>
        </rect>
       </property>
@@ -443,9 +443,9 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
-        <widget class="QmitkSurfaceBasedInterpolator" name="m_SurfaceBasedInterpolator" native="true">
+        <widget class="QmitkSurfaceBasedInterpolatorWidget" name="m_SurfaceBasedInterpolatorWidget" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -512,15 +512,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QmitkSliceBasedInterpolator</class>
+   <class>QmitkSliceBasedInterpolatorWidget</class>
    <extends>QWidget</extends>
-   <header location="global">QmitkSliceBasedInterpolator.h</header>
+   <header location="global">QmitkSliceBasedInterpolatorWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QmitkSurfaceBasedInterpolator</class>
+   <class>QmitkSurfaceBasedInterpolatorWidget</class>
    <extends>QWidget</extends>
-   <header location="global">QmitkSurfaceBasedInterpolator.h</header>
+   <header location="global">QmitkSurfaceBasedInterpolatorWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

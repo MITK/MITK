@@ -96,7 +96,7 @@ QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
   m_ToolManager->ActivateTool(-1);
 /*
   todo: check this
-  m_Controls.m_SliceBasedInterpolator->EnableInterpolation(false);
+  m_Controls.m_SliceBasedInterpolatorWidget->EnableInterpolation(false);
   ctkPluginContext* context = mitk::PluginActivator::getContext();
   ctkServiceReference ppmRef = context->getServiceReference<mitk::PlanePositionManagerService>();
   mitk::PlanePositionManagerService* service = context->getService<mitk::PlanePositionManagerService>(ppmRef);
@@ -106,13 +106,7 @@ QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
   m_ToolManager->SetReferenceData(NULL);
   m_ToolManager->SetWorkingData(NULL);
 
-  try
-  {
-    m_ServiceRegistration.Unregister();
-  }
-  catch (const std::exception&)
-  {}
-
+  m_ServiceRegistration.Unregister();
 }
 
 void QmitkMultiLabelSegmentationView::InitializeListeners()
@@ -181,8 +175,8 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_LabelSetWidget->SetLastFileOpenPath(this->GetLastFileOpenPath());
   m_Controls.m_LabelSetWidget->hide();
 
-//  m_Controls.m_SurfaceStampWidget->SetDataStorage(*(this->GetDataStorage()) );
-//  m_Controls.m_MaskStampWidget->SetDataStorage(*(this->GetDataStorage()) );
+  m_Controls.m_SurfaceBasedInterpolatorWidget->SetDataStorage( *(this->GetDataStorage()) );
+  m_Controls.m_SliceBasedInterpolatorWidget->SetDataStorage( *(this->GetDataStorage()) );
 
   // all part of open source MITK
   m_Controls.m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
@@ -223,8 +217,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
     controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
     controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
     controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
-    m_Controls.m_SliceBasedInterpolator->Initialize(controllers, this->GetDataStorage());
-    m_Controls.m_SurfaceBasedInterpolator->Initialize(this->GetDataStorage());
+    m_Controls.m_SliceBasedInterpolatorWidget->SetSliceNavigationControllers(controllers);
 //    m_Controls.m_LabelSetWidget->SetRenderWindowPart(this->m_IRenderWindowPart);
   }
 
@@ -272,9 +265,7 @@ void QmitkMultiLabelSegmentationView::RenderWindowPartActivated(mitk::IRenderWin
     controllers.push_back(renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
     controllers.push_back(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
     controllers.push_back(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
-    m_Controls.m_SliceBasedInterpolator->Initialize(controllers, this->GetDataStorage());
-    m_Controls.m_SurfaceBasedInterpolator->Initialize(this->GetDataStorage());
-//    m_Controls.m_LabelSetWidget->SetRenderWindowPart(this->m_IRenderWindowPart);
+    m_Controls.m_SliceBasedInterpolatorWidget->SetSliceNavigationControllers(controllers);
   }
 }
 
@@ -317,8 +308,8 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
     m_Controls.m_pbNewSegmentationSession->setEnabled(false);
     m_Controls.m_LabelSetWidget->setEnabled(false);
     m_Controls.m_pbNewLabel->setEnabled(false);
-    m_Controls.m_SliceBasedInterpolator->setEnabled(false);
-    m_Controls.m_SurfaceBasedInterpolator->setEnabled(false);
+    m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(false);
+    m_Controls.m_SurfaceBasedInterpolatorWidget->setEnabled(false);
     return;
   }
 
@@ -329,15 +320,15 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
   {
     m_Controls.m_LabelSetWidget->setEnabled(false);
     m_Controls.m_pbNewLabel->setEnabled(false);
-    m_Controls.m_SliceBasedInterpolator->setEnabled(false);
-    m_Controls.m_SurfaceBasedInterpolator->setEnabled(false);
+    m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(false);
+    m_Controls.m_SurfaceBasedInterpolatorWidget->setEnabled(false);
     return;
   }
 
   m_Controls.m_LabelSetWidget->setEnabled(true);
   m_Controls.m_pbNewLabel->setEnabled(true);
-  m_Controls.m_SliceBasedInterpolator->setEnabled(true);
-  m_Controls.m_SurfaceBasedInterpolator->setEnabled(true);
+  m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(true);
+  m_Controls.m_SurfaceBasedInterpolatorWidget->setEnabled(true);
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
   assert(workingImage);

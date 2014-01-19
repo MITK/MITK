@@ -20,5 +20,7 @@
     <file>UnlockExterior_48x48.png</file>
     <file>NewLabel_48x48.png</file>
     <file>ClearSeeds_48x48.png</file>
+    <file>Start.png</file>
+    <file>Stop.png</file>
   </qresource>
 </RCC>

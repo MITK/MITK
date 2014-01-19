@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkSurfaceBasedInterpolator.h"
+#include "QmitkSurfaceBasedInterpolatorWidget.h"
 
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
@@ -37,23 +37,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 
-QmitkSurfaceBasedInterpolator::QmitkSurfaceBasedInterpolator(QWidget* parent, const char*  /*name*/) : QWidget(parent),
+QmitkSurfaceBasedInterpolatorWidget::QmitkSurfaceBasedInterpolatorWidget(QWidget* parent, const char*  /*name*/) : QWidget(parent),
 m_SurfaceInterpolator(mitk::SurfaceInterpolationController::GetInstance()),
 m_ToolManager(NULL),
 m_DataStorage(NULL),
-m_Initialized(false),
 m_Activated(false)
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
 
-  connect(m_Controls.m_btStart, SIGNAL(toggled(bool)), this, SLOT(OnActivateWidget(bool)));
-  connect(m_Controls.m_btAccept, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
-  connect(m_Controls.m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
-  connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  Q_ASSERT(m_ToolManager);
 
-  itk::ReceptorMemberCommand<QmitkSurfaceBasedInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSurfaceBasedInterpolator>::New();
-  command->SetCallbackFunction( this, &QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationInfoChanged );
+  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkSurfaceBasedInterpolatorWidget>( this, &QmitkSurfaceBasedInterpolatorWidget::OnToolManagerWorkingDataModified );
+
+  connect(m_Controls.m_btStart, SIGNAL(toggled(bool)), this, SLOT(OnToggleWidgetActivation(bool)));
+  connect(m_Controls.m_btAccept, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
+  connect(m_Controls.m_cbShowPositionNodes, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
+  connect(m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)));
+
+  itk::ReceptorMemberCommand<QmitkSurfaceBasedInterpolatorWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkSurfaceBasedInterpolatorWidget>::New();
+  command->SetCallbackFunction( this, &QmitkSurfaceBasedInterpolatorWidget::OnSurfaceInterpolationInfoChanged );
   m_SurfaceInterpolationInfoChangedObserverTag = m_SurfaceInterpolator->AddObserver( itk::ModifiedEvent(), command );
 
   m_InterpolatedSurfaceNode = mitk::DataNode::New();
@@ -83,46 +87,20 @@ m_Activated(false)
   m_Timer = new QTimer(this);
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(ChangeSurfaceColor()));
 
+  m_Controls.m_btAccept->setEnabled(false);
+  m_Controls.m_cbShowPositionNodes->setEnabled(false);
+
   this->setEnabled(false);
 }
 
-void QmitkSurfaceBasedInterpolator::Initialize(mitk::DataStorage* storage)
+void QmitkSurfaceBasedInterpolatorWidget::SetDataStorage(mitk::DataStorage& storage)
 {
-  Q_ASSERT(storage);
-
-  if (m_Initialized)
-  {
-    // remove old observers
-    this->Uninitialize();
-  }
-
-  m_DataStorage = storage;
-
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-
-  // react whenever the active working image changes
-  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkSurfaceBasedInterpolator>( this, &QmitkSurfaceBasedInterpolator::OnToolManagerWorkingDataModified );
-
-  m_Initialized = true;
+  m_DataStorage = &storage;
 }
 
-void QmitkSurfaceBasedInterpolator::Uninitialize()
+QmitkSurfaceBasedInterpolatorWidget::~QmitkSurfaceBasedInterpolatorWidget()
 {
-  if (m_ToolManager.IsNotNull())
-  {
-    m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkSurfaceBasedInterpolator>(this, &QmitkSurfaceBasedInterpolator::OnToolManagerWorkingDataModified);
-  }
-
-  m_Initialized = false;
-}
-
-QmitkSurfaceBasedInterpolator::~QmitkSurfaceBasedInterpolator()
-{
-  if (m_Initialized)
-  {
-    // remove old observers
-    this->Uninitialize();
-  }
+  m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkSurfaceBasedInterpolatorWidget>(this, &QmitkSurfaceBasedInterpolatorWidget::OnToolManagerWorkingDataModified);
 
   if(m_DataStorage->Exists(m_3DContourNode))
     m_DataStorage->Remove(m_3DContourNode);
@@ -136,7 +114,7 @@ QmitkSurfaceBasedInterpolator::~QmitkSurfaceBasedInterpolator()
   delete m_Timer;
 }
 
-void QmitkSurfaceBasedInterpolator::OnShowInformation(bool on)
+void QmitkSurfaceBasedInterpolatorWidget::OnShowInformation(bool on)
 {
   if (on)
     m_Controls.m_InformationWidget->show();
@@ -144,7 +122,7 @@ void QmitkSurfaceBasedInterpolator::OnShowInformation(bool on)
     m_Controls.m_InformationWidget->hide();
 }
 
-void QmitkSurfaceBasedInterpolator::ShowInterpolationResult(bool status)
+void QmitkSurfaceBasedInterpolatorWidget::ShowInterpolationResult(bool status)
 {
    if (m_InterpolatedSurfaceNode.IsNotNull())
       m_InterpolatedSurfaceNode->SetVisibility(status);
@@ -154,18 +132,8 @@ void QmitkSurfaceBasedInterpolator::ShowInterpolationResult(bool status)
 
    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
-/*
-void QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationFinished()
-{
-  mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
-  m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
 
-  mitk::Surface::Pointer contoursAsSurface = m_SurfaceInterpolator->GetContoursAsSurface();
-  m_3DContourNode->SetData(contoursAsSurface);
-}
-*/
-
- void QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationFinished()
+ void QmitkSurfaceBasedInterpolatorWidget::OnSurfaceInterpolationFinished()
  {
    mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
 
@@ -183,7 +151,7 @@ void QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationFinished()
    }
  }
 
-void QmitkSurfaceBasedInterpolator::OnShowMarkers(bool state)
+void QmitkSurfaceBasedInterpolatorWidget::OnShowMarkers(bool state)
 {
   mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = m_DataStorage->GetSubset(
     mitk::NodePredicateProperty::New("isContourMarker", mitk::BoolProperty::New(true)));
@@ -208,19 +176,19 @@ void QmitkSurfaceBasedInterpolator::OnShowMarkers(bool state)
   }
 }
 
-void QmitkSurfaceBasedInterpolator::StartUpdateInterpolationTimer()
+void QmitkSurfaceBasedInterpolatorWidget::StartUpdateInterpolationTimer()
 {
   m_Timer->start(500);
 }
 
-void QmitkSurfaceBasedInterpolator::StopUpdateInterpolationTimer()
+void QmitkSurfaceBasedInterpolatorWidget::StopUpdateInterpolationTimer()
 {
   m_Timer->stop();
   m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(255.0,255.0,0.0));
   mitk::RenderingManager::GetInstance()->RequestUpdate(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow() );
 }
 
-void QmitkSurfaceBasedInterpolator::ChangeSurfaceColor()
+void QmitkSurfaceBasedInterpolatorWidget::ChangeSurfaceColor()
 {
   float currentColor[3];
   m_InterpolatedSurfaceNode->GetColor(currentColor);
@@ -239,10 +207,8 @@ void QmitkSurfaceBasedInterpolator::ChangeSurfaceColor()
   mitk::RenderingManager::GetInstance()->RequestUpdate(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());
 }
 
-void QmitkSurfaceBasedInterpolator::OnToolManagerWorkingDataModified()
+void QmitkSurfaceBasedInterpolatorWidget::OnToolManagerWorkingDataModified()
 {
-  if (!m_Initialized) return;
-
   mitk::DataNode* workingNode = this->m_ToolManager->GetWorkingData(0);
   if (!workingNode)
   {
@@ -260,38 +226,43 @@ void QmitkSurfaceBasedInterpolator::OnToolManagerWorkingDataModified()
   }
 
   m_WorkingImage = workingImage;
+
+  this->setEnabled(true);
 }
 
-void QmitkSurfaceBasedInterpolator::OnRunInterpolation()
+void QmitkSurfaceBasedInterpolatorWidget::OnRunInterpolation()
 {
   m_SurfaceInterpolator->Interpolate();
 }
 
-void QmitkSurfaceBasedInterpolator::OnActivateWidget(bool enabled)
+void QmitkSurfaceBasedInterpolatorWidget::OnToggleWidgetActivation(bool enabled)
 {
-  if (!m_Initialized) return;
+  Q_ASSERT(m_ToolManager);
 
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   if (!workingNode) return;
 
-  m_Activated = enabled;
+  m_Controls.m_btAccept->setEnabled(enabled);
+  m_Controls.m_cbShowPositionNodes->setEnabled(enabled);
 
-  if ( m_ToolManager.IsNotNull() )
+  if (enabled)
+    m_Controls.m_btStart->setText("Stop");
+  else
+    m_Controls.m_btStart->setText("Start");
+
+  for (unsigned int i = 0; i < m_ToolManager->GetTools().size(); i++)
   {
-    unsigned int numberOfExistingTools = m_ToolManager->GetTools().size();
-    for(unsigned int i = 0; i < numberOfExistingTools; i++)
-    {
-      mitk::SegTool2D* tool = dynamic_cast<mitk::SegTool2D*>(m_ToolManager->GetToolById(i));
-      if (tool) tool->SetEnable3DInterpolation( m_Activated );
-    }
+    mitk::SegTool2D* tool = dynamic_cast<mitk::SegTool2D*>(m_ToolManager->GetToolById(i));
+    if (tool) tool->SetEnable3DInterpolation( enabled );
   }
 
-  if (m_Activated)
+  if (enabled)
   {
     if (!m_DataStorage->Exists(m_InterpolatedSurfaceNode))
     {
       m_DataStorage->Add( m_InterpolatedSurfaceNode );
     }
+
     if (!m_DataStorage->Exists(m_3DContourNode))
     {
       m_DataStorage->Add( m_3DContourNode );
@@ -334,7 +305,7 @@ void QmitkSurfaceBasedInterpolator::OnActivateWidget(bool enabled)
 
     if (ret == QMessageBox::Yes)
     {
-      m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolator::OnRunInterpolation);
+      m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolatorWidget::OnRunInterpolation);
       m_Watcher.setFuture(m_Future);
     }
   }
@@ -352,10 +323,12 @@ void QmitkSurfaceBasedInterpolator::OnActivateWidget(bool enabled)
     mitk::UndoController::GetCurrentUndoModel()->Clear();
   }
 
+  m_Activated = enabled;
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkSurfaceBasedInterpolator::OnAcceptInterpolationClicked()
+void QmitkSurfaceBasedInterpolatorWidget::OnAcceptInterpolationClicked()
 {
   if (m_InterpolatedSurfaceNode.IsNotNull() && m_InterpolatedSurfaceNode->GetData())
   {
@@ -364,14 +337,14 @@ void QmitkSurfaceBasedInterpolator::OnAcceptInterpolationClicked()
   }
 }
 
-void QmitkSurfaceBasedInterpolator::OnSurfaceInterpolationInfoChanged(const itk::EventObject& /*e*/)
+void QmitkSurfaceBasedInterpolatorWidget::OnSurfaceInterpolationInfoChanged(const itk::EventObject& /*e*/)
 {
   if (m_Activated)
   {
     if (m_Watcher.isRunning())
       m_Watcher.waitForFinished();
 
-    m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolator::OnRunInterpolation);
+    m_Future = QtConcurrent::run(this, &QmitkSurfaceBasedInterpolatorWidget::OnRunInterpolation);
     m_Watcher.setFuture(m_Future);
   }
 }

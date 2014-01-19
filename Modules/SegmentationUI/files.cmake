@@ -32,8 +32,8 @@ Qmitk/QmitkFillHolesTool3DGUI.cpp
 Qmitk/QmitkKeepNConnectedRegionsTool3DGUI.cpp
 Qmitk/QmitkSplitConnectedRegionsTool3DGUI.cpp
 Qmitk/QmitkConnectedRegionSelectorTool3DGUI.cpp
-Qmitk/QmitkSliceBasedInterpolator.cpp
-Qmitk/QmitkSurfaceBasedInterpolator.cpp
+Qmitk/QmitkSliceBasedInterpolatorWidget.cpp
+Qmitk/QmitkSurfaceBasedInterpolatorWidget.cpp
 Qmitk/QmitkSurfaceStampWidget.cpp
 Qmitk/QmitkMaskStampWidget.cpp
 Qmitk/QmitkLabelSetTableWidget.cpp
@@ -75,8 +75,8 @@ Qmitk/QmitkFillHolesTool3DGUI.h
 Qmitk/QmitkKeepNConnectedRegionsTool3DGUI.h
 Qmitk/QmitkSplitConnectedRegionsTool3DGUI.h
 Qmitk/QmitkConnectedRegionSelectorTool3DGUI.h
-Qmitk/QmitkSliceBasedInterpolator.h
-Qmitk/QmitkSurfaceBasedInterpolator.h
+Qmitk/QmitkSliceBasedInterpolatorWidget.h
+Qmitk/QmitkSurfaceBasedInterpolatorWidget.h
 Qmitk/QmitkSurfaceStampWidget.h
 Qmitk/QmitkMaskStampWidget.h
 Qmitk/QmitkLabelSetTableWidget.h
@@ -89,8 +89,8 @@ Qmitk/QmitkAdaptiveRegionGrowingToolGUIControls.ui
 Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkAutoThresholdTool3DGUIControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
-Qmitk/QmitkSliceBasedInterpolatorControls.ui
-Qmitk/QmitkSurfaceBasedInterpolatorControls.ui
+Qmitk/QmitkSliceBasedInterpolatorWidgetGUIControls.ui
+Qmitk/QmitkSurfaceBasedInterpolatorWidgetGUIControls.ui
 Qmitk/QmitkLabelSetWidgetControls.ui
 Qmitk/QmitkDilateTool3DGUIControls.ui
 Qmitk/QmitkErodeTool3DGUIControls.ui
@@ -106,8 +106,8 @@ Qmitk/QmitkBinaryThresholdToolGUIControls.ui
 Qmitk/QmitkBinaryThresholdULToolGUIControls.ui
 Qmitk/QmitkFastMarchingToolGUIControls.ui
 Qmitk/QmitkConnectedRegionSelectorTool3DGUIControls.ui
-Qmitk/QmitkSurfaceStampWidgetControls.ui
-Qmitk/QmitkMaskStampWidgetControls.ui
+Qmitk/QmitkSurfaceStampWidgetGUIControls.ui
+Qmitk/QmitkMaskStampWidgetGUIControls.ui
 )
 
 set(QRC_FILES

@@ -14,33 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkSliceBasedInterpolator_h_Included
-#define QmitkSliceBasedInterpolator_h_Included
+#ifndef QmitkSliceBasedInterpolatorWidget_h_Included
+#define QmitkSliceBasedInterpolatorWidget_h_Included
 
 #include "mitkSliceNavigationController.h"
 #include "SegmentationUIExports.h"
-#include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "mitkSegmentationInterpolationController.h"
-#include "mitkToolManager.h"
-#include "mitkDiffSliceOperation.h"
 #include "mitkContourModelSet.h"
 
 #include <map>
 
 #include <QWidget>
 
-
-#include "ui_QmitkSliceBasedInterpolatorControls.h"
+#include "ui_QmitkSliceBasedInterpolatorWidgetGUIControls.h"
 
 namespace mitk
 {
   class PlaneGeometry;
   class SliceNavigationController;
   class LabelSetImage;
+  class ToolManager;
+  class DiffSliceOperation;
 }
-
-class QPushButton;
 
 /**
   \brief GUI for slices interpolation.
@@ -55,7 +51,7 @@ class QPushButton;
 
   While mitk::SegmentationInterpolation does the bookkeeping of interpolation
   (keeping track of which slices contain how much segmentation) and the algorithmic work,
-  QmitkSliceBasedInterpolator is responsible to watch the GUI, to notice, which slice is currently
+  QmitkSliceBasedInterpolatorWidget is responsible to watch the GUI, to notice, which slice is currently
   visible. It triggers generation of interpolation suggestions and also triggers acception of
   suggestions.
 
@@ -64,25 +60,21 @@ class QPushButton;
   Last contributor: $Author: maleike $
 */
 
-class SegmentationUI_EXPORT QmitkSliceBasedInterpolator : public QWidget
+class SegmentationUI_EXPORT QmitkSliceBasedInterpolatorWidget : public QWidget
 {
   Q_OBJECT
 
   public:
 
-    QmitkSliceBasedInterpolator(QWidget* parent = 0, const char* name = 0);
+    QmitkSliceBasedInterpolatorWidget(QWidget* parent = 0, const char* name = 0);
+    virtual ~QmitkSliceBasedInterpolatorWidget();
+
+    void SetDataStorage(mitk::DataStorage& storage);
 
     /**
-      Initializes the widget. To be called once before real use.
+      Sets the slice navigation controllers for getting slice changed events from the views.
     */
-    void Initialize(const QList<mitk::SliceNavigationController*> &controllers, mitk::DataStorage* storage);
-
-    /**
-      \brief Removal of observers.
-    */
-    void Uninitialize();
-
-    virtual ~QmitkSliceBasedInterpolator();
+    void SetSliceNavigationControllers(const QList<mitk::SliceNavigationController*> &controllers);
 
     void OnToolManagerWorkingDataModified();
 
@@ -104,9 +96,9 @@ class SegmentationUI_EXPORT QmitkSliceBasedInterpolator : public QWidget
   protected slots:
 
     /**
-      \brief Reaction to groupbox checked
+      \brief Reaction to "Start/Stop" button click
     */
-    void OnActivateWidget(bool);
+    void OnToggleWidgetActivation(bool);
 
     /**
       \brief Reaction to "Accept Current Slice" button click.
@@ -120,10 +112,15 @@ class SegmentationUI_EXPORT QmitkSliceBasedInterpolator : public QWidget
     void OnAcceptAllInterpolationsClicked();
 
     /*
-     * Will trigger interpolation for all slices in given orientation (called from popup menu of OnAcceptAllInterpolationsClicked)
+      \brief Called from popup menu of OnAcceptAllInterpolationsClicked()
+       Will trigger interpolation for all slices in given orientation
     */
     void OnAcceptAllPopupActivated(QAction* action);
 
+    /*
+      \brief Reaction to "Usage Information" checkbox button click.
+      Shows an overview of the underlining algorithm and key directions on how to use the tool
+    */
     void OnShowInformation(bool);
 
   protected:
@@ -172,11 +169,9 @@ private:
 
     mitk::SegmentationInterpolationController::Pointer m_SliceInterpolatorController;
 
-    mitk::ToolManager::Pointer m_ToolManager;
+    mitk::ToolManager* m_ToolManager;
 
-    Ui::QmitkSliceBasedInterpolatorControls m_Controls;
-
-    bool m_Initialized;
+    Ui::QmitkSliceBasedInterpolatorWidgetGUIControls m_Controls;
 
     bool m_Activated;
 

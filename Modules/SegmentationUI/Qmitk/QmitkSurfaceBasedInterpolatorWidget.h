@@ -14,14 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkSurfaceBasedInterpolator_h_Included
-#define QmitkSurfaceBasedInterpolator_h_Included
+#ifndef QmitkSurfaceBasedInterpolatorWidgetWidget_h_Included
+#define QmitkSurfaceBasedInterpolatorWidgetWidget_h_Included
 
 #include "SegmentationUIExports.h"
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "mitkSurfaceInterpolationController.h"
-#include "mitkToolManager.h"
 #include "mitkLabelSetImage.h"
 
 #include <map>
@@ -34,7 +33,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFutureWatcher>
 #include <QTimer>
 
-#include "ui_QmitkSurfaceBasedInterpolatorControls.h"
+#include "ui_QmitkSurfaceBasedInterpolatorWidgetGUIControls.h"
+
+namespace mitk {
+  class ToolManager;
+}
 
 /**
   \brief GUI for surface-based interpolation.
@@ -47,29 +50,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
 
-  QmitkSurfaceBasedInterpolatorController is responsible to watch the GUI, to notice, which slice is currently
+  QmitkSurfaceBasedInterpolatorWidgetController is responsible to watch the GUI, to notice, which slice is currently
   visible. It triggers generation of interpolation suggestions and also triggers acception of suggestions.
 */
 
-class SegmentationUI_EXPORT QmitkSurfaceBasedInterpolator : public QWidget
+class SegmentationUI_EXPORT QmitkSurfaceBasedInterpolatorWidget : public QWidget
 {
   Q_OBJECT
 
   public:
 
-    QmitkSurfaceBasedInterpolator(QWidget* parent = 0, const char* name = 0);
+    QmitkSurfaceBasedInterpolatorWidget(QWidget* parent = 0, const char* name = 0);
+    virtual ~QmitkSurfaceBasedInterpolatorWidget();
 
-    /**
-      Initializes the widget. To be called once before real use.
-    */
-    void Initialize(mitk::DataStorage* storage);
-
-    /**
-      Removal of observers.
-    */
-    void Uninitialize();
-
-    virtual ~QmitkSurfaceBasedInterpolator();
+    void SetDataStorage(mitk::DataStorage& storage);
 
     void OnToolManagerWorkingDataModified();
 
@@ -85,7 +79,10 @@ class SegmentationUI_EXPORT QmitkSurfaceBasedInterpolator : public QWidget
 
   protected slots:
 
-    void OnActivateWidget(bool);
+    /**
+      \brief Reaction to "Start/Stop" button click
+    */
+    void OnToggleWidgetActivation(bool);
 
     void OnAcceptInterpolationClicked();
 
@@ -107,11 +104,9 @@ private:
 
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
-    mitk::ToolManager::Pointer m_ToolManager;
+    mitk::ToolManager* m_ToolManager;
 
-    Ui::QmitkSurfaceBasedInterpolatorControls m_Controls;
-
-    bool m_Initialized;
+    Ui::QmitkSurfaceBasedInterpolatorWidgetGUIControls m_Controls;
 
     bool m_Activated;
 

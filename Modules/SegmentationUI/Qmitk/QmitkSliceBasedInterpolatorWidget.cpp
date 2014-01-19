@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkSliceBasedInterpolator.h"
+#include "QmitkSliceBasedInterpolatorWidget.h"
 
 #include <mitkColorProperty.h>
 #include <mitkProperties.h>
@@ -24,8 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkInteractionConst.h>
 #include <mitkApplyDiffImageOperation.h>
 #include <mitkDiffImageApplier.h>
+#include "mitkDiffSliceOperation.h"
 #include <mitkDiffSliceOperationApplier.h>
 #include <mitkUndoController.h>
+#include <mitkToolManager.h>
 #include <mitkSegTool2D.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkVtkImageOverwrite.h>
@@ -45,11 +47,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QApplication>
 
-QmitkSliceBasedInterpolator::QmitkSliceBasedInterpolator(QWidget* parent, const char*  /*name*/) : QWidget(parent),
+QmitkSliceBasedInterpolatorWidget::QmitkSliceBasedInterpolatorWidget(QWidget* parent, const char*  /*name*/) : QWidget(parent),
 m_SliceInterpolatorController( mitk::SegmentationInterpolationController::New() ),
 m_ToolManager(NULL),
 m_DataStorage(NULL),
-m_Initialized(false),
 m_Activated(false),
 m_LastSNC(0),
 m_LastSliceIndex(0)
@@ -57,13 +58,18 @@ m_LastSliceIndex(0)
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
 
-  connect(m_Controls.m_btStart, SIGNAL(toggled(bool)), this, SLOT(OnActivateWidget(bool)));
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  Q_ASSERT(m_ToolManager);
+
+  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkSliceBasedInterpolatorWidget>( this, &QmitkSliceBasedInterpolatorWidget::OnToolManagerWorkingDataModified );
+
+  connect(m_Controls.m_btStart, SIGNAL(toggled(bool)), this, SLOT(OnToggleWidgetActivation(bool)));
   connect(m_Controls.m_btApplyForCurrentSlice, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
   connect(m_Controls.m_btApplyForAllSlices, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()));
   connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
 
-  itk::ReceptorMemberCommand<QmitkSliceBasedInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSliceBasedInterpolator>::New();
-  command->SetCallbackFunction( this, &QmitkSliceBasedInterpolator::OnSliceInterpolationInfoChanged );
+  itk::ReceptorMemberCommand<QmitkSliceBasedInterpolatorWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkSliceBasedInterpolatorWidget>::New();
+  command->SetCallbackFunction( this, &QmitkSliceBasedInterpolatorWidget::OnSliceInterpolationInfoChanged );
   m_InterpolationInfoChangedObserverTag = m_SliceInterpolatorController->AddObserver( itk::ModifiedEvent(), command );
 
   m_FeedbackContour = mitk::ContourModelSet::New();
@@ -76,10 +82,13 @@ m_LastSliceIndex(0)
   m_FeedbackContourNode->SetProperty("contour.project-onto-plane", mitk::BoolProperty::New(true));
   m_FeedbackContourNode->SetProperty("contour.width", mitk::FloatProperty::New(2.5));
 
+  m_Controls.m_btApplyForCurrentSlice->setEnabled(false);
+  m_Controls.m_btApplyForAllSlices->setEnabled(false);
+
   this->setEnabled(false);
 }
 
-const QmitkSliceBasedInterpolator::ActionToSliceDimensionMapType QmitkSliceBasedInterpolator::CreateActionToSliceDimension()
+const QmitkSliceBasedInterpolatorWidget::ActionToSliceDimensionMapType QmitkSliceBasedInterpolatorWidget::CreateActionToSliceDimension()
 {
   ActionToSliceDimensionMapType actionToSliceDimension;
   foreach(mitk::SliceNavigationController* slicer, m_ControllerToDeleteObserverTag.keys())
@@ -97,24 +106,14 @@ const QmitkSliceBasedInterpolator::ActionToSliceDimensionMapType QmitkSliceBased
   return actionToSliceDimension;
 }
 
-void QmitkSliceBasedInterpolator::Initialize(const QList<mitk::SliceNavigationController *> &controllers, mitk::DataStorage* storage)
+void QmitkSliceBasedInterpolatorWidget::SetDataStorage(mitk::DataStorage& storage)
+{
+  m_DataStorage = &storage;
+}
+
+void QmitkSliceBasedInterpolatorWidget::SetSliceNavigationControllers(const QList<mitk::SliceNavigationController *> &controllers)
 {
   Q_ASSERT(!controllers.empty());
-
-  Q_ASSERT(storage);
-
-  if (m_Initialized)
-  {
-    // remove old observers
-    this->Uninitialize();
-  }
-
-  m_DataStorage = storage;
-
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-
-  // react whenever the set of selected segmentation changes
-  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkSliceBasedInterpolator>( this, &QmitkSliceBasedInterpolator::OnToolManagerWorkingDataModified );
 
   // connect to the slice navigation controller. after each change, call the interpolator
   foreach(mitk::SliceNavigationController* slicer, controllers)
@@ -124,29 +123,25 @@ void QmitkSliceBasedInterpolator::Initialize(const QList<mitk::SliceNavigationCo
 
     m_TimeStep.insert(slicer, slicer->GetTime()->GetPos());
 
-    itk::MemberCommand<QmitkSliceBasedInterpolator>::Pointer deleteCommand = itk::MemberCommand<QmitkSliceBasedInterpolator>::New();
-    deleteCommand->SetCallbackFunction( this, &QmitkSliceBasedInterpolator::OnSliceNavigationControllerDeleted);
+    itk::MemberCommand<QmitkSliceBasedInterpolatorWidget>::Pointer deleteCommand = itk::MemberCommand<QmitkSliceBasedInterpolatorWidget>::New();
+    deleteCommand->SetCallbackFunction( this, &QmitkSliceBasedInterpolatorWidget::OnSliceNavigationControllerDeleted);
     m_ControllerToDeleteObserverTag.insert(slicer, slicer->AddObserver(itk::DeleteEvent(), deleteCommand));
 
-    itk::MemberCommand<QmitkSliceBasedInterpolator>::Pointer timeChangedCommand = itk::MemberCommand<QmitkSliceBasedInterpolator>::New();
-    timeChangedCommand->SetCallbackFunction( this, &QmitkSliceBasedInterpolator::OnTimeChanged);
+    itk::MemberCommand<QmitkSliceBasedInterpolatorWidget>::Pointer timeChangedCommand = itk::MemberCommand<QmitkSliceBasedInterpolatorWidget>::New();
+    timeChangedCommand->SetCallbackFunction( this, &QmitkSliceBasedInterpolatorWidget::OnTimeChanged);
     m_ControllerToTimeObserverTag.insert(slicer, slicer->AddObserver(mitk::SliceNavigationController::TimeSlicedGeometryEvent(NULL,0), timeChangedCommand));
 
-    itk::MemberCommand<QmitkSliceBasedInterpolator>::Pointer sliceChangedCommand = itk::MemberCommand<QmitkSliceBasedInterpolator>::New();
-    sliceChangedCommand->SetCallbackFunction( this, &QmitkSliceBasedInterpolator::OnSliceChanged);
+    itk::MemberCommand<QmitkSliceBasedInterpolatorWidget>::Pointer sliceChangedCommand = itk::MemberCommand<QmitkSliceBasedInterpolatorWidget>::New();
+    sliceChangedCommand->SetCallbackFunction( this, &QmitkSliceBasedInterpolatorWidget::OnSliceChanged);
     m_ControllerToSliceObserverTag.insert(slicer, slicer->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), sliceChangedCommand));
   }
-  m_ActionToSliceDimensionMap = this->CreateActionToSliceDimension();
 
-  m_Initialized = true;
+  m_ActionToSliceDimensionMap = this->CreateActionToSliceDimension();
 }
 
-void QmitkSliceBasedInterpolator::Uninitialize()
+QmitkSliceBasedInterpolatorWidget::~QmitkSliceBasedInterpolatorWidget()
 {
-  if (m_ToolManager.IsNotNull())
-  {
-    m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkSliceBasedInterpolator>(this, &QmitkSliceBasedInterpolator::OnToolManagerWorkingDataModified);
-  }
+  m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkSliceBasedInterpolatorWidget>(this, &QmitkSliceBasedInterpolatorWidget::OnToolManagerWorkingDataModified);
 
   foreach(mitk::SliceNavigationController* slicer, m_ControllerToSliceObserverTag.keys())
   {
@@ -157,25 +152,12 @@ void QmitkSliceBasedInterpolator::Uninitialize()
 
   m_ActionToSliceDimensionMap.clear();
 
-  m_Initialized = false;
-}
-
-QmitkSliceBasedInterpolator::~QmitkSliceBasedInterpolator()
-{
-  if (m_Initialized)
-  {
-    // remove old observers
-    this->Uninitialize();
-  }
-
   // remove observer
   m_SliceInterpolatorController->RemoveObserver( m_InterpolationInfoChangedObserverTag );
 }
 
-void QmitkSliceBasedInterpolator::OnToolManagerWorkingDataModified()
+void QmitkSliceBasedInterpolatorWidget::OnToolManagerWorkingDataModified()
 {
-  if (!m_Initialized) return;
-
   mitk::DataNode* workingNode = this->m_ToolManager->GetWorkingData(0);
   if (!workingNode)
   {
@@ -193,9 +175,11 @@ void QmitkSliceBasedInterpolator::OnToolManagerWorkingDataModified()
   }
 
   m_WorkingImage = workingImage;
+
+  this->setEnabled(true);
 }
 
-void QmitkSliceBasedInterpolator::OnTimeChanged(itk::Object* sender, const itk::EventObject& e)
+void QmitkSliceBasedInterpolatorWidget::OnTimeChanged(itk::Object* sender, const itk::EventObject& e)
 {
   //Check if we really have a GeometryTimeEvent
   if (!dynamic_cast<const mitk::SliceNavigationController::GeometryTimeEvent*>(&e))
@@ -213,7 +197,7 @@ void QmitkSliceBasedInterpolator::OnTimeChanged(itk::Object* sender, const itk::
   }
 }
 
-void QmitkSliceBasedInterpolator::OnSliceChanged(itk::Object *sender, const itk::EventObject &e)
+void QmitkSliceBasedInterpolatorWidget::OnSliceChanged(itk::Object *sender, const itk::EventObject &e)
 {
   if (this->m_Activated && m_WorkingImage.IsNotNull())
   {
@@ -231,7 +215,7 @@ void QmitkSliceBasedInterpolator::OnSliceChanged(itk::Object *sender, const itk:
   }
 }
 
-void QmitkSliceBasedInterpolator::TranslateAndInterpolateChangedSlice(const itk::EventObject& e, mitk::SliceNavigationController* slicer)
+void QmitkSliceBasedInterpolatorWidget::TranslateAndInterpolateChangedSlice(const itk::EventObject& e, mitk::SliceNavigationController* slicer)
 {
   if (this->m_Activated && m_WorkingImage.IsNotNull())
   {
@@ -253,7 +237,7 @@ void QmitkSliceBasedInterpolator::TranslateAndInterpolateChangedSlice(const itk:
   }
 }
 
-void QmitkSliceBasedInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned int timeStep, mitk::SliceNavigationController* slicer )
+void QmitkSliceBasedInterpolatorWidget::Interpolate( mitk::PlaneGeometry* plane, unsigned int timeStep, mitk::SliceNavigationController* slicer )
 {
   int clickedSliceDimension(-1);
   int clickedSliceIndex(-1);
@@ -296,7 +280,7 @@ void QmitkSliceBasedInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsig
   m_LastSliceIndex = clickedSliceIndex;
 }
 
-mitk::Image::Pointer QmitkSliceBasedInterpolator::GetWorkingSlice(const mitk::PlaneGeometry* planeGeometry)
+mitk::Image::Pointer QmitkSliceBasedInterpolatorWidget::GetWorkingSlice(const mitk::PlaneGeometry* planeGeometry)
 {
   unsigned int timeStep = m_LastSNC->GetTime()->GetPos();
 
@@ -336,23 +320,24 @@ mitk::Image::Pointer QmitkSliceBasedInterpolator::GetWorkingSlice(const mitk::Pl
   return slice;
 }
 
-void QmitkSliceBasedInterpolator::OnActivateWidget(bool enabled)
+void QmitkSliceBasedInterpolatorWidget::OnToggleWidgetActivation(bool enabled)
 {
-  if (!m_Initialized) return;
+  Q_ASSERT(m_ToolManager);
 
-  m_Activated = enabled;
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  if (!workingNode) return;
 
-  if ( m_ToolManager.IsNotNull() )
+  m_Controls.m_btApplyForCurrentSlice->setEnabled(enabled);
+  m_Controls.m_btApplyForAllSlices->setEnabled(enabled);
+
+  unsigned int numberOfExistingTools = m_ToolManager->GetTools().size();
+  for(unsigned int i = 0; i < numberOfExistingTools; i++)
   {
-    unsigned int numberOfExistingTools = m_ToolManager->GetTools().size();
-    for(unsigned int i = 0; i < numberOfExistingTools; i++)
-    {
-      mitk::SegTool2D* tool = dynamic_cast<mitk::SegTool2D*>(m_ToolManager->GetToolById(i));
-      if (tool) tool->SetEnable2DInterpolation( m_Activated );
-    }
+    mitk::SegTool2D* tool = dynamic_cast<mitk::SegTool2D*>(m_ToolManager->GetToolById(i));
+    if (tool) tool->SetEnable2DInterpolation( enabled );
   }
 
-  if (m_Activated)
+  if (enabled)
   {
     if (!m_DataStorage->Exists(m_FeedbackContourNode))
     {
@@ -371,10 +356,12 @@ void QmitkSliceBasedInterpolator::OnActivateWidget(bool enabled)
     mitk::UndoController::GetCurrentUndoModel()->Clear();
   }
 
+  m_Activated = enabled;
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkSliceBasedInterpolator::OnAcceptInterpolationClicked()
+void QmitkSliceBasedInterpolatorWidget::OnAcceptInterpolationClicked()
 {
   if (m_WorkingImage.IsNotNull() && m_FeedbackContourNode->GetData())
   {
@@ -449,7 +436,7 @@ void QmitkSliceBasedInterpolator::OnAcceptInterpolationClicked()
   }
 }
 
-void QmitkSliceBasedInterpolator::AcceptAllInterpolations(mitk::SliceNavigationController* slicer)
+void QmitkSliceBasedInterpolatorWidget::AcceptAllInterpolations(mitk::SliceNavigationController* slicer)
 {
   // Since we need to shift the plane it must be clone so that the original plane isn't altered
   mitk::PlaneGeometry::Pointer reslicePlane = slicer->GetCurrentPlaneGeometry()->Clone();
@@ -549,7 +536,7 @@ void QmitkSliceBasedInterpolator::AcceptAllInterpolations(mitk::SliceNavigationC
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkSliceBasedInterpolator::OnAcceptAllInterpolationsClicked()
+void QmitkSliceBasedInterpolatorWidget::OnAcceptAllInterpolationsClicked()
 {
   QMenu orientationPopup(this);
   std::map<QAction*, mitk::SliceNavigationController*>::const_iterator it;
@@ -561,7 +548,7 @@ void QmitkSliceBasedInterpolator::OnAcceptAllInterpolationsClicked()
   orientationPopup.exec( QCursor::pos() );
 }
 
-void QmitkSliceBasedInterpolator::OnShowInformation(bool on)
+void QmitkSliceBasedInterpolatorWidget::OnShowInformation(bool on)
 {
   if (on)
     m_Controls.m_InformationWidget->show();
@@ -569,7 +556,7 @@ void QmitkSliceBasedInterpolator::OnShowInformation(bool on)
     m_Controls.m_InformationWidget->hide();
 }
 
-void QmitkSliceBasedInterpolator::OnAcceptAllPopupActivated(QAction* action)
+void QmitkSliceBasedInterpolatorWidget::OnAcceptAllPopupActivated(QAction* action)
 {
   ActionToSliceDimensionMapType::const_iterator iter = m_ActionToSliceDimensionMap.find( action );
   if (iter != m_ActionToSliceDimensionMap.end())
@@ -579,7 +566,7 @@ void QmitkSliceBasedInterpolator::OnAcceptAllPopupActivated(QAction* action)
   }
 }
 
-void QmitkSliceBasedInterpolator::UpdateVisibleSuggestion()
+void QmitkSliceBasedInterpolatorWidget::UpdateVisibleSuggestion()
 {
   if (this->m_Activated && m_LastSNC)
   {
@@ -598,13 +585,13 @@ void QmitkSliceBasedInterpolator::UpdateVisibleSuggestion()
   }
 }
 
-void QmitkSliceBasedInterpolator::OnSliceInterpolationInfoChanged(const itk::EventObject& /*e*/)
+void QmitkSliceBasedInterpolatorWidget::OnSliceInterpolationInfoChanged(const itk::EventObject& /*e*/)
 {
   // something (e.g. undo) changed the interpolation info, we should refresh our display
   this->UpdateVisibleSuggestion();
 }
 
-void QmitkSliceBasedInterpolator::OnSliceNavigationControllerDeleted(const itk::Object *sender, const itk::EventObject& /*e*/)
+void QmitkSliceBasedInterpolatorWidget::OnSliceNavigationControllerDeleted(const itk::Object *sender, const itk::EventObject& /*e*/)
 {
   //Don't know how to avoid const_cast here?!
   mitk::SliceNavigationController* slicer = dynamic_cast<mitk::SliceNavigationController*>(const_cast<itk::Object*>(sender));
@@ -616,17 +603,17 @@ void QmitkSliceBasedInterpolator::OnSliceNavigationControllerDeleted(const itk::
   }
 }
 
-void QmitkSliceBasedInterpolator::WaitCursorOn()
+void QmitkSliceBasedInterpolatorWidget::WaitCursorOn()
 {
   QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 }
 
-void QmitkSliceBasedInterpolator::WaitCursorOff()
+void QmitkSliceBasedInterpolatorWidget::WaitCursorOff()
 {
   this->RestoreOverrideCursor();
 }
 
-void QmitkSliceBasedInterpolator::RestoreOverrideCursor()
+void QmitkSliceBasedInterpolatorWidget::RestoreOverrideCursor()
 {
   QApplication::restoreOverrideCursor();
 }

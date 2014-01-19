@@ -64,8 +64,6 @@ void QmitkUSNewVideoDeviceWidget::CreateConnections()
     connect( m_Controls->m_RadioDeviceSource, SIGNAL(clicked()), this, SLOT(OnDeviceTypeSelection()) );
     connect( m_Controls->m_RadioFileSource,   SIGNAL(clicked()), this, SLOT(OnDeviceTypeSelection()) );
   }
-  // Hide & show stuff
-  m_Controls->m_FilePathSelector->setVisible(false);
 }
 
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
@@ -124,8 +122,8 @@ void QmitkUSNewVideoDeviceWidget::OnClickedCancel(){
 }
 
 void QmitkUSNewVideoDeviceWidget::OnDeviceTypeSelection(){
-  m_Controls->m_FilePathSelector->setVisible(m_Controls->m_RadioFileSource->isChecked());
-  m_Controls->m_DeviceSelector->setVisible(m_Controls->m_RadioDeviceSource->isChecked());
+  m_Controls->m_FilePathSelector->setEnabled(m_Controls->m_RadioFileSource->isChecked());
+  m_Controls->m_DeviceSelector->setEnabled(m_Controls->m_RadioDeviceSource->isChecked());
 }
 
 ///////////////// Methods & Slots Handling Logic //////////////////////////

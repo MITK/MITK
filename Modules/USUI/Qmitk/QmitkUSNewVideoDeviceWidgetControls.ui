@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>405</width>
+    <width>285</width>
     <height>595</height>
    </rect>
   </property>
@@ -22,6 +22,9 @@
   <layout class="QFormLayout" name="formLayout">
    <property name="fieldGrowthPolicy">
     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+   </property>
+   <property name="margin">
+    <number>0</number>
    </property>
    <item row="0" column="0" colspan="2">
     <widget class="QGroupBox" name="m_BoxMetadata">
@@ -114,8 +117,14 @@
       <string>Video Source:</string>
      </property>
      <layout class="QFormLayout" name="formLayout_2">
+      <property name="labelAlignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
       <item row="1" column="1">
        <widget class="QLineEdit" name="m_FilePathSelector">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -189,15 +198,21 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QCheckBox" name="m_CheckResolutionOverride">
+      <item row="2" column="1">
+       <widget class="QLabel" name="label_9">
         <property name="text">
-         <string>Enable Resolution Override</string>
+         <string>Width:</string>
         </property>
        </widget>
       </item>
       <item row="3" column="1">
        <widget class="QSpinBox" name="m_ResolutionWidth">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimum">
          <number>10</number>
         </property>
@@ -214,6 +229,12 @@
       </item>
       <item row="3" column="2">
        <widget class="QSpinBox" name="m_ResolutionHeight">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimum">
          <number>10</number>
         </property>
@@ -228,17 +249,17 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="label_9">
-        <property name="text">
-         <string>Width:</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="2">
        <widget class="QLabel" name="label_10">
         <property name="text">
          <string>Height:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2">
+       <widget class="QCheckBox" name="m_CheckResolutionOverride">
+        <property name="text">
+         <string>Enable Resolution Override</string>
         </property>
        </widget>
       </item>
@@ -298,8 +319,6 @@
   <tabstop>m_RadioFileSource</tabstop>
   <tabstop>m_FilePathSelector</tabstop>
   <tabstop>m_CheckResolutionOverride</tabstop>
-  <tabstop>m_ResolutionWidth</tabstop>
-  <tabstop>m_ResolutionHeight</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/USUI.qrc"/>

@@ -16,6 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCreateDistanceImageFromSurfaceFilter.h"
 
+#include <mitkImageAccessByItk.h>
+
+#include "vtkSmartPointer.h"
+#include "vtkDoubleArray.h"
+#include "vtkCellArray.h"
+#include "vtkCellData.h"
+#include "vtkPolyData.h"
+
 mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImageFromSurfaceFilter()
 {
   m_DistanceImageVolume = 50000;
@@ -546,9 +554,16 @@ void mitk::CreateDistanceImageFromSurfaceFilter::SetProgressStepSize(unsigned in
   this->m_ProgressStepSize = stepSize;
 }
 
-void mitk::CreateDistanceImageFromSurfaceFilter::SetReferenceImage( itk::ImageBase<3>::Pointer referenceImage )
+void mitk::CreateDistanceImageFromSurfaceFilter::SetReferenceImage(const mitk::Image* image)//itk::ImageBase<3>::Pointer referenceImage )
 {
- m_ReferenceImage = referenceImage;
+  m_ReferenceImage = itk::ImageBase<3>::New();
+  AccessFixedDimensionByItk_1( image, GetImageBase, 3, m_ReferenceImage );
+}
+
+template<typename TPixel, unsigned int VImageDimension>
+void mitk::CreateDistanceImageFromSurfaceFilter::GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& output)
+{
+  output->Graft(input);
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::DetermineBounds( DistanceImageType::PointType &minPointInWorldCoordinates,

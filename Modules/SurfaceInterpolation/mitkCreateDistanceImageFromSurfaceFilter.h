@@ -23,12 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurface.h"
 #include "mitkProgressBar.h"
 
-#include "vtkSmartPointer.h"
-#include "vtkDoubleArray.h"
-#include "vtkCellArray.h"
-#include "vtkCellData.h"
-#include "vtkPolyData.h"
-
 #include "vnl/vnl_matrix.h"
 #include "vnl/vnl_vector.h"
 #include "vnl/vnl_vector_fixed.h"
@@ -135,7 +129,7 @@ namespace mitk {
       \brief Sets a reference image for
       \a Parameter The reference image
     */
-    void SetReferenceImage( itk::ImageBase<3>::Pointer referenceImage );
+    void SetReferenceImage(const mitk::Image* image); //itk::ImageBase<3>::Pointer referenceImage );
 
 
   protected:
@@ -173,6 +167,9 @@ namespace mitk {
 
 
     void FillImageRegion(DistanceImageType::RegionType reqRegion, DistanceImageType::PixelType pixelValue, DistanceImageType::Pointer image);
+
+    template<typename TPixel, unsigned int VImageDimension>
+    void GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& output);
 
     //Data structures for the interpolation method
     CenterList m_Centers;

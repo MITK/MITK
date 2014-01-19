@@ -9,11 +9,11 @@ QmitkUSCombinedModalityCreationWidget::QmitkUSCombinedModalityCreationWidget(QWi
 
   std::string filterExcludeCombinedModalities = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(!(" + mitk::USDevice::US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + ")))";
 
-  ui->usDevicesServiceList->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL, filterExcludeCombinedModalities);
-  ui->trackingDevicesServiceList->Initialize<mitk::NavigationDataSource>(mitk::NavigationDataSource::US_PROPKEY_DEVICENAME);
-
   connect( ui->usDevicesServiceList,       SIGNAL( ServiceSelectionChanged(us::ServiceReferenceU) ), this, SLOT(OnSelectedUltrasoundOrTrackingDevice()) );
   connect( ui->trackingDevicesServiceList, SIGNAL( ServiceSelectionChanged(us::ServiceReferenceU) ), this, SLOT(OnSelectedUltrasoundOrTrackingDevice()) );
+
+  ui->usDevicesServiceList->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL, filterExcludeCombinedModalities);
+  ui->trackingDevicesServiceList->Initialize<mitk::NavigationDataSource>(mitk::NavigationDataSource::US_PROPKEY_DEVICENAME);
 
   connect( ui->createButton, SIGNAL(clicked()), this, SLOT(OnCreation()) );
   connect( ui->cancelButton, SIGNAL(clicked()), this, SIGNAL(SignalAborted()) );

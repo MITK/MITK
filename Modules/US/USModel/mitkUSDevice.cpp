@@ -234,6 +234,11 @@ bool mitk::USDevice::Connect()
   return true;
 }
 
+void mitk::USDevice::ConnectAsynchron()
+{
+  this->m_MultiThreader->SpawnThread(this->ConnectThread, this);
+}
+
 bool mitk::USDevice::Disconnect()
 {
   if ( ! GetIsConnected())
@@ -504,7 +509,7 @@ ITK_THREAD_RETURN_TYPE mitk::USDevice::Acquire(void* pInfoStruct)
 {
   /* extract this pointer from Thread Info structure */
   struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  mitk::USDevice * device = (mitk::USDevice *) pInfo->UserData;
+  mitk::USDevice* device = (mitk::USDevice*) pInfo->UserData;
   while (device->GetIsActive())
   {
     // lock this thread when ultrasound device is freezed
@@ -521,5 +526,16 @@ ITK_THREAD_RETURN_TYPE mitk::USDevice::Acquire(void* pInfoStruct)
 
     device->GrabImage();
   }
+  return ITK_THREAD_RETURN_VALUE;
+}
+
+ITK_THREAD_RETURN_TYPE mitk::USDevice::ConnectThread(void* pInfoStruct)
+{
+  /* extract this pointer from Thread Info structure */
+  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
+  mitk::USDevice* device = (mitk::USDevice*) pInfo->UserData;
+
+  device->Connect();
+
   return ITK_THREAD_RETURN_VALUE;
 }

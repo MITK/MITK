@@ -156,6 +156,8 @@ class USControlInterfaceDoppler;
     */
     bool Connect();
 
+    void ConnectAsynchron();
+
     /**
     * \brief Works analogously to mitk::USDevice::Connect(). Don't override this Method, but onDisconnection instead.
     */
@@ -243,6 +245,7 @@ class USControlInterfaceDoppler;
     itkGetMacro(SpawnAcquireThread, bool);
 
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
+    static ITK_THREAD_RETURN_TYPE ConnectThread(void* pInfoStruct);
 
     mitk::Image::Pointer m_Image;
     mitk::Image::Pointer m_OutputImage;

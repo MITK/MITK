@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <FiberTrackingExports.h>
 #include <vnl/vnl_vector_fixed.h>
 
+
 namespace mitk
 {
 
@@ -41,8 +42,11 @@ public:
     {
     }
 
+#pragma warning(push)
+#pragma warning(disable: 4251)
     vnl_vector_fixed<float, 3> pos; // particle position (world coordinates. corner based voxels. not accounted for image rotation.
     vnl_vector_fixed<float, 3> dir; // normalized direction vector
+#pragma warning(pop)
 
     int gridindex;          // index in the grid where it is living
     int ID;                 // particle ID

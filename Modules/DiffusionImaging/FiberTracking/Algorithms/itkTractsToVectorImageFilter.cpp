@@ -507,7 +507,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
 
         if ( directions.size() > maxNumDirections )
         {
-            for (unsigned int i=maxNumDirections; i<std::min(directions.size(), m_MaxNumDirections); i++)
+            for (unsigned int i=maxNumDirections; i<std::min<unsigned int>(directions.size(), m_MaxNumDirections); i++)
             {
                 ItkDirectionImageType::Pointer directionImage = ItkDirectionImageType::New();
                 directionImage->SetSpacing( spacing );
@@ -519,7 +519,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
                 directionImage->FillBuffer(nullVec);
                 m_DirectionImageContainer->InsertElement(i, directionImage);
             }
-            maxNumDirections = std::min(directions.size(), m_MaxNumDirections);
+            maxNumDirections = std::min<unsigned int>(directions.size(), m_MaxNumDirections);
         }
 
         unsigned int numDir = directions.size();

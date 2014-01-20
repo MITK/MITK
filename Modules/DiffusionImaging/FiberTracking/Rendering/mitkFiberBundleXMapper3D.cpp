@@ -52,7 +52,7 @@ const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
  This method is called once the mapper gets new input,
  for UI rotation or changes in colorcoding this method is NOT called
  */
-void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
+void mitk::FiberBundleXMapper3D::InternalGenerateData(mitk::BaseRenderer *renderer)
 {
     mitk::FiberBundleX* FBX = dynamic_cast<mitk::FiberBundleX*> (GetDataNode()->GetData());
     if (FBX == NULL)
@@ -123,7 +123,7 @@ void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
          || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
     {
         MITK_DEBUG << "UPDATE NEEDED FOR _ " << renderer->GetName();
-        this->GenerateData(renderer);
+        this->InternalGenerateData(renderer);
     }
 
 }
@@ -164,11 +164,6 @@ vtkProp* mitk::FiberBundleXMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
     //MITK_INFO << "FiberBundleXxXXMapper3D()GetVTKProp";
     //this->GenerateData();
     return m_LSH.GetLocalStorage(renderer)->m_FiberAssembly;
-
-}
-
-void mitk::FiberBundleXMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
-{
 
 }
 

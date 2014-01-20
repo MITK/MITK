@@ -51,7 +51,7 @@ public:
 
     typedef Vector< float, 3 >                                  DirectionType;
     typedef Image< DirectionType, 3 >                           DirectionImageType;
-    typedef VectorContainer< int, DirectionImageType::Pointer > DirectionImageContainerType;
+    typedef VectorContainer< unsigned int, DirectionImageType::Pointer > DirectionImageContainerType;
     typedef Image< float, 3 >                                   FloatImageType;
     typedef Image< bool, 3 >                                    BoolImageType;
     typedef Image< unsigned char, 3 >                           UCharImageType;

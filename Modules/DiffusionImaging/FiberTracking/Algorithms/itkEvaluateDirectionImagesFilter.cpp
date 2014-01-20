@@ -48,14 +48,14 @@ void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
     DirectionImageContainerType::Pointer set1 = DirectionImageContainerType::New();
     DirectionImageContainerType::Pointer set2 = DirectionImageContainerType::New();
 
-    for (int i=0; i<m_ImageSet->Size(); i++)
+    for (unsigned int i=0; i<m_ImageSet->Size(); i++)
     {
         typename itk::ImageDuplicator< DirectionImageType >::Pointer duplicator = itk::ImageDuplicator< DirectionImageType >::New();
         duplicator->SetInputImage( m_ImageSet->GetElement(i) );
         duplicator->Update();
         set1->InsertElement(i, dynamic_cast<DirectionImageType*>(duplicator->GetOutput()));
     }
-    for (int i=0; i<m_ReferenceImageSet->Size(); i++)
+    for (unsigned int i=0; i<m_ReferenceImageSet->Size(); i++)
     {
         typename itk::ImageDuplicator< DirectionImageType >::Pointer duplicator = itk::ImageDuplicator< DirectionImageType >::New();
         duplicator->SetInputImage( m_ReferenceImageSet->GetElement(i) );

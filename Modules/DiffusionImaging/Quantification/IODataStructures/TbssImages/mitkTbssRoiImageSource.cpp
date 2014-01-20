@@ -33,9 +33,20 @@ mitk::TbssRoiImageSource::TbssRoiImageSource()
 }
 
 
-itk::DataObject::Pointer mitk::TbssRoiImageSource::MakeOutput( itk::ProcessObject::DataObjectPointerArraySizeType /*idx*/ )
+itk::DataObject::Pointer mitk::TbssRoiImageSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-  return static_cast<itk::DataObject*>(mitk::TbssRoiImage::New().GetPointer());
+  return OutputType::New().GetPointer();
+}
+
+
+itk::DataObject::Pointer mitk::TbssRoiImageSource::MakeOutput( const DataObjectIdentifierType & name )
+{
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
+    {
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    }
+  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
 
 

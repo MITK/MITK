@@ -21,8 +21,8 @@ using namespace mitk;
 
 template< class ScalarType >
 AstroStickModel< ScalarType >::AstroStickModel()
-    : m_Diffusivity(0.001)
-    , m_BValue(1000)
+    : m_BValue(1000)
+    , m_Diffusivity(0.001)
     , m_NumSticks(42)
     , m_RandomizeSticks(false)
 {
@@ -51,7 +51,7 @@ void AstroStickModel< ScalarType >::SetSeed(int s)
 }
 
 template< class ScalarType >
-ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(int dir)
+ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
 {
     ScalarType signal = 0;
 
@@ -68,7 +68,7 @@ ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(int dir)
 
     if (bVal>0.0001)
     {
-        for (int j=0; j<m_NumSticks; j++)
+        for (unsigned int j=0; j<m_NumSticks; j++)
         {
             ScalarType dot = 0;
             if(m_RandomizeSticks)
@@ -113,7 +113,7 @@ typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >:
 
         if (bVal>0.0001)
         {
-            for (int j=0; j<m_NumSticks; j++)
+            for (unsigned int j=0; j<m_NumSticks; j++)
             {
                 ScalarType dot = 0;
                 if(m_RandomizeSticks)

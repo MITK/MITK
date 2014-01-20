@@ -41,12 +41,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk{
 
 FibersFromPlanarFiguresFilter::FibersFromPlanarFiguresFilter()
-    : m_Density(1000)
+    : m_FiberDistribution(DISTRIBUTE_UNIFORM)
+    , m_Density(1000)
     , m_FiberSampling(1)
     , m_Tension(0)
     , m_Continuity(0)
     , m_Bias(0)
-    , m_FiberDistribution(DISTRIBUTE_UNIFORM)
     , m_Variance(0.1)
 {
 
@@ -90,11 +90,11 @@ void FibersFromPlanarFiguresFilter::GeneratePoints()
 void FibersFromPlanarFiguresFilter::GenerateData()
 {
     // check if enough fiducials are available
-    for (int i=0; i<m_Fiducials.size(); i++)
+    for (unsigned int i=0; i<m_Fiducials.size(); i++)
         if (m_Fiducials.at(i).size()<2)
             itkExceptionMacro("At least 2 fiducials needed per fiber bundle!");
 
-    for (int i=0; i<m_Fiducials.size(); i++)
+    for (unsigned int i=0; i<m_Fiducials.size(); i++)
     {
         vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
         vtkSmartPointer<vtkPoints> m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
@@ -167,7 +167,7 @@ void FibersFromPlanarFiguresFilter::GenerateData()
 
             vnl_vector_fixed< double, 3 > n = planeGeo->GetNormalVnl();
 
-            for (int k=1; k<bundle.size(); k++)
+            for (unsigned int k=1; k<bundle.size(); k++)
             {
                 figure = bundle.at(k);
                 p0 = figure->GetControlPoint(0);

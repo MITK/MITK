@@ -33,15 +33,15 @@ namespace itk
   template <class TInputImageType, class TOutputImageType>
   ShortestPathImageFilter<TInputImageType, TOutputImageType>
     ::ShortestPathImageFilter() :
+    m_Nodes(0),
+    m_Graph_NumberOfNodes(0),
     m_FullNeighborsMode(false),
     m_MakeOutputImage(true),
     m_StoreVectorOrder(false),
     m_CalcAllDistances(false),
-    m_ActivateTimeOut(false),
     multipleEndPoints(false),
-    m_Initialized(false),
-    m_Nodes(0),
-    m_Graph_NumberOfNodes(0)
+    m_ActivateTimeOut(false),
+    m_Initialized(false)
   {
     m_endPoints.clear();
     m_endPointsClosed.clear();
@@ -77,7 +77,7 @@ namespace itk
     {
       coord[1] = node / size[0];
       coord[0] = node % size[0];
-      if ((coord[0] >= size[0]) || (coord[1] >= size[1]))
+      if (((unsigned long)coord[0] >= size[0]) || ((unsigned long)coord[1] >= size[1]))
       {
         coord[0] = 0;
         coord[1] = 0;
@@ -88,7 +88,7 @@ namespace itk
       coord[2] = node / (size[0]*size[1]);
       coord[1] = (node % (size[0]*size[1])) / size[0];
       coord[0] = (node % (size[0]*size[1])) % size[0];
-      if ((coord[0] >= size[0]) || (coord[1] >= size[1]) || (coord[2] >= size[2]))
+      if (((unsigned long)coord[0] >= size[0]) || ((unsigned long)coord[1] >= size[1]) || ((unsigned long)coord[2] >= size[2]))
       {
         coord[0] = 0;
         coord[1] = 0;
@@ -138,9 +138,9 @@ namespace itk
     if (dim == 2)
     {
       if ((coord[0] >= 0)
-        && (coord[0] < size[0])
+        && ((unsigned long)coord[0] < size[0])
         && (coord[1] >= 0 )
-        && (coord[1] < size[1] ))
+        && ((unsigned long)coord[1] < size[1] ))
       {
         return true;
       }
@@ -148,11 +148,11 @@ namespace itk
     if (dim == 3)
     {
       if ((coord[0] >= 0)
-        && (coord[0] < size[0])
+        && ((unsigned long)coord[0] < size[0])
         && (coord[1] >= 0 )
-        && (coord[1] < size[1] )
+        && ((unsigned long)coord[1] < size[1] )
         && (coord[2] >= 0 )
-        && (coord[2] < size[2] ))
+        && ((unsigned long)coord[2] < size[2] ))
       {
         return true;
       }
@@ -505,10 +505,8 @@ namespace itk
     // init variables
     double durationAll = 0;
     bool timeout = false;
-    bool makeNewHeapNecessary = false;
     NodeNumType mainNodeListIndex = 0;
     DistanceType curNodeDistance = 0;
-    DistanceType curNodeDistAndEst = 0;
     NodeNumType numberOfNodesChecked = 0;
 
     // Create Multimap (tree structure for fast searching)
@@ -531,7 +529,6 @@ namespace itk
 
       // Get element with lowest score
       mainNodeListIndex = myMap.begin()->second->mainListIndex;
-      curNodeDistAndEst = myMap.begin()->second->distAndEst;
       curNodeDistance = myMap.begin()->second->distance;
       myMap.begin()->second->closed = true; // close it
 
@@ -611,8 +608,6 @@ namespace itk
 
             // 1st : find and delete old element
             bool found = false;
-            double lookFor = neighborNodes[i]->distAndEst;
-            unsigned int lookForId = neighborNodes[i]->mainListIndex;
             ret = myMap.equal_range(neighborNodes[i]->distAndEst);
 
             if ((ret.first == ret.second))
@@ -709,7 +704,7 @@ namespace itk
       if ( multipleEndPoints )
       {
         // super slow, make it faster
-        for (int i=0 ;i<m_endPoints.size(); i++)
+        for (unsigned int i=0 ;i<m_endPoints.size(); i++)
         {
           if (CoordToNode(m_endPoints[i]) == mainNodeListIndex)
           {
@@ -760,7 +755,7 @@ namespace itk
 
       if (!multipleEndPoints) // Only one path was calculated
       {
-        for (int i=0; i< m_VectorPath.size(); i++)
+        for (unsigned int i=0; i< m_VectorPath.size(); i++)
         {
           shortestPathImageIt.SetIndex( m_VectorPath[i] );
           shortestPathImageIt.Set( FOREGROUND ) ;
@@ -768,9 +763,9 @@ namespace itk
       }
       else // multiple pathes has been calculated, draw all
       {
-        for (int i =0; i<m_MultipleVectorPaths.size(); i++)
+        for (unsigned int i =0; i<m_MultipleVectorPaths.size(); i++)
         {
-          for (int j=0; j< m_MultipleVectorPaths[i].size(); j++)
+          for (unsigned int j=0; j< m_MultipleVectorPaths[i].size(); j++)
           {
             shortestPathImageIt.SetIndex( m_MultipleVectorPaths[i][j] );
             shortestPathImageIt.Set( FOREGROUND ) ;
@@ -866,36 +861,27 @@ namespace itk
 
       // Go backwards from endnote to startnode
       NodeNumType prevNode = m_Graph_EndNode;
-      while (prevNode != -1)
+      while(prevNode != m_Graph_StartNode)
       {
         m_VectorPath.push_back( NodeToCoord(prevNode) );
-
-        if (prevNode == m_Graph_StartNode)
-          break;
-
         prevNode = m_Nodes[prevNode].prevNode;
-      }
-
+      } m_VectorPath.push_back( NodeToCoord(prevNode) );
       // reverse it
       std::reverse(m_VectorPath.begin(), m_VectorPath.end() );
     }
     // Multiple end end points and pathes
     else
     {
-      for (int i=0; i<m_endPointsClosed.size(); i++)
+      for (unsigned int i=0; i<m_endPointsClosed.size(); i++)
       {
         m_VectorPath.clear();
         // Go backwards from endnote to startnode
         NodeNumType prevNode = CoordToNode(m_endPointsClosed[i]);
-        while (prevNode != -1)
+        while (prevNode != m_Graph_StartNode)
         {
           m_VectorPath.push_back( NodeToCoord(prevNode) );
-
-          if (prevNode == m_Graph_StartNode)
-            break;
-
           prevNode = m_Nodes[prevNode].prevNode;
-        }
+        } m_VectorPath.push_back( NodeToCoord(prevNode) );
 
         // reverse it
         std::reverse(m_VectorPath.begin(), m_VectorPath.end() );

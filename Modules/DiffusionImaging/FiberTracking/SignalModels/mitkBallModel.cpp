@@ -34,7 +34,7 @@ BallModel< ScalarType >::~BallModel()
 }
 
 template< class ScalarType >
-ScalarType BallModel< ScalarType >::SimulateMeasurement(int dir)
+ScalarType BallModel< ScalarType >::SimulateMeasurement(unsigned int dir)
 {
     ScalarType signal = 0;
 

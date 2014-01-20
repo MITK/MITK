@@ -40,7 +40,7 @@ public:
 
     /** Actual signal generation **/
     PixelType SimulateMeasurement();
-    ScalarType SimulateMeasurement(int dir);
+    ScalarType SimulateMeasurement(unsigned int dir);
 
     void SetDiffusivity(ScalarType D) { m_Diffusivity = D; }
     void SetBvalue(ScalarType bValue) { m_BValue = bValue; }

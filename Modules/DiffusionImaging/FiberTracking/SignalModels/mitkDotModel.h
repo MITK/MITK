@@ -39,7 +39,7 @@ public:
 
     /** Actual signal generation **/
     PixelType SimulateMeasurement();
-    ScalarType SimulateMeasurement(int dir);
+    ScalarType SimulateMeasurement(unsigned int dir);
 
 protected:
 

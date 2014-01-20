@@ -79,7 +79,7 @@ void mitk::ConnectomicsHistogramBase::PrintToConsole() const
 {
   MITK_INFO << "Histogram - Maximum " << this->GetYMax() << " Minimum " << this->GetYMin() << " Range " << this->GetRange();
 
-  for( int index( 0 ); index < m_HistogramVector.size(); index++ )
+  for(unsigned int index( 0 ); index < m_HistogramVector.size(); index++ )
   {
     MITK_INFO << " Bin: " << index << " Value: " << m_HistogramVector[ index ];
   }
@@ -141,7 +141,7 @@ float mitk::ConnectomicsHistogramBase::GetRelativeBin( double start, double end 
   if( std::abs( end - start ) <= 1.0 )
   { // if the bin size is one or less, we can do not need to interpolate
 
-    int index( 0 );
+    unsigned int index( 0 );
     try
     {
       // show the value for n between n - .5 and n + .5
@@ -166,7 +166,7 @@ float mitk::ConnectomicsHistogramBase::GetRelativeBin( double start, double end 
   else
   { // if the bin size is more than one we need to interpolate
 
-    int indexStart( 0 ), indexEnd( 0 );
+    unsigned int indexStart( 0 ), indexEnd( 0 );
 
     try
     {
@@ -192,7 +192,7 @@ float mitk::ConnectomicsHistogramBase::GetRelativeBin( double start, double end 
       result += endPercentage   * m_HistogramVector[ indexEnd   ];
 
       // add whole inbetween bins
-      for( int tempIndex = indexStart + 1; tempIndex < indexEnd; tempIndex++ )
+      for( unsigned int tempIndex = indexStart + 1; tempIndex < indexEnd; tempIndex++ )
       {
         result += m_HistogramVector[ tempIndex ];
       }
@@ -211,7 +211,7 @@ float mitk::ConnectomicsHistogramBase::GetRelativeBin( double start, double end 
 
 void mitk::ConnectomicsHistogramBase::UpdateYMax()
 {
-  for ( int index( 0 ); index < m_HistogramVector.size(); index++ )
+  for ( unsigned int index( 0 ); index < m_HistogramVector.size(); index++ )
   {
     if( m_HistogramVector[ index ] > m_TopValue )
     {

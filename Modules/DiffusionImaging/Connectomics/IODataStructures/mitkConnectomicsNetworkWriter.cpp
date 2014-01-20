@@ -90,7 +90,7 @@ void mitk::ConnectomicsNetworkWriter::GenerateData()
       TiXmlElement* verticesXML = new TiXmlElement(mitk::ConnectomicsNetworkDefinitions::XML_VERTICES);
       { // begin vertices section
         VertexVectorType vertexVector = this->GetInput()->GetVectorOfAllNodes();
-        for( int index = 0; index < vertexVector.size(); index++ )
+        for( unsigned int index = 0; index < vertexVector.size(); index++ )
         {
           // not localized as of yet TODO
           TiXmlElement* vertexXML = new TiXmlElement(mitk::ConnectomicsNetworkDefinitions::XML_VERTEX );
@@ -107,7 +107,7 @@ void mitk::ConnectomicsNetworkWriter::GenerateData()
       TiXmlElement* edgesXML = new TiXmlElement(mitk::ConnectomicsNetworkDefinitions::XML_EDGES);
       { // begin edges section
         EdgeVectorType edgeVector = this->GetInput()->GetVectorOfAllEdges();
-        for( int index = 0; index < edgeVector.size(); index++ )
+        for(unsigned  int index = 0; index < edgeVector.size(); index++ )
         {
           TiXmlElement* edgeXML = new TiXmlElement(mitk::ConnectomicsNetworkDefinitions::XML_EDGE );
           edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_ID , index );

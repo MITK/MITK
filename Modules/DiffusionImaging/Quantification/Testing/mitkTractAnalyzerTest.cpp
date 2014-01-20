@@ -69,7 +69,7 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
 
   // Output roi for debug purposes
   std::cout << "ROI\n";
-  for(int t=0; t<roi.size(); t++)
+  for(unsigned int t=0; t<roi.size(); t++)
   {
      itk::Index<3> ix = roi.at(t);
      std::cout << ix[0] << ", " << ix[1] << ", " << ix[2] << "\n";

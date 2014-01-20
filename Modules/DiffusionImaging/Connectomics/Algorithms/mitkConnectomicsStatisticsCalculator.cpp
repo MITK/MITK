@@ -175,7 +175,7 @@ void mitk::ConnectomicsStatisticsCalculator::CalculateAverageComponentSize()
 void mitk::ConnectomicsStatisticsCalculator::CalculateLargestComponentSize()
 {
   m_LargestComponentSize = 0;
-  std::vector<int> bins( m_NumberOfConnectedComponents );
+  std::vector<unsigned int> bins( m_NumberOfConnectedComponents );
 
   for(unsigned int i=0; i < m_NumberOfVertices; i++)
   {
@@ -573,7 +573,7 @@ void mitk::ConnectomicsStatisticsCalculator::CalculateSpectralMetrics()
   m_AdjacencyEnergy = 0;
   m_VectorOfSortedEigenValues.clear();
 
-  for(int i=0; i < m_NumberOfVertices; ++i)
+  for(unsigned int i=0; i < m_NumberOfVertices; ++i)
   {
     double value = std::fabs(eigenSystem.get_eigenvalue(i));
     m_VectorOfSortedEigenValues.push_back(value);
@@ -601,7 +601,7 @@ void mitk::ConnectomicsStatisticsCalculator::CalculateLaplacianMetrics()
   vnl_symmetric_eigensystem <double> laplacianEigenSystem( laplacianMatrix );
   m_LaplacianEnergy = 0;
   m_LaplacianTrace  = 0;
-  for(int i(0); i < m_NumberOfVertices; ++i)
+  for(unsigned int i(0); i < m_NumberOfVertices; ++i)
   {
     double value = std::fabs( laplacianEigenSystem.get_eigenvalue(i) );
     m_VectorOfSortedLaplacianEigenValues.push_back( value );
@@ -671,7 +671,7 @@ void  mitk::ConnectomicsStatisticsCalculator::CalculateNormalizedLaplacianMetric
   m_NormalizedLaplacianTrace = 0;
   m_NormalizedLaplacianEnergy = 0;
 
-  for(int i(0); i< m_NumberOfVertices; ++i)
+  for(unsigned int i(0); i< m_NumberOfVertices; ++i)
   {
     double eigenValue = std::fabs(normalizedLaplacianEigensystem.get_eigenvalue(i));
     m_VectorOfSortedNormalizedLaplacianEigenValues.push_back(eigenValue);

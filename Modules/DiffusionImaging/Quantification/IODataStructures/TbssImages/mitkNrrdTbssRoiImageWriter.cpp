@@ -69,7 +69,7 @@ void mitk::NrrdTbssRoiImageWriter::GenerateData()
     itk::Index<3> ix = *it;
 
     sprintf( keybuffer, "ROI_index_%04d", i );
-    sprintf( valbuffer, "%1d %1d %1d", ix[0],ix[1],ix[2]);
+    sprintf( valbuffer, "%ld %ld %ld", ix[0],ix[1],ix[2]);
 
     std::cout << valbuffer << std::endl;
 

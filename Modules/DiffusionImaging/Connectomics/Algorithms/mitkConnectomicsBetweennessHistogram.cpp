@@ -90,7 +90,7 @@ void mitk::ConnectomicsBetweennessHistogram::ConvertCentralityMapToHistogram()
 {
   double maximumFloat( 0.0 );
 
-  for ( int index( 0 ); index < m_CentralityMap.size(); index++ )
+  for ( unsigned int index( 0 ); index < m_CentralityMap.size(); index++ )
   {
     if( m_CentralityMap[ index ] > maximumFloat )
     {
@@ -117,7 +117,7 @@ void mitk::ConnectomicsBetweennessHistogram::ConvertCentralityMapToHistogram()
 
   m_HistogramVector.resize( maximumInt + 1 );
 
-  for ( int index( 0 ); index < m_CentralityMap.size(); index++ )
+  for ( unsigned int index( 0 ); index < m_CentralityMap.size(); index++ )
   {
     int value( 0 );
     value = Double2Int::convert( ( m_CentralityMap[index ] + 0.5 ) );

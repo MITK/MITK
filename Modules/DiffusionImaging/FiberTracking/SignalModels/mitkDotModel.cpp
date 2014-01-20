@@ -32,7 +32,7 @@ DotModel< ScalarType >::~DotModel()
 }
 
 template< class ScalarType >
-ScalarType DotModel< ScalarType >::SimulateMeasurement(int dir)
+ScalarType DotModel< ScalarType >::SimulateMeasurement(unsigned int /*dir*/)
 {
     return 1;
 }

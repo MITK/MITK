@@ -40,11 +40,11 @@ TPDPixelType>
     m_FaThreshold(0.2),
     m_StepSize(1),
     m_MaxLength(10000),
+    m_MinTractLength(0.0),
     m_SeedsPerVoxel(1),
     m_F(1.0),
     m_G(0.0),
     m_Interpolate(true),
-    m_MinTractLength(0.0),
     m_ResampleFibers(false)
 {
     // At least 1 inputs is necessary for a vector image.

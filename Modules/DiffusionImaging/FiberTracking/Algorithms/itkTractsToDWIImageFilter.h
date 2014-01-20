@@ -122,23 +122,6 @@ protected:
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using FFT and add k-space artifacts. */
     DoubleDwiType::Pointer DoKspaceStuff(std::vector< DoubleDwiType::Pointer >& images);
 
-    itk::Vector<double,3>               m_Spacing;              ///< output image spacing
-    itk::Vector<double,3>               m_UpsampledSpacing;
-    itk::Point<double,3>                m_Origin;               ///< output image origin
-    itk::Point<double,3>                m_UpsampledOrigin;
-    MatrixType                          m_DirectionMatrix;      ///< output image rotation
-    ImageRegion<3>                      m_ImageRegion;          ///< output image size
-    ImageRegion<3>                      m_UpsampledImageRegion;
-    ItkUcharImgType::Pointer            m_TissueMask;           ///< voxels outside of this binary mask contain only noise (are treated as air)
-    ItkDoubleImgType::Pointer           m_FrequencyMap;         ///< map of the B0 inhomogeneities
-    double                              m_kOffset;
-    double                              m_tLine;
-    double                              m_TE;
-    double                              m_tInhom;
-    FiberBundleType                     m_FiberBundle;          ///< input fiber bundle
-    DiffusionModelList                  m_FiberModels;          ///< generate signal of fiber compartments
-    DiffusionModelList                  m_NonFiberModels;       ///< generate signal of non-fiber compartments
-    NoiseModelType*                     m_NoiseModel;           ///< generates the noise added to the image values
     bool                                m_CircleDummy;
     unsigned int                        m_VolumeAccuracy;
     bool                                m_AddGibbsRinging;      ///< causes ringing artifacts
@@ -147,15 +130,32 @@ protected:
     double                              m_InterpolationShrink;
     double                              m_FiberRadius;
     double                              m_SignalScale;
-    mitk::LevelWindow                   m_LevelWindow;
+    double                              m_kOffset;
+    double                              m_tLine;
     bool                                m_UseInterpolation;
     std::vector< ItkDoubleImgType::Pointer >    m_VolumeFractions;  ///< one double image for each compartment containing the corresponding volume fraction per voxel
     bool                                m_SimulateRelaxation;
-    bool                                m_SimulateEddyCurrents;
+    double                              m_tInhom;
+    double                              m_TE;
+    ItkDoubleImgType::Pointer           m_FrequencyMap;         ///< map of the B0 inhomogeneities
     double                              m_EddyGradientStrength;
+    bool                                m_SimulateEddyCurrents;
     int                                 m_Spikes;
-    double                              m_SpikeAmplitude;
     double                              m_Wrap;
+    NoiseModelType*                     m_NoiseModel;           ///< generates the noise added to the image values
+    double                              m_SpikeAmplitude;
+    itk::Vector<double,3>               m_Spacing;              ///< output image spacing
+    itk::Vector<double,3>               m_UpsampledSpacing;
+    itk::Point<double,3>                m_Origin;               ///< output image origin
+    itk::Point<double,3>                m_UpsampledOrigin;
+    MatrixType                          m_DirectionMatrix;      ///< output image rotation
+    ImageRegion<3>                      m_ImageRegion;          ///< output image size
+    ImageRegion<3>                      m_UpsampledImageRegion;
+    ItkUcharImgType::Pointer            m_TissueMask;           ///< voxels outside of this binary mask contain only noise (are treated as air)
+    FiberBundleType                     m_FiberBundle;          ///< input fiber bundle
+    DiffusionModelList                  m_FiberModels;          ///< generate signal of fiber compartments
+    DiffusionModelList                  m_NonFiberModels;       ///< generate signal of non-fiber compartments
+    mitk::LevelWindow                   m_LevelWindow;
     VectorType                          m_MaxTranslation;
     VectorType                          m_MaxRotation;
     bool                                m_AddMotionArtifact;

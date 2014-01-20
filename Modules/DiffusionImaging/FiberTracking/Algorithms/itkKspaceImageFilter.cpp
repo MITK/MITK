@@ -35,11 +35,11 @@ namespace itk {
 template< class TPixelType >
 KspaceImageFilter< TPixelType >
 ::KspaceImageFilter()
-    : m_tLine(1)
-    , m_kOffset(0)
-    , m_FrequencyMap(NULL)
-    , m_SimulateRelaxation(true)
+    : m_SimulateRelaxation(true)
     , m_SimulateEddyCurrents(false)
+    , m_FrequencyMap(NULL)
+    , m_tLine(1)
+    , m_kOffset(0)
     , m_Tau(70)
     , m_EddyGradientMagnitude(30)
     , m_IsBaseline(true)

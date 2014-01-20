@@ -26,6 +26,8 @@ class FiberTracking_EXPORT GibbsEnergyComputer : public EnergyComputer
 
     GibbsEnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* mask, ParticleGrid* particleGrid, SphereInterpolator* interpolator, ItkRandGenType* randGen);
 
+    virtual ~GibbsEnergyComputer();
+
     // external energy calculation
     float ComputeExternalEnergy(vnl_vector_fixed<float, 3>& R, vnl_vector_fixed<float, 3>& N, Particle* dp);
 

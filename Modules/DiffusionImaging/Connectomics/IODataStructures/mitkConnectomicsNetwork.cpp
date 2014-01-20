@@ -118,7 +118,7 @@ bool mitk::ConnectomicsNetwork::VerifyRequestedRegion()
 {
   return true;
 }
-void mitk::ConnectomicsNetwork::SetRequestedRegion(const itk::DataObject *data )
+void mitk::ConnectomicsNetwork::SetRequestedRegion(const itk::DataObject * /*data*/ )
 {
 
 }
@@ -243,7 +243,7 @@ int mitk::ConnectomicsNetwork::GetNumberOfSelfLoops()
   std::vector< std::pair< std::pair< NetworkNode, NetworkNode > , NetworkEdge > >
     edgeVector =  GetVectorOfAllEdges();
 
-  for( int index = 0; index < edgeVector.size() ; index++ )
+  for( unsigned int index = 0; index < edgeVector.size() ; index++ )
   {
     double sourceX, sourceY, sourceZ, targetX, targetY, targetZ;
 
@@ -330,7 +330,7 @@ int mitk::ConnectomicsNetwork::GetMaximumDegree() const
 
   std::vector< int > vectorOfDegree = GetDegreeOfNodes();
 
-  for( int index( 0 ); index < vectorOfDegree.size(); ++index )
+  for( unsigned int index( 0 ); index < vectorOfDegree.size(); ++index )
   {
     if( maximumDegree < vectorOfDegree[ index ] )
     {
@@ -382,13 +382,13 @@ std::vector< double > mitk::ConnectomicsNetwork::GetClusteringCoefficientsByDegr
   // where N_{k} is the number of vertices of degree k
   // Y(k) is the set of vertices of degree k
   // c_{i} is the local clustering coefficient of vertex i
-  for( int degree( 0 ); degree < vectorOfClusteringCoefficientsByDegree.size(); ++degree )
+  for( unsigned int degree( 0 ); degree < vectorOfClusteringCoefficientsByDegree.size(); ++degree )
   {
     vectorOfClusteringCoefficientsByDegree[ degree ] = 0;
     int n_k( 0 );
-    for( int index( 0 ); index < vectorOfDegree.size(); ++index )
+    for( unsigned int index( 0 ); index < vectorOfDegree.size(); ++index )
     {
-      if( degree == vectorOfDegree[ index ] )
+      if( degree == (unsigned int)vectorOfDegree[ index ] )
       {// if in Y( degree )
         vectorOfClusteringCoefficientsByDegree[ degree ] += vectorOfClusteringCoefficients[ index ];
         n_k++;
@@ -415,7 +415,7 @@ double mitk::ConnectomicsNetwork::GetGlobalClusteringCoefficient( )
 
   int normalizationParameter( 0 );
 
-  for( int index( 0 ); index < vectorOfDegree.size(); ++index )
+  for( unsigned int index( 0 ); index < vectorOfDegree.size(); ++index )
   {
     degreeDistribution[ vectorOfDegree[ index ] ]++;
     normalizationParameter++;
@@ -423,7 +423,7 @@ double mitk::ConnectomicsNetwork::GetGlobalClusteringCoefficient( )
   // c_{mean} = sum_{k} P_{k} c_{mean}(k)
   // where P_{k} is the degree distribution
   // k is the degree
-  for( int degree( 0 ); degree < degreeDistribution.size(); ++degree )
+  for( unsigned int degree( 0 ); degree < degreeDistribution.size(); ++degree )
   {
     globalClusteringCoefficient +=
       degreeDistribution[ degree ] / ( (double) normalizationParameter)
@@ -458,7 +458,7 @@ void mitk::ConnectomicsNetwork::ImportNetwort( mitk::ConnectomicsNetwork::Pointe
   EdgeVectorType edgeVector = source->GetVectorOfAllEdges();
   std::map< int, VertexDescriptorType > idToVertexMap;
 
-  for( int loop(0); loop < vertexVector.size(); loop++ )
+  for( unsigned int loop(0); loop < vertexVector.size(); loop++ )
   {
     VertexDescriptorType newVertex = this->AddVertex( vertexVector[ loop ].id );
     this->SetLabel( newVertex, vertexVector[ loop ].label );
@@ -472,7 +472,7 @@ void mitk::ConnectomicsNetwork::ImportNetwort( mitk::ConnectomicsNetwork::Pointe
     idToVertexMap.insert( std::pair< int, VertexDescriptorType >( vertexVector[ loop ].id, newVertex) );
   }
 
-  for( int loop(0); loop < edgeVector.size(); loop++ )
+  for( unsigned int loop(0); loop < edgeVector.size(); loop++ )
   {
     VertexDescriptorType source = idToVertexMap.find( edgeVector[ loop ].second.sourceId )->second;
     VertexDescriptorType target = idToVertexMap.find( edgeVector[ loop ].second.targetId )->second;
@@ -527,7 +527,7 @@ void mitk::ConnectomicsNetwork::UpdateBounds( )
   // for each direction, make certain the point is in between
   for( int index(0), end(nodeVector.size()) ; index < end; index++ )
   {
-    for( int direction(0); direction < nodeVector.at( index ).coordinates.size(); direction++ )
+    for( unsigned int direction(0); direction < nodeVector.at( index ).coordinates.size(); direction++ )
     {
       if( nodeVector.at( index ).coordinates.at(direction) < bounds[ 2 * direction ]  )
       {

@@ -36,7 +36,7 @@ class DiffusionNoiseModel
 public:
 
     DiffusionNoiseModel(){}
-    ~DiffusionNoiseModel(){}
+    virtual ~DiffusionNoiseModel(){}
 
     typedef itk::VariableLengthVector< ScalarType > PixelType;
 

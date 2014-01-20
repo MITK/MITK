@@ -354,6 +354,8 @@ set(CPP_FILES
   Rendering/vtkNeverTranslucentTexture.cpp
   Rendering/mitkRenderingTestHelper.cpp
 
+  Rendering/vtkMitkShaderTexture.cpp
+
   Rendering/mitkOverlay.cpp
   Rendering/mitkVtkOverlay.cpp
   Rendering/mitkVtkOverlay2D.cpp

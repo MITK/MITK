@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageReadAccessor.h"
 #include <mitkNavigationDataSmoothingFilter.h>
 #include <mitkNavigationDataDelayFilter.h>
+#include "mitkTrackingDeviceSource.h"
 
 // US Control Interfaces
 #include "mitkUSControlInterfaceProbes.h"
@@ -206,10 +207,16 @@ bool mitk::USCombinedModality::OnDisconnection()
 
 bool mitk::USCombinedModality::OnActivation()
 {
-  if (m_UltrasoundDevice.IsNull())
+  if ( m_UltrasoundDevice.IsNull() )
   {
     MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
     mitkThrow() << "UltrasoundDevice must not be null.";
+  }
+
+  mitk::TrackingDeviceSource::Pointer trackingDeviceSource = dynamic_cast<mitk::TrackingDeviceSource*>(m_TrackingDevice.GetPointer());
+  if ( trackingDeviceSource.IsNull() || ! trackingDeviceSource->StartTracking() )
+  {
+    MITK_WARN("USCombinedModality")("USDevice") << "Cannot start tracking.";
   }
 
   return m_UltrasoundDevice->Activate();
@@ -217,10 +224,16 @@ bool mitk::USCombinedModality::OnActivation()
 
 bool mitk::USCombinedModality::OnDeactivation()
 {
-  if (m_UltrasoundDevice.IsNull())
+  if ( m_UltrasoundDevice.IsNull() )
   {
     MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
     mitkThrow() << "UltrasoundDevice must not be null.";
+  }
+
+  mitk::TrackingDeviceSource::Pointer trackingDeviceSource = dynamic_cast<mitk::TrackingDeviceSource*>(m_TrackingDevice.GetPointer());
+  if ( trackingDeviceSource.IsNull() || ! trackingDeviceSource->StopTracking() )
+  {
+    MITK_WARN("USCombinedModality")("USDevice") << "Cannot stop tracking.";
   }
 
   m_UltrasoundDevice->Deactivate();

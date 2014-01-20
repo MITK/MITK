@@ -37,7 +37,7 @@ TensorModel< ScalarType >::~TensorModel()
 }
 
 template< class ScalarType >
-ScalarType TensorModel< ScalarType >::SimulateMeasurement(int dir)
+ScalarType TensorModel< ScalarType >::SimulateMeasurement(unsigned int dir)
 {
     ScalarType signal = 0;
 

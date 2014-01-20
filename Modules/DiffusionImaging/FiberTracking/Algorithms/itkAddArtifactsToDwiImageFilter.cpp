@@ -157,7 +157,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         if (m_kOffset>0)
             m_StatusText += this->GetTime()+" > Simulating ghosts\n";
 
-        std::vector< int > spikeVolume;
+        std::vector< unsigned int > spikeVolume;
         for (int i=0; i<m_Spikes; i++)
             spikeVolume.push_back(m_RandGen->GetIntegerVariate()%inputImage->GetVectorLength());
         std::sort (spikeVolume.begin(), spikeVolume.end());

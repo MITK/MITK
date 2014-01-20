@@ -46,7 +46,7 @@ public:
 
     /** Realizes actual signal generation. Has to be implemented in subclass. **/
     virtual PixelType SimulateMeasurement() = 0;
-    virtual ScalarType SimulateMeasurement(int dir) = 0;
+    virtual ScalarType SimulateMeasurement(unsigned int dir) = 0;
 
     GradientType GetGradientDirection(int i) { return m_GradientList.at(i); }
     void SetFiberDirection(GradientType fiberDirection){ m_FiberDirection = fiberDirection; }
@@ -72,7 +72,7 @@ public:
                 return i;
         return -1;
     }
-    bool IsBaselineIndex(int idx)
+    bool IsBaselineIndex(unsigned int idx)
     {
         if (m_GradientList.size()>idx && m_GradientList.at(idx).GetNorm()<0.0001)
             return true;

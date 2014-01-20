@@ -34,7 +34,7 @@ StickModel< ScalarType >::~StickModel()
 }
 
 template< class ScalarType >
-ScalarType StickModel< ScalarType >::SimulateMeasurement(int dir)
+ScalarType StickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
 {
     ScalarType signal = 0;
 

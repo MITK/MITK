@@ -42,7 +42,7 @@ public:
 
     /** Actual signal generation **/
     PixelType SimulateMeasurement();
-    ScalarType SimulateMeasurement(int dir);
+    ScalarType SimulateMeasurement(unsigned int dir);
 
     void SetSeed(int s);    ///< set seed for random generator that creates the stick orientations
 

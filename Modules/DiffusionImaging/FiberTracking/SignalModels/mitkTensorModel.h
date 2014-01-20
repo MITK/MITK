@@ -41,7 +41,7 @@ public:
 
     /** Actual signal generation **/
     PixelType SimulateMeasurement();
-    ScalarType SimulateMeasurement(int dir);
+    ScalarType SimulateMeasurement(unsigned int dir);
 
     void SetBvalue(ScalarType bValue) { m_BValue = bValue; }
     void SetDiffusivity1(ScalarType d1){ m_KernelTensorMatrix[0][0] = d1; }

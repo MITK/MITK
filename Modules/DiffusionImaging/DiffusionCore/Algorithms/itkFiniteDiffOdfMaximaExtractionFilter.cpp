@@ -78,7 +78,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
         {
             flag = true;
             std::vector< int > neighbours = odf.GetNeighbors(i);
-            for (int j=0; j<neighbours.size(); j++)
+            for (unsigned int j=0; j<neighbours.size(); j++)
                 if (val<=odf.GetElement(neighbours.at(j)))
                 {
                     flag = false;
@@ -88,7 +88,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
             {
                 container.push_back(odf.GetDirection(i).normalize());
                 used[i] = true;
-                for (int j=0; j<neighbours.size(); j++)
+                for (unsigned int j=0; j<neighbours.size(); j++)
                     used[neighbours.at(j)] = true;
             }
         }
@@ -123,7 +123,7 @@ std::vector< vnl_vector_fixed< double, 3 > >  FiniteDiffOdfMaximaExtractionFilte
             workingMean = oldMean;
             workingMean.normalize();
             currentMean.fill(0.0);
-            for (int i=0; i<inDirs.size(); i++)
+            for (unsigned int i=0; i<inDirs.size(); i++)
             {
                 angle = dot_product(workingMean, inDirs[i]);
                 if (angle>=m_ClusteringThreshold)
@@ -154,7 +154,7 @@ std::vector< vnl_vector_fixed< double, 3 > >  FiniteDiffOdfMaximaExtractionFilte
 
         // find next unused seed
         free = false;
-        for (int i=0; i<touched.size(); i++)
+        for (unsigned int i=0; i<touched.size(); i++)
             if (touched[i]==0)
             {
                 currentMean = inDirs[i];
@@ -194,7 +194,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
     }
 
     m_DirectionImageContainer = ItkDirectionImageContainer::New();
-    for (int i=0; i<m_MaxNumPeaks; i++)
+    for (unsigned int i=0; i<m_MaxNumPeaks; i++)
     {
         itk::Vector< float, 3 > nullVec; nullVec.Fill(0.0);
         ItkDirectionImage::Pointer img = ItkDirectionImage::New();
@@ -278,7 +278,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
             continue;
         }
 
-        for (int i=0; i<m_DirectionImageContainer->Size(); i++)
+        for (unsigned int i=0; i<m_DirectionImageContainer->Size(); i++)
         {
             ItkDirectionImage::Pointer img = m_DirectionImageContainer->GetElement(i);
             itk::Vector< float, 3 > pixel = img->GetPixel(index);
@@ -314,7 +314,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
     directionsPolyData->SetLines(m_VtkCellArray);
     m_OutputFiberBundle = mitk::FiberBundleX::New(directionsPolyData);
 
-    for (int i=0; i<m_DirectionImageContainer->Size(); i++)
+    for (unsigned int i=0; i<m_DirectionImageContainer->Size(); i++)
     {
         ItkDirectionImage::Pointer img = m_DirectionImageContainer->GetElement(i);
         this->SetNthOutput(i, img);
@@ -367,7 +367,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
         Cart2Sph(candidates, sphCoords);                // convert candidate peaks to spherical angles
         shBasis = CalcShBasis(sphCoords);            // evaluate spherical harmonics at each peak
         max = 0.0;
-        for (int i=0; i<candidates.size(); i++)         // scale peaks according to ODF value
+        for (unsigned int i=0; i<candidates.size(); i++)         // scale peaks according to ODF value
         {
             double val = 0;
             for (int j=0; j<m_NumCoeffs; j++)
@@ -379,10 +379,10 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
         std::sort( peaks.begin(), peaks.end(), CompareVectors );  // sort peaks
 
         // kick out directions to close to a larger direction (too far away to cluster but too close to keep)
-        int m = peaks.size();
+        unsigned int m = peaks.size();
         if ( m>m_DirectionImageContainer->Size() )
             m = m_DirectionImageContainer->Size();
-        for (int i=0; i<m; i++)
+        for (unsigned int i=0; i<m; i++)
         {
             DirectionType v1 = peaks.at(i);
             double val = v1.magnitude();
@@ -390,7 +390,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
                 break;
 
             bool flag = true;
-            for (int j=0; j<peaks.size(); j++)
+            for (unsigned int j=0; j<peaks.size(); j++)
                 if (i!=j)
                 {
                     DirectionType v2 = peaks.at(j);
@@ -409,10 +409,10 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
         peaks = temp;
 
         // fill output image
-        int num = peaks.size();
+        unsigned int num = peaks.size();
         if ( num>m_DirectionImageContainer->Size() )
             num = m_DirectionImageContainer->Size();
-        for (int i=0; i<num; i++)
+        for (unsigned int i=0; i<num; i++)
         {
             vnl_vector<double> dir = peaks.at(i);
 
@@ -452,7 +452,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
 {
     sphCoords.set_size(dir.size(), 2);
 
-    for (int i=0; i<dir.size(); i++)
+    for (unsigned int i=0; i<dir.size(); i++)
     {
         double mag = dir[i].magnitude();
 

@@ -149,7 +149,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
     boost::progress_display disp(2*images.at(0)->GetVectorLength()*images.at(0)->GetLargestPossibleRegion().GetSize(2));
     for (unsigned int g=0; g<images.at(0)->GetVectorLength(); g++)
     {
-        std::vector< int > spikeSlice;
+        std::vector< unsigned int > spikeSlice;
         while (!spikeVolume.empty() && spikeVolume.back()==g)
         {
             spikeSlice.push_back(m_RandGen->GetIntegerVariate()%images.at(0)->GetLargestPossibleRegion().GetSize(2));
@@ -218,7 +218,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
             idft->SetFrequencyMap(fMapSlice);
             idft->SetSignalScale(m_SignalScale);
             idft->SetOutSize(outSize);
-            int numSpikes = 0;
+            unsigned int numSpikes = 0;
             while (!spikeSlice.empty() && spikeSlice.back()==z)
             {
                 numSpikes++;
@@ -233,7 +233,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
 
             ++disp;
             unsigned long newTick = 50*disp.count()/disp.expected_count();
-            for (int tick = 0; tick<(newTick-lastTick); tick++)
+            for (unsigned int tick = 0; tick<(newTick-lastTick); tick++)
                 m_StatusText += "*";
             lastTick = newTick;
 
@@ -257,7 +257,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                 }
             ++disp;
             newTick = 50*disp.count()/disp.expected_count();
-            for (int tick = 0; tick<(newTick-lastTick); tick++)
+            for (unsigned int tick = 0; tick<(newTick-lastTick); tick++)
                 m_StatusText += "*";
             lastTick = newTick;
         }
@@ -685,7 +685,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             }
             ++disp;
             unsigned long newTick = 50*disp.count()/disp.expected_count();
-            for (int tick = 0; tick<(newTick-lastTick); tick++)
+            for (unsigned int tick = 0; tick<(newTick-lastTick); tick++)
                 m_StatusText += "*";
             lastTick = newTick;
         }
@@ -882,7 +882,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
         ++disp2;
         unsigned long newTick = 50*disp2.count()/disp2.expected_count();
-        for (int tick = 0; tick<(newTick-lastTick); tick++)
+        for (unsigned int tick = 0; tick<(newTick-lastTick); tick++)
             m_StatusText += "*";
         lastTick = newTick;
 

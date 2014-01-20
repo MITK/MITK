@@ -139,9 +139,9 @@ float GibbsEnergyComputer::ComputeExternalEnergy(vnl_vector_fixed<float, 3> &R, 
         if (dp != neighbour)                        // don't evaluate against itself
         {
             // see Reisert et al. "Global Reconstruction of Neuronal Fibers", MICCAI 2009
-            float dot = fabs(dot_product(N,neighbour->dir));
+            float dot = fabs(dot_product(N,neighbour->GetDir()));
             float bw = mbesseli0(dot);
-            float dpos = (neighbour->pos-R).squared_magnitude();
+            float dpos = (neighbour->GetPos()-R).squared_magnitude();
             float w = mexp(dpos*gamma_s);
             modelVal += w*(bw+m_ParticleChemicalPotential);
             w = mexp(dpos*gamma_reg_s);
@@ -190,19 +190,19 @@ float GibbsEnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1)
 float GibbsEnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1, Particle *p2, int ep2)
 {
     // see Reisert et al. "Global Reconstruction of Neuronal Fibers", MICCAI 2009
-    if ((dot_product(p1->dir,p2->dir))*ep1*ep2 > -m_CurvatureThreshold)     // angle between particles is too sharp
+    if ((dot_product(p1->GetDir(),p2->GetDir()))*ep1*ep2 > -m_CurvatureThreshold)     // angle between particles is too sharp
         return itk::NumericTraits<float>::NonpositiveMin();
 
     // calculate the endpoints of the two particles
-    vnl_vector_fixed<float, 3> endPoint1 = p1->pos + (p1->dir * (m_ParticleLength * ep1));
-    vnl_vector_fixed<float, 3> endPoint2 = p2->pos + (p2->dir * (m_ParticleLength * ep2));
+    vnl_vector_fixed<float, 3> endPoint1 = p1->GetPos() + (p1->GetDir() * (m_ParticleLength * ep1));
+    vnl_vector_fixed<float, 3> endPoint2 = p2->GetPos() + (p2->GetDir() * (m_ParticleLength * ep2));
 
     // check if endpoints are too far apart to connect
     if ((endPoint1-endPoint2).squared_magnitude() > m_SquaredParticleLength)
         return itk::NumericTraits<float>::NonpositiveMin();
 
     // calculate center point of the two particles
-    vnl_vector_fixed<float, 3> R = (p2->pos + p1->pos); R *= 0.5;
+    vnl_vector_fixed<float, 3> R = (p2->GetPos() + p1->GetPos()); R *= 0.5;
 
     // they are not allowed to connect if the mask image does not allow it
     if (SpatProb(R) == 0)

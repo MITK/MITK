@@ -147,7 +147,7 @@ Particle* ParticleGrid::NewParticle(vnl_vector_fixed<float, 3> R)
     if (m_OccupationCount[idx] < m_CellCapacity)
     {
         Particle *p = &(m_Particles[m_NumParticles]);
-        p->pos = R;
+        p->GetPos() = R;
         p->mID = -1;
         p->pID = -1;
         m_NumParticles++;
@@ -167,17 +167,17 @@ bool ParticleGrid::TryUpdateGrid(int k)
 {
     Particle* p = &(m_Particles[k]);
 
-    int xint = int(p->pos[0]*m_GridScale[0]);
+    int xint = int(p->GetPos()[0]*m_GridScale[0]);
     if (xint < 0)
         return false;
     if (xint >= m_GridSize[0])
         return false;
-    int yint = int(p->pos[1]*m_GridScale[1]);
+    int yint = int(p->GetPos()[1]*m_GridScale[1]);
     if (yint < 0)
         return false;
     if (yint >= m_GridSize[1])
         return false;
-    int zint = int(p->pos[2]*m_GridScale[2]);
+    int zint = int(p->GetPos()[2]*m_GridScale[2]);
     if (zint < 0)
         return false;
     if (zint >= m_GridSize[2])

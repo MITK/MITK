@@ -106,8 +106,8 @@ void MetropolisHastingsSampler::MakeProposal()
         m_EnergyComputer->DrawRandomPosition(R);
         vnl_vector_fixed<float, 3> N = GetRandomDirection();
         Particle prop;
-        prop.pos = R;
-        prop.dir = N;
+        prop.GetPos() = R;
+        prop.GetDir() = N;
 
         float prob =  m_Density * m_DeathProb /((m_BirthProb)*(m_ParticleGrid->m_NumParticles+1));
 
@@ -120,8 +120,8 @@ void MetropolisHastingsSampler::MakeProposal()
             Particle *p = m_ParticleGrid->NewParticle(R);
             if (p!=0)
             {
-                p->pos = R;
-                p->dir = N;
+                p->GetPos() = R;
+                p->GetDir() = N;
                 m_AcceptedProposals++;
             }
         }
@@ -135,7 +135,7 @@ void MetropolisHastingsSampler::MakeProposal()
             Particle *dp = m_ParticleGrid->GetParticle(pnum);
             if (dp->pID == -1 && dp->mID == -1)
             {
-                float ex_energy = m_EnergyComputer->ComputeExternalEnergy(dp->pos,dp->dir,dp);
+                float ex_energy = m_EnergyComputer->ComputeExternalEnergy(dp->GetPos(),dp->GetDir(),dp);
                 float in_energy = m_EnergyComputer->ComputeInternalEnergy(dp);
 
                 float prob = m_ParticleGrid->m_NumParticles * (m_BirthProb) /(m_Density*m_DeathProb); //*SpatProb(dp->R);
@@ -158,26 +158,26 @@ void MetropolisHastingsSampler::MakeProposal()
             Particle *p =  m_ParticleGrid->GetParticle(pnum);
             Particle prop_p = *p;
 
-            DistortVector(m_Sigma, prop_p.pos);
-            DistortVector(m_Sigma/(2*m_ParticleLength), prop_p.dir);
-            prop_p.dir.normalize();
+            DistortVector(m_Sigma, prop_p.GetPos());
+            DistortVector(m_Sigma/(2*m_ParticleLength), prop_p.GetDir());
+            prop_p.GetDir().normalize();
 
 
-            float ex_energy = m_EnergyComputer->ComputeExternalEnergy(prop_p.pos,prop_p.dir,p)
-                    - m_EnergyComputer->ComputeExternalEnergy(p->pos,p->dir,p);
+            float ex_energy = m_EnergyComputer->ComputeExternalEnergy(prop_p.GetPos(),prop_p.GetDir(),p)
+                    - m_EnergyComputer->ComputeExternalEnergy(p->GetPos(),p->GetDir(),p);
             float in_energy = m_EnergyComputer->ComputeInternalEnergy(&prop_p) - m_EnergyComputer->ComputeInternalEnergy(p);
 
             float prob = exp(ex_energy/m_ExTemp+in_energy/m_InTemp);
             if (m_RandGen->GetVariate() < prob)
             {
-                vnl_vector_fixed<float, 3> Rtmp = p->pos;
-                vnl_vector_fixed<float, 3> Ntmp = p->dir;
-                p->pos = prop_p.pos;
-                p->dir = prop_p.dir;
+                vnl_vector_fixed<float, 3> Rtmp = p->GetPos();
+                vnl_vector_fixed<float, 3> Ntmp = p->GetDir();
+                p->GetPos() = prop_p.GetPos();
+                p->GetDir() = prop_p.GetDir();
                 if (!m_ParticleGrid->TryUpdateGrid(pnum))
                 {
-                    p->pos = Rtmp;
-                    p->dir = Ntmp;
+                    p->GetPos() = Rtmp;
+                    p->GetDir() = Ntmp;
                 }
                 m_AcceptedProposals++;
             }
@@ -200,49 +200,49 @@ void MetropolisHastingsSampler::MakeProposal()
                 int ep_plus = (plus->pID == p->ID)? 1 : -1;
                 Particle *minus = m_ParticleGrid->GetParticle(p->mID);
                 int ep_minus = (minus->pID == p->ID)? 1 : -1;
-                prop_p.pos = (plus->pos + plus->dir * (m_ParticleLength * ep_plus)  + minus->pos + minus->dir * (m_ParticleLength * ep_minus));
-                prop_p.pos *= 0.5;
-                prop_p.dir = plus->pos - minus->pos;
-                prop_p.dir.normalize();
+                prop_p.GetPos() = (plus->GetPos() + plus->GetDir() * (m_ParticleLength * ep_plus)  + minus->GetPos() + minus->GetDir() * (m_ParticleLength * ep_minus));
+                prop_p.GetPos() *= 0.5;
+                prop_p.GetDir() = plus->GetPos() - minus->GetPos();
+                prop_p.GetDir().normalize();
             }
             else if (p->pID != -1)
             {
                 Particle *plus = m_ParticleGrid->GetParticle(p->pID);
                 int ep_plus = (plus->pID == p->ID)? 1 : -1;
-                prop_p.pos = plus->pos + plus->dir * (m_ParticleLength * ep_plus * 2);
-                prop_p.dir = plus->dir;
+                prop_p.GetPos() = plus->GetPos() + plus->GetDir() * (m_ParticleLength * ep_plus * 2);
+                prop_p.GetDir() = plus->GetDir();
             }
             else if (p->mID != -1)
             {
                 Particle *minus = m_ParticleGrid->GetParticle(p->mID);
                 int ep_minus = (minus->pID == p->ID)? 1 : -1;
-                prop_p.pos = minus->pos + minus->dir * (m_ParticleLength * ep_minus * 2);
-                prop_p.dir = minus->dir;
+                prop_p.GetPos() = minus->GetPos() + minus->GetDir() * (m_ParticleLength * ep_minus * 2);
+                prop_p.GetDir() = minus->GetDir();
             }
             else
                 no_proposal = true;
 
             if (!no_proposal)
             {
-                float cos = dot_product(prop_p.dir, p->dir);
-                float p_rev = exp(-((prop_p.pos-p->pos).squared_magnitude() + (1-cos*cos))*m_Gamma)/m_Z;
+                float cos = dot_product(prop_p.GetDir(), p->GetDir());
+                float p_rev = exp(-((prop_p.GetPos()-p->GetPos()).squared_magnitude() + (1-cos*cos))*m_Gamma)/m_Z;
 
-                float ex_energy = m_EnergyComputer->ComputeExternalEnergy(prop_p.pos,prop_p.dir,p)
-                        - m_EnergyComputer->ComputeExternalEnergy(p->pos,p->dir,p);
+                float ex_energy = m_EnergyComputer->ComputeExternalEnergy(prop_p.GetPos(),prop_p.GetDir(),p)
+                        - m_EnergyComputer->ComputeExternalEnergy(p->GetPos(),p->GetDir(),p);
                 float in_energy = m_EnergyComputer->ComputeInternalEnergy(&prop_p) - m_EnergyComputer->ComputeInternalEnergy(p);
 
                 float prob = exp(ex_energy/m_ExTemp+in_energy/m_InTemp)*m_ShiftProb*p_rev/(m_OptShiftProb+m_ShiftProb*p_rev);
 
                 if (m_RandGen->GetVariate() < prob)
                 {
-                    vnl_vector_fixed<float, 3> Rtmp = p->pos;
-                    vnl_vector_fixed<float, 3> Ntmp = p->dir;
-                    p->pos = prop_p.pos;
-                    p->dir = prop_p.dir;
+                    vnl_vector_fixed<float, 3> Rtmp = p->GetPos();
+                    vnl_vector_fixed<float, 3> Ntmp = p->GetDir();
+                    p->GetPos() = prop_p.GetPos();
+                    p->GetDir() = prop_p.GetDir();
                     if (!m_ParticleGrid->TryUpdateGrid(pnum))
                     {
-                        p->pos = Rtmp;
-                        p->dir = Ntmp;
+                        p->GetPos() = Rtmp;
+                        p->GetDir() = Ntmp;
                     }
                     m_AcceptedProposals++;
                 }
@@ -427,7 +427,7 @@ void MetropolisHastingsSampler::ComputeEndPointProposalDistribution(EndPoint P)
     int ep = P.ep;
 
     float dist,dot;
-    vnl_vector_fixed<float, 3> R = p->pos + (p->dir * (ep*m_ParticleLength) );
+    vnl_vector_fixed<float, 3> R = p->GetPos() + (p->GetDir() * (ep*m_ParticleLength) );
     m_ParticleGrid->ComputeNeighbors(R);
     m_SimpSamp.clear();
 
@@ -441,10 +441,10 @@ void MetropolisHastingsSampler::ComputeEndPointProposalDistribution(EndPoint P)
         {
             if (p2->mID == -1)
             {
-                dist = (p2->pos - p2->dir * m_ParticleLength - R).squared_magnitude();
+                dist = (p2->GetPos() - p2->GetDir() * m_ParticleLength - R).squared_magnitude();
                 if (dist < m_DistanceThreshold)
                 {
-                    dot = dot_product(p2->dir,p->dir) * ep;
+                    dot = dot_product(p2->GetDir(),p->GetDir()) * ep;
                     if (dot > m_CurvatureThreshold)
                     {
                         float en = m_EnergyComputer->ComputeInternalEnergyConnection(p,ep,p2,-1);
@@ -454,10 +454,10 @@ void MetropolisHastingsSampler::ComputeEndPointProposalDistribution(EndPoint P)
             }
             if (p2->pID == -1)
             {
-                dist = (p2->pos + p2->dir * m_ParticleLength - R).squared_magnitude();
+                dist = (p2->GetPos() + p2->GetDir() * m_ParticleLength - R).squared_magnitude();
                 if (dist < m_DistanceThreshold)
                 {
-                    dot = dot_product(p2->dir,p->dir) * (-ep);
+                    dot = dot_product(p2->GetDir(),p->GetDir()) * (-ep);
                     if (dot > m_CurvatureThreshold)
                     {
                         float en = m_EnergyComputer->ComputeInternalEnergyConnection(p,ep,p2,+1);

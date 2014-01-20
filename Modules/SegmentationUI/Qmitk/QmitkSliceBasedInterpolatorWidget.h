@@ -17,11 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkSliceBasedInterpolatorWidget_h_Included
 #define QmitkSliceBasedInterpolatorWidget_h_Included
 
-#include "mitkSliceNavigationController.h"
 #include "SegmentationUIExports.h"
 #include "mitkDataStorage.h"
 #include "mitkSegmentationInterpolationController.h"
-#include "mitkContourModelSet.h"
+#include "mitkSliceNavigationController.h"
 
 #include <map>
 
@@ -189,9 +188,6 @@ private:
 
     mitk::DataNode::Pointer  m_PreviewNode;
     mitk::Image::Pointer     m_PreviewImage;
-
-    //mitk::DataNode::Pointer m_FeedbackContourNode;
-    //mitk::ContourModelSet::Pointer m_FeedbackContour;
 
     mitk::LabelSetImage::Pointer m_WorkingImage;
 

@@ -25,17 +25,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffSliceOperation.h"
 #include <mitkDiffSliceOperationApplier.h>
 #include <mitkUndoController.h>
-#include <mitkToolManager.h>
 #include <mitkSegTool2D.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkVtkImageOverwrite.h>
 #include <mitkExtractSliceFilter.h>
 #include <mitkLabelSetImage.h>
 #include <mitkImageTimeSelector.h>
-#include <mitkImageToContourModelSetFilter.h>
-#include <mitkContourUtils.h>
 #include <mitkImageCast.h>
 #include <mitkToolManagerProvider.h>
+#include <mitkToolManager.h>
 #include <mitkImageAccessByItk.h>
 
 #include "QmitkStdMultiWidget.h"

@@ -46,7 +46,8 @@ short TrackVis::create(string filename , itk::Size<3> size, itk::Point<float,3> 
         return 0;
     }
     sprintf(hdr.id_string,"TRACK");
-    fwrite((char*)&hdr, 1, 1000, fp);
+    if (fwrite((char*)&hdr, 1, 1000, fp) != 1000)
+      MITK_ERROR << "TrackVis::create : Error occurding during writing fiber.";
 
     this->filename = filename;
 
@@ -142,7 +143,9 @@ short TrackVis::read( mitk::FiberBundleX* fib )
         float tmp[3];
         for(int i=0; i<numPoints; i++)
         {
-            fread((char*)tmp, 1, 12, fp);
+            if (fread((char*)tmp, 1, 12, fp) == 0)
+              MITK_ERROR << "TrackVis::read: Error during read.";
+
             tmp[0] = -tmp[0];
             tmp[1] = -tmp[1];
             vtkIdType id = vtkNewPoints->InsertNextPoint(tmp);
@@ -166,14 +169,16 @@ short TrackVis::read( mitk::FiberBundleX* fib )
 void TrackVis::updateTotal( int totFibers )
 {
     fseek(fp, 1000-12, SEEK_SET);
-    fwrite((char*)&totFibers, 1, 4, fp);
+    if (fwrite((char*)&totFibers, 1, 4, fp) != 4)
+      MITK_ERROR << "[ERROR] Problems saving the fiber!";
 }
 
 
 void TrackVis::writeHdr()
 {
     fseek(fp, 0, SEEK_SET);
-    fwrite((char*)&hdr, 1, 1000, fp);
+    if (fwrite((char*)&hdr, 1, 1000, fp) != 1000)
+      MITK_ERROR << "[ERROR] Problems saving the fiber!";
 }
 
 

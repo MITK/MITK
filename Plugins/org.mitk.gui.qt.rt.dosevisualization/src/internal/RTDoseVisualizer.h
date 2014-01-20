@@ -33,6 +33,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDoseVisPreferenceHelper.h"
 
+// Shader
+#include <mitkCoreServices.h>
+#include <mitkIShaderRepository.h>
+#include <mitkShaderProperty.h>
+
 /*forward declarations*/
 class QmitkIsoDoseLevelSetModel;
 class QmitkDoseColorDelegate;

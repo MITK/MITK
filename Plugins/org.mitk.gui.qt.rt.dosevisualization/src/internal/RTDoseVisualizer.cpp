@@ -49,6 +49,13 @@ RTDoseVisualizer::RTDoseVisualizer()
     m_selectedPresetName = "";
     m_internalUpdate = false;
     m_PrescribedDose_Data = 0.0;
+
+    mitk::CoreServicePointer<mitk::IShaderRepository> shaderRepo(mitk::CoreServices::GetShaderRepository());
+    std::string path = "/home/riecker/mitkShaderLightning.xml";
+    std::string isoShaderName = "mitkIsoLineShader";
+    MITK_INFO << "shader found under: " << path;
+    std::ifstream str(path.c_str());
+    shaderRepo->LoadShader(str,isoShaderName);
 }
 
 RTDoseVisualizer::~RTDoseVisualizer()
@@ -280,7 +287,7 @@ void RTDoseVisualizer::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sour
   const QList<mitk::DataNode::Pointer>& nodes )
 {
   QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
-  
+
   mitk::DataNode* selectedNode = NULL;
 
   if (!dataNodes.empty())
@@ -298,7 +305,7 @@ void RTDoseVisualizer::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sour
   {
     m_selectedNode = selectedNode;
   }
-  
+
   UpdateBySelectedNode();
 }
 
@@ -319,7 +326,7 @@ void RTDoseVisualizer::UpdateBySelectedNode()
     ///////////////////////////////////////////
     //dose specific information
     int fracCount = 1;
-    m_selectedNode->GetIntProperty(mitk::rt::Constants::DOSE_FRACTION_COUNT_PROPERTY_NAME.c_str(),fracCount);   
+    m_selectedNode->GetIntProperty(mitk::rt::Constants::DOSE_FRACTION_COUNT_PROPERTY_NAME.c_str(),fracCount);
     m_Controls.NrOfFractions->setText(QString::number(fracCount));
 
     m_PrescribedDose_Data = 0.0;
@@ -363,7 +370,7 @@ void RTDoseVisualizer::UpdateBySelectedNode()
     m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),referenceDose);
     m_Controls.spinReferenceDose->setValue(referenceDose);
 
-    mitk::IsoDoseLevelSetProperty::Pointer propIsoSet = 
+    mitk::IsoDoseLevelSetProperty::Pointer propIsoSet =
     dynamic_cast<mitk::IsoDoseLevelSetProperty* >(m_selectedNode->GetProperty(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str()));
 
     if (propIsoSet)
@@ -384,11 +391,11 @@ void RTDoseVisualizer::UpdateByPreferences()
   int index = 0;
   int selectedIndex = -1;
   for (mitk::rt::PresetMapType::const_iterator pos = m_Presets.begin(); pos != m_Presets.end(); ++pos, ++index)
-	{
+  {
     m_Controls.comboPresets->addItem(QString(pos->first.c_str()));
     if (this->m_selectedPresetName == pos->first)
     {
-      selectedIndex = index; 
+      selectedIndex = index;
     }
   }
 
@@ -434,13 +441,13 @@ void RTDoseVisualizer::OnCurrentPresetChanged(const QString& presetName)
 void RTDoseVisualizer::ActualizeIsoLevelsForAllDoseDataNodes()
 {
   std::string presetName = mitk::rt::GetSelectedPresetName();
-  
+
   mitk::rt::PresetMapType presetMap = mitk::rt::LoadPresetsMap();
 
   mitk::NodePredicateProperty::Pointer isDoseNode = mitk::NodePredicateProperty::New(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(true));
 
   mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->GetDataStorage()->GetSubset(isDoseNode);
-  
+
   mitk::IsoDoseLevelSet* selectedPreset = presetMap[presetName];
 
   if (!selectedPreset)
@@ -458,16 +465,16 @@ void RTDoseVisualizer::ActualizeIsoLevelsForAllDoseDataNodes()
 
 void RTDoseVisualizer::ActualizeReferenceDoseForAllDoseDataNodes()
 {
-  /** @TODO Kl‰ren ob diese pr‰sentations info genauso wie*/
+  /** @TODO Kl√§ren ob diese pr√§sentations info genauso wie*/
   mitk::DoseValueAbs value = 0;
   bool sync = mitk::rt::GetReferenceDoseValue(value);
-  
+
   if (sync)
   {
     mitk::NodePredicateProperty::Pointer isDoseNode = mitk::NodePredicateProperty::New(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(true));
 
     mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->GetDataStorage()->GetSubset(isDoseNode);
-  
+
     for(mitk::DataStorage::SetOfObjects::const_iterator pos = nodes->begin(); pos != nodes->end(); ++pos)
     {
       (*pos)->SetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), value);
@@ -477,5 +484,5 @@ void RTDoseVisualizer::ActualizeReferenceDoseForAllDoseDataNodes()
 
 void RTDoseVisualizer::ActualizeDisplayStyleForAllDoseDataNodes()
 {
-  /** @TODO Kl‰ren ob diese pr‰sentations info global oder auch per node gespeichert wird*/
+  /** @TODO Kl√§ren ob diese pr√§sentations info global oder auch per node gespeichert wird*/
 }

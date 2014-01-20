@@ -434,7 +434,7 @@ void mitk::ConnectomicsStatisticsCalculator::CalculateShortestPathMetrics()
 
   //The size of the giant connected component so far.
   unsigned int giant_component_size = 0;
-  VertexDescriptorType radius_src = 0;
+  VertexDescriptorType radius_src(0);
 
   //Loop over the vertices
   for( boost::tie(vi, vi_end) = boost::vertices( *(m_Network->GetBoostGraph()) ); vi!=vi_end; ++vi)

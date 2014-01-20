@@ -53,8 +53,8 @@ public:
     itkGetMacro( NormalizeVectors, bool)                                ///< Normalize vectors to length 1
     itkSetMacro( UseWorkingCopy, bool)                                  ///< Do not modify input fiber bundle. Use a copy.
     itkGetMacro( UseWorkingCopy, bool)                                  ///< Do not modify input fiber bundle. Use a copy.
-    itkSetMacro( MaxNumDirections, int)                                 ///< If more directions are extracted, only the largest are kept.
-    itkGetMacro( MaxNumDirections, int)                                 ///< If more directions are extracted, only the largest are kept.
+    itkSetMacro( MaxNumDirections, unsigned long)                                 ///< If more directions are extracted, only the largest are kept.
+    itkGetMacro( MaxNumDirections, unsigned long)                                 ///< If more directions are extracted, only the largest are kept.
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)                   ///< only process voxels inside mask
     itkSetMacro( FiberBundle, FiberBundleX::Pointer)                    ///< input fiber bundle
     itkGetMacro( ClusteredDirectionsContainer, ContainerType::Pointer)  ///< output directions
@@ -88,7 +88,7 @@ protected:
     ContainerType::Pointer              m_DirectionsContainer;              ///< container for fiber directions
     bool                                m_UseWorkingCopy;                   ///< do not modify input fiber bundle but work on copy
     bool                                m_UseTrilinearInterpolation;        ///< trilinearly interpolate between neighbouring voxels
-    int                                 m_MaxNumDirections;                 ///< if more directions per voxel are extracted, only the largest are kept
+    unsigned long                                 m_MaxNumDirections;                 ///< if more directions per voxel are extracted, only the largest are kept
     float                               m_Thres;                            ///< distance threshold for trilinear interpolation
 
     // output datastructures

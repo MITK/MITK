@@ -169,7 +169,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         boost::progress_display disp(inputImage->GetVectorLength()*inputRegion.GetSize(2));
         for (unsigned int g=0; g<inputImage->GetVectorLength(); g++)
         {
-            std::vector< int > spikeSlice;
+            std::vector< unsigned int > spikeSlice;
             while (!spikeVolume.empty() && spikeVolume.back()==g)
             {
                 spikeSlice.push_back(m_RandGen->GetIntegerVariate()%inputImage->GetLargestPossibleRegion().GetSize(2));

@@ -238,10 +238,6 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::splitModule(
   // The submap
   ToModuleMapType vertexToModuleSubMap;
 
-  // copy vertices
-  VertexToVertexMapType::iterator iter = graphToSubgraphVertexMap.begin();
-  VertexToVertexMapType::iterator end =  graphToSubgraphVertexMap.end();
-
   // run simulated annealing on the subgraph to determine how the module should be split
   if( m_Depth > 0 && m_StepSize > 0 )
   {

@@ -169,7 +169,7 @@ float GibbsEnergyComputer::ComputeInternalEnergy(Particle *dp)
 float GibbsEnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1)
 {
     Particle *p2 = 0;
-    int ep2;
+    int ep2 = 0;
 
     if (ep1 == 1)
         p2 = m_ParticleGrid->GetParticle(p1->pID);  // get predecessor

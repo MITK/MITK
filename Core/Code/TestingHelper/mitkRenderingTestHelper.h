@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNodeFactory.h>
 #include <mitkDataStorage.h>
 
-#include <MitkExports.h>
+#include <MitkTestingHelperExports.h>
 
 class vtkRenderWindow;
 class vtkRenderer;
@@ -30,7 +30,7 @@ class vtkRenderer;
 namespace mitk
 {
 
-class MITK_CORE_EXPORT RenderingTestHelper
+class MITK_TESTINGHELPER_EXPORT RenderingTestHelper
 {
 
 public:

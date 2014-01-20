@@ -15,7 +15,7 @@ MITK_CREATE_MODULE(MitkIGT
   INCLUDE_DIRS Algorithms Common DataManagement ExceptionHandling IO Rendering TrackingDevices
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
   DEPENDS Mitk ImageStatistics SceneSerialization MitkIGTBase
-  PACKAGE_DEPENDS tinyxml
+  PACKAGE_DEPENDS ITK|ITKRegistrationCommon tinyxml
   ADDITIONAL_LIBS "${ADDITIONAL_LIBS}"
   WARNINGS_AS_ERRORS
 )
@@ -35,10 +35,9 @@ if(MitkIGT_IS_ENABLED)
   MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/NDIPolarisVicra.stl )
 endif()
 
-MITK_CHECK_MODULE(_RESULT MitkIGT)
-if(_RESULT)
+if(NOT MODULE_IS_ENABLED)
   message(STATUS "IGTTutorialStep1 won't be built. Missing: ${_RESULT}")
-else(_RESULT)
+else()
 ## create IGT config
 configure_file(mitkIGTConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTConfig.h @ONLY)
 
@@ -47,5 +46,5 @@ configure_file(mitkIGTConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTConfig.h @ONLY)
 add_subdirectory(Tutorial)
 
 add_subdirectory(Testing)
-endif(_RESULT)
+endif()
 

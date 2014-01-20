@@ -30,8 +30,6 @@ macro(mitk_create_executable EXECUTABLE_NAME)
       ADDITIONAL_LIBS        # list of additional libraries linked to this executable
       FILES_CMAKE            # file name of a CMake file setting source list variables
                              # (defaults to files.cmake)
-      QT4_MODULES            # the executable depends on a given list of Qt 4 modules
-      QT5_MODULES            # the executable depends on a given list of Qt 5 modules
      )
 
   set(_macro_options
@@ -61,34 +59,35 @@ macro(mitk_create_executable EXECUTABLE_NAME)
                      TARGET_DEPENDS ${EXEC_TARGET_DEPENDS}
                      ADDITIONAL_LIBS ${EXEC_ADDITIONAL_LIBS}
                      FILES_CMAKE ${EXEC_FILES_CMAKE}
-                     QT4_MODULES ${EXEC_QT4_MODULES}
-                     QT5_MODULES ${EXEC_QT5_MODULES}
                      ${_EXEC_OPTIONS}
                     )
 
-  # Add meta dependencies (e.g. on auto-load modules from depending modules)
-  if(ALL_META_DEPENDENCIES)
-    add_dependencies(${EXEC_NAME} ${ALL_META_DEPENDENCIES})
-  endif()
+  set(EXECUTABLE_IS_ENABLED ${MODULE_IS_ENABLED})
+  if(MODULE_IS_ENABLED)
+    # Add meta dependencies (e.g. on auto-load modules from depending modules)
+    if(ALL_META_DEPENDENCIES)
+      add_dependencies(${EXEC_NAME} ${ALL_META_DEPENDENCIES})
+    endif()
 
-  # Create batch files for Windows platforms
-  if(WIN32)
-    set(_batch_file_in "${CMAKE_CURRENT_SOURCE_DIR}/${EXEC_NAME}.bat.in")
-    if(NOT EXISTS "${_batch_file_in}")
-      set(_batch_file_in "${MITK_CMAKE_DIR}/StartApp.bat.in")
-    endif()
-    if(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-      set(_batch_file_out_dir "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-    else()
-      set(_batch_file_out_dir "${CMAKE_CURRENT_BINARY_DIR}")
-    endif()
-    if(NOT EXEC_NO_BATCH_FILE)
-      foreach(BUILD_TYPE debug release)
-        mitkFunctionCreateWindowsBatchScript(
-            ${_batch_file_in} ${_batch_file_out_dir}/${EXEC_NAME}_${BUILD_TYPE}.bat
-            ${BUILD_TYPE}
-           )
-      endforeach()
+    # Create batch files for Windows platforms
+    if(WIN32)
+      set(_batch_file_in "${CMAKE_CURRENT_SOURCE_DIR}/${EXEC_NAME}.bat.in")
+      if(NOT EXISTS "${_batch_file_in}")
+        set(_batch_file_in "${MITK_CMAKE_DIR}/StartApp.bat.in")
+      endif()
+      if(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+        set(_batch_file_out_dir "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+      else()
+        set(_batch_file_out_dir "${CMAKE_CURRENT_BINARY_DIR}")
+      endif()
+      if(NOT EXEC_NO_BATCH_FILE)
+        foreach(BUILD_TYPE debug release)
+          mitkFunctionCreateWindowsBatchScript(
+              ${_batch_file_in} ${_batch_file_out_dir}/${EXEC_NAME}_${BUILD_TYPE}.bat
+              ${BUILD_TYPE}
+             )
+        endforeach()
+      endif()
     endif()
   endif()
 

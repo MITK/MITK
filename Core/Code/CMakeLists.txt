@@ -21,7 +21,10 @@ MITK_CREATE_MODULE( Mitk
   INTERNAL_INCLUDE_DIRS
     ${OPENGL_INCLUDE_DIR}
   DEPENDS mbilog CppMicroServices
-  PACKAGE_DEPENDS tinyxml ITK VTK OpenGL
+  PACKAGE_DEPENDS tinyxml GDCM
+                  ITK|ITKTransform+ITKImageGrid+ITKImageFeature+ITKTestKernel+ITKIORAW
+                  VTK|vtkFiltersTexture+vtkFiltersParallel+vtkImagingStencil+vtkImagingMath+vtkInteractionStyle+vtkRenderingOpenGL+vtkRenderingLabel+vtkInteractionWidgets+vtkIOGeometry+vtkIOXML
+                  OpenGL
   EXPORT_DEFINE MITK_CORE_EXPORT
   WARNINGS_AS_ERRORS
   # Do not automatically create CppMicroServices initialization code.
@@ -52,5 +55,6 @@ endif(MSVC_IDE OR MSVC_VERSION OR MINGW)
 
 # build tests?
 if(BUILD_TESTING)
+  add_subdirectory(TestingHelper)
   add_subdirectory(Testing)
 ENDIF()

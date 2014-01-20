@@ -1,7 +1,78 @@
+function(_mitk_parse_package_args)
+  set(packages ${ARGN})
+  set(PACKAGE_NAMES )
+  foreach(_package ${packages})
+    string(REPLACE "|" ";" _package_list ${_package})
+    if("${_package_list}" STREQUAL "${_package}")
+      list(APPEND PACKAGE_NAMES ${_package})
+    else()
+      list(GET _package_list 0 _package_name)
+      list(GET _package_list 1 _package_components)
+      if(NOT _package_name OR NOT _package_components)
+        message(SEND_ERROR "PACKAGE argument syntax wrong. ${_package} is not of the form PACKAGE[|COMPONENT1[+COMPONENT2]...]")
+      endif()
+      list(APPEND PACKAGE_NAMES ${_package_name})
+    endif()
+  endforeach()
+
+  if(PACKAGE_NAMES)
+    set(package_names_normalized )
+    list(REMOVE_DUPLICATES PACKAGE_NAMES)
+    list(FIND PACKAGE_NAMES Qt4 _has_qt4_dep)
+    list(FIND PACKAGE_NAMES Qt5 _has_qt5_dep)
+    foreach(_package_name ${PACKAGE_NAMES})
+      set(${_package_name}_REQUIRED_COMPONENTS )
+      # Special filter for exclusive OR Qt4 / Qt5 dependency
+      if(_package_name STREQUAL "Qt4")
+        if(MITK_USE_Qt4)
+          list(APPEND package_names_normalized ${_package_name})
+        elseif(MITK_USE_Qt5 AND _has_qt5_dep EQUAL -1)
+          list(APPEND package_names_normalized ${_package_name})
+        endif()
+      elseif(_package_name STREQUAL "Qt5")
+        if(MITK_USE_Qt5)
+          list(APPEND package_names_normalized ${_package_name})
+        elseif(MITK_USE_Qt4 AND _has_qt4_dep EQUAL -1)
+          list(APPEND package_names_normalized ${_package_name})
+        endif()
+      else()
+        list(APPEND package_names_normalized ${_package_name})
+      endif()
+    endforeach()
+    set(PACKAGE_NAMES ${package_names_normalized})
+  endif()
+
+  foreach(_package ${packages})
+    string(REPLACE "|" ";" _package_list ${_package})
+    if(NOT "${_package_list}" STREQUAL "${_package}")
+      list(GET _package_list 0 _package_name)
+      list(GET _package_list 1 _package_components)
+      string(REPLACE "+" ";" _package_components_list "${_package_components}")
+      list(APPEND ${_package_name}_REQUIRED_COMPONENTS ${_package_components_list})
+   endif()
+  endforeach()
+
+  foreach(_package_name ${PACKAGE_NAMES})
+    if(${_package_name}_REQUIRED_COMPONENTS)
+      list(REMOVE_DUPLICATES ${_package_name}_REQUIRED_COMPONENTS)
+    endif()
+    set(${_package_name}_REQUIRED_COMPONENTS ${${_package_name}_REQUIRED_COMPONENTS} PARENT_SCOPE)
+  endforeach()
+  set(PACKAGE_NAMES ${PACKAGE_NAMES} PARENT_SCOPE)
+endfunction()
+
+
 #! This CMake function sets up the necessary include directories,
 #! linker dependencies, and compile flags for a given target which
-#! depends on a set of MITK modules, packages, and Qt4 and/or Qt5
-#! components.
+#! depends on a set of MITK modules or packages.
+#!
+#! A package argument is of the form
+#!
+#!   PACKAGE[|COMPONENT1[+COMPONENT2]...]
+#!
+#! where PACKAGE is the package name (e.g. VTK) and components are
+#! the names of required package components or libraries.
+#!
 #! If a dependency is not available, an error is thrown.
 function(mitk_use_modules)
 
@@ -9,8 +80,6 @@ function(mitk_use_modules)
       TARGET           # The target name (required)
       MODULES          # MITK modules which the given TARGET uses
       PACKAGES         # MITK packages which the given TARGET uses
-      QT4_MODULES      # Qt4 components the TARGET depends on
-      QT5_MODULES      # Qt5 components the TARGET depends on
      )
 
   set(_macro_options )
@@ -23,127 +92,81 @@ function(mitk_use_modules)
   elseif(NOT TARGET ${USE_TARGET})
     message(SEND_ERROR "The given TARGET argument ${USE_TARGET} is not a valid target")
   endif()
-  set(all_deps ${USE_MODULES} ${USE_PACKAGES})
-  set(all_args MODULES PACKAGES)
-  if(MITK_USE_Qt4)
-    list(APPEND all_deps ${USE_QT4_MODULES})
-    list(APPEND all_args QT4_MODULES)
-  elseif(MITK_USE_Qt5)
-    list(APPEND all_deps ${USE_QT5_MODULES})
-    list(APPEND all_args QT5_MODULES)
-  endif()
-  if(NOT all_deps)
-    message(SEND_ERROR "The arguments ${all_args} must not all be empty.")
-  endif()
-
-  # The MODULE_NAME variable is used for example in the MITK_Qt5*_Config.cmake files
-  set(MODULE_NAME ${USE_TARGET})
-
-  set(depends "")
-  # check for each parameter if it is a package (3rd party)
-  set(package_candidates ${USE_MODULES} ${USE_PACKAGES})
-  if(MITK_USE_Qt4 AND USE_QT4_MODULES)
-    list(APPEND package_candidates Qt4)
-  endif()
-  if(MITK_USE_Qt5 AND USE_QT5_MODULES)
-    list(APPEND package_candidates ${USE_QT5_MODULES})
-  endif()
-  set(package_depends )
-  if(package_candidates)
-    foreach(package ${package_candidates})
-      set(is_package)
-      foreach(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
-        if(EXISTS "${dir}/MITK_${package}_Config.cmake")
-          list(APPEND package_depends ${package})
-          set(is_package 1)
-          break()
-        endif()
-      endforeach()
-      if(NOT is_package)
-        list(APPEND depends ${package})
-      endif()
-    endforeach()
-  endif()
-
-  set(first_level_module_deps ${depends})
-  set(depends_before "not initialized")
-  while(NOT "${depends}" STREQUAL "${depends_before}")
-    set(depends_before ${depends})
-    foreach(dependency ${depends})
-      if(NOT ${dependency}_CONFIG_FILE)
-        message(SEND_ERROR "Missing module: ${dependency}")
-      endif()
-      include(${${dependency}_CONFIG_FILE})
-      list(APPEND depends ${${dependency}_DEPENDS})
-      list(APPEND package_depends ${${dependency}_PACKAGE_DEPENDS})
-    endforeach()
-
-    if(depends)
-      list(REMOVE_DUPLICATES depends)
-      list(SORT depends)
-    endif()
-
-    if(package_depends)
-      list(REMOVE_DUPLICATES package_depends)
-      list(SORT package_depends)
-    endif()
-  endwhile()
 
   set(ALL_INCLUDE_DIRECTORIES)
   set(ALL_LIBRARIES)
-  set(ALL_QT4_MODULES ${USE_QT4_MODULES})
-  set(ALL_QT5_MODULES ${USE_QT5_MODULES})
+  set(ALL_COMPILE_DEFINITIONS)
   set(ALL_META_DEPENDENCIES)
 
-  foreach(dependency ${depends})
-    if(NOT ${dependency}_CONFIG_FILE)
-      message(SEND_ERROR "Missing module ${dependency}")
-    endif()
-    include(${${dependency}_CONFIG_FILE})
-    if(${dependency}_IS_DEPRECATED AND NOT MODULE_IS_DEPRECATED)
-      # Only print the message if the dependent module
-      # is not deprecated itself and if it is a first-level dependency.
-      if(first_level_module_deps)
-        list(FIND first_level_module_deps ${dependency} _index)
+  set(depends ${USE_MODULES})
+  set(package_depends ${USE_PACKAGES})
+
+  # Get transitive MODULE and PACKAGE dependencies
+  if(depends)
+    set(depends_before "not initialized")
+    while(NOT "${depends}" STREQUAL "${depends_before}")
+      set(depends_before ${depends})
+      foreach(dependency ${depends})
+        if(NOT ${dependency}_CONFIG_FILE)
+          message(SEND_ERROR "Missing module: ${dependency}")
+        endif()
+        include(${${dependency}_CONFIG_FILE})
+        list(APPEND package_depends ${${dependency}_PACKAGE_DEPENDS})
+        list(APPEND depends ${${dependency}_DEPENDS})
+      endforeach()
+
+      list(REMOVE_DUPLICATES depends)
+      list(SORT depends)
+    endwhile()
+
+    # Iterate over all module dependencies
+    foreach(dependency ${depends})
+      if(${dependency}_IS_DEPRECATED AND NOT MODULE_IS_DEPRECATED)
+        # Only print the message if the dependent module
+        # is not deprecated itself and if it is a first-level dependency.
+        list(FIND USE_MODULES ${dependency} _index)
         if(_index GREATER -1)
           message(WARNING "Module ${dependency} is deprecated since ${${dependency}_DEPRECATED_SINCE}")
         endif()
       endif()
-    endif()
 
-    list(APPEND ALL_INCLUDE_DIRECTORIES ${${dependency}_INCLUDE_DIRS})
-    list(APPEND ALL_LIBRARIES ${${dependency}_PROVIDES})
-    list(APPEND ALL_QT4_MODULES ${${dependency}_QT4_MODULES})
-    list(APPEND ALL_QT5_MODULES ${${dependency}_QT5_MODULES})
-    if(TARGET ${dependency}-autoload)
-      list(APPEND ALL_META_DEPENDENCIES ${dependency}-autoload)
-    endif()
-  endforeach(dependency)
-
-  if(ALL_QT4_MODULES)
-    list(REMOVE_DUPLICATES ALL_QT4_MODULES)
-  endif()
-  if(ALL_QT5_MODULES)
-    list(REMOVE_DUPLICATES ALL_QT5_MODULES)
-  endif()
-
-  set(MODULE_QT4_MODULES ${ALL_QT4_MODULES})
-  foreach(package ${package_depends})
-    foreach(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
-      if(EXISTS "${dir}/MITK_${package}_Config.cmake")
-        include("${dir}/MITK_${package}_Config.cmake")
-        break()
+      list(APPEND ALL_INCLUDE_DIRECTORIES ${${dependency}_INCLUDE_DIRS})
+      list(APPEND ALL_LIBRARIES ${${dependency}_PROVIDES})
+      if(TARGET ${dependency}-autoload)
+        list(APPEND ALL_META_DEPENDENCIES ${dependency}-autoload)
       endif()
     endforeach()
-  endforeach()
 
-  if(depends)
     list(APPEND ALL_INCLUDE_DIRECTORIES ${MODULES_CONF_DIRS})
   endif()
 
+  # Parse package dependencies
+  if(package_depends)
+    _mitk_parse_package_args(${package_depends})
+
+    # Read all package information
+    foreach(_package ${PACKAGE_NAMES})
+      set(${_package}_REQUIRED_COMPONENTS_BY_MODULE ${${_package}_REQUIRED_COMPONENTS})
+      set(_package_found 0)
+      foreach(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
+        if((NOT DEFINED MITK_USE_${_package} OR MITK_USE_${_package}) AND EXISTS "${dir}/MITK_${_package}_Config.cmake")
+          include("${dir}/MITK_${_package}_Config.cmake")
+          set(_package_found 1)
+          break()
+        endif()
+      endforeach()
+      if(NOT _package_found)
+        message(SEND_ERROR "Missing package: ${_package}")
+      endif()
+    endforeach()
+  endif()
+
   if(ALL_INCLUDE_DIRECTORIES)
-    list(REMOVE_DUPLICATES ALL_INCLUDE_DIRECTORIES)
     include_directories(${ALL_INCLUDE_DIRECTORIES})
+  endif()
+
+  if(ALL_COMPILE_DEFINITIONS)
+    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ${ALL_COMPILE_DEFINITIONS})
   endif()
 
   if(ALL_LIBRARIES)
@@ -152,8 +175,6 @@ function(mitk_use_modules)
 
   set(ALL_INCLUDE_DIRECTORIES ${ALL_INCLUDE_DIRECTORIES} PARENT_SCOPE)
   set(ALL_LIBRARIES ${ALL_LIBRARIES} PARENT_SCOPE)
-  set(ALL_QT4_MODULES ${ALL_QT4_MODULES} PARENT_SCOPE)
-  set(ALL_QT5_MODULES ${ALL_QT5_MODULES} PARENT_SCOPE)
   set(ALL_META_DEPENDENCIES ${ALL_META_DEPENDENCIES} PARENT_SCOPE)
 
 endfunction()

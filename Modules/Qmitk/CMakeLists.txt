@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE( Qmitk
                DEPENDS Mitk PlanarFigure
-               QT4_MODULES QtCore QtGui
+               PACKAGE_DEPENDS VTK|vtkGUISupportQt Qt4|QtGui
                SUBPROJECTS MITK-CoreUI
                EXPORT_DEFINE QMITK_EXPORT
 )

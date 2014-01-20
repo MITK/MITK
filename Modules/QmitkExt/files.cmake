@@ -64,9 +64,6 @@ set(CPP_FILES
  QmitkLineEdit.cpp
 )
 
-QT4_ADD_RESOURCES(CPP_FILES resources/QmitkResources.qrc)
-
-
 set(MOC_H_FILES
  QmitkPropertyObservers/QmitkBasePropertyView.h
  QmitkPropertyObservers/QmitkBoolPropertyWidget.h
@@ -130,4 +127,5 @@ set(UI_FILES
 
 set(QRC_FILES
   QmitkExt.qrc
+  resources/QmitkResources.qrc
 )

@@ -35,7 +35,6 @@ set(MITK_EXPORTS_FILE_INCLUDED 1)
 set(_example_dirs
   MbiLog
   QtFreeRender
-  QtAppExample
   Tutorial
 #  Overlays# depends on QmitkExt..
 )
@@ -44,6 +43,10 @@ set(_example_dirs
 if (MITK_USE_Qt5)
   list(APPEND _example_dirs
     QuickRender
+    )
+elseif (MITK_USE_Qt4)
+  list(APPEND _example_dirs
+    QtAppExample
     )
 endif()
 

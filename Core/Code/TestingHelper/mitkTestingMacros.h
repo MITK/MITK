@@ -20,11 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkMacro.h>
 #include <mitkTestManager.h>
-#include <mitkTesting.h>
 #include <mitkTestCaller.h>
 
 #include <cppunit/extensions/HelperMacros.h>
-#include "cppunit/ui/text/TestRunner.h"
+#include <cppunit/ui/text/TestRunner.h>
 
 namespace mitk {
   /** @brief Indicate a failed test. */

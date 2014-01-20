@@ -26,7 +26,6 @@ FunctionCreateBlueBerryApplication(
   NAME mitkWorkbench
   DESCRIPTION "MITK Workbench"
   EXCLUDE_PLUGINS ${_exclude_plugins}
-  LINK_LIBRARIES ${ALL_LIBRARIES}
   ${_app_options}
 )
 mitk_use_modules(TARGET mitkWorkbench MODULES qtsingleapplication Mitk)
@@ -47,4 +46,3 @@ endif(APPLE)
 if(MITK_MODULES_ENABLED_PLUGINS)
   add_dependencies(mitkWorkbench ${MITK_MODULES_ENABLED_PLUGINS})
 endif()
-

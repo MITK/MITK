@@ -95,14 +95,14 @@ if(BUILD_TESTING)
       set_tests_properties(mitkProjectTemplatePackageTest PROPERTIES
                            DEPENDS mitkProjectTemplateBuildTest-Release
                            TIMEOUT 6000
-                           LABELS "MITK;BlueBerry")
+                           LABELS "MITK;BlueBerry;PACKAGE_TESTS")
     elseif(CMAKE_BUILD_TYPE)
       add_test(NAME mitkProjectTemplatePackageTest
                COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR}/AwesomeProject-build --config ${CMAKE_BUILD_TYPE} --target package)
       set_tests_properties(mitkProjectTemplatePackageTest PROPERTIES
                            DEPENDS mitkProjectTemplateBuildTest-${CMAKE_BUILD_TYPE}
                            TIMEOUT 6000
-                           LABELS "MITK;BlueBerry")
+                           LABELS "MITK;BlueBerry;PACKAGE_TESTS")
     endif()
 
   endif()

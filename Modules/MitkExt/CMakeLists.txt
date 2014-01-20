@@ -9,7 +9,7 @@ configure_file(${PROJECT_SOURCE_DIR}/CMake/ToolGUIExtensionITKFactory.cpp.in ${P
 MITK_CREATE_MODULE( MitkExt
                INCLUDE_DIRS Algorithms Controllers DataManagement Interactions IO Rendering
                DEPENDS MitkDataTypesExt ImageExtraction IpPicSupport
-               PACKAGE_DEPENDS ANN
+               PACKAGE_DEPENDS ANN ITK|ITKConnectedComponents+ITKBinaryMathematicalMorphology
                DEPRECATED_SINCE 2014.03
 )
 

@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProgressBar.h>
 #include <mitkOperationEvent.h>
 #include <mitkInteractionConst.h>
-#include <mitkApplyDiffImageOperation.h>
-#include <mitkDiffImageApplier.h>
 #include "mitkDiffSliceOperation.h"
 #include <mitkDiffSliceOperationApplier.h>
 #include <mitkUndoController.h>
@@ -36,7 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageTimeSelector.h>
 #include <mitkImageToContourModelSetFilter.h>
 #include <mitkContourUtils.h>
+#include <mitkImageCast.h>
 #include <mitkToolManagerProvider.h>
+#include <mitkImageAccessByItk.h>
 
 #include "QmitkStdMultiWidget.h"
 
@@ -72,15 +72,18 @@ m_LastSliceIndex(0)
   command->SetCallbackFunction( this, &QmitkSliceBasedInterpolatorWidget::OnSliceInterpolationInfoChanged );
   m_InterpolationInfoChangedObserverTag = m_SliceInterpolatorController->AddObserver( itk::ModifiedEvent(), command );
 
-  m_FeedbackContour = mitk::ContourModelSet::New();
-  m_FeedbackContourNode = mitk::DataNode::New();
-  m_FeedbackContourNode->SetData( m_FeedbackContour );
-  m_FeedbackContourNode->SetName("slice-based interpolation preview");
-  m_FeedbackContourNode->SetProperty("visible", mitk::BoolProperty::New(true));
-  m_FeedbackContourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_FeedbackContourNode->SetProperty("layer", mitk::IntProperty::New(1000));
-  m_FeedbackContourNode->SetProperty("contour.project-onto-plane", mitk::BoolProperty::New(true));
-  m_FeedbackContourNode->SetProperty("contour.width", mitk::FloatProperty::New(2.5));
+  // feedback node and its visualization properties
+  m_PreviewNode = mitk::DataNode::New();
+  m_PreviewNode->SetName("3D tool preview");
+
+  m_PreviewNode->SetProperty("texture interpolation", mitk::BoolProperty::New(false) );
+  m_PreviewNode->SetProperty("layer", mitk::IntProperty::New(100) );
+  m_PreviewNode->SetProperty("binary", mitk::BoolProperty::New(true) );
+  m_PreviewNode->SetProperty("outline binary", mitk::BoolProperty::New(true) );
+  m_PreviewNode->SetProperty("outline binary shadow", mitk::BoolProperty::New(true) );
+  m_PreviewNode->SetProperty("helper object", mitk::BoolProperty::New(true) );
+  m_PreviewNode->SetOpacity(1.0);
+  m_PreviewNode->SetColor(0.0, 1.0, 0.0);
 
   m_Controls.m_btApplyForCurrentSlice->setEnabled(false);
   m_Controls.m_btApplyForAllSlices->setEnabled(false);
@@ -199,7 +202,7 @@ void QmitkSliceBasedInterpolatorWidget::OnTimeChanged(itk::Object* sender, const
 
 void QmitkSliceBasedInterpolatorWidget::OnSliceChanged(itk::Object *sender, const itk::EventObject &e)
 {
-  if (this->m_Activated && m_WorkingImage.IsNotNull())
+  if (m_Activated && m_WorkingImage.IsNotNull())
   {
     //Check whether we really have a GeometrySliceEvent
     if (!dynamic_cast<const mitk::SliceNavigationController::GeometrySliceEvent*>(&e))
@@ -217,7 +220,7 @@ void QmitkSliceBasedInterpolatorWidget::OnSliceChanged(itk::Object *sender, cons
 
 void QmitkSliceBasedInterpolatorWidget::TranslateAndInterpolateChangedSlice(const itk::EventObject& e, mitk::SliceNavigationController* slicer)
 {
-  if (this->m_Activated && m_WorkingImage.IsNotNull())
+  if (m_Activated && m_WorkingImage.IsNotNull())
   {
     const mitk::SliceNavigationController::GeometrySliceEvent& event = dynamic_cast<const mitk::SliceNavigationController::GeometrySliceEvent&>(e);
     mitk::TimeGeometry* tsg = event.GetTimeGeometry();
@@ -248,33 +251,10 @@ void QmitkSliceBasedInterpolatorWidget::Interpolate( mitk::PlaneGeometry* plane,
 
   mitk::Image::Pointer interpolation = m_SliceInterpolatorController->Interpolate( clickedSliceDimension, clickedSliceIndex, plane, timeStep );
 
-  if (interpolation.IsNotNull())
-  {
-    mitk::ImageToContourModelSetFilter::Pointer contourExtractor = mitk::ImageToContourModelSetFilter::New();
-    contourExtractor->SetInput(interpolation);
+  m_PreviewNode->SetData( interpolation );
 
-    try
-    {
-      contourExtractor->Update();
-    }
-    catch ( itk::ExceptionObject& e )
-    {
-      MITK_ERROR << "Exception caught: " << e.GetDescription();
-      return;
-    }
-
-    m_FeedbackContour = contourExtractor->GetOutput();
-    m_FeedbackContour->DisconnectPipeline();
-
-    m_FeedbackContourNode->SetData( m_FeedbackContour );
-
-    const mitk::Color& color = m_WorkingImage->GetActiveLabelColor();
-    m_FeedbackContourNode->SetProperty("contour.color", mitk::ColorProperty::New(color));
-  }
-  else
-  {
-    m_FeedbackContour->Clear();
-  }
+  const mitk::Color& color = m_WorkingImage->GetActiveLabelColor();
+  m_PreviewNode->SetColor(color);
 
   m_LastSNC = slicer;
   m_LastSliceIndex = clickedSliceIndex;
@@ -330,6 +310,11 @@ void QmitkSliceBasedInterpolatorWidget::OnToggleWidgetActivation(bool enabled)
   m_Controls.m_btApplyForCurrentSlice->setEnabled(enabled);
   m_Controls.m_btApplyForAllSlices->setEnabled(enabled);
 
+  if (enabled)
+    m_Controls.m_btStart->setText("Stop");
+  else
+    m_Controls.m_btStart->setText("Start");
+
   unsigned int numberOfExistingTools = m_ToolManager->GetTools().size();
   for(unsigned int i = 0; i < numberOfExistingTools; i++)
   {
@@ -339,18 +324,20 @@ void QmitkSliceBasedInterpolatorWidget::OnToggleWidgetActivation(bool enabled)
 
   if (enabled)
   {
-    if (!m_DataStorage->Exists(m_FeedbackContourNode))
+    if (!m_DataStorage->Exists(m_PreviewNode))
     {
-      m_DataStorage->Add( m_FeedbackContourNode );
+      m_DataStorage->Add( m_PreviewNode );
     }
+
     m_SliceInterpolatorController->SetWorkingImage( m_WorkingImage );
     this->UpdateVisibleSuggestion();
   }
   else
   {
-    if (m_DataStorage->Exists(m_FeedbackContourNode))
+
+    if (m_DataStorage->Exists(m_PreviewNode))
     {
-      m_DataStorage->Remove( m_FeedbackContourNode );
+      m_DataStorage->Remove( m_PreviewNode );
     }
 
     mitk::UndoController::GetCurrentUndoModel()->Clear();
@@ -361,25 +348,85 @@ void QmitkSliceBasedInterpolatorWidget::OnToggleWidgetActivation(bool enabled)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+template<typename TPixel, unsigned int VImageDimension>
+void QmitkSliceBasedInterpolatorWidget::WritePreviewOnWorkingImage( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, int overwritevalue )
+{
+  typedef itk::Image<TPixel,VImageDimension> SliceType;
+
+  typename SliceType::Pointer sourceSliceITK;
+  mitk::CastToItkImage( sourceSlice, sourceSliceITK );
+
+  // now the original slice and the ipSegmentation-painted slice are in the same format, and we can just copy all pixels that are non-zero
+  typedef itk::ImageRegionIterator< SliceType >        OutputIteratorType;
+  typedef itk::ImageRegionConstIterator< SliceType >   InputIteratorType;
+
+  InputIteratorType inputIterator( sourceSliceITK, sourceSliceITK->GetLargestPossibleRegion() );
+  OutputIteratorType outputIterator( targetSlice, targetSlice->GetLargestPossibleRegion() );
+
+  outputIterator.GoToBegin();
+  inputIterator.GoToBegin();
+
+  int activePixelValue = m_WorkingImage->GetActiveLabelIndex();
+
+  if (activePixelValue == 0) // if exterior is the active label
+  {
+    while ( !outputIterator.IsAtEnd() )
+    {
+      if (inputIterator.Get() != 0)
+      {
+        outputIterator.Set( overwritevalue );
+      }
+      ++outputIterator;
+      ++inputIterator;
+    }
+  }
+  else if (overwritevalue != 0) // if we are not erasing
+  {
+    while ( !outputIterator.IsAtEnd() )
+    {
+      int targetValue = static_cast<int>(outputIterator.Get());
+      if ( inputIterator.Get() != 0 )
+      {
+        if (!m_WorkingImage->GetLabelLocked(targetValue))
+          outputIterator.Set( overwritevalue );
+      }
+
+      ++outputIterator;
+      ++inputIterator;
+    }
+  }
+  else // if we are erasing
+  {
+    while ( !outputIterator.IsAtEnd() )
+    {
+      const int targetValue = outputIterator.Get();
+      if (inputIterator.Get() != 0)
+      {
+        if (targetValue == activePixelValue)
+          outputIterator.Set( overwritevalue );
+      }
+
+      ++outputIterator;
+      ++inputIterator;
+    }
+  }
+}
+
 void QmitkSliceBasedInterpolatorWidget::OnAcceptInterpolationClicked()
 {
-  if (m_WorkingImage.IsNotNull() && m_FeedbackContourNode->GetData())
+  if (m_WorkingImage.IsNotNull() && m_PreviewNode->GetData())
   {
     const mitk::PlaneGeometry* planeGeometry = m_LastSNC->GetCurrentPlaneGeometry();
     if (!planeGeometry) return;
+
     mitk::Image::Pointer sliceImage = this->GetWorkingSlice(planeGeometry);
     if (sliceImage.IsNull()) return;
 
     unsigned int timeStep = m_LastSNC->GetTime()->GetPos();
 
-    int numberOfContours = m_FeedbackContour->GetSize();
-    for (int i=0; i<numberOfContours; i++)
-    {
- //     mitk::ContourModel::Pointer projectedContour = mitk::ContourModel::New();
-//      const mitk::Geometry3D* sliceGeometry = sliceImage->GetGeometry(timeStep);
-//      mitk::ContourUtils::ProjectContourTo2DSlice( sliceGeometry, m_FeedbackContour->GetContourModelAt(i), projectedContour );
-      mitk::ContourUtils::FillContourInSlice( m_FeedbackContour->GetContourModelAt(i), sliceImage, m_WorkingImage->GetActiveLabelIndex() );
-    }
+    mitk::Image::Pointer previewSlice = dynamic_cast<mitk::Image*>( m_PreviewNode->GetData() );
+
+    AccessFixedDimensionByItk_2( sliceImage, WritePreviewOnWorkingImage, 2, previewSlice, m_WorkingImage->GetActiveLabelIndex() );
 
     //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
     vtkSmartPointer<mitkVtkImageOverwrite> overwrite = vtkSmartPointer<mitkVtkImageOverwrite>::New();
@@ -430,7 +477,7 @@ void QmitkSliceBasedInterpolatorWidget::OnAcceptInterpolationClicked()
     m_undoOperation = NULL;
     m_doOperation = NULL;
 
-    m_FeedbackContour->Clear();
+    m_PreviewNode->SetData(NULL);
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -438,6 +485,7 @@ void QmitkSliceBasedInterpolatorWidget::OnAcceptInterpolationClicked()
 
 void QmitkSliceBasedInterpolatorWidget::AcceptAllInterpolations(mitk::SliceNavigationController* slicer)
 {
+  /*
   // Since we need to shift the plane it must be clone so that the original plane isn't altered
   mitk::PlaneGeometry::Pointer reslicePlane = slicer->GetCurrentPlaneGeometry()->Clone();
   unsigned int timeStep = slicer->GetTime()->GetPos();
@@ -532,7 +580,7 @@ void QmitkSliceBasedInterpolatorWidget::AcceptAllInterpolations(mitk::SliceNavig
 
   //the image was modified within the pipeline, but not marked so
   m_WorkingImage->Modified();
-
+*/
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -568,7 +616,7 @@ void QmitkSliceBasedInterpolatorWidget::OnAcceptAllPopupActivated(QAction* actio
 
 void QmitkSliceBasedInterpolatorWidget::UpdateVisibleSuggestion()
 {
-  if (this->m_Activated && m_LastSNC)
+  if (m_Activated && m_LastSNC)
   {
     // determine which one is the current view, try to do an initial interpolation
     mitk::BaseRenderer* renderer = m_LastSNC->GetRenderer();

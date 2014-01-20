@@ -47,7 +47,7 @@ const mitk::ImageToContourModelSetFilter::InputType* mitk::ImageToContourModelSe
 
 void mitk::ImageToContourModelSetFilter::GenerateData()
 {
-  mitk::Image::ConstPointer sliceImage = ImageToContourModelSetFilter::GetInput();
+  mitk::Image::ConstPointer sliceImage = this->GetInput();
 
   if ( !sliceImage )
   {
@@ -80,6 +80,8 @@ void mitk::ImageToContourModelSetFilter::ExtractContoursITKProcessing (itk::Imag
   contourExtractor->Update();
 
   unsigned int foundPaths = contourExtractor->GetNumberOfIndexedOutputs();
+
+  MITK_INFO << "foundPaths: " << foundPaths;
 
   //
   // set the number of outputs to the number of paths found

@@ -295,7 +295,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
                                                                             unsigned int timeStep )
 {
   if (m_WorkingImage.IsNull()) return NULL;
-  if(!currentPlane) return NULL;
+  if (!currentPlane) return NULL;
   if ( timeStep >= m_LabelCountInSlice.size() ) return NULL;
   if ( sliceDimension > 2 ) return NULL;
   int upperLimit = m_LabelCountInSlice[timeStep][sliceDimension].size();
@@ -309,7 +309,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
 
   int lowerBound(0);
   int upperBound(0);
-  bool bounds( false );
+  bool bounds(false);
 
   for (lowerBound = sliceIndex - 1; /*lowerBound >= 0*/; --lowerBound)
   {

@@ -175,6 +175,9 @@ private:
 
     bool m_Activated;
 
+    template<typename TPixel, unsigned int VImageDimension>
+    void WritePreviewOnWorkingImage( itk::Image<TPixel,VImageDimension>* target, const mitk::Image* source, int overwritevalue );
+
     QHash<mitk::SliceNavigationController*, int> m_ControllerToTimeObserverTag;
     QHash<mitk::SliceNavigationController*, int> m_ControllerToSliceObserverTag;
     QHash<mitk::SliceNavigationController*, int> m_ControllerToDeleteObserverTag;
@@ -184,8 +187,11 @@ private:
     mitk::DiffSliceOperation* m_doOperation;
     mitk::DiffSliceOperation* m_undoOperation;
 
-    mitk::DataNode::Pointer m_FeedbackContourNode;
-    mitk::ContourModelSet::Pointer m_FeedbackContour;
+    mitk::DataNode::Pointer  m_PreviewNode;
+    mitk::Image::Pointer     m_PreviewImage;
+
+    //mitk::DataNode::Pointer m_FeedbackContourNode;
+    //mitk::ContourModelSet::Pointer m_FeedbackContour;
 
     mitk::LabelSetImage::Pointer m_WorkingImage;
 

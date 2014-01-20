@@ -9,7 +9,7 @@ else()
 endif()
 
 MITK_CREATE_MODULE_TESTS(LABELS MITK-Core)
-mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES ITK>ITKThresholding)
+mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES ITK|ITKThresholding)
 
 mitkAddCustomModuleTest(mitkVolumeCalculatorTest_Png2D-bw mitkVolumeCalculatorTest
                         ${MITK_DATA_DIR}/Png2D-bw.png

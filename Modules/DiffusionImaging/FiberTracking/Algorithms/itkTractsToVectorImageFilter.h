@@ -37,10 +37,10 @@ public:
     typedef std::vector< OutputImageType::Pointer > OutputImageContainerType;
 
     typedef vnl_vector_fixed< double, 3 >                               DirectionType;
-    typedef VectorContainer< int, DirectionType >                       DirectionContainerType;
-    typedef VectorContainer< int, DirectionContainerType::Pointer >     ContainerType;
+    typedef VectorContainer< unsigned int, DirectionType >                       DirectionContainerType;
+    typedef VectorContainer< unsigned int, DirectionContainerType::Pointer >     ContainerType;
     typedef Image< Vector< float, 3 >, 3>                               ItkDirectionImageType;
-    typedef VectorContainer< int, ItkDirectionImageType::Pointer >      DirectionImageContainerType;
+    typedef VectorContainer< unsigned int, ItkDirectionImageType::Pointer >      DirectionImageContainerType;
 
     typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
 

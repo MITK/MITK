@@ -197,7 +197,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
                 if (index[2] < 0 || (unsigned long)index[2] >= outImageSize[2])
                     continue;
 
-                int idx = index[0] + outImageSize[0]*(index[1] + outImageSize[1]*index[2]);
+                unsigned int idx = index[0] + outImageSize[0]*(index[1] + outImageSize[1]*index[2]);
                 DirectionContainerType::Pointer dirCont = DirectionContainerType::New();
                 if (m_DirectionsContainer->IndexExists(idx))
                 {
@@ -496,7 +496,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
 
         std::vector< DirectionType > directions;
 
-        for (int i=0; i<dirCont->Size(); i++)
+        for (unsigned int i=0; i<dirCont->Size(); i++)
             if (dirCont->ElementAt(i).magnitude()>0.0001)
                 directions.push_back(dirCont->ElementAt(i));
 

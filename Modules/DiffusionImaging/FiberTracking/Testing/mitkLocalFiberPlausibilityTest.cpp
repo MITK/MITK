@@ -60,7 +60,7 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
 
         typedef itk::Image<unsigned char, 3>                                    ItkUcharImgType;
         typedef itk::Image< itk::Vector< float, 3>, 3 >                         ItkDirectionImage3DType;
-        typedef itk::VectorContainer< int, ItkDirectionImage3DType::Pointer >   ItkDirectionImageContainerType;
+        typedef itk::VectorContainer< unsigned int, ItkDirectionImage3DType::Pointer >   ItkDirectionImageContainerType;
         typedef itk::EvaluateDirectionImagesFilter< float >                     EvaluationFilterType;
 
         // load fiber bundle

@@ -790,7 +790,7 @@ double  mitk::OdfVtkMapper2D<T,N>::GetMinImageSpacing( int index )
     // Spacing adapted scaling
     double spacing[3];
     m_VtkImage->GetSpacing(spacing);
-    double min;
+    double min = spacing[0];
     if(index==0)
     {
         min = spacing[0];

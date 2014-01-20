@@ -4,7 +4,6 @@ set(CPP_FILES
   Qmitk/QmitkDoseColorDelegate.cpp
   Qmitk/QmitkDoseValueDelegate.cpp
   Qmitk/QmitkDoseVisualStyleDelegate.cpp
-  Helper/mitkDoseNodeSyncHelper.cpp
   Helper/mitkRTUIConstants.cpp
   Helper/mitkIsoLevelsGenerator.cpp
 )

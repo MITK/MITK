@@ -383,6 +383,7 @@ endif()
 # CMake function(s) and macro(s)
 #-----------------------------------------------------------------------------
 
+include(CMakePackageConfigHelpers)
 include(CheckCXXSourceCompiles)
 include(mitkFunctionCheckCompilerFlags)
 include(mitkFunctionGetGccVersion)
@@ -977,6 +978,9 @@ endforeach()
 
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)
+
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  VERSION ${MITK_VERSION_STRING} COMPATIBILITY AnyNewerVersion)
 
 # If we are under Windows, create two batch files which correctly
 # set up the environment for the application and for Visual Studio

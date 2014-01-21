@@ -42,7 +42,7 @@ public:
 
     void SetNoiseVariance(double var){ m_NoiseVariance = var; }
     double GetNoiseVariance(){ return m_NoiseVariance; }
-    void SetSeed(int seed);
+    void SetSeed(int seed); ///< Set seed for random number generator
 
 protected:
 

@@ -73,7 +73,7 @@ public:
         out.m_EddyStrength = m_EddyStrength;
         out.m_Spikes = m_Spikes;
         out.m_SpikeAmplitude = m_SpikeAmplitude;
-        out.m_Wrap = m_Wrap;
+        out.m_CroppingFactor = m_CroppingFactor;
         out.m_DoSimulateRelaxation = m_DoSimulateRelaxation;
         out.m_DoDisablePartialVolume = m_DoDisablePartialVolume;
         out.m_DoAddMotion = m_DoAddMotion;
@@ -123,7 +123,7 @@ public:
     double                              m_SpikeAmplitude;           ///< amplitude of spikes relative to the largest signal intensity (magnitude of complex)
     double                              m_KspaceLineOffset;         ///< Causes N/2 ghosts. Larger offset means stronger ghost.
     double                              m_EddyStrength;             ///< Strength of eddy current induced gradients in T/m.
-    double                              m_Wrap;                     ///< FOV size in y-direction is multiplied by this factor. Causes aliasing artifacts.
+    double                              m_CroppingFactor;           ///< FOV size in y-direction is multiplied by this factor. Causes aliasing artifacts.
     bool                                m_DoAddGibbsRinging;        ///< Add Gibbs ringing artifact
     bool                                m_DoSimulateRelaxation;     ///< Add T2 relaxation effects
     bool                                m_DoDisablePartialVolume;   ///< Disable partial volume effects. Each voxel is either all fiber or all non-fiber.

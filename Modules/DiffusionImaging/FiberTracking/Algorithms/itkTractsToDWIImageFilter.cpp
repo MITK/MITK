@@ -261,7 +261,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         m_RandGen->SetSeed();
 
     // initialize output dwi image
-    ImageRegion<3> croppedRegion = m_Parameters.m_ImageRegion; croppedRegion.SetSize(1, croppedRegion.GetSize(1)*m_Parameters.m_Wrap);
+    ImageRegion<3> croppedRegion = m_Parameters.m_ImageRegion; croppedRegion.SetSize(1, croppedRegion.GetSize(1)*m_Parameters.m_CroppingFactor);
     itk::Point<double,3> shiftedOrigin = m_Parameters.m_ImageOrigin; shiftedOrigin[1] += (m_Parameters.m_ImageRegion.GetSize(1)-croppedRegion.GetSize(1))*m_Parameters.m_ImageSpacing[1]/2;
     typename OutputImageType::Pointer outImage = OutputImageType::New();
     outImage->SetSpacing( m_Parameters.m_ImageSpacing );
@@ -712,7 +712,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
     // do k-space stuff
     DoubleDwiType::Pointer doubleOutImage;
-    if (m_Parameters.m_Spikes>0 || m_Parameters.m_FrequencyMap.IsNotNull() || m_Parameters.m_KspaceLineOffset>0 || m_Parameters.m_DoSimulateRelaxation || m_Parameters.m_EddyStrength>0 || m_Parameters.m_DoAddGibbsRinging || m_Parameters.m_Wrap<1.0)
+    if (m_Parameters.m_Spikes>0 || m_Parameters.m_FrequencyMap.IsNotNull() || m_Parameters.m_KspaceLineOffset>0 || m_Parameters.m_DoSimulateRelaxation || m_Parameters.m_EddyStrength>0 || m_Parameters.m_DoAddGibbsRinging || m_Parameters.m_CroppingFactor<1.0)
     {
         m_StatusText += this->GetTime()+" > Adjusting complex signal\n";
         MITK_INFO << "Adjusting complex signal:";
@@ -727,7 +727,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             m_StatusText += "Simulating eddy currents\n";
         if (m_Parameters.m_Spikes>0)
             m_StatusText += "Simulating spikes\n";
-        if (m_Parameters.m_Wrap<1.0)
+        if (m_Parameters.m_CroppingFactor<1.0)
             m_StatusText += "Simulating aliasing artifacts\n";
         if (m_Parameters.m_KspaceLineOffset>0)
             m_StatusText += "Simulating ghosts\n";

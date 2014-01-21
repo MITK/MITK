@@ -103,9 +103,9 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         fMap->FillBuffer(0.0);
     }
 
-    if (m_Parameters.m_Spikes>0 || m_Parameters.m_FrequencyMap.IsNotNull() || m_Parameters.m_KspaceLineOffset>0.0 || m_Parameters.m_DoAddGibbsRinging || m_Parameters.m_EddyStrength>0 || m_Parameters.m_Wrap<1.0)
+    if (m_Parameters.m_Spikes>0 || m_Parameters.m_FrequencyMap.IsNotNull() || m_Parameters.m_KspaceLineOffset>0.0 || m_Parameters.m_DoAddGibbsRinging || m_Parameters.m_EddyStrength>0 || m_Parameters.m_CroppingFactor<1.0)
     {
-        ImageRegion<3> croppedRegion = inputRegion; croppedRegion.SetSize(1, croppedRegion.GetSize(1)*m_Parameters.m_Wrap);
+        ImageRegion<3> croppedRegion = inputRegion; croppedRegion.SetSize(1, croppedRegion.GetSize(1)*m_Parameters.m_CroppingFactor);
         itk::Point<double,3> shiftedOrigin = inputImage->GetOrigin(); shiftedOrigin[1] += (inputRegion.GetSize(1)-croppedRegion.GetSize(1))*inputImage->GetSpacing()[1]/2;
 
         outputImage = InputImageType::New();
@@ -140,7 +140,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
             m_StatusText += "Simulating eddy currents\n";
         if (m_Parameters.m_Spikes>0)
             m_StatusText += "Simulating spikes\n";
-        if (m_Parameters.m_Wrap<1.0)
+        if (m_Parameters.m_CroppingFactor<1.0)
             m_StatusText += "Simulating aliasing artifacts\n";
         if (m_Parameters.m_KspaceLineOffset>0)
             m_StatusText += "Simulating ghosts\n";

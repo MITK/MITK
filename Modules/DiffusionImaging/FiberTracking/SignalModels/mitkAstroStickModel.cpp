@@ -60,13 +60,13 @@ ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(int dir)
 
     ScalarType b = -m_BValue*m_Diffusivity;
 
-    if (m_RandomizeSticks)
+    if (m_RandomizeSticks)  // random number of sticks
         m_NumSticks = 30 + m_RandGen->GetIntegerVariate()%31;
 
     GradientType g = this->m_GradientList[dir];
     ScalarType bVal = g.GetNorm(); bVal *= bVal;
 
-    if (bVal>0.0001)
+    if (bVal>0.0001)    // is weighted direction
     {
         for (int j=0; j<m_NumSticks; j++)
         {
@@ -79,7 +79,7 @@ ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(int dir)
         }
         signal /= m_NumSticks;
     }
-    else
+    else    // is baseline direction
         signal = 1;
 
     return signal;

@@ -238,12 +238,12 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
 
         // Aliasing
         parameters.m_KspaceLineOffset = 0;
-        parameters.m_Wrap = 0.4;
+        parameters.m_CroppingFactor = 0.4;
         parameters.m_SignalScale = 1000;
         StartSimulation(parameters, fiberBundle, aliasing, argv[10]);
 
         // Eddy currents
-        parameters.m_Wrap = 1;
+        parameters.m_CroppingFactor = 1;
         parameters.m_SignalScale = 10000;
         parameters.m_EddyStrength = 0.05;
         StartSimulation(parameters, fiberBundle, eddy, argv[11]);

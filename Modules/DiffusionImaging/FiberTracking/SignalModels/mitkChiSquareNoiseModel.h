@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 /**
-  * \brief Implementation of noise following a rician distribution
+  * \brief Implementation of noise following a chi-squared distribution
   *
   */
 
@@ -42,7 +42,7 @@ public:
 
     void SetNoiseVariance(double var){ m_Distribution = boost::random::chi_squared_distribution<double>(var/2); }
     double GetNoiseVariance(){ return m_Distribution.n()*2; }
-    void SetSeed(int seed);
+    void SetSeed(int seed); ///< seed for random number generator
 
 protected:
 

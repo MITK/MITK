@@ -437,7 +437,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     if (m_Controls->m_AddAliasing->isChecked())
     {
         parameters.m_ArtifactModelString += "_ALIASING";
-        parameters.m_Wrap = (100-m_Controls->m_WrapBox->value())/100;
+        parameters.m_CroppingFactor = (100-m_Controls->m_WrapBox->value())/100;
         parameters.m_ResultNode->AddProperty("Fiberfox.Aliasing", DoubleProperty::New(m_Controls->m_WrapBox->value()));
     }
 
@@ -1692,7 +1692,7 @@ void QmitkFiberfoxView::SimulateForExistingDwi(mitk::DataNode* imageNode)
             parameters.m_KspaceLineOffset<=0.000001 &&
             !parameters.m_DoAddGibbsRinging &&
             !(parameters.m_EddyStrength>0) &&
-            parameters.m_Wrap>0.999)
+            parameters.m_CroppingFactor>0.999)
     {
         QMessageBox::information( NULL, "Simulation cancelled", "No valid artifact enabled! Motion artifacts and relaxation effects can NOT be added to an existing diffusion weighted image.");
         return;

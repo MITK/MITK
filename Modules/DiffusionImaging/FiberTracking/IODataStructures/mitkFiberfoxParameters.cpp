@@ -48,7 +48,7 @@ mitk::FiberfoxParameters< ScalarType >::FiberfoxParameters()
     , m_tEcho(100)
     , m_tInhom(50)
     , m_tLine(1)
-    , m_Wrap(1)
+    , m_CroppingFactor(1)
     , m_MaskImage(NULL)
     , m_FrequencyMap(NULL)
     , m_NoiseModel(NULL)
@@ -272,7 +272,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             }
 
             m_KspaceLineOffset = v1.second.get<double>("artifacts.m_KspaceLineOffset");
-            m_Wrap = (100-v1.second.get<double>("artifacts.aliasingfactor"))/100;
+            m_CroppingFactor = (100-v1.second.get<double>("artifacts.aliasingfactor"))/100;
             m_Spikes = v1.second.get<int>("artifacts.m_Spikesnum");
             m_SpikeAmplitude = v1.second.get<double>("artifacts.m_Spikesscale");
             m_EddyStrength = v1.second.get<double>("artifacts.m_EddyStrength");
@@ -437,7 +437,7 @@ void mitk::FiberfoxParameters< ScalarType >::PrintSelf()
     MITK_INFO << "m_EddyStrength: " << m_EddyStrength;
     MITK_INFO << "m_Spikes: " << m_Spikes;
     MITK_INFO << "m_SpikeAmplitude: " << m_SpikeAmplitude;
-    MITK_INFO << "m_Wrap: " << m_Wrap;
+    MITK_INFO << "m_Wrap: " << m_CroppingFactor;
     MITK_INFO << "m_DoSimulateRelaxation: " << m_DoSimulateRelaxation;
     MITK_INFO << "m_DoDisablePartialVolume: " << m_DoDisablePartialVolume;
     MITK_INFO << "m_DoAddMotion: " << m_DoAddMotion;

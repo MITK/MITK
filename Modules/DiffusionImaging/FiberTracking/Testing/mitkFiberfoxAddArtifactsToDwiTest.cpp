@@ -149,7 +149,7 @@ public:
 
     void Aliasing()
     {
-        m_Parameters.m_Wrap = 0.4;
+        m_Parameters.m_CroppingFactor = 0.4;
         StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/aliasing2.dwi") );
     }
 

@@ -21,7 +21,7 @@ macro(MITK_CREATE_MODULE_CONF MODULE_NAME_IN)
   if(MODULE_QT_MODULE)
     message(WARNING "The QT_MODULE option is deprecated. Please use PACKAGE_DEPENDS Qt4|QtCore and/or PACKAGE_DEPENDS Qt5|Core instead.")
     if (NOT "${MODULE_PACKAGE_DEPENDS}" MATCHES "^.*Qt4.*$")
-      list(APPEND MODULE_PACKAGE_DEPENDS Qt4>QtGui)
+      list(APPEND MODULE_PACKAGE_DEPENDS Qt4|QtGui)
     endif()
   endif()
 

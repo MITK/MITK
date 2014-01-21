@@ -21,7 +21,7 @@ if(MITK_USE_GLUT)
       mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
       get_filename_component(GLUT_DIR ${GLUT_LIBRARY} PATH)
     else()
-      set(patch_cmd ${CMAKE_COMMAND} -Dproj:STRING=${proj} -Dproj_target:STRING=GLUT -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake)
+      set(patch_cmd ${CMAKE_COMMAND} -Dproj:STRING=${proj} -Dproj_target:STRING=freeglut -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake)
 
       ExternalProject_Add(${proj}
          SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src

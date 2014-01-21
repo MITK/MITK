@@ -58,48 +58,18 @@ bool CompareDwi(itk::VectorImage< short, 3 >* dwi1, itk::VectorImage< short, 3 >
     return true;
 }
 
-void StartSimulation(FiberfoxParameters parameters, FiberBundleX::Pointer fiberBundle, mitk::DiffusionImage<short>::Pointer refImage, string message)
+void StartSimulation(FiberfoxParameters<double> parameters, FiberBundleX::Pointer fiberBundle, mitk::DiffusionImage<short>::Pointer refImage, string message)
 {
     itk::TractsToDWIImageFilter< short >::Pointer tractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
     tractsToDwiFilter->SetUseConstantRandSeed(true);
-    tractsToDwiFilter->SetSimulateEddyCurrents(parameters.m_DoSimulateEddyCurrents);
-    tractsToDwiFilter->SetEddyGradientStrength(parameters.m_EddyStrength);
-    tractsToDwiFilter->SetAddGibbsRinging(parameters.m_AddGibbsRinging);
-    tractsToDwiFilter->SetSimulateRelaxation(parameters.m_DoSimulateRelaxation);
-    tractsToDwiFilter->SetImageRegion(parameters.m_ImageRegion);
-    tractsToDwiFilter->SetSpacing(parameters.m_ImageSpacing);
-    tractsToDwiFilter->SetOrigin(parameters.m_ImageOrigin);
-    tractsToDwiFilter->SetDirectionMatrix(parameters.m_ImageDirection);
+    tractsToDwiFilter->SetParameters(parameters);
     tractsToDwiFilter->SetFiberBundle(fiberBundle);
-    tractsToDwiFilter->SetFiberModels(parameters.m_FiberModelList);
-    tractsToDwiFilter->SetNonFiberModels(parameters.m_NonFiberModelList);
-    tractsToDwiFilter->SetNoiseModel(parameters.m_NoiseModel);
-    tractsToDwiFilter->SetkOffset(parameters.m_KspaceLineOffset);
-    tractsToDwiFilter->SettLine(parameters.m_tLine);
-    tractsToDwiFilter->SettInhom(parameters.m_tInhom);
-    tractsToDwiFilter->SetTE(parameters.m_tEcho);
-    tractsToDwiFilter->SetNumberOfRepetitions(parameters.m_Repetitions);
-    tractsToDwiFilter->SetEnforcePureFiberVoxels(parameters.m_DoDisablePartialVolume);
-    tractsToDwiFilter->SetInterpolationShrink(parameters.m_InterpolationShrink);
-    tractsToDwiFilter->SetFiberRadius(parameters.m_AxonRadius);
-    tractsToDwiFilter->SetSignalScale(parameters.m_SignalScale);
-    if (parameters.m_InterpolationShrink>0)
-        tractsToDwiFilter->SetUseInterpolation(true);
-    tractsToDwiFilter->SetTissueMask(parameters.m_MaskImage);
-    tractsToDwiFilter->SetFrequencyMap(parameters.m_FrequencyMap);
-    tractsToDwiFilter->SetSpikeAmplitude(parameters.m_SpikeAmplitude);
-    tractsToDwiFilter->SetSpikes(parameters.m_Spikes);
-    tractsToDwiFilter->SetWrap(parameters.m_Wrap);
-    tractsToDwiFilter->SetAddMotionArtifact(parameters.m_DoAddMotion);
-    tractsToDwiFilter->SetMaxTranslation(parameters.m_Translation);
-    tractsToDwiFilter->SetMaxRotation(parameters.m_Rotation);
-    tractsToDwiFilter->SetRandomMotion(parameters.m_RandomMotion);
     tractsToDwiFilter->Update();
 
     mitk::DiffusionImage<short>::Pointer testImage = mitk::DiffusionImage<short>::New();
     testImage->SetVectorImage( tractsToDwiFilter->GetOutput() );
     testImage->SetB_Value(parameters.m_Bvalue);
-    testImage->SetDirections(parameters.m_GradientDirections);
+    testImage->SetDirections(parameters.GetGradientDirections());
     testImage->InitializeFromVectorImage();
 
     if (refImage.IsNotNull())
@@ -164,7 +134,7 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     ItkDoubleImgType::Pointer fMap = ItkDoubleImgType::New();
     mitk::CastToItkImage<ItkDoubleImgType>(mitkFMap, fMap);
 
-    FiberfoxParameters parameters;
+    FiberfoxParameters<double> parameters;
     parameters.m_DoSimulateRelaxation = true;
     parameters.m_SignalScale = 10000;
     parameters.m_ImageRegion = stickBall->GetVectorImage()->GetLargestPossibleRegion();
@@ -172,25 +142,14 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     parameters.m_ImageOrigin = stickBall->GetVectorImage()->GetOrigin();
     parameters.m_ImageDirection = stickBall->GetVectorImage()->GetDirection();
     parameters.m_Bvalue = stickBall->GetB_Value();
-    mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer dirs = stickBall->GetDirections();
-    parameters.m_NumGradients = 0;
-    for (unsigned int i=0; i<dirs->Size(); i++)
-    {
-        DiffusionSignalModel<double>::GradientType g;
-        g[0] = dirs->at(i)[0];
-        g[1] = dirs->at(i)[1];
-        g[2] = dirs->at(i)[2];
-        parameters.m_GradientDirections.push_back(g);
-        if (dirs->at(i).magnitude()>0.0001)
-            parameters.m_NumGradients++;
-    }
+    parameters.SetGradienDirections(stickBall->GetDirections());
 
     // intra and inter axonal compartments
     mitk::StickModel<double> stickModel;
     stickModel.SetBvalue(parameters.m_Bvalue);
     stickModel.SetT2(110);
     stickModel.SetDiffusivity(0.001);
-    stickModel.SetGradientList(parameters.m_GradientDirections);
+    stickModel.SetGradientList(parameters.GetGradientDirections());
 
     mitk::TensorModel<double> tensorModel;
     tensorModel.SetT2(110);
@@ -198,14 +157,14 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     tensorModel.SetDiffusivity1(0.001);
     tensorModel.SetDiffusivity2(0.00025);
     tensorModel.SetDiffusivity3(0.00025);
-    tensorModel.SetGradientList(parameters.m_GradientDirections);
+    tensorModel.SetGradientList(parameters.GetGradientDirections());
 
     // extra axonal compartment models
     mitk::BallModel<double> ballModel;
     ballModel.SetT2(80);
     ballModel.SetBvalue(parameters.m_Bvalue);
     ballModel.SetDiffusivity(0.001);
-    ballModel.SetGradientList(parameters.m_GradientDirections);
+    ballModel.SetGradientList(parameters.GetGradientDirections());
 
     mitk::AstroStickModel<double> astrosticksModel;
     astrosticksModel.SetT2(80);
@@ -213,11 +172,11 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     astrosticksModel.SetDiffusivity(0.001);
     astrosticksModel.SetRandomizeSticks(true);
     astrosticksModel.SetSeed(0);
-    astrosticksModel.SetGradientList(parameters.m_GradientDirections);
+    astrosticksModel.SetGradientList(parameters.GetGradientDirections());
 
     mitk::DotModel<double> dotModel;
     dotModel.SetT2(80);
-    dotModel.SetGradientList(parameters.m_GradientDirections);
+    dotModel.SetGradientList(parameters.GetGradientDirections());
 
     // noise models
     mitk::RicianNoiseModel<double>* ricianNoiseModel = new mitk::RicianNoiseModel<double>();
@@ -226,7 +185,7 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
 
     // Rician noise
     mitk::ChiSquareNoiseModel<double>* chiSquareNoiseModel = new mitk::ChiSquareNoiseModel<double>();
-    chiSquareNoiseModel->SetDOF(500000);
+    chiSquareNoiseModel->SetNoiseVariance(1000000);
     chiSquareNoiseModel->SetSeed(0);
 
     try{
@@ -269,11 +228,11 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
         parameters.m_FiberModelList.push_back(&stickModel);
         parameters.m_NonFiberModelList.clear();
         parameters.m_NonFiberModelList.push_back(&ballModel);
-        parameters.m_AddGibbsRinging = true;
+        parameters.m_DoAddGibbsRinging = true;
         StartSimulation(parameters, fiberBundle, gibbsringing, argv[8]);
 
         // Ghost
-        parameters.m_AddGibbsRinging = false;
+        parameters.m_DoAddGibbsRinging = false;
         parameters.m_KspaceLineOffset = 0.25;
         StartSimulation(parameters, fiberBundle, ghost, argv[9]);
 
@@ -286,21 +245,19 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
         // Eddy currents
         parameters.m_Wrap = 1;
         parameters.m_SignalScale = 10000;
-        parameters.m_DoSimulateEddyCurrents = true;
         parameters.m_EddyStrength = 0.05;
         StartSimulation(parameters, fiberBundle, eddy, argv[11]);
 
         // Motion (linear)
-        parameters.m_DoSimulateEddyCurrents = false;
         parameters.m_EddyStrength = 0.0;
         parameters.m_DoAddMotion = true;
-        parameters.m_RandomMotion = false;
+        parameters.m_DoRandomizeMotion = false;
         parameters.m_Translation[1] = 10;
         parameters.m_Rotation[2] = 90;
         StartSimulation(parameters, fiberBundle, linearmotion, argv[12]);
 
         // Motion (random)
-        parameters.m_RandomMotion = true;
+        parameters.m_DoRandomizeMotion = true;
         parameters.m_Translation[1] = 5;
         parameters.m_Rotation[2] = 45;
         StartSimulation(parameters, fiberBundle, randommotion, argv[13]);

@@ -38,18 +38,7 @@ namespace itk {
 template< class TPixelType >
 AddArtifactsToDwiImageFilter< TPixelType >
 ::AddArtifactsToDwiImageFilter()
-    : m_NoiseModel(NULL)
-    , m_FrequencyMap(NULL)
-    , m_kOffset(0)
-    , m_tLine(1)
-    , m_EddyGradientStrength(0.0)
-    , m_SimulateEddyCurrents(false)
-    , m_TE(100)
-    , m_AddGibbsRinging(false)
-    , m_Spikes(0)
-    , m_SpikeAmplitude(1)
-    , m_Wrap(1.0)
-    , m_UseConstantRandSeed(false)
+    : m_UseConstantRandSeed(false)
 {
     this->SetNumberOfRequiredInputs( 1 );
 
@@ -69,13 +58,13 @@ void AddArtifactsToDwiImageFilter< TPixelType >
     m_StartTime = clock();
     m_StatusText = "Starting simulation\n";
 
-    typename DiffusionImageType::Pointer inputImage  = static_cast< DiffusionImageType * >( this->ProcessObject::GetInput(0) );
+    typename InputImageType::Pointer inputImage  = static_cast< InputImageType* >( this->ProcessObject::GetInput(0) );
     itk::ImageRegion<3> inputRegion = inputImage->GetLargestPossibleRegion();
 
-    typename itk::ImageDuplicator<DiffusionImageType>::Pointer duplicator = itk::ImageDuplicator<DiffusionImageType>::New();
+    typename itk::ImageDuplicator<InputImageType>::Pointer duplicator = itk::ImageDuplicator<InputImageType>::New();
     duplicator->SetInputImage( inputImage );
     duplicator->Update();
-    typename DiffusionImageType::Pointer outputImage = duplicator->GetOutput();
+    typename InputImageType::Pointer outputImage = duplicator->GetOutput();
 
     // is input slize size even?
     int xMax=inputRegion.GetSize(0); int yMax=inputRegion.GetSize(1);
@@ -96,7 +85,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
     slice->FillBuffer(0.0);
 
     ImageRegion<2> upsampledSliceRegion;
-    if (m_AddGibbsRinging)
+    if (m_Parameters.m_DoAddGibbsRinging)
     {
         upsampledSliceRegion.SetSize(0, xMax*2);
         upsampledSliceRegion.SetSize(1, yMax*2);
@@ -104,7 +93,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
 
     // frequency map slice
     typename SliceType::Pointer fMap = NULL;
-    if (m_FrequencyMap.IsNotNull())
+    if (m_Parameters.m_FrequencyMap.IsNotNull())
     {
         fMap = SliceType::New();
         fMap->SetLargestPossibleRegion( sliceRegion );
@@ -114,12 +103,12 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         fMap->FillBuffer(0.0);
     }
 
-    if (m_Spikes>0 || m_FrequencyMap.IsNotNull() || m_kOffset>0.0 || m_AddGibbsRinging || m_SimulateEddyCurrents || m_Wrap<1.0)
+    if (m_Parameters.m_Spikes>0 || m_Parameters.m_FrequencyMap.IsNotNull() || m_Parameters.m_KspaceLineOffset>0.0 || m_Parameters.m_DoAddGibbsRinging || m_Parameters.m_EddyStrength>0 || m_Parameters.m_Wrap<1.0)
     {
-        ImageRegion<3> croppedRegion = inputRegion; croppedRegion.SetSize(1, croppedRegion.GetSize(1)*m_Wrap);
+        ImageRegion<3> croppedRegion = inputRegion; croppedRegion.SetSize(1, croppedRegion.GetSize(1)*m_Parameters.m_Wrap);
         itk::Point<double,3> shiftedOrigin = inputImage->GetOrigin(); shiftedOrigin[1] += (inputRegion.GetSize(1)-croppedRegion.GetSize(1))*inputImage->GetSpacing()[1]/2;
 
-        outputImage = DiffusionImageType::New();
+        outputImage = InputImageType::New();
         outputImage->SetSpacing( inputImage->GetSpacing() );
         outputImage->SetOrigin( shiftedOrigin );
         outputImage->SetDirection( inputImage->GetDirection() );
@@ -128,7 +117,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         outputImage->SetRequestedRegion( croppedRegion );
         outputImage->SetVectorLength( inputImage->GetVectorLength() );
         outputImage->Allocate();
-        typename DiffusionImageType::PixelType temp;
+        typename InputImageType::PixelType temp;
         temp.SetSize(inputImage->GetVectorLength());
         temp.Fill(0.0);
         outputImage->FillBuffer(temp);
@@ -143,21 +132,21 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                 transform[i][j] *= inputImage->GetSpacing()[j];
 
         m_StatusText += this->GetTime()+" > Adjusting complex signal\n";
-        if (m_FrequencyMap.IsNotNull())
+        if (m_Parameters.m_FrequencyMap.IsNotNull())
             m_StatusText += "Simulating distortions\n";
-        if (m_AddGibbsRinging)
+        if (m_Parameters.m_DoAddGibbsRinging)
             m_StatusText += "Simulating ringing artifacts\n";
-        if (m_SimulateEddyCurrents)
+        if (m_Parameters.m_EddyStrength>0)
             m_StatusText += "Simulating eddy currents\n";
-        if (m_Spikes>0)
+        if (m_Parameters.m_Spikes>0)
             m_StatusText += "Simulating spikes\n";
-        if (m_Wrap<1.0)
+        if (m_Parameters.m_Wrap<1.0)
             m_StatusText += "Simulating aliasing artifacts\n";
-        if (m_kOffset>0)
+        if (m_Parameters.m_KspaceLineOffset>0)
             m_StatusText += "Simulating ghosts\n";
 
         std::vector< int > spikeVolume;
-        for (int i=0; i<m_Spikes; i++)
+        for (int i=0; i<m_Parameters.m_Spikes; i++)
             spikeVolume.push_back(m_RandGen->GetIntegerVariate()%inputImage->GetVectorLength());
         std::sort (spikeVolume.begin(), spikeVolume.end());
         std::reverse (spikeVolume.begin(), spikeVolume.end());
@@ -192,16 +181,16 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                     {
                         typename SliceType::IndexType index2D;
                         index2D[0]=x; index2D[1]=y;
-                        typename DiffusionImageType::IndexType index3D;
+                        typename InputImageType::IndexType index3D;
                         index3D[0]=x; index3D[1]=y; index3D[2]=z;
 
                         SliceType::PixelType pix2D = (SliceType::PixelType)inputImage->GetPixel(index3D)[g];
                         slice->SetPixel(index2D, pix2D);
                         if (fMap.IsNotNull())
-                            fMap->SetPixel(index2D, m_FrequencyMap->GetPixel(index3D));
+                            fMap->SetPixel(index2D, m_Parameters.m_FrequencyMap->GetPixel(index3D));
                     }
 
-                if (m_AddGibbsRinging)
+                if (m_Parameters.m_DoAddGibbsRinging)
                 {
                     itk::ResampleImageFilter<SliceType, SliceType>::Pointer resampler = itk::ResampleImageFilter<SliceType, SliceType>::New();
                     resampler->SetInput(slice);
@@ -233,14 +222,13 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                 typename itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
                 idft->SetUseConstantRandSeed(m_UseConstantRandSeed);
                 idft->SetCompartmentImages(compartmentSlices);
-                idft->SetkOffset(m_kOffset);
-                idft->SettLine(m_tLine);
+                idft->SetkOffset(m_Parameters.m_KspaceLineOffset);
+                idft->SettLine(m_Parameters.m_tLine);
                 idft->SetSimulateRelaxation(false);
                 idft->SetFrequencyMap(fMap);
-                idft->SetDiffusionGradientDirection(m_GradientList.at(g));
-                idft->SetSimulateEddyCurrents(m_SimulateEddyCurrents);
-                idft->SetEddyGradientMagnitude(m_EddyGradientStrength);
-                idft->SetTE(m_TE);
+                idft->SetDiffusionGradientDirection(m_Parameters.GetGradientDirection(g));
+                idft->SetEddyGradientMagnitude(m_Parameters.m_EddyStrength);
+                idft->SetTE(m_Parameters.m_tEcho);
                 idft->SetZ((double)z-(double)inputRegion.GetSize(2)/2.0);
                 idft->SetDirectionMatrix(transform);
                 idft->SetOutSize(outSize);
@@ -251,7 +239,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                     spikeSlice.pop_back();
                 }
                 idft->SetSpikes(numSpikes);
-                idft->SetSpikeAmplitude(m_SpikeAmplitude);
+                idft->SetSpikeAmplitude(m_Parameters.m_SpikeAmplitude);
                 idft->Update();
                 fSlice = idft->GetOutput();
 
@@ -266,9 +254,9 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                 for (unsigned int y=0; y<outputImage->GetLargestPossibleRegion().GetSize(1); y++)
                     for (unsigned int x=0; x<outputImage->GetLargestPossibleRegion().GetSize(0); x++)
                     {
-                        typename DiffusionImageType::IndexType index3D;
+                        typename InputImageType::IndexType index3D;
                         index3D[0]=x; index3D[1]=y; index3D[2]=z;
-                        typename DiffusionImageType::PixelType pix3D = outputImage->GetPixel(index3D);
+                        typename InputImageType::PixelType pix3D = outputImage->GetPixel(index3D);
                         typename SliceType::IndexType index2D;
                         index2D[0]=x; index2D[1]=y;
 
@@ -292,14 +280,14 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         m_StatusText += "\n\n";
     }
 
-    if (m_NoiseModel!=NULL)
+    if (m_Parameters.m_NoiseModel!=NULL)
     {
         m_StatusText += this->GetTime()+" > Adding noise\n";
         m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
         m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
         unsigned long lastTick = 0;
 
-        ImageRegionIterator<DiffusionImageType> it1 (outputImage, outputImage->GetLargestPossibleRegion());
+        ImageRegionIterator<InputImageType> it1 (outputImage, outputImage->GetLargestPossibleRegion());
         boost::progress_display disp(outputImage->GetLargestPossibleRegion().GetNumberOfPixels());
         while(!it1.IsAtEnd())
         {
@@ -315,8 +303,8 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                 m_StatusText += "*";
             lastTick = newTick;
 
-            typename DiffusionImageType::PixelType signal = it1.Get();
-            m_NoiseModel->AddNoise(signal);
+            typename InputImageType::PixelType signal = it1.Get();
+            m_Parameters.m_NoiseModel->AddNoise(signal);
             it1.Set(signal);
 
             ++it1;

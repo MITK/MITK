@@ -40,8 +40,8 @@ public:
     /** Adds rician noise to the input pixel **/
     void AddNoise(PixelType& pixel);
 
-    void SetDOF(double var){ m_Distribution = boost::random::chi_squared_distribution<double>(var); }
-    double GetNoiseVariance(){ return m_Distribution.n(); }
+    void SetNoiseVariance(double var){ m_Distribution = boost::random::chi_squared_distribution<double>(var/2); }
+    double GetNoiseVariance(){ return m_Distribution.n()*2; }
     void SetSeed(int seed);
 
 protected:

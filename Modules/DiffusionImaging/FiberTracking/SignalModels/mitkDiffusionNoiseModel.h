@@ -46,6 +46,9 @@ public:
     /** Seed random generator. Has to be implemented in subclass. **/
     virtual void SetSeed(int seed) = 0;
 
+    virtual double GetNoiseVariance() = 0;
+    virtual void SetNoiseVariance(double var) = 0;
+
 protected:
 
 };

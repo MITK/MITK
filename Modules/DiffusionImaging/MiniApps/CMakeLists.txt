@@ -39,7 +39,7 @@ IF(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     PeakExtraction.cpp
     PeaksAngularError.cpp
     MultishellMethods.cpp
-    FiberFoxProcessing.cpp
+    #FiberFoxProcessing.cpp
     ExportShImage.cpp
     NetworkCreation.cpp
     NetworkStatistics.cpp

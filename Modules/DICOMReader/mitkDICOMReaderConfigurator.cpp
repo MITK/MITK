@@ -104,6 +104,8 @@ mitk::DICOMReaderConfigurator
     if (classname == "ClassicDICOMSeriesReader")
     {
       mitk::ClassicDICOMSeriesReader::Pointer reader = mitk::ClassicDICOMSeriesReader::New();
+      this->ConfigureCommonPropertiesOfDICOMITKSeriesGDCMReader(reader.GetPointer(), rootElement);
+      this->ConfigureCommonPropertiesOfThreeDnTDICOMSeriesReader(reader.GetPointer(), rootElement);
       return reader.GetPointer();
     }
     if (classname == "ThreeDnTDICOMSeriesReader")
@@ -144,6 +146,22 @@ mitk::DICOMReaderConfigurator
   (   s == "true" || s == "on" || s == "1" \
    || s == "TRUE" || s == "ON")
 
+void
+mitk::DICOMReaderConfigurator
+::ConfigureCommonPropertiesOfThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, TiXmlElement* element) const
+{
+  // add the "group3DnT" flag
+  bool group3DnT(true);
+  const char* group3DnTC = element->Attribute("group3DnT");
+  if (group3DnTC)
+  {
+    std::string group3DnTS(group3DnTC);
+    group3DnT = boolStringTrue(group3DnTS);
+  }
+
+  reader->SetGroup3DandT( group3DnT );
+}
+
 mitk::ThreeDnTDICOMSeriesReader::Pointer
 mitk::DICOMReaderConfigurator
 ::ConfigureThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, TiXmlElement* element) const
@@ -156,23 +174,13 @@ mitk::DICOMReaderConfigurator
     return NULL;
   }
 
-  // add the "group3DnT" flag
-  bool group3DnT(true);
-  const char* group3DnTC = element->Attribute("group3DnT");
-  if (group3DnTC)
-  {
-    std::string group3DnTS(group3DnTC);
-    group3DnT = boolStringTrue(group3DnTS);
-  }
-
-  reader->SetGroup3DandT( group3DnT );
-
+  this->ConfigureCommonPropertiesOfThreeDnTDICOMSeriesReader(reader,element);
   return reader;
 }
 
-mitk::DICOMITKSeriesGDCMReader::Pointer
+void
 mitk::DICOMReaderConfigurator
-::ConfigureDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, TiXmlElement* element) const
+::ConfigureCommonPropertiesOfDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, TiXmlElement* element) const
 {
   assert(element);
 
@@ -200,6 +208,16 @@ mitk::DICOMReaderConfigurator
   }
 
   reader->SetFixTiltByShearing( fixTiltByShearing );
+
+}
+
+mitk::DICOMITKSeriesGDCMReader::Pointer
+mitk::DICOMReaderConfigurator
+::ConfigureDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, TiXmlElement* element) const
+{
+  assert(element);
+
+  this->ConfigureCommonPropertiesOfDICOMITKSeriesGDCMReader(reader, element);
 
   // "acceptTwoSlicesGroups" flag
   bool acceptTwoSlicesGroups(true);

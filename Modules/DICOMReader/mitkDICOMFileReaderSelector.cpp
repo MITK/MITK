@@ -122,7 +122,7 @@ mitk::DICOMFileReaderSelector
   this->AddConfigFromResource("configurations/3D/imageposition.xml");
   this->AddConfigFromResource("configurations/3D/imageposition_byacquisition.xml");
   //this->AddConfigFromResource("configurations/3D/imagetime.xml"); // no sense in this one? want to see a real-world example first
-  //this->AddConfigFromResource("configurations/3D/classicreader.xml"); // currently is 3D+t actually
+  this->AddConfigFromResource("configurations/3D/classicreader.xml"); // currently is 3D+t actually
 }
 
 void

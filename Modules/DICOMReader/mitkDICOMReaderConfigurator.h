@@ -117,6 +117,8 @@ class DICOMReader_EXPORT DICOMReaderConfigurator : public itk::LightObject
 
     ThreeDnTDICOMSeriesReader::Pointer ConfigureThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, TiXmlElement*) const;
     DICOMITKSeriesGDCMReader::Pointer ConfigureDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, TiXmlElement*) const;
+    void ConfigureCommonPropertiesOfDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, TiXmlElement* element) const;
+    void ConfigureCommonPropertiesOfThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, TiXmlElement* element) const;
 
     DICOMSortCriterion::Pointer CreateDICOMSortByTag(TiXmlElement* xmlElement, DICOMSortCriterion::Pointer secondaryCriterion) const;
     DICOMSortCriterion::Pointer CreateSortByImagePositionPatient(TiXmlElement* xmlElement, DICOMSortCriterion::Pointer secondaryCriterion) const;

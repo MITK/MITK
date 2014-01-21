@@ -297,40 +297,7 @@ mitk::DICOMITKSeriesGDCMReader
 
   // scan files for sorting-relevant tags
   timer.Start("Setup scanning");
-  for(SorterList::iterator sorterIter = m_Sorter.begin();
-      sorterIter != m_Sorter.end();
-      ++sorterIter)
-  {
-    assert(sorterIter->IsNotNull());
-
-    DICOMTagList tags = (*sorterIter)->GetTagsOfInterest();
-    filescanner->AddTags( tags );
-  }
-
-  // Add some of our own interest
-  // TODO all tags that are needed in DICOMImageBlockDescriptor should be added by DICOMFileReader (this code location here should query all superclasses for tags)
-  filescanner->AddTag( DICOMTag(0x0018,0x1164) ); // pixel spacing
-  filescanner->AddTag( DICOMTag(0x0028,0x0030) ); // imager pixel spacing
-
-  filescanner->AddTag( DICOMTag(0x0028,0x1050) ); // window center
-  filescanner->AddTag( DICOMTag(0x0028,0x1051) ); // window width
-  filescanner->AddTag( DICOMTag(0x0008,0x0008) ); // image type
-  filescanner->AddTag( DICOMTag(0x0028,0x0004) ); // photometric interpretation
-
-  filescanner->AddTag( DICOMTag(0x0020,0x1041) ); // slice location
-  filescanner->AddTag( DICOMTag(0x0020,0x0013) ); // instance number
-  filescanner->AddTag( DICOMTag(0x0008,0x0016) ); // sop class UID
-  filescanner->AddTag( DICOMTag(0x0008,0x0018) ); // sop instance UID
-
-  filescanner->AddTag( DICOMTag(0x0020,0x0011) ); // series number
-  filescanner->AddTag( DICOMTag(0x0008,0x1030) ); // study description
-  filescanner->AddTag( DICOMTag(0x0008,0x103e) ); // series description
-  filescanner->AddTag( DICOMTag(0x0008,0x0060) ); // modality
-  filescanner->AddTag( DICOMTag(0x0020,0x0012) ); // acquisition number
-  filescanner->AddTag( DICOMTag(0x0018,0x0024) ); // sequence name
-  filescanner->AddTag( DICOMTag(0x0020,0x0037) ); // image orientation
-  filescanner->AddTag( DICOMTag(0x0020,0x0032) ); // ipp
-
+  filescanner->AddTags( this->GetTagsOfInterest() );
 
   timer.Stop("Setup scanning");
 
@@ -341,14 +308,6 @@ mitk::DICOMITKSeriesGDCMReader
   timer.Stop("Tag scanning");
 
   timer.Start("Setup sorting");
-  // TODO move this out into a GDCMTagCache class
-  // Class has to do
-  // - add files(file list)
-  // - scan()
-  // - addtag ( DICOMITKSeriesGDCMReader::GetTagsOfInterest(), which calls DICOMImageBlockDescriptor::GetTagsOfInterest() )
-  // - getAllFrames
-  // - getTagValue(frame, tag)
-  //
   m_SortingResultInProgress.clear();
   m_SortingResultInProgress.push_back(filescanner->GetFrameInfoList());
   timer.Stop("Setup sorting");
@@ -685,4 +644,47 @@ mitk::DICOMITKSeriesGDCMReader
 ::GetTagCache() const
 {
   return m_TagCache;
+}
+
+mitk::DICOMTagList
+mitk::DICOMITKSeriesGDCMReader
+::GetTagsOfInterest() const
+{
+  DICOMTagList completeList;
+
+  for(SorterList::const_iterator sorterIter = m_Sorter.begin();
+      sorterIter != m_Sorter.end();
+      ++sorterIter)
+  {
+    assert(sorterIter->IsNotNull());
+
+    DICOMTagList tags = (*sorterIter)->GetTagsOfInterest();
+    completeList.insert( completeList.end(), tags.begin(), tags.end() );
+  }
+
+  // Add some of our own interest
+  // TODO all tags that are needed in DICOMImageBlockDescriptor should be added by DICOMFileReader (this code location here should query all superclasses for tags)
+  completeList.push_back( DICOMTag(0x0018,0x1164) ); // pixel spacing
+  completeList.push_back( DICOMTag(0x0028,0x0030) ); // imager pixel spacing
+
+  completeList.push_back( DICOMTag(0x0028,0x1050) ); // window center
+  completeList.push_back( DICOMTag(0x0028,0x1051) ); // window width
+  completeList.push_back( DICOMTag(0x0008,0x0008) ); // image type
+  completeList.push_back( DICOMTag(0x0028,0x0004) ); // photometric interpretation
+
+  completeList.push_back( DICOMTag(0x0020,0x1041) ); // slice location
+  completeList.push_back( DICOMTag(0x0020,0x0013) ); // instance number
+  completeList.push_back( DICOMTag(0x0008,0x0016) ); // sop class UID
+  completeList.push_back( DICOMTag(0x0008,0x0018) ); // sop instance UID
+
+  completeList.push_back( DICOMTag(0x0020,0x0011) ); // series number
+  completeList.push_back( DICOMTag(0x0008,0x1030) ); // study description
+  completeList.push_back( DICOMTag(0x0008,0x103e) ); // series description
+  completeList.push_back( DICOMTag(0x0008,0x0060) ); // modality
+  completeList.push_back( DICOMTag(0x0020,0x0012) ); // acquisition number
+  completeList.push_back( DICOMTag(0x0018,0x0024) ); // sequence name
+  completeList.push_back( DICOMTag(0x0020,0x0037) ); // image orientation
+  completeList.push_back( DICOMTag(0x0020,0x0032) ); // ipp
+
+  return completeList;
 }

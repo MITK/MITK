@@ -256,6 +256,8 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 
     virtual bool operator==(const DICOMFileReader& other) const;
 
+    virtual DICOMTagList GetTagsOfInterest() const;
+
   protected:
 
     virtual void InternalPrintConfiguration(std::ostream& os) const;

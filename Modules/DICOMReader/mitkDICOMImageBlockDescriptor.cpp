@@ -459,7 +459,7 @@ mitk::DICOMImageBlockDescriptor
   {
     double level = stringtodouble( windowCenter );
     double window = stringtodouble( windowWidth );
-    mitkImage->SetProperty("levelwindow", LevelWindowProperty::New( LevelWindow(level,window) ) );
+    mitkImage->SetProperty("levelwindow", LevelWindowProperty::New(LevelWindow(level,window)) );
   }
   catch (...)
   {

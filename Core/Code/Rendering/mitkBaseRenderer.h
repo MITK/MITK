@@ -383,6 +383,13 @@ namespace mitk
     itkGetMacro(EmptyWorldGeometry, bool)
 
     //##Documentation
+    //## @brief Tells if the displayed region is shifted and rescaled if the render window is resized.
+    itkGetMacro(KeepDisplayedRegion, bool)
+    //##Documentation
+    //## @brief Tells if the displayed region should be shifted and rescaled if the render window is resized.
+    itkSetMacro(KeepDisplayedRegion, bool)
+
+    //##Documentation
     //## @brief Mouse event dispatchers
     //## @note for internal use only. preliminary.
     virtual void MousePressEvent(MouseEvent*);
@@ -578,6 +585,10 @@ namespace mitk
     //##Documentation
     //## @brief Helper class which establishes connection between Interactors and Dispatcher via a common DataStorage.
     BindDispatcherInteractor* m_BindDispatcherInteractor;
+
+    //##Documentation
+    //## @brief Tells if the displayed region should be shifted or rescaled if the render window is resized.
+    bool m_KeepDisplayedRegion;
 
   protected:
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;

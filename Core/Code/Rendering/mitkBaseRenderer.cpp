@@ -111,7 +111,7 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
     m_RenderWindow(NULL), m_VtkRenderer(NULL), m_MapperID(defaultMapper), m_DataStorage(NULL), m_RenderingManager(rm), m_LastUpdateTime(0), m_CameraController(
         NULL), m_SliceNavigationController(NULL), m_CameraRotationController(NULL), /*m_Size(),*/
     m_Focused(false), m_WorldGeometry(NULL), m_WorldTimeGeometry(NULL), m_CurrentWorldGeometry(NULL), m_CurrentWorldGeometry2D(NULL), m_DisplayGeometry(
-        NULL), m_Slice(0), m_TimeStep(), m_CurrentWorldGeometry2DUpdateTime(), m_DisplayGeometryUpdateTime(), m_TimeStepUpdateTime(), m_WorldGeometryData(
+        NULL), m_Slice(0), m_TimeStep(), m_CurrentWorldGeometry2DUpdateTime(), m_DisplayGeometryUpdateTime(), m_TimeStepUpdateTime(), m_KeepDisplayedRegion(true), m_WorldGeometryData(
         NULL), m_DisplayGeometryData(NULL), m_CurrentWorldGeometry2DData(NULL), m_WorldGeometryNode(NULL), m_DisplayGeometryNode(NULL), m_CurrentWorldGeometry2DNode(
         NULL), m_DisplayGeometryTransformTime(0), m_CurrentWorldGeometry2DTransformTime(0), m_Name(name), /*m_Bounds(),*/m_EmptyWorldGeometry(
         true), m_DepthPeelingEnabled(true), m_MaxNumberOfPeels(100), m_NumberOfVisibleLODEnabledMappers(0)
@@ -316,7 +316,7 @@ void mitk::BaseRenderer::Resize(int w, int h)
   if (m_CameraController)
     m_CameraController->Resize(w, h); //(formerly problematic on windows: vtkSizeBug)
 
-  GetDisplayGeometry()->SetSizeInDisplayUnits(w, h);
+  GetDisplayGeometry()->SetSizeInDisplayUnits(w, h, m_KeepDisplayedRegion);
 }
 
 void mitk::BaseRenderer::InitRenderer(vtkRenderWindow* renderwindow)

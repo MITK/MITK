@@ -74,7 +74,7 @@ FunctionCreateBlueBerryApplication(
   NO_INSTALL
   SHOW_CONSOLE
 )
-mitk_use_modules(TARGET ${PROJECT_NAME} PACKAGES Qt4>QtGui)
+mitk_use_modules(TARGET ${PROJECT_NAME} PACKAGES Qt4|QtGui)
 
 add_dependencies(${PROJECT_NAME} ${ALL_REQUIRED_PLUGIN_TARGETS})
 

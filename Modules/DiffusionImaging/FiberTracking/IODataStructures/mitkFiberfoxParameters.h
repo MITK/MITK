@@ -31,7 +31,7 @@ using namespace std;
 namespace mitk {
 
 /**
-  * \brief Datastructure to manage the Fiberfox signal generation parameters
+  * \brief Datastructure to manage the Fiberfox signal generation parameters.
   *
   */
 
@@ -40,17 +40,18 @@ class FiberfoxParameters
 {
 public:
 
-    typedef itk::Image<double, 3>           ItkDoubleImgType;
-    typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
-    typedef std::vector< DiffusionSignalModel<double>* > DiffusionModelListType;
-    typedef DiffusionSignalModel<double>::GradientListType GradientListType;
-    typedef DiffusionSignalModel<double>::GradientType GradientType;
-    typedef DiffusionNoiseModel<ScalarType> NoiseModelType;
-    typedef DiffusionSignalModel<double>*   DiffusionModelType;
+    typedef itk::Image<double, 3>                           ItkDoubleImgType;
+    typedef itk::Image<unsigned char, 3>                    ItkUcharImgType;
+    typedef std::vector< DiffusionSignalModel<double>* >    DiffusionModelListType;
+    typedef DiffusionSignalModel<double>::GradientListType  GradientListType;
+    typedef DiffusionSignalModel<double>::GradientType      GradientType;
+    typedef DiffusionNoiseModel<ScalarType>                 NoiseModelType;
+    typedef DiffusionSignalModel<double>*                   DiffusionModelType;
 
     FiberfoxParameters();
     ~FiberfoxParameters();
 
+    /** Get same parameter object with different template parameter */
     template< class OutType > FiberfoxParameters< OutType > CopyParameters()
     {
         FiberfoxParameters< OutType > out;
@@ -99,51 +100,51 @@ public:
     }
 
     /** Output image specifications */
-    itk::ImageRegion<3>                 m_ImageRegion;
-    itk::Vector<double,3>               m_ImageSpacing;
-    itk::Point<double,3>                m_ImageOrigin;
-    itk::Matrix<double, 3, 3>           m_ImageDirection;
+    itk::ImageRegion<3>                 m_ImageRegion;              ///< Image size.
+    itk::Vector<double,3>               m_ImageSpacing;             ///< Image voxel size.
+    itk::Point<double,3>                m_ImageOrigin;              ///< Image origin.
+    itk::Matrix<double, 3, 3>           m_ImageDirection;           ///< Image rotation matrix.
 
     /** Other acquisitions parameters */
-    unsigned int                        m_Repetitions;
-    double                              m_SignalScale;
-    double                              m_tEcho;
-    double                              m_tLine;
-    double                              m_tInhom;
+    unsigned int                        m_Repetitions;              ///< Noise will be summed N times and afterwards averaged.
+    double                              m_SignalScale;              ///< Scaling factor for output signal (before noise is added).
+    double                              m_tEcho;                    ///< Echo time TE.
+    double                              m_tLine;                    ///< k-space line readout time.
+    double                              m_tInhom;                   ///< T2'
     double                              m_Bvalue;
 
     /** Signal generation */
-    DiffusionModelListType              m_FiberModelList;       ///< Intra- and inter-axonal compartments
-    DiffusionModelListType              m_NonFiberModelList;    ///< Extra-axonal compartments
-    double                              m_AxonRadius;           ///< Determines compartment volume fractions (0 == automatic axon radius estimation)
+    DiffusionModelListType              m_FiberModelList;           ///< Intra- and inter-axonal compartments.
+    DiffusionModelListType              m_NonFiberModelList;        ///< Extra-axonal compartments.
+    double                              m_AxonRadius;               ///< Determines compartment volume fractions (0 == automatic axon radius estimation)
 
     /** Artifacts */
-    int                                 m_Spikes;
-    double                              m_SpikeAmplitude;
-    double                              m_KspaceLineOffset;
-    double                              m_EddyStrength;
-    double                              m_Wrap;
-    bool                                m_DoAddGibbsRinging;
-    bool                                m_DoSimulateRelaxation;
-    bool                                m_DoDisablePartialVolume;
-    bool                                m_DoAddMotion;
-    bool                                m_DoRandomizeMotion;
-    itk::Vector<double,3>               m_Translation;
-    itk::Vector<double,3>               m_Rotation;
-    NoiseModelType*                     m_NoiseModel;
-    ItkDoubleImgType::Pointer           m_FrequencyMap;
-    ItkUcharImgType::Pointer            m_MaskImage;
+    int                                 m_Spikes;                   ///< Number of spikes randomly appearing in the image
+    double                              m_SpikeAmplitude;           ///< amplitude of spikes relative to the largest signal intensity (magnitude of complex)
+    double                              m_KspaceLineOffset;         ///< Causes N/2 ghosts. Larger offset means stronger ghost.
+    double                              m_EddyStrength;             ///< Strength of eddy current induced gradients in T/m.
+    double                              m_Wrap;                     ///< FOV size in y-direction is multiplied by this factor. Causes aliasing artifacts.
+    bool                                m_DoAddGibbsRinging;        ///< Add Gibbs ringing artifact
+    bool                                m_DoSimulateRelaxation;     ///< Add T2 relaxation effects
+    bool                                m_DoDisablePartialVolume;   ///< Disable partial volume effects. Each voxel is either all fiber or all non-fiber.
+    bool                                m_DoAddMotion;              ///< Enable motion artifacts.
+    bool                                m_DoRandomizeMotion;        ///< Toggles between random and linear motion.
+    itk::Vector<double,3>               m_Translation;              ///< Maximum translational motion.
+    itk::Vector<double,3>               m_Rotation;                 ///< Maximum rotational motion.
+    NoiseModelType*                     m_NoiseModel;               ///< If != NULL, noise is added to the image.
+    ItkDoubleImgType::Pointer           m_FrequencyMap;             ///< If != NULL, distortions are added to the image using this frequency map.
+    ItkUcharImgType::Pointer            m_MaskImage;                ///< Signal is only genrated inside of the mask image.
 
-    /** Output parameters */
-    mitk::DataNode::Pointer             m_ResultNode;
-    mitk::DataNode::Pointer             m_ParentNode;
-    string                              m_SignalModelString;
-    string                              m_ArtifactModelString;
-    string                              m_OutputPath;
+    /** Output parameters (only relevant in GUI application) */
+    mitk::DataNode::Pointer             m_ResultNode;               ///< Stores resulting image.
+    mitk::DataNode::Pointer             m_ParentNode;               ///< Parent node or result node.
+    string                              m_SignalModelString;        ///< Appendet to the name of the result node
+    string                              m_ArtifactModelString;      ///< Appendet to the name of the result node
+    string                              m_OutputPath;               ///< Image is automatically saved to the specified folder after simulation is finished.
 
-    void PrintSelf();
-    void LoadParameters(string filename);
-    void GenerateHalfShell();
+    void PrintSelf();                           ///< Print parameters to stdout.
+    void LoadParameters(string filename);       ///< Load image generation parameters from .ffp file.
+    void GenerateGradientHalfShell();           ///< Generates half shell of gradient directions (with m_NumGradients non-zero directions)
 
     std::vector< int > GetBaselineIndices();
     unsigned int GetFirstBaselineIndex();
@@ -155,15 +156,15 @@ public:
     GradientListType GetGradientDirections();
     GradientType GetGradientDirection(unsigned int i);
 
-    void SetNumWeightedGradients(int numGradients);
+    void SetNumWeightedGradients(int numGradients); ///< Automaticall calls GenerateGradientHalfShell() afterwards.
     void SetGradienDirections(GradientListType gradientList);
     void SetGradienDirections(mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer gradientList);
 
 protected:
 
-    unsigned int                        m_NumBaseline;
-    unsigned int                        m_NumGradients;
-    GradientListType                    m_GradientDirections;
+    unsigned int                        m_NumBaseline;          ///< Number of non-diffusion-weighted image volumes.
+    unsigned int                        m_NumGradients;         ///< Number of diffusion-weighted image volumes.
+    GradientListType                    m_GradientDirections;   ///< Total number of image volumes.
 
 };
 }

@@ -43,8 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberfoxParameters.h>
 
 /*!
-\brief View for fiber based diffusion software phantoms (Fiberfox).
-
+\brief View for fiber based diffusion software phantoms (Fiberfox). See "Fiberfox: Facilitating the creation of realistic white matter software phantoms" (DOI: 10.1002/mrm.25045) for details.
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
@@ -213,12 +212,14 @@ protected:
     // GUI thread
     QmitkFiberfoxWorker     m_Worker;   ///< runs filter
     QThread                 m_Thread;   ///< worker thread
-    itk::TractsToDWIImageFilter< short >::Pointer           m_TractsToDwiFilter;
-    itk::AddArtifactsToDwiImageFilter< short >::Pointer     m_ArtifactsToDwiFilter;
     bool                    m_ThreadIsRunning;
     QTimer*                 m_SimulationTimer;
     QTime                   m_SimulationTime;
     QString                 m_SimulationStatusText;
+
+    /** Image filters that do all the simulations. */
+    itk::TractsToDWIImageFilter< short >::Pointer           m_TractsToDwiFilter;
+    itk::AddArtifactsToDwiImageFilter< short >::Pointer     m_ArtifactsToDwiFilter;
 
     friend class QmitkFiberfoxWorker;
 };

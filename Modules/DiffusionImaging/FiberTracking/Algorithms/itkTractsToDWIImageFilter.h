@@ -27,7 +27,9 @@ namespace itk
 {
 
 /**
-* \brief Generates artificial diffusion weighted image volume from the input fiberbundle using a generic multicompartment model.   */
+* \brief Generates artificial diffusion weighted image volume from the input fiberbundle using a generic multicompartment model.
+* See "Fiberfox: Facilitating the creation of realistic white matter software phantoms" (DOI: 10.1002/mrm.25045) for details.
+*/
 
 template< class PixelType >
 class TractsToDWIImageFilter : public ImageSource< itk::VectorImage< PixelType, 3 > >
@@ -53,18 +55,18 @@ public:
     itkNewMacro(Self)
     itkTypeMacro( TractsToDWIImageFilter, ImageSource )
 
-    // input
-    itkSetMacro( FiberBundle, FiberBundleType )         ///< input fiber bundle
-    mitk::LevelWindow GetLevelWindow(){ return m_LevelWindow; }
-    itkGetMacro( StatusText, std::string )
-    itkSetMacro( UseConstantRandSeed, bool )
+    /** Input */
+    itkSetMacro( FiberBundle, FiberBundleType )             ///< Input fiber bundle
+    itkSetMacro( UseConstantRandSeed, bool )                ///< Seed for random generator.
+    void SetParameters( FiberfoxParameters<double> param )  ///< Simulation parameters.
+    { m_Parameters = param; }
 
-    void SetParameters( FiberfoxParameters<double> param ){ m_Parameters = param; }
+    /** Output */
     FiberfoxParameters<double> GetParameters(){ return m_Parameters; }
-
-    // output
     std::vector< ItkDoubleImgType::Pointer > GetVolumeFractions() ///< one double image for each compartment containing the corresponding volume fraction per voxel
     { return m_VolumeFractions; }
+    mitk::LevelWindow GetLevelWindow(){ return m_LevelWindow; }
+    itkGetMacro( StatusText, std::string )
 
     void GenerateData();
 
@@ -81,18 +83,17 @@ protected:
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using DFT and add k-space artifacts. */
     DoubleDwiType::Pointer DoKspaceStuff(std::vector< DoubleDwiType::Pointer >& images);
 
-    mitk::FiberfoxParameters<double>    m_Parameters;
-
-    itk::Vector<double,3>               m_UpsampledSpacing;
-    itk::Point<double,3>                m_UpsampledOrigin;
-    ImageRegion<3>                      m_UpsampledImageRegion;
-    FiberBundleType                     m_FiberBundle;
+    mitk::FiberfoxParameters<double>            m_Parameters;
+    itk::Vector<double,3>                       m_UpsampledSpacing;
+    itk::Point<double,3>                        m_UpsampledOrigin;
+    ImageRegion<3>                              m_UpsampledImageRegion;
+    FiberBundleType                             m_FiberBundle;
     mitk::LevelWindow                           m_LevelWindow;
     std::vector< ItkDoubleImgType::Pointer >    m_VolumeFractions;
+    std::string                                 m_StatusText;
+    time_t                                      m_StartTime;
+    bool                                        m_UseConstantRandSeed;
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
-    std::string                         m_StatusText;
-    time_t                              m_StartTime;
-    bool                                m_UseConstantRandSeed;
 };
 }
 

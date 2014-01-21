@@ -66,7 +66,7 @@ mitk::FiberfoxParameters< ScalarType >::FiberfoxParameters()
     m_ResultNode = mitk::DataNode::New();
     m_ParentNode = NULL;
 
-    GenerateHalfShell();
+    GenerateGradientHalfShell();
 }
 
 template< class ScalarType >
@@ -77,7 +77,7 @@ mitk::FiberfoxParameters< ScalarType >::~FiberfoxParameters()
 }
 
 template< class ScalarType >
-void mitk::FiberfoxParameters< ScalarType >::GenerateHalfShell()
+void mitk::FiberfoxParameters< ScalarType >::GenerateGradientHalfShell()
 {
     int NPoints = 2*m_NumGradients;
     m_GradientDirections.clear();
@@ -183,7 +183,7 @@ template< class ScalarType >
 void mitk::FiberfoxParameters< ScalarType >::SetNumWeightedGradients(int numGradients)
 {
     m_NumGradients = numGradients;
-    GenerateHalfShell();
+    GenerateGradientHalfShell();
 }
 
 template< class ScalarType >
@@ -245,7 +245,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             m_ImageSpacing[1] = v1.second.get<double>("basic.spacing.y");
             m_ImageSpacing[2] = v1.second.get<double>("basic.spacing.z");
             m_NumGradients = v1.second.get<int>("basic.numgradients");
-            GenerateHalfShell();
+            GenerateGradientHalfShell();
             m_Bvalue = v1.second.get<int>("basic.bvalue");
             m_Repetitions = v1.second.get<int>("repetitions");
             m_SignalScale = v1.second.get<int>("signalScale");

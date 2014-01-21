@@ -415,7 +415,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         parameters.m_ImageDirection.SetIdentity();
         parameters.SetNumWeightedGradients(m_Controls->m_NumGradientsBox->value());
         parameters.m_Bvalue = m_Controls->m_BvalueBox->value();
-        parameters.GenerateHalfShell();
+        parameters.GenerateGradientHalfShell();
     }
 
     // signal relaxation

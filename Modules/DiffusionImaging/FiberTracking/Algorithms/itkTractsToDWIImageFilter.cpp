@@ -263,7 +263,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     // initialize output dwi image
     ImageRegion<3> croppedRegion = m_Parameters.m_ImageRegion; croppedRegion.SetSize(1, croppedRegion.GetSize(1)*m_Parameters.m_Wrap);
     itk::Point<double,3> shiftedOrigin = m_Parameters.m_ImageOrigin; shiftedOrigin[1] += (m_Parameters.m_ImageRegion.GetSize(1)-croppedRegion.GetSize(1))*m_Parameters.m_ImageSpacing[1]/2;
-
     typename OutputImageType::Pointer outImage = OutputImageType::New();
     outImage->SetSpacing( m_Parameters.m_ImageSpacing );
     outImage->SetOrigin( shiftedOrigin );
@@ -303,7 +302,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         m_Parameters.m_MaskImage = zeroPadder->GetOutput();
     }
 
-    // apply in-plane upsampling
+    // Apply in-plane upsampling for Gibbs ringing artifact
     double upsampling = 1;
     if (m_Parameters.m_DoAddGibbsRinging)
         upsampling = 2;

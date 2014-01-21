@@ -20,10 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkITKDICOMSeriesReaderHelper.h"
 #include "mitkGantryTiltInformation.h"
 #include "mitkDICOMTagBasedSorter.h"
+#include "mitkDICOMGDCMTagScanner.h"
 
 #include <itkTimeProbesCollectorBase.h>
 
-#include <gdcmScanner.h>
 #include <gdcmUIDs.h>
 
 mitk::DICOMITKSeriesGDCMReader
@@ -39,7 +39,6 @@ mitk::DICOMITKSeriesGDCMReader
 ::DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other )
 :itk::Object()
 ,DICOMFileReader(other)
-,DICOMTagCache(other)
 ,m_FixTiltByShearing(false)
 ,m_Sorter( other.m_Sorter ) // TODO should clone the list items
 ,m_EquiDistantBlocksSorter( other.m_EquiDistantBlocksSorter->Clone() )
@@ -271,12 +270,13 @@ mitk::DICOMITKSeriesGDCMReader
 
   timer.Start("Reset");
   this->ClearOutputs();
-  m_InputFrameList.clear();
-  m_GDCMScanner.ClearTags();
+  DICOMGDCMTagScanner::Pointer filescanner = DICOMGDCMTagScanner::New();
+  m_TagCache = filescanner.GetPointer(); // keep alive and make accessible to sub-classes
   timer.Stop("Reset");
 
   // prepare initial sorting (== list of input files)
   StringList inputFilenames = this->GetInputFiles();
+  filescanner->SetInputFiles(inputFilenames);
 
   timer.Start("Check appropriateness of input files");
   if ( inputFilenames.empty()
@@ -304,56 +304,53 @@ mitk::DICOMITKSeriesGDCMReader
     assert(sorterIter->IsNotNull());
 
     DICOMTagList tags = (*sorterIter)->GetTagsOfInterest();
-    for(DICOMTagList::const_iterator tagIter = tags.begin();
-        tagIter != tags.end();
-        ++tagIter)
-    {
-      MITK_DEBUG << "Sorting uses tag " << tagIter->GetGroup() << "," << tagIter->GetElement();
-      m_GDCMScanner.AddTag( gdcm::Tag(tagIter->GetGroup(), tagIter->GetElement()) );
-    }
+    filescanner->AddTags( tags );
   }
 
   // Add some of our own interest
   // TODO all tags that are needed in DICOMImageBlockDescriptor should be added by DICOMFileReader (this code location here should query all superclasses for tags)
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0018,0x1164) ); // pixel spacing
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0028,0x0030) ); // imager pixel spacing
+  filescanner->AddTag( DICOMTag(0x0018,0x1164) ); // pixel spacing
+  filescanner->AddTag( DICOMTag(0x0028,0x0030) ); // imager pixel spacing
 
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0028,0x1050) ); // window center
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0028,0x1051) ); // window width
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0008) ); // image type
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0028,0x0004) ); // photometric interpretation
+  filescanner->AddTag( DICOMTag(0x0028,0x1050) ); // window center
+  filescanner->AddTag( DICOMTag(0x0028,0x1051) ); // window width
+  filescanner->AddTag( DICOMTag(0x0008,0x0008) ); // image type
+  filescanner->AddTag( DICOMTag(0x0028,0x0004) ); // photometric interpretation
 
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x1041) ); // slice location
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x0013) ); // instance number
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0016) ); // sop class UID
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0018) ); // sop instance UID
+  filescanner->AddTag( DICOMTag(0x0020,0x1041) ); // slice location
+  filescanner->AddTag( DICOMTag(0x0020,0x0013) ); // instance number
+  filescanner->AddTag( DICOMTag(0x0008,0x0016) ); // sop class UID
+  filescanner->AddTag( DICOMTag(0x0008,0x0018) ); // sop instance UID
 
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x0011) ); // series number
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x1030) ); // study description
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x103e) ); // series description
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0008,0x0060) ); // modality
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x0012) ); // acquisition number
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0018,0x0024) ); // sequence name
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x0037) ); // image orientation
-  m_GDCMScanner.AddTag( gdcm::Tag(0x0020,0x0032) ); // ipp
+  filescanner->AddTag( DICOMTag(0x0020,0x0011) ); // series number
+  filescanner->AddTag( DICOMTag(0x0008,0x1030) ); // study description
+  filescanner->AddTag( DICOMTag(0x0008,0x103e) ); // series description
+  filescanner->AddTag( DICOMTag(0x0008,0x0060) ); // modality
+  filescanner->AddTag( DICOMTag(0x0020,0x0012) ); // acquisition number
+  filescanner->AddTag( DICOMTag(0x0018,0x0024) ); // sequence name
+  filescanner->AddTag( DICOMTag(0x0020,0x0037) ); // image orientation
+  filescanner->AddTag( DICOMTag(0x0020,0x0032) ); // ipp
+
 
   timer.Stop("Setup scanning");
 
   timer.Start("Tag scanning");
   PushLocale();
-  m_GDCMScanner.Scan( inputFilenames );
+  filescanner->Scan();
   PopLocale();
   timer.Stop("Tag scanning");
 
   timer.Start("Setup sorting");
-  for (StringList::const_iterator inputIter = inputFilenames.begin();
-       inputIter != inputFilenames.end();
-       ++inputIter)
-  {
-    m_InputFrameList.push_back( DICOMGDCMImageFrameInfo::New( DICOMImageFrameInfo::New(*inputIter, 0), m_GDCMScanner.GetMapping(inputIter->c_str()) ) );
-  }
+  // TODO move this out into a GDCMTagCache class
+  // Class has to do
+  // - add files(file list)
+  // - scan()
+  // - addtag ( DICOMITKSeriesGDCMReader::GetTagsOfInterest(), which calls DICOMImageBlockDescriptor::GetTagsOfInterest() )
+  // - getAllFrames
+  // - getTagValue(frame, tag)
+  //
   m_SortingResultInProgress.clear();
-  m_SortingResultInProgress.push_back( m_InputFrameList );
+  m_SortingResultInProgress.push_back(filescanner->GetFrameInfoList());
   timer.Stop("Setup sorting");
 
   // sort and split blocks as configured
@@ -401,7 +398,7 @@ mitk::DICOMITKSeriesGDCMReader
     assert(!frameList.empty());
 
     DICOMImageBlockDescriptor block;
-    block.SetTagCache( this ); // important: this must be before SetImageFrameList(), because SetImageFrameList will trigger reading of lots of interesting tags!
+    block.SetTagCache( filescanner ); // important: this must be before SetImageFrameList(), because SetImageFrameList will trigger reading of lots of interesting tags!
     block.SetImageFrameList( frameList );
     block.SetTiltInformation( tiltInfo );
 
@@ -683,23 +680,9 @@ mitk::DICOMITKSeriesGDCMReader
   return m_DecimalPlacesForOrientation;
 }
 
-std::string
+mitk::DICOMTagCache::Pointer
 mitk::DICOMITKSeriesGDCMReader
-::GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const
+::GetTagCache() const
 {
-  // TODO inefficient. if (m_InputFrameList.contains(frame)) return frame->GetTagValueAsString(tag);
-  for(DICOMGDCMImageFrameList::const_iterator frameIter = m_InputFrameList.begin();
-      frameIter != m_InputFrameList.end();
-      ++frameIter)
-  {
-    if ( (*frameIter)->GetFrameInfo().IsNotNull() &&
-         (*((*frameIter)->GetFrameInfo()) == *frame )
-       )
-    {
-      return (*frameIter)->GetTagValueAsString(tag);
-    }
-
-  }
-
-  return "";
+  return m_TagCache;
 }

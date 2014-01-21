@@ -1,5 +1,6 @@
 set(H_FILES
   mitkDICOMFileReader.h
+  mitkDICOMGDCMTagScanner.h
   mitkDICOMImageFrameInfo.h
   mitkDICOMImageBlockDescriptor.h
   mitkDICOMGDCMImageFrameInfo.h
@@ -22,6 +23,7 @@ set(H_FILES
 
 set(CPP_FILES
   mitkDICOMFileReader.cpp
+  mitkDICOMGDCMTagScanner.cpp
   mitkDICOMImageBlockDescriptor.cpp
   mitkDICOMITKSeriesGDCMReader.cpp
   mitkDICOMDatasetSorter.cpp

@@ -194,7 +194,7 @@ namespace mitk
   repeating most of AnalyzeInputFiles().
 
 */
-class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, protected DICOMTagCache
+class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 {
   public:
 
@@ -260,9 +260,6 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
 
     virtual void InternalPrintConfiguration(std::ostream& os) const;
 
-    // From DICOMTagCache
-    virtual std::string GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const;
-
     /// \brief Return active C locale
     std::string GetActiveLocale() const;
     /**
@@ -295,6 +292,8 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
       \return REMAINING blocks
     */
     virtual SortingBlockList Condense3DBlocks(SortingBlockList& resultOf3DGrouping);
+
+    virtual DICOMTagCache::Pointer GetTagCache() const;
 
     /// \brief Sorting step as described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy
     SortingBlockList InternalExecuteSortingStep(
@@ -345,11 +344,9 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader, prot
     mutable std::stack<std::string> m_ReplacedCLocales;
     mutable std::stack<std::locale> m_ReplacedCinLocales;
 
-    DICOMGDCMImageFrameList m_InputFrameList;
-
-    gdcm::Scanner m_GDCMScanner;
-
     double m_DecimalPlacesForOrientation;
+
+    DICOMTagCache::Pointer m_TagCache;
 };
 
 }

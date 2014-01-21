@@ -180,7 +180,7 @@ mitk::ThreeDnTDICOMSeriesReader
     assert(!frameList.empty());
 
     DICOMImageBlockDescriptor block;
-    block.SetTagCache( this ); // important: this must be before SetImageFrameList(), because SetImageFrameList will trigger reading of lots of interesting tags!
+    block.SetTagCache( this->GetTagCache() ); // important: this must be before SetImageFrameList(), because SetImageFrameList will trigger reading of lots of interesting tags!
     block.SetImageFrameList( frameList );
     block.SetTiltInformation( tiltInfo );
 

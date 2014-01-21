@@ -472,7 +472,7 @@ namespace itk
         double p[3];
         points->GetPoint(i,p);
         std::vector<int> neighbors = GetNeighbors(i);
-        for(int j=0; j<neighbors.size(); j++)
+        for(std::size_t j=0; j<neighbors.size(); j++)
         {
           double n[3];
           points->GetPoint(neighbors[j],n);

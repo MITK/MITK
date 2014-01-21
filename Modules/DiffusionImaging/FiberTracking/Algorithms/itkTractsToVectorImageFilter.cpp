@@ -673,7 +673,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
 
     std::vector< vnl_vector_fixed< double, 3 > > normalizedDirs;
     std::vector< int > touched;
-    for (int i=0; i<inDirs.size(); i++)
+    for (std::size_t i=0; i<inDirs.size(); i++)
     {
         normalizedDirs.push_back(inDirs[i]);
         normalizedDirs.back().normalize();
@@ -682,7 +682,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
     // initialize
     float max = 0.0;
     touched.resize(inDirs.size(), 0);
-    for (int j=0; j<inDirs.size(); j++)
+    for (std::size_t j=0; j<inDirs.size(); j++)
     {
         currentMean = inDirs[j];
         oldMean.fill(0.0);
@@ -697,7 +697,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
             workingMean = oldMean;
             workingMean.normalize();
             currentMean.fill(0.0);
-            for (int i=0; i<normalizedDirs.size(); i++)
+            for (std::size_t i=0; i<normalizedDirs.size(); i++)
             {
                 angle = dot_product(workingMean, normalizedDirs[i]);
                 if (angle>=m_AngularThreshold)
@@ -719,7 +719,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
             bool add = true;
             vnl_vector_fixed< double, 3 > normMean = currentMean;
             normMean.normalize();
-            for (int i=0; i<outDirs.size(); i++)
+            for (std::size_t i=0; i<outDirs.size(); i++)
             {
                 vnl_vector_fixed< double, 3 > dir = outDirs[i];
                 dir.normalize();
@@ -746,10 +746,10 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
     }
 
     if (m_NormalizeVectors)
-        for (int i=0; i<outDirs.size(); i++)
+        for (std::size_t i=0; i<outDirs.size(); i++)
             outDirs[i].normalize();
     else if (max>0)
-        for (int i=0; i<outDirs.size(); i++)
+        for (std::size_t i=0; i<outDirs.size(); i++)
             outDirs[i] /= max;
 
     if (inDirs.size()==outDirs.size())
@@ -796,7 +796,7 @@ TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer TractsTo
 
     // max normalize voxel directions
     if (max>0 && !m_NormalizeVectors)
-        for (int i=0; i<container->Size(); i++)
+        for (std::size_t i=0; i<container->Size(); i++)
             container->ElementAt(i) /= max;
 
     if (container->Size()<dirCont->Size())

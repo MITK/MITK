@@ -269,11 +269,11 @@ namespace itk
 
       VectorImageType::SizeType size = m_DirectionImage->GetLargestPossibleRegion().GetSize();
 
-      for(int i=0; i<size[0]; i++)
+      for(std::size_t i=0; i<size[0]; i++)
       {
-        for(int j=0; j<size[1]; j++)
+        for(std::size_t j=0; j<size[1]; j++)
         {
-          for(int k=0; k<size[2]; k++)
+          for(std::size_t k=0; k<size[2]; k++)
           {
             itk::Index<3> ix;
             ix[0] = i;

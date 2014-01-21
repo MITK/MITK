@@ -267,7 +267,7 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
       // do the averaging
       const unsigned int numavg = dirIndices[i].size();
       unsigned int sum = 0;
-      for(int j=0; j<numavg; j++)
+      for(unsigned int j=0; j<numavg; j++)
       {
         //MITK_INFO << newVec[i] << " << " << oldVec[dirIndices[i].at(j)];
         sum += oldVec[dirIndices[i].at(j)];

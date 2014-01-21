@@ -103,7 +103,7 @@ class OptimizerIterationCommand : public itk::Command
 public:
   itkNewMacro( OptimizerIterationCommand )
 
-  void Execute(itk::Object *caller, const itk::EventObject & event)
+  void Execute(itk::Object *caller, const itk::EventObject & /*event*/)
   {
     OptimizerType* optimizer = dynamic_cast< OptimizerType* >( caller );
 
@@ -112,7 +112,7 @@ public:
 
   }
 
-  void Execute(const itk::Object * object, const itk::EventObject & event)
+  void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/)
   {
 
   }

@@ -429,9 +429,9 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
     myfile.open (fname.c_str());
     myfile << "A1=[";
-    for(int i=0; i<A.rows(); i++)
+    for(unsigned int i=0; i<A.rows(); i++)
     {
-        for(int j=0; j<A.columns(); j++)
+        for(unsigned int j=0; j<A.columns(); j++)
         {
             myfile << A(i,j) << " ";
             if(j==A.columns()-1 && i!=A.rows()-1)

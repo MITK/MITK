@@ -270,14 +270,10 @@ mitk::DICOMITKSeriesGDCMReader
 
   timer.Start("Reset");
   this->ClearOutputs();
-  DICOMGDCMTagScanner::Pointer filescanner = DICOMGDCMTagScanner::New();
-  m_TagCache = filescanner.GetPointer(); // keep alive and make accessible to sub-classes
   timer.Stop("Reset");
 
   // prepare initial sorting (== list of input files)
   StringList inputFilenames = this->GetInputFiles();
-  filescanner->SetInputFiles(inputFilenames);
-
   timer.Start("Check appropriateness of input files");
   if ( inputFilenames.empty()
        ||
@@ -296,21 +292,29 @@ mitk::DICOMITKSeriesGDCMReader
   timer.Stop("Check appropriateness of input files");
 
   // scan files for sorting-relevant tags
-  timer.Start("Setup scanning");
-  filescanner->AddTags( this->GetTagsOfInterest() );
+  if (m_TagCache.IsNull())
+  {
+    timer.Start("Tag scanning");
+    DICOMGDCMTagScanner::Pointer filescanner = DICOMGDCMTagScanner::New();
+    m_TagCache = filescanner.GetPointer(); // keep alive and make accessible to sub-classes
 
-  timer.Stop("Setup scanning");
+    filescanner->SetInputFiles(inputFilenames);
+    filescanner->AddTags( this->GetTagsOfInterest() );
 
-  timer.Start("Tag scanning");
-  PushLocale();
-  filescanner->Scan();
-  PopLocale();
-  timer.Stop("Tag scanning");
+    PushLocale();
+    filescanner->Scan();
+    PopLocale();
 
-  timer.Start("Setup sorting");
+    timer.Stop("Tag scanning");
+  }
+  else
+  {
+    // ensure that the tag cache contains our required tags AND files and has scanned!
+  }
+
   m_SortingResultInProgress.clear();
-  m_SortingResultInProgress.push_back(filescanner->GetFrameInfoList());
-  timer.Stop("Setup sorting");
+  // TODO this should look better!
+  m_SortingResultInProgress.push_back( static_cast<DICOMGDCMTagScanner*>(m_TagCache.GetPointer())->GetFrameInfoList() );
 
   // sort and split blocks as configured
 
@@ -357,7 +361,7 @@ mitk::DICOMITKSeriesGDCMReader
     assert(!frameList.empty());
 
     DICOMImageBlockDescriptor block;
-    block.SetTagCache( filescanner ); // important: this must be before SetImageFrameList(), because SetImageFrameList will trigger reading of lots of interesting tags!
+    block.SetTagCache( this->GetTagCache() ); // important: this must be before SetImageFrameList(), because SetImageFrameList will trigger reading of lots of interesting tags!
     block.SetImageFrameList( frameList );
     block.SetTiltInformation( tiltInfo );
 
@@ -644,6 +648,13 @@ mitk::DICOMITKSeriesGDCMReader
 ::GetTagCache() const
 {
   return m_TagCache;
+}
+
+void
+mitk::DICOMITKSeriesGDCMReader
+::SetTagCache(DICOMTagCache::Pointer tagCache)
+{
+  m_TagCache = tagCache;
 }
 
 mitk::DICOMTagList

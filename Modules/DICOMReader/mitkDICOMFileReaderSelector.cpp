@@ -17,8 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMFileReaderSelector.h"
 #include "mitkDICOMReaderConfigurator.h"
 
-#include "mitkModuleContext.h"
+#include "mitkDICOMGDCMTagScanner.h"
 
+#include <usModuleContext.h>
 #include <usGetModuleContext.h>
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
@@ -189,6 +190,20 @@ mitk::DICOMFileReaderSelector
 {
   ReaderList workingCandidates;
 
+  // do the tag scanning externally and just ONCE
+  DICOMGDCMTagScanner::Pointer gdcmScanner = DICOMGDCMTagScanner::New();
+  gdcmScanner->SetInputFiles( m_InputFilenames );
+
+  // let all readers analyze the file set
+  for (ReaderList::iterator rIter = m_Readers.begin();
+       rIter != m_Readers.end();
+       ++rIter)
+  {
+    gdcmScanner->AddTags( (*rIter)->GetTagsOfInterest() );
+  }
+
+  gdcmScanner->Scan();
+
   // let all readers analyze the file set
   unsigned int readerIndex(0);
   for (ReaderList::iterator rIter = m_Readers.begin();
@@ -196,6 +211,7 @@ mitk::DICOMFileReaderSelector
        ++readerIndex, ++rIter)
   {
     (*rIter)->SetInputFiles( m_InputFilenames );
+    (*rIter)->SetTagCache( gdcmScanner.GetPointer() );
     try
     {
       (*rIter)->AnalyzeInputFiles();

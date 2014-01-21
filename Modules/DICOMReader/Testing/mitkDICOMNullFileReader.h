@@ -39,6 +39,9 @@ class DICOMNullFileReader : public DICOMFileReader
 
     bool operator==(const DICOMFileReader& other) const;
 
+    virtual DICOMTagList GetTagsOfInterest() const { return DICOMTagList(); }
+    virtual void SetTagCache( DICOMTagCache::Pointer ) {}
+
   protected:
 
     DICOMNullFileReader();

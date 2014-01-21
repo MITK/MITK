@@ -296,6 +296,7 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     virtual SortingBlockList Condense3DBlocks(SortingBlockList& resultOf3DGrouping);
 
     virtual DICOMTagCache::Pointer GetTagCache() const;
+    void SetTagCache(DICOMTagCache::Pointer);
 
     /// \brief Sorting step as described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy
     SortingBlockList InternalExecuteSortingStep(

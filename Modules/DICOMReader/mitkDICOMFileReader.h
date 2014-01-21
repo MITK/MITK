@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "DICOMReaderExports.h"
 
+#include "mitkDICOMTagCache.h"
+
 #include "mitkDICOMImageBlockDescriptor.h"
 
 namespace mitk
@@ -80,6 +82,11 @@ class DICOMReader_EXPORT DICOMFileReader : virtual public itk::Object
     /// Load the mitk::Image%s in our outputs, the DICOMImageBlockDescriptor. To be called only after AnalyzeInputFiles(). Take care of potential exceptions!
     virtual bool LoadImages() = 0;
 
+    // TODO seems reasonable
+    virtual DICOMTagList GetTagsOfInterest() const = 0;
+    // TODO need to document
+    virtual void SetTagCache(DICOMTagCache::Pointer) = 0;
+
     /// Short label/name to describe this reader
     void SetConfigurationLabel(const std::string&);
     /// Short label/name to describe this reader
@@ -93,7 +100,7 @@ class DICOMReader_EXPORT DICOMFileReader : virtual public itk::Object
     void PrintConfiguration(std::ostream& os) const;
     /// Print output description to given stream, for human reader
     void PrintOutputs(std::ostream& os, bool filenameDetails = false) const;
-    
+
     virtual bool operator==(const DICOMFileReader& other) const = 0;
 
   protected:

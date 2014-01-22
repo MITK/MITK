@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class ModuleResource;
-
 /*!
   \brief Toolkit specific implementation of mitk::ApplicationCursor
 
@@ -40,7 +38,7 @@ class MITK_CORE_EXPORT ApplicationCursorImplementation
     virtual void PushCursor(const char* XPM[], int hotspotX, int hotspotY) = 0;
 
     /// Change the current application cursor
-    virtual void PushCursor(const ModuleResource, int hotspotX, int hotspotY) = 0;
+    virtual void PushCursor(std::istream&, int hotspotX, int hotspotY) = 0;
 
     /// Restore the previous cursor
     virtual void PopCursor() = 0;
@@ -51,7 +49,7 @@ class MITK_CORE_EXPORT ApplicationCursorImplementation
     /// Set absolute mouse position on screen
     virtual void SetCursorPosition(const Point2I&) = 0;
 
-    virtual ~ApplicationCursorImplementation() {};
+    virtual ~ApplicationCursorImplementation() {}
 
   protected:
   private:
@@ -81,7 +79,7 @@ class MITK_CORE_EXPORT ApplicationCursor
     void PushCursor(const char* XPM[], int hotspotX = -1, int hotspotY = -1);
 
     /// Change the current application cursor
-    void PushCursor(const ModuleResource, int hotspotX = -1, int hotspotY = -1);
+    void PushCursor(std::istream&, int hotspotX = -1, int hotspotY = -1);
 
     /// Restore the previous cursor
     void PopCursor();

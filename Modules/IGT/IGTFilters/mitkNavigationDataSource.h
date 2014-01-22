@@ -163,7 +163,7 @@ namespace mitk {
 
 
   private:
-    mitk::ServiceRegistration m_ServiceRegistration;
+    us::ServiceRegistration<Self> m_ServiceRegistration;
   };
 } // namespace mitk
 // This is the microservice declaration. Do not meddle!

@@ -49,9 +49,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIShaderRepository.h>
 #include <mitkShaderProperty.h>
 
-#include <mitkGetModuleContext.h>
-#include <mitkModuleContext.h>
-#include <mitkServiceReference.h>
+#include <mitkCoreServices.h>
 
 mitk::FiberBundleXMapper2D::FiberBundleXMapper2D()
 {
@@ -168,16 +166,6 @@ void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * rend
 
 }
 
-mitk::IShaderRepository *mitk::FiberBundleXMapper2D::GetShaderRepository()
-{
-  ServiceReference serviceRef = GetModuleContext()->GetServiceReference<mitk::IShaderRepository>();
-  if (serviceRef)
-  {
-    return GetModuleContext()->GetService<IShaderRepository>(serviceRef);
-  }
-  return NULL;
-}
-
 // ALL RAW DATA FOR VISUALIZATION IS GENERATED HERE.
 // vtkActors and Mappers are feeded here
 void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
@@ -225,11 +213,8 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
     localStorage->m_PointActor->GetProperty()->ShadingOn();
 
     // Applying shading properties
-    if (IShaderRepository* shaderRepo = GetShaderRepository())
-    {
-        shaderRepo->ApplyProperties(this->GetDataNode(),localStorage->m_PointActor,renderer, localStorage->m_LastUpdateTime);
-    }
-
+    CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
+    shaderRepo->ApplyProperties(this->GetDataNode(),localStorage->m_PointActor,renderer, localStorage->m_LastUpdateTime);
 
 
     this->UpdateShaderParameter(renderer);
@@ -256,10 +241,8 @@ void mitk::FiberBundleXMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk
 {    //add shader to datano
     node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));
 
-    if (IShaderRepository* shaderRepo = GetShaderRepository())
-    {
-      shaderRepo->AddDefaultProperties(node,renderer,overwrite);
-    }
+    CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
+    shaderRepo->AddDefaultProperties(node,renderer,overwrite);
 
     //add other parameters to propertylist
     node->AddProperty( "Fiber2DSliceThickness", mitk::FloatProperty::New(2.0f), renderer, overwrite );

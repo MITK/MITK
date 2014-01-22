@@ -25,8 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkScalarModeProperty.h"
 #include "mitkClippingProperty.h"
 
+#include "mitkIShaderRepository.h"
 #include "mitkShaderProperty.h"
-#include "mitkShaderRepository.h"
+#include "mitkCoreServices.h"
 
 
 #include <vtkActor.h>
@@ -269,7 +270,8 @@ void mitk::ToFSurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::Bas
     // VTK Properties
     ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
     // Shaders
-    mitk::ShaderRepository::GetGlobalShaderRepository()->ApplyProperties(this->GetDataNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
+    CoreServicePointer<IShaderRepository>(mitk::CoreServices::GetShaderRepository())->ApplyProperties(
+          this->GetDataNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
   }
 
   mitk::LookupTableProperty::Pointer lookupTableProp;
@@ -448,7 +450,7 @@ void mitk::ToFSurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataN
 
   // Shaders
   {
-    mitk::ShaderRepository::GetGlobalShaderRepository()->AddDefaultProperties(node,renderer,overwrite);
+    CoreServicePointer<IShaderRepository>(mitk::CoreServices::GetShaderRepository())->AddDefaultProperties(node,renderer,overwrite);
   }
 }
 

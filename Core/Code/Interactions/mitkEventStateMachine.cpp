@@ -21,18 +21,13 @@
 #include "mitkStateMachineCondition.h"
 #include "mitkStateMachineTransition.h"
 #include "mitkStateMachineState.h"
-// us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include "mitkModuleResourceStream.h"
-#include "mitkModuleRegistry.h"
 
 mitk::EventStateMachine::EventStateMachine() :
     m_StateMachineContainer(NULL), m_CurrentState(NULL)
 {
 }
 
-bool mitk::EventStateMachine::LoadStateMachine(const std::string& filename, const Module* module)
+bool mitk::EventStateMachine::LoadStateMachine(const std::string& filename, const us::Module* module)
 {
   if (m_StateMachineContainer != NULL)
   {

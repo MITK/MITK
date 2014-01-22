@@ -19,9 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDrawPaintbrushTool.xpm"
 
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include <mitkGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, DrawPaintbrushTool, "Paintbrush drawing tool");
@@ -41,17 +42,17 @@ const char** mitk::DrawPaintbrushTool::GetXPM() const
   return mitkDrawPaintbrushTool_xpm;
 }
 
-mitk::ModuleResource mitk::DrawPaintbrushTool::GetIconResource() const
+us::ModuleResource mitk::DrawPaintbrushTool::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Paint_48x48.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("Paint_48x48.png");
   return resource;
 }
 
-mitk::ModuleResource mitk::DrawPaintbrushTool::GetCursorIconResource() const
+us::ModuleResource mitk::DrawPaintbrushTool::GetCursorIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Paint_Cursor_32x32.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("Paint_Cursor_32x32.png");
   return resource;
 }
 

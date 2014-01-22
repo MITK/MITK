@@ -15,10 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTestingMacros.h"
-
-#include "mitkDiffusionCoreObjectFactory.h"
-#include "mitkCoreObjectFactory.h"
 #include "mitkDiffusionImage.h"
+#include "mitkCoreObjectFactory.h"
 
 /**Documentation
  *  Test for factory registration
@@ -29,9 +27,6 @@ int mitkFactoryRegistrationTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("FactoryRegistrationTest");
 
   MITK_INFO << "Starting Factory registration test.";
-
-  RegisterDiffusionCoreObjectFactory();
-
   MITK_INFO << "Factory has been registered.";
 
   bool canWrite = false;

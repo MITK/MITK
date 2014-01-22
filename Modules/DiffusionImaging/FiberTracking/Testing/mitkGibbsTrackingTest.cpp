@@ -45,7 +45,6 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     MITK_INFO << "Parameter file: " << argv[3];
     MITK_INFO << "Reference bundle: " << argv[4];
 
-    RegisterDiffusionCoreObjectFactory();
     RegisterFiberTrackingObjectFactory();
 
     const std::string s1="", s2="";

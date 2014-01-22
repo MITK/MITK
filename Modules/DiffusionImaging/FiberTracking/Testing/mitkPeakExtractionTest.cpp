@@ -57,7 +57,6 @@ int mitkPeakExtractionTest(int argc, char* argv[])
     {
         mitk::CoreObjectFactory::GetInstance();
 
-        RegisterDiffusionCoreObjectFactory();
         RegisterFiberTrackingObjectFactory();
 
         mitk::Image::Pointer image = mitk::IOUtil::LoadImage(shCoeffFileName);

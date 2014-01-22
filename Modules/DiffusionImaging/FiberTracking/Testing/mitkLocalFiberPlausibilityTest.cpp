@@ -55,7 +55,6 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
         RegisterFiberTrackingObjectFactory();
 
         typedef itk::Image<unsigned char, 3>                                    ItkUcharImgType;

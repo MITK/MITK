@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include "mitkIOUtil.h"
 
-#include "mitkDiffusionCoreObjectFactory.h"
-
 #include "mitkDWIHeadMotionCorrectionFilter.h"
 #include "mitkNrrdDiffusionImageWriter.h"
 
@@ -35,8 +33,6 @@ int mitkDWHeadMotionCorrectionTest( int argc, char* argv[] )
   MITK_TEST_BEGIN("mitkDWHeadMotionCorrectionTest");
 
   MITK_TEST_CONDITION_REQUIRED( argc > 2, "Specify input and output.");
-
-  RegisterDiffusionCoreObjectFactory();
 
   mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage( argv[1] );
   DiffusionImageType* dwimage =

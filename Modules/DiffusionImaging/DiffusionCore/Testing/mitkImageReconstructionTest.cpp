@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImage.h>
 #include <mitkIOUtil.h>
 #include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <itkDiffusionTensor3D.h>
 #include <mitkTestingMacros.h>
 #include <itkDiffusionTensor3DReconstructionImageFilter.h>
@@ -39,8 +38,6 @@ int mitkImageReconstructionTest(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
-
         mitk::DiffusionImage<short>::Pointer dwi = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[1])->GetData());
 
         {

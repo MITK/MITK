@@ -52,7 +52,6 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
         RegisterFiberTrackingObjectFactory();
 
         // load input image

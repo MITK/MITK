@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 static void CreateNetworkFromFibersAndParcellation(std::string fiberFilename, std::string parcellationFilename, std::string outputFilename, bool testMode, std::string referenceFilename)
 {
   // registering Factories
-  RegisterDiffusionCoreObjectFactory();
   RegisterFiberTrackingObjectFactory();
   RegisterConnectomicsObjectFactory();
 

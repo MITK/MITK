@@ -445,10 +445,23 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
   d->m_CurrentSelection = nodes;
   this->UpdateMeasurementText();
 
+  if(d->m_CurrentSelection.size() == 0)
+  {
+
+    mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDataStorage()->GetAll();
+    const mitk::DataNode* node = 0;
+
+    for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End(); it++)
+    {
+      node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
+      mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>( node );
+      nonConstNode->SetSelected(false);
+    }
+
+  }
   for( int i=d->m_CurrentSelection.size()-1; i>= 0; --i)
   {
     mitk::DataNode* node = d->m_CurrentSelection.at(i);
-
     mitk::PlanarFigure* _PlanarFigure = dynamic_cast<mitk::PlanarFigure*> (node->GetData());
 
     // the last selected planar figure

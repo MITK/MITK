@@ -23,3 +23,8 @@ void mitk::EventRecorder::Notify(mitk::InteractionEvent *interactionEvent, bool 
 {
   std::cout << EventFactory::EventToXML(interactionEvent) << "\n";
 }
+
+void mitk::EventRecorder::SetEventIgnoreList(std::vector<std::string> list)
+{
+ m_IgnoreList = list;
+}

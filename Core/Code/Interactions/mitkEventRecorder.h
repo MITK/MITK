@@ -36,13 +36,17 @@ namespace mitk
 
     /**
      * By this function the Observer gets notified about new events.
-     * Here it is adapted to pass the events to the state machine in order to use
-     * its infrastructure.
-     * It also checks if event is to be accepted when it already has been processed by a DataInteractor.
      */
     virtual void Notify(InteractionEvent* interactionEvent, bool);
 
+    /**
+     * @brief SetEventIgnoreList Optional. Provide a list of strings that describe which events are to be ignored
+     */
+    void SetEventIgnoreList(std::vector<std::string> list);
+
   private:
+
+    std::vector<std::string> m_IgnoreList;
 
   };
 }

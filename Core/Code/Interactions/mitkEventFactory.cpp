@@ -270,13 +270,13 @@ std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
     // Position on Screen
     eventXML += " <" + InteractionEventConst::xmlTagAttribute() +" " + InteractionEventConst::xmlParameterName() + "=\"" + InteractionEventConst::xmlEventPropertyPositionOnScreen() + "\" ";
     eventXML += InteractionEventConst::xmlParameterValue() + "\"";
-    eventXML += GetPositionInWorld(event);
+    eventXML += GetPositionOnScreen(event);
     eventXML += "\"/>\n";
 
     // Position in World
     eventXML += " <" + InteractionEventConst::xmlTagAttribute() +" " + InteractionEventConst::xmlParameterName() + "=\"" + InteractionEventConst::xmlEventPropertyPositionInWorld() + "\" ";
     eventXML += InteractionEventConst::xmlParameterValue() + "\"";
-    eventXML += GetPositionOnScreen(event);
+    eventXML += GetPositionInWorld(event);
     eventXML += "\"/>\n";
   }
   // TODO Implement Key Events!!

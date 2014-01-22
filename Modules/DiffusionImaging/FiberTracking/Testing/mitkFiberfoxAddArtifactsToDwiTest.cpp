@@ -117,7 +117,19 @@ public:
 
         if (refImage.IsNotNull())
         {
-            CPPUNIT_ASSERT_MESSAGE(testFileName, CompareDwi(testImage->GetVectorImage(), refImage->GetVectorImage()));
+            bool ok = CompareDwi(testImage->GetVectorImage(), refImage->GetVectorImage());
+            if (!ok)
+            {
+                NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
+                writer->SetFileName("/tmp/test2.dwi");
+                writer->SetInput(testImage);
+                writer->Update();
+
+                writer->SetFileName("/tmp/ref2.dwi");
+                writer->SetInput(refImage);
+                writer->Update();
+            }
+            CPPUNIT_ASSERT_MESSAGE(testFileName, ok);
         }
         else
         {

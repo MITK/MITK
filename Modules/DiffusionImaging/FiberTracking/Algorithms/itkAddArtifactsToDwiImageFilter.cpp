@@ -92,16 +92,19 @@ void AddArtifactsToDwiImageFilter< TPixelType >
     }
 
     // frequency map slice
-    typename SliceType::Pointer fMap = NULL;
+    typename SliceType::Pointer fMapSlice = NULL;
     if (m_Parameters.m_FrequencyMap.IsNotNull())
     {
-        fMap = SliceType::New();
-        fMap->SetLargestPossibleRegion( sliceRegion );
-        fMap->SetBufferedRegion( sliceRegion );
-        fMap->SetRequestedRegion( sliceRegion );
-        fMap->Allocate();
-        fMap->FillBuffer(0.0);
+        fMapSlice = SliceType::New();
+        fMapSlice->SetLargestPossibleRegion( sliceRegion );
+        fMapSlice->SetBufferedRegion( sliceRegion );
+        fMapSlice->SetRequestedRegion( sliceRegion );
+        fMapSlice->Allocate();
+        fMapSlice->FillBuffer(0.0);
     }
+
+    m_Parameters.m_SignalScale = 1;
+    m_Parameters.m_DoSimulateRelaxation = false;
 
     if (m_Parameters.m_Spikes>0 || m_Parameters.m_FrequencyMap.IsNotNull() || m_Parameters.m_KspaceLineOffset>0.0 || m_Parameters.m_DoAddGibbsRinging || m_Parameters.m_EddyStrength>0 || m_Parameters.m_CroppingFactor<1.0)
     {
@@ -126,11 +129,6 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         tempY += tempY%2;
         croppedRegion.SetSize(1, tempY);
 
-        MatrixType transform = inputImage->GetDirection();
-        for (int i=0; i<3; i++)
-            for (int j=0; j<3; j++)
-                transform[i][j] *= inputImage->GetSpacing()[j];
-
         m_StatusText += this->GetTime()+" > Adjusting complex signal\n";
         if (m_Parameters.m_FrequencyMap.IsNotNull())
             m_StatusText += "Simulating distortions\n";
@@ -150,6 +148,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
             spikeVolume.push_back(m_RandGen->GetIntegerVariate()%inputImage->GetVectorLength());
         std::sort (spikeVolume.begin(), spikeVolume.end());
         std::reverse (spikeVolume.begin(), spikeVolume.end());
+        FiberfoxParameters<double> doubleParam = m_Parameters.CopyParameters<double>();
 
         m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
         m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
@@ -186,8 +185,8 @@ void AddArtifactsToDwiImageFilter< TPixelType >
 
                         SliceType::PixelType pix2D = (SliceType::PixelType)inputImage->GetPixel(index3D)[g];
                         slice->SetPixel(index2D, pix2D);
-                        if (fMap.IsNotNull())
-                            fMap->SetPixel(index2D, m_Parameters.m_FrequencyMap->GetPixel(index3D));
+                        if (fMapSlice.IsNotNull())
+                            fMapSlice->SetPixel(index2D, m_Parameters.m_FrequencyMap->GetPixel(index3D));
                     }
 
                 if (m_Parameters.m_DoAddGibbsRinging)
@@ -201,15 +200,15 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                     typename SliceType::Pointer upslice = resampler->GetOutput();
                     compartmentSlices.push_back(upslice);
 
-                    if (fMap.IsNotNull())
+                    if (fMapSlice.IsNotNull())
                     {
                         itk::ResampleImageFilter<SliceType, SliceType>::Pointer resampler = itk::ResampleImageFilter<SliceType, SliceType>::New();
-                        resampler->SetInput(fMap);
-                        resampler->SetOutputParametersFromImage(fMap);
+                        resampler->SetInput(fMapSlice);
+                        resampler->SetOutputParametersFromImage(fMapSlice);
                         resampler->SetSize(upsampledSliceRegion.GetSize());
-                        resampler->SetOutputSpacing(fMap->GetSpacing()/2);
+                        resampler->SetOutputSpacing(fMapSlice->GetSpacing()/2);
                         resampler->Update();
-                        fMap = resampler->GetOutput();
+                        fMapSlice = resampler->GetOutput();
                     }
                 }
                 else
@@ -221,16 +220,11 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                 itk::Size<2> outSize; outSize.SetElement(0, xMax); outSize.SetElement(1, croppedRegion.GetSize()[1]);
                 typename itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
                 idft->SetUseConstantRandSeed(m_UseConstantRandSeed);
+                idft->SetParameters(doubleParam);
                 idft->SetCompartmentImages(compartmentSlices);
-                idft->SetkOffset(m_Parameters.m_KspaceLineOffset);
-                idft->SettLine(m_Parameters.m_tLine);
-                idft->SetSimulateRelaxation(false);
-                idft->SetFrequencyMap(fMap);
+                idft->SetFrequencyMapSlice(fMapSlice);
                 idft->SetDiffusionGradientDirection(m_Parameters.GetGradientDirection(g));
-                idft->SetEddyGradientMagnitude(m_Parameters.m_EddyStrength);
-                idft->SetTE(m_Parameters.m_tEcho);
                 idft->SetZ((double)z-(double)inputRegion.GetSize(2)/2.0);
-                idft->SetDirectionMatrix(transform);
                 idft->SetOutSize(outSize);
                 int numSpikes = 0;
                 while (!spikeSlice.empty() && spikeSlice.back()==z)
@@ -238,8 +232,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                     numSpikes++;
                     spikeSlice.pop_back();
                 }
-                idft->SetSpikes(numSpikes);
-                idft->SetSpikeAmplitude(m_Parameters.m_SpikeAmplitude);
+                idft->SetSpikesPerSlice(numSpikes);
                 idft->Update();
                 fSlice = idft->GetOutput();
 

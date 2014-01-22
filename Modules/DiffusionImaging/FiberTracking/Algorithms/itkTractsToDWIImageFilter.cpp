@@ -95,16 +95,6 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
     newImage->SetVectorLength( images.at(0)->GetVectorLength() );
     newImage->Allocate();
 
-    MatrixType transform = m_Parameters.m_ImageDirection;
-    for (int i=0; i<3; i++)
-        for (int j=0; j<3; j++)
-        {
-            if (j<2)
-                transform[i][j] *= m_UpsampledSpacing[j];
-            else
-                transform[i][j] *= m_Parameters.m_ImageSpacing[j];
-        }
-
     std::vector< unsigned int > spikeVolume;
     for (int i=0; i<m_Parameters.m_Spikes; i++)
         spikeVolume.push_back(m_RandGen->GetIntegerVariate()%images.at(0)->GetVectorLength());
@@ -174,17 +164,10 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
             idft->SetCompartmentImages(compartmentSlices);
             idft->SetT2(t2Vector);
             idft->SetUseConstantRandSeed(m_UseConstantRandSeed);
-            idft->SetkOffset(m_Parameters.m_KspaceLineOffset);
-            idft->SettLine(m_Parameters.m_tLine);
-            idft->SetTE(m_Parameters.m_tEcho);
-            idft->SetTinhom(m_Parameters.m_tInhom);
-            idft->SetSimulateRelaxation(m_Parameters.m_DoSimulateRelaxation);
-            idft->SetEddyGradientMagnitude(m_Parameters.m_EddyStrength);
+            idft->SetParameters(m_Parameters);
             idft->SetZ((double)z-(double)images.at(0)->GetLargestPossibleRegion().GetSize(2)/2.0);
-            idft->SetDirectionMatrix(transform);
-            idft->SetDiffusionGradientDirection(m_Parameters.m_FiberModelList.at(0)->GetGradientDirection(g));
-            idft->SetFrequencyMap(fMapSlice);
-            idft->SetSignalScale(m_Parameters.m_SignalScale);
+            idft->SetDiffusionGradientDirection(m_Parameters.GetGradientDirection(g));
+            idft->SetFrequencyMapSlice(fMapSlice);
             idft->SetOutSize(outSize);
             int numSpikes = 0;
             while (!spikeSlice.empty() && spikeSlice.back()==z)
@@ -192,8 +175,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                 numSpikes++;
                 spikeSlice.pop_back();
             }
-            idft->SetSpikes(numSpikes);
-            idft->SetSpikeAmplitude(m_Parameters.m_SpikeAmplitude);
+            idft->SetSpikesPerSlice(numSpikes);
             idft->Update();
 
             ComplexSliceType::Pointer fSlice;

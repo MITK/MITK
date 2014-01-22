@@ -35,6 +35,7 @@ mitk::FiberfoxParameters< ScalarType >::FiberfoxParameters()
     , m_DoDisablePartialVolume(false)
     , m_DoSimulateRelaxation(true)
     , m_EddyStrength(0)
+    , m_Tau(70)
     , m_KspaceLineOffset(0)
     , m_NumGradients(6)
     , m_NumBaseline(1)
@@ -437,7 +438,7 @@ void mitk::FiberfoxParameters< ScalarType >::PrintSelf()
     MITK_INFO << "m_EddyStrength: " << m_EddyStrength;
     MITK_INFO << "m_Spikes: " << m_Spikes;
     MITK_INFO << "m_SpikeAmplitude: " << m_SpikeAmplitude;
-    MITK_INFO << "m_Wrap: " << m_CroppingFactor;
+    MITK_INFO << "m_CroppingFactor: " << m_CroppingFactor;
     MITK_INFO << "m_DoSimulateRelaxation: " << m_DoSimulateRelaxation;
     MITK_INFO << "m_DoDisablePartialVolume: " << m_DoDisablePartialVolume;
     MITK_INFO << "m_DoAddMotion: " << m_DoAddMotion;

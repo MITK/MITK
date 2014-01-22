@@ -61,6 +61,15 @@ See LICENSE.txt or http://www.mitk.org for details.
     m_Offsets.push_back(referenceOffset);
   }
 
+  bool mitk::NodeDisplacementFilter::RemoveNode(unsigned int i)
+  {
+    if ( i >= m_Nodes.size() ) { return false; }
+
+    m_Nodes.erase(m_Nodes.begin()+i);
+    m_Offsets.erase(m_Offsets.begin()+i);
+    return true;
+  }
+
   int mitk::NodeDisplacementFilter::GetNumberOfNodes()
   {
     return m_Nodes.size();

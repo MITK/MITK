@@ -49,12 +49,12 @@ mitk::ClassicDICOMSeriesReader
   // define above sorting for this class
   this->AddSortingElement( tagSorter );
 
-  this->SetFixTiltByShearing(true); // TODO that was configurable, default was true
+  this->SetFixTiltByShearing(true); // that was configurable, default was true
   this->SetToleratedOriginOffset(0.005); // was hard-coded
-  this->SetGroup3DandT(true); // TODO that was configurable, default was true
+  this->SetGroup3DandT(true); // that was configurable, default was true
 
   m_EquiDistantBlocksSorter->SetAcceptTwoSlicesGroups(false); // old reader did not accept that
-  
+
   this->SetConfigurationLabel("2013 sorting logic");
   this->SetConfigurationDescription("Sort by Image Position, then Acquisition Number, Time, Trigger time, group by 3D+t, group tilted images");
 }

@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVector.h"
 
-#include <gdcmScanner.h>
-
 namespace mitk
 {
 

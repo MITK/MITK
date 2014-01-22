@@ -1,6 +1,6 @@
 Important
 
-[ ] Make sure that ..Selector does tag scanning only once
+[x] Make sure that ..Selector does tag scanning only once
 [ ] Check Gantry Tilt TODO/Bug in old reader
 [ ] - and in new reader, how do we WANT to handle this?
 [x] Keep OLD DICOMTesting module, in order to test code until it is removed

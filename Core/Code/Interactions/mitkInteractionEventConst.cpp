@@ -85,6 +85,18 @@ const std::string InteractionEventConst::xmlEventPropertyButtonState()
   return xmlEventPropertyButtonState;
 }
 
+const std::string InteractionEventConst::xmlEventPropertyPositionInWorld()
+{
+  static const std::string xmlEventPropertyPosition = "PositionInWorld";
+  return xmlEventPropertyPosition;
+}
+
+const std::string InteractionEventConst::xmlEventPropertyPositionOnScreen()
+{
+  static const std::string xmlEventPropertyPosition = "PositionOnScreen";
+  return xmlEventPropertyPosition;
+}
+
 const std::string InteractionEventConst::xmlEventPropertyKey()
 {
   static const std::string xmlEventPropertyKey = "Key";
@@ -95,6 +107,12 @@ const std::string InteractionEventConst::xmlEventPropertyScrollDirection()
 {
   static const std::string xmlEventPropertyScrollDirection = "ScrollDirection";
   return xmlEventPropertyScrollDirection;
+}
+
+const std::string InteractionEventConst::xmlEventPropertyWheelDelta()
+{
+  static const std::string xmlEventPropertyWheelDelta = "WheelDelta";
+  return xmlEventPropertyWheelDelta;
 }
 
 const std::string InteractionEventConst::xmlEventPropertySignalName()

@@ -44,8 +44,11 @@ struct MITK_CORE_EXPORT InteractionEventConst
   static const std::string xmlEventPropertyModifier(); // = "Modifiers";
   static const std::string xmlEventPropertyEventButton(); // = "EventButton";
   static const std::string xmlEventPropertyButtonState(); // = "ButtonState";
+  static const std::string xmlEventPropertyPositionInWorld(); // = "PositionInWorld";
+  static const std::string xmlEventPropertyPositionOnScreen(); // = "PositionOnScreen";
   static const std::string xmlEventPropertyKey(); // = "Key";
   static const std::string xmlEventPropertyScrollDirection(); // = "ScrollDirection";
+  static const std::string xmlEventPropertyWheelDelta(); // = "WheelDelta";
   static const std::string xmlEventPropertySignalName(); // = "SignalName";
 };
 

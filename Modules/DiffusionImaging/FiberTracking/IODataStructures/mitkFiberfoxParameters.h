@@ -122,7 +122,8 @@ public:
     int                                 m_Spikes;                   ///< Number of spikes randomly appearing in the image
     double                              m_SpikeAmplitude;           ///< amplitude of spikes relative to the largest signal intensity (magnitude of complex)
     double                              m_KspaceLineOffset;         ///< Causes N/2 ghosts. Larger offset means stronger ghost.
-    double                              m_EddyStrength;             ///< Strength of eddy current induced gradients in T/m.
+    double                              m_EddyStrength;             ///< Strength of eddy current induced gradients in mT/m.
+    double                              m_Tau;                      ///< Eddy current decay constant (in ms)
     double                              m_CroppingFactor;           ///< FOV size in y-direction is multiplied by this factor. Causes aliasing artifacts.
     bool                                m_DoAddGibbsRinging;        ///< Add Gibbs ringing artifact
     bool                                m_DoSimulateRelaxation;     ///< Add T2 relaxation effects

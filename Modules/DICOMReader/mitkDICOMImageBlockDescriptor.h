@@ -63,6 +63,8 @@ class DICOMReader_EXPORT DICOMImageBlockDescriptor
     DICOMImageBlockDescriptor(const DICOMImageBlockDescriptor& other);
     DICOMImageBlockDescriptor& operator=(const DICOMImageBlockDescriptor& other);
 
+    static DICOMTagList GetTagsOfInterest();
+
     /// List of frames that constitute the mitk::Image (DICOMImageFrame%s)
     void SetImageFrameList(const DICOMImageFrameList& framelist);
     /// List of frames that constitute the mitk::Image (DICOMImageFrame%s)

@@ -78,6 +78,37 @@ mitk::DICOMImageBlockDescriptor
   return *this;
 }
 
+mitk::DICOMTagList
+mitk::DICOMImageBlockDescriptor::GetTagsOfInterest()
+{
+  DICOMTagList completeList;
+
+  completeList.push_back( DICOMTag(0x0018,0x1164) ); // pixel spacing
+  completeList.push_back( DICOMTag(0x0028,0x0030) ); // imager pixel spacing
+
+  completeList.push_back( DICOMTag(0x0008,0x0018) ); // sop instance UID
+  completeList.push_back( DICOMTag(0x0008,0x0016) ); // sop class UID
+
+  completeList.push_back( DICOMTag(0x0020,0x0011) ); // series number
+  completeList.push_back( DICOMTag(0x0008,0x1030) ); // study description
+  completeList.push_back( DICOMTag(0x0008,0x103e) ); // series description
+  completeList.push_back( DICOMTag(0x0008,0x0060) ); // modality
+  completeList.push_back( DICOMTag(0x0018,0x0024) ); // sequence name
+  completeList.push_back( DICOMTag(0x0020,0x0037) ); // image orientation
+
+  completeList.push_back( DICOMTag(0x0020,0x1041) ); // slice location
+  completeList.push_back( DICOMTag(0x0020,0x0012) ); // acquisition number
+  completeList.push_back( DICOMTag(0x0020,0x0013) ); // instance number
+  completeList.push_back( DICOMTag(0x0020,0x0032) ); // image position patient
+
+  completeList.push_back( DICOMTag(0x0028,0x1050) ); // window center
+  completeList.push_back( DICOMTag(0x0028,0x1051) ); // window width
+  completeList.push_back( DICOMTag(0x0008,0x0008) ); // image type
+  completeList.push_back( DICOMTag(0x0028,0x0004) ); // photometric interpretation
+
+  return completeList;
+}
+
 void
 mitk::DICOMImageBlockDescriptor
 ::SetTiltInformation(const GantryTiltInformation& info)

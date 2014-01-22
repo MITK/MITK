@@ -1,8 +1,12 @@
 Important
 
 [x] Make sure that ..Selector does tag scanning only once
-[ ] Check Gantry Tilt TODO/Bug in old reader
-[ ] - and in new reader, how do we WANT to handle this?
+[x] Check Gantry Tilt TODO/Bug in old reader
+[x] - and in new reader, how do we WANT to handle this?
+      - old and new code both did not correctly check the stored value against the calculated value
+        - it SEEMS like tilts below 45 degrees were never checked against the tag, and bigger values are probably unrealistic(?)
+        - so, nothing wrong. It just seems that we calculated a DIFFERENT angle than the one recorded
+      - in the new reader we remove the check. We are right as far as our shearing is affected.
 [x] Keep OLD DICOMTesting module, in order to test code until it is removed
     - restored this module as DCMTesting module
 [x] ONLY load a pre-sorted list
@@ -54,7 +58,7 @@ Nice-to-have
 
 [ ] Multi-Frame images (DCMTK)
 [ ] ...
-[ ] Add the tags used by DICOMImageBlockDescriptor dynamically instead of hard-coded
+[x] Add the tags used by DICOMImageBlockDescriptor dynamically instead of hard-coded
     (look for ToDo around m_GDCMScanner.AddTag() in mitkDICOMITKSeriesGDCMReader.cpp)
 [ ] Let DICOMImageBlockDescriptor describe attributes common and different for all blocks of a series
 [ ] Let DICOMImageBlockDescriptor check image properties when mitk::Image is set (pre-loaded case)

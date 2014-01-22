@@ -695,6 +695,7 @@ mitk::DICOMITKSeriesGDCMReader
 {
   DICOMTagList completeList;
 
+  // check all configured sorters
   for(SorterList::const_iterator sorterIter = m_Sorter.begin();
       sorterIter != m_Sorter.end();
       ++sorterIter)
@@ -705,29 +706,16 @@ mitk::DICOMITKSeriesGDCMReader
     completeList.insert( completeList.end(), tags.begin(), tags.end() );
   }
 
-  // Add some of our own interest
-  // TODO all tags that are needed in DICOMImageBlockDescriptor should be added by DICOMFileReader (this code location here should query all superclasses for tags)
-  completeList.push_back( DICOMTag(0x0018,0x1164) ); // pixel spacing
-  completeList.push_back( DICOMTag(0x0028,0x0030) ); // imager pixel spacing
+  // check our own forced sorters
+  DICOMTagList tags = m_EquiDistantBlocksSorter->GetTagsOfInterest();
+  completeList.insert( completeList.end(), tags.begin(), tags.end() );
 
-  completeList.push_back( DICOMTag(0x0028,0x1050) ); // window center
-  completeList.push_back( DICOMTag(0x0028,0x1051) ); // window width
-  completeList.push_back( DICOMTag(0x0008,0x0008) ); // image type
-  completeList.push_back( DICOMTag(0x0028,0x0004) ); // photometric interpretation
+  tags = m_NormalDirectionConsistencySorter->GetTagsOfInterest();
+  completeList.insert( completeList.end(), tags.begin(), tags.end() );
 
-  completeList.push_back( DICOMTag(0x0020,0x1041) ); // slice location
-  completeList.push_back( DICOMTag(0x0020,0x0013) ); // instance number
-  completeList.push_back( DICOMTag(0x0008,0x0016) ); // sop class UID
-  completeList.push_back( DICOMTag(0x0008,0x0018) ); // sop instance UID
-
-  completeList.push_back( DICOMTag(0x0020,0x0011) ); // series number
-  completeList.push_back( DICOMTag(0x0008,0x1030) ); // study description
-  completeList.push_back( DICOMTag(0x0008,0x103e) ); // series description
-  completeList.push_back( DICOMTag(0x0008,0x0060) ); // modality
-  completeList.push_back( DICOMTag(0x0020,0x0012) ); // acquisition number
-  completeList.push_back( DICOMTag(0x0018,0x0024) ); // sequence name
-  completeList.push_back( DICOMTag(0x0020,0x0037) ); // image orientation
-  completeList.push_back( DICOMTag(0x0020,0x0032) ); // ipp
+  // add the tags for DICOMImageBlockDescriptor
+  tags = DICOMImageBlockDescriptor::GetTagsOfInterest();
+  completeList.insert( completeList.end(), tags.begin(), tags.end() );
 
   return completeList;
 }

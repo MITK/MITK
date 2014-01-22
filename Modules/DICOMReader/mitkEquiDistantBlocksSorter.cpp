@@ -233,7 +233,7 @@ mitk::EquiDistantBlocksSorter
   DICOMTagList tags;
   tags.push_back( DICOMTag(0x0020, 0x0032) ); // ImagePositionPatient
   tags.push_back( DICOMTag(0x0020, 0x0037) ); // ImageOrientationPatient
-  tags.push_back( DICOMTag(0x0018, 0x1120) ); // GantryTilt
+  tags.push_back( DICOMTag(0x0018, 0x1120) ); // GantryDetectorTilt
 
   return tags;
 }
@@ -343,7 +343,6 @@ mitk::EquiDistantBlocksSorter
   // we const_cast here, because I could not use a map.at(), which would make the code much more readable
   const DICOMTag tagImagePositionPatient = DICOMTag(0x0020,0x0032); // Image Position (Patient)
   const DICOMTag    tagImageOrientation = DICOMTag(0x0020, 0x0037); // Image Orientation
-  const DICOMTag          tagGantryTilt = DICOMTag(0x0018, 0x1120); // gantry tilt
 
   Vector3D fromFirstToSecondOrigin; fromFirstToSecondOrigin.Fill(0.0);
   bool fromFirstToSecondOriginInitialized(false);
@@ -459,40 +458,13 @@ mitk::EquiDistantBlocksSorter
 
           if ( groupImagesWithGantryTilt && tiltInfo.IsRegularGantryTilt() )
           {
-            // check if this is at least roughly the same angle as recorded in DICOM tags
-            double angle = 0.0;
-            std::string tiltStr = (*dsIter)->GetTagValueAsString( tagGantryTilt );
-            std::istringstream i(tiltStr);
-            if (i >> angle)
-            {
-              MITK_DEBUG << "Comparing recorded tilt angle " << angle << " against calculated value " << tiltInfo.GetTiltAngleInDegrees();
-              // TODO we probably want the signs correct, too (that depends: this is just a rough check, nothing serious)
-              if ( fabs(angle) - tiltInfo.GetTiltAngleInDegrees() > 0.25)
-              {
-                result.AddFileToUnsortedBlock( *dsIter ); // sort away for further analysis
-                fileFitsIntoPattern = false;
-              }
-              else  // tilt angle from header is less than 0.25 degrees different from what we calculated, assume this is fine
-              {
-                assert(!datasets.empty());
+            assert(!datasets.empty());
 
-                result.FlagGantryTilt(tiltInfo);
-                result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
-                result.SetFirstFilenameOfBlock( datasets.front()->GetFilenameIfAvailable() );
-                result.SetLastFilenameOfBlock( datasets.back()->GetFilenameIfAvailable() );
-                fileFitsIntoPattern = true;
-              }
-            }
-            else // we cannot check the calculated tilt angle against the one from the dicom header (so we assume we are right)
-            {
-              assert(!datasets.empty());
-
-              result.FlagGantryTilt(tiltInfo);
-              result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
-              result.SetFirstFilenameOfBlock( datasets.front()->GetFilenameIfAvailable() );
-              result.SetLastFilenameOfBlock( datasets.back()->GetFilenameIfAvailable() );
-              fileFitsIntoPattern = true;
-            }
+            result.FlagGantryTilt(tiltInfo);
+            result.AddFileToSortedBlock( *dsIter ); // this file is good for current block
+            result.SetFirstFilenameOfBlock( datasets.front()->GetFilenameIfAvailable() );
+            result.SetLastFilenameOfBlock( datasets.back()->GetFilenameIfAvailable() );
+            fileFitsIntoPattern = true;
           }
           else // caller does not want tilt compensation OR shearing is more complicated than tilt
           {

@@ -153,7 +153,6 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase2()
 
   this->VerifyStatistics(ComputeStatistics(m_Image, figure1.GetPointer()), 255.0, 0.0);
 }
->>>>>>> origin/master
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase3()
 {
@@ -329,10 +328,6 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase10()
   this->VerifyStatistics(ComputeStatistics(m_Image, figure2.GetPointer()), 127.66, 127.5);
 }
 
-<<<<<<< HEAD
-  mitk::Image::Pointer image = mitkImageStatisticsCalculatorTestClass::GetTestImage();
-  MITK_TEST_CONDITION_REQUIRED( image.IsNotNull(), "Loading test image" );
-=======
 void mitkImageStatisticsCalculatorTestSuite::TestCase11()
 {
   /*****************************
@@ -355,7 +350,6 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase11()
 
   this->VerifyStatistics(ComputeStatistics(m_Image, figure2.GetPointer()), 204.0, 105.58 );
 }
->>>>>>> origin/master
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase12()
 {

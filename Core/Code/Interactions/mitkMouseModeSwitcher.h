@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObject.h>
 #include "mitkDisplayInteractor.h"
 
+#include "mitkEventRecorder.h"
+
 namespace mitk {
 
 /***********************************************************************
@@ -116,11 +118,15 @@ namespace mitk {
     InteractionScheme m_ActiveInteractionScheme;
     MouseMode         m_ActiveMouseMode;
     DisplayInteractor::Pointer m_CurrentObserver;
+
+    EventRecorder* m_CurrentObserverDEBUG;
     /**
      * Reference to the service registration of the observer,
      * it is needed to unregister the observer on unload.
      */
     us::ServiceRegistration<InteractionEventObserver> m_ServiceRegistration;
+
+    us::ServiceRegistration<InteractionEventObserver> m_ServiceRegistrationDEBUG;
   };
 } // namespace mitk
 

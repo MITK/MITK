@@ -241,6 +241,7 @@ set(CPP_FILES
   Interactions/mitkEventFactory.cpp
   Interactions/mitkInteractionEventHandler.cpp
   Interactions/mitkEventMapper.cpp
+  Interactions/mitkEventRecorder.cpp
   Interactions/mitkEventStateMachine.cpp
   Interactions/mitkGlobalInteraction.cpp
   Interactions/mitkInteractor.cpp

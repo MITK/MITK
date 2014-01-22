@@ -109,44 +109,6 @@ QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
   m_ServiceRegistration.Unregister();
 }
 
-void QmitkMultiLabelSegmentationView::InitializeListeners()
-{
-  if (m_Interactor.IsNull())
-  {
-    /*
-    us::ModuleContext* moduleContext = us::GetModuleContext();
-    m_Interactor = mitk::SegmentationInteractor::New();
-    m_Interactor->LoadStateMachine( "SegmentationInteraction.xml", moduleContext->GetModule());
-    m_Interactor->SetEventConfig ( "ConfigSegmentation.xml", moduleContext->GetModule());
-    us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>( m_Interactor.GetPointer(), us::ServiceProperties() );
-    */
-    us::Module* module = us::GetModuleContext()->GetModule();
-    std::vector<us::ModuleResource> resources = module->FindResources("/", "*", true);
-    MITK_INFO << "number of resources found: " << resources.size();
-    for (std::vector<us::ModuleResource>::iterator iter = resources.begin(); iter != resources.end(); ++iter)
-    {
-      MITK_INFO << iter->GetResourcePath();
-    }
-
-    m_Interactor = mitk::SegmentationInteractor::New();
-    if (!m_Interactor->LoadStateMachine("SegmentationInteraction.xml", module))
-    {
-      MITK_WARN << "Error loading state machine";
-    }
-
-    if (!m_Interactor->SetEventConfig ("ConfigSegmentation.xml", module))
-    {
-      MITK_WARN << "Error loading state machine configuration";
-    }
-
-    // Register as listener via micro services
-    us::ServiceProperties props;
-    props["name"] = std::string("SegmentationInteraction");
-    m_ServiceRegistration = us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>(
-        m_Interactor.GetPointer(),props);
-  }
-}
-
 void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 {
   // setup the basic GUI of this view
@@ -210,7 +172,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 
   connect( m_Controls.m_cbInterpolation, SIGNAL( activated (int) ), this, SLOT( OnInterpolationSelectionChanged(int) ) );
 
-  m_Controls.m_swInterpolation->setCurrentIndex(2);
+  m_Controls.m_cbInterpolation->setCurrentIndex(0);
 
   this->OnReferenceSelectionChanged( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode() );
 
@@ -226,7 +188,44 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   }
 
   this->InitializeListeners();
+}
 
+void QmitkMultiLabelSegmentationView::InitializeListeners()
+{
+  if (m_Interactor.IsNull())
+  {
+    /*
+    us::ModuleContext* moduleContext = us::GetModuleContext();
+    m_Interactor = mitk::SegmentationInteractor::New();
+    m_Interactor->LoadStateMachine( "SegmentationInteraction.xml", moduleContext->GetModule());
+    m_Interactor->SetEventConfig ( "ConfigSegmentation.xml", moduleContext->GetModule());
+    us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>( m_Interactor.GetPointer(), us::ServiceProperties() );
+    */
+    us::Module* module = us::GetModuleContext()->GetModule();
+    std::vector<us::ModuleResource> resources = module->FindResources("/", "*", true);
+    MITK_INFO << "number of resources found: " << resources.size();
+    for (std::vector<us::ModuleResource>::iterator iter = resources.begin(); iter != resources.end(); ++iter)
+    {
+      MITK_INFO << iter->GetResourcePath();
+    }
+
+    m_Interactor = mitk::SegmentationInteractor::New();
+    if (!m_Interactor->LoadStateMachine("SegmentationInteraction.xml", module))
+    {
+      MITK_WARN << "Error loading state machine";
+    }
+
+    if (!m_Interactor->SetEventConfig ("ConfigSegmentation.xml", module))
+    {
+      MITK_WARN << "Error loading state machine configuration";
+    }
+
+    // Register as listener via micro services
+    us::ServiceProperties props;
+    props["name"] = std::string("SegmentationInteraction");
+    m_ServiceRegistration = us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>(
+        m_Interactor.GetPointer(),props);
+  }
 }
 
 void QmitkMultiLabelSegmentationView::SetFocus ()
@@ -512,7 +511,22 @@ void QmitkMultiLabelSegmentationView::OnInterpolationSelectionChanged(int index)
 
 void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk::DataNode *node)
 {
+  if (m_ReferenceNode.IsNull() ) return;
+
   m_ToolManager->ActivateTool(-1);
+
+  //check image geometry
+  if (node)
+  {
+    mitk::Image* refImage = dynamic_cast<mitk::Image*>(m_ReferenceNode->GetData());
+    assert(refImage);
+
+    mitk::Image* workingImage = dynamic_cast<mitk::Image*>(node->GetData());
+    assert(workingImage);
+
+    if (!this->CheckForSameGeometry(refImage, workingImage))
+      return;
+  }
 
   m_WorkingNode = const_cast<mitk::DataNode*>(node);
 

@@ -281,5 +281,5 @@ struct RegisterDiffusionCoreObjectFactory{
   mitk::DiffusionCoreObjectFactory::Pointer m_Factory;
 };
 
-static RegisterDiffusionCoreObjectFactory registerPlanarFigureObjectFactory;
+static RegisterDiffusionCoreObjectFactory registerDiffusionCoreObjectFactory;
 

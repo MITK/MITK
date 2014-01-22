@@ -46,7 +46,7 @@ typedef short DiffusionPixelType;
 typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
 typedef std::multimap<std::string, std::string> MultimapType;
 
-mitk::DiffusionCoreObjectFactory::DiffusionCoreObjectFactory(bool /*registerSelf*/)
+mitk::DiffusionCoreObjectFactory::DiffusionCoreObjectFactory()
   :CoreObjectFactoryBase()
 {
 
@@ -265,13 +265,21 @@ void mitk::DiffusionCoreObjectFactory::RegisterIOFactories()
 {
 }
 
-void RegisterDiffusionCoreObjectFactory()
-{
-  static bool oneDiffusionCoreObjectFactoryRegistered = false;
-  if ( ! oneDiffusionCoreObjectFactoryRegistered ) {
-    MITK_DEBUG << "Registering DiffusionCoreObjectFactory..." << std::endl;
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::DiffusionCoreObjectFactory::New());
 
-    oneDiffusionCoreObjectFactoryRegistered = true;
+struct RegisterDiffusionCoreObjectFactory{
+  RegisterDiffusionCoreObjectFactory()
+    : m_Factory( mitk::DiffusionCoreObjectFactory::New() )
+  {
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory( m_Factory );
   }
-}
+
+  ~RegisterDiffusionCoreObjectFactory()
+  {
+    mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory( m_Factory );
+  }
+
+  mitk::DiffusionCoreObjectFactory::Pointer m_Factory;
+};
+
+static RegisterDiffusionCoreObjectFactory registerPlanarFigureObjectFactory;
+

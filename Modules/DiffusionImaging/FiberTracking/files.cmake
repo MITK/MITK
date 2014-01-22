@@ -9,7 +9,6 @@ set(CPP_FILES
   IODataStructures/FiberBundleX/mitkTrackvis.cpp
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
   IODataStructures/mitkFiberTrackingObjectFactory.cpp
-  IODataStructures/mitkFiberfoxParameters.cpp
 
   # Rendering
   Rendering/mitkFiberBundleXMapper2D.cpp

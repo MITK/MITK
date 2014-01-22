@@ -35,18 +35,18 @@ namespace itk {
 template< class TPixelType >
 KspaceImageFilter< TPixelType >
 ::KspaceImageFilter()
-    : m_SimulateRelaxation(true)
-    , m_SimulateEddyCurrents(false)
-    , m_FrequencyMap(NULL)
-    , m_tLine(1)
+    : m_tLine(1)
     , m_kOffset(0)
+    , m_FrequencyMap(NULL)
+    , m_SimulateRelaxation(true)
     , m_Tau(70)
     , m_EddyGradientMagnitude(30)
     , m_IsBaseline(true)
-    , m_SignalScale(1)
+    , m_SignalScale(25)
     , m_Spikes(0)
     , m_SpikeAmplitude(1)
     , m_UseConstantRandSeed(false)
+    , m_Tinhom(50)
 {
     m_DiffusionGradientDirection.Fill(0.0);
 
@@ -70,20 +70,8 @@ void KspaceImageFilter< TPixelType >
     outputImage->SetRequestedRegion( region );
     outputImage->Allocate();
 
-    m_SimulateDistortions = true;
-    if (m_FrequencyMap.IsNull())
-    {
-        m_SimulateDistortions = false;
-        m_FrequencyMap = InputImageType::New();
-        m_FrequencyMap->SetLargestPossibleRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
-        m_FrequencyMap->SetBufferedRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
-        m_FrequencyMap->SetRequestedRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
-        m_FrequencyMap->Allocate();
-        m_FrequencyMap->FillBuffer(0);
-    }
-
     double gamma = 42576000;    // Gyromagnetic ratio in Hz/T
-    if (m_DiffusionGradientDirection.GetNorm()>0.001)
+    if (m_EddyGradientMagnitude>0 && m_DiffusionGradientDirection.GetNorm()>0.001)
     {
         m_EddyGradientMagnitude /= 1000; // eddy gradient magnitude in T/m
         m_DiffusionGradientDirection.Normalize();
@@ -141,7 +129,7 @@ void KspaceImageFilter< TPixelType >
 
         // calculate eddy current decay factors
         double eddyDecay = 0;
-        if (m_SimulateEddyCurrents)
+        if (m_EddyGradientMagnitude>0)
             eddyDecay = exp(-(m_TE/2 + t)/m_Tau) * t/1000;
 
         // calcualte signal relaxation factors
@@ -184,13 +172,13 @@ void KspaceImageFilter< TPixelType >
 
             // simulate eddy currents and other distortions
             double omega_t = 0;
-            if ( m_SimulateEddyCurrents && !m_IsBaseline)
+            if ( m_EddyGradientMagnitude>0 && !m_IsBaseline)
             {
                 itk::Vector< double, 3 > pos; pos[0] = x; pos[1] = y; pos[2] = m_Z;
                 pos = m_DirectionMatrix*pos/1000;   // vector from image center to current position (in meter)
                 omega_t += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2])*eddyDecay;
             }
-            if (m_SimulateDistortions)
+            if (m_FrequencyMap.IsNotNull()) // simulate distortions
                 omega_t += m_FrequencyMap->GetPixel(it.GetIndex())*t/1000;
 
             if (y<-yMaxFov/2)

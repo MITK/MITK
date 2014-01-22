@@ -27,7 +27,7 @@ This file is based heavily on a corresponding ITK filter.
 #include <itkImageSource.h>
 
 namespace itk{
-/** \class EvaluateDirectionImagesFilter
+/** \brief Evaluates the voxel-wise angular error between two sets of directions.
  */
 
 template< class PixelType >
@@ -56,17 +56,19 @@ public:
     typedef Image< bool, 3 >                                    BoolImageType;
     typedef Image< unsigned char, 3 >                           UCharImageType;
 
-    itkSetMacro( ImageSet , DirectionImageContainerType::Pointer)
-    itkSetMacro( ReferenceImageSet , DirectionImageContainerType::Pointer)
-    itkSetMacro( MaskImage , UCharImageType::Pointer)
-    itkSetMacro( IgnoreMissingDirections , bool)
+    itkSetMacro( ImageSet , DirectionImageContainerType::Pointer)           ///< test image containers
+    itkSetMacro( ReferenceImageSet , DirectionImageContainerType::Pointer)  ///< reference image containers
+    itkSetMacro( MaskImage , UCharImageType::Pointer)                       ///< Calculation is only performed inside of the mask image.
+    itkSetMacro( IgnoreMissingDirections , bool)                            ///< If in one voxel, the number of directions differs between the test container and the reference, the excess directions are ignored. Otherwise, the error to the next closest direction is calculated.
 
+    /** Output statistics of the measured angular errors. */
     itkGetMacro( MeanAngularError, float)
     itkGetMacro( MinAngularError, float)
     itkGetMacro( MaxAngularError, float)
     itkGetMacro( VarAngularError, float)
     itkGetMacro( MedianAngularError, float)
 
+    /** Output statistics of the measured peak length errors. */
     itkGetMacro( MeanLengthError, float)
     itkGetMacro( MinLengthError, float)
     itkGetMacro( MaxLengthError, float)
@@ -79,17 +81,16 @@ protected:
 
     void GenerateData();
 
-    UCharImageType::Pointer                 m_MaskImage;
-    DirectionImageContainerType::Pointer    m_ImageSet;
-    DirectionImageContainerType::Pointer    m_ReferenceImageSet;
-    bool                                    m_IgnoreMissingDirections;
+    UCharImageType::Pointer                  m_MaskImage;
+    DirectionImageContainerType::Pointer     m_ImageSet;
+    DirectionImageContainerType::Pointer     m_ReferenceImageSet;
+    bool                                     m_IgnoreMissingDirections;
     double                                   m_MeanAngularError;
     double                                   m_MedianAngularError;
     double                                   m_MaxAngularError;
     double                                   m_MinAngularError;
     double                                   m_VarAngularError;
     std::vector< double >                    m_AngularErrorVector;
-
     double                                   m_MeanLengthError;
     double                                   m_MedianLengthError;
     double                                   m_MaxLengthError;

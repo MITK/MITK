@@ -56,28 +56,6 @@ public:
 
     double GetWeight() { return m_Weight; }
     double GetT2() { return m_T2; }
-    int GetNumGradients(){ return m_GradientList.size(); }
-    std::vector< int > GetBaselineIndices()
-    {
-        std::vector< int > result;
-        for( unsigned int i=0; i<this->m_GradientList.size(); i++)
-            if (m_GradientList.at(i).GetNorm()<0.0001)
-                result.push_back(i);
-        return result;
-    }
-    int GetFirstBaselineIndex()
-    {
-        for( unsigned int i=0; i<this->m_GradientList.size(); i++)
-            if (m_GradientList.at(i).GetNorm()<0.0001)
-                return i;
-        return -1;
-    }
-    bool IsBaselineIndex(unsigned int idx)
-    {
-        if (m_GradientList.size()>idx && m_GradientList.at(idx).GetNorm()<0.0001)
-            return true;
-        return false;
-    }
 
 protected:
 

@@ -43,8 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberfoxParameters.h>
 
 /*!
-\brief View for fiber based diffusion software phantoms (Fiberfox).
-
+\brief View for fiber based diffusion software phantoms (Fiberfox). See "Fiberfox: Facilitating the creation of realistic white matter software phantoms" (DOI: 10.1002/mrm.25045) for details.
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
@@ -99,28 +98,28 @@ public:
 
 protected slots:
 
-    void SetOutputPath();
-    void LoadParameters();
-    void SaveParameters();
+    void SetOutputPath();           ///< path where image is automatically saved to after the simulation is finished
+    void LoadParameters();          ///< load fiberfox parameters
+    void SaveParameters();          ///< save fiberfox parameters
 
     void BeforeThread();
     void AfterThread();
-    void KillThread();
-    void UpdateSimulationStatus();
+    void KillThread();              ///< abort simulation
+    void UpdateSimulationStatus();  ///< print simulation progress and satus messages
 
-    void OnDrawROI();           ///< adds new ROI, handles interactors etc.
-    void OnAddBundle();         ///< adds new fiber bundle to datastorage
-    void OnFlipButton();        ///< negate one coordinate of the fiber waypoints in the selcted planar figure. needed in case of unresolvable twists
-    void GenerateFibers();      ///< generate fibers from the selected ROIs
-    void GenerateImage();       ///< generate artificial image from the selected fiber bundle
-    void JoinBundles();         ///< merges selcted fiber bundles into one
-    void CopyBundles();         ///< add copy of the selected bundle to the datamanager
-    void ApplyTransform();    ///< rotate and shift selected bundles
-    void AlignOnGrid();         ///< shift selected fiducials to nearest voxel center
-    void Comp1ModelFrameVisibility(int index);///< only show parameters of selected fiber model type
-    void Comp2ModelFrameVisibility(int index);///< only show parameters of selected non-fiber model type
-    void Comp3ModelFrameVisibility(int index);///< only show parameters of selected non-fiber model type
-    void Comp4ModelFrameVisibility(int index);///< only show parameters of selected non-fiber model type
+    void OnDrawROI();               ///< adds new ROI, handles interactors etc.
+    void OnAddBundle();             ///< adds new fiber bundle to datastorage
+    void OnFlipButton();            ///< negate one coordinate of the fiber waypoints in the selcted planar figure. needed in case of unresolvable twists
+    void GenerateFibers();          ///< generate fibers from the selected ROIs
+    void GenerateImage();           ///< start image simulation
+    void JoinBundles();             ///< merges selcted fiber bundles into one
+    void CopyBundles();             ///< add copy of the selected bundle to the datamanager
+    void ApplyTransform();          ///< rotate and shift selected bundles
+    void AlignOnGrid();             ///< shift selected fiducials to nearest voxel center
+    void Comp1ModelFrameVisibility(int index);  ///< only show parameters of selected signal model for compartment 1
+    void Comp2ModelFrameVisibility(int index);  ///< only show parameters of selected signal model for compartment 2
+    void Comp3ModelFrameVisibility(int index);  ///< only show parameters of selected signal model for compartment 3
+    void Comp4ModelFrameVisibility(int index);  ///< only show parameters of selected signal model for compartment 4
     void ShowAdvancedOptions(int state);
 
     /** update fibers if any parameter changes */
@@ -131,6 +130,9 @@ protected slots:
     void OnBiasChanged(double value);
     void OnVarianceChanged(double value);
     void OnDistributionChanged(int value);
+    void OnConstantRadius(int value);
+
+    /** update GUI elements */
     void OnAddNoise(int value);
     void OnAddGhosts(int value);
     void OnAddDistortions(int value);
@@ -138,7 +140,6 @@ protected slots:
     void OnAddSpikes(int value);
     void OnAddAliasing(int value);
     void OnAddMotion(int value);
-    void OnConstantRadius(int value);
 
 protected:
 
@@ -149,10 +150,10 @@ protected:
 
     Ui::QmitkFiberfoxViewControls* m_Controls;
 
-    void SimulateForExistingDwi(mitk::DataNode* imageNode);
-    void SimulateImageFromFibers(mitk::DataNode* fiberNode);
-    void UpdateImageParameters();                   ///< update iamge generation paaremeter struct
-    void UpdateGui();                               ///< enable/disbale buttons etc. according to current datamanager selection
+    void SimulateForExistingDwi(mitk::DataNode* imageNode);     ///< add artifacts to existing diffusion weighted image
+    void SimulateImageFromFibers(mitk::DataNode* fiberNode);    ///< simulate new diffusion weighted image
+    template< class ScalarType > FiberfoxParameters< ScalarType > UpdateImageParameters();  ///< update fiberfox paramater object (template parameter defines noise model type)
+    void UpdateGui();                                           ///< enable/disbale buttons etc. according to current datamanager selection
     void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
     void EnableCrosshairNavigation();               ///< enable crosshair navigation if planar figure interaction ends
     void DisableCrosshairNavigation();              ///< disable crosshair navigation if planar figure interaction starts
@@ -179,9 +180,6 @@ protected:
         unsigned int m_Flipped;
     };
 
-    FiberfoxParameters                                  m_ImageGenParameters;
-    FiberfoxParameters                                  m_ImageGenParametersBackup;
-
     std::map<mitk::DataNode*, QmitkPlanarFigureData>    m_DataNodeToPlanarFigureData;   ///< map each planar figure uniquely to a QmitkPlanarFigureData
     mitk::DataNode::Pointer                             m_SelectedFiducial;             ///< selected planar ellipse
     mitk::DataNode::Pointer                             m_SelectedImage;
@@ -190,8 +188,9 @@ protected:
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles2;
     vector< mitk::DataNode::Pointer >                   m_SelectedFiducials;
     vector< mitk::DataNode::Pointer >                   m_SelectedImages;
+    ItkUcharImgType::Pointer                            m_ItkMaskImage;
 
-    // intra and inter axonal compartments
+    /** intra and inter axonal compartments */
     mitk::StickModel<double> m_StickModel1;
     mitk::StickModel<double> m_StickModel2;
     mitk::TensorModel<double> m_ZeppelinModel1;
@@ -199,7 +198,7 @@ protected:
     mitk::TensorModel<double> m_TensorModel1;
     mitk::TensorModel<double> m_TensorModel2;
 
-    // extra axonal compartment models
+    /** extra axonal compartment models */
     mitk::BallModel<double> m_BallModel1;
     mitk::BallModel<double> m_BallModel2;
     mitk::AstroStickModel<double> m_AstrosticksModel1;
@@ -207,18 +206,20 @@ protected:
     mitk::DotModel<double> m_DotModel1;
     mitk::DotModel<double> m_DotModel2;
 
-    QString m_ParameterFile;
-    string m_OutputPath;
+    QString m_ParameterFile;    ///< parameter file name
+    string  m_OutputPath;       ///< image save path
 
     // GUI thread
     QmitkFiberfoxWorker     m_Worker;   ///< runs filter
     QThread                 m_Thread;   ///< worker thread
-    itk::TractsToDWIImageFilter< short >::Pointer           m_TractsToDwiFilter;
-    itk::AddArtifactsToDwiImageFilter< short >::Pointer     m_ArtifactsToDwiFilter;
     bool                    m_ThreadIsRunning;
     QTimer*                 m_SimulationTimer;
     QTime                   m_SimulationTime;
     QString                 m_SimulationStatusText;
+
+    /** Image filters that do all the simulations. */
+    itk::TractsToDWIImageFilter< short >::Pointer           m_TractsToDwiFilter;
+    itk::AddArtifactsToDwiImageFilter< short >::Pointer     m_ArtifactsToDwiFilter;
 
     friend class QmitkFiberfoxWorker;
 };

@@ -38,13 +38,16 @@ mitk::DICOMITKSeriesGDCMReader
 
 mitk::DICOMITKSeriesGDCMReader
 ::DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other )
-:itk::Object()
-,DICOMFileReader(other)
+:DICOMFileReader(other)
 ,m_FixTiltByShearing(false)
-,m_Sorter( other.m_Sorter ) // TODO should clone the list items
+,m_SortingResultInProgress( other.m_SortingResultInProgress )
+,m_Sorter( other.m_Sorter )
 ,m_EquiDistantBlocksSorter( other.m_EquiDistantBlocksSorter->Clone() )
 ,m_NormalDirectionConsistencySorter( other.m_NormalDirectionConsistencySorter->Clone() )
+,m_ReplacedCLocales( other.m_ReplacedCLocales )
+,m_ReplacedCinLocales( other.m_ReplacedCinLocales )
 ,m_DecimalPlacesForOrientation(other.m_DecimalPlacesForOrientation)
+,m_TagCache( other.m_TagCache )
 {
 }
 
@@ -61,10 +64,14 @@ mitk::DICOMITKSeriesGDCMReader
   {
     DICOMFileReader::operator=(other);
     this->m_FixTiltByShearing = other.m_FixTiltByShearing;
+    this->m_SortingResultInProgress = other.m_SortingResultInProgress;
     this->m_Sorter = other.m_Sorter; // TODO should clone the list items
     this->m_EquiDistantBlocksSorter = other.m_EquiDistantBlocksSorter->Clone();
     this->m_NormalDirectionConsistencySorter = other.m_NormalDirectionConsistencySorter->Clone();
+    this->m_ReplacedCLocales = other.m_ReplacedCLocales;
+    this->m_ReplacedCinLocales = other.m_ReplacedCinLocales;
     this->m_DecimalPlacesForOrientation = other.m_DecimalPlacesForOrientation;
+    this->m_TagCache = other.m_TagCache;
   }
   return *this;
 }

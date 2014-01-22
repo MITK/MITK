@@ -1,7 +1,7 @@
 Important
 
 [x] Make sure that ..Selector does tag scanning only once
-[x] Check Gantry Tilt TODO/Bug in old reader
+[x] Check Gantry Tilt ToDo/Bug in old reader
 [x] - and in new reader, how do we WANT to handle this?
       - old and new code both did not correctly check the stored value against the calculated value
         - it SEEMS like tilts below 45 degrees were never checked against the tag, and bigger values are probably unrealistic(?)

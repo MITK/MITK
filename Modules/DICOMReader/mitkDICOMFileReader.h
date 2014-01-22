@@ -53,7 +53,7 @@ namespace mitk
   brings a number of methods that describe its configuration/specifics by
   means of a short label and a (longer) description.
 */
-class DICOMReader_EXPORT DICOMFileReader : virtual public itk::Object
+class DICOMReader_EXPORT DICOMFileReader : public itk::Object
 {
   public:
 
@@ -82,9 +82,9 @@ class DICOMReader_EXPORT DICOMFileReader : virtual public itk::Object
     /// Load the mitk::Image%s in our outputs, the DICOMImageBlockDescriptor. To be called only after AnalyzeInputFiles(). Take care of potential exceptions!
     virtual bool LoadImages() = 0;
 
-    // TODO seems reasonable
     virtual DICOMTagList GetTagsOfInterest() const = 0;
-    // TODO need to document
+
+    /// A way to provide external knowledge about files and tag values is appreciated.
     virtual void SetTagCache(DICOMTagCache::Pointer) = 0;
 
     /// Short label/name to describe this reader

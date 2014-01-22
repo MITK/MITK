@@ -18,14 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::DICOMGDCMTagScanner
 ::DICOMGDCMTagScanner()
-:itk::Object()
 {
 }
 
 mitk::DICOMGDCMTagScanner
 ::DICOMGDCMTagScanner(const DICOMGDCMTagScanner& other)
-:itk::Object()
-,DICOMTagCache(other)
+:DICOMTagCache(other)
 {
 }
 

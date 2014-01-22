@@ -24,6 +24,12 @@ mitk::DICOMTagBasedSorter::CutDecimalPlaces
 {
 }
 
+mitk::DICOMTagBasedSorter::CutDecimalPlaces
+::CutDecimalPlaces(const CutDecimalPlaces& other)
+:m_Precision(other.m_Precision)
+{
+}
+
 std::string
 mitk::DICOMTagBasedSorter::CutDecimalPlaces
 ::operator()(const std::string& input) const
@@ -66,6 +72,14 @@ mitk::DICOMTagBasedSorter::CutDecimalPlaces
   return resultString.str();
 }
 
+mitk::DICOMTagBasedSorter::TagValueProcessor*
+mitk::DICOMTagBasedSorter::CutDecimalPlaces
+::Clone() const
+{
+  return new CutDecimalPlaces(*this);
+}
+
+
 unsigned int
 mitk::DICOMTagBasedSorter::CutDecimalPlaces
 ::GetPrecision() const
@@ -94,8 +108,16 @@ mitk::DICOMTagBasedSorter
 mitk::DICOMTagBasedSorter
 ::DICOMTagBasedSorter(const DICOMTagBasedSorter& other )
 :DICOMDatasetSorter(other)
-,m_StrictSorting(other.m_StrictSorting)
+,m_DistinguishingTags( other.m_DistinguishingTags )
+,m_SortCriterion( other.m_SortCriterion )
+,m_StrictSorting( other.m_StrictSorting )
 {
+  for(TagValueProcessorMap::const_iterator ti = other.m_TagValueProcessor.begin();
+      ti != other.m_TagValueProcessor.end();
+      ++ti)
+  {
+    m_TagValueProcessor[ti->first] = ti->second->Clone();
+  }
 }
 
 mitk::DICOMTagBasedSorter&
@@ -105,7 +127,16 @@ mitk::DICOMTagBasedSorter
   if (this != &other)
   {
     DICOMDatasetSorter::operator=(other);
+    m_DistinguishingTags = other.m_DistinguishingTags;
+    m_SortCriterion = other.m_SortCriterion;
     m_StrictSorting = other.m_StrictSorting;
+
+    for(TagValueProcessorMap::const_iterator ti = other.m_TagValueProcessor.begin();
+        ti != other.m_TagValueProcessor.end();
+        ++ti)
+    {
+      m_TagValueProcessor[ti->first] = ti->second->Clone();
+    }
   }
   return *this;
 }

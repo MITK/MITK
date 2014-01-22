@@ -33,7 +33,7 @@ namespace mitk
     \ingroup DICOMReaderModule
     \brief ...
   */
-  class DICOMReader_EXPORT DICOMTagCache : virtual public itk::Object
+  class DICOMReader_EXPORT DICOMTagCache : public itk::Object
   {
     public:
 

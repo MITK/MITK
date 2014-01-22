@@ -54,6 +54,7 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
       public:
         /// \brief Implements the "processing".
         virtual std::string operator()(const std::string&) const = 0;
+        virtual TagValueProcessor* Clone() const = 0;
     };
 
     /**
@@ -64,8 +65,10 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
     {
       public:
         CutDecimalPlaces(unsigned int precision);
+        CutDecimalPlaces(const CutDecimalPlaces& other);
         unsigned int GetPrecision() const;
         virtual std::string operator()(const std::string&) const;
+        virtual TagValueProcessor* Clone() const;
       private:
         unsigned int m_Precision;
     };

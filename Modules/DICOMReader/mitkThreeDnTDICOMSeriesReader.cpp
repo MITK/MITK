@@ -26,8 +26,7 @@ mitk::ThreeDnTDICOMSeriesReader
 
 mitk::ThreeDnTDICOMSeriesReader
 ::ThreeDnTDICOMSeriesReader(const ThreeDnTDICOMSeriesReader& other )
-:itk::Object()
-,DICOMITKSeriesGDCMReader(other)
+:DICOMITKSeriesGDCMReader(other)
 ,m_Group3DandT(true)
 {
 }

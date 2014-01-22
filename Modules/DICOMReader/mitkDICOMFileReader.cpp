@@ -32,6 +32,7 @@ mitk::DICOMFileReader
 mitk::DICOMFileReader
 ::DICOMFileReader(const DICOMFileReader& other )
 :itk::Object()
+,m_InputFilenames( other.m_InputFilenames )
 ,m_Outputs( other.m_Outputs )
 ,m_ConfigLabel( other.m_ConfigLabel )
 ,m_ConfigDescription( other.m_ConfigDescription )

@@ -208,6 +208,10 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
 
+  connect( m_Controls.m_cbInterpolation, SIGNAL( activated (int) ), this, SLOT( OnInterpolationSelectionChanged(int) ) );
+
+  m_Controls.m_swInterpolation->setCurrentIndex(2);
+
   this->OnReferenceSelectionChanged( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode() );
 
   m_IRenderWindowPart = this->GetRenderWindowPart();
@@ -484,6 +488,26 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
   this->UpdateControls();
 
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
+}
+
+void QmitkMultiLabelSegmentationView::OnInterpolationSelectionChanged(int index)
+{
+  if (index == 1)
+  {
+    m_Controls.m_SurfaceBasedInterpolatorWidget->m_Controls.m_btStart->setChecked(false);//OnToggleWidgetActivation(false);
+    m_Controls.m_swInterpolation->setCurrentIndex(0);
+  }
+  else if (index == 2)
+  {
+    m_Controls.m_SliceBasedInterpolatorWidget->m_Controls.m_btStart->setChecked(false);
+    m_Controls.m_swInterpolation->setCurrentIndex(1);
+  }
+  else
+  {
+    m_Controls.m_SurfaceBasedInterpolatorWidget->m_Controls.m_btStart->setChecked(false);
+    m_Controls.m_SliceBasedInterpolatorWidget->m_Controls.m_btStart->setChecked(false);
+    m_Controls.m_swInterpolation->setCurrentIndex(2);
+  }
 }
 
 void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk::DataNode *node)

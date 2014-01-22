@@ -77,12 +77,16 @@ class SegmentationUI_EXPORT QmitkSurfaceBasedInterpolatorWidget : public QWidget
      */
     void ShowInterpolationResult(bool);
 
-  protected slots:
+    Ui::QmitkSurfaceBasedInterpolatorWidgetGUIControls m_Controls;
+
+  public slots:
 
     /**
       \brief Reaction to "Start/Stop" button click
     */
     void OnToggleWidgetActivation(bool);
+
+  protected slots:
 
     void OnAcceptInterpolationClicked();
 
@@ -105,8 +109,6 @@ private:
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
     mitk::ToolManager* m_ToolManager;
-
-    Ui::QmitkSurfaceBasedInterpolatorWidgetGUIControls m_Controls;
 
     bool m_Activated;
 

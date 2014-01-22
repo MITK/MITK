@@ -60,6 +60,9 @@ protected slots:
   /// \brief reaction to the selection of a new Segmentation (working) image in the DataStorage combobox
   void OnSegmentationSelectionChanged(const mitk::DataNode *node);
 
+  /// \brief reaction to ...
+  void OnInterpolationSelectionChanged(int);
+
   /// \brief reaction to the selection of any 2D segmentation tool
   void OnManualTool2DSelected(int id);
 

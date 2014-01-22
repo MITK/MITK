@@ -88,16 +88,20 @@ class SegmentationUI_EXPORT QmitkSliceBasedInterpolatorWidget : public QWidget
     */
     void OnSliceInterpolationInfoChanged(const itk::EventObject&);
 
+    Ui::QmitkSliceBasedInterpolatorWidgetGUIControls m_Controls;
+
   signals:
 
     void signalSliceBasedInterpolationEnabled(bool);
 
-  protected slots:
+  public slots:
 
     /**
       \brief Reaction to "Start/Stop" button click
     */
     void OnToggleWidgetActivation(bool);
+
+  protected slots:
 
     /**
       \brief Reaction to "Accept Current Slice" button click.
@@ -127,6 +131,7 @@ class SegmentationUI_EXPORT QmitkSliceBasedInterpolatorWidget : public QWidget
     typedef std::map<QAction*, mitk::SliceNavigationController*> ActionToSliceDimensionMapType;
 
     const ActionToSliceDimensionMapType CreateActionToSliceDimension();
+
     ActionToSliceDimensionMapType m_ActionToSliceDimensionMap;
 
     void AcceptAllInterpolations(mitk::SliceNavigationController* slicer);
@@ -169,8 +174,6 @@ private:
     mitk::SegmentationInterpolationController::Pointer m_SliceInterpolatorController;
 
     mitk::ToolManager* m_ToolManager;
-
-    Ui::QmitkSliceBasedInterpolatorWidgetGUIControls m_Controls;
 
     bool m_Activated;
 

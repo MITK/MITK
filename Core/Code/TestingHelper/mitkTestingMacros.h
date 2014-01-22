@@ -14,6 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef mitkTestingMacros_h
+#define mitkTestingMacros_h
+
 #include <exception>
 #include <string>
 #include <iostream>
@@ -371,3 +374,5 @@ namespace mitk {
   args.push_back(arg2);                                        \
   MITK_PARAMETERIZED_TEST(TESTMETHOD, args)                    \
 }
+
+#endif

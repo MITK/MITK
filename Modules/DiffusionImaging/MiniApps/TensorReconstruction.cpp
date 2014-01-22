@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseDataIOFactory.h"
 #include "mitkDiffusionImage.h"
 #include "mitkBaseData.h"
-#include "mitkDiffusionCoreObjectFactory.h"
 
 #include <itkDiffusionTensor3DReconstructionImageFilter.h>
 #include <itkDiffusionTensor3D.h>
@@ -54,8 +53,6 @@ int TensorReconstruction(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
-
         MITK_INFO << "Loading image ...";
         const std::string s1="", s2="";
         std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );

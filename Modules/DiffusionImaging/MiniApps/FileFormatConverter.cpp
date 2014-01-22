@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkDiffusionImage.h>
 #include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkFiberTrackingObjectFactory.h>
 #include <mitkIOUtil.h>
 #include <mitkNrrdDiffusionImageWriter.h>
@@ -46,7 +45,6 @@ int FileFormatConverter(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
         RegisterFiberTrackingObjectFactory();
 
         MITK_INFO << "Loading " << inName;

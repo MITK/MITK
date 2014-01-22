@@ -34,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImage.h>
 #include <mitkQBallImage.h>
 #include <mitkBaseData.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkFiberTrackingObjectFactory.h>
 #include <mitkFiberBundleX.h>
 #include "ctkCommandLineParser.h"
@@ -72,7 +71,6 @@ int MultishellMethods(int argc, char* argv[])
 
   try
   {
-    RegisterDiffusionCoreObjectFactory();
     RegisterFiberTrackingObjectFactory();
 
     MITK_INFO << "Loading " << inName;

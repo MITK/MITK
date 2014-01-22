@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseData.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <metaCommand.h>
 #include "ctkCommandLineParser.h"
 #include <usAny.h>
@@ -51,7 +50,6 @@ int StartShConversion(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
 
         typedef itk::Image< float, 4 > OutImageType;
         typedef itk::Image< itk::Vector< float, (shOrder*shOrder + shOrder + 2)/2 + shOrder >, 3 > InputImageType;

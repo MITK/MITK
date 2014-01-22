@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkQBallImage.h>
 #include <mitkTensorImage.h>
 #include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkFiberTrackingObjectFactory.h>
 #include <mitkFiberBundleX.h>
 #include <itkGibbsTrackingFilter.h>
@@ -110,7 +109,6 @@ int GibbsTracking(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
         RegisterFiberTrackingObjectFactory();
 
         // instantiate gibbs tracker

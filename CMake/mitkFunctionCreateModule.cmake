@@ -55,6 +55,7 @@ endfunction()
 #! List of variables available after the function is called:
 #! - MODULE_NAME
 #! - MODULE_IS_ENABLED
+#! - MODULE_SUBPROJECTS
 #!
 #! \param MODULE_NAME_IN The name for the new module
 #! \param HEADERS_ONLY specify this if the modules just contains header files.
@@ -540,5 +541,6 @@ function(mitk_create_module MODULE_NAME_IN)
 
   set(MODULE_NAME ${MODULE_NAME} PARENT_SCOPE)
   set(MODULE_IS_ENABLED ${MODULE_IS_ENABLED} PARENT_SCOPE)
+  set(MODULE_SUBPROJECTS ${MODULE_SUBPROJECTS} PARENT_SCOPE)
 
 endfunction()

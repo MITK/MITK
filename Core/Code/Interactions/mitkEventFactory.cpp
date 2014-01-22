@@ -284,7 +284,11 @@ std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
   //  {
   //    event = InteractionKeyEvent::New(NULL, key, modifiers);
   //  }
-  else if (eventClass == "MOUSEWHEELEVENT")
+  else
+  {
+    MITK_WARN << "Event not recognized, discarding event of type " << event->GetNameOfClass();
+  }
+  if (eventClass == "MOUSEWHEELEVENT")
   {
     MouseWheelEvent* we = dynamic_cast<MouseWheelEvent*> (event);
     int delta = we->GetWheelDelta();
@@ -296,10 +300,6 @@ std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
     eventXML += InteractionEventConst::xmlParameterValue() + "\"";
     eventXML += ss.str();
     eventXML += "\"/>\n";
-  }
-  else
-  {
-    MITK_WARN << "Event not recognized, discarding event of type " << event->GetNameOfClass();
   }
   // closing tag:
   eventXML += "</" + InteractionEventConst::xmlTagEventVariant() +  ">";

@@ -21,5 +21,5 @@
 
 void mitk::EventRecorder::Notify(mitk::InteractionEvent *interactionEvent, bool /*isHandled*/)
 {
-  MITK_INFO << EventFactory::EventToXML(interactionEvent);
+  std::cout << EventFactory::EventToXML(interactionEvent) << "\n";
 }

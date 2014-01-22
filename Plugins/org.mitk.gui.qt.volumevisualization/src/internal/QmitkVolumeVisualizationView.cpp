@@ -338,3 +338,14 @@ void QmitkVolumeVisualizationView::SetFocus()
 
 }
 
+void QmitkVolumeVisualizationView::NodeRemoved(const mitk::DataNode* node)
+{
+  if(m_SelectedNode == node)
+  {
+    m_SelectedNode=0;
+    m_Controls->m_SelectedImageLabel->hide();
+    m_Controls->m_ErrorImageLabel->hide();
+    m_Controls->m_NoSelectedImageLabel->show();
+    UpdateInterface();
+  }
+}

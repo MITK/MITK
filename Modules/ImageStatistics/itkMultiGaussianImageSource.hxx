@@ -323,23 +323,13 @@ namespace itk
     double summand0, summand1, summand2, value, factor;
     for(unsigned int n = 0; n < m_NumberOfGaussians; ++n)
     {
-      //TODO
-      //summand0 = FunctionPhi((xMax - m_CenterX[n]  * m_Spacing[0]) / (m_SigmaX[n] * m_Spacing[0]) ) - FunctionPhi((xMin - m_CenterX[n]  * m_Spacing[0]) / (m_SigmaX[n] * m_Spacing[0]) );
-      //summand1 = FunctionPhi((yMax - m_CenterY[n] * m_Spacing[1]) / (m_SigmaY[n] * m_Spacing[1]) ) - FunctionPhi((yMin - m_CenterY[n] * m_Spacing[1]) / (m_SigmaY[n] * m_Spacing[1]) );
-      //summand2 = FunctionPhi((zMax - m_CenterZ[n] * m_Spacing[2]) / (m_SigmaZ[n] * m_Spacing[2]) ) - FunctionPhi((zMin - m_CenterZ[n] * m_Spacing[2]) / (m_SigmaZ[n] * m_Spacing[2]) );
       summand0 = FunctionPhi((xMax - m_CenterX[n]) / m_SigmaX[n] ) - FunctionPhi((xMin - m_CenterX[n]) / m_SigmaX[n] );
       summand1 = FunctionPhi((yMax - m_CenterY[n]) / m_SigmaY[n] ) - FunctionPhi((yMin - m_CenterY[n]) / m_SigmaY[n] );
       summand2 = FunctionPhi((zMax - m_CenterZ[n]) / m_SigmaZ[n] ) - FunctionPhi((zMin - m_CenterZ[n]) / m_SigmaZ[n] );
 
       value = summand0 * summand1 * summand2;
-      factor = (m_SigmaX[n] * m_SigmaY[n] * m_SigmaZ[n] ) * pow(2.0 * itk::Math::pi, 1.5 );   // *  /
-      //  ( ((xMax - m_CenterX[n]) / m_SigmaX[n] - (xMin - m_CenterX[n]) / m_SigmaX[n])
-      //  * ((yMax - m_CenterY[n]) / m_SigmaY[n] - (yMin - m_CenterY[n]) / m_SigmaY[n])
-      //  * ((zMax - m_CenterZ[n]) / m_SigmaZ[n] - (zMin - m_CenterZ[n]) / m_SigmaZ[n]));
-      // 1 / ((xMax - xMin) * (yMax - yMin) * (zMax - zMin) * pow(2.0 * itk::Math::pi, 1.5 ));// (m_SigmaX[n] * m_SigmaY[n] * m_SigmaZ[n] ) / ((xMax - xMin) * (yMax - yMin) * (zMax - zMin)); //* pow(2.0 * itk::Math::pi, 1.5 ));
+      factor = (m_SigmaX[n] * m_SigmaY[n] * m_SigmaZ[n] ) * pow(2.0 * itk::Math::pi, 1.5 );
       mean = mean + factor * value * m_Altitude[n];
-      // m_Volume = m_Volume + (xMax - xMin) * (yMax - yMin) * (zMax - zMin);
-
     }
     return mean;
   }
@@ -615,7 +605,7 @@ namespace itk
     double meanValueTemp;
     PointType midpoint;
     MapContainerPoints::ElementIdentifier cuboidNumber = m_Midpoints.Size();
-    SetNormalDistributionValues();
+   // SetNormalDistributionValues();
     double radius;
     //double xMin, xMax, yMin, yMax, zMin, zMax;
 
@@ -712,17 +702,17 @@ namespace itk
     yMax = y + m_Spacing[1] / 2.0;
     zMin = z - m_Spacing[2] / 2.0;
     zMax = z + m_Spacing[2] / 2.0;
-    for( unsigned int n =0; n < m_NumberOfGaussians; ++n )
+    for( unsigned int n = 0; n < m_NumberOfGaussians; ++n )
     {
-
-      summand0 = FunctionPhi((xMax - m_CenterX[n]) / m_SigmaX[n] ) - FunctionPhi((xMin - m_CenterX[n]) / m_SigmaX[n] );
-      summand1 = FunctionPhi((yMax - m_CenterY[n]) / m_SigmaY[n] ) - FunctionPhi((yMin - m_CenterY[n]) / m_SigmaY[n] );
-      summand2 = FunctionPhi((zMax - m_CenterZ[n]) / m_SigmaZ[n] ) - FunctionPhi((zMin - m_CenterZ[n]) / m_SigmaZ[n] );
+      summand0 = FunctionPhi( (xMax - m_CenterX[n]) / m_SigmaX[n] ) - FunctionPhi( (xMin - m_CenterX[n]) / m_SigmaX[n] );
+      summand1 = FunctionPhi( (yMax - m_CenterY[n]) / m_SigmaY[n] ) - FunctionPhi( (yMin - m_CenterY[n]) / m_SigmaY[n] );
+      summand2 = FunctionPhi( (zMax - m_CenterZ[n]) / m_SigmaZ[n] ) - FunctionPhi( (zMin - m_CenterZ[n]) / m_SigmaZ[n] );
       value = summand0 * summand1 * summand2;
-      factor = (m_SigmaX[n] * m_SigmaY[n] * m_SigmaZ[n] ) * pow(2.0 * itk::Math::pi, 1.5 );
+      factor = ( m_SigmaX[n] * m_SigmaY[n] * m_SigmaZ[n] ) * pow( 2.0 * itk::Math::pi, 1.5 );
       mean = mean + factor * value * m_Altitude[n];
     }
     value = mean / (m_Spacing[0] * m_Spacing[1] * m_Spacing[2] );
+
     /*
 
     //this calculate the value of the gaussian at the midpoint of the voxel:
@@ -739,6 +729,7 @@ namespace itk
     }
 
     */
+   // std::cout << "X: " << xMin << " " << x << " "<< xMax << "   Y: "<< yMin << " " << y << " " << yMax << " Z: "<< zMin << " "<< z << " " << zMax << "   value:    " << value << std::endl;
     return value;
   }
 
@@ -750,7 +741,7 @@ namespace itk
   {
     for(unsigned int i = 0; i < x.size();  ++i)
     {
-      //  NOT ?? the x,y,z are given in index coordinates -> multiply by the spacing aand save the global coordinate
+
       m_CenterX.push_back( x[i] );
       m_CenterY.push_back( y[i] );
       m_CenterZ.push_back( z[i] );
@@ -795,6 +786,7 @@ namespace itk
     image->Allocate();
     IteratorType imageIt(image, image->GetLargestPossibleRegion());
     PointType globalCoordinate;
+    this->SetNormalDistributionValues();
     for(imageIt.GoToBegin(); !imageIt.IsAtEnd(); ++imageIt)
     {
       valueReal = 0.0;

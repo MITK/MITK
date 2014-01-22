@@ -113,6 +113,19 @@ public:
   static std::string CreateTemporaryFile(std::ofstream& tmpStream, std::ios_base::openmode mode,
                                          const std::string& templateName = "XXXXXX",
                                          std::string path = std::string());
+  /**
+   * Create and open an empty temporary file.
+   *
+   * This method generates a unique temporary filename from \c templateName and creates
+   * this file.
+   *
+   * The file is created with read and write permissions for owner only.
+   *
+   * @return The filename of the created temporary file.
+   *
+   * @throw mitk::Exception if the temporary file could not be created.
+   */
+  static std::string CreateTemporaryFile();
 
   /**
    * Create a temporary directory.

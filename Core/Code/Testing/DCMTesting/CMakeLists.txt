@@ -30,29 +30,24 @@ MITK_CREATE_MODULE( mitkDCMTesting
   DEPENDS Mitk # Mitk.so
 )
 
-MITK_CHECK_MODULE(_RESULT mitkDCMTesting)
-if(_RESULT)
-  message(STATUS "mitkDCMTesting application won't be built. Missing: ${_RESULT}")
-else(_RESULT)
+mitk_check_module_dependencies(MODULES mitkDCMTesting MISSING_DEPENDENCIES_VAR _missing_deps)
 
-# add helpful applications
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+if(_missing_deps)
+  message(STATUS "mitkDCMTesting application won't be built. Missing: ${_missing_deps}")
+else(_missing_deps)
 
-# remove with newer MITK version
-MITK_USE_MODULE( mitkDCMTesting )
-include_directories(${ALL_INCLUDE_DIRECTORIES})
+  # add helpful applications
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-# dumps out image information
-add_executable(DumpDCMMitkImage DumpDCMMitkImage.cpp)
-#Newer code: mitk_use_modules(TARGET DumpDCMMitkImage MODULES mitkDCMTesting)
-target_link_libraries(DumpDCMMitkImage ${ALL_LIBRARIES})
+  # dumps out image information
+  add_executable(DumpDCMMitkImage DumpDCMMitkImage.cpp)
+  mitk_use_modules(TARGET DumpDCMMitkImage MODULES mitkDCMTesting)
 
-# compares dumped out image information against reference dump
-add_executable(VerifyDCMMitkImageDump VerifyDCMMitkImageDump.cpp)
-#Newer code: mitk_use_modules(TARGET VerifyDCMMitkImageDump MODULES mitkDCMTesting)
-target_link_libraries(VerifyDCMMitkImageDump ${ALL_LIBRARIES})
+  # compares dumped out image information against reference dump
+  add_executable(VerifyDCMMitkImageDump VerifyDCMMitkImageDump.cpp)
+  mitk_use_modules(TARGET VerifyDCMMitkImageDump MODULES mitkDCMTesting)
 
-add_subdirectory(Testing)
+  add_subdirectory(Testing)
 endif()
 
 endif()

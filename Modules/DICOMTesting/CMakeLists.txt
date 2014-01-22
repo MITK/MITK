@@ -17,24 +17,21 @@ MITK_CREATE_MODULE( DICOMTesting
   DEPENDS DICOMReader
 )
 
-MITK_CHECK_MODULE(_RESULT DICOMTesting)
-if(_RESULT)
-  message(STATUS "DICOMTesting application won't be built. Missing: ${_RESULT}")
-else(_RESULT)
+mitk_check_module_dependencies(MODULES DICOMTesting MISSING_DEPENDENCIES_VAR _missing_deps)
 
-# add helpful applications
-MITK_USE_MODULE( DICOMTesting )
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${ALL_INCLUDE_DIRECTORIES})
+if(_missing_deps)
+  message(STATUS "mitkDICOMTesting module helper applications won't be built. Missing: ${_missing_deps}")
+else(_missing_deps)
 
-# dumps out image information
-add_executable(DumpDICOMMitkImage DumpDICOMMitkImage.cpp)
-mitk_use_modules(TARGET DumpDICOMMitkImage MODULES mitkDICOMTesting)
+  # dumps out image information
+  add_executable(DumpDICOMMitkImage DumpDICOMMitkImage.cpp)
+  mitk_use_modules(TARGET DumpDICOMMitkImage MODULES DICOMTesting)
 
-# compares dumped out image information against reference dump
-add_executable(VerifyDICOMMitkImageDump VerifyDICOMMitkImageDump.cpp)
-mitk_use_modules(TARGET VerifyDICOMMitkImageDump MODULES mitkDICOMTesting)
+  # compares dumped out image information against reference dump
+  add_executable(VerifyDICOMMitkImageDump VerifyDICOMMitkImageDump.cpp)
+  mitk_use_modules(TARGET VerifyDICOMMitkImageDump MODULES DICOMTesting)
 
-add_subdirectory(Testing)
+  add_subdirectory(Testing)
 endif()
 
 endif()

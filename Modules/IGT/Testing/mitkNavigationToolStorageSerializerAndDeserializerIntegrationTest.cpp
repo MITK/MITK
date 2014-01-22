@@ -38,9 +38,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Poco/File.h>
 
 
-class mitkNavigationToolStorageSerializerAndDeserializerTestSuite : public mitk::TestFixture
+class mitkNavigationToolStorageSerializerAndDeserializerIntegrationTestSuite : public mitk::TestFixture
 {
-  CPPUNIT_TEST_SUITE(mitkNavigationToolStorageSerializerAndDeserializerTestSuite);
+  CPPUNIT_TEST_SUITE(mitkNavigationToolStorageSerializerAndDeserializerIntegrationTestSuite);
   MITK_TEST(TestInstantiationSerializer);
   MITK_TEST(TestInstantiationDeserializer);
   CPPUNIT_TEST_SUITE_END();
@@ -73,7 +73,7 @@ public:
   }
 
 };
-MITK_TEST_SUITE_REGISTRATION(mitkNavigationToolStorageSerializerAndDeserializer)
+MITK_TEST_SUITE_REGISTRATION(mitkNavigationToolStorageSerializerAndDeserializerIntegration)
 
 
 

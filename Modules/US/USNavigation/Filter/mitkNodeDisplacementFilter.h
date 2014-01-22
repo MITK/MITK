@@ -51,11 +51,19 @@ namespace mitk {
     itkNewMacro(Self);
 
     /**
-    * \brief Adds a note  to the filter, the position of which will then be continously update relatively to the selected input stream.
+    * \brief Adds a node to the filter.
+    * The position of which will then be continously update relatively to the selected input stream.
     *
     * The node should have a geometry and position set in the coordinate system of the selected input stream
     */
-    virtual void AddNode(  mitk::DataNode::Pointer node );
+    virtual void AddNode(mitk::DataNode::Pointer node);
+
+    /**
+     * \brief Removes a node from the filter.
+     * \param i index of the node, the index corresponds to the order in which the nodes where added by AddNode()
+     * \return true if a node with the given index was removed, false if the index was greater or equal the number of nodes in the filter
+     */
+    bool RemoveNode(unsigned int i);
 
     /**
     * \brief Returns the number of nodes that were added to this filter.

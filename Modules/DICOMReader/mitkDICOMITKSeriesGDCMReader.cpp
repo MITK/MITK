@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 //#define MBILOG_ENABLE_DEBUG
+//#define ENABLE_TIMING
 
 #include "mitkDICOMITKSeriesGDCMReader.h"
 #include "mitkITKDICOMSeriesReaderHelper.h"
@@ -262,19 +263,27 @@ mitk::DICOMITKSeriesGDCMReader
   return input; // to be implemented differently by sub-classes
 }
 
+#if defined(MBILOG_ENABLE_DEBUG) || defined (ENABLE_TIMING)
+  #define timeStart(part) timer.Start(part);
+  #define timeStop(part) timer.Stop(part);
+#else
+  #define timeStart(part)
+  #define timeStop(part)
+#endif
+
 void
 mitk::DICOMITKSeriesGDCMReader
 ::AnalyzeInputFiles()
 {
   itk::TimeProbesCollectorBase timer;
 
-  timer.Start("Reset");
+  timeStart("Reset");
   this->ClearOutputs();
-  timer.Stop("Reset");
+  timeStop("Reset");
 
   // prepare initial sorting (== list of input files)
   StringList inputFilenames = this->GetInputFiles();
-  timer.Start("Check appropriateness of input files");
+  timeStart("Check input for DCM");
   if ( inputFilenames.empty()
        ||
        !this->CanHandleFile( inputFilenames.front() ) // first
@@ -289,12 +298,12 @@ mitk::DICOMITKSeriesGDCMReader
     return;
   }
 
-  timer.Stop("Check appropriateness of input files");
+  timeStop("Check input for DCM");
 
   // scan files for sorting-relevant tags
   if (m_TagCache.IsNull())
   {
-    timer.Start("Tag scanning");
+    timeStart("Tag scanning");
     DICOMGDCMTagScanner::Pointer filescanner = DICOMGDCMTagScanner::New();
     m_TagCache = filescanner.GetPointer(); // keep alive and make accessible to sub-classes
 
@@ -305,7 +314,7 @@ mitk::DICOMITKSeriesGDCMReader
     filescanner->Scan();
     PopLocale();
 
-    timer.Stop("Tag scanning");
+    timeStop("Tag scanning");
   }
   else
   {
@@ -338,27 +347,32 @@ mitk::DICOMITKSeriesGDCMReader
 
   // sort and split blocks as configured
 
-  timer.Start("Sorting frames");
+  timeStart("Sorting frames");
   unsigned int sorterIndex = 0;
   for(SorterList::iterator sorterIter = m_Sorter.begin();
       sorterIter != m_Sorter.end();
       ++sorterIndex, ++sorterIter)
   {
-    m_SortingResultInProgress = this->InternalExecuteSortingStep(sorterIndex, *sorterIter, m_SortingResultInProgress, &timer);
+    std::stringstream ss; ss << "Sorting step " << sorterIndex;
+    timeStart( ss.str().c_str() );
+    m_SortingResultInProgress = this->InternalExecuteSortingStep(sorterIndex, *sorterIter, m_SortingResultInProgress);
+    timeStop( ss.str().c_str() );
   }
 
   // a last extra-sorting step: ensure equidistant slices
-  m_SortingResultInProgress = this->InternalExecuteSortingStep(sorterIndex++, m_EquiDistantBlocksSorter.GetPointer(), m_SortingResultInProgress, &timer);
+  timeStart( "EquiDistantBlocksSorter" );
+  m_SortingResultInProgress = this->InternalExecuteSortingStep(sorterIndex++, m_EquiDistantBlocksSorter.GetPointer(), m_SortingResultInProgress);
+  timeStop( "EquiDistantBlocksSorter" );
 
-  timer.Stop("Sorting frames");
+  timeStop("Sorting frames");
 
-  timer.Start("Condensing 3D blocks (3D+t or vector values)");
+  timeStart("Condensing 3D blocks");
   m_SortingResultInProgress = this->Condense3DBlocks( m_SortingResultInProgress );
-  timer.Stop("Condensing 3D blocks (3D+t or vector values)");
+  timeStop("Condensing 3D blocks");
 
   // provide final result as output
 
-  timer.Start("Output");
+  timeStart("Output");
   unsigned int o = this->GetNumberOfOutputs();
   this->SetNumberOfOutputs( o + m_SortingResultInProgress.size() ); // Condense3DBlocks may already have added outputs!
   for (SortingBlockList::iterator blockIter = m_SortingResultInProgress.begin();
@@ -389,9 +403,9 @@ mitk::DICOMITKSeriesGDCMReader
 
     this->SetOutput( o, block );
   }
-  timer.Stop("Output");
+  timeStop("Output");
 
-#ifdef MBILOG_ENABLE_DEBUG
+#if defined(MBILOG_ENABLE_DEBUG) || defined (ENABLE_TIMING)
   std::cout << "---------------------------------------------------------------" << std::endl;
   timer.Report( std::cout );
   std::cout << "---------------------------------------------------------------" << std::endl;
@@ -403,14 +417,14 @@ mitk::DICOMITKSeriesGDCMReader
 ::InternalExecuteSortingStep(
     unsigned int sortingStepIndex,
     DICOMDatasetSorter::Pointer sorter,
-    const SortingBlockList& input,
-    itk::TimeProbesCollectorBase* timer)
+    const SortingBlockList& input)
 {
   SortingBlockList nextStepSorting; // we should not modify our input list while processing it
   std::stringstream ss; ss << "Sorting step " << sortingStepIndex << " '";
+#if defined(MBILOG_ENABLE_DEBUG)
   sorter->PrintConfiguration(ss);
+#endif
   ss << "'";
-  timer->Start( ss.str().c_str() );
   nextStepSorting.clear();
 
   MITK_DEBUG << "================================================================================";
@@ -452,8 +466,6 @@ mitk::DICOMITKSeriesGDCMReader
       nextStepSorting.push_back( sortedGdcmInfoFrameList );
     }
   }
-
-  timer->Stop( ss.str().c_str() );
 
   return nextStepSorting;
 }

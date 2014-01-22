@@ -302,8 +302,7 @@ class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     SortingBlockList InternalExecuteSortingStep(
         unsigned int sortingStepIndex,
         DICOMDatasetSorter::Pointer sorter,
-        const SortingBlockList& input,
-        itk::TimeProbesCollectorBase* timer);
+        const SortingBlockList& input);
 
     /// \brief Loads the mitk::Image by means of an itk::ImageSeriesReader
     virtual bool LoadMitkImageForOutput(unsigned int o);

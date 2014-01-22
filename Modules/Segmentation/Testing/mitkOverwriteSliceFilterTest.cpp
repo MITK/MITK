@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGeometry3D.h>
 #include <mitkRotationOperation.h>
 #include <mitkInteractionConst.h>
+#include <mitkImagePixelReadAccessor.h>
 
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
@@ -88,6 +89,9 @@ int mitkOverwriteSliceFilterTest(int argc, char* argv[])
     mitk::Image::Pointer workingImage;
     CastToMitkImage(image, workingImage);
 
+    typedef mitk::ImagePixelReadAccessor< unsigned short, 3 > ReadAccessorType;
+    ReadAccessorType refImgReadAccessor( referenceImage );
+    ReadAccessorType workingImgReadAccessor( workingImage );
 
 
   /* ============= setup plane ============*/
@@ -138,7 +142,7 @@ int mitkOverwriteSliceFilterTest(int argc, char* argv[])
       id[1] = y;
       for (int z = 0; z < VolumeSize; ++z){
         id[2] = z;
-        areSame = referenceImage->GetPixelValueByIndex(id) == workingImage->GetPixelValueByIndex(id);
+        areSame = refImgReadAccessor.GetPixelByIndex( id ) == workingImgReadAccessor.GetPixelByIndex( id );
         if(!areSame)
           goto stop;
       }
@@ -186,7 +190,7 @@ stop:
       id[1] = yy;
       for ( zz = 0; zz < VolumeSize; ++zz){
         id[2] = zz;
-        areSame = referenceImage->GetPixelValueByIndex(id) == workingImage->GetPixelValueByIndex(id);
+        areSame = refImgReadAccessor.GetPixelByIndex( id ) == workingImgReadAccessor.GetPixelByIndex( id );
         if(!areSame)
           goto stop2;
       }

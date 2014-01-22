@@ -38,7 +38,8 @@ std::string
 mitk::DICOMGDCMTagScanner
 ::GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const
 {
-  // TODO inefficient. if (m_InputFrameList.contains(frame)) return frame->GetTagValueAsString(tag);
+  assert(frame);
+
   for(DICOMGDCMImageFrameList::const_iterator frameIter = m_ScanResult.begin();
       frameIter != m_ScanResult.end();
       ++frameIter)
@@ -52,15 +53,44 @@ mitk::DICOMGDCMTagScanner
 
   }
 
-  return "";
+  if ( m_ScannedTags.find(tag) != m_ScannedTags.end() )
+  {
+    if ( std::find( m_InputFilenames.begin(), m_InputFilenames.end(), frame->Filename ) != m_InputFilenames.end() )
+    {
+      // precondition of gdcm::Scanner::GetValue() fulfilled
+      return m_GDCMScanner.GetValue( frame->Filename.c_str(), gdcm::Tag( tag.GetGroup(), tag.GetElement() ) );
+    }
+    else
+    {
+      // callers are required to tell us about the filenames they are interested in
+      // this is a helpful reminder for them to inform us
+      std::stringstream errorstring;
+      errorstring << "Invalid call to DICOMGDCMTagScanner::GetTagValue( "
+        << "'" << frame->Filename << "', frame " << frame->FrameNo
+        << " ). Filename was never mentioned before!";
+      MITK_ERROR << errorstring.str();
+      throw std::invalid_argument(errorstring.str());
+    }
+  }
+  else
+  {
+    // callers are required to tell us about the tags they are interested in
+    // this is a helpful reminder for them to inform us
+    std::stringstream errorstring;
+    errorstring << "Invalid call to DICOMGDCMTagScanner::GetTagValue( ";
+    tag.Print(errorstring);
+    errorstring << " ). Tag was never mentioned before!";
+    MITK_ERROR << errorstring.str();
+    throw std::invalid_argument(errorstring.str());
+  }
 }
 
 void
 mitk::DICOMGDCMTagScanner
 ::AddTag(const DICOMTag& tag)
 {
-  // TODO check for duplicates?
-  m_GDCMScanner.AddTag( gdcm::Tag(tag.GetGroup(), tag.GetElement()) );
+  m_ScannedTags.insert(tag);
+  m_GDCMScanner.AddTag( gdcm::Tag(tag.GetGroup(), tag.GetElement()) ); // also a set, duplicate calls to AddTag don't hurt
 }
 
 void

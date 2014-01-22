@@ -313,8 +313,28 @@ mitk::DICOMITKSeriesGDCMReader
   }
 
   m_SortingResultInProgress.clear();
-  // TODO this should look better!
-  m_SortingResultInProgress.push_back( static_cast<DICOMGDCMTagScanner*>(m_TagCache.GetPointer())->GetFrameInfoList() );
+  // TODO We should remove the following cast
+  // DICOMImageFrameInfo would need to inherit DICOMDatasetAccess!
+  // - then the DICOMGDCMTagScanner class could create a DICOMGDCMImageFrameList internally
+  //   - and return it as a DICOMImageFrameList
+  // - like this, DICOMITKSeriesGDCMReader could use the DICOMImageFrameInfoList to feed its sorters
+  // - problem:
+  //   - DICOMImageFrameInfo is also part of DICOMImageBlockDescriptor, which is meant
+  //     to describe the scanner output, even after the reader (and its scanner) is deleted.
+  //   - if DICOMImageFrameInfo now inherits DICOMDatasetAccess, it would also need to implement
+  //     GetTagValueAsString().
+  //     - so this could all work if we implement a default response in DICOMImageFrameInfo::GetTagValueAsString() (like in GetFilenameIfAvailable)
+  //       and overwrite it in DICOMGDCMImageFrameInfo, which also knows about a specific GDCM scanner result
+  //       (which again COULD (no need to?) be hidden as a point to a DICOMGDCMTagScanner class)
+  //
+  if ( DICOMGDCMTagScanner* tagCache = dynamic_cast<DICOMGDCMTagScanner*>(m_TagCache.GetPointer()) )
+  {
+    m_SortingResultInProgress.push_back( tagCache->GetFrameInfoList() );
+  }
+  else
+  {
+    throw std::logic_error("Bad implementation error: DICOMITKSeriesGDCMReader now unable to find dataset/tag information for its input.");
+  }
 
   // sort and split blocks as configured
 

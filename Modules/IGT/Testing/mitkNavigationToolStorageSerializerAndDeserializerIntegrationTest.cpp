@@ -77,35 +77,6 @@ MITK_TEST_SUITE_REGISTRATION(mitkNavigationToolStorageSerializerAndDeserializerI
 
 
 
-
-
-//static void TestWriteSimpleToolStorage()
-//{
-//  //create Tool Storage
-//  mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
-//  //first tool
-//  mitk::NavigationTool::Pointer myTool1 = mitk::NavigationTool::New();
-//  myTool1->SetIdentifier("001");
-//  myStorage->AddTool(myTool1);
-//  //second tool
-//  mitk::NavigationTool::Pointer myTool2 = mitk::NavigationTool::New();
-//  myTool2->SetIdentifier("002");
-//  myStorage->AddTool(myTool2);
-//  //third tool
-//  mitk::NavigationTool::Pointer myTool3 = mitk::NavigationTool::New();
-//  myTool3->SetIdentifier("003");
-//  myStorage->AddTool(myTool3);
-//
-//  //create Serializer
-//  mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
-//
-//  //create filename
-//  std::string filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorage.storage";
-//
-//  //test serialization
-//  bool success = mySerializer->Serialize(filename,myStorage);
-//  MITK_TEST_CONDITION_REQUIRED(success,"Testing serialization of simple tool storage");
-//}
 //
 //static void TestWriteAndReadSimpleToolStorageWithToolLandmarks()
 //{
@@ -168,7 +139,7 @@ MITK_TEST_SUITE_REGISTRATION(mitkNavigationToolStorageSerializerAndDeserializerI
 //    (float(readToolTipRot.r()) == float(0.4))),
 //    "..Testing if tool tip orientation has been stored and loaded correctly.");
 //}
-//
+//Datei in MITK-Data: SimpleIGTStorage.storage
 //static void TestReadSimpleToolStorage()
 //{
 //  mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
@@ -189,79 +160,8 @@ MITK_TEST_SUITE_REGISTRATION(mitkNavigationToolStorageSerializerAndDeserializerI
 //  MITK_TEST_CONDITION_REQUIRED(foundtool1&&foundtool2&&foundtool3," ..Testing if identifiers of tools where saved / loaded successfully");
 //}
 //
-//static void CleanUp()
-//{
-//  try
-//  {
-//    std::remove((std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorage.storage").c_str());
-//    std::remove((std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorageToolReg.storage").c_str());
-//    std::remove((std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorage2.storage").c_str());
-//  }
-//  catch(...)
-//  {
-//    MITK_INFO << "Warning: Error occured when deleting test file!";
-//  }
-//}
 //
-//static void TestWriteComplexToolStorage()
-//{
-//  //create first tool
-//  mitk::Surface::Pointer testSurface;
-//  std::string toolFileName(MITK_IGT_DATA_DIR);
-//  toolFileName.append("/ClaronTool");
-//  mitk::NavigationTool::Pointer myNavigationTool = mitk::NavigationTool::New();
-//  myNavigationTool->SetCalibrationFile(toolFileName);
-//
-//  mitk::DataNode::Pointer myNode = mitk::DataNode::New();
-//  myNode->SetName("ClaronTool");
-//
-//  //load an stl File
-//  std::string pathToClaronTool(MITK_IGT_DATA_DIR);
-//  pathToClaronTool.append("/ClaronTool.stl");
-//  testSurface = mitk::IOUtil::LoadSurface(pathToClaronTool);
-//  myNode->SetData(testSurface);
-//
-//  myNavigationTool->SetDataNode(myNode);
-//  myNavigationTool->SetIdentifier("ClaronTool#1");
-//  myNavigationTool->SetSerialNumber("0815");
-//  myNavigationTool->SetTrackingDeviceType(mitk::ClaronMicron);
-//  myNavigationTool->SetType(mitk::NavigationTool::Fiducial);
-//
-//  //create second tool
-//  mitk::NavigationTool::Pointer myNavigationTool2 = mitk::NavigationTool::New();
-//  mitk::Surface::Pointer testSurface2;
-//
-//  mitk::DataNode::Pointer myNode2 = mitk::DataNode::New();
-//  myNode2->SetName("AuroraTool");
-//
-//  //load an stl File
-//  std::string pathToEMTool(MITK_IGT_DATA_DIR);
-//  pathToEMTool.append("/EMTool.stl");
-//  testSurface2 = mitk::IOUtil::LoadSurface(pathToEMTool);
-//  myNode2->SetData(testSurface2);
-//
-//  myNavigationTool2->SetDataNode(myNode2);
-//  myNavigationTool2->SetIdentifier("AuroraTool#1");
-//  myNavigationTool2->SetSerialNumber("0816");
-//  myNavigationTool2->SetTrackingDeviceType(mitk::NDIAurora);
-//  myNavigationTool2->SetType(mitk::NavigationTool::Instrument);
-//
-//  //create navigation tool storage
-//  mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
-//  myStorage->AddTool(myNavigationTool);
-//  myStorage->AddTool(myNavigationTool2);
-//
-//  //create Serializer
-//  mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
-//
-//  //create filename
-//  std::string filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorage2.storage";
-//
-//  //test serialization
-//  bool success = mySerializer->Serialize(filename,myStorage);
-//  MITK_TEST_CONDITION_REQUIRED(success,"Testing serialization of complex tool storage");
-//}
-//
+//Datei in MITK-Data: ComplexIGTStorage.storage
 //static void TestReadComplexToolStorage()
 //{
 //  mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!

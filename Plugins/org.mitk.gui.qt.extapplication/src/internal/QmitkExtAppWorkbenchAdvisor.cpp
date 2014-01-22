@@ -49,7 +49,7 @@ QmitkExtAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   excludeViews.push_back("org.mitk.views.modules");
   advisor->SetViewExcludeList(excludeViews);
 
-  advisor->SetWindowIcon(":/QmitkExtApplication/icon_research.xpm");
+  advisor->SetWindowIcon(":/org.mitk.gui.qt.extapplication/../../../mitk.ico");
   return advisor;
   //return new QmitkExtWorkbenchWindowAdvisor(this, configurer);
 }

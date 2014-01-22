@@ -71,7 +71,8 @@ public:
                    int number);
 
 
-  void PlotFiberBundles(TractContainerType tracts, mitk::Image* img, bool avg=false);
+  template <typename T>
+  void PlotFiberBundles(const mitk::PixelType, TractContainerType tracts, mitk::Image* img, bool avg=false);
 
 
   /* \brief Sets the projections of the individual subjects */

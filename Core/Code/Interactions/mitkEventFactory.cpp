@@ -312,7 +312,6 @@ std::string mitk::EventFactory::GetButtonState(mitk::InteractionEvent *event)
   std::string eventClass = event->GetNameOfClass();
   std::transform(eventClass.begin(), eventClass.end(), eventClass.begin(), ::toupper);
 
-  MITK_INFO << eventClass;
   std::string strButtonState = "";
   if (eventClass == "MOUSEPRESSEVENT")
   {
